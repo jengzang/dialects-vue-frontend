@@ -22,7 +22,7 @@
             @change="handleFileSelect"
             style="display: none"
           />
-          <div class="upload-icon">📄</div>
+          <div class="upload-icon"><InlineIcon icon="📄" /></div>
           <h3 class="upload-title">{{ t('tools.jyut2ipa.upload.title') }}</h3>
           <p class="upload-hint">{{ t('tools.jyut2ipa.upload.hint') }}</p>
         </div>
@@ -54,7 +54,7 @@
           <p v-if="jyutImportSummary" class="info-text info-text--summary">{{ jyutImportSummary }}</p>
 
           <div class="config-card" @click="showConfigModal = true">
-            <div class="config-icon">⚙️</div>
+            <div class="config-icon"><InlineIcon icon="⚙️" /></div>
             <div class="config-content">
               <div class="config-title">{{ t('tools.jyut2ipa.configCard.title') }}</div>
               <div class="config-desc">{{ t('tools.jyut2ipa.configCard.desc') }}</div>
@@ -95,7 +95,7 @@
       </div>
 
       <div class="complete-area" v-if="completed">
-        <div class="complete-icon">✅</div>
+        <div class="complete-icon"><InlineIcon icon="✅" /></div>
         <h3 class="complete-title">{{ t('tools.jyut2ipa.complete.title') }}</h3>
         <p class="complete-text">{{ t('tools.jyut2ipa.complete.text') }}</p>
 
@@ -116,11 +116,11 @@
 
         <div class="action-buttons">
           <button class="main-glass-button" data-variant="primary" data-size="large" @click="downloadResult">
-            <span class="icon">⬇️</span>
+            <span class="icon"><InlineIcon icon="⬇️" /></span>
             <span>{{ t('tools.jyut2ipa.actions.downloadResult') }}</span>
           </button>
           <button class="main-glass-button" data-variant="secondary" @click="reset">
-            <span class="icon">🔄</span>
+            <span class="icon"><InlineIcon icon="🔄" /></span>
             <span>{{ t('tools.jyut2ipa.actions.resetTask') }}</span>
           </button>
         </div>
@@ -167,7 +167,7 @@
       <template #header>
         <div class="jyut2ipa-config-header">
           <div class="header-left">
-            <h3 class="jyut2ipa-config-title">⚙️ {{ t('tools.jyut2ipa.modal.title') }}</h3>
+            <h3 class="jyut2ipa-config-title"><InlineIcon icon="⚙️" />{{ t('tools.jyut2ipa.modal.title') }}</h3>
             <div class="header-stats">
               <span class="stat-inline">
                 {{ t('tools.jyut2ipa.modal.totalRules') }}
@@ -188,23 +188,17 @@
               class="icon-btn"
               @click="exportConfig"
               :title="t('tools.jyut2ipa.modal.exportTitle')"
-            >
-              📤
-            </button>
+            ><InlineIcon icon="📤" /></button>
             <button
               class="icon-btn"
               @click="importConfig"
               :title="t('tools.jyut2ipa.modal.importTitle')"
-            >
-              📥
-            </button>
+            ><InlineIcon icon="📥" /></button>
             <button
               class="close-btn close-btn-lg close-btn-inline"
               :title="t('tools.common.close')"
               @click="showConfigModal = false"
-            >
-              ✕
-            </button>
+            ><InlineIcon icon="✕" /></button>
           </div>
         </div>
       </template>
@@ -274,26 +268,21 @@
                     class="btn-delete"
                     @click="deleteRule(rule)"
                     :title="t('tools.common.delete')"
-                  >
-                    🗑️
-                  </button>
+                  ><InlineIcon icon="🗑️" /></button>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <button class="btn-add-rule" @click="addNewRule">
-          ➕ {{ t('tools.jyut2ipa.actions.addRule') }}
+        <button class="btn-add-rule" @click="addNewRule"><InlineIcon icon="➕" />{{ t('tools.jyut2ipa.actions.addRule') }}
         </button>
       </div>
 
       <template #footer>
-          <button class="main-glass-button" data-variant="secondary" @click="resetConfigConfirm">
-            🔄 {{ t('tools.jyut2ipa.actions.resetDefault') }}
+          <button class="main-glass-button" data-variant="secondary" @click="resetConfigConfirm"><InlineIcon icon="🔄" />{{ t('tools.jyut2ipa.actions.resetDefault') }}
           </button>
-          <button class="main-glass-button" data-variant="primary" @click="saveConfig">
-            💾 {{ t('tools.jyut2ipa.actions.saveConfig') }}
+          <button class="main-glass-button" data-variant="primary" @click="saveConfig"><InlineIcon icon="💾" />{{ t('tools.jyut2ipa.actions.saveConfig') }}
           </button>
       </template>
     </AppModal>
@@ -309,6 +298,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
@@ -1374,7 +1364,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   background: var(--glass-80);
   border: 1px solid rgba(var(--color-primary-rgb), 0.15);
   border-radius: var(--radius-sm);
-  font-family: 'Courier New', monospace;
+  font-family: var(--font-mono);
   font-size: 13px;
   transition: all 0.2s ease;
   color: var(--color-primary-hover);

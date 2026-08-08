@@ -18,12 +18,11 @@
             type="text"
             class="search-input vml-char-input"
             placeholder="搜尋村名..."
-            @input="handleSearchInput"
+            @keyup.enter="handleSearch"
           />
         </div>
         <div class="vml-control-actions">
-          <button class="search-button solid-button" @click="handleSearch">
-            🔍 搜索
+          <button class="search-button solid-button" @click="handleSearch"><InlineIcon icon="🔍" />搜索
           </button>
         </div>
       </div>
@@ -67,8 +66,7 @@
         </div>
 
         <div class="vml-control-actions">
-          <button class="clear-filters-button" @click="clearFilters" v-if="hasFilters">
-            ✕ 清除篩選
+          <button class="clear-filters-button" @click="clearFilters" v-if="hasFilters"><InlineIcon icon="✕" />清除篩選
           </button>
         </div>
       </div>
@@ -77,6 +75,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed } from 'vue'
 import { villagesMLStore } from '@/VillagesML/store/villagesMLStore.js'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
@@ -89,8 +88,6 @@ const emit = defineEmits(['search'])
 const localKeyword = ref(villagesMLStore.searchKeyword)
 const localFilters = ref({ ...villagesMLStore.searchFilters })
 const hasCounties = ref(true)  // 标记当前城市是否有区县
-
-let searchTimeout = null
 
 // Computed
 const hasFilters = computed(() => {
@@ -120,13 +117,6 @@ const townshipParent = computed(() => {
 })
 
 // Methods
-const handleSearchInput = () => {
-  clearTimeout(searchTimeout)
-  searchTimeout = setTimeout(() => {
-    handleSearch()
-  }, 300)
-}
-
 const handleSearch = () => {
   // console.log('[SearchPanel] handleSearch called with filters:', localFilters.value)
   villagesMLStore.searchKeyword = localKeyword.value

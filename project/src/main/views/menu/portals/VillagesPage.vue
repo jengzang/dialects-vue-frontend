@@ -3,8 +3,18 @@
     <h2 class="page-title">{{ $t('villages.title') }}</h2>
 
     <div class="villages-grid">
+      <button class="entry-button" @click="handleToponyms">
+        <div class="entry-button__icon"><InlineIcon icon="📍" /></div>
+        <div class="entry-button__name">
+          {{ $t('villages.toponyms.name') }}
+        </div>
+        <div class="entry-button__desc">
+          {{ $t('villages.toponyms.desc') }}
+        </div>
+      </button>
+
       <button class="entry-button" @click="handleGdVillages">
-        <div class="entry-button__icon">🏘️</div>
+        <div class="entry-button__icon"><InlineIcon icon="🏘️" /></div>
         <div class="entry-button__name">
           {{ $t('villages.gdVillages.name') }}
         </div>
@@ -14,7 +24,7 @@
       </button>
 
       <button class="entry-button" @click="handleVillagesML">
-        <div class="entry-button__icon">🤖</div>
+        <div class="entry-button__icon"><InlineIcon icon="🤖" /></div>
         <div class="entry-button__name">
           {{ $t('villages.villagesML.name') }}
         </div>
@@ -24,7 +34,7 @@
       </button>
 
       <button class="entry-button" @click="handleGdVillagesTable">
-        <div class="entry-button__icon">📈</div>
+        <div class="entry-button__icon"><InlineIcon icon="📊" /></div>
         <div class="entry-button__name">
           {{ $t('villages.gdVillagesTable.name') }}
         </div>
@@ -34,7 +44,7 @@
       </button>
 
       <button class="entry-button" @click="handleYcVillages">
-        <div class="entry-button__icon">🏠</div>
+        <div class="entry-button__icon"><InlineIcon icon="🌾" /></div>
         <div class="entry-button__name">
           {{ $t('villages.ycVillages.name') }}
         </div>
@@ -48,7 +58,7 @@
         class="entry-button"
         @click="handleAllVillages"
       >
-        <div class="entry-button__icon">📋</div>
+        <div class="entry-button__icon"><InlineIcon icon="📋" /></div>
         <div class="entry-button__name">
           {{ $t('villages.allVillages.name') }}
         </div>
@@ -61,12 +71,17 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { userStore } from '@/main/store/store.js'
 
 const router = useRouter()
 const route = useRoute()
+
+const handleToponyms = () => {
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/toponyms'))
+};
 
 const handleGdVillagesTable = () => {
   router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/table'))
@@ -90,41 +105,17 @@ const handleAllVillages = () => {
 </script>
 
 <style scoped lang="scss">
+@use './portal-page' as *;
 
 .villages-page {
-  min-width: 80dvw;
-  min-height: 70dvh;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  @include portal-page;
 }
 
 .page-title {
-  margin: 0 0 40px;
-  color: var(--text-deep);
-  font-size: 28px;
-  font-weight: 700;
-  text-align: center;
+  @include portal-page-title;
 }
 
 .villages-grid {
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 24px;
-}
-
-@media (max-aspect-ratio: 1 / 1) {
-  .page-title {
-    margin-bottom: 15px;
-    font-size: 24px;
-  }
-
-  .villages-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
+  @include portal-grid;
 }
 </style>

@@ -42,6 +42,7 @@
         @goToUserData="goToUserData"
         @goToUserRegions="goToUserRegions"
         @goToModifyProfile="setMode('modifyProfile')"
+        @goToSettings="goToSettings"
         @logout="logout"
         @goToAdminPanel="goToAdminPanel"
         @goToTableManager="goToTableManager"
@@ -456,6 +457,11 @@ const goToUserRegions = () => {
     path: buildLocalePath(resolveRouteLocale(route), '/auth/regions'),
     query: { username: user.value.username }
   })
+}
+
+const goToSettings = () => {
+  router.push(buildLocalePath(resolveRouteLocale(route), '/menu/settings'))
+  showSuccess(t('navigation.submenu.about.setting'))
 }
 
 const showBenefitsPopup = () => {

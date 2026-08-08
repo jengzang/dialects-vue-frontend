@@ -8,6 +8,18 @@
     "logoAlt": "Dialect Pronunciation Atlas",
     "decorationAlt": "Blue ring"
   },
+  "showcase": {
+    "nav": "Product showcase",
+    "switchTo": "Switch to",
+    "yinxi": { "title": "Phonological System", "action": "View System" },
+    "zhonggu": { "title": "Query Map", "action": "View Map" },
+    "result": { "title": "Query Results", "action": "View Results" },
+    "villages": { "title": "Guangdong Villages", "action": "Browse" },
+    "compare": { "title": "Dialect Comparison", "action": "Compare" },
+    "gis": { "title": "GIS Drawing", "action": "Start Drawing" },
+    "evolution": { "title": "Sound Evolution", "action": "View Evolution" },
+    "photiccompare": { "title": "Phonetic Comparison", "action": "View Sankey" }
+  },
   "features": {
     "sectionTitle": "Core Features",
     "query": {
@@ -54,6 +66,7 @@
     "villages": {
       "title": "Natural Village Data",
       "desc": "Village-name analysis and dialect mapping",
+      "toponyms": "Village Toponym Distribution - Explore where natural-village place names cluster by character or name fragment",
       "gdVillages": "Guangdong Natural Villages - Browse the Guangdong natural-village hierarchy",
       "villagesML": "Machine Learning - Analyze natural-village names with machine learning",
       "gdVillagesTable": "Guangdong Village Table - Detailed village data for Guangdong",

@@ -21,7 +21,7 @@
   </div>
 
   <!-- 右下角功能按钮组 -->
-  <div class="floating-buttons">
+  <div class="floating-buttons" :class="`position-${floatButtonsPosition}`">
     <!-- 返回首页按钮 -->
     <button
       class="float-btn menu-btn"
@@ -34,12 +34,12 @@
 
     <!-- 打开侧边栏按钮 - 只在非首页时显示 -->
     <button
-      v-if="!isHomePage"
+      v-if="showHomeButton && !isHomePage"
       class="float-btn home-btn"
       @click="goToHome"
       :title="t('navigation.actions.backHome')"
     >
-      🏠
+      <InlineIcon icon="🏠" />
     </button>
   </div>
 </template>
@@ -48,6 +48,7 @@
 import { computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { userStore } from '@/main/store/store.js';
 import NavAvatar from '@/components/bar/NavAvatar.vue';
@@ -65,6 +66,17 @@ const props = defineProps({
     type: String,
     default: 'top-right',
     validator: (value) => ['top-right', 'bottom-left'].includes(value)
+  },
+  // 是否显示返回首页按钮，默认在非首页时显示
+  showHomeButton: {
+    type: Boolean,
+    default: true
+  },
+  // 浮动按钮组位置: 'bottom-right' | 'top-left'
+  floatButtonsPosition: {
+    type: String,
+    default: 'bottom-right',
+    validator: (value) => ['bottom-right', 'top-left'].includes(value)
   }
 });
 
@@ -175,10 +187,12 @@ $transition-base: 0.3s ease;
     padding: 0 10px;
     border-radius: 22px;
 
-    &.position-top-right,
+    &.position-top-right {
+      top: $mobile-offset;
+      right: $mobile-offset;
+    }
+
     &.position-bottom-left {
-      top: auto;
-      right: auto;
       bottom: $mobile-offset;
       left: $mobile-offset;
     }
@@ -203,15 +217,27 @@ $transition-base: 0.3s ease;
 /* 右下角功能按钮组 */
 .floating-buttons {
   position: fixed;
-  right: 30px;
-  bottom: 30px;
+  right: $desktop-offset;
+  bottom: $desktop-offset;
   z-index: 998;
   @include flex-col;
   gap: 12px;
 
+  &.position-top-left {
+    right: auto;
+    left: $desktop-offset;
+    bottom: auto;
+    top: $desktop-offset;
+
+    @media (max-aspect-ratio: 1/1) {
+      left: $mobile-offset;
+      top: $mobile-offset;
+    }
+  }
+
   @media (max-aspect-ratio: 1/1) {
-    right: 20px;
-    bottom: 20px;
+    right: $mobile-offset;
+    bottom: $mobile-offset;
     gap: 10px;
   }
 }
@@ -277,10 +303,12 @@ $transition-base: 0.3s ease;
     width: $mobile-auth-size;
     height: $mobile-auth-size;
 
-    &.position-top-right,
+    &.position-top-right {
+      top: $mobile-offset;
+      right: $mobile-offset;
+    }
+
     &.position-bottom-left {
-      top: auto;
-      right: auto;
       bottom: $mobile-offset;
       left: $mobile-offset;
     }

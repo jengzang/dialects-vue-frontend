@@ -13,8 +13,8 @@
           </div>
 
           <div class="button-row vml-control-actions">
-            <button class="action-btn" @click="resetView">🎯 復位</button>
-            <button class="action-btn fullscreen-btn" @click="toggleFullScreen">⛶ 全屏</button>
+            <button class="action-btn" @click="resetView"><InlineIcon icon="🎯" />復位</button>
+            <button class="action-btn fullscreen-btn" @click="toggleFullScreen"><InlineIcon icon="⛶" />全屏</button>
           </div>
         </div>
 
@@ -26,14 +26,14 @@
       </div>
 
       <!-- 全屏退出按鈕 -->
-      <button v-if="isFullScreen" class="exit-fullscreen-btn" @click="toggleFullScreen">
-        ✕ 退出全屏
+      <button v-if="isFullScreen" class="exit-fullscreen-btn" @click="toggleFullScreen"><InlineIcon icon="✕" />退出全屏
       </button>
     </div>
   </Teleport>
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, onMounted, onBeforeUnmount, shallowRef, nextTick, watch, computed } from 'vue'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
@@ -254,20 +254,20 @@ const showPopup = (feature, lngLat) => {
 
   if (props.type === 'hotspot') {
     html += `
-      <h4 style="margin: 0 0 8px 0;">🔴 熱點 #${props.hotspot_id}</h4>
+      <h4 style="margin: 0 0 8px 0;"><InlineIcon icon="🔴" />熱點 #${props.hotspot_id}</h4>
       <p style="margin: 4px 0;"><strong>半徑:</strong> ${props.radius_km?.toFixed(2)} km</p>
       <p style="margin: 4px 0;"><strong>村莊數:</strong> ${props.village_count}</p>
       <p style="margin: 4px 0;"><strong>密度:</strong> ${props.density?.toFixed(2)}</p>
     `
   } else if (props.type === 'cluster') {
     html += `
-      <h4 style="margin: 0 0 8px 0;">🔵 聚類 #${props.cluster_id}</h4>
+      <h4 style="margin: 0 0 8px 0;"><InlineIcon icon="🔵" />聚類 #${props.cluster_id}</h4>
       <p style="margin: 4px 0;"><strong>大小:</strong> ${props.cluster_size} 點</p>
       <p style="margin: 4px 0;"><strong>平均距離:</strong> ${props.avg_distance_km?.toFixed(2)} km</p>
     `
   } else if (props.type === 'integration') {
     html += `
-      <h4 style="margin: 0 0 8px 0;">🟣 空間整合: ${props.character}</h4>
+      <h4 style="margin: 0 0 8px 0;"><InlineIcon icon="🟣" />空間整合: ${props.character}</h4>
       <p style="margin: 4px 0;"><strong>聚類 ID:</strong> ${props.cluster_id}</p>
       <p style="margin: 4px 0;"><strong>聚類大小:</strong> ${props.cluster_size} 村</p>
       <p style="margin: 4px 0;"><strong>含該字村數:</strong> ${props.n_villages_with_char}</p>
@@ -277,19 +277,19 @@ const showPopup = (feature, lngLat) => {
       <p style="margin: 4px 0;"><strong>空間一致性:</strong> ${props.spatial_coherence?.toFixed(3) || 'N/A'}</p>
       <p style="margin: 4px 0;"><strong>主要城市:</strong> ${props.dominant_city || 'N/A'}</p>
       <p style="margin: 4px 0;"><strong>主要區縣:</strong> ${props.dominant_county || 'N/A'}</p>
-      ${props.is_significant ? '<p style="margin: 4px 0; color: #ffd700; font-weight: bold;">✨ 統計顯著</p>' : ''}
+      ${props.is_significant ? '<p style="margin: 4px 0; color: #ffd700; font-weight: bold;"><InlineIcon icon="✨" />統計顯著</p>' : ''}
       ${props.avg_p_value ? `<p style="margin: 4px 0;"><strong>P值:</strong> ${props.avg_p_value?.toFixed(4)}</p>` : ''}
     `
   } else if (props.type === 'village') {
     html += `
-      <h4 style="margin: 0 0 8px 0;">🏘️ ${props.village_name}</h4>
+      <h4 style="margin: 0 0 8px 0;"><InlineIcon icon="🏘️" />${props.village_name}</h4>
       <p style="margin: 4px 0;"><strong>城市:</strong> ${props.city || 'N/A'}</p>
       <p style="margin: 4px 0;"><strong>區縣:</strong> ${props.county || 'N/A'}</p>
       <p style="margin: 4px 0;"><strong>鄉鎮:</strong> ${props.township || 'N/A'}</p>
     `
   } else if (props.type === 'cluster-center') {
     html += `
-      <h4 style="margin: 0 0 8px 0;">🎯 聚類中心 #${props.cluster_id}</h4>
+      <h4 style="margin: 0 0 8px 0;"><InlineIcon icon="🎯" />聚類中心 #${props.cluster_id}</h4>
       <p style="margin: 4px 0;"><strong>聚類大小:</strong> ${props.cluster_size} 村</p>
       <p style="margin: 4px 0;"><strong>平均距離:</strong> ${props.avg_distance_km?.toFixed(2)} km</p>
       <p style="margin: 4px 0;"><strong>空間一致性:</strong> ${props.spatial_coherence?.toFixed(3)}</p>
@@ -299,7 +299,7 @@ const showPopup = (feature, lngLat) => {
     `
   } else if (props.type === 'ngram') {
     html += `
-      <h4 style="margin: 0 0 8px 0;">🟢 N-gram: ${props.ngram}</h4>
+      <h4 style="margin: 0 0 8px 0;"><InlineIcon icon="🟢" />N-gram: ${props.ngram}</h4>
       <p style="margin: 4px 0;"><strong>區域:</strong> ${props.region_name}</p>
       ${props.city ? `<p style="margin: 4px 0;"><strong>城市:</strong> ${props.city}</p>` : ''}
       ${props.county ? `<p style="margin: 4px 0;"><strong>區縣:</strong> ${props.county}</p>` : ''}
@@ -311,7 +311,7 @@ const showPopup = (feature, lngLat) => {
     `
   } else if (props.type === 'character') {
     html += `
-      <h4 style="margin: 0 0 8px 0;">🟡 字符: ${props.char}</h4>
+      <h4 style="margin: 0 0 8px 0;"><InlineIcon icon="🟡" />字符: ${props.char}</h4>
       <p style="margin: 4px 0;"><strong>區域:</strong> ${props.region_name}</p>
       ${props.city ? `<p style="margin: 4px 0;"><strong>城市:</strong> ${props.city}</p>` : ''}
       ${props.county ? `<p style="margin: 4px 0;"><strong>區縣:</strong> ${props.county}</p>` : ''}

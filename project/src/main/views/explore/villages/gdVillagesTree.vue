@@ -4,13 +4,11 @@
     <div class="header-section">
       <div class="title-row">
         <h2 style="margin: 0;">{{ t('villages.pages.gdTree.title') }}</h2>
-<!--        <button class="village-link-btn" @click="goToYCVillages">-->
-<!--          <span role="img" aria-label="ycVillages">🏠</span> 陽春自然村-->
-<!--        </button>-->
+        <span class="cross-link" @click="goToGdTable">{{ t('villages.pages.gdTable.title') }} →</span>
       </div>
       <!-- <p class="subtitle">{{ t('villages.pages.gdTree.subtitle') }}</p> -->
       <div class="search-wrapper">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon"><InlineIcon icon="🔍" /></span>
         <input
             type="text"
             v-model="searchQuery"
@@ -30,7 +28,7 @@
 
       <!-- Initial Error State -->
       <div v-else-if="initialLoadError" class="initial-state error-state">
-        <div class="error-icon">⚠️</div>
+        <div class="error-icon"><InlineIcon icon="⚠️" /></div>
         <p class="error-message">{{ initialLoadError }}</p>
         <button @click="loadInitialCities" class="retry-btn">
           {{ t('villages.pages.gdTree.retry') }}
@@ -65,8 +63,7 @@
                     @click.stop="handleCityMapClick(city)"
                     title="顯示全市村落地圖"
                 >🌍</button>
-                <div class="loaded-badge">
-                  ✓ {{ t('villages.pages.gdTree.loaded') }}
+                <div class="loaded-badge"><InlineIcon icon="✓" />{{ t('villages.pages.gdTree.loaded') }}
                 </div>
               </template>
             </div>
@@ -114,6 +111,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
@@ -561,6 +559,10 @@ const handleCityMapClick = (city) => {
 onMounted(() => {
   loadInitialCities();
 });
+
+const goToGdTable = () => {
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/table'));
+};
 </script>
 
 
@@ -618,6 +620,20 @@ $transition-base: 0.3s;
     gap: 5px !important;
     font-size: 14px;
     white-space: nowrap;
+  }
+}
+
+.cross-link {
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.7;
   }
 }
 

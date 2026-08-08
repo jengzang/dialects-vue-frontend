@@ -81,6 +81,7 @@ function normalizeCoord(value) {
   const lng = Number(value[0]);
   const lat = Number(value[1]);
   if (!Number.isFinite(lng) || !Number.isFinite(lat)) return null;
+  if (lng < -180 || lng > 180 || lat < -90 || lat > 90) return null;
   return [lng, lat];
 }
 

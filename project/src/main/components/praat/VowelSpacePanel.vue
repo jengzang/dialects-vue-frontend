@@ -4,8 +4,7 @@
       <h2 class="panel-title">{{ t('praat.vowelSpace.title') }}</h2>
 
       <!-- Usage Hint -->
-      <div class="usage-hint">
-        💡 {{ t('praat.vowelSpace.usageHint') }}
+      <div class="usage-hint"><InlineIcon icon="💡" />{{ t('praat.vowelSpace.usageHint') }}
       </div>
 
       <!-- Control Buttons -->
@@ -136,6 +135,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import * as echarts from 'echarts'
 import { useI18n } from 'vue-i18n'

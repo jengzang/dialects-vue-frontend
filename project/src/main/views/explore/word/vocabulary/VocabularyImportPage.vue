@@ -4,6 +4,11 @@
       <div class="upload-mode main-glass-panel">
         <div class="upload-head">
             <h3>{{ t('words.wordList.upload.title') }}</h3>
+            <div class="upload-head-counts">
+              <span>{{ t('words.wordList.upload.totalEntries', { count: vocabTotalCount ?? '…' }) }}</span>
+              <span class="count-sep">·</span>
+              <span>{{ t('words.wordList.upload.totalLocations', { count: vocabLocationCount ?? '…' }) }}</span>
+            </div>
             <!-- <p>{{ t('words.wordList.upload.desc') }}</p> -->
             <div v-if="requiresLogin" class="upload-access-notice">
               <p>{{ uploadAccessNotice }}</p>
@@ -35,6 +40,22 @@
           </span>
         </div>
 
+        <div class="upload-example">
+          <div class="upload-example__title">{{ t('words.wordList.upload.dataExample') }}</div>
+          <div class="upload-example__row">
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--def">{{ t('words.wordList.columns.definition') }}</b>吃饭</span>
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--head">{{ t('words.wordList.columns.headword') }}</b>食饭</span>
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--ipa">{{ t('words.wordList.columns.pronunciation') }}</b>sek2fan22</span>
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--note">{{ t('words.wordList.columns.detail') }}</b>也可说喫饭</span>
+          </div>
+          <div class="upload-example__row">
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--def">{{ t('words.wordList.columns.definition') }}</b>睡觉</span>
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--head">{{ t('words.wordList.columns.headword') }}</b>睏觉</span>
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--ipa">{{ t('words.wordList.columns.pronunciation') }}</b>kʰuəŋ34kɔ34</span>
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--note">{{ t('words.wordList.columns.detail') }}</b>多见于吴语淮官等</span>
+          </div>
+        </div>
+
         <div class="upload-parser-row">
           <div class="upload-parser-head">
             <h3 class="upload-section-title">{{ t('words.wordList.upload.chooseFile') }}</h3>
@@ -47,6 +68,8 @@
             name="parser-mode"
             :options="parserModeOptions"
           />
+          <CheckBox v-model="fillStandardFromLocal" :label="t('words.wordList.upload.fillStandardFromLocal')" />
+          <p v-if="fillStandardFromLocal" class="upload-fill-hint">{{ t('words.wordList.upload.fillStandardFromLocalHint') }}</p>
         </div>
 
         <TabularImportPreview
@@ -125,7 +148,7 @@
           @dragleave.prevent="isDragOver = false"
           @drop.prevent="handleDrop"
         >
-          <div class="upload-zone-icon">📄</div>
+          <div class="upload-zone-icon"><InlineIcon icon="📄" /></div>
           <p class="upload-zone-hint">{{ t('words.wordList.upload.dropHint') }}</p>
         </div>
 
@@ -164,17 +187,40 @@
       @close="closeUploadLocationEditor"
     >
       <div class="upload-location-modal">
-        <div class="upload-location-modal-toolbar">
-          <button
-            class="main-glass-button"
-            data-variant="primary"
-            type="button"
-            :disabled="isLoadingYindianLocation || !uploadLocationDraft.location_name.trim()"
-            @click="useYindianLocationData"
-          >
-            {{ isLoadingYindianLocation ? t('common.label.loading') : t('words.wordList.upload.useYindianData') }}
-          </button>
-          <p class="upload-location-modal-hint">{{ t('words.wordList.upload.yindianHint') }}</p>
+        <div class="yindian-match-section">
+          <h4 class="yindian-match-title">{{ t('words.wordList.upload.useYindianData') }}</h4>
+          <div class="yindian-match-row">
+            <div class="yindian-input-wrapper">
+              <input
+                v-model="yindianQuery"
+                type="text"
+                :placeholder="t('words.wordList.upload.yindianHint')"
+                autocomplete="off"
+                @input="onYindianInput"
+                @keydown.enter.prevent="confirmYindianQuery"
+                @blur="onYindianBlur"
+              />
+              <div v-if="yindianSuggestions.length" class="yindian-suggestions">
+                <div
+                  v-for="item in yindianSuggestions"
+                  :key="item"
+                  class="yindian-suggest-item"
+                  @mousedown.prevent="applyYindianSuggestion(item)"
+                >
+                  {{ item }}
+                </div>
+              </div>
+            </div>
+            <button
+              class="main-glass-button"
+              data-variant="primary"
+              type="button"
+              :disabled="!yindianQuery.trim() || isLoadingYindian"
+              @click="confirmYindianQuery"
+            >
+              {{ isLoadingYindian ? t('common.label.loading') : t('common.button.confirm') }}
+            </button>
+          </div>
           <span v-if="uploadLocationEditorStatus">{{ uploadLocationEditorStatus }}</span>
         </div>
 
@@ -225,7 +271,10 @@
     >
       <div class="format-help-content ui-scrollbar">
         <div class="help-section">
-          <h4>{{ t('words.wordList.upload.formatHelpTable.title') }}</h4>
+          <div class="help-section-head">
+            <h4>{{ t('words.wordList.upload.formatHelpTable.title') }}</h4>
+            <a class="help-download" :href="`/data/sample/vocabulary_sample_table.xlsx`" download>{{ t('words.wordList.upload.downloadSample') }}</a>
+          </div>
           <p>{{ t('words.wordList.upload.formatHelpTable.desc') }}</p>
           <div class="format-details">
             <p><strong>{{ t('words.wordList.upload.formatHelpTable.required') }}</strong></p>
@@ -238,7 +287,10 @@
               </thead>
               <tbody>
                 <tr v-for="col in formatHelpTableColumns" :key="col.key">
-                  <td><code>{{ col.key }}</code><span v-if="col.required" class="help-required">*</span></td>
+                  <td>
+                    <code>{{ col.label }}</code><span v-if="col.required" class="help-required">*</span>
+                    <span v-if="col.hint" class="help-field-hint">{{ col.hint }}</span>
+                  </td>
                   <td>{{ col.aliases }}</td>
                 </tr>
               </tbody>
@@ -248,7 +300,10 @@
         </div>
 
         <div class="help-section">
-          <h4>{{ t('words.wordList.upload.formatHelpBracket.title') }}</h4>
+          <div class="help-section-head">
+            <h4>{{ t('words.wordList.upload.formatHelpBracket.title') }}</h4>
+            <a class="help-download" :href="`/data/sample/vocabulary_sample_doc_bracket.docx`" download>{{ t('words.wordList.upload.downloadSample') }}</a>
+          </div>
           <p>{{ t('words.wordList.upload.formatHelpBracket.desc') }}</p>
           <div class="format-details">
             <table class="help-table">
@@ -282,7 +337,10 @@
         </div>
 
         <div class="help-section">
-          <h4>{{ t('words.wordList.upload.formatHelpWhitespace.title') }}</h4>
+          <div class="help-section-head">
+            <h4>{{ t('words.wordList.upload.formatHelpWhitespace.title') }}</h4>
+            <a class="help-download" :href="`/data/sample/vocabulary_sample_doc_whitespace.docx`" download>{{ t('words.wordList.upload.downloadSample') }}</a>
+          </div>
           <p>{{ t('words.wordList.upload.formatHelpWhitespace.desc') }}</p>
           <div class="format-details">
             <table class="help-table">
@@ -296,22 +354,28 @@
               <tbody>
                 <tr>
                   <td>1</td>
-                  <td>standard_word</td>
+                  <td>{{ t('words.wordList.columns.definition') }}</td>
                   <td>{{ t('common.label.yes') }}</td>
                 </tr>
                 <tr>
                   <td>2</td>
-                  <td>local_expression</td>
-                  <td>{{ t('common.label.yes') }}</td>
+                  <td>
+                    {{ t('words.wordList.columns.headword') }}
+                    <span class="help-field-hint">{{ t('words.wordList.upload.formatHelpTable.atLeastOne') }}</span>
+                  </td>
+                  <td>{{ t('common.label.no') }}</td>
                 </tr>
                 <tr>
                   <td>3</td>
-                  <td>ipa</td>
-                  <td>{{ t('common.label.yes') }}</td>
+                  <td>
+                    {{ t('words.wordList.columns.pronunciation') }}
+                    <span class="help-field-hint">{{ t('words.wordList.upload.formatHelpTable.atLeastOne') }}</span>
+                  </td>
+                  <td>{{ t('common.label.no') }}</td>
                 </tr>
                 <tr>
                   <td>4+</td>
-                  <td>notes</td>
+                  <td>{{ t('words.wordList.columns.detail') }}</td>
                   <td>{{ t('common.label.no') }}</td>
                 </tr>
               </tbody>
@@ -332,11 +396,13 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import InlineIcon from '@/components/common/InlineIcon.vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { getLocationDetail, previewVocabularyImport, uploadVocabulary } from '@/api'
+import { batchMatch, getLocationDetail, getVocabularyCounts, previewVocabularyImport, uploadVocabulary } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
@@ -344,7 +410,7 @@ import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.
 import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue'
 import { formatCoord } from '@/main/utils/drawMap/formatCoord.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
-import { showError, showSuccess, showWarning } from '@/utils/ui/message.js'
+import { showError, showInfo, showSuccess, showWarning } from '@/utils/ui/message.js'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -377,6 +443,16 @@ const uploadAccessNotice = computed(() => {
   }
   return ''
 })
+
+const vocabTotalCount = ref(null)
+const vocabLocationCount = ref(null)
+
+onMounted(async () => {
+  const counts = await getVocabularyCounts()
+  vocabTotalCount.value = counts.total
+  vocabLocationCount.value = counts.locations
+})
+
 function navigateToSuggestion() {
   router.push(buildLocalePath(resolveRouteLocale(route), '/menu/about/suggestion'))
 }
@@ -389,6 +465,7 @@ const backendPreview = ref(null)
 const isOverwriteConfirmed = ref(false)
 
 const uploadParserMode = ref('auto')
+const fillStandardFromLocal = ref(false)
 const uploadFile = ref(null)
 const fileInputEl = ref(null)
 const isDragOver = ref(false)
@@ -407,8 +484,11 @@ const createEmptyUploadLocation = () => ({
 const uploadLocation = ref(createEmptyUploadLocation())
 const uploadLocationDraft = ref(createEmptyUploadLocation())
 const isUploadLocationEditorOpen = ref(false)
-const isLoadingYindianLocation = ref(false)
+const yindianQuery = ref('')
+const yindianSuggestions = ref([])
+const isLoadingYindian = ref(false)
 const uploadLocationEditorStatus = ref('')
+let yindianDebounceTimer = null
 
 const uploadLocationFields = computed(() => [
   {
@@ -441,31 +521,31 @@ const parserModeOptions = computed(() => [
 ])
 
 const formatHelpTableColumns = computed(() => [
-  { key: 'standard_word', required: true, aliases: 'standard_word / written / 释义 / 书面 / 书面词条 / 词条 / meaning' },
-  { key: 'local_expression', required: true, aliases: 'local_expression / vocabulary / 当地讲法 / 方言词 / 方言讲法 / local' },
-  { key: 'ipa', required: true, aliases: 'ipa / IPA / 音标 / 国际音标' },
-  { key: 'notes', required: false, aliases: 'notes / note / 注释 / 备注 / 说明' },
+  { key: 'standard_word', label: t('words.wordList.columns.definition'), required: true, aliases: 'standard_word / written / 释义 / 书面 / 书面词条 / 词条 / meaning' },
+  { key: 'local_expression', label: t('words.wordList.columns.headword'), required: false, aliases: 'local_expression / vocabulary / 当地讲法 / 方言词 / 方言讲法 / local', hint: t('words.wordList.upload.formatHelpTable.atLeastOne') },
+  { key: 'ipa', label: t('words.wordList.columns.pronunciation'), required: false, aliases: 'ipa / IPA / 音标 / 国际音标', hint: t('words.wordList.upload.formatHelpTable.atLeastOne') },
+  { key: 'notes', label: t('words.wordList.columns.detail'), required: false, aliases: 'notes / note / 注释 / 备注 / 说明' },
 ])
 
 const importSchema = computed(() => [
   {
     key: 'standard_word',
     label: t('words.wordList.columns.definition'),
-    required: true,
+    required: !fillStandardFromLocal.value,
     aliases: ['standard_word', 'written', '释义', '釋義', '书面', '書面', '书面词条', '書面詞條', '词条', '詞條', 'meaning'],
     example: t('words.wordList.import.examples.definition')
   },
   {
     key: 'local_expression',
     label: t('words.wordList.columns.headword'),
-    required: true,
+    required: false,
     aliases: ['local_expression', 'vocabulary', '当地讲法', '當地講法', '方言词', '方言詞', '方言讲法', '方言講法', 'local'],
     example: t('words.wordList.import.examples.headword')
   },
   {
     key: 'ipa',
     label: t('words.wordList.columns.pronunciation'),
-    required: true,
+    required: false,
     aliases: ['ipa', 'IPA', '音标', '音標', '国际音标', '國際音標'],
     example: t('words.wordList.import.examples.pronunciation')
   },
@@ -587,6 +667,8 @@ function normalizeUploadLocation(location) {
 function openUploadLocationEditor() {
   uploadLocationDraft.value = { ...uploadLocation.value }
   uploadLocationEditorStatus.value = ''
+  yindianQuery.value = ''
+  yindianSuggestions.value = []
   isUploadLocationEditorOpen.value = true
 }
 
@@ -594,6 +676,8 @@ function closeUploadLocationEditor() {
   isUploadLocationEditorOpen.value = false
   uploadLocationDraft.value = createEmptyUploadLocation()
   uploadLocationEditorStatus.value = ''
+  yindianQuery.value = ''
+  yindianSuggestions.value = []
 }
 
 function confirmUploadLocationEditor() {
@@ -623,15 +707,12 @@ function applyYindianLocationDetail(detail) {
   }
 }
 
-async function useYindianLocationData() {
-  const locationName = uploadLocationDraft.value.location_name.trim()
-  if (!locationName || isLoadingYindianLocation.value) return
-
-  isLoadingYindianLocation.value = true
+async function fillFromYindian(name) {
+  if (!name || isLoadingYindian.value) return
+  isLoadingYindian.value = true
   uploadLocationEditorStatus.value = ''
-
   try {
-    const response = await getLocationDetail(locationName)
+    const response = await getLocationDetail(name)
     const detail = getLocationDetailRow(response)
     if (!detail) {
       uploadLocationEditorStatus.value = t('words.wordList.upload.yindianNotFound')
@@ -645,8 +726,44 @@ async function useYindianLocationData() {
     uploadLocationEditorStatus.value = error.message || t('words.wordList.upload.yindianFailed')
     showError(uploadLocationEditorStatus.value)
   } finally {
-    isLoadingYindianLocation.value = false
+    isLoadingYindian.value = false
   }
+}
+
+function onYindianInput() {
+  clearTimeout(yindianDebounceTimer)
+  const query = yindianQuery.value.trim()
+  if (!query) {
+    yindianSuggestions.value = []
+    return
+  }
+  yindianDebounceTimer = setTimeout(async () => {
+    try {
+      const results = await batchMatch(query, false)
+      const items = Array.isArray(results) ? results.flatMap((r) => r.items || []) : []
+      yindianSuggestions.value = [...new Set(items)]
+    } catch {
+      yindianSuggestions.value = []
+    }
+  }, 300)
+}
+
+function onYindianBlur() {
+  setTimeout(() => {
+    yindianSuggestions.value = []
+  }, 200)
+}
+
+function applyYindianSuggestion(item) {
+  yindianQuery.value = item
+  yindianSuggestions.value = []
+  return fillFromYindian(item)
+}
+
+function confirmYindianQuery() {
+  const name = yindianQuery.value.trim()
+  if (!name || isLoadingYindian.value) return
+  return fillFromYindian(name)
 }
 
 function clearUploadFile() {
@@ -702,6 +819,12 @@ function handleUploadFile(event) {
   event.target.value = ''
 }
 
+watch(fillStandardFromLocal, (val) => {
+  if (val) {
+    showInfo(t('words.wordList.upload.fillStandardFromLocalHint'))
+  }
+})
+
 watch([uploadParserMode, selectedUploadFile, uploadLocation], () => {
   backendPreview.value = null
   isOverwriteConfirmed.value = false
@@ -741,6 +864,7 @@ async function handlePreviewImport() {
       file,
       location,
       parser_mode: uploadParserMode.value,
+      fill_standard_from_local: fillStandardFromLocal.value,
     })
     backendPreview.value = previewResponse
     if (previewResponse.success) {
@@ -790,6 +914,7 @@ async function handleImportAfterPreview() {
       location,
       parser_mode: uploadParserMode.value,
       overwrite: shouldConfirmOverwrite.value ? isOverwriteConfirmed.value : false,
+      fill_standard_from_local: fillStandardFromLocal.value,
     })
     uploadStatusText.value = t('words.wordList.upload.success', { count: response.imported_count || 0 })
     showSuccess(uploadStatusText.value)
@@ -800,6 +925,12 @@ async function handleImportAfterPreview() {
   } finally {
     isUploading.value = false
   }
+}
+</script>
+
+<script>
+export default {
+  name: 'VocabularyImportPage'
 }
 </script>
 

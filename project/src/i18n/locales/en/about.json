@@ -342,6 +342,15 @@
         "direct": "Direct Input"
       }
     },
+    "iconMode": {
+      "title": "Icon Style",
+      "description": "\"All Color\" uses native Emoji — the old default style with vivid colors but inconsistent look. \"Nav Bar Mono\" (current default) shows clean line icons in the sidebar and top bar while keeping colorful Emoji in page content. \"All Mono\" applies consistent line icons everywhere for a minimal, uniform appearance.",
+      "options": {
+        "allEmoji": "All Color",
+        "allSvg": "All Mono",
+        "barSvg": "Nav Bar Mono"
+      }
+    },
     "updateNotice": {
       "title": "Update Notice",
       "description": "Choose how to display new version update content.",

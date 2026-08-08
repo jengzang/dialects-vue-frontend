@@ -132,6 +132,10 @@
 
 .draw-tool-button-grid {
   @include draw-button-grid(2);
+
+  .main-glass-button:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
 }
 
 .draw-tool-button-grid--three {
@@ -145,6 +149,19 @@
 .draw-tool-mode-button {
   justify-content: center;
   gap: 0.35rem;
+}
+
+.draw-shape-edit-status {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.45rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.24);
+  border-radius: var(--radius-sm2);
+  background: rgba(var(--color-primary-rgb), 0.08);
+  color: rgba(var(--text-deep-rgb), 0.72);
+  font-size: 0.78rem;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -182,6 +199,176 @@
   gap: 0.55rem;
 }
 
+.draw-feature-list {
+  @include flex-col;
+  gap: 0.45rem;
+  max-height: 12rem;
+  overflow: auto;
+  padding-right: 0.1rem;
+  @include scrollbars.visible-scrollbar;
+  @include scrollbars.visible-scrollbar-webkit;
+}
+
+.draw-feature-batch-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  justify-content: flex-end;
+}
+
+.draw-feature-selected-count {
+  font-size: 0.76rem;
+  color: rgba(var(--text-deep-rgb), 0.62);
+  white-space: nowrap;
+}
+
+.draw-feature-batch-move {
+  min-width: 7.5rem;
+}
+
+.draw-feature-table-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.55rem;
+}
+
+.draw-feature-table-batch-field {
+  flex: 1 1 10rem;
+}
+
+.draw-feature-table-property-tools {
+  display: flex;
+  flex: 1 1 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.draw-feature-table-batch-value {
+  flex: 1 1 8rem;
+}
+
+.draw-feature-table-wrap {
+  max-height: 14rem;
+  overflow: auto;
+  border: 1px solid var(--glass-60);
+  border-radius: var(--radius-sm2);
+  background: var(--glass-40);
+  @include scrollbars.visible-scrollbar;
+  @include scrollbars.visible-scrollbar-webkit;
+}
+
+.draw-feature-table {
+  width: 100%;
+  min-width: 32rem;
+  border-collapse: collapse;
+  color: var(--text-deep);
+  font-size: 0.82rem;
+}
+
+.draw-feature-table th,
+.draw-feature-table td {
+  padding: 0.48rem 0.55rem;
+  border-bottom: 1px solid var(--glass-50);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.draw-feature-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--glass-70);
+  color: rgba(var(--text-deep-rgb), 0.7);
+  font-weight: 700;
+}
+
+.draw-feature-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.draw-feature-table-input {
+  min-width: 8.5rem;
+  padding: 0.38rem 0.55rem;
+  font-size: 0.82rem;
+}
+
+.draw-feature-table-summary {
+  display: block;
+  max-width: 11rem;
+  @include text-truncate;
+}
+
+.draw-feature-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--glass-60);
+  border-radius: 10px;
+  background: var(--glass-50);
+  color: var(--text-deep);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.draw-feature-row-checkbox {
+  flex-shrink: 0;
+}
+
+.draw-feature-row-select {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.draw-feature-row:hover {
+  background: var(--glass-80);
+  border-color: rgba(var(--color-primary-rgb), 0.35);
+}
+
+.draw-feature-row[data-active='true'] {
+  background: rgba(var(--color-primary-rgb), 0.14);
+  border-color: rgba(var(--color-primary-rgb), 0.5);
+}
+
+.draw-feature-row-main {
+  min-width: 0;
+  @include flex-col;
+  gap: 0.18rem;
+}
+
+.draw-feature-row-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.draw-feature-row-meta,
+.draw-feature-row-state {
+  flex-shrink: 0;
+  font-size: 0.76rem;
+  color: rgba(var(--text-deep-rgb), 0.62);
+}
+
 .draw-layer-row {
   @include flex-col;
   gap: 0.45rem;
@@ -198,9 +385,46 @@
 
 .draw-layer-row-button {
   width: 100%;
-  justify-content: flex-start;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.65rem;
   text-align: left;
   color: var(--action-primary-text);
+}
+
+div.draw-layer-row-button {
+  cursor: default;
+}
+
+.draw-layer-row-main {
+  flex: 1;
+  min-width: 0;
+  @include flex-col;
+  gap: 0.18rem;
+}
+
+.draw-layer-row-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-deep);
+}
+
+.draw-layer-rename-input {
+  padding: 0.35rem 0.55rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.draw-layer-row-meta,
+.draw-layer-row-state {
+  flex-shrink: 0;
+  font-size: 0.76rem;
+  line-height: 1.4;
+  text-align: right;
+  color: rgba(var(--text-deep-rgb), 0.72);
 }
 
 .draw-layer-row-actions {

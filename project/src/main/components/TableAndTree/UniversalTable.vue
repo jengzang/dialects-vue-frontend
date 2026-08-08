@@ -2,7 +2,7 @@
   <div class="universal-table glass-container" :style="containerStyle">
     <div class="toolbar">
       <div class="search-wrapper">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon"><InlineIcon icon="🔍" /></span>
           <input
               v-model="searchText"
               @compositionstart="handleSearchCompositionStart"
@@ -14,7 +14,7 @@
       </div>
       <div v-if="canUseTableActions" class="action-buttons">
         <button v-if="!isEditMode" class="main-glass-button" data-size="compact" @click="exportToExcel">
-          <span class="icon">📤</span><span class="btn-text">Excel</span>
+          <span class="icon"><InlineIcon icon="📤" /></span><span class="btn-text">Excel</span>
         </button>
         <button class="main-glass-button" data-variant="primary" @click="openAddModal">
           <span class="icon">＋</span> <span class="btn-text">{{ t('tableTree.universalTable.toolbar.add') }}</span>
@@ -25,7 +25,7 @@
           :data-state="isEditMode ? 'edit-mode' : 'default'"
           @click="toggleEditMode"
         >
-          <span class="icon">{{ isEditMode ? '✕' : '✎' }}</span>
+          <span class="icon"><InlineIcon :icon="isEditMode ? '✕' : '✎'" /></span>
           <span class="btn-text">{{ isEditMode ? t('common.button.cancel') : t('common.button.edit') }}</span>
         </button>
         <button
@@ -35,7 +35,7 @@
           @click="openBatchReplaceModal"
           :title="t('tableTree.universalTable.toolbar.batchReplace')"
         >
-          <span class="icon">🔄</span>
+          <span class="icon"><InlineIcon icon="🔄" /></span>
           <span class="btn-text">{{ t('tableTree.universalTable.toolbar.batchReplace') }}</span>
         </button>
         <button
@@ -45,7 +45,7 @@
           @click="submitBatchEdit"
           :disabled="Object.keys(changedCells).length === 0"
         >
-          <span class="icon">✓</span>
+          <span class="icon"><InlineIcon icon="✓" /></span>
           <span class="btn-text">{{ t('tableTree.universalTable.toolbar.submitWithCount', { count: changedRowCount }) }}</span>
         </button>
       </div>
@@ -58,7 +58,7 @@
       </div>
 
       <div v-else-if="tableData.length === 0" class="empty-state">
-        <span>📭 {{ t('tableTree.universalTable.states.noData') }}</span>
+        <span><InlineIcon icon="📭" /> {{ t('tableTree.universalTable.states.noData') }}</span>
       </div>
       <table>
         <colgroup>
@@ -106,7 +106,7 @@
             {{ row[col.key] }}
           </td>
           <td v-if="canUseTableActions" class="action-td">
-            <button class="icon-action-btn delete" :title="t('common.button.delete')" @click="handleDelete(row)">✕</button>
+            <button class="icon-action-btn delete" :title="t('common.button.delete')" @click="handleDelete(row)"><InlineIcon icon="✕" /></button>
           </td>
         </tr>
         </tbody>
@@ -135,7 +135,8 @@
       </div>
       <button class="page-btn" @click="changePage(1)" :disabled="currentPage >= totalPages">→</button>
       <button class="fullscreen-toggle-btn" @click="toggleFullscreen">
-        {{ isFullscreen ? t('tableTree.universalTable.toolbar.exit') : `⛶ ${t('tableTree.universalTable.toolbar.fullscreen')}` }}
+        <template v-if="isFullscreen">{{ t('tableTree.universalTable.toolbar.exit') }}</template>
+        <template v-else><InlineIcon icon="⛶" /> {{ t('tableTree.universalTable.toolbar.fullscreen') }}</template>
       </button>
     </div>
 
@@ -151,7 +152,7 @@
               </div>
 
               <div v-else-if="tableData.length === 0" class="empty-state">
-                <span>📭 {{ t('tableTree.universalTable.states.noData') }}</span>
+                <span><InlineIcon icon="📭" /> {{ t('tableTree.universalTable.states.noData') }}</span>
               </div>
               <table>
                 <colgroup>
@@ -199,7 +200,7 @@
                     {{ row[col.key] }}
                   </td>
                   <td v-if="canUseTableActions" class="action-td">
-                    <button class="icon-action-btn delete" :title="t('common.button.delete')" @click="handleDelete(row)">✕</button>
+                    <button class="icon-action-btn delete" :title="t('common.button.delete')" @click="handleDelete(row)"><InlineIcon icon="✕" /></button>
                   </td>
                 </tr>
                 </tbody>
@@ -247,7 +248,7 @@
             >
               <div class="filter-header">
               <span>{{ t('tableTree.universalTable.filter.title', { label: currentFilterLabel }) }}</span>
-              <button class="close-btn close-btn-sm close-btn-inline close-btn-mobile-only" :aria-label="t('common.button.close')" @click="closeFilter">✕</button>
+              <button class="close-btn close-btn-sm close-btn-inline close-btn-mobile-only" :aria-label="t('common.button.close')" @click="closeFilter"><InlineIcon icon="✕" /></button>
             </div>
 
             <div v-bind="containerProps" class="filter-list ui-scrollbar" style="max-height: 300px">
@@ -507,7 +508,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed, onUnmounted, nextTick } from 'vue';
+import InlineIcon from '@/components/common/InlineIcon.vue'
+import { ref, reactive, onMounted, computed, onUnmounted, nextTick, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import * as XLSX from 'xlsx';
 import {
@@ -674,10 +676,32 @@ if (props.defaultFilter) {
   });
 }
 
+watch(() => props.defaultFilter, (next) => {
+  if (!next) return
+  let changed = false
+  Object.keys(next).forEach(key => {
+    const value = next[key]
+    const normalized = Array.isArray(value) ? [...value] : [value]
+    if (JSON.stringify(filterState[key]) !== JSON.stringify(normalized)) {
+      filterState[key] = normalized
+      changed = true
+    }
+  })
+  if (changed) fetchData()
+})
+
 // 獲取數據
 const fetchData = async () => {
   isLoading.value = true; // 開啟 loading
   const searchCols = props.columns.map(c => c.key);
+  const filters = { ...filterState }
+  if (props.defaultFilter) {
+    Object.entries(props.defaultFilter).forEach(([key, value]) => {
+      if (!filters[key] || filters[key].length === 0) {
+        filters[key] = Array.isArray(value) ? [...value] : [value]
+      }
+    })
+  }
   const payload = {
     db_key: props.dbKey,
     table_name: props.tableName,
@@ -685,7 +709,7 @@ const fetchData = async () => {
     page_size: TABLE_CONFIG.PAGE_SIZE,  // ✅ 使用 constants 配置
     sort_by: sortCol.value,
     sort_desc: sortDesc.value,
-    filters: filterState,
+    filters,
     search_text: searchText.value,
     search_columns: searchCols
   };
@@ -1574,15 +1598,6 @@ $text-dark: var(--text-dark);
 $text-muted: var(--text-tertiary);
 $transition-fast: 0.2s;
 $mobile-breakpoint: 768px;
-$system-font:
-  -apple-system,
-  BlinkMacSystemFont,
-  "SF Pro Text",
-  "Segoe UI",
-  Roboto,
-  Helvetica,
-  Arial,
-  sans-serif;
 
 /* ========================================
    UniversalTable 组件样式
@@ -1598,7 +1613,7 @@ $system-font:
   border: 1px solid var(--glass-40);
   box-shadow: var(--shadow-md);
   padding: 12px 4px;
-  font-family: $system-font;
+  font-family: var(--font-sans);
   color: var(--text-primary);
   @include flex-col;
   gap: 6px;
@@ -1635,6 +1650,7 @@ $system-font:
   background: var(--glass-60);
   font-size: 14px;
   outline: none;
+  color: var(--text-deep);
   transition: all 0.3s;
 
   &:focus {
@@ -1894,7 +1910,7 @@ td {
 
 /* Filter Popup */
 .main-glass-panel[data-surface='filter-popup'] {
-  --main-glass-panel-background: var(--glass-30);
+  --main-glass-panel-background: var(--surface-glass-floating);
   --main-glass-panel-backdrop-filter: blur(25px);
   --main-glass-panel-border: 1px solid var(--glass-80);
   --main-glass-panel-shadow: var(--shadow-lg);
@@ -2142,6 +2158,7 @@ td {
 
   &.clickable {
     cursor: pointer;
+    // color: var(--text-deep);
     background: var(--glass-50);
     border: 1px solid var(--border-light);
 
@@ -2166,7 +2183,8 @@ td {
   font-weight: 600;
   text-align: center;
   appearance: textfield;
-  background: white;
+  color: var(--text-deep);
+  background: var(--bg-white);
   border: 2px solid var(--color-primary);
   border-radius: var(--radius-md);
   outline: none;
@@ -2280,7 +2298,7 @@ td {
   padding: 10px 12px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-medium);
-  background: white;
+  background: var(--bg-white);
   font-size: 14px;
   outline: none;
   transition: all 0.3s;

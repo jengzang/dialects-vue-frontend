@@ -1,8 +1,7 @@
 <template>
   <div class="spatial-visualization-tab">
 <!--      <h3 class="villagesml-subtab-title">空間分析 - 空間可視化</h3>-->
-    <h2>
-      🗺️ 空間可視化
+    <h2><InlineIcon icon="🗺️" />空間可視化
       <HelpIcon content="多圖層疊加可視化。支持熱點、聚類、N-gram分布、字符傾向熱力圖的組合展示。字符傾向使用藍→白→紅漸變表示Lift值（低→中→高）" />
     </h2>
 
@@ -37,15 +36,15 @@
           <!-- N-gram 過濾器 -->
           <div v-if="layers.ngrams" class="section">
             <h3>N-gram 設置</h3>
-            <p class="layer-note">⚠️ 僅支持 2-4 字符的 N-gram，區域固定為鄉鎮級</p>
+            <p class="layer-note"><InlineIcon icon="⚠️" />僅支持 2-3 字符的 N-gram，區域固定為鄉鎮級</p>
             <div class="filter-row vml-control-surface vml-control-row">
               <div class="vml-control-field">
                 <input
                   v-model="filters.ngram"
                   type="text"
-                  placeholder="輸入 2-4 字 N-gram（如：新村）"
+                  placeholder="輸入 2-3 字 N-gram（如：新村）"
                   class="filter-input"
-                  maxlength="4"
+                  maxlength="3"
                 >
               </div>
             </div>
@@ -154,6 +153,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, onMounted } from 'vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -274,8 +274,8 @@ const loadData = async () => {
     showWarning('請輸入 N-gram')
     return
   }
-  if (layers.value.ngrams && (filters.value.ngram.trim().length < 2 || filters.value.ngram.trim().length > 4)) {
-    showWarning('N-gram 須為 2-4 個字符')
+  if (layers.value.ngrams && (filters.value.ngram.trim().length < 2 || filters.value.ngram.trim().length > 3)) {
+    showWarning('N-gram 須為 2-3 個字符')
     return
   }
 

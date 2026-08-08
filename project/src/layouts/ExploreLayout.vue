@@ -16,6 +16,7 @@
         </transition>
       </router-view>
     </div>
+    <ScrollToTop />
     <PageTutorialGuide />
   </div>
 </template>
@@ -23,6 +24,7 @@
 <script setup>
 import ExploreBar from '@/components/bar/ExploreBar.vue'
 import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
+import ScrollToTop from '@/components/common/ScrollToTop.vue'
 
 const keepAliveViewNames = [
   'AllVillages',
@@ -34,10 +36,7 @@ const keepAliveViewNames = [
   'MergeTool',
   'TableManage',
   'VillagesML',
-  'YangChunSpoken',
-  'YangChunVillages',
-  'YuBaoPage',
-  'VocabularyPage'
+  'YangChunVillages'
 ]
 
 </script>
@@ -48,15 +47,6 @@ const keepAliveViewNames = [
 
 $fade-duration: 0.14s;
 $portrait-ratio: 1;
-
-$system-font:
-  -apple-system,
-  BlinkMacSystemFont,
-  'Segoe UI',
-  Roboto,
-  Helvetica,
-  Arial,
-  sans-serif;
 
 /* 页面背景 */
 .explore-layout {
@@ -78,13 +68,14 @@ $system-font:
 /* 内容区域 */
 .content-area {
   position: relative;
-  height: 88dvh;
   display: flex;
   justify-content: center;
+  flex: 1;
+  width: 100%;
   padding: 10px 6px;
-  padding-top: calc(7.5dvh - 15px);
+  padding-top: calc(7dvh - 15px);
   color: var(--text-deep);
-  font-family: $system-font;
+  font-family: var(--font-sans);
 }
 
 /* 页面切换动画 */

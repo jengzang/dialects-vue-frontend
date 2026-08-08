@@ -772,7 +772,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
 
 /* 结果区域 */
 .results-area {
-  width: 100%;
+  width: 93dvw;
   @include flex-col;
   align-items: center;
   margin-top: 25px;

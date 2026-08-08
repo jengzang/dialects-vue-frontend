@@ -1,7 +1,6 @@
 import { api } from '../auth/httpClient.js';
 
-export const TOPONYM_DEFAULT_PLACE_TYPE_CODE = '22200';
-export const TOPONYM_DEFAULT_POINT_LIMIT = 5000;
+export const TOPONYM_DEFAULT_POINT_LIMIT = 0;
 export const TOPONYM_DEFAULT_NAME_LIMIT = 20;
 export const TOPONYM_DETAILS_ID_LIMIT = 10;
 
@@ -26,7 +25,10 @@ function appendCommonSearchParams(query, params = {}, defaultLimit) {
   query.set('q', keyword);
   query.set('match_mode', normalizeMatchMode(params.match_mode));
   query.set('limit', String(normalizeLimit(params.limit, defaultLimit)));
-  query.set('place_type_code', String(params.place_type_code || TOPONYM_DEFAULT_PLACE_TYPE_CODE));
+
+  if (params.place_type_code !== undefined && params.place_type_code !== null && params.place_type_code !== '') {
+    query.set('place_type_code', String(params.place_type_code));
+  }
 
   if (params.bbox) {
     query.set('bbox', String(params.bbox));
@@ -35,6 +37,14 @@ function appendCommonSearchParams(query, params = {}, defaultLimit) {
   if (params.zoom !== undefined && params.zoom !== null && params.zoom !== '') {
     query.set('zoom', String(params.zoom));
   }
+}
+
+function appendRepeatedParams(query, key, value) {
+  const values = Array.isArray(value) ? value : [value];
+  values
+    .map((item) => String(item || '').trim())
+    .filter(Boolean)
+    .forEach((item) => query.append(key, item));
 }
 
 function getFastApiErrorMessage(error, fallback) {
@@ -83,11 +93,33 @@ export async function getToponymNames(params = {}) {
   if (params.include_division_tree) {
     query.set('include_division_tree', 'true');
   }
+  if (params.parent_path) {
+    appendRepeatedParams(query, 'parent_path', params.parent_path);
+  }
+  if (params.page !== undefined && params.page !== null && params.page !== '') {
+    query.set('page', String(params.page));
+  }
+  if (params.page_size !== undefined && params.page_size !== null && params.page_size !== '') {
+    query.set('page_size', String(params.page_size));
+  }
 
   try {
     const payload = await api(`/api/toponyms/names?${query.toString()}`);
     return {
       items: Array.isArray(payload?.items) ? payload.items : [],
+      mode: payload?.mode || (params.include_division_tree ? 'full' : 'flat'),
+      reason: payload?.reason || '',
+      threshold: payload?.threshold ?? null,
+      filtered_count: payload?.filtered_count ?? null,
+      levels: payload?.levels ?? null,
+      lazy_bootstrap: Array.isArray(payload?.lazy_bootstrap) ? payload.lazy_bootstrap : [],
+      level: payload?.level ?? null,
+      parent_path: Array.isArray(payload?.parent_path) ? payload.parent_path : [],
+      children: Array.isArray(payload?.children) ? payload.children : [],
+      names: Array.isArray(payload?.names) ? payload.names : [],
+      page: payload?.page ?? null,
+      page_size: payload?.page_size ?? null,
+      has_more: Boolean(payload?.has_more),
     };
   } catch (error) {
     throw new Error(getFastApiErrorMessage(error, 'failed to load toponym names'));

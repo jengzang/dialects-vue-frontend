@@ -82,7 +82,7 @@
 
       <div v-if="!showSpectrogram" class="spectrogram-placeholder main-glass-panel-inner">
         <div class="placeholder-content">
-          <span class="placeholder-icon">🌊</span>
+          <span class="placeholder-icon"><InlineIcon icon="🌊" /></span>
           <p>{{ t('praat.results.charts.spectrogram.loadHint') }}</p>
           <button class="load-spectrogram-btn main-glass-button" @click="loadSpectrogram">
             {{ t('praat.results.charts.spectrogram.loadButton') }}
@@ -142,6 +142,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import {ref, watch, onMounted, onBeforeUnmount, computed, nextTick} from 'vue'
 import * as echarts from 'echarts'
 import { useI18n } from 'vue-i18n'
@@ -816,7 +817,7 @@ $transition-normal: 0.3s;
 
   &.contour-display {
     color: $primary-blue;
-    font-family: "Courier New", monospace;
+    font-family: var(--font-mono);
     font-size: 1.1rem;
     letter-spacing: 0.05em;
   }

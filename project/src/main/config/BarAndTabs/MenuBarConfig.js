@@ -68,10 +68,16 @@ const DISPLAY_DEFAULTS = {
 
 const DISPLAY_PRESETS = {
   standard: {},
+  standard_small: {
+    weight: 0.8,
+    mobileWeight: 0.9,
+    weightIconOnly: 0.5,
+    fontSize: 1.2,
+  },
   compactDesktop: {
     weight: 0.8,
     weightIconOnly: 0.25,
-    fontSize: 1.2
+    fontSize: 1.1
   },
   resultTab: {
     mobileWeightIconOnly: 0.4
@@ -86,9 +92,10 @@ const STORAGE_KEY_PREFIX = 'menu_last_sub_'
 const MENU_CHILD_PATHS = {
   query: ['/menu/query/char', '/menu/query/zhonggu', '/menu/query/yinwei', '/menu/query/tone'],
   compare: ['/menu/compare/char', '/menu/compare/zhonggu', '/menu/compare/tone', '/menu/compare/phonetic'],
-  map: ['/menu/map/view', '/menu/map/divide', '/menu/map/custom', '/menu/map/draw'],
+  map: ['/menu/map/view', '/menu/map/divide', '/menu/map/custom'],
   pho: ['/menu/pho/matrix', '/menu/pho/custom', '/menu/pho/count', '/menu/pho/evolution'],
-  about: ['/menu/about/intro', '/menu/about/suggestion', '/menu/about/like', '/menu/about/settings']
+  vocabulary: ['/menu/vocabulary/view', '/menu/vocabulary/import', '/menu/vocabulary/manage'],
+  about: ['/menu/about/intro', '/menu/about/suggestion', '/menu/about/like']
 }
 
 const createDisplayConfig = ({ preset = 'standard', overrides = {} } = {}) => ({
@@ -130,8 +137,11 @@ function getMenuTabKeyFromRoute(route) {
   if (normalizedPath === '/menu/result') return 'result'
   if (normalizedPath === '/menu/source') return 'source'
   if (normalizedPath === '/menu/privacy') return 'privacy'
+  if (normalizedPath === '/menu/settings') return 'setting'
   if (normalizedPath === '/menu/tools') return 'tools'
-  if (normalizedPath === '/menu/words') return 'words'
+  if (normalizedPath.startsWith('/menu/vocabulary')) return 'vocabulary'
+  if (normalizedPath === '/menu/yubao') return 'yubao'
+  if (normalizedPath === '/menu/words') return 'vocabulary'
   if (normalizedPath === '/menu/villages') return 'villages'
   if (normalizedPath === '/menu/cluster') return 'cluster'
   if (normalizedPath.startsWith('/menu/pho/')) return 'pho'
@@ -146,12 +156,24 @@ export function useMenuTabsConfig() {
 
   return computed(() => [
     createMenuTab({
+      tab: 'setting',
+      label: t('navigation.tabs.settings'),
+      icon: '⚙️',
+      display: {
+        preset: 'compactDesktop',
+        overrides: { scroll: 'left', weight: 0.7, weightIconOnly: 0.3 }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/menu/settings') }
+      }
+    }),
+    createMenuTab({
       tab: 'source',
       label: t('source.title'),
       icon: '🔗',
       display: {
         preset: 'compactDesktop',
-        overrides: { scroll: 'left', weight: 0.7, weightIconOnly: 0.3 }
+        overrides: { scroll: 'left', weight: 0.85, weightIconOnly: 0.3 }
       },
       navigation: {
         defaultTo: { path: withRouteLocale(route, '/menu/source') }
@@ -163,7 +185,7 @@ export function useMenuTabsConfig() {
       icon: '🎙️',
       display: {
         preset: 'compactDesktop',
-        overrides: { scroll: 'left', weight: 0.7, weightIconOnly: 0.3 }
+        overrides: { scroll: 'left', weight: 0.85, weightIconOnly: 0.3 }
       },
       navigation: {
         defaultTo: { path: withRouteLocale(route, '/explore/tools/praat') }
@@ -192,12 +214,13 @@ export function useMenuTabsConfig() {
       display: {
         preset: 'compactDesktop',
         overrides: {
-          weight: 0.8,
-          mobileWeight: 0.8
+          mobileScroll: 'left',
+          weight: 0.7,
+          weightIconOnly: 0.4,
         }
       },
       navigation: {
-        defaultTo: { path: withRouteLocale(route, '/menu/about/settings') }
+        defaultTo: { path: withRouteLocale(route, '/menu/about/intro') }
       }
     }),
     createMenuTab({
@@ -263,6 +286,33 @@ export function useMenuTabsConfig() {
       }
     }),
     createMenuTab({
+      tab: 'vocabulary',
+      label: t('navigation.tabs.vocabulary'),
+      icon: '📋',
+      display: {
+        preset: 'standard_small',
+        overrides: {}
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/menu/vocabulary') }
+      }
+    }),
+    createMenuTab({
+      tab: 'yubao',
+      label: t('navigation.tabs.yubao'),
+      icon: '📖',
+      display: {
+        preset: 'compactDesktop',
+        overrides: {
+          mobileScroll: 'right',
+          weight: 0.7,
+        }
+      },
+      navigation: {
+        defaultTo: { path: withRouteLocale(route, '/menu/yubao') }
+      }
+    }),
+    createMenuTab({
       tab: 'charClass',
       label: t('navigation.tabs.charClass'),
       icon: '📚',
@@ -281,24 +331,12 @@ export function useMenuTabsConfig() {
       }
     }),
     createMenuTab({
-      tab: 'words',
-      label: t('navigation.tabs.phrases'),
-      icon: '📖',
-      display: {
-        preset: 'compactDesktop',
-        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
-      },
-      navigation: {
-        defaultTo: { path: withRouteLocale(route, '/menu/words') }
-      }
-    }),
-    createMenuTab({
       tab: 'villages',
       label: t('navigation.tabs.villages'),
       icon: '🏘️',
       display: {
         preset: 'compactDesktop',
-        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
+        overrides: { scroll: 'right', weight: 0.8, weightIconOnly: 0.3 }
       },
       navigation: {
         defaultTo: { path: withRouteLocale(route, '/menu/villages') }
@@ -310,7 +348,7 @@ export function useMenuTabsConfig() {
       icon: '🧰',
       display: {
         preset: 'compactDesktop',
-        overrides: { scroll: 'right', weight: 0.7, weightIconOnly: 0.3 }
+        overrides: { scroll: 'right', weight: 0.8, weightIconOnly: 0.3 }
       },
       navigation: {
         defaultTo: { path: withRouteLocale(route, '/menu/tools') }
@@ -424,6 +462,11 @@ export function resolveMenuBarTarget(tabConfig, currentRoute = null) {
 
   const rememberedPath = readMenuBarMemory(tabConfig.navigation.tabKey)
   if (!rememberedPath) {
+    return tabConfig.to
+  }
+
+  const validPaths = MENU_CHILD_PATHS[tabConfig.navigation.tabKey]
+  if (validPaths && !validPaths.includes(rememberedPath)) {
     return tabConfig.to
   }
 

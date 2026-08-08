@@ -11,13 +11,13 @@
       @dragleave="isDragOver = false"
       @click="triggerFileInput"
     >
-      <div class="upload-icon">🎵</div>
+      <div class="upload-icon"><InlineIcon icon="🎵" /></div>
       <p class="upload-text">{{ t('praat.audioInput.upload.text') }}</p>
       <p class="upload-hint">{{ t('praat.audioInput.upload.hint') }}</p>
       <input
         ref="fileInput"
         type="file"
-        accept="audio/*"
+        accept="audio/*,.m4a,.mp3,.wav,.ogg,.flac,.aac,.webm"
         @change="handleFileSelect"
         style="display: none"
       />
@@ -36,7 +36,7 @@
           @click="toggleRecording"
           :disabled="isProcessing"
         >
-          <span class="record-icon">{{ isRecording ? '⏹' : '🎤' }}</span>
+          <span class="record-icon"><InlineIcon :icon="isRecording ? '⏹' : '🎤'" /></span>
           <span>{{ isRecording ? t('praat.audioInput.recording.stop') : t('praat.audioInput.recording.start') }}</span>
         </button>
       </div>
@@ -49,15 +49,16 @@
     <!-- Selected File Info -->
     <div v-if="displayFile" class="file-info main-glass-panel-inner">
       <div class="file-details">
-        <span class="file-name">📁 {{ displayFile.name }}</span>
+        <span class="file-name"><InlineIcon icon="📁" />{{ displayFile.name }}</span>
         <span class="file-size">{{ formatFileSize(displayFile.size) }}</span>
       </div>
-      <button class="close-btn" @click="clearFile">✕</button>
+      <button class="close-btn" @click="clearFile"><InlineIcon icon="✕" /></button>
     </div>
   </div>
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { PRAAT_AUDIO_LIMITS } from '@/main/config/constants.js'
@@ -505,8 +506,6 @@ $transition-duration: 0.3s;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    padding: 1rem;
-    border: none;
     font-size: 1rem;
     cursor: pointer;
 

@@ -101,8 +101,7 @@
         {{ feature }} ({{ pieCountByFeature[feature] || 0 }})
       </button>
 
-      <div v-if="currentDataLocationName" class="feature-tabs-location">
-        📍 {{ currentDataLocationName }}
+      <div v-if="currentDataLocationName" class="feature-tabs-location" @click.stop="handleLocationClick(currentDataLocationName)"><InlineIcon icon="📍" />{{ currentDataLocationName }}
       </div>
     </div>
 
@@ -249,10 +248,19 @@
         </div>
       </template>
     </HoverDetailCard>
+
+    <LocationDetailPopup
+      :visible="locationPopup.visible"
+      :location-name="locationPopup.locationName"
+      :data="locationPopup.data"
+      :loading="locationPopup.loading"
+      @close="locationPopup.visible = false"
+    />
   </div>
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -264,7 +272,8 @@ import CheckBox from '@/components/selector/CheckBox.vue'
 import HoverDetailCard from '@/components/ToastAndHelp/HoverDetailCard.vue'
 import { resolveHoverDetailCardPosition } from '@/utils/EchartHover/hoverDetailCardPosition.js'
 import LocationMultiInput from '../geo/LocationMultiInput.vue'
-import { postPhoPieByValue, postPhoPieByStatus } from '@/api'
+import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue'
+import { postPhoPieByValue, postPhoPieByStatus, getLocationDetail } from '@/api'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { TABLE_COLUMN_SCHEMAS } from '../../config/chars_positions/characters.js'
 import { userStore } from '@/main/store/store.js'
@@ -329,6 +338,32 @@ const isLoading = ref(false)
 const isMatching = ref(false)
 const errorMessage = ref('')
 const rawData = ref(null)
+
+// 地点详情弹窗
+const locationPopup = ref({
+  visible: false,
+  locationName: '',
+  data: null,
+  loading: false
+})
+
+const handleLocationClick = async (locationName) => {
+  if (!locationName) return
+
+  locationPopup.value.visible = true
+  locationPopup.value.locationName = locationName
+  locationPopup.value.loading = true
+  locationPopup.value.data = null
+
+  try {
+    const response = await getLocationDetail(locationName)
+    locationPopup.value.data = response
+  } catch (error) {
+    console.error('查询地名数据失败:', error)
+  } finally {
+    locationPopup.value.loading = false
+  }
+}
 const hasQueriedRealData = ref(false)
 const pendingUrlAutoQuery = ref(false)
 
@@ -1626,6 +1661,14 @@ $portrait-ratio: 1;
     white-space: nowrap;
     font-size: 14px;
     font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: var(--color-primary-hover);
+      text-decoration: underline;
+    }
 
     :root[data-color-theme='dark'] & {
       color: var(--text-primary);
@@ -1859,6 +1902,14 @@ $portrait-ratio: 1;
 
   .feature-tabs-location {
     padding: 10px 6px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: var(--color-primary-hover);
+      text-decoration: underline;
+    }
   }
 
   .pie-chart {

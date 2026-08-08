@@ -636,8 +636,8 @@ $glass-blur: 8px;
   gap: 8px;
   align-items: center;
   padding: 10px 7px;
-  background: var(--glass-60);
-  border: 1px solid var(--glass-60);
+  background: var(--surface-glass-floating);
+  border: 1px solid var(--border-glass);
   border-radius: var(--radius-pill);
   box-shadow:
     inset 0 0 1px var(--glass-50),
@@ -785,10 +785,17 @@ $glass-blur: 8px;
   background: rgba(var(--color-primary-rgb), 0.04);
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
+  text-decoration: none;
   transition: all $transition-fast ease;
+
+  &::after {
+    content: '\00A0🔍';
+    font-size: 0.8em;
+  }
 
   &:hover {
     color: $primary-blue;
+    text-decoration: underline;
     background: rgba(var(--color-primary-rgb), 0.1);
     border-color: rgba(var(--color-primary-rgb), 0.25);
     box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.12);
@@ -853,15 +860,28 @@ $glass-blur: 8px;
   width: 100px;
   @include text-truncate;
   font-size: 12px;
+  cursor: pointer;
+  text-decoration: none;
   transition:
+    color $transition-fast ease,
     transform $transition-fast ease,
     background-color $transition-fast ease;
 
+  &::after {
+    content: '\00A0🔍';
+    font-size: 0.85em;
+    transition: color $transition-fast ease;
+  }
+
   &:hover {
-    color: $deep-blue;
-    cursor: pointer;
+    color: $primary-blue;
+    text-decoration: underline;
     background-color: var(--bg-light-gray);
     transform: scale(1.15);
+
+    &::after {
+      color: $primary-blue;
+    }
   }
 }
 
@@ -933,12 +953,7 @@ $glass-blur: 8px;
 
 .loading-text {
   color: $text-gray;
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Helvetica Neue",
-    "Segoe UI",
-    sans-serif;
+  font-family: var(--font-sans);
   font-size: 16px;
 }
 

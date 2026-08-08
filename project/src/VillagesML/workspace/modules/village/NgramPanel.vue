@@ -1,6 +1,6 @@
 <template>
   <div class="vml-glass-panel">
-    <h3 class="panel-title">📐 N-gram 分解</h3>
+    <h3 class="panel-title"><InlineIcon icon="📐" />N-gram 分解</h3>
 
     <div v-if="loading" class="vml-loading">
       <div class="ui-loading--page" aria-hidden="true"></div>
@@ -72,6 +72,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 defineProps({
   villageId: {
     type: Number,

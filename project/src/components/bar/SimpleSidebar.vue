@@ -26,8 +26,11 @@
             @mouseenter="handleItemMouseEnter(item, key, $event)"
             @mouseleave="item.children && canHover ? scheduleCloseSubmenu() : null"
           >
-            <span role="img" :aria-label="key">{{ item.icon }}</span>
+            <BarIcon :icon="item.icon" />
             {{ item.label }}
+            <svg v-if="item.children && canHover" class="sidebar-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+            <svg v-else-if="item.children" class="sidebar-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
+            <svg v-else-if="item.external" class="sidebar-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </li>
         </ul>
 
@@ -43,7 +46,7 @@
               <span class="stat-value">{{ totalVisits }}</span>
             </div>
             <button class="expand-btn main-sidebar-expand-btn" @click="toggleStatsPanel">
-              📊
+              <InlineIcon icon="📊" />
             </button>
           </div>
         </div>
@@ -69,14 +72,14 @@
       <div v-else class="stats-content">
         <div class="stats-summary-large">
           <div class="stat-card">
-            <div class="stat-icon">📅</div>
+            <div class="stat-icon"><InlineIcon icon="📅" /></div>
             <div class="stat-info">
               <span class="stat-label-large">{{ t('navigation.stats.todayVisits') }}</span>
               <span class="stat-value-large">{{ todayVisits }}</span>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon">🌐</div>
+            <div class="stat-icon"><InlineIcon icon="🌐" /></div>
             <div class="stat-info">
               <span class="stat-label-large">{{ t('navigation.stats.totalVisits') }}</span>
               <span class="stat-value-large">{{ totalVisits }}</span>
@@ -122,7 +125,7 @@
           class="submenu-item main-sidebar-submenu-item"
           @click="handleSubmenuClick(child)"
         >
-          <span class="submenu-icon">{{ child.icon }}</span>
+          <BarIcon :icon="child.icon" class="submenu-icon" />
           <span class="submenu-label">{{ child.label }}</span>
         </div>
       </div>
@@ -136,6 +139,8 @@ import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue'
 import { clearToken, getToken } from '@/api/auth/auth.js'
+import BarIcon from '@/components/common/BarIcon.vue'
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { useVisitStats, ensureVisitHistory } from '@/composables/data/useVisitStats.js'
 import {userStore} from "@/main/store/store.js";
 import { useSidebarConfig } from '@/main/config/index.js';
@@ -854,6 +859,13 @@ $portrait-ratio: 1;
 }
 
 
+.sidebar-chevron,
+.sidebar-external {
+  flex-shrink: 0;
+  margin-left: auto;
+  opacity: 0.6;
+}
+
 .submenu-icon {
   flex-shrink: 0;
 
@@ -944,7 +956,7 @@ $portrait-ratio: 1;
 
 
     li {
-      padding: 3px 15px;
+      padding: 3px 8px 3px 15px;
       font-size: 1.1rem;
     }
   }

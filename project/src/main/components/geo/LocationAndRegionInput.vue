@@ -35,7 +35,7 @@
               class="inline-suggestion"
               :style="suggestionStyle"
           >
-            <div v-if="successMessage" class="success">✅ {{ successMessage }}</div>
+            <div v-if="successMessage" class="success"><InlineIcon icon="✅" />{{ successMessage }}</div>
             <div
                 v-for="item in suggestions"
                 :key="item"
@@ -72,7 +72,7 @@
               @click="openPartitionInfoModal"
               :title="$t('query.components.locationAndRegionInput.viewPartitionDetails')"
           >
-            <span class="icon">ℹ️</span>
+            <span class="icon"><InlineIcon icon="ℹ️" /></span>
           </button>
         </div>
 
@@ -184,6 +184,7 @@
 
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, nextTick ,onMounted, onActivated, watch, computed,defineProps, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getLocations, getCustomFeature, getLocationPartitions, batchMatch, getPartitions } from '@/api/index.js'

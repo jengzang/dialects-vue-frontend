@@ -23,7 +23,7 @@ export const MENU_LEGACY_ROUTES = {
       map: '/menu/map/view',
       divide: '/menu/map/divide',
       custom: '/menu/map/custom',
-      draw: '/menu/map/draw'
+      draw: '/explore/gis'
     }
   },
   pho: {
@@ -37,12 +37,12 @@ export const MENU_LEGACY_ROUTES = {
     }
   },
   about: {
-    defaultPath: '/menu/about/settings',
+    defaultPath: '/menu/about/intro',
     subMap: {
       intro: '/menu/about/intro',
       suggestion: '/menu/about/suggestion',
       like: '/menu/about/like',
-      setting: '/menu/about/settings'
+      setting: '/menu/settings'
     }
   },
   result: {
@@ -88,7 +88,7 @@ export const EXPLORE_LEGACY_ROUTES = {
     path: '/explore/manage'
   },
   YuBao: {
-    path: '/explore/yubao',
+    path: '/menu/yubao',
     defaultTab: 'vocabulary',
     tabMap: {
       vocabulary: 'vocabulary',
@@ -96,7 +96,7 @@ export const EXPLORE_LEGACY_ROUTES = {
     }
   },
   Vocabulary: {
-    path: '/explore/vocabulary/view',
+    path: '/menu/vocabulary',
     defaultTab: 'table',
     tabMap: {
       table: 'table',
@@ -115,7 +115,7 @@ export const EXPLORE_LEGACY_ROUTES = {
     }
   },
   ycSpoken: {
-    path: '/explore/yc-spoken'
+    path: '/explore/yc/words'
   },
   gdVillages: {
     path: '/explore/villages/gd'

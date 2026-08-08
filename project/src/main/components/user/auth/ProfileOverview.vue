@@ -15,13 +15,14 @@
         class="benefit-circle-btn"
         :title="$t('auth.profile.viewBenefits')"
         @click="$emit('showBenefits')"
-      >
-        🎁
-      </button>
+      ><InlineIcon icon="🎁" /></button>
     </div>
 
     <!-- Overview Tab -->
     <div v-if="currentTab === 'overview'">
+      <div class="settings-link" @click="$emit('goToSettings')">
+        {{ $t('auth.profile.goToSettings') }} →
+      </div>
       <!-- User Info Card -->
       <div class="user-profile-card">
         <!-- Avatar Header -->
@@ -35,7 +36,7 @@
             <div class="profile-username">
               {{ user.username }}
             </div>
-            <div v-if="user.email" class="profile-email">✉️ {{ user.email }}</div>
+            <div v-if="user.email" class="profile-email"><InlineIcon icon="✉️" />{{ user.email }}</div>
             <div class="user-info-badge" v-html="$t('auth.profile.userNumber', { id: user.id })" />
           </div>
         </div>
@@ -43,14 +44,14 @@
         <!-- Info Grid -->
         <div class="info-metrics-grid">
           <div class="metric-item">
-            <div class="metric-icon">🗓️</div>
+            <div class="metric-icon"><InlineIcon icon="🗓️" /></div>
             <div class="metric-content">
               <span class="metric-label">{{ $t('auth.profile.registerLabel') }}</span>
               <span class="metric-value">{{ fmt(user.created_at) }}</span>
             </div>
           </div>
           <div class="metric-item">
-            <div class="metric-icon">⏱️</div>
+            <div class="metric-icon"><InlineIcon icon="⏱️" /></div>
             <div class="metric-content">
               <span class="metric-label">{{ $t('auth.profile.onlineLabel') }}</span>
               <span class="metric-value">{{ formatOnlineTime(user.total_online_seconds) }}</span>
@@ -61,7 +62,7 @@
         <!-- Custom Row (Always side-by-side, clickable) -->
         <div class="info-custom-row">
           <div class="metric-item highlightable clickable" @click="$emit('goToUserRegions')">
-            <div class="metric-icon">🗂️</div>
+            <div class="metric-icon"><InlineIcon icon="🗂️" /></div>
             <div class="metric-content">
               <span class="metric-label">{{ $t('auth.profile.regionsLabel') }}</span>
               <span class="metric-value count-number">
@@ -70,7 +71,7 @@
             </div>
           </div>
           <div class="metric-item highlightable clickable" @click="$emit('goToUserData')">
-            <div class="metric-icon">📊</div>
+            <div class="metric-icon"><InlineIcon icon="📊" /></div>
             <div class="metric-content">
               <span class="metric-label">{{ $t('auth.profile.dataLabel') }}</span>
               <span class="metric-value count-number">
@@ -83,31 +84,25 @@
 
       <!-- Action Buttons -->
       <div class="action-buttons">
-        <ActionButton variant="info" @click="$emit('goToUserData')">
-          📊 {{ $t('auth.profile.buttons.userData') }}
+        <ActionButton variant="info" @click="$emit('goToUserData')"><InlineIcon icon="📊" />{{ $t('auth.profile.buttons.userData') }}
         </ActionButton>
-        <ActionButton variant="teal" @click="$emit('goToUserRegions')">
-          🗂️ {{ $t('auth.profile.buttons.userRegions') }}
+        <ActionButton variant="teal" @click="$emit('goToUserRegions')"><InlineIcon icon="🗂️" />{{ $t('auth.profile.buttons.userRegions') }}
         </ActionButton>
-        <ActionButton variant="blue" @click="$emit('goToModifyProfile')">
-          🛠 {{ $t('auth.profile.buttons.modifyProfile') }}
+        <ActionButton variant="blue" @click="$emit('goToModifyProfile')"><InlineIcon icon="🛠" />{{ $t('auth.profile.buttons.modifyProfile') }}
         </ActionButton>
-        <ActionButton variant="danger" @click="$emit('logout')">
-          🚪 {{ $t('auth.profile.buttons.logout') }}
+        <ActionButton variant="danger" @click="$emit('logout')"><InlineIcon icon="🚪" />{{ $t('auth.profile.buttons.logout') }}
         </ActionButton>
         <ActionButton
           v-if="user?.role === 'admin'"
           variant="green"
           @click="$emit('goToAdminPanel')"
-        >
-          🧑‍💻 {{ $t('auth.profile.buttons.adminPanel') }}
+        ><InlineIcon icon="🧑‍💻" />{{ $t('auth.profile.buttons.adminPanel') }}
         </ActionButton>
         <ActionButton
           v-if="user?.role === 'admin'"
           variant="yellow"
           @click="$emit('goToTableManager')"
-        >
-          📈 {{ $t('auth.profile.buttons.tableManager') }}
+        ><InlineIcon icon="📈" />{{ $t('auth.profile.buttons.tableManager') }}
         </ActionButton>
       </div>
     </div>
@@ -120,6 +115,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ActionButton from './ActionButton.vue'
@@ -157,6 +153,7 @@ defineEmits([
   'goToUserData',
   'goToUserRegions',
   'goToModifyProfile',
+  'goToSettings',
   'logout',
   'goToAdminPanel',
   'goToTableManager',
@@ -491,6 +488,27 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
 
   @media (max-aspect-ratio: 1/1) {
     padding: 12px 20px !important;
+  }
+}
+
+.settings-link {
+  max-width: 600px;
+  margin: 12px auto 6px;
+  padding-right: 4px;
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.7;
+  }
+
+  @media (min-aspect-ratio: 1/1) {
+    max-width: 650px;
   }
 }
 

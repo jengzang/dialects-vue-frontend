@@ -6,9 +6,7 @@
         class="benefit-circle-btn"
         @click="$emit('showBenefits')"
         :title="$t('auth.register.viewBenefits')"
-      >
-        🎁
-      </button>
+      ><InlineIcon icon="🎁" /></button>
     </h3>
 
     <!-- Username -->
@@ -66,6 +64,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref } from 'vue'
 import FormInput from './FormInput.vue'
 

@@ -5,11 +5,13 @@
         <div class="input-wrapper">
           <textarea
             ref="searchInputEl"
-            :value="query"
+            :value="inputText"
             class="search-input"
             rows="1"
             :placeholder="t('words.wordList.search.placeholder')"
-            @input="emit('update:query', ($event.target).value)"
+            @compositionstart="handleCompositionStart"
+            @compositionend="handleCompositionEnd"
+            @input="handleInput"
           />
         </div>
 
@@ -20,7 +22,7 @@
             :title="t('words.wordList.search.settings')"
             @click="searchFieldModalOpen = true"
           >
-            <span aria-hidden="true">⚙️</span>
+            <span aria-hidden="true"><InlineIcon icon="⚙️" /></span>
           </button>
           <AppModal
             v-model="searchFieldModalOpen"
@@ -39,6 +41,18 @@
                 :model-value="isFieldChecked(field.value)"
                 :label="field.label"
                 @update:model-value="(val) => toggleField(field.value, val)"
+              />
+            </div>
+            <div class="search-field-mode-section">
+              <h4 class="search-field-modal-title">
+                {{ t('words.wordList.search.filterModeTitle') }}
+              </h4>
+              <SwitchToggle
+                :model-value="filterByRegion"
+                :show-label="true"
+                :active-text="t('words.wordList.search.filterByRegion')"
+                :inactive-text="t('words.wordList.search.filterByLocation')"
+                @update:model-value="emit('update:filterByRegion', $event)"
               />
             </div>
             <div class="search-field-mode-section">
@@ -102,7 +116,10 @@
         </template>
       </div>
 
-      <div class="location-filter">
+      <div
+        v-if="!filterByRegion"
+        class="location-filter"
+      >
         <button
           ref="locationTriggerEl"
           class="select-trigger global-select-trigger location-select-trigger"
@@ -128,12 +145,38 @@
           @close="locationDropdownOpen = false"
         />
       </div>
+
+      <div
+        v-else
+        class="location-filter"
+      >
+        <SimpleSelectDropdown
+          :model-value="selectedProvince"
+          :options="provinceOptions"
+          :placeholder="t('words.wordList.search.provincePlaceholder')"
+          searchable
+          match-trigger-width
+          width="100%"
+          @update:model-value="emit('update:selectedProvince', $event)"
+        />
+        <SimpleSelectDropdown
+          :model-value="selectedCity"
+          :options="cityOptions"
+          :placeholder="t('words.wordList.search.cityPlaceholder')"
+          :disabled="!selectedProvince"
+          searchable
+          match-trigger-width
+          width="100%"
+          @update:model-value="emit('update:selectedCity', $event)"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import InlineIcon from '@/components/common/InlineIcon.vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
@@ -154,6 +197,11 @@ const props = defineProps({
   searchFieldOptions: { type: Array, default: () => [] },
   locationOptions: { type: Array, default: () => [] },
   standardWordOptions: { type: Array, default: () => [] },
+  filterByRegion: { type: Boolean, default: false },
+  selectedProvince: { type: String, default: '' },
+  selectedCity: { type: String, default: '' },
+  provinceOptions: { type: Array, default: () => [] },
+  cityOptions: { type: Array, default: () => [] },
 })
 
 const emit = defineEmits([
@@ -163,6 +211,9 @@ const emit = defineEmits([
   'update:selectedStandardWord',
   'update:selectedStandardWords',
   'update:singleSelect',
+  'update:filterByRegion',
+  'update:selectedProvince',
+  'update:selectedCity',
 ])
 
 const searchInputEl = ref(null)
@@ -171,6 +222,38 @@ const standardWordTriggerEl = ref(null)
 const searchFieldModalOpen = ref(false)
 const locationDropdownOpen = ref(false)
 const standardWordDropdownOpen = ref(false)
+
+const inputText = ref(props.query)
+const isComposing = ref(false)
+let searchTimer = null
+
+watch(() => props.query, (val) => {
+  inputText.value = val
+})
+
+function handleCompositionStart() {
+  isComposing.value = true
+  clearTimeout(searchTimer)
+}
+
+function handleCompositionEnd(e) {
+  isComposing.value = false
+  inputText.value = e.target.value
+  scheduleSearchEmit()
+}
+
+function handleInput(e) {
+  inputText.value = e.target.value
+  if (isComposing.value) return
+  scheduleSearchEmit()
+}
+
+function scheduleSearchEmit() {
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => {
+    emit('update:query', inputText.value)
+  }, 500)
+}
 
 function formatMultiSelectLabel(selectedValues, options, placeholder) {
   const selectedLabels = selectedValues
@@ -319,6 +402,7 @@ const standardWordTriggerLabel = computed(() => {
 
 .location-filter {
   display: flex;
+  gap: 10px;
   align-items: center;
   justify-content: center;
   position: relative;
@@ -362,6 +446,10 @@ const standardWordTriggerLabel = computed(() => {
   .top-controls {
     @include flex-col;
     gap: 10px;
+  }
+
+  .search-container {
+    width: 100%;
   }
 
   .search-section {

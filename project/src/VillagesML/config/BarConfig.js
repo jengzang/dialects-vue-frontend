@@ -463,7 +463,7 @@ export function createVillagesMLCommonBarSchema(isAuthenticated = false) {
         label: '搜索',
         icon: '🔍',
          display: {
-            overrides: { mobileScroll: 'left', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 0.9 }
+            overrides: { mobileScroll: 'left', weightIconOnly: 0.4, fontSize: 1.2, mobileFontSize: 0.9 }
         },
         navigation: {
             defaultTo: buildCurrentVillagesMLPath({ module: 'search' }),
@@ -477,7 +477,7 @@ export function createVillagesMLCommonBarSchema(isAuthenticated = false) {
       label: '信息',
       icon: 'ℹ️',
       display: {
-            overrides: { mobileScroll: 'right', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 0.9 }
+            overrides: { scroll: 'right', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 0.9 }
        },
        navigation: {
              defaultTo: buildCurrentVillagesMLPath({ module: 'system' }),

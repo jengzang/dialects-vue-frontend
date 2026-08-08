@@ -68,6 +68,22 @@ const routes = [
         redirect: createLocaleRedirect('/explore/tools/praat')
       },
       {
+        path: 'menu/map/draw',
+        redirect: createLocaleRedirect('/explore/gis')
+      },
+      {
+        path: 'explore/yubao',
+        redirect: createLocaleRedirect('/menu/yubao')
+      },
+      {
+        path: 'explore/vocabulary/:child?',
+        redirect: createLocaleRedirect('/menu/vocabulary')
+      },
+      {
+        path: 'explore/yc-spoken',
+        redirect: createLocaleRedirect('/explore/yc/words')
+      },
+      {
         path: 'auth',
         component: Auth
       },
@@ -175,7 +191,8 @@ const ROUTE_QUERY_ALLOWLIST = {
       source: [],
       privacy: [],
       tools: [],
-      words: [],
+      vocabulary: [],
+      yubao: [],
       villages: []
     }
   },
@@ -184,11 +201,9 @@ const ROUTE_QUERY_ALLOWLIST = {
     variantKey: 'page',
     variants: {
       CharacterClassification: ['sub', 'table', 'levels'],
-      YuBao: ['sub'],
       praat: ['tab'],
       VillagesML: ['module', 'subtab', 'pattern', 'ngram', 'villageId', 'detail'],
       ycVillages: [],
-      ycSpoken: [],
       manage: [],
       gdVillages: [],
       gdVillagesTable: [],
@@ -214,29 +229,14 @@ const ROUTE_QUERY_ALLOWLIST = {
   '/explore/tools/praat': {
     base: ['tab']
   },
+  '/explore/gis': {
+    base: ['scrollTo']
+  },
   '/explore/manage': {
-    base: []
-  },
-  '/explore/yubao': {
-    base: ['tab']
-  },
-  '/explore/vocabulary': {
-    base: []
-  },
-  '/explore/vocabulary/view': {
-    base: ['tab']
-  },
-  '/explore/vocabulary/import': {
-    base: []
-  },
-  '/explore/vocabulary/manage': {
     base: []
   },
   '/explore/char-class': {
     base: ['tab', 'table', 'levels']
-  },
-  '/explore/yc-spoken': {
-    base: []
   },
   '/explore/villages/gd': {
     base: []
@@ -245,6 +245,12 @@ const ROUTE_QUERY_ALLOWLIST = {
     base: []
   },
   '/explore/villages/yc': {
+    base: []
+  },
+  '/explore/yc/words': {
+    base: []
+  },
+  '/explore/yc/villages': {
     base: []
   },
   '/explore/villages/ml': {
@@ -274,7 +280,7 @@ const ROUTE_QUERY_ALLOWLIST = {
   '/menu/about/like': {
     base: []
   },
-  '/menu/about/settings': {
+  '/menu/settings': {
     base: []
   },
   '/menu/result': {
@@ -291,6 +297,21 @@ const ROUTE_QUERY_ALLOWLIST = {
   },
   '/menu/words': {
     base: []
+  },
+  '/menu/vocabulary': {
+    base: []
+  },
+  '/menu/vocabulary/view': {
+    base: ['tab']
+  },
+  '/menu/vocabulary/import': {
+    base: []
+  },
+  '/menu/vocabulary/manage': {
+    base: []
+  },
+  '/menu/yubao': {
+    base: ['tab']
   },
   '/menu/villages': {
     base: []

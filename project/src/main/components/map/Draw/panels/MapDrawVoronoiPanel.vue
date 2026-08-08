@@ -329,6 +329,7 @@ const offsetClass = computed(() => {
 }
 
 .voronoi-panel {
+
   &.offset-double {
     right: 47rem;
   }
@@ -359,6 +360,8 @@ const offsetClass = computed(() => {
 
 .voronoi-summary-card {
   @include flex-col;
+  justify-content: center;
+  align-items: center;
   gap: 0.25rem;
   padding: 0.8rem;
   border-radius: 14px;

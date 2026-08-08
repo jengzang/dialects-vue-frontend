@@ -8,6 +8,18 @@
     "logoAlt": "方音圖鑑",
     "decorationAlt": "藍色圓環"
   },
+  "showcase": {
+    "nav": "產品展示",
+    "switchTo": "切換到",
+    "yinxi": { "title": "方言音系", "action": "查看音系" },
+    "zhonggu": { "title": "中古查詢地圖", "action": "查看地圖" },
+    "result": { "title": "查詢結果", "action": "查看結果" },
+    "villages": { "title": "廣東自然村", "action": "瀏覽村落" },
+    "compare": { "title": "方言比較", "action": "進入比較" },
+    "gis": { "title": "GIS 繪圖", "action": "開始繪圖" },
+    "evolution": { "title": "語音演化", "action": "查看演化" },
+    "photiccompare": { "title": "比較音值", "action": "查看桑基圖" }
+  },
   "features": {
     "sectionTitle": "核心功能",
     "query": {
@@ -54,6 +66,7 @@
     "villages": {
       "title": "自然村資料",
       "desc": "村落地名分析與方言繪圖",
+      "toponyms": "地名分佈 - 按漢字或地名片段查看自然村地名的地理分佈",
       "gdVillages": "廣東自然村 - 廣東自然村樹狀圖",
       "villagesML": "機器學習 - 自然村名機器學習",
       "gdVillagesTable": "全粵村情表格 - 廣東村落詳細表格",

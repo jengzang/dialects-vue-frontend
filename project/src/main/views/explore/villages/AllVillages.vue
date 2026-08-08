@@ -20,7 +20,7 @@
         </div>
       </div>
       <div class="search-wrapper">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon"><InlineIcon icon="🔍" /></span>
         <input
             type="text"
             v-model="searchQuery"
@@ -40,7 +40,7 @@
 
       <!-- Initial Error State -->
       <div v-else-if="initialLoadError" class="initial-state error-state">
-        <div class="error-icon">⚠️</div>
+        <div class="error-icon"><InlineIcon icon="⚠️" /></div>
         <p class="error-message">{{ initialLoadError }}</p>
         <button @click="loadInitialCities" class="retry-btn">
           {{ t('villages.pages.allVillages.retry') }}
@@ -127,6 +127,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { decompressSync, strFromU8 } from 'fflate'

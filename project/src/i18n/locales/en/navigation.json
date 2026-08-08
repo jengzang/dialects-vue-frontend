@@ -52,6 +52,7 @@
       "ycSpoken": "Yangchun Colloquial Vocabulary"
     },
     "villages": {
+      "toponyms": "Village Toponym Distribution",
       "gdVillages": "Guangdong Villages",
       "VillagesML": "Machine Learning",
       "gdVillagesTable": "Guangdong Village Table",
@@ -64,6 +65,7 @@
       "merge": "Merge Character Lists",
       "derive": "Character List Derivation",
       "praat": "Acoustic Analysis",
+      "gis": "GIS",
       "praatname": "Praat"
     },
     "source": {
@@ -91,7 +93,11 @@
     "about": "About",
     "tools": "Tools",
     "praat": "Praat",
+    "gis": "GIS",
     "phrases": "Phrases",
+    "vocabulary": "Vocabulary",
+    "yubao": "YuBao",
+    "yangchun": "Yangchun",
     "villages": "Villages",
     "aboutWebsite": "About",
     "settings": "Settings"

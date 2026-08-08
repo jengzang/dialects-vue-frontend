@@ -53,14 +53,14 @@
             />
 
             <template v-if="!referenceFile">
-              <div class="upload-icon">📋</div>
+              <div class="upload-icon"><InlineIcon icon="📋" /></div>
               <div class="upload-text">{{ t('tools.merge.reference.uploadText') }}</div>
               <div class="upload-hint">{{ t('tools.merge.reference.uploadHint') }}</div>
             </template>
 
             <template v-else>
               <div class="file-info-card">
-                <div class="file-icon">✅</div>
+                <div class="file-icon"><InlineIcon icon="✅" /></div>
                 <div class="file-details">
                   <div class="file-name">{{ referenceFile.name }}</div>
                   <div class="file-meta">
@@ -75,9 +75,7 @@
                   class="remove-btn"
                   :title="t('tools.common.close')"
                   @click.stop="removeReference"
-                >
-                  ✕
-                </button>
+                ><InlineIcon icon="✕" /></button>
               </div>
             </template>
           </div>
@@ -164,7 +162,7 @@
               @change="handleFilesSelect"
               style="display: none"
             />
-            <div class="upload-icon">📁</div>
+            <div class="upload-icon"><InlineIcon icon="📁" /></div>
             <div class="upload-text">{{ t('tools.merge.files.uploadText') }}</div>
             <div class="upload-hint">{{ t('tools.merge.files.uploadHint') }}</div>
           </div>
@@ -206,7 +204,7 @@
                 <div class="file-item-status">
                   {{ item.mapped ? t('tools.merge.files.mapped') : t('tools.merge.files.pendingMapping') }}
                 </div>
-                <button v-if="!item.mapped" class="file-item-remove" @click.stop="removePendingFile(index)">🗑️</button>
+                <button v-if="!item.mapped" class="file-item-remove" @click.stop="removePendingFile(index)"><InlineIcon icon="🗑️" /></button>
               </div>
             </div>
           </div>
@@ -219,9 +217,9 @@
                 :key="index"
                 class="file-item"
               >
-                <div class="file-item-icon">📄</div>
+                <div class="file-item-icon"><InlineIcon icon="📄" /></div>
                 <div class="file-item-name">{{ file.name }}</div>
-                <button class="file-item-remove" @click="removeFile(index)">🗑️</button>
+                <button class="file-item-remove" @click="removeFile(index)"><InlineIcon icon="🗑️" /></button>
               </div>
             </div>
           </div>
@@ -274,26 +272,26 @@
           </div>
 
           <div class="complete-view" v-else>
-            <h3 class="complete-title">✅ {{ t('tools.merge.complete.title') }}</h3>
+            <h3 class="complete-title"><InlineIcon icon="✅" />{{ t('tools.merge.complete.title') }}</h3>
             <p class="complete-text">{{ t('tools.merge.complete.text') }}</p>
 
             <div class="result-summary">
 <!--              <div class="summary-card">-->
-<!--                <div class="summary-icon">📊</div>-->
+<!--                <div class="summary-icon"><InlineIcon icon="📊" /></div>-->
 <!--                <div class="summary-content">-->
 <!--                  <div class="summary-number">{{ mergeStats.totalRows }}</div>-->
 <!--                  <div class="summary-label">總行數</div>-->
 <!--                </div>-->
 <!--              </div>-->
               <div class="summary-card">
-                <div class="summary-icon">📁</div>
+                <div class="summary-icon"><InlineIcon icon="📁" /></div>
                 <div class="summary-content">
                   <div class="summary-number">{{ mergeStats.totalFiles }}</div>
                   <div class="summary-label">{{ t('tools.merge.summary.mergedFileCount') }}</div>
                 </div>
               </div>
 <!--              <div class="summary-card">-->
-<!--                <div class="summary-icon">📋</div>-->
+<!--                <div class="summary-icon"><InlineIcon icon="📋" /></div>-->
 <!--                <div class="summary-content">-->
 <!--                  <div class="summary-number">{{ mergeStats.totalColumns }}</div>-->
 <!--                  <div class="summary-label">總列數</div>-->
@@ -303,11 +301,11 @@
 
             <div class="result-actions">
               <button class="main-glass-button" data-variant="primary" data-size="large" @click="downloadMerged">
-                <span class="icon">⬇️</span>
+                <span class="icon"><InlineIcon icon="⬇️" /></span>
                 <span>{{ t('tools.merge.actions.downloadResult') }}</span>
               </button>
               <button class="main-glass-button" data-variant="secondary" @click="reset">
-                <span class="icon">🔄</span>
+                <span class="icon"><InlineIcon icon="🔄" /></span>
                 <span>{{ t('tools.merge.actions.resetTask') }}</span>
               </button>
             </div>
@@ -322,7 +320,7 @@
                 >
                   <span class="merged-index">{{ index + 1 }}</span>
                   <span class="merged-name">{{ file.name }}</span>
-                  <span class="merged-status">✓ {{ t('tools.common.completed') }}</span>
+                  <span class="merged-status"><InlineIcon icon="✓" />{{ t('tools.common.completed') }}</span>
                 </div>
               </div>
             </div>
@@ -334,7 +332,9 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, reactive, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
@@ -349,6 +349,7 @@ import defaultReferenceWorkbookUrl from '/data/参考表.xlsx?url'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t } = useI18n()
+const route = useRoute()
 const { requireAuth } = useAuthGuard({
   defaultRedirect: '/explore/tools/merge',
 })

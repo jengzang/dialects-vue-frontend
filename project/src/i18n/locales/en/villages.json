@@ -1,24 +1,28 @@
 {
   "title": "Natural Villages",
+  "toponyms": {
+    "name": "Village Toponym Distribution",
+    "desc": "Explore where natural-village place names cluster by character or name fragment"
+  },
   "gdVillages": {
-    "name": "Guangdong Villages",
-    "desc": "Guangdong Province natural villages tree view"
+    "name": "Guangdong Natural Villages",
+    "desc": "Browse the Guangdong natural-village hierarchy"
   },
   "villagesML": {
-    "name": "Village Analysis",
-    "desc": "Machine learning and NLP analysis of Guangdong villages"
+    "name": "Machine Learning",
+    "desc": "Analyze natural-village names with machine learning"
   },
   "gdVillagesTable": {
-    "name": "Village Data Table",
-    "desc": "Guangdong Province natural villages table data"
+    "name": "Guangdong Village Table",
+    "desc": "Detailed village data for Guangdong"
   },
   "ycVillages": {
-    "name": "Yangchun Villages",
-    "desc": "Yangchun County natural villages (from county records)"
+    "name": "Yangchun Natural Villages",
+    "desc": "Natural-village data for Yangchun"
   },
   "allVillages": {
-    "name": "All Villages",
-    "desc": "All villages data (admin only)"
+    "name": "All Natural Villages",
+    "desc": "Complete natural-village data (administrators only)"
   },
   "dashboard": {
     "pageTitle": "Village Analysis System",
@@ -132,6 +136,110 @@
         "dialect": "Dialect",
         "longitude": "Longitude",
         "latitude": "Latitude"
+      }
+    },
+    "toponyms": {
+      "title": "Village Toponym Distribution",
+      "subtitle": "Enter a Chinese character or place-name fragment to inspect matching point distribution, then click a point to query local and Ministry details manually.",
+      "search": {
+        "keyword": "Keyword",
+        "placeholder": "Try: 黄, 塘, 村",
+        "matchMode": "Match",
+        "placeType": "Type",
+        "submit": "Search",
+        "searching": "Searching..."
+      },
+      "matchModes": {
+        "prefix": "Prefix",
+        "suffix": "Suffix",
+        "exact": "Exact",
+        "contains": "Contains"
+      },
+      "placeTypes": {
+        "naturalVillage": "Natural village / rural settlement",
+        "adminVillage": "Administrative village",
+        "villageCommittee": "Village committee"
+      },
+      "layers": {
+        "title": "Base Layers",
+        "caption": "Country boundary loads by default",
+        "country": "Country",
+        "provinces": "Provinces",
+        "cities": "Cities",
+        "riverL1": "River level 1",
+        "riverL2": "River level 2",
+        "riverL3": "River level 3",
+        "loading": "Loading"
+      },
+      "chart": {
+        "ariaLabel": "Natural village toponym distribution chart",
+        "placeholderTitle": "ECharts Distribution",
+        "countryLoading": "Loading China country boundary",
+        "countryReady": "China country boundary is ready",
+        "searchFirst": "Search a keyword to draw matching points here",
+        "pointsReady": "{count} drawable points are ready",
+        "noDrawablePoints": "No drawable points.",
+        "pointsSeries": "Matching points",
+        "pointTooltip": "Click to query detailed village information",
+        "baseMapError": "Base map failed to load",
+        "configAriaLabel": "Chart settings",
+        "configTitle": "Chart Settings",
+        "configPointStyle": "Point Style",
+        "configSize": "Size",
+        "configShape": "Shape",
+        "configColor": "Color",
+        "configBackground": "Background"
+      },
+      "results": {
+        "title": "Results",
+        "empty": "Search a keyword first.",
+        "loading": "Loading points...",
+        "count": "Backend matched {count}; {shown} points are drawable.",
+        "truncated": "Results were truncated. Narrow the keyword or choose a stricter match mode."
+      },
+      "nameTree": {
+        "title": "Name Hierarchy",
+        "load": "Query name hierarchy",
+        "loading": "Loading",
+        "idle": "After searching points, query administrative name hierarchy manually.",
+        "empty": "No name hierarchy results",
+        "level": "Level {level}",
+        "lazyFallback": "{count} results exceed the full-tree threshold of {threshold}; expand levels manually.",
+        "expand": "Expand name hierarchy",
+        "loadingNode": "Loading child level...",
+        "loadMore": "Load more"
+      },
+      "detail": {
+        "title": "Point Detail",
+        "empty": "Click a map point to view local details.",
+        "cardHint": "Use the buttons to query detailed village information.",
+        "selectedPoint": "Selected coordinates",
+        "localButton": "Query local detail",
+        "localButtonLoading": "Querying...",
+        "localHint": "Query local detail first, then query Ministry detail if needed.",
+        "localLoading": "Loading local detail...",
+        "localSource": "Source",
+        "localSourceName": "Local toponyms database",
+        "noLocalDetail": "No local detail found.",
+        "name": "Standard name",
+        "placeType": "Type",
+        "coordinates": "Detail coordinates",
+        "divisionPath": "Administrative path",
+        "officialButton": "Query Ministry detail",
+        "officialLoading": "Querying...",
+        "officialArea": "Ministry area",
+        "officialCity": "Ministry city",
+        "officialOldName": "Former name",
+        "unknown": "Unknown"
+      },
+      "errors": {
+        "emptyQuery": "Enter a keyword before searching.",
+        "countryLayer": "Failed to load the country boundary.",
+        "optionalLayer": "Failed to load the optional layer.",
+        "nameTree": "Failed to load name hierarchy.",
+        "points": "Failed to load points.",
+        "details": "Failed to load local detail.",
+        "official": "Failed to load Ministry detail."
       }
     },
     "allVillages": {

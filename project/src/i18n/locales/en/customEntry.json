@@ -53,7 +53,15 @@
       "title": "Feature records",
       "description": "Each row represents one custom record ready to submit.",
       "add": "+ Add row",
-      "duplicateWarning": "A record with the same category and comparative feature already exists for this point. Continue saving?",
+      "noticeTrigger": "Field Guide",
+      "noticeTitle": "Field Instructions",
+      "hints": {
+        "phonology": "Select 漢字 for char search, 調值 for tone search, 聲母/韻母/聲調 for MC or phoneme search, or use 詞彙 / custom category",
+      "feature": "For char search: specific character (e.g. 好). For tone search: tone class (e.g. 陰平). For MC search: query term like 幫/流摄. For phoneme search: identifier like p/a",
+      "value": "Pronunciation e.g. ɐu, tone value e.g. 55, MC search value e.g. ou/ts, phoneme search distribution e.g. 假攝",
+      "warning": "The Category + Comparative Feature combination determines which search scenario the data appears in. Wrong combinations still save data, but it won't render on the map in query flows — it can only be viewed by clicking into cards on the current page."
+    },
+    "duplicateWarning": "A record with the same category and comparative feature already exists for this point. Continue saving?",
       "headers": {
         "phonology": "Category",
         "feature": "Comparative Feature",

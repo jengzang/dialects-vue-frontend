@@ -511,7 +511,7 @@ const handleQuickAdjust = (action) => {
 
 .distance {
   color: var(--text-secondary);
-  font-family: monospace;
+  font-family: var(--font-mono);
 }
 
 .empty-state {

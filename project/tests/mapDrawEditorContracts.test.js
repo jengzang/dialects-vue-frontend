@@ -1,0 +1,615 @@
+import { readFileSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { describe, expect, it } from 'vitest'
+
+const testsDir = dirname(fileURLToPath(import.meta.url))
+const projectRoot = resolve(testsDir, '..')
+const editableMapLibrePath = resolve(projectRoot, 'src/main/components/map/EditableMapLibre.vue')
+const mapDrawTabPath = resolve(projectRoot, 'src/main/views/explore/GisPage.vue')
+const mapDrawToolsPanelPath = resolve(projectRoot, 'src/main/components/map/Draw/panels/MapDrawToolsPanel.vue')
+const mapDrawLayersPanelPath = resolve(projectRoot, 'src/main/components/map/Draw/panels/MapDrawLayersPanel.vue')
+const useGisMapCorePath = resolve(projectRoot, 'src/composables/gis/useGisMapCore.js')
+const useGisFeaturesPath = resolve(projectRoot, 'src/composables/gis/useGisFeatures.js')
+const useGisLayersPath = resolve(projectRoot, 'src/composables/gis/useGisLayers.js')
+const useGisHistoryPath = resolve(projectRoot, 'src/composables/gis/useGisHistory.js')
+const useGisVoronoiPath = resolve(projectRoot, 'src/composables/gis/useGisVoronoi.js')
+const zhCnMapLocalePath = resolve(projectRoot, 'src/i18n/locales/zh-CN/map.json')
+const zhHantMapLocalePath = resolve(projectRoot, 'src/i18n/locales/zh-Hant/map.json')
+const enMapLocalePath = resolve(projectRoot, 'src/i18n/locales/en/map.json')
+
+function readSource(path) {
+  return readFileSync(path, 'utf8')
+}
+
+function drawStylesBlock(source) {
+  const start = source.indexOf('const drawStyles = [')
+  const end = source.indexOf('const props = defineProps')
+
+  expect(start).toBeGreaterThan(-1)
+  expect(end).toBeGreaterThan(start)
+
+  return source.slice(start, end)
+}
+
+describe('Map draw editor contracts', () => {
+  it('enables Mapbox Draw user properties for active layer styling', () => {
+    const source = readSource(editableMapLibrePath)
+
+    expect(source).toContain('userProperties: true')
+    expect(source).toContain('keybindings: false')
+  })
+
+  it('reads user-prefixed style properties in active Draw layers', () => {
+    const source = readSource(editableMapLibrePath)
+    const stylesSource = drawStylesBlock(source)
+
+    for (const key of [
+      'user_fill',
+      'user_stroke',
+      'user_fillOpacity',
+      'user_strokeWidth',
+      'user_visible',
+      'user_pointRadius',
+      'user_pointColor',
+      'user_pointStrokeColor',
+    ]) {
+      expect(stylesSource).toContain(`['get', '${key}']`)
+    }
+
+    for (const key of [
+      'fill',
+      'stroke',
+      'fillOpacity',
+      'strokeWidth',
+      'visible',
+      'pointRadius',
+      'pointColor',
+      'pointStrokeColor',
+    ]) {
+      expect(stylesSource).not.toContain(`['get', '${key}']`)
+    }
+  })
+
+  it('keeps hidden active layer features in Draw state and hides them through style filters', () => {
+    const editableSource = readSource(editableMapLibrePath)
+    const tabSource = readSource(mapDrawTabPath)
+    const stylesSource = drawStylesBlock(editableSource)
+
+    expect(stylesSource).toContain(`['!=', 'user_visible', false]`)
+    expect(editableSource).not.toContain('props.activeLayer?.visible === false ? emptyFeatureCollection()')
+    expect(tabSource).not.toContain('activeLayer.value.visible === false ? emptyFeatureCollection()')
+  })
+
+  it('exposes undo and redo actions in the tools panel', () => {
+    const source = readSource(mapDrawToolsPanelPath)
+
+    expect(source).toContain('canUndo')
+    expect(source).toContain('canRedo')
+    expect(source).toContain(`$emit('undo')`)
+    expect(source).toContain(`$emit('redo')`)
+    expect(source).toContain(`t('map.drawTab.buttons.undo')`)
+    expect(source).toContain(`t('map.drawTab.buttons.redo')`)
+  })
+
+  it('wires map draw history to commands and keyboard shortcuts', () => {
+    const tabSource = readSource(mapDrawTabPath)
+    const historySource = readSource(useGisHistoryPath)
+
+    expect(tabSource).toContain('useGisHistory')
+    expect(historySource).toContain('createMapDrawHistory')
+    expect(historySource).toContain('commitHistory')
+    expect(historySource).toContain('undoHistory')
+    expect(historySource).toContain('redoHistory')
+    expect(tabSource).toContain('@undo="undoHistory"')
+    expect(tabSource).toContain('@redo="redoHistory"')
+    expect(tabSource).toContain('handleDrawHistoryKeydown')
+    expect(tabSource).toContain(`document.addEventListener('keydown', handleDrawHistoryKeydown)`)
+    expect(tabSource).toContain(`document.removeEventListener('keydown', handleDrawHistoryKeydown)`)
+    expect(tabSource).toContain("event.key.toLowerCase() === 'a'")
+    expect(tabSource).toContain("event.key === 'Delete'")
+    expect(tabSource).toContain("event.key === 'Backspace'")
+    expect(tabSource).toContain("event.key === 'Escape'")
+    expect(tabSource).toContain('isSelectAll && canModifyActiveLayer.value')
+    expect(tabSource).toContain('isDelete && canDeleteSelection.value')
+    expect(tabSource).toMatch(/if \(isEscape[\s\S]*resetDrawSelectionMode\(\);/)
+    expect(tabSource).toContain('handleSelectAllFeatures();')
+    expect(tabSource).toContain('handleDeleteSelected();')
+    expect(tabSource).toContain('before-features-change')
+  })
+
+  it('commits history before generated Voronoi layers are added', () => {
+    const source = readSource(useGisVoronoiPath)
+
+    expect(source).toMatch(/commitHistory\(\);\s+layers\.value\.unshift\(\.\.\.exportedLayers\)/)
+  })
+
+  it('refreshes the layer id seed when history snapshots are restored', () => {
+    const coreSource = readSource(useGisMapCorePath)
+    const historySource = readSource(useGisHistoryPath)
+
+    expect(coreSource).toContain('const syncLayerIdSeedFromLayers')
+    expect(historySource).toMatch(/const applyHistorySnapshot = \(snapshot\) => \{[\s\S]*syncLayerIdSeedFromLayers\(layers\.value\)/)
+  })
+
+  it('guards history restore state with finally and skips no-op all-layer visibility commits', () => {
+    const historySource = readSource(useGisHistoryPath)
+    const layersSource = readSource(useGisLayersPath)
+
+    expect(historySource).toMatch(/try \{[\s\S]*syncAllLayersAfterMutation\(\);[\s\S]*\} finally \{[\s\S]*isApplyingHistory\.value = false/)
+    expect(layersSource).toContain('if (layers.value.every((layer) => layer.visible === visible)) return;')
+  })
+
+  it('restores Mapbox Draw mode from history snapshots without UI mode drift', () => {
+    const source = readSource(useGisHistoryPath)
+
+    expect(source).toContain(`const restoredSelectedFeatureId = snapshot.selectedFeatureId || '';`)
+    expect(source).toContain(`const restoredMode = snapshot.currentMode || 'simple_select';`)
+    expect(source).toContain('selectedFeatureIds: selectedFeatureIds.value,')
+    expect(source).toContain('const restoredSelectedFeatureIds = Array.isArray(snapshot.selectedFeatureIds)')
+    expect(source).toContain('setFeatureSelection(restoredSelectedFeatureIds, restoredSelectedFeatureId);')
+    expect(source).toContain('currentMode.value = restoredMode;')
+    expect(source).toContain('editableMapRef?.value?.selectFeature?.(sid);')
+    expect(source).toContain('editableMapRef?.value?.selectFeatures?.(selectedFeatureIds.value);')
+    expect(source).toContain('editableMapRef?.value?.setDrawMode?.(restoredMode);')
+  })
+
+  it('exits direct selection when active layer visibility or lock state changes', () => {
+    const coreSource = readSource(useGisMapCorePath)
+    const layersSource = readSource(useGisLayersPath)
+
+    expect(coreSource).toContain('const resetDrawSelectionMode = () =>')
+    expect(layersSource).toMatch(/function toggleLayerVisibility\(layerId\) \{[\s\S]*if \(layerId === activeLayerId\.value\) \{[\s\S]*resetDrawSelectionMode\(\)/)
+    expect(layersSource).toMatch(/function setAllLayersVisibility\(visible\) \{[\s\S]*if \(!visible && activeLayerId\.value\) \{[\s\S]*resetDrawSelectionMode\(\)/)
+    expect(layersSource).toMatch(/function toggleLayerLock\(layerId\) \{[\s\S]*if \(layerId === activeLayerId\.value\) \{[\s\S]*resetDrawSelectionMode\(\)/)
+  })
+
+  it('exposes an edit shape action for selected line and polygon features', () => {
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+    const coreSource = readSource(useGisMapCorePath)
+    const featuresSource = readSource(useGisFeaturesPath)
+    const editableSource = readSource(editableMapLibrePath)
+
+    expect(panelSource).toContain('canEditShape')
+    expect(panelSource).toContain(`$emit('edit-shape')`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.editShape')`)
+    expect(tabSource).toContain(':can-edit-shape="canEditSelectedShape"')
+    expect(tabSource).toContain('@edit-shape="handleEditSelectedShape"')
+    expect(coreSource).toContain('const canEditSelectedShape = computed')
+    expect(featuresSource).toContain('function handleEditSelectedShape()')
+    expect(featuresSource).toContain("editableMapRef?.value?.selectFeature?.(selectedFeatureId.value, { directEdit: true });")
+    expect(editableSource).toContain(`emit('mode-change'`)
+    expect(tabSource).toContain('@mode-change="handleDrawModeChange"')
+  })
+
+  it('shows active layer features in the tools panel and lets users select one explicitly', () => {
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+    const coreSource = readSource(useGisMapCorePath)
+
+    expect(panelSource).toContain('featureItems')
+    expect(panelSource).toContain('selectedFeatureId')
+    expect(panelSource).toContain(`$emit('select-feature', feature.id)`)
+    expect(panelSource).toContain(`t('map.drawTab.labels.featureList')`)
+    expect(panelSource).toContain(`t('map.drawTab.labels.emptyFeatureList')`)
+    expect(tabSource).toContain(':feature-items="activeLayerFeatureItems"')
+    expect(tabSource).toContain(':selected-feature-id="selectedEditorFeatureId"')
+    expect(tabSource).toContain('@select-feature="handleSelectFeatureFromPanel"')
+    expect(coreSource).toContain("editableMapRef?.value?.selectFeature?.(featureId, { directEdit: false });")
+    expect(coreSource).toMatch(/const handleSelectFeatureFromPanel = \(featureId\) => \{[\s\S]*currentMode\.value = 'simple_select'/)
+  })
+
+  it('edits selected feature properties separately from active layer properties', () => {
+    const coreSource = readSource(useGisMapCorePath)
+    const featuresSource = readSource(useGisFeaturesPath)
+
+    expect(coreSource).toContain('const selectedFeature = computed')
+    expect(coreSource).toContain('const selectedEditorProperties = computed')
+    expect(featuresSource).toContain('function updateSelectedFeatureProperty(key, value)')
+    expect(featuresSource).toContain('if (selectedFeatureId.value)')
+    expect(featuresSource).toContain('updateFeatureProperty(selectedFeatureId.value, key, value);')
+    expect(featuresSource).toContain('activeLayer.value[key] = value;')
+  })
+
+  it('keeps feature selection stable and exits direct mode when selected feature is hidden or locked', () => {
+    const source = readSource(useGisFeaturesPath)
+
+    expect(source).toContain('setFeatureSelection(')
+    expect(source).toContain('editableMapRef?.value?.updateFeatureProperties?.(featureId, { [key]: value }, { commitHistory: false });')
+    expect(source).toMatch(/if \(key === 'visible' && value === false\) resetDrawSelectionMode\(\);/)
+    expect(source).toMatch(/if \(key === 'locked' && value === true\) resetDrawSelectionMode\(\);/)
+  })
+
+  it('suppresses duplicate history commits when feature properties are synced into Draw', () => {
+    const source = readSource(editableMapLibrePath)
+
+    expect(source).toContain('const updateFeatureProperties = (featureId, nextProperties, options = {}) =>')
+    expect(source).toContain('syncFeaturesFromDraw({ commitHistory: options.commitHistory !== false })')
+  })
+
+  it('does not enter direct edit mode for hidden or locked selected features', () => {
+    const coreSource = readSource(useGisMapCorePath)
+    const editableSource = readSource(editableMapLibrePath)
+
+    expect(coreSource).toMatch(/const canEditSelectedShape = computed\(\(\) => \{[\s\S]*selectedFeature\.value/)
+    expect(coreSource).toContain('selectedFeature.value.properties?.visible !== false')
+    expect(coreSource).toContain('selectedFeature.value.properties?.locked !== true')
+    expect(coreSource).toContain("['LineString', 'Polygon'].includes(selectedEditorGeometryType.value)")
+    expect(editableSource).toContain('const selectFeature = (featureId, options = {}) =>')
+    expect(editableSource).toContain('const shouldDirectEdit = options.directEdit !== false')
+    expect(editableSource).toMatch(/if \(!shouldDirectEdit\) \{[\s\S]*draw\.value\?\.changeMode\?\.\('simple_select', \{ featureIds: \[featureId\] \}\)/)
+    expect(editableSource).toContain('feature?.properties?.locked || feature?.properties?.visible === false')
+    expect(editableSource).toMatch(/feature\?\.properties\?\.locked \|\| feature\?\.properties\?\.visible === false[\s\S]*draw\.value\?\.changeMode\?\.\('simple_select'\)/)
+    expect(editableSource).toMatch(/feature\?\.properties\?\.locked \|\| feature\?\.properties\?\.visible === false[\s\S]*emit\('mode-change', 'simple_select'\)/)
+  })
+
+  it('prevents drawing and destructive actions while the active layer is hidden or locked', () => {
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+    const coreSource = readSource(useGisMapCorePath)
+    const featuresSource = readSource(useGisFeaturesPath)
+
+    expect(panelSource).toContain('canModifyActiveLayer')
+    expect(panelSource).toContain(':disabled="!canModifyActiveLayer"')
+    expect(panelSource).toContain(':disabled="!canDeleteSelection"')
+    expect(coreSource).toContain('const canModifyActiveLayer = computed')
+    expect(coreSource).toContain('const canDeleteSelection = computed')
+    expect(coreSource).toContain('activeLayer.value.visible !== false')
+    expect(coreSource).toContain('activeLayer.value.locked !== true')
+    expect(tabSource).toContain(':can-modify-active-layer="canModifyActiveLayer"')
+    expect(tabSource).toContain(':can-delete-selection="canDeleteSelection"')
+    expect(coreSource).toMatch(/const setMode = \(mode\) => \{[\s\S]*if \(!canModifyActiveLayer\.value && mode !== 'simple_select'\) \{[\s\S]*resetDrawSelectionMode\(\);[\s\S]*return;/)
+    expect(featuresSource).toMatch(/async function handleDeleteSelected\(\) \{[\s\S]*if \(!canDeleteSelection\.value\) return;/)
+    expect(featuresSource).toContain('editableMapRef?.value?.canDeleteSelected?.() === false')
+    expect(featuresSource).toMatch(/async function handleClearAll\(\) \{[\s\S]*if \(!canModifyActiveLayer\.value\) return;/)
+  })
+
+  it('supports duplicating the selected feature in the active layer', () => {
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+    const coreSource = readSource(useGisMapCorePath)
+    const featuresSource = readSource(useGisFeaturesPath)
+
+    expect(panelSource).toContain('canDuplicateFeature')
+    expect(panelSource).toContain(':disabled="!canDuplicateFeature"')
+    expect(panelSource).toContain(`$emit('duplicate-feature')`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.duplicateFeature')`)
+    expect(tabSource).toContain(':can-duplicate-feature="canDuplicateSelectedFeature"')
+    expect(tabSource).toContain('@duplicate-feature="handleDuplicateSelectedFeature"')
+    expect(coreSource).toContain('const canDuplicateSelectedFeature = computed')
+    expect(featuresSource).toContain('function buildDuplicateFeatureId(layer, sourceId)')
+    expect(featuresSource).toContain('function cloneFeatureForDuplicate(feature, dupId, opts = {})')
+    expect(featuresSource).toContain('function handleDuplicateSelectedFeature()')
+    expect(featuresSource).toMatch(/function handleDuplicateSelectedFeature\(\) \{[\s\S]*if \(!canDuplicateSelectedFeature\.value\) return;[\s\S]*commitHistory\(\);/)
+    expect(featuresSource).toContain('layer.featureCollection = {')
+    expect(featuresSource).toContain('setFeatureSelection([dupId], dupId);')
+    expect(featuresSource).toContain("editableMapRef?.value?.selectFeature?.(dupId, { directEdit: false });")
+  })
+
+  it('supports moving the selected feature to another compatible layer', () => {
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+    const coreSource = readSource(useGisMapCorePath)
+    const featuresSource = readSource(useGisFeaturesPath)
+
+    expect(panelSource).toContain('featureMoveLayerOptions')
+    expect(panelSource).toContain('SimpleSelectDropdown')
+    expect(panelSource).toContain(`t('map.drawTab.labels.moveFeatureToLayer')`)
+    expect(panelSource).toContain(`$emit('move-feature-to-layer', $event)`)
+    expect(panelSource).toContain(`'move-feature-to-layer'`)
+    expect(tabSource).toContain(':feature-move-layer-options="featureMoveLayerOptions"')
+    expect(tabSource).toContain('@move-feature-to-layer="handleMoveSelectedFeatureToLayer"')
+    expect(coreSource).toContain('const featureMoveLayerOptions = computed')
+    expect(coreSource).toContain('if (!canDuplicateSelectedFeature.value) return [];')
+    expect(coreSource).toContain('layer.geometryType === activeLayer.value?.geometryType')
+    expect(coreSource).toContain('layer.id !== activeLayerId.value')
+    expect(coreSource).toContain('layer.visible !== false')
+    expect(coreSource).toContain('layer.locked !== true')
+    expect(featuresSource).toContain('function handleMoveSelectedFeatureToLayer(targetLayerId)')
+    expect(featuresSource).toContain('if (!canDuplicateSelectedFeature.value) return;')
+    expect(featuresSource).toContain('const feature = source?.featureCollection?.features?.find')
+    expect(featuresSource).toMatch(/function handleMoveSelectedFeatureToLayer\(targetLayerId\) \{[\s\S]*commitHistory\(\)/)
+    expect(featuresSource).toMatch(/source\.featureCollection = \{[\s\S]*features: \(srcFc\.features \?\? \[\]\)\.filter/)
+    expect(featuresSource).toMatch(/target\.featureCollection = \{[\s\S]*features: \[\.\.\.\(tgtFc\.features \?\? \[\]\), feature\]/)
+    expect(featuresSource).toContain('activeLayerId.value = target.id;')
+    expect(featuresSource).toContain("editableMapRef?.value?.selectFeature?.(selectedFeatureId.value, { directEdit: false });")
+  })
+
+  it('supports moving checked features to another compatible layer', () => {
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+    const coreSource = readSource(useGisMapCorePath)
+    const featuresSource = readSource(useGisFeaturesPath)
+
+    expect(panelSource).toContain('selectedFeatureIds.length > 1 && featureMoveLayerOptions.length')
+    expect(panelSource).toContain(`$emit('move-selected-features-to-layer', $event)`)
+    expect(panelSource).toContain(`'move-selected-features-to-layer'`)
+    expect(tabSource).toContain('@move-selected-features-to-layer="handleMoveSelectedFeaturesToLayer"')
+    expect(coreSource).toContain('const canMoveSelectedFeatures = computed')
+    expect(featuresSource).toContain('function handleMoveSelectedFeaturesToLayer(targetLayerId)')
+    expect(featuresSource).toContain('if (!canMoveSelectedFeatures.value) return;')
+    expect(featuresSource).toContain('const selectedIds = new Set(selectedFeatureIds.value);')
+    expect(featuresSource).toContain('selectedIds.has(getFeatureId(f)) && isFeatureEditableForMutation(f)')
+    expect(featuresSource).toContain('const idsSet = new Set(toMove.map((f) => getFeatureId(f)));')
+    expect(featuresSource).toMatch(/function handleMoveSelectedFeaturesToLayer\(targetLayerId\) \{[\s\S]*commitHistory\(\);/)
+    expect(featuresSource).toMatch(/source\.featureCollection = \{[\s\S]*features: srcFeatures\.filter/)
+    expect(featuresSource).toContain('target.featureCollection = { ...tgtFc, features: [...(tgtFc.features ?? []), ...toMove] };')
+    expect(featuresSource).toContain('activeLayerId.value = target.id;')
+    expect(featuresSource).toContain('setFeatureSelection(movedIds, movedIds[0]);')
+    expect(featuresSource).toContain('editableMapRef?.value?.selectFeatures?.(selectedFeatureIds.value);')
+  })
+
+  it('supports checkbox-based batch deletion for active-layer features', () => {
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+    const coreSource = readSource(useGisMapCorePath)
+    const featuresSource = readSource(useGisFeaturesPath)
+    const editableSource = readSource(editableMapLibrePath)
+
+    expect(panelSource).toContain('selectedFeatureIds')
+    expect(panelSource).toContain(`$emit('toggle-feature-selection', feature.id)`)
+    expect(panelSource).toContain(`$emit('delete-selected-features')`)
+    expect(panelSource).toContain(`t('map.drawTab.labels.selectedFeatureCount'`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.deleteSelectedFeatures')`)
+    expect(coreSource).toContain('const selectedFeatureIds = ref([]);')
+    expect(tabSource).toContain(':selected-feature-ids="selectedFeatureIds"')
+    expect(coreSource).toContain('const normalizeFeatureSelectPayload = (featureSelection) =>')
+    expect(coreSource).toContain('const selectableSet = new Set(activeLayerSelectableFeatureIds.value);')
+    expect(coreSource).toContain('Array.isArray(featureSelection)')
+    expect(tabSource).toContain('@toggle-feature-selection="handleToggleFeatureSelection"')
+    expect(tabSource).toContain('@delete-selected-features="handleDeleteSelectedFeatures"')
+    expect(coreSource).toContain('const handleToggleFeatureSelection = (featureId) =>')
+    expect(coreSource).toContain('const getSelectableFeatureSelectionIds = (featureIds = []) =>')
+    expect(coreSource).toContain('const getPreferredFeatureSelectionId = (featureIds = [], requestedFeatureId = \'\') =>')
+    expect(coreSource).toContain('setFeatureSelection(nextIds, getPreferredFeatureSelectionId(nextIds, normalizedId));')
+    expect(coreSource).toContain('const mapFeatureIds = getSelectableFeatureSelectionIds(selectedFeatureIds.value);')
+    expect(coreSource).toContain('editableMapRef?.value?.selectFeatures?.(mapFeatureIds);')
+    expect(featuresSource).toContain('function handleDeleteSelectedFeatures()')
+    expect(featuresSource).toMatch(/function handleDeleteSelectedFeatures\(\) \{[\s\S]*commitHistory\(\);/)
+    expect(featuresSource).toContain('.filter((f) => !idsToDelete.has(getFeatureId(f)))')
+    expect(featuresSource).toContain('features: next')
+    expect(featuresSource).toContain('const remainingSelectedIds = selectedIdsBeforeDelete.filter((id) => !idsToDelete.has(id));')
+    expect(featuresSource).toContain('setFeatureSelection(remainingSelectedIds, remainingSelectedIds[0]);')
+    expect(editableSource).toContain('const selectFeatures = (featureIds = []) =>')
+    expect(editableSource).toContain("emit('feature-select', selectedIds.length > 1 ? selectedIds : selectedFeatureId.value)")
+    expect(editableSource).toContain("draw.value?.changeMode?.('simple_select', { featureIds: selectedIds })")
+  })
+
+  it('supports map box selection for visible unlocked active-layer features', () => {
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+    const coreSource = readSource(useGisMapCorePath)
+    const editableSource = readSource(editableMapLibrePath)
+
+    expect(panelSource).toContain(`$emit('toggle-feature-box-select')`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.boxSelectFeatures')`)
+    expect(tabSource).toContain(':feature-box-select-enabled="isFeatureBoxSelectMode"')
+    expect(tabSource).toContain('@feature-box-select="handleFeatureBoxSelect"')
+    expect(tabSource).toContain(':is-feature-box-select-mode="isFeatureBoxSelectMode"')
+    expect(tabSource).toContain(':can-use-feature-box-select="canUseFeatureBoxSelect"')
+    expect(coreSource).toContain('const isFeatureBoxSelectMode = ref(false);')
+    expect(coreSource).toContain('const handleToggleFeatureBoxSelect = () =>')
+    expect(coreSource).toContain('const handleFeatureBoxSelect = (payload = []) =>')
+    expect(coreSource).toContain('const selectableSet = new Set(activeLayerSelectableFeatureIds.value);')
+    expect(coreSource).toContain("payload.selectionMode === 'add'")
+    expect(coreSource).toContain("payload.selectionMode === 'subtract'")
+    expect(tabSource).toContain('@toggle-feature-box-select="handleToggleFeatureBoxSelect"')
+    expect(editableSource).toContain('featureBoxSelectEnabled')
+    expect(editableSource).toContain(`'feature-box-select'`)
+    expect(editableSource).toContain('const buildFeatureIdsInScreenBox = (box) =>')
+    expect(editableSource).toContain('const featureBoxSelectionMode = ref(defaultFeatureBoxSelectionMode)')
+    expect(editableSource).toContain("emit('feature-box-select', {")
+  })
+
+  it('supports checkbox-based batch visibility and locking for active-layer features', () => {
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+    const featuresSource = readSource(useGisFeaturesPath)
+
+    expect(panelSource).toContain(`$emit('set-selected-features-visible', false)`)
+    expect(panelSource).toContain(`$emit('set-selected-features-visible', true)`)
+    expect(panelSource).toContain(`$emit('set-selected-features-locked', true)`)
+    expect(panelSource).toContain(`$emit('set-selected-features-locked', false)`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.hideSelectedFeatures')`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.showSelectedFeatures')`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.lockSelectedFeatures')`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.unlockSelectedFeatures')`)
+    expect(tabSource).toContain('@set-selected-features-visible="handleSetSelectedFeaturesVisible"')
+    expect(tabSource).toContain('@set-selected-features-locked="handleSetSelectedFeaturesLocked"')
+    expect(featuresSource).toContain('function updateSelectedFeaturesProperty(key, value)')
+    expect(featuresSource).toContain('function handleSetSelectedFeaturesVisible(visible)')
+    expect(featuresSource).toContain('function handleSetSelectedFeaturesLocked(locked)')
+    expect(featuresSource).toContain('function getEditableSelectedFeatureIds(features = [], featureIds = [])')
+    expect(featuresSource).toMatch(/function updateSelectedFeaturesProperty\(key, value\) \{[\s\S]*commitHistory\(\);/)
+    expect(featuresSource).toContain('resetDrawSelectionMode();')
+    expect(featuresSource).toContain('editableMapRef?.value?.selectFeatures?.(getEditableSelectedFeatureIds(next, selectedIdsBeforeMutation));')
+  })
+
+  it('supports a feature data table and checked-name batch editing', () => {
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+    const coreSource = readSource(useGisMapCorePath)
+    const featuresSource = readSource(useGisFeaturesPath)
+
+    expect(panelSource).toContain('featureTableColumns')
+    expect(panelSource).toContain('featureTableRows')
+    expect(panelSource).toContain('selectedFeatureBatchName')
+    expect(panelSource).toContain('selectedFeatureBatchPropertyKey')
+    expect(panelSource).toContain('selectedFeatureBatchPropertyValue')
+    expect(panelSource).toContain('canApplySelectedFeatureBatchProperty')
+    expect(panelSource).toContain(`t('map.drawTab.labels.featureDataTable')`)
+    expect(panelSource).toContain(`t('map.drawTab.labels.batchFeatureName')`)
+    expect(panelSource).toContain(`t('map.drawTab.labels.batchFeatureProperty')`)
+    expect(panelSource).toContain(`$emit('update-feature-table-cell', row.id, 'name', $event.target.value)`)
+    expect(panelSource).toContain(`$emit('update-feature-table-cell', row.id, column.key, $event.target.value)`)
+    expect(panelSource).toContain(`$emit('update:selected-feature-batch-name', $event.target.value)`)
+    expect(panelSource).toContain(`$emit('apply-selected-feature-batch-name')`)
+    expect(panelSource).toContain(`$emit('update:selected-feature-batch-property-key', $event)`)
+    expect(panelSource).toContain(`$emit('update:selected-feature-batch-property-value', $event.target.value)`)
+    expect(panelSource).toContain(`$emit('apply-selected-feature-batch-property')`)
+    expect(tabSource).toContain(':feature-table-columns="activeLayerFeatureTableColumns"')
+    expect(tabSource).toContain(':feature-table-rows="activeLayerFeatureTableRows"')
+    expect(tabSource).toContain(':selected-feature-batch-name="selectedFeatureBatchName"')
+    expect(tabSource).toContain(':selected-feature-batch-property-key="selectedFeatureBatchPropertyKey"')
+    expect(tabSource).toContain(':selected-feature-batch-property-value="selectedFeatureBatchPropertyValue"')
+    expect(tabSource).toContain(':can-apply-selected-feature-batch-property="canApplySelectedFeatureBatchProperty"')
+    expect(tabSource).toContain('@update-feature-table-cell="handleUpdateFeatureTableCell"')
+    expect(tabSource).toContain('@update:selected-feature-batch-name="selectedFeatureBatchName = $event"')
+    expect(tabSource).toContain('@apply-selected-feature-batch-name="handleApplySelectedFeatureBatchName"')
+    expect(tabSource).toContain('@update:selected-feature-batch-property-key="selectedFeatureBatchPropertyKey = $event"')
+    expect(tabSource).toContain('@update:selected-feature-batch-property-value="selectedFeatureBatchPropertyValue = $event"')
+    expect(tabSource).toContain('@apply-selected-feature-batch-property="handleApplySelectedFeatureBatchProperty"')
+    expect(coreSource).toContain('const selectedFeatureBatchName = ref')
+    expect(coreSource).toContain('const selectedFeatureBatchPropertyKey = ref')
+    expect(coreSource).toContain('const selectedFeatureBatchPropertyValue = ref')
+    expect(coreSource).toContain('const canApplySelectedFeatureBatchProperty = computed')
+    expect(coreSource).toContain('const activeLayerFeatureTableColumns = computed')
+    expect(coreSource).toContain('const activeLayerFeatureTableRows = computed')
+    expect(featuresSource).toContain('function handleUpdateFeatureTableCell(featureId, key, value)')
+    expect(featuresSource).toContain('function handleApplySelectedFeatureBatchName()')
+    expect(featuresSource).toContain('function handleApplySelectedFeatureBatchProperty()')
+    expect(featuresSource).toContain("updateSelectedFeaturesProperty('name', next);")
+    expect(featuresSource).toContain('updateSelectedFeaturesProperty(nextKey, selectedFeatureBatchPropertyValue.value);')
+  })
+
+  it('falls back to layer editing when selected feature id is stale', () => {
+    const tabSource = readSource(mapDrawTabPath)
+    const coreSource = readSource(useGisMapCorePath)
+
+    expect(coreSource).toContain("const selectedEditorFeatureId = computed(() => selectedFeature.value ? selectedFeatureId.value : '');")
+    expect(tabSource).toContain(':selected-feature-id="selectedEditorFeatureId"')
+  })
+
+  it('supports duplicating a draw layer from the layers panel', () => {
+    const panelSource = readSource(mapDrawLayersPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+    const layersSource = readSource(useGisLayersPath)
+
+    expect(panelSource).toContain(`$emit('duplicate-layer', layer.id)`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.duplicateLayer')`)
+    expect(panelSource).toContain(`'duplicate-layer'`)
+    expect(tabSource).toContain('@duplicate-layer="handleDuplicateLayer"')
+    expect(layersSource).toContain('const cloneFeatureForDuplicateLayer = (feature, index, layerId) =>')
+    expect(layersSource).toContain('const dupId = `${layerId}-feature-${index + 1}`;')
+    expect(layersSource).toContain('id: dupId,')
+    expect(layersSource).toContain('function handleDuplicateLayer(layerId)')
+    expect(layersSource).toMatch(/function handleDuplicateLayer\(layerId\) \{[\s\S]*commitHistory\(\)/)
+    expect(layersSource).toContain("dup.name = `${src.name} ${t('map.drawTab.labels.copySuffix')}`;")
+    expect(layersSource).toContain('.map((f, i) => cloneFeatureForDuplicateLayer(f, i, dup.id))')
+    expect(layersSource).toContain('activeLayerId.value = dup.id;')
+    expect(layersSource).toContain('syncAllLayersAfterMutation();')
+  })
+
+  it('supports renaming a draw layer from the layers panel', () => {
+    const panelSource = readSource(mapDrawLayersPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+    const layersSource = readSource(useGisLayersPath)
+
+    expect(panelSource).toContain('renamingLayerId')
+    expect(panelSource).toContain('renameDraft')
+    expect(panelSource).toContain('startLayerRename(layer)')
+    expect(panelSource).toContain('commitLayerRename(layer)')
+    expect(panelSource).toContain('@blur="commitLayerRename(layer)"')
+    expect(panelSource).toContain(`emit('rename-layer', layer.id, nextName)`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.renameLayer')`)
+    expect(panelSource).toContain(`'rename-layer'`)
+    expect(tabSource).toContain('@rename-layer="handleRenameLayer"')
+    expect(layersSource).toContain('function handleRenameLayer(layerId, name)')
+    expect(layersSource).toMatch(/function handleRenameLayer\(layerId, name\) \{[\s\S]*commitHistory\(\)/)
+    expect(layersSource).toMatch(/target\.featureCollection = \{[\s\S]*features: \(fc\.features \?\? \[\]\)\.map/)
+    expect(layersSource).toContain('syncAllLayersAfterMutation();')
+  })
+
+  it('confirms before deleting a draw layer', () => {
+    const source = readSource(useGisLayersPath)
+
+    expect(source).toContain('async function handleDeleteLayer(layerId)')
+    expect(source).toMatch(/async function handleDeleteLayer\(layerId\) \{[\s\S]*showConfirm\(t\('map\.drawTab\.messages\.deleteLayerConfirm', \{ name: layer\.name \}\)\)/)
+    expect(source).toMatch(/const confirmed = await showConfirm[\s\S]*if \(!confirmed\) return;[\s\S]*commitHistory\(\);/)
+  })
+
+  it('shows layer geometry, feature count, and state in the layers panel', () => {
+    const source = readSource(mapDrawLayersPanelPath)
+
+    expect(source).toContain('draw-layer-row-title')
+    expect(source).toContain('getGeometryLabel(layer.geometryType)')
+    expect(source).toContain('getLayerFeatureCount(layer)')
+    expect(source).toContain(`t('map.drawTab.labels.layerFeatureCount', { count: getLayerFeatureCount(layer) })`)
+    expect(source).toContain(`layer.visible ? t('map.drawTab.labels.visibleShort') : t('map.drawTab.labels.hiddenShort')`)
+    expect(source).toContain(`v-if="layer.locked"`)
+    expect(source).toContain(`t('map.drawTab.labels.lockedShort')`)
+  })
+
+  it('has localized labels for duplicating draw layers', () => {
+    const zhCn = JSON.parse(readSource(zhCnMapLocalePath))
+    const zhHant = JSON.parse(readSource(zhHantMapLocalePath))
+    const en = JSON.parse(readSource(enMapLocalePath))
+
+    expect(zhCn.drawTab.buttons.duplicateLayer).toBe('复制图层')
+    expect(zhCn.drawTab.buttons.duplicateFeature).toBe('复制要素')
+    expect(zhCn.drawTab.labels.copySuffix).toBe('副本')
+    expect(zhHant.drawTab.buttons.duplicateLayer).toBe('複製圖層')
+    expect(zhHant.drawTab.buttons.duplicateFeature).toBe('複製要素')
+    expect(zhHant.drawTab.labels.copySuffix).toBe('副本')
+    expect(en.drawTab.buttons.duplicateLayer).toBe('Duplicate Layer')
+    expect(en.drawTab.buttons.duplicateFeature).toBe('Duplicate Feature')
+    expect(en.drawTab.labels.copySuffix).toBe('Copy')
+  })
+
+  it('has localized labels for renaming draw layers', () => {
+    const zhCn = JSON.parse(readSource(zhCnMapLocalePath))
+    const zhHant = JSON.parse(readSource(zhHantMapLocalePath))
+    const en = JSON.parse(readSource(enMapLocalePath))
+
+    expect(zhCn.drawTab.buttons.renameLayer).toBe('重命名')
+    expect(zhCn.drawTab.buttons.saveLayerName).toBe('保存名称')
+    expect(zhHant.drawTab.buttons.renameLayer).toBe('重命名')
+    expect(zhHant.drawTab.buttons.saveLayerName).toBe('保存名稱')
+    expect(en.drawTab.buttons.renameLayer).toBe('Rename')
+    expect(en.drawTab.buttons.saveLayerName).toBe('Save Name')
+  })
+
+  it('has localized labels for moving selected features between draw layers', () => {
+    const zhCn = JSON.parse(readSource(zhCnMapLocalePath))
+    const zhHant = JSON.parse(readSource(zhHantMapLocalePath))
+    const en = JSON.parse(readSource(enMapLocalePath))
+
+    expect(zhCn.drawTab.labels.moveFeatureToLayer).toBe('移动到图层')
+    expect(zhHant.drawTab.labels.moveFeatureToLayer).toBe('移動到圖層')
+    expect(en.drawTab.labels.moveFeatureToLayer).toBe('Move to Layer')
+  })
+
+  it('has localized labels for feature batch actions', () => {
+    const zhCn = JSON.parse(readSource(zhCnMapLocalePath))
+    const zhHant = JSON.parse(readSource(zhHantMapLocalePath))
+    const en = JSON.parse(readSource(enMapLocalePath))
+
+    expect(zhCn.drawTab.buttons.deleteSelectedFeatures).toBe('删除勾选要素')
+    expect(zhCn.drawTab.labels.selectedFeatureCount).toBe('已勾选 {count} 个')
+    expect(zhHant.drawTab.buttons.deleteSelectedFeatures).toBe('刪除勾選要素')
+    expect(zhHant.drawTab.labels.selectedFeatureCount).toBe('已勾選 {count} 個')
+    expect(en.drawTab.buttons.deleteSelectedFeatures).toBe('Delete Checked')
+    expect(en.drawTab.labels.selectedFeatureCount).toBe('{count} checked')
+  })
+
+  it('has localized layer row feature count labels', () => {
+    const zhCn = JSON.parse(readSource(zhCnMapLocalePath))
+    const zhHant = JSON.parse(readSource(zhHantMapLocalePath))
+    const en = JSON.parse(readSource(enMapLocalePath))
+
+    expect(zhCn.drawTab.labels.layerFeatureCount).toBe('{count} 个要素')
+    expect(zhHant.drawTab.labels.layerFeatureCount).toBe('{count} 個要素')
+    expect(en.drawTab.labels.layerFeatureCount).toBe('{count} feature(s)')
+  })
+
+  it('has localized confirmation text for deleting draw layers', () => {
+    const zhCn = JSON.parse(readSource(zhCnMapLocalePath))
+    const zhHant = JSON.parse(readSource(zhHantMapLocalePath))
+    const en = JSON.parse(readSource(enMapLocalePath))
+
+    expect(zhCn.drawTab.messages.deleteLayerConfirm).toBe('确认删除图层“{name}”吗？')
+    expect(zhHant.drawTab.messages.deleteLayerConfirm).toBe('確認刪除圖層「{name}」嗎？')
+    expect(en.drawTab.messages.deleteLayerConfirm).toBe('Delete layer "{name}"?')
+  })
+})

@@ -810,7 +810,7 @@ onMounted(async () => {
   // 如果 URL 中没有 sub 参数，默认跳转到 vocabulary
   if (!route.query.tab) {
     await router.replace({
-      path: '/explore/yubao',
+      path: '/menu/yubao',
       query: { ...route.query, tab: 'vocabulary' }
     })
   }
@@ -911,7 +911,6 @@ $text-primary: var(--text-primary);
 $text-secondary: var(--text-secondary);
 $text-tertiary: var(--text-lightest);
 
-$font-monospace: "Courier New", monospace;
 
 $transition-fast: 0.2s;
 $transition-control: 0.25s;
@@ -1102,14 +1101,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   padding: 12px 16px;
   overflow: hidden;
   color: var(--text-dark);
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    "PingFang SC",
-    "Hiragino Sans GB",
-    "Microsoft YaHei",
-    sans-serif;
+  font-family: var(--font-sans);
   font-size: 15px;
   line-height: 1.6;
   resize: vertical;
@@ -1403,7 +1395,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 
 .pronunciation-text {
   color: $primary;
-  font-family: $font-monospace;
+  font-family: var(--font-mono);
   font-size: 14px;
   font-weight: 500;
 
@@ -1431,7 +1423,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 
 .phonetic-text {
   color: $primary;
-  font-family: $font-monospace;
+  font-family: var(--font-mono);
   font-size: 14px;
   font-weight: 500;
   line-height: 1.6;

@@ -4,7 +4,7 @@ import vue from '@vitejs/plugin-vue';
 import path from 'path';
 import http from 'http';
 
-const mpaEntryRoots = ['auth', 'menu', 'intro', 'explore', 'villagesML'];
+const mpaEntryRoots = ['auth', 'menu', 'explore', 'villagesML'];
 const localePrefixPattern = /^\/(zh-CN|zh-Hant|en)(?=\/|$)/;
 const localeAwareEntryRoots = new Set(['auth', 'menu', 'explore']);
 
@@ -181,7 +181,7 @@ export default defineConfig(async ({ mode }) => {
           main: path.resolve(__dirname, 'index.html'),
           auth: path.resolve(__dirname, 'auth/index.html'),
           menu: path.resolve(__dirname, 'menu/index.html'),
-          intro: path.resolve(__dirname, 'intro/index.html'),
+
           explore: path.resolve(__dirname, 'explore/index.html'),
           villagesML: path.resolve(__dirname, 'villagesML/index.html'),
         },

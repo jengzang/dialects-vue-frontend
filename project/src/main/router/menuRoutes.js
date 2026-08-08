@@ -1,5 +1,6 @@
 const PhoPage = () => import('@/main/views/menu/PhoPage.vue')
 const AboutPage = () => import('@/main/views/menu/support/AboutPage.vue')
+const SettingsPage = () => import('@/main/views/menu/support/SettingsPage.vue')
 const QueryPage = () => import('@/main/views/menu/QueryPage.vue')
 const ComparePage = () => import('@/main/views/menu/ComparePage.vue')
 const MapPage = () => import('@/main/views/menu/MapPage.vue')
@@ -7,7 +8,11 @@ const ResultPage = () => import('@/main/views/menu/ResultPage.vue')
 const SourcePage = () => import('@/main/views/menu/support/SourcePage.vue')
 const PrivacyPage = () => import('@/main/views/menu/support/PrivacyPage.vue')
 const ToolsPage = () => import('@/main/views/menu/portals/ToolsPage.vue')
-const WordsPage = () => import('@/main/views/menu/portals/WordsPage.vue')
+const VocabularyPage = () => import('@/main/views/menu/VocabularyPage.vue')
+const VocabularyViewPage = () => import('@/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
+const VocabularyImportPage = () => import('@/main/views/explore/word/vocabulary/VocabularyImportPage.vue')
+const VocabularyManagePage = () => import('@/main/views/explore/word/vocabulary/VocabularyManagePage.vue')
+const YuBaoMenuPage = () => import('@/main/views/menu/YuBaoMenuPage.vue')
 const VillagesPage = () => import('@/main/views/menu/portals/VillagesPage.vue')
 const DialectClusteringPage = () => import('@/main/views/menu/DialectClustering.vue')
 
@@ -17,7 +22,7 @@ export const menuRoutes = [
     component: PhoPage
   },
   {
-    path: 'menu/about/:section(intro|suggestion|like|settings)',
+    path: 'menu/about/:section(intro|suggestion|like)',
     component: AboutPage
   },
   {
@@ -53,12 +58,16 @@ export const menuRoutes = [
     })
   },
   {
-    path: 'menu/map/:sub(view|divide|custom|draw)',
+    path: 'menu/map/:sub(view|divide|custom)',
     component: MapPage
   },
   {
     path: 'menu/result',
     component: ResultPage
+  },
+  {
+    path: 'menu/settings',
+    component: SettingsPage
   },
   {
     path: 'menu/source',
@@ -74,7 +83,38 @@ export const menuRoutes = [
   },
   {
     path: 'menu/words',
-    component: WordsPage
+    redirect: to => ({
+      path: `/${to.params.locale}/menu/vocabulary`,
+      query: to.query,
+      hash: to.hash,
+    })
+  },
+  {
+    path: 'menu/vocabulary',
+    component: VocabularyPage,
+    redirect: to => ({
+      path: `/${to.params.locale}/menu/vocabulary/view`,
+      query: to.query,
+      hash: to.hash,
+    }),
+    children: [
+      {
+        path: 'view',
+        component: VocabularyViewPage
+      },
+      {
+        path: 'import',
+        component: VocabularyImportPage
+      },
+      {
+        path: 'manage',
+        component: VocabularyManagePage
+      }
+    ]
+  },
+  {
+    path: 'menu/yubao',
+    component: YuBaoMenuPage
   },
   {
     path: 'menu/villages',

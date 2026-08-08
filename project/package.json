@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "@mapbox/mapbox-gl-draw": "^1.5.1",
+    "@phosphor-icons/vue": "^2.2.1",
     "@tmcw/togeojson": "^7.1.2",
     "@turf/turf": "^7.3.5",
     "@vueuse/core": "^14.1.0",

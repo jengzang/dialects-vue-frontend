@@ -16,6 +16,7 @@
         </transition>
       </router-view>
     </div>
+    <ScrollToTop />
     <PageTutorialGuide />
     <PanelManager />
   </div>
@@ -29,6 +30,7 @@
 import NavBar from "@/components/bar/NavBar.vue";
 import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 import PanelManager from '@/main/components/result/PanelManager.vue'
+import ScrollToTop from '@/components/common/ScrollToTop.vue'
 
 const keepAliveViewNames = [
   'ComparePage',
@@ -37,6 +39,8 @@ const keepAliveViewNames = [
   'PhoPage',
   'QueryPage',
   'ResultPage',
+  'VocabularyPage',
+  'YuBaoMenuPage',
 ]
 
 // const shouldShowHeader = computed(() => {
@@ -49,15 +53,6 @@ const keepAliveViewNames = [
 <style scoped lang="scss">
 $fade-duration: 0.14s;
 $portrait-ratio: 1;
-
-$system-font:
-  -apple-system,
-  BlinkMacSystemFont,
-  'Segoe UI',
-  Roboto,
-  Helvetica,
-  Arial,
-  sans-serif;
 
 /* 页面背景 */
 .menu-bg {
@@ -83,10 +78,10 @@ $system-font:
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 10dvh 12px 12px;
+  padding: 6dvh 12px 12px;
   overflow-x: hidden;
   color: var(--text-deep);
-  font-family: $system-font;
+  font-family: var(--font-sans);
 }
 
 /* 页面切换动画 */
@@ -113,7 +108,7 @@ $system-font:
   }
 
   .glass-content {
-    padding: 17dvh 8px 8px;
+    padding: 15dvh 8px 8px;
     font-size: 1.1rem;
     line-height: 1.6;
   }

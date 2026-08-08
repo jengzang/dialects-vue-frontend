@@ -8,7 +8,7 @@
           @click="emit('openPartitionInfo')"
           :title="$t('query.components.locationAndRegionInput.viewPartitionDetails')"
       >
-        <span class="icon">ℹ️</span>
+        <span class="icon"><InlineIcon icon="ℹ️" /></span>
       </button>
     </div>
 
@@ -46,6 +46,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, nextTick, computed } from 'vue'
 import { getPartitions } from '@/api/index.js'
 import * as OpenCCT2CN from 'opencc-js/t2cn'

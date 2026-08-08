@@ -8,6 +8,18 @@
     "logoAlt": "方音图鉴",
     "decorationAlt": "蓝色圆环"
   },
+  "showcase": {
+    "nav": "产品展示",
+    "switchTo": "切换到",
+    "yinxi": { "title": "方言音系", "action": "查看音系" },
+    "zhonggu": { "title": "中古查询地图", "action": "查看地图" },
+    "result": { "title": "查询结果", "action": "查看结果" },
+    "villages": { "title": "广东自然村", "action": "浏览村落" },
+    "compare": { "title": "方言比较", "action": "进入比较" },
+    "gis": { "title": "GIS 绘图", "action": "开始绘图" },
+    "evolution": { "title": "语音演化", "action": "查看演化" },
+    "photiccompare": { "title": "比较音值", "action": "查看桑基图" }
+  },
   "features": {
     "sectionTitle": "核心功能",
     "query": {
@@ -54,6 +66,7 @@
     "villages": {
       "title": "自然村资料",
       "desc": "村落地名分析与方言绘图",
+      "toponyms": "地名分布 - 按汉字或地名片段查看自然村地名的地理分布",
       "gdVillages": "广东自然村 - 广东自然村树状图",
       "villagesML": "机器学习 - 自然村名机器学习",
       "gdVillagesTable": "全粤村情表格 - 广东村落详细表格",

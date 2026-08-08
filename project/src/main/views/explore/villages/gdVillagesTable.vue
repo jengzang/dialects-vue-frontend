@@ -2,9 +2,7 @@
   <div style="width: 100%;justify-content: center;align-items:center;display: flex;flex-direction: column">
     <div class="title-row">
       <h2 style="margin: 0;">{{ t('villages.pages.gdTable.title') }}</h2>
-<!--      <button class="village-link-btn" @click="goToGDVillages">-->
-<!--        <span role="img" aria-label="ycVillages">🏠</span> 樹狀圖-->
-<!--      </button>-->
+      <span class="cross-link" @click="goToGdTree">{{ t('villages.pages.gdTree.title') }} →</span>
     </div>
     <UniversalTable
         db-key="village"
@@ -17,8 +15,12 @@
 <script setup>
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRouter, useRoute } from 'vue-router';
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue';
 const { t } = useI18n();
+const router = useRouter();
+const route = useRoute();
 
 const spokenColumns = computed(() => [
   { key: '市级', label: t('villages.pages.gdTable.columns.prefecture'), filterable: true, width: 0.8 },
@@ -32,6 +34,10 @@ const spokenColumns = computed(() => [
 
 ]);
 
+const goToGdTree = () => {
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/gd'));
+};
+
 </script>
 
 
@@ -40,9 +46,6 @@ const spokenColumns = computed(() => [
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
 
-$button-text-color: var(--color-primary-hover);
-$button-transition: 0.3s ease;
-
 .title-row {
   display: flex;
   align-items: center;
@@ -50,34 +53,17 @@ $button-transition: 0.3s ease;
   margin: 0;
 }
 
-.village-link-btn {
-  padding: 8px 16px;
-  color: $button-text-color;
-  font-size: 1rem;
-  font-weight: 1000;
+.cross-link {
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
   white-space: nowrap;
   cursor: pointer;
   user-select: none;
-  background: linear-gradient(
-    145deg,
-    var(--glass-20),
-    var(--glass-10)
-  );
-  border: 3px solid var(--glass-40);
-  border-radius: 25px;
-  box-shadow:
-    0 6px 10px rgba(0, 0, 0, 0.1),
-    0 1px 4px rgba(0, 0, 0, 0.08);
-  transition: all $button-transition;
+  transition: opacity 0.2s;
 
   &:hover {
-    background: linear-gradient(
-      145deg,
-      var(--glass-50),
-      var(--glass-30)
-    );
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-    transform: scale(1.05);
+    opacity: 0.7;
   }
 }
 </style>

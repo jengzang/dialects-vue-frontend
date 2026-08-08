@@ -3,21 +3,21 @@
     <!-- 欢迎屏幕 -->
     <div v-if="!fileUploaded" class="welcome-screen">
       <div class="glass-container-shell welcome-card">
-        <div class="welcome-icon">📋</div>
+        <div class="welcome-icon"><InlineIcon icon="📋" /></div>
         <h2 class="title">{{ t('tools.checkTool.welcome.title') }}</h2>
 <!--        <p class="subtitle">上傳文件開始檢查和編輯</p>-->
 
         <div class="welcome-features">
           <div class="feature-item">
-            <span class="feature-icon">✓</span>
+            <span class="feature-icon"><InlineIcon icon="✓" /></span>
             <span>{{ t('tools.checkTool.welcome.feature1') }}</span>
           </div>
           <div class="feature-item">
-            <span class="feature-icon">✓</span>
+            <span class="feature-icon"><InlineIcon icon="✓" /></span>
             <span>{{ t('tools.checkTool.welcome.feature2') }}</span>
           </div>
           <div class="feature-item">
-            <span class="feature-icon">✓</span>
+            <span class="feature-icon"><InlineIcon icon="✓" /></span>
             <span>{{ t('tools.checkTool.welcome.feature3') }}</span>
           </div>
         </div>
@@ -25,8 +25,7 @@
         <div class="format-selector">
           <div class="format-label-row">
             <label class="format-label">{{ t('tools.checkTool.welcome.formatLabel') }}</label>
-            <button class="main-glass-button info-help-btn" data-size="small" @click="showFormatHelpModal = true">
-              📋 {{ t('tools.checkTool.welcome.formatHelp') }}
+            <button class="main-glass-button info-help-btn" data-size="small" @click="showFormatHelpModal = true"><InlineIcon icon="📋" />{{ t('tools.checkTool.welcome.formatHelp') }}
             </button>
           </div>
           <div class="format-options">
@@ -61,7 +60,7 @@
           @drop.prevent="!isUploading && handleDrop($event)"
         >
           <template v-if="!isUploading">
-            <div class="upload-icon-large">📄</div>
+            <div class="upload-icon-large"><InlineIcon icon="📄" /></div>
             <h3 class="upload-text">{{ t('tools.checkTool.welcome.uploadTitle') }}</h3>
             <p class="hint-text">{{ t('tools.checkTool.welcome.uploadHint') }}</p>
           </template>
@@ -102,7 +101,7 @@
       <!-- 侧边栏 -->
       <aside v-if="!isPortrait && !sidebarCollapsed" class="sidebar glass-panel">
         <div class="sidebar-header">
-          <h3>📋 {{ t('tools.checkTool.sidebar.title') }}</h3>
+          <h3><InlineIcon icon="📋" />{{ t('tools.checkTool.sidebar.title') }}</h3>
           <button class="main-glass-button" data-size="small" @click="toggleShowAll">
             {{ showingAll ? '👁️ ' + t('tools.checkTool.sidebar.showErrorsOnly') : '👁️ ' + t('tools.checkTool.sidebar.showAll') }}
           </button>
@@ -115,7 +114,7 @@
           <!-- 错误统计卡片 -->
           <div class="sidebar-section" :class="{ collapsed: !errorStatsExpanded }">
             <div class="section-header" @click="toggleErrorStats">
-              <span class="section-title">🔍 {{ t('tools.checkTool.sidebar.errorListTitle') }}</span>
+              <span class="section-title"><InlineIcon icon="🔍" />{{ t('tools.checkTool.sidebar.errorListTitle') }}</span>
               <span class="toggle-icon">{{ errorStatsExpanded ? '▼' : '▶' }}</span>
             </div>
 
@@ -172,7 +171,7 @@
           <!-- 调值统计卡片 -->
           <div class="sidebar-section" :class="{ collapsed: !toneStatsExpanded }">
             <div class="section-header" @click="toggleToneStats">
-              <span class="section-title">📊 {{ t('tools.checkTool.sidebar.toneStatsTitle') }}</span>
+              <span class="section-title"><InlineIcon icon="📊" />{{ t('tools.checkTool.sidebar.toneStatsTitle') }}</span>
               <span class="toggle-icon">{{ toneStatsExpanded ? '▼' : '▶' }}</span>
             </div>
 
@@ -225,7 +224,7 @@
           <!-- 声韵统计卡片 -->
           <div class="sidebar-section" :class="{ collapsed: !onsetRimeStatsExpanded }">
             <div class="section-header" @click="toggleOnsetRimeStats">
-              <span class="section-title">🔤 {{ t('tools.checkTool.sidebar.onsetRimeTitle') }}</span>
+              <span class="section-title"><InlineIcon icon="🔤" />{{ t('tools.checkTool.sidebar.onsetRimeTitle') }}</span>
               <span class="toggle-icon">{{ onsetRimeStatsExpanded ? '▼' : '▶' }}</span>
             </div>
 
@@ -282,12 +281,11 @@
         <!-- 文件信息栏 -->
         <div class="file-info-bar glass-panel">
           <div class="file-info-left">
-            <span class="file-name">📁 {{ fileName }}</span>
+            <span class="file-name"><InlineIcon icon="📁" />{{ fileName }}</span>
             <span class="file-rows">{{ t('tools.checkTool.fileBar.rows', { count: totalRows }) }}</span>
           </div>
           <button v-if="!isPortrait" class="main-glass-button" data-variant="secondary" data-size="small" @click="resetUpload">{{ t('tools.checkTool.fileBar.changeFile') }}</button>
-          <button v-if="!isPortrait" class="main-glass-button info-help-btn" data-size="small" @click="showHelpModal = true">
-            ❓ {{ t('tools.checkTool.fileBar.help') }}
+          <button v-if="!isPortrait" class="main-glass-button info-help-btn" data-size="small" @click="showHelpModal = true"><InlineIcon icon="❓" />{{ t('tools.checkTool.fileBar.help') }}
           </button>
           <!-- 模式切换 -->
           <div class="mode-tabs glass-panel">
@@ -295,15 +293,13 @@
                 class="tab-btn"
                 :class="{ active: currentMode === 'table' }"
                 @click="switchMode('table')"
-            >
-              📊 {{ t('tools.checkTool.fileBar.tableView') }}
+            ><InlineIcon icon="📊" />{{ t('tools.checkTool.fileBar.tableView') }}
             </button>
             <button
                 class="tab-btn"
                 :class="{ active: currentMode === 'command' }"
                 @click="switchMode('command')"
-            >
-              💻 {{ t('tools.checkTool.fileBar.commandMode') }}
+            ><InlineIcon icon="💻" />{{ t('tools.checkTool.fileBar.commandMode') }}
             </button>
           </div>
         </div>
@@ -317,7 +313,7 @@
             <div class="table-stats">
               <span>{{ t('tools.checkTool.table.errorCount') }}<strong>{{ errorStats.total }}</strong></span>
               <span class="ml-2">{{ t('tools.checkTool.table.pendingCount') }}<strong>{{ totalPendingChanges }}</strong></span>
-              <span v-if="isEditMode" class="edit-hint">💡 {{ t('tools.checkTool.table.clickToEdit') }}</span>
+              <span v-if="isEditMode" class="edit-hint"><InlineIcon icon="💡" />{{ t('tools.checkTool.table.clickToEdit') }}</span>
             </div>
             <div class="table-actions">
               <button
@@ -335,22 +331,18 @@
                 data-variant="primary"
                 :disabled="totalPendingChanges === 0"
                 @click="batchSave"
-              >
-                💾 {{ t('tools.checkTool.table.saveChanges') }} ({{ totalPendingChanges }})
+              ><InlineIcon icon="💾" />{{ t('tools.checkTool.table.saveChanges') }} ({{ totalPendingChanges }})
               </button>
               <button
                 v-show="isEditMode"
                 class="main-glass-button"
                 data-size="small"
                 @click="cancelEdit"
-              >
-                ❌ {{ t('tools.checkTool.table.cancel') }}
+              ><InlineIcon icon="❌" />{{ t('tools.checkTool.table.cancel') }}
               </button>
-              <button v-show="!isEditMode" class="main-glass-button" data-size="small" @click="showBatchReplaceModal = true">
-                🔄 {{ t('tools.checkTool.table.batchReplace') }}
+              <button v-show="!isEditMode" class="main-glass-button" data-size="small" @click="showBatchReplaceModal = true"><InlineIcon icon="🔄" />{{ t('tools.checkTool.table.batchReplace') }}
               </button>
-              <button v-show="!isEditMode" class="main-glass-button" data-size="small" @click="downloadFile">
-                ⬇️ {{ t('tools.checkTool.table.download') }}
+              <button v-show="!isEditMode" class="main-glass-button" data-size="small" @click="downloadFile"><InlineIcon icon="⬇️" />{{ t('tools.checkTool.table.download') }}
               </button>
             </div>
           </div>
@@ -434,7 +426,7 @@
                   />
                   <template v-else>
                     {{ getPendingValue(row.row, 'char') || row.char || '' }}
-                    <span v-if="row.errors?.includes('nonSingleChar')" class="error-indicator">❌</span>
+                    <span v-if="row.errors?.includes('nonSingleChar')" class="error-indicator"><InlineIcon icon="❌" /></span>
                   </template>
                 </div>
 
@@ -459,7 +451,7 @@
                   />
                   <template v-else>
                     {{ getPendingValue(row.row, 'ipa') || row.ipa || '' }}
-                    <span v-if="row.errors?.includes('invalidIpa')" class="error-indicator">⚠️</span>
+                    <span v-if="row.errors?.includes('invalidIpa')" class="error-indicator"><InlineIcon icon="⚠️" /></span>
                   </template>
                 </div>
 
@@ -526,7 +518,7 @@
                   />
                   <template v-else>
                     {{ getPendingValue(row.row, 'tone') || row.tone || '' }}
-                    <span v-if="row.errors?.includes('missingTone')" class="error-indicator">🔍</span>
+                    <span v-if="row.errors?.includes('missingTone')" class="error-indicator"><InlineIcon icon="🔍" /></span>
                   </template>
                 </div>
 
@@ -571,9 +563,8 @@
         <div v-show="currentMode === 'command'" class="command-view">
           <div class="command-panel glass-panel">
             <div class="command-header">
-              <h3>💻 {{ t('tools.checkTool.command.title') }}</h3>
-              <button v-if="!isPortrait" class="main-glass-button info-help-btn" data-size="small" @click="showHelpModal = true">
-                ❓ {{ t('tools.checkTool.command.help') }}
+              <h3><InlineIcon icon="💻" />{{ t('tools.checkTool.command.title') }}</h3>
+              <button v-if="!isPortrait" class="main-glass-button info-help-btn" data-size="small" @click="showHelpModal = true"><InlineIcon icon="❓" />{{ t('tools.checkTool.command.help') }}
               </button>
             </div>
 
@@ -584,14 +575,14 @@
             ></textarea>
 
             <div class="command-actions">
-              <button class="main-glass-button" @click="clearCommand">🗑️ {{ t('tools.checkTool.command.clear') }}</button>
+              <button class="main-glass-button" @click="clearCommand"><InlineIcon icon="🗑️" />{{ t('tools.checkTool.command.clear') }}</button>
               <button class="main-glass-button" data-variant="primary" @click="executeCommand">▶️ {{ t('tools.checkTool.command.execute') }}</button>
             </div>
 
             <!-- 执行结果 -->
             <div v-if="commandLog.length > 0" class="command-result glass-panel">
               <div class="result-header">
-                <h4>📋 {{ t('tools.checkTool.command.resultTitle') }}</h4>
+                <h4><InlineIcon icon="📋" />{{ t('tools.checkTool.command.resultTitle') }}</h4>
                 <button class="main-glass-button" data-size="small" @click="clearCommandLog">{{ t('tools.checkTool.command.clearResult') }}</button>
               </div>
               <div class="result-log ui-scrollbar">
@@ -670,7 +661,7 @@
       <template #footer>
 <!--        <div class="check-tool-simple-modal-footer">-->
           <button class="main-glass-button" data-variant="secondary" @click="showBatchReplaceModal = false">{{ t('tools.checkTool.batchReplace.cancel') }}</button>
-          <button class="main-glass-button" data-variant="primary" @click="executeBatchReplace">🔄 {{ t('tools.checkTool.batchReplace.execute') }}</button>
+          <button class="main-glass-button" data-variant="primary" @click="executeBatchReplace"><InlineIcon icon="🔄" />{{ t('tools.checkTool.batchReplace.execute') }}</button>
 <!--        </div>-->
       </template>
     </AppModal>
@@ -686,7 +677,7 @@
     >
       <div class="help-content ui-scrollbar">
 <!--            <div class="help-section">-->
-<!--              <h4>📋 文件要求</h4>-->
+<!--              <h4><InlineIcon icon="📋" />文件要求</h4>-->
 <!--              <ul>-->
 <!--                <li>支持 .xlsx 和 .xls 格式</li>-->
 <!--                <li>必須包含"漢字"或"單字"列</li>-->
@@ -696,7 +687,7 @@
 <!--            </div>-->
 
             <div class="help-section">
-              <h4>🔍 {{ t('tools.checkTool.help.checksTitle') }}</h4>
+              <h4><InlineIcon icon="🔍" />{{ t('tools.checkTool.help.checksTitle') }}</h4>
               <ul>
                 <li>{{ t('tools.checkTool.help.checkNonSingleChar') }}</li>
                 <li>{{ t('tools.checkTool.help.checkInvalidIpa') }}</li>
@@ -705,7 +696,7 @@
             </div>
 
             <div class="help-section">
-              <h4>💻 {{ t('tools.checkTool.help.commandTitle') }}</h4>
+              <h4><InlineIcon icon="💻" />{{ t('tools.checkTool.help.commandTitle') }}</h4>
               <table class="help-table">
                 <thead>
                   <tr>
@@ -747,11 +738,11 @@
                   </tr>
                 </tbody>
               </table>
-              <p class="hint-text">💡 {{ t('tools.checkTool.help.commandHint') }}<code>c-帥-好; i-帥-jat4</code></p>
+              <p class="hint-text"><InlineIcon icon="💡" />{{ t('tools.checkTool.help.commandHint') }}<code>c-帥-好; i-帥-jat4</code></p>
             </div>
 
             <div class="help-section">
-              <h4>✏️ {{ t('tools.checkTool.help.editTitle') }}</h4>
+              <h4><InlineIcon icon="✏️" />{{ t('tools.checkTool.help.editTitle') }}</h4>
               <ul>
                 <li>{{ t('tools.checkTool.help.editCell') }}</li>
                 <li>{{ t('tools.checkTool.help.editBatch') }}</li>
@@ -913,6 +904,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RecycleScroller } from 'vue-virtual-scroller'
@@ -2199,7 +2191,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
 .welcome {
   &-screen {
-    width: 100%;
+    // width: 100%;
     height: 100%;
     @include flex-center;
     padding: 20px;
@@ -3219,7 +3211,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     @include glass-surface($glass-panel, 10px, 16px);
     color: $text-main;
     font-size: 14px;
-    font-family: "SF Mono", Monaco, monospace;
+    font-family: var(--font-mono);
     resize: vertical;
     transition: all 0.2s ease;
 
@@ -3267,7 +3259,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     margin-bottom: 8px;
     border-radius: var(--radius-sm2);
     font-size: 13px;
-    font-family: "SF Mono", Monaco, monospace;
+    font-family: var(--font-mono);
 
     &.success {
       background: $success-soft;
@@ -3466,7 +3458,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
       background: $primary-soft;
       padding: 2px 6px;
       border-radius: var(--radius-xs);
-      font-family: "SF Mono", Monaco, monospace;
+      font-family: var(--font-mono);
       font-size: 11px;
     }
   }

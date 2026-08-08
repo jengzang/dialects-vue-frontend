@@ -51,7 +51,7 @@ export function useSidebarConfig() {
                 { label: t('navigation.submenu.map.view'), icon: '🗺️', path: withRouteLocale(route, '/menu/map/view') },
                 { label: t('navigation.submenu.map.divide'), icon: '🧩', path: withRouteLocale(route, '/menu/map/divide') },
                 { label: t('navigation.submenu.map.custom'), icon: '📝', path: withRouteLocale(route, '/menu/map/custom') },
-                { label: t('navigation.submenu.map.draw'), icon: '✏️', path: withRouteLocale(route, '/menu/map/draw') }
+                { label: t('navigation.submenu.map.draw'), icon: '✏️', path: withRouteLocale(route, '/explore/gis') }
             ]
         },
         pho: {
@@ -80,12 +80,12 @@ export function useSidebarConfig() {
         words: {
             label: t('navigation.menu.words'),
             icon: '📖',
-            path: withRouteLocale(route, '/menu/words'),
+            path: withRouteLocale(route, '/menu/vocabulary'),
             children: [
-                { label: t('navigation.submenu.words.wordList'), icon: '📒', path: withRouteLocale(route, '/explore/vocabulary/view') },
-                { label: t('navigation.submenu.words.vocabulary'), icon: '📖', path: withRouteLocale(route, '/explore/yubao?tab=vocabulary') },
-                { label: t('navigation.submenu.words.grammar'), icon: '🗣️', path: withRouteLocale(route, '/explore/yubao?tab=grammar') },
-                { label: t('navigation.submenu.words.ycSpoken'), icon: '💬', path: withRouteLocale(route, '/explore/yc-spoken') }
+                { label: t('navigation.submenu.words.wordList'), icon: '📋', path: withRouteLocale(route, '/menu/vocabulary') },
+                { label: t('navigation.submenu.words.vocabulary'), icon: '📖', path: withRouteLocale(route, '/menu/yubao?tab=vocabulary') },
+                { label: t('navigation.submenu.words.grammar'), icon: '🗣️', path: withRouteLocale(route, '/menu/yubao?tab=grammar') },
+                { label: t('navigation.submenu.words.ycSpoken'), icon: '💬', path: withRouteLocale(route, '/explore/yc/words') }
             ]
         },
         villages: {
@@ -94,9 +94,10 @@ export function useSidebarConfig() {
             path: withRouteLocale(route, '/menu/villages'),
             children: [
                 { label: t('navigation.submenu.villages.VillagesML'), icon: '🤖', path: withRouteLocale(route, '/explore/villages/ml') },
+                { label: t('navigation.submenu.villages.toponyms'), icon: '📍', path: withRouteLocale(route, '/explore/villages/toponyms') },
                 { label: t('navigation.submenu.villages.gdVillages'), icon: '🏘️', path: withRouteLocale(route, '/explore/villages/gd') },
-                { label: t('navigation.submenu.villages.gdVillagesTable'), icon: '📊', path: withRouteLocale(route, '/explore/villages/table') },
-                { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: withRouteLocale(route, '/explore/villages/yc') },
+                // { label: t('navigation.submenu.villages.gdVillagesTable'), icon: '📊', path: withRouteLocale(route, '/explore/villages/table') },
+                { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: withRouteLocale(route, '/explore/yc/villages') },
                 { label: t('navigation.submenu.villages.allVillages'), icon: '📋', path: withRouteLocale(route, '/explore/villages/all'), visibleWhen: () => userStore.role === 'admin' }
             ]
         },
@@ -105,7 +106,7 @@ export function useSidebarConfig() {
             icon: '🔗',
             path: withRouteLocale(route, '/menu/source'),
             children: [
-                { label: t('navigation.submenu.source.source'), icon: '📋', path: withRouteLocale(route, '/menu/source') },
+                { label: t('navigation.submenu.source.source'), icon: '📎', path: withRouteLocale(route, '/menu/source') },
                 { label: t('navigation.submenu.source.privacy'), icon: '🔒', path: withRouteLocale(route, '/menu/privacy') },
                 { label: t('navigation.submenu.source.suggestion'), icon: '💬', path: withRouteLocale(route, '/menu/about/suggestion') },
                 { label: t('navigation.submenu.source.like'), icon: '❤️', path: withRouteLocale(route, '/menu/about/like') }
@@ -119,7 +120,7 @@ export function useSidebarConfig() {
                 { label: t('navigation.submenu.tools.check'), icon: '📝', path: withRouteLocale(route, '/explore/tools/check') },
                 { label: t('navigation.submenu.tools.jyut2ipa'), icon: '🔤', path: withRouteLocale(route, '/explore/tools/jyut2ipa') },
                 { label: t('navigation.submenu.tools.merge'), icon: '🔗', path: withRouteLocale(route, '/explore/tools/merge') },
-                { label: t('navigation.submenu.tools.derive'), icon: '🧪', path: withRouteLocale(route, '/explore/tools/derive') },
+                // { label: t('navigation.submenu.tools.derive'), icon: '🧪', path: withRouteLocale(route, '/explore/tools/derive') },
                 // { label: t('navigation.submenu.tools.praat'), icon: '👂️', path: withRouteLocale(route, '/explore/tools/praat') }
             ]
         },
@@ -133,12 +134,12 @@ export function useSidebarConfig() {
         about_ontop: {
             label: t('navigation.menu.about_ontop'),
             icon: '🌐',
-            path: withRouteLocale(route, '/menu/about/settings'),
+            path: withRouteLocale(route, '/menu/about/intro'),
             children: [
                 { label: t('navigation.submenu.about.intro'), icon: 'ℹ️', path: withRouteLocale(route, '/menu/about/intro') },
                 { label: t('navigation.submenu.about.suggestion'), icon: '💬', path: withRouteLocale(route, '/menu/about/suggestion') },
                 { label: t('navigation.submenu.about.like'), icon: '❤️', path: withRouteLocale(route, '/menu/about/like') },
-                { label: t('navigation.submenu.about.setting'), icon: '⚙️', path: withRouteLocale(route, '/menu/about/settings') }
+                { label: t('navigation.submenu.about.setting'), icon: '⚙️', path: withRouteLocale(route, '/menu/settings') }
             ],
             showIn: ['none']
         }
@@ -183,7 +184,7 @@ export const SideConfig = {
             { label: '地圖', icon: '📍', path: buildLocalePath('zh-Hant', '/menu/map/view') },
             { label: '分區圖', icon: '📊', path: buildLocalePath('zh-Hant', '/menu/map/divide') },
             { label: '自定義', icon: '🎨', path: buildLocalePath('zh-Hant', '/menu/map/custom') },
-            { label: '地圖繪製', icon: '✏️', path: buildLocalePath('zh-Hant', '/menu/map/draw') }
+            { label: '地圖繪製', icon: '✏️', path: buildLocalePath('zh-Hant', '/explore/gis') }
         ]
     },
     pho: {
@@ -217,12 +218,12 @@ export const SideConfig = {
     words: {
         label: '詞句',
         icon: '💬',
-        path: buildLocalePath('zh-Hant', '/explore/vocabulary/view'),
+        path: buildLocalePath('zh-Hant', '/menu/vocabulary'),
         children: [
-            { label: '詞表', icon: '📒', path: buildLocalePath('zh-Hant', '/explore/vocabulary/view') },
-            { label: '語保詞彙', icon: '📝', path: buildLocalePath('zh-Hant', '/explore/yubao?tab=vocabulary') },
-            { label: '語保語法', icon: '🗂️', path: buildLocalePath('zh-Hant', '/explore/yubao?tab=grammar') },
-            { label: '陽春口語詞', icon: '🗣️', path: buildLocalePath('zh-Hant', '/explore/yc-spoken') }
+            { label: '詞表', icon: '�', path: buildLocalePath('zh-Hant', '/menu/vocabulary') },
+            { label: '語保詞彙', icon: '📝', path: buildLocalePath('zh-Hant', '/menu/yubao?tab=vocabulary') },
+            { label: '語保語法', icon: '🗂️', path: buildLocalePath('zh-Hant', '/menu/yubao?tab=grammar') },
+            { label: '陽春口語詞', icon: '🗣️', path: buildLocalePath('zh-Hant', '/explore/yc/words') }
         ]
     },
     villages: {
@@ -230,10 +231,11 @@ export const SideConfig = {
         icon: '🏕️',
         path: buildLocalePath('zh-Hant', '/menu/villages'),
         children: [
+            { label: '自然村地名分佈', icon: '📍', path: buildLocalePath('zh-Hant', '/explore/villages/toponyms') },
             { label: '廣東自然村', icon: '🏕️', path: buildLocalePath('zh-Hant', '/explore/villages/gd') },
             { label: '機器學習', icon: '🤖', path: buildLocalePath('zh-Hant', '/explore/villages/ml') },
             { label: '全粵村情表格', icon: '📊', path: buildLocalePath('zh-Hant', '/explore/villages/table') },
-            { label: '陽春自然村', icon: '🏠', path: buildLocalePath('zh-Hant', '/explore/villages/yc') },
+            { label: '陽春自然村', icon: '🏠', path: buildLocalePath('zh-Hant', '/explore/yc/villages') },
             { label: '全部自然村', icon: '📋', path: buildLocalePath('zh-Hant', '/explore/villages/all'), visibleWhen: () => userStore.role === 'admin' }
         ]
     },
@@ -245,7 +247,7 @@ export const SideConfig = {
             { label: '字表工具', icon: '📋', path: buildLocalePath('zh-Hant', '/explore/tools/check') },
             { label: '粵拼轉IPA', icon: '🔄', path: buildLocalePath('zh-Hant', '/explore/tools/jyut2ipa') },
             { label: '字表合併', icon: '🔗', path: buildLocalePath('zh-Hant', '/explore/tools/merge') },
-            { label: '字表推導', icon: '🧪', path: buildLocalePath('zh-Hant', '/explore/tools/derive') },
+            // { label: '字表推導', icon: '🧪', path: buildLocalePath('zh-Hant', '/explore/tools/derive') },
             { label: '聲學分析', icon: '🌊', path: buildLocalePath('zh-Hant', '/explore/tools/praat') }
         ]
     },
@@ -254,7 +256,7 @@ export const SideConfig = {
         icon: '📂',
         path: buildLocalePath('zh-Hant', '/menu/source'),
         children: [
-            { label: '字表來源', icon: '📋', path: buildLocalePath('zh-Hant', '/menu/source') },
+            { label: '字表來源', icon: '📎', path: buildLocalePath('zh-Hant', '/menu/source') },
             { label: '隱私政策', icon: '🛡️', path: buildLocalePath('zh-Hant', '/menu/privacy') },
             { label: '提出建議', icon: '💡', path: buildLocalePath('zh-Hant', '/menu/about/suggestion') },
             { label: '支持作者', icon: '❤️', path: buildLocalePath('zh-Hant', '/menu/about/like') }
@@ -267,8 +269,7 @@ export const SideConfig = {
         children: [
             { label: '簡介', icon: 'ℹ️', path: buildLocalePath('zh-Hant', '/menu/about/intro') },
             { label: '提出建議', icon: '💡', path: buildLocalePath('zh-Hant', '/menu/about/suggestion') },
-            { label: '支持作者', icon: '❤️', path: buildLocalePath('zh-Hant', '/menu/about/like') },
-            { label: '設置', icon: '⚙️', path: buildLocalePath('zh-Hant', '/menu/about/settings') }
+            { label: '支持作者', icon: '❤️', path: buildLocalePath('zh-Hant', '/menu/about/like') }
         ],
         showIn: ['none']
     }

@@ -2,7 +2,7 @@
   <div class="ngram-stats-page">
     <h3 class="villagesml-subtab-title">
       模式分析 - N-gram 統計
-      <HelpIcon content="分析2-4字N-gram的區域分布、傾向性和顯著性。支持按位置（前綴/中間/後綴）篩選。Z分數衡量N-gram在特定區域的使用傾向，P值<0.05表示統計顯著" />
+      <HelpIcon content="分析2-3字N-gram的區域分布、傾向性和顯著性。支持按位置（前綴/中間/後綴）篩選。Z分數衡量N-gram在特定區域的使用傾向，P值<0.05表示統計顯著" />
     </h3>
 
     <!-- Info Banner (if coming from explore page) -->
@@ -452,11 +452,10 @@ const positionCounts = computed(() => {
 const loadAvailableNgrams = async () => {
   loadingNgramList.value = true
   try {
-    // 获取 2-4 字的高频 N-gram
+    // 获取 2-3 字的高频 N-gram
     const results = await Promise.all([
       getNgramFrequency({ n: 2, top_k: 200, position: 'all' }),
-      getNgramFrequency({ n: 3, top_k: 150, position: 'all' }),
-      getNgramFrequency({ n: 4, top_k: 100, position: 'all' })
+      getNgramFrequency({ n: 3, top_k: 150, position: 'all' })
     ])
 
     // 合并结果并按频率排序

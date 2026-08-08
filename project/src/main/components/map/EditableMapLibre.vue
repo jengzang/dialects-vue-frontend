@@ -1,6 +1,19 @@
 <template>
   <div class="editable-map-shell main-glass-panel">
     <div ref="mapContainer" class="editable-map-stage" />
+    <div
+      v-if="props.featureBoxSelectEnabled"
+      class="editable-map-box-select-capture"
+      @mousedown.prevent.stop="handleFeatureBoxMouseDown"
+      @mousemove.prevent.stop="handleFeatureBoxMouseMove"
+      @mouseup.prevent.stop="handleFeatureBoxMouseUp"
+    >
+      <div
+        v-if="featureBoxOverlayStyle"
+        class="editable-map-box-select-overlay"
+        :style="featureBoxOverlayStyle"
+      />
+    </div>
   </div>
 </template>
 
@@ -25,51 +38,63 @@ const drawStyles = [
   {
     id: 'gl-draw-polygon-fill',
     type: 'fill',
-    filter: ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+    filter: ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static'], ['!=', 'user_visible', false]],
     paint: {
-      'fill-color': ['coalesce', ['get', 'fill'], drawFallbackPointColor],
-      'fill-outline-color': ['coalesce', ['get', 'stroke'], drawFallbackStroke],
-      'fill-opacity': ['coalesce', ['get', 'fillOpacity'], 0.22],
+      'fill-color': ['coalesce', ['get', 'user_fill'], drawFallbackPointColor],
+      'fill-outline-color': ['coalesce', ['get', 'user_stroke'], drawFallbackStroke],
+      'fill-opacity': ['case', ['==', ['coalesce', ['get', 'user_visible'], true], false], 0, ['coalesce', ['get', 'user_fillOpacity'], 0.22]],
     },
   },
   {
     id: 'gl-draw-polygon-stroke',
     type: 'line',
-    filter: ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']],
+    filter: ['all', ['==', '$type', 'Polygon'], ['!=', 'mode', 'static'], ['!=', 'user_visible', false]],
     layout: {
       'line-cap': 'round',
       'line-join': 'round',
     },
     paint: {
-      'line-color': ['coalesce', ['get', 'stroke'], drawFallbackStroke],
-      'line-width': ['coalesce', ['get', 'strokeWidth'], 3],
-      'line-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
+      'line-color': ['coalesce', ['get', 'user_stroke'], drawFallbackStroke],
+      'line-width': ['coalesce', ['get', 'user_strokeWidth'], 3],
+      'line-opacity': ['case', ['==', ['coalesce', ['get', 'user_visible'], true], false], 0, 1],
     },
   },
   {
     id: 'gl-draw-line',
     type: 'line',
-    filter: ['all', ['==', '$type', 'LineString'], ['!=', 'mode', 'static']],
+    filter: ['all', ['==', '$type', 'LineString'], ['!=', 'mode', 'static'], ['!=', 'user_visible', false]],
     layout: {
       'line-cap': 'round',
       'line-join': 'round',
     },
     paint: {
-      'line-color': ['coalesce', ['get', 'stroke'], drawFallbackStroke],
-      'line-width': ['coalesce', ['get', 'strokeWidth'], 4],
-      'line-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
+      'line-color': ['coalesce', ['get', 'user_stroke'], drawFallbackStroke],
+      'line-width': ['coalesce', ['get', 'user_strokeWidth'], 4],
+      'line-opacity': ['case', ['==', ['coalesce', ['get', 'user_visible'], true], false], 0, 1],
     },
   },
   {
     id: 'gl-draw-point',
     type: 'circle',
-    filter: ['all', ['==', '$type', 'Point'], ['!=', 'meta', 'midpoint'], ['!=', 'mode', 'static']],
+    filter: ['all', ['==', '$type', 'Point'], ['!=', 'meta', 'midpoint'], ['!=', 'mode', 'static'], ['!=', 'user_visible', false]],
     paint: {
-      'circle-radius': ['coalesce', ['get', 'pointRadius'], 6],
-      'circle-color': ['coalesce', ['get', 'pointColor'], drawFallbackPointColor],
-      'circle-stroke-color': ['coalesce', ['get', 'pointStrokeColor'], drawFallbackStroke],
+      'circle-radius': ['coalesce', ['get', 'user_pointRadius'], 6],
+      'circle-color': ['coalesce', ['get', 'user_pointColor'], drawFallbackPointColor],
+      'circle-stroke-color': ['coalesce', ['get', 'user_pointStrokeColor'], drawFallbackStroke],
       'circle-stroke-width': 2,
-      'circle-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
+      'circle-opacity': ['case', ['==', ['coalesce', ['get', 'user_visible'], true], false], 0, 1],
+    },
+  },
+  {
+    id: 'gl-draw-midpoint',
+    type: 'circle',
+    filter: ['all', ['==', 'meta', 'midpoint'], ['!=', 'mode', 'static']],
+    paint: {
+      'circle-radius': 5,
+      'circle-color': drawFallbackStroke,
+      'circle-stroke-color': '#ffffff',
+      'circle-stroke-width': 2,
+      'circle-opacity': 0.9,
     },
   },
   {
@@ -83,6 +108,12 @@ const drawStyles = [
       'circle-stroke-width': 2,
     },
   },
+]
+const featureBoxSelectableLayerIds = [
+  'gl-draw-polygon-fill',
+  'gl-draw-polygon-stroke',
+  'gl-draw-line',
+  'gl-draw-point',
 ]
 
 const props = defineProps({
@@ -113,17 +144,25 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  featureBoxSelectEnabled: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits([
   'update:modelValue',
+  'before-features-change',
   'features-change',
   'feature-select',
+  'shape-edit-state-change',
+  'mode-change',
   'export-image',
   'export-layer',
   'update:currentStyleKey',
   'preview-feature-hover',
   'map-click',
+  'feature-box-select',
 ])
 
 const mapContainer = ref(null)
@@ -132,14 +171,18 @@ const draw = shallowRef(null)
 const selectedFeatureId = ref('')
 const currentStyleKey = ref(props.currentStyleKey || 'gaode')
 const isFullscreen = ref(false)
+const isFeatureBoxDragging = ref(false)
+const featureBoxStartPoint = ref(null)
+const featureBoxEndPoint = ref(null)
+const defaultFeatureBoxSelectionMode = 'replace'
+const featureBoxSelectionMode = ref(defaultFeatureBoxSelectionMode)
 let previousPreviewSourceIds = []
 let hoveredFeatureKey = null
 let hoveredFeatureSource = null
 let previewHoverBound = false
-const emptyFeatureCollection = () => ({
-  type: 'FeatureCollection',
-  features: [],
-})
+let suppressedProgrammaticFeatureSelectionIds = null
+let isDeletingSelected = false
+let featureBoxDragPanWasEnabled = true
 const sanitizeLayerFilename = (layerName) => {
   return String(layerName || 'map-draw-layer')
     .trim()
@@ -410,30 +453,138 @@ const syncReadonlyLayers = () => {
   applyPreviewHover()
 }
 
-const syncSelectedFeature = () => {
-  const selectedIds = draw.value?.getSelectedIds?.() ?? []
-  selectedFeatureId.value = selectedIds[0] ? String(selectedIds[0]) : ''
-  emit('feature-select', selectedFeatureId.value)
+const normalizeFeatureIds = (featureIds = []) => featureIds
+  .map((featureId) => String(featureId || ''))
+  .filter(Boolean)
+
+const areFeatureIdsEqual = (leftFeatureIds = [], rightFeatureIds = []) => {
+  const leftIds = normalizeFeatureIds(leftFeatureIds)
+  const rightIds = normalizeFeatureIds(rightFeatureIds)
+  if (leftIds.length !== rightIds.length) return false
+  const rightIdSet = new Set(rightIds)
+  return leftIds.every((featureId) => rightIdSet.has(featureId))
 }
 
-const syncFeaturesFromDraw = () => {
+const getSelectedFeatureIdsFromDraw = () => {
+  const selectedIds = normalizeFeatureIds(draw.value?.getSelectedIds?.() ?? [])
+  if (selectedIds.length > 0) return selectedIds
+  const mode = draw.value?.getMode?.()
+  if (mode === 'direct_select' && selectedFeatureId.value && draw.value?.get?.(selectedFeatureId.value)) {
+    return [selectedFeatureId.value]
+  }
+  return selectedIds
+}
+
+const getSelectedVertexCountFromDraw = () => {
+  const mode = draw.value?.getMode?.() || 'simple_select'
+  if (mode !== 'direct_select') return 0
+  const selectedPoints = draw.value?.getSelectedPoints?.()
+  return Array.isArray(selectedPoints?.features) ? selectedPoints.features.length : 0
+}
+
+const getSelectedPointCoordinatesFromDraw = () => {
+  const selectedPoints = draw.value?.getSelectedPoints?.()
+  return (selectedPoints?.features ?? [])
+    .map((feature) => feature?.geometry?.coordinates)
+    .filter((coordinates) => Array.isArray(coordinates) && coordinates.length >= 2)
+}
+
+const areCoordinatesEqual = (left, right) => {
+  if (!Array.isArray(left) || !Array.isArray(right)) return false
+  return Number(left[0]) === Number(right[0]) && Number(left[1]) === Number(right[1])
+}
+
+const countSelectedCoordinates = (coordinates = [], selectedCoordinates = []) => {
+  return coordinates.filter((coordinate) => (
+    selectedCoordinates.some((selectedCoordinate) => areCoordinatesEqual(coordinate, selectedCoordinate))
+  )).length
+}
+
+const getEditableRingCoordinates = (ring = []) => {
+  if (ring.length > 1 && areCoordinatesEqual(ring[0], ring[ring.length - 1])) {
+    return ring.slice(0, -1)
+  }
+  return ring
+}
+
+const canDeleteSelected = () => {
+  if (draw.value?.getMode?.() !== 'direct_select') return true
+  const featureId = selectedFeatureId.value
+  const feature = featureId ? draw.value?.get?.(featureId) : null
+  const selectedCoordinates = getSelectedPointCoordinatesFromDraw()
+  if (!feature || selectedCoordinates.length === 0) return false
+
+  const geometry = feature.geometry ?? {}
+  if (geometry.type === 'LineString') {
+    const coordinates = geometry.coordinates ?? []
+    const selectedCount = countSelectedCoordinates(coordinates, selectedCoordinates)
+    return selectedCount > 0 && coordinates.length - selectedCount >= 2
+  }
+  if (geometry.type === 'Polygon') {
+    return (geometry.coordinates ?? []).every((ring) => {
+      const editableRing = getEditableRingCoordinates(ring)
+      const selectedCount = countSelectedCoordinates(editableRing, selectedCoordinates)
+      return selectedCount === 0 || editableRing.length - selectedCount >= 3
+    })
+  }
+  return false
+}
+
+const syncShapeEditState = () => {
+  const mode = draw.value?.getMode?.() || 'simple_select'
+  emit('shape-edit-state-change', {
+    mode,
+    featureId: mode === 'direct_select' ? selectedFeatureId.value : '',
+    selectedVertexCount: getSelectedVertexCountFromDraw(),
+  })
+}
+
+const syncSelectedFeature = () => {
+  const selectedIds = getSelectedFeatureIdsFromDraw()
+  selectedFeatureId.value = selectedIds[0] ? String(selectedIds[0]) : ''
+  if (suppressedProgrammaticFeatureSelectionIds) {
+    if (areFeatureIdsEqual(selectedIds, suppressedProgrammaticFeatureSelectionIds)) {
+      syncShapeEditState()
+      return
+    }
+    suppressedProgrammaticFeatureSelectionIds = null
+  }
+  emit('feature-select', selectedIds.length > 1 ? selectedIds : selectedFeatureId.value)
+  syncShapeEditState()
+}
+
+const syncDrawMode = (event) => {
+  emit('mode-change', event?.mode || draw.value?.getMode?.() || 'simple_select')
+  syncSelectedFeature()
+}
+
+const syncFeaturesFromDraw = (options = {}) => {
   const featureCollection = normalizeFeatureCollection(draw.value?.getAll?.())
+  const shouldCommitHistory = options.commitHistory !== false && !isDeletingSelected
+  if (shouldCommitHistory) {
+    emit('before-features-change')
+  }
   emit('update:modelValue', featureCollection)
   emit('features-change', featureCollection)
   syncSelectedFeature()
 }
 
 const setDrawMode = (mode) => {
+  suppressedProgrammaticFeatureSelectionIds = null
   draw.value?.changeMode?.(mode)
   if (mode === 'simple_select') {
     syncSelectedFeature()
+  } else {
+    syncShapeEditState()
   }
 }
 
-const selectFeature = (featureId) => {
+const selectFeature = (featureId, options = {}) => {
+  suppressedProgrammaticFeatureSelectionIds = null
   if (!draw.value || !featureId) {
     selectedFeatureId.value = ''
     emit('feature-select', selectedFeatureId.value)
+    syncShapeEditState()
     return
   }
 
@@ -441,38 +592,293 @@ const selectFeature = (featureId) => {
   if (!feature) {
     selectedFeatureId.value = ''
     emit('feature-select', selectedFeatureId.value)
+    syncShapeEditState()
     return
   }
 
-  if (feature?.properties?.locked) {
+  const shouldDirectEdit = options.directEdit !== false
+  if (!shouldDirectEdit) {
+    draw.value?.changeMode?.('simple_select', { featureIds: [featureId] })
+    emit('mode-change', 'simple_select')
     selectedFeatureId.value = String(featureId)
     emit('feature-select', selectedFeatureId.value)
+    syncShapeEditState()
+    return
+  }
+
+  if (feature?.properties?.locked || feature?.properties?.visible === false) {
+    draw.value?.changeMode?.('simple_select')
+    emit('mode-change', 'simple_select')
+    selectedFeatureId.value = String(featureId)
+    emit('feature-select', selectedFeatureId.value)
+    syncShapeEditState()
     return
   }
 
   draw.value?.changeMode?.('simple_select')
   draw.value?.changeMode?.('direct_select', { featureId })
+  emit('mode-change', 'direct_select')
   selectedFeatureId.value = String(featureId)
   emit('feature-select', selectedFeatureId.value)
+  syncShapeEditState()
 }
 
-const updateFeatureProperties = (featureId, nextProperties) => {
+const selectFeatures = (featureIds = []) => {
+  if (!draw.value) {
+    selectedFeatureId.value = ''
+    return
+  }
+
+  const selectedIds = featureIds
+    .map((featureId) => String(featureId || ''))
+    .filter((featureId) => featureId && draw.value?.get?.(featureId))
+  suppressedProgrammaticFeatureSelectionIds = selectedIds
+  draw.value?.changeMode?.('simple_select', { featureIds: selectedIds })
+  emit('mode-change', 'simple_select')
+  selectedFeatureId.value = selectedIds[0] || ''
+  syncShapeEditState()
+}
+
+const normalizeFeatureBoxPoint = (point) => {
+  if (Number.isFinite(Number(point?.x)) && Number.isFinite(Number(point?.y))) {
+    return {
+      x: Number(point.x),
+      y: Number(point.y),
+    }
+  }
+
+  const clientX = point?.clientX ?? point?.originalEvent?.clientX
+  const clientY = point?.clientY ?? point?.originalEvent?.clientY
+  const rect = map.value?.getCanvas?.()?.getBoundingClientRect?.()
+  if (Number.isFinite(Number(clientX)) && Number.isFinite(Number(clientY)) && rect) {
+    return {
+      x: Number(clientX) - rect.left,
+      y: Number(clientY) - rect.top,
+    }
+  }
+
+  return { x: 0, y: 0 }
+}
+
+const buildScreenBox = (startPoint, endPoint) => ({
+  minX: Math.min(startPoint.x, endPoint.x),
+  minY: Math.min(startPoint.y, endPoint.y),
+  maxX: Math.max(startPoint.x, endPoint.x),
+  maxY: Math.max(startPoint.y, endPoint.y),
+})
+
+const isPointInScreenBox = (point, box) => {
+  return point.x >= box.minX
+    && point.x <= box.maxX
+    && point.y >= box.minY
+    && point.y <= box.maxY
+}
+
+const getDrawFeatureId = (feature) => String(feature?.id ?? feature?.properties?.id ?? '')
+
+const isFeatureBoxSelectableFeature = (featureId) => {
+  const feature = draw.value?.get?.(featureId)
+  return Boolean(
+    feature
+    && feature.properties?.visible !== false
+    && feature.properties?.locked !== true
+  )
+}
+
+const collectProjectedFeaturePoints = (coordinates, points = []) => {
+  if (!Array.isArray(coordinates)) return points
+  const longitude = Number(coordinates[0])
+  const latitude = Number(coordinates[1])
+  if (
+    coordinates.length >= 2
+    && Number.isFinite(longitude)
+    && Number.isFinite(latitude)
+  ) {
+    points.push(map.value.project([longitude, latitude]))
+    return points
+  }
+  coordinates.forEach((childCoordinates) => {
+    collectProjectedFeaturePoints(childCoordinates, points)
+  })
+  return points
+}
+
+const featureIntersectsScreenBox = (feature, box) => {
+  if (!map.value || !feature?.geometry) return false
+  return collectProjectedFeaturePoints(feature.geometry.coordinates)
+    .some((point) => isPointInScreenBox(point, box))
+}
+
+const buildRenderedFeatureIdsInScreenBox = (box) => {
+  if (!map.value) return []
+  const layerIds = featureBoxSelectableLayerIds
+    .filter((layerId) => map.value.getLayer?.(layerId))
+  if (layerIds.length === 0) return []
+
+  try {
+    return map.value.queryRenderedFeatures(
+      [[box.minX, box.minY], [box.maxX, box.maxY]],
+      { layers: layerIds }
+    )
+      .map(getDrawFeatureId)
+      .filter((featureId) => featureId && isFeatureBoxSelectableFeature(featureId))
+  } catch {
+    return []
+  }
+}
+
+const buildGeometryFeatureIdsInScreenBox = (box) => {
+  return (normalizeFeatureCollection(draw.value?.getAll?.() ?? props.modelValue).features ?? [])
+    .filter((feature) => {
+      const featureId = getDrawFeatureId(feature)
+      return featureId
+        && isFeatureBoxSelectableFeature(featureId)
+        && featureIntersectsScreenBox(feature, box)
+    })
+    .map(getDrawFeatureId)
+}
+
+const buildFeatureIdsInScreenBox = (box) => {
+  const selectedFeatureIdSet = new Set([
+    ...buildRenderedFeatureIdsInScreenBox(box),
+    ...buildGeometryFeatureIdsInScreenBox(box),
+  ])
+  return (normalizeFeatureCollection(draw.value?.getAll?.() ?? props.modelValue).features ?? [])
+    .map(getDrawFeatureId)
+    .filter((featureId) => selectedFeatureIdSet.has(featureId))
+}
+
+const featureBoxOverlayStyle = computed(() => {
+  if (!isFeatureBoxDragging.value || !featureBoxStartPoint.value || !featureBoxEndPoint.value) return null
+  const box = buildScreenBox(featureBoxStartPoint.value, featureBoxEndPoint.value)
+  return {
+    left: `${box.minX}px`,
+    top: `${box.minY}px`,
+    width: `${Math.max(box.maxX - box.minX, 1)}px`,
+    height: `${Math.max(box.maxY - box.minY, 1)}px`,
+  }
+})
+
+const syncFeatureBoxCursor = () => {
+  const canvas = map.value?.getCanvas?.()
+  if (!canvas) return
+  canvas.style.cursor = props.featureBoxSelectEnabled ? 'crosshair' : ''
+}
+
+const getFeatureBoxSelectionMode = (event) => {
+  const sourceEvent = event?.originalEvent ?? event ?? {}
+  if (sourceEvent.altKey || sourceEvent.optionKey) return 'subtract'
+  if (sourceEvent.shiftKey) return 'add'
+  return defaultFeatureBoxSelectionMode
+}
+
+const restoreFeatureBoxDragPan = () => {
+  if (featureBoxDragPanWasEnabled) {
+    map.value?.dragPan?.enable?.()
+  }
+}
+
+const unbindFeatureBoxDocumentListeners = () => {
+  document.removeEventListener('mousemove', handleFeatureBoxDocumentMouseMove)
+  document.removeEventListener('mouseup', handleFeatureBoxDocumentMouseUp)
+}
+
+const resetFeatureBoxSelection = () => {
+  const wasDragging = isFeatureBoxDragging.value
+  isFeatureBoxDragging.value = false
+  featureBoxStartPoint.value = null
+  featureBoxEndPoint.value = null
+  featureBoxSelectionMode.value = defaultFeatureBoxSelectionMode
+  unbindFeatureBoxDocumentListeners()
+  if (wasDragging) {
+    restoreFeatureBoxDragPan()
+  }
+  syncFeatureBoxCursor()
+}
+
+const finishFeatureBoxSelection = (point) => {
+  if (!isFeatureBoxDragging.value || !featureBoxStartPoint.value) return
+  featureBoxEndPoint.value = point
+  const box = buildScreenBox(featureBoxStartPoint.value, featureBoxEndPoint.value)
+  const selectedFeatureIds = buildFeatureIdsInScreenBox(box)
+  const selectionMode = featureBoxSelectionMode.value
+  resetFeatureBoxSelection()
+  selectFeatures(selectedFeatureIds)
+  emit('feature-box-select', {
+    featureIds: selectedFeatureIds,
+    selectionMode,
+  })
+}
+
+const handleFeatureBoxMouseDown = (event) => {
+  const button = event?.originalEvent?.button ?? event?.button
+  if (!props.featureBoxSelectEnabled || !map.value || (button !== undefined && button !== 0)) return
+
+  event?.preventDefault?.()
+  event?.originalEvent?.preventDefault?.()
+  event?.originalEvent?.stopPropagation?.()
+  featureBoxDragPanWasEnabled = map.value.dragPan?.isEnabled?.() ?? true
+  if (featureBoxDragPanWasEnabled) {
+    map.value.dragPan?.disable?.()
+  }
+  featureBoxSelectionMode.value = getFeatureBoxSelectionMode(event)
+  featureBoxStartPoint.value = normalizeFeatureBoxPoint(event.point ?? event)
+  featureBoxEndPoint.value = featureBoxStartPoint.value
+  isFeatureBoxDragging.value = true
+  document.addEventListener('mousemove', handleFeatureBoxDocumentMouseMove)
+  document.addEventListener('mouseup', handleFeatureBoxDocumentMouseUp)
+}
+
+const handleFeatureBoxMouseMove = (event) => {
+  if (!isFeatureBoxDragging.value) return
+  event?.preventDefault?.()
+  event?.stopPropagation?.()
+  featureBoxEndPoint.value = normalizeFeatureBoxPoint(event.point ?? event)
+}
+
+const handleFeatureBoxMouseUp = (event) => {
+  event?.preventDefault?.()
+  event?.stopPropagation?.()
+  finishFeatureBoxSelection(normalizeFeatureBoxPoint(event.point ?? event))
+}
+
+const handleFeatureBoxDocumentMouseMove = (event) => {
+  if (!isFeatureBoxDragging.value) return
+  event?.preventDefault?.()
+  event?.stopPropagation?.()
+  featureBoxEndPoint.value = normalizeFeatureBoxPoint(event)
+}
+
+const handleFeatureBoxDocumentMouseUp = (event) => {
+  event?.preventDefault?.()
+  event?.stopPropagation?.()
+  finishFeatureBoxSelection(normalizeFeatureBoxPoint(event))
+}
+
+const updateFeatureProperties = (featureId, nextProperties, options = {}) => {
   if (!draw.value || !featureId || !nextProperties) return
 
   Object.entries(nextProperties).forEach(([key, value]) => {
     draw.value?.setFeatureProperty?.(featureId, key, value)
   })
-  syncFeaturesFromDraw()
+  syncFeaturesFromDraw({ commitHistory: options.commitHistory !== false })
 }
 
 const deleteSelected = () => {
-  draw.value?.trash?.()
-  syncFeaturesFromDraw()
+  if (!canDeleteSelected()) return false
+  isDeletingSelected = true
+  try {
+    draw.value?.trash?.()
+    syncFeaturesFromDraw({ commitHistory: false })
+    return true
+  } finally {
+    isDeletingSelected = false
+  }
 }
 
 const clearAll = () => {
   draw.value?.deleteAll?.()
-  syncFeaturesFromDraw()
+  syncFeaturesFromDraw({ commitHistory: false })
 }
 
 const importGeoJson = (featureCollection, options = {}) => {
@@ -498,7 +904,7 @@ const importGeoJson = (featureCollection, options = {}) => {
   selectedFeatureId.value = ''
   if (shouldEmitChanges) {
     syncFeaturesFromDraw()
-  } else {
+  } else if (options.emitSelection !== false) {
     syncSelectedFeature()
   }
 }
@@ -513,18 +919,20 @@ const bindDrawEvents = () => {
   map.value.on('draw.update', syncFeaturesFromDraw)
   map.value.on('draw.delete', syncFeaturesFromDraw)
   map.value.on('draw.selectionchange', syncSelectedFeature)
-  map.value.on('draw.modechange', syncSelectedFeature)
+  map.value.on('draw.modechange', syncDrawMode)
 }
 
 const initializeDraw = () => {
   draw.value = new MapboxDraw({
     displayControlsDefault: false,
+    keybindings: false,
     controls: {
       point: true,
       line_string: true,
       polygon: true,
       trash: true,
     },
+    userProperties: true,
     styles: drawStyles,
     defaultMode: 'simple_select',
   })
@@ -534,12 +942,22 @@ const initializeDraw = () => {
   bindDrawEvents()
   syncReadonlyLayers()
 
-  const initialFeatures = normalizeFeatureCollection(
-    props.activeLayer?.visible === false ? emptyFeatureCollection() : props.modelValue
-  )
+  const initialFeatures = normalizeFeatureCollection(props.modelValue)
   if (initialFeatures.features.length > 0) {
     draw.value.set(initialFeatures)
   }
+}
+
+const restoreLayersAfterStyleLoad = () => {
+  if (!map.value) return
+
+  syncReadonlyLayers()
+
+  if (!draw.value) return
+
+  const currentFeatures = draw.value.getAll?.() ?? normalizeFeatureCollection(props.modelValue)
+  draw.value.set(currentFeatures)
+  syncSelectedFeature()
 }
 
 const resetView = () => {
@@ -854,9 +1272,11 @@ const initializeMap = async () => {
   map.value.on('click', (e) => {
     emit('map-click', { lng: e.lngLat.lng, lat: e.lngLat.lat })
   })
+  map.value.on('style.load', restoreLayersAfterStyleLoad)
   map.value.on('styledata', () => {
     syncReadonlyLayers()
   })
+  syncFeatureBoxCursor()
 }
 
 const gatherPreviewFillLayerIds = () => {
@@ -878,20 +1298,25 @@ const unbindPreviewHover = () => {
 
 const resetHoveredFeature = () => {
   if (hoveredFeatureKey && hoveredFeatureSource && map.value) {
-    map.value.setFeatureState(
-      { source: hoveredFeatureSource, id: hoveredFeatureKey },
-      { hover: false }
-    )
+    try {
+      map.value.setFeatureState(
+        { source: hoveredFeatureSource, id: hoveredFeatureKey },
+        { hover: false }
+      )
+    } catch {
+      /* source may have been removed (e.g. voronoi preview cleared) */
+    }
   }
   hoveredFeatureKey = null
   hoveredFeatureSource = null
   if (map.value) {
-    map.value.getCanvas().style.cursor = ''
+    syncFeatureBoxCursor()
   }
   emit('preview-feature-hover', null)
 }
 
 const onPreviewMouseMove = (e) => {
+  if (props.featureBoxSelectEnabled) return
   const fillLayerIds = gatherPreviewFillLayerIds()
   const pointLayerIds = gatherPreviewPointLayerIds()
   const allLayerIds = [...fillLayerIds, ...pointLayerIds]
@@ -1010,12 +1435,10 @@ const exportImage = async (options = {}) => {
 }
 
 watch(
-  () => [props.modelValue, props.activeLayer?.visible],
-  ([nextValue]) => {
+  () => props.modelValue,
+  (nextValue) => {
     if (!draw.value || !nextValue) return
-    const normalized = normalizeFeatureCollection(
-      props.activeLayer?.visible === false ? emptyFeatureCollection() : nextValue
-    )
+    const normalized = normalizeFeatureCollection(nextValue)
     draw.value.deleteAll()
     if (normalized.features.length > 0) {
       draw.value.set(normalized)
@@ -1038,6 +1461,18 @@ watch(
   () => props.enablePreviewHover,
   () => {
     applyPreviewHover()
+  }
+)
+
+watch(
+  () => props.featureBoxSelectEnabled,
+  (enabled) => {
+    if (!enabled) {
+      resetFeatureBoxSelection()
+      return
+    }
+    resetHoveredFeature()
+    syncFeatureBoxCursor()
   }
 )
 
@@ -1070,6 +1505,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('fullscreenchange', syncFullscreenState)
+  resetFeatureBoxSelection()
   unbindPreviewHover()
   if (map.value) {
     map.value.remove()
@@ -1083,8 +1519,10 @@ defineExpose({
   getFeatureCollection: () => normalizeFeatureCollection(draw.value?.getAll?.() ?? props.modelValue),
   setDrawMode,
   selectFeature,
+  selectFeatures,
   selectedFeatureId,
   updateFeatureProperties,
+  canDeleteSelected,
   deleteSelected,
   syncReadonlyLayers,
   clearAll,
@@ -1104,6 +1542,7 @@ defineExpose({
 
 <style scoped lang="scss">
 .editable-map-shell {
+  position: relative;
   width: 100%;
   min-height: 80dvh;
   overflow: hidden;
@@ -1120,6 +1559,21 @@ defineExpose({
   @media (max-aspect-ratio:1/1) {
     min-height: 70dvh;
   }
+}
+
+.editable-map-box-select-capture {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  cursor: crosshair;
+}
+
+.editable-map-box-select-overlay {
+  position: absolute;
+  pointer-events: none;
+  border: 1px solid rgba(37, 99, 235, 0.85);
+  background: rgba(59, 130, 246, 0.16);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.72) inset;
 }
 
 :deep(.draw-control-container) {

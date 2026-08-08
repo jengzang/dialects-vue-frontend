@@ -16,6 +16,8 @@
     <!-- 悬浮按钮组 -->
     <FloatingButtons
       :auth-button-position="authButtonPosition"
+      :float-buttons-position="floatButtonsPosition"
+      :show-home-button="false"
       @toggle-sidebar="isSidebarOpen = !isSidebarOpen"
     />
 
@@ -25,6 +27,7 @@
       @close="isSidebarOpen = false"
     />
 
+    <ScrollToTop />
     <PageTutorialGuide
       v-if="showTutorialGuide"
     />
@@ -37,18 +40,22 @@ import { useRoute } from 'vue-router';
 import FloatingButtons from '@/components/bar/FloatingButtons.vue';
 import SimpleSidebar from '@/components/bar/SimpleSidebar.vue';
 import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
+import ScrollToTop from '@/components/common/ScrollToTop.vue'
 
 const route = useRoute();
 const isSidebarOpen = ref(false);
 const authButtonPosition = ref('top-right');
+const floatButtonsPosition = ref('bottom-right');
 const showTutorialGuide = computed(() => route.path.endsWith('/explore/tools/praat'))
 
-// 根据路由自动设置 auth-button 位置
+// 根据路由自动设置浮动按钮位置
 watch(() => route.path, (newPath) => {
   if (newPath === '/villagesML' || newPath.startsWith('/villagesML/')) {
     authButtonPosition.value = 'bottom-left';
+    floatButtonsPosition.value = 'bottom-right';
   } else {
     authButtonPosition.value = 'top-right';
+    floatButtonsPosition.value = 'top-left';
   }
 }, { immediate: true });
 </script>
@@ -56,15 +63,6 @@ watch(() => route.path, (newPath) => {
 
 <style scoped lang="scss">
 $portrait-ratio: 1;
-
-$system-font:
-  -apple-system,
-  BlinkMacSystemFont,
-  'Segoe UI',
-  Roboto,
-  Helvetica,
-  Arial,
-  sans-serif;
 
 /* 页面背景 */
 .simple-layout {
@@ -98,7 +96,7 @@ $system-font:
   justify-content: center;
   padding: 10px 6px;
   color: var(--text-deep);
-  font-family: $system-font;
+  font-family: var(--font-sans);
 }
 
 /* 页面切换动画 */

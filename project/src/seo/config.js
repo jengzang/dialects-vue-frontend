@@ -238,7 +238,7 @@ const SEO_CONFIG = {
         en: 'Visualize dialect evolution with charts to examine correspondences and differentiation across locations.',
       },
     },
-    '/explore/yubao': {
+    '/menu/yubao': {
       title: {
         'zh-Hant': '詞彙與語法｜方音圖鑑',
         'zh-CN': '词汇与语法｜方音图鉴',
@@ -262,7 +262,7 @@ const SEO_CONFIG = {
         en: 'Explore phonological status data of Chinese characters across Middle Chinese, Old Chinese, Early Modern Chinese, and Cantonese rhyme books.',
       },
     },
-    '/explore/yc-spoken': {
+    '/explore/yc/words': {
       title: {
         'zh-Hant': '陽春口語詞｜方音圖鑑',
         'zh-CN': '阳春口语词｜方音图鉴',
@@ -299,6 +299,9 @@ const SEO_CONFIG = {
       },
     },
     '/explore/villages/yc': {
+      redirect: '/explore/yc/villages'
+    },
+    '/explore/yc/villages': {
       title: {
         'zh-Hant': '陽春自然村｜方音圖鑑',
         'zh-CN': '阳春自然村｜方音图鉴',
@@ -335,15 +338,54 @@ const SEO_CONFIG = {
       },
     },
     '/menu/words': {
+      redirect: '/menu/vocabulary'
+    },
+    '/menu/vocabulary': {
       title: {
-        'zh-Hant': '詞彙與語法｜方音圖鑑',
-        'zh-CN': '词汇与语法｜方音图鉴',
-        en: 'Vocabulary & Grammar | Dialects Atlas',
+        'zh-Hant': '詞表｜方音圖鑑',
+        'zh-CN': '词表｜方音图鉴',
+        en: 'Vocabulary List | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '集中查看語保詞彙、語保語法與陽春口語詞等詞句資料入口。',
-        'zh-CN': '集中查看语保词汇、语保语法与阳春口语词等词句资料入口。',
-        en: 'Browse entry points to language preservation vocabulary, grammar materials, and Yangchun colloquial word resources.',
+        'zh-Hant': '查閱詞彙資料，支持卡片、地圖、表格三種視圖，以及詞彙上傳與管理。',
+        'zh-CN': '查阅词汇资料，支持卡片、地图、表格三种视图，以及词汇上传与管理。',
+        en: 'Browse vocabulary materials with card, map, and table views, plus upload and management features.',
+      },
+    },
+    '/menu/vocabulary/view': {
+      title: {
+        'zh-Hant': '詞表瀏覽｜方音圖鑑',
+        'zh-CN': '词表浏览｜方音图鉴',
+        en: 'Vocabulary Browser | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '以卡片、地圖或表格視圖瀏覽方言詞彙資料，支持分類篩選與搜索。',
+        'zh-CN': '以卡片、地图或表格视图浏览方言词汇资料，支持分类筛选与搜索。',
+        en: 'Browse dialect vocabulary in card, map, or table views with category filtering and search.',
+      },
+    },
+    '/menu/vocabulary/import': {
+      title: {
+        'zh-Hant': '詞表匯入｜方音圖鑑',
+        'zh-CN': '词表导入｜方音图鉴',
+        en: 'Vocabulary Import | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '匯入方言詞彙資料，支持批量上傳與格式校驗。',
+        'zh-CN': '导入方言词汇资料，支持批量上传与格式校验。',
+        en: 'Import dialect vocabulary data with batch upload and format validation.',
+      },
+    },
+    '/menu/vocabulary/manage': {
+      title: {
+        'zh-Hant': '詞表管理｜方音圖鑑',
+        'zh-CN': '词表管理｜方音图鉴',
+        en: 'Vocabulary Management | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '管理方言詞彙資料庫，支持編輯、刪除與批量操作。',
+        'zh-CN': '管理方言词汇数据库，支持编辑、删除与批量操作。',
+        en: 'Manage the dialect vocabulary database with editing, deletion, and batch operations.',
       },
     },
     '/menu/villages': {
@@ -382,6 +424,198 @@ const SEO_CONFIG = {
         en: 'View dialect data, regional mapping, and custom map layers through an interactive geolinguistic map interface.',
       },
     },
+    '/menu/map/divide': {
+      title: {
+        'zh-Hant': '分區地圖｜方音圖鑑',
+        'zh-CN': '分区地图｜方音图鉴',
+        en: 'Dialect Division Map | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '以地圖方式查看方言分區結果，從地理語言學視角探索方言分區與分佈。',
+        'zh-CN': '以地图方式查看方言分区结果，从地理语言学视角探索方言分区与分布。',
+        en: 'Explore dialect division results through an interactive geolinguistic map of dialect regions.',
+      },
+    },
+    '/menu/map/custom': {
+      title: {
+        'zh-Hant': '自定義地圖｜方音圖鑑',
+        'zh-CN': '自定义地图｜方音图鉴',
+        en: 'Custom Map | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '在互動地圖上繪製與管理自定義區域、標記與圖層，建立個人化的方言地圖。',
+        'zh-CN': '在交互地图上绘制与管理自定义区域、标记与图层，建立个人化的方言地图。',
+        en: 'Draw and manage custom regions, markers, and layers on an interactive map for personalized dialect mapping.',
+      },
+    },
+    '/menu/settings': {
+      title: {
+        'zh-Hant': '設定｜方音圖鑑',
+        'zh-CN': '设置｜方音图鉴',
+        en: 'Settings | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '管理方音圖鑑的帳號設定、語言偏好與個人化選項。',
+        'zh-CN': '管理方音图鉴的账号设置、语言偏好与个性化选项。',
+        en: 'Manage your Dialects Atlas account settings, language preferences, and personalization options.',
+      },
+    },
+    '/menu/result': {
+      title: {
+        'zh-Hant': '查詢結果｜方音圖鑑',
+        'zh-CN': '查询结果｜方音图鉴',
+        en: 'Query Results | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '查看方言查詢結果，以表格形式瀏覽字音、音位、中古地位與聲調等資料。',
+        'zh-CN': '查看方言查询结果，以表格形式浏览字音、音位、中古地位与声调等资料。',
+        en: 'View dialect query results in table format, including character pronunciation, phoneme, Middle Chinese position, and tone data.',
+      },
+    },
+    '/menu/about/intro': {
+      title: {
+        'zh-Hant': '項目介紹｜方音圖鑑',
+        'zh-CN': '项目介绍｜方音图鉴',
+        en: 'About | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '了解方音圖鑑項目的背景、目標與功能介紹。',
+        'zh-CN': '了解方音图鉴项目的背景、目标与功能介绍。',
+        en: 'Learn about the background, goals, and features of the Dialects Atlas project.',
+      },
+    },
+    '/menu/about/suggestion': {
+      title: {
+        'zh-Hant': '意見反饋｜方音圖鑑',
+        'zh-CN': '意见反馈｜方音图鉴',
+        en: 'Feedback | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '向方音圖鑑提交意見反饋、功能建議或問題回報。',
+        'zh-CN': '向方音图鉴提交意见反馈、功能建议或问题回报。',
+        en: 'Submit feedback, feature suggestions, or bug reports to the Dialects Atlas team.',
+      },
+    },
+    '/menu/about/like': {
+      title: {
+        'zh-Hant': '支持我們｜方音圖鑑',
+        'zh-CN': '支持我们｜方音图鉴',
+        en: 'Support Us | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '以按讚、分享或贊助的方式支持方音圖鑑的持續開發與維護。',
+        'zh-CN': '以点赞、分享或赞助的方式支持方音图鉴的持续开发与维护。',
+        en: 'Support the ongoing development and maintenance of Dialects Atlas through likes, shares, or sponsorship.',
+      },
+    },
+    '/explore': {
+      title: {
+        'zh-Hant': '探索｜方音圖鑑',
+        'zh-CN': '探索｜方音图鉴',
+        en: 'Explore | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '探索方音圖鑑的互動工具與資料集，包括地圖繪製、字表工具、自然村資料與語音分析等功能。',
+        'zh-CN': '探索方音图鉴的交互工具与数据集，包括地图绘制、字表工具、自然村资料与语音分析等功能。',
+        en: 'Explore interactive tools and datasets in Dialects Atlas, including map drawing, table tools, village data, and phonetic analysis.',
+      },
+    },
+    '/explore/gis': {
+      title: {
+        'zh-Hant': '地圖繪製｜方音圖鑑',
+        'zh-CN': '地图绘制｜方音图鉴',
+        en: 'Map Drawing | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '在互動地圖上繪製、編輯與管理多邊形、標記與圖層，進行地理語言學數據的可視化操作。',
+        'zh-CN': '在交互地图上绘制、编辑与管理多边形、标记与图层，进行地理语言学数据的可视化操作。',
+        en: 'Draw, edit, and manage polygons, markers, and layers on an interactive map for geolinguistic data visualization.',
+      },
+    },
+    '/explore/manage': {
+      title: {
+        'zh-Hant': '字表管理｜方音圖鑑',
+        'zh-CN': '字表管理｜方音图鉴',
+        en: 'Table Management | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '管理方言字表資料，支持上傳、編輯與整理方言字音對照表。',
+        'zh-CN': '管理方言字表资料，支持上传、编辑与整理方言字音对照表。',
+        en: 'Manage dialect character tables with support for uploading, editing, and organizing dialect-character pronunciation mappings.',
+      },
+    },
+    '/explore/tools/check': {
+      title: {
+        'zh-Hant': '字表檢查｜方音圖鑑',
+        'zh-CN': '字表检查｜方音图鉴',
+        en: 'Table Check | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '檢查方言字表的格式與內容正確性，驗證字音資料的完整性與一致性。',
+        'zh-CN': '检查方言字表的格式与内容正确性，验证字音资料的完整性与一致性。',
+        en: 'Check the format and content correctness of dialect character tables, verifying the completeness and consistency of pronunciation data.',
+      },
+    },
+    '/explore/tools/jyut2ipa': {
+      title: {
+        'zh-Hant': '粵拼轉 IPA｜方音圖鑑',
+        'zh-CN': '粤拼转 IPA｜方音图鉴',
+        en: 'Jyutping to IPA | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '將粵拼轉換為國際音標（IPA），支持批量轉換與結果校對。',
+        'zh-CN': '将粤拼转换为国际音标（IPA），支持批量转换与结果校对。',
+        en: 'Convert Jyutping romanization to International Phonetic Alphabet (IPA) with support for batch conversion and result verification.',
+      },
+    },
+    '/explore/tools/merge': {
+      title: {
+        'zh-Hant': '字表合併｜方音圖鑑',
+        'zh-CN': '字表合并｜方音图鉴',
+        en: 'Table Merge | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '合併多個方言字表，整合不同來源的字音資料，生成統一的對照表。',
+        'zh-CN': '合并多个方言字表，整合不同来源的字音资料，生成统一的对照表。',
+        en: 'Merge multiple dialect character tables from different sources into a unified comparison table.',
+      },
+    },
+    '/explore/tools/derive': {
+      title: {
+        'zh-Hant': '字表推導｜方音圖鑑',
+        'zh-CN': '字表推导｜方音图鉴',
+        en: 'Table Derivation | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '根據音韻規則推導方言字表，從中古音推導各方言的預期讀音。',
+        'zh-CN': '根据音韵规则推导方言字表，从中古音推导各方言的预期读音。',
+        en: 'Derive dialect character tables based on phonological rules, predicting expected pronunciations from Middle Chinese.',
+      },
+    },
+    '/explore/tools/praat': {
+      title: {
+        'zh-Hant': '聲學分析｜方音圖鑑',
+        'zh-CN': '声学分析｜方音图鉴',
+        en: 'Acoustic Analysis | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '上傳音頻文件進行聲學分析，使用 Praat 工具查看語音頻譜、共振峰與音高軌跡。',
+        'zh-CN': '上传音频文件进行声学分析，使用 Praat 工具查看语音频谱、共振峰与音高轨迹。',
+        en: 'Upload audio files for acoustic analysis with Praat, inspecting speech spectrograms, formants, and pitch contours.',
+      },
+    },
+    '/explore/villages/toponyms': {
+      title: {
+        'zh-Hant': '地名分佈｜方音圖鑑',
+        'zh-CN': '地名分布｜方音图鉴',
+        en: 'Toponym Distribution | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '以地圖與圖表方式查看方言地名分佈資料，探索地名與方言的地理關聯。',
+        'zh-CN': '以地图与图表方式查看方言地名分布资料，探索地名与方言的地理关联。',
+        en: 'Explore toponym distribution data through maps and charts, examining the geographic relationship between place names and dialects.',
+      },
+    },
   },
 }
 
@@ -389,7 +623,7 @@ export const SITEMAP_PATHS = [
   '/',
   '/menu/source',
   '/menu/privacy',
-  '/menu/about/settings',
+  '/menu/settings',
   '/menu/about/intro',
   '/menu/about/suggestion',
   '/menu/about/like',
@@ -408,10 +642,13 @@ export const SITEMAP_PATHS = [
   '/menu/map/view',
   '/menu/map/divide',
   '/menu/map/custom',
-  '/menu/map/draw',
+  '/explore/gis',
   '/menu/result',
   '/menu/tools',
   '/menu/words',
+  '/menu/vocabulary',
+  '/menu/yubao',
+  '/explore/yc/words',
   '/menu/villages',
   '/menu/cluster',
   '/explore',
@@ -421,13 +658,13 @@ export const SITEMAP_PATHS = [
   '/explore/tools/derive',
   '/explore/tools/praat',
   '/explore/manage',
-  '/explore/yubao',
   '/explore/char-class',
-  '/explore/yc-spoken',
+  '/explore/yc/villages',
   '/explore/villages/gd',
   '/explore/villages/table',
   '/explore/villages/yc',
   '/explore/villages/ml',
+  '/explore/villages/toponyms',
 ]
 
 export const NOINDEX_PATHS = new Set([

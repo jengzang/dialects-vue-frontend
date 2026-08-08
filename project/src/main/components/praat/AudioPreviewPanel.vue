@@ -1,7 +1,6 @@
 <template>
   <div v-if="effectiveSegments.length > 0 || audioBlob" class="audio-preview-panel">
-    <h3 class="panel-title">
-      🎵 {{ t('praat.audioPreview.title') }}
+    <h3 class="panel-title"><InlineIcon icon="🎵" />{{ t('praat.audioPreview.title') }}
       <span v-if="effectiveSegments.length > 1" class="segment-count">{{ t('praat.audioPreview.segmentCount', { count: effectiveSegments.length }) }}</span>
     </h3>
 
@@ -29,7 +28,7 @@
           <h4>{{ t('praat.audioPreview.manual.fullWaveform', { duration: totalDuration.toFixed(1) }) }}</h4>
         </div>
         <div ref="fullWaveformContainer" class="full-waveform"></div>
-        <p class="hint">💡 {{ t('praat.audioPreview.manual.hint') }}</p>
+        <p class="hint"><InlineIcon icon="💡" />{{ t('praat.audioPreview.manual.hint') }}</p>
       </div>
 
       <!-- Control Buttons -->
@@ -40,16 +39,14 @@
           :disabled="!selectedRegionId || isConfirming"
         >
           <span v-if="isConfirming">{{ t('praat.audioPreview.manual.processing') }}</span>
-          <span v-else>✓ {{ t('praat.audioPreview.manual.confirmButton') }}</span>
+          <span v-else><InlineIcon icon="✓" />{{ t('praat.audioPreview.manual.confirmButton') }}</span>
         </button>
-        <button @click="clearAllRegions" class="btn-clear main-glass-button">
-          🗑️ {{ t('praat.audioPreview.manual.clearButton') }}
+        <button @click="clearAllRegions" class="btn-clear main-glass-button"><InlineIcon icon="🗑️" />{{ t('praat.audioPreview.manual.clearButton') }}
         </button>
       </div>
 
       <!-- Validation Messages -->
-      <div v-if="validationError" class="validation-error">
-        ⚠️ {{ validationError }}
+      <div v-if="validationError" class="validation-error"><InlineIcon icon="⚠️" />{{ validationError }}
       </div>
 
       <!-- Selected Regions List -->
@@ -68,10 +65,8 @@
             </span>
             <span class="region-duration">{{ t('praat.audioPreview.manual.duration', { duration: region.duration.toFixed(1) }) }}</span>
             <div class="region-actions">
-              <span v-if="selectedRegionId === region.id" class="selected-indicator">✓ {{ t('praat.audioPreview.manual.selected') }}</span>
-              <button @click.stop="deleteRegion(region.id)" class="btn-delete">
-                🗑️
-              </button>
+              <span v-if="selectedRegionId === region.id" class="selected-indicator"><InlineIcon icon="✓" />{{ t('praat.audioPreview.manual.selected') }}</span>
+              <button @click.stop="deleteRegion(region.id)" class="btn-delete"><InlineIcon icon="🗑️" /></button>
             </div>
           </div>
 
@@ -122,7 +117,7 @@
     <!-- Auto Mode (Original) -->
     <div v-else class="auto-mode">
       <div v-if="effectiveSegments.length > 1" class="info-banner">
-        <span class="info-icon">ℹ️</span>
+        <span class="info-icon"><InlineIcon icon="ℹ️" /></span>
         <span>{{ t('praat.audioPreview.auto.selectHint') }}</span>
       </div>
 
@@ -150,7 +145,7 @@
               </span>
             </div>
             <div class="segment-actions">
-              <span v-if="selectedIndex === index" class="selected-badge">✓ {{ t('praat.audioPreview.auto.selected') }}</span>
+              <span v-if="selectedIndex === index" class="selected-badge"><InlineIcon icon="✓" />{{ t('praat.audioPreview.auto.selected') }}</span>
               <span class="drag-hint">⋮⋮</span>
             </div>
           </div>
@@ -181,6 +176,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, watch, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import WaveSurfer from 'wavesurfer.js'
@@ -961,7 +957,7 @@ $transition-normal: 0.3s;
 }
 
 .audio-preview-panel {
-  padding: 1.25rem;
+  padding: 0.6rem 1rem;
 }
 
 .panel-title {
@@ -985,7 +981,7 @@ $transition-normal: 0.3s;
   display: flex;
   justify-content: center;
   gap: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .mode-button {
@@ -1207,7 +1203,7 @@ $transition-normal: 0.3s;
 }
 
 .full-waveform-section {
-  padding: 1rem;
+  padding: 0.5rem;
   background: $surface-medium;
   border-radius: var(--radius-lg);
 }
@@ -1299,11 +1295,11 @@ $transition-normal: 0.3s;
 .regions-list {
   @include flex-col;
   gap: 0.75rem;
-  max-height: 20rem;
+  max-height: 38dvh;
   overflow-y: auto;
 
   > h4 {
-    margin: 0 0 0.5rem;
+    margin: 0.5rem 0 0;
     color: $text-primary;
     text-align: center;
     font-size: 0.9rem;
@@ -1444,7 +1440,15 @@ $transition-normal: 0.3s;
 
 @media (max-aspect-ratio: 1/1) {
   .audio-preview-panel {
-    padding: 0.5rem;
+    padding: 0.3rem 0.8rem;
+  }
+
+  .full-waveform-section{
+    padding:0.1rem;
+  }
+
+  .full-waveform{
+    padding:0;
   }
 
   .manual-mode {

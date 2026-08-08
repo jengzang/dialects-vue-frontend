@@ -1,7 +1,7 @@
 <template>
   <div class="navbar">
     <!-- 桌面端的布局 -->
-    <div class="navbar-desktop">
+    <div ref="desktopRef" class="navbar-desktop">
       <div  class="navbar-item logo-and-title" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
         <div @click="toggleSidebar" class="logo-container desktop-brand-logo">
           <img class="logo" :src="faviconSrc" alt="Logo" />
@@ -10,12 +10,24 @@
           <img src="../../assets/picture/title.png" alt="Title" class="title-logo" />
         </div>
       </div>
-      <nav 
-          ref="navRef" 
-          class="navbar-btn" 
+      <button
+        v-if="canScrollLeft || isScrolling"
+        class="scroll-arrow scroll-arrow--left"
+        :style="{ left: arrowLeftPx + 'px' }"
+        @mousedown.prevent="startScroll('left')"
+        @mouseup="stopScroll"
+        @mouseleave="stopScroll"
+        @touchstart.prevent="startScroll('left')"
+        @touchend="stopScroll"
+      >◀</button>
+
+      <nav
+          ref="navRef"
+          class="navbar-btn"
           :class="scrollClass"
       >
-      <!-- <nav 
+        <div class="tab-pill" :style="desktopPillStyle" />
+      <!-- <nav
           ref="navRef" 
           class="navbar-btn" 
           :class="scrollClassMobile"
@@ -33,12 +45,13 @@
               :href="href"
               class="menu-item"
               :class="[
-                { active: isMenuTabActive(t.tab) },
                 t.cssClass,
                 { 'tab-overflow-left': getTabScroll(t, false) === 'left', 'tab-overflow-right': getTabScroll(t, false) === 'right' }
               ]"
               :style="{
                 flex: getOverflowFlex(t, isMenuTabActive(t.tab), false),
+                minWidth: getOverflowMinWidth(t, false),
+                maxWidth: getOverflowMaxWidth(t, false),
                 fontSize: t.fontSize + 'rem'
               }"
               @click.prevent="onMenuBarClick(t, navigate)"
@@ -46,14 +59,32 @@
               @mouseleave="handleTabTooltipLeave"
               @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
-          <span class="emoji">{{ t.icon }}</span>
-          <span
-            class="label"
-            v-if="!t.showLabelOnlyWhenActive || isMenuTabActive(t.tab)"
-          >{{ t.label }}</span>
+          <span class="menu-inner" :class="{ active: isMenuTabActive(t.tab) }">
+            <BarIcon :icon="t.icon" class="nav-icon" :weight="isMenuTabActive(t.tab) ? 'fill' : 'bold'" />
+            <span
+              class="label"
+              v-if="!t.showLabelOnlyWhenActive || isMenuTabActive(t.tab)"
+            >{{ t.label }}</span>
+            <svg v-if="t.to?.path && !t.to.path.includes('/menu/')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </span>
           </a>
         </RouterLink>
       </nav>
+
+      <button
+        v-if="canScrollRight || isScrolling"
+        class="scroll-arrow scroll-arrow--right"
+        :style="{ right: arrowRightPx + 'px' }"
+        @mousedown.prevent="startScroll('right')"
+        @mouseup="stopScroll"
+        @mouseleave="stopScroll"
+        @touchstart.prevent="startScroll('right')"
+        @touchend="stopScroll"
+      >▶</button>
+
+      <div class="settings-icon-container" @click="goToSettings" :title="t('navigation.submenu.about.setting')">
+        <BarIcon icon="⚙️" />
+      </div>
       <div v-if="userStore.username" class="avatar-container" @click="goToAuthPage">
         <NavAvatar />
       </div>
@@ -82,28 +113,28 @@
             <img src="../../assets/picture/title.png" alt="Title" class="title-logo" />
           </div>
         </div>
-        <div v-if="userStore.username" class="avatar-container" @click="goToAuthPage">
-          <NavAvatar />
-        </div>
-        <div v-else class="logo-container mobile-login-button" @click="goToAuthPage">
-          <!-- 显示用户名或"登录" -->
-          <span class="login-text">
-            {{ t('navigation.login') }}
-          </span>
+        <div class="navbar-top-actions">
+          <div class="settings-icon-container" @click="goToSettings" :title="t('navigation.submenu.about.setting')">
+            <BarIcon icon="⚙️" />
+          </div>
+          <div v-if="userStore.username" class="avatar-container" @click="goToAuthPage">
+            <NavAvatar />
+          </div>
+          <div v-else class="logo-container mobile-login-button" @click="goToAuthPage">
+            <!-- 显示用户名或"登录" -->
+            <span class="login-text">
+              {{ t('navigation.login') }}
+            </span>
+          </div>
         </div>
       </div>
 
       <!-- 第二部分：导航按钮 -->
-      <div ref="mobileNavRef" 
-          class="navbar-bottom" 
-          :class="scrollClass" 
+      <div ref="mobileNavRef"
+          class="navbar-bottom"
+          :class="scrollClassMobile"
       >
-      <!-- <div ref="mobileNavRef" 
-          class="navbar-bottom" 
-          :class="scrollClass" 
-          @scroll="onScroll" 
-          @scrollend="onScrollEnd"
-      > -->
+        <div class="tab-pill tab-pill--mobile" :style="mobilePillStyle" />
         <RouterLink
             v-for="t in orderedMobileTabs"
             :key="t.tab"
@@ -116,12 +147,13 @@
               :href="href"
               class="menu-item"
               :class="[
-                { active: isMenuTabActive(t.tab) },
                 t.cssClass,
-                { 'tab-overflow-left': getTabScroll(t, true) === 'left', 'tab-overflow-right': getTabScroll(t, true) === 'right' }
+                { active: isMenuTabActive(t.tab), 'tab-overflow-left': getTabScroll(t, true) === 'left', 'tab-overflow-right': getTabScroll(t, true) === 'right' }
               ]"
               :style="{
                 flex: getOverflowFlex(t, isMenuTabActive(t.tab), true),
+                minWidth: getOverflowMinWidth(t, true),
+                maxWidth: getOverflowMaxWidth(t, true),
                 fontSize: (t.mobileFontSize || t.fontSize) + 'rem'
               }"
               @click.prevent="onMenuBarClick(t, navigate)"
@@ -129,11 +161,17 @@
               @mouseleave="handleTabTooltipLeave"
               @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
-            <span class="emoji">{{ t.icon }}</span>
-            <span
-              class="label"
-              v-if="!t.hideLabelOnMobile && (!(t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) || isMenuTabActive(t.tab))"
-            >{{ t.label }}</span>
+            <span class="tab-icon-label" :class="{ 'tab-icon-label--stack': !isMenuTabActive(t.tab) && (t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) !== false }">
+              <span class="tab-icon-row">
+                <BarIcon :icon="t.icon" class="nav-icon" :weight="isMenuTabActive(t.tab) ? 'fill' : 'bold'" />
+                <svg v-if="t.to?.path && !t.to.path.includes('/menu/')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+              </span>
+              <span
+                class="label"
+                :class="{ 'label--tiny': !isMenuTabActive(t.tab) && (t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) !== false }"
+                v-if="!t.hideLabelOnMobile"
+              >{{ t.label }}</span>
+            </span>
           </a>
         </RouterLink>
       </div>
@@ -167,11 +205,16 @@ import {
 } from '@/main/config/index.js'
 import { userStore } from '@/main/store/store.js'
 import NavAvatar from '@/components/bar/NavAvatar.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import SimpleSidebar from '@/components/bar/SimpleSidebar.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { useTabTooltip } from '@/composables/bar/useTabTooltip.js'
+import { useTabPill } from '@/composables/bar/useTabPill.js'
 import { useScrollSnap } from '@/composables/bar/useScrollSnap.js'
+import { useScrollArrows } from '@/composables/bar/useScrollArrows.js'
+import { useBarOverflow, getDefaultTabScroll, sortTabsByScroll } from '@/composables/bar/useBarOverflow.js'
 import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { showSuccess } from '@/utils/ui/message.js'
 
 const faviconSrc = computed(() =>
   currentColorTheme.value === COLOR_THEME_GREEN
@@ -183,11 +226,15 @@ const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const isSidebarVisible = ref(false)
+const desktopRef = ref(null)
 const navRef = ref(null)
 const mobileNavRef = ref(null)
 
 // Tab label tooltip
 const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
+
+const { pillStyle: desktopPillStyle } = useTabPill(navRef, '.menu-inner.active', route)
+const { pillStyle: mobilePillStyle } = useTabPill(mobileNavRef, '.menu-item.active', route)
 
 // ===== sessionStorage 管理：记住每个 tab 的最后访问的 sub =====
 watch(() => route.path, () => {
@@ -199,21 +246,10 @@ watch(() => route.path, () => {
 const allMenuTabs = useMenuBarConfig()
 const tabs = computed(() => filterVisibleMenuBarTabs(allMenuTabs.value))
 
-const getTabScroll = (tab, isMobile) => {
-  return isMobile ? (tab.mobileScroll ?? tab.scroll) : tab.scroll
-}
+const getTabScroll = (tab, isMobile) => getDefaultTabScroll(tab, isMobile)
 
-// Overflow scroll: sort tabs：左溢出 → 主 → 右溢出
-const sortTabsByScroll = (tabs, isMobile) => {
-  const all = tabs
-  const left = all.filter(t => getTabScroll(t, isMobile) === 'left')
-  const main = all.filter(t => !getTabScroll(t, isMobile) || (getTabScroll(t, isMobile) !== 'left' && getTabScroll(t, isMobile) !== 'right'))
-  const right = all.filter(t => getTabScroll(t, isMobile) === 'right')
-  return [...left, ...main, ...right]
-}
-
-const orderedTabs = computed(() => sortTabsByScroll(tabs.value, false))
-const orderedMobileTabs = computed(() => sortTabsByScroll(tabs.value, true))
+const orderedTabs = computed(() => sortTabsByScroll(tabs.value, false, getTabScroll))
+const orderedMobileTabs = computed(() => sortTabsByScroll(tabs.value, true, getTabScroll))
 
 const { hasOverflowDesktop, hasOverflowMobile, scrollClass, scrollClassMobile, onScroll, onScrollEnd, navContentWidth } = useScrollSnap(
   navRef,
@@ -223,50 +259,22 @@ const { hasOverflowDesktop, hasOverflowMobile, scrollClass, scrollClassMobile, o
   orderedMobileTabs
 )
 
-const hasOverflowForLayout = (isMobile) => isMobile ? hasOverflowMobile.value : hasOverflowDesktop.value
+const { canScrollLeft, canScrollRight, isScrolling, arrowLeftPx, arrowRightPx, startScroll, stopScroll } = useScrollArrows(
+  navRef,
+  hasOverflowDesktop,
+  100,
+  desktopRef
+)
 
-const getFlexWeight = (tab, isActive, isMobile) => {
-  let labelVisible
-
-  if (isMobile) {
-    const showOnlyWhenActive = tab.mobileShowLabelOnlyWhenActive ?? tab.showLabelOnlyWhenActive
-    labelVisible = !tab.hideLabelOnMobile && (!showOnlyWhenActive || isActive)
-  } else {
-    labelVisible = !tab.showLabelOnlyWhenActive || isActive
-  }
-
-  if (labelVisible) {
-    return isMobile ? (tab.mobileWeight || tab.weight) : tab.weight
-  } else {
-    if (isMobile) {
-      return tab.mobileWeightIconOnly || tab.mobileWeight || tab.weightIconOnly || tab.weight
-    } else {
-      return tab.weightIconOnly || tab.weight
-    }
-  }
-}
-
-const getRenderedPrimaryTabs = (isMobile) =>
-  (isMobile ? orderedMobileTabs.value : orderedTabs.value)
-    .filter(t => !getTabScroll(t, isMobile) || (getTabScroll(t, isMobile) !== 'left' && getTabScroll(t, isMobile) !== 'right'))
-    .filter(t => !isMobile || !t.hideOnMobile)
-
-const getPrimaryTotalWeight = (isMobile) =>
-  getRenderedPrimaryTabs(isMobile)
-    .reduce((s, t) => s + getFlexWeight(t, isMenuTabActive(t.tab), isMobile), 0) || 1
-
-const getOverflowFlex = (t, isActive, isMobile) => {
-  if (getTabScroll(t, isMobile)) return '0 0 auto'
-  if (hasOverflowForLayout(isMobile)) {
-    const w = getFlexWeight(t, isActive, isMobile)
-    const totalWeight = getPrimaryTotalWeight(isMobile)
-    if (navContentWidth.value > 0) {
-      return `0 0 ${(w / totalWeight) * navContentWidth.value}px`
-    }
-    return `0 0 ${(w / totalWeight) * 100}%`
-  }
-  return getFlexWeight(t, isActive, isMobile) + ' 1 0'
-}
+const { getOverflowFlex, getOverflowMinWidth, getOverflowMaxWidth } = useBarOverflow({
+  orderedTabs,
+  orderedMobileTabs,
+  hasOverflowDesktop,
+  hasOverflowMobile,
+  navContentWidth,
+  getTabScroll,
+  resolveIsActive: (tabName) => isMenuTabActive(tabName),
+})
 
 const isMenuTabActive = (tabName) => {
   return getMenuBarActiveTab(tabs.value, route) === tabName
@@ -298,12 +306,18 @@ const goToAuthPage = () => {
 const toggleSidebar = () => {
   isSidebarVisible.value = !isSidebarVisible.value
 }
+
+const goToSettings = () => {
+  router.push(buildLocalePath(resolveRouteLocale(route), '/menu/settings'))
+  showSuccess(t('navigation.submenu.about.setting'))
+}
 </script>
 
 
 
 
 <style scoped lang="scss">
+@use './bar-shared' as *;
 
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
@@ -311,9 +325,9 @@ $primary-dark: var(--color-primary-hover);
 $mobile-aspect-ratio: 1;
 
 // 桌面端不再直接使用 10dvh，避免高分辨率屏幕上导航栏过高。
-$desktop-navbar-height: clamp(64px, 7dvh, 82px);
-$desktop-control-size: clamp(44px, 4.8dvh, 56px);
-$desktop-title-height: clamp(50px, 6.2dvh, 70px);
+$desktop-navbar-height: clamp(50px, 6.8dvh, 70px);
+$desktop-control-size: clamp(44px, 5dvh, 56px);
+$desktop-title-height: clamp(40px, 6.2dvh, 60px);
 
 @mixin soft-glass-background {
   background: linear-gradient(
@@ -343,8 +357,9 @@ $desktop-title-height: clamp(50px, 6.2dvh, 70px);
   background: linear-gradient(135deg, var(--glass-20), var(--glass-10));
   border: 1px solid var(--glass-30);
   box-shadow: var(--shadow-glass-inset);
-  backdrop-filter: blur(6px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  backdrop-filter: blur(6px) saturate(160%);
+  -webkit-backdrop-filter: blur(6px) saturate(160%);
+  will-change: backdrop-filter;
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease,
@@ -353,6 +368,7 @@ $desktop-title-height: clamp(50px, 6.2dvh, 70px);
 
 /* 桌面端 */
 .navbar-desktop {
+  position: relative;
   width: 100%;
   height: $desktop-navbar-height;
   display: flex;
@@ -363,6 +379,7 @@ $desktop-title-height: clamp(50px, 6.2dvh, 70px);
 }
 
 .navbar-btn {
+  position: relative;
   flex: 1 1 auto;
   min-width: 0;
   max-width: 1200px;
@@ -393,6 +410,31 @@ $desktop-title-height: clamp(50px, 6.2dvh, 70px);
   cursor: pointer;
 }
 
+.tab-pill {
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  top: 50%;
+  pointer-events: none;
+  background: linear-gradient(
+    145deg,
+    var(--glass-20),
+    var(--glass-10)
+  );
+  border-radius: 25px;
+  box-shadow:
+    0 6px 10px rgba(0, 0, 0, 0.1),
+    0 1px 4px rgba(0, 0, 0, 0.08);
+  transition:
+    transform 0.6s cubic-bezier(0.25, 0.1, 0.0, 1.0),
+    width 0.6s cubic-bezier(0.25, 0.1, 0.0, 1.0),
+    opacity 0.15s ease;
+
+  &--mobile {
+    border-radius: 30px;
+  }
+}
+
 .logo-container {
   flex: 0 0 auto;
   // box-sizing: border-box;
@@ -404,7 +446,7 @@ $desktop-title-height: clamp(50px, 6.2dvh, 70px);
   justify-content: center;
   gap: 4px;
 
-  @include glass-blur(15px, 150%);
+  @include glass-blur(8px, 150%);
   @include soft-glass-background;
   @include soft-glass-shadow;
 
@@ -467,7 +509,6 @@ $desktop-title-height: clamp(50px, 6.2dvh, 70px);
 
   @include flex-center;
 
-  gap: 1px;
   border-radius: var(--radius-md);
   color: $primary;
   white-space: nowrap;
@@ -476,13 +517,37 @@ $desktop-title-height: clamp(50px, 6.2dvh, 70px);
   font-size: 1.3rem;
   cursor: pointer;
   user-select: none;
+  .tab-external {
+    flex-shrink: 0;
+    opacity: 0.6;
+  }
+}
+
+.menu-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 1px;
+  --tab-pad: clamp(3px, 1.2vw, 14px);
+  height: calc(100% - clamp(3px, 1dvh, 6px));
+  margin: 0 calc(var(--tab-pad) * -1);
+  padding: 0 var(--tab-pad);
+  font-size: 0.9em;
+  border: 3px solid transparent;
+  border-radius: var(--radius-md);
+
+  &:has(.tab-external) {
+    padding-right: calc(var(--tab-pad) / 2);
+  }
   transition:
     background 0.25s ease,
     color 0.25s ease,
     border-color 0.25s ease,
     border-radius 0.25s ease,
     box-shadow 0.25s ease,
-    height 0.25s ease;
+    font-size 0.25s ease;
 
   .label {
     min-width: 0;
@@ -491,36 +556,42 @@ $desktop-title-height: clamp(50px, 6.2dvh, 70px);
     white-space: nowrap;
   }
 
-  .label {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    min-width: 0;
-  }
-
-  &:hover {
+  .menu-item:hover & {
     background: rgba(var(--color-primary-rgb), 0.12);
-    color: $primary;
   }
 
   &.active {
+    position: relative;
     @include soft-glass-background;
     @include soft-glass-shadow;
 
     border: 3px solid var(--glass-40);
-    border-radius: 0 0 25px 25px;
+    border-radius: 25px;
     color: var(--color-primary-hover);
     font-weight: 1000;
+    font-size: 1.1em;
     transition:
-      background 0.3s ease,
-      color 0.3s ease,
-      border-color 0.3s ease,
-      border-radius 0.3s ease,
-      box-shadow 0.3s ease,
-      height 0.3s ease;
+      background 0.3s ease 0.6s,
+      color 0.3s ease 0.6s,
+      border-color 0.3s ease 0.6s,
+      border-radius 0.3s ease 0.6s,
+      box-shadow 0.3s ease 0.6s,
+      font-size 0.3s ease 0.6s;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 3px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 65%;
+      height: 2px;
+      background: var(--color-primary-hover);
+      border-radius: 2px;
+      opacity: 0.5;
+    }
 
     &:hover {
-      margin: 0;
       background: linear-gradient(
         145deg,
         var(--glass-50),
@@ -554,6 +625,27 @@ $desktop-title-height: clamp(50px, 6.2dvh, 70px);
   max-width: calc(#{$desktop-control-size} + 10px);
   height: calc(#{$desktop-control-size} + 10px);
   margin-right: 10px;
+}
+
+.settings-icon-container {
+  @include flex-center;
+
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  margin-right: 2px;
+  font-size: 16px;
+  cursor: pointer;
+  user-select: none;
+  border-radius: var(--radius-full);
+  transition: all 0.3s ease;
+  opacity: 0.7;
+
+  &:hover {
+    opacity: 1;
+    background: rgba(var(--color-primary-rgb), 0.1);
+    transform: rotate(30deg);
+  }
 }
 
 /* 移动端导航布局 */
@@ -614,6 +706,11 @@ $desktop-title-height: clamp(50px, 6.2dvh, 70px);
   border-radius: 30px;
 }
 
+.navbar-top-actions {
+  display: flex;
+  align-items: center;
+}
+
 .navbar-top .avatar-container {
   flex: 0 0 calc(6dvh + 16px);
   width: calc(6dvh + 16px);
@@ -623,6 +720,7 @@ $desktop-title-height: clamp(50px, 6.2dvh, 70px);
 }
 
 .navbar-bottom {
+  position: relative;
   width: 100%;
   height: 6dvh;
   display: flex;
@@ -644,8 +742,69 @@ $desktop-title-height: clamp(50px, 6.2dvh, 70px);
 
   .menu-item {
     height: 6dvh !important;
+    border: 3px solid transparent;
     border-radius: 30px !important;
+
+    .tab-icon-label {
+      display: flex;
+      align-items: center;
+      gap: 1px;
+      min-width: 0;
+    }
+
+    .tab-icon-label--stack {
+      flex-direction: column;
+    }
+
+    .tab-icon-row {
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-icon, .label {
+      font-size: 0.9em;
+    }
+
+    .label--tiny {
+      font-size: 0.45em !important;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      line-height: 1;
+    }
+
+    &.active {
+      position: relative;
+      z-index: 1;
+      @include soft-glass-background;
+      @include soft-glass-shadow;
+
+      border: 3px solid var(--glass-40);
+      border-radius: 30px;
+      color: var(--color-primary-hover);
+      font-weight: 1000;
+      transition: 0.3s ease 0.6s;
+
+      .nav-icon, .label {
+        font-size: 1.1em;
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 3px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 65%;
+        height: 2px;
+        background: var(--color-primary-hover);
+        border-radius: 2px;
+        opacity: 0.5;
+      }
+    }
   }
+
 
   .title {
     img {
@@ -655,55 +814,25 @@ $desktop-title-height: clamp(50px, 6.2dvh, 70px);
   }
 }
 
-.tab-tooltip {
-  padding: 6px 12px;
-  color: var(--text-primary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-.tab-tooltip-fade-enter-active,
-.tab-tooltip-fade-leave-active {
-  transition: opacity 0.15s ease;
-}
-
-.tab-tooltip-fade-enter-from,
-.tab-tooltip-fade-leave-to {
-  opacity: 0;
-}
+@include bar-tab-tooltip;
 
 .navbar-btn.has-overflow-tabs,
 .navbar-bottom.has-overflow-tabs {
-  justify-content: flex-start;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-    width: 0;
-    height: 0;
-  }
+  @include bar-has-overflow-tabs;
 }
 
 .tab-overflow-left,
 .tab-overflow-right {
-  flex-shrink: 0;
+  @include bar-overflow-tabs;
 }
 
-@media (orientation: landscape) {
-  .tab-overflow-left,
-  .tab-overflow-right {
-    padding-inline: 10px;
-  }
+.scroll-arrow {
+  @include bar-scroll-arrow;
 }
 
-@media (orientation: portrait) {
-  .tab-overflow-left,
-  .tab-overflow-right {
-    padding-inline: 14px;
+@media (max-aspect-ratio: 1/1) {
+  .scroll-arrow {
+    display: none;
   }
 }
 

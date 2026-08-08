@@ -76,9 +76,6 @@
         <CustomTab
           v-show="activeTab === 'custom'"
         />
-        <MapDrawTab
-          v-show="activeTab === 'draw'"
-        />
         <!-- 自定義數據提交面板（只在 map tab 顯示） -->
         <CustomDataPanel
           v-if="activeTab === 'map'"
@@ -102,7 +99,6 @@ import { mapStore } from '@/main/store/store.js'
 import TabsContainer from '@/components/common/TabsContainer.vue'
 import DivideTab from "@/main/components/map/Tabs/DivideTab.vue";
 import CustomTab from '@/main/components/map/Tabs/CustomTab.vue'
-import MapDrawTab from '@/main/components/map/Tabs/MapDrawTab.vue'
 import MapLibre from "@/main/components/map/MapLibre.vue";
 import CustomDataPanel from '@/main/components/map/custom/CustomDataPanel.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
@@ -128,14 +124,12 @@ const mapClickCoordinates = ref(null)
 const routeSubToTab = {
   view: 'map',
   divide: 'divide',
-  custom: 'custom',
-  draw: 'draw'
+  custom: 'custom'
 }
 const tabToRouteSub = {
   map: 'view',
   divide: 'divide',
   custom: 'custom',
-  draw: 'draw'
 }
 const currentTab = computed(() => routeSubToTab[route.params.sub] || 'map')
 
@@ -151,8 +145,7 @@ const isMapRoute = computed(() => {
 const tabs = computed(() => [
   { name: 'map', label: t('map.tabs.map') },
   { name: 'divide', label: t('map.tabs.divide') },
-  { name: 'custom', label: t('map.tabs.custom') },
-  { name: 'draw', label: t('map.tabs.draw') }
+  { name: 'custom', label: t('map.tabs.custom') }
 ])
 
 // 處理地圖點擊事件

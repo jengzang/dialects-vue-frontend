@@ -1,7 +1,7 @@
 <template>
 <!--  <ExploreLayout>-->
     <div class="village-deep-dive-page">
-      <h1 class="page-title">🏘️ 村名深度分析</h1>
+      <h1 class="page-title"><InlineIcon icon="🏘️" />村名深度分析</h1>
 
       <!-- Village Selector -->
       <div class="village-selector vml-glass-panel">
@@ -78,7 +78,7 @@
 
       <!-- Empty State -->
       <div v-else class="empty-state vml-glass-panel">
-        <div class="empty-icon">🔍</div>
+        <div class="empty-icon"><InlineIcon icon="🔍" /></div>
         <p>請搜尋並選擇一個村莊以查看詳細分析</p>
       </div>
     </div>
@@ -86,6 +86,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import {

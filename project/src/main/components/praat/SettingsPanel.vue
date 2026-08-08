@@ -28,7 +28,7 @@
               @change="applyResolutionPreset"
           >
           <span class="radio-label">
-              <span class="radio-title">⚡ {{ resolutionPresets.quick.title }}</span>
+              <span class="radio-title"><InlineIcon icon="⚡" />{{ resolutionPresets.quick.title }}</span>
               <span class="radio-desc">{{ resolutionPresets.quick.desc }}</span>
             </span>
         </label>
@@ -42,7 +42,7 @@
               @change="applyResolutionPreset"
           >
           <span class="radio-label">
-              <span class="radio-title">⚖️ {{ resolutionPresets.standard.title }}</span>
+              <span class="radio-title"><InlineIcon icon="⚖️" />{{ resolutionPresets.standard.title }}</span>
               <span class="radio-desc">{{ resolutionPresets.standard.desc }}</span>
             </span>
         </label>
@@ -56,7 +56,7 @@
               @change="applyResolutionPreset"
           >
           <span class="radio-label">
-              <span class="radio-title">💎 {{ resolutionPresets.high.title }}</span>
+              <span class="radio-title"><InlineIcon icon="💎" />{{ resolutionPresets.high.title }}</span>
               <span class="radio-desc">{{ resolutionPresets.high.desc }}</span>
             </span>
         </label>
@@ -186,6 +186,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, reactive, watch, ref, onMounted } from 'vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { useI18n } from 'vue-i18n'

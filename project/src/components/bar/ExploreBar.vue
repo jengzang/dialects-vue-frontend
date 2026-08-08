@@ -1,6 +1,6 @@
 <template>
   <div class="explorebar">
-    <div class="explorebar-desktop">
+    <div ref="desktopRef" class="explorebar-desktop">
       <div class="logo-and-title" @click="toggleSidebar" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
         <div class="logo-container">
           <img class="logo" :src="faviconSrc" alt="Logo" />
@@ -10,44 +10,72 @@
         </div>
       </div>
 
+      <button
+        v-if="(showScrollArrows && canScrollLeft) || isScrolling"
+        class="scroll-arrow scroll-arrow--left"
+        :style="{ left: arrowLeftPx + 'px' }"
+        @mousedown.prevent="startScroll('left')"
+        @mouseup="stopScroll"
+        @mouseleave="stopScroll"
+        @touchstart.prevent="startScroll('left')"
+        @touchend="stopScroll"
+      >◀</button>
+
       <nav
         ref="navRef"
         class="explorebar-tabs ui-scrollbar--hidden"
         :class="scrollClass"
         @mouseleave="handleTabLeave"
       >
+        <div class="tab-pill" :style="desktopPillStyle" />
         <RouterLink
-          v-for="t in orderedTabs"
-          :key="t.tab"
-          :to="t.to"
-          custom
-          v-slot="{ href, navigate }"
+        v-for="t in orderedTabs"
+        :key="t.tab"
+        :to="t.to"
+        custom
+        v-slot="{ href, navigate }"
+      >
+        <a
+          :href="href"
+          class="tab-item"
+          :class="{
+            'tab-overflow-left': getTabScroll(t, false) === 'left',
+            'tab-overflow-right': getTabScroll(t, false) === 'right'
+          }"
+          :style="{
+            flex: getOverflowFlex(t, isActiveComputed(t.tab), false),
+            minWidth: getOverflowMinWidth(t, false),
+            maxWidth: getOverflowMaxWidth(t, false),
+            fontSize: t.fontSize + 'rem'
+          }"
+          @click.prevent.stop="onClick(t, navigate, $event)"
+          @mouseenter="(e) => { handleTabHover(t, t.tab, e); handleTabTooltipEnter(e, t.label) }"
+          @mouseleave="handleTabTooltipLeave"
+          @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
         >
-          <a
-            :href="href"
-            class="tab-item"
-            :class="{
-              active: isActiveComputed(t.tab),
-              'tab-overflow-left': getTabScroll(t, false) === 'left',
-              'tab-overflow-right': getTabScroll(t, false) === 'right'
-            }"
-            :style="{
-              flex: getOverflowFlex(t, isActiveComputed(t.tab), false),
-              fontSize: t.fontSize + 'rem'
-            }"
-            @click.prevent.stop="onClick(t, navigate, $event)"
-            @mouseenter="(e) => { handleTabHover(t, t.tab, e); handleTabTooltipEnter(e, t.label) }"
-            @mouseleave="handleTabTooltipLeave"
-            @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
-          >
-            <span class="emoji">{{ t.icon }}</span>
+          <span class="tab-inner" :class="{ active: isActiveComputed(t.tab) }">
+            <BarIcon :icon="t.icon" class="nav-icon" :weight="isActiveComputed(t.tab) ? 'fill' : 'bold'" />
             <span
               class="label"
               v-if="!t.showLabelOnlyWhenActive || isActiveComputed(t.tab)"
             >{{ t.label }}</span>
-          </a>
-        </RouterLink>
+            <svg v-if="getTabChildren(t.tab).length" class="tab-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
+            <svg v-else-if="!t.navigation?.matchPages?.length && !t.navigation?.activeMatchPaths?.length" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+          </span>
+        </a>
+      </RouterLink>
       </nav>
+
+      <button
+        v-if="(showScrollArrows && canScrollRight) || isScrolling"
+        class="scroll-arrow scroll-arrow--right"
+        :style="{ right: arrowRightPx + 'px' }"
+        @mousedown.prevent="startScroll('right')"
+        @mouseup="stopScroll"
+        @mouseleave="stopScroll"
+        @touchstart.prevent="startScroll('right')"
+        @touchend="stopScroll"
+      >▶</button>
 
       <div v-if="userStore.username" class="avatar-container" @click="goToAuthPage">
         <NavAvatar />
@@ -67,6 +95,7 @@
         class="explorebar-tabs ui-scrollbar--hidden"
         :class="scrollClassMobile"
       >
+        <div class="tab-pill tab-pill--mobile" :style="mobilePillStyle" />
         <RouterLink
           v-for="t in orderedMobileTabs"
           :key="t.tab"
@@ -85,6 +114,8 @@
             }"
             :style="{
               flex: getOverflowFlex(t, isActiveComputed(t.tab), true),
+              minWidth: getOverflowMinWidth(t, true),
+              maxWidth: getOverflowMaxWidth(t, true),
               fontSize: (t.mobileFontSize || t.fontSize) + 'rem'
             }"
             @click.prevent.stop="onClick(t, navigate, $event)"
@@ -92,11 +123,18 @@
             @mouseleave="handleTabTooltipLeave"
             @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
-            <span class="emoji">{{ t.icon }}</span>
-            <span
-              class="label"
-              v-if="!t.hideLabelOnMobile && (!(t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) || isActiveComputed(t.tab))"
-            >{{ t.label }}</span>
+            <span class="tab-icon-label" :class="{ 'tab-icon-label--stack': !isActiveComputed(t.tab) && (t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) !== false }">
+              <span class="tab-icon-row">
+                <BarIcon :icon="t.icon" class="nav-icon" :weight="isActiveComputed(t.tab) ? 'fill' : 'bold'" />
+                <svg v-if="getTabChildren(t.tab).length" class="tab-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
+                <svg v-else-if="!t.navigation?.matchPages?.length && !t.navigation?.activeMatchPaths?.length" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+              </span>
+              <span
+                class="label"
+                :class="{ 'label--tiny': !isActiveComputed(t.tab) && (t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) !== false }"
+                v-if="!t.hideLabelOnMobile"
+              >{{ t.label }}</span>
+            </span>
           </a>
         </RouterLink>
       </nav>
@@ -134,7 +172,7 @@
             class="submenu-item"
             @click="handleSubmenuClick(child)"
           >
-            <span class="submenu-icon">{{ child.icon }}</span>
+            <BarIcon :icon="child.icon" class="submenu-icon" />
             <span class="submenu-label">{{ child.label }}</span>
           </div>
         </div>
@@ -162,6 +200,7 @@ import { useI18n } from 'vue-i18n'
 import { userStore } from '@/main/store/store.js'
 import NavAvatar from '@/components/bar/NavAvatar.vue'
 import SimpleSidebar from '@/components/bar/SimpleSidebar.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import {
   useExploreBarConfig,
   getExploreBarTabs,
@@ -171,8 +210,22 @@ import {
   matchExploreBarChildRoute
 } from '@/main/config/BarAndTabs/ExploreBarConfig.js'
 import { useTabTooltip } from '@/composables/bar/useTabTooltip.js'
+import { useTabPill } from '@/composables/bar/useTabPill.js'
 import { useScrollSnap } from '@/composables/bar/useScrollSnap.js'
+import { useScrollArrows } from '@/composables/bar/useScrollArrows.js'
+import { useBarOverflow, getDefaultTabScroll, sortTabsByScroll } from '@/composables/bar/useBarOverflow.js'
 import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+
+const props = defineProps({
+  showScrollArrows: {
+    type: Boolean,
+    default: true,
+  },
+  scrollArrowAmount: {
+    type: Number,
+    default: 100,
+  },
+})
 
 const faviconSrc = computed(() =>
   currentColorTheme.value === COLOR_THEME_GREEN
@@ -192,27 +245,20 @@ const tabs = computed(() => {
 
 const isSidebarVisible = ref(false)
 const activeSubmenu = ref(null)
+const desktopRef = ref(null)
 const navRef = ref(null)
 const mobileNavRef = ref(null)
 
 // Tab label tooltip
 const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
 
-const getTabScroll = (tab, isMobile) => {
-  return isMobile ? (tab.mobileScroll ?? tab.scroll) : tab.scroll
-}
+const { pillStyle: desktopPillStyle } = useTabPill(navRef, '.tab-inner.active', route)
+const { pillStyle: mobilePillStyle } = useTabPill(mobileNavRef, '.tab-item.active', route)
 
-// Overflow scroll: sort tabs：左溢出 → 主 → 右溢出
-const sortTabsByScroll = (tabs, isMobile) => {
-  const all = tabs
-  const left = all.filter(t => getTabScroll(t, isMobile) === 'left')
-  const main = all.filter(t => !getTabScroll(t, isMobile) || (getTabScroll(t, isMobile) !== 'left' && getTabScroll(t, isMobile) !== 'right'))
-  const right = all.filter(t => getTabScroll(t, isMobile) === 'right')
-  return [...left, ...main, ...right]
-}
+const getTabScroll = (tab, isMobile) => getDefaultTabScroll(tab, isMobile)
 
-const orderedTabs = computed(() => sortTabsByScroll(tabs.value, false))
-const orderedMobileTabs = computed(() => sortTabsByScroll(tabs.value, true))
+const orderedTabs = computed(() => sortTabsByScroll(tabs.value, false, getTabScroll))
+const orderedMobileTabs = computed(() => sortTabsByScroll(tabs.value, true, getTabScroll))
 
 const { hasOverflowDesktop, hasOverflowMobile, scrollClass, scrollClassMobile, onScroll, onScrollEnd, navContentWidth } = useScrollSnap(
   navRef,
@@ -222,29 +268,22 @@ const { hasOverflowDesktop, hasOverflowMobile, scrollClass, scrollClassMobile, o
   orderedMobileTabs
 )
 
-const hasOverflowForLayout = (isMobile) => isMobile ? hasOverflowMobile.value : hasOverflowDesktop.value
+const { canScrollLeft, canScrollRight, isScrolling, arrowLeftPx, arrowRightPx, startScroll, stopScroll } = useScrollArrows(
+  navRef,
+  hasOverflowDesktop,
+  props.scrollArrowAmount,
+  desktopRef
+)
 
-const getRenderedPrimaryTabs = (isMobile) =>
-  (isMobile ? orderedMobileTabs.value : orderedTabs.value)
-    .filter(t => !getTabScroll(t, isMobile) || (getTabScroll(t, isMobile) !== 'left' && getTabScroll(t, isMobile) !== 'right'))
-    .filter(t => !isMobile || !t.hideOnMobile)
-
-const getPrimaryTotalWeight = (isMobile) =>
-  getRenderedPrimaryTabs(isMobile)
-    .reduce((s, t) => s + getFlexWeight(t, isActiveComputed(t.tab), isMobile), 0) || 1
-
-const getOverflowFlex = (t, isActive, isMobile) => {
-  if (getTabScroll(t, isMobile)) return '0 0 auto'
-  if (hasOverflowForLayout(isMobile)) {
-    const w = getFlexWeight(t, isActive, isMobile)
-    const totalWeight = getPrimaryTotalWeight(isMobile)
-    if (navContentWidth.value > 0) {
-      return `0 0 ${(w / totalWeight) * navContentWidth.value}px`
-    }
-    return `0 0 ${(w / totalWeight) * 100}%`
-  }
-  return getFlexWeight(t, isActive, isMobile) + ' 1 0'
-}
+const { getOverflowFlex, getOverflowMinWidth, getOverflowMaxWidth } = useBarOverflow({
+  orderedTabs,
+  orderedMobileTabs,
+  hasOverflowDesktop,
+  hasOverflowMobile,
+  navContentWidth,
+  getTabScroll,
+  resolveIsActive: (tabName) => isActiveComputed(tabName),
+})
 
 const submenuPosition = ref({ top: 0, left: 0 })
 let closeSubmenuTimer = null
@@ -360,27 +399,6 @@ const getCurrentTab = () => {
 
 const isActiveComputed = (tabName) => {
   return getCurrentTab() === tabName
-}
-
-const getFlexWeight = (tab, isActive, isMobileLayout) => {
-  let labelVisible
-
-  if (isMobileLayout) {
-    const showOnlyWhenActive = tab.mobileShowLabelOnlyWhenActive ?? tab.showLabelOnlyWhenActive
-    labelVisible = !tab.hideLabelOnMobile && (!showOnlyWhenActive || isActive)
-  } else {
-    labelVisible = !tab.showLabelOnlyWhenActive || isActive
-  }
-
-  if (labelVisible) {
-    return isMobileLayout ? (tab.mobileWeight || tab.weight) : tab.weight
-  }
-
-  if (isMobileLayout) {
-    return tab.mobileWeightIconOnly || tab.mobileWeight || tab.weightIconOnly || tab.weight
-  }
-
-  return tab.weightIconOnly || tab.weight
 }
 
 const onClick = async (tabConfig, navigate, event) => {
@@ -513,14 +531,15 @@ const goToAuthPage = () => {
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
+@use './bar-shared' as *;
 
 $primary-blue: var(--color-primary);
 $primary-blue-dark: var(--color-primary-hover);
 $active-blue: var(--color-primary-hover);
 $text-primary: var(--text-dark);
 
-$desktop-bar-height: 7.5dvh;
-$desktop-tab-height: 6.5dvh;
+$desktop-bar-height: 6.5dvh;
+$desktop-tab-height: 5.8dvh;
 
 $transition-fast: 0.2s;
 $transition-base: 0.3s;
@@ -549,10 +568,12 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   border-bottom: 1px solid var(--glass-50);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
-  @include glass-blur(12px, 160%);
+  @include glass-blur(8px, 160%);
+  will-change: backdrop-filter;
 }
 
 .explorebar-desktop {
+  position: relative;
   display: flex;
   gap: 10px;
   align-items: center;
@@ -570,6 +591,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .explorebar-tabs {
+  position: relative;
   display: flex;
   flex: 1 1 auto;
   gap: 8px;
@@ -586,7 +608,6 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 .tab-item {
   display: flex;
   flex: 1 1 0;
-  gap: 1px;
   align-items: center;
   justify-content: center;
   min-width: 0;
@@ -598,15 +619,36 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   white-space: nowrap;
   cursor: pointer;
   user-select: none;
-  // background: var(--glass-10);
   border-radius: var(--radius-md);
+}
+
+.tab-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 1px;
+  --tab-pad: clamp(3px, 1.2vw, 14px);
+  height: calc(100% - clamp(3px, 1dvh, 6px));
+  margin: 0 calc(var(--tab-pad) * -1);
+  padding: 0 var(--tab-pad);
+  font-size: 0.9em;
+  border: 3px solid transparent;
+  border-radius: var(--radius-md);
+
+  &:has(.tab-chevron),
+  &:has(.tab-external) {
+    padding-right: calc(var(--tab-pad) / 2);
+  }
+
   transition:
     background 0.25s ease,
     color 0.25s ease,
     border-color 0.25s ease,
     border-radius 0.25s ease,
     box-shadow 0.25s ease,
-    height 0.25s ease;
+    font-size 0.25s ease;
 
   .label {
     overflow: hidden;
@@ -615,42 +657,53 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     min-width: 0;
   }
 
-  .label {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    min-width: 0;
+  .tab-chevron,
+  .tab-external {
+    flex-shrink: 0;
+    opacity: 0.6;
   }
 
-  &:hover {
-    height: 90%;
-    color: $primary-blue;
+  .tab-item:hover &:not(.active) {
     background: rgba(var(--color-primary-rgb), 0.12);
   }
 
   &.active {
+    position: relative;
     color: $active-blue;
     font-weight: 1000;
+    font-size: 1.1em;
     background: linear-gradient(
       145deg,
       var(--glass-20),
       var(--glass-10)
     );
     border: 3px solid var(--glass-40);
-    border-radius: 0 0 25px 25px;
+    border-radius: 25px;
     box-shadow:
       0 6px 10px rgba(0, 0, 0, 0.1),
       0 1px 4px rgba(0, 0, 0, 0.08);
     transition:
-      background $transition-base ease,
-      color $transition-base ease,
-      border-color $transition-base ease,
-      border-radius $transition-base ease,
-      box-shadow $transition-base ease,
-      height $transition-base ease;
+      background $transition-base ease 0.6s,
+      color $transition-base ease 0.6s,
+      border-color $transition-base ease 0.6s,
+      border-radius $transition-base ease 0.6s,
+      box-shadow $transition-base ease 0.6s,
+      font-size $transition-base ease 0.6s;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 3px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 65%;
+      height: 2px;
+      background: var(--color-primary-hover);
+      border-radius: 2px;
+      opacity: 0.5;
+    }
 
     &:hover {
-      margin: 0;
       background: linear-gradient(
         145deg,
         var(--glass-50),
@@ -661,11 +714,36 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 }
 
+.tab-pill {
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  top: 50%;
+  pointer-events: none;
+  background: linear-gradient(
+    145deg,
+    var(--glass-20),
+    var(--glass-10)
+  );
+  border-radius: 25px;
+  box-shadow:
+    0 6px 10px rgba(0, 0, 0, 0.1),
+    0 1px 4px rgba(0, 0, 0, 0.08);
+  transition:
+    transform 0.6s cubic-bezier(0.25, 0.1, 0.0, 1.0),
+    width 0.6s cubic-bezier(0.25, 0.1, 0.0, 1.0),
+    opacity 0.15s ease;
+
+  &--mobile {
+    border-radius: 30px;
+  }
+}
+
 .logo-container {
   flex-shrink: 0;
-  width: 6dvh;
+  width: 5.5dvh;
   min-width: 5dvh;
-  height: 6dvh;
+  height: 5.5dvh;
   cursor: pointer;
   border-radius: var(--radius-full);
   transition: all $transition-base ease;
@@ -752,7 +830,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     gap: 3px;
     align-items: center;
     justify-content: space-between;
-    height: max(8dvh, 44px);
+    height: max(7dvh, 40px);
     padding: 0 1%;
 
     .explorebar-tabs {
@@ -768,10 +846,77 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     .tab-item {
       flex-shrink: 0;
       height: max(6dvh, 40px);
-      border-radius: 30px;
+      border: 3px solid transparent;
+
+      .tab-icon-label {
+        display: flex;
+        align-items: center;
+        gap: 1px;
+        min-width: 0;
+      }
+
+      .tab-icon-label--stack {
+        flex-direction: column;
+      }
+
+      .tab-icon-row {
+        display: flex;
+        align-items: center;
+      }
+
+      .nav-icon, .label {
+        font-size: 0.9em;
+      }
+
+      .tab-chevron,
+      .tab-external {
+        flex-shrink: 0;
+        margin-left: 1px;
+        opacity: 0.6;
+      }
+
+      .label--tiny {
+        font-size: 0.45em !important;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        line-height: 1;
+      }
 
       &.active {
+        position: relative;
+        z-index: 1;
+        color: $active-blue;
+        font-weight: 1000;
+        background: linear-gradient(
+          145deg,
+          var(--glass-20),
+          var(--glass-10)
+        );
+        border: 3px solid var(--glass-40);
         border-radius: 30px;
+        box-shadow:
+          0 6px 10px rgba(0, 0, 0, 0.1),
+          0 1px 4px rgba(0, 0, 0, 0.08);
+        transition: 0.3s ease 0.6s;
+
+        .nav-icon, .label {
+          font-size: 1.1em;
+        }
+
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 3px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 65%;
+          height: 2px;
+          background: var(--color-primary-hover);
+          border-radius: 2px;
+          opacity: 0.5;
+        }
       }
     }
 
@@ -868,41 +1013,24 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   transform: translateY(-10px) scale(0.95);
 }
 
-.tab-tooltip {
-  padding: 6px 12px;
-  color: var(--text-primary);
-  font-size: 0.875rem;
-  font-weight: 500;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-.tab-tooltip-fade-enter-active,
-.tab-tooltip-fade-leave-active {
-  transition: opacity 0.15s ease;
-}
-
-.tab-tooltip-fade-enter-from,
-.tab-tooltip-fade-leave-to {
-  opacity: 0;
-}
+@include bar-tab-tooltip;
 
 .explorebar-tabs.has-overflow-tabs {
-  justify-content: flex-start;
-  overflow-x: scroll;
-  scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; width: 0; height: 0; }
+  @include bar-has-overflow-tabs;
 }
 
 .tab-overflow-left,
 .tab-overflow-right {
-  flex-shrink: 0;
+  @include bar-overflow-tabs;
 }
 
-@media (orientation: landscape) {
-  .tab-overflow-left,
-  .tab-overflow-right {
-    padding-inline: 10px;
+.scroll-arrow {
+  @include bar-scroll-arrow;
+}
+
+@media (max-aspect-ratio: 1/1) {
+  .scroll-arrow {
+    display: none;
   }
 }
 

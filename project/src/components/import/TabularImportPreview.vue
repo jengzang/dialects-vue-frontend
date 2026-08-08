@@ -50,7 +50,7 @@
 
     <div class="tabular-import-preview tabular-import-preview--modal">
       <div v-if="!file" class="tabular-import-preview__empty">
-        <div class="tabular-import-preview__empty-icon">📄</div>
+        <div class="tabular-import-preview__empty-icon"><InlineIcon icon="📄" /></div>
         <div class="tabular-import-preview__empty-copy">
           <p class="tabular-import-preview__empty-title">{{ t('common.importPreview.empty.title') }}</p>
           <p class="tabular-import-preview__empty-text">{{ t('common.importPreview.empty.description') }}</p>
@@ -237,7 +237,7 @@
     </div>
 
     <div v-if="!file" class="tabular-import-preview__empty">
-      <div class="tabular-import-preview__empty-icon">📄</div>
+      <div class="tabular-import-preview__empty-icon"><InlineIcon icon="📄" /></div>
       <div class="tabular-import-preview__empty-copy">
         <p class="tabular-import-preview__empty-title">{{ t('common.importPreview.empty.title') }}</p>
         <p class="tabular-import-preview__empty-text">{{ t('common.importPreview.empty.description') }}</p>
@@ -378,6 +378,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RecycleScroller } from 'vue-virtual-scroller'

@@ -38,6 +38,7 @@
       <ManageLocationsSection
         v-else-if="manageSection === 'locations'"
         :has-vocabulary-permission="hasVocabularyPermission"
+        :can-delete-location="canViewVocabularyLogs"
       />
       <ManageLogsSection
         v-else-if="manageSection === 'logs'"
@@ -161,7 +162,7 @@ function navigateToAuth() {
 }
 
 function navigateToList() {
-  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/vocabulary/view'))
+  router.push(buildLocalePath(resolveRouteLocale(route), '/menu/vocabulary/view'))
 }
 
 watch(() => [
@@ -175,6 +176,12 @@ watch(() => [
   }
   ensureVocabularyMe().catch(() => null)
 }, { immediate: true })
+</script>
+
+<script>
+export default {
+  name: 'VocabularyManagePage'
+}
 </script>
 
 <style scoped lang="scss" src="./vocabulary.scss"></style>

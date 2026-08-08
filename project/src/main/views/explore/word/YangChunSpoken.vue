@@ -2,9 +2,7 @@
   <div style="width: 100%;justify-content: center;align-items:center;display: flex;flex-direction: column">
     <div class="title-row">
       <h2>{{ t('words.ycSpoken.name') }}</h2>
-      <button class="village-link-btn" @click="goToYCVillages">
-        <span role="img" aria-label="ycVillages">🏠</span> {{ t('villages.ycVillages.name') }}
-      </button>
+      <span class="cross-link" @click="goToYCVillages">{{ t('villages.ycVillages.name') }} →</span>
     </div>
     <UniversalTable
         db-key="spoken"
@@ -49,9 +47,6 @@ const goToYCVillages = () => {
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
 
-$button-text-color: var(--color-primary-hover);
-$transition-duration: 0.3s;
-
 .title-row {
   display: flex;
   flex-wrap: wrap;
@@ -67,34 +62,17 @@ $transition-duration: 0.3s;
   }
 }
 
-.village-link-btn {
-  padding: 8px 16px;
-  color: $button-text-color;
-  font-size: 1rem;
-  font-weight: 1000;
+.cross-link {
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
   white-space: nowrap;
   cursor: pointer;
   user-select: none;
-  background: linear-gradient(
-    145deg,
-    var(--glass-20),
-    var(--glass-10)
-  );
-  border: 3px solid var(--glass-40);
-  border-radius: 25px;
-  box-shadow:
-    0 6px 10px rgba(0, 0, 0, 0.1),
-    0 1px 4px rgba(0, 0, 0, 0.08);
-  transition: all $transition-duration ease;
+  transition: opacity 0.2s;
 
   &:hover {
-    background: linear-gradient(
-      145deg,
-      var(--glass-50),
-      var(--glass-30)
-    );
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-    transform: scale(1.05);
+    opacity: 0.7;
   }
 }
 </style>

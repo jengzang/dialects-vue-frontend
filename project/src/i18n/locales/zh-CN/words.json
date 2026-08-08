@@ -44,17 +44,17 @@
     },
     "search": {
       "label": "搜索",
-      "placeholder": "搜索释义、词条、发音、详情",
+      "placeholder": "搜索标准词、方言词、音标、详细释义",
       "standardWordPlaceholder": "按标准词筛选地图",
       "locationPlaceholder": "按地点筛选当前结果",
       "fieldCount": "已选 {count} 列",
       "fields": {
         "all": "全部内容",
-        "definition": "释义",
-        "headword": "词条",
-        "pronunciation": "发音",
-        "detail": "详情",
-        "ipa": "发音",
+        "definition": "标准词",
+        "headword": "方言词",
+        "pronunciation": "音标",
+        "detail": "详细释义",
+        "ipa": "音标",
         "notes": "注释",
         "location": "地点"
       },
@@ -62,13 +62,20 @@
       "filterTitle": "搜索筛选",
       "standardWordFilterMode": "地图标准词筛选",
       "singleSelect": "单选",
-      "multiSelect": "多选"
+      "multiSelect": "多选",
+      "filterModeTitle": "筛选方式",
+      "filterByRegion": "按行政区",
+      "filterByLocation": "按地点",
+      "provincePlaceholder": "选择省",
+      "cityPlaceholder": "选择市",
+      "allProvinces": "全部省份",
+      "allCities": "全部城市"
     },
     "sort": {
       "label": "排序",
       "location": "按地点",
-      "definition": "按释义",
-      "headword": "按词条",
+      "definition": "按标准词",
+      "headword": "按方言词",
       "updatedAt": "按更新时间"
     },
     "viewModes": {
@@ -93,15 +100,15 @@
       "next": "下一页"
     },
     "columns": {
-      "headword": "词条",
-      "definition": "释义",
-      "pronunciation": "发音",
+      "headword": "方言词",
+      "definition": "标准词",
+      "pronunciation": "音标",
       "pronunciationType": "注音类型",
       "location": "地点",
       "locationFull": "完整地点",
       "informations": "附加信息",
       "sourceFilename": "来源文件",
-      "detail": "详情"
+      "detail": "详细释义"
     },
     "table": {
       "label": "词表结果"
@@ -113,6 +120,8 @@
     },
     "upload": {
       "title": "上传词表",
+      "totalEntries": "词条 {count}",
+      "totalLocations": "地点 {count}",
       "desc": "选择表格文件后映射词表字段，提交后进入审查流程。",
       "chooseFile": "选择文件",
       "dropHint": "点击或拖放 Excel、CSV、TSV、Word 文档到此处",
@@ -146,8 +155,8 @@
       "parserModes": {
         "auto": "自动识别",
         "table": "表格",
-        "docWhitespace": "文档空白分隔",
-        "docBracket": "文档括号识别"
+        "docWhitespace": "空格分隔",
+        "docBracket": "括号识别"
       },
       "missingLocation": "请填写上传词表对应的地点名称及经纬度。",
       "unsupportedFile": "请上传支持的词表文件（.xlsx、.xls、.csv、.tsv、.docx、.doc）。",
@@ -160,35 +169,40 @@
       "yindianHint": "请输入音典档案里的标准地名简称（繁体）以匹配",
       "success": "上传完成，导入 {count} 条。",
       "failed": "上传词表失败",
+      "dataExample": "数据示例",
+      "fillStandardFromLocal": "方言词自动填充标准词",
+      "fillStandardFromLocalHint": "已开启方言词自动填充标准词，仅针对没有标准词的词表。建议在上传成功后，前往管理页面自行更正标准词。标准词用于地图绘制，不统一可能影响地图绘制效果",
+      "downloadSample": "下载示例文件",
       "formatHelp": "格式说明",
       "formatHelpTitle": "词汇上传格式说明",
       "formatHelpTable": {
-        "title": "表格格式（table）",
+        "title": "表格格式",
         "desc": "适用文件：.xlsx、.xls、.csv、.tsv",
-        "required": "必填列（列名支持中英文别名，大小写和空格不敏感）：",
+        "required": "必填列：",
         "colField": "字段",
-        "colAliases": "接受的列名",
-        "note": "每行一条记录，standard_word 和 local_expression 同时为空时该行跳过，任一必填列缺值时报错。"
+        "colAliases": "自动识别的列名",
+        "atLeastOne": "至少一个非空",
+        "note": "每行一条记录，标准词必填，方言词和音标至少一个非空，两者同时为空时该行跳过。"
       },
       "formatHelpBracket": {
-        "title": "文档括号格式（doc_bracket）",
+        "title": "文档括号格式",
         "desc": "适用文件：.docx、.doc、.txt。每行一条记录，用括号标记不同字段：",
         "colSymbol": "符号",
         "colMeaning": "含义",
-        "ipa": "IPA 音标",
-        "notes": "备注",
-        "localExpression": "方言讲法",
-        "standardWord": "书面词（standard_word）",
+        "ipa": "音标",
+        "notes": "详细释义",
+        "localExpression": "方言词",
+        "standardWord": "标准词",
         "remaining": "括号外的剩余文字",
-        "note": "三个括号标记均为可选，但每行解析后 standard_word、local_expression、ipa 至少要有值。括号可混合使用全角/半角（() 和 （） 均支持）。"
+        "note": "三个括号标记均为可选，但每行解析后标准词必填，方言词和音标至少一个非空。括号可混合使用全角/半角（() 和 （） 均支持）。"
       },
       "formatHelpWhitespace": {
-        "title": "文档空格格式（doc_whitespace）",
-        "desc": "适用文件：.docx、.doc、.txt。每行一条记录，字段之间用空格分隔，按顺序为：书面词 方言讲法 音标 [备注...]",
+        "title": "文档空格格式",
+        "desc": "适用文件：.docx、.doc、.txt。每行一条记录，字段之间用空格分隔，最少 1 个字段（方言词），开启「方言词自动填充标准词」后单字段行也能正常导入。顺序为：标准词 方言词 [音标] [详细释义...]",
         "colPosition": "位置",
         "colField": "字段",
         "colRequired": "必填",
-        "note": "注意 IPA 中不能含空格（如 ȵit2 tʰəu2 会被拆成两个字段导致解析错误），含空格的 IPA 请使用括号格式或表格格式。"
+        "note": "注意音标中不能含空格（如 ȵit2 tʰəu2 会被拆成两个字段导致解析错误），含空格的音标请使用括号格式或表格格式。"
       }
     },
     "locations": {
@@ -334,7 +348,7 @@
       "town": "镇",
       "village": "村",
       "character": "字",
-      "pronunciation": "发音",
+      "pronunciation": "音标",
       "note": "注释",
       "region1": "分区1",
       "region2": "分区2",

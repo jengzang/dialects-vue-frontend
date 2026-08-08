@@ -1,20 +1,24 @@
 {
   "title": "自然村",
+  "toponyms": {
+    "name": "地名分佈",
+    "desc": "按漢字或地名片段查看自然村地名的地理分佈"
+  },
   "gdVillages": {
     "name": "廣東自然村",
-    "desc": "廣東省自然村樹狀圖"
+    "desc": "廣東自然村樹狀圖"
   },
   "villagesML": {
-    "name": "廣東自然村分析",
-    "desc": "廣東自然村數據機器學習、NLP等"
+    "name": "機器學習",
+    "desc": "自然村名機器學習"
   },
   "gdVillagesTable": {
     "name": "全粵村情表格",
-    "desc": "廣東省自然村表格數據"
+    "desc": "廣東村落詳細表格"
   },
   "ycVillages": {
     "name": "陽春自然村",
-    "desc": "廣東省陽春縣自然村(來自縣志)"
+    "desc": "陽春自然村資料"
   },
   "allVillages": {
     "name": "全部自然村",
@@ -122,7 +126,7 @@
       }
     },
     "gdTable": {
-      "title": "全粵村情",
+      "title": "廣東自然村表格",
       "columns": {
         "prefecture": "地級",
         "county": "縣級",
@@ -132,6 +136,110 @@
         "dialect": "方言",
         "longitude": "經度",
         "latitude": "緯度"
+      }
+    },
+    "toponyms": {
+      "title": "自然村地名分佈",
+      "subtitle": "輸入漢字或地名片段，查看匹配地名的全國點位分佈；點擊點位後可手動查詢本地與民政部詳情。",
+      "search": {
+        "keyword": "關鍵詞",
+        "placeholder": "例如：黃、塘、村",
+        "matchMode": "匹配方式",
+        "placeType": "地名類型",
+        "submit": "搜索分佈",
+        "searching": "搜索中..."
+      },
+      "matchModes": {
+        "prefix": "前綴匹配",
+        "suffix": "後綴匹配",
+        "exact": "精確匹配",
+        "contains": "包含匹配"
+      },
+      "placeTypes": {
+        "naturalVillage": "自然村/農村居民點",
+        "adminVillage": "行政村",
+        "villageCommittee": "村委會"
+      },
+      "layers": {
+        "title": "底圖圖層",
+        "caption": "默認僅加載國界",
+        "country": "國界",
+        "provinces": "省界",
+        "cities": "市界",
+        "riverL1": "一級河流",
+        "riverL2": "二級河流",
+        "riverL3": "三級河流",
+        "loading": "加載中"
+      },
+      "chart": {
+        "ariaLabel": "自然村地名分佈圖",
+        "placeholderTitle": "ECharts 分佈圖",
+        "countryLoading": "正在加載中國國界底圖",
+        "countryReady": "中國國界底圖已就緒",
+        "searchFirst": "輸入關鍵詞後搜索，點位將顯示在這裡",
+        "pointsReady": "已準備 {count} 個可繪製點位",
+        "noDrawablePoints": "沒有可繪製點位。",
+        "pointsSeries": "匹配點位",
+        "pointTooltip": "點擊後可以查詢具體村莊資訊",
+        "baseMapError": "底圖加載失敗",
+        "configAriaLabel": "圖表設定",
+        "configTitle": "圖表設定",
+        "configPointStyle": "點位樣式",
+        "configSize": "大小",
+        "configShape": "形狀",
+        "configColor": "顏色",
+        "configBackground": "背景色"
+      },
+      "results": {
+        "title": "結果",
+        "empty": "先輸入關鍵詞搜索分佈。",
+        "loading": "正在加載點位...",
+        "count": "後端匹配 {count} 條，當前可繪製 {shown} 個點位。",
+        "truncated": "結果已截斷，可縮小關鍵詞或切換為更嚴格的匹配方式。"
+      },
+      "nameTree": {
+        "title": "地名層級",
+        "load": "查詢地名層級",
+        "loading": "加載中",
+        "idle": "搜索點位後，可手動查詢行政區層級地名。",
+        "empty": "暫無地名層級結果",
+        "level": "{level} 級",
+        "lazyFallback": "結果較多：{count} 條，超過完整樹閾值 {threshold}，可逐級展開。",
+        "expand": "展開地名層級",
+        "loadingNode": "正在加載下級...",
+        "loadMore": "加載更多"
+      },
+      "detail": {
+        "title": "點位詳情",
+        "empty": "點擊地圖點位後查看本地詳情。",
+        "cardHint": "點擊按鈕後再查詢具體村莊資訊。",
+        "selectedPoint": "選中坐標",
+        "localButton": "查詢本地詳情",
+        "localButtonLoading": "查詢中...",
+        "localHint": "可先查詢本地詳情，再按需查詢民政部詳情。",
+        "localLoading": "正在加載本地詳情...",
+        "localSource": "來源",
+        "localSourceName": "本地地名庫",
+        "noLocalDetail": "未找到本地詳情。",
+        "name": "標準地名",
+        "placeType": "類型",
+        "coordinates": "詳情坐標",
+        "divisionPath": "行政區劃",
+        "officialButton": "查詢民政部詳情",
+        "officialLoading": "查詢中...",
+        "officialArea": "民政部區縣",
+        "officialCity": "民政部城市",
+        "officialOldName": "曾用名",
+        "unknown": "未知"
+      },
+      "errors": {
+        "emptyQuery": "請輸入關鍵詞後再搜索。",
+        "countryLayer": "無法加載國界底圖。",
+        "optionalLayer": "無法加載可選圖層。",
+        "nameTree": "無法加載地名層級。",
+        "points": "無法加載點位。",
+        "details": "無法加載本地詳情。",
+        "official": "無法加載民政部詳情。"
       }
     },
     "allVillages": {

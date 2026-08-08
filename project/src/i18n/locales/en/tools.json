@@ -1,24 +1,28 @@
 {
   "title": "Toolbox",
   "dataCheck": {
-    "name": "Data Check",
-    "desc": "Check data accuracy and format"
+    "name": "Character List Processing",
+    "desc": "Validate character lists and convert formats"
   },
   "jyutpingToIpa": {
     "name": "Jyutping to IPA",
-    "desc": "Convert Jyutping to IPA"
+    "desc": "Convert Jyutping to the International Phonetic Alphabet"
   },
   "mergeTables": {
-    "name": "Merge Tables",
-    "desc": "Merge multiple data tables"
+    "name": "Merge Character Lists",
+    "desc": "Combine multiple character lists"
   },
   "deriveTables": {
     "name": "Character Table Inference",
     "desc": "Generate a complete character table from a small sample and rule presets"
   },
   "praatAnalysis": {
-    "name": "Acoustic Analysis",
-    "desc": "Analyze pitch, formants, and related data with Praat"
+    "name": "Praat Acoustic Analysis",
+    "desc": "Experimental phonetics tools and data analysis"
+  },
+  "gis": {
+    "name": "Map Drawing",
+    "desc": "Online GIS drawing and Voronoi polygons"
   },
   "common": {
     "close": "Close",

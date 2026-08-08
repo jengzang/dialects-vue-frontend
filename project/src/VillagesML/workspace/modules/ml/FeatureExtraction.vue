@@ -6,10 +6,10 @@
       </h3>
     <!-- Header -->
     <div class="page-header">
-<!--      <h2>🔐 特徵提取 Feature Extraction</h2>-->
+<!--      <h2><InlineIcon icon="🔐" />特徵提取 Feature Extraction</h2>-->
 <!--      <p class="subtitle">為自訂村莊集合提取特徵向量</p>-->
       <div v-if="!isAuthenticated" class="auth-warning">
-        <span class="lock-icon">🔒</span>
+        <span class="lock-icon"><InlineIcon icon="🔒" /></span>
         <span>此功能需要登錄</span>
         <button @click="goToAuth" class="solid-button small">前往登錄</button>
       </div>
@@ -29,7 +29,7 @@
             type="text"
             placeholder="搜尋村莊名稱..."
             class="glass-input small"
-            @input="handleSearchInput"
+            @keyup.enter="loadVillages"
           >
         </div>
 
@@ -96,7 +96,7 @@
 
         <!-- Empty State -->
         <div v-if="allVillages.length === 0 && !loading" class="empty-hint">
-          <p>👆 請輸入搜索關鍵詞或選擇區域，然後點擊「載入村莊」按鈕</p>
+          <p><InlineIcon icon="👆" />請輸入搜索關鍵詞或選擇區域，然後點擊「載入村莊」按鈕</p>
         </div>
 
         <!-- Village List -->
@@ -319,7 +319,7 @@
         <div v-if="aggregationResults.aggregates.ngram" class="agg-section">
           <h4>N-gram 聚類分布</h4>
           <div v-if="aggregationResults.aggregates.ngram.kmeans_clusters.length === 0 && aggregationResults.aggregates.ngram.dbscan_clusters.length === 0" class="empty-cluster-hint">
-            <p>⚠️ 所選村莊暫無聚類數據</p>
+            <p><InlineIcon icon="⚠️" />所選村莊暫無聚類數據</p>
             <p class="hint-text">這些村莊可能尚未進行聚類分析，或聚類數據未同步到數據庫</p>
           </div>
           <div v-else class="cluster-grid">
@@ -385,6 +385,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -435,8 +436,6 @@ const resultsPageSize = 20
 // Chart ref
 const aggregationChart = ref(null)
 let aggregationChartInstance = null
-
-let searchTimeout = null
 
 // Feature types (现在后端已支持所有类型)
 const featureTypes = [
@@ -516,18 +515,6 @@ const goToAuth = () => {
       redirect: route.fullPath || buildCurrentVillagesMLPath({ module: 'compute', subtab: 'features' })
     }
   })
-}
-
-// 搜索输入防抖 (参考 SearchPanel)
-const handleSearchInput = () => {
-  clearTimeout(searchTimeout)
-  searchTimeout = setTimeout(() => {
-    currentPage.value = 1
-    // 只要有搜索关键词或筛选条件，就自动加载
-    if (searchKeyword.value || hasFilters.value) {
-      loadVillages()
-    }
-  }, 300)
 }
 
 // 城市变化处理 (参考 SearchPanel)
@@ -1274,7 +1261,7 @@ onBeforeUnmount(() => {
   background: rgba(var(--vml-blue-rgb), 0.1);
   padding: 2px 8px;
   border-radius: var(--radius-sm2);
-  font-family: monospace;
+  font-family: var(--font-mono);
 }
 
 .village-location {

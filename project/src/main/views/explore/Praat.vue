@@ -1,18 +1,13 @@
 <template>
+
   <div class="praat-page">
 <!--    &lt;!&ndash; Login Button (top right) &ndash;&gt;-->
 <!--    <div v-if="!userStore.isAuthenticated" class="login-prompt">-->
 <!--      <button class="login-button main-glass-button" @click="goToLogin">-->
-<!--        <span>🔒</span>-->
+<!--        <span><InlineIcon icon="🔒" /></span>-->
 <!--        <span>請先登錄</span>-->
 <!--      </button>-->
 <!--    </div>-->
-
-    <div class="page-header">
-      <h1 class="page-title">{{ t('praat.main.title') }}</h1>
-      <p class="page-description">{{ t('praat.main.description') }}</p>
-    </div>
-
     <!-- Tab Navigation -->
     <div class="tab-navigation">
       <div class="tab-container">
@@ -50,6 +45,11 @@
       </div>
     </div>
 
+    <div class="page-header">
+      <h1 class="page-title">{{ t('praat.main.title') }}</h1>
+      <p v-if="activeTab === 'upload'" class="page-description">{{ t('praat.main.description') }}</p>
+    </div>
+
 <!--    <div class="page-content">-->
       <!-- Tab Content (using v-show for keep-alive behavior) -->
       <!-- Tab 1: Prepare Analysis -->
@@ -57,7 +57,7 @@
           <!-- Settings Button and Mode Selector -->
           <div class="settings-trigger">
             <button class="settings-button main-glass-button" @click="showSettings = true">
-              <span class="settings-icon">⚙️</span>
+              <span class="settings-icon"><InlineIcon icon="⚙️" /></span>
               <span>{{ t('praat.main.settings.button') }}</span>
             </button>
 
@@ -115,7 +115,7 @@
 
           <!-- No Results Message -->
           <div v-else-if="!analysisResults" class="no-results-state main-glass-panel">
-            <div class="no-results-icon">📊</div>
+            <div class="no-results-icon"><InlineIcon icon="📊" /></div>
             <h3 class="no-results-title">{{ t('praat.main.noResults.title') }}</h3>
             <p class="no-results-text">{{ t('praat.main.noResults.text') }}</p>
           </div>
@@ -146,7 +146,7 @@
       <div v-if="showSettings" class="settings-sidebar">
         <div class="sidebar-header">
           <h2 class="sidebar-title">{{ t('praat.main.settings.title') }}</h2>
-          <button class="close-btn close-btn-lg" @click="showSettings = false">✕</button>
+          <button class="close-btn close-btn-lg" @click="showSettings = false"><InlineIcon icon="✕" /></button>
         </div>
         <div class="sidebar-content">
           <SettingsPanel
@@ -160,9 +160,7 @@
     <!-- Audio Preview Floating Window (Only on Tab 1) -->
     <Transition name="preview-fade">
       <div v-if="showAudioPreview" class="audio-preview-float">
-        <button class="close-btn close-btn-sm close-btn-corner" @click="showPreview = false" :title="t('praat.main.closePreview')">
-          ✕
-        </button>
+        <button class="close-btn close-btn-sm close-btn-corner" @click="showPreview = false" :title="t('praat.main.closePreview')"><InlineIcon icon="✕" /></button>
         <AudioPreviewPanel
           :audio-blob="audioBlob"
           :segments="audioSegments"
@@ -175,16 +173,17 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, reactive, onBeforeUnmount, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import AudioInputPanel from '../components/praat/AudioInputPanel.vue'
-import AudioPreviewPanel from '../components/praat/AudioPreviewPanel.vue'
-import SettingsPanel from '../components/praat/SettingsPanel.vue'
-import JobStatusPanel from '../components/praat/JobStatusPanel.vue'
-import AnalysisResultsPanel from '../components/praat/AnalysisResultsPanel.vue'
-import VowelSpacePanel from '../components/praat/VowelSpacePanel.vue'
-import PitchTonePanel from '../components/praat/PitchTonePanel.vue'
+import AudioInputPanel from '@/main/components/praat/AudioInputPanel.vue'
+import AudioPreviewPanel from '@/main/components/praat/AudioPreviewPanel.vue'
+import SettingsPanel from '@/main/components/praat/SettingsPanel.vue'
+import JobStatusPanel from '@/main/components/praat/JobStatusPanel.vue'
+import AnalysisResultsPanel from '@/main/components/praat/AnalysisResultsPanel.vue'
+import VowelSpacePanel from '@/main/components/praat/VowelSpacePanel.vue'
+import PitchTonePanel from '@/main/components/praat/PitchTonePanel.vue'
 import { usePraatApi } from '@/api'
 import { userStore } from '@/main/store/store.js'
 import { showError, showWarning } from '@/utils/ui/message.js'
@@ -936,7 +935,7 @@ onBeforeUnmount(() => {
   @include flex-col;
   justify-content: center;
   align-items: center;
-  height: 95dvh;
+  min-height: 100%;
 }
 
 /* Login Prompt */
@@ -951,7 +950,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 1.2rem;
   cursor: pointer;
   font-size: 1rem;
   font-weight: 500;
@@ -969,11 +968,11 @@ onBeforeUnmount(() => {
 
 .page-header {
   text-align: center;
-  margin-bottom: 1rem;
+  // margin-bottom: 1rem;
 }
 
 .page-title {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
   margin-top: 1rem;
@@ -1081,7 +1080,7 @@ onBeforeUnmount(() => {
   gap: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  max-height: 75dvh;
+  max-height: 80dvh;
   border-radius: 25px;
   width: 90dvw;
 }
@@ -1093,12 +1092,12 @@ onBeforeUnmount(() => {
 }
 
 .action-section {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.2rem;
 }
 
 .start-button {
   width: 100%;
-  padding: 1rem 1.5rem;
+  padding: 1rem 1.2rem;
   font-size: 1.1rem;
   font-weight: 600;
   border: none;
@@ -1122,7 +1121,7 @@ onBeforeUnmount(() => {
 
 /* Job Status Inline (in Tab 2) */
 .job-status-inline {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.2rem;
 }
 
 /* Settings Trigger */
@@ -1130,7 +1129,7 @@ onBeforeUnmount(() => {
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.2rem;
   flex-wrap: wrap;
 }
 
@@ -1258,11 +1257,11 @@ onBeforeUnmount(() => {
   border-bottom: none;
 
   /* 使用字体权重和字间距提升高级感 */
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+  font-family: var(--font-sans);
 }
 
 .sidebar-title {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0;
@@ -1315,7 +1314,7 @@ onBeforeUnmount(() => {
     inset 0 1px 0 var(--glass-60);
   z-index: 100;
   overflow: hidden;
-  max-height: 95dvh;
+  max-height: 90dvh;
 }
 
 /* Preview Fade Transition */
@@ -1335,22 +1334,20 @@ onBeforeUnmount(() => {
 }
 
 /* Mobile Responsive */
-/* Mobile Responsive */
-@media (max-width: 768px) {
+@media (max-aspect-ratio: 1/1) {
   .praat-page {
     padding: 0;
+    min-height: 100%;
+    margin: 0;
   }
 
   .page-title {
-    font-size: 2rem;
+    font-size: 1.8rem;
+    margin:0;
   }
 
   .tab-navigation {
-    position: fixed;
-    bottom: auto;
-    top: 0.5rem;
-    left: 50%;
-    transform: translateX(-50%);
+    position: static;
     width: 100%;
   }
 
@@ -1374,7 +1371,9 @@ onBeforeUnmount(() => {
   .audio-preview-float {
     position: fixed;
     bottom: auto;
-    top: 0;
+    top: 8dvh;
+    max-height: 90dvh;
+    // overflow-y: auto;
     left: 0;
     right: 0;
     width: 100%;
@@ -1433,7 +1432,7 @@ onBeforeUnmount(() => {
 
 
 .loading-title {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: var(--color-text-primary);
   margin-bottom: 0.5rem;
@@ -1487,12 +1486,12 @@ onBeforeUnmount(() => {
 
 .no-results-icon {
   font-size: 4rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.2rem;
   opacity: 0.6;
 }
 
 .no-results-title {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: var(--color-text-primary);
   margin-bottom: 0.5rem;

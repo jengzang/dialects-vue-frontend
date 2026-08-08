@@ -8,9 +8,9 @@
     "dialectClustering": "聚類",
     "map": "地圖",
     "words": "詞句",
-    "villages": "自然村",
+    "villages": "村落",
     "tools": "工具",
-    "source": "資料源",
+    "source": "資料",
     "about": "關於網站",
     "about_ontop": "關於網站"
   },
@@ -52,6 +52,7 @@
       "ycSpoken": "陽春口語詞"
     },
     "villages": {
+      "toponyms": "地名分佈",
       "gdVillages": "廣東自然村",
       "VillagesML": "機器學習",
       "gdVillagesTable": "廣東村莊表格",
@@ -64,6 +65,7 @@
       "merge": "字表合併",
       "derive": "字表推導",
       "praat": "聲學分析",
+      "gis": "GIS",
       "praatname": "Praat"
     },
     "source": {
@@ -91,7 +93,11 @@
     "about": "關於",
     "tools": "工具",
     "praat": "praat",
+    "gis": "GIS",
     "phrases": "詞句",
+    "vocabulary": "詞表",
+    "yubao": "語保",
+    "yangchun": "陽春",
     "villages": "村落",
     "aboutWebsite": "關於",
     "settings": "設置"

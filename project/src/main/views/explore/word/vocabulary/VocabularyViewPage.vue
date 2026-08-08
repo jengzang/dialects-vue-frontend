@@ -7,10 +7,15 @@
       v-model:selected-standard-word="selectedStandardWord"
       v-model:selected-standard-words="selectedStandardWordsModel"
       v-model:single-select="singleSelect"
+      v-model:filter-by-region="filterByRegion"
+      v-model:selected-province="selectedProvince"
+      v-model:selected-city="selectedCity"
       :view-mode="viewMode"
       :search-field-options="searchFieldOptions"
       :location-options="locationOptions"
       :standard-word-options="standardWordOptions"
+      :province-options="provinceOptions"
+      :city-options="cityOptions"
     />
 
     <section v-if="viewMode !== 'table'" class="content-area">
@@ -188,11 +193,22 @@ const props = defineProps({
 })
 
 const query = ref('')
-const viewMode = ref(normalizeViewMode(route.query.tab))
-const selectedSearchFields = ref([])
+function resolveViewModeFromRoute() {
+  const tab = route.query.tab
+  if (tab === 'map' || tab === 'table') return tab
+  const stored = sessionStorage.getItem('vocabulary_view_mode')
+  if (stored === 'map' || stored === 'table') return stored
+  return 'card'
+}
+
+const viewMode = ref(resolveViewModeFromRoute())
+const selectedSearchFields = ref(JSON.parse(localStorage.getItem('vocabulary_search_fields') || '[]'))
 const selectedLocations = ref([])
+const filterByRegion = ref(localStorage.getItem('vocabulary_filter_by_region') === 'true')
+const selectedProvince = ref('')
+const selectedCity = ref('')
 const selectedStandardWord = ref('')
-const singleSelect = ref(true)
+const singleSelect = ref(localStorage.getItem('vocabulary_single_select') !== 'false')
 const selectedStandardWordsModel = ref([])
 const selectedStandardWords = computed(() => {
   if (singleSelect.value) {
@@ -235,6 +251,32 @@ const searchFieldOptions = computed(() => [
 
 const locationOptions = computed(() => {
   return vocabularyLocationOptions.value
+})
+
+const provinceOptions = computed(() => {
+  const seen = new Set()
+  const provinces = vocabularyLocationOptions.value
+    .filter((opt) => {
+      if (!opt.province || seen.has(opt.province)) return false
+      seen.add(opt.province)
+      return true
+    })
+    .map((opt) => ({ value: opt.province, label: opt.province }))
+  return [
+    { value: '', label: t('words.wordList.search.allProvinces') },
+    ...provinces,
+  ]
+})
+
+const cityOptions = computed(() => {
+  const seen = new Set()
+  const cities = vocabularyLocationOptions.value
+    .filter((opt) => opt.province === selectedProvince.value && opt.city && !seen.has(opt.city) && seen.add(opt.city))
+    .map((opt) => ({ value: opt.city, label: opt.city }))
+  return [
+    { value: '', label: t('words.wordList.search.allCities') },
+    ...cities,
+  ]
 })
 
 const standardWordOptions = computed(() => {
@@ -355,11 +397,17 @@ function normalizeVocabularyEntry(item, index = 0, locationContext = '') {
 }
 
 function buildVocabularyQueryParams() {
-  return {
+  const params = {
     q: query.value.trim(),
-    locations: selectedLocations.value,
     search_fields: normalizeSelectedSearchFields(),
   }
+  if (filterByRegion.value) {
+    if (selectedProvince.value) params.province = selectedProvince.value
+    if (selectedCity.value) params.city = selectedCity.value
+  } else {
+    params.locations = selectedLocations.value
+  }
+  return params
 }
 
 function buildVocabularyItemsParams(overrides = {}) {
@@ -648,14 +696,14 @@ function loadActiveViewMode() {
   }
 }
 
-onMounted(() => {
-  loadVocabularyLocationOptions()
+onMounted(async () => {
+  await loadVocabularyLocationOptions()
   loadVocabularyStandardWords()
   loadActiveViewMode()
 })
 
 watch(() => route.query.tab, (tab) => {
-  const nextMode = normalizeViewMode(tab)
+  const nextMode = tab ? normalizeViewMode(tab) : resolveViewModeFromRoute()
   if (viewMode.value !== nextMode) {
     viewMode.value = nextMode
   }
@@ -665,7 +713,23 @@ watch(viewMode, () => {
   loadActiveViewMode()
 })
 
-watchDebounced([query, selectedSearchFields, selectedLocations], () => {
+watch(selectedProvince, () => {
+  selectedCity.value = ''
+})
+
+watch(filterByRegion, (val) => {
+  localStorage.setItem('vocabulary_filter_by_region', val ? 'true' : 'false')
+})
+
+watch(selectedSearchFields, (val) => {
+  localStorage.setItem('vocabulary_search_fields', JSON.stringify(val))
+}, { deep: true })
+
+watch(singleSelect, (val) => {
+  localStorage.setItem('vocabulary_single_select', val ? 'true' : 'false')
+})
+
+watchDebounced([query, selectedSearchFields, selectedLocations, filterByRegion, selectedProvince, selectedCity], () => {
   loadVocabularyStandardWords()
 
   if (shouldUseVocabularyItemsApi()) {
@@ -695,6 +759,12 @@ watch(selectedStandardWords, (words) => {
     loadVocabularyMapPoints()
   }
 })
+</script>
+
+<script>
+export default {
+  name: 'VocabularyViewPage'
+}
 </script>
 
 <style scoped lang="scss" src="./vocabulary.scss"></style>
