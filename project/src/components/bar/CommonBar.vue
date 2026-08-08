@@ -31,6 +31,7 @@
         :class="scrollClass"
         @mouseleave="handleTabLeave"
       >
+        <div class="tab-pill" :style="desktopPillStyle" />
         <RouterLink
         v-for="t in orderedTabs"
         :key="t.tab"
@@ -57,14 +58,7 @@
           @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
         >
           <span class="tab-inner" :class="{ active: isActiveComputed(t.tab) }">
-            <span
-              class="emoji"
-              :style="{
-                fontSize: ((t.mobileFontSize || t.fontSize) * 1) + 'rem'
-              }"
-            >
-              {{ t.icon }}
-            </span>
+            <BarIcon :icon="t.icon" class="nav-icon" :style="{ fontSize: ((t.mobileFontSize || t.fontSize) * 1) + 'rem' }" />
             <span
               class="label"
               v-if="!t.showLabelOnlyWhenActive || isActiveComputed(t.tab)"
@@ -111,6 +105,7 @@
         class="commonbar-tabs ui-scrollbar--hidden"
         :class="scrollClassMobile"
       >
+        <div class="tab-pill tab-pill--mobile" :style="mobilePillStyle" />
         <RouterLink
           v-for="t in orderedMobileTabs"
           :key="t.tab"
@@ -138,14 +133,7 @@
             @mouseleave="handleTabTooltipLeave"
             @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
-            <span
-              class="emoji"
-              :style="{
-                fontSize: ((t.mobileFontSize || t.fontSize) * 1.2) + 'rem'
-              }"
-            >
-              {{ t.icon }}
-            </span>
+            <BarIcon :icon="t.icon" class="nav-icon" :style="{ fontSize: ((t.mobileFontSize || t.fontSize) * 1.2) + 'rem' }" />
             <span
               class="label"
               v-if="!t.hideLabelOnMobile && (!(t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) || isActiveComputed(t.tab))"
@@ -195,7 +183,7 @@
             class="submenu-item"
             @click="handleSubmenuClick(child)"
           >
-            <span class="submenu-icon">{{ child.icon }}</span>
+            <BarIcon :icon="child.icon" class="submenu-icon" />
             <span class="submenu-label">{{ child.label }}</span>
           </div>
         </div>
@@ -222,6 +210,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { userStore } from '@/main/store/store.js'
 import NavAvatar from '@/components/bar/NavAvatar.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import {
   filterVisibleCommonBarTabs,
   getCommonBarActiveTab,
@@ -233,6 +222,7 @@ import {
   writeCommonBarMemory
 } from '@/utils/bar/commonBarNavigation.js'
 import { useTabTooltip } from '@/composables/bar/useTabTooltip.js'
+import { useTabPill } from '@/composables/bar/useTabPill.js'
 import { useScrollSnap } from '@/composables/bar/useScrollSnap.js'
 import { useScrollArrows } from '@/composables/bar/useScrollArrows.js'
 import { useBarOverflow, getDefaultTabScroll, sortTabsByScroll } from '@/composables/bar/useBarOverflow.js'
@@ -341,6 +331,9 @@ const mobileNavRef = ref(null)
 
 // Tab label tooltip
 const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
+
+const { pillStyle: desktopPillStyle } = useTabPill(navRef, '.tab-inner.active', route)
+const { pillStyle: mobilePillStyle } = useTabPill(mobileNavRef, '.tab-item.active', route)
 
 const getTabScroll = (tab, isMobile) => getDefaultTabScroll(tab, isMobile)
 
@@ -645,6 +638,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .commonbar-tabs {
+  position: relative;
   display: flex;
   flex: 1 1 auto;
   gap: 8px;
@@ -675,6 +669,8 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .tab-inner {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: 1px;
@@ -711,31 +707,20 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     opacity: 0.6;
   }
 
-  .tab-item:hover & {
+  .tab-item:hover &:not(.active) {
     background: rgba(var(--color-primary-rgb), 0.12);
   }
 
   &.active {
     position: relative;
+    z-index: 1;
     color: $active-blue;
     font-weight: 1000;
     font-size: 1.1em;
-    background: linear-gradient(
-      145deg,
-      var(--glass-20),
-      var(--glass-10)
-    );
     border: 3px solid var(--glass-40);
     border-radius: 25px;
-    box-shadow:
-      0 6px 10px rgba(0, 0, 0, 0.1),
-      0 1px 4px rgba(0, 0, 0, 0.08);
     transition:
-      background $transition-base ease,
       color $transition-base ease,
-      border-color $transition-base ease,
-      border-radius $transition-base ease,
-      box-shadow $transition-base ease,
       font-size $transition-base ease;
 
     &::after {
@@ -759,6 +744,30 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
       );
       box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
     }
+  }
+}
+
+.tab-pill {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  background: linear-gradient(
+    145deg,
+    var(--glass-20),
+    var(--glass-10)
+  );
+  border-radius: 25px;
+  box-shadow:
+    0 6px 10px rgba(0, 0, 0, 0.1),
+    0 1px 4px rgba(0, 0, 0, 0.08);
+  transition:
+    left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+    width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+  &--mobile {
+    border-radius: 30px;
   }
 }
 
@@ -891,7 +900,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
       flex-shrink: 0;
       height: max(6dvh, 40px);
 
-      .emoji, .label {
+      .nav-icon, .label {
         font-size: 0.9em;
       }
 
@@ -904,20 +913,13 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
       &.active {
         position: relative;
+        z-index: 1;
         color: $active-blue;
         font-weight: 1000;
-        background: linear-gradient(
-          145deg,
-          var(--glass-20),
-          var(--glass-10)
-        );
         border: 3px solid var(--glass-40);
         border-radius: 30px;
-        box-shadow:
-          0 6px 10px rgba(0, 0, 0, 0.1),
-          0 1px 4px rgba(0, 0, 0, 0.08);
 
-        .emoji, .label {
+        .nav-icon, .label {
           font-size: 1.1em;
         }
 

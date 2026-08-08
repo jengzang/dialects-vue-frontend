@@ -26,7 +26,8 @@
           class="navbar-btn"
           :class="scrollClass"
       >
-      <!-- <nav 
+        <div class="tab-pill" :style="desktopPillStyle" />
+      <!-- <nav
           ref="navRef" 
           class="navbar-btn" 
           :class="scrollClassMobile"
@@ -59,7 +60,7 @@
               @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
           <span class="menu-inner" :class="{ active: isMenuTabActive(t.tab) }">
-            <span class="emoji">{{ t.icon }}</span>
+            <BarIcon :icon="t.icon" class="nav-icon" />
             <span
               class="label"
               v-if="!t.showLabelOnlyWhenActive || isMenuTabActive(t.tab)"
@@ -133,6 +134,7 @@
           class="navbar-bottom"
           :class="scrollClassMobile"
       >
+        <div class="tab-pill tab-pill--mobile" :style="mobilePillStyle" />
         <RouterLink
             v-for="t in orderedMobileTabs"
             :key="t.tab"
@@ -159,7 +161,7 @@
               @mouseleave="handleTabTooltipLeave"
               @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
-            <span class="emoji">{{ t.icon }}</span>
+            <BarIcon :icon="t.icon" class="nav-icon" />
             <span
               class="label"
               v-if="!t.hideLabelOnMobile && (!(t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) || isMenuTabActive(t.tab))"
@@ -198,9 +200,11 @@ import {
 } from '@/main/config/index.js'
 import { userStore } from '@/main/store/store.js'
 import NavAvatar from '@/components/bar/NavAvatar.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import SimpleSidebar from '@/components/bar/SimpleSidebar.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { useTabTooltip } from '@/composables/bar/useTabTooltip.js'
+import { useTabPill } from '@/composables/bar/useTabPill.js'
 import { useScrollSnap } from '@/composables/bar/useScrollSnap.js'
 import { useScrollArrows } from '@/composables/bar/useScrollArrows.js'
 import { useBarOverflow, getDefaultTabScroll, sortTabsByScroll } from '@/composables/bar/useBarOverflow.js'
@@ -223,6 +227,9 @@ const mobileNavRef = ref(null)
 
 // Tab label tooltip
 const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
+
+const { pillStyle: desktopPillStyle } = useTabPill(navRef, '.menu-inner.active', route)
+const { pillStyle: mobilePillStyle } = useTabPill(mobileNavRef, '.menu-item.active', route)
 
 // ===== sessionStorage 管理：记住每个 tab 的最后访问的 sub =====
 watch(() => route.path, () => {
@@ -367,6 +374,7 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
 }
 
 .navbar-btn {
+  position: relative;
   flex: 1 1 auto;
   min-width: 0;
   max-width: 1200px;
@@ -395,6 +403,30 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   gap: 10px;
   margin-left: 5px;
   cursor: pointer;
+}
+
+.tab-pill {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  background: linear-gradient(
+    145deg,
+    var(--glass-20),
+    var(--glass-10)
+  );
+  border-radius: 25px;
+  box-shadow:
+    0 6px 10px rgba(0, 0, 0, 0.1),
+    0 1px 4px rgba(0, 0, 0, 0.08);
+  transition:
+    left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+    width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+  &--mobile {
+    border-radius: 30px;
+  }
 }
 
 .logo-container {
@@ -486,6 +518,8 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
 }
 
 .menu-inner {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: 1px;
@@ -514,26 +548,20 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
     white-space: nowrap;
   }
 
-  .menu-item:hover & {
+  .menu-item:hover &:not(.active) {
     background: rgba(var(--color-primary-rgb), 0.12);
   }
 
   &.active {
     position: relative;
-    @include soft-glass-background;
-    @include soft-glass-shadow;
-
-    border: 3px solid var(--glass-40);
-    border-radius: 25px;
+    z-index: 1;
     color: var(--color-primary-hover);
     font-weight: 1000;
     font-size: 1.1em;
+    border: 3px solid var(--glass-40);
+    border-radius: 25px;
     transition:
-      background 0.3s ease,
       color 0.3s ease,
-      border-color 0.3s ease,
-      border-radius 0.3s ease,
-      box-shadow 0.3s ease,
       font-size 0.3s ease;
 
     &::after {
@@ -678,6 +706,7 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
 }
 
 .navbar-bottom {
+  position: relative;
   width: 100%;
   height: 6dvh;
   display: flex;
@@ -701,20 +730,19 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
     height: 6dvh !important;
     border-radius: 30px !important;
 
-    .emoji, .label {
+    .nav-icon, .label {
       font-size: 0.9em;
     }
 
     &.active {
       position: relative;
-      @include soft-glass-background;
-      @include soft-glass-shadow;
-
-      border: 3px solid var(--glass-40);
+      z-index: 1;
       color: var(--color-primary-hover);
       font-weight: 1000;
+      border: 3px solid var(--glass-40);
+      border-radius: 30px;
 
-      .emoji, .label {
+      .nav-icon, .label {
         font-size: 1.1em;
       }
 

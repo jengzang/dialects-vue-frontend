@@ -26,7 +26,7 @@
             @mouseenter="handleItemMouseEnter(item, key, $event)"
             @mouseleave="item.children && canHover ? scheduleCloseSubmenu() : null"
           >
-            <span role="img" :aria-label="key">{{ item.icon }}</span>
+            <BarIcon :icon="item.icon" />
             {{ item.label }}
             <svg v-if="item.children && canHover" class="sidebar-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
             <svg v-else-if="item.children" class="sidebar-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
@@ -125,7 +125,7 @@
           class="submenu-item main-sidebar-submenu-item"
           @click="handleSubmenuClick(child)"
         >
-          <span class="submenu-icon">{{ child.icon }}</span>
+          <BarIcon :icon="child.icon" class="submenu-icon" />
           <span class="submenu-label">{{ child.label }}</span>
         </div>
       </div>
@@ -139,6 +139,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue'
 import { clearToken, getToken } from '@/api/auth/auth.js'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { useVisitStats, ensureVisitHistory } from '@/composables/data/useVisitStats.js'
 import {userStore} from "@/main/store/store.js";
 import { useSidebarConfig } from '@/main/config/index.js';
