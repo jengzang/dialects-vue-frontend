@@ -75,6 +75,10 @@
                 dm.content = descs[loc];
                 document.head.appendChild(dm);
             }
+
+            var lt = document.querySelector('.app-boot-text');
+            var loadingTexts = { 'zh-Hant': '頁面載入中...', 'zh-CN': '页面加载中...', 'en': 'Loading...' };
+            if (lt && loadingTexts[loc]) lt.textContent = loadingTexts[loc];
         })();
     </script>
     <script type="module" src="/src/main/main.js"></script>
