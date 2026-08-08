@@ -228,7 +228,7 @@
           @clear-custom-import="clearVoronoiCustomImport"
           @open-ignore-modal="openVoronoiIgnoreModal"
           @preview-points="previewVoronoiPoints"
-          @export-layer="exportVoronoiToLayer"
+          @export-layer="openVoronoiExportModal"
           @calculate="handleBuildVoronoi"
           @open-field-merge="showFieldMergeModal = true"
           @update:expand-ratio="voronoiExpandRatio = $event"
