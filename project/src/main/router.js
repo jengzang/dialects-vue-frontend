@@ -112,18 +112,6 @@ const routes = [
         redirect: createLocaleRedirect('/explore/gis')
       },
       {
-        path: 'explore/yubao',
-        redirect: createLocaleRedirect('/menu/yubao')
-      },
-      {
-        path: 'explore/vocabulary/:child?',
-        redirect: createLocaleRedirect('/menu/vocabulary')
-      },
-      {
-        path: 'explore/yc-spoken',
-        redirect: createLocaleRedirect('/explore/yc/words')
-      },
-      {
         path: 'auth',
         component: Auth,
         meta: { queryAllowlist: ['view', 'redirect'] }
