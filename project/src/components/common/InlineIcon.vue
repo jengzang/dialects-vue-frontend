@@ -14,12 +14,16 @@
 <script setup>
 import { computed } from 'vue'
 import { resolvePhosphorIcon } from '@/composables/bar/usePhosphorMap.js'
+import { currentIconMode, ICON_MODE_ALL_SVG } from '@/composables/core/uiPreferences.js'
 
 const props = defineProps({
   icon: { type: String, required: true }
 })
 
-const phosphorIcon = computed(() => resolvePhosphorIcon(props.icon))
+const phosphorIcon = computed(() => {
+  if (currentIconMode.value !== ICON_MODE_ALL_SVG) return null
+  return resolvePhosphorIcon(props.icon)
+})
 </script>
 
 <style scoped>

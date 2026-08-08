@@ -92,6 +92,29 @@
         </div>
       </div>
 
+      <div class="setting-section setting-split">
+        <div class="setting-split-item">
+          <h3 class="section-title">
+            {{ $t('about.settings.iconMode.title') }}
+            <HelpIcon
+              :content="$t('about.settings.iconMode.description')"
+              size="sm"
+              placement="right"
+              icon="?"
+              icon-color="var(--color-primary)"
+            />
+          </h3>
+          <RadioGroup
+            v-model="iconModeModel"
+            :options="iconModeRadioOptions"
+            name="settings-icon-mode"
+            class="settings-radio-group"
+          />
+        </div>
+        <hr class="setting-split-divider">
+        <div class="setting-split-item" /> <!-- spacer -->
+      </div>
+
       <div class="setting-section tutorial-toggle-section">
         <div class="tutorial-toggle-copy">
           <h3 class="section-title">{{ $t('about.settings.tutorialToggle.title') }}</h3>
@@ -183,10 +206,15 @@ import {
   COLOR_THEME_GREEN,
   UI_MODE_DEFAULT,
   UI_MODE_COMPACT,
+  ICON_MODE_ALL_EMOJI,
+  ICON_MODE_ALL_SVG,
+  ICON_MODE_BAR_SVG,
   getStoredColorTheme,
   getStoredInterfaceMode,
+  getStoredIconMode,
   setColorTheme,
   setInterfaceMode,
+  setIconMode,
 } from '@/composables/core/uiPreferences.js'
 import { buildLocalePath, stripLocaleFromPath } from '@/i18n/localeRouting.js'
 import {
@@ -231,6 +259,7 @@ const languages = ref([
 
 const interfaceMode = ref(getStoredInterfaceMode())
 const colorTheme = ref(getStoredColorTheme())
+const iconMode = ref(getStoredIconMode())
 
 const colorThemeOptions = computed(() => [
   { value: COLOR_THEME_BLUE, label: t('navigation.settings.colorTheme.options.blue') },
@@ -266,6 +295,27 @@ const interfaceModeRadioOptions = computed(() =>
 const interfaceModeModel = computed({
   get: () => interfaceMode.value,
   set: (mode) => changeInterfaceMode(mode)
+})
+
+const iconModeOptions = computed(() => [
+  { value: ICON_MODE_BAR_SVG, label: t('about.settings.iconMode.options.barSvg') },
+  { value: ICON_MODE_ALL_EMOJI, label: t('about.settings.iconMode.options.allEmoji') },
+  { value: ICON_MODE_ALL_SVG, label: t('about.settings.iconMode.options.allSvg') },
+])
+
+const iconModeRadioOptions = computed(() =>
+  iconModeOptions.value.map(option => ({
+    value: option.value,
+    label: option.label
+  }))
+)
+
+const iconModeModel = computed({
+  get: () => iconMode.value,
+  set: (mode) => {
+    if (mode === iconMode.value) return
+    iconMode.value = setIconMode(mode)
+  }
 })
 
 const characterTableOptions = computed(() =>

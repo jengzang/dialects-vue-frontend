@@ -342,6 +342,15 @@
         "direct": "直接輸入"
       }
     },
+    "iconMode": {
+      "title": "圖標風格",
+      "description": "選擇導航欄和內文圖標的渲染方式。",
+      "options": {
+        "allEmoji": "全 Emoji",
+        "allSvg": "全 SVG",
+        "barSvg": "導航 SVG + 內文 Emoji"
+      }
+    },
     "updateNotice": {
       "title": "更新提示",
       "description": "選擇新版本更新內容的展示方式。",

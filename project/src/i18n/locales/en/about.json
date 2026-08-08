@@ -342,6 +342,15 @@
         "direct": "Direct Input"
       }
     },
+    "iconMode": {
+      "title": "Icon Style",
+      "description": "Choose how navigation and inline icons are rendered.",
+      "options": {
+        "allEmoji": "All Emoji",
+        "allSvg": "All SVG",
+        "barSvg": "Nav SVG + Inline Emoji"
+      }
+    },
     "updateNotice": {
       "title": "Update Notice",
       "description": "Choose how to display new version update content.",

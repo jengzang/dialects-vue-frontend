@@ -14,6 +14,7 @@
 <script setup>
 import { computed } from 'vue'
 import { resolvePhosphorIcon } from '@/composables/bar/usePhosphorMap.js'
+import { currentIconMode, ICON_MODE_ALL_EMOJI } from '@/composables/core/uiPreferences.js'
 
 const props = defineProps({
   icon: { type: String, required: true },
@@ -22,5 +23,8 @@ const props = defineProps({
 
 const phosphorWeight = computed(() => props.weight)
 
-const phosphorIcon = computed(() => resolvePhosphorIcon(props.icon))
+const phosphorIcon = computed(() => {
+  if (currentIconMode.value === ICON_MODE_ALL_EMOJI) return null
+  return resolvePhosphorIcon(props.icon)
+})
 </script>
