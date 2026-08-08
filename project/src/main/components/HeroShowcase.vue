@@ -63,32 +63,60 @@ const route = useRoute()
 
 const showcaseItems = [
   {
+    id: 'yinxi',
+    titleKey: 'home.showcase.yinxi.title',
+    image: '/showcase/yinxi.webp',
+    route: '/menu/pho/matrix',
+    actionLabelKey: 'home.showcase.yinxi.action'
+  },
+  {
+    id: 'zhonggu',
+    titleKey: 'home.showcase.zhonggu.title',
+    image: '/showcase/zhonggu.webp',
+    route: '/menu/query/zhonggu',
+    actionLabelKey: 'home.showcase.zhonggu.action'
+  },
+  {
+    id: 'result',
+    titleKey: 'home.showcase.result.title',
+    image: '/showcase/result.webp',
+    route: '/menu/query/zhonggu',
+    actionLabelKey: 'home.showcase.result.action'
+  },
+  {
+    id: 'villages',
+    titleKey: 'home.showcase.villages.title',
+    image: '/showcase/villages.webp',
+    route: '/explore/villages/gd',
+    actionLabelKey: 'home.showcase.villages.action'
+  },
+  {
     id: 'compare',
     titleKey: 'home.showcase.compare.title',
-    image: '/showcase/compare.svg',
+    image: '/showcase/compare.webp',
     route: '/menu/compare/char',
     actionLabelKey: 'home.showcase.compare.action'
   },
   {
-    id: 'query',
-    titleKey: 'home.showcase.query.title',
-    image: '/showcase/query.svg',
-    route: '/menu/query/zhonggu',
-    actionLabelKey: 'home.showcase.query.action'
+    id: 'gis',
+    titleKey: 'home.showcase.gis.title',
+    image: '/showcase/gis.webp',
+    route: '/explore/gis',
+    actionLabelKey: 'home.showcase.gis.action'
   },
   {
-    id: 'map',
-    titleKey: 'home.showcase.map.title',
-    image: '/showcase/map.svg',
-    route: '/menu/map/view',
-    actionLabelKey: 'home.showcase.map.action'
+    id: 'evolution',
+    titleKey: 'home.showcase.evolution.title',
+    image: '/showcase/evolution.webp',
+    route: '/menu/pho/evolution',
+    actionLabelKey: 'home.showcase.evolution.action'
   },
   {
-    id: 'charclass',
-    titleKey: 'home.showcase.charclass.title',
-    image: '/showcase/charclass.svg',
-    route: '/explore/char-class',
-    actionLabelKey: 'home.showcase.charclass.action'
+    id: 'phocompare',
+    titleKey: 'home.showcase.phocompare.title',
+    image: '/showcase/phocompare.webp',
+    route: '/menu/compare/phonetic',
+    actionLabelKey: 'home.showcase.phocompare.action'
   }
 ]
 

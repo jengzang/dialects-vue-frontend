@@ -11,10 +11,14 @@
   "showcase": {
     "nav": "Product showcase",
     "switchTo": "Switch to",
+    "yinxi": { "title": "Phonological System", "action": "View System" },
+    "zhonggu": { "title": "Query Map", "action": "View Map" },
+    "result": { "title": "Query Results", "action": "View Results" },
+    "villages": { "title": "Guangdong Villages", "action": "Browse" },
     "compare": { "title": "Dialect Comparison", "action": "Compare" },
-    "query": { "title": "Query & Analysis", "action": "Query" },
-    "map": { "title": "Map Visualization", "action": "View Map" },
-    "charclass": { "title": "Historical Categories", "action": "Explore" }
+    "gis": { "title": "GIS Drawing", "action": "Start Drawing" },
+    "evolution": { "title": "Sound Evolution", "action": "View Evolution" },
+    "phocompare": { "title": "Phonetic Comparison", "action": "View Sankey" }
   },
   "features": {
     "sectionTitle": "Core Features",
