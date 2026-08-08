@@ -8,6 +8,14 @@
     "logoAlt": "方音圖鑑",
     "decorationAlt": "藍色圓環"
   },
+  "showcase": {
+    "nav": "產品展示",
+    "switchTo": "切換到",
+    "compare": { "title": "方言比較", "action": "進入比較" },
+    "query": { "title": "查詢分析", "action": "開始查詢" },
+    "map": { "title": "地圖可視化", "action": "查看分佈" },
+    "charclass": { "title": "漢字資料", "action": "探索漢字" }
+  },
   "features": {
     "sectionTitle": "核心功能",
     "query": {

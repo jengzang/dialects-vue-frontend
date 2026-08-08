@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff7ed"/>
+      <stop offset="100%" style="stop-color:#ffedd5"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" fill="url(#bg)" rx="12"/>
+  <rect x="32" y="32" width="896" height="48" fill="#fff" rx="8" opacity="0.8"/>
+  <text x="48" y="63" font-family="system-ui,sans-serif" font-size="18" fill="#ea580c" font-weight="600">汉字资料</text>
+  <rect x="32" y="104" width="280" height="404" fill="#fff" rx="10" opacity="0.75"/>
+  <rect x="48" y="120" width="248" height="20" fill="#fff7ed" rx="4"/>
+  <rect x="48" y="156" width="248" height="2" fill="#e8edf5"/>
+  <rect x="48" y="174" width="220" height="16" fill="#ea580c" rx="4" opacity="0.1"/>
+  <rect x="48" y="202" width="180" height="14" fill="#e8edf5" rx="4"/>
+  <rect x="48" y="228" width="200" height="14" fill="#e8edf5" rx="4"/>
+  <rect x="48" y="256" width="248" height="2" fill="#e8edf5"/>
+  <rect x="48" y="274" width="160" height="16" fill="#e8edf5" rx="4"/>
+  <rect x="48" y="302" width="200" height="14" fill="#e8edf5" rx="4"/>
+  <rect x="48" y="328" width="140" height="14" fill="#e8edf5" rx="4"/>
+  <rect x="336" y="104" width="592" height="404" fill="#fff" rx="10" opacity="0.7"/>
+  <rect x="360" y="128" width="544" height="24" fill="#fff7ed" rx="6"/>
+  <rect x="360" y="168" width="120" height="14" fill="#ea580c" rx="4" opacity="0.1"/>
+  <rect x="360" y="198" width="180" height="12" fill="#e8edf5" rx="4"/>
+  <rect x="360" y="226" width="140" height="12" fill="#e8edf5" rx="4"/>
+  <rect x="360" y="270" width="100" height="14" fill="#ea580c" rx="4" opacity="0.1"/>
+  <rect x="360" y="300" width="200" height="12" fill="#e8edf5" rx="4"/>
+  <rect x="360" y="328" width="160" height="12" fill="#e8edf5" rx="4"/>
+  <rect x="360" y="356" width="180" height="12" fill="#e8edf5" rx="4"/>
+</svg>

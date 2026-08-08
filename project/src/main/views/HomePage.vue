@@ -7,7 +7,10 @@
     <section class="hero-section">
       <div class="hero-content">
         <img src="@/assets/picture/title.png" :alt="$t('home.hero.logoAlt')" class="hero-logo title-logo" />
-        <h1 class="hero-title">{{ $t('home.hero.title') }}</h1>
+        <div class="hero-title-row">
+          <h1 class="hero-title">{{ $t('home.hero.title') }}</h1>
+          <img :src="heroDecorationSrc" :alt="$t('home.hero.decorationAlt')" class="hero-decoration" />
+        </div>
         <p class="hero-subtitle">{{ $t('home.hero.subtitle') }}</p>
         <div class="hero-actions">
           <button class="btn-primary" @click="navigateTo('/menu/query/zhonggu')">
@@ -23,8 +26,9 @@
             <span class="btn-text">{{ $t('home.hero.featuresIntro') }}</span>
           </button>
         </div>
-        <img :src="heroDecorationSrc" :alt="$t('home.hero.decorationAlt')" class="hero-decoration" />
       </div>
+
+      <HeroShowcase />
     </section>
 
     <!-- Features Section -->
@@ -590,6 +594,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import HeroShowcase from '@/main/components/HeroShowcase.vue'
 import { computed, ref, onMounted, defineAsyncComponent } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -793,7 +798,9 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     min-height: 85vh;
     padding: 2rem 1.5rem;
 
+    @include flex-col;
     @include flex-center;
+    gap: 1rem;
   }
 
   &-content {
@@ -809,8 +816,16 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     filter: drop-shadow(0 4px 12px rgba(var(--color-primary-rgb), 0.15));
   }
 
-  &-title {
+  &-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
     margin-bottom: 0.75rem;
+  }
+
+  &-title {
+    margin-bottom: 0;
     font-size: clamp(1.25rem, 3vw, 1.75rem);
     font-weight: 600;
     letter-spacing: 0.05em;
@@ -834,9 +849,9 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   }
 
   &-decoration {
-    width: auto;
-    max-height: 100px;
-    opacity: 0.9;
+    width: 50px;
+    height: 50px;
+    opacity: 0.85;
     animation: float 6s ease-in-out infinite;
   }
 }

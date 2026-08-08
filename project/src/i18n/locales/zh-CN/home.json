@@ -8,6 +8,14 @@
     "logoAlt": "方音图鉴",
     "decorationAlt": "蓝色圆环"
   },
+  "showcase": {
+    "nav": "产品展示",
+    "switchTo": "切换到",
+    "compare": { "title": "方言比较", "action": "进入比较" },
+    "query": { "title": "查询分析", "action": "开始查询" },
+    "map": { "title": "地图可视化", "action": "查看分布" },
+    "charclass": { "title": "汉字资料", "action": "探索汉字" }
+  },
   "features": {
     "sectionTitle": "核心功能",
     "query": {

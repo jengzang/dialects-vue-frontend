@@ -8,6 +8,14 @@
     "logoAlt": "Dialect Pronunciation Atlas",
     "decorationAlt": "Blue ring"
   },
+  "showcase": {
+    "nav": "Product showcase",
+    "switchTo": "Switch to",
+    "compare": { "title": "Dialect Comparison", "action": "Compare" },
+    "query": { "title": "Query & Analysis", "action": "Query" },
+    "map": { "title": "Map Visualization", "action": "View Map" },
+    "charclass": { "title": "Historical Categories", "action": "Explore" }
+  },
   "features": {
     "sectionTitle": "Core Features",
     "query": {

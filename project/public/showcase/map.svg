@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0fdf4"/>
+      <stop offset="100%" style="stop-color:#dcfce7"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" fill="url(#bg)" rx="12"/>
+  <rect x="32" y="32" width="896" height="48" fill="#fff" rx="8" opacity="0.8"/>
+  <text x="48" y="63" font-family="system-ui,sans-serif" font-size="18" fill="#16a34a" font-weight="600">地图可视化</text>
+  <rect x="32" y="104" width="200" height="404" fill="#fff" rx="10" opacity="0.75"/>
+  <rect x="48" y="120" width="168" height="20" fill="#e8edf5" rx="4"/>
+  <rect x="48" y="152" width="140" height="14" fill="#16a34a" rx="4" opacity="0.12"/>
+  <rect x="48" y="178" width="120" height="14" fill="#e8edf5" rx="4"/>
+  <rect x="48" y="204" width="150" height="14" fill="#e8edf5" rx="4"/>
+  <rect x="48" y="230" width="100" height="14" fill="#e8edf5" rx="4"/>
+  <rect x="256" y="104" width="672" height="404" fill="#fff" rx="10" opacity="0.7"/>
+  <circle cx="560" cy="280" r="120" fill="#dcfce7" opacity="0.6"/>
+  <circle cx="560" cy="280" r="80" fill="#bbf7d0" opacity="0.5"/>
+  <circle cx="560" cy="280" r="40" fill="#16a34a" opacity="0.15"/>
+  <circle cx="400" cy="220" r="6" fill="#16a34a" opacity="0.4"/>
+  <circle cx="480" cy="340" r="6" fill="#16a34a" opacity="0.4"/>
+  <circle cx="650" cy="200" r="6" fill="#16a34a" opacity="0.4"/>
+  <circle cx="700" cy="350" r="6" fill="#16a34a" opacity="0.4"/>
+  <circle cx="520" cy="180" r="6" fill="#16a34a" opacity="0.4"/>
+  <line x1="400" y1="220" x2="560" y2="280" stroke="#16a34a" stroke-opacity="0.15" stroke-width="1"/>
+  <line x1="480" y1="340" x2="560" y2="280" stroke="#16a34a" stroke-opacity="0.15" stroke-width="1"/>
+  <line x1="650" y1="200" x2="560" y2="280" stroke="#16a34a" stroke-opacity="0.15" stroke-width="1"/>
+  <line x1="700" y1="350" x2="560" y2="280" stroke="#16a34a" stroke-opacity="0.15" stroke-width="1"/>
+  <line x1="520" y1="180" x2="560" y2="280" stroke="#16a34a" stroke-opacity="0.15" stroke-width="1"/>
+</svg>
