@@ -498,7 +498,7 @@ $dropdown-blur: 12px;
   left: 2dvw;
   z-index: 1;
   @include flex-col;
-  height: 78dvh;
+  height: 85dvh;
   overflow: auto;
   resize: both;
   border: 1px solid var(--border-light-gray);
@@ -512,7 +512,7 @@ $dropdown-blur: 12px;
     right: 1dvw;
     bottom: 2dvh;
     left: 1dvw;
-    height: 70dvh;
+    height: 74dvh;
   }
 }
 

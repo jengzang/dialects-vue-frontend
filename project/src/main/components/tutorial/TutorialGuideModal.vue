@@ -240,7 +240,7 @@
     </template>
   </AppModal>
 
-  <ScrollToTop :container="articleScrollRef" :show-after="200" />
+  <ScrollToTop :container="scrollContainer" :show-after="200" />
 </template>
 
 <script setup>
@@ -321,6 +321,7 @@ const { t } = useI18n()
 const modalBodyRef = ref(null)
 const articleTopRef = ref(null)
 const articleScrollRef = ref(null)
+const scrollContainer = computed(() => articleScrollRef.value)
 
 const shouldShowCatalog = computed(() => {
   return !props.isCompact || props.isMobileLandscape || props.isCatalogOpen

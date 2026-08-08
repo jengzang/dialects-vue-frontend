@@ -56,6 +56,10 @@ onBeforeUnmount(() => {
   unregisterInstance(uid)
 })
 
+const isPortrait = computed(() =>
+  window.matchMedia('(max-aspect-ratio: 1/1)').matches
+)
+
 const props = defineProps({
   container: {
     type: Object,
@@ -63,7 +67,11 @@ const props = defineProps({
   },
   showAfter: {
     type: Number,
-    default: 400,
+    default: 200,
+  },
+  mobileShowAfter: {
+    type: Number,
+    default: 100,
   },
   right: {
     type: String,
@@ -121,7 +129,11 @@ function handleScroll() {
   })
 }
 
-const visible = computed(() => scrollTop.value > props.showAfter)
+const threshold = computed(() =>
+  isPortrait.value ? props.mobileShowAfter : props.showAfter
+)
+
+const visible = computed(() => scrollTop.value > threshold.value)
 
 const progress = computed(() => {
   const max = scrollHeight.value - viewportHeight.value
@@ -134,6 +146,7 @@ const dashOffset = computed(() => circumference * (1 - progress.value))
 const positionStyle = computed(() => ({
   right: props.right,
   bottom: `calc(${props.bottom} + env(safe-area-inset-bottom))`,
+  zIndex: props.container ? 20001 : 999,
 }))
 
 function scrollToTop() {
@@ -163,12 +176,12 @@ onBeforeUnmount(() => {
   }
   if (rafId) cancelAnimationFrame(rafId)
 })
+
 </script>
 
 <style scoped lang="scss">
 .scroll-to-top {
   position: fixed;
-  z-index: 999;
   display: flex;
   align-items: center;
   justify-content: center;
