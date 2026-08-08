@@ -83,7 +83,7 @@
       >▶</button>
 
       <div class="settings-icon-container" @click="goToSettings" :title="t('navigation.submenu.about.setting')">
-        ⚙️
+        <BarIcon icon="⚙️" />
       </div>
       <div v-if="userStore.username" class="avatar-container" @click="goToAuthPage">
         <NavAvatar />
@@ -115,7 +115,7 @@
         </div>
         <div class="navbar-top-actions">
           <div class="settings-icon-container" @click="goToSettings" :title="t('navigation.submenu.about.setting')">
-            ⚙️
+            <BarIcon icon="⚙️" />
           </div>
           <div v-if="userStore.username" class="avatar-container" @click="goToAuthPage">
             <NavAvatar />
