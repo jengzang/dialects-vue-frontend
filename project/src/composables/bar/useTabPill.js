@@ -28,7 +28,7 @@ export function useTabPill(containerRef, activeSelector, route) {
 
       hideTimer = setTimeout(() => {
         pillStyle.value = { ...pillStyle.value, opacity: 0 }
-      }, 700)
+      }, 600)
     })
   }
 

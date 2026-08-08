@@ -679,6 +679,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   margin: 0 calc(var(--tab-pad) * -1);
   padding: 0 var(--tab-pad);
   font-size: 0.9em;
+  border: 3px solid transparent;
   border-radius: var(--radius-md);
 
   &:has(.tab-chevron),
@@ -727,12 +728,12 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
       0 6px 10px rgba(0, 0, 0, 0.1),
       0 1px 4px rgba(0, 0, 0, 0.08);
     transition:
-      background $transition-base ease,
-      color $transition-base ease,
-      border-color $transition-base ease,
-      border-radius $transition-base ease,
-      box-shadow $transition-base ease,
-      font-size $transition-base ease;
+      background $transition-base ease 0.6s,
+      color $transition-base ease 0.6s,
+      border-color $transition-base ease 0.6s,
+      border-radius $transition-base ease 0.6s,
+      box-shadow $transition-base ease 0.6s,
+      font-size $transition-base ease 0.6s;
 
     &::after {
       content: '';
@@ -774,8 +775,8 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     0 6px 10px rgba(0, 0, 0, 0.1),
     0 1px 4px rgba(0, 0, 0, 0.08);
   transition:
-    transform 0.7s cubic-bezier(0.34, 1.8, 0.64, 1),
-    width 0.7s cubic-bezier(0.34, 1.8, 0.64, 1),
+    transform 0.6s cubic-bezier(0.25, 0.1, 0.0, 1.0),
+    width 0.6s cubic-bezier(0.25, 0.1, 0.0, 1.0),
     opacity 0.15s ease;
 
   &--mobile {
@@ -911,6 +912,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     .tab-item {
       flex-shrink: 0;
       height: max(6dvh, 40px);
+      border: 3px solid transparent;
 
       .nav-icon, .label {
         font-size: 0.9em;
@@ -938,6 +940,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
         box-shadow:
           0 6px 10px rgba(0, 0, 0, 0.1),
           0 1px 4px rgba(0, 0, 0, 0.08);
+        transition: 0.3s ease 0.6s;
 
         .nav-icon, .label {
           font-size: 1.1em;

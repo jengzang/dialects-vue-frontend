@@ -421,8 +421,8 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
     0 6px 10px rgba(0, 0, 0, 0.1),
     0 1px 4px rgba(0, 0, 0, 0.08);
   transition:
-    transform 0.7s cubic-bezier(0.34, 1.8, 0.64, 1),
-    width 0.7s cubic-bezier(0.34, 1.8, 0.64, 1),
+    transform 0.6s cubic-bezier(0.25, 0.1, 0.0, 1.0),
+    width 0.6s cubic-bezier(0.25, 0.1, 0.0, 1.0),
     opacity 0.15s ease;
 
   &--mobile {
@@ -529,6 +529,7 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   margin: 0 calc(var(--tab-pad) * -1);
   padding: 0 var(--tab-pad);
   font-size: 0.9em;
+  border: 3px solid transparent;
   border-radius: var(--radius-md);
 
   &:has(.tab-external) {
@@ -564,12 +565,12 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
     font-weight: 1000;
     font-size: 1.1em;
     transition:
-      background 0.3s ease,
-      color 0.3s ease,
-      border-color 0.3s ease,
-      border-radius 0.3s ease,
-      box-shadow 0.3s ease,
-      font-size 0.3s ease;
+      background 0.3s ease 0.6s,
+      color 0.3s ease 0.6s,
+      border-color 0.3s ease 0.6s,
+      border-radius 0.3s ease 0.6s,
+      box-shadow 0.3s ease 0.6s,
+      font-size 0.3s ease 0.6s;
 
     &::after {
       content: '';
@@ -735,6 +736,7 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
 
   .menu-item {
     height: 6dvh !important;
+    border: 3px solid transparent;
     border-radius: 30px !important;
 
     .nav-icon, .label {
@@ -751,6 +753,7 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
       border-radius: 30px;
       color: var(--color-primary-hover);
       font-weight: 1000;
+      transition: 0.3s ease 0.6s;
 
       .nav-icon, .label {
         font-size: 1.1em;
