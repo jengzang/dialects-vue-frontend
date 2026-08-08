@@ -33,6 +33,48 @@
       </div>
     </div>
 
+    <script>
+        (function() {
+            var p = location.pathname;
+            var m = p.match(/^\/(zh-CN|zh-Hant|en)(\/|$)/);
+            var loc = m ? m[1] : 'zh-Hant';
+            var page = p.replace(/^\/(zh-CN|zh-Hant|en)/, '').replace(/\/+$/, '') || '/';
+            var base = 'https://dialects.yzup.top';
+
+            document.documentElement.lang = loc;
+
+            var c = document.createElement('link');
+            c.rel = 'canonical';
+            c.href = base + '/' + loc + (page === '/' ? '' : page);
+            document.head.appendChild(c);
+
+            ['zh-Hant', 'zh-CN', 'en'].forEach(function(l) {
+                var a = document.createElement('link');
+                a.rel = 'alternate';
+                a.hreflang = l;
+                a.href = base + '/' + l + (page === '/' ? '' : page);
+                document.head.appendChild(a);
+            });
+            var x = document.createElement('link');
+            x.rel = 'alternate';
+            x.hreflang = 'x-default';
+            x.href = base + '/zh-Hant' + (page === '/' ? '' : page);
+            document.head.appendChild(x);
+
+            var titles = { 'zh-Hant': '自然村機器學習｜方音圖鑑', 'zh-CN': '自然村机器学习｜方音图鉴', 'en': 'Village ML Analysis | Dialects Atlas' };
+            if (titles[loc]) document.title = titles[loc];
+
+            var oldDm = document.querySelector('meta[name="description"]');
+            if (oldDm) oldDm.remove();
+            var descs = { 'zh-Hant': '自然村機器學習分析 - 基於283,070條廣東自然村地名的語言地理分析平台。提供搜尋探索、字符分析、語義分析、空間分析、模式分析、區域分析、聚類計算等7大模組。', 'zh-CN': '自然村机器学习分析 - 基于283,070条广东自然村地名的语言地理分析平台。提供搜索探索、字符分析、语义分析、空间分析、模式分析、区域分析、聚类计算等7大模块。', 'en': 'Machine learning analysis of Guangdong natural village toponyms — a geolinguistic platform covering 283,070 village names. Modules: search, character frequency, semantics, spatial analysis, pattern analysis, regional analysis, and clustering.' };
+            if (descs[loc]) {
+                var dm = document.createElement('meta');
+                dm.name = 'description';
+                dm.content = descs[loc];
+                document.head.appendChild(dm);
+            }
+        })();
+    </script>
     <script type="module" src="/src/VillagesML/app/main.js"></script>
   </body>
 </html>

@@ -34,6 +34,48 @@
         <div class="app-boot-text">頁面載入中...</div>
       </div>
     </div>
+    <script>
+        (function() {
+            var p = location.pathname;
+            var m = p.match(/^\/(zh-CN|zh-Hant|en)(\/|$)/);
+            var loc = m ? m[1] : 'zh-Hant';
+            var page = p.replace(/^\/(zh-CN|zh-Hant|en)/, '').replace(/\/+$/, '') || '/';
+            var base = 'https://dialects.yzup.top';
+
+            document.documentElement.lang = loc;
+
+            var c = document.createElement('link');
+            c.rel = 'canonical';
+            c.href = base + '/' + loc + (page === '/' ? '' : page);
+            document.head.appendChild(c);
+
+            ['zh-Hant', 'zh-CN', 'en'].forEach(function(l) {
+                var a = document.createElement('link');
+                a.rel = 'alternate';
+                a.hreflang = l;
+                a.href = base + '/' + l + (page === '/' ? '' : page);
+                document.head.appendChild(a);
+            });
+            var x = document.createElement('link');
+            x.rel = 'alternate';
+            x.hreflang = 'x-default';
+            x.href = base + '/zh-Hant' + (page === '/' ? '' : page);
+            document.head.appendChild(x);
+
+            var titles = { 'zh-Hant': '登錄與註冊｜方音圖鑑', 'zh-CN': '登录与注册｜方音图鉴', 'en': 'Login & Sign Up | Dialects Atlas' };
+            if (titles[loc]) document.title = titles[loc];
+
+            var oldDm = document.querySelector('meta[name="description"]');
+            if (oldDm) oldDm.remove();
+            var descs = { 'zh-Hant': '登錄方音圖鑑帳號，使用郵箱或用戶名訪問自定義地圖、個人資料與更多進階功能。', 'zh-CN': '登录方音图鉴账号，使用邮箱或用户名访问自定义地图、个人资料与更多进阶功能。', 'en': 'Sign in to Dialects Atlas with your email or username to access custom maps, personal data, and more advanced features.' };
+            if (descs[loc]) {
+                var dm = document.createElement('meta');
+                dm.name = 'description';
+                dm.content = descs[loc];
+                document.head.appendChild(dm);
+            }
+        })();
+    </script>
     <script type="module" src="/src/main/main.js"></script>
 
   </body>
