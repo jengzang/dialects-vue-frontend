@@ -343,12 +343,12 @@
       }
     },
     "iconMode": {
-      "title": "圖標風格",
-      "description": "選擇導航欄和內文圖標的渲染方式。",
+      "title": "圖標效果",
+      "description": "導航欄和頁面內圖標的外觀風格。",
       "options": {
-        "allEmoji": "全 Emoji",
-        "allSvg": "全 SVG",
-        "barSvg": "導航 SVG + 內文 Emoji"
+        "allEmoji": "全部彩色圖標",
+        "allSvg": "全部單色圖標",
+        "barSvg": "導航單色 · 內文彩色"
       }
     },
     "updateNotice": {

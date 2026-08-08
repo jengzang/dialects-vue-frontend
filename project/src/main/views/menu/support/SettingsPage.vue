@@ -89,12 +89,7 @@
             name="settings-interface-mode"
             class="settings-radio-group interface-mode-radio-group"
           />
-        </div>
-      </div>
-
-      <div class="setting-section setting-split">
-        <div class="setting-split-item">
-          <h3 class="section-title">
+          <h3 class="section-title" style="margin-top: 18px">
             {{ $t('about.settings.iconMode.title') }}
             <HelpIcon
               :content="$t('about.settings.iconMode.description')"
@@ -111,8 +106,6 @@
             class="settings-radio-group"
           />
         </div>
-        <hr class="setting-split-divider">
-        <div class="setting-split-item" /> <!-- spacer -->
       </div>
 
       <div class="setting-section tutorial-toggle-section">

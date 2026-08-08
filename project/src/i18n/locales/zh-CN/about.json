@@ -343,12 +343,12 @@
       }
     },
     "iconMode": {
-      "title": "图标风格",
-      "description": "选择导航栏和内文图标的渲染方式。",
+      "title": "图标效果",
+      "description": "导航栏和页面内图标的外观风格。",
       "options": {
-        "allEmoji": "全 Emoji",
-        "allSvg": "全 SVG",
-        "barSvg": "导航 SVG + 内文 Emoji"
+        "allEmoji": "全部彩色图标",
+        "allSvg": "全部单色图标",
+        "barSvg": "导航单色 · 内文彩色"
       }
     },
     "updateNotice": {

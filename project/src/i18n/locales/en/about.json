@@ -344,11 +344,11 @@
     },
     "iconMode": {
       "title": "Icon Style",
-      "description": "Choose how navigation and inline icons are rendered.",
+      "description": "Choose icon appearance for navigation and page content.",
       "options": {
-        "allEmoji": "All Emoji",
-        "allSvg": "All SVG",
-        "barSvg": "Nav SVG + Inline Emoji"
+        "allEmoji": "All Color Icons",
+        "allSvg": "All Mono Icons",
+        "barSvg": "Nav Mono · Text Color"
       }
     },
     "updateNotice": {
