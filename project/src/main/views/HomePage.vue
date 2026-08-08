@@ -814,6 +814,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &-logo {
     width: clamp(220px, 40vw, 380px);
     height: auto;
+    margin-top: 2rem;
     margin-bottom: 0.6rem;
     filter: drop-shadow(0 4px 12px rgba(var(--color-primary-rgb), 0.15));
   }
@@ -835,7 +836,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   }
 
   &-subtitle {
-    margin-bottom: 2.5rem;
+    margin-bottom: 2rem;
     font-size: clamp(0.95rem, 2vw, 1.25rem);
     line-height: 1.5;
     font-weight: 500;
@@ -855,7 +856,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     align-items: center;
     justify-content: center;
     gap: 1.5rem;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
   }
 
   &-decoration {

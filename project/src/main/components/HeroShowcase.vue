@@ -278,12 +278,13 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+@use 'sass:math';
 $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
 $side-scale: 0.83;
 $side-rotate: 12deg;
-$side-translate: -42%;
-$active-width: 65%;
-$img-ratio: 16 / 10;
+$side-translate: -36%;
+$active-width: 70%;
+$img-ratio: math.div(16, 10);
 $duration: 450ms;
 
 .showcase {
@@ -299,7 +300,7 @@ $duration: 450ms;
 .showcase-viewport {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: math.div(16, 8);
   overflow: hidden;
   border-radius: var(--radius-lg);
   contain: layout style paint;
@@ -478,13 +479,13 @@ $duration: 450ms;
 }
 
 // Responsive: compact mode when screen is squarish or tall
-@media (max-aspect-ratio: 4/3) {
+@media (max-aspect-ratio: #{math.div(4, 3)}) {
   .showcase {
     max-width: 720px;
   }
 
   .showcase-viewport {
-    aspect-ratio: 16 / 10;
+    aspect-ratio: math.div(16, 10);
   }
 
   .showcase-item {
@@ -525,13 +526,13 @@ $duration: 450ms;
 }
 
 // Responsive: narrow portrait mode — single card, no 3D
-@media (max-aspect-ratio: 3/4) {
+@media (max-aspect-ratio: #{math.div(3, 4)}) {
   .showcase {
     max-width: 100%;
   }
 
   .showcase-viewport {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: math.div(4, 3);
   }
 
   .showcase-item {
