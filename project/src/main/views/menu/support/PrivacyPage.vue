@@ -171,6 +171,7 @@ $transition-base: 0.3s;
 }
 
 .content-section {
+  font-family: var(--font-serif);
   animation: fade-in 0.5s ease-in;
 }
 
