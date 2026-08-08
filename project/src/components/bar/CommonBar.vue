@@ -133,13 +133,18 @@
             @mouseleave="handleTabTooltipLeave"
             @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
-            <BarIcon :icon="t.icon" class="nav-icon" :weight="isActiveComputed(t.tab) ? 'fill' : 'bold'" :style="{ fontSize: ((t.mobileFontSize || t.fontSize) * 1.2) + 'rem' }" />
-            <span
-              class="label"
-              v-if="!t.hideLabelOnMobile && (!(t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) || isActiveComputed(t.tab))"
-            >{{ t.label }}</span>
-            <svg v-if="getTabChildren(t.tab)?.length" class="tab-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
-            <svg v-else-if="t.to && !t.to.startsWith('/villagesML')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <span class="tab-icon-label" :class="{ 'tab-icon-label--stack': !isActiveComputed(t.tab) && (t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) !== false }">
+              <span class="tab-icon-row">
+                <BarIcon :icon="t.icon" class="nav-icon" :weight="isActiveComputed(t.tab) ? 'fill' : 'bold'" :style="{ fontSize: ((t.mobileFontSize || t.fontSize) * 1.2) + 'rem' }" />
+                <svg v-if="getTabChildren(t.tab)?.length" class="tab-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
+                <svg v-else-if="t.to && !t.to.startsWith('/villagesML')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+              </span>
+              <span
+                class="label"
+                :class="{ 'label--tiny': !isActiveComputed(t.tab) && (t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) !== false }"
+                v-if="!t.hideLabelOnMobile"
+              >{{ t.label }}</span>
+            </span>
           </a>
         </RouterLink>
       </nav>
@@ -914,6 +919,22 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
       height: max(6dvh, 40px);
       border: 3px solid transparent;
 
+      .tab-icon-label {
+        display: flex;
+        align-items: center;
+        gap: 1px;
+        min-width: 0;
+      }
+
+      .tab-icon-label--stack {
+        flex-direction: column;
+      }
+
+      .tab-icon-row {
+        display: flex;
+        align-items: center;
+      }
+
       .nav-icon, .label {
         font-size: 0.9em;
       }
@@ -923,6 +944,15 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
         flex-shrink: 0;
         margin-left: 1px;
         opacity: 0.6;
+      }
+
+      .label--tiny {
+        font-size: 0.45em !important;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        line-height: 1;
       }
 
       &.active {

@@ -161,12 +161,17 @@
               @mouseleave="handleTabTooltipLeave"
               @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
           >
-            <BarIcon :icon="t.icon" class="nav-icon" :weight="isMenuTabActive(t.tab) ? 'fill' : 'bold'" />
-            <span
-              class="label"
-              v-if="!t.hideLabelOnMobile && (!(t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) || isMenuTabActive(t.tab))"
-            >{{ t.label }}</span>
-            <svg v-if="t.to?.path && !t.to.path.includes('/menu/')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <span class="tab-icon-label" :class="{ 'tab-icon-label--stack': !isMenuTabActive(t.tab) && (t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) !== false }">
+              <span class="tab-icon-row">
+                <BarIcon :icon="t.icon" class="nav-icon" :weight="isMenuTabActive(t.tab) ? 'fill' : 'bold'" />
+                <svg v-if="t.to?.path && !t.to.path.includes('/menu/')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+              </span>
+              <span
+                class="label"
+                :class="{ 'label--tiny': !isMenuTabActive(t.tab) && (t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) !== false }"
+                v-if="!t.hideLabelOnMobile"
+              >{{ t.label }}</span>
+            </span>
           </a>
         </RouterLink>
       </div>
@@ -739,8 +744,33 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
     border: 3px solid transparent;
     border-radius: 30px !important;
 
+    .tab-icon-label {
+      display: flex;
+      align-items: center;
+      gap: 1px;
+      min-width: 0;
+    }
+
+    .tab-icon-label--stack {
+      flex-direction: column;
+    }
+
+    .tab-icon-row {
+      display: flex;
+      align-items: center;
+    }
+
     .nav-icon, .label {
       font-size: 0.9em;
+    }
+
+    .label--tiny {
+      font-size: 0.45em !important;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      line-height: 1;
     }
 
     &.active {
