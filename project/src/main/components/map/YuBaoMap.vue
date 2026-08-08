@@ -1072,7 +1072,7 @@ watch(() => props.activeTab, () => {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   font-size: 13px;
   white-space: nowrap;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   transition: all 0.2s;
   border: 1px solid rgba(0, 0, 0, 0.1);

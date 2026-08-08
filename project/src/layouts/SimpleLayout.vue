@@ -58,15 +58,6 @@ watch(() => route.path, (newPath) => {
 <style scoped lang="scss">
 $portrait-ratio: 1;
 
-$system-font:
-  -apple-system,
-  BlinkMacSystemFont,
-  'Segoe UI',
-  Roboto,
-  Helvetica,
-  Arial,
-  sans-serif;
-
 /* 页面背景 */
 .simple-layout {
   min-height: 100dvh;
@@ -99,7 +90,7 @@ $system-font:
   justify-content: center;
   padding: 10px 6px;
   color: var(--text-deep);
-  font-family: $system-font;
+  font-family: var(--font-sans);
 }
 
 /* 页面切换动画 */

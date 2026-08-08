@@ -1597,15 +1597,6 @@ $text-dark: var(--text-dark);
 $text-muted: var(--text-tertiary);
 $transition-fast: 0.2s;
 $mobile-breakpoint: 768px;
-$system-font:
-  -apple-system,
-  BlinkMacSystemFont,
-  "SF Pro Text",
-  "Segoe UI",
-  Roboto,
-  Helvetica,
-  Arial,
-  sans-serif;
 
 /* ========================================
    UniversalTable 组件样式
@@ -1621,7 +1612,7 @@ $system-font:
   border: 1px solid var(--glass-40);
   box-shadow: var(--shadow-md);
   padding: 12px 4px;
-  font-family: $system-font;
+  font-family: var(--font-sans);
   color: var(--text-primary);
   @include flex-col;
   gap: 6px;

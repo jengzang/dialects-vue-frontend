@@ -1257,7 +1257,7 @@ onBeforeUnmount(() => {
   border-bottom: none;
 
   /* 使用字体权重和字间距提升高级感 */
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+  font-family: var(--font-sans);
 }
 
 .sidebar-title {

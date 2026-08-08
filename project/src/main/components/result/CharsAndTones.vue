@@ -953,12 +953,7 @@ $glass-blur: 8px;
 
 .loading-text {
   color: $text-gray;
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Helvetica Neue",
-    "Segoe UI",
-    sans-serif;
+  font-family: var(--font-sans);
   font-size: 16px;
 }
 

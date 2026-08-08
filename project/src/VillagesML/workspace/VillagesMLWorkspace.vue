@@ -522,7 +522,7 @@ const handleAdjustParams = (action) => {
   padding: 10px 6px;
   padding-top: calc(7dvh + 10px); /* CommonBar height + spacing */
   color: var(--text-deep);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   animation: fadeIn 0.3s ease;
 }
 

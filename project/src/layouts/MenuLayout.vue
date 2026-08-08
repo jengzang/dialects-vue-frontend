@@ -52,15 +52,6 @@ const keepAliveViewNames = [
 $fade-duration: 0.14s;
 $portrait-ratio: 1;
 
-$system-font:
-  -apple-system,
-  BlinkMacSystemFont,
-  'Segoe UI',
-  Roboto,
-  Helvetica,
-  Arial,
-  sans-serif;
-
 /* 页面背景 */
 .menu-bg {
   min-height: 100dvh;
@@ -88,7 +79,7 @@ $system-font:
   padding: 6dvh 12px 12px;
   overflow-x: hidden;
   color: var(--text-deep);
-  font-family: $system-font;
+  font-family: var(--font-sans);
 }
 
 /* 页面切换动画 */

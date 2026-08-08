@@ -410,12 +410,7 @@ $transition-fast: 0.2s;
 .timer-text {
   margin-bottom: 5px;
   color: $text-primary;
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    sans-serif;
+  font-family: var(--font-sans);
   font-size: 2em;
   font-weight: 200;
   font-variant-numeric: tabular-nums;

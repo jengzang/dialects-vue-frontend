@@ -265,7 +265,7 @@
   flex-direction: column;
   padding: 12px 12px;
   z-index: 90000;
-  font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", sans-serif;
+  font-family: var(--font-sans);
   transition: all 0.4s ease;
   opacity: 1;
   pointer-events: auto;

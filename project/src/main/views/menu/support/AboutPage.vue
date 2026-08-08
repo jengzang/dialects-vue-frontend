@@ -397,7 +397,7 @@ $ease-standard: 0.3s ease;@mixin glass-card(
 p {
   margin-bottom: 20px;
   color: $text-primary;
-  font-family: Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 16px;
   line-height: 1.6;
 
@@ -442,7 +442,7 @@ em {
   margin: 0 auto;
   padding: 2rem 1rem;
   text-align: center;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-sans);
   color: var(--text-primary);
 }
 
@@ -783,13 +783,7 @@ em {
   margin: 0 auto;
   justify-content: center;
   color: var(--text-deep);
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-sans);
   text-align: center;
 
   p {
