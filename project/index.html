@@ -11,6 +11,48 @@
         <link rel="preload" as="image" href="/src/assets/picture/title.png">
         <link rel="dns-prefetch" href="https://dialects.yzup.top">
         <link rel="preconnect" href="https://dialects.yzup.top" crossorigin>
+        <script>
+            (function() {
+                var p = location.pathname;
+                var m = p.match(/^\/(zh-CN|zh-Hant|en)(\/|$)/);
+                var loc = m ? m[1] : 'zh-Hant';
+                var page = p.replace(/^\/(zh-CN|zh-Hant|en)/, '').replace(/\/+$/, '') || '/';
+                var base = 'https://dialects.yzup.top';
+
+                document.documentElement.lang = loc;
+
+                var c = document.createElement('link');
+                c.rel = 'canonical';
+                c.href = base + '/' + loc + (page === '/' ? '' : page);
+                document.head.appendChild(c);
+
+                ['zh-Hant', 'zh-CN', 'en'].forEach(function(l) {
+                    var a = document.createElement('link');
+                    a.rel = 'alternate';
+                    a.hreflang = l;
+                    a.href = base + '/' + l + (page === '/' ? '' : page);
+                    document.head.appendChild(a);
+                });
+                var x = document.createElement('link');
+                x.rel = 'alternate';
+                x.hreflang = 'x-default';
+                x.href = base + '/zh-Hant' + (page === '/' ? '' : page);
+                document.head.appendChild(x);
+
+                var titles = { 'zh-Hant': '方音圖鑑｜方言比較 · 地理語言學', 'zh-CN': '方音图鉴｜方言比较 · 地理语言学', 'en': 'Dialects Atlas | Dialect Comparison · Geolinguistics' };
+                if (titles[loc]) document.title = titles[loc];
+
+                var oldDm = document.querySelector('meta[name="description"]');
+                if (oldDm) oldDm.remove();
+                var descs = { 'zh-Hant': '方音圖鑑是一個專注於方言比較與地理語言學的線上平台，提供查字、查中古、查音位、查調、音系分析、方言比較、地圖可視化與自然村資料等功能。', 'zh-CN': '方音图鉴是一个专注于方言比较与地理语言学的在线平台，提供查字、查中古、查音位、查调、音系分析、方言比较、地图可视化与自然村资料等功能。', 'en': 'Dialects Atlas is an online platform focused on dialect comparison and geolinguistics, offering character lookup, Middle Chinese query, phoneme analysis, tone query, phonology analysis, dialect comparison, map visualization, and village datasets.' };
+                if (descs[loc]) {
+                    var dm = document.createElement('meta');
+                    dm.name = 'description';
+                    dm.content = descs[loc];
+                    document.head.appendChild(dm);
+                }
+            })();
+        </script>
         <script type="application/ld+json">
             {
                 "@context": "https://schema.org",
@@ -156,46 +198,9 @@
             var p = location.pathname;
             var m = p.match(/^\/(zh-CN|zh-Hant|en)(\/|$)/);
             var loc = m ? m[1] : 'zh-Hant';
-            var page = p.replace(/^\/(zh-CN|zh-Hant|en)/, '').replace(/\/+$/, '') || '/';
-            var base = 'https://dialects.yzup.top';
 
-            // --- <head> ---
-            document.documentElement.lang = loc;
-
-            var c = document.createElement('link');
-            c.rel = 'canonical';
-            c.href = base + '/' + loc + (page === '/' ? '' : page);
-            document.head.appendChild(c);
-
-            ['zh-Hant', 'zh-CN', 'en'].forEach(function(l) {
-                var a = document.createElement('link');
-                a.rel = 'alternate';
-                a.hreflang = l;
-                a.href = base + '/' + l + (page === '/' ? '' : page);
-                document.head.appendChild(a);
-            });
-            var x = document.createElement('link');
-            x.rel = 'alternate';
-            x.hreflang = 'x-default';
-            x.href = base + '/zh-Hant' + (page === '/' ? '' : page);
-            document.head.appendChild(x);
-
-            var titles = { 'zh-Hant': '方音圖鑑｜方言比較 · 地理語言學', 'zh-CN': '方音图鉴｜方言比较 · 地理语言学', 'en': 'Dialects Atlas | Dialect Comparison · Geolinguistics' };
-            if (titles[loc]) document.title = titles[loc];
-
-            var oldDm = document.querySelector('meta[name="description"]');
-            if (oldDm) oldDm.remove();
-            var descs = { 'zh-Hant': '方音圖鑑是一個專注於方言比較與地理語言學的線上平台，提供查字、查中古、查音位、查調、音系分析、方言比較、地圖可視化與自然村資料等功能。', 'zh-CN': '方音图鉴是一个专注于方言比较与地理语言学的在线平台，提供查字、查中古、查音位、查调、音系分析、方言比较、地图可视化与自然村资料等功能。', 'en': 'Dialects Atlas is an online platform focused on dialect comparison and geolinguistics, offering character lookup, Middle Chinese query, phoneme analysis, tone query, phonology analysis, dialect comparison, map visualization, and village datasets.' };
-            if (descs[loc]) {
-                var dm = document.createElement('meta');
-                dm.name = 'description';
-                dm.content = descs[loc];
-                document.head.appendChild(dm);
-            }
-
-            // --- <body> ---
-            var h1Texts = { 'zh-Hant': '方音圖鑑', 'zh-CN': '方音图鉴', 'en': 'Dialects Atlas' };
             var h1 = document.querySelector('.app-boot-title');
+            var h1Texts = { 'zh-Hant': '方音圖鑑', 'zh-CN': '方音图鉴', 'en': 'Dialects Atlas' };
             if (h1 && h1Texts[loc]) h1.textContent = h1Texts[loc];
 
             var bd = document.querySelector('.app-boot-desc');
@@ -221,10 +226,6 @@
                     if (linkTexts[loc] && linkTexts[loc][i]) links[i].textContent = linkTexts[loc][i];
                 }
             }
-
-            var np = document.querySelector('noscript p');
-            var noscriptTexts = { 'zh-Hant': '本網站需要 JavaScript 才能使用完整的方言查詢、比較、地圖和聲學分析功能。你仍可通過上方鏈接瀏覽主要工具入口。', 'zh-CN': '本网站需要 JavaScript 才能使用完整的方言查询、比较、地图和声学分析功能。你仍可通过上方链接浏览主要工具入口。', 'en': 'JavaScript is required for the full dialect query, comparison, map, and acoustic analysis features. You can still browse the main tool entries via the links above.' };
-            if (np && noscriptTexts[loc]) np.textContent = noscriptTexts[loc];
         })();
     </script>
     <script type="module" src="./src/main/main.js"></script>
