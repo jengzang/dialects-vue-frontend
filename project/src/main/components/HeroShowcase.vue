@@ -283,7 +283,7 @@ $side-scale: 0.83;
 $side-rotate: 12deg;
 $side-translate: -48%;
 $active-width: 70%;
-$img-ratio: 16 / 9;
+$img-ratio: 4 / 3;
 $duration: 450ms;
 
 .showcase {
