@@ -16,6 +16,7 @@
     <!-- 悬浮按钮组 -->
     <FloatingButtons
       :auth-button-position="authButtonPosition"
+      :float-buttons-position="floatButtonsPosition"
       :show-home-button="false"
       @toggle-sidebar="isSidebarOpen = !isSidebarOpen"
     />
@@ -42,14 +43,17 @@ import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 const route = useRoute();
 const isSidebarOpen = ref(false);
 const authButtonPosition = ref('top-right');
+const floatButtonsPosition = ref('bottom-right');
 const showTutorialGuide = computed(() => route.path.endsWith('/explore/tools/praat'))
 
-// 根据路由自动设置 auth-button 位置
+// 根据路由自动设置浮动按钮位置
 watch(() => route.path, (newPath) => {
   if (newPath === '/villagesML' || newPath.startsWith('/villagesML/')) {
     authButtonPosition.value = 'bottom-left';
+    floatButtonsPosition.value = 'bottom-right';
   } else {
     authButtonPosition.value = 'top-right';
+    floatButtonsPosition.value = 'top-left';
   }
 }, { immediate: true });
 </script>

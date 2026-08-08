@@ -21,7 +21,7 @@
   </div>
 
   <!-- 右下角功能按钮组 -->
-  <div class="floating-buttons">
+  <div class="floating-buttons" :class="`position-${floatButtonsPosition}`">
     <!-- 返回首页按钮 -->
     <button
       class="float-btn menu-btn"
@@ -71,6 +71,12 @@ const props = defineProps({
   showHomeButton: {
     type: Boolean,
     default: true
+  },
+  // 浮动按钮组位置: 'bottom-right' | 'top-left'
+  floatButtonsPosition: {
+    type: String,
+    default: 'bottom-right',
+    validator: (value) => ['bottom-right', 'top-left'].includes(value)
   }
 });
 
@@ -209,15 +215,27 @@ $transition-base: 0.3s ease;
 /* 右下角功能按钮组 */
 .floating-buttons {
   position: fixed;
-  right: 30px;
-  bottom: 30px;
+  right: $desktop-offset;
+  bottom: $desktop-offset;
   z-index: 998;
   @include flex-col;
   gap: 12px;
 
+  &.position-top-left {
+    right: auto;
+    left: $desktop-offset;
+    bottom: auto;
+    top: $desktop-offset;
+
+    @media (max-aspect-ratio: 1/1) {
+      left: $mobile-offset;
+      top: $mobile-offset;
+    }
+  }
+
   @media (max-aspect-ratio: 1/1) {
-    right: 20px;
-    bottom: 20px;
+    right: $mobile-offset;
+    bottom: $mobile-offset;
     gap: 10px;
   }
 }
