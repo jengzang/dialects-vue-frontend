@@ -63,13 +63,6 @@ const route = useRoute()
 
 const showcaseItems = [
   {
-    id: 'yinxi',
-    titleKey: 'home.showcase.yinxi.title',
-    image: '/showcase/yinxi.webp',
-    route: '/menu/pho/matrix',
-    actionLabelKey: 'home.showcase.yinxi.action'
-  },
-  {
     id: 'zhonggu',
     titleKey: 'home.showcase.zhonggu.title',
     image: '/showcase/zhonggu.webp',
@@ -84,13 +77,6 @@ const showcaseItems = [
     actionLabelKey: 'home.showcase.result.action'
   },
   {
-    id: 'villages',
-    titleKey: 'home.showcase.villages.title',
-    image: '/showcase/villages.webp',
-    route: '/explore/villages/gd',
-    actionLabelKey: 'home.showcase.villages.action'
-  },
-  {
     id: 'compare',
     titleKey: 'home.showcase.compare.title',
     image: '/showcase/compare.webp',
@@ -98,11 +84,18 @@ const showcaseItems = [
     actionLabelKey: 'home.showcase.compare.action'
   },
   {
-    id: 'gis',
-    titleKey: 'home.showcase.gis.title',
-    image: '/showcase/gis.webp',
-    route: '/explore/gis',
-    actionLabelKey: 'home.showcase.gis.action'
+    id: 'phocompare',
+    titleKey: 'home.showcase.phocompare.title',
+    image: '/showcase/phocompare.webp',
+    route: '/menu/compare/phonetic',
+    actionLabelKey: 'home.showcase.phocompare.action'
+  },
+  {
+    id: 'yinxi',
+    titleKey: 'home.showcase.yinxi.title',
+    image: '/showcase/yinxi.webp',
+    route: '/menu/pho/matrix',
+    actionLabelKey: 'home.showcase.yinxi.action'
   },
   {
     id: 'evolution',
@@ -112,11 +105,18 @@ const showcaseItems = [
     actionLabelKey: 'home.showcase.evolution.action'
   },
   {
-    id: 'phocompare',
-    titleKey: 'home.showcase.phocompare.title',
-    image: '/showcase/phocompare.webp',
-    route: '/menu/compare/phonetic',
-    actionLabelKey: 'home.showcase.phocompare.action'
+    id: 'villages',
+    titleKey: 'home.showcase.villages.title',
+    image: '/showcase/villages.webp',
+    route: '/explore/villages/gd',
+    actionLabelKey: 'home.showcase.villages.action'
+  },
+  {
+    id: 'gis',
+    titleKey: 'home.showcase.gis.title',
+    image: '/showcase/gis.webp',
+    route: '/explore/gis',
+    actionLabelKey: 'home.showcase.gis.action'
   }
 ]
 

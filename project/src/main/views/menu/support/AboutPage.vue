@@ -441,6 +441,7 @@ em {
   padding: 2rem 1rem;
   text-align: center;
   font-family: var(--font-serif);
+  font-weight: 500;
   color: var(--text-primary);
 }
 
