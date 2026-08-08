@@ -627,6 +627,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   z-index: 1;
   display: flex;
   align-items: center;
+  min-width: 0;
   gap: 1px;
   --tab-pad: clamp(3px, 1.2vw, 14px);
   height: calc(100% - clamp(3px, 1dvh, 6px));
