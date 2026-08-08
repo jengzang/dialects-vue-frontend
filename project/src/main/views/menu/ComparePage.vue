@@ -2264,11 +2264,11 @@ $text-muted: var(--text-lightest);
 /* Tab5 音值比较 */
 .tab5 {
   &-page {
-    width: 93dvw;
     max-width: none;
     max-height: none;
     flex-direction: column;
     align-items: center;
+    overflow-x: auto;
   }
 
   &-location-group {
@@ -2430,10 +2430,6 @@ $text-muted: var(--text-lightest);
   }
 
   .tab5 {
-    &-page {
-      width: 86dvw !important;
-    }
-
     &-location-group {
       max-width: 520px;
     }
