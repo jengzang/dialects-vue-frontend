@@ -3,8 +3,9 @@ import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
-import { getFeatureCounts } from '@/api'
+import { getFeatureCounts, getLocationDetail } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
+import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue'
 import LocationMultiInput from '@/main/components/geo/LocationMultiInput.vue'
 import CountLocationJumpNav from '@/main/components/pho/CountLocationJumpNav.vue'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
@@ -850,6 +851,32 @@ const openLocationModal = async (syllable, featureType, stats) => {
   modalLoading.value = false
 }
 
+// 地点详情弹窗
+const locationPopup = ref({
+  visible: false,
+  locationName: '',
+  data: null,
+  loading: false
+})
+
+const handleLocationClick = async (locationName) => {
+  if (!locationName) return
+
+  locationPopup.value.visible = true
+  locationPopup.value.locationName = locationName
+  locationPopup.value.loading = true
+  locationPopup.value.data = null
+
+  try {
+    const response = await getLocationDetail(locationName)
+    locationPopup.value.data = response
+  } catch (error) {
+    console.error('查询地名数据失败:', error)
+  } finally {
+    locationPopup.value.loading = false
+  }
+}
+
 // 关闭弹窗
 const closeLocationModal = () => {
   modalOpenToken += 1
@@ -1043,7 +1070,7 @@ onBeforeUnmount(() => {
           :id="getLocationAnchorId(locationName)"
           class="location-detail"
         >
-          <h4 class="location-name">{{ locationName }}</h4>
+          <h4 class="location-name" @click.stop="handleLocationClick(locationName)">{{ locationName }}</h4>
 
           <div
             v-for="(features, featureType) in locationData"
@@ -1070,6 +1097,14 @@ onBeforeUnmount(() => {
       <p>{{ $t('phonology.phonology.countphos.states.emptyInput') }}</p>
       <p>{{ $t('phonology.phonology.countphos.states.hint') }}</p>
     </div>
+
+    <LocationDetailPopup
+      :visible="locationPopup.visible"
+      :location-name="locationPopup.locationName"
+      :data="locationPopup.data"
+      :loading="locationPopup.loading"
+      @close="locationPopup.visible = false"
+    />
 
     <CountLocationJumpNav
       v-if="isCurrentCountRoute && hasResultData && locationNavItems.length > 0"
@@ -1526,6 +1561,19 @@ $mobile-breakpoint: 768px;
     color: var(--color-primary);
     font-size: 18px;
     font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+
+    &::after {
+      content: '\00A0🔍';
+      font-size: 0.7em;
+    }
+
+    &:hover {
+      color: var(--color-primary-hover);
+      text-decoration: underline;
+    }
   }
 
   .feature-group {
