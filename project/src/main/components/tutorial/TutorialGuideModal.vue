@@ -861,6 +861,7 @@ $float-catalog-button-left:0;
   }
 
   &__content {
+    font-family: var(--font-serif);
     color: var(--text-primary);
     line-height: 1.72;
 
