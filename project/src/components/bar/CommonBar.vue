@@ -713,14 +713,25 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
   &.active {
     position: relative;
-    z-index: 1;
     color: $active-blue;
     font-weight: 1000;
     font-size: 1.1em;
+    background: linear-gradient(
+      145deg,
+      var(--glass-20),
+      var(--glass-10)
+    );
     border: 3px solid var(--glass-40);
     border-radius: 25px;
+    box-shadow:
+      0 6px 10px rgba(0, 0, 0, 0.1),
+      0 1px 4px rgba(0, 0, 0, 0.08);
     transition:
+      background $transition-base ease,
       color $transition-base ease,
+      border-color $transition-base ease,
+      border-radius $transition-base ease,
+      box-shadow $transition-base ease,
       font-size $transition-base ease;
 
     &::after {
@@ -750,8 +761,8 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 .tab-pill {
   position: absolute;
   z-index: 0;
+  left: 0;
   top: 50%;
-  transform: translateY(-50%);
   pointer-events: none;
   background: linear-gradient(
     145deg,
@@ -763,8 +774,9 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     0 6px 10px rgba(0, 0, 0, 0.1),
     0 1px 4px rgba(0, 0, 0, 0.08);
   transition:
-    left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
-    width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform 0.7s cubic-bezier(0.34, 1.8, 0.64, 1),
+    width 0.7s cubic-bezier(0.34, 1.8, 0.64, 1),
+    opacity 0.15s ease;
 
   &--mobile {
     border-radius: 30px;
@@ -916,8 +928,16 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
         z-index: 1;
         color: $active-blue;
         font-weight: 1000;
+        background: linear-gradient(
+          145deg,
+          var(--glass-20),
+          var(--glass-10)
+        );
         border: 3px solid var(--glass-40);
         border-radius: 30px;
+        box-shadow:
+          0 6px 10px rgba(0, 0, 0, 0.1),
+          0 1px 4px rgba(0, 0, 0, 0.08);
 
         .nav-icon, .label {
           font-size: 1.1em;

@@ -408,8 +408,8 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
 .tab-pill {
   position: absolute;
   z-index: 0;
+  left: 0;
   top: 50%;
-  transform: translateY(-50%);
   pointer-events: none;
   background: linear-gradient(
     145deg,
@@ -421,8 +421,9 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
     0 6px 10px rgba(0, 0, 0, 0.1),
     0 1px 4px rgba(0, 0, 0, 0.08);
   transition:
-    left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
-    width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform 0.7s cubic-bezier(0.34, 1.8, 0.64, 1),
+    width 0.7s cubic-bezier(0.34, 1.8, 0.64, 1),
+    opacity 0.15s ease;
 
   &--mobile {
     border-radius: 30px;
@@ -548,20 +549,26 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
     white-space: nowrap;
   }
 
-  .menu-item:hover &:not(.active) {
+  .menu-item:hover & {
     background: rgba(var(--color-primary-rgb), 0.12);
   }
 
   &.active {
     position: relative;
-    z-index: 1;
+    @include soft-glass-background;
+    @include soft-glass-shadow;
+
+    border: 3px solid var(--glass-40);
+    border-radius: 25px;
     color: var(--color-primary-hover);
     font-weight: 1000;
     font-size: 1.1em;
-    border: 3px solid var(--glass-40);
-    border-radius: 25px;
     transition:
+      background 0.3s ease,
       color 0.3s ease,
+      border-color 0.3s ease,
+      border-radius 0.3s ease,
+      box-shadow 0.3s ease,
       font-size 0.3s ease;
 
     &::after {
@@ -737,10 +744,13 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
     &.active {
       position: relative;
       z-index: 1;
-      color: var(--color-primary-hover);
-      font-weight: 1000;
+      @include soft-glass-background;
+      @include soft-glass-shadow;
+
       border: 3px solid var(--glass-40);
       border-radius: 30px;
+      color: var(--color-primary-hover);
+      font-weight: 1000;
 
       .nav-icon, .label {
         font-size: 1.1em;
