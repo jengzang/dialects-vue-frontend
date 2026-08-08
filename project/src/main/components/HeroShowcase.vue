@@ -61,17 +61,25 @@
       <div
         v-if="previewImage"
         class="showcase-preview-overlay"
-        @click="previewImage = null"
-        @keydown.escape="previewImage = null"
+        @click="closePreview"
+        @keydown.escape="closePreview"
       >
-        <button class="showcase-preview-close" @click="previewImage = null" :aria-label="t('common.button.close')">
+        <button class="close-btn showcase-preview-close" @click="closePreview" :aria-label="t('common.button.close')">
           ×
         </button>
         <img
           :src="previewImage"
           :alt="t(activeItem.titleKey)"
           class="showcase-preview-img"
+          :class="{ 'is-zoomed': previewZoom > 1, 'is-dragging': isPreviewDragging }"
+          :style="previewStyle"
           @click.stop
+          @wheel.prevent="onPreviewWheel"
+          @dblclick.prevent="togglePreviewZoom"
+          @mousedown.prevent="onPreviewDragStart"
+          @touchstart.prevent="onPreviewTouchStart"
+          @touchmove.prevent="onPreviewTouchMove"
+          @touchend.prevent="onPreviewTouchEnd"
         />
       </div>
     </Teleport>
@@ -182,12 +190,100 @@ function navigateTo(path) {
 }
 
 const previewImage = ref(null)
+const previewZoom = ref(1)
+const previewPanX = ref(0)
+const previewPanY = ref(0)
+
+const isPreviewDragging = ref(false)
+
+const previewStyle = computed(() => {
+  const transform = `scale(${previewZoom.value}) translate(${previewPanX.value}px, ${previewPanY.value}px)`
+  const transition = isPreviewDragging.value ? 'none' : 'transform 0.2s ease'
+  const cursor = isPreviewDragging.value ? 'grabbing' : previewZoom.value > 1 ? 'grab' : 'zoom-in'
+  return { transform, transition, cursor }
+})
+
+function openPreview(src) {
+  previewImage.value = src
+  previewZoom.value = 1
+  previewPanX.value = 0
+  previewPanY.value = 0
+}
+
+function closePreview() {
+  previewImage.value = null
+}
+
+function togglePreviewZoom() {
+  previewZoom.value = previewZoom.value > 1 ? 1 : 2
+  if (previewZoom.value === 1) {
+    previewPanX.value = 0
+    previewPanY.value = 0
+  }
+}
+
+function onPreviewWheel(e) {
+  const delta = e.deltaY > 0 ? -0.12 : 0.12
+  previewZoom.value = Math.max(0.5, Math.min(4, previewZoom.value + delta))
+  if (previewZoom.value <= 1) {
+    previewPanX.value = 0
+    previewPanY.value = 0
+  }
+}
+
+let previewDragStartX = 0
+let previewDragStartY = 0
+let previewPanStartX = 0
+let previewPanStartY = 0
+
+function onPreviewDragStart(e) {
+  if (previewZoom.value <= 1) return
+  isPreviewDragging.value = true
+  previewDragStartX = e.clientX
+  previewDragStartY = e.clientY
+  previewPanStartX = previewPanX.value
+  previewPanStartY = previewPanY.value
+  document.addEventListener('mousemove', onPreviewDragMove)
+  document.addEventListener('mouseup', onPreviewDragEnd)
+}
+
+function onPreviewDragMove(e) {
+  if (!isPreviewDragging.value) return
+  previewPanX.value = previewPanStartX + (e.clientX - previewDragStartX) / previewZoom.value
+  previewPanY.value = previewPanStartY + (e.clientY - previewDragStartY) / previewZoom.value
+}
+
+function onPreviewDragEnd() {
+  isPreviewDragging.value = false
+  document.removeEventListener('mousemove', onPreviewDragMove)
+  document.removeEventListener('mouseup', onPreviewDragEnd)
+}
+
+function onPreviewTouchStart(e) {
+  if (previewZoom.value <= 1) return
+  if (e.touches.length !== 1) return
+  isPreviewDragging.value = true
+  previewDragStartX = e.touches[0].clientX
+  previewDragStartY = e.touches[0].clientY
+  previewPanStartX = previewPanX.value
+  previewPanStartY = previewPanY.value
+}
+
+function onPreviewTouchMove(e) {
+  if (!isPreviewDragging.value || e.touches.length !== 1) return
+  previewPanX.value = previewPanStartX + (e.touches[0].clientX - previewDragStartX) / previewZoom.value
+  previewPanY.value = previewPanStartY + (e.touches[0].clientY - previewDragStartY) / previewZoom.value
+}
+
+function onPreviewTouchEnd() {
+  isPreviewDragging.value = false
+}
 
 function handleItemClick(i) {
   const cls = slotClass(i)
   if (cls === 'is-prev') goToPrev()
   else if (cls === 'is-next') goToNext()
-  else if (cls === 'is-active') previewImage.value = items.value[i].image
+  else if (cls === 'is-active') openPreview(items.value[i].image)
 }
 
 function goToPrev() {
@@ -335,6 +431,8 @@ onBeforeUnmount(() => {
   document.removeEventListener('keydown', onKeydown)
   document.removeEventListener('mousemove', onDragMove)
   document.removeEventListener('mouseup', onDragEnd)
+  document.removeEventListener('mousemove', onPreviewDragMove)
+  document.removeEventListener('mouseup', onPreviewDragEnd)
 })
 </script>
 
@@ -344,7 +442,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
 $side-scale: 0.83;
 $side-rotate: 12deg;
 $side-translate: -36%;
-$active-width: 70%;
+$active-width: 66%;
 $img-ratio: math.div(16, 10);
 $duration: 450ms;
 
@@ -361,7 +459,7 @@ $duration: 450ms;
 .showcase-viewport {
   position: relative;
   width: 100%;
-  aspect-ratio: math.div(16, 8);
+  aspect-ratio: math.div(16, 7);
   overflow: hidden;
   border-radius: var(--radius-lg);
   contain: layout style paint;
@@ -709,21 +807,6 @@ $duration: 450ms;
   position: absolute;
   top: 20px;
   right: 24px;
-  z-index: 1;
-  width: 44px;
-  height: 44px;
-  border: none;
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
-  font-size: 28px;
-  line-height: 1;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  transition: background 0.2s;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.25);
-  }
 }
 
 .showcase-preview-img {
@@ -732,6 +815,13 @@ $duration: 450ms;
   object-fit: contain;
   border-radius: var(--radius-lg);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  transform-origin: center center;
+  user-select: none;
+  -webkit-user-select: none;
+
+  &.is-dragging {
+    will-change: transform;
+  }
 }
 
 @keyframes fadeIn {

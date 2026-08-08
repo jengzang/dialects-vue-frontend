@@ -135,7 +135,8 @@
       </div>
       <button class="page-btn" @click="changePage(1)" :disabled="currentPage >= totalPages">→</button>
       <button class="fullscreen-toggle-btn" @click="toggleFullscreen">
-        {{ isFullscreen ? t('tableTree.universalTable.toolbar.exit') : `<InlineIcon icon="⛶" /> ${t('tableTree.universalTable.toolbar.fullscreen')}` }}
+        <template v-if="isFullscreen">{{ t('tableTree.universalTable.toolbar.exit') }}</template>
+        <template v-else><InlineIcon icon="⛶" /> {{ t('tableTree.universalTable.toolbar.fullscreen') }}</template>
       </button>
     </div>
 
