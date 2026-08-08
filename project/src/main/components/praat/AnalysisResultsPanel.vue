@@ -948,6 +948,7 @@ $transition-normal: 0.3s;
     transform $transition-normal ease;
 
   &:hover {
+    background: var(--color-primary);
     opacity: 0.9;
     box-shadow: 0 6px 16px $blue-shadow-hover;
     transform: translateY(-2px);

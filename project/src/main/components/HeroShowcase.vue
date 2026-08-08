@@ -21,27 +21,28 @@
         @keydown.enter="handleItemClick(i)"
         @keydown.space.prevent="handleItemClick(i)"
       >
-        <div class="showcase-skeleton" :class="{ 'is-hidden': loadedImages.has(i) }">
-          <div class="skeleton-line skeleton-line-lg"></div>
-          <div class="skeleton-line skeleton-line-sm"></div>
-          <div class="skeleton-line skeleton-line-xs"></div>
+        <div class="showcase-img-wrap">
+          <div class="showcase-skeleton" :class="{ 'is-hidden': loadedImages.has(i) }">
+            <div class="skeleton-line skeleton-line-lg"></div>
+            <div class="skeleton-line skeleton-line-sm"></div>
+            <div class="skeleton-line skeleton-line-xs"></div>
+          </div>
+          <img
+            :src="item.image"
+            :alt="t(item.titleKey)"
+            loading="lazy"
+            decoding="async"
+            :class="{ 'is-loaded': loadedImages.has(i) }"
+            @load="onImgLoad($event, i)"
+          />
         </div>
-        <img
-          :src="item.image"
-          :alt="t(item.titleKey)"
-          loading="lazy"
-          decoding="async"
-          :class="{ 'is-loaded': loadedImages.has(i) }"
-          @load="onImgLoad($event, i)"
-        />
+        <div class="showcase-card-info">
+          <h3 class="showcase-card-title"><BarIcon :icon="item.icon" /> {{ t(item.titleKey) }}</h3>
+          <button class="showcase-card-cta" @click.stop="navigateTo(item.route)">
+            {{ t(item.actionLabelKey) }} <span class="cta-arrow">→</span>
+          </button>
+        </div>
       </div>
-    </div>
-
-    <div class="showcase-info">
-      <h3 class="showcase-title"><BarIcon :icon="activeItem.icon" /> {{ t(activeItem.titleKey) }}</h3>
-      <button class="showcase-cta" @click="navigateTo(activeItem.route)">
-        {{ t(activeItem.actionLabelKey) }} <span class="cta-arrow">→</span>
-      </button>
     </div>
 
     <div class="showcase-dots" role="tablist" :aria-label="t('home.showcase.nav')">
@@ -389,7 +390,7 @@ let dragMoved = false
 let dragHandled = false
 
 function onDragStart(e) {
-  if (e.target.closest('.showcase-cta, .showcase-dot')) return
+  if (e.target.closest('.showcase-card-cta, .showcase-dot')) return
   dragging = true
   dragMoved = false
   dragHandled = false
@@ -421,13 +422,13 @@ let touchStartX = 0
 let touchStartY = 0
 
 function onTouchStart(e) {
-  if (e.target.closest('.showcase-cta, .showcase-dot')) return
+  if (e.target.closest('.showcase-card-cta, .showcase-dot')) return
   touchStartX = e.touches[0].clientX
   touchStartY = e.touches[0].clientY
 }
 
 function onTouchMove(e) {
-  if (e.target.closest('.showcase-cta, .showcase-dot')) return
+  if (e.target.closest('.showcase-card-cta, .showcase-dot')) return
   const dx = e.touches[0].clientX - touchStartX
   const dy = e.touches[0].clientY - touchStartY
   // 横滑时阻止页面滚动
@@ -520,7 +521,7 @@ $duration: 450ms;
 .showcase-viewport {
   position: relative;
   width: 100%;
-  aspect-ratio: math.div(16, 6);
+  aspect-ratio: math.div(16, 7.5);
   overflow: hidden;
   border-radius: var(--radius-lg);
   contain: layout style paint;
@@ -540,8 +541,8 @@ $duration: 450ms;
   top: 50%;
   left: 50%;
   width: $active-width;
-  aspect-ratio: $img-ratio;
-  height: auto;
+  display: flex;
+  flex-direction: column;
   transform-origin: center center;
   transform-style: preserve-3d;
   backface-visibility: hidden;
@@ -549,23 +550,28 @@ $duration: 450ms;
     transform $duration $ease-apple,
     opacity $duration $ease-apple;
 
-  img {
+  .showcase-img-wrap {
     position: relative;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border: 1px solid rgba(var(--text-slate-light-rgb), 0.12);
-    border-radius: var(--radius-md);
-    box-shadow:
-      0 0 0 1px rgba(var(--text-slate-light-rgb), 0.04),
-      0 2px 8px rgba(0, 0, 0, 0.06),
-      0 8px 28px rgba(0, 0, 0, 0.07);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    z-index: 1;
+    aspect-ratio: $img-ratio;
 
-    &.is-loaded {
-      opacity: 1;
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border: 1px solid rgba(var(--text-slate-light-rgb), 0.12);
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
+      box-shadow:
+        0 0 0 1px rgba(var(--text-slate-light-rgb), 0.04),
+        0 2px 8px rgba(0, 0, 0, 0.06),
+        0 8px 28px rgba(0, 0, 0, 0.07);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+
+      &.is-loaded {
+        opacity: 1;
+      }
     }
   }
 
@@ -577,7 +583,6 @@ $duration: 450ms;
     flex-direction: column;
     justify-content: flex-end;
     padding: 12%;
-    border-radius: var(--radius-md);
 
     &.is-hidden {
       display: none;
@@ -689,23 +694,25 @@ $duration: 450ms;
   }
 }
 
-.showcase-info {
+.showcase-card-info {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.875rem 0.5rem 0.5rem;
-  max-width: $active-width;
-  margin: 0 auto;
+  padding: 0.65rem 0.9rem;
+  background: var(--glass-70);
+  border: 1px solid var(--glass-40);
+  border-top: 0;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
 }
 
-.showcase-title {
+.showcase-card-title {
   margin: 0;
-  font-size: 0.9375rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary);
 }
 
-.showcase-cta {
+.showcase-card-cta {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
@@ -713,7 +720,7 @@ $duration: 450ms;
   background: none;
   border: none;
   color: var(--color-primary);
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 500;
   cursor: pointer;
   transition: gap 0.2s ease;
@@ -771,7 +778,7 @@ $duration: 450ms;
   }
 
   .showcase-viewport {
-    aspect-ratio: math.div(16, 10);
+    aspect-ratio: math.div(16, 11);
   }
 
   .showcase-item {
@@ -806,9 +813,6 @@ $duration: 450ms;
     }
   }
 
-  .showcase-info {
-    max-width: 88%;
-  }
 }
 
 // Responsive: narrow portrait mode — single card, no 3D
@@ -818,7 +822,7 @@ $duration: 450ms;
   }
 
   .showcase-viewport {
-    aspect-ratio: math.div(4, 3);
+    aspect-ratio: math.div(4, 3.5);
   }
 
   .showcase-item {
@@ -841,12 +845,8 @@ $duration: 450ms;
     }
   }
 
-  .showcase-info {
-    max-width: 100%;
-  }
-
-  .showcase-title {
-    font-size: 0.875rem;
+  .showcase-card-title {
+    font-size: 0.9375rem;
   }
 }
 
