@@ -281,9 +281,9 @@ onBeforeUnmount(() => {
 $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
 $side-scale: 0.83;
 $side-rotate: 12deg;
-$side-translate: -48%;
-$active-width: 70%;
-$img-ratio: 4 / 3;
+$side-translate: -30%;
+$active-width: 92%;
+$img-ratio: 16 / 10;
 $duration: 450ms;
 
 .showcase {
@@ -299,7 +299,7 @@ $duration: 450ms;
 .showcase-viewport {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 16 / 10;
   overflow: hidden;
   border-radius: var(--radius-lg);
   contain: layout style paint;

@@ -9,22 +9,24 @@
         <img src="@/assets/picture/title.png" :alt="$t('home.hero.logoAlt')" class="hero-logo title-logo" />
         <div class="hero-title-row">
           <h1 class="hero-title">{{ $t('home.hero.title') }}</h1>
-          <img :src="heroDecorationSrc" :alt="$t('home.hero.decorationAlt')" class="hero-decoration" />
         </div>
         <p class="hero-subtitle">{{ $t('home.hero.subtitle') }}</p>
-        <div class="hero-actions">
-          <button class="btn-primary" @click="navigateTo('/menu/query/zhonggu')">
-            <span class="btn-icon"><InlineIcon icon="🚀" /></span>
-            <span class="btn-text">{{ $t('home.hero.startExploring') }}</span>
-          </button>
-          <!-- <button class="btn-primary btn-explore" @click="navigateTo('/explore?page=YuBao')">
-            <span class="btn-icon"><InlineIcon icon="🧰" /></span>
-            <span class="btn-text">{{ $t('home.hero.expandTools') }}</span>
-          </button> -->
-          <button class="btn-secondary" @click="scrollToFeatures">
-            <span class="btn-icon"><InlineIcon icon="📖" /></span>
-            <span class="btn-text">{{ $t('home.hero.featuresIntro') }}</span>
-          </button>
+        <div class="hero-bottom-row">
+          <div class="hero-actions">
+            <button class="btn-primary" @click="navigateTo('/menu/query/zhonggu')">
+              <span class="btn-icon"><InlineIcon icon="🚀" /></span>
+              <span class="btn-text">{{ $t('home.hero.startExploring') }}</span>
+            </button>
+            <!-- <button class="btn-primary btn-explore" @click="navigateTo('/explore?page=YuBao')">
+              <span class="btn-icon"><InlineIcon icon="🧰" /></span>
+              <span class="btn-text">{{ $t('home.hero.expandTools') }}</span>
+            </button> -->
+            <button class="btn-secondary" @click="scrollToFeatures">
+              <span class="btn-icon"><InlineIcon icon="📖" /></span>
+              <span class="btn-text">{{ $t('home.hero.featuresIntro') }}</span>
+            </button>
+          </div>
+          <img :src="heroDecorationSrc" :alt="$t('home.hero.decorationAlt')" class="hero-decoration" />
         </div>
       </div>
 
@@ -812,7 +814,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &-logo {
     width: clamp(220px, 40vw, 380px);
     height: auto;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.6rem;
     filter: drop-shadow(0 4px 12px rgba(var(--color-primary-rgb), 0.15));
   }
 
@@ -845,12 +847,20 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     justify-content: center;
     flex-wrap: wrap;
     gap: 1rem;
+    // margin-bottom: 2rem;
+  }
+
+  &-bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
     margin-bottom: 2rem;
   }
 
   &-decoration {
-    width: 50px;
-    height: 50px;
+    width: 72px;
+    height: 72px;
     opacity: 0.85;
     animation: float 6s ease-in-out infinite;
   }
@@ -884,10 +894,10 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.875rem 2rem;
+  padding: 1.05rem 2.5rem;
   border: none;
   border-radius: var(--radius-md);
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s $ease-apple;
