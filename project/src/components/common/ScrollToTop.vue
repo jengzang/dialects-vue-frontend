@@ -49,11 +49,15 @@ import { registerInstance, unregisterInstance, isTopOfStack } from './scrollToTo
 
 const { t } = useI18n()
 
-const uid = registerInstance()
-const isActive = computed(() => isTopOfStack(uid))
+const uid = ref(null)
+const isActive = computed(() => isTopOfStack(uid.value))
+
+onMounted(() => {
+  uid.value = registerInstance()
+})
 
 onBeforeUnmount(() => {
-  unregisterInstance(uid)
+  if (uid.value != null) unregisterInstance(uid.value)
 })
 
 const isPortrait = computed(() =>

@@ -15,6 +15,7 @@ export function unregisterInstance(uid) {
 }
 
 export function isTopOfStack(uid) {
+  if (uid == null) return false
   const stack = instanceStack.value
   return stack.length > 0 && stack[stack.length - 1] === uid
 }
