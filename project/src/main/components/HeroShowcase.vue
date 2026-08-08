@@ -56,6 +56,25 @@
         @click="goTo(i)"
       />
     </div>
+
+    <Teleport to="body">
+      <div
+        v-if="previewImage"
+        class="showcase-preview-overlay"
+        @click="previewImage = null"
+        @keydown.escape="previewImage = null"
+      >
+        <button class="showcase-preview-close" @click="previewImage = null" :aria-label="t('common.button.close')">
+          ×
+        </button>
+        <img
+          :src="previewImage"
+          :alt="t(activeItem.titleKey)"
+          class="showcase-preview-img"
+          @click.stop
+        />
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -162,10 +181,13 @@ function navigateTo(path) {
   })
 }
 
+const previewImage = ref(null)
+
 function handleItemClick(i) {
   const cls = slotClass(i)
   if (cls === 'is-prev') goToPrev()
   else if (cls === 'is-next') goToNext()
+  else if (cls === 'is-active') previewImage.value = items.value[i].image
 }
 
 function goToPrev() {
@@ -268,23 +290,21 @@ function onTouchEnd(e) {
 }
 
 // Scroll wheel
-let wheelAccum = 0
-let wheelTimer = null
-const WHEEL_THRESHOLD = 80
+let wheelCooldown = false
+const WHEEL_COOLDOWN = 600
 
 function onWheel(e) {
   if (!showcaseRef.value) return
   if (!showcaseRef.value.contains(e.target)) return
   if (Math.abs(e.deltaX) <= Math.abs(e.deltaY) && Math.abs(e.deltaX) < 5) return
+  if (wheelCooldown) return
 
-  wheelAccum += e.deltaX || e.deltaY
-  if (Math.abs(wheelAccum) >= WHEEL_THRESHOLD) {
-    if (wheelAccum > 0) goToNext()
-    else goToPrev()
-    wheelAccum = 0
-  }
-  clearTimeout(wheelTimer)
-  wheelTimer = setTimeout(() => { wheelAccum = 0 }, 300)
+  const delta = e.deltaX || e.deltaY
+  if (delta > 0) goToNext()
+  else goToPrev()
+
+  wheelCooldown = true
+  setTimeout(() => { wheelCooldown = false }, WHEEL_COOLDOWN)
   e.preventDefault()
 }
 
@@ -434,7 +454,7 @@ $duration: 450ms;
     transform: translate(-50%, -50%) translateX(0) scale(1) rotateY(0deg);
     opacity: 1;
     z-index: 3;
-    cursor: default;
+    cursor: zoom-in;
     pointer-events: auto;
 
     img {
@@ -670,5 +690,52 @@ $duration: 450ms;
   img {
     animation: none;
   }
+}
+
+.showcase-preview-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: fadeIn 0.2s ease;
+}
+
+.showcase-preview-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  z-index: 1;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 28px;
+  line-height: 1;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+}
+
+.showcase-preview-img {
+  max-width: 92vw;
+  max-height: 92vh;
+  object-fit: contain;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 </style>
