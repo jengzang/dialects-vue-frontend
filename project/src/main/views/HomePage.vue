@@ -5,31 +5,27 @@
 
     <!-- Hero Section -->
     <section class="hero-section">
-      <div class="hero-row">
-        <div class="hero-left">
-          <div class="hero-content">
-            <img src="@/assets/picture/title.png" :alt="$t('home.hero.logoAlt')" class="hero-logo title-logo" />
-            <div class="hero-title-row">
-              <h1 class="hero-title">{{ $t('home.hero.title') }}</h1>
-            </div>
-            <p class="hero-subtitle">{{ $t('home.hero.subtitle') }}</p>
-            <div class="hero-bottom-row">
-              <div class="hero-actions">
-                <button class="btn-primary" @click="navigateTo('/menu/query/zhonggu')">
-                  <span class="btn-icon"><InlineIcon icon="🚀" /></span>
-                  <span class="btn-text">{{ $t('home.hero.startExploring') }}</span>
-                </button>
-                <button class="btn-secondary" @click="scrollToFeatures">
-                  <span class="btn-icon"><InlineIcon icon="📖" /></span>
-                  <span class="btn-text">{{ $t('home.hero.featuresIntro') }}</span>
-                </button>
-              </div>
-              <img :src="heroDecorationSrc" :alt="$t('home.hero.decorationAlt')" class="hero-decoration" />
-            </div>
-          </div>
-        </div>
+      <GlobeBackground :points="globePoints" />
 
-        <GlobeBackground :points="globePoints" />
+      <div class="hero-content">
+        <img src="@/assets/picture/title.png" :alt="$t('home.hero.logoAlt')" class="hero-logo title-logo" />
+        <div class="hero-title-row">
+          <h1 class="hero-title">{{ $t('home.hero.title') }}</h1>
+        </div>
+        <p class="hero-subtitle">{{ $t('home.hero.subtitle') }}</p>
+        <div class="hero-bottom-row">
+          <div class="hero-actions">
+            <button class="btn-primary" @click="navigateTo('/menu/query/zhonggu')">
+              <span class="btn-icon"><InlineIcon icon="🚀" /></span>
+              <span class="btn-text">{{ $t('home.hero.startExploring') }}</span>
+            </button>
+            <button class="btn-secondary" @click="scrollToFeatures">
+              <span class="btn-icon"><InlineIcon icon="📖" /></span>
+              <span class="btn-text">{{ $t('home.hero.featuresIntro') }}</span>
+            </button>
+          </div>
+          <img :src="heroDecorationSrc" :alt="$t('home.hero.decorationAlt')" class="hero-decoration" />
+        </div>
       </div>
 
       <HeroShowcase />
@@ -821,45 +817,31 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &-section {
     position: relative;
     z-index: 1;
-    min-height: 85vh;
+    min-height: 100dvh;
     overflow: hidden;
 
     @include flex-col;
-    align-items: stretch;
-  }
-
-  &-row {
-    position: relative;
-    flex: 1;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-  }
-
-  &-left {
-    position: relative;
-    z-index: 1;
-    flex: 0 0 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    gap: 1rem;
     padding: 2rem 1.5rem;
   }
 
   &-content {
     position: relative;
     z-index: 1;
-    max-width: 540px;
-    text-align: center;
+    max-width: 520px;
+    margin-right: auto;
+    margin-left: 3rem;
+    text-align: left;
     animation: heroFadeIn 1s $ease-apple;
   }
 
   &-logo {
-    width: clamp(180px, 30vw, 340px);
+    width: clamp(220px, 40vw, 380px);
     height: auto;
-    margin-top: 1rem;
-    margin-bottom: 0.5rem;
+    margin-top: 2rem;
+    margin-bottom: 0.6rem;
     filter: drop-shadow(0 4px 12px rgba(var(--color-primary-rgb), 0.15));
   }
 
@@ -1796,19 +1778,11 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 @media (orientation: portrait) {
   .hero {
     &-section {
-      min-height: 75vh;
-    }
-
-    &-row {
-      flex-direction: row;
-    }
-
-    &-left {
-      flex: 0 0 50%;
+      min-height: 100dvh;
     }
 
     &-logo {
-      width: clamp(180px, 35vw, 300px);
+      width: clamp(180px, 50vw, 340px);
     }
 
     &-actions {

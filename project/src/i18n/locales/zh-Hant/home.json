@@ -274,8 +274,5 @@
     "weixinLabel": "微信",
     "alipayAlt": "支付寶收款碼",
     "alipayLabel": "支付寶"
-  },
-  "globe": {
-    "toggleTitle": "切換地球渲染模式"
   }
 }

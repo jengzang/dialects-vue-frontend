@@ -15,6 +15,7 @@ const props = defineProps({
 
 const containerRef = ref(null)
 let globe = null
+let resizeObserver = null
 
 function getPrimaryRgb() {
   return getComputedStyle(document.documentElement)
@@ -46,11 +47,27 @@ function render() {
   globe.controls().enableZoom = true
   globe.controls().enablePointerInteraction = true
 
-  globe.pointOfView({ lat: 35, lng: 105, altitude: 2.8 })
+  globe.pointOfView({ lat: 32, lng: 110, altitude: 2.6 })
 
+  if (globe.camera()) {
+    globe.camera().position.x += 0.35
+  }
   if (globe.renderer()) {
     globe.renderer().setClearColor(0x000000, 0)
+    globe.renderer().setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
   }
+  if (globe.scene()) {
+    globe.scene().background = null
+  }
+
+  resizeObserver = new ResizeObserver(() => {
+    if (containerRef.value && globe) {
+      const { width, height } = containerRef.value.getBoundingClientRect()
+      globe.width(width)
+      globe.height(height)
+    }
+  })
+  resizeObserver.observe(containerRef.value)
 }
 
 function updatePoints() {
@@ -59,6 +76,10 @@ function updatePoints() {
 }
 
 function destroy() {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+    resizeObserver = null
+  }
   if (globe) {
     if (globe.renderer()) {
       globe.renderer().dispose()
