@@ -446,7 +446,7 @@ const initChart = () => {
       minInterval: 1,
       // 【新增】标签格式化，强制去掉小数点
       axisLabel: {
-        formatter: (value) => value.toFixed(0)
+        formatter: (value) => value?.toFixed(0) ?? ''
       },
       max: (value) => {
         // 1. 先计算出带缓冲的最大值
@@ -474,7 +474,7 @@ const initChart = () => {
       minInterval: 1,
       // 【新增】
       axisLabel: {
-        formatter: (value) => value.toFixed(0)
+        formatter: (value) => value?.toFixed(0) ?? ''
       },
       max: (value) => {
         let val = value.max + 50;

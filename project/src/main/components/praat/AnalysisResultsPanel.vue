@@ -457,9 +457,9 @@ const initSpectrogramChart = () => {
   const option = {
     tooltip: {
       formatter: (params) => {
-        const t = time[params.data[0]].toFixed(3)
-        const f = frequency[params.data[1]].toFixed(0)
-        const e = params.data[2].toFixed(1)
+        const t = (time[params.data[0]] ?? 0).toFixed(3)
+        const f = (frequency[params.data[1]] ?? 0).toFixed(0)
+        const e = (params.data[2] ?? 0).toFixed(1)
         return t('praat.results.charts.spectrogram.tooltip', {
           time: t,
           freq: f,

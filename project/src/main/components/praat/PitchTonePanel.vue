@@ -911,10 +911,10 @@ const initElevenPointChart = () => {
       textStyle: { color: '#000', fontSize: 12 },
       formatter: (params) => {
         let result = t('praat.pitchTone.step3.chart.tooltipTimeElevenPoint', {
-          percent: params[0].value[0].toFixed(0)
+          percent: (params[0]?.value[0] ?? 0).toFixed(0)
         }) + '<br/>'
         params.forEach(param => {
-          result += `${param.seriesName}: ${param.value[1].toFixed(2)}<br/>`
+          result += `${param.seriesName}: ${(param.value[1] ?? 0).toFixed(2)}<br/>`
         })
         return result
       },
@@ -1002,10 +1002,10 @@ const initContinuousChart = (isZScore) => {
       trigger: 'axis',
       formatter: (params) => {
         let result = t('praat.pitchTone.step3.chart.tooltipTime', {
-          time: params[0].value[0].toFixed(1)
+          time: (params[0]?.value[0] ?? 0).toFixed(1)
         }) + '<br/>'
         params.forEach(param => {
-          result += `${param.seriesName}: ${param.value[1].toFixed(2)}<br/>`
+          result += `${param.seriesName}: ${(param.value[1] ?? 0).toFixed(2)}<br/>`
         })
         return result
       }

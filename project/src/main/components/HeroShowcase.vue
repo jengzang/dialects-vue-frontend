@@ -38,7 +38,7 @@
     </div>
 
     <div class="showcase-info">
-      <h3 class="showcase-title">{{ t(activeItem.titleKey) }}</h3>
+      <h3 class="showcase-title"><BarIcon :icon="activeItem.icon" /> {{ t(activeItem.titleKey) }}</h3>
       <button class="showcase-cta" @click="navigateTo(activeItem.route)">
         {{ t(activeItem.actionLabelKey) }} <span class="cta-arrow">→</span>
       </button>
@@ -94,6 +94,7 @@ import { ref, reactive, computed, onMounted, onBeforeUnmount, shallowRef } from 
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import BarIcon from '@/components/common/BarIcon.vue'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -102,6 +103,7 @@ const route = useRoute()
 const showcaseItems = [
   {
     id: 'zhonggu',
+    icon: '🔍',
     titleKey: 'home.showcase.zhonggu.title',
     image: '/showcase/zhonggu.webp',
     route: '/menu/query/zhonggu',
@@ -109,6 +111,7 @@ const showcaseItems = [
   },
   {
     id: 'result',
+    icon: '📉',
     titleKey: 'home.showcase.result.title',
     image: '/showcase/result.webp',
     route: '/menu/query/zhonggu',
@@ -116,6 +119,7 @@ const showcaseItems = [
   },
   {
     id: 'compare',
+    icon: '↔️',
     titleKey: 'home.showcase.compare.title',
     image: '/showcase/compare.webp',
     route: '/menu/compare/char',
@@ -123,6 +127,7 @@ const showcaseItems = [
   },
   {
     id: 'photiccompare',
+    icon: '🎵',
     titleKey: 'home.showcase.photiccompare.title',
     image: '/showcase/photiccompare.webp',
     route: '/menu/compare/phonetic',
@@ -130,6 +135,7 @@ const showcaseItems = [
   },
   {
     id: 'yinxi',
+    icon: '⚛️',
     titleKey: 'home.showcase.yinxi.title',
     image: '/showcase/yinxi.webp',
     route: '/menu/pho/matrix',
@@ -137,6 +143,7 @@ const showcaseItems = [
   },
   {
     id: 'evolution',
+    icon: '🥧',
     titleKey: 'home.showcase.evolution.title',
     image: '/showcase/evolution.webp',
     route: '/menu/pho/evolution',
@@ -144,6 +151,7 @@ const showcaseItems = [
   },
   {
     id: 'villages',
+    icon: '🏘️',
     titleKey: 'home.showcase.villages.title',
     image: '/showcase/villages.webp',
     route: '/explore/villages/gd',
@@ -151,10 +159,19 @@ const showcaseItems = [
   },
   {
     id: 'gis',
+    icon: '🗺️',
     titleKey: 'home.showcase.gis.title',
     image: '/showcase/gis.webp',
     route: '/explore/gis',
     actionLabelKey: 'home.showcase.gis.action'
+  },
+  {
+    id: 'praat',
+    icon: '🎙️',
+    titleKey: 'home.showcase.praat.title',
+    image: '/showcase/praat.webp',
+    route: '/explore/tools/praat',
+    actionLabelKey: 'home.showcase.praat.action'
   }
 ]
 
