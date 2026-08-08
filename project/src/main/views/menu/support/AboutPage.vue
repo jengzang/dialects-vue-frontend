@@ -397,7 +397,7 @@ $ease-standard: 0.3s ease;@mixin glass-card(
 p {
   margin-bottom: 20px;
   color: $text-primary;
-  font-family: var(--font-sans);
+  font-family: var(--font-serif);
   font-size: 16px;
   line-height: 1.6;
 
@@ -600,7 +600,7 @@ em {
   background: transparent;
   border-radius: var(--radius-sm2);
   color: $text-primary;
-  font-family: Georgia, serif;
+  font-family: var(--font-serif);
   font-size: 18px;
   line-height: 1.8;
   text-align: left;

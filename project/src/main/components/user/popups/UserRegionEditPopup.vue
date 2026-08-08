@@ -319,7 +319,6 @@ $transition-normal: 0.3s;
 }
 
 .location-input {
-  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
   line-height: 2;
   resize: vertical;
 }
