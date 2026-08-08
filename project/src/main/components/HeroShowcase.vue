@@ -7,6 +7,7 @@
     @touchstart="onTouchStart"
     @touchmove="onTouchMove"
     @touchend="onTouchEnd"
+    @wheel="onWheel"
     @mousedown="onDragStart"
   >
     <div class="showcase-viewport" :style="{ perspective: '1200px' }">
@@ -248,7 +249,13 @@ function onTouchStart(e) {
 }
 
 function onTouchMove(e) {
-  // Don't preventDefault here to avoid blocking vertical scroll
+  if (e.target.closest('.showcase-cta, .showcase-dot')) return
+  const dx = e.touches[0].clientX - touchStartX
+  const dy = e.touches[0].clientY - touchStartY
+  // 横滑时阻止页面滚动
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
+    e.preventDefault()
+  }
 }
 
 function onTouchEnd(e) {
@@ -258,6 +265,27 @@ function onTouchEnd(e) {
   if (Math.abs(dx) < 40) return
   if (dx < -40) goToNext()
   else if (dx > 40) goToPrev()
+}
+
+// Scroll wheel
+let wheelAccum = 0
+let wheelTimer = null
+const WHEEL_THRESHOLD = 80
+
+function onWheel(e) {
+  if (!showcaseRef.value) return
+  if (!showcaseRef.value.contains(e.target)) return
+  if (Math.abs(e.deltaX) <= Math.abs(e.deltaY) && Math.abs(e.deltaX) < 5) return
+
+  wheelAccum += e.deltaX || e.deltaY
+  if (Math.abs(wheelAccum) >= WHEEL_THRESHOLD) {
+    if (wheelAccum > 0) goToNext()
+    else goToPrev()
+    wheelAccum = 0
+  }
+  clearTimeout(wheelTimer)
+  wheelTimer = setTimeout(() => { wheelAccum = 0 }, 300)
+  e.preventDefault()
 }
 
 // Keyboard
