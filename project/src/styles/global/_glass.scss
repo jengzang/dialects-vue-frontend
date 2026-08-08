@@ -67,6 +67,7 @@
   align-items: center;
   padding: 10px 14px;
   background: var(--surface-panel);
+  backdrop-filter: blur(6px);
   border: 1px solid var(--border-glass-subtle);
   border-radius: var(--radius-md);
   font-size: 14px;
@@ -162,9 +163,11 @@
     0 0 0 0.5px var(--glass-10);
 }
 
-// Shared panel — static surface, no blur (was glass-panel)
+// Shared glass panel — used by both VillagesML and main app
 .glass-panel {
   background: var(--surface-panel);
+  backdrop-filter: blur(18px) saturate(145%);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
   border-radius: var(--radius-xl);
   border: 1px solid var(--border-glass);
   box-shadow: var(--shadow-glass);

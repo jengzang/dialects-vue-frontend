@@ -1605,7 +1605,9 @@ $mobile-breakpoint: 768px;
 
 .universal-table.glass-container {
   /* 使用全局变量替代局部变量 */
-  background: var(--surface-panel);
+  background: var(--glass-30);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-radius: var(--radius-xl);
   border: 1px solid var(--glass-40);
   box-shadow: var(--shadow-md);
@@ -1764,7 +1766,9 @@ thead {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: var(--surface-panel-strong);
+  background: var(--glass-90);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 th, td {

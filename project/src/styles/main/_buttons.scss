@@ -184,8 +184,10 @@
   @include flex-col;
   align-items: center;
   gap: 12px;
-  background: var(--surface-panel);
-  border: 2px solid var(--border-glass);
+  background: linear-gradient(145deg, var(--glass-30), var(--glass-20));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 2px solid var(--glass-40);
   border-radius: var(--radius-xl);
   box-shadow:
     0 6px 12px rgba(0, 0, 0, 0.08),
@@ -199,7 +201,7 @@
     border-color 0.3s ease;
 
   &:hover {
-    background: var(--surface-panel-hover);
+    background: linear-gradient(145deg, var(--glass-50), var(--glass-30));
     border-color: rgba(var(--color-primary-rgb), 0.3);
     box-shadow:
       0 12px 24px rgba(0, 0, 0, 0.15),

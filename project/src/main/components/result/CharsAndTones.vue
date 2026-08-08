@@ -543,10 +543,11 @@ onMounted(() => {
   overflow-x: auto;
   overflow-y: auto;
   font-size: 18px;
-  background: var(--surface-panel-subtle);
-  border: 2px solid var(--border-glass-subtle);
+  background: var(--glass-05);
+  border: 2px solid var(--glass-10);
   border-radius: var(--radius-md);
   box-shadow: 0 8px 24px var(--bg-hover);
+  backdrop-filter: blur(8px);
 
   @media (max-aspect-ratio: 1/1) {
     height: 60dvh;
@@ -841,10 +842,12 @@ $glass-blur: 8px;
     position: sticky;
     left: 0;
     z-index: 10;
-    background: var(--surface-panel-strong);
+    background: var(--glass-80);
     background-clip: padding-box;
     border-right: 1px solid rgba(0, 0, 0, 0.1);
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur($glass-blur);
+    -webkit-backdrop-filter: blur($glass-blur);
   }
 
   th:first-child {
