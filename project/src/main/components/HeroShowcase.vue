@@ -20,12 +20,18 @@
         @keydown.enter="handleItemClick(i)"
         @keydown.space.prevent="handleItemClick(i)"
       >
+        <div class="showcase-skeleton" :class="{ 'is-hidden': loadedImages.has(i) }">
+          <div class="skeleton-line skeleton-line-lg"></div>
+          <div class="skeleton-line skeleton-line-sm"></div>
+          <div class="skeleton-line skeleton-line-xs"></div>
+        </div>
         <img
           :src="item.image"
           :alt="t(item.titleKey)"
           loading="lazy"
           decoding="async"
-          @load="$event.target.classList.add('is-loaded')"
+          :class="{ 'is-loaded': loadedImages.has(i) }"
+          @load="onImgLoad($event, i)"
         />
       </div>
     </div>
@@ -53,7 +59,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, shallowRef } from 'vue'
+import { ref, reactive, computed, onMounted, onBeforeUnmount, shallowRef } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
@@ -263,6 +269,12 @@ function onKeydown(e) {
   if (e.key === 'ArrowRight') { e.preventDefault(); goToNext() }
 }
 
+const loadedImages = reactive(new Set())
+
+function onImgLoad(e, i) {
+  loadedImages.add(i)
+}
+
 onMounted(() => {
   if (!prefersReducedMotion) {
     autoTimer = setInterval(goToNext, AUTO_INTERVAL)
@@ -331,6 +343,7 @@ $duration: 450ms;
     opacity $duration $ease-apple;
 
   img {
+    position: relative;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -338,20 +351,54 @@ $duration: 450ms;
     box-shadow: var(--shadow-glass);
     opacity: 0;
     transition: opacity 0.4s ease;
-    background:
-      linear-gradient(
-        90deg,
-        rgba(255,255,255,0.04) 25%,
-        rgba(255,255,255,0.1) 50%,
-        rgba(255,255,255,0.04) 75%
-      );
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
+    z-index: 1;
 
     &.is-loaded {
       opacity: 1;
-      background: none;
-      animation: none;
+    }
+  }
+
+  .showcase-skeleton {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 12%;
+    border-radius: var(--radius-md);
+
+    &.is-hidden {
+      display: none;
+    }
+  }
+
+  .skeleton-line {
+    border-radius: var(--radius-pill);
+    background: linear-gradient(
+      90deg,
+      rgba(var(--text-slate-light-rgb), 0.15) 25%,
+      rgba(var(--text-slate-light-rgb), 0.35) 50%,
+      rgba(var(--text-slate-light-rgb), 0.15) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.2s linear infinite;
+
+    &-lg {
+      width: 62%;
+      height: 16px;
+      margin-bottom: 10px;
+    }
+
+    &-sm {
+      width: 42%;
+      height: 13px;
+      margin-bottom: 8px;
+    }
+
+    &-xs {
+      width: 28%;
+      height: 11px;
     }
   }
 
