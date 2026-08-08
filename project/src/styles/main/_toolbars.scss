@@ -140,7 +140,7 @@
   width: auto;
   max-width: min(300px, calc(100vw - 20px));
   z-index: 10001;
-  background: var(--glass-90) !important;
+  background: var(--surface-glass-floating-strong) !important;
   backdrop-filter: blur(10px) saturate(145%);
   -webkit-backdrop-filter: blur(10px) saturate(145%);
   border: 1px solid var(--glass-40);

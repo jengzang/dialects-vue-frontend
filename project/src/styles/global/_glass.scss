@@ -17,11 +17,7 @@
 }
 
 .global-dialog-surface {
-  background: linear-gradient(
-    145deg,
-    var(--glass-90),
-    var(--glass-90)
-  );
+  background: var(--surface-glass-floating-strong);
   backdrop-filter: blur(18px) saturate(145%);
   -webkit-backdrop-filter: blur(18px) saturate(145%);
   border-radius: var(--radius-xl);
@@ -40,6 +36,7 @@
   border-radius: 18px;
   font-size: 15px;
   font-weight: 500;
+  background: var(--surface-glass-floating);
   backdrop-filter: blur(16px) saturate(145%);
   -webkit-backdrop-filter: blur(16px) saturate(145%);
   box-shadow:
@@ -52,7 +49,7 @@
 }
 
 .global-floating-panel {
-  background: var(--glass-90);
+  background: var(--surface-glass-floating);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(var(--color-silver-rgb), 0.24);
@@ -72,7 +69,6 @@
   background: var(--surface-panel);
   border: 1px solid var(--border-glass-subtle);
   border-radius: var(--radius-md);
-  backdrop-filter: blur(6px);
   font-size: 14px;
   cursor: pointer;
   user-select: none;
@@ -143,11 +139,7 @@
   font-weight: 700;
   cursor: pointer;
   user-select: none;
-  background: linear-gradient(
-    145deg,
-    var(--glass-90),
-    var(--glass-80)
-  );
+  background: var(--surface-glass-floating);
   backdrop-filter: blur(10px) saturate(145%);
   -webkit-backdrop-filter: blur(10px) saturate(145%);
   border: 1px solid var(--glass-40);
@@ -159,11 +151,7 @@
 }
 
 .global-tooltip-surface {
-  background: linear-gradient(
-    145deg,
-    var(--glass-90),
-    var(--glass-90)
-  );
+  background: var(--surface-glass-floating-strong);
   backdrop-filter: blur(10px) saturate(145%);
   -webkit-backdrop-filter: blur(10px) saturate(145%);
   border: 1px solid var(--glass-40);
@@ -174,11 +162,9 @@
     0 0 0 0.5px var(--glass-10);
 }
 
-// Shared glass panel — used by both VillagesML and main app
+// Shared panel — static surface, no blur (was glass-panel)
 .glass-panel {
   background: var(--surface-panel);
-  backdrop-filter: blur(18px) saturate(145%);
-  -webkit-backdrop-filter: blur(18px) saturate(145%);
   border-radius: var(--radius-xl);
   border: 1px solid var(--border-glass);
   box-shadow: var(--shadow-glass);

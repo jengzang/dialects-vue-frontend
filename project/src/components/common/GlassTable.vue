@@ -133,8 +133,6 @@ function onSort(col) {
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-glass);
-  backdrop-filter: blur(18px) saturate(145%);
-  -webkit-backdrop-filter: blur(18px) saturate(145%);
 }
 
 .glass-table-scroll {
@@ -161,9 +159,7 @@ th {
   text-align: left;
   white-space: nowrap;
   user-select: none;
-  background: var(--glass-90);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: var(--surface-panel-strong);
   border-bottom: 1px solid var(--border-glass-subtle);
 }
 

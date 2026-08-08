@@ -1605,9 +1605,7 @@ $mobile-breakpoint: 768px;
 
 .universal-table.glass-container {
   /* 使用全局变量替代局部变量 */
-  background: var(--glass-30);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: var(--surface-panel);
   border-radius: var(--radius-xl);
   border: 1px solid var(--glass-40);
   box-shadow: var(--shadow-md);
@@ -1766,9 +1764,7 @@ thead {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: var(--glass-90);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: var(--surface-panel-strong);
 }
 
 th, td {
@@ -1909,7 +1905,7 @@ td {
 
 /* Filter Popup */
 .main-glass-panel[data-surface='filter-popup'] {
-  --main-glass-panel-background: var(--glass-30);
+  --main-glass-panel-background: var(--surface-glass-floating);
   --main-glass-panel-backdrop-filter: blur(25px);
   --main-glass-panel-border: 1px solid var(--glass-80);
   --main-glass-panel-shadow: var(--shadow-lg);

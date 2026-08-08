@@ -411,7 +411,6 @@ const getToneData = (data) => {
 $primary-blue: var(--color-primary);
 $text-dark: var(--text-dark);
 $text-muted: var(--text-tertiary);
-$glass-blur: 12px;
 $button-blur: 20px;
 $transition-duration: 0.25s;
 
@@ -421,15 +420,6 @@ $transition-duration: 0.25s;
   border: 1px solid var(--border-gray-lighter);
   transform: translateZ(0);
   isolation: isolate;
-
-  &::before {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    content: "";
-    backdrop-filter: blur($glass-blur);
-    -webkit-backdrop-filter: blur($glass-blur);
-  }
 }
 
 @mixin glass-button {
@@ -438,8 +428,6 @@ $transition-duration: 0.25s;
   font-weight: 500;
   cursor: pointer;
   border-radius: var(--radius-md);
-  backdrop-filter: blur($button-blur) saturate(180%);
-  -webkit-backdrop-filter: blur($button-blur) saturate(180%);
 }
 
 .phonology-matrix {
@@ -474,12 +462,10 @@ $transition-duration: 0.25s;
   margin-bottom: 15px;
   overflow-x: auto;
   overflow-y: auto;
-  background: var(--glass-60);
+  background: var(--surface-panel);
   border: 1px solid var(--border-gray-light);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md2);
-  backdrop-filter: blur($glass-blur);
-  -webkit-backdrop-filter: blur($glass-blur);
 
   /* GPU acceleration for smooth scrolling */
   will-change: transform;
@@ -725,15 +711,15 @@ $transition-duration: 0.25s;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  background: var(--glass-70);
-  border: 1px solid var(--glass-60);
+  background: var(--surface-glass-floating);
+  border: 1px solid var(--border-glass);
   border-radius: var(--radius-pill);
   backdrop-filter: blur($button-blur) saturate(180%);
   -webkit-backdrop-filter: blur($button-blur) saturate(180%);
   transition: all $transition-duration ease;
 
   &:hover {
-    background: var(--glass-90);
+    background: var(--surface-glass-floating-strong);
     transform: scale(1.04);
   }
 }

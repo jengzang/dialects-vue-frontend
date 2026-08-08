@@ -79,14 +79,24 @@
   --sidebar-shell-border: var(--glass-30);
   --sidebar-shell-shadow: inset 0 0 0.5px var(--glass-20), 0 10px 24px rgba(0, 0, 0, 0.16), 0 0 0 0.5px var(--glass-10);
 
-  /* 语义别名 — 默认蓝色主题映射旧 token，避免改变既有视觉 */
+  /* ── 静态表面层级（纯色，无玻璃）── */
+  --surface-elevation-0: #ffffff;           /* 最高层 — 卡片、面板 */
+  --surface-elevation-1: #f8f9fb;           /* 微下沉 — 内层面板、卡片 hover */
+  --surface-elevation-2: #f0f2f5;           /* 再下沉 — 次级容器 */
+
+  /* ── 浮动玻璃表面（保留 blur）── */
+  --surface-glass-floating: rgba(255, 255, 255, 0.78);         /* 一般浮层 */
+  --surface-glass-floating-strong: rgba(255, 255, 255, 0.92);  /* 弹窗、侧边栏 */
+  --surface-glass-floating-subtle: rgba(255, 255, 255, 0.62);  /* 半透明遮罩 */
+
+  /* 语义别名 — 静态表面改用实体色 token */
   --surface-page: var(--bg-body);
-  --surface-panel: var(--glass-60);
-  --surface-panel-hover: var(--glass-80);
-  --surface-panel-strong: var(--glass-90);
-  --surface-panel-subtle: var(--glass-30);
-  --surface-glass-button: var(--glass-50);
-  --surface-glass-button-hover: var(--glass-70);
+  --surface-panel: var(--surface-elevation-0);
+  --surface-panel-hover: var(--surface-elevation-1);
+  --surface-panel-strong: var(--surface-elevation-0);
+  --surface-panel-subtle: var(--surface-elevation-1);
+  --surface-glass-button: var(--surface-elevation-0);
+  --surface-glass-button-hover: var(--surface-elevation-1);
   --surface-selected: var(--bg-blue-light);
   --text-selected: var(--color-primary-hover);
   --border-glass: var(--glass-40);
@@ -300,13 +310,22 @@
   --sidebar-shell-background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(248, 251, 255, 0.86));
   --sidebar-shell-border: rgba(226, 232, 240, 0.68);
   --sidebar-shell-shadow: inset 0 0 0.5px rgba(255, 255, 255, 0.82), 0 14px 34px rgba(15, 23, 42, 0.07), 0 0 0 0.5px rgba(148, 163, 184, 0.12);
+  /* ── 静态表面层级 ── */
+  --surface-elevation-0: #ffffff;
+  --surface-elevation-1: #f8f9fb;
+  --surface-elevation-2: #f0f2f5;
+  /* ── 浮动玻璃表面 ── */
+  --surface-glass-floating: rgba(255, 255, 255, 0.80);
+  --surface-glass-floating-strong: rgba(255, 255, 255, 0.94);
+  --surface-glass-floating-subtle: rgba(255, 255, 255, 0.64);
+
   --surface-page: #fdfdfd;
-  --surface-panel: rgba(255, 255, 255, 0.88);
-  --surface-panel-hover: rgba(255, 255, 255, 0.94);
-  --surface-panel-strong: rgba(255, 255, 255, 0.98);
-  --surface-panel-subtle: rgba(255, 255, 255, 0.66);
-  --surface-glass-button: rgba(255, 255, 255, 0.78);
-  --surface-glass-button-hover: rgba(255, 255, 255, 0.92);
+  --surface-panel: var(--surface-elevation-0);
+  --surface-panel-hover: var(--surface-elevation-1);
+  --surface-panel-strong: var(--surface-elevation-0);
+  --surface-panel-subtle: var(--surface-elevation-1);
+  --surface-glass-button: var(--surface-elevation-0);
+  --surface-glass-button-hover: var(--surface-elevation-1);
   --surface-selected: #f5f8fc;
   --text-selected: #1d1d1f;
   --border-glass: rgba(226, 232, 240, 0.58);
@@ -415,6 +434,15 @@
   --color-primary-rgb: 56, 142, 60;
   --color-primary-hover-rgb: 27, 94, 32;
 
+  /* ── 静态表面层级 ── */
+  --surface-elevation-0: #dae5d6;
+  --surface-elevation-1: #cfdfca;
+  --surface-elevation-2: #bed2bb;
+  /* ── 浮动玻璃表面 ── */
+  --surface-glass-floating: rgba(235, 244, 230, 0.78);
+  --surface-glass-floating-strong: rgba(235, 244, 230, 0.92);
+  --surface-glass-floating-subtle: rgba(235, 244, 230, 0.62);
+
   --bg-body: #caddc5;
   --bg-white: #dae5d6;
   --bg-light-gray: #cfdfca;
@@ -466,12 +494,12 @@
   --glass-80: rgba(235, 244, 230, 0.88);
   --glass-90: rgba(235, 244, 230, 0.94);
 
-  --surface-panel: rgba(235, 244, 230, 0.88);
-  --surface-panel-hover: rgba(235, 244, 230, 0.94);
-  --surface-panel-strong: rgba(235, 244, 230, 0.98);
-  --surface-panel-subtle: rgba(235, 244, 230, 0.66);
-  --surface-glass-button: rgba(235, 244, 230, 0.78);
-  --surface-glass-button-hover: rgba(235, 244, 230, 0.92);
+  --surface-panel: var(--surface-elevation-0);
+  --surface-panel-hover: var(--surface-elevation-1);
+  --surface-panel-strong: var(--surface-elevation-0);
+  --surface-panel-subtle: var(--surface-elevation-1);
+  --surface-glass-button: var(--surface-elevation-0);
+  --surface-glass-button-hover: var(--surface-elevation-1);
   --surface-selected: #b6d2b3;
   --text-selected: #1b5e20;
 
@@ -569,6 +597,15 @@
   --color-primary-hover-rgb: 255, 255, 255;
 
   /* ── 頁面背景（GitHub canvas.default → canvas.subtle → canvas.overlay）── */
+  /* ── 静态表面层级 ── */
+  --surface-elevation-0: #161b22;
+  --surface-elevation-1: #21262d;
+  --surface-elevation-2: #0d1117;
+  /* ── 浮动玻璃表面（纯白高不透明度，不染色）── */
+  --surface-glass-floating: rgba(255, 255, 255, 0.14);
+  --surface-glass-floating-strong: rgba(255, 255, 255, 0.22);
+  --surface-glass-floating-subtle: rgba(255, 255, 255, 0.08);
+
   --bg-body: #0d1117;
   --bg-white: #161b22;
   --bg-light-gray: #0d1117;
@@ -609,17 +646,17 @@
   --text-slate-light: #7d8590;
   --text-slate-light-rgb: 125, 133, 144;
 
-  /* ── 毛玻璃（全部白色疊加，暗色背景上的真正玻璃質感）── */
-  --glass-05: rgba(255, 255, 255, 0.03);
-  --glass-10: rgba(255, 255, 255, 0.05);
-  --glass-20: rgba(255, 255, 255, 0.08);
-  --glass-30: rgba(255, 255, 255, 0.10);
-  --glass-40: rgba(255, 255, 255, 0.13);
-  --glass-50: rgba(255, 255, 255, 0.16);
-  --glass-60: rgba(255, 255, 255, 0.20);
-  --glass-70: rgba(255, 255, 255, 0.24);
-  --glass-80: rgba(255, 255, 255, 0.28);
-  --glass-90: rgba(255, 255, 255, 0.32);
+  /* ── 毛玻璃（提高不透明度，暗色背景下玻璃可见）── */
+  --glass-05: rgba(255, 255, 255, 0.04);
+  --glass-10: rgba(255, 255, 255, 0.08);
+  --glass-20: rgba(255, 255, 255, 0.12);
+  --glass-30: rgba(255, 255, 255, 0.16);
+  --glass-40: rgba(255, 255, 255, 0.20);
+  --glass-50: rgba(255, 255, 255, 0.24);
+  --glass-60: rgba(255, 255, 255, 0.30);
+  --glass-70: rgba(255, 255, 255, 0.36);
+  --glass-80: rgba(255, 255, 255, 0.42);
+  --glass-90: rgba(255, 255, 255, 0.50);
 
   /* ── 語義表面（GitHub 層級：canvas.subtle / overlay / inset）── */
   --surface-panel: #161b22;

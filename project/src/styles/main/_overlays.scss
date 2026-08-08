@@ -25,7 +25,7 @@
 .main-glass-modal {
   --main-glass-modal-width: min(720px, 94vw);
   --main-glass-modal-max-height: min(70vh, 640px);
-  --main-glass-modal-background: var(--glass-90);
+  --main-glass-modal-background: var(--surface-glass-floating-strong);
   --main-glass-modal-border: 1px solid var(--glass-40);
   --main-glass-modal-radius: 18px;
   --main-glass-modal-shadow: var(--shadow-popup);
@@ -66,7 +66,7 @@
   --main-query-modal-body-offset: 100px;
   --main-query-modal-header-padding: 12px 14px;
   --main-query-modal-body-padding: 12px 14px 16px;
-  --main-query-modal-background: var(--glass-70);
+  --main-query-modal-background: var(--surface-glass-floating);
   --main-query-modal-border-color: rgba(var(--color-silver-rgb), 0.34);
   --main-query-modal-radius: 18px;
   width: var(--main-query-modal-width);
@@ -121,7 +121,7 @@
 .main-crud-modal {
   --main-crud-modal-width: min(800px, 100%);
   --main-crud-modal-max-height: 90vh;
-  --main-crud-modal-background: var(--glass-90);
+  --main-crud-modal-background: var(--surface-glass-floating-strong);
   --main-crud-modal-border: 1px solid var(--glass-20);
   --main-crud-modal-radius: 18px;
   --main-crud-modal-shadow: 0 18px 42px rgba(0, 0, 0, 0.2);
@@ -176,7 +176,7 @@
   --main-tool-modal-header-border-color: var(--glass-40);
   --main-tool-modal-body-padding: 20px 24px;
   --main-tool-modal-body-overflow-y: auto;
-  --main-tool-modal-background: var(--glass-90);
+  --main-tool-modal-background: var(--surface-glass-floating-strong);
   --main-tool-modal-border-color: var(--glass-50);
   --main-tool-modal-radius: 24px;
   --main-tool-modal-shadow: var(--shadow-overlay);
@@ -216,7 +216,7 @@
 }
 
 .tool-modal-shell {
-  background: var(--glass-90);
+  background: var(--surface-glass-floating-strong);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--glass-50);
