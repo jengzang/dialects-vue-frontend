@@ -2,7 +2,7 @@
   <Teleport to="body">
     <Transition name="scroll-to-top-fade">
       <button
-        v-if="visible"
+        v-if="visible && isActive"
         class="scroll-to-top"
         :style="positionStyle"
         :aria-label="t('common.button.scrollToTop')"
@@ -42,11 +42,19 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onBeforeUnmount, unref } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount, unref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { PhArrowLineUp } from '@phosphor-icons/vue'
+import { registerInstance, unregisterInstance, isTopOfStack } from './scrollToTopState.js'
 
 const { t } = useI18n()
+
+const uid = registerInstance()
+const isActive = computed(() => isTopOfStack(uid))
+
+onBeforeUnmount(() => {
+  unregisterInstance(uid)
+})
 
 const props = defineProps({
   container: {
