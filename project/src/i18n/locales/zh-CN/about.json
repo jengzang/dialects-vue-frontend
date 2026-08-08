@@ -348,7 +348,7 @@
       "options": {
         "allEmoji": "全部彩色图标",
         "allSvg": "全部单色图标",
-        "barSvg": "导航单色 · 内文彩色"
+        "barSvg": "导航栏单色"
       }
     },
     "updateNotice": {
