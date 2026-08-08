@@ -62,11 +62,11 @@
         v-if="previewImage"
         class="showcase-preview-overlay"
         @click="closePreview"
-        @keydown.escape="closePreview"
       >
         <button class="close-btn showcase-preview-close" @click="closePreview" :aria-label="t('common.button.close')">
           ×
         </button>
+        <h3 class="showcase-preview-title">{{ t(activeItem.titleKey) }}</h3>
         <img
           :src="previewImage"
           :alt="t(activeItem.titleKey)"
@@ -81,6 +81,9 @@
           @touchmove.prevent="onPreviewTouchMove"
           @touchend.prevent="onPreviewTouchEnd"
         />
+        <button class="showcase-preview-cta" @click.stop="navigateTo(activeItem.route)">
+          {{ t(activeItem.actionLabelKey) }}
+        </button>
       </div>
     </Teleport>
   </div>
@@ -203,15 +206,23 @@ const previewStyle = computed(() => {
   return { transform, transition, cursor }
 })
 
+function onPreviewKeydown(e) {
+  if (e.key === 'Escape') closePreview()
+}
+
 function openPreview(src) {
   previewImage.value = src
   previewZoom.value = 1
   previewPanX.value = 0
   previewPanY.value = 0
+  pauseAuto()
+  document.addEventListener('keydown', onPreviewKeydown)
 }
 
 function closePreview() {
   previewImage.value = null
+  resumeAuto()
+  document.removeEventListener('keydown', onPreviewKeydown)
 }
 
 function togglePreviewZoom() {
@@ -259,9 +270,28 @@ function onPreviewDragEnd() {
   document.removeEventListener('mouseup', onPreviewDragEnd)
 }
 
+let pinchStartDist = 0
+let pinchStartZoom = 1
+let pinchCenterX = 0
+let pinchCenterY = 0
+
+function getTouchDist(touches) {
+  const dx = touches[0].clientX - touches[1].clientX
+  const dy = touches[0].clientY - touches[1].clientY
+  return Math.hypot(dx, dy)
+}
+
 function onPreviewTouchStart(e) {
-  if (previewZoom.value <= 1) return
+  if (e.touches.length === 2) {
+    isPreviewDragging.value = false
+    pinchStartDist = getTouchDist(e.touches)
+    pinchStartZoom = previewZoom.value
+    pinchCenterX = (e.touches[0].clientX + e.touches[1].clientX) / 2
+    pinchCenterY = (e.touches[0].clientY + e.touches[1].clientY) / 2
+    return
+  }
   if (e.touches.length !== 1) return
+  if (previewZoom.value <= 1) return
   isPreviewDragging.value = true
   previewDragStartX = e.touches[0].clientX
   previewDragStartY = e.touches[0].clientY
@@ -270,13 +300,25 @@ function onPreviewTouchStart(e) {
 }
 
 function onPreviewTouchMove(e) {
+  if (e.touches.length === 2) {
+    const newDist = getTouchDist(e.touches)
+    const newZoom = Math.max(0.5, Math.min(4, pinchStartZoom * (newDist / pinchStartDist)))
+    previewZoom.value = newZoom
+    if (newZoom <= 1) {
+      previewPanX.value = 0
+      previewPanY.value = 0
+    }
+    return
+  }
   if (!isPreviewDragging.value || e.touches.length !== 1) return
   previewPanX.value = previewPanStartX + (e.touches[0].clientX - previewDragStartX) / previewZoom.value
   previewPanY.value = previewPanStartY + (e.touches[0].clientY - previewDragStartY) / previewZoom.value
 }
 
-function onPreviewTouchEnd() {
-  isPreviewDragging.value = false
+function onPreviewTouchEnd(e) {
+  if (e.touches.length === 0) {
+    isPreviewDragging.value = false
+  }
 }
 
 function handleItemClick(i) {
@@ -313,6 +355,7 @@ function pauseAuto() {
 function resumeAuto() {
   if (prefersReducedMotion) return
   if (autoTimer) return
+  if (previewImage.value) return
   autoTimer = setInterval(goToNext, AUTO_INTERVAL)
 }
 
@@ -429,6 +472,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   clearInterval(autoTimer)
   document.removeEventListener('keydown', onKeydown)
+  document.removeEventListener('keydown', onPreviewKeydown)
   document.removeEventListener('mousemove', onDragMove)
   document.removeEventListener('mouseup', onDragEnd)
   document.removeEventListener('mousemove', onPreviewDragMove)
@@ -442,7 +486,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
 $side-scale: 0.83;
 $side-rotate: 12deg;
 $side-translate: -36%;
-$active-width: 66%;
+$active-width: 60%;
 $img-ratio: math.div(16, 10);
 $duration: 450ms;
 
@@ -459,7 +503,7 @@ $duration: 450ms;
 .showcase-viewport {
   position: relative;
   width: 100%;
-  aspect-ratio: math.div(16, 7);
+  aspect-ratio: math.div(16, 6);
   overflow: hidden;
   border-radius: var(--radius-lg);
   contain: layout style paint;
@@ -493,8 +537,12 @@ $duration: 450ms;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border: 1px solid rgba(var(--text-slate-light-rgb), 0.12);
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-glass);
+    box-shadow:
+      0 0 0 1px rgba(var(--text-slate-light-rgb), 0.04),
+      0 2px 8px rgba(0, 0, 0, 0.06),
+      0 8px 28px rgba(0, 0, 0, 0.07);
     opacity: 0;
     transition: opacity 0.4s ease;
     z-index: 1;
@@ -556,12 +604,18 @@ $duration: 450ms;
     pointer-events: auto;
 
     img {
-      box-shadow: var(--shadow-lg);
+      box-shadow:
+        0 0 0 1px rgba(var(--text-slate-light-rgb), 0.05),
+        0 4px 16px rgba(0, 0, 0, 0.08),
+        0 12px 40px rgba(0, 0, 0, 0.1);
       transition: box-shadow $duration $ease-apple, transform $duration $ease-apple;
     }
 
     &:hover img {
-      box-shadow: 0 12px 48px rgba(var(--color-primary-rgb), 0.22), var(--shadow-lg);
+      box-shadow:
+        0 0 0 1px rgba(var(--color-primary-rgb), 0.12),
+        0 6px 24px rgba(var(--color-primary-rgb), 0.16),
+        0 16px 48px rgba(0, 0, 0, 0.14);
     }
   }
 
@@ -577,7 +631,9 @@ $duration: 450ms;
       transform: translate(-50%, -50%) translateX($side-translate) scale(calc(#{$side-scale} + 0.04)) rotateY($side-rotate);
 
       img {
-        box-shadow: 0 8px 32px rgba(var(--color-primary-rgb), 0.18);
+        box-shadow:
+          0 0 0 1px rgba(var(--color-primary-rgb), 0.08),
+          0 4px 20px rgba(var(--color-primary-rgb), 0.12);
       }
     }
 
@@ -598,7 +654,9 @@ $duration: 450ms;
       transform: translate(-50%, -50%) translateX(calc(-1 * #{$side-translate})) scale(calc(#{$side-scale} + 0.04)) rotateY(-#{$side-rotate});
 
       img {
-        box-shadow: 0 8px 32px rgba(var(--color-primary-rgb), 0.18);
+        box-shadow:
+          0 0 0 1px rgba(var(--color-primary-rgb), 0.08),
+          0 4px 20px rgba(var(--color-primary-rgb), 0.12);
       }
     }
 
@@ -809,18 +867,65 @@ $duration: 450ms;
   right: 24px;
 }
 
+.showcase-preview-title {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  font-weight: 500;
+  pointer-events: none;
+}
+
 .showcase-preview-img {
-  max-width: 92vw;
-  max-height: 92vh;
+  max-width: 80dvw;
+  max-height: 80dvh;
   object-fit: contain;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: var(--radius-lg);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 24px 80px rgba(0, 0, 0, 0.5);
   transform-origin: center center;
   user-select: none;
   -webkit-user-select: none;
 
   &.is-dragging {
     will-change: transform;
+  }
+  @media (max-aspect-ratio: 1/1) {
+    max-width: 98dvw;
+    max-height: 80dvh;
+  }
+
+}
+
+.showcase-preview-cta {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.6rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-pill);
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background 0.2s, border-color 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.35);
+  }
+
+  &:active {
+    background: rgba(255, 255, 255, 0.15);
   }
 }
 
