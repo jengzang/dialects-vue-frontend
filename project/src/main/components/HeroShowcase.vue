@@ -281,8 +281,8 @@ onBeforeUnmount(() => {
 $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
 $side-scale: 0.83;
 $side-rotate: 12deg;
-$side-translate: -30%;
-$active-width: 92%;
+$side-translate: -42%;
+$active-width: 65%;
 $img-ratio: 16 / 10;
 $duration: 450ms;
 
