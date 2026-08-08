@@ -158,5 +158,7 @@
     "matrixFeature": "Feature Class",
     "zeroInitial": "Zero Initial",
     "zeroFinal": "Zero Final"
-  }
+  },
+  "mapDataReady": "🗺️ Map data loaded",
+  "viewMap": "View Map →"
 }

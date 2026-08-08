@@ -52,6 +52,7 @@ import { useI18n } from 'vue-i18n'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js';
 import { getCoordinates, searchChars, searchZhongGu, searchYinWei, searchTones } from '@/api'
 import {globalPayload, mapStore, resultCache, userStore} from '@/main/store/store.js';
+import { showInfo } from '@/utils/ui/message.js';
 import ResultList from "@/main/components/result/ResultList.vue";
 import CharsAndTones from "@/main/components/result/CharsAndTones.vue";
 import SimpleSelectDropdown from "@/components/selector/SimpleSelectDropdown.vue";
@@ -321,6 +322,15 @@ watch(
               : JSON.parse(JSON.stringify(latestResults.value));
         } catch (e) {
           resultCache.latestResults = latestResults.value;
+        }
+
+        if (mapStore.mergedData && mapStore.mergedData.length > 0) {
+          showInfo(t('result.mapDataReady'), 5000, {
+            actionText: t('result.viewMap'),
+            onAction: () => {
+              router.push(buildLocalePath(resolveRouteLocale(route), '/menu/map/view'))
+            }
+          })
         }
       }
     },
