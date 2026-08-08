@@ -18,7 +18,7 @@
     "compare": { "title": "方言比较", "action": "进入比较" },
     "gis": { "title": "GIS 绘图", "action": "开始绘图" },
     "evolution": { "title": "语音演化", "action": "查看演化" },
-    "phocompare": { "title": "比较音值", "action": "查看桑基图" }
+    "photiccompare": { "title": "比较音值", "action": "查看桑基图" }
   },
   "features": {
     "sectionTitle": "核心功能",

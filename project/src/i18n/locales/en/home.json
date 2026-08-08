@@ -18,7 +18,7 @@
     "compare": { "title": "Dialect Comparison", "action": "Compare" },
     "gis": { "title": "GIS Drawing", "action": "Start Drawing" },
     "evolution": { "title": "Sound Evolution", "action": "View Evolution" },
-    "phocompare": { "title": "Phonetic Comparison", "action": "View Sankey" }
+    "photiccompare": { "title": "Phonetic Comparison", "action": "View Sankey" }
   },
   "features": {
     "sectionTitle": "Core Features",

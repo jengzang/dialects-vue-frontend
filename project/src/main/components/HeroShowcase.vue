@@ -84,11 +84,11 @@ const showcaseItems = [
     actionLabelKey: 'home.showcase.compare.action'
   },
   {
-    id: 'phocompare',
-    titleKey: 'home.showcase.phocompare.title',
-    image: '/showcase/phocompare.webp',
+    id: 'photiccompare',
+    titleKey: 'home.showcase.photiccompare.title',
+    image: '/showcase/photiccompare.webp',
     route: '/menu/compare/phonetic',
-    actionLabelKey: 'home.showcase.phocompare.action'
+    actionLabelKey: 'home.showcase.photiccompare.action'
   },
   {
     id: 'yinxi',
