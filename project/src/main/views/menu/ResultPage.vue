@@ -337,11 +337,11 @@ watch(
     { immediate: true }
 );
 
-// 用户切到地图页面时自动关闭 toast
+// 离开 ResultPage 时自动关闭 toast
 watch(
   () => route.path,
   (newPath) => {
-    if (newPath.endsWith('/menu/map/view')) {
+    if (!newPath.includes('/menu/result')) {
       hideMessage()
     }
   }
