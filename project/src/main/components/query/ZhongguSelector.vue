@@ -3,7 +3,7 @@
 
     <div v-if="hasSelection" class="info-header">
       <div class="info-text">
-        <span class="info-icon">ℹ️</span>
+        <span class="info-icon"><InlineIcon icon="ℹ️" /></span>
         <span>
           {{ $t('query.components.zhongguSelector.possibleCombinations', { count: combinations.length }) }}
           <span v-if="!loading && results.length >= 0" class="fade-in">
@@ -21,8 +21,7 @@
       </button>
     </div>
 
-    <div v-if="limitHint" class="limit-warning">
-      ⚠️ {{ limitHint }}
+    <div v-if="limitHint" class="limit-warning"><InlineIcon icon="⚠️" />{{ limitHint }}
     </div>
 
     <div v-if="loading" class="status-msg loading">
@@ -53,6 +52,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getCharList } from '@/api'

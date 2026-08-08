@@ -22,8 +22,7 @@
           />
         </div>
         <div class="vml-control-actions">
-          <button class="search-button solid-button" @click="handleSearch">
-            🔍 搜索
+          <button class="search-button solid-button" @click="handleSearch"><InlineIcon icon="🔍" />搜索
           </button>
         </div>
       </div>
@@ -67,8 +66,7 @@
         </div>
 
         <div class="vml-control-actions">
-          <button class="clear-filters-button" @click="clearFilters" v-if="hasFilters">
-            ✕ 清除篩選
+          <button class="clear-filters-button" @click="clearFilters" v-if="hasFilters"><InlineIcon icon="✕" />清除篩選
           </button>
         </div>
       </div>
@@ -77,6 +75,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed } from 'vue'
 import { villagesMLStore } from '@/VillagesML/store/villagesMLStore.js'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'

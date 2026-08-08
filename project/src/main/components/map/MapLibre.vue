@@ -35,8 +35,8 @@
           />
         </div>
         <div class="button-row">
-          <button class="action-btn" @click="resetView">🎯 {{ t('map.mapLibre.buttons.reset') }}</button>
-          <button class="action-btn fullscreen-btn" @click="toggleFullScreen">⛶ {{ t('map.mapLibre.buttons.fullscreen') }}</button>
+          <button class="action-btn" @click="resetView"><InlineIcon icon="🎯" />{{ t('map.mapLibre.buttons.reset') }}</button>
+          <button class="action-btn fullscreen-btn" @click="toggleFullScreen"><InlineIcon icon="⛶" />{{ t('map.mapLibre.buttons.fullscreen') }}</button>
         </div>
       </div>
 
@@ -56,7 +56,7 @@
       <div v-if="locationPopup.visible" class="location-popup-overlay" @click="closeLocationPopup">
         <div class="location-popup-content" @click.stop>
           <div class="location-popup-header">
-            <h3>📍 {{ t('map.mapLibre.locationPopup.title', { location: locationPopup.locationName }) }}</h3>
+            <h3><InlineIcon icon="📍" />{{ t('map.mapLibre.locationPopup.title', { location: locationPopup.locationName }) }}</h3>
             <button
               class="close-btn close-btn-lg close-btn-inline"
               @click="closeLocationPopup"
@@ -121,6 +121,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, onMounted, onActivated, onBeforeUnmount, shallowRef, nextTick, watch, computed, h, render } from 'vue';
 import { useI18n } from 'vue-i18n';
 import maplibregl from 'maplibre-gl';

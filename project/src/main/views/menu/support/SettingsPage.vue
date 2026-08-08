@@ -140,8 +140,7 @@
             data-variant="secondary"
             @click="showUpdateNotice = true"
             style="white-space: nowrap;"
-          >
-            📋 {{ $t('about.settings.viewUpdateLog') }}
+          ><InlineIcon icon="📋" />{{ $t('about.settings.viewUpdateLog') }}
           </button>
         </div>
       </div>
@@ -164,6 +163,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'

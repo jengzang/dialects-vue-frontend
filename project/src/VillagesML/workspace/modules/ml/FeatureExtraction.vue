@@ -6,10 +6,10 @@
       </h3>
     <!-- Header -->
     <div class="page-header">
-<!--      <h2>🔐 特徵提取 Feature Extraction</h2>-->
+<!--      <h2><InlineIcon icon="🔐" />特徵提取 Feature Extraction</h2>-->
 <!--      <p class="subtitle">為自訂村莊集合提取特徵向量</p>-->
       <div v-if="!isAuthenticated" class="auth-warning">
-        <span class="lock-icon">🔒</span>
+        <span class="lock-icon"><InlineIcon icon="🔒" /></span>
         <span>此功能需要登錄</span>
         <button @click="goToAuth" class="solid-button small">前往登錄</button>
       </div>
@@ -96,7 +96,7 @@
 
         <!-- Empty State -->
         <div v-if="allVillages.length === 0 && !loading" class="empty-hint">
-          <p>👆 請輸入搜索關鍵詞或選擇區域，然後點擊「載入村莊」按鈕</p>
+          <p><InlineIcon icon="👆" />請輸入搜索關鍵詞或選擇區域，然後點擊「載入村莊」按鈕</p>
         </div>
 
         <!-- Village List -->
@@ -319,7 +319,7 @@
         <div v-if="aggregationResults.aggregates.ngram" class="agg-section">
           <h4>N-gram 聚類分布</h4>
           <div v-if="aggregationResults.aggregates.ngram.kmeans_clusters.length === 0 && aggregationResults.aggregates.ngram.dbscan_clusters.length === 0" class="empty-cluster-hint">
-            <p>⚠️ 所選村莊暫無聚類數據</p>
+            <p><InlineIcon icon="⚠️" />所選村莊暫無聚類數據</p>
             <p class="hint-text">這些村莊可能尚未進行聚類分析，或聚類數據未同步到數據庫</p>
           </div>
           <div v-else class="cluster-grid">
@@ -385,6 +385,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { useRoute, useRouter } from 'vue-router'

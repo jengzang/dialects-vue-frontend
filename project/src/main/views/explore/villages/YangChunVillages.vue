@@ -7,7 +7,7 @@
       </div>
       <p>{{ t('villages.pages.yangChun.source') }}</p>
       <div class="search-wrapper">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon"><InlineIcon icon="🔍" /></span>
         <input
             type="text"
             v-model="searchQuery"
@@ -33,6 +33,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import {ref, computed} from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter, useRoute } from 'vue-router';

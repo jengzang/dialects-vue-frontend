@@ -16,9 +16,7 @@
             @click.stop="handleMapClick"
             :title="mapButtonTitle"
             :disabled="node._lazy && !node._childrenLoaded"
-        >
-          🌍
-        </button>
+        >🌍</button>
         <button
             v-if="hasChildren"
             class="expand-btn"
@@ -58,6 +56,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 

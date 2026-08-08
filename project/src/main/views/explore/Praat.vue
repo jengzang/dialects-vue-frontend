@@ -4,7 +4,7 @@
 <!--    &lt;!&ndash; Login Button (top right) &ndash;&gt;-->
 <!--    <div v-if="!userStore.isAuthenticated" class="login-prompt">-->
 <!--      <button class="login-button main-glass-button" @click="goToLogin">-->
-<!--        <span>🔒</span>-->
+<!--        <span><InlineIcon icon="🔒" /></span>-->
 <!--        <span>請先登錄</span>-->
 <!--      </button>-->
 <!--    </div>-->
@@ -57,7 +57,7 @@
           <!-- Settings Button and Mode Selector -->
           <div class="settings-trigger">
             <button class="settings-button main-glass-button" @click="showSettings = true">
-              <span class="settings-icon">⚙️</span>
+              <span class="settings-icon"><InlineIcon icon="⚙️" /></span>
               <span>{{ t('praat.main.settings.button') }}</span>
             </button>
 
@@ -115,7 +115,7 @@
 
           <!-- No Results Message -->
           <div v-else-if="!analysisResults" class="no-results-state main-glass-panel">
-            <div class="no-results-icon">📊</div>
+            <div class="no-results-icon"><InlineIcon icon="📊" /></div>
             <h3 class="no-results-title">{{ t('praat.main.noResults.title') }}</h3>
             <p class="no-results-text">{{ t('praat.main.noResults.text') }}</p>
           </div>
@@ -146,7 +146,7 @@
       <div v-if="showSettings" class="settings-sidebar">
         <div class="sidebar-header">
           <h2 class="sidebar-title">{{ t('praat.main.settings.title') }}</h2>
-          <button class="close-btn close-btn-lg" @click="showSettings = false">✕</button>
+          <button class="close-btn close-btn-lg" @click="showSettings = false"><InlineIcon icon="✕" /></button>
         </div>
         <div class="sidebar-content">
           <SettingsPanel
@@ -160,9 +160,7 @@
     <!-- Audio Preview Floating Window (Only on Tab 1) -->
     <Transition name="preview-fade">
       <div v-if="showAudioPreview" class="audio-preview-float">
-        <button class="close-btn close-btn-sm close-btn-corner" @click="showPreview = false" :title="t('praat.main.closePreview')">
-          ✕
-        </button>
+        <button class="close-btn close-btn-sm close-btn-corner" @click="showPreview = false" :title="t('praat.main.closePreview')"><InlineIcon icon="✕" /></button>
         <AudioPreviewPanel
           :audio-blob="audioBlob"
           :segments="audioSegments"
@@ -175,6 +173,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, reactive, onBeforeUnmount, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'

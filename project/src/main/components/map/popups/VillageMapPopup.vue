@@ -47,21 +47,19 @@
           </button>
 
           <div class="button-row">
-            <button class="control-btn" @click="resetView">🎯 {{ t('map.villageMapPopup.buttons.reset') }}</button>
-            <button class="control-btn" @click="toggleFullscreen">⛶ {{ t('map.villageMapPopup.buttons.fullscreen') }}</button>
+            <button class="control-btn" @click="resetView"><InlineIcon icon="🎯" />{{ t('map.villageMapPopup.buttons.reset') }}</button>
+            <button class="control-btn" @click="toggleFullscreen"><InlineIcon icon="⛶" />{{ t('map.villageMapPopup.buttons.fullscreen') }}</button>
           </div>
 
           <button
             v-if="hasDialectData"
             class="control-btn control-btn-full"
             @click="navigateToVoronoi"
-          >
-            ⬡ {{ t('map.villageMapPopup.buttons.voronoi') }}
+          ><InlineIcon icon="⬡" />{{ t('map.villageMapPopup.buttons.voronoi') }}
           </button>
         </div>
 
-        <button v-if="isFullscreen" class="exit-fullscreen-btn" @click="toggleFullscreen">
-          ✕ {{ t('map.villageMapPopup.buttons.exitFullscreen') }}
+        <button v-if="isFullscreen" class="exit-fullscreen-btn" @click="toggleFullscreen"><InlineIcon icon="✕" />{{ t('map.villageMapPopup.buttons.exitFullscreen') }}
         </button>
       </div>
     </div>
@@ -69,6 +67,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch, shallowRef, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter, useRoute } from 'vue-router'

@@ -13,8 +13,7 @@
 
       <!-- Search Section -->
       <div class="search-section vml-glass-panel">
-        <h2>
-          🔍 相似字搜尋
+        <h2><InlineIcon icon="🔍" />相似字搜尋
           <HelpIcon
             content="輸入單個字符，系統將返回Top-K相似字符及其相似度分數。可調整返回數量（5-50）。"
             size="sm"
@@ -85,7 +84,7 @@
           <h3>相似度網絡圖</h3>
           <div v-if="similarities.length > 0" ref="vizChartRef" class="viz-chart"></div>
           <div v-else class="viz-placeholder">
-            <p>📊 相似度可視化</p>
+            <p><InlineIcon icon="📊" />相似度可視化</p>
             <p class="viz-note">搜尋字符後將顯示 {{ searchChar || '該字' }} 及其相似字的關係網絡</p>
           </div>
         </div>
@@ -153,6 +152,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, onBeforeUnmount, onMounted, nextTick } from 'vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import * as echarts from 'echarts'

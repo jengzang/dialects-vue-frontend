@@ -6,10 +6,10 @@
       </h3>
     <!-- Header -->
     <div class="page-header">
-<!--      <h2>🔐 子集分析 Subset Analysis</h2>-->
+<!--      <h2><InlineIcon icon="🔐" />子集分析 Subset Analysis</h2>-->
 <!--      <p class="subtitle">對自訂村莊子集進行聚類與比較分析</p>-->
       <div v-if="!isAuthenticated" class="auth-warning">
-        <span class="lock-icon">🔒</span>
+        <span class="lock-icon"><InlineIcon icon="🔒" /></span>
         <span>此功能需要登錄</span>
         <button @click="goToAuth" class="solid-button small">前往登錄</button>
       </div>
@@ -18,12 +18,12 @@
     <!-- Filter Builder -->
     <div class="vml-glass-panel filter-panel">
       <div class="panel-header">
-        <h3>📋 步驟 1：篩選器構建</h3>
+        <h3><InlineIcon icon="📋" />步驟 1：篩選器構建</h3>
         <button @click="addFilter" class="solid-button small">+ 添加篩選條件</button>
       </div>
       <div class="filter-content">
         <div class="usage-hint">
-          <span class="hint-icon">💡</span>
+          <span class="hint-icon"><InlineIcon icon="💡" /></span>
           <span class="hint-text">添加篩選條件，定義你想要分析的村莊集合</span>
         </div>
         <div v-for="(filter, idx) in filters" :key="idx" class="filter-row vml-control-surface vml-control-row">
@@ -104,7 +104,7 @@
     <!-- Filtered Villages List -->
     <div v-if="currentFilteredVillages.length > 0" class="vml-glass-panel villages-list-panel">
       <div class="panel-header">
-        <h3>📊 步驟 2：查看篩選結果</h3>
+        <h3><InlineIcon icon="📊" />步驟 2：查看篩選結果</h3>
         <div class="header-info">
           <span class="total-count">
             共 {{ currentFilteredVillages.length }} 個村莊
@@ -113,15 +113,13 @@
       </div>
       <div class="villages-list-content">
         <div class="usage-hint">
-          <span class="hint-icon">💡</span>
+          <span class="hint-icon"><InlineIcon icon="💡" /></span>
           <span class="hint-text">確認篩選結果無誤後，點擊下方「保存為子集 A/B」按鈕</span>
         </div>
         <div class="save-actions">
-          <button @click="saveAsSubsetA" :disabled="!canSaveSubset" class="solid-button primary">
-            💾 保存為子集 A
+          <button @click="saveAsSubsetA" :disabled="!canSaveSubset" class="solid-button primary"><InlineIcon icon="💾" />保存為子集 A
           </button>
-          <button @click="saveAsSubsetB" :disabled="!canSaveSubset" class="solid-button primary">
-            💾 保存為子集 B
+          <button @click="saveAsSubsetB" :disabled="!canSaveSubset" class="solid-button primary"><InlineIcon icon="💾" />保存為子集 B
           </button>
         </div>
         <div class="villages-table-wrapper">
@@ -155,11 +153,11 @@
     <!-- Subset Comparison -->
     <div class="vml-glass-panel comparison-panel">
       <div class="panel-header">
-        <h3>⚖️ 步驟 3：子集比較</h3>
+        <h3><InlineIcon icon="⚖️" />步驟 3：子集比較</h3>
       </div>
       <div class="comparison-content">
         <div class="usage-hint">
-          <span class="hint-icon">💡</span>
+          <span class="hint-icon"><InlineIcon icon="💡" /></span>
           <span class="hint-text">保存兩個不同的子集後，點擊「比較子集」按鈕，系統會分析兩個子集的語義和形態差異</span>
         </div>
         <div class="subset-selector">
@@ -175,8 +173,7 @@
                 <span class="value">{{ formatFilterSummary(subsetA.filterParams) }}</span>
               </div>
             </div>
-            <button @click="saveAsSubsetA" :disabled="!canSaveSubset" class="solid-button small">
-              💾 更新子集 A
+            <button @click="saveAsSubsetA" :disabled="!canSaveSubset" class="solid-button small"><InlineIcon icon="💾" />更新子集 A
             </button>
           </div>
           <div class="vs-divider">VS</div>
@@ -192,8 +189,7 @@
                 <span class="value">{{ formatFilterSummary(subsetB.filterParams) }}</span>
               </div>
             </div>
-            <button @click="saveAsSubsetB" :disabled="!canSaveSubset" class="solid-button small">
-              💾 更新子集 B
+            <button @click="saveAsSubsetB" :disabled="!canSaveSubset" class="solid-button small"><InlineIcon icon="💾" />更新子集 B
             </button>
           </div>
         </div>
@@ -220,35 +216,35 @@
           <h4>⏱️ 性能統計</h4>
           <div class="timings-grid">
             <div class="timing-card">
-              <div class="timing-icon">📊</div>
+              <div class="timing-icon"><InlineIcon icon="📊" /></div>
               <div class="timing-info">
                 <div class="timing-label">數據加載</div>
                 <div class="timing-value">{{ comparisonResults.timings.data_loading }}ms</div>
               </div>
             </div>
             <div class="timing-card">
-              <div class="timing-icon">🏷️</div>
+              <div class="timing-icon"><InlineIcon icon="🏷️" /></div>
               <div class="timing-info">
                 <div class="timing-label">語義分析</div>
                 <div class="timing-value">{{ comparisonResults.timings.semantic }}ms</div>
               </div>
             </div>
             <div class="timing-card">
-              <div class="timing-icon">📐</div>
+              <div class="timing-icon"><InlineIcon icon="📐" /></div>
               <div class="timing-info">
                 <div class="timing-label">形態學分析</div>
                 <div class="timing-value">{{ comparisonResults.timings.morphology }}ms</div>
               </div>
             </div>
             <div class="timing-card">
-              <div class="timing-icon">🔤</div>
+              <div class="timing-icon"><InlineIcon icon="🔤" /></div>
               <div class="timing-info">
                 <div class="timing-label">字符分析</div>
                 <div class="timing-value">{{ comparisonResults.timings.character }}ms</div>
               </div>
             </div>
             <div class="timing-card">
-              <div class="timing-icon">🗺️</div>
+              <div class="timing-icon"><InlineIcon icon="🗺️" /></div>
               <div class="timing-info">
                 <div class="timing-label">空間分析</div>
                 <div class="timing-value">{{ comparisonResults.timings.spatial }}ms</div>
@@ -284,7 +280,7 @@
 
         <!-- Semantic Comparison Table -->
         <div v-if="comparisonResults.semantic_comparison" class="feature-diff-table">
-          <h4>🏷️ 語義類別比較</h4>
+          <h4><InlineIcon icon="🏷️" />語義類別比較</h4>
           <table class="glass-table">
             <thead>
               <tr>
@@ -317,7 +313,7 @@
 
         <!-- Morphology Comparison Table -->
         <div v-if="comparisonResults.morphology_comparison" class="feature-diff-table">
-          <h4>📐 形態學特徵比較</h4>
+          <h4><InlineIcon icon="📐" />形態學特徵比較</h4>
           <table class="glass-table">
             <thead>
               <tr>
@@ -342,7 +338,7 @@
 
         <!-- Character Comparison Table -->
         <div v-if="comparisonResults.character_comparison" class="feature-diff-table">
-          <h4>🔤 字符特徵比較 (Top 20)</h4>
+          <h4><InlineIcon icon="🔤" />字符特徵比較 (Top 20)</h4>
           <table class="glass-table">
             <thead>
               <tr>
@@ -371,7 +367,7 @@
 
         <!-- Spatial Comparison -->
         <div v-if="comparisonResults.spatial_comparison" class="spatial-comparison-section">
-          <h4>🗺️ 空間特徵比較</h4>
+          <h4><InlineIcon icon="🗺️" />空間特徵比較</h4>
           <div class="spatial-metrics">
             <div class="spatial-group">
               <h5>子集 A 地理範圍</h5>
@@ -543,6 +539,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, nextTick, onBeforeUnmount } from 'vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { useRoute, useRouter } from 'vue-router'

@@ -39,7 +39,7 @@
       @click="goToHome"
       :title="t('navigation.actions.backHome')"
     >
-      🏠
+      <InlineIcon icon="🏠" />
     </button>
   </div>
 </template>
@@ -48,6 +48,7 @@
 import { computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { userStore } from '@/main/store/store.js';
 import NavAvatar from '@/components/bar/NavAvatar.vue';

@@ -8,7 +8,7 @@
       </div>
       <!-- <p class="subtitle">{{ t('villages.pages.gdTree.subtitle') }}</p> -->
       <div class="search-wrapper">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon"><InlineIcon icon="🔍" /></span>
         <input
             type="text"
             v-model="searchQuery"
@@ -28,7 +28,7 @@
 
       <!-- Initial Error State -->
       <div v-else-if="initialLoadError" class="initial-state error-state">
-        <div class="error-icon">⚠️</div>
+        <div class="error-icon"><InlineIcon icon="⚠️" /></div>
         <p class="error-message">{{ initialLoadError }}</p>
         <button @click="loadInitialCities" class="retry-btn">
           {{ t('villages.pages.gdTree.retry') }}
@@ -63,8 +63,7 @@
                     @click.stop="handleCityMapClick(city)"
                     title="顯示全市村落地圖"
                 >🌍</button>
-                <div class="loaded-badge">
-                  ✓ {{ t('villages.pages.gdTree.loaded') }}
+                <div class="loaded-badge"><InlineIcon icon="✓" />{{ t('villages.pages.gdTree.loaded') }}
                 </div>
               </template>
             </div>
@@ -112,6 +111,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';

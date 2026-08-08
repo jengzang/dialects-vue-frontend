@@ -229,9 +229,9 @@
             :disabled="buttonState.isRunning || isRunDisabled"
             :class="{ disabled: isRunDisabled }"
         >
-          <span v-if="buttonState.isRunning">🔄 {{ $t('query.button.running') }}</span>
-          <span v-else-if="isRunDisabled">🚫 {{ $t('query.button.invalid') }}</span>
-          <span v-else>🚀 {{ $t('query.button.run') }}</span>
+          <span v-if="buttonState.isRunning"><InlineIcon icon="🔄" />{{ $t('query.button.running') }}</span>
+          <span v-else-if="isRunDisabled"><InlineIcon icon="🚫" />{{ $t('query.button.invalid') }}</span>
+          <span v-else><InlineIcon icon="🚀" />{{ $t('query.button.run') }}</span>
         </button>
       </div>
       <!-- 🔹 建議與操作區 -->
@@ -252,6 +252,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import {computed, nextTick, reactive, ref, onMounted, onBeforeUnmount, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import { useI18n } from 'vue-i18n'

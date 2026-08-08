@@ -11,15 +11,15 @@
         <p class="hero-subtitle">{{ $t('home.hero.subtitle') }}</p>
         <div class="hero-actions">
           <button class="btn-primary" @click="navigateTo('/menu/query/zhonggu')">
-            <span class="btn-icon">🚀</span>
+            <span class="btn-icon"><InlineIcon icon="🚀" /></span>
             <span class="btn-text">{{ $t('home.hero.startExploring') }}</span>
           </button>
           <!-- <button class="btn-primary btn-explore" @click="navigateTo('/explore?page=YuBao')">
-            <span class="btn-icon">🧰</span>
+            <span class="btn-icon"><InlineIcon icon="🧰" /></span>
             <span class="btn-text">{{ $t('home.hero.expandTools') }}</span>
           </button> -->
           <button class="btn-secondary" @click="scrollToFeatures">
-            <span class="btn-icon">📖</span>
+            <span class="btn-icon"><InlineIcon icon="📖" /></span>
             <span class="btn-text">{{ $t('home.hero.featuresIntro') }}</span>
           </button>
         </div>
@@ -35,7 +35,7 @@
         <!-- 查詢功能 -->
         <div class="feature-card" :class="{ expanded: expandedCard === 'query' }">
           <div class="card-header" @click="toggleCard('query')">
-            <div class="card-icon">🔍</div>
+            <div class="card-icon"><InlineIcon icon="🔍" /></div>
             <div class="card-info">
               <h3 class="card-title">{{ $t('home.features.query.title') }}</h3>
               <p class="card-desc">{{ $t('home.features.query.desc') }}</p>
@@ -47,19 +47,19 @@
           <transition name="expand">
             <div v-if="expandedCard === 'query'" class="card-body">
               <a @click.stop="navigateTo('/menu/query/char')" class="feature-link">
-                <span class="link-icon">📝</span>
+                <span class="link-icon"><InlineIcon icon="📝" /></span>
                 <span class="link-text">{{ $t('home.features.query.searchChar') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/query/zhonggu')" class="feature-link">
-                <span class="link-icon">📜</span>
+                <span class="link-icon"><InlineIcon icon="📜" /></span>
                 <span class="link-text">{{ $t('home.features.query.searchMiddle') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/query/yinwei')" class="feature-link">
-                <span class="link-icon">🗣️</span>
+                <span class="link-icon"><InlineIcon icon="🗣️" /></span>
                 <span class="link-text">{{ $t('home.features.query.searchPhoneme') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/query/tone')" class="feature-link">
-                <span class="link-icon">🎶</span>
+                <span class="link-icon"><InlineIcon icon="🎶" /></span>
                 <span class="link-text">{{ $t('home.features.query.searchTone') }}</span>
               </a>
             </div>
@@ -69,7 +69,7 @@
         <!-- 比較功能 -->
         <div class="feature-card" :class="{ expanded: expandedCard === 'compare' }">
           <div class="card-header" @click="toggleCard('compare')">
-            <div class="card-icon">🔀</div>
+            <div class="card-icon"><InlineIcon icon="🔀" /></div>
             <div class="card-info">
               <h3 class="card-title">{{ $t('home.features.compare.title') }}</h3>
               <p class="card-desc">{{ $t('home.features.compare.desc') }}</p>
@@ -81,19 +81,19 @@
           <transition name="expand">
             <div v-if="expandedCard === 'compare'" class="card-body">
               <a @click.stop="navigateTo('/menu/compare/char')" class="feature-link">
-                <span class="link-icon">📊</span>
+                <span class="link-icon"><InlineIcon icon="📊" /></span>
                 <span class="link-text">{{ $t('home.features.compare.compareChar') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/compare/zhonggu')" class="feature-link">
-                <span class="link-icon">🎯</span>
+                <span class="link-icon"><InlineIcon icon="🎯" /></span>
                 <span class="link-text">{{ $t('home.features.compare.compareMiddle') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/compare/tone')" class="feature-link">
-                <span class="link-icon">🎹</span>
+                <span class="link-icon"><InlineIcon icon="🎹" /></span>
                 <span class="link-text">{{ $t('home.features.compare.compareTone') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/compare/phonetic')" class="feature-link">
-                <span class="link-icon">⚖️</span>
+                <span class="link-icon"><InlineIcon icon="⚖️" /></span>
                 <span class="link-text">{{ $t('home.features.compare.comparePhonetic') }}</span>
               </a>
             </div>
@@ -103,7 +103,7 @@
         <!-- 地圖可視化 -->
         <div class="feature-card" :class="{ expanded: expandedCard === 'map' }">
           <div class="card-header" @click="toggleCard('map')">
-            <div class="card-icon">🗺️</div>
+            <div class="card-icon"><InlineIcon icon="🗺️" /></div>
             <div class="card-info">
               <h3 class="card-title">{{ $t('home.features.map.title') }}</h3>
               <p class="card-desc">{{ $t('home.features.map.desc') }}</p>
@@ -115,19 +115,19 @@
           <transition name="expand">
             <div v-if="expandedCard === 'map'" class="card-body">
               <a @click.stop="navigateTo('/menu/map/view')" class="feature-link">
-                <span class="link-icon">📍</span>
+                <span class="link-icon"><InlineIcon icon="📍" /></span>
                 <span class="link-text">{{ $t('home.features.map.dialectMap') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/map/divide')" class="feature-link">
-                <span class="link-icon">🧭</span>
+                <span class="link-icon"><InlineIcon icon="🧭" /></span>
                 <span class="link-text">{{ $t('home.features.map.regionMap') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/map/custom')" class="feature-link">
-                <span class="link-icon">📁</span>
+                <span class="link-icon"><InlineIcon icon="📁" /></span>
                 <span class="link-text">{{ $t('home.features.map.customMap') }}</span>
               </a>
               <a @click.stop="navigateTo('/explore/gis')" class="feature-link">
-                <span class="link-icon">✏️</span>
+                <span class="link-icon"><InlineIcon icon="✏️" /></span>
                 <span class="link-text">{{ $t('home.features.map.drawMap') }}</span>
               </a>
             </div>
@@ -137,7 +137,7 @@
         <!-- 音系分析 -->
         <div class="feature-card" :class="{ expanded: expandedCard === 'pho' }">
           <div class="card-header" @click="toggleCard('pho')">
-            <div class="card-icon">🧬</div>
+            <div class="card-icon"><InlineIcon icon="🧬" /></div>
             <div class="card-info">
               <h3 class="card-title">{{ $t('home.features.phonology.title') }}</h3>
               <p class="card-desc">{{ $t('home.features.phonology.desc') }}</p>
@@ -149,19 +149,19 @@
           <transition name="expand">
             <div v-if="expandedCard === 'pho'" class="card-body">
               <a @click.stop="navigateTo('/menu/pho/matrix')" class="feature-link">
-                <span class="link-icon">⚗️</span>
+                <span class="link-icon"><InlineIcon icon="⚗️" /></span>
                 <span class="link-text">{{ $t('home.features.phonology.phonologyQuery') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/pho/custom')" class="feature-link">
-                <span class="link-icon">🔬</span>
+                <span class="link-icon"><InlineIcon icon="🔬" /></span>
                 <span class="link-text">{{ $t('home.features.phonology.phonemeClassify') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/pho/count')" class="feature-link">
-                <span class="link-icon">📊</span>
+                <span class="link-icon"><InlineIcon icon="📊" /></span>
                 <span class="link-text">{{ $t('home.features.phonology.syllableCount') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/pho/evolution')" class="feature-link">
-                <span class="link-icon">🥧</span>
+                <span class="link-icon"><InlineIcon icon="🥧" /></span>
                 <span class="link-text">{{ $t('home.features.phonology.evolution') }}</span>
               </a>
             </div>
@@ -171,7 +171,7 @@
         <!-- 漢字字表 -->
         <div class="feature-card" :class="{ expanded: expandedCard === 'charClass' }">
           <div class="card-header" @click="toggleCard('charClass')">
-            <div class="card-icon">📜</div>
+            <div class="card-icon"><InlineIcon icon="📜" /></div>
             <div class="card-info">
               <h3 class="card-title">{{ $t('home.features.charClass.title') }}</h3>
               <p class="card-desc">{{ $t('home.features.charClass.desc') }}</p>
@@ -183,19 +183,19 @@
           <transition name="expand">
             <div v-if="expandedCard === 'charClass'" class="card-body">
               <a @click.stop="navigateTo('/explore/char-class?tab=zhonggu')" class="feature-link">
-                <span class="link-icon">🏛️</span>
+                <span class="link-icon"><InlineIcon icon="🏛️" /></span>
                 <span class="link-text">{{ $t('home.features.charClass.zhonggu') }}</span>
               </a>
               <a @click.stop="navigateTo('/explore/char-class?tab=shanggu')" class="feature-link">
-                <span class="link-icon">📿</span>
+                <span class="link-icon"><InlineIcon icon="📿" /></span>
                 <span class="link-text">{{ $t('home.features.charClass.shanggu') }}</span>
               </a>
               <a @click.stop="navigateTo('/explore/char-class?tab=jingu')" class="feature-link">
-                <span class="link-icon">📖</span>
+                <span class="link-icon"><InlineIcon icon="📖" /></span>
                 <span class="link-text">{{ $t('home.features.charClass.jingu') }}</span>
               </a>
               <a @click.stop="navigateTo('/explore/char-class?tab=yueyun')" class="feature-link">
-                <span class="link-icon">🎵</span>
+                <span class="link-icon"><InlineIcon icon="🎵" /></span>
                 <span class="link-text">{{ $t('home.features.charClass.yueyun') }}</span>
               </a>
             </div>
@@ -205,7 +205,7 @@
         <!-- 詞句資料 -->
         <div class="feature-card" :class="{ expanded: expandedCard === 'words' }">
           <div class="card-header" @click="toggleCard('words')">
-            <div class="card-icon">📖</div>
+            <div class="card-icon"><InlineIcon icon="📖" /></div>
             <div class="card-info">
               <h3 class="card-title">{{ $t('home.features.words.title') }}</h3>
               <p class="card-desc">{{ $t('home.features.words.desc') }}</p>
@@ -217,19 +217,19 @@
           <transition name="expand">
             <div v-if="expandedCard === 'words'" class="card-body">
               <a @click.stop="navigateTo('/menu/vocabulary')" class="feature-link">
-                <span class="link-icon">📋</span>
+                <span class="link-icon"><InlineIcon icon="📋" /></span>
                 <span class="link-text">{{ $t('home.features.words.wordList') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/yubao?tab=vocabulary')" class="feature-link">
-                <span class="link-icon">📖</span>
+                <span class="link-icon"><InlineIcon icon="📖" /></span>
                 <span class="link-text">{{ $t('home.features.words.yubaoVocab') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/yubao?tab=grammar')" class="feature-link">
-                <span class="link-icon">🗣️</span>
+                <span class="link-icon"><InlineIcon icon="🗣️" /></span>
                 <span class="link-text">{{ $t('home.features.words.yubaoGrammar') }}</span>
               </a>
               <a @click.stop="navigateTo('/explore/yc/words')" class="feature-link">
-                <span class="link-icon">💬</span>
+                <span class="link-icon"><InlineIcon icon="💬" /></span>
                 <span class="link-text">{{ $t('home.features.words.ycSpoken') }}</span>
               </a>
             </div>
@@ -239,7 +239,7 @@
         <!-- 自然村資料 -->
         <div class="feature-card" :class="{ expanded: expandedCard === 'villages' }">
           <div class="card-header" @click="toggleCard('villages')">
-            <div class="card-icon">🏘️</div>
+            <div class="card-icon"><InlineIcon icon="🏘️" /></div>
             <div class="card-info">
               <h3 class="card-title">{{ $t('home.features.villages.title') }}</h3>
               <p class="card-desc">{{ $t('home.features.villages.desc') }}</p>
@@ -251,23 +251,23 @@
           <transition name="expand">
             <div v-if="expandedCard === 'villages'" class="card-body">
               <a @click.stop="navigateTo('/explore/villages/toponyms')" class="feature-link">
-                <span class="link-icon">📍</span>
+                <span class="link-icon"><InlineIcon icon="📍" /></span>
                 <span class="link-text">{{ $t('home.features.villages.toponyms') }}</span>
               </a>
               <a @click.stop="navigateTo('/explore/villages/ml')" class="feature-link">
-                <span class="link-icon">🤖</span>
+                <span class="link-icon"><InlineIcon icon="🤖" /></span>
                 <span class="link-text">{{ $t('home.features.villages.villagesML') }}</span>
               </a>
               <a @click.stop="navigateTo('/explore/villages/gd')" class="feature-link">
-                <span class="link-icon">🏘️</span>
+                <span class="link-icon"><InlineIcon icon="🏘️" /></span>
                 <span class="link-text">{{ $t('home.features.villages.gdVillages') }}</span>
               </a>
               <!-- <a @click.stop="navigateTo('/explore/villages/table')" class="feature-link">
-                <span class="link-icon">📊</span>
+                <span class="link-icon"><InlineIcon icon="📊" /></span>
                 <span class="link-text">{{ $t('home.features.villages.gdVillagesTable') }}</span>
               </a> -->
               <a @click.stop="navigateTo('/explore/villages/yc')" class="feature-link">
-                <span class="link-icon">🌾</span>
+                <span class="link-icon"><InlineIcon icon="🌾" /></span>
                 <span class="link-text">{{ $t('home.features.villages.ycVillages') }}</span>
               </a>
             </div>
@@ -277,7 +277,7 @@
         <!-- 專業工具 -->
         <div class="feature-card" :class="{ expanded: expandedCard === 'tools' }">
           <div class="card-header" @click="toggleCard('tools')">
-            <div class="card-icon">🧰</div>
+            <div class="card-icon"><InlineIcon icon="🧰" /></div>
             <div class="card-info">
               <h3 class="card-title">{{ $t('home.features.tools.title') }}</h3>
               <p class="card-desc">{{ $t('home.features.tools.desc') }}</p>
@@ -289,23 +289,23 @@
           <transition name="expand">
             <div v-if="expandedCard === 'tools'" class="card-body">
               <a @click.stop="navigateTo('/explore/tools/check')" class="feature-link">
-                <span class="link-icon">📋</span>
+                <span class="link-icon"><InlineIcon icon="📋" /></span>
                 <span class="link-text">{{ $t('home.features.tools.tableProcess') }}</span>
               </a>
               <a @click.stop="navigateTo('/explore/tools/jyut2ipa')" class="feature-link">
-                <span class="link-icon">🔤</span>
+                <span class="link-icon"><InlineIcon icon="🔤" /></span>
                 <span class="link-text">{{ $t('home.features.tools.jyut2ipa') }}</span>
               </a>
               <a @click.stop="navigateTo('/explore/tools/merge')" class="feature-link">
-                <span class="link-icon">🔗</span>
+                <span class="link-icon"><InlineIcon icon="🔗" /></span>
                 <span class="link-text">{{ $t('home.features.tools.tableMerge') }}</span>
               </a>
               <!-- <a @click.stop="navigateTo('/explore/tools/derive')" class="feature-link">
-                <span class="link-icon">🧪</span>
+                <span class="link-icon"><InlineIcon icon="🧪" /></span>
                 <span class="link-text">{{ $t('home.features.tools.tableDerive') }}</span>
               </a> -->
               <!-- <a @click.stop="navigateTo('/explore?page=praat')" class="feature-link">
-                <span class="link-icon">🎙️</span>
+                <span class="link-icon"><InlineIcon icon="🎙️" /></span>
                 <span class="link-text">聲學分析 - 實驗語音學工具</span>
               </a> -->
             </div>
@@ -315,7 +315,7 @@
         <!-- Praat 聲學分析 -->
         <div class="feature-card clickable" @click="navigateTo('/explore/tools/praat')">
           <div class="card-header">
-            <div class="card-icon">🎙️</div>
+            <div class="card-icon"><InlineIcon icon="🎙️" /></div>
             <div class="card-info">
               <h3 class="card-title">{{ $t('home.features.praat.title') }}</h3>
               <p class="card-desc">{{ $t('home.features.praat.desc') }}</p>
@@ -327,7 +327,7 @@
         <!-- 方言聚类 -->
 <!--        <div class="feature-card clickable" @click="navigateTo('/menu/luster')">-->
 <!--          <div class="card-header">-->
-<!--            <div class="card-icon">🧩</div>-->
+<!--            <div class="card-icon"><InlineIcon icon="🧩" /></div>-->
 <!--            <div class="card-info">-->
 <!--              <h3 class="card-title">{{ $t('home.features.dialectClustering.title') }}</h3>-->
 <!--              <p class="card-desc">{{ $t('home.features.dialectClustering.desc') }}</p>-->
@@ -339,7 +339,7 @@
         <!-- 關於網站 -->
         <div class="feature-card" :class="{ expanded: expandedCard === 'about' }">
           <div class="card-header" @click="toggleCard('about')">
-            <div class="card-icon">🌐</div>
+            <div class="card-icon"><InlineIcon icon="🌐" /></div>
             <div class="card-info">
               <h3 class="card-title">{{ $t('home.features.about.title') }}</h3>
               <p class="card-desc">{{ $t('home.features.about.desc') }}</p>
@@ -351,23 +351,23 @@
           <transition name="expand">
             <div v-if="expandedCard === 'about'" class="card-body">
               <a @click.stop="navigateTo('/menu/about/intro')" class="feature-link">
-                <span class="link-icon">ℹ️</span>
+                <span class="link-icon"><InlineIcon icon="ℹ️" /></span>
                 <span class="link-text">{{ $t('home.features.about.intro') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/about/suggestion')" class="feature-link">
-                <span class="link-icon">💬</span>
+                <span class="link-icon"><InlineIcon icon="💬" /></span>
                 <span class="link-text">{{ $t('home.features.about.suggestion') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/about/like')" class="feature-link">
-                <span class="link-icon">❤️</span>
+                <span class="link-icon"><InlineIcon icon="❤️" /></span>
                 <span class="link-text">{{ $t('home.features.about.likeAuthor') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/settings')" class="feature-link">
-                <span class="link-icon">⚙️</span>
+                <span class="link-icon"><InlineIcon icon="⚙️" /></span>
                 <span class="link-text">{{ $t('home.features.about.setting') }}</span>
               </a>
               <a @click.stop="navigateTo('/menu/source')" class="feature-link">
-                <span class="link-icon">🔗</span>
+                <span class="link-icon"><InlineIcon icon="🔗" /></span>
                 <span class="link-text">{{ $t('home.features.about.source') }}</span>
               </a>
             </div>
@@ -383,42 +383,42 @@
       <div class="roadmap-list">
         <div class="roadmap-item">
           <div class="roadmap-header">
-            <div class="roadmap-icon">📜</div>
+            <div class="roadmap-icon"><InlineIcon icon="📜" /></div>
             <h3 class="roadmap-title">{{ $t('home.roadmap.charsGeneration.title') }}</h3>
           </div>
           <p class="roadmap-desc">{{ $t('home.roadmap.charsGeneration.desc') }}</p>
         </div>
         <div class="roadmap-item">
           <div class="roadmap-header">
-            <div class="roadmap-icon">🎙️</div>
+            <div class="roadmap-icon"><InlineIcon icon="🎙️" /></div>
             <h3 class="roadmap-title">{{ $t('home.roadmap.phoneticsToolbox.title') }}</h3>
           </div>
           <p class="roadmap-desc">{{ $t('home.roadmap.phoneticsToolbox.desc') }}</p>
         </div>
         <div class="roadmap-item">
           <div class="roadmap-header">
-            <div class="roadmap-icon">🧬</div>
+            <div class="roadmap-icon"><InlineIcon icon="🧬" /></div>
             <h3 class="roadmap-title">{{ $t('home.roadmap.dialectClustering.title') }}</h3>
           </div>
           <p class="roadmap-desc">{{ $t('home.roadmap.dialectClustering.desc') }}</p>
         </div>
         <div class="roadmap-item">
           <div class="roadmap-header">
-            <div class="roadmap-icon">🌳</div>
+            <div class="roadmap-icon"><InlineIcon icon="🌳" /></div>
             <h3 class="roadmap-title">{{ $t('home.roadmap.evolutionTree.title') }}</h3>
           </div>
           <p class="roadmap-desc">{{ $t('home.roadmap.evolutionTree.desc') }}</p>
         </div>
         <div class="roadmap-item">
           <div class="roadmap-header">
-            <div class="roadmap-icon">🔊</div>
+            <div class="roadmap-icon"><InlineIcon icon="🔊" /></div>
             <h3 class="roadmap-title">{{ $t('home.roadmap.ipaTTS.title') }}</h3>
           </div>
           <p class="roadmap-desc">{{ $t('home.roadmap.ipaTTS.desc') }}</p>
         </div>
         <div class="roadmap-item">
           <div class="roadmap-header">
-            <div class="roadmap-icon">🤖</div>
+            <div class="roadmap-icon"><InlineIcon icon="🤖" /></div>
             <h3 class="roadmap-title">{{ $t('home.roadmap.dialectBot.title') }}</h3>
           </div>
           <p class="roadmap-desc">{{ $t('home.roadmap.dialectBot.desc') }}</p>
@@ -429,33 +429,33 @@
     <!-- Login Benefits Section -->
     <section class="login-section">
       <div class="login-card">
-        <div class="login-icon">🔐</div>
+        <div class="login-icon"><InlineIcon icon="🔐" /></div>
         <div class="login-content">
           <h3 class="login-title">{{ $t('home.login.title') }}</h3>
           <p class="login-desc">{{ $t('home.login.desc') }}</p>
           <div class="login-benefits">
             <div class="benefit-item">
-              <span class="benefit-icon">🗺️</span>
+              <span class="benefit-icon"><InlineIcon icon="🗺️" /></span>
               <span class="benefit-text">{{ $t('home.login.benefits.customMap') }}</span>
             </div>
             <div class="benefit-item">
-              <span class="benefit-icon">🗂️</span>
+              <span class="benefit-icon"><InlineIcon icon="🗂️" /></span>
               <span class="benefit-text">{{ $t('home.login.benefits.customRegion') }}</span>
             </div>
             <div class="benefit-item">
-              <span class="benefit-icon">🔍</span>
+              <span class="benefit-icon"><InlineIcon icon="🔍" /></span>
               <span class="benefit-text">{{ $t('home.login.benefits.moreLocations') }}</span>
             </div>
             <div class="benefit-item">
-              <span class="benefit-icon">🎙️</span>
+              <span class="benefit-icon"><InlineIcon icon="🎙️" /></span>
               <span class="benefit-text">{{ $t('home.login.benefits.praatTools') }}</span>
             </div>
             <div class="benefit-item">
-              <span class="benefit-icon">🧰</span>
+              <span class="benefit-icon"><InlineIcon icon="🧰" /></span>
               <span class="benefit-text">{{ $t('home.login.benefits.tableTools') }}</span>
             </div>
             <div class="benefit-item">
-              <span class="benefit-icon">📊</span>
+              <span class="benefit-icon"><InlineIcon icon="📊" /></span>
               <span class="benefit-text">{{ $t('home.login.benefits.queryHistory') }}</span>
             </div>
           </div>
@@ -498,7 +498,7 @@
       </div>
 
       <div class="contact-card">
-        <div class="contact-icon">💬</div>
+        <div class="contact-icon"><InlineIcon icon="💬" /></div>
         <div class="contact-content">
           <h3 class="contact-title">{{ $t('home.contact.title') }}</h3>
           <p class="contact-desc">{{ $t('home.contact.desc') }}</p>
@@ -569,7 +569,7 @@
       @close="showSupport = false"
     />
     <!--      <div class="home-support-shell" @click.stop>
-            <button class="close-btn close-btn-lg close-btn-corner" @click="showSupport = false">✕</button>
+            <button class="close-btn close-btn-lg close-btn-corner" @click="showSupport = false"><InlineIcon icon="✕" /></button>
             <h3 class="home-support-title">{{ $t('home.supportModal.title') }}</h3>
             <p class="home-support-subtitle">{{ $t('home.supportModal.subtitle') }}</p>
             <div class="donate-qr-grid">
@@ -588,6 +588,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, ref, onMounted, defineAsyncComponent } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'

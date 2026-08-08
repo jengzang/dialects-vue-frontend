@@ -42,18 +42,15 @@
         </div>
 
         <div class="button-row">
-          <button class="action-btn" @click="resetView" :title="t('map.yuBaoMap.buttons.reset')">
-            🎯 {{ t('map.yuBaoMap.buttons.reset') }}
+          <button class="action-btn" @click="resetView" :title="t('map.yuBaoMap.buttons.reset')"><InlineIcon icon="🎯" />{{ t('map.yuBaoMap.buttons.reset') }}
           </button>
-          <button class="action-btn fullscreen-btn" @click="toggleFullScreen" :title="t('map.yuBaoMap.buttons.fullscreen')">
-            ⛶ {{ t('map.yuBaoMap.buttons.fullscreen') }}
+          <button class="action-btn fullscreen-btn" @click="toggleFullScreen" :title="t('map.yuBaoMap.buttons.fullscreen')"><InlineIcon icon="⛶" />{{ t('map.yuBaoMap.buttons.fullscreen') }}
           </button>
         </div>
       </div>
     </div>
 
-    <button v-if="isFullScreen" class="exit-fullscreen-btn" @click="toggleFullScreen">
-      ✕ {{ t('map.yuBaoMap.buttons.exitFullscreen') }}
+    <button v-if="isFullScreen" class="exit-fullscreen-btn" @click="toggleFullScreen"><InlineIcon icon="✕" />{{ t('map.yuBaoMap.buttons.exitFullscreen') }}
     </button>
 
     <Teleport to="body">
@@ -133,6 +130,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, onMounted, onBeforeUnmount, shallowRef, nextTick, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import maplibregl from 'maplibre-gl'

@@ -44,8 +44,7 @@
             id="stickyContextText"
             class="stickybar-location-trigger"
             @click.stop="toggleLocationDropdown"
-          >
-            📍 {{ currentStickyLocation || t('result.resultList.locationPlaceholder') }}
+          ><InlineIcon icon="📍" />{{ currentStickyLocation || t('result.resultList.locationPlaceholder') }}
           </div>
 
           <div class="stickybar-location-dropdown" :class="{ open: isLocationDropdownOpen }">
@@ -117,6 +116,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch, onMounted, nextTick, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DataRow from './DataRow.vue';

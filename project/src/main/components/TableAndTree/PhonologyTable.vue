@@ -1,7 +1,7 @@
 <template>
   <div class="phonology-matrix" :class="{ 'is-fullscreen': isFullScreen }">
     <div v-if="location" class="location-header">
-      <div class="location-title">📍 {{ location }}</div>
+      <div class="location-title"><InlineIcon icon="📍" />{{ location }}</div>
       <div class="header-actions">
         <button class="tone-search-btn" @click="handleShowDetails" :disabled="isLoading">
           {{ isLoading ? t('result.phonologyTable.loadingButton') : t('result.phonologyTable.detailButton') }}
@@ -78,6 +78,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue';

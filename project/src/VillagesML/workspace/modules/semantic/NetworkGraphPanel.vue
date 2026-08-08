@@ -17,7 +17,7 @@
         <strong>執行時間:</strong> {{ network.execution_time_ms }}ms
       </span>
       <span class="metadata-item" v-if="network.from_cache">
-        <span class="cache-badge">📦 來自緩存</span>
+        <span class="cache-badge"><InlineIcon icon="📦" />來自緩存</span>
       </span>
     </div>
 
@@ -55,6 +55,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import * as echarts from 'echarts'
 import { getCategoryDisplayName, getCategoryIcon } from '@/VillagesML/config/villagesML.js'

@@ -129,9 +129,7 @@
                   type="button"
                   @click="showFeatureDetail(row.特徵, row.聲韻調)"
                   title="查看该特征在其他地点的分布"
-                >
-                  🔍
-                </button>
+                ><InlineIcon icon="🔍" /></button>
               </div>
             </div>
             <div class="point-cell" :data-label="t('customEntry.pointDetail.rows.headers.value')">
@@ -303,6 +301,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, ref, watch, nextTick } from 'vue';
 import { batchMatch, getRegions, getUserPoints } from '@/api';
 import { showConfirm, showWarning } from '@/utils/ui/message.js';

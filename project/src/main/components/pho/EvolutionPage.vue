@@ -101,8 +101,7 @@
         {{ feature }} ({{ pieCountByFeature[feature] || 0 }})
       </button>
 
-      <div v-if="currentDataLocationName" class="feature-tabs-location" @click.stop="handleLocationClick(currentDataLocationName)">
-        📍 {{ currentDataLocationName }}
+      <div v-if="currentDataLocationName" class="feature-tabs-location" @click.stop="handleLocationClick(currentDataLocationName)"><InlineIcon icon="📍" />{{ currentDataLocationName }}
       </div>
     </div>
 
@@ -261,6 +260,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'

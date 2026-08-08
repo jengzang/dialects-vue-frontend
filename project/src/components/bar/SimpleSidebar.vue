@@ -46,7 +46,7 @@
               <span class="stat-value">{{ totalVisits }}</span>
             </div>
             <button class="expand-btn main-sidebar-expand-btn" @click="toggleStatsPanel">
-              📊
+              <InlineIcon icon="📊" />
             </button>
           </div>
         </div>
@@ -72,14 +72,14 @@
       <div v-else class="stats-content">
         <div class="stats-summary-large">
           <div class="stat-card">
-            <div class="stat-icon">📅</div>
+            <div class="stat-icon"><InlineIcon icon="📅" /></div>
             <div class="stat-info">
               <span class="stat-label-large">{{ t('navigation.stats.todayVisits') }}</span>
               <span class="stat-value-large">{{ todayVisits }}</span>
             </div>
           </div>
           <div class="stat-card">
-            <div class="stat-icon">🌐</div>
+            <div class="stat-icon"><InlineIcon icon="🌐" /></div>
             <div class="stat-info">
               <span class="stat-label-large">{{ t('navigation.stats.totalVisits') }}</span>
               <span class="stat-value-large">{{ totalVisits }}</span>
@@ -140,6 +140,7 @@ import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue'
 import { clearToken, getToken } from '@/api/auth/auth.js'
 import BarIcon from '@/components/common/BarIcon.vue'
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { useVisitStats, ensureVisitHistory } from '@/composables/data/useVisitStats.js'
 import {userStore} from "@/main/store/store.js";
 import { useSidebarConfig } from '@/main/config/index.js';

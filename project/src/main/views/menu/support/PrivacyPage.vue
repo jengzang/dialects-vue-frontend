@@ -1,4 +1,5 @@
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { useI18n } from 'vue-i18n'
 import { showSuccess } from '@/utils/ui/message.js'
 
@@ -14,19 +15,18 @@ const copyCitation = () => {
   <div class="privacy-content glass-container glass-container-soft">
       <!-- 标题和语言切换 -->
       <div class="header">
-        <h1 class="title">📜 {{ t('privacy.title') }}</h1>
+        <h1 class="title"><InlineIcon icon="📜" />{{ t('privacy.title') }}</h1>
       </div>
 
       <div class="content-section">
         <!-- 引用建议 -->
         <section class="section">
-          <h2>📖 {{ t('privacy.citation.title') }}</h2>
+          <h2><InlineIcon icon="📖" />{{ t('privacy.citation.title') }}</h2>
           <div class="citation-box">
             <p class="citation-text">
               {{ t('privacy.citation.text') }}
             </p>
-            <button class="copy-btn" @click="copyCitation">
-              📋 {{ t('privacy.citation.copyButton') }}
+            <button class="copy-btn" @click="copyCitation"><InlineIcon icon="📋" />{{ t('privacy.citation.copyButton') }}
             </button>
           </div>
           <p class="note">
@@ -36,7 +36,7 @@ const copyCitation = () => {
 
         <!-- 隐私政策 -->
         <section class="section">
-          <h2>🔒 {{ t('privacy.privacy.title') }}</h2>
+          <h2><InlineIcon icon="🔒" />{{ t('privacy.privacy.title') }}</h2>
 
           <h3>{{ t('privacy.privacy.dataCollection.title') }}</h3>
           <p>
@@ -97,7 +97,7 @@ const copyCitation = () => {
 
         <!-- 免责声明 -->
         <section class="section">
-          <h2>⚠️ {{ t('privacy.disclaimer.title') }}</h2>
+          <h2><InlineIcon icon="⚠️" />{{ t('privacy.disclaimer.title') }}</h2>
           <p>
             {{ t('privacy.disclaimer.text') }}
           </p>

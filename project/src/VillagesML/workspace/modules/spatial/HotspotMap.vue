@@ -14,8 +14,8 @@
           </div>
 
           <div class="button-row vml-control-actions">
-            <button class="action-btn" @click="resetView">🎯 復位</button>
-            <button class="action-btn fullscreen-btn" @click="toggleFullScreen">⛶ 全屏</button>
+            <button class="action-btn" @click="resetView"><InlineIcon icon="🎯" />復位</button>
+            <button class="action-btn fullscreen-btn" @click="toggleFullScreen"><InlineIcon icon="⛶" />全屏</button>
           </div>
         </div>
 
@@ -27,8 +27,7 @@
       </div>
 
       <!-- 全屏退出按鈕 -->
-      <button v-if="isFullScreen" class="exit-fullscreen-btn" @click="toggleFullScreen">
-        ✕ 退出全屏
+      <button v-if="isFullScreen" class="exit-fullscreen-btn" @click="toggleFullScreen"><InlineIcon icon="✕" />退出全屏
       </button>
 
       <!-- 村莊詳情彈窗 -->
@@ -37,7 +36,7 @@
           <div class="village-popup-content" @click.stop>
             <div class="popup-header">
               <h3>{{ selectedVillage.village_name }}</h3>
-              <button class="close-btn close-btn-lg close-btn-inline" @click="closePopup">✕</button>
+              <button class="close-btn close-btn-lg close-btn-inline" @click="closePopup"><InlineIcon icon="✕" /></button>
             </div>
             <div class="popup-body">
               <div class="info-row">
@@ -65,6 +64,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, onMounted, onBeforeUnmount, shallowRef, nextTick, watch, computed } from 'vue'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'

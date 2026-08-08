@@ -148,7 +148,7 @@
           @dragleave.prevent="isDragOver = false"
           @drop.prevent="handleDrop"
         >
-          <div class="upload-zone-icon">📄</div>
+          <div class="upload-zone-icon"><InlineIcon icon="📄" /></div>
           <p class="upload-zone-hint">{{ t('words.wordList.upload.dropHint') }}</p>
         </div>
 
@@ -396,6 +396,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'

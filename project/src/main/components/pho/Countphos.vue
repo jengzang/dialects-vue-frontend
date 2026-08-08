@@ -1,4 +1,5 @@
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -899,7 +900,7 @@ onBeforeUnmount(() => {
 <template>
   <div class="phonology-page">
     <!-- <div class="page-header">
-      <h2 class="page-title">🧮 音節統計</h2>
+      <h2 class="page-title"><InlineIcon icon="🧮" />音節統計</h2>
     </div> -->
 
     <!-- 地点输入组件 -->

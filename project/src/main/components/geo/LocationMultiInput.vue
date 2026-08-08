@@ -26,8 +26,7 @@
           </button>
         </div>
       </div>
-      <div v-if="warningMessage" class="warning-message">
-        ⚠️ {{ warningMessage }}
+      <div v-if="warningMessage" class="warning-message"><InlineIcon icon="⚠️" />{{ warningMessage }}
       </div>
       <textarea
         id="location-input"
@@ -48,8 +47,7 @@
           class="suggestions-dropdown"
           :style="suggestionStyle"
         >
-          <div v-if="successMessage" class="success-message">
-            ✅ {{ successMessage }}
+          <div v-if="successMessage" class="success-message"><InlineIcon icon="✅" />{{ successMessage }}
           </div>
           <div
             v-for="item in suggestions"
@@ -93,6 +91,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getLocations, batchMatch, getLocationPartitions } from '@/api/index.js'

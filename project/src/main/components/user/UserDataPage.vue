@@ -6,7 +6,7 @@
           {{ t('common.button.back') }}
         </button>
         <h2>
-          <span class="title-icon">📊</span>
+          <span class="title-icon"><InlineIcon icon="📊" /></span>
           <span>{{ t('user.dataPage.title') }}</span>
           <span v-if="username" class="username-badge">{{ username }}</span>
         </h2>
@@ -19,27 +19,23 @@
 
     <div class="toolbar liquid-panel">
       <div class="toolbar-left">
-        <button class="liquid-btn btn-primary" type="button" @click="openBatchCreateModal">
-          ➕ {{ t('user.dataPage.toolbar.batchAdd') }}
+        <button class="liquid-btn btn-primary" type="button" @click="openBatchCreateModal"><InlineIcon icon="➕" />{{ t('user.dataPage.toolbar.batchAdd') }}
         </button>
         <button
           class="liquid-btn btn-warning"
           type="button"
           :disabled="selectedRecords.length === 0"
           @click="handleBatchEdit"
-        >
-          ✏️ {{ t('user.dataPage.toolbar.batchEdit') }}
+        ><InlineIcon icon="✏️" />{{ t('user.dataPage.toolbar.batchEdit') }}
         </button>
         <button
           class="liquid-btn btn-danger"
           type="button"
           :disabled="selectedRecords.length === 0"
           @click="handleBatchDelete"
-        >
-          🗑️ {{ t('user.dataPage.toolbar.batchDelete') }}
+        ><InlineIcon icon="🗑️" />{{ t('user.dataPage.toolbar.batchDelete') }}
         </button>
-        <button class="liquid-btn btn-secondary" type="button" @click="fetchData">
-          🔄 {{ t('user.dataPage.toolbar.refresh') }}
+        <button class="liquid-btn btn-secondary" type="button" @click="fetchData"><InlineIcon icon="🔄" />{{ t('user.dataPage.toolbar.refresh') }}
         </button>
       </div>
       <div class="toolbar-right">
@@ -167,7 +163,7 @@
       close-label="關閉"
       @update:modelValue="closeBatchEditModal"
     >
-      <p class="hint">💡 {{ t('user.dataPage.batchEdit.hint') }}</p>
+      <p class="hint"><InlineIcon icon="💡" />{{ t('user.dataPage.batchEdit.hint') }}</p>
       <div class="batch-table-wrapper" data-variant="edit">
         <table class="batch-table">
           <thead>
@@ -215,13 +211,11 @@
       close-label="關閉"
       @update:modelValue="closeBatchCreateModal"
     >
-      <p class="hint">💡 {{ t('user.dataPage.batchCreate.hint') }}</p>
+      <p class="hint"><InlineIcon icon="💡" />{{ t('user.dataPage.batchCreate.hint') }}</p>
       <div class="batch-table-controls">
-        <button class="liquid-btn btn-add-row" type="button" @click="addBatchRow">
-          ➕ {{ t('user.dataPage.batchCreate.addRow') }}
+        <button class="liquid-btn btn-add-row" type="button" @click="addBatchRow"><InlineIcon icon="➕" />{{ t('user.dataPage.batchCreate.addRow') }}
         </button>
-        <button class="liquid-btn btn-clear" type="button" @click="clearBatchRows">
-          🗑️ {{ t('user.dataPage.batchCreate.clear') }}
+        <button class="liquid-btn btn-clear" type="button" @click="clearBatchRows"><InlineIcon icon="🗑️" />{{ t('user.dataPage.batchCreate.clear') }}
         </button>
         <span class="row-count">
           {{ t('user.dataPage.batchCreate.currentRows', { count: batchRows.length }) }}
@@ -321,6 +315,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'

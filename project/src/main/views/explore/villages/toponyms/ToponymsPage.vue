@@ -20,9 +20,7 @@
               data-variant="secondary"
               :aria-label="t('villages.pages.toponyms.chart.configAriaLabel')"
               @click="openChartConfig"
-            >
-              ⚙
-            </button>
+            ><InlineIcon icon="⚙" /></button>
           </template>
         </ToponymSearchBar>
       </div>
@@ -116,6 +114,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import {

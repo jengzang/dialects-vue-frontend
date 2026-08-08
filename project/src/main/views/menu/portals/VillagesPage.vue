@@ -4,7 +4,7 @@
 
     <div class="villages-grid">
       <button class="entry-button" @click="handleToponyms">
-        <div class="entry-button__icon">📍</div>
+        <div class="entry-button__icon"><InlineIcon icon="📍" /></div>
         <div class="entry-button__name">
           {{ $t('villages.toponyms.name') }}
         </div>
@@ -14,7 +14,7 @@
       </button>
 
       <button class="entry-button" @click="handleGdVillages">
-        <div class="entry-button__icon">🏘️</div>
+        <div class="entry-button__icon"><InlineIcon icon="🏘️" /></div>
         <div class="entry-button__name">
           {{ $t('villages.gdVillages.name') }}
         </div>
@@ -24,7 +24,7 @@
       </button>
 
       <button class="entry-button" @click="handleVillagesML">
-        <div class="entry-button__icon">🤖</div>
+        <div class="entry-button__icon"><InlineIcon icon="🤖" /></div>
         <div class="entry-button__name">
           {{ $t('villages.villagesML.name') }}
         </div>
@@ -34,7 +34,7 @@
       </button>
 
       <button class="entry-button" @click="handleGdVillagesTable">
-        <div class="entry-button__icon">📊</div>
+        <div class="entry-button__icon"><InlineIcon icon="📊" /></div>
         <div class="entry-button__name">
           {{ $t('villages.gdVillagesTable.name') }}
         </div>
@@ -44,7 +44,7 @@
       </button>
 
       <button class="entry-button" @click="handleYcVillages">
-        <div class="entry-button__icon">🌾</div>
+        <div class="entry-button__icon"><InlineIcon icon="🌾" /></div>
         <div class="entry-button__name">
           {{ $t('villages.ycVillages.name') }}
         </div>
@@ -58,7 +58,7 @@
         class="entry-button"
         @click="handleAllVillages"
       >
-        <div class="entry-button__icon">📋</div>
+        <div class="entry-button__icon"><InlineIcon icon="📋" /></div>
         <div class="entry-button__name">
           {{ $t('villages.allVillages.name') }}
         </div>
@@ -71,6 +71,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { userStore } from '@/main/store/store.js'

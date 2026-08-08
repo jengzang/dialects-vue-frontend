@@ -4,7 +4,7 @@
 
     <div class="tools-grid">
       <button class="entry-button" @click="handleDataCheck">
-        <div class="entry-button__icon">📋</div>
+        <div class="entry-button__icon"><InlineIcon icon="📋" /></div>
         <div class="entry-button__name">
           {{ $t('tools.dataCheck.name') }}
         </div>
@@ -14,7 +14,7 @@
       </button>
 
       <button class="entry-button" @click="handleJyutpingToIpa">
-        <div class="entry-button__icon">🔤</div>
+        <div class="entry-button__icon"><InlineIcon icon="🔤" /></div>
         <div class="entry-button__name">
           {{ $t('tools.jyutpingToIpa.name') }}
         </div>
@@ -24,7 +24,7 @@
       </button>
 
       <button class="entry-button" @click="handleMergeTables">
-        <div class="entry-button__icon">🔗</div>
+        <div class="entry-button__icon"><InlineIcon icon="🔗" /></div>
         <div class="entry-button__name">
           {{ $t('tools.mergeTables.name') }}
         </div>
@@ -34,7 +34,7 @@
       </button>
 
       <!-- <button class="entry-button" @click="handleDeriveTables">
-        <div class="entry-button__icon">🧪</div>
+        <div class="entry-button__icon"><InlineIcon icon="🧪" /></div>
         <div class="entry-button__name">
           {{ $t('tools.deriveTables.name') }}
         </div>
@@ -44,7 +44,7 @@
       </button> -->
 
       <button class="entry-button" @click="handlePraatTables">
-        <div class="entry-button__icon">🎙️</div>
+        <div class="entry-button__icon"><InlineIcon icon="🎙️" /></div>
         <div class="entry-button__name">
           {{ $t('tools.praatAnalysis.name') }}
         </div>
@@ -54,7 +54,7 @@
       </button>
 
       <button class="entry-button" @click="handleGis">
-        <div class="entry-button__icon">🗺</div>
+        <div class="entry-button__icon"><InlineIcon icon="🗺" /></div>
         <div class="entry-button__name">
           {{ $t('tools.gis.name') }}
         </div>
@@ -67,6 +67,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   buildLocalePath,

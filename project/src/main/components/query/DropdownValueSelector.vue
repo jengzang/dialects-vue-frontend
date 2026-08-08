@@ -30,8 +30,8 @@
             :class="{ active: isAllSelected(key) }"
             @click="toggleSelectAll(key)"
           >
-            <span v-if="isAllSelected(key)">☑</span>
-            <span v-else>☐</span>
+            <span v-if="isAllSelected(key)"><InlineIcon icon="☑" /></span>
+            <span v-else><InlineIcon icon="☐" /></span>
             {{ $t('query.tab2.selectAll') }}
           </div>
 
@@ -59,6 +59,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { S2T_T2S_MAPPING } from '@/main/config'

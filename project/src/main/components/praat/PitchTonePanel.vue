@@ -17,8 +17,7 @@
       <div class="controls-section main-glass-panel-inner">
         <div class="input-group">
           <div class="selection-info">
-            <span v-if="currentSelection.length > 0" class="status-active">
-              ✅ {{ t('praat.pitchTone.step1.controls.selectionStatus.active', { count: currentSelection.length }) }}
+            <span v-if="currentSelection.length > 0" class="status-active"><InlineIcon icon="✅" />{{ t('praat.pitchTone.step1.controls.selectionStatus.active', { count: currentSelection.length }) }}
             </span>
             <span v-else class="status-idle">{{ t('praat.pitchTone.step1.controls.selectionStatus.idle') }}</span>
           </div>
@@ -34,10 +33,9 @@
               class="action-btn add-btn"
               :disabled="currentSelection.length === 0 || !toneNameInput"
               @click="saveTone"
-            >➕ {{ t('praat.pitchTone.step1.controls.addButton') }}</button>
+            ><InlineIcon icon="➕" />{{ t('praat.pitchTone.step1.controls.addButton') }}</button>
 
-          <div class="persistence-hint">
-            💡 {{ t('praat.pitchTone.step1.controls.persistenceHint') }}
+          <div class="persistence-hint"><InlineIcon icon="💡" />{{ t('praat.pitchTone.step1.controls.persistenceHint') }}
           </div>
         </div>
 
@@ -60,7 +58,7 @@
     </div>
 
     <div v-else class="no-data-message">
-      <div class="no-data-icon">📊</div>
+      <div class="no-data-icon"><InlineIcon icon="📊" /></div>
       <p>{{ t('praat.pitchTone.noData.text') }}</p>
     </div>
 
@@ -91,7 +89,7 @@
         <button
             class="analyze-btn"
             @click="performTValueAnalysis"
-        >🚀 {{ t('praat.pitchTone.step2.analyzeButton', { count: savedTones.length }) }}</button>
+        ><InlineIcon icon="🚀" />{{ t('praat.pitchTone.step2.analyzeButton', { count: savedTones.length }) }}</button>
       </div>
     </div>
 
@@ -117,8 +115,7 @@
       </div>
 
       <div class="export-actions">
-        <button class="export-btn" @click="exportToExcel">
-          📊 {{ t('praat.pitchTone.step3.exportButton') }}
+        <button class="export-btn" @click="exportToExcel"><InlineIcon icon="📊" />{{ t('praat.pitchTone.step3.exportButton') }}
         </button>
       </div>
 
@@ -166,6 +163,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import * as echarts from 'echarts'
 import * as XLSX from 'xlsx'

@@ -23,8 +23,7 @@
       </div>
 
       <div class="vml-control-actions">
-        <button class="analyze-button solid-button" @click="handleAnalyze" :disabled="!localName">
-          🔍 開始分析
+        <button class="analyze-button solid-button" @click="handleAnalyze" :disabled="!localName"><InlineIcon icon="🔍" />開始分析
         </button>
       </div>
     </div>
@@ -32,6 +31,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref } from 'vue'
 import { villagesMLStore } from '@/VillagesML/store/villagesMLStore.js'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'

@@ -7,8 +7,8 @@
       @click.stop
     >
       <div class="popup-content">
-        <p>📍 {{ t('result.terms.location') }}: {{ data.location }}</p>
-        <p>🧩 {{ t('result.terms.feature') }}: {{ checkedFeatures }}</p>
+        <p><InlineIcon icon="📍" />{{ t('result.terms.location') }}: {{ data.location }}</p>
+        <p><InlineIcon icon="🧩" />{{ t('result.terms.feature') }}: {{ checkedFeatures }}</p>
 
         <span v-for="option in modeOptions" :key="option.id">
           {{ getModeLabel(option.id) }}: {{ getDisplayContent(option.id) }}
@@ -20,8 +20,7 @@
           class="mini-button"
           :style="shouldUseBaseDescription(option.id) ? { fontSize: '17px' } : {}"
           @click="handleAction(option.id, option.bool)"
-        >
-          🔍{{ getModeLabel(option.id) }}
+        ><InlineIcon icon="🔍" />{{ getModeLabel(option.id) }}
         </button>
       </div>
     </div>
@@ -29,6 +28,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { parseFeatureString } from '@/main/utils/query/ResultTable.js';

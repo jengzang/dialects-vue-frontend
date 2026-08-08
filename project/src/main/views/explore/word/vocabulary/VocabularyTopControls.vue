@@ -22,7 +22,7 @@
             :title="t('words.wordList.search.settings')"
             @click="searchFieldModalOpen = true"
           >
-            <span aria-hidden="true">⚙️</span>
+            <span aria-hidden="true"><InlineIcon icon="⚙️" /></span>
           </button>
           <AppModal
             v-model="searchFieldModalOpen"
@@ -175,6 +175,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'

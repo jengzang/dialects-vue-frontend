@@ -48,9 +48,7 @@
               @click="indicesRegionName = ''"
               class="clear-button"
               type="button"
-            >
-              ✕
-            </button>
+            ><InlineIcon icon="✕" /></button>
           </div>
           <span class="input-hint">查詢特定區域</span>
         </div>
@@ -140,6 +138,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'

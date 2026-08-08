@@ -9,7 +9,7 @@
     <template #header>
       <!-- 头部 -->
 <!--      <div class="partition-modal-header">-->
-        <div class="partition-modal-title">🗂️ {{ $t('query.components.partitionModal.title') }}</div>
+        <div class="partition-modal-title"><InlineIcon icon="🗂️" />{{ $t('query.components.partitionModal.title') }}</div>
         <!-- 选择模式开关 -->
         <div class="selection-mode-toggle">
           <label class="toggle-label">{{ $t('query.components.partitionModal.enableSelection') }}</label>
@@ -64,7 +64,7 @@
         </div>
 
         <div v-else-if="errorMessage" class="error-state">
-          <span>❌ {{ errorMessage }}</span>
+          <span><InlineIcon icon="❌" />{{ errorMessage }}</span>
         </div>
 
         <div v-else class="partition-tree-container" :class="{ 'selection-mode': selectionMode }">
@@ -86,6 +86,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch, defineComponent, h, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'

@@ -21,8 +21,7 @@
           data-variant="secondary"
           type="button"
           @click="showAddLayerModal = true"
-        >
-          ➕ {{ t('map.drawTab.buttons.addLayer') }}
+        ><InlineIcon icon="➕" />{{ t('map.drawTab.buttons.addLayer') }}
         </button>
         <button
           class="main-glass-button"
@@ -30,24 +29,21 @@
           :data-active="isVoronoiPanelOpen"
           type="button"
           @click="togglePanel('voronoi')"
-        >
-          ⬡ {{ t('map.drawTab.buttons.voronoi') }}
+        ><InlineIcon icon="⬡" />{{ t('map.drawTab.buttons.voronoi') }}
         </button>
         <button
           class="main-glass-button"
           data-variant="secondary"
           type="button"
           @click="showExportModal = true"
-        >
-          📤 {{ t('map.drawTab.buttons.export') }}
+        ><InlineIcon icon="📤" />{{ t('map.drawTab.buttons.export') }}
         </button>
         <button
           class="main-glass-button"
           data-variant="secondary"
           type="button"
           @click="showLocalStorageModal = true"
-        >
-          💾 {{ t('map.drawTab.buttons.saveToLocal') }}
+        ><InlineIcon icon="💾" />{{ t('map.drawTab.buttons.saveToLocal') }}
         </button>
         <button
           class="main-glass-button"
@@ -55,8 +51,7 @@
           :data-active="isDrawingPanelOpen"
           type="button"
           @click="togglePanel('drawing')"
-        >
-          🛠️ {{ t('map.drawTab.buttons.drawingTools') }}
+        ><InlineIcon icon="🛠️" />{{ t('map.drawTab.buttons.drawingTools') }}
         </button>
         <button
           class="main-glass-button"
@@ -64,8 +59,7 @@
           :data-active="isLayersPanelOpen"
           type="button"
           @click="togglePanel('layers')"
-        >
-          🗂️ {{ t('map.drawTab.buttons.layers') }}
+        ><InlineIcon icon="🗂️" />{{ t('map.drawTab.buttons.layers') }}
         </button>
       </div>
     </div>
@@ -75,9 +69,7 @@
       class="auth-warning-container"
     >
       <div class="auth-warning-card">
-        <div class="auth-warning-icon">
-          🔒
-        </div>
+        <div class="auth-warning-icon"><InlineIcon icon="🔒" /></div>
         <p class="auth-warning-text">
           {{ t('map.drawTab.auth.loginRequired') }}
         </p>
@@ -265,7 +257,7 @@
             type="button"
             @click="onCreateLayerClicked('Point')"
           >
-            <span class="draw-card-icon">📍</span>
+            <span class="draw-card-icon"><InlineIcon icon="📍" /></span>
             <div class="draw-card-text">
               <div class="draw-card-title">
                 {{ t('map.drawTab.buttons.createPointLayer') }}
@@ -281,7 +273,7 @@
             type="button"
             @click="onCreateLayerClicked('LineString')"
           >
-            <span class="draw-card-icon">➖</span>
+            <span class="draw-card-icon"><InlineIcon icon="➖" /></span>
             <div class="draw-card-text">
               <div class="draw-card-title">
                 {{ t('map.drawTab.buttons.createLineLayer') }}
@@ -297,7 +289,7 @@
             type="button"
             @click="onCreateLayerClicked('Polygon')"
           >
-            <span class="draw-card-icon">⬡</span>
+            <span class="draw-card-icon"><InlineIcon icon="⬡" /></span>
             <div class="draw-card-text">
               <div class="draw-card-title">
                 {{ t('map.drawTab.buttons.createPolygonLayer') }}
@@ -313,7 +305,7 @@
             type="button"
             @click="onImportLayerClicked"
           >
-            <span class="draw-card-icon">📤</span>
+            <span class="draw-card-icon"><InlineIcon icon="📤" /></span>
             <div class="draw-card-text">
               <div class="draw-card-title">
                 {{ t('map.drawTab.buttons.importLayer') }}
@@ -329,7 +321,7 @@
             type="button"
             @click="onAdminBoundaryClicked"
           >
-            <span class="draw-card-icon">🗺️</span>
+            <span class="draw-card-icon"><InlineIcon icon="🗺️" /></span>
             <div class="draw-card-text">
               <div class="draw-card-title">
                 {{ t('map.drawTab.buttons.adminBoundary') }}
@@ -345,7 +337,7 @@
             type="button"
             @click="onRiverImportClicked"
           >
-            <span class="draw-card-icon">🌊</span>
+            <span class="draw-card-icon"><InlineIcon icon="🌊" /></span>
             <div class="draw-card-text">
               <div class="draw-card-title">
                 {{ t('map.drawTab.buttons.riverImport') }}
@@ -371,7 +363,7 @@
             :disabled="!activeLayer"
             @click="onExportCurrentClicked"
           >
-            <span class="draw-card-icon">📄</span>
+            <span class="draw-card-icon"><InlineIcon icon="📄" /></span>
             <div class="draw-card-text">
               <div class="draw-card-title">
                 {{ t('map.drawTab.buttons.exportLayer') }}
@@ -388,7 +380,7 @@
             :disabled="!layers.length"
             @click="onExportAllClicked"
           >
-            <span class="draw-card-icon">🗂️</span>
+            <span class="draw-card-icon"><InlineIcon icon="🗂️" /></span>
             <div class="draw-card-text">
               <div class="draw-card-title">
                 {{ t('map.drawTab.buttons.exportAllLayers') }}
@@ -404,7 +396,7 @@
             type="button"
             @click="onExportImageClicked"
           >
-            <span class="draw-card-icon">🖼️</span>
+            <span class="draw-card-icon"><InlineIcon icon="🖼️" /></span>
             <div class="draw-card-text">
               <div class="draw-card-title">
                 {{ t('map.drawTab.buttons.exportImage') }}
@@ -428,7 +420,7 @@
             type="button"
             @click="openSaveLocalDraftModal"
           >
-            <span class="draw-card-icon">💾</span>
+            <span class="draw-card-icon"><InlineIcon icon="💾" /></span>
             <div class="draw-card-text">
               <div class="draw-card-title">
                 {{ t('map.drawTab.buttons.saveAsNewLocal') }}
@@ -442,7 +434,7 @@
             :disabled="!storedDraftOptions.length"
             @click="handleUpdateLocal"
           >
-            <span class="draw-card-icon">♻️</span>
+            <span class="draw-card-icon"><InlineIcon icon="♻️" /></span>
             <div class="draw-card-text">
               <div class="draw-card-title">
                 {{ t('map.drawTab.buttons.updateLocal') }}
@@ -456,7 +448,7 @@
             :disabled="!storedDraftOptions.length"
             @click="handleRestoreLocal"
           >
-            <span class="draw-card-icon">📂</span>
+            <span class="draw-card-icon"><InlineIcon icon="📂" /></span>
             <div class="draw-card-text">
               <div class="draw-card-title">
                 {{ t('map.drawTab.buttons.restoreLocal') }}
@@ -470,7 +462,7 @@
             :disabled="!storedDraftOptions.length"
             @click="handleDeleteLocal"
           >
-            <span class="draw-card-icon">🗑️</span>
+            <span class="draw-card-icon"><InlineIcon icon="🗑️" /></span>
             <div class="draw-card-text">
               <div class="draw-card-title">
                 {{ t('map.drawTab.buttons.deleteLocal') }}
@@ -712,6 +704,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { onBeforeUnmount, onMounted, ref, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';

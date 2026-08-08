@@ -1,4 +1,5 @@
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
@@ -60,7 +61,7 @@ const goToPrivacy = () => {
   <div style="width: 100%;justify-content: center;align-items:center;display: flex;flex-direction: column">
     <div class="header-row">
 
-      <h2 class="tabs-title" style="font-size: 1.5rem;">🔗 {{ t('source.title') }}</h2>
+      <h2 class="tabs-title" style="font-size: 1.5rem;"><InlineIcon icon="🔗" />{{ t('source.title') }}</h2>
       <a class="privacy-link" @click="goToPrivacy">
         {{ t('source.privacyLink') }}
       </a>

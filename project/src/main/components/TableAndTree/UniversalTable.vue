@@ -2,7 +2,7 @@
   <div class="universal-table glass-container" :style="containerStyle">
     <div class="toolbar">
       <div class="search-wrapper">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon"><InlineIcon icon="🔍" /></span>
           <input
               v-model="searchText"
               @compositionstart="handleSearchCompositionStart"
@@ -14,7 +14,7 @@
       </div>
       <div v-if="canUseTableActions" class="action-buttons">
         <button v-if="!isEditMode" class="main-glass-button" data-size="compact" @click="exportToExcel">
-          <span class="icon">📤</span><span class="btn-text">Excel</span>
+          <span class="icon"><InlineIcon icon="📤" /></span><span class="btn-text">Excel</span>
         </button>
         <button class="main-glass-button" data-variant="primary" @click="openAddModal">
           <span class="icon">＋</span> <span class="btn-text">{{ t('tableTree.universalTable.toolbar.add') }}</span>
@@ -25,7 +25,7 @@
           :data-state="isEditMode ? 'edit-mode' : 'default'"
           @click="toggleEditMode"
         >
-          <span class="icon">{{ isEditMode ? '✕' : '✎' }}</span>
+          <span class="icon"><InlineIcon :icon="isEditMode ? '✕' : '✎'" /></span>
           <span class="btn-text">{{ isEditMode ? t('common.button.cancel') : t('common.button.edit') }}</span>
         </button>
         <button
@@ -35,7 +35,7 @@
           @click="openBatchReplaceModal"
           :title="t('tableTree.universalTable.toolbar.batchReplace')"
         >
-          <span class="icon">🔄</span>
+          <span class="icon"><InlineIcon icon="🔄" /></span>
           <span class="btn-text">{{ t('tableTree.universalTable.toolbar.batchReplace') }}</span>
         </button>
         <button
@@ -45,7 +45,7 @@
           @click="submitBatchEdit"
           :disabled="Object.keys(changedCells).length === 0"
         >
-          <span class="icon">✓</span>
+          <span class="icon"><InlineIcon icon="✓" /></span>
           <span class="btn-text">{{ t('tableTree.universalTable.toolbar.submitWithCount', { count: changedRowCount }) }}</span>
         </button>
       </div>
@@ -58,7 +58,7 @@
       </div>
 
       <div v-else-if="tableData.length === 0" class="empty-state">
-        <span>📭 {{ t('tableTree.universalTable.states.noData') }}</span>
+        <span><InlineIcon icon="📭" /> {{ t('tableTree.universalTable.states.noData') }}</span>
       </div>
       <table>
         <colgroup>
@@ -106,7 +106,7 @@
             {{ row[col.key] }}
           </td>
           <td v-if="canUseTableActions" class="action-td">
-            <button class="icon-action-btn delete" :title="t('common.button.delete')" @click="handleDelete(row)">✕</button>
+            <button class="icon-action-btn delete" :title="t('common.button.delete')" @click="handleDelete(row)"><InlineIcon icon="✕" /></button>
           </td>
         </tr>
         </tbody>
@@ -135,7 +135,7 @@
       </div>
       <button class="page-btn" @click="changePage(1)" :disabled="currentPage >= totalPages">→</button>
       <button class="fullscreen-toggle-btn" @click="toggleFullscreen">
-        {{ isFullscreen ? t('tableTree.universalTable.toolbar.exit') : `⛶ ${t('tableTree.universalTable.toolbar.fullscreen')}` }}
+        {{ isFullscreen ? t('tableTree.universalTable.toolbar.exit') : `<InlineIcon icon="⛶" /> ${t('tableTree.universalTable.toolbar.fullscreen')}` }}
       </button>
     </div>
 
@@ -151,7 +151,7 @@
               </div>
 
               <div v-else-if="tableData.length === 0" class="empty-state">
-                <span>📭 {{ t('tableTree.universalTable.states.noData') }}</span>
+                <span><InlineIcon icon="📭" /> {{ t('tableTree.universalTable.states.noData') }}</span>
               </div>
               <table>
                 <colgroup>
@@ -199,7 +199,7 @@
                     {{ row[col.key] }}
                   </td>
                   <td v-if="canUseTableActions" class="action-td">
-                    <button class="icon-action-btn delete" :title="t('common.button.delete')" @click="handleDelete(row)">✕</button>
+                    <button class="icon-action-btn delete" :title="t('common.button.delete')" @click="handleDelete(row)"><InlineIcon icon="✕" /></button>
                   </td>
                 </tr>
                 </tbody>
@@ -247,7 +247,7 @@
             >
               <div class="filter-header">
               <span>{{ t('tableTree.universalTable.filter.title', { label: currentFilterLabel }) }}</span>
-              <button class="close-btn close-btn-sm close-btn-inline close-btn-mobile-only" :aria-label="t('common.button.close')" @click="closeFilter">✕</button>
+              <button class="close-btn close-btn-sm close-btn-inline close-btn-mobile-only" :aria-label="t('common.button.close')" @click="closeFilter"><InlineIcon icon="✕" /></button>
             </div>
 
             <div v-bind="containerProps" class="filter-list ui-scrollbar" style="max-height: 300px">
@@ -507,6 +507,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, reactive, onMounted, computed, onUnmounted, nextTick, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import * as XLSX from 'xlsx';

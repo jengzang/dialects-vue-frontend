@@ -136,12 +136,12 @@
             <span class="category-separator">-</span>
             <p class="category-subtitle">區域排行</p>
           </div>
-          <button class="close-button" @click="selectedCategory = null">✕</button>
+          <button class="close-button" @click="selectedCategory = null"><InlineIcon icon="✕" /></button>
         </div>
 
         <!-- Prompt when no category selected -->
         <div v-if="!selectedCategory" class="prompt-message">
-          <span class="prompt-icon">👆</span>
+          <span class="prompt-icon"><InlineIcon icon="👆" /></span>
           <p>請點擊上方的類別卡片以查看該類別在不同區域的排行</p>
         </div>
 
@@ -276,6 +276,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
