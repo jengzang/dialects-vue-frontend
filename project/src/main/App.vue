@@ -1,9 +1,11 @@
 <!-- ✅ App.vue -->
 <template>
   <!-- 🧱 動態載入 layout -->
-  <component :is="layoutComponent">
-    <router-view />
-  </component>
+  <ErrorBoundary>
+    <component :is="layoutComponent">
+      <router-view />
+    </component>
+  </ErrorBoundary>
 
   <RateLimitNotice />
   <GlobalToast />
@@ -32,6 +34,7 @@ import ExploreLayout from '../layouts/ExploreLayout.vue'
 import GlobalToast from '../components/ToastAndHelp/GlobalToast.vue'
 import GlobalConfirm from '../components/ToastAndHelp/GlobalConfirm.vue'
 import RateLimitNotice from '../components/ToastAndHelp/RateLimitNotice.vue'
+import ErrorBoundary from '../components/ToastAndHelp/ErrorBoundary.vue'
 import { initOnlineTimeTracker, stopOnlineTimeTracker } from '../utils/user/onlineTimeTracker.js'
 import { initLoginPromptTracker, stopLoginPromptTracker } from '../utils/user/loginPromptTracker.js'
 import { getToken } from '../api/auth/auth.js'
@@ -52,6 +55,7 @@ import { isRouteLoading } from '../utils/ui/routeLoading.js'
 
 export default {
   components: {
+    ErrorBoundary,
     GlobalToast,
     GlobalConfirm,
     RateLimitNotice

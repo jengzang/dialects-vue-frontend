@@ -19,7 +19,19 @@ const DialectClusteringPage = () => import('@/main/views/menu/DialectClustering.
 export const menuRoutes = [
   {
     path: 'menu/pho/:section(matrix|custom|count|evolution)',
-    component: PhoPage
+    component: PhoPage,
+    meta: {
+      queryAllowlist: {
+        base: [],
+        variantKey: 'section',
+        variants: {
+          matrix: ['loc'],
+          custom: ['loc', 'feature', 'h', 'v', 'c'],
+          count: [],
+          evolution: ['loc']
+        }
+      }
+    }
   },
   {
     path: 'menu/about/:section(intro|suggestion|like)',
@@ -59,7 +71,18 @@ export const menuRoutes = [
   },
   {
     path: 'menu/map/:sub(view|divide|custom)',
-    component: MapPage
+    component: MapPage,
+    meta: {
+      queryAllowlist: {
+        base: [],
+        variantKey: 'sub',
+        variants: {
+          view: ['feature', 'locations', 'regions', 'regionMode', 'openPanel', 'phonology'],
+          divide: [],
+          custom: []
+        }
+      }
+    }
   },
   {
     path: 'menu/result',
@@ -100,7 +123,8 @@ export const menuRoutes = [
     children: [
       {
         path: 'view',
-        component: VocabularyViewPage
+        component: VocabularyViewPage,
+        meta: { queryAllowlist: ['tab'] }
       },
       {
         path: 'import',
@@ -114,7 +138,8 @@ export const menuRoutes = [
   },
   {
     path: 'menu/yubao',
-    component: YuBaoMenuPage
+    component: YuBaoMenuPage,
+    meta: { queryAllowlist: ['tab'] }
   },
   {
     path: 'menu/villages',

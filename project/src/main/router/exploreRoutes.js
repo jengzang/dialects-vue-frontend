@@ -36,11 +36,13 @@ export const exploreRoutes = [
   },
   {
     path: 'explore/tools/praat',
-    component: PraatPage
+    component: PraatPage,
+    meta: { queryAllowlist: ['tab'] }
   },
   {
     path: 'explore/gis',
-    component: GisPage
+    component: GisPage,
+    meta: { queryAllowlist: ['scrollTo'] }
   },
   {
     path: 'explore/manage',
@@ -64,7 +66,8 @@ export const exploreRoutes = [
   },
   {
     path: 'explore/char-class',
-    component: CharacterClassificationPage
+    component: CharacterClassificationPage,
+    meta: { queryAllowlist: ['tab', 'table', 'levels'] }
   },
   {
     path: 'explore/yc-spoken',
