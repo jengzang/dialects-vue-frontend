@@ -390,7 +390,7 @@ $text-muted: var(--text-tertiary);
 }
 
 .settings-container {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -451,9 +451,39 @@ $text-muted: var(--text-tertiary);
 }
 
 .color-theme-radio-group {
-  flex-wrap: nowrap;
-  gap: 6px;
-  overflow-x: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-items: center;
+  gap: 4px 16px;
+
+  :deep(.liquid-radio-text) {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &::before {
+      width: 18px;
+      height: 18px;
+      content: '';
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 5px;
+      flex-shrink: 0;
+    }
+  }
+
+  :deep(.liquid-radio-label:nth-child(1) .liquid-radio-text::before) {
+    background: #007aff;
+  }
+  :deep(.liquid-radio-label:nth-child(2) .liquid-radio-text::before) {
+    background: #388e3c;
+  }
+  :deep(.liquid-radio-label:nth-child(3) .liquid-radio-text::before) {
+    background: linear-gradient(135deg, #fff 50%, #e8e8e8 50%);
+    border-color: rgba(0, 0, 0, 0.18);
+  }
+  :deep(.liquid-radio-label:nth-child(4) .liquid-radio-text::before) {
+    background: linear-gradient(135deg, #0d1117 50%, #21262d 50%);
+  }
 }
 
 .interface-mode-radio-group {
