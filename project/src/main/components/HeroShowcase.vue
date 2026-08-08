@@ -23,8 +23,9 @@
         <img
           :src="item.image"
           :alt="t(item.titleKey)"
-          :loading="i === activeIndex ? undefined : 'lazy'"
-          :decoding="i === activeIndex ? undefined : 'async'"
+          loading="lazy"
+          decoding="async"
+          @load="$event.target.classList.add('is-loaded')"
         />
       </div>
     </div>
@@ -335,6 +336,23 @@ $duration: 450ms;
     object-fit: cover;
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-glass);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    background:
+      linear-gradient(
+        90deg,
+        rgba(255,255,255,0.04) 25%,
+        rgba(255,255,255,0.1) 50%,
+        rgba(255,255,255,0.04) 75%
+      );
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+
+    &.is-loaded {
+      opacity: 1;
+      background: none;
+      animation: none;
+    }
   }
 
   &.is-active {
@@ -564,9 +582,18 @@ $duration: 450ms;
   }
 }
 
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .showcase-item {
     transition-duration: 0.01ms;
+  }
+
+  img {
+    animation: none;
   }
 }
 </style>
