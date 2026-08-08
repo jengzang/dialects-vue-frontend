@@ -208,6 +208,12 @@ export default defineConfig(async ({ mode }) => {
             if (id.includes('wavesurfer')) {
               return 'wavesurfer';
             }
+            if (id.includes('globe.gl') || id.includes('three')) {
+              return 'globe-gl';
+            }
+            if (id.includes('cobe')) {
+              return 'cobe';
+            }
             if (
               id.includes('node_modules/vue/') ||
               id.includes('node_modules/@vue/') ||

@@ -5,29 +5,31 @@
 
     <!-- Hero Section -->
     <section class="hero-section">
-      <div class="hero-content">
-        <img src="@/assets/picture/title.png" :alt="$t('home.hero.logoAlt')" class="hero-logo title-logo" />
-        <div class="hero-title-row">
-          <h1 class="hero-title">{{ $t('home.hero.title') }}</h1>
-        </div>
-        <p class="hero-subtitle">{{ $t('home.hero.subtitle') }}</p>
-        <div class="hero-bottom-row">
-          <div class="hero-actions">
-            <button class="btn-primary" @click="navigateTo('/menu/query/zhonggu')">
-              <span class="btn-icon"><InlineIcon icon="🚀" /></span>
-              <span class="btn-text">{{ $t('home.hero.startExploring') }}</span>
-            </button>
-            <!-- <button class="btn-primary btn-explore" @click="navigateTo('/explore?page=YuBao')">
-              <span class="btn-icon"><InlineIcon icon="🧰" /></span>
-              <span class="btn-text">{{ $t('home.hero.expandTools') }}</span>
-            </button> -->
-            <button class="btn-secondary" @click="scrollToFeatures">
-              <span class="btn-icon"><InlineIcon icon="📖" /></span>
-              <span class="btn-text">{{ $t('home.hero.featuresIntro') }}</span>
-            </button>
+      <div class="hero-row">
+        <div class="hero-left">
+          <div class="hero-content">
+            <img src="@/assets/picture/title.png" :alt="$t('home.hero.logoAlt')" class="hero-logo title-logo" />
+            <div class="hero-title-row">
+              <h1 class="hero-title">{{ $t('home.hero.title') }}</h1>
+            </div>
+            <p class="hero-subtitle">{{ $t('home.hero.subtitle') }}</p>
+            <div class="hero-bottom-row">
+              <div class="hero-actions">
+                <button class="btn-primary" @click="navigateTo('/menu/query/zhonggu')">
+                  <span class="btn-icon"><InlineIcon icon="🚀" /></span>
+                  <span class="btn-text">{{ $t('home.hero.startExploring') }}</span>
+                </button>
+                <button class="btn-secondary" @click="scrollToFeatures">
+                  <span class="btn-icon"><InlineIcon icon="📖" /></span>
+                  <span class="btn-text">{{ $t('home.hero.featuresIntro') }}</span>
+                </button>
+              </div>
+              <img :src="heroDecorationSrc" :alt="$t('home.hero.decorationAlt')" class="hero-decoration" />
+            </div>
           </div>
-          <img :src="heroDecorationSrc" :alt="$t('home.hero.decorationAlt')" class="hero-decoration" />
         </div>
+
+        <GlobeBackground :points="globePoints" />
       </div>
 
       <HeroShowcase />
@@ -616,6 +618,9 @@ const SupportPopup = defineAsyncComponent(() =>
 const UpdateNoticeModal = defineAsyncComponent(() =>
   import('@/main/components/user/popups/UpdateNoticeModal.vue')
 )
+const GlobeBackground = defineAsyncComponent(() =>
+  import('@/main/components/globe/GlobeBackground.vue')
+)
 
 const { t, locale } = useI18n()
 const router = useRouter()
@@ -627,6 +632,7 @@ const {
 } = useVisitStats()
 const featuresSection = ref(null)
 const expandedCard = ref(null)
+const globePoints = ref([])
 const showSupport = ref(false)
 const showBenefitsPopup = ref(false)
 const showUpdateNotice = ref(false)
@@ -728,9 +734,27 @@ async function fetchSourceStats() {
   }
 }
 
+async function fetchGlobePoints() {
+  try {
+    const res = await fetch('/data/dots.json')
+    const json = await res.json()
+    const lonIdx = json.fields.indexOf('lon')
+    const latIdx = json.fields.indexOf('lat')
+    const nameIdx = json.fields.indexOf('語言')
+    globePoints.value = json.data.map(row => ({
+      lng: row[lonIdx],
+      lat: row[latIdx],
+      name: row[nameIdx],
+    }))
+  } catch (error) {
+    console.error('获取地球散点数据失败:', error)
+  }
+}
+
 onMounted(() => {
   fetchVisitStats()
   fetchSourceStats()
+  fetchGlobePoints()
 })
 </script>
 
@@ -798,24 +822,44 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     position: relative;
     z-index: 1;
     min-height: 85vh;
-    padding: 2rem 1.5rem;
+    overflow: hidden;
 
     @include flex-col;
-    @include flex-center;
-    gap: 1rem;
+    align-items: stretch;
+  }
+
+  &-row {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  &-left {
+    position: relative;
+    z-index: 1;
+    flex: 0 0 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
   }
 
   &-content {
-    max-width: 700px;
+    position: relative;
+    z-index: 1;
+    max-width: 540px;
     text-align: center;
     animation: heroFadeIn 1s $ease-apple;
   }
 
   &-logo {
-    width: clamp(220px, 40vw, 380px);
+    width: clamp(180px, 30vw, 340px);
     height: auto;
-    margin-top: 2rem;
-    margin-bottom: 0.6rem;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
     filter: drop-shadow(0 4px 12px rgba(var(--color-primary-rgb), 0.15));
   }
 
@@ -1755,8 +1799,16 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
       min-height: 75vh;
     }
 
+    &-row {
+      flex-direction: row;
+    }
+
+    &-left {
+      flex: 0 0 50%;
+    }
+
     &-logo {
-      width: clamp(260px, 50vw, 400px);
+      width: clamp(180px, 35vw, 300px);
     }
 
     &-actions {

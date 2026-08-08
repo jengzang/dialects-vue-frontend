@@ -275,5 +275,8 @@
     "weixinLabel": "WeChat",
     "alipayAlt": "Alipay payment QR code",
     "alipayLabel": "Alipay"
+  },
+  "globe": {
+    "toggleTitle": "Switch globe renderer"
   }
 }
