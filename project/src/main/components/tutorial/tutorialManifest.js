@@ -234,6 +234,27 @@ export const tutorialManifest = [
     order: 32,
     path: '/explore/yc/words',
   }),
+  createPathEntry({
+    key: 'menu-vocabulary-view',
+    categoryKey: 'corpusAndCharClass',
+    groupKey: 'menuVocabulary',
+    order: 33,
+    path: '/menu/vocabulary/view',
+  }),
+  createPathEntry({
+    key: 'menu-vocabulary-import',
+    categoryKey: 'corpusAndCharClass',
+    groupKey: 'menuVocabulary',
+    order: 34,
+    path: '/menu/vocabulary/import',
+  }),
+  createPathEntry({
+    key: 'menu-vocabulary-manage',
+    categoryKey: 'corpusAndCharClass',
+    groupKey: 'menuVocabulary',
+    order: 35,
+    path: '/menu/vocabulary/manage',
+  }),
 
   // ==================== 实用工具 ====================
   createQueryEntry({
