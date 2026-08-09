@@ -325,24 +325,24 @@ export const tutorialManifest = [
     expectedValue: 'overview',
   }),
   createPathEntry({
-    key: 'auth-data',
+    key: 'menu-map-custom',
     categoryKey: 'account',
     groupKey: 'authData',
     order: 62,
+    path: '/menu/map/custom',
+  }),
+  createPathEntry({
+    key: 'auth-data',
+    categoryKey: 'account',
+    groupKey: 'authData',
+    order: 63,
     path: '/auth/data',
   }),
   createPathEntry({
     key: 'auth-regions',
     categoryKey: 'account',
     groupKey: 'authData',
-    order: 63,
-    path: '/auth/regions',
-  }),
-  createPathEntry({
-    key: 'menu-map-custom',
-    categoryKey: 'account',
-    groupKey: 'authData',
     order: 64,
-    path: '/menu/map/custom',
+    path: '/auth/regions',
   }),
 ]
