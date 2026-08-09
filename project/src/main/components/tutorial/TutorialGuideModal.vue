@@ -365,7 +365,7 @@ const modalMaxHeight = computed(() => {
     return 'min(88dvh, 720px)'
   }
 
-  return 'min(82dvh, 780px)'
+  return 'min(88dvh, 800px)'
 })
 
 function scrollSelectionIntoView() {
@@ -873,6 +873,7 @@ $float-catalog-button-left:0;
 
   &__content {
     font-family: var(--font-serif);
+    font-size: 0.95rem;
     color: var(--text-primary);
     line-height: 1.72;
 
@@ -881,6 +882,14 @@ $float-catalog-button-left:0;
     :deep(h3) {
       color: var(--color-primary-hover);
       line-height: 1.3;
+    }
+
+    :deep(h2) {
+      font-size: 1.2rem;
+    }
+
+    :deep(h3) {
+      font-size: 1.05rem;
     }
 
     :deep(p) {
@@ -908,11 +917,13 @@ $float-catalog-button-left:0;
 
     :deep(img) {
       display: block;
-      max-width: 100%;
+      max-width: min(100%, 95dvw);
+      max-height: 50dvh;
       height: auto;
       margin: 12px 0;
       border-radius: var(--radius-lg);
       border: 1px solid rgba(110, 160, 214, 0.12);
+      object-fit: contain;
     }
   }
 }
