@@ -7,6 +7,10 @@ import {
   getPlatformAcceptanceChecklist,
   getPlatformAcceptanceDiagnostics,
 } from '../src/platform/featureMatrix.js'
+import {
+  DEFAULT_NATIVE_DIST_MAX_BYTES,
+  formatNativeDistBytes,
+} from './audit-native-dist.mjs'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -166,6 +170,8 @@ function parseBootedIosSimulators(output) {
 }
 
 async function printNativeSmokeStatus() {
+  console.log(`\nNative dist size budget: ${formatNativeDistBytes(DEFAULT_NATIVE_DIST_MAX_BYTES)}`)
+
   const androidEnv = withAndroidEnv()
   const adbResult = await runCapture('adb', ['devices'], { env: androidEnv })
   const androidDevices = adbResult.code === 0 ? parseAdbDevices(adbResult.stdout) : []

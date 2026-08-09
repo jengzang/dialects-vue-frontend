@@ -42,6 +42,8 @@ describe('platform build scripts', () => {
     expect(source).toContain('getPlatformAcceptanceChecklist')
     expect(source).toContain('verifyAcceptanceChecklist')
     expect(source).toContain('printNativeSmokeStatus')
+    expect(source).toContain('Native dist size')
+    expect(source).toContain('DEFAULT_NATIVE_DIST_MAX_BYTES')
     expect(source).toContain('android/app/build/outputs/apk/debug/app-debug.apk')
     expect(source).toContain('xcrun simctl install booted')
     expect(source).toContain('adb install -r')

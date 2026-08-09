@@ -189,6 +189,22 @@ export const PLATFORM_FEATURE_MATRIX = {
     },
     disabledReason: 'remote-tutorial-assets',
   },
+  buildReports: {
+    category: 'build',
+    targets: {
+      web: true,
+      ios: false,
+      android: false,
+      native: false,
+    },
+    nativeDistPrune: {
+      paths: [
+        'bundle-network.html',
+        'bundle-treemap.html',
+      ],
+    },
+    disabledReason: 'web-build-analysis-only',
+  },
   seoOnly: {
     category: 'build',
     targets: {

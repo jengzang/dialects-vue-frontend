@@ -15,6 +15,14 @@ describe('native dist pruning manifest', () => {
     expect(NATIVE_DIST_PRUNE_PATHS).toContain('tutorial')
   })
 
+  it('removes Vite bundle visualizer reports from native builds', () => {
+    const manifest = getNativeDistPruneManifest()
+
+    expect(NATIVE_DIST_PRUNE_PATHS).toEqual(manifest.paths)
+    expect(NATIVE_DIST_PRUNE_PATHS).toContain('bundle-network.html')
+    expect(NATIVE_DIST_PRUNE_PATHS).toContain('bundle-treemap.html')
+  })
+
   it('keeps GIS static resources in native builds', () => {
     const manifest = getNativeDistPruneManifest()
 

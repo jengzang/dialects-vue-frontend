@@ -35,6 +35,8 @@ npm run build:android
 
 `build:ios` 和 `build:android` 只負責前端 WebView 產物，不會完整編譯 Xcode 或 Gradle 原生 App。
 
+Native dist audit 會同時檢查體積預算，默認上限為 45 MiB。Web 端保留 Vite visualizer 產物；iOS / Android native 端會剪掉 `bundle-network.html`、`bundle-treemap.html` 和遠端教程截圖目錄，避免開發分析文件與教程截圖進入 App 包。
+
 ## 完整驗證命令
 
 需要確認平台 App 可構建時使用：
@@ -132,6 +134,7 @@ npm run verify:platform:android
 - 文件導入 / 導出在 native 端走 Capacitor FilePicker、Filesystem、Share 等真實插件能力。
 - 地圖繪製保留在 Web 端，native 端不打包地圖繪製專用靜態資源。
 - native dist audit 會檢查 Web-only 地圖繪製資源是否被誤打進 native 產物，例如 `data/国界面.kmz`。
+- native dist audit 會檢查教程截圖、`bundle-network.html`、`bundle-treemap.html` 是否被誤打進 native 產物，並輸出 native dist size / 45 MiB 預算。
 
 ## 注意事項
 
