@@ -32,7 +32,7 @@ function render() {
   const bgTint = getCssRgb('--bg-blue-tint-rgb', '240, 247, 255')
 
   globe = Globe()(containerRef.value)
-    .globeImageUrl('/textures/earth-blue-marble.jpg')
+    .globeImageUrl('/textures/earth-color-relief.jpg')
     .backgroundImageUrl(null)
     .showGraticules(false)
     .backgroundColor('rgba(0,0,0,0)') 
@@ -51,7 +51,7 @@ function render() {
 
   globe.controls().autoRotate = false
   globe.controls().autoRotateSpeed = 0.4
-  globe.controls().enableZoom = true
+  globe.controls().enableZoom = false
   globe.controls().enablePan = true
   globe.controls().enablePointerInteraction = true
 
@@ -78,6 +78,16 @@ function render() {
   resizeObserver.observe(containerRef.value)
 
   window.addEventListener('keydown', onKeyDown)
+  window.addEventListener('wheel', onWheel, { passive: false })
+}
+
+function onWheel(e) {
+  if (!e.ctrlKey && !e.metaKey) return
+  e.preventDefault()
+  const delta = e.deltaY > 0 ? 0.15 : -0.15
+  const pov = globe.pointOfView()
+  const alt = Math.max(0.4, Math.min(3.5, pov.altitude + delta))
+  globe.pointOfView({ lat: pov.lat, lng: pov.lng, altitude: alt })
 }
 
 function onKeyDown(e) {
@@ -124,6 +134,7 @@ function updatePoints() {
 
 function destroy() {
   window.removeEventListener('keydown', onKeyDown)
+  window.removeEventListener('wheel', onWheel)
   if (resizeObserver) {
     resizeObserver.disconnect()
     resizeObserver = null
