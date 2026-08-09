@@ -324,6 +324,49 @@ describe('PageTutorialGuide', () => {
     wrapper.unmount()
   })
 
+  it('opens image preview when clicking an article image', async () => {
+    const { default: PageTutorialGuide } = await tutorialModule()
+    const wrapper = await openGuideFor(PageTutorialGuide)
+
+    const articleImage = document.querySelector('.tutorial-article img')
+    expect(articleImage).toBeTruthy()
+
+    articleImage.click()
+    await nextTick()
+
+    const previewImg = document.querySelector('.image-preview-overlay__img')
+    expect(previewImg).toBeTruthy()
+    expect(previewImg.getAttribute('src')).toBe(articleImage.getAttribute('src'))
+
+    const closeBtn = document.querySelector('.image-preview-overlay .close-btn')
+    expect(closeBtn).toBeTruthy()
+    closeBtn.click()
+    await nextTick()
+
+    expect(document.querySelector('.image-preview-overlay')).toBeNull()
+
+    wrapper.unmount()
+  })
+
+  it('closes image preview on Escape key', async () => {
+    const { default: PageTutorialGuide } = await tutorialModule()
+    const wrapper = await openGuideFor(PageTutorialGuide)
+
+    const articleImage = document.querySelector('.tutorial-article img')
+    articleImage.click()
+    await nextTick()
+
+    const overlay = document.querySelector('.image-preview-overlay')
+    expect(overlay).toBeTruthy()
+
+    overlay.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    await nextTick()
+
+    expect(document.querySelector('.image-preview-overlay')).toBeNull()
+
+    wrapper.unmount()
+  })
+
   it('hides the trigger on unsupported routes', async () => {
     route.path = '/'
     route.params = {}

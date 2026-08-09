@@ -190,6 +190,7 @@
             v-if="selectedDocument?.html"
             class="tutorial-article__content"
             data-tutorial-content
+            @click="handleArticleClick"
             v-html="selectedDocument.html"
           />
           <!-- eslint-enable vue/no-v-html -->
@@ -241,6 +242,12 @@
   </AppModal>
 
   <ScrollToTop :container="scrollContainer" :show-after="200" />
+
+  <ImagePreviewOverlay
+    :src="previewImageSrc"
+    :alt="previewImageAlt"
+    @close="closeImagePreview"
+  />
 </template>
 
 <script setup>
@@ -248,6 +255,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
 import ScrollToTop from '@/components/common/ScrollToTop.vue'
+import ImagePreviewOverlay from '@/components/common/ImagePreviewOverlay.vue'
 import { tutorialEnabled, setTutorialEnabled } from '@/main/store/store.js'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { showInfo } from '@/utils/ui/message.js'
@@ -322,6 +330,25 @@ const modalBodyRef = ref(null)
 const articleTopRef = ref(null)
 const articleScrollRef = ref(null)
 const scrollContainer = computed(() => articleScrollRef.value)
+
+const previewImageSrc = ref('')
+const previewImageAlt = ref('')
+
+function handleArticleClick(e) {
+  const img = e.target.closest('img')
+  if (!img) return
+  openImagePreview(img.src, img.alt || '')
+}
+
+function openImagePreview(src, alt) {
+  previewImageSrc.value = src
+  previewImageAlt.value = alt
+}
+
+function closeImagePreview() {
+  previewImageSrc.value = ''
+  previewImageAlt.value = ''
+}
 
 const shouldShowCatalog = computed(() => {
   return !props.isCompact || props.isMobileLandscape || props.isCatalogOpen
