@@ -291,6 +291,11 @@
       }
     }
   },
+  "errorBoundary": {
+    "message": "頁面渲染出現異常，請嘗試刷新頁面",
+    "retry": "重試",
+    "feedback": "回饋建議"
+  },
   "updateNotice": {
 
     "title": "更新通知",

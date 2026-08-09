@@ -291,6 +291,11 @@
       }
     }
   },
+  "errorBoundary": {
+    "message": "页面渲染出现异常，请尝试刷新页面",
+    "retry": "重试",
+    "feedback": "反馈建议"
+  },
   "updateNotice": {
     "title": "更新通知",
     "defaultItem": "新功能提示",

@@ -40,8 +40,8 @@ function render() {
     .pointLat('lat')
     .pointLng('lng')
     .pointColor(() => `rgba(${primary}, 0.7)`)
-    .pointRadius(0.2)
-    .pointAltitude(0.01)
+    .pointRadius(0.35)
+    .pointAltitude(0.02)
     .pointResolution(2)
 
   globe.controls().autoRotate = false
@@ -81,10 +81,10 @@ function onKeyDown(e) {
   if (!canvas) return
 
   const step = e.shiftKey ? 3 : 1
-  const cur = canvas.style.transform || 'translate(0px, 0px)'
-  const match = cur.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/)
-  let x = match ? parseFloat(match[1]) : 0
-  let y = match ? parseFloat(match[2]) : 0
+  const cur = canvas.style.transform || getComputedStyle(canvas).transform
+  const match = cur.match(/matrix\(([-\d.]+),\s*[-\d.]+,\s*[-\d.]+,\s*([-\d.]+),\s*([-\d.]+),\s*([-\d.]+)\)/)
+  let x = match ? parseFloat(match[3]) : 0
+  let y = match ? parseFloat(match[4]) : 0
 
   switch (e.key) {
     case 'ArrowLeft':  x -= step; break
