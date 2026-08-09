@@ -1,5 +1,5 @@
 import { onMounted, onBeforeUnmount, watch } from 'vue'
-import { currentColorTheme, COLOR_THEME_DARK, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { currentColorTheme, UI_MODE_COMPACT, COLOR_THEME_DARK, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
 
 const LIGHT_COLORS = [
   '#ff8f00', '#ff6d00', '#ffab00', '#ffc107', '#ffd54f',
@@ -95,6 +95,7 @@ function tick() {
 
 function onClick(e) {
   if (!canvas) return
+  if (document.documentElement.dataset.uiMode === UI_MODE_COMPACT) return
   const tag = e.target.tagName
   if (['BUTTON', 'A', 'INPUT', 'SELECT', 'TEXTAREA', 'LABEL'].includes(tag)) return
   if (e.target.closest('[data-no-particles]')) return
@@ -103,6 +104,7 @@ function onClick(e) {
 }
 
 export function useClickParticles() {
+  if (document.documentElement.dataset.uiMode === UI_MODE_COMPACT) return
   colors = isDark() ? [...DARK_COLORS] : [...LIGHT_COLORS]
 
   watch(currentColorTheme, (val) => {

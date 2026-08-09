@@ -16,8 +16,13 @@ const props = defineProps({
 const containerRef = ref(null)
 let globe = null
 let resizeObserver = null
+let orientationMql = null
+let orientationHandler = null
 let projShiftX = -0.3
 let projShiftY = -0.1
+
+const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+const isPortrait = ref(!isTouchDevice && matchMedia('(orientation: portrait)').matches)
 
 function getCssRgb(varName, fallback) {
   return getComputedStyle(document.documentElement)
@@ -45,9 +50,19 @@ function render() {
     .pointRadius(0.15)
     .pointAltitude(0.001)
     .pointResolution(6)
-  const enableHover = !('ontouchstart' in window || navigator.maxTouchPoints > 0 || matchMedia('(orientation: portrait)').matches)
-  if (enableHover) {
-    globe.pointLabel('name').onPointHover(() => {})
+  if (!isTouchDevice) {
+    orientationMql = matchMedia('(orientation: portrait)')
+    orientationHandler = (e) => { isPortrait.value = e.matches }
+    orientationMql.addEventListener('change', orientationHandler)
+
+    watch(isPortrait, (portrait) => {
+      if (!globe) return
+      if (portrait) {
+        globe.pointLabel(null).onPointHover(null)
+      } else {
+        globe.pointLabel('name').onPointHover(() => {})
+      }
+    }, { immediate: true })
   }
 
   globe.controls().autoRotate = false
@@ -150,6 +165,11 @@ function updatePoints() {
 function destroy() {
   window.removeEventListener('keydown', onKeyDown)
   window.removeEventListener('wheel', onWheel)
+  if (orientationMql) {
+    orientationMql.removeEventListener('change', orientationHandler)
+    orientationMql = null
+    orientationHandler = null
+  }
   if (resizeObserver) {
     resizeObserver.disconnect()
     resizeObserver = null

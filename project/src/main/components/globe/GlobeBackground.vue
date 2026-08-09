@@ -1,16 +1,22 @@
 <template>
   <div v-if="webglSupported" class="globe-background">
-    <Suspense>
-      <GlobeGLRenderer :points="points" />
-      <template #fallback>
-        <div class="globe-loading"><span class="ui-loading--page"></span></div>
-      </template>
-    </Suspense>
+    <template v-if="simpleMode">
+      <img src="/showcase/compact-earth.webp" class="globe-static" />
+    </template>
+    <template v-else>
+      <Suspense>
+        <GlobeGLRenderer :points="points" />
+        <template #fallback>
+          <div class="globe-loading"><span class="ui-loading--page"></span></div>
+        </template>
+      </Suspense>
+    </template>
   </div>
 </template>
 
 <script setup>
 import { defineAsyncComponent, computed } from 'vue'
+import { UI_MODE_COMPACT } from '@/composables/core/uiPreferences.js'
 
 const GlobeGLRenderer = defineAsyncComponent(() => import('./GlobeGLRenderer.vue'))
 
@@ -20,6 +26,8 @@ defineProps({
     default: () => [],
   },
 })
+
+const simpleMode = computed(() => document.documentElement.dataset.uiMode === UI_MODE_COMPACT)
 
 const webglSupported = computed(() => {
   try {
@@ -50,6 +58,14 @@ const webglSupported = computed(() => {
     bottom: 0;
     left: 0;
   }
+}
+
+.globe-static {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: right center;
+  opacity: 0.85;
 }
 
 .globe-loading {
