@@ -34,13 +34,18 @@ const webglSupported = computed(() => {
 <style scoped lang="scss">
 .globe-background {
   position: absolute;
-  inset: 0;
+  top: -10%;
+  right: -20%;
+  bottom: -10%;
+  left: -20%;
   z-index: 0;
+  background: var(--bg-page-gradient);
 
   canvas {
     display: block;
     width: 100% !important;
     height: 100% !important;
+    transform: translateX(15%);
   }
 }
 

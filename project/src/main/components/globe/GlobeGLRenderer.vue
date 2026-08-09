@@ -17,27 +17,29 @@ const containerRef = ref(null)
 let globe = null
 let resizeObserver = null
 
-function getPrimaryRgb() {
+function getCssRgb(varName, fallback) {
   return getComputedStyle(document.documentElement)
-    .getPropertyValue('--color-primary-rgb')
-    .trim() || '0, 122, 255'
+    .getPropertyValue(varName)
+    .trim() || fallback
 }
 
 function render() {
   if (!containerRef.value) return
 
-  const rgb = getPrimaryRgb()
+  const primary = getCssRgb('--color-primary-rgb', '0, 122, 255')
+  const bgTint = getCssRgb('--bg-blue-tint-rgb', '240, 247, 255')
 
   globe = Globe()(containerRef.value)
     .globeImageUrl('/textures/earth-blue-marble.jpg')
     .backgroundImageUrl(null)
     .showGraticules(false)
-    .atmosphereColor(`rgba(${rgb}, 0.12)`)
-    .atmosphereAltitude(0.15)
+    .backgroundColor('rgba(0,0,0,0)') 
+    .atmosphereColor(`rgb(${bgTint})`)
+    .atmosphereAltitude(0.18)
     .pointsData(props.points)
     .pointLat('lat')
     .pointLng('lng')
-    .pointColor(() => `rgba(${rgb}, 0.7)`)
+    .pointColor(() => `rgba(${primary}, 0.7)`)
     .pointRadius(0.2)
     .pointAltitude(0.01)
     .pointResolution(2)
@@ -47,11 +49,7 @@ function render() {
   globe.controls().enableZoom = true
   globe.controls().enablePointerInteraction = true
 
-  globe.pointOfView({ lat: 32, lng: 110, altitude: 2.6 })
-
-  if (globe.camera()) {
-    globe.camera().position.x += 0.35
-  }
+  globe.pointOfView({ lat: 30, lng: 108, altitude: 1.9 })
   if (globe.renderer()) {
     globe.renderer().setClearColor(0x000000, 0)
     globe.renderer().setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
