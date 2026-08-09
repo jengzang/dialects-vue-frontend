@@ -43,17 +43,12 @@ const webglSupported = computed(() => {
 
   :deep(canvas) {
     display: block;
-    transform: translate(489px, -91px);
   }
   @media (orientation: portrait) {
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-
-    :deep(canvas) {
-      transform: translate(0, 0);
-    }
   }
 }
 

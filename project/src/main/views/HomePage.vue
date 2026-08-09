@@ -819,6 +819,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     z-index: 1;
     min-height: 100dvh;
     overflow: hidden;
+    border-radius: var(--radius-2xl);
 
     @include flex-col;
     align-items: flex-start;
@@ -828,7 +829,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   }
 
   &-content {
-    padding: 3rem;
+    padding: 2rem;
     position: relative;
     z-index: 1;
     max-width: 520px;
@@ -1785,6 +1786,15 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   .hero {
     &-section {
       min-height: 100dvh;
+    }
+
+    &-title {
+      margin: 0;
+    }
+
+    &-subtitle {
+      margin-top: 0;
+      font-size: clamp(0.8rem, 3dvw, 1.1rem);
     }
 
     &-content {

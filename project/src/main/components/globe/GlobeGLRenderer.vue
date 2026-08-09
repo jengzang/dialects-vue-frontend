@@ -16,8 +16,8 @@ const props = defineProps({
 const containerRef = ref(null)
 let globe = null
 let resizeObserver = null
-let canvasOffsetX = 489
-let canvasOffsetY = -91
+let projShiftX = -0.3
+let projShiftY = -0.05
 
 function getCssRgb(varName, fallback) {
   return getComputedStyle(document.documentElement)
@@ -45,9 +45,7 @@ function render() {
     .pointRadius(0.18)
     .pointAltitude(0.001)
     .pointResolution(6)
-    .onPointHover((point) => {
-      console.log('[Globe hover]', point ? point.name : null)
-    })
+    .pointLabel('name')
 
   globe.controls().autoRotate = false
   globe.controls().autoRotateSpeed = 0.4
@@ -55,7 +53,9 @@ function render() {
   globe.controls().enablePan = true
   globe.controls().enablePointerInteraction = true
 
-  globe.pointOfView({ lat: 24.933, lng: 118.832, altitude: 1.303 })
+  globe.pointOfView({ lat: 28, lng: 85, altitude: 1.5 })
+
+  patchCameraProjection()
 
   dumpGlobeParams()
   globe.controls().addEventListener('end', dumpGlobeParams)
@@ -90,23 +90,33 @@ function onWheel(e) {
   globe.pointOfView({ lat: pov.lat, lng: pov.lng, altitude: alt })
 }
 
-function onKeyDown(e) {
-  if (!containerRef.value) return
-  const canvas = containerRef.value.querySelector('canvas')
-  if (!canvas) return
+function patchCameraProjection() {
+  if (!globe) return
+  const cam = globe.camera()
+  if (!cam || cam._projPatched) return
+  cam._projPatched = true
+  const orig = cam.updateProjectionMatrix.bind(cam)
+  cam.updateProjectionMatrix = function () {
+    orig()
+    cam.projectionMatrix.elements[8] = projShiftX
+    cam.projectionMatrix.elements[9] = projShiftY
+  }
+}
 
-  const step = e.shiftKey ? 3 : 1
+function onKeyDown(e) {
+  if (!globe) return
+  const step = e.shiftKey ? 0.05 : 0.01
 
   switch (e.key) {
-    case 'ArrowLeft':  canvasOffsetX -= step; break
-    case 'ArrowRight': canvasOffsetX += step; break
-    case 'ArrowUp':    canvasOffsetY -= step; break
-    case 'ArrowDown':  canvasOffsetY += step; break
+    case 'ArrowLeft':  projShiftX += step; break
+    case 'ArrowRight': projShiftX -= step; break
+    case 'ArrowUp':    projShiftY -= step; break
+    case 'ArrowDown':  projShiftY += step; break
     default: return
   }
   e.preventDefault()
-  canvas.style.transform = `translate(${canvasOffsetX}px, ${canvasOffsetY}px)`
-  console.log('[Globe offset]', { x: `${canvasOffsetX}px`, y: `${canvasOffsetY}px` }, '| pointOfView:', globe?.pointOfView())
+  globe.camera().updateProjectionMatrix()
+  console.log('[Proj shift]', { x: projShiftX.toFixed(3), y: projShiftY.toFixed(3) }, '| pov:', globe.pointOfView())
 }
 
 function dumpGlobeParams() {
