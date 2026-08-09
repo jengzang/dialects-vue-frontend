@@ -9,36 +9,11 @@
     </div>
 
     <!-- Floating Search -->
-    <Teleport to="body">
-    <div
-      v-if="isPageActive"
-      class="floating-search"
-      :class="{ active: showFloatingSearchInput }"
-    >
-      <button
-        class="floating-search-toggle"
-        type="button"
-        :aria-label="t('villages.pages.gdTree.searchPlaceholder')"
-        @click="openSearch"
-      ><InlineIcon icon="🔍" /></button>
-      <input
-        v-if="showFloatingSearchInput"
-        ref="searchInputRef"
-        v-model="searchQuery"
-        type="text"
-        :placeholder="t('villages.pages.gdTree.searchPlaceholder')"
-        class="floating-search-input"
-        @keydown.esc="closeSearch"
-      />
-      <button
-        v-if="showFloatingSearchInput"
-        class="floating-search-clear"
-        type="button"
-        :aria-label="t('common.button.close')"
-        @click="closeSearch"
-      >×</button>
-    </div>
-    </Teleport>
+    <FloatingSearch
+      v-model="searchQuery"
+      :placeholder="t('villages.pages.gdTree.searchPlaceholder')"
+      :close-label="t('common.button.close')"
+    />
 
     <!-- Content Area -->
     <div class="content-area ui-scrollbar">
@@ -134,9 +109,10 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import { ref, computed, watch, onMounted, onActivated, onDeactivated, nextTick } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import FloatingSearch from '@/components/common/FloatingSearch.vue'
 import VillagesTreeItem from '@/main/components/TableAndTree/VillagesTreeItem.vue';
 import VillageMapPopup from '@/main/components/map/popups/VillageMapPopup.vue';
 import { lazyLoadTree, loadFullTree } from '@/api';
@@ -170,35 +146,18 @@ const loadedCitiesData = ref({});
 const searchQuery = ref('');
 const debouncedSearchQuery = ref('');
 let searchDebounceTimer = null;
-const isSearchOpen = ref(false);
-const searchInputRef = ref(null);
-const isPageActive = ref(true);
-
-onActivated(() => { isPageActive.value = true; });
-onDeactivated(() => { isPageActive.value = false; });
-
-const showFloatingSearchInput = computed(() => {
-  return isSearchOpen.value || searchQuery.value.trim().length > 0;
-});
-
-const openSearch = async () => {
-  isSearchOpen.value = true;
-  await nextTick();
-  searchInputRef.value?.focus();
-};
-
-const closeSearch = () => {
-  isSearchOpen.value = false;
-  searchQuery.value = '';
-  debouncedSearchQuery.value = '';
-};
 
 watch(searchQuery, (val) => {
   clearTimeout(searchDebounceTimer);
+  if (!val.trim()) {
+    debouncedSearchQuery.value = '';
+    return;
+  }
   searchDebounceTimer = setTimeout(() => {
     debouncedSearchQuery.value = val;
   }, 300);
 });
+
 const loadingStates = ref({});
 const isInitialLoading = ref(false);
 const initialLoadError = ref(null);
@@ -704,85 +663,6 @@ $transition-base: 0.3s;
   margin: 3px;
   color: $text-secondary;
   font-size: 14px;
-}
-
-.floating-search {
-  position: fixed;
-  top: 16dvh;
-  left: 12px;
-  z-index: 5;
-  display: inline-flex;
-  align-items: center;
-  width: 40px;
-  height: 40px;
-  overflow: hidden;
-  background: var(--glass-70);
-  border: 1px solid var(--glass-70);
-  border-radius: var(--radius-pill);
-  backdrop-filter: blur(18px) saturate(180%);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-  box-shadow:
-    0 8px 22px rgba(var(--color-primary-rgb), 0.12),
-    inset 0 0 0.5px var(--glass-60);
-  transition:
-    width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-    background 0.2s ease,
-    box-shadow 0.2s ease;
-
-  &.active {
-    width: min(320px, calc(100% - 24px));
-    background: var(--glass-90);
-    box-shadow:
-      0 10px 26px rgba(var(--color-primary-rgb), 0.16),
-      inset 0 0 0.5px var(--glass-70);
-  }
-}
-
-.floating-search-toggle {
-  flex: 0 0 40px;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  font-size: 16px;
-  line-height: 1;
-  color: $primary-blue;
-  cursor: pointer;
-  background: transparent;
-  border: none;
-}
-
-.floating-search-input {
-  flex: 1;
-  min-width: 0;
-  height: 100%;
-  padding: 0 8px 0 0;
-  font-size: 13px;
-  color: var(--text-deep);
-  background: transparent;
-  border: none;
-  outline: none;
-
-  &::placeholder {
-    color: rgba(var(--text-slate-rgb), 0.72);
-  }
-}
-
-.floating-search-clear {
-  flex: 0 0 36px;
-  width: 36px;
-  height: 40px;
-  padding: 0;
-  font-size: 18px;
-  line-height: 1;
-  color: $text-muted;
-  cursor: pointer;
-  background: transparent;
-  border: none;
-  transition: color 0.15s;
-
-  &:hover {
-    color: $text-secondary;
-  }
 }
 
 /* Content Area */

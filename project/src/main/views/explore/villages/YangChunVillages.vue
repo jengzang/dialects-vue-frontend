@@ -6,18 +6,16 @@
         <span class="cross-link" @click="goToYcSpoken">{{ t('words.ycSpoken.name') }} →</span>
       </div>
       <p>{{ t('villages.pages.yangChun.source') }}</p>
-      <div class="search-wrapper">
-        <span class="search-icon"><InlineIcon icon="🔍" /></span>
-        <input
-            type="text"
-            v-model="searchQuery"
-            :placeholder="t('villages.pages.yangChun.searchPlaceholder')"
-            class="glass-input"
-        />
-      </div>
     </div>
 
-    <div class="tree-content ui-scrollbar">
+    <!-- Floating Search -->
+    <FloatingSearch
+      v-model="searchQuery"
+      :placeholder="t('villages.pages.yangChun.searchPlaceholder')"
+      :close-label="t('common.button.close')"
+    />
+
+    <div class="tree-content">
       <div v-if="displayData.length === 0" class="empty-state">
         {{ t('villages.pages.yangChun.noResults') }}
       </div>
@@ -33,8 +31,8 @@
 </template>
 
 <script setup>
-import InlineIcon from '@/components/common/InlineIcon.vue'
-import {ref, computed} from 'vue';
+import FloatingSearch from '@/components/common/FloatingSearch.vue'
+import { ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter, useRoute } from 'vue-router';
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
@@ -93,7 +91,19 @@ const initTree = () => {
 
 const fullTreeData = ref(initTree());
 const searchQuery = ref('');
+const debouncedSearchQuery = ref('');
+let searchDebounceTimer = null;
 
+watch(searchQuery, (val) => {
+  clearTimeout(searchDebounceTimer);
+  if (!val.trim()) {
+    debouncedSearchQuery.value = '';
+    return;
+  }
+  searchDebounceTimer = setTimeout(() => {
+    debouncedSearchQuery.value = val;
+  }, 300);
+});
 
 // 修改 VillageMap.vue 中的 filterTree 函數
 const filterTree = (nodes, query) => {
@@ -136,8 +146,9 @@ const filterTree = (nodes, query) => {
 };
 
 const displayData = computed(() => {
-  if (!searchQuery.value.trim()) return fullTreeData.value;
-  return filterTree(fullTreeData.value, searchQuery.value.trim());
+  const query = debouncedSearchQuery.value.trim();
+  if (!query) return fullTreeData.value;
+  return filterTree(fullTreeData.value, query);
 });
 
 const goToYcSpoken = () => {
@@ -160,20 +171,23 @@ $transition-base: 0.3s;
 .glass-container {
   @include flex-col;
   width: 60dvw;
-  height: 95%;
+  min-height: 95dvh;
   margin: 20px auto;
-  overflow: hidden;
+  background: var(--glass-70);
   color: $text-primary;
 
   @media (max-aspect-ratio: 1/1) {
     width: 90dvw;
-    height: 92%;
   }
 }
 
 .header-section {
   padding: 20px 20px 10px;
-  background: var(--glass-30);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  // background: var(--glass-30);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 
   p {
@@ -210,28 +224,8 @@ $transition-base: 0.3s;
   font-weight: 700;
 }
 
-.search-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.search-icon {
-  position: absolute;
-  left: 12px;
-  font-size: 14px;
-  opacity: 0.5;
-}
-
-.glass-input {
-  padding: 10px 16px 10px 36px;
-  font-size: 14px;
-}
-
 .tree-content {
-  flex: 1;
   padding: 16px;
-  overflow-y: auto;
 }
 
 .empty-state {
