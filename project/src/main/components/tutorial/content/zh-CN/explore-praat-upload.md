@@ -4,10 +4,6 @@ Praat 声学分析的入口。上传语音文件或直接录音，截取分段�
 
 ## 功能简介
 
-Praat 是经典的声学分析软件，广泛用于语音学研究，支持音高分析、共振峰提取、频谱图等多种功能。但其界面老旧，操作依赖快捷键，对新手不友好。
-
-![Praat 桌面版传统界面](/tutorial/explore-praat-upload/01-praat-desktop.webp)
-
 网站集成了 Praat 核心算法（基于 `praat-parselmouth` Python 包），提供现代化的网页界面进行声学分析。相比桌面版 Praat，操作更为简便，移动端和桌面端均可使用。
 
 **需要登录**才能使用（因 Praat 算法非常消耗 CPU，服务器性能有限）。
