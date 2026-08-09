@@ -35,4 +35,4 @@
 - 沒有登入時會先跳轉到登入頁面
 - 如果某個模塊沒有數據，對應的卡片和圖表不會顯示
 
-![聲學分析結果——基頻、共振峰等](/tutorial/explore-praat-results/01-results.jpg)
+![聲學分析結果——基頻、共振峰等](/tutorial/explore-praat-results/01-results.webp)

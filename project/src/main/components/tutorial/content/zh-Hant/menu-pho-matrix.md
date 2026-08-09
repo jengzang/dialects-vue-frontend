@@ -28,10 +28,10 @@
 - 網址同步匹配成功的地點名單，可直接分享連結
 - 如需更靈活的分類方式（自選橫縱軸和格內項目），使用「音素查詢」
 
-![音系矩陣輸入頁面](/tutorial/menu-pho-matrix/01-input.jpg)
+![音系矩陣輸入頁面](/tutorial/menu-pho-matrix/01-input.webp)
 
-![完整音系表——聲韻調拼合矩陣](/tutorial/menu-pho-matrix/02-matrix.jpg)
+![完整音系表——聲韻調拼合矩陣](/tutorial/menu-pho-matrix/02-matrix.webp)
 
-![文白讀顏色標注](/tutorial/menu-pho-matrix/03-wenbai.jpg)
+![文白讀顏色標注](/tutorial/menu-pho-matrix/03-wenbai.webp)
 
-![點擊詳情查看方言點資訊](/tutorial/menu-pho-matrix/04-popup.jpg)
+![點擊詳情查看方言點資訊](/tutorial/menu-pho-matrix/04-popup.webp)

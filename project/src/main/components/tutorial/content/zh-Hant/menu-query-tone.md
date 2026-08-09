@@ -33,6 +33,6 @@
 - 地圖模式可直觀看出調值的區域分布特徵
 - 如需深入比較調類合流情況，可使用「比較調類」功能
 
-![查調結果——調值表格](/tutorial/menu-query-tone/02-result.jpg)
+![查調結果——調值表格](/tutorial/menu-query-tone/02-result.webp)
 
-![地圖模式——調值區域分布](/tutorial/menu-query-tone/03-map.jpg)
+![地圖模式——調值區域分布](/tutorial/menu-query-tone/03-map.webp)

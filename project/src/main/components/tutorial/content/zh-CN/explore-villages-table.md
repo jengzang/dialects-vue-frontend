@@ -8,11 +8,14 @@
 
 其中可打开筛选器的栏位：市級、区县级、乡镇級、行政村、方言分布。
 
+![自然村表格1.png](/tutorial/explore-villages-table/自然村表格1.webp)
+
 ## 搜索
 
 - 搜索框对全部栏位进行后端查询
-- 输入后约 300ms 延迟自动搜索
+- 输入后自动搜索
 - 每次搜索页码回到第 1 页
+![自然村表格3.png](/tutorial/explore-villages-table/自然村表格3.webp)
 
 ## 排序
 
@@ -23,6 +26,7 @@
 - 筛选器选项根据当前搜索条件动态变化
 - 支持多选、全选/反选
 - 套用筛选后页码回到第 1 页
+![自然村表格2.png](/tutorial/explore-villages-table/自然村表格2.webp)
 
 ## 分页
 
@@ -41,5 +45,3 @@
 
 - 搜索为后端查询，结果不立即变化是因为防抖延迟
 - 筛选器选项受当前搜索条件影响，不一定是全表完整值
-
-![廣東自然村表格——排序、篩選、分頁](/tutorial/explore-villages-table/01-overview.jpg)

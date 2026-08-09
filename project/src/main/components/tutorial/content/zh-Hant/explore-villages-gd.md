@@ -39,6 +39,6 @@
 - 目前只有廣東省數據
 - 瓦片地圖源在國外，可能需要科學上網
 
-![廣東自然村樹狀圖——按行政層級展開](/tutorial/explore-villages-gd/01-tree.jpg)
+![廣東自然村樹狀圖——按行政層級展開](/tutorial/explore-villages-gd/01-tree.webp)
 
-![地圖彈窗——點擊 🌍 查看](/tutorial/explore-villages-gd/02-map.jpg)
+![地圖彈窗——點擊 🌍 查看](/tutorial/explore-villages-gd/02-map.webp)

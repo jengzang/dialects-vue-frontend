@@ -33,6 +33,6 @@
 - 點擊地圖會把經緯度傳給自定義數據面板，方便添加新數據
 - 未登入時不能開啓「自定義數據」開關
 
-![方言地圖——數據空間分布](/tutorial/menu-map-view/01-overview.jpg)
+![方言地圖——數據空間分布](/tutorial/menu-map-view/01-overview.webp)
 
-![點擊地圖查看詳情](/tutorial/menu-map-view/02-detail.jpg)
+![點擊地圖查看詳情](/tutorial/menu-map-view/02-detail.webp)

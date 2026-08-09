@@ -48,12 +48,12 @@
 - 按鈕灰色時通常表示中古条件尚未形成有效查询
 - 想从字形出发查读音用「查字」；想从音值倒推中古来源用「查音位」
 
-![查中古輸入頁面](/tutorial/menu-query-zhonggu/01-input.jpg)
+![查中古輸入頁面](/tutorial/menu-query-zhonggu/01-input.webp)
 
-![查中古結果頁面——按中古地位分組展示](/tutorial/menu-query-zhonggu/02-result.jpg)
+![查中古結果頁面——按中古地位分組展示](/tutorial/menu-query-zhonggu/02-result.webp)
 
-![地圖頁面——方言數據空間分布](/tutorial/menu-query-zhonggu/03-map.jpg)
+![地圖頁面——方言數據空間分布](/tutorial/menu-query-zhonggu/03-map.webp)
 
-![文白讀顏色標注：紅文讀、藍白讀](/tutorial/menu-query-zhonggu/04-wenbai.jpg)
+![文白讀顏色標注：紅文讀、藍白讀](/tutorial/menu-query-zhonggu/04-wenbai.webp)
 
-![右下角切換顯示模式：全顯 vs 主體](/tutorial/menu-query-zhonggu/05-display-mode.jpg)
+![右下角切換顯示模式：全顯 vs 主體](/tutorial/menu-query-zhonggu/05-display-mode.webp)

@@ -5,9 +5,10 @@
 ## 基本操作
 
 1. 登录账号
-2. 选择数据格式（音典、跳跳老鼠、县志）
+2. 选择数据格式（一字一音、一音多字、县志），「说明」处有详细要求
 3. 上传文件（支持 .xlsx、.xls、.doc、.docx、.tsv，单文件上限 3 MB）
 4. 系统自动分析并展示错误统计
+![字表检查1.jpg](/tutorial/explore-check/字表检查1.webp)
 
 ## 检查功能
 
@@ -18,8 +19,14 @@
 ## 统计与筛选
 
 - 左侧整理错误类型、调值统计、声母与韵母统计
+![字表检查2.png](/tutorial/explore-check/字表检查2.webp)
 - 点击错误列自动跳转到对应数据行
+- 调值统计功能可以快速发现哪些调辖字很少，进而检查错误；也可以看各调类具体有哪些字
+![字表检查8.png](/tutorial/explore-check/字表检查8.webp)
+![字表检查9.png](/tutorial/explore-check/字表检查9.webp)
 - 点击声母或韵母统计可直接筛选
+![字表检查3.png](/tutorial/explore-check/字表检查3.webp)
+![字表检查4.png](/tutorial/explore-check/字表检查4.webp)
 - 搜索框支持快速定位
 
 ## 编辑模式
@@ -27,8 +34,11 @@
 切换到编辑模式后：
 - 可直接修改单元格值
 - 可标记整列删除
+![字表检查5.jpg](/tutorial/explore-check/字表检查5.webp)
 - 支持 IPA 批量替换
+![字表检查6.png](/tutorial/explore-check/字表检查6.webp)
 - 支持入声调/舒声调批量替换
+![字表检查7.png](/tutorial/explore-check/字表检查7.webp)
 - 批量储存后系统重新分析最新内容
 - 完成后下载更改后的文件
 
@@ -37,7 +47,3 @@
 - 格式选错会整份资料错误拆栏，上传前务必确认
 - 退出编辑模式时未储存的修改会被清空
 - 服务器做了限流，上传加载较慢请耐心等待
-
-![字表檢查——自動分析錯誤統計](/tutorial/explore-check/01-overview.jpg)
-
-![編輯模式——在線修改與批量替換](/tutorial/explore-check/02-edit.jpg)

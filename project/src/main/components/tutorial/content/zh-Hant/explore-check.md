@@ -38,6 +38,6 @@
 - 退出編輯模式時未儲存的修改會被清空
 - 伺服器做了限流，上傳載入較慢請耐心等待
 
-![字表檢查——自動分析錯誤統計](/tutorial/explore-check/01-overview.jpg)
+![字表檢查——自動分析錯誤統計](/tutorial/explore-check/01-overview.webp)
 
-![編輯模式——在線修改與批量替換](/tutorial/explore-check/02-edit.jpg)
+![編輯模式——在線修改與批量替換](/tutorial/explore-check/02-edit.webp)

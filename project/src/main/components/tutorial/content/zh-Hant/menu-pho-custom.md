@@ -29,8 +29,8 @@
 - 切換字表後可選分類欄位會跟著變化
 - 此功能適合做探索性分析，從不同角度觀察音系結構
 
-![音素查詢——自選三維分類維度](/tutorial/menu-pho-custom/01-input.jpg)
+![音素查詢——自選三維分類維度](/tutorial/menu-pho-custom/01-input.webp)
 
-![按清濁×發聲部位×聲母分類結果](/tutorial/menu-pho-custom/02-result.jpg)
+![按清濁×發聲部位×聲母分類結果](/tutorial/menu-pho-custom/02-result.webp)
 
-![按開合口×韻攝×等分類結果](/tutorial/menu-pho-custom/03-result2.jpg)
+![按開合口×韻攝×等分類結果](/tutorial/menu-pho-custom/03-result2.webp)

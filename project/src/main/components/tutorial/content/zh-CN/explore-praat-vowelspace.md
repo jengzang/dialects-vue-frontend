@@ -30,4 +30,4 @@
 - 如需精确分析，推荐单音节 + 仔细截取
 - 没有 formant 数据时，此页面无法使用
 
-![元音空間圖——F1/F2 共振峰繪製](/tutorial/explore-praat-vowelspace/01-overview.jpg)
+![元音空間圖——F1/F2 共振峰繪製](/tutorial/explore-praat-vowelspace/01-overview.webp)

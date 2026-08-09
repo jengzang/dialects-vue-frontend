@@ -31,6 +31,6 @@
 - 導入規則後需手動點擊儲存才能持久化
 - 檔案格式不正確或過大時會直接報錯
 
-![粵拼轉 IPA——自定義轉換規則](/tutorial/explore-jyut2ipa/01-overview.jpg)
+![粵拼轉 IPA——自定義轉換規則](/tutorial/explore-jyut2ipa/01-overview.webp)
 
-![轉換結果預覽](/tutorial/explore-jyut2ipa/02-result.jpg)
+![轉換結果預覽](/tutorial/explore-jyut2ipa/02-result.webp)

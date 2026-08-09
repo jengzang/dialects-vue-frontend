@@ -36,8 +36,8 @@
 - 必須先選擇比較角度（聲母/韻母/聲調）才能運行
 - 如果只想知道某個字本身怎麼讀，先用「查字」
 
-![比較漢字輸入界面](/tutorial/menu-compare-char/01-overview.jpg)
+![比較漢字輸入界面](/tutorial/menu-compare-char/01-overview.webp)
 
-![地圖結果——顏色區分相同/部分相同/不同](/tutorial/menu-compare-char/02-map.jpg)
+![地圖結果——顏色區分相同/部分相同/不同](/tutorial/menu-compare-char/02-map.webp)
 
-![點擊地圖查看具體讀音細節](/tutorial/menu-compare-char/03-popup.jpg)
+![點擊地圖查看具體讀音細節](/tutorial/menu-compare-char/03-popup.webp)

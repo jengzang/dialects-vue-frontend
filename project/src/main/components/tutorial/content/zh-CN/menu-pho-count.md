@@ -12,29 +12,31 @@
 ### 全量数据（默认）
 
 - **饼图**：查看各音节占比，点击可弹窗查看具体音节来源
+![音节统计1.png](/tutorial/menu-pho-count/音节统计1.webp)
+![音节统计2.png](/tutorial/menu-pho-count/音节统计2.webp)
 - **柱状图**：查看各音节所存在的地点数，点击可弹窗查看
+![音节统计3.png](/tutorial/menu-pho-count/音节统计3.webp)
+![音节统计4.png](/tutorial/menu-pho-count/音节统计4.webp)
 - **散点图**：横轴为音节总数量，纵轴为地点数，圆圈越大代表音节数量越多
+![音节统计5.png](/tutorial/menu-pho-count/音节统计5.webp)
 - 可切换只看声母/韵母/声调
+![音节统计6.png](/tutorial/menu-pho-count/音节统计6.webp)
 
 ### 自定义地点
 
-可自由选择地点进行分析：
+可自由选择地点进行分析(单次最多可选100个)：
 - 汇总区域：按声母、韵母、声调顺序显示每个音节的统计信息（总次数、出现地点数）
 - 逐地点明细：每个地点的声母、韵母、声调数目
 - 右侧轮盘导航可快速跳转到想查看的地点
+![音节统计7.png](/tutorial/menu-pho-count/音节统计7.webp)
 
 ## 交互
 
 - 点击图表可弹窗查看详情
 - 轮盘导航支持自由滚动和快速定位
+![音节统计8.png](/tutorial/menu-pho-count/音节统计8.webp)
 
 ## 提示
 
 - 上方汇总是跨地点加总，下方明细是单地点数据
 - 不输入地点时默认展示全量所有地点的统计
-
-![餅圖——各音節佔比](/tutorial/menu-pho-count/01-pie.jpg)
-
-![散點圖——音節數量與地點數關係](/tutorial/menu-pho-count/02-scatter.jpg)
-
-![逐地點明細——聲韻調數目](/tutorial/menu-pho-count/03-detail.jpg)

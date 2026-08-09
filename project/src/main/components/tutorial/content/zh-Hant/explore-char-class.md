@@ -40,8 +40,8 @@
 - 廣韻注釋可以幫助理解各字的中古音韻地位
 - 此頁面與「查中古」互補：這裡是瀏覽字表，查中古是按條件搜讀音
 
-![漢字字集——中古廣韻樹狀結構](/tutorial/explore-char-class/01-overview.jpg)
+![漢字字集——中古廣韻樹狀結構](/tutorial/explore-char-class/01-overview.webp)
 
-![按中古地位逐級展開](/tutorial/explore-char-class/02-tree.jpg)
+![按中古地位逐級展開](/tutorial/explore-char-class/02-tree.webp)
 
-![顯示廣韻注釋](/tutorial/explore-char-class/03-zhushi.jpg)
+![顯示廣韻注釋](/tutorial/explore-char-class/03-zhushi.webp)

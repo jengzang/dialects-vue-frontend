@@ -33,8 +33,8 @@
 - 上方匯總是跨地點加總，下方明細是單地點數據
 - 不輸入地點時預設展示全量所有地點的統計
 
-![餅圖——各音節佔比](/tutorial/menu-pho-count/01-pie.jpg)
+![餅圖——各音節佔比](/tutorial/menu-pho-count/01-pie.webp)
 
-![散點圖——音節數量與地點數關係](/tutorial/menu-pho-count/02-scatter.jpg)
+![散點圖——音節數量與地點數關係](/tutorial/menu-pho-count/02-scatter.webp)
 
-![逐地點明細——聲韻調數目](/tutorial/menu-pho-count/03-detail.jpg)
+![逐地點明細——聲韻調數目](/tutorial/menu-pho-count/03-detail.webp)

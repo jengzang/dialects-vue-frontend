@@ -1,6 +1,6 @@
 # 字表合并
 
-按参考表的汉字顺序，批量合并多个字表文件。
+上传参考表与待合并字表，批量完成对齐与合并。
 
 ## 三步流程
 
@@ -10,6 +10,8 @@
 - 参考表必须有「单字」列，其顺序即为最终合并顺序
 - 支持上传自定义参考表（.xlsx、.xls，上限 3 MB）
 - 可预览默认参考表后一键套用
+![字表合并1.png](/tutorial/explore-merge/字表合并1.webp)
+![字表合并2.png](/tutorial/explore-merge/字表合并2.webp)
 
 ### 步骤 2：上传待合并文件
 
@@ -19,21 +21,20 @@
   - 音标列：「IPA」、「ipa」、「音標」、「音标」、「syllable」
   - 注释列：「注释」、「注釋」、「解釋」、「notes」
 - 每个文件可单独移除
+![字表合并3.png](/tutorial/explore-merge/字表合并3.webp)
 
 ### 步骤 3：合并与下载
 
 - 点击「开始合并」，显示进度
+- 完成后下载合并结果
 - 参考表之外的字会在末尾补充
 - 一字多音以「;」分隔
 - 注释存为 Excel 批注
-- 完成后下载合并结果
+![字表合并4.png](/tutorial/explore-merge/字表合并4.webp)
+![字表合并5.png](/tutorial/explore-merge/字表合并5.webp)
 
 ## 提示
 
 - 需登录才能使用
 - 原始数据质量不佳时建议先去「字表检查」整理
 - 可点击「重设」清除所有步骤重新开始
-
-![字表合併——上傳參考表與待合併檔案](/tutorial/explore-merge/01-overview.jpg)
-
-![合併結果——按參考表順序排列](/tutorial/explore-merge/02-result.jpg)

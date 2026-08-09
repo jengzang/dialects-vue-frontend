@@ -36,6 +36,6 @@
 - 如需查看完整調類系統，先用「查調」
 - 可一次性分析多個地點，觀察區域性的調類歸並趨勢
 
-![比較調類——珠三角陽上、陰去合併](/tutorial/menu-compare-tone/01-overview.jpg)
+![比較調類——珠三角陽上、陰去合併](/tutorial/menu-compare-tone/01-overview.webp)
 
-![南方方言陰入、陽入合併情況](/tutorial/menu-compare-tone/02-overall.jpg)
+![南方方言陰入、陽入合併情況](/tutorial/menu-compare-tone/02-overall.webp)

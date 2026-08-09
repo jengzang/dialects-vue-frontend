@@ -31,6 +31,6 @@
 - 结果会直接跳转到地图页展示，不留在本页
 - 注意分区的模式（地图集 vs 音典），画出来的范围可能不同
 
-![分區繪圖——不同分區以不同顏色標示](/tutorial/menu-map-divide/01-overview.jpg)
+![分區繪圖——不同分區以不同顏色標示](/tutorial/menu-map-divide/01-overview.webp)
 
-![全國分區圖——音典一級分區](/tutorial/menu-map-divide/02-national.jpg)
+![全國分區圖——音典一級分區](/tutorial/menu-map-divide/02-national.webp)

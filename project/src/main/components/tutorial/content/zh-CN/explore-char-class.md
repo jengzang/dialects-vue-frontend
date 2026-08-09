@@ -9,7 +9,8 @@
 - **近古音**（洪武正韵等）
 - **粤韵**
 
-可在「关于 → 设置」中切换字集。
+可在「设置」中切换字集。
+![字集1.png](/tutorial/explore-char-class/字集1.webp)
 
 ## 基本操作
 
@@ -18,6 +19,7 @@
 3. 根据需要增减层级或调整层级顺序
 4. 树状结构载入后，可在右侧搜索节点
 5. 可切换显示/隐藏广韵注释
+![字集2.png](/tutorial/explore-char-class/字集2.webp)
 
 ## 层级配置
 
@@ -31,6 +33,7 @@
 ## 交互
 
 - 逐级展开树状结构，查看每层包含的汉字
+![字集3.jpg](/tutorial/explore-char-class/字集3.webp)
 - 搜索功能在已载入的树上做前端查找
 - 可按照声纽、清浊等不同维度分类浏览
 
@@ -38,10 +41,5 @@
 
 - 切换字集后重新加载对应数据
 - 广韵注释可以帮助理解各字的中古音韵地位
+![字集4.jpg](/tutorial/explore-char-class/字集4.webp)
 - 此页面与「查中古」互补：这里是浏览字表，查中古是按条件搜读音
-
-![漢字字集——中古廣韻樹狀結構](/tutorial/explore-char-class/01-overview.jpg)
-
-![按中古地位逐級展開](/tutorial/explore-char-class/02-tree.jpg)
-
-![顯示廣韻注釋](/tutorial/explore-char-class/03-zhushi.jpg)

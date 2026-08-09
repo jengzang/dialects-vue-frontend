@@ -37,4 +37,4 @@
 - 一條錄音可截取多個調類
 - 推薦使用單音節模式截取韻核部分進行精確分析
 
-![T 值五度圖——石鋒法標調結果](/tutorial/explore-praat-pitchtone/01-overview.jpg)
+![T 值五度圖——石鋒法標調結果](/tutorial/explore-praat-pitchtone/01-overview.webp)

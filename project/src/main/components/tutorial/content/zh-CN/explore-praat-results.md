@@ -35,4 +35,4 @@
 - 没有登录时会先跳转到登录页面
 - 如果某个模块没有数据，对应的卡片和图表不会显示
 
-![聲學分析結果——基頻、共振峰等](/tutorial/explore-praat-results/01-results.jpg)
+![聲學分析結果——基頻、共振峰等](/tutorial/explore-praat-results/01-results.webp)

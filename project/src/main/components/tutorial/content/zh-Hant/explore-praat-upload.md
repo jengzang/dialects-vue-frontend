@@ -38,6 +38,6 @@ Praat 聲學分析的入口。上傳語音檔案或直接錄音，截取分段�
 - 手機錄音音質通常好於電腦自帶麥克風
 - 上傳較慢，請耐心等待
 
-![上傳語音檔案或直接錄音](/tutorial/explore-praat-upload/01-upload.jpg)
+![上傳語音檔案或直接錄音](/tutorial/explore-praat-upload/01-upload.webp)
 
-![在波形上拖動截取分段](/tutorial/explore-praat-upload/02-segment.jpg)
+![在波形上拖動截取分段](/tutorial/explore-praat-upload/02-segment.webp)

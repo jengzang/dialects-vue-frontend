@@ -33,6 +33,6 @@
 - 点击地图会把经纬度传给自定义数据面板，方便添加新数据
 - 未登录时不能开启「自定义数据」开关
 
-![方言地圖——數據空間分布](/tutorial/menu-map-view/01-overview.jpg)
+![方言地圖——數據空間分布](/tutorial/menu-map-view/01-overview.webp)
 
-![點擊地圖查看詳情](/tutorial/menu-map-view/02-detail.jpg)
+![點擊地圖查看詳情](/tutorial/menu-map-view/02-detail.webp)
