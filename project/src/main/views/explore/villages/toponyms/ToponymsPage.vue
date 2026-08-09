@@ -10,32 +10,54 @@
         <ToponymSearchBar
           v-model:query="query"
           v-model:match-mode="matchMode"
-          v-model:place-type-code="placeTypeCode"
-          v-model:point-limit="pointLimit"
           :loading="pointsLoading"
           @search="handleSearch"
-        />
-        <ToponymLayerControls
-          :layer-state="layerState"
-          :loading-layers="loadingLayers"
-          :layer-errors="layerErrors"
-          @toggle-layer="handleToggleLayer"
-        />
+        >
+          <template #actions>
+            <button
+              class="main-glass-button"
+              type="button"
+              data-variant="secondary"
+              :aria-label="t('villages.pages.toponyms.chart.configAriaLabel')"
+              @click="openChartConfig"
+            ><InlineIcon icon="⚙" /></button>
+          </template>
+        </ToponymSearchBar>
       </div>
     </section>
 
-    <section class="toponyms-page__body">
+    <section class="toponyms-page__workspace">
       <div class="toponyms-page__chart main-glass-panel">
         <div class="toponyms-page__chart-inner main-glass-panel-inner">
+          <div class="toponyms-page__chart-header">
+            <div class="toponyms-page__stat-strip">
+              <span>{{ t('villages.pages.toponyms.chart.pointsSeries') }}</span>
+              <strong>{{ scatterData.length }}</strong>
+              <small v-if="hasSearched">
+                {{
+                  t('villages.pages.toponyms.results.count', {
+                    count: pointCount,
+                    shown: scatterData.length,
+                  })
+                }}
+              </small>
+              <small v-else>{{ t('villages.pages.toponyms.chart.searchFirst') }}</small>
+            </div>
+          </div>
+
           <ToponymDistributionChart
+            ref="chartRef"
             :country-layer="countryLayer"
             :loaded-layers="loadedLayers"
             :layer-state="layerState"
+            :loading-layers="loadingLayers"
+            :layer-errors="layerErrors"
             :scatter-data="scatterData"
             :loading="pointsLoading"
             :error="countryError || pointsError"
             :has-searched="hasSearched"
             @select-point="handleSelectPoint"
+            @toggle-layer="handleToggleLayer"
           />
         </div>
       </div>
@@ -47,25 +69,53 @@
         :point-count="pointCount"
         :scatter-count="scatterData.length"
         :truncated="pointsTruncated"
-        :suggestions="suggestions"
-        :suggestions-loading="suggestionsLoading"
-        :suggestions-error="suggestionsError"
-        :selected-point="selectedPoint"
-        :local-detail="selectedLocalDetail"
-        :local-loading="detailsLoading"
-        :local-error="detailsError"
-        :official-detail="officialDetail"
-        :official-loading="officialLoading"
-        :official-error="officialError"
-        @select-suggestion="handleSelectSuggestion"
-        @request-official-detail="handleOfficialDetailRequest"
+        :name-tree="nameTree"
+        :name-tree-meta="nameTreeMeta"
+        :name-tree-loading="nameTreeLoading"
+        :name-tree-error="nameTreeError"
+        :name-tree-loaded="nameTreeLoaded"
+        @request-name-tree="handleNameTreeRequest"
+        @expand-name-tree-node="handleNameTreeNodeExpand"
+        @load-more-name-tree-names="handleNameTreeNamesMore"
       />
     </section>
+
+    <Teleport to="body">
+      <HoverDetailCard
+        :visible="isDetailCardOpen"
+        :is-mobile-layout="isMobileLayout"
+        :is-pinned="isDetailCardPinned"
+        :desktop-card-position="desktopCardPosition"
+        root-class="toponym-detail-card"
+        @close="closeDetailCard"
+      >
+        <template #header>
+          <div class="toponyms-page__detail-card-header">
+            <strong>{{ t('villages.pages.toponyms.detail.title') }}</strong>
+            <span>{{ t('villages.pages.toponyms.detail.cardHint') }}</span>
+          </div>
+        </template>
+
+        <ToponymDetailPanel
+          :selected-point="selectedPoint"
+          :local-detail="selectedLocalDetail"
+          :local-loading="detailsLoading"
+          :local-error="detailsError"
+          :local-requested="localDetailRequested"
+          :official-detail="officialDetail"
+          :official-loading="officialLoading"
+          :official-error="officialError"
+          @request-local-detail="handleLocalDetailRequest"
+          @request-official-detail="handleOfficialDetailRequest"
+        />
+      </HoverDetailCard>
+    </Teleport>
   </main>
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
+import InlineIcon from '@/components/common/InlineIcon.vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import {
   getToponymDetails,
@@ -73,7 +123,9 @@ import {
   getToponymOfficialDetail,
   getToponymPoints,
 } from '@/api';
-import ToponymLayerControls from './ToponymLayerControls.vue';
+import HoverDetailCard from '@/components/ToastAndHelp/HoverDetailCard.vue';
+import { resolveHoverDetailCardPosition } from '@/utils/EchartHover/hoverDetailCardPosition.js';
+import ToponymDetailPanel from './ToponymDetailPanel.vue';
 import ToponymDistributionChart from './ToponymDistributionChart.vue';
 import ToponymResultsPanel from './ToponymResultsPanel.vue';
 import ToponymSearchBar from './ToponymSearchBar.vue';
@@ -81,18 +133,26 @@ import { buildToponymScatterData } from './toponymsChartData.js';
 import { getDefaultToponymsLayerState, loadToponymsGisAsset } from './toponymsGisAssets.js';
 
 const { t } = useI18n();
+const TOPONYM_NAME_TREE_PAGE_SIZE = 100;
 
+const chartRef = ref(null);
 const query = ref('');
 const matchMode = ref('prefix');
-const placeTypeCode = ref('22200');
-const pointLimit = ref(5000);
 const hasSearched = ref(false);
+const lastPointSearchParams = ref(null);
 
-const suggestions = ref([]);
-const suggestionsLoading = ref(false);
-const suggestionsError = ref('');
-const suggestionRequestId = ref(0);
-let suggestionTimer = null;
+const nameTree = ref([]);
+const nameTreeMeta = reactive({
+  mode: '',
+  reason: '',
+  threshold: null,
+  filteredCount: null,
+  levels: 4,
+});
+const nameTreeLoading = ref(false);
+const nameTreeError = ref('');
+const nameTreeLoaded = ref(false);
+const nameTreeRequestId = ref(0);
 
 const pointRows = ref([]);
 const pointCount = ref(0);
@@ -105,12 +165,19 @@ const selectedPoint = ref(null);
 const selectedLocalDetail = ref(null);
 const detailsLoading = ref(false);
 const detailsError = ref('');
+const localDetailRequested = ref(false);
 const detailsRequestId = ref(0);
 
 const officialDetail = ref(null);
 const officialLoading = ref(false);
 const officialError = ref('');
+const officialRequestId = ref(0);
 let officialAbortController = null;
+const isDetailCardOpen = ref(false);
+const isDetailCardPinned = ref(false);
+const isMobileLayout = ref(false);
+const desktopCardPosition = ref({ left: '0px', top: '0px' });
+let layoutMediaQuery = null;
 
 const layerState = reactive(getDefaultToponymsLayerState());
 const loadedLayers = reactive({});
@@ -123,21 +190,19 @@ const scatterData = computed(() => buildToponymScatterData(pointRows.value));
 const countryLayer = computed(() => loadedLayers.country || null);
 
 onMounted(() => {
+  setupLayoutWatcher();
   loadCountryLayer();
 });
 
 onBeforeUnmount(() => {
-  if (suggestionTimer) {
-    clearTimeout(suggestionTimer);
-  }
-
   if (officialAbortController) {
     officialAbortController.abort();
   }
-});
 
-watch([query, matchMode, placeTypeCode], () => {
-  scheduleSuggestionLoad();
+  if (layoutMediaQuery) {
+    layoutMediaQuery.removeEventListener('change', syncLayoutMode);
+    layoutMediaQuery = null;
+  }
 });
 
 async function loadCountryLayer() {
@@ -155,62 +220,15 @@ async function loadCountryLayer() {
   }
 }
 
-function scheduleSuggestionLoad() {
-  if (suggestionTimer) {
-    clearTimeout(suggestionTimer);
-  }
-
-  const keyword = query.value.trim();
-  if (!keyword) {
-    suggestions.value = [];
-    suggestionsError.value = '';
-    suggestionsLoading.value = false;
-    return;
-  }
-
-  suggestionTimer = setTimeout(() => {
-    loadSuggestions(keyword);
-  }, 280);
-}
-
-async function loadSuggestions(keyword) {
-  const requestId = suggestionRequestId.value + 1;
-  suggestionRequestId.value = requestId;
-  suggestionsLoading.value = true;
-  suggestionsError.value = '';
-
-  try {
-    const payload = await getToponymNames({
-      q: keyword,
-      match_mode: matchMode.value,
-      place_type_code: placeTypeCode.value,
-      limit: 20,
-    });
-
-    if (requestId !== suggestionRequestId.value) return;
-    suggestions.value = payload.items.filter((item) => typeof item === 'string');
-  } catch (error) {
-    if (requestId !== suggestionRequestId.value) return;
-    suggestions.value = [];
-    suggestionsError.value = error.message || t('villages.pages.toponyms.errors.suggestions');
-  } finally {
-    if (requestId === suggestionRequestId.value) {
-      suggestionsLoading.value = false;
-    }
-  }
-}
-
 async function handleSearch() {
   const keyword = query.value.trim();
   hasSearched.value = true;
   pointsError.value = '';
-  selectedPoint.value = null;
-  selectedLocalDetail.value = null;
-  detailsError.value = '';
-  officialDetail.value = null;
-  officialError.value = '';
+  resetNameTree();
+  resetSelectedDetails();
 
   if (!keyword) {
+    lastPointSearchParams.value = null;
     pointRows.value = [];
     pointCount.value = 0;
     pointsTruncated.value = false;
@@ -218,24 +236,28 @@ async function handleSearch() {
     return;
   }
 
+  const searchParams = {
+    q: keyword,
+    match_mode: matchMode.value,
+  };
   const requestId = pointsRequestId.value + 1;
   pointsRequestId.value = requestId;
   pointsLoading.value = true;
 
   try {
     const payload = await getToponymPoints({
-      q: keyword,
-      match_mode: matchMode.value,
-      place_type_code: placeTypeCode.value,
-      limit: pointLimit.value,
+      ...searchParams,
+      limit: 0,
     });
 
     if (requestId !== pointsRequestId.value) return;
+    lastPointSearchParams.value = searchParams;
     pointRows.value = payload.items;
     pointCount.value = payload.count;
     pointsTruncated.value = payload.truncated;
   } catch (error) {
     if (requestId !== pointsRequestId.value) return;
+    lastPointSearchParams.value = null;
     pointRows.value = [];
     pointCount.value = 0;
     pointsTruncated.value = false;
@@ -247,9 +269,102 @@ async function handleSearch() {
   }
 }
 
-function handleSelectSuggestion(name) {
-  query.value = name;
-  handleSearch();
+async function handleNameTreeRequest() {
+  const searchParams = lastPointSearchParams.value;
+  nameTreeError.value = '';
+  nameTreeLoaded.value = true;
+
+  if (!searchParams?.q) {
+    nameTree.value = [];
+    nameTreeError.value = t('villages.pages.toponyms.errors.emptyQuery');
+    return;
+  }
+
+  const requestId = nameTreeRequestId.value + 1;
+  nameTreeRequestId.value = requestId;
+  nameTreeLoading.value = true;
+
+  try {
+    const payload = await getToponymNames({
+      ...searchParams,
+      include_division_tree: true,
+      limit: 0,
+    });
+
+    if (requestId !== nameTreeRequestId.value) return;
+    normalizeToponymNameTreePayload(payload);
+  } catch (error) {
+    if (requestId !== nameTreeRequestId.value) return;
+    nameTree.value = [];
+    nameTreeError.value = error.message || t('villages.pages.toponyms.errors.nameTree');
+  } finally {
+    if (requestId === nameTreeRequestId.value) {
+      nameTreeLoading.value = false;
+    }
+  }
+}
+
+async function handleNameTreeNodeExpand(node) {
+  if (!node?.path?.length || node.loading) return;
+
+  if (node.loaded || !node.lazy) {
+    node.expanded = !node.expanded;
+    return;
+  }
+
+  const requestId = nameTreeRequestId.value;
+  node.loading = true;
+  node.error = '';
+
+  try {
+    const payload = await getToponymNames({
+      ...lastPointSearchParams.value,
+      include_division_tree: true,
+      limit: 0,
+      parent_path: node.path,
+      page: 1,
+      page_size: TOPONYM_NAME_TREE_PAGE_SIZE,
+    });
+
+    if (requestId !== nameTreeRequestId.value) return;
+    mergeLazyTreePayload(node, payload);
+  } catch (error) {
+    if (requestId !== nameTreeRequestId.value) return;
+    node.error = error.message || t('villages.pages.toponyms.errors.nameTree');
+  } finally {
+    if (requestId === nameTreeRequestId.value) {
+      node.loading = false;
+    }
+  }
+}
+
+async function handleNameTreeNamesMore(node) {
+  if (!node?.path?.length || node.namesLoading || !node.namesHasMore) return;
+
+  const requestId = nameTreeRequestId.value;
+  node.namesLoading = true;
+  node.error = '';
+
+  try {
+    const payload = await getToponymNames({
+      ...lastPointSearchParams.value,
+      include_division_tree: true,
+      limit: 0,
+      parent_path: node.path,
+      page: node.namesPage + 1,
+      page_size: TOPONYM_NAME_TREE_PAGE_SIZE,
+    });
+
+    if (requestId !== nameTreeRequestId.value) return;
+    mergeLazyTreePayload(node, payload);
+  } catch (error) {
+    if (requestId !== nameTreeRequestId.value) return;
+    node.error = error.message || t('villages.pages.toponyms.errors.nameTree');
+  } finally {
+    if (requestId === nameTreeRequestId.value) {
+      node.namesLoading = false;
+    }
+  }
 }
 
 async function handleSelectPoint(point) {
@@ -260,14 +375,38 @@ async function handleSelectPoint(point) {
     id,
     coordinates: Array.isArray(point.coordinates) ? point.coordinates : point.value || [],
   };
+  detailsRequestId.value += 1;
   selectedLocalDetail.value = null;
   detailsError.value = '';
+  detailsLoading.value = false;
+  localDetailRequested.value = false;
+  officialRequestId.value += 1;
+  abortOfficialDetailRequest();
   officialDetail.value = null;
   officialError.value = '';
+  officialLoading.value = false;
+  isDetailCardOpen.value = true;
+  isDetailCardPinned.value = true;
+
+  if (!isMobileLayout.value && point.eventPosition) {
+    desktopCardPosition.value = resolveHoverDetailCardPosition({
+      clientX: point.eventPosition.clientX,
+      clientY: point.eventPosition.clientY,
+      cardWidth: 340,
+      cardHeight: 420,
+    });
+  }
+}
+
+async function handleLocalDetailRequest() {
+  const id = selectedPoint.value?.id;
+  if (!id) return;
 
   const requestId = detailsRequestId.value + 1;
   detailsRequestId.value = requestId;
   detailsLoading.value = true;
+  detailsError.value = '';
+  localDetailRequested.value = true;
 
   try {
     const payload = await getToponymDetails(id);
@@ -283,28 +422,183 @@ async function handleSelectPoint(point) {
   }
 }
 
+function openChartConfig() {
+  if (chartRef.value?.showConfigModal !== undefined) {
+    chartRef.value.showConfigModal = true;
+  }
+}
+
+function closeDetailCard() {
+  isDetailCardOpen.value = false;
+  isDetailCardPinned.value = false;
+}
+
+function resetSelectedDetails() {
+  detailsRequestId.value += 1;
+  selectedPoint.value = null;
+  selectedLocalDetail.value = null;
+  detailsError.value = '';
+  detailsLoading.value = false;
+  localDetailRequested.value = false;
+  officialRequestId.value += 1;
+  abortOfficialDetailRequest();
+  officialDetail.value = null;
+  officialError.value = '';
+  officialLoading.value = false;
+  closeDetailCard();
+}
+
+function resetNameTree() {
+  nameTreeRequestId.value += 1;
+  nameTree.value = [];
+  resetNameTreeMeta();
+  nameTreeError.value = '';
+  nameTreeLoading.value = false;
+  nameTreeLoaded.value = false;
+}
+
+function resetNameTreeMeta() {
+  nameTreeMeta.mode = '';
+  nameTreeMeta.reason = '';
+  nameTreeMeta.threshold = null;
+  nameTreeMeta.filteredCount = null;
+  nameTreeMeta.levels = 4;
+}
+
+function normalizeToponymNameTreePayload(payload) {
+  updateNameTreeMeta(payload);
+  if (payload.mode === 'lazy_fallback') {
+    nameTree.value = buildToponymTreeNodes(payload.lazy_bootstrap, {
+      lazyBootstrap: true,
+      expanded: true,
+      levels: nameTreeMeta.levels,
+    });
+    return;
+  }
+
+  nameTree.value = buildToponymTreeNodes(payload.items, {
+    expanded: true,
+    levels: nameTreeMeta.levels,
+  });
+}
+
+function updateNameTreeMeta(payload) {
+  nameTreeMeta.mode = payload.mode || '';
+  nameTreeMeta.reason = payload.reason || '';
+  nameTreeMeta.threshold = payload.threshold;
+  nameTreeMeta.filteredCount = payload.filtered_count;
+  nameTreeMeta.levels = payload.levels || nameTreeMeta.levels || 4;
+}
+
+function mergeLazyTreePayload(node, payload) {
+  if (Array.isArray(payload.children)) {
+    node.children = buildToponymTreeNodes(payload.children, {
+      parentPath: node.path,
+      lazy: true,
+      levels: nameTreeMeta.levels,
+    });
+    node.loaded = true;
+    node.expanded = true;
+    return;
+  }
+
+  if (Array.isArray(payload.names)) {
+    node.names = payload.page && payload.page > 1
+      ? [...node.names, ...payload.names]
+      : payload.names;
+    node.namesPage = payload.page || 1;
+    node.namesHasMore = Boolean(payload.has_more);
+    node.loaded = true;
+    node.expanded = true;
+    node.lazy = false;
+  }
+}
+
+function buildToponymTreeNodes(nodes, options = {}) {
+  if (!Array.isArray(nodes)) return [];
+
+  return nodes.map((node, index) => createToponymTreeNode(node, index, options));
+}
+
+function createToponymTreeNode(node, index, options = {}) {
+  const name = typeof node?.name === 'string' && node.name ? node.name : '-';
+  const level = Number.isFinite(Number(node?.level)) ? Number(node.level) : null;
+  const path = [...(options.parentPath || []), name];
+  const rawChildren = Array.isArray(node?.children) ? node.children : [];
+  const lazyBootstrap = Boolean(options.lazyBootstrap);
+  const lazy = Boolean(options.lazy || (lazyBootstrap && level && level < options.levels));
+  const childOptions = {
+    parentPath: path,
+    expanded: options.expanded,
+    lazy: lazyBootstrap,
+    levels: options.levels,
+  };
+  const children = buildToponymTreeNodes(rawChildren, childOptions);
+
+  return {
+    key: `${path.join('/')}:${level ?? '-'}:${index}`,
+    name,
+    level: level ?? '-',
+    path,
+    names: Array.isArray(node?.names) ? node.names.filter((item) => typeof item === 'string' && item) : [],
+    children,
+    expanded: options.expanded || Boolean(children.length && !lazy),
+    lazy,
+    loaded: Boolean(!lazy || children.length),
+    loading: false,
+    error: '',
+    namesPage: 1,
+    namesHasMore: false,
+    namesLoading: false,
+  };
+}
+
+function setupLayoutWatcher() {
+  if (typeof window === 'undefined' || !window.matchMedia) return;
+
+  layoutMediaQuery = window.matchMedia('(max-aspect-ratio: 1 / 1)');
+  syncLayoutMode();
+  layoutMediaQuery.addEventListener('change', syncLayoutMode);
+}
+
+function syncLayoutMode() {
+  isMobileLayout.value = Boolean(layoutMediaQuery?.matches);
+}
+
+function abortOfficialDetailRequest() {
+  if (!officialAbortController) return;
+  officialAbortController.abort();
+  officialAbortController = null;
+}
+
 async function handleOfficialDetailRequest() {
   const id = selectedPoint.value?.id || selectedLocalDetail.value?.id;
   if (!id) return;
 
-  if (officialAbortController) {
-    officialAbortController.abort();
-  }
+  abortOfficialDetailRequest();
 
+  const requestId = officialRequestId.value + 1;
+  officialRequestId.value = requestId;
   officialAbortController = new AbortController();
   officialLoading.value = true;
   officialError.value = '';
   officialDetail.value = null;
 
   try {
-    officialDetail.value = await getToponymOfficialDetail(id, {
+    const detail = await getToponymOfficialDetail(id, {
       signal: officialAbortController.signal,
     });
+    if (requestId !== officialRequestId.value) return;
+    officialDetail.value = detail;
   } catch (error) {
+    if (requestId !== officialRequestId.value) return;
     if (error.name === 'AbortError') return;
     officialError.value = error.message || t('villages.pages.toponyms.errors.official');
   } finally {
-    officialLoading.value = false;
+    if (requestId === officialRequestId.value) {
+      officialLoading.value = false;
+      officialAbortController = null;
+    }
   }
 }
 
@@ -381,7 +675,7 @@ async function handleToggleLayer({ key, visible }) {
     gap: 14px;
   }
 
-  &__body {
+  &__workspace {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 360px;
     gap: 16px;
@@ -393,16 +687,88 @@ async function handleToggleLayer({ key, visible }) {
   }
 
   &__chart-inner {
+    @include flex-col;
+    gap: 12px;
     min-block-size: 68dvh;
   }
+
+  &__chart-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  &__stat-strip {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-inline-size: 0;
+
+    span,
+    small {
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    strong {
+      color: var(--text-deep);
+      font-size: 20px;
+      line-height: 1.2;
+      font-weight: 700;
+    }
+
+    small {
+      @include text-truncate;
+      max-inline-size: 520px;
+    }
+  }
+
+  &__chart-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    min-inline-size: 0;
+  }
+
+  &__detail-card-header {
+    @include flex-col;
+    gap: 4px;
+
+    strong {
+      color: var(--text-deep);
+      font-size: 15px;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    span {
+      color: var(--text-secondary);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+  }
+}
+
+:global(.toponym-detail-card.is-desktop-card) {
+  width: 360px;
 }
 
 @media (max-aspect-ratio: 1 / 1) {
   .toponyms-page {
     padding: 14px;
 
-    &__body {
+    &__workspace {
       grid-template-columns: 1fr;
+    }
+
+    &__chart-header {
+      @include flex-col;
+    }
+
+    &__chart-toolbar {
+      justify-content: flex-start;
     }
 
     &__chart,

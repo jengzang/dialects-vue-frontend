@@ -1,6 +1,6 @@
 <template>
   <div class="vml-glass-panel">
-    <h3 class="panel-title">🗺️ 空間特徵</h3>
+    <h3 class="panel-title"><InlineIcon icon="🗺️" />空間特徵</h3>
 
     <div v-if="loading" class="vml-loading">
       <div class="ui-loading--page" aria-hidden="true"></div>
@@ -10,7 +10,7 @@
     <div v-else-if="data" class="spatial-content">
       <div class="spatial-grid">
         <div v-if="data.spatial_cluster_id !== undefined" class="spatial-item">
-          <div class="item-icon">🎯</div>
+          <div class="item-icon"><InlineIcon icon="🎯" /></div>
           <div class="item-content">
             <div class="item-label">空間聚類ID</div>
             <div class="item-value">{{ data.spatial_cluster_id }}</div>
@@ -18,7 +18,7 @@
         </div>
 
         <div v-if="data.cluster_size" class="spatial-item">
-          <div class="item-icon">📦</div>
+          <div class="item-icon"><InlineIcon icon="📦" /></div>
           <div class="item-content">
             <div class="item-label">聚類大小</div>
             <div class="item-value">{{ data.cluster_size }}</div>
@@ -26,7 +26,7 @@
         </div>
 
         <div v-if="data.nn_distance_1" class="spatial-item">
-          <div class="item-icon">📏</div>
+          <div class="item-icon"><InlineIcon icon="📏" /></div>
           <div class="item-content">
             <div class="item-label">最近鄰距離</div>
             <div class="item-value">{{ data.nn_distance_1.toFixed(2) }} km</div>
@@ -34,7 +34,7 @@
         </div>
 
         <div v-if="data.local_density_1km !== undefined" class="spatial-item">
-          <div class="item-icon">📊</div>
+          <div class="item-icon"><InlineIcon icon="📊" /></div>
           <div class="item-content">
             <div class="item-label">1km密度</div>
             <div class="item-value">{{ data.local_density_1km }}</div>
@@ -42,7 +42,7 @@
         </div>
 
         <div v-if="data.local_density_5km !== undefined" class="spatial-item">
-          <div class="item-icon">📊</div>
+          <div class="item-icon"><InlineIcon icon="📊" /></div>
           <div class="item-content">
             <div class="item-label">5km密度</div>
             <div class="item-value">{{ data.local_density_5km }}</div>
@@ -50,7 +50,7 @@
         </div>
 
         <div v-if="data.local_density_10km !== undefined" class="spatial-item">
-          <div class="item-icon">📊</div>
+          <div class="item-icon"><InlineIcon icon="📊" /></div>
           <div class="item-content">
             <div class="item-label">10km密度</div>
             <div class="item-value">{{ data.local_density_10km }}</div>
@@ -58,7 +58,7 @@
         </div>
 
         <div v-if="data.isolation_score !== undefined" class="spatial-item">
-          <div class="item-icon">🏝️</div>
+          <div class="item-icon"><InlineIcon icon="🏝️" /></div>
           <div class="item-content">
             <div class="item-label">孤立度</div>
             <div class="item-value">{{ data.isolation_score.toFixed(2) }}</div>
@@ -75,8 +75,7 @@
       </div>
 
       <!-- Coordinates -->
-      <div v-if="data.longitude && data.latitude" class="coordinates-line">
-        🗺️ 地理坐標: {{ data.longitude.toFixed(6) }}, {{ data.latitude.toFixed(6) }}
+      <div v-if="data.longitude && data.latitude" class="coordinates-line"><InlineIcon icon="🗺️" />地理坐標: {{ data.longitude.toFixed(6) }}, {{ data.latitude.toFixed(6) }}
       </div>
     </div>
 
@@ -87,6 +86,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 defineProps({
   villageId: {
     type: Number,

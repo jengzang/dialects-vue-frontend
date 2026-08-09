@@ -1,7 +1,6 @@
 <template>
   <div class="spatial-clusters-tab">
-    <h2>
-      🎯 空間聚類
+    <h2><InlineIcon icon="🎯" />空間聚類
       <HelpIcon content="基於地理坐標的村莊聚類分析。支持多種聚類算法（DBSCAN、HDBSCAN、K-Means等）。展示聚類中心、規模、平均距離和空間範圍統計" />
     </h2>
 
@@ -36,28 +35,28 @@
       <h3>聚類統計摘要 · {{ clustersSummary.run_id }}</h3>
       <div class="summary-grid">
         <div class="summary-card">
-          <div class="summary-icon">🎯</div>
+          <div class="summary-icon"><InlineIcon icon="🎯" /></div>
           <div class="summary-label">總聚類數</div>
           <div class="summary-value">{{ clustersSummary.total_clusters?.toLocaleString() }}</div>
         </div>
         <div class="summary-card">
-          <div class="summary-icon">🏘️</div>
+          <div class="summary-icon"><InlineIcon icon="🏘️" /></div>
           <div class="summary-label">村莊總數</div>
           <div class="summary-value">{{ clustersSummary.total_villages?.toLocaleString() }}</div>
         </div>
         <div class="summary-card">
-          <div class="summary-icon">📊</div>
+          <div class="summary-icon"><InlineIcon icon="📊" /></div>
           <div class="summary-label">噪聲點</div>
           <div class="summary-value">{{ clustersSummary.noise_points }}</div>
         </div>
         <div class="summary-card" v-if="clustersSummary.cluster_size">
-          <div class="summary-icon">📈</div>
+          <div class="summary-icon"><InlineIcon icon="📈" /></div>
           <div class="summary-label">平均 / 最大聚類規模</div>
           <div class="summary-value">{{ clustersSummary.cluster_size.avg?.toFixed(2) }}</div>
           <div class="summary-sub">最小 {{ clustersSummary.cluster_size.min?.toFixed(2) }} · 最大 {{ clustersSummary.cluster_size.max?.toFixed(2) }}</div>
         </div>
         <div class="summary-card" v-if="clustersSummary.spatial_extent">
-          <div class="summary-icon">📍</div>
+          <div class="summary-icon"><InlineIcon icon="📍" /></div>
           <div class="summary-label">平均聚類內距離</div>
           <div class="summary-value">{{ clustersSummary.spatial_extent.avg_distance_km?.toFixed(2) }} km</div>
           <div class="summary-sub">
@@ -71,6 +70,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, onMounted, computed, watch } from 'vue'
 import SpatialMap from './SpatialMap.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'

@@ -7,8 +7,7 @@
     @update:modelValue="close"
   >
     <template #header>
-      <div class="village-modal-title">
-        🏘️ {{ village.name }} - 深度分析
+      <div class="village-modal-title"><InlineIcon icon="🏘️" />{{ village.name }} - 深度分析
       </div>
       <button class="close-btn close-btn-lg close-btn-inline" type="button" @click="close">×</button>
     </template>
@@ -77,6 +76,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch } from 'vue'
 import AppModal from '@/components/common/AppModal.vue'
 import VillageInfoPanel from '../village/VillageInfoPanel.vue'

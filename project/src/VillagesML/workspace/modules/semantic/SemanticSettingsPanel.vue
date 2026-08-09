@@ -4,7 +4,7 @@
 
     <!-- 登錄提示 -->
     <div v-if="!isAuthenticated" class="auth-notice">
-      <span class="notice-icon">🔒</span>
+      <span class="notice-icon"><InlineIcon icon="🔒" /></span>
       <span class="notice-text">此功能需要登錄</span>
     </div>
 
@@ -63,7 +63,7 @@
             特徵向量中心性
           </label>
         </div>
-        <span v-if="selectedMetrics.length === 0" class="error-hint">⚠️ 請至少選擇一個中心性指標</span>
+        <span v-if="selectedMetrics.length === 0" class="error-hint"><InlineIcon icon="⚠️" />請至少選擇一個中心性指標</span>
       </div>
 
       <!-- Detail Mode Toggle -->
@@ -95,6 +95,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { reactive, computed, ref, watch } from 'vue'
 import { villagesMLStore } from '@/VillagesML/store/villagesMLStore.js'
 import { userStore } from '@/main/store/store.js'

@@ -27,7 +27,7 @@ export const PLATFORM_FEATURE_MATRIX = {
       android: true,
       native: true,
     },
-    routes: ['/menu/map/draw'],
+    routes: ['/explore/gis'],
     tutorials: ['menu-map-draw'],
   },
   fileImport: {

@@ -6,9 +6,7 @@
         class="benefit-circle-btn"
         @click="$emit('showBenefits')"
         :title="$t('auth.login.viewBenefits')"
-      >
-        🎁
-      </button>
+      ><InlineIcon icon="🎁" /></button>
     </h3>
 
     <!-- Tab Switcher -->
@@ -74,6 +72,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import FormInput from './FormInput.vue'

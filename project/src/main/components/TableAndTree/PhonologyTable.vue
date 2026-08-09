@@ -1,7 +1,7 @@
 <template>
   <div class="phonology-matrix" :class="{ 'is-fullscreen': isFullScreen }">
     <div v-if="location" class="location-header">
-      <div class="location-title">📍 {{ location }}</div>
+      <div class="location-title"><InlineIcon icon="📍" />{{ location }}</div>
       <div class="header-actions">
         <button class="tone-search-btn" @click="handleShowDetails" :disabled="isLoading">
           {{ isLoading ? t('result.phonologyTable.loadingButton') : t('result.phonologyTable.detailButton') }}
@@ -78,6 +78,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue';
@@ -474,11 +475,11 @@ $transition-duration: 0.25s;
   overflow-x: auto;
   overflow-y: auto;
   background: var(--glass-60);
+  backdrop-filter: blur($glass-blur);
+  -webkit-backdrop-filter: blur($glass-blur);
   border: 1px solid var(--border-gray-light);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md2);
-  backdrop-filter: blur($glass-blur);
-  -webkit-backdrop-filter: blur($glass-blur);
 
   /* GPU acceleration for smooth scrolling */
   will-change: transform;
@@ -724,15 +725,15 @@ $transition-duration: 0.25s;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  background: var(--glass-70);
-  border: 1px solid var(--glass-60);
+  background: var(--surface-glass-floating);
+  border: 1px solid var(--border-glass);
   border-radius: var(--radius-pill);
   backdrop-filter: blur($button-blur) saturate(180%);
   -webkit-backdrop-filter: blur($button-blur) saturate(180%);
   transition: all $transition-duration ease;
 
   &:hover {
-    background: var(--glass-90);
+    background: var(--surface-glass-floating-strong);
     transform: scale(1.04);
   }
 }

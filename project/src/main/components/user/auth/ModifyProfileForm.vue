@@ -13,8 +13,7 @@
         class="avatar-edit-btn"
         type="button"
         @click="avatarEditorRef?.open()"
-      >
-        🎨 {{ avatarEditText }}
+      ><InlineIcon icon="🎨" />{{ avatarEditText }}
       </button>
     </div>
 
@@ -102,6 +101,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import FormInput from './FormInput.vue'

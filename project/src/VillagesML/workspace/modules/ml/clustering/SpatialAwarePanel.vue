@@ -10,7 +10,7 @@
       <p class="panel-description">基於空間聚類結果的二次聚類分析</p>
 
       <div v-if="!isAuthenticated" class="vml-auth-notice">
-        <span class="notice-icon">🔒</span>
+        <span class="notice-icon"><InlineIcon icon="🔒" /></span>
         <span>此功能需要登錄後使用</span>
       </div>
 
@@ -44,7 +44,7 @@
 
         <button @click="runClustering" :disabled="loading" class="run-button solid-button">
           <span v-if="loading" class="ui-loading--hourglass" aria-hidden="true">⏳</span>
-          <span v-else>🚀</span>
+          <span v-else><InlineIcon icon="🚀" /></span>
           {{ loading ? '運行中...' : '運行聚類' }}
         </button>
       </div>
@@ -58,6 +58,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed } from 'vue'
 import { villagesMLStore } from '@/VillagesML/store/villagesMLStore.js'
 import { SPATIAL_CLUSTERING_RUN_LABELS } from '@/VillagesML/config/villagesML.js'

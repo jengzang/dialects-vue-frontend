@@ -7,7 +7,7 @@
 
       <div class="page-title-group">
         <h1 class="page-title">
-          <span class="title-icon">🗂️</span>
+          <span class="title-icon"><InlineIcon icon="🗂️" /></span>
           <span>{{ t('user.regionPage.title') }}</span>
         </h1>
 
@@ -57,7 +57,7 @@
       v-else-if="!loading && filteredRegions.length === 0"
       class="empty-state empty-state-base status-panel liquid-panel"
     >
-      <div class="empty-icon">📭</div>
+      <div class="empty-icon"><InlineIcon icon="📭" /></div>
       <p class="empty-text">
         {{ searchQuery ? t('user.regionPage.empty.noMatch') : t('user.regionPage.empty.noRegions') }}
       </p>
@@ -86,9 +86,7 @@
               type="button"
               :title="t('common.button.edit')"
               @click="openEditModal(region)"
-            >
-              ✏️
-            </button>
+            ><InlineIcon icon="✏️" /></button>
             <button
               class="btn-icon-action danger"
               type="button"
@@ -103,7 +101,7 @@
               >
                 ↻
               </span>
-              <span v-else>🗑️</span>
+              <span v-else><InlineIcon icon="🗑️" /></span>
             </button>
           </div>
         </div>
@@ -154,6 +152,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'

@@ -355,6 +355,43 @@
 
       <section class="help-section help-section--blue">
         <h4 class="section-title">
+          📋 {{ t('map.customTab.helpModal.sections.searchMapping.title') }}
+        </h4>
+
+        <p class="help-paragraph">
+          {{ t('map.customTab.helpModal.sections.searchMapping.intro') }}
+        </p>
+
+        <div class="table-container">
+          <table class="example-table">
+            <thead>
+              <tr>
+                <th>{{ t('map.customTab.helpModal.sections.searchMapping.columns.scene') }}</th>
+                <th>{{ t('map.customTab.helpModal.sections.searchMapping.columns.phonology') }}</th>
+                <th>{{ t('map.customTab.helpModal.sections.searchMapping.columns.feature') }}</th>
+                <th>{{ t('map.customTab.helpModal.sections.searchMapping.columns.value') }}</th>
+                <th>{{ t('map.customTab.helpModal.sections.searchMapping.columns.desc') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="row in searchMappingRows" :key="row.scene">
+                <td><strong>{{ row.scene }}</strong></td>
+                <td>{{ row.phonology }}</td>
+                <td>{{ row.feature }}</td>
+                <td>{{ row.value }}</td>
+                <td class="note-text">{{ row.desc }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="example-hint">
+          {{ t('map.customTab.helpModal.sections.searchMapping.note') }}
+        </p>
+      </section>
+
+      <section class="help-section help-section--blue">
+        <h4 class="section-title">
           📍 {{ t('map.customTab.helpModal.sections.steps.title') }}
         </h4>
 
@@ -460,6 +497,37 @@ const helpCollectionNotes = computed(() => [
   t('map.customTab.helpModal.sections.customCollection.notes.scope'),
   t('map.customTab.helpModal.sections.customCollection.notes.search'),
   t('map.customTab.helpModal.sections.customCollection.notes.display'),
+]);
+
+const searchMappingRows = computed(() => [
+  {
+    scene: t('map.customTab.helpModal.sections.searchMapping.rows.chars.scene'),
+    phonology: t('map.customTab.helpModal.sections.searchMapping.rows.chars.phonology'),
+    feature: t('map.customTab.helpModal.sections.searchMapping.rows.chars.feature'),
+    value: t('map.customTab.helpModal.sections.searchMapping.rows.chars.value'),
+    desc: t('map.customTab.helpModal.sections.searchMapping.rows.chars.desc'),
+  },
+  {
+    scene: t('map.customTab.helpModal.sections.searchMapping.rows.tones.scene'),
+    phonology: t('map.customTab.helpModal.sections.searchMapping.rows.tones.phonology'),
+    feature: t('map.customTab.helpModal.sections.searchMapping.rows.tones.feature'),
+    value: t('map.customTab.helpModal.sections.searchMapping.rows.tones.value'),
+    desc: t('map.customTab.helpModal.sections.searchMapping.rows.tones.desc'),
+  },
+  {
+    scene: t('map.customTab.helpModal.sections.searchMapping.rows.zhongGu.scene'),
+    phonology: t('map.customTab.helpModal.sections.searchMapping.rows.zhongGu.phonology'),
+    feature: t('map.customTab.helpModal.sections.searchMapping.rows.zhongGu.feature'),
+    value: t('map.customTab.helpModal.sections.searchMapping.rows.zhongGu.value'),
+    desc: t('map.customTab.helpModal.sections.searchMapping.rows.zhongGu.desc'),
+  },
+  {
+    scene: t('map.customTab.helpModal.sections.searchMapping.rows.yinWei.scene'),
+    phonology: t('map.customTab.helpModal.sections.searchMapping.rows.yinWei.phonology'),
+    feature: t('map.customTab.helpModal.sections.searchMapping.rows.yinWei.feature'),
+    value: t('map.customTab.helpModal.sections.searchMapping.rows.yinWei.value'),
+    desc: t('map.customTab.helpModal.sections.searchMapping.rows.yinWei.desc'),
+  },
 ]);
 
 const helpStepsItems = computed(() => [
@@ -629,7 +697,7 @@ $glass-card: var(--glass-50);
 .highlight-geo {
   background-color: var(--bg-light-gray);
   color: var(--text-muted);
-  font-family: monospace;
+  font-family: var(--font-mono);
   font-size: 11px;
 }
 
@@ -713,7 +781,7 @@ $glass-card: var(--glass-50);
   background: rgba(var(--color-primary-rgb), 0.08);
   border-radius: var(--radius-xs);
   color: $primary-blue;
-  font-family: monospace;
+  font-family: var(--font-mono);
   font-size: 12px;
 }
 
@@ -768,7 +836,7 @@ $glass-card: var(--glass-50);
 .usage-example-sm {
   margin-top: 2px;
   color: $usage-green;
-  font-family: monospace;
+  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
 }

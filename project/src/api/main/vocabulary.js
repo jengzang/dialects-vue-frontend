@@ -78,6 +78,8 @@ function stripVocabularyBatchReplaceParams(params = {}) {
  * @property {string} [q] 模糊搜索内容。
  * @property {VocabularySearchField | VocabularySearchField[]} [search_fields] 指定 q 搜索字段。
  * @property {string | string[]} [locations] 独立地点筛选，多个地点之间为 OR；该筛选与 q 内容匹配是 AND 关系。
+ * @property {string} [province] 按省筛选，与 locations 互斥。
+ * @property {string} [city] 按市筛选，与 locations 互斥。
  * @property {number} [page=1] 卡片模式结果页码；后端默认 1。
  * @property {number} [page_size=50] 卡片模式每页数量；后端默认 50，最大 200。
  */
@@ -144,6 +146,8 @@ export function buildVocabularyItemsPath(params = {}) {
     q: params.q,
     search_fields: params.search_fields,
     locations: params.locations,
+    province: params.province,
+    city: params.city,
     page: params.page,
     page_size: params.page_size,
   })}`
@@ -162,6 +166,8 @@ export function buildVocabularyMapPointsPath(params = {}) {
     q: params.q,
     search_fields: params.search_fields,
     locations: params.locations,
+    province: params.province,
+    city: params.city,
   })}`
 }
 
@@ -178,6 +184,8 @@ export function buildVocabularyStandardWordsPath(params = {}) {
     q: params.q,
     search_fields: params.search_fields,
     locations: params.locations,
+    province: params.province,
+    city: params.city,
     limit: params.limit,
   })}`
 }
@@ -196,6 +204,8 @@ export function buildVocabularyMapItemsPath(params = {}) {
     q: params.q,
     search_fields: params.search_fields,
     locations: params.locations,
+    province: params.province,
+    city: params.city,
   })}`
 }
 
@@ -315,7 +325,7 @@ export async function setVocabularyPermission(userId, permissionLevel) {
 /**
  * 获取词表地点筛选候选值，供卡片/地图模式的地点多选筛选使用。
  *
- * @returns {Promise<Array<{value: string, label: string}>>}
+ * @returns {Promise<Array<{value: string, label: string, province: string, city: string}>>}
  */
 export async function getVocabularyLocationOptions() {
   try {
@@ -333,6 +343,8 @@ export async function getVocabularyLocationOptions() {
       options.push({
         value: locationName,
         label: location.location_label || locationName,
+        province: location.province || '',
+        city: location.city || '',
       })
       return options
     }, [])
@@ -351,7 +363,7 @@ export async function getVocabularyLocationNames() {
 /**
  * 获取词表地点元数据。
  *
- * @param {{user_id?: number|string, location_name?: string, page?: number, page_size?: number}} [params={}]
+ * @param {{user_id?: number|string, username?: string, location_name?: string, page?: number, page_size?: number}} [params={}]
  * @returns {Promise<{locations: Array<object>, total: number, page: number, page_size: number}>}
  */
 export async function getVocabularyLocations(params = {}) {
@@ -398,6 +410,25 @@ export async function updateVocabularyLocation(locationName, data, params = {}) 
     console.error('Update vocabulary location error:', error)
     showError(error.message || '更新詞表地點信息失敗')
     throw new Error(error.message || '更新詞表地點信息失敗')
+  }
+}
+
+/**
+ * 删除词表地点（级联删除该地点下所有词条）。
+ *
+ * @param {string} locationName
+ * @param {{user_id?: number|string}} [params={}]
+ * @returns {Promise<{status: string, location_name: string, deleted_entries: number}>}
+ */
+export async function deleteVocabularyLocation(locationName, params = {}) {
+  try {
+    return await api(`${VOCABULARY_LOCATIONS_ENDPOINT}/${encodeURIComponent(locationName)}${appendQueryParams(params)}`, {
+      method: 'DELETE',
+    })
+  } catch (error) {
+    console.error('Delete vocabulary location error:', error)
+    showError(error.message || '刪除詞表地點失敗')
+    throw new Error(error.message || '刪除詞表地點失敗')
   }
 }
 

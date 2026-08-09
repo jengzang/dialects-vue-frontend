@@ -34,7 +34,7 @@
           <!-- VS 分隔符 -->
           <!-- <div class="vs-divider">
             <div class="vs-line"></div>
-            <div class="vs-badge">⚡ VS ⚡</div>
+            <div class="vs-badge"><InlineIcon icon="⚡" />VS ⚡</div>
             <div class="vs-line"></div>
           </div> -->
 
@@ -146,9 +146,7 @@
                       <button
                         class="remove-btn"
                         @click="removeFromGroup('group1', index)"
-                      >
-                        ✕
-                      </button>
+                      ><InlineIcon icon="✕" /></button>
                     </div>
                     <div
                       v-if="tabStates.tab2.group1Items.length === 0"
@@ -180,9 +178,7 @@
                       <button
                         class="remove-btn"
                         @click="removeFromGroup('group2', index)"
-                      >
-                        ✕
-                      </button>
+                      ><InlineIcon icon="✕" /></button>
                     </div>
                     <div
                       v-if="tabStates.tab2.group2Items.length === 0"
@@ -276,9 +272,7 @@
                       <button
                         class="remove-btn"
                         @click="removeFromGroup('group1', index)"
-                      >
-                        ✕
-                      </button>
+                      ><InlineIcon icon="✕" /></button>
                     </div>
                     <div
                       v-if="tabStates.tab2.group1Items.length === 0"
@@ -312,9 +306,7 @@
                       <button
                         class="remove-btn"
                         @click="removeFromGroup('group2', index)"
-                      >
-                        ✕
-                      </button>
+                      ><InlineIcon icon="✕" /></button>
                     </div>
                     <div
                       v-if="tabStates.tab2.group2Items.length === 0"
@@ -469,9 +461,9 @@
           :class="{ disabled: isRunDisabled }"
           @click="runAction"
         >
-          <span v-if="buttonState.isRunning">🔄 {{ $t('compare.button.running') }}</span>
-          <span v-else-if="isRunDisabled">🚫 {{ $t('compare.button.invalid') }}</span>
-          <span v-else>🚀 {{ $t('compare.button.startCompare') }}</span>
+          <span v-if="buttonState.isRunning"><InlineIcon icon="🔄" />{{ $t('compare.button.running') }}</span>
+          <span v-else-if="isRunDisabled"><InlineIcon icon="🚫" />{{ $t('compare.button.invalid') }}</span>
+          <span v-else><InlineIcon icon="🚀" />{{ $t('compare.button.startCompare') }}</span>
         </button>
 
         <!-- Tab5 独立运行按钮 -->
@@ -482,9 +474,9 @@
           :class="{ disabled: isTab5RunDisabled }"
           @click="runTab5Action"
         >
-          <span v-if="buttonState.isRunning">🔄 {{ $t('compare.button.running') }}</span>
-          <span v-else-if="isTab5RunDisabled">🚫 {{ $t('compare.button.invalid') }}</span>
-          <span v-else>🚀 {{ $t('compare.button.startCompare') }}</span>
+          <span v-if="buttonState.isRunning"><InlineIcon icon="🔄" />{{ $t('compare.button.running') }}</span>
+          <span v-else-if="isTab5RunDisabled"><InlineIcon icon="🚫" />{{ $t('compare.button.invalid') }}</span>
+          <span v-else><InlineIcon icon="🚀" />{{ $t('compare.button.startCompare') }}</span>
         </button>
       </div>
 
@@ -522,6 +514,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, nextTick, reactive, ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -2264,11 +2257,11 @@ $text-muted: var(--text-lightest);
 /* Tab5 音值比较 */
 .tab5 {
   &-page {
-    width: 93dvw;
     max-width: none;
     max-height: none;
     flex-direction: column;
     align-items: center;
+    overflow-x: auto;
   }
 
   &-location-group {
@@ -2430,10 +2423,6 @@ $text-muted: var(--text-lightest);
   }
 
   .tab5 {
-    &-page {
-      width: 86dvw !important;
-    }
-
     &-location-group {
       max-width: 520px;
     }

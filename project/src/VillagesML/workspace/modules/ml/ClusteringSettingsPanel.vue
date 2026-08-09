@@ -4,7 +4,7 @@
 
     <!-- 登錄提示 -->
     <div v-if="!isAuthenticated" class="auth-notice">
-      <span class="notice-icon">🔒</span>
+      <span class="notice-icon"><InlineIcon icon="🔒" /></span>
       <span class="notice-text">此功能需要登錄</span>
     </div>
 
@@ -80,6 +80,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { reactive, computed, watch, onMounted, ref } from 'vue'
 import { villagesMLStore } from '@/VillagesML/store/villagesMLStore.js'
 import { userStore } from '@/main/store/store.js'

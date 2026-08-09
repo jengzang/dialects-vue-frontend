@@ -89,6 +89,22 @@
             name="settings-interface-mode"
             class="settings-radio-group interface-mode-radio-group"
           />
+          <h3 class="section-title" style="margin-top: 18px">
+            {{ $t('about.settings.iconMode.title') }}
+            <HelpIcon
+              :content="$t('about.settings.iconMode.description')"
+              size="sm"
+              placement="right"
+              icon="?"
+              icon-color="var(--color-primary)"
+            />
+          </h3>
+          <RadioGroup
+            v-model="iconModeModel"
+            :options="iconModeRadioOptions"
+            name="settings-icon-mode"
+            class="settings-radio-group"
+          />
         </div>
       </div>
 
@@ -140,8 +156,7 @@
             data-variant="secondary"
             @click="showUpdateNotice = true"
             style="white-space: nowrap;"
-          >
-            📋 {{ $t('about.settings.viewUpdateLog') }}
+          ><InlineIcon icon="📋" />{{ $t('about.settings.viewUpdateLog') }}
           </button>
         </div>
       </div>
@@ -164,6 +179,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -183,10 +199,15 @@ import {
   COLOR_THEME_GREEN,
   UI_MODE_DEFAULT,
   UI_MODE_COMPACT,
+  ICON_MODE_ALL_EMOJI,
+  ICON_MODE_ALL_SVG,
+  ICON_MODE_BAR_SVG,
   getStoredColorTheme,
   getStoredInterfaceMode,
+  getStoredIconMode,
   setColorTheme,
   setInterfaceMode,
+  setIconMode,
 } from '@/composables/core/uiPreferences.js'
 import { buildLocalePath, stripLocaleFromPath } from '@/i18n/localeRouting.js'
 import {
@@ -231,6 +252,7 @@ const languages = ref([
 
 const interfaceMode = ref(getStoredInterfaceMode())
 const colorTheme = ref(getStoredColorTheme())
+const iconMode = ref(getStoredIconMode())
 
 const colorThemeOptions = computed(() => [
   { value: COLOR_THEME_BLUE, label: t('navigation.settings.colorTheme.options.blue') },
@@ -266,6 +288,27 @@ const interfaceModeRadioOptions = computed(() =>
 const interfaceModeModel = computed({
   get: () => interfaceMode.value,
   set: (mode) => changeInterfaceMode(mode)
+})
+
+const iconModeOptions = computed(() => [
+  { value: ICON_MODE_BAR_SVG, label: t('about.settings.iconMode.options.barSvg') },
+  { value: ICON_MODE_ALL_EMOJI, label: t('about.settings.iconMode.options.allEmoji') },
+  { value: ICON_MODE_ALL_SVG, label: t('about.settings.iconMode.options.allSvg') },
+])
+
+const iconModeRadioOptions = computed(() =>
+  iconModeOptions.value.map(option => ({
+    value: option.value,
+    label: option.label
+  }))
+)
+
+const iconModeModel = computed({
+  get: () => iconMode.value,
+  set: (mode) => {
+    if (mode === iconMode.value) return
+    iconMode.value = setIconMode(mode)
+  }
 })
 
 const characterTableOptions = computed(() =>
@@ -347,7 +390,7 @@ $text-muted: var(--text-tertiary);
 }
 
 .settings-container {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -408,9 +451,39 @@ $text-muted: var(--text-tertiary);
 }
 
 .color-theme-radio-group {
-  flex-wrap: nowrap;
-  gap: 6px;
-  overflow-x: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-items: center;
+  gap: 4px 16px;
+
+  :deep(.liquid-radio-text) {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &::before {
+      width: 18px;
+      height: 18px;
+      content: '';
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 5px;
+      flex-shrink: 0;
+    }
+  }
+
+  :deep(.liquid-radio-label:nth-child(1) .liquid-radio-text::before) {
+    background: #007aff;
+  }
+  :deep(.liquid-radio-label:nth-child(2) .liquid-radio-text::before) {
+    background: #388e3c;
+  }
+  :deep(.liquid-radio-label:nth-child(3) .liquid-radio-text::before) {
+    background: linear-gradient(135deg, #fff 50%, #e8e8e8 50%);
+    border-color: rgba(0, 0, 0, 0.18);
+  }
+  :deep(.liquid-radio-label:nth-child(4) .liquid-radio-text::before) {
+    background: linear-gradient(135deg, #0d1117 50%, #21262d 50%);
+  }
 }
 
 .interface-mode-radio-group {

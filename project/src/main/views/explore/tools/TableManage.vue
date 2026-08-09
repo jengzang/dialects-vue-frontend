@@ -6,7 +6,7 @@
     </div>
 
     <div v-else-if="!isAdmin" class="access-denied">
-      <h2>⚠️ {{ t('tools.tableManage.accessDenied.title') }}</h2>
+      <h2><InlineIcon icon="⚠️" />{{ t('tools.tableManage.accessDenied.title') }}</h2>
       <p>{{ t('tools.tableManage.accessDenied.desc') }}</p>
       <button @click="goHome">{{ t('tools.tableManage.accessDenied.goHome') }}</button>
     </div>
@@ -172,6 +172,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'

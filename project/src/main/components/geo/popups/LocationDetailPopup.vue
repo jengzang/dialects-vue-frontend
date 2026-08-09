@@ -39,7 +39,7 @@
               class="map-lookup-btn"
               :title="t('result.locationMapPopup.titleFallback')"
               @click="showMapPopup = true"
-            >🔍</button>
+            ><InlineIcon icon="🔍" /></button>
           </span>
         </div>
 
@@ -82,6 +82,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { useI18n } from 'vue-i18n';
 import { computed, ref } from 'vue';
 import AppModal from '@/components/common/AppModal.vue'

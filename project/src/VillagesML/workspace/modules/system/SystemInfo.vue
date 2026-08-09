@@ -12,49 +12,49 @@
       <div class="panel-header">
         <h3>數據庫概覽 Database Overview</h3>
         <button @click="refreshOverview" :disabled="loading" class="solid-button small">
-          <span v-if="!loading">🔄 刷新</span>
+          <span v-if="!loading"><InlineIcon icon="🔄" />刷新</span>
           <span v-else>刷新中...</span>
         </button>
       </div>
       <div v-if="overview" class="overview-content">
         <div class="overview-grid">
           <div class="overview-card">
-            <div class="card-icon">🗄️</div>
+            <div class="card-icon"><InlineIcon icon="🗄️" /></div>
             <div class="card-info">
               <div class="card-label">數據庫大小</div>
               <div class="card-value">{{ formatSize(overview.database_size) }}</div>
             </div>
           </div>
           <div class="overview-card">
-            <div class="card-icon">📊</div>
+            <div class="card-icon"><InlineIcon icon="📊" /></div>
             <div class="card-info">
               <div class="card-label">總表數</div>
               <div class="card-value">{{ overview.total_tables }}</div>
             </div>
           </div>
           <div class="overview-card">
-            <div class="card-icon">📝</div>
+            <div class="card-icon"><InlineIcon icon="📝" /></div>
             <div class="card-info">
               <div class="card-label">總記錄數</div>
               <div class="card-value">{{ formatNumber(overview.total_records) }}</div>
             </div>
           </div>
           <div class="overview-card">
-            <div class="card-icon">🏘️</div>
+            <div class="card-icon"><InlineIcon icon="🏘️" /></div>
             <div class="card-info">
               <div class="card-label">村莊總數</div>
               <div class="card-value">{{ formatNumber(overview.village_count) }}</div>
             </div>
           </div>
           <div class="overview-card">
-            <div class="card-icon">🔤</div>
+            <div class="card-icon"><InlineIcon icon="🔤" /></div>
             <div class="card-info">
               <div class="card-label">字符總數</div>
               <div class="card-value">{{ formatNumber(overview.character_count) }}</div>
             </div>
           </div>
           <div class="overview-card">
-            <div class="card-icon">🌐</div>
+            <div class="card-icon"><InlineIcon icon="🌐" /></div>
             <div class="card-info">
               <div class="card-label">區域總數</div>
               <div class="card-value">{{ overview.region_count }}</div>
@@ -71,35 +71,35 @@
         <button @click="refreshNgramStats" :disabled="loadingNgram" class="solid-button small">
           <span v-if="loadingNgram">加載中...</span>
           <span v-else-if="!ngramStats">加載</span>
-          <span v-else>🔄 刷新</span>
+          <span v-else><InlineIcon icon="🔄" />刷新</span>
         </button>
       </div>
       <div v-if="ngramStats" class="overview-content">
         <!-- 主要统计卡片 -->
         <div class="overview-grid">
           <div class="overview-card large-card">
-            <div class="card-icon">📐</div>
+            <div class="card-icon"><InlineIcon icon="📐" /></div>
             <div class="card-info">
               <div class="card-label">N-gram 總數</div>
               <div class="card-value">{{ formatNumber(ngramStats.ngram_significance?.total || 0) }}</div>
             </div>
           </div>
           <div class="overview-card large-card">
-            <div class="card-icon">🔍</div>
+            <div class="card-icon"><InlineIcon icon="🔍" /></div>
             <div class="card-info">
               <div class="card-label">過濾前總數</div>
               <div class="card-value">{{ formatNumber(ngramStats.ngram_significance?.total_before_filter || 0) }}</div>
             </div>
           </div>
           <div class="overview-card large-card">
-            <div class="card-icon">📊</div>
+            <div class="card-icon"><InlineIcon icon="📊" /></div>
             <div class="card-info">
               <div class="card-label">顯著率</div>
               <div class="card-value">{{ calculateSignificanceRate(ngramStats.ngram_significance) }}</div>
             </div>
           </div>
           <div class="overview-card large-card">
-            <div class="card-icon">🌐</div>
+            <div class="card-icon"><InlineIcon icon="🌐" /></div>
             <div class="card-info">
               <div class="card-label">區域 N-gram 頻率</div>
               <div class="card-value">{{ formatNumber(ngramStats.regional_ngram_frequency?.total || 0) }}</div>
@@ -146,7 +146,7 @@
             <button @click="refreshTables" :disabled="loadingTables" class="solid-button small">
               <span v-if="loadingTables">加載中...</span>
               <span v-else-if="tables === null">加載</span>
-              <span v-else>🔄 刷新</span>
+              <span v-else><InlineIcon icon="🔄" />刷新</span>
             </button>
           </div>
           <div class="vml-control-field">
@@ -269,6 +269,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, onMounted } from 'vue'
 import { getVillagesOverview, getVillagesNgrams, getVillagesTables, getCachedVillagesOverview, getCachedVillagesNgrams, getCachedVillagesTables } from '@/composables/data/useVillagesCache.js'
 import { showError, showSuccess } from '@/utils/ui/message.js'

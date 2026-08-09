@@ -2,8 +2,7 @@
 <!--  <ExploreLayout>-->
     <div class="spatial-integration-page">
 <!--      <h3 class="villagesml-subtab-title">空間分析 - 空間整合</h3>-->
-      <h1 class="page-title">
-        🌐 空間整合分析
+      <h1 class="page-title"><InlineIcon icon="🌐" />空間整合分析
         <HelpIcon content="整合字符傾向與空間聚類數據。分析字符在特定聚類中的傾向偏差、空間一致性和統計顯著性。支持按字符或按聚類查詢" />
       </h1>
 
@@ -91,7 +90,7 @@
                   <div>{{ item.spatial_coherence?.toFixed(3) || 'N/A' }}</div>
                   <div>{{ item.spatial_specificity?.toFixed(3) || 'N/A' }}</div>
                   <div>
-                    <span v-if="item.is_significant" class="significant-badge">✨ 顯著</span>
+                    <span v-if="item.is_significant" class="significant-badge"><InlineIcon icon="✨" />顯著</span>
                     <span v-else class="not-significant">-</span>
                   </div>
                   <div>{{ item.dominant_city || 'N/A' }}</div>
@@ -146,7 +145,7 @@
               @point-click="handlePointClick"
             />
             <div v-else class="map-placeholder">
-              <p>🗺️ 暫無地圖數據</p>
+              <p><InlineIcon icon="🗺️" />暫無地圖數據</p>
             </div>
           </div>
 
@@ -219,7 +218,7 @@
               @point-click="handlePointClick"
             />
             <div v-else class="map-placeholder">
-              <p>🗺️ 暫無地圖數據</p>
+              <p><InlineIcon icon="🗺️" />暫無地圖數據</p>
             </div>
           </div>
 
@@ -295,7 +294,7 @@
                   <div>{{ char.spatial_specificity?.toFixed(2) || 'N/A' }}</div>
                   <div class="char-pvalue">{{ char.p_value?.toExponential(2) || 'N/A' }}</div>
                   <div>
-                    <span v-if="char.is_significant" class="char-badge">✨ 顯著</span>
+                    <span v-if="char.is_significant" class="char-badge"><InlineIcon icon="✨" />顯著</span>
                     <span v-else class="not-significant">-</span>
                   </div>
                 </div>
@@ -313,17 +312,17 @@
         <h2>整合摘要</h2>
         <div class="summary-grid">
           <div class="summary-card">
-            <div class="summary-icon">🔥</div>
+            <div class="summary-icon"><InlineIcon icon="🔥" /></div>
             <div class="summary-label">總熱點數</div>
             <div class="summary-value">{{ summary.total_hotspots }}</div>
           </div>
           <div class="summary-card">
-            <div class="summary-icon">🎯</div>
+            <div class="summary-icon"><InlineIcon icon="🎯" /></div>
             <div class="summary-label">總聚類數</div>
             <div class="summary-value">{{ summary.total_clusters }}</div>
           </div>
           <div class="summary-card">
-            <div class="summary-icon">📊</div>
+            <div class="summary-icon"><InlineIcon icon="📊" /></div>
             <div class="summary-label">覆蓋率</div>
             <div class="summary-value">{{ (summary.coverage * 100).toFixed(1) }}%</div>
           </div>
@@ -341,6 +340,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch, onMounted } from 'vue'
 import SpatialMap from './SpatialMap.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'

@@ -2,6 +2,7 @@ import { WEB_BASE } from '../../env-config.js';
 import { showRateLimitNotice } from '../../utils/user/rateLimitNotice.js';
 import { recordLoginPromptApiHit } from '../../utils/user/loginPromptTracker.js';
 import { userStore } from '../../main/store/store.js';
+import { showError as showErrorToast } from '../../utils/ui/message.js';
 
 import { getToken, getTokenExpiresAt } from './tokenStorage.js';
 import { clearSession, refreshAccessToken } from './session.js';
@@ -389,10 +390,9 @@ export async function api(path, options = {}) {
     if (
       showError &&
       error.kind !== 'network' &&
-      error.status !== 429 &&
-      typeof window.showErrorToast === 'function'
+      error.status !== 429
     ) {
-      window.showErrorToast(error.message);
+      showErrorToast(error.message);
     }
     throw error;
   }

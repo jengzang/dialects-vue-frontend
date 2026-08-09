@@ -127,7 +127,7 @@
             />
 
             <div class="search-wrapper">
-              <span class="search-icon">🔍</span>
+              <span class="search-icon"><InlineIcon icon="🔍" /></span>
               <input
                 v-model="searchQuery"
                 type="text"
@@ -147,7 +147,7 @@
           </div>
 
           <div v-else-if="loadError" class="state-block">
-            <div class="state-icon">⚠️</div>
+            <div class="state-icon"><InlineIcon icon="⚠️" /></div>
             <p class="state-message">{{ loadError }}</p>
             <button type="button" class="glass-button retry-button" @click="retryCurrentState">
               {{ t('charClass.actions.retry') }}
@@ -155,7 +155,7 @@
           </div>
 
           <div v-else-if="displayTree.length === 0" class="state-block">
-            <div class="state-icon">{{ searchQuery.trim() ? '🔎' : '📚' }}</div>
+            <div class="state-icon"><InlineIcon :icon="searchQuery.trim() ? '🔎' : '📚'" /></div>
             <p class="state-message">
               {{ searchQuery.trim() ? t('charClass.search.noResults') : t('charClass.states.emptyTree') }}
             </p>
@@ -179,6 +179,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'

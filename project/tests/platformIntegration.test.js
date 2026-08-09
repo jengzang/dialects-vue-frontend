@@ -3,8 +3,6 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { redirectUnsupportedMapDraw } from '../src/main/router/menuRoutes.js'
-
 const testsDir = dirname(fileURLToPath(import.meta.url))
 const projectRoot = resolve(testsDir, '..')
 
@@ -40,23 +38,23 @@ describe('platform integration seams', () => {
     const menuBarSource = readSource('src/main/config/BarAndTabs/MenuBarConfig.js')
     const menuRoutesSource = readSource('src/main/router/menuRoutes.js')
     const homePageSource = readSource('src/main/views/HomePage.vue')
+    const gisPageSource = readSource('src/main/views/explore/GisPage.vue')
     const tutorialManifestSource = readSource('src/main/components/tutorial/tutorialManifest.js')
 
-    expect(mapPageSource).toContain("import { isPlatformFeatureEnabled } from '@/platform/index.js'")
-    expect(mapPageSource).toContain("isPlatformFeatureEnabled('mapDraw')")
-    expect(mapPageSource).toContain("v-if=\"canUseMapDraw\"")
-    expect(mapPageSource).toContain('defineAsyncComponent')
-    expect(mapPageSource).toContain("const MapDrawTab = defineAsyncComponent(() => import('@/main/components/map/Tabs/MapDrawTab.vue'))")
-    expect(mapPageSource).not.toContain("import MapDrawTab from '@/main/components/map/Tabs/MapDrawTab.vue'")
+    expect(gisPageSource).toContain('@/main/composables/gis/')
+    expect(mapPageSource).not.toContain("isPlatformFeatureEnabled('mapDraw')")
+    expect(mapPageSource).not.toContain("v-if=\"canUseMapDraw\"")
+    expect(mapPageSource).not.toContain('MapDrawTab')
     expect(menuBarSource).toContain("import { isPlatformRouteEnabled } from '@/platform/index.js'")
     expect(menuBarSource).toContain("filterPlatformChildPaths")
     expect(menuBarSource).toContain('isPlatformRouteEnabled(path)')
     expect(menuBarSource).not.toContain("isPlatformFeatureEnabled('mapDraw')")
-    expect(menuRoutesSource).toContain("import { isPlatformRouteEnabled } from '@/platform/index.js'")
-    expect(menuRoutesSource).toContain("redirectUnsupportedMapDraw")
+    expect(menuRoutesSource).toContain("path: 'menu/map/:sub(view|divide|custom)'")
+    expect(menuRoutesSource).not.toContain("redirectUnsupportedMapDraw")
     expect(menuRoutesSource).not.toContain("isPlatformFeatureEnabled('mapDraw')")
-    expect(homePageSource).toContain("import { isPlatformFeatureEnabled } from '@/platform/index.js'")
-    expect(homePageSource).toContain('v-if="canUseMapDraw"')
+    expect(homePageSource).toContain("navigateTo('/explore/gis')")
+    expect(homePageSource).not.toContain("isPlatformFeatureEnabled('mapDraw')")
+    expect(homePageSource).not.toContain('canUseMapDraw')
     expect(tutorialManifestSource).toContain("import { isPlatformTutorialEnabled } from '@/platform/index.js'")
     expect(tutorialManifestSource).toContain('createPlatformPathEntry')
     expect(tutorialManifestSource).not.toContain("isPlatformFeatureEnabled('mapDraw')")
@@ -109,22 +107,18 @@ describe('platform integration seams', () => {
     expect(editableMapSource).not.toContain('document.fullscreenElement === mapContainer.value')
   })
 
-  it('keeps native-webview map drawing routes available for GIS', () => {
+  it('keeps native-webview GIS routes available', async () => {
     window.webkit = { messageHandlers: { dialectsNative: {} } }
+    vi.resetModules()
+    const { isPlatformRouteEnabled } = await import('../src/platform/index.js')
 
-    expect(redirectUnsupportedMapDraw({
-      params: { locale: 'zh-Hant', sub: 'draw' },
-      query: { from: 'test' },
-      hash: '#top',
-    })).toBe(true)
+    expect(isPlatformRouteEnabled('/explore/gis')).toBe(true)
   })
 
-  it('keeps supported web map drawing routes available', () => {
-    expect(redirectUnsupportedMapDraw({
-      params: { locale: 'zh-Hant', sub: 'draw' },
-      query: {},
-      hash: '',
-    })).toBe(true)
+  it('keeps supported web GIS routes available', async () => {
+    const { isPlatformRouteEnabled } = await import('../src/platform/index.js')
+
+    expect(isPlatformRouteEnabled('/explore/gis')).toBe(true)
   })
 
   it('keeps map drawing tutorials in native-webview runtimes for GIS', async () => {

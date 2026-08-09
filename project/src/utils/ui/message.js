@@ -239,14 +239,3 @@ function showMessage(message, type, duration, options = {}) {
         changelogMode: Boolean(options.changelogMode)
     }
 }
-
-// ========================================
-// 向后兼容：挂载到 window（可选）
-// ========================================
-if (typeof window !== 'undefined') {
-    window.showSuccessToast = showSuccess
-    window.showErrorToast = showError
-    window.showWarningToast = showWarning
-    window.showInfoToast = showInfo
-    window.showConfirm = showConfirm
-}

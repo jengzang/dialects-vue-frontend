@@ -332,17 +332,6 @@ const runAction = async () => {
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
 
-$apple-font:
-  -apple-system,
-  BlinkMacSystemFont,
-  "SF Pro Display",
-  "SF Pro Text",
-  "PingFang SC",
-  "Hiragino Sans GB",
-  "Microsoft YaHei",
-  Arial,
-  sans-serif;
-
 $text-strong: var(--text-deep);
 $text-main: var(--text-primary);
 $text-secondary: var(--text-secondary);
@@ -354,7 +343,7 @@ $text-secondary: var(--text-secondary);
 }
 
 .page {
-  width: min(90%, 920px);
+  width: max(50%, 500px);
   min-width: 0;
 }
 
@@ -363,7 +352,7 @@ $text-secondary: var(--text-secondary);
 .page-footer,
 .horizontal-dropdown,
 .allmap-first {
-  font-family: $apple-font;
+  font-family: var(--font-sans);
 }
 
 /* 顶部标题与提示 */
@@ -441,7 +430,7 @@ $text-secondary: var(--text-secondary);
 
 /* 下拉框左侧文字 */
 .query-label {
-  font-family: $apple-font;
+  font-family: var(--font-sans);
   font-size: 14px;
   font-weight: 600;
   line-height: 1.4;
@@ -459,7 +448,7 @@ $text-secondary: var(--text-secondary);
 
   /* 影响 SimpleSelectDropdown 组件内部字体 */
   :deep(*) {
-    font-family: $apple-font;
+    font-family: var(--font-sans);
   }
 
   :deep(.dropdown) {

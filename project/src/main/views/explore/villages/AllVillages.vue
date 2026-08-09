@@ -19,16 +19,14 @@
           />
         </div>
       </div>
-      <div class="search-wrapper">
-        <span class="search-icon">🔍</span>
-        <input
-            type="text"
-            v-model="searchQuery"
-            :placeholder="t('villages.pages.allVillages.searchPlaceholder')"
-            class="glass-input"
-        />
-      </div>
     </div>
+
+    <!-- Floating Search -->
+    <FloatingSearch
+      v-model="searchQuery"
+      :placeholder="t('villages.pages.allVillages.searchPlaceholder')"
+      :close-label="t('common.button.close')"
+    />
 
     <!-- Content Area -->
     <div class="content-area ui-scrollbar">
@@ -40,7 +38,7 @@
 
       <!-- Initial Error State -->
       <div v-else-if="initialLoadError" class="initial-state error-state">
-        <div class="error-icon">⚠️</div>
+        <div class="error-icon"><InlineIcon icon="⚠️" /></div>
         <p class="error-message">{{ initialLoadError }}</p>
         <button @click="loadInitialCities" class="retry-btn">
           {{ t('villages.pages.allVillages.retry') }}
@@ -127,6 +125,8 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
+import FloatingSearch from '@/components/common/FloatingSearch.vue'
 import { ref, computed, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { decompressSync, strFromU8 } from 'fflate'
@@ -149,6 +149,19 @@ const API_CONFIG = {
 const topLevelCities = ref([]);
 const loadedCitiesData = ref({});
 const searchQuery = ref('');
+const debouncedSearchQuery = ref('');
+let searchDebounceTimer = null;
+
+watch(searchQuery, (val) => {
+  clearTimeout(searchDebounceTimer);
+  if (!val.trim()) {
+    debouncedSearchQuery.value = '';
+    return;
+  }
+  searchDebounceTimer = setTimeout(() => {
+    debouncedSearchQuery.value = val;
+  }, 300);
+});
 const loadingStates = ref({});
 const isInitialLoading = ref(false);
 const initialLoadError = ref(null);
@@ -557,7 +570,7 @@ const getFilteredCityData = (cityName) => {
     cityData = filterByPlaceTypeCode(cityData, matchedCodes.value)
   }
 
-  const query = searchQuery.value.trim();
+  const query = debouncedSearchQuery.value.trim();
   if (!query) return cityData;
 
   return filterTree(cityData, query);
@@ -682,20 +695,23 @@ $transition-base: 0.3s;
   @include flex-col;
   width: 90dvw;
   max-width: 1400px;
-  height: 90dvh;
+  min-height: 90dvh;
   margin: 10px auto;
-  overflow: hidden;
+  background: var(--glass-50);
   color: $text-primary;
 
   @media (max-aspect-ratio: 1/1) {
     width: 92dvw;
-    height: 88dvh;
+    min-height: 88dvh;
     border-radius: var(--radius-xl);
   }
 }
 
 .header-section {
-  padding: 24px 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 16px;
   background: var(--glass-30);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 
@@ -730,23 +746,8 @@ $transition-base: 0.3s;
   }
 }
 
-.search-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.search-icon {
-  position: absolute;
-  left: 14px;
-  font-size: 16px;
-  opacity: 0.5;
-}
-
 .content-area {
-  flex: 1;
   padding: 24px;
-  overflow-y: auto;
 
   @media (max-aspect-ratio: 1/1) {
     padding: 16px;

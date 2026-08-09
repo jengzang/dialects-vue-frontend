@@ -158,5 +158,7 @@
     "matrixFeature": "分類特徵",
     "zeroInitial": "零聲母",
     "zeroFinal": "零韻母"
-  }
+  },
+  "mapDataReady": "🗺️ 地圖數據已加載",
+  "viewMap": "查看地圖 →"
 }

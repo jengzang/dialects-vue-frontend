@@ -130,11 +130,11 @@ function onSort(col) {
 .glass-table-shell {
   min-width: 0;
   background: var(--surface-panel);
+  backdrop-filter: blur(18px) saturate(145%);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-glass);
-  backdrop-filter: blur(18px) saturate(145%);
-  -webkit-backdrop-filter: blur(18px) saturate(145%);
 }
 
 .glass-table-scroll {

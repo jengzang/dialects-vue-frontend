@@ -2,7 +2,7 @@
   <div class="tree-node">
     <div class="node-content" :class="{ 'is-match': isMatch }" @click="toggle">
       <div class="node-label">
-        <span class="icon">{{ hasChildren ? '📁' : '📍' }}</span>
+        <span class="icon"><InlineIcon :icon="hasChildren ? '📁' : '📍'" /></span>
         <span class="text" v-if="isMatch" v-html="highlightName"></span>
         <span class="text" v-else>{{ node.name }}</span>
       </div>
@@ -36,6 +36,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch } from 'vue';
 
 // 定義組件名稱以便遞歸調用

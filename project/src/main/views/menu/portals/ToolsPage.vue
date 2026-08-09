@@ -4,7 +4,7 @@
 
     <div class="tools-grid">
       <button class="entry-button" @click="handleDataCheck">
-        <div class="entry-button__icon">🔍</div>
+        <div class="entry-button__icon"><InlineIcon icon="📋" /></div>
         <div class="entry-button__name">
           {{ $t('tools.dataCheck.name') }}
         </div>
@@ -14,7 +14,7 @@
       </button>
 
       <button class="entry-button" @click="handleJyutpingToIpa">
-        <div class="entry-button__icon">🔄</div>
+        <div class="entry-button__icon"><InlineIcon icon="🔤" /></div>
         <div class="entry-button__name">
           {{ $t('tools.jyutpingToIpa.name') }}
         </div>
@@ -24,7 +24,7 @@
       </button>
 
       <button class="entry-button" @click="handleMergeTables">
-        <div class="entry-button__icon">🔗</div>
+        <div class="entry-button__icon"><InlineIcon icon="🔗" /></div>
         <div class="entry-button__name">
           {{ $t('tools.mergeTables.name') }}
         </div>
@@ -33,18 +33,18 @@
         </div>
       </button>
 
-      <button class="entry-button" @click="handleDeriveTables">
-        <div class="entry-button__icon">🧪</div>
+      <!-- <button class="entry-button" @click="handleDeriveTables">
+        <div class="entry-button__icon"><InlineIcon icon="🧪" /></div>
         <div class="entry-button__name">
           {{ $t('tools.deriveTables.name') }}
         </div>
         <div class="entry-button__desc">
           {{ $t('tools.deriveTables.desc') }}
         </div>
-      </button>
+      </button> -->
 
       <button class="entry-button" @click="handlePraatTables">
-        <div class="entry-button__icon">👂️</div>
+        <div class="entry-button__icon"><InlineIcon icon="🎙️" /></div>
         <div class="entry-button__name">
           {{ $t('tools.praatAnalysis.name') }}
         </div>
@@ -52,11 +52,22 @@
           {{ $t('tools.praatAnalysis.desc') }}
         </div>
       </button>
+
+      <button class="entry-button" @click="handleGis">
+        <div class="entry-button__icon"><InlineIcon icon="🗺" /></div>
+        <div class="entry-button__name">
+          {{ $t('tools.gis.name') }}
+        </div>
+        <div class="entry-button__desc">
+          {{ $t('tools.gis.desc') }}
+        </div>
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   buildLocalePath,
@@ -94,14 +105,14 @@ const handleMergeTables = () => {
   )
 }
 
-const handleDeriveTables = () => {
-  router.push(
-    buildLocalePath(
-      resolveRouteLocale(route),
-      '/explore/tools/derive'
-    )
-  )
-}
+// const handleDeriveTables = () => {
+//   router.push(
+//     buildLocalePath(
+//       resolveRouteLocale(route),
+//       '/explore/tools/derive'
+//     )
+//   )
+// }
 
 const handlePraatTables = () => {
   router.push(
@@ -111,44 +122,29 @@ const handlePraatTables = () => {
     )
   )
 }
+
+const handleGis = () => {
+  router.push(
+    buildLocalePath(
+      resolveRouteLocale(route),
+      '/explore/gis'
+    )
+  )
+}
 </script>
 
 <style scoped lang="scss">
+@use './portal-page' as *;
+
 .tools-page {
-  min-width: 80dvw;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  @include portal-page;
 }
 
 .page-title {
-  margin: 0 0 30px;
-  color: var(--text-primary);
-  font-size: 32px;
-  font-weight: 700;
-  text-align: center;
+  @include portal-page-title;
 }
 
 .tools-grid {
-  width: 100%;
-  max-width: 1000px;
-  display: grid;
-  grid-template-columns: repeat(
-    auto-fit,
-    minmax(250px, 1fr)
-  );
-  gap: 20px;
-}
-
-@media (max-width: 768px) {
-  .page-title {
-    font-size: 24px;
-  }
-
-  .tools-grid {
-    grid-template-columns: 1fr;
-  }
+  @include portal-grid;
 }
 </style>

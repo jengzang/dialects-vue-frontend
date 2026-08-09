@@ -132,6 +132,10 @@
 
 .draw-tool-button-grid {
   @include draw-button-grid(2);
+
+  .main-glass-button:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
 }
 
 .draw-tool-button-grid--three {
@@ -145,6 +149,19 @@
 .draw-tool-mode-button {
   justify-content: center;
   gap: 0.35rem;
+}
+
+.draw-shape-edit-status {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.45rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.24);
+  border-radius: var(--radius-sm2);
+  background: rgba(var(--color-primary-rgb), 0.08);
+  color: rgba(var(--text-deep-rgb), 0.72);
+  font-size: 0.78rem;
 }
 
 @media (hover: hover) and (pointer: fine) {

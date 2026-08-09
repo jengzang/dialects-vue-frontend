@@ -1,0 +1,34 @@
+// Shared styles for portal entry pages (ToolsPage, VillagesPage, etc.)
+
+@mixin portal-page {
+  min-width: 80dvw;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin portal-page-title {
+  margin: 0 0 30px;
+  color: var(--text-primary);
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+
+  @media (max-width: 768px) {
+    font-size: 24px;
+  }
+}
+
+@mixin portal-grid {
+  width: 100%;
+  max-width: 1000px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}

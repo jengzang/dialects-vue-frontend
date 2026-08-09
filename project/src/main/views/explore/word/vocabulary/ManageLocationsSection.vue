@@ -11,8 +11,8 @@
 
         <form class="manage-filter-grid locations-filter-grid" @submit.prevent="applyLocationFilters">
           <label class="upload-field">
-            <span>{{ t('words.wordList.locations.filters.userId') }}</span>
-            <input v-model="locationFilters.user_id" type="text" :placeholder="t('words.wordList.locations.filters.userId')" />
+            <span>{{ t('words.wordList.locations.filters.userName') }}</span>
+            <input v-model="locationFilters.username" type="text" :placeholder="t('words.wordList.locations.filters.userName')" />
           </label>
           <label class="upload-field">
             <span>{{ t('words.wordList.locations.filters.locationName') }}</span>
@@ -39,14 +39,18 @@
       </div>
 
       <div v-else-if="locationRows.length" class="locations-list">
-        <article v-for="location in locationRows" :key="`${location.user_id || ''}-${location.location_name}`" class="location-item">
+        <article v-for="location in locationRows" :key="`${location.username || location.user_id || ''}-${location.location_name}`" class="location-item">
           <div class="location-item-head">
             <div class="location-item-info">
               <strong>{{ location.location_name }}</strong>
               <p>{{ location.location_label || location.location_name }}</p>
             </div>
+            <span class="location-item-username">{{ location.username }}</span>
             <button class="main-glass-button" data-variant="primary" type="button" @click="openLocationEditor(location)">
               {{ t('common.button.edit') }}
+            </button>
+            <button v-if="canDeleteLocation" class="main-glass-button" data-variant="danger" type="button" @click="handleDeleteLocation(location)">
+              {{ t('common.button.delete') }}
             </button>
           </div>
         </article>
@@ -89,6 +93,43 @@
       <p class="location-edit-modal-desc">
         {{ editingLocationDraft.location_label || editingLocationDraft.location_name }}
       </p>
+
+      <div class="yindian-match-section">
+        <h4 class="yindian-match-title">{{ t('words.wordList.upload.useYindianData') }}</h4>
+        <div class="yindian-match-row">
+          <div class="yindian-input-wrapper">
+            <input
+              v-model="yindianQuery"
+              type="text"
+              :placeholder="t('words.wordList.upload.yindianHint')"
+              autocomplete="off"
+              @input="onYindianInput"
+              @keydown.enter.prevent="confirmYindianQuery"
+              @blur="onYindianBlur"
+            />
+            <div v-if="yindianSuggestions.length" class="yindian-suggestions">
+              <div
+                v-for="item in yindianSuggestions"
+                :key="item"
+                class="yindian-suggest-item"
+                @mousedown.prevent="applyYindianSuggestion(item)"
+              >
+                {{ item }}
+              </div>
+            </div>
+          </div>
+          <button
+            class="main-glass-button"
+            data-variant="primary"
+            type="button"
+            :disabled="!yindianQuery.trim() || isLoadingYindian"
+            @click="confirmYindianQuery"
+          >
+            {{ isLoadingYindian ? t('common.label.loading') : t('common.button.confirm') }}
+          </button>
+        </div>
+      </div>
+
       <div class="locations-edit-grid">
         <label v-for="field in locationEditFields" :key="field.key" class="upload-field">
           <span>{{ field.label }}</span>
@@ -113,9 +154,9 @@
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getVocabularyLocations, updateVocabularyLocation } from '@/api'
+import { batchMatch, deleteVocabularyLocation, getLocationDetail, getVocabularyLocations, updateVocabularyLocation } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
-import { showError, showSuccess } from '@/utils/ui/message.js'
+import { showConfirm, showError, showSuccess, showWarning } from '@/utils/ui/message.js'
 
 const { t } = useI18n()
 const pageSizeOptions = [20, 50, 100, 200]
@@ -123,6 +164,7 @@ const pageSizeOptions = [20, 50, 100, 200]
 const props = defineProps({
   hasVocabularyPermission: { type: Boolean, default: false },
   canViewVocabularyLogs: { type: Boolean, default: false },
+  canDeleteLocation: { type: Boolean, default: false },
 })
 
 const isLoadingLocations = ref(false)
@@ -132,8 +174,12 @@ const locationRows = ref([])
 const isLocationEditorOpen = ref(false)
 const editingLocationSource = ref(null)
 const editingLocationDraft = ref(null)
+const yindianQuery = ref('')
+const yindianSuggestions = ref([])
+const isLoadingYindian = ref(false)
+let yindianDebounceTimer = null
 const locationFilters = reactive({
-  user_id: '',
+  username: '',
   location_name: '',
 })
 const locationPagination = reactive({
@@ -204,7 +250,7 @@ function applyLocationFilters() {
 }
 
 function resetLocationFilters() {
-  locationFilters.user_id = ''
+  locationFilters.username = ''
   locationFilters.location_name = ''
   return applyLocationFilters()
 }
@@ -232,6 +278,85 @@ function closeLocationEditor() {
   isLocationEditorOpen.value = false
   editingLocationSource.value = null
   editingLocationDraft.value = null
+  yindianQuery.value = ''
+  yindianSuggestions.value = []
+}
+
+function getLocationDetailRow(response) {
+  if (Array.isArray(response?.data)) return response.data[0] || null
+  if (response?.data && typeof response.data === 'object') return response.data
+  return response && typeof response === 'object' ? response : null
+}
+
+function applyYindianDetail(detail) {
+  if (!editingLocationDraft.value || !detail) return
+  editingLocationDraft.value = {
+    ...editingLocationDraft.value,
+    location_name: editingLocationDraft.value.location_name || detail?.['語言'] || '',
+    coordinates: detail?.['經緯度'] || editingLocationDraft.value.coordinates,
+    province: detail?.['省'] || editingLocationDraft.value.province,
+    city: detail?.['市'] || editingLocationDraft.value.city,
+    county: detail?.['縣'] || editingLocationDraft.value.county,
+    town: detail?.['鎮'] || editingLocationDraft.value.town,
+    administrative_village: detail?.['行政村'] || editingLocationDraft.value.administrative_village,
+    natural_village: detail?.['自然村'] || editingLocationDraft.value.natural_village,
+    yindian_region: detail?.['音典分區'] || editingLocationDraft.value.yindian_region,
+  }
+}
+
+async function fillFromYindian(name) {
+  if (!name || isLoadingYindian.value) return
+  isLoadingYindian.value = true
+  try {
+    const response = await getLocationDetail(name)
+    const detail = getLocationDetailRow(response)
+    if (!detail) {
+      showWarning(t('words.wordList.upload.yindianNotFound'))
+      return
+    }
+    applyYindianDetail(detail)
+    showSuccess(t('words.wordList.upload.yindianFilled'))
+  } catch (error) {
+    showError(error.message || t('words.wordList.upload.yindianFailed'))
+  } finally {
+    isLoadingYindian.value = false
+  }
+}
+
+function onYindianInput() {
+  clearTimeout(yindianDebounceTimer)
+  const query = yindianQuery.value.trim()
+  if (!query) {
+    yindianSuggestions.value = []
+    return
+  }
+  yindianDebounceTimer = setTimeout(async () => {
+    try {
+      const results = await batchMatch(query, false)
+      const items = Array.isArray(results) ? results.flatMap((r) => r.items || []) : []
+      yindianSuggestions.value = [...new Set(items)]
+    } catch {
+      yindianSuggestions.value = []
+    }
+  }, 300)
+}
+
+function onYindianBlur() {
+  setTimeout(() => {
+    yindianSuggestions.value = []
+  }, 200)
+}
+
+function applyYindianSuggestion(item) {
+  yindianQuery.value = item
+  yindianSuggestions.value = []
+  return fillFromYindian(item)
+}
+
+function confirmYindianQuery() {
+  const name = yindianQuery.value.trim()
+  if (!name || isLoadingYindian.value) return
+  return fillFromYindian(name)
 }
 
 async function handleSaveLocation(location) {
@@ -261,9 +386,37 @@ function handleSaveEditingLocation() {
   return handleSaveLocation(editingLocationDraft.value || editingLocationSource.value)
 }
 
+async function handleDeleteLocation(location) {
+  if (!location?.location_name) return
+
+  const confirmed = await showConfirm(
+    t('words.wordList.locations.deleteConfirm', { name: location.location_name }),
+    { confirmText: t('common.button.delete'), cancelText: t('common.button.cancel') },
+  )
+  if (!confirmed) return
+
+  locationsStatusText.value = ''
+  try {
+    const params = location.user_id ? { user_id: location.user_id } : {}
+    const result = await deleteVocabularyLocation(location.location_name, params)
+    locationsStatusText.value = t('words.wordList.locations.deleteSuccess', { count: result.deleted_entries })
+    showSuccess(locationsStatusText.value)
+    await loadVocabularyLocations()
+  } catch (error) {
+    locationsStatusText.value = error.message || t('words.wordList.locations.deleteFailed')
+    showError(locationsStatusText.value)
+  }
+}
+
 watch(() => props.hasVocabularyPermission, (has) => {
   if (has) loadVocabularyLocations()
 }, { immediate: true })
+</script>
+
+<script>
+export default {
+  name: 'ManageLocationsSection'
+}
 </script>
 
 <style scoped lang="scss" src="./vocabulary.scss"></style>

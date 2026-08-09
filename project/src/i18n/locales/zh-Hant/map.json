@@ -265,6 +265,48 @@
               "text": "確認欄位無誤後送出，資料就會保存到你的個人資料庫。"
             }
           }
+        },
+        "searchMapping": {
+          "title": "各搜尋場景的欄位要求",
+          "intro": "自定義數據要能在各搜尋接口中被查到，「分類」和「對比特徵」兩個欄位的組合決定了它出現在哪個搜尋場景。如果填錯了，數據能存但搜尋永遠查不到。",
+          "note": "另外「簡稱」必須與搜尋時指定的方言點一致，否則也查不到。",
+          "columns": {
+            "scene": "搜尋場景",
+            "phonology": "分類 必須填",
+            "feature": "對比特徵 必須填",
+            "value": "值 填",
+            "desc": "說明"
+          },
+          "rows": {
+            "chars": {
+              "scene": "查字",
+              "phonology": "漢字",
+              "feature": "某個漢字，如 好",
+              "value": "該字在該方言點的讀音",
+              "desc": "搜「好」時命中"
+            },
+            "tones": {
+              "scene": "查調",
+              "phonology": "調值",
+              "feature": "調類名，如 陰平",
+              "value": "調值，如 55",
+              "desc": "搜某方言點的調值時返回"
+            },
+            "zhongGu": {
+              "scene": "查中古",
+              "phonology": "聲母 / 韻母 / 聲調",
+              "feature": "中古音查詢條件字符串",
+              "value": "對應的音值",
+              "desc": "如搜「幫」組聲母時命中"
+            },
+            "yinWei": {
+              "scene": "查音位",
+              "phonology": "聲母 / 韻母 / 聲調",
+              "feature": "音位標識，如 p",
+              "value": "具體音值",
+              "desc": "搜某音位分佈時命中"
+            }
+          }
         }
       }
     },
@@ -501,9 +543,11 @@
       "drawPolygon": "繪製面",
       "select": "選擇",
       "editShape": "編輯形狀",
+      "finishShapeEdit": "完成編輯",
       "undo": "撤銷",
       "redo": "重做",
       "deleteSelected": "刪除選中",
+      "deleteSelectedVertices": "刪除頂點",
       "deleteSelectedFeatures": "刪除勾選要素",
       "selectAllFeatures": "全選可編輯",
       "invertFeatureSelection": "反選可編輯",
@@ -701,6 +745,8 @@
       "feature": "要素",
       "layerFeatureCount": "{count} 個要素",
       "selectedFeatureCount": "已勾選 {count} 個",
+      "shapeEditing": "正在編輯形狀",
+      "selectedVertexCount": "已選頂點 {count} 個",
       "copySuffix": "副本",
       "layerEditor": "圖層屬性",
       "featureEditor": "要素屬性",

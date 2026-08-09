@@ -156,6 +156,7 @@ const emit = defineEmits([
   'before-features-change',
   'features-change',
   'feature-select',
+  'shape-edit-state-change',
   'mode-change',
   'export-image',
   'export-layer',
@@ -182,6 +183,7 @@ let hoveredFeatureKey = null
 let hoveredFeatureSource = null
 let previewHoverBound = false
 let suppressedProgrammaticFeatureSelectionIds = null
+let isDeletingSelected = false
 let featureBoxDragPanWasEnabled = true
 const sanitizeLayerFilename = (layerName) => {
   return String(layerName || 'map-draw-layer')
@@ -465,14 +467,92 @@ const areFeatureIdsEqual = (leftFeatureIds = [], rightFeatureIds = []) => {
   return leftIds.every((featureId) => rightIdSet.has(featureId))
 }
 
-const syncSelectedFeature = () => {
+const getSelectedFeatureIdsFromDraw = () => {
   const selectedIds = normalizeFeatureIds(draw.value?.getSelectedIds?.() ?? [])
+  if (selectedIds.length > 0) return selectedIds
+  const mode = draw.value?.getMode?.()
+  if (mode === 'direct_select' && selectedFeatureId.value && draw.value?.get?.(selectedFeatureId.value)) {
+    return [selectedFeatureId.value]
+  }
+  return selectedIds
+}
+
+const getSelectedVertexCountFromDraw = () => {
+  const mode = draw.value?.getMode?.() || 'simple_select'
+  if (mode !== 'direct_select') return 0
+  const selectedPoints = draw.value?.getSelectedPoints?.()
+  return Array.isArray(selectedPoints?.features) ? selectedPoints.features.length : 0
+}
+
+const getSelectedPointCoordinatesFromDraw = () => {
+  const selectedPoints = draw.value?.getSelectedPoints?.()
+  return (selectedPoints?.features ?? [])
+    .map((feature) => feature?.geometry?.coordinates)
+    .filter((coordinates) => Array.isArray(coordinates) && coordinates.length >= 2)
+}
+
+const areCoordinatesEqual = (left, right) => {
+  if (!Array.isArray(left) || !Array.isArray(right)) return false
+  return Number(left[0]) === Number(right[0]) && Number(left[1]) === Number(right[1])
+}
+
+const countSelectedCoordinates = (coordinates = [], selectedCoordinates = []) => {
+  return coordinates.filter((coordinate) => (
+    selectedCoordinates.some((selectedCoordinate) => areCoordinatesEqual(coordinate, selectedCoordinate))
+  )).length
+}
+
+const getEditableRingCoordinates = (ring = []) => {
+  if (ring.length > 1 && areCoordinatesEqual(ring[0], ring[ring.length - 1])) {
+    return ring.slice(0, -1)
+  }
+  return ring
+}
+
+const canDeleteSelected = () => {
+  if (draw.value?.getMode?.() !== 'direct_select') return true
+  const featureId = selectedFeatureId.value
+  const feature = featureId ? draw.value?.get?.(featureId) : null
+  const selectedCoordinates = getSelectedPointCoordinatesFromDraw()
+  if (!feature || selectedCoordinates.length === 0) return false
+
+  const geometry = feature.geometry ?? {}
+  if (geometry.type === 'LineString') {
+    const coordinates = geometry.coordinates ?? []
+    const selectedCount = countSelectedCoordinates(coordinates, selectedCoordinates)
+    return selectedCount > 0 && coordinates.length - selectedCount >= 2
+  }
+  if (geometry.type === 'Polygon') {
+    return (geometry.coordinates ?? []).every((ring) => {
+      const editableRing = getEditableRingCoordinates(ring)
+      const selectedCount = countSelectedCoordinates(editableRing, selectedCoordinates)
+      return selectedCount === 0 || editableRing.length - selectedCount >= 3
+    })
+  }
+  return false
+}
+
+const syncShapeEditState = () => {
+  const mode = draw.value?.getMode?.() || 'simple_select'
+  emit('shape-edit-state-change', {
+    mode,
+    featureId: mode === 'direct_select' ? selectedFeatureId.value : '',
+    selectedVertexCount: getSelectedVertexCountFromDraw(),
+  })
+}
+
+const syncSelectedFeature = () => {
+  const selectedIds = getSelectedFeatureIdsFromDraw()
   selectedFeatureId.value = selectedIds[0] ? String(selectedIds[0]) : ''
   if (suppressedProgrammaticFeatureSelectionIds) {
-    if (areFeatureIdsEqual(selectedIds, suppressedProgrammaticFeatureSelectionIds)) return
+    if (areFeatureIdsEqual(selectedIds, suppressedProgrammaticFeatureSelectionIds)) {
+      syncShapeEditState()
+      return
+    }
     suppressedProgrammaticFeatureSelectionIds = null
   }
   emit('feature-select', selectedIds.length > 1 ? selectedIds : selectedFeatureId.value)
+  syncShapeEditState()
 }
 
 const syncDrawMode = (event) => {
@@ -482,7 +562,8 @@ const syncDrawMode = (event) => {
 
 const syncFeaturesFromDraw = (options = {}) => {
   const featureCollection = normalizeFeatureCollection(draw.value?.getAll?.())
-  if (options.commitHistory !== false) {
+  const shouldCommitHistory = options.commitHistory !== false && !isDeletingSelected
+  if (shouldCommitHistory) {
     emit('before-features-change')
   }
   emit('update:modelValue', featureCollection)
@@ -495,6 +576,8 @@ const setDrawMode = (mode) => {
   draw.value?.changeMode?.(mode)
   if (mode === 'simple_select') {
     syncSelectedFeature()
+  } else {
+    syncShapeEditState()
   }
 }
 
@@ -503,6 +586,7 @@ const selectFeature = (featureId, options = {}) => {
   if (!draw.value || !featureId) {
     selectedFeatureId.value = ''
     emit('feature-select', selectedFeatureId.value)
+    syncShapeEditState()
     return
   }
 
@@ -510,6 +594,7 @@ const selectFeature = (featureId, options = {}) => {
   if (!feature) {
     selectedFeatureId.value = ''
     emit('feature-select', selectedFeatureId.value)
+    syncShapeEditState()
     return
   }
 
@@ -519,6 +604,7 @@ const selectFeature = (featureId, options = {}) => {
     emit('mode-change', 'simple_select')
     selectedFeatureId.value = String(featureId)
     emit('feature-select', selectedFeatureId.value)
+    syncShapeEditState()
     return
   }
 
@@ -527,6 +613,7 @@ const selectFeature = (featureId, options = {}) => {
     emit('mode-change', 'simple_select')
     selectedFeatureId.value = String(featureId)
     emit('feature-select', selectedFeatureId.value)
+    syncShapeEditState()
     return
   }
 
@@ -535,6 +622,7 @@ const selectFeature = (featureId, options = {}) => {
   emit('mode-change', 'direct_select')
   selectedFeatureId.value = String(featureId)
   emit('feature-select', selectedFeatureId.value)
+  syncShapeEditState()
 }
 
 const selectFeatures = (featureIds = []) => {
@@ -550,6 +638,7 @@ const selectFeatures = (featureIds = []) => {
   draw.value?.changeMode?.('simple_select', { featureIds: selectedIds })
   emit('mode-change', 'simple_select')
   selectedFeatureId.value = selectedIds[0] || ''
+  syncShapeEditState()
 }
 
 const normalizeFeatureBoxPoint = (point) => {
@@ -778,8 +867,15 @@ const updateFeatureProperties = (featureId, nextProperties, options = {}) => {
 }
 
 const deleteSelected = () => {
-  draw.value?.trash?.()
-  syncFeaturesFromDraw({ commitHistory: false })
+  if (!canDeleteSelected()) return false
+  isDeletingSelected = true
+  try {
+    draw.value?.trash?.()
+    syncFeaturesFromDraw({ commitHistory: false })
+    return true
+  } finally {
+    isDeletingSelected = false
+  }
 }
 
 const clearAll = () => {
@@ -831,6 +927,7 @@ const bindDrawEvents = () => {
 const initializeDraw = () => {
   draw.value = new MapboxDraw({
     displayControlsDefault: false,
+    keybindings: false,
     controls: {
       point: true,
       line_string: true,
@@ -1198,10 +1295,14 @@ const unbindPreviewHover = () => {
 
 const resetHoveredFeature = () => {
   if (hoveredFeatureKey && hoveredFeatureSource && map.value) {
-    map.value.setFeatureState(
-      { source: hoveredFeatureSource, id: hoveredFeatureKey },
-      { hover: false }
-    )
+    try {
+      map.value.setFeatureState(
+        { source: hoveredFeatureSource, id: hoveredFeatureKey },
+        { hover: false }
+      )
+    } catch {
+      /* source may have been removed (e.g. voronoi preview cleared) */
+    }
   }
   hoveredFeatureKey = null
   hoveredFeatureSource = null
@@ -1418,6 +1519,7 @@ defineExpose({
   selectFeatures,
   selectedFeatureId,
   updateFeatureProperties,
+  canDeleteSelected,
   deleteSelected,
   syncReadonlyLayers,
   clearAll,

@@ -44,8 +44,7 @@
             id="stickyContextText"
             class="stickybar-location-trigger"
             @click.stop="toggleLocationDropdown"
-          >
-            📍 {{ currentStickyLocation || t('result.resultList.locationPlaceholder') }}
+          ><InlineIcon icon="📍" />{{ currentStickyLocation || t('result.resultList.locationPlaceholder') }}
           </div>
 
           <div class="stickybar-location-dropdown" :class="{ open: isLocationDropdownOpen }">
@@ -117,6 +116,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch, onMounted, nextTick, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DataRow from './DataRow.vue';
@@ -468,14 +468,6 @@ $panel-radius: 12px;
 $dropdown-radius: 10px;
 $transition-duration: 0.2s;
 $dropdown-blur: 12px;
-$system-font:
-  -apple-system,
-  BlinkMacSystemFont,
-  "Segoe UI",
-  Roboto,
-  Helvetica,
-  Arial,
-  sans-serif;
 
 @mixin glass-dropdown($background, $max-height, $min-width) {
   position: absolute;
@@ -506,7 +498,7 @@ $system-font:
   left: 2dvw;
   z-index: 1;
   @include flex-col;
-  height: 78dvh;
+  height: 85dvh;
   overflow: auto;
   resize: both;
   border: 1px solid var(--border-light-gray);
@@ -520,7 +512,7 @@ $system-font:
     right: 1dvw;
     bottom: 2dvh;
     left: 1dvw;
-    height: 70dvh;
+    height: 74dvh;
   }
 }
 
@@ -625,7 +617,7 @@ $system-font:
 .stickybar-location-wrapper {
   position: relative;
   z-index: 2;
-  font-family: $system-font;
+  font-family: var(--font-sans);
 }
 
 .stickybar-location-trigger {
@@ -688,7 +680,7 @@ $system-font:
   top: 50%;
   left: 50%;
   z-index: 1;
-  font-family: $system-font;
+  font-family: var(--font-sans);
   font-size: 14px;
   transform: translate(-50%, -50%);
 
@@ -748,7 +740,7 @@ $system-font:
   position: absolute;
   right: 5%;
   @include flex-center;
-  font-family: "Arial", sans-serif;
+  font-family: var(--font-sans);
   font-size: 16px;
   transform: translateX(-50%);
 

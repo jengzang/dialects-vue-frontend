@@ -1,22 +1,19 @@
 import { userStore } from '@/main/store/store.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import i18n from '@/i18n/index.js'
 
 const CheckTool = () => import('@/main/views/explore/tools/CheckTool.vue')
 const Jyut2IpaTool = () => import('@/main/views/explore/tools/Jyut2IpaTool.vue')
 const MergeTool = () => import('@/main/views/explore/tools/MergeTool.vue')
 const DeriveTool = () => import('@/main/views/explore/tools/DeriveTool.vue')
-const PraatPage = () => import('@/main/views/Praat.vue')
+const PraatPage = () => import('@/main/views/explore/Praat.vue')
+const GisPage = () => import('@/main/views/explore/GisPage.vue')
 const TableManagePage = () => import('@/main/views/explore/tools/TableManage.vue')
-const YuBaoPage = () => import('@/main/views/explore/word/YuBaoPage.vue')
-const VocabularyPage = () => import('@/main/views/explore/word/VocabularyPage.vue')
-const VocabularyViewPage = () => import('@/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
-const VocabularyImportPage = () => import('@/main/views/explore/word/vocabulary/VocabularyImportPage.vue')
-const VocabularyManagePage = () => import('@/main/views/explore/word/vocabulary/VocabularyManagePage.vue')
 const CharacterClassificationPage = () => import('@/main/views/explore/charClass/CharacterClassification.vue')
-const YangChunSpokenPage = () => import('@/main/views/explore/word/YangChunSpoken.vue')
 const GdVillagesTreePage = () => import('@/main/views/explore/villages/gdVillagesTree.vue')
 const GdVillagesTablePage = () => import('@/main/views/explore/villages/gdVillagesTable.vue')
 const YangChunVillagesPage = () => import('@/main/views/explore/villages/YangChunVillages.vue')
+const YangChunSpokenPage = () => import('@/main/views/explore/word/YangChunSpoken.vue')
 const AllVillagesPage = () => import('@/main/views/explore/villages/AllVillages.vue')
 const VillagesMLPage = () => import('@/main/views/explore/villages/VillagesML.vue')
 const ToponymsPage = () => import('@/main/views/explore/villages/toponyms/ToponymsPage.vue')
@@ -40,7 +37,13 @@ export const exploreRoutes = [
   },
   {
     path: 'explore/tools/praat',
-    component: PraatPage
+    component: PraatPage,
+    meta: { queryAllowlist: ['tab'] }
+  },
+  {
+    path: 'explore/gis',
+    component: GisPage,
+    meta: { queryAllowlist: ['scrollTo'] }
   },
   {
     path: 'explore/manage',
@@ -48,42 +51,51 @@ export const exploreRoutes = [
   },
   {
     path: 'explore/yubao',
-    component: YuBaoPage
-  },
-  {
-    path: 'explore/vocabulary',
-    component: VocabularyPage,
     redirect: (to) => ({
-      path: buildLocalePath(resolveRouteLocale(to), '/explore/vocabulary/view'),
+      path: buildLocalePath(resolveRouteLocale(to), '/menu/yubao'),
       query: to.query,
       hash: to.hash,
-    }),
-    children: [
-      {
-        path: 'view',
-        component: VocabularyViewPage
-      },
-      {
-        path: 'import',
-        component: VocabularyImportPage
-      },
-      {
-        path: 'manage',
-        component: VocabularyManagePage
-      }
-    ]
+    })
+  },
+  {
+    path: 'explore/vocabulary/:child?',
+    redirect: (to) => ({
+      path: buildLocalePath(resolveRouteLocale(to), '/menu/vocabulary'),
+      query: to.query,
+      hash: to.hash,
+    })
   },
   {
     path: 'explore/char-class',
-    component: CharacterClassificationPage
+    component: CharacterClassificationPage,
+    meta: { queryAllowlist: ['tab', 'table', 'levels'] }
   },
   {
     path: 'explore/yc-spoken',
+    redirect: (to) => ({
+      path: buildLocalePath(resolveRouteLocale(to), '/explore/yc/words'),
+      query: to.query,
+      hash: to.hash,
+    })
+  },
+  {
+    path: 'explore/yc/words',
     component: YangChunSpokenPage
   },
   {
+    path: 'explore/yc/villages',
+    component: YangChunVillagesPage
+  },
+  {
     path: 'explore/villages/toponyms',
-    component: ToponymsPage
+    component: ToponymsPage,
+    beforeEnter: async (to, from) => {
+      const { showConfirm } = await import('@/utils/ui/message.js')
+      await showConfirm(i18n.global.t('villages.toponyms.notReady'), {
+        title: i18n.global.t('villages.toponyms.name'),
+      })
+      return { path: from.path || '/', replace: true }
+    }
   },
   {
     path: 'explore/villages/gd',
@@ -95,7 +107,11 @@ export const exploreRoutes = [
   },
   {
     path: 'explore/villages/yc',
-    component: YangChunVillagesPage
+    redirect: (to) => ({
+      path: buildLocalePath(resolveRouteLocale(to), '/explore/yc/villages'),
+      query: to.query,
+      hash: to.hash,
+    })
   },
   {
     path: 'explore/villages/ml',

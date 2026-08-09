@@ -1,7 +1,7 @@
 <template>
   <div class="phonology-matrix-page">
     <!-- <div class="page-header">
-      <h2 class="page-title">🔍️ 音系查詢</h2>
+      <h2 class="page-title"><InlineIcon icon="🔍️" />音系查詢</h2>
     </div> -->
 
     <!-- 地点输入组件 -->
@@ -54,6 +54,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getPhonologyMatrix } from '@/api'

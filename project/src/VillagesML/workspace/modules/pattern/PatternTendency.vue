@@ -6,7 +6,7 @@
     </h3>
 
     <div class="vml-glass-panel">
-      <h2>📊 模式傾向性分析</h2>
+      <h2><InlineIcon icon="📊" />模式傾向性分析</h2>
 
       <!-- Controls -->
       <div class="controls vml-control-surface vml-control-row vml-control-row--center">
@@ -91,6 +91,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'

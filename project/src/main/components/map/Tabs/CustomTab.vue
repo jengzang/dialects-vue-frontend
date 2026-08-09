@@ -29,9 +29,7 @@
         class="auth-warning-container"
       >
         <div class="auth-warning-card">
-          <div class="auth-warning-icon">
-            🔒
-          </div>
+          <div class="auth-warning-icon"><InlineIcon icon="🔒" /></div>
 
           <p class="auth-warning-text">
             {{ t('map.customTab.validation.loginFirst') || '请先登录以查看 and 管理您的个人语料特征数据' }}
@@ -76,9 +74,7 @@
             type="button"
             :aria-label="t('map.customTab.labels.featureSearch') || '过滤特征'"
             @click="openSearch"
-          >
-            🔍
-          </button>
+          ><InlineIcon icon="🔍" /></button>
 
           <input
             v-if="showFloatingSearchInput"
@@ -121,9 +117,7 @@
               v-else-if="userFeatures.length === 0"
               class="tree-empty-state"
             >
-              <div class="empty-state-icon">
-                📂
-              </div>
+              <div class="empty-state-icon"><InlineIcon icon="📂" /></div>
 
               <p class="empty-state-title">
                 {{ t('customEntry.featureList.emptyTitle') || '暂无个人特征数据' }}
@@ -198,8 +192,7 @@
             class="flat-link-btn"
             type="button"
             @click="goToDataManager"
-          >
-            ⚙️ {{ t('map.customTab.helpModal.sections.customCollection.items.manage.label') || '管理我的所有自定义数据' }}
+          ><InlineIcon icon="⚙️" />{{ t('map.customTab.helpModal.sections.customCollection.items.manage.label') || '管理我的所有自定义数据' }}
           </button>
         </div>
       </div>
@@ -222,6 +215,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, nextTick, ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';

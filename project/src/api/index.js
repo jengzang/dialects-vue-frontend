@@ -80,6 +80,7 @@ export {
   getVocabularyLogs,
   getVocabularyCounts,
   updateVocabularyLocation,
+  deleteVocabularyLocation,
   setVocabularyPermission,
   previewVocabularyImport,
   uploadVocabulary,

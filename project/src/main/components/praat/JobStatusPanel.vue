@@ -27,25 +27,26 @@
 
     <!-- Error State -->
     <div v-else-if="status === 'error' || status === 'failed'" class="error-content">
-      <div class="error-icon">❌</div>
+      <div class="error-icon"><InlineIcon icon="❌" /></div>
       <h3 class="error-title">{{ t('praat.jobStatus.error.title') }}</h3>
       <p class="error-text">{{ error || t('praat.jobStatus.error.defaultText') }}</p>
     </div>
 
     <!-- Completed State -->
     <div v-else-if="status === 'completed' || status === 'done'" class="completed-content">
-      <div class="completed-icon">✅</div>
+      <div class="completed-icon"><InlineIcon icon="✅" /></div>
       <h3 class="completed-title">{{ t('praat.jobStatus.completed.title') }}</h3>
     </div>
 
     <div v-else-if="status === 'canceled'" class="canceled-content">
-      <div class="canceled-icon">🟠</div>
+      <div class="canceled-icon"><InlineIcon icon="🟠" /></div>
       <h3 class="canceled-title">{{ t('praat.jobStatus.canceled.title') }}</h3>
     </div>
   </div>
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, watch, onUnmounted } from "vue"
 import { useI18n } from 'vue-i18n'
 
@@ -147,7 +148,7 @@ $transition-duration: 0.3s;
 
   .job-id {
     color: $text-primary;
-    font-family: "Courier New", monospace;
+    font-family: var(--font-mono);
     font-size: 0.9rem;
     font-weight: 600;
   }

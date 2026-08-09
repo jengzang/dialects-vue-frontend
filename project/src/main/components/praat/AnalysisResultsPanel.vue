@@ -82,7 +82,7 @@
 
       <div v-if="!showSpectrogram" class="spectrogram-placeholder main-glass-panel-inner">
         <div class="placeholder-content">
-          <span class="placeholder-icon">🌊</span>
+          <span class="placeholder-icon"><InlineIcon icon="🌊" /></span>
           <p>{{ t('praat.results.charts.spectrogram.loadHint') }}</p>
           <button class="load-spectrogram-btn main-glass-button" @click="loadSpectrogram">
             {{ t('praat.results.charts.spectrogram.loadButton') }}
@@ -142,6 +142,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import {ref, watch, onMounted, onBeforeUnmount, computed, nextTick} from 'vue'
 import * as echarts from 'echarts'
 import { useI18n } from 'vue-i18n'
@@ -456,9 +457,9 @@ const initSpectrogramChart = () => {
   const option = {
     tooltip: {
       formatter: (params) => {
-        const t = time[params.data[0]].toFixed(3)
-        const f = frequency[params.data[1]].toFixed(0)
-        const e = params.data[2].toFixed(1)
+        const t = (time[params.data[0]] ?? 0).toFixed(3)
+        const f = (frequency[params.data[1]] ?? 0).toFixed(0)
+        const e = (params.data[2] ?? 0).toFixed(1)
         return t('praat.results.charts.spectrogram.tooltip', {
           time: t,
           freq: f,
@@ -816,7 +817,7 @@ $transition-normal: 0.3s;
 
   &.contour-display {
     color: $primary-blue;
-    font-family: "Courier New", monospace;
+    font-family: var(--font-mono);
     font-size: 1.1rem;
     letter-spacing: 0.05em;
   }
@@ -947,6 +948,7 @@ $transition-normal: 0.3s;
     transform $transition-normal ease;
 
   &:hover {
+    background: var(--color-primary);
     opacity: 0.9;
     box-shadow: 0 6px 16px $blue-shadow-hover;
     transform: translateY(-2px);

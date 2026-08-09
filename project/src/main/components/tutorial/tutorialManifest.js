@@ -67,47 +67,6 @@ function normalizePraatTab(currentRoute) {
 }
 
 export const tutorialManifest = [
-  // ==================== 账户与个人数据 ====================
-  createQueryEntry({
-    key: 'auth-login',
-    categoryKey: 'account',
-    groupKey: 'authAccount',
-    order: 0,
-    path: '/auth',
-    queryResolver: normalizeAuthView,
-    expectedValue: 'login',
-  }),
-  createQueryEntry({
-    key: 'auth-overview',
-    categoryKey: 'account',
-    groupKey: 'authAccount',
-    order: 1,
-    path: '/auth',
-    queryResolver: normalizeAuthView,
-    expectedValue: 'overview',
-  }),
-  createPathEntry({
-    key: 'auth-data',
-    categoryKey: 'account',
-    groupKey: 'authData',
-    order: 2,
-    path: '/auth/data',
-  }),
-  createPathEntry({
-    key: 'auth-regions',
-    categoryKey: 'account',
-    groupKey: 'authData',
-    order: 3,
-    path: '/auth/regions',
-  }),
-  createPathEntry({
-    key: 'menu-map-custom',
-    categoryKey: 'account',
-    groupKey: 'menuMapCustom',
-    order: 4,
-    path: '/menu/map/custom',
-  }),
-
   // ==================== 多方言点对比分析 ====================
   createPathEntry({
     key: 'menu-query-char',
@@ -218,28 +177,41 @@ export const tutorialManifest = [
   }),
 
   // ==================== 词句与字集 ====================
+  createPathEntry({
+    key: 'menu-vocabulary-view',
+    categoryKey: 'corpusAndCharClass',
+    groupKey: 'menuVocabulary',
+    order: 30,
+    path: '/menu/vocabulary/view',
+  }),
+  createPathEntry({
+    key: 'menu-vocabulary-import',
+    categoryKey: 'corpusAndCharClass',
+    groupKey: 'menuVocabulary',
+    order: 31,
+    path: '/menu/vocabulary/import',
+  }),
+  createPathEntry({
+    key: 'menu-vocabulary-manage',
+    categoryKey: 'corpusAndCharClass',
+    groupKey: 'menuVocabulary',
+    order: 32,
+    path: '/menu/vocabulary/manage',
+  }),
   createPathPrefixEntry({
     key: 'explore-yubao',
     categoryKey: 'corpusAndCharClass',
     groupKey: 'exploreYubao',
-    order: 30,
-    pathPrefix: '/explore/yubao',
+    order: 33,
+    pathPrefix: '/menu/yubao',
   }),
   createPathPrefixEntry({
     key: 'explore-char-class',
     categoryKey: 'corpusAndCharClass',
     groupKey: 'exploreCharClass',
-    order: 31,
+    order: 34,
     pathPrefix: '/explore/char-class',
   }),
-  createPathEntry({
-    key: 'explore-yc-spoken',
-    categoryKey: 'corpusAndCharClass',
-    groupKey: 'exploreYcSpoken',
-    order: 32,
-    path: '/explore/yc-spoken',
-  }),
-
   // ==================== 实用工具 ====================
   createQueryEntry({
     key: 'explore-praat-upload',
@@ -304,7 +276,7 @@ export const tutorialManifest = [
     categoryKey: 'practicalTools',
     groupKey: 'menuMapDraw',
     order: 47,
-    path: '/menu/map/draw',
+    path: '/explore/gis',
   }),
 
   // ==================== 自然村 ====================
@@ -327,6 +299,56 @@ export const tutorialManifest = [
     categoryKey: 'villages',
     groupKey: 'villagesML',
     order: 52,
-    pathPrefix: '/villagesML',
+    pathPrefix: '/explore/villages/ml',
+  }),
+
+  // ==================== 阳春相关 ====================
+  createPathEntry({
+    key: 'explore-yc-spoken',
+    categoryKey: 'yangchun',
+    groupKey: 'exploreYcSpoken',
+    order: 53,
+    path: '/explore/yc/words',
+  }),
+
+  // ==================== 账户与个人数据 ====================
+  createQueryEntry({
+    key: 'auth-login',
+    categoryKey: 'account',
+    groupKey: 'authAccount',
+    order: 60,
+    path: '/auth',
+    queryResolver: normalizeAuthView,
+    expectedValue: 'login',
+  }),
+  createQueryEntry({
+    key: 'auth-overview',
+    categoryKey: 'account',
+    groupKey: 'authAccount',
+    order: 61,
+    path: '/auth',
+    queryResolver: normalizeAuthView,
+    expectedValue: 'overview',
+  }),
+  createPathEntry({
+    key: 'menu-map-custom',
+    categoryKey: 'account',
+    groupKey: 'authData',
+    order: 62,
+    path: '/menu/map/custom',
+  }),
+  createPathEntry({
+    key: 'auth-data',
+    categoryKey: 'account',
+    groupKey: 'authData',
+    order: 63,
+    path: '/auth/data',
+  }),
+  createPathEntry({
+    key: 'auth-regions',
+    categoryKey: 'account',
+    groupKey: 'authData',
+    order: 64,
+    path: '/auth/regions',
   }),
 ].filter(Boolean)

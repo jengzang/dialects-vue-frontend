@@ -1,7 +1,7 @@
 <template>
   <div class="phonology-matrix-page">
     <!-- <div class="page-header">
-      <h2 class="page-title">📐 音素分類</h2>
+      <h2 class="page-title"><InlineIcon icon="📐" />音素分類</h2>
     </div> -->
 
     <!-- 特徵選擇 Tab -->
@@ -99,6 +99,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'

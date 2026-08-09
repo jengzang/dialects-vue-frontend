@@ -130,7 +130,7 @@
         <div class="partition-stage">
           <!-- 自定義分區觸發按鈕 -->
           <div class="custom-region-trigger" @click.stop="openCustomRegionPopup">
-            <div class="custom-region-icon">🗂️</div>
+            <div class="custom-region-icon"><InlineIcon icon="🗂️" /></div>
             <div class="custom-region-label">{{ $t('query.components.regionSelector.myCustomRegions') }}</div>
             <div class="custom-region-arrow">→</div>
           </div>
@@ -280,6 +280,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'

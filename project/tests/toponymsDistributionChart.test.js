@@ -15,14 +15,45 @@ describe('toponyms ECharts distribution chart', () => {
     const chart = readSource('src/main/views/explore/villages/toponyms/ToponymDistributionChart.vue');
 
     expect(chart).toContain("import * as echarts from 'echarts'");
-    expect(chart).toContain("echarts.registerMap('toponyms-country'");
+    expect(chart).toContain('echarts.registerMap(COUNTRY_MAP_NAME');
     expect(chart).toContain("coordinateSystem: 'geo'");
     expect(chart).toContain("seriesType: 'scatter'");
     expect(chart).toContain('buildRiverLineSeriesData');
-    expect(chart).toContain('buildMapOverlaySeries');
+    expect(chart).toContain('buildBoundaryLineSeriesData');
+    expect(chart).toContain('buildBoundarySeries');
     expect(chart).toContain('buildRiverSeries');
     expect(chart).toContain('extractToponymPointFromChartParams');
+    expect(chart).toContain('eventPosition');
+    expect(chart).toContain('params.event.event.clientX');
     expect(chart).toContain("emit('select-point'");
+    expect(chart).toContain('large: true');
+    expect(chart).toContain('largeThreshold: TOPONYM_LARGE_RENDER_THRESHOLD');
+    expect(chart).toContain('progressive: 0');
+    expect(chart).toContain('replaceMerge: [\'series\']');
+    expect(chart).toContain('notMerge: false');
+    expect(chart).not.toContain('setOption(' + '\n    {' + '\n      backgroundColor');
+    expect(chart).not.toContain('large: false');
+  });
+
+  it('keeps layer controls and point style config in a chart settings modal', () => {
+    const page = readSource('src/main/views/explore/villages/toponyms/ToponymsPage.vue');
+    const chart = readSource('src/main/views/explore/villages/toponyms/ToponymDistributionChart.vue');
+    const layers = readSource('src/main/views/explore/villages/toponyms/ToponymLayerControls.vue');
+
+    expect(chart).toContain('<AppModal');
+    expect(chart).toContain('<ToponymLayerControls');
+    expect(page).toContain('⚙');
+    expect(page).toContain('openChartConfig');
+    expect(chart).toContain('POINT_SHAPE_OPTIONS');
+    expect(chart).toContain('pointConfig.size');
+    expect(chart).toContain('pointConfig.shape');
+    expect(chart).toContain('pointConfig.color');
+    expect(chart).toContain('pointConfig.backgroundColor');
+    expect(layers).toContain('class="toponym-layer-controls__toggle"');
+    expect(page).toContain(':loading-layers="loadingLayers"');
+    expect(page).toContain(':layer-errors="layerErrors"');
+    expect(page).not.toContain('toponyms-page__chart-toolbar');
+    expect(chart).toContain('@include flex-center');
   });
 
   it('uses token-derived chart colors and cleans up ECharts lifecycle resources', () => {

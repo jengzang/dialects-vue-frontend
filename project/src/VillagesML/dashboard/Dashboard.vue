@@ -2,7 +2,7 @@
 <!--  <ExploreLayout>-->
     <div class="dashboard-page">
       <div class="page-header">
-        <h1 class="page-title">📊 {{ t('villages.dashboard.pageTitle') }}</h1>
+        <h1 class="page-title"><InlineIcon icon="📊" />{{ t('villages.dashboard.pageTitle') }}</h1>
         <SimpleSelectDropdown
           v-model="activeDataset"
           :options="datasetOptions"
@@ -33,7 +33,7 @@
 
       <!-- Maintenance Notice -->
 <!--      <div v-if="showMaintenanceNotice" class="maintenance-notice">-->
-<!--        <span class="notice-icon">🔧</span>-->
+<!--        <span class="notice-icon"><InlineIcon icon="🔧" /></span>-->
 <!--        <div class="notice-content">-->
 <!--          <strong>數據庫優化通知</strong>-->
 <!--          <span>計劃於 2026-03-02 進行 N-gram 數據優化，將刪除統計不顯著的條目（391萬 → 230萬），查詢性能將大幅提升。</span>-->
@@ -42,14 +42,14 @@
 
       <!-- Section Header: Features -->
       <div class="section-header">
-        <h2>🧭 {{ t('villages.dashboard.featuresHeader') }}</h2>
+        <h2><InlineIcon icon="🧭" />{{ t('villages.dashboard.featuresHeader') }}</h2>
         <p class="section-description">{{ t('villages.dashboard.featuresDesc') }}</p>
       </div>
 
 
       <!-- Quick Search -->
 <!--      <div class="quick-search glass-panel">-->
-<!--        <h2>🔍 快速搜尋</h2>-->
+<!--        <h2><InlineIcon icon="🔍" />快速搜尋</h2>-->
 <!--        <div class="search-input-group">-->
 <!--          <input-->
 <!--            v-model="searchKeyword"-->
@@ -92,7 +92,7 @@
         </div>
       </div>
       <div class="section-header">
-        <h2>📈 {{ t('villages.dashboard.statsHeader') }}</h2>
+        <h2><InlineIcon icon="📈" />{{ t('villages.dashboard.statsHeader') }}</h2>
         <p class="section-description">{{ t('villages.dashboard.statsDesc') }}</p>
       </div>
       <!-- Statistics Cards -->
@@ -126,6 +126,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'

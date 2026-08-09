@@ -8,8 +8,6 @@
   text-align: center;
   gap: 8px;
   background: var(--surface-glass-button);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
   border: 1px solid var(--border-glass);
   border-radius: var(--main-glass-button-border-radius, var(--radius-lg));
   color: var(--text-deep);
@@ -54,6 +52,18 @@
     }
   }
 
+  &[data-variant='danger'] {
+    background: var(--color-error);
+    border-color: var(--color-error);
+    color: #fff;
+
+    &:hover:not(:disabled) {
+      background: var(--color-error-dark, #c62828);
+      border-color: var(--color-error-dark, #c62828);
+      box-shadow: 0 4px 12px rgba(211, 47, 47, 0.35);
+    }
+  }
+
   &[data-size='large'] {
     padding: var(--main-glass-button-large-padding, 14px 40px);
     font-size: var(--main-glass-button-large-font-size, 16px);
@@ -73,8 +83,6 @@
 
 .glass-button {
   background: var(--surface-panel-subtle);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-glass-subtle);
   border-radius: var(--radius-md);
   white-space: nowrap;

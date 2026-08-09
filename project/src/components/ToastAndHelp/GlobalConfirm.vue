@@ -10,7 +10,7 @@
   >
     <template #header>
       <div class="confirm-header">
-        <span class="confirm-icon">⚠️</span>
+        <span class="confirm-icon"><InlineIcon icon="⚠️" /></span>
         <h3 class="confirm-title">{{ confirmState.title }}</h3>
       </div>
     </template>
@@ -31,6 +31,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import AppModal from '@/components/common/AppModal.vue'
 import { confirmState, resolveConfirm } from '@/utils/ui/message.js'
 

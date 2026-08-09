@@ -18,7 +18,7 @@
         @keyup="onKeyup"
         @blur="onBlur"
       ></textarea>
-      <span v-if="showSuccessCheckmark" class="success-checkmark">✓</span>
+      <span v-if="showSuccessCheckmark" class="success-checkmark"><InlineIcon icon="✓" /></span>
     </div>
 
     <Teleport to="body">
@@ -59,6 +59,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getFeatureCounts } from '@/api'

@@ -20,8 +20,7 @@
         </label>
         <span class="toggle-hint">（語義分類更細緻）</span>
       </div>
-      <button class="lexicon-button" @click="showLexiconModal = true">
-        📖 查看詞典
+      <button class="lexicon-button" @click="showLexiconModal = true"><InlineIcon icon="📖" />查看詞典
       </button>
     </div>
 
@@ -63,6 +62,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed } from 'vue'
 import AppModal from '@/components/common/AppModal.vue'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'

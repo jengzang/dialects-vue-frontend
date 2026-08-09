@@ -162,7 +162,9 @@
           </section>
         </aside>
 
-        <article class="tutorial-article ui-scrollbar">
+        <article
+          ref="articleScrollRef"
+          class="tutorial-article ui-scrollbar">
           <div
             ref="articleTopRef"
             class="tutorial-article__anchor"
@@ -198,6 +200,7 @@
           >
             {{ t('tutorial.ui.missing') }}
           </p>
+
         </article>
       </div>
     </div>
@@ -236,12 +239,15 @@
       </div>
     </template>
   </AppModal>
+
+  <ScrollToTop :container="scrollContainer" :show-after="200" />
 </template>
 
 <script setup>
 import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
+import ScrollToTop from '@/components/common/ScrollToTop.vue'
 import { tutorialEnabled, setTutorialEnabled } from '@/main/store/store.js'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { showInfo } from '@/utils/ui/message.js'
@@ -314,6 +320,8 @@ const { t } = useI18n()
 
 const modalBodyRef = ref(null)
 const articleTopRef = ref(null)
+const articleScrollRef = ref(null)
+const scrollContainer = computed(() => articleScrollRef.value)
 
 const shouldShowCatalog = computed(() => {
   return !props.isCompact || props.isMobileLandscape || props.isCatalogOpen
@@ -357,7 +365,7 @@ const modalMaxHeight = computed(() => {
     return 'min(88dvh, 720px)'
   }
 
-  return 'min(82dvh, 780px)'
+  return 'min(88dvh, 800px)'
 })
 
 function scrollSelectionIntoView() {
@@ -556,9 +564,12 @@ $float-catalog-button-left:0;
       gap: 12px;
     }
 
-    .tutorial-catalog,
-    .tutorial-article {
+    .tutorial-catalog {
       max-height: none;
+    }
+
+    .tutorial-article {
+      max-height: var(--tutorial-content-max-height);
     }
 
     .tutorial-article {
@@ -861,6 +872,8 @@ $float-catalog-button-left:0;
   }
 
   &__content {
+    font-family: var(--font-serif);
+    font-size: 0.95rem;
     color: var(--text-primary);
     line-height: 1.72;
 
@@ -869,6 +882,14 @@ $float-catalog-button-left:0;
     :deep(h3) {
       color: var(--color-primary-hover);
       line-height: 1.3;
+    }
+
+    :deep(h2) {
+      font-size: 1.2rem;
+    }
+
+    :deep(h3) {
+      font-size: 1.05rem;
     }
 
     :deep(p) {
@@ -896,11 +917,13 @@ $float-catalog-button-left:0;
 
     :deep(img) {
       display: block;
-      max-width: 100%;
+      max-width: min(100%, 95dvw);
+      max-height: 50dvh;
       height: auto;
       margin: 12px 0;
       border-radius: var(--radius-lg);
       border: 1px solid rgba(110, 160, 214, 0.12);
+      object-fit: contain;
     }
   }
 }
@@ -1076,5 +1099,11 @@ $float-catalog-button-left:0;
   .tutorial-article {
     padding-top: 52px;
   }
+}
+</style>
+
+<style>
+.content.ui-scrollbar:has([data-tutorial-modal]) {
+  overflow: visible;
 }
 </style>

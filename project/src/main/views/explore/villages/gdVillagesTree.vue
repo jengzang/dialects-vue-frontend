@@ -6,17 +6,14 @@
         <h2 style="margin: 0;">{{ t('villages.pages.gdTree.title') }}</h2>
         <span class="cross-link" @click="goToGdTable">{{ t('villages.pages.gdTable.title') }} →</span>
       </div>
-      <!-- <p class="subtitle">{{ t('villages.pages.gdTree.subtitle') }}</p> -->
-      <div class="search-wrapper">
-        <span class="search-icon">🔍</span>
-        <input
-            type="text"
-            v-model="searchQuery"
-            :placeholder="t('villages.pages.gdTree.searchPlaceholder')"
-            class="glass-input"
-        />
-      </div>
     </div>
+
+    <!-- Floating Search -->
+    <FloatingSearch
+      v-model="searchQuery"
+      :placeholder="t('villages.pages.gdTree.searchPlaceholder')"
+      :close-label="t('common.button.close')"
+    />
 
     <!-- Content Area -->
     <div class="content-area ui-scrollbar">
@@ -28,7 +25,7 @@
 
       <!-- Initial Error State -->
       <div v-else-if="initialLoadError" class="initial-state error-state">
-        <div class="error-icon">⚠️</div>
+        <div class="error-icon"><InlineIcon icon="⚠️" /></div>
         <p class="error-message">{{ initialLoadError }}</p>
         <button @click="loadInitialCities" class="retry-btn">
           {{ t('villages.pages.gdTree.retry') }}
@@ -63,8 +60,7 @@
                     @click.stop="handleCityMapClick(city)"
                     title="顯示全市村落地圖"
                 >🌍</button>
-                <div class="loaded-badge">
-                  ✓ {{ t('villages.pages.gdTree.loaded') }}
+                <div class="loaded-badge"><InlineIcon icon="✓" />{{ t('villages.pages.gdTree.loaded') }}
                 </div>
               </template>
             </div>
@@ -112,9 +108,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import InlineIcon from '@/components/common/InlineIcon.vue'
+import { ref, computed, watch, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import FloatingSearch from '@/components/common/FloatingSearch.vue'
 import VillagesTreeItem from '@/main/components/TableAndTree/VillagesTreeItem.vue';
 import VillageMapPopup from '@/main/components/map/popups/VillageMapPopup.vue';
 import { lazyLoadTree, loadFullTree } from '@/api';
@@ -146,6 +144,20 @@ const API_CONFIG = computed(() => {
 const topLevelCities = ref([]);
 const loadedCitiesData = ref({});
 const searchQuery = ref('');
+const debouncedSearchQuery = ref('');
+let searchDebounceTimer = null;
+
+watch(searchQuery, (val) => {
+  clearTimeout(searchDebounceTimer);
+  if (!val.trim()) {
+    debouncedSearchQuery.value = '';
+    return;
+  }
+  searchDebounceTimer = setTimeout(() => {
+    debouncedSearchQuery.value = val;
+  }, 300);
+});
+
 const loadingStates = ref({});
 const isInitialLoading = ref(false);
 const initialLoadError = ref(null);
@@ -426,7 +438,7 @@ const getFilteredCityData = (cityName) => {
     return [];
   }
 
-  const query = searchQuery.value.trim();
+  const query = debouncedSearchQuery.value.trim();
   if (!query) {
     return cityData;
   }
@@ -587,21 +599,24 @@ $transition-base: 0.3s;
   @include flex-col;
   width: 90dvw;
   max-width: 1400px;
-  height: 90dvh;
+  min-height: 90dvh;
   margin: 10px auto;
-  overflow: hidden;
+  background: var(--glass-50);
   color: $text-primary;
 
   @media (max-aspect-ratio: 1/1) {
     width: 92dvw;
-    height: 88dvh;
+    min-height: 88dvh;
     border-radius: var(--radius-xl);
   }
 }
 
 /* Header Section */
 .header-section {
-  padding: 24px 28px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background: var(--glass-30);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 
@@ -650,24 +665,9 @@ $transition-base: 0.3s;
   font-size: 14px;
 }
 
-.search-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.search-icon {
-  position: absolute;
-  left: 14px;
-  font-size: 16px;
-  opacity: 0.5;
-}
-
 /* Content Area */
 .content-area {
-  flex: 1;
   padding: 24px;
-  overflow-y: auto;
 
   @media (max-aspect-ratio: 1/1) {
     padding: 16px;

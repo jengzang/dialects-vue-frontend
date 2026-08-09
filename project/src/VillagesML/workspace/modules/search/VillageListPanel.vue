@@ -8,7 +8,7 @@
 
     <!-- Empty State -->
     <div v-else-if="!villages || villages.length === 0" class="empty-state">
-      <div class="empty-icon">🏘️</div>
+      <div class="empty-icon"><InlineIcon icon="🏘️" /></div>
       <p>{{ emptyMessage }}</p>
     </div>
 
@@ -39,9 +39,7 @@
               <td>{{ village.county }}</td>
               <td>{{ village.township }}</td>
               <td>
-                <button class="analyze-button" @click="openDeepAnalysis(village)">
-                  🔍
-                </button>
+                <button class="analyze-button" @click="openDeepAnalysis(village)"><InlineIcon icon="🔍" /></button>
               </td>
             </tr>
           </tbody>
@@ -75,6 +73,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed } from 'vue'
 import { villagesMLStore } from '@/VillagesML/store/villagesMLStore.js'
 

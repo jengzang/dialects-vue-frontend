@@ -52,6 +52,7 @@ import { useI18n } from 'vue-i18n'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js';
 import { getCoordinates, searchChars, searchZhongGu, searchYinWei, searchTones } from '@/api'
 import {globalPayload, mapStore, resultCache, userStore} from '@/main/store/store.js';
+import { showInfo, hideMessage } from '@/utils/ui/message.js';
 import ResultList from "@/main/components/result/ResultList.vue";
 import CharsAndTones from "@/main/components/result/CharsAndTones.vue";
 import SimpleSelectDropdown from "@/components/selector/SimpleSelectDropdown.vue";
@@ -322,9 +323,28 @@ watch(
         } catch (e) {
           resultCache.latestResults = latestResults.value;
         }
+
+        if (mapStore.mergedData && mapStore.mergedData.length > 0) {
+          showInfo(t('result.mapDataReady'), 5000, {
+            actionText: t('result.viewMap'),
+            onAction: () => {
+              router.push(buildLocalePath(resolveRouteLocale(route), '/menu/map/view'))
+            }
+          })
+        }
       }
     },
     { immediate: true }
+);
+
+// 离开 ResultPage 时自动关闭 toast
+watch(
+  () => route.path,
+  (newPath) => {
+    if (!newPath.includes('/menu/result')) {
+      hideMessage()
+    }
+  }
 );
 
 const goToQuery = () => {
@@ -400,12 +420,7 @@ $transition-fast: 0.2s;
 .timer-text {
   margin-bottom: 5px;
   color: $text-primary;
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    sans-serif;
+  font-family: var(--font-sans);
   font-size: 2em;
   font-weight: 200;
   font-variant-numeric: tabular-nums;

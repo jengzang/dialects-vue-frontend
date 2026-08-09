@@ -239,7 +239,7 @@ $transition-normal: 0.3s;
 
   .tag-key {
     margin-right: 6px;
-    font-family: "Menlo", "Consolas", monospace;
+    font-family: var(--font-mono);
     font-weight: 600;
   }
 

@@ -11,8 +11,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { getVocabularyLocations } from '@/api'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 
 const { t } = useI18n()
@@ -24,22 +25,45 @@ const props = defineProps({
   managePermissionLevel: { type: String, default: null },
 })
 
-const defaultFilter = computed(() => {
-  if (props.managePermissionLevel === 'edit' && props.manageUserId != null) {
-    return { user_id: props.manageUserId }
+const userLocationNames = ref([])
+
+onMounted(async () => {
+  try {
+    const response = await getVocabularyLocations({ page_size: 200 })
+    const locations = Array.isArray(response.locations) ? response.locations : []
+    userLocationNames.value = locations.map((l) => l.location_name).filter(Boolean)
+  } catch {
+    // no-op
   }
-  return null
 })
 
-const tableColumns = computed(() => [
-  { key: 'standard_word', label: t('words.wordList.columns.definition'), filterable: false, width: 1.2 },
-  { key: 'local_expression', label: t('words.wordList.columns.headword'), filterable: false, width: 1 },
-  { key: 'ipa', label: t('words.wordList.columns.pronunciation'), filterable: false, width: 1.2 },
-  { key: 'notes', label: t('words.wordList.columns.detail'), filterable: false, width: 1.6 },
-  { key: 'location_name', label: t('words.wordList.columns.location'), filterable: true, width: 1 },
-  { key: 'informations', label: t('words.wordList.columns.informations'), filterable: false, width: 1.2 },
-  { key: 'source_filename', label: t('words.wordList.columns.sourceFilename'), filterable: true, width: 1.2 },
-])
+const defaultFilter = computed(() => {
+  if (!userLocationNames.value.length) return null
+  return { location_name: [...userLocationNames.value] }
+})
+
+const tableColumns = computed(() => {
+  const columns = [
+    { key: 'standard_word', label: t('words.wordList.columns.definition'), filterable: true, width: 1.2 },
+    { key: 'local_expression', label: t('words.wordList.columns.headword'), filterable: false, width: 1 },
+    { key: 'ipa', label: t('words.wordList.columns.pronunciation'), filterable: false, width: 1.2 },
+    { key: 'notes', label: t('words.wordList.columns.detail'), filterable: false, width: 1.6 },
+  ]
+  if (props.managePermissionLevel === 'manage') {
+    columns.push({ key: 'location_name', label: t('words.wordList.columns.location'), filterable: true, width: 1 })
+  }
+  columns.push(
+    { key: 'informations', label: t('words.wordList.columns.informations'), filterable: false, width: 1.2 },
+    { key: 'source_filename', label: t('words.wordList.columns.sourceFilename'), filterable: true, width: 1.2 },
+  )
+  return columns
+})
+</script>
+
+<script>
+export default {
+  name: 'ManageEntriesSection'
+}
 </script>
 
 <style scoped lang="scss" src="./vocabulary.scss"></style>

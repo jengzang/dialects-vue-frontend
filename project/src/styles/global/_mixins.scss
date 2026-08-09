@@ -32,3 +32,13 @@
   }
 }
 
+@mixin solid-surface($elevation: 0) {
+  @if $elevation == 1 {
+    background: var(--surface-elevation-1);
+  } @else if $elevation == 2 {
+    background: var(--surface-elevation-2);
+  } @else {
+    background: var(--surface-elevation-0);
+  }
+}
+

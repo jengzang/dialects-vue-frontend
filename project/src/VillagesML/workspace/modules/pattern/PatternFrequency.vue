@@ -6,7 +6,7 @@
     </h3>
 
     <div class="vml-glass-panel">
-      <h2>🔍 模式頻率分析</h2>
+      <h2><InlineIcon icon="🔍" />模式頻率分析</h2>
 
       <!-- Query Mode Selection -->
       <div class="mode-selector vml-control-surface vml-control-row vml-control-row--center">
@@ -115,6 +115,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'

@@ -146,7 +146,7 @@ describe('platform runtime detection and capabilities', () => {
         android: true,
         native: true,
       },
-      routes: ['/menu/map/draw'],
+      routes: ['/explore/gis'],
       tutorials: ['menu-map-draw'],
     })
     expect(PLATFORM_FEATURE_MATRIX.mapDraw).not.toHaveProperty('nativeDistPrune')
@@ -163,7 +163,7 @@ describe('platform runtime detection and capabilities', () => {
     })).toEqual({ enabled: true, reason: null })
     expect(getNativeDistPruneManifest().paths).not.toContain('data/国界面.kmz')
     expect(getNativeDistPruneManifest().globPatterns).not.toContain('^assets/voronoiClip\\.worker-[\\w-]+\\.js$')
-    expect(isPlatformRouteEnabled('/menu/map/draw', {
+    expect(isPlatformRouteEnabled('/explore/gis', {
       family: 'android',
       os: 'android',
       container: 'native-webview',

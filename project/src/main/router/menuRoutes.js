@@ -1,5 +1,3 @@
-import { isPlatformRouteEnabled } from '@/platform/index.js'
-
 const PhoPage = () => import('@/main/views/menu/PhoPage.vue')
 const AboutPage = () => import('@/main/views/menu/support/AboutPage.vue')
 const SettingsPage = () => import('@/main/views/menu/support/SettingsPage.vue')
@@ -10,26 +8,30 @@ const ResultPage = () => import('@/main/views/menu/ResultPage.vue')
 const SourcePage = () => import('@/main/views/menu/support/SourcePage.vue')
 const PrivacyPage = () => import('@/main/views/menu/support/PrivacyPage.vue')
 const ToolsPage = () => import('@/main/views/menu/portals/ToolsPage.vue')
-const WordsPage = () => import('@/main/views/menu/portals/WordsPage.vue')
+const VocabularyPage = () => import('@/main/views/menu/VocabularyPage.vue')
+const VocabularyViewPage = () => import('@/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
+const VocabularyImportPage = () => import('@/main/views/explore/word/vocabulary/VocabularyImportPage.vue')
+const VocabularyManagePage = () => import('@/main/views/explore/word/vocabulary/VocabularyManagePage.vue')
+const YuBaoMenuPage = () => import('@/main/views/menu/YuBaoMenuPage.vue')
 const VillagesPage = () => import('@/main/views/menu/portals/VillagesPage.vue')
 const DialectClusteringPage = () => import('@/main/views/menu/DialectClustering.vue')
-
-export function redirectUnsupportedMapDraw(to) {
-  if (to.params.sub !== 'draw' || isPlatformRouteEnabled('/menu/map/draw')) {
-    return true
-  }
-
-  return {
-    path: `/${to.params.locale}/menu/map/view`,
-    query: to.query,
-    hash: to.hash,
-  }
-}
 
 export const menuRoutes = [
   {
     path: 'menu/pho/:section(matrix|custom|count|evolution)',
-    component: PhoPage
+    component: PhoPage,
+    meta: {
+      queryAllowlist: {
+        base: [],
+        variantKey: 'section',
+        variants: {
+          matrix: ['loc'],
+          custom: ['loc', 'feature', 'h', 'v', 'c'],
+          count: [],
+          evolution: ['loc']
+        }
+      }
+    }
   },
   {
     path: 'menu/about/:section(intro|suggestion|like)',
@@ -68,9 +70,19 @@ export const menuRoutes = [
     })
   },
   {
-    path: 'menu/map/:sub(view|divide|custom|draw)',
-    beforeEnter: redirectUnsupportedMapDraw,
-    component: MapPage
+    path: 'menu/map/:sub(view|divide|custom)',
+    component: MapPage,
+    meta: {
+      queryAllowlist: {
+        base: [],
+        variantKey: 'sub',
+        variants: {
+          view: ['feature', 'locations', 'regions', 'regionMode', 'openPanel', 'phonology'],
+          divide: [],
+          custom: []
+        }
+      }
+    }
   },
   {
     path: 'menu/result',
@@ -94,7 +106,40 @@ export const menuRoutes = [
   },
   {
     path: 'menu/words',
-    component: WordsPage
+    redirect: to => ({
+      path: `/${to.params.locale}/menu/vocabulary`,
+      query: to.query,
+      hash: to.hash,
+    })
+  },
+  {
+    path: 'menu/vocabulary',
+    component: VocabularyPage,
+    redirect: to => ({
+      path: `/${to.params.locale}/menu/vocabulary/view`,
+      query: to.query,
+      hash: to.hash,
+    }),
+    children: [
+      {
+        path: 'view',
+        component: VocabularyViewPage,
+        meta: { queryAllowlist: ['tab'] }
+      },
+      {
+        path: 'import',
+        component: VocabularyImportPage
+      },
+      {
+        path: 'manage',
+        component: VocabularyManagePage
+      }
+    ]
+  },
+  {
+    path: 'menu/yubao',
+    component: YuBaoMenuPage,
+    meta: { queryAllowlist: ['tab'] }
   },
   {
     path: 'menu/villages',

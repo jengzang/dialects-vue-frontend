@@ -357,4 +357,10 @@ watch(() => props.canViewVocabularyLogs, (can) => {
 }, { immediate: true })
 </script>
 
+<script>
+export default {
+  name: 'ManageLogsSection'
+}
+</script>
+
 <style scoped lang="scss" src="./vocabulary.scss"></style>

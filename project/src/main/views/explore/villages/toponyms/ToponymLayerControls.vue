@@ -1,6 +1,7 @@
 <template>
   <section
     class="toponym-layer-controls"
+    :class="{ 'toponym-layer-controls--compact': compact }"
     :aria-label="t('villages.pages.toponyms.layers.title')"
   >
     <div class="toponym-layer-controls__header">
@@ -12,8 +13,8 @@
       <label
         v-for="layer in optionalLayers"
         :key="layer.key"
-        class="toponym-layer-controls__item"
-        :class="{ 'toponym-layer-controls__item--active': layerState[layer.key] }"
+        class="toponym-layer-controls__toggle"
+        :class="{ 'toponym-layer-controls__toggle--active': layerState[layer.key] }"
       >
         <input
           type="checkbox"
@@ -35,6 +36,10 @@ import { useI18n } from 'vue-i18n';
 import { TOPONYMS_GIS_ASSETS } from './toponymsGisAssets.js';
 
 defineProps({
+  compact: {
+    type: Boolean,
+    default: false,
+  },
   layerState: {
     type: Object,
     required: true,
@@ -94,7 +99,7 @@ function handleToggle(key, visible) {
     flex-wrap: wrap;
   }
 
-  &__item {
+  &__toggle {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -125,6 +130,35 @@ function handleToggle(key, visible) {
 
     &:has(input:disabled) {
       @include disabled-state;
+    }
+  }
+
+  &--compact {
+    gap: 6px;
+
+    .toponym-layer-controls {
+      &__header {
+        justify-content: flex-end;
+
+        h2 {
+          font-size: 13px;
+        }
+
+        span {
+          display: none;
+        }
+      }
+
+      &__list {
+        justify-content: flex-end;
+        gap: 6px;
+      }
+
+      &__toggle {
+        min-block-size: 28px;
+        padding: 4px 8px;
+        font-size: 12px;
+      }
     }
   }
 }

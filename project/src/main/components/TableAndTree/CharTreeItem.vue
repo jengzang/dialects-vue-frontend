@@ -7,7 +7,7 @@
       @click="toggle"
     >
       <div class="node-label">
-        <span class="icon">{{ hasChildren ? '📁' : '✍️' }}</span>
+        <span class="icon"><InlineIcon :icon="hasChildren ? '📁' : '✍️'" /></span>
         <span class="text" v-if="isMatch" v-html="highlightName"></span>
         <span class="text" v-else>{{ displayName }}</span>
         <span v-if="node._loadingChildren" class="lazy-indicator">↻</span>
@@ -103,6 +103,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 

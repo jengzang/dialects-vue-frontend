@@ -1,24 +1,28 @@
 {
   "title": "工具箱",
   "dataCheck": {
-    "name": "字表檢查",
-    "desc": "檢查字表正確性和格式"
+    "name": "字表處理",
+    "desc": "字表檢查與格式轉換"
   },
   "jyutpingToIpa": {
-    "name": "粵拼轉 IPA",
-    "desc": "將粵拼轉換為國際音標"
+    "name": "粵拼轉IPA",
+    "desc": "粵拼轉國際音標"
   },
   "mergeTables": {
     "name": "字表合併",
-    "desc": "合併多個字表數據"
+    "desc": "合併多個字表"
   },
   "deriveTables": {
     "name": "字表推導",
     "desc": "基於少量樣本與規則生成完整字表"
   },
   "praatAnalysis": {
-    "name": "聲學分析",
-    "desc": "基於 Praat 進行基頻、共振峰等分析"
+    "name": "Praat 聲學分析",
+    "desc": "實驗語音學工具與數據分析"
+  },
+  "gis": {
+    "name": "繪圖工具",
+    "desc": "GIS在線繪圖 泰森多邊形"
   },
   "common": {
     "close": "關閉",

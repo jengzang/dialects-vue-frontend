@@ -1,8 +1,7 @@
 <template>
   <div class="spatial-visualization-tab">
 <!--      <h3 class="villagesml-subtab-title">空間分析 - 空間可視化</h3>-->
-    <h2>
-      🗺️ 空間可視化
+    <h2><InlineIcon icon="🗺️" />空間可視化
       <HelpIcon content="多圖層疊加可視化。支持熱點、聚類、N-gram分布、字符傾向熱力圖的組合展示。字符傾向使用藍→白→紅漸變表示Lift值（低→中→高）" />
     </h2>
 
@@ -37,7 +36,7 @@
           <!-- N-gram 過濾器 -->
           <div v-if="layers.ngrams" class="section">
             <h3>N-gram 設置</h3>
-            <p class="layer-note">⚠️ 僅支持 2-3 字符的 N-gram，區域固定為鄉鎮級</p>
+            <p class="layer-note"><InlineIcon icon="⚠️" />僅支持 2-3 字符的 N-gram，區域固定為鄉鎮級</p>
             <div class="filter-row vml-control-surface vml-control-row">
               <div class="vml-control-field">
                 <input
@@ -154,6 +153,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, onMounted } from 'vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { useRoute, useRouter } from 'vue-router'

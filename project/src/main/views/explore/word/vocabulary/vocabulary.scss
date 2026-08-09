@@ -3,7 +3,7 @@
   max-width: 1200px;
   min-height: 100%;
   margin: 0 auto;
-  padding: 16px 20px 24px;
+  padding: 6px 20px 24px;
   color: var(--text-primary);
 }
 
@@ -87,7 +87,7 @@
 
 .vocabulary-view-page > .content-area {
   min-height: 300px;
-  max-height: 70dvh;
+  // max-height: 70dvh;
   padding: 0;
   overflow: auto;
   background: var(--glass-60);
@@ -222,7 +222,7 @@
 
 .pronunciation-text {
   color: var(--color-primary);
-  font-family: var(--font-monospace, 'SF Mono', Monaco, Consolas, monospace);
+  font-family: var(--font-mono);
   font-size: 14px;
   font-weight: 500;
 }
@@ -710,6 +710,14 @@
   justify-content: center;
 }
 
+.location-item-username {
+  font-size: 0.8rem;
+  color: var(--text-secondary, #888);
+  background: var(--glass-10);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm, 4px);
+}
+
 .location-item-info {
   display: flex;
   gap: 8px;
@@ -736,6 +744,72 @@
   color: var(--text-secondary);
 }
 
+.yindian-match-section {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--color-primary-border);
+  padding: 8px 0;
+  gap: 8px;
+}
+
+.yindian-match-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.yindian-match-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.yindian-input-wrapper {
+  // flex: 1;
+  position: relative;
+
+  input {
+    // width: 100%;
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    background: var(--surface-panel);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-md);
+    color: var(--text-deep);
+    outline: none;
+
+    &:focus {
+      border-color: var(--action-primary-border);
+    }
+  }
+}
+
+.yindian-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  margin-top: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  background: var(--surface-panel);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-glass-hover);
+}
+
+.yindian-suggest-item {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  color: var(--text-deep);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-panel-hover);
+  }
+}
+
 .location-edit-modal-actions {
   display: flex;
   gap: 10px;
@@ -760,6 +834,7 @@
   font-weight: 600;
 
   &[data-action='create'],
+  &[data-action='batch_create'],
   &[data-action='insert'],
   &[data-action='INSERT'] {
     background: rgba(var(--color-success-rgb), 0.12);
@@ -767,6 +842,7 @@
   }
 
   &[data-action='update'],
+  &[data-action='batch_update'],
   &[data-action='edit'],
   &[data-action='UPDATE'] {
     background: rgba(var(--color-primary-rgb), 0.12);
@@ -774,6 +850,7 @@
   }
 
   &[data-action='delete'],
+  &[data-action='batch_delete'],
   &[data-action='remove'],
   &[data-action='DELETE'] {
     background: rgba(var(--color-error-rgb), 0.12);
@@ -848,7 +925,7 @@
     padding-bottom: 12px;
   }
   .vocabulary-page {
-    padding: 12px;
+    padding: 9px;
   }
 
   .vocabulary-view-page > .content-area {

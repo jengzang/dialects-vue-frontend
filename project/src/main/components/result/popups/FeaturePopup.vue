@@ -7,9 +7,9 @@
       @click.stop
     >
       <div class="popup-content">
-        <p>📍 {{ t('result.terms.location') }}: {{ data.location }}</p>
-        <p>🧩 {{ t('result.terms.feature') }}: {{ checkedFeatures }}</p>
-        <p>🔍 {{ t('result.featurePopup.queryLabel') }}: {{ t('result.featurePopup.queryHint', { feature: data.feature || '' }) }}</p>
+        <p><InlineIcon icon="📍" />{{ t('result.terms.location') }}: {{ data.location }}</p>
+        <p><InlineIcon icon="🧩" />{{ t('result.terms.feature') }}: {{ checkedFeatures }}</p>
+        <p><InlineIcon icon="🔍" />{{ t('result.featurePopup.queryLabel') }}: {{ t('result.featurePopup.queryHint', { feature: data.feature || '' }) }}</p>
 
         <template v-for="field in unmatchedFields" :key="field">
           <button
@@ -26,6 +26,7 @@
 </template>
 
 <script setup>
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { parseFeatureString } from '@/main/utils/query/ResultTable.js';

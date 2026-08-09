@@ -3,7 +3,7 @@ import { queryPhonology } from '@/api'
 import { API_CONFIG } from '../../config/constants.js'
 import { resultCache } from '../../store/store.js'
 import i18n from '@/i18n'
-import { showWarning } from '@/utils/ui/message.js'
+import { showError, showWarning } from '@/utils/ui/message.js'
 import {
     DEFAULT_CHARACTER_TABLE,
     getCharacterTableColumnValues
@@ -417,7 +417,7 @@ export async function get_detail(location, feature_value, bool=false, vue=false,
         resultCache.latestResults = validData;
 
         if (validData.length === 0) {
-            window.showWarningToast("未查詢到相關詳情");
+            showWarning("未查詢到相關詳情");
             return;
         }
 
@@ -427,7 +427,7 @@ export async function get_detail(location, feature_value, bool=false, vue=false,
         // ============================================
         if (typeof window.updatePanel === 'function' && tempPanelId) {
             if (validData.length === 0) {
-                window.showWarningToast("未查詢到相關詳情");
+                showWarning("未查詢到相關詳情");
                 // 如果沒數據，把那個轉圈圈的窗口關掉
                 window.removePanel(tempPanelId);
             } else {
@@ -442,6 +442,6 @@ export async function get_detail(location, feature_value, bool=false, vue=false,
         const message = typeof detail === 'string'
             ? detail
             : detail?.message || error?.message;
-        window.showErrorToast(message);
+        showError(message);
     }
 }
