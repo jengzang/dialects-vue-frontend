@@ -828,6 +828,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   }
 
   &-content {
+    padding: 1rem;
     position: relative;
     z-index: 1;
     max-width: 520px;
@@ -837,6 +838,8 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     animation: heroFadeIn 1s $ease-apple;
     backdrop-filter: blur(8px) saturate(180%);
     border-radius: var(--radius-lg);
+    // background: var(--bg-blue-hover);
+    background: color-mix(in srgb, var(--bg-body) 50%, transparent);
   }
 
   &-logo {

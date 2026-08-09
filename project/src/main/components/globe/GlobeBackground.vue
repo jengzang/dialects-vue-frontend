@@ -43,8 +43,6 @@ const webglSupported = computed(() => {
 
   :deep(canvas) {
     display: block;
-    width: 100% !important;
-    height: 100% !important;
     transform: translate(489px, -91px);
   }
 }

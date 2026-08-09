@@ -16,6 +16,8 @@ const props = defineProps({
 const containerRef = ref(null)
 let globe = null
 let resizeObserver = null
+let canvasOffsetX = 489
+let canvasOffsetY = -91
 
 function getCssRgb(varName, fallback) {
   return getComputedStyle(document.documentElement)
@@ -40,9 +42,12 @@ function render() {
     .pointLat('lat')
     .pointLng('lng')
     .pointColor(() => `rgba(${primary}, 0.7)`)
-    .pointRadius(0.35)
-    .pointAltitude(0.02)
-    .pointResolution(2)
+    .pointRadius(0.18)
+    .pointAltitude(0.001)
+    .pointResolution(6)
+    .onPointHover((point) => {
+      console.log('[Globe hover]', point ? point.name : null)
+    })
 
   globe.controls().autoRotate = false
   globe.controls().autoRotateSpeed = 0.4
@@ -81,21 +86,17 @@ function onKeyDown(e) {
   if (!canvas) return
 
   const step = e.shiftKey ? 3 : 1
-  const cur = canvas.style.transform || getComputedStyle(canvas).transform
-  const match = cur.match(/matrix\(([-\d.]+),\s*[-\d.]+,\s*[-\d.]+,\s*([-\d.]+),\s*([-\d.]+),\s*([-\d.]+)\)/)
-  let x = match ? parseFloat(match[3]) : 0
-  let y = match ? parseFloat(match[4]) : 0
 
   switch (e.key) {
-    case 'ArrowLeft':  x -= step; break
-    case 'ArrowRight': x += step; break
-    case 'ArrowUp':    y -= step; break
-    case 'ArrowDown':  y += step; break
+    case 'ArrowLeft':  canvasOffsetX -= step; break
+    case 'ArrowRight': canvasOffsetX += step; break
+    case 'ArrowUp':    canvasOffsetY -= step; break
+    case 'ArrowDown':  canvasOffsetY += step; break
     default: return
   }
   e.preventDefault()
-  canvas.style.transform = `translate(${x}px, ${y}px)`
-  console.log('[Globe offset]', { x: `${x}px`, y: `${y}px` }, '| pointOfView:', globe?.pointOfView())
+  canvas.style.transform = `translate(${canvasOffsetX}px, ${canvasOffsetY}px)`
+  console.log('[Globe offset]', { x: `${canvasOffsetX}px`, y: `${canvasOffsetY}px` }, '| pointOfView:', globe?.pointOfView())
 }
 
 function dumpGlobeParams() {
