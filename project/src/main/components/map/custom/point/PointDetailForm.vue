@@ -864,7 +864,7 @@ watch(
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.85fr);
   gap: $spacing-lg;
 
-  @media (max-width: 1100px) {
+  @media (max-width: 1000px) {
     grid-template-columns: 1fr;
   }
 }

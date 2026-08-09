@@ -322,7 +322,7 @@ const detailTitle = computed(() => {
 const mapPoints = computed(() =>
   rows.value
     .map((row) => {
-      const [latText, lngText] = String(row['經緯度'] || '').split(',');
+      const [lngText, latText] = String(row['經緯度'] || '').split(',');
       const lat = Number(String(latText).trim());
       const lng = Number(String(lngText).trim());
       if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
@@ -512,7 +512,7 @@ watch(
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.85fr);
   gap: $spacing-lg;
 
-  @media (max-width: 1100px) {
+  @media (max-width: 1000px) {
     grid-template-columns: 1fr;
   }
 }
