@@ -49,6 +49,8 @@
   },
   "assist": {
     "badge": "新手指引",
+    "diceTooltip": "點擊一鍵體驗",
+    "fingerHint": "👆 點擊檢視教程",
     "experience": {
       "badge": "快速體驗",
       "queryChar": {

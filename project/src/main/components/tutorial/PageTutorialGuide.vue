@@ -8,8 +8,12 @@
     <TutorialDiceTrigger
       :entry="currentMatchedEntry"
       :has-dice-config="Boolean(currentDiceEntry)"
+      :show-dice-tooltip="showDiceTooltip"
+      :show-finger-hint="showFingerHint"
       @open="openGuide"
       @apply-dice="applyDiceConfig"
+      @dismiss-dice-tooltip="dismissDiceTooltip"
+      @dismiss-finger-hint="dismissFingerHint"
     />
 
     <TutorialGuideModal
@@ -73,7 +77,14 @@ const { locale, t } = useI18n()
 
 let disclaimerShown = false
 
+const DICE_TOOLTIP_PREFIX = 'tutorial-dice-tooltip-shown:'
+
 const isOpen = ref(false)
+const showDiceTooltip = ref(false)
+const showFingerHint = ref(false)
+let diceTooltipTimer = null
+let fingerHintTimer = null
+let hasOpenedTutorialThisSession = false
 const isCatalogOpen = ref(false)
 const selectedKey = ref('')
 const guideModalRef = ref(null)
@@ -219,6 +230,9 @@ function openGuide() {
     return
   }
 
+  hasOpenedTutorialThisSession = true
+  dismissFingerHint()
+
   // 教程内容已正式更新，暂时不需要 AI 免责弹窗
   // if (!disclaimerShown) {
   //   disclaimerShown = true
@@ -279,6 +293,9 @@ function goNext() {
 }
 
 function applyDiceConfig() {
+  dismissDiceTooltip()
+  dismissFingerHint()
+
   if (!currentDiceEntry.value) {
     return
   }
@@ -293,7 +310,66 @@ function applyDiceConfig() {
   isOpen.value = false
 }
 
+function getDiceTooltipKey() {
+  return DICE_TOOLTIP_PREFIX + (currentMatchedEntry.value?.key || '')
+}
+
+function dismissDiceTooltip() {
+  showDiceTooltip.value = false
+  if (diceTooltipTimer) {
+    clearTimeout(diceTooltipTimer)
+    diceTooltipTimer = null
+  }
+  const entryKey = currentMatchedEntry.value?.key
+  if (entryKey) {
+    try {
+      localStorage.setItem(DICE_TOOLTIP_PREFIX + entryKey, '1')
+    } catch (_) { /* ignore */ }
+  }
+}
+
+function tryShowDiceTooltip() {
+  if (!currentDiceEntry.value) {
+    return
+  }
+  const key = getDiceTooltipKey()
+  try {
+    if (localStorage.getItem(key)) {
+      return
+    }
+  } catch (_) { return }
+
+  showDiceTooltip.value = true
+  diceTooltipTimer = setTimeout(() => {
+    dismissDiceTooltip()
+  }, 4000)
+}
+
+function dismissFingerHint() {
+  showFingerHint.value = false
+  if (fingerHintTimer) {
+    clearTimeout(fingerHintTimer)
+    fingerHintTimer = null
+  }
+}
+
+function scheduleFingerHint() {
+  if (fingerHintTimer) {
+    return
+  }
+  fingerHintTimer = setTimeout(() => {
+    if (!hasOpenedTutorialThisSession && currentMatchedEntry.value) {
+      showFingerHint.value = true
+      fingerHintTimer = setTimeout(() => {
+        dismissFingerHint()
+      }, 5000)
+    }
+  }, 45000)
+}
+
 watch(currentMatchedEntry, (entry) => {
+  dismissFingerHint()
+
   if (!entry) {
     selectedKey.value = ''
     isOpen.value = false
@@ -303,6 +379,8 @@ watch(currentMatchedEntry, (entry) => {
   if (!selectedKey.value || !tutorialEntryMap.value.has(selectedKey.value)) {
     selectedKey.value = entry.key
   }
+
+  scheduleFingerHint()
 
   if (!isOpen.value) {
     return
@@ -315,6 +393,17 @@ watch(currentMatchedEntry, (entry) => {
   }
 
   scrollSelectionIntoView()
+}, { immediate: true })
+
+watch(currentDiceEntry, (diceEntry) => {
+  if (diceEntry) {
+    // Delay to avoid overlapping with breathing animation
+    setTimeout(() => {
+      tryShowDiceTooltip()
+    }, 2500)
+  } else {
+    dismissDiceTooltip()
+  }
 }, { immediate: true })
 
 watch(locale, () => {
@@ -349,6 +438,12 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('resize', updateViewport)
   window.removeEventListener('orientationchange', updateViewport)
+  if (diceTooltipTimer) {
+    clearTimeout(diceTooltipTimer)
+  }
+  if (fingerHintTimer) {
+    clearTimeout(fingerHintTimer)
+  }
 })
 </script>
 

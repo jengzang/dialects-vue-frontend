@@ -49,6 +49,8 @@
   },
   "assist": {
     "badge": "Starter Guide",
+    "diceTooltip": "Click to try",
+    "fingerHint": "👆 Click for guide",
     "experience": {
       "badge": "Quick Start",
       "queryChar": {
