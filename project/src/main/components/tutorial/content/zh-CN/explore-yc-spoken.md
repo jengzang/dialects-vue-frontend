@@ -22,7 +22,7 @@
 
 - 用表格筛选器按栏位过滤数据
 - 可点击标题旁的村落按钮跳转到阳春自然村页面
-![阳春口语.png](/tutorial/explore-yc-spoken/阳春口语.webp)
+![阳春口语.webp](/tutorial/explore-yc-spoken/阳春口语.webp)
 
 ## 提示
 

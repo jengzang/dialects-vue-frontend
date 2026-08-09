@@ -10,7 +10,7 @@
 4. 修改条件，组出第二组条件
 5. 点击「加入组 2」
 6. 输入地点或分区，点击「比较」
-![比较中古1.jpg](/tutorial/menu-compare-zhonggu/比较中古1.webp)
+![比较中古1.webp](/tutorial/menu-compare-zhonggu/比较中古1.webp)
 
 ## 核心交互
 
@@ -37,7 +37,7 @@
 
 同一地点内部比较时，该算法更为可靠（因为同一地点音值不同即意味着音类不同）。
 
-![比较中古2.jpg](/tutorial/menu-compare-zhonggu/比较中古2.webp)
+![比较中古2.webp](/tutorial/menu-compare-zhonggu/比较中古2.webp)
 
 ## 提示
 
@@ -45,4 +45,4 @@
 - 第一次使用建议每组只放一条条件，确认流程后再增加
 - 想先单独查看某组条件的结果，先用「查中古」各自查一遍
 - 可以弹窗查看具体信息
-![比较中古3.jpg](/tutorial/menu-compare-zhonggu/比较中古3.webp)
+![比较中古3.webp](/tutorial/menu-compare-zhonggu/比较中古3.webp)

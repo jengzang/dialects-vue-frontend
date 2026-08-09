@@ -10,18 +10,18 @@
 
 1. 在输入框搜索条目（支持繁简匹配），从下拉建议中点选
 2. 选择展示模式：地图、卡片或表格
-![语保1.png](/tutorial/explore-yubao/语保1.webp)
+![语保1.webp](/tutorial/explore-yubao/语保1.webp)
 
 ### 地图模式
 
 - 比例尺较小时自动聚合显示方言点
 - 放大地图后显示具体内容
 - 三种显示方式，在右上角可切换：**释义（文字）**、**语音（发音）**、**地名**
-![语保2.png](/tutorial/explore-yubao/语保2.webp)
-![语保3.png](/tutorial/explore-yubao/语保3.webp)
-![语保4.png](/tutorial/explore-yubao/语保4.webp)
+![语保2.webp](/tutorial/explore-yubao/语保2.webp)
+![语保3.webp](/tutorial/explore-yubao/语保3.webp)
+![语保4.webp](/tutorial/explore-yubao/语保4.webp)
 - 点击地图上的点可弹窗查看详情
-![语保5.png](/tutorial/explore-yubao/语保5.webp)
+![语保5.webp](/tutorial/explore-yubao/语保5.webp)
 - 支持全屏显示
 
 ### 卡片模式
@@ -29,7 +29,7 @@
 - 卡片显示地名、词汇、注释、发音、分区
 - 搜索框可输入地名/注释/音标进行匹配
 - 支持无限滚动加载
-![语保6.png](/tutorial/explore-yubao/语保6.webp)
+![语保6.webp](/tutorial/explore-yubao/语保6.webp)
 
 ### 表格模式
 
@@ -37,15 +37,15 @@
 - 部分列支持弹窗筛选（多选、反选）
 - 支持全屏查看
 - 表格中可搜索匹配
-![语保7.png](/tutorial/explore-yubao/语保7.webp)
+![语保7.webp](/tutorial/explore-yubao/语保7.webp)
 
 ## 语法查询（语保 50 句）
 
 切换到「语保语法」标签页，可查询语保工程的 50 个语法例句：
 
 - 通过弹窗选择所需条目或通过输入匹配关键字
-![语保8.png](/tutorial/explore-yubao/语保8.webp)
-![语保9.png](/tutorial/explore-yubao/语保9.webp)
+![语保8.webp](/tutorial/explore-yubao/语保8.webp)
+![语保9.webp](/tutorial/explore-yubao/语保9.webp)
 - 同样支持卡片、表格、地图三种模式
 - 卡片显示地名、具体发音、注释文字与分区
 - 表格支持搜索、排序、筛选

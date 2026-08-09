@@ -8,11 +8,11 @@
 
 1. 页面加载市級清单
 2. 点击目标市卡片上的「加载」
-![自然村树状图1.png](/tutorial/explore-villages-gd/自然村树状图1.webp)
+![自然村树状图1.webp](/tutorial/explore-villages-gd/自然村树状图1.webp)
 3. 逐级展开树状结构：市 → 区县 → 乡镇 → 行政村 → 自然村
-![自然村树状图2.png](/tutorial/explore-villages-gd/自然村树状图2.webp)
+![自然村树状图2.webp](/tutorial/explore-villages-gd/自然村树状图2.webp)
 4. 点击节点右侧的 🌍 打开地图弹窗
-![自然村树状图3.png](/tutorial/explore-villages-gd/自然村树状图3.webp)
+![自然村树状图3.webp](/tutorial/explore-villages-gd/自然村树状图3.webp)
 
 ## 节点信息
 
@@ -26,7 +26,7 @@
 - 搜索框只比对已载入的节点
 - 命中节点的高层路径自动展开
 - 命中文本高亮显示
-![自然村树状图4.png](/tutorial/explore-villages-gd/自然村树状图4.webp)
+![自然村树状图4.webp](/tutorial/explore-villages-gd/自然村树状图4.webp)
 
 ## 地图功能
 
@@ -35,7 +35,7 @@
 - 地图弹窗支持切换底图、重设视角(右上角切换)、全屏
 - **方言模式**：以不同颜色标示不同方言，不聚合
 - **村名模式**：点聚合显示
-![自然村树状图5.png](/tutorial/explore-villages-gd/自然村树状图5.webp)
+![自然村树状图5.webp](/tutorial/explore-villages-gd/自然村树状图5.webp)
 
 ## 提示
 

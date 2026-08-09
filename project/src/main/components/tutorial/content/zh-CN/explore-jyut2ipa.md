@@ -9,7 +9,7 @@
 3. 上传 Excel 文件（.xlsx、.xls，单文件上限 3 MB）
 4. 等待任务处理完成
 5. 预览结果并下载
-![粤拼1.png](/tutorial/explore-jyut2ipa/粤拼1.webp)
+![粤拼1.webp](/tutorial/explore-jyut2ipa/粤拼1.webp)
 
 ## 自定义规则
 
@@ -19,15 +19,15 @@
 - 可从 JSON 导入规则
 - 重设会恢复为默认规则
 - 规则保存到 localStorage，跨会话保持
-![粤拼2.png](/tutorial/explore-jyut2ipa/粤拼2.webp)
+![粤拼2.webp](/tutorial/explore-jyut2ipa/粤拼2.webp)
 
 ## 输出结果
 
 - 预览表显示前 10 笔数据
 - 字段包括：字、粤拼、IPA、声母、韵母、音调
 - 下载文件保留原始文件名并加前缀
-![粤拼3.png](/tutorial/explore-jyut2ipa/粤拼3.webp)
-![粤拼4.png](/tutorial/explore-jyut2ipa/粤拼4.webp)
+![粤拼3.webp](/tutorial/explore-jyut2ipa/粤拼3.webp)
+![粤拼4.webp](/tutorial/explore-jyut2ipa/粤拼4.webp)
 
 ## 提示
 

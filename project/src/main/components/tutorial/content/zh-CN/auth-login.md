@@ -23,8 +23,8 @@
 ## 没有账号？
 
 点击底部的「没有账号？」链接可切换到注册页面。注册只需邮箱 + 密码 + 用户名。
-![登录1.png](/tutorial/auth-login/登录1.webp)
-![登录2.png](/tutorial/auth-login/登录2.webp)
+![登录1.webp](/tutorial/auth-login/登录1.webp)
+![登录2.webp](/tutorial/auth-login/登录2.webp)
 
 ## 提示
 

@@ -12,9 +12,9 @@
 
 1. 填写分区名称
 2. 手动输入地点或通过「选择地点」按钮添加地点
-![分区1.png](/tutorial/auth-regions/分区1.webp)
-![分区2.png](/tutorial/auth-regions/分区2.webp)
-![分区3.png](/tutorial/auth-regions/分区3.webp)
+![分区1.webp](/tutorial/auth-regions/分区1.webp)
+![分区2.webp](/tutorial/auth-regions/分区2.webp)
+![分区3.webp](/tutorial/auth-regions/分区3.webp)
 3. 手动输入时用空格或换行分隔地点，系统自动去重
 4. 每个分区最多 1000 个地点
 5. 地点数 ≥ 1 且名称非空时才能储存

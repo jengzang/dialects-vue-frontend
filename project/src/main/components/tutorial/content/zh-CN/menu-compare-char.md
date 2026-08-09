@@ -8,7 +8,7 @@
 2. 选择比较角度：声母、韵母或声调
 3. 输入地点或分区
 4. 点击「比较」，直接跳转到地图页面
-![比较1.png](/tutorial/menu-compare-char/比较1.webp)
+![比较1.webp](/tutorial/menu-compare-char/比较1.webp)
 
 ## 结果解读
 
@@ -18,21 +18,21 @@
 - **黄色**：部分相同
 - **红色**：完全不同
 - 灰色：无数据
-![比较2.png](/tutorial/menu-compare-char/比较2.webp)
+![比较2.webp](/tutorial/menu-compare-char/比较2.webp)
 
 ## 典型用例
 
 - 「心」与「时」的声母比较，可大致看出粤方言的边擦音分布
-![比较4.png](/tutorial/menu-compare-char/比较4.webp)
+![比较4.webp](/tutorial/menu-compare-char/比较4.webp)
 - 「客」与「黑」的调值比较，可大致看出粤方言的阴入情况
-![比较5.png](/tutorial/menu-compare-char/比较5.webp)
+![比较5.webp](/tutorial/menu-compare-char/比较5.webp)
 - 「九」与「酒」的声母比较，可看出南方方言的颚化情况
-![比较6.png](/tutorial/menu-compare-char/比较6.webp)
+![比较6.webp](/tutorial/menu-compare-char/比较6.webp)
 
 ## 结果交互
 
 - 点击地图上的点可弹窗查看具体读音细节
-![比较3.png](/tutorial/menu-compare-char/比较3.webp)
+![比较3.webp](/tutorial/menu-compare-char/比较3.webp)
 - 支持全屏放大查看
 - 可切换显示地名标签
 

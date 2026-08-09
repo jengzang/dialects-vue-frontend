@@ -9,15 +9,15 @@
 3. 选择第一层分类和第二层分类（不能选同一栏）
 4. 输入 1 个地点
 5. 点击「查询」
-![演化1.png](/tutorial/menu-pho-evolution/演化1.webp)
+![演化1.webp](/tutorial/menu-pho-evolution/演化1.webp)
 
 ## 结果展示
 
 - 查询成功后出现「声母、韵母、声调」三个切换按钮
 - **饼图**：展示当前分类下的音变分布
-![演化2.png](/tutorial/menu-pho-evolution/演化2.webp)
+![演化2.webp](/tutorial/menu-pho-evolution/演化2.webp)
 - **桑基图（Sankey）**：展示音变流向，可切换显示
-![演化3.png](/tutorial/menu-pho-evolution/演化3.webp)
+![演化3.webp](/tutorial/menu-pho-evolution/演化3.webp)
 - 桌面端：鼠标悬停或点击饼图可显示细节卡片
 - 手机端：以可关闭的卡片方式显示
 

@@ -11,16 +11,16 @@
    - **纵向**：第二层分类（如发声部位、韵摄）
    - **格内**：单元格内的细分（如声母、等）
 4. 点击「查询」
-![音素查询2.jpg](/tutorial/menu-pho-custom/音素查询2.webp)
+![音素查询2.webp](/tutorial/menu-pho-custom/音素查询2.webp)
 
 ## 典型用例
 
 - 横向按清浊、纵向按发声部位、格内按声母 → 整理出每个声母音值的数量分布
-![音素查询3.jpg](/tutorial/menu-pho-custom/音素查询3.webp)
+![音素查询3.webp](/tutorial/menu-pho-custom/音素查询3.webp)
 - 横向按开合口、纵向按韵摄、格内按等 → 整理出各韵母音值的数目
-![音素查询4.jpg](/tutorial/menu-pho-custom/音素查询4.webp)
+![音素查询4.webp](/tutorial/menu-pho-custom/音素查询4.webp)
 - 横向按清浊、纵向按调类、格内按声母 → 整理出各分类中调类的数目
-![音素查询1.png](/tutorial/menu-pho-custom/音素查询1.webp)
+![音素查询1.webp](/tutorial/menu-pho-custom/音素查询1.webp)
 
 ## 交互
 

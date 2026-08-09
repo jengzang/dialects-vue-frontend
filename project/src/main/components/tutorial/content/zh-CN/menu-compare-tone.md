@@ -8,7 +8,7 @@
 2. 再勾选第二个调类（如阳上）
 3. 输入地点或分区
 4. 点击「比较」，直接跳转到地图页面
-![比较调类1.png](/tutorial/menu-compare-tone/比较调类1.webp)
+![比较调类1.webp](/tutorial/menu-compare-tone/比较调类1.webp)
 
 ## 结果解读
 
@@ -22,11 +22,11 @@
 ## 典型用例
 
 - 珠三角一带的阳上、阴去合并情况
-![比较调类2.png](/tutorial/menu-compare-tone/比较调类2.webp)
+![比较调类2.webp](/tutorial/menu-compare-tone/比较调类2.webp)
 - 客家话阴平、阴去合并情况
-![比较调类3.png](/tutorial/menu-compare-tone/比较调类3.webp)
+![比较调类3.webp](/tutorial/menu-compare-tone/比较调类3.webp)
 - 南方方言的阴入、阳入合并情况
-![比较调类4.png](/tutorial/menu-compare-tone/比较调类4.webp)
+![比较调类4.webp](/tutorial/menu-compare-tone/比较调类4.webp)
 - 四邑、莞宝的阴平、阴去、阳上调类格局
 
 ## 限制
