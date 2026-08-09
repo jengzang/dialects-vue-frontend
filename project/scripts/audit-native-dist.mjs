@@ -28,7 +28,6 @@ async function listFiles(root, prefix = '') {
 
   for (const entry of entries) {
     const relativePath = path.posix.join(prefix.split(path.sep).join(path.posix.sep), entry.name)
-    const absolutePath = path.join(root, prefix, entry.name)
 
     if (entry.isDirectory()) {
       files.push(...await listFiles(root, path.join(prefix, entry.name)))
@@ -45,6 +44,7 @@ export function auditNativeDistFiles(files) {
 
   return files.filter((filePath) => (
     forbiddenPathSet.has(filePath) ||
+    NATIVE_DIST_FORBIDDEN_PATHS.some((forbiddenPath) => filePath.startsWith(`${forbiddenPath}/`)) ||
     NATIVE_DIST_FORBIDDEN_GLOBS.some((pattern) => pattern.test(filePath))
   ))
 }

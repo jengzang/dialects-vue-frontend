@@ -8,6 +8,13 @@ import {
 import { getNativeDistPruneManifest } from '../src/platform/index.js'
 
 describe('native dist pruning manifest', () => {
+  it('removes bundled tutorial screenshots from native builds', () => {
+    const manifest = getNativeDistPruneManifest()
+
+    expect(NATIVE_DIST_PRUNE_PATHS).toEqual(manifest.paths)
+    expect(NATIVE_DIST_PRUNE_PATHS).toContain('tutorial')
+  })
+
   it('keeps GIS static resources in native builds', () => {
     const manifest = getNativeDistPruneManifest()
 

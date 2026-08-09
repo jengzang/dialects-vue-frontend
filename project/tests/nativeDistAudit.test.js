@@ -17,6 +17,13 @@ describe('native dist audit manifest', () => {
     expect(NATIVE_DIST_FORBIDDEN_GLOBS.some((pattern) => pattern.test('assets/voronoiClip.worker-BB4duF4T.js'))).toBe(false)
   })
 
+  it('fails native dist audit when bundled tutorial screenshots remain', () => {
+    expect(auditNativeDistFiles([
+      'tutorial/menu-query-char/01-输入页面.webp',
+      'assets/index.Dav9-R3r.js',
+    ])).toEqual(['tutorial/menu-query-char/01-输入页面.webp'])
+  })
+
   it('allows GIS native files and ordinary map assets', () => {
     expect(auditNativeDistFiles([
       'assets/MapPage.D_UChiyI.js',
