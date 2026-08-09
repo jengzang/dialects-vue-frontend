@@ -20,6 +20,9 @@ const mocks = vi.hoisted(() => {
     mapSelectFeatures: vi.fn(),
     mapCanDeleteSelected: vi.fn(),
     mapDeleteSelected: vi.fn(),
+    mapImportGeoJson: vi.fn(),
+    routerPush: vi.fn(),
+    isAuthenticated: { value: true },
     AUTO_DRAFT_ID: '__map_draw_auto_draft__',
   }
 })
@@ -32,11 +35,12 @@ vi.mock('vue-i18n', () => ({
 
 vi.mock('vue-router', () => ({
   useRoute: () => ({ query: {} }),
+  useRouter: () => ({ push: mocks.routerPush }),
 }))
 
 vi.mock('@/composables/router/useAuthGuard.js', () => ({
   useAuthGuard: () => ({
-    isAuthenticated: ref(true),
+    isAuthenticated: mocks.isAuthenticated,
     requireAuth: vi.fn(),
   }),
 }))
@@ -101,11 +105,12 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         selectFeatures: mocks.mapSelectFeatures,
         canDeleteSelected: mocks.mapCanDeleteSelected,
         deleteSelected: mocks.mapDeleteSelected,
-        importGeoJson: vi.fn((_featureCollection, options = {}) => {
+        importGeoJson: (featureCollection, options = {}) => {
+          mocks.mapImportGeoJson(featureCollection, options)
           if (options.emitSelection !== false) {
             emit('feature-select', '')
           }
-        }),
+        },
         syncReadonlyLayers: vi.fn(),
         removeReadonlyLayerById: vi.fn(),
         resetView: vi.fn(),
@@ -270,6 +275,7 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       canModifyActiveLayer: { type: Boolean, default: false },
     },
     emits: [
+      'set-mode',
       'toggle-feature-selection',
       'select-all-features',
       'invert-feature-selection',
@@ -291,6 +297,13 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
         <span data-testid="active-layer-id">{{ activeLayer?.id || '' }}</span>
         <span data-testid="current-mode">{{ currentMode }}</span>
         <span data-testid="selected-vertex-count">{{ selectedVertexCount }}</span>
+        <button
+          data-testid="draw-polygon-mode"
+          type="button"
+          @click="$emit('set-mode', 'draw_polygon')"
+        >
+          draw polygon mode
+        </button>
         <label v-for="feature in featureItems" :key="feature.id" data-testid="feature-row">
           <input
             data-testid="feature-checkbox"
@@ -656,6 +669,9 @@ describe('MapDrawTab draft safety', () => {
     mocks.mapCanDeleteSelected.mockReset()
     mocks.mapCanDeleteSelected.mockReturnValue(true)
     mocks.mapDeleteSelected.mockReset()
+    mocks.mapImportGeoJson.mockReset()
+    mocks.routerPush.mockReset()
+    mocks.isAuthenticated.value = true
     readImportedLayerFile.mockReset()
     splitFeatureCollectionByGeometryType.mockReset()
 
@@ -665,6 +681,93 @@ describe('MapDrawTab draft safety', () => {
 
   afterEach(() => {
     document.body.innerHTML = ''
+  })
+
+  it('keeps drawing tools visible but blocks unauthenticated draw-mode writes', async () => {
+    mocks.isAuthenticated.value = false
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.showConfirm.mockResolvedValue(false)
+
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="tools-panel"]')).toBeTruthy()
+
+    wrapper.host.querySelector('[data-testid="draw-polygon-mode"]').click()
+    await flushTicks()
+
+    expect(mocks.showConfirm).toHaveBeenCalledWith('map.drawTab.auth.loginRequired')
+    expect(wrapper.host.querySelector('[data-testid="active-layer-id"]').textContent).toBe('')
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('simple_select')
+    expect(mocks.mapSetDrawMode).not.toHaveBeenCalledWith('draw_polygon')
+
+    wrapper.unmount()
+  })
+
+  it('blocks unauthenticated draw-mode writes when an editable layer already exists', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="active-layer-id"]').textContent).not.toBe('')
+
+    mocks.mapSetDrawMode.mockClear()
+    mocks.isAuthenticated.value = false
+    mocks.showConfirm.mockResolvedValue(false)
+    wrapper.host.querySelector('[data-testid="draw-polygon-mode"]').click()
+    await flushTicks()
+
+    expect(mocks.showConfirm).toHaveBeenCalledWith('map.drawTab.auth.loginRequired')
+    expect(mocks.mapSetDrawMode).not.toHaveBeenCalledWith('draw_polygon')
+
+    wrapper.unmount()
+  })
+
+  it('rejects unauthenticated feature changes emitted by the map canvas', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinate"]').textContent).toBe('1')
+
+    mocks.isAuthenticated.value = false
+    mocks.showConfirm.mockResolvedValue(false)
+    wrapper.host.querySelector('[data-testid="emit-geometry-update"]').click()
+    await flushTicks()
+
+    expect(mocks.showConfirm).toHaveBeenCalledWith('map.drawTab.auth.loginRequired')
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinate"]').textContent).toBe('1')
+    expect(mocks.mapImportGeoJson).toHaveBeenCalled()
+    const [syncedFeatureCollection, syncOptions] = mocks.mapImportGeoJson.mock.calls.at(-1)
+    expect(syncOptions).toEqual({ emitChanges: false, emitSelection: false })
+    expect(syncedFeatureCollection.features[0].geometry.coordinates[0][1][0]).toBe(1)
+
+    document.dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      key: 'z',
+      metaKey: true,
+    }))
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="active-layer-id"]').textContent).toBe('')
+
+    wrapper.unmount()
   })
 
   it('prompts to restore the hidden auto draft when one is available', async () => {
@@ -750,7 +853,7 @@ describe('MapDrawTab draft safety', () => {
     clickButtonContaining(wrapper.host, 'map.drawTab.buttons.saveToLocal')
     await nextTick()
     clickButtonContaining(wrapper.host, 'map.drawTab.buttons.saveAsNewLocal')
-    await nextTick()
+    await flushTicks()
     const input = wrapper.host.querySelector('input[type="text"]')
     expect(input).toBeTruthy()
     input.value = 'Saved draft'
@@ -789,7 +892,7 @@ describe('MapDrawTab draft safety', () => {
     clickButtonContaining(wrapper.host, 'map.drawTab.buttons.saveToLocal')
     await nextTick()
     clickButtonContaining(wrapper.host, 'map.drawTab.buttons.saveAsNewLocal')
-    await nextTick()
+    await flushTicks()
     const input = wrapper.host.querySelector('input[type="text"]')
     expect(input).toBeTruthy()
     input.value = 'Saved draft'
@@ -838,7 +941,7 @@ describe('MapDrawTab draft safety', () => {
     clickButtonContaining(wrapper.host, 'map.drawTab.buttons.saveToLocal')
     await nextTick()
     clickButtonContaining(wrapper.host, 'map.drawTab.buttons.saveAsNewLocal')
-    await nextTick()
+    await flushTicks()
     const input = wrapper.host.querySelector('input[type="text"]')
     expect(input).toBeTruthy()
     input.value = 'Saved draft'

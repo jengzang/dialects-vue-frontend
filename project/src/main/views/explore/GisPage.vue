@@ -88,14 +88,15 @@
         <div class="draw-map-area">
           <EditableMapLibre
             ref="editableMapRef"
-            v-model="activeLayerFeatureCollection"
             v-model:current-style-key="currentStyleKey"
+            :model-value="activeLayerFeatureCollection"
             :active-layer="activeLayer"
             :all-layers="layers"
             :preview-layers="voronoiPreviewLayers"
             :enable-preview-hover="voronoiPreviewLayers.length > 0"
             :feature-box-select-enabled="isFeatureBoxSelectMode"
-            @before-features-change="commitHistory"
+            @update:model-value="handleActiveLayerModelUpdate"
+            @before-features-change="handleBeforeFeaturesChange"
             @features-change="handleActiveLayerFeaturesChange"
             @feature-select="handleFeatureSelect"
             @feature-box-select="handleFeatureBoxSelect"
@@ -149,7 +150,7 @@
           :is-feature-box-select-mode="isFeatureBoxSelectMode"
           :can-use-feature-box-select="canUseFeatureBoxSelect"
           :can-modify-active-layer="canModifyActiveLayer"
-          @set-mode="setMode"
+          @set-mode="handleSetMode"
           @select-feature="handleSelectFeatureFromPanel"
           @toggle-feature-selection="handleToggleFeatureSelection"
           @select-all-features="handleSelectAllFeatures"
@@ -942,9 +943,48 @@ const handlePanelStyleUpdate = (value) => {
   handleStyleChange();
 };
 
+const handleSetMode = async (mode) => {
+  if (mode !== 'simple_select' && !await guardWrite()) return;
+  setMode(mode);
+};
+
 // ---- Feature change handler ----
-const handleActiveLayerFeaturesChange = (nextValue) => {
+let isRejectingUnauthenticatedFeatureChange = false;
+
+const rejectUnauthenticatedFeatureChange = async () => {
+  if (isRejectingUnauthenticatedFeatureChange) {
+    syncActiveLayerToMap();
+    return;
+  }
+  isRejectingUnauthenticatedFeatureChange = true;
+  try {
+    await guardWrite();
+    syncActiveLayerToMap();
+  } finally {
+    isRejectingUnauthenticatedFeatureChange = false;
+  }
+};
+
+const handleBeforeFeaturesChange = () => {
+  if (!isAuthenticated.value) return;
+  commitHistory();
+};
+
+const handleActiveLayerModelUpdate = async (nextValue) => {
+  if (!isAuthenticated.value) {
+    await rejectUnauthenticatedFeatureChange();
+    return;
+  }
+
   activeLayerFeatureCollection.value = nextValue;
+};
+
+const handleActiveLayerFeaturesChange = async () => {
+  if (!isAuthenticated.value) {
+    await rejectUnauthenticatedFeatureChange();
+    return;
+  }
+
   if (selectedFeatureIds.value.length > 0 || selectedFeatureId.value) {
     const fids = selectedFeatureIds.value.length > 0
       ? selectedFeatureIds.value
