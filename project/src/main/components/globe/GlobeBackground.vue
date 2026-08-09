@@ -3,7 +3,7 @@
     <Suspense>
       <GlobeGLRenderer :points="points" />
       <template #fallback>
-        <div class="globe-loading"></div>
+        <div class="globe-loading"><span class="ui-loading--page"></span></div>
       </template>
     </Suspense>
   </div>
@@ -55,5 +55,8 @@ const webglSupported = computed(() => {
 .globe-loading {
   width: 100%;
   height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

@@ -17,7 +17,7 @@ const containerRef = ref(null)
 let globe = null
 let resizeObserver = null
 let projShiftX = -0.3
-let projShiftY = -0.05
+let projShiftY = -0.1
 
 function getCssRgb(varName, fallback) {
   return getComputedStyle(document.documentElement)
@@ -46,6 +46,7 @@ function render() {
     .pointAltitude(0.001)
     .pointResolution(6)
     .pointLabel('name')
+    .onPointHover(() => {})
 
   globe.controls().autoRotate = false
   globe.controls().autoRotateSpeed = 0.4
@@ -53,12 +54,12 @@ function render() {
   globe.controls().enablePan = true
   globe.controls().enablePointerInteraction = true
 
-  globe.pointOfView({ lat: 28, lng: 85, altitude: 1.5 })
+  globe.pointOfView({ lat: 23, lng: 105, altitude: 1.5 })
 
   patchCameraProjection()
 
-  dumpGlobeParams()
-  globe.controls().addEventListener('end', dumpGlobeParams)
+  // dumpGlobeParams()
+  // globe.controls().addEventListener('end', dumpGlobeParams)
 
   if (globe.renderer()) {
     globe.renderer().setClearColor(0x000000, 0)
@@ -100,6 +101,7 @@ function patchCameraProjection() {
     orig()
     cam.projectionMatrix.elements[8] = projShiftX
     cam.projectionMatrix.elements[9] = projShiftY
+    cam.projectionMatrixInverse.copy(cam.projectionMatrix).invert()
   }
 }
 
@@ -115,27 +117,28 @@ function onKeyDown(e) {
     default: return
   }
   e.preventDefault()
+  
   globe.camera().updateProjectionMatrix()
-  console.log('[Proj shift]', { x: projShiftX.toFixed(3), y: projShiftY.toFixed(3) }, '| pov:', globe.pointOfView())
+  // console.log('[Proj shift]', { x: projShiftX.toFixed(3), y: projShiftY.toFixed(3) }, '| pov:', globe.pointOfView())
 }
 
-function dumpGlobeParams() {
-  if (!globe) return
-  const cam = globe.camera()
-  const ctrl = globe.controls()
-  const target = ctrl?.target
-  const pov = globe.pointOfView()
-  const containerRect = containerRef.value?.getBoundingClientRect()
-
-  console.log('[Globe params]', {
-    pointOfView: pov,
-    camera: cam ? {
-      position: { x: cam.position.x, y: cam.position.y, z: cam.position.z },
-    } : null,
-    controlsTarget: target ? { x: target.x, y: target.y, z: target.z } : null,
-    container: containerRect ? { w: Math.round(containerRect.width), h: Math.round(containerRect.height) } : null,
-  })
-}
+// function dumpGlobeParams() {
+//   if (!globe) return
+//   const cam = globe.camera()
+//   const ctrl = globe.controls()
+//   const target = ctrl?.target
+//   const pov = globe.pointOfView()
+//   const containerRect = containerRef.value?.getBoundingClientRect()
+//
+//   console.log('[Globe params]', {
+//     pointOfView: pov,
+//     camera: cam ? {
+//       position: { x: cam.position.x, y: cam.position.y, z: cam.position.z },
+//     } : null,
+//     controlsTarget: target ? { x: target.x, y: target.y, z: target.z } : null,
+//     container: containerRect ? { w: Math.round(containerRect.width), h: Math.round(containerRect.height) } : null,
+//   })
+// }
 
 function updatePoints() {
   if (!globe) return

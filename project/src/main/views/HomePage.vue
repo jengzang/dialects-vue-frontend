@@ -1794,7 +1794,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
     &-subtitle {
       margin-top: 0;
-      font-size: clamp(0.8rem, 3dvw, 1.1rem);
+      font-size: clamp(0.7rem, 3dvw, 1.1rem);
     }
 
     &-content {
@@ -1810,7 +1810,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
     &-logo {
       width: clamp(180px, 50vw, 340px);
-      margin: 0.5rem;
+      margin: 0;
     }
 
     &-actions {
