@@ -219,13 +219,14 @@ function openGuide() {
     return
   }
 
-  if (!disclaimerShown) {
-    disclaimerShown = true
-    showConfirm(t('tutorial.disclaimer.message'), {
-      title: t('tutorial.disclaimer.title'),
-      confirmText: t('tutorial.disclaimer.confirm'),
-    })
-  }
+  // 教程内容已正式更新，暂时不需要 AI 免责弹窗
+  // if (!disclaimerShown) {
+  //   disclaimerShown = true
+  //   showConfirm(t('tutorial.disclaimer.message'), {
+  //     title: t('tutorial.disclaimer.title'),
+  //     confirmText: t('tutorial.disclaimer.confirm'),
+  //   })
+  // }
 
   selectedKey.value = currentMatchedEntry.value.key
   isCatalogOpen.value = true

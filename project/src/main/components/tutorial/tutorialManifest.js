@@ -98,7 +98,7 @@ export const tutorialManifest = [
   createPathEntry({
     key: 'menu-map-custom',
     categoryKey: 'account',
-    groupKey: 'menuMapCustom',
+    groupKey: 'authData',
     order: 4,
     path: '/menu/map/custom',
   }),
@@ -229,7 +229,7 @@ export const tutorialManifest = [
   }),
   createPathEntry({
     key: 'explore-yc-spoken',
-    categoryKey: 'corpusAndCharClass',
+    categoryKey: 'yangchun',
     groupKey: 'exploreYcSpoken',
     order: 32,
     path: '/explore/yc/words',
@@ -321,6 +321,6 @@ export const tutorialManifest = [
     categoryKey: 'villages',
     groupKey: 'villagesML',
     order: 52,
-    pathPrefix: '/villagesML',
+    pathPrefix: '/explore/villages/ml',
   }),
 ]
