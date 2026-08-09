@@ -21,13 +21,24 @@
 
 ## 实例
 
-- 阳春白话「你」字的元音轨迹：从 ɛ 往下滑到 æ，再往上到 ɨ
-- 东莞石排「宝」的韵母：起点介于 ə 和 ɐ 之间，终点未达到 u
+阳春白话「你」字的元音轨迹：从 ɛ 往下滑到 æ，再往上滑到 ɨ 附近结束。
+
+![阳春白话「你」字元音滑动轨迹](/tutorial/explore-praat-vowelspace/01-ni-trajectory.webp)
+
+阳春合水涯话的「高」字，韵母并不完全是 ɔ，有向上滑动的动程：
+
+![阳春合水涯话「高」字元音](/tutorial/explore-praat-vowelspace/02-gao-vowel.webp)
+
+东莞石排话的「宝」，起点介于 ə 和 ɐ 之间，终点未达到 u：
+
+![东莞石排话「宝」字元音](/tutorial/explore-praat-vowelspace/03-bao-vowel.webp)
+
+连续语流模式的元音点非常散，需要点击具体的每一段去查看，但误差较大：
+
+![连续语流模式元音散点图](/tutorial/explore-praat-vowelspace/04-continuous-scatter.webp)
 
 ## 提示
 
 - 连续语流模式的元音点非常散，误差较大
 - 如需精确分析，推荐单音节 + 仔细截取
 - 没有 formant 数据时，此页面无法使用
-
-![元音空間圖——F1/F2 共振峰繪製](/tutorial/explore-praat-vowelspace/01-overview.webp)
