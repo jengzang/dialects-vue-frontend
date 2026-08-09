@@ -16,13 +16,13 @@
     "hideTutorialTip": "You can re-enable tutorials in About - Settings."
   },
   "categories": {
-    "account": "Account & Personal Data",
     "multiCompare": "Multi-Variety Comparison",
     "singleAnalysis": "Single-Variety Analysis",
     "corpusAndCharClass": "Corpus & Character Sets",
     "yangchun": "Yangchun",
     "practicalTools": "Practical Tools",
-    "villages": "Village Analysis"
+    "villages": "Village Analysis",
+    "account": "Account & Personal Data"
   },
   "groups": {
     "authAccount": "Account Management",
@@ -32,11 +32,11 @@
     "menuCompare": "Compare",
     "menuMapOverview": "Map & Results",
     "menuPhonology": "Phonology Analysis",
+    "menuVocabulary": "Vocabulary",
     "exploreYubao": "YuBao Corpus",
     "exploreCharClass": "Character Sets",
     "exploreYcSpoken": "Yangchun Spoken",
     "praat": "Praat Acoustic Analysis",
-    "menuVocabulary": "Vocabulary",
     "exploreTools": "Character Table Tools",
     "menuMapDraw": "Map Drawing",
     "exploreVillages": "Guangdong Villages",

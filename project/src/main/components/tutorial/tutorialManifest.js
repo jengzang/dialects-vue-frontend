@@ -62,47 +62,6 @@ function normalizePraatTab(currentRoute) {
 }
 
 export const tutorialManifest = [
-  // ==================== 账户与个人数据 ====================
-  createQueryEntry({
-    key: 'auth-login',
-    categoryKey: 'account',
-    groupKey: 'authAccount',
-    order: 0,
-    path: '/auth',
-    queryResolver: normalizeAuthView,
-    expectedValue: 'login',
-  }),
-  createQueryEntry({
-    key: 'auth-overview',
-    categoryKey: 'account',
-    groupKey: 'authAccount',
-    order: 1,
-    path: '/auth',
-    queryResolver: normalizeAuthView,
-    expectedValue: 'overview',
-  }),
-  createPathEntry({
-    key: 'auth-data',
-    categoryKey: 'account',
-    groupKey: 'authData',
-    order: 2,
-    path: '/auth/data',
-  }),
-  createPathEntry({
-    key: 'auth-regions',
-    categoryKey: 'account',
-    groupKey: 'authData',
-    order: 3,
-    path: '/auth/regions',
-  }),
-  createPathEntry({
-    key: 'menu-map-custom',
-    categoryKey: 'account',
-    groupKey: 'authData',
-    order: 4,
-    path: '/menu/map/custom',
-  }),
-
   // ==================== 多方言点对比分析 ====================
   createPathEntry({
     key: 'menu-query-char',
@@ -213,47 +172,47 @@ export const tutorialManifest = [
   }),
 
   // ==================== 词句与字集 ====================
-  createPathPrefixEntry({
-    key: 'explore-yubao',
-    categoryKey: 'corpusAndCharClass',
-    groupKey: 'exploreYubao',
-    order: 30,
-    pathPrefix: '/menu/yubao',
-  }),
-  createPathPrefixEntry({
-    key: 'explore-char-class',
-    categoryKey: 'corpusAndCharClass',
-    groupKey: 'exploreCharClass',
-    order: 31,
-    pathPrefix: '/explore/char-class',
-  }),
-  createPathEntry({
-    key: 'explore-yc-spoken',
-    categoryKey: 'yangchun',
-    groupKey: 'exploreYcSpoken',
-    order: 32,
-    path: '/explore/yc/words',
-  }),
   createPathEntry({
     key: 'menu-vocabulary-view',
     categoryKey: 'corpusAndCharClass',
     groupKey: 'menuVocabulary',
-    order: 33,
+    order: 30,
     path: '/menu/vocabulary/view',
   }),
   createPathEntry({
     key: 'menu-vocabulary-import',
     categoryKey: 'corpusAndCharClass',
     groupKey: 'menuVocabulary',
-    order: 34,
+    order: 31,
     path: '/menu/vocabulary/import',
   }),
   createPathEntry({
     key: 'menu-vocabulary-manage',
     categoryKey: 'corpusAndCharClass',
     groupKey: 'menuVocabulary',
-    order: 35,
+    order: 32,
     path: '/menu/vocabulary/manage',
+  }),
+  createPathPrefixEntry({
+    key: 'explore-yubao',
+    categoryKey: 'corpusAndCharClass',
+    groupKey: 'exploreYubao',
+    order: 33,
+    pathPrefix: '/menu/yubao',
+  }),
+  createPathPrefixEntry({
+    key: 'explore-char-class',
+    categoryKey: 'corpusAndCharClass',
+    groupKey: 'exploreCharClass',
+    order: 34,
+    pathPrefix: '/explore/char-class',
+  }),
+  createPathEntry({
+    key: 'explore-yc-spoken',
+    categoryKey: 'yangchun',
+    groupKey: 'exploreYcSpoken',
+    order: 35,
+    path: '/explore/yc/words',
   }),
 
   // ==================== 实用工具 ====================
@@ -343,5 +302,46 @@ export const tutorialManifest = [
     groupKey: 'villagesML',
     order: 52,
     pathPrefix: '/explore/villages/ml',
+  }),
+
+  // ==================== 账户与个人数据 ====================
+  createQueryEntry({
+    key: 'auth-login',
+    categoryKey: 'account',
+    groupKey: 'authAccount',
+    order: 60,
+    path: '/auth',
+    queryResolver: normalizeAuthView,
+    expectedValue: 'login',
+  }),
+  createQueryEntry({
+    key: 'auth-overview',
+    categoryKey: 'account',
+    groupKey: 'authAccount',
+    order: 61,
+    path: '/auth',
+    queryResolver: normalizeAuthView,
+    expectedValue: 'overview',
+  }),
+  createPathEntry({
+    key: 'auth-data',
+    categoryKey: 'account',
+    groupKey: 'authData',
+    order: 62,
+    path: '/auth/data',
+  }),
+  createPathEntry({
+    key: 'auth-regions',
+    categoryKey: 'account',
+    groupKey: 'authData',
+    order: 63,
+    path: '/auth/regions',
+  }),
+  createPathEntry({
+    key: 'menu-map-custom',
+    categoryKey: 'account',
+    groupKey: 'authData',
+    order: 64,
+    path: '/menu/map/custom',
   }),
 ]
