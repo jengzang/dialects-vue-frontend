@@ -9,6 +9,8 @@
 3. 輸入地點或分割槽
 4. 點選「執行」
 
+![查音位輸入頁面](/tutorial/menu-query-yinwei/01-input.webp)
+
 ## 結果頁面
 
 - 按所選維度分組，展示該音位對應的中古來源分佈
@@ -16,11 +18,15 @@
 - 點選各來源可彈窗細分查詢
 - 點選地名可檢視詳情
 
+![查音位結果——中古來源分佈](/tutorial/menu-query-yinwei/02-result.webp)
+
 ## 地圖頁面
 
 - 將音位來源的地理分佈繪製在地圖上
 - 可直觀檢視某一讀音的地理分佈特徵
 - 點選地圖上的點可彈窗檢視詳情
+
+![地圖模式——音位地理分佈](/tutorial/menu-query-yinwei/03-map.webp)
 
 ## 常見用法示例
 
@@ -33,9 +39,3 @@
 - 此功能計算複雜度較高，地點太多時容易超時，建議先減少地點多試幾次
 - 與查中古的區別：查音位是從實際讀音出發，適合做音類分合的探索性分析
 - 如果只是想檢視某個字的讀音，用「查字」更直接
-
-![查音位輸入頁面](/tutorial/menu-query-yinwei/01-input.webp)
-
-![查音位結果——中古來源分佈](/tutorial/menu-query-yinwei/02-result.webp)
-
-![地圖模式——音位地理分佈](/tutorial/menu-query-yinwei/03-map.webp)

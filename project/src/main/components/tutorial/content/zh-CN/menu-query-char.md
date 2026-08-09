@@ -8,6 +8,8 @@
 2. 在下方地点/分区区域选择方言点或分区
 3. 点击「运行」按钮，自动跳转到结果页面
 
+![查字輸入頁面](/tutorial/menu-query-char/01-input.webp)
+
 ## 结果页面
 
 - 每个方言点显示该汉字的具体读音（IPA）
@@ -15,6 +17,10 @@
 - 颜色标注文白读：红色为文读、蓝色为白读、黑色为普通读音
 - 点击地名可弹窗查看该方言点的详细信息
 - 点击音值可反查音节来源
+
+![查字結果頁面——各地方言讀音](/tutorial/menu-query-char/02-result.webp)
+
+![文白讀顏色標注：藍白讀、紅文讀](/tutorial/menu-query-char/04-wenbai.webp)
 
 ## 地图页面
 
@@ -25,6 +31,8 @@
 - 右上角可切换显示地名标签
 - 地图支持全屏展示，方便截图
 - 可切换不同底图（街道图、地形图等）
+
+![地圖模式——讀音地理分布](/tutorial/menu-query-char/03-map.webp)
 
 ## 筛选与统计
 
@@ -39,11 +47,3 @@
 - 地点支持模糊匹配，输入简繁均可
 - 输入行政区划名称可匹配该区域所有方言点
 - 与查中古不同：查字以汉字为出发点，直接看读音
-
-![查字輸入頁面](/tutorial/menu-query-char/01-input.webp)
-
-![查字結果頁面——各地方言讀音](/tutorial/menu-query-char/02-result.webp)
-
-![地圖模式——讀音地理分布](/tutorial/menu-query-char/03-map.webp)
-
-![文白讀顏色標注：藍白讀、紅文讀](/tutorial/menu-query-char/04-wenbai.webp)

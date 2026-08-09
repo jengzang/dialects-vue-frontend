@@ -10,6 +10,8 @@
 4. 点击「详情」可查看所选地位组合具体包含哪些字
 5. 输入地点或分区，点击「运行」
 
+![查中古輸入頁面](/tutorial/menu-query-zhonggu/01-input.webp)
+
 ## 结果页面
 
 - 按中古地位分组展示各地方言读音
@@ -18,6 +20,10 @@
 - 点击音值可弹窗反查音节来源
 - 点击地名可查看方言点详细信息
 - 左侧地点列表可快速跳转
+
+![查中古結果頁面——按中古地位分組展示](/tutorial/menu-query-zhonggu/02-result.webp)
+
+![文白讀顏色標注：紅文讀、藍白讀](/tutorial/menu-query-zhonggu/04-wenbai.webp)
 
 ## 筛选与细分查询
 
@@ -32,6 +38,8 @@
 - **全显模式**：方框包着汉字，显示所有地位
 - **主体模式**：只显示一行汉字，筛掉占比过低或字数过少的地位，更节省空间
 
+![右下角切換顯示模式：全顯 vs 主體](/tutorial/menu-query-zhonggu/05-display-mode.webp)
+
 ## 地图页面
 
 - 默认显示占比最高的音值
@@ -41,19 +49,11 @@
   - 小于 20%：不显示
 - 点击地图上的点可弹窗查看详情
 
+![地圖頁面——方言數據空間分布](/tutorial/menu-query-zhonggu/03-map.webp)
+
 ## 提示
 
 - 首次使用建议只选 1-2 个核心条件，结果更容易看懂
 - 结果太多时先加分區缩小范围；结果太少时减少条件数量
 - 按鈕灰色時通常表示中古条件尚未形成有效查询
 - 想从字形出发查读音用「查字」；想从音值倒推中古来源用「查音位」
-
-![查中古輸入頁面](/tutorial/menu-query-zhonggu/01-input.webp)
-
-![查中古結果頁面——按中古地位分組展示](/tutorial/menu-query-zhonggu/02-result.webp)
-
-![地圖頁面——方言數據空間分布](/tutorial/menu-query-zhonggu/03-map.webp)
-
-![文白讀顏色標注：紅文讀、藍白讀](/tutorial/menu-query-zhonggu/04-wenbai.webp)
-
-![右下角切換顯示模式：全顯 vs 主體](/tutorial/menu-query-zhonggu/05-display-mode.webp)
