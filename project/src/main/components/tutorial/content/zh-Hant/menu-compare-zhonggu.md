@@ -10,7 +10,7 @@
 4. 修改條件，組出第二組條件
 5. 點選「加入組 2」
 6. 輸入地點或分割槽，點選「比較」
-![比較中古1.webp](/tutorial/menu-compare-zhonggu/比較中古1.webp)
+![比較中古1.webp](/tutorial/menu-compare-zhonggu/比较中古1.webp)
 
 ## 核心互動
 
@@ -37,7 +37,7 @@
 
 同一地點內部比較時，該演算法更為可靠（因為同一地點音值不同即意味著音類不同）。
 
-![比較中古2.webp](/tutorial/menu-compare-zhonggu/比較中古2.webp)
+![比較中古2.webp](/tutorial/menu-compare-zhonggu/比较中古2.webp)
 
 ## 提示
 
@@ -45,4 +45,4 @@
 - 第一次使用建議每組只放一條條件，確認流程後再增加
 - 想先單獨檢視某組條件的結果，先用「查中古」各自查一遍
 - 可以彈窗檢視具體資訊
-![比較中古3.webp](/tutorial/menu-compare-zhonggu/比較中古3.webp)
+![比較中古3.webp](/tutorial/menu-compare-zhonggu/比较中古3.webp)

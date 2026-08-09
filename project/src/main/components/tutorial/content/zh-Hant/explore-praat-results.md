@@ -16,15 +16,15 @@
 
 ### 共振峰與頻譜圖
 
-共振峰軌跡反映元音音值；頻譜圖展示頻率-時間的能量分佈（僅支援 3 秒以內語音，需手動點選載入）：
+共振峰軌跡反映母音音值；頻譜圖展示頻率-時間的能量分佈（僅支援 3 秒以內語音，需手動點選載入）：
 
 ![共振峰軌跡和頻譜圖](/tutorial/explore-praat-results/03-formant-spectrogram.webp)
 
-### 品質分析與設定
+### 質量分析與設定
 
 音質分析包括諧噪比（HNR）、基頻微擾（jitter）、振幅微擾（shimmer）等指標。點選齒輪圖示可重新調整分析設定：
 
-![品質分析卡片和分析設定](/tutorial/explore-praat-results/04-quality-and-settings.webp)
+![質量分析卡片和分析設定](/tutorial/explore-praat-results/04-quality-and-settings.webp)
 
 ## 連續語流分析結果
 
@@ -48,9 +48,9 @@
 
 ![連續語流頻譜圖載入完成](/tutorial/explore-praat-results/09-spectrogram-loaded.webp)
 
-連續語流的品質分析結果：
+連續語流的質量分析結果：
 
-![連續語流品質分析](/tutorial/explore-praat-results/10-continuous-quality.webp)
+![連續語流質量分析](/tutorial/explore-praat-results/10-continuous-quality.webp)
 
 ## 圖表互動
 

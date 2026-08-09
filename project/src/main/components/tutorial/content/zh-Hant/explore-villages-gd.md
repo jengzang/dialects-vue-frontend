@@ -8,11 +8,11 @@
 
 1. 頁面載入市級清單
 2. 點選目標市卡片上的「載入」
-![自然村樹狀圖1.webp](/tutorial/explore-villages-gd/自然村樹狀圖1.webp)
+![自然村樹狀圖1.webp](/tutorial/explore-villages-gd/自然村树状图1.webp)
 3. 逐級展開樹狀結構：市 → 區縣 → 鄉鎮 → 行政村 → 自然村
-![自然村樹狀圖2.webp](/tutorial/explore-villages-gd/自然村樹狀圖2.webp)
+![自然村樹狀圖2.webp](/tutorial/explore-villages-gd/自然村树状图2.webp)
 4. 點選節點右側的 🌍 開啟地圖彈窗
-![自然村樹狀圖3.webp](/tutorial/explore-villages-gd/自然村樹狀圖3.webp)
+![自然村樹狀圖3.webp](/tutorial/explore-villages-gd/自然村树状图3.webp)
 
 ## 節點資訊
 
@@ -26,7 +26,7 @@
 - 搜尋框只比對已載入的節點
 - 命中節點的高層路徑自動展開
 - 命中文本高亮顯示
-![自然村樹狀圖4.webp](/tutorial/explore-villages-gd/自然村樹狀圖4.webp)
+![自然村樹狀圖4.webp](/tutorial/explore-villages-gd/自然村树状图4.webp)
 
 ## 地圖功能
 
@@ -35,7 +35,7 @@
 - 地圖彈窗支援切換底圖、重設視角(右上角切換)、全屏
 - **方言模式**：以不同顏色標示不同方言，不聚合
 - **村名模式**：點聚合顯示
-![自然村樹狀圖5.webp](/tutorial/explore-villages-gd/自然村樹狀圖5.webp)
+![自然村樹狀圖5.webp](/tutorial/explore-villages-gd/自然村树状图5.webp)
 
 ## 提示
 

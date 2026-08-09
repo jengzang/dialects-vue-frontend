@@ -11,16 +11,16 @@
    - **縱向**：第二層分類（如發聲部位、韻攝）
    - **格內**：單元格內的細分（如聲母、等）
 4. 點選「查詢」
-![音素查詢2.webp](/tutorial/menu-pho-custom/音素查詢2.webp)
+![音素查詢2.webp](/tutorial/menu-pho-custom/音素查询2.webp)
 
 ## 典型用例
 
 - 橫向按清濁、縱向按發聲部位、格內按聲母 → 整理出每個聲母音值的數量分佈
-![音素查詢3.webp](/tutorial/menu-pho-custom/音素查詢3.webp)
+![音素查詢3.webp](/tutorial/menu-pho-custom/音素查询3.webp)
 - 橫向按開合口、縱向按韻攝、格內按等 → 整理出各韻母音值的數目
-![音素查詢4.webp](/tutorial/menu-pho-custom/音素查詢4.webp)
+![音素查詢4.webp](/tutorial/menu-pho-custom/音素查询4.webp)
 - 橫向按清濁、縱向按調類、格內按聲母 → 整理出各分類中調類的數目
-![音素查詢1.webp](/tutorial/menu-pho-custom/音素查詢1.webp)
+![音素查詢1.webp](/tutorial/menu-pho-custom/音素查询1.webp)
 
 ## 互動
 

@@ -12,15 +12,15 @@
 ### 全量資料（預設）
 
 - **餅圖**：檢視各音節佔比，點選可彈窗檢視具體音節來源
-![音節統計1.webp](/tutorial/menu-pho-count/音節統計1.webp)
-![音節統計2.webp](/tutorial/menu-pho-count/音節統計2.webp)
+![音節統計1.webp](/tutorial/menu-pho-count/音节统计1.webp)
+![音節統計2.webp](/tutorial/menu-pho-count/音节统计2.webp)
 - **柱狀圖**：檢視各音節所存在的地點數，點選可彈窗檢視
-![音節統計3.webp](/tutorial/menu-pho-count/音節統計3.webp)
-![音節統計4.webp](/tutorial/menu-pho-count/音節統計4.webp)
+![音節統計3.webp](/tutorial/menu-pho-count/音节统计3.webp)
+![音節統計4.webp](/tutorial/menu-pho-count/音节统计4.webp)
 - **散點圖**：橫軸為音節總數量，縱軸為地點數，圓圈越大代表音節數量越多
-![音節統計5.webp](/tutorial/menu-pho-count/音節統計5.webp)
+![音節統計5.webp](/tutorial/menu-pho-count/音节统计5.webp)
 - 可切換隻看聲母/韻母/聲調
-![音節統計6.webp](/tutorial/menu-pho-count/音節統計6.webp)
+![音節統計6.webp](/tutorial/menu-pho-count/音节统计6.webp)
 
 ### 自定義地點
 
@@ -28,13 +28,13 @@
 - 彙總區域：按聲母、韻母、聲調順序顯示每個音節的統計資訊（總次數、出現地點數）
 - 逐地點明細：每個地點的聲母、韻母、聲調數目
 - 右側輪盤導航可快速跳轉到想檢視的地點
-![音節統計7.webp](/tutorial/menu-pho-count/音節統計7.webp)
+![音節統計7.webp](/tutorial/menu-pho-count/音节统计7.webp)
 
 ## 互動
 
 - 點選圖表可彈窗檢視詳情
 - 輪盤導航支援自由滾動和快速定位
-![音節統計8.webp](/tutorial/menu-pho-count/音節統計8.webp)
+![音節統計8.webp](/tutorial/menu-pho-count/音节统计8.webp)
 
 ## 提示
 

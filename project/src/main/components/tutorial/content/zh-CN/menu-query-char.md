@@ -18,9 +18,9 @@
 - 点击地名可弹窗查看该方言点的详细信息
 - 点击音值可反查音节来源
 
-![查字結果頁面——各地方言讀音](/tutorial/menu-query-char/02-result.webp)
+![查字結果頁面——各地方言读音](/tutorial/menu-query-char/02-result.webp)
 
-![文白讀顏色標注：藍白讀、紅文讀](/tutorial/menu-query-char/04-wenbai.webp)
+![文白读顏色標注：藍白读、紅文读](/tutorial/menu-query-char/04-wenbai.webp)
 
 ## 地图页面
 
@@ -32,7 +32,7 @@
 - 地图支持全屏展示，方便截图
 - 可切换不同底图（街道图、地形图等）
 
-![地圖模式——讀音地理分布](/tutorial/menu-query-char/03-map.webp)
+![地图模式——读音地理分布](/tutorial/menu-query-char/03-map.webp)
 
 ## 筛选与统计
 

@@ -8,7 +8,7 @@
 2. 選擇資料格式（一字一音、一音多字、縣誌），「說明」處有詳細要求
 3. 上傳檔案（支援 .xlsx、.xls、.doc、.docx、.tsv，單檔案上限 3 MB）
 4. 系統自動分析並展示錯誤統計
-![字表檢查1.webp](/tutorial/explore-check/字表檢查1.webp)
+![字表檢查1.webp](/tutorial/explore-check/字表检查1.webp)
 
 ## 檢查功能
 
@@ -19,14 +19,14 @@
 ## 統計與篩選
 
 - 左側整理錯誤型別、調值統計、聲母與韻母統計
-![字表檢查2.webp](/tutorial/explore-check/字表檢查2.webp)
+![字表檢查2.webp](/tutorial/explore-check/字表检查2.webp)
 - 點選錯誤列自動跳轉到對應資料行
 - 調值統計功能可以快速發現哪些調轄字很少，進而檢查錯誤；也可以看各調類具體有哪些字
-![字表檢查8.webp](/tutorial/explore-check/字表檢查8.webp)
-![字表檢查9.webp](/tutorial/explore-check/字表檢查9.webp)
+![字表檢查8.webp](/tutorial/explore-check/字表检查8.webp)
+![字表檢查9.webp](/tutorial/explore-check/字表检查9.webp)
 - 點選聲母或韻母統計可直接篩選
-![字表檢查3.webp](/tutorial/explore-check/字表檢查3.webp)
-![字表檢查4.webp](/tutorial/explore-check/字表檢查4.webp)
+![字表檢查3.webp](/tutorial/explore-check/字表检查3.webp)
+![字表檢查4.webp](/tutorial/explore-check/字表检查4.webp)
 - 搜尋框支援快速定位
 
 ## 編輯模式
@@ -34,11 +34,11 @@
 切換到編輯模式後：
 - 可直接修改單元格值
 - 可標記整列刪除
-![字表檢查5.webp](/tutorial/explore-check/字表檢查5.webp)
+![字表檢查5.webp](/tutorial/explore-check/字表检查5.webp)
 - 支援 IPA 批次替換
-![字表檢查6.webp](/tutorial/explore-check/字表檢查6.webp)
+![字表檢查6.webp](/tutorial/explore-check/字表检查6.webp)
 - 支援入聲調/舒聲調批次替換
-![字表檢查7.webp](/tutorial/explore-check/字表檢查7.webp)
+![字表檢查7.webp](/tutorial/explore-check/字表检查7.webp)
 - 批次儲存後系統重新分析最新內容
 - 完成後下載更改後的檔案
 

@@ -22,7 +22,7 @@
 
 - 用表格篩選器按欄位過濾資料
 - 可點選標題旁的村落按鈕跳轉到陽春自然村頁面
-![陽春口語.webp](/tutorial/explore-yc-spoken/陽春口語.webp)
+![陽春口語.webp](/tutorial/explore-yc-spoken/阳春口语.webp)
 
 ## 提示
 

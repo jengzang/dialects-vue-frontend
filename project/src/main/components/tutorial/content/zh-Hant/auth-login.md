@@ -23,8 +23,8 @@
 ## 沒有賬號？
 
 點選底部的「沒有賬號？」連結可切換到註冊頁面。註冊只需郵箱 + 密碼 + 使用者名稱。
-![登入1.webp](/tutorial/auth-login/登入1.webp)
-![登入2.webp](/tutorial/auth-login/登入2.webp)
+![登入1.webp](/tutorial/auth-login/登录1.webp)
+![登入2.webp](/tutorial/auth-login/登录2.webp)
 
 ## 提示
 

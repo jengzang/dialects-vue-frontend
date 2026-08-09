@@ -10,8 +10,8 @@
 - 參考表必須有「單字」列，其順序即為最終合併順序
 - 支援上傳自定義參考表（.xlsx、.xls，上限 3 MB）
 - 可預覽預設參考表後一鍵套用
-![字表合併1.webp](/tutorial/explore-merge/字表合併1.webp)
-![字表合併2.webp](/tutorial/explore-merge/字表合併2.webp)
+![字表合併1.webp](/tutorial/explore-merge/字表合并1.webp)
+![字表合併2.webp](/tutorial/explore-merge/字表合并2.webp)
 
 ### 步驟 2：上傳待合併檔案
 
@@ -21,7 +21,7 @@
   - 音標列：「IPA」、「ipa」、「音標」、「音標」、「syllable」
   - 註釋列：「註釋」、「注釋」、「解釋」、「notes」
 - 每個檔案可單獨移除
-![字表合併3.webp](/tutorial/explore-merge/字表合併3.webp)
+![字表合併3.webp](/tutorial/explore-merge/字表合并3.webp)
 
 ### 步驟 3：合併與下載
 
@@ -30,8 +30,8 @@
 - 參考表之外的字會在末尾補充
 - 一字多音以「;」分隔
 - 註釋存為 Excel 批註
-![字表合併4.webp](/tutorial/explore-merge/字表合併4.webp)
-![字表合併5.webp](/tutorial/explore-merge/字表合併5.webp)
+![字表合併4.webp](/tutorial/explore-merge/字表合并4.webp)
+![字表合併5.webp](/tutorial/explore-merge/字表合并5.webp)
 
 ## 提示
 

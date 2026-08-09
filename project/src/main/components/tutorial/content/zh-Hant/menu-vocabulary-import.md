@@ -2,17 +2,17 @@
 
 上傳新的詞表資料，填寫地點資訊並提交。整個流程 1 分鐘內即可完成。
 
-![詞表首頁總覽](/tutorial/menu-vocabulary/01-詞表首頁總覽.webp)
+![詞表首頁總覽](/tutorial/menu-vocabulary/01-词表首页总览.webp)
 
 ## 第一步：申請權限
 
 要上傳詞表，首先需要聯絡站長申請權限。
 
-![申請權限入口](/tutorial/menu-vocabulary/02-申請權限入口.webp)
+![申請權限入口](/tutorial/menu-vocabulary/02-申请权限入口.webp)
 
 目前有兩種權限型別：
 
-![權限型別說明](/tutorial/menu-vocabulary/03-權限型別說明.webp)
+![權限型別說明](/tutorial/menu-vocabulary/03-权限类型说明.webp)
 
 - **管理**權限：可以管理所有人的詞表，以及檢視編輯日誌
 - **編輯**權限：只能上傳和編輯自己的詞表
@@ -21,19 +21,19 @@
 
 獲得權限後，進入匯入詞表頁面，首先需要填寫詞表對應的地點資訊。
 
-![填寫地點資訊](/tutorial/menu-vocabulary/04-填寫地點資訊.webp)
+![填寫地點資訊](/tutorial/menu-vocabulary/04-填写地点信息.webp)
 
 在地點資訊表單中填入相關資訊：
 
-![地點資訊表單](/tutorial/menu-vocabulary/05-地點資訊表單.webp)
+![地點資訊表單](/tutorial/menu-vocabulary/05-地点信息表单.webp)
 
 系統可以自動匹配音典檔案裡已有的資料：
 
-![自動匹配音典資料](/tutorial/menu-vocabulary/06-自動匹配音典資料.webp)
+![自動匹配音典資料](/tutorial/menu-vocabulary/06-自动匹配音典数据.webp)
 
 也可以自己手動輸入，匹配後的音典資料同樣可以修改：
 
-![手動輸入地點資訊](/tutorial/menu-vocabulary/07-手動輸入地點資訊.webp)
+![手動輸入地點資訊](/tutorial/menu-vocabulary/07-手动输入地点信息.webp)
 
 完成後點選確認即可。
 
@@ -41,7 +41,7 @@
 
 詞表資料需要按照指定格式準備：
 
-![詞表格式說明](/tutorial/menu-vocabulary/08-詞表格式說明.webp)
+![詞表格式說明](/tutorial/menu-vocabulary/08-词表格式说明.webp)
 
 核心欄位為：
 
@@ -62,13 +62,13 @@
 
 **2. 文件空格分隔**
 
-![文件空格分隔格式](/tutorial/menu-vocabulary/10-文件空格分隔格式.webp)
+![文件空格分隔格式](/tutorial/menu-vocabulary/10-文档空格分隔格式.webp)
 
 必須按順序排列：標準詞 方言詞 音標 詳細釋義，中間用**空格分隔**，詳細釋義可留空。
 
 **3. 文件括號識別**
 
-![文件括號識別格式](/tutorial/menu-vocabulary/11-文件括號識別格式.webp)
+![文件括號識別格式](/tutorial/menu-vocabulary/11-文档括号识别格式.webp)
 
 標準詞不用括號，方言詞用圓括號 `()` 或 `（）`，音標用方括號 `[]`，詳細釋義用大括號 `{}`。
 
@@ -76,31 +76,31 @@
 
 點選「格式說明」按鈕可以檢視詳細說明，並下載示例格式檔案：
 
-![格式說明按鈕與示例下載](/tutorial/menu-vocabulary/12-格式說明按鈕與示例下載.webp)
+![格式說明按鈕與示例下載](/tutorial/menu-vocabulary/12-格式说明按钮与示例下载.webp)
 
 ## 第四步：上傳詞表
 
 點選「選擇檔案」上傳準備好的詞表檔案：
 
-![選擇檔案上傳](/tutorial/menu-vocabulary/13-選擇檔案上傳.webp)
+![選擇檔案上傳](/tutorial/menu-vocabulary/13-选择文件上传.webp)
 
 也可以直接拖動檔案到上傳區域：
 
-![拖拽檔案上傳](/tutorial/menu-vocabulary/14-拖拽檔案上傳.webp)
+![拖拽檔案上傳](/tutorial/menu-vocabulary/14-拖拽文件上传.webp)
 
 Excel 格式支援預覽，可以調整列匹配關係和表頭所在行數：
 
-![Excel預覽列匹配](/tutorial/menu-vocabulary/15-Excel預覽列匹配.webp)
+![Excel預覽列匹配](/tutorial/menu-vocabulary/15-Excel预览列匹配.webp)
 
 確認無誤後點擊右下角「確認」。
 
 後端會先預覽匯入結果，此時資料還未寫入資料庫：
 
-![預覽匯入結果](/tutorial/menu-vocabulary/16-預覽匯入結果.webp)
+![預覽匯入結果](/tutorial/menu-vocabulary/16-预览导入结果.webp)
 
 確認結果無誤後，點選「提交詞表」，將正式寫入資料庫：
 
-![資料寫入完成](/tutorial/menu-vocabulary/17-資料寫入完成.webp)
+![資料寫入完成](/tutorial/menu-vocabulary/17-数据写入完成.webp)
 
 整個過程不到 1 秒即可完成資料寫入。
 
@@ -108,7 +108,7 @@ Excel 格式支援預覽，可以調整列匹配關係和表頭所在行數：
 
 站長已整理好語保（中國語言資源保護工程）的詞表資料，均為標準的 Excel 格式，可直接匯入上傳。
 
-![語保詞表資料](/tutorial/menu-vocabulary/48-語保詞表資料.webp)
+![語保詞表資料](/tutorial/menu-vocabulary/48-语保词表数据.webp)
 
 一共 1200 多個方言點。如果您願意貢獻或維護某一地區的詞表，歡迎聯絡站長。在確認您對相關方言有足夠了解後，會為您開放相應權限。
 

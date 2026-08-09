@@ -12,9 +12,9 @@
 
 1. 填寫分割槽名稱
 2. 手動輸入地點或通過「選擇地點」按鈕新增地點
-![分割槽1.webp](/tutorial/auth-regions/分割槽1.webp)
-![分割槽2.webp](/tutorial/auth-regions/分割槽2.webp)
-![分割槽3.webp](/tutorial/auth-regions/分割槽3.webp)
+![分割槽1.webp](/tutorial/auth-regions/分区1.webp)
+![分割槽2.webp](/tutorial/auth-regions/分区2.webp)
+![分割槽3.webp](/tutorial/auth-regions/分区3.webp)
 3. 手動輸入時用空格或換行分隔地點，系統自動去重
 4. 每個分割槽最多 1000 個地點
 5. 地點數 ≥ 1 且名稱非空時才能儲存

@@ -8,7 +8,7 @@
 2. 再勾選第二個調類（如陽上）
 3. 輸入地點或分割槽
 4. 點選「比較」，直接跳轉到地圖頁面
-![比較調類1.webp](/tutorial/menu-compare-tone/比較調類1.webp)
+![比較調類1.webp](/tutorial/menu-compare-tone/比较调类1.webp)
 
 ## 結果解讀
 
@@ -22,11 +22,11 @@
 ## 典型用例
 
 - 珠三角一帶的陽上、陰去合併情況
-![比較調類2.webp](/tutorial/menu-compare-tone/比較調類2.webp)
+![比較調類2.webp](/tutorial/menu-compare-tone/比较调类2.webp)
 - 客家話陰平、陰去合併情況
-![比較調類3.webp](/tutorial/menu-compare-tone/比較調類3.webp)
+![比較調類3.webp](/tutorial/menu-compare-tone/比较调类3.webp)
 - 南方方言的陰入、陽入合併情況
-![比較調類4.webp](/tutorial/menu-compare-tone/比較調類4.webp)
+![比較調類4.webp](/tutorial/menu-compare-tone/比较调类4.webp)
 - 四邑、莞寶的陰平、陰去、陽上調類格局
 
 ## 限制

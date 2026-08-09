@@ -26,7 +26,7 @@
 - 可直观查看某一读音的地理分布特征
 - 点击地图上的点可弹窗查看详情
 
-![地圖模式——音位地理分布](/tutorial/menu-query-yinwei/03-map.webp)
+![地图模式——音位地理分布](/tutorial/menu-query-yinwei/03-map.webp)
 
 ## 常见用法示例
 

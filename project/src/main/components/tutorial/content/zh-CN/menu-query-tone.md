@@ -23,7 +23,7 @@
 - 地图上的数字是具体调值
 - 如有调类合并情况，点击弹窗显示归并详情
 
-![地圖模式——調值區域分布](/tutorial/menu-query-tone/03-map.webp)
+![地图模式——調值區域分布](/tutorial/menu-query-tone/03-map.webp)
 
 ## 特点
 
