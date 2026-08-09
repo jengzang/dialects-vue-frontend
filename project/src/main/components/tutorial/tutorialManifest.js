@@ -207,14 +207,6 @@ export const tutorialManifest = [
     order: 34,
     pathPrefix: '/explore/char-class',
   }),
-  createPathEntry({
-    key: 'explore-yc-spoken',
-    categoryKey: 'yangchun',
-    groupKey: 'exploreYcSpoken',
-    order: 35,
-    path: '/explore/yc/words',
-  }),
-
   // ==================== 实用工具 ====================
   createQueryEntry({
     key: 'explore-praat-upload',
@@ -302,6 +294,15 @@ export const tutorialManifest = [
     groupKey: 'villagesML',
     order: 52,
     pathPrefix: '/explore/villages/ml',
+  }),
+
+  // ==================== 阳春相关 ====================
+  createPathEntry({
+    key: 'explore-yc-spoken',
+    categoryKey: 'yangchun',
+    groupKey: 'exploreYcSpoken',
+    order: 53,
+    path: '/explore/yc/words',
   }),
 
   // ==================== 账户与个人数据 ====================
