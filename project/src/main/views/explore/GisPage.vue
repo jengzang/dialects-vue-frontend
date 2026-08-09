@@ -711,12 +711,12 @@ import { useRoute, useRouter } from 'vue-router';
 import { showConfirm } from '@/utils/ui/message.js';
 
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
-import { useGisMapCore } from '@/composables/gis/useGisMapCore.js';
-import { useGisHistory } from '@/composables/gis/useGisHistory.js';
-import { useGisLayers } from '@/composables/gis/useGisLayers.js';
-import { useGisFeatures } from '@/composables/gis/useGisFeatures.js';
-import { useGisDrafts } from '@/composables/gis/useGisDrafts.js';
-import { useGisVoronoi } from '@/composables/gis/useGisVoronoi.js';
+import { useGisMapCore } from '@/main/composables/gis/useGisMapCore.js';
+import { useGisHistory } from '@/main/composables/gis/useGisHistory.js';
+import { useGisLayers } from '@/main/composables/gis/useGisLayers.js';
+import { useGisFeatures } from '@/main/composables/gis/useGisFeatures.js';
+import { useGisDrafts } from '@/main/composables/gis/useGisDrafts.js';
+import { useGisVoronoi } from '@/main/composables/gis/useGisVoronoi.js';
 
 import EditableMapLibre from '@/main/components/map/EditableMapLibre.vue';
 import MapDrawLayersPanel from '@/main/components/map/Draw/panels/MapDrawLayersPanel.vue';
