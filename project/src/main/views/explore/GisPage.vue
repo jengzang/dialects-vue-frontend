@@ -320,7 +320,7 @@
           <button
             class="draw-modal-card-btn"
             type="button"
-            @click="onAdminBoundaryClicked"
+            @click="onAdminBoundaryImportClicked"
           >
             <span class="draw-card-icon"><InlineIcon icon="🗺️" /></span>
             <div class="draw-card-text">
@@ -336,7 +336,7 @@
           <button
             class="draw-modal-card-btn"
             type="button"
-            @click="onRiverImportClicked"
+            @click="onRiverLayerImportClicked"
           >
             <span class="draw-card-icon"><InlineIcon icon="🌊" /></span>
             <div class="draw-card-text">
@@ -1058,6 +1058,16 @@ const onCreateLayerClicked = (type) => {
 const onImportLayerClicked = () => {
   triggerImportLayer();
   showAddLayerModal.value = false;
+};
+
+const onAdminBoundaryImportClicked = async () => {
+  showAddLayerModal.value = false;
+  await onAdminBoundaryClicked();
+};
+
+const onRiverLayerImportClicked = async () => {
+  showAddLayerModal.value = false;
+  await onRiverImportClicked();
 };
 
 const onExportCurrentClicked = () => {

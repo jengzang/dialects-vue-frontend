@@ -9,11 +9,14 @@ const editableMapLibrePath = resolve(projectRoot, 'src/main/components/map/Edita
 const mapDrawTabPath = resolve(projectRoot, 'src/main/views/explore/GisPage.vue')
 const mapDrawToolsPanelPath = resolve(projectRoot, 'src/main/components/map/Draw/panels/MapDrawToolsPanel.vue')
 const mapDrawLayersPanelPath = resolve(projectRoot, 'src/main/components/map/Draw/panels/MapDrawLayersPanel.vue')
+const clipBoundaryModalPath = resolve(projectRoot, 'src/main/components/map/Draw/modals/ClipBoundaryModal.vue')
 const useGisMapCorePath = resolve(projectRoot, 'src/main/composables/gis/useGisMapCore.js')
 const useGisFeaturesPath = resolve(projectRoot, 'src/main/composables/gis/useGisFeatures.js')
 const useGisLayersPath = resolve(projectRoot, 'src/main/composables/gis/useGisLayers.js')
 const useGisHistoryPath = resolve(projectRoot, 'src/main/composables/gis/useGisHistory.js')
 const useGisVoronoiPath = resolve(projectRoot, 'src/main/composables/gis/useGisVoronoi.js')
+const partitionVoronoiAsyncPath = resolve(projectRoot, 'src/main/utils/drawMap/partitionVoronoiAsync.js')
+const partitionVoronoiWorkerPath = resolve(projectRoot, 'src/main/utils/drawMap/partitionVoronoi.worker.js')
 const zhCnMapLocalePath = resolve(projectRoot, 'src/i18n/locales/zh-CN/map.json')
 const zhHantMapLocalePath = resolve(projectRoot, 'src/i18n/locales/zh-Hant/map.json')
 const enMapLocalePath = resolve(projectRoot, 'src/i18n/locales/en/map.json')
@@ -122,6 +125,54 @@ describe('Map draw editor contracts', () => {
     const source = readSource(useGisVoronoiPath)
 
     expect(source).toMatch(/commitHistory\(\);\s+layers\.value\.unshift\(\.\.\.exportedLayers\)/)
+  })
+
+  it('loads village Voronoi payload without scheduling a later custom import clear', () => {
+    const source = readSource(useGisVoronoiPath)
+    const consumeBody = source.match(/function consumeVillageVoronoiPayload\(payload\) \{([\s\S]*?)\n\s{2}\}/)?.[1] ?? ''
+
+    expect(consumeBody).toContain('resetVoronoiCustomImportState();')
+    expect(consumeBody).not.toContain('clearVoronoiCustomImport();')
+    expect(consumeBody).toMatch(/resetVoronoiCustomImportState\(\);\s+voronoiCustomImportRows\.value =/)
+  })
+
+  it('runs heavy Voronoi generation through the async worker adapter', () => {
+    const voronoiSource = readSource(useGisVoronoiPath)
+    const asyncSource = readSource(partitionVoronoiAsyncPath)
+    const workerSource = readSource(partitionVoronoiWorkerPath)
+
+    expect(voronoiSource).toContain('calculatePartitionVoronoiAsync')
+    expect(voronoiSource).not.toContain('calculatePartitionVoronoi,')
+    expect(voronoiSource).toMatch(/await calculatePartitionVoronoiAsync\(pts, level, colorMap, expandRatio\)/)
+    expect(voronoiSource).toContain('voronoiCalculationRequestId')
+    expect(voronoiSource).toContain('getVoronoiCalculationSignature(level, expandRatio)')
+    expect(voronoiSource).toContain('calculateCurrentVoronoiResult')
+    expect(voronoiSource).toMatch(/if \(requestId !== voronoiCalculationRequestId \|\| signature !== getVoronoiCalculationSignature\(level, expandRatio\)\) return;/)
+    expect(voronoiSource).toMatch(/if \(calculated\.signature !== getVoronoiCalculationSignature\(calculated\.level, calculated\.expandRatio\)\) return false;/)
+    expect(asyncSource).toContain("new Worker(new URL('./partitionVoronoi.worker.js', import.meta.url), { type: 'module' })")
+    expect(asyncSource).toContain('getPartitionVoronoiWorker()')
+    expect(asyncSource).toContain('runSyncFallback(points, level, colorMap, expandRatio)')
+    expect(asyncSource).toContain('calculatePartitionVoronoi(points, level, colorMap, expandRatio)')
+    expect(workerSource).toContain('calculatePartitionVoronoi(points, level, colorMap, expandRatio)')
+  })
+
+  it('closes the add-layer chooser before opening boundary import modals', () => {
+    const source = readSource(mapDrawTabPath)
+
+    expect(source).toContain('@click="onAdminBoundaryImportClicked"')
+    expect(source).toContain('@click="onRiverLayerImportClicked"')
+    expect(source).toMatch(/const onAdminBoundaryImportClicked = async \(\) => \{[\s\S]*showAddLayerModal\.value = false;[\s\S]*await onAdminBoundaryClicked\(\);[\s\S]*\}/)
+    expect(source).toMatch(/const onRiverLayerImportClicked = async \(\) => \{[\s\S]*showAddLayerModal\.value = false;[\s\S]*await onRiverImportClicked\(\);[\s\S]*\}/)
+  })
+
+  it('reopens high precision clip boundary modal from selected ids and fetches matching options', () => {
+    const source = readSource(clipBoundaryModalPath)
+
+    expect(source).toContain('getInitialSelectedValues()')
+    expect(source).toMatch(/localSelected\.value = getInitialSelectedValues\(\);/)
+    expect(source).toMatch(/if \(localHighPrecision\.value && localLevel\.value !== 'country'\) \{[\s\S]*fetchHighPrecisionOptions\(localLevel\.value\)/)
+    expect(source).toContain('props.boundaryConfig.selectedIds')
+    expect(source).toContain(':disabled="localSelected.length === 0 || isOptionsLoading"')
   })
 
   it('refreshes the layer id seed when history snapshots are restored', () => {

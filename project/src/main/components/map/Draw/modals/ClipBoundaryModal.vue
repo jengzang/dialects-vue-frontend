@@ -73,7 +73,7 @@
           class="main-glass-button"
           data-variant="primary"
           type="button"
-          :disabled="localSelected.length === 0"
+          :disabled="localSelected.length === 0 || isOptionsLoading"
           @click="handleConfirm"
         >
           {{ mode === 'import' ? t('map.drawTab.voronoi.clipBoundaryConfirmImport') : t('map.drawTab.voronoi.confirmExport') }}
@@ -152,6 +152,17 @@ const filteredOptions = computed(() => {
   return currentOptions.value.filter((opt) => opt.label.toLowerCase().includes(query));
 });
 
+function getInitialHighPrecision() {
+  return props.boundaryConfig.highPrecision ?? props.highPrecision;
+}
+
+function getInitialSelectedValues() {
+  if (localHighPrecision.value && localLevel.value !== 'country') {
+    return [...(props.boundaryConfig.selectedIds || [])];
+  }
+  return [...(props.boundaryConfig.selectedNames || [])];
+}
+
 const fetchHighPrecisionOptions = async (level) => {
   const deep = LEVEL_DEEP_MAP[level];
   if (deep === undefined) return;
@@ -176,14 +187,18 @@ watch(
     if (val) {
       searchQuery.value = '';
       localLevel.value = props.boundaryConfig.level || 'country';
-      localHighPrecision.value = props.highPrecision;
+      localHighPrecision.value = getInitialHighPrecision();
       highPrecisionOptions.value = [];
-      localSelected.value = [...(props.boundaryConfig.selectedNames || [])];
+      localSelected.value = getInitialSelectedValues();
       if (localSelected.value.length === 0 && localLevel.value === 'country') {
         localSelected.value = ['中国'];
       }
+      if (localHighPrecision.value && localLevel.value !== 'country') {
+        fetchHighPrecisionOptions(localLevel.value);
+      }
     }
   },
+  { immediate: true },
 );
 
 function isOptionDisabled(optionValue) {

@@ -21,9 +21,9 @@ import {
   buildPartitionPointFeatureCollection,
   buildPartitionPoints,
   buildVoronoiSelectionOptions,
-  calculatePartitionVoronoi,
   normalizePartitionPoint,
 } from '@/main/utils/drawMap/partitionVoronoi.js';
+import { calculatePartitionVoronoiAsync } from '@/main/utils/drawMap/partitionVoronoiAsync.js';
 import { useVoronoiCustomImport } from '@/composables/import/useVoronoiCustomImport.js';
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js';
 import { globalPayload } from '@/main/store/store.js';
@@ -113,6 +113,7 @@ export function useGisVoronoi(options = {}) {
   const voronoiFieldMergeMap = ref(new Map());
   const voronoiExpandRatio = ref(50);
   const voronoiEnableExpand = ref(false);
+  let voronoiCalculationRequestId = 0;
 
   // Clip boundary
   const clipBoundaryConfig = ref({ enabled: false, level: 'country', selectedNames: [] });
@@ -375,6 +376,25 @@ export function useGisVoronoi(options = {}) {
     voronoiPartitionPoints.value = next;
   }
 
+  function getVoronoiCalculationSignature(level, expandRatio) {
+    return JSON.stringify({
+      level,
+      expandRatio,
+      points: activeVoronoiPoints.value,
+      colorMap: voronoiColorMap.value,
+    });
+  }
+
+  async function calculateCurrentVoronoiResult() {
+    const level = Number(voronoiRegionLevel.value) || 3;
+    const pts = activeVoronoiPoints.value;
+    const colorMap = voronoiColorMap.value;
+    const expandRatio = voronoiEnableExpand.value ? voronoiExpandRatio.value : -1;
+    const signature = getVoronoiCalculationSignature(level, expandRatio);
+    const result = await calculatePartitionVoronoiAsync(pts, level, colorMap, expandRatio);
+    return { result, level, expandRatio, signature };
+  }
+
   function normalizeVoronoiPoints(partitionData = voronoiRawPartitionData.value) {
     voronoiOfficialPoints.value = buildPartitionPoints(partitionData, { partitionMode: voronoiPartitionMode.value });
     syncVoronoiPartitionPoints();
@@ -388,12 +408,16 @@ export function useGisVoronoi(options = {}) {
     voronoiPreviewLayers.value = [];
   }
 
-  async function clearVoronoiCustomImport() {
-    if (!await guardWrite()) return;
+  function resetVoronoiCustomImportState() {
     voronoiCustomImportRows.value = [];
     voronoiCustomImportMeta.value = null;
     syncVoronoiPartitionPoints();
     clearVoronoiPreviewState();
+  }
+
+  async function clearVoronoiCustomImport() {
+    if (!await guardWrite()) return;
+    resetVoronoiCustomImportState();
     setVoronoiStatus('customImportCleared');
   }
 
@@ -419,7 +443,7 @@ export function useGisVoronoi(options = {}) {
   // ---- Village data ----
 
   function consumeVillageVoronoiPayload(payload) {
-    clearVoronoiCustomImport();
+    resetVoronoiCustomImportState();
     voronoiCustomImportRows.value = (payload.points || []).map((p, i) => ({ ...p, source: 'village', customRowId: `village-${i + 1}` }));
     voronoiCustomImportMeta.value = { partitionMode: 'village', summary: { totalRowCount: (payload.points || []).length } };
     useVoronoiOfficialData.value = false;
@@ -528,10 +552,9 @@ export function useGisVoronoi(options = {}) {
     await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
     try {
       await ensureVoronoiPointsLoaded();
-      const level = Number(voronoiRegionLevel.value) || 3;
-      const pts = activeVoronoiPoints.value;
-      const expandRatio = voronoiEnableExpand.value ? voronoiExpandRatio.value : -1;
-      const result = calculatePartitionVoronoi(pts, level, voronoiColorMap.value, expandRatio);
+      const requestId = ++voronoiCalculationRequestId;
+      const { result, level, expandRatio, signature } = await calculateCurrentVoronoiResult();
+      if (requestId !== voronoiCalculationRequestId || signature !== getVoronoiCalculationSignature(level, expandRatio)) return;
       voronoiLastResult.value = result;
       voronoiPreviewType.value = 'polygons';
       voronoiPreviewLayers.value = [{ id: 'voronoi-preview-polygons', type: 'polygons', featureCollection: result.merged }];
@@ -547,10 +570,12 @@ export function useGisVoronoi(options = {}) {
   async function exportVoronoiToLayer() {
     if (!await guardWrite()) return;
     await ensureVoronoiPointsLoaded();
-    const level = Number(voronoiRegionLevel.value) || 3;
-    const pts = activeVoronoiPoints.value;
-    const expandRatio2 = voronoiEnableExpand.value ? voronoiExpandRatio.value : -1;
-    const result = calculatePartitionVoronoi(pts, level, voronoiColorMap.value, expandRatio2);
+    let calculated = await calculateCurrentVoronoiResult();
+    if (calculated.signature !== getVoronoiCalculationSignature(calculated.level, calculated.expandRatio)) {
+      calculated = await calculateCurrentVoronoiResult();
+      if (calculated.signature !== getVoronoiCalculationSignature(calculated.level, calculated.expandRatio)) return false;
+    }
+    const { result } = calculated;
     voronoiLastResult.value = result;
     const keys = voronoiExportGroups.value.map((item) => item.key);
     const sel = voronoiExportSelections.value.filter((item) => keys.includes(item));
