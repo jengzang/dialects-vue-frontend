@@ -32,21 +32,24 @@ function render() {
   const bgTint = getCssRgb('--bg-blue-tint-rgb', '240, 247, 255')
 
   globe = Globe()(containerRef.value)
-    .globeImageUrl('/textures/earth-color-relief.jpg')
+    .globeImageUrl('/textures/earth-color-relief-dark.jpg')
     .backgroundImageUrl(null)
     .showGraticules(false)
     .backgroundColor('rgba(0,0,0,0)') 
     .atmosphereColor(`rgb(${bgTint})`)
-    .atmosphereAltitude(0.18)
+    .atmosphereAltitude(0.2)
     .pointsData(props.points)
     .pointLat('lat')
     .pointLng('lng')
-    .pointColor(() => `rgba(${primary}, 0.7)`)
-    .pointRadius(0.18)
+    .pointColor(() => `rgb(${primary})`)
+    .pointRadius(0.15)
     .pointAltitude(0.001)
     .pointResolution(6)
     .pointLabel('name')
-    .onPointHover(() => {})
+
+  if (!('ontouchstart' in window || navigator.maxTouchPoints > 0)) {
+    globe.onPointHover(() => {})
+  }
 
   globe.controls().autoRotate = false
   globe.controls().autoRotateSpeed = 0.4

@@ -841,6 +841,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     backdrop-filter: blur(8px) saturate(180%);
     border-radius: var(--radius-lg);
     // background: var(--bg-blue-hover);
+    border: 1px solid var(--glass-40);
     background: color-mix(in srgb, var(--bg-body) 50%, transparent);
   }
 
@@ -979,8 +980,8 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   @include section-container;
 
   padding:
-    clamp(3rem, 8vw, 6rem)
-    clamp(1.5rem, 4vw, 2.5rem);
+    clamp(3rem, 6dvw, 6rem)
+    clamp(1.5rem, 4dvw, 2.5rem);
 }
 
 .section {
