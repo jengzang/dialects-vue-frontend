@@ -828,12 +828,13 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   }
 
   &-content {
-    padding: 1rem;
+    padding: 3rem;
     position: relative;
     z-index: 1;
     max-width: 520px;
     margin-right: auto;
-    margin-left: 3rem;
+    margin-left: 1rem;
+    margin-bottom: 5rem;
     text-align: left;
     animation: heroFadeIn 1s $ease-apple;
     backdrop-filter: blur(8px) saturate(180%);
@@ -845,7 +846,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &-logo {
     width: clamp(220px, 40vw, 380px);
     height: auto;
-    margin-top: 2rem;
+    margin-top: 1rem;
     margin-bottom: 0.6rem;
     filter: drop-shadow(0 4px 12px rgba(var(--color-primary-rgb), 0.15));
   }
@@ -887,7 +888,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     align-items: center;
     justify-content: center;
     gap: 1.5rem;
-    margin-bottom: 5rem;
+    // margin-bottom: 5rem;
   }
 
   &-decoration {
@@ -1788,16 +1789,18 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
     &-content {
       margin-left: 0;
-      padding: 0.3rem;
+      padding: 1rem;
       background: var(--glass-30);
       backdrop-filter: blur(8px) saturate(180%);
       -webkit-backdrop-filter: blur(24px) saturate(180%);
       border-radius: var(--radius-xl);
       border: 1px solid var(--glass-40);
+      margin-bottom: 6rem;
     }
 
     &-logo {
       width: clamp(180px, 50vw, 340px);
+      margin: 0.5rem;
     }
 
     &-actions {
