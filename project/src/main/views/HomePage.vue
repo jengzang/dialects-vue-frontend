@@ -785,13 +785,10 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 /* Base */
 .home-page {
   position: relative;
-  width: 90dvw;
-  min-height: 100vh;
-  margin: 0 auto;
+  width: 100%;
+  min-height: 100dvh;
   overflow-x: hidden;
   background: linear-gradient(135deg, var(--bg-body) 0%, var(--bg-light-gray) 100%);
-  border-radius: var(--radius-2xl);
-  box-shadow: 0 8px 32px rgba(var(--color-primary-rgb), 0.12);
 }
 
 .bg-gradient {
@@ -1973,6 +1970,17 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   .hero-logo {
     animation: none;
+  }
+}
+</style>
+
+<style lang="scss">
+.simple-layout:has(.home-page) {
+  padding: 0 !important;
+
+  .content-area {
+    width: 100%;
+    padding: 0;
   }
 }
 </style>
