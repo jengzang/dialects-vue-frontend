@@ -1,5 +1,6 @@
 import { userStore } from '@/main/store/store.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import i18n from '@/i18n/index.js'
 
 const CheckTool = () => import('@/main/views/explore/tools/CheckTool.vue')
 const Jyut2IpaTool = () => import('@/main/views/explore/tools/Jyut2IpaTool.vue')
@@ -87,7 +88,14 @@ export const exploreRoutes = [
   },
   {
     path: 'explore/villages/toponyms',
-    component: ToponymsPage
+    component: ToponymsPage,
+    beforeEnter: async (to, from) => {
+      const { showConfirm } = await import('@/utils/ui/message.js')
+      await showConfirm(i18n.global.t('villages.toponyms.notReady'), {
+        title: i18n.global.t('villages.toponyms.name'),
+      })
+      return { path: from.path || '/', replace: true }
+    }
   },
   {
     path: 'explore/villages/gd',

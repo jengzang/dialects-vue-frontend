@@ -2,7 +2,8 @@
   "title": "Natural Villages",
   "toponyms": {
     "name": "Village Toponym Distribution",
-    "desc": "Explore where natural-village place names cluster by character or name fragment"
+    "desc": "Explore where natural-village place names cluster by character or name fragment",
+    "notReady": "The Toponym Distribution feature is still under development. Stay tuned!"
   },
   "gdVillages": {
     "name": "Guangdong Natural Villages",
