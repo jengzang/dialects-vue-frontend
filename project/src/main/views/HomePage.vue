@@ -601,6 +601,7 @@ import { useI18n } from 'vue-i18n'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
 import { useVisitStats } from '@/composables/data/useVisitStats.js'
+import { useClickParticles } from '@/main/composables/useClickParticles.js'
 import { getCachedSourceStats, getSourceStats } from '@/composables/data/useSourceStats.js'
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 
@@ -746,6 +747,8 @@ async function fetchGlobePoints() {
     console.error('获取地球散点数据失败:', error)
   }
 }
+
+useClickParticles()
 
 onMounted(() => {
   fetchVisitStats()
