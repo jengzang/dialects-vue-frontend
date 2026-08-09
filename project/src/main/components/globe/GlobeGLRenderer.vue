@@ -45,10 +45,9 @@ function render() {
     .pointRadius(0.15)
     .pointAltitude(0.001)
     .pointResolution(6)
-    .pointLabel('name')
-
-  if (!('ontouchstart' in window || navigator.maxTouchPoints > 0)) {
-    globe.onPointHover(() => {})
+  const enableHover = !('ontouchstart' in window || navigator.maxTouchPoints > 0 || matchMedia('(orientation: portrait)').matches)
+  if (enableHover) {
+    globe.pointLabel('name').onPointHover(() => {})
   }
 
   globe.controls().autoRotate = false
