@@ -47,9 +47,14 @@ function render() {
   globe.controls().autoRotate = false
   globe.controls().autoRotateSpeed = 0.4
   globe.controls().enableZoom = true
+  globe.controls().enablePan = true
   globe.controls().enablePointerInteraction = true
 
-  globe.pointOfView({ lat: 30, lng: 108, altitude: 1.9 })
+  globe.pointOfView({ lat: 24.933, lng: 118.832, altitude: 1.303 })
+
+  dumpGlobeParams()
+  globe.controls().addEventListener('end', dumpGlobeParams)
+
   if (globe.renderer()) {
     globe.renderer().setClearColor(0x000000, 0)
     globe.renderer().setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
@@ -66,6 +71,49 @@ function render() {
     }
   })
   resizeObserver.observe(containerRef.value)
+
+  window.addEventListener('keydown', onKeyDown)
+}
+
+function onKeyDown(e) {
+  if (!containerRef.value) return
+  const canvas = containerRef.value.querySelector('canvas')
+  if (!canvas) return
+
+  const step = e.shiftKey ? 3 : 1
+  const cur = canvas.style.transform || 'translate(0px, 0px)'
+  const match = cur.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/)
+  let x = match ? parseFloat(match[1]) : 0
+  let y = match ? parseFloat(match[2]) : 0
+
+  switch (e.key) {
+    case 'ArrowLeft':  x -= step; break
+    case 'ArrowRight': x += step; break
+    case 'ArrowUp':    y -= step; break
+    case 'ArrowDown':  y += step; break
+    default: return
+  }
+  e.preventDefault()
+  canvas.style.transform = `translate(${x}px, ${y}px)`
+  console.log('[Globe offset]', { x: `${x}px`, y: `${y}px` }, '| pointOfView:', globe?.pointOfView())
+}
+
+function dumpGlobeParams() {
+  if (!globe) return
+  const cam = globe.camera()
+  const ctrl = globe.controls()
+  const target = ctrl?.target
+  const pov = globe.pointOfView()
+  const containerRect = containerRef.value?.getBoundingClientRect()
+
+  console.log('[Globe params]', {
+    pointOfView: pov,
+    camera: cam ? {
+      position: { x: cam.position.x, y: cam.position.y, z: cam.position.z },
+    } : null,
+    controlsTarget: target ? { x: target.x, y: target.y, z: target.z } : null,
+    container: containerRect ? { w: Math.round(containerRect.width), h: Math.round(containerRect.height) } : null,
+  })
 }
 
 function updatePoints() {
@@ -74,6 +122,7 @@ function updatePoints() {
 }
 
 function destroy() {
+  window.removeEventListener('keydown', onKeyDown)
   if (resizeObserver) {
     resizeObserver.disconnect()
     resizeObserver = null

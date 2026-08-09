@@ -41,11 +41,11 @@ const webglSupported = computed(() => {
   z-index: 0;
   background: var(--bg-page-gradient);
 
-  canvas {
+  :deep(canvas) {
     display: block;
     width: 100% !important;
     height: 100% !important;
-    transform: translateX(15%);
+    transform: translate(489px, -91px);
   }
 }
 
