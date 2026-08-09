@@ -32,7 +32,7 @@ function render() {
   const bgTint = getCssRgb('--bg-blue-tint-rgb', '240, 247, 255')
 
   globe = Globe()(containerRef.value)
-    .globeImageUrl('/textures/earth-color-relief-dark.jpg')
+    .globeImageUrl('/showcase/earth-color-relief-dark.webp')
     .backgroundImageUrl(null)
     .showGraticules(false)
     .backgroundColor('rgba(0,0,0,0)') 
