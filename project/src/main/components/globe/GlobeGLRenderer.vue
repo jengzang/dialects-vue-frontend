@@ -51,25 +51,23 @@ function render() {
     .pointAltitude(0.001)
     .pointResolution(6)
   if (!isTouchDevice) {
+    globe.pointLabel('name').onPointHover(() => {})
+
     orientationMql = matchMedia('(orientation: portrait)')
     orientationHandler = (e) => { isPortrait.value = e.matches }
     orientationMql.addEventListener('change', orientationHandler)
 
     watch(isPortrait, (portrait) => {
-      if (!globe) return
-      if (portrait) {
-        globe.pointLabel(null).onPointHover(null)
-      } else {
-        globe.pointLabel('name').onPointHover(() => {})
-      }
+      globe?.enablePointerInteraction(!portrait)
     }, { immediate: true })
+  } else {
+    globe.enablePointerInteraction(false)
   }
 
   globe.controls().autoRotate = false
   globe.controls().autoRotateSpeed = 0.4
   globe.controls().enableZoom = false
   globe.controls().enablePan = true
-  globe.controls().enablePointerInteraction = true
 
   globe.pointOfView({ lat: 23, lng: 105, altitude: 1.5 })
 
