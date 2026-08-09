@@ -79,7 +79,7 @@ const props = defineProps({
   },
   bottom: {
     type: String,
-    default: '32px',
+    default: '24px',
   },
   size: {
     type: Number,

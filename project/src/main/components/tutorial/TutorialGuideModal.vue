@@ -564,9 +564,12 @@ $float-catalog-button-left:0;
       gap: 12px;
     }
 
-    .tutorial-catalog,
-    .tutorial-article {
+    .tutorial-catalog {
       max-height: none;
+    }
+
+    .tutorial-article {
+      max-height: var(--tutorial-content-max-height);
     }
 
     .tutorial-article {
@@ -1085,5 +1088,11 @@ $float-catalog-button-left:0;
   .tutorial-article {
     padding-top: 52px;
   }
+}
+</style>
+
+<style>
+.content.ui-scrollbar:has([data-tutorial-modal]) {
+  overflow: visible;
 }
 </style>
