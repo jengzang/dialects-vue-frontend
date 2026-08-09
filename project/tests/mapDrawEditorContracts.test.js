@@ -234,6 +234,26 @@ describe('Map draw editor contracts', () => {
     expect(tabSource).toContain('@mode-change="handleDrawModeChange"')
   })
 
+  it('exposes first-class coordinate-path vertex editing for lines and polygons', () => {
+    const editableSource = readSource(editableMapLibrePath)
+
+    expect(editableSource).toContain('const selectedVertexCoordPaths = ref([])')
+    expect(editableSource).toContain('const selectVertex = (featureId, coordPath) =>')
+    expect(editableSource).toContain('const insertVertex = (featureId, coordPath, coordinate, options = {}) =>')
+    expect(editableSource).toContain('const moveVertex = (featureId, coordPath, coordinate, options = {}) =>')
+    expect(editableSource).toContain('const deleteVertices = (featureId, coordPaths, options = {}) =>')
+    expect(editableSource).toContain("draw.value?.changeMode?.('direct_select', { featureId, coordPath: normalizedPath })")
+    expect(editableSource).toContain('insertVertexIntoFeature(feature, coordPath, coordinate)')
+    expect(editableSource).toContain('moveVertexInFeature(feature, coordPath, coordinate)')
+    expect(editableSource).toContain('deleteVerticesFromFeature(feature, coordPaths)')
+    expect(editableSource).toContain('closePolygonRing(editableRing)')
+    expect(editableSource).toContain('isLineGeometryValid(nextGeometry.coordinates)')
+    expect(editableSource).toContain('isPolygonGeometryValid(nextGeometry.coordinates)')
+    expect(editableSource).toContain('selectVertex,')
+    expect(editableSource).toContain('insertVertex,')
+    expect(editableSource).toContain('moveVertex,')
+  })
+
   it('shows active layer features in the tools panel and lets users select one explicitly', () => {
     const panelSource = readSource(mapDrawToolsPanelPath)
     const tabSource = readSource(mapDrawTabPath)

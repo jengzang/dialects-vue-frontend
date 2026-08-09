@@ -716,6 +716,172 @@ describe('EditableMapLibre state flow', () => {
     wrapper.unmount()
   })
 
+  it('selects a specific line vertex by coordinate path', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1], [2, 2]] },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didSelect = wrapper.exposed.selectVertex('line-1', '1')
+
+    expect(didSelect).toBe(true)
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('direct_select', {
+      featureId: 'line-1',
+      coordPath: '1',
+    })
+    expect(wrapper.events).toContainEqual(['feature-select', 'line-1'])
+    expect(wrapper.events).toContainEqual([
+      'shape-edit-state-change',
+      {
+        mode: 'direct_select',
+        featureId: 'line-1',
+        selectedVertexCount: 1,
+      },
+    ])
+
+    wrapper.unmount()
+  })
+
+  it('inserts a line vertex on an edge and keeps the inserted vertex selected', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [2, 2]] },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didInsert = wrapper.exposed.insertVertex('line-1', '1', [1, 1])
+
+    expect(didInsert).toBe(true)
+    expect(wrapper.events.map(([eventName]) => eventName)).toEqual(expect.arrayContaining([
+      'before-features-change',
+      'features-change',
+    ]))
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [1, 1], [2, 2]])
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('direct_select', {
+      featureId: 'line-1',
+      coordPath: '1',
+    })
+
+    wrapper.unmount()
+  })
+
+  it('moves a polygon vertex while keeping the ring closed', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [0, 0],
+            [2, 0],
+            [1, 1],
+            [0, 0],
+          ]],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didMove = wrapper.exposed.moveVertex('polygon-1', '0.0', [0, 2])
+
+    expect(didMove).toBe(true)
+    const nextRing = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1]
+      .features[0].geometry.coordinates[0]
+    expect(nextRing).toEqual([
+      [0, 2],
+      [2, 0],
+      [1, 1],
+      [0, 2],
+    ])
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('direct_select', {
+      featureId: 'polygon-1',
+      coordPath: '0.0',
+    })
+
+    wrapper.unmount()
+  })
+
+  it('deletes a selected line vertex by coordinate path and reconnects the line', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1], [2, 2]] },
+      }],
+    })
+    await nextTick()
+    wrapper.exposed.selectVertex('line-1', '1')
+    wrapper.events.length = 0
+
+    const didDelete = wrapper.exposed.deleteSelected()
+
+    expect(didDelete).toBe(true)
+    expect(wrapper.draw.trash).not.toHaveBeenCalled()
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [2, 2]])
+    expect(wrapper.events).toContainEqual([
+      'shape-edit-state-change',
+      {
+        mode: 'direct_select',
+        featureId: 'line-1',
+        selectedVertexCount: 0,
+      },
+    ])
+
+    wrapper.unmount()
+  })
+
+  it('blocks selected coordinate-path deletion when geometry would become invalid', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [0, 0],
+            [1, 0],
+            [0, 1],
+            [0, 0],
+          ]],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.exposed.selectVertex('polygon-1', '0.1')
+    wrapper.events.length = 0
+
+    const didDelete = wrapper.exposed.deleteSelected()
+
+    expect(didDelete).toBe(false)
+    expect(wrapper.draw.trash).not.toHaveBeenCalled()
+    expect(wrapper.events.some(([eventName]) => eventName === 'features-change')).toBe(false)
+
+    wrapper.unmount()
+  })
+
   it('can sync feature properties without emitting a duplicate history commit', async () => {
     const wrapper = mountEditableMapLibre({
       type: 'FeatureCollection',

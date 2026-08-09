@@ -169,6 +169,7 @@ const mapContainer = ref(null)
 const map = shallowRef(null)
 const draw = shallowRef(null)
 const selectedFeatureId = ref('')
+const selectedVertexCoordPaths = ref([])
 const currentStyleKey = ref(props.currentStyleKey || 'gaode')
 const isFullscreen = ref(false)
 const isFeatureBoxDragging = ref(false)
@@ -488,14 +489,18 @@ const getSelectedVertexCountFromDraw = () => {
   const mode = draw.value?.getMode?.() || 'simple_select'
   if (mode !== 'direct_select') return 0
   const selectedPoints = draw.value?.getSelectedPoints?.()
-  return Array.isArray(selectedPoints?.features) ? selectedPoints.features.length : 0
+  const selectedPointCount = Array.isArray(selectedPoints?.features) ? selectedPoints.features.length : 0
+  return selectedPointCount || selectedVertexCoordPaths.value.length
 }
 
 const getSelectedPointCoordinatesFromDraw = () => {
   const selectedPoints = draw.value?.getSelectedPoints?.()
-  return (selectedPoints?.features ?? [])
+  const selectedPointCoordinates = (selectedPoints?.features ?? [])
     .map((feature) => feature?.geometry?.coordinates)
     .filter((coordinates) => Array.isArray(coordinates) && coordinates.length >= 2)
+  if (selectedPointCoordinates.length > 0) return selectedPointCoordinates
+  const feature = selectedFeatureId.value ? draw.value?.get?.(selectedFeatureId.value) : null
+  return getCoordinatesForCoordPaths(feature, selectedVertexCoordPaths.value)
 }
 
 const areCoordinatesEqual = (left, right) => {
@@ -516,10 +521,224 @@ const getEditableRingCoordinates = (ring = []) => {
   return ring
 }
 
+const parseCoordPath = (coordPath) => {
+  const parts = String(coordPath ?? '')
+    .split('.')
+    .map((part) => Number(part))
+  if (parts.length === 0 || parts.some((part) => !Number.isInteger(part) || part < 0)) return null
+  return parts
+}
+
+const normalizeVertexCoordinate = (coordinate) => {
+  const longitude = Number(coordinate?.[0])
+  const latitude = Number(coordinate?.[1])
+  if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return null
+  return [longitude, latitude]
+}
+
+const cloneFeatureForGeometryEdit = (feature) => ({
+  ...feature,
+  properties: { ...(feature?.properties ?? {}) },
+  geometry: feature?.geometry
+    ? {
+        ...feature.geometry,
+        coordinates: structuredClone(feature.geometry.coordinates),
+      }
+    : feature?.geometry,
+})
+
+const closePolygonRing = (ring = []) => {
+  const editableRing = getEditableRingCoordinates(ring)
+  if (editableRing.length === 0) return []
+  return [
+    ...editableRing,
+    [...editableRing[0]],
+  ]
+}
+
+const isLineGeometryValid = (coordinates = []) => coordinates.length >= 2
+  && coordinates.every((coordinate) => normalizeVertexCoordinate(coordinate))
+
+const isPolygonGeometryValid = (coordinates = []) => coordinates.length > 0
+  && coordinates.every((ring) => {
+    const editableRing = getEditableRingCoordinates(ring)
+    return editableRing.length >= 3
+      && editableRing.every((coordinate) => normalizeVertexCoordinate(coordinate))
+      && areCoordinatesEqual(ring[0], ring.at(-1))
+  })
+
+const normalizeExistingCoordPath = (feature, coordPath) => {
+  const parts = parseCoordPath(coordPath)
+  const geometry = feature?.geometry ?? {}
+  if (!parts) return ''
+
+  if (geometry.type === 'LineString') {
+    const [coordinateIndex] = parts
+    const coordinates = geometry.coordinates ?? []
+    if (parts.length !== 1 || coordinateIndex >= coordinates.length) return ''
+    return String(coordinateIndex)
+  }
+
+  if (geometry.type === 'Polygon') {
+    const [ringIndex, coordinateIndex] = parts
+    const ring = geometry.coordinates?.[ringIndex]
+    if (parts.length !== 2 || !Array.isArray(ring)) return ''
+    const editableRing = getEditableRingCoordinates(ring)
+    if (coordinateIndex < editableRing.length) return `${ringIndex}.${coordinateIndex}`
+    if (coordinateIndex === editableRing.length && areCoordinatesEqual(ring[0], ring.at(-1))) {
+      return `${ringIndex}.0`
+    }
+  }
+
+  return ''
+}
+
+const normalizeInsertCoordPath = (feature, coordPath) => {
+  const parts = parseCoordPath(coordPath)
+  const geometry = feature?.geometry ?? {}
+  if (!parts) return ''
+
+  if (geometry.type === 'LineString') {
+    const [coordinateIndex] = parts
+    const coordinates = geometry.coordinates ?? []
+    if (parts.length !== 1 || coordinateIndex < 1 || coordinateIndex >= coordinates.length) return ''
+    return String(coordinateIndex)
+  }
+
+  if (geometry.type === 'Polygon') {
+    const [ringIndex, coordinateIndex] = parts
+    const ring = geometry.coordinates?.[ringIndex]
+    if (parts.length !== 2 || !Array.isArray(ring)) return ''
+    const editableRing = getEditableRingCoordinates(ring)
+    if (coordinateIndex < 1 || coordinateIndex > editableRing.length) return ''
+    return `${ringIndex}.${coordinateIndex}`
+  }
+
+  return ''
+}
+
+const getCoordinatesForCoordPaths = (feature, coordPaths = []) => {
+  const geometry = feature?.geometry ?? {}
+  return coordPaths
+    .map((coordPath) => normalizeExistingCoordPath(feature, coordPath))
+    .filter(Boolean)
+    .map((coordPath) => {
+      const parts = parseCoordPath(coordPath)
+      if (geometry.type === 'LineString') {
+        return geometry.coordinates?.[parts[0]]
+      }
+      if (geometry.type === 'Polygon') {
+        return getEditableRingCoordinates(geometry.coordinates?.[parts[0]] ?? [])[parts[1]]
+      }
+      return null
+    })
+    .filter(Boolean)
+}
+
+const deleteVerticesFromFeature = (feature, coordPaths = []) => {
+  const geometry = feature?.geometry ?? {}
+  const normalizedPaths = [...new Set(coordPaths
+    .map((coordPath) => normalizeExistingCoordPath(feature, coordPath))
+    .filter(Boolean))]
+  if (normalizedPaths.length === 0) return null
+
+  const nextFeature = cloneFeatureForGeometryEdit(feature)
+  const nextGeometry = nextFeature.geometry
+
+  if (geometry.type === 'LineString') {
+    const indexes = normalizedPaths
+      .map((coordPath) => Number(coordPath))
+      .sort((left, right) => right - left)
+    indexes.forEach((coordinateIndex) => {
+      nextGeometry.coordinates.splice(coordinateIndex, 1)
+    })
+    return isLineGeometryValid(nextGeometry.coordinates) ? nextFeature : null
+  }
+
+  if (geometry.type === 'Polygon') {
+    const pathsByRing = new Map()
+    normalizedPaths.forEach((coordPath) => {
+      const [ringIndex, coordinateIndex] = parseCoordPath(coordPath)
+      const indexes = pathsByRing.get(ringIndex) ?? []
+      indexes.push(coordinateIndex)
+      pathsByRing.set(ringIndex, indexes)
+    })
+    pathsByRing.forEach((coordinateIndexes, ringIndex) => {
+      const editableRing = getEditableRingCoordinates(nextGeometry.coordinates[ringIndex])
+      coordinateIndexes
+        .sort((left, right) => right - left)
+        .forEach((coordinateIndex) => {
+          editableRing.splice(coordinateIndex, 1)
+        })
+      nextGeometry.coordinates[ringIndex] = closePolygonRing(editableRing)
+    })
+    return isPolygonGeometryValid(nextGeometry.coordinates) ? nextFeature : null
+  }
+
+  return null
+}
+
+const insertVertexIntoFeature = (feature, coordPath, coordinate) => {
+  const nextCoordinate = normalizeVertexCoordinate(coordinate)
+  const normalizedPath = normalizeInsertCoordPath(feature, coordPath)
+  if (!nextCoordinate || !normalizedPath) return null
+
+  const nextFeature = cloneFeatureForGeometryEdit(feature)
+  const nextGeometry = nextFeature.geometry
+  const parts = parseCoordPath(normalizedPath)
+
+  if (nextGeometry.type === 'LineString') {
+    nextGeometry.coordinates.splice(parts[0], 0, nextCoordinate)
+    return isLineGeometryValid(nextGeometry.coordinates) ? { feature: nextFeature, coordPath: normalizedPath } : null
+  }
+
+  if (nextGeometry.type === 'Polygon') {
+    const [ringIndex, coordinateIndex] = parts
+    const editableRing = getEditableRingCoordinates(nextGeometry.coordinates[ringIndex])
+    editableRing.splice(coordinateIndex, 0, nextCoordinate)
+    nextGeometry.coordinates[ringIndex] = closePolygonRing(editableRing)
+    return isPolygonGeometryValid(nextGeometry.coordinates) ? { feature: nextFeature, coordPath: normalizedPath } : null
+  }
+
+  return null
+}
+
+const moveVertexInFeature = (feature, coordPath, coordinate) => {
+  const nextCoordinate = normalizeVertexCoordinate(coordinate)
+  const normalizedPath = normalizeExistingCoordPath(feature, coordPath)
+  if (!nextCoordinate || !normalizedPath) return null
+
+  const nextFeature = cloneFeatureForGeometryEdit(feature)
+  const nextGeometry = nextFeature.geometry
+  const parts = parseCoordPath(normalizedPath)
+
+  if (nextGeometry.type === 'LineString') {
+    nextGeometry.coordinates[parts[0]] = nextCoordinate
+    return isLineGeometryValid(nextGeometry.coordinates) ? { feature: nextFeature, coordPath: normalizedPath } : null
+  }
+
+  if (nextGeometry.type === 'Polygon') {
+    const [ringIndex, coordinateIndex] = parts
+    const editableRing = getEditableRingCoordinates(nextGeometry.coordinates[ringIndex])
+    editableRing[coordinateIndex] = nextCoordinate
+    nextGeometry.coordinates[ringIndex] = closePolygonRing(editableRing)
+    return isPolygonGeometryValid(nextGeometry.coordinates) ? { feature: nextFeature, coordPath: normalizedPath } : null
+  }
+
+  return null
+}
+
+const canDeleteVerticesByCoordPaths = (feature, coordPaths = []) => {
+  return Boolean(deleteVerticesFromFeature(feature, coordPaths))
+}
+
 const canDeleteSelected = () => {
   if (draw.value?.getMode?.() !== 'direct_select') return true
   const featureId = selectedFeatureId.value
   const feature = featureId ? draw.value?.get?.(featureId) : null
+  if (feature && selectedVertexCoordPaths.value.length > 0) {
+    return canDeleteVerticesByCoordPaths(feature, selectedVertexCoordPaths.value)
+  }
   const selectedCoordinates = getSelectedPointCoordinatesFromDraw()
   if (!feature || selectedCoordinates.length === 0) return false
 
@@ -550,7 +769,11 @@ const syncShapeEditState = () => {
 
 const syncSelectedFeature = () => {
   const selectedIds = getSelectedFeatureIdsFromDraw()
+  const previousSelectedFeatureId = selectedFeatureId.value
   selectedFeatureId.value = selectedIds[0] ? String(selectedIds[0]) : ''
+  if (draw.value?.getMode?.() !== 'direct_select' || previousSelectedFeatureId !== selectedFeatureId.value) {
+    selectedVertexCoordPaths.value = []
+  }
   if (suppressedProgrammaticFeatureSelectionIds) {
     if (areFeatureIdsEqual(selectedIds, suppressedProgrammaticFeatureSelectionIds)) {
       syncShapeEditState()
@@ -563,6 +786,9 @@ const syncSelectedFeature = () => {
 }
 
 const syncDrawMode = (event) => {
+  if ((event?.mode || draw.value?.getMode?.()) !== 'direct_select') {
+    selectedVertexCoordPaths.value = []
+  }
   emit('mode-change', event?.mode || draw.value?.getMode?.() || 'simple_select')
   syncSelectedFeature()
 }
@@ -575,11 +801,16 @@ const syncFeaturesFromDraw = (options = {}) => {
   }
   emit('update:modelValue', featureCollection)
   emit('features-change', featureCollection)
-  syncSelectedFeature()
+  if (options.syncSelection !== false) {
+    syncSelectedFeature()
+  }
 }
 
 const setDrawMode = (mode) => {
   suppressedProgrammaticFeatureSelectionIds = null
+  if (mode !== 'direct_select') {
+    selectedVertexCoordPaths.value = []
+  }
   draw.value?.changeMode?.(mode)
   if (mode === 'simple_select') {
     syncSelectedFeature()
@@ -592,6 +823,7 @@ const selectFeature = (featureId, options = {}) => {
   suppressedProgrammaticFeatureSelectionIds = null
   if (!draw.value || !featureId) {
     selectedFeatureId.value = ''
+    selectedVertexCoordPaths.value = []
     emit('feature-select', selectedFeatureId.value)
     syncShapeEditState()
     return
@@ -600,6 +832,7 @@ const selectFeature = (featureId, options = {}) => {
   const feature = draw.value?.get?.(featureId)
   if (!feature) {
     selectedFeatureId.value = ''
+    selectedVertexCoordPaths.value = []
     emit('feature-select', selectedFeatureId.value)
     syncShapeEditState()
     return
@@ -609,6 +842,7 @@ const selectFeature = (featureId, options = {}) => {
     draw.value?.changeMode?.('simple_select', { featureIds: [] })
     emit('mode-change', 'simple_select')
     selectedFeatureId.value = ''
+    selectedVertexCoordPaths.value = []
     syncShapeEditState()
     return
   }
@@ -618,6 +852,7 @@ const selectFeature = (featureId, options = {}) => {
     draw.value?.changeMode?.('simple_select', { featureIds: [featureId] })
     emit('mode-change', 'simple_select')
     selectedFeatureId.value = String(featureId)
+    selectedVertexCoordPaths.value = []
     emit('feature-select', selectedFeatureId.value)
     syncShapeEditState()
     return
@@ -634,6 +869,7 @@ const selectFeature = (featureId, options = {}) => {
 const selectFeatures = (featureIds = []) => {
   if (!draw.value) {
     selectedFeatureId.value = ''
+    selectedVertexCoordPaths.value = []
     return
   }
 
@@ -644,6 +880,7 @@ const selectFeatures = (featureIds = []) => {
   draw.value?.changeMode?.('simple_select', { featureIds: selectedIds })
   emit('mode-change', 'simple_select')
   selectedFeatureId.value = selectedIds[0] || ''
+  selectedVertexCoordPaths.value = []
   syncShapeEditState()
 }
 
@@ -867,8 +1104,92 @@ const updateFeatureProperties = (featureId, nextProperties, options = {}) => {
   syncFeaturesFromDraw({ commitHistory: options.commitHistory !== false })
 }
 
+const replaceFeatureInDraw = (nextFeature, options = {}) => {
+  if (!draw.value || !nextFeature || typeof draw.value.set !== 'function') return false
+  const nextFeatureId = getDrawFeatureId(nextFeature)
+  if (!nextFeatureId) return false
+
+  const featureCollection = normalizeFeatureCollection(draw.value.getAll?.() ?? props.modelValue)
+  const nextFeatures = (featureCollection.features ?? []).map((feature) => (
+    getDrawFeatureId(feature) === nextFeatureId ? nextFeature : feature
+  ))
+  if (!nextFeatures.some((feature) => getDrawFeatureId(feature) === nextFeatureId)) return false
+
+  draw.value.set({
+    type: 'FeatureCollection',
+    features: nextFeatures,
+  })
+  syncFeaturesFromDraw({
+    commitHistory: options.commitHistory !== false,
+    syncSelection: false,
+  })
+  return true
+}
+
+const selectVertex = (featureId, coordPath) => {
+  suppressedProgrammaticFeatureSelectionIds = null
+  const feature = featureId ? draw.value?.get?.(featureId) : null
+  const normalizedPath = normalizeExistingCoordPath(feature, coordPath)
+  if (!draw.value || !featureId || !feature || !isDrawFeatureSelectable(feature) || !normalizedPath) {
+    return false
+  }
+
+  selectedVertexCoordPaths.value = [normalizedPath]
+  draw.value?.changeMode?.('simple_select')
+  draw.value?.changeMode?.('direct_select', { featureId, coordPath: normalizedPath })
+  emit('mode-change', 'direct_select')
+  selectedFeatureId.value = String(featureId)
+  emit('feature-select', selectedFeatureId.value)
+  syncShapeEditState()
+  return true
+}
+
+const insertVertex = (featureId, coordPath, coordinate, options = {}) => {
+  const feature = featureId ? draw.value?.get?.(featureId) : null
+  if (!draw.value || !feature || !isDrawFeatureSelectable(feature)) return false
+  const result = insertVertexIntoFeature(feature, coordPath, coordinate)
+  if (!result) return false
+
+  const didReplace = replaceFeatureInDraw(result.feature, options)
+  if (!didReplace) return false
+  selectVertex(featureId, result.coordPath)
+  return true
+}
+
+const moveVertex = (featureId, coordPath, coordinate, options = {}) => {
+  const feature = featureId ? draw.value?.get?.(featureId) : null
+  if (!draw.value || !feature || !isDrawFeatureSelectable(feature)) return false
+  const result = moveVertexInFeature(feature, coordPath, coordinate)
+  if (!result) return false
+
+  const didReplace = replaceFeatureInDraw(result.feature, options)
+  if (!didReplace) return false
+  selectVertex(featureId, result.coordPath)
+  return true
+}
+
+const deleteVertices = (featureId, coordPaths, options = {}) => {
+  const feature = featureId ? draw.value?.get?.(featureId) : null
+  if (!draw.value || !feature || !isDrawFeatureSelectable(feature)) return false
+  const nextFeature = deleteVerticesFromFeature(feature, coordPaths)
+  if (!nextFeature) return false
+
+  const didReplace = replaceFeatureInDraw(nextFeature, options)
+  if (!didReplace) return false
+  selectedVertexCoordPaths.value = []
+  draw.value?.changeMode?.('direct_select', { featureId })
+  emit('mode-change', 'direct_select')
+  selectedFeatureId.value = String(featureId)
+  emit('feature-select', selectedFeatureId.value)
+  syncShapeEditState()
+  return true
+}
+
 const deleteSelected = () => {
   if (!canDeleteSelected()) return false
+  if (draw.value?.getMode?.() === 'direct_select' && selectedVertexCoordPaths.value.length > 0) {
+    return deleteVertices(selectedFeatureId.value, selectedVertexCoordPaths.value, { commitHistory: false })
+  }
   isDeletingSelected = true
   try {
     draw.value?.trash?.()
@@ -881,6 +1202,7 @@ const deleteSelected = () => {
 
 const clearAll = () => {
   draw.value?.deleteAll?.()
+  selectedVertexCoordPaths.value = []
   syncFeaturesFromDraw({ commitHistory: false })
 }
 
@@ -905,6 +1227,7 @@ const importGeoJson = (featureCollection, options = {}) => {
     draw.value.set(nextFeatureCollection)
   }
   selectedFeatureId.value = ''
+  selectedVertexCoordPaths.value = []
   if (shouldEmitChanges) {
     syncFeaturesFromDraw()
   } else if (options.emitSelection !== false) {
@@ -1523,6 +1846,9 @@ defineExpose({
   setDrawMode,
   selectFeature,
   selectFeatures,
+  selectVertex,
+  insertVertex,
+  moveVertex,
   selectedFeatureId,
   updateFeatureProperties,
   canDeleteSelected,
