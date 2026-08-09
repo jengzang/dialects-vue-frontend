@@ -367,7 +367,7 @@ describe('EditableMapLibre state flow', () => {
     wrapper.unmount()
   })
 
-  it('keeps locked or hidden features out of direct edit mode', async () => {
+  it('keeps locked or hidden features out of map selection modes', async () => {
     const wrapper = mountEditableMapLibre({
       type: 'FeatureCollection',
       features: [{
@@ -381,10 +381,83 @@ describe('EditableMapLibre state flow', () => {
 
     wrapper.exposed.selectFeature('hidden-1', { directEdit: true })
 
-    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select')
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: [] })
     expect(wrapper.draw.changeMode).not.toHaveBeenCalledWith('direct_select', { featureId: 'hidden-1' })
+    expect(wrapper.draw.changeMode).not.toHaveBeenCalledWith('simple_select', { featureIds: ['hidden-1'] })
     expect(wrapper.events).toContainEqual(['mode-change', 'simple_select'])
-    expect(wrapper.events).toContainEqual(['feature-select', 'hidden-1'])
+    expect(wrapper.events).not.toContainEqual(['feature-select', 'hidden-1'])
+
+    wrapper.draw.changeMode.mockClear()
+    wrapper.events.length = 0
+    wrapper.exposed.selectFeature('hidden-1', { directEdit: false })
+
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: [] })
+    expect(wrapper.draw.changeMode).not.toHaveBeenCalledWith('simple_select', { featureIds: ['hidden-1'] })
+    expect(wrapper.events).toContainEqual(['mode-change', 'simple_select'])
+    expect(wrapper.events).not.toContainEqual(['feature-select', 'hidden-1'])
+
+    wrapper.unmount()
+  })
+
+  it('filters hidden and locked features out of natural Draw selection changes', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'visible-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'hidden-1',
+        type: 'Feature',
+        properties: { visible: false, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'locked-1',
+        type: 'Feature',
+        properties: { visible: true, locked: true },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    wrapper.draw.selectedIds = ['hidden-1', 'locked-1', 'visible-1']
+    wrapper.map.emit('draw.selectionchange')
+
+    expect(wrapper.events).toContainEqual(['feature-select', 'visible-1'])
+    expect(wrapper.events).not.toContainEqual(['feature-select', ['hidden-1', 'locked-1', 'visible-1']])
+
+    wrapper.unmount()
+  })
+
+  it('filters hidden and locked features out of programmatic multi-selection', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'visible-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'hidden-1',
+        type: 'Feature',
+        properties: { visible: false, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'locked-1',
+        type: 'Feature',
+        properties: { visible: true, locked: true },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    wrapper.exposed.selectFeatures(['hidden-1', 'visible-1', 'locked-1'])
+
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: ['visible-1'] })
+    expect(wrapper.events).toContainEqual(['mode-change', 'simple_select'])
 
     wrapper.unmount()
   })

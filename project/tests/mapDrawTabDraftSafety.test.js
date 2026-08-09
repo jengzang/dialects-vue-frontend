@@ -266,6 +266,7 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       selectedFeatureBatchName: { type: String, default: '' },
       selectedFeatureBatchPropertyKey: { type: String, default: '' },
       selectedFeatureBatchPropertyValue: { type: String, default: '' },
+      selectedFeatureId: { type: String, default: '' },
       selectedFeatureIds: { type: Array, default: () => [] },
       currentMode: { type: String, default: 'simple_select' },
       selectedVertexCount: { type: Number, default: 0 },
@@ -276,6 +277,7 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
     },
     emits: [
       'set-mode',
+      'select-feature',
       'toggle-feature-selection',
       'select-all-features',
       'invert-feature-selection',
@@ -319,6 +321,14 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
           >
             {{ feature.visible ? 'visible' : 'hidden' }} {{ feature.locked ? 'locked' : 'unlocked' }}
           </span>
+          <button
+            data-testid="feature-select-row"
+            type="button"
+            :data-active="selectedFeatureId === feature.id ? 'true' : 'false'"
+            @click.stop="$emit('select-feature', feature.id)"
+          >
+            select row
+          </button>
         </label>
         <button
           data-testid="toggle-feature-box-select"
@@ -1562,6 +1572,67 @@ describe('MapDrawTab draft safety', () => {
     expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
       .map((item) => item.checked)).toEqual([false, false, true])
     expect(mocks.mapSelectFeature).toHaveBeenCalledTimes(mapSelectFeatureCallCountBeforeNaturalSelection + 1)
+    expect(mocks.mapSelectFeature).toHaveBeenLastCalledWith('feature-3', { directEdit: false })
+
+    wrapper.unmount()
+  })
+
+  it('keeps hidden and locked panel row selection out of map selection state', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    let checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[0].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="hide-selected-features"]').click()
+    await flushTicks()
+
+    checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[1].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="lock-selected-features"]').click()
+    await flushTicks()
+
+    mocks.mapSelectFeature.mockClear()
+    mocks.mapSelectFeatures.mockClear()
+
+    let rowButtons = wrapper.host.querySelectorAll('[data-testid="feature-select-row"]')
+    rowButtons[0].click()
+    await flushTicks()
+
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((item) => item.checked)).toEqual([true, false, false])
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+    expect(mocks.mapSelectFeature).not.toHaveBeenCalled()
+
+    rowButtons = wrapper.host.querySelectorAll('[data-testid="feature-select-row"]')
+    rowButtons[1].click()
+    await flushTicks()
+
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((item) => item.checked)).toEqual([false, true, false])
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+    expect(mocks.mapSelectFeature).not.toHaveBeenCalled()
+
+    rowButtons = wrapper.host.querySelectorAll('[data-testid="feature-select-row"]')
+    rowButtons[2].click()
+    await flushTicks()
+
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((item) => item.checked)).toEqual([false, false, true])
     expect(mocks.mapSelectFeature).toHaveBeenLastCalledWith('feature-3', { directEdit: false })
 
     wrapper.unmount()

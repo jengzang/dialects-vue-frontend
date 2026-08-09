@@ -519,8 +519,7 @@ export function useGisMapCore(options = {}) {
   const handleSelectFeatureFromPanel = (featureId) => {
     if (!featureId) return;
     setFeatureSelection([featureId], featureId);
-    editableMapRef?.value?.selectFeature?.(featureId, { directEdit: false });
-    currentMode.value = 'simple_select';
+    syncFeatureSelectionToMap();
   };
 
   const getPreferredFeatureSelectionId = (featureIds = [], requestedFeatureId = '') => {

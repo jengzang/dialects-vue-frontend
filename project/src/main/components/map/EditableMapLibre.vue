@@ -465,11 +465,20 @@ const areFeatureIdsEqual = (leftFeatureIds = [], rightFeatureIds = []) => {
   return leftIds.every((featureId) => rightIdSet.has(featureId))
 }
 
+const isDrawFeatureSelectable = (feature) => Boolean(
+  feature
+  && feature.properties?.visible !== false
+  && feature.properties?.locked !== true
+)
+
+const isDrawFeatureSelectableById = (featureId) => isDrawFeatureSelectable(draw.value?.get?.(featureId))
+
 const getSelectedFeatureIdsFromDraw = () => {
   const selectedIds = normalizeFeatureIds(draw.value?.getSelectedIds?.() ?? [])
+    .filter(isDrawFeatureSelectableById)
   if (selectedIds.length > 0) return selectedIds
   const mode = draw.value?.getMode?.()
-  if (mode === 'direct_select' && selectedFeatureId.value && draw.value?.get?.(selectedFeatureId.value)) {
+  if (mode === 'direct_select' && selectedFeatureId.value && isDrawFeatureSelectableById(selectedFeatureId.value)) {
     return [selectedFeatureId.value]
   }
   return selectedIds
@@ -596,18 +605,17 @@ const selectFeature = (featureId, options = {}) => {
     return
   }
 
-  const shouldDirectEdit = options.directEdit !== false
-  if (!shouldDirectEdit) {
-    draw.value?.changeMode?.('simple_select', { featureIds: [featureId] })
+  if (!isDrawFeatureSelectable(feature)) {
+    draw.value?.changeMode?.('simple_select', { featureIds: [] })
     emit('mode-change', 'simple_select')
-    selectedFeatureId.value = String(featureId)
-    emit('feature-select', selectedFeatureId.value)
+    selectedFeatureId.value = ''
     syncShapeEditState()
     return
   }
 
-  if (feature?.properties?.locked || feature?.properties?.visible === false) {
-    draw.value?.changeMode?.('simple_select')
+  const shouldDirectEdit = options.directEdit !== false
+  if (!shouldDirectEdit) {
+    draw.value?.changeMode?.('simple_select', { featureIds: [featureId] })
     emit('mode-change', 'simple_select')
     selectedFeatureId.value = String(featureId)
     emit('feature-select', selectedFeatureId.value)
@@ -631,7 +639,7 @@ const selectFeatures = (featureIds = []) => {
 
   const selectedIds = featureIds
     .map((featureId) => String(featureId || ''))
-    .filter((featureId) => featureId && draw.value?.get?.(featureId))
+    .filter((featureId) => featureId && isDrawFeatureSelectableById(featureId))
   suppressedProgrammaticFeatureSelectionIds = selectedIds
   draw.value?.changeMode?.('simple_select', { featureIds: selectedIds })
   emit('mode-change', 'simple_select')
@@ -677,12 +685,7 @@ const isPointInScreenBox = (point, box) => {
 const getDrawFeatureId = (feature) => String(feature?.id ?? feature?.properties?.id ?? '')
 
 const isFeatureBoxSelectableFeature = (featureId) => {
-  const feature = draw.value?.get?.(featureId)
-  return Boolean(
-    feature
-    && feature.properties?.visible !== false
-    && feature.properties?.locked !== true
-  )
+  return isDrawFeatureSelectableById(featureId)
 }
 
 const collectProjectedFeaturePoints = (coordinates, points = []) => {

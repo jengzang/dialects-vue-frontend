@@ -247,8 +247,8 @@ describe('Map draw editor contracts', () => {
     expect(tabSource).toContain(':feature-items="activeLayerFeatureItems"')
     expect(tabSource).toContain(':selected-feature-id="selectedEditorFeatureId"')
     expect(tabSource).toContain('@select-feature="handleSelectFeatureFromPanel"')
-    expect(coreSource).toContain("editableMapRef?.value?.selectFeature?.(featureId, { directEdit: false });")
-    expect(coreSource).toMatch(/const handleSelectFeatureFromPanel = \(featureId\) => \{[\s\S]*currentMode\.value = 'simple_select'/)
+    expect(coreSource).toMatch(/const handleSelectFeatureFromPanel = \(featureId\) => \{[\s\S]*setFeatureSelection\(\[featureId\], featureId\);[\s\S]*syncFeatureSelectionToMap\(\);[\s\S]*\}/)
+    expect(coreSource).toMatch(/const syncFeatureSelectionToMap = \(\) => \{[\s\S]*currentMode\.value = 'simple_select'/)
   })
 
   it('edits selected feature properties separately from active layer properties', () => {
@@ -290,9 +290,12 @@ describe('Map draw editor contracts', () => {
     expect(editableSource).toContain('const selectFeature = (featureId, options = {}) =>')
     expect(editableSource).toContain('const shouldDirectEdit = options.directEdit !== false')
     expect(editableSource).toMatch(/if \(!shouldDirectEdit\) \{[\s\S]*draw\.value\?\.changeMode\?\.\('simple_select', \{ featureIds: \[featureId\] \}\)/)
-    expect(editableSource).toContain('feature?.properties?.locked || feature?.properties?.visible === false')
-    expect(editableSource).toMatch(/feature\?\.properties\?\.locked \|\| feature\?\.properties\?\.visible === false[\s\S]*draw\.value\?\.changeMode\?\.\('simple_select'\)/)
-    expect(editableSource).toMatch(/feature\?\.properties\?\.locked \|\| feature\?\.properties\?\.visible === false[\s\S]*emit\('mode-change', 'simple_select'\)/)
+    expect(editableSource).toContain('const isDrawFeatureSelectable = (feature) => Boolean')
+    expect(editableSource).toContain('const isDrawFeatureSelectableById = (featureId) => isDrawFeatureSelectable(draw.value?.get?.(featureId))')
+    expect(editableSource).toMatch(/if \(!isDrawFeatureSelectable\(feature\)\) \{[\s\S]*draw\.value\?\.changeMode\?\.\('simple_select', \{ featureIds: \[\] \}\)/)
+    expect(editableSource).toMatch(/if \(!isDrawFeatureSelectable\(feature\)\) \{[\s\S]*emit\('mode-change', 'simple_select'\)/)
+    expect(editableSource).toMatch(/const getSelectedFeatureIdsFromDraw = \(\) => \{[\s\S]*filter\(isDrawFeatureSelectableById\)/)
+    expect(editableSource).toMatch(/const selectFeatures = \(featureIds = \[\]\) => \{[\s\S]*filter\(\(featureId\) => featureId && isDrawFeatureSelectableById\(featureId\)\)/)
   })
 
   it('prevents drawing and destructive actions while the active layer is hidden or locked', () => {
