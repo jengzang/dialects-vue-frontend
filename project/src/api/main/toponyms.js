@@ -27,7 +27,7 @@ function appendCommonSearchParams(query, params = {}, defaultLimit) {
   query.set('limit', String(normalizeLimit(params.limit, defaultLimit)));
 
   if (params.place_type_code !== undefined && params.place_type_code !== null && params.place_type_code !== '') {
-    query.set('place_type_code', String(params.place_type_code));
+    appendRepeatedParams(query, 'place_type_code', params.place_type_code);
   }
 
   if (params.bbox) {

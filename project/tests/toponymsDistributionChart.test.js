@@ -47,8 +47,12 @@ describe('toponyms ECharts distribution chart', () => {
     expect(chart).toContain('POINT_SHAPE_OPTIONS');
     expect(chart).toContain('pointConfig.size');
     expect(chart).toContain('pointConfig.shape');
-    expect(chart).toContain('pointConfig.color');
-    expect(chart).toContain('pointConfig.backgroundColor');
+    expect(chart).toContain("POINT_COLOR_TOKEN = '--color-primary'");
+    expect(chart).toContain('cssToken(POINT_COLOR_TOKEN)');
+    expect(chart).not.toContain('type="color"');
+    expect(chart).not.toMatch(/#[0-9a-fA-F]{3,8}/);
+    expect(chart).not.toContain('pointConfig.color');
+    expect(chart).not.toContain('pointConfig.backgroundColor');
     expect(layers).toContain('class="toponym-layer-controls__toggle"');
     expect(page).toContain(':loading-layers="loadingLayers"');
     expect(page).toContain(':layer-errors="layerErrors"');

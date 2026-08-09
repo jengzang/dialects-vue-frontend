@@ -85,6 +85,8 @@ describe('toponyms page shell', () => {
     const nameTreeBody = functionBody(page, 'handleNameTreeRequest');
 
     expect(searchBody).toContain('limit: 0');
+    expect(page).toContain("const TOPONYM_VILLAGE_PLACE_TYPE_CODES = ['22200', '21610', '27610']");
+    expect(searchBody).toContain('place_type_code: TOPONYM_VILLAGE_PLACE_TYPE_CODES');
     expect(searchBody).toContain('lastPointSearchParams.value = searchParams');
     expect(searchBody).not.toContain('pointLimit.value');
     expect(nameTreeBody).toContain('getToponymNames');
@@ -97,6 +99,9 @@ describe('toponyms page shell', () => {
     expect(page).toContain('parent_path: node.path');
     expect(page).toContain('page_size: TOPONYM_NAME_TREE_PAGE_SIZE');
     expect(page).toContain('mergeLazyTreePayload');
+    expect(functionBody(page, 'mergeLazyTreePayload').indexOf('Array.isArray(payload.names)')).toBeLessThan(
+      functionBody(page, 'mergeLazyTreePayload').indexOf('Array.isArray(payload.children)')
+    );
     expect(page).toContain('lazy_bootstrap');
     expect(page).toContain('lazyBootstrap: true');
     expect(page).toContain('expanded: true');
@@ -140,8 +145,10 @@ describe('toponyms page shell', () => {
     const detailPanel = readSource('src/main/views/explore/villages/toponyms/ToponymDetailPanel.vue');
 
     expect(page).toContain('toponyms-page__workspace');
+    expect(page).toContain('toponyms-page__toolbar-copy');
     expect(page).toContain('toponyms-page__chart-header');
     expect(page).toContain('toponyms-page__stat-strip');
+    expect(page).not.toContain('toponyms-page__hero');
     expect(searchBar).toContain('toponym-search-bar__hint');
     expect(resultsPanel).toContain('toponym-results-panel__inspector');
     expect(resultsPanel).toContain('toponym-results-panel__name-tree-note');
@@ -155,6 +162,7 @@ describe('toponyms page shell', () => {
       'src/main/views/explore/villages/toponyms/ToponymLayerControls.vue',
       'src/main/views/explore/villages/toponyms/ToponymResultsPanel.vue',
       'src/main/views/explore/villages/toponyms/ToponymDetailPanel.vue',
+      'src/main/views/explore/villages/toponyms/ToponymDistributionChart.vue',
     ];
 
     for (const file of files) {

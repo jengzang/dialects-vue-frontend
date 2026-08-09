@@ -64,6 +64,27 @@ describe('toponyms API contracts', () => {
     expect(query.get('place_type_code')).toBeNull();
   });
 
+  it('serializes multiple place type codes as repeated query params', async () => {
+    apiMock.mockResolvedValueOnce({
+      items: [],
+      count: 0,
+      truncated: false,
+      next: null,
+    });
+
+    await getToponymPoints({
+      q: '黄',
+      match_mode: 'prefix',
+      limit: 0,
+      place_type_code: ['22200', '21610', '27610'],
+    });
+
+    const calledUrl = apiMock.mock.calls[0][0];
+    const query = new URL(`https://example.test${calledUrl}`).searchParams;
+
+    expect(query.getAll('place_type_code')).toEqual(['22200', '21610', '27610']);
+  });
+
   it('exports toponyms APIs from the shared API surface', () => {
     const source = readSource('src/api/index.js');
 

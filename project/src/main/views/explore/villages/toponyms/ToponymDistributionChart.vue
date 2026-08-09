@@ -43,22 +43,6 @@
               @update:model-value="pointConfig.shape = $event"
             />
           </label>
-
-          <label class="chart-config__field">
-            <span>{{ t('villages.pages.toponyms.chart.configColor') }}</span>
-            <input
-              v-model="pointConfig.color"
-              type="color"
-            >
-          </label>
-
-          <label class="chart-config__field">
-            <span>{{ t('villages.pages.toponyms.chart.configBackground') }}</span>
-            <input
-              v-model="pointConfig.backgroundColor"
-              type="color"
-            >
-          </label>
         </fieldset>
 
         <fieldset class="chart-config__group">
@@ -91,6 +75,7 @@ import {
 const COUNTRY_MAP_NAME = 'toponyms-country';
 const BOUNDARY_LAYER_KEYS = ['provinces', 'cities'];
 const TOPONYM_LARGE_RENDER_THRESHOLD = 2000;
+const POINT_COLOR_TOKEN = '--color-primary';
 const POINT_CLICK_FILTER = {
   seriesType: 'scatter',
 };
@@ -156,8 +141,6 @@ const registeredLayers = new Set();
 const pointConfig = reactive({
   size: 6,
   shape: 'rect',
-  color: '#1a73e8',
-  backgroundColor: '#ffffff',
 });
 
 const statusText = computed(() => {
@@ -234,7 +217,7 @@ function renderChart() {
   }
 
   const option = {
-    backgroundColor: pointConfig.backgroundColor || 'transparent',
+    backgroundColor: 'transparent',
     animation: false,
     tooltip: buildTooltipOption(),
     geo: {
@@ -324,7 +307,7 @@ function buildPointSeries() {
     progressive: 0,
     progressiveThreshold: Number.MAX_SAFE_INTEGER,
     itemStyle: {
-      color: pointConfig.color,
+      color: cssToken(POINT_COLOR_TOKEN),
       opacity: 0.72,
     },
     emphasis: {
@@ -449,16 +432,6 @@ defineExpose({ showConfigModal });
     input[type="range"] {
       flex: 1;
       margin: 0;
-    }
-
-    input[type="color"] {
-      inline-size: 36px;
-      block-size: 28px;
-      padding: 0;
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-sm2);
-      background: none;
-      cursor: pointer;
     }
 
     small {
