@@ -846,10 +846,10 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   }
 
   &-logo {
+    display: block;
     width: clamp(220px, 40vw, 380px);
     height: auto;
-    margin-top: 1rem;
-    margin-bottom: 0.6rem;
+    margin: 1rem auto 0.6rem;
     filter: drop-shadow(0 4px 12px rgba(var(--color-primary-rgb), 0.15));
   }
 
@@ -1799,19 +1799,20 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     }
 
     &-content {
-      margin-left: 0;
+      margin: 0 auto 6rem;
       padding: 1rem;
+      text-align: center;
       background: var(--glass-30);
       backdrop-filter: blur(8px) saturate(180%);
       -webkit-backdrop-filter: blur(24px) saturate(180%);
       border-radius: var(--radius-xl);
       border: 1px solid var(--glass-40);
-      margin-bottom: 6rem;
     }
 
     &-logo {
+      display: block;
       width: clamp(180px, 50vw, 340px);
-      margin: 0;
+      margin: 0 auto;
     }
 
     &-actions {

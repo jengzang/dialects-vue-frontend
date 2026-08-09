@@ -356,10 +356,9 @@ describe('PageTutorialGuide', () => {
     articleImage.click()
     await nextTick()
 
-    const overlay = document.querySelector('.image-preview-overlay')
-    expect(overlay).toBeTruthy()
+    expect(document.querySelector('.image-preview-overlay')).toBeTruthy()
 
-    overlay.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
     await nextTick()
 
     expect(document.querySelector('.image-preview-overlay')).toBeNull()

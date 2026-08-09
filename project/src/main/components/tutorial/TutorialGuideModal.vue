@@ -246,7 +246,9 @@
   <ImagePreviewOverlay
     :src="previewImageSrc"
     :alt="previewImageAlt"
+    :sibling-images="previewSiblingImages"
     @close="closeImagePreview"
+    @navigate="onImageNavigate"
   />
 </template>
 
@@ -333,10 +335,23 @@ const scrollContainer = computed(() => articleScrollRef.value)
 
 const previewImageSrc = ref('')
 const previewImageAlt = ref('')
+const previewSiblingImages = ref([])
+
+function collectArticleImages() {
+  const container = articleScrollRef.value
+  if (!container) return []
+  return [...container.querySelectorAll('.tutorial-article__content img')].map((img) => ({
+    src: img.src,
+    alt: img.alt || '',
+  }))
+}
 
 function handleArticleClick(e) {
   const img = e.target.closest('img')
   if (!img) return
+
+  const siblings = collectArticleImages()
+  previewSiblingImages.value = siblings
   openImagePreview(img.src, img.alt || '')
 }
 
@@ -348,6 +363,12 @@ function openImagePreview(src, alt) {
 function closeImagePreview() {
   previewImageSrc.value = ''
   previewImageAlt.value = ''
+  previewSiblingImages.value = []
+}
+
+function onImageNavigate({ src, alt }) {
+  previewImageSrc.value = src
+  previewImageAlt.value = alt
 }
 
 const shouldShowCatalog = computed(() => {

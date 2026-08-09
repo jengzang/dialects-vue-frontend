@@ -69,7 +69,7 @@ function render() {
   globe.controls().enableZoom = false
   globe.controls().enablePan = true
 
-  globe.pointOfView({ lat: 23, lng: 105, altitude: 1.5 })
+  globe.pointOfView({ lat: 24, lng: 110, altitude: 1.5 })
 
   patchCameraProjection()
 

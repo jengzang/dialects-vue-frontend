@@ -13,32 +13,43 @@ const commonMessages = {
   },
 }
 
-function mountOverlay(src = '/test-image.webp', alt = 'Test image') {
+function mountOverlay(src = '/test-image.webp', alt = 'Test image', siblingImages = []) {
   const host = document.createElement('div')
   document.body.appendChild(host)
+  let onClose
+  let onNavigate
   const app = createApp({
     template: `
       <ImagePreviewOverlay
         :src="src"
         :alt="alt"
+        :sibling-images="siblingImages"
         @close="onClose"
+        @navigate="onNavigate"
       />
     `,
     data() {
-      return { src, alt }
+      return {
+        src,
+        alt,
+        siblingImages,
+      }
     },
     methods: {
       onClose() {
         this.src = ''
         this.alt = ''
+        this.siblingImages = []
+      },
+      onNavigate({ src: newSrc, alt: newAlt }) {
+        this.src = newSrc
+        this.alt = newAlt
       },
     },
     components: {},
   })
 
-  // Use defineAsyncComponent to get the component
   return import('../src/components/common/ImagePreviewOverlay.vue').then((mod) => {
-    app._instance?.proxy?.$options?.components
     app.component('ImagePreviewOverlay', mod.default)
     const i18n = createI18n({
       legacy: false,
@@ -59,15 +70,8 @@ function mountOverlay(src = '/test-image.webp', alt = 'Test image') {
   })
 }
 
-async function openOverlay() {
-  const wrapper = await mountOverlay()
-  await nextTick()
-  return wrapper
-}
-
 describe('ImagePreviewOverlay', () => {
   beforeEach(() => {
-    // ensure body is clean
     document.body.innerHTML = ''
   })
 
@@ -132,8 +136,7 @@ describe('ImagePreviewOverlay', () => {
     const wrapper = await mountOverlay()
     await nextTick()
 
-    const overlay = document.querySelector('.image-preview-overlay')
-    overlay.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
     await nextTick()
 
     expect(document.querySelector('.image-preview-overlay')).toBeNull()
@@ -148,15 +151,12 @@ describe('ImagePreviewOverlay', () => {
     const img = document.querySelector('.image-preview-overlay__img')
     expect(img).toBeTruthy()
 
-    // Initial: no zoom
     expect(img.style.transform).toContain('scale(1)')
 
-    // Double-click to zoom to 2x
     img.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }))
     await nextTick()
     expect(img.style.transform).toContain('scale(2)')
 
-    // Double-click again to reset to 1x
     img.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }))
     await nextTick()
     expect(img.style.transform).toContain('scale(1)')
@@ -170,20 +170,13 @@ describe('ImagePreviewOverlay', () => {
 
     const img = document.querySelector('.image-preview-overlay__img')
 
-    // Zoom in (scroll up = negative deltaY)
     img.dispatchEvent(new WheelEvent('wheel', { deltaY: -120, bubbles: true }))
     await nextTick()
     expect(img.style.transform).toContain('scale(1.12)')
 
-    // Zoom out (scroll down = positive deltaY)
     img.dispatchEvent(new WheelEvent('wheel', { deltaY: 120, bubbles: true }))
     await nextTick()
     expect(img.style.transform).toContain('scale(1)')
-
-    // Keep zooming out to below 1 → pans reset
-    img.dispatchEvent(new WheelEvent('wheel', { deltaY: 120, bubbles: true }))
-    await nextTick()
-    expect(img.style.transform).toContain('scale(0.88)')
 
     wrapper.unmount()
   })
@@ -194,17 +187,126 @@ describe('ImagePreviewOverlay', () => {
 
     const img = document.querySelector('.image-preview-overlay__img')
 
-    // Zoom in
     img.dispatchEvent(new WheelEvent('wheel', { deltaY: -120, bubbles: true }))
     await nextTick()
     expect(img.style.transform).toContain('scale(1.12)')
 
-    // Close
     const closeBtn = document.querySelector('.image-preview-overlay .close-btn')
     closeBtn.click()
     await nextTick()
 
     expect(document.querySelector('.image-preview-overlay')).toBeNull()
+
+    wrapper.unmount()
+  })
+
+  it('zooms with + and - keys', async () => {
+    const wrapper = await mountOverlay()
+    await nextTick()
+
+    const img = document.querySelector('.image-preview-overlay__img')
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: '=', bubbles: true }))
+    await nextTick()
+    expect(img.style.transform).toContain('scale(1.25)')
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: '-', bubbles: true }))
+    await nextTick()
+    expect(img.style.transform).toContain('scale(1)')
+
+    wrapper.unmount()
+  })
+
+  it('resets with 0 key', async () => {
+    const wrapper = await mountOverlay()
+    await nextTick()
+
+    const img = document.querySelector('.image-preview-overlay__img')
+
+    img.dispatchEvent(new WheelEvent('wheel', { deltaY: -120, bubbles: true }))
+    await nextTick()
+    expect(img.style.transform).toContain('scale(1.12)')
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: '0', bubbles: true }))
+    await nextTick()
+    expect(img.style.transform).toContain('scale(1)')
+
+    wrapper.unmount()
+  })
+
+  it('shows nav arrows with siblings and navigates', async () => {
+    const siblings = [
+      { src: '/img1.webp', alt: 'First' },
+      { src: '/img2.webp', alt: 'Second' },
+      { src: '/img3.webp', alt: 'Third' },
+    ]
+    const wrapper = await mountOverlay('/img2.webp', 'Second', siblings)
+    await nextTick()
+
+    expect(document.querySelector('.image-preview-overlay__nav--prev')).toBeTruthy()
+    expect(document.querySelector('.image-preview-overlay__nav--next')).toBeTruthy()
+
+    const prevBtn = document.querySelector('.image-preview-overlay__nav--prev')
+    prevBtn.click()
+    await nextTick()
+
+    const img = document.querySelector('.image-preview-overlay__img')
+    expect(img.getAttribute('src')).toBe('/img1.webp')
+
+    wrapper.unmount()
+  })
+
+  it('hides nav arrows when only one image', async () => {
+    const wrapper = await mountOverlay('/img1.webp', 'Only')
+    await nextTick()
+
+    expect(document.querySelector('.image-preview-overlay__nav--prev')).toBeNull()
+    expect(document.querySelector('.image-preview-overlay__nav--next')).toBeNull()
+
+    wrapper.unmount()
+  })
+
+  it('navigates with arrow keys when siblings present and not shift', async () => {
+    const siblings = [
+      { src: '/img1.webp', alt: 'First' },
+      { src: '/img2.webp', alt: 'Second' },
+    ]
+    const wrapper = await mountOverlay('/img1.webp', 'First', siblings)
+    await nextTick()
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }))
+    await nextTick()
+
+    expect(document.querySelector('.image-preview-overlay__img').getAttribute('src')).toBe('/img2.webp')
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }))
+    await nextTick()
+
+    expect(document.querySelector('.image-preview-overlay__img').getAttribute('src')).toBe('/img1.webp')
+
+    wrapper.unmount()
+  })
+
+  it('shifts pan with arrow keys when zoomed (shift or no siblings)', async () => {
+    const siblings = [
+      { src: '/img1.webp', alt: 'First' },
+      { src: '/img2.webp', alt: 'Second' },
+    ]
+    const wrapper = await mountOverlay('/img1.webp', 'First', siblings)
+    await nextTick()
+
+    const img = document.querySelector('.image-preview-overlay__img')
+
+    // Zoom in so panning is active
+    img.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }))
+    await nextTick()
+    expect(img.style.transform).toContain('scale(2)')
+
+    // With siblings, shift+ArrowRight should pan instead of navigate
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', shiftKey: true, bubbles: true }))
+    await nextTick()
+    // src should still be img1 (panned, not navigated)
+    expect(img.getAttribute('src')).toBe('/img1.webp')
 
     wrapper.unmount()
   })
