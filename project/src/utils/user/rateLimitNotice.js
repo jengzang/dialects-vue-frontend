@@ -1,5 +1,4 @@
 import { reactive } from 'vue'
-import { showWarning } from '@/utils/ui/message.js'
 import i18n from '@/i18n'
 
 function createDefaultState() {
@@ -75,7 +74,8 @@ export function clearRateLimitNotice() {
   Object.assign(rateLimitNoticeState, createDefaultState())
 }
 
-export function showRateLimitNotice(notice = {}) {
+export async function showRateLimitNotice(notice = {}) {
+  const { showWarning } = await import('@/utils/ui/message.js')
   const t = i18n.global.t
 
   const retryAfterSeconds = normalizeRetryAfterSeconds(
