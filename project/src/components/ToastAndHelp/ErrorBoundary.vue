@@ -64,9 +64,7 @@
 
 <script setup>
 import { onErrorCaptured, ref } from 'vue'
-import { useRouter } from 'vue-router'
 
-const router = useRouter()
 const hasError = ref(false)
 
 onErrorCaptured((err, instance, info) => {
@@ -76,12 +74,12 @@ onErrorCaptured((err, instance, info) => {
 })
 
 function resetError() {
-  hasError.value = false
+  window.location.reload()
 }
 
 function goToFeedback() {
-  hasError.value = false
-  router.push('/menu/about/suggestion')
+  sessionStorage.setItem('__error_boundary_redirect', '/menu/about/suggestion')
+  window.location.reload()
 }
 </script>
 

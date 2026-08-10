@@ -104,6 +104,15 @@ export default {
       return MenuLayout
     })
 
+    // ErrorBoundary 强刷后跳转反馈页
+    onMounted(() => {
+      const redirect = sessionStorage.getItem('__error_boundary_redirect')
+      if (redirect) {
+        sessionStorage.removeItem('__error_boundary_redirect')
+        router.replace(redirect)
+      }
+    })
+
     // 初始化在线时长统计
     onMounted(async () => {
       const token = getToken()
