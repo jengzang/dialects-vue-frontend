@@ -134,15 +134,15 @@ const categoryConfigs = computed(() => [
     categoryKey: 'category_工具使用',
     endpoints: [
       {
-        key: 'endpoint__api_tools_check_analyze',
+        key: 'endpoint_group_tools_check',
         label: t('user.leaderboard.categories.tools.items.check')
       },
       {
-        key: 'endpoint__api_tools_jyut2ipa_upload',
+        key: 'endpoint_group_tools_jyut2ipa',
         label: t('user.leaderboard.categories.tools.items.jyut2ipa')
       },
       {
-        key: 'endpoint__api_tools_merge_execute',
+        key: 'endpoint_group_tools_merge',
         label: t('user.leaderboard.categories.tools.items.merge')
       },
       {
@@ -152,21 +152,41 @@ const categoryConfigs = computed(() => [
     ]
   },
   {
+    id: 'villageGeography',
+    icon: '🌏',
+    label: t('user.leaderboard.categories.villageGeography.label'),
+    categoryKey: 'category_地理村落',
+    endpoints: [
+      {
+        key: 'endpoint__api_get_coordinates',
+        label: t('user.leaderboard.categories.villageGeography.items.coordinates'),
+        tooltip: t('user.leaderboard.categories.villageGeography.tooltips.coordinates')
+      },
+      {
+        key: 'endpoint_group_locations',
+        label: t('user.leaderboard.categories.villageGeography.items.locations'),
+        tooltip: t('user.leaderboard.categories.villageGeography.tooltips.locations')
+      },
+      {
+        key: 'endpoint_group_villages_ml',
+        label: t('user.leaderboard.categories.villageGeography.items.villages')
+      },
+      // {
+      //   key: 'endpoint_group_toponyms',
+      //   label: t('user.leaderboard.categories.villageGeography.items.toponyms')
+      // },
+      // {
+      //   key: 'endpoint_group_gis',
+      //   label: t('user.leaderboard.categories.villageGeography.items.gis')
+      // }
+    ]
+  },
+  {
     id: 'other',
     icon: '🏷️',
     label: t('user.leaderboard.categories.other.label'),
     categoryKey: 'category_其他查询',
     endpoints: [
-      {
-        key: 'endpoint__api_get_coordinates',
-        label: t('user.leaderboard.categories.other.items.coordinates'),
-        tooltip: t('user.leaderboard.categories.other.tooltips.coordinates')
-      },
-      {
-        key: 'endpoint_group_locations',
-        label: t('user.leaderboard.categories.other.items.locations'),
-        tooltip: t('user.leaderboard.categories.other.tooltips.locations')
-      },
       {
         key: 'endpoint__sql_query',
         label: t('user.leaderboard.categories.other.items.table'),
@@ -176,12 +196,27 @@ const categoryConfigs = computed(() => [
         key: 'endpoint_group_sql_tree',
         label: t('user.leaderboard.categories.other.items.tree'),
         tooltip: t('user.leaderboard.categories.other.tooltips.tree')
+      }
+    ]
+  },
+  {
+    id: 'customData',
+    icon: '📋',
+    label: t('user.leaderboard.categories.customData.label'),
+    categoryKey: 'category_用户自定义',
+    endpoints: [
+      {
+        key: 'endpoint_group_custom_regions',
+        label: t('user.leaderboard.categories.customData.items.customRegions')
       },
       {
-        key:'endpoint_group_villages_ml',
-        label: t('user.leaderboard.categories.other.items.villages'),
-        // tooltip: t()
+        key: 'endpoint_group_custom_data_query',
+        label: t('user.leaderboard.categories.customData.items.customDataQuery')
       },
+      {
+        key: 'endpoint_group_custom_data_edit',
+        label: t('user.leaderboard.categories.customData.items.customDataEdit')
+      }
     ]
   },
 ])
