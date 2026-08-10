@@ -155,13 +155,10 @@ const partitionModeOptions = computed(() => [
 
 const effectiveDrawableCount = computed(() => {
   if (allPartitionRows.value.length === 0) return 0
+  if (!ignoreDialectIslands.value) return allPartitionRows.value.length
   let count = 0
   allPartitionRows.value.forEach((row) => {
-    if (ignoreDialectIslands.value && getStringField(row, ['方言島', '方言岛']) === '1') return
-    const name = getStringField(row, ['簡稱', '简称'])
-    const coordinate = parseCoordinate(getStringField(row, ['經緯度', '经纬度']))
-    const region = resolvePartitionField(row)
-    if (name && coordinate && region) count++
+    if (getStringField(row, ['方言島', '方言岛']) !== '1') count++
   })
   return count
 })
