@@ -73,7 +73,8 @@
     "labels": {
       "regionLevel": "绘图区层级",
       "useAllData": "使用全部数据",
-      "partitionSource": "分区来源"
+      "partitionSource": "分区来源",
+      "ignoreDialectIslands": "忽略方言岛"
     },
     "placeholders": {
       "selectLevel": "请选择层级"

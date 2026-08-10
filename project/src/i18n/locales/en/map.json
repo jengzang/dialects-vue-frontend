@@ -73,7 +73,8 @@
     "labels": {
       "regionLevel": "Region Level",
       "useAllData": "Use All Data",
-      "partitionSource": "Region Source"
+      "partitionSource": "Region Source",
+      "ignoreDialectIslands": "Ignore Dialect Islands"
     },
     "placeholders": {
       "selectLevel": "Select a level"

@@ -7,7 +7,7 @@ import provincesGeoJsonUrl from '/data/gis/china_provinces.geojson?url';
 import citiesGeoJsonUrl from '/data/gis/china_cities_simplified_balanced.geojson?url';
 import countiesGeoJsonUrl from '/data/gis/china_counties_simplified_light.geojson?url';
 
-import { getLocationPartitions } from '@/api/main/geo/LocationAndRegion.js';
+import { getLocationPoints } from '@/api/main/geo/LocationAndRegion.js';
 import { usePartitionCache } from '@/composables/data/usePartitionCache.js';
 import { showError, showSuccess } from '@/utils/ui/message.js';
 import {
@@ -69,7 +69,7 @@ export function useGisVoronoi(options = {}) {
     return true;
   }
 
-  const { getPartitionData } = usePartitionCache();
+  const { getPartitionPoints } = usePartitionCache();
 
   // ---- Voronoi state ----
   const voronoiRawPartitionData = ref([]);
@@ -475,7 +475,7 @@ export function useGisVoronoi(options = {}) {
     if (isVoronoiLoadingPoints.value) return;
     isVoronoiLoadingPoints.value = true;
     try {
-      const data = await getPartitionData(() => getLocationPartitions());
+      const data = await getPartitionPoints(() => getLocationPoints());
       voronoiRawPartitionData.value = Array.isArray(data) ? data : [];
       normalizeVoronoiPoints(voronoiRawPartitionData.value);
       setVoronoiStatus('pointsLoaded', { count: voronoiPartitionPoints.value.length });

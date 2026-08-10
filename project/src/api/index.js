@@ -104,6 +104,7 @@ export {
   getLocations,
   getLocationDetail,
   getLocationPartitions,
+  getLocationPoints,
   batchMatch,
   getPartitions,
   getRegions,

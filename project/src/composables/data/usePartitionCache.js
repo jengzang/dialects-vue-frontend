@@ -35,6 +35,7 @@ function writeJsonCache(key, value) {
 }
 
 export const PARTITION_DATA_CACHE_KEY = 'partition_data_cache'
+export const PARTITION_POINTS_CACHE_KEY = 'partition_points_cache'
 export const YINDIAN_TREE_CACHE_KEY = '__YINDIAN_TREE_CACHE__'
 
 export function usePartitionCache() {
@@ -48,6 +49,18 @@ export function usePartitionCache() {
     const response = await loadPartitionData()
     const data = response?.data || []
     writeJsonCache(PARTITION_DATA_CACHE_KEY, data)
+    return data
+  }
+
+  async function getPartitionPoints(loadPoints) {
+    const cached = readJsonCache(PARTITION_POINTS_CACHE_KEY)
+    if (cached) {
+      return cached
+    }
+
+    const response = await loadPoints()
+    const data = response?.data || []
+    writeJsonCache(PARTITION_POINTS_CACHE_KEY, data)
     return data
   }
 
@@ -80,6 +93,7 @@ export function usePartitionCache() {
 
   return {
     getPartitionData,
+    getPartitionPoints,
     getCachedYindianTree,
     getYindianTree,
   }

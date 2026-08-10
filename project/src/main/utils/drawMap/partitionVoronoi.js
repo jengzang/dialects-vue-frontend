@@ -7,6 +7,7 @@ const FIELD_KEYS = {
   coordinate: ['經緯度', '经纬度', 'coordinates', 'coordinate', 'coord', 'lnglat', 'lonlat'],
   mapPartition: ['地圖集二分區', '地圖集分區', '地图集二分区', '地图集分区', 'mapPartition'],
   yindianPartition: ['音典分區', '音典分区', 'yindianPartition'],
+  dialectIsland: ['方言島', '方言岛', 'dialectIsland'],
 }
 
 export const PARTITION_MODE_MAP = 'map'
@@ -87,6 +88,7 @@ export function normalizePartitionPoint(row, options = {}) {
     partitionLevel1: getPartitionKeyFromParts(partitionParts, 1),
     partitionLevel2: getPartitionKeyFromParts(partitionParts, 2),
     partitionLevel3: getPartitionKeyFromParts(partitionParts, 3),
+    isDialectIsland: getStringField(row, FIELD_KEYS.dialectIsland) === '1',
     raw: row,
   }
 }

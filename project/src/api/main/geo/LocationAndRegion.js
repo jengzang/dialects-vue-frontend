@@ -82,6 +82,20 @@ export async function getLocationPartitions() {
 }
 
 /**
+ * 获取地点坐标点（地图打点、Voronoi 图）
+ * @returns {Promise<Object>} { data: [...] }，每行含 簡稱、經緯度、地圖集二分區、音典分區，方言島時含 方言島: 1
+ */
+export async function getLocationPoints() {
+  try {
+    return await api('/api/locations/points')
+  } catch (error) {
+    console.error('Get location points error:', error)
+    showError(error.message || 'Failed to fetch location points')
+    throw new Error(error.message || 'Failed to fetch location points')
+  }
+}
+
+/**
  * 批量匹配地点
  * @param {string} inputString - 输入字符串（多个地点用逗号或空格分隔）
  * @param {boolean} [filterValidAbbrs=false] - 是否只过滤有效简称
