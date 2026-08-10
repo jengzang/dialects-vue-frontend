@@ -8,7 +8,7 @@
       <GlobeBackground :points="globePoints" />
 
       <div class="hero-content">
-        <img src="@/assets/picture/title.png" :alt="$t('home.hero.logoAlt')" class="hero-logo title-logo" />
+        <img src="/brand/title.webp" :alt="$t('home.hero.logoAlt')" class="hero-logo title-logo" />
         <div class="hero-title-row">
           <h1 class="hero-title">{{ $t('home.hero.title') }}</h1>
         </div>
@@ -578,11 +578,11 @@
             <p class="home-support-subtitle">{{ $t('home.supportModal.subtitle') }}</p>
             <div class="donate-qr-grid">
               <div class="donate-qr-box">
-                <img src="@/assets/picture/weixin.png" :alt="$t('home.supportModal.weixinAlt')" />
+                <img src="/brand/weixin.webp" :alt="$t('home.supportModal.weixinAlt')" />
                 <p class="donate-qr-label">{{ $t('home.supportModal.weixinLabel') }}</p>
               </div>
               <div class="donate-qr-box">
-                <img src="@/assets/picture/zfb.jpg" :alt="$t('home.supportModal.alipayAlt')" />
+                <img src="/brand/zfb.webp" :alt="$t('home.supportModal.alipayAlt')" />
                 <p class="donate-qr-label">{{ $t('home.supportModal.alipayLabel') }}</p>
               </div>
             </div>
@@ -646,8 +646,8 @@ const LAST_UPDATE_DATE = computed(() => homeUpdateNotice.value.lastUpdateDate)
 
 const heroDecorationSrc = computed(() =>
   currentColorTheme.value === COLOR_THEME_GREEN
-    ? new URL('@/assets/picture/GreenCircle.png', import.meta.url).href
-    : new URL('@/assets/picture/BlueCircle.png', import.meta.url).href
+    ? '/brand/GreenCircle.webp'
+    : '/brand/BlueCircle.webp'
 )
 
 const projects = [

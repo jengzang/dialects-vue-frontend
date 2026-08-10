@@ -10,7 +10,7 @@
     <div v-if="isOpen" class="sidebar main-sidebar-shell" @touchmove.stop>
       <!-- 标题图片 (可选) -->
       <div v-if="showTitle" class="sidebar-header">
-        <img src="../../assets/picture/title.png" alt="Title" class="title-img title-logo" />
+        <img src="/brand/title.webp" alt="Title" class="title-img title-logo" />
       </div>
       <div v-else class="sidebar-empty main-sidebar-empty"></div>
 

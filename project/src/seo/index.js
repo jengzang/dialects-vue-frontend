@@ -7,7 +7,7 @@ import {
   stripLocaleFromPath,
 } from '@/i18n/localeRouting.js'
 
-const DEFAULT_OG_IMAGE = '/og-cover.png'
+const DEFAULT_OG_IMAGE = '/brand/title.webp'
 const DEFAULT_JSON_LD = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
