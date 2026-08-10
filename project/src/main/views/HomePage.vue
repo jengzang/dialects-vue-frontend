@@ -564,7 +564,9 @@
       :last-update-date="homeUpdateNotice.lastUpdateDate"
       :title="homeUpdateNotice.title"
       :items="homeUpdateNotice.items"
+      :view-detail-text="$t('home.viewDetails')"
       @close="showUpdateNotice = false"
+      @show-detail="showUpdateNotice = true"
     />
 
     <!-- Support Modal -->
@@ -640,7 +642,7 @@ const sourceDataCount = ref(cachedSourceStats.dataCount)
 
 // 当前版本号和更新时间
 const homeUpdateNotice = computed(() => getHomeUpdateNotice((key, values) => t(key, values, { locale: locale.value })))
-const updateNoticeMode = computed(() => localStorage.getItem('update-notice-mode') || 'modal')
+const updateNoticeMode = computed(() => localStorage.getItem('update-notice-mode') || 'showinfo')
 const CURRENT_VERSION = computed(() => homeUpdateNotice.value.version)
 const LAST_UPDATE_DATE = computed(() => homeUpdateNotice.value.lastUpdateDate)
 

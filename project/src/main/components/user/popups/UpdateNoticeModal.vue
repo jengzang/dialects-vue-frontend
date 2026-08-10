@@ -68,7 +68,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import AppModal from '@/components/common/AppModal.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
-import { showInfo } from '@/utils/ui/message.js'
+import { showInfo, hideMessage } from '@/utils/ui/message.js'
 
 const UPDATE_NOTICE_DISMISS_STORAGE_KEY = 'update-notice-dismissed'
 const UPDATE_NOTICE_LAST_SHOWN_PREFIX = 'update-notice-last-shown'
@@ -103,10 +103,14 @@ const props = defineProps({
     type: String,
     default: 'modal',
     validator: (v) => ['modal', 'showinfo'].includes(v)
+  },
+  viewDetailText: {
+    type: String,
+    default: '查看详情'
   }
 })
 
-const emit = defineEmits(['close', 'confirm', 'update:visible'])
+const emit = defineEmits(['close', 'confirm', 'update:visible', 'show-detail'])
 
 const dontShowAgain = ref(false)
 const versionLine = computed(() => {
@@ -162,18 +166,34 @@ const shouldAutoShow = () => {
 watch(() => props.visible, (val) => {
   if (val && props.mode === 'showinfo') {
     emit('update:visible', false)
-    showInfo(buildSummaryText(), 8000, { changelogMode: true })
+    showInfo(buildSummaryText(), 8000, {
+      changelogMode: true,
+      actionText: '查看詳情',
+      onAction: () => {
+        hideMessage()
+        emit('show-detail')
+      }
+    })
   }
 })
 
 onMounted(() => {
   if (!props.autoShow || !shouldAutoShow()) return
 
-  if (props.mode === 'showinfo') {
-    showInfo(buildSummaryText(), 8000, { changelogMode: true })
-  } else {
-    emit('update:visible', true)
-  }
+  setTimeout(() => {
+    if (props.mode === 'showinfo') {
+      showInfo(buildSummaryText(), 8000, {
+        changelogMode: true,
+        actionText: props.viewDetailText,
+        onAction: () => {
+          hideMessage()
+          emit('show-detail')
+        }
+      })
+    } else {
+      emit('update:visible', true)
+    }
+  }, 3000)
 })
 </script>
 

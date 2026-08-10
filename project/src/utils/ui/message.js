@@ -63,7 +63,8 @@ export const messageState = ref({
     onAction: null,
     onDismiss: null,
     timerId: null,
-    changelogMode: false
+    changelogMode: false,
+    positionRight: false
 })
 
 // ========================================
@@ -236,6 +237,7 @@ function showMessage(message, type, duration, options = {}) {
         onAction: typeof options.onAction === 'function' ? options.onAction : null,
         onDismiss: typeof options.onDismiss === 'function' ? options.onDismiss : null,
         timerId,
-        changelogMode: Boolean(options.changelogMode)
+        changelogMode: Boolean(options.changelogMode),
+        positionRight: Boolean(options.positionRight)
     }
 }

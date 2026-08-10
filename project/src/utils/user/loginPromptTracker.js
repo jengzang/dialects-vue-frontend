@@ -135,6 +135,7 @@ function showLoginPromptToast() {
   showInfo('messages.loginPrompt.message', TOAST_DURATION_MS, {
     actionText: 'messages.loginPrompt.login',
     dismissText: 'messages.loginPrompt.dismiss',
+    positionRight: true,
     onAction: () => {
       if (typeof window !== 'undefined') {
         window.location.href = buildLoginUrl()
