@@ -235,6 +235,8 @@
           @update:expand-ratio="voronoiExpandRatio = $event"
           :enable-yindian-adjust="voronoiEnableYindianAdjust"
           @update:enable-yindian-adjust="voronoiEnableYindianAdjust = $event"
+          :show-dialect-islands="voronoiShowDialectIslands"
+          @update:show-dialect-islands="voronoiShowDialectIslands = $event"
           :is-adding-points="isAddingDialectPoints"
           @toggle-add-points="toggleAddDialectPoints"
         />
@@ -893,7 +895,7 @@ const {
   useVoronoiOfficialData, hasVoronoiCustomImport,
   voronoiOfficialPointCount, voronoiCustomPointCount,
   voronoiCustomImportSummaryText, isVillageDataSource, hasFieldMerge,
-  voronoiExpandRatio, voronoiEnableExpand, voronoiEnableYindianAdjust,
+  voronoiExpandRatio, voronoiEnableExpand, voronoiEnableYindianAdjust, voronoiShowDialectIslands,
   voronoiTotalPointCount, voronoiActivePointCount,
   ignoredVoronoiLocations, voronoiGroupCount, voronoiPanelOffsetMode,
   voronoiSelectionOptions, voronoiColorMap, voronoiExportGroups,

@@ -641,6 +641,7 @@
       "noCustomPoints": "No custom points yet",
       "previewPoints": "Preview Points",
       "yindianAdjust": "Adjust",
+      "showDialectIslands": "Dialect Islands",
       "exportToLayer": "Export to Layer",
       "calculate": "Calculate Voronoi Polygons",
       "pointsLoaded": "Loaded {count} valid point(s)",

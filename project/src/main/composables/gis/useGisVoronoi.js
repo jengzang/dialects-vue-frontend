@@ -94,6 +94,7 @@ export function useGisVoronoi(options = {}) {
   const voronoiPartitionMode = ref(PARTITION_MODE_YINDIAN);
   const voronoiRegionLevel = ref(1);
   const voronoiEnableYindianAdjust = ref(false);
+  const voronoiShowDialectIslands = ref(true);
   const isVoronoiPanelOpen = ref(false);
   const isVoronoiLoadingPoints = ref(false);
   const isVoronoiCalculating = ref(false);
@@ -828,6 +829,22 @@ export function useGisVoronoi(options = {}) {
     }
   });
 
+  watch(voronoiShowDialectIslands, (show) => {
+    const dialectIslandNames = new Set(
+      voronoiPartitionPoints.value
+        .filter((p) => p.isDialectIsland)
+        .map((p) => normalizeVoronoiLocationName(p.name))
+    );
+    if (show) {
+      ignoredVoronoiLocations.value = ignoredVoronoiLocations.value
+        .filter((name) => !dialectIslandNames.has(normalizeVoronoiLocationName(name)));
+    } else {
+      const next = new Set(ignoredVoronoiLocations.value.map(normalizeVoronoiLocationName).filter(Boolean));
+      dialectIslandNames.forEach((name) => next.add(name));
+      ignoredVoronoiLocations.value = Array.from(next);
+    }
+  });
+
   watch(voronoiPartitionMode, async () => {
     normalizeVoronoiPoints();
     clearVoronoiPreviewState();
@@ -881,7 +898,7 @@ export function useGisVoronoi(options = {}) {
     voronoiCustomImportRows, voronoiCustomImportMeta, useVoronoiOfficialData,
     showVoronoiPreviewModal, voronoiImportFileInputRef, voronoiImport, voronoiTabularState,
     ignoredVoronoiLocations, voronoiPreviewLayers, voronoiPreviewType, hoveredPolygon,
-    voronoiPartitionMode, voronoiRegionLevel, voronoiEnableYindianAdjust, isVoronoiPanelOpen,
+    voronoiPartitionMode, voronoiRegionLevel, voronoiEnableYindianAdjust, voronoiShowDialectIslands, isVoronoiPanelOpen,
     isVoronoiLoadingPoints, isVoronoiCalculating, showVoronoiIgnoreModal, showFieldMergeModal,
     isAddingDialectPoints, showAddDialectPartitionModal, addDialectPartitionKey, pendingAddPartitionKey,
     voronoiStatusText, voronoiLastResult, voronoiExportSelections, voronoiExportProgress,

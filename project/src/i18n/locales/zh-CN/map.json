@@ -641,6 +641,7 @@
       "noCustomPoints": "暂无自定义点",
       "previewPoints": "预览点位",
       "yindianAdjust": "调整",
+      "showDialectIslands": "方言島",
       "exportToLayer": "导出至图层",
       "calculate": "泰森多边形",
       "pointsLoaded": "已加载 {count} 个有效点位",

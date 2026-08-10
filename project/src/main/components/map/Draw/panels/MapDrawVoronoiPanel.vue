@@ -83,6 +83,13 @@
               :options="partitionModeOptions"
               @update:model-value="$emit('update:partition-mode', $event)"
             />
+            <CheckBox
+              :model-value="showDialectIslands"
+              class="voronoi-dialect-island-checkbox"
+              @update:model-value="$emit('update:show-dialect-islands', $event)"
+            >
+              {{ t('map.drawTab.voronoi.showDialectIslands') }}
+            </CheckBox>
           </div>
           <div class="draw-basemap-select">
             <span class="draw-field-label">{{ t('map.divideTab.labels.regionLevel') }}</span>
@@ -275,6 +282,7 @@ const props = defineProps({
   enableExpand: { type: Boolean, default: false },
   isAddingPoints: { type: Boolean, default: false },
   enableYindianAdjust: { type: Boolean, default: false },
+  showDialectIslands: { type: Boolean, default: true },
 })
 
 defineEmits([
@@ -292,6 +300,7 @@ defineEmits([
   'update:expand-ratio',
   'toggle-add-points',
   'update:enable-yindian-adjust',
+  'update:show-dialect-islands',
 ])
 
 const { t } = useI18n()
@@ -390,7 +399,8 @@ const offsetClass = computed(() => {
   }
 }
 
-.voronoi-adjust-checkbox {
+.voronoi-adjust-checkbox,
+.voronoi-dialect-island-checkbox {
   flex-shrink: 0;
 }
 
