@@ -37,12 +37,12 @@
   "rateLimit": {
     "defaultMessage": "请求过于频繁，请稍后再试。",
     "retryIn": "恢复倒计时",
-    "guestHint": "登录账号后可继续查询，不必一直等待游客额度恢复。",
-    "userHint": "请等待倒计时结束后再试，无需重复提交。",
+    "guestHint": "登录账号后可继续查询。",
+    "userHint": "请等待 {duration} 后再试，无需重复提交。",
     "limitTypes": {
-      "guest_ip_limit": "游客额度已满",
-      "authenticated_ip_limit": "当前 IP 额度已满",
-      "authenticated_user_limit": "当前账号额度已满",
+      "guest_ip_limit": "您的查询额度已满",
+      "authenticated_ip_limit": "您当前查询次数过多",
+      "authenticated_user_limit": "您的账号查询次数过多",
       "login_ip_limit": "登录请求过于频繁",
       "default": "当前请求已被限流"
     },

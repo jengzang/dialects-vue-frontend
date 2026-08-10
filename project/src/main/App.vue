@@ -7,7 +7,6 @@
     </component>
   </ErrorBoundary>
 
-  <RateLimitNotice />
   <GlobalToast />
 
   <!-- 🍎 全局确认对话框 -->
@@ -33,13 +32,16 @@ import SimpleLayout from '../layouts/SimpleLayout.vue'
 import ExploreLayout from '../layouts/ExploreLayout.vue'
 import GlobalToast from '../components/ToastAndHelp/GlobalToast.vue'
 import GlobalConfirm from '../components/ToastAndHelp/GlobalConfirm.vue'
-import RateLimitNotice from '../components/ToastAndHelp/RateLimitNotice.vue'
+
 import ErrorBoundary from '../components/ToastAndHelp/ErrorBoundary.vue'
 import { initOnlineTimeTracker, stopOnlineTimeTracker } from '../utils/user/onlineTimeTracker.js'
 import { initLoginPromptTracker, stopLoginPromptTracker } from '../utils/user/loginPromptTracker.js'
 import { getToken } from '../api/auth/auth.js'
 import { stripLocaleFromPath } from '../i18n/localeRouting.js'
 import { isRouteLoading } from '../utils/ui/routeLoading.js'
+import { showRateLimitNotice } from '../utils/user/rateLimitNotice.js'
+
+window.__showRateLimitNotice = showRateLimitNotice
 
 // // 🌉 建立 bridge 用於跨組件共享 iframe 狀態
 // const nativeFrame = ref(null)
@@ -58,7 +60,7 @@ export default {
     ErrorBoundary,
     GlobalToast,
     GlobalConfirm,
-    RateLimitNotice
+
   },
   setup() {
     const route = useRoute()

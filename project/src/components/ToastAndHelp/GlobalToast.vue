@@ -36,11 +36,61 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, watch, onBeforeUnmount } from 'vue'
 import { messageState, triggerMessageAction, hideMessage, persistMessageUntilDismiss } from '@/utils/ui/message.js'
 
+const dynamicMessage = ref('')
+
+let tickerId = null
+
+function startTicker() {
+  stopTicker()
+  const fn = messageState.value.messageFn
+  if (typeof fn !== 'function') return
+  dynamicMessage.value = fn()
+  tickerId = setInterval(() => {
+    const text = fn()
+    if (!text) {
+      hideMessage()
+      return
+    }
+    dynamicMessage.value = text
+  }, 1000)
+}
+
+function stopTicker() {
+  if (tickerId) {
+    clearInterval(tickerId)
+    tickerId = null
+  }
+}
+
+watch(
+  () => messageState.value.messageFn,
+  (fn) => {
+    if (typeof fn === 'function') {
+      startTicker()
+    } else {
+      stopTicker()
+      dynamicMessage.value = ''
+    }
+  },
+  { immediate: true }
+)
+
+watch(
+  () => messageState.value.show,
+  (show) => {
+    if (!show) {
+      stopTicker()
+    }
+  }
+)
+
+onBeforeUnmount(() => stopTicker())
+
 const messageLines = computed(() => {
-  const msg = messageState.value.message || ''
+  const msg = dynamicMessage.value || messageState.value.message || ''
   return msg.split('\n')
 })
 
