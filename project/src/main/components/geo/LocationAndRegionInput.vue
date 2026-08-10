@@ -672,7 +672,6 @@ loadTreeFor(regionUsing.value)
 
 onMounted(() => {
   reset()
-  loadCustomRegionsData()
   commitLastValidRegionSelection()
 })
 
