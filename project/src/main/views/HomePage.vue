@@ -596,7 +596,6 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import HeroShowcase from '@/main/components/HeroShowcase.vue'
 import { computed, ref, onMounted, defineAsyncComponent } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -607,18 +606,21 @@ import { useClickParticles } from '@/main/composables/useClickParticles.js'
 import { getCachedSourceStats, getSourceStats } from '@/composables/data/useSourceStats.js'
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 
-// ✅ 条件渲染的组件懒加载
-const UserBenefitsPopup = defineAsyncComponent(() =>
-  import('@/main/components/user/popups/UserBenefitsPopup.vue')
-)
-const SupportPopup = defineAsyncComponent(() =>
-  import('@/main/components/user/popups/SupportPopup.vue')
-)
+// ✅ 懒加载：先弹窗 → 地球 → Hero 展示
 const UpdateNoticeModal = defineAsyncComponent(() =>
   import('@/main/components/user/popups/UpdateNoticeModal.vue')
 )
 const GlobeBackground = defineAsyncComponent(() =>
   import('@/main/components/globe/GlobeBackground.vue')
+)
+const HeroShowcase = defineAsyncComponent(() =>
+  import('@/main/components/HeroShowcase.vue')
+)
+const UserBenefitsPopup = defineAsyncComponent(() =>
+  import('@/main/components/user/popups/UserBenefitsPopup.vue')
+)
+const SupportPopup = defineAsyncComponent(() =>
+  import('@/main/components/user/popups/SupportPopup.vue')
 )
 
 const { t, locale } = useI18n()
@@ -753,9 +755,11 @@ async function fetchGlobePoints() {
 useClickParticles()
 
 onMounted(() => {
-  fetchVisitStats()
-  fetchSourceStats()
   fetchGlobePoints()
+  setTimeout(() => {
+    fetchVisitStats()
+    fetchSourceStats()
+  }, 1000)
 })
 </script>
 
