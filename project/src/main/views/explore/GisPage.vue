@@ -233,6 +233,8 @@
           @calculate="handleBuildVoronoi"
           @open-field-merge="showFieldMergeModal = true"
           @update:expand-ratio="voronoiExpandRatio = $event"
+          :enable-yindian-adjust="voronoiEnableYindianAdjust"
+          @update:enable-yindian-adjust="voronoiEnableYindianAdjust = $event"
           :is-adding-points="isAddingDialectPoints"
           @toggle-add-points="toggleAddDialectPoints"
         />
@@ -891,7 +893,7 @@ const {
   useVoronoiOfficialData, hasVoronoiCustomImport,
   voronoiOfficialPointCount, voronoiCustomPointCount,
   voronoiCustomImportSummaryText, isVillageDataSource, hasFieldMerge,
-  voronoiExpandRatio, voronoiEnableExpand,
+  voronoiExpandRatio, voronoiEnableExpand, voronoiEnableYindianAdjust,
   voronoiTotalPointCount, voronoiActivePointCount,
   ignoredVoronoiLocations, voronoiGroupCount, voronoiPanelOffsetMode,
   voronoiSelectionOptions, voronoiColorMap, voronoiExportGroups,

@@ -93,6 +93,7 @@ export function useGisVoronoi(options = {}) {
   const hoveredPolygon = ref(null);
   const voronoiPartitionMode = ref(PARTITION_MODE_YINDIAN);
   const voronoiRegionLevel = ref(1);
+  const voronoiEnableYindianAdjust = ref(false);
   const isVoronoiPanelOpen = ref(false);
   const isVoronoiLoadingPoints = ref(false);
   const isVoronoiCalculating = ref(false);
@@ -209,7 +210,7 @@ export function useGisVoronoi(options = {}) {
   });
 
   const voronoiSelectionOptions = computed(() => {
-    return buildVoronoiSelectionOptions(applyFieldMerge(voronoiPartitionPoints.value), Number(voronoiRegionLevel.value) || 3);
+    return buildVoronoiSelectionOptions(applyFieldMerge(voronoiPartitionPoints.value), 3);
   });
 
   const voronoiColorMap = computed(() => {
@@ -265,6 +266,55 @@ export function useGisVoronoi(options = {}) {
       if (g1 === undefined && g2 === undefined && g3 === undefined) return p;
       return { ...p, partitionLevel1: g1 ?? p.partitionLevel1, partitionLevel2: g2 ?? p.partitionLevel2, partitionLevel3: g3 ?? p.partitionLevel3 };
     });
+  }
+
+  const YINDIAN_IGNORE_LEVEL1 = new Set(['域外方音', '現代標準漢語', '民語漢字音', '戲劇']);
+  const YINDIAN_RENAME_LEVEL1 = { '類閩': '嶺東', '白語': '白語和蔡家話', '蔡家話': '白語和蔡家話' };
+
+  const yindianAdjustMergeKeys = new Set();
+
+  function applyYindianAdjustToState() {
+    const nextMerge = new Map(voronoiFieldMergeMap.value);
+    yindianAdjustMergeKeys.clear();
+
+    Object.entries(YINDIAN_RENAME_LEVEL1).forEach(([from, to]) => {
+      nextMerge.set(from, to);
+      yindianAdjustMergeKeys.add(from);
+    });
+
+    voronoiPartitionPoints.value.forEach((p) => {
+      if (!p.partitionLevel1 || !p.partitionLevel2) return;
+      if (p.partitionLevel1 === '閩') return;
+      const target = YINDIAN_RENAME_LEVEL1[p.partitionLevel1] || p.partitionLevel1;
+      nextMerge.set(p.partitionLevel2, target);
+      yindianAdjustMergeKeys.add(p.partitionLevel2);
+    });
+
+    voronoiFieldMergeMap.value = nextMerge;
+
+    const ignoreNames = new Set(ignoredVoronoiLocations.value.map(normalizeVoronoiLocationName).filter(Boolean));
+    voronoiPartitionPoints.value.forEach((p) => {
+      if (YINDIAN_IGNORE_LEVEL1.has(p.partitionLevel1)) {
+        ignoreNames.add(normalizeVoronoiLocationName(p.name));
+      }
+    });
+    ignoredVoronoiLocations.value = Array.from(ignoreNames);
+  }
+
+  function removeYindianAdjustFromState() {
+    const nextMerge = new Map(voronoiFieldMergeMap.value);
+    yindianAdjustMergeKeys.forEach((key) => nextMerge.delete(key));
+    voronoiFieldMergeMap.value = nextMerge;
+    yindianAdjustMergeKeys.clear();
+
+    const yindianIgnoreNames = new Set();
+    voronoiPartitionPoints.value.forEach((p) => {
+      if (YINDIAN_IGNORE_LEVEL1.has(p.partitionLevel1)) {
+        yindianIgnoreNames.add(normalizeVoronoiLocationName(p.name));
+      }
+    });
+    ignoredVoronoiLocations.value = ignoredVoronoiLocations.value
+      .filter((name) => !yindianIgnoreNames.has(normalizeVoronoiLocationName(name)));
   }
 
   const activeVoronoiPoints = computed(() => {
@@ -769,6 +819,15 @@ export function useGisVoronoi(options = {}) {
 
   // ---- Watchers ----
 
+  watch(voronoiEnableYindianAdjust, (enabled) => {
+    if (enabled) {
+      voronoiRegionLevel.value = 2;
+      applyYindianAdjustToState();
+    } else {
+      removeYindianAdjustFromState();
+    }
+  });
+
   watch(voronoiPartitionMode, async () => {
     normalizeVoronoiPoints();
     clearVoronoiPreviewState();
@@ -822,7 +881,7 @@ export function useGisVoronoi(options = {}) {
     voronoiCustomImportRows, voronoiCustomImportMeta, useVoronoiOfficialData,
     showVoronoiPreviewModal, voronoiImportFileInputRef, voronoiImport, voronoiTabularState,
     ignoredVoronoiLocations, voronoiPreviewLayers, voronoiPreviewType, hoveredPolygon,
-    voronoiPartitionMode, voronoiRegionLevel, isVoronoiPanelOpen,
+    voronoiPartitionMode, voronoiRegionLevel, voronoiEnableYindianAdjust, isVoronoiPanelOpen,
     isVoronoiLoadingPoints, isVoronoiCalculating, showVoronoiIgnoreModal, showFieldMergeModal,
     isAddingDialectPoints, showAddDialectPartitionModal, addDialectPartitionKey, pendingAddPartitionKey,
     voronoiStatusText, voronoiLastResult, voronoiExportSelections, voronoiExportProgress,

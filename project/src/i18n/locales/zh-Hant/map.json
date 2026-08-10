@@ -639,6 +639,7 @@
       "deletedPartitionPoints": "已刪除 {key} 下的 {count} 個自定義點",
       "noCustomPoints": "暫無自定義點",
       "previewPoints": "預覽點位",
+      "yindianAdjust": "調整",
       "exportToLayer": "導出至圖層",
       "calculate": "泰森多邊形",
       "pointsLoaded": "已載入 {count} 個有效點位",

@@ -89,8 +89,17 @@
             <SimpleSelectDropdown
               :model-value="regionLevel"
               :options="regionLevelOptions"
+              :disabled="enableYindianAdjust"
               @update:model-value="$emit('update:region-level', $event)"
             />
+            <CheckBox
+              v-if="partitionMode === 'yindian'"
+              :model-value="enableYindianAdjust"
+              class="voronoi-adjust-checkbox"
+              @update:model-value="$emit('update:enable-yindian-adjust', $event)"
+            >
+              {{ t('map.drawTab.voronoi.yindianAdjust') }}
+            </CheckBox>
           </div>
         </section>
 
@@ -265,6 +274,7 @@ const props = defineProps({
   expandRatio: { type: Number, default: 50 },
   enableExpand: { type: Boolean, default: false },
   isAddingPoints: { type: Boolean, default: false },
+  enableYindianAdjust: { type: Boolean, default: false },
 })
 
 defineEmits([
@@ -281,6 +291,7 @@ defineEmits([
   'update:enable-expand',
   'update:expand-ratio',
   'toggle-add-points',
+  'update:enable-yindian-adjust',
 ])
 
 const { t } = useI18n()
@@ -377,6 +388,10 @@ const offsetClass = computed(() => {
     font-size: 1.08rem;
     color: $deep-blue;
   }
+}
+
+.voronoi-adjust-checkbox {
+  flex-shrink: 0;
 }
 
 .expand-ratio-slider {

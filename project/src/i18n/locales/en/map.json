@@ -639,6 +639,7 @@
       "deletedPartitionPoints": "Deleted {count} custom point(s) under {key}",
       "noCustomPoints": "No custom points yet",
       "previewPoints": "Preview Points",
+      "yindianAdjust": "Adjust",
       "exportToLayer": "Export to Layer",
       "calculate": "Calculate Voronoi Polygons",
       "pointsLoaded": "Loaded {count} valid point(s)",
