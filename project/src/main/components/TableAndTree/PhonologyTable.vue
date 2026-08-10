@@ -470,7 +470,7 @@ $transition-duration: 0.25s;
 }
 
 .matrix-wrapper {
-  max-height: 60dvh;
+  max-height: 66dvh;
   margin-bottom: 15px;
   overflow-x: auto;
   overflow-y: auto;
@@ -484,6 +484,9 @@ $transition-duration: 0.25s;
   /* GPU acceleration for smooth scrolling */
   will-change: transform;
   contain: layout style;
+  @media (max-aspect-ratio: 1/1) {
+    max-height: 60dvh;
+  }
 }
 
 .matrix-table {

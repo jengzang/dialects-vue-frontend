@@ -803,6 +803,12 @@ watch(
   .matrix-container {
     @include flex-col;
     gap: 30px;
+    padding: 32px;
+
+    @media (max-aspect-ratio: 1/1) {
+      padding: 16px;
+    }
+
   }
 
   /* 空状态 */

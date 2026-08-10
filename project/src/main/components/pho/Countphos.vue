@@ -940,7 +940,7 @@ onBeforeUnmount(() => {
         <p>{{ $t('phonology.phonology.countphos.actions.loading') }}</p>
       </div>
       <!-- 匯總統計部分 -->
-      <section class="aggregated-section">
+      <section class="aggregated-section glass-panel">
         <!-- <h3 class="section-title">匯總統計</h3> -->
         <h3 class="section-title section-title--with-pill">
           <span>{{ $t('phonology.phonology.countphos.titlePrefix') }}</span>
@@ -949,7 +949,7 @@ onBeforeUnmount(() => {
 
         <!-- 圖表統計部分 -->
         <div v-if="hasChartData" :id="getChartsAnchorId()" class="charts-section">
-          <div class="chart-block">
+          <div class="chart-block glass-card">
             <h4 class="chart-block-title">{{ $t('phonology.phonology.countphos.charts.pie.title') }}</h4>
             <p class="chart-block-desc">
               {{ $t('phonology.phonology.countphos.charts.pie.description') }}
@@ -970,7 +970,7 @@ onBeforeUnmount(() => {
             </div>
           </div>
 
-          <div class="chart-block">
+          <div class="chart-block glass-card">
             <h4 class="chart-block-title">{{ $t('phonology.phonology.countphos.charts.bar.title') }}</h4>
             <p class="chart-block-desc">
               {{ $t('phonology.phonology.countphos.charts.bar.description') }}
@@ -993,7 +993,7 @@ onBeforeUnmount(() => {
             </div>
           </div>
 
-          <div class="chart-block">
+          <div class="chart-block glass-card">
             <h4 class="chart-block-title">{{ $t('phonology.phonology.countphos.charts.scatter.title') }}</h4>
             <p class="chart-block-desc">
               {{ $t('phonology.phonology.countphos.charts.scatter.description') }}
@@ -1020,7 +1020,7 @@ onBeforeUnmount(() => {
             <div
               v-for="(stats, syllable) in features"
               :key="syllable"
-              class="syllable-card"
+              class="syllable-card glass-card"
             >
               <div class="syllable-top">
                 <div class="syllable-name">{{ syllable }}</div>
@@ -1059,7 +1059,7 @@ onBeforeUnmount(() => {
       </section>
 
       <!-- 地點詳情部分 -->
-      <section v-if="hasLocationDetailData" class="locations-section">
+      <section v-if="hasLocationDetailData" class="locations-section glass-panel">
         <h3 class="section-title">{{ $t('phonology.phonology.countphos.sections.locations') }}</h3>
         <p class="section-subtitle">
           {{ $t('phonology.phonology.countphos.sections.locationsSubtitle') }}
@@ -1069,7 +1069,7 @@ onBeforeUnmount(() => {
           v-for="(locationData, locationName) in featureData"
           :key="locationName"
           :id="getLocationAnchorId(locationName)"
-          class="location-detail"
+          class="location-detail glass-card"
         >
           <h4 class="location-name" @click.stop="handleLocationClick(locationName)">{{ locationName }}</h4>
 
@@ -1335,7 +1335,7 @@ $mobile-breakpoint: 768px;
   /* 汇总与地点详情玻璃容器 */
   .aggregated-section,
   .locations-section {
-    background: var(--glass-60);
+    background: none;
     border: 1px solid var(--border-gray-light);
     border-radius: var(--radius-lg);
     backdrop-filter: blur(12px);
@@ -1358,9 +1358,9 @@ $mobile-breakpoint: 768px;
 
   .chart-block {
     padding: 16px;
-    background: var(--glass-60);
-    border: 1px solid rgba(var(--color-primary-rgb), 0.1);
-    border-radius: 14px;
+    // background: var(--glass-60);
+    // border: 1px solid rgba(var(--color-primary-rgb), 0.1);
+    // border-radius: 14px;
     box-shadow: 0 10px 24px rgba(20, 38, 60, 0.04);
   }
 
@@ -1453,13 +1453,13 @@ $mobile-breakpoint: 768px;
 
   .syllable-card {
     padding: 12px;
-    background: var(--glass-10);
-    border: 1px solid var(--border-gray-lighter);
-    border-radius: var(--radius-sm2);
+    background: var(--glass-60);
+    // border: 1px solid var(--border-gray-lighter);
+    // border-radius: var(--radius-sm2);
     transition: all 0.2s ease;
 
     &:hover {
-      background: var(--glass-20);
+      background: var(--glass-90);
       box-shadow: var(--shadow-sm);
       transform: translateY(-2px);
     }
@@ -1541,13 +1541,8 @@ $mobile-breakpoint: 768px;
   .location-detail {
     margin-bottom: 16px;
     padding: 18px;
-    background: linear-gradient(
-      180deg,
-      var(--glass-80),
-      rgba(247, 251, 255, 0.66)
-    );
-    border: 1px solid rgba(var(--color-primary-rgb), 0.12);
-    border-radius: var(--radius-md);
+    // border: 1px solid rgba(var(--color-primary-rgb), 0.12);
+    // border-radius: var(--radius-md);
     box-shadow: 0 10px 24px rgba(20, 38, 60, 0.06);
 
     &:last-child {
