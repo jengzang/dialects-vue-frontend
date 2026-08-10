@@ -57,14 +57,13 @@ export const messageState = ref({
     show: false,
     type: 'info',        // 'success' | 'error' | 'warning' | 'info'
     message: '',
-    messageFn: null,     // () => string — 动态模式，每秒调用刷新
+    dynamic: null,       // { fn: () => string, interval: number } — 动态刷新模式，fn 返回空串表示终止
     duration: 3000,
     actionText: '',
     dismissText: '',
     onAction: null,
     onDismiss: null,
     timerId: null,
-    tickerId: null,
     rateLimitMode: false,
     changelogMode: false,
     positionRight: false
@@ -234,14 +233,13 @@ function showMessage(message, type, duration, options = {}) {
         show: true,
         type,
         message: translatedMessage,
-        messageFn: typeof options.messageFn === 'function' ? options.messageFn : null,
+        dynamic: options.dynamic || null,
         duration,
         actionText: translatedActionText,
         dismissText: translatedDismissText,
         onAction: typeof options.onAction === 'function' ? options.onAction : null,
         onDismiss: typeof options.onDismiss === 'function' ? options.onDismiss : null,
         timerId,
-        tickerId: null,
         rateLimitMode: Boolean(options.rateLimitMode),
         changelogMode: Boolean(options.changelogMode),
         positionRight: Boolean(options.positionRight)

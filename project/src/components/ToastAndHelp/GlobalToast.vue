@@ -45,17 +45,17 @@ let tickerId = null
 
 function startTicker() {
   stopTicker()
-  const fn = messageState.value.messageFn
-  if (typeof fn !== 'function') return
-  dynamicMessage.value = fn()
+  const d = messageState.value.dynamic
+  if (!d || typeof d.fn !== 'function') return
+  dynamicMessage.value = d.fn()
   tickerId = setInterval(() => {
-    const text = fn()
+    const text = d.fn()
     if (!text) {
       hideMessage()
       return
     }
     dynamicMessage.value = text
-  }, 1000)
+  }, d.interval)
 }
 
 function stopTicker() {
@@ -66,9 +66,9 @@ function stopTicker() {
 }
 
 watch(
-  () => messageState.value.messageFn,
-  (fn) => {
-    if (typeof fn === 'function') {
+  () => messageState.value.dynamic,
+  (d) => {
+    if (d && typeof d.fn === 'function') {
       startTicker()
     } else {
       stopTicker()

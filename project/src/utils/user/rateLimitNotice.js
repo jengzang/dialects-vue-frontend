@@ -142,7 +142,7 @@ export function showRateLimitNotice(notice = {}) {
   const toastDuration = messageFn ? 3600000 : 8000
 
   showWarning(messageFn ? buildMessage(retryAfterSeconds) : staticMessage, toastDuration, {
-    messageFn,
+    dynamic: messageFn ? { fn: messageFn, interval: 1000 } : null,
     rateLimitMode: true,
     actionText: showLoginAction ? t('navigation.login') : '',
     dismissText: t('common.button.close'),
