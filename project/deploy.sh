@@ -107,7 +107,7 @@ echo -e "${YELLOW}========================================${NC}"
 echo -e "${GREEN}✓ 部署成功！${NC}"
 echo -e "${YELLOW}========================================${NC}"
 echo -e "${GREEN}已上传的内容：${NC}"
-echo -e "  - assets/ (完全替换)"
+echo -e "  - assets/ 完全替换"
 for item in "${FILES_TO_UPLOAD[@]}"; do
     if [ -e "${LOCAL_DIST}${item}" ]; then
         echo -e "  - ${item}"

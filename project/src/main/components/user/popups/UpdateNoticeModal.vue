@@ -1,7 +1,7 @@
 <template>
   <AppModal
-    v-if="mode === 'modal'"
-    :model-value="visible"
+    v-if="mode === 'modal' || forceModal"
+    :model-value="visible || forceModal"
     size="sm"
     width="100%"
     max-width="600px"
@@ -113,6 +113,7 @@ const props = defineProps({
 const emit = defineEmits(['close', 'confirm', 'update:visible', 'show-detail'])
 
 const dontShowAgain = ref(false)
+const forceModal = ref(false)
 const versionLine = computed(() => {
   if (props.lastUpdateDate) {
     return `${props.version} · ${props.lastUpdateDate}`
@@ -128,6 +129,7 @@ const buildSummaryText = () => {
 }
 
 const handleClose = () => {
+  forceModal.value = false
   emit('update:visible', false)
   emit('close')
 }
@@ -140,6 +142,7 @@ const handleConfirm = () => {
       localStorage.setItem(UPDATE_NOTICE_DISMISS_STORAGE_KEY, JSON.stringify(dismissedVersions))
     }
   }
+  forceModal.value = false
   emit('confirm')
   emit('update:visible', false)
   emit('close')
@@ -168,9 +171,10 @@ watch(() => props.visible, (val) => {
     emit('update:visible', false)
     showInfo(buildSummaryText(), 8000, {
       changelogMode: true,
-      actionText: '查看詳情',
+      actionText: props.viewDetailText,
       onAction: () => {
         hideMessage()
+        forceModal.value = true
         emit('show-detail')
       }
     })
@@ -187,6 +191,7 @@ onMounted(() => {
         actionText: props.viewDetailText,
         onAction: () => {
           hideMessage()
+          forceModal.value = true
           emit('show-detail')
         }
       })
