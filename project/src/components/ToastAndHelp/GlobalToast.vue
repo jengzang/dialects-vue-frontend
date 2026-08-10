@@ -3,7 +3,7 @@
     <Transition name="toast-fade">
       <div
         v-if="messageState.show"
-        :class="['global-toast', 'global-toast-shell', messageState.type, { 'has-action': messageState.actionText, 'rate-limit-toast': messageState.rateLimitMode, 'changelog-toast': messageState.changelogMode, 'position-right': messageState.positionRight }]"
+        :class="['global-toast', 'global-toast-shell', messageState.type, { 'has-action': messageState.actionText, 'changelog-toast': messageState.changelogMode, 'position-right': messageState.positionRight }]"
         @mouseenter="persistMessageUntilDismiss"
         @click="persistMessageUntilDismiss"
       >
@@ -260,37 +260,6 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
     &.toast-fade-leave-active {
       animation-name: toast-out-side;
-    }
-  }
-
-  &.rate-limit-toast {
-    max-width: min(480px, calc(100vw - 32px));
-    padding: 16px 20px;
-    font-weight: 500;
-    border-radius: 24px;
-    box-shadow:
-      0 20px 54px rgba(120, 90, 20, 0.16),
-      0 6px 16px rgba(160, 120, 26, 0.12),
-      inset 0 0 0 0.5px var(--glass-50);
-
-    .toast-icon {
-      width: 38px;
-      height: 38px;
-      font-size: 16px;
-      background: rgba(255, 214, 102, 0.3);
-      border: 1px solid var(--glass-50);
-      border-radius: 14px;
-      box-shadow: 0 8px 20px rgba(160, 120, 26, 0.18);
-    }
-
-    .toast-message {
-      font-size: 14px;
-      line-height: 1.55;
-    }
-
-    .toast-action {
-      padding: 8px 16px;
-      font-size: 13px;
     }
   }
 
