@@ -143,6 +143,7 @@ export function showRateLimitNotice(notice = {}) {
 
   showWarning(messageFn ? buildMessage(retryAfterSeconds) : staticMessage, toastDuration, {
     messageFn,
+    rateLimitMode: true,
     actionText: showLoginAction ? t('navigation.login') : '',
     dismissText: t('common.button.close'),
     onAction: showLoginAction

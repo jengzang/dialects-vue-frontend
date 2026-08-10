@@ -65,6 +65,7 @@ export const messageState = ref({
     onDismiss: null,
     timerId: null,
     tickerId: null,
+    rateLimitMode: false,
     changelogMode: false,
     positionRight: false
 })
@@ -241,6 +242,7 @@ function showMessage(message, type, duration, options = {}) {
         onDismiss: typeof options.onDismiss === 'function' ? options.onDismiss : null,
         timerId,
         tickerId: null,
+        rateLimitMode: Boolean(options.rateLimitMode),
         changelogMode: Boolean(options.changelogMode),
         positionRight: Boolean(options.positionRight)
     }
