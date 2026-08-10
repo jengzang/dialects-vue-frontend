@@ -45,10 +45,8 @@ fi
 FILES_TO_UPLOAD=(
     "index.html"
     "config.js"
-    "vite.svg"
     "robots.txt"
-    "sitemap.xml"
-    "og-cover.png"  
+    "sitemap.xml"  
     "auth/"
     "detail/"
     "explore/"
