@@ -1,7 +1,6 @@
 import { reactive } from 'vue'
 import { showWarning } from '@/utils/ui/message.js'
 import i18n from '@/i18n'
-import router from '@/main/router.js'
 
 function createDefaultState() {
   return {
@@ -146,9 +145,10 @@ export function showRateLimitNotice(notice = {}) {
     actionText: showLoginAction ? t('navigation.login') : '',
     dismissText: t('common.button.close'),
     onAction: showLoginAction
-      ? () => {
+      ? async () => {
           clearRateLimitNotice()
           const redirect = getSafeRedirectPath(window.location.pathname)
+          const { default: router } = await import('@/main/router.js')
           router.push({
             path: '/auth',
             query: redirect ? { view: 'login', redirect } : { view: 'login' }

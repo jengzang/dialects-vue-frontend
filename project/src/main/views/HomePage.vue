@@ -381,7 +381,7 @@
     </section>
 
     <!-- Roadmap Section -->
-    <section class="roadmap-section">
+    <!-- <section class="roadmap-section">
       <h2 class="section-title">{{ $t('home.roadmap.sectionTitle') }}</h2>
       <p class="section-subtitle">{{ $t('home.roadmap.sectionSubtitle') }}</p>
       <div class="roadmap-list">
@@ -428,7 +428,7 @@
           <p class="roadmap-desc">{{ $t('home.roadmap.dialectBot.desc') }}</p>
         </div>
       </div>
-    </section>
+    </section> -->
 
     <!-- Login Benefits Section -->
     <section class="login-section">
