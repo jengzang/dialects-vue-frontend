@@ -810,12 +810,8 @@ $warning: var(--color-warning);
 
 .page-title {
   margin: 12px;
+  color: $primary;
   font-size: 28px;
-  font-weight: 700;
-  text-align: center;
-  letter-spacing: -0.02em;
-
-  @include gradient-text($primary, $primary-dark);
 }
 
 .top-metrics-cards {

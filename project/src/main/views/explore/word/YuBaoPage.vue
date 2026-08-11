@@ -981,18 +981,6 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   }
 }
 
-.page-title {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: center;
-  width: 100%;
-  margin: 0 0 12px;
-  color: var(--text-primary);
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
 /* 顶部控制栏 */
 .top-controls {
   display: flex;

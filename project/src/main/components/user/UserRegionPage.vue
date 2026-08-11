@@ -657,15 +657,9 @@ $region-glass-border: var(--glass-60);
   }
 
   .page-title {
-    @include flex-center;
-    min-width: 0;
-    gap: 10px;
     margin: 0;
     color: $region-text;
     font-size: clamp(20px, 2.3vw, 28px);
-    font-weight: 800;
-    letter-spacing: -0.04em;
-    white-space: nowrap;
   }
 
   .title-icon {
@@ -1087,7 +1081,6 @@ $region-glass-border: var(--glass-60);
 
     .page-title {
       font-size: 20px;
-      white-space: normal;
     }
 
     .header-stats {

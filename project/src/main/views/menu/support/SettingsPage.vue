@@ -381,12 +381,9 @@ $text-muted: var(--text-tertiary);
 }
 
 .page-title {
-  width: 100%;
   margin-top: 0;
   margin-bottom: 1.5rem;
   font-size: 1.8rem;
-  font-weight: bold;
-  text-align: center;
   color: $text-primary;
 }
 

@@ -974,13 +974,9 @@ onBeforeUnmount(() => {
 
 .page-title {
   font-size: 2rem;
-  font-weight: 700;
   margin-bottom: 0.5rem;
   margin-top: 1rem;
-  background: linear-gradient(135deg, #007aff, #6e00ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--color-primary);
 }
 
 .page-description {

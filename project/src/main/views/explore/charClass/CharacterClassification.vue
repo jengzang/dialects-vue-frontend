@@ -678,7 +678,6 @@ $panel-radius-portrait: 24px;.char-class-page {
   gap: 6px;
 }
 
-.page-title,
 .tree-title {
   margin: 0;
   color: $text-primary;
@@ -686,6 +685,8 @@ $panel-radius-portrait: 24px;.char-class-page {
 }
 
 .page-title {
+  margin: 0;
+  color: $text-primary;
   font-size: 25px;
 
   @media (orientation: portrait) {
