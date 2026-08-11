@@ -54,11 +54,11 @@
               <Teleport to="body">
                 <div
                     v-if="excludeDropdownOpen === 'tab2'"
-                    class="dropdown-panel choice-dropdown-panel"
+                    class="dropdown-panel glass-dropdown-panel"
                     :style="excludeDropdownStyle"
                 >
                   <div
-                      class="dropdown-item choice-dropdown-item"
+                      class="dropdown-item glass-dropdown-item"
                       v-for="option in excludeOptions"
                       :key="option.value"
                       :class="{ active: isExcludeSelected(option.value, 'tab2') }"
@@ -101,11 +101,11 @@
                 <Teleport to="body">
                   <div
                       v-if="excludeDropdownOpen === 'tab2'"
-                      class="dropdown-panel choice-dropdown-panel"
+                      class="dropdown-panel glass-dropdown-panel"
                       :style="excludeDropdownStyle"
                   >
                     <div
-                        class="dropdown-item choice-dropdown-item"
+                        class="dropdown-item glass-dropdown-item"
                         v-for="option in excludeOptions"
                         :key="option.value"
                         :class="{ active: isExcludeSelected(option.value, 'tab2') }"
@@ -176,12 +176,12 @@
                 <Teleport to="body">
                   <div
                       v-if="excludeDropdownOpen === 'tab3'"
-                      class="dropdown-panel choice-dropdown-panel"
+                      class="dropdown-panel glass-dropdown-panel"
                       :style="excludeDropdownStyle"
                   >
 
                     <div
-                        class="dropdown-item choice-dropdown-item"
+                        class="dropdown-item glass-dropdown-item"
                         v-for="option in excludeOptions"
                         :key="option.value"
                         :class="{ active: isExcludeSelected(option.value, 'tab3') }"
@@ -231,7 +231,8 @@
       <!-- ✅ 炫酷按鈕 -->
       <div class="run-container">
         <button
-            class="run-btn"
+            class="glass-button"
+            data-variant="run"
             @click="runAction"
             :disabled="buttonState.isRunning || isRunDisabled"
             :class="{ disabled: isRunDisabled }"

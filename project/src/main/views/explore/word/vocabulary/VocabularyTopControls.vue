@@ -17,7 +17,7 @@
 
         <div class="field-filter">
           <button
-            class="gear-btn main-glass-button"
+            class="gear-btn glass-button"
             type="button"
             :title="t('words.wordList.search.settings')"
             @click="searchFieldModalOpen = true"

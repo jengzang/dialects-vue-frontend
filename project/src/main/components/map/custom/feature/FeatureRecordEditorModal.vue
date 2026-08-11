@@ -95,7 +95,7 @@
             type="text"
             :placeholder="t('customEntry.featureRecord.placeholders.value')"
           />
-          <button class="main-glass-button field-notice-trigger field-notice-trigger--inline" type="button" @click="isFieldNoticeOpen = true">
+          <button class="glass-button field-notice-trigger field-notice-trigger--inline" type="button" @click="isFieldNoticeOpen = true">
             {{ t('customEntry.pointDetail.rows.noticeTrigger') }}
           </button>
         </label>
@@ -133,11 +133,11 @@
     </div>
 
     <template #footer>
-      <button class="main-glass-button" type="button" @click="closeModal">
+      <button class="glass-button" type="button" @click="closeModal">
         {{ t('customEntry.featureRecord.actions.cancel') }}
       </button>
       <button
-        class="main-glass-button"
+        class="glass-button"
         data-variant="primary"
         type="button"
         :disabled="isSaving"
@@ -781,7 +781,7 @@ watch(
 }
 
 .field-notice-trigger {
-  --main-glass-button-padding: 2px 10px;
+  --glass-button-padding: 2px 10px;
   font-size: 11px;
   color: $warning;
   border-color: rgba(var(--color-warning-rgb), 0.3);

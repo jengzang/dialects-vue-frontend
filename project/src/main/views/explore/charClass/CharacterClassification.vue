@@ -131,7 +131,8 @@
               <input
                 v-model="searchQuery"
                 type="text"
-                class="glass-input"
+                class="glass-field"
+                data-shape="search"
                 :placeholder="t('charClass.search.placeholder')"
                 :disabled="loading"
               />
@@ -949,25 +950,9 @@ $panel-radius-portrait: 24px;.char-class-page {
   transform: translateY(-50%);
 }
 
-.glass-input {
-  width: auto;
-  padding: 11px 14px 11px 40px;
-  color: $text-primary;
-  background: var(--glass-30);
-  border: 1px solid var(--glass-30);
-  border-radius: var(--radius-lg);
-  outline: none;
-  transition:
-    border-color $transition-fast ease,
-    box-shadow $transition-fast ease,
-    background $transition-fast ease;
-
-  @include glass-blur(16px, 180%);
-
-  &:focus {
-    border-color: rgba(var(--color-primary-rgb), 0.35);
-    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.08);
-  }
+.search-wrapper .glass-field {
+  --glass-field-width: auto;
+  --glass-field-padding: 11px 14px 11px 40px;
 }
 
 .tree-body {

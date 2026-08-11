@@ -3,7 +3,7 @@
     <!-- Header Section -->
     <div class="header-section">
       <div class="title-row">
-        <h1 style="margin: 0;font-size: 1.5em;"><BarIcon icon="🌳" />{{ t('villages.pages.gdTree.title') }}</h1>
+        <h1 style="margin: 0;font-size: 1.5em;"><BarIcon icon="🌳" />{{ t('navigation.pageTitles.villages.gdTree') }}</h1>
         <span class="cross-link" @click="goToGdTable">{{ t('villages.pages.gdTable.title') }} →</span>
       </div>
     </div>

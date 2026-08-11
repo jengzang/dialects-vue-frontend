@@ -1,9 +1,9 @@
 <template>
   <div class="regional-vectors-page">
-    <h3 class="villagesml-subtab-title">
-      區域分析 - 特徵向量
+    <h1 class="villagesml-subtab-title">
+      <BarIcon icon="🧭" />區域分析 - 特徵向量
       <HelpIcon content="基於9維語義類別特徵向量比較區域。餘弦相似度：向量夾角余弦值（0-1）。歐氏距離：向量空間直線距離。曼哈頓距離：各維度差值絕對值之和。支持批量比較熱力圖和PCA降維散點圖" />
-    </h3>
+    </h1>
 
     <!-- Region Selector -->
     <div class="vml-glass-panel selector-panel">
@@ -230,6 +230,7 @@ import { compareRegionalVectors, batchCompareRegionalVectors, reduceRegionalVect
 import { showError, showSuccess, showWarning } from '@/utils/ui/message.js'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { SEMANTIC_CATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'
 
 // State - Two Region Comparison

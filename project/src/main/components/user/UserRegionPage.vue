@@ -8,7 +8,7 @@
       <div class="page-title-group">
         <h1 class="page-title">
           <BarIcon class="title-icon" icon="🗂️" />
-          <span>{{ t('user.regionPage.title') }}</span>
+          <span>{{ t('navigation.pageTitles.user.region') }}</span>
         </h1>
 
         <div class="header-stats">

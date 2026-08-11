@@ -115,7 +115,7 @@ const createPageConfig = ({ titleKey, tables, defaultTableKey }) =>
 
 export const CHAR_CLASS_PAGE_CONFIGS = freezeRecord({
   zhonggu: createPageConfig({
-    titleKey: 'charClass.pages.zhonggu.title',
+    titleKey: 'navigation.pageTitles.charClass.zhonggu',
     defaultTableKey: 'characters',
     tables: {
       characters: createTableConfig({
@@ -162,7 +162,7 @@ export const CHAR_CLASS_PAGE_CONFIGS = freezeRecord({
     }
   }),
   shanggu: createPageConfig({
-    titleKey: 'charClass.pages.shanggu.title',
+    titleKey: 'navigation.pageTitles.charClass.shanggu',
     defaultTableKey: 'old_chinese',
     tables: {
       old_chinese: createTableConfig({
@@ -211,7 +211,7 @@ export const CHAR_CLASS_PAGE_CONFIGS = freezeRecord({
     }
   }),
   jingu: createPageConfig({
-    titleKey: 'charClass.pages.jingu.title',
+    titleKey: 'navigation.pageTitles.charClass.jingu',
     defaultTableKey: 'zhongyuan',
     tables: {
       zhongyuan: createTableConfig({
@@ -341,7 +341,7 @@ export const CHAR_CLASS_PAGE_CONFIGS = freezeRecord({
     }
   }),
   yueyun: createPageConfig({
-    titleKey: 'charClass.pages.yueyun.title',
+    titleKey: 'navigation.pageTitles.charClass.yueyun',
     defaultTableKey: 'fenyun',
     tables: {
       fenyun: createTableConfig({

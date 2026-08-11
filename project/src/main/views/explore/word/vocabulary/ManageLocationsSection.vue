@@ -19,10 +19,10 @@
             <input v-model="locationFilters.location_name" type="text" :placeholder="t('words.wordList.locations.filters.locationName')" />
           </label>
           <div class="filter-actions">
-            <button class="main-glass-button" data-variant="primary" type="submit">
+            <button class="glass-button" data-variant="primary" type="submit">
               {{ t('common.button.search') }}
             </button>
-            <button class="main-glass-button" data-variant="secondary" type="button" @click="resetLocationFilters">
+            <button class="glass-button" data-variant="secondary" type="button" @click="resetLocationFilters">
               {{ t('common.button.reset') }}
             </button>
           </div>
@@ -46,10 +46,10 @@
               <p>{{ location.location_label || location.location_name }}</p>
             </div>
             <span class="location-item-username">{{ location.username }}</span>
-            <button class="main-glass-button" data-variant="primary" type="button" @click="openLocationEditor(location)">
+            <button class="glass-button" data-variant="primary" type="button" @click="openLocationEditor(location)">
               {{ t('common.button.edit') }}
             </button>
-            <button v-if="canDeleteLocation" class="main-glass-button" data-variant="danger" type="button" @click="handleDeleteLocation(location)">
+            <button v-if="canDeleteLocation" class="glass-button" data-variant="danger" type="button" @click="handleDeleteLocation(location)">
               {{ t('common.button.delete') }}
             </button>
           </div>
@@ -68,10 +68,10 @@
           </select>
         </label>
         <span class="pagination-nav-group">
-          <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoPreviousLocationPage" @click="goToLocationPage(-1)">
+          <button class="glass-button" data-variant="secondary" type="button" :disabled="!canGoPreviousLocationPage" @click="goToLocationPage(-1)">
             {{ t('words.wordList.pagination.previous') }}
           </button>
-          <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoNextLocationPage" @click="goToLocationPage(1)">
+          <button class="glass-button" data-variant="secondary" type="button" :disabled="!canGoNextLocationPage" @click="goToLocationPage(1)">
             {{ t('words.wordList.pagination.next') }}
           </button>
         </span>
@@ -119,7 +119,7 @@
             </div>
           </div>
           <button
-            class="main-glass-button"
+            class="glass-button"
             data-variant="primary"
             type="button"
             :disabled="!yindianQuery.trim() || isLoadingYindian"
@@ -140,10 +140,10 @@
 
     <template #footer>
       <div class="location-edit-modal-actions">
-        <button class="main-glass-button" data-variant="secondary" type="button" @click="closeLocationEditor">
+        <button class="glass-button" data-variant="secondary" type="button" @click="closeLocationEditor">
           {{ t('common.button.cancel') }}
         </button>
-        <button class="main-glass-button" data-variant="primary" type="button" @click="handleSaveEditingLocation">
+        <button class="glass-button" data-variant="primary" type="button" @click="handleSaveEditingLocation">
           {{ t('words.wordList.locations.save') }}
         </button>
       </div>

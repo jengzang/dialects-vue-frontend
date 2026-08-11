@@ -13,7 +13,7 @@
             <div v-if="requiresLogin" class="upload-access-notice">
               <p>{{ uploadAccessNotice }}</p>
               <button
-                class="main-glass-button"
+                class="glass-button"
                 data-variant="primary"
                 type="button"
                 @click="navigateToSuggestion"
@@ -29,7 +29,7 @@
             <strong>{{ uploadLocation.location_name || t('words.wordList.upload.locationName') }}</strong>
             <p>{{ uploadLocationSummaryText }}</p>
           </div>
-          <button class="main-glass-button" data-variant="primary" type="button" @click="openUploadLocationEditor">
+          <button class="glass-button" data-variant="primary" type="button" @click="openUploadLocationEditor">
             {{ uploadLocation.location_name ? t('common.button.edit') : t('words.wordList.upload.enterLocationInfo') }}
           </button>
         </div>
@@ -59,7 +59,7 @@
         <div class="upload-parser-row">
           <div class="upload-parser-head">
             <h3 class="upload-section-title">{{ t('words.wordList.upload.chooseFile') }}</h3>
-            <button class="main-glass-button info-help-btn" data-size="small" type="button" @click="showFormatHelp = true">
+            <button class="glass-button info-help-btn" data-size="small" type="button" @click="showFormatHelp = true">
               ? {{ t('words.wordList.upload.formatHelp') }}
             </button>
           </div>
@@ -155,7 +155,7 @@
         <div class="upload-actions">
           <button
             v-if="selectedUploadFile"
-            class="main-glass-button"
+            class="glass-button"
             data-variant="secondary"
             type="button"
             :disabled="isUploading"
@@ -164,7 +164,7 @@
             {{ t('common.importPreview.actions.reselect') }}
           </button>
           <button
-            class="main-glass-button"
+            class="glass-button"
             data-variant="primary"
             type="button"
             :disabled="!canImportAfterPreview"
@@ -212,7 +212,7 @@
               </div>
             </div>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="primary"
               type="button"
               :disabled="!yindianQuery.trim() || isLoadingYindian"
@@ -252,10 +252,10 @@
 
       <template #footer>
         <div class="location-edit-modal-actions">
-          <button class="main-glass-button" data-variant="secondary" type="button" @click="closeUploadLocationEditor">
+          <button class="glass-button" data-variant="secondary" type="button" @click="closeUploadLocationEditor">
             {{ t('common.button.cancel') }}
           </button>
-          <button class="main-glass-button" data-variant="primary" type="button" @click="confirmUploadLocationEditor">
+          <button class="glass-button" data-variant="primary" type="button" @click="confirmUploadLocationEditor">
             {{ t('common.button.confirm') }}
           </button>
         </div>
@@ -386,7 +386,7 @@
       </div>
 
       <template #footer>
-        <button class="main-glass-button" data-variant="primary" type="button" @click="showFormatHelp = false">
+        <button class="glass-button" data-variant="primary" type="button" @click="showFormatHelp = false">
           {{ t('tools.checkTool.help.gotIt') }}
         </button>
       </template>

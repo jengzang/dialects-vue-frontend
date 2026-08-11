@@ -1,14 +1,12 @@
 @use '@/styles/global/mixins' as *;
 
-$transition-base: 0.3s;
-
-.choice-dropdown-panel {
+.glass-dropdown-panel {
   position: absolute;
-  min-width: 80px;
-  max-height: 40dvh;
-  overflow: auto;
   z-index: 1000;
+  min-width: var(--glass-dropdown-min-width, 80px);
+  max-height: var(--glass-dropdown-max-height, 40dvh);
   padding: 6px 0;
+  overflow: auto;
   border-radius: var(--radius-md);
   background: var(--surface-panel-strong);
   backdrop-filter: blur(12px);
@@ -16,69 +14,68 @@ $transition-base: 0.3s;
   box-shadow: 0 8px 32px var(--bg-hover-strong);
 }
 
-.choice-dropdown-item {
+.glass-dropdown-item {
   padding: 8px 16px;
-  cursor: pointer;
   font-size: 14px;
+  cursor: pointer;
   transition: background-color 0.2s;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+
+  @include text-truncate;
 }
 
-.choice-dropdown-item.active {
+.glass-dropdown-item.active,
+.glass-dropdown-item[data-active='true'] {
   background-color: var(--surface-selected);
   color: var(--text-selected);
   font-weight: bold;
 }
 
-.choice-dropdown-item:hover {
+.glass-dropdown-item:hover {
   background-color: var(--surface-selected);
 }
 
-.main-search-field {
-  // width: min(360px, 100%);
-  padding: 10px 14px;
-  border: 1px solid var(--border-control);
-  border-radius: var(--radius-pill);
-  background: var(--surface-panel);
+.glass-field {
+  width: var(--glass-field-width, 100%);
+  box-sizing: border-box;
+  padding: var(--glass-field-padding, 10px 14px);
+  border: 1px solid var(--glass-field-border-color, var(--border-control));
+  border-radius: var(--glass-field-radius, var(--radius-md));
+  background: var(--glass-field-background, var(--surface-panel-hover));
   color: var(--text-deep);
-  font-size: 14px;
+  font-size: var(--glass-field-font-size, 14px);
+  line-height: var(--glass-field-line-height, 1.4);
   outline: none;
   transition:
     border-color 0.18s ease,
     box-shadow 0.18s ease,
     background-color 0.18s ease;
-}
 
-.main-search-field::placeholder {
-  color: var(--text-slate-light);
-}
+  &[data-shape='search'] {
+    border-radius: var(--glass-field-search-radius, var(--radius-pill));
+    background: var(--glass-field-search-background, var(--surface-panel));
+  }
 
-.main-search-field:focus {
-  border-color: var(--border-control-focus);
-  background: var(--surface-panel-strong);
-  box-shadow: var(--focus-ring);
-}
+  &[data-size='compact'] {
+    padding: var(--glass-field-compact-padding, 6px 10px);
+    font-size: var(--glass-field-compact-font-size, 12px);
+  }
 
-.glass-input {
-  width: 100%;
-  padding: 12px 18px 12px 42px;
-  font-size: 15px;
-  color: var(--text-deep);
-  background: rgba(0, 0, 0, 0.05);
-  border: none;
-  border-radius: 15px;
-  outline: none;
-  transition: all $transition-base ease;
-
-  &:focus {
-    background: var(--glass-80);
-    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.3);
+  &:focus,
+  &:focus-within {
+    border-color: var(--glass-field-focus-border-color, var(--border-control-focus));
+    background: var(--glass-field-focus-background, var(--surface-panel-strong));
+    box-shadow: var(--glass-field-focus-shadow, var(--focus-ring));
   }
 
   &::placeholder {
-    color: var(--text-secondary);
+    color: var(--text-slate-light);
+  }
+
+  &:disabled,
+  &[aria-disabled='true'] {
+    @include disabled-state;
+
+    box-shadow: none;
   }
 }
 
@@ -153,32 +150,6 @@ $transition-base: 0.3s;
   &:disabled {
     @include disabled-state;
   }
-}
-
-.main-input-field {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid var(--border-control);
-  border-radius: var(--radius-md);
-  background: var(--surface-panel-hover);
-  color: var(--text-deep);
-  font-size: 14px;
-  outline: none;
-  transition:
-    border-color 0.18s ease,
-    box-shadow 0.18s ease,
-    background-color 0.18s ease;
-  box-sizing: border-box;
-}
-
-.main-input-field::placeholder {
-  color: var(--text-slate-light);
-}
-
-.main-input-field:focus {
-  border-color: var(--border-control-focus);
-  background: var(--bg-white);
-  box-shadow: var(--focus-ring);
 }
 
 .main-glow-switch:hover {

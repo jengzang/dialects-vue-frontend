@@ -1,12 +1,12 @@
 <template>
   <div class="pattern-frequency-page">
-    <h3 class="villagesml-subtab-title">
-      模式分析 - 頻率分析
+    <h1 class="villagesml-subtab-title">
+      <BarIcon icon="🔍" />模式分析 - 頻率分析
       <HelpIcon content="統計村名模式的出現頻率。全局模式：分析全省範圍內最常見的模式。區域模式：分析特定區域內的高頻模式。支持設置最小佔比和返回數量" />
-    </h3>
+    </h1>
 
     <div class="vml-glass-panel">
-      <h2><InlineIcon icon="🔍" />模式頻率分析</h2>
+      <h2><BarIcon icon="🔍" />模式頻率分析</h2>
 
       <!-- Query Mode Selection -->
       <div class="mode-selector vml-control-surface vml-control-row vml-control-row--center">
@@ -116,6 +116,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'

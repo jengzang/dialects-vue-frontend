@@ -1,14 +1,14 @@
 <template>
   <div class="semantic-composition-page">
-    <h3 class="villagesml-subtab-title">
-      語義分析 - 組合模式
+    <h1 class="villagesml-subtab-title">
+      <BarIcon icon="🧩" />語義分析 - 組合模式
       <HelpIcon
         content="分析村名語義類別的組合規律。使用PMI（互信息）量化類別間關聯強度，PMI>2表示強關聯。"
         size="md"
         fontSize="16px"
         trigger="both"
       />
-    </h3>
+    </h1>
 
     <!-- Detail Mode Toggle -->
     <SemanticDetailToolbar v-model="detailMode" />
@@ -93,6 +93,7 @@
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import SemanticDetailToolbar from '@/VillagesML/components/SemanticDetailToolbar.vue'
 import { getSemanticCompositionPatterns } from '@/api/index.js'
 import { showError } from '@/utils/ui/message.js'

@@ -14,14 +14,14 @@
         <div class="access-gate-actions">
           <button
             v-if="requiresLogin"
-            class="main-glass-button"
+            class="glass-button"
             data-variant="primary"
             type="button"
             @click="navigateToAuth()"
           >
             {{ t('words.wordList.access.loginAction') }}
           </button>
-          <button class="main-glass-button" data-variant="secondary" type="button" @click="navigateToList">
+          <button class="glass-button" data-variant="secondary" type="button" @click="navigateToList">
             {{ t('words.wordList.access.backToList') }}
           </button>
         </div>

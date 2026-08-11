@@ -20,7 +20,7 @@
             </div>
             <div class="draw-tool-inline-actions">
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
                 @click="$emit('set-all-layers-visibility', true)"
@@ -28,7 +28,7 @@
                 {{ t('map.drawTab.buttons.showAllLayers') }}
               </button>
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
                 @click="$emit('set-all-layers-visibility', false)"
@@ -53,7 +53,7 @@
             >
               <component
                 :is="renamingLayerId === layer.id ? 'div' : 'button'"
-                class="main-glass-button draw-layer-row-button"
+                class="glass-button draw-layer-row-button"
                 :data-variant="activeLayerId === layer.id ? 'primary' : 'secondary'"
                 :data-active="activeLayerId === layer.id"
                 :type="renamingLayerId === layer.id ? undefined : 'button'"
@@ -88,7 +88,7 @@
               </component>
               <div class="draw-layer-row-actions">
                 <button
-                  class="main-glass-button draw-layer-chip-action"
+                  class="glass-button draw-layer-chip-action"
                   data-variant="secondary"
                   type="button"
                   :title="t('map.drawTab.buttons.bringToFront')"
@@ -97,7 +97,7 @@
                   ⤒
                 </button>
                 <button
-                  class="main-glass-button draw-layer-chip-action"
+                  class="glass-button draw-layer-chip-action"
                   data-variant="secondary"
                   type="button"
                   :title="t('map.drawTab.buttons.moveLayerUp')"
@@ -106,7 +106,7 @@
                   ↑
                 </button>
                 <button
-                  class="main-glass-button draw-layer-chip-action"
+                  class="glass-button draw-layer-chip-action"
                   data-variant="secondary"
                   type="button"
                   :title="t('map.drawTab.buttons.moveLayerDown')"
@@ -115,7 +115,7 @@
                   ↓
                 </button>
                 <button
-                  class="main-glass-button draw-layer-chip-action"
+                  class="glass-button draw-layer-chip-action"
                   data-variant="secondary"
                   type="button"
                   :title="t('map.drawTab.buttons.sendToBack')"
@@ -124,7 +124,7 @@
                   ⤓
                 </button>
                 <button
-                  class="main-glass-button draw-layer-chip-action"
+                  class="glass-button draw-layer-chip-action"
                   data-variant="secondary"
                   type="button"
                   @click.stop="$emit('toggle-layer-visibility', layer.id)"
@@ -132,7 +132,7 @@
                   {{ layer.visible ? t('map.drawTab.buttons.hideLayer') : t('map.drawTab.buttons.showLayer') }}
                 </button>
                 <button
-                  class="main-glass-button draw-layer-chip-action"
+                  class="glass-button draw-layer-chip-action"
                   data-variant="secondary"
                   type="button"
                   @click.stop="$emit('toggle-layer-lock', layer.id)"
@@ -141,7 +141,7 @@
                 </button>
                 <button
                   v-if="renamingLayerId !== layer.id"
-                  class="main-glass-button draw-layer-chip-action"
+                  class="glass-button draw-layer-chip-action"
                   data-variant="secondary"
                   type="button"
                   @click.stop="startLayerRename(layer)"
@@ -150,7 +150,7 @@
                 </button>
                 <button
                   v-else
-                  class="main-glass-button draw-layer-chip-action"
+                  class="glass-button draw-layer-chip-action"
                   data-variant="secondary"
                   type="button"
                   @click.stop="commitLayerRename(layer)"
@@ -158,7 +158,7 @@
                   {{ t('map.drawTab.buttons.saveLayerName') }}
                 </button>
                 <button
-                  class="main-glass-button draw-layer-chip-action"
+                  class="glass-button draw-layer-chip-action"
                   data-variant="secondary"
                   type="button"
                   @click.stop="$emit('duplicate-layer', layer.id)"
@@ -166,7 +166,7 @@
                   {{ t('map.drawTab.buttons.duplicateLayer') }}
                 </button>
                 <button
-                  class="main-glass-button draw-layer-chip-action"
+                  class="glass-button draw-layer-chip-action"
                   data-variant="secondary"
                   type="button"
                   @click.stop="$emit('delete-layer', layer.id)"

@@ -1,8 +1,8 @@
 <template>
   <div class="spatial-clusters-tab">
-    <h2><InlineIcon icon="🎯" />空間聚類
+    <h1 class="villagesml-subtab-title"><BarIcon icon="🎯" />空間聚類
       <HelpIcon content="基於地理坐標的村莊聚類分析。支持多種聚類算法（DBSCAN、HDBSCAN、K-Means等）。展示聚類中心、規模、平均距離和空間範圍統計" />
-    </h2>
+    </h1>
 
     <!-- Run 選擇器 -->
     <div class="cluster-controls vml-control-surface vml-control-row">
@@ -71,6 +71,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, onMounted, computed, watch } from 'vue'
 import SpatialMap from './SpatialMap.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'

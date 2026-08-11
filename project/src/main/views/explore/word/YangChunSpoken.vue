@@ -1,7 +1,7 @@
 <template>
   <div style="width: 100%;justify-content: center;align-items:center;display: flex;flex-direction: column">
     <div class="title-row">
-      <h1><BarIcon icon="🗣️" />{{ t('words.ycSpoken.name') }}</h1>
+      <h1><BarIcon icon="🗣️" />{{ t('navigation.pageTitles.words.yangChunSpoken') }}</h1>
       <span class="cross-link" @click="goToYCVillages">{{ t('villages.ycVillages.name') }} →</span>
     </div>
     <UniversalTable

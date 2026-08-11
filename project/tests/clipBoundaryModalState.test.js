@@ -147,7 +147,7 @@ describe('ClipBoundaryModal state restore', () => {
     await flushTicks()
 
     expect(mocks.api).toHaveBeenCalledWith('/api/gis/children?deep=1')
-    expect(wrapper.host.querySelector('.main-glass-button[data-variant="primary"]').disabled).toBe(true)
+    expect(wrapper.host.querySelector('.glass-button[data-variant="primary"]').disabled).toBe(true)
 
     resolveOptions({
       items: [
@@ -161,7 +161,7 @@ describe('ClipBoundaryModal state restore', () => {
       .find((item) => item.textContent.includes('佛山'))
     expect(selectedOption).toBeTruthy()
     expect(selectedOption.querySelector('input').checked).toBe(true)
-    expect(wrapper.host.querySelector('.main-glass-button[data-variant="primary"]').disabled).toBe(false)
+    expect(wrapper.host.querySelector('.glass-button[data-variant="primary"]').disabled).toBe(false)
 
     wrapper.unmount()
   })

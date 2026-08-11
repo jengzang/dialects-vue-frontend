@@ -1,9 +1,9 @@
 <template>
   <div class="semantic-indices-page">
-    <h3 class="villagesml-subtab-title">
-      語義分析 - 語義指數
+    <h1 class="villagesml-subtab-title">
+      <BarIcon icon="📈" />語義分析 - 語義指數
       <HelpIcon content="計算區域的語義強度指數。語義強度 = 該區域村莊名稱中，平均每個村莊包含該語義類別字符的次數。標準化指數用於跨區域比較，省內排名反映該語義類別在省內的相對強度" />
-    </h3>
+    </h1>
 
     <!-- Detail Mode Toggle -->
     <SemanticDetailToolbar v-model="detailMode" />
@@ -139,6 +139,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'

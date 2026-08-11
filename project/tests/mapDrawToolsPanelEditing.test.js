@@ -71,6 +71,8 @@ function mountToolsPanel(overrides = {}) {
       <MapDrawToolsPanel
         v-bind="props"
         @set-mode="events.push(['set-mode', $event])"
+        @undo="events.push(['undo'])"
+        @redo="events.push(['redo'])"
         @delete-selected="events.push(['delete-selected'])"
       />
     `,
@@ -105,6 +107,12 @@ describe('MapDrawToolsPanel editing affordances', () => {
       .toContain('map.drawTab.labels.selectedVertexCount{"count":0}')
     expect(wrapper.host.querySelector('[data-testid="shape-edit-hint"]').textContent)
       .toContain('map.drawTab.labels.shapeEditNoVertexHint')
+    expect(wrapper.host.querySelector('[data-testid="shape-edit-insert-hint"]').textContent)
+      .toContain('map.drawTab.labels.shapeEditInsertVertexHint')
+    expect(wrapper.host.querySelector('[data-testid="shape-edit-move-hint"]').textContent)
+      .toContain('map.drawTab.labels.shapeEditMoveVertexHint')
+    expect(wrapper.host.querySelector('[data-testid="shape-edit-history-hint"]').textContent)
+      .toContain('map.drawTab.labels.shapeEditHistoryHint')
 
     const deleteButton = wrapper.host.querySelector('[data-testid="shape-edit-delete-vertices"]')
     expect(deleteButton.disabled).toBe(true)
@@ -161,6 +169,40 @@ describe('MapDrawToolsPanel editing affordances', () => {
     await nextTick()
 
     expect(wrapper.events).not.toContainEqual(['delete-selected'])
+
+    wrapper.unmount()
+  })
+
+  it('exposes undo and redo shortcut feedback from the history buttons', async () => {
+    const wrapper = mountToolsPanel({
+      canUndo: true,
+      canRedo: false,
+    })
+    await nextTick()
+
+    const undoButton = wrapper.host.querySelector('[data-testid="draw-tool-undo"]')
+    const redoButton = wrapper.host.querySelector('[data-testid="draw-tool-redo"]')
+    expect(undoButton.title).toContain('map.drawTab.labels.undoAvailableHint')
+    expect(undoButton.disabled).toBe(false)
+    expect(redoButton.title).toContain('map.drawTab.labels.redoUnavailableHint')
+    expect(redoButton.disabled).toBe(true)
+
+    undoButton.click()
+    await nextTick()
+    expect(wrapper.events).toContainEqual(['undo'])
+
+    wrapper.props.canUndo = false
+    wrapper.props.canRedo = true
+    await nextTick()
+
+    expect(undoButton.title).toContain('map.drawTab.labels.undoUnavailableHint')
+    expect(undoButton.disabled).toBe(true)
+    expect(redoButton.title).toContain('map.drawTab.labels.redoAvailableHint')
+    expect(redoButton.disabled).toBe(false)
+
+    redoButton.click()
+    await nextTick()
+    expect(wrapper.events).toContainEqual(['redo'])
 
     wrapper.unmount()
   })

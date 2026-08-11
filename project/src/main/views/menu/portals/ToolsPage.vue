@@ -1,64 +1,64 @@
 <template>
   <div class="tools-page">
-    <h1 class="page-title"><BarIcon icon="🛠️" />{{ $t('tools.title') }}</h1>
+    <h1 class="page-title"><BarIcon icon="🛠️" />{{ $t('navigation.pageTitles.portals.tools') }}</h1>
 
     <div class="tools-grid">
-      <button class="entry-button" @click="handleDataCheck">
-        <div class="entry-button__icon"><InlineIcon icon="📋" /></div>
-        <div class="entry-button__name">
+      <button class="portal-entry-card glass-card" data-interactive="true" @click="handleDataCheck">
+        <div class="portal-entry-card__icon"><InlineIcon icon="📋" /></div>
+        <div class="portal-entry-card__name">
           {{ $t('tools.dataCheck.name') }}
         </div>
-        <div class="entry-button__desc">
+        <div class="portal-entry-card__desc">
           {{ $t('tools.dataCheck.desc') }}
         </div>
       </button>
 
-      <button class="entry-button" @click="handleJyutpingToIpa">
-        <div class="entry-button__icon"><InlineIcon icon="🔤" /></div>
-        <div class="entry-button__name">
+      <button class="portal-entry-card glass-card" data-interactive="true" @click="handleJyutpingToIpa">
+        <div class="portal-entry-card__icon"><InlineIcon icon="🔤" /></div>
+        <div class="portal-entry-card__name">
           {{ $t('tools.jyutpingToIpa.name') }}
         </div>
-        <div class="entry-button__desc">
+        <div class="portal-entry-card__desc">
           {{ $t('tools.jyutpingToIpa.desc') }}
         </div>
       </button>
 
-      <button class="entry-button" @click="handleMergeTables">
-        <div class="entry-button__icon"><InlineIcon icon="🔗" /></div>
-        <div class="entry-button__name">
+      <button class="portal-entry-card glass-card" data-interactive="true" @click="handleMergeTables">
+        <div class="portal-entry-card__icon"><InlineIcon icon="🔗" /></div>
+        <div class="portal-entry-card__name">
           {{ $t('tools.mergeTables.name') }}
         </div>
-        <div class="entry-button__desc">
+        <div class="portal-entry-card__desc">
           {{ $t('tools.mergeTables.desc') }}
         </div>
       </button>
 
-      <!-- <button class="entry-button" @click="handleDeriveTables">
-        <div class="entry-button__icon"><InlineIcon icon="🧪" /></div>
-        <div class="entry-button__name">
+      <!-- <button class="portal-entry-card glass-card" data-interactive="true" @click="handleDeriveTables">
+        <div class="portal-entry-card__icon"><InlineIcon icon="🧪" /></div>
+        <div class="portal-entry-card__name">
           {{ $t('tools.deriveTables.name') }}
         </div>
-        <div class="entry-button__desc">
+        <div class="portal-entry-card__desc">
           {{ $t('tools.deriveTables.desc') }}
         </div>
       </button> -->
 
-      <button class="entry-button" @click="handlePraatTables">
-        <div class="entry-button__icon"><InlineIcon icon="🎙️" /></div>
-        <div class="entry-button__name">
+      <button class="portal-entry-card glass-card" data-interactive="true" @click="handlePraatTables">
+        <div class="portal-entry-card__icon"><InlineIcon icon="🎙️" /></div>
+        <div class="portal-entry-card__name">
           {{ $t('tools.praatAnalysis.name') }}
         </div>
-        <div class="entry-button__desc">
+        <div class="portal-entry-card__desc">
           {{ $t('tools.praatAnalysis.desc') }}
         </div>
       </button>
 
-      <button class="entry-button" @click="handleGis">
-        <div class="entry-button__icon"><InlineIcon icon="🗺" /></div>
-        <div class="entry-button__name">
+      <button class="portal-entry-card glass-card" data-interactive="true" @click="handleGis">
+        <div class="portal-entry-card__icon"><InlineIcon icon="🗺" /></div>
+        <div class="portal-entry-card__name">
           {{ $t('tools.gis.name') }}
         </div>
-        <div class="entry-button__desc">
+        <div class="portal-entry-card__desc">
           {{ $t('tools.gis.desc') }}
         </div>
       </button>

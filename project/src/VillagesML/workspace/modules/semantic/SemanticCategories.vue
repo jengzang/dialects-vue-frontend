@@ -1,15 +1,15 @@
 <template>
 <!--  <ExploreLayout>-->
     <div class="semantic-categories-page">
-      <h3 class="villagesml-subtab-title">
-        語義分析 - 類別標籤
+      <h1 class="villagesml-subtab-title">
+        <BarIcon icon="🏷️" />語義分析 - 類別標籤
         <HelpIcon
           content="基於混合詞典v4.0（LLM標注+人工校驗），9大類別+76子類別。VTF（Virtual Term Frequency）為置信度加權的語義類別出現強度。點擊類別卡片查看該類別在不同區域的分佈排行"
           size="md"
           fontSize="16px"
           trigger="both"
         />
-      </h3>
+      </h1>
 
       <!-- Detail Mode Toggle -->
       <SemanticDetailToolbar v-model="detailMode" />
@@ -277,6 +277,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'

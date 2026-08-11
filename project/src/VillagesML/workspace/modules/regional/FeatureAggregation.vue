@@ -1,9 +1,9 @@
 <template>
   <div class="feature-aggregation-page">
-    <h3 class="villagesml-subtab-title">
-      區域分析 - 特徵聚合
+    <h1 class="villagesml-subtab-title">
+      <BarIcon icon="🧩" />區域分析 - 特徵聚合
       <HelpIcon content="多區域特徵統計聚合。一次性對比多個區域的語義畫像、Z分數、獨特後綴/字符、多樣性指標、結構畫像，支持 lift 顯著性判斷和跨區域標準差排名。" />
-    </h3>
+    </h1>
 
     <div v-if="!isAuthenticated" class="auth-warning">
       <span>此功能需要登錄</span>
@@ -355,6 +355,7 @@ import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { aggregateFeatures } from '@/api/index.js'
 import { showError, showWarning } from '@/utils/ui/message.js'
 import { userStore } from '@/main/store/store.js'

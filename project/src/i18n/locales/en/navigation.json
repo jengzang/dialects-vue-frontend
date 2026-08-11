@@ -86,6 +86,32 @@
     }
   },
   "pageTitles": {
+    "user": {
+      "data": "Personal Data Management",
+      "region": "Personal Region Management"
+    },
+    "support": {
+      "privacy": "Privacy Policy & Citation",
+      "settings": "Settings",
+      "source": "Sources",
+      "aboutIntro": "ℹ️ About This Site",
+      "aboutSuggestion": "Share Feedback",
+      "aboutLike": "❤️ Support the Author"
+    },
+    "portals": {
+      "tools": "Toolbox",
+      "villages": "Natural Villages"
+    },
+    "result": {
+      "pleaseQuery": "Please query first",
+      "tab1": "Search Characters",
+      "tab2": "Search Middle Chinese",
+      "tab3": "Search Phonemes",
+      "tab4": "Search Tones"
+    },
+    "cluster": {
+      "workspace": "Dialect Clustering Workspace"
+    },
     "query": {
       "tab1": "Character Query",
       "tab2": "Middle Chinese Query",
@@ -117,6 +143,37 @@
     "yubao": {
       "vocabulary": "Language Preservation Vocabulary",
       "grammar": "Language Preservation Grammar"
+    },
+    "words": {
+      "yangChunSpoken": "Yangchun Spoken Words"
+    },
+    "praat": {
+      "main": "Praat Acoustic Analysis"
+    },
+    "tools": {
+      "check": "Dialect Table Check Tool",
+      "jyut2ipa": "Jyutping-to-IPA Tool",
+      "merge": "Table Merge Tool",
+      "tableManage": "Table Management Panel",
+      "tableManageAccessDenied": "Access Denied"
+    },
+    "villages": {
+      "dashboard": "Village Analysis System",
+      "gdTree": "Guangdong Village Tree",
+      "gdTable": "Guangdong Village Overview",
+      "yangChun": "Yangchun Administrative Divisions",
+      "all": "All Villages",
+      "toponyms": "Village Toponym Distribution"
+    },
+    "charClass": {
+      "zhonggu": "Middle Chinese Phonology Data",
+      "shanggu": "Old Chinese Data",
+      "jingu": "Early Modern Phonology Data",
+      "yueyun": "Cantonese Rime Book Data"
+    },
+    "yangchun": {
+      "overview": "Yangchun Dialect Overview",
+      "expressions": "Yangchun Expressions and Reduplicatives"
     }
   },
   "tabs": {

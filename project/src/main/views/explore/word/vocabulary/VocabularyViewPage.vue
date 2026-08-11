@@ -83,7 +83,7 @@
 
       <button
         v-if="canLoadMore"
-        class="load-more-btn main-glass-button"
+        class="load-more-btn glass-button"
         data-variant="secondary"
         type="button"
         :disabled="isLoadingMore"
@@ -140,7 +140,7 @@
           </article>
           <button
             v-if="canLoadMoreMapDetail"
-            class="load-more-btn main-glass-button"
+            class="load-more-btn glass-button"
             data-variant="secondary"
             type="button"
             :disabled="isLoadingMapDetail"

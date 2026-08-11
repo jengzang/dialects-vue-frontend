@@ -36,7 +36,8 @@
           </p>
 
           <button
-            class="enter-btn"
+            class="glass-button"
+            data-variant="enter"
             @click="handleLogin"
           >
             {{ t('map.customTab.labels.login') }}

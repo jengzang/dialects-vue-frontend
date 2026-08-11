@@ -133,7 +133,7 @@
 .draw-tool-button-grid {
   @include draw-button-grid(2);
 
-  .main-glass-button:last-child:nth-child(odd) {
+  .glass-button:last-child:nth-child(odd) {
     grid-column: 1 / -1;
   }
 }
@@ -142,7 +142,7 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-.draw-tool-button-grid--three .main-glass-button {
+.draw-tool-button-grid--three .glass-button {
   padding: 0.4rem 0.3rem !important;
 }
 
@@ -186,6 +186,19 @@
   color: rgba(var(--text-deep-rgb), 0.68);
 }
 
+.draw-shape-edit-tips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.draw-shape-edit-tips span {
+  padding: 0.18rem 0.42rem;
+  border-radius: var(--radius-sm2);
+  background: var(--glass-50);
+  color: rgba(var(--text-deep-rgb), 0.68);
+}
+
 .draw-shape-edit-actions {
   display: flex;
   flex-wrap: wrap;
@@ -194,7 +207,7 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .draw-tool-button-grid .main-glass-button:hover:not(:disabled) {
+  .draw-tool-button-grid .glass-button:hover:not(:disabled) {
     background: var(--color-primary);
     color: var(--action-primary-text);
   }

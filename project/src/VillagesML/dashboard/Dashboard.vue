@@ -2,7 +2,7 @@
 <!--  <ExploreLayout>-->
     <div class="dashboard-page">
       <div class="page-header">
-        <h1 class="page-title"><BarIcon icon="📊" />{{ t('villages.dashboard.pageTitle') }}</h1>
+        <h1 class="page-title"><BarIcon icon="📊" />{{ t('navigation.pageTitles.villages.dashboard') }}</h1>
         <SimpleSelectDropdown
           v-model="activeDataset"
           :options="datasetOptions"

@@ -6,7 +6,7 @@
     </div>
 
     <div v-else-if="!isAdmin" class="access-denied">
-      <h1><BarIcon icon="⚠️" />{{ t('tools.tableManage.accessDenied.title') }}</h1>
+      <h1><BarIcon icon="⚠️" />{{ t('navigation.pageTitles.tools.tableManageAccessDenied') }}</h1>
       <p>{{ t('tools.tableManage.accessDenied.desc') }}</p>
       <button @click="goHome">{{ t('tools.tableManage.accessDenied.goHome') }}</button>
     </div>
@@ -26,7 +26,7 @@
       </div>
 
       <div v-show="!showUniversalTable || showConfigPanel" class="config-panel">
-        <h1 v-if="!showUniversalTable"><BarIcon icon="📈" />{{ t('tools.tableManage.page.title') }}</h1>
+        <h1 v-if="!showUniversalTable"><BarIcon icon="📈" />{{ t('navigation.pageTitles.tools.tableManage') }}</h1>
 
         <div class="config-actions">
           <button @click="saveCurrentConfig" class="btn-action-small">{{ t('tools.tableManage.actions.saveConfig') }}</button>

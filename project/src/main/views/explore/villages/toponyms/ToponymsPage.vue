@@ -3,7 +3,7 @@
     <section class="toponyms-page__controls glass-panel">
       <div class="toponyms-page__controls-inner glass-subpanel">
         <div class="toponyms-page__toolbar-copy">
-          <h1><BarIcon icon="📍" />{{ t('villages.pages.toponyms.title') }}</h1>
+          <h1><BarIcon icon="📍" />{{ t('navigation.pageTitles.villages.toponyms') }}</h1>
           <p>{{ t('villages.pages.toponyms.subtitle') }}</p>
         </div>
 
@@ -15,7 +15,7 @@
         >
           <template #actions>
             <button
-              class="main-glass-button"
+              class="glass-button"
               type="button"
               data-variant="secondary"
               :aria-label="t('villages.pages.toponyms.chart.configAriaLabel')"

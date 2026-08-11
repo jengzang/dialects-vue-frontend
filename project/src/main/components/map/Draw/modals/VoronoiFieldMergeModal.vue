@@ -40,7 +40,7 @@
     <template #footer>
       <div class="field-merge-footer">
         <button
-          class="main-glass-button"
+          class="glass-button"
           data-variant="secondary"
           type="button"
           @click="$emit('reset-field-merge')"
@@ -48,7 +48,7 @@
           {{ t('map.drawTab.voronoi.fieldMergeReset') }}
         </button>
         <button
-          class="main-glass-button"
+          class="glass-button"
           data-variant="primary"
           type="button"
           @click="$emit('update:modelValue', false)"

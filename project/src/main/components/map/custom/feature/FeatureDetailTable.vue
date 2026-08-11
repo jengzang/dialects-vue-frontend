@@ -2,7 +2,7 @@
   <section class="feature-detail-table">
     <div class="feature-detail-header">
       <button
-        class="main-glass-button"
+        class="glass-button"
         type="button"
         @click="$emit('back')"
       >
@@ -31,7 +31,7 @@
               :placeholder="t('customEntry.pointDetail.placeholders.phonology')"
             >
           </label>
-          <button class="main-glass-button field-notice-trigger" type="button" @click="isFieldNoticeOpen = true">
+          <button class="glass-button field-notice-trigger" type="button" @click="isFieldNoticeOpen = true">
             {{ t('customEntry.pointDetail.rows.noticeTrigger') }}
           </button>
         </div>
@@ -46,7 +46,7 @@
         </p>
       </div>
       <button
-        class="main-glass-button"
+        class="glass-button"
         data-variant="primary"
         type="button"
         @click="openCreateModal"
@@ -69,7 +69,7 @@
         >
           <div>{{ errorMessage }}</div>
           <button
-            class="main-glass-button"
+            class="glass-button"
             type="button"
             @click="loadRecords"
           >
@@ -750,7 +750,7 @@ watch(
 }
 
 .field-notice-trigger {
-  --main-glass-button-padding: 2px 10px;
+  --glass-button-padding: 2px 10px;
   font-size: 11px;
   color: $warning;
   border-color: rgba(var(--color-warning-rgb), 0.3);

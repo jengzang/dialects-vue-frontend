@@ -86,6 +86,32 @@
     }
   },
   "pageTitles": {
+    "user": {
+      "data": "个人数据管理",
+      "region": "个人分区管理"
+    },
+    "support": {
+      "privacy": "隐私政策与引用说明",
+      "settings": "设置",
+      "source": "资料源",
+      "aboutIntro": "ℹ️ 关于网站",
+      "aboutSuggestion": "我有建议",
+      "aboutLike": "❤️ 喜欢作者"
+    },
+    "portals": {
+      "tools": "工具箱",
+      "villages": "自然村"
+    },
+    "result": {
+      "pleaseQuery": "请先查询",
+      "tab1": "查字",
+      "tab2": "查中古",
+      "tab3": "查音位",
+      "tab4": "查调"
+    },
+    "cluster": {
+      "workspace": "方言聚类工作台"
+    },
     "query": {
       "tab1": "查字",
       "tab2": "查中古",
@@ -117,6 +143,37 @@
     "yubao": {
       "vocabulary": "语保词汇",
       "grammar": "语保语法"
+    },
+    "words": {
+      "yangChunSpoken": "阳春口语词"
+    },
+    "praat": {
+      "main": "Praat 声学分析"
+    },
+    "tools": {
+      "check": "方言字表检查工具",
+      "jyut2ipa": "粤拼转IPA工具",
+      "merge": "字表合并工具",
+      "tableManage": "表格管理面板",
+      "tableManageAccessDenied": "权限不足"
+    },
+    "villages": {
+      "dashboard": "自然村分析系统",
+      "gdTree": "广东自然村树状图",
+      "gdTable": "广东自然村表格",
+      "yangChun": "阳春行政规划",
+      "all": "全部自然村",
+      "toponyms": "地名分布"
+    },
+    "charClass": {
+      "zhonggu": "中古音韵数据",
+      "shanggu": "上古音数据",
+      "jingu": "近古音数据",
+      "yueyun": "粤语韵书数据"
+    },
+    "yangchun": {
+      "overview": "阳春方言概览",
+      "expressions": "阳春熟语与叠式词"
     }
   },
   "tabs": {

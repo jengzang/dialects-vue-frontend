@@ -9,18 +9,19 @@
               @compositionend="handleSearchCompositionEnd"
               @input="handleSearch"
               :placeholder="t('tableTree.universalTable.toolbar.searchPlaceholder')"
-              class="search-input"
+              class="search-input glass-field"
+              data-shape="search"
           />
       </div>
       <div v-if="canUseTableActions" class="action-buttons">
-        <button v-if="!isEditMode" class="main-glass-button" data-size="compact" @click="exportToExcel">
+        <button v-if="!isEditMode" class="glass-button" data-size="compact" @click="exportToExcel">
           <span class="icon"><InlineIcon icon="📤" /></span><span class="btn-text">Excel</span>
         </button>
-        <button class="main-glass-button" data-variant="primary" @click="openAddModal">
+        <button class="glass-button" data-variant="primary" @click="openAddModal">
           <span class="icon">＋</span> <span class="btn-text">{{ t('tableTree.universalTable.toolbar.add') }}</span>
         </button>
         <button
-          class="main-glass-button"
+          class="glass-button"
           data-role="edit-toggle"
           :data-state="isEditMode ? 'edit-mode' : 'default'"
           @click="toggleEditMode"
@@ -30,7 +31,7 @@
         </button>
         <button
           v-if="isEditMode"
-          class="main-glass-button"
+          class="glass-button"
           data-variant="secondary"
           @click="openBatchReplaceModal"
           :title="t('tableTree.universalTable.toolbar.batchReplace')"
@@ -40,7 +41,7 @@
         </button>
         <button
           v-if="isEditMode"
-          class="main-glass-button"
+          class="glass-button"
           data-role="submit"
           @click="submitBatchEdit"
           :disabled="Object.keys(changedCells).length === 0"
@@ -124,7 +125,8 @@
             ref="pageInputRef"
             v-model.number="inputPageNumber"
             type="number"
-            class="page-input"
+            class="page-input glass-field"
+            data-size="compact"
             :min="1"
             :max="totalPages"
             @keyup.enter="confirmPageJump"
@@ -218,7 +220,8 @@
                     ref="pageInputRefFullscreen"
                     v-model.number="inputPageNumber"
                     type="number"
-                    class="page-input"
+                    class="page-input glass-field"
+                    data-size="compact"
                     :min="1"
                     :max="totalPages"
                     @keyup.enter="confirmPageJump"
@@ -305,7 +308,7 @@
           <input
             v-model="newRecordData[col.key]"
             type="text"
-            class="field-input"
+            class="field-input glass-field"
             :placeholder="t('tableTree.universalTable.addModal.inputPlaceholder', { label: col.label })"
           />
         </div>
@@ -357,7 +360,7 @@
                   type="text"
                   v-model="batchReplace.findText"
                   :placeholder="t('tableTree.universalTable.batchReplace.findPlaceholder')"
-                  class="glass-input"
+                  class="glass-field"
                 />
                 <small v-if="batchReplace.findText.trim() === ''" class="help-text">
                   ℹ️ {{ t('tableTree.universalTable.batchReplace.emptySearchHint') }}
@@ -371,7 +374,7 @@
                   type="text"
                   v-model="batchReplace.replaceText"
                   :placeholder="t('tableTree.universalTable.batchReplace.replacePlaceholder')"
-                  class="glass-input"
+                  class="glass-field"
                 />
               </div>
 
@@ -478,7 +481,7 @@
       <template #footer>
         <div class="batch-replace-modal-footer">
               <button
-                class="main-glass-button"
+                class="glass-button"
                 data-variant="secondary"
                 @click="previewBatchReplace"
                 :disabled="!canPreview"
@@ -487,7 +490,7 @@
                 <span>{{ t('tableTree.universalTable.batchReplace.preview') }}</span>
               </button>
               <button
-                class="main-glass-button"
+                class="glass-button"
                 data-variant="primary"
                 @click="executeBatchReplace"
                 :disabled="batchReplace.replaceAllPages ? batchReplace.totalMatches === 0 : batchReplace.previewResults.length === 0"
@@ -496,7 +499,7 @@
                 <span>{{ t('tableTree.universalTable.batchReplace.replaceWithCount', { count: batchReplaceCount }) }}</span>
               </button>
               <button
-                class="main-glass-button"
+                class="glass-button"
                 @click="closeBatchReplaceModal"
               >
                 <span>{{ t('common.button.cancel') }}</span>
@@ -1643,21 +1646,8 @@ $mobile-breakpoint: 768px;
 }
 
 .search-input {
-  width: 80%;
-  padding: 10px 12px 10px 36px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-medium);
-  background: var(--glass-60);
-  font-size: 14px;
-  outline: none;
-  color: var(--text-deep);
-  transition: all 0.3s;
-
-  &:focus {
-    background: var(--bg-white);
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px var(--color-primary-light);
-  }
+  --glass-field-width: 80%;
+  --glass-field-padding: 10px 12px 10px 36px;
 }
 
 .search-icon {
@@ -1674,10 +1664,10 @@ $mobile-breakpoint: 768px;
 
 }
 
-.main-glass-button {
-  --main-glass-button-padding: 8px 16px;
-  --main-glass-button-border-radius: var(--radius-md);
-  --main-glass-button-font-size: 13px;
+.glass-button {
+  --glass-button-padding: 8px 16px;
+  --glass-button-border-radius: var(--radius-md);
+  --glass-button-font-size: 13px;
 
   display: flex;
   align-items: center;
@@ -1696,7 +1686,7 @@ $mobile-breakpoint: 768px;
   }
 
   &[data-size='compact'] {
-    --main-glass-button-padding: 8px 6px;
+    --glass-button-padding: 8px 6px;
     &:hover:not(:disabled) {
         background: var(--glass-30)
     }
@@ -1732,7 +1722,7 @@ $mobile-breakpoint: 768px;
 }
 
 /* 提交按鈕樣式 */
-.main-glass-button[data-role='submit'] {
+.glass-button[data-role='submit'] {
   color: white;
   font-weight: 600;
   background: linear-gradient(135deg, $success-green, var(--color-success));
@@ -2068,7 +2058,7 @@ td {
     justify-content: space-between;
   }
 
-  .action-buttons .main-glass-button {
+  .action-buttons .glass-button {
     flex: 1;
     justify-content: center;
     padding: 8px;
@@ -2177,28 +2167,18 @@ td {
 }
 
 .page-input {
-  width: 50px;
-  padding: 6px 8px;
-  font-size: 14px;
+  --glass-field-width: 50px;
+  --glass-field-compact-padding: 6px 8px;
+
   font-weight: 600;
   text-align: center;
   appearance: textfield;
-  color: var(--text-deep);
-  background: var(--bg-white);
-  border: 2px solid var(--color-primary);
-  border-radius: var(--radius-md);
-  outline: none;
-  transition: all $transition-fast;
   -moz-appearance: textfield;
 
   &::-webkit-outer-spin-button,
   &::-webkit-inner-spin-button {
     margin: 0;
     -webkit-appearance: none;
-  }
-
-  &:focus {
-    box-shadow: 0 0 0 3px var(--color-primary-light);
   }
 }
 
@@ -2293,20 +2273,7 @@ td {
 }
 
 .field-input {
-  color: var(--text-deep);
   flex: 1;
-  padding: 10px 12px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-medium);
-  background: var(--bg-white);
-  font-size: 14px;
-  outline: none;
-  transition: all 0.3s;
-}
-
-.field-input:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 
 .add-record-modal-actions {
@@ -2466,21 +2433,8 @@ td {
     }
   }
 
-  .glass-input {
-    width: 80%;
-    padding: 10px 14px;
-    border: 1px solid var(--border-gray-medium);
-    border-radius: var(--radius-md);
-    background: var(--glass-60);
-    font-size: 14px;
-    outline: none;
-    transition: all $transition-fast;
-
-    &:focus {
-      border-color: $primary-blue;
-      background: var(--glass-90);
-      box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
-    }
+  .glass-field {
+    --glass-field-width: 80%;
   }
 }
 
@@ -2789,21 +2743,21 @@ td {
   background: var(--glass-50);
 }
 
-.batch-replace-modal-footer .main-glass-button {
+.batch-replace-modal-footer .glass-button {
   flex: 1;
 }
 
-.batch-replace-modal-footer .main-glass-button:disabled {
+.batch-replace-modal-footer .glass-button:disabled {
   @include disabled-state;
 }
 
-.batch-replace-modal-footer .main-glass-button[data-variant='secondary'] {
+.batch-replace-modal-footer .glass-button[data-variant='secondary'] {
   background: rgba(108, 117, 125, 0.1);
   color: var(--text-slate);
   border: 1px solid rgba(108, 117, 125, 0.2);
 }
 
-.batch-replace-modal-footer .main-glass-button[data-variant='secondary'] {
+.batch-replace-modal-footer .glass-button[data-variant='secondary'] {
   background: rgba(108, 117, 125, 0.2);
 
   &:hover:not(:disabled) {

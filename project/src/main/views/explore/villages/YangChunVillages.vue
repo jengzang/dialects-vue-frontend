@@ -2,7 +2,7 @@
   <div class="glass-container glass-shell">
     <div class="header-section">
       <div class="title-row">
-        <h1 style="margin: 0;font-size: 1.5em;"><BarIcon icon="🌾" />{{ t('villages.pages.yangChun.title') }}</h1>
+        <h1 style="margin: 0;font-size: 1.5em;"><BarIcon icon="🌾" />{{ t('navigation.pageTitles.villages.yangChun') }}</h1>
         <span class="cross-link" @click="goToYcSpoken">{{ t('words.ycSpoken.name') }} →</span>
       </div>
       <p>{{ t('villages.pages.yangChun.source') }}</p>

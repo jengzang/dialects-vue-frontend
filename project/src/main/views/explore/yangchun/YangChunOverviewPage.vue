@@ -9,13 +9,13 @@
     >
       <div class="yc-hero__copy">
         <span class="yc-eyebrow">Yangchun Dialect Atlas</span>
-        <h1><BarIcon icon="🌾" />阳春方言概览</h1>
+        <h1><BarIcon icon="🌾" />{{ t('navigation.pageTitles.yangchun.overview') }}</h1>
         <p>
           从白话到涯话，从城镇中心到山边方言岛，阳春是两阳地区观察粤客接触、迁徙与方言分布的关键区域。
         </p>
         <div class="yc-hero__actions">
           <button
-            class="main-glass-button"
+            class="glass-button"
             data-variant="primary"
             type="button"
             @click="scrollToSection('yc-map')"
@@ -23,7 +23,7 @@
             看分布格局
           </button>
           <button
-            class="main-glass-button"
+            class="glass-button"
             type="button"
             @click="scrollToSection('yc-phonology')"
           >
@@ -52,7 +52,7 @@
       <button
         v-for="section in pageSections"
         :key="section.id"
-        class="main-glass-button"
+        class="glass-button"
         data-size="small"
         type="button"
         @click="scrollToSection(section.id)"
@@ -88,7 +88,7 @@
             <button
               v-for="group in dialectGroups"
               :key="group.id"
-              class="yc-map-marker main-glass-button"
+              class="yc-map-marker glass-button"
               :class="{ 'yc-map-marker--active': group.id === activeGroupId }"
               data-size="small"
               :data-active="group.id === activeGroupId"
@@ -204,7 +204,7 @@
           <button
             v-for="item in phonologyDetails"
             :key="item.id"
-            class="main-glass-button"
+            class="glass-button"
             :data-active="item.id === activePhonologyId"
             type="button"
             role="tab"
@@ -258,6 +258,7 @@
 <script setup>
 import BarIcon from '@/components/common/BarIcon.vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import {
   dialectGroups,
   migrationNotes,
@@ -267,6 +268,7 @@ import {
 } from './yangchunOverviewData.js'
 
 const pageEl = ref(null)
+const { t } = useI18n()
 const activeGroupId = ref(dialectGroups[0].id)
 const activePhonologyId = ref(phonologyDetails[0].id)
 
@@ -521,7 +523,7 @@ onBeforeUnmount(() => {
 .yc-map-marker {
   position: absolute;
   z-index: 1;
-  --main-glass-button-padding: 8px 12px;
+  --glass-button-padding: 8px 12px;
   transform: translate(-50%, -50%);
   transition: transform 0.18s ease;
 
@@ -632,7 +634,7 @@ onBeforeUnmount(() => {
 .yc-phonology-tabs {
   align-content: flex-start;
 
-  .main-glass-button {
+  .glass-button {
     width: 100%;
     justify-content: flex-start;
   }

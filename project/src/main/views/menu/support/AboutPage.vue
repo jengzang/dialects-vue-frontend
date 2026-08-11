@@ -9,7 +9,7 @@
       <template #default="{ currentTab }">
         <!-- 新的"簡介"页面 -->
         <div v-if="currentTab === 'intro'" class="thanks-container">
-          <h1 class="tabs-title"><BarIcon icon="📖" />{{ $t('about.intro.title') }}</h1>
+          <h1 class="tabs-title"><BarIcon icon="📖" />{{ $t('navigation.pageTitles.support.aboutIntro') }}</h1>
           <p style=" text-align: left;">{{ $t('about.intro.description') }}</p>
           <ul class="customlist">
             <li v-for="(feature, idx) in featureList" :key="idx" class="feature-item">
@@ -94,7 +94,7 @@
         <!-- 新的"建議"页面 -->
         <div v-if="currentTab === 'suggestion'" class="page2">
           <div class="suggestion-box">
-            <h1 class="tabs-title"><BarIcon icon="💬" />{{ $t('about.suggestion.title') }}</h1>
+            <h1 class="tabs-title"><BarIcon icon="💬" />{{ $t('navigation.pageTitles.support.aboutSuggestion') }}</h1>
             <p v-html="$t('about.suggestion.description')"></p>
             <p class="subtext">👇 {{ $t('about.suggestion.subtext') }}</p>
             <div class="card-links">
@@ -136,7 +136,7 @@
         <div v-if="currentTab === 'like'" class="cards-container">
           <h1 class="tabs-title like-author-title">
             <BarIcon icon="❤️" />
-            {{ $t('about.like.title') }}
+            {{ $t('navigation.pageTitles.support.aboutLike') }}
             <span class="follow-buttons">
               <button class="follow-button zhihu-follow" @click="followClicked">
                 <img

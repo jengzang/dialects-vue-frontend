@@ -63,14 +63,14 @@
     <template #footer>
       <div class="clip-boundary-footer">
         <button
-          class="main-glass-button"
+          class="glass-button"
           type="button"
           @click="handleClose"
         >
           {{ t('map.drawTab.buttons.cancel') }}
         </button>
         <button
-          class="main-glass-button"
+          class="glass-button"
           data-variant="primary"
           type="button"
           :disabled="localSelected.length === 0 || isOptionsLoading"

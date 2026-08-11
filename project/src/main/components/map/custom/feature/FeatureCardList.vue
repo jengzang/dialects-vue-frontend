@@ -2,11 +2,11 @@
   <section class="feature-card-list">
     <div class="feature-card-toolbar">
       <div class="feature-card-heading">
-        <input v-model="keyword" class="feature-card-search main-search-field" type="text" :placeholder="t('customEntry.featureList.searchPlaceholder')" />
+        <input v-model="keyword" class="feature-card-search glass-field" data-shape="search" type="text" :placeholder="t('customEntry.featureList.searchPlaceholder')" />
         <h4 class="feature-card-title">{{ t('customEntry.featureList.title') }}</h4>
         <p class="feature-card-description">{{ t('customEntry.featureList.description') }}</p>
       </div>
-      <button class="main-glass-button" data-variant="primary" type="button" @click="$emit('create')">
+      <button class="glass-button" data-variant="primary" type="button" @click="$emit('create')">
         {{ t('customEntry.featureList.create') }}
       </button>
     </div>
@@ -22,7 +22,7 @@
     <div v-else-if="errorMessage" class="feature-list-state main-list-state glass-subpanel" data-state="error">
       <div class="feature-list-state-title main-list-state-title">{{ t('customEntry.featureList.loadFailed') }}</div>
       <p class="feature-list-state-text main-list-state-text">{{ errorMessage }}</p>
-      <button class="main-glass-button" type="button" @click="$emit('retry')">{{ t('customEntry.featureList.retry') }}</button>
+      <button class="glass-button" type="button" @click="$emit('retry')">{{ t('customEntry.featureList.retry') }}</button>
     </div>
 
     <div v-else-if="filteredItems.length === 0" class="feature-list-state main-list-state glass-subpanel">

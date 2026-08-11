@@ -1,10 +1,10 @@
 <template>
 <!--  <ExploreLayout>-->
     <div class="regional-aggregates-page">
-      <h3 class="villagesml-subtab-title">
-        區域分析 - 🌍聚合統計
+      <h1 class="villagesml-subtab-title">
+        <BarIcon icon="🌍" />區域分析 - 聚合統計
         <HelpIcon content="按行政級別聚合村莊統計數據。包含村莊總數、平均名稱長度、語義類別分布等。空間聚合展示村莊密度、隔離指數和空間分散度的關係" />
-      </h3>
+      </h1>
 <!--      <h1 class="page-title"><InlineIcon icon="🌍" />區域聚合統計</h1>-->
 
       <!-- Aggregates Table -->
@@ -191,6 +191,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue'
 import AppModal from '@/components/common/AppModal.vue'
 import RegionDisplay from '@/VillagesML/components/RegionDisplay.vue'

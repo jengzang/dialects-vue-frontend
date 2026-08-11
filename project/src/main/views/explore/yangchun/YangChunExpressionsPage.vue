@@ -3,7 +3,7 @@
     <section class="yc-expressions-hero glass-shell">
       <div>
         <span class="yc-eyebrow">Yangchun Expressions</span>
-        <h1><BarIcon icon="📝" />阳春熟语与叠式词</h1>
+        <h1><BarIcon icon="📝" />{{ t('navigation.pageTitles.yangchun.expressions') }}</h1>
         <p>
           AABB、ABB、AAB、歇后语、农谚、惯用语都可以在这里按类型浏览，后续资料会继续补全。
         </p>
@@ -19,7 +19,8 @@
         <span>搜索</span>
         <input
           v-model="searchQuery"
-          class="main-input-field"
+          class="glass-field"
+          data-shape="search"
           type="search"
           placeholder="搜词形、释义、例句、地域或标签"
         >
@@ -33,7 +34,7 @@
         <button
           v-for="category in yangchunExpressionCategories"
           :key="category.id"
-          class="main-glass-button"
+          class="glass-button"
           data-size="small"
           :data-active="activeCategory === category.id"
           type="button"
@@ -51,7 +52,7 @@
         <button
           v-for="pattern in yangchunExpressionPatterns"
           :key="pattern"
-          class="main-glass-button"
+          class="glass-button"
           data-size="small"
           :data-active="activePattern === pattern"
           type="button"
@@ -65,7 +66,7 @@
         <span>共 {{ filteredItems.length }} 条</span>
         <div class="yc-view-switch">
           <button
-            class="main-glass-button"
+            class="glass-button"
             data-size="small"
             :data-active="viewMode === 'card'"
             type="button"
@@ -74,7 +75,7 @@
             卡片
           </button>
           <button
-            class="main-glass-button"
+            class="glass-button"
             data-size="small"
             :data-active="viewMode === 'table'"
             type="button"
@@ -146,6 +147,7 @@
 <script setup>
 import BarIcon from '@/components/common/BarIcon.vue'
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import GlassTable from '@/components/common/GlassTable.vue'
 import {
   yangchunExpressionCategories,
@@ -154,6 +156,7 @@ import {
 } from './yangchunExpressionsMock.js'
 
 const activeCategory = ref('all')
+const { t } = useI18n()
 const activePattern = ref('全部')
 const searchQuery = ref('')
 const viewMode = ref('card')
@@ -260,7 +263,7 @@ const filteredItems = computed(() => {
     font-weight: 700;
   }
 
-  .main-input-field {
+  .glass-field {
     min-height: 44px;
   }
 }

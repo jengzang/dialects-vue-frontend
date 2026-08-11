@@ -17,10 +17,10 @@
         </form>
 
         <div class="filter-actions">
-          <button class="main-glass-button" data-variant="primary" type="button" @click="applyLogFilters">
+          <button class="glass-button" data-variant="primary" type="button" @click="applyLogFilters">
             {{ t('common.button.search') }}
           </button>
-          <button class="main-glass-button" data-variant="secondary" type="button" @click="resetLogFilters">
+          <button class="glass-button" data-variant="secondary" type="button" @click="resetLogFilters">
             {{ t('common.button.reset') }}
           </button>
         </div>
@@ -85,10 +85,10 @@
           </select>
         </label>
         <span class="pagination-nav-group">
-          <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoPreviousLogPage" @click="goToLogPage(-1)">
+          <button class="glass-button" data-variant="secondary" type="button" :disabled="!canGoPreviousLogPage" @click="goToLogPage(-1)">
             {{ t('words.wordList.pagination.previous') }}
           </button>
-          <button class="main-glass-button" data-variant="secondary" type="button" :disabled="!canGoNextLogPage" @click="goToLogPage(1)">
+          <button class="glass-button" data-variant="secondary" type="button" :disabled="!canGoNextLogPage" @click="goToLogPage(1)">
             {{ t('words.wordList.pagination.next') }}
           </button>
         </span>

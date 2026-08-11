@@ -108,13 +108,13 @@
                 <Teleport to="body">
                   <div
                     v-if="excludeDropdownOpen === 'tab2_current'"
-                    class="dropdown-panel choice-dropdown-panel"
+                    class="dropdown-panel glass-dropdown-panel"
                     :style="excludeDropdownStyle"
                   >
                     <div
                       v-for="option in excludeOptions"
                       :key="option.value"
-                      class="dropdown-item choice-dropdown-item"
+                      class="dropdown-item glass-dropdown-item"
                       :class="{ active: isExcludeSelected(option.value, 'tab2', 'current') }"
                       @click="toggleExcludeOption(option.value, 'tab2', 'current')"
                     >
@@ -222,13 +222,13 @@
                 <Teleport to="body">
                   <div
                     v-if="excludeDropdownOpen === 'tab2_current'"
-                    class="dropdown-panel choice-dropdown-panel"
+                    class="dropdown-panel glass-dropdown-panel"
                     :style="excludeDropdownStyle"
                   >
                     <div
                       v-for="option in excludeOptions"
                       :key="option.value"
-                      class="dropdown-item choice-dropdown-item"
+                      class="dropdown-item glass-dropdown-item"
                       :class="{ active: isExcludeSelected(option.value, 'tab2', 'current') }"
                       @click="toggleExcludeOption(option.value, 'tab2', 'current')"
                     >
@@ -465,7 +465,8 @@
         <!-- Tab1, Tab2, Tab4 运行按钮 -->
         <button
           v-if="currentTab !== 'tab5'"
-          class="run-btn"
+          class="glass-button"
+          data-variant="run"
           :disabled="buttonState.isRunning || isRunDisabled"
           :class="{ disabled: isRunDisabled }"
           @click="runAction"
@@ -478,7 +479,8 @@
         <!-- Tab5 独立运行按钮 -->
         <button
           v-else
-          class="run-btn"
+          class="glass-button"
+          data-variant="run"
           :disabled="buttonState.isRunning || isTab5RunDisabled"
           :class="{ disabled: isTab5RunDisabled }"
           @click="runTab5Action"

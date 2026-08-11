@@ -1,68 +1,68 @@
 <template>
   <div class="villages-page">
-    <h1 class="page-title"><BarIcon icon="🏘️" />{{ $t('villages.title') }}</h1>
+    <h1 class="page-title"><BarIcon icon="🏘️" />{{ $t('navigation.pageTitles.portals.villages') }}</h1>
 
     <div class="villages-grid">
-      <button class="entry-button" @click="handleToponyms">
-        <div class="entry-button__icon"><InlineIcon icon="📍" /></div>
-        <div class="entry-button__name">
+      <button class="portal-entry-card glass-card" data-interactive="true" @click="handleToponyms">
+        <div class="portal-entry-card__icon"><InlineIcon icon="📍" /></div>
+        <div class="portal-entry-card__name">
           {{ $t('villages.toponyms.name') }}
         </div>
-        <div class="entry-button__desc">
+        <div class="portal-entry-card__desc">
           {{ $t('villages.toponyms.desc') }}
         </div>
       </button>
 
-      <button class="entry-button" @click="handleGdVillages">
-        <div class="entry-button__icon"><InlineIcon icon="🏘️" /></div>
-        <div class="entry-button__name">
+      <button class="portal-entry-card glass-card" data-interactive="true" @click="handleGdVillages">
+        <div class="portal-entry-card__icon"><InlineIcon icon="🏘️" /></div>
+        <div class="portal-entry-card__name">
           {{ $t('villages.gdVillages.name') }}
         </div>
-        <div class="entry-button__desc">
+        <div class="portal-entry-card__desc">
           {{ $t('villages.gdVillages.desc') }}
         </div>
       </button>
 
-      <button class="entry-button" @click="handleVillagesML">
-        <div class="entry-button__icon"><InlineIcon icon="🤖" /></div>
-        <div class="entry-button__name">
+      <button class="portal-entry-card glass-card" data-interactive="true" @click="handleVillagesML">
+        <div class="portal-entry-card__icon"><InlineIcon icon="🤖" /></div>
+        <div class="portal-entry-card__name">
           {{ $t('villages.villagesML.name') }}
         </div>
-        <div class="entry-button__desc">
+        <div class="portal-entry-card__desc">
           {{ $t('villages.villagesML.desc') }}
         </div>
       </button>
 
-      <button class="entry-button" @click="handleGdVillagesTable">
-        <div class="entry-button__icon"><InlineIcon icon="📊" /></div>
-        <div class="entry-button__name">
+      <button class="portal-entry-card glass-card" data-interactive="true" @click="handleGdVillagesTable">
+        <div class="portal-entry-card__icon"><InlineIcon icon="📊" /></div>
+        <div class="portal-entry-card__name">
           {{ $t('villages.gdVillagesTable.name') }}
         </div>
-        <div class="entry-button__desc">
+        <div class="portal-entry-card__desc">
           {{ $t('villages.gdVillagesTable.desc') }}
         </div>
       </button>
 
-      <button class="entry-button" @click="handleYcVillages">
-        <div class="entry-button__icon"><InlineIcon icon="🌾" /></div>
-        <div class="entry-button__name">
+      <button class="portal-entry-card glass-card" data-interactive="true" @click="handleYcVillages">
+        <div class="portal-entry-card__icon"><InlineIcon icon="🌾" /></div>
+        <div class="portal-entry-card__name">
           {{ $t('villages.ycVillages.name') }}
         </div>
-        <div class="entry-button__desc">
+        <div class="portal-entry-card__desc">
           {{ $t('villages.ycVillages.desc') }}
         </div>
       </button>
 
       <button
         v-if="userStore.role === 'admin'"
-        class="entry-button"
+        class="portal-entry-card glass-card" data-interactive="true"
         @click="handleAllVillages"
       >
-        <div class="entry-button__icon"><InlineIcon icon="📋" /></div>
-        <div class="entry-button__name">
+        <div class="portal-entry-card__icon"><InlineIcon icon="📋" /></div>
+        <div class="portal-entry-card__name">
           {{ $t('villages.allVillages.name') }}
         </div>
-        <div class="entry-button__desc">
+        <div class="portal-entry-card__desc">
           {{ $t('villages.allVillages.desc') }}
         </div>
       </button>

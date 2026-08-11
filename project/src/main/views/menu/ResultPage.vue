@@ -94,15 +94,15 @@ const showLongWaitWarning = ref(false);
 let timerInterval = null;
 
 const tabMap = computed(() => ({
-  'tab1': t('result.tabs.tab1'),
-  'tab2': t('result.tabs.tab2'),
-  'tab3': t('result.tabs.tab3'),
-  'tab4': t('result.tabs.tab4')
+  'tab1': t('navigation.pageTitles.result.tab1'),
+  'tab2': t('navigation.pageTitles.result.tab2'),
+  'tab3': t('navigation.pageTitles.result.tab3'),
+  'tab4': t('navigation.pageTitles.result.tab4')
 }));
 
 const pageTitle = computed(() => {
   const p = globalPayload.value;
-  if (!p) return t('result.pleaseQuery');
+  if (!p) return t('navigation.pageTitles.result.pleaseQuery');
   const sourceTab = p._sourceTab || 'tab2';
   const tabName = tabMap.value[sourceTab] || sourceTab;
   let featureText = '';

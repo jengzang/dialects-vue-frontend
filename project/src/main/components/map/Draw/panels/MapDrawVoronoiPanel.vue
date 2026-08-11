@@ -30,7 +30,7 @@
           </div>
           <div class="voronoi-data-source-actions">
             <button
-              class="main-glass-button"
+              class="glass-button"
               :data-variant="hasCustomImport ? 'primary' : 'secondary'"
               type="button"
               @click="$emit('open-custom-import')"
@@ -41,7 +41,7 @@
             </button>
             <button
               v-if="hasCustomImport"
-              class="main-glass-button"
+              class="glass-button"
               data-variant="secondary"
               type="button"
               @click="$emit('clear-custom-import')"
@@ -161,7 +161,7 @@
           <div class="draw-tool-button-grid">
             <button
               v-if="hasFieldMerge"
-              class="main-glass-button"
+              class="glass-button"
               data-variant="secondary"
               type="button"
               @click="$emit('open-field-merge')"
@@ -169,7 +169,7 @@
               {{ t('map.drawTab.voronoi.fieldMergeOpenButton') }}
             </button>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="secondary"
               type="button"
               @click="$emit('open-ignore-modal')"
@@ -177,7 +177,7 @@
               {{ t('map.drawTab.voronoi.ignorePointsAction') }}
             </button>
             <button
-              class="main-glass-button draw-tool-mode-button"
+              class="glass-button draw-tool-mode-button"
               :data-variant="isAddingPoints ? 'primary' : 'secondary'"
               :data-active="isAddingPoints"
               type="button"
@@ -192,7 +192,7 @@
               {{ isAddingPoints ? t('map.drawTab.voronoi.addDialectPointExit') : t('map.drawTab.voronoi.addDialectPoint') }}
             </button>
             <button
-              class="main-glass-button draw-tool-mode-button"
+              class="glass-button draw-tool-mode-button"
               :data-variant="isPointsPreviewActive ? 'primary' : 'secondary'"
               :data-active="isPointsPreviewActive"
               type="button"
@@ -207,7 +207,7 @@
               {{ t('map.drawTab.voronoi.previewPoints') }}
             </button>
             <button
-              class="main-glass-button draw-tool-mode-button"
+              class="glass-button draw-tool-mode-button"
               :data-variant="isPolygonPreviewActive ? 'primary' : 'secondary'"
               :data-active="isPolygonPreviewActive"
               type="button"
@@ -222,7 +222,7 @@
               {{ isCalculating ? t('map.drawTab.buttons.voronoiRunning') : t('map.drawTab.voronoi.calculate') }}
             </button>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="secondary"
               type="button"
               :disabled="!activePoints"

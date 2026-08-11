@@ -48,7 +48,7 @@
           }}
         </p>
         <button
-          class="main-glass-button toponym-results-panel__tree-action"
+          class="glass-button toponym-results-panel__tree-action"
           type="button"
           :disabled="loading || nameTreeLoading || !hasSearched"
           @click="emit('request-name-tree')"
@@ -121,7 +121,7 @@
             </div>
             <button
               v-if="row.node.namesHasMore"
-              class="main-glass-button toponym-results-panel__more-action"
+              class="glass-button toponym-results-panel__more-action"
               type="button"
               :disabled="row.node.namesLoading"
               @click="emit('load-more-name-tree-names', row.node)"

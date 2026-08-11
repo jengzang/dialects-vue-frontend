@@ -1,9 +1,9 @@
 <template>
   <div class="spatial-visualization-tab">
 <!--      <h3 class="villagesml-subtab-title">空間分析 - 空間可視化</h3>-->
-    <h2><InlineIcon icon="🗺️" />空間可視化
+    <h1 class="villagesml-subtab-title"><BarIcon icon="🗺️" />空間可視化
       <HelpIcon content="多圖層疊加可視化。支持熱點、聚類、N-gram分布、字符傾向熱力圖的組合展示。字符傾向使用藍→白→紅漸變表示Lift值（低→中→高）" />
-    </h2>
+    </h1>
 
     <div class="viz-container">
       <!-- 左側控制面板 -->
@@ -154,6 +154,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed, onMounted } from 'vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { useRoute, useRouter } from 'vue-router'

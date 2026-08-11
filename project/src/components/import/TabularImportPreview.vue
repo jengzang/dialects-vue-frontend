@@ -17,7 +17,7 @@
         <div class="tabular-import-preview__header-actions">
           <button
             v-if="canExport"
-            class="main-glass-button"
+            class="glass-button"
             data-variant="secondary"
             data-size="small"
             type="button"
@@ -28,7 +28,7 @@
           </button>
           <button
             v-if="file"
-            class="main-glass-button"
+            class="glass-button"
             data-variant="secondary"
             data-size="small"
             type="button"
@@ -190,11 +190,11 @@
     </div>
 
     <template #footer>
-      <button class="main-glass-button" data-variant="secondary" type="button" @click="handleCancel">
+      <button class="glass-button" data-variant="secondary" type="button" @click="handleCancel">
         {{ t('common.button.cancel') }}
       </button>
       <button
-        class="main-glass-button"
+        class="glass-button"
         data-variant="primary"
         type="button"
         :disabled="mappingEnabled && !diagnostics.isComplete"
@@ -214,7 +214,7 @@
       <div class="tabular-import-preview__header-actions">
         <button
           v-if="canExport"
-          class="main-glass-button"
+          class="glass-button"
           data-variant="secondary"
           data-size="small"
           type="button"
@@ -225,7 +225,7 @@
         </button>
         <button
           v-if="file"
-          class="main-glass-button"
+          class="glass-button"
           data-variant="secondary"
           data-size="small"
           type="button"

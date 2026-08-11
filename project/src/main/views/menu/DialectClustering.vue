@@ -2,7 +2,7 @@
   <div class="dialect-clustering-page">
     <header class="page-header glass-panel">
       <div>
-        <h1><BarIcon icon="🕸️" />{{ t('cluster.page.title') }}</h1>
+        <h1><BarIcon icon="🕸️" />{{ t('navigation.pageTitles.cluster.workspace') }}</h1>
         <p>{{ t('cluster.page.description') }}</p>
       </div>
       <button

@@ -1,9 +1,9 @@
 <template>
   <div class="ngram-explore-page">
-    <h3 class="villagesml-subtab-title">
-      模式分析 - N-gram 探索
+    <h1 class="villagesml-subtab-title">
+      <BarIcon icon="🔍" />模式分析 - N-gram 探索
       <HelpIcon content="探索N-gram（2-3字組合）的頻率分布和模式搜索。支持按位置（前綴/中間/後綴）篩選，支持通配符（*）模式搜索。顯著率表示統計顯著（p<0.05）的N-gram比例" />
-    </h3>
+    </h1>
 
     <!-- Statistics Banner -->
     <div v-if="ngramStats" class="vml-glass-panel">
@@ -204,6 +204,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import {
   getNgramFrequency,
   getNgramPatterns

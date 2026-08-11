@@ -31,7 +31,7 @@
         </div>
 
         <button
-          class="record-button main-glass-button"
+          class="record-button glass-button"
           :class="{ 'recording': isRecording }"
           @click="toggleRecording"
           :disabled="isProcessing"

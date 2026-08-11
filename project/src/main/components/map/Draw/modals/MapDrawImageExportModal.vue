@@ -122,11 +122,11 @@
 
     <template #footer>
       <div class="scope-modal-footer">
-        <button class="main-glass-button" type="button" @click="handleClose(false)">
+        <button class="glass-button" type="button" @click="handleClose(false)">
           {{ t('common.button.cancel') }}
         </button>
         <button
-          class="main-glass-button scope-confirm-btn"
+          class="glass-button scope-confirm-btn"
           data-variant="primary"
           type="button"
           @click="handleConfirm"

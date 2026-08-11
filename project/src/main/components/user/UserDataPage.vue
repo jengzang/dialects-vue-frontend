@@ -7,7 +7,7 @@
         </button>
         <h1>
           <BarIcon class="title-icon" icon="📊" />
-          <span>{{ t('user.dataPage.title') }}</span>
+          <span>{{ t('navigation.pageTitles.user.data') }}</span>
           <span v-if="username" class="username-badge">{{ username }}</span>
         </h1>
       </div>

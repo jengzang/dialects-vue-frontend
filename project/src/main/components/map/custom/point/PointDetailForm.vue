@@ -1,7 +1,7 @@
 <template>
   <section class="point-detail-form">
     <div class="point-detail-header">
-      <button class="main-glass-button" type="button" @click="$emit('back')">
+      <button class="glass-button" type="button" @click="$emit('back')">
         {{ t('customEntry.pointDetail.back') }}
       </button>
       <div class="point-detail-heading">
@@ -90,7 +90,7 @@
           <p class="point-rows-description">
             {{ t('customEntry.pointDetail.rows.description') }}
           </p>
-          <button class="main-glass-button field-notice-trigger" type="button" @click="isFieldNoticeOpen = true">
+          <button class="glass-button field-notice-trigger" type="button" @click="isFieldNoticeOpen = true">
             {{ t('customEntry.pointDetail.rows.noticeTrigger') }}
           </button>
         </div>
@@ -154,14 +154,14 @@
           </div>
         </div>
           <div class="action-group">
-            <button class="main-glass-button add-row-btn" type="button" @click="addRow">
+            <button class="glass-button add-row-btn" type="button" @click="addRow">
               {{ t('customEntry.pointDetail.rows.add') }}
             </button>
-            <button class="main-glass-button" type="button" @click="$emit('back')">
+            <button class="glass-button" type="button" @click="$emit('back')">
               {{ t('customEntry.pointDetail.actions.cancel') }}
             </button>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="primary"
               type="button"
               :disabled="isSaving"
@@ -834,8 +834,8 @@ watch(
 }
 
 .point-detail-header {
-  --main-glass-button-white-space: nowrap;
-  --main-glass-button-padding: 12px 20px;
+  --glass-button-white-space: nowrap;
+  --glass-button-padding: 12px 20px;
   display: flex;
   align-items: flex-start;
   gap: 14px;
@@ -1200,8 +1200,8 @@ watch(
   gap: $radius-md;
   margin-top: $spacing-lg;
   flex-wrap: wrap;
-  --main-glass-button-padding: 12px 20px;
-  --main-glass-button-white-space: nowrap;
+  --glass-button-padding: 12px 20px;
+  --glass-button-white-space: nowrap;
 
   @media (max-width: 480px) {
     flex-direction: row;
@@ -1234,7 +1234,7 @@ watch(
 }
 
 .field-notice-trigger {
-  --main-glass-button-padding: 2px 10px;
+  --glass-button-padding: 2px 10px;
   font-size: 11px;
   color: $warning;
   border-color: rgba(var(--color-warning-rgb), 0.3);

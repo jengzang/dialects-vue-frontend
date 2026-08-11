@@ -1,14 +1,14 @@
 <template>
   <div class="vml-glass-panel">
-    <h3 class="villagesml-subtab-title">
-      搜索特定自然村
+    <h1 class="villagesml-subtab-title">
+      <BarIcon icon="🔍" />搜索特定自然村
       <HelpIcon
         content="支持關鍵詞模糊匹配（SQL LIKE '%keyword%'）和三級行政區（市→縣→鎮）聯動篩選"
         size="md"
         fontSize="16px"
         trigger="both"
       />
-    </h3>
+    </h1>
     <div class="vml-control-surface">
       <!-- Search Input -->
       <div class="search-input-group vml-control-row">
@@ -76,6 +76,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed } from 'vue'
 import { villagesMLStore } from '@/VillagesML/store/villagesMLStore.js'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'

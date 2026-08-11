@@ -1,7 +1,7 @@
 <template>
   <div style="width: 100%;justify-content: center;align-items:center;display: flex;flex-direction: column">
     <div class="title-row">
-      <h1 style="margin: 0;font-size: 1.5em;"><BarIcon icon="📋" />{{ t('villages.pages.gdTable.title') }}</h1>
+      <h1 style="margin: 0;font-size: 1.5em;"><BarIcon icon="📋" />{{ t('navigation.pageTitles.villages.gdTable') }}</h1>
       <span class="cross-link" @click="goToGdTree">{{ t('villages.pages.gdTree.title') }} →</span>
     </div>
     <UniversalTable

@@ -84,7 +84,7 @@
         <div class="placeholder-content">
           <span class="placeholder-icon"><InlineIcon icon="🌊" /></span>
           <p>{{ t('praat.results.charts.spectrogram.loadHint') }}</p>
-          <button class="load-spectrogram-btn main-glass-button" @click="loadSpectrogram">
+          <button class="load-spectrogram-btn glass-button" @click="loadSpectrogram">
             {{ t('praat.results.charts.spectrogram.loadButton') }}
           </button>
         </div>

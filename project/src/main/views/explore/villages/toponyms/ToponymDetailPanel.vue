@@ -15,7 +15,7 @@
 
       <div class="toponym-detail-panel__actions">
         <button
-          class="main-glass-button"
+          class="glass-button"
           type="button"
           :disabled="localLoading"
           @click="emit('request-local-detail')"
@@ -27,7 +27,7 @@
           }}
         </button>
         <button
-          class="main-glass-button"
+          class="glass-button"
           type="button"
           :disabled="officialLoading"
           @click="emit('request-official-detail')"

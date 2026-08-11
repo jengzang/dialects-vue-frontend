@@ -26,7 +26,7 @@
           </div>
           <div class="draw-tool-button-grid draw-tool-button-grid--three">
             <button
-              class="main-glass-button draw-tool-mode-button"
+              class="glass-button draw-tool-mode-button"
               :data-variant="currentMode === 'simple_select' ? 'primary' : 'secondary'"
               :data-active="currentMode === 'simple_select'"
               type="button"
@@ -41,7 +41,7 @@
             </button>
             <button
               v-if="!activeLayer || activeLayer.geometryType === 'Point'"
-              class="main-glass-button draw-tool-mode-button"
+              class="glass-button draw-tool-mode-button"
               :data-variant="currentMode === 'draw_point' ? 'primary' : 'secondary'"
               :data-active="currentMode === 'draw_point'"
               type="button"
@@ -57,7 +57,7 @@
             </button>
             <button
               v-if="!activeLayer || activeLayer.geometryType === 'LineString'"
-              class="main-glass-button draw-tool-mode-button"
+              class="glass-button draw-tool-mode-button"
               :data-variant="currentMode === 'draw_line_string' ? 'primary' : 'secondary'"
               :data-active="currentMode === 'draw_line_string'"
               type="button"
@@ -73,7 +73,7 @@
             </button>
             <button
               v-if="!activeLayer || activeLayer.geometryType === 'Polygon'"
-              class="main-glass-button draw-tool-mode-button"
+              class="glass-button draw-tool-mode-button"
               :data-variant="currentMode === 'draw_polygon' ? 'primary' : 'secondary'"
               :data-active="currentMode === 'draw_polygon'"
               type="button"
@@ -88,7 +88,7 @@
               {{ t('map.drawTab.buttons.drawPolygon') }}
             </button>
             <button
-              class="main-glass-button draw-tool-mode-button"
+              class="glass-button draw-tool-mode-button"
               :data-variant="currentMode === 'direct_select' ? 'primary' : 'secondary'"
               :data-active="currentMode === 'direct_select'"
               type="button"
@@ -103,7 +103,7 @@
               {{ currentMode === 'direct_select' ? t('map.drawTab.buttons.finishShapeEdit') : t('map.drawTab.buttons.editShape') }}
             </button>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="secondary"
               type="button"
               :disabled="!canDuplicateFeature"
@@ -112,25 +112,31 @@
               {{ t('map.drawTab.buttons.duplicateFeature') }}
             </button>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="secondary"
+              data-testid="draw-tool-undo"
               type="button"
+              :title="undoButtonTitle"
+              :aria-label="undoButtonTitle"
               :disabled="!canUndo"
               @click="$emit('undo')"
             >
               {{ t('map.drawTab.buttons.undo') }}
             </button>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="secondary"
+              data-testid="draw-tool-redo"
               type="button"
+              :title="redoButtonTitle"
+              :aria-label="redoButtonTitle"
               :disabled="!canRedo"
               @click="$emit('redo')"
             >
               {{ t('map.drawTab.buttons.redo') }}
             </button>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="secondary"
               type="button"
               :disabled="!canDeleteSelection"
@@ -139,7 +145,7 @@
               {{ currentMode === 'direct_select' && selectedVertexCount > 0 ? t('map.drawTab.buttons.deleteSelectedVertices') : t('map.drawTab.buttons.deleteSelected') }}
             </button>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="secondary"
               type="button"
               :disabled="!canModifyActiveLayer"
@@ -148,7 +154,7 @@
               {{ t('map.drawTab.buttons.clearAll') }}
             </button>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="secondary"
               type="button"
               @click="$emit('reset-view')"
@@ -156,7 +162,7 @@
               {{ t('map.mapLibre.buttons.reset') }}
             </button>
             <button
-              class="main-glass-button"
+              class="glass-button"
               :data-variant="isFullscreen ? 'primary' : 'secondary'"
               :data-active="isFullscreen"
               type="button"
@@ -190,9 +196,20 @@
             >
               {{ shapeEditHintText }}
             </div>
+            <div class="draw-shape-edit-tips">
+              <span data-testid="shape-edit-insert-hint">
+                {{ t('map.drawTab.labels.shapeEditInsertVertexHint') }}
+              </span>
+              <span data-testid="shape-edit-move-hint">
+                {{ t('map.drawTab.labels.shapeEditMoveVertexHint') }}
+              </span>
+              <span data-testid="shape-edit-history-hint">
+                {{ t('map.drawTab.labels.shapeEditHistoryHint') }}
+              </span>
+            </div>
             <div class="draw-shape-edit-actions">
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 data-testid="shape-edit-delete-vertices"
                 type="button"
@@ -202,7 +219,7 @@
                 {{ t('map.drawTab.buttons.deleteSelectedVertices') }}
               </button>
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 data-testid="shape-edit-finish"
                 type="button"
@@ -227,7 +244,7 @@
                 {{ t('map.drawTab.labels.selectedFeatureCount', { count: selectedFeatureIds.length }) }}
               </span>
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
                 :disabled="!canModifyActiveLayer || featureItems.length === 0"
@@ -236,7 +253,7 @@
                 {{ t('map.drawTab.buttons.selectAllFeatures') }}
               </button>
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
                 :disabled="!canModifyActiveLayer || featureItems.length === 0"
@@ -245,7 +262,7 @@
                 {{ t('map.drawTab.buttons.invertFeatureSelection') }}
               </button>
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 :data-variant="isFeatureBoxSelectMode ? 'primary' : 'secondary'"
                 :data-active="isFeatureBoxSelectMode"
                 type="button"
@@ -255,7 +272,7 @@
                 {{ t('map.drawTab.buttons.boxSelectFeatures') }}
               </button>
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
                 :disabled="selectedFeatureIds.length === 0"
@@ -264,7 +281,7 @@
                 {{ t('map.drawTab.buttons.clearFeatureSelection') }}
               </button>
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
                 :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
@@ -273,7 +290,7 @@
                 {{ t('map.drawTab.buttons.deleteSelectedFeatures') }}
               </button>
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
                 :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
@@ -282,7 +299,7 @@
                 {{ t('map.drawTab.buttons.hideSelectedFeatures') }}
               </button>
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
                 :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
@@ -291,7 +308,7 @@
                 {{ t('map.drawTab.buttons.showSelectedFeatures') }}
               </button>
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
                 :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
@@ -300,7 +317,7 @@
                 {{ t('map.drawTab.buttons.lockSelectedFeatures') }}
               </button>
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
                 :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
@@ -384,7 +401,7 @@
               >
             </label>
             <button
-              class="main-glass-button draw-tool-inline-button"
+              class="glass-button draw-tool-inline-button"
               data-variant="secondary"
               type="button"
               :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0 || !selectedFeatureBatchName.trim()"
@@ -416,7 +433,7 @@
                 @input="$emit('update:selected-feature-batch-property-value', $event.target.value)"
               >
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
                 :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0 || !canApplySelectedFeatureBatchProperty"
@@ -737,6 +754,18 @@ const featureTableBatchPropertyOptions = computed(() => props.featureTableColumn
   label: column.label,
   value: column.key,
 })))
+
+const undoButtonTitle = computed(() => (
+  props.canUndo
+    ? t('map.drawTab.labels.undoAvailableHint')
+    : t('map.drawTab.labels.undoUnavailableHint')
+))
+
+const redoButtonTitle = computed(() => (
+  props.canRedo
+    ? t('map.drawTab.labels.redoAvailableHint')
+    : t('map.drawTab.labels.redoUnavailableHint')
+))
 
 const selectedShapeEditLabel = computed(() => {
   const selectedFeature = props.featureItems.find((feature) => feature.id === props.selectedFeatureId)

@@ -17,14 +17,14 @@
           {{ t('map.drawTab.labels.featureCount', { count: featureCount }) }}
         </span>
         <button
-          class="main-glass-button"
+          class="glass-button"
           data-variant="secondary"
           type="button"
           @click="showAddLayerModal = true"
         ><InlineIcon icon="➕" />{{ t('map.drawTab.buttons.addLayer') }}
         </button>
         <button
-          class="main-glass-button"
+          class="glass-button"
           :data-variant="isVoronoiPanelOpen ? 'primary' : 'secondary'"
           :data-active="isVoronoiPanelOpen"
           type="button"
@@ -32,21 +32,21 @@
         ><InlineIcon icon="⬡" />{{ t('map.drawTab.buttons.voronoi') }}
         </button>
         <button
-          class="main-glass-button"
+          class="glass-button"
           data-variant="secondary"
           type="button"
           @click="showExportModal = true"
         ><InlineIcon icon="📤" />{{ t('map.drawTab.buttons.export') }}
         </button>
         <button
-          class="main-glass-button"
+          class="glass-button"
           data-variant="secondary"
           type="button"
           @click="showLocalStorageModal = true"
         ><InlineIcon icon="💾" />{{ t('map.drawTab.buttons.saveToLocal') }}
         </button>
         <button
-          class="main-glass-button"
+          class="glass-button"
           :data-variant="isDrawingPanelOpen ? 'primary' : 'secondary'"
           :data-active="isDrawingPanelOpen"
           type="button"
@@ -54,7 +54,7 @@
         ><InlineIcon icon="🛠️" />{{ t('map.drawTab.buttons.drawingTools') }}
         </button>
         <button
-          class="main-glass-button"
+          class="glass-button"
           :data-variant="isLayersPanelOpen ? 'primary' : 'secondary'"
           :data-active="isLayersPanelOpen"
           type="button"
@@ -74,7 +74,8 @@
           {{ t('map.drawTab.auth.loginRequired') }}
         </p>
         <button
-          class="enter-btn"
+          class="glass-button"
+          data-variant="enter"
           type="button"
           @click="handleLogin"
         >
@@ -507,11 +508,11 @@
 
         <template #footer>
           <div class="scope-modal-footer">
-            <button class="main-glass-button" type="button" @click="showSaveLocalDraftModal = false">
+            <button class="glass-button" type="button" @click="showSaveLocalDraftModal = false">
               {{ t('common.button.cancel') }}
             </button>
             <button
-              class="main-glass-button scope-confirm-btn"
+              class="glass-button scope-confirm-btn"
               data-variant="primary"
               type="button"
               @click="confirmSaveAsNewLocal"
@@ -640,7 +641,7 @@
             <span class="add-point-partition-key">{{ item.key }}</span>
             <span class="add-point-partition-count">{{ item.count }}</span>
             <button
-              class="main-glass-button add-point-delete-btn"
+              class="glass-button add-point-delete-btn"
               type="button"
               data-variant="secondary"
               @click="deleteCustomPointsByPartition(item.key)"
@@ -659,14 +660,14 @@
         <template #footer>
           <div class="scope-modal-footer">
             <button
-              class="main-glass-button"
+              class="glass-button"
               type="button"
               @click="showAddDialectPartitionModal = false"
             >
               {{ t('common.button.cancel') }}
             </button>
             <button
-              class="main-glass-button scope-confirm-btn"
+              class="glass-button scope-confirm-btn"
               data-variant="primary"
               type="button"
               :disabled="!pendingAddPartitionKey"
@@ -1167,7 +1168,7 @@ watch(getCurrentWorkbenchSignature, () => {
     }
   }
 
-  .main-glass-button {
+  .glass-button {
     padding: 12px 16px;
   }
 
@@ -1180,7 +1181,7 @@ watch(getCurrentWorkbenchSignature, () => {
       justify-content: flex-end;
 
       @media (hover: hover) and (pointer: fine) {
-        .main-glass-button:hover:not(:disabled) {
+        .glass-button:hover:not(:disabled) {
           background: var(--color-primary);
           color: var(--action-primary-text);
         }
@@ -1295,7 +1296,7 @@ watch(getCurrentWorkbenchSignature, () => {
         gap: 0.45rem;
         width: 100%;
 
-        .main-glass-button,
+        .glass-button,
         .draw-feature-count-badge {
           justify-content: center;
           min-width: auto;
