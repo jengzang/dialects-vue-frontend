@@ -85,6 +85,9 @@ vi.mock('maplibre-gl', () => {
       })
     }
     removeSource(sourceId) {
+      if ([...this.layers.values()].some((layer) => layer.source === sourceId)) {
+        throw new Error(`Source "${sourceId}" is still in use`)
+      }
       this.sources.delete(sourceId)
     }
     setLayoutProperty() {}
@@ -243,6 +246,8 @@ function mountEditableMapLibre(modelValue, options = {}) {
       return mapInstances.at(-1)
     },
     currentStyleKey,
+    activeLayer,
+    allLayers,
     featureBoxSelectEnabled,
     host,
     unmount() {
@@ -1077,6 +1082,156 @@ describe('EditableMapLibre state flow', () => {
     ])
     expect(wrapper.events.some(([eventName]) => eventName === 'before-features-change')).toBe(false)
     expect(wrapper.events.some(([eventName]) => eventName === 'features-change')).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('refreshes readonly overlays when the active layer changes', async () => {
+    const firstLayer = {
+      id: 'first-layer',
+      geometryType: 'Polygon',
+      visible: true,
+      locked: false,
+      stroke: '#111111',
+      strokeWidth: 2,
+      fill: '#222222',
+      fillOpacity: 0.2,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [{
+          id: 'first-polygon-1',
+          type: 'Feature',
+          properties: {},
+          geometry: { type: 'Polygon', coordinates: [] },
+        }],
+      },
+    }
+    const secondLayer = {
+      id: 'second-layer',
+      geometryType: 'Polygon',
+      visible: true,
+      locked: false,
+      stroke: '#333333',
+      strokeWidth: 2,
+      fill: '#444444',
+      fillOpacity: 0.2,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [{
+          id: 'second-polygon-1',
+          type: 'Feature',
+          properties: {},
+          geometry: { type: 'Polygon', coordinates: [] },
+        }],
+      },
+    }
+    const wrapper = mountEditableMapLibre(firstLayer.featureCollection, {
+      activeLayer: firstLayer,
+      allLayers: [firstLayer, secondLayer],
+    })
+    await nextTick()
+
+    expect(wrapper.map.getSource('readonly-draw-source-first-layer')).toBeNull()
+    expect(wrapper.map.getSource('readonly-draw-source-second-layer')).toBeTruthy()
+
+    wrapper.activeLayer.value = secondLayer
+    await nextTick()
+
+    expect(wrapper.map.getSource('readonly-draw-source-first-layer')).toBeTruthy()
+    expect(wrapper.map.getSource('readonly-draw-source-second-layer')).toBeNull()
+
+    wrapper.unmount()
+  })
+
+  it('removes readonly overlays for layers that are replaced from all layers', async () => {
+    const activeLayer = {
+      id: 'active-layer',
+      geometryType: 'Polygon',
+      visible: true,
+      locked: false,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    }
+    const removedLayer = {
+      id: 'removed-layer',
+      geometryType: 'Polygon',
+      visible: true,
+      locked: false,
+      stroke: '#111111',
+      strokeWidth: 2,
+      fill: '#222222',
+      fillOpacity: 0.2,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [{
+          id: 'removed-polygon-1',
+          type: 'Feature',
+          properties: {},
+          geometry: { type: 'Polygon', coordinates: [] },
+        }],
+      },
+    }
+    const wrapper = mountEditableMapLibre(activeLayer.featureCollection, {
+      activeLayer,
+      allLayers: [activeLayer, removedLayer],
+    })
+    await nextTick()
+
+    expect(wrapper.map.getSource('readonly-draw-source-removed-layer')).toBeTruthy()
+
+    wrapper.allLayers.value = [activeLayer]
+    await nextTick()
+
+    expect(wrapper.map.getSource('readonly-draw-source-removed-layer')).toBeNull()
+
+    wrapper.unmount()
+  })
+
+  it('removes readonly overlays when a layer id starts with the preview source prefix', async () => {
+    const activeLayer = {
+      id: 'active-layer',
+      geometryType: 'Polygon',
+      visible: true,
+      locked: false,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    }
+    const removedLayer = {
+      id: 'preview-draw-source-shadow',
+      geometryType: 'Polygon',
+      visible: true,
+      locked: false,
+      stroke: '#111111',
+      strokeWidth: 2,
+      fill: '#222222',
+      fillOpacity: 0.2,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [{
+          id: 'shadow-polygon-1',
+          type: 'Feature',
+          properties: {},
+          geometry: { type: 'Polygon', coordinates: [] },
+        }],
+      },
+    }
+    const wrapper = mountEditableMapLibre(activeLayer.featureCollection, {
+      activeLayer,
+      allLayers: [activeLayer, removedLayer],
+    })
+    await nextTick()
+
+    expect(wrapper.map.getLayer('readonly-draw-fill-preview-draw-source-shadow')).toBeTruthy()
+
+    wrapper.allLayers.value = [activeLayer]
+    await nextTick()
+
+    expect(wrapper.map.getLayer('readonly-draw-fill-preview-draw-source-shadow')).toBe(false)
+    expect(wrapper.map.getSource('readonly-draw-source-preview-draw-source-shadow')).toBeNull()
 
     wrapper.unmount()
   })

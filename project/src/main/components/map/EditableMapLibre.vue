@@ -199,6 +199,7 @@ const featureBoxEndPoint = ref(null)
 const defaultFeatureBoxSelectionMode = 'replace'
 const featureBoxSelectionMode = ref(defaultFeatureBoxSelectionMode)
 let previousPreviewSourceIds = []
+let previousReadonlySourceIds = []
 let hoveredFeatureKey = null
 let hoveredFeatureSource = null
 let previewHoverBound = false
@@ -423,19 +424,23 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
 const cleanupReadonlyLayerDescriptors = (layerDescriptors) => {
   if (!map.value) return
   const activeSourceIds = new Set(layerDescriptors.map((descriptor) => descriptor.sourceId))
+  const currentReadonlySourceIds = (props.allLayers ?? [])
+    .filter((layer) => layer?.id)
+    .map((layer) => `readonly-draw-source-${layer.id}`)
   const currentPreviewSourceIds = (props.previewLayers ?? []).map((layer, index) => `preview-draw-source-${layer?.id ?? index}`)
   const candidateSourceIds = [
-    ...(props.allLayers ?? [])
-      .filter((layer) => layer?.id && layer.id !== props.activeLayer?.id)
-      .map((layer) => `readonly-draw-source-${layer.id}`),
+    ...currentReadonlySourceIds,
+    ...previousReadonlySourceIds,
     ...currentPreviewSourceIds,
     ...previousPreviewSourceIds,
   ]
 
   candidateSourceIds.forEach((sourceId) => {
     if (activeSourceIds.has(sourceId)) return
-    const idSuffix = sourceId.replace(/^readonly-draw-source-/, '').replace(/^preview-draw-source-/, '')
-    const prefix = sourceId.startsWith('preview-draw-source-') ? 'preview' : 'readonly'
+    const isPreviewSource = sourceId.startsWith('preview-draw-source-')
+    const sourcePrefix = isPreviewSource ? 'preview-draw-source-' : 'readonly-draw-source-'
+    const idSuffix = sourceId.slice(sourcePrefix.length)
+    const prefix = isPreviewSource ? 'preview' : 'readonly'
     const fillLayerId = `${prefix}-draw-fill-${idSuffix}`
     const lineLayerId = `${prefix}-draw-line-${idSuffix}`
     const pointLayerId = `${prefix}-draw-point-${idSuffix}`
@@ -445,6 +450,7 @@ const cleanupReadonlyLayerDescriptors = (layerDescriptors) => {
     if (map.value.getSource(sourceId)) map.value.removeSource(sourceId)
   })
 
+  previousReadonlySourceIds = currentReadonlySourceIds
   previousPreviewSourceIds = currentPreviewSourceIds
 }
 
@@ -1804,6 +1810,14 @@ watch(
     syncReadonlyLayers()
   },
   { deep: true }
+)
+
+watch(
+  () => props.activeLayer?.id,
+  () => {
+    if (!map.value) return
+    syncReadonlyLayers()
+  }
 )
 
 watch(
