@@ -21,11 +21,24 @@ describe('main style structure conventions', () => {
     expect(entry).toContain("@use './main/layout' as main-layout;")
   })
 
-  it('keeps panel title text rules in info utilities', () => {
+  it('keeps shared page title rules in info utilities', () => {
     const surfaces = readSource('src/styles/main/_surfaces.scss')
     const info = readSource('src/styles/main/_info.scss')
 
     expect(surfaces).not.toContain('.panel-title')
-    expect(info).toContain('.panel-title')
+    expect(info).not.toContain('.panel-title')
+    expect(info).toContain('.page-title')
+    expect(info).not.toMatch(/@media\s*\(\s*(?:max|min)-width:/)
+  })
+
+  it('uses the global page title utility for repeated tab page titles', () => {
+    for (const file of [
+      'src/main/views/menu/PhoPage.vue',
+      'src/main/views/menu/QueryPage.vue',
+      'src/main/views/menu/ComparePage.vue',
+      'src/main/views/menu/MapPage.vue',
+    ]) {
+      expect(readSource(file), file).not.toContain('.page-title {')
+    }
   })
 })

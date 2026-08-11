@@ -10,6 +10,16 @@
   white-space: nowrap;
 }
 
+.page-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
 .page-footer {
   display: inline-flex;
   align-items: center;
@@ -33,16 +43,4 @@
 
 .info-text strong {
   color: var(--color-primary-hover);
-}
-
-@media (max-width: 768px) {
-  .panel-title {
-    font-size: 2.2rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .panel-title {
-    font-size: 2.4rem;
-  }
 }

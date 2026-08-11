@@ -847,17 +847,6 @@ export default {
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
 
-/* 📄 內容區塊動畫 */
-.page-title {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 0 12px;
-  color: var(--text-primary);
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
 .tab-content-inner {
   display: flex;
   flex-direction: column;
