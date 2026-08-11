@@ -99,12 +99,6 @@
   transition: border-color 0.22s ease, background-color 0.22s ease, box-shadow 0.22s ease;
 }
 
-.main-card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--main-card-min-width, 220px), 1fr));
-  gap: var(--main-card-grid-gap, 14px);
-}
-
 .page {
   display: flex;
   justify-content: center;
@@ -128,21 +122,9 @@
   }
 }
 
-@media (max-width: 768px) {
-  .panel-title {
-    font-size: 2.2rem;
-  }
-}
-
 @media (max-width: 600px) {
   .page {
     padding: 10px;
     font-size: 16px;
-  }
-}
-
-@media (max-width: 480px) {
-  .panel-title {
-    font-size: 2.4rem;
   }
 }

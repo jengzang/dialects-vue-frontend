@@ -34,3 +34,15 @@
 .info-text strong {
   color: var(--color-primary-hover);
 }
+
+@media (max-width: 768px) {
+  .panel-title {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .panel-title {
+    font-size: 2.4rem;
+  }
+}
