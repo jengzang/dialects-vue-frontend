@@ -102,6 +102,10 @@ This repository has strict collaboration and change-control rules. Read this bef
 
 - All component `<style>` blocks must use `<style scoped lang="scss">` with SCSS, never plain CSS.
 - Import the project mixins at the top of every component style block: `@use '@/styles/global/mixins' as *;`
+- Component styles must reuse the shared style foundations under `src/styles` whenever possible, including tokens, mixins, shared classes, and existing style modules.
+- Individual components should only define placement/layout details such as `padding`, `margin`, `position`, offsets, sizing, and local layout glue.
+- Do not create component-local visual styling when an existing shared style, token, mixin, or common component can satisfy the need.
+- Only add component-specific visual styles when the requirement genuinely cannot be met by the shared styles or common components, and keep that exception as narrow as possible.
 - Use available mixins instead of writing the raw CSS they abstract:
   - `@include flex-center` — `display: flex; align-items: center; justify-content: center`
   - `@include flex-col` — `display: flex; flex-direction: column`
