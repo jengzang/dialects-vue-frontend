@@ -1,24 +1,24 @@
 <template>
-  <div v-if="results" class="analysis-results-panel main-glass-panel">
+  <div v-if="results" class="analysis-results-panel glass-panel">
     <h2 class="panel-title">{{ t('praat.results.title') }}</h2>
 
     <!-- Summary Statistics -->
     <div class="summary-section">
       <h3 class="section-title">{{ t('praat.results.basicInfo.title') }}</h3>
       <div class="stats-grid">
-        <div class="stat-card main-glass-panel-inner">
+        <div class="stat-card glass-subpanel">
           <div class="stat-label">{{ t('praat.results.basicInfo.duration') }}</div>
           <div class="stat-value">{{ t('praat.results.basicInfo.durationValue', { duration: results.meta?.duration_s?.toFixed(2) }) }}</div>
         </div>
-        <div class="stat-card main-glass-panel-inner">
+        <div class="stat-card glass-subpanel">
           <div class="stat-label">{{ t('praat.results.basicInfo.sampleRate') }}</div>
           <div class="stat-value">{{ t('praat.results.basicInfo.sampleRateValue', { rate: results.meta?.sample_rate }) }}</div>
         </div>
-        <div v-if="results.summary?.intensity" class="stat-card main-glass-panel-inner">
+        <div v-if="results.summary?.intensity" class="stat-card glass-subpanel">
           <div class="stat-label">{{ t('praat.results.basicInfo.avgIntensity') }}</div>
           <div class="stat-value">{{ t('praat.results.basicInfo.avgIntensityValue', { intensity: results.summary.intensity.mean_db?.toFixed(1) }) }}</div>
         </div>
-        <div v-if="results.summary?.intensity" class="stat-card main-glass-panel-inner">
+        <div v-if="results.summary?.intensity" class="stat-card glass-subpanel">
           <div class="stat-label">{{ t('praat.results.basicInfo.intensityRange') }}</div>
           <div class="stat-value">
             {{ t('praat.results.basicInfo.intensityRangeValue', {
@@ -34,19 +34,19 @@
     <div v-if="results.units?.[0]?.tone_features" class="summary-section">
       <h3 class="section-title">{{ t('praat.results.toneFeatures.title') }}</h3>
       <div class="stats-grid">
-        <div class="stat-card main-glass-panel-inner">
+        <div class="stat-card glass-subpanel">
           <div class="stat-label">{{ t('praat.results.toneFeatures.f0Start') }}</div>
           <div class="stat-value">{{ t('praat.results.toneFeatures.f0StartValue', { f0: results.units[0].tone_features.f0_start?.toFixed(1) }) }}</div>
         </div>
-        <div class="stat-card main-glass-panel-inner">
+        <div class="stat-card glass-subpanel">
           <div class="stat-label">{{ t('praat.results.toneFeatures.f0End') }}</div>
           <div class="stat-value">{{ t('praat.results.toneFeatures.f0EndValue', { f0: results.units[0].tone_features.f0_end?.toFixed(1) }) }}</div>
         </div>
-        <div class="stat-card main-glass-panel-inner">
+        <div class="stat-card glass-subpanel">
           <div class="stat-label">{{ t('praat.results.toneFeatures.f0Slope') }}</div>
           <div class="stat-value">{{ t('praat.results.toneFeatures.f0SlopeValue', { slope: results.units[0].tone_features.f0_slope?.toFixed(2) }) }}</div>
         </div>
-        <div class="stat-card main-glass-panel-inner">
+        <div class="stat-card glass-subpanel">
           <div class="stat-label">{{ t('praat.results.toneFeatures.contour5pt') }}</div>
           <div class="stat-value contour-display">
             {{ t('praat.results.toneFeatures.contour5ptValue', { contour: formatContour5pt(results.units[0].tone_features.contour_5pt) }) }}
@@ -80,7 +80,7 @@
     <div v-if="hasSpectrogramData" class="chart-section">
       <h3 class="section-title">{{ t('praat.results.charts.spectrogram.title') }}</h3>
 
-      <div v-if="!showSpectrogram" class="spectrogram-placeholder main-glass-panel-inner">
+      <div v-if="!showSpectrogram" class="spectrogram-placeholder glass-subpanel">
         <div class="placeholder-content">
           <span class="placeholder-icon"><InlineIcon icon="🌊" /></span>
           <p>{{ t('praat.results.charts.spectrogram.loadHint') }}</p>
@@ -98,7 +98,7 @@
       <h3 class="section-title">{{ t('praat.results.voiceQuality.title') }}</h3>
       <div class="quality-grid">
         <!-- HNR Gauge -->
-        <div v-if="results.summary?.voice_quality.hnr" class="quality-card main-glass-panel-inner">
+        <div v-if="results.summary?.voice_quality.hnr" class="quality-card glass-subpanel">
           <div class="quality-label">{{ t('praat.results.voiceQuality.hnr.label') }}</div>
           <div class="quality-value" :class="getHnrClass(results.summary?.voice_quality.hnr.mean_db)">
             {{ t('praat.results.voiceQuality.hnr.value', { hnr: results.summary?.voice_quality.hnr.mean_db?.toFixed(1) }) }}
@@ -110,7 +110,7 @@
         </div>
 
         <!-- Jitter -->
-        <div v-if="results.summary?.voice_quality.jitter" class="quality-card main-glass-panel-inner">
+        <div v-if="results.summary?.voice_quality.jitter" class="quality-card glass-subpanel">
           <div class="quality-label">{{ t('praat.results.voiceQuality.jitter.label') }}</div>
           <div class="quality-value"
                :class="getJitterClass(results.summary?.voice_quality.jitter.local)">
@@ -124,7 +124,7 @@
         </div>
 
         <!-- Shimmer -->
-        <div v-if="results.summary?.voice_quality.shimmer" class="quality-card main-glass-panel-inner">
+        <div v-if="results.summary?.voice_quality.shimmer" class="quality-card glass-subpanel">
           <div class="quality-label">{{ t('praat.results.voiceQuality.shimmer.label') }}</div>
           <div class="quality-value"
                :class="getShimmerClass(results.summary?.voice_quality.shimmer.local)">

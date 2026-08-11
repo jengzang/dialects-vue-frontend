@@ -1,7 +1,7 @@
 <template>
   <div class="vocabulary-import-page">
     <section class="content-area">
-      <div class="upload-mode main-glass-panel">
+      <div class="upload-mode glass-panel">
         <div class="upload-head">
             <h3>{{ t('words.wordList.upload.title') }}</h3>
             <div class="upload-head-counts">

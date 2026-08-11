@@ -12,20 +12,20 @@
     </div>
 
     <div v-if="loading" class="point-grid main-card-grid">
-      <div v-for="index in 3" :key="index" class="point-card point-card-skeleton main-data-card main-glass-panel-inner" aria-hidden="true">
+      <div v-for="index in 3" :key="index" class="point-card point-card-skeleton main-data-card glass-subpanel" aria-hidden="true">
         <div class="skeleton-line skeleton-line-lg"></div>
         <div class="skeleton-line skeleton-line-sm"></div>
         <div class="skeleton-line skeleton-line-xs"></div>
       </div>
     </div>
 
-    <div v-else-if="errorMessage" class="point-list-state main-list-state main-glass-panel-inner" data-state="error">
+    <div v-else-if="errorMessage" class="point-list-state main-list-state glass-subpanel" data-state="error">
       <div class="point-list-state-title main-list-state-title">{{ t('customEntry.pointList.loadFailed') }}</div>
       <p class="point-list-state-text main-list-state-text">{{ errorMessage }}</p>
       <button class="main-glass-button" type="button" @click="$emit('retry')">{{ t('customEntry.pointList.retry') }}</button>
     </div>
 
-    <div v-else-if="filteredItems.length === 0" class="point-list-state main-list-state main-glass-panel-inner">
+    <div v-else-if="filteredItems.length === 0" class="point-list-state main-list-state glass-subpanel">
       <div class="point-list-state-title main-list-state-title">{{ t('customEntry.pointList.emptyTitle') }}</div>
       <p class="point-list-state-text main-list-state-text">{{ t('customEntry.pointList.emptyText') }}</p>
     </div>
@@ -34,7 +34,7 @@
       <button
         v-for="item in filteredItems"
         :key="item.point_key || `${item['簡稱'] || ''}-${item['音典分區'] || ''}`"
-        class="point-card main-data-card main-glass-panel-inner"
+        class="point-card main-data-card glass-subpanel"
         type="button"
         @click="$emit('select', item)"
       >

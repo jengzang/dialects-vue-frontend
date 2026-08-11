@@ -8,7 +8,7 @@
       class="contribute-mode-switch"
     />
     <section v-if="shouldShowAccessGate" class="content-area">
-      <div class="access-gate main-glass-panel">
+      <div class="access-gate glass-panel">
         <h3>{{ accessGateTitle }}</h3>
         <p>{{ accessGateDescription }}</p>
         <div class="access-gate-actions">

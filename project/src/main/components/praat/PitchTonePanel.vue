@@ -1,5 +1,5 @@
 <template>
-  <div class="pitch-tone-panel main-glass-panel">
+  <div class="pitch-tone-panel glass-panel">
     <h2 class="panel-title" style="margin:0">{{ t('praat.pitchTone.title') }}</h2>
 
     <!-- Step 1: Select and Label -->
@@ -14,7 +14,7 @@
 
       <div ref="pitchChartContainer" class="chart-container"></div>
 
-      <div class="controls-section main-glass-panel-inner">
+      <div class="controls-section glass-subpanel">
         <div class="input-group">
           <div class="selection-info">
             <span v-if="currentSelection.length > 0" class="status-active"><InlineIcon icon="✅" />{{ t('praat.pitchTone.step1.controls.selectionStatus.active', { count: currentSelection.length }) }}

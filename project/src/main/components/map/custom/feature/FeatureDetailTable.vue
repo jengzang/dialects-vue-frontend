@@ -56,7 +56,7 @@
     </div>
 
     <div class="feature-detail-layout">
-      <div class="feature-detail-main main-glass-panel-inner">
+      <div class="feature-detail-main glass-subpanel">
         <div
           v-if="loading"
           class="feature-detail-state"
@@ -147,7 +147,7 @@
         </div>
       </div>
 
-      <div class="feature-detail-side main-glass-panel-inner">
+      <div class="feature-detail-side glass-subpanel">
         <div class="feature-detail-map-title">
           {{ t('customEntry.featureDetail.mapTitle') }}
         </div>

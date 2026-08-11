@@ -1,6 +1,6 @@
 <template>
   <section class="content-area">
-    <div class="logs-mode main-glass-panel">
+    <div class="logs-mode glass-panel">
       <div class="top-controls">
         <div class="locations-head">
           <div>

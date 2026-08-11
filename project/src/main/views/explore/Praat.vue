@@ -114,7 +114,7 @@
           />
 
           <!-- No Results Message -->
-          <div v-else-if="!analysisResults" class="no-results-state main-glass-panel">
+          <div v-else-if="!analysisResults" class="no-results-state glass-panel">
             <div class="no-results-icon"><InlineIcon icon="📊" /></div>
             <h3 class="no-results-title">{{ t('praat.main.noResults.title') }}</h3>
             <p class="no-results-text">{{ t('praat.main.noResults.text') }}</p>

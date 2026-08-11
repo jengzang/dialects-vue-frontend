@@ -1,6 +1,6 @@
 <template>
   <section
-    class="panel main-glass-panel"
+    class="panel glass-panel"
     data-step="input"
   >
     <div class="panel-header">
@@ -24,7 +24,7 @@
       {{ formErrorMessage }}
     </div>
 
-    <div class="location-section main-glass-panel-inner">
+    <div class="location-section glass-subpanel">
       <div class="section-heading">
         <h3>{{ t('cluster.input.locationTitle') }}</h3>
         <p>{{ t('cluster.input.locationDescription') }}</p>
@@ -48,7 +48,7 @@
       <article
         v-for="(group, index) in workspaceState.requestDraft.groups"
         :key="group.id"
-        class="group-panel main-glass-panel-inner"
+        class="group-panel glass-subpanel"
       >
         <div class="group-panel__header group-panel__header--compact">
           <button

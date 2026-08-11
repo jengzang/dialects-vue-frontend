@@ -1,7 +1,7 @@
 <template>
   <main class="toponyms-page glass-container glass-container-shell">
-    <section class="toponyms-page__controls main-glass-panel">
-      <div class="toponyms-page__controls-inner main-glass-panel-inner">
+    <section class="toponyms-page__controls glass-panel">
+      <div class="toponyms-page__controls-inner glass-subpanel">
         <div class="toponyms-page__toolbar-copy">
           <h1>{{ t('villages.pages.toponyms.title') }}</h1>
           <p>{{ t('villages.pages.toponyms.subtitle') }}</p>
@@ -29,8 +29,8 @@
     </section>
 
     <section class="toponyms-page__workspace">
-      <div class="toponyms-page__chart main-glass-panel">
-        <div class="toponyms-page__chart-inner main-glass-panel-inner">
+      <div class="toponyms-page__chart glass-panel">
+        <div class="toponyms-page__chart-inner glass-subpanel">
           <div class="toponyms-page__chart-header">
             <div class="toponyms-page__stat-strip">
               <span>{{ t('villages.pages.toponyms.chart.pointsSeries') }}</span>

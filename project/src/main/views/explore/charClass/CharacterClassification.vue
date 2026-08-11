@@ -50,7 +50,7 @@
             <div
               v-for="(levelKey, index) in levels"
               :key="`${selectedTableKey}-${index}-${levelKey}`"
-              class="level-row glass-panel-inner"
+              class="level-row glass-subpanel"
             >
               <div class="level-row-header">
                 <span class="level-badge">{{ t('charClass.common.level', { index: index + 1 }) }}</span>

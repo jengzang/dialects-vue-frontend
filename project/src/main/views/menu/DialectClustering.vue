@@ -1,6 +1,6 @@
 <template>
   <div class="dialect-clustering-page">
-    <header class="page-header main-glass-panel">
+    <header class="page-header glass-panel">
       <div>
         <h1>{{ t('cluster.page.title') }}</h1>
         <p>{{ t('cluster.page.description') }}</p>
@@ -15,7 +15,7 @@
     </header>
 
     <nav
-      class="step-nav main-glass-panel-inner"
+      class="step-nav glass-subpanel"
       aria-label="Cluster workflow steps"
     >
       <button
@@ -32,7 +32,7 @@
       </button>
     </nav>
 
-    <section class="workspace-stage-shell main-glass-panel">
+    <section class="workspace-stage-shell glass-panel">
       <div class="workspace-stage-head">
         <div>
           <p class="stage-kicker">

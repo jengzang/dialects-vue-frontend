@@ -31,7 +31,7 @@
 
     <template #default>
       <div class="feature-scope-modal">
-        <div class="feature-scope-summary main-glass-panel-inner">
+        <div class="feature-scope-summary glass-subpanel">
           <div class="summary-item">
             <span class="summary-label">{{ t('map.customTab.scopeModal.summary.phonology') }}</span>
             <span class="summary-value">{{ featureMeta?.phonology || t('map.customTab.scopeModal.summary.empty') }}</span>
@@ -50,17 +50,17 @@
           </div>
         </div>
 
-        <div v-if="loading" class="feature-scope-state main-list-state main-glass-panel-inner">
+        <div v-if="loading" class="feature-scope-state main-list-state glass-subpanel">
           <div class="main-list-state-title">{{ t('map.customTab.scopeModal.loading') }}</div>
         </div>
 
-        <div v-else-if="errorMessage" class="feature-scope-state main-list-state main-glass-panel-inner" data-state="error">
+        <div v-else-if="errorMessage" class="feature-scope-state main-list-state glass-subpanel" data-state="error">
           <div class="main-list-state-title">{{ t('map.customTab.scopeModal.loadFailed') }}</div>
           <p class="main-list-state-text">{{ errorMessage }}</p>
         </div>
 
         <template v-else>
-          <div class="scope-toolbar main-glass-panel-inner">
+          <div class="scope-toolbar glass-subpanel">
             <div class="scope-toolbar-main">
               <div class="scope-toolbar-info">
                 {{ t('map.customTab.scopeModal.selectedCount', { count: selectedLocations.length }) }}
@@ -78,7 +78,7 @@
           </div>
 
           <div class="scope-grid">
-            <section class="scope-panel main-glass-panel-inner">
+            <section class="scope-panel glass-subpanel">
               <div class="scope-panel-title">{{ t('map.customTab.scopeModal.regionTitle') }}</div>
               <div v-if="filteredRegionsEmpty" class="feature-scope-state main-list-state">
                 <div class="main-list-state-title">{{ t('map.customTab.scopeModal.emptyRegions') }}</div>
@@ -129,7 +129,7 @@
               </template>
             </section>
 
-            <section class="scope-panel main-glass-panel-inner">
+            <section class="scope-panel glass-subpanel">
               <div class="scope-panel-title">{{ t('map.customTab.scopeModal.locationTitle') }}</div>
               <div v-if="filteredLocations.length === 0" class="feature-scope-state main-list-state">
                 <div class="main-list-state-title">{{ t('map.customTab.scopeModal.emptyLocations') }}</div>
@@ -730,7 +730,7 @@ function formatRegionNames(regionNames) {
   gap: 10px;
 }
 
-.main-glass-panel-inner {
+.glass-subpanel {
   padding: 10px 20px;
 }
 </style>

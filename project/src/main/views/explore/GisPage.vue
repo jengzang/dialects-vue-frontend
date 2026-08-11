@@ -1,6 +1,6 @@
 <template>
   <div ref="drawTabRoot" class="map-draw-tab page-content-stack">
-    <div class="page-footer draw-tab-header main-glass-panel">
+    <div class="page-footer draw-tab-header glass-panel">
       <!-- <div class="draw-tab-copy">
         <h3 class="draw-tab-title">
           {{ t('map.drawTab.title') }}
@@ -585,7 +585,7 @@
       />
 
       <div v-if="showVoronoiExportProgressOverlay" class="voronoi-export-progress-overlay">
-        <div class="voronoi-export-progress-panel main-glass-panel-inner">
+        <div class="voronoi-export-progress-panel glass-subpanel">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <div class="voronoi-export-progress-title">
             {{ t('map.drawTab.voronoi.exportLoadingTitle') }}

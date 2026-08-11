@@ -1,66 +1,101 @@
 @use '@/styles/global/mixins' as *;
+
+.glass-panel,
 .main-glass-panel {
-  --main-glass-panel-background: var(--surface-panel);
-  --main-glass-panel-backdrop-filter: blur(18px) saturate(145%);
-  --main-glass-panel-border-radius: var(--radius-xl);
-  --main-glass-panel-border: 1px solid var(--border-glass);
-  --main-glass-panel-shadow: 0 4px 14px rgba(var(--color-shadow-rgb), 0.08), 0 1px 4px rgba(var(--color-shadow-rgb), 0.06);
-  --main-glass-panel-hover-shadow: 0 8px 22px rgba(var(--color-shadow-rgb), 0.1), 0 2px 8px rgba(var(--color-shadow-rgb), 0.08);
-  background: var(--main-glass-panel-background);
-  backdrop-filter: var(--main-glass-panel-backdrop-filter);
-  -webkit-backdrop-filter: var(--main-glass-panel-backdrop-filter);
-  border-radius: var(--main-glass-panel-border-radius);
-  border: var(--main-glass-panel-border);
-  box-shadow: var(--main-glass-panel-shadow);
+  background: var(--glass-panel-background, var(--main-glass-panel-background, var(--surface-panel)));
+  backdrop-filter: var(--glass-panel-backdrop-filter, var(--main-glass-panel-backdrop-filter, blur(18px) saturate(145%)));
+  -webkit-backdrop-filter: var(--glass-panel-backdrop-filter, var(--main-glass-panel-backdrop-filter, blur(18px) saturate(145%)));
+  border: var(--glass-panel-border, var(--main-glass-panel-border, 1px solid var(--border-glass)));
+  border-radius: var(--glass-panel-radius, var(--main-glass-panel-border-radius, var(--radius-xl)));
+  box-shadow: var(
+    --glass-panel-shadow,
+    var(--main-glass-panel-shadow, 0 4px 14px rgba(var(--color-shadow-rgb), 0.08), 0 1px 4px rgba(var(--color-shadow-rgb), 0.06))
+  );
   transition: box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease;
 }
 
+.glass-panel:hover,
 .main-glass-panel:hover {
-  box-shadow: var(--main-glass-panel-hover-shadow);
+  box-shadow: var(
+    --glass-panel-hover-shadow,
+    var(--main-glass-panel-hover-shadow, 0 8px 22px rgba(var(--color-shadow-rgb), 0.1), 0 2px 8px rgba(var(--color-shadow-rgb), 0.08))
+  );
 }
 
-.main-glass-panel-inner {
-  --main-glass-panel-inner-background: var(--surface-glass-button);
-  --main-glass-panel-inner-backdrop-filter: blur(10px) saturate(135%);
-  --main-glass-panel-inner-border-radius: var(--radius-md);
-  --main-glass-panel-inner-border: 1px solid var(--border-glass-subtle);
-  background: var(--main-glass-panel-inner-background);
-  backdrop-filter: var(--main-glass-panel-inner-backdrop-filter);
-  -webkit-backdrop-filter: var(--main-glass-panel-inner-backdrop-filter);
-  border-radius: var(--main-glass-panel-inner-border-radius);
-  border: var(--main-glass-panel-inner-border);
+.glass-subpanel,
+.main-glass-panel-inner,
+.glass-panel-inner {
+  background: var(--glass-subpanel-background, var(--main-glass-panel-inner-background, var(--surface-glass-button)));
+  backdrop-filter: var(--glass-subpanel-backdrop-filter, var(--main-glass-panel-inner-backdrop-filter, blur(10px) saturate(135%)));
+  -webkit-backdrop-filter: var(--glass-subpanel-backdrop-filter, var(--main-glass-panel-inner-backdrop-filter, blur(10px) saturate(135%)));
+  border: var(--glass-subpanel-border, var(--main-glass-panel-inner-border, 1px solid var(--border-glass-subtle)));
+  border-radius: var(--glass-subpanel-radius, var(--main-glass-panel-inner-border-radius, var(--radius-md)));
   transition: border-color 0.22s ease, background-color 0.22s ease, box-shadow 0.22s ease;
 }
 
-.main-glass-shell {
-  --main-glass-shell-background: var(--surface-panel-strong);
-  --main-glass-shell-backdrop-filter: blur(12px) saturate(145%);
-  --main-glass-shell-border: 1px solid var(--border-glass);
-  --main-glass-shell-radius: 30px;
-  --main-glass-shell-shadow: 0 8px 24px rgba(var(--color-shadow-rgb), 0.08);
-  background: var(--main-glass-shell-background);
-  backdrop-filter: var(--main-glass-shell-backdrop-filter);
-  -webkit-backdrop-filter: var(--main-glass-shell-backdrop-filter);
-  border: var(--main-glass-shell-border);
-  border-radius: var(--main-glass-shell-radius);
-  box-shadow: var(--main-glass-shell-shadow);
+.glass-shell,
+.main-glass-shell,
+.tool-glass-container,
+.glass-container-shell {
+  background: var(--glass-shell-background, var(--main-glass-shell-background, var(--surface-panel-strong)));
+  backdrop-filter: var(--glass-shell-backdrop-filter, var(--main-glass-shell-backdrop-filter, blur(12px) saturate(145%)));
+  -webkit-backdrop-filter: var(--glass-shell-backdrop-filter, var(--main-glass-shell-backdrop-filter, blur(12px) saturate(145%)));
+  border: var(--glass-shell-border, var(--main-glass-shell-border, 1px solid var(--border-glass)));
+  border-radius: var(--glass-shell-radius, var(--main-glass-shell-radius, 30px));
+  box-shadow: var(--glass-shell-shadow, var(--main-glass-shell-shadow, 0 8px 24px rgba(var(--color-shadow-rgb), 0.08)));
 }
 
 .tool-glass-container,
 .glass-container-shell {
-  background: var(--surface-panel-hover);
-  backdrop-filter: blur(12px) saturate(145%);
-  -webkit-backdrop-filter: blur(12px) saturate(145%);
-  border: 1px solid var(--border-glass);
-  border-radius: 30px;
-  box-shadow: 0 8px 24px rgba(var(--color-shadow-rgb), 0.08);
+  --glass-shell-background: var(--surface-panel-hover);
 }
 
 .glass-container-soft {
-  background: var(--surface-panel-strong);
-  backdrop-filter: blur(10px) saturate(140%);
-  -webkit-backdrop-filter: blur(10px) saturate(140%);
-  border: 1px solid var(--border-glass);
+  background: var(--glass-panel-background, var(--surface-panel-strong));
+  backdrop-filter: var(--glass-panel-backdrop-filter, blur(10px) saturate(140%));
+  -webkit-backdrop-filter: var(--glass-panel-backdrop-filter, blur(10px) saturate(140%));
+  border: var(--glass-panel-border, 1px solid var(--border-glass));
+}
+
+.glass-card {
+  background: var(--glass-card-background, var(--glass-30));
+  backdrop-filter: var(--glass-card-backdrop-filter, blur(14px) saturate(145%));
+  -webkit-backdrop-filter: var(--glass-card-backdrop-filter, blur(14px) saturate(145%));
+  border: var(--glass-card-border, 1px solid var(--border-glass));
+  border-radius: var(--glass-card-radius, var(--radius-xl));
+  box-shadow: var(--glass-card-shadow, 0 6px 18px var(--bg-hover-light), inset 0 0 0 1px var(--glass-30));
+  transition: background-color 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.surface-shell {
+  background: var(--surface-shell-fill, var(--surface-panel-strong));
+  border: var(--surface-shell-border, 1px solid var(--border-control));
+  border-radius: var(--surface-shell-radius, 30px);
+  box-shadow: var(--surface-shell-shadow, 0 8px 24px rgba(var(--color-shadow-rgb), 0.06));
+  transition: box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease;
+}
+
+.surface-panel {
+  background: var(--surface-panel-fill, var(--surface-panel));
+  border: var(--surface-panel-border, 1px solid var(--border-control));
+  border-radius: var(--surface-panel-radius, var(--radius-xl));
+  box-shadow: var(--surface-panel-shadow, 0 4px 14px rgba(var(--color-shadow-rgb), 0.06));
+  transition: box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease;
+}
+
+.surface-card {
+  background: var(--surface-card-fill, var(--surface-panel-hover));
+  border: var(--surface-card-border, 1px solid var(--border-control));
+  border-radius: var(--surface-card-radius, var(--radius-lg));
+  box-shadow: var(--surface-card-shadow, 0 2px 8px rgba(var(--color-shadow-rgb), 0.05));
+  transition: box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease;
+}
+
+.surface-subpanel {
+  background: var(--surface-subpanel-fill, var(--surface-panel-subtle));
+  border: var(--surface-subpanel-border, 1px solid var(--border-glass-subtle));
+  border-radius: var(--surface-subpanel-radius, var(--radius-md));
+  transition: border-color 0.22s ease, background-color 0.22s ease, box-shadow 0.22s ease;
 }
 
 .main-card-grid {
@@ -87,25 +122,6 @@
 
 .main-data-card[aria-hidden='true'] {
   cursor: default;
-}
-
-.glass-panel-inner {
-  background: var(--surface-panel-subtle);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-glass-subtle);
-  transition: border-color 0.22s ease, background-color 0.22s ease, box-shadow 0.22s ease;
-}
-
-.glass-card {
-  background: var(--glass-30);
-  backdrop-filter: blur(14px) saturate(145%);
-  -webkit-backdrop-filter: blur(14px) saturate(145%);
-  border: 1px solid var(--border-glass);
-  box-shadow: 0 6px 18px var(--bg-hover-light), inset 0 0 0 1px var(--glass-30);
-  border-radius: var(--radius-xl);
-  transition: background-color 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
 }
 
 .page {

@@ -1,7 +1,7 @@
 <template>
   <div class="evolution-page">
     <!-- 控制面板 -->
-    <div class="main-glass-panel" data-panel="control">
+    <div class="glass-panel" data-panel="control">
       <!-- 统计模式选择 -->
       <div class="control-row">
         <label class="control-label">{{ t('phonology.phonology.evolution.queryMode.label', '统计模式') }}：</label>
@@ -1500,7 +1500,7 @@ $portrait-ratio: 1;
 }
 
 /* 控制面板 */
-.main-glass-panel {
+.glass-panel {
   --main-glass-panel-background: var(--glass-60);
   --main-glass-panel-backdrop-filter: blur(12px);
   --main-glass-panel-border-radius: var(--radius-lg);
@@ -1869,7 +1869,7 @@ $portrait-ratio: 1;
     padding: 3px;
   }
 
-  .main-glass-panel {
+  .glass-panel {
     padding: 16px;
   }
 

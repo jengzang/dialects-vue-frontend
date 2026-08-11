@@ -241,7 +241,7 @@
       <transition name="fade-scale">
         <div v-if="activeFilterCol" class="teleport-overlay" @click="closeFilter">
           <div
-              class="main-glass-panel"
+              class="glass-panel"
               data-surface="filter-popup"
               :style="popupStyle"
               @click.stop
@@ -1909,7 +1909,7 @@ td {
 }
 
 /* Filter Popup */
-.main-glass-panel[data-surface='filter-popup'] {
+.glass-panel[data-surface='filter-popup'] {
   --main-glass-panel-background: var(--surface-glass-floating);
   --main-glass-panel-backdrop-filter: blur(25px);
   --main-glass-panel-border: 1px solid var(--glass-80);
@@ -2087,8 +2087,8 @@ td {
     -webkit-backdrop-filter: blur(2px);
   }
 
-  .main-glass-panel[data-surface='filter-popup'],
-  .main-glass-panel[data-surface='filter-popup'].align-right {
+  .glass-panel[data-surface='filter-popup'],
+  .glass-panel[data-surface='filter-popup'].align-right {
     position: fixed;
     top: 50%;
     left: 50%;

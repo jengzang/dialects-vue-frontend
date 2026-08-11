@@ -19,7 +19,7 @@
     </div>
 
     <div class="point-detail-layout">
-      <div class="point-detail-main main-glass-panel-inner">
+      <div class="point-detail-main glass-subpanel">
         <div class="point-base-fields">
           <div class="point-field">
             <span class="point-field-label">{{
@@ -174,7 +174,7 @@
           </div>
       </div>
 
-      <div class="point-detail-side main-glass-panel-inner">
+      <div class="point-detail-side glass-subpanel">
         <div class="point-map-title">
           {{
             isCreateMode

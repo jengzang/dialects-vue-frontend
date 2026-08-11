@@ -1,5 +1,5 @@
 <template>
-  <div v-if="jobId && isVisible" class="job-status-panel main-glass-panel">
+  <div v-if="jobId && isVisible" class="job-status-panel glass-panel">
     <div class="panel-header">
       <div class="job-info">
         <span class="job-label">{{ t('praat.jobStatus.jobId') }}</span>

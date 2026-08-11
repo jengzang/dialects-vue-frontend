@@ -7,7 +7,7 @@
     @update:modelValue="handleClose"
   >
     <div class="voronoi-export-modal">
-      <div class="feature-scope-summary main-glass-panel-inner">
+      <div class="feature-scope-summary glass-subpanel">
         <div class="summary-item">
           <span class="summary-label">{{ t('map.drawTab.voronoi.partitionGroups') }}</span>
           <span class="summary-value summary-number">{{ groups.length }}</span>
@@ -35,7 +35,7 @@
         </div>
       </div>
 
-      <section class="scope-panel main-glass-panel-inner voronoi-export-list-panel">
+      <section class="scope-panel glass-subpanel voronoi-export-list-panel">
         <div v-if="groups.length === 0" class="feature-scope-state main-list-state">
           <div class="main-list-state-title">{{ t('map.drawTab.voronoi.exportListEmpty') }}</div>
         </div>

@@ -2,7 +2,7 @@
   <Transition name="draw-panel-slide">
     <aside
       v-show="isOpen"
-      class="draw-tool-panel main-glass-panel voronoi-panel"
+      class="draw-tool-panel glass-panel voronoi-panel"
       :class="offsetClass"
     >
       <div class="draw-tool-panel-header">

@@ -7,7 +7,7 @@
     @update:modelValue="handleClose"
   >
     <div class="image-export-preview-modal">
-      <div class="image-export-preview-summary main-glass-panel-inner">
+      <div class="image-export-preview-summary glass-subpanel">
         <div class="summary-item">
           <span class="summary-label">{{ t('map.drawTab.imageExport.summary.layers') }}</span>
           <span class="summary-value summary-number">{{ previewLayerCount }}</span>
@@ -27,7 +27,7 @@
       </div>
 
       <div class="image-export-preview-main">
-        <div class="image-export-preview-sidebar main-glass-panel-inner">
+        <div class="image-export-preview-sidebar glass-subpanel">
           <div class="sidebar-title">{{ t('map.drawTab.imageExport.previewGuideTitle') }}</div>
           <p class="sidebar-text">{{ previewHint }}</p>
           <p v-if="validationMessage" class="image-export-preview-validation">
@@ -35,7 +35,7 @@
           </p>
         </div>
 
-        <div class="image-export-preview-stage main-glass-panel-inner">
+        <div class="image-export-preview-stage glass-subpanel">
           <div ref="mapContainer" class="image-export-preview-map" />
         </div>
       </div>

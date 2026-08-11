@@ -1,5 +1,5 @@
 <template>
-  <section class="panel main-glass-panel">
+  <section class="panel glass-panel">
     <div class="panel-header">
       <div>
         <h2>{{ t('cluster.task.title') }}</h2>
@@ -8,7 +8,7 @@
     </div>
 
     <div class="stage-context-stack">
-      <div class="stage-context-card main-glass-panel-inner">
+      <div class="stage-context-card glass-subpanel">
         <h3>{{ t('cluster.context.title') }}</h3>
         <div class="context-list">
           <div
@@ -22,7 +22,7 @@
         </div>
       </div>
 
-      <div class="stage-context-card main-glass-panel-inner">
+      <div class="stage-context-card glass-subpanel">
         <h3>{{ t('cluster.context.progressTitle') }}</h3>
         <div class="stage-progress-list">
           <div
@@ -43,7 +43,7 @@
 
       <div
         v-if="workspaceState.activeTask.taskId"
-        class="task-status-card main-glass-panel-inner"
+        class="task-status-card glass-subpanel"
       >
         <div class="task-row">
           <span>{{ t('cluster.task.source') }}</span>

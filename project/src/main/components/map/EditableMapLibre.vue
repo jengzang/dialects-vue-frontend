@@ -1,5 +1,5 @@
 <template>
-  <div class="editable-map-shell main-glass-panel">
+  <div class="editable-map-shell glass-panel">
     <div ref="mapContainer" class="editable-map-stage" />
     <div
       v-if="props.featureBoxSelectEnabled"

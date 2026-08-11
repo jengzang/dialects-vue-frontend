@@ -7,7 +7,7 @@
     @update:modelValue="handleClose"
   >
     <div class="image-export-modal">
-      <div class="feature-scope-summary main-glass-panel-inner">
+      <div class="feature-scope-summary glass-subpanel">
         <div class="summary-item">
           <span class="summary-label">{{ t('map.drawTab.imageExport.summary.layers') }}</span>
           <span class="summary-value summary-number">{{ layers.length }}</span>
@@ -23,7 +23,7 @@
       </div>
 
       <div class="scope-grid image-export-grid">
-        <section class="scope-panel main-glass-panel-inner">
+        <section class="scope-panel glass-subpanel">
           <div class="scope-panel-title">{{ t('map.drawTab.imageExport.sections.range') }}</div>
           <label v-for="option in rangeOptions" :key="option.value" class="scope-radio-item">
             <input v-model="form.rangeMode" type="radio" name="image-export-range" :value="option.value">
@@ -34,7 +34,7 @@
           </label>
         </section>
 
-        <section class="scope-panel main-glass-panel-inner">
+        <section class="scope-panel glass-subpanel">
           <div class="scope-panel-title">{{ t('map.drawTab.imageExport.sections.size') }}</div>
           <label class="draw-field">
             <!-- <span class="draw-field-label">{{ t('map.drawTab.imageExport.labels.sizePreset') }}</span> -->
@@ -57,7 +57,7 @@
           </div>
         </section>
 
-        <section class="scope-panel main-glass-panel-inner">
+        <section class="scope-panel glass-subpanel">
           <div class="scope-panel-title">{{ t('map.drawTab.imageExport.sections.zoom') }}</div>
           <label v-for="option in zoomOptions" :key="option.value" class="scope-radio-item">
             <input v-model="form.zoomMode" type="radio" name="image-export-zoom" :value="option.value">
@@ -72,7 +72,7 @@
           </label>
         </section>
 
-        <section class="scope-panel main-glass-panel-inner">
+        <section class="scope-panel glass-subpanel">
           <div class="scope-panel-title">{{ t('map.drawTab.imageExport.sections.content') }}</div>
           <CheckBox
             :model-value="form.includeBasemap"

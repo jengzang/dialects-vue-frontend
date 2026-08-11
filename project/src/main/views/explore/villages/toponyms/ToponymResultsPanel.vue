@@ -1,6 +1,6 @@
 <template>
-  <aside class="toponym-results-panel toponym-results-panel__inspector main-glass-panel">
-    <div class="toponym-results-panel__inner main-glass-panel-inner">
+  <aside class="toponym-results-panel toponym-results-panel__inspector glass-panel">
+    <div class="toponym-results-panel__inner glass-subpanel">
       <section class="toponym-results-panel__summary">
         <h2>{{ t('villages.pages.toponyms.results.title') }}</h2>
         <p v-if="!hasSearched">
