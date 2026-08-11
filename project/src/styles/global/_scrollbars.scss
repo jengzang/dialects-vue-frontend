@@ -125,7 +125,7 @@
   .patterns-table,
   .indices-table,
   .pmi-results,
-  .main-glass-panel[data-surface='table-container']
+  .glass-panel[data-surface='table-container']
 ) {
   @include visible-scrollbar;
 }
@@ -199,7 +199,7 @@
   .patterns-table,
   .indices-table,
   .pmi-results,
-  .main-glass-panel[data-surface='table-container']
+  .glass-panel[data-surface='table-container']
 ) {
   @include visible-scrollbar-webkit;
 }

@@ -92,7 +92,7 @@
         </div>
 
         <div v-else class="tabular-import-preview__body">
-          <div v-if="mappingEnabled" class="tabular-import-preview__mapping main-glass-panel-inner">
+          <div v-if="mappingEnabled" class="tabular-import-preview__mapping glass-subpanel">
             <div class="tabular-import-preview__section-head">
               <div class="tabular-import-preview__section-head-row">
                 <h4>{{ t('common.importPreview.mapping.title') }}</h4>
@@ -146,7 +146,7 @@
             </div>
           </div>
 
-          <div class="tabular-import-preview__preview main-glass-panel-inner">
+          <div class="tabular-import-preview__preview glass-subpanel">
             <div class="tabular-import-preview__table-wrap ui-scrollbar" :style="tableStyle">
               <div class="tabular-import-preview__table">
                 <div class="tabular-import-preview__table-header">
@@ -205,7 +205,7 @@
     </template>
   </AppModal>
 
-  <div v-else class="tabular-import-preview main-glass-panel">
+  <div v-else class="tabular-import-preview glass-panel">
     <div class="tabular-import-preview__embedded-header">
       <div>
         <p class="tabular-import-preview__eyebrow">{{ title }}</p>
@@ -279,7 +279,7 @@
       </div>
 
       <div v-else class="tabular-import-preview__body">
-        <div v-if="mappingEnabled" class="tabular-import-preview__mapping main-glass-panel-inner">
+        <div v-if="mappingEnabled" class="tabular-import-preview__mapping glass-subpanel">
           <div class="tabular-import-preview__section-head">
             <div class="tabular-import-preview__section-head-row">
               <h4>{{ t('common.importPreview.mapping.title') }}</h4>
@@ -333,7 +333,7 @@
           </div>
         </div>
 
-        <div class="tabular-import-preview__preview main-glass-panel-inner">
+        <div class="tabular-import-preview__preview glass-subpanel">
           <div class="tabular-import-preview__table-wrap ui-scrollbar" :style="tableStyle">
             <div class="tabular-import-preview__table">
               <div class="tabular-import-preview__table-header">

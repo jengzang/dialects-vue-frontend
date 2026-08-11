@@ -44,6 +44,18 @@ function trackedVueFilesUnder(relativePath) {
     .map((file) => resolve(projectRoot, file))
 }
 
+function trackedStyleAndVueFilesUnder(relativePath) {
+  const output = execFileSync('git', ['ls-files', relativePath], {
+    cwd: projectRoot,
+    encoding: 'utf8',
+  })
+
+  return output
+    .split('\n')
+    .filter((file) => file.endsWith('.vue') || file.endsWith('.scss'))
+    .map((file) => resolve(projectRoot, file))
+}
+
 describe('main surface conventions', () => {
   it('defines the canonical main glass surface primitives without the legacy main prefix', () => {
     const source = readSource('src/styles/main/_surfaces.scss')
@@ -107,6 +119,27 @@ describe('main surface conventions', () => {
 
       for (const legacyToken of legacyTokens) {
         expect(classTokens, `${file} should not use ${legacyToken}`).not.toContain(legacyToken)
+      }
+    }
+  })
+
+  it('does not keep legacy surface tokens in tracked source files', () => {
+    const legacyTokens = [
+      'main-glass-panel',
+      'main-glass-panel-inner',
+      'main-glass-shell',
+      'glass-panel-inner',
+      'tool-glass-container',
+      'glass-container-shell',
+      'glass-container-soft',
+      'main-data-card',
+    ]
+
+    for (const file of trackedStyleAndVueFilesUnder('src')) {
+      const source = readFileSync(file, 'utf8')
+
+      for (const legacyToken of legacyTokens) {
+        expect(source, `${file} should not contain ${legacyToken}`).not.toContain(legacyToken)
       }
     }
   })
