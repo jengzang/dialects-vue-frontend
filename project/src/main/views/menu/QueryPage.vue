@@ -4,9 +4,16 @@
     :model-value="currentTab"
     :route-value="currentTab"
     :resolve-route="resolveTabRoute"
-    v-slot="{ currentTab }"
   >
-    <div class="tab-content-inner query-page-root">
+    <template #header>
+      <h1 class="page-title">
+        <BarIcon :icon="activePageIcon" />
+        {{ activePageTitle }}
+      </h1>
+    </template>
+
+    <template #default="{ currentTab }">
+      <div class="tab-content-inner query-page-root">
       <div v-show="currentTab === 'tab1'" class="page">
         <div class="page-content-stack">
           <!-- 🔹 輸入框區塊 -->
@@ -247,11 +254,13 @@
       <div v-else-if="currentTab === 'tab4'" class="page-footer" style="margin-top: 20px">
         <small class="hint">{{ $t('query.tab4.description') }}</small>
       </div>
-    </div>
+      </div>
+    </template>
   </TabsContainer>
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import {computed, nextTick, reactive, ref, onMounted, onBeforeUnmount, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
@@ -312,6 +321,23 @@ const tabs = [
   { name: 'tab3', label: t('query.tab3.title') },
   { name: 'tab4', label: t('query.tab4.title') }
 ]
+
+const pageTitleKeys = {
+  tab1: 'navigation.pageTitles.query.tab1',
+  tab2: 'navigation.pageTitles.query.tab2',
+  tab3: 'navigation.pageTitles.query.tab3',
+  tab4: 'navigation.pageTitles.query.tab4'
+}
+
+const pageTitleIcons = {
+  tab1: '🔤',
+  tab2: '📖',
+  tab3: '🔍',
+  tab4: '📊'
+}
+
+const activePageTitle = computed(() => t(pageTitleKeys[currentTab.value] || pageTitleKeys.tab2))
+const activePageIcon = computed(() => pageTitleIcons[currentTab.value] || pageTitleIcons.tab2)
 
 // Compute limit context based on current tab
 const locationLimitContext = computed(() => {
@@ -818,8 +844,19 @@ export default {
 
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 /* 📄 內容區塊動畫 */
+.page-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
 .tab-content-inner {
   display: flex;
   flex-direction: column;

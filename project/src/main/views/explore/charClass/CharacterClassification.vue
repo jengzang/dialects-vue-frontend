@@ -4,7 +4,7 @@
       <section class="config-panel glass-panel">
         <div class="panel-header">
           <div class="panel-title-group">
-            <h1 class="page-title">{{ t(currentPageConfig.titleKey) }}</h1>
+            <h1 class="page-title"><BarIcon icon="🔤" />{{ t(currentPageConfig.titleKey) }}</h1>
             <!-- <p class="page-subtitle">{{ t('charClass.common.subtitle') }}</p> -->
           </div>
         </div>
@@ -179,6 +179,7 @@
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

@@ -2,7 +2,7 @@
   <div class="dialect-clustering-page">
     <header class="page-header glass-panel">
       <div>
-        <h1>{{ t('cluster.page.title') }}</h1>
+        <h1><BarIcon icon="🕸️" />{{ t('cluster.page.title') }}</h1>
         <p>{{ t('cluster.page.description') }}</p>
       </div>
       <button
@@ -86,6 +86,7 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import ClusterInputPanel from '@/main/views/menu/cluster/ClusterInputPanel.vue'
 import ClusterResultPanel from '@/main/views/menu/cluster/ClusterResultPanel.vue'
 import ClusterTaskSidebar from '@/main/views/menu/cluster/ClusterTaskSidebar.vue'

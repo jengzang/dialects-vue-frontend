@@ -1,6 +1,6 @@
 <template>
   <div class="villages-page">
-    <h1 class="page-title">{{ $t('villages.title') }}</h1>
+    <h1 class="page-title"><BarIcon icon="🏘️" />{{ $t('villages.title') }}</h1>
 
     <div class="villages-grid">
       <button class="entry-button" @click="handleToponyms">
@@ -72,6 +72,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { userStore } from '@/main/store/store.js'

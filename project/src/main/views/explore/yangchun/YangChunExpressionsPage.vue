@@ -3,7 +3,7 @@
     <section class="yc-expressions-hero glass-shell">
       <div>
         <span class="yc-eyebrow">Yangchun Expressions</span>
-        <h1>阳春熟语与叠式词</h1>
+        <h1><BarIcon icon="📝" />阳春熟语与叠式词</h1>
         <p>
           AABB、ABB、AAB、歇后语、农谚、惯用语都可以在这里按类型浏览，后续资料会继续补全。
         </p>
@@ -144,6 +144,7 @@
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import { computed, ref } from 'vue'
 import GlassTable from '@/components/common/GlassTable.vue'
 import {

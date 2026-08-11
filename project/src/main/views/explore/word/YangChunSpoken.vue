@@ -1,7 +1,7 @@
 <template>
   <div style="width: 100%;justify-content: center;align-items:center;display: flex;flex-direction: column">
     <div class="title-row">
-      <h1>{{ t('words.ycSpoken.name') }}</h1>
+      <h1><BarIcon icon="🗣️" />{{ t('words.ycSpoken.name') }}</h1>
       <span class="cross-link" @click="goToYCVillages">{{ t('villages.ycVillages.name') }} →</span>
     </div>
     <UniversalTable
@@ -14,6 +14,7 @@
 
 <script setup>
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue';
+import BarIcon from '@/components/common/BarIcon.vue'
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter, useRoute } from 'vue-router';

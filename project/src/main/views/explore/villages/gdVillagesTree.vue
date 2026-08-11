@@ -3,7 +3,7 @@
     <!-- Header Section -->
     <div class="header-section">
       <div class="title-row">
-        <h1 style="margin: 0;font-size: 1.5em;">{{ t('villages.pages.gdTree.title') }}</h1>
+        <h1 style="margin: 0;font-size: 1.5em;"><BarIcon icon="🌳" />{{ t('villages.pages.gdTree.title') }}</h1>
         <span class="cross-link" @click="goToGdTable">{{ t('villages.pages.gdTable.title') }} →</span>
       </div>
     </div>
@@ -113,6 +113,7 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import FloatingSearch from '@/components/common/FloatingSearch.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import VillagesTreeItem from '@/main/components/TableAndTree/VillagesTreeItem.vue';
 import VillageMapPopup from '@/main/components/map/popups/VillageMapPopup.vue';
 import { lazyLoadTree, loadFullTree } from '@/api';

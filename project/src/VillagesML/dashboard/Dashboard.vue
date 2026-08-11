@@ -2,7 +2,7 @@
 <!--  <ExploreLayout>-->
     <div class="dashboard-page">
       <div class="page-header">
-        <h1 class="page-title"><InlineIcon icon="📊" />{{ t('villages.dashboard.pageTitle') }}</h1>
+        <h1 class="page-title"><BarIcon icon="📊" />{{ t('villages.dashboard.pageTitle') }}</h1>
         <SimpleSelectDropdown
           v-model="activeDataset"
           :options="datasetOptions"
@@ -126,6 +126,7 @@
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

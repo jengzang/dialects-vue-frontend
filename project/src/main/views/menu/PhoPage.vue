@@ -6,6 +6,13 @@
       :route-value="currentTab"
       :resolve-route="resolveTabRoute"
     >
+      <template #header>
+        <h1 class="page-title">
+          <BarIcon :icon="activePageIcon" />
+          {{ activePageTitle }}
+        </h1>
+      </template>
+
       <template #default="{ currentTab }">
         <div class="pho-content">
           <KeepAlive>
@@ -22,6 +29,7 @@ import { KeepAlive, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import BarIcon from '@/components/common/BarIcon.vue'
 import TabsContainer from '@/components/common/TabsContainer.vue'
 import PhonologyMatrixPage from '@/main/components/pho/PhonologyPage.vue'
 import PhonologyCustomPage from '@/main/components/pho/PhonologyCustom.vue'
@@ -62,6 +70,23 @@ const tabs = computed(() => [
   { name: 'evolution', label: t('phonology.tabs.evolution') }
 ])
 
+const pageTitleKeys = {
+  phonologyMatrix: 'navigation.pageTitles.pho.matrix',
+  phonologyCustom: 'navigation.pageTitles.pho.custom',
+  Countphos: 'navigation.pageTitles.pho.count',
+  evolution: 'navigation.pageTitles.pho.evolution'
+}
+
+const pageTitleIcons = {
+  phonologyMatrix: '🔍️',
+  phonologyCustom: '📐',
+  Countphos: '🧮',
+  evolution: '📈'
+}
+
+const activePageTitle = computed(() => t(pageTitleKeys[currentTab.value] || pageTitleKeys.phonologyMatrix))
+const activePageIcon = computed(() => pageTitleIcons[currentTab.value] || pageTitleIcons.phonologyMatrix)
+
 const tabComponentMap = {
   phonologyMatrix: PhonologyMatrixPage,
   phonologyCustom: PhonologyCustomPage,
@@ -81,8 +106,20 @@ const resolveTabRoute = (tabName) => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 .pho-page {
   width: 100%;
+}
+
+.page-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .pho-content {

@@ -1,5 +1,10 @@
 <template>
   <div class="yubao-page">
+    <h1 class="page-title">
+      <BarIcon :icon="activePageIcon" />
+      {{ activePageTitle }}
+    </h1>
+
     <!-- 顶部控制栏 -->
     <div class="top-controls">
       <!-- Tab 切换 + 查看全部按钮 -->
@@ -350,6 +355,7 @@ import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 import { watchDebounced } from '@vueuse/core'
 import YuBaoMap from '@/main/components/map/YuBaoMap.vue'
 import AppModal from '@/components/common/AppModal.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 import { useStorageState } from '@/composables/core/useStorageState.js'
 
@@ -448,6 +454,16 @@ const activeTabLabel = computed(() => (
   activeTab.value === 'vocabulary'
     ? t('words.yuBaoVocabulary.name')
     : t('words.yuBaoGrammar.name')
+))
+
+const activePageTitle = computed(() => (
+  activeTab.value === 'vocabulary'
+    ? t('navigation.pageTitles.yubao.vocabulary')
+    : t('navigation.pageTitles.yubao.grammar')
+))
+
+const activePageIcon = computed(() => (
+  activeTab.value === 'vocabulary' ? '📚' : '📗'
 ))
 
 // 检查输入是否有效（是否在数据列表中完全匹配）
@@ -963,6 +979,18 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   @media (max-width: 768px) {
     padding: 4px;
   }
+}
+
+.page-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  width: 100%;
+  margin: 0 0 12px;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 /* 顶部控制栏 */

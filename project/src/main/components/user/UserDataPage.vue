@@ -6,7 +6,7 @@
           {{ t('common.button.back') }}
         </button>
         <h1>
-          <span class="title-icon"><InlineIcon icon="📊" /></span>
+          <BarIcon class="title-icon" icon="📊" />
           <span>{{ t('user.dataPage.title') }}</span>
           <span v-if="username" class="username-badge">{{ username }}</span>
         </h1>
@@ -315,6 +315,7 @@
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'

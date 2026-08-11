@@ -3,7 +3,7 @@
     <section class="toponyms-page__controls glass-panel">
       <div class="toponyms-page__controls-inner glass-subpanel">
         <div class="toponyms-page__toolbar-copy">
-          <h1>{{ t('villages.pages.toponyms.title') }}</h1>
+          <h1><BarIcon icon="📍" />{{ t('villages.pages.toponyms.title') }}</h1>
           <p>{{ t('villages.pages.toponyms.subtitle') }}</p>
         </div>
 
@@ -116,6 +116,7 @@
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue';
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';

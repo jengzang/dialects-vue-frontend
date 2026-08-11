@@ -2,7 +2,7 @@
   <div class="merge-tool-container">
     <div class="glass-container glass-shell" style="max-height: 80dvh;overflow: auto;">
       <div class="header-section">
-        <h1 class="title">{{ t('tools.merge.page.title') }}</h1>
+        <h1 class="title"><BarIcon icon="🔗" />{{ t('tools.merge.page.title') }}</h1>
         <p class="subtitle">{{ t('tools.merge.page.subtitle') }}</p>
       </div>
 
@@ -332,6 +332,7 @@
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'

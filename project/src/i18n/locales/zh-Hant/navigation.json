@@ -85,6 +85,40 @@
       "setting": "設置"
     }
   },
+  "pageTitles": {
+    "query": {
+      "tab1": "查字",
+      "tab2": "查中古",
+      "tab3": "查音位",
+      "tab4": "查調"
+    },
+    "compare": {
+      "tab1": "漢字對比",
+      "tab2": "中古對比",
+      "tab4": "調類對比",
+      "tab5": "音值對比"
+    },
+    "map": {
+      "view": "主地圖",
+      "divide": "分區著色",
+      "custom": "自定義數據"
+    },
+    "pho": {
+      "matrix": "音系查詢",
+      "custom": "音素分類",
+      "count": "音節統計",
+      "evolution": "演變"
+    },
+    "vocabulary": {
+      "view": "詞表查詢",
+      "import": "詞表上傳",
+      "manage": "詞表管理"
+    },
+    "yubao": {
+      "vocabulary": "語保詞彙",
+      "grammar": "語保語法"
+    }
+  },
   "tabs": {
     "home": "首頁",
     "phonology": "音系",

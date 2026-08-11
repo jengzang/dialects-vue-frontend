@@ -5,6 +5,13 @@
     :route-value="currentTab"
     :resolve-route="resolveTabRoute"
   >
+    <template #header>
+      <h1 class="page-title">
+        <BarIcon :icon="activePageIcon" />
+        {{ activePageTitle }}
+      </h1>
+    </template>
+
     <!-- Tab 右侧额外内容 -->
     <template #tab-extra>
       <!-- 比较模式：显示比较对象 -->
@@ -96,6 +103,7 @@ import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { mapStore } from '@/main/store/store.js'
 
+import BarIcon from '@/components/common/BarIcon.vue'
 import TabsContainer from '@/components/common/TabsContainer.vue'
 import DivideTab from "@/main/components/map/Tabs/DivideTab.vue";
 import CustomTab from '@/main/components/map/Tabs/CustomTab.vue'
@@ -147,6 +155,21 @@ const tabs = computed(() => [
   { name: 'divide', label: t('map.tabs.divide') },
   { name: 'custom', label: t('map.tabs.custom') }
 ])
+
+const pageTitleKeys = {
+  map: 'navigation.pageTitles.map.view',
+  divide: 'navigation.pageTitles.map.divide',
+  custom: 'navigation.pageTitles.map.custom'
+}
+
+const pageTitleIcons = {
+  map: '🗺️',
+  divide: '🎨',
+  custom: '🗂️'
+}
+
+const activePageTitle = computed(() => t(pageTitleKeys[currentTab.value] || pageTitleKeys.map))
+const activePageIcon = computed(() => pageTitleIcons[currentTab.value] || pageTitleIcons.map)
 
 // 處理地圖點擊事件
 const handleMapClick = (coordinates) => {
@@ -305,6 +328,16 @@ $white: var(--text-white);
 $transition-fast: 0.2s;
 $transition-base: 0.3s;
 /* 外层内容容器 */
+.page-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
 .tab-content {
   display: flex;
   flex-direction: column;

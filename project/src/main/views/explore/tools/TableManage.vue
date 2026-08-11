@@ -6,7 +6,7 @@
     </div>
 
     <div v-else-if="!isAdmin" class="access-denied">
-      <h1><InlineIcon icon="⚠️" />{{ t('tools.tableManage.accessDenied.title') }}</h1>
+      <h1><BarIcon icon="⚠️" />{{ t('tools.tableManage.accessDenied.title') }}</h1>
       <p>{{ t('tools.tableManage.accessDenied.desc') }}</p>
       <button @click="goHome">{{ t('tools.tableManage.accessDenied.goHome') }}</button>
     </div>
@@ -26,7 +26,7 @@
       </div>
 
       <div v-show="!showUniversalTable || showConfigPanel" class="config-panel">
-        <h1 v-if="!showUniversalTable">{{ t('tools.tableManage.page.title') }}</h1>
+        <h1 v-if="!showUniversalTable"><BarIcon icon="📈" />{{ t('tools.tableManage.page.title') }}</h1>
 
         <div class="config-actions">
           <button @click="saveCurrentConfig" class="btn-action-small">{{ t('tools.tableManage.actions.saveConfig') }}</button>
@@ -172,6 +172,7 @@
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'

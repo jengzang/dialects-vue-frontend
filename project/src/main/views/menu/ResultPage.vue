@@ -1,7 +1,7 @@
 <template>
   <div class="result-page-container">
     <div class="header-row">
-      <h1 class="tabs-title">{{ pageTitle }}</h1>
+      <h1 class="tabs-title"><BarIcon icon="📊" />{{ pageTitle }}</h1>
       <div v-if="currentTabRef === 'tab1'" class="dropdown-wrapper" style="flex:none;">
         <SimpleSelectDropdown
           v-model="selectedTab1Type"
@@ -56,6 +56,7 @@ import { showInfo, hideMessage } from '@/utils/ui/message.js';
 import ResultList from "@/main/components/result/ResultList.vue";
 import CharsAndTones from "@/main/components/result/CharsAndTones.vue";
 import SimpleSelectDropdown from "@/components/selector/SimpleSelectDropdown.vue";
+import BarIcon from '@/components/common/BarIcon.vue'
 import {generateTonesMergedData,generateCharsMergedData,func_mergeData,requestMapFitView} from "@/utils/map/MapData.js";
 import { DEFAULT_CHARACTER_TABLE } from '@/main/config/index.js'
 

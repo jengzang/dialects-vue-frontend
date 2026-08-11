@@ -1,7 +1,7 @@
 <template>
   <div class="settings-page-wrapper">
     <div class="settings-container">
-      <h1 class="page-title">{{ $t('navigation.tabs.settings') }}</h1>
+      <h1 class="page-title"><BarIcon icon="⚙️" />{{ $t('navigation.tabs.settings') }}</h1>
       <div class="setting-section">
         <h3 class="section-title">{{ $t('navigation.settings.language.title') }}</h3>
         <div class="language-options">
@@ -180,6 +180,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'

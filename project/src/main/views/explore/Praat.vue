@@ -46,7 +46,7 @@
     </div>
 
     <div class="page-header">
-      <h1 class="page-title">{{ t('praat.main.title') }}</h1>
+      <h1 class="page-title"><BarIcon icon="🎙️" />{{ t('praat.main.title') }}</h1>
       <p v-if="activeTab === 'upload'" class="page-description">{{ t('praat.main.description') }}</p>
     </div>
 
@@ -173,6 +173,7 @@
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, reactive, onBeforeUnmount, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'

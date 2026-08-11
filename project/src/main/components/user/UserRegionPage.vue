@@ -7,7 +7,7 @@
 
       <div class="page-title-group">
         <h1 class="page-title">
-          <span class="title-icon"><InlineIcon icon="🗂️" /></span>
+          <BarIcon class="title-icon" icon="🗂️" />
           <span>{{ t('user.regionPage.title') }}</span>
         </h1>
 
@@ -152,6 +152,7 @@
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'

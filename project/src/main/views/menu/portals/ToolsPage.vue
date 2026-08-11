@@ -1,6 +1,6 @@
 <template>
   <div class="tools-page">
-    <h1 class="page-title">{{ $t('tools.title') }}</h1>
+    <h1 class="page-title"><BarIcon icon="🛠️" />{{ $t('tools.title') }}</h1>
 
     <div class="tools-grid">
       <button class="entry-button" @click="handleDataCheck">
@@ -68,6 +68,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   buildLocalePath,

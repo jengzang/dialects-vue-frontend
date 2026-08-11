@@ -1,12 +1,19 @@
 <template>
   <TabsContainer
-    v-slot="{ currentTab }"
     :tabs="tabs"
     :model-value="currentTab"
     :route-value="currentTab"
     :resolve-route="resolveTabRoute"
   >
-    <div class="tab-content-inner compare-page-root">
+    <template #header>
+      <h1 class="page-title">
+        <BarIcon :icon="activePageIcon" />
+        {{ activePageTitle }}
+      </h1>
+    </template>
+
+    <template #default="{ currentTab }">
+      <div class="tab-content-inner compare-page-root">
       <!-- Tab1: 比較漢字 -->
       <div
         v-show="currentTab === 'tab1'"
@@ -511,11 +518,13 @@
       >
         <small class="hint">{{ $t('compare.messages.tab5Hint') }}</small>
       </div>
-    </div>
+      </div>
+    </template>
   </TabsContainer>
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, nextTick, reactive, ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -578,6 +587,23 @@ const tabs = computed(() => [
   { name: 'tab4', label: t('compare.tabs.tab4') },
   { name: 'tab5', label: t('compare.tabs.tab5') }
 ])
+
+const pageTitleKeys = {
+  tab1: 'navigation.pageTitles.compare.tab1',
+  tab2: 'navigation.pageTitles.compare.tab2',
+  tab4: 'navigation.pageTitles.compare.tab4',
+  tab5: 'navigation.pageTitles.compare.tab5'
+}
+
+const pageTitleIcons = {
+  tab1: '🔤',
+  tab2: '📖',
+  tab4: '📊',
+  tab5: '🎵'
+}
+
+const activePageTitle = computed(() => t(pageTitleKeys[currentTab.value] || pageTitleKeys.tab2))
+const activePageIcon = computed(() => pageTitleIcons[currentTab.value] || pageTitleIcons.tab2)
 
 // Compute limit context based on current tab
 const locationLimitContext = computed(() => {
@@ -1798,6 +1824,7 @@ export default {
 
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
 $group1-primary: #4caf50;
@@ -1809,6 +1836,16 @@ $text-primary: var(--text-dark);
 $text-muted: var(--text-lightest);
 
 /* 页面主体 */
+.page-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
 .tab-content-inner {
   display: flex;
   flex-direction: column;

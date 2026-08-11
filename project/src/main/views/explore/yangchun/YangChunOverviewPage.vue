@@ -9,7 +9,7 @@
     >
       <div class="yc-hero__copy">
         <span class="yc-eyebrow">Yangchun Dialect Atlas</span>
-        <h1>阳春方言概览</h1>
+        <h1><BarIcon icon="🌾" />阳春方言概览</h1>
         <p>
           从白话到涯话，从城镇中心到山边方言岛，阳春是两阳地区观察粤客接触、迁徙与方言分布的关键区域。
         </p>
@@ -256,6 +256,7 @@
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import {
   dialectGroups,

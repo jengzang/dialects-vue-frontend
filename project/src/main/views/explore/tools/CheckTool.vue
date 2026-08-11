@@ -4,7 +4,7 @@
     <div v-if="!fileUploaded" class="welcome-screen">
       <div class="glass-shell welcome-card">
         <div class="welcome-icon"><InlineIcon icon="📋" /></div>
-        <h1 class="title">{{ t('tools.checkTool.welcome.title') }}</h1>
+        <h1 class="title"><BarIcon icon="📋" />{{ t('tools.checkTool.welcome.title') }}</h1>
 <!--        <p class="subtitle">上傳文件開始檢查和編輯</p>-->
 
         <div class="welcome-features">
@@ -904,6 +904,7 @@
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'

@@ -85,6 +85,40 @@
       "setting": "Settings"
     }
   },
+  "pageTitles": {
+    "query": {
+      "tab1": "Character Query",
+      "tab2": "Middle Chinese Query",
+      "tab3": "Reading Query",
+      "tab4": "Tone Query"
+    },
+    "compare": {
+      "tab1": "Character Comparison",
+      "tab2": "Middle Chinese Comparison",
+      "tab4": "Tone Class Comparison",
+      "tab5": "Reading Comparison"
+    },
+    "map": {
+      "view": "Main Map",
+      "divide": "Regional Coloring",
+      "custom": "Custom Data"
+    },
+    "pho": {
+      "matrix": "Phonological System Query",
+      "custom": "Phoneme Classification",
+      "count": "Syllable Statistics",
+      "evolution": "Evolution"
+    },
+    "vocabulary": {
+      "view": "Vocabulary Query",
+      "import": "Vocabulary Upload",
+      "manage": "Vocabulary Management"
+    },
+    "yubao": {
+      "vocabulary": "Language Preservation Vocabulary",
+      "grammar": "Language Preservation Grammar"
+    }
+  },
   "tabs": {
     "home": "Home",
     "phonology": "Phonology",

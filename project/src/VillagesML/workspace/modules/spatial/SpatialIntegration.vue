@@ -2,7 +2,7 @@
 <!--  <ExploreLayout>-->
     <div class="spatial-integration-page">
 <!--      <h3 class="villagesml-subtab-title">空間分析 - 空間整合</h3>-->
-      <h1 class="page-title"><InlineIcon icon="🌐" />空間整合分析
+      <h1 class="page-title"><BarIcon icon="🌐" />空間整合分析
         <HelpIcon content="整合字符傾向與空間聚類數據。分析字符在特定聚類中的傾向偏差、空間一致性和統計顯著性。支持按字符或按聚類查詢" />
       </h1>
 
@@ -341,6 +341,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed, watch, onMounted } from 'vue'
 import SpatialMap from './SpatialMap.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'

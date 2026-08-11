@@ -1,5 +1,7 @@
 <template>
   <div class="tabs-wrapper">
+    <slot name="header"></slot>
+
     <div class="tabs ui-scrollbar--hidden">
       <!-- 额外的 tab 左侧内容插槽 -->
       <slot name="tab-extra"></slot>

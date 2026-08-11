@@ -9,7 +9,7 @@
       <template #default="{ currentTab }">
         <!-- 新的"簡介"页面 -->
         <div v-if="currentTab === 'intro'" class="thanks-container">
-          <h1 class="tabs-title">{{ $t('about.intro.title') }}</h1>
+          <h1 class="tabs-title"><BarIcon icon="📖" />{{ $t('about.intro.title') }}</h1>
           <p style=" text-align: left;">{{ $t('about.intro.description') }}</p>
           <ul class="customlist">
             <li v-for="(feature, idx) in featureList" :key="idx" class="feature-item">
@@ -54,7 +54,7 @@
 
           <p style=" text-align: left;font-weight: bold;text-decoration: underline">{{ $t('about.intro.footer') }}</p>
 
-          <h2 class="tabs-title" style="margin-top: 20px">🙏 {{ $t('about.thanks.title') }}</h2>
+          <h2 class="tabs-title" style="margin-top: 20px"><BarIcon icon="🙏" />{{ $t('about.thanks.title') }}</h2>
           <ul class="thanks-list">
             <li>
               ✔ <a href="https://mcpdict.vear.vip/" target="_blank" rel="noopener noreferrer" class="thanks-link">{{ $t('about.thanks.mcpdict') }}</a>
@@ -94,7 +94,7 @@
         <!-- 新的"建議"页面 -->
         <div v-if="currentTab === 'suggestion'" class="page2">
           <div class="suggestion-box">
-            <h1 class="tabs-title">💬 {{ $t('about.suggestion.title') }}</h1>
+            <h1 class="tabs-title"><BarIcon icon="💬" />{{ $t('about.suggestion.title') }}</h1>
             <p v-html="$t('about.suggestion.description')"></p>
             <p class="subtext">👇 {{ $t('about.suggestion.subtext') }}</p>
             <div class="card-links">
@@ -135,6 +135,7 @@
         <!-- 新的"喜歡"页面 -->
         <div v-if="currentTab === 'like'" class="cards-container">
           <h1 class="tabs-title like-author-title">
+            <BarIcon icon="❤️" />
             {{ $t('about.like.title') }}
             <span class="follow-buttons">
               <button class="follow-button zhihu-follow" @click="followClicked">
@@ -209,7 +210,7 @@
 
           <!-- 感悟部分 -->
           <div class="thoughts-container">
-            <h2 class="tabs-title" style="margin-top: 3rem">{{ $t('about.reflection.title') }}</h2>
+            <h2 class="tabs-title" style="margin-top: 3rem"><BarIcon icon="💡" />{{ $t('about.reflection.title') }}</h2>
             <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph1') }}</p>
             <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph2') }}</p>
             <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph3') }}</p>
@@ -232,6 +233,7 @@ import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import i18n from '@/i18n/index.js'
+import BarIcon from '@/components/common/BarIcon.vue'
 import SupportPopup from '@/main/components/user/popups/SupportPopup.vue'
 import TabsContainer from '@/components/common/TabsContainer.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
