@@ -102,6 +102,7 @@ export function useGisMapCore(options = {}) {
   const selectedFeatureId = ref('');
   const selectedFeatureIds = ref([]);
   const selectedVertexCount = ref(0);
+  const canDeleteSelectedVertices = ref(false);
   const isFeatureBoxSelectMode = ref(false);
   const isDrawingPanelOpen = ref(true);
   const isLayersPanelOpen = ref(false);
@@ -176,12 +177,14 @@ export function useGisMapCore(options = {}) {
       ? preferredId
       : validIds[0] || '';
     selectedVertexCount.value = 0;
+    canDeleteSelectedVertices.value = false;
   };
 
   const clearFeatureSelection = () => {
     selectedFeatureId.value = '';
     selectedFeatureIds.value = [];
     selectedVertexCount.value = 0;
+    canDeleteSelectedVertices.value = false;
   };
 
   const activeLayerFeatureItems = computed(() => activeLayerFeatures.value.map((feature, index) => ({
@@ -292,7 +295,7 @@ export function useGisMapCore(options = {}) {
       && canModifyActiveLayer.value
       && selectedFeature.value.properties?.visible !== false
       && selectedFeature.value.properties?.locked !== true
-      && (currentMode.value !== 'direct_select' || selectedVertexCount.value > 0)
+      && (currentMode.value !== 'direct_select' || canDeleteSelectedVertices.value)
     );
   });
 
@@ -441,6 +444,7 @@ export function useGisMapCore(options = {}) {
     }
     if (currentMode.value !== 'direct_select') {
       selectedVertexCount.value = 0;
+      canDeleteSelectedVertices.value = false;
     }
   };
 
@@ -449,10 +453,12 @@ export function useGisMapCore(options = {}) {
     const featureId = String(state?.featureId || '');
     if (mode !== 'direct_select' || !featureId || featureId !== selectedFeatureId.value || !activeLayerFeatureIdSet.value.has(featureId)) {
       selectedVertexCount.value = 0;
+      canDeleteSelectedVertices.value = false;
       return;
     }
     const nextCount = Number(state.selectedVertexCount);
     selectedVertexCount.value = Number.isFinite(nextCount) && nextCount > 0 ? nextCount : 0;
+    canDeleteSelectedVertices.value = selectedVertexCount.value > 0 && state.canDeleteSelectedVertices === true;
   };
 
   const normalizeFeatureSelectPayload = (featureSelection) => {
@@ -604,6 +610,7 @@ export function useGisMapCore(options = {}) {
     selectedFeatureId,
     selectedFeatureIds,
     selectedVertexCount,
+    canDeleteSelectedVertices,
     isFeatureBoxSelectMode,
     isDrawingPanelOpen,
     isLayersPanelOpen,

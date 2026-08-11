@@ -135,6 +135,7 @@
           :selected-feature-id="selectedEditorFeatureId"
           :selected-feature-ids="selectedFeatureIds"
           :selected-vertex-count="selectedVertexCount"
+          :can-delete-selected-vertices="canDeleteSelectedVertices"
           :selected-feature-batch-name="selectedFeatureBatchName"
           :selected-feature-batch-property-key="selectedFeatureBatchPropertyKey"
           :selected-feature-batch-property-value="selectedFeatureBatchPropertyValue"
@@ -771,7 +772,7 @@ const { setCommitHistory } = core;
 
 const {
   layers, activeLayerId, currentMode, currentStyleKey,
-  selectedFeatureId, selectedFeatureIds, selectedVertexCount, isFeatureBoxSelectMode,
+  selectedFeatureId, selectedFeatureIds, selectedVertexCount, canDeleteSelectedVertices, isFeatureBoxSelectMode,
   isDrawingPanelOpen, isLayersPanelOpen, isMapFullscreen,
   selectedFeatureBatchName, selectedFeatureBatchPropertyKey, selectedFeatureBatchPropertyValue,
   mapStyleOptions, activeLayer, activeLayerFeatureCollection, featureCount,

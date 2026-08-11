@@ -152,9 +152,8 @@
 }
 
 .draw-shape-edit-status {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  @include flex-col;
+  align-items: stretch;
   gap: 0.45rem;
   padding: 0.45rem 0.6rem;
   border: 1px solid rgba(var(--color-primary-rgb), 0.24);
@@ -162,6 +161,36 @@
   background: rgba(var(--color-primary-rgb), 0.08);
   color: rgba(var(--text-deep-rgb), 0.72);
   font-size: 0.78rem;
+}
+
+.draw-shape-edit-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.draw-shape-edit-target {
+  min-width: 0;
+  font-weight: 700;
+  color: var(--text-deep);
+  @include text-truncate;
+}
+
+.draw-shape-edit-count {
+  color: rgba(var(--text-deep-rgb), 0.68);
+  white-space: nowrap;
+}
+
+.draw-shape-edit-hint {
+  color: rgba(var(--text-deep-rgb), 0.68);
+}
+
+.draw-shape-edit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.4rem;
 }
 
 @media (hover: hover) and (pointer: fine) {

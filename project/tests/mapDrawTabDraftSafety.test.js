@@ -187,14 +187,21 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         <button
           data-testid="emit-direct-select-vertex"
           type="button"
-          @click="$emit('shape-edit-state-change', { mode: 'direct_select', featureId: 'feature-1', selectedVertexCount: 1 })"
+          @click="$emit('shape-edit-state-change', { mode: 'direct_select', featureId: 'feature-1', selectedVertexCount: 1, canDeleteSelectedVertices: true })"
         >
           emit selected vertex
         </button>
         <button
+          data-testid="emit-direct-select-invalid-vertex"
+          type="button"
+          @click="$emit('shape-edit-state-change', { mode: 'direct_select', featureId: 'feature-1', selectedVertexCount: 1, canDeleteSelectedVertices: false })"
+        >
+          emit invalid selected vertex
+        </button>
+        <button
           data-testid="emit-direct-select-no-vertex"
           type="button"
-          @click="$emit('shape-edit-state-change', { mode: 'direct_select', featureId: 'feature-1', selectedVertexCount: 0 })"
+          @click="$emit('shape-edit-state-change', { mode: 'direct_select', featureId: 'feature-1', selectedVertexCount: 0, canDeleteSelectedVertices: false })"
         >
           emit no selected vertex
         </button>
@@ -270,6 +277,7 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       selectedFeatureIds: { type: Array, default: () => [] },
       currentMode: { type: String, default: 'simple_select' },
       selectedVertexCount: { type: Number, default: 0 },
+      canDeleteSelectedVertices: { type: Boolean, default: false },
       canApplySelectedFeatureBatchProperty: { type: Boolean, default: false },
       isFeatureBoxSelectMode: { type: Boolean, default: false },
       canUseFeatureBoxSelect: { type: Boolean, default: false },
@@ -299,6 +307,7 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
         <span data-testid="active-layer-id">{{ activeLayer?.id || '' }}</span>
         <span data-testid="current-mode">{{ currentMode }}</span>
         <span data-testid="selected-vertex-count">{{ selectedVertexCount }}</span>
+        <span data-testid="can-delete-selected-vertices">{{ canDeleteSelectedVertices ? 'true' : 'false' }}</span>
         <button
           data-testid="draw-polygon-mode"
           type="button"
@@ -2064,6 +2073,7 @@ describe('MapDrawTab draft safety', () => {
     await flushTicks()
     expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('direct_select')
     expect(wrapper.host.querySelector('[data-testid="selected-vertex-count"]').textContent).toBe('0')
+    expect(wrapper.host.querySelector('[data-testid="can-delete-selected-vertices"]').textContent).toBe('false')
 
     const emptyDeleteEvent = new KeyboardEvent('keydown', {
       bubbles: true,
@@ -2080,6 +2090,7 @@ describe('MapDrawTab draft safety', () => {
     wrapper.host.querySelector('[data-testid="emit-direct-select-vertex"]').click()
     await flushTicks()
     expect(wrapper.host.querySelector('[data-testid="selected-vertex-count"]').textContent).toBe('1')
+    expect(wrapper.host.querySelector('[data-testid="can-delete-selected-vertices"]').textContent).toBe('true')
 
     const deleteEvent = new KeyboardEvent('keydown', {
       bubbles: true,
@@ -2094,6 +2105,43 @@ describe('MapDrawTab draft safety', () => {
     expect(wrapper.host.querySelectorAll('[data-testid="feature-row"]')).toHaveLength(1)
     expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('direct_select')
     expect(wrapper.host.querySelectorAll('[data-testid="feature-row"]')).toHaveLength(1)
+
+    wrapper.unmount()
+  })
+
+  it('does not advertise or run vertex deletion when selected vertices would invalidate geometry', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="emit-direct-select"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="emit-direct-select-invalid-vertex"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('direct_select')
+    expect(wrapper.host.querySelector('[data-testid="selected-vertex-count"]').textContent).toBe('1')
+    expect(wrapper.host.querySelector('[data-testid="can-delete-selected-vertices"]').textContent).toBe('false')
+
+    const deleteEvent = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Delete',
+    })
+    document.dispatchEvent(deleteEvent)
+    await flushTicks()
+
+    expect(deleteEvent.defaultPrevented).toBe(false)
+    expect(mocks.mapCanDeleteSelected).not.toHaveBeenCalled()
+    expect(mocks.mapDeleteSelected).not.toHaveBeenCalled()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('direct_select')
 
     wrapper.unmount()
   })

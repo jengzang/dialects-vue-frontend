@@ -170,8 +170,47 @@
             class="draw-shape-edit-status"
             data-testid="shape-edit-status"
           >
-            <span>{{ t('map.drawTab.labels.shapeEditing') }}</span>
-            <span>{{ t('map.drawTab.labels.selectedVertexCount', { count: selectedVertexCount }) }}</span>
+            <div class="draw-shape-edit-main">
+              <span
+                class="draw-shape-edit-target"
+                data-testid="shape-edit-target"
+              >
+                {{ t('map.drawTab.labels.shapeEditTarget', { name: selectedShapeEditLabel }) }}
+              </span>
+              <span
+                class="draw-shape-edit-count"
+                data-testid="shape-edit-selected-count"
+              >
+                {{ t('map.drawTab.labels.selectedVertexCount', { count: selectedVertexCount }) }}
+              </span>
+            </div>
+            <div
+              class="draw-shape-edit-hint"
+              data-testid="shape-edit-hint"
+            >
+              {{ shapeEditHintText }}
+            </div>
+            <div class="draw-shape-edit-actions">
+              <button
+                class="main-glass-button draw-tool-inline-button"
+                data-variant="secondary"
+                data-testid="shape-edit-delete-vertices"
+                type="button"
+                :disabled="!canDeleteSelectedVertices"
+                @click="$emit('delete-selected')"
+              >
+                {{ t('map.drawTab.buttons.deleteSelectedVertices') }}
+              </button>
+              <button
+                class="main-glass-button draw-tool-inline-button"
+                data-variant="secondary"
+                data-testid="shape-edit-finish"
+                type="button"
+                @click="$emit('set-mode', 'simple_select')"
+              >
+                {{ t('map.drawTab.buttons.finishShapeEdit') }}
+              </button>
+            </div>
           </div>
         </section>
 
@@ -643,6 +682,7 @@ const props = defineProps({
   canRedo: { type: Boolean, default: false },
   canEditShape: { type: Boolean, default: false },
   canDeleteSelection: { type: Boolean, default: false },
+  canDeleteSelectedVertices: { type: Boolean, default: false },
   canDuplicateFeature: { type: Boolean, default: false },
   isFeatureBoxSelectMode: { type: Boolean, default: false },
   canUseFeatureBoxSelect: { type: Boolean, default: false },
@@ -694,6 +734,22 @@ const featureTableBatchPropertyOptions = computed(() => props.featureTableColumn
   label: column.label,
   value: column.key,
 })))
+
+const selectedShapeEditLabel = computed(() => {
+  const selectedFeature = props.featureItems.find((feature) => feature.id === props.selectedFeatureId)
+  return selectedFeature?.label
+    || props.selectedFeatureProperties?.name
+    || props.selectedLayerLabel
+    || t('map.drawTab.labels.feature')
+})
+
+const shapeEditHintText = computed(() => {
+  if (props.selectedVertexCount <= 0) return t('map.drawTab.labels.shapeEditNoVertexHint')
+  if (props.canDeleteSelectedVertices) {
+    return t('map.drawTab.labels.shapeEditSelectedVertexHint', { count: props.selectedVertexCount })
+  }
+  return t('map.drawTab.labels.shapeEditCannotDeleteHint')
+})
 </script>
 
 <style scoped lang="scss">

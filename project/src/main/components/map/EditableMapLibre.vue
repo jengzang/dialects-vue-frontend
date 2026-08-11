@@ -86,6 +86,16 @@ const drawStyles = [
     },
   },
   {
+    id: 'gl-draw-midpoint-halo',
+    type: 'circle',
+    filter: ['all', ['==', 'meta', 'midpoint'], ['!=', 'mode', 'static']],
+    paint: {
+      'circle-radius': 8,
+      'circle-color': '#ffffff',
+      'circle-opacity': 0.72,
+    },
+  },
+  {
     id: 'gl-draw-midpoint',
     type: 'circle',
     filter: ['all', ['==', 'meta', 'midpoint'], ['!=', 'mode', 'static']],
@@ -106,6 +116,17 @@ const drawStyles = [
       'circle-color': '#ffffff',
       'circle-stroke-color': drawFallbackStroke,
       'circle-stroke-width': 2,
+    },
+  },
+  {
+    id: 'gl-draw-active-vertex',
+    type: 'circle',
+    filter: ['all', ['==', 'meta', 'vertex'], ['==', 'active', 'true'], ['!=', 'mode', 'static']],
+    paint: {
+      'circle-radius': 7,
+      'circle-color': drawFallbackStroke,
+      'circle-stroke-color': '#ffffff',
+      'circle-stroke-width': 3,
     },
   },
 ]
@@ -760,10 +781,12 @@ const canDeleteSelected = () => {
 
 const syncShapeEditState = () => {
   const mode = draw.value?.getMode?.() || 'simple_select'
+  const selectedVertexCount = getSelectedVertexCountFromDraw()
   emit('shape-edit-state-change', {
     mode,
     featureId: mode === 'direct_select' ? selectedFeatureId.value : '',
-    selectedVertexCount: getSelectedVertexCountFromDraw(),
+    selectedVertexCount,
+    canDeleteSelectedVertices: mode === 'direct_select' && selectedVertexCount > 0 && canDeleteSelected(),
   })
 }
 

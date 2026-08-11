@@ -268,7 +268,16 @@ describe('EditableMapLibre state flow', () => {
         id: 'polygon-1',
         type: 'Feature',
         properties: { visible: true, locked: false },
-        geometry: { type: 'Polygon', coordinates: [] },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [0, 0],
+            [2, 0],
+            [2, 2],
+            [0, 2],
+            [0, 0],
+          ]],
+        },
       }],
     })
     await nextTick()
@@ -535,6 +544,7 @@ describe('EditableMapLibre state flow', () => {
         mode: 'direct_select',
         featureId: 'polygon-1',
         selectedVertexCount: 1,
+        canDeleteSelectedVertices: true,
       },
     ])
 
@@ -572,6 +582,7 @@ describe('EditableMapLibre state flow', () => {
         mode: 'simple_select',
         featureId: '',
         selectedVertexCount: 0,
+        canDeleteSelectedVertices: false,
       },
     ])
 
@@ -743,6 +754,7 @@ describe('EditableMapLibre state flow', () => {
         mode: 'direct_select',
         featureId: 'line-1',
         selectedVertexCount: 1,
+        canDeleteSelectedVertices: true,
       },
     ])
 
@@ -845,6 +857,35 @@ describe('EditableMapLibre state flow', () => {
         mode: 'direct_select',
         featureId: 'line-1',
         selectedVertexCount: 0,
+        canDeleteSelectedVertices: false,
+      },
+    ])
+
+    wrapper.unmount()
+  })
+
+  it('reports selected vertices as not deletable when deletion would invalidate a line', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1]] },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    wrapper.exposed.selectVertex('line-1', '1')
+
+    expect(wrapper.events).toContainEqual([
+      'shape-edit-state-change',
+      {
+        mode: 'direct_select',
+        featureId: 'line-1',
+        selectedVertexCount: 1,
+        canDeleteSelectedVertices: false,
       },
     ])
 
