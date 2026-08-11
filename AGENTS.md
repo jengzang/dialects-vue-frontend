@@ -104,6 +104,7 @@ This repository has strict collaboration and change-control rules. Read this bef
 - Import the project mixins at the top of every component style block: `@use '@/styles/global/mixins' as *;`
 - Component styles must reuse the shared style foundations under `src/styles` whenever possible, including tokens, mixins, shared classes, and existing style modules.
 - Individual components should only define placement/layout details such as `padding`, `margin`, `position`, offsets, sizing, and local layout glue.
+- Visual appearance for buttons, cards, panels, shells, modal/dialog surfaces, toolbars, and state blocks should come from shared classes/components first; component-local styles should only compose those primitives and handle local placement.
 - Do not create component-local visual styling when an existing shared style, token, mixin, or common component can satisfy the need.
 - Only add component-specific visual styles when the requirement genuinely cannot be met by the shared styles or common components, and keep that exception as narrow as possible.
 - Use available mixins instead of writing the raw CSS they abstract:
