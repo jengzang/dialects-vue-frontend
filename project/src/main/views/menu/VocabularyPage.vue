@@ -97,7 +97,7 @@ const pageTitleKeyByPath = {
 }
 
 const pageTitleIconByPath = {
-  '/menu/vocabulary/view': '📚',
+  '/menu/vocabulary/view': '📋',
   '/menu/vocabulary/import': '📤',
   '/menu/vocabulary/manage': '⚙️',
 }

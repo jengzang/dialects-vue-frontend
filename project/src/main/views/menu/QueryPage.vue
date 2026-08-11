@@ -331,10 +331,10 @@ const pageTitleKeys = {
 }
 
 const pageTitleIcons = {
-  tab1: '🔤',
-  tab2: '📖',
-  tab3: '🔍',
-  tab4: '📊'
+  tab1: '🔣',
+  tab2: '📜',
+  tab3: '🗣️',
+  tab4: '🎼'
 }
 
 const activePageTitle = computed(() => t(pageTitleKeys[currentTab.value] || pageTitleKeys.tab2))

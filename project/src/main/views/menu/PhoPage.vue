@@ -78,10 +78,10 @@ const pageTitleKeys = {
 }
 
 const pageTitleIcons = {
-  phonologyMatrix: '🔍️',
+  phonologyMatrix: '⚛️',
   phonologyCustom: '📐',
   Countphos: '🧮',
-  evolution: '📈'
+  evolution: '🥧'
 }
 
 const activePageTitle = computed(() => t(pageTitleKeys[currentTab.value] || pageTitleKeys.phonologyMatrix))

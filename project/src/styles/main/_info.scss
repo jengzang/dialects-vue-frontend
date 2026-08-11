@@ -13,7 +13,9 @@
 .page-title {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  width: 100%;
   margin: 0 0 12px;
   color: var(--text-primary);
   font-size: 1.5rem;

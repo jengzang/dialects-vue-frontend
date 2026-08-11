@@ -598,9 +598,9 @@ const pageTitleKeys = {
 }
 
 const pageTitleIcons = {
-  tab1: '🔤',
-  tab2: '📖',
-  tab4: '📊',
+  tab1: '↔️',
+  tab2: '📜',
+  tab4: '📈',
   tab5: '🎵'
 }
 

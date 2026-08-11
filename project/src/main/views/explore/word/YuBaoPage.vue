@@ -463,7 +463,7 @@ const activePageTitle = computed(() => (
 ))
 
 const activePageIcon = computed(() => (
-  activeTab.value === 'vocabulary' ? '📚' : '📗'
+  activeTab.value === 'vocabulary' ? '📖' : '🗣️'
 ))
 
 // 检查输入是否有效（是否在数据列表中完全匹配）
