@@ -1,7 +1,7 @@
 <template>
   <div class="user-region-page">
-    <div class="page-header liquid-panel">
-      <button class="liquid-btn back-btn" type="button" @click="goBack">
+    <div class="page-header glass-panel">
+      <button class="glass-button back-btn" data-variant="secondary" type="button" @click="goBack">
         {{ t('common.button.back') }}
       </button>
 
@@ -26,13 +26,13 @@
       <div class="user-badge">{{ username }}</div>
     </div>
 
-    <div class="toolbar liquid-panel">
+    <div class="toolbar glass-panel">
       <div class="toolbar-actions">
-        <button class="liquid-btn btn-primary" type="button" @click="openCreateModal">
+        <button class="glass-button" data-variant="primary" type="button" @click="openCreateModal">
           <span class="btn-icon">+</span>
           {{ t('user.regionPage.actions.create') }}
         </button>
-        <button class="liquid-btn btn-secondary" type="button" @click="loadRegions">
+        <button class="glass-button" data-variant="secondary" type="button" @click="loadRegions">
           <span class="btn-icon">↻</span>
           {{ t('user.regionPage.actions.refresh') }}
         </button>
@@ -43,31 +43,32 @@
           v-model="searchQuery"
           type="text"
           :placeholder="t('user.regionPage.searchPlaceholder')"
-          class="search-input"
+          class="search-input glass-field"
+          data-shape="search"
         />
       </div>
     </div>
 
-    <div v-if="loading" class="loading-container loading-state-base status-panel liquid-panel">
+    <div v-if="loading" class="loading-container loading-state-base status-panel glass-panel">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <p>{{ t('common.label.loading') }}</p>
     </div>
 
     <div
       v-else-if="!loading && filteredRegions.length === 0"
-      class="empty-state empty-state-base status-panel liquid-panel"
+      class="empty-state empty-state-base status-panel glass-panel"
     >
       <div class="empty-icon"><InlineIcon icon="📭" /></div>
       <p class="empty-text">
         {{ searchQuery ? t('user.regionPage.empty.noMatch') : t('user.regionPage.empty.noRegions') }}
       </p>
-      <button v-if="!searchQuery" class="liquid-btn btn-primary" type="button" @click="openCreateModal">
+      <button v-if="!searchQuery" class="glass-button" data-variant="primary" type="button" @click="openCreateModal">
         {{ t('user.regionPage.empty.createFirst') }}
       </button>
     </div>
 
     <div v-else class="region-list">
-      <div v-for="region in filteredRegions" :key="region.id" class="region-card liquid-panel">
+      <div v-for="region in filteredRegions" :key="region.id" class="region-card glass-card">
         <div class="region-header">
           <div class="region-title-group">
             <h3 class="region-name">{{ region.region_name }}</h3>
@@ -82,13 +83,16 @@
 
           <div class="region-actions">
             <button
-              class="btn-icon-action"
+              class="glass-button btn-icon-action"
+              data-size="compact"
               type="button"
               :title="t('common.button.edit')"
               @click="openEditModal(region)"
             ><InlineIcon icon="✏️" /></button>
             <button
-              class="btn-icon-action danger"
+              class="glass-button btn-icon-action"
+              data-size="compact"
+              data-variant="danger"
               type="button"
               :title="t('common.button.delete')"
               :disabled="deletingRegions[region.region_name]"
@@ -516,83 +520,6 @@ $region-text: var(--text-deep);
 $region-muted: var(--text-slate);
 $region-soft: var(--text-slate);
 $region-accent: var(--color-primary);
-$region-danger: var(--color-error-light);
-$region-success: var(--color-success);
-$region-border: rgba(var(--text-slate-light-rgb), 0.22);
-$region-glass-border: var(--glass-60);
-
-@mixin glass-panel($radius: 24px, $padding: 18px) {
-  position: relative;
-  padding: $padding;
-  border: 1px solid $region-glass-border;
-  border-radius: $radius;
-  background:
-    linear-gradient(135deg, var(--glass-80), var(--glass-40)),
-    linear-gradient(180deg, var(--glass-70), var(--glass-30));
-  box-shadow:
-    0 24px 70px rgba(var(--color-shadow-rgb), 0.12),
-    0 8px 22px rgba(var(--color-shadow-rgb), 0.08),
-    inset 0 1px 0 var(--glass-80),
-    inset 0 -1px 0 var(--glass-20);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-}
-
-@mixin control-glass {
-  border: 1px solid var(--glass-60);
-  background:
-    linear-gradient(135deg, var(--glass-80), var(--glass-40)),
-    var(--glass-50);
-  box-shadow:
-    inset 0 1px 0 var(--glass-80),
-    0 8px 22px rgba(var(--color-shadow-rgb), 0.08);
-  backdrop-filter: blur(18px) saturate(180%);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-}
-
-@mixin button-base {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 38px;
-  padding: 9px 16px;
-  border: none;
-  border-radius: 14px;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 1;
-  white-space: nowrap;
-  cursor: pointer;
-  user-select: none;
-  transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    background-color 0.18s ease,
-    border-color 0.18s ease,
-    opacity 0.18s ease;
-
-  &:hover:not(:disabled) {
-    transform: translateY(-1px);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0) scale(0.985);
-  }
-
-  &:disabled {
-    opacity: 0.52;
-    cursor: not-allowed;
-    pointer-events: none;
-    box-shadow: none;
-  }
-
-  &:focus-visible {
-    outline: none;
-    box-shadow:
-      0 0 0 3px rgba(var(--color-primary-rgb), 0.18),
-      0 10px 26px rgba(var(--color-shadow-rgb), 0.12);
-  }
-}
 
 .user-region-page {
   position: relative;
@@ -635,10 +562,6 @@ $region-glass-border: var(--glass-60);
     background-size: 42px 42px;
     mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.32), transparent 72%);
   }
-}
-
-.liquid-panel {
-  @include glass-panel;
 }
 
 .page-header {
@@ -731,43 +654,8 @@ $region-glass-border: var(--glass-60);
   }
 }
 
-.liquid-btn {
-  @include button-base;
-}
-
-.back-btn,
-.btn-secondary {
-  @include control-glass;
-
-  color: $region-text;
-
-  &:hover:not(:disabled) {
-    border-color: rgba(var(--color-primary-rgb), 0.3);
-    color: $region-accent;
-    background:
-      linear-gradient(135deg, var(--glass-90), var(--glass-50)),
-      rgba(var(--color-primary-rgb), 0.08);
-  }
-}
-
 .back-btn:hover:not(:disabled) {
   transform: translateX(-2px);
-}
-
-.btn-primary {
-  color: var(--action-primary-text);
-  background:
-    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.96), rgba(0, 81, 213, 0.92)),
-    $region-accent;
-  box-shadow:
-    inset 0 1px 0 var(--glass-30),
-    0 12px 28px rgba(var(--color-primary-rgb), 0.26);
-
-  &:hover:not(:disabled) {
-    box-shadow:
-      inset 0 1px 0 var(--glass-30),
-      0 16px 36px rgba(var(--color-primary-rgb), 0.34);
-  }
 }
 
 .btn-icon {
@@ -797,31 +685,9 @@ $region-glass-border: var(--glass-60);
 }
 
 .search-input {
-  @include control-glass;
-
   width: 100%;
   height: 42px;
-  padding: 10px 15px;
-  border-radius: 15px;
-  color: $region-text;
   font-size: 14px;
-  transition:
-    border-color 0.18s ease,
-    box-shadow 0.18s ease,
-    background-color 0.18s ease;
-
-  &::placeholder {
-    color: $region-soft;
-  }
-
-  &:focus {
-    outline: none;
-    border-color: rgba(var(--color-primary-rgb), 0.56);
-    background: var(--glass-80);
-    box-shadow:
-      0 0 0 4px rgba(var(--color-primary-rgb), 0.11),
-      inset 0 1px 0 var(--glass-80);
-  }
 }
 
 .status-panel {
@@ -889,11 +755,6 @@ $region-glass-border: var(--glass-60);
 
   &:hover {
     transform: translateY(-2px);
-    border-color: rgba(var(--color-primary-rgb), 0.24);
-    box-shadow:
-      0 26px 76px rgba(var(--color-shadow-rgb), 0.14),
-      0 12px 28px rgba(var(--color-primary-rgb), 0.08),
-      inset 0 1px 0 var(--glass-80);
 
     &::before {
       opacity: 1;
@@ -934,54 +795,11 @@ $region-glass-border: var(--glass-60);
 }
 
 .btn-icon-action {
-  @include control-glass;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   width: 34px;
   height: 34px;
   padding: 0;
-  border-radius: var(--radius-md);
   font-size: 15px;
-  cursor: pointer;
-  transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    border-color 0.18s ease,
-    background-color 0.18s ease;
-
-  &:hover:not(:disabled) {
-    transform: translateY(-1px);
-    border-color: rgba(var(--color-primary-rgb), 0.32);
-    background:
-      linear-gradient(135deg, var(--glass-90), var(--glass-50)),
-      rgba(var(--color-primary-rgb), 0.08);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0) scale(0.98);
-  }
-
-  &:disabled {
-    opacity: 0.56;
-    cursor: not-allowed;
-    pointer-events: none;
-  }
-
-  &.danger {
-    border-color: rgba(var(--color-error-light-rgb), 0.2);
-    background:
-      linear-gradient(135deg, var(--glass-70), var(--glass-40)),
-      rgba(var(--color-error-light-rgb), 0.08);
-
-    &:hover:not(:disabled) {
-      border-color: rgba(var(--color-error-light-rgb), 0.38);
-      background:
-        linear-gradient(135deg, var(--glass-80), var(--glass-40)),
-        rgba(var(--color-error-light-rgb), 0.13);
-    }
-  }
+  --glass-button-border-radius: var(--radius-md);
 }
 
 .ui-loading--inline {
@@ -1163,7 +981,8 @@ $region-glass-border: var(--glass-60);
     padding: 8px;
   }
 
-  .liquid-panel {
+  .glass-panel,
+  .glass-card {
     border-radius: 18px;
   }
 
@@ -1174,7 +993,7 @@ $region-glass-border: var(--glass-60);
     padding: 14px;
   }
 
-  .liquid-btn {
+  .glass-button {
     width: 100%;
     min-height: 38px;
     padding-inline: 10px;

@@ -1,8 +1,8 @@
 <template>
   <div class="user-data-page">
-    <div class="page-header liquid-panel">
+    <div class="page-header glass-panel">
       <div class="header-left">
-        <button class="liquid-btn btn-back" type="button" @click="goBack">
+        <button class="glass-button btn-back" data-variant="secondary" type="button" @click="goBack">
           {{ t('common.button.back') }}
         </button>
         <h1>
@@ -12,45 +12,48 @@
         </h1>
       </div>
       <div class="stats">
-        <span>{{ t('user.dataPage.stats.totalRows', { count: totalCount }) }}</span>
-        <span>{{ t('user.dataPage.stats.selectedRows', { count: selectedRecords.length }) }}</span>
+        <span class="glass-subpanel stat-chip">{{ t('user.dataPage.stats.totalRows', { count: totalCount }) }}</span>
+        <span class="glass-subpanel stat-chip">{{ t('user.dataPage.stats.selectedRows', { count: selectedRecords.length }) }}</span>
       </div>
     </div>
 
-    <div class="toolbar liquid-panel">
+    <div class="toolbar glass-panel">
       <div class="toolbar-left">
-        <button class="liquid-btn btn-primary" type="button" @click="openBatchCreateModal"><InlineIcon icon="➕" />{{ t('user.dataPage.toolbar.batchAdd') }}
+        <button class="glass-button" data-variant="primary" type="button" @click="openBatchCreateModal"><InlineIcon icon="➕" />{{ t('user.dataPage.toolbar.batchAdd') }}
         </button>
         <button
-          class="liquid-btn btn-warning"
+          class="glass-button"
+          data-variant="secondary"
           type="button"
           :disabled="selectedRecords.length === 0"
           @click="handleBatchEdit"
         ><InlineIcon icon="✏️" />{{ t('user.dataPage.toolbar.batchEdit') }}
         </button>
         <button
-          class="liquid-btn btn-danger"
+          class="glass-button"
+          data-variant="danger"
           type="button"
           :disabled="selectedRecords.length === 0"
           @click="handleBatchDelete"
         ><InlineIcon icon="🗑️" />{{ t('user.dataPage.toolbar.batchDelete') }}
         </button>
-        <button class="liquid-btn btn-secondary" type="button" @click="fetchData"><InlineIcon icon="🔄" />{{ t('user.dataPage.toolbar.refresh') }}
+        <button class="glass-button" data-variant="secondary" type="button" @click="fetchData"><InlineIcon icon="🔄" />{{ t('user.dataPage.toolbar.refresh') }}
         </button>
       </div>
       <div class="toolbar-right">
         <input
           v-model="searchQuery"
-          class="search-input liquid-input"
+          class="search-input glass-field"
+          data-shape="search"
           :placeholder="t('user.dataPage.searchPlaceholder')"
           @input="handleSearch"
         />
       </div>
     </div>
 
-    <div class="table-container liquid-panel">
+    <div class="table-container glass-panel">
       <div v-if="loading" class="loading-overlay">
-        <div class="loading-content">
+        <div class="loading-content glass-panel">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <div class="loading-text">{{ t('common.label.loading') }}</div>
         </div>
@@ -102,7 +105,7 @@
             <td class="cell-note">{{ record.說明 || '-' }}</td>
             <td>{{ formatDate(record.created_at) }}</td>
             <td>
-              <button class="liquid-btn btn-edit" type="button" @click="openEditModal(record)">
+              <button class="glass-button btn-edit" data-size="compact" data-variant="primary" type="button" @click="openEditModal(record)">
                 {{ t('common.button.edit') }}
               </button>
             </td>
@@ -111,7 +114,7 @@
       </table>
     </div>
 
-    <div v-if="filteredData.length > 0" class="pagination liquid-panel">
+    <div v-if="filteredData.length > 0" class="pagination glass-panel">
       <div class="pagination-info">
         {{
           t('user.dataPage.pagination.showing', {
@@ -122,10 +125,10 @@
         }}
       </div>
       <div class="pagination-controls">
-        <button class="btn-page" type="button" :disabled="currentPage === 1" @click="goToPage(1)">
+        <button class="glass-button btn-page" data-size="compact" type="button" :disabled="currentPage === 1" @click="goToPage(1)">
           {{ t('user.dataPage.pagination.first') }}
         </button>
-        <button class="btn-page" type="button" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">
+        <button class="glass-button btn-page" data-size="compact" type="button" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">
           {{ t('user.dataPage.pagination.previous') }}
         </button>
         <div class="page-numbers">
@@ -133,16 +136,18 @@
             v-for="page in visiblePages"
             :key="page"
             type="button"
-            :class="['btn-page', { active: page === currentPage }]"
+            :class="['glass-button', 'btn-page', { active: page === currentPage }]"
+            data-size="compact"
+            :data-active="page === currentPage ? 'true' : undefined"
             @click="goToPage(page)"
           >
             {{ page }}
           </button>
         </div>
-        <button class="btn-page" type="button" :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)">
+        <button class="glass-button btn-page" data-size="compact" type="button" :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)">
           {{ t('user.dataPage.pagination.next') }}
         </button>
-        <button class="btn-page" type="button" :disabled="currentPage === totalPages" @click="goToPage(totalPages)">
+        <button class="glass-button btn-page" data-size="compact" type="button" :disabled="currentPage === totalPages" @click="goToPage(totalPages)">
           {{ t('user.dataPage.pagination.last') }}
         </button>
       </div>
@@ -181,23 +186,23 @@
           <tbody>
             <tr v-for="(row, index) in batchEditRows" :key="index">
               <td>{{ index + 1 }}</td>
-              <td><input v-model="row.簡稱" :placeholder="t('user.dataPage.form.shortName')" /></td>
-              <td><input v-model="row.音典分區" :placeholder="t('user.dataPage.form.regionPlaceholder')" /></td>
-              <td><input v-model="row.經緯度" :placeholder="t('user.dataPage.form.coordinatesPlaceholder')" /></td>
-              <td><input v-model="row.聲韻調" :placeholder="t('user.dataPage.form.phonologyPlaceholder')" /></td>
-              <td><input v-model="row.特徵" :placeholder="t('user.dataPage.form.featurePlaceholder')" /></td>
-              <td><input v-model="row.值" :placeholder="t('user.dataPage.form.valuePlaceholder')" /></td>
-              <td><input v-model="row.說明" :placeholder="t('user.dataPage.form.notePlaceholder')" /></td>
+              <td><input v-model="row.簡稱" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.shortName')" /></td>
+              <td><input v-model="row.音典分區" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.regionPlaceholder')" /></td>
+              <td><input v-model="row.經緯度" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.coordinatesPlaceholder')" /></td>
+              <td><input v-model="row.聲韻調" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.phonologyPlaceholder')" /></td>
+              <td><input v-model="row.特徵" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.featurePlaceholder')" /></td>
+              <td><input v-model="row.值" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.valuePlaceholder')" /></td>
+              <td><input v-model="row.說明" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.notePlaceholder')" /></td>
             </tr>
           </tbody>
         </table>
       </div>
       <template #footer>
         <div class="user-data-modal-footer">
-          <button class="liquid-btn btn-primary" type="button" :disabled="validBatchEditRows.length === 0" @click="submitBatchEdit">
+          <button class="glass-button" data-variant="primary" type="button" :disabled="validBatchEditRows.length === 0" @click="submitBatchEdit">
             {{ t('user.dataPage.batchEdit.save', { count: validBatchEditRows.length }) }}
           </button>
-          <button class="liquid-btn btn-secondary" type="button" @click="closeBatchEditModal">
+          <button class="glass-button" data-variant="secondary" type="button" @click="closeBatchEditModal">
             {{ t('common.button.cancel') }}
           </button>
         </div>
@@ -213,9 +218,9 @@
     >
       <p class="hint"><InlineIcon icon="💡" />{{ t('user.dataPage.batchCreate.hint') }}</p>
       <div class="batch-table-controls">
-        <button class="liquid-btn btn-add-row" type="button" @click="addBatchRow"><InlineIcon icon="➕" />{{ t('user.dataPage.batchCreate.addRow') }}
+        <button class="glass-button" data-variant="primary" type="button" @click="addBatchRow"><InlineIcon icon="➕" />{{ t('user.dataPage.batchCreate.addRow') }}
         </button>
-        <button class="liquid-btn btn-clear" type="button" @click="clearBatchRows"><InlineIcon icon="🗑️" />{{ t('user.dataPage.batchCreate.clear') }}
+        <button class="glass-button" data-variant="secondary" type="button" @click="clearBatchRows"><InlineIcon icon="🗑️" />{{ t('user.dataPage.batchCreate.clear') }}
         </button>
         <span class="row-count">
           {{ t('user.dataPage.batchCreate.currentRows', { count: batchRows.length }) }}
@@ -239,15 +244,15 @@
           <tbody>
             <tr v-for="(row, index) in batchRows" :key="index">
               <td>{{ index + 1 }}</td>
-              <td><input v-model="row.簡稱" :placeholder="t('user.dataPage.form.shortName')" /></td>
-              <td><input v-model="row.音典分區" :placeholder="t('user.dataPage.form.regionPlaceholder')" /></td>
-              <td><input v-model="row.經緯度" :placeholder="t('user.dataPage.form.coordinatesPlaceholder')" /></td>
-              <td><input v-model="row.聲韻調" :placeholder="t('user.dataPage.form.phonologyPlaceholder')" /></td>
-              <td><input v-model="row.特徵" :placeholder="t('user.dataPage.form.featurePlaceholder')" /></td>
-              <td><input v-model="row.值" :placeholder="t('user.dataPage.form.valuePlaceholder')" /></td>
-              <td><input v-model="row.說明" :placeholder="t('user.dataPage.form.notePlaceholder')" /></td>
+              <td><input v-model="row.簡稱" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.shortName')" /></td>
+              <td><input v-model="row.音典分區" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.regionPlaceholder')" /></td>
+              <td><input v-model="row.經緯度" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.coordinatesPlaceholder')" /></td>
+              <td><input v-model="row.聲韻調" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.phonologyPlaceholder')" /></td>
+              <td><input v-model="row.特徵" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.featurePlaceholder')" /></td>
+              <td><input v-model="row.值" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.valuePlaceholder')" /></td>
+              <td><input v-model="row.說明" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.notePlaceholder')" /></td>
               <td>
-                <button class="btn-remove" type="button" @click="removeBatchRow(index)">×</button>
+                <button class="glass-button btn-remove" data-size="compact" data-variant="danger" type="button" @click="removeBatchRow(index)">×</button>
               </td>
             </tr>
           </tbody>
@@ -255,10 +260,10 @@
       </div>
       <template #footer>
         <div class="user-data-modal-footer">
-          <button class="liquid-btn btn-primary" type="button" :disabled="validBatchRows.length === 0" @click="submitBatchCreate">
+          <button class="glass-button" data-variant="primary" type="button" :disabled="validBatchRows.length === 0" @click="submitBatchCreate">
             {{ t('user.dataPage.batchCreate.submit', { count: validBatchRows.length }) }}
           </button>
-          <button class="liquid-btn btn-secondary" type="button" @click="closeBatchCreateModal">
+          <button class="glass-button" data-variant="secondary" type="button" @click="closeBatchCreateModal">
             {{ t('common.button.cancel') }}
           </button>
         </div>
@@ -274,38 +279,38 @@
     >
       <div class="form-group">
         <label>{{ t('user.dataPage.table.shortNameRequired') }}</label>
-        <input v-model="editingRecord.簡稱" />
+        <input v-model="editingRecord.簡稱" class="glass-field" />
       </div>
       <div class="form-group">
         <label>{{ t('user.dataPage.table.regionRequired') }}</label>
-        <input v-model="editingRecord.音典分區" />
+        <input v-model="editingRecord.音典分區" class="glass-field" />
       </div>
       <div class="form-group">
         <label>{{ t('user.dataPage.table.coordinatesRequired') }}</label>
-        <input v-model="editingRecord.經緯度" :placeholder="t('user.dataPage.form.coordinatesPlaceholder')" />
+        <input v-model="editingRecord.經緯度" class="glass-field" :placeholder="t('user.dataPage.form.coordinatesPlaceholder')" />
       </div>
       <div class="form-group">
         <label>{{ t('user.dataPage.table.phonology') }}</label>
-        <input v-model="editingRecord.聲韻調" />
+        <input v-model="editingRecord.聲韻調" class="glass-field" />
       </div>
       <div class="form-group">
         <label>{{ t('user.dataPage.table.featureRequired') }}</label>
-        <input v-model="editingRecord.特徵" />
+        <input v-model="editingRecord.特徵" class="glass-field" />
       </div>
       <div class="form-group">
         <label>{{ t('user.dataPage.table.valueRequired') }}</label>
-        <input v-model="editingRecord.值" />
+        <input v-model="editingRecord.值" class="glass-field" />
       </div>
       <div class="form-group">
         <label>{{ t('user.dataPage.table.note') }}</label>
-        <textarea v-model="editingRecord.說明" rows="3"></textarea>
+        <textarea v-model="editingRecord.說明" class="glass-field" rows="3"></textarea>
       </div>
       <template #footer>
         <div class="user-data-modal-footer">
-          <button class="liquid-btn btn-primary" type="button" @click="submitEdit">
+          <button class="glass-button" data-variant="primary" type="button" @click="submitEdit">
             {{ t('common.button.save') }}
           </button>
-          <button class="liquid-btn btn-secondary" type="button" @click="closeEditModal">
+          <button class="glass-button" data-variant="secondary" type="button" @click="closeEditModal">
             {{ t('common.button.cancel') }}
           </button>
         </div>
@@ -761,84 +766,7 @@ onMounted(() => {
 
 $user-text: var(--text-deep);
 $user-muted: var(--text-slate);
-$user-border: rgba(var(--text-slate-light-rgb), 0.24);
-$user-glass-border: var(--glass-60);
 $user-accent: var(--color-primary);
-$user-danger: var(--color-error-light);
-$user-warning: var(--color-warning);
-$user-success: var(--color-success);
-
-@mixin glass-panel($radius: 24px, $padding: 18px) {
-  position: relative;
-  padding: $padding;
-  border: 1px solid $user-glass-border;
-  border-radius: $radius;
-  background:
-    linear-gradient(135deg, var(--glass-80), var(--glass-40)),
-    linear-gradient(180deg, var(--glass-70), var(--glass-30));
-  box-shadow:
-    0 24px 70px rgba(var(--color-shadow-rgb), 0.12),
-    0 8px 22px rgba(var(--color-shadow-rgb), 0.08),
-    inset 0 1px 0 var(--glass-80),
-    inset 0 -1px 0 var(--glass-30);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-}
-
-@mixin control-glass {
-  border: 1px solid var(--glass-60);
-  background:
-    linear-gradient(135deg, var(--glass-80), var(--glass-40)),
-    var(--glass-60);
-  box-shadow:
-    inset 0 1px 0 var(--glass-80),
-    0 8px 22px rgba(var(--color-shadow-rgb), 0.08);
-  backdrop-filter: blur(18px) saturate(180%);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-}
-
-@mixin liquid-button-base {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 38px;
-  padding: 9px 16px;
-  border: none;
-  border-radius: 14px;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 1;
-  white-space: nowrap;
-  cursor: pointer;
-  user-select: none;
-  transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    background-color 0.18s ease,
-    border-color 0.18s ease,
-    opacity 0.18s ease;
-
-  &:hover:not(:disabled) {
-    transform: translateY(-1px);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0) scale(0.985);
-  }
-
-  &:disabled {
-    opacity: 0.48;
-    cursor: not-allowed;
-    box-shadow: none;
-  }
-
-  &:focus-visible {
-    outline: none;
-    box-shadow:
-      0 0 0 3px rgba(var(--color-primary-rgb), 0.18),
-      0 10px 26px rgba(var(--color-shadow-rgb), 0.12);
-  }
-}
 
 .user-data-page {
   position: relative;
@@ -880,10 +808,6 @@ $user-success: var(--color-success);
     background-size: 42px 42px;
     mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.32), transparent 72%);
   }
-}
-
-.liquid-panel {
-  @include glass-panel;
 }
 
 .page-header {
@@ -946,17 +870,15 @@ $user-success: var(--color-success);
   color: $user-muted;
   font-size: 14px;
   font-weight: 700;
+}
 
-  span {
-    @include control-glass;
-
-    display: inline-flex;
-    align-items: center;
-    min-height: 34px;
-    padding: 7px 12px;
-    color: var(--text-deep);
-    border-radius: var(--radius-pill);
-  }
+.stat-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 7px 12px;
+  color: var(--text-deep);
+  --glass-subpanel-radius: var(--radius-pill);
 }
 
 .toolbar {
@@ -979,125 +901,23 @@ $user-success: var(--color-success);
   max-width: 420px;
 }
 
-.liquid-btn {
-  @include liquid-button-base;
-}
-
-.btn-back,
-.btn-secondary,
-.btn-clear {
-  @include control-glass;
-
-  color: $user-text;
-
-  &:hover:not(:disabled) {
-    border-color: rgba(var(--color-primary-rgb), 0.28);
-    background:
-      linear-gradient(135deg, var(--glass-90), var(--glass-50)),
-      rgba(var(--color-primary-rgb), 0.08);
-  }
-}
-
 .btn-back:hover:not(:disabled) {
   transform: translateX(-2px);
 }
 
-.btn-primary {
-  color: var(--action-primary-text);
-  background:
-    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.96), rgba(0, 81, 213, 0.92)),
-    $user-accent;
-  box-shadow:
-    inset 0 1px 0 var(--glass-30),
-    0 12px 28px rgba(var(--color-primary-rgb), 0.26);
-
-  &:hover:not(:disabled) {
-    box-shadow:
-      inset 0 1px 0 var(--glass-30),
-      0 16px 36px rgba(var(--color-primary-rgb), 0.34);
-  }
-}
-
-.btn-warning {
-  color: var(--text-white);
-  background:
-    linear-gradient(135deg, rgba(var(--color-warning-rgb), 0.96), rgba(255, 107, 0, 0.9)),
-    $user-warning;
-  box-shadow:
-    inset 0 1px 0 var(--glass-30),
-    0 12px 28px rgba(var(--color-warning-rgb), 0.22);
-}
-
-.btn-danger {
-  color: var(--text-white);
-  background:
-    linear-gradient(135deg, rgba(var(--color-error-light-rgb), 0.96), rgba(var(--color-error-rgb), 0.92)),
-    $user-danger;
-  box-shadow:
-    inset 0 1px 0 var(--glass-30),
-    0 12px 28px rgba(var(--color-error-light-rgb), 0.22);
-}
-
-.btn-add-row {
-  color: var(--text-white);
-  background:
-    linear-gradient(135deg, rgba(var(--color-success-rgb), 0.96), rgba(40, 167, 69, 0.9)),
-    $user-success;
-  box-shadow:
-    inset 0 1px 0 var(--glass-30),
-    0 12px 28px rgba(var(--color-success-rgb), 0.22);
-}
-
 .btn-edit {
   min-height: 30px;
-  padding: 7px 12px;
-  border-radius: 11px;
-  color: var(--action-primary-text);
-  font-size: 12px;
-  background:
-    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.96), rgba(0, 81, 213, 0.92)),
-    $user-accent;
-  box-shadow:
-    inset 0 1px 0 var(--glass-30),
-    0 8px 18px rgba(var(--color-primary-rgb), 0.24);
+  --glass-button-border-radius: 11px;
 }
 
-.liquid-input,
 .form-group input,
 .form-group textarea,
 .batch-table input {
   width: 100%;
-  border: 1px solid rgba(var(--text-slate-light-rgb), 0.28);
-  color: $user-text;
-  background:
-    linear-gradient(135deg, var(--glass-80), var(--glass-50)),
-    var(--glass-60);
-  box-shadow:
-    inset 0 1px 0 var(--glass-70),
-    0 8px 18px rgba(var(--color-shadow-rgb), 0.04);
-  transition:
-    border-color 0.18s ease,
-    box-shadow 0.18s ease,
-    background-color 0.18s ease;
-
-  &::placeholder {
-    color: var(--text-slate);
-  }
-
-  &:focus {
-    outline: none;
-    border-color: rgba(var(--color-primary-rgb), 0.56);
-    background: var(--glass-90);
-    box-shadow:
-      0 0 0 4px rgba(var(--color-primary-rgb), 0.11),
-      inset 0 1px 0 var(--glass-80);
-  }
 }
 
 .search-input {
   height: 42px;
-  padding: 10px 15px;
-  border-radius: 15px;
   font-size: 14px;
 }
 
@@ -1120,11 +940,11 @@ $user-success: var(--color-success);
 }
 
 .loading-content {
-  @include glass-panel(20px, 18px 22px);
-
   @include flex-col;
   align-items: center;
   gap: 14px;
+  padding: 18px 22px;
+  --glass-panel-radius: 20px;
 }
 
 .loading-text {
@@ -1265,33 +1085,8 @@ $user-success: var(--color-success);
 }
 
 .btn-page {
-  @include liquid-button-base;
-  @include control-glass;
-
   min-width: 38px;
   min-height: 36px;
-  padding: 8px 12px;
-  color: var(--text-dark);
-  font-size: 13px;
-
-  &:hover:not(:disabled) {
-    border-color: rgba(var(--color-primary-rgb), 0.38);
-    color: $user-accent;
-    background:
-      linear-gradient(135deg, var(--glass-90), var(--glass-50)),
-      rgba(var(--color-primary-rgb), 0.08);
-  }
-
-  &.active {
-    color: var(--action-primary-text);
-    border-color: rgba(var(--color-primary-rgb), 0.45);
-    background:
-      linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.96), rgba(0, 81, 213, 0.92)),
-      $user-accent;
-    box-shadow:
-      inset 0 1px 0 var(--glass-30),
-      0 12px 24px rgba(var(--color-primary-rgb), 0.24);
-  }
 }
 
 .hint {
@@ -1376,8 +1171,6 @@ $user-success: var(--color-success);
   input {
     min-width: 0;
     height: 34px;
-    padding: 7px 9px;
-    border-radius: var(--radius-md);
     font-size: 13px;
   }
 
@@ -1410,33 +1203,11 @@ $user-success: var(--color-success);
 }
 
 .btn-remove {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   width: 28px;
   height: 28px;
-  border: none;
-  border-radius: var(--radius-md);
-  color: var(--text-white);
+  min-height: 28px;
   font-size: 18px;
   line-height: 1;
-  cursor: pointer;
-  background:
-    linear-gradient(135deg, rgba(var(--color-error-light-rgb), 0.96), rgba(var(--color-error-rgb), 0.92)),
-    $user-danger;
-  box-shadow:
-    inset 0 1px 0 var(--glass-20),
-    0 8px 18px rgba(var(--color-error-light-rgb), 0.2);
-  transition:
-    transform 0.16s ease,
-    box-shadow 0.16s ease;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow:
-      inset 0 1px 0 var(--glass-30),
-      0 12px 24px rgba(var(--color-error-light-rgb), 0.26);
-  }
 }
 
 .form-group {
@@ -1452,8 +1223,6 @@ $user-success: var(--color-success);
 
   input,
   textarea {
-    padding: 10px 12px;
-    border-radius: 13px;
     font-size: 14px;
   }
 
@@ -1541,7 +1310,7 @@ $user-success: var(--color-success);
     min-width: 0;
   }
 
-  .liquid-btn {
+  .glass-button {
     padding-inline: 10px;
     font-size: 13px;
   }
@@ -1653,7 +1422,7 @@ $user-success: var(--color-success);
     gap: 6px;
   }
 
-  .liquid-btn {
+  .glass-button {
     min-height: 34px;
     padding: 7px 8px;
     font-size: 12px;

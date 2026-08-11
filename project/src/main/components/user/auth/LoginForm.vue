@@ -3,7 +3,8 @@
     <h3 class="form-title">
       {{ $t('auth.login.title') }}
       <button
-        class="benefit-circle-btn"
+        class="glass-button auth-benefit-button"
+        data-size="compact"
         @click="$emit('showBenefits')"
         :title="$t('auth.login.viewBenefits')"
       ><InlineIcon icon="🎁" /></button>
@@ -54,7 +55,7 @@
 
     <!-- Submit Button -->
     <div class="form-row">
-      <button class="btn-search" @click="handleSubmit" :disabled="loading">
+      <button class="glass-button auth-submit-button" data-variant="primary" @click="handleSubmit" :disabled="loading">
         <span v-if="loading" class="ui-loading--inline" aria-hidden="true">↻</span>
         <span v-else>{{ $t('auth.login.button') }}</span>
       </button>
@@ -135,15 +136,10 @@ watch(() => props.loginMode, () => {
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
 
-$primary-blue: var(--color-primary);
-$primary-blue-dark: var(--color-primary-hover);
 $success-green: var(--color-success);
 $title-color: var(--text-primary);
 $error-color: red;
-$white: var(--action-primary-text);
-$transition-fast: 0.2s;
-$transition-medium: 0.3s;
-$smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
+
 .login-form {
   padding: 12px;
   text-align: center;
@@ -166,30 +162,8 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   margin: 12px 0;
 }
 
-.btn-search {
-  @include flex-center;
-
-  gap: 8px;
-  padding: 12px 24px;
-  color: $white;
+.auth-submit-button {
   font-size: 17px;
-  cursor: pointer;
-  background-color: $primary-blue;
-  border: none;
-  border-radius: var(--radius-sm2);
-  transition:
-    background-color $transition-medium,
-    transform $transition-fast;
-
-  &:hover:not(:disabled) {
-    background-color: $primary-blue-dark;
-    transform: scale(1.04);
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.7;
-  }
 
   @media (max-aspect-ratio: 1/1) {
     width: 100%;
@@ -217,31 +191,13 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   color: $success-green;
 }
 
-.benefit-circle-btn {
-  @include flex-center;
-
+.auth-benefit-button {
   width: 35px;
   height: 35px;
+  min-height: 35px;
   padding: 0;
   font-size: 20px;
   line-height: 1;
-  cursor: pointer;
-  user-select: none;
-  background-color: $white;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: var(--radius-full);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  transition: all $transition-fast $smooth-easing;
-
-  &:hover {
-    border-color: rgba(var(--color-warning-rgb), 0.3);
-    box-shadow: 0 4px 12px rgba(var(--color-warning-rgb), 0.15);
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-    transform: translateY(0) scale(0.96);
-  }
+  --glass-button-border-radius: var(--radius-full);
 }
 </style>
