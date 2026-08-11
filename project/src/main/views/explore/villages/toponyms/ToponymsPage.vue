@@ -1,5 +1,5 @@
 <template>
-  <main class="toponyms-page glass-container glass-container-shell">
+  <main class="toponyms-page glass-container glass-shell">
     <section class="toponyms-page__controls glass-panel">
       <div class="toponyms-page__controls-inner glass-subpanel">
         <div class="toponyms-page__toolbar-copy">

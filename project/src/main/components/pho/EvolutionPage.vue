@@ -1501,14 +1501,14 @@ $portrait-ratio: 1;
 
 /* 控制面板 */
 .glass-panel {
-  --main-glass-panel-background: var(--glass-60);
-  --main-glass-panel-backdrop-filter: blur(12px);
-  --main-glass-panel-border-radius: var(--radius-lg);
-  --main-glass-panel-border: 1px solid var(--glass-30);
-  --main-glass-panel-shadow:
+  --glass-panel-background: var(--glass-60);
+  --glass-panel-backdrop-filter: blur(12px);
+  --glass-panel-radius: var(--radius-lg);
+  --glass-panel-border: 1px solid var(--glass-30);
+  --glass-panel-shadow:
     0 4px 16px rgba(0, 0, 0, 0.08),
     inset 0 0 0 1px var(--glass-30);
-  --main-glass-panel-hover-shadow:
+  --glass-panel-hover-shadow:
     0 4px 16px rgba(0, 0, 0, 0.08),
     inset 0 0 0 1px var(--glass-30);
 

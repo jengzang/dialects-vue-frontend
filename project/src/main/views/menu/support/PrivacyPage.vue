@@ -12,7 +12,7 @@ const copyCitation = () => {
 </script>
 
 <template>
-  <div class="privacy-content glass-container glass-container-soft">
+  <div class="privacy-content glass-container glass-panel">
       <!-- 标题和语言切换 -->
       <div class="header">
         <h1 class="title"><InlineIcon icon="📜" />{{ t('privacy.title') }}</h1>

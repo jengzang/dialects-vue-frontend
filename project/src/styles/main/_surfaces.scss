@@ -1,60 +1,35 @@
 @use '@/styles/global/mixins' as *;
 
-.glass-panel,
-.main-glass-panel {
-  background: var(--glass-panel-background, var(--main-glass-panel-background, var(--surface-panel)));
-  backdrop-filter: var(--glass-panel-backdrop-filter, var(--main-glass-panel-backdrop-filter, blur(18px) saturate(145%)));
-  -webkit-backdrop-filter: var(--glass-panel-backdrop-filter, var(--main-glass-panel-backdrop-filter, blur(18px) saturate(145%)));
-  border: var(--glass-panel-border, var(--main-glass-panel-border, 1px solid var(--border-glass)));
-  border-radius: var(--glass-panel-radius, var(--main-glass-panel-border-radius, var(--radius-xl)));
-  box-shadow: var(
-    --glass-panel-shadow,
-    var(--main-glass-panel-shadow, 0 4px 14px rgba(var(--color-shadow-rgb), 0.08), 0 1px 4px rgba(var(--color-shadow-rgb), 0.06))
-  );
+.glass-panel {
+  background: var(--glass-panel-background, var(--surface-panel));
+  backdrop-filter: var(--glass-panel-backdrop-filter, blur(18px) saturate(145%));
+  -webkit-backdrop-filter: var(--glass-panel-backdrop-filter, blur(18px) saturate(145%));
+  border: var(--glass-panel-border, 1px solid var(--border-glass));
+  border-radius: var(--glass-panel-radius, var(--radius-xl));
+  box-shadow: var(--glass-panel-shadow, 0 4px 14px rgba(var(--color-shadow-rgb), 0.08), 0 1px 4px rgba(var(--color-shadow-rgb), 0.06));
   transition: box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease;
 }
 
-.glass-panel:hover,
-.main-glass-panel:hover {
-  box-shadow: var(
-    --glass-panel-hover-shadow,
-    var(--main-glass-panel-hover-shadow, 0 8px 22px rgba(var(--color-shadow-rgb), 0.1), 0 2px 8px rgba(var(--color-shadow-rgb), 0.08))
-  );
+.glass-panel:hover {
+  box-shadow: var(--glass-panel-hover-shadow, 0 8px 22px rgba(var(--color-shadow-rgb), 0.1), 0 2px 8px rgba(var(--color-shadow-rgb), 0.08));
 }
 
-.glass-subpanel,
-.main-glass-panel-inner,
-.glass-panel-inner {
-  background: var(--glass-subpanel-background, var(--main-glass-panel-inner-background, var(--surface-glass-button)));
-  backdrop-filter: var(--glass-subpanel-backdrop-filter, var(--main-glass-panel-inner-backdrop-filter, blur(10px) saturate(135%)));
-  -webkit-backdrop-filter: var(--glass-subpanel-backdrop-filter, var(--main-glass-panel-inner-backdrop-filter, blur(10px) saturate(135%)));
-  border: var(--glass-subpanel-border, var(--main-glass-panel-inner-border, 1px solid var(--border-glass-subtle)));
-  border-radius: var(--glass-subpanel-radius, var(--main-glass-panel-inner-border-radius, var(--radius-md)));
+.glass-subpanel {
+  background: var(--glass-subpanel-background, var(--surface-glass-button));
+  backdrop-filter: var(--glass-subpanel-backdrop-filter, blur(10px) saturate(135%));
+  -webkit-backdrop-filter: var(--glass-subpanel-backdrop-filter, blur(10px) saturate(135%));
+  border: var(--glass-subpanel-border, 1px solid var(--border-glass-subtle));
+  border-radius: var(--glass-subpanel-radius, var(--radius-md));
   transition: border-color 0.22s ease, background-color 0.22s ease, box-shadow 0.22s ease;
 }
 
-.glass-shell,
-.main-glass-shell,
-.tool-glass-container,
-.glass-container-shell {
-  background: var(--glass-shell-background, var(--main-glass-shell-background, var(--surface-panel-strong)));
-  backdrop-filter: var(--glass-shell-backdrop-filter, var(--main-glass-shell-backdrop-filter, blur(12px) saturate(145%)));
-  -webkit-backdrop-filter: var(--glass-shell-backdrop-filter, var(--main-glass-shell-backdrop-filter, blur(12px) saturate(145%)));
-  border: var(--glass-shell-border, var(--main-glass-shell-border, 1px solid var(--border-glass)));
-  border-radius: var(--glass-shell-radius, var(--main-glass-shell-radius, 30px));
-  box-shadow: var(--glass-shell-shadow, var(--main-glass-shell-shadow, 0 8px 24px rgba(var(--color-shadow-rgb), 0.08)));
-}
-
-.tool-glass-container,
-.glass-container-shell {
-  --glass-shell-background: var(--surface-panel-hover);
-}
-
-.glass-container-soft {
-  background: var(--glass-panel-background, var(--surface-panel-strong));
-  backdrop-filter: var(--glass-panel-backdrop-filter, blur(10px) saturate(140%));
-  -webkit-backdrop-filter: var(--glass-panel-backdrop-filter, blur(10px) saturate(140%));
-  border: var(--glass-panel-border, 1px solid var(--border-glass));
+.glass-shell {
+  background: var(--glass-shell-background, var(--surface-panel-strong));
+  backdrop-filter: var(--glass-shell-backdrop-filter, blur(12px) saturate(145%));
+  -webkit-backdrop-filter: var(--glass-shell-backdrop-filter, blur(12px) saturate(145%));
+  border: var(--glass-shell-border, 1px solid var(--border-glass));
+  border-radius: var(--glass-shell-radius, 30px);
+  box-shadow: var(--glass-shell-shadow, 0 8px 24px rgba(var(--color-shadow-rgb), 0.08));
 }
 
 .glass-card {
@@ -64,7 +39,20 @@
   border: var(--glass-card-border, 1px solid var(--border-glass));
   border-radius: var(--glass-card-radius, var(--radius-xl));
   box-shadow: var(--glass-card-shadow, 0 6px 18px var(--bg-hover-light), inset 0 0 0 1px var(--glass-30));
-  transition: background-color 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  transition: background-color 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease, transform 0.16s ease;
+}
+
+.glass-card[data-interactive='true'] {
+  cursor: pointer;
+}
+
+.glass-card[data-interactive='true']:hover:not([aria-hidden='true']) {
+  transform: translateY(-1px);
+  box-shadow: var(--glass-card-hover-shadow, 0 10px 20px rgba(var(--color-shadow-rgb), 0.1));
+}
+
+.glass-card[aria-hidden='true'] {
+  cursor: default;
 }
 
 .surface-shell {
@@ -88,7 +76,20 @@
   border: var(--surface-card-border, 1px solid var(--border-control));
   border-radius: var(--surface-card-radius, var(--radius-lg));
   box-shadow: var(--surface-card-shadow, 0 2px 8px rgba(var(--color-shadow-rgb), 0.05));
-  transition: box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease;
+  transition: box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease, transform 0.16s ease;
+}
+
+.surface-card[data-interactive='true'] {
+  cursor: pointer;
+}
+
+.surface-card[data-interactive='true']:hover:not([aria-hidden='true']) {
+  transform: translateY(-1px);
+  box-shadow: var(--surface-card-hover-shadow, 0 10px 20px rgba(var(--color-shadow-rgb), 0.08));
+}
+
+.surface-card[aria-hidden='true'] {
+  cursor: default;
 }
 
 .surface-subpanel {
@@ -102,26 +103,6 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(var(--main-card-min-width, 220px), 1fr));
   gap: var(--main-card-grid-gap, 14px);
-}
-
-.main-data-card {
-  @include flex-col;
-  align-items: flex-start;
-  gap: var(--main-data-card-gap, 8px);
-  padding: var(--main-data-card-padding, 18px);
-  border: 1px solid var(--glass-50);
-  text-align: left;
-  cursor: pointer;
-  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
-}
-
-.main-data-card:hover:not([aria-hidden='true']) {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(var(--color-shadow-rgb), 0.1);
-}
-
-.main-data-card[aria-hidden='true'] {
-  cursor: default;
 }
 
 .page {

@@ -66,16 +66,40 @@ describe('main surface conventions', () => {
     expect(panelBlock).toContain('var(--surface-panel')
   })
 
-  it('keeps legacy main surface classes as compatibility aliases only', () => {
+  it('does not keep legacy surface aliases or legacy surface variables', () => {
     const source = readSource('src/styles/main/_surfaces.scss')
+    const legacySelectors = [
+      '.main-glass-panel',
+      '.main-glass-panel-inner',
+      '.main-glass-shell',
+      '.glass-panel-inner',
+      '.tool-glass-container',
+      '.glass-container-shell',
+      '.glass-container-soft',
+      '.main-data-card',
+    ]
+    const legacyVariables = ['--main-glass-panel', '--main-glass-panel-inner', '--main-glass-shell']
 
-    expect(source).toMatch(/\.glass-panel,\s*\n\.main-glass-panel\s*\{/)
-    expect(source).toMatch(/\.glass-subpanel,\s*\n\.main-glass-panel-inner,\s*\n\.glass-panel-inner\s*\{/)
-    expect(source).toMatch(/\.glass-shell,\s*\n\.main-glass-shell,\s*\n\.tool-glass-container,\s*\n\.glass-container-shell\s*\{/)
+    for (const selector of legacySelectors) {
+      expect(source, `shared surfaces should not define ${selector}`).not.toContain(selector)
+    }
+
+    for (const variable of legacyVariables) {
+      expect(source, `shared surfaces should not fallback to ${variable}`).not.toContain(variable)
+    }
   })
 
   it('uses canonical surface class names in main Vue templates', () => {
-    const legacyTokens = ['main-glass-panel', 'main-glass-panel-inner', 'main-glass-shell', 'glass-panel-inner']
+    const legacyTokens = [
+      'main-glass-panel',
+      'main-glass-panel-inner',
+      'main-glass-shell',
+      'glass-panel-inner',
+      'tool-glass-container',
+      'glass-container-shell',
+      'glass-container-soft',
+      'main-data-card',
+    ]
 
     for (const file of trackedVueFilesUnder('src/main')) {
       const source = readFileSync(file, 'utf8')

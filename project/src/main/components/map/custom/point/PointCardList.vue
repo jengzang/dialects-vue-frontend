@@ -12,7 +12,7 @@
     </div>
 
     <div v-if="loading" class="point-grid main-card-grid">
-      <div v-for="index in 3" :key="index" class="point-card point-card-skeleton main-data-card glass-subpanel" aria-hidden="true">
+      <div v-for="index in 3" :key="index" class="point-card point-card-skeleton glass-card" aria-hidden="true">
         <div class="skeleton-line skeleton-line-lg"></div>
         <div class="skeleton-line skeleton-line-sm"></div>
         <div class="skeleton-line skeleton-line-xs"></div>
@@ -34,7 +34,8 @@
       <button
         v-for="item in filteredItems"
         :key="item.point_key || `${item['簡稱'] || ''}-${item['音典分區'] || ''}`"
-        class="point-card main-data-card glass-subpanel"
+        class="point-card glass-card"
+        data-interactive="true"
         type="button"
         @click="$emit('select', item)"
       >
@@ -131,6 +132,14 @@ const filteredItems = computed(() => {
   font-size: 16px;
   font-weight: 700;
   color: $text-strong;
+}
+
+.point-card {
+  @include flex-col;
+  align-items: flex-start;
+  gap: var(--point-card-gap, 8px);
+  padding: var(--point-card-padding, 18px);
+  text-align: left;
 }
 
 .point-card-region {

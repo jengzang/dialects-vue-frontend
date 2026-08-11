@@ -1910,12 +1910,12 @@ td {
 
 /* Filter Popup */
 .glass-panel[data-surface='filter-popup'] {
-  --main-glass-panel-background: var(--surface-glass-floating);
-  --main-glass-panel-backdrop-filter: blur(25px);
-  --main-glass-panel-border: 1px solid var(--glass-80);
-  --main-glass-panel-shadow: var(--shadow-lg);
-  --main-glass-panel-hover-shadow: var(--shadow-lg);
-  --main-glass-panel-border-radius: var(--radius-lg);
+  --glass-panel-background: var(--surface-glass-floating);
+  --glass-panel-backdrop-filter: blur(25px);
+  --glass-panel-border: 1px solid var(--glass-80);
+  --glass-panel-shadow: var(--shadow-lg);
+  --glass-panel-hover-shadow: var(--shadow-lg);
+  --glass-panel-radius: var(--radius-lg);
 
   position: absolute;
   top: 100%;

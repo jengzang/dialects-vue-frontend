@@ -12,7 +12,7 @@
     </div>
 
     <div v-if="loading" class="feature-grid main-card-grid">
-      <div v-for="index in 3" :key="index" class="feature-card feature-card-skeleton main-data-card glass-subpanel" aria-hidden="true">
+      <div v-for="index in 3" :key="index" class="feature-card feature-card-skeleton glass-card" aria-hidden="true">
         <div class="skeleton-line skeleton-line-lg"></div>
         <div class="skeleton-chip"></div>
         <div class="skeleton-line skeleton-line-sm"></div>
@@ -34,7 +34,8 @@
       <button
         v-for="item in filteredItems"
         :key="item.feature_key || `${item['特徵'] || ''}-${item['聲韻調'] || ''}`"
-        class="feature-card main-data-card glass-subpanel"
+        class="feature-card glass-card"
+        data-interactive="true"
         type="button"
         @click="$emit('select', item)"
       >
@@ -139,7 +140,11 @@ function resolveToneType(item) {
 }
 
 .feature-card {
-  --main-data-card-gap: 10px;
+  @include flex-col;
+  align-items: flex-start;
+  gap: var(--feature-card-gap, 10px);
+  padding: var(--feature-card-padding, 18px);
+  text-align: left;
 }
 
 .feature-card-name {
