@@ -1,7 +1,7 @@
 <template>
   <div class="settings-page-wrapper">
     <div class="settings-container">
-      <h2 class="page-title">{{ $t('navigation.tabs.settings') }}</h2>
+      <h1 class="page-title">{{ $t('navigation.tabs.settings') }}</h1>
       <div class="setting-section">
         <h3 class="section-title">{{ $t('navigation.settings.language.title') }}</h3>
         <div class="language-options">

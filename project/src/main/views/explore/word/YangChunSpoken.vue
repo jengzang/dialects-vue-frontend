@@ -1,7 +1,7 @@
 <template>
   <div style="width: 100%;justify-content: center;align-items:center;display: flex;flex-direction: column">
     <div class="title-row">
-      <h2>{{ t('words.ycSpoken.name') }}</h2>
+      <h1>{{ t('words.ycSpoken.name') }}</h1>
       <span class="cross-link" @click="goToYCVillages">{{ t('villages.ycVillages.name') }} →</span>
     </div>
     <UniversalTable
@@ -56,7 +56,8 @@ const goToYCVillages = () => {
   margin: 0;
   font-size: 1em;
 
-  h2 {
+  h1 {
+    font-size: 1.5em;
     margin: 0 20px 0 0;
     white-space: nowrap;
   }

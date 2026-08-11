@@ -1,6 +1,6 @@
 <template>
   <div class="villages-page">
-    <h2 class="page-title">{{ $t('villages.title') }}</h2>
+    <h1 class="page-title">{{ $t('villages.title') }}</h1>
 
     <div class="villages-grid">
       <button class="entry-button" @click="handleToponyms">

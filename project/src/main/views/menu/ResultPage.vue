@@ -1,7 +1,7 @@
 <template>
   <div class="result-page-container">
     <div class="header-row">
-      <h2 class="tabs-title">{{ pageTitle }}</h2>
+      <h1 class="tabs-title">{{ pageTitle }}</h1>
       <div v-if="currentTabRef === 'tab1'" class="dropdown-wrapper" style="flex:none;">
         <SimpleSelectDropdown
           v-model="selectedTab1Type"

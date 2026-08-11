@@ -1,8 +1,8 @@
 <template>
   <div class="merge-tool-container">
-    <div class="glass-container glass-container-shell" style="max-height: 80dvh;overflow: auto;">
+    <div class="glass-container glass-shell" style="max-height: 80dvh;overflow: auto;">
       <div class="header-section">
-        <h2 class="title">{{ t('tools.merge.page.title') }}</h2>
+        <h1 class="title">{{ t('tools.merge.page.title') }}</h1>
         <p class="subtitle">{{ t('tools.merge.page.subtitle') }}</p>
       </div>
 

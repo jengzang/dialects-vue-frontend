@@ -1,9 +1,9 @@
 <template>
-  <div class="glass-container glass-container-shell">
+  <div class="glass-container glass-shell">
     <!-- Header Section -->
     <div class="header-section">
       <div class="title-row">
-        <h2 style="margin: 0;">{{ t('villages.pages.allVillages.title') }}</h2>
+        <h1 style="margin: 0;font-size: 1.5em;">{{ t('villages.pages.allVillages.title') }}</h1>
         <div class="filter-controls">
           <SimpleSelectDropdown
             v-model="filterMode"

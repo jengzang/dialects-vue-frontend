@@ -61,7 +61,7 @@ const goToPrivacy = () => {
   <div style="width: 100%;justify-content: center;align-items:center;display: flex;flex-direction: column">
     <div class="header-row">
 
-      <h2 class="tabs-title" style="font-size: 1.5rem;"><InlineIcon icon="🔗" />{{ t('source.title') }}</h2>
+      <h1 class="tabs-title" style="font-size: 1.5rem;"><InlineIcon icon="🔗" />{{ t('source.title') }}</h1>
       <a class="privacy-link" @click="goToPrivacy">
         {{ t('source.privacyLink') }}
       </a>

@@ -6,7 +6,7 @@
     </div>
 
     <div v-else-if="!isAdmin" class="access-denied">
-      <h2><InlineIcon icon="⚠️" />{{ t('tools.tableManage.accessDenied.title') }}</h2>
+      <h1><InlineIcon icon="⚠️" />{{ t('tools.tableManage.accessDenied.title') }}</h1>
       <p>{{ t('tools.tableManage.accessDenied.desc') }}</p>
       <button @click="goHome">{{ t('tools.tableManage.accessDenied.goHome') }}</button>
     </div>
@@ -26,7 +26,7 @@
       </div>
 
       <div v-show="!showUniversalTable || showConfigPanel" class="config-panel">
-        <h2 v-if="!showUniversalTable">{{ t('tools.tableManage.page.title') }}</h2>
+        <h1 v-if="!showUniversalTable">{{ t('tools.tableManage.page.title') }}</h1>
 
         <div class="config-actions">
           <button @click="saveCurrentConfig" class="btn-action-small">{{ t('tools.tableManage.actions.saveConfig') }}</button>
@@ -704,7 +704,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);@mixin glass-panel(
 .admin-panel {
   width: 100%;
 
-  h2 {
+  h1 {
     margin-bottom: 24px;
     font-size: 32px;
     font-weight: 800;
@@ -754,7 +754,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);@mixin glass-panel(
 
   @include glass-blur(20px, 180%);
 
-  h2 {
+  h1 {
     margin-bottom: 10px;
     color: var(--color-warning-dark);
     font-weight: 700;
@@ -1250,7 +1250,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);@mixin glass-panel(
   }
 
   .admin-panel {
-    h2 {
+    h1 {
       font-size: 24px;
     }
   }

@@ -1,8 +1,8 @@
 <template>
-  <div class="glass-container glass-container-shell">
+  <div class="glass-container glass-shell">
     <div class="header-section">
       <div class="title-row">
-        <h2 style="margin: 0;">{{ t('villages.pages.yangChun.title') }}</h2>
+        <h1 style="margin: 0;font-size: 1.5em;">{{ t('villages.pages.yangChun.title') }}</h1>
         <span class="cross-link" @click="goToYcSpoken">{{ t('words.ycSpoken.name') }} →</span>
       </div>
       <p>{{ t('villages.pages.yangChun.source') }}</p>

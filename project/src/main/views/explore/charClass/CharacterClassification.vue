@@ -4,7 +4,7 @@
       <section class="config-panel glass-panel">
         <div class="panel-header">
           <div class="panel-title-group">
-            <h2 class="page-title">{{ t(currentPageConfig.titleKey) }}</h2>
+            <h1 class="page-title">{{ t(currentPageConfig.titleKey) }}</h1>
             <!-- <p class="page-subtitle">{{ t('charClass.common.subtitle') }}</p> -->
           </div>
         </div>

@@ -9,7 +9,7 @@
       <template #default="{ currentTab }">
         <!-- 新的"簡介"页面 -->
         <div v-if="currentTab === 'intro'" class="thanks-container">
-          <h2 class="tabs-title">{{ $t('about.intro.title') }}</h2>
+          <h1 class="tabs-title">{{ $t('about.intro.title') }}</h1>
           <p style=" text-align: left;">{{ $t('about.intro.description') }}</p>
           <ul class="customlist">
             <li v-for="(feature, idx) in featureList" :key="idx" class="feature-item">
@@ -94,7 +94,7 @@
         <!-- 新的"建議"页面 -->
         <div v-if="currentTab === 'suggestion'" class="page2">
           <div class="suggestion-box">
-            <h2 class="tabs-title">💬 {{ $t('about.suggestion.title') }}</h2>
+            <h1 class="tabs-title">💬 {{ $t('about.suggestion.title') }}</h1>
             <p v-html="$t('about.suggestion.description')"></p>
             <p class="subtext">👇 {{ $t('about.suggestion.subtext') }}</p>
             <div class="card-links">
@@ -134,7 +134,7 @@
 
         <!-- 新的"喜歡"页面 -->
         <div v-if="currentTab === 'like'" class="cards-container">
-          <h2 class="tabs-title like-author-title">
+          <h1 class="tabs-title like-author-title">
             {{ $t('about.like.title') }}
             <span class="follow-buttons">
               <button class="follow-button zhihu-follow" @click="followClicked">
@@ -156,7 +156,7 @@
                 GitHub
               </a>
             </span>
-          </h2>
+          </h1>
           <p style="display: block; width: 100%; clear: both; margin: 0 0 0.8rem;">
             {{ $t('about.like.starMessage') }}
           </p>

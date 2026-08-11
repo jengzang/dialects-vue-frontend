@@ -5,11 +5,11 @@
         <button class="liquid-btn btn-back" type="button" @click="goBack">
           {{ t('common.button.back') }}
         </button>
-        <h2>
+        <h1>
           <span class="title-icon"><InlineIcon icon="📊" /></span>
           <span>{{ t('user.dataPage.title') }}</span>
           <span v-if="username" class="username-badge">{{ username }}</span>
-        </h2>
+        </h1>
       </div>
       <div class="stats">
         <span>{{ t('user.dataPage.stats.totalRows', { count: totalCount }) }}</span>
@@ -899,7 +899,7 @@ $user-success: var(--color-success);
   min-width: 0;
   gap: 16px;
 
-  h2 {
+  h1 {
     display: flex;
     align-items: center;
     min-width: 0;
@@ -1497,7 +1497,7 @@ $user-success: var(--color-success);
     gap: 12px;
     flex-wrap: wrap;
 
-    h2 {
+    h1 {
       flex: 1;
       min-width: 200px;
       font-size: 18px;
@@ -1634,7 +1634,7 @@ $user-success: var(--color-success);
   .header-left {
     align-items: flex-start;
 
-    h2 {
+    h1 {
       width: 100%;
       min-width: 0;
       font-size: 16px;

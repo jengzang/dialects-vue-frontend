@@ -1,6 +1,6 @@
 <template>
   <div class="tools-page">
-    <h2 class="page-title">{{ $t('tools.title') }}</h2>
+    <h1 class="page-title">{{ $t('tools.title') }}</h1>
 
     <div class="tools-grid">
       <button class="entry-button" @click="handleDataCheck">
