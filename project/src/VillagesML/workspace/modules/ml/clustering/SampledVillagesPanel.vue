@@ -1,9 +1,9 @@
 <template>
   <div class="sampled-villages-panel">
-    <h3 class="villagesml-subtab-title">
-      ML計算 - 採樣村莊聚類
+    <h1 class="villagesml-subtab-title">
+      <BarIcon icon="🏘️" />ML計算 - 採樣村莊聚類
       <HelpIcon content="對採樣村莊進行聚類，適合大規模數據集。採樣策略：隨機採樣、分層採樣（按區域比例）、系統採樣（等間隔）。特徵包括語義、字符嵌入、結構。支持K-Means、DBSCAN、GMM算法" />
-    </h3>
+    </h1>
     <div class="vml-two-col">
     <!-- 左側：參數設置 -->
     <div class="vml-glass-panel">
@@ -94,6 +94,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed } from 'vue'
 import { villagesMLStore } from '@/VillagesML/store/villagesMLStore.js'
 import { userStore } from '@/main/store/store.js'

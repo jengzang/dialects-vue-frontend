@@ -152,6 +152,7 @@ describe('SEO heading semantics', () => {
       'src/VillagesML/workspace/modules/spatial/SpatialHotspotsTab.vue',
       'src/VillagesML/workspace/modules/spatial/SpatialVisualizationTab.vue',
       'src/VillagesML/workspace/modules/spatial/SpatialClustersTab.vue',
+      'src/VillagesML/workspace/modules/spatial/SpatialIntegration.vue',
       'src/VillagesML/workspace/modules/pattern/NgramStats.vue',
       'src/VillagesML/workspace/modules/pattern/PatternTendency.vue',
       'src/VillagesML/workspace/modules/pattern/PatternFrequency.vue',
@@ -172,6 +173,7 @@ describe('SEO heading semantics', () => {
       'src/VillagesML/workspace/modules/character/CharacterNetwork.vue',
       'src/VillagesML/workspace/modules/character/CharacterEmbeddings.vue',
       'src/VillagesML/workspace/modules/character/CharacterSignificance.vue',
+      'src/VillagesML/workspace/modules/village/VillageDeepDive.vue',
       'src/VillagesML/workspace/modules/ml/SubsetAnalysis.vue',
       'src/VillagesML/workspace/modules/ml/FeatureExtraction.vue',
       'src/VillagesML/workspace/modules/ml/clustering/CharacterTendencyPanel.vue',
@@ -185,8 +187,11 @@ describe('SEO heading semantics', () => {
 
       expect(source, `${file} imports BarIcon`).toContain("import BarIcon from '@/components/common/BarIcon.vue'")
       expect(source, `${file} has no active VillagesML h3 page title`).not.toContain('<h3 class="villagesml-subtab-title"')
-      expect(source, `${file} renders a VillagesML h1 page title with BarIcon`).toMatch(/<h1\b[\s\S]*class="villagesml-subtab-title"[\s\S]*?<BarIcon[\s\S]*?<\/h1>/)
-      expect(source, `${file} has no top-level h2 title with InlineIcon`).not.toMatch(/<h2\b[\s\S]*?<InlineIcon[\s\S]*?<\/h2>/)
+      expect(source, `${file} renders a VillagesML h1 page title with BarIcon`).toMatch(/<h1\b[\s\S]*?<BarIcon[\s\S]*?<\/h1>/)
+      const h2Snippets = source.match(/<h2\b[\s\S]*?<\/h2>/g) || []
+      for (const snippet of h2Snippets) {
+        expect(snippet, `${file} h2 title icon uses BarIcon`).not.toContain('<InlineIcon')
+      }
     }
   })
 
@@ -289,7 +294,6 @@ describe('SEO heading semantics', () => {
       'src/main/views/explore/tools/Jyut2IpaTool.vue',
       'src/main/views/explore/tools/MergeTool.vue',
       'src/main/views/explore/tools/TableManage.vue',
-      'src/main/views/explore/charClass/CharacterClassification.vue',
       'src/main/config/chars_positions/charClassPageConfigs.js',
       'src/VillagesML/dashboard/Dashboard.vue',
       'src/main/views/explore/yangchun/YangChunOverviewPage.vue',
@@ -297,6 +301,9 @@ describe('SEO heading semantics', () => {
     ]) {
       expect(readSource(file), file).toContain('navigation.pageTitles')
     }
+
+    const charClassSource = readSource('src/main/views/explore/charClass/CharacterClassification.vue')
+    expect(charClassSource).toContain('{{ t(currentPageConfig.titleKey) }}')
 
     for (const file of [
       'src/main/views/menu/support/PrivacyPage.vue',
@@ -309,7 +316,7 @@ describe('SEO heading semantics', () => {
       const h1Snippets = stripHtmlComments(readSource(file)).match(/<h1\b[\s\S]*?<\/h1>/g) || []
 
       for (const snippet of h1Snippets) {
-        expect(snippet, `${file} h1 uses pageTitles or computed page title`).not.toMatch(/\bt\('(?!(navigation\.pageTitles\.))/)
+        expect(snippet, `${file} h1 uses pageTitles or computed page title`).toMatch(/navigation\.pageTitles|currentPageConfig\.titleKey/)
         expect(snippet, `${file} h1 has no hard-coded CJK page title`).not.toMatch(/>[^<{]*[\u3400-\u9fff]/)
       }
     }
@@ -318,8 +325,8 @@ describe('SEO heading semantics', () => {
   it('uses h1 for active about tab titles while keeping nested section titles below h1', () => {
     const source = readSource('src/main/views/menu/support/AboutPage.vue')
 
-    expect(source).toContain('<h1 class="tabs-title"><BarIcon icon="📖" />{{ $t(\'about.intro.title\') }}</h1>')
-    expect(source).toContain('<h1 class="tabs-title"><BarIcon icon="💬" />{{ $t(\'about.suggestion.title\') }}</h1>')
+    expect(source).toContain('<h1 class="tabs-title"><BarIcon icon="📖" />{{ $t(\'navigation.pageTitles.support.aboutIntro\') }}</h1>')
+    expect(source).toContain('<h1 class="tabs-title"><BarIcon icon="💬" />{{ $t(\'navigation.pageTitles.support.aboutSuggestion\') }}</h1>')
     expect(source).toContain('<h1 class="tabs-title like-author-title">')
     expect(source).toContain('<h2 class="tabs-title" style="margin-top: 20px"><BarIcon icon="🙏" />{{ $t(\'about.thanks.title\') }}</h2>')
     expect(source).toContain('<h2 class="tabs-title" style="margin-top: 3rem"><BarIcon icon="💡" />{{ $t(\'about.reflection.title\') }}</h2>')
@@ -328,7 +335,7 @@ describe('SEO heading semantics', () => {
   it('uses h1 for table management page states without changing conditional visibility', () => {
     const source = readSource('src/main/views/explore/tools/TableManage.vue')
 
-    expect(source).toContain('<h1><BarIcon icon="⚠️" />{{ t(\'tools.tableManage.accessDenied.title\') }}</h1>')
-    expect(source).toContain('<h1 v-if="!showUniversalTable"><BarIcon icon="📈" />{{ t(\'tools.tableManage.page.title\') }}</h1>')
+    expect(source).toContain('<h1><BarIcon icon="⚠️" />{{ t(\'navigation.pageTitles.tools.tableManageAccessDenied\') }}</h1>')
+    expect(source).toContain('<h1 v-if="!showUniversalTable"><BarIcon icon="📈" />{{ t(\'navigation.pageTitles.tools.tableManage\') }}</h1>')
   })
 })

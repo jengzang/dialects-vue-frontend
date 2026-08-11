@@ -42,7 +42,7 @@
 
       <!-- Section Header: Features -->
       <div class="section-header">
-        <h2><InlineIcon icon="🧭" />{{ t('villages.dashboard.featuresHeader') }}</h2>
+        <h2><BarIcon icon="🧭" />{{ t('villages.dashboard.featuresHeader') }}</h2>
         <p class="section-description">{{ t('villages.dashboard.featuresDesc') }}</p>
       </div>
 
@@ -92,7 +92,7 @@
         </div>
       </div>
       <div class="section-header">
-        <h2><InlineIcon icon="📈" />{{ t('villages.dashboard.statsHeader') }}</h2>
+        <h2><BarIcon icon="📈" />{{ t('villages.dashboard.statsHeader') }}</h2>
         <p class="section-description">{{ t('villages.dashboard.statsDesc') }}</p>
       </div>
       <!-- Statistics Cards -->
