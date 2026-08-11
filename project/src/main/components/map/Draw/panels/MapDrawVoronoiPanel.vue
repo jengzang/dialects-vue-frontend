@@ -150,10 +150,11 @@
             <span class="draw-field-label">{{ t('map.drawTab.voronoi.expandRatio', { ratio: expandRatio }) }}</span>
             <input
               type="range"
-              class="expand-ratio-slider"
+              class="expand-ratio-slider glass-range"
               min="0"
               max="100"
               :value="expandRatio"
+              :style="{ '--glass-range-progress': expandRatio + '%' }"
               @input="$emit('update:expand-ratio', Number($event.target.value))"
             >
           </div>
@@ -406,7 +407,6 @@ const offsetClass = computed(() => {
 
 .expand-ratio-slider {
   flex: 1;
-  accent-color: var(--color-primary);
 }
 
 .draw-tool-panel-body {

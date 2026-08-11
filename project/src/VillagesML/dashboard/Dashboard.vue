@@ -11,7 +11,7 @@
       </div>
 
       <!-- Introduction Section -->
-      <div class="intro-section glass-panel">
+      <div class="intro-section vml-glass-panel">
         <p class="intro-text">
           <strong>{{ t('villages.dashboard.introTitle') }}</strong>{{ t('villages.dashboard.introText') }}
         </p>
@@ -48,7 +48,7 @@
 
 
       <!-- Quick Search -->
-<!--      <div class="quick-search glass-panel">-->
+<!--      <div class="quick-search vml-glass-panel">-->
 <!--        <h2><InlineIcon icon="🔍" />快速搜尋</h2>-->
 <!--        <div class="search-input-group">-->
 <!--          <input-->
@@ -69,7 +69,7 @@
         <div
           v-for="feature in features"
           :key="feature.id"
-          class="feature-card glass-panel"
+          class="feature-card vml-glass-panel"
           @click="navigateTo(feature.route)"
         >
           <div class="feature-header">
@@ -97,7 +97,7 @@
       </div>
       <!-- Statistics Cards -->
       <div class="stats-grid">
-        <div v-for="stat in statistics" :key="stat.key" class="stat-card glass-panel">
+        <div v-for="stat in statistics" :key="stat.key" class="stat-card vml-glass-panel">
           <div class="stat-icon">{{ stat.icon }}</div>
           <div class="stat-content">
             <template v-if="stat.loadable && !ngramStats">

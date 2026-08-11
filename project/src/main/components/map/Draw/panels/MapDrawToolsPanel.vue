@@ -580,12 +580,13 @@
             >
               <span class="draw-field-label">{{ t('map.drawTab.labels.strokeWidth') }}：{{ selectedFeatureProperties.strokeWidth }}</span>
               <input
-                class="draw-range-input"
+                class="draw-range-input glass-range"
                 type="range"
                 min="1"
                 max="12"
                 step="1"
                 :value="selectedFeatureProperties.strokeWidth"
+                :style="{ '--glass-range-progress': (((selectedFeatureProperties.strokeWidth - 1) / 11) * 100) + '%' }"
                 @input="$emit('update-feature-property', 'strokeWidth', Number($event.target.value))"
               >
             </label>
@@ -596,12 +597,13 @@
             >
               <span class="draw-field-label">{{ t('map.drawTab.labels.pointRadius') }}：{{ selectedFeatureProperties.pointRadius }}</span>
               <input
-                class="draw-range-input"
+                class="draw-range-input glass-range"
                 type="range"
                 min="3"
                 max="24"
                 step="1"
                 :value="selectedFeatureProperties.pointRadius"
+                :style="{ '--glass-range-progress': (((selectedFeatureProperties.pointRadius - 3) / 21) * 100) + '%' }"
                 @input="$emit('update-feature-property', 'pointRadius', Number($event.target.value))"
               >
             </label>
@@ -612,12 +614,13 @@
             >
               <span class="draw-field-label">{{ t('map.drawTab.labels.fillOpacity') }}：{{ selectedFeatureProperties.fillOpacity }}</span>
               <input
-                class="draw-range-input"
+                class="draw-range-input glass-range"
                 type="range"
                 min="0"
                 max="1"
                 step="0.05"
                 :value="selectedFeatureProperties.fillOpacity"
+                :style="{ '--glass-range-progress': (selectedFeatureProperties.fillOpacity * 100) + '%' }"
                 @input="$emit('update-feature-property', 'fillOpacity', Number($event.target.value))"
               >
             </label>

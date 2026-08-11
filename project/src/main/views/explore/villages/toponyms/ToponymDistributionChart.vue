@@ -26,10 +26,12 @@
             <span>{{ t('villages.pages.toponyms.chart.configSize') }}</span>
             <input
               v-model.number="pointConfig.size"
+              class="glass-range"
               type="range"
               min="1"
               max="20"
               step="1"
+              :style="{ '--glass-range-progress': (((pointConfig.size - 1) / 19) * 100) + '%' }"
             >
             <small>{{ pointConfig.size }}px</small>
           </label>
@@ -429,7 +431,7 @@ defineExpose({ showConfigModal });
       font-size: 13px;
     }
 
-    input[type="range"] {
+    .glass-range {
       flex: 1;
       margin: 0;
     }

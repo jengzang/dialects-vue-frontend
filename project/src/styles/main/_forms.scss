@@ -82,6 +82,79 @@ $transition-base: 0.3s;
   }
 }
 
+.glass-range {
+  --glass-range-track-height: 4px;
+  --glass-range-thumb-size: 14px;
+
+  width: 100%;
+  background: transparent;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+
+  &::-webkit-slider-runnable-track {
+    height: var(--glass-range-track-height);
+    border-radius: var(--radius-pill);
+    background: linear-gradient(
+      to right,
+      var(--color-primary) 0%,
+      var(--color-primary) var(--glass-range-progress, 0%),
+      var(--bg-hover-strong) var(--glass-range-progress, 0%),
+      var(--bg-hover-strong) 100%
+    );
+  }
+
+  &::-webkit-slider-thumb {
+    width: var(--glass-range-thumb-size);
+    height: var(--glass-range-thumb-size);
+    margin-top: calc((var(--glass-range-track-height) - var(--glass-range-thumb-size)) / 2);
+    border: none;
+    border-radius: var(--radius-full);
+    background: var(--color-primary);
+    cursor: pointer;
+    transition:
+      background 0.2s ease,
+      box-shadow 0.2s ease;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  &:hover::-webkit-slider-thumb {
+    background: var(--color-primary-hover);
+    box-shadow: 0 0 6px var(--color-primary-shadow);
+  }
+
+  &::-moz-range-track {
+    height: var(--glass-range-track-height);
+    border-radius: var(--radius-pill);
+    background: linear-gradient(
+      to right,
+      var(--color-primary) 0%,
+      var(--color-primary) var(--glass-range-progress, 0%),
+      var(--bg-hover-strong) var(--glass-range-progress, 0%),
+      var(--bg-hover-strong) 100%
+    );
+  }
+
+  &::-moz-range-thumb {
+    width: var(--glass-range-thumb-size);
+    height: var(--glass-range-thumb-size);
+    border: none;
+    border-radius: var(--radius-full);
+    background: var(--color-primary);
+    cursor: pointer;
+  }
+
+  &:hover::-moz-range-thumb {
+    background: var(--color-primary-hover);
+    box-shadow: 0 0 6px var(--color-primary-shadow);
+  }
+
+  &:disabled {
+    @include disabled-state;
+  }
+}
+
 .main-input-field {
   width: 100%;
   padding: 10px 14px;
