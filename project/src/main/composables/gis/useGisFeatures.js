@@ -231,6 +231,9 @@ export function useGisFeatures(options = {}) {
       })),
     };
     syncAllLayersAfterMutation();
+    if ((key === 'visible' && value === false) || (key === 'locked' && value === true)) {
+      resetDrawSelectionMode();
+    }
   }
 
   function getDefaultedFeatureStateValue(feature, key) {

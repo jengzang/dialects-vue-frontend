@@ -438,6 +438,10 @@ export function useGisMapCore(options = {}) {
   };
 
   const handleDrawModeChange = (mode) => {
+    if (mode !== 'simple_select' && !canModifyActiveLayer.value) {
+      resetDrawSelectionMode();
+      return;
+    }
     currentMode.value = mode || 'simple_select';
     if (currentMode.value !== 'simple_select') {
       isFeatureBoxSelectMode.value = false;

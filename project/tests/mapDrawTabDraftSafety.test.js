@@ -295,6 +295,7 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       'move-selected-features-to-layer',
       'set-selected-features-visible',
       'set-selected-features-locked',
+      'update-feature-property',
       'update-feature-table-cell',
       'update:selected-feature-batch-name',
       'apply-selected-feature-batch-name',
@@ -308,6 +309,20 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
         <span data-testid="current-mode">{{ currentMode }}</span>
         <span data-testid="selected-vertex-count">{{ selectedVertexCount }}</span>
         <span data-testid="can-delete-selected-vertices">{{ canDeleteSelectedVertices ? 'true' : 'false' }}</span>
+        <button
+          data-testid="editor-hide-active-layer"
+          type="button"
+          @click="$emit('update-feature-property', 'visible', false)"
+        >
+          editor hide active layer
+        </button>
+        <button
+          data-testid="editor-lock-active-layer"
+          type="button"
+          @click="$emit('update-feature-property', 'locked', true)"
+        >
+          editor lock active layer
+        </button>
         <button
           data-testid="draw-polygon-mode"
           type="button"
@@ -2226,6 +2241,123 @@ describe('MapDrawTab draft safety', () => {
     await flushTicks()
     expect(lockedBackspaceEvent.defaultPrevented).toBe(false)
     expect(mocks.mapDeleteSelected).not.toHaveBeenCalled()
+
+    wrapper.unmount()
+  })
+
+  it('ignores stale direct-select map events after the active layer is hidden or locked', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="emit-direct-select"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('direct_select')
+
+    wrapper.host.querySelector('[data-testid="toggle-layer-visibility"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('simple_select')
+    expect(wrapper.host.querySelector('[data-testid="feature-checkbox"]').checked).toBe(false)
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+
+    wrapper.host.querySelector('[data-testid="emit-direct-select"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('simple_select')
+    expect(wrapper.host.querySelector('[data-testid="feature-checkbox"]').checked).toBe(false)
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+
+    wrapper.host.querySelector('[data-testid="toggle-layer-visibility"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="emit-direct-select"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('direct_select')
+
+    wrapper.host.querySelector('[data-testid="toggle-layer-lock"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('simple_select')
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+
+    wrapper.host.querySelector('[data-testid="emit-direct-select"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('simple_select')
+    expect(wrapper.host.querySelector('[data-testid="feature-checkbox"]').checked).toBe(false)
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+
+    wrapper.unmount()
+  })
+
+  it('exits drawing mode when the layer editor hides the active layer', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    wrapper.host.querySelector('[data-testid="draw-polygon-mode"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('draw_polygon')
+
+    wrapper.host.querySelector('[data-testid="editor-hide-active-layer"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('simple_select')
+    expect(wrapper.host.querySelector('[data-testid="box-select-mode"]').textContent).toBe('off')
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+
+    const setDrawModeCallCountAfterHide = mocks.mapSetDrawMode.mock.calls.length
+    wrapper.host.querySelector('[data-testid="draw-polygon-mode"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('simple_select')
+    expect(mocks.mapSetDrawMode).toHaveBeenCalledTimes(setDrawModeCallCountAfterHide)
+
+    wrapper.unmount()
+  })
+
+  it('exits box selection when the layer editor hides or locks the active layer', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    wrapper.host.querySelector('[data-testid="toggle-feature-box-select"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="box-select-mode"]').textContent).toBe('on')
+
+    wrapper.host.querySelector('[data-testid="editor-hide-active-layer"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="box-select-mode"]').textContent).toBe('off')
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+
+    wrapper.host.querySelector('[data-testid="toggle-layer-visibility"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="toggle-feature-box-select"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="box-select-mode"]').textContent).toBe('on')
+
+    wrapper.host.querySelector('[data-testid="editor-lock-active-layer"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('simple_select')
+    expect(wrapper.host.querySelector('[data-testid="box-select-mode"]').textContent).toBe('off')
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
 
     wrapper.unmount()
   })
