@@ -339,13 +339,15 @@ export function useExploreBarConfig() {
                 overrides: { mobileScroll: 'right', weightIconOnly: 0.3 }
             },
             navigation: {
-                defaultTo: { path: withRouteLocale(route, '/explore/yc/words') },
-                matchPages: ['ycSpoken', 'ycVillages'],
+                defaultTo: { path: withRouteLocale(route, '/explore/yc/overview') },
+                matchPages: ['ycOverview', 'ycSpoken', 'ycExpressions', 'ycVillages'],
                 activeMatchPaths: [],
                 rememberChild: true,
-                defaultChild: '/explore/yc/words',
+                defaultChild: '/explore/yc/overview',
                 children: [
+                    { label: t('navigation.submenu.yangchun.overview'), icon: '🧭', path: withRouteLocale(route, '/explore/yc/overview') },
                     { label: t('navigation.submenu.words.ycSpoken'), icon: '💬', path: withRouteLocale(route, '/explore/yc/words') },
+                    { label: t('navigation.submenu.yangchun.expressions'), icon: '🪶', path: withRouteLocale(route, '/explore/yc/expressions') },
                     { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: withRouteLocale(route, '/explore/yc/villages') }
                 ]
             }

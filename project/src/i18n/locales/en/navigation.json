@@ -51,6 +51,10 @@
       "wordList": "Vocabulary List",
       "ycSpoken": "Yangchun Colloquial Vocabulary"
     },
+    "yangchun": {
+      "overview": "Dialect Overview",
+      "expressions": "Yangchun Expressions"
+    },
     "villages": {
       "toponyms": "Village Toponym Distribution",
       "gdVillages": "Guangdong Villages",

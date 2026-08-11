@@ -114,8 +114,14 @@ export const EXPLORE_LEGACY_ROUTES = {
       yueyun: 'yueyun'
     }
   },
+  ycOverview: {
+    path: '/explore/yc/overview'
+  },
   ycSpoken: {
     path: '/explore/yc/words'
+  },
+  ycExpressions: {
+    path: '/explore/yc/expressions'
   },
   gdVillages: {
     path: '/explore/villages/gd'

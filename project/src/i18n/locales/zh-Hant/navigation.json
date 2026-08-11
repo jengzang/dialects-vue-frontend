@@ -51,6 +51,10 @@
       "wordList": "詞表",
       "ycSpoken": "陽春口語詞"
     },
+    "yangchun": {
+      "overview": "方言概覽",
+      "expressions": "陽春熟語"
+    },
     "villages": {
       "toponyms": "地名分佈",
       "gdVillages": "廣東自然村",
