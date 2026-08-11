@@ -6,7 +6,7 @@
 
 **Architecture:** Build one shared footer component and small focused helpers. The footer reuses existing stats composables, existing common controls, existing design tokens, and the existing tutorial modal through a tiny global request bridge. Feedback submits directly to the confirmed backend suggestions API with optional screenshot upload; link sharing ships in the first pass, while branded image sharing stays as a phase-2 enhancement.
 
-**Tech Stack:** Vue 3, Vue Router, Vue I18n, SCSS scoped component styles, existing `api()` client, existing `AppModal`, existing selector controls, existing `main-glass-button` styles, existing design tokens, existing `useVisitStats()` and `useSourceStats()`, Vitest.
+**Tech Stack:** Vue 3, Vue Router, Vue I18n, SCSS scoped component styles, existing `api()` client, existing `AppModal`, existing selector controls, existing `glass-button` / `glass-field` / `glass-panel` / `surface-subpanel` / info utility classes, existing design tokens, existing `useVisitStats()` and `useSourceStats()`, Vitest.
 
 ---
 
@@ -105,18 +105,42 @@ These constraints are part of the plan, not optional style advice:
 - Work from the current `dev` branch. Preserve unrelated local changes, especially map draw files.
 - Do not introduce new visual systems for the footer. Reuse existing common components and global classes:
   - `AppModal` for feedback.
-  - `RadioGroup` for feedback category selection.
+  - `ChoiceSelector` for compact feedback category selection.
   - `CheckBox` for optional screenshot consent.
-  - `main-glass-button` for footer actions and modal submit buttons, tuned through CSS custom properties when compact sizing is needed.
+  - `glass-button` for footer actions, modal submit buttons, and screenshot retake buttons.
+  - `glass-field` for feedback title, content, and contact fields.
+  - `glass-panel` for the footer shell.
+  - `surface-subpanel` for inline screenshot preview/status blocks.
+  - `page-footer`, `info-text`, and `hint` for footer copy, meta, and helper text.
+  - `page-title` remains the shared page-heading utility; avoid it inside the compact footer unless the footer deliberately needs page-heading treatment.
 - Every new Vue component style block must be `<style scoped lang="scss">` and must start with `@use '@/styles/global/mixins' as *;`.
 - Use existing CSS custom properties from `project/src/styles/global/_tokens.scss` for colors, radii, shadows, surfaces, and text. Do not add hardcoded UI colors in component SCSS.
 - Use existing mixins such as `flex-col`, `flex-center`, `text-truncate`, `disabled-state`, and `glass-blur` instead of raw duplicated declarations where they apply.
+- Component-local SCSS may only define placement and layout glue: spacing, sizing, wrapping, grid/flex layout, overflow containment, and local CSS custom-property overrides for shared classes.
+- Component-local SCSS must not define visual skin for buttons, inputs, panels, chips, cards, modal surfaces, screenshot blocks, or state blocks. No component-local `background`, `border`, `border-radius`, `box-shadow`, `color`, or focus-ring styling unless a shared class cannot satisfy the requirement and the exception is explicitly noted in that task's CR checklist.
+- Language/theme metadata is neutral in v1 and uses `info-text`. If colored theme labels are still required, add a small shared utility under `project/src/styles/main/_info.scss` in a separately confirmed task instead of styling a private chip inside the footer component.
 - Do not add width-based media queries. Responsive footer layout must use `@media (max-aspect-ratio: 1 / 1)`.
 - The footer is a compact utility surface, not a marketing section. It should not use hero-scale text, decorative blobs, nested cards, or one-off visual effects.
 - Footer stats must use the shared `useVisitStats()` and `useSourceStats()` cache path. Do not create duplicate homepage/sidebar stats requests.
 - First-pass feedback opens a modal and calls `POST /api/suggestions` directly. Do not navigate users to the old `/menu/about/suggestion` page for this flow.
 - First-pass feedback includes optional automatic screenshot capture because backend `image_base64` support is confirmed.
 - First-pass share behavior is link-first: `navigator.share` when available, then clipboard fallback. Branded share images are a phase-2 task and must not block the base footer.
+
+## Shared Style Contract
+
+Use this contract while executing every task in this plan:
+
+- `glass-button` is the only footer/modal action-button skin. Use its `data-variant` and `data-size` API before considering any local CSS custom property override.
+- `glass-field` is the only feedback text input and textarea skin. Component SCSS may set textarea behavior such as `resize`, but must not draw field borders, fills, text colors, or focus states.
+- `glass-panel` is the footer shell surface. The footer component may set width, margin, padding, and internal layout, but the shell fill, blur, border, radius, and shadow come from `glass-panel`.
+- `surface-subpanel` is the nested screenshot preview/status surface. The feedback component may set preview spacing and image sizing, but the preview surface itself comes from the shared class.
+- `page-footer` is the shared inline footer/meta row utility. Use it for the stats/legal/language row, then add local wrapping and spacing only where the layout requires it.
+- `info-text` is the shared neutral text row utility. Use it for stats items, language/theme metadata, and compact page identity text.
+- `hint` is the shared muted helper-text utility. Use it for the one-line feature description and screenshot helper copy.
+- `page-title` is a page-heading utility, not the default compact footer title style. Only use it inside the footer if the footer is intentionally elevated into a page-heading role.
+- `ChoiceSelector` owns the visual behavior of feedback category selection. Do not rebuild category tabs with local buttons and styles.
+- `CheckBox` owns the screenshot opt-in control skin.
+- `AppModal` owns the feedback dialog shell, fixed header, scrollable content, and footer slot.
 
 ## File Structure
 
@@ -133,7 +157,7 @@ These constraints are part of the plan, not optional style advice:
 - Create `project/src/components/footer/AppFooter.vue`
   - Shared footer UI and action wiring.
 - Create `project/src/main/components/footer/LayoutFeedbackModal.vue`
-  - Feedback type picker and suggestion form. Reuses `AppModal`, `RadioGroup`, and `CheckBox` for screenshot consent.
+  - Feedback type picker and suggestion form. Reuses `AppModal`, `ChoiceSelector`, and `CheckBox` for screenshot consent.
 - Create `project/src/utils/share/pageSnapshot.js`
   - Optional page screenshot capture and compression helper for feedback.
 - Create `project/src/utils/share/shareCard.js`
@@ -1106,43 +1130,43 @@ Create `project/src/components/footer/AppFooter.vue`:
 
 ```vue
 <template>
-  <footer class="app-footer" :data-layout-kind="layoutKind">
+  <footer class="app-footer glass-panel" data-app-footer :data-layout-kind="layoutKind">
     <div class="footer-primary">
-      <p class="page-copy">
-        <span class="page-title">{{ t(context.pageTitleKey) }}</span>
-        <span class="page-description">{{ t(context.pageDescriptionKey) }}</span>
+      <p class="info-text page-copy">
+        <strong>{{ t(context.pageTitleKey) }}</strong>
+        <span class="hint">{{ t(context.pageDescriptionKey) }}</span>
       </p>
 
       <div class="footer-actions" aria-label="layout footer actions">
         <button
           type="button"
-          class="main-glass-button footer-action"
-          data-size="small"
+          class="glass-button footer-action"
+          data-size="compact"
           :disabled="!context.hasTutorial"
           @click="openTutorial"
         >
           {{ t('layoutFooter.actions.tutorial') }}
         </button>
-        <button type="button" class="main-glass-button footer-action" data-size="small" @click="isFeedbackOpen = true">
+        <button type="button" class="glass-button footer-action" data-size="compact" @click="isFeedbackOpen = true">
           {{ t('layoutFooter.actions.feedback') }}
         </button>
-        <button type="button" class="main-glass-button footer-action" data-size="small" @click="shareCurrentPage">
+        <button type="button" class="glass-button footer-action" data-size="compact" @click="shareCurrentPage">
           {{ t('layoutFooter.actions.share') }}
         </button>
-        <button type="button" class="main-glass-button footer-action" data-size="small" @click="goToSettings">
+        <button type="button" class="glass-button footer-action" data-size="compact" @click="goToSettings">
           {{ t('layoutFooter.actions.settings') }}
         </button>
       </div>
     </div>
 
-    <div class="footer-meta">
-      <span class="theme-chip" :data-theme="currentColorTheme">
+    <div class="page-footer footer-meta">
+      <span class="info-text">
         {{ t(context.languageLabelKey) }} · {{ t(context.themeLabelKey) }}
       </span>
-      <span>{{ t('layoutFooter.stats.visits', { today: todayVisits, total: totalVisits }) }}</span>
-      <span>{{ t('layoutFooter.stats.source', { locationCount: sourceLocationCount, dataCount: sourceDataCount }) }}</span>
-      <span>{{ t('layoutFooter.stats.databaseVersion', { version: sourceDbVersion }) }}</span>
-      <span>{{ t('layoutFooter.legal.icp') }}</span>
+      <span class="info-text">{{ t('layoutFooter.stats.visits', { today: todayVisits, total: totalVisits }) }}</span>
+      <span class="info-text">{{ t('layoutFooter.stats.source', { locationCount: sourceLocationCount, dataCount: sourceDataCount }) }}</span>
+      <span class="info-text">{{ t('layoutFooter.stats.databaseVersion', { version: sourceDbVersion }) }}</span>
+      <span class="info-text">{{ t('layoutFooter.legal.icp') }}</span>
     </div>
 
     <LayoutFeedbackModal
@@ -1273,11 +1297,6 @@ onMounted(fetchFooterStats)
   width: min(100%, 1200px);
   margin: 10px auto 0;
   padding: 10px 12px;
-  border: 1px solid rgba(var(--color-primary-rgb), 0.14);
-  border-radius: var(--radius-md);
-  background: var(--glass-60);
-  color: var(--text-deep);
-  font-size: 0.85rem;
 }
 
 .footer-primary {
@@ -1294,15 +1313,6 @@ onMounted(fetchFooterStats)
   gap: 2px;
 }
 
-.page-title {
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.page-description {
-  color: var(--text-dark-lighter);
-}
-
 .footer-actions,
 .footer-meta {
   display: flex;
@@ -1315,32 +1325,13 @@ onMounted(fetchFooterStats)
   justify-content: flex-end;
 }
 
-.theme-chip {
-  padding: 4px 8px;
-  border: 1px solid rgba(var(--color-primary-rgb), 0.18);
-  border-radius: var(--radius-sm);
-  background: var(--glass-70);
-  color: var(--text-deep);
-}
-
 .footer-action {
-  --main-glass-button-padding: 4px 8px;
-  --main-glass-button-border-radius: var(--radius-sm);
-  --main-glass-button-font-size: 0.85rem;
-
-  &:disabled {
-    @include disabled-state;
-  }
+  min-width: 0;
 }
 
 .footer-meta {
   justify-content: center;
   margin-top: 8px;
-  color: var(--text-dark-lighter);
-}
-
-.theme-chip[data-theme='green'] {
-  color: var(--color-success);
 }
 
 @media (max-aspect-ratio: 1 / 1) {
@@ -1360,7 +1351,6 @@ onMounted(fetchFooterStats)
 
   .footer-action {
     min-width: 0;
-    padding-inline: 4px;
   }
 }
 </style>
@@ -1444,8 +1434,10 @@ CR checklist:
 - Existing `PageTutorialGuide`, `PanelManager`, `FloatingButtons`, and `SimpleSidebar` remain mounted.
 - `SimpleLayout` behavior changes only enough to stack footer after content.
 - Styles use `<style scoped lang="scss">` and project mixins.
-- Footer action buttons reuse `main-glass-button`; footer SCSS only supplies compact CSS custom-property overrides.
-- Footer surfaces, text, borders, and states use existing `var(--...)` design tokens.
+- Footer action buttons reuse `glass-button` with `data-size="compact"`; footer SCSS does not draw button visual skin.
+- Footer shell reuses `glass-panel`; footer copy and metadata reuse `info-text`, `hint`, and `page-footer`.
+- Component-local footer SCSS contains only layout glue and no `background`, `border`, `border-radius`, `box-shadow`, `color`, or focus-ring styling.
+- Footer surfaces, text, borders, and states come from shared classes and existing `var(--...)` design tokens.
 - `source_path` passed to feedback is `route.path`; `route.fullPath`, query, hash, locale, theme, layout, app version, and database version stay in feedback context.
 - No width-based responsive media query appears.
 
@@ -1499,20 +1491,24 @@ vi.mock('../src/components/common/AppModal.vue', () => ({
   },
 }))
 
-vi.mock('../src/components/selector/RadioGroup.vue', () => ({
+vi.mock('../src/components/selector/ChoiceSelector.vue', () => ({
   default: {
-    props: ['modelValue', 'options', 'name'],
-    emits: ['update:modelValue', 'change'],
+    props: ['modelValue', 'options', 'ariaLabel', 'disabled'],
+    emits: ['update:modelValue'],
     template: `
-      <select
-        :name="name"
-        :value="modelValue"
-        @change="$emit('update:modelValue', $event.target.value); $emit('change', $event.target.value)"
-      >
-        <option v-for="option in options" :key="option.value" :value="option.value">
+      <div role="tablist" :aria-label="ariaLabel">
+        <button
+          v-for="option in options"
+          :key="option.value"
+          type="button"
+          :data-feedback-category="option.value"
+          :data-active="modelValue === option.value"
+          :disabled="disabled"
+          @click="$emit('update:modelValue', option.value)"
+        >
           {{ option.label }}
-        </option>
-      </select>
+        </button>
+      </div>
     `,
   },
 }))
@@ -1563,8 +1559,7 @@ describe('LayoutFeedbackModal', () => {
     const wrapper = mountModal(LayoutFeedbackModal)
     await nextTick()
 
-    wrapper.host.querySelector('[name="category"]').value = 'bug'
-    wrapper.host.querySelector('[name="category"]').dispatchEvent(new Event('change'))
+    wrapper.host.querySelector('[data-feedback-category="bug"]').click()
     wrapper.host.querySelector('[name="title"]').value = '地图没有刷新'
     wrapper.host.querySelector('[name="title"]').dispatchEvent(new Event('input'))
     wrapper.host.querySelector('[name="content"]').value = '切换分区后地图颜色没有变化。'
@@ -1673,11 +1668,10 @@ Create `project/src/main/components/footer/LayoutFeedbackModal.vue`:
     <form class="feedback-form" @submit.prevent="submit">
       <div class="field feedback-category">
         <span>{{ t('layoutFooter.feedback.category') }}</span>
-        <RadioGroup
+        <ChoiceSelector
           v-model="category"
-          name="category"
           :options="categoryOptions"
-          :size="13"
+          :aria-label="t('layoutFooter.feedback.category')"
         />
       </div>
 
@@ -1685,6 +1679,7 @@ Create `project/src/main/components/footer/LayoutFeedbackModal.vue`:
         <span>{{ t('layoutFooter.feedback.titleLabel') }}</span>
         <input
           v-model.trim="title"
+          class="glass-field"
           name="title"
           maxlength="200"
           :placeholder="t('layoutFooter.feedback.titlePlaceholder')"
@@ -1695,6 +1690,7 @@ Create `project/src/main/components/footer/LayoutFeedbackModal.vue`:
         <span>{{ t('layoutFooter.feedback.contentLabel') }}</span>
         <textarea
           v-model.trim="content"
+          class="glass-field"
           name="content"
           maxlength="5000"
           rows="5"
@@ -1706,6 +1702,7 @@ Create `project/src/main/components/footer/LayoutFeedbackModal.vue`:
         <span>{{ t('layoutFooter.feedback.contactLabel') }}</span>
         <input
           v-model.trim="contact"
+          class="glass-field"
           name="contact"
           maxlength="200"
           :placeholder="t('layoutFooter.feedback.contactPlaceholder')"
@@ -1716,7 +1713,7 @@ Create `project/src/main/components/footer/LayoutFeedbackModal.vue`:
     <template #footer>
       <button
         type="button"
-        class="main-glass-button submit-button"
+        class="glass-button submit-button"
         data-variant="primary"
         data-size="small"
         data-submit-feedback
@@ -1733,7 +1730,7 @@ Create `project/src/main/components/footer/LayoutFeedbackModal.vue`:
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
-import RadioGroup from '@/components/selector/RadioGroup.vue'
+import ChoiceSelector from '@/components/selector/ChoiceSelector.vue'
 import { submitSuggestion } from '@/api/main/suggestions.js'
 import { showError, showSuccess } from '@/utils/ui/message.js'
 
@@ -1833,19 +1830,10 @@ watch(
 .field {
   @include flex-col;
   gap: 6px;
-  color: var(--text-deep);
-  font-size: 0.92rem;
 }
 
-input,
-textarea {
-  width: 100%;
-  padding: 8px 10px;
-  border: 1px solid rgba(var(--color-primary-rgb), 0.22);
-  border-radius: var(--radius-sm);
-  background: var(--glass-70);
-  color: var(--text-deep);
-  font: inherit;
+.feedback-category {
+  align-items: flex-start;
 }
 
 textarea {
@@ -1853,9 +1841,7 @@ textarea {
 }
 
 .submit-button {
-  --main-glass-button-padding: 8px 14px;
-  --main-glass-button-border-radius: var(--radius-sm);
-  --main-glass-button-font-size: 0.9rem;
+  min-width: 96px;
 }
 </style>
 ```
@@ -1882,8 +1868,10 @@ CR checklist:
 
 - The modal uses `AppModal`, so the header does not scroll with content.
 - Feedback submits directly through `submitSuggestion()`; it does not navigate to `/menu/about/suggestion`.
-- The category picker reuses `RadioGroup`; do not replace it with a custom segmented-control skin.
-- The submit button reuses `main-glass-button` with compact CSS custom-property overrides.
+- The category picker reuses `ChoiceSelector`; do not replace it with a custom segmented-control skin.
+- Title, content, and contact controls reuse `glass-field`; do not add component-local input or textarea visual styling.
+- The submit button reuses `glass-button` with `data-variant="primary"`.
+- Component-local modal SCSS contains only layout glue and no `background`, `border`, `border-radius`, `box-shadow`, `color`, or focus-ring styling.
 - The initial frontend category choices are `general`, `bug`, `feature`, `data_issue`, and `ui`.
 - Backend `422` responses show `layoutFooter.feedback.validationFailed`; other errors show `layoutFooter.feedback.failed`.
 - Existing Chinese copy outside `layoutFooter.json` is untouched.
@@ -2116,8 +2104,8 @@ Add the checkbox inside the form:
 >
   {{ t('layoutFooter.feedback.screenshot.label') }}
 </CheckBox>
-<p class="screenshot-hint">{{ t('layoutFooter.feedback.screenshot.hint') }}</p>
-<div v-if="includeScreenshot" class="screenshot-preview">
+<p class="hint screenshot-hint">{{ t('layoutFooter.feedback.screenshot.hint') }}</p>
+<div v-if="includeScreenshot" class="surface-subpanel screenshot-preview">
   <img
     v-if="screenshotDataUrl"
     :src="screenshotDataUrl"
@@ -2126,8 +2114,8 @@ Add the checkbox inside the form:
   <span v-else>{{ t('layoutFooter.feedback.screenshot.capturing') }}</span>
   <button
     type="button"
-    class="main-glass-button screenshot-retake"
-    data-size="small"
+    class="glass-button screenshot-retake"
+    data-size="compact"
     :disabled="isCapturingScreenshot"
     @click="captureScreenshotPreview"
   >
@@ -2219,18 +2207,12 @@ Add styles:
 
 .screenshot-hint {
   margin: -6px 0 0;
-  color: var(--text-dark-lighter);
-  font-size: 0.82rem;
 }
 
 .screenshot-preview {
   @include flex-col;
   gap: 8px;
   padding: 8px;
-  border: 1px solid var(--border-glass-subtle);
-  border-radius: var(--radius-sm);
-  background: var(--surface-panel-subtle);
-  color: var(--text-dark-lighter);
 }
 
 .screenshot-preview img {
@@ -2238,13 +2220,10 @@ Add styles:
   width: 100%;
   max-height: 180px;
   object-fit: contain;
-  border-radius: var(--radius-xs);
 }
 
 .screenshot-retake {
   align-self: flex-start;
-  --main-glass-button-padding: 6px 10px;
-  --main-glass-button-font-size: 0.82rem;
 }
 ```
 
@@ -2313,6 +2292,8 @@ CR checklist:
 - Automatic screenshots are encoded as `image/webp`.
 - Screenshot compression targets about 600 KB and throws `screenshot_too_large` if output remains above 1 MB.
 - Screenshot consent reuses `CheckBox`; do not style a native checkbox from scratch.
+- Screenshot helper copy reuses `hint`; preview/status surface reuses `surface-subpanel`; retake action reuses `glass-button`.
+- Component-local screenshot SCSS contains only spacing and image sizing.
 - Modal and footer are ignored by screenshot capture.
 - Chinese and emoji content remain literal.
 - The new dependency is justified by current-page screenshot support.
