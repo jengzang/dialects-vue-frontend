@@ -10,6 +10,10 @@ import {
 // ========================================
 export const globalPayload = ref(null)
 
+// 音節統計跨頁跳轉的「待填地點」。不寫 URL（countphos 最多 100 個地點，會撐爆查詢串），
+// 改由彈窗寫入此共享 ref，Countphos 掛載/激活時消費後清空。
+export const pendingCountphosLocations = ref([])
+
 const {
     state: preferredCharacterTableState,
     write: writePreferredCharacterTableState

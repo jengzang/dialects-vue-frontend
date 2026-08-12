@@ -214,31 +214,43 @@ const loadData = async () => {
   })
 }
 
+// URL 中的 loc 已是规范地点名（loadData 写入的是 matchedLocations），
+// 直接用它初始化 matchedLocations 并自动查询，不再依赖 LocationMultiInput 的异步匹配
+const runUrlAutoQuery = () => {
+  const urlLocations = Array.isArray(locationQuery.value)
+    ? locationQuery.value.slice(0, PHONOLOGY_LOCATION_LIMITS.matrix)
+    : []
+
+  if (urlLocations.length === 0) return
+
+  matchedLocations.value = [...urlLocations]
+  loadData()
+}
+
 // 页面加载时自动查询
 onMounted(() => {
-  if (locationQuery.value.length > 0) {
-    // 等待 LocationMultiInput 完成地点匹配
-    const unwatch = watch(matchedLocations, (locations) => {
-      if (locations.length > 0) {
-        loadData()
-        unwatch() // 只自动查询一次
-      }
-    })
-  }
+  runUrlAutoQuery()
 })
 
-// 处理浏览器前进/后退
+// 处理浏览器前进/后退 + 跨页跳转（含 KeepAlive 重新激活时 URL 变化）
 watch(locationQuery, (urlLocations) => {
   const limitedUrlLocations = Array.isArray(urlLocations)
     ? urlLocations.slice(0, PHONOLOGY_LOCATION_LIMITS.matrix)
     : []
 
-  // 只有当 URL 的地点和当前匹配的地点不同时，才需要清空数据
+  // 只有当 URL 的地点和当前匹配的地点不同时，才需要清空数据并重新查询
   // 这样可以避免在查询成功更新 URL 后误清空数据
-  if (JSON.stringify(limitedUrlLocations) !== JSON.stringify(matchedLocations.value)) {
-    queryStrings.value = [...limitedUrlLocations]
-    matrixData.value = null
-    error.value = null
+  if (JSON.stringify(limitedUrlLocations) === JSON.stringify(matchedLocations.value)) {
+    return
+  }
+
+  queryStrings.value = [...limitedUrlLocations]
+  matrixData.value = null
+  error.value = null
+
+  if (limitedUrlLocations.length > 0) {
+    matchedLocations.value = [...limitedUrlLocations]
+    loadData()
   }
 })
 </script>

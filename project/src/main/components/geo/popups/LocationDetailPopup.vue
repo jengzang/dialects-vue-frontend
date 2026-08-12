@@ -49,6 +49,12 @@
         </div>
       </div>
 
+      <div class="phono-actions">
+        <button type="button" class="phono-action-btn" @click="goToPhonology('matrix')">{{ t('phonology.tabs.matrix') }}</button>
+        <button type="button" class="phono-action-btn" @click="goToPhonology('evolution')">{{ t('phonology.tabs.evolution') }}</button>
+        <button type="button" class="phono-action-btn" @click="goToPhonology('count')">{{ t('phonology.tabs.count') }}</button>
+      </div>
+
       <div class="tone-section" v-if="getToneData(data.data[0]).length > 0">
         <div class="section-title">{{ t('result.locationDetailPopup.toneSection.title') }}</div>
         <table class="tone-table">
@@ -85,6 +91,10 @@
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { useI18n } from 'vue-i18n';
 import { computed, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import { encodeQueryValueBase64Url } from '@/utils/urlParams.js'
+import { pendingCountphosLocations } from '@/main/store/store.js'
 import AppModal from '@/components/common/AppModal.vue'
 import LocationMapPopup from './LocationMapPopup.vue'
 
@@ -98,9 +108,13 @@ const props = defineProps({
 
 const emit = defineEmits(['close']);
 const { t } = useI18n();
+const route = useRoute()
+const router = useRouter()
 const showMapPopup = ref(false)
 
 const modalTitle = computed(() => `📍 ${t('result.locationDetailPopup.title', { name: props.locationName })}`)
+
+const locationText = computed(() => props.data?.data?.[0]?.['簡稱'] || props.locationName)
 
 const parsedCoord = computed(() => {
   const raw = props.data?.data?.[0]?.['經緯度']
@@ -165,6 +179,26 @@ const getToneData = (data) => {
 
 const handleClose = () => {
   emit('close');
+};
+
+const goToPhonology = (section) => {
+  const loc = locationText.value
+  if (!loc) return
+
+  emit('close')
+
+  if (section === 'count') {
+    pendingCountphosLocations.value = [loc]
+    router.push({
+      path: buildLocalePath(resolveRouteLocale(route), '/menu/pho/count')
+    })
+    return
+  }
+
+  router.push({
+    path: buildLocalePath(resolveRouteLocale(route), `/menu/pho/${section}`),
+    query: { loc: encodeQueryValueBase64Url(loc) }
+  })
 };
 </script>
 
@@ -243,6 +277,33 @@ $transition-fast: 0.2s;
     margin-left: 12px;
     color: $text-main;
     word-break: break-all;
+  }
+}
+
+/* 音系跳转按钮 */
+.phono-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.phono-action-btn {
+  flex: 1;
+  padding: 8px 0;
+  background: $primary-background-light;
+  border: 1px solid $primary-divider;
+  border-radius: var(--radius-sm);
+  color: $primary;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background $transition-fast ease,
+    border-color $transition-fast ease;
+
+  &:hover {
+    background: $primary-background-medium;
+    border-color: $primary;
   }
 }
 

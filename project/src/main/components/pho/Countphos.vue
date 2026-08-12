@@ -1,6 +1,6 @@
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, nextTick, onMounted, onBeforeUnmount, onActivated, onDeactivated, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
@@ -10,6 +10,7 @@ import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopu
 import LocationMultiInput from '@/main/components/geo/LocationMultiInput.vue'
 import CountLocationJumpNav from '@/main/components/pho/CountLocationJumpNav.vue'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
+import { pendingCountphosLocations } from '@/main/store/store.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { useNavAnchorJump } from '@/composables/bar/useNavAnchorJump.js'
 import all_feature_counts from '/data/feature_counts_20260624.json?url'
@@ -892,9 +893,45 @@ const closeLocationModal = () => {
   modalLocationText.value = ''
 }
 
+const isActive = ref(true)
+
+const consumePendingCountphosLocations = () => {
+  const pending = pendingCountphosLocations.value
+  if (!Array.isArray(pending) || pending.length === 0) return
+
+  const locations = pending.slice(0, PHONOLOGY_LOCATION_LIMITS.countphos)
+  queryStrings.value = [...locations]
+  matchedLocations.value = [...locations]
+  pendingCountphosLocations.value = []
+
+  loadData()
+}
+
 onMounted(async () => {
   window.addEventListener('resize', resizeCharts)
-  await loadDefaultCountsData()
+
+  if (pendingCountphosLocations.value.length > 0) {
+    consumePendingCountphosLocations()
+  } else {
+    await loadDefaultCountsData()
+  }
+})
+
+onActivated(() => {
+  isActive.value = true
+  if (pendingCountphosLocations.value.length > 0) {
+    consumePendingCountphosLocations()
+  }
+})
+
+onDeactivated(() => {
+  isActive.value = false
+})
+
+watch(pendingCountphosLocations, () => {
+  if (isActive.value) {
+    consumePendingCountphosLocations()
+  }
 })
 
 onBeforeUnmount(() => {
