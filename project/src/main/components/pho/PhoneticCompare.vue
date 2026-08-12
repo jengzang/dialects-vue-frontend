@@ -776,17 +776,32 @@ watch(() => props.queryLocations, (newVal) => {
 }, { deep: true, immediate: true })
 
 // ========== 监听 tab 可见性：进入 tab5 时补渲染 ==========
-watch(() => props.active, (active) => {
+watch(() => props.active, async (active) => {
   if (!active) return
-  if (!rawData.value) return
 
-  if (chartInstance.value) {
-    chartInstance.value.resize()
-    return
+  if (!rawData.value) return
+  if (!Array.isArray(activeLocations.value) || activeLocations.value.length < 2) return
+
+  // 等 v-show 生效、容器恢复可见尺寸后再重绘。
+  // 单次双 rAF 可能在布局尚未完成时仍拿到 clientWidth=0，这里轮询至尺寸可用。
+  const el = sankeyContainerRef.value
+  if (el) {
+    for (let i = 0; i < 10; i++) {
+      if (el.clientWidth > 0 && el.clientHeight > 0) break
+      await waitForPaint()
+    }
   }
 
-  if (Array.isArray(activeLocations.value) && activeLocations.value.length >= 2) {
-    renderSankey(activeLocations.value)
+  // 复用与 changeFeature 相同的可靠渲染路径
+  isChartRendering.value = true
+  await nextTick()
+  await waitForPaint()
+
+  try {
+    await renderSankey(activeLocations.value)
+    await waitForPaint()
+  } finally {
+    isChartRendering.value = false
   }
 })
 
