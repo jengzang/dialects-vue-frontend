@@ -366,20 +366,6 @@
     "loading": {
       "rendering": "地图渲染中..."
     },
-    "locationPopup": {
-      "title": "{location} - 详细信息",
-      "loading": "加载中...",
-      "noData": "暂无数据",
-      "fields": {
-        "mapRegion2": "地图集二分区：",
-        "phoneticRegion": "音典分区：",
-        "characterSource": "字表来源：",
-        "coordinates": "经纬度：",
-        "adminRegion": "行政区划：",
-        "toneCategory": "调类",
-        "toneValue": "调值"
-      }
-    },
     "popup": {
       "note": "说明: {note}"
     },

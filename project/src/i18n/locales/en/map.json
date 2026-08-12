@@ -366,20 +366,6 @@
     "loading": {
       "rendering": "Rendering map..."
     },
-    "locationPopup": {
-      "title": "{location} – Details",
-      "loading": "Loading...",
-      "noData": "No data available",
-      "fields": {
-        "mapRegion2": "Atlas Level-2 Region:",
-        "phoneticRegion": "MCPDict Region:",
-        "characterSource": "Character-List Source:",
-        "coordinates": "Coordinates:",
-        "adminRegion": "Administrative Division:",
-        "toneCategory": "Tone Class",
-        "toneValue": "Tone Value"
-      }
-    },
     "popup": {
       "note": "Note: {note}"
     },

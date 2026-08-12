@@ -52,71 +52,13 @@
       <span>{{ t('map.mapLibre.loading.rendering') }}</span>
     </div>
 
-    <Teleport to="body">
-      <div v-if="locationPopup.visible" class="location-popup-overlay" @click="closeLocationPopup">
-        <div class="location-popup-content" @click.stop>
-          <div class="location-popup-header">
-            <h3><InlineIcon icon="📍" />{{ t('map.mapLibre.locationPopup.title', { location: locationPopup.locationName }) }}</h3>
-            <button
-              class="close-btn close-btn-lg close-btn-inline"
-              @click="closeLocationPopup"
-              :title="t('common.button.close')"
-              :aria-label="t('common.button.close')"
-            >
-              &times;
-            </button>
-          </div>
-          <div class="location-popup-body">
-            <div v-if="locationPopup.loading" class="popup-loading">
-              <div class="ui-loading--page" aria-hidden="true"></div>
-              <span>{{ t('map.mapLibre.locationPopup.loading') }}</span>
-            </div>
-            <div v-else-if="locationPopup.data && locationPopup.data.data && locationPopup.data.data.length > 0" class="data-display">
-              <div class="dialect-info">
-                <div class="info-line title-line">
-                  {{ locationPopup.data.data[0]['語言'] }}
-                </div>
-                <div class="info-line">
-                  <strong>{{ t('map.mapLibre.locationPopup.fields.mapRegion2') }}</strong>{{ locationPopup.data.data[0]['地圖集二分區'] || t('map.mapLibre.common.none') }}
-                </div>
-                <div class="info-line">
-                  <strong>{{ t('map.mapLibre.locationPopup.fields.phoneticRegion') }}</strong>{{ locationPopup.data.data[0]['音典分區'] || t('map.mapLibre.common.none') }}
-                </div>
-                <div class="info-line">
-                  <strong>{{ t('map.mapLibre.locationPopup.fields.characterSource') }}</strong>{{ locationPopup.data.data[0]['字表來源（母本）'] || t('map.mapLibre.common.none') }}
-                </div>
-                <div class="info-line">
-                  <strong>{{ t('map.mapLibre.locationPopup.fields.coordinates') }}</strong>{{ formatCoordinates(locationPopup.data.data[0]['經緯度']) }}
-                </div>
-                <div class="info-line">
-                  <strong>{{ t('map.mapLibre.locationPopup.fields.adminRegion') }}</strong>{{ formatAdministrativeRegion(locationPopup.data.data[0]) }}
-                </div>
-
-                <div class="tone-table-container">
-                  <table class="tone-table">
-                    <thead>
-                      <tr>
-                        <th>{{ t('map.mapLibre.locationPopup.fields.toneCategory') }}</th>
-                        <th>{{ t('map.mapLibre.locationPopup.fields.toneValue') }}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(tone, index) in getToneData(locationPopup.data.data[0])" :key="index">
-                        <td>{{ tone.label }}</td>
-                        <td>{{ tone.value }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-            <div v-else class="no-data">
-              {{ t('map.mapLibre.locationPopup.noData') }}
-            </div>
-          </div>
-        </div>
-      </div>
-    </Teleport>
+    <LocationDetailPopup
+      :visible="locationPopup.visible"
+      :location-name="locationPopup.locationName"
+      :data="locationPopup.data"
+      :loading="locationPopup.loading"
+      @close="closeLocationPopup"
+    />
   </div>
 </template>
 
@@ -138,6 +80,7 @@ import CheckBox from '@/components/selector/CheckBox.vue'
 import MapLegend from './MapLegend.vue'
 import CompareMapPopup from './popups/CompareMapPopup.vue'
 import FeatureMapPopup from './popups/FeatureMapPopup.vue'
+import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue'
 
 // --- Props: 只接收數據，不負責請求 ---
 const props = defineProps({
@@ -255,20 +198,6 @@ const handleLocationClick = async (locationName) => {
   locationPopup.value.data = null;
 
   try {
-    const payload = {
-      db_key: "query",
-      table_name: "dialects",
-      page: 1,
-      page_size: 50,
-      sort_by: null,
-      sort_desc: false,
-      search_columns: [],
-      search_text: "",
-      filters: {
-        '簡稱': [locationName]
-      }
-    };
-
     const response = await getLocationDetail(locationName);
 
     locationPopup.value.data = response;
@@ -285,60 +214,11 @@ const closeLocationPopup = () => {
   locationPopup.value.visible = false;
 };
 
-// 格式化行政區劃
-const formatAdministrativeRegion = (data) => {
-  const parts = [];
-  if (data['省']) parts.push(data['省']);
-  if (data['市']) parts.push(data['市']);
-  if (data['縣']) parts.push(data['縣']);
-  if (data['鎮']) parts.push(data['鎮']);
-  if (data['行政村']) parts.push(data['行政村']);
-  if (data['自然村']) parts.push(data['自然村']);
-  return parts.length > 0 ? parts.join('-') : t('map.mapLibre.common.none');
-};
-
-// 格式化經緯度（保留6位小數）
-const formatCoordinates = (coords) => {
-  if (!coords) return t('map.mapLibre.common.none');
-  const parts = coords.split(',');
-  if (parts.length !== 2) return coords;
-
-  const lng = parseFloat(parts[0]);
-  const lat = parseFloat(parts[1]);
-
-  if (isNaN(lng) || isNaN(lat)) return coords;
-
-  return `${lng.toFixed(6)}, ${lat.toFixed(6)}`;
-};
-
 const isValidCoordinatePair = (coord) => {
   return Array.isArray(coord) &&
     coord.length >= 2 &&
     Number.isFinite(coord[0]) &&
     Number.isFinite(coord[1]);
-};
-
-// 提取調值數據
-const getToneData = (data) => {
-  const tones = [
-    { key: 'T1陰平', label: 'T1' },
-    { key: 'T2陽平', label: 'T2' },
-    { key: 'T3陰上', label: 'T3' },
-    { key: 'T4陽上', label: 'T4' },
-    { key: 'T5陰去', label: 'T5' },
-    { key: 'T6陽去', label: 'T6' },
-    { key: 'T7陰入', label: 'T7' },
-    { key: 'T8陽入', label: 'T8' },
-    { key: 'T9其他調', label: 'T9' },
-    { key: 'T10輕聲', label: 'T10' }
-  ];
-
-  return tones
-    .map(tone => ({
-      label: tone.label,
-      value: data[tone.key] || t('map.mapLibre.common.none')
-    }))
-    .filter(tone => tone.value !== t('map.mapLibre.common.none'));
 };
 
 import { CATEGORY_PALETTE } from '@/main/config/colors/mapColors.js'
@@ -942,7 +822,6 @@ const resetView = () => {
 $map-border-radius: var(--radius-2xl);
 $map-transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 $control-panel-width: 160px;
-$popup-max-width: 800px;
 $glass-transition: all 0.3s ease;
 
 .map-page-container {
@@ -1147,167 +1026,6 @@ $glass-transition: all 0.3s ease;
   font-weight: 700;
 
   background: var(--glass-80);
-}
-
-/* =========================
- * 地点详情弹窗
- * ========================= */
-
-.location-popup-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.location-popup-content {
-  display: flex;
-  flex-direction: column;
-
-  width: 90%;
-  max-width: $popup-max-width;
-  max-height: 80vh;
-
-  overflow: hidden;
-
-  background: var(--bg-white);
-  border-radius: var(--radius-md);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-}
-
-.location-popup-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  padding: 20px;
-
-  border-bottom: 1px solid var(--border-divider);
-
-  h3 {
-    margin: 0;
-
-    color: var(--text-dark);
-    font-size: 18px;
-  }
-}
-
-.location-popup-body {
-  flex: 1;
-
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.popup-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  padding: 40px;
-
-  color: var(--text-tertiary);
-}
-
-.dialect-info {
-  font-size: 14px;
-  line-height: 1.8;
-}
-
-.info-line {
-  padding: 8px 0;
-
-  border-bottom: 1px solid var(--bg-light);
-
-  strong {
-    margin-right: 8px;
-
-    color: var(--text-medium);
-  }
-
-  &:last-of-type {
-    margin-bottom: 20px;
-
-    border-bottom: 0;
-  }
-
-  &.title-line {
-    margin-bottom: 16px;
-    padding: 12px 0;
-
-    color: var(--text-dark);
-    font-size: 20px;
-    font-weight: 700;
-
-    border-bottom: 2px solid var(--color-primary);
-  }
-}
-
-.tone-table-container {
-  margin-top: 20px;
-}
-
-.tone-table {
-  width: 100%;
-
-  font-size: 14px;
-
-  border-collapse: collapse;
-
-  th,
-  td {
-    padding: 10px;
-
-    text-align: left;
-
-    border: 1px solid var(--border-light-gray);
-  }
-
-  th {
-    color: var(--text-dark);
-    font-weight: 600;
-
-    background: var(--bg-light);
-  }
-
-  tbody {
-    tr {
-      &:hover {
-        background: var(--bg-light-gray);
-      }
-    }
-  }
-}
-
-.data-display {
-  pre {
-    margin: 0;
-    padding: 16px;
-
-    overflow-x: auto;
-
-    font-size: 13px;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    overflow-wrap: break-word;
-
-    background: var(--bg-light);
-    border-radius: var(--radius-sm2);
-  }
-}
-
-.no-data {
-  padding: 40px;
-
-  color: var(--text-lightest);
-  font-size: 16px;
-  text-align: center;
 }
 
 /* =========================

@@ -43,15 +43,15 @@ const router = useRouter()
 const pathSectionToTab = {
   matrix: 'phonologyMatrix',
   custom: 'phonologyCustom',
+  evolution: 'evolution',
   count: 'Countphos',
-  evolution: 'evolution'
 }
 
 const tabToPathSection = {
   phonologyMatrix: 'matrix',
   phonologyCustom: 'custom',
+  evolution: 'evolution',
   Countphos: 'count',
-  evolution: 'evolution'
 }
 
 const currentTab = computed(() => {

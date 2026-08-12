@@ -366,20 +366,6 @@
     "loading": {
       "rendering": "地圖渲染中..."
     },
-    "locationPopup": {
-      "title": "{location} - 詳細資訊",
-      "loading": "載入中...",
-      "noData": "暫無資料",
-      "fields": {
-        "mapRegion2": "地圖集二分區：",
-        "phoneticRegion": "音典分區：",
-        "characterSource": "字表來源：",
-        "coordinates": "經緯度：",
-        "adminRegion": "行政區劃：",
-        "toneCategory": "調類",
-        "toneValue": "調值"
-      }
-    },
     "popup": {
       "note": "說明: {note}"
     },

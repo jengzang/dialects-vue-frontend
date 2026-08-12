@@ -121,12 +121,12 @@ $transition-duration: 0.5s;
   gap: 16px;
   justify-content: flex-start;
   max-width: 100%;
-  padding: 8px 12px;
+  padding: 3px 8px 12px 8px;
   overflow-x: auto;
 
   @media (max-width: 600px) {
     gap: 6px;
-    padding: 8px;
+    padding: 2px 6px 8px 6px;
   }
 }
 
