@@ -143,11 +143,11 @@
       >
         <div class="locations-list">
           <span
-            v-for="(loc, idx) in locationsResult"
-            :key="loc + '_' + idx"
+            v-for="(item, idx) in locationsResultWithPartitions"
+            :key="item.name + '_' + idx"
             class="loc-chip"
           >
-            {{ loc }}
+            <span class="loc-chip-name">{{ item.name }}</span><span v-if="item.hasPartition" class="loc-chip-partition"><span class="part-val">{{ item.map }}</span> · <span class="part-val">{{ item.yindian }}</span></span>
           </span>
         </div>
       </AppModal>
@@ -701,6 +701,7 @@ async function fetchLocationsResult() {
     limitHint.value = t('query.components.locationAndRegionInput.requireInput')
     selectedCount.value = null
     locationsResult.value = []
+    locationsPartitions.value = {}
 
     // ✅ 修复：清空自定义地点预览
     if (props.useInputMode) {
@@ -744,6 +745,8 @@ async function fetchLocationsResult() {
         : []
     // ✅ 存列表（用於預覽與彈層）
     locationsResult.value = uniqueLocations
+    // ✅ 存分區映射（用於彈層顯示分區）
+    locationsPartitions.value = data?.locations_partitions || {}
     // 6️⃣ 核心結果：locations_result
     const count = uniqueLocations.length
     selectedCount.value = count
@@ -780,6 +783,7 @@ async function fetchLocationsResult() {
     limitHint.value = t('query.components.locationMultiInput.errorFetchLocations')
     selectedCount.value = null
     locationsResult.value = []
+    locationsPartitions.value = {}
     customFeatureLocations.value = []
     updateDisabledState(true)  // ⭐ 錯誤時禁用按鈕
   }
@@ -960,6 +964,9 @@ watch(() => props.modelValue.regions, (newRegions) => {
 // ✅ 保存服務端返回的 locations_result
 const locationsResult = ref([])
 
+// ✅ 保存服務端返回的 locations_partitions（簡稱 → {地圖集二分區, 音典分區}）
+const locationsPartitions = ref({})
+
 // ✅ 保存自定義特徵的地點列表（僅輸入模式）
 const customFeatureLocations = ref([])
 
@@ -986,6 +993,22 @@ const customPreviewText = computed(() => {
   if (!arr.length) return ''
   const first4 = arr.slice(0, 4).join('、')
   return arr.length > 4 ? `${first4}…` : first4
+})
+
+// 展開彈層用的地點列表（簡稱 + 分區）
+const locationsResultWithPartitions = computed(() => {
+  const partitions = locationsPartitions.value || {}
+  return (locationsResult.value || []).map(name => {
+    const p = partitions[name]
+    const map = p?.['地圖集二分區']
+    const yindian = p?.['音典分區']
+    return {
+      name,
+      map: map || '',
+      yindian: yindian || '',
+      hasPartition: Boolean(map || yindian)
+    }
+  })
 })
 
 function openModal() {
@@ -1438,6 +1461,31 @@ $portrait-ratio: 1;
     );
     border-color: rgba(102, 126, 234, 0.3);
     color: $custom-purple;
+  }
+
+  .loc-chip-name {
+    color: var(--color-primary-hover);
+    font-weight: 600;
+
+    // @media (max-aspect-ratio: $portrait-ratio) {
+    //   font-size: 13px;
+    // }
+  }
+
+  .loc-chip-partition {
+    margin-left: 6px;
+    color: var(--text-dark-medium);
+    font-size: 11px;
+
+    .part-val {
+      display: inline-block;
+      padding: 1px 2px;
+      background: var(--color-primary-light);
+      border-radius: var(--radius-sm);
+    }
+    // @media (max-aspect-ratio: $portrait-ratio) {
+    //   font-size: 10px;
+    // }
   }
 }
 
