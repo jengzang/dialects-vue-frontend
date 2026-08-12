@@ -78,6 +78,12 @@
   },
   "locationDetailPopup": {
     "title": "Location {name}",
+    "phonologyActions": {
+      "title": "Quick View",
+      "matrix": "View Phonology",
+      "evolution": "Middle Chinese Evolution",
+      "count": "Syllable Statistics"
+    },
     "loading": "Loading...",
     "noData": "No data",
     "fields": {

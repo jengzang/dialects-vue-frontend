@@ -78,6 +78,12 @@
   },
   "locationDetailPopup": {
     "title": "地點 {name}",
+    "phonologyActions": {
+      "title": "快速查看",
+      "matrix": "查看音系",
+      "evolution": "中古演化",
+      "count": "音節統計"
+    },
     "loading": "載入中...",
     "noData": "暫無數據",
     "fields": {

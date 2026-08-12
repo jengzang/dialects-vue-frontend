@@ -12,6 +12,19 @@
     </div>
 
     <div v-else-if="data && data.data && data.data.length > 0" class="location-content">
+      <div class="section-title">{{ t('result.locationDetailPopup.phonologyActions.title') }}</div>
+      <div class="phono-actions">
+        <button type="button" class="glass-button" @click="goToPhonology('matrix')">
+          <BarIcon :icon="'⚛️'" />{{ t('result.locationDetailPopup.phonologyActions.matrix') }}
+        </button>
+        <button type="button" class="glass-button" @click="goToPhonology('evolution')">
+          <BarIcon :icon="'🥧'" />{{ t('result.locationDetailPopup.phonologyActions.evolution') }}
+        </button>
+        <button type="button" class="glass-button" @click="goToPhonology('count')">
+          <BarIcon :icon="'🧮'" />{{ t('result.locationDetailPopup.phonologyActions.count') }}
+        </button>
+      </div>
+
       <div class="info-section">
         <div class="info-title">{{ data.data[0]['語言'] || locationName }}</div>
 
@@ -49,12 +62,6 @@
         </div>
       </div>
 
-      <div class="phono-actions">
-        <button type="button" class="phono-action-btn" @click="goToPhonology('matrix')">{{ t('phonology.tabs.matrix') }}</button>
-        <button type="button" class="phono-action-btn" @click="goToPhonology('evolution')">{{ t('phonology.tabs.evolution') }}</button>
-        <button type="button" class="phono-action-btn" @click="goToPhonology('count')">{{ t('phonology.tabs.count') }}</button>
-      </div>
-
       <div class="tone-section" v-if="getToneData(data.data[0]).length > 0">
         <div class="section-title">{{ t('result.locationDetailPopup.toneSection.title') }}</div>
         <table class="tone-table">
@@ -89,6 +96,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { useI18n } from 'vue-i18n';
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router'
@@ -287,20 +295,17 @@ $transition-fast: 0.2s;
   margin-bottom: 20px;
 }
 
-.phono-action-btn {
+.glass-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   flex: 1;
   padding: 8px 0;
-  background: $primary-background-light;
   border: 1px solid $primary-divider;
-  border-radius: var(--radius-sm);
   color: $primary;
   font-size: 13px;
   font-weight: 600;
-  cursor: pointer;
-  transition:
-    background $transition-fast ease,
-    border-color $transition-fast ease;
-
   &:hover {
     background: $primary-background-medium;
     border-color: $primary;
