@@ -445,6 +445,7 @@
         </div>
         <PhoneticCompare
           :query-locations="tabStates.tab5.queryLocations"
+          :active="currentTab === 'tab5'"
           :enable-link-optimization="tabStates.tab5.enableLinkOptimization"
           :ignore-polyphonic-chars="tabStates.tab5.ignorePolyphonicChars"
           :min-link-char-count="tabStates.tab5.minLinkCharCount"
@@ -561,6 +562,8 @@ import { getCoordinates } from '@/api'
 import { requestMapFitView } from '@/utils/map/MapData.js'
 import { showWarning } from '@/utils/ui/message.js'
 import { useQueryConfig } from '@/composables/data/useQueryConfig.js'
+import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
+import { encodeQueryValueBase64Url, parseLocationsFromUrl } from '@/utils/urlParams.js'
 
 const { t } = useI18n()
 const selectedCharacterTable = preferredCharacterTable
@@ -694,8 +697,8 @@ const tabStates = reactive({
     matchedLocations: [],
     queryLocations: [],
 
-    enableLinkOptimization: false,
-    ignorePolyphonicChars: false,
+    enableLinkOptimization: true,
+    ignorePolyphonicChars: true,
 
     // 真正传给 PhoneticCompare 的值
     minLinkCharCount: 3,
@@ -705,6 +708,57 @@ const tabStates = reactive({
     minLinkCharCountDraft: 3,
     minNodeCharCountDraft: 10
   }
+})
+
+// ========== Tab5 地点 URL 状态（与 Evolution 对齐） ==========
+const COMPARE_LOCATION_LIMIT = 5
+
+const parseCompareLocationQuery = (value) => {
+  return parseLocationsFromUrl(
+    { query: { loc: value } },
+    { limit: COMPARE_LOCATION_LIMIT }
+  )
+}
+
+const serializeCompareLocationQuery = (locations) => {
+  if (!Array.isArray(locations)) return []
+
+  return locations
+    .filter(Boolean)
+    .slice(0, COMPARE_LOCATION_LIMIT)
+    .map((location) => encodeQueryValueBase64Url(location))
+}
+
+const { state: locationQuery, set: setLocationQuery } = useRouteQueryState('loc', {
+  defaultValue: [],
+  parse: parseCompareLocationQuery,
+  serialize: serializeCompareLocationQuery,
+  replace: true,
+  removeIf: (locations) => !Array.isArray(locations) || locations.length === 0,
+})
+
+const syncTab5FromUrl = (urlLocations) => {
+  const limited = (Array.isArray(urlLocations) ? urlLocations : []).slice(0, COMPARE_LOCATION_LIMIT)
+
+  tabStates.tab5.locations = [...limited]
+  tabStates.tab5.matchedLocations = [...limited]
+  tabStates.tab5.queryLocations = [...limited]
+}
+
+// 初始同步：URL 已带 loc 时，填充输入并触发真实查询
+const initialUrlLocations = locationQuery.value
+if (Array.isArray(initialUrlLocations) && initialUrlLocations.length > 0) {
+  syncTab5FromUrl(initialUrlLocations)
+}
+
+watch(locationQuery, (urlLocations) => {
+  const limited = (Array.isArray(urlLocations) ? urlLocations : []).slice(0, COMPARE_LOCATION_LIMIT)
+
+  if (JSON.stringify(limited) === JSON.stringify(tabStates.tab5.queryLocations)) {
+    return
+  }
+
+  syncTab5FromUrl(limited)
 })
 
 // Tab2 相關方法
@@ -1353,6 +1407,7 @@ const runTab5Action = () => {
   }
 
   tabStates.tab5.queryLocations = [...tabStates.tab5.matchedLocations]
+  setLocationQuery(tabStates.tab5.matchedLocations.slice(0, COMPARE_LOCATION_LIMIT))
 }
 
 // 點擊按鈕行為

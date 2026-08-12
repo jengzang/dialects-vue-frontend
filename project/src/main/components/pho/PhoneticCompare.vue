@@ -129,6 +129,12 @@ const props = defineProps({
     default: () => []
   },
 
+  // 父组件传入：当前 tab 是否可见（用于延迟渲染隐藏的桑基图）
+  active: {
+    type: Boolean,
+    default: true
+  },
+
   // 父组件传入：是否启用 Sankey 自动布局优化
   // false 时 layoutIterations = 0，节点顺序更接近输入顺序
   // true 时 layoutIterations = 200，ECharts 会尝试优化连线交叉
@@ -158,7 +164,8 @@ const props = defineProps({
 
 // ========== 响应式数据 ==========
 const rawData = ref(null)
-const activeFeature = ref('聲母')
+const activeLocations = ref([])
+const activeFeature = ref('韻母')
 const isLoading = ref(false)
 const errorMessage = ref('')
 
@@ -208,7 +215,7 @@ const shouldIgnorePolyphonicChars = computed(() => {
 const sankeyWidth = computed(() => {
   if (!rawData.value?.data) return '100%'
 
-  const validLocs = props.queryLocations.filter(loc => rawData.value.data[loc])
+  const validLocs = activeLocations.value.filter(loc => rawData.value.data[loc])
   if (validLocs.length < 2) return '100%'
 
   const minWidthPerColumn = isMobileLayout.value ? 160 : 240
@@ -240,7 +247,7 @@ const changeFeature = async (feat) => {
   await waitForPaint()
 
   try {
-    await renderSankey(props.queryLocations)
+    await renderSankey(activeLocations.value)
     // 给浏览器一帧机会完成图表刷新
     await waitForPaint()
   } finally {
@@ -269,7 +276,7 @@ const rerenderSankeyOnly = async () => {
     await waitForPaint()
 
     try {
-      await renderSankey(props.queryLocations)
+      await renderSankey(activeLocations.value)
       await waitForPaint()
     } finally {
       isChartRendering.value = false
@@ -291,6 +298,7 @@ const clearChart = () => {
 }
 
 const handleQuery = async (queryLocs) => {
+  demoLoadSeq++
   isLoading.value = true
   isChartRendering.value = false
   hasPendingRerender = false
@@ -318,6 +326,7 @@ const handleQuery = async (queryLocs) => {
     }
 
     rawData.value = response
+    activeLocations.value = queryLocs
 
     // 接口 loading 结束，结果区域进入 DOM
     isLoading.value = false
@@ -705,20 +714,81 @@ watch(
   }
 )
 
+// ========== 演示数据（初始值，与 Evolution 对齐） ==========
+const demoDataCache = ref(null)
+let demoLoadSeq = 0
+
+const getDemoData = async () => {
+  if (demoDataCache.value) return demoDataCache.value
+
+  const response = await fetch('/data/pho_compare.json')
+  if (!response.ok) {
+    throw new Error(`Failed to load demo data: ${response.status}`)
+  }
+
+  const data = await response.json()
+  demoDataCache.value = data
+  return data
+}
+
+const applyDemoData = async () => {
+  const seq = ++demoLoadSeq
+
+  try {
+    const demoData = await getDemoData()
+    if (seq !== demoLoadSeq) return
+
+    const demoLocations = Object.keys(demoData.data || {})
+    closeDetailCard()
+    clearChart()
+    errorMessage.value = ''
+    isLoading.value = false
+    hasPendingRerender = false
+    rawData.value = demoData
+    activeLocations.value = demoLocations
+
+    isChartRendering.value = true
+    await nextTick()
+    await waitForPaint()
+
+    await renderSankey(demoLocations)
+
+    await waitForPaint()
+  } catch (error) {
+    if (seq !== demoLoadSeq) return
+    console.error('Load pho_compare demo failed:', error)
+    errorMessage.value = error.message || '加载演示数据失败'
+    isLoading.value = false
+  } finally {
+    if (seq === demoLoadSeq) {
+      isChartRendering.value = false
+    }
+  }
+}
+
 // ========== 监听 queryLocations 触发查询 ==========
 watch(() => props.queryLocations, (newVal) => {
   if (Array.isArray(newVal) && newVal.length >= 2 && newVal.length <= 5) {
     handleQuery(newVal)
   } else {
-    rawData.value = null
-    errorMessage.value = ''
-    isLoading.value = false
-    isChartRendering.value = false
-    hasPendingRerender = false
-    clearChart()
-    closeDetailCard()
+    applyDemoData()
   }
 }, { deep: true, immediate: true })
+
+// ========== 监听 tab 可见性：进入 tab5 时补渲染 ==========
+watch(() => props.active, (active) => {
+  if (!active) return
+  if (!rawData.value) return
+
+  if (chartInstance.value) {
+    chartInstance.value.resize()
+    return
+  }
+
+  if (Array.isArray(activeLocations.value) && activeLocations.value.length >= 2) {
+    renderSankey(activeLocations.value)
+  }
+})
 
 onMounted(() => {
   isMobileLayout.value = window.matchMedia(MOBILE_LAYOUT_MEDIA_QUERY).matches

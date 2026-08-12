@@ -59,7 +59,19 @@ export const menuRoutes = [
   },
   {
     path: 'menu/compare/:sub(char|zhonggu|tone|phonetic)',
-    component: ComparePage
+    component: ComparePage,
+    meta: {
+      queryAllowlist: {
+        base: [],
+        variantKey: 'sub',
+        variants: {
+          char: [],
+          zhonggu: [],
+          tone: [],
+          phonetic: ['loc']
+        }
+      }
+    }
   },
   {
     path: 'menu/map',
