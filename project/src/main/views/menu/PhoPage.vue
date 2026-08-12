@@ -66,8 +66,8 @@ const currentTab = computed(() => {
 const tabs = computed(() => [
   { name: 'phonologyMatrix', label: t('phonology.tabs.matrix') },
   { name: 'phonologyCustom', label: t('phonology.tabs.custom') },
-  { name: 'Countphos', label: t('phonology.tabs.count') },
-  { name: 'evolution', label: t('phonology.tabs.evolution') }
+  { name: 'evolution', label: t('phonology.tabs.evolution') },
+  { name: 'Countphos', label: t('phonology.tabs.count') }
 ])
 
 const pageTitleKeys = {

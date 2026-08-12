@@ -104,6 +104,7 @@ const chartFeatureTypes = computed(() => {
 })
 
 const hasChartData = computed(() => chartFeatureTypes.value.length > 0)
+const isSingleLocation = computed(() => displayLocationCount.value === 1)
 const isResultsBusy = computed(() => loading.value || rendering.value)
 const isCurrentCountRoute = computed(() => route.path === '/menu/pho/count' || route.path.endsWith('/menu/pho/count'))
 
@@ -129,6 +130,11 @@ const {
     }
     return map[featureType] || featureType
   }
+})
+
+const visibleNavItems = computed(() => {
+  if (!isSingleLocation.value) return locationNavItems.value
+  return locationNavItems.value.filter((item) => item.kind !== 'total')
 })
 
 // 处理匹配到的地点列表
@@ -970,7 +976,7 @@ onBeforeUnmount(() => {
             </div>
           </div>
 
-          <div class="chart-block glass-card">
+          <div v-if="!isSingleLocation" class="chart-block glass-card">
             <h4 class="chart-block-title">{{ $t('phonology.phonology.countphos.charts.bar.title') }}</h4>
             <p class="chart-block-desc">
               {{ $t('phonology.phonology.countphos.charts.bar.description') }}
@@ -993,7 +999,7 @@ onBeforeUnmount(() => {
             </div>
           </div>
 
-          <div class="chart-block glass-card">
+          <div v-if="!isSingleLocation" class="chart-block glass-card">
             <h4 class="chart-block-title">{{ $t('phonology.phonology.countphos.charts.scatter.title') }}</h4>
             <p class="chart-block-desc">
               {{ $t('phonology.phonology.countphos.charts.scatter.description') }}
@@ -1009,53 +1015,55 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <div
-          v-for="(features, featureType) in aggregatedData"
-          :key="featureType"
-          :id="getAggregatedAnchorId(featureType)"
-          class="feature-category"
-        >
-          <h4 class="category-title">{{ featureType }}</h4>
-          <div class="syllable-grid">
-            <div
-              v-for="(stats, syllable) in features"
-              :key="syllable"
-              class="syllable-card glass-card"
-            >
-              <div class="syllable-top">
-                <div class="syllable-name">{{ syllable }}</div>
-                <div class="syllable-stats">
-                  <span class="stat-item">
-                    <span class="stat-label">{{ $t('phonology.phonology.countphos.stats.total') }}:</span>
-                    <span class="stat-value">{{ stats.totalCount }}</span>
-                  </span>
-                  <span class="stat-item">
-                    <span class="stat-label">{{ $t('phonology.phonology.countphos.stats.locationCount') }}:</span>
-                    <span class="stat-value">{{ stats.locationCount }}</span>
-                  </span>
+        <template v-if="!isSingleLocation">
+          <div
+            v-for="(features, featureType) in aggregatedData"
+            :key="featureType"
+            :id="getAggregatedAnchorId(featureType)"
+            class="feature-category"
+          >
+            <h4 class="category-title">{{ featureType }}</h4>
+            <div class="syllable-grid">
+              <div
+                v-for="(stats, syllable) in features"
+                :key="syllable"
+                class="syllable-card glass-card"
+              >
+                <div class="syllable-top">
+                  <div class="syllable-name">{{ syllable }}</div>
+                  <div class="syllable-stats">
+                    <span class="stat-item">
+                      <span class="stat-label">{{ $t('phonology.phonology.countphos.stats.total') }}:</span>
+                      <span class="stat-value">{{ stats.totalCount }}</span>
+                    </span>
+                    <span class="stat-item">
+                      <span class="stat-label">{{ $t('phonology.phonology.countphos.stats.locationCount') }}:</span>
+                      <span class="stat-value">{{ stats.locationCount }}</span>
+                    </span>
+                  </div>
                 </div>
-              </div>
-              <div class="location-tags">
-                <!-- 显示前10个地点 -->
-                <span
-                  v-for="loc in stats.locations.slice(0, 10)"
-                  :key="loc"
-                  class="location-tag"
-                >
-                  {{ loc }}
-                </span>
-                <!-- 如果超过10个，显示展开按钮 -->
-                <button
-                  v-if="stats.locations.length > 10"
-                  class="expand-btn"
-                  @click="openLocationModal(syllable, featureType, stats)"
-                >
-                  {{ $t('phonology.phonology.countphos.stats.more', { count: stats.locations.length - 10 }) }}
-                </button>
+                <div class="location-tags">
+                  <!-- 显示前10个地点 -->
+                  <span
+                    v-for="loc in stats.locations.slice(0, 10)"
+                    :key="loc"
+                    class="location-tag"
+                  >
+                    {{ loc }}
+                  </span>
+                  <!-- 如果超过10个，显示展开按钮 -->
+                  <button
+                    v-if="stats.locations.length > 10"
+                    class="expand-btn"
+                    @click="openLocationModal(syllable, featureType, stats)"
+                  >
+                    {{ $t('phonology.phonology.countphos.stats.more', { count: stats.locations.length - 10 }) }}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </template>
       </section>
 
       <!-- 地點詳情部分 -->
@@ -1108,8 +1116,8 @@ onBeforeUnmount(() => {
     />
 
     <CountLocationJumpNav
-      v-if="isCurrentCountRoute && hasResultData && locationNavItems.length > 0"
-      :items="locationNavItems"
+      v-if="isCurrentCountRoute && hasResultData && visibleNavItems.length > 0"
+      :items="visibleNavItems"
       :follow-id="currentVisibleNavId"
       @jump="handleLocationNavJump"
     />
