@@ -5,12 +5,12 @@
     :route-value="currentTab"
     :resolve-route="resolveTabRoute"
   >
-    <template #header>
+    <!-- <template #header>
       <h1 class="page-title">
         <BarIcon :icon="activePageIcon" />
         {{ activePageTitle }}
       </h1>
-    </template>
+    </template> -->
 
     <!-- Tab 右侧额外内容 -->
     <template #tab-extra>

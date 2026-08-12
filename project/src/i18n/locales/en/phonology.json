@@ -225,7 +225,7 @@
   },
   "tabs": {
     "matrix": "Phonology",
-    "custom": "Phoneme Class",
+    "custom": "Pho-Class",
     "count": "Syllable Count",
     "evolution": "Evolution"
   }

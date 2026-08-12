@@ -6,9 +6,9 @@
     >
       <!-- Header Area -->
       <div class="page-footer">
-        <h3 style="margin: 0">
+        <h1 class="page-title" style="font-size: 20px;">
           {{ t('map.customTab.title') }}
-        </h3>
+        </h1>
 
         <div class="header-actions">
           <button
@@ -678,6 +678,10 @@ const openEntryModal = () => {
   @include flex-center;
   width: 100%;
   gap: 12px;
+}
+
+.page-title {
+  width: auto;
 }
 
 .header-actions {

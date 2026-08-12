@@ -548,7 +548,7 @@ const getInitialFeature = (data) => {
   return features.find(feature => featureKeys.includes(feature) && (data.data[feature]?.length || 0) > 0) || features[0]
 }
 
-const applyDemoData = async ({ syncLocations = locationQuery.value.length === 0 } = {}) => {
+const applyDemoData = async ({ syncLocations = false } = {}) => {
   const demoData = await getDemoData()
   closeMobilePieDetail()
   syncControlsFromData(demoData, { syncLocations })

@@ -365,7 +365,7 @@ $text-secondary: var(--text-secondary);
 }
 
 .page {
-  width: max(50%, 500px);
+  width: min(90%, 500px);
   min-width: 0;
 }
 
