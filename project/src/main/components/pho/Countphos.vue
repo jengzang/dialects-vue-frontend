@@ -955,7 +955,7 @@ onBeforeUnmount(() => {
         :max-locations="PHONOLOGY_LOCATION_LIMITS.countphos"
       />
       <button
-        class="load-btn"
+        class="action-btn"
         @click="loadData"
         :disabled="matchedLocations.length === 0 || loading || isMatching"
       >
@@ -1219,52 +1219,6 @@ $mobile-breakpoint: 768px;
     justify-content: center;
     gap: 5px;
     margin: 0 auto 30px;
-  }
-
-  .load-btn {
-    max-width: 100px;
-    @include flex-center;
-    gap: 8px;
-    padding: 12px 24px;
-    background: linear-gradient(
-      135deg,
-      var(--color-primary) 0%,
-      var(--color-primary-hover) 100%
-    );
-    border: none;
-    border-radius: var(--radius-md);
-    box-shadow:
-      0 4px 12px var(--color-primary-shadow),
-      0 2px 4px rgba(0, 0, 0, 0.08);
-    color: var(--action-primary-text);
-    white-space: nowrap;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-
-    &:hover:not(:disabled) {
-      background: linear-gradient(
-        135deg,
-        var(--color-primary-hover) 0%,
-        var(--color-primary-hover) 100%
-      );
-      box-shadow:
-        0 6px 16px var(--color-primary-shadow-light),
-        0 3px 6px rgba(0, 0, 0, 0.12);
-      transform: translateY(-1px);
-    }
-
-    &:active:not(:disabled) {
-      transform: translateY(0);
-    }
-
-    &:disabled {
-      background: var(--bg-hover-medium);
-      box-shadow: none;
-      color: var(--text-secondary);
-      cursor: not-allowed;
-    }
   }
 
   /* 页面加载与错误状态 */

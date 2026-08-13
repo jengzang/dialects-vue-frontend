@@ -38,7 +38,7 @@
 
     <div v-else-if="!isLoading && latestResults.length === 0" class="empty-state">
       <p>{{ $t('result.noData') }}</p>
-      <button class="go-query-btn" @click="goToQuery">
+      <button class="action-btn" @click="goToQuery">
         {{ $t('result.goToQuery') }}
       </button>
     </div>
@@ -454,26 +454,11 @@ $transition-fast: 0.2s;
   text-align: center;
 }
 
-.go-query-btn {
-  padding: 10px 24px;
-  color: $white;
-  font-size: 15px;
-  cursor: pointer;
-  background-color: $primary-blue;
-  border: none;
-  border-radius: var(--radius-xl);
-  box-shadow: 0 4px 6px rgba(var(--color-primary-rgb), 0.2);
-  transition: all $transition-fast ease;
-
-  &:hover {
-    background-color: $primary-blue-hover;
-    box-shadow: 0 6px 8px rgba(var(--color-primary-rgb), 0.3);
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(1px);
-  }
+/* 空态跳转按钮: 仅尺寸覆盖, 视觉见 main/_buttons.scss 的 .action-btn */
+.action-btn {
+  --action-btn-padding: 10px 24px;
+  --action-btn-font-size: 15px;
+  --action-btn-radius: var(--radius-xl);
 }
 
 /* SimpleSelectDropdown 外层 */

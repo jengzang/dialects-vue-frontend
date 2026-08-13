@@ -78,7 +78,7 @@
         <button
           @click="handleQuery"
           :disabled="isLoading || isMatching || !canQuery"
-          class="query-button"
+          class="action-btn"
         >
           {{ isLoading ? t('phonology.phonology.evolution.controls.loading') : t('phonology.phonology.evolution.controls.query') }}
         </button>
@@ -1608,28 +1608,11 @@ $portrait-ratio: 1;
   }
 }
 
-/* 查询按钮 */
-.query-button {
-  padding: 10px 24px;
-  background: var(--color-primary);
-  border: none;
-  border-radius: var(--radius-md);
-  box-shadow: 0 2px 8px var(--color-primary-shadow);
-  color: var(--action-primary-text);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s $ease-fluid;
-
-  &:hover:not(:disabled) {
-    background: var(--color-primary-hover);
-    box-shadow: 0 4px 12px var(--color-primary-shadow-light);
-    transform: translateY(-1px);
-  }
-
-  &:disabled {
-    @include disabled-state;
-  }
+/* 查询按钮: 仅尺寸覆盖, 视觉见 main/_buttons.scss 的 .action-btn */
+.action-btn {
+  --action-btn-padding: 10px 24px;
+  --action-btn-font-size: 14px;
+  --action-btn-font-weight: 500;
 }
 
 /* 错误提示 */

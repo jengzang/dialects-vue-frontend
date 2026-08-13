@@ -61,7 +61,7 @@
                   v-if="!loadedCitiesData[city]"
                   @click="loadCityData(city)"
                   :disabled="loadingStates[city]"
-                  class="load-btn"
+                  class="action-btn action-btn--sm"
               >
                 {{ loadingStates[city] ? t('villages.pages.allVillages.loading') : t('villages.pages.allVillages.load') }}
               </button>
@@ -826,33 +826,6 @@ $transition-base: 0.3s;
   display: flex;
   gap: 8px;
   align-items: center;
-}
-
-.load-btn {
-  padding: 8px 16px;
-  color: $white;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  background: linear-gradient(
-    135deg,
-    $primary-blue 0%,
-    $primary-blue-dark 100%
-  );
-  border: none;
-  border-radius: var(--radius-md);
-  box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
-  transition: all $transition-fast;
-
-  &:hover:not(:disabled) {
-    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.4);
-    transform: scale(1.05);
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
-  }
 }
 
 .reload-btn {
