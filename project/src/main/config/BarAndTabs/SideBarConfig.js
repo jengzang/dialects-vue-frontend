@@ -95,6 +95,7 @@ export function useSidebarConfig() {
             children: [
                 { label: t('navigation.submenu.villages.VillagesML'), icon: '🤖', path: withRouteLocale(route, '/explore/villages/ml') },
                 { label: t('navigation.submenu.villages.toponyms'), icon: '📍', path: withRouteLocale(route, '/explore/villages/toponyms') },
+                { label: t('navigation.submenu.villages.toponymSearch'), icon: '🔎', path: withRouteLocale(route, '/explore/villages/search') },
                 { label: t('navigation.submenu.villages.gdVillages'), icon: '🏘️', path: withRouteLocale(route, '/explore/villages/gd') },
                 // { label: t('navigation.submenu.villages.gdVillagesTable'), icon: '📊', path: withRouteLocale(route, '/explore/villages/table') },
                 { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: withRouteLocale(route, '/explore/yc/villages') },
@@ -232,6 +233,7 @@ export const SideConfig = {
         path: buildLocalePath('zh-Hant', '/menu/villages'),
         children: [
             { label: '自然村地名分佈', icon: '📍', path: buildLocalePath('zh-Hant', '/explore/villages/toponyms') },
+            { label: '地名查詢', icon: '🔎', path: buildLocalePath('zh-Hant', '/explore/villages/search') },
             { label: '廣東自然村', icon: '🏕️', path: buildLocalePath('zh-Hant', '/explore/villages/gd') },
             { label: '機器學習', icon: '🤖', path: buildLocalePath('zh-Hant', '/explore/villages/ml') },
             { label: '全粵村情表格', icon: '📊', path: buildLocalePath('zh-Hant', '/explore/villages/table') },

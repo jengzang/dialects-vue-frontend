@@ -57,6 +57,7 @@
     },
     "villages": {
       "toponyms": "地名分佈",
+      "toponymSearch": "地名查詢",
       "gdVillages": "廣東自然村",
       "VillagesML": "機器學習",
       "gdVillagesTable": "廣東村莊表格",
@@ -163,7 +164,8 @@
       "gdTable": "廣東自然村表格",
       "yangChun": "陽春行政規劃",
       "all": "全部自然村",
-      "toponyms": "自然村地名分佈"
+      "toponyms": "自然村地名分佈",
+      "toponymSearch": "地名查詢"
     },
     "charClass": {
       "zhonggu": "中古音韻數據",

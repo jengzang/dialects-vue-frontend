@@ -57,6 +57,7 @@
     },
     "villages": {
       "toponyms": "Village Toponym Distribution",
+      "toponymSearch": "Toponym Search",
       "gdVillages": "Guangdong Villages",
       "VillagesML": "Machine Learning",
       "gdVillagesTable": "Guangdong Village Table",
@@ -163,7 +164,8 @@
       "gdTable": "Guangdong Village Overview",
       "yangChun": "Yangchun Administrative Divisions",
       "all": "All Villages",
-      "toponyms": "Village Toponym Distribution"
+      "toponyms": "Village Toponym Distribution",
+      "toponymSearch": "Toponym Search"
     },
     "charClass": {
       "zhonggu": "Middle Chinese Phonology Data",

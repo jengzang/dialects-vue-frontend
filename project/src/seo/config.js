@@ -616,6 +616,18 @@ const SEO_CONFIG = {
         en: 'Explore toponym distribution data through maps and charts, examining the geographic relationship between place names and dialects.',
       },
     },
+    '/explore/villages/search': {
+      title: {
+        'zh-Hant': '地名查詢｜方音圖鑑',
+        'zh-CN': '地名查询｜方音图鉴',
+        en: 'Toponym Search | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '查詢具體自然村地名條目，點擊結果後查看本地地名庫詳情。',
+        'zh-CN': '查询具体自然村地名条目，点击结果后查看本地地名库详情。',
+        en: 'Search concrete natural-village toponym entries and open local database details from selected results.',
+      },
+    },
   },
 }
 
@@ -665,6 +677,7 @@ export const SITEMAP_PATHS = [
   '/explore/villages/yc',
   '/explore/villages/ml',
   '/explore/villages/toponyms',
+  '/explore/villages/search',
 ]
 
 export const NOINDEX_PATHS = new Set([

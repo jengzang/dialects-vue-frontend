@@ -18,6 +18,7 @@ const YangChunExpressionsPage = () => import('@/main/views/explore/yangchun/Yang
 const AllVillagesPage = () => import('@/main/views/explore/villages/AllVillages.vue')
 const VillagesMLPage = () => import('@/main/views/explore/villages/VillagesML.vue')
 const ToponymsPage = () => import('@/main/views/explore/villages/toponyms/ToponymsPage.vue')
+const ToponymSearchPage = () => import('@/main/views/explore/villages/toponyms/ToponymSearchPage.vue')
 
 export const exploreRoutes = [
   {
@@ -106,6 +107,10 @@ export const exploreRoutes = [
   {
     path: 'explore/villages/toponyms',
     component: ToponymsPage
+  },
+  {
+    path: 'explore/villages/search',
+    component: ToponymSearchPage
   },
   {
     path: 'explore/villages/gd',

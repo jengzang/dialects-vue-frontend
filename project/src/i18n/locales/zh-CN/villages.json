@@ -242,6 +242,66 @@
         "official": "无法加载民政部详情。"
       }
     },
+    "toponymSearch": {
+      "title": "地名查询",
+      "subtitle": "查询具体自然村地名条目，点击结果后查看本地详情。",
+      "search": {
+        "keyword": "关键词",
+        "placeholder": "例如：樊家、黄、村",
+        "matchMode": "匹配方式",
+        "placeType": "地名类型",
+        "areaCode": "行政区 code",
+        "areaCodePlaceholder": "例如：44",
+        "areaScope": "行政区范围",
+        "limit": "返回数量",
+        "submit": "搜索地名",
+        "searching": "搜索中...",
+        "reset": "重置"
+      },
+      "areaScopes": {
+        "descendants": "包含下级",
+        "exact": "仅当前行政区"
+      },
+      "limits": {
+        "50": "50 条",
+        "100": "100 条",
+        "200": "200 条"
+      },
+      "results": {
+        "title": "查询结果",
+        "idle": "输入关键词后点击搜索。",
+        "loading": "正在查询地名...",
+        "empty": "没有找到匹配条目。",
+        "loadFailed": "查询失败",
+        "count": "找到 {count} 条，当前显示 {shown} 条。",
+        "truncated": "结果已截断，请缩小范围或使用更严格的匹配方式。"
+      },
+      "detail": {
+        "title": "条目详情",
+        "empty": "点击结果后查看详情。",
+        "loading": "正在加载详情...",
+        "loadFailed": "详情加载失败",
+        "source": "来源",
+        "sourceName": "本地地名库",
+        "id": "ID",
+        "name": "标准地名",
+        "placeType": "类型",
+        "coordinates": "经纬度",
+        "divisionPath": "行政区划",
+        "unknown": "未知",
+        "viewDistribution": "查看分布"
+      },
+      "placeTypes": {
+        "22200": "自然村/农村居民点",
+        "21610": "行政村",
+        "27610": "村委会"
+      },
+      "errors": {
+        "emptyQuery": "请输入关键词后再搜索。",
+        "search": "无法查询地名。",
+        "details": "无法加载本地详情。"
+      }
+    },
     "allVillages": {
       "title": "全部自然村",
       "searchPlaceholder": "搜索已加载的村落...",

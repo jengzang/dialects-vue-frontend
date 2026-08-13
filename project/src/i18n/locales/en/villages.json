@@ -242,6 +242,66 @@
         "official": "Failed to load Ministry detail."
       }
     },
+    "toponymSearch": {
+      "title": "Toponym Search",
+      "subtitle": "Search concrete natural-village toponym entries, then open local details from a selected result.",
+      "search": {
+        "keyword": "Keyword",
+        "placeholder": "Try: 樊家, 黄, 村",
+        "matchMode": "Match",
+        "placeType": "Toponym type",
+        "areaCode": "Area code",
+        "areaCodePlaceholder": "Example: 44",
+        "areaScope": "Area scope",
+        "limit": "Limit",
+        "submit": "Search toponyms",
+        "searching": "Searching...",
+        "reset": "Reset"
+      },
+      "areaScopes": {
+        "descendants": "Include descendants",
+        "exact": "Exact area only"
+      },
+      "limits": {
+        "50": "50 items",
+        "100": "100 items",
+        "200": "200 items"
+      },
+      "results": {
+        "title": "Search Results",
+        "idle": "Enter a keyword, then click search.",
+        "loading": "Searching toponyms...",
+        "empty": "No matching entries found.",
+        "loadFailed": "Search failed",
+        "count": "Found {count}; showing {shown}.",
+        "truncated": "Results were truncated. Narrow the range or choose a stricter match mode."
+      },
+      "detail": {
+        "title": "Entry Detail",
+        "empty": "Click a result to view details.",
+        "loading": "Loading details...",
+        "loadFailed": "Detail failed to load",
+        "source": "Source",
+        "sourceName": "Local toponyms database",
+        "id": "ID",
+        "name": "Standard name",
+        "placeType": "Type",
+        "coordinates": "Coordinates",
+        "divisionPath": "Administrative path",
+        "unknown": "Unknown",
+        "viewDistribution": "View Distribution"
+      },
+      "placeTypes": {
+        "22200": "Natural village / rural settlement",
+        "21610": "Administrative village",
+        "27610": "Village committee"
+      },
+      "errors": {
+        "emptyQuery": "Enter a keyword before searching.",
+        "search": "Failed to search toponyms.",
+        "details": "Failed to load local details."
+      }
+    },
     "allVillages": {
       "title": "All Villages",
       "searchPlaceholder": "Search loaded villages...",
