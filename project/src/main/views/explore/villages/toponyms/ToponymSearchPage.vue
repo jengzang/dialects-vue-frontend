@@ -147,7 +147,9 @@
               class="toponym-search-page__result-card glass-card"
               data-interactive="true"
               type="button"
+              :aria-pressed="selectedItem?.id === item.id"
               :disabled="!item.id"
+              @click="handleSelectResult(item)"
             >
               <strong>{{ item.name || unknownLabel }}</strong>
               <span>{{ item.id || unknownLabel }}</span>
@@ -159,10 +161,59 @@
       <aside class="toponym-search-page__detail glass-panel">
         <header class="toponym-search-page__section-header">
           <h2>{{ t('villages.pages.toponymSearch.detail.title') }}</h2>
+          <button
+            v-if="selectedItem"
+            class="glass-button"
+            data-size="small"
+            type="button"
+            @click="handleViewDistribution"
+          >
+            {{ t('villages.pages.toponymSearch.detail.viewDistribution') }}
+          </button>
         </header>
-        <div class="main-list-state glass-subpanel">
+
+        <div v-if="!selectedItem" class="main-list-state glass-subpanel">
           <p class="main-list-state-text">{{ t('villages.pages.toponymSearch.detail.empty') }}</p>
         </div>
+
+        <div v-else-if="detailsLoading" class="main-list-state glass-subpanel">
+          <p class="main-list-state-text">{{ t('villages.pages.toponymSearch.detail.loading') }}</p>
+        </div>
+
+        <div v-else-if="detailsError" class="main-list-state glass-subpanel" data-state="error">
+          <div class="main-list-state-title">{{ t('villages.pages.toponymSearch.detail.loadFailed') }}</div>
+          <p class="main-list-state-text">{{ detailsError }}</p>
+          <button class="glass-button" type="button" @click="handleSelectResult(selectedItem)">
+            {{ t('villages.pages.toponymSearch.search.submit') }}
+          </button>
+        </div>
+
+        <dl v-else class="toponym-search-page__detail-list glass-subpanel">
+          <div class="toponym-search-page__detail-source">
+            <dt>{{ t('villages.pages.toponymSearch.detail.source') }}</dt>
+            <dd>{{ t('villages.pages.toponymSearch.detail.sourceName') }}</dd>
+          </div>
+          <div>
+            <dt>{{ t('villages.pages.toponymSearch.detail.id') }}</dt>
+            <dd>{{ selectedItem.id || unknownLabel }}</dd>
+          </div>
+          <div>
+            <dt>{{ t('villages.pages.toponymSearch.detail.name') }}</dt>
+            <dd>{{ selectedLocalDetail?.name || selectedItem.name || unknownLabel }}</dd>
+          </div>
+          <div>
+            <dt>{{ t('villages.pages.toponymSearch.detail.placeType') }}</dt>
+            <dd>{{ detailPlaceTypeText }}</dd>
+          </div>
+          <div>
+            <dt>{{ t('villages.pages.toponymSearch.detail.coordinates') }}</dt>
+            <dd>{{ detailCoordinatesText }}</dd>
+          </div>
+          <div>
+            <dt>{{ t('villages.pages.toponymSearch.detail.divisionPath') }}</dt>
+            <dd>{{ detailDivisionPathText }}</dd>
+          </div>
+        </dl>
       </aside>
     </section>
   </main>
@@ -171,11 +222,13 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getToponymSearch } from '@/api';
+import { useRouter } from 'vue-router';
+import { getToponymDetails, getToponymSearch } from '@/api';
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue';
 
 const { t } = useI18n();
+const router = useRouter();
 
 const query = ref('');
 const matchMode = ref('prefix');
@@ -192,8 +245,39 @@ const searchTruncated = ref(false);
 const searchLoading = ref(false);
 const searchError = ref('');
 const searchRequestId = ref(0);
+const selectedItem = ref(null);
+const selectedLocalDetail = ref(null);
+const detailsLoading = ref(false);
+const detailsError = ref('');
+const detailsRequestId = ref(0);
 
 const unknownLabel = computed(() => t('villages.pages.toponymSearch.detail.unknown'));
+
+const detailPlaceTypeText = computed(() => (
+  firstTextValue([
+    selectedLocalDetail.value?.place_type_name,
+    selectedLocalDetail.value?.place_type,
+    selectedLocalDetail.value?.place_type_code,
+  ])
+));
+
+const detailCoordinatesText = computed(() => (
+  formatCoordinates(selectedLocalDetail.value?.longitude, selectedLocalDetail.value?.latitude)
+));
+
+const detailDivisionPathText = computed(() => {
+  const path = selectedLocalDetail.value?.division_path;
+  if (Array.isArray(path)) {
+    const names = path.map((item) => item?.name || item).filter(Boolean);
+    if (names.length) return names.join(' / ');
+  }
+
+  return firstTextValue([
+    selectedLocalDetail.value?.division_path,
+    selectedLocalDetail.value?.area_name,
+    selectedLocalDetail.value?.area_code,
+  ]);
+});
 
 const matchModeOptions = computed(() => [
   { value: 'prefix', label: t('villages.pages.toponyms.matchModes.prefix') },
@@ -261,6 +345,7 @@ async function handleSearch() {
   searchItems.value = [];
   searchCount.value = 0;
   searchTruncated.value = false;
+  clearDetailState();
 
   if (!keyword) {
     searchError.value = t('villages.pages.toponymSearch.errors.emptyQuery');
@@ -303,6 +388,67 @@ function handleReset() {
   searchError.value = '';
   searchLoading.value = false;
   searchRequestId.value += 1;
+  clearDetailState();
+}
+
+async function handleSelectResult(item) {
+  const id = item?.id;
+  if (!id) return;
+
+  selectedItem.value = item;
+  selectedLocalDetail.value = null;
+  detailsError.value = '';
+
+  const requestId = detailsRequestId.value + 1;
+  detailsRequestId.value = requestId;
+  detailsLoading.value = true;
+
+  try {
+    const payload = await getToponymDetails(id);
+    if (requestId !== detailsRequestId.value) return;
+    selectedLocalDetail.value = payload.items?.[0] || null;
+  } catch (error) {
+    if (requestId !== detailsRequestId.value) return;
+    detailsError.value = error?.message || t('villages.pages.toponymSearch.errors.details');
+  } finally {
+    if (requestId === detailsRequestId.value) {
+      detailsLoading.value = false;
+    }
+  }
+}
+
+function handleViewDistribution() {
+  router.push({
+    path: '/explore/villages/toponyms',
+    query: {
+      q: query.value.trim(),
+      match_mode: matchMode.value,
+    },
+  });
+}
+
+function clearDetailState() {
+  selectedItem.value = null;
+  selectedLocalDetail.value = null;
+  detailsLoading.value = false;
+  detailsError.value = '';
+  detailsRequestId.value += 1;
+}
+
+function firstTextValue(values) {
+  const value = values.find((item) => item !== undefined && item !== null && String(item).trim());
+  return value === undefined ? unknownLabel.value : String(value);
+}
+
+function formatCoordinates(longitude, latitude) {
+  const lng = Number(longitude);
+  const lat = Number(latitude);
+
+  if (!Number.isFinite(lng) || !Number.isFinite(lat)) {
+    return unknownLabel.value;
+  }
+
+  return `${lng.toFixed(6)}, ${lat.toFixed(6)}`;
 }
 </script>
 
@@ -419,6 +565,10 @@ function handleReset() {
   padding: 16px;
   text-align: left;
 
+  &[aria-pressed='true'] {
+    border-color: var(--color-primary);
+  }
+
   strong {
     color: var(--text-primary);
     font-size: 16px;
@@ -432,6 +582,36 @@ function handleReset() {
 
     @include text-truncate;
   }
+}
+
+.toponym-search-page__detail-list {
+  @include flex-col;
+  gap: 12px;
+  margin: 0;
+  padding: 14px;
+
+  div {
+    @include flex-col;
+    gap: 4px;
+  }
+
+  dt {
+    color: var(--text-secondary);
+    font-size: 12px;
+  }
+
+  dd {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+  }
+}
+
+.toponym-search-page__detail-source {
+  padding-block-end: 4px;
+  border-block-end: 1px solid var(--border-glass-subtle);
 }
 
 @media (max-aspect-ratio: 1 / 1) {

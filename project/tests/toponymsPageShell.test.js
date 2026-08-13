@@ -24,7 +24,7 @@ describe('toponyms page shell', () => {
   it('builds the independent toponym catalog search page with shared glass and selector primitives', () => {
     const page = readSource('src/main/views/explore/villages/toponyms/ToponymSearchPage.vue');
 
-    expect(page).toContain("import { getToponymSearch } from '@/api'");
+    expect(page).toContain('getToponymSearch');
     expect(page).toContain("import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'");
     expect(page).toContain("import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'");
     expect(page).toContain('class="toponym-search-page glass-shell"');
@@ -47,6 +47,33 @@ describe('toponyms page shell', () => {
     expect(page).not.toContain('main-glass');
     expect(page).not.toContain('main-search-field');
     expect(page).not.toMatch(/@media\s*\((?:max|min)-width/);
+  });
+
+  it('loads catalog entry details only after result clicks and keeps distribution navigation separate', () => {
+    const page = readSource('src/main/views/explore/villages/toponyms/ToponymSearchPage.vue');
+    const searchBody = functionBody(page, 'handleSearch');
+    const detailBody = functionBody(page, 'handleSelectResult');
+    const distributionBody = functionBody(page, 'handleViewDistribution');
+
+    expect(page).toContain("import { getToponymDetails, getToponymSearch } from '@/api'");
+    expect(page).toContain('const router = useRouter()');
+    expect(page).toContain('@click="handleSelectResult(item)"');
+    expect(page).toContain(':aria-pressed="selectedItem?.id === item.id"');
+    expect(page).toContain('selectedLocalDetail');
+    expect(page).toContain('detailsLoading');
+    expect(page).toContain('detailsError');
+    expect(page).toContain('class="toponym-search-page__detail-list glass-subpanel"');
+    expect(page).toContain('@click="handleViewDistribution"');
+    expect(searchBody).not.toContain('getToponymDetails');
+    expect(detailBody).toContain('const id = item?.id');
+    expect(detailBody).toContain('const payload = await getToponymDetails(id)');
+    expect(detailBody).not.toContain('getToponymPoints');
+    expect(distributionBody).toContain("path: '/explore/villages/toponyms'");
+    expect(distributionBody).toContain('q: query.value.trim()');
+    expect(distributionBody).toContain('match_mode: matchMode.value');
+    expect(distributionBody).not.toContain('place_type_code');
+    expect(distributionBody).not.toContain('area_code');
+    expect(page).not.toContain('/api/toponyms/points');
   });
 
   it('wires split toponyms APIs without first-paint point loading', () => {
