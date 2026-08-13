@@ -693,6 +693,75 @@ const resolveSnappedCoordinate = (coordinate, options = {}) => {
   return best.coordinate
 }
 
+const closeSnappedRingIfNeeded = (originalRing = [], nextRing = []) => {
+  if (originalRing.length > 1 && areCoordinatesEqual(originalRing[0], originalRing.at(-1)) && nextRing.length > 1) {
+    return [
+      ...nextRing.slice(0, -1),
+      [...nextRing[0]],
+    ]
+  }
+  return nextRing
+}
+
+const snapCoordinateForFeature = (featureId, coordinate) => {
+  return resolveSnappedCoordinate(coordinate, { excludeFeatureId: featureId }) ?? coordinate
+}
+
+const snapGeometryCoordinatesForFeature = (geometry, featureId) => {
+  if (!geometry?.type) return geometry
+
+  if (geometry.type === 'Point') {
+    return { ...geometry, coordinates: snapCoordinateForFeature(featureId, geometry.coordinates) }
+  }
+
+  if (geometry.type === 'LineString') {
+    return {
+      ...geometry,
+      coordinates: (geometry.coordinates ?? []).map((coordinate) => snapCoordinateForFeature(featureId, coordinate)),
+    }
+  }
+
+  if (geometry.type === 'Polygon') {
+    return {
+      ...geometry,
+      coordinates: (geometry.coordinates ?? []).map((ring) => {
+        const nextRing = (ring ?? []).map((coordinate) => snapCoordinateForFeature(featureId, coordinate))
+        return closeSnappedRingIfNeeded(ring, nextRing)
+      }),
+    }
+  }
+
+  return geometry
+}
+
+const getDrawEventFeatureIds = (event = {}) => {
+  return new Set((event?.features ?? [])
+    .map((feature) => getDrawFeatureId(feature))
+    .filter(Boolean))
+}
+
+const snapFeatureCollectionCoordinates = (featureCollection, options = {}) => {
+  if (props.snappingEnabled === false || options.snapFeatures !== true || options.type === 'draw.delete') {
+    return { featureCollection, changed: false }
+  }
+
+  const targetIds = getDrawEventFeatureIds(options)
+  let changed = false
+  const features = (featureCollection.features ?? []).map((feature) => {
+    const featureId = getDrawFeatureId(feature)
+    if (targetIds.size > 0 && !targetIds.has(featureId)) return feature
+    const geometry = snapGeometryCoordinatesForFeature(feature.geometry, featureId)
+    if (JSON.stringify(geometry) === JSON.stringify(feature.geometry)) return feature
+    changed = true
+    return { ...feature, geometry }
+  })
+
+  return {
+    featureCollection: changed ? { ...featureCollection, features } : featureCollection,
+    changed,
+  }
+}
+
 const parseCoordPath = (coordPath) => {
   const parts = String(coordPath ?? '')
     .split('.')
@@ -968,7 +1037,11 @@ const syncDrawMode = (event) => {
 }
 
 const syncFeaturesFromDraw = (options = {}) => {
-  const featureCollection = normalizeFeatureCollection(draw.value?.getAll?.())
+  const normalized = normalizeFeatureCollection(draw.value?.getAll?.())
+  const { featureCollection, changed } = snapFeatureCollectionCoordinates(normalized, options)
+  if (changed) {
+    draw.value?.set?.(featureCollection)
+  }
   const shouldCommitHistory = options.commitHistory !== false && !isDeletingSelected
   if (shouldCommitHistory) {
     emit('before-features-change')
@@ -1421,8 +1494,8 @@ const mountHiddenDrawControls = () => {
 }
 
 const bindDrawEvents = () => {
-  map.value.on('draw.create', syncFeaturesFromDraw)
-  map.value.on('draw.update', syncFeaturesFromDraw)
+  map.value.on('draw.create', (event) => syncFeaturesFromDraw({ ...event, snapFeatures: true }))
+  map.value.on('draw.update', (event) => syncFeaturesFromDraw({ ...event, snapFeatures: true }))
   map.value.on('draw.delete', syncFeaturesFromDraw)
   map.value.on('draw.selectionchange', syncSelectedFeature)
   map.value.on('draw.modechange', syncDrawMode)

@@ -196,6 +196,7 @@ function mountEditableMapLibre(modelValue, options = {}) {
   const enablePreviewHover = ref(options.enablePreviewHover ?? false)
   const featureBoxSelectEnabled = ref(options.featureBoxSelectEnabled ?? false)
   const snappingEnabled = ref(options.snappingEnabled ?? true)
+  const snapTolerance = ref(options.snapTolerance ?? 12)
   const snapGridSize = ref(options.snapGridSize ?? 0)
 
   const Root = defineComponent({
@@ -211,6 +212,7 @@ function mountEditableMapLibre(modelValue, options = {}) {
         enablePreviewHover,
         featureBoxSelectEnabled,
         snappingEnabled,
+        snapTolerance,
         snapGridSize,
         events,
       }
@@ -226,6 +228,7 @@ function mountEditableMapLibre(modelValue, options = {}) {
         :enable-preview-hover="enablePreviewHover"
         :feature-box-select-enabled="featureBoxSelectEnabled"
         :snapping-enabled="snappingEnabled"
+        :snap-tolerance="snapTolerance"
         :snap-grid-size="snapGridSize"
         @before-features-change="events.push(['before-features-change'])"
         @features-change="events.push(['features-change', $event])"
@@ -995,6 +998,101 @@ describe('EditableMapLibre state flow', () => {
       .toEqual([[0, 0], [5.4, 5.3], [10, 0]])
 
     disabledWrapper.unmount()
+  })
+
+  it('snaps coordinates emitted by Draw create and update events before syncing state', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [],
+    }, {
+      allLayers: [{
+        id: 'reference-points',
+        visible: true,
+        locked: true,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [{
+            id: 'reference-point-1',
+            type: 'Feature',
+            properties: { visible: true, locked: true },
+            geometry: { type: 'Point', coordinates: [50, 50] },
+          }],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.draw.set.mockClear()
+    wrapper.events.length = 0
+    wrapper.draw.features.set('drawn-line-1', {
+      id: 'drawn-line-1',
+      type: 'Feature',
+      properties: { visible: true, locked: false },
+      geometry: { type: 'LineString', coordinates: [[0, 0], [50.4, 50.3], [100, 0]] },
+    })
+
+    wrapper.map.emit('draw.create')
+
+    const syncedFeatureCollection = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1]
+    expect(syncedFeatureCollection.features[0].geometry.coordinates)
+      .toEqual([[0, 0], [50, 50], [100, 0]])
+    expect(wrapper.draw.set).toHaveBeenCalledWith(syncedFeatureCollection)
+
+    wrapper.events.length = 0
+    wrapper.draw.set.mockClear()
+    wrapper.draw.features.set('drawn-line-1', {
+      id: 'drawn-line-1',
+      type: 'Feature',
+      properties: { visible: true, locked: false },
+      geometry: { type: 'LineString', coordinates: [[0, 0], [50.2, 50.1], [100, 0]] },
+    })
+
+    wrapper.map.emit('draw.update')
+
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [50, 50], [100, 0]])
+    expect(wrapper.draw.set).toHaveBeenCalledTimes(1)
+
+    wrapper.unmount()
+  })
+
+  it('does not snap Draw event coordinates when snapping is disabled', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [],
+    }, {
+      snappingEnabled: false,
+      allLayers: [{
+        id: 'reference-points',
+        visible: true,
+        locked: true,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [{
+            id: 'reference-point-1',
+            type: 'Feature',
+            properties: { visible: true, locked: true },
+            geometry: { type: 'Point', coordinates: [5, 5] },
+          }],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.draw.set.mockClear()
+    wrapper.events.length = 0
+    wrapper.draw.features.set('drawn-line-1', {
+      id: 'drawn-line-1',
+      type: 'Feature',
+      properties: { visible: true, locked: false },
+      geometry: { type: 'LineString', coordinates: [[0, 0], [5.4, 5.3], [10, 0]] },
+    })
+
+    wrapper.map.emit('draw.create')
+
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [5.4, 5.3], [10, 0]])
+    expect(wrapper.draw.set).not.toHaveBeenCalled()
+
+    wrapper.unmount()
   })
 
   it('deletes a selected line vertex by coordinate path and reconnects the line', async () => {
