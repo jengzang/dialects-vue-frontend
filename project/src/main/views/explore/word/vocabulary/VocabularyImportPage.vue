@@ -122,10 +122,11 @@
           <p v-if="(backendPreview.would_delete_existing_count ?? 0) > 0" class="backend-preview-warning">
             {{ t('words.wordList.upload.replaceWarning', { count: backendPreview.would_delete_existing_count }) }}
           </p>
-          <label v-if="shouldConfirmOverwrite" class="backend-preview-overwrite">
-            <input v-model="isOverwriteConfirmed" type="checkbox" />
-            <span>{{ t('words.wordList.upload.confirmOverwrite') }}</span>
-          </label>
+          <CheckBox
+            v-if="shouldConfirmOverwrite"
+            v-model="isOverwriteConfirmed"
+            :label="t('words.wordList.upload.confirmOverwrite')"
+          />
           <ul v-if="backendPreview.errors?.length" class="backend-preview-errors">
             <li v-for="error in backendPreview.errors" :key="error">{{ error }}</li>
           </ul>
