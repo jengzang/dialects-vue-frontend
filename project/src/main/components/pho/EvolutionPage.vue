@@ -261,7 +261,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, onActivated, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
@@ -1459,6 +1459,12 @@ onMounted(async () => {
   }
 
   window.addEventListener('resize', handleWindowResize)
+})
+
+// KeepAlive 缓存恢复激活时重新渲染，避免容器隐藏后图表尺寸归零导致空白
+onActivated(async () => {
+  if (!rawData.value) return
+  await renderCurrentVisualizationWithLoading()
 })
 
 onUnmounted(() => {
