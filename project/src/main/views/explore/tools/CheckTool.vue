@@ -4,7 +4,7 @@
     <div v-if="!fileUploaded" class="welcome-screen">
       <div class="glass-shell welcome-card">
         <div class="welcome-icon"><InlineIcon icon="📋" /></div>
-        <h1 class="title"><BarIcon icon="📋" />{{ t('navigation.pageTitles.tools.check') }}</h1>
+        <h1 class="title"><BarIcon icon="📝" />{{ t('navigation.pageTitles.tools.check') }}</h1>
 <!--        <p class="subtitle">上傳文件開始檢查和編輯</p>-->
 
         <div class="welcome-features">

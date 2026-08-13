@@ -4,7 +4,7 @@
       <section class="config-panel glass-panel">
         <div class="panel-header">
           <div class="panel-title-group">
-            <h1 class="page-title"><BarIcon icon="🔤" />{{ t(currentPageConfig.titleKey) }}</h1>
+            <h1 class="page-title"><BarIcon :icon="activePageIcon" />{{ t(currentPageConfig.titleKey) }}</h1>
             <!-- <p class="page-subtitle">{{ t('charClass.common.subtitle') }}</p> -->
           </div>
         </div>
@@ -232,7 +232,15 @@ const loadingCacheKey = ref('')
 
 let loadRequestId = 0
 
+const pageTitleIcons = {
+  zhonggu: '📜',
+  shanggu: '🏛️',
+  jingu: '📖',
+  yueyun: '🎵'
+}
+
 const currentPageConfig = computed(() => getCharClassPageConfig(activeTab.value))
+const activePageIcon = computed(() => pageTitleIcons[activeTab.value] || pageTitleIcons.zhonggu)
 const hasMultipleTables = computed(() => Object.keys(currentPageConfig.value.tables).length > 1)
 const currentTableConfig = computed(() => {
   const normalizedTableKey = sanitizeCharClassTableKey(currentPageConfig.value, selectedTableKey.value)

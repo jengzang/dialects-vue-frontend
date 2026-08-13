@@ -1,7 +1,7 @@
 <template>
   <div class="semantic-subcategories-page">
     <h1 class="villagesml-subtab-title">
-      <BarIcon icon="🗂️" />語義分析 - 子類別分析
+      <BarIcon icon="🏷️" />語義分析 - 子類別分析
       <HelpIcon content="分析76個語義子類別的區域分布。區域對比模式：用雷達圖展示特定區域內某父類別下各子類別的VTF和傾向值（Z-score）。傾向排行模式：找出全省範圍內傾向值最高的Top N子類別" />
     </h1>
 

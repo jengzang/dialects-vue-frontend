@@ -2,7 +2,7 @@
 <!--  <ExploreLayout>-->
     <div class="character-significance-page">
       <h1 class="villagesml-subtab-title">
-        <BarIcon icon="✨" />字符分析 - 顯著性
+        <BarIcon icon="⭐" />字符分析 - 顯著性
         <HelpIcon
           content="使用卡方檢驗判斷字符在某地區的使用頻率是否與全局期望顯著不同。檢驗統計量：χ² = Σ[(O-E)²/E]，其中O為觀察頻率，E為期望頻率。顯著性標記：***（p<0.001極顯著）、**（p<0.01非常顯著）、*（p<0.05顯著）、n.s.（p≥0.05不顯著）。Cramér's V效應量衡量關聯強度，V>0.3表示中等效應，V>0.5表示大效應"
           size="md"

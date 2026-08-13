@@ -3,7 +3,7 @@
     <!-- Header Section -->
     <div class="header-section">
       <div class="title-row">
-        <h1 style="margin: 0;font-size: 1.5em;"><BarIcon icon="🏘️" />{{ t('navigation.pageTitles.villages.all') }}</h1>
+        <h1 style="margin: 0;font-size: 1.5em;"><BarIcon icon="📋" />{{ t('navigation.pageTitles.villages.all') }}</h1>
         <div class="filter-controls">
           <SimpleSelectDropdown
             v-model="filterMode"

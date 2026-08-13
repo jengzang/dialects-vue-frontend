@@ -16,7 +16,7 @@ const copyCitation = () => {
   <div class="privacy-content glass-container glass-panel">
       <!-- 标题和语言切换 -->
       <div class="header">
-        <h1 class="title"><BarIcon icon="📜" />{{ t('navigation.pageTitles.support.privacy') }}</h1>
+        <h1 class="title"><BarIcon icon="🔒" />{{ t('navigation.pageTitles.support.privacy') }}</h1>
       </div>
 
       <div class="content-section">
