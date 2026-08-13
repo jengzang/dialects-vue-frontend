@@ -102,7 +102,7 @@
                 href="https://github.com/jengzang/dialects-js-frontend/issues"
                 target="_blank"
                 rel="noopener"
-                class="card"
+                class="card glass-card"
               >
                 <img class="card-icon" src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" />
                 <span v-html="$t('about.suggestion.frontend.title')"></span>
@@ -112,7 +112,7 @@
                 href="https://github.com/jengzang/dialects-build/issues"
                 target="_blank"
                 rel="noopener"
-                class="card"
+                class="card glass-card"
               >
                 <img class="card-icon" src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" />
                 <span v-html="$t('about.suggestion.backend.title')"></span>
@@ -122,7 +122,7 @@
                 href="https://www.zhihu.com/project/detail/60225"
                 target="_blank"
                 rel="noopener"
-                class="card"
+                class="card glass-card"
               >
                 <img class="card-icon" src="https://static.zhihu.com/heifetz/favicon.ico" alt="Zhihu" />
                 <span v-html="$t('about.suggestion.zhihu.title')"></span>
@@ -161,7 +161,7 @@
             {{ $t('about.like.starMessage') }}
           </p>
           <a
-            class="project-card"
+            class="project-card glass-card"
             v-for="project in githubProjects"
             :key="project.name"
             :href="project.url"
@@ -180,7 +180,7 @@
             {{ $t('about.like.zhihuLike') }}
           </p>
           <a
-            class="project-card"
+            class="project-card glass-card"
             v-for="project in zhihuProjects"
             :key="project.name"
             :href="project.url"
@@ -640,20 +640,18 @@ em {
   margin: 0 auto;
   padding: 1.1rem;
   box-sizing: border-box;
+  background: var(--glass-70);
 
-  @include glass-card;
+  // @include glass-card;
 
-  border-radius: var(--radius-md);
+  // border-radius: var(--radius-md);
   box-shadow: 0 2px 10px rgba(var(--color-primary-rgb), 0.08);
   color: inherit;
   text-decoration: none;
-  transition:
-    transform $ease-standard,
-    box-shadow $ease-standard;
 
   &:hover {
     background: var(--glass-80);
-    box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.15);
+    // box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.15);
     transform: translateY(-6px) scale(1.01);
   }
 
@@ -813,18 +811,19 @@ em {
   align-items: center;
   padding: 20px;
   overflow: hidden;
+  background: var(--glass-50);
 
-  @include glass-card;
+  // @include glass-card;
 
-  border-radius: var(--radius-lg);
-  box-shadow: 0 6px 12px rgba(var(--color-primary-rgb), 0.1);
+  // border-radius: var(--radius-lg);
+  // box-shadow: 0 6px 12px rgba(var(--color-primary-rgb), 0.1);
   color: var(--text-primary);
   font-size: 18px;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
-  transform: scale(1);
-  transition: all $ease-standard;
+  // transform: scale(1);
+  // transition: all $ease-standard;
 
   &:hover {
     background: var(--glass-80);

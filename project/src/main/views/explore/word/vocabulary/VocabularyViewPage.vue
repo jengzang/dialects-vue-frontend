@@ -33,7 +33,7 @@
           <article
             v-for="entry in entries"
             :key="entry.id"
-            class="card vocabulary-card"
+            class="card glass-card"
           >
             <div class="card-row row-1">
               <span class="location-chain">{{ entry.location }}</span>

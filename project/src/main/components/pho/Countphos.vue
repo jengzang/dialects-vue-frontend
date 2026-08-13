@@ -1344,6 +1344,8 @@ $mobile-breakpoint: 768px;
 
   /* 标题 */
   .section-title {
+    display:flex;
+    justify-content: center;
     margin: 8px 0;
     color: var(--text-dark);
     font-size: 20px;
@@ -1351,6 +1353,7 @@ $mobile-breakpoint: 768px;
 
     &--with-pill {
       display: flex;
+      justify-content: center;
       align-items: center;
       flex-wrap: wrap;
       gap: 8px;
@@ -1372,6 +1375,8 @@ $mobile-breakpoint: 768px;
   }
 
   .section-subtitle {
+    display:flex;
+    justify-content: center;
     margin-bottom: 20px;
     color: var(--text-dark-light);
     font-size: 14px;
@@ -1381,9 +1386,11 @@ $mobile-breakpoint: 768px;
   .aggregated-section,
   .locations-section {
     background: none;
-    border: 1px solid var(--border-gray-light);
-    border-radius: var(--radius-lg);
-    backdrop-filter: blur(12px);
+    border: none;
+    box-shadow: none;
+    // border: 1px solid var(--border-gray-light);
+    // border-radius: var(--radius-lg);
+    // backdrop-filter: blur(12px);
   }
 
   .aggregated-section {
@@ -1406,7 +1413,7 @@ $mobile-breakpoint: 768px;
     // background: var(--glass-60);
     // border: 1px solid rgba(var(--color-primary-rgb), 0.1);
     // border-radius: 14px;
-    box-shadow: 0 10px 24px rgba(20, 38, 60, 0.04);
+    // box-shadow: 0 10px 24px rgba(20, 38, 60, 0.04);
   }
 
   .chart-block-title {
@@ -1482,6 +1489,8 @@ $mobile-breakpoint: 768px;
   }
 
   .category-title {
+    display: flex;
+    justify-content: center;
     margin-bottom: 16px;
     padding-bottom: 8px;
     border-bottom: 2px solid var(--border-gray-light);
@@ -1596,24 +1605,29 @@ $mobile-breakpoint: 768px;
   }
 
   .location-name {
+    display: flex;
+    justify-content: center;
     margin-bottom: 12px;
     padding-bottom: 8px;
     border-bottom: 1px solid rgba(var(--color-primary-rgb), 0.12);
     color: var(--color-primary);
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     cursor: pointer;
     text-decoration: none;
     transition: all 0.2s ease;
 
     &::after {
+      display: flex;
       content: '\00A0🔍';
+      align-items: center;
       font-size: 0.7em;
     }
 
     &:hover {
       color: var(--color-primary-hover);
-      text-decoration: underline;
+      scale: (1.1);
+      // text-decoration: underline;
     }
   }
 

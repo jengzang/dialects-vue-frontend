@@ -149,15 +149,15 @@
   gap: 14px;
   padding: 18px 20px;
   overflow: hidden;
-  background: var(--glass-80);
-  border: 0.5px solid var(--glass-90);
-  border-radius: var(--radius-lg);
+  // background: var(--glass-80);
+  // border: 0.5px solid var(--glass-90);
+  // border-radius: var(--radius-lg);
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.06),
     0 2px 8px rgba(0, 0, 0, 0.04),
     inset 0 1px 0 var(--text-white);
-  backdrop-filter: blur(20px) saturate(180%);
-  transition: all 0.2s ease;
+  // backdrop-filter: blur(20px) saturate(180%);
+  // transition: all 0.2s ease;
 
   &:hover {
     border-color: rgba(var(--color-primary-rgb), 0.2);
