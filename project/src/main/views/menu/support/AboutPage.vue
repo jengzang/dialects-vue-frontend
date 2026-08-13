@@ -103,6 +103,7 @@
                 target="_blank"
                 rel="noopener"
                 class="card glass-card"
+                data-interactive="true"
               >
                 <img class="card-icon" src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" />
                 <span v-html="$t('about.suggestion.frontend.title')"></span>
@@ -113,6 +114,7 @@
                 target="_blank"
                 rel="noopener"
                 class="card glass-card"
+                data-interactive="true"
               >
                 <img class="card-icon" src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" />
                 <span v-html="$t('about.suggestion.backend.title')"></span>
@@ -123,6 +125,7 @@
                 target="_blank"
                 rel="noopener"
                 class="card glass-card"
+                data-interactive="true"
               >
                 <img class="card-icon" src="https://static.zhihu.com/heifetz/favicon.ico" alt="Zhihu" />
                 <span v-html="$t('about.suggestion.zhihu.title')"></span>
@@ -162,6 +165,7 @@
           </p>
           <a
             class="project-card glass-card"
+            data-interactive="true"
             v-for="project in githubProjects"
             :key="project.name"
             :href="project.url"
@@ -181,6 +185,7 @@
           </p>
           <a
             class="project-card glass-card"
+            data-interactive="true"
             v-for="project in zhihuProjects"
             :key="project.name"
             :href="project.url"

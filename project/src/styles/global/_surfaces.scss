@@ -8,11 +8,12 @@
   border-radius: var(--glass-panel-radius, var(--radius-xl));
   box-shadow: var(--glass-panel-shadow, 0 4px 14px rgba(var(--color-shadow-rgb), 0.08), 0 1px 4px rgba(var(--color-shadow-rgb), 0.06));
   transition: box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease;
+
+  &:hover {
+   box-shadow: var(--glass-panel-hover-shadow, 0 8px 22px rgba(var(--color-shadow-rgb), 0.1), 0 2px 8px rgba(var(--color-shadow-rgb), 0.08));
+  }
 }
 
-.glass-panel:hover {
-  box-shadow: var(--glass-panel-hover-shadow, 0 8px 22px rgba(var(--color-shadow-rgb), 0.1), 0 2px 8px rgba(var(--color-shadow-rgb), 0.08));
-}
 
 .glass-subpanel {
   background: var(--glass-subpanel-background, var(--surface-glass-button));
@@ -43,12 +44,7 @@
 
   &:hover {
     background: var(--glass-80);
-    // border-color: rgba(var(--color-primary-rgb), 0.2);
-    box-shadow:
-      0 12px 48px rgba(0, 0, 0, 0.08),
-      0 4px 12px rgba(0, 0, 0, 0.06),
-      inset 0 1px 0 var(--text-white);
-    transform: translateY(-5px) scale(1.01);
+    box-shadow: var(--glass-card-hover-shadow, 0 10px 20px rgba(var(--color-shadow-rgb), 0.1));
   }
 
 }
@@ -58,8 +54,11 @@
 }
 
 .glass-card[data-interactive='true']:hover:not([aria-hidden='true']) {
-  transform: translateY(-1px);
-  box-shadow: var(--glass-card-hover-shadow, 0 10px 20px rgba(var(--color-shadow-rgb), 0.1));
+  transform: translateY(-5px) scale(1.01);
+  box-shadow:
+    0 12px 48px rgba(0, 0, 0, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 var(--text-white);
 }
 
 .glass-card[aria-hidden='true'] {
@@ -80,6 +79,10 @@
   border-radius: var(--surface-panel-radius, var(--radius-xl));
   box-shadow: var(--surface-panel-shadow, 0 4px 14px rgba(var(--color-shadow-rgb), 0.06));
   transition: box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease;
+}
+
+.surface-panel:hover {
+  box-shadow: var(--surface-panel-hover-shadow, 0 8px 22px rgba(var(--color-shadow-rgb), 0.1), 0 2px 8px rgba(var(--color-shadow-rgb), 0.08));
 }
 
 .surface-card {
