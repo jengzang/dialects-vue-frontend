@@ -112,10 +112,10 @@
   gap: var(--pill-btn-gap, 6px);
   padding: var(--pill-btn-padding, 9px 14px);
   background: var(--pill-btn-bg, var(--surface-glass-button));
-  border: var(--pill-btn-border, 1px solid var(--border-glass));
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
   border-radius: var(--pill-btn-radius, var(--radius-pill));
   box-shadow: var(--pill-btn-shadow, none);
-  color: var(--pill-btn-color, var(--text-deep));
+  color: var(--pill-btn-color, var(--color-primary));
   font-size: var(--pill-btn-font-size, 12px);
   font-weight: var(--pill-btn-font-weight, 600);
   line-height: 1;

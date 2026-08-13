@@ -14,13 +14,13 @@
     <div v-else-if="data && data.data && data.data.length > 0" class="location-content">
       <div class="section-title">{{ t('result.locationDetailPopup.phonologyActions.title') }}</div>
       <div class="phono-actions">
-        <button type="button" class="glass-button" @click="goToPhonology('matrix')">
+        <button type="button" class="quick-search pill-btn" @click="goToPhonology('matrix')">
           <BarIcon :icon="'⚛️'" />{{ t('result.locationDetailPopup.phonologyActions.matrix') }}
         </button>
-        <button type="button" class="glass-button" @click="goToPhonology('evolution')">
+        <button type="button" class="quick-search pill-btn" @click="goToPhonology('evolution')">
           <BarIcon :icon="'🥧'" />{{ t('result.locationDetailPopup.phonologyActions.evolution') }}
         </button>
-        <button type="button" class="glass-button" @click="goToPhonology('count')">
+        <button type="button" class="quick-search pill-btn" @click="goToPhonology('count')">
           <BarIcon :icon="'🧮'" />{{ t('result.locationDetailPopup.phonologyActions.count') }}
         </button>
       </div>
@@ -295,7 +295,7 @@ $transition-fast: 0.2s;
   margin-bottom: 20px;
 }
 
-.glass-button {
+.quick-search {
   display: inline-flex;
   align-items: center;
   justify-content: center;
