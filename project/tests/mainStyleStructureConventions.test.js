@@ -66,7 +66,7 @@ function topLevelDeclarations(block) {
 
       if (char === ';') {
         const declaration = current.trim()
-        if (declaration) declarations.push(declaration)
+        if (declaration && !declaration.startsWith('//')) declarations.push(declaration)
         current = ''
       }
     }
@@ -116,6 +116,10 @@ describe('main style structure conventions', () => {
       'margin-bottom',
       'margin-left',
       'color',
+      'background',
+      'background-clip',
+      '-webkit-background-clip',
+      '-webkit-text-fill-color',
     ])
 
     for (const file of [

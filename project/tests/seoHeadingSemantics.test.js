@@ -107,7 +107,6 @@ describe('SEO heading semantics', () => {
       'src/main/views/explore/villages/YangChunVillages.vue',
       'src/main/views/explore/villages/AllVillages.vue',
       'src/main/views/explore/word/YangChunSpoken.vue',
-      'src/main/views/menu/support/AboutPage.vue',
       'src/main/views/explore/tools/TableManage.vue',
       'src/main/components/user/UserRegionPage.vue',
       'src/main/views/explore/Praat.vue',
@@ -325,11 +324,11 @@ describe('SEO heading semantics', () => {
   it('uses h1 for active about tab titles while keeping nested section titles below h1', () => {
     const source = readSource('src/main/views/menu/support/AboutPage.vue')
 
-    expect(source).toContain('<h1 class="tabs-title"><BarIcon icon="📖" />{{ $t(\'navigation.pageTitles.support.aboutIntro\') }}</h1>')
-    expect(source).toContain('<h1 class="tabs-title"><BarIcon icon="💬" />{{ $t(\'navigation.pageTitles.support.aboutSuggestion\') }}</h1>')
+    expect(source).toContain('<h1 class="tabs-title">{{ $t(\'navigation.pageTitles.support.aboutIntro\') }}</h1>')
+    expect(source).toContain('<h1 class="tabs-title">💬 {{ $t(\'navigation.pageTitles.support.aboutSuggestion\') }}</h1>')
     expect(source).toContain('<h1 class="tabs-title like-author-title">')
-    expect(source).toContain('<h2 class="tabs-title" style="margin-top: 20px"><BarIcon icon="🙏" />{{ $t(\'about.thanks.title\') }}</h2>')
-    expect(source).toContain('<h2 class="tabs-title" style="margin-top: 3rem"><BarIcon icon="💡" />{{ $t(\'about.reflection.title\') }}</h2>')
+    expect(source).toContain('<h2 class="tabs-title" style="margin-top: 20px">🙏 {{ $t(\'about.thanks.title\') }}</h2>')
+    expect(source).toContain('<h2 class="tabs-title" style="margin-top: 3rem">{{ $t(\'about.reflection.title\') }}</h2>')
   })
 
   it('uses h1 for table management page states without changing conditional visibility', () => {
