@@ -38,7 +38,7 @@
 
             <button
               type="button"
-              class="glass-button add-level-button"
+              class="action-btn add-level-button"
               :disabled="!canAddLevel"
               @click="addLevel"
             >
@@ -779,6 +779,8 @@ $panel-radius-portrait: 24px;.char-class-page {
 
 .add-level-button {
   color: var(--action-primary-text);
+  padding: 4px;
+  font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
   background: var(--color-primary);

@@ -58,11 +58,11 @@
             </CheckBox>
           </div>
           <div class="voronoi-source-summary-grid">
-            <div class="voronoi-summary-card">
+            <div class="voronoi-summary-card glass-card">
               <span class="voronoi-summary-label">{{ t('map.drawTab.voronoi.officialPoints') }}</span>
               <strong class="voronoi-summary-value">{{ officialPointCount }}</strong>
             </div>
-            <div class="voronoi-summary-card">
+            <div class="voronoi-summary-card glass-card">
               <span class="voronoi-summary-label">{{ t('map.drawTab.voronoi.customPoints') }}</span>
               <strong class="voronoi-summary-value">{{ customPointCount }}</strong>
             </div>
@@ -115,19 +115,19 @@
             {{ t('map.drawTab.voronoi.summaryTitle') }}
           </div>
           <div class="voronoi-summary-grid">
-            <div class="voronoi-summary-card">
+            <div class="voronoi-summary-card glass-card">
               <span class="voronoi-summary-label">{{ t('map.drawTab.voronoi.totalPoints') }}</span>
               <strong class="voronoi-summary-value">{{ totalPoints }}</strong>
             </div>
-            <div class="voronoi-summary-card">
+            <div class="voronoi-summary-card glass-card">
               <span class="voronoi-summary-label">{{ t('map.drawTab.voronoi.activePoints') }}</span>
               <strong class="voronoi-summary-value">{{ activePoints }}</strong>
             </div>
-            <div class="voronoi-summary-card">
+            <div class="voronoi-summary-card glass-card">
               <span class="voronoi-summary-label">{{ t('map.drawTab.voronoi.ignoredPoints') }}</span>
               <strong class="voronoi-summary-value">{{ ignoredCount }}</strong>
             </div>
-            <div class="voronoi-summary-card">
+            <div class="voronoi-summary-card glass-card">
               <span class="voronoi-summary-label">{{ t('map.drawTab.voronoi.partitionGroups') }}</span>
               <strong class="voronoi-summary-value">{{ groupCount }}</strong>
             </div>
@@ -385,9 +385,9 @@ const offsetClass = computed(() => {
   align-items: center;
   gap: 0.25rem;
   padding: 0.8rem;
-  border-radius: 14px;
-  background: var(--glass-50);
-  border: 1px solid var(--glass-60);
+  // border-radius: 14px;
+  // background: var(--glass-50);
+  // border: 1px solid var(--glass-60);
 
   .voronoi-summary-label {
     font-size: 0.78rem;
