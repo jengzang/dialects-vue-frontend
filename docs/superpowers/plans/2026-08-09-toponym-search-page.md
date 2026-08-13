@@ -2,15 +2,75 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add an independent natural-village toponym catalog search page at `/explore/villages/search`, keeping it parallel to, not a replacement for, the existing distribution page at `/explore/villages/toponyms`.
+**Goal:** Add an independent natural-village toponym catalog search page at `/explore/villages/search`, parallel to `/explore/villages/toponyms`, for querying concrete place-name entries and loading details only after the user selects a result.
 
-**Architecture:** The new page follows the current main Explore/Villages page organization: route entry in `project/src/main/router/exploreRoutes.js`, navigation entries in the existing bar/sidebar configs, localized copy in `project/src/i18n/locales/*/villages.json` and `navigation.json`, API helpers in `project/src/api/main/toponyms.js`, and a Vue page under `project/src/main/views/explore/villages/toponyms/`. It reuses the existing glass container/panel/button/input/select style system and the detail-copy logic from the current toponym page, but it keeps its data flow separate from the map distribution workflow.
+**Architecture:** The new page is a path-route Explore/Villages page. It uses existing API and route organization, but its visual implementation must follow the current shared `glass-*` foundations under `project/src/styles/global/`, not the older `ToponymsPage.vue` visual structure. `ToponymsPage.vue` is useful only for endpoint boundary, request-id stale-response handling, and detail-field semantics; it is not a visual/layout reference for this feature.
 
-**Tech Stack:** Vue 3 `<script setup>`, Vue Router path routes, Vue I18n JSON locale files, existing `api` HTTP client, scoped SCSS using `@use '@/styles/global/mixins' as *;`, design tokens from `project/src/styles/global/_tokens.scss`, existing `SimpleSelectDropdown`, existing `MultiSelectDropdown`, existing `HoverDetailCard`, and project test/build commands.
+**Tech Stack:** Vue 3 `<script setup>`, Vue Router path routes, Vue I18n JSON locale files, existing `api` HTTP client, `SimpleSelectDropdown`, `MultiSelectDropdown`, shared `glass-shell`, `glass-panel`, `glass-subpanel`, `glass-card`, `glass-button`, `glass-field`, `main-card-grid`, state classes from `main/_states.scss`, scoped SCSS with project mixins, and Vitest/build verification through `project/package.json`.
 
 ---
 
-## 1. Product Boundary
+## 1. Current Style System Assessment
+
+The current shared style system has been reorganized. Do not base the new page on the older `main-glass-*` / `main-search-field` conventions from `ToponymsPage.vue`.
+
+Use these shared foundations first:
+
+- `project/src/styles/global/_surfaces.scss`
+  - `glass-shell`: page/hero shell surface.
+  - `glass-panel`: main section/panel surface.
+  - `glass-subpanel`: secondary inset panel/state/details surface.
+  - `glass-card`: repeated card/result item surface; supports `data-interactive="true"`.
+  - `surface-*`: non-glass alternatives, only if the page explicitly needs a solid look.
+- `project/src/styles/global/_buttons.scss`
+  - `glass-button`
+  - variants: `data-variant="primary"`, `secondary`, `danger`, `enter`
+  - sizes: `data-size="large"`, `small`, `compact`
+  - active state: `data-active="true"`
+- `project/src/styles/global/_forms.scss`
+  - `glass-field`
+  - `data-shape="search"` for search inputs
+  - `data-size="compact"` for dense inputs
+  - `glass-dropdown-panel` / `glass-dropdown-item` are available for dropdown-like surfaces, though existing select components already wrap most of this.
+- `project/src/styles/main/_states.scss`
+  - `main-list-state`
+  - `main-list-state-title`
+  - `main-list-state-text`
+- `project/src/components/selector/_selector.scss`
+  - `select-trigger`
+  - `floating-panel`
+
+Concrete current references:
+
+- `project/src/main/components/map/custom/feature/FeatureCardList.vue`
+  - Uses `glass-field data-shape="search"`, `glass-button`, `main-card-grid`, `glass-card`, `glass-subpanel`, and `main-list-state`.
+  - Use it only as a template/class-composition reference for card lists and states. Do not copy its responsive CSS because it still contains a width-based media query.
+- `project/src/main/views/explore/word/vocabulary/VocabularyImportPage.vue`
+  - Uses `glass-panel`, `glass-button`, modal actions, compact dense tool layout.
+  - This is a good reference for tool-form density and action hierarchy.
+- `project/src/components/import/TabularImportPreview.vue`
+  - Uses `glass-button`, `glass-subpanel`, existing select controls, loading state, and dense structured panels.
+- `project/src/main/views/explore/yangchun/YangChunOverviewPage.vue`
+  - Uses `glass-shell`, `glass-panel`, `glass-subpanel`, `glass-button` in the current visual language.
+  - Use it only for shell/panel composition, not for editorial/hero marketing layout.
+
+`ToponymsPage.vue` is explicitly not a visual reference for this new page.
+
+### Current Card / Surface Inventory
+
+Global reusable surface classes in `project/src/styles/global/_surfaces.scss`:
+
+- `glass-shell`: page-level shell.
+- `glass-panel`: main panel/container.
+- `glass-subpanel`: secondary panel, state block, or detail group.
+- `glass-card`: repeated card/item surface; supports `data-interactive="true"`.
+- `surface-shell`, `surface-panel`, `surface-subpanel`, `surface-card`: solid/non-glass alternatives.
+
+So the current shared card choices are two card primitives: `glass-card` and `surface-card`. The repo also has many business-local card class names such as `feature-card`, `point-card`, `region-card`, `portal-entry-card`, and `stat-card`, but those are local layout/content classes layered on top of shared surfaces. For this page, result items should use `glass-card`, with a local class only for spacing/text layout.
+
+---
+
+## 2. Product Boundary
 
 ### Existing Page: `/explore/villages/toponyms`
 
@@ -20,8 +80,8 @@ Keep these endpoints and behavior unchanged:
 
 - `GET /api/toponyms/points`
 - `GET /api/toponyms/names`
-- Manual local detail lookup through `GET /api/toponyms/details`
-- Optional official detail lookup through the existing Ministry detail flow
+- manual local detail lookup through `GET /api/toponyms/details`
+- optional official detail lookup through the existing Ministry detail flow
 
 Do not change the distribution page's map behavior, GIS layer behavior, name-tree behavior, point loading, chart settings, or visual layout while implementing the new search page.
 
@@ -34,117 +94,159 @@ Use these endpoints:
 - `GET /api/toponyms/search`
 - `GET /api/toponyms/details`
 
-The search endpoint is a list lookup only. It returns `id + name` by default. It must not be treated as a point-distribution endpoint.
+The search endpoint is list lookup only. It returns `id + name` by default. It must not be treated as a point-distribution endpoint.
 
 ### Hard Data Boundary
-
-The new page must not automatically join `/api/toponyms/search` results with `/api/toponyms/points` results to create a table containing `id + name + longitude + latitude`.
 
 Allowed flow:
 
 1. User submits the search form.
 2. Page calls `/api/toponyms/search`.
 3. Result list shows `name` and `id`.
-4. User clicks a result row.
+4. User clicks a result card.
 5. Page calls `/api/toponyms/details?ids=<id>`.
 6. Detail panel shows local details, including coordinates if the detail payload has them.
 
 Disallowed flow:
 
-1. User submits the search form.
-2. Page calls `/api/toponyms/search`.
-3. Page also calls `/api/toponyms/points`.
-4. Page tries to merge the two responses by id/name/coordinates.
+1. Page calls `/api/toponyms/search`.
+2. Page also calls `/api/toponyms/points`.
+3. Page merges responses into `id + name + longitude + latitude`.
 
-The “查看分布” action is only a router navigation to `/explore/villages/toponyms` with `q` and `match_mode`. It does not prefetch `/points` inside the new search page.
-
----
-
-## 2. Current Project Organization To Follow
-
-### Existing Toponym Page Shape
-
-The existing distribution page is `project/src/main/views/explore/villages/toponyms/ToponymsPage.vue`.
-
-Its page-level conventions should be copied:
-
-- outer shell: `glass-container glass-container-shell`;
-- top control panel: `main-glass-panel` with `main-glass-panel-inner`;
-- page copy block with compact `h1` and `p`;
-- landscape layout as a grid;
-- portrait/mobile layout with `@media (max-aspect-ratio: 1 / 1)`;
-- no width-based responsive breakpoints;
-- detail overlay via `Teleport to="body"` and `HoverDetailCard`;
-- scoped style block with `lang="scss"`;
-- `@use '@/styles/global/mixins' as *;` at the top of the style block;
-- token-based colors, spacing surfaces, borders, and states.
-
-The new page should feel like a sibling tool, not a new product surface.
-
-### Existing Component Patterns
-
-Use:
-
-- `SimpleSelectDropdown` for single-select fields: `match_mode`, `area_scope`, and `limit` if limit is implemented as presets.
-- `MultiSelectDropdown` for `place_type_code`, following the existing trigger + Teleport panel usage in `project/src/main/views/explore/word/vocabulary/VocabularyTopControls.vue` and `project/src/main/components/geo/RegionSelector.vue`.
-- `main-search-field` for `q` and `area_code`.
-- `main-glass-button` for search, reset, detail, and distribution navigation actions.
-- `main-glass-panel` and `main-glass-panel-inner` for page surfaces.
-- `HoverDetailCard` for the detail panel, matching the existing `ToponymDetailPanel` behavior.
-- `InlineIcon` only if an existing icon-style button is needed.
-
-Do not introduce a new visual system, a marketing layout, a hero section, new color palette, or page-level card nesting.
-
-### Multi-Select Type Control
-
-`project/src/components/selector/MultiSelectDropdown.vue` already exists and must be reused for `place_type_code`.
-
-Important usage detail: `MultiSelectDropdown` is the dropdown panel only. It does not render its own trigger. Existing pages create a trigger button with `select-trigger global-select-trigger`, keep a trigger `ref`, and render `MultiSelectDropdown` only while the dropdown is open.
-
-Recommended implementation:
-
-- add `const placeTypeTriggerEl = ref(null)` and `const placeTypeDropdownOpen = ref(false)`;
-- render a trigger button using `class="select-trigger global-select-trigger"`;
-- compute the trigger label with the same compact style used by `VocabularyTopControls.vue`: placeholder when empty, single selected label when one item is selected, and `firstLabel +N` for multiple selections;
-- render `MultiSelectDropdown` with `:model-value="selectedPlaceTypeCodes"`, `:options="placeTypeOptions"`, `:trigger-el="placeTypeTriggerEl"`, `align="left"`, `direction="down"`;
-- update `selectedPlaceTypeCodes` through `@update:model-value`;
-- close by setting `placeTypeDropdownOpen = false` on `@close`;
-- default selected values remain `22200`, `21610`, `27610`.
-
-Do not change `SimpleSelectDropdown` to support multi-select. Do not add a new local chip implementation for this field unless `MultiSelectDropdown` is proven unusable during implementation.
+The “查看分布” action is only a router navigation to `/explore/villages/toponyms` with `q` and `match_mode`. The new page must not prefetch `/points`.
 
 ---
 
-## 3. New Page Layout
+## 3. File Structure
+
+### Create
+
+- `project/src/main/views/explore/villages/toponyms/ToponymSearchPage.vue`
+
+Keep it as one page component for the first implementation. Do not extract a search form, result list, detail panel, composable, or shared helper unless explicitly confirmed later.
+
+### Modify
+
+- `project/src/api/main/toponyms.js`
+  - Add `getToponymSearch`.
+- `project/src/api/index.js`
+  - Export `getToponymSearch`.
+- `project/src/main/router/exploreRoutes.js`
+  - Add the path route.
+- `project/src/main/config/BarAndTabs/ExploreBarConfig.js`
+  - Add the villages child navigation entry.
+- `project/src/main/config/BarAndTabs/SideBarConfig.js`
+  - Add the villages child navigation entry.
+- `project/src/seo/config.js`
+  - Add SEO config and sitemap path.
+- `project/src/i18n/locales/zh-CN/navigation.json`
+- `project/src/i18n/locales/zh-Hant/navigation.json`
+- `project/src/i18n/locales/en/navigation.json`
+- `project/src/i18n/locales/zh-CN/villages.json`
+- `project/src/i18n/locales/zh-Hant/villages.json`
+- `project/src/i18n/locales/en/villages.json`
+
+### Do Not Touch By Default
+
+- `project/src/main/views/explore/villages/toponyms/ToponymsPage.vue`
+- `project/src/main/views/explore/villages/toponyms/ToponymDistributionChart.vue`
+- `project/src/main/views/explore/villages/toponyms/ToponymResultsPanel.vue`
+- `project/src/main/views/explore/villages/toponyms/ToponymSearchBar.vue`
+- `project/src/main/views/explore/villages/toponyms/ToponymDetailPanel.vue`
+- `project/src/styles/global/*`
+
+Changing shared styles or the existing distribution page is outside this task unless explicitly requested.
+
+---
+
+## 4. Layout Plan
+
+### Overall Composition
+
+Use a compact tool layout:
+
+```vue
+<main class="toponym-search-page glass-shell">
+  <section class="toponym-search-page__header glass-panel">
+    <div class="toponym-search-page__copy">
+      <h1>{{ t('villages.pages.toponymSearch.title') }}</h1>
+      <p>{{ t('villages.pages.toponymSearch.subtitle') }}</p>
+    </div>
+    <form class="toponym-search-page__form" @submit.prevent="handleSearch">
+      <!-- controls -->
+    </form>
+  </section>
+
+  <section class="toponym-search-page__workspace">
+    <section class="toponym-search-page__results glass-panel">
+      <!-- result header + states + card grid/list -->
+    </section>
+    <aside class="toponym-search-page__detail glass-panel">
+      <!-- selected detail -->
+    </aside>
+  </section>
+</main>
+```
+
+Visual rules:
+
+- Use `glass-shell` for the page container.
+- Use `glass-panel` for the search header, results panel, and detail panel.
+- Use `glass-subpanel` for empty/error/loading state blocks and detail field groups.
+- Use `glass-card data-interactive="true"` for each clickable search result.
+- Use `main-card-grid` if the result list is a card grid. If a denser list is required, use a local grid/list layout but keep each row as `glass-card`.
+- Use `glass-button` for all actions.
+- Use `glass-field data-shape="search"` for `q`.
+- Use `glass-field` for `area_code`.
+- Use existing selector components for dropdowns:
+  - `SimpleSelectDropdown` for every single-select control.
+  - `MultiSelectDropdown` for the multi-select `place_type_code` control.
+  - Do not build a local select/dropdown component for this page.
 
 ### Desktop / Landscape
 
-The page uses a two-band layout:
+Use a two-band layout:
 
-1. Top search controls panel:
-   - left: title and subtitle;
-   - right: compact form with keyword, match mode, place type multi-select, area code, area scope, limit, and submit button.
+1. Search panel on top:
+   - title/subtitle on the left;
+   - dense form on the right;
+   - controls wrap within the panel.
+2. Workspace below:
+   - left/main: results;
+   - right: details.
 
-2. Workspace grid:
-   - main column: search result list;
-   - right column: selected result summary / detail status panel.
-
-Suggested grid:
+Suggested component-local layout only:
 
 ```scss
+.toponym-search-page {
+  @include flex-col;
+  gap: 16px;
+  width: 100%;
+  min-height: 70dvh;
+  padding: 20px;
+}
+
+.toponym-search-page__header {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.32fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  padding: 18px;
+}
+
 .toponym-search-page__workspace {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
   gap: 16px;
-  align-items: stretch;
+  align-items: start;
 }
 ```
 
-This mirrors the existing distribution page's `minmax(0, 1fr) 360px` pattern, but replaces the chart with a list.
+This local CSS is placement/layout only. Do not restyle panel backgrounds, card backgrounds, button colors, or field appearance locally.
 
 ### Portrait / Mobile
 
-Use only:
+Use only aspect-ratio responsive rules:
 
 ```scss
 @media (max-aspect-ratio: 1 / 1) {
@@ -152,96 +254,231 @@ Use only:
     padding: 14px;
   }
 
-  .toponym-search-page__controls-inner,
+  .toponym-search-page__header,
   .toponym-search-page__workspace {
     grid-template-columns: 1fr;
   }
 }
 ```
 
-Do not use `max-width`, `min-width`, pixel width breakpoints, or viewport-width font scaling.
-
-### Result List
-
-The result list is a tool surface:
-
-- header shows result count and truncated state;
-- list rows show `name` as primary text;
-- `id` is secondary text in monospace style or small muted text;
-- optional `place_type_code` and `area_code` are not shown by default;
-- selected row gets a token-based selected state;
-- list uses `ui-scrollbar` if scrollable.
-
-Suggested row data displayed by default:
-
-```text
-樊家村
-92e4878410adb6ebacfc245f2589bc4d
-```
-
-### Detail Panel
-
-Use a detail panel on the right in landscape and inside `HoverDetailCard` or stacked panel on portrait. The safest initial implementation is:
-
-- keep a right-side panel in the workspace for the selected detail;
-- optionally use `HoverDetailCard` only if the implementation can match the current `ToponymsPage.vue` interaction cleanly.
-
-Because search results are list rows rather than map points, a persistent right-side detail panel is easier to understand than a pointer-positioned floating card. If a floating detail is used, set a fixed card position rather than relying on chart event coordinates.
-
-Detail fields:
-
-- selected result name;
-- selected result id;
-- local detail source label;
-- standard name;
-- place type or place type code;
-- coordinates formatted as `longitude, latitude`;
-- administrative division path;
-- error/loading/empty states.
-
-Reuse the current `ToponymDetailPanel.vue` text and formatting ideas, but do not force the existing component if its `selectedPoint` mental model makes the search page awkward. A small dedicated local detail renderer inside `ToponymSearchPage.vue` is acceptable and lower risk than reshaping the existing map component.
+Do not use `max-width`, `min-width`, pixel width breakpoints, or viewport-width font scaling in the new component.
 
 ---
 
-## 4. API Contract
+## 5. Controls
+
+### Fields
+
+- `q`
+  - `input.glass-field[data-shape="search"]`
+  - required at submit time only
+- `match_mode`
+  - use the common `SimpleSelectDropdown`
+  - options: `prefix`, `suffix`, `exact`, `contains`
+- `place_type_code`
+  - use the common `MultiSelectDropdown`
+  - defaults: `22200`, `21610`, `27610`
+- `area_code`
+  - `input.glass-field`
+  - optional
+- `area_scope`
+  - use the common `SimpleSelectDropdown`
+  - options: `descendants`, `exact`
+  - only sent when `area_code` is non-empty
+- `limit`
+  - use the common `SimpleSelectDropdown`
+  - presets: `50`, `100`, `200`
+  - default: `50`
+
+Single-select template pattern:
+
+```vue
+<SimpleSelectDropdown
+  v-model="matchMode"
+  :options="matchModeOptions"
+  match-trigger-width
+  width="100%"
+/>
+```
+
+Use the same component pattern for `areaScope` and `limit`. Do not replace these controls with native `<select>`, local dropdown markup, or page-specific select components.
+
+### MultiSelectDropdown Usage
+
+`MultiSelectDropdown` is the common multi-select component currently available in this repository. Its public API is panel-style: it receives `modelValue`, `options`, and `triggerEl`, then teleports the dropdown panel to `body`. Follow existing usage in `VocabularyTopControls.vue` and `RegionSelector.vue`; do not build another multi-select.
+
+Required state:
+
+```js
+const selectedPlaceTypeCodes = ref(['22200', '21610', '27610']);
+const placeTypeTriggerEl = ref(null);
+const placeTypeDropdownOpen = ref(false);
+```
+
+Required trigger wrapper:
+
+```vue
+<button
+  ref="placeTypeTriggerEl"
+  class="toponym-search-page__select-trigger select-trigger"
+  :class="{ 'is-open': placeTypeDropdownOpen }"
+  type="button"
+  @click="placeTypeDropdownOpen = !placeTypeDropdownOpen"
+>
+  <span class="select-label">{{ placeTypeTriggerLabel }}</span>
+  <span class="select-arrow" aria-hidden="true">⌄</span>
+</button>
+<MultiSelectDropdown
+  v-if="placeTypeDropdownOpen"
+  :model-value="selectedPlaceTypeCodes"
+  :options="placeTypeOptions"
+  :trigger-el="placeTypeTriggerEl"
+  align="left"
+  direction="down"
+  @update:model-value="selectedPlaceTypeCodes = $event"
+  @close="placeTypeDropdownOpen = false"
+/>
+```
+
+Label helper:
+
+```js
+function formatMultiSelectLabel(selectedValues, options, placeholder) {
+  const selectedLabels = selectedValues
+    .map((value) => options.find((option) => option.value === value)?.label || value)
+    .filter(Boolean);
+
+  if (!selectedLabels.length) return placeholder;
+  if (selectedLabels.length === 1) return selectedLabels[0];
+  return `${selectedLabels[0]} +${selectedLabels.length - 1}`;
+}
+```
+
+Do not implement local chip buttons for `place_type_code`. Do not modify `SimpleSelectDropdown` to make it multi-select.
+
+`global-select-trigger` is not a current shared class in this repository. The shared trigger class is `select-trigger`; any extra class on this page should be local placement glue only.
+
+### Buttons
+
+Use `glass-button`, not `main-glass-button`.
+
+- Search: `class="glass-button" data-variant="primary"`
+- Reset: `class="glass-button" data-variant="secondary"`
+- View distribution: `class="glass-button" data-variant="secondary"`
+- Retry after error: `class="glass-button"`
+- Small utility buttons, if any: `data-size="small"` or `data-size="compact"`
+- Selected result state: set `data-active="true"` on the result card/button where appropriate.
+
+---
+
+## 6. Result and Detail UI
+
+### Result Items
+
+Default result shape:
+
+```json
+{
+  "id": "92e4878410adb6ebacfc245f2589bc4d",
+  "name": "樊家村"
+}
+```
+
+Render each item as:
+
+```vue
+<button
+  v-for="item in searchItems"
+  :key="item.id || item.name"
+  class="toponym-search-page__result-card glass-card"
+  data-interactive="true"
+  :data-active="selectedItem?.id === item.id"
+  type="button"
+  :disabled="!item.id"
+  @click="handleDetailRequest(item)"
+>
+  <strong>{{ item.name || t('villages.pages.toponymSearch.detail.unknown') }}</strong>
+  <span>{{ item.id || t('villages.pages.toponymSearch.detail.unknown') }}</span>
+</button>
+```
+
+Use `glass-card` here. This is the most important style correction from the previous plan.
+
+Optional `area_code` and `place_type_code` are not shown by default. Do not send include flags unless the page actually renders those fields.
+
+### State Blocks
+
+Use shared state classes:
+
+```vue
+<div class="main-list-state glass-subpanel" data-state="error">
+  <div class="main-list-state-title">{{ t('villages.pages.toponymSearch.results.loadFailed') }}</div>
+  <p class="main-list-state-text">{{ searchError }}</p>
+</div>
+```
+
+Use similar `main-list-state glass-subpanel` blocks for idle, empty, loading, and no-detail states.
+
+### Detail Panel
+
+Use a persistent right-side `glass-panel` on landscape and stacked panel on portrait. Do not use map-pointer `HoverDetailCard`; search results are list/card interactions, not map points.
+
+Inside details, use `glass-subpanel` field groups:
+
+```vue
+<dl v-if="selectedDetail" class="toponym-search-page__detail-list glass-subpanel">
+  <div>
+    <dt>{{ t('villages.pages.toponymSearch.detail.name') }}</dt>
+    <dd>{{ selectedDetail.name || selectedItem.name || unknownLabel }}</dd>
+  </div>
+  <div>
+    <dt>{{ t('villages.pages.toponymSearch.detail.placeType') }}</dt>
+    <dd>{{ selectedDetail.place_type || selectedDetail.place_type_code || unknownLabel }}</dd>
+  </div>
+  <div>
+    <dt>{{ t('villages.pages.toponymSearch.detail.coordinates') }}</dt>
+    <dd>{{ formatCoordinates(selectedDetail) }}</dd>
+  </div>
+  <div>
+    <dt>{{ t('villages.pages.toponymSearch.detail.divisionPath') }}</dt>
+    <dd>{{ formatDivisionPath(selectedDetail) }}</dd>
+  </div>
+</dl>
+```
+
+---
+
+## 7. API Contract
 
 ### Add `getToponymSearch(params = {})`
 
 File: `project/src/api/main/toponyms.js`
 
-The helper should:
+Add:
 
-- require non-empty `q`;
-- normalize `match_mode` with existing `normalizeMatchMode`;
-- default `limit` to `50`;
-- support repeated `place_type_code`;
-- support `area_code`;
-- support `area_scope` as `descendants` or `exact`;
-- support `include_place_type_code`;
-- support `include_area_code`;
-- return normalized `{ items, count, truncated }`;
-- use `getFastApiErrorMessage(error, 'failed to search toponyms')`.
+```js
+export const TOPONYM_DEFAULT_SEARCH_LIMIT = 50;
+const AREA_SCOPES = new Set(['descendants', 'exact']);
 
-Expected request example:
-
-```http
-GET /api/toponyms/search?q=樊家&match_mode=prefix&place_type_code=22200&limit=50
-```
-
-Expected response:
-
-```json
-{
-  "items": [
-    {
-      "id": "92e4878410adb6ebacfc245f2589bc4d",
-      "name": "樊家村"
-    }
-  ],
-  "count": 1,
-  "truncated": false
+function normalizeAreaScope(value) {
+  return AREA_SCOPES.has(value) ? value : 'descendants';
 }
 ```
+
+Add a catalog-search-specific param builder. Do not reuse `appendCommonSearchParams` if it would carry point-only params like `bbox` or `zoom` into `/search`.
+
+Required behavior:
+
+- require non-empty `q`;
+- normalize `match_mode`;
+- default `limit` to `50`;
+- append repeated `place_type_code`;
+- send `area_code` only when non-empty;
+- send `area_scope` only when `area_code` is non-empty;
+- send `include_place_type_code` and `include_area_code` only when explicitly requested;
+- return `{ items, count, truncated }`;
+- fallback count should be `items.length` when backend omits `count`;
+- use `getFastApiErrorMessage(error, 'failed to search toponyms')`.
 
 ### Preserve Existing Helpers
 
@@ -252,35 +489,27 @@ Do not change the semantics of:
 - `getToponymDetails`;
 - `getToponymOfficialDetail`.
 
-The existing `appendCommonSearchParams` includes `bbox` and `zoom` for point distribution. The new search helper may reuse the safe parts of that function if doing so does not add point-only parameters to `/search`. If reuse would blur the endpoint boundary, write a separate append function for catalog search.
-
 ### Export API
 
 File: `project/src/api/index.js`
 
-Export:
-
-```js
-getToponymSearch
-```
-
-from `./main/toponyms.js`.
+Export `getToponymSearch` from `./main/toponyms.js`.
 
 ---
 
-## 5. Route, Navigation, Portal, and SEO
+## 8. Route, Navigation, Portal, and SEO
 
 ### Route
 
 File: `project/src/main/router/exploreRoutes.js`
 
-Add a lazy import:
+Add:
 
 ```js
 const ToponymSearchPage = () => import('@/main/views/explore/villages/toponyms/ToponymSearchPage.vue')
 ```
 
-Add route:
+Add:
 
 ```js
 {
@@ -291,68 +520,38 @@ Add route:
 
 Do not remove or redirect `explore/villages/toponyms`.
 
-### Explore Route Query Allowlist
-
-File: `project/src/main/router.js`
-
-If the search page is reachable through the `ExploreEntry` `page` query compatibility layer, add a `toponymSearch` variant with:
-
-```js
-toponymSearch: ['q', 'match_mode', 'place_type_code', 'area_code', 'area_scope', 'limit']
-```
-
-If direct path routing is sufficient, no query-allowlist change is needed for the concrete `/explore/villages/search` route.
-
-### Top Bar and Sidebar
+### Navigation
 
 Files:
 
 - `project/src/main/config/BarAndTabs/ExploreBarConfig.js`
 - `project/src/main/config/BarAndTabs/SideBarConfig.js`
 
-Add a child entry under `villages`:
+Add a villages child entry:
 
 ```js
 { label: t('navigation.submenu.villages.toponymSearch'), icon: '🔎', path: withRouteLocale(route, '/explore/villages/search') }
 ```
 
-Also update villages tab matching so the villages tab stays active on `/explore/villages/search`.
+Also update villages active matching so `/explore/villages/search` keeps the villages tab active.
 
-Do not remove the existing `toponyms` entry. The new order should keep both visible. Recommended order:
+Do not remove the existing `toponyms` entry.
 
-1. `VillagesML`
-2. `地名查询`
-3. `地名分布`
-4. `广东自然村`
-5. admin-only `全部自然村`
-
-### Villages Portal Page
+### Portal Page
 
 File: `project/src/main/views/menu/portals/VillagesPage.vue`
 
-Add one entry button for “地名查询” only if the product wants the portal to expose both search and distribution. Because this is a visible portal structure change, confirm before implementing if the user has not explicitly asked for a portal entry.
-
-If confirmed, add:
-
-- `handleToponymSearch`;
-- a new button using existing `entry-button` classes;
-- i18n copy under top-level `villages.toponymSearch`.
+Do not modify by default. Adding a new visible portal card changes the menu surface and should be a separate confirmed step.
 
 ### SEO and Sitemap
 
 File: `project/src/seo/config.js`
 
-Add:
-
-```js
-'/explore/villages/search'
-```
-
-with localized title and description. Keep `/explore/villages/toponyms` unchanged.
+Add `/explore/villages/search` title/description and sitemap path. Do not rewrite existing `/explore/villages/toponyms` SEO text.
 
 ---
 
-## 6. I18n Plan
+## 9. I18n Plan
 
 Files:
 
@@ -369,23 +568,15 @@ Add navigation key:
 "toponymSearch": "地名查询"
 ```
 
-Use Traditional Chinese in `zh-Hant`, preserving literal characters:
+Traditional Chinese:
 
 ```json
 "toponymSearch": "地名查詢"
 ```
 
-Add page copy under:
+Add page copy under `villages.pages.toponymSearch`. Keep edits minimal; do not rewrite existing Chinese copy.
 
-```json
-"villages": {
-  "pages": {
-    "toponymSearch": {}
-  }
-}
-```
-
-Recommended zh-CN keys:
+Recommended zh-CN copy:
 
 ```json
 {
@@ -418,14 +609,15 @@ Recommended zh-CN keys:
     "idle": "输入关键词后点击搜索。",
     "loading": "正在查询地名...",
     "empty": "没有找到匹配条目。",
+    "loadFailed": "查询失败",
     "count": "找到 {count} 条，当前显示 {shown} 条。",
-    "truncated": "结果已截断，请缩小范围或使用更严格的匹配方式。",
-    "selected": "已选条目"
+    "truncated": "结果已截断，请缩小范围或使用更严格的匹配方式。"
   },
   "detail": {
     "title": "条目详情",
-    "empty": "点击左侧结果后查看详情。",
+    "empty": "点击结果后查看详情。",
     "loading": "正在加载详情...",
+    "loadFailed": "详情加载失败",
     "source": "来源",
     "sourceName": "本地地名库",
     "id": "ID",
@@ -449,15 +641,13 @@ Recommended zh-CN keys:
 }
 ```
 
-When editing Chinese-heavy JSON files, use the smallest possible patch and inspect the diff immediately for Chinese, Traditional Chinese, and emoji integrity.
+After editing Chinese-heavy JSON, immediately inspect diff for simplified/traditional Chinese integrity, literal emoji, and encoding damage.
 
 ---
 
-## 7. State and Data Flow
+## 10. Page State and Data Flow
 
-### Page State
-
-Use local refs in `ToponymSearchPage.vue`:
+Use local refs:
 
 ```js
 const query = ref('');
@@ -482,49 +672,27 @@ const detailError = ref('');
 const detailRequestId = ref(0);
 ```
 
-This mirrors the request-id protection style already used in `ToponymsPage.vue`.
-
-Add a local label helper for the multi-select trigger, following `VocabularyTopControls.vue`:
-
-```js
-function formatMultiSelectLabel(selectedValues, options, placeholder) {
-  const selectedLabels = selectedValues
-    .map((value) => options.find((option) => option.value === value)?.label || value)
-    .filter(Boolean);
-
-  if (!selectedLabels.length) return placeholder;
-  if (selectedLabels.length === 1) return selectedLabels[0];
-  return `${selectedLabels[0]} +${selectedLabels.length - 1}`;
-}
-
-const placeTypeTriggerLabel = computed(() => formatMultiSelectLabel(
-  selectedPlaceTypeCodes.value,
-  placeTypeOptions.value,
-  t('villages.pages.toponymSearch.search.placeType'),
-));
-```
-
-### Search Flow
+Search flow:
 
 1. Trim `query`.
 2. Set `hasSearched = true`.
 3. Reset selected item/detail.
-4. If query is empty, set localized empty-query error and do not call API.
+4. If query is empty, clear results and show localized empty-query error.
 5. Build params:
    - `q`;
    - `match_mode`;
-   - `place_type_code` from `selectedPlaceTypeCodes`;
+   - `place_type_code` from `selectedPlaceTypeCodes` only when non-empty;
    - `area_code` only when non-empty;
    - `area_scope` only when `area_code` is non-empty;
    - `limit`.
 6. Increment `searchRequestId`.
 7. Call `getToponymSearch`.
 8. Ignore stale responses.
-9. Normalize items to array and update count/truncated.
+9. Update `searchItems`, `searchCount`, and `searchTruncated`.
 
-### Detail Flow
+Detail flow:
 
-1. User clicks a result item.
+1. User clicks a result card.
 2. Store `selectedItem`.
 3. Reset previous detail.
 4. Increment `detailRequestId`.
@@ -532,11 +700,7 @@ const placeTypeTriggerLabel = computed(() => formatMultiSelectLabel(
 6. Ignore stale responses.
 7. Set `selectedDetail = payload.items[0] || null`.
 
-Do not call details for all search results. Details endpoint has a 10-id limit; this page should request one id at a time.
-
-### Distribution Navigation Flow
-
-Use:
+Distribution navigation:
 
 ```js
 router.push({
@@ -548,98 +712,29 @@ router.push({
 });
 ```
 
-Only include non-empty `q`. Do not include `place_type_code`, `area_code`, `area_scope`, or `limit` unless the existing distribution page explicitly supports and consumes them.
-
-The current distribution page does not read initial `q` and `match_mode` from route query. If implementing this navigation, either:
-
-- add route-query hydration to `ToponymsPage.vue` in a separate reviewed step; or
-- keep the navigation query for future compatibility and do not claim the destination auto-searches.
-
-Because adding query hydration changes existing distribution page behavior, treat it as a separate explicit step and review carefully.
+Do not add query hydration or auto-search behavior to `ToponymsPage.vue` in this task.
 
 ---
 
-## 8. Edge Cases
+## 11. Edge Cases
 
-### Empty Query
-
-No request. Show localized error. Keep previous results only if that is consistent with the existing page style; recommended behavior is clearing previous search results to avoid confusing stale data.
-
-### Contains Query
-
-`contains` can be slow, especially single-character searches. Do not perform input-triggered requests. Button-submit only.
-
-Optional non-blocking hint:
-
-- show muted text near match mode when `matchMode === 'contains'`;
-- do not block the request unless the backend returns an error.
-
-### Limit
-
-Default `50`. Allow `50`, `100`, and `200` as presets unless the user asks for free numeric input.
-
-Rationale: this is a catalog lookup UI, not a data export page.
-
-### Type Selection
-
-If all type values are deselected, recommended behavior is to omit `place_type_code` and search all backend-supported types. If product wants village-only by default, keep the three default values selected and allow the user to reselect after clearing.
-
-Do not silently re-add types after the user clears them.
-
-### Area Filter
-
-If `area_code` is empty:
-
-- do not send `area_scope`;
-- keep the UI scope dropdown enabled or disabled based on clarity. Recommended: keep enabled but send it only with `area_code`, so the form is predictable.
-
-If `area_code` has whitespace:
-
-- trim before sending.
-
-### Optional Include Flags
-
-Do not send `include_area_code=true` or `include_place_type_code=true` in the first implementation unless the result row actually renders those fields.
-
-If adding result chips for type/area later, implement it as a separate reviewed change.
-
-### Search Response Shape
-
-Handle defensively:
-
-- `items` missing or non-array -> `[]`;
-- `count` missing -> `items.length`;
-- `truncated` missing -> `false`;
-- item missing `id` -> render disabled row and do not request detail;
-- item missing `name` -> display localized unknown.
-
-### Detail Response Shape
-
-Handle defensively:
-
-- no `items[0]` -> show no-detail state;
-- missing `longitude` or `latitude` -> coordinates show unknown;
-- missing `division_path` or malformed division path -> administrative path shows unknown;
-- `place_type` missing -> fall back to `place_type_code`;
-- both missing -> unknown.
-
-### Request Races
-
-Use request ids for search and detail, matching `ToponymsPage.vue`. Stale responses must not overwrite newer state.
-
-### Existing Dirty Workspace
-
-Before each implementation step, run:
-
-```bash
-git status --short
-```
-
-There are currently unrelated modified/untracked files under map draw and GIS Voronoi work. Do not stage, commit, revert, or modify those files for this feature.
+- Empty query: no request; clear previous results; show localized error.
+- `contains`: allowed, button-submit only; no input-triggered requests.
+- Limit: default `50`; preset values `50`, `100`, `200`.
+- All place types deselected: omit `place_type_code`.
+- Empty `area_code`: do not send `area_scope`.
+- Search response missing `items`: use `[]`.
+- Search response missing `count`: use `items.length`.
+- Search result missing `id`: render disabled card; do not request detail.
+- Detail response empty: show no-detail state.
+- Missing coordinates: show unknown.
+- Missing `division_path`: show unknown.
+- Stale search/detail responses: ignore via request id.
+- Details endpoint limit: request one id at a time.
 
 ---
 
-## 9. Implementation Tasks
+## 12. Implementation Tasks
 
 ### Task 1: API Helper
 
@@ -648,28 +743,24 @@ There are currently unrelated modified/untracked files under map draw and GIS Vo
 - Modify: `project/src/api/main/toponyms.js`
 - Modify: `project/src/api/index.js`
 
-- [ ] Inspect current diff:
+- [ ] Inspect current state:
 
 ```bash
 git status --short
 git diff -- project/src/api/main/toponyms.js project/src/api/index.js
 ```
 
-- [ ] Add `TOPONYM_DEFAULT_SEARCH_LIMIT = 50`.
+- [ ] Add `TOPONYM_DEFAULT_SEARCH_LIMIT`, `AREA_SCOPES`, `normalizeAreaScope`, and `appendToponymSearchParams`.
 
-- [ ] Add a small helper for catalog-search-only params so `/search` does not inherit `bbox` or `zoom`.
+- [ ] Add `getToponymSearch`.
 
-- [ ] Add `getToponymSearch(params = {})`.
+- [ ] Export `getToponymSearch`.
 
-- [ ] Export `getToponymSearch` from `project/src/api/index.js`.
-
-- [ ] Run targeted checks:
+- [ ] Run:
 
 ```bash
 npm --prefix project test
 ```
-
-The test script is defined in `project/package.json` as `vitest run`.
 
 - [ ] CR:
 
@@ -679,9 +770,10 @@ git diff -- project/src/api/main/toponyms.js project/src/api/index.js
 
 Confirm:
 
-- existing `points`, `names`, `details`, and official detail helpers are unchanged except shared safe helpers if needed;
-- no point-only params are sent to `/search`;
-- repeated `place_type_code` is supported.
+- existing helpers keep behavior;
+- `/search` does not receive `bbox` or `zoom`;
+- repeated `place_type_code` is supported;
+- `area_scope` is only sent when `area_code` is sent.
 
 - [ ] Commit only these files:
 
@@ -690,7 +782,7 @@ git add project/src/api/main/toponyms.js project/src/api/index.js
 git commit -m "feat: add toponym catalog search api"
 ```
 
-### Task 2: Route, Navigation, SEO, and I18n Skeleton
+### Task 2: Route, Navigation, SEO, I18n
 
 **Files:**
 
@@ -698,29 +790,22 @@ git commit -m "feat: add toponym catalog search api"
 - Modify: `project/src/main/config/BarAndTabs/ExploreBarConfig.js`
 - Modify: `project/src/main/config/BarAndTabs/SideBarConfig.js`
 - Modify: `project/src/seo/config.js`
-- Modify: `project/src/i18n/locales/zh-CN/navigation.json`
-- Modify: `project/src/i18n/locales/zh-Hant/navigation.json`
-- Modify: `project/src/i18n/locales/en/navigation.json`
-- Modify: `project/src/i18n/locales/zh-CN/villages.json`
-- Modify: `project/src/i18n/locales/zh-Hant/villages.json`
-- Modify: `project/src/i18n/locales/en/villages.json`
+- Modify: locale files listed in Section 9
 
-- [ ] Inspect current diff:
+- [ ] Inspect current state:
 
 ```bash
 git status --short
 git diff -- project/src/main/router/exploreRoutes.js project/src/main/config/BarAndTabs/ExploreBarConfig.js project/src/main/config/BarAndTabs/SideBarConfig.js project/src/seo/config.js project/src/i18n/locales/zh-CN/navigation.json project/src/i18n/locales/zh-Hant/navigation.json project/src/i18n/locales/en/navigation.json project/src/i18n/locales/zh-CN/villages.json project/src/i18n/locales/zh-Hant/villages.json project/src/i18n/locales/en/villages.json
 ```
 
-- [ ] Add the lazy route import and `/explore/villages/search` route.
+- [ ] Add route import and route entry.
 
-- [ ] Add navigation labels for `toponymSearch`.
+- [ ] Add navigation labels and villages child entries.
 
-- [ ] Add the new navigation child under villages in both top bar and sidebar.
+- [ ] Add SEO and sitemap entry.
 
-- [ ] Add localized page copy under `villages.pages.toponymSearch`.
-
-- [ ] Add SEO config and sitemap path for `/explore/villages/search`.
+- [ ] Add i18n copy with minimal localized JSON patches.
 
 - [ ] CR:
 
@@ -730,10 +815,11 @@ git diff -- project/src/main/router/exploreRoutes.js project/src/main/config/Bar
 
 Confirm:
 
-- Chinese and Traditional Chinese text is intact;
-- literal emoji in nav config remains literal emoji;
-- existing `toponyms` labels and copy are not rewritten;
-- no route replaces `/explore/villages/toponyms`.
+- existing Chinese copy is not rewritten;
+- Traditional Chinese remains Traditional Chinese;
+- literal emoji remain literal;
+- no route replaces `/explore/villages/toponyms`;
+- no portal card is added unless separately confirmed.
 
 - [ ] Commit only these files:
 
@@ -742,142 +828,20 @@ git add project/src/main/router/exploreRoutes.js project/src/main/config/BarAndT
 git commit -m "feat: route toponym search page"
 ```
 
-### Task 3: Search Page UI and Search Flow
+### Task 3: Page UI and Search Flow
 
 **Files:**
 
 - Create: `project/src/main/views/explore/villages/toponyms/ToponymSearchPage.vue`
 
-- [ ] Inspect current directory:
+- [ ] Inspect current state:
 
 ```bash
 rg --files project/src/main/views/explore/villages/toponyms
 git status --short
 ```
 
-- [ ] Create `ToponymSearchPage.vue` using `<script setup>`.
-
-- [ ] Template structure:
-
-```vue
-<main class="toponym-search-page glass-container glass-container-shell">
-  <section class="toponym-search-page__controls main-glass-panel">
-    <div class="toponym-search-page__controls-inner main-glass-panel-inner">
-      <div class="toponym-search-page__toolbar-copy">
-        <h1>{{ t('villages.pages.toponymSearch.title') }}</h1>
-        <p>{{ t('villages.pages.toponymSearch.subtitle') }}</p>
-      </div>
-      <form class="toponym-search-page__form" @submit.prevent="handleSearch">
-        <label class="toponym-search-page__field toponym-search-page__field--query">
-          <span>{{ t('villages.pages.toponymSearch.search.keyword') }}</span>
-          <input
-            class="main-search-field"
-            :value="query"
-            :placeholder="t('villages.pages.toponymSearch.search.placeholder')"
-            autocomplete="off"
-            @input="query = $event.target.value"
-          >
-        </label>
-        <label class="toponym-search-page__field">
-          <span>{{ t('villages.pages.toponymSearch.search.matchMode') }}</span>
-          <SimpleSelectDropdown v-model="matchMode" :options="matchModeOptions" match-trigger-width />
-        </label>
-        <div class="toponym-search-page__field">
-          <span>{{ t('villages.pages.toponymSearch.search.placeType') }}</span>
-          <button
-            ref="placeTypeTriggerEl"
-            class="select-trigger global-select-trigger"
-            :class="{ 'is-open': placeTypeDropdownOpen }"
-            type="button"
-            @click="placeTypeDropdownOpen = !placeTypeDropdownOpen"
-          >
-            <span class="select-label">{{ placeTypeTriggerLabel }}</span>
-            <span class="select-arrow" aria-hidden="true">⌄</span>
-          </button>
-          <MultiSelectDropdown
-            v-if="placeTypeDropdownOpen"
-            :model-value="selectedPlaceTypeCodes"
-            :options="placeTypeOptions"
-            :trigger-el="placeTypeTriggerEl"
-            align="left"
-            direction="down"
-            @update:model-value="selectedPlaceTypeCodes = $event"
-            @close="placeTypeDropdownOpen = false"
-          />
-        </div>
-        <label class="toponym-search-page__field">
-          <span>{{ t('villages.pages.toponymSearch.search.areaCode') }}</span>
-          <input
-            class="main-search-field"
-            :value="areaCode"
-            :placeholder="t('villages.pages.toponymSearch.search.areaCodePlaceholder')"
-            autocomplete="off"
-            @input="areaCode = $event.target.value"
-          >
-        </label>
-        <label class="toponym-search-page__field">
-          <span>{{ t('villages.pages.toponymSearch.search.areaScope') }}</span>
-          <SimpleSelectDropdown v-model="areaScope" :options="areaScopeOptions" match-trigger-width />
-        </label>
-        <label class="toponym-search-page__field">
-          <span>{{ t('villages.pages.toponymSearch.search.limit') }}</span>
-          <SimpleSelectDropdown v-model="limit" :options="limitOptions" match-trigger-width />
-        </label>
-        <button class="main-glass-button" type="submit" :disabled="searchLoading">
-          {{ searchLoading ? t('villages.pages.toponymSearch.search.searching') : t('villages.pages.toponymSearch.search.submit') }}
-        </button>
-      </form>
-    </div>
-  </section>
-
-  <section class="toponym-search-page__workspace">
-    <section class="toponym-search-page__results main-glass-panel">
-      <div class="toponym-search-page__results-inner main-glass-panel-inner">
-        <header class="toponym-search-page__section-header">
-          <h2>{{ t('villages.pages.toponymSearch.results.title') }}</h2>
-          <span v-if="hasSearched">
-            {{ t('villages.pages.toponymSearch.results.count', { count: searchCount, shown: searchItems.length }) }}
-          </span>
-        </header>
-        <p v-if="!hasSearched">{{ t('villages.pages.toponymSearch.results.idle') }}</p>
-        <p v-else-if="searchLoading">{{ t('villages.pages.toponymSearch.results.loading') }}</p>
-        <p v-else-if="searchError" class="toponym-search-page__error">{{ searchError }}</p>
-        <p v-else-if="!searchItems.length">{{ t('villages.pages.toponymSearch.results.empty') }}</p>
-        <ol v-else class="toponym-search-page__result-list ui-scrollbar">
-          <li v-for="item in searchItems" :key="item.id || item.name">
-            <button type="button" :disabled="!item.id" @click="handleDetailRequest(item)">
-              <strong>{{ item.name || t('villages.pages.toponymSearch.detail.unknown') }}</strong>
-              <span>{{ item.id || t('villages.pages.toponymSearch.detail.unknown') }}</span>
-            </button>
-          </li>
-        </ol>
-      </div>
-    </section>
-    <aside class="toponym-search-page__detail main-glass-panel">
-      <div class="toponym-search-page__detail-inner main-glass-panel-inner">
-        <header class="toponym-search-page__section-header">
-          <h2>{{ t('villages.pages.toponymSearch.detail.title') }}</h2>
-        </header>
-        <p v-if="!selectedItem">{{ t('villages.pages.toponymSearch.detail.empty') }}</p>
-        <p v-else-if="detailLoading">{{ t('villages.pages.toponymSearch.detail.loading') }}</p>
-        <p v-else-if="detailError" class="toponym-search-page__error">{{ detailError }}</p>
-        <dl v-else class="toponym-search-page__detail-list">
-          <div>
-            <dt>{{ t('villages.pages.toponymSearch.detail.id') }}</dt>
-            <dd>{{ selectedItem.id }}</dd>
-          </div>
-          <div>
-            <dt>{{ t('villages.pages.toponymSearch.detail.name') }}</dt>
-            <dd>{{ selectedDetail?.name || selectedItem.name || t('villages.pages.toponymSearch.detail.unknown') }}</dd>
-          </div>
-        </dl>
-      </div>
-    </aside>
-  </section>
-</main>
-```
-
-- [ ] Script imports:
+- [ ] Create page with:
 
 ```js
 import { computed, ref } from 'vue';
@@ -889,37 +853,15 @@ import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js';
 ```
 
-- [ ] Add state from Section 7.
-
-- [ ] Add computed options for match mode, area scope, limit, and place type multi-select.
+- [ ] Use `glass-shell`, `glass-panel`, `glass-subpanel`, `glass-card`, `glass-button`, `glass-field`, `main-card-grid`, and `main-list-state` in the template.
 
 - [ ] Implement `handleSearch`.
 
-- [ ] Implement selected-row and empty/loading/error states.
+- [ ] Implement idle/loading/error/empty states with `main-list-state glass-subpanel`.
 
-- [ ] Add scoped SCSS:
+- [ ] Render results as `glass-card data-interactive="true"`.
 
-```vue
-<style scoped lang="scss">
-@use '@/styles/global/mixins' as *;
-
-.toponym-search-page {
-  @include flex-col;
-  gap: 16px;
-  width: 100%;
-  min-height: 70dvh;
-  padding: 20px;
-}
-
-@media (max-aspect-ratio: 1 / 1) {
-  .toponym-search-page {
-    padding: 14px;
-  }
-}
-</style>
-```
-
-Expand styles only with token-based values and existing mixins.
+- [ ] Add scoped SCSS that only handles local placement, spacing, sizing, and layout.
 
 - [ ] Run:
 
@@ -935,14 +877,16 @@ git diff -- project/src/main/views/explore/villages/toponyms/ToponymSearchPage.v
 
 Confirm:
 
-- no `/api/toponyms/points` import or call exists;
-- no automatic join exists;
-- no width media query exists;
+- no `main-glass-*` or `main-search-field` is used;
+- result items use `glass-card`;
+- buttons use `glass-button`;
+- inputs use `glass-field`;
+- no `/api/toponyms/points` import/call exists;
+- no width-based media query exists;
 - style block uses `scoped lang="scss"` and imports mixins;
-- raw `display: flex; flex-direction: column` is not used where `@include flex-col` should be used;
-- raw text truncation triple is not used where `@include text-truncate` should be used.
+- visual appearance comes from shared classes first.
 
-- [ ] Commit only this file:
+- [ ] Commit:
 
 ```bash
 git add project/src/main/views/explore/villages/toponyms/ToponymSearchPage.vue
@@ -955,23 +899,30 @@ git commit -m "feat: add toponym search page"
 
 - Modify: `project/src/main/views/explore/villages/toponyms/ToponymSearchPage.vue`
 
-- [ ] Add click handling for result rows.
+- [ ] Implement result-card click detail loading.
 
-- [ ] Add `handleDetailRequest(item)` that calls `getToponymDetails(item.id)`.
+- [ ] Render detail groups inside `glass-subpanel`.
 
-- [ ] Add detail rendering for:
+- [ ] Add formatting helpers:
 
-  - id;
-  - name;
-  - place type;
-  - coordinates;
-  - division path.
+```js
+function formatCoordinates(detail) {
+  const lng = Number(detail?.longitude);
+  const lat = Number(detail?.latitude);
+  if (!Number.isFinite(lng) || !Number.isFinite(lat)) {
+    return t('villages.pages.toponymSearch.detail.unknown');
+  }
+  return `${lng.toFixed(6)}, ${lat.toFixed(6)}`;
+}
 
-- [ ] Add `formatCoordinates` and `formatDivisionPath` helpers inside the page.
+function formatDivisionPath(detail) {
+  const path = Array.isArray(detail?.division_path) ? detail.division_path : [];
+  const names = path.map((item) => item?.name).filter(Boolean);
+  return names.length ? names.join(' / ') : t('villages.pages.toponymSearch.detail.unknown');
+}
+```
 
-- [ ] Add “查看分布” button using router push to `/explore/villages/toponyms` with `q` and `match_mode`.
-
-- [ ] Do not add query hydration to `ToponymsPage.vue` in this task unless explicitly approved.
+- [ ] Add “查看分布” as `glass-button data-variant="secondary"`.
 
 - [ ] Run:
 
@@ -987,10 +938,11 @@ git diff -- project/src/main/views/explore/villages/toponyms/ToponymSearchPage.v
 
 Confirm:
 
-- details are requested only after a row click;
-- only one id is sent to `getToponymDetails`;
-- coordinates come only from detail payload;
-- distribution navigation does not request points in the search page.
+- details are requested only after clicking one result;
+- only one id is passed to `getToponymDetails`;
+- coordinates come only from details;
+- search page does not request `/points`;
+- no `HoverDetailCard` map-style interaction was introduced.
 
 - [ ] Commit:
 
@@ -1003,86 +955,79 @@ git commit -m "feat: show toponym search details"
 
 **Files:**
 
-- No planned source changes unless verification reveals a defect.
+- No planned source changes.
 
-- [ ] Run project tests from the correct package directory:
+- [ ] Run:
 
 ```bash
 npm --prefix project test
-```
-
-- [ ] Run build or type check if available in `project/package.json`:
-
-```bash
 npm --prefix project run build
 ```
 
-- [ ] Search for forbidden boundary violations:
+- [ ] Search for boundary/style violations:
 
 ```bash
 rg -n "getToponymPoints|/api/toponyms/points|toponyms/points" project/src/main/views/explore/villages/toponyms/ToponymSearchPage.vue
-```
-
-Expected: no matches.
-
-- [ ] Search for width-based media queries in the new page:
-
-```bash
+rg -n "main-glass|main-search-field" project/src/main/views/explore/villages/toponyms/ToponymSearchPage.vue
 rg -n "max-width|min-width" project/src/main/views/explore/villages/toponyms/ToponymSearchPage.vue
-```
-
-Expected: no matches.
-
-- [ ] Search for raw CSS patterns disallowed by AGENTS:
-
-```bash
 rg -n "display:\\s*flex;\\s*flex-direction:\\s*column|overflow:\\s*hidden;\\s*text-overflow:\\s*ellipsis;\\s*white-space:\\s*nowrap" project/src/main/views/explore/villages/toponyms/ToponymSearchPage.vue
 ```
 
 Expected: no matches.
 
-- [ ] Inspect full scoped diff:
+- [ ] Inspect full diff:
 
 ```bash
 git diff
+git status --short
 ```
 
 Confirm:
 
-- no unrelated map draw or Voronoi changes are staged;
-- existing Chinese and Traditional Chinese copy is preserved except newly added keys;
-- existing emoji remain literal;
-- `/explore/villages/toponyms` remains available;
+- unrelated existing changes are not staged;
+- Chinese, Traditional Chinese, and emoji are intact;
+- `/explore/villages/toponyms` is unchanged;
 - `/explore/villages/search` is the only new page route.
 
 ---
 
-## 10. Decisions That Need Explicit Confirmation Before Implementation
+## 13. Current Workspace Warning
 
-These are intentionally not included as default implementation work:
+At plan time, the workspace has unrelated changes:
 
-1. Adding a new card to `project/src/main/views/menu/portals/VillagesPage.vue`.
-2. Extracting shared search form, detail panel, multi-select trigger helper, or result list components.
-3. Making `SimpleSelectDropdown` support multi-select.
-4. Hydrating `/explore/villages/toponyms` from route query and auto-filling `q` / `match_mode`.
-5. Auto-searching on page mount when `/explore/villages/search?q=...` is opened.
-6. Showing `area_code` or `place_type_code` columns by default via include flags.
-7. Batch detail lookup for multiple selected ids.
+- `project/public/sitemap.xml`
+- `project/src/main/components/map/Draw/modals/MapDrawImageExportModal.vue`
+- `project/src/main/views/explore/word/vocabulary/VocabularyImportPage.vue`
+- `docs/reference/`
+- `docs/zhihu/阳春/`
 
-Default implementation should avoid all seven unless the user confirms them.
+Implementation must not stage, commit, revert, or rewrite these unless the user explicitly brings them into scope.
 
 ---
 
-## 11. Self-Review Checklist
+## 14. Decisions Requiring Confirmation Before Implementation
 
-- This plan keeps `/explore/villages/search` parallel to `/explore/villages/toponyms`.
+Do not include these by default:
+
+1. Adding a new portal card in `VillagesPage.vue`.
+2. Extracting reusable components or composables.
+3. Modifying shared `glass-*` styles.
+4. Modifying existing `ToponymsPage.vue` query hydration or auto-search behavior.
+5. Auto-searching on mount when `/explore/villages/search?q=...` is opened.
+6. Showing `area_code` or `place_type_code` columns by default via include flags.
+7. Batch detail lookup for multiple selected ids.
+
+---
+
+## 15. Self-Review Checklist
+
+- The plan uses current `glass-*` shared styles.
+- The plan requires `glass-card` for result items.
+- The plan does not use `ToponymsPage.vue` as a visual reference.
+- The plan keeps `/explore/villages/search` independent from `/explore/villages/toponyms`.
 - The new page never calls `/api/toponyms/points`.
 - The new page never joins search results with point data.
-- Details are fetched only after selecting an item.
-- Detail requests use one id at a time, within the 10-id backend limit.
-- The page layout follows current Explore/Villages glass-panel conventions.
+- Details are fetched only after selecting one item.
 - Responsive behavior uses only `@media (max-aspect-ratio: 1 / 1)`.
-- SCSS uses project mixins and design tokens.
-- The plan avoids structural component extraction unless confirmed.
-- The plan includes CR and commit boundaries for each step.
-- The plan explicitly protects unrelated dirty workspace changes.
+- Component styles only handle local layout glue.
+- Chinese/Traditional Chinese/emoji CR is required before commits.
