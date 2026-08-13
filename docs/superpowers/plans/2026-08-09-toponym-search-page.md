@@ -6,7 +6,7 @@
 
 **Architecture:** The new page follows the current main Explore/Villages page organization: route entry in `project/src/main/router/exploreRoutes.js`, navigation entries in the existing bar/sidebar configs, localized copy in `project/src/i18n/locales/*/villages.json` and `navigation.json`, API helpers in `project/src/api/main/toponyms.js`, and a Vue page under `project/src/main/views/explore/villages/toponyms/`. It reuses the existing glass container/panel/button/input/select style system and the detail-copy logic from the current toponym page, but it keeps its data flow separate from the map distribution workflow.
 
-**Tech Stack:** Vue 3 `<script setup>`, Vue Router path routes, Vue I18n JSON locale files, existing `api` HTTP client, scoped SCSS using `@use '@/styles/global/mixins' as *;`, design tokens from `project/src/styles/global/_tokens.scss`, existing `SimpleSelectDropdown`, existing `HoverDetailCard`, and project test/build commands.
+**Tech Stack:** Vue 3 `<script setup>`, Vue Router path routes, Vue I18n JSON locale files, existing `api` HTTP client, scoped SCSS using `@use '@/styles/global/mixins' as *;`, design tokens from `project/src/styles/global/_tokens.scss`, existing `SimpleSelectDropdown`, existing `MultiSelectDropdown`, existing `HoverDetailCard`, and project test/build commands.
 
 ---
 
@@ -86,6 +86,7 @@ The new page should feel like a sibling tool, not a new product surface.
 Use:
 
 - `SimpleSelectDropdown` for single-select fields: `match_mode`, `area_scope`, and `limit` if limit is implemented as presets.
+- `MultiSelectDropdown` for `place_type_code`, following the existing trigger + Teleport panel usage in `project/src/main/views/explore/word/vocabulary/VocabularyTopControls.vue` and `project/src/main/components/geo/RegionSelector.vue`.
 - `main-search-field` for `q` and `area_code`.
 - `main-glass-button` for search, reset, detail, and distribution navigation actions.
 - `main-glass-panel` and `main-glass-panel-inner` for page surfaces.
@@ -96,17 +97,21 @@ Do not introduce a new visual system, a marketing layout, a hero section, new co
 
 ### Multi-Select Type Control
 
-`SimpleSelectDropdown` is currently a single-select component. For `place_type_code` multi-select, avoid changing it into a global multi-select component for this feature.
+`project/src/components/selector/MultiSelectDropdown.vue` already exists and must be reused for `place_type_code`.
 
-Recommended local control:
+Important usage detail: `MultiSelectDropdown` is the dropdown panel only. It does not render its own trigger. Existing pages create a trigger button with `select-trigger global-select-trigger`, keep a trigger `ref`, and render `MultiSelectDropdown` only while the dropdown is open.
 
-- a compact chip/check button group inside the search form;
-- default selected values: `22200`, `21610`, `27610`;
-- labels from existing `villages.pages.toponyms.placeTypes` where possible, or new localized labels under `villages.pages.toponymSearch.placeTypes`;
-- each chip is a `button type="button"` with selected state;
-- use `main-glass-button`-adjacent token styling, not hardcoded colors.
+Recommended implementation:
 
-This keeps the change scoped and avoids a structural component refactor.
+- add `const placeTypeTriggerEl = ref(null)` and `const placeTypeDropdownOpen = ref(false)`;
+- render a trigger button using `class="select-trigger global-select-trigger"`;
+- compute the trigger label with the same compact style used by `VocabularyTopControls.vue`: placeholder when empty, single selected label when one item is selected, and `firstLabel +N` for multiple selections;
+- render `MultiSelectDropdown` with `:model-value="selectedPlaceTypeCodes"`, `:options="placeTypeOptions"`, `:trigger-el="placeTypeTriggerEl"`, `align="left"`, `direction="down"`;
+- update `selectedPlaceTypeCodes` through `@update:model-value`;
+- close by setting `placeTypeDropdownOpen = false` on `@close`;
+- default selected values remain `22200`, `21610`, `27610`.
+
+Do not change `SimpleSelectDropdown` to support multi-select. Do not add a new local chip implementation for this field unless `MultiSelectDropdown` is proven unusable during implementation.
 
 ---
 
@@ -118,7 +123,7 @@ The page uses a two-band layout:
 
 1. Top search controls panel:
    - left: title and subtitle;
-   - right: compact form with keyword, match mode, type chips, area code, area scope, limit, and submit button.
+   - right: compact form with keyword, match mode, place type multi-select, area code, area scope, limit, and submit button.
 
 2. Workspace grid:
    - main column: search result list;
@@ -458,6 +463,8 @@ Use local refs in `ToponymSearchPage.vue`:
 const query = ref('');
 const matchMode = ref('prefix');
 const selectedPlaceTypeCodes = ref(['22200', '21610', '27610']);
+const placeTypeTriggerEl = ref(null);
+const placeTypeDropdownOpen = ref(false);
 const areaCode = ref('');
 const areaScope = ref('descendants');
 const limit = ref(50);
@@ -477,6 +484,26 @@ const detailRequestId = ref(0);
 
 This mirrors the request-id protection style already used in `ToponymsPage.vue`.
 
+Add a local label helper for the multi-select trigger, following `VocabularyTopControls.vue`:
+
+```js
+function formatMultiSelectLabel(selectedValues, options, placeholder) {
+  const selectedLabels = selectedValues
+    .map((value) => options.find((option) => option.value === value)?.label || value)
+    .filter(Boolean);
+
+  if (!selectedLabels.length) return placeholder;
+  if (selectedLabels.length === 1) return selectedLabels[0];
+  return `${selectedLabels[0]} +${selectedLabels.length - 1}`;
+}
+
+const placeTypeTriggerLabel = computed(() => formatMultiSelectLabel(
+  selectedPlaceTypeCodes.value,
+  placeTypeOptions.value,
+  t('villages.pages.toponymSearch.search.placeType'),
+));
+```
+
 ### Search Flow
 
 1. Trim `query`.
@@ -486,7 +513,7 @@ This mirrors the request-id protection style already used in `ToponymsPage.vue`.
 5. Build params:
    - `q`;
    - `match_mode`;
-   - `place_type_code` from selected chips;
+   - `place_type_code` from `selectedPlaceTypeCodes`;
    - `area_code` only when non-empty;
    - `area_scope` only when `area_code` is non-empty;
    - `limit`.
@@ -555,7 +582,7 @@ Rationale: this is a catalog lookup UI, not a data export page.
 
 ### Type Selection
 
-If all type chips are deselected, recommended behavior is to omit `place_type_code` and search all backend-supported types. If product wants village-only by default, keep the three default chips selected and allow the user to reselect after clearing.
+If all type values are deselected, recommended behavior is to omit `place_type_code` and search all backend-supported types. If product wants village-only by default, keep the three default values selected and allow the user to reselect after clearing.
 
 Do not silently re-add types after the user clears them.
 
@@ -755,16 +782,28 @@ git status --short
           <span>{{ t('villages.pages.toponymSearch.search.matchMode') }}</span>
           <SimpleSelectDropdown v-model="matchMode" :options="matchModeOptions" match-trigger-width />
         </label>
-        <div class="toponym-search-page__type-chips" role="group">
+        <div class="toponym-search-page__field">
+          <span>{{ t('villages.pages.toponymSearch.search.placeType') }}</span>
           <button
-            v-for="option in placeTypeOptions"
-            :key="option.value"
+            ref="placeTypeTriggerEl"
+            class="select-trigger global-select-trigger"
+            :class="{ 'is-open': placeTypeDropdownOpen }"
             type="button"
-            :class="{ 'is-selected': selectedPlaceTypeCodes.includes(option.value) }"
-            @click="togglePlaceType(option.value)"
+            @click="placeTypeDropdownOpen = !placeTypeDropdownOpen"
           >
-            {{ option.label }}
+            <span class="select-label">{{ placeTypeTriggerLabel }}</span>
+            <span class="select-arrow" aria-hidden="true">⌄</span>
           </button>
+          <MultiSelectDropdown
+            v-if="placeTypeDropdownOpen"
+            :model-value="selectedPlaceTypeCodes"
+            :options="placeTypeOptions"
+            :trigger-el="placeTypeTriggerEl"
+            align="left"
+            direction="down"
+            @update:model-value="selectedPlaceTypeCodes = $event"
+            @close="placeTypeDropdownOpen = false"
+          />
         </div>
         <label class="toponym-search-page__field">
           <span>{{ t('villages.pages.toponymSearch.search.areaCode') }}</span>
@@ -845,13 +884,14 @@ import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
 import { getToponymDetails, getToponymSearch } from '@/api';
+import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue';
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js';
 ```
 
 - [ ] Add state from Section 7.
 
-- [ ] Add computed options for match mode, area scope, limit, and place type chips.
+- [ ] Add computed options for match mode, area scope, limit, and place type multi-select.
 
 - [ ] Implement `handleSearch`.
 
@@ -1022,7 +1062,7 @@ Confirm:
 These are intentionally not included as default implementation work:
 
 1. Adding a new card to `project/src/main/views/menu/portals/VillagesPage.vue`.
-2. Extracting shared search form, detail panel, chip group, or result list components.
+2. Extracting shared search form, detail panel, multi-select trigger helper, or result list components.
 3. Making `SimpleSelectDropdown` support multi-select.
 4. Hydrating `/explore/villages/toponyms` from route query and auto-filling `q` / `match_mode`.
 5. Auto-searching on page mount when `/explore/villages/search?q=...` is opened.
