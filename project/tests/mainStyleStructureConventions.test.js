@@ -77,7 +77,7 @@ function topLevelDeclarations(block) {
 
 describe('main style structure conventions', () => {
   it('keeps layout helpers out of surface primitives', () => {
-    const surfaces = readSource('src/styles/main/_surfaces.scss')
+    const surfaces = readSource('src/styles/global/_surfaces.scss')
     const layout = readSource('src/styles/main/_layout.scss')
     const entry = readSource('src/styles/main-entry.scss')
 
@@ -87,8 +87,8 @@ describe('main style structure conventions', () => {
   })
 
   it('keeps shared page title rules in info utilities', () => {
-    const surfaces = readSource('src/styles/main/_surfaces.scss')
-    const info = readSource('src/styles/main/_info.scss')
+    const surfaces = readSource('src/styles/global/_surfaces.scss')
+    const info = readSource('src/styles/global/_info.scss')
 
     expect(surfaces).not.toContain('.panel-title')
     expect(info).not.toContain('.panel-title')

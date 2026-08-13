@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
@@ -53,12 +53,13 @@ function trackedStyleAndVueFilesUnder(relativePath) {
   return output
     .split('\n')
     .filter((file) => file.endsWith('.vue') || file.endsWith('.scss'))
+    .filter((file) => existsSync(resolve(projectRoot, file)))
     .map((file) => resolve(projectRoot, file))
 }
 
 describe('main surface conventions', () => {
   it('defines the canonical main glass surface primitives without the legacy main prefix', () => {
-    const source = readSource('src/styles/main/_surfaces.scss')
+    const source = readSource('src/styles/global/_surfaces.scss')
 
     expect(source).toContain('.glass-shell')
     expect(source).toContain('.glass-panel')
@@ -67,7 +68,7 @@ describe('main surface conventions', () => {
   })
 
   it('defines non-glass surface primitives for solid/plain containers', () => {
-    const source = readSource('src/styles/main/_surfaces.scss')
+    const source = readSource('src/styles/global/_surfaces.scss')
     const panelBlock = blockFor(source, '.surface-panel')
 
     expect(source).toContain('.surface-shell')
@@ -79,7 +80,7 @@ describe('main surface conventions', () => {
   })
 
   it('does not keep legacy surface aliases or legacy surface variables', () => {
-    const source = readSource('src/styles/main/_surfaces.scss')
+    const source = readSource('src/styles/global/_surfaces.scss')
     const legacySelectors = [
       '.main-glass-panel',
       '.main-glass-panel-inner',

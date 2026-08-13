@@ -474,8 +474,6 @@ watch(
 
 @use '../../_map-variables' as *;
 
-@use '@/styles/main/_surfaces.scss';
-
 .feature-detail-table {
   @include flex-col;
   gap: $spacing-lg;

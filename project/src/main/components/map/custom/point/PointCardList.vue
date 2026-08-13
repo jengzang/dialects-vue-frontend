@@ -87,8 +87,6 @@ const filteredItems = computed(() => {
 
 @use '../../_map-variables' as *;
 
-@use '@/styles/main/_surfaces.scss';
-
 .point-card-list {
   @include flex-col;
   gap: 18px;

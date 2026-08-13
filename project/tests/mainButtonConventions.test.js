@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
@@ -20,6 +20,7 @@ function trackedStyleAndVueFilesUnder(relativePath) {
   return output
     .split('\n')
     .filter((file) => file.endsWith('.vue') || file.endsWith('.scss'))
+    .filter((file) => existsSync(resolve(projectRoot, file)))
     .map((file) => resolve(projectRoot, file))
 }
 
@@ -29,7 +30,7 @@ function legacyTokenPattern(token) {
 
 describe('main button conventions', () => {
   it('defines glass-button as the canonical main button primitive', () => {
-    const source = readSource('src/styles/main/_buttons.scss')
+    const source = readSource('src/styles/global/_buttons.scss')
 
     expect(source).toContain('.glass-button')
     expect(source).toContain("&[data-variant='primary']")
@@ -41,7 +42,7 @@ describe('main button conventions', () => {
   })
 
   it('does not keep legacy shared button selectors or variables', () => {
-    const source = readSource('src/styles/main/_buttons.scss')
+    const source = readSource('src/styles/global/_buttons.scss')
     const legacySelectors = ['.main-glass-button', '.run-btn', '.enter-btn', '.entry-button']
     const legacyVariables = ['--main-glass-button']
 

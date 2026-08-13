@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
@@ -20,6 +20,7 @@ function trackedMainStyleAndVueFiles() {
   return output
     .split('\n')
     .filter((file) => file.endsWith('.vue') || file.endsWith('.scss'))
+    .filter((file) => existsSync(resolve(projectRoot, file)))
     .map((file) => resolve(projectRoot, file))
 }
 
@@ -29,7 +30,7 @@ function legacyTokenPattern(token) {
 
 describe('main form conventions', () => {
   it('defines glass-field and glass-dropdown as the canonical main form primitives', () => {
-    const source = readSource('src/styles/main/_forms.scss')
+    const source = readSource('src/styles/global/_forms.scss')
 
     expect(source).toContain('.glass-field')
     expect(source).toContain("&[data-shape='search']")
@@ -40,7 +41,7 @@ describe('main form conventions', () => {
   })
 
   it('does not define legacy main field selectors', () => {
-    const source = readSource('src/styles/main/_forms.scss')
+    const source = readSource('src/styles/global/_forms.scss')
     const legacySelectors = ['.main-search-field', '.main-input-field', '.glass-input', '.choice-dropdown-panel', '.choice-dropdown-item']
 
     for (const selector of legacySelectors) {

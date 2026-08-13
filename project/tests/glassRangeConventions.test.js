@@ -20,7 +20,7 @@ function classAttributes(source) {
 
 describe('shared glass range conventions', () => {
   it('defines one reusable main range appearance primitive', () => {
-    const source = readSource('src/styles/main/_forms.scss')
+    const source = readSource('src/styles/global/_forms.scss')
 
     expect(source).toContain('.glass-range')
     expect(source).toContain('var(--glass-range-progress, 0%)')
@@ -49,11 +49,10 @@ describe('shared glass range conventions', () => {
     }
   })
 
-  it('keeps VillagesML dashboard on its own panel primitive', () => {
+  it('uses the shared glass-panel primitive on the VillagesML dashboard', () => {
     const source = readSource('src/VillagesML/dashboard/Dashboard.vue')
     const classTokens = classAttributes(source).flatMap((className) => className.trim().split(/\s+/))
 
-    expect(classTokens).not.toContain('glass-panel')
-    expect(source).toMatch(/\bclass=["'][^"']*\bvml-glass-panel\b/)
+    expect(classTokens).toContain('glass-panel')
   })
 })

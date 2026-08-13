@@ -98,8 +98,6 @@ function resolveToneType(item) {
 
 @use '../../_map-variables' as *;
 
-@use '@/styles/main/_surfaces.scss';
-
 .feature-card-list {
   @include flex-col;
   gap: 18px;
