@@ -149,11 +149,12 @@
           class="yc-group-scroller"
           tabindex="0"
           aria-label="阳春方言板块横向列表"
-          @scroll="updateGroupCarousel"
+          @scroll="onGroupCarouselScroll"
         >
           <button
-            v-for="group in dialectGroups"
+            v-for="(group, index) in dialectGroups"
             :key="group.id"
+            :ref="(el) => setGroupRef(el, index)"
             class="glass-card yc-group-card"
             data-interactive="true"
             :data-group-id="group.id"
@@ -298,6 +299,7 @@ import {
 
 const pageEl = ref(null)
 const groupScroller = ref(null)
+const groupRefs = ref([])
 const { t } = useI18n()
 const activeGroupId = ref(dialectGroups[0].id)
 const activePhonologyId = ref(phonologyDetails[0].id)
@@ -321,6 +323,11 @@ const activePhonology = computed(() => (
 ))
 
 let revealObserver = null
+let groupRaf = 0
+
+function setGroupRef(el, index) {
+  if (el) groupRefs.value[index] = el
+}
 
 function markerStyle(group) {
   return {
@@ -351,6 +358,53 @@ function updateGroupCarousel() {
   if (!scroller) return
   groupCanPrev.value = scroller.scrollLeft > 4
   groupCanNext.value = scroller.scrollLeft + scroller.clientWidth < scroller.scrollWidth - 4
+}
+
+function syncGroupCarouselPadding() {
+  const scroller = groupScroller.value
+  const firstCard = groupRefs.value[0]
+  if (!scroller || !firstCard) return
+  const padding = Math.max(2, (scroller.clientWidth - firstCard.clientWidth) / 2)
+  scroller.style.paddingLeft = `${padding}px`
+  scroller.style.paddingRight = `${padding}px`
+}
+
+function updateGroupCardTransforms() {
+  const scroller = groupScroller.value
+  if (!scroller) return
+  const scrollerRect = scroller.getBoundingClientRect()
+  const center = scrollerRect.left + (scrollerRect.width / 2)
+  let activeIndex = 0
+  let activeDistance = Infinity
+
+  groupRefs.value.forEach((node, index) => {
+    if (!node) return
+    const rect = node.getBoundingClientRect()
+    const normalized = (rect.left + (rect.width / 2) - center) / rect.width
+    const clamped = Math.max(-2, Math.min(2, normalized))
+    const distance = Math.abs(clamped)
+    const scale = Math.max(0.72, 1 - (0.18 * distance))
+
+    if (distance < activeDistance) {
+      activeDistance = distance
+      activeIndex = index
+    }
+
+    node.style.transform = `perspective(1000px) rotateY(${-12 * clamped}deg) scale(${scale})`
+    node.style.opacity = String(Math.max(0.62, 1 - (0.24 * distance)))
+    node.style.zIndex = String(Math.round(100 - (32 * distance)))
+  })
+
+  groupRefs.value.forEach((node, index) => {
+    if (!node) return
+    node.dataset.carouselActive = String(index === activeIndex)
+  })
+}
+
+function onGroupCarouselScroll() {
+  cancelAnimationFrame(groupRaf)
+  groupRaf = requestAnimationFrame(updateGroupCardTransforms)
+  updateGroupCarousel()
 }
 
 function scrollGroupCarousel(direction) {
@@ -389,13 +443,20 @@ function initReveal() {
 onMounted(async () => {
   await nextTick()
   initReveal()
+  syncGroupCarouselPadding()
   updateGroupCarousel()
+  updateGroupCardTransforms()
   window.addEventListener('resize', updateGroupCarousel)
+  window.addEventListener('resize', syncGroupCarouselPadding)
+  window.addEventListener('resize', updateGroupCardTransforms)
 })
 
 onBeforeUnmount(() => {
+  cancelAnimationFrame(groupRaf)
   revealObserver?.disconnect()
   window.removeEventListener('resize', updateGroupCarousel)
+  window.removeEventListener('resize', syncGroupCarouselPadding)
+  window.removeEventListener('resize', updateGroupCardTransforms)
 })
 </script>
 
@@ -650,8 +711,10 @@ onBeforeUnmount(() => {
 .yc-group-scroller {
   display: flex;
   gap: 14px;
+  align-items: center;
   overflow-x: auto;
-  padding: 4px 2px 14px;
+  padding: 18px 2px 24px;
+  perspective: 1200px;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
 }
@@ -659,8 +722,10 @@ onBeforeUnmount(() => {
 .yc-group-card {
   flex: 0 0 min(320px, 76dvw);
   min-height: 190px;
+  transform-origin: center;
   scroll-snap-align: center;
   text-align: left;
+  will-change: transform, opacity;
 
   strong {
     font-size: 1.18rem;
