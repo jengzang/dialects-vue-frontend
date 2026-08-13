@@ -215,6 +215,12 @@ describe('Map draw editor contracts', () => {
     expect(layersSource).toMatch(/function toggleLayerLock\(layerId\) \{[\s\S]*if \(layerId === activeLayerId\.value\) \{[\s\S]*resetDrawSelectionMode\(\)/)
   })
 
+  it('clears map selection when active layer changes', () => {
+    const layersSource = readSource(useGisLayersPath)
+
+    expect(layersSource).toMatch(/function handleSelectLayer\(layerId\) \{[\s\S]*clearFeatureSelection\(\);[\s\S]*editableMapRef\.value\.selectFeatures\(\[\]\);/)
+  })
+
   it('exposes an edit shape action for selected line and polygon features', () => {
     const panelSource = readSource(mapDrawToolsPanelPath)
     const tabSource = readSource(mapDrawTabPath)
@@ -541,6 +547,7 @@ describe('Map draw editor contracts', () => {
     expect(coreSource).toContain('const selectedFeatureIds = ref([]);')
     expect(tabSource).toContain(':selected-feature-ids="selectedFeatureIds"')
     expect(coreSource).toContain('const normalizeFeatureSelectPayload = (featureSelection) =>')
+    expect(coreSource).toContain('const normalizeFeatureIdsToActiveLayerOrder = (featureIds = []) =>')
     expect(coreSource).toContain('const selectableSet = new Set(activeLayerSelectableFeatureIds.value);')
     expect(coreSource).toContain('Array.isArray(featureSelection)')
     expect(tabSource).toContain('@toggle-feature-selection="handleToggleFeatureSelection"')
@@ -578,6 +585,7 @@ describe('Map draw editor contracts', () => {
     expect(coreSource).toContain('const handleToggleFeatureBoxSelect = () =>')
     expect(coreSource).toContain('const handleFeatureBoxSelect = (payload = []) =>')
     expect(coreSource).toContain('const selectableSet = new Set(activeLayerSelectableFeatureIds.value);')
+    expect(coreSource).toContain('normalizeFeatureIdsToActiveLayerOrder(featureIds')
     expect(coreSource).toContain("payload.selectionMode === 'add'")
     expect(coreSource).toContain("payload.selectionMode === 'subtract'")
     expect(tabSource).toContain('@toggle-feature-box-select="handleToggleFeatureBoxSelect"')

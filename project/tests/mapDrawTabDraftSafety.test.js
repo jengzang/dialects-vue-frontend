@@ -291,6 +291,13 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         >
           emit feature mixed selection
         </button>
+        <button
+          data-testid="emit-feature-priority-selection"
+          type="button"
+          @click="$emit('feature-select', ['feature-3', 'feature-2', 'feature-2', 'feature-1'])"
+        >
+          emit feature priority selection
+        </button>
       </div>
     `,
   }),
@@ -1668,6 +1675,79 @@ describe('MapDrawTab draft safety', () => {
       .map((item) => item.checked)).toEqual([false, false, true])
     expect(mocks.mapSelectFeature).toHaveBeenCalledTimes(mapSelectFeatureCallCountBeforeNaturalSelection + 1)
     expect(mocks.mapSelectFeature).toHaveBeenLastCalledWith('feature-3', { directEdit: false })
+
+    wrapper.unmount()
+  })
+
+  it('normalizes natural map selection to active-layer order and resyncs stale hits', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    const checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[0].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="hide-selected-features"]').click()
+    await flushTicks()
+
+    mocks.mapSelectFeatures.mockClear()
+    wrapper.host.querySelector('[data-testid="emit-feature-priority-selection"]').click()
+    await flushTicks()
+
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((item) => item.checked)).toEqual([false, true, true])
+    expect(mocks.latestToolsPanelProps.selectedFeatureIds).toEqual(['feature-2', 'feature-3'])
+    expect(mocks.latestToolsPanelProps.selectedFeatureId).toBe('feature-2')
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith(['feature-2', 'feature-3'])
+
+    wrapper.unmount()
+  })
+
+  it('clears map and panel selection when switching active layers', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+
+    const layerButtons = wrapper.host.querySelectorAll('[data-testid="layer-button"]')
+    layerButtons[0].click()
+    await flushTicks()
+
+    wrapper.host.querySelector('[data-testid="feature-checkbox"]').click()
+    await flushTicks()
+    expect(mocks.latestToolsPanelProps.selectedFeatureIds).toEqual(['feature-1'])
+
+    mocks.mapSelectFeatures.mockClear()
+    layerButtons[1].click()
+    await flushTicks()
+
+    expect(mocks.latestToolsPanelProps.selectedFeatureIds).toEqual([])
+    expect(mocks.latestToolsPanelProps.selectedFeatureId).toBe('')
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
 
     wrapper.unmount()
   })

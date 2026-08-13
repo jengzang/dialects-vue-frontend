@@ -64,7 +64,11 @@ export function useGisLayers(options = {}) {
     activeLayerId.value = layerId;
     clearFeatureSelection();
     currentMode.value = 'simple_select';
-    editableMapRef?.value?.setDrawMode?.('simple_select');
+    if (editableMapRef?.value?.selectFeatures) {
+      editableMapRef.value.selectFeatures([]);
+    } else {
+      editableMapRef?.value?.setDrawMode?.('simple_select');
+    }
   }
 
   async function moveLayer(layerId, direction) {

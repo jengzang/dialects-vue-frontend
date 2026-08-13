@@ -555,6 +555,15 @@ export function useGisMapCore(options = {}) {
     return featureIds.filter((id) => selectableSet.has(id));
   };
 
+  const normalizeFeatureIdsToActiveLayerOrder = (featureIds = []) => {
+    const requestedSet = new Set(
+      featureIds
+        .map((id) => String(id || ''))
+        .filter(Boolean)
+    );
+    return activeLayerSelectableFeatureIds.value.filter((id) => requestedSet.has(id));
+  };
+
   const syncFeatureSelectionToMap = () => {
     currentMode.value = 'simple_select';
     const mapFeatureIds = getSelectableFeatureSelectionIds(selectedFeatureIds.value);
@@ -646,7 +655,7 @@ export function useGisMapCore(options = {}) {
       : featureSelection ? [featureSelection] : [])
       .map((id) => String(id || ''))
       .filter(Boolean);
-    const filteredIds = sourceIds.filter((id) => selectableSet.has(id));
+    const filteredIds = normalizeFeatureIdsToActiveLayerOrder(sourceIds.filter((id) => selectableSet.has(id)));
     const shouldSync = sourceIds.length !== filteredIds.length
       || sourceIds.some((id, i) => id !== filteredIds[i]);
     return {
@@ -673,9 +682,9 @@ export function useGisMapCore(options = {}) {
       ? payload.selectionMode
       : 'replace';
     const selectableSet = new Set(activeLayerSelectableFeatureIds.value);
-    const filteredIds = featureIds
+    const filteredIds = normalizeFeatureIdsToActiveLayerOrder(featureIds
       .map((id) => String(id || ''))
-      .filter((id) => selectableSet.has(id));
+      .filter((id) => selectableSet.has(id)));
     const filteredSet = new Set(filteredIds);
     const currentIds = selectedFeatureIds.value
       .filter((id) => selectableSet.has(id));
