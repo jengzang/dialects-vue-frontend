@@ -94,7 +94,7 @@ describe('syllable count frontend contracts', () => {
     const composableSource = readSource('src/composables/bar/useNavAnchorJump.js')
 
     expect(source).toContain('getSyllableAnchorId')
-    expect(source).toContain('hasSyllableData: hasSyllableResultData')
+    expect(source).toContain('hasSyllableData: computed(() => (queryMode.value.syllableCounts && hasSyllableResultData.value))')
     expect(source).toContain("t('phonology.phonology.countphos.nav.syllableSummary')")
     expect(composableSource).toContain("kind: 'syllable'")
   })
@@ -105,5 +105,26 @@ describe('syllable count frontend contracts', () => {
     expect(source).toContain("'mode'")
     expect(source).toContain("'toneMode'")
     expect(source).toContain("'syllable'")
+  })
+
+  it('defaults Countphos to the syllable snapshot view with feature snapshot loaded in the background', () => {
+    const source = readSource('src/main/components/pho/Countphos.vue')
+
+    expect(source).toContain("import all_syllable_counts from '/data/syllable_counts_20260813.json?url'")
+    expect(source).toContain('const queryMode = ref({ featureCounts: false, syllableCounts: true })')
+    expect(source).toContain('normalizeSyllableSnapshot')
+    expect(source).toContain('getDefaultSyllableData')
+    expect(source).toContain('getDefaultCountsData')
+    expect(source).toContain('if (!isUsingDefaultCounts.value) return')
+    expect(source).toContain('v-if="queryMode.featureCounts && !isSingleLocation && hasChartData"')
+    expect(source).toContain('v-if="queryMode.syllableCounts && hasSyllableResultData"')
+    expect(source).toContain('v-if="queryMode.featureCounts && hasLocationDetailData"')
+    expect(source).toContain('v-if="queryMode.syllableCounts && showSyllableLocations"')
+
+    // 导航项也按模式门控:特徵統計 nav 数据只在 featureCounts 时透出
+    expect(source).toContain('featureData: computed(() => (queryMode.value.featureCounts ? featureData.value : {}))')
+    expect(source).toContain('aggregatedData: computed(() => (queryMode.value.featureCounts ? aggregatedData.value : {}))')
+    expect(source).toContain('hasChartData: computed(() => (queryMode.value.featureCounts && hasChartData.value))')
+    expect(source).toContain('extraLocationData: computed(() => (queryMode.value.syllableCounts && showSyllableLocations.value ? syllableLocationData.value : {}))')
   })
 })

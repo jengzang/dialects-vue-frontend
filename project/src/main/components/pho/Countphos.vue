@@ -19,6 +19,7 @@ import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { requestMapFitView } from '@/utils/map/MapData.js'
 import { showConfirm } from '@/utils/ui/message.js'
 import all_feature_counts from '/data/feature_counts_20260624.json?url'
+import all_syllable_counts from '/data/syllable_counts_20260813.json?url'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -34,7 +35,7 @@ const countphosLocationQuery = ref({
   regionUsing: 'map'
 })
 const locationInputRef = ref(null)
-const queryMode = ref({ featureCounts: true, syllableCounts: true })
+const queryMode = ref({ featureCounts: false, syllableCounts: true })
 const matchedLocations = ref([])
 const isLocationInputDisabled = ref(true)
 const rendering = ref(false)
@@ -91,6 +92,8 @@ const scatterChartEl = ref(null)
 let scatterChartInstance = null
 let defaultCountsCache = null
 let defaultCountsPromise = null
+let defaultSyllableCache = null
+let defaultSyllablePromise = null
 
 // 弹窗状态
 const showLocationModal = ref(false)
@@ -243,12 +246,12 @@ const {
   getLocationAnchorId,
   handleLocationNavJump
 } = useNavAnchorJump({
-  featureData,
-  aggregatedData,
-  hasChartData,
+  featureData: computed(() => (queryMode.value.featureCounts ? featureData.value : {})),
+  aggregatedData: computed(() => (queryMode.value.featureCounts ? aggregatedData.value : {})),
+  hasChartData: computed(() => (queryMode.value.featureCounts && hasChartData.value)),
   hasResultData,
-  extraLocationData: computed(() => (showSyllableLocations.value ? syllableLocationData.value : {})),
-  hasSyllableData: hasSyllableResultData,
+  extraLocationData: computed(() => (queryMode.value.syllableCounts && showSyllableLocations.value ? syllableLocationData.value : {})),
+  hasSyllableData: computed(() => (queryMode.value.syllableCounts && hasSyllableResultData.value)),
   syllableLabel: t('phonology.phonology.countphos.nav.syllableSummary'),
   isEnabled: isCurrentCountRoute,
   chartsLabel: t('phonology.phonology.countphos.nav.chartsLabel'),
@@ -827,26 +830,83 @@ const getDefaultCountsData = async () => {
   return defaultCountsPromise
 }
 
+// syllable snapshot 无单地点数据,包装成前端期望的 aggregated 结构
+const normalizeSyllableSnapshot = (result = {}) => {
+  const normalized = {}
+
+  for (const mode of ['toneless', 'toned']) {
+    const section = result[mode]
+    if (!section) continue
+
+    normalized[mode] = {
+      total_tokens: section.total_tokens,
+      unique_syllables: section.unique_syllables,
+      locations: {},
+      aggregated: {
+        total_tokens: section.total_tokens,
+        unique_syllables: section.unique_syllables,
+        syllables: section.syllables || {}
+      }
+    }
+  }
+
+  return normalized
+}
+
+const getDefaultSyllableData = async () => {
+  if (defaultSyllableCache) {
+    return defaultSyllableCache
+  }
+
+  if (!defaultSyllablePromise) {
+    defaultSyllablePromise = fetch(all_syllable_counts)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Failed to load default syllable counts: ${res.status}`)
+        }
+        return res.json()
+      })
+      .then((result) => {
+        const normalized = normalizeSyllableSnapshot(result)
+        defaultSyllableCache = normalized
+        return normalized
+      })
+      .finally(() => {
+        defaultSyllablePromise = null
+      })
+  }
+
+  return defaultSyllablePromise
+}
+
 const loadDefaultCountsData = async () => {
   error.value = null
 
   await loadCountsTask.run(async () => {
-    const cachedData = await getDefaultCountsData()
+    // 先加载音节 snapshot 作为默认视图;feature snapshot 后台并行加载,不阻塞
+    const syllablePromise = getDefaultSyllableData()
+    const featurePromise = getDefaultCountsData()
 
+    const syllableSnapshot = await syllablePromise
     featureData.value = {}
-    aggregatedData.value = cachedData.aggregated
-    syllableData.value = null
-    displayLocationCount.value = cachedData.locationCount
+    aggregatedData.value = {}
+    syllableData.value = syllableSnapshot
     isUsingDefaultCounts.value = true
+
+    featurePromise
+      .then((cachedData) => {
+        if (!isUsingDefaultCounts.value) return
+        aggregatedData.value = cachedData.aggregated
+        displayLocationCount.value = cachedData.locationCount
+      })
+      .catch((err) => {
+        console.error('默认声韵调统计数据加载失败:', err)
+      })
   }, {
     onError: (err) => {
       console.error('默认音节统计数据加载失败:', err)
     }
   })
-
-  if (!error.value && Object.keys(aggregatedData.value).length > 0) {
-    await renderAllCharts()
-  }
 }
 
 const buildCountRequestPayload = () => ({
@@ -895,11 +955,21 @@ const loadData = async () => {
       error.value = err.message || t('phonology.phonology.countphos.states.loadError')
     }
   })
-
-  if (!error.value && Object.keys(aggregatedData.value).length > 0) {
-    await renderAllCharts()
-  }
 }
+
+// 特徵統計視圖激活且有聚合數據時渲染圖表;關閉時清理,避免離屏 DOM 實例殘留
+watch(
+  [() => queryMode.value.featureCounts, () => Object.keys(aggregatedData.value || {}).length],
+  async ([featureActive]) => {
+    if (!featureActive) {
+      disposeAllCharts()
+      return
+    }
+    if (!error.value && hasChartData.value) {
+      await renderAllCharts()
+    }
+  }
+)
 
 // 計算匯總統計數據
 const calculateAggregatedData = (data) => {
@@ -1173,7 +1243,7 @@ onBeforeUnmount(() => {
         <p>{{ $t('phonology.phonology.countphos.actions.loading') }}</p>
       </div>
       <!-- 匯總統計部分 -->
-      <section v-if="!isSingleLocation && hasChartData" class="aggregated-section glass-panel">
+      <section v-if="queryMode.featureCounts && !isSingleLocation && hasChartData" class="aggregated-section glass-panel">
         <!-- <h3 class="section-title">匯總統計</h3> -->
         <h3 class="section-title section-title--with-pill">
           <span>{{ $t('phonology.phonology.countphos.titlePrefix') }}</span>
@@ -1294,7 +1364,7 @@ onBeforeUnmount(() => {
       </section>
 
       <section
-        v-if="hasSyllableResultData"
+        v-if="queryMode.syllableCounts && hasSyllableResultData"
         :id="getSyllableAnchorId()"
         class="syllable-section glass-panel"
       >
@@ -1385,7 +1455,7 @@ onBeforeUnmount(() => {
       </section>
 
       <!-- 地點詳情部分 -->
-      <section v-if="hasLocationDetailData" class="locations-section glass-panel">
+      <section v-if="queryMode.featureCounts && hasLocationDetailData" class="locations-section glass-panel">
         <h3 class="section-title">{{ $t('phonology.phonology.countphos.sections.locations') }}</h3>
         <p class="section-subtitle">
           {{ $t('phonology.phonology.countphos.sections.locationsSubtitle') }}
@@ -1420,7 +1490,7 @@ onBeforeUnmount(() => {
       </section>
 
       <!-- 音節地點詳情 -->
-      <section v-if="showSyllableLocations" class="locations-section glass-panel">
+      <section v-if="queryMode.syllableCounts && showSyllableLocations" class="locations-section glass-panel">
         <h3 class="section-title">{{ $t('phonology.phonology.countphos.sections.locations') }}</h3>
         <p class="section-subtitle">
           {{ $t('phonology.phonology.countphos.sections.locationsSubtitle') }}
