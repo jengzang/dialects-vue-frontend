@@ -17,6 +17,7 @@ import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { useNavAnchorJump } from '@/composables/bar/useNavAnchorJump.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { requestMapFitView } from '@/utils/map/MapData.js'
+import { showConfirm } from '@/utils/ui/message.js'
 import all_feature_counts from '/data/feature_counts_20260624.json?url'
 
 const { t } = useI18n()
@@ -203,16 +204,28 @@ const syllableStatsList = computed(() => {
     })
 })
 
-const currentSyllableTotalTokens = computed(() => {
-  const total = Number(currentSyllableSummary.value?.total_tokens || 0)
-  if (total > 0) return total
-
-  return syllableStatsList.value.reduce((sum, item) => sum + item.totalCount, 0)
-})
-
 const currentSyllableUniqueCount = computed(() => {
   const unique = Number(currentSyllableSummary.value?.unique_syllables || 0)
   return unique || syllableStatsList.value.length
+})
+
+// 卡片上限:默认只渲染前 100 张,避免大量卡片导致卡顿
+const SYLLABLE_GRID_LIMIT = 100
+const visibleSyllableLimit = ref(SYLLABLE_GRID_LIMIT)
+const visibleSyllableStats = computed(() => syllableStatsList.value.slice(0, visibleSyllableLimit.value))
+const hasMoreSyllables = computed(() => syllableStatsList.value.length > visibleSyllableLimit.value)
+
+const loadAllSyllables = async () => {
+  if (!hasMoreSyllables.value) return
+  const confirmed = await showConfirm(t('phonology.phonology.countphos.syllables.loadAllConfirm'))
+  if (confirmed) {
+    visibleSyllableLimit.value = Number.POSITIVE_INFINITY
+  }
+}
+
+// 切换带调/不带调或新数据加载后,重置为默认上限
+watch(syllableStatsList, () => {
+  visibleSyllableLimit.value = SYLLABLE_GRID_LIMIT
 })
 
 const {
@@ -1272,13 +1285,6 @@ onBeforeUnmount(() => {
             </p>
           </div>
           <div class="syllable-section-controls">
-            <button
-              v-if="canShowSyllableHeatmap"
-              class="expand-btn heatmap-btn"
-              @click="openSyllableHeatmap"
-            >
-              {{ $t('phonology.phonology.countphos.syllables.heatmap') }}
-            </button>
             <SwitchToggle
               v-model="isTonedSyllableMode"
               :active-text="$t('phonology.phonology.countphos.syllables.modes.toned')"
@@ -1296,18 +1302,21 @@ onBeforeUnmount(() => {
             <span class="stat-value">{{ syllableModeLabel }}</span>
           </span>
           <span class="summary-pill">
-            <span class="stat-label">{{ $t('phonology.phonology.countphos.syllables.unique') }}:</span>
+            <span class="stat-label">{{ $t('phonology.phonology.countphos.syllables.tokens') }}:</span>
             <span class="stat-value">{{ currentSyllableUniqueCount }}</span>
           </span>
-          <span class="summary-pill">
-            <span class="stat-label">{{ $t('phonology.phonology.countphos.syllables.tokens') }}:</span>
-            <span class="stat-value">{{ currentSyllableTotalTokens }}</span>
-          </span>
+          <button
+            v-if="canShowSyllableHeatmap"
+            class="expand-btn heatmap-btn"
+            @click="openSyllableHeatmap"
+          >
+            {{ $t('phonology.phonology.countphos.syllables.viewHeatmap') }}
+          </button>
         </div>
 
         <div class="syllable-grid">
           <div
-            v-for="item in syllableStatsList"
+            v-for="item in visibleSyllableStats"
             :key="`${syllableMode}-${item.syllable}`"
             class="syllable-card glass-card"
           >
@@ -1344,6 +1353,14 @@ onBeforeUnmount(() => {
             </div>
           </div>
         </div>
+
+        <button
+          v-if="hasMoreSyllables"
+          class="load-more-btn"
+          @click="loadAllSyllables"
+        >
+          {{ $t('phonology.phonology.countphos.syllables.loadMore') }}
+        </button>
       </section>
 
       <!-- 地點詳情部分 -->
@@ -1852,6 +1869,35 @@ $primary-deep: #003d9e;
     &:hover {
       background: var(--color-success-hover, var(--color-success));
       box-shadow: var(--shadow-sm);
+    }
+  }
+
+  .load-more-btn {
+    display: block;
+    margin: 16px auto 0;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, $primary, $primary-dark);
+    border: none;
+    border-radius: var(--radius-md);
+    box-shadow: 0 2px 6px rgba(var(--color-primary-rgb), 0.3);
+    color: var(--action-primary-text);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: linear-gradient(
+        135deg,
+        $primary-dark,
+        $primary-deep
+      );
+      box-shadow: 0 4px 8px rgba(var(--color-primary-rgb), 0.4);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
     }
   }
 

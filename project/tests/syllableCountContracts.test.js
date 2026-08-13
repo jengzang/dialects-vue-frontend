@@ -65,6 +65,17 @@ describe('syllable count frontend contracts', () => {
     expect(source).toContain('openSyllableHeatmap')
   })
 
+  it('caps the syllable grid at 100 cards with a confirmed load-more button and moves the heatmap button to the summary row', () => {
+    const source = readSource('src/main/components/pho/Countphos.vue')
+
+    expect(source).toContain('visibleSyllableStats')
+    expect(source).toContain('hasMoreSyllables')
+    expect(source).toContain('loadAllSyllables')
+    expect(source).toContain("showConfirm(t('phonology.phonology.countphos.syllables.loadAllConfirm'))")
+    expect(source).toContain('syllable-summary-row')
+    expect(source).toContain('viewHeatmap')
+  })
+
   it('allows syllable heatmap route query keys on map view', () => {
     const source = readSource('src/main/router/menuRoutes.js')
 

@@ -108,6 +108,9 @@
         "tokens": "音節總數",
         "viewLocations": "地點",
         "heatmap": "熱力圖",
+        "viewHeatmap": "查看熱力圖",
+        "loadMore": "載入更多",
+        "loadAllConfirm": "載入全部卡片可能造成卡頓,確定繼續?",
         "modes": {
           "toneless": "不帶調",
           "toned": "帶調"
