@@ -56,6 +56,17 @@ describe('Yangchun Explore pages', () => {
     expect(source).toContain('信宜移民涯话方言岛')
   })
 
+  it('uses a horizontally scrollable dialect group carousel on the overview page', () => {
+    const source = readSource('src/main/views/explore/yangchun/YangChunOverviewPage.vue')
+
+    expect(source).toContain('ref="groupScroller"')
+    expect(source).toContain('yc-group-carousel')
+    expect(source).toContain('yc-group-scroller')
+    expect(source).toContain("scrollGroupCarousel('prev')")
+    expect(source).toContain("scrollGroupCarousel('next')")
+    expect(source).toContain('scroll-snap-type: x mandatory')
+  })
+
   it('keeps expressions mock data ready for a future backend contract', () => {
     const source = readSource('src/main/views/explore/yangchun/yangchunExpressionsMock.js')
 

@@ -133,20 +133,49 @@
         <p>每个板块保留主要分布、简要特点和来源线索，方便以后与地图图层对应。</p>
       </div>
 
-      <div class="main-card-grid yc-group-grid">
+      <div class="yc-group-carousel">
         <button
-          v-for="group in dialectGroups"
-          :key="group.id"
-          class="glass-card yc-group-card"
-          data-interactive="true"
-          :aria-pressed="group.id === activeGroupId"
+          class="glass-button yc-group-carousel__arrow"
+          :disabled="!groupCanPrev"
+          aria-label="向左浏览方言板块"
           type="button"
-          @click="selectGroup(group.id)"
+          @click="scrollGroupCarousel('prev')"
         >
-          <span class="yc-group-card__badge glass-subpanel">{{ group.badge }}</span>
-          <strong>{{ group.name }}</strong>
-          <p>{{ group.short }}</p>
-          <small>{{ group.area }}</small>
+          ‹
+        </button>
+
+        <div
+          ref="groupScroller"
+          class="yc-group-scroller"
+          tabindex="0"
+          aria-label="阳春方言板块横向列表"
+          @scroll="updateGroupCarousel"
+        >
+          <button
+            v-for="group in dialectGroups"
+            :key="group.id"
+            class="glass-card yc-group-card"
+            data-interactive="true"
+            :data-group-id="group.id"
+            :aria-pressed="group.id === activeGroupId"
+            type="button"
+            @click="selectGroup(group.id)"
+          >
+            <span class="yc-group-card__badge glass-subpanel">{{ group.badge }}</span>
+            <strong>{{ group.name }}</strong>
+            <p>{{ group.short }}</p>
+            <small>{{ group.area }}</small>
+          </button>
+        </div>
+
+        <button
+          class="glass-button yc-group-carousel__arrow"
+          :disabled="!groupCanNext"
+          aria-label="向右浏览方言板块"
+          type="button"
+          @click="scrollGroupCarousel('next')"
+        >
+          ›
         </button>
       </div>
 
@@ -268,9 +297,12 @@ import {
 } from './yangchunOverviewData.js'
 
 const pageEl = ref(null)
+const groupScroller = ref(null)
 const { t } = useI18n()
 const activeGroupId = ref(dialectGroups[0].id)
 const activePhonologyId = ref(phonologyDetails[0].id)
+const groupCanPrev = ref(false)
+const groupCanNext = ref(false)
 
 const pageSections = [
   { id: 'yc-map', label: '分布' },
@@ -299,10 +331,38 @@ function markerStyle(group) {
 
 function selectGroup(id) {
   activeGroupId.value = id
+  nextTick(() => {
+    const scroller = groupScroller.value
+    const target = scroller?.querySelector(`[data-group-id="${id}"]`)
+    if (!scroller || !target) return
+    const scrollerRect = scroller.getBoundingClientRect()
+    const targetRect = target.getBoundingClientRect()
+    const left = targetRect.left - scrollerRect.left + scroller.scrollLeft - ((scroller.clientWidth - targetRect.width) / 2)
+    scroller.scrollTo({ left, behavior: 'smooth' })
+  })
 }
 
 function scrollToSection(id) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
+function updateGroupCarousel() {
+  const scroller = groupScroller.value
+  if (!scroller) return
+  groupCanPrev.value = scroller.scrollLeft > 4
+  groupCanNext.value = scroller.scrollLeft + scroller.clientWidth < scroller.scrollWidth - 4
+}
+
+function scrollGroupCarousel(direction) {
+  const scroller = groupScroller.value
+  if (!scroller) return
+  const card = scroller.querySelector('.yc-group-card')
+  const cardWidth = card?.clientWidth || Math.round(scroller.clientWidth * 0.72)
+  const gap = 14
+  scroller.scrollBy({
+    left: direction === 'next' ? cardWidth + gap : -(cardWidth + gap),
+    behavior: 'smooth',
+  })
 }
 
 function initReveal() {
@@ -329,10 +389,13 @@ function initReveal() {
 onMounted(async () => {
   await nextTick()
   initReveal()
+  updateGroupCarousel()
+  window.addEventListener('resize', updateGroupCarousel)
 })
 
 onBeforeUnmount(() => {
   revealObserver?.disconnect()
+  window.removeEventListener('resize', updateGroupCarousel)
 })
 </script>
 
@@ -565,13 +628,38 @@ onBeforeUnmount(() => {
   font-size: 0.9rem;
 }
 
-.yc-group-grid,
 .yc-source-grid {
   --main-card-min-width: 260px;
 }
 
+.yc-group-carousel {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.yc-group-carousel__arrow {
+  min-width: 42px;
+  min-height: 42px;
+  padding: 0;
+  font-size: 1.35rem;
+}
+
+.yc-group-scroller {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 4px 2px 14px;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+}
+
 .yc-group-card {
+  flex: 0 0 min(320px, 76dvw);
   min-height: 190px;
+  scroll-snap-align: center;
   text-align: left;
 
   strong {
