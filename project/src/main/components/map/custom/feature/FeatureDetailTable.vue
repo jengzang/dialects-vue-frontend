@@ -31,7 +31,7 @@
               :placeholder="t('customEntry.pointDetail.placeholders.phonology')"
             >
           </label>
-          <button class="glass-button field-notice-trigger" type="button" @click="isFieldNoticeOpen = true">
+          <button class="pill-btn field-notice-trigger" type="button" @click="isFieldNoticeOpen = true">
             {{ t('customEntry.pointDetail.rows.noticeTrigger') }}
           </button>
         </div>
@@ -747,18 +747,16 @@ watch(
   }
 }
 
+/* 字段提示触发钮: 仅尺寸/颜色覆盖, 视觉见 main/_buttons.scss 的 .pill-btn */
 .field-notice-trigger {
-  --glass-button-padding: 2px 10px;
-  font-size: 11px;
-  color: $warning;
-  border-color: rgba(var(--color-warning-rgb), 0.3);
-  background: rgba(var(--color-warning-rgb), 0.06);
-
-  &:hover:not(:disabled) {
-    background: rgba(var(--color-warning-rgb), 0.12);
-    border-color: $warning;
-    color: $warning;
-  }
+  --pill-btn-padding: 2px 10px;
+  --pill-btn-font-size: 11px;
+  --pill-btn-font-weight: 500;
+  --pill-btn-color: $warning;
+  --pill-btn-border: 1px solid rgba(var(--color-warning-rgb), 0.3);
+  --pill-btn-bg: rgba(var(--color-warning-rgb), 0.06);
+  --pill-btn-hover-bg: rgba(var(--color-warning-rgb), 0.12);
+  --pill-btn-hover-border: $warning;
 }
 
 .field-notice-body {

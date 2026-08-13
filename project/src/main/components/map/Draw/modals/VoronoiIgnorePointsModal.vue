@@ -52,7 +52,7 @@
               {{ t('map.drawTab.voronoi.ignoreSelectedCount', { count: selectedLocations.length }) }}
             </div>
           </div>
-          <button class="scope-clear-btn" type="button" @click="clearSelection">
+          <button class="pill-btn scope-clear-btn" type="button" @click="clearSelection">
             {{ t('map.drawTab.voronoi.clearSelection') }}
           </button>
         </div>
@@ -481,12 +481,10 @@ function formatRegionNames(regionNames) {
   }
 }
 
+/* 清空选择: 仅尺寸/颜色覆盖, 视觉见 main/_buttons.scss 的 .pill-btn */
 .scope-clear-btn {
-  border: none;
-  background: transparent;
-  color: $primary;
-  font-weight: 700;
-  cursor: pointer;
+  --pill-btn-color: $primary;
+  --pill-btn-font-weight: 700;
 }
 
 .scope-grid {

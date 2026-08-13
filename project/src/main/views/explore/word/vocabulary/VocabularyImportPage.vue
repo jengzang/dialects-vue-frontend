@@ -59,7 +59,7 @@
         <div class="upload-parser-row">
           <div class="upload-parser-head">
             <h3 class="upload-section-title">{{ t('words.wordList.upload.chooseFile') }}</h3>
-            <button class="glass-button info-help-btn" data-size="small" type="button" @click="showFormatHelp = true">
+            <button class="pill-btn" type="button" @click="showFormatHelp = true">
               ? {{ t('words.wordList.upload.formatHelp') }}
             </button>
           </div>

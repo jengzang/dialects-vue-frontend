@@ -72,7 +72,7 @@
                 @update:modelValue="recognizeHierarchy = $event"
               />
             </div>
-            <button class="scope-clear-btn" type="button" @click="clearSelection">
+            <button class="pill-btn scope-clear-btn" type="button" @click="clearSelection">
               {{ t('map.customTab.scopeModal.clearSelection') }}
             </button>
           </div>
@@ -578,12 +578,10 @@ function formatRegionNames(regionNames) {
   }
 }
 
+/* 清空选择: 仅尺寸/颜色覆盖, 视觉见 main/_buttons.scss 的 .pill-btn */
 .scope-clear-btn {
-  border: none;
-  background: transparent;
-  color: $text-muted;
-  font-size: 13px;
-  cursor: pointer;
+  --pill-btn-color: $text-muted;
+  --pill-btn-font-size: 13px;
 }
 
 .scope-grid {

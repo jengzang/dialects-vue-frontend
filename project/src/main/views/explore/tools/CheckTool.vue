@@ -25,7 +25,7 @@
         <div class="format-selector">
           <div class="format-label-row">
             <label class="format-label">{{ t('tools.checkTool.welcome.formatLabel') }}</label>
-            <button class="glass-button info-help-btn" data-size="small" @click="showFormatHelpModal = true"><InlineIcon icon="📋" />{{ t('tools.checkTool.welcome.formatHelp') }}
+            <button class="pill-btn info-help-btn" @click="showFormatHelpModal = true"><InlineIcon icon="📋" />{{ t('tools.checkTool.welcome.formatHelp') }}
             </button>
           </div>
           <div class="format-options">
@@ -286,7 +286,7 @@
             <span class="file-rows">{{ t('tools.checkTool.fileBar.rows', { count: totalRows }) }}</span>
           </div>
           <button v-if="!isPortrait" class="glass-button" data-variant="secondary" data-size="small" @click="resetUpload">{{ t('tools.checkTool.fileBar.changeFile') }}</button>
-          <button v-if="!isPortrait" class="glass-button info-help-btn" data-size="small" @click="showHelpModal = true"><InlineIcon icon="❓" />{{ t('tools.checkTool.fileBar.help') }}
+          <button v-if="!isPortrait" class="pill-btn info-help-btn" @click="showHelpModal = true"><InlineIcon icon="❓" />{{ t('tools.checkTool.fileBar.help') }}
           </button>
           <!-- 模式切换 -->
           <div class="mode-tabs glass-panel">
@@ -565,7 +565,7 @@
           <div class="command-panel glass-panel">
             <div class="command-header">
               <h3><InlineIcon icon="💻" />{{ t('tools.checkTool.command.title') }}</h3>
-              <button v-if="!isPortrait" class="glass-button info-help-btn" data-size="small" @click="showHelpModal = true"><InlineIcon icon="❓" />{{ t('tools.checkTool.command.help') }}
+              <button v-if="!isPortrait" class="pill-btn info-help-btn" @click="showHelpModal = true"><InlineIcon icon="❓" />{{ t('tools.checkTool.command.help') }}
               </button>
             </div>
 
@@ -4112,19 +4112,15 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   }
 }
 
-// "说明" help buttons — stand out from the glass background with a visible border and hover glow
+// "说明" help buttons — 视觉见 main/_buttons.scss 的 .pill-btn, 仅颜色覆盖
 .info-help-btn {
-  border: 1px dashed rgba(var(--color-primary-rgb), 0.45) !important;
-  background: rgba(var(--color-primary-rgb), 0.07) !important;
-  color: var(--color-primary-hover) !important;
-  font-weight: 600 !important;
-  transition: all 0.22s ease !important;
-
-  &:hover:not(:disabled) {
-    background: rgba(var(--color-primary-rgb), 0.14) !important;
-    border-color: rgba(var(--color-primary-rgb), 0.65) !important;
-    box-shadow: 0 2px 12px rgba(var(--color-primary-rgb), 0.18) !important;
-    transform: translateY(-2px) !important;
-  }
+  --pill-btn-border: 1px dashed rgba(var(--color-primary-rgb), 0.45);
+  --pill-btn-bg: rgba(var(--color-primary-rgb), 0.07);
+  --pill-btn-color: var(--color-primary-hover);
+  --pill-btn-font-weight: 600;
+  --pill-btn-hover-bg: rgba(var(--color-primary-rgb), 0.14);
+  --pill-btn-hover-border: rgba(var(--color-primary-rgb), 0.65);
+  --pill-btn-hover-shadow: 0 2px 12px rgba(var(--color-primary-rgb), 0.18);
+  --pill-btn-hover-transform: translateY(-2px);
 }
 </style>

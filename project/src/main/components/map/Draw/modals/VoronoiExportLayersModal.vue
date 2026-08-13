@@ -18,15 +18,15 @@
         </div>
         <div class="summary-actions">
           <button
-            class="scope-clear-btn summary-action-button"
-            data-variant="danger"
+            class="pill-btn scope-clear-btn summary-action-button"
             type="button"
             @click="emit('clear-selection')"
           >
             {{ t('map.drawTab.voronoi.clearSelection') }}
           </button>
           <button
-            class="scope-clip-btn summary-action-button"
+            class="pill-btn summary-action-button"
+            style="background: rgba(var(--color-success-rgb), 0.3);"
             type="button"
             @click="emit('open-clip-boundary')"
           >
@@ -203,47 +203,18 @@ function handleClose(value = false) {
   }
 }
 
+/* 清空选择: 仅尺寸/颜色覆盖, 视觉见 main/_buttons.scss 的 .pill-btn */
 .scope-clear-btn {
-  border: 1px solid rgba(var(--color-error-light-rgb), 0.28);
-  background: var(--bg-error-light);
-  color: var(--color-error-dark);
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1;
-  padding: 9px 14px;
-  border-radius: var(--radius-pill);
-  box-shadow: 0 8px 18px rgba(var(--color-error-light-rgb), 0.14);
-  cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-
-  &:hover {
-    background: rgba(var(--color-error-rgb), 0.08);
-    border-color: rgba(var(--color-error-rgb), 0.38);
-    box-shadow: 0 10px 22px rgba(var(--color-error-light-rgb), 0.18);
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-}
-
-.scope-clip-btn {
-  border: 1px solid var(--border-glass);
-  background: var(--surface-glass-button);
-  color: var(--text-deep);
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1;
-  padding: 9px 14px;
-  border-radius: var(--radius-pill);
-  cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-
-  &:hover {
-    background: var(--glass-60);
-    border-color: var(--border-control);
-  }
+  --pill-btn-padding: 9px 14px;
+  --pill-btn-font-size: 12px;
+  --pill-btn-font-weight: 700;
+  --pill-btn-border: 1px solid rgba(var(--color-error-light-rgb), 0.28);
+  --pill-btn-bg: var(--bg-error-light);
+  --pill-btn-color: var(--color-error-dark);
+  --pill-btn-shadow: 0 8px 18px rgba(var(--color-error-light-rgb), 0.14);
+  --pill-btn-hover-bg: rgba(var(--color-error-rgb), 0.08);
+  --pill-btn-hover-border: rgba(var(--color-error-rgb), 0.38);
+  --pill-btn-hover-shadow: 0 10px 22px rgba(var(--color-error-light-rgb), 0.18);
 }
 
 .voronoi-export-hint {
