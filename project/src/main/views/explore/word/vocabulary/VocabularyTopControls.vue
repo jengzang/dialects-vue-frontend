@@ -317,6 +317,7 @@ const standardWordTriggerLabel = computed(() => {
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
+@use '@/components/selector/selector' as *;
 
 .top-controls {
   // border: 1px solid var(--glass-30);

@@ -119,6 +119,27 @@ $text-action-info: rgba(20, 34, 56, 0.88);
 $toast-enter-easing: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
+/* 基础玻璃壳，.global-toast 在其后覆写共享属性 */
+.global-toast-shell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 28px;
+  border-radius: 18px;
+  font-size: 15px;
+  font-weight: 500;
+  background: var(--surface-glass-floating);
+  backdrop-filter: blur(16px) saturate(145%);
+  -webkit-backdrop-filter: blur(16px) saturate(145%);
+  box-shadow:
+    0 6px 22px var(--bg-hover-strong),
+    0 2px 6px var(--bg-hover-medium),
+    inset 0 0 0 0.5px var(--glass-20);
+  max-width: 90dvw;
+  word-break: break-word;
+  border: 1px solid var(--glass-30);
+}
+
 @mixin toast-icon($background, $font-size, $color: null) {
   width: 24px;
   height: 24px;

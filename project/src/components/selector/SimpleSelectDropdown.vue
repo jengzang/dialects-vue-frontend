@@ -123,6 +123,7 @@ defineExpose({
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
+@use './selector' as *;
 
 $arrow-transition: 0.2s ease;
 

@@ -108,6 +108,51 @@ $mobile-gap: 10px;
   }
 }
 
+.global-action-btn {
+  flex: 1;
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.global-action-btn-secondary {
+  background: var(--bg-hover) !important;
+  color: var(--text-dark-medium) !important;
+  border: 1px solid var(--bg-hover-strong) !important;
+}
+
+.global-action-btn-secondary:hover {
+  background: var(--bg-overlay-light2);
+  transform: translateY(-1px);
+}
+
+.global-action-btn-secondary:active {
+  transform: translateY(0);
+}
+
+.global-action-btn-primary {
+  background: var(--action-primary-bg);
+  color: var(--action-primary-text);
+  box-shadow: var(--action-primary-shadow);
+}
+
+.global-action-btn-primary:hover {
+  background: var(--action-primary-bg-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--action-primary-shadow);
+}
+
+.global-action-btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(var(--color-primary-rgb), 0.22);
+}
+
 .confirm-btn {
   @media (max-width: 768px) {
     padding: 10px 20px;

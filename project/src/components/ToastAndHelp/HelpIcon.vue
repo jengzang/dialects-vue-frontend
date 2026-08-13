@@ -300,6 +300,7 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
+@use '../bar/bar-shared' as *;
 
 $text-color: var(--text-primary);
 $primary-shadow: rgba(var(--color-primary-rgb), 0.25);
@@ -320,6 +321,22 @@ $transition-tooltip: 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
 .help-icon-container {
   position: relative;
   display: inline-block;
+}
+
+.global-help-icon-shell {
+  @include flex-center;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  background: var(--surface-glass-floating);
+  backdrop-filter: blur(10px) saturate(145%);
+  -webkit-backdrop-filter: blur(10px) saturate(145%);
+  border: 1px solid var(--glass-40);
+  box-shadow:
+    inset 0 0 0.5px var(--glass-20),
+    0 4px 10px rgba(var(--color-primary-rgb), 0.1),
+    0 0 0 0.5px var(--glass-10);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
 }
 
 /*
