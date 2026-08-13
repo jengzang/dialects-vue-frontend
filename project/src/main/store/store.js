@@ -14,6 +14,10 @@ export const globalPayload = ref(null)
 // 改由彈窗寫入此共享 ref，Countphos 掛載/激活時消費後清空。
 export const pendingCountphosLocations = ref([])
 
+// 音節統計跨頁跳轉時,由彈窗一併寫入的統計方式勾選配置（featureCounts / syllableCounts）。
+// LocationDetailPopup 傳單一地點時預設兩者皆勾;Countphos 消費後清空。
+export const pendingCountphosQueryMode = ref(null)
+
 const {
     state: preferredCharacterTableState,
     write: writePreferredCharacterTableState

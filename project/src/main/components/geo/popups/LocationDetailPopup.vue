@@ -102,7 +102,7 @@ import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { encodeQueryValueBase64Url } from '@/utils/urlParams.js'
-import { pendingCountphosLocations } from '@/main/store/store.js'
+import { pendingCountphosLocations, pendingCountphosQueryMode } from '@/main/store/store.js'
 import AppModal from '@/components/common/AppModal.vue'
 import LocationMapPopup from './LocationMapPopup.vue'
 
@@ -197,6 +197,7 @@ const goToPhonology = (section) => {
 
   if (section === 'count') {
     pendingCountphosLocations.value = [loc]
+    pendingCountphosQueryMode.value = { featureCounts: true, syllableCounts: true }
     router.push({
       path: buildLocalePath(resolveRouteLocale(route), '/menu/pho/count')
     })

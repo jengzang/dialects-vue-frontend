@@ -12,7 +12,7 @@ import CountLocationJumpNav from '@/main/components/pho/CountLocationJumpNav.vue
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
-import { mapStore, pendingCountphosLocations } from '@/main/store/store.js'
+import { mapStore, pendingCountphosLocations, pendingCountphosQueryMode } from '@/main/store/store.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { useNavAnchorJump } from '@/composables/bar/useNavAnchorJump.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
@@ -1039,6 +1039,11 @@ const consumePendingCountphosLocations = () => {
   const pending = pendingCountphosLocations.value
   if (!Array.isArray(pending) || pending.length === 0) return
 
+  const pendingQueryMode = pendingCountphosQueryMode.value
+  if (pendingQueryMode) {
+    queryMode.value = { ...queryMode.value, ...pendingQueryMode }
+  }
+
   const locations = pending.slice(0, PHONOLOGY_LOCATION_LIMITS.countphos)
   countphosLocationQuery.value = {
     locations: [...locations],
@@ -1048,6 +1053,7 @@ const consumePendingCountphosLocations = () => {
   matchedLocations.value = [...locations]
   isLocationInputDisabled.value = false
   pendingCountphosLocations.value = []
+  pendingCountphosQueryMode.value = null
 
   loadData()
 }
