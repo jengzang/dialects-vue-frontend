@@ -19,6 +19,7 @@ export function useNavAnchorJump(options = {}) {
     aggregatedData,
     hasChartData,
     hasResultData,
+    extraLocationData,
     isEnabled = true,
 
     chartsLabel = '圖表',
@@ -78,8 +79,13 @@ export function useNavAnchorJump(options = {}) {
 
     const dataByLocation = getResolvedValue(featureData, {})
     const dataByFeatureType = getResolvedValue(aggregatedData, {})
+    const extraByLocation = getResolvedValue(extraLocationData, {})
 
     const orderedLocations = Object.keys(dataByLocation)
+
+    Object.keys(extraByLocation)
+      .filter((location) => !orderedLocations.includes(location))
+      .forEach((location) => orderedLocations.push(location))
     const totalItems = []
 
     if (Boolean(unref(hasChartData))) {

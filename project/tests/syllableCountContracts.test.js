@@ -76,6 +76,18 @@ describe('syllable count frontend contracts', () => {
     expect(source).toContain('viewHeatmap')
   })
 
+  it('shows per-location syllable details and feeds them to the location jump nav', () => {
+    const source = readSource('src/main/components/pho/Countphos.vue')
+    const composableSource = readSource('src/composables/bar/useNavAnchorJump.js')
+
+    expect(source).toContain('syllableLocationData')
+    expect(source).toContain('hasSyllableLocationData')
+    expect(source).toContain('showSyllableLocations')
+    expect(source).toContain('extraLocationData')
+    expect(source).toContain('syllableModeLabel')
+    expect(composableSource).toContain('extraLocationData')
+  })
+
   it('allows syllable heatmap route query keys on map view', () => {
     const source = readSource('src/main/router/menuRoutes.js')
 

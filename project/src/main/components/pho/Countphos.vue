@@ -189,6 +189,11 @@ const currentSyllableSummary = computed(() => syllableData.value?.[syllableMode.
 const currentSyllableAggregated = computed(() => currentSyllableSummary.value?.syllables || {})
 const hasSyllableResultData = computed(() => Object.keys(currentSyllableAggregated.value || {}).length > 0)
 
+const syllableLocationData = computed(() => syllableData.value?.[syllableMode.value]?.locations || {})
+const hasSyllableLocationData = computed(() => Object.keys(syllableLocationData.value).length > 0)
+// 与声韵调独立的地点详情互斥,避免两个 section 渲染同一地点锚点 id 重复
+const showSyllableLocations = computed(() => hasSyllableLocationData.value && !hasLocationDetailData.value)
+
 const syllableStatsList = computed(() => {
   return Object.entries(currentSyllableAggregated.value || {})
     .map(([syllable, stats]) => ({
@@ -240,6 +245,7 @@ const {
   aggregatedData,
   hasChartData,
   hasResultData,
+  extraLocationData: computed(() => (showSyllableLocations.value ? syllableLocationData.value : {})),
   isEnabled: isCurrentCountRoute,
   chartsLabel: t('phonology.phonology.countphos.nav.chartsLabel'),
   formatTotalLabel: (featureType) => {
@@ -1387,6 +1393,37 @@ onBeforeUnmount(() => {
             <div class="feature-tags">
               <span
                 v-for="(count, syllable) in features"
+                :key="syllable"
+                class="feature-tag"
+              >
+                <span class="tag-syllable">{{ syllable }}</span>
+                <span class="tag-count">{{ count }}</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 音節地點詳情 -->
+      <section v-if="showSyllableLocations" class="locations-section glass-panel">
+        <h3 class="section-title">{{ $t('phonology.phonology.countphos.sections.locations') }}</h3>
+        <p class="section-subtitle">
+          {{ $t('phonology.phonology.countphos.sections.locationsSubtitle') }}
+        </p>
+
+        <div
+          v-for="(locationData, locationName) in syllableLocationData"
+          :key="locationName"
+          :id="getLocationAnchorId(locationName)"
+          class="location-detail glass-card"
+        >
+          <h4 class="location-name" @click.stop="handleLocationClick(locationName)">{{ locationName }}</h4>
+
+          <div class="feature-group">
+            <h5 class="feature-type">{{ syllableModeLabel }}</h5>
+            <div class="feature-tags">
+              <span
+                v-for="(count, syllable) in locationData.syllables"
                 :key="syllable"
                 class="feature-tag"
               >
