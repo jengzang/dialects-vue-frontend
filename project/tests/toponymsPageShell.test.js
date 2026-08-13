@@ -36,11 +36,16 @@ describe('toponyms page shell', () => {
     expect(page).toContain('data-interactive="true"');
     expect(page).toContain('<SimpleSelectDropdown');
     expect(page).toContain('<MultiSelectDropdown');
-    expect(page).toContain('class="toponym-search-page__select-trigger select-trigger"');
+    expect(page).toContain('v-model="selectedPlaceTypeCodes"');
+    expect(page).toContain(':placeholder="t(\'villages.pages.toponymSearch.search.placeType\')"');
     expect(page).toContain('@submit.prevent="handleSearch"');
     expect(page).toContain('const selectedPlaceTypeCodes = ref([');
     expect(page).toContain('place_type_code: selectedPlaceTypeCodes.value');
     expect(page).toContain('const limit = ref(50)');
+    expect(page).not.toContain('placeTypeTriggerEl');
+    expect(page).not.toContain('placeTypeDropdownOpen');
+    expect(page).not.toContain('formatMultiSelectLabel');
+    expect(page).not.toContain('toponym-search-page__select-trigger');
     expect(page).not.toContain('getToponymPoints');
     expect(page).not.toContain('/api/toponyms/points');
     expect(page).not.toContain('watch([query');

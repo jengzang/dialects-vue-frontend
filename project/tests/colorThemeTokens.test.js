@@ -168,6 +168,19 @@ describe('color theme token coverage', () => {
     expect(multiSelectDropdownSource).toContain('$text-secondary: var(--text-secondary);')
   })
 
+  it('lets the shared multi-select own its trigger while preserving external trigger compatibility', () => {
+    const source = readSource(multiSelectDropdownPath)
+
+    expect(source).toContain('v-if="!hasExternalTrigger"')
+    expect(source).toContain('class="select-trigger"')
+    expect(source).toContain('const hasExternalTrigger = computed(() => Boolean(props.triggerEl))')
+    expect(source).toContain('const internalTriggerEl = ref(null)')
+    expect(source).toContain('const displayLabel = computed(() => {')
+    expect(source).toContain('width: {')
+    expect(source).toContain('matchTriggerWidth: {')
+    expect(source).toContain('props.triggerEl?.value || props.triggerEl || internalTriggerEl.value')
+  })
+
   it('gives the sidebar shell dedicated theme-aware glass surface tokens', () => {
     const source = readSource(tokensPath)
     const lightBlock = themeBlock(source, 'light')

@@ -1,4 +1,23 @@
 <template>
+  <div
+    v-if="!hasExternalTrigger"
+    class="multi-select-dropdown"
+    :style="containerStyle"
+  >
+    <div
+      ref="internalTriggerEl"
+      class="select-trigger"
+      :class="{ 'is-open': isOpen, 'is-disabled': disabled }"
+      @click="handleToggle"
+    >
+      <span class="select-label">{{ displayLabel }}</span>
+      <span
+        class="select-arrow"
+        aria-hidden="true"
+      >▾</span>
+    </div>
+  </div>
+
   <Teleport to="body">
     <div
       v-if="isOpen"
@@ -87,6 +106,14 @@ const props = defineProps({
     type: String,
     default: '40dvh'
   },
+  width: {
+    type: String,
+    default: null
+  },
+  matchTriggerWidth: {
+    type: Boolean,
+    default: false
+  },
   align: {
     type: String,
     default: 'left',
@@ -101,14 +128,40 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'close'])
 
-const isOpen = ref(true)
+const isOpen = ref(false)
 const searchQuery = ref('')
+const internalTriggerEl = ref(null)
 const dropdownPanel = ref(null)
 const dropdownStyle = ref({
   position: 'absolute',
   top: '0px',
   left: '0px',
   zIndex: 30001
+})
+
+const hasExternalTrigger = computed(() => Boolean(props.triggerEl))
+
+const displayLabel = computed(() => {
+  const selectedLabels = props.modelValue
+    .map((value) => props.options.find((option) => option.value === value)?.label || value)
+    .filter(Boolean)
+
+  if (!selectedLabels.length) {
+    return props.placeholder || t('common.components.dropdown.placeholder')
+  }
+
+  if (selectedLabels.length === 1) {
+    return selectedLabels[0]
+  }
+
+  return `${selectedLabels[0]} +${selectedLabels.length - 1}`
+})
+
+const containerStyle = computed(() => {
+  if (props.width) {
+    return { width: props.width }
+  }
+  return {}
 })
 
 // Filtered options based on search
@@ -161,13 +214,30 @@ const handleClose = () => {
   emit('close')
 }
 
+const handleToggle = () => {
+  if (props.disabled) return
+
+  if (isOpen.value) {
+    handleClose()
+    return
+  }
+
+  isOpen.value = true
+  nextTick(updatePosition)
+}
+
+const getTriggerElement = () => {
+  return props.triggerEl?.value || props.triggerEl || internalTriggerEl.value
+}
+
 // Position dropdown
 const updatePosition = () => {
-  if (!props.triggerEl || !dropdownPanel.value) return
+  const triggerElement = getTriggerElement()
+  if (!triggerElement || !dropdownPanel.value) return
 
   nextTick(() => {
-    const triggerRect = props.triggerEl.getBoundingClientRect()
-    const panelWidth = dropdownPanel.value.offsetWidth || 200
+    const triggerRect = triggerElement.getBoundingClientRect()
+    const panelWidth = props.matchTriggerWidth ? triggerRect.width : (dropdownPanel.value.offsetWidth || 200)
     const panelHeight = dropdownPanel.value.offsetHeight || 300
     const viewportHeight = window.innerHeight
     const viewportWidth = window.innerWidth
@@ -226,7 +296,10 @@ const updatePosition = () => {
 }
 
 onMounted(() => {
-  updatePosition()
+  if (hasExternalTrigger.value) {
+    isOpen.value = true
+    nextTick(updatePosition)
+  }
   window.addEventListener('resize', updatePosition)
   window.addEventListener('scroll', updatePosition, true)
 })
@@ -243,6 +316,7 @@ watch(() => props.triggerEl, () => {
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
+@use './selector' as *;
 
 $primary-blue: var(--color-primary-hover);
 $selected-background: var(--bg-blue-light);
@@ -251,7 +325,36 @@ $text-secondary: var(--text-secondary);
 $text-muted: var(--text-muted);
 $divider-color: var(--border-light);
 
-$transition-fast: 0.2s;/*
+$transition-fast: 0.2s;
+$arrow-transition: 0.2s ease;
+
+.multi-select-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.select-label {
+  flex: 1;
+
+  @include text-truncate;
+}
+
+.select-arrow {
+  margin-left: 8px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  transition: transform $arrow-transition;
+}
+
+.select-trigger {
+  &.is-open {
+    .select-arrow {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+/*
  * 下拉层通过 Teleport 渲染到 body，
  * 因此保持为顶层选择器。
  */

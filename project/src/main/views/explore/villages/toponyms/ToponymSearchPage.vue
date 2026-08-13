@@ -31,25 +31,14 @@
 
         <div class="toponym-search-page__field">
           <span>{{ t('villages.pages.toponymSearch.search.placeType') }}</span>
-          <button
-            ref="placeTypeTriggerEl"
-            class="toponym-search-page__select-trigger select-trigger"
-            :class="{ 'is-open': placeTypeDropdownOpen }"
-            type="button"
-            @click="placeTypeDropdownOpen = !placeTypeDropdownOpen"
-          >
-            <span class="select-label">{{ placeTypeTriggerLabel }}</span>
-            <span class="select-arrow" aria-hidden="true">⌄</span>
-          </button>
           <MultiSelectDropdown
-            v-if="placeTypeDropdownOpen"
-            :model-value="selectedPlaceTypeCodes"
+            v-model="selectedPlaceTypeCodes"
             :options="placeTypeOptions"
-            :trigger-el="placeTypeTriggerEl"
+            :placeholder="t('villages.pages.toponymSearch.search.placeType')"
             align="left"
             direction="down"
-            @update:model-value="selectedPlaceTypeCodes = $event"
-            @close="placeTypeDropdownOpen = false"
+            match-trigger-width
+            width="100%"
           />
         </div>
 
@@ -233,8 +222,6 @@ const router = useRouter();
 const query = ref('');
 const matchMode = ref('prefix');
 const selectedPlaceTypeCodes = ref(['22200', '21610', '27610']);
-const placeTypeTriggerEl = ref(null);
-const placeTypeDropdownOpen = ref(false);
 const areaCode = ref('');
 const areaScope = ref('descendants');
 const limit = ref(50);
@@ -303,24 +290,6 @@ const limitOptions = computed(() => [
   { value: 200, label: t('villages.pages.toponymSearch.limits.200') },
 ]);
 
-const placeTypeTriggerLabel = computed(() => (
-  formatMultiSelectLabel(
-    selectedPlaceTypeCodes.value,
-    placeTypeOptions.value,
-    t('villages.pages.toponymSearch.search.placeType')
-  )
-));
-
-function formatMultiSelectLabel(selectedValues, options, placeholder) {
-  const selectedLabels = selectedValues
-    .map((value) => options.find((option) => option.value === value)?.label || value)
-    .filter(Boolean);
-
-  if (!selectedLabels.length) return placeholder;
-  if (selectedLabels.length === 1) return selectedLabels[0];
-  return `${selectedLabels[0]} +${selectedLabels.length - 1}`;
-}
-
 function buildSearchParams() {
   const params = {
     q: query.value.trim(),
@@ -377,7 +346,6 @@ function handleReset() {
   query.value = '';
   matchMode.value = 'prefix';
   selectedPlaceTypeCodes.value = ['22200', '21610', '27610'];
-  placeTypeDropdownOpen.value = false;
   areaCode.value = '';
   areaScope.value = 'descendants';
   limit.value = 50;
@@ -501,14 +469,6 @@ function formatCoordinates(longitude, latitude) {
 
 .toponym-search-page__field--query {
   grid-column: span 2;
-}
-
-.toponym-search-page__select-trigger {
-  width: 100%;
-}
-
-.select-label {
-  @include text-truncate;
 }
 
 .toponym-search-page__actions {
