@@ -34,7 +34,7 @@
           <div class="location-input-wrapper">
             <input
               v-model="location"
-              class="feature-record-input"
+              class="feature-record-input glass-field"
               type="text"
               :placeholder="t('customEntry.featureRecord.placeholders.location')"
               @input="handleLocationInput"
@@ -63,7 +63,7 @@
           <span>{{ t('customEntry.featureRecord.labels.region') }}</span>
           <input
             v-model="region"
-            class="feature-record-input"
+            class="feature-record-input glass-field"
             type="text"
             :placeholder="t('customEntry.featureRecord.placeholders.region')"
           />
@@ -91,7 +91,7 @@
           <span>{{ t('customEntry.featureRecord.labels.value') }}</span>
           <input
             v-model="valueField"
-            class="feature-record-input"
+            class="feature-record-input glass-field"
             type="text"
             :placeholder="t('customEntry.featureRecord.placeholders.value')"
           />
@@ -103,7 +103,7 @@
           <span>{{ t('customEntry.featureRecord.labels.note') }}</span>
           <input
             v-model="noteField"
-            class="feature-record-input"
+            class="feature-record-input glass-field"
             type="text"
             :placeholder="t('customEntry.featureRecord.placeholders.note')"
           />
@@ -114,7 +114,7 @@
           <span>{{ t('customEntry.featureRecord.labels.coord') }}</span>
           <input
             :value="coordText"
-            class="feature-record-input"
+            class="feature-record-input glass-field"
             type="text"
             readonly
             :placeholder="t('customEntry.featureRecord.placeholders.coord')"
@@ -609,28 +609,6 @@ watch(
 
 .feature-record-input {
   width: 100%;
-  padding: 10px 14px;
-  border: 1px solid $muted-ring;
-  border-radius: $radius-md;
-  background: $glass-medium;
-  color: $text-strong;
-  font-size: 14px;
-  outline: none;
-  transition:
-    border-color 0.18s ease,
-    box-shadow 0.18s ease,
-    background-color 0.18s ease;
-  box-sizing: border-box;
-
-  &::placeholder {
-    color: $text-light;
-  }
-
-  &:focus {
-    border-color: $primary-focus;
-    background: var(--text-white);
-    box-shadow: 0 0 0 4px $primary-glass;
-  }
 }
 
 .location-input-wrapper {

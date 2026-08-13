@@ -28,7 +28,7 @@
             <div class="location-input-wrapper">
               <input
                 v-model="location"
-                class="point-field-input"
+                class="point-field-input glass-field"
                 type="text"
                 :placeholder="t('customEntry.pointDetail.placeholders.location')"
                 @input="handleLocationInput"
@@ -61,7 +61,7 @@
             <span class="point-field-label">{{ t('customEntry.pointDetail.labels.region') }}</span>
             <input
               v-model="region"
-              class="point-field-input"
+              class="point-field-input glass-field"
               type="text"
               :placeholder="t('customEntry.pointDetail.placeholders.region')"
             />
@@ -110,7 +110,7 @@
             >
               <input
                 v-model="row.聲韻調"
-                class="point-row-input"
+                class="point-row-input glass-field"
                 type="text"
                 :placeholder="t('customEntry.pointDetail.placeholders.phonology')"
               />
@@ -119,7 +119,7 @@
               <div class="feature-input-wrapper">
                 <input
                   v-model="row.特徵"
-                  class="point-row-input"
+                  class="point-row-input glass-field"
                   type="text"
                   :placeholder="t('customEntry.pointDetail.placeholders.feature')"
                 />
@@ -135,7 +135,7 @@
             <div class="point-cell" :data-label="t('customEntry.pointDetail.rows.headers.value')">
               <input
                 v-model="row.值"
-                class="point-row-input"
+                class="point-row-input glass-field"
                 type="text"
                 :placeholder="t('customEntry.pointDetail.placeholders.value')"
               />
@@ -143,7 +143,7 @@
             <div class="point-cell" :data-label="t('customEntry.pointDetail.rows.headers.note')">
               <input
                 v-model="row.說明"
-                class="point-row-input"
+                class="point-row-input glass-field"
                 type="text"
                 :placeholder="t('customEntry.pointDetail.placeholders.note')"
               />
@@ -186,7 +186,7 @@
           <span class="point-field-label">{{ t('customEntry.pointDetail.labels.coord') }}</span>
           <input
             :value="coordText"
-            class="point-field-input"
+            class="point-field-input glass-field"
             type="text"
             readonly
             :placeholder="t('customEntry.pointDetail.placeholders.coord')"
@@ -914,28 +914,6 @@ watch(
 .point-field-input,
 .point-row-input {
   width: 100%;
-  padding: 10px 14px;
-  border: 1px solid $muted-ring;
-  border-radius: $radius-md;
-  background: $glass-medium;
-  color: $text-strong;
-  font-size: 14px;
-  outline: none;
-  transition:
-    border-color 0.18s ease,
-    box-shadow 0.18s ease,
-    background-color 0.18s ease;
-  box-sizing: border-box;
-
-  &::placeholder {
-    color: $text-light;
-  }
-
-  &:focus {
-    border-color: $primary-focus;
-    background: var(--text-white);
-    box-shadow: 0 0 0 4px $primary-glass;
-  }
 }
 
 // -- Location autocomplete --

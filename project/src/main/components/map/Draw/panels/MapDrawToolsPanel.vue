@@ -457,7 +457,7 @@
                 {{ t('map.drawTab.labels.batchFeatureName') }}
               </span>
               <input
-                class="draw-input"
+                class="draw-input glass-field"
                 type="text"
                 :value="selectedFeatureBatchName"
                 @input="$emit('update:selected-feature-batch-name', $event.target.value)"
@@ -488,7 +488,7 @@
                 @update:model-value="$emit('update:selected-feature-batch-property-key', $event)"
               />
               <input
-                class="draw-input draw-feature-table-batch-value"
+                class="draw-input draw-feature-table-batch-value glass-field"
                 type="text"
                 :value="selectedFeatureBatchPropertyValue"
                 :placeholder="t('map.drawTab.labels.batchFeaturePropertyValue')"
@@ -532,7 +532,7 @@
                 >
                   <td>
                     <input
-                      class="draw-input draw-feature-table-input"
+                      class="draw-input draw-feature-table-input glass-field"
                       type="text"
                       :value="row.name"
                       :disabled="!canModifyActiveLayer"
@@ -544,7 +544,7 @@
                     :key="column.key"
                   >
                     <input
-                      class="draw-input draw-feature-table-input"
+                      class="draw-input draw-feature-table-input glass-field"
                       type="text"
                       :value="row.properties?.[column.key] ?? ''"
                       :disabled="!canModifyActiveLayer"
@@ -583,7 +583,7 @@
                 {{ selectedFeatureId ? t('map.drawTab.labels.featureName') : t('map.drawTab.labels.layerName') }}
               </span>
               <input
-                class="draw-input"
+                class="draw-input glass-field"
                 type="text"
                 :value="selectedFeatureProperties.name"
                 @input="$emit('update-feature-property', 'name', $event.target.value)"
@@ -608,7 +608,7 @@
             >
               <span class="draw-field-label">{{ t('map.drawTab.labels.strokeColor') }}</span>
               <input
-                class="draw-color-input"
+                class="draw-color-input glass-field"
                 type="color"
                 :value="selectedFeatureProperties.stroke"
                 @input="$emit('update-feature-property', 'stroke', $event.target.value)"
@@ -621,7 +621,7 @@
             >
               <span class="draw-field-label">{{ t('map.drawTab.labels.pointColor') }}</span>
               <input
-                class="draw-color-input"
+                class="draw-color-input glass-field"
                 type="color"
                 :value="selectedFeatureProperties.pointColor"
                 @input="$emit('update-feature-property', 'pointColor', $event.target.value)"
@@ -634,7 +634,7 @@
             >
               <span class="draw-field-label">{{ t('map.drawTab.labels.pointStrokeColor') }}</span>
               <input
-                class="draw-color-input"
+                class="draw-color-input glass-field"
                 type="color"
                 :value="selectedFeatureProperties.pointStrokeColor"
                 @input="$emit('update-feature-property', 'pointStrokeColor', $event.target.value)"
@@ -647,7 +647,7 @@
             >
               <span class="draw-field-label">{{ t('map.drawTab.labels.fillColor') }}</span>
               <input
-                class="draw-color-input"
+                class="draw-color-input glass-field"
                 type="color"
                 :value="selectedFeatureProperties.fill"
                 @input="$emit('update-feature-property', 'fill', $event.target.value)"
