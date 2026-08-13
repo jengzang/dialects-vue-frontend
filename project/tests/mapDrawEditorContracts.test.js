@@ -59,6 +59,7 @@ describe('Map draw editor contracts', () => {
     ]) {
       expect(stylesSource).toContain(`['get', '${key}']`)
     }
+    expect(source).toContain("const activeLayerOpacityExpression = ['coalesce', ['get', 'user_opacity'], 1]")
 
     for (const key of [
       'fill',
@@ -69,6 +70,7 @@ describe('Map draw editor contracts', () => {
       'pointRadius',
       'pointColor',
       'pointStrokeColor',
+      'opacity',
     ]) {
       expect(stylesSource).not.toContain(`['get', '${key}']`)
     }
@@ -735,6 +737,32 @@ describe('Map draw editor contracts', () => {
     expect(source).toContain(`t('map.drawTab.labels.lockedShort')`)
   })
 
+  it('supports layer opacity from the layer panel through map rendering', () => {
+    const panelSource = readSource(mapDrawLayersPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+    const coreSource = readSource(useGisMapCorePath)
+    const layersSource = readSource(useGisLayersPath)
+    const editableSource = readSource(editableMapLibrePath)
+
+    expect(panelSource).toContain(`t('map.drawTab.labels.layerOpacity')`)
+    expect(panelSource).toContain(`emit('update-layer-opacity', layer.id, Number(event.target.value))`)
+    expect(panelSource).toContain(`'update-layer-opacity'`)
+    expect(tabSource).toContain('@update-layer-opacity="handleUpdateLayerOpacity"')
+    expect(coreSource).toContain('opacity: 1,')
+    expect(coreSource).toContain(`'opacity'`)
+    expect(coreSource).toContain(`'user_opacity'`)
+    expect(layersSource).toContain('async function handleUpdateLayerOpacity(layerId, opacity)')
+    expect(layersSource).toMatch(/handleUpdateLayerOpacity\(layerId, opacity\)[\s\S]*commitHistory\(\)/)
+    expect(layersSource).toContain("applyLayerPropertyToFeatures(layer, 'opacity', nextOpacity);")
+    expect(layersSource).toContain('dup.opacity = src.opacity;')
+    expect(editableSource).toContain('const layerOpacityExpression =')
+    expect(editableSource).toContain('const activeLayerOpacityExpression =')
+    expect(editableSource).toContain('opacity: feature.properties?.opacity ?? layer.opacity ?? 1')
+    expect(tabSource).toContain('function applyActiveLayerDefaultsToFeatureCollection(featureCollection)')
+    expect(tabSource).toContain('opacity: props.opacity ?? activeLayer.value?.opacity ?? 1')
+    expect(tabSource).toContain('activeLayerFeatureCollection.value = applyActiveLayerDefaultsToFeatureCollection(nextValue);')
+  })
+
   it('has localized labels for duplicating draw layers', () => {
     const zhCn = JSON.parse(readSource(zhCnMapLocalePath))
     const zhHant = JSON.parse(readSource(zhHantMapLocalePath))
@@ -762,6 +790,16 @@ describe('Map draw editor contracts', () => {
     expect(zhHant.drawTab.buttons.saveLayerName).toBe('保存名稱')
     expect(en.drawTab.buttons.renameLayer).toBe('Rename')
     expect(en.drawTab.buttons.saveLayerName).toBe('Save Name')
+  })
+
+  it('has localized labels for layer opacity', () => {
+    const zhCn = JSON.parse(readSource(zhCnMapLocalePath))
+    const zhHant = JSON.parse(readSource(zhHantMapLocalePath))
+    const en = JSON.parse(readSource(enMapLocalePath))
+
+    expect(zhCn.drawTab.labels.layerOpacity).toBe('图层透明度')
+    expect(zhHant.drawTab.labels.layerOpacity).toBe('圖層透明度')
+    expect(en.drawTab.labels.layerOpacity).toBe('Layer Opacity')
   })
 
   it('has localized labels for moving selected features between draw layers', () => {

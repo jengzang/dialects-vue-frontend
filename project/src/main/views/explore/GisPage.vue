@@ -199,6 +199,7 @@
           @move-layer-to-bottom="moveLayerToBottom"
           @toggle-layer-visibility="toggleLayerVisibility"
           @toggle-layer-lock="toggleLayerLock"
+          @update-layer-opacity="handleUpdateLayerOpacity"
           @rename-layer="handleRenameLayer"
           @duplicate-layer="handleDuplicateLayer"
           @delete-layer="handleDeleteLayer"
@@ -825,6 +826,7 @@ const gisLayers = useGisLayers({
 const {
   handleCreateLayer, handleSelectLayer, moveLayer, moveLayerToTop, moveLayerToBottom,
   toggleLayerVisibility, setAllLayersVisibility, toggleLayerLock,
+  handleUpdateLayerOpacity,
   handleRenameLayer, handleDuplicateLayer, handleDeleteLayer,
   triggerImportLayer, handleImportAsNewLayer,
   handleExportLayer, handleExportAllLayers,
@@ -985,13 +987,39 @@ const handleBeforeFeaturesChange = () => {
   commitHistory();
 };
 
+function applyActiveLayerDefaultsToFeatureCollection(featureCollection) {
+  if (!featureCollection || !Array.isArray(featureCollection.features)) return featureCollection;
+  return {
+    ...featureCollection,
+    features: featureCollection.features.map((feature) => {
+      const props = feature?.properties ?? {};
+      return {
+        ...feature,
+        properties: {
+          ...props,
+          stroke: props.stroke ?? activeLayer.value?.stroke,
+          strokeWidth: props.strokeWidth ?? activeLayer.value?.strokeWidth,
+          fill: props.fill ?? activeLayer.value?.fill,
+          fillOpacity: props.fillOpacity ?? activeLayer.value?.fillOpacity,
+          opacity: props.opacity ?? activeLayer.value?.opacity ?? 1,
+          pointRadius: props.pointRadius ?? activeLayer.value?.pointRadius,
+          pointColor: props.pointColor ?? activeLayer.value?.pointColor,
+          pointStrokeColor: props.pointStrokeColor ?? activeLayer.value?.pointStrokeColor,
+          visible: props.visible ?? activeLayer.value?.visible ?? true,
+          locked: props.locked ?? activeLayer.value?.locked ?? false,
+        },
+      };
+    }),
+  };
+}
+
 const handleActiveLayerModelUpdate = async (nextValue) => {
   if (!isAuthenticated.value) {
     await rejectUnauthenticatedFeatureChange();
     return;
   }
 
-  activeLayerFeatureCollection.value = nextValue;
+  activeLayerFeatureCollection.value = applyActiveLayerDefaultsToFeatureCollection(nextValue);
 };
 
 const handleActiveLayerFeaturesChange = async () => {

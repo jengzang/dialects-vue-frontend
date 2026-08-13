@@ -775,6 +775,7 @@
       "strokeColor": "線條顏色",
       "fillColor": "填充顏色",
       "fillOpacity": "填充透明度",
+      "layerOpacity": "圖層透明度",
       "strokeWidth": "線條寬度",
       "pointColor": "點填充色",
       "pointStrokeColor": "點描邊色",

@@ -67,7 +67,7 @@
                   <input
                     v-else
                     ref="renameInputRefs"
-                    class="draw-input draw-layer-rename-input"
+                    class="draw-input draw-layer-rename-input glass-field"
                     type="text"
                     :value="renameDraft"
                     @click.stop
@@ -139,6 +139,24 @@
                 >
                   {{ layer.locked ? t('map.drawTab.buttons.unlockLayer') : t('map.drawTab.buttons.lockLayer') }}
                 </button>
+                <label
+                  class="draw-layer-opacity-field"
+                  @click.stop
+                >
+                  <span class="draw-layer-opacity-label">
+                    {{ t('map.drawTab.labels.layerOpacity') }}
+                    {{ Math.round(getLayerOpacity(layer) * 100) }}%
+                  </span>
+                  <input
+                    class="draw-range-input glass-range"
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    :value="getLayerOpacity(layer)"
+                    @input="handleLayerOpacityInput(layer, $event)"
+                  >
+                </label>
                 <button
                   v-if="renamingLayerId !== layer.id"
                   class="glass-button draw-layer-chip-action"
@@ -228,6 +246,7 @@ const emit = defineEmits([
   'duplicate-layer',
   'delete-layer',
   'set-all-layers-visibility',
+  'update-layer-opacity',
   'update-style-key',
 ])
 
@@ -243,6 +262,16 @@ const getGeometryLabel = (geometryType) => {
   if (geometryType === 'Point') return t('map.drawTab.geometry.point')
   if (geometryType === 'Polygon') return t('map.drawTab.geometry.polygon')
   return t('map.drawTab.geometry.line')
+}
+
+const getLayerOpacity = (layer) => {
+  const opacity = Number(layer?.opacity)
+  if (!Number.isFinite(opacity)) return 1
+  return Math.min(1, Math.max(0, opacity))
+}
+
+const handleLayerOpacityInput = (layer, event) => {
+  emit('update-layer-opacity', layer.id, Number(event.target.value))
 }
 
 const startLayerRename = (layer) => {

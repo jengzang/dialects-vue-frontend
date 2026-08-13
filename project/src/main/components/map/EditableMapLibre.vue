@@ -34,6 +34,8 @@ import { pickDrawColor } from '@/main/config/colors/mapColors.js'
 const [drawFallbackStroke, drawFallbackPointColor] = pickDrawColor(0)
 
 const drawControlContainerClass = 'draw-control-container'
+const activeLayerOpacityExpression = ['coalesce', ['get', 'user_opacity'], 1]
+const layerOpacityExpression = ['coalesce', ['get', 'opacity'], 1]
 const drawStyles = [
   {
     id: 'gl-draw-polygon-fill',
@@ -42,7 +44,7 @@ const drawStyles = [
     paint: {
       'fill-color': ['coalesce', ['get', 'user_fill'], drawFallbackPointColor],
       'fill-outline-color': ['coalesce', ['get', 'user_stroke'], drawFallbackStroke],
-      'fill-opacity': ['case', ['==', ['coalesce', ['get', 'user_visible'], true], false], 0, ['coalesce', ['get', 'user_fillOpacity'], 0.22]],
+      'fill-opacity': ['case', ['==', ['coalesce', ['get', 'user_visible'], true], false], 0, ['*', ['coalesce', ['get', 'user_fillOpacity'], 0.22], activeLayerOpacityExpression]],
     },
   },
   {
@@ -56,7 +58,7 @@ const drawStyles = [
     paint: {
       'line-color': ['coalesce', ['get', 'user_stroke'], drawFallbackStroke],
       'line-width': ['coalesce', ['get', 'user_strokeWidth'], 3],
-      'line-opacity': ['case', ['==', ['coalesce', ['get', 'user_visible'], true], false], 0, 1],
+      'line-opacity': ['case', ['==', ['coalesce', ['get', 'user_visible'], true], false], 0, activeLayerOpacityExpression],
     },
   },
   {
@@ -70,7 +72,7 @@ const drawStyles = [
     paint: {
       'line-color': ['coalesce', ['get', 'user_stroke'], drawFallbackStroke],
       'line-width': ['coalesce', ['get', 'user_strokeWidth'], 4],
-      'line-opacity': ['case', ['==', ['coalesce', ['get', 'user_visible'], true], false], 0, 1],
+      'line-opacity': ['case', ['==', ['coalesce', ['get', 'user_visible'], true], false], 0, activeLayerOpacityExpression],
     },
   },
   {
@@ -82,7 +84,7 @@ const drawStyles = [
       'circle-color': ['coalesce', ['get', 'user_pointColor'], drawFallbackPointColor],
       'circle-stroke-color': ['coalesce', ['get', 'user_pointStrokeColor'], drawFallbackStroke],
       'circle-stroke-width': 2,
-      'circle-opacity': ['case', ['==', ['coalesce', ['get', 'user_visible'], true], false], 0, 1],
+      'circle-opacity': ['case', ['==', ['coalesce', ['get', 'user_visible'], true], false], 0, activeLayerOpacityExpression],
     },
   },
   {
@@ -239,6 +241,7 @@ const buildReadonlyLayerDescriptors = () => {
           strokeWidth: feature.properties?.strokeWidth ?? layer.strokeWidth,
           fill: feature.properties?.fill ?? layer.fill,
           fillOpacity: feature.properties?.fillOpacity ?? layer.fillOpacity,
+          opacity: feature.properties?.opacity ?? layer.opacity ?? 1,
           pointRadius: feature.properties?.pointRadius ?? layer.pointRadius,
           pointColor: feature.properties?.pointColor ?? layer.pointColor,
           pointStrokeColor: feature.properties?.pointStrokeColor ?? layer.pointStrokeColor,
@@ -343,15 +346,15 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
             ['==', ['coalesce', ['get', 'visible'], true], false], 0,
             ['case',
               ['boolean', ['feature-state', 'hover'], false],
-              0.35,
-              ['coalesce', ['get', 'fillOpacity'], 0.22],
+              ['*', 0.35, layerOpacityExpression],
+              ['*', ['coalesce', ['get', 'fillOpacity'], 0.22], layerOpacityExpression],
             ],
           ],
         }
       : {
           'fill-color': ['coalesce', ['get', 'fill'], drawFallbackPointColor],
           'fill-outline-color': ['coalesce', ['get', 'stroke'], drawFallbackStroke],
-          'fill-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, ['coalesce', ['get', 'fillOpacity'], 0.22]],
+          'fill-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, ['*', ['coalesce', ['get', 'fillOpacity'], 0.22], layerOpacityExpression]],
         }
 
     map.value.addLayer({
@@ -376,12 +379,12 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
             4,
             ['coalesce', ['get', 'strokeWidth'], 3],
           ],
-          'line-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
+          'line-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, layerOpacityExpression],
         }
       : {
           'line-color': ['coalesce', ['get', 'stroke'], drawFallbackStroke],
           'line-width': ['coalesce', ['get', 'strokeWidth'], 3],
-          'line-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
+          'line-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, layerOpacityExpression],
         }
 
     map.value.addLayer({
@@ -427,7 +430,7 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
           4,
           2,
         ],
-        'circle-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, 1],
+        'circle-opacity': ['case', ['==', ['coalesce', ['get', 'visible'], true], false], 0, layerOpacityExpression],
       },
     })
   }

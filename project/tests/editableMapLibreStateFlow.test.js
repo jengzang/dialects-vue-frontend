@@ -1304,6 +1304,52 @@ describe('EditableMapLibre state flow', () => {
     wrapper.unmount()
   })
 
+  it('renders layer opacity through active draw styles and readonly overlays', async () => {
+    const activeLayer = {
+      id: 'active-layer',
+      geometryType: 'Polygon',
+      visible: true,
+      locked: false,
+      opacity: 0.4,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    }
+    const readonlyLayer = {
+      id: 'readonly-layer',
+      geometryType: 'Polygon',
+      visible: true,
+      locked: false,
+      stroke: '#111111',
+      strokeWidth: 2,
+      fill: '#222222',
+      fillOpacity: 0.2,
+      opacity: 0.35,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [{
+          id: 'readonly-polygon-1',
+          type: 'Feature',
+          properties: {},
+          geometry: { type: 'Polygon', coordinates: [] },
+        }],
+      },
+    }
+    const wrapper = mountEditableMapLibre(activeLayer.featureCollection, {
+      activeLayer,
+      allLayers: [activeLayer, readonlyLayer],
+    })
+    await nextTick()
+
+    expect(JSON.stringify(wrapper.draw.options.styles)).toContain('user_opacity')
+    expect(wrapper.map.getSource('readonly-draw-source-readonly-layer').data.features[0].properties.opacity).toBe(0.35)
+    expect(JSON.stringify(wrapper.map.getLayer('readonly-draw-fill-readonly-layer').paint['fill-opacity'])).toContain('opacity')
+    expect(JSON.stringify(wrapper.map.getLayer('readonly-draw-line-readonly-layer').paint['line-opacity'])).toContain('opacity')
+
+    wrapper.unmount()
+  })
+
   it('removes readonly overlays for layers that are replaced from all layers', async () => {
     const activeLayer = {
       id: 'active-layer',

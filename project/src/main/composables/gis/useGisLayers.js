@@ -16,6 +16,12 @@ function emptyFeatureCollection() {
   return { type: 'FeatureCollection', features: [] };
 }
 
+function normalizeLayerOpacity(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return 1;
+  return Math.min(1, Math.max(0, number));
+}
+
 export function useGisLayers(options = {}) {
   const { t } = useI18n();
   const {
@@ -145,6 +151,19 @@ export function useGisLayers(options = {}) {
     syncAllLayersAfterMutation();
   }
 
+  async function handleUpdateLayerOpacity(layerId, opacity) {
+    if (!await guardWrite()) return;
+    const layer = layers.value.find((item) => item.id === layerId);
+    if (!layer) return;
+    const nextOpacity = normalizeLayerOpacity(opacity);
+    if (normalizeLayerOpacity(layer.opacity) === nextOpacity) return;
+    commitHistory();
+    layer.opacity = nextOpacity;
+    applyLayerPropertyToFeatures(layer, 'opacity', nextOpacity);
+    syncAllLayersAfterMutation();
+    editableMapRef?.value?.syncReadonlyLayers?.();
+  }
+
   async function handleRenameLayer(layerId, name) {
     if (!await guardWrite()) return;
     const target = layers.value.find((item) => item.id === layerId);
@@ -188,6 +207,7 @@ export function useGisLayers(options = {}) {
     dup.strokeWidth = src.strokeWidth;
     dup.fill = src.fill;
     dup.fillOpacity = src.fillOpacity;
+    dup.opacity = src.opacity;
     dup.pointRadius = src.pointRadius;
     dup.pointColor = src.pointColor;
     dup.pointStrokeColor = src.pointStrokeColor;
@@ -457,6 +477,7 @@ export function useGisLayers(options = {}) {
     toggleLayerVisibility,
     setAllLayersVisibility,
     toggleLayerLock,
+    handleUpdateLayerOpacity,
     handleRenameLayer,
     handleDuplicateLayer,
     handleDeleteLayer,

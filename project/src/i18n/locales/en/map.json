@@ -775,6 +775,7 @@
       "strokeColor": "Stroke Color",
       "fillColor": "Fill Color",
       "fillOpacity": "Fill Opacity",
+      "layerOpacity": "Layer Opacity",
       "strokeWidth": "Stroke Width",
       "pointColor": "Point Fill Color",
       "pointStrokeColor": "Point Stroke Color",

@@ -241,6 +241,7 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         <span data-testid="first-feature-coordinate">{{ modelValue?.features?.[0]?.geometry?.coordinates?.[0]?.[1]?.[0] ?? '' }}</span>
         <span data-testid="first-feature-geometry-type">{{ modelValue?.features?.[0]?.geometry?.type || '' }}</span>
         <span data-testid="first-feature-coordinates">{{ stringify(modelValue?.features?.[0]?.geometry?.coordinates ?? null) }}</span>
+        <span data-testid="first-feature-opacity">{{ modelValue?.features?.[0]?.properties?.opacity ?? '' }}</span>
         <span data-testid="box-select-mode">{{ featureBoxSelectEnabled ? 'on' : 'off' }}</span>
         <button
           data-testid="emit-box-selection"
@@ -584,7 +585,7 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawLayersPanel.vue', () => ({
       layers: { type: Array, default: () => [] },
       activeLayerId: { type: String, default: '' },
     },
-    emits: ['select-layer', 'toggle-layer-visibility', 'toggle-layer-lock'],
+    emits: ['select-layer', 'toggle-layer-visibility', 'toggle-layer-lock', 'update-layer-opacity'],
     template: `
       <div data-testid="layers-panel">
         <div v-for="layer in layers" :key="layer.id">
@@ -610,6 +611,15 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawLayersPanel.vue', () => ({
           >
             lock
           </button>
+          <input
+            data-testid="layer-opacity-input"
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            :value="layer.opacity ?? 1"
+            @input="$emit('update-layer-opacity', layer.id, Number($event.target.value))"
+          >
         </div>
       </div>
     `,
@@ -1148,6 +1158,30 @@ describe('MapDrawTab draft safety', () => {
     wrapper.host.querySelector('[data-testid="delete-selected-features"]').click()
     await flushTicks()
     expect(wrapper.host.querySelectorAll('[data-testid="feature-row"]')).toHaveLength(2)
+
+    wrapper.unmount()
+  })
+
+  it('applies active layer opacity to newly drawn features', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+
+    const opacityInput = wrapper.host.querySelector('[data-testid="layer-opacity-input"]')
+    opacityInput.value = '0.35'
+    opacityInput.dispatchEvent(new Event('input', { bubbles: true }))
+    await flushTicks()
+
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="first-feature-opacity"]').textContent).toBe('0.35')
 
     wrapper.unmount()
   })
