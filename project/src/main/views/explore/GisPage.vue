@@ -172,6 +172,7 @@
           :selected-feature-id="selectedEditorFeatureId"
           :selected-feature-ids="selectedFeatureIds"
           :selected-vertex-count="selectedVertexCount"
+          :selected-vertex="selectedVertex"
           :can-delete-selected-vertices="canDeleteSelectedVertices"
           :selected-feature-batch-name="selectedFeatureBatchName"
           :selected-feature-batch-property-key="selectedFeatureBatchPropertyKey"
@@ -205,6 +206,7 @@
           @simplify-selected-geometry="handleSimplifySelectedGeometry"
           @close-selected-line="handleCloseSelectedLine"
           @convert-selected-line-to-polygon="handleConvertSelectedLineToPolygon"
+          @move-selected-vertex="handleMoveSelectedVertex"
           @undo="undoHistory"
           @redo="redoHistory"
           @delete-selected="handleDeleteSelected"
@@ -819,7 +821,7 @@ const { setCommitHistory } = core;
 
 const {
   layers, activeLayerId, currentMode, currentStyleKey,
-  selectedFeatureId, selectedFeatureIds, selectedVertexCount, canDeleteSelectedVertices, isFeatureBoxSelectMode,
+  selectedFeatureId, selectedFeatureIds, selectedVertexCount, selectedVertex, canDeleteSelectedVertices, isFeatureBoxSelectMode,
   isDrawingPanelOpen, isLayersPanelOpen, isMapFullscreen,
   selectedFeatureBatchName, selectedFeatureBatchPropertyKey, selectedFeatureBatchPropertyValue,
   snappingEnabled, snapTolerance, snapGridSize,
@@ -897,6 +899,7 @@ const gisFeatures = useGisFeatures({
 const {
   handleEditSelectedShape, handleDuplicateSelectedFeature,
   handleReverseSelectedGeometry, handleSimplifySelectedGeometry, handleCloseSelectedLine, handleConvertSelectedLineToPolygon,
+  handleMoveSelectedVertex,
   handleDeleteSelected, handleDeleteSelectedFeatures, handleClearAll,
   updateFeatureProperty, updateSelectedFeatureProperty,
   updateSelectedFeaturesProperty,

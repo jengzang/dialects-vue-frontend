@@ -249,6 +249,45 @@
                 {{ t('map.drawTab.labels.shapeEditHistoryHint') }}
               </span>
             </div>
+            <div
+              v-if="canEditSelectedVertexCoordinate"
+              class="draw-shape-edit-coordinate"
+              data-testid="shape-edit-coordinate-editor"
+            >
+              <span class="draw-field-label">
+                {{ t('map.drawTab.labels.selectedVertexCoordinate') }}
+              </span>
+              <label class="draw-field draw-shape-edit-coordinate-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.longitude') }}</span>
+                <input
+                  v-model="vertexLongitudeInput"
+                  class="draw-input glass-field"
+                  data-testid="shape-edit-longitude-input"
+                  type="number"
+                  step="0.000001"
+                >
+              </label>
+              <label class="draw-field draw-shape-edit-coordinate-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.latitude') }}</span>
+                <input
+                  v-model="vertexLatitudeInput"
+                  class="draw-input glass-field"
+                  data-testid="shape-edit-latitude-input"
+                  type="number"
+                  step="0.000001"
+                >
+              </label>
+              <button
+                class="glass-button draw-tool-inline-button"
+                data-variant="secondary"
+                data-testid="shape-edit-apply-coordinate"
+                type="button"
+                :disabled="!canApplySelectedVertexCoordinate"
+                @click="applySelectedVertexCoordinate"
+              >
+                {{ t('map.drawTab.buttons.applyVertexCoordinate') }}
+              </button>
+            </div>
             <div class="draw-shape-edit-actions">
               <button
                 class="glass-button draw-tool-inline-button"
@@ -745,7 +784,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
@@ -765,6 +804,7 @@ const props = defineProps({
   selectedFeatureId: { type: String, default: '' },
   selectedFeatureIds: { type: Array, default: () => [] },
   selectedVertexCount: { type: Number, default: 0 },
+  selectedVertex: { type: Object, default: null },
   selectedFeatureBatchName: { type: String, default: '' },
   selectedFeatureBatchPropertyKey: { type: String, default: '' },
   selectedFeatureBatchPropertyValue: { type: String, default: '' },
@@ -794,7 +834,7 @@ const props = defineProps({
   canModifyActiveLayer: { type: Boolean, default: false },
 })
 
-defineEmits([
+const emit = defineEmits([
   'set-mode',
   'select-feature',
   'toggle-feature-selection',
@@ -808,6 +848,7 @@ defineEmits([
   'simplify-selected-geometry',
   'close-selected-line',
   'convert-selected-line-to-polygon',
+  'move-selected-vertex',
   'undo',
   'redo',
   'delete-selected',
@@ -871,6 +912,56 @@ const shapeEditHintText = computed(() => {
   }
   return t('map.drawTab.labels.shapeEditCannotDeleteHint')
 })
+
+const vertexLongitudeInput = ref('')
+const vertexLatitudeInput = ref('')
+
+const selectedVertexCoordinate = computed(() => {
+  const coordinate = props.selectedVertex?.coordinate
+  const longitude = Number(coordinate?.[0])
+  const latitude = Number(coordinate?.[1])
+  if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return null
+  return [longitude, latitude]
+})
+
+const canEditSelectedVertexCoordinate = computed(() => (
+  props.currentMode === 'direct_select'
+  && props.selectedVertexCount === 1
+  && Boolean(props.selectedVertex?.featureId)
+  && typeof props.selectedVertex?.coordPath === 'string'
+  && Boolean(selectedVertexCoordinate.value)
+))
+
+const parsedVertexCoordinateInput = computed(() => {
+  const longitude = Number(vertexLongitudeInput.value)
+  const latitude = Number(vertexLatitudeInput.value)
+  if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return null
+  return [longitude, latitude]
+})
+
+const canApplySelectedVertexCoordinate = computed(() => {
+  if (!canEditSelectedVertexCoordinate.value) return false
+  const currentCoordinate = selectedVertexCoordinate.value
+  const nextCoordinate = parsedVertexCoordinateInput.value
+  if (!currentCoordinate || !nextCoordinate) return false
+  return currentCoordinate[0] !== nextCoordinate[0] || currentCoordinate[1] !== nextCoordinate[1]
+})
+
+watch(() => props.selectedVertex, () => {
+  const coordinate = selectedVertexCoordinate.value
+  vertexLongitudeInput.value = coordinate ? String(coordinate[0]) : ''
+  vertexLatitudeInput.value = coordinate ? String(coordinate[1]) : ''
+}, { immediate: true, deep: true })
+
+const applySelectedVertexCoordinate = () => {
+  const coordinate = parsedVertexCoordinateInput.value
+  if (!canApplySelectedVertexCoordinate.value || !coordinate) return
+  emit('move-selected-vertex', {
+    featureId: props.selectedVertex.featureId,
+    coordPath: props.selectedVertex.coordPath,
+    coordinate,
+  })
+}
 </script>
 
 <style scoped lang="scss">

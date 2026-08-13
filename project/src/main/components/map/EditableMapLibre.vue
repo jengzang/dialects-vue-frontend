@@ -925,6 +925,20 @@ const getCoordinatesForCoordPaths = (feature, coordPaths = []) => {
     .filter(Boolean)
 }
 
+const getSelectedVertexState = () => {
+  if (selectedVertexCoordPaths.value.length !== 1 || !selectedFeatureId.value) return null
+  const feature = draw.value?.get?.(selectedFeatureId.value)
+  const coordPath = normalizeExistingCoordPath(feature, selectedVertexCoordPaths.value[0])
+  const coordinate = getCoordinatesForCoordPaths(feature, [coordPath])[0]
+  const normalizedCoordinate = normalizeVertexCoordinate(coordinate)
+  if (!feature || !coordPath || !normalizedCoordinate) return null
+  return {
+    featureId: selectedFeatureId.value,
+    coordPath,
+    coordinate: normalizedCoordinate,
+  }
+}
+
 const deleteVerticesFromFeature = (feature, coordPaths = []) => {
   const geometry = feature?.geometry ?? {}
   const normalizedPaths = [...new Set(coordPaths
@@ -1055,6 +1069,7 @@ const syncShapeEditState = () => {
     mode,
     featureId: mode === 'direct_select' ? selectedFeatureId.value : '',
     selectedVertexCount,
+    selectedVertex: mode === 'direct_select' ? getSelectedVertexState() : null,
     canDeleteSelectedVertices: mode === 'direct_select' && selectedVertexCount > 0 && canDeleteSelected(),
   })
 }

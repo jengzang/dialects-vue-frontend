@@ -53,6 +53,7 @@ function mountToolsPanel(overrides = {}) {
     selectedFeatureId: 'feature-1',
     selectedFeatureIds: ['feature-1'],
     selectedVertexCount: 0,
+    selectedVertex: null,
     canUseSelectedGeometryTools: true,
     canCloseSelectedLine: false,
     canConvertSelectedLineToPolygon: true,
@@ -85,6 +86,7 @@ function mountToolsPanel(overrides = {}) {
         @simplify-selected-geometry="events.push(['simplify-selected-geometry'])"
         @close-selected-line="events.push(['close-selected-line'])"
         @convert-selected-line-to-polygon="events.push(['convert-selected-line-to-polygon'])"
+        @move-selected-vertex="events.push(['move-selected-vertex', $event])"
         @delete-selected="events.push(['delete-selected'])"
       />
     `,
@@ -181,6 +183,69 @@ describe('MapDrawToolsPanel editing affordances', () => {
     await nextTick()
 
     expect(wrapper.events).not.toContainEqual(['delete-selected'])
+
+    wrapper.unmount()
+  })
+
+  it('edits a single selected vertex by exact longitude and latitude', async () => {
+    const wrapper = mountToolsPanel({
+      selectedVertexCount: 1,
+      selectedVertex: {
+        featureId: 'feature-1',
+        coordPath: '0.2',
+        coordinate: [113.25, 23.5],
+      },
+      canDeleteSelection: true,
+      canDeleteSelectedVertices: true,
+    })
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-testid="shape-edit-coordinate-editor"]').textContent)
+      .toContain('map.drawTab.labels.selectedVertexCoordinate')
+    const longitudeInput = wrapper.host.querySelector('[data-testid="shape-edit-longitude-input"]')
+    const latitudeInput = wrapper.host.querySelector('[data-testid="shape-edit-latitude-input"]')
+    const applyButton = wrapper.host.querySelector('[data-testid="shape-edit-apply-coordinate"]')
+
+    expect(longitudeInput.value).toBe('113.25')
+    expect(latitudeInput.value).toBe('23.5')
+    expect(applyButton.disabled).toBe(true)
+
+    longitudeInput.value = '113.75'
+    longitudeInput.dispatchEvent(new Event('input', { bubbles: true }))
+    latitudeInput.value = '24.125'
+    latitudeInput.dispatchEvent(new Event('input', { bubbles: true }))
+    await nextTick()
+
+    expect(applyButton.disabled).toBe(false)
+    applyButton.click()
+    await nextTick()
+
+    expect(wrapper.events).toContainEqual([
+      'move-selected-vertex',
+      {
+        featureId: 'feature-1',
+        coordPath: '0.2',
+        coordinate: [113.75, 24.125],
+      },
+    ])
+
+    wrapper.unmount()
+  })
+
+  it('hides exact coordinate editing for multiple selected vertices', async () => {
+    const wrapper = mountToolsPanel({
+      selectedVertexCount: 2,
+      selectedVertex: {
+        featureId: 'feature-1',
+        coordPath: '0.2',
+        coordinate: [113.25, 23.5],
+      },
+      canDeleteSelection: true,
+      canDeleteSelectedVertices: true,
+    })
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-testid="shape-edit-coordinate-editor"]')).toBeNull()
 
     wrapper.unmount()
   })

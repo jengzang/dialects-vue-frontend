@@ -9,6 +9,7 @@ export function useGisFeatures(options = {}) {
     activeLayer,
     selectedFeatureId,
     selectedFeatureIds,
+    selectedVertex,
     editableMapRef,
     currentMode,
     getFeatureId,
@@ -298,6 +299,26 @@ export function useGisFeatures(options = {}) {
     });
   }
 
+  async function handleMoveSelectedVertex(payload = {}) {
+    if (!await guardWrite()) return;
+    if (!canModifyActiveLayer.value || !canEditSelectedShape.value || !canUseSelectedGeometryTools?.value) return;
+    const featureId = String(payload.featureId || selectedVertex?.value?.featureId || '');
+    const coordPath = String(payload.coordPath || selectedVertex?.value?.coordPath || '');
+    const coordinate = payload.coordinate ?? selectedVertex?.value?.coordinate;
+    if (!featureId || featureId !== selectedFeatureId.value || !coordPath || !Array.isArray(coordinate)) return;
+    if (selectedVertex?.value?.featureId !== featureId || selectedVertex.value?.coordPath !== coordPath) return;
+    const nextCoordinate = [Number(coordinate[0]), Number(coordinate[1])];
+    if (!Number.isFinite(nextCoordinate[0]) || !Number.isFinite(nextCoordinate[1])) return;
+    const currentCoordinate = selectedVertex.value?.coordinate ?? [];
+    if (Number(currentCoordinate[0]) === nextCoordinate[0] && Number(currentCoordinate[1]) === nextCoordinate[1]) return;
+    if (typeof editableMapRef?.value?.moveVertex !== 'function') return;
+
+    commitHistory();
+    const didMove = editableMapRef.value.moveVertex(featureId, coordPath, nextCoordinate, { commitHistory: false });
+    if (didMove === false) return;
+    currentMode.value = 'direct_select';
+  }
+
   async function handleDuplicateSelectedFeature() {
     if (!await guardWrite()) return;
     if (!canDuplicateSelectedFeature.value) return;
@@ -542,6 +563,7 @@ export function useGisFeatures(options = {}) {
     handleSimplifySelectedGeometry,
     handleCloseSelectedLine,
     handleConvertSelectedLineToPolygon,
+    handleMoveSelectedVertex,
     handleDeleteSelected,
     handleDeleteSelectedFeatures,
     handleClearAll,

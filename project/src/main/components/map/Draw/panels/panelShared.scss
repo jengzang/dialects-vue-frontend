@@ -206,6 +206,23 @@
   gap: 0.4rem;
 }
 
+.draw-shape-edit-coordinate {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: end;
+  gap: 0.4rem;
+}
+
+.draw-shape-edit-coordinate > .draw-field-label {
+  grid-column: 1 / -1;
+}
+
+.draw-shape-edit-coordinate-field {
+  @include flex-col;
+  align-items: stretch;
+  gap: 0.25rem;
+}
+
 @media (hover: hover) and (pointer: fine) {
   .draw-tool-button-grid .glass-button:hover:not(:disabled) {
     background: var(--color-primary);

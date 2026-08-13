@@ -229,6 +229,7 @@ export function useGisMapCore(options = {}) {
   const selectedFeatureId = ref('');
   const selectedFeatureIds = ref([]);
   const selectedVertexCount = ref(0);
+  const selectedVertex = ref(null);
   const canDeleteSelectedVertices = ref(false);
   const isFeatureBoxSelectMode = ref(false);
   const isDrawingPanelOpen = ref(true);
@@ -307,6 +308,7 @@ export function useGisMapCore(options = {}) {
       ? preferredId
       : validIds[0] || '';
     selectedVertexCount.value = 0;
+    selectedVertex.value = null;
     canDeleteSelectedVertices.value = false;
   };
 
@@ -314,6 +316,7 @@ export function useGisMapCore(options = {}) {
     selectedFeatureId.value = '';
     selectedFeatureIds.value = [];
     selectedVertexCount.value = 0;
+    selectedVertex.value = null;
     canDeleteSelectedVertices.value = false;
   };
 
@@ -666,11 +669,28 @@ export function useGisMapCore(options = {}) {
     const featureId = String(state?.featureId || '');
     if (mode !== 'direct_select' || !featureId || featureId !== selectedFeatureId.value || !activeLayerFeatureIdSet.value.has(featureId)) {
       selectedVertexCount.value = 0;
+      selectedVertex.value = null;
       canDeleteSelectedVertices.value = false;
       return;
     }
     const nextCount = Number(state.selectedVertexCount);
     selectedVertexCount.value = Number.isFinite(nextCount) && nextCount > 0 ? nextCount : 0;
+    const nextVertex = state?.selectedVertex;
+    const nextCoordinate = [
+      Number(nextVertex?.coordinate?.[0]),
+      Number(nextVertex?.coordinate?.[1]),
+    ];
+    selectedVertex.value = selectedVertexCount.value === 1
+      && nextVertex?.featureId === featureId
+      && typeof nextVertex.coordPath === 'string'
+      && Number.isFinite(nextCoordinate[0])
+      && Number.isFinite(nextCoordinate[1])
+      ? {
+          featureId,
+          coordPath: nextVertex.coordPath,
+          coordinate: nextCoordinate,
+        }
+      : null;
     canDeleteSelectedVertices.value = selectedVertexCount.value > 0 && state.canDeleteSelectedVertices === true;
   };
 
@@ -823,6 +843,7 @@ export function useGisMapCore(options = {}) {
     selectedFeatureId,
     selectedFeatureIds,
     selectedVertexCount,
+    selectedVertex,
     canDeleteSelectedVertices,
     isFeatureBoxSelectMode,
     isDrawingPanelOpen,

@@ -558,6 +558,7 @@ describe('EditableMapLibre state flow', () => {
         mode: 'direct_select',
         featureId: 'polygon-1',
         selectedVertexCount: 1,
+        selectedVertex: null,
         canDeleteSelectedVertices: true,
       },
     ])
@@ -596,6 +597,7 @@ describe('EditableMapLibre state flow', () => {
         mode: 'simple_select',
         featureId: '',
         selectedVertexCount: 0,
+        selectedVertex: null,
         canDeleteSelectedVertices: false,
       },
     ])
@@ -768,7 +770,54 @@ describe('EditableMapLibre state flow', () => {
         mode: 'direct_select',
         featureId: 'line-1',
         selectedVertexCount: 1,
+        selectedVertex: {
+          featureId: 'line-1',
+          coordPath: '1',
+          coordinate: [1, 1],
+        },
         canDeleteSelectedVertices: true,
+      },
+    ])
+
+    wrapper.unmount()
+  })
+
+  it('emits selected vertex coordinates for exact coordinate editing', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [113, 23],
+            [114, 23],
+            [114, 24],
+            [113, 23],
+          ]],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didSelect = wrapper.exposed.selectVertex('polygon-1', '0.2')
+
+    expect(didSelect).toBe(true)
+    expect(wrapper.events).toContainEqual([
+      'shape-edit-state-change',
+      {
+        mode: 'direct_select',
+        featureId: 'polygon-1',
+        selectedVertexCount: 1,
+        selectedVertex: {
+          featureId: 'polygon-1',
+          coordPath: '0.2',
+          coordinate: [114, 24],
+        },
+        canDeleteSelectedVertices: false,
       },
     ])
 
@@ -1121,6 +1170,7 @@ describe('EditableMapLibre state flow', () => {
         mode: 'direct_select',
         featureId: 'line-1',
         selectedVertexCount: 0,
+        selectedVertex: null,
         canDeleteSelectedVertices: false,
       },
     ])
@@ -1149,6 +1199,11 @@ describe('EditableMapLibre state flow', () => {
         mode: 'direct_select',
         featureId: 'line-1',
         selectedVertexCount: 1,
+        selectedVertex: {
+          featureId: 'line-1',
+          coordPath: '1',
+          coordinate: [1, 1],
+        },
         canDeleteSelectedVertices: false,
       },
     ])
