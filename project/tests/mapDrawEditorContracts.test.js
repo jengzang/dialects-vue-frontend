@@ -308,6 +308,9 @@ describe('Map draw editor contracts', () => {
 
   it('snaps vertex edits to visible reference geometry without using the edited feature as its own reference', () => {
     const editableSource = readSource(editableMapLibrePath)
+    const tabSource = readSource(mapDrawTabPath)
+    const coreSource = readSource(useGisMapCorePath)
+    const draftsSource = readSource(resolve(projectRoot, 'src/main/composables/gis/useGisDrafts.js'))
 
     expect(editableSource).toContain('snappingEnabled')
     expect(editableSource).toContain('snapTolerance')
@@ -320,6 +323,18 @@ describe('Map draw editor contracts', () => {
     expect(editableSource).toContain('maybeSnapCoordinateToGrid')
     expect(editableSource).toMatch(/insertVertexIntoFeature\(feature, coordPath, resolveSnappedCoordinate\(coordinate, \{[\s\S]*excludeFeatureId: featureId/)
     expect(editableSource).toMatch(/moveVertexInFeature\(feature, coordPath, resolveSnappedCoordinate\(coordinate, \{[\s\S]*excludeFeatureId: featureId/)
+    expect(coreSource).toContain('const snappingEnabled = ref(true);')
+    expect(coreSource).toContain('const snapTolerance = ref(12);')
+    expect(coreSource).toContain('const snapGridSize = ref(0);')
+    expect(tabSource).toContain(':snapping-enabled="snappingEnabled"')
+    expect(tabSource).toContain(':snap-tolerance="snapTolerance"')
+    expect(tabSource).toContain(':snap-grid-size="snapGridSize"')
+    expect(tabSource).toContain(`t('map.drawTab.labels.snapping')`)
+    expect(tabSource).toContain(`t('map.drawTab.labels.snapTolerance')`)
+    expect(tabSource).toContain(`t('map.drawTab.labels.snapGridSize')`)
+    expect(draftsSource).toContain('snappingEnabled: snappingEnabled.value')
+    expect(draftsSource).toContain('snapTolerance: snapTolerance.value')
+    expect(draftsSource).toContain('snapGridSize: snapGridSize.value')
   })
 
   it('shows direct-edit status affordances for target shape and vertex actions', () => {

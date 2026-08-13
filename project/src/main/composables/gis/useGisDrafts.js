@@ -23,6 +23,9 @@ export function useGisDrafts(options = {}) {
     currentStyleKey,
     isDrawingPanelOpen,
     isLayersPanelOpen,
+    snappingEnabled,
+    snapTolerance,
+    snapGridSize,
     isAuthenticated,
     onAuthRequired,
     clearFeatureSelection,
@@ -64,6 +67,9 @@ export function useGisDrafts(options = {}) {
     currentStyleKey: currentStyleKey.value,
     isDrawingPanelOpen: isDrawingPanelOpen.value,
     isLayersPanelOpen: isLayersPanelOpen.value,
+    snappingEnabled: snappingEnabled.value,
+    snapTolerance: snapTolerance.value,
+    snapGridSize: snapGridSize.value,
   });
 
   const getCurrentWorkbenchSignature = () => buildDraftStateSignature(buildPersistedWorkbenchState());
@@ -132,6 +138,9 @@ export function useGisDrafts(options = {}) {
     currentStyleKey.value = state?.currentStyleKey || 'gaode';
     isDrawingPanelOpen.value = state?.isDrawingPanelOpen ?? true;
     isLayersPanelOpen.value = state?.isLayersPanelOpen ?? false;
+    if (snappingEnabled) snappingEnabled.value = state?.snappingEnabled ?? true;
+    if (snapTolerance) snapTolerance.value = Number.isFinite(Number(state?.snapTolerance)) ? Number(state.snapTolerance) : 12;
+    if (snapGridSize) snapGridSize.value = Number.isFinite(Number(state?.snapGridSize)) ? Number(state.snapGridSize) : 0;
     clearFeatureSelection();
     syncLayerIdSeedFromLayers(layers.value);
     syncAllLayersAfterMutation();

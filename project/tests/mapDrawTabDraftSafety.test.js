@@ -88,7 +88,7 @@ vi.mock('@/main/utils/drawMap/draftStorage.js', async () => {
 vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
   default: defineComponent({
     name: 'EditableMapLibreStub',
-    props: ['modelValue', 'activeLayer', 'featureBoxSelectEnabled'],
+    props: ['modelValue', 'activeLayer', 'featureBoxSelectEnabled', 'snappingEnabled', 'snapTolerance', 'snapGridSize'],
     emits: [
       'update:modelValue',
       'before-features-change',
@@ -243,6 +243,9 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         <span data-testid="first-feature-coordinates">{{ stringify(modelValue?.features?.[0]?.geometry?.coordinates ?? null) }}</span>
         <span data-testid="first-feature-opacity">{{ modelValue?.features?.[0]?.properties?.opacity ?? '' }}</span>
         <span data-testid="box-select-mode">{{ featureBoxSelectEnabled ? 'on' : 'off' }}</span>
+        <span data-testid="snapping-enabled">{{ snappingEnabled ? 'on' : 'off' }}</span>
+        <span data-testid="snap-tolerance">{{ snapTolerance }}</span>
+        <span data-testid="snap-grid-size">{{ snapGridSize }}</span>
         <button
           data-testid="emit-box-selection"
           type="button"
@@ -905,6 +908,9 @@ describe('MapDrawTab draft safety', () => {
       }],
       activeLayerId: 'layer-1',
       currentStyleKey: 'gaode',
+      snappingEnabled: false,
+      snapTolerance: 28,
+      snapGridSize: 0.5,
     })
     mocks.getDraftRecordById.mockImplementation(async (id) => (id === mocks.AUTO_DRAFT_ID ? autoDraft : null))
     mocks.showConfirm.mockResolvedValue(false)
@@ -914,6 +920,37 @@ describe('MapDrawTab draft safety', () => {
 
     expect(mocks.showConfirm).toHaveBeenCalledWith('map.drawTab.messages.autoDraftRestoreConfirm')
     expect(mocks.deleteDraftRecord).toHaveBeenCalledWith(mocks.AUTO_DRAFT_ID)
+    expect(wrapper.host.querySelector('[data-testid="snapping-enabled"]').textContent).toBe('on')
+
+    wrapper.unmount()
+  })
+
+  it('restores snapping settings from an accepted hidden auto draft', async () => {
+    const autoDraft = buildAutoDraftRecord({
+      layers: [{
+        id: 'layer-1',
+        name: 'Recovered Layer',
+        geometryType: 'Polygon',
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [{ id: 'feature-1', type: 'Feature', properties: {}, geometry: null }],
+        },
+      }],
+      activeLayerId: 'layer-1',
+      currentStyleKey: 'gaode',
+      snappingEnabled: false,
+      snapTolerance: 28,
+      snapGridSize: 0.5,
+    })
+    mocks.getDraftRecordById.mockImplementation(async (id) => (id === mocks.AUTO_DRAFT_ID ? autoDraft : null))
+    mocks.showConfirm.mockResolvedValue(true)
+
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="snapping-enabled"]').textContent).toBe('off')
+    expect(wrapper.host.querySelector('[data-testid="snap-tolerance"]').textContent).toBe('28')
+    expect(wrapper.host.querySelector('[data-testid="snap-grid-size"]').textContent).toBe('0.5')
 
     wrapper.unmount()
   })
@@ -1182,6 +1219,35 @@ describe('MapDrawTab draft safety', () => {
     await flushTicks()
 
     expect(wrapper.host.querySelector('[data-testid="first-feature-opacity"]').textContent).toBe('0.35')
+
+    wrapper.unmount()
+  })
+
+  it('passes snapping controls from the draw toolbar into the map editor', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="snapping-enabled"]').textContent).toBe('on')
+    expect(wrapper.host.querySelector('[data-testid="snap-tolerance"]').textContent).toBe('12')
+    expect(wrapper.host.querySelector('[data-testid="snap-grid-size"]').textContent).toBe('0')
+
+    wrapper.host.querySelector('[data-testid="toggle-snapping"]').click()
+    await nextTick()
+    expect(wrapper.host.querySelector('[data-testid="snapping-enabled"]').textContent).toBe('off')
+
+    const toleranceInput = wrapper.host.querySelector('[data-testid="snap-tolerance-input"]')
+    toleranceInput.value = '24'
+    toleranceInput.dispatchEvent(new Event('input', { bubbles: true }))
+    await nextTick()
+    expect(wrapper.host.querySelector('[data-testid="snap-tolerance"]').textContent).toBe('24')
+
+    const gridInput = wrapper.host.querySelector('[data-testid="snap-grid-input"]')
+    gridInput.value = '0.25'
+    gridInput.dispatchEvent(new Event('input', { bubbles: true }))
+    await nextTick()
+    expect(wrapper.host.querySelector('[data-testid="snap-grid-size"]').textContent).toBe('0.25')
 
     wrapper.unmount()
   })

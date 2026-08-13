@@ -227,6 +227,9 @@ export function useGisMapCore(options = {}) {
   const selectedFeatureBatchName = ref('');
   const selectedFeatureBatchPropertyKey = ref('');
   const selectedFeatureBatchPropertyValue = ref('');
+  const snappingEnabled = ref(true);
+  const snapTolerance = ref(12);
+  const snapGridSize = ref(0);
 
   // ---- Computeds ----
   const mapStyleOptions = computed(() => {
@@ -808,6 +811,9 @@ export function useGisMapCore(options = {}) {
     selectedFeatureBatchName,
     selectedFeatureBatchPropertyKey,
     selectedFeatureBatchPropertyValue,
+    snappingEnabled,
+    snapTolerance,
+    snapGridSize,
     // Computeds
     mapStyleOptions,
     activeLayer,
