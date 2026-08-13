@@ -1,16 +1,68 @@
 import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { createApp, defineComponent, nextTick } from 'vue'
 
 const testsDir = dirname(fileURLToPath(import.meta.url))
 const projectRoot = resolve(testsDir, '..')
+
+vi.mock('vue-i18n', () => ({
+  useI18n: () => ({
+    t: (key) => key,
+  }),
+}))
+
+vi.mock('@/components/common/BarIcon.vue', () => ({
+  default: defineComponent({
+    name: 'BarIconStub',
+    props: {
+      icon: { type: String, required: true },
+    },
+    template: '<span class="bar-icon-emoji">{{ icon }}</span>',
+  }),
+}))
 
 function readSource(relativePath) {
   return readFileSync(resolve(projectRoot, relativePath), 'utf8')
 }
 
+async function mountOverviewPage() {
+  window.matchMedia = vi.fn(() => ({
+    matches: true,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  }))
+
+  const component = (await import('../src/main/views/explore/yangchun/YangChunOverviewPage.vue')).default
+  const host = document.createElement('div')
+  document.body.appendChild(host)
+  const app = createApp(component)
+  app.mount(host)
+  await nextTick()
+
+  return {
+    host,
+    unmount() {
+      app.unmount()
+      host.remove()
+    },
+  }
+}
+
+function setReadonlyNumber(target, property, value) {
+  Object.defineProperty(target, property, {
+    configurable: true,
+    value,
+  })
+}
+
 describe('Yangchun Explore pages', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+    vi.restoreAllMocks()
+  })
+
   it('registers overview and expressions as canonical Yangchun path routes', () => {
     const source = readSource('src/main/router/exploreRoutes.js')
 
@@ -65,6 +117,54 @@ describe('Yangchun Explore pages', () => {
     expect(source).toContain("scrollGroupCarousel('prev')")
     expect(source).toContain("scrollGroupCarousel('next')")
     expect(source).toContain('scroll-snap-type: x mandatory')
+  })
+
+  it('scrolls the dialect group carousel and centers the selected group card', async () => {
+    const wrapper = await mountOverviewPage()
+
+    const scroller = wrapper.host.querySelector('.yc-group-scroller')
+    const nextButton = wrapper.host.querySelector('[aria-label="向右浏览方言板块"]')
+    const targetCard = wrapper.host.querySelector('[data-group-id="chunxi"]')
+    const detailTitle = wrapper.host.querySelector('.yc-group-detail h3')
+
+    expect(scroller).toBeTruthy()
+    expect(nextButton).toBeTruthy()
+    expect(targetCard).toBeTruthy()
+    expect(detailTitle.textContent).toContain('春中白话')
+
+    setReadonlyNumber(scroller, 'clientWidth', 360)
+    setReadonlyNumber(scroller, 'scrollWidth', 1200)
+    setReadonlyNumber(scroller.querySelector('.yc-group-card'), 'clientWidth', 280)
+    scroller.scrollBy = vi.fn()
+    scroller.dispatchEvent(new Event('scroll'))
+    await nextTick()
+
+    expect(nextButton.disabled).toBe(false)
+
+    nextButton.click()
+    await nextTick()
+
+    expect(scroller.scrollBy).toHaveBeenCalledWith({
+      left: 294,
+      behavior: 'smooth',
+    })
+
+    scroller.getBoundingClientRect = () => ({ left: 20 })
+    targetCard.getBoundingClientRect = () => ({ left: 420, width: 280 })
+    scroller.scrollTo = vi.fn()
+
+    targetCard.click()
+    await nextTick()
+    await nextTick()
+
+    expect(wrapper.host.querySelector('.yc-group-detail h3').textContent).toContain('春西白话')
+    expect(wrapper.host.querySelector('.yc-active-panel h3').textContent).toContain('春西白话')
+    expect(scroller.scrollTo).toHaveBeenCalledWith({
+      left: 360,
+      behavior: 'smooth',
+    })
+
+    wrapper.unmount()
   })
 
   it('keeps expressions mock data ready for a future backend contract', () => {
