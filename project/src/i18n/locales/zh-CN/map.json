@@ -356,6 +356,11 @@
       "enabled": "开启",
       "disabled": "关闭"
     },
+    "displayModes": {
+      "heatmap": "热力图",
+      "placeNames": "查看地名",
+      "dot": "圆点图"
+    },
     "buttons": {
       "reset": "复位",
       "fullscreen": "全屏",

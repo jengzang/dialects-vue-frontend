@@ -98,7 +98,8 @@ export const userStore = reactive({
 // 地图状态管理
 // ========================================
 export const mapStore = reactive({
-    mode: 'base',             // 默认模式: 'base' | 'dot' | 'feature' | 'compare' | 'syllableHeatmap'
+    mode: 'base',             // 默认模式: 'base' | 'dot' | 'heatmap' | 'feature' | 'compare' | 'syllableHeatmap'
+    divideMapView: false,     // 从 DivideTab 进入地图的上下文标记，控制三模式 RadioGroup 显隐
     mapData: null,            // 存放基础地图数据 (center, zoom, locations)
     mergedData: [],           // 存放特征数据 (results)
     syllableHeatmapPayload: null, // 音節熱力圖專用數據，避免污染 mergedData

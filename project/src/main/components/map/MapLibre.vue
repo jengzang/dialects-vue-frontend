@@ -24,7 +24,7 @@
         </div>
 
         <div
-          v-if="mapStore.mode !== 'syllableHeatmap'"
+          v-if="mapStore.mode !== 'syllableHeatmap' && !mapStore.divideMapView"
           id="base-switch-container"
           class="custom-switch-container1"
         >
@@ -33,6 +33,17 @@
             :label="t('map.mapLibre.controls.viewPlaceNames')"
             :font-size="14"
             @change="() => toggleBaseMode()"
+          />
+        </div>
+        <div
+          v-if="mapStore.divideMapView && isDivideDisplayMode"
+          class="display-mode-radios"
+        >
+          <RadioGroup
+            v-model="divideDisplayMode"
+            name="map-display-mode"
+            :options="divideDisplayModes"
+            :size="13"
           />
         </div>
         <div class="button-row">
@@ -65,6 +76,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import RadioGroup from '@/components/selector/RadioGroup.vue'
 import { ref, onMounted, onActivated, onBeforeUnmount, shallowRef, nextTick, watch, computed, h, render } from 'vue';
 import { useI18n } from 'vue-i18n';
 import maplibregl from 'maplibre-gl';
@@ -107,6 +119,8 @@ const emit = defineEmits(['map-click']);
 const SYLLABLE_HEATMAP_SOURCE_ID = 'syllable-heatmap-source';
 const SYLLABLE_HEATMAP_LAYER_ID = 'syllable-heatmap-layer';
 const SYLLABLE_HEATMAP_POINT_LAYER_ID = 'syllable-heatmap-point-layer';
+const DOT_HEATMAP_SOURCE_ID = 'dot-heatmap-source';
+const DOT_HEATMAP_LAYER_ID = 'dot-heatmap-layer';
 
 const mapContainer = ref(null);
 const map = shallowRef(null);
@@ -170,6 +184,18 @@ const toggleCustomSwitch = async () => {
 const lastNonBaseMode = ref('feature');
 // 只要當前 store 是 base 模式，開關就是開的
 const isBaseModeActive = computed(() => mapStore.mode === 'base');
+
+// DivideTab 三模式切换：热力图 / 查看地名 / 圆点图
+const isDivideDisplayMode = computed(() => ['base', 'dot', 'heatmap'].includes(mapStore.mode));
+const divideDisplayModes = computed(() => [
+  { label: t('map.mapLibre.displayModes.heatmap'), value: 'heatmap' },
+  { label: t('map.mapLibre.displayModes.placeNames'), value: 'base' },
+  { label: t('map.mapLibre.displayModes.dot'), value: 'dot' }
+]);
+const divideDisplayMode = computed({
+  get: () => mapStore.mode,
+  set: (value) => { mapStore.mode = value; }
+});
 
 // 4. 切換邏輯
 const toggleBaseMode = (e) => {
@@ -242,6 +268,7 @@ onActivated(() => {
 
 onBeforeUnmount(() => {
   clearSyllableHeatmapLayers();
+  clearDotHeatmapLayers();
   clearMarkers();
   if (map.value) {
     map.value.remove();
@@ -330,6 +357,7 @@ const renderMapContent = async (shouldResetView = true) => {
   // 清除舊標記
   clearMarkers();
   clearSyllableHeatmapLayers();
+  clearDotHeatmapLayers();
 
   // 視角統一由 requestMapFitView -> resetView 控制，這裡不再消費入口側預計算的 center/zoom。
   void shouldResetView;
@@ -345,6 +373,8 @@ const renderMapContent = async (shouldResetView = true) => {
     drawCompareMap();
   } else if (mapStore.mode === 'syllableHeatmap') {
     drawSyllableHeatmap();
+  } else if (mapStore.mode === 'heatmap') {
+    drawDotHeatmap();
   }
 };
 
@@ -371,6 +401,18 @@ const clearSyllableHeatmapLayers = () => {
 
   if (map.value.getSource(SYLLABLE_HEATMAP_SOURCE_ID)) {
     map.value.removeSource(SYLLABLE_HEATMAP_SOURCE_ID);
+  }
+};
+
+const clearDotHeatmapLayers = () => {
+  if (!map.value) return;
+
+  if (map.value.getLayer(DOT_HEATMAP_LAYER_ID)) {
+    map.value.removeLayer(DOT_HEATMAP_LAYER_ID);
+  }
+
+  if (map.value.getSource(DOT_HEATMAP_SOURCE_ID)) {
+    map.value.removeSource(DOT_HEATMAP_SOURCE_ID);
   }
 };
 
@@ -741,6 +783,76 @@ const drawCompareMap = () => {
   // console.log(`✅ 绘制完成，共添加 ${currentMarkers.length} 个标记`)
 };
 
+// =======================================================
+// 邏輯: 點位密度熱力圖 (dot 模式数据的 heatmap 展示)
+// =======================================================
+const getDotHeatmapFeatureCollection = () => {
+  const locations = mapStore.mapData?.coordinates_locations || [];
+
+  return {
+    type: 'FeatureCollection',
+    features: locations
+      .filter(([, coord]) => isValidCoordinatePair(coord))
+      .map(([location, coord]) => ({
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: coord
+        },
+        properties: {
+          location: location || '',
+          count: 1
+        }
+      }))
+  };
+};
+
+const drawDotHeatmap = () => {
+  const featureCollection = getDotHeatmapFeatureCollection();
+  if (featureCollection.features.length === 0) return;
+
+  map.value.addSource(DOT_HEATMAP_SOURCE_ID, {
+    type: 'geojson',
+    data: featureCollection
+  });
+
+  map.value.addLayer({
+    id: DOT_HEATMAP_LAYER_ID,
+    type: 'heatmap',
+    source: DOT_HEATMAP_SOURCE_ID,
+    maxzoom: 14,
+    paint: {
+      'heatmap-weight': 1,
+      'heatmap-intensity': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        3, 0.3,
+        11, 0.7
+      ],
+      'heatmap-color': [
+        'interpolate',
+        ['linear'],
+        ['heatmap-density'],
+        0, 'rgba(33,102,172,0)',
+        0.2, '#67a9cf',
+        0.4, '#d1e5f0',
+        0.6, '#fddbc7',
+        0.8, '#ef8a62',
+        1, '#b2182b'
+      ],
+      'heatmap-radius': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        3, 32,
+        11, 72
+      ],
+      'heatmap-opacity': 0.9
+    }
+  });
+};
+
 const getSyllableHeatmapFeatureCollection = () => {
   const payload = mapStore.syllableHeatmapPayload || {};
   const toneMode = payload.toneMode === 'toned' ? 'toned' : 'toneless';
@@ -1109,6 +1221,20 @@ $glass-transition: all 0.3s ease;
   gap: 12px;
 
   width: 100%;
+}
+
+.display-mode-radios {
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+
+  width: 100%;
+  padding: 4px 0;
+
+  :deep(.liquid-radio-group) {
+    gap: 4px 10px;
+  }
 }
 
 .button-row {

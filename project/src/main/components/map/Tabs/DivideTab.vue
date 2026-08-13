@@ -291,6 +291,7 @@ const runAllDataAction = async () => {
   mapStore.mapData = buildAllDataMapData()
   mapStore.mergedData = []
   mapStore.mode = 'dot'
+  mapStore.divideMapView = true
   requestMapFitView()
 
   await router.replace({
@@ -335,6 +336,7 @@ const runAction = async () => {
     mapStore.mapData = data;
     mapStore.mergedData = [];
     mapStore.mode = 'dot';
+    mapStore.divideMapView = true;
     requestMapFitView()
 
     // 切換回地圖 Tab

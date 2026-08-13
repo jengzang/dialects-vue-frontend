@@ -356,6 +356,11 @@
       "enabled": "On",
       "disabled": "Off"
     },
+    "displayModes": {
+      "heatmap": "Heatmap",
+      "placeNames": "Place Names",
+      "dot": "Dot Map"
+    },
     "buttons": {
       "reset": "Reset",
       "fullscreen": "Fullscreen",
