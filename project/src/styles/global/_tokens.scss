@@ -84,6 +84,8 @@
   --surface-elevation-1: #f8f9fb;           /* 微下沉 — 内层面板、卡片 hover */
   --surface-elevation-2: #f0f2f5;           /* 再下沉 — 次级容器 */
 
+  --glass-card-shadow: 0 6px 12px #00000014, 0 2px 4px #0000000a;
+
   /* ── 浮动玻璃表面（保留 blur）── */
   --surface-glass-floating: rgba(255, 255, 255, 0.78);         /* 一般浮层 */
   --surface-glass-floating-strong: rgba(255, 255, 255, 0.92);  /* 弹窗、侧边栏 */

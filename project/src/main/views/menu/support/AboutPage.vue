@@ -649,11 +649,11 @@ em {
   color: inherit;
   text-decoration: none;
 
-  &:hover {
-    background: var(--glass-80);
+  // &:hover {
+    // background: var(--glass-80);
     // box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.15);
-    transform: translateY(-6px) scale(1.01);
-  }
+    // transform: translateY(-6px) scale(1.01);
+  // }
 
   p {
     margin: 0.5rem 0.5rem 0.2rem;
@@ -811,7 +811,7 @@ em {
   align-items: center;
   padding: 20px;
   overflow: hidden;
-  background: var(--glass-50);
+  // background: var(--glass-50);
 
   // @include glass-card;
 
@@ -825,12 +825,12 @@ em {
   // transform: scale(1);
   // transition: all $ease-standard;
 
-  &:hover {
-    background: var(--glass-80);
-    border-color: rgba(var(--color-primary-rgb), 0.35);
-    box-shadow: 0 10px 20px rgba(var(--color-primary-rgb), 0.2);
-    transform: scale(1.02) translateY(-2px);
-  }
+  // &:hover {
+  //   background: var(--glass-80);
+  //   border-color: rgba(var(--color-primary-rgb), 0.35);
+  //   box-shadow: 0 10px 20px rgba(var(--color-primary-rgb), 0.2);
+  //   transform: scale(1.02) translateY(-2px);
+  // }
 
   span {
     margin-top: 10px;

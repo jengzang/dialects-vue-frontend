@@ -1328,10 +1328,10 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   // background: var(--glass-80);
   // border: 0.5px solid var(--glass-90);
   // border-radius: var(--radius-lg);
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.06),
-    0 2px 8px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 var(--text-white);
+  // box-shadow:
+  //   0 8px 32px rgba(0, 0, 0, 0.06),
+  //   0 2px 8px rgba(0, 0, 0, 0.04),
+  //   inset 0 1px 0 var(--text-white);
   // transition: all $transition-base $ease-standard;
 
   // @include saturated-glass;

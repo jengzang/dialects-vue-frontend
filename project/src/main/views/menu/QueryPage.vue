@@ -21,7 +21,7 @@
             <label class="query-label" for="hanzi-input">{{ $t('query.tab1.label') }}</label>
             <textarea
                 id="hanzi-input"
-                style="height: 5dvh;white-space:nowrap;width:min(80dvw,600px)"
+                style="height: 5dvh;white-space:nowrap;width:min(80dvw,500px)"
                 :placeholder="$t('query.tab1.placeholder')"
                 v-model="hanziInput"
                 @input="handleHanziInput"

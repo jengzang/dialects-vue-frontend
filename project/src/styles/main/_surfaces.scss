@@ -33,13 +33,24 @@
 }
 
 .glass-card {
-  background: var(--glass-card-background, var(--glass-30));
+  background: var(--glass-card-background, var(--glass-50));
   backdrop-filter: var(--glass-card-backdrop-filter, blur(14px) saturate(145%));
   -webkit-backdrop-filter: var(--glass-card-backdrop-filter, blur(14px) saturate(145%));
   border: var(--glass-card-border, 1px solid var(--border-glass));
   border-radius: var(--glass-card-radius, var(--radius-xl));
   box-shadow: var(--glass-card-shadow, 0 6px 18px var(--bg-hover-light), inset 0 0 0 1px var(--glass-30));
   transition: background-color 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease, transform 0.16s ease;
+
+  &:hover {
+    background: var(--glass-80);
+    // border-color: rgba(var(--color-primary-rgb), 0.2);
+    box-shadow:
+      0 12px 48px rgba(0, 0, 0, 0.08),
+      0 4px 12px rgba(0, 0, 0, 0.06),
+      inset 0 1px 0 var(--text-white);
+    transform: translateY(-5px) scale(1.01);
+  }
+
 }
 
 .glass-card[data-interactive='true'] {
