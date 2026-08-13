@@ -1242,6 +1242,85 @@ describe('EditableMapLibre state flow', () => {
     wrapper.unmount()
   })
 
+  it('splits a selected polygon with a crossing cutter line', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false, name: '分区' },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [0, 0],
+            [4, 0],
+            [4, 4],
+            [0, 4],
+            [0, 0],
+          ]],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didSplit = wrapper.exposed.splitPolygonWithLine('polygon-1', {
+      id: 'line-1',
+      type: 'Feature',
+      properties: { visible: true, locked: false },
+      geometry: { type: 'LineString', coordinates: [[2, -1], [2, 5]] },
+    })
+
+    expect(didSplit).toBe(true)
+    const nextFeatures = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features
+    expect(nextFeatures).toHaveLength(2)
+    expect(nextFeatures[0].id).toBe('polygon-1')
+    expect(nextFeatures[1].id).toBe('polygon-1-split-1')
+    expect(nextFeatures.every((feature) => feature.geometry.type === 'Polygon')).toBe(true)
+    expect(nextFeatures.every((feature) => feature.properties.name === '分区')).toBe(true)
+    expect(nextFeatures.map((feature) => feature.geometry.coordinates[0].length)).toEqual([5, 5])
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', {
+      featureIds: ['polygon-1', 'polygon-1-split-1'],
+    })
+
+    wrapper.unmount()
+  })
+
+  it('blocks polygon splitting when the cutter line does not cross the polygon', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [0, 0],
+            [4, 0],
+            [4, 4],
+            [0, 4],
+            [0, 0],
+          ]],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didSplit = wrapper.exposed.splitPolygonWithLine('polygon-1', {
+      id: 'line-1',
+      type: 'Feature',
+      properties: { visible: true, locked: false },
+      geometry: { type: 'LineString', coordinates: [[5, 5], [6, 6]] },
+    })
+
+    expect(didSplit).toBe(false)
+    expect(wrapper.events.some(([eventName]) => eventName === 'features-change')).toBe(false)
+
+    wrapper.unmount()
+  })
+
   it('reports selected vertices as not deletable when deletion would invalidate a line', async () => {
     const wrapper = mountEditableMapLibre({
       type: 'FeatureCollection',

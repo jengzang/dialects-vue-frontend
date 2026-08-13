@@ -19,6 +19,7 @@ export function useGisFeatures(options = {}) {
     canUseSelectedGeometryTools,
     canCloseSelectedLine,
     canSplitSelectedLine,
+    canSplitSelectedPolygon,
     canConvertSelectedLineToPolygon,
     canDeleteSelection,
     canMoveSelectedFeatures,
@@ -32,6 +33,7 @@ export function useGisFeatures(options = {}) {
     activeLayerFeatureTableColumns,
     selectedEditorProperties,
     selectedEditorGeometryType,
+    selectedPolygonSplitLineFeature,
     canApplySelectedFeatureBatchProperty,
     selectedFeatureBatchName,
     selectedFeatureBatchPropertyKey,
@@ -335,6 +337,20 @@ export function useGisFeatures(options = {}) {
     currentMode.value = 'simple_select';
   }
 
+  async function handleSplitSelectedPolygon() {
+    if (!await guardWrite()) return;
+    if (!canSplitSelectedPolygon?.value || typeof editableMapRef?.value?.splitPolygonWithLine !== 'function') return;
+    const cutterFeature = selectedPolygonSplitLineFeature?.value;
+    if (!selectedFeatureId.value || !cutterFeature) return;
+    if (typeof editableMapRef.value.canSplitPolygonWithLine === 'function'
+      && !editableMapRef.value.canSplitPolygonWithLine(selectedFeatureId.value, cutterFeature)) return;
+
+    commitHistory();
+    const didSplit = editableMapRef.value.splitPolygonWithLine(selectedFeatureId.value, cutterFeature, { commitHistory: false });
+    if (didSplit === false) return;
+    currentMode.value = 'simple_select';
+  }
+
   async function handleDuplicateSelectedFeature() {
     if (!await guardWrite()) return;
     if (!canDuplicateSelectedFeature.value) return;
@@ -581,6 +597,7 @@ export function useGisFeatures(options = {}) {
     handleConvertSelectedLineToPolygon,
     handleMoveSelectedVertex,
     handleSplitSelectedLine,
+    handleSplitSelectedPolygon,
     handleDeleteSelected,
     handleDeleteSelectedFeatures,
     handleClearAll,

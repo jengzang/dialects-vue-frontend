@@ -238,6 +238,7 @@ export function useGisMapCore(options = {}) {
   const selectedFeatureBatchName = ref('');
   const selectedFeatureBatchPropertyKey = ref('');
   const selectedFeatureBatchPropertyValue = ref('');
+  const selectedPolygonSplitLineId = ref('');
   const snappingEnabled = ref(true);
   const snapTolerance = ref(12);
   const snapGridSize = ref(0);
@@ -462,6 +463,46 @@ export function useGisMapCore(options = {}) {
       && splitIndex < coordinates.length - 1
     );
   });
+
+  const buildPolygonSplitLineValue = (layerId, featureId) => `${layerId}::${featureId}`;
+
+  const polygonSplitLineOptions = computed(() => layers.value
+    .filter((layer) => (
+      layer.id !== activeLayerId.value
+      && layer.geometryType === 'LineString'
+      && layer.visible !== false
+      && layer.locked !== true
+    ))
+    .flatMap((layer) => (layer.featureCollection?.features ?? [])
+      .filter((feature) => (
+        feature?.geometry?.type === 'LineString'
+        && feature.properties?.visible !== false
+        && feature.properties?.locked !== true
+        && getFeatureId(feature)
+      ))
+      .map((feature, index) => ({
+        label: `${layer.name} · ${getFeatureLabel(feature, index)}`,
+        value: buildPolygonSplitLineValue(layer.id, getFeatureId(feature)),
+      }))));
+
+  const selectedPolygonSplitLineFeature = computed(() => {
+    const [layerId, featureId] = String(selectedPolygonSplitLineId.value || '').split('::');
+    if (!layerId || !featureId) return null;
+    const layer = layers.value.find((item) => item.id === layerId);
+    if (!layer || layer.visible === false || layer.locked === true || layer.geometryType !== 'LineString') return null;
+    return (layer.featureCollection?.features ?? []).find((feature) => (
+      getFeatureId(feature) === featureId
+      && feature.geometry?.type === 'LineString'
+      && feature.properties?.visible !== false
+      && feature.properties?.locked !== true
+    )) ?? null;
+  });
+
+  const canSplitSelectedPolygon = computed(() => Boolean(
+    canUseSelectedGeometryTools.value
+    && selectedFeature.value?.geometry?.type === 'Polygon'
+    && selectedPolygonSplitLineFeature.value
+  ));
 
   const geometryQualitySummary = computed(() => {
     const issues = [];
@@ -867,6 +908,7 @@ export function useGisMapCore(options = {}) {
     selectedFeatureBatchName,
     selectedFeatureBatchPropertyKey,
     selectedFeatureBatchPropertyValue,
+    selectedPolygonSplitLineId,
     snappingEnabled,
     snapTolerance,
     snapGridSize,
@@ -892,6 +934,9 @@ export function useGisMapCore(options = {}) {
     canUseSelectedGeometryTools,
     canCloseSelectedLine,
     canSplitSelectedLine,
+    polygonSplitLineOptions,
+    selectedPolygonSplitLineFeature,
+    canSplitSelectedPolygon,
     canConvertSelectedLineToPolygon,
     geometryQualitySummary,
     canDeleteSelection,

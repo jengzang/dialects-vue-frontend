@@ -173,6 +173,8 @@
           :selected-feature-ids="selectedFeatureIds"
           :selected-vertex-count="selectedVertexCount"
           :selected-vertex="selectedVertex"
+          :polygon-split-line-options="polygonSplitLineOptions"
+          :selected-polygon-split-line-id="selectedPolygonSplitLineId"
           :can-delete-selected-vertices="canDeleteSelectedVertices"
           :selected-feature-batch-name="selectedFeatureBatchName"
           :selected-feature-batch-property-key="selectedFeatureBatchPropertyKey"
@@ -187,6 +189,7 @@
           :can-use-selected-geometry-tools="canUseSelectedGeometryTools"
           :can-close-selected-line="canCloseSelectedLine"
           :can-split-selected-line="canSplitSelectedLine"
+          :can-split-selected-polygon="canSplitSelectedPolygon"
           :can-convert-selected-line-to-polygon="canConvertSelectedLineToPolygon"
           :geometry-quality-summary="geometryQualitySummary"
           :can-delete-selection="canDeleteSelection"
@@ -207,6 +210,8 @@
           @simplify-selected-geometry="handleSimplifySelectedGeometry"
           @close-selected-line="handleCloseSelectedLine"
           @split-selected-line="handleSplitSelectedLine"
+          @update:selected-polygon-split-line-id="selectedPolygonSplitLineId = $event"
+          @split-selected-polygon="handleSplitSelectedPolygon"
           @convert-selected-line-to-polygon="handleConvertSelectedLineToPolygon"
           @move-selected-vertex="handleMoveSelectedVertex"
           @undo="undoHistory"
@@ -826,6 +831,7 @@ const {
   selectedFeatureId, selectedFeatureIds, selectedVertexCount, selectedVertex, canDeleteSelectedVertices, isFeatureBoxSelectMode,
   isDrawingPanelOpen, isLayersPanelOpen, isMapFullscreen,
   selectedFeatureBatchName, selectedFeatureBatchPropertyKey, selectedFeatureBatchPropertyValue,
+  selectedPolygonSplitLineId,
   snappingEnabled, snapTolerance, snapGridSize,
   mapStyleOptions, activeLayer, activeLayerFeatureCollection, featureCount,
   activeLayerFeatures, selectedFeature, activeLayerFeatureIdSet,
@@ -834,7 +840,9 @@ const {
   canApplySelectedFeatureBatchProperty, featureMoveLayerOptions,
   selectedEditorProperties, selectedEditorFeatureId, selectedEditorGeometryType,
   canModifyActiveLayer, canEditSelectedShape, canDeleteSelection, canDuplicateSelectedFeature,
-  canUseSelectedGeometryTools, canCloseSelectedLine, canSplitSelectedLine, canConvertSelectedLineToPolygon, geometryQualitySummary,
+  canUseSelectedGeometryTools, canCloseSelectedLine, canSplitSelectedLine,
+  polygonSplitLineOptions, selectedPolygonSplitLineFeature, canSplitSelectedPolygon,
+  canConvertSelectedLineToPolygon, geometryQualitySummary,
   canUseFeatureBoxSelect, canMoveSelectedFeatures, selectedLayerLabel,
   createEmptyLayer, getFeatureId, getFeatureLabel, getLayerLabel,
   syncLayerIdSeedFromLayers, applyLayerPropertyToFeatures,
@@ -882,16 +890,18 @@ const {
 
 // ---- Features ----
 const gisFeatures = useGisFeatures({
-  layers, activeLayerId, activeLayer, selectedFeatureId, selectedFeatureIds,
+  layers, activeLayerId, activeLayer, selectedFeatureId, selectedFeatureIds, selectedVertex,
   editableMapRef, currentMode, getFeatureId,
   canModifyActiveLayer, canDuplicateSelectedFeature,
   canEditSelectedShape, canDeleteSelection, canMoveSelectedFeatures,
-  canUseSelectedGeometryTools, canCloseSelectedLine, canConvertSelectedLineToPolygon,
+  canUseSelectedGeometryTools, canCloseSelectedLine, canSplitSelectedLine,
+  canSplitSelectedPolygon, canConvertSelectedLineToPolygon,
   setFeatureSelection, clearFeatureSelection,
   syncAllLayersAfterMutation, syncFeatureSelectionToMap,
   resetDrawSelectionMode, commitHistory,
   activeLayerFeatureIdSet, activeLayerFeatureTableColumns,
   selectedEditorProperties, selectedEditorGeometryType,
+  selectedPolygonSplitLineFeature,
   canApplySelectedFeatureBatchProperty,
   selectedFeatureBatchName, selectedFeatureBatchPropertyKey, selectedFeatureBatchPropertyValue,
   featureMoveLayerOptions,
@@ -901,7 +911,7 @@ const gisFeatures = useGisFeatures({
 const {
   handleEditSelectedShape, handleDuplicateSelectedFeature,
   handleReverseSelectedGeometry, handleSimplifySelectedGeometry, handleCloseSelectedLine, handleConvertSelectedLineToPolygon,
-  handleMoveSelectedVertex, handleSplitSelectedLine,
+  handleMoveSelectedVertex, handleSplitSelectedLine, handleSplitSelectedPolygon,
   handleDeleteSelected, handleDeleteSelectedFeatures, handleClearAll,
   updateFeatureProperty, updateSelectedFeatureProperty,
   updateSelectedFeaturesProperty,

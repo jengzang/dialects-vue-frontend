@@ -164,6 +164,32 @@
             >
               {{ t('map.drawTab.buttons.lineToPolygon') }}
             </button>
+            <div
+              v-if="selectedFeatureGeometryType === 'Polygon'"
+              class="draw-tool-wide-control"
+              data-testid="draw-tool-polygon-split-tool"
+            >
+              <span class="draw-field-label">{{ t('map.drawTab.labels.polygonSplitLine') }}</span>
+              <SimpleSelectDropdown
+                class="draw-tool-wide-select"
+                data-testid="draw-tool-polygon-split-line-select"
+                :model-value="selectedPolygonSplitLineId"
+                :options="polygonSplitLineOptions"
+                :placeholder="t('map.drawTab.labels.polygonSplitLine')"
+                :disabled="!canUseSelectedGeometryTools || polygonSplitLineOptions.length === 0"
+                @update:model-value="$emit('update:selected-polygon-split-line-id', $event)"
+              />
+              <button
+                class="glass-button draw-tool-inline-button"
+                data-variant="secondary"
+                data-testid="draw-tool-split-polygon"
+                type="button"
+                :disabled="!canSplitSelectedPolygon"
+                @click="$emit('split-selected-polygon')"
+              >
+                {{ t('map.drawTab.buttons.splitPolygon') }}
+              </button>
+            </div>
             <button
               class="glass-button"
               data-variant="secondary"
@@ -816,6 +842,8 @@ const props = defineProps({
   selectedFeatureIds: { type: Array, default: () => [] },
   selectedVertexCount: { type: Number, default: 0 },
   selectedVertex: { type: Object, default: null },
+  polygonSplitLineOptions: { type: Array, default: () => [] },
+  selectedPolygonSplitLineId: { type: String, default: '' },
   selectedFeatureBatchName: { type: String, default: '' },
   selectedFeatureBatchPropertyKey: { type: String, default: '' },
   selectedFeatureBatchPropertyValue: { type: String, default: '' },
@@ -829,6 +857,7 @@ const props = defineProps({
   canUseSelectedGeometryTools: { type: Boolean, default: false },
   canCloseSelectedLine: { type: Boolean, default: false },
   canSplitSelectedLine: { type: Boolean, default: false },
+  canSplitSelectedPolygon: { type: Boolean, default: false },
   canConvertSelectedLineToPolygon: { type: Boolean, default: false },
   geometryQualitySummary: {
     type: Object,
@@ -860,6 +889,8 @@ const emit = defineEmits([
   'simplify-selected-geometry',
   'close-selected-line',
   'split-selected-line',
+  'update:selected-polygon-split-line-id',
+  'split-selected-polygon',
   'convert-selected-line-to-polygon',
   'move-selected-vertex',
   'undo',

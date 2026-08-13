@@ -146,6 +146,22 @@
   padding: 0.4rem 0.3rem !important;
 }
 
+.draw-tool-wide-control {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 0.45rem;
+}
+
+.draw-tool-wide-control > .draw-field-label {
+  grid-column: 1 / -1;
+}
+
+.draw-tool-wide-select {
+  min-width: 0;
+}
+
 .draw-tool-mode-button {
   justify-content: center;
   gap: 0.35rem;

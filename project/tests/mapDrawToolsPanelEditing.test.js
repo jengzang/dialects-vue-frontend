@@ -28,7 +28,7 @@ vi.mock('@/components/selector/SimpleSelectDropdown.vue', () => ({
       options: { type: Array, default: () => [] },
     },
     emits: ['update:modelValue'],
-    template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)" />',
+    template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)"><option v-for="option in options" :key="option.value" :value="option.value">{{ option.label }}</option></select>',
   }),
 }))
 
@@ -54,10 +54,13 @@ function mountToolsPanel(overrides = {}) {
     selectedFeatureIds: ['feature-1'],
     selectedVertexCount: 0,
     selectedVertex: null,
+    polygonSplitLineOptions: [],
+    selectedPolygonSplitLineId: '',
     canUseSelectedGeometryTools: true,
     canCloseSelectedLine: false,
     canConvertSelectedLineToPolygon: true,
     canSplitSelectedLine: false,
+    canSplitSelectedPolygon: false,
     canDeleteSelection: false,
     canDeleteSelectedVertices: false,
     canEditShape: true,
@@ -88,6 +91,8 @@ function mountToolsPanel(overrides = {}) {
         @close-selected-line="events.push(['close-selected-line'])"
         @convert-selected-line-to-polygon="events.push(['convert-selected-line-to-polygon'])"
         @split-selected-line="events.push(['split-selected-line'])"
+        @update:selected-polygon-split-line-id="events.push(['update:selected-polygon-split-line-id', $event]); props.selectedPolygonSplitLineId = $event"
+        @split-selected-polygon="events.push(['split-selected-polygon'])"
         @move-selected-vertex="events.push(['move-selected-vertex', $event])"
         @delete-selected="events.push(['delete-selected'])"
       />
@@ -361,6 +366,42 @@ describe('MapDrawToolsPanel editing affordances', () => {
     splitLineButton.click()
     await nextTick()
     expect(wrapper.events).toContainEqual(['split-selected-line'])
+
+    wrapper.unmount()
+  })
+
+  it('selects a cutter line and runs polygon splitting when a polygon is selected', async () => {
+    const wrapper = mountToolsPanel({
+      currentMode: 'simple_select',
+      selectedFeatureGeometryType: 'Polygon',
+      polygonSplitLineOptions: [
+        { label: '切割线 · 线 A', value: 'line-layer::line-1' },
+      ],
+      selectedPolygonSplitLineId: '',
+      canUseSelectedGeometryTools: true,
+      canSplitSelectedPolygon: false,
+    })
+    await nextTick()
+
+    const splitTool = wrapper.host.querySelector('[data-testid="draw-tool-polygon-split-tool"]')
+    const select = wrapper.host.querySelector('[data-testid="draw-tool-polygon-split-line-select"]')
+    const splitButton = wrapper.host.querySelector('[data-testid="draw-tool-split-polygon"]')
+
+    expect(splitTool.textContent).toContain('map.drawTab.labels.polygonSplitLine')
+    expect(splitButton.disabled).toBe(true)
+
+    select.value = 'line-layer::line-1'
+    select.dispatchEvent(new Event('change', { bubbles: true }))
+    wrapper.props.canSplitSelectedPolygon = true
+    await nextTick()
+
+    expect(wrapper.events).toContainEqual(['update:selected-polygon-split-line-id', 'line-layer::line-1'])
+    expect(splitButton.disabled).toBe(false)
+
+    splitButton.click()
+    await nextTick()
+
+    expect(wrapper.events).toContainEqual(['split-selected-polygon'])
 
     wrapper.unmount()
   })

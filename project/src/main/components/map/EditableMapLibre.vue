@@ -25,6 +25,15 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 
 import { mapStyle } from '@/utils/map/MapSource.js'
 import {
+  area,
+  booleanPointInPolygon,
+  featureCollection,
+  lineSplit,
+  pointOnFeature,
+  polygonToLine,
+  polygonize,
+} from '@turf/turf'
+import {
   exportCurrentMapAsPng,
   exportFeatureCollectionAsGeoJson,
   normalizeFeatureCollection,
@@ -1032,8 +1041,11 @@ const moveVertexInFeature = (feature, coordPath, coordinate) => {
   return null
 }
 
-const buildSplitFeatureId = (featureCollection, sourceId) => {
-  const existingIds = new Set((featureCollection.features ?? []).map((feature) => getDrawFeatureId(feature)).filter(Boolean))
+const buildSplitFeatureId = (featureCollection, sourceId, reservedIds = new Set()) => {
+  const existingIds = new Set([
+    ...(featureCollection.features ?? []).map((feature) => getDrawFeatureId(feature)).filter(Boolean),
+    ...reservedIds,
+  ])
   let index = 1
   let nextId = `${String(sourceId || 'feature')}-split-${index}`
   while (existingIds.has(nextId)) {
@@ -1079,6 +1091,88 @@ const splitLineFeatureAtCoordPath = (featureCollection, featureId, coordPath) =>
       )),
     },
     featureIds: [String(featureId), secondFeatureId],
+  }
+}
+
+const isCutterLineFeature = (feature) => Boolean(
+  feature
+  && isDrawFeatureSelectable(feature)
+  && feature.geometry?.type === 'LineString'
+  && isLineGeometryValid(feature.geometry.coordinates ?? [])
+)
+
+const splitLineNetwork = (lineFeature, splitterFeature) => {
+  try {
+    return lineSplit(lineFeature, splitterFeature).features ?? []
+  } catch {
+    return []
+  }
+}
+
+const getInternalCutterLineSegments = (polygonFeature, cutterFeature) => {
+  const segments = splitLineNetwork(cutterFeature, polygonToLine(polygonFeature))
+  return segments.filter((segment) => (
+    isLineGeometryValid(segment.geometry?.coordinates ?? [])
+    && booleanPointInPolygon(pointOnFeature(segment), polygonFeature, { ignoreBoundary: false })
+  ))
+}
+
+const buildPolygonSplitPieces = (polygonFeature, cutterFeature) => {
+  if (!polygonFeature || polygonFeature.geometry?.type !== 'Polygon' || !isPolygonGeometryValid(polygonFeature.geometry.coordinates ?? [])) return []
+  if (!isCutterLineFeature(cutterFeature)) return []
+  const boundarySegments = splitLineNetwork(polygonToLine(polygonFeature), cutterFeature)
+  const cutterSegments = getInternalCutterLineSegments(polygonFeature, cutterFeature)
+  if (boundarySegments.length === 0 || cutterSegments.length === 0) return []
+
+  try {
+    return (polygonize(featureCollection([...boundarySegments, ...cutterSegments])).features ?? [])
+      .filter((piece) => (
+        piece.geometry?.type === 'Polygon'
+        && isPolygonGeometryValid(piece.geometry.coordinates ?? [])
+        && area(piece) > 0
+        && booleanPointInPolygon(pointOnFeature(piece), polygonFeature, { ignoreBoundary: false })
+      ))
+  } catch {
+    return []
+  }
+}
+
+const cloneSplitPolygonFeature = (feature, id, geometry) => ({
+  ...feature,
+  id,
+  properties: {
+    ...(feature?.properties ?? {}),
+    id,
+  },
+  geometry: {
+    ...geometry,
+    coordinates: structuredClone(geometry.coordinates),
+  },
+})
+
+const splitPolygonFeatureWithLine = (featureCollection, featureId, cutterFeature) => {
+  const feature = featureId ? (featureCollection.features ?? []).find((item) => getDrawFeatureId(item) === String(featureId)) : null
+  if (!feature || !isDrawFeatureSelectable(feature) || feature.geometry?.type !== 'Polygon') return null
+  const pieces = buildPolygonSplitPieces(feature, cutterFeature)
+  if (pieces.length < 2) return null
+
+  const splitFeatures = pieces
+    .sort((left, right) => area(right) - area(left))
+    .reduce((items, piece, index) => {
+      const reservedIds = new Set(items.map((item) => getDrawFeatureId(item)))
+      const id = index === 0 ? String(featureId) : buildSplitFeatureId(featureCollection, featureId, reservedIds)
+      items.push(cloneSplitPolygonFeature(feature, id, piece.geometry))
+      return items
+    }, [])
+  const featureIds = splitFeatures.map((item) => getDrawFeatureId(item))
+  return {
+    featureCollection: {
+      ...featureCollection,
+      features: (featureCollection.features ?? []).flatMap((item) => (
+        getDrawFeatureId(item) === String(featureId) ? splitFeatures : [item]
+      )),
+    },
+    featureIds,
   }
 }
 
@@ -1571,6 +1665,27 @@ const canSplitLineAtVertex = (featureId, coordPath) => {
   if (!draw.value || !featureId) return false
   const featureCollection = normalizeFeatureCollection(draw.value.getAll?.() ?? props.modelValue)
   return Boolean(splitLineFeatureAtCoordPath(featureCollection, featureId, coordPath))
+}
+
+const splitPolygonWithLine = (featureId, cutterFeature, options = {}) => {
+  if (!draw.value || !featureId) return false
+  const featureCollection = normalizeFeatureCollection(draw.value.getAll?.() ?? props.modelValue)
+  const result = splitPolygonFeatureWithLine(featureCollection, featureId, cutterFeature)
+  if (!result) return false
+
+  draw.value.set(result.featureCollection)
+  syncFeaturesFromDraw({
+    commitHistory: options.commitHistory !== false,
+    syncSelection: false,
+  })
+  selectFeatures(result.featureIds)
+  return true
+}
+
+const canSplitPolygonWithLine = (featureId, cutterFeature) => {
+  if (!draw.value || !featureId) return false
+  const featureCollection = normalizeFeatureCollection(draw.value.getAll?.() ?? props.modelValue)
+  return Boolean(splitPolygonFeatureWithLine(featureCollection, featureId, cutterFeature))
 }
 
 const deleteSelected = () => {
@@ -2249,6 +2364,8 @@ defineExpose({
   moveVertex,
   canSplitLineAtVertex,
   splitLineAtVertex,
+  canSplitPolygonWithLine,
+  splitPolygonWithLine,
   selectedFeatureId,
   updateFeatureProperties,
   canDeleteSelected,
