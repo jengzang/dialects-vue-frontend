@@ -169,6 +169,18 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  snappingEnabled: {
+    type: Boolean,
+    default: true,
+  },
+  snapTolerance: {
+    type: Number,
+    default: 12,
+  },
+  snapGridSize: {
+    type: Number,
+    default: 0,
+  },
 })
 
 const emit = defineEmits([
@@ -546,6 +558,136 @@ const getEditableRingCoordinates = (ring = []) => {
     return ring.slice(0, -1)
   }
   return ring
+}
+
+const getCoordinatePairs = (geometry) => {
+  if (!geometry) return []
+  if (geometry.type === 'Point') return [geometry.coordinates].filter((coordinate) => normalizeVertexCoordinate(coordinate))
+  if (geometry.type === 'LineString') return (geometry.coordinates ?? []).filter((coordinate) => normalizeVertexCoordinate(coordinate))
+  if (geometry.type === 'Polygon') {
+    return (geometry.coordinates ?? [])
+      .flatMap((ring) => getEditableRingCoordinates(ring))
+      .filter((coordinate) => normalizeVertexCoordinate(coordinate))
+  }
+  if (geometry.type === 'MultiPoint' || geometry.type === 'MultiLineString' || geometry.type === 'MultiPolygon') {
+    const coordinates = []
+    iterateCoordinates(geometry.coordinates, (coordinate) => {
+      if (normalizeVertexCoordinate(coordinate)) coordinates.push(coordinate)
+    })
+    return coordinates
+  }
+  return []
+}
+
+const getCoordinateSegments = (geometry) => {
+  const segments = []
+  if (!geometry) return segments
+  if (geometry.type === 'LineString') {
+    const coordinates = (geometry.coordinates ?? []).filter((coordinate) => normalizeVertexCoordinate(coordinate))
+    coordinates.slice(1).forEach((coordinate, index) => {
+      segments.push([coordinates[index], coordinate])
+    })
+    return segments
+  }
+  if (geometry.type === 'Polygon') {
+    ;(geometry.coordinates ?? []).forEach((ring) => {
+      const closedRing = closePolygonRing(ring)
+      closedRing.slice(1).forEach((coordinate, index) => {
+        segments.push([closedRing[index], coordinate])
+      })
+    })
+    return segments
+  }
+  return segments
+}
+
+const isSnapReferenceLayerVisible = (layer) => layer?.visible !== false
+
+const isSnapReferenceFeatureVisible = (feature) => feature?.properties?.visible !== false
+
+const getSnapReferenceFeatures = (options = {}) => {
+  const excludedFeatureId = String(options.excludeFeatureId || '')
+  const activeFeatures = normalizeFeatureCollection(draw.value?.getAll?.() ?? props.modelValue).features ?? []
+  const layerFeatures = (props.allLayers ?? [])
+    .filter(isSnapReferenceLayerVisible)
+    .flatMap((layer) => normalizeFeatureCollection(layer?.featureCollection).features ?? [])
+  return [...activeFeatures, ...layerFeatures]
+    .filter((feature) => {
+      const featureId = getDrawFeatureId(feature)
+      return feature?.geometry
+        && isSnapReferenceFeatureVisible(feature)
+        && (!excludedFeatureId || featureId !== excludedFeatureId)
+    })
+}
+
+const projectCoordinate = (coordinate) => {
+  if (!map.value || !normalizeVertexCoordinate(coordinate)) return null
+  return map.value.project(coordinate)
+}
+
+const getSquaredScreenDistance = (left, right) => {
+  if (!left || !right) return Infinity
+  return ((left.x - right.x) ** 2) + ((left.y - right.y) ** 2)
+}
+
+const getNearestPointOnProjectedSegment = (targetPoint, startPoint, endPoint, startCoordinate, endCoordinate) => {
+  const segmentX = endPoint.x - startPoint.x
+  const segmentY = endPoint.y - startPoint.y
+  const segmentLengthSquared = (segmentX ** 2) + (segmentY ** 2)
+  if (segmentLengthSquared <= 0) return null
+  const rawT = (((targetPoint.x - startPoint.x) * segmentX) + ((targetPoint.y - startPoint.y) * segmentY)) / segmentLengthSquared
+  const t = Math.max(0, Math.min(1, rawT))
+  return [
+    startCoordinate[0] + ((endCoordinate[0] - startCoordinate[0]) * t),
+    startCoordinate[1] + ((endCoordinate[1] - startCoordinate[1]) * t),
+  ]
+}
+
+const maybeSnapCoordinateToGrid = (coordinate) => {
+  const gridSize = Number(props.snapGridSize)
+  if (!Number.isFinite(gridSize) || gridSize <= 0) return null
+  const normalized = normalizeVertexCoordinate(coordinate)
+  if (!normalized) return null
+  return [
+    Math.round(normalized[0] / gridSize) * gridSize,
+    Math.round(normalized[1] / gridSize) * gridSize,
+  ]
+}
+
+const resolveSnappedCoordinate = (coordinate, options = {}) => {
+  const normalized = normalizeVertexCoordinate(coordinate)
+  if (!normalized || props.snappingEnabled === false || options.snapping === false) return normalized
+  const targetPoint = projectCoordinate(normalized)
+  if (!targetPoint) return normalized
+  const tolerance = Math.max(0, Number(props.snapTolerance) || 0)
+  const toleranceSquared = tolerance ** 2
+  let best = { coordinate: normalized, distanceSquared: Infinity, priority: -1 }
+
+  const acceptCandidate = (candidateCoordinate, priority) => {
+    const candidate = normalizeVertexCoordinate(candidateCoordinate)
+    const candidatePoint = projectCoordinate(candidate)
+    if (!candidatePoint) return
+    const distanceSquared = getSquaredScreenDistance(targetPoint, candidatePoint)
+    if (distanceSquared > toleranceSquared) return
+    if (distanceSquared < best.distanceSquared || (distanceSquared === best.distanceSquared && priority > best.priority)) {
+      best = { coordinate: candidate, distanceSquared, priority }
+    }
+  }
+
+  getSnapReferenceFeatures(options).forEach((feature) => {
+    getCoordinatePairs(feature.geometry).forEach((candidate) => {
+      acceptCandidate(candidate, 3)
+    })
+    getCoordinateSegments(feature.geometry).forEach(([startCoordinate, endCoordinate]) => {
+      const startPoint = projectCoordinate(startCoordinate)
+      const endPoint = projectCoordinate(endCoordinate)
+      const candidate = getNearestPointOnProjectedSegment(targetPoint, startPoint, endPoint, startCoordinate, endCoordinate)
+      acceptCandidate(candidate, 2)
+    })
+  })
+
+  acceptCandidate(maybeSnapCoordinateToGrid(normalized), 1)
+  return best.coordinate
 }
 
 const parseCoordPath = (coordPath) => {
@@ -1176,7 +1318,10 @@ const selectVertex = (featureId, coordPath) => {
 const insertVertex = (featureId, coordPath, coordinate, options = {}) => {
   const feature = featureId ? draw.value?.get?.(featureId) : null
   if (!draw.value || !feature || !isDrawFeatureSelectable(feature)) return false
-  const result = insertVertexIntoFeature(feature, coordPath, coordinate)
+  const result = insertVertexIntoFeature(feature, coordPath, resolveSnappedCoordinate(coordinate, {
+    ...options,
+    excludeFeatureId: featureId,
+  }))
   if (!result) return false
 
   const didReplace = replaceFeatureInDraw(result.feature, options)
@@ -1188,7 +1333,10 @@ const insertVertex = (featureId, coordPath, coordinate, options = {}) => {
 const moveVertex = (featureId, coordPath, coordinate, options = {}) => {
   const feature = featureId ? draw.value?.get?.(featureId) : null
   if (!draw.value || !feature || !isDrawFeatureSelectable(feature)) return false
-  const result = moveVertexInFeature(feature, coordPath, coordinate)
+  const result = moveVertexInFeature(feature, coordPath, resolveSnappedCoordinate(coordinate, {
+    ...options,
+    excludeFeatureId: featureId,
+  }))
   if (!result) return false
 
   const didReplace = replaceFeatureInDraw(result.feature, options)

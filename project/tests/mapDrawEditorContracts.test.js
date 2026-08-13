@@ -243,8 +243,8 @@ describe('Map draw editor contracts', () => {
     expect(editableSource).toContain('const moveVertex = (featureId, coordPath, coordinate, options = {}) =>')
     expect(editableSource).toContain('const deleteVertices = (featureId, coordPaths, options = {}) =>')
     expect(editableSource).toContain("draw.value?.changeMode?.('direct_select', { featureId, coordPath: normalizedPath })")
-    expect(editableSource).toContain('insertVertexIntoFeature(feature, coordPath, coordinate)')
-    expect(editableSource).toContain('moveVertexInFeature(feature, coordPath, coordinate)')
+    expect(editableSource).toContain('insertVertexIntoFeature(feature, coordPath, resolveSnappedCoordinate(coordinate')
+    expect(editableSource).toContain('moveVertexInFeature(feature, coordPath, resolveSnappedCoordinate(coordinate')
     expect(editableSource).toContain('deleteVerticesFromFeature(feature, coordPaths)')
     expect(editableSource).toContain('closePolygonRing(editableRing)')
     expect(editableSource).toContain('isLineGeometryValid(nextGeometry.coordinates)')
@@ -252,6 +252,22 @@ describe('Map draw editor contracts', () => {
     expect(editableSource).toContain('selectVertex,')
     expect(editableSource).toContain('insertVertex,')
     expect(editableSource).toContain('moveVertex,')
+  })
+
+  it('snaps vertex edits to visible reference geometry without using the edited feature as its own reference', () => {
+    const editableSource = readSource(editableMapLibrePath)
+
+    expect(editableSource).toContain('snappingEnabled')
+    expect(editableSource).toContain('snapTolerance')
+    expect(editableSource).toContain('snapGridSize')
+    expect(editableSource).toContain('const resolveSnappedCoordinate = (coordinate, options = {}) =>')
+    expect(editableSource).toContain('const getSnapReferenceFeatures = (options = {}) =>')
+    expect(editableSource).toContain('excludeFeatureId')
+    expect(editableSource).toContain('getCoordinateSegments(feature.geometry)')
+    expect(editableSource).toContain('getNearestPointOnProjectedSegment')
+    expect(editableSource).toContain('maybeSnapCoordinateToGrid')
+    expect(editableSource).toMatch(/insertVertexIntoFeature\(feature, coordPath, resolveSnappedCoordinate\(coordinate, \{[\s\S]*excludeFeatureId: featureId/)
+    expect(editableSource).toMatch(/moveVertexInFeature\(feature, coordPath, resolveSnappedCoordinate\(coordinate, \{[\s\S]*excludeFeatureId: featureId/)
   })
 
   it('shows direct-edit status affordances for target shape and vertex actions', () => {

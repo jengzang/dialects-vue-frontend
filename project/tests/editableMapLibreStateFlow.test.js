@@ -195,6 +195,8 @@ function mountEditableMapLibre(modelValue, options = {}) {
   const previewLayers = ref(options.previewLayers ?? [])
   const enablePreviewHover = ref(options.enablePreviewHover ?? false)
   const featureBoxSelectEnabled = ref(options.featureBoxSelectEnabled ?? false)
+  const snappingEnabled = ref(options.snappingEnabled ?? true)
+  const snapGridSize = ref(options.snapGridSize ?? 0)
 
   const Root = defineComponent({
     components: { EditableMapLibre },
@@ -208,6 +210,8 @@ function mountEditableMapLibre(modelValue, options = {}) {
         previewLayers,
         enablePreviewHover,
         featureBoxSelectEnabled,
+        snappingEnabled,
+        snapGridSize,
         events,
       }
     },
@@ -221,6 +225,8 @@ function mountEditableMapLibre(modelValue, options = {}) {
         :preview-layers="previewLayers"
         :enable-preview-hover="enablePreviewHover"
         :feature-box-select-enabled="featureBoxSelectEnabled"
+        :snapping-enabled="snappingEnabled"
+        :snap-grid-size="snapGridSize"
         @before-features-change="events.push(['before-features-change'])"
         @features-change="events.push(['features-change', $event])"
         @feature-select="events.push(['feature-select', $event])"
@@ -834,6 +840,161 @@ describe('EditableMapLibre state flow', () => {
     })
 
     wrapper.unmount()
+  })
+
+  it('snaps inserted vertices to visible reference points', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [10, 0]] },
+      }],
+    }, {
+      allLayers: [{
+        id: 'reference-points',
+        visible: true,
+        locked: true,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [{
+            id: 'reference-point-1',
+            type: 'Feature',
+            properties: { visible: true, locked: true },
+            geometry: { type: 'Point', coordinates: [5, 5] },
+          }],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didInsert = wrapper.exposed.insertVertex('line-1', '1', [5.4, 5.3])
+
+    expect(didInsert).toBe(true)
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [5, 5], [10, 0]])
+
+    wrapper.unmount()
+  })
+
+  it('snaps moved vertices to visible reference edges', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [0, 0],
+            [10, 0],
+            [5, 8],
+            [0, 0],
+          ]],
+        },
+      }],
+    }, {
+      allLayers: [{
+        id: 'reference-lines',
+        visible: true,
+        locked: true,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [{
+            id: 'reference-line-1',
+            type: 'Feature',
+            properties: { visible: true, locked: true },
+            geometry: { type: 'LineString', coordinates: [[0, 5], [10, 5]] },
+          }],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didMove = wrapper.exposed.moveVertex('polygon-1', '0.2', [4.8, 5.4])
+
+    expect(didMove).toBe(true)
+    const nextRing = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1]
+      .features[0].geometry.coordinates[0]
+    expect(nextRing).toEqual([
+      [0, 0],
+      [10, 0],
+      [4.8, 5],
+      [0, 0],
+    ])
+
+    wrapper.unmount()
+  })
+
+  it('does not snap to hidden reference features or when snapping is disabled', async () => {
+    const referenceLayer = {
+      id: 'reference-points',
+      visible: true,
+      locked: true,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [{
+          id: 'hidden-reference-point',
+          type: 'Feature',
+          properties: { visible: false, locked: true },
+          geometry: { type: 'Point', coordinates: [5, 5] },
+        }],
+      },
+    }
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [10, 0]] },
+      }],
+    }, { allLayers: [referenceLayer] })
+    await nextTick()
+    wrapper.events.length = 0
+
+    wrapper.exposed.insertVertex('line-1', '1', [5.4, 5.3])
+
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [5.4, 5.3], [10, 0]])
+    wrapper.unmount()
+
+    const disabledWrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-2',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [10, 0]] },
+      }],
+    }, {
+      snappingEnabled: false,
+      allLayers: [{
+        ...referenceLayer,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [{
+            id: 'visible-reference-point',
+            type: 'Feature',
+            properties: { visible: true, locked: true },
+            geometry: { type: 'Point', coordinates: [5, 5] },
+          }],
+        },
+      }],
+    })
+    await nextTick()
+    disabledWrapper.events.length = 0
+
+    disabledWrapper.exposed.insertVertex('line-2', '1', [5.4, 5.3])
+
+    expect(disabledWrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [5.4, 5.3], [10, 0]])
+
+    disabledWrapper.unmount()
   })
 
   it('deletes a selected line vertex by coordinate path and reconnects the line', async () => {
