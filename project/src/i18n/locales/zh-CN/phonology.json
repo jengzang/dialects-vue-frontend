@@ -113,6 +113,12 @@
           "toned": "带调"
         }
       },
+      "queryModes": {
+        "featureCounts": "声韵调独立",
+        "syllableCounts": "整体音节",
+        "singleHint": "单一地点可同时勾选两种统计方式",
+        "multiHint": "多地点时仅能勾选一种统计方式"
+      },
       "charts": {
         "pie": {
           "title": "音节总量占比",

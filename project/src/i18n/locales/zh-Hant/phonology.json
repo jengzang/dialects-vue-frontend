@@ -113,6 +113,12 @@
           "toned": "帶調"
         }
       },
+      "queryModes": {
+        "featureCounts": "聲韻調獨立",
+        "syllableCounts": "整體音節",
+        "singleHint": "單一地點可同時勾選兩種統計方式",
+        "multiHint": "多地點時僅能勾選一種統計方式"
+      },
       "charts": {
         "pie": {
           "title": "音節總量佔比",

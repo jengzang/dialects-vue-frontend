@@ -113,6 +113,12 @@
           "toned": "Toned"
         }
       },
+      "queryModes": {
+        "featureCounts": "Initials, finals and tones",
+        "syllableCounts": "Overall syllables",
+        "singleHint": "A single location can select both statistics at once",
+        "multiHint": "Multiple locations allow only one statistics selection at a time"
+      },
       "charts": {
         "pie": {
           "title": "Syllable Share by Total Count",

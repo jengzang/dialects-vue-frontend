@@ -10,6 +10,7 @@ import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopu
 import LocationAndRegionInput from '@/main/components/geo/LocationAndRegionInput.vue'
 import CountLocationJumpNav from '@/main/components/pho/CountLocationJumpNav.vue'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { mapStore, pendingCountphosLocations } from '@/main/store/store.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
@@ -31,6 +32,8 @@ const countphosLocationQuery = ref({
   regions: [],
   regionUsing: 'map'
 })
+const locationInputRef = ref(null)
+const queryMode = ref({ featureCounts: true, syllableCounts: true })
 const matchedLocations = ref([])
 const isLocationInputDisabled = ref(true)
 const rendering = ref(false)
@@ -120,6 +123,44 @@ const isResultsBusy = computed(() => loading.value || rendering.value)
 const isCurrentCountRoute = computed(() => route.path === '/menu/pho/count' || route.path.endsWith('/menu/pho/count'))
 const isCountphosQueryEmpty = computed(() => {
   return (countphosLocationQuery.value.locations || []).length === 0 && (countphosLocationQuery.value.regions || []).length === 0
+})
+
+// 单/多地点判定:优先用输入组件已解析的地点数,未解析时回退到原始输入
+const isSingleLocationQuery = computed(() => {
+  const resolvedCount = Number(locationInputRef.value?.selectedCount || 0)
+  if (resolvedCount > 0) return resolvedCount === 1
+
+  const q = countphosLocationQuery.value
+  const locs = Array.isArray(q.locations) ? q.locations : []
+  const regs = Array.isArray(q.regions) ? q.regions : []
+  return locs.length === 1 && regs.length === 0
+})
+const isMultiLocationQuery = computed(() => !isSingleLocationQuery.value)
+
+// 多地点的两个统计方式互斥,且始终至少保留一个勾选
+const handleQueryModeToggle = (mode, checked) => {
+  if (checked) {
+    if (mode === 'featureCounts') {
+      queryMode.value.featureCounts = true
+      if (isMultiLocationQuery.value) queryMode.value.syllableCounts = false
+    } else {
+      queryMode.value.syllableCounts = true
+      if (isMultiLocationQuery.value) queryMode.value.featureCounts = false
+    }
+  } else if (mode === 'featureCounts' ? queryMode.value.syllableCounts : queryMode.value.featureCounts) {
+    queryMode.value[mode] = false
+  }
+}
+
+// 单地点默认两个都勾选;进入多地点且两个都勾选时只保留特徵統計
+watch(isSingleLocationQuery, (single) => {
+  if (isCountphosQueryEmpty.value) return
+  if (single) {
+    queryMode.value.featureCounts = true
+    queryMode.value.syllableCounts = true
+  } else if (queryMode.value.featureCounts && queryMode.value.syllableCounts) {
+    queryMode.value.syllableCounts = false
+  }
 })
 
 const resolvedLocationCount = computed(() => {
@@ -797,6 +838,11 @@ const loadData = async () => {
     return
   }
 
+  // 多地点时两个都勾选 → 只请求特徵統計(互斥保底)
+  if (isMultiLocationQuery.value && queryMode.value.featureCounts && queryMode.value.syllableCounts) {
+    queryMode.value.syllableCounts = false
+  }
+
   error.value = null
   disposeAllCharts()
   featureData.value = {}
@@ -808,8 +854,8 @@ const loadData = async () => {
   await loadCountsTask.run(async () => {
     const countRequestPayload = buildCountRequestPayload()
     const [result, syllableResult] = await Promise.all([
-      getFeatureCounts(countRequestPayload),
-      getSyllableCounts(countRequestPayload)
+      queryMode.value.featureCounts ? getFeatureCounts(countRequestPayload) : Promise.resolve(undefined),
+      queryMode.value.syllableCounts ? getSyllableCounts(countRequestPayload) : Promise.resolve(undefined)
     ])
 
     // 存儲原始數據
@@ -1044,10 +1090,31 @@ onBeforeUnmount(() => {
     <!-- 地点输入组件 -->
     <div class="input-section">
       <LocationAndRegionInput
+        ref="locationInputRef"
         v-model="countphosLocationQuery"
         limit-context="countphos"
         @update:runDisabled="handleRunDisabled"
       />
+      <div class="query-mode-row">
+        <CheckBox
+          :model-value="queryMode.featureCounts"
+          :label="$t('phonology.phonology.countphos.queryModes.featureCounts')"
+          @change="(checked) => handleQueryModeToggle('featureCounts', checked)"
+        />
+        <CheckBox
+          :model-value="queryMode.syllableCounts"
+          :label="$t('phonology.phonology.countphos.queryModes.syllableCounts')"
+          @change="(checked) => handleQueryModeToggle('syllableCounts', checked)"
+        />
+        <span
+          v-if="!isCountphosQueryEmpty"
+          class="query-mode-hint"
+        >
+          {{ isMultiLocationQuery
+            ? $t('phonology.phonology.countphos.queryModes.multiHint')
+            : $t('phonology.phonology.countphos.queryModes.singleHint') }}
+        </span>
+      </div>
       <button
         class="action-btn"
         @click="loadData"
@@ -1076,7 +1143,7 @@ onBeforeUnmount(() => {
         <p>{{ $t('phonology.phonology.countphos.actions.loading') }}</p>
       </div>
       <!-- 匯總統計部分 -->
-      <section v-if="!isSingleLocation" class="aggregated-section glass-panel">
+      <section v-if="!isSingleLocation && hasChartData" class="aggregated-section glass-panel">
         <!-- <h3 class="section-title">匯總統計</h3> -->
         <h3 class="section-title section-title--with-pill">
           <span>{{ $t('phonology.phonology.countphos.titlePrefix') }}</span>
@@ -1275,14 +1342,6 @@ onBeforeUnmount(() => {
                 {{ $t('phonology.phonology.countphos.stats.more', { count: item.locations.length - 10 }) }}
               </button>
             </div>
-            <div class="syllable-card-actions">
-              <button
-                class="expand-btn"
-                @click="openLocationModal(item.syllable, syllableModeLabel, item)"
-              >
-                {{ $t('phonology.phonology.countphos.syllables.viewLocations') }}
-              </button>
-            </div>
           </div>
         </div>
       </section>
@@ -1402,6 +1461,21 @@ $primary-deep: #003d9e;
     justify-content: center;
     gap: 5px;
     margin: 0 auto 30px;
+  }
+
+  .query-mode-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .query-mode-hint {
+    width: 100%;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 12px;
   }
 
   /* 页面加载与错误状态 */

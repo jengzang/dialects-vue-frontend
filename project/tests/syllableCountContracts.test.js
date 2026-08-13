@@ -44,6 +44,16 @@ describe('syllable count frontend contracts', () => {
     expect(source).toContain("region_mode: countphosLocationQuery.value.regionUsing")
   })
 
+  it('lets Countphos select which count API to request, one at a time for multiple locations', () => {
+    const source = readSource('src/main/components/pho/Countphos.vue')
+
+    expect(source).toContain("import CheckBox from '@/components/selector/CheckBox.vue'")
+    expect(source).toContain('<CheckBox')
+    expect(source).toContain('queryMode')
+    expect(source).toContain('isSingleLocationQuery')
+    expect(source).toContain('handleQueryModeToggle')
+  })
+
   it('adds an inline syllable section with tone switch and heatmap threshold above ten resolved points', () => {
     const source = readSource('src/main/components/pho/Countphos.vue')
 
