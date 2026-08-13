@@ -21,6 +21,34 @@ function functionBody(source, functionName) {
 }
 
 describe('toponyms page shell', () => {
+  it('builds the independent toponym catalog search page with shared glass and selector primitives', () => {
+    const page = readSource('src/main/views/explore/villages/toponyms/ToponymSearchPage.vue');
+
+    expect(page).toContain("import { getToponymSearch } from '@/api'");
+    expect(page).toContain("import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'");
+    expect(page).toContain("import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'");
+    expect(page).toContain('class="toponym-search-page glass-shell"');
+    expect(page).toContain('class="toponym-search-page__header glass-panel"');
+    expect(page).toContain('class="toponym-search-page__results glass-panel"');
+    expect(page).toContain('class="toponym-search-page__detail glass-panel"');
+    expect(page).toContain('class="toponym-search-page__result-grid main-card-grid"');
+    expect(page).toContain('class="toponym-search-page__result-card glass-card"');
+    expect(page).toContain('data-interactive="true"');
+    expect(page).toContain('<SimpleSelectDropdown');
+    expect(page).toContain('<MultiSelectDropdown');
+    expect(page).toContain('class="toponym-search-page__select-trigger select-trigger"');
+    expect(page).toContain('@submit.prevent="handleSearch"');
+    expect(page).toContain('const selectedPlaceTypeCodes = ref([');
+    expect(page).toContain('place_type_code: selectedPlaceTypeCodes.value');
+    expect(page).toContain('const limit = ref(50)');
+    expect(page).not.toContain('getToponymPoints');
+    expect(page).not.toContain('/api/toponyms/points');
+    expect(page).not.toContain('watch([query');
+    expect(page).not.toContain('main-glass');
+    expect(page).not.toContain('main-search-field');
+    expect(page).not.toMatch(/@media\s*\((?:max|min)-width/);
+  });
+
   it('wires split toponyms APIs without first-paint point loading', () => {
     const page = readSource('src/main/views/explore/villages/toponyms/ToponymsPage.vue');
 
