@@ -13,3 +13,44 @@
   transform: translateX(-50%);
   pointer-events: none;
 }
+
+.run-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--run-btn-gap, 8px);
+  padding: var(--run-btn-padding, 14px 28px);
+  overflow: hidden;
+  background: var(--color-gradient);
+  border: 0;
+  border-radius: var(--run-btn-radius, var(--radius-pill));
+  box-shadow: var(--shadow-glow-sm);
+  color: var(--text-white);
+  font-size: var(--run-btn-font-size, 18px);
+  font-weight: var(--run-btn-font-weight, 700);
+  letter-spacing: var(--run-btn-letter-spacing, 1px);
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+  transition:
+    background-color 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out,
+    transform 0.3s ease-in-out;
+
+  &:hover:not(:disabled) {
+    background: var(--color-gradient);
+    box-shadow: var(--shadow-glow);
+    transform: scale(1.2);
+  }
+
+  &:disabled {
+    background: var(--border-gray);
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  span {
+    display: inline-block;
+  }
+}

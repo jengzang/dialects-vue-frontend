@@ -231,8 +231,7 @@
       <!-- ✅ 炫酷按鈕 -->
       <div class="run-container">
         <button
-            class="glass-button"
-            data-variant="run"
+            class="run-btn"
             @click="runAction"
             :disabled="buttonState.isRunning || isRunDisabled"
             :class="{ disabled: isRunDisabled }"

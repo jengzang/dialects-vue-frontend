@@ -71,41 +71,6 @@
     }
   }
 
-  &[data-variant='run'] {
-    position: relative;
-    padding: var(--glass-button-run-padding, 14px 28px);
-    overflow: hidden;
-    background: var(--color-gradient);
-    border: 0;
-    border-radius: var(--glass-button-run-radius, var(--radius-pill));
-    box-shadow: var(--shadow-glow-sm);
-    color: var(--text-white);
-    font-size: var(--glass-button-run-font-size, 18px);
-    font-weight: var(--glass-button-run-font-weight, 700);
-    letter-spacing: var(--glass-button-run-letter-spacing, 1px);
-    white-space: nowrap;
-    pointer-events: auto;
-    transition:
-      background-color 0.3s ease-in-out,
-      box-shadow 0.3s ease-in-out,
-      transform 0.3s ease-in-out;
-
-    &:hover:not(:disabled) {
-      background: var(--color-gradient);
-      box-shadow: var(--shadow-glow);
-      transform: scale(1.2);
-    }
-
-    &:disabled {
-      background: var(--border-gray);
-      opacity: 0.7;
-    }
-
-    span {
-      display: inline-block;
-    }
-  }
-
   &[data-variant='enter'] {
     padding: var(--glass-button-enter-padding, 0.5rem 1rem);
     background: var(--enter-button-bg);
