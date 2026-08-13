@@ -80,6 +80,13 @@ const isClosedValidPolygonRing = (coordinates = []) => {
     && getUniqueCoordinateCount(coordinates) >= 3;
 };
 
+const isValidLineCoordinates = (coordinates = []) => {
+  return Array.isArray(coordinates)
+    && coordinates.length >= 2
+    && coordinates.every(isCoordinatePair)
+    && getUniqueCoordinateCount(coordinates) >= 2;
+};
+
 const normalizeCoordinatePair = (coordinate) => [Number(coordinate[0]), Number(coordinate[1])];
 
 const getCoordinateIssueKey = (coordinate) => {
@@ -422,6 +429,16 @@ export function useGisMapCore(options = {}) {
       && selectedFeature.value?.geometry?.type === 'LineString'
       && (activeLayerFeatures.value.length === 1)
       && isClosedValidPolygonRing(selectedFeature.value.geometry.coordinates ?? [])
+    );
+  });
+
+  const canCloseSelectedLine = computed(() => {
+    const coordinates = selectedFeature.value?.geometry?.coordinates ?? [];
+    return Boolean(
+      canUseSelectedGeometryTools.value
+      && selectedFeature.value?.geometry?.type === 'LineString'
+      && isValidLineCoordinates(coordinates)
+      && !coordinatesEqual(coordinates[0], coordinates[coordinates.length - 1])
     );
   });
 
@@ -834,6 +851,7 @@ export function useGisMapCore(options = {}) {
     canModifyActiveLayer,
     canEditSelectedShape,
     canUseSelectedGeometryTools,
+    canCloseSelectedLine,
     canConvertSelectedLineToPolygon,
     geometryQualitySummary,
     canDeleteSelection,

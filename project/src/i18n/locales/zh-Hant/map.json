@@ -549,6 +549,7 @@
       "duplicateFeature": "複製要素",
       "reverseGeometry": "反向幾何",
       "simplifyGeometry": "簡化幾何",
+      "closeLine": "閉合線",
       "lineToPolygon": "閉合線轉面",
       "duplicateLayer": "複製圖層",
       "renameLayer": "重命名",

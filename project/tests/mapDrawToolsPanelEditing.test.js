@@ -54,6 +54,7 @@ function mountToolsPanel(overrides = {}) {
     selectedFeatureIds: ['feature-1'],
     selectedVertexCount: 0,
     canUseSelectedGeometryTools: true,
+    canCloseSelectedLine: false,
     canConvertSelectedLineToPolygon: true,
     canDeleteSelection: false,
     canDeleteSelectedVertices: false,
@@ -82,6 +83,7 @@ function mountToolsPanel(overrides = {}) {
         @redo="events.push(['redo'])"
         @reverse-selected-geometry="events.push(['reverse-selected-geometry'])"
         @simplify-selected-geometry="events.push(['simplify-selected-geometry'])"
+        @close-selected-line="events.push(['close-selected-line'])"
         @convert-selected-line-to-polygon="events.push(['convert-selected-line-to-polygon'])"
         @delete-selected="events.push(['delete-selected'])"
       />
@@ -223,29 +225,35 @@ describe('MapDrawToolsPanel editing affordances', () => {
       selectedFeatureGeometryType: 'LineString',
       canEditShape: true,
       canModifyActiveLayer: true,
+      canCloseSelectedLine: true,
     })
     await nextTick()
 
     const reverseButton = wrapper.host.querySelector('[data-testid="draw-tool-reverse-geometry"]')
     const simplifyButton = wrapper.host.querySelector('[data-testid="draw-tool-simplify-geometry"]')
+    const closeLineButton = wrapper.host.querySelector('[data-testid="draw-tool-close-line"]')
     const convertButton = wrapper.host.querySelector('[data-testid="draw-tool-line-to-polygon"]')
 
     expect(reverseButton.disabled).toBe(false)
     expect(simplifyButton.disabled).toBe(false)
+    expect(closeLineButton.disabled).toBe(false)
     expect(convertButton.disabled).toBe(false)
 
     reverseButton.click()
     simplifyButton.click()
+    closeLineButton.click()
     convertButton.click()
     await nextTick()
 
     expect(wrapper.events).toContainEqual(['reverse-selected-geometry'])
     expect(wrapper.events).toContainEqual(['simplify-selected-geometry'])
+    expect(wrapper.events).toContainEqual(['close-selected-line'])
     expect(wrapper.events).toContainEqual(['convert-selected-line-to-polygon'])
 
     wrapper.props.selectedFeatureGeometryType = 'Polygon'
     await nextTick()
 
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-close-line"]')).toBeNull()
     expect(wrapper.host.querySelector('[data-testid="draw-tool-line-to-polygon"]')).toBeNull()
 
     wrapper.unmount()
@@ -258,12 +266,14 @@ describe('MapDrawToolsPanel editing affordances', () => {
       canEditShape: false,
       canModifyActiveLayer: false,
       canUseSelectedGeometryTools: false,
+      canCloseSelectedLine: false,
       canConvertSelectedLineToPolygon: false,
     })
     await nextTick()
 
     expect(wrapper.host.querySelector('[data-testid="draw-tool-reverse-geometry"]').disabled).toBe(true)
     expect(wrapper.host.querySelector('[data-testid="draw-tool-simplify-geometry"]').disabled).toBe(true)
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-close-line"]')).toBeNull()
     expect(wrapper.host.querySelector('[data-testid="draw-tool-line-to-polygon"]')).toBeNull()
 
     wrapper.unmount()
@@ -277,12 +287,14 @@ describe('MapDrawToolsPanel editing affordances', () => {
       canEditShape: true,
       canModifyActiveLayer: true,
       canUseSelectedGeometryTools: false,
+      canCloseSelectedLine: false,
       canConvertSelectedLineToPolygon: false,
     })
     await nextTick()
 
     expect(wrapper.host.querySelector('[data-testid="draw-tool-reverse-geometry"]').disabled).toBe(true)
     expect(wrapper.host.querySelector('[data-testid="draw-tool-simplify-geometry"]').disabled).toBe(true)
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-close-line"]').disabled).toBe(true)
     expect(wrapper.host.querySelector('[data-testid="draw-tool-line-to-polygon"]').disabled).toBe(true)
 
     wrapper.props.selectedFeatureIds = ['feature-1']
@@ -291,7 +303,13 @@ describe('MapDrawToolsPanel editing affordances', () => {
 
     expect(wrapper.host.querySelector('[data-testid="draw-tool-reverse-geometry"]').disabled).toBe(false)
     expect(wrapper.host.querySelector('[data-testid="draw-tool-simplify-geometry"]').disabled).toBe(false)
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-close-line"]').disabled).toBe(true)
     expect(wrapper.host.querySelector('[data-testid="draw-tool-line-to-polygon"]').disabled).toBe(true)
+
+    wrapper.props.canCloseSelectedLine = true
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-close-line"]').disabled).toBe(false)
 
     wrapper.props.canConvertSelectedLineToPolygon = true
     await nextTick()

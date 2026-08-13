@@ -16,6 +16,7 @@ export function useGisFeatures(options = {}) {
     canDuplicateSelectedFeature,
     canEditSelectedShape,
     canUseSelectedGeometryTools,
+    canCloseSelectedLine,
     canConvertSelectedLineToPolygon,
     canDeleteSelection,
     canMoveSelectedFeatures,
@@ -275,6 +276,15 @@ export function useGisFeatures(options = {}) {
     });
   }
 
+  async function handleCloseSelectedLine() {
+    if (!canCloseSelectedLine?.value) return;
+    await mutateSelectedGeometry((geometry) => {
+      if (geometry?.type !== 'LineString' || !isValidLineCoordinates(geometry.coordinates ?? [])) return null;
+      const coordinates = closeCoordinateRing(geometry.coordinates ?? []);
+      return { ...geometry, coordinates };
+    });
+  }
+
   async function handleConvertSelectedLineToPolygon() {
     if (!canConvertSelectedLineToPolygon?.value) return;
     await mutateSelectedGeometry((geometry, layer) => {
@@ -530,6 +540,7 @@ export function useGisFeatures(options = {}) {
     handleDuplicateSelectedFeature,
     handleReverseSelectedGeometry,
     handleSimplifySelectedGeometry,
+    handleCloseSelectedLine,
     handleConvertSelectedLineToPolygon,
     handleDeleteSelected,
     handleDeleteSelectedFeatures,

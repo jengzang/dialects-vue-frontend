@@ -184,6 +184,7 @@
           :can-redo="canRedoHistory"
           :can-edit-shape="canEditSelectedShape"
           :can-use-selected-geometry-tools="canUseSelectedGeometryTools"
+          :can-close-selected-line="canCloseSelectedLine"
           :can-convert-selected-line-to-polygon="canConvertSelectedLineToPolygon"
           :geometry-quality-summary="geometryQualitySummary"
           :can-delete-selection="canDeleteSelection"
@@ -202,6 +203,7 @@
           @duplicate-feature="handleDuplicateSelectedFeature"
           @reverse-selected-geometry="handleReverseSelectedGeometry"
           @simplify-selected-geometry="handleSimplifySelectedGeometry"
+          @close-selected-line="handleCloseSelectedLine"
           @convert-selected-line-to-polygon="handleConvertSelectedLineToPolygon"
           @undo="undoHistory"
           @redo="redoHistory"
@@ -827,7 +829,7 @@ const {
   canApplySelectedFeatureBatchProperty, featureMoveLayerOptions,
   selectedEditorProperties, selectedEditorFeatureId, selectedEditorGeometryType,
   canModifyActiveLayer, canEditSelectedShape, canDeleteSelection, canDuplicateSelectedFeature,
-  canUseSelectedGeometryTools, canConvertSelectedLineToPolygon, geometryQualitySummary,
+  canUseSelectedGeometryTools, canCloseSelectedLine, canConvertSelectedLineToPolygon, geometryQualitySummary,
   canUseFeatureBoxSelect, canMoveSelectedFeatures, selectedLayerLabel,
   createEmptyLayer, getFeatureId, getFeatureLabel, getLayerLabel,
   syncLayerIdSeedFromLayers, applyLayerPropertyToFeatures,
@@ -878,7 +880,7 @@ const gisFeatures = useGisFeatures({
   editableMapRef, currentMode, getFeatureId,
   canModifyActiveLayer, canDuplicateSelectedFeature,
   canEditSelectedShape, canDeleteSelection, canMoveSelectedFeatures,
-  canUseSelectedGeometryTools, canConvertSelectedLineToPolygon,
+  canUseSelectedGeometryTools, canCloseSelectedLine, canConvertSelectedLineToPolygon,
   setFeatureSelection, clearFeatureSelection,
   syncAllLayersAfterMutation, syncFeatureSelectionToMap,
   resetDrawSelectionMode, commitHistory,
@@ -892,7 +894,7 @@ const gisFeatures = useGisFeatures({
 
 const {
   handleEditSelectedShape, handleDuplicateSelectedFeature,
-  handleReverseSelectedGeometry, handleSimplifySelectedGeometry, handleConvertSelectedLineToPolygon,
+  handleReverseSelectedGeometry, handleSimplifySelectedGeometry, handleCloseSelectedLine, handleConvertSelectedLineToPolygon,
   handleDeleteSelected, handleDeleteSelectedFeatures, handleClearAll,
   updateFeatureProperty, updateSelectedFeatureProperty,
   updateSelectedFeaturesProperty,

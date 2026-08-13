@@ -549,6 +549,7 @@
       "duplicateFeature": "Duplicate Feature",
       "reverseGeometry": "Reverse Geometry",
       "simplifyGeometry": "Simplify Geometry",
+      "closeLine": "Close Line",
       "lineToPolygon": "Closed Line to Polygon",
       "duplicateLayer": "Duplicate Layer",
       "renameLayer": "Rename",

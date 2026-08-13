@@ -135,6 +135,17 @@
               v-if="selectedFeatureGeometryType === 'LineString'"
               class="glass-button"
               data-variant="secondary"
+              data-testid="draw-tool-close-line"
+              type="button"
+              :disabled="!canCloseSelectedLine"
+              @click="$emit('close-selected-line')"
+            >
+              {{ t('map.drawTab.buttons.closeLine') }}
+            </button>
+            <button
+              v-if="selectedFeatureGeometryType === 'LineString'"
+              class="glass-button"
+              data-variant="secondary"
               data-testid="draw-tool-line-to-polygon"
               type="button"
               :disabled="!canConvertSelectedLineToPolygon"
@@ -765,6 +776,7 @@ const props = defineProps({
   canRedo: { type: Boolean, default: false },
   canEditShape: { type: Boolean, default: false },
   canUseSelectedGeometryTools: { type: Boolean, default: false },
+  canCloseSelectedLine: { type: Boolean, default: false },
   canConvertSelectedLineToPolygon: { type: Boolean, default: false },
   geometryQualitySummary: {
     type: Object,
@@ -794,6 +806,7 @@ defineEmits([
   'duplicate-feature',
   'reverse-selected-geometry',
   'simplify-selected-geometry',
+  'close-selected-line',
   'convert-selected-line-to-polygon',
   'undo',
   'redo',

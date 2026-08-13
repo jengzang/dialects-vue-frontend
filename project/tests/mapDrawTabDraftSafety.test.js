@@ -202,14 +202,32 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         emit('update:modelValue', collection)
         emit('features-change', collection)
       }
+      const emitOpenLineUpdate = () => {
+        const [firstFeature, ...remainingFeatures] = props.modelValue?.features ?? []
+        if (!firstFeature) return
+        const collection = {
+          type: 'FeatureCollection',
+          features: [{
+            ...firstFeature,
+            geometry: {
+              type: 'LineString',
+              coordinates: [[0, 0], [2, 0], [2, 2]],
+            },
+          }, ...remainingFeatures],
+        }
+        emit('before-features-change')
+        emit('update:modelValue', collection)
+        emit('features-change', collection)
+      }
       const stringify = (value) => JSON.stringify(value)
-      return { addPolygonFeature, emitGeometryUpdate, emitDuplicateLineUpdate, stringify }
+      return { addPolygonFeature, emitGeometryUpdate, emitDuplicateLineUpdate, emitOpenLineUpdate, stringify }
     },
     template: `
       <div>
         <button data-testid="editable-map" type="button" @click="addPolygonFeature">draw polygon</button>
         <button data-testid="emit-geometry-update" type="button" @click="emitGeometryUpdate">emit geometry update</button>
         <button data-testid="emit-duplicate-line-update" type="button" @click="emitDuplicateLineUpdate">emit duplicate line update</button>
+        <button data-testid="emit-open-line-update" type="button" @click="emitOpenLineUpdate">emit open line update</button>
         <button
           data-testid="emit-direct-select"
           type="button"
@@ -330,6 +348,7 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       canUseFeatureBoxSelect: { type: Boolean, default: false },
       canModifyActiveLayer: { type: Boolean, default: false },
       canUseSelectedGeometryTools: { type: Boolean, default: false },
+      canCloseSelectedLine: { type: Boolean, default: false },
       canConvertSelectedLineToPolygon: { type: Boolean, default: false },
       geometryQualitySummary: {
         type: Object,
@@ -350,6 +369,7 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       'set-selected-features-locked',
       'reverse-selected-geometry',
       'simplify-selected-geometry',
+      'close-selected-line',
       'convert-selected-line-to-polygon',
       'update-feature-property',
       'update-feature-table-cell',
@@ -403,6 +423,13 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
           @click="$emit('simplify-selected-geometry')"
         >
           simplify geometry
+        </button>
+        <button
+          data-testid="close-selected-line"
+          type="button"
+          @click="$emit('close-selected-line')"
+        >
+          close line
         </button>
         <button
           data-testid="convert-selected-line-to-polygon"
@@ -2369,6 +2396,48 @@ describe('MapDrawTab draft safety', () => {
     expect(mocks.latestToolsPanelProps.selectedFeatureGeometryType).toBe('Polygon')
     expect(mocks.latestToolsPanelProps.selectedFeatureIds).toEqual(['feature-1'])
     expect(mocks.mapSelectFeature).toHaveBeenLastCalledWith('feature-1', { directEdit: false })
+
+    wrapper.unmount()
+  })
+
+  it('closes an open selected line and keeps the change undoable', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createLineLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="feature-checkbox"]').click()
+    await flushTicks()
+
+    wrapper.host.querySelector('[data-testid="emit-open-line-update"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinates"]').textContent)
+      .toBe('[[0,0],[2,0],[2,2]]')
+
+    expect(mocks.latestToolsPanelProps.canCloseSelectedLine).toBe(true)
+    expect(mocks.latestToolsPanelProps.canConvertSelectedLineToPolygon).toBe(false)
+
+    wrapper.host.querySelector('[data-testid="close-selected-line"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinates"]').textContent)
+      .toBe('[[0,0],[2,0],[2,2],[0,0]]')
+    expect(mocks.latestToolsPanelProps.canCloseSelectedLine).toBe(false)
+    expect(mocks.latestToolsPanelProps.canConvertSelectedLineToPolygon).toBe(true)
+
+    document.dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      key: 'z',
+      metaKey: true,
+    }))
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinates"]').textContent)
+      .toBe('[[0,0],[2,0],[2,2]]')
 
     wrapper.unmount()
   })
