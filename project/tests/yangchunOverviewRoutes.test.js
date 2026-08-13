@@ -124,12 +124,15 @@ describe('Yangchun Explore pages', () => {
   it('uses a horizontally scrollable dialect group carousel on the overview page', () => {
     const source = readSource('src/main/views/explore/yangchun/YangChunOverviewPage.vue')
 
+    expect(source).toContain("@use '@/styles/global/scrollbars' as scrollbars;")
     expect(source).toContain('ref="groupScroller"')
     expect(source).toContain('yc-group-carousel')
     expect(source).toContain('yc-group-scroller')
     expect(source).toContain("scrollGroupCarousel('prev')")
     expect(source).toContain("scrollGroupCarousel('next')")
     expect(source).toContain('scroll-snap-type: x mandatory')
+    expect(source).toContain('@include scrollbars.hidden-scrollbar;')
+    expect(source).toContain('@include scrollbars.hidden-scrollbar-webkit;')
   })
 
   it('scrolls the dialect group carousel and centers the selected group card', async () => {

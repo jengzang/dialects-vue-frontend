@@ -462,6 +462,7 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
+@use '@/styles/global/scrollbars' as scrollbars;
 
 .yangchun-overview {
   @include flex-col;
@@ -709,6 +710,8 @@ onBeforeUnmount(() => {
 }
 
 .yc-group-scroller {
+  @include scrollbars.hidden-scrollbar;
+  @include scrollbars.hidden-scrollbar-webkit;
   display: flex;
   gap: 14px;
   align-items: center;
