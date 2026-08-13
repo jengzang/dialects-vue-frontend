@@ -200,7 +200,7 @@ const {
 
 const visibleNavItems = computed(() => {
   if (!isSingleLocation.value) return locationNavItems.value
-  return locationNavItems.value.filter((item) => item.kind !== 'total')
+  return locationNavItems.value.filter((item) => item.kind !== 'total' && item.kind !== 'charts')
 })
 
 const handleRunDisabled = (disabled) => {
@@ -983,12 +983,11 @@ const consumePendingCountphosLocations = () => {
   loadData()
 }
 
-const openSyllableHeatmap = (syllable) => {
-  if (!syllable || !canShowSyllableHeatmap.value) return
+const openSyllableHeatmap = () => {
+  if (!canShowSyllableHeatmap.value) return
 
   mapStore.mode = 'syllableHeatmap'
   mapStore.syllableHeatmapPayload = {
-    syllable,
     toneMode: syllableMode.value,
     points: Array.isArray(syllableData.value?.points) ? syllableData.value.points : []
   }
@@ -998,8 +997,7 @@ const openSyllableHeatmap = (syllable) => {
     path: buildLocalePath(resolveRouteLocale(route), '/menu/map/view'),
     query: {
       mode: 'syllableHeatmap',
-      toneMode: syllableMode.value,
-      syllable
+      toneMode: syllableMode.value
     }
   })
 }
@@ -1078,7 +1076,7 @@ onBeforeUnmount(() => {
         <p>{{ $t('phonology.phonology.countphos.actions.loading') }}</p>
       </div>
       <!-- 匯總統計部分 -->
-      <section class="aggregated-section glass-panel">
+      <section v-if="!isSingleLocation" class="aggregated-section glass-panel">
         <!-- <h3 class="section-title">匯總統計</h3> -->
         <h3 class="section-title section-title--with-pill">
           <span>{{ $t('phonology.phonology.countphos.titlePrefix') }}</span>
@@ -1206,14 +1204,23 @@ onBeforeUnmount(() => {
               {{ $t('phonology.phonology.countphos.syllables.subtitle') }}
             </p>
           </div>
-          <SwitchToggle
-            v-model="isTonedSyllableMode"
-            :active-text="$t('phonology.phonology.countphos.syllables.modes.toned')"
-            :inactive-text="$t('phonology.phonology.countphos.syllables.modes.toneless')"
-            :aria-label="$t('phonology.phonology.countphos.syllables.modeSwitch')"
-            color="green"
-            show-label
-          />
+          <div class="syllable-section-controls">
+            <button
+              v-if="canShowSyllableHeatmap"
+              class="expand-btn heatmap-btn"
+              @click="openSyllableHeatmap"
+            >
+              {{ $t('phonology.phonology.countphos.syllables.heatmap') }}
+            </button>
+            <SwitchToggle
+              v-model="isTonedSyllableMode"
+              :active-text="$t('phonology.phonology.countphos.syllables.modes.toned')"
+              :inactive-text="$t('phonology.phonology.countphos.syllables.modes.toneless')"
+              :aria-label="$t('phonology.phonology.countphos.syllables.modeSwitch')"
+              color="green"
+              show-label
+            />
+          </div>
         </div>
 
         <div class="syllable-summary-row">
@@ -1250,19 +1257,30 @@ onBeforeUnmount(() => {
                 </span>
               </div>
             </div>
+            <div class="location-tags">
+              <!-- 显示前10个地点 -->
+              <span
+                v-for="loc in item.locations.slice(0, 10)"
+                :key="loc"
+                class="location-tag"
+              >
+                {{ loc }}
+              </span>
+              <!-- 如果超过10个，显示展开按钮 -->
+              <button
+                v-if="item.locations.length > 10"
+                class="expand-btn"
+                @click="openLocationModal(item.syllable, syllableModeLabel, item)"
+              >
+                {{ $t('phonology.phonology.countphos.stats.more', { count: item.locations.length - 10 }) }}
+              </button>
+            </div>
             <div class="syllable-card-actions">
               <button
                 class="expand-btn"
                 @click="openLocationModal(item.syllable, syllableModeLabel, item)"
               >
                 {{ $t('phonology.phonology.countphos.syllables.viewLocations') }}
-              </button>
-              <button
-                v-if="canShowSyllableHeatmap"
-                class="expand-btn heatmap-btn"
-                @click="openSyllableHeatmap(item.syllable)"
-              >
-                {{ $t('phonology.phonology.countphos.syllables.heatmap') }}
               </button>
             </div>
           </div>
@@ -1527,6 +1545,12 @@ $primary-deep: #003d9e;
     justify-content: space-between;
     gap: 16px;
     margin-bottom: 14px;
+  }
+
+  .syllable-section-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
   .syllable-summary-row {

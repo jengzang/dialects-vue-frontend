@@ -744,15 +744,14 @@ const drawCompareMap = () => {
 const getSyllableHeatmapFeatureCollection = () => {
   const payload = mapStore.syllableHeatmapPayload || {};
   const toneMode = payload.toneMode === 'toned' ? 'toned' : 'toneless';
-  const syllable = payload.syllable || '';
   const points = Array.isArray(payload.points) ? payload.points : [];
 
   return {
     type: 'FeatureCollection',
     features: points
       .map((point) => {
-        const count = Number(point?.[toneMode]?.[syllable] || 0);
-        if (count <= 0 || !isValidCoordinatePair(point?.coordinate)) return null;
+        const uniqueSyllables = Number(point?.unique_syllables?.[toneMode] || 0);
+        if (uniqueSyllables <= 0 || !isValidCoordinatePair(point?.coordinate)) return null;
 
         return {
           type: 'Feature',
@@ -762,11 +761,10 @@ const getSyllableHeatmapFeatureCollection = () => {
           },
           properties: {
             location: point.location || '',
-            syllable,
             toneMode,
-            count,
-            totalTokens: Number(point?.total_tokens?.[toneMode] || 0),
-            uniqueSyllables: Number(point?.unique_syllables?.[toneMode] || 0)
+            count: uniqueSyllables,
+            uniqueSyllables,
+            totalTokens: Number(point?.total_tokens?.[toneMode] || 0)
           }
         };
       })
@@ -784,10 +782,12 @@ const createSyllableHeatmapPopupNode = (properties) => {
   title.textContent = properties.location || '';
   const mode = document.createElement('div');
   mode.textContent = `${t('phonology.phonology.countphos.syllables.currentMode')}: ${toneModeText}`;
-  const count = document.createElement('div');
-  count.textContent = `${properties.syllable}: ${properties.count}`;
+  const unique = document.createElement('div');
+  unique.textContent = `${t('phonology.phonology.countphos.syllables.unique')}: ${properties.uniqueSyllables}`;
+  const tokens = document.createElement('div');
+  tokens.textContent = `${t('phonology.phonology.countphos.syllables.tokens')}: ${properties.totalTokens}`;
 
-  container.append(title, mode, count);
+  container.append(title, mode, unique, tokens);
   return container;
 };
 
@@ -811,8 +811,11 @@ const drawSyllableHeatmap = () => {
         ['linear'],
         ['get', 'count'],
         0, 0,
-        1, 0.2,
-        10, 1
+        100, 0.15,
+        200, 0.35,
+        400, 0.6,
+        800, 0.85,
+        1500, 1
       ],
       'heatmap-intensity': [
         'interpolate',
@@ -859,8 +862,10 @@ const drawSyllableHeatmap = () => {
         'interpolate',
         ['linear'],
         ['get', 'count'],
-        1, 4,
-        10, 12
+        0, 3,
+        200, 6,
+        500, 10,
+        1500, 16
       ],
       'circle-color': '#ef8a62',
       'circle-stroke-color': '#ffffff',
