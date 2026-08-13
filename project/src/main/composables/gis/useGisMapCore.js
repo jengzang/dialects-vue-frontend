@@ -78,6 +78,88 @@ const isClosedValidPolygonRing = (coordinates = []) => {
     && getUniqueCoordinateCount(coordinates) >= 3;
 };
 
+const normalizeCoordinatePair = (coordinate) => [Number(coordinate[0]), Number(coordinate[1])];
+
+const getCoordinateIssueKey = (coordinate) => {
+  if (!isCoordinatePair(coordinate)) return '';
+  const [lng, lat] = normalizeCoordinatePair(coordinate);
+  return `${lng},${lat}`;
+};
+
+const getDuplicateCoordinateCount = (coordinates = []) => {
+  const seen = new Set();
+  const duplicates = new Set();
+  coordinates.forEach((coordinate, index) => {
+    if (!isCoordinatePair(coordinate)) return;
+    if (index === coordinates.length - 1 && coordinatesEqual(coordinate, coordinates[0])) return;
+    const key = getCoordinateIssueKey(coordinate);
+    if (seen.has(key)) duplicates.add(key);
+    seen.add(key);
+  });
+  return duplicates.size;
+};
+
+const getSignedRingArea = (ring = []) => {
+  if (!Array.isArray(ring) || ring.length < 4) return 0;
+  let area = 0;
+  for (let index = 0; index < ring.length - 1; index += 1) {
+    const current = ring[index];
+    const next = ring[index + 1];
+    if (!isCoordinatePair(current) || !isCoordinatePair(next)) continue;
+    area += Number(current[0]) * Number(next[1]) - Number(next[0]) * Number(current[1]);
+  }
+  return area / 2;
+};
+
+const getOrientation = (a, b, c) => {
+  const value = (
+    (Number(b[1]) - Number(a[1])) * (Number(c[0]) - Number(b[0]))
+    - (Number(b[0]) - Number(a[0])) * (Number(c[1]) - Number(b[1]))
+  );
+  if (Math.abs(value) <= 1e-10) return 0;
+  return value > 0 ? 1 : 2;
+};
+
+const isCoordinateOnSegment = (a, b, c) => {
+  return Number(b[0]) <= Math.max(Number(a[0]), Number(c[0]))
+    && Number(b[0]) >= Math.min(Number(a[0]), Number(c[0]))
+    && Number(b[1]) <= Math.max(Number(a[1]), Number(c[1]))
+    && Number(b[1]) >= Math.min(Number(a[1]), Number(c[1]));
+};
+
+const segmentsIntersect = (a, b, c, d) => {
+  if (!isCoordinatePair(a) || !isCoordinatePair(b) || !isCoordinatePair(c) || !isCoordinatePair(d)) return false;
+  const o1 = getOrientation(a, b, c);
+  const o2 = getOrientation(a, b, d);
+  const o3 = getOrientation(c, d, a);
+  const o4 = getOrientation(c, d, b);
+  if (o1 !== o2 && o3 !== o4) return true;
+  return (o1 === 0 && isCoordinateOnSegment(a, c, b))
+    || (o2 === 0 && isCoordinateOnSegment(a, d, b))
+    || (o3 === 0 && isCoordinateOnSegment(c, a, d))
+    || (o4 === 0 && isCoordinateOnSegment(c, b, d));
+};
+
+const hasRingSelfIntersection = (ring = []) => {
+  if (!Array.isArray(ring) || ring.length < 5) return false;
+  for (let firstIndex = 0; firstIndex < ring.length - 1; firstIndex += 1) {
+    for (let secondIndex = firstIndex + 1; secondIndex < ring.length - 1; secondIndex += 1) {
+      const isAdjacent = Math.abs(firstIndex - secondIndex) <= 1;
+      const sharesClosure = firstIndex === 0 && secondIndex === ring.length - 2;
+      if (isAdjacent || sharesClosure) continue;
+      if (segmentsIntersect(ring[firstIndex], ring[firstIndex + 1], ring[secondIndex], ring[secondIndex + 1])) {
+        return true;
+      }
+    }
+  }
+  return false;
+};
+
+const pushGeometryQualityIssue = (issues, id, label, level = 'warning') => {
+  if (issues.some((item) => item.id === id)) return;
+  issues.push({ id, label, level });
+};
+
 export function useGisMapCore(options = {}) {
   const { t } = useI18n();
   const {
@@ -335,6 +417,48 @@ export function useGisMapCore(options = {}) {
       && (activeLayerFeatures.value.length === 1)
       && isClosedValidPolygonRing(selectedFeature.value.geometry.coordinates ?? [])
     );
+  });
+
+  const geometryQualitySummary = computed(() => {
+    const issues = [];
+    activeLayerFeatures.value.forEach((feature) => {
+      const geometry = feature?.geometry;
+      if (!geometry?.type) {
+        pushGeometryQualityIssue(issues, 'empty-geometry', t('map.drawTab.labels.geometryQualityEmptyGeometry'), 'error');
+        return;
+      }
+      if (geometry.type === 'LineString') {
+        const coordinates = geometry.coordinates ?? [];
+        if (getDuplicateCoordinateCount(coordinates) > 0) {
+          pushGeometryQualityIssue(issues, 'duplicate-coordinate', t('map.drawTab.labels.geometryQualityDuplicateCoordinate'), 'warning');
+        }
+        if (getUniqueCoordinateCount(coordinates) < 2) {
+          pushGeometryQualityIssue(issues, 'zero-length-line', t('map.drawTab.labels.geometryQualityZeroLengthLine'), 'error');
+        }
+        return;
+      }
+      if (geometry.type === 'Polygon') {
+        (geometry.coordinates ?? []).forEach((ring) => {
+          if (getDuplicateCoordinateCount(ring) > 0) {
+            pushGeometryQualityIssue(issues, 'duplicate-coordinate', t('map.drawTab.labels.geometryQualityDuplicateCoordinate'), 'warning');
+          }
+          if (!isClosedValidPolygonRing(ring)) {
+            pushGeometryQualityIssue(issues, 'invalid-polygon-ring', t('map.drawTab.labels.geometryQualityInvalidPolygonRing'), 'error');
+          }
+          if (Math.abs(getSignedRingArea(ring)) <= 1e-10) {
+            pushGeometryQualityIssue(issues, 'zero-area-polygon', t('map.drawTab.labels.geometryQualityZeroAreaPolygon'), 'error');
+          }
+          if (hasRingSelfIntersection(ring)) {
+            pushGeometryQualityIssue(issues, 'self-intersection', t('map.drawTab.labels.geometryQualitySelfIntersection'), 'error');
+          }
+        });
+      }
+    });
+    return {
+      hasIssues: issues.length > 0,
+      issueCount: issues.length,
+      items: issues.slice(0, 5),
+    };
   });
 
   const canDeleteSelection = computed(() => {
@@ -693,6 +817,7 @@ export function useGisMapCore(options = {}) {
     canEditSelectedShape,
     canUseSelectedGeometryTools,
     canConvertSelectedLineToPolygon,
+    geometryQualitySummary,
     canDeleteSelection,
     canDuplicateSelectedFeature,
     canUseFeatureBoxSelect,

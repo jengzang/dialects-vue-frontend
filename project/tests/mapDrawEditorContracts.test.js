@@ -262,6 +262,22 @@ describe('Map draw editor contracts', () => {
     expect(featuresSource).toContain("layerGeometryType: 'Polygon'")
   })
 
+  it('surfaces active layer geometry quality diagnostics in the draw tools panel', () => {
+    const coreSource = readSource(useGisMapCorePath)
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+
+    expect(coreSource).toContain('const geometryQualitySummary = computed')
+    expect(coreSource).toContain('getDuplicateCoordinateCount')
+    expect(coreSource).toContain('hasRingSelfIntersection')
+    expect(coreSource).toContain('geometryQualityDuplicateCoordinate')
+    expect(coreSource).toContain('geometryQualitySelfIntersection')
+    expect(panelSource).toContain('geometryQualitySummary')
+    expect(panelSource).toContain('data-testid="geometry-quality-status"')
+    expect(panelSource).toContain(`t('map.drawTab.labels.geometryQualityIssueCount'`)
+    expect(tabSource).toContain(':geometry-quality-summary="geometryQualitySummary"')
+  })
+
   it('exposes first-class coordinate-path vertex editing for lines and polygons', () => {
     const editableSource = readSource(editableMapLibrePath)
 

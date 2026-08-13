@@ -260,6 +260,38 @@
               </button>
             </div>
           </div>
+          <div
+            class="draw-shape-edit-status"
+            data-testid="geometry-quality-status"
+          >
+            <div class="draw-shape-edit-main">
+              <span
+                class="draw-shape-edit-target"
+                data-testid="geometry-quality-title"
+              >
+                {{ t('map.drawTab.labels.geometryQuality') }}
+              </span>
+              <span
+                class="draw-shape-edit-count"
+                data-testid="geometry-quality-count"
+              >
+                {{ geometryQualitySummary.hasIssues ? t('map.drawTab.labels.geometryQualityIssueCount', { count: geometryQualitySummary.issueCount }) : t('map.drawTab.labels.geometryQualityOk') }}
+              </span>
+            </div>
+            <div
+              v-if="geometryQualitySummary.hasIssues"
+              class="draw-shape-edit-tips"
+            >
+              <span
+                v-for="item in geometryQualitySummary.items"
+                :key="item.id"
+                data-testid="geometry-quality-item"
+                :data-level="item.level"
+              >
+                {{ item.label }}
+              </span>
+            </div>
+          </div>
         </section>
 
         <section class="draw-tool-section">
@@ -734,6 +766,14 @@ const props = defineProps({
   canEditShape: { type: Boolean, default: false },
   canUseSelectedGeometryTools: { type: Boolean, default: false },
   canConvertSelectedLineToPolygon: { type: Boolean, default: false },
+  geometryQualitySummary: {
+    type: Object,
+    default: () => ({
+      hasIssues: false,
+      issueCount: 0,
+      items: [],
+    }),
+  },
   canDeleteSelection: { type: Boolean, default: false },
   canDeleteSelectedVertices: { type: Boolean, default: false },
   canDuplicateFeature: { type: Boolean, default: false },

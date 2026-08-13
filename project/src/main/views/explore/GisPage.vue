@@ -149,6 +149,7 @@
           :can-edit-shape="canEditSelectedShape"
           :can-use-selected-geometry-tools="canUseSelectedGeometryTools"
           :can-convert-selected-line-to-polygon="canConvertSelectedLineToPolygon"
+          :geometry-quality-summary="geometryQualitySummary"
           :can-delete-selection="canDeleteSelection"
           :can-duplicate-feature="canDuplicateSelectedFeature"
           :is-feature-box-select-mode="isFeatureBoxSelectMode"
@@ -788,7 +789,7 @@ const {
   canApplySelectedFeatureBatchProperty, featureMoveLayerOptions,
   selectedEditorProperties, selectedEditorFeatureId, selectedEditorGeometryType,
   canModifyActiveLayer, canEditSelectedShape, canDeleteSelection, canDuplicateSelectedFeature,
-  canUseSelectedGeometryTools, canConvertSelectedLineToPolygon,
+  canUseSelectedGeometryTools, canConvertSelectedLineToPolygon, geometryQualitySummary,
   canUseFeatureBoxSelect, canMoveSelectedFeatures, selectedLayerLabel,
   createEmptyLayer, getFeatureId, getFeatureLabel, getLayerLabel,
   syncLayerIdSeedFromLayers, applyLayerPropertyToFeatures,

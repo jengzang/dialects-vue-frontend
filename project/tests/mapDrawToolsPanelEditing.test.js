@@ -61,6 +61,11 @@ function mountToolsPanel(overrides = {}) {
     canModifyActiveLayer: true,
     selectedFeatureProperties: { name: '边界 A', visible: true, locked: false },
     selectedFeatureGeometryType: 'Polygon',
+    geometryQualitySummary: {
+      hasIssues: false,
+      issueCount: 0,
+      items: [],
+    },
     ...overrides,
   })
 
@@ -292,6 +297,40 @@ describe('MapDrawToolsPanel editing affordances', () => {
     await nextTick()
 
     expect(wrapper.host.querySelector('[data-testid="draw-tool-line-to-polygon"]').disabled).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('shows geometry quality status and diagnostics in the drawing tools panel', async () => {
+    const wrapper = mountToolsPanel({
+      geometryQualitySummary: {
+        hasIssues: true,
+        issueCount: 2,
+        items: [
+          { id: 'duplicate', label: '重复顶点', level: 'warning' },
+          { id: 'self-intersection', label: '面自相交', level: 'error' },
+        ],
+      },
+    })
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-testid="geometry-quality-title"]').textContent)
+      .toContain('map.drawTab.labels.geometryQuality')
+    expect(wrapper.host.querySelector('[data-testid="geometry-quality-count"]').textContent)
+      .toContain('map.drawTab.labels.geometryQualityIssueCount{"count":2}')
+    expect([...wrapper.host.querySelectorAll('[data-testid="geometry-quality-item"]')]
+      .map((item) => item.textContent)).toEqual(['重复顶点', '面自相交'])
+
+    wrapper.props.geometryQualitySummary = {
+      hasIssues: false,
+      issueCount: 0,
+      items: [],
+    }
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-testid="geometry-quality-count"]').textContent)
+      .toContain('map.drawTab.labels.geometryQualityOk')
+    expect(wrapper.host.querySelectorAll('[data-testid="geometry-quality-item"]')).toHaveLength(0)
 
     wrapper.unmount()
   })

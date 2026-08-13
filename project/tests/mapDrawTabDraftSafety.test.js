@@ -185,13 +185,31 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         emit('update:modelValue', collection)
         emit('features-change', collection)
       }
+      const emitDuplicateLineUpdate = () => {
+        const [firstFeature, ...remainingFeatures] = props.modelValue?.features ?? []
+        if (!firstFeature) return
+        const collection = {
+          type: 'FeatureCollection',
+          features: [{
+            ...firstFeature,
+            geometry: {
+              type: 'LineString',
+              coordinates: [[0, 0], [0, 0], [1, 1]],
+            },
+          }, ...remainingFeatures],
+        }
+        emit('before-features-change')
+        emit('update:modelValue', collection)
+        emit('features-change', collection)
+      }
       const stringify = (value) => JSON.stringify(value)
-      return { addPolygonFeature, emitGeometryUpdate, stringify }
+      return { addPolygonFeature, emitGeometryUpdate, emitDuplicateLineUpdate, stringify }
     },
     template: `
       <div>
         <button data-testid="editable-map" type="button" @click="addPolygonFeature">draw polygon</button>
         <button data-testid="emit-geometry-update" type="button" @click="emitGeometryUpdate">emit geometry update</button>
+        <button data-testid="emit-duplicate-line-update" type="button" @click="emitDuplicateLineUpdate">emit duplicate line update</button>
         <button
           data-testid="emit-direct-select"
           type="button"
@@ -302,6 +320,10 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       canModifyActiveLayer: { type: Boolean, default: false },
       canUseSelectedGeometryTools: { type: Boolean, default: false },
       canConvertSelectedLineToPolygon: { type: Boolean, default: false },
+      geometryQualitySummary: {
+        type: Object,
+        default: () => ({ hasIssues: false, issueCount: 0, items: [] }),
+      },
     },
     emits: [
       'set-mode',
@@ -2212,6 +2234,35 @@ describe('MapDrawTab draft safety', () => {
     expect(wrapper.host.querySelector('[data-testid="first-feature-coordinates"]').textContent)
       .toBe('[[0,0],[0.5,0],[1,0],[1,1],[0,0]]')
     expect(mocks.latestToolsPanelProps.selectedFeatureIds).toEqual(['feature-1', 'feature-2'])
+
+    wrapper.unmount()
+  })
+
+  it('surfaces active layer geometry quality diagnostics in the tools panel', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createLineLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    expect(mocks.latestToolsPanelProps.geometryQualitySummary).toMatchObject({
+      hasIssues: false,
+      issueCount: 0,
+      items: [],
+    })
+
+    wrapper.host.querySelector('[data-testid="emit-duplicate-line-update"]').click()
+    await flushTicks()
+
+    expect(mocks.latestToolsPanelProps.geometryQualitySummary.hasIssues).toBe(true)
+    expect(mocks.latestToolsPanelProps.geometryQualitySummary.items.map((item) => item.id))
+      .toContain('duplicate-coordinate')
 
     wrapper.unmount()
   })
