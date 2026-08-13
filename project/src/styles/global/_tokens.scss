@@ -117,10 +117,6 @@
   --enter-button-bg-hover: var(--color-primary-hover);
   --enter-button-text: white;
   --enter-button-shadow: 0 2px 6px rgba(var(--color-primary-rgb), 0.3);
-  --switch-hover-background: dimgray;
-  --switch-thumb-background: white;
-  --switch-label-text: black;
-  --switch-thumb-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.5);
   --sidebar-item-background: var(--glass-80);
   --sidebar-item-background-hover: var(--glass-60);
   --sidebar-item-text: var(--color-primary-hover);
@@ -242,7 +238,6 @@
   --shadow-sm-strong: 0 2px 8px rgba(0, 0, 0, 0.2);
   --shadow-above-sm: 0 4px 8px rgba(0, 0, 0, 0.15);
   --shadow-above: 0 4px 15px rgba(0, 0, 0, 0.2);
-  --shadow-spread: 0 6px 18px rgba(0, 0, 0, 0.2);
   --shadow-card: 0 12px 24px rgba(0, 0, 0, 0.15);
   --shadow-card-sm: 0 8px 32px rgba(0, 0, 0, 0.15);
   --shadow-popup: 0 16px 44px rgba(0, 0, 0, 0.18);
@@ -346,10 +341,6 @@
   --enter-button-bg-hover: #000000;
   --enter-button-text: #ffffff;
   --enter-button-shadow: 0 2px 8px rgba(29, 29, 31, 0.18);
-  --switch-hover-background: rgba(29, 29, 31, 0.16);
-  --switch-thumb-background: #ffffff;
-  --switch-label-text: #1d1d1f;
-  --switch-thumb-shadow: 0 0 8px rgba(29, 29, 31, 0.16);
   --sidebar-item-background: rgba(255, 255, 255, 0.84);
   --sidebar-item-background-hover: rgba(255, 255, 255, 0.96);
   --sidebar-item-text: #2f343b;
@@ -542,10 +533,6 @@
   --enter-button-bg-hover: #1b5e20;
   --enter-button-text: #ffffff;
   --enter-button-shadow: 0 2px 8px rgba(56, 142, 60, 0.22);
-  --switch-hover-background: rgba(56, 142, 60, 0.18);
-  --switch-thumb-background: #ffffff;
-  --switch-label-text: #1d3d20;
-  --switch-thumb-shadow: 0 0 8px rgba(56, 142, 60, 0.24);
 
   --sidebar-shell-background: linear-gradient(145deg, rgba(215, 228, 210, 0.96), rgba(196, 220, 190, 0.86));
   --sidebar-shell-border: rgba(90, 148, 86, 0.42);
@@ -710,10 +697,6 @@
   --enter-button-bg-hover: #2ea043;
   --enter-button-text: #ffffff;
   --enter-button-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-  --switch-hover-background: rgba(240, 246, 252, 0.12);
-  --switch-thumb-background: #e6edf3;
-  --switch-label-text: #e6edf3;
-  --switch-thumb-shadow: 0 0 8px rgba(88, 166, 255, 0.2);
 
   /* ── 側邊欄 ── */
   --sidebar-shell-background: linear-gradient(145deg, #161b22, #0d1117);
