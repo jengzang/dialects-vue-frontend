@@ -308,6 +308,10 @@ export async function getFeatureCounts(params = {}) {
       query.append('region_mode', params.region_mode)
     }
 
+    if (params.new_format) {
+      query.append('new_format', 'true')
+    }
+
     return await api(`/api/feature_counts?${query.toString()}`, {
       loginPromptEligible: true
     })

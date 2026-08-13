@@ -110,7 +110,7 @@ describe('syllable count frontend contracts', () => {
   it('defaults Countphos to the syllable snapshot view with feature snapshot loaded in the background', () => {
     const source = readSource('src/main/components/pho/Countphos.vue')
 
-    expect(source).toContain("import all_syllable_counts from '/data/syllable_counts_20260813.json?url'")
+    expect(source).toContain("import all_syllable_counts from '/data/syllable_counts_20260814.json?url'")
     expect(source).toContain('const queryMode = ref({ featureCounts: false, syllableCounts: true })')
     expect(source).toContain('normalizeSyllableSnapshot')
     expect(source).toContain('getDefaultSyllableData')

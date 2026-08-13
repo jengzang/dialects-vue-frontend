@@ -18,8 +18,10 @@ import { useNavAnchorJump } from '@/composables/bar/useNavAnchorJump.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { requestMapFitView } from '@/utils/map/MapData.js'
 import { showConfirm } from '@/utils/ui/message.js'
-import all_feature_counts from '/data/feature_counts_20260624.json?url'
-import all_syllable_counts from '/data/syllable_counts_20260813.json?url'
+import all_feature_counts from '/data/feature_counts_20260814.json?url'
+import all_syllable_counts from '/data/syllable_counts_20260814.json?url'
+import all_points from '/data/points_20260814.json?url'
+import { resolveStatsLocations } from '@/main/utils/countData.js'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -94,6 +96,8 @@ let defaultCountsCache = null
 let defaultCountsPromise = null
 let defaultSyllableCache = null
 let defaultSyllablePromise = null
+let defaultPointsCache = null
+let defaultPointsPromise = null
 
 // 弹窗状态
 const showLocationModal = ref(false)
@@ -797,27 +801,78 @@ const renderAllCharts = async () => {
   }
 }
 
+// points_YYYYMMDD.json 是唯一的地点名↔id 映射表,快照视图共用
+const getDefaultPointsMaps = () => {
+  if (defaultPointsCache) {
+    return Promise.resolve(defaultPointsCache)
+  }
+
+  if (!defaultPointsPromise) {
+    defaultPointsPromise = fetch(all_points)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Failed to load points data: ${res.status}`)
+        }
+        return res.json()
+      })
+      .then((result) => {
+        defaultPointsCache = {
+          byId: new Map((result?.points || []).map((p) => [p.id, p.location]))
+        }
+        return defaultPointsCache
+      })
+      .finally(() => {
+        defaultPointsPromise = null
+      })
+  }
+
+  return defaultPointsPromise
+}
+
+// 特征快照:新文件按 聲母/韻母/聲調 分档,每档条目带 bitmap,解码成地点名数组
+const normalizeFeatureSnapshot = (result = {}, byId, locationsCount) => {
+  const normalized = {}
+
+  Object.entries(result || {}).forEach(([featureType, features]) => {
+    if (!features || typeof features !== 'object') return
+
+    const out = {}
+    Object.entries(features).forEach(([key, stats]) => {
+      out[key] = {
+        totalCount: Number(stats?.totalCount || 0),
+        locationCount: Number(stats?.locationCount || 0),
+        locations: resolveStatsLocations(stats, byId, locationsCount)
+      }
+    })
+
+    normalized[featureType] = out
+  })
+
+  return normalizeAndFilterAggregatedData(normalized, { applyDefaultThreshold: true })
+}
+
 const getDefaultCountsData = async () => {
   if (defaultCountsCache) {
     return defaultCountsCache
   }
 
   if (!defaultCountsPromise) {
-    defaultCountsPromise = fetch(all_feature_counts)
-      .then((res) => {
+    defaultCountsPromise = Promise.all([
+      fetch(all_feature_counts).then((res) => {
         if (!res.ok) {
           throw new Error(`Failed to load default feature counts: ${res.status}`)
         }
         return res.json()
-      })
-      .then((result) => {
-        const aggregated = normalizeAndFilterAggregatedData(result?.aggregated || result || {}, {
-          applyDefaultThreshold: true
-        })
+      }),
+      getDefaultPointsMaps()
+    ])
+      .then(([result, pointMaps]) => {
+        const locationsCount = Number(result?.locations_count || 0)
+        const aggregated = normalizeFeatureSnapshot(result, pointMaps.byId, locationsCount)
 
         defaultCountsCache = {
           aggregated,
-          locationCount: Number(result?.locationCount || 0) || inferAggregatedLocationCount(aggregated)
+          locationCount: locationsCount
         }
 
         return defaultCountsCache
@@ -831,12 +886,22 @@ const getDefaultCountsData = async () => {
 }
 
 // syllable snapshot 无单地点数据,包装成前端期望的 aggregated 结构
-const normalizeSyllableSnapshot = (result = {}) => {
+// 新文件每个音节带 bitmap,解码成地点名数组
+const normalizeSyllableSnapshot = (result = {}, byId, locationsCount) => {
   const normalized = {}
 
   for (const mode of ['toneless', 'toned']) {
     const section = result[mode]
     if (!section) continue
+
+    const syllables = {}
+    Object.entries(section.syllables || {}).forEach(([syllable, stats]) => {
+      syllables[syllable] = {
+        totalCount: Number(stats?.totalCount || 0),
+        locationCount: Number(stats?.locationCount || 0),
+        locations: resolveStatsLocations(stats, byId, locationsCount)
+      }
+    })
 
     normalized[mode] = {
       total_tokens: section.total_tokens,
@@ -845,7 +910,7 @@ const normalizeSyllableSnapshot = (result = {}) => {
       aggregated: {
         total_tokens: section.total_tokens,
         unique_syllables: section.unique_syllables,
-        syllables: section.syllables || {}
+        syllables
       }
     }
   }
@@ -859,15 +924,17 @@ const getDefaultSyllableData = async () => {
   }
 
   if (!defaultSyllablePromise) {
-    defaultSyllablePromise = fetch(all_syllable_counts)
-      .then((res) => {
+    defaultSyllablePromise = Promise.all([
+      fetch(all_syllable_counts).then((res) => {
         if (!res.ok) {
           throw new Error(`Failed to load default syllable counts: ${res.status}`)
         }
         return res.json()
-      })
-      .then((result) => {
-        const normalized = normalizeSyllableSnapshot(result)
+      }),
+      getDefaultPointsMaps()
+    ])
+      .then(([result, pointMaps]) => {
+        const normalized = normalizeSyllableSnapshot(result, pointMaps.byId, Number(result?.locations_count || 0))
         defaultSyllableCache = normalized
         return normalized
       })
@@ -912,7 +979,8 @@ const loadDefaultCountsData = async () => {
 const buildCountRequestPayload = () => ({
   locations: Array.isArray(countphosLocationQuery.value.locations) ? countphosLocationQuery.value.locations : [],
   regions: Array.isArray(countphosLocationQuery.value.regions) ? countphosLocationQuery.value.regions : [],
-  region_mode: countphosLocationQuery.value.regionUsing || 'map'
+  region_mode: countphosLocationQuery.value.regionUsing || 'map',
+  new_format: true
 })
 
 const loadData = async () => {
@@ -941,9 +1009,9 @@ const loadData = async () => {
       queryMode.value.syllableCounts ? getSyllableCounts(countRequestPayload) : Promise.resolve(undefined)
     ])
 
-    // 存儲原始數據
-    featureData.value = result || {}
-    syllableData.value = syllableResult || null
+    // 存儲原始數據:locations 是 per-location 明细(键为地点名,原样);aggregated 走单独归一化
+    featureData.value = result?.locations || {}
+    syllableData.value = normalizeSyllableApiLocations(syllableResult) || null
 
     // 計算匯總數據
     aggregatedData.value = calculateAggregatedData(result || {})
@@ -971,40 +1039,49 @@ watch(
   }
 )
 
-// 計算匯總統計數據
+// 实时音节接口:aggregated.syllables[*].locations 是 id 数组,用本响应 points 还原成地点名
+const normalizeSyllableApiLocations = (result) => {
+  if (!result) return result
+
+  const points = Array.isArray(result?.points) ? result.points : []
+  if (!points.length) return result
+
+  const byId = new Map(points.map((p) => [p.id, p.location]))
+
+  for (const mode of ['toneless', 'toned']) {
+    const source = result?.[mode]?.aggregated?.syllables
+    if (!source) continue
+
+    Object.entries(source).forEach(([syllable, stats]) => {
+      if (!Array.isArray(stats?.locations)) return
+      source[syllable] = {
+        ...stats,
+        locations: stats.locations.map((id) => byId.get(Number(id))).filter(Boolean)
+      }
+    })
+  }
+
+  return result
+}
+
+// 計算匯總統計數據:新格式 aggregated 里 locations 是 id 数组
+// feature_counts 无 points,id 用本响应 locations 对象的键序解码(Object.keys 顺序即 id 空间,勿排序)
 const calculateAggregatedData = (data) => {
+  const locationNames = Object.keys(data?.locations || {})
   const aggregated = {}
 
-  // 遍歷每個地點的數據
-  Object.keys(data || {}).forEach(locationName => {
-    const locationData = data[locationName] || {}
+  Object.entries(data?.aggregated || {}).forEach(([featureType, features]) => {
+    const out = {}
 
-    // 遍歷每個特徵類型（聲母/韻母/聲調）
-    Object.keys(locationData).forEach(featureType => {
-      if (!aggregated[featureType]) {
-        aggregated[featureType] = {}
+    Object.entries(features || {}).forEach(([key, stats]) => {
+      out[key] = {
+        totalCount: Number(stats?.totalCount || 0),
+        locationCount: Number(stats?.locationCount || 0),
+        locations: Array.isArray(stats?.locations) ? stats.locations.map((id) => locationNames[Number(id)]).filter(Boolean) : []
       }
-
-      const features = locationData[featureType] || {}
-
-      // 遍歷每個音節
-      Object.keys(features).forEach(syllable => {
-        const count = Number(features[syllable] || 0)
-        if (count <= 0) return
-
-        if (!aggregated[featureType][syllable]) {
-          aggregated[featureType][syllable] = {
-            totalCount: 0, // 總數量
-            locationCount: 0, // 出現在多少個地點
-            locations: [] // 具體哪些地點
-          }
-        }
-
-        aggregated[featureType][syllable].totalCount += count
-        aggregated[featureType][syllable].locationCount += 1
-        aggregated[featureType][syllable].locations.push(locationName)
-      })
     })
+
+    aggregated[featureType] = out
   })
 
   return normalizeAndFilterAggregatedData(aggregated)
@@ -1012,22 +1089,6 @@ const calculateAggregatedData = (data) => {
 
 const orderAggregatedData = (data = {}) => {
   return normalizeAndFilterAggregatedData(data)
-}
-
-const inferAggregatedLocationCount = (aggregated = {}) => {
-  const locationSet = new Set()
-
-  Object.values(aggregated || {}).forEach((features) => {
-    Object.values(features || {}).forEach((stats) => {
-      if (Array.isArray(stats?.locations)) {
-        stats.locations.forEach((location) => {
-          if (location) locationSet.add(location)
-        })
-      }
-    })
-  })
-
-  return locationSet.size
 }
 
 // 打开地点详情弹窗
@@ -1128,13 +1189,42 @@ const consumePendingCountphosLocations = () => {
   loadData()
 }
 
+// 新格式 points 只含 {id, location, coordinate},热力图所需独特音节数/总词次在 per-location 明细里,按地点名拼装
+const buildSyllableHeatmapPoints = (syllableData) => {
+  const points = Array.isArray(syllableData?.points) ? syllableData.points : []
+  if (!points.length) return []
+
+  const perLocation = {}
+  for (const mode of ['toneless', 'toned']) {
+    const locs = syllableData?.[mode]?.locations || {}
+    Object.entries(locs).forEach(([name, data]) => {
+      const syllables = data?.syllables || {}
+      if (!perLocation[name]) perLocation[name] = { unique: {}, tokens: {} }
+      perLocation[name].unique[mode] = Object.keys(syllables).length
+      perLocation[name].tokens[mode] = Object.values(syllables).reduce((sum, count) => sum + Number(count || 0), 0)
+    })
+  }
+
+  return points
+    .filter((p) => p?.location && perLocation[p.location])
+    .map((p) => {
+      const stats = perLocation[p.location]
+      return {
+        location: p.location,
+        coordinate: p.coordinate,
+        unique_syllables: { toneless: stats.unique.toneless || 0, toned: stats.unique.toned || 0 },
+        total_tokens: { toneless: stats.tokens.toneless || 0, toned: stats.tokens.toned || 0 }
+      }
+    })
+}
+
 const openSyllableHeatmap = () => {
   if (!canShowSyllableHeatmap.value) return
 
   mapStore.mode = 'syllableHeatmap'
   mapStore.syllableHeatmapPayload = {
     toneMode: syllableMode.value,
-    points: Array.isArray(syllableData.value?.points) ? syllableData.value.points : []
+    points: buildSyllableHeatmapPoints(syllableData.value)
   }
   requestMapFitView()
 
