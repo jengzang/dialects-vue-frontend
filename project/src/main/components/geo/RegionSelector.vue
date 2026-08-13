@@ -796,7 +796,8 @@ function onHoverL2(item, e, immediate = false) {
     lvl3.value = getChildren(item.label)
 
     if (popupLeft != null && rawTop != null) {
-      const popupTop = clampPopupTopByLvl1(rawTop, 240)
+      // lvl3 贴近 hover 的 lvl2 行；仅当超出视口底部时上移
+      const popupTop = Math.max(0, Math.min(rawTop, window.innerHeight - 240))
       lvl3Pos.value = { position: 'fixed', left: `${popupLeft}px`, top: `${popupTop}px` }
     }
   }
@@ -1195,6 +1196,12 @@ $portrait-ratio: 1;
     background: rgba(var(--color-primary-rgb), 0.25);
     box-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.28);
   }
+}
+
+/* lvl3 末级无 active 状态，hover 直接复用前两级的激活色 */
+.partition-lvl3 .partition-line:hover {
+  background: rgba(var(--color-primary-rgb), 0.25);
+  box-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.28);
 }
 
 .partition-item {
