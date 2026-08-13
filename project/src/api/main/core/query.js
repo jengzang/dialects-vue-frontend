@@ -277,6 +277,8 @@ export async function getCharList(params) {
  * @param {Object} params - 查询参数
  * @property {string[]} [params.features] - 特征列表
  * @property {string[]} [params.locations] - 地点列表
+ * @property {string[]} [params.regions] - 区域列表
+ * @property {string} [params.region_mode] - 区域模式
  * @returns {Promise<Object>} 特征计数统计
  * @throws {Error} 查询失败
  * @example
@@ -285,7 +287,7 @@ export async function getCharList(params) {
  *   locations: ['广州', '香港']
  * })
  */
-export async function getFeatureCounts(params) {
+export async function getFeatureCounts(params = {}) {
   try {
     const query = new URLSearchParams()
 
@@ -296,6 +298,16 @@ export async function getFeatureCounts(params) {
       })
     }
 
+    if (params.regions && Array.isArray(params.regions)) {
+      params.regions.forEach(reg => {
+        query.append('regions', reg)
+      })
+    }
+
+    if (params.region_mode) {
+      query.append('region_mode', params.region_mode)
+    }
+
     return await api(`/api/feature_counts?${query.toString()}`, {
       loginPromptEligible: true
     })
@@ -303,6 +315,29 @@ export async function getFeatureCounts(params) {
     console.error('Get feature counts error:', error)
     showError(error.message || '獲取音位特徵計數失敗')
     throw new Error(error.message || '獲取音位特徵計數失敗')
+  }
+}
+
+/**
+ * 获取音节计数（不带调与带调一起返回）
+ * @param {Object} params - 查询参数
+ * @property {string[]} [params.locations] - 地点列表
+ * @property {string[]} [params.regions] - 区域列表
+ * @property {string} [params.region_mode] - 区域模式
+ * @returns {Promise<Object>} 音节计数统计
+ * @throws {Error} 查询失败
+ */
+export async function getSyllableCounts(params) {
+  try {
+    return await api('/api/syllable_counts', {
+      method: 'POST',
+      body: params,
+      loginPromptEligible: true
+    })
+  } catch (error) {
+    console.error('Get syllable counts error:', error)
+    showError(error.message || '獲取音節計數失敗')
+    throw new Error(error.message || '獲取音節計數失敗')
   }
 }
 

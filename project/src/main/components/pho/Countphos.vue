@@ -1,30 +1,38 @@
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, nextTick, onMounted, onBeforeUnmount, onActivated, onDeactivated, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
-import { getFeatureCounts, getLocationDetail } from '@/api'
+import { getFeatureCounts, getLocationDetail, getSyllableCounts } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue'
-import LocationMultiInput from '@/main/components/geo/LocationMultiInput.vue'
+import LocationAndRegionInput from '@/main/components/geo/LocationAndRegionInput.vue'
 import CountLocationJumpNav from '@/main/components/pho/CountLocationJumpNav.vue'
+import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
-import { pendingCountphosLocations } from '@/main/store/store.js'
+import { mapStore, pendingCountphosLocations } from '@/main/store/store.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { useNavAnchorJump } from '@/composables/bar/useNavAnchorJump.js'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import { requestMapFitView } from '@/utils/map/MapData.js'
 import all_feature_counts from '/data/feature_counts_20260624.json?url'
 
 const { t } = useI18n()
 const route = useRoute()
+const router = useRouter()
 
 const loadCountsTask = useAsyncTask()
 const loading = loadCountsTask.loading
 const error = ref(null)
 const matrixData = ref(null)
-const queryStrings = ref([])
+const countphosLocationQuery = ref({
+  locations: [],
+  regions: [],
+  regionUsing: 'map'
+})
 const matchedLocations = ref([])
-const isMatching = ref(false) // 添加匹配状态
+const isLocationInputDisabled = ref(true)
 const rendering = ref(false)
 
 const waitForPaint = () => {
@@ -38,13 +46,15 @@ const waitForPaint = () => {
 // 音節統計數據
 const featureData = ref({}) // 存儲每個地點的原始數據
 const aggregatedData = ref({}) // 存儲匯總統計數據
+const syllableData = ref(null)
+const syllableMode = ref('toneless')
 
 //默认加载
 const isUsingDefaultCounts = ref(false)
 const displayLocationCount = ref(0)
 
 const hasResultData = computed(() => {
-  return Object.keys(featureData.value).length > 0 || Object.keys(aggregatedData.value).length > 0
+  return Object.keys(featureData.value).length > 0 || Object.keys(aggregatedData.value).length > 0 || hasSyllableResultData.value
 })
 
 const hasLocationDetailData = computed(() => {
@@ -108,6 +118,61 @@ const hasChartData = computed(() => chartFeatureTypes.value.length > 0)
 const isSingleLocation = computed(() => displayLocationCount.value === 1)
 const isResultsBusy = computed(() => loading.value || rendering.value)
 const isCurrentCountRoute = computed(() => route.path === '/menu/pho/count' || route.path.endsWith('/menu/pho/count'))
+const isCountphosQueryEmpty = computed(() => {
+  return (countphosLocationQuery.value.locations || []).length === 0 && (countphosLocationQuery.value.regions || []).length === 0
+})
+
+const resolvedLocationCount = computed(() => {
+  const metaCount = Number(syllableData.value?.meta?.locations_count || 0)
+  if (metaCount > 0) return metaCount
+
+  const pointCount = Array.isArray(syllableData.value?.points) ? syllableData.value.points.length : 0
+  if (pointCount > 0) return pointCount
+
+  return displayLocationCount.value || matchedLocations.value.length || 0
+})
+
+const canShowSyllableHeatmap = computed(() => resolvedLocationCount.value > 10)
+
+const isTonedSyllableMode = computed({
+  get: () => syllableMode.value === 'toned',
+  set: (value) => {
+    syllableMode.value = value ? 'toned' : 'toneless'
+  }
+})
+
+const syllableModeLabel = computed(() => t(`phonology.phonology.countphos.syllables.modes.${syllableMode.value}`))
+
+const currentSyllableSummary = computed(() => syllableData.value?.[syllableMode.value]?.aggregated || null)
+const currentSyllableAggregated = computed(() => currentSyllableSummary.value?.syllables || {})
+const hasSyllableResultData = computed(() => Object.keys(currentSyllableAggregated.value || {}).length > 0)
+
+const syllableStatsList = computed(() => {
+  return Object.entries(currentSyllableAggregated.value || {})
+    .map(([syllable, stats]) => ({
+      syllable,
+      totalCount: Number(stats?.totalCount || 0),
+      locationCount: Number(stats?.locationCount || stats?.locations?.length || 0),
+      locations: Array.isArray(stats?.locations) ? stats.locations : []
+    }))
+    .sort((a, b) => {
+      if (b.totalCount !== a.totalCount) return b.totalCount - a.totalCount
+      if (b.locationCount !== a.locationCount) return b.locationCount - a.locationCount
+      return a.syllable.localeCompare(b.syllable, 'zh-Hant')
+    })
+})
+
+const currentSyllableTotalTokens = computed(() => {
+  const total = Number(currentSyllableSummary.value?.total_tokens || 0)
+  if (total > 0) return total
+
+  return syllableStatsList.value.reduce((sum, item) => sum + item.totalCount, 0)
+})
+
+const currentSyllableUniqueCount = computed(() => {
+  const unique = Number(currentSyllableSummary.value?.unique_syllables || 0)
+  return unique || syllableStatsList.value.length
+})
 
 const {
   locationNavItems,
@@ -138,14 +203,8 @@ const visibleNavItems = computed(() => {
   return locationNavItems.value.filter((item) => item.kind !== 'total')
 })
 
-// 处理匹配到的地点列表
-const handleMatchedLocations = (locations) => {
-  matchedLocations.value = locations
-}
-
-// 处理匹配状态
-const handleIsMatching = (matching) => {
-  isMatching.value = matching
+const handleRunDisabled = (disabled) => {
+  isLocationInputDisabled.value = disabled
 }
 
 const setChartRef = (chartType, featureType, el) => {
@@ -324,7 +383,7 @@ const formatLocationsPreview = (locations = [], limit = 2) => {
 }
 
 const isMobileChart = () => {
-  return window.innerWidth <= 768
+  return window.matchMedia?.('(max-aspect-ratio: 1 / 1)').matches || false
 }
 
 const getTotalLocationCountForCharts = () => {
@@ -712,6 +771,7 @@ const loadDefaultCountsData = async () => {
 
     featureData.value = {}
     aggregatedData.value = cachedData.aggregated
+    syllableData.value = null
     displayLocationCount.value = cachedData.locationCount
     isUsingDefaultCounts.value = true
   }, {
@@ -725,8 +785,14 @@ const loadDefaultCountsData = async () => {
   }
 }
 
+const buildCountRequestPayload = () => ({
+  locations: Array.isArray(countphosLocationQuery.value.locations) ? countphosLocationQuery.value.locations : [],
+  regions: Array.isArray(countphosLocationQuery.value.regions) ? countphosLocationQuery.value.regions : [],
+  region_mode: countphosLocationQuery.value.regionUsing || 'map'
+})
+
 const loadData = async () => {
-  if (matchedLocations.value.length === 0) {
+  if (isCountphosQueryEmpty.value) {
     error.value = t('phonology.phonology.countphos.states.minLocationError')
     return
   }
@@ -735,20 +801,25 @@ const loadData = async () => {
   disposeAllCharts()
   featureData.value = {}
   aggregatedData.value = {}
+  syllableData.value = null
   isUsingDefaultCounts.value = false
-  displayLocationCount.value = matchedLocations.value.length
+  displayLocationCount.value = 0
 
   await loadCountsTask.run(async () => {
-    // 調用 API
-    const result = await getFeatureCounts({ locations: matchedLocations.value })
+    const countRequestPayload = buildCountRequestPayload()
+    const [result, syllableResult] = await Promise.all([
+      getFeatureCounts(countRequestPayload),
+      getSyllableCounts(countRequestPayload)
+    ])
 
     // 存儲原始數據
     featureData.value = result || {}
+    syllableData.value = syllableResult || null
 
     // 計算匯總數據
     aggregatedData.value = calculateAggregatedData(result || {})
 
-    displayLocationCount.value = Object.keys(featureData.value).length || matchedLocations.value.length
+    displayLocationCount.value = resolvedLocationCount.value || Object.keys(featureData.value).length
   }, {
     onError: (err) => {
       console.error('加載失敗:', err)
@@ -900,11 +971,37 @@ const consumePendingCountphosLocations = () => {
   if (!Array.isArray(pending) || pending.length === 0) return
 
   const locations = pending.slice(0, PHONOLOGY_LOCATION_LIMITS.countphos)
-  queryStrings.value = [...locations]
+  countphosLocationQuery.value = {
+    locations: [...locations],
+    regions: [],
+    regionUsing: countphosLocationQuery.value.regionUsing || 'map'
+  }
   matchedLocations.value = [...locations]
+  isLocationInputDisabled.value = false
   pendingCountphosLocations.value = []
 
   loadData()
+}
+
+const openSyllableHeatmap = (syllable) => {
+  if (!syllable || !canShowSyllableHeatmap.value) return
+
+  mapStore.mode = 'syllableHeatmap'
+  mapStore.syllableHeatmapPayload = {
+    syllable,
+    toneMode: syllableMode.value,
+    points: Array.isArray(syllableData.value?.points) ? syllableData.value.points : []
+  }
+  requestMapFitView()
+
+  router.push({
+    path: buildLocalePath(resolveRouteLocale(route), '/menu/map/view'),
+    query: {
+      mode: 'syllableHeatmap',
+      toneMode: syllableMode.value,
+      syllable
+    }
+  })
 }
 
 onMounted(async () => {
@@ -948,19 +1045,17 @@ onBeforeUnmount(() => {
 
     <!-- 地点输入组件 -->
     <div class="input-section">
-      <LocationMultiInput
-        v-model="queryStrings"
-        @update:matchedLocations="handleMatchedLocations"
-        @update:isMatching="handleIsMatching"
-        :max-locations="PHONOLOGY_LOCATION_LIMITS.countphos"
+      <LocationAndRegionInput
+        v-model="countphosLocationQuery"
+        limit-context="countphos"
+        @update:runDisabled="handleRunDisabled"
       />
       <button
         class="action-btn"
         @click="loadData"
-        :disabled="matchedLocations.length === 0 || loading || isMatching"
+        :disabled="isCountphosQueryEmpty || loading || isLocationInputDisabled"
       >
-        <span v-if="isMatching" class="ui-loading--inline" aria-hidden="true">↻</span>
-        <span v-else-if="loading">{{ $t('phonology.phonology.countphos.actions.loading') }}</span>
+        <span v-if="loading">{{ $t('phonology.phonology.countphos.actions.loading') }}</span>
         <span v-else>{{ $t('phonology.phonology.countphos.actions.query') }}</span>
       </button>
     </div>
@@ -1103,6 +1198,77 @@ onBeforeUnmount(() => {
         </template>
       </section>
 
+      <section v-if="hasSyllableResultData" class="syllable-section glass-panel">
+        <div class="syllable-section-header">
+          <div>
+            <h3 class="section-title">{{ $t('phonology.phonology.countphos.syllables.title') }}</h3>
+            <p class="section-subtitle">
+              {{ $t('phonology.phonology.countphos.syllables.subtitle') }}
+            </p>
+          </div>
+          <SwitchToggle
+            v-model="isTonedSyllableMode"
+            :active-text="$t('phonology.phonology.countphos.syllables.modes.toned')"
+            :inactive-text="$t('phonology.phonology.countphos.syllables.modes.toneless')"
+            :aria-label="$t('phonology.phonology.countphos.syllables.modeSwitch')"
+            color="green"
+            show-label
+          />
+        </div>
+
+        <div class="syllable-summary-row">
+          <span class="summary-pill">
+            <span class="stat-label">{{ $t('phonology.phonology.countphos.syllables.currentMode') }}:</span>
+            <span class="stat-value">{{ syllableModeLabel }}</span>
+          </span>
+          <span class="summary-pill">
+            <span class="stat-label">{{ $t('phonology.phonology.countphos.syllables.unique') }}:</span>
+            <span class="stat-value">{{ currentSyllableUniqueCount }}</span>
+          </span>
+          <span class="summary-pill">
+            <span class="stat-label">{{ $t('phonology.phonology.countphos.syllables.tokens') }}:</span>
+            <span class="stat-value">{{ currentSyllableTotalTokens }}</span>
+          </span>
+        </div>
+
+        <div class="syllable-grid">
+          <div
+            v-for="item in syllableStatsList"
+            :key="`${syllableMode}-${item.syllable}`"
+            class="syllable-card glass-card"
+          >
+            <div class="syllable-top">
+              <div class="syllable-name">{{ item.syllable }}</div>
+              <div class="syllable-stats">
+                <span class="stat-item">
+                  <span class="stat-label">{{ $t('phonology.phonology.countphos.stats.total') }}:</span>
+                  <span class="stat-value">{{ item.totalCount }}</span>
+                </span>
+                <span class="stat-item">
+                  <span class="stat-label">{{ $t('phonology.phonology.countphos.stats.locationCount') }}:</span>
+                  <span class="stat-value">{{ item.locationCount }}</span>
+                </span>
+              </div>
+            </div>
+            <div class="syllable-card-actions">
+              <button
+                class="expand-btn"
+                @click="openLocationModal(item.syllable, syllableModeLabel, item)"
+              >
+                {{ $t('phonology.phonology.countphos.syllables.viewLocations') }}
+              </button>
+              <button
+                v-if="canShowSyllableHeatmap"
+                class="expand-btn heatmap-btn"
+                @click="openSyllableHeatmap(item.syllable)"
+              >
+                {{ $t('phonology.phonology.countphos.syllables.heatmap') }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- 地點詳情部分 -->
       <section v-if="hasLocationDetailData" class="locations-section glass-panel">
         <h3 class="section-title">{{ $t('phonology.phonology.countphos.sections.locations') }}</h3>
@@ -1205,7 +1371,6 @@ onBeforeUnmount(() => {
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
 $primary-deep: #003d9e;
-$mobile-breakpoint: 768px;
 .phonology-page {
   min-width: 80dvw;
   max-width: min(1000px, 98%);
@@ -1338,6 +1503,7 @@ $mobile-breakpoint: 768px;
 
   /* 汇总与地点详情玻璃容器 */
   .aggregated-section,
+  .syllable-section,
   .locations-section {
     background: none;
     border: none;
@@ -1349,6 +1515,42 @@ $mobile-breakpoint: 768px;
 
   .aggregated-section {
     padding: 12px;
+  }
+
+  .syllable-section {
+    padding: 12px;
+  }
+
+  .syllable-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+  }
+
+  .syllable-summary-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .summary-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    background: var(--glass-70);
+    border: 1px solid var(--glass-60);
+    border-radius: var(--radius-pill);
+  }
+
+  .syllable-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
   }
 
   .locations-section {
@@ -1545,6 +1747,16 @@ $mobile-breakpoint: 768px;
     }
   }
 
+  .heatmap-btn {
+    background: var(--color-success);
+    box-shadow: 0 2px 6px rgba(var(--color-primary-rgb), 0.18);
+
+    &:hover {
+      background: var(--color-success-hover, var(--color-success));
+      box-shadow: var(--shadow-sm);
+    }
+  }
+
   /* 单地点详情 */
   .location-detail {
     margin-bottom: 16px;
@@ -1655,8 +1867,13 @@ $mobile-breakpoint: 768px;
   }
 
   /* 移动端 */
-  @media (max-width: $mobile-breakpoint) {
+  @media (max-aspect-ratio: #{1 / 1}) {
     min-width: 0;
+
+    .syllable-section-header {
+      @include flex-col;
+      align-items: center;
+    }
 
     .syllable-grid {
       grid-template-columns: 1fr;

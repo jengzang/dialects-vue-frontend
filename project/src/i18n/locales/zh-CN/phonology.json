@@ -99,6 +99,20 @@
         "locations": "地点详情",
         "locationsSubtitle": "每个地点的音节统计"
       },
+      "syllables": {
+        "title": "音节数统计",
+        "subtitle": "统计不带调与带调音节的总量、独立音节数和各音节数量。",
+        "modeSwitch": "切换不带调与带调音节统计",
+        "currentMode": "模式",
+        "unique": "独立音节",
+        "tokens": "音节总数",
+        "viewLocations": "地点",
+        "heatmap": "热力图",
+        "modes": {
+          "toneless": "不带调",
+          "toned": "带调"
+        }
+      },
       "charts": {
         "pie": {
           "title": "音节总量占比",

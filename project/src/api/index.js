@@ -96,6 +96,7 @@ export {
   searchTones,
   getCharList,
   getFeatureCounts,
+  getSyllableCounts,
   getFeatureStats,
 } from './main/core/query.js';
 

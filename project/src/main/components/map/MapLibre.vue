@@ -11,7 +11,7 @@
         </div>
 
         <div
-          v-if="hasCustomData && mapStore.mapData"
+          v-if="mapStore.mode !== 'syllableHeatmap' && hasCustomData && mapStore.mapData"
           id="custom-switch-container"
           class="custom-switch-container1"
         >
@@ -24,6 +24,7 @@
         </div>
 
         <div
+          v-if="mapStore.mode !== 'syllableHeatmap'"
           id="base-switch-container"
           class="custom-switch-container1"
         >
@@ -103,6 +104,10 @@ const props = defineProps({
 // --- Emits ---
 const emit = defineEmits(['map-click']);
 
+const SYLLABLE_HEATMAP_SOURCE_ID = 'syllable-heatmap-source';
+const SYLLABLE_HEATMAP_LAYER_ID = 'syllable-heatmap-layer';
+const SYLLABLE_HEATMAP_POINT_LAYER_ID = 'syllable-heatmap-point-layer';
+
 const mapContainer = ref(null);
 const map = shallowRef(null);
 const currentStyleKey = ref('gaode');
@@ -181,6 +186,7 @@ const toggleBaseMode = (e) => {
 // 管理所有的 Marker 實例，用於清除
 let currentMarkers = [];
 let currentPopupMountTargets = [];
+let syllableHeatmapClickHandler = null;
 
 // 地名點擊彈窗狀態
 const locationPopup = ref({
@@ -235,6 +241,7 @@ onActivated(() => {
 });
 
 onBeforeUnmount(() => {
+  clearSyllableHeatmapLayers();
   clearMarkers();
   if (map.value) {
     map.value.remove();
@@ -245,7 +252,7 @@ onBeforeUnmount(() => {
 // --- 監聽數據變化，自動重繪 ---
 watch(
   // 監聽源改成 store 裡的數據
-    [() => mapStore.mapData, () => mapStore.mergedData, () => mapStore.mode, () => props.activeFeature],
+    [() => mapStore.mapData, () => mapStore.mergedData, () => mapStore.syllableHeatmapPayload, () => mapStore.mode, () => props.activeFeature],
     () => {
       // 視圖內容變更時只重繪，不在這裡自行判斷是否 reset；
       // reset 邊界統一由 requestMapFitView -> fitViewKey watcher 控制。
@@ -322,6 +329,7 @@ const renderMapContent = async (shouldResetView = true) => {
 
   // 清除舊標記
   clearMarkers();
+  clearSyllableHeatmapLayers();
 
   // 視角統一由 requestMapFitView -> resetView 控制，這裡不再消費入口側預計算的 center/zoom。
   void shouldResetView;
@@ -335,6 +343,8 @@ const renderMapContent = async (shouldResetView = true) => {
     drawFeatureMap();
   } else if (mapStore.mode === 'compare') {
     drawCompareMap();
+  } else if (mapStore.mode === 'syllableHeatmap') {
+    drawSyllableHeatmap();
   }
 };
 
@@ -343,6 +353,25 @@ const clearMarkers = () => {
   currentPopupMountTargets = [];
   currentMarkers.forEach(marker => marker.remove());
   currentMarkers = [];
+};
+
+const clearSyllableHeatmapLayers = () => {
+  if (!map.value) return;
+
+  if (syllableHeatmapClickHandler) {
+    map.value.off('click', SYLLABLE_HEATMAP_POINT_LAYER_ID, syllableHeatmapClickHandler);
+    syllableHeatmapClickHandler = null;
+  }
+
+  [SYLLABLE_HEATMAP_POINT_LAYER_ID, SYLLABLE_HEATMAP_LAYER_ID].forEach((layerId) => {
+    if (map.value.getLayer(layerId)) {
+      map.value.removeLayer(layerId);
+    }
+  });
+
+  if (map.value.getSource(SYLLABLE_HEATMAP_SOURCE_ID)) {
+    map.value.removeSource(SYLLABLE_HEATMAP_SOURCE_ID);
+  }
 };
 
 // =======================================================
@@ -712,6 +741,153 @@ const drawCompareMap = () => {
   // console.log(`✅ 绘制完成，共添加 ${currentMarkers.length} 个标记`)
 };
 
+const getSyllableHeatmapFeatureCollection = () => {
+  const payload = mapStore.syllableHeatmapPayload || {};
+  const toneMode = payload.toneMode === 'toned' ? 'toned' : 'toneless';
+  const syllable = payload.syllable || '';
+  const points = Array.isArray(payload.points) ? payload.points : [];
+
+  return {
+    type: 'FeatureCollection',
+    features: points
+      .map((point) => {
+        const count = Number(point?.[toneMode]?.[syllable] || 0);
+        if (count <= 0 || !isValidCoordinatePair(point?.coordinate)) return null;
+
+        return {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: point.coordinate
+          },
+          properties: {
+            location: point.location || '',
+            syllable,
+            toneMode,
+            count,
+            totalTokens: Number(point?.total_tokens?.[toneMode] || 0),
+            uniqueSyllables: Number(point?.unique_syllables?.[toneMode] || 0)
+          }
+        };
+      })
+      .filter(Boolean)
+  };
+};
+
+const createSyllableHeatmapPopupNode = (properties) => {
+  const toneModeText = properties.toneMode === 'toned'
+    ? t('phonology.phonology.countphos.syllables.modes.toned')
+    : t('phonology.phonology.countphos.syllables.modes.toneless');
+
+  const container = document.createElement('div');
+  const title = document.createElement('strong');
+  title.textContent = properties.location || '';
+  const mode = document.createElement('div');
+  mode.textContent = `${t('phonology.phonology.countphos.syllables.currentMode')}: ${toneModeText}`;
+  const count = document.createElement('div');
+  count.textContent = `${properties.syllable}: ${properties.count}`;
+
+  container.append(title, mode, count);
+  return container;
+};
+
+const drawSyllableHeatmap = () => {
+  const featureCollection = getSyllableHeatmapFeatureCollection();
+  if (featureCollection.features.length === 0) return;
+
+  map.value.addSource(SYLLABLE_HEATMAP_SOURCE_ID, {
+    type: 'geojson',
+    data: featureCollection
+  });
+
+  map.value.addLayer({
+    id: SYLLABLE_HEATMAP_LAYER_ID,
+    type: 'heatmap',
+    source: SYLLABLE_HEATMAP_SOURCE_ID,
+    maxzoom: 11,
+    paint: {
+      'heatmap-weight': [
+        'interpolate',
+        ['linear'],
+        ['get', 'count'],
+        0, 0,
+        1, 0.2,
+        10, 1
+      ],
+      'heatmap-intensity': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        3, 0.8,
+        10, 1.8
+      ],
+      'heatmap-color': [
+        'interpolate',
+        ['linear'],
+        ['heatmap-density'],
+        0, 'rgba(33,102,172,0)',
+        0.2, '#67a9cf',
+        0.4, '#d1e5f0',
+        0.6, '#fddbc7',
+        0.8, '#ef8a62',
+        1, '#b2182b'
+      ],
+      'heatmap-radius': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        3, 14,
+        10, 34
+      ],
+      'heatmap-opacity': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        9, 0.85,
+        12, 0
+      ]
+    }
+  });
+
+  map.value.addLayer({
+    id: SYLLABLE_HEATMAP_POINT_LAYER_ID,
+    type: 'circle',
+    source: SYLLABLE_HEATMAP_SOURCE_ID,
+    minzoom: 7,
+    paint: {
+      'circle-radius': [
+        'interpolate',
+        ['linear'],
+        ['get', 'count'],
+        1, 4,
+        10, 12
+      ],
+      'circle-color': '#ef8a62',
+      'circle-stroke-color': '#ffffff',
+      'circle-stroke-width': 1.5,
+      'circle-opacity': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        7, 0,
+        11, 0.85
+      ]
+    }
+  });
+
+  syllableHeatmapClickHandler = (event) => {
+    const feature = event.features?.[0];
+    if (!feature) return;
+
+    new maplibregl.Popup({ offset: 12 })
+      .setLngLat(feature.geometry.coordinates)
+      .setDOMContent(createSyllableHeatmapPopupNode(feature.properties || {}))
+      .addTo(map.value);
+  };
+
+  map.value.on('click', SYLLABLE_HEATMAP_POINT_LAYER_ID, syllableHeatmapClickHandler);
+};
+
 // 創建比較模式的彈窗內容
 function createComparePopupNode(item) {
   const statusMap = {
@@ -762,6 +938,9 @@ const handleStyleChange = () => {
   if (!map.value) return;
   const newStyle = mapStyle(currentStyleKey.value);
   map.value.setStyle(newStyle);
+  map.value.once('style.load', () => {
+    renderMapContent(false);
+  });
 };
 
 const AUTO_RESET_DENSITY_PERCENTILE = 0.98;
@@ -771,7 +950,12 @@ const collectResetViewPoints = () => {
   let points = [];
 
   // compare / feature 模式优先按当前结果坐标复位，避免退回到 mapData 全量范围
-  if ((mapStore.mode === 'compare' || mapStore.mode === 'feature') && mapStore.mergedData && mapStore.mergedData.length > 0) {
+  if (mapStore.mode === 'syllableHeatmap') {
+    points = getSyllableHeatmapFeatureCollection().features
+      .map(feature => feature.geometry?.coordinates)
+      .filter(isValidCoordinatePair);
+  }
+  else if ((mapStore.mode === 'compare' || mapStore.mode === 'feature') && mapStore.mergedData && mapStore.mergedData.length > 0) {
     points = mapStore.mergedData
       .map(item => item.coordinate)
       .filter(isValidCoordinatePair);
@@ -819,6 +1003,8 @@ const resetView = () => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $map-border-radius: var(--radius-2xl);
 $map-transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 $control-panel-width: 160px;

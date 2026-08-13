@@ -89,7 +89,7 @@ export const menuRoutes = [
         base: [],
         variantKey: 'sub',
         variants: {
-          view: ['feature', 'locations', 'regions', 'regionMode', 'openPanel', 'phonology'],
+          view: ['feature', 'locations', 'regions', 'regionMode', 'openPanel', 'phonology', 'mode', 'toneMode', 'syllable'],
           divide: [],
           custom: []
         }

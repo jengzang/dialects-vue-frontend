@@ -150,6 +150,22 @@ export const LOCATION_LIMITS = {
         }
     },
 
+    // countphos: 音節統計
+    countphos: {
+        anonymous: {
+            MAX_LOCATIONS: 100,
+            MESSAGE: '未登錄用戶音節統計最多可選 {limit} 個地點'
+        },
+        user: {
+            MAX_LOCATIONS: 1000,
+            MESSAGE: '用戶音節統計最多可選 {limit} 個地點'
+        },
+        admin: {
+            MAX_LOCATIONS: Infinity,
+            MESSAGE: ''
+        }
+    },
+
     // compare: 比較功能 - 細分為三個子頁面
     // compare_tab1: 漢字比較
     compare_tab1: {

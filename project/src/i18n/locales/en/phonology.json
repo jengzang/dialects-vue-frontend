@@ -99,6 +99,20 @@
         "locations": "Location Details",
         "locationsSubtitle": "Syllable statistics for each location"
       },
+      "syllables": {
+        "title": "Syllable Count Statistics",
+        "subtitle": "Counts toneless and toned syllables, including total tokens, unique syllables, and per-syllable counts.",
+        "modeSwitch": "Switch between toneless and toned syllable statistics",
+        "currentMode": "Mode",
+        "unique": "Unique syllables",
+        "tokens": "Syllable tokens",
+        "viewLocations": "Locations",
+        "heatmap": "Heatmap",
+        "modes": {
+          "toneless": "Toneless",
+          "toned": "Toned"
+        }
+      },
       "charts": {
         "pie": {
           "title": "Syllable Share by Total Count",
