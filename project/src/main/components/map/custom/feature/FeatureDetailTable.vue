@@ -18,7 +18,7 @@
             <input
               v-model="localFeatureName"
               type="text"
-              class="header-text-input"
+              class="header-text-input glass-field"
               :placeholder="t('customEntry.pointDetail.placeholders.feature')"
             >
           </label>
@@ -27,7 +27,7 @@
             <input
               v-model="localPhonology"
               type="text"
-              class="header-text-input"
+              class="header-text-input glass-field"
               :placeholder="t('customEntry.pointDetail.placeholders.phonology')"
             >
           </label>
@@ -657,28 +657,7 @@ watch(
 }
 
 .header-text-input {
-  padding: $radius-sm $radius-md;
-  border: 1px solid $muted-ring;
-  border-radius: $spacing-sm;
-  background: $glass-medium;
-  color: $text-strong;
-  font-size: 14px;
-  outline: none;
-  transition:
-    border-color 0.18s ease,
-    box-shadow 0.18s ease,
-    background-color 0.18s ease;
   width: 160px;
-
-  &::placeholder {
-    color: $text-light;
-  }
-
-  &:focus {
-    border-color: $primary-focus;
-    background: var(--text-white);
-    box-shadow: 0 0 0 3px $primary-glass;
-  }
 }
 
 // -- Point detail modal --

@@ -9,6 +9,12 @@ const projectRoot = resolve(testsDir, '..')
 const requestedFieldFiles = [
   'src/main/components/map/custom/feature/FeatureRecordEditorModal.vue',
   'src/main/components/map/custom/point/PointDetailForm.vue',
+  'src/main/components/map/custom/CustomDataPanel.vue',
+  'src/main/components/map/custom/feature/FeatureDetailTable.vue',
+  'src/main/components/map/custom/feature/FeatureScopeSelectionModal.vue',
+  'src/main/components/map/Draw/modals/ClipBoundaryModal.vue',
+  'src/main/components/map/Draw/modals/VoronoiFieldMergeModal.vue',
+  'src/main/components/map/Draw/modals/VoronoiIgnorePointsModal.vue',
   'src/main/components/map/Draw/panels/MapDrawToolsPanel.vue',
   'src/main/components/map/Draw/panels/MapDrawLayersPanel.vue',
 ]

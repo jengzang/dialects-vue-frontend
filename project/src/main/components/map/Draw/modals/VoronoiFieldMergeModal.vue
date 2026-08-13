@@ -11,7 +11,8 @@
           <input
             v-model="searchText"
             type="text"
-            class="scope-search-input"
+            class="scope-search-input glass-field"
+            data-shape="search"
             :placeholder="t('map.drawTab.voronoi.searchPlaceholder')"
           >
         </div>
@@ -28,7 +29,7 @@
           >
             <span class="field-merge-original">{{ entry.original }}</span>
             <input
-              class="scope-search-input field-merge-input"
+              class="scope-search-input field-merge-input glass-field"
               :value="entry.groupName"
               @input="$emit('update:field-merge', entry.original, $event.target.value)"
             >
@@ -108,19 +109,8 @@ watch(() => props.modelValue, (isOpen) => {
   .scope-search-input {
     width: 100%;
     height: 38px;
-    border: 1px solid var(--glass-60);
-    border-radius: var(--radius-md);
-    padding: 0 14px;
     font-size: 13px;
-    color: var(--text-strong);
-    background: var(--glass-strong);
     box-sizing: border-box;
-
-    &:focus {
-      outline: none;
-      border-color: rgba(var(--color-primary-rgb), 0.48);
-      box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.16);
-    }
   }
 }
 

@@ -13,7 +13,8 @@
             <input
               v-model="searchText"
               type="text"
-              class="scope-search-input"
+              class="scope-search-input glass-field"
+              data-shape="search"
               :placeholder="t('map.customTab.scopeModal.searchPlaceholder')"
             >
           </div>
@@ -500,18 +501,7 @@ function formatRegionNames(regionNames) {
   .scope-search-input {
     width: 80%;
     height: 38px;
-    border: 1px solid $muted-active;
-    border-radius: var(--radius-md);
-    padding: 0 14px;
     font-size: 13px;
-    color: $text-strong;
-    background: $glass-strong;
-
-    &:focus {
-      outline: none;
-      border-color: rgba(var(--color-primary-rgb), 0.48);
-      box-shadow: 0 0 0 3px $primary-border;
-    }
   }
 }
 

@@ -32,7 +32,8 @@
           v-if="localLevel !== 'country'"
           v-model="searchQuery"
           type="text"
-          class="clip-boundary-search"
+          class="clip-boundary-search glass-field"
+          data-shape="search"
           :placeholder="t('map.drawTab.voronoi.clipBoundarySearchPlaceholder')"
         >
         <p v-if="highPrecisionLimit" class="clip-boundary-hint">
@@ -294,21 +295,7 @@ function handleConfirm() {
 }
 
 .clip-boundary-search {
-  padding: 7px 10px;
-  color: var(--text-deep);
   font-size: 13px;
-  background: var(--glass-50);
-  border: 1px solid var(--border-glass);
-  border-radius: var(--radius-sm);
-  outline: none;
-
-  &:focus {
-    border-color: rgba(var(--color-primary-rgb), 0.5);
-  }
-
-  &::placeholder {
-    color: var(--text-tertiary);
-  }
 }
 
 .clip-boundary-loading {

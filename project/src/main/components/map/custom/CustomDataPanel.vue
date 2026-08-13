@@ -14,6 +14,7 @@
             <input
                 id="location-input"
                 v-model="formData.location"
+                class="glass-field"
                 type="text"
                 :placeholder="t('map.customDataPanel.placeholders.location')"
                 autocomplete="off"
@@ -47,6 +48,7 @@
             <input
                 id="region-input"
                 v-model="formData.region"
+                class="glass-field"
                 type="text"
                 :placeholder="t('map.customDataPanel.placeholders.region')"
             />
@@ -57,6 +59,7 @@
             <input
                 id="coordinates-input"
                 v-model="formData.coordinates"
+                class="glass-field"
                 type="text"
                 :placeholder="t('map.customDataPanel.placeholders.coordinates')"
             />
@@ -67,6 +70,7 @@
             <input
                 id="feature-type-input"
                 v-model="formData.featureType"
+                class="glass-field"
                 type="text"
                 :placeholder="t('map.customDataPanel.placeholders.featureType')"
                 autocomplete="off"
@@ -79,6 +83,7 @@
             <input
                 id="feature-field-input"
                 v-model="formData.featureField"
+                class="glass-field"
                 type="text"
                 :placeholder="t('map.customDataPanel.placeholders.featureField')"
                 :readonly="formData.featureField.trim() !== ''"
@@ -99,6 +104,7 @@
             <input
                 id="value-input"
                 v-model="formData.value"
+                class="glass-field"
                 type="text"
                 :placeholder="t('map.customDataPanel.placeholders.value')"
             />
@@ -109,6 +115,7 @@
             <textarea
                 id="description-input"
                 v-model="formData.description"
+                class="glass-field"
                 :placeholder="t('map.customDataPanel.placeholders.description')"
                 rows="3"
             />
@@ -467,25 +474,12 @@ const resetForm = () => {
 .form-group textarea {
   flex: 1;               /* 占据剩余空间 */
   padding: 8px 10px;     /* 略微减小 padding 以适应更紧凑的布局 */
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: var(--radius-md);
   font-size: 14px;
-  background: var(--glass-80);
-  transition: all 0.3s ease;
 }
 
 .form-group input[readonly] {
-  background: rgba(240, 240, 240, 0.8);
   cursor: not-allowed;
   color: var(--text-tertiary)
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  background: white;
-  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
 }
 
 .form-group textarea {
