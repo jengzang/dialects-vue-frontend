@@ -186,6 +186,7 @@
           :can-edit-shape="canEditSelectedShape"
           :can-use-selected-geometry-tools="canUseSelectedGeometryTools"
           :can-close-selected-line="canCloseSelectedLine"
+          :can-split-selected-line="canSplitSelectedLine"
           :can-convert-selected-line-to-polygon="canConvertSelectedLineToPolygon"
           :geometry-quality-summary="geometryQualitySummary"
           :can-delete-selection="canDeleteSelection"
@@ -205,6 +206,7 @@
           @reverse-selected-geometry="handleReverseSelectedGeometry"
           @simplify-selected-geometry="handleSimplifySelectedGeometry"
           @close-selected-line="handleCloseSelectedLine"
+          @split-selected-line="handleSplitSelectedLine"
           @convert-selected-line-to-polygon="handleConvertSelectedLineToPolygon"
           @move-selected-vertex="handleMoveSelectedVertex"
           @undo="undoHistory"
@@ -832,7 +834,7 @@ const {
   canApplySelectedFeatureBatchProperty, featureMoveLayerOptions,
   selectedEditorProperties, selectedEditorFeatureId, selectedEditorGeometryType,
   canModifyActiveLayer, canEditSelectedShape, canDeleteSelection, canDuplicateSelectedFeature,
-  canUseSelectedGeometryTools, canCloseSelectedLine, canConvertSelectedLineToPolygon, geometryQualitySummary,
+  canUseSelectedGeometryTools, canCloseSelectedLine, canSplitSelectedLine, canConvertSelectedLineToPolygon, geometryQualitySummary,
   canUseFeatureBoxSelect, canMoveSelectedFeatures, selectedLayerLabel,
   createEmptyLayer, getFeatureId, getFeatureLabel, getLayerLabel,
   syncLayerIdSeedFromLayers, applyLayerPropertyToFeatures,
@@ -899,7 +901,7 @@ const gisFeatures = useGisFeatures({
 const {
   handleEditSelectedShape, handleDuplicateSelectedFeature,
   handleReverseSelectedGeometry, handleSimplifySelectedGeometry, handleCloseSelectedLine, handleConvertSelectedLineToPolygon,
-  handleMoveSelectedVertex,
+  handleMoveSelectedVertex, handleSplitSelectedLine,
   handleDeleteSelected, handleDeleteSelectedFeatures, handleClearAll,
   updateFeatureProperty, updateSelectedFeatureProperty,
   updateSelectedFeaturesProperty,

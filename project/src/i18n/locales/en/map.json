@@ -551,6 +551,7 @@
       "reverseGeometry": "Reverse Geometry",
       "simplifyGeometry": "Simplify Geometry",
       "closeLine": "Close Line",
+      "splitLine": "Split Line",
       "lineToPolygon": "Closed Line to Polygon",
       "duplicateLayer": "Duplicate Layer",
       "renameLayer": "Rename",

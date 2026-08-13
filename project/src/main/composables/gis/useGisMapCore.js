@@ -448,6 +448,21 @@ export function useGisMapCore(options = {}) {
     );
   });
 
+  const canSplitSelectedLine = computed(() => {
+    const coordinates = selectedFeature.value?.geometry?.coordinates ?? [];
+    const splitIndex = Number(selectedVertex.value?.coordPath);
+    return Boolean(
+      canUseSelectedGeometryTools.value
+      && currentMode.value === 'direct_select'
+      && selectedFeature.value?.geometry?.type === 'LineString'
+      && selectedVertex.value?.featureId === selectedFeatureId.value
+      && selectedVertexCount.value === 1
+      && Number.isInteger(splitIndex)
+      && splitIndex > 0
+      && splitIndex < coordinates.length - 1
+    );
+  });
+
   const geometryQualitySummary = computed(() => {
     const issues = [];
     activeLayerFeatures.value.forEach((feature) => {
@@ -876,6 +891,7 @@ export function useGisMapCore(options = {}) {
     canEditSelectedShape,
     canUseSelectedGeometryTools,
     canCloseSelectedLine,
+    canSplitSelectedLine,
     canConvertSelectedLineToPolygon,
     geometryQualitySummary,
     canDeleteSelection,

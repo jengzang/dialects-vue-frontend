@@ -1032,6 +1032,56 @@ const moveVertexInFeature = (feature, coordPath, coordinate) => {
   return null
 }
 
+const buildSplitFeatureId = (featureCollection, sourceId) => {
+  const existingIds = new Set((featureCollection.features ?? []).map((feature) => getDrawFeatureId(feature)).filter(Boolean))
+  let index = 1
+  let nextId = `${String(sourceId || 'feature')}-split-${index}`
+  while (existingIds.has(nextId)) {
+    index += 1
+    nextId = `${String(sourceId || 'feature')}-split-${index}`
+  }
+  return nextId
+}
+
+const cloneSplitLineFeature = (feature, id, coordinates) => ({
+  ...feature,
+  id,
+  properties: {
+    ...(feature?.properties ?? {}),
+    id,
+  },
+  geometry: {
+    ...feature.geometry,
+    coordinates: coordinates.map((coordinate) => [...coordinate]),
+  },
+})
+
+const splitLineFeatureAtCoordPath = (featureCollection, featureId, coordPath) => {
+  const feature = featureId ? (featureCollection.features ?? []).find((item) => getDrawFeatureId(item) === String(featureId)) : null
+  if (!feature || !isDrawFeatureSelectable(feature) || feature.geometry?.type !== 'LineString') return null
+  const normalizedPath = normalizeExistingCoordPath(feature, coordPath)
+  if (!normalizedPath) return null
+  const splitIndex = Number(normalizedPath)
+  const coordinates = (feature.geometry.coordinates ?? []).map((coordinate) => normalizeVertexCoordinate(coordinate))
+  if (!coordinates.every(Boolean) || splitIndex <= 0 || splitIndex >= coordinates.length - 1) return null
+
+  const firstCoordinates = coordinates.slice(0, splitIndex + 1)
+  const secondCoordinates = coordinates.slice(splitIndex)
+  if (!isLineGeometryValid(firstCoordinates) || !isLineGeometryValid(secondCoordinates)) return null
+  const secondFeatureId = buildSplitFeatureId(featureCollection, featureId)
+  const firstFeature = cloneSplitLineFeature(feature, String(featureId), firstCoordinates)
+  const secondFeature = cloneSplitLineFeature(feature, secondFeatureId, secondCoordinates)
+  return {
+    featureCollection: {
+      ...featureCollection,
+      features: (featureCollection.features ?? []).flatMap((item) => (
+        getDrawFeatureId(item) === String(featureId) ? [firstFeature, secondFeature] : [item]
+      )),
+    },
+    featureIds: [String(featureId), secondFeatureId],
+  }
+}
+
 const canDeleteVerticesByCoordPaths = (feature, coordPaths = []) => {
   return Boolean(deleteVerticesFromFeature(feature, coordPaths))
 }
@@ -1500,6 +1550,27 @@ const deleteVertices = (featureId, coordPaths, options = {}) => {
   emit('feature-select', selectedFeatureId.value)
   syncShapeEditState()
   return true
+}
+
+const splitLineAtVertex = (featureId, coordPath, options = {}) => {
+  if (!draw.value || !featureId) return false
+  const featureCollection = normalizeFeatureCollection(draw.value.getAll?.() ?? props.modelValue)
+  const result = splitLineFeatureAtCoordPath(featureCollection, featureId, coordPath)
+  if (!result) return false
+
+  draw.value.set(result.featureCollection)
+  syncFeaturesFromDraw({
+    commitHistory: options.commitHistory !== false,
+    syncSelection: false,
+  })
+  selectFeatures(result.featureIds)
+  return true
+}
+
+const canSplitLineAtVertex = (featureId, coordPath) => {
+  if (!draw.value || !featureId) return false
+  const featureCollection = normalizeFeatureCollection(draw.value.getAll?.() ?? props.modelValue)
+  return Boolean(splitLineFeatureAtCoordPath(featureCollection, featureId, coordPath))
 }
 
 const deleteSelected = () => {
@@ -2176,6 +2247,8 @@ defineExpose({
   selectVertex,
   insertVertex,
   moveVertex,
+  canSplitLineAtVertex,
+  splitLineAtVertex,
   selectedFeatureId,
   updateFeatureProperties,
   canDeleteSelected,

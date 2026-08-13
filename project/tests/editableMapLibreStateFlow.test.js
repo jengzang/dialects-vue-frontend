@@ -1178,6 +1178,70 @@ describe('EditableMapLibre state flow', () => {
     wrapper.unmount()
   })
 
+  it('splits a selected line at a middle vertex and keeps both resulting lines valid', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false, name: '边界线' },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1], [2, 2], [3, 3]] },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didSplit = wrapper.exposed.splitLineAtVertex('line-1', '2')
+
+    expect(didSplit).toBe(true)
+    const nextFeatures = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features
+    expect(nextFeatures).toHaveLength(2)
+    expect(nextFeatures.map((feature) => feature.geometry.coordinates)).toEqual([
+      [[0, 0], [1, 1], [2, 2]],
+      [[2, 2], [3, 3]],
+    ])
+    expect(nextFeatures[0].id).toBe('line-1')
+    expect(nextFeatures[1].id).toBe('line-1-split-1')
+    expect(nextFeatures[1].properties.name).toBe('边界线')
+    expect(wrapper.events).toContainEqual(['mode-change', 'simple_select'])
+    expect(wrapper.events).toContainEqual([
+      'shape-edit-state-change',
+      {
+        mode: 'simple_select',
+        featureId: '',
+        selectedVertexCount: 0,
+        selectedVertex: null,
+        canDeleteSelectedVertices: false,
+      },
+    ])
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', {
+      featureIds: ['line-1', 'line-1-split-1'],
+    })
+
+    wrapper.unmount()
+  })
+
+  it('blocks line splitting at endpoints or invalid coordinate paths', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1], [2, 2]] },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    expect(wrapper.exposed.splitLineAtVertex('line-1', '0')).toBe(false)
+    expect(wrapper.exposed.splitLineAtVertex('line-1', '2')).toBe(false)
+    expect(wrapper.exposed.splitLineAtVertex('line-1', 'x')).toBe(false)
+    expect(wrapper.events.some(([eventName]) => eventName === 'features-change')).toBe(false)
+
+    wrapper.unmount()
+  })
+
   it('reports selected vertices as not deletable when deletion would invalidate a line', async () => {
     const wrapper = mountEditableMapLibre({
       type: 'FeatureCollection',

@@ -18,6 +18,7 @@ export function useGisFeatures(options = {}) {
     canEditSelectedShape,
     canUseSelectedGeometryTools,
     canCloseSelectedLine,
+    canSplitSelectedLine,
     canConvertSelectedLineToPolygon,
     canDeleteSelection,
     canMoveSelectedFeatures,
@@ -319,6 +320,21 @@ export function useGisFeatures(options = {}) {
     currentMode.value = 'direct_select';
   }
 
+  async function handleSplitSelectedLine() {
+    if (!await guardWrite()) return;
+    if (!canSplitSelectedLine?.value || typeof editableMapRef?.value?.splitLineAtVertex !== 'function') return;
+    const featureId = selectedVertex?.value?.featureId;
+    const coordPath = selectedVertex?.value?.coordPath;
+    if (!featureId || featureId !== selectedFeatureId.value || typeof coordPath !== 'string') return;
+    if (typeof editableMapRef.value.canSplitLineAtVertex === 'function'
+      && !editableMapRef.value.canSplitLineAtVertex(featureId, coordPath)) return;
+
+    commitHistory();
+    const didSplit = editableMapRef.value.splitLineAtVertex(featureId, coordPath, { commitHistory: false });
+    if (didSplit === false) return;
+    currentMode.value = 'simple_select';
+  }
+
   async function handleDuplicateSelectedFeature() {
     if (!await guardWrite()) return;
     if (!canDuplicateSelectedFeature.value) return;
@@ -564,6 +580,7 @@ export function useGisFeatures(options = {}) {
     handleCloseSelectedLine,
     handleConvertSelectedLineToPolygon,
     handleMoveSelectedVertex,
+    handleSplitSelectedLine,
     handleDeleteSelected,
     handleDeleteSelectedFeatures,
     handleClearAll,

@@ -146,6 +146,17 @@
               v-if="selectedFeatureGeometryType === 'LineString'"
               class="glass-button"
               data-variant="secondary"
+              data-testid="draw-tool-split-line"
+              type="button"
+              :disabled="!canSplitSelectedLine"
+              @click="$emit('split-selected-line')"
+            >
+              {{ t('map.drawTab.buttons.splitLine') }}
+            </button>
+            <button
+              v-if="selectedFeatureGeometryType === 'LineString'"
+              class="glass-button"
+              data-variant="secondary"
               data-testid="draw-tool-line-to-polygon"
               type="button"
               :disabled="!canConvertSelectedLineToPolygon"
@@ -817,6 +828,7 @@ const props = defineProps({
   canEditShape: { type: Boolean, default: false },
   canUseSelectedGeometryTools: { type: Boolean, default: false },
   canCloseSelectedLine: { type: Boolean, default: false },
+  canSplitSelectedLine: { type: Boolean, default: false },
   canConvertSelectedLineToPolygon: { type: Boolean, default: false },
   geometryQualitySummary: {
     type: Object,
@@ -847,6 +859,7 @@ const emit = defineEmits([
   'reverse-selected-geometry',
   'simplify-selected-geometry',
   'close-selected-line',
+  'split-selected-line',
   'convert-selected-line-to-polygon',
   'move-selected-vertex',
   'undo',

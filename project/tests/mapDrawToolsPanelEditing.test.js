@@ -57,6 +57,7 @@ function mountToolsPanel(overrides = {}) {
     canUseSelectedGeometryTools: true,
     canCloseSelectedLine: false,
     canConvertSelectedLineToPolygon: true,
+    canSplitSelectedLine: false,
     canDeleteSelection: false,
     canDeleteSelectedVertices: false,
     canEditShape: true,
@@ -86,6 +87,7 @@ function mountToolsPanel(overrides = {}) {
         @simplify-selected-geometry="events.push(['simplify-selected-geometry'])"
         @close-selected-line="events.push(['close-selected-line'])"
         @convert-selected-line-to-polygon="events.push(['convert-selected-line-to-polygon'])"
+        @split-selected-line="events.push(['split-selected-line'])"
         @move-selected-vertex="events.push(['move-selected-vertex', $event])"
         @delete-selected="events.push(['delete-selected'])"
       />
@@ -291,35 +293,74 @@ describe('MapDrawToolsPanel editing affordances', () => {
       canEditShape: true,
       canModifyActiveLayer: true,
       canCloseSelectedLine: true,
+      canSplitSelectedLine: true,
     })
     await nextTick()
 
     const reverseButton = wrapper.host.querySelector('[data-testid="draw-tool-reverse-geometry"]')
     const simplifyButton = wrapper.host.querySelector('[data-testid="draw-tool-simplify-geometry"]')
     const closeLineButton = wrapper.host.querySelector('[data-testid="draw-tool-close-line"]')
+    const splitLineButton = wrapper.host.querySelector('[data-testid="draw-tool-split-line"]')
     const convertButton = wrapper.host.querySelector('[data-testid="draw-tool-line-to-polygon"]')
 
     expect(reverseButton.disabled).toBe(false)
     expect(simplifyButton.disabled).toBe(false)
     expect(closeLineButton.disabled).toBe(false)
+    expect(splitLineButton.disabled).toBe(false)
     expect(convertButton.disabled).toBe(false)
 
     reverseButton.click()
     simplifyButton.click()
     closeLineButton.click()
+    splitLineButton.click()
     convertButton.click()
     await nextTick()
 
     expect(wrapper.events).toContainEqual(['reverse-selected-geometry'])
     expect(wrapper.events).toContainEqual(['simplify-selected-geometry'])
     expect(wrapper.events).toContainEqual(['close-selected-line'])
+    expect(wrapper.events).toContainEqual(['split-selected-line'])
     expect(wrapper.events).toContainEqual(['convert-selected-line-to-polygon'])
 
     wrapper.props.selectedFeatureGeometryType = 'Polygon'
     await nextTick()
 
     expect(wrapper.host.querySelector('[data-testid="draw-tool-close-line"]')).toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-split-line"]')).toBeNull()
     expect(wrapper.host.querySelector('[data-testid="draw-tool-line-to-polygon"]')).toBeNull()
+
+    wrapper.unmount()
+  })
+
+  it('keeps line splitting disabled until a middle line vertex is selected', async () => {
+    const wrapper = mountToolsPanel({
+      currentMode: 'direct_select',
+      selectedFeatureGeometryType: 'LineString',
+      selectedVertexCount: 1,
+      selectedVertex: {
+        featureId: 'feature-1',
+        coordPath: '1',
+        coordinate: [113.25, 23.5],
+      },
+      canUseSelectedGeometryTools: true,
+      canSplitSelectedLine: false,
+    })
+    await nextTick()
+
+    const splitLineButton = wrapper.host.querySelector('[data-testid="draw-tool-split-line"]')
+    expect(splitLineButton.disabled).toBe(true)
+
+    splitLineButton.click()
+    await nextTick()
+    expect(wrapper.events).not.toContainEqual(['split-selected-line'])
+
+    wrapper.props.canSplitSelectedLine = true
+    await nextTick()
+    expect(splitLineButton.disabled).toBe(false)
+
+    splitLineButton.click()
+    await nextTick()
+    expect(wrapper.events).toContainEqual(['split-selected-line'])
 
     wrapper.unmount()
   })

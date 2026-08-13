@@ -551,6 +551,7 @@
       "reverseGeometry": "反向几何",
       "simplifyGeometry": "简化几何",
       "closeLine": "闭合线",
+      "splitLine": "分割线",
       "lineToPolygon": "闭合线转面",
       "duplicateLayer": "复制图层",
       "renameLayer": "重命名",
