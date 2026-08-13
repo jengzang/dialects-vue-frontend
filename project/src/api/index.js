@@ -126,6 +126,7 @@ export { postPhoPieByValue, postPhoPieByStatus } from './main/core/phoPie.js';
 export {
   getToponymNames,
   getToponymPoints,
+  getToponymSearch,
   getToponymOfficialDetail,
   getToponymDetails,
 } from './main/toponyms.js';

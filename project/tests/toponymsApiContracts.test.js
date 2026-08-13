@@ -9,7 +9,7 @@ vi.mock('../src/api/auth/httpClient.js', () => ({
   api: apiMock,
 }));
 
-const { getToponymNames, getToponymPoints } = await import('../src/api/main/toponyms.js');
+const { getToponymNames, getToponymPoints, getToponymSearch } = await import('../src/api/main/toponyms.js');
 
 const testsDir = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(testsDir, '..');
@@ -28,6 +28,7 @@ describe('toponyms API contracts', () => {
 
     expect(source).toContain('/api/toponyms/names');
     expect(source).toContain('/api/toponyms/points');
+    expect(source).toContain('/api/toponyms/search');
     expect(source).toContain('/api/toponyms/details');
     expect(source).toContain('https://dmfw.mca.gov.cn/9095/stname/detailsPub');
     expect(source).toContain('getToponymOfficialDetail');
@@ -90,9 +91,72 @@ describe('toponyms API contracts', () => {
 
     expect(source).toContain('getToponymNames');
     expect(source).toContain('getToponymPoints');
+    expect(source).toContain('getToponymSearch');
     expect(source).toContain('getToponymOfficialDetail');
     expect(source).toContain('getToponymDetails');
     expect(source).toContain('./main/toponyms.js');
+  });
+
+  it('serializes catalog search params without point-only filters', async () => {
+    apiMock.mockResolvedValueOnce({
+      items: [{ id: '92e4878410adb6ebacfc245f2589bc4d', name: '樊家村' }],
+      truncated: false,
+    });
+
+    const payload = await getToponymSearch({
+      q: ' 樊家 ',
+      match_mode: 'prefix',
+      place_type_code: ['22200', '21610', '27610'],
+      area_code: '44',
+      area_scope: 'descendants',
+      bbox: '110,20,115,25',
+      zoom: 6,
+    });
+
+    const calledUrl = apiMock.mock.calls[0][0];
+    const query = new URL(`https://example.test${calledUrl}`).searchParams;
+
+    expect(calledUrl).toContain('/api/toponyms/search?');
+    expect(query.get('q')).toBe('樊家');
+    expect(query.get('match_mode')).toBe('prefix');
+    expect(query.get('limit')).toBe('50');
+    expect(query.getAll('place_type_code')).toEqual(['22200', '21610', '27610']);
+    expect(query.get('area_code')).toBe('44');
+    expect(query.get('area_scope')).toBe('descendants');
+    expect(query.get('bbox')).toBeNull();
+    expect(query.get('zoom')).toBeNull();
+    expect(payload).toEqual({
+      items: [{ id: '92e4878410adb6ebacfc245f2589bc4d', name: '樊家村' }],
+      count: 1,
+      truncated: false,
+    });
+  });
+
+  it('omits area scope when catalog search has no area code', async () => {
+    apiMock.mockResolvedValueOnce({
+      items: [],
+      count: 0,
+      truncated: true,
+    });
+
+    await getToponymSearch({
+      q: '黄',
+      match_mode: 'unknown',
+      area_scope: 'exact',
+      limit: 100,
+      include_area_code: true,
+      include_place_type_code: true,
+    });
+
+    const calledUrl = apiMock.mock.calls[0][0];
+    const query = new URL(`https://example.test${calledUrl}`).searchParams;
+
+    expect(query.get('match_mode')).toBe('prefix');
+    expect(query.get('limit')).toBe('100');
+    expect(query.get('area_code')).toBeNull();
+    expect(query.get('area_scope')).toBeNull();
+    expect(query.get('include_area_code')).toBe('true');
+    expect(query.get('include_place_type_code')).toBe('true');
   });
 
   it('serializes lazy tree parent paths as repeated query params and keeps lazy response fields', async () => {
