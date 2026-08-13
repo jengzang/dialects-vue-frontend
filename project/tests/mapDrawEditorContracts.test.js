@@ -234,6 +234,34 @@ describe('Map draw editor contracts', () => {
     expect(tabSource).toContain('@mode-change="handleDrawModeChange"')
   })
 
+  it('wires first-stage selected geometry tools through the draw tools panel', () => {
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+    const featuresSource = readSource(useGisFeaturesPath)
+
+    expect(panelSource).toContain(`$emit('reverse-selected-geometry')`)
+    expect(panelSource).toContain(`$emit('simplify-selected-geometry')`)
+    expect(panelSource).toContain(`$emit('convert-selected-line-to-polygon')`)
+    expect(panelSource).toContain('canUseSelectedGeometryTools')
+    expect(panelSource).toContain('canConvertSelectedLineToPolygon')
+    expect(panelSource).toContain(`t('map.drawTab.buttons.reverseGeometry')`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.simplifyGeometry')`)
+    expect(panelSource).toContain(`t('map.drawTab.buttons.lineToPolygon')`)
+    expect(tabSource).toContain('@reverse-selected-geometry="handleReverseSelectedGeometry"')
+    expect(tabSource).toContain('@simplify-selected-geometry="handleSimplifySelectedGeometry"')
+    expect(tabSource).toContain('@convert-selected-line-to-polygon="handleConvertSelectedLineToPolygon"')
+    expect(tabSource).toContain(':can-use-selected-geometry-tools="canUseSelectedGeometryTools"')
+    expect(tabSource).toContain(':can-convert-selected-line-to-polygon="canConvertSelectedLineToPolygon"')
+    expect(featuresSource).toContain('async function handleReverseSelectedGeometry()')
+    expect(featuresSource).toContain('async function handleSimplifySelectedGeometry()')
+    expect(featuresSource).toContain('async function handleConvertSelectedLineToPolygon()')
+    expect(featuresSource).toContain('reversePathCoordinates')
+    expect(featuresSource).toContain('simplifyPathCoordinates')
+    expect(featuresSource).toContain('!canUseSelectedGeometryTools?.value')
+    expect(featuresSource).toContain('!canConvertSelectedLineToPolygon?.value')
+    expect(featuresSource).toContain("layerGeometryType: 'Polygon'")
+  })
+
   it('exposes first-class coordinate-path vertex editing for lines and polygons', () => {
     const editableSource = readSource(editableMapLibrePath)
 

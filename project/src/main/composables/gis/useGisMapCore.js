@@ -46,6 +46,38 @@ const formatFeatureTableValue = (value) => {
   return String(value);
 };
 
+const isCoordinatePair = (coordinate) => {
+  return Array.isArray(coordinate)
+    && coordinate.length >= 2
+    && Number.isFinite(Number(coordinate[0]))
+    && Number.isFinite(Number(coordinate[1]));
+};
+
+const coordinatesEqual = (a, b) => {
+  return isCoordinatePair(a)
+    && isCoordinatePair(b)
+    && Number(a[0]) === Number(b[0])
+    && Number(a[1]) === Number(b[1]);
+};
+
+const getUniqueCoordinateCount = (coordinates = []) => {
+  const seen = new Set();
+  coordinates.forEach((coordinate, index) => {
+    if (!isCoordinatePair(coordinate)) return;
+    if (index === coordinates.length - 1 && coordinatesEqual(coordinate, coordinates[0])) return;
+    seen.add(`${Number(coordinate[0])},${Number(coordinate[1])}`);
+  });
+  return seen.size;
+};
+
+const isClosedValidPolygonRing = (coordinates = []) => {
+  return Array.isArray(coordinates)
+    && coordinates.length >= 4
+    && coordinates.every(isCoordinatePair)
+    && coordinatesEqual(coordinates[0], coordinates[coordinates.length - 1])
+    && getUniqueCoordinateCount(coordinates) >= 3;
+};
+
 export function useGisMapCore(options = {}) {
   const { t } = useI18n();
   const {
@@ -284,6 +316,24 @@ export function useGisMapCore(options = {}) {
       && selectedFeature.value.properties?.visible !== false
       && selectedFeature.value.properties?.locked !== true
       && ['LineString', 'Polygon'].includes(selectedEditorGeometryType.value)
+    );
+  });
+
+  const canUseSelectedGeometryTools = computed(() => {
+    return Boolean(
+      canEditSelectedShape.value
+      && canModifyActiveLayer.value
+      && selectedFeatureIds.value.length === 1
+      && selectedFeatureIds.value[0] === selectedFeatureId.value
+    );
+  });
+
+  const canConvertSelectedLineToPolygon = computed(() => {
+    return Boolean(
+      canUseSelectedGeometryTools.value
+      && selectedFeature.value?.geometry?.type === 'LineString'
+      && (activeLayerFeatures.value.length === 1)
+      && isClosedValidPolygonRing(selectedFeature.value.geometry.coordinates ?? [])
     );
   });
 
@@ -641,6 +691,8 @@ export function useGisMapCore(options = {}) {
     selectedEditorGeometryType,
     canModifyActiveLayer,
     canEditSelectedShape,
+    canUseSelectedGeometryTools,
+    canConvertSelectedLineToPolygon,
     canDeleteSelection,
     canDuplicateSelectedFeature,
     canUseFeatureBoxSelect,

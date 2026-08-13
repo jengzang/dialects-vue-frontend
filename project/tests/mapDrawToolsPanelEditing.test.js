@@ -53,6 +53,8 @@ function mountToolsPanel(overrides = {}) {
     selectedFeatureId: 'feature-1',
     selectedFeatureIds: ['feature-1'],
     selectedVertexCount: 0,
+    canUseSelectedGeometryTools: true,
+    canConvertSelectedLineToPolygon: true,
     canDeleteSelection: false,
     canDeleteSelectedVertices: false,
     canEditShape: true,
@@ -73,6 +75,9 @@ function mountToolsPanel(overrides = {}) {
         @set-mode="events.push(['set-mode', $event])"
         @undo="events.push(['undo'])"
         @redo="events.push(['redo'])"
+        @reverse-selected-geometry="events.push(['reverse-selected-geometry'])"
+        @simplify-selected-geometry="events.push(['simplify-selected-geometry'])"
+        @convert-selected-line-to-polygon="events.push(['convert-selected-line-to-polygon'])"
         @delete-selected="events.push(['delete-selected'])"
       />
     `,
@@ -203,6 +208,90 @@ describe('MapDrawToolsPanel editing affordances', () => {
     redoButton.click()
     await nextTick()
     expect(wrapper.events).toContainEqual(['redo'])
+
+    wrapper.unmount()
+  })
+
+  it('exposes selected geometry tools for editable line and polygon features', async () => {
+    const wrapper = mountToolsPanel({
+      currentMode: 'simple_select',
+      selectedFeatureGeometryType: 'LineString',
+      canEditShape: true,
+      canModifyActiveLayer: true,
+    })
+    await nextTick()
+
+    const reverseButton = wrapper.host.querySelector('[data-testid="draw-tool-reverse-geometry"]')
+    const simplifyButton = wrapper.host.querySelector('[data-testid="draw-tool-simplify-geometry"]')
+    const convertButton = wrapper.host.querySelector('[data-testid="draw-tool-line-to-polygon"]')
+
+    expect(reverseButton.disabled).toBe(false)
+    expect(simplifyButton.disabled).toBe(false)
+    expect(convertButton.disabled).toBe(false)
+
+    reverseButton.click()
+    simplifyButton.click()
+    convertButton.click()
+    await nextTick()
+
+    expect(wrapper.events).toContainEqual(['reverse-selected-geometry'])
+    expect(wrapper.events).toContainEqual(['simplify-selected-geometry'])
+    expect(wrapper.events).toContainEqual(['convert-selected-line-to-polygon'])
+
+    wrapper.props.selectedFeatureGeometryType = 'Polygon'
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-line-to-polygon"]')).toBeNull()
+
+    wrapper.unmount()
+  })
+
+  it('disables selected geometry tools when the current selection is not editable', async () => {
+    const wrapper = mountToolsPanel({
+      currentMode: 'simple_select',
+      selectedFeatureGeometryType: 'Point',
+      canEditShape: false,
+      canModifyActiveLayer: false,
+      canUseSelectedGeometryTools: false,
+      canConvertSelectedLineToPolygon: false,
+    })
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-reverse-geometry"]').disabled).toBe(true)
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-simplify-geometry"]').disabled).toBe(true)
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-line-to-polygon"]')).toBeNull()
+
+    wrapper.unmount()
+  })
+
+  it('keeps selected geometry tools single-selection only and gates line conversion separately', async () => {
+    const wrapper = mountToolsPanel({
+      currentMode: 'simple_select',
+      selectedFeatureGeometryType: 'LineString',
+      selectedFeatureIds: ['feature-1', 'feature-2'],
+      canEditShape: true,
+      canModifyActiveLayer: true,
+      canUseSelectedGeometryTools: false,
+      canConvertSelectedLineToPolygon: false,
+    })
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-reverse-geometry"]').disabled).toBe(true)
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-simplify-geometry"]').disabled).toBe(true)
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-line-to-polygon"]').disabled).toBe(true)
+
+    wrapper.props.selectedFeatureIds = ['feature-1']
+    wrapper.props.canUseSelectedGeometryTools = true
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-reverse-geometry"]').disabled).toBe(false)
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-simplify-geometry"]').disabled).toBe(false)
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-line-to-polygon"]').disabled).toBe(true)
+
+    wrapper.props.canConvertSelectedLineToPolygon = true
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-line-to-polygon"]').disabled).toBe(false)
 
     wrapper.unmount()
   })

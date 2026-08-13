@@ -114,6 +114,37 @@
             <button
               class="glass-button"
               data-variant="secondary"
+              data-testid="draw-tool-reverse-geometry"
+              type="button"
+              :disabled="!canUseSelectedGeometryTools"
+              @click="$emit('reverse-selected-geometry')"
+            >
+              {{ t('map.drawTab.buttons.reverseGeometry') }}
+            </button>
+            <button
+              class="glass-button"
+              data-variant="secondary"
+              data-testid="draw-tool-simplify-geometry"
+              type="button"
+              :disabled="!canUseSelectedGeometryTools"
+              @click="$emit('simplify-selected-geometry')"
+            >
+              {{ t('map.drawTab.buttons.simplifyGeometry') }}
+            </button>
+            <button
+              v-if="selectedFeatureGeometryType === 'LineString'"
+              class="glass-button"
+              data-variant="secondary"
+              data-testid="draw-tool-line-to-polygon"
+              type="button"
+              :disabled="!canConvertSelectedLineToPolygon"
+              @click="$emit('convert-selected-line-to-polygon')"
+            >
+              {{ t('map.drawTab.buttons.lineToPolygon') }}
+            </button>
+            <button
+              class="glass-button"
+              data-variant="secondary"
               data-testid="draw-tool-undo"
               type="button"
               :title="undoButtonTitle"
@@ -701,6 +732,8 @@ const props = defineProps({
   canUndo: { type: Boolean, default: false },
   canRedo: { type: Boolean, default: false },
   canEditShape: { type: Boolean, default: false },
+  canUseSelectedGeometryTools: { type: Boolean, default: false },
+  canConvertSelectedLineToPolygon: { type: Boolean, default: false },
   canDeleteSelection: { type: Boolean, default: false },
   canDeleteSelectedVertices: { type: Boolean, default: false },
   canDuplicateFeature: { type: Boolean, default: false },
@@ -719,6 +752,9 @@ defineEmits([
   'toggle-feature-box-select',
   'edit-shape',
   'duplicate-feature',
+  'reverse-selected-geometry',
+  'simplify-selected-geometry',
+  'convert-selected-line-to-polygon',
   'undo',
   'redo',
   'delete-selected',

@@ -15,6 +15,8 @@ export function useGisFeatures(options = {}) {
     canModifyActiveLayer,
     canDuplicateSelectedFeature,
     canEditSelectedShape,
+    canUseSelectedGeometryTools,
+    canConvertSelectedLineToPolygon,
     canDeleteSelection,
     canMoveSelectedFeatures,
     setFeatureSelection,
@@ -107,6 +109,183 @@ export function useGisFeatures(options = {}) {
         ? { ...feature.geometry, coordinates: structuredClone(feature.geometry.coordinates) }
         : feature?.geometry,
     };
+  }
+
+  function isCoordinatePair(coordinate) {
+    return Array.isArray(coordinate)
+      && coordinate.length >= 2
+      && Number.isFinite(Number(coordinate[0]))
+      && Number.isFinite(Number(coordinate[1]));
+  }
+
+  function coordinatesEqual(a, b) {
+    return isCoordinatePair(a)
+      && isCoordinatePair(b)
+      && Number(a[0]) === Number(b[0])
+      && Number(a[1]) === Number(b[1]);
+  }
+
+  function isClosedCoordinatePath(coordinates = []) {
+    return coordinates.length >= 2 && coordinatesEqual(coordinates[0], coordinates[coordinates.length - 1]);
+  }
+
+  function closeCoordinateRing(coordinates = []) {
+    const next = cloneCoordinatePath(coordinates);
+    if (!next.length) return [];
+    if (!isClosedCoordinatePath(next)) next.push([...next[0]]);
+    return next;
+  }
+
+  function getUniqueCoordinateCount(coordinates = []) {
+    const seen = new Set();
+    coordinates.forEach((coordinate, index) => {
+      if (!isCoordinatePair(coordinate)) return;
+      if (index === coordinates.length - 1 && coordinatesEqual(coordinate, coordinates[0])) return;
+      seen.add(`${Number(coordinate[0])},${Number(coordinate[1])}`);
+    });
+    return seen.size;
+  }
+
+  function cloneCoordinatePath(coordinates = []) {
+    return coordinates
+      .filter(isCoordinatePair)
+      .map((coordinate) => [Number(coordinate[0]), Number(coordinate[1])]);
+  }
+
+  function reversePathCoordinates(coordinates = []) {
+    const cloned = cloneCoordinatePath(coordinates);
+    if (!isClosedCoordinatePath(cloned)) return cloned.reverse();
+    const first = cloned[0];
+    const middle = cloned.slice(1, -1).reverse();
+    return [[...first], ...middle, [...first]];
+  }
+
+  function isCollinearCoordinate(prev, current, next) {
+    if (!isCoordinatePair(prev) || !isCoordinatePair(current) || !isCoordinatePair(next)) return false;
+    const cross = (
+      (Number(current[0]) - Number(prev[0])) * (Number(next[1]) - Number(prev[1]))
+      - (Number(current[1]) - Number(prev[1])) * (Number(next[0]) - Number(prev[0]))
+    );
+    return Math.abs(cross) <= 1e-10;
+  }
+
+  function removeConsecutiveDuplicateCoordinates(coordinates = []) {
+    return coordinates.reduce((items, coordinate) => {
+      if (!isCoordinatePair(coordinate)) return items;
+      if (items.length && coordinatesEqual(items[items.length - 1], coordinate)) return items;
+      items.push([...coordinate]);
+      return items;
+    }, []);
+  }
+
+  function simplifyPathCoordinates(coordinates = []) {
+    const wasClosed = isClosedCoordinatePath(coordinates);
+    let path = wasClosed ? coordinates.slice(0, -1) : coordinates;
+    path = removeConsecutiveDuplicateCoordinates(path);
+    const minLength = wasClosed ? 3 : 2;
+    let changed = true;
+    while (changed && path.length > minLength) {
+      changed = false;
+      for (let index = 0; index < path.length; index += 1) {
+        if (!wasClosed && (index === 0 || index === path.length - 1)) continue;
+        const prev = path[(index - 1 + path.length) % path.length];
+        const current = path[index];
+        const next = path[(index + 1) % path.length];
+        if (coordinatesEqual(prev, current) || coordinatesEqual(current, next) || isCollinearCoordinate(prev, current, next)) {
+          path.splice(index, 1);
+          changed = true;
+          break;
+        }
+      }
+    }
+    return wasClosed ? closeCoordinateRing(path) : path;
+  }
+
+  function isValidLineCoordinates(coordinates = []) {
+    return Array.isArray(coordinates)
+      && coordinates.filter(isCoordinatePair).length >= 2
+      && getUniqueCoordinateCount(coordinates) >= 2;
+  }
+
+  function isValidPolygonRings(rings = []) {
+    return Array.isArray(rings)
+      && rings.length > 0
+      && rings.every((ring) => (
+        Array.isArray(ring)
+        && isClosedCoordinatePath(ring)
+        && ring.filter(isCoordinatePair).length >= 4
+        && getUniqueCoordinateCount(ring) >= 3
+      ));
+  }
+
+  async function mutateSelectedGeometry(buildNext) {
+    if (!await guardWrite()) return;
+    if (!canModifyActiveLayer.value || !canEditSelectedShape.value || !canUseSelectedGeometryTools?.value) return;
+    const layer = activeLayer.value;
+    const fc = layer?.featureCollection ?? emptyFeatureCollection();
+    const targetFeature = (fc.features ?? []).find((feature) => getFeatureId(feature) === selectedFeatureId.value);
+    if (!layer || !targetFeature || !isFeatureEditableForMutation(targetFeature)) return;
+    const nextResult = buildNext(targetFeature.geometry, layer, targetFeature);
+    const nextGeometry = nextResult?.geometry ?? nextResult;
+    if (!nextGeometry?.type || JSON.stringify(nextGeometry) === JSON.stringify(targetFeature.geometry)) return;
+
+    commitHistory();
+    layer.featureCollection = {
+      ...fc,
+      features: (fc.features ?? []).map((feature) => {
+        if (getFeatureId(feature) !== selectedFeatureId.value) return feature;
+        return { ...feature, geometry: nextGeometry };
+      }),
+    };
+    if (nextResult?.layerGeometryType) {
+      layer.geometryType = nextResult.layerGeometryType;
+    }
+    setFeatureSelection(selectedFeatureIds.value.length ? selectedFeatureIds.value : [selectedFeatureId.value], selectedFeatureId.value);
+    currentMode.value = 'simple_select';
+    syncAllLayersAfterMutation();
+    editableMapRef?.value?.selectFeature?.(selectedFeatureId.value, { directEdit: false });
+  }
+
+  async function handleReverseSelectedGeometry() {
+    await mutateSelectedGeometry((geometry) => {
+      if (geometry?.type === 'LineString' && isValidLineCoordinates(geometry.coordinates)) {
+        return { ...geometry, coordinates: reversePathCoordinates(geometry.coordinates) };
+      }
+      if (geometry?.type === 'Polygon' && isValidPolygonRings(geometry.coordinates)) {
+        return {
+          ...geometry,
+          coordinates: geometry.coordinates.map((ring) => reversePathCoordinates(ring)),
+        };
+      }
+      return null;
+    });
+  }
+
+  async function handleSimplifySelectedGeometry() {
+    await mutateSelectedGeometry((geometry) => {
+      if (geometry?.type === 'LineString') {
+        const coordinates = simplifyPathCoordinates(geometry.coordinates ?? []);
+        return isValidLineCoordinates(coordinates) ? { ...geometry, coordinates } : null;
+      }
+      if (geometry?.type === 'Polygon') {
+        const coordinates = (geometry.coordinates ?? []).map((ring) => simplifyPathCoordinates(ring));
+        return isValidPolygonRings(coordinates) ? { ...geometry, coordinates } : null;
+      }
+      return null;
+    });
+  }
+
+  async function handleConvertSelectedLineToPolygon() {
+    if (!canConvertSelectedLineToPolygon?.value) return;
+    await mutateSelectedGeometry((geometry, layer) => {
+      if (geometry?.type !== 'LineString') return null;
+      const ring = closeCoordinateRing(geometry.coordinates ?? []);
+      if (!isValidPolygonRings([ring])) return null;
+      return {
+        geometry: { type: 'Polygon', coordinates: [ring] },
+        layerGeometryType: 'Polygon',
+      };
+    });
   }
 
   async function handleDuplicateSelectedFeature() {
@@ -349,6 +528,9 @@ export function useGisFeatures(options = {}) {
   return {
     handleEditSelectedShape,
     handleDuplicateSelectedFeature,
+    handleReverseSelectedGeometry,
+    handleSimplifySelectedGeometry,
+    handleConvertSelectedLineToPolygon,
     handleDeleteSelected,
     handleDeleteSelectedFeatures,
     handleClearAll,

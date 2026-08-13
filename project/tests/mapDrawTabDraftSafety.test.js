@@ -21,6 +21,7 @@ const mocks = vi.hoisted(() => {
     mapCanDeleteSelected: vi.fn(),
     mapDeleteSelected: vi.fn(),
     mapImportGeoJson: vi.fn(),
+    latestToolsPanelProps: null,
     routerPush: vi.fn(),
     isAuthenticated: { value: true },
     AUTO_DRAFT_ID: '__map_draw_auto_draft__',
@@ -121,6 +122,7 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         const nextIndex = (props.modelValue?.features?.length ?? 0) + 1
         const previousFeatures = props.modelValue?.features ?? []
         const activeLayerId = props.activeLayer?.id || ''
+        const geometryType = props.activeLayer?.geometryType || 'Polygon'
         if (!firstLayerId && activeLayerId) firstLayerId = activeLayerId
         const isFollowupLayer = activeLayerId && firstLayerId && activeLayerId !== firstLayerId
         const featureProperties = isFollowupLayer
@@ -129,13 +131,18 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
               region: `Region ${nextIndex}`,
               user_id: `user-${nextIndex}`,
             }
-        const collection = {
-          type: 'FeatureCollection',
-          features: [...previousFeatures, {
-            id: `feature-${nextIndex}`,
-            type: 'Feature',
-            properties: featureProperties,
-            geometry: {
+        const geometry = geometryType === 'LineString'
+          ? {
+              type: 'LineString',
+              coordinates: [
+                [0, 0],
+                [0.5, 0],
+                [1, 0],
+                [1, 1],
+                [0, 0],
+              ],
+            }
+          : {
               type: 'Polygon',
               coordinates: [[
                 [0, 0],
@@ -143,7 +150,14 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
                 [1, 1],
                 [0, 0],
               ]],
-            },
+            }
+        const collection = {
+          type: 'FeatureCollection',
+          features: [...previousFeatures, {
+            id: `feature-${nextIndex}`,
+            type: 'Feature',
+            properties: featureProperties,
+            geometry,
           }],
         }
         emit('update:modelValue', collection)
@@ -171,7 +185,8 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         emit('update:modelValue', collection)
         emit('features-change', collection)
       }
-      return { addPolygonFeature, emitGeometryUpdate }
+      const stringify = (value) => JSON.stringify(value)
+      return { addPolygonFeature, emitGeometryUpdate, stringify }
     },
     template: `
       <div>
@@ -206,6 +221,8 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
           emit no selected vertex
         </button>
         <span data-testid="first-feature-coordinate">{{ modelValue?.features?.[0]?.geometry?.coordinates?.[0]?.[1]?.[0] ?? '' }}</span>
+        <span data-testid="first-feature-geometry-type">{{ modelValue?.features?.[0]?.geometry?.type || '' }}</span>
+        <span data-testid="first-feature-coordinates">{{ stringify(modelValue?.features?.[0]?.geometry?.coordinates ?? null) }}</span>
         <span data-testid="box-select-mode">{{ featureBoxSelectEnabled ? 'on' : 'off' }}</span>
         <button
           data-testid="emit-box-selection"
@@ -275,6 +292,7 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       selectedFeatureBatchPropertyValue: { type: String, default: '' },
       selectedFeatureId: { type: String, default: '' },
       selectedFeatureIds: { type: Array, default: () => [] },
+      selectedFeatureGeometryType: { type: String, default: '' },
       currentMode: { type: String, default: 'simple_select' },
       selectedVertexCount: { type: Number, default: 0 },
       canDeleteSelectedVertices: { type: Boolean, default: false },
@@ -282,6 +300,8 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       isFeatureBoxSelectMode: { type: Boolean, default: false },
       canUseFeatureBoxSelect: { type: Boolean, default: false },
       canModifyActiveLayer: { type: Boolean, default: false },
+      canUseSelectedGeometryTools: { type: Boolean, default: false },
+      canConvertSelectedLineToPolygon: { type: Boolean, default: false },
     },
     emits: [
       'set-mode',
@@ -295,6 +315,9 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       'move-selected-features-to-layer',
       'set-selected-features-visible',
       'set-selected-features-locked',
+      'reverse-selected-geometry',
+      'simplify-selected-geometry',
+      'convert-selected-line-to-polygon',
       'update-feature-property',
       'update-feature-table-cell',
       'update:selected-feature-batch-name',
@@ -303,6 +326,10 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       'update:selected-feature-batch-property-value',
       'apply-selected-feature-batch-property',
     ],
+    setup(props) {
+      mocks.latestToolsPanelProps = props
+      return { props }
+    },
     template: `
       <div data-testid="tools-panel">
         <span data-testid="active-layer-id">{{ activeLayer?.id || '' }}</span>
@@ -329,6 +356,27 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
           @click="$emit('set-mode', 'draw_polygon')"
         >
           draw polygon mode
+        </button>
+        <button
+          data-testid="reverse-selected-geometry"
+          type="button"
+          @click="$emit('reverse-selected-geometry')"
+        >
+          reverse geometry
+        </button>
+        <button
+          data-testid="simplify-selected-geometry"
+          type="button"
+          @click="$emit('simplify-selected-geometry')"
+        >
+          simplify geometry
+        </button>
+        <button
+          data-testid="convert-selected-line-to-polygon"
+          type="button"
+          @click="$emit('convert-selected-line-to-polygon')"
+        >
+          convert line to polygon
         </button>
         <label v-for="feature in featureItems" :key="feature.id" data-testid="feature-row">
           <input
@@ -704,6 +752,7 @@ describe('MapDrawTab draft safety', () => {
     mocks.mapCanDeleteSelected.mockReturnValue(true)
     mocks.mapDeleteSelected.mockReset()
     mocks.mapImportGeoJson.mockReset()
+    mocks.latestToolsPanelProps = null
     mocks.routerPush.mockReset()
     mocks.isAuthenticated.value = true
     readImportedLayerFile.mockReset()
@@ -2065,6 +2114,104 @@ describe('MapDrawTab draft safety', () => {
     await flushTicks()
 
     expect(wrapper.host.querySelector('[data-testid="first-feature-coordinate"]').textContent).toBe('1')
+
+    wrapper.unmount()
+  })
+
+  it('applies selected geometry tools and keeps them undoable', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createLineLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    wrapper.host.querySelector('[data-testid="feature-checkbox"]').click()
+    await flushTicks()
+    expect(mocks.latestToolsPanelProps.canUseSelectedGeometryTools).toBe(true)
+    expect(mocks.latestToolsPanelProps.canConvertSelectedLineToPolygon).toBe(true)
+    expect(wrapper.host.querySelector('[data-testid="first-feature-geometry-type"]').textContent).toBe('LineString')
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinates"]').textContent)
+      .toBe('[[0,0],[0.5,0],[1,0],[1,1],[0,0]]')
+
+    wrapper.host.querySelector('[data-testid="reverse-selected-geometry"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinates"]').textContent)
+      .toBe('[[0,0],[1,1],[1,0],[0.5,0],[0,0]]')
+
+    document.dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      key: 'z',
+      metaKey: true,
+    }))
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinates"]').textContent)
+      .toBe('[[0,0],[0.5,0],[1,0],[1,1],[0,0]]')
+
+    wrapper.host.querySelector('[data-testid="simplify-selected-geometry"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinates"]').textContent)
+      .toBe('[[0,0],[1,0],[1,1],[0,0]]')
+
+    wrapper.host.querySelector('[data-testid="convert-selected-line-to-polygon"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="first-feature-geometry-type"]').textContent).toBe('Polygon')
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinates"]').textContent)
+      .toBe('[[[0,0],[1,0],[1,1],[0,0]]]')
+    expect(mocks.latestToolsPanelProps.selectedFeatureGeometryType).toBe('Polygon')
+    expect(mocks.latestToolsPanelProps.selectedFeatureIds).toEqual(['feature-1'])
+    expect(mocks.mapSelectFeature).toHaveBeenLastCalledWith('feature-1', { directEdit: false })
+
+    wrapper.unmount()
+  })
+
+  it('keeps selected geometry tools out of multi-selection and avoids mixed line polygon layers', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createLineLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    const checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[0].click()
+    await flushTicks()
+
+    expect(mocks.latestToolsPanelProps.canUseSelectedGeometryTools).toBe(true)
+    expect(mocks.latestToolsPanelProps.canConvertSelectedLineToPolygon).toBe(false)
+
+    wrapper.host.querySelector('[data-testid="convert-selected-line-to-polygon"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="first-feature-geometry-type"]').textContent).toBe('LineString')
+    expect(mocks.latestToolsPanelProps.selectedFeatureGeometryType).toBe('LineString')
+
+    checkboxes[1].click()
+    await flushTicks()
+
+    expect(mocks.latestToolsPanelProps.selectedFeatureIds).toEqual(['feature-1', 'feature-2'])
+    expect(mocks.latestToolsPanelProps.canUseSelectedGeometryTools).toBe(false)
+    expect(mocks.latestToolsPanelProps.canConvertSelectedLineToPolygon).toBe(false)
+
+    wrapper.host.querySelector('[data-testid="reverse-selected-geometry"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinates"]').textContent)
+      .toBe('[[0,0],[0.5,0],[1,0],[1,1],[0,0]]')
+    expect(mocks.latestToolsPanelProps.selectedFeatureIds).toEqual(['feature-1', 'feature-2'])
 
     wrapper.unmount()
   })

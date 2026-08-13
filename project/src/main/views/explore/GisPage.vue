@@ -147,6 +147,8 @@
           :can-undo="canUndoHistory"
           :can-redo="canRedoHistory"
           :can-edit-shape="canEditSelectedShape"
+          :can-use-selected-geometry-tools="canUseSelectedGeometryTools"
+          :can-convert-selected-line-to-polygon="canConvertSelectedLineToPolygon"
           :can-delete-selection="canDeleteSelection"
           :can-duplicate-feature="canDuplicateSelectedFeature"
           :is-feature-box-select-mode="isFeatureBoxSelectMode"
@@ -161,6 +163,9 @@
           @toggle-feature-box-select="handleToggleFeatureBoxSelect"
           @edit-shape="handleEditSelectedShape"
           @duplicate-feature="handleDuplicateSelectedFeature"
+          @reverse-selected-geometry="handleReverseSelectedGeometry"
+          @simplify-selected-geometry="handleSimplifySelectedGeometry"
+          @convert-selected-line-to-polygon="handleConvertSelectedLineToPolygon"
           @undo="undoHistory"
           @redo="redoHistory"
           @delete-selected="handleDeleteSelected"
@@ -783,6 +788,7 @@ const {
   canApplySelectedFeatureBatchProperty, featureMoveLayerOptions,
   selectedEditorProperties, selectedEditorFeatureId, selectedEditorGeometryType,
   canModifyActiveLayer, canEditSelectedShape, canDeleteSelection, canDuplicateSelectedFeature,
+  canUseSelectedGeometryTools, canConvertSelectedLineToPolygon,
   canUseFeatureBoxSelect, canMoveSelectedFeatures, selectedLayerLabel,
   createEmptyLayer, getFeatureId, getFeatureLabel, getLayerLabel,
   syncLayerIdSeedFromLayers, applyLayerPropertyToFeatures,
@@ -832,6 +838,7 @@ const gisFeatures = useGisFeatures({
   editableMapRef, currentMode, getFeatureId,
   canModifyActiveLayer, canDuplicateSelectedFeature,
   canEditSelectedShape, canDeleteSelection, canMoveSelectedFeatures,
+  canUseSelectedGeometryTools, canConvertSelectedLineToPolygon,
   setFeatureSelection, clearFeatureSelection,
   syncAllLayersAfterMutation, syncFeatureSelectionToMap,
   resetDrawSelectionMode, commitHistory,
@@ -845,6 +852,7 @@ const gisFeatures = useGisFeatures({
 
 const {
   handleEditSelectedShape, handleDuplicateSelectedFeature,
+  handleReverseSelectedGeometry, handleSimplifySelectedGeometry, handleConvertSelectedLineToPolygon,
   handleDeleteSelected, handleDeleteSelectedFeatures, handleClearAll,
   updateFeatureProperty, updateSelectedFeatureProperty,
   updateSelectedFeaturesProperty,
