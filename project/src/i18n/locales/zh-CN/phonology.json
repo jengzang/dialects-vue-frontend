@@ -117,6 +117,7 @@
         }
       },
       "queryModes": {
+        "title": "统计模式",
         "featureCounts": "声韵调独立",
         "syllableCounts": "整体音节",
         "singleHint": "单一地点可同时勾选两种统计方式",
@@ -150,6 +151,7 @@
       "nav": {
         "navLabel": "音节统计页面导航",
         "chartsLabel": "图表",
+        "syllableSummary": "汇总",
         "totalInitial": "总声母",
         "totalFinal": "总韵母",
         "totalTone": "总声调",

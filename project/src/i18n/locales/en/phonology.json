@@ -117,6 +117,7 @@
         }
       },
       "queryModes": {
+        "title": "Statistics Mode",
         "featureCounts": "Initials, finals and tones",
         "syllableCounts": "Overall syllables",
         "singleHint": "A single location can select both statistics at once",
@@ -150,6 +151,7 @@
       "nav": {
         "navLabel": "Syllable statistics page navigation",
         "chartsLabel": "Charts",
+        "syllableSummary": "Summary",
         "totalInitial": "Total Initials",
         "totalFinal": "Total Finals",
         "totalTone": "Total Tones",

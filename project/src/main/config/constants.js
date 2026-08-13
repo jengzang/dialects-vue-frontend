@@ -153,11 +153,11 @@ export const LOCATION_LIMITS = {
     // countphos: 音節統計
     countphos: {
         anonymous: {
-            MAX_LOCATIONS: 100,
+            MAX_LOCATIONS: 20,
             MESSAGE: '未登錄用戶音節統計最多可選 {limit} 個地點'
         },
         user: {
-            MAX_LOCATIONS: 1000,
+            MAX_LOCATIONS: 200,
             MESSAGE: '用戶音節統計最多可選 {limit} 個地點'
         },
         admin: {

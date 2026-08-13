@@ -153,9 +153,10 @@ const handleQueryModeToggle = (mode, checked) => {
   }
 }
 
-// 单地点默认两个都勾选;进入多地点且两个都勾选时只保留特徵統計
-watch(isSingleLocationQuery, (single) => {
-  if (isCountphosQueryEmpty.value) return
+// 单地点默认两个都勾选;输入变为多地点且两个都勾选时只保留特徵統計
+// 监听 isEmpty 组合:直接从空输入填多个地点时 isSingleLocationQuery 不会变化(false→false),需靠 isEmpty 翻转触发
+watch([isSingleLocationQuery, isCountphosQueryEmpty], ([single, empty]) => {
+  if (empty) return
   if (single) {
     queryMode.value.featureCounts = true
     queryMode.value.syllableCounts = true
@@ -237,6 +238,7 @@ const {
   locationNavItems,
   currentVisibleNavId,
   getChartsAnchorId,
+  getSyllableAnchorId,
   getAggregatedAnchorId,
   getLocationAnchorId,
   handleLocationNavJump
@@ -246,6 +248,8 @@ const {
   hasChartData,
   hasResultData,
   extraLocationData: computed(() => (showSyllableLocations.value ? syllableLocationData.value : {})),
+  hasSyllableData: hasSyllableResultData,
+  syllableLabel: t('phonology.phonology.countphos.nav.syllableSummary'),
   isEnabled: isCurrentCountRoute,
   chartsLabel: t('phonology.phonology.countphos.nav.chartsLabel'),
   formatTotalLabel: (featureType) => {
@@ -1115,6 +1119,7 @@ onBeforeUnmount(() => {
         @update:runDisabled="handleRunDisabled"
       />
       <div class="query-mode-row">
+        <span class="query-mode-title">{{ $t('phonology.phonology.countphos.queryModes.title') }}</span>
         <CheckBox
           :model-value="queryMode.featureCounts"
           :label="$t('phonology.phonology.countphos.queryModes.featureCounts')"
@@ -1282,7 +1287,11 @@ onBeforeUnmount(() => {
         </template>
       </section>
 
-      <section v-if="hasSyllableResultData" class="syllable-section glass-panel">
+      <section
+        v-if="hasSyllableResultData"
+        :id="getSyllableAnchorId()"
+        class="syllable-section glass-panel"
+      >
         <div class="syllable-section-header">
           <div>
             <h3 class="section-title">{{ $t('phonology.phonology.countphos.syllables.title') }}</h3>
@@ -1523,6 +1532,11 @@ $primary-deep: #003d9e;
     justify-content: center;
     gap: 16px;
     flex-wrap: wrap;
+  }
+
+  .query-mode-title {
+    font-weight: 600;
+    color: var(--text-secondary);
   }
 
   .query-mode-hint {

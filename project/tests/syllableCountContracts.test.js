@@ -52,6 +52,7 @@ describe('syllable count frontend contracts', () => {
     expect(source).toContain('queryMode')
     expect(source).toContain('isSingleLocationQuery')
     expect(source).toContain('handleQueryModeToggle')
+    expect(source).toContain('watch([isSingleLocationQuery, isCountphosQueryEmpty]')
   })
 
   it('adds an inline syllable section with tone switch and heatmap threshold above ten resolved points', () => {
@@ -86,6 +87,16 @@ describe('syllable count frontend contracts', () => {
     expect(source).toContain('extraLocationData')
     expect(source).toContain('syllableModeLabel')
     expect(composableSource).toContain('extraLocationData')
+  })
+
+  it('adds a nav point for the syllable aggregate summary', () => {
+    const source = readSource('src/main/components/pho/Countphos.vue')
+    const composableSource = readSource('src/composables/bar/useNavAnchorJump.js')
+
+    expect(source).toContain('getSyllableAnchorId')
+    expect(source).toContain('hasSyllableData: hasSyllableResultData')
+    expect(source).toContain("t('phonology.phonology.countphos.nav.syllableSummary')")
+    expect(composableSource).toContain("kind: 'syllable'")
   })
 
   it('allows syllable heatmap route query keys on map view', () => {

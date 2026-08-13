@@ -117,6 +117,7 @@
         }
       },
       "queryModes": {
+        "title": "統計模式",
         "featureCounts": "聲韻調獨立",
         "syllableCounts": "整體音節",
         "singleHint": "單一地點可同時勾選兩種統計方式",
@@ -150,6 +151,7 @@
       "nav": {
         "navLabel": "音節統計頁面導航",
         "chartsLabel": "圖表",
+        "syllableSummary": "匯總",
         "totalInitial": "總聲母",
         "totalFinal": "總韻母",
         "totalTone": "總聲調",
