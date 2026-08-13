@@ -38,11 +38,12 @@
           <div class="scope-panel-title">{{ t('map.drawTab.imageExport.sections.size') }}</div>
           <label class="draw-field">
             <!-- <span class="draw-field-label">{{ t('map.drawTab.imageExport.labels.sizePreset') }}</span> -->
-            <select v-model="form.sizePreset" class="draw-select-input" style="width: 100%;">
-              <option v-for="option in sizeOptions" :key="option.value" :value="option.value">
-                {{ option.label }}
-              </option>
-            </select>
+            <SimpleSelectDropdown
+              v-model="form.sizePreset"
+              :options="sizeOptions"
+              width="100%"
+              match-trigger-width
+            />
           </label>
 
           <div v-if="form.sizePreset === 'custom'" class="image-export-custom-size">
@@ -143,6 +144,7 @@ import { computed, reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
+import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
