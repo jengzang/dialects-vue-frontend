@@ -1448,6 +1448,48 @@ describe('EditableMapLibre state flow', () => {
     wrapper.unmount()
   })
 
+  it('renders optional layer labels through active draw styles and readonly overlays', async () => {
+    const activeLayer = {
+      id: 'active-layer',
+      geometryType: 'Point',
+      visible: true,
+      locked: false,
+      labelsVisible: true,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    }
+    const readonlyLayer = {
+      id: 'readonly-layer',
+      geometryType: 'Point',
+      visible: true,
+      locked: false,
+      labelsVisible: true,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [{
+          id: 'readonly-point-1',
+          type: 'Feature',
+          properties: { name: '标注 A' },
+          geometry: { type: 'Point', coordinates: [113, 23] },
+        }],
+      },
+    }
+    const wrapper = mountEditableMapLibre(activeLayer.featureCollection, {
+      activeLayer,
+      allLayers: [activeLayer, readonlyLayer],
+    })
+    await nextTick()
+
+    expect(JSON.stringify(wrapper.draw.options.styles)).toContain('user_labelsVisible')
+    expect(wrapper.map.getSource('readonly-draw-source-readonly-layer').data.features[0].properties.labelsVisible).toBe(true)
+    expect(wrapper.map.getLayer('readonly-draw-label-readonly-layer').type).toBe('symbol')
+    expect(JSON.stringify(wrapper.map.getLayer('readonly-draw-label-readonly-layer').layout['text-field'])).toContain('name')
+
+    wrapper.unmount()
+  })
+
   it('removes readonly overlays for layers that are replaced from all layers', async () => {
     const activeLayer = {
       id: 'active-layer',

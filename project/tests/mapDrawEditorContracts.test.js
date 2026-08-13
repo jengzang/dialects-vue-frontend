@@ -785,6 +785,32 @@ describe('Map draw editor contracts', () => {
     expect(tabSource).toContain('activeLayerFeatureCollection.value = applyActiveLayerDefaultsToFeatureCollection(nextValue);')
   })
 
+  it('supports optional layer labels from the layer panel through map rendering', () => {
+    const panelSource = readSource(mapDrawLayersPanelPath)
+    const tabSource = readSource(mapDrawTabPath)
+    const coreSource = readSource(useGisMapCorePath)
+    const layersSource = readSource(useGisLayersPath)
+    const editableSource = readSource(editableMapLibrePath)
+
+    expect(panelSource).toContain(`t('map.drawTab.labels.layerLabels')`)
+    expect(panelSource).toContain(`emit('toggle-layer-labels', layer.id)`)
+    expect(panelSource).toContain(`'toggle-layer-labels'`)
+    expect(tabSource).toContain('@toggle-layer-labels="toggleLayerLabels"')
+    expect(coreSource).toContain('labelsVisible: false,')
+    expect(coreSource).toContain(`'labelsVisible'`)
+    expect(coreSource).toContain(`'user_labelsVisible'`)
+    expect(layersSource).toContain('async function toggleLayerLabels(layerId)')
+    expect(layersSource).toMatch(/toggleLayerLabels\(layerId\)[\s\S]*commitHistory\(\)/)
+    expect(layersSource).toContain("applyLayerPropertyToFeatures(layer, 'labelsVisible', layer.labelsVisible);")
+    expect(layersSource).toContain('dup.labelsVisible = src.labelsVisible;')
+    expect(editableSource).toContain('const activeLayerLabelsVisibleExpression =')
+    expect(editableSource).toContain('const layerLabelsVisibleExpression =')
+    expect(editableSource).toContain(`text-field`)
+    expect(editableSource).toContain(`['coalesce', ['get', 'name'], ['get', 'title'], ['get', 'label'], '']`)
+    expect(editableSource).toContain('labelsVisible: feature.properties?.labelsVisible ?? layer.labelsVisible ?? false')
+    expect(tabSource).toContain('labelsVisible: props.labelsVisible ?? activeLayer.value?.labelsVisible ?? false')
+  })
+
   it('has localized labels for duplicating draw layers', () => {
     const zhCn = JSON.parse(readSource(zhCnMapLocalePath))
     const zhHant = JSON.parse(readSource(zhHantMapLocalePath))
@@ -822,6 +848,16 @@ describe('Map draw editor contracts', () => {
     expect(zhCn.drawTab.labels.layerOpacity).toBe('图层透明度')
     expect(zhHant.drawTab.labels.layerOpacity).toBe('圖層透明度')
     expect(en.drawTab.labels.layerOpacity).toBe('Layer Opacity')
+  })
+
+  it('has localized labels for layer label visibility', () => {
+    const zhCn = JSON.parse(readSource(zhCnMapLocalePath))
+    const zhHant = JSON.parse(readSource(zhHantMapLocalePath))
+    const en = JSON.parse(readSource(enMapLocalePath))
+
+    expect(zhCn.drawTab.labels.layerLabels).toBe('图层标签')
+    expect(zhHant.drawTab.labels.layerLabels).toBe('圖層標籤')
+    expect(en.drawTab.labels.layerLabels).toBe('Layer Labels')
   })
 
   it('has localized labels for moving selected features between draw layers', () => {

@@ -151,6 +151,17 @@ export function useGisLayers(options = {}) {
     syncAllLayersAfterMutation();
   }
 
+  async function toggleLayerLabels(layerId) {
+    if (!await guardWrite()) return;
+    const layer = layers.value.find((item) => item.id === layerId);
+    if (!layer) return;
+    commitHistory();
+    layer.labelsVisible = !layer.labelsVisible;
+    applyLayerPropertyToFeatures(layer, 'labelsVisible', layer.labelsVisible);
+    syncAllLayersAfterMutation();
+    editableMapRef?.value?.syncReadonlyLayers?.();
+  }
+
   async function handleUpdateLayerOpacity(layerId, opacity) {
     if (!await guardWrite()) return;
     const layer = layers.value.find((item) => item.id === layerId);
@@ -208,6 +219,7 @@ export function useGisLayers(options = {}) {
     dup.fill = src.fill;
     dup.fillOpacity = src.fillOpacity;
     dup.opacity = src.opacity;
+    dup.labelsVisible = src.labelsVisible;
     dup.pointRadius = src.pointRadius;
     dup.pointColor = src.pointColor;
     dup.pointStrokeColor = src.pointStrokeColor;
@@ -477,6 +489,7 @@ export function useGisLayers(options = {}) {
     toggleLayerVisibility,
     setAllLayersVisibility,
     toggleLayerLock,
+    toggleLayerLabels,
     handleUpdateLayerOpacity,
     handleRenameLayer,
     handleDuplicateLayer,

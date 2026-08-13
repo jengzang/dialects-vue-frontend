@@ -237,6 +237,7 @@
           @move-layer-to-bottom="moveLayerToBottom"
           @toggle-layer-visibility="toggleLayerVisibility"
           @toggle-layer-lock="toggleLayerLock"
+          @toggle-layer-labels="toggleLayerLabels"
           @update-layer-opacity="handleUpdateLayerOpacity"
           @rename-layer="handleRenameLayer"
           @duplicate-layer="handleDuplicateLayer"
@@ -865,6 +866,7 @@ const gisLayers = useGisLayers({
 const {
   handleCreateLayer, handleSelectLayer, moveLayer, moveLayerToTop, moveLayerToBottom,
   toggleLayerVisibility, setAllLayersVisibility, toggleLayerLock,
+  toggleLayerLabels,
   handleUpdateLayerOpacity,
   handleRenameLayer, handleDuplicateLayer, handleDeleteLayer,
   triggerImportLayer, handleImportAsNewLayer,
@@ -1043,6 +1045,7 @@ function applyActiveLayerDefaultsToFeatureCollection(featureCollection) {
           fill: props.fill ?? activeLayer.value?.fill,
           fillOpacity: props.fillOpacity ?? activeLayer.value?.fillOpacity,
           opacity: props.opacity ?? activeLayer.value?.opacity ?? 1,
+          labelsVisible: props.labelsVisible ?? activeLayer.value?.labelsVisible ?? false,
           pointRadius: props.pointRadius ?? activeLayer.value?.pointRadius,
           pointColor: props.pointColor ?? activeLayer.value?.pointColor,
           pointStrokeColor: props.pointStrokeColor ?? activeLayer.value?.pointStrokeColor,

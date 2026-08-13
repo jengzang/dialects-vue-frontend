@@ -260,6 +260,7 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         <span data-testid="first-feature-geometry-type">{{ modelValue?.features?.[0]?.geometry?.type || '' }}</span>
         <span data-testid="first-feature-coordinates">{{ stringify(modelValue?.features?.[0]?.geometry?.coordinates ?? null) }}</span>
         <span data-testid="first-feature-opacity">{{ modelValue?.features?.[0]?.properties?.opacity ?? '' }}</span>
+        <span data-testid="first-feature-labels-visible">{{ modelValue?.features?.[0]?.properties?.labelsVisible ? 'true' : 'false' }}</span>
         <span data-testid="box-select-mode">{{ featureBoxSelectEnabled ? 'on' : 'off' }}</span>
         <span data-testid="snapping-enabled">{{ snappingEnabled ? 'on' : 'off' }}</span>
         <span data-testid="snap-tolerance">{{ snapTolerance }}</span>
@@ -615,7 +616,7 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawLayersPanel.vue', () => ({
       layers: { type: Array, default: () => [] },
       activeLayerId: { type: String, default: '' },
     },
-    emits: ['select-layer', 'toggle-layer-visibility', 'toggle-layer-lock', 'update-layer-opacity'],
+    emits: ['select-layer', 'toggle-layer-visibility', 'toggle-layer-lock', 'toggle-layer-labels', 'update-layer-opacity'],
     template: `
       <div data-testid="layers-panel">
         <div v-for="layer in layers" :key="layer.id">
@@ -640,6 +641,14 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawLayersPanel.vue', () => ({
             @click="$emit('toggle-layer-lock', layer.id)"
           >
             lock
+          </button>
+          <button
+            data-testid="toggle-layer-labels"
+            type="button"
+            :data-active="layer.labelsVisible ? 'true' : 'false'"
+            @click="$emit('toggle-layer-labels', layer.id)"
+          >
+            labels
           </button>
           <input
             data-testid="layer-opacity-input"
@@ -1246,6 +1255,30 @@ describe('MapDrawTab draft safety', () => {
     await flushTicks()
 
     expect(wrapper.host.querySelector('[data-testid="first-feature-opacity"]').textContent).toBe('0.35')
+
+    wrapper.unmount()
+  })
+
+  it('applies active layer label visibility to newly drawn features', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="toggle-layer-labels"]').dataset.active).toBe('false')
+    wrapper.host.querySelector('[data-testid="toggle-layer-labels"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="toggle-layer-labels"]').dataset.active).toBe('true')
+
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="first-feature-labels-visible"]').textContent).toBe('true')
 
     wrapper.unmount()
   })

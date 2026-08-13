@@ -35,7 +35,10 @@ const [drawFallbackStroke, drawFallbackPointColor] = pickDrawColor(0)
 
 const drawControlContainerClass = 'draw-control-container'
 const activeLayerOpacityExpression = ['coalesce', ['get', 'user_opacity'], 1]
+const activeLayerLabelsVisibleExpression = ['coalesce', ['get', 'user_labelsVisible'], false]
 const layerOpacityExpression = ['coalesce', ['get', 'opacity'], 1]
+const layerLabelsVisibleExpression = ['coalesce', ['get', 'labelsVisible'], false]
+const labelTextFieldExpression = ['coalesce', ['get', 'name'], ['get', 'title'], ['get', 'label'], '']
 const drawStyles = [
   {
     id: 'gl-draw-polygon-fill',
@@ -129,6 +132,24 @@ const drawStyles = [
       'circle-color': drawFallbackStroke,
       'circle-stroke-color': '#ffffff',
       'circle-stroke-width': 3,
+    },
+  },
+  {
+    id: 'gl-draw-label',
+    type: 'symbol',
+    filter: ['all', ['!=', 'meta', 'midpoint'], ['!=', 'meta', 'vertex'], ['!=', 'mode', 'static'], ['!=', 'user_visible', false]],
+    layout: {
+      'text-field': labelTextFieldExpression,
+      'text-size': 12,
+      'text-offset': [0, 1.1],
+      'text-anchor': 'top',
+      'text-allow-overlap': false,
+    },
+    paint: {
+      'text-color': ['coalesce', ['get', 'user_stroke'], drawFallbackStroke],
+      'text-halo-color': '#ffffff',
+      'text-halo-width': 1,
+      'text-opacity': ['case', ['==', activeLayerLabelsVisibleExpression, true], activeLayerOpacityExpression, 0],
     },
   },
 ]
@@ -242,6 +263,7 @@ const buildReadonlyLayerDescriptors = () => {
           fill: feature.properties?.fill ?? layer.fill,
           fillOpacity: feature.properties?.fillOpacity ?? layer.fillOpacity,
           opacity: feature.properties?.opacity ?? layer.opacity ?? 1,
+          labelsVisible: feature.properties?.labelsVisible ?? layer.labelsVisible ?? false,
           pointRadius: feature.properties?.pointRadius ?? layer.pointRadius,
           pointColor: feature.properties?.pointColor ?? layer.pointColor,
           pointStrokeColor: feature.properties?.pointStrokeColor ?? layer.pointStrokeColor,
@@ -259,6 +281,7 @@ const buildReadonlyLayerDescriptors = () => {
         fillLayerId: `readonly-draw-fill-${layer.id}`,
         lineLayerId: `readonly-draw-line-${layer.id}`,
         pointLayerId: `readonly-draw-point-${layer.id}`,
+        labelLayerId: `readonly-draw-label-${layer.id}`,
         featureCollection: normalizeFeatureCollection({
           type: 'FeatureCollection',
           features,
@@ -299,6 +322,7 @@ const buildPreviewLayerDescriptors = () => {
       fillLayerId: `preview-draw-fill-${layer?.id ?? layerIndex}`,
       lineLayerId: `preview-draw-line-${layer?.id ?? layerIndex}`,
       pointLayerId: `preview-draw-point-${layer?.id ?? layerIndex}`,
+      labelLayerId: `preview-draw-label-${layer?.id ?? layerIndex}`,
       isPreview: true,
       promoteId: 'partitionKey',
       featureCollection: normalizeFeatureCollection({
@@ -434,6 +458,27 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
       },
     })
   }
+
+  if (!map.value.getLayer(descriptor.labelLayerId)) {
+    map.value.addLayer({
+      id: descriptor.labelLayerId,
+      type: 'symbol',
+      source: descriptor.sourceId,
+      layout: {
+        'text-field': labelTextFieldExpression,
+        'text-size': 12,
+        'text-offset': [0, 1.1],
+        'text-anchor': 'top',
+        'symbol-sort-key': ['coalesce', ['get', 'layerOrder'], 0],
+      },
+      paint: {
+        'text-color': ['coalesce', ['get', 'stroke'], drawFallbackStroke],
+        'text-halo-color': '#ffffff',
+        'text-halo-width': 1,
+        'text-opacity': ['case', ['==', layerLabelsVisibleExpression, true], layerOpacityExpression, 0],
+      },
+    })
+  }
 }
 
 const cleanupReadonlyLayerDescriptors = (layerDescriptors) => {
@@ -459,6 +504,8 @@ const cleanupReadonlyLayerDescriptors = (layerDescriptors) => {
     const fillLayerId = `${prefix}-draw-fill-${idSuffix}`
     const lineLayerId = `${prefix}-draw-line-${idSuffix}`
     const pointLayerId = `${prefix}-draw-point-${idSuffix}`
+    const labelLayerId = `${prefix}-draw-label-${idSuffix}`
+    if (map.value.getLayer(labelLayerId)) map.value.removeLayer(labelLayerId)
     if (map.value.getLayer(pointLayerId)) map.value.removeLayer(pointLayerId)
     if (map.value.getLayer(lineLayerId)) map.value.removeLayer(lineLayerId)
     if (map.value.getLayer(fillLayerId)) map.value.removeLayer(fillLayerId)
@@ -476,7 +523,9 @@ const removeReadonlyLayerById = (layerId) => {
   const fillLayerId = `readonly-draw-fill-${layerId}`
   const lineLayerId = `readonly-draw-line-${layerId}`
   const pointLayerId = `readonly-draw-point-${layerId}`
+  const labelLayerId = `readonly-draw-label-${layerId}`
 
+  if (map.value.getLayer(labelLayerId)) map.value.removeLayer(labelLayerId)
   if (map.value.getLayer(pointLayerId)) map.value.removeLayer(pointLayerId)
   if (map.value.getLayer(lineLayerId)) map.value.removeLayer(lineLayerId)
   if (map.value.getLayer(fillLayerId)) map.value.removeLayer(fillLayerId)
@@ -1664,6 +1713,7 @@ const buildDrawLayerIdSet = () => {
     layerIds.add(descriptor.fillLayerId)
     layerIds.add(descriptor.lineLayerId)
     layerIds.add(descriptor.pointLayerId)
+    layerIds.add(descriptor.labelLayerId)
   })
   return layerIds
 }
@@ -1704,6 +1754,7 @@ const applyExportContentVisibility = (options = {}) => {
         descriptor.fillLayerId === layer.id
         || descriptor.lineLayerId === layer.id
         || descriptor.pointLayerId === layer.id
+        || descriptor.labelLayerId === layer.id
       ))
 
       if (!matchedReadonlyLayer) {

@@ -780,6 +780,7 @@
       "fillColor": "Fill Color",
       "fillOpacity": "Fill Opacity",
       "layerOpacity": "Layer Opacity",
+      "layerLabels": "Layer Labels",
       "strokeWidth": "Stroke Width",
       "pointColor": "Point Fill Color",
       "pointStrokeColor": "Point Stroke Color",

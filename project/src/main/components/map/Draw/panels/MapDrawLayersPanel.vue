@@ -139,6 +139,14 @@
                 >
                   {{ layer.locked ? t('map.drawTab.buttons.unlockLayer') : t('map.drawTab.buttons.lockLayer') }}
                 </button>
+                <button
+                  class="glass-button draw-layer-chip-action"
+                  :data-variant="layer.labelsVisible ? 'primary' : 'secondary'"
+                  type="button"
+                  @click.stop="emit('toggle-layer-labels', layer.id)"
+                >
+                  {{ t('map.drawTab.labels.layerLabels') }}
+                </button>
                 <label
                   class="draw-layer-opacity-field"
                   @click.stop
@@ -242,6 +250,7 @@ const emit = defineEmits([
   'move-layer-to-bottom',
   'toggle-layer-visibility',
   'toggle-layer-lock',
+  'toggle-layer-labels',
   'rename-layer',
   'duplicate-layer',
   'delete-layer',
