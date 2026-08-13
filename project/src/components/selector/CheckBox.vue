@@ -78,6 +78,14 @@ const handleChange = (event) => {
   const checked = event.target.checked
   emit('update:modelValue', checked)
   emit('change', checked)
+
+  // 父级可能拒绝该变更(如要求至少勾选一项)。若 modelValue 未随之更新,
+  // 把原生 input 状态同步回 modelValue,否则勾选指示会停留在点击后的状态
+  requestAnimationFrame(() => {
+    if (event.target.checked !== props.modelValue) {
+      event.target.checked = props.modelValue
+    }
+  })
 }
 </script>
 
