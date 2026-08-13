@@ -9,7 +9,7 @@
         <p>{{ t('cluster.input.description') }}</p>
       </div>
       <button
-        class="global-action-btn global-action-btn-secondary add-group-btn"
+        class="action-btn action-btn-secondary add-group-btn"
         type="button"
         @click="addGroup"
       >
@@ -67,7 +67,7 @@
             <span class="group-summary-arrow">{{ isGroupExpanded(group.id) ? '−' : '+' }}</span>
           </button>
           <button
-            class="global-action-btn global-action-btn-secondary group-remove-btn"
+            class="action-btn action-btn-secondary group-remove-btn"
             type="button"
             :disabled="workspaceState.requestDraft.groups.length === 1"
             @click="removeGroup(index)"
@@ -183,7 +183,7 @@
 
     <div class="panel-actions">
       <button
-        class="global-action-btn global-action-btn-primary"
+        class="action-btn action-btn-primary"
         type="button"
         :disabled="isPreviewPending"
         @click="handlePreview"

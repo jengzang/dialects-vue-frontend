@@ -6,7 +6,7 @@
         <p>{{ t('cluster.page.description') }}</p>
       </div>
       <button
-        class="global-action-btn global-action-btn-secondary reset-btn"
+        class="action-btn action-btn-secondary reset-btn"
         type="button"
         @click="showResetModal = true"
       >
@@ -65,14 +65,14 @@
       <p>{{ t('cluster.page.description') }}</p>
       <template #footer>
         <button
-          class="global-action-btn global-action-btn-secondary"
+          class="action-btn action-btn-secondary"
           type="button"
           @click="showResetModal = false"
         >
           {{ t('common.button.cancel') }}
         </button>
         <button
-          class="global-action-btn global-action-btn-primary"
+          class="action-btn action-btn-primary"
           type="button"
           @click="confirmResetWorkspace"
         >

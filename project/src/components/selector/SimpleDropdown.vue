@@ -7,7 +7,7 @@
     >
       <div
         ref="dropdownPanel"
-        class="dropdown-panel global-floating-panel"
+        class="dropdown-panel floating-panel"
         :style="dropdownStyle"
         @click.stop
         @keydown="handleKeydown"

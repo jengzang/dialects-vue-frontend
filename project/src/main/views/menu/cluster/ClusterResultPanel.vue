@@ -10,7 +10,7 @@
       </div>
       <button
         v-if="canReloadResult"
-        class="global-action-btn global-action-btn-secondary reload-result-btn"
+        class="action-btn action-btn-secondary reload-result-btn"
         type="button"
         @click="reloadCurrentResult"
       >

@@ -3,7 +3,7 @@
     <!-- 触发图标 -->
     <div
       ref="iconRef"
-      class="help-icon global-help-icon-shell"
+      class="help-icon help-icon-shell"
       :class="[sizeClass, { 'is-visible': isVisible }]"
       :style="iconStyle"
       @mouseenter="handleHover('enter')"
@@ -19,7 +19,7 @@
       <Transition name="tooltip-fade">
         <div
           v-if="isVisible"
-          class="help-tooltip global-tooltip-surface"
+          class="help-tooltip tooltip-surface"
           :style="[tooltipPosition, { maxWidth: tooltipMaxWidth }]"
         >
           <slot name="content">{{ content }}</slot>
@@ -323,7 +323,7 @@ $transition-tooltip: 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
   display: inline-block;
 }
 
-.global-help-icon-shell {
+.help-icon-shell {
   @include flex-center;
   font-weight: 700;
   cursor: pointer;
@@ -340,7 +340,7 @@ $transition-tooltip: 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 /*
- * 主体玻璃样式由 global-help-icon-shell 提供，
+ * 主体玻璃样式由 help-icon-shell 提供，
  * 当前组件只负责尺寸和交互状态。
  */
 .help-icon {
@@ -395,7 +395,7 @@ $transition-tooltip: 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
 /*
  * Tooltip 通过 Teleport 渲染到 body，
  * 因此保持为顶层选择器。
- * 玻璃表面由 global-tooltip-surface 提供。
+ * 玻璃表面由 tooltip-surface 提供。
  */
 .help-tooltip {
   position: absolute;

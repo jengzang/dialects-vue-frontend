@@ -184,7 +184,7 @@
       <Transition name="tab-tooltip-fade">
         <div
           v-if="tooltip.visible"
-          class="tab-tooltip global-tooltip-surface"
+          class="tab-tooltip tooltip-surface"
           :style="tooltipStyle"
         >{{ tooltip.label }}</div>
       </Transition>

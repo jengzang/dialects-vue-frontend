@@ -20,10 +20,10 @@
     </div>
 
     <div class="confirm-actions">
-      <button class="confirm-btn global-action-btn global-action-btn-secondary cancel-btn" @click="handleCancel">
+      <button class="confirm-btn action-btn action-btn-secondary cancel-btn" @click="handleCancel">
         {{ confirmState.cancelText }}
       </button>
-      <button class="confirm-btn global-action-btn global-action-btn-primary" @click="handleConfirm">
+      <button class="confirm-btn action-btn action-btn-primary" @click="handleConfirm">
         {{ confirmState.confirmText }}
       </button>
     </div>
@@ -108,7 +108,7 @@ $mobile-gap: 10px;
   }
 }
 
-.global-action-btn {
+.action-btn {
   flex: 1;
   padding: 12px 24px;
   border-radius: var(--radius-md);
@@ -121,34 +121,34 @@ $mobile-gap: 10px;
   overflow: hidden;
 }
 
-.global-action-btn-secondary {
+.action-btn-secondary {
   background: var(--bg-hover) !important;
   color: var(--text-dark-medium) !important;
   border: 1px solid var(--bg-hover-strong) !important;
 }
 
-.global-action-btn-secondary:hover {
+.action-btn-secondary:hover {
   background: var(--bg-overlay-light2);
   transform: translateY(-1px);
 }
 
-.global-action-btn-secondary:active {
+.action-btn-secondary:active {
   transform: translateY(0);
 }
 
-.global-action-btn-primary {
+.action-btn-primary {
   background: var(--action-primary-bg);
   color: var(--action-primary-text);
   box-shadow: var(--action-primary-shadow);
 }
 
-.global-action-btn-primary:hover {
+.action-btn-primary:hover {
   background: var(--action-primary-bg-hover);
   transform: translateY(-1px);
   box-shadow: var(--action-primary-shadow);
 }
 
-.global-action-btn-primary:active {
+.action-btn-primary:active {
   transform: translateY(0);
   box-shadow: 0 2px 6px rgba(var(--color-primary-rgb), 0.22);
 }

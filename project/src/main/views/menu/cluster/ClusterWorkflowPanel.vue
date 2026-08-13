@@ -54,7 +54,7 @@
 
     <div class="panel-actions">
       <button
-        class="global-action-btn global-action-btn-primary"
+        class="action-btn action-btn-primary"
         type="button"
         :disabled="!workspaceState.prepareHash || isPreparePending"
         @click="handlePrepare"
@@ -118,7 +118,7 @@
 
     <div class="panel-actions">
       <button
-        class="global-action-btn global-action-btn-primary"
+        class="action-btn action-btn-primary"
         type="button"
         :disabled="!workspaceState.prepareCompleted || isDistancePending"
         @click="handleDistance"
@@ -231,7 +231,7 @@
 
     <div class="panel-actions">
       <button
-        class="global-action-btn global-action-btn-primary"
+        class="action-btn action-btn-primary"
         type="button"
         :disabled="!currentDistanceHash || isClusterPending"
         @click="handleCluster"
@@ -257,7 +257,7 @@
         <h2>{{ t('cluster.quickRun.title') }}</h2>
         <p>{{ t('cluster.quickRun.description') }}</p>
         <button
-          class="global-action-btn global-action-btn-secondary"
+          class="action-btn action-btn-secondary"
           type="button"
           :disabled="isQuickRunPending"
           @click="handleQuickRun"

@@ -3,7 +3,7 @@
     <Transition name="toast-fade">
       <div
         v-if="messageState.show"
-        :class="['global-toast', 'global-toast-shell', messageState.type, { 'has-action': messageState.actionText, 'changelog-toast': messageState.changelogMode, 'position-right': messageState.positionRight }]"
+        :class="['global-toast', 'toast-shell', messageState.type, { 'has-action': messageState.actionText, 'changelog-toast': messageState.changelogMode, 'position-right': messageState.positionRight }]"
         @mouseenter="persistMessageUntilDismiss"
         @click="persistMessageUntilDismiss"
       >
@@ -120,7 +120,7 @@ $toast-enter-easing: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
 /* 基础玻璃壳，.global-toast 在其后覆写共享属性 */
-.global-toast-shell {
+.toast-shell {
   display: flex;
   align-items: center;
   gap: 12px;

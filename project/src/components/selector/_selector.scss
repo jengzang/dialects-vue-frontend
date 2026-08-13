@@ -1,6 +1,6 @@
 @use '@/styles/global/mixins' as *;
 
-.global-floating-panel {
+.floating-panel {
   background: var(--surface-glass-floating);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -13,7 +13,7 @@
   padding: 6px 0;
 }
 
-.global-select-trigger {
+.select-trigger {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -28,16 +28,16 @@
   transition: border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
 }
 
-.global-select-trigger:hover:not(.is-disabled) {
+.select-trigger:hover:not(.is-disabled) {
   border-color: var(--border-control-focus);
   background: var(--surface-panel-hover);
 }
 
-.global-select-trigger.is-open {
+.select-trigger.is-open {
   border-color: var(--border-control-focus);
   background: var(--surface-panel-hover);
 }
 
-.global-select-trigger.is-disabled {
+.select-trigger.is-disabled {
   @include disabled-state;
 }
