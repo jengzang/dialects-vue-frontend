@@ -815,7 +815,8 @@ const getDefaultPointsMaps = () => {
       .then((result) => {
         defaultPointsCache = {
           byId: new Map((result?.points || []).map((p) => [p.id, p.location])),
-          byName: new Map((result?.points || []).map((p) => [p.location, p.coordinate]))
+          byName: new Map((result?.points || []).map((p) => [p.location, p.coordinate])),
+          points: result?.points || []
         }
         return defaultPointsCache
       })
@@ -1187,11 +1188,12 @@ const consumePendingCountphosLocations = () => {
   loadData()
 }
 
-// 新格式音节统计按「音节 → 覆盖地点名数组」聚合(aggregated.syllables[*].locations),无 per-location 明细。
-// 等值线需要的每地点独特音节数,需反转成「地点 → 独特音节数」;坐标来自实时 points 或 defaultPointsCache.byName。
-const buildIsoplethPoints = (syllableData) => {
+// 每地点独特音节数 / 词条总数,按优先级取:
+//   1) points 自带 unique_syllables / total_tokens(快照新格式,后端导出脚本补齐后);
+//   2) syllableData[mode].locations[loc](实时接口 per-location 明细);
+//   3) 反转 aggregated.syllables[*].locations 兜底(旧快照,仅有 top-N 聚合)。
+const reverseSyllableStats = (syllableData) => {
   const perLocation = {}
-
   for (const mode of ['toneless', 'toned']) {
     const syllables = syllableData?.[mode]?.aggregated?.syllables || {}
     for (const stats of Object.values(syllables)) {
@@ -1203,37 +1205,71 @@ const buildIsoplethPoints = (syllableData) => {
       }
     }
   }
+  return perLocation
+}
 
-  const coordinateByName = new Map()
-  if (Array.isArray(syllableData?.points)) {
-    for (const p of syllableData.points) {
-      if (p?.location && Array.isArray(p?.coordinate)) coordinateByName.set(p.location, p.coordinate)
+const buildIsoplethPoints = (syllableData) => {
+  const locationStats = {}
+  for (const mode of ['toneless', 'toned']) {
+    const locations = syllableData?.[mode]?.locations || {}
+    for (const [name, data] of Object.entries(locations)) {
+      if (!name || !data) continue
+      if (!locationStats[name]) {
+        locationStats[name] = {
+          unique: { toneless: 0, toned: 0 },
+          tokens: { toneless: 0, toned: 0 }
+        }
+      }
+      locationStats[name].unique[mode] = Number(data.unique_syllables || 0)
+      locationStats[name].tokens[mode] = Number(data.total_tokens || 0)
     }
-  } else if (defaultPointsCache?.byName) {
-    for (const [name, coord] of defaultPointsCache.byName) coordinateByName.set(name, coord)
   }
 
-  const points = Object.entries(perLocation)
-    .map(([location, stats]) => {
-      const coordinate = coordinateByName.get(location)
-      if (!coordinate) return null
-      return {
-        location,
-        coordinate,
-        unique_syllables: { toneless: stats.unique.toneless, toned: stats.unique.toned },
-        total_tokens: { toneless: 0, toned: 0 }
+  const hasLocationDetail = Object.keys(locationStats).length > 0
+  const reversed = hasLocationDetail ? null : reverseSyllableStats(syllableData)
+
+  const points = Array.isArray(syllableData?.points)
+    ? syllableData.points
+    : (defaultPointsCache?.points || [])
+
+  const out = []
+  for (const p of points) {
+    const location = p?.location
+    const coordinate = p?.coordinate
+    if (!location || !Array.isArray(coordinate)) continue
+
+    let unique
+    let tokens
+    if (p.unique_syllables) {
+      unique = {
+        toneless: Number(p.unique_syllables.toneless || 0),
+        toned: Number(p.unique_syllables.toned || 0)
       }
-    })
-    .filter(Boolean)
+      tokens = p.total_tokens
+        ? {
+            toneless: Number(p.total_tokens.toneless || 0),
+            toned: Number(p.total_tokens.toned || 0)
+          }
+        : { toneless: 0, toned: 0 }
+    } else if (locationStats[location]) {
+      unique = locationStats[location].unique
+      tokens = locationStats[location].tokens
+    } else if (reversed && reversed[location]) {
+      unique = reversed[location].unique
+      tokens = { toneless: 0, toned: 0 }
+    } else {
+      continue
+    }
+
+    out.push({ location, coordinate, unique_syllables: unique, total_tokens: tokens })
+  }
 
   console.log('[Countphos] buildIsoplethPoints', {
-    perLocationCount: Object.keys(perLocation).length,
-    coordinateMapSize: coordinateByName.size,
-    pointsCount: points.length,
-    sample: points.slice(0, 3)
+    pointsCount: out.length,
+    sample: out.slice(0, 3)
   })
 
-  return points
+  return out
 }
 
 const openIsopleth = () => {
