@@ -621,6 +621,7 @@
       "fieldMergeOpenButton": "Edit Merge Fields",
       "fieldMergeReset": "Reset Merges",
       "expandRatio": "Expand: {ratio}%",
+      "boundaryClip": "Boundary Clip",
       "enableExpand": "Enable Circular Extension",
       "enableExpandOn": "Auto crop",
       "enableExpandOff": "Default square",

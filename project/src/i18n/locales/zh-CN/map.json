@@ -621,6 +621,7 @@
       "fieldMergeOpenButton": "编辑合并字段",
       "fieldMergeReset": "重置合并",
       "expandRatio": "延伸比例: {ratio}%",
+      "boundaryClip": "边界裁剪",
       "enableExpand": "启用圆形延伸裁剪",
       "enableExpandOn": "自动裁剪",
       "enableExpandOff": "默认方形",

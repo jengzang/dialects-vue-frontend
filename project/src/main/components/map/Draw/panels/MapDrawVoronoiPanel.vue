@@ -143,6 +143,7 @@
             {{ t('map.drawTab.voronoi.actionsTitle') }}
           </div>
           <div class="draw-basemap-select">
+            <span class="draw-field-label">{{ t('map.drawTab.voronoi.boundaryClip') }}</span>
             <SwitchToggle
               :model-value="enableExpand"
               label-position="inside"
