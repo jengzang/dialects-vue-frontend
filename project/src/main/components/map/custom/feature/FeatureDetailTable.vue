@@ -728,14 +728,20 @@ watch(
 
 /* 字段提示触发钮: 仅尺寸/颜色覆盖, 视觉见 main/_buttons.scss 的 .pill-btn */
 .field-notice-trigger {
-  --pill-btn-padding: 2px 10px;
-  --pill-btn-font-size: 11px;
-  --pill-btn-font-weight: 500;
-  --pill-btn-color: $warning;
-  --pill-btn-border: 1px solid rgba(var(--color-warning-rgb), 0.3);
-  --pill-btn-bg: rgba(var(--color-warning-rgb), 0.06);
-  --pill-btn-hover-bg: rgba(var(--color-warning-rgb), 0.12);
-  --pill-btn-hover-border: $warning;
+  --pill-btn-padding: 6px 14px;
+  --pill-btn-font-size: 12px;
+  --pill-btn-font-weight: 600;
+  --pill-btn-color: #fff;
+  --pill-btn-border: 1px solid rgb(var(--color-warning-rgb));
+  --pill-btn-bg: rgb(var(--color-warning-rgb));
+  --pill-btn-hover-bg: var(--color-warning-dark);
+  --pill-btn-hover-border: var(--color-warning-dark);
+  --pill-btn-shadow: 0 4px 14px rgba(var(--color-warning-rgb), 0.35);
+
+  &::before {
+    content: "⚠️";
+    font-size: 13px;
+  }
 }
 
 .field-notice-body {
