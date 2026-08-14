@@ -669,6 +669,7 @@ $region-accent: var(--color-primary);
   align-items: center;
   justify-content: space-between;
   gap: 14px;
+  padding:12px;
   margin-bottom: 18px;
 }
 
@@ -734,6 +735,7 @@ $region-accent: var(--color-primary);
 }
 
 .region-card {
+padding:20px;
   overflow: hidden;
   transition:
     transform 0.18s ease,

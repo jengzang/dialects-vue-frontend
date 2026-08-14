@@ -883,6 +883,7 @@ $user-accent: var(--color-primary);
 
 .toolbar {
   display: flex;
+  padding:12px;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
