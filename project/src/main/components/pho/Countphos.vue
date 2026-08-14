@@ -1546,7 +1546,7 @@ onBeforeUnmount(() => {
           </span>
           <button
             v-if="canShowIsopleth"
-            class="expand-btn isopleth-btn"
+            class="glass-button isopleth-btn"
             @click="openIsopleth"
           >
             {{ $t('phonology.phonology.countphos.syllables.viewIsopleth') }}

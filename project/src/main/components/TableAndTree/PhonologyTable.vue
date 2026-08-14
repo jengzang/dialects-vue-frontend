@@ -3,10 +3,10 @@
     <div v-if="location" class="location-header">
       <div class="location-title"><InlineIcon icon="📍" />{{ location }}</div>
       <div class="header-actions">
-        <button class="tone-search-btn" @click="handleShowDetails" :disabled="isLoading">
+        <button class="tone-search-btn glass-button" @click="handleShowDetails" :disabled="isLoading">
           {{ isLoading ? t('result.phonologyTable.loadingButton') : t('result.phonologyTable.detailButton') }}
         </button>
-        <button class="fullscreen-btn" @click="toggleFullScreen">
+        <button class="fullscreen-btn glass-button" @click="toggleFullScreen">
           {{ t('result.phonologyTable.fullscreen') }}
         </button>
       </div>

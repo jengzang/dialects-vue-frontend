@@ -101,7 +101,7 @@
         {{ feature }} ({{ pieCountByFeature[feature] || 0 }})
       </button>
 
-      <div v-if="currentDataLocationName" class="feature-tabs-location" @click.stop="handleLocationClick(currentDataLocationName)"><InlineIcon icon="📍" />{{ currentDataLocationName }}
+      <div v-if="currentDataLocationName" class="feature-tabs-location glass-button" @click.stop="handleLocationClick(currentDataLocationName)"><InlineIcon icon="📍" />{{ currentDataLocationName }}
       </div>
     </div>
 
