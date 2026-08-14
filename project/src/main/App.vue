@@ -24,7 +24,7 @@
 
 <script>
 import { computed, onMounted, onBeforeUnmount } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 // import IntroLayout from '../layouts/IntroLayout.vue'
 import MenuLayout from '../layouts/MenuLayout.vue'
@@ -64,6 +64,7 @@ export default {
   },
   setup() {
     const route = useRoute()
+    const router = useRouter()
 
     const layoutComponent = computed(() => {
       const normalizedPath = stripLocaleFromPath(route.path)

@@ -154,6 +154,7 @@ export default defineConfig(async ({ mode }) => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, 'src'),
+        'globe.gl': path.resolve(__dirname, 'node_modules/globe.gl/dist/globe.gl.min.js'),
       },
     },
     define: {
