@@ -363,6 +363,10 @@
       "placeNames": "查看地名",
       "dot": "圆点图"
     },
+    "heatmap": {
+      "radius": "半径",
+      "intensity": "强度"
+    },
     "isopleth": {
       "title": "音节等值线图"
     },

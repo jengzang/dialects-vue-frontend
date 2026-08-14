@@ -46,6 +46,34 @@
             :size="13"
           />
         </div>
+        <div v-if="mapStore.mode === 'heatmap'" class="heatmap-sliders">
+          <label class="heatmap-slider">
+            <span class="heatmap-slider-label">{{ t('map.mapLibre.heatmap.radius') }}：{{ heatmapRadiusScale.toFixed(1) }}×</span>
+            <input
+              class="glass-range"
+              type="range"
+              min="0.1"
+              max="5"
+              step="0.1"
+              :value="heatmapRadiusScale"
+              :style="{ '--glass-range-progress': ((heatmapRadiusScale - 0.1) / 4.9 * 100) + '%' }"
+              @input="onHeatmapRadiusChange"
+            />
+          </label>
+          <label class="heatmap-slider">
+            <span class="heatmap-slider-label">{{ t('map.mapLibre.heatmap.intensity') }}：{{ heatmapIntensityScale.toFixed(1) }}×</span>
+            <input
+              class="glass-range"
+              type="range"
+              min="0.1"
+              max="5"
+              step="0.1"
+              :value="heatmapIntensityScale"
+              :style="{ '--glass-range-progress': ((heatmapIntensityScale - 0.1) / 4.9 * 100) + '%' }"
+              @input="onHeatmapIntensityChange"
+            />
+          </label>
+        </div>
         <div v-if="mapStore.mode === 'isopleth' && isoplethLegend" class="isopleth-legend">
           <div class="isopleth-legend-title">{{ t('map.mapLibre.isopleth.title') }}</div>
           <div
@@ -885,6 +913,43 @@ const drawCompareMap = () => {
 // =======================================================
 // 邏輯: 點位密度熱力圖 (dot 模式数据的 heatmap 展示)
 // =======================================================
+
+// 热力图半径/强度缩放比例（默认 1 保持原有 zoom 插值不变）
+const heatmapRadiusScale = ref(1)
+const heatmapIntensityScale = ref(1)
+
+const buildHeatmapRadiusPaint = () => [
+  'interpolate',
+  ['linear'],
+  ['zoom'],
+  3, 32 * heatmapRadiusScale.value,
+  11, 72 * heatmapRadiusScale.value
+]
+
+const buildHeatmapIntensityPaint = () => [
+  'interpolate',
+  ['linear'],
+  ['zoom'],
+  3, 0.3 * heatmapIntensityScale.value,
+  11, 0.7 * heatmapIntensityScale.value
+]
+
+const updateDotHeatmapPaint = () => {
+  if (!map.value || !map.value.getLayer(DOT_HEATMAP_LAYER_ID)) return
+  map.value.setPaintProperty(DOT_HEATMAP_LAYER_ID, 'heatmap-radius', buildHeatmapRadiusPaint())
+  map.value.setPaintProperty(DOT_HEATMAP_LAYER_ID, 'heatmap-intensity', buildHeatmapIntensityPaint())
+}
+
+const onHeatmapRadiusChange = (event) => {
+  heatmapRadiusScale.value = Number(event.target.value)
+  updateDotHeatmapPaint()
+}
+
+const onHeatmapIntensityChange = (event) => {
+  heatmapIntensityScale.value = Number(event.target.value)
+  updateDotHeatmapPaint()
+}
+
 const getDotHeatmapFeatureCollection = () => {
   const locations = mapStore.mapData?.coordinates_locations || [];
 
@@ -922,13 +987,7 @@ const drawDotHeatmap = () => {
     maxzoom: 14,
     paint: {
       'heatmap-weight': 1,
-      'heatmap-intensity': [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        3, 0.3,
-        11, 0.7
-      ],
+      'heatmap-intensity': buildHeatmapIntensityPaint(),
       'heatmap-color': [
         'interpolate',
         ['linear'],
@@ -940,13 +999,7 @@ const drawDotHeatmap = () => {
         0.8, '#ef8a62',
         1, '#b2182b'
       ],
-      'heatmap-radius': [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        3, 32,
-        11, 72
-      ],
+      'heatmap-radius': buildHeatmapRadiusPaint(),
       'heatmap-opacity': 0.9
     }
   });
@@ -1560,6 +1613,26 @@ $glass-transition: all 0.3s ease;
   :deep(.liquid-radio-group) {
     gap: 4px 10px;
   }
+}
+
+.heatmap-sliders {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 0;
+}
+
+.heatmap-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.heatmap-slider-label {
+  color: var(--text-tertiary);
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .isopleth-legend {

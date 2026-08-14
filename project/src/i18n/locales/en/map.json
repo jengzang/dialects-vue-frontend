@@ -363,6 +363,10 @@
       "placeNames": "Place Names",
       "dot": "Dot Map"
     },
+    "heatmap": {
+      "radius": "Radius",
+      "intensity": "Intensity"
+    },
     "isopleth": {
       "title": "Syllable Isopleth"
     },
