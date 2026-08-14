@@ -62,6 +62,9 @@ const minCharCountProgress = computed(() => {
   const span = MIN_CHAR_COUNT_MAX - MIN_CHAR_COUNT_MIN
   return ((minCharCount.value - MIN_CHAR_COUNT_MIN) / span) * 100
 })
+// 忽略历史音:数字开头地点(年份+地名,如 1604馬尼拉漳州 / 1935南昌)
+const ignoreHistorical = ref(true)
+const isHistoricalLocation = (name) => /^\d/.test(String(name || ''))
 
 //默认加载
 const isUsingDefaultCounts = ref(false)
@@ -208,12 +211,20 @@ const showSyllableLocations = computed(() => hasSyllableLocationData.value)
 
 const syllableStatsList = computed(() => {
   return Object.entries(currentSyllableAggregated.value || {})
-    .map(([syllable, stats]) => ({
-      syllable,
-      totalCount: Number(stats?.totalCount || 0),
-      locationCount: Number(stats?.locationCount || stats?.locations?.length || 0),
-      locations: Array.isArray(stats?.locations) ? stats.locations : []
-    }))
+    .map(([syllable, stats]) => {
+      const locations = Array.isArray(stats?.locations) ? stats.locations : []
+      const filteredLocations = ignoreHistorical.value
+        ? locations.filter((name) => !isHistoricalLocation(name))
+        : locations
+      return {
+        syllable,
+        totalCount: Number(stats?.totalCount || 0),
+        locationCount: ignoreHistorical.value
+          ? filteredLocations.length
+          : Number(stats?.locationCount || stats?.locations?.length || 0),
+        locations: filteredLocations
+      }
+    })
     .sort((a, b) => {
       if (b.totalCount !== a.totalCount) return b.totalCount - a.totalCount
       if (b.locationCount !== a.locationCount) return b.locationCount - a.locationCount
@@ -1249,6 +1260,7 @@ const buildIsoplethPoints = (syllableData) => {
     const location = p?.location
     const coordinate = p?.coordinate
     if (!location || !Array.isArray(coordinate)) continue
+    if (ignoreHistorical.value && isHistoricalLocation(location)) continue
 
     let unique
     let tokens
@@ -1381,6 +1393,16 @@ onBeforeUnmount(() => {
           :inactive-text="$t('phonology.phonology.countphos.syllables.modes.toneless')"
           :aria-label="$t('phonology.phonology.countphos.syllables.modeSwitch')"
           color="green"
+          show-label
+          label-position="inside"
+          auto-width
+        />
+        <SwitchToggle
+          v-if="queryMode.syllableCounts"
+          v-model="ignoreHistorical"
+          :active-text="$t('phonology.phonology.countphos.syllables.ignoreHistorical')"
+          :inactive-text="$t('phonology.phonology.countphos.syllables.allLocations')"
+          :aria-label="$t('phonology.phonology.countphos.syllables.ignoreHistorical')"
           show-label
           label-position="inside"
           auto-width

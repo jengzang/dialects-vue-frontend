@@ -113,6 +113,8 @@
         "loadAllConfirm": "加载全部卡片可能造成卡顿,确定继续?",
         "minCharCount": "最少字数",
         "qualifiedSyllables": "字数≥{min}音节",
+        "ignoreHistorical": "忽略历史音",
+        "allLocations": "全部地点",
         "modes": {
           "toneless": "不带调",
           "toned": "带调"

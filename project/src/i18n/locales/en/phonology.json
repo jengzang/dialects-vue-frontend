@@ -113,6 +113,8 @@
         "loadAllConfirm": "Loading all cards may cause lag. Continue?",
         "minCharCount": "Min. characters",
         "qualifiedSyllables": "Syllables ≥{min} chars",
+        "ignoreHistorical": "Ignore historical",
+        "allLocations": "All locations",
         "modes": {
           "toneless": "Toneless",
           "toned": "Toned"
