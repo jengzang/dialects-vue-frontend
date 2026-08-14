@@ -61,8 +61,8 @@ export function useSidebarConfig() {
             children: [
                 { label: t('navigation.submenu.pho.phonologyMatrix'), icon: '⚛️', path: withRouteLocale(route, '/menu/pho/matrix') },
                 { label: t('navigation.submenu.pho.phonologyCustom'), icon: '📐', path: withRouteLocale(route, '/menu/pho/custom') },
-                { label: t('navigation.submenu.pho.Countphos'), icon: '🧮', path: withRouteLocale(route, '/menu/pho/count') },
-                { label: t('navigation.submenu.pho.evolution'), icon: '🥧', path: withRouteLocale(route, '/menu/pho/evolution') }
+                { label: t('navigation.submenu.pho.evolution'), icon: '🥧', path: withRouteLocale(route, '/menu/pho/evolution') },
+                { label: t('navigation.submenu.pho.Countphos'), icon: '🧮', path: withRouteLocale(route, '/menu/pho/count') }
             ]
         },
         // cluster intentionally remains disabled in the i18n sidebar config.
@@ -195,8 +195,8 @@ export const SideConfig = {
         children: [
             { label: '音系查詢', icon: '⚙️', path: buildLocalePath('zh-Hant', '/menu/pho/matrix') },
             { label: '音素分類', icon: '🧩', path: buildLocalePath('zh-Hant', '/menu/pho/custom') },
-            { label: '音節統計', icon: '🧮', path: buildLocalePath('zh-Hant', '/menu/pho/count') },
-            { label: '演變', icon: '🧬', path: buildLocalePath('zh-Hant', '/menu/pho/evolution') }
+            { label: '演變', icon: '🧬', path: buildLocalePath('zh-Hant', '/menu/pho/evolution') },
+            { label: '音節統計', icon: '🧮', path: buildLocalePath('zh-Hant', '/menu/pho/count') }
         ]
     },
     cluster: {

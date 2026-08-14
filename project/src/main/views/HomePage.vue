@@ -160,13 +160,13 @@
                 <span class="link-icon"><InlineIcon icon="🔬" /></span>
                 <span class="link-text">{{ $t('home.features.phonology.phonemeClassify') }}</span>
               </a>
-              <a @click.stop="navigateTo('/menu/pho/count')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="📊" /></span>
-                <span class="link-text">{{ $t('home.features.phonology.syllableCount') }}</span>
-              </a>
               <a @click.stop="navigateTo('/menu/pho/evolution')" class="feature-link">
                 <span class="link-icon"><InlineIcon icon="🥧" /></span>
                 <span class="link-text">{{ $t('home.features.phonology.evolution') }}</span>
+              </a>
+              <a @click.stop="navigateTo('/menu/pho/count')" class="feature-link">
+                <span class="link-icon"><InlineIcon icon="📊" /></span>
+                <span class="link-text">{{ $t('home.features.phonology.syllableCount') }}</span>
               </a>
             </div>
           </transition>
