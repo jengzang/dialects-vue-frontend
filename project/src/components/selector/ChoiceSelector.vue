@@ -1,6 +1,6 @@
 <template>
-  <div class="card-group choice-selector" role="tablist" :aria-label="ariaLabel">
-    <div
+  <div class="card-group choice-selector" role="radiogroup" :aria-label="ariaLabel">
+    <label
       v-for="(option, index) in options"
       :key="option.value"
       class="card-group-item choice-selector-item"
@@ -10,20 +10,24 @@
         last: index === options.length - 1,
         disabled
       }"
-      role="tab"
-      :tabindex="disabled ? -1 : 0"
-      :aria-selected="modelValue === option.value"
-      :aria-disabled="disabled"
-      @click="handleSelect(option.value)"
-      @keydown.enter.prevent="handleSelect(option.value)"
-      @keydown.space.prevent="handleSelect(option.value)"
     >
-      {{ option.label }}
-    </div>
+      <input
+        type="radio"
+        class="choice-selector-input"
+        :name="groupId"
+        :value="option.value"
+        :checked="modelValue === option.value"
+        :disabled="disabled"
+        @change="handleSelect(option.value)"
+      />
+      <span class="choice-selector-text">{{ option.label }}</span>
+    </label>
   </div>
 </template>
 
 <script setup>
+import { useId } from 'vue'
+
 const props = defineProps({
   modelValue: {
     type: String,
@@ -44,6 +48,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue'])
+
+const groupId = useId()
 
 function handleSelect(value) {
   if (props.disabled || props.modelValue === value) {
@@ -72,6 +78,9 @@ $transition-fast: 0.2s ease;
 
 .card-group-item {
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 10px 16px;
   color: inherit;
   font-size: inherit;
@@ -123,5 +132,17 @@ $transition-fast: 0.2s ease;
   @media (max-aspect-ratio: 1/1) {
     padding: 12px;
   }
+}
+
+.choice-selector-input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+.card-group-item:has(.choice-selector-input:focus-visible) {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
 }
 </style>
