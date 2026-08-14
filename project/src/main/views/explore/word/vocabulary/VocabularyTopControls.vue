@@ -52,6 +52,8 @@
                 :show-label="true"
                 :active-text="t('words.wordList.search.filterByRegion')"
                 :inactive-text="t('words.wordList.search.filterByLocation')"
+                label-position="inside"
+                auto-width
                 @update:model-value="emit('update:filterByRegion', $event)"
               />
             </div>
@@ -64,6 +66,8 @@
                 :show-label="true"
                 :active-text="t('words.wordList.search.singleSelect')"
                 :inactive-text="t('words.wordList.search.multiSelect')"
+                label-position="inside"
+                auto-width
               />
             </div>
           </AppModal>

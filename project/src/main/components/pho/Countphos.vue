@@ -1360,6 +1360,8 @@ onBeforeUnmount(() => {
           :aria-label="$t('phonology.phonology.countphos.syllables.modeSwitch')"
           color="green"
           show-label
+          label-position="inside"
+          auto-width
         />
         <span
           v-if="!isCountphosQueryEmpty"
