@@ -85,7 +85,7 @@
         />
         <!-- 自定義數據提交面板（只在 map tab 顯示） -->
         <CustomDataPanel
-          v-if="activeTab === 'map' && mapStore.mode !== 'syllableHeatmap'"
+          v-if="activeTab === 'map' && mapStore.mode !== 'isopleth'"
           :map-click-coordinates="mapClickCoordinates"
           :selected-feature="selectedFeature"
           @submit-success="handleSubmitSuccess"

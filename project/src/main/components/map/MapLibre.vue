@@ -11,7 +11,7 @@
         </div>
 
         <div
-          v-if="mapStore.mode !== 'syllableHeatmap' && hasCustomData && mapStore.mapData"
+          v-if="mapStore.mode !== 'isopleth' && hasCustomData && mapStore.mapData"
           id="custom-switch-container"
           class="custom-switch-container1"
         >
@@ -24,7 +24,7 @@
         </div>
 
         <div
-          v-if="mapStore.mode !== 'syllableHeatmap' && !mapStore.divideMapView"
+          v-if="mapStore.mode !== 'isopleth' && !mapStore.divideMapView"
           id="base-switch-container"
           class="custom-switch-container1"
         >
@@ -45,6 +45,17 @@
             :options="divideDisplayModes"
             :size="13"
           />
+        </div>
+        <div v-if="mapStore.mode === 'isopleth' && isoplethLegend" class="isopleth-legend">
+          <div class="isopleth-legend-title">{{ t('map.mapLibre.isopleth.title') }}</div>
+          <div
+            class="isopleth-legend-bar"
+            :style="{ background: `linear-gradient(to right, ${isoplethLegend.colors.join(', ')})` }"
+          ></div>
+          <div class="isopleth-legend-labels">
+            <span>{{ isoplethLegend.p5 }}</span>
+            <span>{{ isoplethLegend.p95 }}</span>
+          </div>
         </div>
         <div class="button-row">
           <button class="action-btn" @click="resetView"><InlineIcon icon="🎯" />{{ t('map.mapLibre.buttons.reset') }}</button>
@@ -94,6 +105,8 @@ import MapLegend from './MapLegend.vue'
 import CompareMapPopup from './popups/CompareMapPopup.vue'
 import FeatureMapPopup from './popups/FeatureMapPopup.vue'
 import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue'
+import { contours } from 'd3-contour';
+import { convex, booleanPointInPolygon } from '@turf/turf';
 
 // --- Props: 只接收數據，不負責請求 ---
 const props = defineProps({
@@ -116,9 +129,9 @@ const props = defineProps({
 // --- Emits ---
 const emit = defineEmits(['map-click']);
 
-const SYLLABLE_HEATMAP_SOURCE_ID = 'syllable-heatmap-source';
-const SYLLABLE_HEATMAP_LAYER_ID = 'syllable-heatmap-layer';
-const SYLLABLE_HEATMAP_POINT_LAYER_ID = 'syllable-heatmap-point-layer';
+const ISOPLETH_SOURCE_ID = 'isopleth-source';
+const ISOPLETH_FILL_LAYER_ID = 'isopleth-fill-layer';
+const ISOPLETH_POINT_LAYER_ID = 'isopleth-point-layer';
 const DOT_HEATMAP_SOURCE_ID = 'dot-heatmap-source';
 const DOT_HEATMAP_LAYER_ID = 'dot-heatmap-layer';
 
@@ -212,7 +225,8 @@ const toggleBaseMode = (e) => {
 // 管理所有的 Marker 實例，用於清除
 let currentMarkers = [];
 let currentPopupMountTargets = [];
-let syllableHeatmapClickHandler = null;
+let isoplethClickHandler = null;
+const isoplethLegend = ref(null);
 
 // 地名點擊彈窗狀態
 const locationPopup = ref({
@@ -267,7 +281,7 @@ onActivated(() => {
 });
 
 onBeforeUnmount(() => {
-  clearSyllableHeatmapLayers();
+  clearIsoplethLayers();
   clearDotHeatmapLayers();
   clearMarkers();
   if (map.value) {
@@ -279,7 +293,7 @@ onBeforeUnmount(() => {
 // --- 監聽數據變化，自動重繪 ---
 watch(
   // 監聽源改成 store 裡的數據
-    [() => mapStore.mapData, () => mapStore.mergedData, () => mapStore.syllableHeatmapPayload, () => mapStore.mode, () => props.activeFeature],
+    [() => mapStore.mapData, () => mapStore.mergedData, () => mapStore.isoplethPayload, () => mapStore.mode, () => props.activeFeature],
     () => {
       // 視圖內容變更時只重繪，不在這裡自行判斷是否 reset；
       // reset 邊界統一由 requestMapFitView -> fitViewKey watcher 控制。
@@ -356,7 +370,7 @@ const renderMapContent = async (shouldResetView = true) => {
 
   // 清除舊標記
   clearMarkers();
-  clearSyllableHeatmapLayers();
+  clearIsoplethLayers();
   clearDotHeatmapLayers();
 
   // 視角統一由 requestMapFitView -> resetView 控制，這裡不再消費入口側預計算的 center/zoom。
@@ -371,8 +385,8 @@ const renderMapContent = async (shouldResetView = true) => {
     drawFeatureMap();
   } else if (mapStore.mode === 'compare') {
     drawCompareMap();
-  } else if (mapStore.mode === 'syllableHeatmap') {
-    drawSyllableHeatmap();
+  } else if (mapStore.mode === 'isopleth') {
+    drawIsopleth();
   } else if (mapStore.mode === 'heatmap') {
     drawDotHeatmap();
   }
@@ -385,22 +399,24 @@ const clearMarkers = () => {
   currentMarkers = [];
 };
 
-const clearSyllableHeatmapLayers = () => {
+const clearIsoplethLayers = () => {
   if (!map.value) return;
 
-  if (syllableHeatmapClickHandler) {
-    map.value.off('click', SYLLABLE_HEATMAP_POINT_LAYER_ID, syllableHeatmapClickHandler);
-    syllableHeatmapClickHandler = null;
+  isoplethLegend.value = null;
+
+  if (isoplethClickHandler) {
+    map.value.off('click', ISOPLETH_POINT_LAYER_ID, isoplethClickHandler);
+    isoplethClickHandler = null;
   }
 
-  [SYLLABLE_HEATMAP_POINT_LAYER_ID, SYLLABLE_HEATMAP_LAYER_ID].forEach((layerId) => {
+  [ISOPLETH_POINT_LAYER_ID, ISOPLETH_FILL_LAYER_ID].forEach((layerId) => {
     if (map.value.getLayer(layerId)) {
       map.value.removeLayer(layerId);
     }
   });
 
-  if (map.value.getSource(SYLLABLE_HEATMAP_SOURCE_ID)) {
-    map.value.removeSource(SYLLABLE_HEATMAP_SOURCE_ID);
+  if (map.value.getSource(ISOPLETH_SOURCE_ID)) {
+    map.value.removeSource(ISOPLETH_SOURCE_ID);
   }
 };
 
@@ -853,8 +869,8 @@ const drawDotHeatmap = () => {
   });
 };
 
-const getSyllableHeatmapFeatureCollection = () => {
-  const payload = mapStore.syllableHeatmapPayload || {};
+const getIsoplethPointFeatureCollection = () => {
+  const payload = mapStore.isoplethPayload || {};
   const toneMode = payload.toneMode === 'toned' ? 'toned' : 'toneless';
   const points = Array.isArray(payload.points) ? payload.points : [];
 
@@ -884,7 +900,7 @@ const getSyllableHeatmapFeatureCollection = () => {
   };
 };
 
-const createSyllableHeatmapPopupNode = (properties) => {
+const createIsoplethPopupNode = (properties) => {
   const toneModeText = properties.toneMode === 'toned'
     ? t('phonology.phonology.countphos.syllables.modes.toned')
     : t('phonology.phonology.countphos.syllables.modes.toneless');
@@ -903,71 +919,186 @@ const createSyllableHeatmapPopupNode = (properties) => {
   return container;
 };
 
-const drawSyllableHeatmap = () => {
-  const featureCollection = getSyllableHeatmapFeatureCollection();
-  if (featureCollection.features.length === 0) return;
+// ---- isopleth(等值线)插值与绘制 ----
+const percentile = (sorted, p) => {
+  if (!sorted.length) return 0;
+  const idx = (sorted.length - 1) * p;
+  const lo = Math.floor(idx);
+  const hi = Math.ceil(idx);
+  if (lo === hi) return sorted[lo];
+  return sorted[lo] + (sorted[hi] - sorted[lo]) * (idx - lo);
+};
 
-  map.value.addSource(SYLLABLE_HEATMAP_SOURCE_ID, {
-    type: 'geojson',
-    data: featureCollection
+const hexToRgb = (hex) => {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+};
+
+const rgbToHex = (r, g, b) =>
+  '#' + [r, g, b].map((x) => Math.round(x).toString(16).padStart(2, '0')).join('');
+
+const ISOPLETH_RAMP_STOPS = ['#67a9cf', '#d1e5f0', '#fddbc7', '#ef8a62', '#b2182b'].map(hexToRgb);
+
+const rampColor = (t) => {
+  const clamped = Math.max(0, Math.min(1, t));
+  const scaled = clamped * (ISOPLETH_RAMP_STOPS.length - 1);
+  const i = Math.min(Math.floor(scaled), ISOPLETH_RAMP_STOPS.length - 2);
+  const f = scaled - i;
+  const a = ISOPLETH_RAMP_STOPS[i];
+  const b = ISOPLETH_RAMP_STOPS[i + 1];
+  return rgbToHex(a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f);
+};
+
+const buildIsopleth = (features) => {
+  // 1. 取点并去重(重合点会使 IDW 权重爆炸)
+  const seen = new Set();
+  const samples = [];
+  features.forEach((feature) => {
+    const coord = feature.geometry?.coordinates;
+    const count = Number(feature.properties?.count || 0);
+    if (!isValidCoordinatePair(coord) || count <= 0) return;
+    const key = `${coord[0].toFixed(6)},${coord[1].toFixed(6)}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    samples.push({ lng: coord[0], lat: coord[1], count });
   });
 
+  if (samples.length < 2) return null;
+
+  // 2. p5–p95 十等份断点,退化时回退 [min, max]
+  const counts = samples.map((s) => s.count).sort((a, b) => a - b);
+  let p5 = percentile(counts, 0.05);
+  let p95 = percentile(counts, 0.95);
+  if (p95 - p5 < 1e-9) {
+    p5 = counts[0];
+    p95 = counts[counts.length - 1];
+    if (p95 - p5 < 1e-9) p95 = p5 + 1;
+  }
+
+  const delta = (p95 - p5) / 10;
+  const breaks = Array.from({ length: 10 }, (_, k) => p5 + k * delta);
+  const colors = Array.from({ length: 10 }, (_, k) => rampColor((k + 1) / 10));
+
+  // 3. 包围盒 + 等距缩放(lng 乘 cos(lat))
+  const lngs = samples.map((s) => s.lng);
+  const lats = samples.map((s) => s.lat);
+  const minLng = Math.min(...lngs);
+  const maxLng = Math.max(...lngs);
+  const minLat = Math.min(...lats);
+  const maxLat = Math.max(...lats);
+  const cosLat = Math.max(0.2, Math.cos(((minLat + maxLat) / 2) * (Math.PI / 180)));
+
+  const width = Math.max(1e-6, (maxLng - minLng) * cosLat);
+  const height = Math.max(1e-6, maxLat - minLat);
+  const target = 150 * 150;
+  const nx = Math.max(10, Math.min(200, Math.round(Math.sqrt(target * (width / height)))));
+  const ny = Math.max(10, Math.min(200, Math.round(target / nx)));
+
+  // 4. 凸包掩码(凸包外不画,防外溢到海洋/bbox)
+  let hull = null;
+  if (samples.length >= 3) {
+    try {
+      hull = convex({
+        type: 'FeatureCollection',
+        features: samples.map((s) => ({
+          type: 'Feature',
+          properties: {},
+          geometry: { type: 'Point', coordinates: [s.lng, s.lat] }
+        }))
+      });
+    } catch {
+      hull = null;
+    }
+  }
+
+  // 5. IDW 插值
+  const samplesScaled = samples.map((s) => ({ x: s.lng * cosLat, y: s.lat, count: s.count }));
+  const idw = (lng, lat) => {
+    const x = lng * cosLat;
+    const y = lat;
+    let weightedSum = 0;
+    let weightTotal = 0;
+    for (const s of samplesScaled) {
+      const dx = x - s.x;
+      const dy = y - s.y;
+      const d2 = dx * dx + dy * dy;
+      if (d2 < 1e-12) return s.count;
+      const w = 1 / d2;
+      weightedSum += w * s.count;
+      weightTotal += w;
+    }
+    return weightTotal ? weightedSum / weightTotal : 0;
+  };
+
+  // 6. 网格值(d3-contour 语义 value >= 阈值;掩码用 -Infinity 而非 NaN)
+  const grid = new Float64Array(nx * ny);
+  const stepX = (maxLng - minLng) / nx;
+  const stepY = (maxLat - minLat) / ny;
+  for (let j = 0; j < ny; j++) {
+    for (let i = 0; i < nx; i++) {
+      const lng = minLng + (i + 0.5) * stepX;
+      const lat = minLat + (j + 0.5) * stepY;
+      if (hull && !booleanPointInPolygon([lng, lat], hull)) {
+        grid[j * nx + i] = -Infinity;
+      } else {
+        grid[j * nx + i] = Math.max(p5, Math.min(p95, idw(lng, lat)));
+      }
+    }
+  }
+
+  // 7. 抽等值面
+  const mapCoord = (pt) => [
+    minLng + (pt[0] / nx) * (maxLng - minLng),
+    minLat + (pt[1] / ny) * (maxLat - minLat)
+  ];
+  const contourFeatures = contours()
+    .size([nx, ny])
+    .thresholds(breaks)(grid)
+    .map((geom) => ({
+      type: 'Feature',
+      properties: { value: geom.value },
+      geometry: {
+        type: 'MultiPolygon',
+        coordinates: geom.coordinates.map((polygon) => polygon.map((ring) => ring.map(mapCoord)))
+      }
+    }));
+
+  return { features: contourFeatures, breaks, colors, p5, p95 };
+};
+
+const drawIsopleth = () => {
+  const pointCollection = getIsoplethPointFeatureCollection();
+  if (pointCollection.features.length === 0) return;
+
+  const result = buildIsopleth(pointCollection.features);
+  if (!result) return;
+
+  map.value.addSource(ISOPLETH_SOURCE_ID, {
+    type: 'geojson',
+    data: {
+      type: 'FeatureCollection',
+      features: [...result.features, ...pointCollection.features]
+    }
+  });
+
+  const fillColorStops = [];
+  result.breaks.forEach((brk, k) => fillColorStops.push(brk, result.colors[k]));
+
   map.value.addLayer({
-    id: SYLLABLE_HEATMAP_LAYER_ID,
-    type: 'heatmap',
-    source: SYLLABLE_HEATMAP_SOURCE_ID,
-    maxzoom: 11,
+    id: ISOPLETH_FILL_LAYER_ID,
+    type: 'fill',
+    source: ISOPLETH_SOURCE_ID,
     paint: {
-      'heatmap-weight': [
-        'interpolate',
-        ['linear'],
-        ['get', 'count'],
-        0, 0,
-        100, 0.15,
-        200, 0.35,
-        400, 0.6,
-        800, 0.85,
-        1500, 1
-      ],
-      'heatmap-intensity': [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        3, 0.8,
-        10, 1.8
-      ],
-      'heatmap-color': [
-        'interpolate',
-        ['linear'],
-        ['heatmap-density'],
-        0, 'rgba(33,102,172,0)',
-        0.2, '#67a9cf',
-        0.4, '#d1e5f0',
-        0.6, '#fddbc7',
-        0.8, '#ef8a62',
-        1, '#b2182b'
-      ],
-      'heatmap-radius': [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        3, 14,
-        10, 34
-      ],
-      'heatmap-opacity': [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        9, 0.85,
-        12, 0
-      ]
+      'fill-color': ['interpolate', ['linear'], ['get', 'value'], ...fillColorStops],
+      'fill-outline-color': ['interpolate', ['linear'], ['get', 'value'], ...fillColorStops],
+      'fill-opacity': 0.85
     }
   });
 
   map.value.addLayer({
-    id: SYLLABLE_HEATMAP_POINT_LAYER_ID,
+    id: ISOPLETH_POINT_LAYER_ID,
     type: 'circle',
-    source: SYLLABLE_HEATMAP_SOURCE_ID,
+    source: ISOPLETH_SOURCE_ID,
     minzoom: 7,
     paint: {
       'circle-radius': [
@@ -992,17 +1123,23 @@ const drawSyllableHeatmap = () => {
     }
   });
 
-  syllableHeatmapClickHandler = (event) => {
+  isoplethClickHandler = (event) => {
     const feature = event.features?.[0];
     if (!feature) return;
 
     new maplibregl.Popup({ offset: 12 })
       .setLngLat(feature.geometry.coordinates)
-      .setDOMContent(createSyllableHeatmapPopupNode(feature.properties || {}))
+      .setDOMContent(createIsoplethPopupNode(feature.properties || {}))
       .addTo(map.value);
   };
 
-  map.value.on('click', SYLLABLE_HEATMAP_POINT_LAYER_ID, syllableHeatmapClickHandler);
+  map.value.on('click', ISOPLETH_POINT_LAYER_ID, isoplethClickHandler);
+
+  isoplethLegend.value = {
+    colors: result.colors,
+    p5: Math.round(result.p5),
+    p95: Math.round(result.p95)
+  };
 };
 
 // 創建比較模式的彈窗內容
@@ -1067,8 +1204,8 @@ const collectResetViewPoints = () => {
   let points = [];
 
   // compare / feature 模式优先按当前结果坐标复位，避免退回到 mapData 全量范围
-  if (mapStore.mode === 'syllableHeatmap') {
-    points = getSyllableHeatmapFeatureCollection().features
+  if (mapStore.mode === 'isopleth') {
+    points = getIsoplethPointFeatureCollection().features
       .map(feature => feature.geometry?.coordinates)
       .filter(isValidCoordinatePair);
   }
@@ -1234,6 +1371,35 @@ $glass-transition: all 0.3s ease;
 
   :deep(.liquid-radio-group) {
     gap: 4px 10px;
+  }
+}
+
+.isopleth-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  width: 100%;
+  padding: 6px 4px;
+
+  &-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  &-bar {
+    width: 100%;
+    height: 10px;
+
+    border-radius: 4px;
+  }
+
+  &-labels {
+    display: flex;
+    justify-content: space-between;
+
+    font-size: 11px;
   }
 }
 

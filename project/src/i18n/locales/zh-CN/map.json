@@ -361,6 +361,9 @@
       "placeNames": "查看地名",
       "dot": "圆点图"
     },
+    "isopleth": {
+      "title": "音节等值线图"
+    },
     "buttons": {
       "reset": "复位",
       "fullscreen": "全屏",

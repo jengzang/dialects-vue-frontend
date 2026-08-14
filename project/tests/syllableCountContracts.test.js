@@ -21,15 +21,15 @@ describe('syllable count frontend contracts', () => {
     expect(indexSource).toContain('getSyllableCounts')
   })
 
-  it('keeps syllable heatmap payload isolated from existing mergedData map logic', () => {
+  it('keeps syllable isopleth payload isolated from existing mergedData map logic', () => {
     const storeSource = readSource('src/main/store/store.js')
     const mapLibreSource = readSource('src/main/components/map/MapLibre.vue')
 
-    expect(storeSource).toContain('syllableHeatmapPayload')
-    expect(mapLibreSource).toContain("mapStore.mode === 'syllableHeatmap'")
-    expect(mapLibreSource).toContain('drawSyllableHeatmap')
-    expect(mapLibreSource).toContain('mapStore.syllableHeatmapPayload')
-    expect(mapLibreSource).toContain('clearSyllableHeatmapLayers')
+    expect(storeSource).toContain('isoplethPayload')
+    expect(mapLibreSource).toContain("mapStore.mode === 'isopleth'")
+    expect(mapLibreSource).toContain('drawIsopleth')
+    expect(mapLibreSource).toContain('mapStore.isoplethPayload')
+    expect(mapLibreSource).toContain('clearIsoplethLayers')
   })
 
   it('wires Countphos through LocationAndRegionInput and fetches both count APIs with the same request payload', () => {
@@ -55,18 +55,18 @@ describe('syllable count frontend contracts', () => {
     expect(source).toContain('watch([isSingleLocationQuery, isCountphosQueryEmpty]')
   })
 
-  it('adds an inline syllable section with tone switch and heatmap threshold above ten resolved points', () => {
+  it('adds an inline syllable section with tone switch and isopleth threshold above ten resolved points', () => {
     const source = readSource('src/main/components/pho/Countphos.vue')
 
     expect(source).toContain('syllable-section')
     expect(source).toContain('<SwitchToggle')
     expect(source).toContain('syllableMode')
-    expect(source).toContain('canShowSyllableHeatmap')
+    expect(source).toContain('canShowIsopleth')
     expect(source).toContain('resolvedLocationCount.value > 10')
-    expect(source).toContain('openSyllableHeatmap')
+    expect(source).toContain('openIsopleth')
   })
 
-  it('caps the syllable grid at 100 cards with a confirmed load-more button and moves the heatmap button to the summary row', () => {
+  it('caps the syllable grid at 100 cards with a confirmed load-more button and moves the isopleth button to the summary row', () => {
     const source = readSource('src/main/components/pho/Countphos.vue')
 
     expect(source).toContain('visibleSyllableStats')
@@ -74,7 +74,7 @@ describe('syllable count frontend contracts', () => {
     expect(source).toContain('loadAllSyllables')
     expect(source).toContain("showConfirm(t('phonology.phonology.countphos.syllables.loadAllConfirm'))")
     expect(source).toContain('syllable-summary-row')
-    expect(source).toContain('viewHeatmap')
+    expect(source).toContain('viewIsopleth')
   })
 
   it('shows per-location syllable details and feeds them to the location jump nav', () => {
@@ -117,7 +117,7 @@ describe('syllable count frontend contracts', () => {
     expect(source).toContain('getDefaultCountsData')
     expect(source).toContain('if (!isUsingDefaultCounts.value) return')
     expect(source).toContain('v-if="queryMode.featureCounts && !isSingleLocation && hasChartData"')
-    expect(source).toContain('v-if="queryMode.syllableCounts && hasSyllableResultData"')
+    expect(source).toContain('v-if="queryMode.syllableCounts && !isSingleLocation && hasSyllableResultData"')
     expect(source).toContain('v-if="queryMode.featureCounts && hasLocationDetailData"')
     expect(source).toContain('v-if="queryMode.syllableCounts && showSyllableLocations"')
 

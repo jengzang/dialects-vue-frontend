@@ -108,7 +108,7 @@
         "tokens": "Syllable tokens",
         "viewLocations": "Locations",
         "heatmap": "Heatmap",
-        "viewHeatmap": "View heatmap",
+        "viewIsopleth": "View isopleth",
         "loadMore": "Load more",
         "loadAllConfirm": "Loading all cards may cause lag. Continue?",
         "modes": {

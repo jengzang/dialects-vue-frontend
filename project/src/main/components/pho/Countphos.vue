@@ -182,7 +182,7 @@ const resolvedLocationCount = computed(() => {
   return displayLocationCount.value || matchedLocations.value.length || 0
 })
 
-const canShowSyllableHeatmap = computed(() => resolvedLocationCount.value > 10)
+const canShowIsopleth = computed(() => resolvedLocationCount.value > 10)
 
 const isTonedSyllableMode = computed({
   get: () => syllableMode.value === 'toned',
@@ -199,8 +199,8 @@ const hasSyllableResultData = computed(() => Object.keys(currentSyllableAggregat
 
 const syllableLocationData = computed(() => syllableData.value?.[syllableMode.value]?.locations || {})
 const hasSyllableLocationData = computed(() => Object.keys(syllableLocationData.value).length > 0)
-// 与声韵调独立的地点详情互斥,避免两个 section 渲染同一地点锚点 id 重复
-const showSyllableLocations = computed(() => hasSyllableLocationData.value && !hasLocationDetailData.value)
+// 单地点同时请求两个 API 时,音节地点详情需与声韵调地点详情同时显示
+const showSyllableLocations = computed(() => hasSyllableLocationData.value)
 
 const syllableStatsList = computed(() => {
   return Object.entries(currentSyllableAggregated.value || {})
@@ -271,7 +271,7 @@ const {
 
 const visibleNavItems = computed(() => {
   if (!isSingleLocation.value) return locationNavItems.value
-  return locationNavItems.value.filter((item) => item.kind !== 'total' && item.kind !== 'charts')
+  return locationNavItems.value.filter((item) => item.kind !== 'total' && item.kind !== 'charts' && item.kind !== 'syllable')
 })
 
 const handleRunDisabled = (disabled) => {
@@ -1190,7 +1190,7 @@ const consumePendingCountphosLocations = () => {
 }
 
 // 新格式 points 只含 {id, location, coordinate},热力图所需独特音节数/总词次在 per-location 明细里,按地点名拼装
-const buildSyllableHeatmapPoints = (syllableData) => {
+const buildIsoplethPoints = (syllableData) => {
   const points = Array.isArray(syllableData?.points) ? syllableData.points : []
   if (!points.length) return []
 
@@ -1218,20 +1218,20 @@ const buildSyllableHeatmapPoints = (syllableData) => {
     })
 }
 
-const openSyllableHeatmap = () => {
-  if (!canShowSyllableHeatmap.value) return
+const openIsopleth = () => {
+  if (!canShowIsopleth.value) return
 
-  mapStore.mode = 'syllableHeatmap'
-  mapStore.syllableHeatmapPayload = {
+  mapStore.mode = 'isopleth'
+  mapStore.isoplethPayload = {
     toneMode: syllableMode.value,
-    points: buildSyllableHeatmapPoints(syllableData.value)
+    points: buildIsoplethPoints(syllableData.value)
   }
   requestMapFitView()
 
   router.push({
     path: buildLocalePath(resolveRouteLocale(route), '/menu/map/view'),
     query: {
-      mode: 'syllableHeatmap',
+      mode: 'isopleth',
       toneMode: syllableMode.value
     }
   })
@@ -1454,13 +1454,16 @@ onBeforeUnmount(() => {
       </section>
 
       <section
-        v-if="queryMode.syllableCounts && hasSyllableResultData"
+        v-if="queryMode.syllableCounts && !isSingleLocation && hasSyllableResultData"
         :id="getSyllableAnchorId()"
         class="syllable-section glass-panel"
       >
         <div class="syllable-section-header">
           <div>
-            <h3 class="section-title">{{ $t('phonology.phonology.countphos.syllables.title') }}</h3>
+            <h3 class="section-title section-title--with-pill">
+              <span>{{ $t('phonology.phonology.countphos.syllables.title') }}</span>
+              <span class="section-title-pill">{{ $t('phonology.phonology.countphos.locationPill', { count: resolvedLocationCount }) }}</span>
+            </h3>
             <p class="section-subtitle">
               {{ $t('phonology.phonology.countphos.syllables.subtitle') }}
             </p>
@@ -1487,11 +1490,11 @@ onBeforeUnmount(() => {
             <span class="stat-value">{{ currentSyllableUniqueCount }}</span>
           </span>
           <button
-            v-if="canShowSyllableHeatmap"
-            class="expand-btn heatmap-btn"
-            @click="openSyllableHeatmap"
+            v-if="canShowIsopleth"
+            class="expand-btn isopleth-btn"
+            @click="openIsopleth"
           >
-            {{ $t('phonology.phonology.countphos.syllables.viewHeatmap') }}
+            {{ $t('phonology.phonology.countphos.syllables.viewIsopleth') }}
           </button>
         </div>
 
@@ -1589,7 +1592,7 @@ onBeforeUnmount(() => {
         <div
           v-for="(locationData, locationName) in syllableLocationData"
           :key="locationName"
-          :id="getLocationAnchorId(locationName)"
+          :id="(queryMode.featureCounts && hasLocationDetailData) ? undefined : getLocationAnchorId(locationName)"
           class="location-detail glass-card"
         >
           <h4 class="location-name" @click.stop="handleLocationClick(locationName)">{{ locationName }}</h4>
@@ -2079,7 +2082,7 @@ $primary-deep: #003d9e;
     }
   }
 
-  .heatmap-btn {
+  .isopleth-btn {
     background: var(--color-success);
     box-shadow: 0 2px 6px rgba(var(--color-primary-rgb), 0.18);
 

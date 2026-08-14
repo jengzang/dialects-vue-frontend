@@ -361,6 +361,9 @@
       "placeNames": "Place Names",
       "dot": "Dot Map"
     },
+    "isopleth": {
+      "title": "Syllable Isopleth"
+    },
     "buttons": {
       "reset": "Reset",
       "fullscreen": "Fullscreen",
