@@ -240,8 +240,6 @@
             >
               {{ t('map.mapLibre.buttons.reset') }}
             </button>
-          </div>
-          <div class="draw-tool-button-grid">
             <button
               class="glass-button"
               :data-variant="isFullscreen ? 'primary' : 'secondary'"
@@ -251,42 +249,42 @@
             >
               {{ isFullscreen ? t('map.mapLibre.buttons.exitFullscreen') : t('map.mapLibre.buttons.fullscreen') }}
             </button>
-            <button
-              class="glass-button"
-              :data-variant="snappingEnabled ? 'primary' : 'secondary'"
-              :data-active="snappingEnabled"
-              data-testid="toggle-snapping"
-              type="button"
-              @click="$emit('update:snappingEnabled', !snappingEnabled)"
-            >
-              {{ t('map.drawTab.labels.snapping') }}
-            </button>
           </div>
           <label class="draw-field">
-            <span class="draw-field-label">{{ t('map.drawTab.labels.snapTolerance') }}：{{ snapTolerance }}</span>
-            <input
-              data-testid="snap-tolerance-input"
-              class="draw-range-input glass-range"
-              type="range"
-              min="0"
-              max="48"
-              step="1"
-              :value="snapTolerance"
-              @input="$emit('update:snapTolerance', Number($event.target.value))"
-            >
+            <span class="draw-field-label">{{ t('map.drawTab.labels.snapping') }}</span>
+            <SwitchToggle
+              :model-value="snappingEnabled"
+              data-testid="toggle-snapping"
+              @update:model-value="$emit('update:snappingEnabled', $event)"
+            />
           </label>
-          <label class="draw-field">
-            <span class="draw-field-label">{{ t('map.drawTab.labels.snapGridSize') }}：{{ snapGridSize }}</span>
-            <input
-              data-testid="snap-grid-input"
-              class="draw-input glass-field"
-              type="number"
-              min="0"
-              step="0.05"
-              :value="snapGridSize"
-              @input="$emit('update:snapGridSize', Number($event.target.value))"
-            >
-          </label>
+          <template v-if="snappingEnabled">
+            <label class="draw-field">
+              <span class="draw-field-label">{{ t('map.drawTab.labels.snapTolerance') }}：{{ snapTolerance }}</span>
+              <input
+                data-testid="snap-tolerance-input"
+                class="draw-range-input glass-range"
+                type="range"
+                min="0"
+                max="48"
+                step="1"
+                :value="snapTolerance"
+                @input="$emit('update:snapTolerance', Number($event.target.value))"
+              >
+            </label>
+            <label class="draw-field">
+              <span class="draw-field-label">{{ t('map.drawTab.labels.snapGridSize') }}：{{ snapGridSize }}</span>
+              <input
+                data-testid="snap-grid-input"
+                class="draw-input glass-field"
+                type="number"
+                min="0"
+                step="0.05"
+                :value="snapGridSize"
+                @input="$emit('update:snapGridSize', Number($event.target.value))"
+              >
+            </label>
+          </template>
           <div
             v-if="currentMode === 'direct_select'"
             class="draw-shape-edit-status"
@@ -862,6 +860,7 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import SwitchToggle from '@/components/common/SwitchToggle.vue'
 
 const { t } = useI18n()
 
