@@ -11,15 +11,42 @@
   "showcase": {
     "nav": "Product showcase",
     "switchTo": "Switch to",
-    "yinxi": { "title": "Phonological System", "action": "View System" },
-    "zhonggu": { "title": "Geolinguistics", "action": "Query MC" },
-    "result": { "title": "Query Results", "action": "View Results" },
-    "villages": { "title": "Guangdong Villages", "action": "Browse" },
-    "compare": { "title": "Dialect Comparison", "action": "Compare" },
-    "gis": { "title": "GIS Drawing", "action": "Start Drawing" },
-    "evolution": { "title": "Sound Evolution", "action": "View Evolution" },
-    "photiccompare": { "title": "Phonetic Comparison", "action": "View Sankey" },
-    "praat": { "title": "Online Praat", "action": "Start Analysis" }
+    "yinxi": {
+      "title": "Phonological System",
+      "action": "View System"
+    },
+    "zhonggu": {
+      "title": "Geolinguistics",
+      "action": "Query MC"
+    },
+    "result": {
+      "title": "Query Results",
+      "action": "View Results"
+    },
+    "villages": {
+      "title": "Guangdong Villages",
+      "action": "Browse"
+    },
+    "compare": {
+      "title": "Dialect Comparison",
+      "action": "Compare"
+    },
+    "gis": {
+      "title": "GIS Drawing",
+      "action": "Start Drawing"
+    },
+    "evolution": {
+      "title": "Sound Evolution",
+      "action": "View Evolution"
+    },
+    "photiccompare": {
+      "title": "Phonetic Comparison",
+      "action": "View Sankey"
+    },
+    "praat": {
+      "title": "Online Praat",
+      "action": "Start Analysis"
+    }
   },
   "features": {
     "sectionTitle": "Core Features",
@@ -151,7 +178,7 @@
     "loginNow": "Log In Now",
     "viewDetails": "View Details"
   },
-  "viewDetails": "View Details",
+  "viewDetails": "Details",
   "intro": {
     "thanks": {
       "aboutTitle": "ℹ️ About This Site",
