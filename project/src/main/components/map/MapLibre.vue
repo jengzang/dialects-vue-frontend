@@ -130,6 +130,7 @@ const props = defineProps({
 const emit = defineEmits(['map-click']);
 
 const ISOPLETH_SOURCE_ID = 'isopleth-source';
+const ISOPLETH_POINT_SOURCE_ID = 'isopleth-point-source';
 const ISOPLETH_FILL_LAYER_ID = 'isopleth-fill-layer';
 const ISOPLETH_POINT_LAYER_ID = 'isopleth-point-layer';
 const DOT_HEATMAP_SOURCE_ID = 'dot-heatmap-source';
@@ -415,9 +416,11 @@ const clearIsoplethLayers = () => {
     }
   });
 
-  if (map.value.getSource(ISOPLETH_SOURCE_ID)) {
-    map.value.removeSource(ISOPLETH_SOURCE_ID);
-  }
+  [ISOPLETH_SOURCE_ID, ISOPLETH_POINT_SOURCE_ID].forEach((sourceId) => {
+    if (map.value.getSource(sourceId)) {
+      map.value.removeSource(sourceId);
+    }
+  });
 };
 
 const clearDotHeatmapLayers = () => {
@@ -873,6 +876,7 @@ const getIsoplethPointFeatureCollection = () => {
   const payload = mapStore.isoplethPayload || {};
   const toneMode = payload.toneMode === 'toned' ? 'toned' : 'toneless';
   const points = Array.isArray(payload.points) ? payload.points : [];
+  console.log('[MapLibre] getIsoplethPointFeatureCollection payload =', payload);
 
   return {
     type: 'FeatureCollection',
@@ -1054,6 +1058,7 @@ const buildIsopleth = (features) => {
   const contourFeatures = contours()
     .size([nx, ny])
     .thresholds(breaks)(grid)
+    .filter((geom) => geom.coordinates.length > 0)
     .map((geom) => ({
       type: 'Feature',
       properties: { value: geom.value },
@@ -1068,16 +1073,32 @@ const buildIsopleth = (features) => {
 
 const drawIsopleth = () => {
   const pointCollection = getIsoplethPointFeatureCollection();
+  console.log('[MapLibre] drawIsopleth pointCount =', pointCollection.features.length);
   if (pointCollection.features.length === 0) return;
 
   const result = buildIsopleth(pointCollection.features);
+  console.log('[MapLibre] drawIsopleth buildIsopleth result =', result && {
+    featureCount: result.features?.length,
+    breaks: result.breaks,
+    colors: result.colors,
+    p5: result.p5,
+    p95: result.p95
+  });
   if (!result) return;
 
   map.value.addSource(ISOPLETH_SOURCE_ID, {
     type: 'geojson',
     data: {
       type: 'FeatureCollection',
-      features: [...result.features, ...pointCollection.features]
+      features: result.features
+    }
+  });
+
+  map.value.addSource(ISOPLETH_POINT_SOURCE_ID, {
+    type: 'geojson',
+    data: {
+      type: 'FeatureCollection',
+      features: pointCollection.features
     }
   });
 
@@ -1098,7 +1119,7 @@ const drawIsopleth = () => {
   map.value.addLayer({
     id: ISOPLETH_POINT_LAYER_ID,
     type: 'circle',
-    source: ISOPLETH_SOURCE_ID,
+    source: ISOPLETH_POINT_SOURCE_ID,
     minzoom: 7,
     paint: {
       'circle-radius': [

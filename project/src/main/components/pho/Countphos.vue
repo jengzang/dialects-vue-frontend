@@ -814,7 +814,8 @@ const getDefaultPointsMaps = () => {
       })
       .then((result) => {
         defaultPointsCache = {
-          byId: new Map((result?.points || []).map((p) => [p.id, p.location]))
+          byId: new Map((result?.points || []).map((p) => [p.id, p.location])),
+          byName: new Map((result?.points || []).map((p) => [p.location, p.coordinate]))
         }
         return defaultPointsCache
       })
@@ -1186,33 +1187,53 @@ const consumePendingCountphosLocations = () => {
   loadData()
 }
 
-// 新格式 points 只含 {id, location, coordinate},热力图所需独特音节数/总词次在 per-location 明细里,按地点名拼装
+// 新格式音节统计按「音节 → 覆盖地点名数组」聚合(aggregated.syllables[*].locations),无 per-location 明细。
+// 等值线需要的每地点独特音节数,需反转成「地点 → 独特音节数」;坐标来自实时 points 或 defaultPointsCache.byName。
 const buildIsoplethPoints = (syllableData) => {
-  const points = Array.isArray(syllableData?.points) ? syllableData.points : []
-  if (!points.length) return []
-
   const perLocation = {}
+
   for (const mode of ['toneless', 'toned']) {
-    const locs = syllableData?.[mode]?.locations || {}
-    Object.entries(locs).forEach(([name, data]) => {
-      const syllables = data?.syllables || {}
-      if (!perLocation[name]) perLocation[name] = { unique: {}, tokens: {} }
-      perLocation[name].unique[mode] = Object.keys(syllables).length
-      perLocation[name].tokens[mode] = Object.values(syllables).reduce((sum, count) => sum + Number(count || 0), 0)
-    })
+    const syllables = syllableData?.[mode]?.aggregated?.syllables || {}
+    for (const stats of Object.values(syllables)) {
+      if (!Array.isArray(stats?.locations)) continue
+      for (const name of stats.locations) {
+        if (!name) continue
+        if (!perLocation[name]) perLocation[name] = { unique: { toneless: 0, toned: 0 } }
+        perLocation[name].unique[mode] += 1
+      }
+    }
   }
 
-  return points
-    .filter((p) => p?.location && perLocation[p.location])
-    .map((p) => {
-      const stats = perLocation[p.location]
+  const coordinateByName = new Map()
+  if (Array.isArray(syllableData?.points)) {
+    for (const p of syllableData.points) {
+      if (p?.location && Array.isArray(p?.coordinate)) coordinateByName.set(p.location, p.coordinate)
+    }
+  } else if (defaultPointsCache?.byName) {
+    for (const [name, coord] of defaultPointsCache.byName) coordinateByName.set(name, coord)
+  }
+
+  const points = Object.entries(perLocation)
+    .map(([location, stats]) => {
+      const coordinate = coordinateByName.get(location)
+      if (!coordinate) return null
       return {
-        location: p.location,
-        coordinate: p.coordinate,
-        unique_syllables: { toneless: stats.unique.toneless || 0, toned: stats.unique.toned || 0 },
-        total_tokens: { toneless: stats.tokens.toneless || 0, toned: stats.tokens.toned || 0 }
+        location,
+        coordinate,
+        unique_syllables: { toneless: stats.unique.toneless, toned: stats.unique.toned },
+        total_tokens: { toneless: 0, toned: 0 }
       }
     })
+    .filter(Boolean)
+
+  console.log('[Countphos] buildIsoplethPoints', {
+    perLocationCount: Object.keys(perLocation).length,
+    coordinateMapSize: coordinateByName.size,
+    pointsCount: points.length,
+    sample: points.slice(0, 3)
+  })
+
+  return points
 }
 
 const openIsopleth = () => {
@@ -1223,6 +1244,7 @@ const openIsopleth = () => {
     toneMode: syllableMode.value,
     points: buildIsoplethPoints(syllableData.value)
   }
+  console.log('[Countphos] openIsopleth -> mapStore.isoplethPayload =', mapStore.isoplethPayload)
   requestMapFitView()
 
   router.push({
