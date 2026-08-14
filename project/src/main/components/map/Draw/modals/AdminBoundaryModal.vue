@@ -23,6 +23,9 @@
             :disabled="loading"
             @update:model-value="handleHighPrecisionToggle"
           />
+          <p v-if="!userStore.isAuthenticated" class="clip-boundary-hint">
+            {{ t('map.drawTab.voronoi.clipBoundaryHighPrecisionLoginHint') }}
+          </p>
         </div>
       </div>
 
@@ -86,12 +89,15 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue';
 import CheckBox from '@/components/selector/CheckBox.vue';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue';
 import SwitchToggle from '@/components/common/SwitchToggle.vue';
 import { api } from '@/api/auth/httpClient.js';
+import { userStore } from '@/main/store/store.js';
+import { showConfirm } from '@/utils/ui/message.js';
 
 const HIGH_PRECISION_MAX = 3;
 const LEVEL_DEEP_MAP = { provinces: 0, cities: 1, counties: 2 };
@@ -117,6 +123,8 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'confirm', 'update:highPrecision']);
 const { t } = useI18n();
+const router = useRouter();
+const route = useRoute();
 
 const localLevel = ref('country');
 const localSelected = ref([]);
@@ -208,7 +216,21 @@ function isOptionDisabled(optionValue) {
   return !localSelected.value.includes(optionValue) && localSelected.value.length >= HIGH_PRECISION_MAX;
 }
 
-function handleHighPrecisionToggle(val) {
+async function handleHighPrecisionToggle(val) {
+  if (val && !userStore.isAuthenticated) {
+    const confirmed = await showConfirm(
+      t('map.drawTab.voronoi.clipBoundaryHighPrecisionLoginConfirm'),
+      { confirmText: t('map.drawTab.voronoi.clipBoundaryGoLogin') }
+    );
+    if (confirmed) {
+      router.push({
+        path: '/auth',
+        query: { view: 'login', redirect: route.fullPath }
+      });
+    }
+    return;
+  }
+
   localHighPrecision.value = val;
   emit('update:highPrecision', val);
   if (val && localLevel.value !== 'country') {

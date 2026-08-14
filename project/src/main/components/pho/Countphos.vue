@@ -1577,6 +1577,7 @@ onBeforeUnmount(() => {
           </button>
         </div>
 
+        <!-- 默认 JSON(快照)无 per-location 字数,滑块暂不生效,先注释掉
         <div v-if="canShowIsopleth" class="isopleth-char-count-row">
           <span class="char-count-label">
             {{ $t('phonology.phonology.countphos.syllables.minCharCount') }}: {{ minCharCount }}
@@ -1592,6 +1593,7 @@ onBeforeUnmount(() => {
             :aria-label="$t('phonology.phonology.countphos.syllables.minCharCount')"
           />
         </div>
+        -->
 
         <div class="syllable-grid">
           <div
