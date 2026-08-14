@@ -453,6 +453,28 @@ $transition-duration: 0.25s;
       max-height: 100dvh;
       margin: 0;
       border-radius: 0;
+      background: var(--surface-elevation-0);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    // .corner-cell,
+    // .initial-header,
+    // .final-header {
+    //   &::before {
+    //     backdrop-filter: none;
+    //     -webkit-backdrop-filter: none;
+    //   }
+    // }
+
+    // .corner-cell,
+    // .initial-header,
+    // .final-header {
+    //   background: var(--surface-elevation-1);
+    // }
+
+    .matrix-cell {
+      background: var(--surface-elevation-0);
     }
   }
 }
