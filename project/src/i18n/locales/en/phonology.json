@@ -111,6 +111,8 @@
         "viewIsopleth": "Isopleth map",
         "loadMore": "Load more",
         "loadAllConfirm": "Loading all cards may cause lag. Continue?",
+        "minCharCount": "Min. characters",
+        "qualifiedSyllables": "Syllables ≥{min} chars",
         "modes": {
           "toneless": "Toneless",
           "toned": "Toned"

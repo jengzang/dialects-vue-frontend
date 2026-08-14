@@ -111,6 +111,8 @@
         "viewIsopleth": "等值線圖",
         "loadMore": "載入更多",
         "loadAllConfirm": "載入全部卡片可能造成卡頓,確定繼續?",
+        "minCharCount": "最少字數",
+        "qualifiedSyllables": "字數≥{min}音節",
         "modes": {
           "toneless": "不帶調",
           "toned": "帶調"

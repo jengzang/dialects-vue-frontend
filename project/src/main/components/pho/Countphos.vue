@@ -55,6 +55,13 @@ const featureData = ref({}) // 存儲每個地點的原始數據
 const aggregatedData = ref({}) // 存儲匯總統計數據
 const syllableData = ref(null)
 const syllableMode = ref('toneless')
+const minCharCount = ref(1)
+const MIN_CHAR_COUNT_MIN = 1
+const MIN_CHAR_COUNT_MAX = 30
+const minCharCountProgress = computed(() => {
+  const span = MIN_CHAR_COUNT_MAX - MIN_CHAR_COUNT_MIN
+  return ((minCharCount.value - MIN_CHAR_COUNT_MIN) / span) * 100
+})
 
 //默认加载
 const isUsingDefaultCounts = ref(false)
@@ -1210,6 +1217,7 @@ const reverseSyllableStats = (syllableData) => {
 }
 
 const buildIsoplethPoints = (syllableData) => {
+  const threshold = Number(minCharCount.value) || 1
   const locationStats = {}
   for (const mode of ['toneless', 'toned']) {
     const locations = syllableData?.[mode]?.locations || {}
@@ -1218,11 +1226,14 @@ const buildIsoplethPoints = (syllableData) => {
       if (!locationStats[name]) {
         locationStats[name] = {
           unique: { toneless: 0, toned: 0 },
-          tokens: { toneless: 0, toned: 0 }
+          tokens: { toneless: 0, toned: 0 },
+          qualified: { toneless: 0, toned: 0 }
         }
       }
       locationStats[name].unique[mode] = Number(data.unique_syllables || 0)
       locationStats[name].tokens[mode] = Number(data.total_tokens || 0)
+      locationStats[name].qualified[mode] = Object.values(data.syllables || {})
+        .filter((count) => Number(count) >= threshold).length
     }
   }
 
@@ -1241,6 +1252,7 @@ const buildIsoplethPoints = (syllableData) => {
 
     let unique
     let tokens
+    let qualified
     if (p.unique_syllables) {
       unique = {
         toneless: Number(p.unique_syllables.toneless || 0),
@@ -1252,17 +1264,26 @@ const buildIsoplethPoints = (syllableData) => {
             toned: Number(p.total_tokens.toned || 0)
           }
         : { toneless: 0, toned: 0 }
+      qualified = { toneless: 0, toned: 0 }
     } else if (locationStats[location]) {
       unique = locationStats[location].unique
       tokens = locationStats[location].tokens
+      qualified = locationStats[location].qualified
     } else if (reversed && reversed[location]) {
       unique = reversed[location].unique
       tokens = { toneless: 0, toned: 0 }
+      qualified = { toneless: 0, toned: 0 }
     } else {
       continue
     }
 
-    out.push({ location, coordinate, unique_syllables: unique, total_tokens: tokens })
+    out.push({
+      location,
+      coordinate,
+      unique_syllables: unique,
+      total_tokens: tokens,
+      qualified_syllable_count: qualified
+    })
   }
 
   console.log('[Countphos] buildIsoplethPoints', {
@@ -1279,6 +1300,7 @@ const openIsopleth = () => {
   mapStore.mode = 'isopleth'
   mapStore.isoplethPayload = {
     toneMode: syllableMode.value,
+    minCharCount: Number(minCharCount.value) || 1,
     points: buildIsoplethPoints(syllableData.value)
   }
   console.log('[Countphos] openIsopleth -> mapStore.isoplethPayload =', mapStore.isoplethPayload)
@@ -1553,6 +1575,22 @@ onBeforeUnmount(() => {
           >
             {{ $t('phonology.phonology.countphos.syllables.viewIsopleth') }}<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </button>
+        </div>
+
+        <div v-if="canShowIsopleth" class="isopleth-char-count-row">
+          <span class="char-count-label">
+            {{ $t('phonology.phonology.countphos.syllables.minCharCount') }}: {{ minCharCount }}
+          </span>
+          <input
+            v-model.number="minCharCount"
+            type="range"
+            class="glass-range char-count-range"
+            :min="MIN_CHAR_COUNT_MIN"
+            :max="MIN_CHAR_COUNT_MAX"
+            step="1"
+            :style="{ '--glass-range-progress': minCharCountProgress + '%' }"
+            :aria-label="$t('phonology.phonology.countphos.syllables.minCharCount')"
+          />
         </div>
 
         <div class="syllable-grid">
@@ -1931,6 +1969,26 @@ $primary-deep: #003d9e;
     background: var(--glass-70);
     border: 1px solid var(--glass-60);
     border-radius: var(--radius-pill);
+  }
+
+  .isopleth-char-count-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    max-width: 360px;
+    margin: 0 auto 16px;
+  }
+
+  .char-count-label {
+    color: var(--text-secondary);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .char-count-range {
+    flex: 1;
+    min-width: 120px;
   }
 
   .syllable-card-actions {

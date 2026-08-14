@@ -963,7 +963,9 @@ const getIsoplethPointFeatureCollection = () => {
     features: points
       .map((point) => {
         const uniqueSyllables = Number(point?.unique_syllables?.[toneMode] || 0);
-        if (uniqueSyllables <= 0 || !isValidCoordinatePair(point?.coordinate)) return null;
+        const qualifiedSyllableCount = Number(point?.qualified_syllable_count?.[toneMode] || 0);
+        const count = qualifiedSyllableCount > 0 ? qualifiedSyllableCount : uniqueSyllables;
+        if (count <= 0 || !isValidCoordinatePair(point?.coordinate)) return null;
 
         return {
           type: 'Feature',
@@ -974,8 +976,10 @@ const getIsoplethPointFeatureCollection = () => {
           properties: {
             location: point.location || '',
             toneMode,
-            count: uniqueSyllables,
+            count,
             uniqueSyllables,
+            qualifiedSyllableCount,
+            minCharCount: Number(payload.minCharCount || 1),
             totalTokens: Number(point?.total_tokens?.[toneMode] || 0)
           }
         };
@@ -1000,6 +1004,13 @@ const createIsoplethPopupNode = (properties) => {
   tokens.textContent = `${t('phonology.phonology.countphos.syllables.tokens')}: ${properties.totalTokens}`;
 
   container.append(title, mode, unique, tokens);
+
+  if (Number(properties.qualifiedSyllableCount) > 0) {
+    const qualified = document.createElement('div');
+    qualified.textContent = `${t('phonology.phonology.countphos.syllables.qualifiedSyllables', { min: properties.minCharCount })}: ${properties.qualifiedSyllableCount}`;
+    container.append(qualified);
+  }
+
   return container;
 };
 
