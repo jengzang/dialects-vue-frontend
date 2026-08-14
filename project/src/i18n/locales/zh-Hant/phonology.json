@@ -115,6 +115,8 @@
         "qualifiedSyllables": "字數≥{min}音節",
         "ignoreHistorical": "忽略歷史音",
         "allLocations": "全部地點",
+        "expandAll": "展開全部",
+        "collapse": "收起",
         "modes": {
           "toneless": "不帶調",
           "toned": "帶調"

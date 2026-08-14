@@ -115,6 +115,8 @@
         "qualifiedSyllables": "Syllables ≥{min} chars",
         "ignoreHistorical": "Ignore historical",
         "allLocations": "All locations",
+        "expandAll": "Expand all",
+        "collapse": "Collapse",
         "modes": {
           "toneless": "Toneless",
           "toned": "Toned"

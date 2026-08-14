@@ -209,6 +209,34 @@ const hasSyllableLocationData = computed(() => Object.keys(syllableLocationData.
 // 单地点同时请求两个 API 时,音节地点详情需与声韵调地点详情同时显示
 const showSyllableLocations = computed(() => hasSyllableLocationData.value)
 
+// 音节地点详情:每个地点默认只显示 top-50 音节(按字数降序),点按钮展开全部
+const SYLLABLE_LOCATION_TOP_LIMIT = 50
+const expandedSyllableLocations = ref({})
+
+const syllableLocationList = computed(() => {
+  return Object.entries(syllableLocationData.value).map(([locationName, locationData]) => {
+    const entries = Object.entries(locationData?.syllables || {})
+      .map(([syllable, count]) => ({ syllable, count: Number(count) || 0 }))
+      .sort((a, b) => b.count - a.count || a.syllable.localeCompare(b.syllable, 'zh-Hant'))
+    return { locationName, entries }
+  })
+})
+
+const isSyllableLocationExpanded = (locationName) => Boolean(expandedSyllableLocations.value[locationName])
+
+const visibleSyllableLocationEntries = (item) => {
+  return isSyllableLocationExpanded(item.locationName)
+    ? item.entries
+    : item.entries.slice(0, SYLLABLE_LOCATION_TOP_LIMIT)
+}
+
+const toggleSyllableLocationExpanded = (locationName) => {
+  const next = { ...expandedSyllableLocations.value }
+  if (next[locationName]) delete next[locationName]
+  else next[locationName] = true
+  expandedSyllableLocations.value = next
+}
+
 const syllableStatsList = computed(() => {
   return Object.entries(currentSyllableAggregated.value || {})
     .map(([syllable, stats]) => {
@@ -1709,25 +1737,34 @@ onBeforeUnmount(() => {
         </p>
 
         <div
-          v-for="(locationData, locationName) in syllableLocationData"
-          :key="locationName"
-          :id="(queryMode.featureCounts && hasLocationDetailData) ? undefined : getLocationAnchorId(locationName)"
+          v-for="item in syllableLocationList"
+          :key="item.locationName"
+          :id="(queryMode.featureCounts && hasLocationDetailData) ? undefined : getLocationAnchorId(item.locationName)"
           class="location-detail glass-card"
         >
-          <h4 class="location-name" @click.stop="handleLocationClick(locationName)">{{ locationName }}</h4>
+          <h4 class="location-name" @click.stop="handleLocationClick(item.locationName)">{{ item.locationName }}</h4>
 
           <div class="feature-group">
             <h5 class="feature-type">{{ syllableModeLabel }}</h5>
             <div class="feature-tags">
               <span
-                v-for="(count, syllable) in locationData.syllables"
-                :key="syllable"
+                v-for="entry in visibleSyllableLocationEntries(item)"
+                :key="entry.syllable"
                 class="feature-tag"
               >
-                <span class="tag-syllable">{{ syllable }}</span>
-                <span class="tag-count">{{ count }}</span>
+                <span class="tag-syllable">{{ entry.syllable }}</span>
+                <span class="tag-count">{{ entry.count }}</span>
               </span>
             </div>
+            <button
+              v-if="item.entries.length > SYLLABLE_LOCATION_TOP_LIMIT"
+              class="expand-btn syllable-location-expand-btn"
+              @click="toggleSyllableLocationExpanded(item.locationName)"
+            >
+              {{ isSyllableLocationExpanded(item.locationName)
+                ? $t('phonology.phonology.countphos.syllables.collapse')
+                : `${$t('phonology.phonology.countphos.syllables.expandAll')} (+${item.entries.length - SYLLABLE_LOCATION_TOP_LIMIT})` }}
+            </button>
           </div>
         </div>
       </section>
@@ -2314,6 +2351,10 @@ $primary-deep: #003d9e;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+  }
+
+  .syllable-location-expand-btn {
+    margin-top: 10px;
   }
 
   .feature-tag {
