@@ -40,7 +40,7 @@ describe('syllable count frontend contracts', () => {
     expect(source).toContain('<LocationAndRegionInput')
     expect(source).toContain('countphosLocationQuery')
     expect(source).toContain('getFeatureCounts(countRequestPayload)')
-    expect(source).toContain('getSyllableCounts(countRequestPayload)')
+    expect(source).toContain('getSyllableCounts(syllablePayload)')
     expect(source).toContain("region_mode: countphosLocationQuery.value.regionUsing")
   })
 

@@ -1025,26 +1025,6 @@ const loadData = async () => {
   })
 }
 
-// 切换带调/不带调时,按 variant 只重请求音节那一档,不重请求特征统计
-const reloadSyllableData = async () => {
-  if (!queryMode.value.syllableCounts || isUsingDefaultCounts.value || isCountphosQueryEmpty.value) return
-
-  await loadCountsTask.run(async () => {
-    const payload = buildCountRequestPayload()
-    const syllableResult = await getSyllableCounts({ ...payload, variant: syllableMode.value })
-    syllableData.value = normalizeSyllableApiLocations(syllableResult) || null
-  }, {
-    onError: (err) => {
-      console.error('音节数据加载失败:', err)
-      error.value = err.message || t('phonology.phonology.countphos.states.loadError')
-    }
-  })
-}
-
-watch(syllableMode, () => {
-  reloadSyllableData()
-})
-
 // 特徵統計視圖激活且有聚合數據時渲染圖表;關閉時清理,避免離屏 DOM 實例殘留
 watch(
   [() => queryMode.value.featureCounts, () => Object.keys(aggregatedData.value || {}).length],

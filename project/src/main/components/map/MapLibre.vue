@@ -53,8 +53,8 @@
             :style="{ background: `linear-gradient(to right, ${isoplethLegend.colors.join(', ')})` }"
           ></div>
           <div class="isopleth-legend-labels">
-            <span>{{ isoplethLegend.p5 }}</span>
-            <span>{{ isoplethLegend.p95 }}</span>
+            <span>{{ isoplethLegend.p3 }}</span>
+            <span>{{ isoplethLegend.p97 }}</span>
           </div>
         </div>
         <div class="button-row">
@@ -354,6 +354,11 @@ const initMap = () => {
   map.value.on('load', () => {
     // 地圖加載完畢，如果有數據，立即渲染
     renderMapContent();
+    // 首次進入地圖視圖時若已帶模式數據(如等值線跳轉),依數據範圍校正視口；
+    // fitViewKey 可能在掛載前就遞增,此處補一次 fit 避免視口停在默認中心。
+    if (mapStore.mode !== 'base') {
+      applyResetView(AUTO_RESET_DENSITY_PERCENTILE);
+    }
   });
 
   // 監聽地圖點擊事件，傳遞坐標給父組件
@@ -969,19 +974,20 @@ const buildIsopleth = (features) => {
 
   if (samples.length < 2) return null;
 
-  // 2. p5–p95 十等份断点,退化时回退 [min, max]
+  // 2. p3–p97 二十等份断点,退化时回退 [min, max]
   const counts = samples.map((s) => s.count).sort((a, b) => a - b);
-  let p5 = percentile(counts, 0.05);
-  let p95 = percentile(counts, 0.95);
-  if (p95 - p5 < 1e-9) {
-    p5 = counts[0];
-    p95 = counts[counts.length - 1];
-    if (p95 - p5 < 1e-9) p95 = p5 + 1;
+  let p3 = percentile(counts, 0.03);
+  let p97 = percentile(counts, 0.97);
+  if (p97 - p3 < 1e-9) {
+    p3 = counts[0];
+    p97 = counts[counts.length - 1];
+    if (p97 - p3 < 1e-9) p97 = p3 + 1;
   }
 
-  const delta = (p95 - p5) / 10;
-  const breaks = Array.from({ length: 10 }, (_, k) => p5 + k * delta);
-  const colors = Array.from({ length: 10 }, (_, k) => rampColor((k + 1) / 10));
+  const bandCount = 20;
+  const delta = (p97 - p3) / bandCount;
+  const breaks = Array.from({ length: bandCount }, (_, k) => p3 + k * delta);
+  const colors = Array.from({ length: bandCount }, (_, k) => rampColor((k + 1) / bandCount));
 
   // 3. 包围盒 + 等距缩放(lng 乘 cos(lat))
   const lngs = samples.map((s) => s.lng);
@@ -1045,7 +1051,7 @@ const buildIsopleth = (features) => {
       if (hull && !booleanPointInPolygon([lng, lat], hull)) {
         grid[j * nx + i] = -Infinity;
       } else {
-        grid[j * nx + i] = Math.max(p5, Math.min(p95, idw(lng, lat)));
+        grid[j * nx + i] = Math.max(p3, Math.min(p97, idw(lng, lat)));
       }
     }
   }
@@ -1068,7 +1074,7 @@ const buildIsopleth = (features) => {
       }
     }));
 
-  return { features: contourFeatures, breaks, colors, p5, p95 };
+  return { features: contourFeatures, breaks, colors, p3, p97 };
 };
 
 const drawIsopleth = () => {
@@ -1081,8 +1087,8 @@ const drawIsopleth = () => {
     featureCount: result.features?.length,
     breaks: result.breaks,
     colors: result.colors,
-    p5: result.p5,
-    p95: result.p95
+    p3: result.p3,
+    p97: result.p97
   });
   if (!result) return;
 
@@ -1112,7 +1118,7 @@ const drawIsopleth = () => {
     paint: {
       'fill-color': ['interpolate', ['linear'], ['get', 'value'], ...fillColorStops],
       'fill-outline-color': ['interpolate', ['linear'], ['get', 'value'], ...fillColorStops],
-      'fill-opacity': 0.6
+      'fill-opacity': 0.5
     }
   });
 
@@ -1158,8 +1164,8 @@ const drawIsopleth = () => {
 
   isoplethLegend.value = {
     colors: result.colors,
-    p5: Math.round(result.p5),
-    p95: Math.round(result.p95)
+    p3: Math.round(result.p3),
+    p97: Math.round(result.p97)
   };
 };
 
