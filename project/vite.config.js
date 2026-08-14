@@ -191,7 +191,7 @@ export default defineConfig(async ({ mode }) => {
           chunkFileNames(chunkInfo) {
             const stableChunks = ['globe-gl', 'echarts', 'maplibre', 'xlsx', 'wavesurfer', 'opencc'];
             if (stableChunks.includes(chunkInfo.name)) {
-              return 'assets/[name].js';
+              return 'assets/[name]-v2.js';
             }
             return 'assets/[name].[hash].js';
           },
