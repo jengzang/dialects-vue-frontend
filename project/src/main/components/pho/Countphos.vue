@@ -1003,9 +1003,10 @@ const loadData = async () => {
 
   await loadCountsTask.run(async () => {
     const countRequestPayload = buildCountRequestPayload()
+    const syllablePayload = { ...countRequestPayload, variant: syllableMode.value }
     const [result, syllableResult] = await Promise.all([
       queryMode.value.featureCounts ? getFeatureCounts(countRequestPayload) : Promise.resolve(undefined),
-      queryMode.value.syllableCounts ? getSyllableCounts(countRequestPayload) : Promise.resolve(undefined)
+      queryMode.value.syllableCounts ? getSyllableCounts(syllablePayload) : Promise.resolve(undefined)
     ])
 
     // 存儲原始數據:locations 是 per-location 明细(键为地点名,原样);aggregated 走单独归一化
@@ -1023,6 +1024,26 @@ const loadData = async () => {
     }
   })
 }
+
+// 切换带调/不带调时,按 variant 只重请求音节那一档,不重请求特征统计
+const reloadSyllableData = async () => {
+  if (!queryMode.value.syllableCounts || isUsingDefaultCounts.value || isCountphosQueryEmpty.value) return
+
+  await loadCountsTask.run(async () => {
+    const payload = buildCountRequestPayload()
+    const syllableResult = await getSyllableCounts({ ...payload, variant: syllableMode.value })
+    syllableData.value = normalizeSyllableApiLocations(syllableResult) || null
+  }, {
+    onError: (err) => {
+      console.error('音节数据加载失败:', err)
+      error.value = err.message || t('phonology.phonology.countphos.states.loadError')
+    }
+  })
+}
+
+watch(syllableMode, () => {
+  reloadSyllableData()
+})
 
 // 特徵統計視圖激活且有聚合數據時渲染圖表;關閉時清理,避免離屏 DOM 實例殘留
 watch(
@@ -1351,6 +1372,15 @@ onBeforeUnmount(() => {
           :label="$t('phonology.phonology.countphos.queryModes.syllableCounts')"
           @change="(checked) => handleQueryModeToggle('syllableCounts', checked)"
         />
+        <SwitchToggle
+          v-if="queryMode.syllableCounts"
+          v-model="isTonedSyllableMode"
+          :active-text="$t('phonology.phonology.countphos.syllables.modes.toned')"
+          :inactive-text="$t('phonology.phonology.countphos.syllables.modes.toneless')"
+          :aria-label="$t('phonology.phonology.countphos.syllables.modeSwitch')"
+          color="green"
+          show-label
+        />
         <span
           v-if="!isCountphosQueryEmpty"
           class="query-mode-hint"
@@ -1522,16 +1552,6 @@ onBeforeUnmount(() => {
             <p class="section-subtitle">
               {{ $t('phonology.phonology.countphos.syllables.subtitle') }}
             </p>
-          </div>
-          <div class="syllable-section-controls">
-            <SwitchToggle
-              v-model="isTonedSyllableMode"
-              :active-text="$t('phonology.phonology.countphos.syllables.modes.toned')"
-              :inactive-text="$t('phonology.phonology.countphos.syllables.modes.toneless')"
-              :aria-label="$t('phonology.phonology.countphos.syllables.modeSwitch')"
-              color="green"
-              show-label
-            />
           </div>
         </div>
 
@@ -1911,12 +1931,6 @@ $primary-deep: #003d9e;
     justify-content: space-between;
     gap: 16px;
     margin-bottom: 14px;
-  }
-
-  .syllable-section-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
   }
 
   .syllable-summary-row {
