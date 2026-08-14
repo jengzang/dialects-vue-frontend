@@ -58,6 +58,7 @@
           </div>
         </div>
         <div class="button-row">
+          <button v-if="mapStore.mode === 'isopleth'" class="action-btn" @click="openAdminBoundaryModal"><InlineIcon icon="🗺️" />{{ t('map.mapLibre.buttons.adminBoundary') }}</button>
           <button class="action-btn" @click="resetView"><InlineIcon icon="🎯" />{{ t('map.mapLibre.buttons.reset') }}</button>
           <button class="action-btn fullscreen-btn" @click="toggleFullScreen"><InlineIcon icon="⛶" />{{ t('map.mapLibre.buttons.fullscreen') }}</button>
         </div>
@@ -81,6 +82,14 @@
       :data="locationPopup.data"
       :loading="locationPopup.loading"
       @close="closeLocationPopup"
+    />
+
+    <AdminBoundaryModal
+      v-model="showAdminBoundaryModal"
+      mode="import"
+      :boundary-options="adminBoundaryOptions"
+      :loading="isAdminBoundaryOptionsLoading"
+      @confirm="handleAdminBoundaryConfirm"
     />
   </div>
 </template>
@@ -107,6 +116,12 @@ import FeatureMapPopup from './popups/FeatureMapPopup.vue'
 import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue'
 import { contours } from 'd3-contour';
 import { convex, booleanPointInPolygon } from '@turf/turf';
+import AdminBoundaryModal from '@/main/components/map/Draw/modals/AdminBoundaryModal.vue';
+import { api } from '@/api/auth/httpClient.js';
+import nationalBorderGeoJsonUrl from '/data/gis/china_country.geojson?url';
+import provincesGeoJsonUrl from '/data/gis/china_provinces.geojson?url';
+import citiesGeoJsonUrl from '/data/gis/china_cities_simplified_balanced.geojson?url';
+import countiesGeoJsonUrl from '/data/gis/china_counties_simplified_light.geojson?url';
 
 // --- Props: 只接收數據，不負責請求 ---
 const props = defineProps({
@@ -135,6 +150,8 @@ const ISOPLETH_FILL_LAYER_ID = 'isopleth-fill-layer';
 const ISOPLETH_POINT_LAYER_ID = 'isopleth-point-layer';
 const DOT_HEATMAP_SOURCE_ID = 'dot-heatmap-source';
 const DOT_HEATMAP_LAYER_ID = 'dot-heatmap-layer';
+const ADMIN_BOUNDARY_SOURCE_ID = 'admin-boundary-source';
+const ADMIN_BOUNDARY_LAYER_ID = 'admin-boundary-line-layer';
 
 const mapContainer = ref(null);
 const map = shallowRef(null);
@@ -229,6 +246,50 @@ let currentPopupMountTargets = [];
 let isoplethClickHandler = null;
 const isoplethLegend = ref(null);
 
+const showAdminBoundaryModal = ref(false);
+const adminBoundaryOptions = ref({ country: [], provinces: [], cities: [], counties: [] });
+const isAdminBoundaryOptionsLoading = ref(false);
+
+let provincesGeoJsonCache = null;
+let citiesGeoJsonCache = null;
+let countiesGeoJsonCache = null;
+
+async function loadProvincesGeoJson() {
+  if (provincesGeoJsonCache) return provincesGeoJsonCache;
+  const res = await fetch(provincesGeoJsonUrl);
+  if (!res.ok) throw new Error(`Failed to load provinces GeoJSON: ${res.status}`);
+  provincesGeoJsonCache = await res.json();
+  return provincesGeoJsonCache;
+}
+
+async function loadCitiesGeoJson() {
+  if (citiesGeoJsonCache) return citiesGeoJsonCache;
+  const res = await fetch(citiesGeoJsonUrl);
+  if (!res.ok) throw new Error(`Failed to load cities GeoJSON: ${res.status}`);
+  citiesGeoJsonCache = await res.json();
+  return citiesGeoJsonCache;
+}
+
+async function loadCountiesGeoJson() {
+  if (countiesGeoJsonCache) return countiesGeoJsonCache;
+  const res = await fetch(countiesGeoJsonUrl);
+  if (!res.ok) throw new Error(`Failed to load counties GeoJSON: ${res.status}`);
+  countiesGeoJsonCache = await res.json();
+  return countiesGeoJsonCache;
+}
+
+async function fetchHighPrecisionBoundaries(selectedIds) {
+  const features = [];
+  for (const id of selectedIds) {
+    const data = await api(`/api/gis/boundary/by-id?feature_id=${id}`);
+    if (data?.geometry) {
+      features.push({ type: 'Feature', properties: data.feature || {}, geometry: data.geometry });
+    }
+  }
+  if (!features.length) return null;
+  return { type: 'FeatureCollection', features };
+}
+
 // 地名點擊彈窗狀態
 const locationPopup = ref({
   visible: false,
@@ -285,6 +346,7 @@ onBeforeUnmount(() => {
   clearIsoplethLayers();
   clearDotHeatmapLayers();
   clearMarkers();
+  clearAdminBoundaryLayers();
   if (map.value) {
     map.value.remove();
     map.value = null;
@@ -378,6 +440,7 @@ const renderMapContent = async (shouldResetView = true) => {
   clearMarkers();
   clearIsoplethLayers();
   clearDotHeatmapLayers();
+  clearAdminBoundaryLayers();
 
   // 視角統一由 requestMapFitView -> resetView 控制，這裡不再消費入口側預計算的 center/zoom。
   void shouldResetView;
@@ -426,6 +489,18 @@ const clearIsoplethLayers = () => {
       map.value.removeSource(sourceId);
     }
   });
+};
+
+const clearAdminBoundaryLayers = () => {
+  if (!map.value) return;
+
+  if (map.value.getLayer(ADMIN_BOUNDARY_LAYER_ID)) {
+    map.value.removeLayer(ADMIN_BOUNDARY_LAYER_ID);
+  }
+
+  if (map.value.getSource(ADMIN_BOUNDARY_SOURCE_ID)) {
+    map.value.removeSource(ADMIN_BOUNDARY_SOURCE_ID);
+  }
 };
 
 const clearDotHeatmapLayers = () => {
@@ -1168,6 +1243,81 @@ const drawIsopleth = () => {
     p97: Math.round(result.p97)
   };
 };
+
+function openAdminBoundaryModal() {
+  showAdminBoundaryModal.value = true;
+  ensureAdminBoundaryOptions();
+}
+
+async function ensureAdminBoundaryOptions() {
+  isAdminBoundaryOptionsLoading.value = true;
+  try {
+    const countryOpts = [{ label: '中国', value: '中国' }];
+    const [prov, city, county] = await Promise.all([
+      loadProvincesGeoJson().catch(() => null),
+      loadCitiesGeoJson().catch(() => null),
+      loadCountiesGeoJson().catch(() => null),
+    ]);
+    adminBoundaryOptions.value = {
+      country: countryOpts,
+      provinces: (prov?.features ?? []).map((f) => f?.properties?.name).filter(Boolean).map((n) => ({ label: n, value: n })),
+      cities: (city?.features ?? []).map((f) => f?.properties?.name).filter(Boolean).map((n) => ({ label: n, value: n })),
+      counties: (county?.features ?? []).map((f) => f?.properties?.name).filter(Boolean).map((n) => ({ label: n, value: n })),
+    };
+  } finally {
+    isAdminBoundaryOptionsLoading.value = false;
+  }
+}
+
+async function handleAdminBoundaryConfirm(config) {
+  const { level, selectedNames, selectedIds, highPrecision } = config;
+  let geoJson;
+  try {
+    if (highPrecision && level !== 'country') {
+      geoJson = await fetchHighPrecisionBoundaries(selectedIds);
+      if (!geoJson) { showError(t('map.drawTab.voronoi.clipBoundaryNoOptions')); return; }
+    } else if (level === 'country') {
+      const res = await fetch(nationalBorderGeoJsonUrl);
+      if (!res.ok) throw new Error(`Failed to load country GeoJSON: ${res.status}`);
+      geoJson = await res.json();
+    } else if (level === 'provinces') {
+      geoJson = await loadProvincesGeoJson();
+    } else if (level === 'cities') {
+      geoJson = await loadCitiesGeoJson();
+    } else {
+      geoJson = await loadCountiesGeoJson();
+    }
+  } catch (error) {
+    showError(error.message || 'Failed to load boundary');
+    return;
+  }
+
+  const filtered = (geoJson.features ?? []).filter(
+    (f) => level === 'country' || selectedNames.includes(f?.properties?.name)
+  );
+  if (!filtered.length) { showError(t('map.drawTab.voronoi.clipBoundaryNoOptions')); return; }
+
+  drawAdminBoundary({ type: 'FeatureCollection', features: filtered });
+}
+
+function drawAdminBoundary(featureCollection) {
+  if (!map.value) return;
+  clearAdminBoundaryLayers();
+  map.value.addSource(ADMIN_BOUNDARY_SOURCE_ID, {
+    type: 'geojson',
+    data: featureCollection
+  });
+  map.value.addLayer({
+    id: ADMIN_BOUNDARY_LAYER_ID,
+    type: 'line',
+    source: ADMIN_BOUNDARY_SOURCE_ID,
+    paint: {
+      'line-color': '#d62728',
+      'line-width': 1.5,
+      'line-opacity': 0.9
+    }
+  });
+}
 
 // 創建比較模式的彈窗內容
 function createComparePopupNode(item) {

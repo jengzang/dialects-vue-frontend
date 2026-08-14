@@ -365,6 +365,7 @@
       "title": "Syllable Isopleth"
     },
     "buttons": {
+      "adminBoundary": "Administrative Boundary",
       "reset": "Reset",
       "fullscreen": "Fullscreen",
       "exitFullscreen": "Exit Fullscreen",

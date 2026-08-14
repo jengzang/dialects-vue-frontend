@@ -365,6 +365,7 @@
       "title": "音節等值線圖"
     },
     "buttons": {
+      "adminBoundary": "行政區劃",
       "reset": "復位",
       "fullscreen": "全屏",
       "exitFullscreen": "退出全屏",

@@ -90,7 +90,7 @@ vi.mock('@/components/selector/CheckBox.vue', () => ({
   }),
 }))
 
-import ClipBoundaryModal from '../src/main/components/map/Draw/modals/ClipBoundaryModal.vue'
+import ClipBoundaryModal from '../src/main/components/map/Draw/modals/AdminBoundaryModal.vue'
 
 async function flushTicks(count = 4) {
   for (let index = 0; index < count; index += 1) {

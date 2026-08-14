@@ -12,7 +12,7 @@ const requestedFieldFiles = [
   'src/main/components/map/custom/CustomDataPanel.vue',
   'src/main/components/map/custom/feature/FeatureDetailTable.vue',
   'src/main/components/map/custom/feature/FeatureScopeSelectionModal.vue',
-  'src/main/components/map/Draw/modals/ClipBoundaryModal.vue',
+  'src/main/components/map/Draw/modals/AdminBoundaryModal.vue',
   'src/main/components/map/Draw/modals/VoronoiFieldMergeModal.vue',
   'src/main/components/map/Draw/modals/VoronoiIgnorePointsModal.vue',
   'src/main/components/map/Draw/panels/MapDrawToolsPanel.vue',

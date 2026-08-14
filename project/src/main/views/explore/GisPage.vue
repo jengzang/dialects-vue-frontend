@@ -583,7 +583,7 @@
         @confirm="confirmVoronoiExport"
       />
 
-      <ClipBoundaryModal
+      <AdminBoundaryModal
         v-model="showClipBoundaryModal"
         :boundary-config="clipBoundaryConfig"
         :boundary-options="boundaryOptionsMap"
@@ -593,7 +593,7 @@
         @confirm="handleClipBoundaryConfirm"
       />
 
-      <ClipBoundaryModal
+      <AdminBoundaryModal
         v-model="showImportBoundaryModal"
         mode="import"
         :boundary-config="importBoundaryConfig"
@@ -759,7 +759,7 @@ import MapDrawImagePreviewModal from '@/main/components/map/Draw/modals/MapDrawI
 import VoronoiExportLayersModal from '@/main/components/map/Draw/modals/VoronoiExportLayersModal.vue';
 import VoronoiIgnorePointsModal from '@/main/components/map/Draw/modals/VoronoiIgnorePointsModal.vue';
 import VoronoiFieldMergeModal from '@/main/components/map/Draw/modals/VoronoiFieldMergeModal.vue';
-import ClipBoundaryModal from '@/main/components/map/Draw/modals/ClipBoundaryModal.vue';
+import AdminBoundaryModal from '@/main/components/map/Draw/modals/AdminBoundaryModal.vue';
 import RiverImportModal from '@/main/components/map/Draw/modals/RiverImportModal.vue';
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue';
