@@ -108,7 +108,7 @@
         "tokens": "音节总数",
         "viewLocations": "地点",
         "heatmap": "热力图",
-        "viewIsopleth": "查看等值线图",
+        "viewIsopleth": "等值线图",
         "loadMore": "加载更多",
         "loadAllConfirm": "加载全部卡片可能造成卡顿,确定继续?",
         "modes": {

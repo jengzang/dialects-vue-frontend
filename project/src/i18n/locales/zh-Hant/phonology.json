@@ -108,7 +108,7 @@
         "tokens": "音節總數",
         "viewLocations": "地點",
         "heatmap": "熱力圖",
-        "viewIsopleth": "查看等值線圖",
+        "viewIsopleth": "等值線圖",
         "loadMore": "載入更多",
         "loadAllConfirm": "載入全部卡片可能造成卡頓,確定繼續?",
         "modes": {
