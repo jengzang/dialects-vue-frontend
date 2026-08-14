@@ -160,14 +160,11 @@ const handleQueryModeToggle = (mode, checked) => {
   }
 }
 
-// 单地点默认两个都勾选;输入变为多地点且两个都勾选时只保留特徵統計
+// 多地点时两个统计方式互斥:输入变为多地点且两个都勾选时只保留特徵統計
 // 监听 isEmpty 组合:直接从空输入填多个地点时 isSingleLocationQuery 不会变化(false→false),需靠 isEmpty 翻转触发
 watch([isSingleLocationQuery, isCountphosQueryEmpty], ([single, empty]) => {
   if (empty) return
-  if (single) {
-    queryMode.value.featureCounts = true
-    queryMode.value.syllableCounts = true
-  } else if (queryMode.value.featureCounts && queryMode.value.syllableCounts) {
+  if (!single && queryMode.value.featureCounts && queryMode.value.syllableCounts) {
     queryMode.value.syllableCounts = false
   }
 })
