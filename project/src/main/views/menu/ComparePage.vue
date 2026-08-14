@@ -2367,7 +2367,7 @@ $text-muted: var(--text-lightest);
   }
 
   &-sankey-controls {
-    flex: 0 0 190px;
+    flex: 0 0 230px;
     @include flex-col;
     justify-content: center;
     gap: 8px;

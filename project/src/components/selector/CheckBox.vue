@@ -94,7 +94,7 @@ const handleChange = (event) => {
   --checkbox-size: 18px;
   --checkbox-color: var(--color-primary);
   --checkbox-shadow: rgba(var(--color-primary-rgb), 0.3);
-  --checkbox-border: rgba(var(--color-primary-rgb), 0.7);
+  --checkbox-border: rgba(var(--color-primary-rgb), 0.9);
 
   display: flex;
   align-items: center;
@@ -139,7 +139,7 @@ const handleChange = (event) => {
   position: absolute;
   width: 100%;
   height: 100%;
-  background: linear-gradient(45deg, var(--checkbox-color), var(--color-primary-cyan));
+  background: var(--checkbox-color);
   opacity: 0;
   transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   transform: scale(0) rotate(-45deg);

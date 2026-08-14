@@ -57,8 +57,8 @@
             <span>{{ isoplethLegend.p97 }}</span>
           </div>
         </div>
+        <button v-if="mapStore.mode === 'isopleth'" class="glass-button admin-boundary-btn" @click="openAdminBoundaryModal"><InlineIcon icon="🗺️" />{{ t('map.mapLibre.buttons.adminBoundary') }}</button>
         <div class="button-row">
-          <button v-if="mapStore.mode === 'isopleth'" class="action-btn" @click="openAdminBoundaryModal"><InlineIcon icon="🗺️" />{{ t('map.mapLibre.buttons.adminBoundary') }}</button>
           <button class="action-btn" @click="resetView"><InlineIcon icon="🎯" />{{ t('map.mapLibre.buttons.reset') }}</button>
           <button class="action-btn fullscreen-btn" @click="toggleFullScreen"><InlineIcon icon="⛶" />{{ t('map.mapLibre.buttons.fullscreen') }}</button>
         </div>
@@ -1312,7 +1312,7 @@ function drawAdminBoundary(featureCollection) {
     type: 'line',
     source: ADMIN_BOUNDARY_SOURCE_ID,
     paint: {
-      'line-color': '#d62728',
+      'line-color': '#4a4a4a',
       'line-width': 1.5,
       'line-opacity': 0.9
     }
@@ -1578,6 +1578,12 @@ $glass-transition: all 0.3s ease;
 
     font-size: 11px;
   }
+}
+
+.admin-boundary-btn {
+  width: 100%;
+  margin-bottom: 10px;
+  border: 2px solid var(--border-glass);
 }
 
 .button-row {

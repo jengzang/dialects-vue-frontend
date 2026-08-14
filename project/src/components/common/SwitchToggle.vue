@@ -151,11 +151,8 @@ const shouldAutoWidth = computed(
 
 const resolvedWidthNumber = computed(() => {
   if (!shouldAutoWidth.value) return widthNumber.value
-  const longest = Math.max(
-    estimateTextWidth(props.activeText),
-    estimateTextWidth(props.inactiveText)
-  )
-  const needed = thumbNumber.value + insetNumber.value * 2 + longest + 28
+  const currentText = props.modelValue ? props.activeText : props.inactiveText
+  const needed = thumbNumber.value + insetNumber.value * 2 + estimateTextWidth(currentText) + 16
   return Math.max(widthNumber.value, Math.min(needed, 180))
 })
 
@@ -237,7 +234,8 @@ $transition-ease: ease;
     background $transition-duration $transition-ease,
     box-shadow $transition-duration $transition-ease,
     transform $transition-duration $transition-ease,
-    opacity $transition-duration $transition-ease;
+    opacity $transition-duration $transition-ease,
+    width $transition-duration $transition-ease;
 
   &.is-on {
     background: var(--switch-toggle-active-color, $active-blue);

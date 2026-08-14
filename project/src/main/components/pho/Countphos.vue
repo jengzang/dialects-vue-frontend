@@ -2134,11 +2134,12 @@ $primary-deep: #003d9e;
   }
 
   .isopleth-btn {
-    background: var(--color-success);
+    background: var(--color-primary);
+    color: var(--action-primary-text);
     box-shadow: 0 2px 6px rgba(var(--color-primary-rgb), 0.18);
 
     &:hover {
-      background: var(--color-success-hover, var(--color-success));
+      background: var(--color-primary-hover);
       box-shadow: var(--shadow-sm);
     }
   }
