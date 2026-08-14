@@ -53,10 +53,10 @@
               class="glass-range"
               type="range"
               min="0.1"
-              max="5"
+              max="3"
               step="0.1"
               :value="heatmapRadiusScale"
-              :style="{ '--glass-range-progress': ((heatmapRadiusScale - 0.1) / 4.9 * 100) + '%' }"
+              :style="{ '--glass-range-progress': ((heatmapRadiusScale - 0.1) / 2.9 * 100) + '%' }"
               @input="onHeatmapRadiusChange"
             />
           </label>
@@ -66,10 +66,10 @@
               class="glass-range"
               type="range"
               min="0.1"
-              max="5"
+              max="3"
               step="0.1"
               :value="heatmapIntensityScale"
-              :style="{ '--glass-range-progress': ((heatmapIntensityScale - 0.1) / 4.9 * 100) + '%' }"
+              :style="{ '--glass-range-progress': ((heatmapIntensityScale - 0.1) / 2.9 * 100) + '%' }"
               @input="onHeatmapIntensityChange"
             />
           </label>
