@@ -66,12 +66,14 @@
             name="divide-all-data-partition-mode"
             :options="partitionModeOptions"
           />
-          <CheckBox
-            v-model="ignoreDialectIslands"
+          <SwitchToggle
+            v-model="showDialectIslands"
             class="all-data-toggle"
-            :label="t('map.divideTab.labels.ignoreDialectIslands')"
-            :font-size="14"
-            :size="16"
+            label-position="inside"
+            auto-width
+            :aria-label="t('map.divideTab.labels.ignoreDialectIslands')"
+            :active-text="t('map.divideTab.labels.showDialectIslandsOn')"
+            :inactive-text="t('map.divideTab.labels.showDialectIslandsOff')"
           />
           <small class="all-data-hint">
             {{ allDataStatusText }}
@@ -111,6 +113,7 @@ import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput
 import SimpleSelectDropdown from "@/components/selector/SimpleSelectDropdown.vue";
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
+import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import { mapStore, uiStore, userStore, isDivideButtonDisabled, setRunning } from "@/main/store/store.js";
 import { getCoordinates, getLocationPoints } from '@/api'
 import { showError, showWarning } from '@/utils/ui/message.js';
@@ -133,6 +136,10 @@ const allPartitionRows = ref([])
 const isLoadingAllData = ref(false)
 const allDataLoadError = ref('')
 const ignoreDialectIslands = ref(false)
+const showDialectIslands = computed({
+  get: () => !ignoreDialectIslands.value,
+  set: (val) => { ignoreDialectIslands.value = !val },
+})
 const locationModel = ref({
   locations: [],
   regions: [],

@@ -83,13 +83,15 @@
               :options="partitionModeOptions"
               @update:model-value="$emit('update:partition-mode', $event)"
             />
-            <CheckBox
+            <SwitchToggle
               :model-value="showDialectIslands"
               class="voronoi-dialect-island-checkbox"
+              label-position="inside"
+              auto-width
+              :active-text="t('map.drawTab.voronoi.showDialectIslandsOn')"
+              :inactive-text="t('map.drawTab.voronoi.showDialectIslandsOff')"
               @update:model-value="$emit('update:show-dialect-islands', $event)"
-            >
-              {{ t('map.drawTab.voronoi.showDialectIslands') }}
-            </CheckBox>
+            />
           </div>
           <div class="draw-basemap-select">
             <span class="draw-field-label">{{ t('map.divideTab.labels.regionLevel') }}</span>
@@ -99,14 +101,16 @@
               :disabled="enableYindianAdjust"
               @update:model-value="$emit('update:region-level', $event)"
             />
-            <CheckBox
+            <SwitchToggle
               v-if="partitionMode === 'yindian'"
               :model-value="enableYindianAdjust"
               class="voronoi-adjust-checkbox"
+              label-position="inside"
+              auto-width
+              :active-text="t('map.drawTab.voronoi.yindianAdjust')"
+              :inactive-text="t('map.drawTab.voronoi.yindianAdjustOff')"
               @update:model-value="$emit('update:enable-yindian-adjust', $event)"
-            >
-              {{ t('map.drawTab.voronoi.yindianAdjust') }}
-            </CheckBox>
+            />
           </div>
         </section>
 
@@ -139,12 +143,14 @@
             {{ t('map.drawTab.voronoi.actionsTitle') }}
           </div>
           <div class="draw-basemap-select">
-            <CheckBox
+            <SwitchToggle
               :model-value="enableExpand"
+              label-position="inside"
+              auto-width
+              :active-text="t('map.drawTab.voronoi.enableExpandOn')"
+              :inactive-text="t('map.drawTab.voronoi.enableExpandOff')"
               @update:model-value="$emit('update:enable-expand', $event)"
-            >
-              {{ t('map.drawTab.voronoi.enableExpand') }}
-            </CheckBox>
+            />
           </div>
           <div v-if="enableExpand" class="draw-basemap-select">
             <span class="draw-field-label">{{ t('map.drawTab.voronoi.expandRatio', { ratio: expandRatio }) }}</span>
@@ -257,6 +263,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
+import SwitchToggle from '@/components/common/SwitchToggle.vue'
 
 const props = defineProps({
   isOpen: { type: Boolean, default: false },

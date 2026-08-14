@@ -74,7 +74,9 @@
       "regionLevel": "繪圖分區層級",
       "useAllData": "使用全部資料",
       "partitionSource": "分區來源",
-      "ignoreDialectIslands": "忽略方言島"
+      "ignoreDialectIslands": "忽略方言島",
+      "showDialectIslandsOn": "全部",
+      "showDialectIslandsOff": "非方言島"
     },
     "placeholders": {
       "selectLevel": "請選擇層級"
@@ -620,6 +622,8 @@
       "fieldMergeReset": "重設合併",
       "expandRatio": "延伸比例: {ratio}%",
       "enableExpand": "啟用圓形延伸裁剪",
+      "enableExpandOn": "自動裁剪",
+      "enableExpandOff": "預設方形",
       "dataSourceTitle": "資料來源",
       "actionsTitle": "操作",
       "totalPoints": "全部點位",
@@ -643,7 +647,10 @@
       "noCustomPoints": "暫無自定義點",
       "previewPoints": "預覽點位",
       "yindianAdjust": "調整",
+      "yindianAdjustOff": "預設",
       "showDialectIslands": "方言島",
+      "showDialectIslandsOn": "全部",
+      "showDialectIslandsOff": "非方言島",
       "exportToLayer": "導出至圖層",
       "calculate": "泰森多邊形",
       "pointsLoaded": "已載入 {count} 個有效點位",

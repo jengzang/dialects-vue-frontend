@@ -74,7 +74,9 @@
       "regionLevel": "Region Level",
       "useAllData": "Use All Data",
       "partitionSource": "Region Source",
-      "ignoreDialectIslands": "Ignore Dialect Islands"
+      "ignoreDialectIslands": "Ignore Dialect Islands",
+      "showDialectIslandsOn": "All",
+      "showDialectIslandsOff": "Non-islands"
     },
     "placeholders": {
       "selectLevel": "Select a level"
@@ -620,6 +622,8 @@
       "fieldMergeReset": "Reset Merges",
       "expandRatio": "Expand: {ratio}%",
       "enableExpand": "Enable Circular Extension",
+      "enableExpandOn": "Auto crop",
+      "enableExpandOff": "Default square",
       "dataSourceTitle": "Data Sources",
       "actionsTitle": "Actions",
       "totalPoints": "Total Points",
@@ -643,7 +647,10 @@
       "noCustomPoints": "No custom points yet",
       "previewPoints": "Preview Points",
       "yindianAdjust": "Adjust",
+      "yindianAdjustOff": "Default",
       "showDialectIslands": "Dialect Islands",
+      "showDialectIslandsOn": "All",
+      "showDialectIslandsOff": "Non-islands",
       "exportToLayer": "Export to Layer",
       "calculate": "Calculate Voronoi Polygons",
       "pointsLoaded": "Loaded {count} valid point(s)",
