@@ -113,6 +113,13 @@
         "loadAllConfirm": "Loading all cards may cause lag. Continue?",
         "minCharCount": "Min. characters",
         "qualifiedSyllables": "Syllables ≥{min} chars",
+        "minShare": "Min. share",
+        "qualifiedSyllablesByShare": "Syllables ≥{min}% share",
+        "filterMode": {
+          "label": "Filter by",
+          "count": "By count",
+          "share": "By share"
+        },
         "ignoreHistorical": "Ignore historical",
         "allLocations": "All locations",
         "expandAll": "Expand all",

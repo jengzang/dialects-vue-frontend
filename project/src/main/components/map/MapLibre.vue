@@ -1032,7 +1032,9 @@ const getIsoplethPointFeatureCollection = () => {
             count,
             uniqueSyllables,
             qualifiedSyllableCount,
+            filterMode: payload.filterMode === 'share' ? 'share' : 'count',
             minCharCount: Number(payload.minCharCount || 1),
+            minShare: Number(payload.minShare || 0.1),
             totalTokens: Number(point?.total_tokens?.[toneMode] || 0)
           }
         };
@@ -1060,7 +1062,10 @@ const createIsoplethPopupNode = (properties) => {
 
   if (Number(properties.qualifiedSyllableCount) > 0) {
     const qualified = document.createElement('div');
-    qualified.textContent = `${t('phonology.phonology.countphos.syllables.qualifiedSyllables', { min: properties.minCharCount })}: ${properties.qualifiedSyllableCount}`;
+    const qualifiedLabel = properties.filterMode === 'share'
+      ? t('phonology.phonology.countphos.syllables.qualifiedSyllablesByShare', { min: properties.minShare })
+      : t('phonology.phonology.countphos.syllables.qualifiedSyllables', { min: properties.minCharCount });
+    qualified.textContent = `${qualifiedLabel}: ${properties.qualifiedSyllableCount}`;
     container.append(qualified);
   }
 

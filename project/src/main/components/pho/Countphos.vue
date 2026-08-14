@@ -62,6 +62,22 @@ const minCharCountProgress = computed(() => {
   const span = MIN_CHAR_COUNT_MAX - MIN_CHAR_COUNT_MIN
   return ((minCharCount.value - MIN_CHAR_COUNT_MIN) / span) * 100
 })
+// 等值线过滤方式:'count' 按绝对字数 / 'share' 按该地点自身占比
+const filterMode = ref('count')
+const isShareFilterMode = computed({
+  get: () => filterMode.value === 'share',
+  set: (value) => {
+    filterMode.value = value ? 'share' : 'count'
+  }
+})
+const minShare = ref(0.1)
+const MIN_SHARE_MIN = 0.01
+const MIN_SHARE_MAX = 1
+const minShareProgress = computed(() => {
+  const span = MIN_SHARE_MAX - MIN_SHARE_MIN
+  return ((minShare.value - MIN_SHARE_MIN) / span) * 100
+})
+const minShareDisplay = computed(() => parseFloat((Number(minShare.value) || 0).toFixed(2)))
 // 忽略历史音:数字开头地点(年份+地名,如 1604馬尼拉漳州 / 1935南昌)
 const ignoreHistorical = ref(true)
 const isHistoricalLocation = (name) => /^\d/.test(String(name || ''))
@@ -1255,8 +1271,21 @@ const reverseSyllableStats = (syllableData) => {
   return perLocation
 }
 
-const buildIsoplethPoints = (syllableData) => {
+const countQualifiedSyllables = (syllables, totalTokens) => {
+  const counts = Object.values(syllables || {}).map((count) => Number(count) || 0)
+
+  if (filterMode.value === 'share') {
+    const total = Number(totalTokens || 0)
+    if (total <= 0) return 0
+    const shareThreshold = (Number(minShare.value) || 0.1) / 100
+    return counts.filter((count) => count / total >= shareThreshold).length
+  }
+
   const threshold = Number(minCharCount.value) || 1
+  return counts.filter((count) => count >= threshold).length
+}
+
+const buildIsoplethPoints = (syllableData) => {
   const locationStats = {}
   for (const mode of ['toneless', 'toned']) {
     const locations = syllableData?.[mode]?.locations || {}
@@ -1271,8 +1300,7 @@ const buildIsoplethPoints = (syllableData) => {
       }
       locationStats[name].unique[mode] = Number(data.unique_syllables || 0)
       locationStats[name].tokens[mode] = Number(data.total_tokens || 0)
-      locationStats[name].qualified[mode] = Object.values(data.syllables || {})
-        .filter((count) => Number(count) >= threshold).length
+      locationStats[name].qualified[mode] = countQualifiedSyllables(data.syllables, data.total_tokens)
     }
   }
 
@@ -1340,7 +1368,9 @@ const openIsopleth = () => {
   mapStore.mode = 'isopleth'
   mapStore.isoplethPayload = {
     toneMode: syllableMode.value,
+    filterMode: filterMode.value,
     minCharCount: Number(minCharCount.value) || 1,
+    minShare: Number(minShare.value) || 0.1,
     points: buildIsoplethPoints(syllableData.value)
   }
   console.log('[Countphos] openIsopleth -> mapStore.isoplethPayload =', mapStore.isoplethPayload)
@@ -1627,23 +1657,50 @@ onBeforeUnmount(() => {
           </button>
         </div>
 
-        <!-- 默认 JSON(快照)无 per-location 字数,滑块暂不生效,先注释掉
-        <div v-if="canShowIsopleth" class="isopleth-char-count-row">
-          <span class="char-count-label">
-            {{ $t('phonology.phonology.countphos.syllables.minCharCount') }}: {{ minCharCount }}
-          </span>
-          <input
-            v-model.number="minCharCount"
-            type="range"
-            class="glass-range char-count-range"
-            :min="MIN_CHAR_COUNT_MIN"
-            :max="MIN_CHAR_COUNT_MAX"
-            step="1"
-            :style="{ '--glass-range-progress': minCharCountProgress + '%' }"
-            :aria-label="$t('phonology.phonology.countphos.syllables.minCharCount')"
+        <div v-if="canShowIsopleth && !isUsingDefaultCounts" class="isopleth-filter">
+          <SwitchToggle
+            v-model="isShareFilterMode"
+            :active-text="$t('phonology.phonology.countphos.syllables.filterMode.share')"
+            :inactive-text="$t('phonology.phonology.countphos.syllables.filterMode.count')"
+            :aria-label="$t('phonology.phonology.countphos.syllables.filterMode.label')"
+            color="green"
+            show-label
+            label-position="inside"
+            auto-width
           />
+
+          <div v-if="filterMode === 'count'" class="isopleth-char-count-row">
+            <span class="char-count-label">
+              {{ $t('phonology.phonology.countphos.syllables.minCharCount') }}: {{ minCharCount }}
+            </span>
+            <input
+              v-model.number="minCharCount"
+              type="range"
+              class="glass-range char-count-range"
+              :min="MIN_CHAR_COUNT_MIN"
+              :max="MIN_CHAR_COUNT_MAX"
+              step="1"
+              :style="{ '--glass-range-progress': minCharCountProgress + '%' }"
+              :aria-label="$t('phonology.phonology.countphos.syllables.minCharCount')"
+            />
+          </div>
+
+          <div v-else class="isopleth-char-count-row">
+            <span class="char-count-label">
+              {{ $t('phonology.phonology.countphos.syllables.minShare') }}: {{ minShareDisplay }}%
+            </span>
+            <input
+              v-model.number="minShare"
+              type="range"
+              class="glass-range char-count-range"
+              :min="MIN_SHARE_MIN"
+              :max="MIN_SHARE_MAX"
+              step="0.01"
+              :style="{ '--glass-range-progress': minShareProgress + '%' }"
+              :aria-label="$t('phonology.phonology.countphos.syllables.minShare')"
+            />
+          </div>
         </div>
-        -->
 
         <div class="syllable-grid">
           <div
@@ -2030,6 +2087,17 @@ $primary-deep: #003d9e;
     background: var(--glass-70);
     border: 1px solid var(--glass-60);
     border-radius: var(--radius-pill);
+  }
+
+  .isopleth-filter {
+    @include flex-col;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 16px;
+
+    .isopleth-char-count-row {
+      margin: 0 auto;
+    }
   }
 
   .isopleth-char-count-row {
