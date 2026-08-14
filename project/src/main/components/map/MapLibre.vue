@@ -1112,7 +1112,7 @@ const drawIsopleth = () => {
     paint: {
       'fill-color': ['interpolate', ['linear'], ['get', 'value'], ...fillColorStops],
       'fill-outline-color': ['interpolate', ['linear'], ['get', 'value'], ...fillColorStops],
-      'fill-opacity': 0.85
+      'fill-opacity': 0.6
     }
   });
 
