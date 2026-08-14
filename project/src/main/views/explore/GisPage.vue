@@ -61,39 +61,6 @@
           @click="togglePanel('layers')"
         ><InlineIcon icon="🗂️" />{{ t('map.drawTab.buttons.layers') }}
         </button>
-        <button
-          class="glass-button"
-          :data-variant="snappingEnabled ? 'primary' : 'secondary'"
-          :data-active="snappingEnabled"
-          data-testid="toggle-snapping"
-          type="button"
-          @click="snappingEnabled = !snappingEnabled"
-        >
-          {{ t('map.drawTab.labels.snapping') }}
-        </button>
-        <label class="draw-toolbar-field">
-          <span>{{ t('map.drawTab.labels.snapTolerance') }} {{ snapTolerance }}</span>
-          <input
-            v-model.number="snapTolerance"
-            data-testid="snap-tolerance-input"
-            class="draw-range-input glass-range"
-            type="range"
-            min="0"
-            max="48"
-            step="1"
-          >
-        </label>
-        <label class="draw-toolbar-field">
-          <span>{{ t('map.drawTab.labels.snapGridSize') }} {{ snapGridSize }}</span>
-          <input
-            v-model.number="snapGridSize"
-            data-testid="snap-grid-input"
-            class="draw-input glass-field"
-            type="number"
-            min="0"
-            step="0.05"
-          >
-        </label>
       </div>
     </div>
 
@@ -165,6 +132,9 @@
           :active-layer="activeLayer"
           :selected-layer-label="selectedLayerLabel"
           :current-mode="currentMode"
+          v-model:snapping-enabled="snappingEnabled"
+          v-model:snap-tolerance="snapTolerance"
+          v-model:snap-grid-size="snapGridSize"
           :feature-items="activeLayerFeatureItems"
           :feature-table-columns="activeLayerFeatureTableColumns"
           :feature-table-rows="activeLayerFeatureTableRows"

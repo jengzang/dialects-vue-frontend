@@ -355,6 +355,9 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
         type: Object,
         default: () => ({ hasIssues: false, issueCount: 0, items: [] }),
       },
+      snappingEnabled: { type: Boolean, default: true },
+      snapTolerance: { type: Number, default: 12 },
+      snapGridSize: { type: Number, default: 0 },
     },
     emits: [
       'set-mode',
@@ -379,6 +382,9 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       'update:selected-feature-batch-property-key',
       'update:selected-feature-batch-property-value',
       'apply-selected-feature-batch-property',
+      'update:snappingEnabled',
+      'update:snapTolerance',
+      'update:snapGridSize',
     ],
     setup(props) {
       mocks.latestToolsPanelProps = props
@@ -388,6 +394,25 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       <div data-testid="tools-panel">
         <span data-testid="active-layer-id">{{ activeLayer?.id || '' }}</span>
         <span data-testid="current-mode">{{ currentMode }}</span>
+        <button
+          data-testid="toggle-snapping"
+          type="button"
+          @click="$emit('update:snappingEnabled', !snappingEnabled)"
+        >
+          toggle snapping
+        </button>
+        <input
+          data-testid="snap-tolerance-input"
+          type="range"
+          :value="snapTolerance"
+          @input="$emit('update:snapTolerance', Number($event.target.value))"
+        >
+        <input
+          data-testid="snap-grid-input"
+          type="number"
+          :value="snapGridSize"
+          @input="$emit('update:snapGridSize', Number($event.target.value))"
+        >
         <span data-testid="selected-vertex-count">{{ selectedVertexCount }}</span>
         <span data-testid="can-delete-selected-vertices">{{ canDeleteSelectedVertices ? 'true' : 'false' }}</span>
         <button
@@ -1283,7 +1308,7 @@ describe('MapDrawTab draft safety', () => {
     wrapper.unmount()
   })
 
-  it('passes snapping controls from the draw toolbar into the map editor', async () => {
+  it('passes snapping controls from the drawing tools panel into the map editor', async () => {
     mocks.getDraftRecordById.mockResolvedValue(null)
     mocks.saveDraftRecord.mockResolvedValue({})
     const wrapper = mountMapDrawTab()

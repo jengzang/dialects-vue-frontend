@@ -250,6 +250,41 @@
               {{ isFullscreen ? t('map.mapLibre.buttons.exitFullscreen') : t('map.mapLibre.buttons.fullscreen') }}
             </button>
           </div>
+          <button
+            class="glass-button"
+            :data-variant="snappingEnabled ? 'primary' : 'secondary'"
+            :data-active="snappingEnabled"
+            data-testid="toggle-snapping"
+            type="button"
+            @click="$emit('update:snappingEnabled', !snappingEnabled)"
+          >
+            {{ t('map.drawTab.labels.snapping') }}
+          </button>
+          <label class="draw-field">
+            <span class="draw-field-label">{{ t('map.drawTab.labels.snapTolerance') }}：{{ snapTolerance }}</span>
+            <input
+              data-testid="snap-tolerance-input"
+              class="draw-range-input glass-range"
+              type="range"
+              min="0"
+              max="48"
+              step="1"
+              :value="snapTolerance"
+              @input="$emit('update:snapTolerance', Number($event.target.value))"
+            >
+          </label>
+          <label class="draw-field">
+            <span class="draw-field-label">{{ t('map.drawTab.labels.snapGridSize') }}：{{ snapGridSize }}</span>
+            <input
+              data-testid="snap-grid-input"
+              class="draw-input glass-field"
+              type="number"
+              min="0"
+              step="0.05"
+              :value="snapGridSize"
+              @input="$emit('update:snapGridSize', Number($event.target.value))"
+            >
+          </label>
           <div
             v-if="currentMode === 'direct_select'"
             class="draw-shape-edit-status"
@@ -873,6 +908,9 @@ const props = defineProps({
   isFeatureBoxSelectMode: { type: Boolean, default: false },
   canUseFeatureBoxSelect: { type: Boolean, default: false },
   canModifyActiveLayer: { type: Boolean, default: false },
+  snappingEnabled: { type: Boolean, default: true },
+  snapTolerance: { type: Number, default: 12 },
+  snapGridSize: { type: Number, default: 0 },
 })
 
 const emit = defineEmits([
@@ -911,6 +949,9 @@ const emit = defineEmits([
   'move-selected-features-to-layer',
   'set-selected-features-visible',
   'set-selected-features-locked',
+  'update:snappingEnabled',
+  'update:snapTolerance',
+  'update:snapGridSize',
 ])
 
 const getGeometryLabel = (geometryType) => {

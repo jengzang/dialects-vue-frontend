@@ -325,6 +325,7 @@ describe('Map draw editor contracts', () => {
   it('snaps vertex edits to visible reference geometry without using the edited feature as its own reference', () => {
     const editableSource = readSource(editableMapLibrePath)
     const tabSource = readSource(mapDrawTabPath)
+    const panelSource = readSource(mapDrawToolsPanelPath)
     const coreSource = readSource(useGisMapCorePath)
     const draftsSource = readSource(resolve(projectRoot, 'src/main/composables/gis/useGisDrafts.js'))
 
@@ -345,9 +346,9 @@ describe('Map draw editor contracts', () => {
     expect(tabSource).toContain(':snapping-enabled="snappingEnabled"')
     expect(tabSource).toContain(':snap-tolerance="snapTolerance"')
     expect(tabSource).toContain(':snap-grid-size="snapGridSize"')
-    expect(tabSource).toContain(`t('map.drawTab.labels.snapping')`)
-    expect(tabSource).toContain(`t('map.drawTab.labels.snapTolerance')`)
-    expect(tabSource).toContain(`t('map.drawTab.labels.snapGridSize')`)
+    expect(panelSource).toContain(`t('map.drawTab.labels.snapping')`)
+    expect(panelSource).toContain(`t('map.drawTab.labels.snapTolerance')`)
+    expect(panelSource).toContain(`t('map.drawTab.labels.snapGridSize')`)
     expect(draftsSource).toContain('snappingEnabled: snappingEnabled.value')
     expect(draftsSource).toContain('snapTolerance: snapTolerance.value')
     expect(draftsSource).toContain('snapGridSize: snapGridSize.value')
