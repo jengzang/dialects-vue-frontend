@@ -1,7 +1,7 @@
 <template>
   <label
     :class="[
-      'liquid-checkbox-label',
+      'checkbox-wrapper',
       {
         'is-checked': modelValue,
         'is-disabled': disabled
@@ -11,19 +11,23 @@
   >
     <input
       type="checkbox"
-      class="liquid-checkbox-input"
       :checked="modelValue"
       :disabled="disabled"
       @change="handleChange"
     />
 
-    <span
-      class="liquid-checkbox-indicator"
-      :style="indicatorStyle"
-      aria-hidden="true"
-    ></span>
+    <div class="checkmark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <path
+          d="M20 6L9 17L4 12"
+          stroke-width="3"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        ></path>
+      </svg>
+    </div>
 
-    <span class="liquid-checkbox-text">
+    <span class="label">
       <slot>{{ label }}</slot>
     </span>
   </label>
@@ -65,12 +69,8 @@ const checkboxFontSize = computed(() => {
   return typeof props.fontSize === 'number' ? `${props.fontSize}px` : props.fontSize
 })
 
-const indicatorStyle = computed(() => ({
-  width: checkboxSize.value,
-  height: checkboxSize.value
-}))
-
 const labelStyle = computed(() => ({
+  '--checkbox-size': checkboxSize.value,
   fontSize: checkboxFontSize.value
 }))
 
@@ -90,39 +90,19 @@ const handleChange = (event) => {
 </script>
 
 <style scoped lang="scss">
-@use '@/styles/global/mixins' as *;
+.checkbox-wrapper {
+  --checkbox-size: 18px;
+  --checkbox-color: var(--color-primary);
+  --checkbox-shadow: rgba(var(--color-primary-rgb), 0.3);
+  --checkbox-border: rgba(var(--color-primary-rgb), 0.7);
 
-$primary-color: var(--color-primary);
-$text-color: var(--text-dark, var(--text-dark));
-$checkmark-color: var(--action-primary-text);
-
-$transition-fast: 0.2s ease;
-$transition-indicator: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-$transition-checkmark: 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-
-.liquid-checkbox-label {
-  display: inline-flex;
-  gap: 6px;
+  display: flex;
   align-items: center;
-  color: $text-color;
-  font-weight: 500;
+  position: relative;
   cursor: pointer;
+  padding: 4px 8px;
   user-select: none;
-  transition:
-    color $transition-fast,
-    opacity $transition-fast;
-
-  &:hover {
-    opacity: 0.8;
-  }
-
-  &.is-checked {
-    color: $primary-color;
-
-    .liquid-checkbox-text {
-      color: $primary-color;
-    }
-  }
+  -webkit-tap-highlight-color: transparent;
 
   &.is-disabled {
     cursor: not-allowed;
@@ -130,68 +110,146 @@ $transition-checkmark: 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
   }
 }
 
-.liquid-checkbox-input {
+.checkbox-wrapper input {
   position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkbox-wrapper .checkmark {
+  position: relative;
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  border: 2px solid var(--checkbox-border);
+  border-radius: var(--radius-sm2);
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--surface-elevation-0);
+  box-shadow: 0 0 15px var(--checkbox-shadow);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.checkbox-wrapper .checkmark::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, var(--checkbox-color), var(--color-primary-cyan));
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transform: scale(0) rotate(-45deg);
+}
+
+.checkbox-wrapper input:checked ~ .checkmark::before {
+  opacity: 1;
+  transform: scale(1) rotate(0);
+}
+
+.checkbox-wrapper .checkmark svg {
   width: 0;
   height: 0;
-  opacity: 0;
-
-  &:checked {
-    + .liquid-checkbox-indicator {
-      background: $primary-color;
-      border-color: $primary-color;
-
-      &::after {
-        transform: translate(-50%, -58%) rotate(45deg) scale(1);
-      }
-    }
-
-    ~ .liquid-checkbox-text {
-      color: $primary-color;
-    }
-  }
-
-  &:focus-visible + .liquid-checkbox-indicator {
-    outline: 2px solid $primary-color;
-    outline-offset: 2px;
-  }
+  color: var(--action-primary-text);
+  z-index: 1;
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
 }
 
-.liquid-checkbox-indicator {
-  position: relative;
-  width: 18px;
-  height: 18px;
-  background: var(--glass-20);
-  border: 1px solid var(--border-gray-medium);
-  border-radius: var(--radius-xs);
+.checkbox-wrapper input:checked ~ .checkmark svg {
+  width: calc(var(--checkbox-size) * 0.72);
+  height: calc(var(--checkbox-size) * 0.72);
+  transform: rotate(360deg);
+}
+
+.checkbox-wrapper:hover .checkmark {
+  border-color: var(--checkbox-color);
+  transform: scale(1.1);
   box-shadow:
-    inset 0 1px 3px var(--glass-50),
-    0 2px 4px rgba(0, 0, 0, 0.05);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: all $transition-indicator;
+    0 0 20px var(--checkbox-shadow),
+    0 0 40px var(--checkbox-shadow),
+    inset 0 0 10px var(--checkbox-shadow);
+}
 
-  &::after {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 5px;
-    height: 9px;
-    content: '';
-    background: transparent;
-    border-right: 2px solid $checkmark-color;
-    border-bottom: 2px solid $checkmark-color;
-    border-radius: 0;
-    box-shadow: none;
-    transform: translate(-50%, -58%) rotate(45deg) scale(0);
-    transform-origin: center;
-    transition: transform $transition-checkmark;
+.checkbox-wrapper input:checked ~ .checkmark {
+  animation: pulse 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 20px var(--checkbox-shadow);
+  }
+  50% {
+    transform: scale(0.9);
+    box-shadow:
+      0 0 30px var(--checkbox-shadow),
+      0 0 50px var(--checkbox-shadow);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 20px var(--checkbox-shadow);
   }
 }
 
-.liquid-checkbox-text {
-  color: inherit;
+.checkbox-wrapper .label {
+  margin-left: 2px;
+  color: var(--text-dark);
   line-height: 1.2;
-  transition: color $transition-fast;
+  opacity: 0.9;
+  transition: all 0.3s;
+}
+
+.checkbox-wrapper.is-checked .label {
+  color: var(--checkbox-color);
+}
+
+.checkbox-wrapper:hover .label {
+  opacity: 1;
+  transform: translateX(5px);
+}
+
+/* Glowing dots animation */
+.checkbox-wrapper::after,
+.checkbox-wrapper::before {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--checkbox-color);
+  opacity: 0;
+  transition: all 0.5s;
+  pointer-events: none;
+}
+
+.checkbox-wrapper::before {
+  left: -10px;
+  top: 50%;
+}
+
+.checkbox-wrapper::after {
+  right: -10px;
+  top: 50%;
+}
+
+.checkbox-wrapper:hover::before {
+  opacity: 1;
+  transform: translateX(-10px);
+  box-shadow: 0 0 10px var(--checkbox-color);
+}
+
+.checkbox-wrapper:hover::after {
+  opacity: 1;
+  transform: translateX(10px);
+  box-shadow: 0 0 10px var(--checkbox-color);
+}
+
+.checkbox-wrapper input:focus-visible ~ .checkmark {
+  outline: 2px solid var(--checkbox-color);
+  outline-offset: 2px;
 }
 </style>

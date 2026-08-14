@@ -192,7 +192,7 @@ $transition-ease: ease;
   position: relative;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   padding: 0;
   cursor: pointer;
   background: var(
@@ -208,11 +208,16 @@ $transition-ease: ease;
 
   &.is-on {
     background: var(--switch-toggle-active-color, $active-blue);
+    justify-content: flex-start;
   }
 
   &.is-disabled {
     cursor: not-allowed;
     opacity: 0.5;
+  }
+
+  &:active:not(.is-disabled) {
+    box-shadow: inset 0 0 0 30px rgba(0, 0, 0, 0.1);
   }
 }
 
@@ -220,13 +225,14 @@ $transition-ease: ease;
   position: absolute;
   inset: 0;
   border-radius: inherit;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.25);
 }
 
 .switch-toggle__thumb {
   position: absolute;
   background: $thumb-background;
   border-radius: var(--radius-full);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.25);
   transition: transform $transition-duration $transition-ease;
 }
 
@@ -239,6 +245,9 @@ $transition-ease: ease;
     z-index: 1;
     white-space: nowrap;
     pointer-events: none;
+    padding: 0 8px;
+    font-size: 11px;
+    font-weight: 500;
   }
 }
 

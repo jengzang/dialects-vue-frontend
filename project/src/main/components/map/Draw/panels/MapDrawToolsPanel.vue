@@ -240,6 +240,8 @@
             >
               {{ t('map.mapLibre.buttons.reset') }}
             </button>
+          </div>
+          <div class="draw-tool-button-grid">
             <button
               class="glass-button"
               :data-variant="isFullscreen ? 'primary' : 'secondary'"
@@ -249,17 +251,17 @@
             >
               {{ isFullscreen ? t('map.mapLibre.buttons.exitFullscreen') : t('map.mapLibre.buttons.fullscreen') }}
             </button>
+            <button
+              class="glass-button"
+              :data-variant="snappingEnabled ? 'primary' : 'secondary'"
+              :data-active="snappingEnabled"
+              data-testid="toggle-snapping"
+              type="button"
+              @click="$emit('update:snappingEnabled', !snappingEnabled)"
+            >
+              {{ t('map.drawTab.labels.snapping') }}
+            </button>
           </div>
-          <button
-            class="glass-button"
-            :data-variant="snappingEnabled ? 'primary' : 'secondary'"
-            :data-active="snappingEnabled"
-            data-testid="toggle-snapping"
-            type="button"
-            @click="$emit('update:snappingEnabled', !snappingEnabled)"
-          >
-            {{ t('map.drawTab.labels.snapping') }}
-          </button>
           <label class="draw-field">
             <span class="draw-field-label">{{ t('map.drawTab.labels.snapTolerance') }}：{{ snapTolerance }}</span>
             <input
