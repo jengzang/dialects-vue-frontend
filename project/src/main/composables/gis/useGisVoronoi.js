@@ -134,9 +134,9 @@ export function useGisVoronoi(options = {}) {
   const imageExportViewState = ref(null);
 
   // GeoJSON caches
-  let provincesGeoJsonCache = null;
-  let citiesGeoJsonCache = null;
-  let countiesGeoJsonCache = null;
+  const provincesGeoJsonCache = ref(null);
+  const citiesGeoJsonCache = ref(null);
+  const countiesGeoJsonCache = ref(null);
   let nationalBorderPreparedCache = null;
 
   // ---- Computeds ----
@@ -241,9 +241,9 @@ export function useGisVoronoi(options = {}) {
 
   const boundaryOptionsMap = computed(() => {
     const countryOpts = [{ label: t('map.drawTab.voronoi.clipBoundaryLevelCountry'), value: '中国' }];
-    const provOpts = (provincesGeoJsonCache?.features ?? []).map((f) => f?.properties?.name).filter(Boolean).map((n) => ({ label: n, value: n }));
-    const cityOpts = (citiesGeoJsonCache?.features ?? []).map((f) => f?.properties?.name).filter(Boolean).map((n) => ({ label: n, value: n }));
-    const countyOpts = (countiesGeoJsonCache?.features ?? []).map((f) => f?.properties?.name).filter(Boolean).map((n) => ({ label: n, value: n }));
+    const provOpts = (provincesGeoJsonCache.value?.features ?? []).map((f) => f?.properties?.name).filter(Boolean).map((n) => ({ label: n, value: n }));
+    const cityOpts = (citiesGeoJsonCache.value?.features ?? []).map((f) => f?.properties?.name).filter(Boolean).map((n) => ({ label: n, value: n }));
+    const countyOpts = (countiesGeoJsonCache.value?.features ?? []).map((f) => f?.properties?.name).filter(Boolean).map((n) => ({ label: n, value: n }));
     return { country: countryOpts, provinces: provOpts, cities: cityOpts, counties: countyOpts };
   });
 
@@ -348,25 +348,25 @@ export function useGisVoronoi(options = {}) {
   // ---- GeoJSON loaders ----
 
   async function loadProvincesGeoJson() {
-    if (provincesGeoJsonCache) return provincesGeoJsonCache;
+    if (provincesGeoJsonCache.value) return provincesGeoJsonCache.value;
     const res = await fetch(provincesGeoJsonUrl);
     if (!res.ok) throw new Error(`Failed: ${res.status}`);
-    provincesGeoJsonCache = await res.json();
-    return provincesGeoJsonCache;
+    provincesGeoJsonCache.value = await res.json();
+    return provincesGeoJsonCache.value;
   }
   async function loadCitiesGeoJson() {
-    if (citiesGeoJsonCache) return citiesGeoJsonCache;
+    if (citiesGeoJsonCache.value) return citiesGeoJsonCache.value;
     const res = await fetch(citiesGeoJsonUrl);
     if (!res.ok) throw new Error(`Failed: ${res.status}`);
-    citiesGeoJsonCache = await res.json();
-    return citiesGeoJsonCache;
+    citiesGeoJsonCache.value = await res.json();
+    return citiesGeoJsonCache.value;
   }
   async function loadCountiesGeoJson() {
-    if (countiesGeoJsonCache) return countiesGeoJsonCache;
+    if (countiesGeoJsonCache.value) return countiesGeoJsonCache.value;
     const res = await fetch(countiesGeoJsonUrl);
     if (!res.ok) throw new Error(`Failed: ${res.status}`);
-    countiesGeoJsonCache = await res.json();
-    return countiesGeoJsonCache;
+    countiesGeoJsonCache.value = await res.json();
+    return countiesGeoJsonCache.value;
   }
 
   async function readNationalBorderCache() {
