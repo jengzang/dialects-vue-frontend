@@ -4,26 +4,15 @@
       <span class="lexicon-title">{{ t('phonology.phonology.homophoneLexicon.title') }}</span>
 
       <div class="lexicon-actions">
-        <div class="mode-switch" role="tablist" :aria-label="t('phonology.phonology.homophoneLexicon.modeLabel')">
-          <button
-            type="button"
-            class="mode-btn"
-            :class="{ 'is-active': currentMode === 'final-grouped' }"
-            @click="setMode('final-grouped')"
-          >
-            {{ t('phonology.phonology.homophoneLexicon.modeFinalGrouped') }}
-          </button>
-          <button
-            type="button"
-            class="mode-btn"
-            :class="{ 'is-active': currentMode === 'syllable' }"
-            @click="setMode('syllable')"
-          >
-            {{ t('phonology.phonology.homophoneLexicon.modeSyllable') }}
-          </button>
-        </div>
+        <RadioGroup
+          :model-value="currentMode"
+          :options="modeOptions"
+          name="homophone-display-mode"
+          :size="12"
+          @update:modelValue="setMode"
+        />
 
-        <button v-if="showCopy" type="button" class="copy-btn" @click="handleCopy">
+        <button v-if="showCopy" type="button" class="glass-button" data-size="compact" @click="handleCopy">
           {{ copyState === 'copied'
             ? t('phonology.phonology.homophoneLexicon.copied')
             : t('phonology.phonology.homophoneLexicon.copy') }}
@@ -40,7 +29,7 @@
         <section v-for="group in groups" :key="group.key" class="lexicon-group">
           <div v-if="group.label" class="group-label">{{ group.label }}</div>
           <div v-for="row in group.rows" :key="row.key" class="lexicon-row">
-            <span v-if="row.prefix" class="row-prefix">{{ row.prefix }}</span>
+            <span v-if="row.prefix" class="row-prefix" :class="{ 'row-prefix--title': !group.label }">{{ row.prefix }}</span>
             <span
               v-for="segment in row.segments"
               :key="segment.key"
@@ -52,7 +41,7 @@
                 :key="charIndex"
                 class="lexicon-char"
                 :style="charColorStyle(charItem.label)"
-              >{{ charItem.char }}</span>
+              >{{ charItem.char }}<span v-if="readingMark(charItem.label)" class="reading-mark">({{ readingMark(charItem.label) }})</span></span>
             </span>
           </div>
         </section>
@@ -64,6 +53,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import RadioGroup from '@/components/selector/RadioGroup.vue'
 import { READING_COLORS } from '@/main/config/colors/readingColors.js'
 import {
   transformMatrixReadStats,
@@ -108,6 +98,11 @@ const setMode = (mode) => {
   emit('update:displayMode', mode)
 }
 
+const modeOptions = computed(() => [
+  { value: 'final-grouped', label: t('phonology.phonology.homophoneLexicon.modeFinalGrouped') },
+  { value: 'syllable', label: t('phonology.phonology.homophoneLexicon.modeSyllable') }
+])
+
 const READING_TYPE_COLOR = {
   文讀: READING_COLORS.wendu,
   白讀: READING_COLORS.baidu,
@@ -119,6 +114,14 @@ const charColorStyle = (label) => {
   const color = READING_TYPE_COLOR[label]
   return color ? { color } : {}
 }
+
+const READING_MARK = {
+  文讀: '文',
+  白讀: '白',
+  文白讀: '文白'
+}
+
+const readingMark = (label) => READING_MARK[label] || ''
 
 const toneLabel = (tone) => {
   if (!props.toneMap) return tone
@@ -218,7 +221,10 @@ const plainText = computed(() => {
     if (group.label) lines.push(group.label)
     for (const row of group.rows) {
       const segments = row.segments.map((segment) => {
-        const chars = segment.chars.map((c) => c.char).join('')
+        const chars = segment.chars.map((c) => {
+          const mark = readingMark(c.label)
+          return `${c.char}${mark ? `(${mark})` : ''}`
+        }).join('')
         return `${segment.prefix}${chars}`
       })
       const parts = row.prefix ? [row.prefix, ...segments] : segments
@@ -309,48 +315,6 @@ $text-secondary: var(--text-slate);
   align-items: center;
 }
 
-.mode-switch {
-  display: inline-flex;
-  padding: 2px;
-  background: var(--glass-80);
-  border: 1px solid var(--bg-hover-strong);
-  border-radius: var(--radius-md);
-}
-
-.mode-btn {
-  padding: 4px 10px;
-  border: none;
-  background: transparent;
-  border-radius: var(--radius-sm);
-  color: $text-secondary;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &.is-active {
-    background: var(--color-primary);
-    color: var(--text-white);
-  }
-}
-
-.copy-btn {
-  padding: 4px 10px;
-  background: var(--glass-80);
-  border: 1px solid var(--bg-hover-strong);
-  border-radius: var(--radius-sm);
-  color: $text-main;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    border-color: var(--color-primary);
-    color: var(--color-primary);
-  }
-}
-
 .lexicon-body {
   padding: 16px;
   background: var(--glass-60);
@@ -390,6 +354,11 @@ $text-secondary: var(--text-slate);
 .row-prefix {
   color: $text-secondary;
   margin-right: 0.5em;
+
+  &--title {
+    color: $text-main;
+    font-weight: 700;
+  }
 }
 
 .lexicon-segment {
@@ -400,5 +369,12 @@ $text-secondary: var(--text-slate);
 
 .segment-tone {
   color: $text-secondary;
+}
+
+.reading-mark {
+  font-size: 0.7em;
+  color: $text-secondary;
+  vertical-align: sub;
+  font-style: italic;
 }
 </style>
