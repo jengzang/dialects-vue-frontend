@@ -37,8 +37,8 @@
       </div>
 
       <template v-else>
-        <section v-for="group in groups" :key="group.label" class="lexicon-group">
-          <div class="group-label">{{ group.label }}</div>
+        <section v-for="group in groups" :key="group.key" class="lexicon-group">
+          <div v-if="group.label" class="group-label">{{ group.label }}</div>
           <div v-for="row in group.rows" :key="row.key" class="lexicon-row">
             <span v-if="row.prefix" class="row-prefix">{{ row.prefix }}</span>
             <span
@@ -170,10 +170,11 @@ const groups = computed(() => {
     }
 
     return [...map.entries()].map(([syllable, list]) => ({
-      label: syllable,
+      key: syllable,
+      label: '',
       rows: [{
         key: syllable,
-        prefix: '',
+        prefix: syllable,
         segments: list.map((entry) => ({
           key: `${syllable}-${entry.tone}`,
           prefix: `[${toneLabel(entry.tone)}]`,
@@ -205,7 +206,7 @@ const groups = computed(() => {
         }))
       })
     }
-    result.push({ label: final, rows })
+    result.push({ key: final, label: final, rows })
   }
   return result
 })
@@ -214,7 +215,7 @@ const plainText = computed(() => {
   const lines = []
 
   for (const group of groups.value) {
-    lines.push(group.label)
+    if (group.label) lines.push(group.label)
     for (const row of group.rows) {
       const segments = row.segments.map((segment) => {
         const chars = segment.chars.map((c) => c.char).join('')
