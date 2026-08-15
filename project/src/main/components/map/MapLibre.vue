@@ -143,7 +143,8 @@ import CompareMapPopup from './popups/CompareMapPopup.vue'
 import FeatureMapPopup from './popups/FeatureMapPopup.vue'
 import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue'
 import { contours } from 'd3-contour';
-import { convex, booleanPointInPolygon } from '@turf/turf';
+import { booleanPointInPolygon } from '@turf/turf';
+import { buildVoronoiClipBoundary, computeVoronoiRadius } from '@/main/utils/drawMap/partitionVoronoi.js';
 import AdminBoundaryModal from '@/main/components/map/Draw/modals/AdminBoundaryModal.vue';
 import { api } from '@/api/auth/httpClient.js';
 import nationalBorderGeoJsonUrl from '/data/gis/china_country.geojson?url';
@@ -176,6 +177,7 @@ const ISOPLETH_SOURCE_ID = 'isopleth-source';
 const ISOPLETH_POINT_SOURCE_ID = 'isopleth-point-source';
 const ISOPLETH_FILL_LAYER_ID = 'isopleth-fill-layer';
 const ISOPLETH_POINT_LAYER_ID = 'isopleth-point-layer';
+const ISOPLETH_EXPAND_FACTOR = 0.5;
 const DOT_HEATMAP_SOURCE_ID = 'dot-heatmap-source';
 const DOT_HEATMAP_LAYER_ID = 'dot-heatmap-layer';
 const ADMIN_BOUNDARY_SOURCE_ID = 'admin-boundary-source';
@@ -1102,6 +1104,18 @@ const rampColor = (t) => {
   return rgbToHex(a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f);
 };
 
+const isPointInsideBoundary = (lng, lat, boundary) => {
+  if (!boundary) return true;
+  const feats = boundary?.type === 'FeatureCollection' ? boundary.features : [boundary];
+  return feats.some((f) => {
+    try {
+      return booleanPointInPolygon([lng, lat], f);
+    } catch {
+      return false;
+    }
+  });
+};
+
 const buildIsopleth = (features) => {
   // 1. 取点并去重(重合点会使 IDW 权重爆炸)
   const seen = new Set();
@@ -1133,7 +1147,7 @@ const buildIsopleth = (features) => {
   const breaks = Array.from({ length: bandCount }, (_, k) => p3 + k * delta);
   const colors = Array.from({ length: bandCount }, (_, k) => rampColor((k + 1) / bandCount));
 
-  // 3. 包围盒 + 等距缩放(lng 乘 cos(lat))
+  // 3. 原始包围盒
   const lngs = samples.map((s) => s.lng);
   const lats = samples.map((s) => s.lat);
   const minLng = Math.min(...lngs);
@@ -1142,28 +1156,21 @@ const buildIsopleth = (features) => {
   const maxLat = Math.max(...lats);
   const cosLat = Math.max(0.2, Math.cos(((minLat + maxLat) / 2) * (Math.PI / 180)));
 
-  const width = Math.max(1e-6, (maxLng - minLng) * cosLat);
-  const height = Math.max(1e-6, maxLat - minLat);
+  // 4. 泰森同款裁剪边界(每个点往外扩张 radius),网格 bbox 按 radius 外扩以容纳该边界
+  const isoplethCoords = samples.map((s) => [s.lng, s.lat]);
+  const radius = computeVoronoiRadius(isoplethCoords, ISOPLETH_EXPAND_FACTOR);
+  const { boundary } = buildVoronoiClipBoundary(isoplethCoords, radius);
+  const pad = radius > 0 ? radius : 0;
+  const gridMinLng = minLng - pad;
+  const gridMaxLng = maxLng + pad;
+  const gridMinLat = minLat - pad;
+  const gridMaxLat = maxLat + pad;
+
+  const width = Math.max(1e-6, (gridMaxLng - gridMinLng) * cosLat);
+  const height = Math.max(1e-6, gridMaxLat - gridMinLat);
   const target = 150 * 150;
   const nx = Math.max(10, Math.min(200, Math.round(Math.sqrt(target * (width / height)))));
   const ny = Math.max(10, Math.min(200, Math.round(target / nx)));
-
-  // 4. 凸包掩码(凸包外不画,防外溢到海洋/bbox)
-  let hull = null;
-  if (samples.length >= 3) {
-    try {
-      hull = convex({
-        type: 'FeatureCollection',
-        features: samples.map((s) => ({
-          type: 'Feature',
-          properties: {},
-          geometry: { type: 'Point', coordinates: [s.lng, s.lat] }
-        }))
-      });
-    } catch {
-      hull = null;
-    }
-  }
 
   // 5. IDW 插值
   const samplesScaled = samples.map((s) => ({ x: s.lng * cosLat, y: s.lat, count: s.count }));
@@ -1186,13 +1193,13 @@ const buildIsopleth = (features) => {
 
   // 6. 网格值(d3-contour 语义 value >= 阈值;掩码用 -Infinity 而非 NaN)
   const grid = new Float64Array(nx * ny);
-  const stepX = (maxLng - minLng) / nx;
-  const stepY = (maxLat - minLat) / ny;
+  const stepX = (gridMaxLng - gridMinLng) / nx;
+  const stepY = (gridMaxLat - gridMinLat) / ny;
   for (let j = 0; j < ny; j++) {
     for (let i = 0; i < nx; i++) {
-      const lng = minLng + (i + 0.5) * stepX;
-      const lat = minLat + (j + 0.5) * stepY;
-      if (hull && !booleanPointInPolygon([lng, lat], hull)) {
+      const lng = gridMinLng + (i + 0.5) * stepX;
+      const lat = gridMinLat + (j + 0.5) * stepY;
+      if (boundary && !isPointInsideBoundary(lng, lat, boundary)) {
         grid[j * nx + i] = -Infinity;
       } else {
         grid[j * nx + i] = Math.max(p3, Math.min(p97, idw(lng, lat)));
@@ -1202,8 +1209,8 @@ const buildIsopleth = (features) => {
 
   // 7. 抽等值面
   const mapCoord = (pt) => [
-    minLng + (pt[0] / nx) * (maxLng - minLng),
-    minLat + (pt[1] / ny) * (maxLat - minLat)
+    gridMinLng + (pt[0] / nx) * (gridMaxLng - gridMinLng),
+    gridMinLat + (pt[1] / ny) * (gridMaxLat - gridMinLat)
   ];
   const contourFeatures = contours()
     .size([nx, ny])
