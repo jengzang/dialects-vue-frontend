@@ -23,6 +23,9 @@
         <button type="button" class="quick-search pill-btn" @click="goToPhonology('count')">
           <BarIcon :icon="'🧮'" />{{ t('result.locationDetailPopup.phonologyActions.count') }}
         </button>
+        <button type="button" class="quick-search pill-btn" @click="openHomophoneLexicon">
+          <BarIcon :icon="'📖'" />{{ t('result.locationDetailPopup.phonologyActions.homophone') }}
+        </button>
       </div>
 
       <div class="info-section">
@@ -92,6 +95,12 @@
     :location-name="data?.data?.[0]?.['語言'] || locationName"
     @close="showMapPopup = false"
   />
+
+  <HomophoneLexiconModal
+    :visible="showLexiconModal"
+    :location="locationText"
+    @close="showLexiconModal = false"
+  />
 </template>
 
 <script setup>
@@ -105,6 +114,7 @@ import { encodeQueryValueBase64Url } from '@/utils/urlParams.js'
 import { pendingCountphosLocations, pendingCountphosQueryMode } from '@/main/store/store.js'
 import AppModal from '@/components/common/AppModal.vue'
 import LocationMapPopup from './LocationMapPopup.vue'
+import HomophoneLexiconModal from '@/main/components/pho/popups/HomophoneLexiconModal.vue'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -119,6 +129,7 @@ const { t } = useI18n();
 const route = useRoute()
 const router = useRouter()
 const showMapPopup = ref(false)
+const showLexiconModal = ref(false)
 
 const modalTitle = computed(() => `📍 ${t('result.locationDetailPopup.title', { name: props.locationName })}`)
 
@@ -187,6 +198,11 @@ const getToneData = (data) => {
 
 const handleClose = () => {
   emit('close');
+};
+
+const openHomophoneLexicon = () => {
+  if (!locationText.value) return
+  showLexiconModal.value = true
 };
 
 const goToPhonology = (section) => {

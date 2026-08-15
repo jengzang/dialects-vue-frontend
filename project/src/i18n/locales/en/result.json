@@ -82,7 +82,8 @@
       "title": "Quick View",
       "matrix": "View Phonology",
       "evolution": "Middle Chinese Evolution",
-      "count": "Syllable Statistics"
+      "count": "Syllable Statistics",
+      "homophone": "Homophone Lexicon"
     },
     "loading": "Loading...",
     "noData": "No data",

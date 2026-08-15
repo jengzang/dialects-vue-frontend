@@ -255,6 +255,17 @@
         "empty": "No data for the current feature"
       }
     },
+    "homophoneLexicon": {
+      "title": "Homophone Lexicon",
+      "modeLabel": "Display",
+      "modeFinalGrouped": "By final",
+      "modeSyllable": "By syllable",
+      "copy": "Copy",
+      "copied": "Copied",
+      "toneCategory": "Tone category",
+      "toneValue": "Tone value",
+      "toneNumber": "Tone number"
+    },
     "compare": {
       "options": {
         "optimizeLinks": "Optimize links"

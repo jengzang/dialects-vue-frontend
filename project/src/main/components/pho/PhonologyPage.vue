@@ -34,17 +34,22 @@
     </div>
 
     <div v-else-if="matrixData" class="matrix-container">
-      <PhonologyMatrix
-        v-for="location in displayLocations"
-        :key="location"
-        :location="location"
-        :initials="matrixData[location].initials"
-        :finals="matrixData[location].finals"
-        :tones="matrixData[location].tones"
-        :matrix="matrixData[location].matrix"
-        :cell-detail-enabled="true"
-        :cell-details="matrixData[location].cellDetails"
-      />
+      <template v-for="location in displayLocations" :key="location">
+        <PhonologyMatrix
+          :location="location"
+          :initials="matrixData[location].initials"
+          :finals="matrixData[location].finals"
+          :tones="matrixData[location].tones"
+          :matrix="matrixData[location].matrix"
+          :cell-detail-enabled="true"
+          :cell-details="matrixData[location].cellDetails"
+        />
+        <HomophoneLexicon
+          :location="location"
+          :data="matrixData[location]"
+          show-copy
+        />
+      </template>
     </div>
 
     <div v-else class="empty">
@@ -59,7 +64,9 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getPhonologyMatrix } from '@/api'
 import PhonologyMatrix from '@/main/components/TableAndTree/PhonologyTable.vue'
+import HomophoneLexicon from '@/main/components/pho/HomophoneLexicon.vue'
 import LocationMultiInput from '@/main/components/geo/LocationMultiInput.vue'
+import { transformMatrixReadStats } from '@/main/utils/phonology/readingStats.js'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
@@ -115,57 +122,6 @@ const displayLocations = computed(() => {
   if (!matrixData.value) return []
   return Object.keys(matrixData.value)
 })
-
-const transformMatrixReadStats = (matrixReadStats = {}) => {
-  const transformedCellDetails = {}
-
-  Object.entries(matrixReadStats || {}).forEach(([initial, finalMap]) => {
-    transformedCellDetails[initial] = {}
-
-    Object.entries(finalMap || {}).forEach(([final, toneMap]) => {
-      transformedCellDetails[initial][final] = {}
-
-      Object.entries(toneMap || {}).forEach(([tone, readStats]) => {
-        const polyphonicDetails = readStats?.polyphonic?.details || {}
-
-        const items = [
-          ['polyphonic', '多音字'],
-          ['wendu', '文讀'],
-          ['baidu', '白讀'],
-          ['wenbai', '文白讀']
-        ]
-          .map(([key, label]) => {
-            const bucket = readStats?.[key]
-            const item = {
-              label,
-              count: Number(bucket?.count || 0),
-              chars: Array.isArray(bucket?.chars) ? bucket.chars : []
-            }
-
-            if (key === 'polyphonic') {
-              const detailEntries = Object.entries(polyphonicDetails).map(([char, values]) => ({
-                char,
-                values: Array.isArray(values) ? values : []
-              }))
-
-              if (detailEntries.length > 0) {
-                item.details = detailEntries
-              }
-            }
-
-            return item
-          })
-          .filter((item) => item.count > 0 || item.chars.length > 0 || item.details?.length > 0)
-
-        if (items.length > 0) {
-          transformedCellDetails[initial][final][tone] = items
-        }
-      })
-    })
-  })
-
-  return transformedCellDetails
-}
 
 // 处理匹配到的地点列表
 const handleMatchedLocations = (locations) => {

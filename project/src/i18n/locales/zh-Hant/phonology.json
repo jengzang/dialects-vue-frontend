@@ -255,6 +255,17 @@
         "empty": "當前特徵沒有數據"
       }
     },
+    "homophoneLexicon": {
+      "title": "同音字彙",
+      "modeLabel": "展示方式",
+      "modeFinalGrouped": "按韻母",
+      "modeSyllable": "按音節",
+      "copy": "複製",
+      "copied": "已複製",
+      "toneCategory": "調類",
+      "toneValue": "調值",
+      "toneNumber": "調號"
+    },
     "compare": {
       "options": {
         "optimizeLinks": "優化連線"

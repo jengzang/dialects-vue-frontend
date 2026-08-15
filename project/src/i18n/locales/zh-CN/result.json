@@ -82,7 +82,8 @@
       "title": "快速查看",
       "matrix": "查看音系",
       "evolution": "中古演化",
-      "count": "音节统计"
+      "count": "音节统计",
+      "homophone": "同音字汇"
     },
     "loading": "加载中...",
     "noData": "暂无数据",
