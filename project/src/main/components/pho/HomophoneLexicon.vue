@@ -40,11 +40,16 @@
         <section v-for="group in groups" :key="group.label" class="lexicon-group">
           <div class="group-label">{{ group.label }}</div>
           <div v-for="row in group.rows" :key="row.key" class="lexicon-row">
-            <span class="row-prefix">{{ row.prefix }}</span>
-            <span class="row-chars">
+            <span v-if="row.prefix" class="row-prefix">{{ row.prefix }}</span>
+            <span
+              v-for="segment in row.segments"
+              :key="segment.key"
+              class="lexicon-segment"
+            >
+              <span class="segment-tone">{{ segment.prefix }}</span>
               <span
-                v-for="(charItem, charIndex) in row.chars"
-                :key="`${row.key}-${charIndex}`"
+                v-for="(charItem, charIndex) in segment.chars"
+                :key="charIndex"
                 class="lexicon-char"
                 :style="charColorStyle(charItem.label)"
               >{{ charItem.char }}</span>
@@ -166,28 +171,43 @@ const groups = computed(() => {
 
     return [...map.entries()].map(([syllable, list]) => ({
       label: syllable,
-      rows: list.map((entry) => ({
-        key: `${syllable}-${entry.tone}`,
-        prefix: `[${toneLabel(entry.tone)}]`,
-        chars: entry.chars
-      }))
+      rows: [{
+        key: syllable,
+        prefix: '',
+        segments: list.map((entry) => ({
+          key: `${syllable}-${entry.tone}`,
+          prefix: `[${toneLabel(entry.tone)}]`,
+          chars: entry.chars
+        }))
+      }]
     }))
   }
 
   const map = new Map()
   for (const entry of entries.value) {
-    if (!map.has(entry.final)) map.set(entry.final, [])
-    map.get(entry.final).push(entry)
+    if (!map.has(entry.final)) map.set(entry.final, new Map())
+    const byInitial = map.get(entry.final)
+    if (!byInitial.has(entry.initial)) byInitial.set(entry.initial, [])
+    byInitial.get(entry.initial).push(entry)
   }
 
-  return [...map.entries()].map(([final, list]) => ({
-    label: final,
-    rows: list.map((entry) => ({
-      key: `${entry.initial}-${entry.tone}`,
-      prefix: `${entry.initial} [${toneLabel(entry.tone)}]`,
-      chars: entry.chars
-    }))
-  }))
+  const result = []
+  for (const [final, byInitial] of map.entries()) {
+    const rows = []
+    for (const [initial, list] of byInitial.entries()) {
+      rows.push({
+        key: `${final}-${initial}`,
+        prefix: initial,
+        segments: list.map((entry) => ({
+          key: `${initial}-${entry.tone}`,
+          prefix: `[${toneLabel(entry.tone)}]`,
+          chars: entry.chars
+        }))
+      })
+    }
+    result.push({ label: final, rows })
+  }
+  return result
 })
 
 const plainText = computed(() => {
@@ -196,8 +216,12 @@ const plainText = computed(() => {
   for (const group of groups.value) {
     lines.push(group.label)
     for (const row of group.rows) {
-      const chars = row.chars.map((c) => c.char).join(' ')
-      lines.push(`${row.prefix} ${chars}`)
+      const segments = row.segments.map((segment) => {
+        const chars = segment.chars.map((c) => c.char).join('')
+        return `${segment.prefix}${chars}`
+      })
+      const parts = row.prefix ? [row.prefix, ...segments] : segments
+      lines.push(parts.join(' '))
     }
   }
 
@@ -364,13 +388,16 @@ $text-secondary: var(--text-slate);
 
 .row-prefix {
   color: $text-secondary;
-}
-
-.row-chars {
-  display: inline;
-}
-
-.lexicon-char {
   margin-right: 0.5em;
+}
+
+.lexicon-segment {
+  &:not(:last-child) {
+    margin-right: 0.5em;
+  }
+}
+
+.segment-tone {
+  color: $text-secondary;
 }
 </style>
