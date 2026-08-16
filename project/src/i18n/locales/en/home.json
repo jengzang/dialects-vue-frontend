@@ -50,6 +50,10 @@
   },
   "features": {
     "sectionTitle": "Core Features",
+    "searchPlaceholder": "Search features…",
+    "recent": "Recent",
+    "clearRecent": "Clear",
+    "noResults": "No matching features",
     "query": {
       "title": "Query & Analysis",
       "desc": "Explore dialect phonology from multiple perspectives",

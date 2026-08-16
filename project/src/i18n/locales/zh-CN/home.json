@@ -50,6 +50,10 @@
   },
   "features": {
     "sectionTitle": "核心功能",
+    "searchPlaceholder": "搜索功能…",
+    "recent": "最近使用",
+    "clearRecent": "清除",
+    "noResults": "没有匹配的功能",
     "query": {
       "title": "查询分析",
       "desc": "多维度查询方言音韵资料",

@@ -50,6 +50,10 @@
   },
   "features": {
     "sectionTitle": "核心功能",
+    "searchPlaceholder": "搜尋功能…",
+    "recent": "最近使用",
+    "clearRecent": "清除",
+    "noResults": "沒有符合的功能",
     "query": {
       "title": "查詢分析",
       "desc": "多維度查詢方言音韻資料",
