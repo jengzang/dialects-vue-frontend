@@ -13,7 +13,7 @@
             v-if="showModeSwitch"
             :model-value="currentMode"
             :options="modeOptions"
-            name="homophone-display-mode"
+            :name="displayModeRadioName"
             :size="12"
             @update:modelValue="setMode"
           />
@@ -78,7 +78,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, useId } from 'vue'
 import { useI18n } from 'vue-i18n'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
@@ -136,6 +136,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:displayMode', 'update:toneMode'])
+
+const displayModeRadioName = useId()
 
 const currentMode = ref(props.displayMode)
 
