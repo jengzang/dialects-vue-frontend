@@ -27,6 +27,68 @@
           <img :src="heroDecorationSrc" :alt="$t('home.hero.decorationAlt')" class="hero-decoration" />
         </div>
       </div>
+      
+      <!-- Featured Tools Section -->
+      <section class="featured-section glass-panel">
+        <div class="featured-heading">
+          <div>
+            <h2 class="section-title">{{ $t('home.featured.sectionTitle') }}</h2>
+            <p class="section-subtitle">{{ $t('home.featured.sectionSubtitle') }}</p>
+          </div>
+          <a class="featured-view-all" @click="scrollToFeatures">{{ $t('home.featured.viewAll') }}</a>
+        </div>
+
+        <div class="featured-carousel">
+          <button
+            class="featured-arrow featured-arrow--prev"
+            :disabled="!featuredCanPrev"
+            aria-label="Previous"
+            @click="scrollFeatured('prev')"
+          >
+            <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
+          </button>
+
+          <div ref="featuredScroller" class="featured-scroller">
+            <div
+              v-for="(item, i) in featuredItems"
+              :key="item.key"
+              :ref="el => setFeaturedRef(el, i)"
+              class="featured-item"
+            >
+              <a class="app-card" @click="navigateTo(item.route)">
+                <span class="app-card__mist"></span>
+                <span class="app-card__vignette"></span>
+
+                <div class="app-card__logo-zone">
+                  <div class="app-card__logo-ring">
+                    <div class="app-card__logo-inner">
+                      <span class="app-card__logo"><InlineIcon :icon="item.icon" /></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="app-card__content">
+                  <h3>{{ item.name }}</h3>
+                  <p>{{ item.desc }}</p>
+                  <div class="app-card__tags">
+                    <span>{{ item.tag }}</span>
+                  </div>
+                  <span class="app-card__cta">{{ $t('home.featured.discover') }}</span>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <button
+            class="featured-arrow featured-arrow--next"
+            :disabled="!featuredCanNext"
+            aria-label="Next"
+            @click="scrollFeatured('next')"
+          >
+            <svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" /></svg>
+          </button>
+        </div>
+      </section>
 
     </section>
 
@@ -54,68 +116,6 @@
     </section>
 
     <FeaturesSection />
-
-    <!-- Featured Tools Section -->
-    <section class="featured-section reveal">
-      <div class="featured-heading">
-        <div>
-          <h2 class="section-title">{{ $t('home.featured.sectionTitle') }}</h2>
-          <p class="section-subtitle">{{ $t('home.featured.sectionSubtitle') }}</p>
-        </div>
-        <a class="featured-view-all" @click="scrollToFeatures">{{ $t('home.featured.viewAll') }}</a>
-      </div>
-
-      <div class="featured-carousel">
-        <button
-          class="featured-arrow featured-arrow--prev"
-          :disabled="!featuredCanPrev"
-          aria-label="Previous"
-          @click="scrollFeatured('prev')"
-        >
-          <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
-        </button>
-
-        <div ref="featuredScroller" class="featured-scroller">
-          <div
-            v-for="(item, i) in featuredItems"
-            :key="item.key"
-            :ref="el => setFeaturedRef(el, i)"
-            class="featured-item"
-          >
-            <a class="app-card" @click="navigateTo(item.route)">
-              <span class="app-card__mist"></span>
-              <span class="app-card__vignette"></span>
-
-              <div class="app-card__logo-zone">
-                <div class="app-card__logo-ring">
-                  <div class="app-card__logo-inner">
-                    <span class="app-card__logo"><InlineIcon :icon="item.icon" /></span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="app-card__content">
-                <h3>{{ item.name }}</h3>
-                <p>{{ item.desc }}</p>
-                <div class="app-card__tags">
-                  <span>{{ item.tag }}</span>
-                </div>
-                <span class="app-card__cta">{{ $t('home.featured.discover') }}</span>
-              </div>
-            </a>
-          </div>
-        </div>
-
-        <button
-          class="featured-arrow featured-arrow--next"
-          :disabled="!featuredCanNext"
-          aria-label="Next"
-          @click="scrollFeatured('next')"
-        >
-          <svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" /></svg>
-        </button>
-      </div>
-    </section>
 
     <!-- Showcase Section (lazy mounted) -->
     <section class="showcase-section" ref="showcaseSectionRef">
@@ -964,10 +964,13 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 /* Featured */
 .featured-section {
   @include section-container;
+  width: 100%;
+  margin-top: auto;
 
   padding:
-    clamp(3rem, 6dvw, 6rem)
-    clamp(1.5rem, 4dvw, 2.5rem);
+    0
+    clamp(1.5rem, 4dvw, 2.5rem)
+    clamp(1rem, 2dvw, 1.5rem);
 }
 
 .featured-heading {

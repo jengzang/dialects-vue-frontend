@@ -468,6 +468,7 @@ $text-primary: var(--text-primary);
   &__header {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.625rem;
     margin-bottom: 0.75rem;
   }
@@ -507,8 +508,9 @@ $text-primary: var(--text-primary);
   }
 
   &__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 0.75rem;
   }
 }
@@ -516,6 +518,8 @@ $text-primary: var(--text-primary);
 .feature-tile {
   display: flex;
   align-items: center;
+  flex: 1 1 250px;
+  max-width: 360px;
   gap: 0.75rem;
   padding: 0.875rem 1rem;
   text-align: left;
@@ -583,11 +587,8 @@ $text-primary: var(--text-primary);
 
 /* Portrait: tighter tiles */
 @media (max-aspect-ratio: 1/1) {
-  .feature-group__grid {
-    grid-template-columns: repeat(auto-fill, minmax(min(160px, 100%), 1fr));
-  }
-
   .feature-tile {
+    flex-basis: 160px;
     gap: 0.5rem;
     padding: 0.75rem 0.75rem;
 
