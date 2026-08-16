@@ -136,6 +136,28 @@
       "desc": "方言聚類流程頁面占位"
     }
   },
+  "platform": {
+    "eyebrow": "方音圖鑑平台",
+    "title": "保存語言多樣性之美，一次一個方言",
+    "desc": "一個專注於中古地位分析、方言比較與地理語言學的線上工具，讓各方言點的聲韻層次與音位分合更容易被探索。",
+    "stats": {
+      "visits": "累計訪問",
+      "locations": "方言地點",
+      "records": "字表記錄"
+    }
+  },
+  "featured": {
+    "sectionTitle": "特色方言",
+    "sectionSubtitle": "一覽具有代表性的方言點",
+    "viewAll": "查看全部 →",
+    "items": {
+      "guangzhou": { "name": "廣州話", "desc": "粵語代表，聲韻調體系完整", "tag": "粵語" },
+      "yangchun": { "name": "陽春話", "desc": "粵語分支，保留豐富古音層次", "tag": "粵語" },
+      "chaozhou": { "name": "潮州話", "desc": "閩南語代表，文白異讀豐富", "tag": "閩語" },
+      "meixian": { "name": "梅縣話", "desc": "客家語代表，聲調系統獨特", "tag": "客家語" },
+      "mandarin": { "name": "普通話", "desc": "官話基準，對比參照系", "tag": "官話" }
+    }
+  },
   "roadmap": {
     "sectionTitle": "開發中的功能",
     "sectionSubtitle": "即將推出的新特性",

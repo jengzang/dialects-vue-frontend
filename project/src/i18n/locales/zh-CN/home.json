@@ -136,6 +136,28 @@
       "desc": "方言聚类流程页面占位"
     }
   },
+  "platform": {
+    "eyebrow": "方音图鉴平台",
+    "title": "保存语言多样性之美，一次一个方言",
+    "desc": "一个专注于中古地位分析、方言比较与地理语言学的在线工具，让各方言点的声韵层次与音位分合更容易被探索。",
+    "stats": {
+      "visits": "累计访问",
+      "locations": "方言地点",
+      "records": "字表记录"
+    }
+  },
+  "featured": {
+    "sectionTitle": "特色方言",
+    "sectionSubtitle": "一览具有代表性的方言点",
+    "viewAll": "查看全部 →",
+    "items": {
+      "guangzhou": { "name": "广州话", "desc": "粤语代表，声韵调体系完整", "tag": "粤语" },
+      "yangchun": { "name": "阳春话", "desc": "粤语分支，保留丰富古音层次", "tag": "粤语" },
+      "chaozhou": { "name": "潮州话", "desc": "闽南语代表，文白异读丰富", "tag": "闽语" },
+      "meixian": { "name": "梅县话", "desc": "客家语代表，声调系统独特", "tag": "客家语" },
+      "mandarin": { "name": "普通话", "desc": "官话基准，对比参照系", "tag": "官话" }
+    }
+  },
   "roadmap": {
     "sectionTitle": "开发中的功能",
     "sectionSubtitle": "即将推出的新特性",

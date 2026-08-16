@@ -1,5 +1,5 @@
 <template>
-  <div class="home-page">
+  <div class="home-page" ref="homePageRef">
     <!-- Animated Background -->
     <div class="bg-gradient"></div>
 
@@ -28,11 +28,33 @@
         </div>
       </div>
 
-      <HeroShowcase />
+    </section>
+
+    <!-- Platform Section -->
+    <section class="platform-section reveal">
+      <article class="platform-card">
+        <span class="platform-eyebrow">{{ $t('home.platform.eyebrow') }}</span>
+        <h2 class="platform-title">{{ $t('home.platform.title') }}</h2>
+        <p class="platform-desc">{{ $t('home.platform.desc') }}</p>
+        <div class="platform-stats">
+          <div class="platform-stat">
+            <span>{{ $t('home.platform.stats.visits') }}</span>
+            <strong>{{ totalVisits }}</strong>
+          </div>
+          <div class="platform-stat">
+            <span>{{ $t('home.platform.stats.locations') }}</span>
+            <strong>{{ sourceLocationCount }}</strong>
+          </div>
+          <div class="platform-stat">
+            <span>{{ $t('home.platform.stats.records') }}</span>
+            <strong>{{ sourceDataCount }}</strong>
+          </div>
+        </div>
+      </article>
     </section>
 
     <!-- Features Section -->
-    <section class="features-section" ref="featuresSection">
+    <section class="features-section reveal" ref="featuresSection">
       <h2 class="section-title">{{ $t('home.features.sectionTitle') }}</h2>
 
       <div class="features-grid">
@@ -380,6 +402,57 @@
       </div>
     </section>
 
+    <!-- Featured Dialects Section -->
+    <section class="featured-section reveal">
+      <div class="featured-heading">
+        <div>
+          <h2 class="section-title">{{ $t('home.featured.sectionTitle') }}</h2>
+          <p class="section-subtitle">{{ $t('home.featured.sectionSubtitle') }}</p>
+        </div>
+        <a class="featured-view-all" @click="navigateTo('/menu/query/zhonggu')">{{ $t('home.featured.viewAll') }}</a>
+      </div>
+
+      <div class="featured-carousel">
+        <button
+          class="featured-arrow featured-arrow--prev"
+          :disabled="!featuredCanPrev"
+          aria-label="Previous"
+          @click="scrollFeatured('prev')"
+        >
+          ‹
+        </button>
+
+        <div ref="featuredScroller" class="featured-scroller">
+          <a
+            v-for="(item, i) in featuredItems"
+            :key="item.key"
+            :ref="el => setFeaturedRef(el, i)"
+            class="featured-card"
+            @click="navigateTo(item.route)"
+          >
+            <span class="featured-card__tag">{{ item.tag }}</span>
+            <h3 class="featured-card__name">{{ item.name }}</h3>
+            <p class="featured-card__desc">{{ item.desc }}</p>
+            <span class="featured-card__cta">→</span>
+          </a>
+        </div>
+
+        <button
+          class="featured-arrow featured-arrow--next"
+          :disabled="!featuredCanNext"
+          aria-label="Next"
+          @click="scrollFeatured('next')"
+        >
+          ›
+        </button>
+      </div>
+    </section>
+
+    <!-- Showcase Section (lazy mounted) -->
+    <section class="showcase-section" ref="showcaseSectionRef">
+      <HeroShowcase v-if="showShowcase" />
+    </section>
+
     <!-- Roadmap Section -->
     <!-- <section class="roadmap-section">
       <h2 class="section-title">{{ $t('home.roadmap.sectionTitle') }}</h2>
@@ -431,7 +504,7 @@
     </section> -->
 
     <!-- Login Benefits Section -->
-    <section class="login-section">
+    <section class="login-section reveal">
       <div class="login-card">
         <div class="login-icon"><InlineIcon icon="🔐" /></div>
         <div class="login-content">
@@ -476,7 +549,7 @@
     </section>
 
     <!-- Projects Section -->
-    <section class="projects-section">
+    <section class="projects-section reveal">
       <h2 class="section-title">{{ $t('home.projects.sectionTitle') }}</h2>
       <p class="section-subtitle">{{ $t('home.projects.sectionSubtitle') }}</p>
       <div class="projects-grid">
@@ -596,7 +669,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import { computed, ref, onMounted, defineAsyncComponent } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
@@ -631,9 +704,16 @@ const {
   totalVisits,
   ensureVisitStats
 } = useVisitStats()
+const homePageRef = ref(null)
 const featuresSection = ref(null)
 const expandedCard = ref(null)
 const globePoints = ref([])
+const showShowcase = ref(false)
+const showcaseSectionRef = ref(null)
+const featuredScroller = ref(null)
+const featuredRefs = ref([])
+const featuredCanPrev = ref(false)
+const featuredCanNext = ref(true)
 const showSupport = ref(false)
 const showBenefitsPopup = ref(false)
 const showUpdateNotice = ref(false)
@@ -704,6 +784,111 @@ function navigateTo(path) {
   })
 }
 
+// 特色方言 carousel 数据
+const featuredKeys = [
+  { key: 'guangzhou', route: '/menu/query/zhonggu' },
+  { key: 'yangchun', route: '/menu/query/zhonggu' },
+  { key: 'chaozhou', route: '/menu/query/zhonggu' },
+  { key: 'meixian', route: '/menu/query/zhonggu' },
+  { key: 'mandarin', route: '/menu/query/zhonggu' }
+]
+
+const featuredItems = computed(() =>
+  featuredKeys.map(({ key, route }) => ({
+    key,
+    route,
+    name: t(`home.featured.items.${key}.name`),
+    desc: t(`home.featured.items.${key}.desc`),
+    tag: t(`home.featured.items.${key}.tag`)
+  }))
+)
+
+// featured carousel
+let featuredRaf = 0
+const setFeaturedRef = (el, i) => { if (el) featuredRefs.value[i] = el }
+
+const updateFeatured = () => {
+  const el = featuredScroller.value
+  if (!el) return
+  const rr = el.getBoundingClientRect()
+  const center = rr.left + rr.width / 2
+  const rects = featuredRefs.value.map(x => x?.getBoundingClientRect() || null)
+  featuredRefs.value.forEach((node, i) => {
+    const r = rects[i]
+    if (!node || !r) return
+    const d = Math.abs((r.left + r.width / 2 - center) / r.width)
+    const scale = Math.max(0.82, 1 - 0.18 * Math.min(2, d))
+    node.style.transform = `scale(${scale})`
+  })
+}
+
+const updateFeaturedArrows = () => {
+  const el = featuredScroller.value
+  if (!el) return
+  featuredCanPrev.value = el.scrollLeft > 4
+  featuredCanNext.value = el.scrollLeft + el.clientWidth < el.scrollWidth - 4
+}
+
+const onFeaturedScroll = () => {
+  cancelAnimationFrame(featuredRaf)
+  featuredRaf = requestAnimationFrame(updateFeatured)
+  updateFeaturedArrows()
+}
+
+const scrollFeatured = (dir) => {
+  const el = featuredScroller.value
+  if (!el) return
+  const width = featuredRefs.value[0]?.clientWidth || el.clientWidth / 3
+  el.scrollBy({ left: dir === 'next' ? width + 24 : -(width + 24), behavior: 'smooth' })
+}
+
+const centerFeatured = () => {
+  const el = featuredScroller.value
+  const target = featuredRefs.value[1] || featuredRefs.value[0]
+  if (!el || !target) return
+  const cr = el.getBoundingClientRect()
+  const tr = target.getBoundingClientRect()
+  el.scrollLeft = tr.left - cr.left + tr.width / 2 - el.clientWidth / 2
+}
+
+// reveal 淡入
+let revealObserver = null
+const initReveal = () => {
+  const root = homePageRef.value
+  if (!root) return
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
+  const nodes = root.querySelectorAll('.reveal')
+  if (reduced) {
+    nodes.forEach(n => n.classList.add('visible'))
+    return
+  }
+  revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible')
+        revealObserver.unobserve(entry.target)
+      }
+    })
+  }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' })
+  nodes.forEach(n => revealObserver.observe(n))
+}
+
+// HeroShowcase 延迟挂载
+let showcaseObserver = null
+const initShowcaseLazy = () => {
+  const target = showcaseSectionRef.value
+  if (!target) return
+  showcaseObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        showShowcase.value = true
+        showcaseObserver.disconnect()
+      }
+    })
+  }, { rootMargin: '400px 0px' })
+  showcaseObserver.observe(target)
+}
+
 function scrollToFeatures() {
   featuresSection.value?.scrollIntoView({ behavior: 'smooth' })
 }
@@ -760,6 +945,19 @@ onMounted(() => {
     fetchVisitStats()
     fetchSourceStats()
   }, 1000)
+  initReveal()
+  initShowcaseLazy()
+  centerFeatured()
+  updateFeatured()
+  updateFeaturedArrows()
+  featuredScroller.value?.addEventListener('scroll', onFeaturedScroll, { passive: true })
+})
+
+onBeforeUnmount(() => {
+  cancelAnimationFrame(featuredRaf)
+  revealObserver?.disconnect()
+  showcaseObserver?.disconnect()
+  featuredScroller.value?.removeEventListener('scroll', onFeaturedScroll)
 })
 </script>
 
@@ -978,6 +1176,104 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     background: var(--surface-panel-strong);
     border-color: rgba(var(--color-primary-rgb), 0.5);
     transform: translateY(-2px);
+  }
+}
+
+/* Reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity 0.8s $ease-apple,
+    transform 0.8s $ease-apple;
+
+  &.visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Platform */
+.platform-section {
+  @include section-container;
+
+  padding:
+    clamp(3rem, 6dvw, 6rem)
+    clamp(1.5rem, 4dvw, 2.5rem);
+}
+
+.platform-card {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(2rem, 4vw, 3.5rem);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--color-primary-rgb), 0.08) 0%,
+    rgba(var(--color-primary-hover-rgb), 0.04) 100%
+  );
+  border: 1px solid rgba(var(--color-primary-rgb), 0.18);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.08);
+}
+
+.platform-eyebrow {
+  display: inline-block;
+  padding: 0.4rem 1rem;
+  background: rgba(var(--color-primary-rgb), 0.1);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  border-radius: var(--radius-full);
+  color: $primary;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.platform-title {
+  margin: 1.25rem 0 0;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.2;
+  color: $text-primary;
+}
+
+.platform-desc {
+  max-width: 64ch;
+  margin: 1rem 0 0;
+  color: var(--text-dark-lighter);
+  line-height: 1.7;
+}
+
+.platform-stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 2rem;
+
+  @media (min-aspect-ratio: 1/1) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.platform-stat {
+  padding: 1.25rem 1.5rem;
+  background: var(--glass-60);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.12);
+  border-radius: var(--radius-lg);
+
+  span {
+    display: block;
+    color: var(--text-dark-lighter);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  strong {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 700;
+    color: $primary;
   }
 }
 
@@ -1256,6 +1552,177 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     opacity: 1;
     transform: translateY(0) scaleY(1);
   }
+}
+
+/* Featured */
+.featured-section {
+  @include section-container;
+
+  padding:
+    clamp(3rem, 6dvw, 6rem)
+    clamp(1.5rem, 4dvw, 2.5rem);
+}
+
+.featured-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+
+  .section-title {
+    margin-bottom: 0.25rem;
+    text-align: left;
+  }
+
+  .section-subtitle {
+    margin-bottom: 0;
+    text-align: left;
+  }
+}
+
+.featured-view-all {
+  color: $primary;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+.featured-carousel {
+  position: relative;
+}
+
+.featured-arrow {
+  @include flex-center;
+  position: absolute;
+  top: 50%;
+  z-index: 10;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: var(--glass-80);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  border-radius: var(--radius-full);
+  color: $primary;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: all 0.25s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--glass-90);
+    border-color: rgba(var(--color-primary-rgb), 0.4);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.15);
+  }
+
+  &:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &--prev {
+    left: 0;
+  }
+
+  &--next {
+    right: 0;
+  }
+}
+
+.featured-scroller {
+  display: flex;
+  align-items: stretch;
+  gap: 1.5rem;
+  overflow-x: auto;
+  padding: 1.5rem max(1.5rem, calc(50% - 170px));
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.featured-card {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  width: 260px;
+  min-height: 200px;
+  padding: 1.5rem;
+  background: var(--glass-70);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.15);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.08);
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transform-origin: center;
+  will-change: transform;
+  transition:
+    transform 200ms cubic-bezier(0, 0, 0.2, 1),
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+
+  &:hover {
+    background: var(--glass-90);
+    border-color: rgba(var(--color-primary-rgb), 0.3);
+    box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.15);
+
+    .featured-card__cta {
+      transform: translateX(4px);
+    }
+  }
+
+  &__tag {
+    align-self: flex-start;
+    padding: 0.3rem 0.75rem;
+    background: rgba(var(--color-primary-rgb), 0.1);
+    border-radius: var(--radius-full);
+    color: $primary;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  &__name {
+    margin: 1rem 0 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $text-primary;
+  }
+
+  &__desc {
+    margin: 0;
+    color: var(--text-dark-lighter);
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  &__cta {
+    align-self: flex-end;
+    margin-top: auto;
+    padding-top: 1rem;
+    color: $primary;
+    font-size: 1.5rem;
+    transition: transform 0.2s ease;
+  }
+}
+
+/* Showcase (lazy) */
+.showcase-section {
+  @include section-container;
+
+  padding:
+    clamp(2rem, 6vw, 4rem)
+    clamp(1rem, 4vw, 2rem);
 }
 
 /* Roadmap */
