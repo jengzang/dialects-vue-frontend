@@ -20,6 +20,8 @@ const VillagesMLPage = () => import('@/main/views/explore/villages/VillagesML.vu
 const ToponymsPage = () => import('@/main/views/explore/villages/toponyms/ToponymsPage.vue')
 const ToponymSearchPage = () => import('@/main/views/explore/villages/toponyms/ToponymSearchPage.vue')
 const G6DemoPage = () => import('@/main/components/g6-demo/index.vue')
+const FeaturesGraphPage = () => import('@/main/views/explore/features/FeaturesGraph.vue')
+const HistoryGraphPage = () => import('@/main/views/explore/history/HistoryGraph.vue')
 
 export const exploreRoutes = [
   {
@@ -136,6 +138,14 @@ export const exploreRoutes = [
   {
     path: 'explore/g6-demo',
     component: G6DemoPage
+  },
+  {
+    path: 'explore/features',
+    component: FeaturesGraphPage
+  },
+  {
+    path: 'explore/history',
+    component: HistoryGraphPage
   },
   {
     path: 'explore/villages/all',
