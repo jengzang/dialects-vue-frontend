@@ -1,5 +1,6 @@
 import { computed } from 'vue'
 import { useStorageState } from '@/composables/core/useStorageState.js'
+import { createSingleFlight } from '@/composables/core/singleFlight.js'
 import { getCustomCounts } from '@/api'
 import { userStore } from '@/main/store/store.js'
 
@@ -16,7 +17,7 @@ const {
   ttl: CUSTOM_DATA_EXISTS_TTL,
 })
 
-let countsProbePromise = null
+const singleFlight = createSingleFlight()
 
 export const hasKnownCustomData = computed(() => customDataExistsState.value === true)
 export const customDataPresenceKnown = computed(() => customDataExistsState.value !== null)
@@ -27,7 +28,7 @@ export function markCustomDataExists(value = true) {
 
 export function invalidateCustomDataPresence() {
   removeCustomDataExistsState()
-  countsProbePromise = null
+  singleFlight.reset()
 }
 
 export function syncCustomDataPresenceFromCounts(counts) {
@@ -49,11 +50,11 @@ export async function ensureCustomDataPresence(options = {}) {
     return cachedValue
   }
 
-  if (!force && countsProbePromise) {
-    return countsProbePromise
+  if (force) {
+    singleFlight.reset()
   }
 
-  countsProbePromise = (async () => {
+  return singleFlight(async () => {
     try {
       const response = await getCustomCounts()
       if (response?.success === true) {
@@ -64,10 +65,6 @@ export async function ensureCustomDataPresence(options = {}) {
     } catch (error) {
       removeCustomDataExistsState()
       throw error
-    } finally {
-      countsProbePromise = null
     }
-  })()
-
-  return countsProbePromise
+  })
 }

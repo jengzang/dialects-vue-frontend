@@ -1,8 +1,10 @@
 import { queryCount } from '@/api'
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
+import { readLocalCache, writeLocalCache } from '@/composables/core/localCache.js'
+import { createSingleFlight } from '@/composables/core/singleFlight.js'
 
 const SOURCE_STATS_STORAGE_KEY = 'source-stats-cache'
-let inFlightPromise = null
+const singleFlight = createSingleFlight()
 
 function getCurrentDbVersion() {
   return getHomeUpdateNotice(() => '').dbVersion || 'default'
@@ -16,53 +18,27 @@ function getEmptyStats() {
 }
 
 function readCachedStats() {
-  if (typeof window === 'undefined' || !window.localStorage) {
+  const parsed = readLocalCache(SOURCE_STATS_STORAGE_KEY, getCurrentDbVersion())
+  if (!parsed) {
     return null
   }
 
-  try {
-    const raw = window.localStorage.getItem(SOURCE_STATS_STORAGE_KEY)
-    if (!raw) {
-      return null
-    }
-
-    const parsed = JSON.parse(raw)
-    if (!parsed || parsed.dbVersion !== getCurrentDbVersion()) {
-      return null
-    }
-
-    if (parsed.locationCount == null || parsed.dataCount == null) {
-      return null
-    }
-
-    return {
-      locationCount: parsed.locationCount,
-      dataCount: parsed.dataCount
-    }
-  } catch (error) {
-    console.warn('讀取字表統計本地緩存失敗:', error)
+  if (parsed.locationCount == null || parsed.dataCount == null) {
     return null
+  }
+
+  return {
+    locationCount: parsed.locationCount,
+    dataCount: parsed.dataCount
   }
 }
 
 function writeCachedStats(stats) {
-  if (typeof window === 'undefined' || !window.localStorage) {
-    return
-  }
-
-  try {
-    window.localStorage.setItem(
-      SOURCE_STATS_STORAGE_KEY,
-      JSON.stringify({
-        dbVersion: getCurrentDbVersion(),
-        locationCount: stats.locationCount,
-        dataCount: stats.dataCount,
-        cachedAt: Date.now()
-      })
-    )
-  } catch (error) {
-    console.warn('寫入字表統計本地緩存失敗:', error)
-  }
+  writeLocalCache(
+    SOURCE_STATS_STORAGE_KEY,
+    { locationCount: stats.locationCount, dataCount: stats.dataCount },
+    getCurrentDbVersion()
+  )
 }
 
 async function requestSourceStats() {
@@ -94,11 +70,5 @@ export async function getSourceStats(options = {}) {
     }
   }
 
-  if (!inFlightPromise) {
-    inFlightPromise = requestSourceStats().finally(() => {
-      inFlightPromise = null
-    })
-  }
-
-  return inFlightPromise
+  return singleFlight(requestSourceStats)
 }

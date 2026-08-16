@@ -3,11 +3,10 @@ import { getRegionList } from '@/api/villagesML/villages.js'
 import { buildVillagesCacheKey } from '@/VillagesML/utils/cacheKeys.js'
 import { getCurrentVillagesMLDataset } from '@/VillagesML/utils/currentDataset.js'
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
+import { readLocalCache, writeLocalCache } from '@/composables/core/localCache.js'
+import { createKeyedSingleFlight } from '@/composables/core/singleFlight.js'
 
-const overviewPromises = new Map()
-const ngramsPromises = new Map()
-const tablesPromises = new Map()
-const regionsPromises = new Map()
+const singleFlight = createKeyedSingleFlight()
 
 function getVillagesCacheKey(kind, parts = []) {
   return buildVillagesCacheKey(kind, {
@@ -21,45 +20,12 @@ function getCurrentDbVersion() {
 }
 
 function readCache(key) {
-  if (typeof window === 'undefined' || !window.localStorage) {
-    return null
-  }
-
-  try {
-    const raw = window.localStorage.getItem(key)
-    if (!raw) {
-      return null
-    }
-
-    const parsed = JSON.parse(raw)
-    if (!parsed || parsed.dbVersion !== getCurrentDbVersion()) {
-      return null
-    }
-
-    return parsed.data
-  } catch (error) {
-    console.warn(`讀取緩存失敗 (${key}):`, error)
-    return null
-  }
+  const parsed = readLocalCache(key, getCurrentDbVersion())
+  return parsed ? parsed.data : null
 }
 
 function writeCache(key, data) {
-  if (typeof window === 'undefined' || !window.localStorage) {
-    return
-  }
-
-  try {
-    window.localStorage.setItem(
-      key,
-      JSON.stringify({
-        dbVersion: getCurrentDbVersion(),
-        data,
-        cachedAt: Date.now()
-      })
-    )
-  } catch (error) {
-    console.warn(`寫入緩存失敗 (${key}):`, error)
-  }
+  writeLocalCache(key, { data }, getCurrentDbVersion())
 }
 
 export function getCachedVillagesOverview() {
@@ -77,16 +43,11 @@ export async function getVillagesOverview(options = {}) {
     }
   }
 
-  if (!overviewPromises.has(cacheKey)) {
-    overviewPromises.set(cacheKey, getMetadataOverview().then((data) => {
-      writeCache(cacheKey, data)
-      return data
-    }).finally(() => {
-      overviewPromises.delete(cacheKey)
-    }))
-  }
-
-  return overviewPromises.get(cacheKey)
+  return singleFlight(cacheKey, async () => {
+    const data = await getMetadataOverview()
+    writeCache(cacheKey, data)
+    return data
+  })
 }
 
 export function getCachedVillagesNgrams() {
@@ -104,16 +65,11 @@ export async function getVillagesNgrams(options = {}) {
     }
   }
 
-  if (!ngramsPromises.has(cacheKey)) {
-    ngramsPromises.set(cacheKey, getNgramStatistics().then((data) => {
-      writeCache(cacheKey, data)
-      return data
-    }).finally(() => {
-      ngramsPromises.delete(cacheKey)
-    }))
-  }
-
-  return ngramsPromises.get(cacheKey)
+  return singleFlight(cacheKey, async () => {
+    const data = await getNgramStatistics()
+    writeCache(cacheKey, data)
+    return data
+  })
 }
 
 export function getCachedVillagesTables() {
@@ -131,16 +87,11 @@ export async function getVillagesTables(options = {}) {
     }
   }
 
-  if (!tablesPromises.has(cacheKey)) {
-    tablesPromises.set(cacheKey, getMetadataTables().then((data) => {
-      writeCache(cacheKey, data)
-      return data
-    }).finally(() => {
-      tablesPromises.delete(cacheKey)
-    }))
-  }
-
-  return tablesPromises.get(cacheKey)
+  return singleFlight(cacheKey, async () => {
+    const data = await getMetadataTables()
+    writeCache(cacheKey, data)
+    return data
+  })
 }
 
 export async function getVillagesRegions(level, parent = null, options = {}) {
@@ -154,17 +105,9 @@ export async function getVillagesRegions(level, parent = null, options = {}) {
     }
   }
 
-  if (!regionsPromises.has(cacheKey)) {
-    regionsPromises.set(
-      cacheKey,
-      getRegionList(level, parent).then((data) => {
-        writeCache(cacheKey, data)
-        return data
-      }).finally(() => {
-        regionsPromises.delete(cacheKey)
-      })
-    )
-  }
-
-  return regionsPromises.get(cacheKey)
+  return singleFlight(cacheKey, async () => {
+    const data = await getRegionList(level, parent)
+    writeCache(cacheKey, data)
+    return data
+  })
 }

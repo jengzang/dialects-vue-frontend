@@ -1,6 +1,7 @@
 // api/query/LocationAndRegion.js - 地点查询 API
 import { api } from '../../auth/httpClient.js'
 import { showError } from '@/utils/ui/message.js'
+import { getCachedLocationDetail, cacheLocationDetail } from '@/composables/data/useLocationDetailCache.js'
 
 /**
  * @typedef {Object} GetLocationsParams
@@ -59,11 +60,18 @@ export async function getLocations(params = {}) {
 
 export async function getLocationDetail(name) {
   try {
+    const cached = getCachedLocationDetail(name)
+    if (cached) {
+      return cached
+    }
+
     const query = new URLSearchParams()
     if (name) {
       query.append('name', name)
     }
-    return await api(`/api/locations/detail?${query.toString()}`)
+    const result = await api(`/api/locations/detail?${query.toString()}`)
+    cacheLocationDetail(name, result)
+    return result
   } catch (error) {
     console.error('Get location detail error:', error)
     showError(error.message || 'Failed to fetch location detail')

@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { createSingleFlight } from '@/composables/core/singleFlight.js'
 import { getTodayVisits, getTotalVisits, getVisitHistory } from '@/api/logs/index.js'
 
 const VISIT_STATS_TTL_MS = 60 * 1000
@@ -17,8 +18,9 @@ const loadingVisitHistory = ref(false)
 
 let visitStatsFetchedAt = 0
 let visitHistoryFetchedAt = 0
-let visitStatsPromise = null
-let visitHistoryPromise = null
+
+const visitStatsSingleFlight = createSingleFlight()
+const visitHistorySingleFlight = createSingleFlight()
 
 function isFresh(fetchedAt, ttl) {
   return fetchedAt > 0 && Date.now() - fetchedAt < ttl
@@ -53,12 +55,8 @@ function normalizeVisitHistory(data) {
 }
 
 async function fetchVisitStats() {
-  if (visitStatsPromise) {
-    return visitStatsPromise
-  }
-
-  loadingVisitStats.value = true
-  visitStatsPromise = (async () => {
+  return visitStatsSingleFlight(async () => {
+    loadingVisitStats.value = true
     try {
       const [todayData, totalData] = await Promise.all([
         getTodayVisits(),
@@ -76,20 +74,13 @@ async function fetchVisitStats() {
       }
     } finally {
       loadingVisitStats.value = false
-      visitStatsPromise = null
     }
-  })()
-
-  return visitStatsPromise
+  })
 }
 
 async function fetchVisitHistory() {
-  if (visitHistoryPromise) {
-    return visitHistoryPromise
-  }
-
-  loadingVisitHistory.value = true
-  visitHistoryPromise = (async () => {
+  return visitHistorySingleFlight(async () => {
+    loadingVisitHistory.value = true
     try {
       const data = await getVisitHistory(getVisitHistoryParams())
       visitHistory.value = normalizeVisitHistory(data)
@@ -98,11 +89,8 @@ async function fetchVisitHistory() {
       return visitHistory.value
     } finally {
       loadingVisitHistory.value = false
-      visitHistoryPromise = null
     }
-  })()
-
-  return visitHistoryPromise
+  })
 }
 
 export async function ensureVisitStats(options = {}) {
