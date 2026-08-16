@@ -17,14 +17,14 @@
         <button type="button" class="quick-search pill-btn" @click="goToPhonology('matrix')">
           <BarIcon :icon="'⚛️'" />{{ t('result.locationDetailPopup.phonologyActions.matrix') }}
         </button>
+        <button type="button" class="quick-search pill-btn" @click="openHomophoneLexicon">
+          <BarIcon :icon="'📖'" />{{ t('result.locationDetailPopup.phonologyActions.homophone') }}
+        </button>
         <button type="button" class="quick-search pill-btn" @click="goToPhonology('evolution')">
           <BarIcon :icon="'🥧'" />{{ t('result.locationDetailPopup.phonologyActions.evolution') }}
         </button>
         <button type="button" class="quick-search pill-btn" @click="goToPhonology('count')">
           <BarIcon :icon="'🧮'" />{{ t('result.locationDetailPopup.phonologyActions.count') }}
-        </button>
-        <button type="button" class="quick-search pill-btn" @click="openHomophoneLexicon">
-          <BarIcon :icon="'📖'" />{{ t('result.locationDetailPopup.phonologyActions.homophone') }}
         </button>
       </div>
 
@@ -307,6 +307,7 @@ $transition-fast: 0.2s;
 
 /* 音系跳转按钮 */
 .phono-actions {
+  flex-wrap: wrap;
   display: flex;
   gap: 8px;
   margin-bottom: 20px;
