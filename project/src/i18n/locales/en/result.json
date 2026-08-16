@@ -46,6 +46,14 @@
     "displayMode": {
       "full": "Full",
       "main": "Main"
+    },
+    "export": {
+      "button": "Copy/Export",
+      "copy": "Copy",
+      "export": "Export",
+      "copied": "Copied to clipboard",
+      "exported": "CSV exported",
+      "copyFailed": "Copy failed"
     }
   },
   "valuePopup": {

@@ -77,22 +77,50 @@
           </div>
         </div>
 
-        <div id="toggleColumnsBtn" class="custom-switch-container">
-          <SwitchToggle
-            :model-value="!isCondensedMode"
-            :width="50"
-            :height="30"
-            :thumb-size="26"
-            color="blue"
-            variant="glow"
-            show-label
-            :active-text="t('result.resultList.displayMode.full')"
-            :inactive-text="t('result.resultList.displayMode.main')"
-            label-position="inside"
-            :aria-label="t('result.resultList.displayMode.full')"
-            class="result-display-switch"
-            @update:modelValue="isCondensedMode = !$event"
-          />
+        <div class="stickybar-right">
+          <div class="export-wrapper" ref="exportWrapperRef">
+            <button
+              type="button"
+              class="export-btn"
+              @click.stop="toggleExportDropdown"
+            >
+              {{ t('result.resultList.export.button') }}
+            </button>
+            <div class="export-dropdown" :class="{ open: isExportDropdownOpen }">
+              <button
+                type="button"
+                class="export-option"
+                @click.stop="handleCopy"
+              >
+                {{ t('result.resultList.export.copy') }}
+              </button>
+              <button
+                type="button"
+                class="export-option"
+                @click.stop="handleExport"
+              >
+                {{ t('result.resultList.export.export') }}
+              </button>
+            </div>
+          </div>
+
+          <div id="toggleColumnsBtn" class="custom-switch-container">
+            <SwitchToggle
+              :model-value="!isCondensedMode"
+              :width="50"
+              :height="30"
+              :thumb-size="26"
+              color="blue"
+              variant="glow"
+              show-label
+              :active-text="t('result.resultList.displayMode.full')"
+              :inactive-text="t('result.resultList.displayMode.main')"
+              label-position="inside"
+              :aria-label="t('result.resultList.displayMode.full')"
+              class="result-display-switch"
+              @update:modelValue="isCondensedMode = !$event"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -126,6 +154,8 @@ import ValuePopup from "./popups/ValuePopup.vue";
 import FeaturePopup from "./popups/FeaturePopup.vue";
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import { resultCache } from '@/main/store/store.js';
+import { showSuccess, showError } from '@/utils/ui/message.js';
+import { copyText, downloadText, toCsv, toTsv } from '@/main/utils/export/resultExport.js';
 
 const props = defineProps({
   data: { type: Array, default: () => [] },
@@ -154,8 +184,10 @@ const isCondensedMode = ref(props.isCondensed);
 const currentStickyLocation = ref('');
 const isFilterOpen = ref(false);
 const isLocationDropdownOpen = ref(false);
+const isExportDropdownOpen = ref(false);
 const filterWrapperRef = ref(null);
 const locationWrapperRef = ref(null);
+const exportWrapperRef = ref(null);
 const selectedValues = ref([]);
 const panelHeight = ref('100%');
 
@@ -383,6 +415,7 @@ const toggleLocationDropdown = () => {
   isLocationDropdownOpen.value = !isLocationDropdownOpen.value;
   if (isLocationDropdownOpen.value) {
     isFilterOpen.value = false;
+    isExportDropdownOpen.value = false;
   }
 };
 
@@ -390,6 +423,15 @@ const toggleFilterDropdown = () => {
   isFilterOpen.value = !isFilterOpen.value;
   if (isFilterOpen.value) {
     isLocationDropdownOpen.value = false;
+    isExportDropdownOpen.value = false;
+  }
+};
+
+const toggleExportDropdown = () => {
+  isExportDropdownOpen.value = !isExportDropdownOpen.value;
+  if (isExportDropdownOpen.value) {
+    isLocationDropdownOpen.value = false;
+    isFilterOpen.value = false;
   }
 };
 
@@ -447,6 +489,48 @@ const handleGlobalClickForStickybar = (e) => {
   ) {
     isLocationDropdownOpen.value = false;
   }
+
+  if (
+    isExportDropdownOpen.value &&
+    exportWrapperRef.value &&
+    !exportWrapperRef.value.contains(e.target)
+  ) {
+    isExportDropdownOpen.value = false;
+  }
+};
+
+// ================= 复制/导出 =================
+const EXPORT_HEADERS = ['地點', '特徵', '值', '對應字', '字數', '佔比'];
+
+const buildExportRows = () => {
+  return sortedData.value.map(item => {
+    const groupValues = item.分組值 || {};
+    const feature = Object.keys(groupValues)[0] || '';
+    const value = groupValues[feature] ?? '';
+    const chars = Array.isArray(item.對應字) ? item.對應字.join('') : (item.對應字 ?? '');
+    const count = item.字數 ?? '';
+    const shareNum = Number(item.佔比);
+    const share = Number.isFinite(shareNum) ? `${(shareNum * 100).toFixed(1)}%` : '';
+    return [item.地點 ?? '', feature, String(value ?? ''), chars, count, share];
+  });
+};
+
+const handleCopy = async () => {
+  isExportDropdownOpen.value = false;
+  const rows = [EXPORT_HEADERS, ...buildExportRows()];
+  const ok = await copyText(toTsv(rows));
+  if (ok) {
+    showSuccess(t('result.resultList.export.copied'));
+  } else {
+    showError(t('result.resultList.export.copyFailed'));
+  }
+};
+
+const handleExport = () => {
+  isExportDropdownOpen.value = false;
+  const rows = [EXPORT_HEADERS, ...buildExportRows()];
+  downloadText(toCsv(rows), `查詢結果_${Date.now()}.csv`);
+  showSuccess(t('result.resultList.export.exported'));
 };
 
 onMounted(() => {
@@ -467,7 +551,6 @@ $text-dark: var(--text-dark);
 $panel-radius: 12px;
 $dropdown-radius: 10px;
 $transition-duration: 0.2s;
-$dropdown-blur: 12px;
 
 @mixin glass-dropdown($background, $max-height, $min-width) {
   position: absolute;
@@ -483,8 +566,6 @@ $dropdown-blur: 12px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: $dropdown-radius;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur($dropdown-blur);
-  -webkit-backdrop-filter: blur($dropdown-blur);
 
   &.open {
     display: block;
@@ -685,7 +766,7 @@ $dropdown-blur: 12px;
   transform: translate(-50%, -50%);
 
   @media (orientation: portrait) {
-    left: 55% !important;
+    left: 47% !important;
   }
 }
 
@@ -736,17 +817,93 @@ $dropdown-blur: 12px;
   }
 }
 
-.custom-switch-container {
+.stickybar-right {
   position: absolute;
-  right: 5%;
+  top: 50%;
+  right: 3%;
+  z-index: 3;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  transform: translateY(-50%);
+
+  @media (orientation: portrait) {
+    right: 1%;
+    gap: 6px;
+  }
+}
+
+.export-wrapper {
+  position: relative;
+}
+
+.export-btn {
+  @include flex-center;
+  padding: 4px 10px;
+  color: $primary-blue;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  background: var(--glass-20);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  border-radius: 14px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.25s ease;
+
+  &:hover {
+    background: var(--glass-40);
+    box-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.4);
+  }
+}
+
+.export-dropdown {
+  position: absolute;
+  right: 0;
+  bottom: 110%;
+  z-index: 9999;
+  display: none;
+  min-width: 90px;
+  padding: 8px;
+  background: var(--glass-90);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: $dropdown-radius;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  &.open {
+    display: block;
+  }
+}
+
+.export-option {
+  display: block;
+  width: 100%;
+  padding: 6px 9px;
+  color: $text-dark;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 7px;
+  transition: color $transition-duration, background $transition-duration;
+
+  &:hover {
+    color: $primary-blue;
+    background: rgba(var(--color-primary-rgb), 0.08);
+  }
+}
+
+.custom-switch-container {
   @include flex-center;
   font-family: var(--font-sans);
   font-size: 16px;
-  transform: translateX(-50%);
-
-  @media (orientation: portrait) {
-    right: 1% !important;
-  }
 }
 
 .result-display-switch {

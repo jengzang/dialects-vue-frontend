@@ -46,6 +46,14 @@
     "displayMode": {
       "full": "全显",
       "main": "主体"
+    },
+    "export": {
+      "button": "复制/导出",
+      "copy": "复制",
+      "export": "导出",
+      "copied": "已复制到剪贴板",
+      "exported": "已导出 CSV",
+      "copyFailed": "复制失败"
     }
   },
   "valuePopup": {
