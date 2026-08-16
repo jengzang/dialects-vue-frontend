@@ -264,7 +264,8 @@
       "copied": "Copied",
       "toneCategory": "Tone category",
       "toneValue": "Tone value",
-      "toneNumber": "Tone number"
+      "toneNumber": "Tone number",
+      "toneSwitch": "Switch tone"
     },
     "compare": {
       "options": {

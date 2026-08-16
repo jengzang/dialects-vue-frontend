@@ -1,16 +1,37 @@
 <template>
   <div class="homophone-lexicon">
-    <div class="lexicon-toolbar">
+    <div v-if="showModeSwitch || showToneSwitch || showCopy" class="lexicon-toolbar">
       <span class="lexicon-title">{{ t('phonology.phonology.homophoneLexicon.title') }}</span>
 
       <div class="lexicon-actions">
         <RadioGroup
+          v-if="showModeSwitch"
           :model-value="currentMode"
           :options="modeOptions"
           name="homophone-display-mode"
           :size="12"
           @update:modelValue="setMode"
         />
+
+        <template v-if="showToneSwitch">
+          <SimpleSelectDropdown
+            v-if="hasToneMap"
+            :model-value="currentToneMode"
+            :options="toneModeOptions"
+            width="auto"
+            @update:modelValue="setToneMode"
+          />
+          <button
+            v-else-if="showToneButton"
+            type="button"
+            class="glass-button"
+            data-size="compact"
+            :disabled="toneLoading"
+            @click="loadToneMap"
+          >
+            {{ toneLoading ? '…' : t('phonology.phonology.homophoneLexicon.toneSwitch') }}
+          </button>
+        </template>
 
         <button v-if="showCopy" type="button" class="glass-button" data-size="compact" @click="handleCopy">
           {{ copyState === 'copied'
@@ -51,14 +72,17 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
+import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import { getLocationDetail } from '@/api'
 import { READING_COLORS } from '@/main/config/colors/readingColors.js'
 import {
   transformMatrixReadStats,
   resolveCharReadingLabel
 } from '@/main/utils/phonology/readingStats.js'
+import { buildToneMapFromDetail } from '@/main/utils/phonology/toneMap.js'
 
 const { t } = useI18n()
 
@@ -86,22 +110,85 @@ const props = defineProps({
   toneMap: {
     type: Object,
     default: null
+  },
+  showModeSwitch: {
+    type: Boolean,
+    default: true
+  },
+  showToneSwitch: {
+    type: Boolean,
+    default: true
   }
 })
 
-const emit = defineEmits(['update:displayMode'])
+const emit = defineEmits(['update:displayMode', 'update:toneMode'])
 
 const currentMode = ref(props.displayMode)
+
+watch(
+  () => props.displayMode,
+  (mode) => {
+    currentMode.value = mode
+  }
+)
 
 const setMode = (mode) => {
   currentMode.value = mode
   emit('update:displayMode', mode)
 }
 
+const currentToneMode = ref(props.toneMode)
+
+watch(
+  () => props.toneMode,
+  (mode) => {
+    currentToneMode.value = mode
+  }
+)
+
+const setToneMode = (mode) => {
+  currentToneMode.value = mode
+  emit('update:toneMode', mode)
+}
+
 const modeOptions = computed(() => [
   { value: 'final-grouped', label: t('phonology.phonology.homophoneLexicon.modeFinalGrouped') },
   { value: 'syllable', label: t('phonology.phonology.homophoneLexicon.modeSyllable') }
 ])
+
+const toneModeOptions = computed(() => [
+  { value: 'category', label: t('phonology.phonology.homophoneLexicon.toneCategory') },
+  { value: 'value', label: t('phonology.phonology.homophoneLexicon.toneValue') },
+  { value: 'number', label: t('phonology.phonology.homophoneLexicon.toneNumber') }
+])
+
+const fetchedToneMap = ref(null)
+const toneLoading = ref(false)
+const toneLoaded = ref(false)
+
+const effectiveToneMap = computed(() => props.toneMap || fetchedToneMap.value)
+
+const hasToneMap = computed(() => {
+  const map = effectiveToneMap.value
+  return !!map && Object.keys(map).length > 0
+})
+
+const showToneButton = computed(() => !hasToneMap.value && !toneLoaded.value)
+
+const loadToneMap = async () => {
+  if (toneLoading.value || toneLoaded.value || hasToneMap.value) return
+
+  toneLoading.value = true
+  try {
+    const response = await getLocationDetail(props.location)
+    fetchedToneMap.value = buildToneMapFromDetail(response?.data?.[0])
+  } catch (err) {
+    console.error('加載調值失敗:', err)
+  } finally {
+    toneLoaded.value = true
+    toneLoading.value = false
+  }
+}
 
 const READING_TYPE_COLOR = {
   文讀: READING_COLORS.wendu,
@@ -124,10 +211,10 @@ const READING_MARK = {
 const readingMark = (label) => READING_MARK[label] || ''
 
 const toneLabel = (tone) => {
-  if (!props.toneMap) return tone
-  const entry = props.toneMap[tone]
+  if (!hasToneMap.value) return tone
+  const entry = effectiveToneMap.value[tone]
   if (!entry) return tone
-  return entry[props.toneMode] ?? tone
+  return entry[currentToneMode.value] ?? tone
 }
 
 const cellDetails = computed(() => transformMatrixReadStats(props.data.matrix_read_stats))

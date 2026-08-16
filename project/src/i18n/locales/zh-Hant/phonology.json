@@ -264,7 +264,8 @@
       "copied": "已複製",
       "toneCategory": "調類",
       "toneValue": "調值",
-      "toneNumber": "調號"
+      "toneNumber": "調號",
+      "toneSwitch": "切換調值"
     },
     "compare": {
       "options": {
