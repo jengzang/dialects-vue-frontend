@@ -1,44 +1,50 @@
 <template>
   <div class="homophone-lexicon">
-    <div v-if="showModeSwitch || showToneSwitch || showCopy" class="lexicon-toolbar">
-      <span class="lexicon-title">{{ t('phonology.phonology.homophoneLexicon.title') }}</span>
+    <div
+      v-if="showModeSwitch || showToneSwitch || showCopy"
+      class="lexicon-toolbar"
+      :class="{ 'lexicon-toolbar--empty': !showTitle && toolbarTo }"
+    >
+      <span v-if="showTitle" class="lexicon-title">{{ t('phonology.phonology.homophoneLexicon.title') }}</span>
 
-      <div class="lexicon-actions">
-        <RadioGroup
-          v-if="showModeSwitch"
-          :model-value="currentMode"
-          :options="modeOptions"
-          name="homophone-display-mode"
-          :size="12"
-          @update:modelValue="setMode"
-        />
-
-        <template v-if="showToneSwitch">
-          <SimpleSelectDropdown
-            v-if="hasToneMap"
-            :model-value="currentToneMode"
-            :options="toneModeOptions"
-            width="auto"
-            @update:modelValue="setToneMode"
+      <Teleport :to="toolbarTo" :disabled="!toolbarTo">
+        <div class="lexicon-actions">
+          <RadioGroup
+            v-if="showModeSwitch"
+            :model-value="currentMode"
+            :options="modeOptions"
+            name="homophone-display-mode"
+            :size="12"
+            @update:modelValue="setMode"
           />
-          <button
-            v-else-if="showToneButton"
-            type="button"
-            class="glass-button"
-            data-size="compact"
-            :disabled="toneLoading"
-            @click="loadToneMap"
-          >
-            {{ toneLoading ? '…' : t('phonology.phonology.homophoneLexicon.toneSwitch') }}
-          </button>
-        </template>
 
-        <button v-if="showCopy" type="button" class="glass-button" data-size="compact" @click="handleCopy">
-          {{ copyState === 'copied'
-            ? t('phonology.phonology.homophoneLexicon.copied')
-            : t('phonology.phonology.homophoneLexicon.copy') }}
-        </button>
-      </div>
+          <template v-if="showToneSwitch">
+            <SimpleSelectDropdown
+              v-if="hasToneMap"
+              :model-value="currentToneMode"
+              :options="toneModeOptions"
+              width="auto"
+              @update:modelValue="setToneMode"
+            />
+            <button
+              v-else-if="showToneButton"
+              type="button"
+              class="glass-button"
+              data-size="compact"
+              :disabled="toneLoading"
+              @click="loadToneMap"
+            >
+              {{ toneLoading ? '…' : t('phonology.phonology.homophoneLexicon.toneSwitch') }}
+            </button>
+          </template>
+
+          <button v-if="showCopy" type="button" class="glass-button" data-size="compact" @click="handleCopy">
+            {{ copyState === 'copied'
+              ? t('phonology.phonology.homophoneLexicon.copied')
+              : t('phonology.phonology.homophoneLexicon.copy') }}
+          </button>
+        </div>
+      </Teleport>
     </div>
 
     <div class="lexicon-body">
@@ -118,6 +124,14 @@ const props = defineProps({
   showToneSwitch: {
     type: Boolean,
     default: true
+  },
+  showTitle: {
+    type: Boolean,
+    default: true
+  },
+  toolbarTo: {
+    type: [String, Object],
+    default: null
   }
 })
 
@@ -388,18 +402,30 @@ $text-secondary: var(--text-slate);
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
+
+  &--empty {
+    margin-bottom: 0;
+  }
 }
 
 .lexicon-title {
   color: $text-main;
   font-size: 15px;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .lexicon-actions {
   display: flex;
   gap: 10px;
   align-items: center;
+
+  :deep(.liquid-radio-group) {
+    gap: 12px;
+  }
+  .glass-button{
+    white-space: nowrap;
+  }
 }
 
 .lexicon-body {

@@ -8,34 +8,10 @@
   >
     <template #header>
       <div class="lexicon-modal-title">
-        <InlineIcon icon="📖" />{{ titleText }}
+        {{ t('phonology.phonology.homophoneLexicon.title') }}
       </div>
       <div class="header-actions">
-        <RadioGroup
-          v-if="lexiconData"
-          :model-value="displayMode"
-          :options="modeOptions"
-          name="homophone-display-mode"
-          :size="12"
-          @update:modelValue="displayMode = $event"
-        />
-        <SimpleSelectDropdown
-          v-if="hasToneMap"
-          :model-value="toneMode"
-          :options="toneModeOptions"
-          width="auto"
-          @update:modelValue="toneMode = $event"
-        />
-        <button
-          v-if="lexiconData"
-          type="button"
-          class="copy-btn"
-          @click="handleCopy"
-        >
-          {{ copyState === 'copied'
-            ? t('phonology.phonology.homophoneLexicon.copied')
-            : t('phonology.phonology.homophoneLexicon.copy') }}
-        </button>
+        <div ref="toolbarTarget" class="toolbar-target"></div>
         <button class="close-btn close-btn-sm close-btn-inline" type="button" @click="handleClose">×</button>
       </div>
     </template>
@@ -45,18 +21,18 @@
       <span>{{ t('result.locationDetailPopup.loading') }}</span>
     </div>
 
-    <HomophoneLexicon
-      v-else-if="lexiconData"
-      ref="lexiconRef"
-      :location="location"
-      :data="lexiconData"
-      :show-copy="false"
-      :show-mode-switch="false"
-      :show-tone-switch="false"
-      :display-mode="displayMode"
-      :tone-mode="toneMode"
-      :tone-map="toneMap"
-    />
+    <template v-else-if="lexiconData">
+      <div v-if="location" class="lexicon-location-title">{{ location }}</div>
+
+      <HomophoneLexicon
+        :location="location"
+        :data="lexiconData"
+        :show-copy="false"
+        :show-title="false"
+        :toolbar-to="toolbarTarget"
+        :tone-map="toneMap"
+      />
+    </template>
 
     <div v-else class="empty-state">
       {{ t('result.noData') }}
@@ -65,13 +41,10 @@
 </template>
 
 <script setup>
-import InlineIcon from '@/components/common/InlineIcon.vue'
-import { ref, computed, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
 import HomophoneLexicon from '@/main/components/pho/HomophoneLexicon.vue'
-import RadioGroup from '@/components/selector/RadioGroup.vue'
-import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import { getPhonologyMatrix, getLocationDetail } from '@/api'
 import { buildToneMapFromDetail } from '@/main/utils/phonology/toneMap.js'
 
@@ -92,29 +65,8 @@ const emit = defineEmits(['close'])
 
 const loading = ref(false)
 const lexiconData = ref(null)
-const lexiconRef = ref(null)
-const copyState = ref('idle')
-const displayMode = ref('final-grouped')
-const toneMode = ref('category')
 const toneMap = ref(null)
-
-const titleText = computed(() => {
-  const title = t('phonology.phonology.homophoneLexicon.title')
-  return props.location ? `${title} · ${props.location}` : title
-})
-
-const modeOptions = computed(() => [
-  { value: 'final-grouped', label: t('phonology.phonology.homophoneLexicon.modeFinalGrouped') },
-  { value: 'syllable', label: t('phonology.phonology.homophoneLexicon.modeSyllable') }
-])
-
-const toneModeOptions = computed(() => [
-  { value: 'category', label: t('phonology.phonology.homophoneLexicon.toneCategory') },
-  { value: 'value', label: t('phonology.phonology.homophoneLexicon.toneValue') },
-  { value: 'number', label: t('phonology.phonology.homophoneLexicon.toneNumber') }
-])
-
-const hasToneMap = computed(() => !!toneMap.value && Object.keys(toneMap.value).length > 0)
+const toolbarTarget = ref(null)
 
 const loadLexicon = async () => {
   if (!props.location) return
@@ -151,16 +103,6 @@ watch(
 const handleClose = () => {
   emit('close')
 }
-
-const handleCopy = async () => {
-  const ok = await lexiconRef.value?.copyPlainText?.()
-  if (ok) {
-    copyState.value = 'copied'
-    setTimeout(() => {
-      copyState.value = 'idle'
-    }, 2000)
-  }
-}
 </script>
 
 <style scoped lang="scss">
@@ -181,23 +123,26 @@ $text-secondary: var(--text-slate);
   gap: 8px;
   align-items: center;
   justify-content: flex-end;
+
+  :deep(.liquid-radio-group) {
+    gap: 6px;
+  }
+  :deep(.liquid-radio-label){
+    padding: 2px 4px;
+    gap: 4px;
+  }
 }
 
-.copy-btn {
-  padding: 6px 12px;
-  background: var(--glass-80);
-  border: 1px solid var(--bg-hover-strong);
-  border-radius: var(--radius-sm);
-  color: $text-main;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.toolbar-target {
+  display: contents;
+}
 
-  &:hover {
-    border-color: var(--color-primary);
-    color: var(--color-primary);
-  }
+.lexicon-location-title {
+  margin-bottom: 12px;
+  color: $text-main;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
 }
 
 .loading-state {
