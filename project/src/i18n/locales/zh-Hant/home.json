@@ -147,15 +147,16 @@
     }
   },
   "featured": {
-    "sectionTitle": "特色方言",
-    "sectionSubtitle": "一覽具有代表性的方言點",
+    "sectionTitle": "特色工具",
+    "sectionSubtitle": "精選核心功能，一鍵直達",
     "viewAll": "查看全部 →",
     "items": {
-      "guangzhou": { "name": "廣州話", "desc": "粵語代表，聲韻調體系完整", "tag": "粵語" },
-      "yangchun": { "name": "陽春話", "desc": "粵語分支，保留豐富古音層次", "tag": "粵語" },
-      "chaozhou": { "name": "潮州話", "desc": "閩南語代表，文白異讀豐富", "tag": "閩語" },
-      "meixian": { "name": "梅縣話", "desc": "客家語代表，聲調系統獨特", "tag": "客家語" },
-      "mandarin": { "name": "普通話", "desc": "官話基準，對比參照系", "tag": "官話" }
+      "zhonggu": { "name": "查中古", "desc": "按中古地位整理各方言點讀音", "tag": "查詢" },
+      "compare": { "name": "方言比較", "desc": "對比各方言點聲韻調的字音差異", "tag": "比較" },
+      "gis": { "name": "GIS 繪圖", "desc": "GIS 在線繪圖 · 泰森多邊形", "tag": "地圖" },
+      "phonology": { "name": "音系查詢", "desc": "查看各方言點音系表", "tag": "音系" },
+      "tableProcess": { "name": "字表處理", "desc": "字表檢查與格式轉換", "tag": "工具" },
+      "praat": { "name": "Praat 聲學分析", "desc": "實驗語音學工具與數據分析", "tag": "聲學" }
     }
   },
   "roadmap": {

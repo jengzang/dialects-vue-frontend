@@ -409,7 +409,7 @@
           <h2 class="section-title">{{ $t('home.featured.sectionTitle') }}</h2>
           <p class="section-subtitle">{{ $t('home.featured.sectionSubtitle') }}</p>
         </div>
-        <a class="featured-view-all" @click="navigateTo('/menu/query/zhonggu')">{{ $t('home.featured.viewAll') }}</a>
+        <a class="featured-view-all" @click="scrollToFeatures">{{ $t('home.featured.viewAll') }}</a>
       </div>
 
       <div class="featured-carousel">
@@ -430,6 +430,7 @@
             class="featured-card"
             @click="navigateTo(item.route)"
           >
+            <span class="featured-card__icon"><InlineIcon :icon="item.icon" /></span>
             <span class="featured-card__tag">{{ item.tag }}</span>
             <h3 class="featured-card__name">{{ item.name }}</h3>
             <p class="featured-card__desc">{{ item.desc }}</p>
@@ -784,18 +785,20 @@ function navigateTo(path) {
   })
 }
 
-// 特色方言 carousel 数据
+// 特色工具 carousel 数据（应用/工具入口）
 const featuredKeys = [
-  { key: 'guangzhou', route: '/menu/query/zhonggu' },
-  { key: 'yangchun', route: '/menu/query/zhonggu' },
-  { key: 'chaozhou', route: '/menu/query/zhonggu' },
-  { key: 'meixian', route: '/menu/query/zhonggu' },
-  { key: 'mandarin', route: '/menu/query/zhonggu' }
+  { key: 'zhonggu', icon: '🔍', route: '/menu/query/zhonggu' },
+  { key: 'compare', icon: '🔀', route: '/menu/compare/char' },
+  { key: 'gis', icon: '🗺️', route: '/explore/gis' },
+  { key: 'phonology', icon: '🧬', route: '/menu/pho/matrix' },
+  { key: 'tableProcess', icon: '🧰', route: '/explore/tools/check' },
+  { key: 'praat', icon: '🎙️', route: '/explore/tools/praat' }
 ]
 
 const featuredItems = computed(() =>
-  featuredKeys.map(({ key, route }) => ({
+  featuredKeys.map(({ key, icon, route }) => ({
     key,
+    icon,
     route,
     name: t(`home.featured.items.${key}.name`),
     desc: t(`home.featured.items.${key}.desc`),
@@ -1680,6 +1683,12 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     .featured-card__cta {
       transform: translateX(4px);
     }
+  }
+
+  &__icon {
+    font-size: 2.25rem;
+    line-height: 1;
+    margin-bottom: 0.75rem;
   }
 
   &__tag {
