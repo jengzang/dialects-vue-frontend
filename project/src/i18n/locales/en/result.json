@@ -162,6 +162,13 @@
     "charNav": {
       "title": "Character navigation",
       "jumpToChar": "Jump to \"{char}\""
+    },
+    "export": {
+      "copy": "Copy",
+      "export": "Export",
+      "copied": "Copied to clipboard",
+      "exported": "CSV exported",
+      "copyFailed": "Copy failed"
     }
   },
   "phonologyTable": {

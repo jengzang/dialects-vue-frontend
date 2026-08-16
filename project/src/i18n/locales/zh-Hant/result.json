@@ -162,6 +162,13 @@
     "charNav": {
       "title": "漢字導航",
       "jumpToChar": "跳轉到「{char}」"
+    },
+    "export": {
+      "copy": "複製",
+      "export": "導出",
+      "copied": "已複製到剪貼板",
+      "exported": "已導出 CSV",
+      "copyFailed": "複製失敗"
     }
   },
   "phonologyTable": {

@@ -32,7 +32,7 @@
           :mode="currentTabRef"
           :tone_for_chars="tone_for_chars"
           :selected-tone-type="selectedTab1Type"
-          :show-char-nav="isResultPageActive && currentTabRef === 'tab1' && !isLoading && latestResults.length > 0"
+          :show-char-nav="isResultPageActive && (currentTabRef === 'tab1' || currentTabRef === 'tab4') && !isLoading && latestResults.length > 0"
       />
     </template>
 
