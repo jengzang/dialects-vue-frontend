@@ -402,7 +402,7 @@
       </div>
     </section>
 
-    <!-- Featured Dialects Section -->
+    <!-- Featured Tools Section -->
     <section class="featured-section reveal">
       <div class="featured-heading">
         <div>
@@ -419,23 +419,38 @@
           aria-label="Previous"
           @click="scrollFeatured('prev')"
         >
-          ‹
+          <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
         </button>
 
         <div ref="featuredScroller" class="featured-scroller">
-          <a
+          <div
             v-for="(item, i) in featuredItems"
             :key="item.key"
             :ref="el => setFeaturedRef(el, i)"
-            class="featured-card"
-            @click="navigateTo(item.route)"
+            class="featured-item"
           >
-            <span class="featured-card__icon"><InlineIcon :icon="item.icon" /></span>
-            <span class="featured-card__tag">{{ item.tag }}</span>
-            <h3 class="featured-card__name">{{ item.name }}</h3>
-            <p class="featured-card__desc">{{ item.desc }}</p>
-            <span class="featured-card__cta">→</span>
-          </a>
+            <a class="app-card" @click="navigateTo(item.route)">
+              <span class="app-card__mist"></span>
+              <span class="app-card__vignette"></span>
+
+              <div class="app-card__logo-zone">
+                <div class="app-card__logo-ring">
+                  <div class="app-card__logo-inner">
+                    <span class="app-card__logo"><InlineIcon :icon="item.icon" /></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="app-card__content">
+                <h3>{{ item.name }}</h3>
+                <p>{{ item.desc }}</p>
+                <div class="app-card__tags">
+                  <span>{{ item.tag }}</span>
+                </div>
+                <span class="app-card__cta">{{ $t('home.featured.discover') }}</span>
+              </div>
+            </a>
+          </div>
         </div>
 
         <button
@@ -444,7 +459,7 @@
           aria-label="Next"
           @click="scrollFeatured('next')"
         >
-          ›
+          <svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" /></svg>
         </button>
       </div>
     </section>
@@ -1586,14 +1601,24 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 }
 
 .featured-view-all {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding-inline: 1.25rem;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  border-radius: var(--radius-full);
+  background: var(--glass-70);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   color: $primary;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: background 0.25s ease, transform 0.25s ease;
 
   &:hover {
-    opacity: 0.7;
+    background: var(--glass-90);
+    transform: translateY(-2px);
   }
 }
 
@@ -1605,23 +1630,27 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   @include flex-center;
   position: absolute;
   top: 50%;
-  z-index: 10;
+  z-index: 200;
+  display: none;
   width: 44px;
   height: 44px;
   padding: 0;
-  background: var(--glass-80);
   border: 1px solid rgba(var(--color-primary-rgb), 0.2);
-  border-radius: var(--radius-full);
+  border-radius: 50%;
+  background: var(--glass-80);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   color: $primary;
-  font-size: 1.75rem;
-  line-height: 1;
   cursor: pointer;
   transform: translateY(-50%);
-  transition: all 0.25s ease;
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+
+  @media (min-aspect-ratio: 1/1) {
+    display: flex;
+  }
 
   &:hover:not(:disabled) {
     background: var(--glass-90);
-    border-color: rgba(var(--color-primary-rgb), 0.4);
     box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.15);
   }
 
@@ -1630,21 +1659,31 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     pointer-events: none;
   }
 
+  svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
   &--prev {
-    left: 0;
+    left: 8px;
   }
 
   &--next {
-    right: 0;
+    right: 8px;
   }
 }
 
 .featured-scroller {
   display: flex;
   align-items: stretch;
-  gap: 1.5rem;
+  gap: 32px;
   overflow-x: auto;
-  padding: 1.5rem max(1.5rem, calc(50% - 170px));
+  padding: 24px max(1.5rem, calc(50% - 170px));
   scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -1654,74 +1693,193 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   }
 }
 
-.featured-card {
-  display: flex;
+.featured-item {
+  width: clamp(260px, 22vw, 340px);
   flex: 0 0 auto;
+  transform-origin: center;
+  will-change: transform;
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.app-card {
+  position: relative;
+  display: flex;
+  min-height: 360px;
+  height: 100%;
   flex-direction: column;
-  width: 260px;
-  min-height: 200px;
-  padding: 1.5rem;
-  background: var(--glass-70);
-  border: 1px solid rgba(var(--color-primary-rgb), 0.15);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.08);
+  overflow: hidden;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  border-radius: 34px;
+  text-align: center;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  background: linear-gradient(
+    180deg,
+    rgba(var(--color-primary-rgb), 0.14) 0%,
+    rgba(var(--color-primary-hover-rgb), 0.08) 100%
+  );
+  box-shadow:
+    0 26px 46px rgba(var(--color-primary-rgb), 0.12),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.32);
   color: inherit;
   text-decoration: none;
   cursor: pointer;
-  transform-origin: center;
-  will-change: transform;
-  transition:
-    transform 200ms cubic-bezier(0, 0, 0.2, 1),
-    background 0.25s ease,
-    box-shadow 0.25s ease;
+  transition: transform 220ms ease-out;
 
   &:hover {
-    background: var(--glass-90);
-    border-color: rgba(var(--color-primary-rgb), 0.3);
-    box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.15);
+    transform: translateY(-4px);
 
-    .featured-card__cta {
-      transform: translateX(4px);
+    .app-card__logo-ring {
+      transform: scale(1.1);
+    }
+
+    .app-card__logo-inner {
+      transform: scale(1.18);
     }
   }
 
-  &__icon {
-    font-size: 2.25rem;
+  &__mist,
+  &__vignette {
+    position: absolute;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  &__mist {
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 118px;
+    background:
+      radial-gradient(circle at 15% 65%, rgba(var(--color-primary-rgb), 0.22), transparent 28%),
+      radial-gradient(circle at 50% 60%, rgba(var(--color-primary-rgb), 0.28), transparent 30%),
+      radial-gradient(circle at 85% 70%, rgba(var(--color-primary-rgb), 0.16), transparent 26%);
+    opacity: 0.5;
+    filter: blur(10px);
+  }
+
+  &__vignette {
+    inset: 0;
+    background: radial-gradient(
+      ellipse 110% 100% at 50% 50%,
+      rgba(var(--color-primary-rgb), 0.03),
+      rgba(var(--color-primary-hover-rgb), 0.1)
+    );
+  }
+
+  &__logo-zone {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    padding-top: 28px;
+  }
+
+  &__logo-ring {
+    display: flex;
+    width: 128px;
+    height: 128px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(var(--color-primary-rgb), 0.26);
+    border-radius: 50%;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.5),
+      rgba(var(--color-primary-rgb), 0.08)
+    );
+    box-shadow:
+      0 16px 28px rgba(0, 0, 0, 0.08),
+      inset 1px 1px 0 rgba(255, 255, 255, 0.5);
+    transition: 0.3s;
+  }
+
+  &__logo-inner {
+    display: flex;
+    width: 80px;
+    height: 80px;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+  }
+
+  &__logo {
+    font-size: 3rem;
     line-height: 1;
-    margin-bottom: 0.75rem;
   }
 
-  &__tag {
-    align-self: flex-start;
-    padding: 0.3rem 0.75rem;
-    background: rgba(var(--color-primary-rgb), 0.1);
-    border-radius: var(--radius-full);
-    color: $primary;
-    font-size: 0.75rem;
-    font-weight: 600;
+  &__content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 20px 24px;
+
+    h3 {
+      margin: 8px 0 4px;
+      font-size: 1.75rem;
+      font-weight: 700;
+      line-height: 1.25;
+      color: $text-primary;
+    }
+
+    > p {
+      display: -webkit-box;
+      min-height: 4.8em;
+      max-width: 27ch;
+      margin: 0;
+      overflow: hidden;
+      color: var(--text-dark-lighter);
+      line-height: 1.6;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
   }
 
-  &__name {
-    margin: 1rem 0 0.5rem;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: $text-primary;
-  }
+  &__tags {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 6px;
 
-  &__desc {
-    margin: 0;
-    color: var(--text-dark-lighter);
-    font-size: 0.875rem;
-    line-height: 1.6;
+    span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 30px;
+      padding-inline: 12px;
+      border: 1px solid rgba(var(--color-primary-rgb), 0.18);
+      border-radius: 999px;
+      background: rgba(var(--color-primary-rgb), 0.08);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      color: $primary;
+      font-size: 0.78rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
   }
 
   &__cta {
-    align-self: flex-end;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 46px;
     margin-top: auto;
-    padding-top: 1rem;
+    padding-inline: 20px;
+    border: 1px solid rgba(var(--color-primary-rgb), 0.26);
+    border-radius: 999px;
+    background: rgba(var(--color-primary-rgb), 0.14);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.5),
+      0 14px 24px rgba(var(--color-primary-rgb), 0.1);
     color: $primary;
-    font-size: 1.5rem;
-    transition: transform 0.2s ease;
+    font-weight: 700;
+    white-space: nowrap;
   }
 }
 

@@ -150,6 +150,7 @@
     "sectionTitle": "特色工具",
     "sectionSubtitle": "精選核心功能，一鍵直達",
     "viewAll": "查看全部 →",
+    "discover": "進入工具 →",
     "items": {
       "zhonggu": { "name": "查中古", "desc": "按中古地位整理各方言點讀音", "tag": "查詢" },
       "compare": { "name": "方言比較", "desc": "對比各方言點聲韻調的字音差異", "tag": "比較" },
