@@ -94,7 +94,7 @@ const categoryConfigs = computed(() => [
         label: t('user.leaderboard.categories.analysis.items.classification')
       },
       {
-        key: 'endpoint__api_feature_counts',
+        key: 'endpoint_group_feature_counts',
         label: t('user.leaderboard.categories.analysis.items.counts')
       },
       {

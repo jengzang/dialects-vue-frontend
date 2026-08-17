@@ -231,7 +231,7 @@
       "count": "次数",
       "gap": "距前一名",
       "firstPlace": "第一名",
-						"percentile": "超越"
+      "percentile": "超越"
     },
     "rank": {
       "first": "第 1 名",
@@ -268,7 +268,7 @@
         },
         "tooltips": {
           "diwei": "包含弹窗内的细分查询，以及旧版网站的相关查询次数。",
-          "syllable": "包含查中古结果页面的“统计”查询以及比较音值的次数"
+          "syllable": "包含音值比较的次数以及查中古结果页面的“统计”"
         }
       },
       "charsTones": {
