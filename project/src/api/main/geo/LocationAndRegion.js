@@ -30,18 +30,25 @@ import { getCachedLocationDetail, cacheLocationDetail } from '@/composables/data
 export async function getLocations(params = {}) {
   try {
     const query = new URLSearchParams()
+    let hasQuery = false
 
     // 处理 locations 参数（数组形式）
     if (params.locations && Array.isArray(params.locations)) {
       params.locations.forEach(loc => {
-        if (loc) query.append('locations', loc)
+        if (loc && /[一-鿿0-9]/.test(loc)) {
+          query.append('locations', loc)
+          hasQuery = true
+        }
       })
     }
 
     // 处理 regions 参数（数组形式）
     if (params.regions && Array.isArray(params.regions)) {
       params.regions.forEach(reg => {
-        if (reg) query.append('regions', reg)
+        if (reg && /[一-鿿0-9]/.test(reg)) {
+          query.append('regions', reg)
+          hasQuery = true
+        }
       })
     }
 
@@ -49,6 +56,9 @@ export async function getLocations(params = {}) {
     if (params.region_mode) {
       query.append('region_mode', params.region_mode)
     }
+
+    // 过滤后无有效地点/区域则不请求后端
+    if (!hasQuery) return { success: false, locations_result: [] }
 
     return await api(`/api/get_locs/?${query.toString()}`)
   } catch (error) {
@@ -113,6 +123,9 @@ export async function getLocationPoints() {
  * const matches = await batchMatch('广州,香港,深圳', false)
  */
 export async function batchMatch(inputString, filterValidAbbrs = false) {
+  // 纯英文（既无中文也无数字）不请求后端
+  if (!/[一-鿿0-9]/.test(inputString)) return []
+
   try {
     const params = new URLSearchParams({
       input_string: inputString,
