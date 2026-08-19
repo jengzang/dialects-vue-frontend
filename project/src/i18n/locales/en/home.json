@@ -58,8 +58,8 @@
       "title": "Query & Analysis",
       "desc": "Explore dialect phonology from multiple perspectives",
       "searchChar": "Characters - View character readings and Middle Chinese categories",
-      "searchMiddle": "Middle Chinese - Organize readings by Middle Chinese categories",
-      "searchPhoneme": "Readings - Trace dialect readings back to their Middle Chinese categories",
+      "searchMiddle": "Middle Chinese - Organize readings by rime-book categories",
+      "searchPhoneme": "Readings - Trace dialect readings back to their rime-book categories",
       "searchTone": "Tones - View tone values and tone classes"
     },
     "compare": {

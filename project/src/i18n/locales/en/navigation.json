@@ -94,14 +94,14 @@
     "support": {
       "privacy": "Privacy Policy & Citation",
       "settings": "Settings",
-      "source": "Sources",
+      "source": "Data Sources",
       "aboutIntro": "ℹ️ About This Site",
       "aboutSuggestion": "Share Feedback",
       "aboutLike": "❤️ Support the Author"
     },
     "portals": {
       "tools": "Toolbox",
-      "villages": "Natural Villages"
+      "villages": "Natural Village Analysis"
     },
     "result": {
       "pleaseQuery": "Please query first",
@@ -114,16 +114,16 @@
       "workspace": "Dialect Clustering Workspace"
     },
     "query": {
-      "tab1": "Character Query",
-      "tab2": "Middle Chinese Query",
-      "tab3": "Reading Query",
-      "tab4": "Tone Query"
+      "tab1": "Character Readings Query",
+      "tab2": "Rime-Book Category Query",
+      "tab3": "Reading Source Analysis",
+      "tab4": "Tone Value & Class Query"
     },
     "compare": {
-      "tab1": "Character Comparison",
-      "tab2": "Middle Chinese Comparison",
-      "tab4": "Tone Class Comparison",
-      "tab5": "Reading Comparison"
+      "tab1": "Initial, Final & Tone Comparison",
+      "tab2": "Rime-Book Category Comparison",
+      "tab4": "Tone-Class Merger Comparison",
+      "tab5": "Phonetic Value Correspondence"
     },
     "map": {
       "view": "Main Map",
@@ -132,9 +132,9 @@
     },
     "pho": {
       "matrix": "Phonological System Query",
-      "custom": "Phoneme Classification",
-      "count": "Syllable Statistics",
-      "evolution": "Evolution"
+      "custom": "Rime-Book Sound Classification",
+      "count": "Count Syllables",
+      "evolution": "Rime-Book Evolution Analysis"
     },
     "vocabulary": {
       "view": "Vocabulary Query",
@@ -142,8 +142,8 @@
       "manage": "Vocabulary Management"
     },
     "yubao": {
-      "vocabulary": "Language Preservation Vocabulary",
-      "grammar": "Language Preservation Grammar"
+      "vocabulary": "Language Preservation 1000 Words",
+      "grammar": "Language Preservation 50 Sentences"
     },
     "words": {
       "yangChunSpoken": "Yangchun Spoken Words"

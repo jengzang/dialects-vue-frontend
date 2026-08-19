@@ -37,7 +37,7 @@
       "phonologyMatrix": "音系查詢",
       "phonologyCustom": "音素分類",
       "Countphos": "音節統計",
-      "evolution": "演變"
+      "evolution": "演化"
     },
     "charClass": {
       "zhonggu": "中古漢語",
@@ -94,14 +94,14 @@
     "support": {
       "privacy": "隱私政策與引用說明",
       "settings": "設置",
-      "source": "資料源",
+      "source": "資料來源",
       "aboutIntro": "ℹ️ 關於網站",
       "aboutSuggestion": "我有建議",
       "aboutLike": "❤️ 喜歡作者"
     },
     "portals": {
       "tools": "工具箱",
-      "villages": "自然村"
+      "villages": "自然村分析"
     },
     "result": {
       "pleaseQuery": "請先查詢",
@@ -114,16 +114,16 @@
       "workspace": "方言聚類工作台"
     },
     "query": {
-      "tab1": "查字",
-      "tab2": "查中古",
-      "tab3": "查音位",
-      "tab4": "查調"
+      "tab1": "查詢漢字讀音",
+      "tab2": "按韻書地位查詢",
+      "tab3": "分析音位的來源",
+      "tab4": "查詢調值調類"
     },
     "compare": {
-      "tab1": "漢字對比",
-      "tab2": "中古對比",
-      "tab4": "調類對比",
-      "tab5": "音值對比"
+      "tab1": "漢字聲韻調對比",
+      "tab2": "按韻書地位對比",
+      "tab4": "調類合流與否對比",
+      "tab5": "音值對應關係圖"
     },
     "map": {
       "view": "主地圖",
@@ -132,9 +132,9 @@
     },
     "pho": {
       "matrix": "音系查詢",
-      "custom": "音素分類",
-      "count": "音節統計",
-      "evolution": "演變"
+      "custom": "按韻書分類聲韻調",
+      "count": "統計音節數量",
+      "evolution": "韻書演化分析"
     },
     "vocabulary": {
       "view": "詞表查詢",
@@ -142,8 +142,8 @@
       "manage": "詞表管理"
     },
     "yubao": {
-      "vocabulary": "語保詞彙",
-      "grammar": "語保語法"
+      "vocabulary": "語保1000詞",
+      "grammar": "語保五十句"
     },
     "words": {
       "yangChunSpoken": "陽春口語詞"
