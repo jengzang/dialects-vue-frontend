@@ -190,21 +190,24 @@ const fetchHighPrecisionOptions = async (level) => {
   }
 };
 
+let initialized = false;
+
 watch(
   () => props.modelValue,
   (val) => {
-    if (val) {
-      searchQuery.value = '';
+    if (!val) return;
+    if (!initialized) {
+      initialized = true;
       localLevel.value = props.boundaryConfig.level || 'country';
       localHighPrecision.value = getInitialHighPrecision();
-      highPrecisionOptions.value = [];
       localSelected.value = getInitialSelectedValues();
       if (localSelected.value.length === 0 && localLevel.value === 'country') {
         localSelected.value = ['中国'];
       }
-      if (localHighPrecision.value && localLevel.value !== 'country') {
-        fetchHighPrecisionOptions(localLevel.value);
-      }
+    }
+    searchQuery.value = '';
+    if (localHighPrecision.value && localLevel.value !== 'country' && highPrecisionOptions.value.length === 0) {
+      fetchHighPrecisionOptions(localLevel.value);
     }
   },
   { immediate: true },
