@@ -37,7 +37,7 @@
       "phonologyMatrix": "音系查询",
       "phonologyCustom": "音素分类",
       "Countphos": "音节统计",
-      "evolution": "演变"
+      "evolution": "演化"
     },
     "charClass": {
       "zhonggu": "中古汉语",
@@ -94,14 +94,14 @@
     "support": {
       "privacy": "隐私政策与引用说明",
       "settings": "设置",
-      "source": "资料源",
+      "source": "资料来源",
       "aboutIntro": "ℹ️ 关于网站",
       "aboutSuggestion": "我有建议",
       "aboutLike": "❤️ 喜欢作者"
     },
     "portals": {
       "tools": "工具箱",
-      "villages": "自然村"
+      "villages": "自然村分析"
     },
     "result": {
       "pleaseQuery": "请先查询",
@@ -114,16 +114,16 @@
       "workspace": "方言聚类工作台"
     },
     "query": {
-      "tab1": "查字",
-      "tab2": "查中古",
-      "tab3": "查音位",
-      "tab4": "查调"
+      "tab1": "查询汉字读音",
+      "tab2": "按韵书地位查询",
+      "tab3": "分析音位的来源",
+      "tab4": "查询调值调类"
     },
     "compare": {
-      "tab1": "汉字对比",
-      "tab2": "中古对比",
-      "tab4": "调类对比",
-      "tab5": "音值对比"
+      "tab1": "汉字声韵调对比",
+      "tab2": "按韵书地位对比",
+      "tab4": "调类合流与否对比",
+      "tab5": "音值对应关系图"
     },
     "map": {
       "view": "主地图",
@@ -132,9 +132,9 @@
     },
     "pho": {
       "matrix": "音系查询",
-      "custom": "音素分类",
-      "count": "音节统计",
-      "evolution": "演变"
+      "custom": "按韵书分类声韵调",
+      "count": "统计音节数量",
+      "evolution": "韵书演化分析"
     },
     "vocabulary": {
       "view": "词表查询",
@@ -142,8 +142,8 @@
       "manage": "词表管理"
     },
     "yubao": {
-      "vocabulary": "语保词汇",
-      "grammar": "语保语法"
+      "vocabulary": "语保1000词",
+      "grammar": "语保五十句"
     },
     "words": {
       "yangChunSpoken": "阳春口语词"

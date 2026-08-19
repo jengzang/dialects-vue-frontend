@@ -185,7 +185,7 @@
       }
     },
     "evolution": {
-      "title": "演变",
+      "title": "演化",
       "queryMode": {
         "label": "统计模式",
         "byValue": "按今音统计",
@@ -238,8 +238,8 @@
       },
       "errors": {
         "minLocation": "请至少选择一个地点",
-        "maxLocation": "演变分析只支持单个地点，请删除多余的地点",
-        "autoLimitLocation": "演变分析只支持单个地点，已自动保留第一个地点",
+        "maxLocation": "演化分析只支持单个地点，请删除多余的地点",
+        "autoLimitLocation": "演化分析只支持单个地点，已自动保留第一个地点",
         "selectDimensions": "请选择两个维度",
         "sameDimensions": "两个维度不能相同",
         "queryFailed": "查询失败"
@@ -277,6 +277,6 @@
     "matrix": "音系",
     "custom": "音素分类",
     "count": "音节统计",
-    "evolution": "演变"
+    "evolution": "演化"
   }
 }

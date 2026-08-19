@@ -58,8 +58,8 @@
       "title": "查询分析",
       "desc": "多维度查询方言音韵资料",
       "searchChar": "查字 - 查询字音、地位",
-      "searchMiddle": "查中古 - 按中古地位整理读音",
-      "searchPhoneme": "查音位 - 分析音位的中古来源",
+      "searchMiddle": "查中古 - 按韵书地位整理读音",
+      "searchPhoneme": "查音位 - 分析音位的韵书来源",
       "searchTone": "查调 - 查询调值、调类"
     },
     "compare": {
@@ -85,7 +85,7 @@
       "phonemeClassify": "音素分类 - 按自定义类别分析音素",
       "syllableCount": "音节统计 - 统计音节数量",
       "middlePosition": "中古地位 - 查询汉字中古地位",
-      "evolution": "演变 - 饼图桑基图展示方言演变"
+      "evolution": "演化 - 饼图桑基图展示方言演化"
     },
     "words": {
       "title": "词句资料",

@@ -1679,7 +1679,7 @@ $glass-transition: all 0.3s ease;
 .admin-boundary-btn {
   width: 100%;
   margin-bottom: 10px;
-  border: 2px solid var(--border-glass);
+  border: 2px solid var(--color-primary-border);
 }
 
 .button-row {

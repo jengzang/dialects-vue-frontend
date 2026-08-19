@@ -12,7 +12,7 @@
     "title": "查中古",
     "placeholder": "请输入中古音",
     "button": "查询",
-    "description": "中古 → 读音 • 按中古地位整理读音",
+    "description": "韵书 → 读音 • 按韵书地位分别整理声韵调的读音",
     "noExclude": "不排除",
     "selectAll": "全选",
     "cards": {
@@ -31,10 +31,10 @@
     "title": "查音位",
     "placeholder": "请输入音位",
     "button": "查询",
-    "description": "读音 → 中古 • 分析音位的中古来源",
+    "description": "读音 → 韵书 • 分析各声韵调的音位来源于什么韵书地位",
     "noExclude": "不排除",
     "selectAll": "全选",
-    "analysisText": "分析<strong>{card}</strong>音节的中古来源，即当今的同<strong>{card}</strong>字分别来自哪些中古[<strong>{keys}</strong>]",
+    "analysisText": "分析<strong>{card}</strong>音节的韵书来源，即当今的同<strong>{card}</strong>字分别来自哪些韵书[<strong>{keys}</strong>]",
     "inputPlaceholder": "输/选 [{key}]",
     "cards": {
       "initial": "声母",
