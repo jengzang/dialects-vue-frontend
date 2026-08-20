@@ -983,6 +983,54 @@ describe('EditableMapLibre state flow', () => {
     wrapper.unmount()
   })
 
+  it('renders a snap preview marker and guide line when a vertex edit snaps', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [0, 0],
+            [10, 0],
+            [5, 8],
+            [0, 0],
+          ]],
+        },
+      }],
+    }, {
+      allLayers: [{
+        id: 'reference-lines',
+        visible: true,
+        locked: true,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [{
+            id: 'reference-line-1',
+            type: 'Feature',
+            properties: { visible: true, locked: true },
+            geometry: { type: 'LineString', coordinates: [[0, 5], [10, 5]] },
+          }],
+        },
+      }],
+    })
+    await nextTick()
+
+    wrapper.exposed.moveVertex('polygon-1', '0.2', [4.8, 5.4])
+
+    expect(wrapper.map.getLayer('draw-snap-preview-guide')).toBeTruthy()
+    expect(wrapper.map.getLayer('draw-snap-preview-point')).toBeTruthy()
+    const snapPreview = wrapper.map.getSource('draw-snap-preview-source')?.data
+    expect(snapPreview.features.map((feature) => feature.geometry.type)).toEqual(['LineString', 'Point'])
+    expect(snapPreview.features[0].geometry.coordinates).toEqual([[4.8, 5.4], [4.8, 5]])
+    expect(snapPreview.features[1].properties.snapType).toBe('edge')
+    expect(snapPreview.features[1].geometry.coordinates).toEqual([4.8, 5])
+
+    wrapper.unmount()
+  })
+
   it('does not snap to hidden reference features or when snapping is disabled', async () => {
     const referenceLayer = {
       id: 'reference-points',

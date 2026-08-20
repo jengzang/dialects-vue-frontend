@@ -168,6 +168,10 @@ const featureBoxSelectableLayerIds = [
   'gl-draw-line',
   'gl-draw-point',
 ]
+const snapPreviewSourceId = 'draw-snap-preview-source'
+const snapPreviewGuideLayerId = 'draw-snap-preview-guide'
+const snapPreviewPointLayerId = 'draw-snap-preview-point'
+const snapPreviewLayerIds = new Set([snapPreviewGuideLayerId, snapPreviewPointLayerId])
 
 const props = defineProps({
   modelValue: {
@@ -693,6 +697,96 @@ const getSquaredScreenDistance = (left, right) => {
   return ((left.x - right.x) ** 2) + ((left.y - right.y) ** 2)
 }
 
+const emptySnapPreviewFeatureCollection = () => featureCollection([])
+
+const ensureSnapPreviewLayers = () => {
+  if (!map.value) return
+
+  if (!map.value.getSource(snapPreviewSourceId)) {
+    map.value.addSource(snapPreviewSourceId, {
+      type: 'geojson',
+      data: emptySnapPreviewFeatureCollection(),
+    })
+  }
+
+  if (!map.value.getLayer(snapPreviewGuideLayerId)) {
+    map.value.addLayer({
+      id: snapPreviewGuideLayerId,
+      type: 'line',
+      source: snapPreviewSourceId,
+      filter: ['==', '$type', 'LineString'],
+      layout: {
+        'line-cap': 'round',
+        'line-join': 'round',
+      },
+      paint: {
+        'line-color': '#0ea5e9',
+        'line-width': 2,
+        'line-dasharray': [1, 1],
+        'line-opacity': 0.85,
+      },
+    })
+  }
+
+  if (!map.value.getLayer(snapPreviewPointLayerId)) {
+    map.value.addLayer({
+      id: snapPreviewPointLayerId,
+      type: 'circle',
+      source: snapPreviewSourceId,
+      filter: ['==', '$type', 'Point'],
+      paint: {
+        'circle-radius': 7,
+        'circle-color': '#0ea5e9',
+        'circle-stroke-color': '#ffffff',
+        'circle-stroke-width': 3,
+        'circle-opacity': 0.95,
+      },
+    })
+  }
+}
+
+const setSnapPreview = (snapResult) => {
+  if (!map.value) return
+  ensureSnapPreviewLayers()
+  const source = map.value.getSource(snapPreviewSourceId)
+  if (!source) return
+  if (!snapResult?.snapped || !normalizeVertexCoordinate(snapResult.coordinate)) {
+    source.setData?.(emptySnapPreviewFeatureCollection())
+    return
+  }
+
+  const features = []
+  const originalCoordinate = normalizeVertexCoordinate(snapResult.originalCoordinate)
+  const snappedCoordinate = normalizeVertexCoordinate(snapResult.coordinate)
+  if (originalCoordinate && snappedCoordinate && !areCoordinatesEqual(originalCoordinate, snappedCoordinate)) {
+    features.push({
+      type: 'Feature',
+      properties: {
+        snapType: snapResult.type,
+      },
+      geometry: {
+        type: 'LineString',
+        coordinates: [originalCoordinate, snappedCoordinate],
+      },
+    })
+  }
+  features.push({
+    type: 'Feature',
+    properties: {
+      snapType: snapResult.type,
+    },
+    geometry: {
+      type: 'Point',
+      coordinates: snappedCoordinate,
+    },
+  })
+  source.setData?.(featureCollection(features))
+}
+
+const clearSnapPreview = () => {
+  setSnapPreview(null)
+}
+
 const getNearestPointOnProjectedSegment = (targetPoint, startPoint, endPoint, startCoordinate, endCoordinate) => {
   const segmentX = endPoint.x - startPoint.x
   const segmentY = endPoint.y - startPoint.y
@@ -717,40 +811,55 @@ const maybeSnapCoordinateToGrid = (coordinate) => {
   ]
 }
 
-const resolveSnappedCoordinate = (coordinate, options = {}) => {
+const resolveSnapResult = (coordinate, options = {}) => {
   const normalized = normalizeVertexCoordinate(coordinate)
-  if (!normalized || props.snappingEnabled === false || options.snapping === false) return normalized
+  const fallback = {
+    coordinate: normalized,
+    originalCoordinate: normalized,
+    snapped: false,
+    type: '',
+  }
+  if (!normalized || props.snappingEnabled === false || options.snapping === false) return fallback
   const targetPoint = projectCoordinate(normalized)
-  if (!targetPoint) return normalized
+  if (!targetPoint) return fallback
   const tolerance = Math.max(0, Number(props.snapTolerance) || 0)
   const toleranceSquared = tolerance ** 2
-  let best = { coordinate: normalized, distanceSquared: Infinity, priority: -1 }
+  let best = { coordinate: normalized, distanceSquared: Infinity, priority: -1, type: '' }
 
-  const acceptCandidate = (candidateCoordinate, priority) => {
+  const acceptCandidate = (candidateCoordinate, priority, type) => {
     const candidate = normalizeVertexCoordinate(candidateCoordinate)
     const candidatePoint = projectCoordinate(candidate)
     if (!candidatePoint) return
     const distanceSquared = getSquaredScreenDistance(targetPoint, candidatePoint)
     if (distanceSquared > toleranceSquared) return
     if (distanceSquared < best.distanceSquared || (distanceSquared === best.distanceSquared && priority > best.priority)) {
-      best = { coordinate: candidate, distanceSquared, priority }
+      best = { coordinate: candidate, distanceSquared, priority, type }
     }
   }
 
   getSnapReferenceFeatures(options).forEach((feature) => {
     getCoordinatePairs(feature.geometry).forEach((candidate) => {
-      acceptCandidate(candidate, 3)
+      acceptCandidate(candidate, 3, 'vertex')
     })
     getCoordinateSegments(feature.geometry).forEach(([startCoordinate, endCoordinate]) => {
       const startPoint = projectCoordinate(startCoordinate)
       const endPoint = projectCoordinate(endCoordinate)
       const candidate = getNearestPointOnProjectedSegment(targetPoint, startPoint, endPoint, startCoordinate, endCoordinate)
-      acceptCandidate(candidate, 2)
+      acceptCandidate(candidate, 2, 'edge')
     })
   })
 
-  acceptCandidate(maybeSnapCoordinateToGrid(normalized), 1)
-  return best.coordinate
+  acceptCandidate(maybeSnapCoordinateToGrid(normalized), 1, 'grid')
+  return {
+    coordinate: best.coordinate,
+    originalCoordinate: normalized,
+    snapped: Boolean(best.type && !areCoordinatesEqual(normalized, best.coordinate)),
+    type: best.type,
+  }
+}
+
+const resolveSnappedCoordinate = (coordinate, options = {}) => {
+  return resolveSnapResult(coordinate, options).coordinate
 }
 
 const closeSnappedRingIfNeeded = (originalRing = [], nextRing = []) => {
@@ -1265,6 +1374,7 @@ const syncFeaturesFromDraw = (options = {}) => {
 
 const setDrawMode = (mode) => {
   suppressedProgrammaticFeatureSelectionIds = null
+  clearSnapPreview()
   if (mode !== 'draw_line_string') {
     clearPendingPolygonSplitSketch()
   }
@@ -1281,6 +1391,7 @@ const setDrawMode = (mode) => {
 
 const selectFeature = (featureId, options = {}) => {
   suppressedProgrammaticFeatureSelectionIds = null
+  clearSnapPreview()
   clearPendingPolygonSplitSketch()
   if (!draw.value || !featureId) {
     selectedFeatureId.value = ''
@@ -1328,6 +1439,7 @@ const selectFeature = (featureId, options = {}) => {
 }
 
 const selectFeatures = (featureIds = []) => {
+  clearSnapPreview()
   clearPendingPolygonSplitSketch()
   if (!draw.value) {
     selectedFeatureId.value = ''
@@ -1609,14 +1721,16 @@ const selectVertex = (featureId, coordPath) => {
 const insertVertex = (featureId, coordPath, coordinate, options = {}) => {
   const feature = featureId ? draw.value?.get?.(featureId) : null
   if (!draw.value || !feature || !isDrawFeatureSelectable(feature)) return false
-  const result = insertVertexIntoFeature(feature, coordPath, resolveSnappedCoordinate(coordinate, {
+  const snapResult = resolveSnapResult(coordinate, {
     ...options,
     excludeFeatureId: featureId,
-  }))
+  })
+  const result = insertVertexIntoFeature(feature, coordPath, snapResult.coordinate)
   if (!result) return false
 
   const didReplace = replaceFeatureInDraw(result.feature, options)
   if (!didReplace) return false
+  setSnapPreview(snapResult)
   selectVertex(featureId, result.coordPath)
   return true
 }
@@ -1624,14 +1738,16 @@ const insertVertex = (featureId, coordPath, coordinate, options = {}) => {
 const moveVertex = (featureId, coordPath, coordinate, options = {}) => {
   const feature = featureId ? draw.value?.get?.(featureId) : null
   if (!draw.value || !feature || !isDrawFeatureSelectable(feature)) return false
-  const result = moveVertexInFeature(feature, coordPath, resolveSnappedCoordinate(coordinate, {
+  const snapResult = resolveSnapResult(coordinate, {
     ...options,
     excludeFeatureId: featureId,
-  }))
+  })
+  const result = moveVertexInFeature(feature, coordPath, snapResult.coordinate)
   if (!result) return false
 
   const didReplace = replaceFeatureInDraw(result.feature, options)
   if (!didReplace) return false
+  setSnapPreview(snapResult)
   selectVertex(featureId, result.coordPath)
   return true
 }
@@ -1644,6 +1760,7 @@ const deleteVertices = (featureId, coordPaths, options = {}) => {
 
   const didReplace = replaceFeatureInDraw(nextFeature, options)
   if (!didReplace) return false
+  clearSnapPreview()
   selectedVertexCoordPaths.value = []
   draw.value?.changeMode?.('direct_select', { featureId })
   emit('mode-change', 'direct_select')
@@ -1784,6 +1901,7 @@ const deleteSelected = () => {
   }
   isDeletingSelected = true
   try {
+    clearSnapPreview()
     draw.value?.trash?.()
     syncFeaturesFromDraw({ commitHistory: false })
     return true
@@ -1795,6 +1913,7 @@ const deleteSelected = () => {
 const clearAll = () => {
   draw.value?.deleteAll?.()
   clearPendingPolygonSplitSketch()
+  clearSnapPreview()
   selectedVertexCoordPaths.value = []
   syncFeaturesFromDraw({ commitHistory: false })
 }
@@ -1803,6 +1922,7 @@ const importGeoJson = (featureCollection, options = {}) => {
   if (!draw.value) return
 
   clearPendingPolygonSplitSketch()
+  clearSnapPreview()
   const normalized = normalizeFeatureCollection(featureCollection)
   const mergeImportedFeatures = options.merge === true
   const shouldEmitChanges = options.emitChanges !== false
@@ -1869,6 +1989,7 @@ const initializeDraw = () => {
   mountHiddenDrawControls()
   bindDrawEvents()
   syncReadonlyLayers()
+  ensureSnapPreviewLayers()
 
   const initialFeatures = normalizeFeatureCollection(props.modelValue)
   if (initialFeatures.features.length > 0) {
@@ -1880,6 +2001,7 @@ const restoreLayersAfterStyleLoad = () => {
   if (!map.value) return
 
   syncReadonlyLayers()
+  ensureSnapPreviewLayers()
 
   if (!draw.value) return
 
@@ -2033,6 +2155,11 @@ const applyExportContentVisibility = (options = {}) => {
 
   ;(map.value.getStyle()?.layers ?? []).forEach((layer) => {
     previousVisibilities.set(layer.id, map.value.getLayoutProperty(layer.id, 'visibility') ?? 'visible')
+
+    if (snapPreviewLayerIds.has(layer.id)) {
+      setLayerVisibility(layer.id, false)
+      return
+    }
 
     if (drawLayerIds.has(layer.id)) {
       if (!includeDrawLayers) {
