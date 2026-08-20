@@ -189,6 +189,27 @@
               >
                 {{ t('map.drawTab.buttons.splitPolygon') }}
               </button>
+              <button
+                v-if="!polygonSplitSketchActive"
+                class="glass-button draw-tool-inline-button"
+                data-variant="secondary"
+                data-testid="draw-tool-start-polygon-split-sketch"
+                type="button"
+                :disabled="!canStartPolygonSplitSketch"
+                @click="$emit('start-polygon-split-sketch')"
+              >
+                {{ t('map.drawTab.buttons.drawPolygonSplitLine') }}
+              </button>
+              <button
+                v-else
+                class="glass-button draw-tool-inline-button"
+                data-variant="secondary"
+                data-testid="draw-tool-cancel-polygon-split-sketch"
+                type="button"
+                @click="$emit('cancel-polygon-split-sketch')"
+              >
+                {{ t('map.drawTab.buttons.cancelPolygonSplitLine') }}
+              </button>
             </div>
             <button
               class="glass-button"
@@ -380,6 +401,16 @@
               >
                 {{ t('map.drawTab.buttons.finishShapeEdit') }}
               </button>
+            </div>
+          </div>
+          <div
+            v-if="geometryEditStatus?.message"
+            class="draw-shape-edit-status"
+            data-testid="geometry-edit-status"
+            :data-state="geometryEditStatus.type"
+          >
+            <div class="draw-shape-edit-hint">
+              {{ geometryEditStatus.message }}
             </div>
           </div>
           <div
@@ -880,6 +911,9 @@ const props = defineProps({
   selectedVertex: { type: Object, default: null },
   polygonSplitLineOptions: { type: Array, default: () => [] },
   selectedPolygonSplitLineId: { type: String, default: '' },
+  canStartPolygonSplitSketch: { type: Boolean, default: false },
+  polygonSplitSketchActive: { type: Boolean, default: false },
+  geometryEditStatus: { type: Object, default: null },
   selectedFeatureBatchName: { type: String, default: '' },
   selectedFeatureBatchPropertyKey: { type: String, default: '' },
   selectedFeatureBatchPropertyValue: { type: String, default: '' },
@@ -930,6 +964,8 @@ const emit = defineEmits([
   'split-selected-line',
   'update:selected-polygon-split-line-id',
   'split-selected-polygon',
+  'start-polygon-split-sketch',
+  'cancel-polygon-split-sketch',
   'convert-selected-line-to-polygon',
   'move-selected-vertex',
   'undo',

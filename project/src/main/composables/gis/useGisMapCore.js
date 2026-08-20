@@ -239,6 +239,8 @@ export function useGisMapCore(options = {}) {
   const selectedFeatureBatchPropertyKey = ref('');
   const selectedFeatureBatchPropertyValue = ref('');
   const selectedPolygonSplitLineId = ref('');
+  const polygonSplitSketchActive = ref(false);
+  const geometryEditStatus = ref(null);
   const snappingEnabled = ref(true);
   const snapTolerance = ref(12);
   const snapGridSize = ref(0);
@@ -504,6 +506,11 @@ export function useGisMapCore(options = {}) {
     && selectedPolygonSplitLineFeature.value
   ));
 
+  const canStartPolygonSplitSketch = computed(() => Boolean(
+    canUseSelectedGeometryTools.value
+    && selectedFeature.value?.geometry?.type === 'Polygon'
+  ));
+
   const geometryQualitySummary = computed(() => {
     const issues = [];
     activeLayerFeatures.value.forEach((feature) => {
@@ -626,6 +633,7 @@ export function useGisMapCore(options = {}) {
   // ---- Mode & selection ----
   const resetDrawSelectionMode = () => {
     isFeatureBoxSelectMode.value = false;
+    polygonSplitSketchActive.value = false;
     clearFeatureSelection();
     currentMode.value = 'simple_select';
     if (editableMapRef?.value?.selectFeatures) {
@@ -688,6 +696,9 @@ export function useGisMapCore(options = {}) {
 
   const setMode = (mode) => {
     isFeatureBoxSelectMode.value = false;
+    if (mode !== 'draw_line_string') {
+      polygonSplitSketchActive.value = false;
+    }
     if (!activeLayer.value && mode !== 'simple_select') {
       const geometryType = mode === 'draw_point'
         ? 'Point'
@@ -711,6 +722,9 @@ export function useGisMapCore(options = {}) {
       return;
     }
     currentMode.value = mode || 'simple_select';
+    if (currentMode.value !== 'draw_line_string') {
+      polygonSplitSketchActive.value = false;
+    }
     if (currentMode.value !== 'simple_select') {
       isFeatureBoxSelectMode.value = false;
     }
@@ -811,6 +825,31 @@ export function useGisMapCore(options = {}) {
     editableMapRef?.value?.setDrawMode?.('simple_select');
   };
 
+  const resolveGeometryEditStatusMessage = (code) => {
+    const messageKeys = {
+      polygonSplitSketchStarted: 'map.drawTab.labels.polygonSplitSketchStarted',
+      polygonSplitSketchCanceled: 'map.drawTab.labels.polygonSplitSketchCanceled',
+      polygonSplitNoTarget: 'map.drawTab.labels.polygonSplitNoTarget',
+      polygonSplitNoCutter: 'map.drawTab.labels.polygonSplitNoCutter',
+      polygonSplitNoPieces: 'map.drawTab.labels.polygonSplitNoPieces',
+      polygonSplitSuccess: 'map.drawTab.labels.polygonSplitSuccess',
+    };
+    const key = messageKeys[code];
+    return key ? t(key) : '';
+  };
+
+  const handleGeometryEditFeedback = (payload = {}) => {
+    const type = ['success', 'error', 'info'].includes(payload.type) ? payload.type : 'info';
+    const code = String(payload.code || '');
+    if (code === 'polygonSplitSketchStarted') {
+      polygonSplitSketchActive.value = true;
+    } else if (code) {
+      polygonSplitSketchActive.value = false;
+    }
+    const message = resolveGeometryEditStatusMessage(code);
+    geometryEditStatus.value = message ? { type, message, code } : null;
+  };
+
   const handleSelectFeatureFromPanel = (featureId) => {
     if (!featureId) return;
     setFeatureSelection([featureId], featureId);
@@ -909,6 +948,8 @@ export function useGisMapCore(options = {}) {
     selectedFeatureBatchPropertyKey,
     selectedFeatureBatchPropertyValue,
     selectedPolygonSplitLineId,
+    polygonSplitSketchActive,
+    geometryEditStatus,
     snappingEnabled,
     snapTolerance,
     snapGridSize,
@@ -937,6 +978,7 @@ export function useGisMapCore(options = {}) {
     polygonSplitLineOptions,
     selectedPolygonSplitLineFeature,
     canSplitSelectedPolygon,
+    canStartPolygonSplitSketch,
     canConvertSelectedLineToPolygon,
     geometryQualitySummary,
     canDeleteSelection,
@@ -959,6 +1001,7 @@ export function useGisMapCore(options = {}) {
     handleShapeEditStateChange,
     handleFeatureSelect,
     handleFeatureBoxSelect,
+    handleGeometryEditFeedback,
     handleToggleFeatureBoxSelect,
     handleSelectFeatureFromPanel,
     handleToggleFeatureSelection,

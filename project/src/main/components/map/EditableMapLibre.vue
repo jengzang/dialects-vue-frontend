@@ -228,6 +228,7 @@ const emit = defineEmits([
   'preview-feature-hover',
   'map-click',
   'feature-box-select',
+  'geometry-edit-feedback',
 ])
 
 const mapContainer = ref(null)
@@ -235,6 +236,7 @@ const map = shallowRef(null)
 const draw = shallowRef(null)
 const selectedFeatureId = ref('')
 const selectedVertexCoordPaths = ref([])
+const pendingPolygonSplitSketchFeatureId = ref('')
 const currentStyleKey = ref(props.currentStyleKey || 'gaode')
 const isFullscreen = ref(false)
 const isFeatureBoxDragging = ref(false)
@@ -1263,6 +1265,9 @@ const syncFeaturesFromDraw = (options = {}) => {
 
 const setDrawMode = (mode) => {
   suppressedProgrammaticFeatureSelectionIds = null
+  if (mode !== 'draw_line_string') {
+    clearPendingPolygonSplitSketch()
+  }
   if (mode !== 'direct_select') {
     selectedVertexCoordPaths.value = []
   }
@@ -1276,6 +1281,7 @@ const setDrawMode = (mode) => {
 
 const selectFeature = (featureId, options = {}) => {
   suppressedProgrammaticFeatureSelectionIds = null
+  clearPendingPolygonSplitSketch()
   if (!draw.value || !featureId) {
     selectedFeatureId.value = ''
     selectedVertexCoordPaths.value = []
@@ -1322,6 +1328,7 @@ const selectFeature = (featureId, options = {}) => {
 }
 
 const selectFeatures = (featureIds = []) => {
+  clearPendingPolygonSplitSketch()
   if (!draw.value) {
     selectedFeatureId.value = ''
     selectedVertexCoordPaths.value = []
@@ -1688,6 +1695,88 @@ const canSplitPolygonWithLine = (featureId, cutterFeature) => {
   return Boolean(splitPolygonFeatureWithLine(featureCollection, featureId, cutterFeature))
 }
 
+const emitGeometryEditFeedback = (type, code) => {
+  emit('geometry-edit-feedback', { type, code })
+}
+
+const clearPendingPolygonSplitSketch = () => {
+  pendingPolygonSplitSketchFeatureId.value = ''
+}
+
+const buildFeatureCollectionWithoutFeatureIds = (featureCollection, featureIds = new Set()) => ({
+  ...featureCollection,
+  features: (featureCollection.features ?? []).filter((feature) => !featureIds.has(getDrawFeatureId(feature))),
+})
+
+const restorePolygonSplitSketchTargetSelection = (featureId) => {
+  if (featureId && isDrawFeatureSelectableById(featureId)) {
+    selectFeatures([featureId])
+    return
+  }
+  selectFeatures([])
+}
+
+const finishPendingPolygonSplitSketch = (event = {}) => {
+  const featureId = pendingPolygonSplitSketchFeatureId.value
+  if (!featureId) return false
+  clearPendingPolygonSplitSketch()
+
+  const createdFeatureIds = getDrawEventFeatureIds(event)
+  const featureCollection = normalizeFeatureCollection(draw.value?.getAll?.() ?? props.modelValue)
+  const cleanedFeatureCollection = buildFeatureCollectionWithoutFeatureIds(featureCollection, createdFeatureIds)
+  const cutterFeature = (event?.features ?? []).find(isCutterLineFeature)
+
+  if (!cutterFeature) {
+    draw.value?.set?.(cleanedFeatureCollection)
+    emitGeometryEditFeedback('error', 'polygonSplitNoCutter')
+    restorePolygonSplitSketchTargetSelection(featureId)
+    return false
+  }
+
+  const result = splitPolygonFeatureWithLine(cleanedFeatureCollection, featureId, cutterFeature)
+  if (!result) {
+    draw.value?.set?.(cleanedFeatureCollection)
+    emitGeometryEditFeedback('error', 'polygonSplitNoPieces')
+    restorePolygonSplitSketchTargetSelection(featureId)
+    return false
+  }
+
+  draw.value.set(result.featureCollection)
+  syncFeaturesFromDraw({
+    commitHistory: true,
+    syncSelection: false,
+  })
+  selectFeatures(result.featureIds)
+  emitGeometryEditFeedback('success', 'polygonSplitSuccess')
+  return true
+}
+
+const startPolygonSplitSketch = (featureId) => {
+  const normalizedFeatureId = String(featureId || selectedFeatureId.value || '')
+  const feature = normalizedFeatureId ? draw.value?.get?.(normalizedFeatureId) : null
+  if (!draw.value || !feature || !isDrawFeatureSelectable(feature) || feature.geometry?.type !== 'Polygon') {
+    emitGeometryEditFeedback('error', 'polygonSplitNoTarget')
+    return false
+  }
+
+  pendingPolygonSplitSketchFeatureId.value = normalizedFeatureId
+  selectedFeatureId.value = normalizedFeatureId
+  selectedVertexCoordPaths.value = []
+  draw.value.changeMode?.('draw_line_string')
+  emit('mode-change', 'draw_line_string')
+  emitGeometryEditFeedback('info', 'polygonSplitSketchStarted')
+  return true
+}
+
+const cancelPolygonSplitSketch = () => {
+  const featureId = pendingPolygonSplitSketchFeatureId.value
+  if (!featureId) return false
+  clearPendingPolygonSplitSketch()
+  restorePolygonSplitSketchTargetSelection(featureId)
+  emitGeometryEditFeedback('info', 'polygonSplitSketchCanceled')
+  return true
+}
+
 const deleteSelected = () => {
   if (!canDeleteSelected()) return false
   if (draw.value?.getMode?.() === 'direct_select' && selectedVertexCoordPaths.value.length > 0) {
@@ -1705,6 +1794,7 @@ const deleteSelected = () => {
 
 const clearAll = () => {
   draw.value?.deleteAll?.()
+  clearPendingPolygonSplitSketch()
   selectedVertexCoordPaths.value = []
   syncFeaturesFromDraw({ commitHistory: false })
 }
@@ -1712,6 +1802,7 @@ const clearAll = () => {
 const importGeoJson = (featureCollection, options = {}) => {
   if (!draw.value) return
 
+  clearPendingPolygonSplitSketch()
   const normalized = normalizeFeatureCollection(featureCollection)
   const mergeImportedFeatures = options.merge === true
   const shouldEmitChanges = options.emitChanges !== false
@@ -1738,13 +1829,21 @@ const importGeoJson = (featureCollection, options = {}) => {
   }
 }
 
+const handleDrawCreate = (event) => {
+  if (pendingPolygonSplitSketchFeatureId.value) {
+    finishPendingPolygonSplitSketch(event)
+    return
+  }
+  syncFeaturesFromDraw({ ...event, snapFeatures: true })
+}
+
 const mountHiddenDrawControls = () => {
   const controlGroup = mapContainer.value?.querySelector('.mapboxgl-ctrl-group')
   controlGroup?.classList.add(drawControlContainerClass)
 }
 
 const bindDrawEvents = () => {
-  map.value.on('draw.create', (event) => syncFeaturesFromDraw({ ...event, snapFeatures: true }))
+  map.value.on('draw.create', handleDrawCreate)
   map.value.on('draw.update', (event) => syncFeaturesFromDraw({ ...event, snapFeatures: true }))
   map.value.on('draw.delete', syncFeaturesFromDraw)
   map.value.on('draw.selectionchange', syncSelectedFeature)
@@ -2366,6 +2465,8 @@ defineExpose({
   splitLineAtVertex,
   canSplitPolygonWithLine,
   splitPolygonWithLine,
+  startPolygonSplitSketch,
+  cancelPolygonSplitSketch,
   selectedFeatureId,
   updateFeatureProperties,
   canDeleteSelected,

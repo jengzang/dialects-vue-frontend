@@ -61,6 +61,9 @@ function mountToolsPanel(overrides = {}) {
     canConvertSelectedLineToPolygon: true,
     canSplitSelectedLine: false,
     canSplitSelectedPolygon: false,
+    canStartPolygonSplitSketch: false,
+    polygonSplitSketchActive: false,
+    geometryEditStatus: null,
     canDeleteSelection: false,
     canDeleteSelectedVertices: false,
     canEditShape: true,
@@ -93,6 +96,8 @@ function mountToolsPanel(overrides = {}) {
         @split-selected-line="events.push(['split-selected-line'])"
         @update:selected-polygon-split-line-id="events.push(['update:selected-polygon-split-line-id', $event]); props.selectedPolygonSplitLineId = $event"
         @split-selected-polygon="events.push(['split-selected-polygon'])"
+        @start-polygon-split-sketch="events.push(['start-polygon-split-sketch'])"
+        @cancel-polygon-split-sketch="events.push(['cancel-polygon-split-sketch'])"
         @move-selected-vertex="events.push(['move-selected-vertex', $event])"
         @delete-selected="events.push(['delete-selected'])"
       />
@@ -402,6 +407,43 @@ describe('MapDrawToolsPanel editing affordances', () => {
     await nextTick()
 
     expect(wrapper.events).toContainEqual(['split-selected-polygon'])
+
+    wrapper.unmount()
+  })
+
+  it('offers a temporary cutter-line sketch mode with status feedback for polygon splitting', async () => {
+    const wrapper = mountToolsPanel({
+      currentMode: 'simple_select',
+      selectedFeatureGeometryType: 'Polygon',
+      canUseSelectedGeometryTools: true,
+      canStartPolygonSplitSketch: true,
+      polygonSplitSketchActive: false,
+      geometryEditStatus: {
+        type: 'info',
+        message: '画一条穿过面的切割线',
+      },
+    })
+    await nextTick()
+
+    const startButton = wrapper.host.querySelector('[data-testid="draw-tool-start-polygon-split-sketch"]')
+    expect(startButton.disabled).toBe(false)
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-cancel-polygon-split-sketch"]')).toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="geometry-edit-status"]').textContent)
+      .toContain('画一条穿过面的切割线')
+
+    startButton.click()
+    await nextTick()
+    expect(wrapper.events).toContainEqual(['start-polygon-split-sketch'])
+
+    wrapper.props.polygonSplitSketchActive = true
+    await nextTick()
+
+    const cancelButton = wrapper.host.querySelector('[data-testid="draw-tool-cancel-polygon-split-sketch"]')
+    expect(cancelButton.disabled).toBe(false)
+    cancelButton.click()
+    await nextTick()
+
+    expect(wrapper.events).toContainEqual(['cancel-polygon-split-sketch'])
 
     wrapper.unmount()
   })

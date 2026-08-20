@@ -236,6 +236,7 @@ function mountEditableMapLibre(modelValue, options = {}) {
         @shape-edit-state-change="events.push(['shape-edit-state-change', $event])"
         @feature-box-select="events.push(['feature-box-select', $event])"
         @mode-change="events.push(['mode-change', $event])"
+        @geometry-edit-feedback="events.push(['geometry-edit-feedback', $event])"
       />
     `,
   })
@@ -1282,6 +1283,107 @@ describe('EditableMapLibre state flow', () => {
     expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', {
       featureIds: ['polygon-1', 'polygon-1-split-1'],
     })
+
+    wrapper.unmount()
+  })
+
+  it('draws a temporary cutter line to split a selected polygon without keeping the cutter feature', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false, name: '分区' },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [0, 0],
+            [4, 0],
+            [4, 4],
+            [0, 4],
+            [0, 0],
+          ]],
+        },
+      }],
+    })
+    await nextTick()
+
+    const didStart = wrapper.exposed.startPolygonSplitSketch('polygon-1')
+    expect(didStart).toBe(true)
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('draw_line_string')
+    expect(wrapper.events).toContainEqual([
+      'geometry-edit-feedback',
+      { type: 'info', code: 'polygonSplitSketchStarted' },
+    ])
+
+    wrapper.events.length = 0
+    const cutterFeature = {
+      id: 'temporary-cutter',
+      type: 'Feature',
+      properties: { visible: true, locked: false },
+      geometry: { type: 'LineString', coordinates: [[2, -1], [2, 5]] },
+    }
+    wrapper.draw.features.set('temporary-cutter', cutterFeature)
+    wrapper.map.emit('draw.create', { features: [cutterFeature] })
+
+    const eventNames = wrapper.events.map(([eventName]) => eventName)
+    expect(eventNames.indexOf('before-features-change')).toBeGreaterThanOrEqual(0)
+    expect(eventNames.indexOf('features-change')).toBeGreaterThan(eventNames.indexOf('before-features-change'))
+    const nextFeatures = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features
+    expect(nextFeatures).toHaveLength(2)
+    expect(nextFeatures.every((feature) => feature.geometry.type === 'Polygon')).toBe(true)
+    expect(nextFeatures.some((feature) => feature.id === 'temporary-cutter')).toBe(false)
+    expect(wrapper.events).toContainEqual([
+      'geometry-edit-feedback',
+      { type: 'success', code: 'polygonSplitSuccess' },
+    ])
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', {
+      featureIds: ['polygon-1', 'polygon-1-split-1'],
+    })
+
+    wrapper.unmount()
+  })
+
+  it('removes an invalid temporary cutter line and reports why polygon splitting failed', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [0, 0],
+            [4, 0],
+            [4, 4],
+            [0, 4],
+            [0, 0],
+          ]],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.exposed.startPolygonSplitSketch('polygon-1')
+    wrapper.events.length = 0
+
+    const cutterFeature = {
+      id: 'temporary-cutter',
+      type: 'Feature',
+      properties: { visible: true, locked: false },
+      geometry: { type: 'LineString', coordinates: [[5, 5], [6, 6]] },
+    }
+    wrapper.draw.features.set('temporary-cutter', cutterFeature)
+    wrapper.map.emit('draw.create', { features: [cutterFeature] })
+
+    expect(wrapper.events.some(([eventName]) => eventName === 'before-features-change')).toBe(false)
+    expect(wrapper.events.some(([eventName]) => eventName === 'features-change')).toBe(false)
+    expect(wrapper.draw.getAll().features.map((feature) => feature.id)).toEqual(['polygon-1'])
+    expect(wrapper.events).toContainEqual([
+      'geometry-edit-feedback',
+      { type: 'error', code: 'polygonSplitNoPieces' },
+    ])
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: ['polygon-1'] })
 
     wrapper.unmount()
   })

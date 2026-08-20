@@ -20,6 +20,7 @@ export function useGisFeatures(options = {}) {
     canCloseSelectedLine,
     canSplitSelectedLine,
     canSplitSelectedPolygon,
+    canStartPolygonSplitSketch,
     canConvertSelectedLineToPolygon,
     canDeleteSelection,
     canMoveSelectedFeatures,
@@ -351,6 +352,21 @@ export function useGisFeatures(options = {}) {
     currentMode.value = 'simple_select';
   }
 
+  async function handleStartPolygonSplitSketch() {
+    if (!await guardWrite()) return;
+    if (!canStartPolygonSplitSketch?.value || typeof editableMapRef?.value?.startPolygonSplitSketch !== 'function') return;
+    const didStart = editableMapRef.value.startPolygonSplitSketch(selectedFeatureId.value);
+    if (didStart === false) return;
+    currentMode.value = 'draw_line_string';
+  }
+
+  function handleCancelPolygonSplitSketch() {
+    if (typeof editableMapRef?.value?.cancelPolygonSplitSketch !== 'function') return;
+    const didCancel = editableMapRef.value.cancelPolygonSplitSketch();
+    if (didCancel === false) return;
+    currentMode.value = 'simple_select';
+  }
+
   async function handleDuplicateSelectedFeature() {
     if (!await guardWrite()) return;
     if (!canDuplicateSelectedFeature.value) return;
@@ -598,6 +614,8 @@ export function useGisFeatures(options = {}) {
     handleMoveSelectedVertex,
     handleSplitSelectedLine,
     handleSplitSelectedPolygon,
+    handleStartPolygonSplitSketch,
+    handleCancelPolygonSplitSketch,
     handleDeleteSelected,
     handleDeleteSelectedFeatures,
     handleClearAll,
