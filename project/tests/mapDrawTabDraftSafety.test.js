@@ -787,6 +787,13 @@ vi.mock('@/main/utils/drawMap/export.js', () => ({
 }))
 
 vi.mock('/data/国界面.kmz?url', () => ({ default: '/data/border.kmz' }))
+vi.mock('/data/gis/china_country.geojson?url', () => ({ default: '/data/gis/china_country.geojson' }))
+vi.mock('/data/gis/china_provinces.geojson?url', () => ({ default: '/data/gis/china_provinces.geojson' }))
+vi.mock('/data/gis/china_cities_simplified_balanced.geojson?url', () => ({ default: '/data/gis/china_cities_simplified_balanced.geojson' }))
+vi.mock('/data/gis/china_counties_simplified_light.geojson?url', () => ({ default: '/data/gis/china_counties_simplified_light.geojson' }))
+vi.mock('/data/gis/china_rivers_l1.geojson?url', () => ({ default: '/data/gis/china_rivers_l1.geojson' }))
+vi.mock('/data/gis/china_rivers_l2.geojson?url', () => ({ default: '/data/gis/china_rivers_l2.geojson' }))
+vi.mock('/data/gis/china_rivers_l3.geojson?url', () => ({ default: '/data/gis/china_rivers_l3.geojson' }))
 
 import { buildAutoDraftRecord } from '../src/main/utils/drawMap/draftStorage.js'
 import { readImportedLayerFile, splitFeatureCollectionByGeometryType } from '../src/main/utils/drawMap/export.js'
