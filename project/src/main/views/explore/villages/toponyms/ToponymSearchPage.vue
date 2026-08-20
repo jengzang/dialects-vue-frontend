@@ -135,13 +135,14 @@
               :key="item.id || item.name"
               class="toponym-search-page__result-card glass-card"
               data-interactive="true"
+              :data-active="selectedItem?.id === item.id"
               type="button"
               :aria-pressed="selectedItem?.id === item.id"
               :disabled="!item.id"
               @click="handleSelectResult(item)"
             >
-              <strong>{{ item.name || unknownLabel }}</strong>
-              <span>{{ item.id || unknownLabel }}</span>
+              <strong class="main-card-title">{{ item.name || unknownLabel }}</strong>
+              <span class="main-card-meta">{{ item.id || unknownLabel }}</span>
             </button>
           </div>
         </template>
@@ -177,7 +178,7 @@
           </button>
         </div>
 
-        <dl v-else class="toponym-search-page__detail-list glass-subpanel">
+        <dl v-else class="toponym-search-page__detail-list main-detail-list glass-subpanel">
           <div class="toponym-search-page__detail-source">
             <dt>{{ t('villages.pages.toponymSearch.detail.source') }}</dt>
             <dd>{{ t('villages.pages.toponymSearch.detail.sourceName') }}</dd>
@@ -524,54 +525,14 @@ function formatCoordinates(longitude, latitude) {
   gap: 8px;
   padding: 16px;
   text-align: left;
-
-  &[aria-pressed='true'] {
-    border-color: var(--color-primary);
-  }
-
-  strong {
-    color: var(--text-primary);
-    font-size: 16px;
-  }
-
-  span {
-    max-width: 100%;
-    color: var(--text-secondary);
-    font-family: var(--font-monospace);
-    font-size: 12px;
-
-    @include text-truncate;
-  }
 }
 
 .toponym-search-page__detail-list {
-  @include flex-col;
-  gap: 12px;
-  margin: 0;
   padding: 14px;
-
-  div {
-    @include flex-col;
-    gap: 4px;
-  }
-
-  dt {
-    color: var(--text-secondary);
-    font-size: 12px;
-  }
-
-  dd {
-    margin: 0;
-    color: var(--text-primary);
-    font-size: 14px;
-    line-height: 1.55;
-    overflow-wrap: anywhere;
-  }
 }
 
 .toponym-search-page__detail-source {
   padding-block-end: 4px;
-  border-block-end: 1px solid var(--border-glass-subtle);
 }
 
 @media (max-aspect-ratio: 1 / 1) {

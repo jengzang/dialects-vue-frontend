@@ -23,6 +23,8 @@ function functionBody(source, functionName) {
 describe('toponyms page shell', () => {
   it('builds the independent toponym catalog search page with shared glass and selector primitives', () => {
     const page = readSource('src/main/views/explore/villages/toponyms/ToponymSearchPage.vue');
+    const surfaces = readSource('src/styles/global/_surfaces.scss');
+    const mainLayout = readSource('src/styles/main/_layout.scss');
 
     expect(page).toContain('getToponymSearch');
     expect(page).toContain("import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'");
@@ -34,6 +36,12 @@ describe('toponyms page shell', () => {
     expect(page).toContain('class="toponym-search-page__result-grid main-card-grid"');
     expect(page).toContain('class="toponym-search-page__result-card glass-card"');
     expect(page).toContain('data-interactive="true"');
+    expect(page).toContain(':data-active="selectedItem?.id === item.id"');
+    expect(page).toContain('class="main-card-title"');
+    expect(page).toContain('class="main-card-meta"');
+    expect(surfaces).toContain(".glass-card[data-active='true']");
+    expect(mainLayout).toContain('.main-card-title');
+    expect(mainLayout).toContain('.main-card-meta');
     expect(page).toContain('<SimpleSelectDropdown');
     expect(page).toContain('<MultiSelectDropdown');
     expect(page).toContain('v-model="selectedPlaceTypeCodes"');
@@ -51,6 +59,8 @@ describe('toponyms page shell', () => {
     expect(page).not.toContain('watch([query');
     expect(page).not.toContain('main-glass');
     expect(page).not.toContain('main-search-field');
+    expect(page).not.toContain("&[aria-pressed='true']");
+    expect(page).not.toContain('font-family: var(--font-monospace)');
     expect(page).not.toMatch(/@media\s*\((?:max|min)-width/);
   });
 
@@ -67,7 +77,9 @@ describe('toponyms page shell', () => {
     expect(page).toContain('selectedLocalDetail');
     expect(page).toContain('detailsLoading');
     expect(page).toContain('detailsError');
-    expect(page).toContain('class="toponym-search-page__detail-list glass-subpanel"');
+    expect(page).toContain('class="toponym-search-page__detail-list main-detail-list glass-subpanel"');
+    expect(page).not.toContain('dt {');
+    expect(page).not.toContain('dd {');
     expect(page).toContain('@click="handleViewDistribution"');
     expect(searchBody).not.toContain('getToponymDetails');
     expect(detailBody).toContain('const id = item?.id');
@@ -110,6 +122,10 @@ describe('toponyms page shell', () => {
 
     expect(page).toContain('<ToponymSearchBar');
     expect(chart).toContain('<ToponymLayerControls');
+    expect(chart).toContain('class="toponym-distribution-chart__status main-list-state glass-subpanel"');
+    expect(chart).not.toContain('background: var(--surface-panel-strong)');
+    expect(chart).not.toContain('border: 1px solid var(--border-glass)');
+    expect(chart).not.toContain('border-radius: var(--radius-sm2)');
     expect(page).toContain('<ToponymResultsPanel');
     expect(page).toContain(':name-tree="nameTree"');
     expect(page).toContain(':name-tree-meta="nameTreeMeta"');

@@ -61,6 +61,10 @@
     inset 0 1px 0 var(--text-white);
 }
 
+.glass-card[data-active='true'] {
+  border-color: var(--action-active-border);
+}
+
 .glass-card[aria-hidden='true'] {
   cursor: default;
 }

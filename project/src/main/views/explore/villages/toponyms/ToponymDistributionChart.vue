@@ -8,9 +8,9 @@
     />
     <div
       v-if="statusText"
-      class="toponym-distribution-chart__status"
+      class="toponym-distribution-chart__status main-list-state glass-subpanel"
     >
-      {{ statusText }}
+      <span class="main-list-state-text">{{ statusText }}</span>
     </div>
 
     <AppModal
@@ -386,13 +386,6 @@ defineExpose({ showConfigModal });
     max-inline-size: 340px;
     block-size: fit-content;
     padding: 8px 10px;
-    border: 1px solid var(--border-glass);
-    border-radius: var(--radius-sm2);
-    background: var(--surface-panel-strong);
-    color: var(--text-secondary);
-    font-size: 13px;
-    line-height: 1.5;
-    text-align: center;
     pointer-events: none;
   }
 }
