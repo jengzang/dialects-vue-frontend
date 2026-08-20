@@ -8,7 +8,7 @@
     </p>
 
     <template v-else>
-      <div class="toponym-detail-panel__selected">
+      <div class="toponym-detail-panel__selected glass-subpanel">
         <span>{{ t('villages.pages.toponyms.detail.selectedPoint') }}</span>
         <strong>{{ formatCoordinates(selectedPoint.coordinates) }}</strong>
       </div>
@@ -67,7 +67,7 @@
 
       <dl
         v-if="localDetail"
-        class="toponym-detail-panel__list"
+        class="toponym-detail-panel__list main-detail-list glass-subpanel"
       >
         <div class="toponym-detail-panel__source-label">
           <dt>{{ t('villages.pages.toponyms.detail.localSource') }}</dt>
@@ -101,7 +101,7 @@
 
         <dl
           v-if="officialDetail"
-          class="toponym-detail-panel__list"
+          class="toponym-detail-panel__list main-detail-list glass-subpanel"
         >
           <div>
             <dt>{{ t('villages.pages.toponyms.detail.officialArea') }}</dt>
@@ -214,9 +214,6 @@ function formatCoordinates(coordinates) {
     @include flex-col;
     gap: 4px;
     padding: 10px;
-    border: 1px solid var(--border-glass-subtle);
-    border-radius: var(--radius-sm2);
-    background: var(--surface-panel-subtle);
 
     span {
       color: var(--text-secondary);
@@ -231,27 +228,7 @@ function formatCoordinates(coordinates) {
   }
 
   &__list {
-    @include flex-col;
-    gap: 8px;
-    margin: 0;
-
-    div {
-      @include flex-col;
-      gap: 3px;
-    }
-
-    dt {
-      color: var(--text-secondary);
-      font-size: 12px;
-    }
-
-    dd {
-      margin: 0;
-      color: var(--text-primary);
-      font-size: 14px;
-      line-height: 1.5;
-      word-break: break-word;
-    }
+    padding: 10px;
   }
 
   &__actions {

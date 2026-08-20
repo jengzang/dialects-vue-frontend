@@ -106,6 +106,7 @@ describe('toponyms page shell', () => {
     const layerControls = readSource('src/main/views/explore/villages/toponyms/ToponymLayerControls.vue');
     const resultsPanel = readSource('src/main/views/explore/villages/toponyms/ToponymResultsPanel.vue');
     const detailPanel = readSource('src/main/views/explore/villages/toponyms/ToponymDetailPanel.vue');
+    const mainStates = readSource('src/styles/main/_states.scss');
 
     expect(page).toContain('<ToponymSearchBar');
     expect(chart).toContain('<ToponymLayerControls');
@@ -147,6 +148,13 @@ describe('toponyms page shell', () => {
     expect(resultsPanel).not.toContain('border: 1px solid var(--border-glass-subtle)');
     expect(detailPanel).toContain("emit('request-local-detail')");
     expect(detailPanel).toContain("emit('request-official-detail')");
+    expect(detailPanel).toContain('class="toponym-detail-panel__selected glass-subpanel"');
+    expect(detailPanel).toContain('class="toponym-detail-panel__list main-detail-list glass-subpanel"');
+    expect(detailPanel).not.toContain('background: var(--surface-panel-subtle)');
+    expect(detailPanel).not.toContain('border: 1px solid var(--border-glass-subtle)');
+    expect(detailPanel).not.toContain('dt {');
+    expect(detailPanel).not.toContain('dd {');
+    expect(mainStates).toContain('.main-detail-list');
   });
 
   it('loads full point results and only fetches name trees on explicit request', () => {

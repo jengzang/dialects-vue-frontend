@@ -34,6 +34,30 @@
   line-height: 1.7;
 }
 
+.main-detail-list {
+  @include flex-col;
+  gap: 8px;
+  margin: 0;
+
+  > div {
+    @include flex-col;
+    gap: 3px;
+  }
+
+  dt {
+    color: var(--text-secondary);
+    font-size: 12px;
+  }
+
+  dd {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+}
+
 .result-panel-vue {
   margin-bottom: 50px;
 }
