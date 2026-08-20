@@ -139,6 +139,12 @@ describe('toponyms page shell', () => {
     expect(resultsPanel).toContain('toponym-results-panel__name-tree');
     expect(resultsPanel).toContain('flattenNameTreeNodes');
     expect(resultsPanel).toContain('!nameTreeLoading && !nameTreeRows.length');
+    expect(resultsPanel).toContain('class="toponym-results-panel__tree-node glass-subpanel"');
+    expect(resultsPanel).toContain('class="glass-button toponym-results-panel__tree-toggle"');
+    expect(resultsPanel).toContain('data-size="compact"');
+    expect(resultsPanel).not.toContain('background: var(--surface-panel-subtle)');
+    expect(resultsPanel).not.toContain('background: var(--surface-glass-button)');
+    expect(resultsPanel).not.toContain('border: 1px solid var(--border-glass-subtle)');
     expect(detailPanel).toContain("emit('request-local-detail')");
     expect(detailPanel).toContain("emit('request-official-detail')");
   });

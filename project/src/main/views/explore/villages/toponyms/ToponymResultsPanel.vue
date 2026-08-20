@@ -84,13 +84,14 @@
           <li
             v-for="row in nameTreeRows"
             :key="row.key"
-            class="toponym-results-panel__tree-node"
+            class="toponym-results-panel__tree-node glass-subpanel"
             :style="getTreeRowStyle(row)"
           >
             <div class="toponym-results-panel__tree-row-main">
               <button
                 v-if="row.expandable"
-                class="toponym-results-panel__tree-toggle"
+                class="glass-button toponym-results-panel__tree-toggle"
+                data-size="compact"
                 type="button"
                 :aria-label="t('villages.pages.toponyms.nameTree.expand')"
                 :disabled="row.node.loading"
@@ -320,9 +321,6 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
     gap: 3px;
     padding: 8px;
     padding-inline-start: calc(8px + var(--toponym-tree-indent, 0px));
-    border: 1px solid var(--border-glass-subtle);
-    border-radius: var(--radius-sm2);
-    background: var(--surface-panel-subtle);
 
     p {
       margin: 0;
@@ -353,25 +351,10 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
   }
 
   &__tree-toggle {
-    @include flex-center;
     flex: 0 0 22px;
     inline-size: 22px;
     block-size: 22px;
     padding: 0;
-    border: 1px solid var(--border-glass-subtle);
-    border-radius: var(--radius-sm);
-    background: var(--surface-glass-button);
-    color: var(--text-primary);
-    font: inherit;
-    cursor: pointer;
-
-    &:hover {
-      background: var(--surface-glass-button-hover);
-    }
-
-    &:disabled {
-      @include disabled-state;
-    }
   }
 
   &__names {
