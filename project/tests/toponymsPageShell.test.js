@@ -124,6 +124,11 @@ describe('toponyms page shell', () => {
     expect(searchBar).not.toContain('placeTypeCode');
     expect(searchBar).not.toContain('placeTypeOptions');
     expect(searchBar).not.toContain('toponyms.search.placeType');
+    expect(layerControls).toContain("import CheckBox from '@/components/selector/CheckBox.vue'");
+    expect(layerControls).toContain('<CheckBox');
+    expect(layerControls).not.toContain('<input');
+    expect(layerControls).not.toContain('accent-color');
+    expect(layerControls).not.toContain('toponym-layer-controls__toggle--active');
     expect(layerControls).toContain('riverL1');
     expect(layerControls).toContain('riverL2');
     expect(layerControls).toContain('riverL3');
