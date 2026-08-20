@@ -511,6 +511,18 @@ export function useGisMapCore(options = {}) {
     && selectedFeature.value?.geometry?.type === 'Polygon'
   ));
 
+  const canMergeSelectedPolygons = computed(() => {
+    if (!canModifyActiveLayer.value || selectedFeatureIds.value.length < 2) return false;
+    const selectedIds = new Set(selectedFeatureIds.value);
+    const selectedFeatures = activeLayerFeatures.value.filter((feature) => selectedIds.has(getFeatureId(feature)));
+    return selectedFeatures.length >= 2
+      && selectedFeatures.every((feature) => (
+        feature.geometry?.type === 'Polygon'
+        && feature.properties?.visible !== false
+        && feature.properties?.locked !== true
+      ));
+  });
+
   const geometryQualitySummary = computed(() => {
     const issues = [];
     activeLayerFeatures.value.forEach((feature) => {
@@ -979,6 +991,7 @@ export function useGisMapCore(options = {}) {
     selectedPolygonSplitLineFeature,
     canSplitSelectedPolygon,
     canStartPolygonSplitSketch,
+    canMergeSelectedPolygons,
     canConvertSelectedLineToPolygon,
     geometryQualitySummary,
     canDeleteSelection,

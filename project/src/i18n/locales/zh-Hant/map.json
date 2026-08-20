@@ -570,6 +570,7 @@
       "splitPolygon": "分割面",
       "drawPolygonSplitLine": "畫線分割面",
       "cancelPolygonSplitLine": "取消畫線",
+      "mergePolygons": "合併面",
       "lineToPolygon": "閉合線轉面",
       "duplicateLayer": "複製圖層",
       "renameLayer": "重命名",

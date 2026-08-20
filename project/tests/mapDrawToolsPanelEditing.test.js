@@ -62,6 +62,7 @@ function mountToolsPanel(overrides = {}) {
     canSplitSelectedLine: false,
     canSplitSelectedPolygon: false,
     canStartPolygonSplitSketch: false,
+    canMergeSelectedPolygons: false,
     polygonSplitSketchActive: false,
     geometryEditStatus: null,
     canDeleteSelection: false,
@@ -98,6 +99,7 @@ function mountToolsPanel(overrides = {}) {
         @split-selected-polygon="events.push(['split-selected-polygon'])"
         @start-polygon-split-sketch="events.push(['start-polygon-split-sketch'])"
         @cancel-polygon-split-sketch="events.push(['cancel-polygon-split-sketch'])"
+        @merge-selected-polygons="events.push(['merge-selected-polygons'])"
         @move-selected-vertex="events.push(['move-selected-vertex', $event])"
         @delete-selected="events.push(['delete-selected'])"
       />
@@ -444,6 +446,52 @@ describe('MapDrawToolsPanel editing affordances', () => {
     await nextTick()
 
     expect(wrapper.events).toContainEqual(['cancel-polygon-split-sketch'])
+
+    wrapper.unmount()
+  })
+
+  it('enables polygon merging for multiple selected polygon features', async () => {
+    const wrapper = mountToolsPanel({
+      currentMode: 'simple_select',
+      selectedFeatureGeometryType: 'Polygon',
+      selectedFeatureIds: ['feature-1', 'feature-2'],
+      canUseSelectedGeometryTools: false,
+      canMergeSelectedPolygons: true,
+    })
+    await nextTick()
+
+    const mergeButton = wrapper.host.querySelector('[data-testid="draw-tool-merge-polygons"]')
+    expect(mergeButton.disabled).toBe(false)
+
+    mergeButton.click()
+    await nextTick()
+
+    expect(wrapper.events).toContainEqual(['merge-selected-polygons'])
+
+    wrapper.props.canMergeSelectedPolygons = false
+    await nextTick()
+    expect(mergeButton.disabled).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('labels merged MultiPolygon features as polygon features', async () => {
+    const wrapper = mountToolsPanel({
+      featureItems: [{
+        id: 'multi-polygon-1',
+        label: '合并面',
+        geometryType: 'MultiPolygon',
+        visible: true,
+        locked: false,
+      }],
+      selectedFeatureGeometryType: 'MultiPolygon',
+      selectedFeatureId: 'multi-polygon-1',
+      selectedFeatureIds: ['multi-polygon-1'],
+    })
+    await nextTick()
+
+    expect(wrapper.host.querySelector('.draw-feature-row-meta').textContent)
+      .toContain('map.drawTab.geometry.polygon')
 
     wrapper.unmount()
   })

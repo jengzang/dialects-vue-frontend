@@ -147,6 +147,7 @@
           :polygon-split-line-options="polygonSplitLineOptions"
           :selected-polygon-split-line-id="selectedPolygonSplitLineId"
           :can-start-polygon-split-sketch="canStartPolygonSplitSketch"
+          :can-merge-selected-polygons="canMergeSelectedPolygons"
           :polygon-split-sketch-active="polygonSplitSketchActive"
           :geometry-edit-status="geometryEditStatus"
           :can-delete-selected-vertices="canDeleteSelectedVertices"
@@ -188,6 +189,7 @@
           @split-selected-polygon="handleSplitSelectedPolygon"
           @start-polygon-split-sketch="handleStartPolygonSplitSketch"
           @cancel-polygon-split-sketch="handleCancelPolygonSplitSketch"
+          @merge-selected-polygons="handleMergeSelectedPolygons"
           @convert-selected-line-to-polygon="handleConvertSelectedLineToPolygon"
           @move-selected-vertex="handleMoveSelectedVertex"
           @undo="undoHistory"
@@ -818,7 +820,7 @@ const {
   canModifyActiveLayer, canEditSelectedShape, canDeleteSelection, canDuplicateSelectedFeature,
   canUseSelectedGeometryTools, canCloseSelectedLine, canSplitSelectedLine,
   polygonSplitLineOptions, selectedPolygonSplitLineFeature, canSplitSelectedPolygon,
-  canStartPolygonSplitSketch, canConvertSelectedLineToPolygon, geometryQualitySummary,
+  canStartPolygonSplitSketch, canMergeSelectedPolygons, canConvertSelectedLineToPolygon, geometryQualitySummary,
   canUseFeatureBoxSelect, canMoveSelectedFeatures, selectedLayerLabel,
   createEmptyLayer, getFeatureId, getFeatureLabel, getLayerLabel,
   syncLayerIdSeedFromLayers, applyLayerPropertyToFeatures,
@@ -871,7 +873,7 @@ const gisFeatures = useGisFeatures({
   canModifyActiveLayer, canDuplicateSelectedFeature,
   canEditSelectedShape, canDeleteSelection, canMoveSelectedFeatures,
   canUseSelectedGeometryTools, canCloseSelectedLine, canSplitSelectedLine,
-  canSplitSelectedPolygon, canStartPolygonSplitSketch, canConvertSelectedLineToPolygon,
+  canSplitSelectedPolygon, canStartPolygonSplitSketch, canMergeSelectedPolygons, canConvertSelectedLineToPolygon,
   setFeatureSelection, clearFeatureSelection,
   syncAllLayersAfterMutation, syncFeatureSelectionToMap,
   resetDrawSelectionMode, commitHistory,
@@ -889,6 +891,7 @@ const {
   handleReverseSelectedGeometry, handleSimplifySelectedGeometry, handleCloseSelectedLine, handleConvertSelectedLineToPolygon,
   handleMoveSelectedVertex, handleSplitSelectedLine, handleSplitSelectedPolygon,
   handleStartPolygonSplitSketch, handleCancelPolygonSplitSketch,
+  handleMergeSelectedPolygons,
   handleDeleteSelected, handleDeleteSelectedFeatures, handleClearAll,
   updateFeatureProperty, updateSelectedFeatureProperty,
   updateSelectedFeaturesProperty,

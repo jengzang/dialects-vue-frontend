@@ -212,6 +212,17 @@
               </button>
             </div>
             <button
+              v-if="selectedFeatureGeometryType === 'Polygon'"
+              class="glass-button"
+              data-variant="secondary"
+              data-testid="draw-tool-merge-polygons"
+              type="button"
+              :disabled="!canMergeSelectedPolygons"
+              @click="$emit('merge-selected-polygons')"
+            >
+              {{ t('map.drawTab.buttons.mergePolygons') }}
+            </button>
+            <button
               class="glass-button"
               data-variant="secondary"
               data-testid="draw-tool-undo"
@@ -912,6 +923,7 @@ const props = defineProps({
   polygonSplitLineOptions: { type: Array, default: () => [] },
   selectedPolygonSplitLineId: { type: String, default: '' },
   canStartPolygonSplitSketch: { type: Boolean, default: false },
+  canMergeSelectedPolygons: { type: Boolean, default: false },
   polygonSplitSketchActive: { type: Boolean, default: false },
   geometryEditStatus: { type: Object, default: null },
   selectedFeatureBatchName: { type: String, default: '' },
@@ -966,6 +978,7 @@ const emit = defineEmits([
   'split-selected-polygon',
   'start-polygon-split-sketch',
   'cancel-polygon-split-sketch',
+  'merge-selected-polygons',
   'convert-selected-line-to-polygon',
   'move-selected-vertex',
   'undo',
@@ -993,7 +1006,7 @@ const emit = defineEmits([
 
 const getGeometryLabel = (geometryType) => {
   if (geometryType === 'Point') return t('map.drawTab.geometry.point')
-  if (geometryType === 'Polygon') return t('map.drawTab.geometry.polygon')
+  if (geometryType === 'Polygon' || geometryType === 'MultiPolygon') return t('map.drawTab.geometry.polygon')
   return t('map.drawTab.geometry.line')
 }
 

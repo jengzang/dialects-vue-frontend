@@ -570,6 +570,7 @@
       "splitPolygon": "Split Polygon",
       "drawPolygonSplitLine": "Draw Cutter Line",
       "cancelPolygonSplitLine": "Cancel Cutter",
+      "mergePolygons": "Merge Polygons",
       "lineToPolygon": "Closed Line to Polygon",
       "duplicateLayer": "Duplicate Layer",
       "renameLayer": "Rename",

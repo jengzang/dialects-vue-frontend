@@ -1,5 +1,6 @@
 import { showConfirm, showSuccess } from '@/utils/ui/message.js';
 import { useI18n } from 'vue-i18n';
+import { featureCollection, union } from '@turf/turf';
 
 export function useGisFeatures(options = {}) {
   const { t } = useI18n();
@@ -21,6 +22,7 @@ export function useGisFeatures(options = {}) {
     canSplitSelectedLine,
     canSplitSelectedPolygon,
     canStartPolygonSplitSketch,
+    canMergeSelectedPolygons,
     canConvertSelectedLineToPolygon,
     canDeleteSelection,
     canMoveSelectedFeatures,
@@ -224,6 +226,38 @@ export function useGisFeatures(options = {}) {
       ));
   }
 
+  function cloneMergedPolygonFeature(baseFeature, geometry) {
+    const id = getFeatureId(baseFeature);
+    return {
+      ...baseFeature,
+      id,
+      properties: {
+        ...(baseFeature?.properties ?? {}),
+        id,
+      },
+      geometry: {
+        ...geometry,
+        coordinates: structuredClone(geometry.coordinates),
+      },
+    };
+  }
+
+  function unionPolygonFeatures(features = []) {
+    const validFeatures = features.filter((feature) => (
+      feature?.geometry?.type === 'Polygon'
+      && isValidPolygonRings(feature.geometry.coordinates ?? [])
+    ));
+    if (validFeatures.length < 2) return null;
+
+    try {
+      const merged = union(featureCollection(validFeatures));
+      if (!merged?.geometry || !['Polygon', 'MultiPolygon'].includes(merged.geometry.type)) return null;
+      return merged.geometry;
+    } catch {
+      return null;
+    }
+  }
+
   async function mutateSelectedGeometry(buildNext) {
     if (!await guardWrite()) return;
     if (!canModifyActiveLayer.value || !canEditSelectedShape.value || !canUseSelectedGeometryTools?.value) return;
@@ -350,6 +384,39 @@ export function useGisFeatures(options = {}) {
     const didSplit = editableMapRef.value.splitPolygonWithLine(selectedFeatureId.value, cutterFeature, { commitHistory: false });
     if (didSplit === false) return;
     currentMode.value = 'simple_select';
+  }
+
+  async function handleMergeSelectedPolygons() {
+    if (!await guardWrite()) return;
+    if (!canMergeSelectedPolygons?.value || !canModifyActiveLayer.value || !activeLayer.value) return;
+    const fc = activeLayer.value.featureCollection ?? emptyFeatureCollection();
+    const selectedIds = new Set(selectedFeatureIds.value);
+    const selectedPolygons = (fc.features ?? [])
+      .filter((feature) => selectedIds.has(getFeatureId(feature)))
+      .filter(isFeatureEditableForMutation);
+    if (selectedPolygons.length < 2) return;
+
+    const mergedGeometry = unionPolygonFeatures(selectedPolygons);
+    if (!mergedGeometry) return;
+
+    const baseFeature = selectedPolygons[0];
+    const mergedId = getFeatureId(baseFeature);
+    const mergedFeature = cloneMergedPolygonFeature(baseFeature, mergedGeometry);
+    let insertedMergedFeature = false;
+    const nextFeatures = (fc.features ?? []).flatMap((feature) => {
+      if (!selectedIds.has(getFeatureId(feature))) return [feature];
+      if (insertedMergedFeature) return [];
+      insertedMergedFeature = true;
+      return [mergedFeature];
+    });
+
+    if (!insertedMergedFeature) return;
+    commitHistory();
+    activeLayer.value.featureCollection = { ...fc, features: nextFeatures };
+    setFeatureSelection([mergedId], mergedId);
+    currentMode.value = 'simple_select';
+    syncAllLayersAfterMutation();
+    editableMapRef?.value?.selectFeature?.(mergedId, { directEdit: false });
   }
 
   async function handleStartPolygonSplitSketch() {
@@ -616,6 +683,7 @@ export function useGisFeatures(options = {}) {
     handleSplitSelectedPolygon,
     handleStartPolygonSplitSketch,
     handleCancelPolygonSplitSketch,
+    handleMergeSelectedPolygons,
     handleDeleteSelected,
     handleDeleteSelectedFeatures,
     handleClearAll,
