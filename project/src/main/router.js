@@ -65,7 +65,7 @@ const routes = [
               compare: ['sub'],
               result: [],
               map: ['sub', 'feature', 'locations', 'regions', 'regionMode', 'openPanel', 'phonology'],
-              pho: ['sub', 'loc', 'feature', 'h', 'v', 'c'],
+              pho: ['sub', 'mloc', 'cloc', 'eloc', 'feature', 'h', 'v', 'c'],
               about: ['sub'],
               source: [],
               privacy: [],

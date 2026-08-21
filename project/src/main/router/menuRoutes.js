@@ -25,10 +25,10 @@ export const menuRoutes = [
         base: [],
         variantKey: 'section',
         variants: {
-          matrix: ['loc'],
-          custom: ['loc', 'feature', 'h', 'v', 'c'],
+          matrix: ['mloc'],
+          custom: ['cloc', 'feature', 'h', 'v', 'c'],
           count: [],
-          evolution: ['loc']
+          evolution: ['eloc']
         }
       }
     }
@@ -68,7 +68,7 @@ export const menuRoutes = [
           char: [],
           zhonggu: [],
           tone: [],
-          phonetic: ['loc']
+          phonetic: ['ploc']
         }
       }
     }

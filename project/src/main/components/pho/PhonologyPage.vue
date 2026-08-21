@@ -105,7 +105,7 @@ const serializeMatrixLocationQuery = (locations) => {
     .map((location) => encodeQueryValueBase64Url(location))
 }
 
-const { state: locationQuery, set: setLocationQuery } = useRouteQueryState('loc', {
+const { state: locationQuery, set: setLocationQuery } = useRouteQueryState('mloc', {
   defaultValue: [],
   parse: parseMatrixLocationQuery,
   serialize: serializeMatrixLocationQuery,

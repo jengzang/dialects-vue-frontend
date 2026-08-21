@@ -205,6 +205,8 @@ const openHomophoneLexicon = () => {
   showLexiconModal.value = true
 };
 
+const PHONOLOGY_LOC_KEY_BY_SECTION = { matrix: 'mloc', evolution: 'eloc' }
+
 const goToPhonology = (section) => {
   const loc = locationText.value
   if (!loc) return
@@ -222,7 +224,7 @@ const goToPhonology = (section) => {
 
   router.push({
     path: buildLocalePath(resolveRouteLocale(route), `/menu/pho/${section}`),
-    query: { loc: encodeQueryValueBase64Url(loc) }
+    query: { [PHONOLOGY_LOC_KEY_BY_SECTION[section]]: encodeQueryValueBase64Url(loc) }
   })
 };
 </script>

@@ -252,7 +252,7 @@ const serializeCustomLocationQuery = (locations) => {
     .map((location) => encodeQueryValueBase64Url(location))
 }
 
-const locationQueryState = useRouteQueryState('loc', {
+const locationQueryState = useRouteQueryState('cloc', {
   defaultValue: [],
   parse: parseCustomLocationQuery,
   serialize: serializeCustomLocationQuery,

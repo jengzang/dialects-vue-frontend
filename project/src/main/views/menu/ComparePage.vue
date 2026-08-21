@@ -727,7 +727,7 @@ const serializeCompareLocationQuery = (locations) => {
     .map((location) => encodeQueryValueBase64Url(location))
 }
 
-const { state: locationQuery, set: setLocationQuery } = useRouteQueryState('loc', {
+const { state: locationQuery, set: setLocationQuery } = useRouteQueryState('ploc', {
   defaultValue: [],
   parse: parseCompareLocationQuery,
   serialize: serializeCompareLocationQuery,

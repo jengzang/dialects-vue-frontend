@@ -314,7 +314,7 @@ const serializeEvolutionLocationQuery = (locations) => {
     .map((location) => encodeQueryValueBase64Url(location))
 }
 
-const { state: locationQuery, set: setLocationQuery } = useRouteQueryState('loc', {
+const { state: locationQuery, set: setLocationQuery } = useRouteQueryState('eloc', {
   defaultValue: [],
   parse: parseEvolutionLocationQuery,
   serialize: serializeEvolutionLocationQuery,
