@@ -162,10 +162,14 @@
           :can-redo="canRedoHistory"
           :can-edit-shape="canEditSelectedShape"
           :can-use-selected-geometry-tools="canUseSelectedGeometryTools"
+          :selected-buffer-distance-km="selectedBufferDistanceKm"
+          :can-buffer-selected-feature="canBufferSelectedFeature"
           :can-close-selected-line="canCloseSelectedLine"
           :can-split-selected-line="canSplitSelectedLine"
           :can-split-selected-polygon="canSplitSelectedPolygon"
           :can-convert-selected-line-to-polygon="canConvertSelectedLineToPolygon"
+          :can-intersect-selected-polygons="canIntersectSelectedPolygons"
+          :can-difference-selected-polygons="canDifferenceSelectedPolygons"
           :geometry-quality-summary="geometryQualitySummary"
           :can-delete-selection="canDeleteSelection"
           :can-duplicate-feature="canDuplicateSelectedFeature"
@@ -183,6 +187,8 @@
           @duplicate-feature="handleDuplicateSelectedFeature"
           @reverse-selected-geometry="handleReverseSelectedGeometry"
           @simplify-selected-geometry="handleSimplifySelectedGeometry"
+          @update:selected-buffer-distance-km="selectedBufferDistanceKm = $event"
+          @buffer-selected-feature="handleBufferSelectedFeature"
           @close-selected-line="handleCloseSelectedLine"
           @split-selected-line="handleSplitSelectedLine"
           @update:selected-polygon-split-line-id="selectedPolygonSplitLineId = $event"
@@ -190,6 +196,8 @@
           @start-polygon-split-sketch="handleStartPolygonSplitSketch"
           @cancel-polygon-split-sketch="handleCancelPolygonSplitSketch"
           @merge-selected-polygons="handleMergeSelectedPolygons"
+          @intersect-selected-polygons="handleIntersectSelectedPolygons"
+          @difference-selected-polygons="handleDifferenceSelectedPolygons"
           @convert-selected-line-to-polygon="handleConvertSelectedLineToPolygon"
           @move-selected-vertex="handleMoveSelectedVertex"
           @undo="undoHistory"
@@ -826,7 +834,7 @@ const {
   isDrawingPanelOpen, isLayersPanelOpen, isMapFullscreen,
   selectedFeatureBatchName, selectedFeatureBatchPropertyKey, selectedFeatureBatchPropertyValue,
   selectedPolygonSplitLineId, polygonSplitSketchActive, geometryEditStatus,
-  snappingEnabled, snapTolerance, snapGridSize,
+  snappingEnabled, snapTolerance, snapGridSize, selectedBufferDistanceKm,
   mapStyleOptions, activeLayer, activeLayerFeatureCollection, featureCount,
   activeLayerFeatures, selectedFeature, activeLayerFeatureIdSet,
   activeLayerFeatureItems, activeLayerSelectableFeatureIds,
@@ -834,9 +842,10 @@ const {
   canApplySelectedFeatureBatchProperty, featureMoveLayerOptions,
   selectedEditorProperties, selectedEditorFeatureId, selectedEditorGeometryType,
   canModifyActiveLayer, canEditSelectedShape, canDeleteSelection, canDuplicateSelectedFeature,
-  canUseSelectedGeometryTools, canCloseSelectedLine, canSplitSelectedLine,
+  canUseSelectedGeometryTools, canBufferSelectedFeature, canCloseSelectedLine, canSplitSelectedLine,
   polygonSplitLineOptions, selectedPolygonSplitLineFeature, canSplitSelectedPolygon,
-  canStartPolygonSplitSketch, canMergeSelectedPolygons, canConvertSelectedLineToPolygon, geometryQualitySummary,
+  canStartPolygonSplitSketch, canMergeSelectedPolygons, canIntersectSelectedPolygons, canDifferenceSelectedPolygons,
+  canConvertSelectedLineToPolygon, geometryQualitySummary,
   canUseFeatureBoxSelect, canMoveSelectedFeatures, selectedLayerLabel,
   createEmptyLayer, getFeatureId, getFeatureLabel, getLayerLabel,
   syncLayerIdSeedFromLayers, applyLayerPropertyToFeatures,
@@ -888,8 +897,9 @@ const gisFeatures = useGisFeatures({
   editableMapRef, currentMode, getFeatureId,
   canModifyActiveLayer, canDuplicateSelectedFeature,
   canEditSelectedShape, canDeleteSelection, canMoveSelectedFeatures,
-  canUseSelectedGeometryTools, canCloseSelectedLine, canSplitSelectedLine,
-  canSplitSelectedPolygon, canStartPolygonSplitSketch, canMergeSelectedPolygons, canConvertSelectedLineToPolygon,
+  canUseSelectedGeometryTools, canBufferSelectedFeature, canCloseSelectedLine, canSplitSelectedLine,
+  canSplitSelectedPolygon, canStartPolygonSplitSketch, canMergeSelectedPolygons,
+  canIntersectSelectedPolygons, canDifferenceSelectedPolygons, canConvertSelectedLineToPolygon,
   setFeatureSelection, clearFeatureSelection,
   syncAllLayersAfterMutation, syncFeatureSelectionToMap,
   resetDrawSelectionMode, commitHistory,
@@ -899,16 +909,18 @@ const gisFeatures = useGisFeatures({
   canApplySelectedFeatureBatchProperty,
   selectedFeatureBatchName, selectedFeatureBatchPropertyKey, selectedFeatureBatchPropertyValue,
   featureMoveLayerOptions,
+  selectedBufferDistanceKm,
   isAuthenticated, onAuthRequired: guardWrite,
   onGeometryEditFeedback: handleGeometryEditFeedback,
 });
 
 const {
   handleEditSelectedShape, handleDuplicateSelectedFeature,
-  handleReverseSelectedGeometry, handleSimplifySelectedGeometry, handleCloseSelectedLine, handleConvertSelectedLineToPolygon,
+  handleReverseSelectedGeometry, handleSimplifySelectedGeometry, handleBufferSelectedFeature,
+  handleCloseSelectedLine, handleConvertSelectedLineToPolygon,
   handleMoveSelectedVertex, handleSplitSelectedLine, handleSplitSelectedPolygon,
   handleStartPolygonSplitSketch, handleCancelPolygonSplitSketch,
-  handleMergeSelectedPolygons,
+  handleMergeSelectedPolygons, handleIntersectSelectedPolygons, handleDifferenceSelectedPolygons,
   handleDeleteSelected, handleDeleteSelectedFeatures, handleClearAll,
   updateFeatureProperty, updateSelectedFeatureProperty,
   updateSelectedFeaturesProperty,

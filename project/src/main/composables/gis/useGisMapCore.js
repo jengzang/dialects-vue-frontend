@@ -266,6 +266,7 @@ export function useGisMapCore(options = {}) {
   const snappingEnabled = ref(true);
   const snapTolerance = ref(12);
   const snapGridSize = ref(0);
+  const selectedBufferDistanceKm = ref(1);
 
   // ---- Computeds ----
   const mapStyleOptions = computed(() => {
@@ -461,6 +462,23 @@ export function useGisMapCore(options = {}) {
     );
   });
 
+  const canBufferSelectedFeature = computed(() => {
+    const geometryType = selectedFeature.value?.geometry?.type;
+    return Boolean(
+      selectedFeatureId.value
+      && activeLayer.value
+      && activeLayer.value.geometryType !== 'Text'
+      && selectedFeature.value
+      && canModifyActiveLayer.value
+      && selectedFeatureIds.value.length === 1
+      && selectedFeatureIds.value[0] === selectedFeatureId.value
+      && ['Point', 'LineString', 'Polygon'].includes(geometryType)
+      && (geometryType === 'Polygon' || activeLayerFeatures.value.length === 1)
+      && selectedFeature.value.properties?.visible !== false
+      && selectedFeature.value.properties?.locked !== true
+    );
+  });
+
   const canConvertSelectedLineToPolygon = computed(() => {
     return Boolean(
       canUseSelectedGeometryTools.value
@@ -551,6 +569,9 @@ export function useGisMapCore(options = {}) {
         && feature.properties?.locked !== true
       ));
   });
+
+  const canIntersectSelectedPolygons = computed(() => canMergeSelectedPolygons.value);
+  const canDifferenceSelectedPolygons = computed(() => canMergeSelectedPolygons.value);
 
   const geometryQualitySummary = computed(() => {
     const issues = [];
@@ -880,6 +901,12 @@ export function useGisMapCore(options = {}) {
       polygonMergeFailed: 'map.drawTab.labels.polygonMergeFailed',
       geometryReverseSuccess: 'map.drawTab.labels.geometryReverseSuccess',
       geometrySimplifySuccess: 'map.drawTab.labels.geometrySimplifySuccess',
+      geometryBufferSuccess: 'map.drawTab.labels.geometryBufferSuccess',
+      geometryBufferFailed: 'map.drawTab.labels.geometryBufferFailed',
+      geometryIntersectSuccess: 'map.drawTab.labels.geometryIntersectSuccess',
+      geometryIntersectFailed: 'map.drawTab.labels.geometryIntersectFailed',
+      geometryDifferenceSuccess: 'map.drawTab.labels.geometryDifferenceSuccess',
+      geometryDifferenceFailed: 'map.drawTab.labels.geometryDifferenceFailed',
       geometryEditNoChange: 'map.drawTab.labels.geometryEditNoChange',
       geometryEditUnavailable: 'map.drawTab.labels.geometryEditUnavailable',
       geometryEditFailed: 'map.drawTab.labels.geometryEditFailed',
@@ -1009,6 +1036,7 @@ export function useGisMapCore(options = {}) {
     snappingEnabled,
     snapTolerance,
     snapGridSize,
+    selectedBufferDistanceKm,
     // Computeds
     mapStyleOptions,
     activeLayer,
@@ -1029,6 +1057,7 @@ export function useGisMapCore(options = {}) {
     canModifyActiveLayer,
     canEditSelectedShape,
     canUseSelectedGeometryTools,
+    canBufferSelectedFeature,
     canCloseSelectedLine,
     canSplitSelectedLine,
     polygonSplitLineOptions,
@@ -1036,6 +1065,8 @@ export function useGisMapCore(options = {}) {
     canSplitSelectedPolygon,
     canStartPolygonSplitSketch,
     canMergeSelectedPolygons,
+    canIntersectSelectedPolygons,
+    canDifferenceSelectedPolygons,
     canConvertSelectedLineToPolygon,
     geometryQualitySummary,
     canDeleteSelection,

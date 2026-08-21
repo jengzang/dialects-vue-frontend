@@ -1,6 +1,6 @@
 import { showConfirm, showSuccess } from '@/utils/ui/message.js';
 import { useI18n } from 'vue-i18n';
-import { featureCollection, union } from '@turf/turf';
+import { buffer, difference, featureCollection, intersect, union } from '@turf/turf';
 
 export function useGisFeatures(options = {}) {
   const { t } = useI18n();
@@ -18,11 +18,14 @@ export function useGisFeatures(options = {}) {
     canDuplicateSelectedFeature,
     canEditSelectedShape,
     canUseSelectedGeometryTools,
+    canBufferSelectedFeature,
     canCloseSelectedLine,
     canSplitSelectedLine,
     canSplitSelectedPolygon,
     canStartPolygonSplitSketch,
     canMergeSelectedPolygons,
+    canIntersectSelectedPolygons,
+    canDifferenceSelectedPolygons,
     canConvertSelectedLineToPolygon,
     canDeleteSelection,
     canMoveSelectedFeatures,
@@ -42,6 +45,7 @@ export function useGisFeatures(options = {}) {
     selectedFeatureBatchPropertyKey,
     selectedFeatureBatchPropertyValue,
     featureMoveLayerOptions,
+    selectedBufferDistanceKm,
     isAuthenticated,
     onAuthRequired,
     onGeometryEditFeedback,
@@ -232,6 +236,12 @@ export function useGisFeatures(options = {}) {
       ));
   }
 
+  function isSupportedPolygonResultGeometry(geometry) {
+    return ['Polygon', 'MultiPolygon'].includes(geometry?.type)
+      && Array.isArray(geometry?.coordinates)
+      && geometry.coordinates.length > 0;
+  }
+
   function cloneMergedPolygonFeature(baseFeature, geometry) {
     const id = getFeatureId(baseFeature);
     return {
@@ -262,6 +272,51 @@ export function useGisFeatures(options = {}) {
     } catch {
       return null;
     }
+  }
+
+  function getSelectedEditablePolygonFeatures() {
+    if (!activeLayer.value || selectedFeatureIds.value.length < 2) return [];
+    const selectedIds = new Set(selectedFeatureIds.value);
+    const polygonFeatures = (activeLayer.value.featureCollection?.features ?? [])
+      .filter((feature) => selectedIds.has(getFeatureId(feature)))
+      .filter(isFeatureEditableForMutation)
+      .filter((feature) => feature?.geometry?.type === 'Polygon' && isValidPolygonRings(feature.geometry.coordinates ?? []));
+    const preferredFeature = polygonFeatures.find((feature) => getFeatureId(feature) === selectedFeatureId.value);
+    if (!preferredFeature) return polygonFeatures;
+    return [
+      preferredFeature,
+      ...polygonFeatures.filter((feature) => getFeatureId(feature) !== selectedFeatureId.value),
+    ];
+  }
+
+  function replaceSelectedBaseFeatureGeometry(baseFeature, nextGeometry) {
+    const layer = activeLayer.value;
+    const fc = layer?.featureCollection ?? emptyFeatureCollection();
+    const baseId = getFeatureId(baseFeature);
+    if (!layer || !baseId || !isSupportedPolygonResultGeometry(nextGeometry)) return false;
+    if (JSON.stringify(nextGeometry) === JSON.stringify(baseFeature.geometry)) return 'no-change';
+
+    commitHistory();
+    layer.geometryType = 'Polygon';
+    layer.featureCollection = {
+      ...fc,
+      features: (fc.features ?? []).map((feature) => {
+        if (getFeatureId(feature) !== baseId) return feature;
+        return cloneMergedPolygonFeature(baseFeature, nextGeometry);
+      }),
+    };
+    setFeatureSelection([baseId], baseId);
+    currentMode.value = 'simple_select';
+    syncAllLayersAfterMutation();
+    editableMapRef?.value?.selectFeature?.(baseId, { directEdit: false });
+    return true;
+  }
+
+  function canReplaceFeatureWithPolygonResult(feature) {
+    const geometryType = feature?.geometry?.type;
+    if (geometryType === 'Polygon') return true;
+    const featureCount = activeLayer.value?.featureCollection?.features?.length ?? 0;
+    return ['Point', 'LineString'].includes(geometryType) && featureCount === 1;
   }
 
   async function mutateSelectedGeometry(buildNext, feedback = {}) {
@@ -341,6 +396,52 @@ export function useGisFeatures(options = {}) {
       noChange: 'geometryEditNoChange',
       failed: 'geometryEditFailed',
     });
+  }
+
+  async function handleBufferSelectedFeature() {
+    if (!await guardWrite()) return;
+    if (!canBufferSelectedFeature?.value || !activeLayer.value) {
+      reportGeometryEditFeedback('error', 'geometryBufferFailed');
+      return;
+    }
+    const distanceKm = Number(selectedBufferDistanceKm?.value ?? 1);
+    if (!Number.isFinite(distanceKm) || distanceKm <= 0) {
+      reportGeometryEditFeedback('error', 'geometryBufferFailed');
+      return;
+    }
+    const fc = activeLayer.value.featureCollection ?? emptyFeatureCollection();
+    const targetFeature = (fc.features ?? []).find((feature) => getFeatureId(feature) === selectedFeatureId.value);
+    if (!targetFeature || !isFeatureEditableForMutation(targetFeature)) {
+      reportGeometryEditFeedback('error', 'geometryBufferFailed');
+      return;
+    }
+    if (!canReplaceFeatureWithPolygonResult(targetFeature)) {
+      reportGeometryEditFeedback('error', 'geometryBufferFailed');
+      return;
+    }
+
+    let bufferedFeature = null;
+    try {
+      bufferedFeature = buffer(targetFeature, distanceKm, { units: 'kilometers' });
+    } catch {
+      reportGeometryEditFeedback('error', 'geometryBufferFailed');
+      return;
+    }
+    const nextGeometry = bufferedFeature?.geometry;
+    if (!isSupportedPolygonResultGeometry(nextGeometry)) {
+      reportGeometryEditFeedback('error', 'geometryBufferFailed');
+      return;
+    }
+    const result = replaceSelectedBaseFeatureGeometry(targetFeature, nextGeometry);
+    if (result === 'no-change') {
+      reportGeometryEditFeedback('info', 'geometryEditNoChange');
+      return;
+    }
+    if (!result) {
+      reportGeometryEditFeedback('error', 'geometryBufferFailed');
+      return;
+    }
+    reportGeometryEditFeedback('success', 'geometryBufferSuccess');
   }
 
   async function handleCloseSelectedLine() {
@@ -515,6 +616,68 @@ export function useGisFeatures(options = {}) {
     syncAllLayersAfterMutation();
     editableMapRef?.value?.selectFeature?.(mergedId, { directEdit: false });
     reportGeometryEditFeedback('success', 'polygonMergeSuccess');
+  }
+
+  async function handleIntersectSelectedPolygons() {
+    if (!await guardWrite()) return;
+    if (!canIntersectSelectedPolygons?.value || !canModifyActiveLayer.value || !activeLayer.value) {
+      reportGeometryEditFeedback('error', 'geometryIntersectFailed');
+      return;
+    }
+    const selectedPolygons = getSelectedEditablePolygonFeatures();
+    if (selectedPolygons.length < 2) {
+      reportGeometryEditFeedback('error', 'geometryIntersectFailed');
+      return;
+    }
+
+    let intersection = null;
+    try {
+      intersection = intersect(featureCollection(selectedPolygons));
+    } catch {
+      reportGeometryEditFeedback('error', 'geometryIntersectFailed');
+      return;
+    }
+    const result = replaceSelectedBaseFeatureGeometry(selectedPolygons[0], intersection?.geometry);
+    if (result === 'no-change') {
+      reportGeometryEditFeedback('info', 'geometryEditNoChange');
+      return;
+    }
+    if (!result) {
+      reportGeometryEditFeedback('error', 'geometryIntersectFailed');
+      return;
+    }
+    reportGeometryEditFeedback('success', 'geometryIntersectSuccess');
+  }
+
+  async function handleDifferenceSelectedPolygons() {
+    if (!await guardWrite()) return;
+    if (!canDifferenceSelectedPolygons?.value || !canModifyActiveLayer.value || !activeLayer.value) {
+      reportGeometryEditFeedback('error', 'geometryDifferenceFailed');
+      return;
+    }
+    const selectedPolygons = getSelectedEditablePolygonFeatures();
+    if (selectedPolygons.length < 2) {
+      reportGeometryEditFeedback('error', 'geometryDifferenceFailed');
+      return;
+    }
+
+    let diffedFeature = null;
+    try {
+      diffedFeature = difference(featureCollection(selectedPolygons));
+    } catch {
+      reportGeometryEditFeedback('error', 'geometryDifferenceFailed');
+      return;
+    }
+    const result = replaceSelectedBaseFeatureGeometry(selectedPolygons[0], diffedFeature?.geometry);
+    if (result === 'no-change') {
+      reportGeometryEditFeedback('info', 'geometryEditNoChange');
+      return;
+    }
+    if (!result) {
+      reportGeometryEditFeedback('error', 'geometryDifferenceFailed');
+      return;
+    }
+    reportGeometryEditFeedback('success', 'geometryDifferenceSuccess');
   }
 
   async function handleStartPolygonSplitSketch() {
@@ -774,6 +937,7 @@ export function useGisFeatures(options = {}) {
     handleDuplicateSelectedFeature,
     handleReverseSelectedGeometry,
     handleSimplifySelectedGeometry,
+    handleBufferSelectedFeature,
     handleCloseSelectedLine,
     handleConvertSelectedLineToPolygon,
     handleMoveSelectedVertex,
@@ -782,6 +946,8 @@ export function useGisFeatures(options = {}) {
     handleStartPolygonSplitSketch,
     handleCancelPolygonSplitSketch,
     handleMergeSelectedPolygons,
+    handleIntersectSelectedPolygons,
+    handleDifferenceSelectedPolygons,
     handleDeleteSelected,
     handleDeleteSelectedFeatures,
     handleClearAll,

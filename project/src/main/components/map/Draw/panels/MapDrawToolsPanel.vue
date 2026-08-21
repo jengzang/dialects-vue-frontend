@@ -147,6 +147,32 @@
             >
               {{ t('map.drawTab.buttons.simplifyGeometry') }}
             </button>
+            <div
+              class="draw-tool-wide-control"
+              data-testid="draw-tool-buffer-controls"
+            >
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.bufferDistanceKm') }}：{{ selectedBufferDistanceKm }}</span>
+                <input
+                  class="draw-input glass-field"
+                  type="number"
+                  min="0.01"
+                  step="0.1"
+                  :value="selectedBufferDistanceKm"
+                  @input="$emit('update:selected-buffer-distance-km', normalizePositiveNumber($event.target.value, selectedBufferDistanceKm))"
+                >
+              </label>
+              <button
+                class="glass-button draw-tool-inline-button"
+                data-variant="secondary"
+                data-testid="draw-tool-buffer-selected"
+                type="button"
+                :disabled="!canBufferSelectedFeature"
+                @click="$emit('buffer-selected-feature')"
+              >
+                {{ t('map.drawTab.buttons.bufferSelectedFeature') }}
+              </button>
+            </div>
             <button
               v-if="selectedFeatureGeometryType === 'LineString'"
               class="glass-button"
@@ -237,6 +263,28 @@
               @click="$emit('merge-selected-polygons')"
             >
               {{ t('map.drawTab.buttons.mergePolygons') }}
+            </button>
+            <button
+              v-if="selectedFeatureGeometryType === 'Polygon'"
+              class="glass-button"
+              data-variant="secondary"
+              data-testid="draw-tool-intersect-polygons"
+              type="button"
+              :disabled="!canIntersectSelectedPolygons"
+              @click="$emit('intersect-selected-polygons')"
+            >
+              {{ t('map.drawTab.buttons.intersectPolygons') }}
+            </button>
+            <button
+              v-if="selectedFeatureGeometryType === 'Polygon'"
+              class="glass-button"
+              data-variant="secondary"
+              data-testid="draw-tool-difference-polygons"
+              type="button"
+              :disabled="!canDifferenceSelectedPolygons"
+              @click="$emit('difference-selected-polygons')"
+            >
+              {{ t('map.drawTab.buttons.differencePolygons') }}
             </button>
             <button
               class="glass-button"
@@ -1036,10 +1084,14 @@ const props = defineProps({
   canRedo: { type: Boolean, default: false },
   canEditShape: { type: Boolean, default: false },
   canUseSelectedGeometryTools: { type: Boolean, default: false },
+  selectedBufferDistanceKm: { type: Number, default: 1 },
+  canBufferSelectedFeature: { type: Boolean, default: false },
   canCloseSelectedLine: { type: Boolean, default: false },
   canSplitSelectedLine: { type: Boolean, default: false },
   canSplitSelectedPolygon: { type: Boolean, default: false },
   canConvertSelectedLineToPolygon: { type: Boolean, default: false },
+  canIntersectSelectedPolygons: { type: Boolean, default: false },
+  canDifferenceSelectedPolygons: { type: Boolean, default: false },
   geometryQualitySummary: {
     type: Object,
     default: () => ({
@@ -1071,6 +1123,8 @@ const emit = defineEmits([
   'duplicate-feature',
   'reverse-selected-geometry',
   'simplify-selected-geometry',
+  'update:selected-buffer-distance-km',
+  'buffer-selected-feature',
   'close-selected-line',
   'split-selected-line',
   'update:selected-polygon-split-line-id',
@@ -1078,6 +1132,8 @@ const emit = defineEmits([
   'start-polygon-split-sketch',
   'cancel-polygon-split-sketch',
   'merge-selected-polygons',
+  'intersect-selected-polygons',
+  'difference-selected-polygons',
   'convert-selected-line-to-polygon',
   'move-selected-vertex',
   'undo',
@@ -1125,6 +1181,11 @@ const featureTableBatchPropertyOptions = computed(() => props.featureTableColumn
   label: column.label,
   value: column.key,
 })))
+
+const normalizePositiveNumber = (value, fallback = 1) => {
+  const nextValue = Number(value)
+  return Number.isFinite(nextValue) && nextValue > 0 ? nextValue : fallback
+}
 
 const undoButtonTitle = computed(() => (
   props.canUndo
