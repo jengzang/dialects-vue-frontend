@@ -65,6 +65,14 @@ function mountToolsPanel(overrides = {}) {
     canMergeSelectedPolygons: false,
     polygonSplitSketchActive: false,
     geometryEditStatus: null,
+    editSessionStatus: {
+      modeLabel: '编辑形状',
+      layerLabel: '图层：边界',
+      featureLabel: '要素：边界 A',
+      vertexLabel: '未选中顶点',
+      snapLabel: '吸附：等待目标',
+      feedback: null,
+    },
     canDeleteSelection: false,
     canDeleteSelectedVertices: false,
     canEditShape: true,
@@ -151,6 +159,38 @@ describe('MapDrawToolsPanel editing affordances', () => {
     wrapper.host.querySelector('[data-testid="shape-edit-finish"]').click()
     await nextTick()
     expect(wrapper.events).toContainEqual(['set-mode', 'simple_select'])
+
+    wrapper.unmount()
+  })
+
+  it('shows the current edit session, snap target, and latest edit feedback', async () => {
+    const wrapper = mountToolsPanel({
+      editSessionStatus: {
+        modeLabel: '编辑形状',
+        layerLabel: '图层：边界',
+        featureLabel: '要素：边界 A',
+        vertexLabel: '顶点：0.2',
+        snapLabel: '吸附：中点 · 参考线 / 边界线',
+        feedback: {
+          type: 'success',
+          message: '已撤回上一步',
+        },
+      },
+    })
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-testid="edit-session-status"]').textContent)
+      .toContain('编辑形状')
+    expect(wrapper.host.querySelector('[data-testid="edit-session-layer"]').textContent)
+      .toContain('图层：边界')
+    expect(wrapper.host.querySelector('[data-testid="edit-session-feature"]').textContent)
+      .toContain('要素：边界 A')
+    expect(wrapper.host.querySelector('[data-testid="edit-session-vertex"]').textContent)
+      .toContain('顶点：0.2')
+    expect(wrapper.host.querySelector('[data-testid="edit-session-snap"]').textContent)
+      .toContain('吸附：中点 · 参考线 / 边界线')
+    expect(wrapper.host.querySelector('[data-testid="edit-session-feedback"]').textContent)
+      .toContain('已撤回上一步')
 
     wrapper.unmount()
   })

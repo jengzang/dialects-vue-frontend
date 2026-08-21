@@ -107,6 +107,7 @@
             @mode-change="handleDrawModeChange"
             @shape-edit-state-change="handleShapeEditStateChange"
             @geometry-edit-feedback="handleGeometryEditFeedback"
+            @snap-state-change="handleSnapStateChange"
             @export-image="handleImageExported"
             @export-layer="handleLayerExported"
             @export-selection-bounds-change="boxSelectionBounds = $event"
@@ -150,6 +151,7 @@
           :can-merge-selected-polygons="canMergeSelectedPolygons"
           :polygon-split-sketch-active="polygonSplitSketchActive"
           :geometry-edit-status="geometryEditStatus"
+          :edit-session-status="editSessionStatus"
           :can-delete-selected-vertices="canDeleteSelectedVertices"
           :selected-feature-batch-name="selectedFeatureBatchName"
           :selected-feature-batch-property-key="selectedFeatureBatchPropertyKey"
@@ -200,8 +202,8 @@
           @difference-selected-polygons="handleDifferenceSelectedPolygons"
           @convert-selected-line-to-polygon="handleConvertSelectedLineToPolygon"
           @move-selected-vertex="handleMoveSelectedVertex"
-          @undo="undoHistory"
-          @redo="redoHistory"
+          @undo="handleUndoHistory"
+          @redo="handleRedoHistory"
           @delete-selected="handleDeleteSelected"
           @delete-selected-features="handleDeleteSelectedFeatures"
           @clear-all="handleClearAll"
@@ -846,11 +848,11 @@ const {
   polygonSplitLineOptions, selectedPolygonSplitLineFeature, canSplitSelectedPolygon,
   canStartPolygonSplitSketch, canMergeSelectedPolygons, canIntersectSelectedPolygons, canDifferenceSelectedPolygons,
   canConvertSelectedLineToPolygon, geometryQualitySummary,
-  canUseFeatureBoxSelect, canMoveSelectedFeatures, selectedLayerLabel,
+  canUseFeatureBoxSelect, canMoveSelectedFeatures, selectedLayerLabel, editSessionStatus,
   createEmptyLayer, getFeatureId, getFeatureLabel, getLayerLabel,
   syncLayerIdSeedFromLayers, applyLayerPropertyToFeatures,
   setMode, handleDrawModeChange, handleShapeEditStateChange, handleFeatureSelect,
-  handleFeatureBoxSelect, handleGeometryEditFeedback, handleToggleFeatureBoxSelect,
+  handleFeatureBoxSelect, handleGeometryEditFeedback, handleSnapStateChange, handleToggleFeatureBoxSelect,
   handleSelectFeatureFromPanel, handleToggleFeatureSelection,
   handleSelectAllFeatures, handleInvertFeatureSelection,
   setFeatureSelection, clearFeatureSelection, resetDrawSelectionMode,
@@ -867,6 +869,24 @@ const history = useGisHistory({
 setCommitHistory(history.commitHistory);
 
 const { canUndoHistory, canRedoHistory, commitHistory, undoHistory, redoHistory } = history;
+
+const handleUndoHistory = () => {
+  const canApply = canUndoHistory.value;
+  undoHistory();
+  handleGeometryEditFeedback({
+    type: canApply ? 'success' : 'info',
+    code: canApply ? 'historyUndoSuccess' : 'historyUndoUnavailable',
+  });
+};
+
+const handleRedoHistory = () => {
+  const canApply = canRedoHistory.value;
+  redoHistory();
+  handleGeometryEditFeedback({
+    type: canApply ? 'success' : 'info',
+    code: canApply ? 'historyRedoSuccess' : 'historyRedoUnavailable',
+  });
+};
 
 // ---- Layers ----
 const gisLayers = useGisLayers({
@@ -1150,8 +1170,8 @@ const handleDrawHistoryKeydown = (event) => {
   const isDelete = event.key === 'Delete' || event.key === 'Backspace';
   const isEscape = event.key === 'Escape';
 
-  if (isUndo) { event.preventDefault(); undoHistory(); return; }
-  if (isRedo) { event.preventDefault(); redoHistory(); return; }
+  if (isUndo) { event.preventDefault(); handleUndoHistory(); return; }
+  if (isRedo) { event.preventDefault(); handleRedoHistory(); return; }
   if (isSelectAll && canModifyActiveLayer.value) { event.preventDefault(); handleSelectAllFeatures(); return; }
   if (isDelete && canDeleteSelection.value) { event.preventDefault(); handleDeleteSelected(); return; }
   if (isEscape && (isFeatureBoxSelectMode.value || selectedFeatureIds.value.length > 0

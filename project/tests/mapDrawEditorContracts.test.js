@@ -106,8 +106,10 @@ describe('Map draw editor contracts', () => {
     expect(historySource).toContain('commitHistory')
     expect(historySource).toContain('undoHistory')
     expect(historySource).toContain('redoHistory')
-    expect(tabSource).toContain('@undo="undoHistory"')
-    expect(tabSource).toContain('@redo="redoHistory"')
+    expect(tabSource).toContain('@undo="handleUndoHistory"')
+    expect(tabSource).toContain('@redo="handleRedoHistory"')
+    expect(tabSource).toContain('const handleUndoHistory = () =>')
+    expect(tabSource).toContain('const handleRedoHistory = () =>')
     expect(tabSource).toContain('handleDrawHistoryKeydown')
     expect(tabSource).toContain(`document.addEventListener('keydown', handleDrawHistoryKeydown)`)
     expect(tabSource).toContain(`document.removeEventListener('keydown', handleDrawHistoryKeydown)`)
@@ -412,6 +414,34 @@ describe('Map draw editor contracts', () => {
 
     expect(editableSource).toContain('const snapPreviewLayerIds = new Set')
     expect(editableSource).toMatch(/if \(snapPreviewLayerIds\.has\(layer\.id\)\) \{[\s\S]*setLayerVisibility\(layer\.id, false\)/)
+  })
+
+  it('surfaces an explicit edit session status with snapping and history feedback', () => {
+    const editableSource = readSource(editableMapLibrePath)
+    const tabSource = readSource(mapDrawTabPath)
+    const panelSource = readSource(mapDrawToolsPanelPath)
+    const coreSource = readSource(useGisMapCorePath)
+    const zhCn = JSON.parse(readSource(zhCnMapLocalePath))
+    const zhHant = JSON.parse(readSource(zhHantMapLocalePath))
+    const en = JSON.parse(readSource(enMapLocalePath))
+
+    expect(editableSource).toContain("'snap-state-change'")
+    expect(coreSource).toContain('const snapState = ref({ active: false });')
+    expect(coreSource).toContain('const editSessionStatus = computed(() =>')
+    expect(coreSource).toContain('const handleSnapStateChange = (payload = {}) =>')
+    expect(coreSource).toContain("historyUndoSuccess: 'map.drawTab.labels.historyUndoSuccess'")
+    expect(coreSource).toContain("historyRedoSuccess: 'map.drawTab.labels.historyRedoSuccess'")
+    expect(tabSource).toContain('@snap-state-change="handleSnapStateChange"')
+    expect(tabSource).toContain(':edit-session-status="editSessionStatus"')
+    expect(tabSource).toContain('const handleUndoHistory = () =>')
+    expect(tabSource).toContain('const handleRedoHistory = () =>')
+    expect(panelSource).toContain('data-testid="edit-session-status"')
+    expect(panelSource).toContain('data-testid="edit-session-snap"')
+    expect(panelSource).toContain('data-testid="edit-session-feedback"')
+
+    expect(zhCn.drawTab.labels.editSessionSnapTarget).toBe('吸附：{type} · {target}')
+    expect(zhHant.drawTab.labels.editSessionSnapTarget).toBe('吸附：{type} · {target}')
+    expect(en.drawTab.labels.editSessionSnapTarget).toBe('Snap: {type} · {target}')
   })
 
   it('shows direct-edit status affordances for target shape and vertex actions', () => {

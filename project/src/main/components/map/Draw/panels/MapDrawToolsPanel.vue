@@ -382,6 +382,45 @@
             </label>
           </template>
           <div
+            v-if="editSessionStatus"
+            class="draw-shape-edit-status"
+            data-testid="edit-session-status"
+            :data-state="editSessionStatus.feedback?.type || 'idle'"
+          >
+            <div class="draw-shape-edit-main">
+              <span
+                class="draw-shape-edit-target"
+                data-testid="edit-session-mode"
+              >
+                {{ editSessionStatus.modeLabel }}
+              </span>
+              <span
+                class="draw-shape-edit-count"
+                data-testid="edit-session-layer"
+              >
+                {{ editSessionStatus.layerLabel }}
+              </span>
+            </div>
+            <div class="draw-shape-edit-tips">
+              <span data-testid="edit-session-feature">
+                {{ editSessionStatus.featureLabel }}
+              </span>
+              <span data-testid="edit-session-vertex">
+                {{ editSessionStatus.vertexLabel }}
+              </span>
+              <span data-testid="edit-session-snap">
+                {{ editSessionStatus.snapLabel }}
+              </span>
+            </div>
+            <div
+              v-if="editSessionStatus.feedback?.message"
+              class="draw-shape-edit-hint"
+              data-testid="edit-session-feedback"
+            >
+              {{ editSessionStatus.feedback.message }}
+            </div>
+          </div>
+          <div
             v-if="currentMode === 'direct_select'"
             class="draw-shape-edit-status"
             data-testid="shape-edit-status"
@@ -1099,6 +1138,10 @@ const props = defineProps({
       issueCount: 0,
       items: [],
     }),
+  },
+  editSessionStatus: {
+    type: Object,
+    default: null,
   },
   canDeleteSelection: { type: Boolean, default: false },
   canDeleteSelectedVertices: { type: Boolean, default: false },

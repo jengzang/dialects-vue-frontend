@@ -263,6 +263,7 @@ export function useGisMapCore(options = {}) {
   const selectedPolygonSplitLineId = ref('');
   const polygonSplitSketchActive = ref(false);
   const geometryEditStatus = ref(null);
+  const snapState = ref({ active: false });
   const snappingEnabled = ref(true);
   const snapTolerance = ref(12);
   const snapGridSize = ref(0);
@@ -665,6 +666,79 @@ export function useGisMapCore(options = {}) {
       }));
   });
 
+  const resolveCurrentModeLabel = () => {
+    if (currentMode.value === 'simple_select') return t('map.drawTab.labels.editSessionModeSelect');
+    if (currentMode.value === 'direct_select') return t('map.drawTab.labels.editSessionModeDirect');
+    if (currentMode.value === 'draw_point' && isTextAnnotationLayer(activeLayer.value)) {
+      return t('map.drawTab.labels.editSessionModeText');
+    }
+    if (currentMode.value === 'draw_point') return t('map.drawTab.labels.editSessionModePoint');
+    if (currentMode.value === 'draw_line_string') return t('map.drawTab.labels.editSessionModeLine');
+    if (currentMode.value === 'draw_polygon') return t('map.drawTab.labels.editSessionModePolygon');
+    return t('map.drawTab.labels.editSessionModeUnknown');
+  };
+
+  const resolveSnapTypeLabel = (type) => {
+    if (type === 'vertex') return t('map.drawTab.labels.snapTypeVertex');
+    if (type === 'midpoint') return t('map.drawTab.labels.snapTypeMidpoint');
+    if (type === 'edge') return t('map.drawTab.labels.snapTypeEdge');
+    if (type === 'grid') return t('map.drawTab.labels.snapTypeGrid');
+    return t('map.drawTab.labels.snapTypeUnknown');
+  };
+
+  const formatSessionCoordinate = (coordinate = []) => {
+    const longitude = Number(coordinate[0]);
+    const latitude = Number(coordinate[1]);
+    if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return '';
+    const trimNumber = (value) => value.toFixed(6).replace(/\.?0+$/, '');
+    return `${trimNumber(longitude)}, ${trimNumber(latitude)}`;
+  };
+
+  const resolveSnapTargetLabel = () => {
+    if (!snappingEnabled.value) return t('map.drawTab.labels.editSessionSnapDisabled');
+    if (!snapState.value?.active) return t('map.drawTab.labels.editSessionSnapWaiting');
+    const type = resolveSnapTypeLabel(snapState.value.type);
+    const sourceLabel = [snapState.value.layerName, snapState.value.featureName]
+      .map((item) => String(item || '').trim())
+      .filter(Boolean)
+      .join(' / ');
+    const target = sourceLabel || formatSessionCoordinate(snapState.value.coordinate) || t('map.drawTab.labels.snapTypeUnknown');
+    return t('map.drawTab.labels.editSessionSnapTarget', { type, target });
+  };
+
+  const resolveSelectedFeatureSessionLabel = () => {
+    if (selectedFeature.value) {
+      const index = activeLayerFeatures.value.findIndex((feature) => getFeatureId(feature) === selectedFeatureId.value);
+      return t('map.drawTab.labels.editSessionFeature', {
+        name: getFeatureLabel(selectedFeature.value, index >= 0 ? index : 0),
+      });
+    }
+    if (selectedFeatureIds.value.length > 0) {
+      return t('map.drawTab.labels.selectedFeatureCount', { count: selectedFeatureIds.value.length });
+    }
+    return t('map.drawTab.labels.editSessionNoFeature');
+  };
+
+  const resolveSelectedVertexSessionLabel = () => {
+    if (selectedVertexCount.value <= 0) return t('map.drawTab.labels.editSessionNoVertex');
+    if (selectedVertexCount.value === 1 && selectedVertex.value?.coordPath) {
+      return t('map.drawTab.labels.editSessionVertexPath', { path: selectedVertex.value.coordPath });
+    }
+    return t('map.drawTab.labels.editSessionVertexCount', { count: selectedVertexCount.value });
+  };
+
+  const editSessionStatus = computed(() => ({
+    mode: currentMode.value,
+    modeLabel: resolveCurrentModeLabel(),
+    layerLabel: t('map.drawTab.labels.editSessionLayer', {
+      name: activeLayer.value?.name || t('map.drawTab.labels.emptyLayer'),
+    }),
+    featureLabel: resolveSelectedFeatureSessionLabel(),
+    vertexLabel: resolveSelectedVertexSessionLabel(),
+    snapLabel: resolveSnapTargetLabel(),
+    feedback: geometryEditStatus.value,
+  }));
+
   // ---- Map sync helpers ----
   const syncActiveLayerToMap = () => {
     if (!editableMapRef?.value || !activeLayer.value) return;
@@ -916,6 +990,10 @@ export function useGisMapCore(options = {}) {
       lineToPolygonUnavailable: 'map.drawTab.labels.lineToPolygonUnavailable',
       vertexMoveSuccess: 'map.drawTab.labels.vertexMoveSuccess',
       vertexMoveFailed: 'map.drawTab.labels.vertexMoveFailed',
+      historyUndoSuccess: 'map.drawTab.labels.historyUndoSuccess',
+      historyUndoUnavailable: 'map.drawTab.labels.historyUndoUnavailable',
+      historyRedoSuccess: 'map.drawTab.labels.historyRedoSuccess',
+      historyRedoUnavailable: 'map.drawTab.labels.historyRedoUnavailable',
     };
     const key = messageKeys[code];
     return key ? t(key) : '';
@@ -931,6 +1009,20 @@ export function useGisMapCore(options = {}) {
     }
     const message = resolveGeometryEditStatusMessage(code);
     geometryEditStatus.value = message ? { type, message, code } : null;
+  };
+
+  const handleSnapStateChange = (payload = {}) => {
+    snapState.value = payload?.active
+      ? {
+          active: true,
+          type: String(payload.type || ''),
+          source: String(payload.source || ''),
+          layerName: String(payload.layerName || ''),
+          featureName: String(payload.featureName || ''),
+          coordinate: Array.isArray(payload.coordinate) ? payload.coordinate : null,
+          originalCoordinate: Array.isArray(payload.originalCoordinate) ? payload.originalCoordinate : null,
+        }
+      : { active: false };
   };
 
   const handleSelectFeatureFromPanel = (featureId) => {
@@ -1033,6 +1125,7 @@ export function useGisMapCore(options = {}) {
     selectedPolygonSplitLineId,
     polygonSplitSketchActive,
     geometryEditStatus,
+    snapState,
     snappingEnabled,
     snapTolerance,
     snapGridSize,
@@ -1074,6 +1167,7 @@ export function useGisMapCore(options = {}) {
     canUseFeatureBoxSelect,
     canMoveSelectedFeatures,
     selectedLayerLabel,
+    editSessionStatus,
     // Helpers
     emptyFeatureCollection,
     createEmptyLayer,
@@ -1090,6 +1184,7 @@ export function useGisMapCore(options = {}) {
     handleFeatureSelect,
     handleFeatureBoxSelect,
     handleGeometryEditFeedback,
+    handleSnapStateChange,
     handleToggleFeatureBoxSelect,
     handleSelectFeatureFromPanel,
     handleToggleFeatureSelection,
