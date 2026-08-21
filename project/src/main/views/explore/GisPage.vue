@@ -900,6 +900,7 @@ const gisFeatures = useGisFeatures({
   selectedFeatureBatchName, selectedFeatureBatchPropertyKey, selectedFeatureBatchPropertyValue,
   featureMoveLayerOptions,
   isAuthenticated, onAuthRequired: guardWrite,
+  onGeometryEditFeedback: handleGeometryEditFeedback,
 });
 
 const {

@@ -44,12 +44,18 @@ export function useGisFeatures(options = {}) {
     featureMoveLayerOptions,
     isAuthenticated,
     onAuthRequired,
+    onGeometryEditFeedback,
   } = options;
 
   async function guardWrite() {
     if (isAuthenticated?.value) return true;
     if (onAuthRequired) return onAuthRequired();
     return true;
+  }
+
+  function reportGeometryEditFeedback(type, code) {
+    if (!code || typeof onGeometryEditFeedback !== 'function') return;
+    onGeometryEditFeedback({ type, code });
   }
 
   function emptyFeatureCollection() {
@@ -258,16 +264,29 @@ export function useGisFeatures(options = {}) {
     }
   }
 
-  async function mutateSelectedGeometry(buildNext) {
-    if (!await guardWrite()) return;
-    if (!canModifyActiveLayer.value || !canEditSelectedShape.value || !canUseSelectedGeometryTools?.value) return;
+  async function mutateSelectedGeometry(buildNext, feedback = {}) {
+    if (!await guardWrite()) return false;
+    if (!canModifyActiveLayer.value || !canEditSelectedShape.value || !canUseSelectedGeometryTools?.value) {
+      reportGeometryEditFeedback('error', feedback.unavailable ?? 'geometryEditUnavailable');
+      return false;
+    }
     const layer = activeLayer.value;
     const fc = layer?.featureCollection ?? emptyFeatureCollection();
     const targetFeature = (fc.features ?? []).find((feature) => getFeatureId(feature) === selectedFeatureId.value);
-    if (!layer || !targetFeature || !isFeatureEditableForMutation(targetFeature)) return;
+    if (!layer || !targetFeature || !isFeatureEditableForMutation(targetFeature)) {
+      reportGeometryEditFeedback('error', feedback.unavailable ?? 'geometryEditUnavailable');
+      return false;
+    }
     const nextResult = buildNext(targetFeature.geometry, layer, targetFeature);
     const nextGeometry = nextResult?.geometry ?? nextResult;
-    if (!nextGeometry?.type || JSON.stringify(nextGeometry) === JSON.stringify(targetFeature.geometry)) return;
+    if (!nextGeometry?.type) {
+      reportGeometryEditFeedback('error', feedback.failed ?? 'geometryEditFailed');
+      return false;
+    }
+    if (JSON.stringify(nextGeometry) === JSON.stringify(targetFeature.geometry)) {
+      reportGeometryEditFeedback('info', feedback.noChange ?? 'geometryEditNoChange');
+      return false;
+    }
 
     commitHistory();
     layer.featureCollection = {
@@ -284,6 +303,8 @@ export function useGisFeatures(options = {}) {
     currentMode.value = 'simple_select';
     syncAllLayersAfterMutation();
     editableMapRef?.value?.selectFeature?.(selectedFeatureId.value, { directEdit: false });
+    reportGeometryEditFeedback('success', feedback.success);
+    return true;
   }
 
   async function handleReverseSelectedGeometry() {
@@ -298,6 +319,9 @@ export function useGisFeatures(options = {}) {
         };
       }
       return null;
+    }, {
+      success: 'geometryReverseSuccess',
+      failed: 'geometryEditFailed',
     });
   }
 
@@ -312,20 +336,33 @@ export function useGisFeatures(options = {}) {
         return isValidPolygonRings(coordinates) ? { ...geometry, coordinates } : null;
       }
       return null;
+    }, {
+      success: 'geometrySimplifySuccess',
+      noChange: 'geometryEditNoChange',
+      failed: 'geometryEditFailed',
     });
   }
 
   async function handleCloseSelectedLine() {
-    if (!canCloseSelectedLine?.value) return;
+    if (!canCloseSelectedLine?.value) {
+      reportGeometryEditFeedback('error', 'lineCloseUnavailable');
+      return;
+    }
     await mutateSelectedGeometry((geometry) => {
       if (geometry?.type !== 'LineString' || !isValidLineCoordinates(geometry.coordinates ?? [])) return null;
       const coordinates = closeCoordinateRing(geometry.coordinates ?? []);
       return { ...geometry, coordinates };
+    }, {
+      success: 'lineCloseSuccess',
+      failed: 'lineCloseUnavailable',
     });
   }
 
   async function handleConvertSelectedLineToPolygon() {
-    if (!canConvertSelectedLineToPolygon?.value) return;
+    if (!canConvertSelectedLineToPolygon?.value) {
+      reportGeometryEditFeedback('error', 'lineToPolygonUnavailable');
+      return;
+    }
     await mutateSelectedGeometry((geometry, layer) => {
       if (geometry?.type !== 'LineString') return null;
       const ring = closeCoordinateRing(geometry.coordinates ?? []);
@@ -334,6 +371,9 @@ export function useGisFeatures(options = {}) {
         geometry: { type: 'Polygon', coordinates: [ring] },
         layerGeometryType: 'Polygon',
       };
+    }, {
+      success: 'lineToPolygonSuccess',
+      failed: 'lineToPolygonUnavailable',
     });
   }
 
@@ -343,61 +383,115 @@ export function useGisFeatures(options = {}) {
     const featureId = String(payload.featureId || selectedVertex?.value?.featureId || '');
     const coordPath = String(payload.coordPath || selectedVertex?.value?.coordPath || '');
     const coordinate = payload.coordinate ?? selectedVertex?.value?.coordinate;
-    if (!featureId || featureId !== selectedFeatureId.value || !coordPath || !Array.isArray(coordinate)) return;
-    if (selectedVertex?.value?.featureId !== featureId || selectedVertex.value?.coordPath !== coordPath) return;
+    if (!featureId || featureId !== selectedFeatureId.value || !coordPath || !Array.isArray(coordinate)) {
+      reportGeometryEditFeedback('error', 'vertexMoveFailed');
+      return;
+    }
+    if (selectedVertex?.value?.featureId !== featureId || selectedVertex.value?.coordPath !== coordPath) {
+      reportGeometryEditFeedback('error', 'vertexMoveFailed');
+      return;
+    }
     const nextCoordinate = [Number(coordinate[0]), Number(coordinate[1])];
-    if (!Number.isFinite(nextCoordinate[0]) || !Number.isFinite(nextCoordinate[1])) return;
+    if (!Number.isFinite(nextCoordinate[0]) || !Number.isFinite(nextCoordinate[1])) {
+      reportGeometryEditFeedback('error', 'vertexMoveFailed');
+      return;
+    }
     const currentCoordinate = selectedVertex.value?.coordinate ?? [];
-    if (Number(currentCoordinate[0]) === nextCoordinate[0] && Number(currentCoordinate[1]) === nextCoordinate[1]) return;
-    if (typeof editableMapRef?.value?.moveVertex !== 'function') return;
+    if (Number(currentCoordinate[0]) === nextCoordinate[0] && Number(currentCoordinate[1]) === nextCoordinate[1]) {
+      reportGeometryEditFeedback('info', 'geometryEditNoChange');
+      return;
+    }
+    if (typeof editableMapRef?.value?.moveVertex !== 'function') {
+      reportGeometryEditFeedback('error', 'vertexMoveFailed');
+      return;
+    }
 
     commitHistory();
     const didMove = editableMapRef.value.moveVertex(featureId, coordPath, nextCoordinate, { commitHistory: false });
-    if (didMove === false) return;
+    if (didMove === false) {
+      reportGeometryEditFeedback('error', 'vertexMoveFailed');
+      return;
+    }
     currentMode.value = 'direct_select';
+    reportGeometryEditFeedback('success', 'vertexMoveSuccess');
   }
 
   async function handleSplitSelectedLine() {
     if (!await guardWrite()) return;
-    if (!canSplitSelectedLine?.value || typeof editableMapRef?.value?.splitLineAtVertex !== 'function') return;
+    if (!canSplitSelectedLine?.value || typeof editableMapRef?.value?.splitLineAtVertex !== 'function') {
+      reportGeometryEditFeedback('error', 'lineSplitInvalidVertex');
+      return;
+    }
     const featureId = selectedVertex?.value?.featureId;
     const coordPath = selectedVertex?.value?.coordPath;
-    if (!featureId || featureId !== selectedFeatureId.value || typeof coordPath !== 'string') return;
+    if (!featureId || featureId !== selectedFeatureId.value || typeof coordPath !== 'string') {
+      reportGeometryEditFeedback('error', 'lineSplitInvalidVertex');
+      return;
+    }
     if (typeof editableMapRef.value.canSplitLineAtVertex === 'function'
-      && !editableMapRef.value.canSplitLineAtVertex(featureId, coordPath)) return;
+      && !editableMapRef.value.canSplitLineAtVertex(featureId, coordPath)) {
+      reportGeometryEditFeedback('error', 'lineSplitInvalidVertex');
+      return;
+    }
 
     commitHistory();
     const didSplit = editableMapRef.value.splitLineAtVertex(featureId, coordPath, { commitHistory: false });
-    if (didSplit === false) return;
+    if (didSplit === false) {
+      reportGeometryEditFeedback('error', 'lineSplitInvalidVertex');
+      return;
+    }
     currentMode.value = 'simple_select';
+    reportGeometryEditFeedback('success', 'lineSplitSuccess');
   }
 
   async function handleSplitSelectedPolygon() {
     if (!await guardWrite()) return;
-    if (!canSplitSelectedPolygon?.value || typeof editableMapRef?.value?.splitPolygonWithLine !== 'function') return;
+    if (!canSplitSelectedPolygon?.value || typeof editableMapRef?.value?.splitPolygonWithLine !== 'function') {
+      reportGeometryEditFeedback('error', 'polygonSplitNoCutter');
+      return;
+    }
     const cutterFeature = selectedPolygonSplitLineFeature?.value;
-    if (!selectedFeatureId.value || !cutterFeature) return;
+    if (!selectedFeatureId.value || !cutterFeature) {
+      reportGeometryEditFeedback('error', 'polygonSplitNoCutter');
+      return;
+    }
     if (typeof editableMapRef.value.canSplitPolygonWithLine === 'function'
-      && !editableMapRef.value.canSplitPolygonWithLine(selectedFeatureId.value, cutterFeature)) return;
+      && !editableMapRef.value.canSplitPolygonWithLine(selectedFeatureId.value, cutterFeature)) {
+      reportGeometryEditFeedback('error', 'polygonSplitNoPieces');
+      return;
+    }
 
     commitHistory();
     const didSplit = editableMapRef.value.splitPolygonWithLine(selectedFeatureId.value, cutterFeature, { commitHistory: false });
-    if (didSplit === false) return;
+    if (didSplit === false) {
+      reportGeometryEditFeedback('error', 'polygonSplitNoPieces');
+      return;
+    }
     currentMode.value = 'simple_select';
+    reportGeometryEditFeedback('success', 'polygonSplitSuccess');
   }
 
   async function handleMergeSelectedPolygons() {
     if (!await guardWrite()) return;
-    if (!canMergeSelectedPolygons?.value || !canModifyActiveLayer.value || !activeLayer.value) return;
+    if (!canMergeSelectedPolygons?.value || !canModifyActiveLayer.value || !activeLayer.value) {
+      reportGeometryEditFeedback('error', 'polygonMergeFailed');
+      return;
+    }
     const fc = activeLayer.value.featureCollection ?? emptyFeatureCollection();
     const selectedIds = new Set(selectedFeatureIds.value);
     const selectedPolygons = (fc.features ?? [])
       .filter((feature) => selectedIds.has(getFeatureId(feature)))
       .filter(isFeatureEditableForMutation);
-    if (selectedPolygons.length < 2) return;
+    if (selectedPolygons.length < 2) {
+      reportGeometryEditFeedback('error', 'polygonMergeFailed');
+      return;
+    }
 
     const mergedGeometry = unionPolygonFeatures(selectedPolygons);
-    if (!mergedGeometry) return;
+    if (!mergedGeometry) {
+      reportGeometryEditFeedback('error', 'polygonMergeFailed');
+      return;
+    }
 
     const baseFeature = selectedPolygons[0];
     const mergedId = getFeatureId(baseFeature);
@@ -410,13 +504,17 @@ export function useGisFeatures(options = {}) {
       return [mergedFeature];
     });
 
-    if (!insertedMergedFeature) return;
+    if (!insertedMergedFeature) {
+      reportGeometryEditFeedback('error', 'polygonMergeFailed');
+      return;
+    }
     commitHistory();
     activeLayer.value.featureCollection = { ...fc, features: nextFeatures };
     setFeatureSelection([mergedId], mergedId);
     currentMode.value = 'simple_select';
     syncAllLayersAfterMutation();
     editableMapRef?.value?.selectFeature?.(mergedId, { directEdit: false });
+    reportGeometryEditFeedback('success', 'polygonMergeSuccess');
   }
 
   async function handleStartPolygonSplitSketch() {

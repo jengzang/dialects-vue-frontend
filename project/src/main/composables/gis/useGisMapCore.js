@@ -874,6 +874,21 @@ export function useGisMapCore(options = {}) {
       polygonSplitNoCutter: 'map.drawTab.labels.polygonSplitNoCutter',
       polygonSplitNoPieces: 'map.drawTab.labels.polygonSplitNoPieces',
       polygonSplitSuccess: 'map.drawTab.labels.polygonSplitSuccess',
+      lineSplitSuccess: 'map.drawTab.labels.lineSplitSuccess',
+      lineSplitInvalidVertex: 'map.drawTab.labels.lineSplitInvalidVertex',
+      polygonMergeSuccess: 'map.drawTab.labels.polygonMergeSuccess',
+      polygonMergeFailed: 'map.drawTab.labels.polygonMergeFailed',
+      geometryReverseSuccess: 'map.drawTab.labels.geometryReverseSuccess',
+      geometrySimplifySuccess: 'map.drawTab.labels.geometrySimplifySuccess',
+      geometryEditNoChange: 'map.drawTab.labels.geometryEditNoChange',
+      geometryEditUnavailable: 'map.drawTab.labels.geometryEditUnavailable',
+      geometryEditFailed: 'map.drawTab.labels.geometryEditFailed',
+      lineCloseSuccess: 'map.drawTab.labels.lineCloseSuccess',
+      lineCloseUnavailable: 'map.drawTab.labels.lineCloseUnavailable',
+      lineToPolygonSuccess: 'map.drawTab.labels.lineToPolygonSuccess',
+      lineToPolygonUnavailable: 'map.drawTab.labels.lineToPolygonUnavailable',
+      vertexMoveSuccess: 'map.drawTab.labels.vertexMoveSuccess',
+      vertexMoveFailed: 'map.drawTab.labels.vertexMoveFailed',
     };
     const key = messageKeys[code];
     return key ? t(key) : '';

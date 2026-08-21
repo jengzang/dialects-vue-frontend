@@ -492,6 +492,31 @@ describe('Map draw editor contracts', () => {
     expect(en.drawTab.labels.polygonSplitLine).toBe('Cutter Line')
   })
 
+  it('reports geometry edit feedback for successful and blocked editor actions', () => {
+    const coreSource = readSource(useGisMapCorePath)
+    const featuresSource = readSource(useGisFeaturesPath)
+    const tabSource = readSource(mapDrawTabPath)
+    const zhCn = JSON.parse(readSource(zhCnMapLocalePath))
+    const zhHant = JSON.parse(readSource(zhHantMapLocalePath))
+    const en = JSON.parse(readSource(enMapLocalePath))
+
+    expect(tabSource).toContain('onGeometryEditFeedback: handleGeometryEditFeedback')
+    expect(featuresSource).toContain('onGeometryEditFeedback')
+    expect(featuresSource).toContain("reportGeometryEditFeedback('success', 'lineSplitSuccess')")
+    expect(featuresSource).toContain("reportGeometryEditFeedback('error', 'lineSplitInvalidVertex')")
+    expect(featuresSource).toContain("reportGeometryEditFeedback('success', 'polygonMergeSuccess')")
+    expect(featuresSource).toContain("reportGeometryEditFeedback('error', 'polygonMergeFailed')")
+    expect(featuresSource).toContain("success: 'geometrySimplifySuccess'")
+    expect(featuresSource).toContain("reportGeometryEditFeedback('info', 'geometryEditNoChange')")
+    expect(coreSource).toContain("lineSplitSuccess: 'map.drawTab.labels.lineSplitSuccess'")
+    expect(coreSource).toContain("polygonMergeFailed: 'map.drawTab.labels.polygonMergeFailed'")
+    expect(coreSource).toContain("geometryEditNoChange: 'map.drawTab.labels.geometryEditNoChange'")
+
+    expect(zhCn.drawTab.labels.lineSplitSuccess).toBe('线已分割，并已选中新线段')
+    expect(zhHant.drawTab.labels.lineSplitSuccess).toBe('線已分割，並已選中新線段')
+    expect(en.drawTab.labels.lineSplitSuccess).toBe('Line split and the new segments are selected')
+  })
+
   it('distinguishes insert midpoints and active vertices in Draw edit styles', () => {
     const editableSource = readSource(editableMapLibrePath)
     const stylesSource = drawStylesBlock(editableSource)
