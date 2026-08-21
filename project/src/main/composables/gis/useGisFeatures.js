@@ -44,8 +44,10 @@ export function useGisFeatures(options = {}) {
     selectedFeatureBatchName,
     selectedFeatureBatchPropertyKey,
     selectedFeatureBatchPropertyValue,
+    selectedTextLabelFieldKey,
     featureMoveLayerOptions,
     selectedBufferDistanceKm,
+    canApplyTextLabelField,
     isAuthenticated,
     onAuthRequired,
     onGeometryEditFeedback,
@@ -66,6 +68,12 @@ export function useGisFeatures(options = {}) {
     return { type: 'FeatureCollection', features: [] };
   }
 
+  function formatFeatureTableValue(value) {
+    if (value === null || value === undefined) return '';
+    if (typeof value === 'object') return JSON.stringify(value);
+    return String(value);
+  }
+
   function isFeatureEditableForMutation(feature) {
     return Boolean(
       feature
@@ -79,6 +87,8 @@ export function useGisFeatures(options = {}) {
     if (key === 'locked' && value === false) return true;
     return isFeatureEditableForMutation(feature);
   }
+
+  const textLayerLayoutPropertyKeys = new Set(['textAllowOverlap', 'textLineHeight']);
 
   function getSelectedMutationFeatureIds(key, value) {
     if (!activeLayer.value || selectedFeatureIds.value.length === 0) return [];
@@ -800,7 +810,7 @@ export function useGisFeatures(options = {}) {
 
   async function updateSelectedFeatureProperty(key, value) {
     if (!await guardWrite()) return;
-    if (selectedFeatureId.value) {
+    if (selectedFeatureId.value && !textLayerLayoutPropertyKeys.has(key)) {
       updateFeatureProperty(selectedFeatureId.value, key, value);
       return;
     }
@@ -881,6 +891,36 @@ export function useGisFeatures(options = {}) {
     updateSelectedFeaturesProperty(nextKey, selectedFeatureBatchPropertyValue.value);
   }
 
+  async function handleApplyTextLabelField() {
+    if (!await guardWrite()) return;
+    if (!canApplyTextLabelField.value || !activeLayer.value) return;
+    const nextKey = String(selectedTextLabelFieldKey.value || '');
+    const selectedIds = new Set(selectedFeatureIds.value);
+    const shouldLimitToSelection = selectedIds.size > 0;
+    const fc = activeLayer.value.featureCollection ?? emptyFeatureCollection();
+    let hasChanges = false;
+    const nextFeatures = (fc.features ?? []).map((feature) => {
+      const featureId = getFeatureId(feature);
+      if (shouldLimitToSelection && !selectedIds.has(featureId)) return feature;
+      if (!isFeatureEditableForMutation(feature)) return feature;
+      const nextLabel = formatFeatureTableValue(feature?.properties?.[nextKey]);
+      if ((feature?.properties?.annotationText ?? '') === nextLabel) return feature;
+      hasChanges = true;
+      return {
+        ...feature,
+        properties: {
+          ...(feature.properties ?? {}),
+          annotationText: nextLabel,
+        },
+      };
+    });
+    if (!hasChanges) return;
+    commitHistory();
+    activeLayer.value.featureCollection = { ...fc, features: nextFeatures };
+    syncAllLayersAfterMutation();
+    setFeatureSelection(selectedFeatureIds.value, selectedFeatureId.value);
+  }
+
   // ---- Move between layers ----
 
   async function handleMoveSelectedFeatureToLayer(targetLayerId) {
@@ -957,6 +997,7 @@ export function useGisFeatures(options = {}) {
     handleUpdateFeatureTableCell,
     handleApplySelectedFeatureBatchName,
     handleApplySelectedFeatureBatchProperty,
+    handleApplyTextLabelField,
     handleSetSelectedFeaturesVisible,
     handleSetSelectedFeaturesLocked,
     handleMoveSelectedFeatureToLayer,

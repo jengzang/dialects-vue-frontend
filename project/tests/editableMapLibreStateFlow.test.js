@@ -110,6 +110,11 @@ vi.mock('maplibre-gl', () => {
     project([longitude, latitude]) {
       return { x: longitude, y: latitude }
     }
+    unproject(point) {
+      const x = Array.isArray(point) ? point[0] : point?.x
+      const y = Array.isArray(point) ? point[1] : point?.y
+      return { toArray: () => [x, y] }
+    }
   }
 
   return {
@@ -1944,6 +1949,23 @@ describe('EditableMapLibre state flow', () => {
       visible: true,
       locked: false,
       labelsVisible: true,
+      textAllowOverlap: false,
+      textPriority: 4,
+      textLineHeight: 1.25,
+      textLetterSpacing: 0.05,
+      textAlign: 'center',
+      textMaxWidth: 10,
+      textMinZoom: 0,
+      textMaxZoom: 12,
+      textBackgroundEnabled: true,
+      textBackgroundColor: '#ffffff',
+      textBackgroundOpacity: 0.75,
+      textBackgroundPadding: 2,
+      textLeaderLine: true,
+      textLeaderColor: '#111111',
+      textLeaderWidth: 2,
+      textOffsetX: 0.5,
+      textOffsetY: 1.2,
       featureCollection: {
         type: 'FeatureCollection',
         features: [{
@@ -1961,9 +1983,27 @@ describe('EditableMapLibre state flow', () => {
     await nextTick()
 
     expect(JSON.stringify(wrapper.draw.options.styles)).toContain('user_labelsVisible')
+    expect(JSON.stringify(wrapper.draw.options.styles)).toContain('user_textScaleVisible')
+    expect(JSON.stringify(wrapper.draw.options.styles)).toContain('user_textPriority')
+    expect(JSON.stringify(wrapper.draw.options.styles)).toContain('user_textBackgroundEnabled')
     expect(wrapper.map.getSource('readonly-draw-source-readonly-layer').data.features[0].properties.labelsVisible).toBe(true)
     expect(wrapper.map.getLayer('readonly-draw-label-readonly-layer').type).toBe('symbol')
     expect(JSON.stringify(wrapper.map.getLayer('readonly-draw-label-readonly-layer').layout['text-field'])).toContain('name')
+    expect(wrapper.map.getLayer('readonly-draw-label-readonly-layer').layout['text-allow-overlap']).toBe(false)
+    expect(wrapper.map.getLayer('readonly-draw-label-readonly-layer').layout['text-line-height']).toBe(1.25)
+    expect(JSON.stringify(wrapper.map.getLayer('readonly-draw-label-readonly-layer').layout['symbol-sort-key'])).toContain('textPriority')
+    expect(JSON.stringify(wrapper.map.getLayer('readonly-draw-label-readonly-layer').paint['text-opacity'])).toContain('textScaleVisible')
+    expect(wrapper.map.getSource('readonly-draw-source-readonly-layer').data.features[0].properties.textScaleVisible).toBe(true)
+    expect(wrapper.map.getLayer('readonly-draw-label-background-readonly-layer').type).toBe('symbol')
+    expect(wrapper.map.getLayer('draw-text-background-fill').type).toBe('fill')
+    expect(wrapper.map.getLayer('draw-text-background-line').type).toBe('line')
+    const backgroundSource = wrapper.map.getSource('draw-text-background-source')?.data
+    expect(backgroundSource.features[0].geometry.type).toBe('Polygon')
+    expect(backgroundSource.features[0].properties.textBackgroundColor).toBe('#ffffff')
+    expect(wrapper.map.getLayer('draw-text-leader-line').type).toBe('line')
+    const leaderSource = wrapper.map.getSource('draw-text-leader-source')?.data
+    expect(leaderSource.features[0].geometry.type).toBe('LineString')
+    expect(leaderSource.features[0].properties.textLeaderColor).toBe('#111111')
 
     wrapper.unmount()
   })

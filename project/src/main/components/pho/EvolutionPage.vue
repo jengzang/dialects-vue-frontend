@@ -1719,7 +1719,7 @@ $portrait-ratio: 1;
 /* 图表区域 */
 .pie-container {
   position: relative;
-  width: 100%;
+  /*width: 100%;*/
 
   &.is-rendering {
     .pie-grid,

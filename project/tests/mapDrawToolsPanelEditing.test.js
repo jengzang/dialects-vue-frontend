@@ -109,6 +109,9 @@ function mountToolsPanel(overrides = {}) {
         @cancel-polygon-split-sketch="events.push(['cancel-polygon-split-sketch'])"
         @merge-selected-polygons="events.push(['merge-selected-polygons'])"
         @move-selected-vertex="events.push(['move-selected-vertex', $event])"
+        @update-feature-property="(key, value) => events.push(['update-feature-property', key, value])"
+        @update:selected-text-label-field-key="events.push(['update:selected-text-label-field-key', $event]); props.selectedTextLabelFieldKey = $event"
+        @apply-text-label-field="events.push(['apply-text-label-field'])"
         @delete-selected="events.push(['delete-selected'])"
       />
     `,
@@ -191,6 +194,77 @@ describe('MapDrawToolsPanel editing affordances', () => {
       .toContain('吸附：中点 · 参考线 / 边界线')
     expect(wrapper.host.querySelector('[data-testid="edit-session-feedback"]').textContent)
       .toContain('已撤回上一步')
+
+    wrapper.unmount()
+  })
+
+  it('edits advanced text annotation controls and applies labels from a data field', async () => {
+    const wrapper = mountToolsPanel({
+      currentMode: 'simple_select',
+      selectedFeatureGeometryType: 'Text',
+      featureTableColumns: [{ key: 'dialect', label: 'dialect' }],
+      selectedTextLabelFieldKey: '',
+      canApplyTextLabelField: false,
+      selectedFeatureProperties: {
+        name: '文本 A',
+        annotationText: '第一行',
+        textSize: 16,
+        textColor: '#111111',
+        textHaloColor: '#ffffff',
+        textHaloWidth: 1,
+        textRotate: 0,
+        textAnchor: 'center',
+        textAllowOverlap: false,
+        textPriority: 0,
+        textLineHeight: 1.2,
+        textLetterSpacing: 0,
+        textAlign: 'center',
+        textMaxWidth: 12,
+        textMinZoom: 4,
+        textMaxZoom: 12,
+        textBackgroundEnabled: true,
+        textBackgroundColor: '#ffffff',
+        textBackgroundOpacity: 0.8,
+        textBackgroundPadding: 2,
+        textLeaderLine: true,
+        textLeaderColor: '#111111',
+        textLeaderWidth: 1,
+        textOffsetX: 0,
+        textOffsetY: 1.1,
+        visible: true,
+        locked: false,
+      },
+    })
+    await nextTick()
+
+    const textInput = wrapper.host.querySelector('[data-testid="text-annotation-input"]')
+    textInput.value = '第一行\n第二行'
+    textInput.dispatchEvent(new Event('input', { bubbles: true }))
+    await nextTick()
+    expect(wrapper.events).toContainEqual(['update-feature-property', 'annotationText', '第一行\n第二行'])
+
+    const allowOverlap = wrapper.host.querySelector('[data-testid="text-allow-overlap-input"]')
+    allowOverlap.checked = true
+    allowOverlap.dispatchEvent(new Event('change', { bubbles: true }))
+    await nextTick()
+    expect(wrapper.events).toContainEqual(['update-feature-property', 'textAllowOverlap', true])
+
+    const priorityInput = wrapper.host.querySelector('[data-testid="text-priority-input"]')
+    priorityInput.value = '10'
+    priorityInput.dispatchEvent(new Event('input', { bubbles: true }))
+    await nextTick()
+    expect(wrapper.events).toContainEqual(['update-feature-property', 'textPriority', 10])
+
+    const fieldSelect = wrapper.host.querySelector('[data-testid="text-label-field-select"]')
+    fieldSelect.value = 'dialect'
+    fieldSelect.dispatchEvent(new Event('change', { bubbles: true }))
+    wrapper.props.canApplyTextLabelField = true
+    await nextTick()
+
+    expect(wrapper.events).toContainEqual(['update:selected-text-label-field-key', 'dialect'])
+    wrapper.host.querySelector('[data-testid="apply-text-label-field"]').click()
+    await nextTick()
+    expect(wrapper.events).toContainEqual(['apply-text-label-field'])
 
     wrapper.unmount()
   })

@@ -157,6 +157,8 @@
           :selected-feature-batch-property-key="selectedFeatureBatchPropertyKey"
           :selected-feature-batch-property-value="selectedFeatureBatchPropertyValue"
           :can-apply-selected-feature-batch-property="canApplySelectedFeatureBatchProperty"
+          :selected-text-label-field-key="selectedTextLabelFieldKey"
+          :can-apply-text-label-field="canApplyTextLabelField"
           :selected-feature-properties="selectedEditorProperties"
           :selected-feature-geometry-type="selectedEditorGeometryType"
           :is-fullscreen="isMapFullscreen"
@@ -216,6 +218,8 @@
           @update:selected-feature-batch-property-key="selectedFeatureBatchPropertyKey = $event"
           @update:selected-feature-batch-property-value="selectedFeatureBatchPropertyValue = $event"
           @apply-selected-feature-batch-property="handleApplySelectedFeatureBatchProperty"
+          @update:selected-text-label-field-key="selectedTextLabelFieldKey = $event"
+          @apply-text-label-field="handleApplyTextLabelField"
           @move-feature-to-layer="handleMoveSelectedFeatureToLayer"
           @move-selected-features-to-layer="handleMoveSelectedFeaturesToLayer"
           @set-selected-features-visible="handleSetSelectedFeaturesVisible"
@@ -835,13 +839,14 @@ const {
   selectedFeatureId, selectedFeatureIds, selectedVertexCount, selectedVertex, canDeleteSelectedVertices, isFeatureBoxSelectMode,
   isDrawingPanelOpen, isLayersPanelOpen, isMapFullscreen,
   selectedFeatureBatchName, selectedFeatureBatchPropertyKey, selectedFeatureBatchPropertyValue,
+  selectedTextLabelFieldKey,
   selectedPolygonSplitLineId, polygonSplitSketchActive, geometryEditStatus,
   snappingEnabled, snapTolerance, snapGridSize, selectedBufferDistanceKm,
   mapStyleOptions, activeLayer, activeLayerFeatureCollection, featureCount,
   activeLayerFeatures, selectedFeature, activeLayerFeatureIdSet,
   activeLayerFeatureItems, activeLayerSelectableFeatureIds,
   activeLayerFeatureTableColumns, activeLayerFeatureTableRows,
-  canApplySelectedFeatureBatchProperty, featureMoveLayerOptions,
+  canApplySelectedFeatureBatchProperty, canApplyTextLabelField, featureMoveLayerOptions,
   selectedEditorProperties, selectedEditorFeatureId, selectedEditorGeometryType,
   canModifyActiveLayer, canEditSelectedShape, canDeleteSelection, canDuplicateSelectedFeature,
   canUseSelectedGeometryTools, canBufferSelectedFeature, canCloseSelectedLine, canSplitSelectedLine,
@@ -928,8 +933,10 @@ const gisFeatures = useGisFeatures({
   selectedPolygonSplitLineFeature,
   canApplySelectedFeatureBatchProperty,
   selectedFeatureBatchName, selectedFeatureBatchPropertyKey, selectedFeatureBatchPropertyValue,
+  selectedTextLabelFieldKey,
   featureMoveLayerOptions,
   selectedBufferDistanceKm,
+  canApplyTextLabelField,
   isAuthenticated, onAuthRequired: guardWrite,
   onGeometryEditFeedback: handleGeometryEditFeedback,
 });
@@ -945,7 +952,7 @@ const {
   updateFeatureProperty, updateSelectedFeatureProperty,
   updateSelectedFeaturesProperty,
   handleUpdateFeatureTableCell,
-  handleApplySelectedFeatureBatchName, handleApplySelectedFeatureBatchProperty,
+  handleApplySelectedFeatureBatchName, handleApplySelectedFeatureBatchProperty, handleApplyTextLabelField,
   handleSetSelectedFeaturesVisible, handleSetSelectedFeaturesLocked,
   handleMoveSelectedFeatureToLayer, handleMoveSelectedFeaturesToLayer,
 } = gisFeatures;
@@ -1100,6 +1107,23 @@ function applyActiveLayerDefaultsToFeatureCollection(featureCollection) {
           textHaloWidth: props.textHaloWidth ?? activeLayer.value?.textHaloWidth,
           textRotate: props.textRotate ?? activeLayer.value?.textRotate,
           textAnchor: props.textAnchor ?? activeLayer.value?.textAnchor,
+          textAllowOverlap: props.textAllowOverlap ?? activeLayer.value?.textAllowOverlap,
+          textPriority: props.textPriority ?? activeLayer.value?.textPriority,
+          textLineHeight: props.textLineHeight ?? activeLayer.value?.textLineHeight,
+          textLetterSpacing: props.textLetterSpacing ?? activeLayer.value?.textLetterSpacing,
+          textAlign: props.textAlign ?? activeLayer.value?.textAlign,
+          textMaxWidth: props.textMaxWidth ?? activeLayer.value?.textMaxWidth,
+          textMinZoom: props.textMinZoom ?? activeLayer.value?.textMinZoom,
+          textMaxZoom: props.textMaxZoom ?? activeLayer.value?.textMaxZoom,
+          textBackgroundEnabled: props.textBackgroundEnabled ?? activeLayer.value?.textBackgroundEnabled,
+          textBackgroundColor: props.textBackgroundColor ?? activeLayer.value?.textBackgroundColor,
+          textBackgroundOpacity: props.textBackgroundOpacity ?? activeLayer.value?.textBackgroundOpacity,
+          textBackgroundPadding: props.textBackgroundPadding ?? activeLayer.value?.textBackgroundPadding,
+          textLeaderLine: props.textLeaderLine ?? activeLayer.value?.textLeaderLine,
+          textLeaderColor: props.textLeaderColor ?? activeLayer.value?.textLeaderColor,
+          textLeaderWidth: props.textLeaderWidth ?? activeLayer.value?.textLeaderWidth,
+          textOffset: props.textOffset ?? activeLayer.value?.textOffset,
+          textFontWeight: props.textFontWeight ?? activeLayer.value?.textFontWeight,
           visible: props.visible ?? activeLayer.value?.visible ?? true,
           locked: props.locked ?? activeLayer.value?.locked ?? false,
         },

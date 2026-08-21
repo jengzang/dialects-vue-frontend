@@ -60,6 +60,7 @@ function mountGisFeatures(overrides = {}) {
     selectFeature: vi.fn(),
     selectFeatures: vi.fn(),
     importGeoJson: vi.fn(),
+    updateFeatureProperties: vi.fn(),
   })
   const commitHistory = vi.fn()
   const syncAllLayersAfterMutation = vi.fn()
@@ -105,14 +106,16 @@ function mountGisFeatures(overrides = {}) {
         .map((feature) => String(feature?.id ?? feature?.properties?.id ?? ''))
         .filter(Boolean)
     )),
-    activeLayerFeatureTableColumns: computed(() => []),
+    activeLayerFeatureTableColumns: computed(() => overrides.activeLayerFeatureTableColumns ?? []),
     selectedEditorProperties: computed(() => null),
-    selectedEditorGeometryType: computed(() => 'Polygon'),
+    selectedEditorGeometryType: computed(() => overrides.selectedEditorGeometryType ?? 'Polygon'),
     selectedPolygonSplitLineFeature: computed(() => null),
     canApplySelectedFeatureBatchProperty: computed(() => false),
     selectedFeatureBatchName: ref(''),
     selectedFeatureBatchPropertyKey: ref(''),
     selectedFeatureBatchPropertyValue: ref(''),
+    selectedTextLabelFieldKey: ref(overrides.selectedTextLabelFieldKey ?? ''),
+    canApplyTextLabelField: computed(() => overrides.canApplyTextLabelField ?? false),
     featureMoveLayerOptions: computed(() => []),
     selectedBufferDistanceKm: ref(overrides.selectedBufferDistanceKm ?? 1),
     isAuthenticated: ref(true),
@@ -134,6 +137,111 @@ function mountGisFeatures(overrides = {}) {
 }
 
 describe('GIS feature operations', () => {
+  it('applies MapLibre layer-layout-only text settings at layer scope even with a selected feature', async () => {
+    const wrapper = mountGisFeatures({
+      layers: [{
+        id: 'layer-1',
+        name: '文本图层',
+        geometryType: 'Text',
+        visible: true,
+        locked: false,
+        textLineHeight: 1.2,
+        textAllowOverlap: false,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [
+            pointFeature('text-1', [113, 23]),
+            pointFeature('text-2', [114, 24]),
+          ],
+        },
+      }],
+      selectedFeatureId: 'text-1',
+      selectedFeatureIds: ['text-1'],
+      selectedEditorGeometryType: 'Text',
+    })
+
+    await wrapper.features.updateSelectedFeatureProperty('textLineHeight', 1.6)
+    await wrapper.features.updateSelectedFeatureProperty('textAllowOverlap', true)
+
+    const layer = wrapper.layers.value[0]
+    expect(layer.textLineHeight).toBe(1.6)
+    expect(layer.textAllowOverlap).toBe(true)
+    expect(layer.featureCollection.features.map((feature) => feature.properties.textLineHeight)).toEqual([1.6, 1.6])
+    expect(layer.featureCollection.features.map((feature) => feature.properties.textAllowOverlap)).toEqual([true, true])
+    expect(wrapper.editableMapRef.value.updateFeatureProperties).not.toHaveBeenCalled()
+    expect(wrapper.syncAllLayersAfterMutation).toHaveBeenCalledTimes(2)
+  })
+
+  it('applies text labels from a data field to editable targets only', async () => {
+    const wrapper = mountGisFeatures({
+      layers: [{
+        id: 'layer-1',
+        name: '文本图层',
+        geometryType: 'Text',
+        visible: true,
+        locked: false,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [
+            { ...pointFeature('text-1', [113, 23]), properties: { id: 'text-1', dialect: '粤语', visible: true, locked: false } },
+            { ...pointFeature('text-2', [114, 24]), properties: { id: 'text-2', dialect: { group: '客家' }, visible: true, locked: false } },
+            { ...pointFeature('text-3', [115, 25]), properties: { id: 'text-3', dialect: '隐藏', visible: false, locked: false } },
+            { ...pointFeature('text-4', [116, 26]), properties: { id: 'text-4', dialect: '锁定', visible: true, locked: true } },
+          ],
+        },
+      }],
+      selectedFeatureId: '',
+      selectedFeatureIds: [],
+      selectedEditorGeometryType: 'Text',
+      activeLayerFeatureTableColumns: [{ key: 'dialect', label: 'dialect' }],
+      selectedTextLabelFieldKey: 'dialect',
+      canApplyTextLabelField: true,
+    })
+
+    await wrapper.features.handleApplyTextLabelField()
+
+    const features = wrapper.layers.value[0].featureCollection.features
+    expect(features.map((feature) => feature.properties.annotationText)).toEqual([
+      '粤语',
+      '{"group":"客家"}',
+      undefined,
+      undefined,
+    ])
+    expect(wrapper.commitHistory).toHaveBeenCalledTimes(1)
+    expect(wrapper.syncAllLayersAfterMutation).toHaveBeenCalledTimes(1)
+  })
+
+  it('applies text labels from a data field to selected editable features only', async () => {
+    const wrapper = mountGisFeatures({
+      layers: [{
+        id: 'layer-1',
+        name: '文本图层',
+        geometryType: 'Text',
+        visible: true,
+        locked: false,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [
+            { ...pointFeature('text-1', [113, 23]), properties: { id: 'text-1', dialect: '粤语', visible: true, locked: false } },
+            { ...pointFeature('text-2', [114, 24]), properties: { id: 'text-2', dialect: '客家话', visible: true, locked: false } },
+          ],
+        },
+      }],
+      selectedFeatureId: 'text-2',
+      selectedFeatureIds: ['text-2'],
+      selectedEditorGeometryType: 'Text',
+      activeLayerFeatureTableColumns: [{ key: 'dialect', label: 'dialect' }],
+      selectedTextLabelFieldKey: 'dialect',
+      canApplyTextLabelField: true,
+    })
+
+    await wrapper.features.handleApplyTextLabelField()
+
+    const features = wrapper.layers.value[0].featureCollection.features
+    expect(features.map((feature) => feature.properties.annotationText)).toEqual([undefined, '客家话'])
+    expect(wrapper.setFeatureSelection).toHaveBeenCalledWith(['text-2'], 'text-2')
+  })
+
   it('merges selected polygon features into the first selected feature and removes the rest', async () => {
     const wrapper = mountGisFeatures()
 

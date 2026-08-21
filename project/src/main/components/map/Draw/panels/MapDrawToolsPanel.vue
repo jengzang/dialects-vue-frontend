@@ -860,13 +860,35 @@
             <template v-if="selectedFeatureGeometryType === 'Text'">
               <label class="draw-field">
                 <span class="draw-field-label">{{ t('map.drawTab.labels.annotationText') }}</span>
-                <input
+                <textarea
                   class="draw-input glass-field"
-                  type="text"
+                  data-testid="text-annotation-input"
+                  rows="3"
                   :value="selectedFeatureProperties.annotationText"
                   @input="$emit('update-feature-property', 'annotationText', $event.target.value)"
-                >
+                />
               </label>
+
+              <div class="draw-basemap-select">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textLabelField') }}</span>
+                <SimpleSelectDropdown
+                  data-testid="text-label-field-select"
+                  :model-value="selectedTextLabelFieldKey"
+                  :options="featureTableBatchPropertyOptions"
+                  :placeholder="t('map.drawTab.labels.textLabelField')"
+                  @update:model-value="$emit('update:selected-text-label-field-key', $event)"
+                />
+                <button
+                  class="glass-button draw-tool-inline-button"
+                  data-variant="secondary"
+                  data-testid="apply-text-label-field"
+                  type="button"
+                  :disabled="!canApplyTextLabelField"
+                  @click="$emit('apply-text-label-field')"
+                >
+                  {{ t('map.drawTab.buttons.applyTextLabelField') }}
+                </button>
+              </div>
 
               <label class="draw-field">
                 <span class="draw-field-label">{{ t('map.drawTab.labels.textSize') }}：{{ selectedFeatureProperties.textSize }}</span>
@@ -937,6 +959,212 @@
                   :options="textAnchorOptions"
                   @update:model-value="$emit('update-feature-property', 'textAnchor', $event)"
                 />
+              </div>
+
+              <div class="draw-basemap-select">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textFontWeight') }}</span>
+                <SimpleSelectDropdown
+                  :model-value="selectedFeatureProperties.textFontWeight"
+                  :options="textFontWeightOptions"
+                  @update:model-value="$emit('update-feature-property', 'textFontWeight', $event)"
+                />
+              </div>
+
+              <div class="draw-basemap-select">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textAlign') }}</span>
+                <SimpleSelectDropdown
+                  :model-value="selectedFeatureProperties.textAlign"
+                  :options="textAlignOptions"
+                  @update:model-value="$emit('update-feature-property', 'textAlign', $event)"
+                />
+              </div>
+
+              <label class="draw-toggle-field">
+                <input
+                  data-testid="text-allow-overlap-input"
+                  type="checkbox"
+                  :checked="selectedFeatureProperties.textAllowOverlap"
+                  @change="$emit('update-feature-property', 'textAllowOverlap', $event.target.checked)"
+                >
+                {{ t('map.drawTab.labels.textAllowOverlap') }}
+              </label>
+
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textPriority') }}：{{ selectedFeatureProperties.textPriority }}</span>
+                <input
+                  class="draw-input glass-field"
+                  data-testid="text-priority-input"
+                  type="number"
+                  step="1"
+                  :value="selectedFeatureProperties.textPriority"
+                  @input="$emit('update-feature-property', 'textPriority', Number($event.target.value))"
+                >
+              </label>
+
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textLineHeight') }}：{{ selectedFeatureProperties.textLineHeight }}</span>
+                <input
+                  class="draw-range-input glass-range"
+                  type="range"
+                  min="0.8"
+                  max="2"
+                  step="0.05"
+                  :value="selectedFeatureProperties.textLineHeight"
+                  @input="$emit('update-feature-property', 'textLineHeight', Number($event.target.value))"
+                >
+              </label>
+
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textLetterSpacing') }}：{{ selectedFeatureProperties.textLetterSpacing }}</span>
+                <input
+                  class="draw-range-input glass-range"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  :value="selectedFeatureProperties.textLetterSpacing"
+                  @input="$emit('update-feature-property', 'textLetterSpacing', Number($event.target.value))"
+                >
+              </label>
+
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textMaxWidth') }}：{{ selectedFeatureProperties.textMaxWidth }}</span>
+                <input
+                  class="draw-range-input glass-range"
+                  type="range"
+                  min="4"
+                  max="32"
+                  step="1"
+                  :value="selectedFeatureProperties.textMaxWidth"
+                  @input="$emit('update-feature-property', 'textMaxWidth', Number($event.target.value))"
+                >
+              </label>
+
+              <div class="draw-tool-wide-control">
+                <label class="draw-field">
+                  <span class="draw-field-label">{{ t('map.drawTab.labels.textMinZoom') }}</span>
+                  <input
+                    class="draw-input glass-field"
+                    type="number"
+                    min="0"
+                    max="24"
+                    step="1"
+                    :value="selectedFeatureProperties.textMinZoom"
+                    @input="$emit('update-feature-property', 'textMinZoom', Number($event.target.value))"
+                  >
+                </label>
+                <label class="draw-field">
+                  <span class="draw-field-label">{{ t('map.drawTab.labels.textMaxZoom') }}</span>
+                  <input
+                    class="draw-input glass-field"
+                    type="number"
+                    min="0"
+                    max="24"
+                    step="1"
+                    :value="selectedFeatureProperties.textMaxZoom"
+                    @input="$emit('update-feature-property', 'textMaxZoom', Number($event.target.value))"
+                  >
+                </label>
+              </div>
+
+              <label class="draw-toggle-field">
+                <input
+                  type="checkbox"
+                  :checked="selectedFeatureProperties.textBackgroundEnabled"
+                  @change="$emit('update-feature-property', 'textBackgroundEnabled', $event.target.checked)"
+                >
+                {{ t('map.drawTab.labels.textBackgroundEnabled') }}
+              </label>
+
+              <label class="draw-field draw-color-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textBackgroundColor') }}</span>
+                <input
+                  class="draw-color-input glass-field"
+                  type="color"
+                  :value="selectedFeatureProperties.textBackgroundColor"
+                  @input="$emit('update-feature-property', 'textBackgroundColor', $event.target.value)"
+                >
+              </label>
+
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textBackgroundOpacity') }}：{{ selectedFeatureProperties.textBackgroundOpacity }}</span>
+                <input
+                  class="draw-range-input glass-range"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  :value="selectedFeatureProperties.textBackgroundOpacity"
+                  @input="$emit('update-feature-property', 'textBackgroundOpacity', Number($event.target.value))"
+                >
+              </label>
+
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textBackgroundPadding') }}：{{ selectedFeatureProperties.textBackgroundPadding }}</span>
+                <input
+                  class="draw-range-input glass-range"
+                  type="range"
+                  min="0"
+                  max="8"
+                  step="0.25"
+                  :value="selectedFeatureProperties.textBackgroundPadding"
+                  @input="$emit('update-feature-property', 'textBackgroundPadding', Number($event.target.value))"
+                >
+              </label>
+
+              <label class="draw-toggle-field">
+                <input
+                  type="checkbox"
+                  :checked="selectedFeatureProperties.textLeaderLine"
+                  @change="$emit('update-feature-property', 'textLeaderLine', $event.target.checked)"
+                >
+                {{ t('map.drawTab.labels.textLeaderLine') }}
+              </label>
+
+              <label class="draw-field draw-color-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textLeaderColor') }}</span>
+                <input
+                  class="draw-color-input glass-field"
+                  type="color"
+                  :value="selectedFeatureProperties.textLeaderColor"
+                  @input="$emit('update-feature-property', 'textLeaderColor', $event.target.value)"
+                >
+              </label>
+
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textLeaderWidth') }}：{{ selectedFeatureProperties.textLeaderWidth }}</span>
+                <input
+                  class="draw-range-input glass-range"
+                  type="range"
+                  min="0.5"
+                  max="8"
+                  step="0.5"
+                  :value="selectedFeatureProperties.textLeaderWidth"
+                  @input="$emit('update-feature-property', 'textLeaderWidth', Number($event.target.value))"
+                >
+              </label>
+
+              <div class="draw-tool-wide-control">
+                <label class="draw-field">
+                  <span class="draw-field-label">{{ t('map.drawTab.labels.textOffsetX') }}</span>
+                  <input
+                    class="draw-input glass-field"
+                    type="number"
+                    step="0.1"
+                    :value="getTextOffsetValue(0)"
+                    @input="emitTextOffsetUpdate(0, $event.target.value)"
+                  >
+                </label>
+                <label class="draw-field">
+                  <span class="draw-field-label">{{ t('map.drawTab.labels.textOffsetY') }}</span>
+                  <input
+                    class="draw-input glass-field"
+                    type="number"
+                    step="0.1"
+                    :value="getTextOffsetValue(1)"
+                    @input="emitTextOffsetUpdate(1, $event.target.value)"
+                  >
+                </label>
               </div>
             </template>
 
@@ -1115,7 +1343,9 @@ const props = defineProps({
   selectedFeatureBatchName: { type: String, default: '' },
   selectedFeatureBatchPropertyKey: { type: String, default: '' },
   selectedFeatureBatchPropertyValue: { type: String, default: '' },
+  selectedTextLabelFieldKey: { type: String, default: '' },
   canApplySelectedFeatureBatchProperty: { type: Boolean, default: false },
+  canApplyTextLabelField: { type: Boolean, default: false },
   selectedFeatureProperties: { type: Object, default: null },
   selectedFeatureGeometryType: { type: String, default: '' },
   isFullscreen: { type: Boolean, default: false },
@@ -1193,6 +1423,8 @@ const emit = defineEmits([
   'update:selected-feature-batch-property-key',
   'update:selected-feature-batch-property-value',
   'apply-selected-feature-batch-property',
+  'update:selected-text-label-field-key',
+  'apply-text-label-field',
   'move-feature-to-layer',
   'move-selected-features-to-layer',
   'set-selected-features-visible',
@@ -1213,6 +1445,17 @@ const textAnchorOptions = computed(() => [
   { label: t('map.drawTab.labels.textAnchorCenter'), value: 'center' },
   { label: t('map.drawTab.labels.textAnchorTop'), value: 'top' },
   { label: t('map.drawTab.labels.textAnchorBottom'), value: 'bottom' },
+])
+
+const textAlignOptions = computed(() => [
+  { label: t('map.drawTab.labels.textAlignLeft'), value: 'left' },
+  { label: t('map.drawTab.labels.textAlignCenter'), value: 'center' },
+  { label: t('map.drawTab.labels.textAlignRight'), value: 'right' },
+])
+
+const textFontWeightOptions = computed(() => [
+  { label: t('map.drawTab.labels.textFontWeightRegular'), value: 'regular' },
+  { label: t('map.drawTab.labels.textFontWeightBold'), value: 'bold' },
 ])
 
 const getFeatureStateLabel = (feature) => {
@@ -1291,6 +1534,27 @@ const canApplySelectedVertexCoordinate = computed(() => {
   if (!currentCoordinate || !nextCoordinate) return false
   return currentCoordinate[0] !== nextCoordinate[0] || currentCoordinate[1] !== nextCoordinate[1]
 })
+
+const getTextOffsetValue = (index) => {
+  const splitOffset = index === 0
+    ? props.selectedFeatureProperties?.textOffsetX
+    : props.selectedFeatureProperties?.textOffsetY
+  if (splitOffset !== undefined) {
+    const splitValue = Number(splitOffset)
+    return Number.isFinite(splitValue) ? splitValue : (index === 0 ? 0 : 1.1)
+  }
+  const offset = props.selectedFeatureProperties?.textOffset
+  const value = Array.isArray(offset) ? Number(offset[index]) : Number(index === 0 ? 0 : 1.1)
+  return Number.isFinite(value) ? value : (index === 0 ? 0 : 1.1)
+}
+
+const emitTextOffsetUpdate = (index, value) => {
+  const nextValue = Number(value)
+  if (!Number.isFinite(nextValue)) return
+  const nextOffset = [getTextOffsetValue(0), getTextOffsetValue(1)]
+  nextOffset[index] = nextValue
+  emit('update-feature-property', 'textOffset', nextOffset)
+}
 
 watch(() => props.selectedVertex, () => {
   const coordinate = selectedVertexCoordinate.value

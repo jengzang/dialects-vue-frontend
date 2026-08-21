@@ -48,6 +48,26 @@ const activeLayerLabelsVisibleExpression = ['coalesce', ['get', 'user_labelsVisi
 const layerOpacityExpression = ['coalesce', ['get', 'opacity'], 1]
 const layerLabelsVisibleExpression = ['coalesce', ['get', 'labelsVisible'], false]
 const textFieldExpression = ['coalesce', ['get', 'user_annotationText'], ['get', 'annotationText'], ['get', 'name'], ['get', 'title'], ['get', 'label'], '']
+const regularTextFontExpression = ['literal', ['Open Sans Regular', 'Arial Unicode MS Regular']]
+const boldTextFontExpression = ['literal', ['Open Sans Bold', 'Arial Unicode MS Bold']]
+const activeTextFontExpression = [
+  'case',
+  ['==', ['coalesce', ['get', 'user_textFontWeight'], 'regular'], 'bold'],
+  boldTextFontExpression,
+  regularTextFontExpression,
+]
+const layerTextFontExpression = [
+  'case',
+  ['==', ['coalesce', ['get', 'textFontWeight'], 'regular'], 'bold'],
+  boldTextFontExpression,
+  regularTextFontExpression,
+]
+const activeTextScaleVisibleExpression = ['coalesce', ['get', 'user_textScaleVisible'], true]
+const layerTextScaleVisibleExpression = ['coalesce', ['get', 'textScaleVisible'], true]
+const activeTextOffsetExpression = ['coalesce', ['get', 'user_textOffset'], ['literal', [0, 1.1]]]
+const layerTextOffsetExpression = ['coalesce', ['get', 'textOffset'], ['literal', [0, 1.1]]]
+const defaultTextLineHeight = 1.2
+const defaultTextAllowOverlap = false
 const drawStyles = [
   {
     id: 'gl-draw-polygon-fill',
@@ -144,22 +164,55 @@ const drawStyles = [
     },
   },
   {
+    id: 'gl-draw-label-background',
+    type: 'symbol',
+    filter: ['all', ['!=', 'meta', 'midpoint'], ['!=', 'meta', 'vertex'], ['!=', 'mode', 'static'], ['!=', 'user_visible', false]],
+    layout: {
+      'text-field': textFieldExpression,
+      'text-size': ['coalesce', ['get', 'user_textSize'], 12],
+      'text-offset': activeTextOffsetExpression,
+      'text-anchor': ['coalesce', ['get', 'user_textAnchor'], 'top'],
+      'text-rotate': ['coalesce', ['get', 'user_textRotate'], 0],
+      'text-font': activeTextFontExpression,
+      'text-justify': ['coalesce', ['get', 'user_textAlign'], 'center'],
+      'text-line-height': defaultTextLineHeight,
+      'text-letter-spacing': ['coalesce', ['get', 'user_textLetterSpacing'], 0],
+      'text-max-width': ['coalesce', ['get', 'user_textMaxWidth'], 12],
+      'text-allow-overlap': defaultTextAllowOverlap,
+      'text-ignore-placement': defaultTextAllowOverlap,
+      'symbol-sort-key': ['coalesce', ['get', 'user_textPriority'], 0],
+    },
+    paint: {
+      'text-color': ['coalesce', ['get', 'user_textBackgroundColor'], '#ffffff'],
+      'text-halo-color': ['coalesce', ['get', 'user_textBackgroundColor'], '#ffffff'],
+      'text-halo-width': ['case', ['==', ['coalesce', ['get', 'user_textBackgroundEnabled'], false], true], ['coalesce', ['get', 'user_textBackgroundPadding'], 2], 0],
+      'text-opacity': ['case', ['all', ['==', activeLayerLabelsVisibleExpression, true], activeTextScaleVisibleExpression, ['==', ['coalesce', ['get', 'user_textBackgroundEnabled'], false], true]], ['coalesce', ['get', 'user_textBackgroundOpacity'], 0.75], 0],
+    },
+  },
+  {
     id: 'gl-draw-label',
     type: 'symbol',
     filter: ['all', ['!=', 'meta', 'midpoint'], ['!=', 'meta', 'vertex'], ['!=', 'mode', 'static'], ['!=', 'user_visible', false]],
     layout: {
       'text-field': textFieldExpression,
       'text-size': ['coalesce', ['get', 'user_textSize'], 12],
-      'text-offset': [0, 1.1],
+      'text-offset': activeTextOffsetExpression,
       'text-anchor': ['coalesce', ['get', 'user_textAnchor'], 'top'],
       'text-rotate': ['coalesce', ['get', 'user_textRotate'], 0],
-      'text-allow-overlap': false,
+      'text-font': activeTextFontExpression,
+      'text-justify': ['coalesce', ['get', 'user_textAlign'], 'center'],
+      'text-line-height': defaultTextLineHeight,
+      'text-letter-spacing': ['coalesce', ['get', 'user_textLetterSpacing'], 0],
+      'text-max-width': ['coalesce', ['get', 'user_textMaxWidth'], 12],
+      'text-allow-overlap': defaultTextAllowOverlap,
+      'text-ignore-placement': defaultTextAllowOverlap,
+      'symbol-sort-key': ['coalesce', ['get', 'user_textPriority'], 0],
     },
     paint: {
       'text-color': ['coalesce', ['get', 'user_textColor'], ['get', 'user_stroke'], drawFallbackStroke],
       'text-halo-color': ['coalesce', ['get', 'user_textHaloColor'], '#ffffff'],
       'text-halo-width': ['coalesce', ['get', 'user_textHaloWidth'], 1],
-      'text-opacity': ['case', ['==', activeLayerLabelsVisibleExpression, true], activeLayerOpacityExpression, 0],
+      'text-opacity': ['case', ['all', ['==', activeLayerLabelsVisibleExpression, true], activeTextScaleVisibleExpression], activeLayerOpacityExpression, 0],
     },
   },
 ]
@@ -173,6 +226,11 @@ const snapPreviewSourceId = 'draw-snap-preview-source'
 const snapPreviewGuideLayerId = 'draw-snap-preview-guide'
 const snapPreviewPointLayerId = 'draw-snap-preview-point'
 const snapPreviewLayerIds = new Set([snapPreviewGuideLayerId, snapPreviewPointLayerId])
+const textLeaderSourceId = 'draw-text-leader-source'
+const textLeaderLayerId = 'draw-text-leader-line'
+const textBackgroundSourceId = 'draw-text-background-source'
+const textBackgroundFillLayerId = 'draw-text-background-fill'
+const textBackgroundLineLayerId = 'draw-text-background-line'
 const snapPriorityBiasSquared = 1
 
 const props = defineProps({
@@ -285,6 +343,34 @@ const buildReadonlyLayerDescriptors = () => {
           pointRadius: feature.properties?.pointRadius ?? layer.pointRadius,
           pointColor: feature.properties?.pointColor ?? layer.pointColor,
           pointStrokeColor: feature.properties?.pointStrokeColor ?? layer.pointStrokeColor,
+          annotationText: feature.properties?.annotationText ?? layer.annotationText,
+          textSize: feature.properties?.textSize ?? layer.textSize,
+          textColor: feature.properties?.textColor ?? layer.textColor,
+          textHaloColor: feature.properties?.textHaloColor ?? layer.textHaloColor,
+          textHaloWidth: feature.properties?.textHaloWidth ?? layer.textHaloWidth,
+          textRotate: feature.properties?.textRotate ?? layer.textRotate,
+          textAnchor: feature.properties?.textAnchor ?? layer.textAnchor,
+          textAllowOverlap: feature.properties?.textAllowOverlap ?? layer.textAllowOverlap ?? false,
+          textPriority: feature.properties?.textPriority ?? layer.textPriority ?? 0,
+          textLineHeight: feature.properties?.textLineHeight ?? layer.textLineHeight ?? 1.2,
+          textLetterSpacing: feature.properties?.textLetterSpacing ?? layer.textLetterSpacing ?? 0,
+          textAlign: feature.properties?.textAlign ?? layer.textAlign ?? 'center',
+          textMaxWidth: feature.properties?.textMaxWidth ?? layer.textMaxWidth ?? 12,
+          textMinZoom: feature.properties?.textMinZoom ?? layer.textMinZoom ?? 0,
+          textMaxZoom: feature.properties?.textMaxZoom ?? layer.textMaxZoom ?? 24,
+          textScaleVisible: isTextScaleVisible(feature, layer),
+          textBackgroundEnabled: feature.properties?.textBackgroundEnabled ?? layer.textBackgroundEnabled ?? false,
+          textBackgroundColor: feature.properties?.textBackgroundColor ?? layer.textBackgroundColor ?? '#ffffff',
+          textBackgroundOpacity: feature.properties?.textBackgroundOpacity ?? layer.textBackgroundOpacity ?? 0.75,
+          textBackgroundPadding: feature.properties?.textBackgroundPadding ?? layer.textBackgroundPadding ?? 2,
+          textLeaderLine: feature.properties?.textLeaderLine ?? layer.textLeaderLine ?? false,
+          textLeaderColor: feature.properties?.textLeaderColor ?? layer.textLeaderColor ?? feature.properties?.textColor ?? layer.textColor ?? layer.stroke,
+          textLeaderWidth: feature.properties?.textLeaderWidth ?? layer.textLeaderWidth ?? 1.5,
+          textOffset: feature.properties?.textOffset ?? layer.textOffset ?? [
+            feature.properties?.textOffsetX ?? layer.textOffsetX ?? 0,
+            feature.properties?.textOffsetY ?? layer.textOffsetY ?? 1.1,
+          ],
+          textFontWeight: feature.properties?.textFontWeight ?? layer.textFontWeight ?? 'regular',
           visible: feature.properties?.visible ?? layer.visible,
           locked: true,
           layerId: layer.id,
@@ -299,7 +385,10 @@ const buildReadonlyLayerDescriptors = () => {
         fillLayerId: `readonly-draw-fill-${layer.id}`,
         lineLayerId: `readonly-draw-line-${layer.id}`,
         pointLayerId: `readonly-draw-point-${layer.id}`,
+        labelBackgroundLayerId: `readonly-draw-label-background-${layer.id}`,
         labelLayerId: `readonly-draw-label-${layer.id}`,
+        textAllowOverlap: layer.textAllowOverlap ?? defaultTextAllowOverlap,
+        textLineHeight: layer.textLineHeight ?? defaultTextLineHeight,
         featureCollection: normalizeFeatureCollection({
           type: 'FeatureCollection',
           features,
@@ -477,6 +566,35 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
     })
   }
 
+  if (descriptor.labelBackgroundLayerId && !map.value.getLayer(descriptor.labelBackgroundLayerId)) {
+    map.value.addLayer({
+      id: descriptor.labelBackgroundLayerId,
+      type: 'symbol',
+      source: descriptor.sourceId,
+      layout: {
+        'text-field': textFieldExpression,
+        'text-size': ['coalesce', ['get', 'textSize'], 12],
+        'text-offset': layerTextOffsetExpression,
+        'text-anchor': ['coalesce', ['get', 'textAnchor'], 'top'],
+        'text-rotate': ['coalesce', ['get', 'textRotate'], 0],
+        'text-font': layerTextFontExpression,
+        'text-justify': ['coalesce', ['get', 'textAlign'], 'center'],
+        'text-line-height': getFiniteTextStyleNumber(descriptor.textLineHeight, defaultTextLineHeight),
+        'text-letter-spacing': ['coalesce', ['get', 'textLetterSpacing'], 0],
+        'text-max-width': ['coalesce', ['get', 'textMaxWidth'], 12],
+        'text-allow-overlap': descriptor.textAllowOverlap === true,
+        'text-ignore-placement': descriptor.textAllowOverlap === true,
+        'symbol-sort-key': ['coalesce', ['get', 'textPriority'], ['get', 'layerOrder'], 0],
+      },
+      paint: {
+        'text-color': ['coalesce', ['get', 'textBackgroundColor'], '#ffffff'],
+        'text-halo-color': ['coalesce', ['get', 'textBackgroundColor'], '#ffffff'],
+        'text-halo-width': ['case', ['==', ['coalesce', ['get', 'textBackgroundEnabled'], false], true], ['coalesce', ['get', 'textBackgroundPadding'], 2], 0],
+        'text-opacity': ['case', ['all', ['==', layerLabelsVisibleExpression, true], layerTextScaleVisibleExpression, ['==', ['coalesce', ['get', 'textBackgroundEnabled'], false], true]], ['coalesce', ['get', 'textBackgroundOpacity'], 0.75], 0],
+      },
+    })
+  }
+
   if (!map.value.getLayer(descriptor.labelLayerId)) {
     map.value.addLayer({
       id: descriptor.labelLayerId,
@@ -485,16 +603,23 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
       layout: {
         'text-field': textFieldExpression,
         'text-size': ['coalesce', ['get', 'textSize'], 12],
-        'text-offset': [0, 1.1],
+        'text-offset': layerTextOffsetExpression,
         'text-anchor': ['coalesce', ['get', 'textAnchor'], 'top'],
         'text-rotate': ['coalesce', ['get', 'textRotate'], 0],
-        'symbol-sort-key': ['coalesce', ['get', 'layerOrder'], 0],
+        'text-font': layerTextFontExpression,
+        'text-justify': ['coalesce', ['get', 'textAlign'], 'center'],
+        'text-line-height': getFiniteTextStyleNumber(descriptor.textLineHeight, defaultTextLineHeight),
+        'text-letter-spacing': ['coalesce', ['get', 'textLetterSpacing'], 0],
+        'text-max-width': ['coalesce', ['get', 'textMaxWidth'], 12],
+        'text-allow-overlap': descriptor.textAllowOverlap === true,
+        'text-ignore-placement': descriptor.textAllowOverlap === true,
+        'symbol-sort-key': ['coalesce', ['get', 'textPriority'], ['get', 'layerOrder'], 0],
       },
       paint: {
         'text-color': ['coalesce', ['get', 'textColor'], ['get', 'stroke'], drawFallbackStroke],
         'text-halo-color': ['coalesce', ['get', 'textHaloColor'], '#ffffff'],
         'text-halo-width': ['coalesce', ['get', 'textHaloWidth'], 1],
-        'text-opacity': ['case', ['==', layerLabelsVisibleExpression, true], layerOpacityExpression, 0],
+        'text-opacity': ['case', ['all', ['==', layerLabelsVisibleExpression, true], layerTextScaleVisibleExpression], layerOpacityExpression, 0],
       },
     })
   }
@@ -523,8 +648,10 @@ const cleanupReadonlyLayerDescriptors = (layerDescriptors) => {
     const fillLayerId = `${prefix}-draw-fill-${idSuffix}`
     const lineLayerId = `${prefix}-draw-line-${idSuffix}`
     const pointLayerId = `${prefix}-draw-point-${idSuffix}`
+    const labelBackgroundLayerId = `${prefix}-draw-label-background-${idSuffix}`
     const labelLayerId = `${prefix}-draw-label-${idSuffix}`
     if (map.value.getLayer(labelLayerId)) map.value.removeLayer(labelLayerId)
+    if (map.value.getLayer(labelBackgroundLayerId)) map.value.removeLayer(labelBackgroundLayerId)
     if (map.value.getLayer(pointLayerId)) map.value.removeLayer(pointLayerId)
     if (map.value.getLayer(lineLayerId)) map.value.removeLayer(lineLayerId)
     if (map.value.getLayer(fillLayerId)) map.value.removeLayer(fillLayerId)
@@ -542,13 +669,297 @@ const removeReadonlyLayerById = (layerId) => {
   const fillLayerId = `readonly-draw-fill-${layerId}`
   const lineLayerId = `readonly-draw-line-${layerId}`
   const pointLayerId = `readonly-draw-point-${layerId}`
+  const labelBackgroundLayerId = `readonly-draw-label-background-${layerId}`
   const labelLayerId = `readonly-draw-label-${layerId}`
 
   if (map.value.getLayer(labelLayerId)) map.value.removeLayer(labelLayerId)
+  if (map.value.getLayer(labelBackgroundLayerId)) map.value.removeLayer(labelBackgroundLayerId)
   if (map.value.getLayer(pointLayerId)) map.value.removeLayer(pointLayerId)
   if (map.value.getLayer(lineLayerId)) map.value.removeLayer(lineLayerId)
   if (map.value.getLayer(fillLayerId)) map.value.removeLayer(fillLayerId)
   if (map.value.getSource(sourceId)) map.value.removeSource(sourceId)
+}
+
+const getTextStyleValue = (feature, layer, key, fallback) => {
+  return feature?.properties?.[key] ?? layer?.[key] ?? fallback
+}
+
+const getFiniteTextStyleNumber = (value, fallback) => {
+  const numberValue = Number(value)
+  return Number.isFinite(numberValue) ? numberValue : fallback
+}
+
+const getTextOffset = (feature, layer) => {
+  const offsetXValue = getTextStyleValue(feature, layer, 'textOffsetX')
+  const offsetYValue = getTextStyleValue(feature, layer, 'textOffsetY')
+  if (offsetXValue !== undefined || offsetYValue !== undefined) {
+    const offsetX = Number(offsetXValue)
+    const offsetY = Number(offsetYValue)
+    return [
+      Number.isFinite(offsetX) ? offsetX : 0,
+      Number.isFinite(offsetY) ? offsetY : 1.1,
+    ]
+  }
+  const offset = getTextStyleValue(feature, layer, 'textOffset', [0, 1.1])
+  const offsetX = Number(offset?.[0])
+  const offsetY = Number(offset?.[1])
+  return [
+    Number.isFinite(offsetX) ? offsetX : 0,
+    Number.isFinite(offsetY) ? offsetY : 1.1,
+  ]
+}
+
+const getTextLabel = (feature, layer) => {
+  return String(
+    getTextStyleValue(
+      feature,
+      layer,
+      'annotationText',
+      feature?.properties?.name ?? feature?.properties?.title ?? feature?.properties?.label ?? ''
+    ) ?? ''
+  )
+}
+
+const shouldRenderTextBackground = (feature, layer) => {
+  return Boolean(
+    feature?.geometry?.type === 'Point'
+    && getTextStyleValue(feature, layer, 'visible', true) !== false
+    && getTextStyleValue(feature, layer, 'labelsVisible', false) === true
+    && getTextStyleValue(feature, layer, 'textBackgroundEnabled', false) === true
+    && isTextScaleVisible(feature, layer)
+    && getTextLabel(feature, layer).trim()
+  )
+}
+
+const shouldRenderTextLeader = (feature, layer) => {
+  return Boolean(
+    feature?.geometry?.type === 'Point'
+    && getTextStyleValue(feature, layer, 'visible', true) !== false
+    && getTextStyleValue(feature, layer, 'labelsVisible', false) === true
+    && getTextStyleValue(feature, layer, 'textLeaderLine', false) === true
+    && isTextScaleVisible(feature, layer)
+  )
+}
+
+const isTextScaleVisible = (feature, layer) => {
+  const zoom = Number(map.value?.getZoom?.())
+  if (!Number.isFinite(zoom)) return true
+  const minZoom = Number(getTextStyleValue(feature, layer, 'textMinZoom', 0))
+  const maxZoom = Number(getTextStyleValue(feature, layer, 'textMaxZoom', 24))
+  const safeMinZoom = Number.isFinite(minZoom) ? minZoom : 0
+  const safeMaxZoom = Number.isFinite(maxZoom) ? maxZoom : 24
+  return zoom >= safeMinZoom && zoom <= safeMaxZoom
+}
+
+const syncActiveTextScaleVisibility = () => {
+  if (!map.value || !draw.value || !['Point', 'Text'].includes(props.activeLayer?.geometryType)) return
+  const features = normalizeFeatureCollection(draw.value.getAll?.()).features ?? []
+  features.forEach((feature) => {
+    const featureId = getDrawFeatureId(feature)
+    if (!featureId) return
+    const nextVisible = isTextScaleVisible(feature, props.activeLayer)
+    if (feature.properties?.textScaleVisible !== nextVisible) {
+      draw.value.setFeatureProperty?.(featureId, 'textScaleVisible', nextVisible)
+    }
+  })
+}
+
+const syncActiveTextLayoutConstants = () => {
+  if (!map.value) return
+  const textLineHeight = getFiniteTextStyleNumber(props.activeLayer?.textLineHeight, defaultTextLineHeight)
+  const textAllowOverlap = props.activeLayer?.textAllowOverlap === true
+  ;['gl-draw-label-background', 'gl-draw-label'].forEach((layerId) => {
+    if (!map.value.getLayer(layerId)) return
+    map.value.setLayoutProperty?.(layerId, 'text-line-height', textLineHeight)
+    map.value.setLayoutProperty?.(layerId, 'text-allow-overlap', textAllowOverlap)
+    map.value.setLayoutProperty?.(layerId, 'text-ignore-placement', textAllowOverlap)
+  })
+}
+
+const buildTextBackgroundFeature = (feature, layer) => {
+  if (!map.value || !shouldRenderTextBackground(feature, layer)) return null
+  const coordinate = normalizeVertexCoordinate(feature.geometry.coordinates)
+  if (!coordinate) return null
+  const label = getTextLabel(feature, layer)
+  const lines = label.split(/\r?\n/)
+  const textSize = getFiniteTextStyleNumber(getTextStyleValue(feature, layer, 'textSize', 16), 16)
+  const lineHeight = getFiniteTextStyleNumber(getTextStyleValue(feature, layer, 'textLineHeight', defaultTextLineHeight), defaultTextLineHeight)
+  const maxWidth = Math.max(1, getFiniteTextStyleNumber(getTextStyleValue(feature, layer, 'textMaxWidth', 12), 12))
+  const padding = Math.max(0, getFiniteTextStyleNumber(getTextStyleValue(feature, layer, 'textBackgroundPadding', 2), 2))
+  const [offsetX, offsetY] = getTextOffset(feature, layer)
+  const wrappedLineCount = lines.reduce((count, line) => {
+    const length = Math.max(1, Array.from(line).length)
+    return count + Math.max(1, Math.ceil(length / maxWidth))
+  }, 0)
+  const longestLineLength = Math.max(1, ...lines.map((line) => Array.from(line).length))
+  const width = (Math.min(longestLineLength, maxWidth) * textSize * 0.62) + (padding * 2)
+  const height = (Math.max(1, wrappedLineCount) * textSize * lineHeight) + (padding * 2)
+  const anchorPoint = map.value.project(coordinate)
+  let centerX = anchorPoint.x + (offsetX * textSize)
+  let centerY = anchorPoint.y + (offsetY * textSize)
+  const anchor = String(getTextStyleValue(feature, layer, 'textAnchor', 'top'))
+  if (anchor.includes('left')) centerX += width / 2
+  if (anchor.includes('right')) centerX -= width / 2
+  if (anchor.includes('top')) centerY += height / 2
+  if (anchor.includes('bottom')) centerY -= height / 2
+  const screenCorners = [
+    { x: centerX - (width / 2), y: centerY - (height / 2) },
+    { x: centerX + (width / 2), y: centerY - (height / 2) },
+    { x: centerX + (width / 2), y: centerY + (height / 2) },
+    { x: centerX - (width / 2), y: centerY + (height / 2) },
+  ]
+  const coordinates = screenCorners
+    .map((point) => normalizeVertexCoordinate(map.value.unproject?.(point)?.toArray?.()))
+    .filter(Boolean)
+  if (coordinates.length !== 4) return null
+  coordinates.push([...coordinates[0]])
+  return {
+    type: 'Feature',
+    properties: {
+      textBackgroundColor: getTextStyleValue(feature, layer, 'textBackgroundColor', '#ffffff'),
+      textBackgroundOpacity: getFiniteTextStyleNumber(getTextStyleValue(feature, layer, 'textBackgroundOpacity', 0.75), 0.75),
+    },
+    geometry: {
+      type: 'Polygon',
+      coordinates: [coordinates],
+    },
+  }
+}
+
+const buildTextBackgroundFeatures = () => {
+  const activeFeatureCollection = normalizeFeatureCollection(draw.value?.getAll?.() ?? props.modelValue)
+  const activeLayer = props.activeLayer ?? {}
+  const activeFeatures = ['Point', 'Text'].includes(activeLayer.geometryType)
+    ? (activeFeatureCollection.features ?? []).map((feature) => buildTextBackgroundFeature(feature, activeLayer))
+    : []
+  const readonlyFeatures = (props.allLayers ?? [])
+    .filter((layer) => layer?.id !== props.activeLayer?.id && ['Point', 'Text'].includes(layer?.geometryType))
+    .flatMap((layer) => (normalizeFeatureCollection(layer?.featureCollection).features ?? [])
+      .map((feature) => buildTextBackgroundFeature(feature, layer)))
+  return [...activeFeatures, ...readonlyFeatures].filter(Boolean)
+}
+
+const ensureTextBackgroundLayers = () => {
+  if (!map.value) return
+  if (!map.value.getSource(textBackgroundSourceId)) {
+    map.value.addSource(textBackgroundSourceId, {
+      type: 'geojson',
+      data: featureCollection([]),
+    })
+  }
+  if (!map.value.getLayer(textBackgroundFillLayerId)) {
+    map.value.addLayer({
+      id: textBackgroundFillLayerId,
+      type: 'fill',
+      source: textBackgroundSourceId,
+      paint: {
+        'fill-color': ['coalesce', ['get', 'textBackgroundColor'], '#ffffff'],
+        'fill-opacity': ['coalesce', ['get', 'textBackgroundOpacity'], 0.75],
+      },
+    }, map.value.getLayer('gl-draw-label') ? 'gl-draw-label' : undefined)
+  }
+  if (!map.value.getLayer(textBackgroundLineLayerId)) {
+    map.value.addLayer({
+      id: textBackgroundLineLayerId,
+      type: 'line',
+      source: textBackgroundSourceId,
+      paint: {
+        'line-color': ['coalesce', ['get', 'textBackgroundColor'], '#ffffff'],
+        'line-opacity': ['coalesce', ['get', 'textBackgroundOpacity'], 0.75],
+        'line-width': 1,
+      },
+    }, map.value.getLayer('gl-draw-label') ? 'gl-draw-label' : undefined)
+  }
+}
+
+const syncTextBackgroundBoxes = () => {
+  if (!map.value) return
+  ensureTextBackgroundLayers()
+  map.value.getSource(textBackgroundSourceId)?.setData?.(featureCollection(buildTextBackgroundFeatures()))
+}
+
+const buildTextLeaderFeature = (feature, layer) => {
+  if (!map.value || !shouldRenderTextLeader(feature, layer)) return null
+  const coordinate = normalizeVertexCoordinate(feature.geometry.coordinates)
+  if (!coordinate) return null
+  const [offsetX, offsetY] = getTextOffset(feature, layer)
+  const textSize = Number(getTextStyleValue(feature, layer, 'textSize', 16)) || 16
+  const startPoint = map.value.project(coordinate)
+  const endPoint = {
+    x: startPoint.x + (offsetX * textSize),
+    y: startPoint.y + (offsetY * textSize),
+  }
+  const endCoordinate = map.value.unproject?.(endPoint)?.toArray?.()
+  if (!normalizeVertexCoordinate(endCoordinate) || areCoordinatesEqual(coordinate, endCoordinate)) return null
+  const leaderColor = getTextStyleValue(
+    feature,
+    layer,
+    'textLeaderColor',
+    getTextStyleValue(feature, layer, 'textColor', getTextStyleValue(feature, layer, 'stroke', drawFallbackStroke))
+  )
+  return {
+    type: 'Feature',
+    properties: {
+      textLeaderColor: leaderColor,
+      textLeaderWidth: Number(getTextStyleValue(feature, layer, 'textLeaderWidth', 1.5)) || 1.5,
+      opacity: Number(getTextStyleValue(feature, layer, 'opacity', 1)) || 1,
+    },
+    geometry: {
+      type: 'LineString',
+      coordinates: [coordinate, endCoordinate],
+    },
+  }
+}
+
+const buildTextLeaderFeatures = () => {
+  const activeFeatureCollection = normalizeFeatureCollection(draw.value?.getAll?.() ?? props.modelValue)
+  const activeLayer = props.activeLayer ?? {}
+  const activeFeatures = ['Point', 'Text'].includes(activeLayer.geometryType)
+    ? (activeFeatureCollection.features ?? []).map((feature) => buildTextLeaderFeature(feature, activeLayer))
+    : []
+  const readonlyFeatures = (props.allLayers ?? [])
+    .filter((layer) => layer?.id !== props.activeLayer?.id && ['Point', 'Text'].includes(layer?.geometryType))
+    .flatMap((layer) => (normalizeFeatureCollection(layer?.featureCollection).features ?? [])
+      .map((feature) => buildTextLeaderFeature(feature, layer)))
+  return [...activeFeatures, ...readonlyFeatures].filter(Boolean)
+}
+
+const ensureTextLeaderLayer = () => {
+  if (!map.value) return
+  if (!map.value.getSource(textLeaderSourceId)) {
+    map.value.addSource(textLeaderSourceId, {
+      type: 'geojson',
+      data: featureCollection([]),
+    })
+  }
+  if (!map.value.getLayer(textLeaderLayerId)) {
+    map.value.addLayer({
+      id: textLeaderLayerId,
+      type: 'line',
+      source: textLeaderSourceId,
+      layout: {
+        'line-cap': 'round',
+        'line-join': 'round',
+      },
+      paint: {
+        'line-color': ['coalesce', ['get', 'textLeaderColor'], drawFallbackStroke],
+        'line-width': ['coalesce', ['get', 'textLeaderWidth'], 1.5],
+        'line-opacity': ['coalesce', ['get', 'opacity'], 1],
+      },
+    })
+  }
+}
+
+const syncTextLeaderLines = () => {
+  if (!map.value) return
+  ensureTextLeaderLayer()
+  map.value.getSource(textLeaderSourceId)?.setData?.(featureCollection(buildTextLeaderFeatures()))
+}
+
+const syncTextScaleVisibility = () => {
+  syncActiveTextScaleVisibility()
+  syncReadonlyLayers()
+  syncTextBackgroundBoxes()
 }
 
 const syncReadonlyLayers = () => {
@@ -561,6 +972,8 @@ const syncReadonlyLayers = () => {
     syncReadonlyLayerDescriptor(descriptor)
   })
   cleanupReadonlyLayerDescriptors(layerDescriptors)
+  syncTextBackgroundBoxes()
+  syncTextLeaderLines()
   applyPreviewHover()
 }
 
@@ -1445,6 +1858,9 @@ const syncFeaturesFromDraw = (options = {}) => {
   }
   emit('update:modelValue', featureCollection)
   emit('features-change', featureCollection)
+  syncActiveTextScaleVisibility()
+  syncTextBackgroundBoxes()
+  syncTextLeaderLines()
   if (options.syncSelection !== false) {
     syncSelectedFeature()
   }
@@ -2068,11 +2484,15 @@ const initializeDraw = () => {
   bindDrawEvents()
   syncReadonlyLayers()
   ensureSnapPreviewLayers()
+  syncActiveTextLayoutConstants()
 
   const initialFeatures = normalizeFeatureCollection(props.modelValue)
   if (initialFeatures.features.length > 0) {
     draw.value.set(initialFeatures)
   }
+  syncActiveTextScaleVisibility()
+  syncTextBackgroundBoxes()
+  syncTextLeaderLines()
 }
 
 const restoreLayersAfterStyleLoad = () => {
@@ -2080,11 +2500,15 @@ const restoreLayersAfterStyleLoad = () => {
 
   syncReadonlyLayers()
   ensureSnapPreviewLayers()
+  syncActiveTextLayoutConstants()
 
   if (!draw.value) return
 
   const currentFeatures = draw.value.getAll?.() ?? normalizeFeatureCollection(props.modelValue)
   draw.value.set(currentFeatures)
+  syncActiveTextScaleVisibility()
+  syncTextBackgroundBoxes()
+  syncTextLeaderLines()
   syncSelectedFeature()
 }
 
@@ -2213,6 +2637,7 @@ const buildDrawLayerIdSet = () => {
     layerIds.add(descriptor.fillLayerId)
     layerIds.add(descriptor.lineLayerId)
     layerIds.add(descriptor.pointLayerId)
+    if (descriptor.labelBackgroundLayerId) layerIds.add(descriptor.labelBackgroundLayerId)
     layerIds.add(descriptor.labelLayerId)
   })
   return layerIds
@@ -2259,6 +2684,7 @@ const applyExportContentVisibility = (options = {}) => {
         descriptor.fillLayerId === layer.id
         || descriptor.lineLayerId === layer.id
         || descriptor.pointLayerId === layer.id
+        || descriptor.labelBackgroundLayerId === layer.id
         || descriptor.labelLayerId === layer.id
       ))
 
@@ -2410,7 +2836,14 @@ const initializeMap = async () => {
   map.value.on('style.load', restoreLayersAfterStyleLoad)
   map.value.on('styledata', () => {
     syncReadonlyLayers()
+    syncActiveTextLayoutConstants()
+    syncTextBackgroundBoxes()
   })
+  map.value.on('moveend', () => {
+    syncTextBackgroundBoxes()
+    syncTextLeaderLines()
+  })
+  map.value.on('zoomend', syncTextScaleVisibility)
   syncFeatureBoxCursor()
 }
 
@@ -2578,6 +3011,9 @@ watch(
     if (normalized.features.length > 0) {
       draw.value.set(normalized)
     }
+    syncActiveTextScaleVisibility()
+    syncTextBackgroundBoxes()
+    syncTextLeaderLines()
     syncSelectedFeature()
   },
   { deep: true }
@@ -2597,6 +3033,14 @@ watch(
   () => {
     if (!map.value) return
     syncReadonlyLayers()
+    syncActiveTextLayoutConstants()
+  }
+)
+
+watch(
+  () => [props.activeLayer?.textAllowOverlap, props.activeLayer?.textLineHeight],
+  () => {
+    syncActiveTextLayoutConstants()
   }
 )
 

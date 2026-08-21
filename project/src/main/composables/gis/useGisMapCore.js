@@ -25,6 +25,24 @@ const featureTableHiddenPropertyKeys = new Set([
   'textHaloWidth',
   'textRotate',
   'textAnchor',
+  'textAllowOverlap',
+  'textPriority',
+  'textLineHeight',
+  'textLetterSpacing',
+  'textAlign',
+  'textMaxWidth',
+  'textMinZoom',
+  'textMaxZoom',
+  'textScaleVisible',
+  'textBackgroundEnabled',
+  'textBackgroundColor',
+  'textBackgroundOpacity',
+  'textBackgroundPadding',
+  'textLeaderLine',
+  'textLeaderColor',
+  'textLeaderWidth',
+  'textOffset',
+  'textFontWeight',
   'visible',
   'locked',
   'user_stroke',
@@ -43,9 +61,28 @@ const featureTableHiddenPropertyKeys = new Set([
   'user_textHaloWidth',
   'user_textRotate',
   'user_textAnchor',
+  'user_textAllowOverlap',
+  'user_textPriority',
+  'user_textLineHeight',
+  'user_textLetterSpacing',
+  'user_textAlign',
+  'user_textMaxWidth',
+  'user_textMinZoom',
+  'user_textMaxZoom',
+  'user_textScaleVisible',
+  'user_textBackgroundEnabled',
+  'user_textBackgroundColor',
+  'user_textBackgroundOpacity',
+  'user_textBackgroundPadding',
+  'user_textLeaderLine',
+  'user_textLeaderColor',
+  'user_textLeaderWidth',
+  'user_textOffset',
+  'user_textFontWeight',
 ]);
 
 const isTextAnnotationLayer = (layer) => layer?.geometryType === 'Text';
+const textLayerLayoutPropertyKeys = ['textAllowOverlap', 'textLineHeight'];
 
 const emptyFeatureCollection = () => ({
   type: 'FeatureCollection',
@@ -230,6 +267,23 @@ export function useGisMapCore(options = {}) {
       textHaloWidth: 1,
       textRotate: 0,
       textAnchor: 'center',
+      textAllowOverlap: false,
+      textPriority: 0,
+      textLineHeight: 1.2,
+      textLetterSpacing: 0,
+      textAlign: 'center',
+      textMaxWidth: 12,
+      textMinZoom: 0,
+      textMaxZoom: 24,
+      textBackgroundEnabled: false,
+      textBackgroundColor: '#ffffff',
+      textBackgroundOpacity: 0.75,
+      textBackgroundPadding: 2,
+      textLeaderLine: false,
+      textLeaderColor: stroke,
+      textLeaderWidth: 1.5,
+      textOffset: [0, 1.1],
+      textFontWeight: 'regular',
       visible: true,
       locked: false,
       featureCollection: emptyFeatureCollection(),
@@ -260,6 +314,7 @@ export function useGisMapCore(options = {}) {
   const selectedFeatureBatchName = ref('');
   const selectedFeatureBatchPropertyKey = ref('');
   const selectedFeatureBatchPropertyValue = ref('');
+  const selectedTextLabelFieldKey = ref('');
   const selectedPolygonSplitLineId = ref('');
   const polygonSplitSketchActive = ref(false);
   const geometryEditStatus = ref(null);
@@ -384,6 +439,13 @@ export function useGisMapCore(options = {}) {
     return column.key === selectedFeatureBatchPropertyKey.value;
   }));
 
+  const canApplyTextLabelField = computed(() => Boolean(
+    isTextAnnotationLayer(activeLayer.value)
+    && activeLayerFeatureTableColumns.value.some((column) => column.key === selectedTextLabelFieldKey.value)
+    && canModifyActiveLayer.value
+    && activeLayerFeatures.value.length > 0
+  ));
+
   const buildFeatureTableProperties = (properties = {}) => Object.fromEntries(
     activeLayerFeatureTableColumns.value.map((column) => [
       column.key,
@@ -422,7 +484,7 @@ export function useGisMapCore(options = {}) {
   const selectedEditorProperties = computed(() => {
     if (!activeLayer.value) return null;
     if (!selectedFeature.value) return activeLayer.value;
-    return {
+    const properties = {
       ...activeLayer.value,
       ...(selectedFeature.value.properties ?? {}),
       name: selectedFeature.value.properties?.name ?? getFeatureLabel(
@@ -430,6 +492,10 @@ export function useGisMapCore(options = {}) {
         activeLayerFeatures.value.findIndex((feature) => getFeatureId(feature) === selectedFeatureId.value)
       ),
     };
+    textLayerLayoutPropertyKeys.forEach((key) => {
+      properties[key] = activeLayer.value?.[key];
+    });
+    return properties;
   });
 
   const selectedEditorFeatureId = computed(() => selectedFeature.value ? selectedFeatureId.value : '');
@@ -1122,6 +1188,7 @@ export function useGisMapCore(options = {}) {
     selectedFeatureBatchName,
     selectedFeatureBatchPropertyKey,
     selectedFeatureBatchPropertyValue,
+    selectedTextLabelFieldKey,
     selectedPolygonSplitLineId,
     polygonSplitSketchActive,
     geometryEditStatus,
@@ -1143,6 +1210,7 @@ export function useGisMapCore(options = {}) {
     activeLayerFeatureTableColumns,
     activeLayerFeatureTableRows,
     canApplySelectedFeatureBatchProperty,
+    canApplyTextLabelField,
     featureMoveLayerOptions,
     selectedEditorProperties,
     selectedEditorFeatureId,
