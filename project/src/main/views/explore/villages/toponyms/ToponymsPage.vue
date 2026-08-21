@@ -120,6 +120,7 @@ import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue';
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
 import {
   getToponymDetails,
   getToponymNames,
@@ -136,7 +137,9 @@ import { buildToponymScatterData } from './toponymsChartData.js';
 import { getDefaultToponymsLayerState, loadToponymsGisAsset } from './toponymsGisAssets.js';
 
 const { t } = useI18n();
+const route = useRoute();
 const TOPONYM_NAME_TREE_PAGE_SIZE = 100;
+const TOPONYM_MATCH_MODES = new Set(['prefix', 'suffix', 'exact', 'contains']);
 const TOPONYM_VILLAGE_PLACE_TYPE_CODES = ['22200', '21610', '27610'];
 
 const chartRef = ref(null);
@@ -196,6 +199,10 @@ const countryLayer = computed(() => loadedLayers.country || null);
 onMounted(() => {
   setupLayoutWatcher();
   loadCountryLayer();
+
+  if (hydrateSearchFromRouteQuery()) {
+    handleSearch();
+  }
 });
 
 onBeforeUnmount(() => {
@@ -222,6 +229,26 @@ async function loadCountryLayer() {
   } finally {
     loadingLayers.country = false;
   }
+}
+
+function hydrateSearchFromRouteQuery() {
+  const rawRouteQuery = Array.isArray(route.query.q) ? route.query.q[0] : route.query.q;
+  const routeQuery = typeof rawRouteQuery === 'string' ? rawRouteQuery.trim() : '';
+
+  if (!routeQuery) return false;
+
+  query.value = routeQuery;
+
+  const rawRouteMatchMode = Array.isArray(route.query.match_mode)
+    ? route.query.match_mode[0]
+    : route.query.match_mode;
+  const routeMatchMode = typeof rawRouteMatchMode === 'string' ? rawRouteMatchMode : '';
+
+  if (TOPONYM_MATCH_MODES.has(routeMatchMode)) {
+    matchMode.value = routeMatchMode;
+  }
+
+  return true;
 }
 
 async function handleSearch() {

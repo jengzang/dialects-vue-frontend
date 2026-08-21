@@ -111,6 +111,21 @@ describe('toponyms page shell', () => {
     expect(page).not.toContain('onMounted(handleSearch');
   });
 
+  it('hydrates distribution searches from catalog navigation query parameters', () => {
+    const page = readSource('src/main/views/explore/villages/toponyms/ToponymsPage.vue');
+    const routeHydrationBody = functionBody(page, 'hydrateSearchFromRouteQuery');
+
+    expect(page).toContain("import { useRoute } from 'vue-router';");
+    expect(page).toContain('const route = useRoute();');
+    expect(page).toContain('function hydrateSearchFromRouteQuery');
+    expect(routeHydrationBody).toContain('route.query.q');
+    expect(routeHydrationBody).toContain('route.query.match_mode');
+    expect(routeHydrationBody).toContain('query.value = routeQuery');
+    expect(routeHydrationBody).toContain('matchMode.value = routeMatchMode');
+    expect(page).toContain('if (hydrateSearchFromRouteQuery())');
+    expect(page).toContain('handleSearch();');
+  });
+
   it('uses dedicated shell components for horizontal search, optional layers, results, and details', () => {
     const page = readSource('src/main/views/explore/villages/toponyms/ToponymsPage.vue');
     const chart = readSource('src/main/views/explore/villages/toponyms/ToponymDistributionChart.vue');
