@@ -12,6 +12,13 @@ const DEFAULT_FEATURE_PROPERTIES = {
   pointRadius: 6,
   pointColor: pickDrawColor(0)[1],
   pointStrokeColor: pickDrawColor(0)[0],
+  annotationText: '',
+  textSize: 16,
+  textColor: pickDrawColor(0)[0],
+  textHaloColor: '#ffffff',
+  textHaloWidth: 1,
+  textRotate: 0,
+  textAnchor: 'center',
   visible: true,
   locked: false,
 }
@@ -396,6 +403,7 @@ function getDefaultDrawProperties(index) {
     fill: pointColor,
     pointColor,
     pointStrokeColor: stroke,
+    textColor: stroke,
   }
 }
 

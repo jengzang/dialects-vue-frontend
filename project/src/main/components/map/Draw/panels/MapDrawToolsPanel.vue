@@ -56,6 +56,22 @@
               {{ t('map.drawTab.buttons.drawPoint') }}
             </button>
             <button
+              v-if="activeLayer?.geometryType === 'Text'"
+              class="glass-button draw-tool-mode-button"
+              :data-variant="currentMode === 'draw_point' ? 'primary' : 'secondary'"
+              :data-active="currentMode === 'draw_point'"
+              type="button"
+              :disabled="!canModifyActiveLayer"
+              @click="$emit('set-mode', 'draw_point')"
+            >
+              <span
+                v-if="currentMode === 'draw_point'"
+                class="draw-tool-check"
+                aria-hidden="true"
+              >✓</span>
+              {{ t('map.drawTab.buttons.drawText') }}
+            </button>
+            <button
               v-if="!activeLayer || activeLayer.geometryType === 'LineString'"
               class="glass-button draw-tool-mode-button"
               :data-variant="currentMode === 'draw_line_string' ? 'primary' : 'secondary'"
@@ -754,6 +770,89 @@
               >
             </label>
 
+            <template v-if="selectedFeatureGeometryType === 'Text'">
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.annotationText') }}</span>
+                <input
+                  class="draw-input glass-field"
+                  type="text"
+                  :value="selectedFeatureProperties.annotationText"
+                  @input="$emit('update-feature-property', 'annotationText', $event.target.value)"
+                >
+              </label>
+
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textSize') }}：{{ selectedFeatureProperties.textSize }}</span>
+                <input
+                  class="draw-range-input glass-range"
+                  type="range"
+                  min="8"
+                  max="48"
+                  step="1"
+                  :value="selectedFeatureProperties.textSize"
+                  :style="{ '--glass-range-progress': (((selectedFeatureProperties.textSize - 8) / 40) * 100) + '%' }"
+                  @input="$emit('update-feature-property', 'textSize', Number($event.target.value))"
+                >
+              </label>
+
+              <label class="draw-field draw-color-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textColor') }}</span>
+                <input
+                  class="draw-color-input glass-field"
+                  type="color"
+                  :value="selectedFeatureProperties.textColor"
+                  @input="$emit('update-feature-property', 'textColor', $event.target.value)"
+                >
+              </label>
+
+              <label class="draw-field draw-color-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textHaloColor') }}</span>
+                <input
+                  class="draw-color-input glass-field"
+                  type="color"
+                  :value="selectedFeatureProperties.textHaloColor"
+                  @input="$emit('update-feature-property', 'textHaloColor', $event.target.value)"
+                >
+              </label>
+
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textHaloWidth') }}：{{ selectedFeatureProperties.textHaloWidth }}</span>
+                <input
+                  class="draw-range-input glass-range"
+                  type="range"
+                  min="0"
+                  max="4"
+                  step="0.25"
+                  :value="selectedFeatureProperties.textHaloWidth"
+                  :style="{ '--glass-range-progress': ((selectedFeatureProperties.textHaloWidth / 4) * 100) + '%' }"
+                  @input="$emit('update-feature-property', 'textHaloWidth', Number($event.target.value))"
+                >
+              </label>
+
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textRotate') }}：{{ selectedFeatureProperties.textRotate }}°</span>
+                <input
+                  class="draw-range-input glass-range"
+                  type="range"
+                  min="-180"
+                  max="180"
+                  step="1"
+                  :value="selectedFeatureProperties.textRotate"
+                  :style="{ '--glass-range-progress': (((selectedFeatureProperties.textRotate + 180) / 360) * 100) + '%' }"
+                  @input="$emit('update-feature-property', 'textRotate', Number($event.target.value))"
+                >
+              </label>
+
+              <div class="draw-basemap-select">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textAnchor') }}</span>
+                <SimpleSelectDropdown
+                  :model-value="selectedFeatureProperties.textAnchor"
+                  :options="textAnchorOptions"
+                  @update:model-value="$emit('update-feature-property', 'textAnchor', $event)"
+                />
+              </div>
+            </template>
+
             <div
               v-if="selectedFeatureId && featureMoveLayerOptions.length"
               class="draw-basemap-select"
@@ -767,7 +866,7 @@
             </div>
 
             <label
-              v-if="selectedFeatureGeometryType !== 'Point'"
+              v-if="selectedFeatureGeometryType !== 'Point' && selectedFeatureGeometryType !== 'Text'"
               class="draw-field draw-color-field"
             >
               <span class="draw-field-label">{{ t('map.drawTab.labels.strokeColor') }}</span>
@@ -819,7 +918,7 @@
             </label>
 
             <label
-              v-if="selectedFeatureGeometryType !== 'Point'"
+              v-if="selectedFeatureGeometryType !== 'Point' && selectedFeatureGeometryType !== 'Text'"
               class="draw-field"
             >
               <span class="draw-field-label">{{ t('map.drawTab.labels.strokeWidth') }}：{{ selectedFeatureProperties.strokeWidth }}</span>
@@ -1006,9 +1105,16 @@ const emit = defineEmits([
 
 const getGeometryLabel = (geometryType) => {
   if (geometryType === 'Point') return t('map.drawTab.geometry.point')
+  if (geometryType === 'Text') return t('map.drawTab.geometry.text')
   if (geometryType === 'Polygon' || geometryType === 'MultiPolygon') return t('map.drawTab.geometry.polygon')
   return t('map.drawTab.geometry.line')
 }
+
+const textAnchorOptions = computed(() => [
+  { label: t('map.drawTab.labels.textAnchorCenter'), value: 'center' },
+  { label: t('map.drawTab.labels.textAnchorTop'), value: 'top' },
+  { label: t('map.drawTab.labels.textAnchorBottom'), value: 'bottom' },
+])
 
 const getFeatureStateLabel = (feature) => {
   const visibleLabel = feature?.visible ? t('map.drawTab.labels.visibleShort') : t('map.drawTab.labels.hiddenShort')

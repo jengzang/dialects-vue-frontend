@@ -311,6 +311,22 @@
           <button
             class="draw-modal-card-btn"
             type="button"
+            @click="onCreateLayerClicked('Text')"
+          >
+            <span class="draw-card-icon">T</span>
+            <div class="draw-card-text">
+              <div class="draw-card-title">
+                {{ t('map.drawTab.buttons.createTextLayer') }}
+              </div>
+              <div class="draw-card-desc">
+                {{ t('map.drawTab.buttons.createTextLayerDesc') }}
+              </div>
+            </div>
+          </button>
+
+          <button
+            class="draw-modal-card-btn"
+            type="button"
             @click="onCreateLayerClicked('LineString')"
           >
             <span class="draw-card-icon"><InlineIcon icon="➖" /></span>
@@ -1044,6 +1060,13 @@ function applyActiveLayerDefaultsToFeatureCollection(featureCollection) {
           pointRadius: props.pointRadius ?? activeLayer.value?.pointRadius,
           pointColor: props.pointColor ?? activeLayer.value?.pointColor,
           pointStrokeColor: props.pointStrokeColor ?? activeLayer.value?.pointStrokeColor,
+          annotationText: props.annotationText ?? activeLayer.value?.annotationText,
+          textSize: props.textSize ?? activeLayer.value?.textSize,
+          textColor: props.textColor ?? activeLayer.value?.textColor,
+          textHaloColor: props.textHaloColor ?? activeLayer.value?.textHaloColor,
+          textHaloWidth: props.textHaloWidth ?? activeLayer.value?.textHaloWidth,
+          textRotate: props.textRotate ?? activeLayer.value?.textRotate,
+          textAnchor: props.textAnchor ?? activeLayer.value?.textAnchor,
           visible: props.visible ?? activeLayer.value?.visible ?? true,
           locked: props.locked ?? activeLayer.value?.locked ?? false,
         },

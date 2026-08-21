@@ -57,7 +57,7 @@ export function useGisLayers(options = {}) {
     layers.value.push(layer);
     activeLayerId.value = layer.id;
     clearFeatureSelection();
-    const mode = geometryType === 'Point'
+    const mode = geometryType === 'Point' || geometryType === 'Text'
       ? 'draw_point'
       : geometryType === 'Polygon'
         ? 'draw_polygon'

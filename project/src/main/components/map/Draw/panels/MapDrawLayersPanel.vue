@@ -269,6 +269,7 @@ const getLayerFeatureCount = (layer) => {
 
 const getGeometryLabel = (geometryType) => {
   if (geometryType === 'Point') return t('map.drawTab.geometry.point')
+  if (geometryType === 'Text') return t('map.drawTab.geometry.text')
   if (geometryType === 'Polygon') return t('map.drawTab.geometry.polygon')
   return t('map.drawTab.geometry.line')
 }

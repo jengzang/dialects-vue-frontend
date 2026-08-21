@@ -19,6 +19,12 @@ const featureTableHiddenPropertyKeys = new Set([
   'pointRadius',
   'pointColor',
   'pointStrokeColor',
+  'textSize',
+  'textColor',
+  'textHaloColor',
+  'textHaloWidth',
+  'textRotate',
+  'textAnchor',
   'visible',
   'locked',
   'user_stroke',
@@ -31,7 +37,15 @@ const featureTableHiddenPropertyKeys = new Set([
   'user_pointRadius',
   'user_pointColor',
   'user_pointStrokeColor',
+  'user_textSize',
+  'user_textColor',
+  'user_textHaloColor',
+  'user_textHaloWidth',
+  'user_textRotate',
+  'user_textAnchor',
 ]);
+
+const isTextAnnotationLayer = (layer) => layer?.geometryType === 'Text';
 
 const emptyFeatureCollection = () => ({
   type: 'FeatureCollection',
@@ -194,6 +208,7 @@ export function useGisMapCore(options = {}) {
       Point: t('map.drawTab.geometry.point'),
       LineString: t('map.drawTab.geometry.line'),
       Polygon: t('map.drawTab.geometry.polygon'),
+      Text: t('map.drawTab.geometry.text'),
     };
     return {
       id: `draw-layer-${layerIdSeed}`,
@@ -204,10 +219,17 @@ export function useGisMapCore(options = {}) {
       fill: pointColor,
       fillOpacity: 0.22,
       opacity: 1,
-      labelsVisible: false,
-      pointRadius: 6,
+      labelsVisible: geometryType === 'Text',
+      pointRadius: geometryType === 'Text' ? 4 : 6,
       pointColor,
       pointStrokeColor: stroke,
+      annotationText: geometryType === 'Text' ? t('map.drawTab.labels.textAnnotationDefaultText') : '',
+      textSize: 16,
+      textColor: stroke,
+      textHaloColor: '#ffffff',
+      textHaloWidth: 1,
+      textRotate: 0,
+      textAnchor: 'center',
       visible: true,
       locked: false,
       featureCollection: emptyFeatureCollection(),
@@ -276,7 +298,12 @@ export function useGisMapCore(options = {}) {
 
   const getFeatureLabel = (feature, index) => {
     const properties = feature?.properties ?? {};
-    return properties.name || properties.title || properties.label || `${t('map.drawTab.labels.feature')} ${index + 1}`;
+    return properties.annotationText || properties.name || properties.title || properties.label || `${t('map.drawTab.labels.feature')} ${index + 1}`;
+  };
+
+  const getFeatureDisplayGeometryType = (feature) => {
+    if (isTextAnnotationLayer(activeLayer.value) && feature?.geometry?.type === 'Point') return 'Text';
+    return feature?.geometry?.type || activeLayer.value?.geometryType || '';
   };
 
   const activeLayerFeatures = computed(() => activeLayer.value?.featureCollection?.features ?? []);
@@ -326,7 +353,7 @@ export function useGisMapCore(options = {}) {
   const activeLayerFeatureItems = computed(() => activeLayerFeatures.value.map((feature, index) => ({
     id: getFeatureId(feature),
     label: getFeatureLabel(feature, index),
-    geometryType: feature?.geometry?.type || activeLayer.value?.geometryType || '',
+    geometryType: getFeatureDisplayGeometryType(feature),
     visible: feature?.properties?.visible ?? activeLayer.value?.visible ?? true,
     locked: feature?.properties?.locked ?? activeLayer.value?.locked ?? false,
   })).filter((item) => item.id));
@@ -373,7 +400,7 @@ export function useGisMapCore(options = {}) {
   const activeLayerFeatureTableRows = computed(() => activeLayerFeatures.value.map((feature, index) => ({
     id: getFeatureId(feature),
     name: feature?.properties?.name ?? getFeatureLabel(feature, index),
-    geometryType: feature?.geometry?.type || activeLayer.value?.geometryType || '',
+    geometryType: getFeatureDisplayGeometryType(feature),
     visible: feature?.properties?.visible ?? activeLayer.value?.visible ?? true,
     locked: feature?.properties?.locked ?? activeLayer.value?.locked ?? false,
     properties: buildFeatureTableProperties(feature?.properties ?? {}),
@@ -404,7 +431,9 @@ export function useGisMapCore(options = {}) {
   });
 
   const selectedEditorFeatureId = computed(() => selectedFeature.value ? selectedFeatureId.value : '');
-  const selectedEditorGeometryType = computed(() => selectedFeature.value?.geometry?.type || activeLayer.value?.geometryType || '');
+  const selectedEditorGeometryType = computed(() => (
+    selectedFeature.value ? getFeatureDisplayGeometryType(selectedFeature.value) : activeLayer.value?.geometryType || ''
+  ));
 
   const canModifyActiveLayer = computed(() => {
     if (!activeLayer.value) return true;
@@ -695,7 +724,7 @@ export function useGisMapCore(options = {}) {
     activeLayerId.value = layer.id;
     clearFeatureSelection();
     isDrawingPanelOpen.value = true;
-    const mode = geometryType === 'Point'
+    const mode = geometryType === 'Point' || geometryType === 'Text'
       ? 'draw_point'
       : geometryType === 'Polygon'
         ? 'draw_polygon'

@@ -47,7 +47,7 @@ const activeLayerOpacityExpression = ['coalesce', ['get', 'user_opacity'], 1]
 const activeLayerLabelsVisibleExpression = ['coalesce', ['get', 'user_labelsVisible'], false]
 const layerOpacityExpression = ['coalesce', ['get', 'opacity'], 1]
 const layerLabelsVisibleExpression = ['coalesce', ['get', 'labelsVisible'], false]
-const labelTextFieldExpression = ['coalesce', ['get', 'name'], ['get', 'title'], ['get', 'label'], '']
+const textFieldExpression = ['coalesce', ['get', 'user_annotationText'], ['get', 'annotationText'], ['get', 'name'], ['get', 'title'], ['get', 'label'], '']
 const drawStyles = [
   {
     id: 'gl-draw-polygon-fill',
@@ -148,16 +148,17 @@ const drawStyles = [
     type: 'symbol',
     filter: ['all', ['!=', 'meta', 'midpoint'], ['!=', 'meta', 'vertex'], ['!=', 'mode', 'static'], ['!=', 'user_visible', false]],
     layout: {
-      'text-field': labelTextFieldExpression,
-      'text-size': 12,
+      'text-field': textFieldExpression,
+      'text-size': ['coalesce', ['get', 'user_textSize'], 12],
       'text-offset': [0, 1.1],
-      'text-anchor': 'top',
+      'text-anchor': ['coalesce', ['get', 'user_textAnchor'], 'top'],
+      'text-rotate': ['coalesce', ['get', 'user_textRotate'], 0],
       'text-allow-overlap': false,
     },
     paint: {
-      'text-color': ['coalesce', ['get', 'user_stroke'], drawFallbackStroke],
-      'text-halo-color': '#ffffff',
-      'text-halo-width': 1,
+      'text-color': ['coalesce', ['get', 'user_textColor'], ['get', 'user_stroke'], drawFallbackStroke],
+      'text-halo-color': ['coalesce', ['get', 'user_textHaloColor'], '#ffffff'],
+      'text-halo-width': ['coalesce', ['get', 'user_textHaloWidth'], 1],
       'text-opacity': ['case', ['==', activeLayerLabelsVisibleExpression, true], activeLayerOpacityExpression, 0],
     },
   },
@@ -480,16 +481,17 @@ const syncReadonlyLayerDescriptor = (descriptor) => {
       type: 'symbol',
       source: descriptor.sourceId,
       layout: {
-        'text-field': labelTextFieldExpression,
-        'text-size': 12,
+        'text-field': textFieldExpression,
+        'text-size': ['coalesce', ['get', 'textSize'], 12],
         'text-offset': [0, 1.1],
-        'text-anchor': 'top',
+        'text-anchor': ['coalesce', ['get', 'textAnchor'], 'top'],
+        'text-rotate': ['coalesce', ['get', 'textRotate'], 0],
         'symbol-sort-key': ['coalesce', ['get', 'layerOrder'], 0],
       },
       paint: {
-        'text-color': ['coalesce', ['get', 'stroke'], drawFallbackStroke],
-        'text-halo-color': '#ffffff',
-        'text-halo-width': 1,
+        'text-color': ['coalesce', ['get', 'textColor'], ['get', 'stroke'], drawFallbackStroke],
+        'text-halo-color': ['coalesce', ['get', 'textHaloColor'], '#ffffff'],
+        'text-halo-width': ['coalesce', ['get', 'textHaloWidth'], 1],
         'text-opacity': ['case', ['==', layerLabelsVisibleExpression, true], layerOpacityExpression, 0],
       },
     })
