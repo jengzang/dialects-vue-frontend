@@ -890,6 +890,58 @@ describe('MapDrawToolsPanel editing affordances', () => {
     expect(wrapper.host.querySelector('[data-testid="draw-tool-selected-geometry-section"]')).toBeNull()
     expect(wrapper.host.querySelector('[data-testid="draw-tool-precision-section"]')).toBeNull()
     expect(wrapper.host.querySelector('[data-testid="draw-tool-reverse-geometry"]')).toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="geometry-quality-status"]')).toBeNull()
+
+    wrapper.unmount()
+  })
+
+  it('keeps point and text drawing precision controls free of topology-only options', async () => {
+    const wrapper = mountToolsPanel({
+      currentMode: 'draw_point',
+      activeLayer: { id: 'point-layer', geometryType: 'Point', visible: true, locked: false },
+      selectedFeatureId: '',
+      selectedFeatureIds: [],
+      selectedFeatureGeometryType: '',
+      selectedFeatureProperties: null,
+    })
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-precision-section"]')).not.toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="toggle-snapping"]')).not.toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="topology-controls"]')).toBeNull()
+
+    wrapper.props.activeLayer = { id: 'text-layer', geometryType: 'Text', visible: true, locked: false }
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-precision-section"]')).not.toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="toggle-snapping"]')).not.toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="topology-controls"]')).toBeNull()
+
+    wrapper.unmount()
+  })
+
+  it('does not show an empty feature data table until there are rows to edit', async () => {
+    const wrapper = mountToolsPanel({
+      currentMode: 'simple_select',
+      featureTableRows: [],
+    })
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-feature-list-section"]')).not.toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-feature-table-section"]')).toBeNull()
+
+    wrapper.props.featureTableRows = [{
+      id: 'feature-1',
+      name: '边界 A',
+      geometryType: 'Polygon',
+      properties: {},
+      propertySummary: '',
+      visible: true,
+      locked: false,
+    }]
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-feature-table-section"]')).not.toBeNull()
 
     wrapper.unmount()
   })

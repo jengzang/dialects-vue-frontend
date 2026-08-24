@@ -412,6 +412,7 @@
             </div>
             </template>
             <div
+              v-if="showTopologyControls"
               class="draw-tool-wide-control"
               data-testid="topology-controls"
             >
@@ -588,6 +589,7 @@
             </div>
           </div>
           <div
+            v-if="showGeometryQualityStatus"
             class="draw-shape-edit-status"
             data-testid="geometry-quality-status"
           >
@@ -1602,6 +1604,23 @@ const isTextAnnotationContext = computed(() => (
   || props.activeLayer?.geometryType === 'Text'
 ))
 
+const geometryToolContextType = computed(() => (
+  props.selectedFeatureGeometryType
+  || props.activeLayer?.geometryType
+  || ''
+))
+
+const isLineOrPolygonContext = computed(() => [
+  'LineString',
+  'Polygon',
+  'MultiPolygon',
+].includes(geometryToolContextType.value))
+
+const isLineOrPolygonDrawingMode = computed(() => [
+  'draw_line_string',
+  'draw_polygon',
+].includes(props.currentMode))
+
 const hasSelectedFeatureContext = computed(() => (
   Boolean(props.selectedFeatureId)
   || props.selectedFeatureIds.length > 0
@@ -1621,9 +1640,16 @@ const showPrecisionControls = computed(() => (
   || Boolean(props.geometryEditStatus?.message)
 ))
 
+const showTopologyControls = computed(() => (
+  showPrecisionControls.value
+  && (isLineOrPolygonContext.value || isLineOrPolygonDrawingMode.value)
+))
+
+const showGeometryQualityStatus = computed(() => isLineOrPolygonContext.value || isLineOrPolygonDrawingMode.value)
+
 const showFeatureListSection = computed(() => props.currentMode === 'simple_select' && !props.polygonSplitSketchActive)
 
-const showFeatureTableSection = computed(() => showFeatureListSection.value)
+const showFeatureTableSection = computed(() => showFeatureListSection.value && props.featureTableRows.length > 0)
 
 const showPropertyEditorSection = computed(() => props.currentMode === 'simple_select')
 
