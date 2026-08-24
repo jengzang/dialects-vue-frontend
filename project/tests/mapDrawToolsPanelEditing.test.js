@@ -607,6 +607,7 @@ describe('MapDrawToolsPanel editing affordances', () => {
     expect(wrapper.events).toContainEqual(['start-polygon-split-sketch'])
 
     wrapper.props.polygonSplitSketchActive = true
+    wrapper.props.currentMode = 'draw_line_string'
     await nextTick()
 
     const cancelButton = wrapper.host.querySelector('[data-testid="draw-tool-cancel-polygon-split-sketch"]')
@@ -891,6 +892,54 @@ describe('MapDrawToolsPanel editing affordances', () => {
     expect(wrapper.host.querySelector('[data-testid="draw-tool-precision-section"]')).toBeNull()
     expect(wrapper.host.querySelector('[data-testid="draw-tool-reverse-geometry"]')).toBeNull()
     expect(wrapper.host.querySelector('[data-testid="geometry-quality-status"]')).toBeNull()
+
+    wrapper.unmount()
+  })
+
+  it('keeps text annotation feedback visible without reopening precision controls', async () => {
+    const wrapper = mountToolsPanel({
+      currentMode: 'simple_select',
+      activeLayer: { id: 'text-layer', geometryType: 'Text', visible: true, locked: false },
+      selectedFeatureGeometryType: 'Text',
+      geometryEditStatus: {
+        type: 'success',
+        message: '已撤回上一步',
+      },
+      selectedFeatureProperties: {
+        name: '文本 A',
+        annotationText: '方言点',
+        textSize: 16,
+        textColor: '#111111',
+        textHaloColor: '#ffffff',
+        textHaloWidth: 1,
+        textRotate: 0,
+        textAnchor: 'center',
+        textAllowOverlap: false,
+        textPriority: 0,
+        textLineHeight: 1.2,
+        textLetterSpacing: 0,
+        textAlign: 'center',
+        textMaxWidth: 12,
+        textMinZoom: 4,
+        textMaxZoom: 12,
+        textBackgroundEnabled: false,
+        textBackgroundColor: '#ffffff',
+        textBackgroundOpacity: 0.8,
+        textBackgroundPadding: 2,
+        textLeaderLine: false,
+        textLeaderColor: '#111111',
+        textLeaderWidth: 1,
+        textOffsetX: 0,
+        textOffsetY: 1.1,
+        visible: true,
+        locked: false,
+      },
+    })
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-testid="geometry-edit-status"]').textContent)
+      .toContain('已撤回上一步')
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-precision-section"]')).toBeNull()
 
     wrapper.unmount()
   })

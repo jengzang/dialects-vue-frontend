@@ -355,6 +355,16 @@
               {{ isFullscreen ? t('map.mapLibre.buttons.exitFullscreen') : t('map.mapLibre.buttons.fullscreen') }}
             </button>
           </div>
+          <button
+            v-if="polygonSplitSketchActive && isDrawingMode"
+            class="glass-button draw-tool-inline-button"
+            data-variant="secondary"
+            data-testid="draw-tool-cancel-polygon-split-sketch"
+            type="button"
+            @click="$emit('cancel-polygon-split-sketch')"
+          >
+            {{ t('map.drawTab.buttons.cancelPolygonSplitLine') }}
+          </button>
           <div
             v-if="showPrecisionControls"
             class="draw-tool-context-stack"
@@ -369,47 +379,47 @@
               />
             </label>
             <template v-if="snappingEnabled">
-            <label class="draw-field">
-              <span class="draw-field-label">{{ t('map.drawTab.labels.snapTolerance') }}：{{ snapTolerance }}</span>
-              <input
-                data-testid="snap-tolerance-input"
-                class="draw-range-input glass-range"
-                type="range"
-                min="0"
-                max="48"
-                step="1"
-                :value="snapTolerance"
-                @input="$emit('update:snapTolerance', Number($event.target.value))"
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.snapTolerance') }}：{{ snapTolerance }}</span>
+                <input
+                  data-testid="snap-tolerance-input"
+                  class="draw-range-input glass-range"
+                  type="range"
+                  min="0"
+                  max="48"
+                  step="1"
+                  :value="snapTolerance"
+                  @input="$emit('update:snapTolerance', Number($event.target.value))"
+                >
+              </label>
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.snapGridSize') }}：{{ snapGridSize }}</span>
+                <input
+                  data-testid="snap-grid-input"
+                  class="draw-input glass-field"
+                  type="number"
+                  min="0"
+                  step="0.05"
+                  :value="snapGridSize"
+                  @input="$emit('update:snapGridSize', Number($event.target.value))"
+                >
+              </label>
+              <div
+                class="draw-tool-wide-control"
+                data-testid="snap-target-controls"
               >
-            </label>
-            <label class="draw-field">
-              <span class="draw-field-label">{{ t('map.drawTab.labels.snapGridSize') }}：{{ snapGridSize }}</span>
-              <input
-                data-testid="snap-grid-input"
-                class="draw-input glass-field"
-                type="number"
-                min="0"
-                step="0.05"
-                :value="snapGridSize"
-                @input="$emit('update:snapGridSize', Number($event.target.value))"
-              >
-            </label>
-            <div
-              class="draw-tool-wide-control"
-              data-testid="snap-target-controls"
-            >
-              <span class="draw-field-label">{{ t('map.drawTab.labels.snapTargets') }}</span>
-              <CheckBox
-                v-for="option in snapTargetOptions"
-                :key="option.key"
-                class="draw-toggle-field"
-                :data-testid="`snap-target-${option.key}`"
-                :model-value="normalizedSnapTargets[option.key]"
-                @update:modelValue="emitSnapTargetUpdate(option.key, $event)"
-              >
-                {{ option.label }}
-              </CheckBox>
-            </div>
+                <span class="draw-field-label">{{ t('map.drawTab.labels.snapTargets') }}</span>
+                <CheckBox
+                  v-for="option in snapTargetOptions"
+                  :key="option.key"
+                  class="draw-toggle-field"
+                  :data-testid="`snap-target-${option.key}`"
+                  :model-value="normalizedSnapTargets[option.key]"
+                  @update:modelValue="emitSnapTargetUpdate(option.key, $event)"
+                >
+                  {{ option.label }}
+                </CheckBox>
+              </div>
             </template>
             <div
               v-if="showTopologyControls"
@@ -577,15 +587,15 @@
                 </button>
               </div>
             </div>
-            <div
-              v-if="geometryEditStatus?.message"
-              class="draw-shape-edit-status"
-              data-testid="geometry-edit-status"
-              :data-state="geometryEditStatus.type"
-            >
-              <div class="draw-shape-edit-hint">
-                {{ geometryEditStatus.message }}
-              </div>
+          </div>
+          <div
+            v-if="geometryEditStatus?.message"
+            class="draw-shape-edit-status"
+            data-testid="geometry-edit-status"
+            :data-state="geometryEditStatus.type"
+          >
+            <div class="draw-shape-edit-hint">
+              {{ geometryEditStatus.message }}
             </div>
           </div>
           <div
@@ -1637,7 +1647,6 @@ const showPrecisionControls = computed(() => (
   isDrawingMode.value
   || isDirectEditMode.value
   || props.polygonSplitSketchActive
-  || Boolean(props.geometryEditStatus?.message)
 ))
 
 const showTopologyControls = computed(() => (
