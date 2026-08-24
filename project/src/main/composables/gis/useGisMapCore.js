@@ -368,12 +368,103 @@ export function useGisMapCore(options = {}) {
     return properties.annotationText || properties.name || properties.title || properties.label || `${t('map.drawTab.labels.feature')} ${index + 1}`;
   };
 
+  const getFeatureTextLabel = (feature, layer) => {
+    const properties = feature?.properties ?? {};
+    return [properties.annotationText, layer?.annotationText, properties.name, properties.title, properties.label]
+      .map((item) => String(item ?? '').trim())
+      .find(Boolean) || '';
+  };
+
+  const getTextStyleNumber = (feature, layer, key, fallback) => {
+    const value = Number(feature?.properties?.[key] ?? layer?.[key] ?? fallback);
+    return Number.isFinite(value) ? value : fallback;
+  };
+
+  const isFeatureTextScaleVisible = (feature, layer, zoom) => {
+    if (!Number.isFinite(zoom)) return true;
+    const minZoom = getTextStyleNumber(feature, layer, 'textMinZoom', 0);
+    const maxZoom = getTextStyleNumber(feature, layer, 'textMaxZoom', 24);
+    return zoom >= minZoom && zoom <= maxZoom;
+  };
+
+  const getCurrentMapZoom = () => {
+    const zoom = Number(editableMapRef?.value?.currentZoom?.value ?? editableMapRef?.value?.currentZoom);
+    return Number.isFinite(zoom) ? zoom : NaN;
+  };
+
   const getFeatureDisplayGeometryType = (feature) => {
     if (isTextAnnotationLayer(activeLayer.value) && feature?.geometry?.type === 'Point') return 'Text';
     return feature?.geometry?.type || activeLayer.value?.geometryType || '';
   };
 
   const activeLayerFeatures = computed(() => activeLayer.value?.featureCollection?.features ?? []);
+
+  const textLabelSummary = computed(() => {
+    const layer = activeLayer.value;
+    if (!layer) return { hasLabels: false, totalCount: 0, items: [] };
+
+    const features = activeLayerFeatures.value;
+    const labelsVisible = layer.labelsVisible === true;
+    const zoom = getCurrentMapZoom();
+    const labeledFeatures = features.filter((feature) => getFeatureTextLabel(feature, layer));
+    const hiddenByScaleCount = labeledFeatures.filter((feature) => (
+      (feature?.properties?.visible ?? layer.visible ?? true) !== false
+      && !isFeatureTextScaleVisible(feature, layer, zoom)
+    )).length;
+    const emptyLabelCount = Math.max(features.length - labeledFeatures.length, 0);
+    const priorityCount = labeledFeatures.filter((feature) => (
+      getTextStyleNumber(feature, layer, 'textPriority', 0) !== 0
+    )).length;
+    const shouldSurface = isTextAnnotationLayer(layer)
+      || labelsVisible
+      || labeledFeatures.length > 0
+      || layer.textBackgroundEnabled === true
+      || layer.textLeaderLine === true;
+    if (!shouldSurface) return { hasLabels: false, totalCount: 0, items: [] };
+
+    const items = [
+      {
+        id: 'total',
+        label: t('map.drawTab.labels.textLabelDiagnosticsTotal', { count: labeledFeatures.length }),
+      },
+      {
+        id: 'collision',
+        label: layer.textAllowOverlap === true
+          ? t('map.drawTab.labels.textLabelDiagnosticsAllowOverlap')
+          : t('map.drawTab.labels.textLabelDiagnosticsAvoidOverlap'),
+      },
+    ];
+    if (!labelsVisible) {
+      items.push({
+        id: 'hidden',
+        label: t('map.drawTab.labels.textLabelDiagnosticsLayerHidden'),
+      });
+    }
+    if (hiddenByScaleCount > 0) {
+      items.push({
+        id: 'scale-hidden',
+        label: t('map.drawTab.labels.textLabelDiagnosticsScaleHidden', { count: hiddenByScaleCount }),
+      });
+    }
+    if (emptyLabelCount > 0) {
+      items.push({
+        id: 'empty',
+        label: t('map.drawTab.labels.textLabelDiagnosticsEmpty', { count: emptyLabelCount }),
+      });
+    }
+    if (priorityCount > 0) {
+      items.push({
+        id: 'priority',
+        label: t('map.drawTab.labels.textLabelDiagnosticsPriority', { count: priorityCount }),
+      });
+    }
+
+    return {
+      hasLabels: true,
+      totalCount: labeledFeatures.length,
+      items,
+    };
+  });
 
   const selectedFeature = computed(() => {
     if (!selectedFeatureId.value) return null;
@@ -1282,6 +1373,7 @@ export function useGisMapCore(options = {}) {
     canDifferenceSelectedPolygons,
     canConvertSelectedLineToPolygon,
     geometryQualitySummary,
+    textLabelSummary,
     canDeleteSelection,
     canDuplicateSelectedFeature,
     canUseFeatureBoxSelect,

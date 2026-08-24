@@ -92,6 +92,10 @@ function mountToolsPanel(overrides = {}) {
       issueCount: 0,
       items: [],
     },
+    textLabelSummary: {
+      hasLabels: false,
+      items: [],
+    },
     ...overrides,
   })
 
@@ -734,6 +738,37 @@ describe('MapDrawToolsPanel editing affordances', () => {
     expect(wrapper.host.querySelector('[data-testid="geometry-quality-count"]').textContent)
       .toContain('map.drawTab.labels.geometryQualityOk')
     expect(wrapper.host.querySelectorAll('[data-testid="geometry-quality-item"]')).toHaveLength(0)
+
+    wrapper.unmount()
+  })
+
+  it('shows text label diagnostics for active annotation layers', async () => {
+    const wrapper = mountToolsPanel({
+      activeLayer: {
+        id: 'text-layer',
+        geometryType: 'Text',
+        labelsVisible: true,
+        visible: true,
+        locked: false,
+      },
+      textLabelSummary: {
+        hasLabels: true,
+        totalCount: 4,
+        items: [
+          { id: 'visible', label: '4 个标注' },
+          { id: 'scale-hidden', label: '2 个被比例尺隐藏' },
+          { id: 'collision', label: '自动避让' },
+        ],
+      },
+    })
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-testid="text-label-diagnostics-title"]').textContent)
+      .toContain('map.drawTab.labels.textLabelDiagnostics')
+    expect(wrapper.host.querySelector('[data-testid="text-label-diagnostics-count"]').textContent)
+      .toContain('map.drawTab.labels.textLabelDiagnosticsCount{"count":4}')
+    expect([...wrapper.host.querySelectorAll('[data-testid="text-label-diagnostics-item"]')]
+      .map((item) => item.textContent)).toEqual(['4 个标注', '2 个被比例尺隐藏', '自动避让'])
 
     wrapper.unmount()
   })

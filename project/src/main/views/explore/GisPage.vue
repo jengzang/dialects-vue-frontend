@@ -178,6 +178,7 @@
           :can-intersect-selected-polygons="canIntersectSelectedPolygons"
           :can-difference-selected-polygons="canDifferenceSelectedPolygons"
           :geometry-quality-summary="geometryQualitySummary"
+          :text-label-summary="textLabelSummary"
           :can-delete-selection="canDeleteSelection"
           :can-duplicate-feature="canDuplicateSelectedFeature"
           :is-feature-box-select-mode="isFeatureBoxSelectMode"
@@ -857,6 +858,7 @@ const {
   polygonSplitLineOptions, selectedPolygonSplitLineFeature, canSplitSelectedPolygon,
   canStartPolygonSplitSketch, canMergeSelectedPolygons, canIntersectSelectedPolygons, canDifferenceSelectedPolygons,
   canConvertSelectedLineToPolygon, geometryQualitySummary,
+  textLabelSummary,
   canUseFeatureBoxSelect, canMoveSelectedFeatures, selectedLayerLabel, editSessionStatus,
   createEmptyLayer, getFeatureId, getFeatureLabel, getLayerLabel,
   syncLayerIdSeedFromLayers, applyLayerPropertyToFeatures,

@@ -385,7 +385,8 @@ describe('Map draw editor contracts', () => {
     expect(editableSource).toContain('const syncTextLeaderLines = () =>')
     expect(editableSource).toContain('const textBackgroundSourceId = \'draw-text-background-source\'')
     expect(editableSource).toContain('const syncTextBackgroundBoxes = () =>')
-    expect(editableSource).toContain('const buildTextBackgroundFeature = (feature, layer) =>')
+    expect(editableSource).toContain("const buildTextBackgroundFeature = (feature, layer, layerId = '') =>")
+    expect(editableSource).toContain("layerId: String(layerId || feature?.properties?.layerId || '')")
     expect(editableSource).toContain("['get', 'user_textRotate']")
     expect(editableSource).toContain("['get', 'textRotate']")
 
@@ -1042,6 +1043,7 @@ describe('Map draw editor contracts', () => {
 
   it('supports optional layer labels from the layer panel through map rendering', () => {
     const panelSource = readSource(mapDrawLayersPanelPath)
+    const toolsPanelSource = readSource(mapDrawToolsPanelPath)
     const tabSource = readSource(mapDrawTabPath)
     const coreSource = readSource(useGisMapCorePath)
     const layersSource = readSource(useGisLayersPath)
@@ -1052,6 +1054,7 @@ describe('Map draw editor contracts', () => {
     expect(panelSource).toContain(`'toggle-layer-labels'`)
     expect(tabSource).toContain('@toggle-layer-labels="toggleLayerLabels"')
     expect(coreSource).toContain("labelsVisible: geometryType === 'Text'")
+    expect(coreSource).toContain('const textLabelSummary = computed')
     expect(coreSource).toContain(`'labelsVisible'`)
     expect(coreSource).toContain(`'user_labelsVisible'`)
     expect(layersSource).toContain('async function toggleLayerLabels(layerId)')
@@ -1060,10 +1063,16 @@ describe('Map draw editor contracts', () => {
     expect(layersSource).toContain('dup.labelsVisible = src.labelsVisible;')
     expect(editableSource).toContain('const activeLayerLabelsVisibleExpression =')
     expect(editableSource).toContain('const layerLabelsVisibleExpression =')
+    expect(editableSource).toContain('layerIds.add(textBackgroundFillLayerId)')
+    expect(editableSource).toContain('layerIds.add(textBackgroundLineLayerId)')
+    expect(editableSource).toContain('layerIds.add(textLeaderLayerId)')
     expect(editableSource).toContain(`text-field`)
     expect(editableSource).toContain(`['coalesce', ['get', 'user_annotationText'], ['get', 'annotationText'], ['get', 'name'], ['get', 'title'], ['get', 'label'], '']`)
     expect(editableSource).toContain('labelsVisible: feature.properties?.labelsVisible ?? layer.labelsVisible ?? false')
     expect(tabSource).toContain('labelsVisible: props.labelsVisible ?? activeLayer.value?.labelsVisible ?? false')
+    expect(tabSource).toContain(':text-label-summary="textLabelSummary"')
+    expect(toolsPanelSource).toContain('data-testid="text-label-diagnostics-title"')
+    expect(toolsPanelSource).toContain('data-testid="text-label-diagnostics-item"')
   })
 
   it('has localized labels for duplicating draw layers', () => {

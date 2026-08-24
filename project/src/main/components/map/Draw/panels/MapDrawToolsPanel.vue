@@ -581,6 +581,35 @@
               </span>
             </div>
           </div>
+          <div
+            v-if="textLabelSummary?.hasLabels"
+            class="draw-shape-edit-status"
+            data-testid="text-label-diagnostics-status"
+          >
+            <div class="draw-shape-edit-main">
+              <span
+                class="draw-shape-edit-target"
+                data-testid="text-label-diagnostics-title"
+              >
+                {{ t('map.drawTab.labels.textLabelDiagnostics') }}
+              </span>
+              <span
+                class="draw-shape-edit-count"
+                data-testid="text-label-diagnostics-count"
+              >
+                {{ t('map.drawTab.labels.textLabelDiagnosticsCount', { count: textLabelSummary.totalCount || 0 }) }}
+              </span>
+            </div>
+            <div class="draw-shape-edit-tips">
+              <span
+                v-for="item in textLabelSummary.items"
+                :key="item.id"
+                data-testid="text-label-diagnostics-item"
+              >
+                {{ item.label }}
+              </span>
+            </div>
+          </div>
         </section>
 
         <section class="draw-tool-section">
@@ -1388,6 +1417,14 @@ const props = defineProps({
     default: () => ({
       hasIssues: false,
       issueCount: 0,
+      items: [],
+    }),
+  },
+  textLabelSummary: {
+    type: Object,
+    default: () => ({
+      hasLabels: false,
+      totalCount: 0,
       items: [],
     }),
   },

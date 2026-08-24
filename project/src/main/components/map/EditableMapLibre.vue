@@ -238,6 +238,7 @@ const textLeaderLayerId = 'draw-text-leader-line'
 const textBackgroundSourceId = 'draw-text-background-source'
 const textBackgroundFillLayerId = 'draw-text-background-fill'
 const textBackgroundLineLayerId = 'draw-text-background-line'
+const textHelperLayerIds = new Set([textLeaderLayerId, textBackgroundFillLayerId, textBackgroundLineLayerId])
 const snapPriorityBiasSquared = 1
 const createDefaultSnapTargets = () => ({
   vertex: true,
@@ -811,7 +812,7 @@ const syncActiveTextLayoutConstants = () => {
   })
 }
 
-const buildTextBackgroundFeature = (feature, layer) => {
+const buildTextBackgroundFeature = (feature, layer, layerId = '') => {
   if (!map.value || !shouldRenderTextBackground(feature, layer)) return null
   const coordinate = normalizeVertexCoordinate(feature.geometry.coordinates)
   if (!coordinate) return null
@@ -851,6 +852,7 @@ const buildTextBackgroundFeature = (feature, layer) => {
   return {
     type: 'Feature',
     properties: {
+      layerId: String(layerId || feature?.properties?.layerId || ''),
       textBackgroundColor: getTextStyleValue(feature, layer, 'textBackgroundColor', '#ffffff'),
       textBackgroundOpacity: getFiniteTextStyleNumber(getTextStyleValue(feature, layer, 'textBackgroundOpacity', 0.75), 0.75),
     },
@@ -865,11 +867,11 @@ const buildTextBackgroundFeatures = () => {
   const activeFeatureCollection = normalizeFeatureCollection(draw.value?.getAll?.() ?? props.modelValue)
   const activeLayer = props.activeLayer ?? {}
   const activeFeatures = ['Point', 'Text'].includes(activeLayer.geometryType)
-    ? (activeFeatureCollection.features ?? []).map((feature) => buildTextBackgroundFeature(feature, activeLayer))
+    ? (activeFeatureCollection.features ?? []).map((feature) => buildTextBackgroundFeature(feature, activeLayer, activeLayer.id))
     : []
   const readonlyFeatures = buildReadonlyLayerDescriptors()
     .flatMap((descriptor) => (descriptor.featureCollection.features ?? [])
-      .map((feature) => buildTextBackgroundFeature(feature, feature.properties ?? {})))
+      .map((feature) => buildTextBackgroundFeature(feature, feature.properties ?? {}, descriptor.layerId)))
   return [...activeFeatures, ...readonlyFeatures].filter(Boolean)
 }
 
@@ -912,7 +914,7 @@ const syncTextBackgroundBoxes = () => {
   map.value.getSource(textBackgroundSourceId)?.setData?.(featureCollection(buildTextBackgroundFeatures()))
 }
 
-const buildTextLeaderFeature = (feature, layer) => {
+const buildTextLeaderFeature = (feature, layer, layerId = '') => {
   if (!map.value || !shouldRenderTextLeader(feature, layer)) return null
   const coordinate = normalizeVertexCoordinate(feature.geometry.coordinates)
   if (!coordinate) return null
@@ -934,6 +936,7 @@ const buildTextLeaderFeature = (feature, layer) => {
   return {
     type: 'Feature',
     properties: {
+      layerId: String(layerId || feature?.properties?.layerId || ''),
       textLeaderColor: leaderColor,
       textLeaderWidth: Number(getTextStyleValue(feature, layer, 'textLeaderWidth', 1.5)) || 1.5,
       opacity: Number(getTextStyleValue(feature, layer, 'opacity', 1)) || 1,
@@ -949,11 +952,11 @@ const buildTextLeaderFeatures = () => {
   const activeFeatureCollection = normalizeFeatureCollection(draw.value?.getAll?.() ?? props.modelValue)
   const activeLayer = props.activeLayer ?? {}
   const activeFeatures = ['Point', 'Text'].includes(activeLayer.geometryType)
-    ? (activeFeatureCollection.features ?? []).map((feature) => buildTextLeaderFeature(feature, activeLayer))
+    ? (activeFeatureCollection.features ?? []).map((feature) => buildTextLeaderFeature(feature, activeLayer, activeLayer.id))
     : []
   const readonlyFeatures = buildReadonlyLayerDescriptors()
     .flatMap((descriptor) => (descriptor.featureCollection.features ?? [])
-      .map((feature) => buildTextLeaderFeature(feature, feature.properties ?? {})))
+      .map((feature) => buildTextLeaderFeature(feature, feature.properties ?? {}, descriptor.layerId)))
   return [...activeFeatures, ...readonlyFeatures].filter(Boolean)
 }
 
@@ -2766,8 +2769,23 @@ const setLayerVisibility = (layerId, visible) => {
   map.value.setLayoutProperty(layerId, 'visibility', visible ? 'visible' : 'none')
 }
 
+const setLayerFilter = (layerId, filter) => {
+  if (!map.value?.getLayer(layerId) || typeof map.value.setFilter !== 'function') return
+  map.value.setFilter(layerId, filter)
+}
+
+const buildLayerIdFilter = (layerIds = []) => {
+  const safeLayerIds = [...layerIds].map((layerId) => String(layerId || '')).filter(Boolean)
+  return safeLayerIds.length
+    ? ['in', ['get', 'layerId'], ['literal', safeLayerIds]]
+    : ['==', ['get', 'layerId'], '__no-selected-layer__']
+}
+
 const buildDrawLayerIdSet = () => {
   const layerIds = new Set(drawStyles.map((style) => style.id))
+  layerIds.add(textBackgroundFillLayerId)
+  layerIds.add(textBackgroundLineLayerId)
+  layerIds.add(textLeaderLayerId)
   buildAllLayerDescriptors().forEach((descriptor) => {
     layerIds.add(descriptor.fillLayerId)
     layerIds.add(descriptor.lineLayerId)
@@ -2789,10 +2807,14 @@ const applyExportContentVisibility = (options = {}) => {
   const selectedLayerIds = new Set(options.selectedLayerIds ?? [])
   const drawLayerIds = buildDrawLayerIdSet()
   const previousVisibilities = new Map()
+  const previousFilters = new Map()
   const activeLayerIsSelected = selectedLayerIds.has(props.activeLayer?.id)
 
   ;(map.value.getStyle()?.layers ?? []).forEach((layer) => {
     previousVisibilities.set(layer.id, map.value.getLayoutProperty(layer.id, 'visibility') ?? 'visible')
+    if (textHelperLayerIds.has(layer.id) && typeof map.value.getFilter === 'function') {
+      previousFilters.set(layer.id, map.value.getFilter(layer.id))
+    }
 
     if (snapPreviewLayerIds.has(layer.id)) {
       setLayerVisibility(layer.id, false)
@@ -2802,6 +2824,16 @@ const applyExportContentVisibility = (options = {}) => {
     if (drawLayerIds.has(layer.id)) {
       if (!includeDrawLayers) {
         setLayerVisibility(layer.id, false)
+        return
+      }
+
+      if (textHelperLayerIds.has(layer.id)) {
+        if (onlySelectedLayers) {
+          setLayerFilter(layer.id, buildLayerIdFilter(selectedLayerIds))
+          setLayerVisibility(layer.id, selectedLayerIds.size > 0)
+          return
+        }
+        setLayerVisibility(layer.id, true)
         return
       }
 
@@ -2841,6 +2873,9 @@ const applyExportContentVisibility = (options = {}) => {
     previousVisibilities.forEach((visibility, layerId) => {
       if (!map.value?.getLayer(layerId)) return
       map.value.setLayoutProperty(layerId, 'visibility', visibility)
+    })
+    previousFilters.forEach((filter, layerId) => {
+      setLayerFilter(layerId, filter ?? null)
     })
   }
 }
