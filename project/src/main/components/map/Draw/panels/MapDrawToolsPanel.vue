@@ -398,6 +398,29 @@
             </div>
           </template>
           <div
+            class="draw-tool-wide-control"
+            data-testid="topology-controls"
+          >
+            <span class="draw-field-label">{{ t('map.drawTab.labels.topologyEditing') }}</span>
+            <CheckBox
+              class="draw-toggle-field"
+              data-testid="topology-editing-toggle"
+              :model-value="topologyEditingEnabled"
+              @update:modelValue="$emit('update:topologyEditingEnabled', $event)"
+            >
+              {{ t('map.drawTab.labels.topologyEditingEnabled') }}
+            </CheckBox>
+            <CheckBox
+              class="draw-toggle-field"
+              data-testid="shared-boundary-protection-toggle"
+              :model-value="sharedBoundaryProtectionEnabled"
+              :disabled="!topologyEditingEnabled"
+              @update:modelValue="$emit('update:sharedBoundaryProtectionEnabled', $event)"
+            >
+              {{ t('map.drawTab.labels.sharedBoundaryProtection') }}
+            </CheckBox>
+          </div>
+          <div
             v-if="editSessionStatus"
             class="draw-shape-edit-status"
             data-testid="edit-session-status"
@@ -1441,6 +1464,8 @@ const props = defineProps({
   snappingEnabled: { type: Boolean, default: true },
   snapTolerance: { type: Number, default: 12 },
   snapGridSize: { type: Number, default: 0 },
+  topologyEditingEnabled: { type: Boolean, default: true },
+  sharedBoundaryProtectionEnabled: { type: Boolean, default: true },
   snapTargets: {
     type: Object,
     default: () => ({
@@ -1501,6 +1526,8 @@ const emit = defineEmits([
   'update:snappingEnabled',
   'update:snapTolerance',
   'update:snapGridSize',
+  'update:topologyEditingEnabled',
+  'update:sharedBoundaryProtectionEnabled',
   'update:snap-targets',
 ])
 

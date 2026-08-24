@@ -42,6 +42,8 @@ export function useGisDrafts(options = {}) {
     snapTolerance,
     snapGridSize,
     snapTargets,
+    topologyEditingEnabled,
+    sharedBoundaryProtectionEnabled,
     isAuthenticated,
     onAuthRequired,
     clearFeatureSelection,
@@ -87,6 +89,8 @@ export function useGisDrafts(options = {}) {
     snapTolerance: snapTolerance.value,
     snapGridSize: snapGridSize.value,
     snapTargets: snapTargets.value,
+    topologyEditingEnabled: topologyEditingEnabled?.value ?? true,
+    sharedBoundaryProtectionEnabled: sharedBoundaryProtectionEnabled?.value ?? true,
   });
 
   const getCurrentWorkbenchSignature = () => buildDraftStateSignature(buildPersistedWorkbenchState());
@@ -159,6 +163,8 @@ export function useGisDrafts(options = {}) {
     if (snapTolerance) snapTolerance.value = Number.isFinite(Number(state?.snapTolerance)) ? Number(state.snapTolerance) : 12;
     if (snapGridSize) snapGridSize.value = Number.isFinite(Number(state?.snapGridSize)) ? Number(state.snapGridSize) : 0;
     if (snapTargets) snapTargets.value = normalizeSnapTargets(state?.snapTargets);
+    if (topologyEditingEnabled) topologyEditingEnabled.value = state?.topologyEditingEnabled ?? true;
+    if (sharedBoundaryProtectionEnabled) sharedBoundaryProtectionEnabled.value = state?.sharedBoundaryProtectionEnabled ?? true;
     clearFeatureSelection();
     syncLayerIdSeedFromLayers(layers.value);
     syncAllLayersAfterMutation();

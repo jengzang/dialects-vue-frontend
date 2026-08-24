@@ -309,6 +309,14 @@ const props = defineProps({
       reference: true,
     }),
   },
+  topologyEditingEnabled: {
+    type: Boolean,
+    default: true,
+  },
+  sharedBoundaryProtectionEnabled: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 const emit = defineEmits([

@@ -332,6 +332,8 @@ export function useGisMapCore(options = {}) {
   const snapTolerance = ref(12);
   const snapGridSize = ref(0);
   const snapTargets = ref(createDefaultSnapTargets());
+  const topologyEditingEnabled = ref(true);
+  const sharedBoundaryProtectionEnabled = ref(true);
   const selectedBufferDistanceKm = ref(1);
 
   // ---- Computeds ----
@@ -1352,6 +1354,8 @@ export function useGisMapCore(options = {}) {
     snapTolerance,
     snapGridSize,
     snapTargets,
+    topologyEditingEnabled,
+    sharedBoundaryProtectionEnabled,
     selectedBufferDistanceKm,
     // Computeds
     mapStyleOptions,

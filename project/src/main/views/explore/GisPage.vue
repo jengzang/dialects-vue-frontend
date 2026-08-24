@@ -100,6 +100,8 @@
             :snap-tolerance="snapTolerance"
             :snap-grid-size="snapGridSize"
             :snap-targets="snapTargets"
+            :topology-editing-enabled="topologyEditingEnabled"
+            :shared-boundary-protection-enabled="sharedBoundaryProtectionEnabled"
             @update:model-value="handleActiveLayerModelUpdate"
             @before-features-change="handleBeforeFeaturesChange"
             @features-change="handleActiveLayerFeaturesChange"
@@ -139,6 +141,8 @@
           v-model:snapping-enabled="snappingEnabled"
           v-model:snap-tolerance="snapTolerance"
           v-model:snap-grid-size="snapGridSize"
+          v-model:topology-editing-enabled="topologyEditingEnabled"
+          v-model:shared-boundary-protection-enabled="sharedBoundaryProtectionEnabled"
           :snap-targets="snapTargets"
           :feature-items="activeLayerFeatureItems"
           :feature-table-columns="activeLayerFeatureTableColumns"
@@ -846,7 +850,9 @@ const {
   selectedFeatureBatchName, selectedFeatureBatchPropertyKey, selectedFeatureBatchPropertyValue,
   selectedTextLabelFieldKey,
   selectedPolygonSplitLineId, polygonSplitSketchActive, geometryEditStatus,
-  snappingEnabled, snapTolerance, snapGridSize, snapTargets, selectedBufferDistanceKm,
+  snappingEnabled, snapTolerance, snapGridSize, snapTargets,
+  topologyEditingEnabled, sharedBoundaryProtectionEnabled,
+  selectedBufferDistanceKm,
   mapStyleOptions, activeLayer, activeLayerFeatureCollection, featureCount,
   activeLayerFeatures, selectedFeature, activeLayerFeatureIdSet,
   activeLayerFeatureItems, activeLayerSelectableFeatureIds,
@@ -969,6 +975,7 @@ const drafts = useGisDrafts({
   layers, activeLayerId, currentStyleKey,
   isDrawingPanelOpen, isLayersPanelOpen,
   snappingEnabled, snapTolerance, snapGridSize, snapTargets,
+  topologyEditingEnabled, sharedBoundaryProtectionEnabled,
   isAuthenticated,
   clearFeatureSelection, syncLayerIdSeedFromLayers,
   syncAllLayersAfterMutation, commitHistory,

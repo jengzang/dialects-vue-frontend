@@ -88,7 +88,17 @@ vi.mock('@/main/utils/drawMap/draftStorage.js', async () => {
 vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
   default: defineComponent({
     name: 'EditableMapLibreStub',
-    props: ['modelValue', 'activeLayer', 'featureBoxSelectEnabled', 'snappingEnabled', 'snapTolerance', 'snapGridSize', 'snapTargets'],
+    props: [
+      'modelValue',
+      'activeLayer',
+      'featureBoxSelectEnabled',
+      'snappingEnabled',
+      'snapTolerance',
+      'snapGridSize',
+      'snapTargets',
+      'topologyEditingEnabled',
+      'sharedBoundaryProtectionEnabled',
+    ],
     emits: [
       'update:modelValue',
       'before-features-change',
@@ -266,6 +276,8 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         <span data-testid="snap-tolerance">{{ snapTolerance }}</span>
         <span data-testid="snap-grid-size">{{ snapGridSize }}</span>
         <span data-testid="snap-target-edge">{{ snapTargets?.edge === false ? 'off' : 'on' }}</span>
+        <span data-testid="topology-editing-enabled">{{ topologyEditingEnabled ? 'on' : 'off' }}</span>
+        <span data-testid="shared-boundary-protection-enabled">{{ sharedBoundaryProtectionEnabled ? 'on' : 'off' }}</span>
         <button
           data-testid="emit-box-selection"
           type="button"
@@ -360,6 +372,8 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       snapTolerance: { type: Number, default: 12 },
       snapGridSize: { type: Number, default: 0 },
       snapTargets: { type: Object, default: () => ({ vertex: true, midpoint: true, edge: true, grid: true, reference: true }) },
+      topologyEditingEnabled: { type: Boolean, default: true },
+      sharedBoundaryProtectionEnabled: { type: Boolean, default: true },
     },
     emits: [
       'set-mode',
@@ -388,6 +402,8 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       'update:snapTolerance',
       'update:snapGridSize',
       'update:snap-targets',
+      'update:topologyEditingEnabled',
+      'update:sharedBoundaryProtectionEnabled',
     ],
     setup(props) {
       mocks.latestToolsPanelProps = props
@@ -422,6 +438,20 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
           @click="$emit('update:snap-targets', { ...snapTargets, edge: !snapTargets.edge })"
         >
           toggle edge snap
+        </button>
+        <button
+          data-testid="toggle-topology-editing"
+          type="button"
+          @click="$emit('update:topologyEditingEnabled', !topologyEditingEnabled)"
+        >
+          toggle topology editing
+        </button>
+        <button
+          data-testid="toggle-shared-boundary-protection"
+          type="button"
+          @click="$emit('update:sharedBoundaryProtectionEnabled', !sharedBoundaryProtectionEnabled)"
+        >
+          toggle shared boundary protection
         </button>
         <span data-testid="selected-vertex-count">{{ selectedVertexCount }}</span>
         <span data-testid="can-delete-selected-vertices">{{ canDeleteSelectedVertices ? 'true' : 'false' }}</span>
@@ -990,6 +1020,8 @@ describe('MapDrawTab draft safety', () => {
       snapTolerance: 28,
       snapGridSize: 0.5,
       snapTargets: { vertex: true, midpoint: true, edge: false, grid: true, reference: true },
+      topologyEditingEnabled: false,
+      sharedBoundaryProtectionEnabled: false,
     })
     mocks.getDraftRecordById.mockImplementation(async (id) => (id === mocks.AUTO_DRAFT_ID ? autoDraft : null))
     mocks.showConfirm.mockResolvedValue(false)
@@ -1021,6 +1053,8 @@ describe('MapDrawTab draft safety', () => {
       snapTolerance: 28,
       snapGridSize: 0.5,
       snapTargets: { vertex: true, midpoint: true, edge: false, grid: true, reference: true },
+      topologyEditingEnabled: false,
+      sharedBoundaryProtectionEnabled: false,
     })
     mocks.getDraftRecordById.mockImplementation(async (id) => (id === mocks.AUTO_DRAFT_ID ? autoDraft : null))
     mocks.showConfirm.mockResolvedValue(true)
@@ -1032,6 +1066,8 @@ describe('MapDrawTab draft safety', () => {
     expect(wrapper.host.querySelector('[data-testid="snap-tolerance"]').textContent).toBe('28')
     expect(wrapper.host.querySelector('[data-testid="snap-grid-size"]').textContent).toBe('0.5')
     expect(wrapper.host.querySelector('[data-testid="snap-target-edge"]').textContent).toBe('off')
+    expect(wrapper.host.querySelector('[data-testid="topology-editing-enabled"]').textContent).toBe('off')
+    expect(wrapper.host.querySelector('[data-testid="shared-boundary-protection-enabled"]').textContent).toBe('off')
 
     wrapper.unmount()
   })
@@ -1358,6 +1394,26 @@ describe('MapDrawTab draft safety', () => {
     wrapper.host.querySelector('[data-testid="toggle-snap-edge"]').click()
     await nextTick()
     expect(wrapper.host.querySelector('[data-testid="snap-target-edge"]').textContent).toBe('off')
+
+    wrapper.unmount()
+  })
+
+  it('passes topology editing controls from the drawing tools panel into the map editor', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="topology-editing-enabled"]').textContent).toBe('on')
+    expect(wrapper.host.querySelector('[data-testid="shared-boundary-protection-enabled"]').textContent).toBe('on')
+
+    wrapper.host.querySelector('[data-testid="toggle-topology-editing"]').click()
+    await nextTick()
+    expect(wrapper.host.querySelector('[data-testid="topology-editing-enabled"]').textContent).toBe('off')
+
+    wrapper.host.querySelector('[data-testid="toggle-shared-boundary-protection"]').click()
+    await nextTick()
+    expect(wrapper.host.querySelector('[data-testid="shared-boundary-protection-enabled"]').textContent).toBe('off')
 
     wrapper.unmount()
   })
