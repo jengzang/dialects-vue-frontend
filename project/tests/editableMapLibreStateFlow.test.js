@@ -1167,6 +1167,7 @@ describe('EditableMapLibre state flow', () => {
       featureName: '边界线',
       coordinate: [5, 5],
       originalCoordinate: [5.2, 5.1],
+      distancePixels: expect.any(Number),
     }])
 
     wrapper.unmount()
@@ -1221,6 +1222,7 @@ describe('EditableMapLibre state flow', () => {
       featureName: '边界线',
       coordinate: [5.2, 5],
       originalCoordinate: [5.2, 5.1],
+      distancePixels: expect.any(Number),
     }])
 
     wrapper.unmount()
@@ -1258,6 +1260,7 @@ describe('EditableMapLibre state flow', () => {
       featureName: '',
       coordinate: [5, 5],
       originalCoordinate: [5.2, 5.1],
+      distancePixels: expect.any(Number),
     }])
 
     gridOnlyWrapper.unmount()
@@ -1384,6 +1387,7 @@ describe('EditableMapLibre state flow', () => {
       featureName: '',
       coordinate: [5, 5],
       originalCoordinate: [5.2, 5.1],
+      distancePixels: expect.any(Number),
     }])
 
     wrapper.unmount()

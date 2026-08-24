@@ -791,6 +791,7 @@
       "editSessionSnapDisabled": "吸附：已关闭",
       "editSessionSnapWaiting": "吸附：等待目标",
       "editSessionSnapTarget": "吸附：{type} · {target}",
+      "editSessionSnapTargetWithDistance": "吸附：{type} · {target} · {distance}px",
       "editSessionHoverTarget": "悬停：{type} · {target}",
       "editTargetTypeVertex": "顶点",
       "editTargetTypeMidpoint": "边中点",

@@ -868,6 +868,15 @@ export function useGisMapCore(options = {}) {
     return `${trimNumber(longitude)}, ${trimNumber(latitude)}`;
   };
 
+  const resolveSnapDistanceLabel = () => {
+    const distancePixels = Number(snapState.value?.distancePixels);
+    if (!Number.isFinite(distancePixels)) return '';
+    const roundedDistance = distancePixels < 10
+      ? Math.round(distancePixels * 10) / 10
+      : Math.round(distancePixels);
+    return String(roundedDistance).replace(/\.0$/, '');
+  };
+
   const resolveSnapTargetLabel = () => {
     if (!snappingEnabled.value) return t('map.drawTab.labels.editSessionSnapDisabled');
     if (!snapState.value?.active) return t('map.drawTab.labels.editSessionSnapWaiting');
@@ -877,7 +886,10 @@ export function useGisMapCore(options = {}) {
       .filter(Boolean)
       .join(' / ');
     const target = sourceLabel || formatSessionCoordinate(snapState.value.coordinate) || t('map.drawTab.labels.snapTypeUnknown');
-    return t('map.drawTab.labels.editSessionSnapTarget', { type, target });
+    const distance = resolveSnapDistanceLabel();
+    return distance
+      ? t('map.drawTab.labels.editSessionSnapTargetWithDistance', { type, target, distance })
+      : t('map.drawTab.labels.editSessionSnapTarget', { type, target });
   };
 
   const resolveSelectedFeatureSessionLabel = () => {
@@ -1213,6 +1225,7 @@ export function useGisMapCore(options = {}) {
           featureName: String(payload.featureName || ''),
           coordinate: Array.isArray(payload.coordinate) ? payload.coordinate : null,
           originalCoordinate: Array.isArray(payload.originalCoordinate) ? payload.originalCoordinate : null,
+          distancePixels: Number.isFinite(Number(payload.distancePixels)) ? Number(payload.distancePixels) : null,
         }
       : { active: false };
   };

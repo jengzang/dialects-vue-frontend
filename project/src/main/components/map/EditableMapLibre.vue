@@ -1237,6 +1237,7 @@ const setSnapPreview = (snapResult) => {
       featureName: snapResult.featureName || '',
       coordinate: normalizeVertexCoordinate(snapResult.coordinate),
       originalCoordinate: normalizeVertexCoordinate(snapResult.originalCoordinate),
+      distancePixels: Number.isFinite(Number(snapResult.distancePixels)) ? Number(snapResult.distancePixels) : null,
     })
   } else {
     emit('snap-state-change', { active: false })
@@ -1392,11 +1393,12 @@ const resolveSnapResult = (coordinate, options = {}) => {
   return {
     coordinate: best.coordinate,
     originalCoordinate: normalized,
-    snapped: Boolean(best.type && !areCoordinatesEqual(normalized, best.coordinate)),
+    snapped: Boolean(best.type),
     type: best.type,
     source: best.source,
     layerName: best.layerName,
     featureName: best.featureName,
+    distancePixels: Number.isFinite(best.distanceSquared) ? Math.sqrt(best.distanceSquared) : null,
   }
 }
 

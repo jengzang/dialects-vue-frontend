@@ -791,6 +791,7 @@
       "editSessionSnapDisabled": "Snap: off",
       "editSessionSnapWaiting": "Snap: waiting for target",
       "editSessionSnapTarget": "Snap: {type} · {target}",
+      "editSessionSnapTargetWithDistance": "Snap: {type} · {target} · {distance}px",
       "editSessionHoverTarget": "Hover: {type} · {target}",
       "editTargetTypeVertex": "vertex",
       "editTargetTypeMidpoint": "edge midpoint",
