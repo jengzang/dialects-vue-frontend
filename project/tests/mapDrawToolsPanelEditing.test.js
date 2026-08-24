@@ -646,6 +646,7 @@ describe('MapDrawToolsPanel editing affordances', () => {
 
   it('labels merged MultiPolygon features as polygon features', async () => {
     const wrapper = mountToolsPanel({
+      currentMode: 'simple_select',
       featureItems: [{
         id: 'multi-polygon-1',
         label: '合并面',
@@ -786,6 +787,109 @@ describe('MapDrawToolsPanel editing affordances', () => {
       .toContain('map.drawTab.labels.textLabelDiagnosticsCount{"count":4}')
     expect([...wrapper.host.querySelectorAll('[data-testid="text-label-diagnostics-item"]')]
       .map((item) => item.textContent)).toEqual(['4 个标注', '2 个被比例尺隐藏', '自动避让'])
+
+    wrapper.unmount()
+  })
+
+  it('keeps drawing mode focused on drawing-related configuration', async () => {
+    const wrapper = mountToolsPanel({
+      currentMode: 'draw_polygon',
+      selectedFeatureId: '',
+      selectedFeatureIds: [],
+      selectedFeatureGeometryType: '',
+      selectedFeatureProperties: null,
+      canUseSelectedGeometryTools: false,
+    })
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-mode-section"]')).not.toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-precision-section"]')).not.toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-selected-geometry-section"]')).toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-feature-list-section"]')).toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-feature-table-section"]')).toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-property-section"]')).toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="toggle-snapping"]')).not.toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="topology-controls"]')).not.toBeNull()
+
+    wrapper.unmount()
+  })
+
+  it('keeps direct shape editing focused on vertex controls instead of feature tables', async () => {
+    const wrapper = mountToolsPanel({
+      currentMode: 'direct_select',
+      selectedFeatureGeometryType: 'Polygon',
+      selectedVertexCount: 1,
+      selectedVertex: {
+        featureId: 'feature-1',
+        coordPath: '0.1',
+        coordinate: [113.25, 23.5],
+      },
+      canDeleteSelection: true,
+      canDeleteSelectedVertices: true,
+      featureTableRows: [{
+        id: 'feature-1',
+        name: '边界 A',
+        geometryType: 'Polygon',
+        properties: {},
+        propertySummary: '',
+        visible: true,
+        locked: false,
+      }],
+    })
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-precision-section"]')).not.toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-selected-geometry-section"]')).not.toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="shape-edit-coordinate-editor"]')).not.toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-feature-list-section"]')).toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-feature-table-section"]')).toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-property-section"]')).toBeNull()
+
+    wrapper.unmount()
+  })
+
+  it('keeps text annotation editing focused on text properties instead of geometry tools', async () => {
+    const wrapper = mountToolsPanel({
+      currentMode: 'simple_select',
+      activeLayer: { id: 'text-layer', geometryType: 'Text', visible: true, locked: false },
+      selectedFeatureGeometryType: 'Text',
+      selectedFeatureProperties: {
+        name: '文本 A',
+        annotationText: '方言点',
+        textSize: 16,
+        textColor: '#111111',
+        textHaloColor: '#ffffff',
+        textHaloWidth: 1,
+        textRotate: 0,
+        textAnchor: 'center',
+        textAllowOverlap: false,
+        textPriority: 0,
+        textLineHeight: 1.2,
+        textLetterSpacing: 0,
+        textAlign: 'center',
+        textMaxWidth: 12,
+        textMinZoom: 4,
+        textMaxZoom: 12,
+        textBackgroundEnabled: false,
+        textBackgroundColor: '#ffffff',
+        textBackgroundOpacity: 0.8,
+        textBackgroundPadding: 2,
+        textLeaderLine: false,
+        textLeaderColor: '#111111',
+        textLeaderWidth: 1,
+        textOffsetX: 0,
+        textOffsetY: 1.1,
+        visible: true,
+        locked: false,
+      },
+    })
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-property-section"]')).not.toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="text-annotation-input"]')).not.toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-selected-geometry-section"]')).toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-precision-section"]')).toBeNull()
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-reverse-geometry"]')).toBeNull()
 
     wrapper.unmount()
   })

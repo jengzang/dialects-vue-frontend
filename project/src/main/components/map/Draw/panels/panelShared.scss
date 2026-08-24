@@ -162,6 +162,26 @@
   min-width: 0;
 }
 
+.draw-tool-context-cluster {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  padding: 0.55rem;
+  border: 1px solid var(--glass-50);
+  border-radius: var(--radius-sm2);
+  background: var(--glass-40);
+}
+
+.draw-tool-context-stack {
+  @include flex-col;
+  gap: 0.6rem;
+  padding: 0.55rem;
+  border: 1px solid var(--glass-50);
+  border-radius: var(--radius-sm2);
+  background: var(--glass-40);
+}
+
 .draw-tool-mode-button {
   justify-content: center;
   gap: 0.35rem;
@@ -585,9 +605,8 @@ div.draw-layer-row-button {
   font-size: 0.92rem;
 }
 
-@media (max-width: 900px) {
+@media (max-aspect-ratio: 1/1) {
   .draw-tool-section-header {
     @include flex-col;
   }
-
 }

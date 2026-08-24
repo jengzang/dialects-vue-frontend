@@ -20,7 +20,10 @@
       </div>
 
       <div class="draw-tool-panel-body">
-        <section class="draw-tool-section">
+        <section
+          class="draw-tool-section"
+          data-testid="draw-tool-mode-section"
+        >
           <div class="draw-tool-section-title">
             {{ t('map.drawTab.buttons.drawingTools') }}
           </div>
@@ -127,165 +130,171 @@
             >
               {{ t('map.drawTab.buttons.duplicateFeature') }}
             </button>
-            <button
-              class="glass-button"
-              data-variant="secondary"
-              data-testid="draw-tool-reverse-geometry"
-              type="button"
-              :disabled="!canUseSelectedGeometryTools"
-              @click="$emit('reverse-selected-geometry')"
-            >
-              {{ t('map.drawTab.buttons.reverseGeometry') }}
-            </button>
-            <button
-              class="glass-button"
-              data-variant="secondary"
-              data-testid="draw-tool-simplify-geometry"
-              type="button"
-              :disabled="!canUseSelectedGeometryTools"
-              @click="$emit('simplify-selected-geometry')"
-            >
-              {{ t('map.drawTab.buttons.simplifyGeometry') }}
-            </button>
             <div
-              class="draw-tool-wide-control"
-              data-testid="draw-tool-buffer-controls"
+              v-if="showSelectedGeometryControls"
+              class="draw-tool-context-cluster"
+              data-testid="draw-tool-selected-geometry-section"
             >
-              <label class="draw-field">
-                <span class="draw-field-label">{{ t('map.drawTab.labels.bufferDistanceKm') }}：{{ selectedBufferDistanceKm }}</span>
-                <input
-                  class="draw-input glass-field"
-                  type="number"
-                  min="0.01"
-                  step="0.1"
-                  :value="selectedBufferDistanceKm"
-                  @input="$emit('update:selected-buffer-distance-km', normalizePositiveNumber($event.target.value, selectedBufferDistanceKm))"
+              <button
+                class="glass-button"
+                data-variant="secondary"
+                data-testid="draw-tool-reverse-geometry"
+                type="button"
+                :disabled="!canUseSelectedGeometryTools"
+                @click="$emit('reverse-selected-geometry')"
+              >
+                {{ t('map.drawTab.buttons.reverseGeometry') }}
+              </button>
+              <button
+                class="glass-button"
+                data-variant="secondary"
+                data-testid="draw-tool-simplify-geometry"
+                type="button"
+                :disabled="!canUseSelectedGeometryTools"
+                @click="$emit('simplify-selected-geometry')"
+              >
+                {{ t('map.drawTab.buttons.simplifyGeometry') }}
+              </button>
+              <div
+                class="draw-tool-wide-control"
+                data-testid="draw-tool-buffer-controls"
+              >
+                <label class="draw-field">
+                  <span class="draw-field-label">{{ t('map.drawTab.labels.bufferDistanceKm') }}：{{ selectedBufferDistanceKm }}</span>
+                  <input
+                    class="draw-input glass-field"
+                    type="number"
+                    min="0.01"
+                    step="0.1"
+                    :value="selectedBufferDistanceKm"
+                    @input="$emit('update:selected-buffer-distance-km', normalizePositiveNumber($event.target.value, selectedBufferDistanceKm))"
+                  >
+                </label>
+                <button
+                  class="glass-button draw-tool-inline-button"
+                  data-variant="secondary"
+                  data-testid="draw-tool-buffer-selected"
+                  type="button"
+                  :disabled="!canBufferSelectedFeature"
+                  @click="$emit('buffer-selected-feature')"
                 >
-              </label>
+                  {{ t('map.drawTab.buttons.bufferSelectedFeature') }}
+                </button>
+              </div>
               <button
-                class="glass-button draw-tool-inline-button"
+                v-if="selectedFeatureGeometryType === 'LineString'"
+                class="glass-button"
                 data-variant="secondary"
-                data-testid="draw-tool-buffer-selected"
+                data-testid="draw-tool-close-line"
                 type="button"
-                :disabled="!canBufferSelectedFeature"
-                @click="$emit('buffer-selected-feature')"
+                :disabled="!canCloseSelectedLine"
+                @click="$emit('close-selected-line')"
               >
-                {{ t('map.drawTab.buttons.bufferSelectedFeature') }}
+                {{ t('map.drawTab.buttons.closeLine') }}
+              </button>
+              <button
+                v-if="selectedFeatureGeometryType === 'LineString'"
+                class="glass-button"
+                data-variant="secondary"
+                data-testid="draw-tool-split-line"
+                type="button"
+                :disabled="!canSplitSelectedLine"
+                @click="$emit('split-selected-line')"
+              >
+                {{ t('map.drawTab.buttons.splitLine') }}
+              </button>
+              <button
+                v-if="selectedFeatureGeometryType === 'LineString'"
+                class="glass-button"
+                data-variant="secondary"
+                data-testid="draw-tool-line-to-polygon"
+                type="button"
+                :disabled="!canConvertSelectedLineToPolygon"
+                @click="$emit('convert-selected-line-to-polygon')"
+              >
+                {{ t('map.drawTab.buttons.lineToPolygon') }}
+              </button>
+              <div
+                v-if="selectedFeatureGeometryType === 'Polygon'"
+                class="draw-tool-wide-control"
+                data-testid="draw-tool-polygon-split-tool"
+              >
+                <span class="draw-field-label">{{ t('map.drawTab.labels.polygonSplitLine') }}</span>
+                <SimpleSelectDropdown
+                  class="draw-tool-wide-select"
+                  data-testid="draw-tool-polygon-split-line-select"
+                  :model-value="selectedPolygonSplitLineId"
+                  :options="polygonSplitLineOptions"
+                  :placeholder="t('map.drawTab.labels.polygonSplitLine')"
+                  :disabled="!canUseSelectedGeometryTools || polygonSplitLineOptions.length === 0"
+                  @update:model-value="$emit('update:selected-polygon-split-line-id', $event)"
+                />
+                <button
+                  class="glass-button draw-tool-inline-button"
+                  data-variant="secondary"
+                  data-testid="draw-tool-split-polygon"
+                  type="button"
+                  :disabled="!canSplitSelectedPolygon"
+                  @click="$emit('split-selected-polygon')"
+                >
+                  {{ t('map.drawTab.buttons.splitPolygon') }}
+                </button>
+                <button
+                  v-if="!polygonSplitSketchActive"
+                  class="glass-button draw-tool-inline-button"
+                  data-variant="secondary"
+                  data-testid="draw-tool-start-polygon-split-sketch"
+                  type="button"
+                  :disabled="!canStartPolygonSplitSketch"
+                  @click="$emit('start-polygon-split-sketch')"
+                >
+                  {{ t('map.drawTab.buttons.drawPolygonSplitLine') }}
+                </button>
+                <button
+                  v-else
+                  class="glass-button draw-tool-inline-button"
+                  data-variant="secondary"
+                  data-testid="draw-tool-cancel-polygon-split-sketch"
+                  type="button"
+                  @click="$emit('cancel-polygon-split-sketch')"
+                >
+                  {{ t('map.drawTab.buttons.cancelPolygonSplitLine') }}
+                </button>
+              </div>
+              <button
+                v-if="selectedFeatureGeometryType === 'Polygon'"
+                class="glass-button"
+                data-variant="secondary"
+                data-testid="draw-tool-merge-polygons"
+                type="button"
+                :disabled="!canMergeSelectedPolygons"
+                @click="$emit('merge-selected-polygons')"
+              >
+                {{ t('map.drawTab.buttons.mergePolygons') }}
+              </button>
+              <button
+                v-if="selectedFeatureGeometryType === 'Polygon'"
+                class="glass-button"
+                data-variant="secondary"
+                data-testid="draw-tool-intersect-polygons"
+                type="button"
+                :disabled="!canIntersectSelectedPolygons"
+                @click="$emit('intersect-selected-polygons')"
+              >
+                {{ t('map.drawTab.buttons.intersectPolygons') }}
+              </button>
+              <button
+                v-if="selectedFeatureGeometryType === 'Polygon'"
+                class="glass-button"
+                data-variant="secondary"
+                data-testid="draw-tool-difference-polygons"
+                type="button"
+                :disabled="!canDifferenceSelectedPolygons"
+                @click="$emit('difference-selected-polygons')"
+              >
+                {{ t('map.drawTab.buttons.differencePolygons') }}
               </button>
             </div>
-            <button
-              v-if="selectedFeatureGeometryType === 'LineString'"
-              class="glass-button"
-              data-variant="secondary"
-              data-testid="draw-tool-close-line"
-              type="button"
-              :disabled="!canCloseSelectedLine"
-              @click="$emit('close-selected-line')"
-            >
-              {{ t('map.drawTab.buttons.closeLine') }}
-            </button>
-            <button
-              v-if="selectedFeatureGeometryType === 'LineString'"
-              class="glass-button"
-              data-variant="secondary"
-              data-testid="draw-tool-split-line"
-              type="button"
-              :disabled="!canSplitSelectedLine"
-              @click="$emit('split-selected-line')"
-            >
-              {{ t('map.drawTab.buttons.splitLine') }}
-            </button>
-            <button
-              v-if="selectedFeatureGeometryType === 'LineString'"
-              class="glass-button"
-              data-variant="secondary"
-              data-testid="draw-tool-line-to-polygon"
-              type="button"
-              :disabled="!canConvertSelectedLineToPolygon"
-              @click="$emit('convert-selected-line-to-polygon')"
-            >
-              {{ t('map.drawTab.buttons.lineToPolygon') }}
-            </button>
-            <div
-              v-if="selectedFeatureGeometryType === 'Polygon'"
-              class="draw-tool-wide-control"
-              data-testid="draw-tool-polygon-split-tool"
-            >
-              <span class="draw-field-label">{{ t('map.drawTab.labels.polygonSplitLine') }}</span>
-              <SimpleSelectDropdown
-                class="draw-tool-wide-select"
-                data-testid="draw-tool-polygon-split-line-select"
-                :model-value="selectedPolygonSplitLineId"
-                :options="polygonSplitLineOptions"
-                :placeholder="t('map.drawTab.labels.polygonSplitLine')"
-                :disabled="!canUseSelectedGeometryTools || polygonSplitLineOptions.length === 0"
-                @update:model-value="$emit('update:selected-polygon-split-line-id', $event)"
-              />
-              <button
-                class="glass-button draw-tool-inline-button"
-                data-variant="secondary"
-                data-testid="draw-tool-split-polygon"
-                type="button"
-                :disabled="!canSplitSelectedPolygon"
-                @click="$emit('split-selected-polygon')"
-              >
-                {{ t('map.drawTab.buttons.splitPolygon') }}
-              </button>
-              <button
-                v-if="!polygonSplitSketchActive"
-                class="glass-button draw-tool-inline-button"
-                data-variant="secondary"
-                data-testid="draw-tool-start-polygon-split-sketch"
-                type="button"
-                :disabled="!canStartPolygonSplitSketch"
-                @click="$emit('start-polygon-split-sketch')"
-              >
-                {{ t('map.drawTab.buttons.drawPolygonSplitLine') }}
-              </button>
-              <button
-                v-else
-                class="glass-button draw-tool-inline-button"
-                data-variant="secondary"
-                data-testid="draw-tool-cancel-polygon-split-sketch"
-                type="button"
-                @click="$emit('cancel-polygon-split-sketch')"
-              >
-                {{ t('map.drawTab.buttons.cancelPolygonSplitLine') }}
-              </button>
-            </div>
-            <button
-              v-if="selectedFeatureGeometryType === 'Polygon'"
-              class="glass-button"
-              data-variant="secondary"
-              data-testid="draw-tool-merge-polygons"
-              type="button"
-              :disabled="!canMergeSelectedPolygons"
-              @click="$emit('merge-selected-polygons')"
-            >
-              {{ t('map.drawTab.buttons.mergePolygons') }}
-            </button>
-            <button
-              v-if="selectedFeatureGeometryType === 'Polygon'"
-              class="glass-button"
-              data-variant="secondary"
-              data-testid="draw-tool-intersect-polygons"
-              type="button"
-              :disabled="!canIntersectSelectedPolygons"
-              @click="$emit('intersect-selected-polygons')"
-            >
-              {{ t('map.drawTab.buttons.intersectPolygons') }}
-            </button>
-            <button
-              v-if="selectedFeatureGeometryType === 'Polygon'"
-              class="glass-button"
-              data-variant="secondary"
-              data-testid="draw-tool-difference-polygons"
-              type="button"
-              :disabled="!canDifferenceSelectedPolygons"
-              @click="$emit('difference-selected-polygons')"
-            >
-              {{ t('map.drawTab.buttons.differencePolygons') }}
-            </button>
             <button
               class="glass-button"
               data-variant="secondary"
@@ -346,15 +355,20 @@
               {{ isFullscreen ? t('map.mapLibre.buttons.exitFullscreen') : t('map.mapLibre.buttons.fullscreen') }}
             </button>
           </div>
-          <label class="draw-field">
-            <span class="draw-field-label">{{ t('map.drawTab.labels.snapping') }}</span>
-            <SwitchToggle
-              :model-value="snappingEnabled"
-              data-testid="toggle-snapping"
-              @update:model-value="$emit('update:snappingEnabled', $event)"
-            />
-          </label>
-          <template v-if="snappingEnabled">
+          <div
+            v-if="showPrecisionControls"
+            class="draw-tool-context-stack"
+            data-testid="draw-tool-precision-section"
+          >
+            <label class="draw-field">
+              <span class="draw-field-label">{{ t('map.drawTab.labels.snapping') }}</span>
+              <SwitchToggle
+                :model-value="snappingEnabled"
+                data-testid="toggle-snapping"
+                @update:model-value="$emit('update:snappingEnabled', $event)"
+              />
+            </label>
+            <template v-if="snappingEnabled">
             <label class="draw-field">
               <span class="draw-field-label">{{ t('map.drawTab.labels.snapTolerance') }}：{{ snapTolerance }}</span>
               <input
@@ -396,180 +410,181 @@
                 {{ option.label }}
               </CheckBox>
             </div>
-          </template>
-          <div
-            class="draw-tool-wide-control"
-            data-testid="topology-controls"
-          >
-            <span class="draw-field-label">{{ t('map.drawTab.labels.topologyEditing') }}</span>
-            <CheckBox
-              class="draw-toggle-field"
-              data-testid="topology-editing-toggle"
-              :model-value="topologyEditingEnabled"
-              @update:modelValue="$emit('update:topologyEditingEnabled', $event)"
+            </template>
+            <div
+              class="draw-tool-wide-control"
+              data-testid="topology-controls"
             >
-              {{ t('map.drawTab.labels.topologyEditingEnabled') }}
-            </CheckBox>
-            <CheckBox
-              class="draw-toggle-field"
-              data-testid="shared-boundary-protection-toggle"
-              :model-value="sharedBoundaryProtectionEnabled"
-              :disabled="!topologyEditingEnabled"
-              @update:modelValue="$emit('update:sharedBoundaryProtectionEnabled', $event)"
-            >
-              {{ t('map.drawTab.labels.sharedBoundaryProtection') }}
-            </CheckBox>
-          </div>
-          <div
-            v-if="editSessionStatus"
-            class="draw-shape-edit-status"
-            data-testid="edit-session-status"
-            :data-state="editSessionStatus.feedback?.type || 'idle'"
-          >
-            <div class="draw-shape-edit-main">
-              <span
-                class="draw-shape-edit-target"
-                data-testid="edit-session-mode"
+              <span class="draw-field-label">{{ t('map.drawTab.labels.topologyEditing') }}</span>
+              <CheckBox
+                class="draw-toggle-field"
+                data-testid="topology-editing-toggle"
+                :model-value="topologyEditingEnabled"
+                @update:modelValue="$emit('update:topologyEditingEnabled', $event)"
               >
-                {{ editSessionStatus.modeLabel }}
-              </span>
-              <span
-                class="draw-shape-edit-count"
-                data-testid="edit-session-layer"
+                {{ t('map.drawTab.labels.topologyEditingEnabled') }}
+              </CheckBox>
+              <CheckBox
+                class="draw-toggle-field"
+                data-testid="shared-boundary-protection-toggle"
+                :model-value="sharedBoundaryProtectionEnabled"
+                :disabled="!topologyEditingEnabled"
+                @update:modelValue="$emit('update:sharedBoundaryProtectionEnabled', $event)"
               >
-                {{ editSessionStatus.layerLabel }}
-              </span>
-            </div>
-            <div class="draw-shape-edit-tips">
-              <span data-testid="edit-session-feature">
-                {{ editSessionStatus.featureLabel }}
-              </span>
-              <span data-testid="edit-session-vertex">
-                {{ editSessionStatus.vertexLabel }}
-              </span>
-              <span data-testid="edit-session-snap">
-                {{ editSessionStatus.snapLabel }}
-              </span>
-              <span
-                v-if="editSessionStatus.hoverLabel"
-                data-testid="edit-session-hover"
-              >
-                {{ editSessionStatus.hoverLabel }}
-              </span>
+                {{ t('map.drawTab.labels.sharedBoundaryProtection') }}
+              </CheckBox>
             </div>
             <div
-              v-if="editSessionStatus.feedback?.message"
-              class="draw-shape-edit-hint"
-              data-testid="edit-session-feedback"
+              v-if="editSessionStatus"
+              class="draw-shape-edit-status"
+              data-testid="edit-session-status"
+              :data-state="editSessionStatus.feedback?.type || 'idle'"
             >
-              {{ editSessionStatus.feedback.message }}
-            </div>
-          </div>
-          <div
-            v-if="currentMode === 'direct_select'"
-            class="draw-shape-edit-status"
-            data-testid="shape-edit-status"
-          >
-            <div class="draw-shape-edit-main">
-              <span
-                class="draw-shape-edit-target"
-                data-testid="shape-edit-target"
-              >
-                {{ t('map.drawTab.labels.shapeEditTarget', { name: selectedShapeEditLabel }) }}
-              </span>
-              <span
-                class="draw-shape-edit-count"
-                data-testid="shape-edit-selected-count"
-              >
-                {{ t('map.drawTab.labels.selectedVertexCount', { count: selectedVertexCount }) }}
-              </span>
-            </div>
-            <div
-              class="draw-shape-edit-hint"
-              data-testid="shape-edit-hint"
-            >
-              {{ shapeEditHintText }}
-            </div>
-            <div class="draw-shape-edit-tips">
-              <span data-testid="shape-edit-insert-hint">
-                {{ t('map.drawTab.labels.shapeEditInsertVertexHint') }}
-              </span>
-              <span data-testid="shape-edit-move-hint">
-                {{ t('map.drawTab.labels.shapeEditMoveVertexHint') }}
-              </span>
-              <span data-testid="shape-edit-history-hint">
-                {{ t('map.drawTab.labels.shapeEditHistoryHint') }}
-              </span>
-            </div>
-            <div
-              v-if="canEditSelectedVertexCoordinate"
-              class="draw-shape-edit-coordinate"
-              data-testid="shape-edit-coordinate-editor"
-            >
-              <span class="draw-field-label">
-                {{ t('map.drawTab.labels.selectedVertexCoordinate') }}
-              </span>
-              <label class="draw-field draw-shape-edit-coordinate-field">
-                <span class="draw-field-label">{{ t('map.drawTab.labels.longitude') }}</span>
-                <input
-                  v-model="vertexLongitudeInput"
-                  class="draw-input glass-field"
-                  data-testid="shape-edit-longitude-input"
-                  type="number"
-                  step="0.000001"
+              <div class="draw-shape-edit-main">
+                <span
+                  class="draw-shape-edit-target"
+                  data-testid="edit-session-mode"
                 >
-              </label>
-              <label class="draw-field draw-shape-edit-coordinate-field">
-                <span class="draw-field-label">{{ t('map.drawTab.labels.latitude') }}</span>
-                <input
-                  v-model="vertexLatitudeInput"
-                  class="draw-input glass-field"
-                  data-testid="shape-edit-latitude-input"
-                  type="number"
-                  step="0.000001"
+                  {{ editSessionStatus.modeLabel }}
+                </span>
+                <span
+                  class="draw-shape-edit-count"
+                  data-testid="edit-session-layer"
                 >
-              </label>
-              <button
-                class="glass-button draw-tool-inline-button"
-                data-variant="secondary"
-                data-testid="shape-edit-apply-coordinate"
-                type="button"
-                :disabled="!canApplySelectedVertexCoordinate"
-                @click="applySelectedVertexCoordinate"
+                  {{ editSessionStatus.layerLabel }}
+                </span>
+              </div>
+              <div class="draw-shape-edit-tips">
+                <span data-testid="edit-session-feature">
+                  {{ editSessionStatus.featureLabel }}
+                </span>
+                <span data-testid="edit-session-vertex">
+                  {{ editSessionStatus.vertexLabel }}
+                </span>
+                <span data-testid="edit-session-snap">
+                  {{ editSessionStatus.snapLabel }}
+                </span>
+                <span
+                  v-if="editSessionStatus.hoverLabel"
+                  data-testid="edit-session-hover"
+                >
+                  {{ editSessionStatus.hoverLabel }}
+                </span>
+              </div>
+              <div
+                v-if="editSessionStatus.feedback?.message"
+                class="draw-shape-edit-hint"
+                data-testid="edit-session-feedback"
               >
-                {{ t('map.drawTab.buttons.applyVertexCoordinate') }}
-              </button>
+                {{ editSessionStatus.feedback.message }}
+              </div>
             </div>
-            <div class="draw-shape-edit-actions">
-              <button
-                class="glass-button draw-tool-inline-button"
-                data-variant="secondary"
-                data-testid="shape-edit-delete-vertices"
-                type="button"
-                :disabled="!canDeleteSelectedVertices"
-                @click="$emit('delete-selected')"
+            <div
+              v-if="currentMode === 'direct_select'"
+              class="draw-shape-edit-status"
+              data-testid="shape-edit-status"
+            >
+              <div class="draw-shape-edit-main">
+                <span
+                  class="draw-shape-edit-target"
+                  data-testid="shape-edit-target"
+                >
+                  {{ t('map.drawTab.labels.shapeEditTarget', { name: selectedShapeEditLabel }) }}
+                </span>
+                <span
+                  class="draw-shape-edit-count"
+                  data-testid="shape-edit-selected-count"
+                >
+                  {{ t('map.drawTab.labels.selectedVertexCount', { count: selectedVertexCount }) }}
+                </span>
+              </div>
+              <div
+                class="draw-shape-edit-hint"
+                data-testid="shape-edit-hint"
               >
-                {{ t('map.drawTab.buttons.deleteSelectedVertices') }}
-              </button>
-              <button
-                class="glass-button draw-tool-inline-button"
-                data-variant="secondary"
-                data-testid="shape-edit-finish"
-                type="button"
-                @click="$emit('set-mode', 'simple_select')"
+                {{ shapeEditHintText }}
+              </div>
+              <div class="draw-shape-edit-tips">
+                <span data-testid="shape-edit-insert-hint">
+                  {{ t('map.drawTab.labels.shapeEditInsertVertexHint') }}
+                </span>
+                <span data-testid="shape-edit-move-hint">
+                  {{ t('map.drawTab.labels.shapeEditMoveVertexHint') }}
+                </span>
+                <span data-testid="shape-edit-history-hint">
+                  {{ t('map.drawTab.labels.shapeEditHistoryHint') }}
+                </span>
+              </div>
+              <div
+                v-if="canEditSelectedVertexCoordinate"
+                class="draw-shape-edit-coordinate"
+                data-testid="shape-edit-coordinate-editor"
               >
-                {{ t('map.drawTab.buttons.finishShapeEdit') }}
-              </button>
+                <span class="draw-field-label">
+                  {{ t('map.drawTab.labels.selectedVertexCoordinate') }}
+                </span>
+                <label class="draw-field draw-shape-edit-coordinate-field">
+                  <span class="draw-field-label">{{ t('map.drawTab.labels.longitude') }}</span>
+                  <input
+                    v-model="vertexLongitudeInput"
+                    class="draw-input glass-field"
+                    data-testid="shape-edit-longitude-input"
+                    type="number"
+                    step="0.000001"
+                  >
+                </label>
+                <label class="draw-field draw-shape-edit-coordinate-field">
+                  <span class="draw-field-label">{{ t('map.drawTab.labels.latitude') }}</span>
+                  <input
+                    v-model="vertexLatitudeInput"
+                    class="draw-input glass-field"
+                    data-testid="shape-edit-latitude-input"
+                    type="number"
+                    step="0.000001"
+                  >
+                </label>
+                <button
+                  class="glass-button draw-tool-inline-button"
+                  data-variant="secondary"
+                  data-testid="shape-edit-apply-coordinate"
+                  type="button"
+                  :disabled="!canApplySelectedVertexCoordinate"
+                  @click="applySelectedVertexCoordinate"
+                >
+                  {{ t('map.drawTab.buttons.applyVertexCoordinate') }}
+                </button>
+              </div>
+              <div class="draw-shape-edit-actions">
+                <button
+                  class="glass-button draw-tool-inline-button"
+                  data-variant="secondary"
+                  data-testid="shape-edit-delete-vertices"
+                  type="button"
+                  :disabled="!canDeleteSelectedVertices"
+                  @click="$emit('delete-selected')"
+                >
+                  {{ t('map.drawTab.buttons.deleteSelectedVertices') }}
+                </button>
+                <button
+                  class="glass-button draw-tool-inline-button"
+                  data-variant="secondary"
+                  data-testid="shape-edit-finish"
+                  type="button"
+                  @click="$emit('set-mode', 'simple_select')"
+                >
+                  {{ t('map.drawTab.buttons.finishShapeEdit') }}
+                </button>
+              </div>
             </div>
-          </div>
-          <div
-            v-if="geometryEditStatus?.message"
-            class="draw-shape-edit-status"
-            data-testid="geometry-edit-status"
-            :data-state="geometryEditStatus.type"
-          >
-            <div class="draw-shape-edit-hint">
-              {{ geometryEditStatus.message }}
+            <div
+              v-if="geometryEditStatus?.message"
+              class="draw-shape-edit-status"
+              data-testid="geometry-edit-status"
+              :data-state="geometryEditStatus.type"
+            >
+              <div class="draw-shape-edit-hint">
+                {{ geometryEditStatus.message }}
+              </div>
             </div>
           </div>
           <div
@@ -635,7 +650,11 @@
           </div>
         </section>
 
-        <section class="draw-tool-section">
+        <section
+          v-if="showFeatureListSection"
+          class="draw-tool-section"
+          data-testid="draw-tool-feature-list-section"
+        >
           <div class="draw-tool-section-header">
             <div class="draw-tool-section-title">
               {{ t('map.drawTab.labels.featureList') }}
@@ -783,7 +802,11 @@
           </div>
         </section>
 
-        <section class="draw-tool-section">
+        <section
+          v-if="showFeatureTableSection"
+          class="draw-tool-section"
+          data-testid="draw-tool-feature-table-section"
+        >
           <div class="draw-tool-section-header">
             <div class="draw-tool-section-title">
               {{ t('map.drawTab.labels.featureDataTable') }}
@@ -911,7 +934,11 @@
           </div>
         </section>
 
-        <section class="draw-tool-section">
+        <section
+          v-if="showPropertyEditorSection"
+          class="draw-tool-section"
+          data-testid="draw-tool-property-section"
+        >
           <div class="draw-tool-section-title">
             {{ selectedFeatureId ? t('map.drawTab.labels.featureEditor') : t('map.drawTab.labels.layerEditor') }}
           </div>
@@ -1565,6 +1592,40 @@ const featureTableBatchPropertyOptions = computed(() => props.featureTableColumn
   label: column.label,
   value: column.key,
 })))
+
+const isDrawingMode = computed(() => typeof props.currentMode === 'string' && props.currentMode.startsWith('draw_'))
+
+const isDirectEditMode = computed(() => props.currentMode === 'direct_select')
+
+const isTextAnnotationContext = computed(() => (
+  props.selectedFeatureGeometryType === 'Text'
+  || props.activeLayer?.geometryType === 'Text'
+))
+
+const hasSelectedFeatureContext = computed(() => (
+  Boolean(props.selectedFeatureId)
+  || props.selectedFeatureIds.length > 0
+  || Boolean(props.selectedFeatureGeometryType)
+))
+
+const showSelectedGeometryControls = computed(() => (
+  !isDrawingMode.value
+  && !isTextAnnotationContext.value
+  && hasSelectedFeatureContext.value
+))
+
+const showPrecisionControls = computed(() => (
+  isDrawingMode.value
+  || isDirectEditMode.value
+  || props.polygonSplitSketchActive
+  || Boolean(props.geometryEditStatus?.message)
+))
+
+const showFeatureListSection = computed(() => props.currentMode === 'simple_select' && !props.polygonSplitSketchActive)
+
+const showFeatureTableSection = computed(() => showFeatureListSection.value)
+
+const showPropertyEditorSection = computed(() => props.currentMode === 'simple_select')
 
 const normalizePositiveNumber = (value, fallback = 1) => {
   const nextValue = Number(value)
