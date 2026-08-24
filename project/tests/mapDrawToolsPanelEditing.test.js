@@ -77,6 +77,14 @@ function mountToolsPanel(overrides = {}) {
     canDeleteSelectedVertices: false,
     canEditShape: true,
     canModifyActiveLayer: true,
+    snappingEnabled: true,
+    snapTargets: {
+      vertex: true,
+      midpoint: true,
+      edge: true,
+      grid: true,
+      reference: true,
+    },
     selectedFeatureProperties: { name: '边界 A', visible: true, locked: false },
     selectedFeatureGeometryType: 'Polygon',
     geometryQualitySummary: {
@@ -113,6 +121,7 @@ function mountToolsPanel(overrides = {}) {
         @update:selected-text-label-field-key="events.push(['update:selected-text-label-field-key', $event]); props.selectedTextLabelFieldKey = $event"
         @apply-text-label-field="events.push(['apply-text-label-field'])"
         @delete-selected="events.push(['delete-selected'])"
+        @update:snap-targets="events.push(['update:snap-targets', $event]); props.snapTargets = $event"
       />
     `,
   })
@@ -194,6 +203,28 @@ describe('MapDrawToolsPanel editing affordances', () => {
       .toContain('吸附：中点 · 参考线 / 边界线')
     expect(wrapper.host.querySelector('[data-testid="edit-session-feedback"]').textContent)
       .toContain('已撤回上一步')
+
+    wrapper.unmount()
+  })
+
+  it('lets users choose which snapping target types are active', async () => {
+    const wrapper = mountToolsPanel()
+    await nextTick()
+
+    const edgeToggle = wrapper.host.querySelector('[data-testid="snap-target-edge"] input')
+    expect(edgeToggle.checked).toBe(true)
+
+    edgeToggle.checked = false
+    edgeToggle.dispatchEvent(new Event('change', { bubbles: true }))
+    await nextTick()
+
+    expect(wrapper.events).toContainEqual(['update:snap-targets', {
+      vertex: true,
+      midpoint: true,
+      edge: false,
+      grid: true,
+      reference: true,
+    }])
 
     wrapper.unmount()
   })

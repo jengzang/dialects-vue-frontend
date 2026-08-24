@@ -84,6 +84,14 @@ const featureTableHiddenPropertyKeys = new Set([
 const isTextAnnotationLayer = (layer) => layer?.geometryType === 'Text';
 const textLayerLayoutPropertyKeys = ['textAllowOverlap', 'textLineHeight'];
 
+const createDefaultSnapTargets = () => ({
+  vertex: true,
+  midpoint: true,
+  edge: true,
+  grid: true,
+  reference: true,
+});
+
 const emptyFeatureCollection = () => ({
   type: 'FeatureCollection',
   features: [],
@@ -322,6 +330,7 @@ export function useGisMapCore(options = {}) {
   const snappingEnabled = ref(true);
   const snapTolerance = ref(12);
   const snapGridSize = ref(0);
+  const snapTargets = ref(createDefaultSnapTargets());
   const selectedBufferDistanceKm = ref(1);
 
   // ---- Computeds ----
@@ -1196,6 +1205,7 @@ export function useGisMapCore(options = {}) {
     snappingEnabled,
     snapTolerance,
     snapGridSize,
+    snapTargets,
     selectedBufferDistanceKm,
     // Computeds
     mapStyleOptions,

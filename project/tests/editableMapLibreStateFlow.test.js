@@ -203,6 +203,13 @@ function mountEditableMapLibre(modelValue, options = {}) {
   const snappingEnabled = ref(options.snappingEnabled ?? true)
   const snapTolerance = ref(options.snapTolerance ?? 12)
   const snapGridSize = ref(options.snapGridSize ?? 0)
+  const snapTargets = ref(options.snapTargets ?? {
+    vertex: true,
+    midpoint: true,
+    edge: true,
+    grid: true,
+    reference: true,
+  })
 
   const Root = defineComponent({
     components: { EditableMapLibre },
@@ -219,6 +226,7 @@ function mountEditableMapLibre(modelValue, options = {}) {
         snappingEnabled,
         snapTolerance,
         snapGridSize,
+        snapTargets,
         events,
       }
     },
@@ -235,6 +243,7 @@ function mountEditableMapLibre(modelValue, options = {}) {
         :snapping-enabled="snappingEnabled"
         :snap-tolerance="snapTolerance"
         :snap-grid-size="snapGridSize"
+        :snap-targets="snapTargets"
         @before-features-change="events.push(['before-features-change'])"
         @features-change="events.push(['features-change', $event])"
         @feature-select="events.push(['feature-select', $event])"
@@ -265,6 +274,7 @@ function mountEditableMapLibre(modelValue, options = {}) {
     activeLayer,
     allLayers,
     featureBoxSelectEnabled,
+    snapTargets,
     host,
     unmount() {
       app.unmount()
@@ -1080,6 +1090,141 @@ describe('EditableMapLibre state flow', () => {
       coordinate: [5, 5],
       originalCoordinate: [5.2, 5.1],
     }])
+
+    wrapper.unmount()
+  })
+
+  it('respects snap target type toggles when choosing edge and grid candidates', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [10, 0]] },
+      }],
+    }, {
+      snapGridSize: 1,
+      snapTargets: {
+        vertex: false,
+        midpoint: false,
+        edge: true,
+        grid: true,
+        reference: true,
+      },
+      allLayers: [{
+        id: 'reference-lines',
+        name: '参考线',
+        visible: true,
+        locked: true,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [{
+            id: 'reference-line-1',
+            type: 'Feature',
+            properties: { name: '边界线', visible: true, locked: true },
+            geometry: { type: 'LineString', coordinates: [[0, 5], [10, 5]] },
+          }],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    wrapper.exposed.insertVertex('line-1', '1', [5.2, 5.1])
+
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [5.2, 5], [10, 0]])
+    expect(wrapper.events).toContainEqual(['snap-state-change', {
+      active: true,
+      type: 'edge',
+      source: 'reference-lines',
+      layerName: '参考线',
+      featureName: '边界线',
+      coordinate: [5.2, 5],
+      originalCoordinate: [5.2, 5.1],
+    }])
+
+    wrapper.unmount()
+
+    const gridOnlyWrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-2',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [10, 0]] },
+      }],
+    }, {
+      snapGridSize: 1,
+      snapTargets: {
+        vertex: false,
+        midpoint: false,
+        edge: false,
+        grid: true,
+        reference: true,
+      },
+    })
+    await nextTick()
+    gridOnlyWrapper.events.length = 0
+
+    gridOnlyWrapper.exposed.insertVertex('line-2', '1', [5.2, 5.1])
+
+    expect(gridOnlyWrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [5, 5], [10, 0]])
+    expect(gridOnlyWrapper.events).toContainEqual(['snap-state-change', {
+      active: true,
+      type: 'grid',
+      source: 'grid',
+      layerName: '',
+      featureName: '',
+      coordinate: [5, 5],
+      originalCoordinate: [5.2, 5.1],
+    }])
+
+    gridOnlyWrapper.unmount()
+  })
+
+  it('can disable cross-layer reference snapping while keeping active-layer edits enabled', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [10, 0]] },
+      }],
+    }, {
+      snapTargets: {
+        vertex: true,
+        midpoint: true,
+        edge: true,
+        grid: false,
+        reference: false,
+      },
+      allLayers: [{
+        id: 'reference-points',
+        visible: true,
+        locked: true,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [{
+            id: 'reference-point-1',
+            type: 'Feature',
+            properties: { visible: true, locked: true },
+            geometry: { type: 'Point', coordinates: [5, 5] },
+          }],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    wrapper.exposed.insertVertex('line-1', '1', [5.2, 5.1])
+
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [5.2, 5.1], [10, 0]])
+    expect(wrapper.events).toContainEqual(['snap-state-change', { active: false }])
 
     wrapper.unmount()
   })

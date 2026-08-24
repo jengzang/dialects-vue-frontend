@@ -88,7 +88,7 @@ vi.mock('@/main/utils/drawMap/draftStorage.js', async () => {
 vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
   default: defineComponent({
     name: 'EditableMapLibreStub',
-    props: ['modelValue', 'activeLayer', 'featureBoxSelectEnabled', 'snappingEnabled', 'snapTolerance', 'snapGridSize'],
+    props: ['modelValue', 'activeLayer', 'featureBoxSelectEnabled', 'snappingEnabled', 'snapTolerance', 'snapGridSize', 'snapTargets'],
     emits: [
       'update:modelValue',
       'before-features-change',
@@ -265,6 +265,7 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         <span data-testid="snapping-enabled">{{ snappingEnabled ? 'on' : 'off' }}</span>
         <span data-testid="snap-tolerance">{{ snapTolerance }}</span>
         <span data-testid="snap-grid-size">{{ snapGridSize }}</span>
+        <span data-testid="snap-target-edge">{{ snapTargets?.edge === false ? 'off' : 'on' }}</span>
         <button
           data-testid="emit-box-selection"
           type="button"
@@ -358,6 +359,7 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       snappingEnabled: { type: Boolean, default: true },
       snapTolerance: { type: Number, default: 12 },
       snapGridSize: { type: Number, default: 0 },
+      snapTargets: { type: Object, default: () => ({ vertex: true, midpoint: true, edge: true, grid: true, reference: true }) },
     },
     emits: [
       'set-mode',
@@ -385,6 +387,7 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       'update:snappingEnabled',
       'update:snapTolerance',
       'update:snapGridSize',
+      'update:snap-targets',
     ],
     setup(props) {
       mocks.latestToolsPanelProps = props
@@ -413,6 +416,13 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
           :value="snapGridSize"
           @input="$emit('update:snapGridSize', Number($event.target.value))"
         >
+        <button
+          data-testid="toggle-snap-edge"
+          type="button"
+          @click="$emit('update:snap-targets', { ...snapTargets, edge: !snapTargets.edge })"
+        >
+          toggle edge snap
+        </button>
         <span data-testid="selected-vertex-count">{{ selectedVertexCount }}</span>
         <span data-testid="can-delete-selected-vertices">{{ canDeleteSelectedVertices ? 'true' : 'false' }}</span>
         <button
@@ -979,6 +989,7 @@ describe('MapDrawTab draft safety', () => {
       snappingEnabled: false,
       snapTolerance: 28,
       snapGridSize: 0.5,
+      snapTargets: { vertex: true, midpoint: true, edge: false, grid: true, reference: true },
     })
     mocks.getDraftRecordById.mockImplementation(async (id) => (id === mocks.AUTO_DRAFT_ID ? autoDraft : null))
     mocks.showConfirm.mockResolvedValue(false)
@@ -1009,6 +1020,7 @@ describe('MapDrawTab draft safety', () => {
       snappingEnabled: false,
       snapTolerance: 28,
       snapGridSize: 0.5,
+      snapTargets: { vertex: true, midpoint: true, edge: false, grid: true, reference: true },
     })
     mocks.getDraftRecordById.mockImplementation(async (id) => (id === mocks.AUTO_DRAFT_ID ? autoDraft : null))
     mocks.showConfirm.mockResolvedValue(true)
@@ -1019,6 +1031,7 @@ describe('MapDrawTab draft safety', () => {
     expect(wrapper.host.querySelector('[data-testid="snapping-enabled"]').textContent).toBe('off')
     expect(wrapper.host.querySelector('[data-testid="snap-tolerance"]').textContent).toBe('28')
     expect(wrapper.host.querySelector('[data-testid="snap-grid-size"]').textContent).toBe('0.5')
+    expect(wrapper.host.querySelector('[data-testid="snap-target-edge"]').textContent).toBe('off')
 
     wrapper.unmount()
   })
@@ -1340,6 +1353,11 @@ describe('MapDrawTab draft safety', () => {
     gridInput.dispatchEvent(new Event('input', { bubbles: true }))
     await nextTick()
     expect(wrapper.host.querySelector('[data-testid="snap-grid-size"]').textContent).toBe('0.25')
+
+    expect(wrapper.host.querySelector('[data-testid="snap-target-edge"]').textContent).toBe('on')
+    wrapper.host.querySelector('[data-testid="toggle-snap-edge"]').click()
+    await nextTick()
+    expect(wrapper.host.querySelector('[data-testid="snap-target-edge"]').textContent).toBe('off')
 
     wrapper.unmount()
   })

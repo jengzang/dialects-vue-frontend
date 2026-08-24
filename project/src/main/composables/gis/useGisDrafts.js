@@ -15,6 +15,21 @@ import {
 
 const mapDrawStorageKey = 'map-draw-workbench-state';
 
+const createDefaultSnapTargets = () => ({
+  vertex: true,
+  midpoint: true,
+  edge: true,
+  grid: true,
+  reference: true,
+});
+
+const normalizeSnapTargets = (value = {}) => {
+  const defaults = createDefaultSnapTargets();
+  return Object.fromEntries(
+    Object.entries(defaults).map(([key, defaultValue]) => [key, value?.[key] ?? defaultValue])
+  );
+};
+
 export function useGisDrafts(options = {}) {
   const { t } = useI18n();
   const {
@@ -26,6 +41,7 @@ export function useGisDrafts(options = {}) {
     snappingEnabled,
     snapTolerance,
     snapGridSize,
+    snapTargets,
     isAuthenticated,
     onAuthRequired,
     clearFeatureSelection,
@@ -70,6 +86,7 @@ export function useGisDrafts(options = {}) {
     snappingEnabled: snappingEnabled.value,
     snapTolerance: snapTolerance.value,
     snapGridSize: snapGridSize.value,
+    snapTargets: snapTargets.value,
   });
 
   const getCurrentWorkbenchSignature = () => buildDraftStateSignature(buildPersistedWorkbenchState());
@@ -141,6 +158,7 @@ export function useGisDrafts(options = {}) {
     if (snappingEnabled) snappingEnabled.value = state?.snappingEnabled ?? true;
     if (snapTolerance) snapTolerance.value = Number.isFinite(Number(state?.snapTolerance)) ? Number(state.snapTolerance) : 12;
     if (snapGridSize) snapGridSize.value = Number.isFinite(Number(state?.snapGridSize)) ? Number(state.snapGridSize) : 0;
+    if (snapTargets) snapTargets.value = normalizeSnapTargets(state?.snapTargets);
     clearFeatureSelection();
     syncLayerIdSeedFromLayers(layers.value);
     syncAllLayersAfterMutation();

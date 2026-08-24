@@ -232,6 +232,20 @@ const textBackgroundSourceId = 'draw-text-background-source'
 const textBackgroundFillLayerId = 'draw-text-background-fill'
 const textBackgroundLineLayerId = 'draw-text-background-line'
 const snapPriorityBiasSquared = 1
+const createDefaultSnapTargets = () => ({
+  vertex: true,
+  midpoint: true,
+  edge: true,
+  grid: true,
+  reference: true,
+})
+
+const normalizeSnapTargets = (value = {}) => {
+  const defaults = createDefaultSnapTargets()
+  return Object.fromEntries(
+    Object.entries(defaults).map(([key, defaultValue]) => [key, value?.[key] ?? defaultValue])
+  )
+}
 
 const props = defineProps({
   modelValue: {
@@ -276,6 +290,16 @@ const props = defineProps({
   snapGridSize: {
     type: Number,
     default: 0,
+  },
+  snapTargets: {
+    type: Object,
+    default: () => ({
+      vertex: true,
+      midpoint: true,
+      edge: true,
+      grid: true,
+      reference: true,
+    }),
   },
 })
 
@@ -1089,6 +1113,8 @@ const isSnapReferenceLayerVisible = (layer) => layer?.visible !== false
 
 const isSnapReferenceFeatureVisible = (feature) => feature?.properties?.visible !== false
 
+const isSnapTargetEnabled = (target) => normalizeSnapTargets(props.snapTargets)[target] !== false
+
 const getSnapFeatureName = (feature) => {
   const properties = feature?.properties ?? {}
   return String(
@@ -1111,14 +1137,17 @@ const getSnapReferenceItems = (options = {}) => {
     source: activeLayerId,
     layerName: activeLayerName,
   }))
-  const layerFeatureItems = (props.allLayers ?? [])
-    .filter(isSnapReferenceLayerVisible)
-    .flatMap((layer) => (normalizeFeatureCollection(layer?.featureCollection).features ?? [])
-      .map((feature) => ({
-        feature,
-        source: String(layer?.id || ''),
-        layerName: String(layer?.name || ''),
-      })))
+  const layerFeatureItems = isSnapTargetEnabled('reference')
+    ? (props.allLayers ?? [])
+        .filter((layer) => String(layer?.id || '') !== activeLayerId)
+        .filter(isSnapReferenceLayerVisible)
+        .flatMap((layer) => (normalizeFeatureCollection(layer?.featureCollection).features ?? [])
+          .map((feature) => ({
+            feature,
+            source: String(layer?.id || ''),
+            layerName: String(layer?.name || ''),
+          })))
+    : []
   return [...activeFeatureItems, ...layerFeatureItems]
     .filter((item) => {
       const featureId = getDrawFeatureId(item.feature)
@@ -1318,26 +1347,36 @@ const resolveSnapResult = (coordinate, options = {}) => {
   }
 
   getSnapReferenceItems(options).forEach((item) => {
-    getCoordinatePairs(item.feature.geometry).forEach((candidate) => {
-      acceptCandidate(candidate, 4, 'vertex', item)
-    })
-    getCoordinateSegments(item.feature.geometry).forEach(([startCoordinate, endCoordinate]) => {
-      acceptCandidate([
-        (Number(startCoordinate[0]) + Number(endCoordinate[0])) / 2,
-        (Number(startCoordinate[1]) + Number(endCoordinate[1])) / 2,
-      ], 3, 'midpoint', item)
-      const startPoint = projectCoordinate(startCoordinate)
-      const endPoint = projectCoordinate(endCoordinate)
-      const candidate = getNearestPointOnProjectedSegment(targetPoint, startPoint, endPoint, startCoordinate, endCoordinate)
-      acceptCandidate(candidate, 2, 'edge', item)
-    })
+    if (isSnapTargetEnabled('vertex')) {
+      getCoordinatePairs(item.feature.geometry).forEach((candidate) => {
+        acceptCandidate(candidate, 4, 'vertex', item)
+      })
+    }
+    if (isSnapTargetEnabled('midpoint') || isSnapTargetEnabled('edge')) {
+      getCoordinateSegments(item.feature.geometry).forEach(([startCoordinate, endCoordinate]) => {
+        if (isSnapTargetEnabled('midpoint')) {
+          acceptCandidate([
+            (Number(startCoordinate[0]) + Number(endCoordinate[0])) / 2,
+            (Number(startCoordinate[1]) + Number(endCoordinate[1])) / 2,
+          ], 3, 'midpoint', item)
+        }
+        if (isSnapTargetEnabled('edge')) {
+          const startPoint = projectCoordinate(startCoordinate)
+          const endPoint = projectCoordinate(endCoordinate)
+          const candidate = getNearestPointOnProjectedSegment(targetPoint, startPoint, endPoint, startCoordinate, endCoordinate)
+          acceptCandidate(candidate, 2, 'edge', item)
+        }
+      })
+    }
   })
 
-  acceptCandidate(maybeSnapCoordinateToGrid(normalized), 1, 'grid', {
-    source: 'grid',
-    layerName: '',
-    featureName: '',
-  })
+  if (isSnapTargetEnabled('grid')) {
+    acceptCandidate(maybeSnapCoordinateToGrid(normalized), 1, 'grid', {
+      source: 'grid',
+      layerName: '',
+      featureName: '',
+    })
+  }
   return {
     coordinate: best.coordinate,
     originalCoordinate: normalized,
@@ -3068,6 +3107,14 @@ watch(
   () => {
     if (!map.value) return
     syncReadonlyLayers()
+  },
+  { deep: true }
+)
+
+watch(
+  () => props.snapTargets,
+  () => {
+    clearSnapPreview()
   },
   { deep: true }
 )

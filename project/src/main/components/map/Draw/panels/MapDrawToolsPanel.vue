@@ -380,6 +380,22 @@
                 @input="$emit('update:snapGridSize', Number($event.target.value))"
               >
             </label>
+            <div
+              class="draw-tool-wide-control"
+              data-testid="snap-target-controls"
+            >
+              <span class="draw-field-label">{{ t('map.drawTab.labels.snapTargets') }}</span>
+              <CheckBox
+                v-for="option in snapTargetOptions"
+                :key="option.key"
+                class="draw-toggle-field"
+                :data-testid="`snap-target-${option.key}`"
+                :model-value="normalizedSnapTargets[option.key]"
+                @update:modelValue="emitSnapTargetUpdate(option.key, $event)"
+              >
+                {{ option.label }}
+              </CheckBox>
+            </div>
           </template>
           <div
             v-if="editSessionStatus"
@@ -1382,6 +1398,16 @@ const props = defineProps({
   snappingEnabled: { type: Boolean, default: true },
   snapTolerance: { type: Number, default: 12 },
   snapGridSize: { type: Number, default: 0 },
+  snapTargets: {
+    type: Object,
+    default: () => ({
+      vertex: true,
+      midpoint: true,
+      edge: true,
+      grid: true,
+      reference: true,
+    }),
+  },
 })
 
 const emit = defineEmits([
@@ -1432,6 +1458,7 @@ const emit = defineEmits([
   'update:snappingEnabled',
   'update:snapTolerance',
   'update:snapGridSize',
+  'update:snap-targets',
 ])
 
 const getGeometryLabel = (geometryType) => {
@@ -1471,6 +1498,33 @@ const featureTableBatchPropertyOptions = computed(() => props.featureTableColumn
 const normalizePositiveNumber = (value, fallback = 1) => {
   const nextValue = Number(value)
   return Number.isFinite(nextValue) && nextValue > 0 ? nextValue : fallback
+}
+
+const defaultSnapTargets = {
+  vertex: true,
+  midpoint: true,
+  edge: true,
+  grid: true,
+  reference: true,
+}
+
+const normalizedSnapTargets = computed(() => Object.fromEntries(
+  Object.entries(defaultSnapTargets).map(([key, defaultValue]) => [key, props.snapTargets?.[key] ?? defaultValue])
+))
+
+const snapTargetOptions = computed(() => [
+  { key: 'vertex', label: t('map.drawTab.labels.snapTargetVertex') },
+  { key: 'midpoint', label: t('map.drawTab.labels.snapTargetMidpoint') },
+  { key: 'edge', label: t('map.drawTab.labels.snapTargetEdge') },
+  { key: 'grid', label: t('map.drawTab.labels.snapTargetGrid') },
+  { key: 'reference', label: t('map.drawTab.labels.snapTargetReference') },
+])
+
+const emitSnapTargetUpdate = (key, value) => {
+  emit('update:snap-targets', {
+    ...normalizedSnapTargets.value,
+    [key]: value,
+  })
 }
 
 const undoButtonTitle = computed(() => (
