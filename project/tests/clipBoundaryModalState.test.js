@@ -6,9 +6,20 @@ const mocks = vi.hoisted(() => ({
 }))
 
 vi.mock('vue-i18n', () => ({
+  createI18n: () => ({
+    global: {
+      locale: { value: 'zh-CN' },
+      t: (key) => key,
+    },
+  }),
   useI18n: () => ({
     t: (key) => key,
   }),
+}))
+
+vi.mock('vue-router', () => ({
+  useRoute: () => ({ fullPath: '/explore/gis' }),
+  useRouter: () => ({ push: vi.fn() }),
 }))
 
 vi.mock('@/api/auth/httpClient.js', () => ({
