@@ -710,14 +710,16 @@ const getTextOffset = (feature, layer) => {
 }
 
 const getTextLabel = (feature, layer) => {
-  return String(
-    getTextStyleValue(
-      feature,
-      layer,
-      'annotationText',
-      feature?.properties?.name ?? feature?.properties?.title ?? feature?.properties?.label ?? ''
-    ) ?? ''
-  )
+  const properties = feature?.properties ?? {}
+  const candidates = [
+    properties.annotationText,
+    layer?.annotationText,
+    properties.name,
+    properties.title,
+    properties.label,
+  ]
+  const label = candidates.find((item) => String(item ?? '').trim())
+  return String(label ?? '')
 }
 
 const shouldRenderTextBackground = (feature, layer) => {
@@ -832,10 +834,9 @@ const buildTextBackgroundFeatures = () => {
   const activeFeatures = ['Point', 'Text'].includes(activeLayer.geometryType)
     ? (activeFeatureCollection.features ?? []).map((feature) => buildTextBackgroundFeature(feature, activeLayer))
     : []
-  const readonlyFeatures = (props.allLayers ?? [])
-    .filter((layer) => layer?.id !== props.activeLayer?.id && ['Point', 'Text'].includes(layer?.geometryType))
-    .flatMap((layer) => (normalizeFeatureCollection(layer?.featureCollection).features ?? [])
-      .map((feature) => buildTextBackgroundFeature(feature, layer)))
+  const readonlyFeatures = buildReadonlyLayerDescriptors()
+    .flatMap((descriptor) => (descriptor.featureCollection.features ?? [])
+      .map((feature) => buildTextBackgroundFeature(feature, feature.properties ?? {})))
   return [...activeFeatures, ...readonlyFeatures].filter(Boolean)
 }
 
@@ -917,10 +918,9 @@ const buildTextLeaderFeatures = () => {
   const activeFeatures = ['Point', 'Text'].includes(activeLayer.geometryType)
     ? (activeFeatureCollection.features ?? []).map((feature) => buildTextLeaderFeature(feature, activeLayer))
     : []
-  const readonlyFeatures = (props.allLayers ?? [])
-    .filter((layer) => layer?.id !== props.activeLayer?.id && ['Point', 'Text'].includes(layer?.geometryType))
-    .flatMap((layer) => (normalizeFeatureCollection(layer?.featureCollection).features ?? [])
-      .map((feature) => buildTextLeaderFeature(feature, layer)))
+  const readonlyFeatures = buildReadonlyLayerDescriptors()
+    .flatMap((descriptor) => (descriptor.featureCollection.features ?? [])
+      .map((feature) => buildTextLeaderFeature(feature, feature.properties ?? {})))
   return [...activeFeatures, ...readonlyFeatures].filter(Boolean)
 }
 

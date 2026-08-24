@@ -656,7 +656,7 @@ describe('Map draw editor contracts', () => {
     expect(coreSource).toContain('const selectedFeature = computed')
     expect(coreSource).toContain('const selectedEditorProperties = computed')
     expect(featuresSource).toContain('function updateSelectedFeatureProperty(key, value)')
-    expect(featuresSource).toContain('if (selectedFeatureId.value)')
+    expect(featuresSource).toContain('if (selectedFeatureId.value && !textLayerLayoutPropertyKeys.has(key))')
     expect(featuresSource).toContain('updateFeatureProperty(selectedFeatureId.value, key, value);')
     expect(featuresSource).toContain('activeLayer.value[key] = value;')
   })
