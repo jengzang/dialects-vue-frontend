@@ -203,6 +203,8 @@ function mountEditableMapLibre(modelValue, options = {}) {
   const snappingEnabled = ref(options.snappingEnabled ?? true)
   const snapTolerance = ref(options.snapTolerance ?? 12)
   const snapGridSize = ref(options.snapGridSize ?? 0)
+  const topologyEditingEnabled = ref(options.topologyEditingEnabled ?? true)
+  const sharedBoundaryProtectionEnabled = ref(options.sharedBoundaryProtectionEnabled ?? true)
   const snapTargets = ref(options.snapTargets ?? {
     vertex: true,
     midpoint: true,
@@ -227,6 +229,8 @@ function mountEditableMapLibre(modelValue, options = {}) {
         snapTolerance,
         snapGridSize,
         snapTargets,
+        topologyEditingEnabled,
+        sharedBoundaryProtectionEnabled,
         events,
       }
     },
@@ -244,6 +248,8 @@ function mountEditableMapLibre(modelValue, options = {}) {
         :snap-tolerance="snapTolerance"
         :snap-grid-size="snapGridSize"
         :snap-targets="snapTargets"
+        :topology-editing-enabled="topologyEditingEnabled"
+        :shared-boundary-protection-enabled="sharedBoundaryProtectionEnabled"
         @before-features-change="events.push(['before-features-change'])"
         @features-change="events.push(['features-change', $event])"
         @feature-select="events.push(['feature-select', $event])"
@@ -311,6 +317,8 @@ describe('EditableMapLibre state flow', () => {
           ]],
         },
       }],
+    }, {
+      snappingEnabled: false,
     })
     await nextTick()
 
@@ -908,6 +916,224 @@ describe('EditableMapLibre state flow', () => {
       featureId: 'polygon-1',
       coordPath: '0.0',
     })
+
+    wrapper.unmount()
+  })
+
+  it('moves matching shared vertices in editable active-layer features when topology editing is on', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [
+        {
+          id: 'polygon-1',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[0, 0], [2, 0], [1, 1], [0, 0]]],
+          },
+        },
+        {
+          id: 'polygon-2',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[2, 0], [4, 0], [3, 1], [2, 0]]],
+          },
+        },
+      ],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didMove = wrapper.exposed.moveVertex('polygon-1', '0.1', [2.2, 0.2])
+
+    expect(didMove).toBe(true)
+    const nextFeatures = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features
+    expect(nextFeatures[0].geometry.coordinates[0]).toEqual([[0, 0], [2.2, 0.2], [1, 1], [0, 0]])
+    expect(nextFeatures[1].geometry.coordinates[0]).toEqual([[2.2, 0.2], [4, 0], [3, 1], [2.2, 0.2]])
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('direct_select', {
+      featureId: 'polygon-1',
+      coordPath: '0.1',
+    })
+
+    wrapper.unmount()
+  })
+
+  it('does not move matching shared vertices when topology editing is off', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [
+        {
+          id: 'polygon-1',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[0, 0], [2, 0], [1, 1], [0, 0]]],
+          },
+        },
+        {
+          id: 'polygon-2',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[2, 0], [4, 0], [3, 1], [2, 0]]],
+          },
+        },
+      ],
+    }, {
+      snappingEnabled: false,
+      topologyEditingEnabled: false,
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didMove = wrapper.exposed.moveVertex('polygon-1', '0.1', [2.2, 0.2])
+
+    expect(didMove).toBe(true)
+    const nextFeatures = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features
+    expect(nextFeatures[0].geometry.coordinates[0]).toEqual([[0, 0], [2.2, 0.2], [1, 1], [0, 0]])
+    expect(nextFeatures[1].geometry.coordinates[0]).toEqual([[2, 0], [4, 0], [3, 1], [2, 0]])
+
+    wrapper.unmount()
+  })
+
+  it('does not topology-edit hidden or locked active-layer features', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [
+        {
+          id: 'polygon-1',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[0, 0], [2, 0], [1, 1], [0, 0]]],
+          },
+        },
+        {
+          id: 'polygon-hidden',
+          type: 'Feature',
+          properties: { visible: false, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[2, 0], [4, 0], [3, 1], [2, 0]]],
+          },
+        },
+        {
+          id: 'polygon-locked',
+          type: 'Feature',
+          properties: { visible: true, locked: true },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[2, 0], [4, 2], [3, 3], [2, 0]]],
+          },
+        },
+      ],
+    }, {
+      snappingEnabled: false,
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didMove = wrapper.exposed.moveVertex('polygon-1', '0.1', [2.2, 0.2])
+
+    expect(didMove).toBe(true)
+    const nextFeatures = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features
+    expect(nextFeatures[0].geometry.coordinates[0]).toEqual([[0, 0], [2.2, 0.2], [1, 1], [0, 0]])
+    expect(nextFeatures[1].geometry.coordinates[0]).toEqual([[2, 0], [4, 0], [3, 1], [2, 0]])
+    expect(nextFeatures[2].geometry.coordinates[0]).toEqual([[2, 0], [4, 2], [3, 3], [2, 0]])
+
+    wrapper.unmount()
+  })
+
+  it('traces snapped active-layer edges by inserting the same vertex into the snapped feature', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [
+        {
+          id: 'line-1',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: { type: 'LineString', coordinates: [[0, 0], [10, 0]] },
+        },
+        {
+          id: 'line-2',
+          type: 'Feature',
+          properties: { name: '共享边', visible: true, locked: false },
+          geometry: { type: 'LineString', coordinates: [[0, 5], [10, 5]] },
+        },
+      ],
+    }, {
+      snapTargets: {
+        vertex: false,
+        midpoint: false,
+        edge: true,
+        grid: false,
+        reference: true,
+      },
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didInsert = wrapper.exposed.insertVertex('line-1', '1', [5.2, 5.1])
+
+    expect(didInsert).toBe(true)
+    const nextFeatures = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features
+    expect(nextFeatures[0].geometry.coordinates).toEqual([[0, 0], [5.2, 5], [10, 0]])
+    expect(nextFeatures[1].geometry.coordinates).toEqual([[0, 5], [5.2, 5], [10, 5]])
+    expect(wrapper.events).toContainEqual(['snap-state-change', expect.objectContaining({
+      active: true,
+      type: 'edge',
+      featureName: '共享边',
+    })])
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('direct_select', {
+      featureId: 'line-1',
+      coordPath: '1',
+    })
+
+    wrapper.unmount()
+  })
+
+  it('does not trace snapped active-layer edges when topology editing is off', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [
+        {
+          id: 'line-1',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: { type: 'LineString', coordinates: [[0, 0], [10, 0]] },
+        },
+        {
+          id: 'line-2',
+          type: 'Feature',
+          properties: { name: '共享边', visible: true, locked: false },
+          geometry: { type: 'LineString', coordinates: [[0, 5], [10, 5]] },
+        },
+      ],
+    }, {
+      topologyEditingEnabled: false,
+      snapTargets: {
+        vertex: false,
+        midpoint: false,
+        edge: true,
+        grid: false,
+        reference: true,
+      },
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didInsert = wrapper.exposed.insertVertex('line-1', '1', [5.2, 5.1])
+
+    expect(didInsert).toBe(true)
+    const nextFeatures = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features
+    expect(nextFeatures[0].geometry.coordinates).toEqual([[0, 0], [5.2, 5], [10, 0]])
+    expect(nextFeatures[1].geometry.coordinates).toEqual([[0, 5], [10, 5]])
 
     wrapper.unmount()
   })

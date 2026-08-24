@@ -1148,7 +1148,10 @@ const getSnapFeatureName = (feature) => {
 }
 
 const getSnapReferenceItems = (options = {}) => {
-  const excludedFeatureId = String(options.excludeFeatureId || '')
+  const excludedFeatureIds = new Set([
+    String(options.excludeFeatureId || ''),
+    ...(Array.isArray(options.excludeFeatureIds) ? options.excludeFeatureIds.map((featureId) => String(featureId || '')) : []),
+  ].filter(Boolean))
   const activeFeatures = normalizeFeatureCollection(draw.value?.getAll?.() ?? props.modelValue).features ?? []
   const activeLayerId = String(props.activeLayer?.id || 'active-layer')
   const activeLayerName = String(props.activeLayer?.name || '')
@@ -1156,6 +1159,7 @@ const getSnapReferenceItems = (options = {}) => {
     feature,
     source: activeLayerId,
     layerName: activeLayerName,
+    isActiveLayer: true,
   }))
   const layerFeatureItems = isSnapTargetEnabled('reference')
     ? (props.allLayers ?? [])
@@ -1166,6 +1170,7 @@ const getSnapReferenceItems = (options = {}) => {
             feature,
             source: String(layer?.id || ''),
             layerName: String(layer?.name || ''),
+            isActiveLayer: false,
           })))
     : []
   return [...activeFeatureItems, ...layerFeatureItems]
@@ -1173,7 +1178,7 @@ const getSnapReferenceItems = (options = {}) => {
       const featureId = getDrawFeatureId(item.feature)
       return item.feature?.geometry
         && isSnapReferenceFeatureVisible(item.feature)
-        && (!excludedFeatureId || featureId !== excludedFeatureId)
+        && !excludedFeatureIds.has(featureId)
     })
 }
 
@@ -1325,6 +1330,8 @@ const resolveSnapResult = (coordinate, options = {}) => {
     source: '',
     layerName: '',
     featureName: '',
+    featureId: '',
+    isActiveLayer: false,
   }
   if (!normalized || props.snappingEnabled === false || options.snapping === false) return fallback
   const targetPoint = projectCoordinate(normalized)
@@ -1340,6 +1347,8 @@ const resolveSnapResult = (coordinate, options = {}) => {
     source: '',
     layerName: '',
     featureName: '',
+    featureId: '',
+    isActiveLayer: false,
   }
 
   const acceptCandidate = (candidateCoordinate, priority, type, item = {}) => {
@@ -1363,6 +1372,8 @@ const resolveSnapResult = (coordinate, options = {}) => {
         source: item.source || '',
         layerName: item.layerName || '',
         featureName: item.featureName || getSnapFeatureName(item.feature),
+        featureId: getDrawFeatureId(item.feature),
+        isActiveLayer: item.isActiveLayer === true,
       }
     }
   }
@@ -1406,6 +1417,8 @@ const resolveSnapResult = (coordinate, options = {}) => {
     source: best.source,
     layerName: best.layerName,
     featureName: best.featureName,
+    featureId: best.featureId,
+    isActiveLayer: best.isActiveLayer,
     distancePixels: Number.isFinite(best.distanceSquared) ? Math.sqrt(best.distanceSquared) : null,
   }
 }
@@ -1699,6 +1712,117 @@ const moveVertexInFeature = (feature, coordPath, coordinate) => {
     editableRing[coordinateIndex] = nextCoordinate
     nextGeometry.coordinates[ringIndex] = closePolygonRing(editableRing)
     return isPolygonGeometryValid(nextGeometry.coordinates) ? { feature: nextFeature, coordPath: normalizedPath } : null
+  }
+
+  return null
+}
+
+const topologyEditingIsEnabled = (options = {}) => props.topologyEditingEnabled !== false
+  && options.topologyEditing !== false
+
+const featureHasCoordinate = (feature, coordinate) => {
+  const normalizedCoordinate = normalizeVertexCoordinate(coordinate)
+  if (!normalizedCoordinate) return false
+  return getCoordinatePairs(feature?.geometry).some((candidate) => areCoordinatesEqual(candidate, normalizedCoordinate))
+}
+
+const getSharedTopologyFeatureIds = (featureCollection, featureId, coordinate) => {
+  const normalizedFeatureId = String(featureId || '')
+  const normalizedCoordinate = normalizeVertexCoordinate(coordinate)
+  if (!normalizedFeatureId || !normalizedCoordinate) return new Set()
+  return new Set((featureCollection.features ?? [])
+    .filter((feature) => getDrawFeatureId(feature) !== normalizedFeatureId)
+    .filter(isDrawFeatureSelectable)
+    .filter((feature) => ['LineString', 'Polygon'].includes(feature?.geometry?.type))
+    .filter((feature) => featureHasCoordinate(feature, normalizedCoordinate))
+    .map((feature) => getDrawFeatureId(feature))
+    .filter(Boolean))
+}
+
+const moveMatchingCoordinatesInFeature = (feature, fromCoordinate, toCoordinate) => {
+  const normalizedFromCoordinate = normalizeVertexCoordinate(fromCoordinate)
+  const normalizedToCoordinate = normalizeVertexCoordinate(toCoordinate)
+  if (!normalizedFromCoordinate || !normalizedToCoordinate) return null
+
+  const nextFeature = cloneFeatureForGeometryEdit(feature)
+  const nextGeometry = nextFeature.geometry
+  let changed = false
+  const replaceCoordinate = (coordinate) => {
+    if (!areCoordinatesEqual(coordinate, normalizedFromCoordinate)) return coordinate
+    changed = true
+    return [...normalizedToCoordinate]
+  }
+
+  if (nextGeometry?.type === 'LineString') {
+    nextGeometry.coordinates = (nextGeometry.coordinates ?? []).map(replaceCoordinate)
+    return changed && isLineGeometryValid(nextGeometry.coordinates) ? nextFeature : null
+  }
+
+  if (nextGeometry?.type === 'Polygon') {
+    nextGeometry.coordinates = (nextGeometry.coordinates ?? []).map((ring) => (
+      closePolygonRing(getEditableRingCoordinates(ring).map(replaceCoordinate))
+    ))
+    return changed && isPolygonGeometryValid(nextGeometry.coordinates) ? nextFeature : null
+  }
+
+  return null
+}
+
+const coordinateEpsilon = 1e-9
+
+const isCoordinateOnSegment = (coordinate, startCoordinate, endCoordinate) => {
+  const point = normalizeVertexCoordinate(coordinate)
+  const start = normalizeVertexCoordinate(startCoordinate)
+  const end = normalizeVertexCoordinate(endCoordinate)
+  if (!point || !start || !end) return false
+  if (areCoordinatesEqual(point, start) || areCoordinatesEqual(point, end)) return false
+
+  const segmentX = end[0] - start[0]
+  const segmentY = end[1] - start[1]
+  const pointX = point[0] - start[0]
+  const pointY = point[1] - start[1]
+  const segmentLengthSquared = (segmentX ** 2) + (segmentY ** 2)
+  if (segmentLengthSquared <= coordinateEpsilon) return false
+
+  const cross = (pointX * segmentY) - (pointY * segmentX)
+  if (Math.abs(cross) > coordinateEpsilon) return false
+
+  const dot = (pointX * segmentX) + (pointY * segmentY)
+  return dot > coordinateEpsilon && dot < segmentLengthSquared - coordinateEpsilon
+}
+
+const insertCoordinateOnMatchingSegment = (feature, coordinate) => {
+  const nextCoordinate = normalizeVertexCoordinate(coordinate)
+  if (!nextCoordinate || featureHasCoordinate(feature, nextCoordinate)) return null
+
+  const nextFeature = cloneFeatureForGeometryEdit(feature)
+  const nextGeometry = nextFeature.geometry
+
+  if (nextGeometry?.type === 'LineString') {
+    const coordinates = nextGeometry.coordinates ?? []
+    const segmentIndex = coordinates.findIndex((startCoordinate, index) => (
+      index < coordinates.length - 1
+      && isCoordinateOnSegment(nextCoordinate, startCoordinate, coordinates[index + 1])
+    ))
+    if (segmentIndex < 0) return null
+    const nextCoordinates = [...coordinates]
+    nextCoordinates.splice(segmentIndex + 1, 0, nextCoordinate)
+    nextGeometry.coordinates = nextCoordinates
+    return isLineGeometryValid(nextGeometry.coordinates) ? nextFeature : null
+  }
+
+  if (nextGeometry?.type === 'Polygon') {
+    for (let ringIndex = 0; ringIndex < (nextGeometry.coordinates ?? []).length; ringIndex += 1) {
+      const editableRing = getEditableRingCoordinates(nextGeometry.coordinates[ringIndex])
+      const segmentIndex = editableRing.findIndex((startCoordinate, index) => (
+        isCoordinateOnSegment(nextCoordinate, startCoordinate, editableRing[(index + 1) % editableRing.length])
+      ))
+      if (segmentIndex < 0) continue
+      const nextRing = [...editableRing]
+      nextRing.splice(segmentIndex + 1, 0, nextCoordinate)
+      nextGeometry.coordinates[ringIndex] = closePolygonRing(nextRing)
+      return isPolygonGeometryValid(nextGeometry.coordinates) ? nextFeature : null
+    }
   }
 
   return null
@@ -2313,15 +2437,24 @@ const updateFeatureProperties = (featureId, nextProperties, options = {}) => {
 }
 
 const replaceFeatureInDraw = (nextFeature, options = {}) => {
-  if (!draw.value || !nextFeature || typeof draw.value.set !== 'function') return false
-  const nextFeatureId = getDrawFeatureId(nextFeature)
-  if (!nextFeatureId) return false
+  return replaceFeaturesInDraw([nextFeature], options)
+}
+
+const replaceFeaturesInDraw = (nextFeaturesForReplacement = [], options = {}) => {
+  if (!draw.value || typeof draw.value.set !== 'function') return false
+  const replacementFeatureById = new Map((nextFeaturesForReplacement ?? [])
+    .map((feature) => [getDrawFeatureId(feature), feature])
+    .filter(([featureId, feature]) => featureId && feature))
+  if (replacementFeatureById.size === 0) return false
 
   const featureCollection = normalizeFeatureCollection(draw.value.getAll?.() ?? props.modelValue)
   const nextFeatures = (featureCollection.features ?? []).map((feature) => (
-    getDrawFeatureId(feature) === nextFeatureId ? nextFeature : feature
+    replacementFeatureById.get(getDrawFeatureId(feature)) ?? feature
   ))
-  if (!nextFeatures.some((feature) => getDrawFeatureId(feature) === nextFeatureId)) return false
+  const replacedFeatureIds = new Set(nextFeatures
+    .map((feature) => getDrawFeatureId(feature))
+    .filter((featureId) => replacementFeatureById.has(featureId)))
+  if (replacedFeatureIds.size !== replacementFeatureById.size) return false
 
   draw.value.set({
     type: 'FeatureCollection',
@@ -2355,6 +2488,7 @@ const selectVertex = (featureId, coordPath) => {
 const insertVertex = (featureId, coordPath, coordinate, options = {}) => {
   const feature = featureId ? draw.value?.get?.(featureId) : null
   if (!draw.value || !feature || !isDrawFeatureSelectable(feature)) return false
+  const featureCollection = normalizeFeatureCollection(draw.value.getAll?.() ?? props.modelValue)
   const snapResult = resolveSnapResult(coordinate, {
     ...options,
     excludeFeatureId: featureId,
@@ -2362,7 +2496,26 @@ const insertVertex = (featureId, coordPath, coordinate, options = {}) => {
   const result = insertVertexIntoFeature(feature, coordPath, snapResult.coordinate)
   if (!result) return false
 
-  const didReplace = replaceFeatureInDraw(result.feature, options)
+  const nextFeatures = [result.feature]
+  const snapTargetFeatureId = String(snapResult.featureId || '')
+  if (
+    topologyEditingIsEnabled(options)
+    && snapResult.isActiveLayer === true
+    && ['edge', 'midpoint'].includes(snapResult.type)
+    && snapTargetFeatureId
+    && snapTargetFeatureId !== String(featureId)
+  ) {
+    const snapTargetFeature = (featureCollection.features ?? [])
+      .find((candidate) => getDrawFeatureId(candidate) === snapTargetFeatureId)
+    if (isDrawFeatureSelectable(snapTargetFeature)) {
+      const tracedFeature = insertCoordinateOnMatchingSegment(snapTargetFeature, snapResult.coordinate)
+      if (tracedFeature) {
+        nextFeatures.push(tracedFeature)
+      }
+    }
+  }
+
+  const didReplace = replaceFeaturesInDraw(nextFeatures, options)
   if (!didReplace) return false
   setSnapPreview(snapResult)
   selectVertex(featureId, result.coordPath)
@@ -2372,14 +2525,32 @@ const insertVertex = (featureId, coordPath, coordinate, options = {}) => {
 const moveVertex = (featureId, coordPath, coordinate, options = {}) => {
   const feature = featureId ? draw.value?.get?.(featureId) : null
   if (!draw.value || !feature || !isDrawFeatureSelectable(feature)) return false
+  const featureCollection = normalizeFeatureCollection(draw.value.getAll?.() ?? props.modelValue)
+  const originalCoordinate = getCoordinatesForCoordPaths(feature, [coordPath])[0]
+  const sharedFeatureIds = topologyEditingIsEnabled(options)
+    ? getSharedTopologyFeatureIds(featureCollection, featureId, originalCoordinate)
+    : new Set()
   const snapResult = resolveSnapResult(coordinate, {
     ...options,
     excludeFeatureId: featureId,
+    excludeFeatureIds: [...sharedFeatureIds],
   })
   const result = moveVertexInFeature(feature, coordPath, snapResult.coordinate)
   if (!result) return false
 
-  const didReplace = replaceFeatureInDraw(result.feature, options)
+  const nextFeatures = [result.feature]
+  if (sharedFeatureIds.size > 0) {
+    ;(featureCollection.features ?? []).forEach((candidate) => {
+      const candidateFeatureId = getDrawFeatureId(candidate)
+      if (!sharedFeatureIds.has(candidateFeatureId)) return
+      const nextFeature = moveMatchingCoordinatesInFeature(candidate, originalCoordinate, snapResult.coordinate)
+      if (nextFeature) {
+        nextFeatures.push(nextFeature)
+      }
+    })
+  }
+
+  const didReplace = replaceFeaturesInDraw(nextFeatures, options)
   if (!didReplace) return false
   setSnapPreview(snapResult)
   selectVertex(featureId, result.coordPath)
