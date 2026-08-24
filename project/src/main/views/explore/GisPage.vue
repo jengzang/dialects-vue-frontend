@@ -1204,8 +1204,7 @@ const handleDrawHistoryKeydown = (event) => {
   if (isUndo) { event.preventDefault(); handleUndoHistory(); return; }
   if (isRedo) { event.preventDefault(); handleRedoHistory(); return; }
   if (isSelectAll && canModifyActiveLayer.value) { event.preventDefault(); handleSelectAllFeatures(); return; }
-  const canAttemptVertexDelete = currentMode.value === 'direct_select' && selectedVertexCount.value > 0;
-  if (isDelete && (canDeleteSelection.value || canAttemptVertexDelete)) { event.preventDefault(); handleDeleteSelected(); return; }
+  if (isDelete && canDeleteSelection.value) { event.preventDefault(); handleDeleteSelected(); return; }
   if (isEscape && (isFeatureBoxSelectMode.value || selectedFeatureIds.value.length > 0
     || selectedFeatureId.value || currentMode.value !== 'simple_select')) {
     event.preventDefault(); resetDrawSelectionMode();
