@@ -222,6 +222,13 @@ const featureBoxSelectableLayerIds = [
   'gl-draw-line',
   'gl-draw-point',
 ]
+const editTargetHoverLayerIds = [
+  'gl-draw-active-vertex',
+  'gl-draw-vertex',
+  'gl-draw-midpoint',
+  'gl-draw-line',
+  'gl-draw-polygon-stroke',
+]
 const snapPreviewSourceId = 'draw-snap-preview-source'
 const snapPreviewGuideLayerId = 'draw-snap-preview-guide'
 const snapPreviewPointLayerId = 'draw-snap-preview-point'
@@ -318,6 +325,7 @@ const emit = defineEmits([
   'feature-box-select',
   'geometry-edit-feedback',
   'snap-state-change',
+  'edit-target-hover',
 ])
 
 const mapContainer = ref(null)
@@ -341,6 +349,7 @@ let previewHoverBound = false
 let suppressedProgrammaticFeatureSelectionIds = null
 let isDeletingSelected = false
 let featureBoxDragPanWasEnabled = true
+let lastEditTargetHoverKey = ''
 const sanitizeLayerFilename = (layerName) => {
   return String(layerName || 'map-draw-layer')
     .trim()
@@ -1908,6 +1917,7 @@ const syncFeaturesFromDraw = (options = {}) => {
 const setDrawMode = (mode) => {
   suppressedProgrammaticFeatureSelectionIds = null
   clearSnapPreview()
+  clearEditTargetHover()
   if (mode !== 'draw_line_string') {
     clearPendingPolygonSplitSketch()
   }
@@ -1925,6 +1935,7 @@ const setDrawMode = (mode) => {
 const selectFeature = (featureId, options = {}) => {
   suppressedProgrammaticFeatureSelectionIds = null
   clearSnapPreview()
+  clearEditTargetHover()
   clearPendingPolygonSplitSketch()
   if (!draw.value || !featureId) {
     selectedFeatureId.value = ''
@@ -1973,6 +1984,7 @@ const selectFeature = (featureId, options = {}) => {
 
 const selectFeatures = (featureIds = []) => {
   clearSnapPreview()
+  clearEditTargetHover()
   clearPendingPolygonSplitSketch()
   if (!draw.value) {
     selectedFeatureId.value = ''
@@ -2027,6 +2039,82 @@ const isPointInScreenBox = (point, box) => {
 }
 
 const getDrawFeatureId = (feature) => String(feature?.id ?? feature?.properties?.id ?? '')
+
+const resolveEditTargetType = (feature) => {
+  const layerId = String(feature?.layer?.id || '')
+  const meta = String(feature?.properties?.meta || '')
+  if (layerId === 'gl-draw-active-vertex' || layerId === 'gl-draw-vertex' || meta === 'vertex') return 'vertex'
+  if (layerId === 'gl-draw-midpoint' || meta === 'midpoint') return 'midpoint'
+  if (layerId === 'gl-draw-line' || layerId === 'gl-draw-polygon-stroke') return 'edge'
+  return ''
+}
+
+const getEditTargetFeatureId = (feature) => String(
+  feature?.properties?.parent
+    ?? feature?.properties?.id
+    ?? feature?.id
+    ?? ''
+)
+
+const getEditTargetCoordPath = (feature) => String(
+  feature?.properties?.coord_path
+    ?? feature?.properties?.coordPath
+    ?? ''
+)
+
+const getEditTargetFeatureName = (featureId) => {
+  const feature = featureId ? draw.value?.get?.(featureId) : null
+  return getSnapFeatureName(feature)
+}
+
+const emitEditTargetHover = (payload = { active: false }) => {
+  const key = payload?.active
+    ? [payload.type, payload.featureId, payload.coordPath].join(':')
+    : ''
+  if (key === lastEditTargetHoverKey) return
+  lastEditTargetHoverKey = key
+  emit('edit-target-hover', payload)
+}
+
+const clearEditTargetHover = () => {
+  emitEditTargetHover({ active: false })
+}
+
+const getEditableHoverLayerIds = () => editTargetHoverLayerIds
+  .filter((layerId) => map.value?.getLayer?.(layerId))
+
+const resolveEditTargetHoverFeature = (event = {}) => {
+  const layerIds = getEditableHoverLayerIds()
+  if (!map.value || layerIds.length === 0) return null
+  try {
+    return (map.value.queryRenderedFeatures(event.point, { layers: layerIds }) ?? [])
+      .find((feature) => resolveEditTargetType(feature) && getEditTargetFeatureId(feature))
+      ?? null
+  } catch {
+    return null
+  }
+}
+
+const handleEditTargetMouseMove = (event = {}) => {
+  if (props.featureBoxSelectEnabled || draw.value?.getMode?.() !== 'direct_select') {
+    clearEditTargetHover()
+    return
+  }
+  const feature = resolveEditTargetHoverFeature(event)
+  const type = resolveEditTargetType(feature)
+  const featureId = getEditTargetFeatureId(feature)
+  if (!type || !featureId || !isDrawFeatureSelectableById(featureId)) {
+    clearEditTargetHover()
+    return
+  }
+  emitEditTargetHover({
+    active: true,
+    type,
+    featureId,
+    coordPath: type === 'edge' ? '' : getEditTargetCoordPath(feature),
+    featureName: getEditTargetFeatureName(featureId),
+  })
+}
 
 const isFeatureBoxSelectableFeature = (featureId) => {
   return isDrawFeatureSelectableById(featureId)
@@ -2428,13 +2516,19 @@ const cancelPolygonSplitSketch = () => {
 }
 
 const deleteSelected = () => {
-  if (!canDeleteSelected()) return false
+  if (!canDeleteSelected()) {
+    if (draw.value?.getMode?.() === 'direct_select' && selectedVertexCoordPaths.value.length > 0) {
+      emitGeometryEditFeedback('error', 'vertexDeleteFailed')
+    }
+    return false
+  }
   if (draw.value?.getMode?.() === 'direct_select' && selectedVertexCoordPaths.value.length > 0) {
     return deleteVertices(selectedFeatureId.value, selectedVertexCoordPaths.value, { commitHistory: false })
   }
   isDeletingSelected = true
   try {
     clearSnapPreview()
+    clearEditTargetHover()
     draw.value?.trash?.()
     syncFeaturesFromDraw({ commitHistory: false })
     return true
@@ -2447,6 +2541,7 @@ const clearAll = () => {
   draw.value?.deleteAll?.()
   clearPendingPolygonSplitSketch()
   clearSnapPreview()
+  clearEditTargetHover()
   selectedVertexCoordPaths.value = []
   syncFeaturesFromDraw({ commitHistory: false })
 }
@@ -2456,6 +2551,7 @@ const importGeoJson = (featureCollection, options = {}) => {
 
   clearPendingPolygonSplitSketch()
   clearSnapPreview()
+  clearEditTargetHover()
   const normalized = normalizeFeatureCollection(featureCollection)
   const mergeImportedFeatures = options.merge === true
   const shouldEmitChanges = options.emitChanges !== false
@@ -2878,6 +2974,8 @@ const initializeMap = async () => {
     syncActiveTextLayoutConstants()
     syncTextBackgroundBoxes()
   })
+  map.value.on('mousemove', handleEditTargetMouseMove)
+  map.value.on('mouseleave', clearEditTargetHover)
   map.value.on('moveend', () => {
     syncTextBackgroundBoxes()
     syncTextLeaderLines()

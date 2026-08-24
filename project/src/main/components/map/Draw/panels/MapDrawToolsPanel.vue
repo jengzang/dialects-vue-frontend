@@ -427,6 +427,12 @@
               <span data-testid="edit-session-snap">
                 {{ editSessionStatus.snapLabel }}
               </span>
+              <span
+                v-if="editSessionStatus.hoverLabel"
+                data-testid="edit-session-hover"
+              >
+                {{ editSessionStatus.hoverLabel }}
+              </span>
             </div>
             <div
               v-if="editSessionStatus.feedback?.message"

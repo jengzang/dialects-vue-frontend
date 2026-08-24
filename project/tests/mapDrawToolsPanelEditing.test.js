@@ -183,6 +183,7 @@ describe('MapDrawToolsPanel editing affordances', () => {
         featureLabel: '要素：边界 A',
         vertexLabel: '顶点：0.2',
         snapLabel: '吸附：中点 · 参考线 / 边界线',
+        hoverLabel: '悬停：边中点 · 0.3',
         feedback: {
           type: 'success',
           message: '已撤回上一步',
@@ -201,6 +202,8 @@ describe('MapDrawToolsPanel editing affordances', () => {
       .toContain('顶点：0.2')
     expect(wrapper.host.querySelector('[data-testid="edit-session-snap"]').textContent)
       .toContain('吸附：中点 · 参考线 / 边界线')
+    expect(wrapper.host.querySelector('[data-testid="edit-session-hover"]').textContent)
+      .toContain('悬停：边中点 · 0.3')
     expect(wrapper.host.querySelector('[data-testid="edit-session-feedback"]').textContent)
       .toContain('已撤回上一步')
 

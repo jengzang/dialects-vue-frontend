@@ -327,6 +327,7 @@ export function useGisMapCore(options = {}) {
   const polygonSplitSketchActive = ref(false);
   const geometryEditStatus = ref(null);
   const snapState = ref({ active: false });
+  const hoveredEditTarget = ref(null);
   const snappingEnabled = ref(true);
   const snapTolerance = ref(12);
   const snapGridSize = ref(0);
@@ -761,6 +762,13 @@ export function useGisMapCore(options = {}) {
     return t('map.drawTab.labels.snapTypeUnknown');
   };
 
+  const resolveEditTargetTypeLabel = (type) => {
+    if (type === 'vertex') return t('map.drawTab.labels.editTargetTypeVertex');
+    if (type === 'midpoint') return t('map.drawTab.labels.editTargetTypeMidpoint');
+    if (type === 'edge') return t('map.drawTab.labels.editTargetTypeEdge');
+    return t('map.drawTab.labels.snapTypeUnknown');
+  };
+
   const formatSessionCoordinate = (coordinate = []) => {
     const longitude = Number(coordinate[0]);
     const latitude = Number(coordinate[1]);
@@ -802,6 +810,20 @@ export function useGisMapCore(options = {}) {
     return t('map.drawTab.labels.editSessionVertexCount', { count: selectedVertexCount.value });
   };
 
+  const resolveHoveredEditTargetLabel = () => {
+    const target = hoveredEditTarget.value;
+    if (currentMode.value !== 'direct_select' || !target?.active) return '';
+    const type = resolveEditTargetTypeLabel(target.type);
+    const detail = [target.featureName, target.coordPath]
+      .map((item) => String(item || '').trim())
+      .filter(Boolean)
+      .join(' · ');
+    return t('map.drawTab.labels.editSessionHoverTarget', {
+      type,
+      target: detail || t('map.drawTab.labels.snapTypeUnknown'),
+    });
+  };
+
   const editSessionStatus = computed(() => ({
     mode: currentMode.value,
     modeLabel: resolveCurrentModeLabel(),
@@ -811,6 +833,7 @@ export function useGisMapCore(options = {}) {
     featureLabel: resolveSelectedFeatureSessionLabel(),
     vertexLabel: resolveSelectedVertexSessionLabel(),
     snapLabel: resolveSnapTargetLabel(),
+    hoverLabel: resolveHoveredEditTargetLabel(),
     feedback: geometryEditStatus.value,
   }));
 
@@ -845,6 +868,7 @@ export function useGisMapCore(options = {}) {
   const resetDrawSelectionMode = () => {
     isFeatureBoxSelectMode.value = false;
     polygonSplitSketchActive.value = false;
+    hoveredEditTarget.value = null;
     clearFeatureSelection();
     currentMode.value = 'simple_select';
     if (editableMapRef?.value?.selectFeatures) {
@@ -942,6 +966,7 @@ export function useGisMapCore(options = {}) {
     if (currentMode.value !== 'direct_select') {
       selectedVertexCount.value = 0;
       canDeleteSelectedVertices.value = false;
+      hoveredEditTarget.value = null;
     }
   };
 
@@ -1065,6 +1090,7 @@ export function useGisMapCore(options = {}) {
       lineToPolygonUnavailable: 'map.drawTab.labels.lineToPolygonUnavailable',
       vertexMoveSuccess: 'map.drawTab.labels.vertexMoveSuccess',
       vertexMoveFailed: 'map.drawTab.labels.vertexMoveFailed',
+      vertexDeleteFailed: 'map.drawTab.labels.vertexDeleteFailed',
       historyUndoSuccess: 'map.drawTab.labels.historyUndoSuccess',
       historyUndoUnavailable: 'map.drawTab.labels.historyUndoUnavailable',
       historyRedoSuccess: 'map.drawTab.labels.historyRedoSuccess',
@@ -1098,6 +1124,21 @@ export function useGisMapCore(options = {}) {
           originalCoordinate: Array.isArray(payload.originalCoordinate) ? payload.originalCoordinate : null,
         }
       : { active: false };
+  };
+
+  const handleEditTargetHover = (payload = {}) => {
+    const featureId = String(payload.featureId || '');
+    if (!payload?.active || currentMode.value !== 'direct_select' || !activeLayerFeatureIdSet.value.has(featureId)) {
+      hoveredEditTarget.value = null;
+      return;
+    }
+    hoveredEditTarget.value = {
+      active: true,
+      type: String(payload.type || ''),
+      featureId,
+      coordPath: String(payload.coordPath || ''),
+      featureName: String(payload.featureName || ''),
+    };
   };
 
   const handleSelectFeatureFromPanel = (featureId) => {
@@ -1202,6 +1243,7 @@ export function useGisMapCore(options = {}) {
     polygonSplitSketchActive,
     geometryEditStatus,
     snapState,
+    hoveredEditTarget,
     snappingEnabled,
     snapTolerance,
     snapGridSize,
@@ -1263,6 +1305,7 @@ export function useGisMapCore(options = {}) {
     handleFeatureBoxSelect,
     handleGeometryEditFeedback,
     handleSnapStateChange,
+    handleEditTargetHover,
     handleToggleFeatureBoxSelect,
     handleSelectFeatureFromPanel,
     handleToggleFeatureSelection,

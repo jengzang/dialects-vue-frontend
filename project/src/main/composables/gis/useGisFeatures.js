@@ -728,12 +728,27 @@ export function useGisFeatures(options = {}) {
 
   async function handleDeleteSelected() {
     if (!await guardWrite()) return;
-    if (!canDeleteSelection.value) return;
+    if (!canDeleteSelection.value) {
+      if (currentMode.value === 'direct_select' && selectedVertex?.value) {
+        reportGeometryEditFeedback('error', 'vertexDeleteFailed');
+      }
+      return;
+    }
     const wasDirectSelect = currentMode.value === 'direct_select';
-    if (editableMapRef?.value?.canDeleteSelected?.() === false) return;
+    if (editableMapRef?.value?.canDeleteSelected?.() === false) {
+      if (wasDirectSelect && selectedVertex?.value) {
+        reportGeometryEditFeedback('error', 'vertexDeleteFailed');
+      }
+      return;
+    }
     commitHistory();
     const didDelete = editableMapRef?.value?.deleteSelected?.();
-    if (didDelete === false) return;
+    if (didDelete === false) {
+      if (wasDirectSelect && selectedVertex?.value) {
+        reportGeometryEditFeedback('error', 'vertexDeleteFailed');
+      }
+      return;
+    }
     if (!wasDirectSelect) {
       currentMode.value = 'simple_select';
     }

@@ -252,6 +252,7 @@ function mountEditableMapLibre(modelValue, options = {}) {
         @mode-change="events.push(['mode-change', $event])"
         @geometry-edit-feedback="events.push(['geometry-edit-feedback', $event])"
         @snap-state-change="events.push(['snap-state-change', $event])"
+        @edit-target-hover="events.push(['edit-target-hover', $event])"
       />
     `,
   })
@@ -1047,6 +1048,83 @@ describe('EditableMapLibre state flow', () => {
     wrapper.unmount()
   })
 
+  it('reports hovered edit targets for vertices, midpoints, and edges while direct editing', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false, name: '边界线' },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [2, 2], [4, 0]] },
+      }],
+    })
+    await nextTick()
+    wrapper.exposed.selectFeature('line-1', { directEdit: true })
+    ;[
+      'gl-draw-active-vertex',
+      'gl-draw-vertex',
+      'gl-draw-midpoint',
+      'gl-draw-line',
+      'gl-draw-polygon-stroke',
+    ].forEach((layerId) => {
+      wrapper.map.addLayer({ id: layerId, type: 'circle' })
+    })
+    wrapper.events.length = 0
+
+    wrapper.map.queryRenderedFeatures.mockReturnValueOnce([{
+      layer: { id: 'gl-draw-vertex' },
+      properties: { meta: 'vertex', parent: 'line-1', coord_path: '1' },
+    }])
+    wrapper.map.emit('mousemove', { point: { x: 2, y: 2 } })
+
+    expect(wrapper.events).toContainEqual(['edit-target-hover', {
+      active: true,
+      type: 'vertex',
+      featureId: 'line-1',
+      coordPath: '1',
+      featureName: '边界线',
+    }])
+
+    wrapper.events.length = 0
+    wrapper.map.queryRenderedFeatures.mockReturnValueOnce([{
+      layer: { id: 'gl-draw-midpoint' },
+      properties: { meta: 'midpoint', parent: 'line-1', coord_path: '2' },
+    }])
+    wrapper.map.emit('mousemove', { point: { x: 3, y: 1 } })
+
+    expect(wrapper.events).toContainEqual(['edit-target-hover', {
+      active: true,
+      type: 'midpoint',
+      featureId: 'line-1',
+      coordPath: '2',
+      featureName: '边界线',
+    }])
+
+    wrapper.events.length = 0
+    wrapper.map.queryRenderedFeatures.mockReturnValueOnce([{
+      id: 'line-1',
+      layer: { id: 'gl-draw-line' },
+      properties: { id: 'line-1', meta: 'feature' },
+    }])
+    wrapper.map.emit('mousemove', { point: { x: 1, y: 1 } })
+
+    expect(wrapper.events).toContainEqual(['edit-target-hover', {
+      active: true,
+      type: 'edge',
+      featureId: 'line-1',
+      coordPath: '',
+      featureName: '边界线',
+    }])
+
+    wrapper.events.length = 0
+    wrapper.map.queryRenderedFeatures.mockReturnValueOnce([])
+    wrapper.map.emit('mousemove', { point: { x: 99, y: 99 } })
+
+    expect(wrapper.events).toContainEqual(['edit-target-hover', { active: false }])
+
+    wrapper.unmount()
+  })
+
   it('prefers snap midpoints over nearby reference edges and reports the snap target', async () => {
     const wrapper = mountEditableMapLibre({
       type: 'FeatureCollection',
@@ -1811,6 +1889,10 @@ describe('EditableMapLibre state flow', () => {
     expect(didDelete).toBe(false)
     expect(wrapper.draw.trash).not.toHaveBeenCalled()
     expect(wrapper.events.some(([eventName]) => eventName === 'features-change')).toBe(false)
+    expect(wrapper.events).toContainEqual([
+      'geometry-edit-feedback',
+      { type: 'error', code: 'vertexDeleteFailed' },
+    ])
 
     wrapper.unmount()
   })
