@@ -586,6 +586,7 @@ describe('EditableMapLibre state flow', () => {
         selectedVertexCount: 1,
         selectedVertex: null,
         canDeleteSelectedVertices: true,
+        deleteBlockCode: '',
       },
     ])
 
@@ -625,6 +626,7 @@ describe('EditableMapLibre state flow', () => {
         selectedVertexCount: 0,
         selectedVertex: null,
         canDeleteSelectedVertices: false,
+        deleteBlockCode: '',
       },
     ])
 
@@ -802,6 +804,7 @@ describe('EditableMapLibre state flow', () => {
           coordinate: [1, 1],
         },
         canDeleteSelectedVertices: true,
+        deleteBlockCode: '',
       },
     ])
 
@@ -844,6 +847,7 @@ describe('EditableMapLibre state flow', () => {
           coordinate: [114, 24],
         },
         canDeleteSelectedVertices: false,
+        deleteBlockCode: '',
       },
     ])
 
@@ -1809,8 +1813,138 @@ describe('EditableMapLibre state flow', () => {
         selectedVertexCount: 0,
         selectedVertex: null,
         canDeleteSelectedVertices: false,
+        deleteBlockCode: '',
       },
     ])
+
+    wrapper.unmount()
+  })
+
+  it('blocks shared boundary vertex deletion when shared boundary protection is on', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [
+        {
+          id: 'polygon-1',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]]],
+          },
+        },
+        {
+          id: 'polygon-2',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[2, 0], [4, 0], [4, 2], [2, 2], [2, 0]]],
+          },
+        },
+      ],
+    })
+    await nextTick()
+    wrapper.exposed.selectVertex('polygon-1', '0.1')
+    wrapper.events.length = 0
+
+    const didDelete = wrapper.exposed.deleteSelected()
+
+    expect(didDelete).toBe(false)
+    expect(wrapper.exposed.canDeleteSelected()).toBe(false)
+    expect(wrapper.draw.trash).not.toHaveBeenCalled()
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')).toBeUndefined()
+    expect(wrapper.events).toContainEqual([
+      'geometry-edit-feedback',
+      { type: 'error', code: 'sharedBoundaryDeleteBlocked' },
+    ])
+
+    wrapper.unmount()
+  })
+
+  it('reports shared boundary deletion blocks for Draw selected vertex points', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [
+        {
+          id: 'polygon-1',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]]],
+          },
+        },
+        {
+          id: 'polygon-2',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[2, 0], [4, 0], [4, 2], [2, 2], [2, 0]]],
+          },
+        },
+      ],
+    })
+    await nextTick()
+    wrapper.exposed.selectFeature('polygon-1', { directEdit: true })
+    wrapper.draw.selectedIds = []
+    wrapper.draw.selectedPoints = [{
+      type: 'Feature',
+      properties: {},
+      geometry: { type: 'Point', coordinates: [2, 0] },
+    }]
+    wrapper.map.emit('draw.selectionchange')
+    wrapper.events.length = 0
+
+    const didDelete = wrapper.exposed.deleteSelected()
+
+    expect(didDelete).toBe(false)
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')).toBeUndefined()
+    expect(wrapper.events).toContainEqual([
+      'geometry-edit-feedback',
+      { type: 'error', code: 'sharedBoundaryDeleteBlocked' },
+    ])
+
+    wrapper.unmount()
+  })
+
+  it('allows shared boundary vertex deletion when shared boundary protection is off', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [
+        {
+          id: 'polygon-1',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]]],
+          },
+        },
+        {
+          id: 'polygon-2',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[2, 0], [4, 0], [4, 2], [2, 2], [2, 0]]],
+          },
+        },
+      ],
+    }, {
+      sharedBoundaryProtectionEnabled: false,
+    })
+    await nextTick()
+    wrapper.exposed.selectVertex('polygon-1', '0.1')
+    wrapper.events.length = 0
+
+    const didDelete = wrapper.exposed.deleteSelected()
+
+    expect(didDelete).toBe(true)
+    const nextFeatures = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features
+    expect(nextFeatures[0].geometry.coordinates[0]).toEqual([[0, 0], [2, 2], [0, 2], [0, 0]])
+    expect(nextFeatures[1].geometry.coordinates[0]).toEqual([[2, 0], [4, 0], [4, 2], [2, 2], [2, 0]])
 
     wrapper.unmount()
   })
@@ -1849,6 +1983,7 @@ describe('EditableMapLibre state flow', () => {
         selectedVertexCount: 0,
         selectedVertex: null,
         canDeleteSelectedVertices: false,
+        deleteBlockCode: '',
       },
     ])
     expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', {
@@ -2086,6 +2221,7 @@ describe('EditableMapLibre state flow', () => {
           coordinate: [1, 1],
         },
         canDeleteSelectedVertices: false,
+        deleteBlockCode: '',
       },
     ])
 

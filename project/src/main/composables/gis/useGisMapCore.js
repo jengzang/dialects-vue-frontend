@@ -315,6 +315,7 @@ export function useGisMapCore(options = {}) {
   const selectedVertexCount = ref(0);
   const selectedVertex = ref(null);
   const canDeleteSelectedVertices = ref(false);
+  const selectedVertexDeleteBlockCode = ref('');
   const isFeatureBoxSelectMode = ref(false);
   const isDrawingPanelOpen = ref(true);
   const isLayersPanelOpen = ref(false);
@@ -500,6 +501,7 @@ export function useGisMapCore(options = {}) {
     selectedVertexCount.value = 0;
     selectedVertex.value = null;
     canDeleteSelectedVertices.value = false;
+    selectedVertexDeleteBlockCode.value = '';
   };
 
   const clearFeatureSelection = () => {
@@ -508,6 +510,7 @@ export function useGisMapCore(options = {}) {
     selectedVertexCount.value = 0;
     selectedVertex.value = null;
     canDeleteSelectedVertices.value = false;
+    selectedVertexDeleteBlockCode.value = '';
   };
 
   const activeLayerFeatureItems = computed(() => activeLayerFeatures.value.map((feature, index) => ({
@@ -909,6 +912,9 @@ export function useGisMapCore(options = {}) {
 
   const resolveSelectedVertexSessionLabel = () => {
     if (selectedVertexCount.value <= 0) return t('map.drawTab.labels.editSessionNoVertex');
+    if (selectedVertexDeleteBlockCode.value === 'sharedBoundaryDeleteBlocked') {
+      return t('map.drawTab.labels.sharedBoundaryDeleteBlocked');
+    }
     if (selectedVertexCount.value === 1 && selectedVertex.value?.coordPath) {
       return t('map.drawTab.labels.editSessionVertexPath', { path: selectedVertex.value.coordPath });
     }
@@ -1071,6 +1077,7 @@ export function useGisMapCore(options = {}) {
     if (currentMode.value !== 'direct_select') {
       selectedVertexCount.value = 0;
       canDeleteSelectedVertices.value = false;
+      selectedVertexDeleteBlockCode.value = '';
       hoveredEditTarget.value = null;
     }
   };
@@ -1082,6 +1089,7 @@ export function useGisMapCore(options = {}) {
       selectedVertexCount.value = 0;
       selectedVertex.value = null;
       canDeleteSelectedVertices.value = false;
+      selectedVertexDeleteBlockCode.value = '';
       return;
     }
     const nextCount = Number(state.selectedVertexCount);
@@ -1103,6 +1111,9 @@ export function useGisMapCore(options = {}) {
         }
       : null;
     canDeleteSelectedVertices.value = selectedVertexCount.value > 0 && state.canDeleteSelectedVertices === true;
+    selectedVertexDeleteBlockCode.value = selectedVertexCount.value > 0 && !canDeleteSelectedVertices.value
+      ? String(state.deleteBlockCode || '')
+      : '';
   };
 
   const normalizeFeatureSelectPayload = (featureSelection) => {
@@ -1196,6 +1207,7 @@ export function useGisMapCore(options = {}) {
       vertexMoveSuccess: 'map.drawTab.labels.vertexMoveSuccess',
       vertexMoveFailed: 'map.drawTab.labels.vertexMoveFailed',
       vertexDeleteFailed: 'map.drawTab.labels.vertexDeleteFailed',
+      sharedBoundaryDeleteBlocked: 'map.drawTab.labels.sharedBoundaryDeleteBlocked',
       historyUndoSuccess: 'map.drawTab.labels.historyUndoSuccess',
       historyUndoUnavailable: 'map.drawTab.labels.historyUndoUnavailable',
       historyRedoSuccess: 'map.drawTab.labels.historyRedoSuccess',
@@ -1337,6 +1349,7 @@ export function useGisMapCore(options = {}) {
     selectedVertexCount,
     selectedVertex,
     canDeleteSelectedVertices,
+    selectedVertexDeleteBlockCode,
     isFeatureBoxSelectMode,
     isDrawingPanelOpen,
     isLayersPanelOpen,

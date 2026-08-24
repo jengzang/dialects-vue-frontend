@@ -841,6 +841,7 @@
       "vertexMoveSuccess": "顶点坐标已更新",
       "vertexMoveFailed": "顶点坐标更新失败",
       "vertexDeleteFailed": "无法删除顶点，否则几何会失效",
+      "sharedBoundaryDeleteBlocked": "该顶点属于共享边界，已阻止删除",
       "historyUndoSuccess": "已撤回上一步",
       "historyUndoUnavailable": "当前没有可撤回的编辑",
       "historyRedoSuccess": "已重做下一步",

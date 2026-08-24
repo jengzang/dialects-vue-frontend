@@ -54,6 +54,7 @@ function mountToolsPanel(overrides = {}) {
     selectedFeatureIds: ['feature-1'],
     selectedVertexCount: 0,
     selectedVertex: null,
+    selectedVertexDeleteBlockCode: '',
     polygonSplitLineOptions: [],
     selectedPolygonSplitLineId: '',
     canUseSelectedGeometryTools: true,
@@ -349,6 +350,22 @@ describe('MapDrawToolsPanel editing affordances', () => {
     await nextTick()
 
     expect(wrapper.events).not.toContainEqual(['delete-selected'])
+
+    wrapper.unmount()
+  })
+
+  it('shows the shared boundary protection reason when protected vertices cannot be deleted', async () => {
+    const wrapper = mountToolsPanel({
+      selectedVertexCount: 1,
+      canDeleteSelection: false,
+      canDeleteSelectedVertices: false,
+      selectedVertexDeleteBlockCode: 'sharedBoundaryDeleteBlocked',
+    })
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-testid="shape-edit-hint"]').textContent)
+      .toContain('map.drawTab.labels.sharedBoundaryDeleteBlocked')
+    expect(wrapper.host.querySelector('[data-testid="shape-edit-delete-vertices"]').disabled).toBe(true)
 
     wrapper.unmount()
   })

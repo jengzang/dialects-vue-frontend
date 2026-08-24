@@ -260,6 +260,13 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
           emit invalid selected vertex
         </button>
         <button
+          data-testid="emit-direct-select-shared-boundary-vertex"
+          type="button"
+          @click="$emit('shape-edit-state-change', { mode: 'direct_select', featureId: 'feature-1', selectedVertexCount: 1, canDeleteSelectedVertices: false, deleteBlockCode: 'sharedBoundaryDeleteBlocked' })"
+        >
+          emit protected shared boundary vertex
+        </button>
+        <button
           data-testid="emit-direct-select-no-vertex"
           type="button"
           @click="$emit('shape-edit-state-change', { mode: 'direct_select', featureId: 'feature-1', selectedVertexCount: 0, canDeleteSelectedVertices: false })"
@@ -356,7 +363,9 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       selectedFeatureGeometryType: { type: String, default: '' },
       currentMode: { type: String, default: 'simple_select' },
       selectedVertexCount: { type: Number, default: 0 },
+      selectedVertexDeleteBlockCode: { type: String, default: '' },
       canDeleteSelectedVertices: { type: Boolean, default: false },
+      geometryEditStatus: { type: Object, default: null },
       canApplySelectedFeatureBatchProperty: { type: Boolean, default: false },
       isFeatureBoxSelectMode: { type: Boolean, default: false },
       canUseFeatureBoxSelect: { type: Boolean, default: false },
@@ -455,6 +464,8 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
         </button>
         <span data-testid="selected-vertex-count">{{ selectedVertexCount }}</span>
         <span data-testid="can-delete-selected-vertices">{{ canDeleteSelectedVertices ? 'true' : 'false' }}</span>
+        <span data-testid="geometry-edit-status-code">{{ geometryEditStatus?.code || '' }}</span>
+        <span data-testid="geometry-edit-status-message">{{ geometryEditStatus?.message || '' }}</span>
         <button
           data-testid="editor-hide-active-layer"
           type="button"
@@ -2743,6 +2754,46 @@ describe('MapDrawTab draft safety', () => {
     expect(mocks.mapCanDeleteSelected).not.toHaveBeenCalled()
     expect(mocks.mapDeleteSelected).not.toHaveBeenCalled()
     expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('direct_select')
+
+    wrapper.unmount()
+  })
+
+  it('reports shared boundary protection when Delete is pressed on a protected vertex', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="emit-direct-select"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="emit-direct-select-shared-boundary-vertex"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('direct_select')
+    expect(wrapper.host.querySelector('[data-testid="selected-vertex-count"]').textContent).toBe('1')
+    expect(wrapper.host.querySelector('[data-testid="can-delete-selected-vertices"]').textContent).toBe('false')
+
+    const deleteEvent = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Delete',
+    })
+    document.dispatchEvent(deleteEvent)
+    await flushTicks()
+
+    expect(deleteEvent.defaultPrevented).toBe(true)
+    expect(mocks.mapCanDeleteSelected).not.toHaveBeenCalled()
+    expect(mocks.mapDeleteSelected).not.toHaveBeenCalled()
+    expect(wrapper.host.querySelector('[data-testid="geometry-edit-status-code"]').textContent)
+      .toBe('sharedBoundaryDeleteBlocked')
+    expect(wrapper.host.querySelector('[data-testid="geometry-edit-status-message"]').textContent)
+      .toBe('map.drawTab.labels.sharedBoundaryDeleteBlocked')
 
     wrapper.unmount()
   })

@@ -841,6 +841,7 @@
       "vertexMoveSuccess": "Vertex coordinate updated",
       "vertexMoveFailed": "Failed to update vertex coordinate",
       "vertexDeleteFailed": "Cannot delete this vertex without invalidating the geometry",
+      "sharedBoundaryDeleteBlocked": "This vertex belongs to a shared boundary, so deletion was blocked",
       "historyUndoSuccess": "Undid the last edit",
       "historyUndoUnavailable": "No edit to undo",
       "historyRedoSuccess": "Redid the next edit",

@@ -1720,6 +1720,10 @@ const moveVertexInFeature = (feature, coordPath, coordinate) => {
 const topologyEditingIsEnabled = (options = {}) => props.topologyEditingEnabled !== false
   && options.topologyEditing !== false
 
+const sharedBoundaryProtectionIsEnabled = (options = {}) => topologyEditingIsEnabled(options)
+  && props.sharedBoundaryProtectionEnabled !== false
+  && options.sharedBoundaryProtection !== false
+
 const featureHasCoordinate = (feature, coordinate) => {
   const normalizedCoordinate = normalizeVertexCoordinate(coordinate)
   if (!normalizedCoordinate) return false
@@ -1826,6 +1830,31 @@ const insertCoordinateOnMatchingSegment = (feature, coordinate) => {
   }
 
   return null
+}
+
+const isSharedBoundaryDeleteBlocked = (featureId, coordinates = [], options = {}) => {
+  if (!sharedBoundaryProtectionIsEnabled(options)) return false
+  const featureCollection = normalizeFeatureCollection(draw.value?.getAll?.() ?? props.modelValue)
+  return (coordinates ?? [])
+    .map(normalizeVertexCoordinate)
+    .filter(Boolean)
+    .some((coordinate) => getSharedTopologyFeatureIds(featureCollection, featureId, coordinate).size > 0)
+}
+
+const getSelectedVertexDeleteCoordinates = (feature) => {
+  if (selectedVertexCoordPaths.value.length > 0) {
+    return getCoordinatesForCoordPaths(feature, selectedVertexCoordPaths.value)
+  }
+  return getSelectedPointCoordinatesFromDraw()
+}
+
+const getSelectedVertexDeleteBlockCode = () => {
+  if (draw.value?.getMode?.() !== 'direct_select') return ''
+  const featureId = selectedFeatureId.value
+  const feature = featureId ? draw.value?.get?.(featureId) : null
+  if (!feature) return ''
+  const coordinates = getSelectedVertexDeleteCoordinates(feature)
+  return isSharedBoundaryDeleteBlocked(featureId, coordinates) ? 'sharedBoundaryDeleteBlocked' : ''
 }
 
 const buildSplitFeatureId = (featureCollection, sourceId, reservedIds = new Set()) => {
@@ -1972,10 +2001,14 @@ const canDeleteSelected = () => {
   const featureId = selectedFeatureId.value
   const feature = featureId ? draw.value?.get?.(featureId) : null
   if (feature && selectedVertexCoordPaths.value.length > 0) {
+    if (isSharedBoundaryDeleteBlocked(featureId, getCoordinatesForCoordPaths(feature, selectedVertexCoordPaths.value))) {
+      return false
+    }
     return canDeleteVerticesByCoordPaths(feature, selectedVertexCoordPaths.value)
   }
   const selectedCoordinates = getSelectedPointCoordinatesFromDraw()
   if (!feature || selectedCoordinates.length === 0) return false
+  if (isSharedBoundaryDeleteBlocked(featureId, selectedCoordinates)) return false
 
   const geometry = feature.geometry ?? {}
   if (geometry.type === 'LineString') {
@@ -1996,12 +2029,16 @@ const canDeleteSelected = () => {
 const syncShapeEditState = () => {
   const mode = draw.value?.getMode?.() || 'simple_select'
   const selectedVertexCount = getSelectedVertexCountFromDraw()
+  const canDeleteSelectedVertex = mode === 'direct_select' && selectedVertexCount > 0 && canDeleteSelected()
   emit('shape-edit-state-change', {
     mode,
     featureId: mode === 'direct_select' ? selectedFeatureId.value : '',
     selectedVertexCount,
     selectedVertex: mode === 'direct_select' ? getSelectedVertexState() : null,
-    canDeleteSelectedVertices: mode === 'direct_select' && selectedVertexCount > 0 && canDeleteSelected(),
+    canDeleteSelectedVertices: canDeleteSelectedVertex,
+    deleteBlockCode: mode === 'direct_select' && selectedVertexCount > 0 && !canDeleteSelectedVertex
+      ? getSelectedVertexDeleteBlockCode()
+      : '',
   })
 }
 
@@ -2701,8 +2738,8 @@ const cancelPolygonSplitSketch = () => {
 
 const deleteSelected = () => {
   if (!canDeleteSelected()) {
-    if (draw.value?.getMode?.() === 'direct_select' && selectedVertexCoordPaths.value.length > 0) {
-      emitGeometryEditFeedback('error', 'vertexDeleteFailed')
+    if (draw.value?.getMode?.() === 'direct_select' && getSelectedVertexCountFromDraw() > 0) {
+      emitGeometryEditFeedback('error', getSelectedVertexDeleteBlockCode() || 'vertexDeleteFailed')
     }
     return false
   }

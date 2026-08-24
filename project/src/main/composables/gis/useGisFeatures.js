@@ -10,7 +10,9 @@ export function useGisFeatures(options = {}) {
     activeLayer,
     selectedFeatureId,
     selectedFeatureIds,
+    selectedVertexCount,
     selectedVertex,
+    selectedVertexDeleteBlockCode,
     editableMapRef,
     currentMode,
     getFeatureId,
@@ -62,6 +64,11 @@ export function useGisFeatures(options = {}) {
   function reportGeometryEditFeedback(type, code) {
     if (!code || typeof onGeometryEditFeedback !== 'function') return;
     onGeometryEditFeedback({ type, code });
+  }
+
+  function hasSelectedDirectVertex() {
+    return currentMode.value === 'direct_select'
+      && (Boolean(selectedVertex?.value) || Number(selectedVertexCount?.value) > 0);
   }
 
   function emptyFeatureCollection() {
@@ -729,23 +736,23 @@ export function useGisFeatures(options = {}) {
   async function handleDeleteSelected() {
     if (!await guardWrite()) return;
     if (!canDeleteSelection.value) {
-      if (currentMode.value === 'direct_select' && selectedVertex?.value) {
-        reportGeometryEditFeedback('error', 'vertexDeleteFailed');
+      if (hasSelectedDirectVertex()) {
+        reportGeometryEditFeedback('error', selectedVertexDeleteBlockCode?.value || 'vertexDeleteFailed');
       }
       return;
     }
     const wasDirectSelect = currentMode.value === 'direct_select';
     if (editableMapRef?.value?.canDeleteSelected?.() === false) {
-      if (wasDirectSelect && selectedVertex?.value) {
-        reportGeometryEditFeedback('error', 'vertexDeleteFailed');
+      if (hasSelectedDirectVertex()) {
+        reportGeometryEditFeedback('error', selectedVertexDeleteBlockCode?.value || 'vertexDeleteFailed');
       }
       return;
     }
     commitHistory();
     const didDelete = editableMapRef?.value?.deleteSelected?.();
     if (didDelete === false) {
-      if (wasDirectSelect && selectedVertex?.value) {
-        reportGeometryEditFeedback('error', 'vertexDeleteFailed');
+      if (wasDirectSelect && hasSelectedDirectVertex()) {
+        reportGeometryEditFeedback('error', selectedVertexDeleteBlockCode?.value || 'vertexDeleteFailed');
       }
       return;
     }

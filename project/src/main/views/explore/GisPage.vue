@@ -152,6 +152,7 @@
           :selected-feature-ids="selectedFeatureIds"
           :selected-vertex-count="selectedVertexCount"
           :selected-vertex="selectedVertex"
+          :selected-vertex-delete-block-code="selectedVertexDeleteBlockCode"
           :polygon-split-line-options="polygonSplitLineOptions"
           :selected-polygon-split-line-id="selectedPolygonSplitLineId"
           :can-start-polygon-split-sketch="canStartPolygonSplitSketch"
@@ -845,7 +846,7 @@ const { setCommitHistory } = core;
 
 const {
   layers, activeLayerId, currentMode, currentStyleKey,
-  selectedFeatureId, selectedFeatureIds, selectedVertexCount, selectedVertex, canDeleteSelectedVertices, isFeatureBoxSelectMode,
+  selectedFeatureId, selectedFeatureIds, selectedVertexCount, selectedVertex, canDeleteSelectedVertices, selectedVertexDeleteBlockCode, isFeatureBoxSelectMode,
   isDrawingPanelOpen, isLayersPanelOpen, isMapFullscreen,
   selectedFeatureBatchName, selectedFeatureBatchPropertyKey, selectedFeatureBatchPropertyValue,
   selectedTextLabelFieldKey,
@@ -931,7 +932,7 @@ const {
 
 // ---- Features ----
 const gisFeatures = useGisFeatures({
-  layers, activeLayerId, activeLayer, selectedFeatureId, selectedFeatureIds, selectedVertex,
+  layers, activeLayerId, activeLayer, selectedFeatureId, selectedFeatureIds, selectedVertexCount, selectedVertex, selectedVertexDeleteBlockCode,
   editableMapRef, currentMode, getFeatureId,
   canModifyActiveLayer, canDuplicateSelectedFeature,
   canEditSelectedShape, canDeleteSelection, canMoveSelectedFeatures,
@@ -1211,7 +1212,11 @@ const handleDrawHistoryKeydown = (event) => {
   if (isUndo) { event.preventDefault(); handleUndoHistory(); return; }
   if (isRedo) { event.preventDefault(); handleRedoHistory(); return; }
   if (isSelectAll && canModifyActiveLayer.value) { event.preventDefault(); handleSelectAllFeatures(); return; }
-  if (isDelete && canDeleteSelection.value) { event.preventDefault(); handleDeleteSelected(); return; }
+  const hasBlockedDirectVertex = currentMode.value === 'direct_select'
+    && selectedVertexCount.value > 0
+    && Boolean(selectedVertexDeleteBlockCode.value)
+    && canModifyActiveLayer.value;
+  if (isDelete && (canDeleteSelection.value || hasBlockedDirectVertex)) { event.preventDefault(); handleDeleteSelected(); return; }
   if (isEscape && (isFeatureBoxSelectMode.value || selectedFeatureIds.value.length > 0
     || selectedFeatureId.value || currentMode.value !== 'simple_select')) {
     event.preventDefault(); resetDrawSelectionMode();

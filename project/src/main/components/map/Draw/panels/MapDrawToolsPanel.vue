@@ -1408,6 +1408,7 @@ const props = defineProps({
   selectedFeatureIds: { type: Array, default: () => [] },
   selectedVertexCount: { type: Number, default: 0 },
   selectedVertex: { type: Object, default: null },
+  selectedVertexDeleteBlockCode: { type: String, default: '' },
   polygonSplitLineOptions: { type: Array, default: () => [] },
   selectedPolygonSplitLineId: { type: String, default: '' },
   canStartPolygonSplitSketch: { type: Boolean, default: false },
@@ -1621,6 +1622,9 @@ const shapeEditHintText = computed(() => {
   if (props.selectedVertexCount <= 0) return t('map.drawTab.labels.shapeEditNoVertexHint')
   if (props.canDeleteSelectedVertices) {
     return t('map.drawTab.labels.shapeEditSelectedVertexHint', { count: props.selectedVertexCount })
+  }
+  if (props.selectedVertexDeleteBlockCode === 'sharedBoundaryDeleteBlocked') {
+    return t('map.drawTab.labels.sharedBoundaryDeleteBlocked')
   }
   return t('map.drawTab.labels.shapeEditCannotDeleteHint')
 })
