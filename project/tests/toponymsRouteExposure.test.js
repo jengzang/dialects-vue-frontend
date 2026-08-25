@@ -62,8 +62,8 @@ describe('toponyms route exposure', () => {
 
   it('adds the villages portal entry above Guangdong villages', () => {
     const source = readSource('src/main/views/menu/portals/VillagesPage.vue');
-    const toponymsIndex = source.indexOf('handleToponyms');
-    const gdIndex = source.indexOf('handleGdVillages');
+    const toponymsIndex = source.indexOf("localeTo('/explore/villages/toponyms')");
+    const gdIndex = source.indexOf("localeTo('/explore/villages/gd')");
 
     expect(toponymsIndex).toBeGreaterThan(-1);
     expect(gdIndex).toBeGreaterThan(-1);

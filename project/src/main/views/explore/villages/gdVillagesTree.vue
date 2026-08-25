@@ -4,7 +4,7 @@
     <div class="header-section">
       <div class="title-row">
         <h1 style="margin: 0;font-size: 1.5em;"><BarIcon icon="🏘️" />{{ t('navigation.pageTitles.villages.gdTree') }}</h1>
-        <span class="cross-link" @click="goToGdTable">{{ t('villages.pages.gdTable.title') }} →</span>
+        <RouterLink class="cross-link" :to="localeTo('/explore/villages/table')">{{ t('villages.pages.gdTable.title') }} →</RouterLink>
       </div>
     </div>
 
@@ -505,6 +505,8 @@ const goToYCVillages = () => {
   router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/yc'));
 };
 
+const localeTo = (path) => buildLocalePath(resolveRouteLocale(route), path);
+
 /**
  * Open map popup with villages data
  */
@@ -573,9 +575,6 @@ onMounted(() => {
   loadInitialCities();
 });
 
-const goToGdTable = () => {
-  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/table'));
-};
 </script>
 
 
@@ -644,6 +643,7 @@ $transition-base: 0.3s;
   font-size: 0.9rem;
   font-weight: 500;
   white-space: nowrap;
+  text-decoration: none;
   cursor: pointer;
   user-select: none;
   transition: opacity 0.2s;

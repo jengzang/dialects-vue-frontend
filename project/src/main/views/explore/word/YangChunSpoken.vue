@@ -2,7 +2,7 @@
   <div style="width: 100%;justify-content: center;align-items:center;display: flex;flex-direction: column">
     <div class="title-row">
       <h1><BarIcon icon="💬" />{{ t('navigation.pageTitles.words.yangChunSpoken') }}</h1>
-      <span class="cross-link" @click="goToYCVillages">{{ t('villages.ycVillages.name') }} →</span>
+      <RouterLink class="cross-link" :to="localeTo('/explore/villages/yc')">{{ t('villages.ycVillages.name') }} →</RouterLink>
     </div>
     <UniversalTable
         db-key="spoken"
@@ -17,11 +17,10 @@ import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue';
 import BarIcon from '@/components/common/BarIcon.vue'
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter, useRoute } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t } = useI18n();
-const router = useRouter();
 const route = useRoute();
 
 const spokenColumns = computed(() => [
@@ -38,9 +37,7 @@ const spokenColumns = computed(() => [
   { key: '待校及说明', label: t('words.ycSpoken.columns.review'), filterable: true, width: 0.8 },
 ]);
 
-const goToYCVillages = () => {
-  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/yc'));
-};
+const localeTo = (path) => buildLocalePath(resolveRouteLocale(route), path);
 </script>
 
 
@@ -69,6 +66,7 @@ const goToYCVillages = () => {
   font-size: 0.9rem;
   font-weight: 500;
   white-space: nowrap;
+  text-decoration: none;
   cursor: pointer;
   user-select: none;
   transition: opacity 0.2s;

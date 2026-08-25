@@ -40,6 +40,8 @@
   gap: var(--portal-entry-card-gap, 12px);
   border-width: var(--portal-entry-card-border-width, 2px);
   text-align: center;
+  color: inherit;
+  text-decoration: none;
 
   &:hover {
     transform: translateY(-4px);

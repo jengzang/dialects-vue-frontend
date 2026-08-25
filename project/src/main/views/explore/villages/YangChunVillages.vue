@@ -3,7 +3,7 @@
     <div class="header-section">
       <div class="title-row">
         <h1 style="margin: 0;font-size: 1.5em;"><BarIcon icon="🏕️" />{{ t('navigation.pageTitles.villages.yangChun') }}</h1>
-        <span class="cross-link" @click="goToYcSpoken">{{ t('words.ycSpoken.name') }} →</span>
+        <RouterLink class="cross-link" :to="localeTo('/explore/yc/words')">{{ t('words.ycSpoken.name') }} →</RouterLink>
       </div>
       <p>{{ t('villages.pages.yangChun.source') }}</p>
     </div>
@@ -35,12 +35,11 @@ import FloatingSearch from '@/components/common/FloatingSearch.vue'
 import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter, useRoute } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import TreeItem from '@/main/components/TableAndTree/TreeItem.vue';
 import villageData from '@/assets/data/yc_villages.json';
 const { t } = useI18n();
-const router = useRouter();
 const route = useRoute();
 
 // 數據標準化邏輯
@@ -152,9 +151,7 @@ const displayData = computed(() => {
   return filterTree(fullTreeData.value, query);
 });
 
-const goToYcSpoken = () => {
-  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/yc/words'));
-};
+const localeTo = (path) => buildLocalePath(resolveRouteLocale(route), path);
 
 </script>
 
@@ -210,6 +207,7 @@ $transition-base: 0.3s;
   font-size: 0.9rem;
   font-weight: 500;
   white-space: nowrap;
+  text-decoration: none;
   cursor: pointer;
   user-select: none;
   transition: opacity 0.2s;

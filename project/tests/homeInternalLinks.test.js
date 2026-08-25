@@ -35,4 +35,38 @@ describe('home and intro internal links', () => {
     expect(aboutPage).toContain('<RouterLink v-if="feature.route" :to="localeTo(feature.route)" class="feature-link feature-subtitle-link">')
     expect(aboutPage).toContain('<RouterLink v-if="item.route" :to="localeTo(item.route)" class="feature-link subfeature-title-link">')
   })
+
+  it('uses RouterLink for public portal cards and static cross-page links', () => {
+    const toolsPage = readSource('src/main/views/menu/portals/ToolsPage.vue')
+    const villagesPage = readSource('src/main/views/menu/portals/VillagesPage.vue')
+    const heroShowcase = readSource('src/main/components/HeroShowcase.vue')
+    const sourcePage = readSource('src/main/views/menu/support/SourcePage.vue')
+    const gdVillagesTable = readSource('src/main/views/explore/villages/gdVillagesTable.vue')
+    const gdVillagesTree = readSource('src/main/views/explore/villages/gdVillagesTree.vue')
+    const yangChunSpoken = readSource('src/main/views/explore/word/YangChunSpoken.vue')
+    const yangChunVillages = readSource('src/main/views/explore/villages/YangChunVillages.vue')
+
+    expect(toolsPage).toContain('<RouterLink class="portal-entry-card glass-card" data-interactive="true" :to="localeTo(\'/explore/tools/check\')">')
+    expect(toolsPage).toContain(':to="localeTo(\'/explore/tools/jyut2ipa\')"')
+    expect(toolsPage).toContain(':to="localeTo(\'/explore/tools/merge\')"')
+    expect(toolsPage).toContain(':to="localeTo(\'/explore/tools/praat\')"')
+    expect(toolsPage).toContain(':to="localeTo(\'/explore/gis\')"')
+    expect(toolsPage).not.toContain('const handleDataCheck')
+
+    expect(villagesPage).toContain('<RouterLink class="portal-entry-card glass-card" data-interactive="true" :to="localeTo(\'/explore/villages/toponyms\')">')
+    expect(villagesPage).toContain(':to="localeTo(\'/explore/villages/table\')"')
+    expect(villagesPage).toContain(':to="localeTo(\'/explore/villages/gd\')"')
+    expect(villagesPage).toContain(':to="localeTo(\'/explore/villages/yc\')"')
+    expect(villagesPage).toContain(':to="localeTo(\'/explore/villages/ml\')"')
+    expect(villagesPage).toContain('@click="handleAllVillages"')
+
+    expect(heroShowcase).toContain('<RouterLink class="showcase-card-cta" :to="localeTo(item.route)" @click.stop>')
+    expect(heroShowcase).toContain('<RouterLink class="showcase-preview-cta" :to="localeTo(activeItem.route)" @click.stop>')
+    expect(sourcePage).toContain('<RouterLink class="privacy-link" :to="localeTo(\'/menu/privacy\')">')
+
+    expect(gdVillagesTable).toContain('<RouterLink class="cross-link" :to="localeTo(\'/explore/villages/gd\')">')
+    expect(gdVillagesTree).toContain('<RouterLink class="cross-link" :to="localeTo(\'/explore/villages/table\')">')
+    expect(yangChunSpoken).toContain('<RouterLink class="cross-link" :to="localeTo(\'/explore/villages/yc\')">')
+    expect(yangChunVillages).toContain('<RouterLink class="cross-link" :to="localeTo(\'/explore/yc/words\')">')
+  })
 })

@@ -38,9 +38,9 @@
         </div>
         <div class="showcase-card-info">
           <h3 class="showcase-card-title"><BarIcon :icon="item.icon" /> {{ t(item.titleKey) }}</h3>
-          <button class="showcase-card-cta" @click.stop="navigateTo(item.route)">
+          <RouterLink class="showcase-card-cta" :to="localeTo(item.route)" @click.stop>
             {{ t(item.actionLabelKey) }} <span class="cta-arrow">→</span>
-          </button>
+          </RouterLink>
         </div>
       </div>
     </div>
@@ -82,9 +82,9 @@
           @touchmove.prevent="onPreviewTouchMove"
           @touchend.prevent="onPreviewTouchEnd"
         />
-        <button class="showcase-preview-cta" @click.stop="navigateTo(activeItem.route)">
+        <RouterLink class="showcase-preview-cta" :to="localeTo(activeItem.route)" @click.stop>
           {{ t(activeItem.actionLabelKey) }}
-        </button>
+        </RouterLink>
       </div>
     </Teleport>
   </div>
@@ -92,13 +92,12 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted, onBeforeUnmount, shallowRef } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import BarIcon from '@/components/common/BarIcon.vue'
 
 const { t } = useI18n()
-const router = useRouter()
 const route = useRoute()
 
 const showcaseItems = [
@@ -203,12 +202,7 @@ function slotClass(i) {
   return 'is-hidden'
 }
 
-function navigateTo(path) {
-  router.push({
-    path: buildLocalePath(resolveRouteLocale(route), path),
-    query: undefined
-  })
-}
+const localeTo = (path) => buildLocalePath(resolveRouteLocale(route), path)
 
 const previewImage = ref(null)
 const previewZoom = ref(1)
@@ -722,6 +716,7 @@ $duration: 450ms;
   color: var(--color-primary);
   font-size: 0.9375rem;
   font-weight: 500;
+  text-decoration: none;
   cursor: pointer;
   transition: gap 0.2s ease;
 
@@ -931,6 +926,7 @@ $duration: 450ms;
   color: #fff;
   font-size: 0.9375rem;
   font-weight: 500;
+  text-decoration: none;
   cursor: pointer;
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);

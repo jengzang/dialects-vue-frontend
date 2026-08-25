@@ -3,7 +3,7 @@
     <h1 class="page-title"><BarIcon icon="🏘️" />{{ $t('navigation.pageTitles.portals.villages') }}</h1>
 
     <div class="villages-grid">
-      <button class="portal-entry-card glass-card" data-interactive="true" @click="handleToponyms">
+      <RouterLink class="portal-entry-card glass-card" data-interactive="true" :to="localeTo('/explore/villages/toponyms')">
         <div class="portal-entry-card__icon"><InlineIcon icon="📍" /></div>
         <div class="portal-entry-card__name">
           {{ $t('villages.toponyms.name') }}
@@ -11,9 +11,9 @@
         <div class="portal-entry-card__desc">
           {{ $t('villages.toponyms.desc') }}
         </div>
-      </button>
+      </RouterLink>
 
-      <button class="portal-entry-card glass-card" data-interactive="true" @click="handleGdVillages">
+      <RouterLink class="portal-entry-card glass-card" data-interactive="true" :to="localeTo('/explore/villages/gd')">
         <div class="portal-entry-card__icon"><InlineIcon icon="🏘️" /></div>
         <div class="portal-entry-card__name">
           {{ $t('villages.gdVillages.name') }}
@@ -21,9 +21,9 @@
         <div class="portal-entry-card__desc">
           {{ $t('villages.gdVillages.desc') }}
         </div>
-      </button>
+      </RouterLink>
 
-      <button class="portal-entry-card glass-card" data-interactive="true" @click="handleVillagesML">
+      <RouterLink class="portal-entry-card glass-card" data-interactive="true" :to="localeTo('/explore/villages/ml')">
         <div class="portal-entry-card__icon"><InlineIcon icon="🤖" /></div>
         <div class="portal-entry-card__name">
           {{ $t('villages.villagesML.name') }}
@@ -31,9 +31,9 @@
         <div class="portal-entry-card__desc">
           {{ $t('villages.villagesML.desc') }}
         </div>
-      </button>
+      </RouterLink>
 
-      <button class="portal-entry-card glass-card" data-interactive="true" @click="handleGdVillagesTable">
+      <RouterLink class="portal-entry-card glass-card" data-interactive="true" :to="localeTo('/explore/villages/table')">
         <div class="portal-entry-card__icon"><InlineIcon icon="📊" /></div>
         <div class="portal-entry-card__name">
           {{ $t('villages.gdVillagesTable.name') }}
@@ -41,9 +41,9 @@
         <div class="portal-entry-card__desc">
           {{ $t('villages.gdVillagesTable.desc') }}
         </div>
-      </button>
+      </RouterLink>
 
-      <button class="portal-entry-card glass-card" data-interactive="true" @click="handleYcVillages">
+      <RouterLink class="portal-entry-card glass-card" data-interactive="true" :to="localeTo('/explore/villages/yc')">
         <div class="portal-entry-card__icon"><InlineIcon icon="🌾" /></div>
         <div class="portal-entry-card__name">
           {{ $t('villages.ycVillages.name') }}
@@ -51,7 +51,7 @@
         <div class="portal-entry-card__desc">
           {{ $t('villages.ycVillages.desc') }}
         </div>
-      </button>
+      </RouterLink>
 
       <button
         v-if="userStore.role === 'admin'"
@@ -80,25 +80,7 @@ import { userStore } from '@/main/store/store.js'
 const router = useRouter()
 const route = useRoute()
 
-const handleToponyms = () => {
-  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/toponyms'))
-};
-
-const handleGdVillagesTable = () => {
-  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/table'))
-};
-
-const handleGdVillages = () => {
-  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/gd'))
-};
-
-const handleYcVillages = () => {
-  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/yc'))
-};
-
-const handleVillagesML = () => {
-  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/ml'))
-};
+const localeTo = (path) => buildLocalePath(resolveRouteLocale(route), path)
 
 const handleAllVillages = () => {
   router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/all'))
