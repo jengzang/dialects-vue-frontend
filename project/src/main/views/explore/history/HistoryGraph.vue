@@ -2,9 +2,13 @@
   <div class="graph-page glass-panel">
     <div class="graph-page__header">
       <h1>网站历史</h1>
-      <p>版本时间线 · 每个版本下为该时期新增功能（标注 ~ 的年份为推断，待核对）</p>
+      <p>版本时间线 · 每个版本下展示摘要、更新类型与用户可感知的主要变化</p>
     </div>
-    <G6Graph :graph-data="historyData" :graph-options="historyOptions" height="640px" />
+    <G6Graph
+      :graph-data="historyData"
+      :graph-options="historyOptions"
+      height="640px"
+    />
   </div>
 </template>
 
