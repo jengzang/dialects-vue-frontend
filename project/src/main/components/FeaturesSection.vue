@@ -27,16 +27,16 @@
     <div v-if="!query && recentItems.length" class="features-recent">
       <span class="features-recent__label">{{ t('home.features.recent') }}</span>
       <div class="features-recent__list">
-        <button
+        <RouterLink
           v-for="item in recentItems"
           :key="item.route"
-          type="button"
+          :to="localeTo(item.route)"
           class="recent-pill"
-          @click="go(item)"
+          @click="recordRecent(item.route)"
         >
           <InlineIcon :icon="item.icon" class="recent-pill__icon" />
           <span class="recent-pill__title">{{ item.title }}</span>
-        </button>
+        </RouterLink>
       </div>
       <button
         type="button"
@@ -56,19 +56,19 @@
       </div>
 
       <div class="feature-group__grid">
-        <button
+        <RouterLink
           v-for="item in group.items"
           :key="item.route"
-          type="button"
+          :to="localeTo(item.route)"
           class="feature-tile"
-          @click="go(item)"
+          @click="recordRecent(item.route)"
         >
           <span class="feature-tile__icon"><InlineIcon :icon="item.icon" /></span>
           <span class="feature-tile__text">
             <span class="feature-tile__title">{{ item.title }}</span>
             <span class="feature-tile__desc">{{ item.desc }}</span>
           </span>
-        </button>
+        </RouterLink>
       </div>
     </div>
 
@@ -80,13 +80,12 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t } = useI18n()
-const router = useRouter()
 const route = useRoute()
 
 const groups = [
@@ -289,21 +288,14 @@ function clearRecents() {
   }
 }
 
-function navigateTo(path) {
-  const [pathname, queryString = ''] = path.split('?')
-  router.push({
-    path: buildLocalePath(resolveRouteLocale(route), pathname),
-    query: queryString ? Object.fromEntries(new URLSearchParams(queryString).entries()) : undefined,
-  })
-}
-
-function go(item) {
-  recordRecent(item.route)
-  navigateTo(item.route)
+function localeTo(path) {
+  return buildLocalePath(resolveRouteLocale(route), path)
 }
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $primary: var(--color-primary);
 $text-primary: var(--text-primary);
 
@@ -443,6 +435,7 @@ $text-primary: var(--text-primary);
   border-radius: var(--radius-full);
   color: $text-primary;
   font-size: 0.8125rem;
+  text-decoration: none;
   cursor: pointer;
   transition: all 0.2s ease;
 
@@ -527,6 +520,7 @@ $text-primary: var(--text-primary);
   border: 1px solid rgba(var(--color-primary-rgb), 0.15);
   border-radius: var(--radius-md);
   color: inherit;
+  text-decoration: none;
   cursor: pointer;
   transition: all 0.2s ease;
 

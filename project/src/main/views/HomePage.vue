@@ -15,10 +15,10 @@
         <p class="hero-subtitle">{{ $t('home.hero.subtitle') }}</p>
         <div class="hero-bottom-row">
           <div class="hero-actions">
-            <button class="btn-primary" @click="navigateTo('/menu/query/zhonggu')">
+            <RouterLink class="btn-primary" :to="localeTo('/menu/query/zhonggu')">
               <span class="btn-icon"><InlineIcon icon="🚀" /></span>
               <span class="btn-text">{{ $t('home.hero.startExploring') }}</span>
-            </button>
+            </RouterLink>
             <button class="btn-secondary" @click="scrollToFeatures">
               <span class="btn-icon"><InlineIcon icon="📖" /></span>
               <span class="btn-text">{{ $t('home.hero.featuresIntro') }}</span>
@@ -55,7 +55,7 @@
               :ref="el => setFeaturedRef(el, i)"
               class="featured-item"
             >
-              <a class="app-card" @click="navigateTo(item.route)">
+              <RouterLink class="app-card" :to="localeTo(item.route)">
                 <span class="app-card__mist"></span>
                 <span class="app-card__vignette"></span>
 
@@ -75,7 +75,7 @@
                   </div>
                   <span class="app-card__cta">{{ $t('home.featured.discover') }}</span>
                 </div>
-              </a>
+              </RouterLink>
             </div>
           </div>
 
@@ -207,9 +207,9 @@
           </div>
         </div>
         <div class="login-actions">
-          <button class="login-btn primary" @click="navigateTo('/auth')">
+          <RouterLink class="login-btn primary" :to="localeTo('/auth')">
             {{ $t('home.login.loginNow') }}
-          </button>
+          </RouterLink>
           <button class="login-btn secondary" @click="showBenefitsPopup = true">
             {{ $t('home.login.viewDetails') }}
           </button>
@@ -259,13 +259,13 @@
     <footer class="footer">
       <div class="footer-content">
         <div class="footer-links">
-          <a @click="navigateTo('/menu/about/intro')" class="footer-link">{{ $t('home.footer.links.about') }}</a>
+          <RouterLink :to="localeTo('/menu/about/intro')" class="footer-link">{{ $t('home.footer.links.about') }}</RouterLink>
           <span class="footer-divider">·</span>
-          <a @click="navigateTo('/menu/source')" class="footer-link">{{ $t('home.footer.links.source') }}</a>
+          <RouterLink :to="localeTo('/menu/source')" class="footer-link">{{ $t('home.footer.links.source') }}</RouterLink>
           <span class="footer-divider">·</span>
-          <a @click="navigateTo('/menu/privacy')" class="footer-link">{{ $t('home.footer.links.privacy') }}</a>
+          <RouterLink :to="localeTo('/menu/privacy')" class="footer-link">{{ $t('home.footer.links.privacy') }}</RouterLink>
           <span class="footer-divider">·</span>
-          <a @click="navigateTo('/menu/settings')" class="footer-link">{{ $t('home.footer.links.setting') }}</a>
+          <RouterLink :to="localeTo('/menu/settings')" class="footer-link">{{ $t('home.footer.links.setting') }}</RouterLink>
           <span class="footer-divider">·</span>
           <a href="https://dialects.yzup.top/detail/" target="_blank" class="footer-link">{{ $t('home.footer.links.oldSite') }}</a>
           <span class="footer-divider">·</span>
@@ -452,6 +452,10 @@ function navigateTo(path) {
   })
 }
 
+function localeTo(path) {
+  return buildLocalePath(resolveRouteLocale(route), path)
+}
+
 // 特色工具 carousel 数据（应用/工具入口）
 const featuredKeys = [
   { key: 'zhonggu', icon: '🔍', route: '/menu/query/zhonggu' },
@@ -630,6 +634,8 @@ onBeforeUnmount(() => {
 
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
 $primary-deep: var(--color-primary-hover);
@@ -804,6 +810,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   border-radius: var(--radius-md);
   font-size: 1.1rem;
   font-weight: 600;
+  text-decoration: none;
   cursor: pointer;
   transition: all 0.3s $ease-apple;
 }
@@ -1597,12 +1604,16 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   }
 
   &-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 0.875rem 1.75rem;
     border: none;
     border-radius: var(--radius-md);
     white-space: nowrap;
     font-size: 0.9375rem;
     font-weight: 600;
+    text-decoration: none;
     cursor: pointer;
     transition: all 0.3s $ease-apple;
 

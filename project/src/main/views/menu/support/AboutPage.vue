@@ -13,8 +13,18 @@
           <p style=" text-align: left;">{{ $t('about.intro.description') }}</p>
           <ul class="customlist">
             <li v-for="(feature, idx) in featureList" :key="idx" class="feature-item">
-              <h3 class="feature-heading">{{ feature.heading }}</h3>
-              <p class="feature-subtitle">{{ feature.subtitle }}</p>
+              <h3 class="feature-heading">
+                <RouterLink v-if="feature.route" :to="localeTo(feature.route)" class="feature-link feature-heading-link">
+                  {{ feature.heading }}
+                </RouterLink>
+                <span v-else>{{ feature.heading }}</span>
+              </h3>
+              <p class="feature-subtitle">
+                <RouterLink v-if="feature.route" :to="localeTo(feature.route)" class="feature-link feature-subtitle-link">
+                  {{ feature.subtitle }}
+                </RouterLink>
+                <span v-else>{{ feature.subtitle }}</span>
+              </p>
               <p class="feature-intro">{{ feature.intro }}</p>
               <ul v-if="feature.items.length" class="subfeature-list">
                 <li
@@ -22,7 +32,12 @@
                   :key="i"
                   class="subfeature-item"
                 >
-                  <h4 class="subfeature-title">{{ item.title }}</h4>
+                  <h4 class="subfeature-title">
+                    <RouterLink v-if="item.route" :to="localeTo(item.route)" class="feature-link subfeature-title-link">
+                      {{ item.title }}
+                    </RouterLink>
+                    <span v-else>{{ item.title }}</span>
+                  </h4>
                   <p class="subfeature-body">{{ item.body }}</p>
                 </li>
               </ul>
@@ -249,20 +264,72 @@ const showQRCodes = ref(false)
 const zhihuFallback = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="4" fill="#0066FF"/><text x="12" y="17" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="sans-serif">知</text></svg>')
 const githubFallback = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#24292f"/><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.78.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12c0-5.52-4.48-10-10-10z" fill="white"/></svg>')
 
+const featureRouteMap = {
+  feature1: '/menu/query/zhonggu',
+  feature2: '/menu/map/view',
+  feature3: '/menu/compare/zhonggu',
+  feature4: '/menu/pho/matrix',
+  feature5: '/explore/char-class?tab=zhonggu',
+  feature6: '/explore/tools/check',
+  feature7: '/menu/yubao?tab=vocabulary',
+  feature8: '/menu/villages',
+  feature9: '/explore/tools/praat',
+  feature10: '/menu/cluster'
+}
+
+const subfeatureRouteMap = {
+  feature1: ['/menu/query/zhonggu', '/menu/query/yinwei', '/menu/query/char', '/menu/query/tone'],
+  feature2: ['/menu/map/view', '/menu/map/divide', '/menu/map/custom', '/explore/gis'],
+  feature3: ['/menu/compare/char', '/menu/compare/zhonggu', '/menu/compare/tone', '/menu/compare/phonetic'],
+  feature4: ['/menu/pho/matrix', '/menu/pho/custom', '/menu/pho/count', '/menu/pho/evolution'],
+  feature5: [
+    '/explore/char-class?tab=zhonggu',
+    '/explore/char-class?tab=shanggu',
+    '/explore/char-class?tab=jingu',
+    '/explore/char-class?tab=yueyun'
+  ],
+  feature6: ['/explore/tools/check', '/explore/tools/jyut2ipa', '/explore/tools/merge', '/explore/tools/derive'],
+  feature7: ['/menu/yubao?tab=vocabulary', '/menu/yubao?tab=grammar', '/explore/yc/words'],
+  feature8: [
+    '/explore/villages/gd',
+    '/explore/villages/toponyms',
+    '/explore/villages/table',
+    '/explore/yc/villages',
+    '/explore/villages/ml'
+  ],
+  feature9: [
+    '/explore/tools/praat',
+    '/explore/tools/praat',
+    '/explore/tools/praat',
+    '/explore/tools/praat',
+    '/explore/tools/praat',
+    '/explore/tools/praat'
+  ],
+  feature10: ['/menu/cluster']
+}
+
 const featureList = computed(() => {
   const messages = i18n.global.messages.value[locale.value]
-  return Array.from({ length: 9 }, (_, i) => {
-    const n = i + 1
-    const f = messages.about.intro.features[`feature${n}`]
+  const featureKeys = Object.keys(messages.about.intro.features)
+  return featureKeys.map((key) => {
+    const f = messages.about.intro.features[key]
     return {
       heading: f.heading,
       subtitle: f.subtitle,
       intro: f.intro,
-      items: f.items || [],
+      route: featureRouteMap[key] || '',
+      items: (f.items || []).map((item, index) => ({
+        ...item,
+        route: subfeatureRouteMap[key]?.[index] || ''
+      })),
       zhihuLink: f.zhihuLink || '',
     }
   })
 })
+
+function localeTo(path) {
+  return buildLocalePath(resolveRouteLocale(route), path)
+}
 
 const pathSectionToTab = {
   intro: 'intro',
@@ -553,6 +620,15 @@ em {
   color: $primary;
   font-size: 14px;
   font-weight: 500;
+}
+
+.feature-link {
+  color: inherit;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .feature-intro {
