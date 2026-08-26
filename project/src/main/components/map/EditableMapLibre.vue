@@ -14,6 +14,24 @@
         :style="featureBoxOverlayStyle"
       />
     </div>
+    <div
+      v-if="hitCandidateMenu"
+      class="editable-map-hit-candidates glass-panel"
+      :style="hitCandidateMenu.style"
+      data-testid="feature-hit-candidate-menu"
+    >
+      <button
+        v-for="candidate in hitCandidateMenu.candidates"
+        :key="candidate.featureId"
+        type="button"
+        class="glass-button small editable-map-hit-candidate"
+        data-testid="feature-hit-candidate-button"
+        @click.stop="selectHitCandidate(candidate.featureId)"
+      >
+        <span class="editable-map-hit-candidate__type">{{ candidate.geometryType }}</span>
+        <span class="editable-map-hit-candidate__name">{{ candidate.featureName }}</span>
+      </button>
+    </div>
   </div>
 </template>
 
@@ -348,6 +366,7 @@ const isFullscreen = ref(false)
 const isFeatureBoxDragging = ref(false)
 const featureBoxStartPoint = ref(null)
 const featureBoxEndPoint = ref(null)
+const hitCandidateMenu = ref(null)
 const defaultFeatureBoxSelectionMode = 'replace'
 const featureBoxSelectionMode = ref(defaultFeatureBoxSelectionMode)
 let previousPreviewSourceIds = []
@@ -359,6 +378,11 @@ let suppressedProgrammaticFeatureSelectionIds = null
 let isDeletingSelected = false
 let featureBoxDragPanWasEnabled = true
 let lastEditTargetHoverKey = ''
+
+const clearHitCandidateMenu = () => {
+  hitCandidateMenu.value = null
+}
+
 const sanitizeLayerFilename = (layerName) => {
   return String(layerName || 'map-draw-layer')
     .trim()
@@ -2085,6 +2109,7 @@ const restoreDrawFeatureCollectionFromModel = () => {
 
 const resetDrawInteractionState = () => {
   suppressedProgrammaticFeatureSelectionIds = null
+  clearHitCandidateMenu()
   clearSnapPreview()
   clearEditTargetHover()
   clearPendingPolygonSplitSketch()
@@ -2129,6 +2154,7 @@ const syncFeaturesFromDraw = (options = {}) => {
 
 const setDrawMode = (mode) => {
   suppressedProgrammaticFeatureSelectionIds = null
+  clearHitCandidateMenu()
   clearSnapPreview()
   clearEditTargetHover()
   if (mode !== 'draw_line_string') {
@@ -2151,6 +2177,7 @@ const setDrawMode = (mode) => {
 
 const selectFeature = (featureId, options = {}) => {
   suppressedProgrammaticFeatureSelectionIds = null
+  clearHitCandidateMenu()
   clearSnapPreview()
   clearEditTargetHover()
   clearPendingPolygonSplitSketch()
@@ -2200,6 +2227,7 @@ const selectFeature = (featureId, options = {}) => {
 }
 
 const selectFeatures = (featureIds = []) => {
+  clearHitCandidateMenu()
   clearSnapPreview()
   clearEditTargetHover()
   clearPendingPolygonSplitSketch()
@@ -2256,6 +2284,95 @@ const isPointInScreenBox = (point, box) => {
 }
 
 const getDrawFeatureId = (feature) => String(feature?.id ?? feature?.properties?.id ?? '')
+
+const getHitCandidateLayerIds = () => {
+  if (!map.value) return []
+  return featureBoxSelectableLayerIds.filter((layerId) => map.value.getLayer?.(layerId))
+}
+
+const getHitCandidateGeometryType = (feature) => String(feature?.geometry?.type || 'Feature')
+
+const buildHitCandidateMenuStyle = (event) => {
+  const point = normalizeFeatureBoxPoint(event?.point ?? event)
+  const rect = map.value?.getCanvas?.()?.getBoundingClientRect?.()
+  const width = Number(mapContainer.value?.clientWidth || rect?.width || 0)
+  const height = Number(mapContainer.value?.clientHeight || rect?.height || 0)
+  const horizontalKey = width > 0 && point.x > width / 2 ? 'right' : 'left'
+  const verticalKey = height > 0 && point.y > height / 2 ? 'bottom' : 'top'
+  return {
+    [horizontalKey]: `${horizontalKey === 'right' ? Math.max(width - point.x + 8, 8) : point.x + 8}px`,
+    [verticalKey]: `${verticalKey === 'bottom' ? Math.max(height - point.y + 8, 8) : point.y + 8}px`,
+  }
+}
+
+const buildHitCandidatesFromClick = (event) => {
+  const layerIds = getHitCandidateLayerIds()
+  if (!map.value || !draw.value || layerIds.length === 0) return []
+
+  let renderedFeatures = []
+  try {
+    renderedFeatures = map.value.queryRenderedFeatures(
+      event?.point ?? normalizeFeatureBoxPoint(event),
+      { layers: layerIds }
+    )
+  } catch {
+    return []
+  }
+
+  const seenFeatureIds = new Set()
+  return renderedFeatures.reduce((candidates, renderedFeature) => {
+    const featureId = getDrawFeatureId(renderedFeature)
+    if (!featureId || seenFeatureIds.has(featureId) || !isDrawFeatureSelectableById(featureId)) {
+      return candidates
+    }
+
+    seenFeatureIds.add(featureId)
+    const drawFeature = draw.value?.get?.(featureId)
+    const feature = drawFeature ?? renderedFeature
+    candidates.push({
+      featureId,
+      featureName: getSnapFeatureName(feature) || featureId,
+      geometryType: getHitCandidateGeometryType(feature),
+    })
+    return candidates
+  }, [])
+}
+
+const selectHitCandidate = (featureId) => {
+  clearHitCandidateMenu()
+  selectFeature(featureId, { directEdit: false })
+}
+
+const handleMapClick = (event = {}) => {
+  if (event?.lngLat) {
+    emit('map-click', { lng: event.lngLat.lng, lat: event.lngLat.lat })
+  }
+
+  if (
+    props.featureBoxSelectEnabled
+    || draw.value?.getMode?.() !== 'simple_select'
+    || !canInteractWithActiveDrawLayer()
+  ) {
+    clearHitCandidateMenu()
+    return
+  }
+
+  const candidates = buildHitCandidatesFromClick(event)
+  if (candidates.length === 0) {
+    clearHitCandidateMenu()
+    return
+  }
+
+  if (candidates.length === 1) {
+    selectFeature(candidates[0].featureId, { directEdit: false })
+    return
+  }
+
+  hitCandidateMenu.value = {
+    candidates,
+    style: buildHitCandidateMenuStyle(event),
+  }
+}
 
 const resolveEditTargetType = (feature) => {
   const layerId = String(feature?.layer?.id || '')
@@ -3260,9 +3377,7 @@ const initializeMap = async () => {
   map.value.addControl(new maplibregl.NavigationControl(), 'top-left')
   map.value.addControl(new maplibregl.FullscreenControl({ container: mapContainer.value }), 'top-left')
   map.value.on('load', initializeDraw)
-  map.value.on('click', (e) => {
-    emit('map-click', { lng: e.lngLat.lng, lat: e.lngLat.lat })
-  })
+  map.value.on('click', handleMapClick)
   map.value.on('style.load', restoreLayersAfterStyleLoad)
   map.value.on('styledata', () => {
     syncReadonlyLayers()
@@ -3577,6 +3692,8 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 .editable-map-shell {
   position: relative;
   width: 100%;
@@ -3610,6 +3727,36 @@ defineExpose({
   border: 1px solid rgba(37, 99, 235, 0.85);
   background: rgba(59, 130, 246, 0.16);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.72) inset;
+}
+
+.editable-map-hit-candidates {
+  @include flex-col;
+  position: absolute;
+  z-index: 5;
+  gap: 4px;
+  min-width: 160px;
+  max-width: min(260px, calc(100% - 24px));
+  padding: 6px;
+  pointer-events: auto;
+}
+
+.editable-map-hit-candidate {
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 32px;
+  padding: 6px 8px;
+  text-align: left;
+}
+
+.editable-map-hit-candidate__type {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.editable-map-hit-candidate__name {
+  @include text-truncate;
+  min-width: 0;
 }
 
 :deep(.draw-control-container) {

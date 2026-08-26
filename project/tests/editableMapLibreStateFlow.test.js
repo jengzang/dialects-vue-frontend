@@ -259,6 +259,7 @@ function mountEditableMapLibre(modelValue, options = {}) {
         @geometry-edit-feedback="events.push(['geometry-edit-feedback', $event])"
         @snap-state-change="events.push(['snap-state-change', $event])"
         @edit-target-hover="events.push(['edit-target-hover', $event])"
+        @map-click="events.push(['map-click', $event])"
       />
     `,
   })
@@ -624,6 +625,145 @@ describe('EditableMapLibre state flow', () => {
 
     expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: ['visible-1'] })
     expect(wrapper.events).toContainEqual(['mode-change', 'simple_select'])
+
+    wrapper.unmount()
+  })
+
+  it('opens a de-duplicated hit-candidate menu for overlapping selectable features', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { name: '面 A', visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'line-1',
+        type: 'Feature',
+        properties: { name: '线 A', visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [] },
+      }],
+    }, {
+      activeLayer: {
+        id: 'active-layer',
+        name: '绘制图层',
+        visible: true,
+        locked: false,
+      },
+    })
+    await nextTick()
+    ;['gl-draw-polygon-fill', 'gl-draw-polygon-stroke', 'gl-draw-line'].forEach((layerId) => {
+      wrapper.map.addLayer({ id: layerId, type: 'line' })
+    })
+    wrapper.map.queryRenderedFeatures.mockReturnValueOnce([
+      { id: 'polygon-1', layer: { id: 'gl-draw-polygon-fill' }, properties: { id: 'polygon-1' } },
+      { id: 'polygon-1', layer: { id: 'gl-draw-polygon-stroke' }, properties: { id: 'polygon-1' } },
+      { id: 'line-1', layer: { id: 'gl-draw-line' }, properties: { id: 'line-1' } },
+    ])
+    wrapper.events.length = 0
+
+    wrapper.map.emit('click', {
+      point: { x: 24, y: 32 },
+      lngLat: { lng: 113, lat: 23 },
+    })
+    await nextTick()
+
+    const menu = wrapper.host.querySelector('[data-testid="feature-hit-candidate-menu"]')
+    const buttons = [...wrapper.host.querySelectorAll('[data-testid="feature-hit-candidate-button"]')]
+    expect(menu).toBeTruthy()
+    expect(buttons).toHaveLength(2)
+    expect(buttons.map((button) => button.textContent)).toEqual([
+      expect.stringContaining('面 A'),
+      expect.stringContaining('线 A'),
+    ])
+    expect(wrapper.draw.changeMode).not.toHaveBeenCalledWith('simple_select', { featureIds: ['polygon-1'] })
+    expect(wrapper.events).toContainEqual(['map-click', { lng: 113, lat: 23 }])
+
+    buttons[1].click()
+    await nextTick()
+
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: ['line-1'] })
+    expect(wrapper.events).toContainEqual(['feature-select', 'line-1'])
+    expect(wrapper.host.querySelector('[data-testid="feature-hit-candidate-menu"]')).toBeFalsy()
+
+    wrapper.unmount()
+  })
+
+  it('selects the only visible unlocked hit candidate without opening the candidate menu', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'visible-1',
+        type: 'Feature',
+        properties: { name: '可选', visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'hidden-1',
+        type: 'Feature',
+        properties: { name: '隐藏', visible: false, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'locked-1',
+        type: 'Feature',
+        properties: { name: '锁定', visible: true, locked: true },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }],
+    })
+    await nextTick()
+    wrapper.map.addLayer({ id: 'gl-draw-polygon-fill', type: 'fill' })
+    wrapper.map.queryRenderedFeatures.mockReturnValueOnce([
+      { id: 'hidden-1', layer: { id: 'gl-draw-polygon-fill' }, properties: { id: 'hidden-1' } },
+      { id: 'locked-1', layer: { id: 'gl-draw-polygon-fill' }, properties: { id: 'locked-1' } },
+      { id: 'visible-1', layer: { id: 'gl-draw-polygon-fill' }, properties: { id: 'visible-1' } },
+    ])
+    wrapper.events.length = 0
+
+    wrapper.map.emit('click', {
+      point: { x: 12, y: 16 },
+      lngLat: { lng: 114, lat: 24 },
+    })
+    await nextTick()
+
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: ['visible-1'] })
+    expect(wrapper.events).toContainEqual(['feature-select', 'visible-1'])
+    expect(wrapper.host.querySelector('[data-testid="feature-hit-candidate-menu"]')).toBeFalsy()
+
+    wrapper.unmount()
+  })
+
+  it('ignores hit candidates while the active layer is hidden', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'visible-1',
+        type: 'Feature',
+        properties: { name: '可选', visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }],
+    }, {
+      activeLayer: {
+        id: 'active-layer',
+        name: '绘制图层',
+        visible: false,
+        locked: false,
+      },
+    })
+    await nextTick()
+    wrapper.map.addLayer({ id: 'gl-draw-polygon-fill', type: 'fill' })
+    wrapper.map.queryRenderedFeatures.mockClear()
+    wrapper.draw.changeMode.mockClear()
+    wrapper.events.length = 0
+
+    wrapper.map.emit('click', {
+      point: { x: 12, y: 16 },
+      lngLat: { lng: 114, lat: 24 },
+    })
+    await nextTick()
+
+    expect(wrapper.map.queryRenderedFeatures).not.toHaveBeenCalled()
+    expect(wrapper.draw.changeMode).not.toHaveBeenCalled()
+    expect(wrapper.events).toEqual([['map-click', { lng: 114, lat: 24 }]])
+    expect(wrapper.host.querySelector('[data-testid="feature-hit-candidate-menu"]')).toBeFalsy()
 
     wrapper.unmount()
   })
