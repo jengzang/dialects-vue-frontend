@@ -49,10 +49,10 @@
     <div v-for="group in visibleGroups" :key="group.id" class="feature-group">
       <div class="feature-group__header">
         <span class="feature-group__icon"><InlineIcon :icon="group.icon" /></span>
-        <RouterLink class="feature-group__heading-link" :to="localeTo(group.route)">
+        <div class="feature-group__text">
           <h3 class="feature-group__title">{{ group.title }}</h3>
           <p v-if="group.desc" class="feature-group__desc">{{ group.desc }}</p>
-        </RouterLink>
+        </div>
       </div>
 
       <div class="feature-group__grid">
@@ -92,7 +92,6 @@ const groups = [
   {
     id: 'query',
     icon: '🔍',
-    route: '/menu/query/zhonggu',
     titleKey: 'home.features.query.title',
     descKey: 'home.features.query.desc',
     items: [
@@ -105,7 +104,6 @@ const groups = [
   {
     id: 'compare',
     icon: '🔀',
-    route: '/menu/compare/zhonggu',
     titleKey: 'home.features.compare.title',
     descKey: 'home.features.compare.desc',
     items: [
@@ -118,7 +116,6 @@ const groups = [
   {
     id: 'map',
     icon: '🗺️',
-    route: '/menu/map/view',
     titleKey: 'home.features.map.title',
     descKey: 'home.features.map.desc',
     items: [
@@ -131,7 +128,6 @@ const groups = [
   {
     id: 'phonology',
     icon: '🧬',
-    route: '/menu/pho/matrix',
     titleKey: 'home.features.phonology.title',
     descKey: 'home.features.phonology.desc',
     items: [
@@ -144,7 +140,6 @@ const groups = [
   {
     id: 'charClass',
     icon: '📜',
-    route: '/explore/char-class?tab=zhonggu',
     titleKey: 'home.features.charClass.title',
     descKey: 'home.features.charClass.desc',
     items: [
@@ -157,7 +152,6 @@ const groups = [
   {
     id: 'words',
     icon: '📖',
-    route: '/menu/words',
     titleKey: 'home.features.words.title',
     descKey: 'home.features.words.desc',
     items: [
@@ -170,7 +164,6 @@ const groups = [
   {
     id: 'villages',
     icon: '🏘️',
-    route: '/menu/villages',
     titleKey: 'home.features.villages.title',
     descKey: 'home.features.villages.desc',
     items: [
@@ -183,7 +176,6 @@ const groups = [
   {
     id: 'tools',
     icon: '🧰',
-    route: '/menu/tools',
     titleKey: 'home.features.tools.title',
     descKey: 'home.features.tools.desc',
     items: [
@@ -195,7 +187,6 @@ const groups = [
   {
     id: 'praat',
     icon: '🎙️',
-    route: '/explore/tools/praat',
     titleKey: 'home.features.praat.title',
     descKey: null,
     items: [
@@ -205,7 +196,6 @@ const groups = [
   {
     id: 'about',
     icon: '🌐',
-    route: '/menu/about/intro',
     titleKey: 'home.features.about.title',
     descKey: 'home.features.about.desc',
     items: [
@@ -233,7 +223,6 @@ const resolvedGroups = computed(() =>
   groups.map((g) => ({
     id: g.id,
     icon: g.icon,
-    route: g.route,
     title: t(g.titleKey),
     desc: g.descKey ? t(g.descKey) : '',
     items: g.items.map((item) => ({ ...item, ...resolveItem(item) })),
@@ -494,11 +483,8 @@ $text-primary: var(--text-primary);
     font-size: 1.25rem;
   }
 
-  &__heading-link {
-    display: block;
+  &__text {
     min-width: 0;
-    color: inherit;
-    text-decoration: none;
   }
 
   &__title {
