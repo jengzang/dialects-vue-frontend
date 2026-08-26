@@ -28,6 +28,7 @@
         class="glass-button small editable-map-hit-candidate"
         data-testid="feature-hit-candidate-button"
         @click.stop="selectHitCandidate(candidate.featureId)"
+        @keydown="handleHitCandidateButtonKeydown"
       >
         <span class="editable-map-hit-candidate__type">{{ candidate.geometryType }}</span>
         <span class="editable-map-hit-candidate__name">{{ candidate.featureName }}</span>
@@ -391,6 +392,25 @@ const focusFirstHitCandidateButton = () => {
       ?.querySelector?.('[data-testid="feature-hit-candidate-button"]')
       ?.focus?.()
   })
+}
+
+const getHitCandidateButtons = () => [
+  ...(hitCandidateMenuElement.value?.querySelectorAll?.('[data-testid="feature-hit-candidate-button"]') ?? []),
+]
+
+const focusAdjacentHitCandidate = (direction) => {
+  const buttons = getHitCandidateButtons()
+  if (buttons.length === 0) return
+  const currentIndex = buttons.indexOf(document.activeElement)
+  const nextIndex = (Math.max(currentIndex, 0) + direction + buttons.length) % buttons.length
+  buttons[nextIndex]?.focus?.()
+}
+
+const handleHitCandidateButtonKeydown = (event) => {
+  if (event?.key !== 'ArrowDown' && event?.key !== 'ArrowUp') return
+  event.preventDefault?.()
+  event.stopPropagation?.()
+  focusAdjacentHitCandidate(event.key === 'ArrowDown' ? 1 : -1)
 }
 
 const sanitizeLayerFilename = (layerName) => {
