@@ -2538,6 +2538,53 @@ describe('EditableMapLibre state flow', () => {
     wrapper.unmount()
   })
 
+  it('lets the page own box-selection merging instead of replacing map selection early', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [[[20, 20], [30, 20], [30, 30], [20, 20]]] },
+      }, {
+        id: 'polygon-2',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [[[60, 60], [70, 60], [70, 70], [60, 60]]] },
+      }],
+    }, { featureBoxSelectEnabled: true })
+    await nextTick()
+    wrapper.exposed.selectFeatures(['polygon-2'])
+    wrapper.draw.changeMode.mockClear()
+    wrapper.events.length = 0
+
+    const captureLayer = wrapper.host.querySelector('.editable-map-box-select-capture')
+    captureLayer.dispatchEvent(new MouseEvent('mousedown', {
+      bubbles: true,
+      cancelable: true,
+      button: 0,
+      shiftKey: true,
+      clientX: 10,
+      clientY: 10,
+    }))
+    document.dispatchEvent(new MouseEvent('mouseup', {
+      bubbles: true,
+      cancelable: true,
+      clientX: 40,
+      clientY: 40,
+    }))
+    await nextTick()
+
+    expect(wrapper.events).toContainEqual([
+      'feature-box-select',
+      { featureIds: ['polygon-1'], selectionMode: 'add' },
+    ])
+    expect(wrapper.draw.changeMode).not.toHaveBeenCalled()
+    expect(wrapper.events.some(([eventName]) => eventName === 'feature-select')).toBe(false)
+
+    wrapper.unmount()
+  })
+
   it('refreshes readonly overlays when the active layer changes', async () => {
     const firstLayer = {
       id: 'first-layer',

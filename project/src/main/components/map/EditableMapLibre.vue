@@ -2455,7 +2455,6 @@ const finishFeatureBoxSelection = (point) => {
   const selectedFeatureIds = buildFeatureIdsInScreenBox(box)
   const selectionMode = featureBoxSelectionMode.value
   resetFeatureBoxSelection()
-  selectFeatures(selectedFeatureIds)
   emit('feature-box-select', {
     featureIds: selectedFeatureIds,
     selectionMode,
