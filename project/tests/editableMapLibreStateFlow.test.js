@@ -731,6 +731,52 @@ describe('EditableMapLibre state flow', () => {
     wrapper.unmount()
   })
 
+  it('closes the hit-candidate menu with Escape without selecting a feature', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { name: '面 A', visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'line-1',
+        type: 'Feature',
+        properties: { name: '线 A', visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [] },
+      }],
+    })
+    await nextTick()
+    ;['gl-draw-polygon-fill', 'gl-draw-line'].forEach((layerId) => {
+      wrapper.map.addLayer({ id: layerId, type: 'line' })
+    })
+    wrapper.map.queryRenderedFeatures.mockReturnValueOnce([
+      { id: 'polygon-1', layer: { id: 'gl-draw-polygon-fill' }, properties: { id: 'polygon-1' } },
+      { id: 'line-1', layer: { id: 'gl-draw-line' }, properties: { id: 'line-1' } },
+    ])
+
+    wrapper.map.emit('click', {
+      point: { x: 24, y: 32 },
+      lngLat: { lng: 113, lat: 23 },
+    })
+    await nextTick()
+    expect(wrapper.host.querySelector('[data-testid="feature-hit-candidate-menu"]')).toBeTruthy()
+
+    wrapper.events.length = 0
+    const escapeEvent = new KeyboardEvent('keydown', {
+      key: 'Escape',
+      cancelable: true,
+    })
+    document.dispatchEvent(escapeEvent)
+    await nextTick()
+
+    expect(escapeEvent.defaultPrevented).toBe(true)
+    expect(wrapper.events.some(([eventName]) => eventName === 'feature-select')).toBe(false)
+    expect(wrapper.host.querySelector('[data-testid="feature-hit-candidate-menu"]')).toBeFalsy()
+
+    wrapper.unmount()
+  })
+
   it('selects the only visible unlocked hit candidate without opening the candidate menu', async () => {
     const wrapper = mountEditableMapLibre({
       type: 'FeatureCollection',

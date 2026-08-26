@@ -2083,6 +2083,14 @@ const clearDrawSelectionForHitCandidateMenu = () => {
   syncShapeEditState()
 }
 
+const handleHitCandidateKeydown = (event) => {
+  if (event?.key !== 'Escape' || !hitCandidateMenu.value) return
+  event.preventDefault?.()
+  event.stopPropagation?.()
+  clearHitCandidateMenu()
+  clearDrawSelectionForHitCandidateMenu()
+}
+
 const syncSelectedFeature = () => {
   if (hitCandidateMenu.value) {
     clearDrawSelectionForHitCandidateMenu()
@@ -3659,11 +3667,13 @@ watch(currentStyleKey, (nextValue) => {
 
 onMounted(() => {
   document.addEventListener('fullscreenchange', syncFullscreenState)
+  document.addEventListener('keydown', handleHitCandidateKeydown)
   initializeMap()
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('fullscreenchange', syncFullscreenState)
+  document.removeEventListener('keydown', handleHitCandidateKeydown)
   resetFeatureBoxSelection()
   unbindPreviewHover()
   if (map.value) {
