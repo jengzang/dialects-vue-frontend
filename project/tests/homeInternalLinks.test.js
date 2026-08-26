@@ -25,6 +25,20 @@ describe('home and intro internal links', () => {
     expect(featuresSection).toContain('@click="recordRecent(item.route)"')
   })
 
+  it('links homepage feature group titles and subtitles to their sections', () => {
+    const featuresSection = readSource('src/main/components/FeaturesSection.vue')
+
+    expect(featuresSection).toContain('<RouterLink class="feature-group__heading-link" :to="localeTo(group.route)">')
+    expect(featuresSection).toContain('<h3 class="feature-group__title">{{ group.title }}</h3>')
+    expect(featuresSection).toContain('<p v-if="group.desc" class="feature-group__desc">{{ group.desc }}</p>')
+    expect(featuresSection).toContain("route: '/menu/query/zhonggu'")
+    expect(featuresSection).toContain("route: '/menu/compare/zhonggu'")
+    expect(featuresSection).toContain("route: '/menu/map/view'")
+    expect(featuresSection).toContain("route: '/menu/pho/matrix'")
+    expect(featuresSection).toContain("route: '/menu/tools'")
+    expect(featuresSection).toContain("route: '/menu/villages'")
+  })
+
   it('links intro feature headings, subtitles, and subfeature titles to their pages', () => {
     const aboutPage = readSource('src/main/views/menu/support/AboutPage.vue')
 
