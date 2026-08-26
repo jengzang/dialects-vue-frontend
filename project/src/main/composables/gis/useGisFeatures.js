@@ -120,7 +120,10 @@ export function useGisFeatures(options = {}) {
 
   async function handleEditSelectedShape() {
     if (!await guardWrite()) return;
-    if (!canEditSelectedShape.value) return;
+    if (!canEditSelectedShape.value) {
+      reportGeometryEditFeedback('error', 'geometryEditUnavailable');
+      return;
+    }
     editableMapRef?.value?.selectFeature?.(selectedFeatureId.value, { directEdit: true });
     currentMode.value = 'direct_select';
   }
@@ -497,7 +500,10 @@ export function useGisFeatures(options = {}) {
 
   async function handleMoveSelectedVertex(payload = {}) {
     if (!await guardWrite()) return;
-    if (!canModifyActiveLayer.value || !canEditSelectedShape.value || !canUseSelectedGeometryTools?.value) return;
+    if (!canModifyActiveLayer.value || !canEditSelectedShape.value || !canUseSelectedGeometryTools?.value) {
+      reportGeometryEditFeedback('error', 'geometryEditUnavailable');
+      return;
+    }
     const featureId = String(payload.featureId || selectedVertex?.value?.featureId || '');
     const coordPath = String(payload.coordPath || selectedVertex?.value?.coordPath || '');
     const coordinate = payload.coordinate ?? selectedVertex?.value?.coordinate;
@@ -699,16 +705,28 @@ export function useGisFeatures(options = {}) {
 
   async function handleStartPolygonSplitSketch() {
     if (!await guardWrite()) return;
-    if (!canStartPolygonSplitSketch?.value || typeof editableMapRef?.value?.startPolygonSplitSketch !== 'function') return;
+    if (!canStartPolygonSplitSketch?.value || typeof editableMapRef?.value?.startPolygonSplitSketch !== 'function') {
+      reportGeometryEditFeedback('error', 'polygonSplitNoTarget');
+      return;
+    }
     const didStart = editableMapRef.value.startPolygonSplitSketch(selectedFeatureId.value);
-    if (didStart === false) return;
+    if (didStart === false) {
+      reportGeometryEditFeedback('error', 'polygonSplitNoTarget');
+      return;
+    }
     currentMode.value = 'draw_line_string';
   }
 
   function handleCancelPolygonSplitSketch() {
-    if (typeof editableMapRef?.value?.cancelPolygonSplitSketch !== 'function') return;
+    if (typeof editableMapRef?.value?.cancelPolygonSplitSketch !== 'function') {
+      reportGeometryEditFeedback('error', 'polygonSplitNoTarget');
+      return;
+    }
     const didCancel = editableMapRef.value.cancelPolygonSplitSketch();
-    if (didCancel === false) return;
+    if (didCancel === false) {
+      reportGeometryEditFeedback('error', 'polygonSplitNoTarget');
+      return;
+    }
     currentMode.value = 'simple_select';
   }
 

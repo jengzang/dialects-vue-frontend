@@ -55,12 +55,15 @@ function mountGisFeatures(overrides = {}) {
   const selectedFeatureId = ref(overrides.selectedFeatureId ?? 'poly-1')
   const selectedFeatureIds = ref(overrides.selectedFeatureIds ?? ['poly-1', 'poly-2'])
   const currentMode = ref('simple_select')
+  const selectedVertexCount = ref(overrides.selectedVertexCount ?? 0)
   const selectedVertex = ref(null)
+  const selectedVertexDeleteBlockCode = ref(overrides.selectedVertexDeleteBlockCode ?? '')
   const editableMapRef = ref({
     selectFeature: vi.fn(),
     selectFeatures: vi.fn(),
     importGeoJson: vi.fn(),
     updateFeatureProperties: vi.fn(),
+    ...(overrides.editableMapRef ?? {}),
   })
   const commitHistory = vi.fn()
   const syncAllLayersAfterMutation = vi.fn()
@@ -76,21 +79,23 @@ function mountGisFeatures(overrides = {}) {
     activeLayer,
     selectedFeatureId,
     selectedFeatureIds,
+    selectedVertexCount,
     selectedVertex,
+    selectedVertexDeleteBlockCode,
     editableMapRef,
     currentMode,
     getFeatureId: (feature) => String(feature?.id ?? feature?.properties?.id ?? ''),
-    canModifyActiveLayer: computed(() => true),
-    canDuplicateSelectedFeature: computed(() => true),
-    canEditSelectedShape: computed(() => true),
-    canDeleteSelection: computed(() => true),
-    canMoveSelectedFeatures: computed(() => true),
-    canUseSelectedGeometryTools: computed(() => false),
+    canModifyActiveLayer: computed(() => overrides.canModifyActiveLayer ?? true),
+    canDuplicateSelectedFeature: computed(() => overrides.canDuplicateSelectedFeature ?? true),
+    canEditSelectedShape: computed(() => overrides.canEditSelectedShape ?? true),
+    canDeleteSelection: computed(() => overrides.canDeleteSelection ?? true),
+    canMoveSelectedFeatures: computed(() => overrides.canMoveSelectedFeatures ?? true),
+    canUseSelectedGeometryTools: computed(() => overrides.canUseSelectedGeometryTools ?? false),
     canBufferSelectedFeature: computed(() => overrides.canBufferSelectedFeature ?? false),
     canCloseSelectedLine: computed(() => false),
     canSplitSelectedLine: computed(() => false),
     canSplitSelectedPolygon: computed(() => false),
-    canStartPolygonSplitSketch: computed(() => false),
+    canStartPolygonSplitSketch: computed(() => overrides.canStartPolygonSplitSketch ?? false),
     canMergeSelectedPolygons: computed(() => true),
     canIntersectSelectedPolygons: computed(() => true),
     canDifferenceSelectedPolygons: computed(() => true),
@@ -127,6 +132,9 @@ function mountGisFeatures(overrides = {}) {
     layers,
     selectedFeatureId,
     selectedFeatureIds,
+    selectedVertexCount,
+    selectedVertex,
+    selectedVertexDeleteBlockCode,
     currentMode,
     editableMapRef,
     commitHistory,
@@ -137,6 +145,75 @@ function mountGisFeatures(overrides = {}) {
 }
 
 describe('GIS feature operations', () => {
+  it('reports why direct shape editing is unavailable', async () => {
+    const wrapper = mountGisFeatures({
+      canEditSelectedShape: false,
+    })
+
+    await wrapper.features.handleEditSelectedShape()
+
+    expect(wrapper.editableMapRef.value.selectFeature).not.toHaveBeenCalled()
+    expect(wrapper.currentMode.value).toBe('simple_select')
+    expect(wrapper.onGeometryEditFeedback).toHaveBeenCalledWith({
+      type: 'error',
+      code: 'geometryEditUnavailable',
+    })
+  })
+
+  it('reports why exact vertex movement is unavailable before touching history', async () => {
+    const wrapper = mountGisFeatures({
+      canUseSelectedGeometryTools: false,
+      selectedFeatureId: 'poly-1',
+      selectedFeatureIds: ['poly-1'],
+    })
+    wrapper.selectedVertex.value = {
+      featureId: 'poly-1',
+      coordPath: '0.1',
+      coordinate: [1, 0],
+    }
+
+    await wrapper.features.handleMoveSelectedVertex({ coordinate: [1.1, 0] })
+
+    expect(wrapper.commitHistory).not.toHaveBeenCalled()
+    expect(wrapper.onGeometryEditFeedback).toHaveBeenCalledWith({
+      type: 'error',
+      code: 'geometryEditUnavailable',
+    })
+  })
+
+  it('reports why polygon split sketch cannot start', async () => {
+    const wrapper = mountGisFeatures({
+      canStartPolygonSplitSketch: false,
+    })
+
+    await wrapper.features.handleStartPolygonSplitSketch()
+
+    expect(wrapper.currentMode.value).toBe('simple_select')
+    expect(wrapper.onGeometryEditFeedback).toHaveBeenCalledWith({
+      type: 'error',
+      code: 'polygonSplitNoTarget',
+    })
+  })
+
+  it('reports when the map adapter rejects polygon split sketch mode', async () => {
+    const startPolygonSplitSketch = vi.fn(() => false)
+    const wrapper = mountGisFeatures({
+      canStartPolygonSplitSketch: true,
+      editableMapRef: {
+        startPolygonSplitSketch,
+      },
+    })
+
+    await wrapper.features.handleStartPolygonSplitSketch()
+
+    expect(startPolygonSplitSketch).toHaveBeenCalledWith('poly-1')
+    expect(wrapper.currentMode.value).toBe('simple_select')
+    expect(wrapper.onGeometryEditFeedback).toHaveBeenCalledWith({
+      type: 'error',
+      code: 'polygonSplitNoTarget',
+    })
+  })
+
   it('applies MapLibre layer-layout-only text settings at layer scope even with a selected feature', async () => {
     const wrapper = mountGisFeatures({
       layers: [{
