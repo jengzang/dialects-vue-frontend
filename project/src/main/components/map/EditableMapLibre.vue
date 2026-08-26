@@ -2072,7 +2072,23 @@ const syncShapeEditState = () => {
   })
 }
 
+const clearDrawSelectionForHitCandidateMenu = () => {
+  const selectedIds = normalizeFeatureIds(draw.value?.getSelectedIds?.() ?? [])
+  if (selectedIds.length > 0) {
+    suppressedProgrammaticFeatureSelectionIds = []
+    draw.value?.changeMode?.('simple_select', { featureIds: [] })
+  }
+  selectedFeatureId.value = ''
+  selectedVertexCoordPaths.value = []
+  syncShapeEditState()
+}
+
 const syncSelectedFeature = () => {
+  if (hitCandidateMenu.value) {
+    clearDrawSelectionForHitCandidateMenu()
+    return
+  }
+
   const selectedIds = getSelectedFeatureIdsFromDraw()
   const previousSelectedFeatureId = selectedFeatureId.value
   selectedFeatureId.value = selectedIds[0] ? String(selectedIds[0]) : ''
@@ -2368,6 +2384,7 @@ const handleMapClick = (event = {}) => {
     return
   }
 
+  clearDrawSelectionForHitCandidateMenu()
   hitCandidateMenu.value = {
     candidates,
     style: buildHitCandidateMenuStyle(event),
