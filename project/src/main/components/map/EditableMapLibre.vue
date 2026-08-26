@@ -1033,8 +1033,14 @@ const areFeatureIdsEqual = (leftFeatureIds = [], rightFeatureIds = []) => {
   return leftIds.every((featureId) => rightIdSet.has(featureId))
 }
 
+const canInteractWithActiveDrawLayer = () => (
+  props.activeLayer?.visible !== false
+  && props.activeLayer?.locked !== true
+)
+
 const isDrawFeatureSelectable = (feature) => Boolean(
   feature
+  && canInteractWithActiveDrawLayer()
   && feature.properties?.visible !== false
   && feature.properties?.locked !== true
 )
@@ -2068,7 +2074,40 @@ const syncDrawMode = (event) => {
   syncSelectedFeature()
 }
 
+const restoreDrawFeatureCollectionFromModel = () => {
+  const featureCollection = normalizeFeatureCollection(props.modelValue)
+  if (featureCollection.features.length > 0) {
+    draw.value?.set?.(featureCollection)
+  } else {
+    draw.value?.deleteAll?.()
+  }
+}
+
+const resetDrawInteractionState = () => {
+  suppressedProgrammaticFeatureSelectionIds = null
+  clearSnapPreview()
+  clearEditTargetHover()
+  clearPendingPolygonSplitSketch()
+  selectedFeatureId.value = ''
+  selectedVertexCoordPaths.value = []
+  draw.value?.changeMode?.('simple_select', { featureIds: [] })
+  emit('mode-change', 'simple_select')
+  syncShapeEditState()
+}
+
+const isDrawMutationSyncEvent = (options = {}) => [
+  'draw.create',
+  'draw.update',
+  'draw.delete',
+].includes(String(options.type || ''))
+
 const syncFeaturesFromDraw = (options = {}) => {
+  if (isDrawMutationSyncEvent(options) && !canInteractWithActiveDrawLayer()) {
+    restoreDrawFeatureCollectionFromModel()
+    resetDrawInteractionState()
+    return
+  }
+
   const normalized = normalizeFeatureCollection(draw.value?.getAll?.())
   const { featureCollection, changed } = snapFeatureCollectionCoordinates(normalized, options)
   if (changed) {
@@ -2097,6 +2136,10 @@ const setDrawMode = (mode) => {
   }
   if (mode !== 'direct_select') {
     selectedVertexCoordPaths.value = []
+  }
+  if (mode !== 'simple_select' && !canInteractWithActiveDrawLayer()) {
+    resetDrawInteractionState()
+    return
   }
   draw.value?.changeMode?.(mode)
   if (mode === 'simple_select') {
@@ -2804,7 +2847,7 @@ const handleDrawCreate = (event) => {
     finishPendingPolygonSplitSketch(event)
     return
   }
-  syncFeaturesFromDraw({ ...event, snapFeatures: true })
+  syncFeaturesFromDraw({ ...event, type: 'draw.create', snapFeatures: true })
 }
 
 const mountHiddenDrawControls = () => {
@@ -2814,8 +2857,8 @@ const mountHiddenDrawControls = () => {
 
 const bindDrawEvents = () => {
   map.value.on('draw.create', handleDrawCreate)
-  map.value.on('draw.update', (event) => syncFeaturesFromDraw({ ...event, snapFeatures: true }))
-  map.value.on('draw.delete', syncFeaturesFromDraw)
+  map.value.on('draw.update', (event) => syncFeaturesFromDraw({ ...event, type: 'draw.update', snapFeatures: true }))
+  map.value.on('draw.delete', (event) => syncFeaturesFromDraw({ ...event, type: 'draw.delete' }))
   map.value.on('draw.selectionchange', syncSelectedFeature)
   map.value.on('draw.modechange', syncDrawMode)
 }

@@ -448,6 +448,123 @@ describe('EditableMapLibre state flow', () => {
     wrapper.unmount()
   })
 
+  it('treats hidden or locked active layers as non-selectable even when feature properties are stale', async () => {
+    const featureCollection = {
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }],
+    }
+    const wrapper = mountEditableMapLibre(featureCollection, {
+      activeLayer: {
+        id: 'active-layer',
+        visible: false,
+        locked: false,
+        featureCollection,
+      },
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    wrapper.exposed.selectFeature('polygon-1', { directEdit: false })
+
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: [] })
+    expect(wrapper.events).toContainEqual(['mode-change', 'simple_select'])
+    expect(wrapper.events).not.toContainEqual(['feature-select', 'polygon-1'])
+
+    wrapper.draw.changeMode.mockClear()
+    wrapper.events.length = 0
+    wrapper.activeLayer.value = {
+      id: 'active-layer',
+      visible: true,
+      locked: true,
+      featureCollection,
+    }
+    await nextTick()
+
+    wrapper.exposed.selectFeature('polygon-1', { directEdit: true })
+
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: [] })
+    expect(wrapper.draw.changeMode).not.toHaveBeenCalledWith('direct_select', { featureId: 'polygon-1' })
+    expect(wrapper.events).toContainEqual(['mode-change', 'simple_select'])
+    expect(wrapper.events).not.toContainEqual(['feature-select', 'polygon-1'])
+
+    wrapper.unmount()
+  })
+
+  it('refuses draw modes and ignores draw mutations while the active layer is hidden or locked', async () => {
+    const featureCollection = {
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }],
+    }
+    const wrapper = mountEditableMapLibre(featureCollection, {
+      activeLayer: {
+        id: 'active-layer',
+        visible: false,
+        locked: false,
+        featureCollection,
+      },
+    })
+    await nextTick()
+    wrapper.draw.changeMode.mockClear()
+    wrapper.draw.set.mockClear()
+    wrapper.events.length = 0
+
+    wrapper.exposed.setDrawMode('draw_polygon')
+
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: [] })
+    expect(wrapper.draw.changeMode).not.toHaveBeenCalledWith('draw_polygon')
+    expect(wrapper.events).toContainEqual(['mode-change', 'simple_select'])
+
+    wrapper.draw.changeMode.mockClear()
+    wrapper.draw.set.mockClear()
+    wrapper.events.length = 0
+    wrapper.draw.features.set('drawn-polygon', {
+      id: 'drawn-polygon',
+      type: 'Feature',
+      properties: { visible: true, locked: false },
+      geometry: { type: 'Polygon', coordinates: [[[0, 0], [1, 0], [0, 0]]] },
+    })
+
+    wrapper.map.emit('draw.create', {
+      type: 'draw.create',
+      features: [wrapper.draw.get('drawn-polygon')],
+    })
+
+    expect(wrapper.events.some(([eventName]) => eventName === 'features-change')).toBe(false)
+    const restoredFeatureCollection = wrapper.draw.set.mock.calls.at(-1)?.[0]
+    expect(restoredFeatureCollection.features.map((feature) => feature.id)).toEqual(['polygon-1'])
+    expect(restoredFeatureCollection.features.some((feature) => feature.id === 'drawn-polygon')).toBe(false)
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: [] })
+
+    wrapper.draw.changeMode.mockClear()
+    wrapper.draw.set.mockClear()
+    wrapper.events.length = 0
+    wrapper.activeLayer.value = {
+      id: 'active-layer',
+      visible: true,
+      locked: true,
+      featureCollection,
+    }
+    await nextTick()
+
+    wrapper.exposed.setDrawMode('draw_line_string')
+
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: [] })
+    expect(wrapper.draw.changeMode).not.toHaveBeenCalledWith('draw_line_string')
+    expect(wrapper.events).toContainEqual(['mode-change', 'simple_select'])
+
+    wrapper.unmount()
+  })
+
   it('filters hidden and locked features out of natural Draw selection changes', async () => {
     const wrapper = mountEditableMapLibre({
       type: 'FeatureCollection',
