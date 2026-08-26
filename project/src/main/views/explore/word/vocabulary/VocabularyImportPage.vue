@@ -408,6 +408,7 @@ import RadioGroup from '@/components/selector/RadioGroup.vue'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
+import { transformTabularFile } from '@/utils/import/transformTabularFile.js'
 import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue'
 import { formatCoord } from '@/main/utils/drawMap/formatCoord.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
@@ -490,6 +491,7 @@ const yindianSuggestions = ref([])
 const isLoadingYindian = ref(false)
 const uploadLocationEditorStatus = ref('')
 let yindianDebounceTimer = null
+let preserveBackendPreviewOnFilePromotion = false
 
 const uploadLocationFields = computed(() => [
   {
@@ -827,6 +829,10 @@ watch(fillStandardFromLocal, (val) => {
 })
 
 watch([uploadParserMode, selectedUploadFile, uploadLocation], () => {
+  if (preserveBackendPreviewOnFilePromotion) {
+    preserveBackendPreviewOnFilePromotion = false
+    return
+  }
   backendPreview.value = null
   isOverwriteConfirmed.value = false
 }, { deep: true })
@@ -835,11 +841,36 @@ function buildUploadLocation() {
   return normalizeUploadLocation(uploadLocation.value)
 }
 
-async function handlePreviewImport() {
-  const file = uploadFile.value || importFlow.pendingFile.value
+function buildVocabularyImportColumnMap() {
+  const mapping = importPreview.mapping.value
+  return [
+    { sourceKey: mapping.standard_word, header: 'standard_word' },
+    { sourceKey: mapping.local_expression, header: 'local_expression' },
+    { sourceKey: mapping.ipa, header: 'ipa' },
+    { sourceKey: mapping.notes, header: 'notes' },
+  ].filter((entry) => entry.sourceKey)
+}
+
+function buildMappedVocabularyImportFile(file) {
+  const columnMap = buildVocabularyImportColumnMap()
+  if (!columnMap.length) {
+    return file
+  }
+
+  return transformTabularFile({
+    parsedFile: importPreview.parsedFile.value,
+    columnMap,
+    selectedSheetId: importPreview.selectedSheetId.value,
+    headerRowIndex: importPreview.headerRowIndex.value,
+    mode: 'replace'
+  })
+}
+
+async function handlePreviewImport(fileOverride = null) {
+  const file = fileOverride || uploadFile.value || importFlow.pendingFile.value
 
   if (!file || isUploading.value || isPreviewingImport.value) {
-    return
+    return null
   }
 
   const location = buildUploadLocation()
@@ -847,13 +878,13 @@ async function handlePreviewImport() {
   if (!location.location_name || !location.coordinates) {
     uploadStatusText.value = t('words.wordList.upload.missingLocation')
     showWarning(t('words.wordList.upload.missingLocation'))
-    return
+    return null
   }
 
   if (!canUploadVocabulary.value) {
     uploadStatusText.value = t('words.wordList.upload.permissionRequired')
     showWarning(uploadStatusText.value)
-    return
+    return null
   }
 
   isPreviewingImport.value = true
@@ -874,9 +905,11 @@ async function handlePreviewImport() {
       uploadStatusText.value = previewResponse.errors?.join('；') || t('words.wordList.upload.previewFailed')
       showError(uploadStatusText.value)
     }
+    return previewResponse
   } catch (error) {
     uploadStatusText.value = error.message || t('words.wordList.upload.previewFailed')
     showError(uploadStatusText.value)
+    return null
   } finally {
     isPreviewingImport.value = false
   }
@@ -884,9 +917,16 @@ async function handlePreviewImport() {
 
 async function handleConfirmUpload() {
   const file = importFlow.pendingFile.value
-  await handlePreviewImport()
-  if (backendPreview.value?.success && file) {
-    uploadFile.value = file
+  if (!file || !importPreview.diagnostics.value.isComplete) {
+    showError(t('common.importPreview.messages.mappingIncomplete'))
+    return
+  }
+
+  const transformedFile = buildMappedVocabularyImportFile(file)
+  const previewResponse = await handlePreviewImport(transformedFile)
+  if (previewResponse?.success) {
+    preserveBackendPreviewOnFilePromotion = true
+    uploadFile.value = transformedFile
     importFlow.pendingFile.value = null
   }
 }
