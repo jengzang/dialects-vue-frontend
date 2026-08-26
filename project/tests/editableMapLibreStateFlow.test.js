@@ -777,6 +777,43 @@ describe('EditableMapLibre state flow', () => {
     wrapper.unmount()
   })
 
+  it('focuses the first hit candidate when the overlap picker opens', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { name: '面 A', visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'line-1',
+        type: 'Feature',
+        properties: { name: '线 A', visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [] },
+      }],
+    })
+    await nextTick()
+    ;['gl-draw-polygon-fill', 'gl-draw-line'].forEach((layerId) => {
+      wrapper.map.addLayer({ id: layerId, type: 'line' })
+    })
+    wrapper.map.queryRenderedFeatures.mockReturnValueOnce([
+      { id: 'polygon-1', layer: { id: 'gl-draw-polygon-fill' }, properties: { id: 'polygon-1' } },
+      { id: 'line-1', layer: { id: 'gl-draw-line' }, properties: { id: 'line-1' } },
+    ])
+
+    wrapper.map.emit('click', {
+      point: { x: 24, y: 32 },
+      lngLat: { lng: 113, lat: 23 },
+    })
+    await nextTick()
+    await nextTick()
+
+    const firstButton = wrapper.host.querySelector('[data-testid="feature-hit-candidate-button"]')
+    expect(document.activeElement).toBe(firstButton)
+
+    wrapper.unmount()
+  })
+
   it('selects the only visible unlocked hit candidate without opening the candidate menu', async () => {
     const wrapper = mountEditableMapLibre({
       type: 'FeatureCollection',

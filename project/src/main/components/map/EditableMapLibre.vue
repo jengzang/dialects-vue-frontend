@@ -16,6 +16,7 @@
     </div>
     <div
       v-if="hitCandidateMenu"
+      ref="hitCandidateMenuElement"
       class="editable-map-hit-candidates glass-panel"
       :style="hitCandidateMenu.style"
       data-testid="feature-hit-candidate-menu"
@@ -367,6 +368,7 @@ const isFeatureBoxDragging = ref(false)
 const featureBoxStartPoint = ref(null)
 const featureBoxEndPoint = ref(null)
 const hitCandidateMenu = ref(null)
+const hitCandidateMenuElement = ref(null)
 const defaultFeatureBoxSelectionMode = 'replace'
 const featureBoxSelectionMode = ref(defaultFeatureBoxSelectionMode)
 let previousPreviewSourceIds = []
@@ -381,6 +383,14 @@ let lastEditTargetHoverKey = ''
 
 const clearHitCandidateMenu = () => {
   hitCandidateMenu.value = null
+}
+
+const focusFirstHitCandidateButton = () => {
+  nextTick(() => {
+    hitCandidateMenuElement.value
+      ?.querySelector?.('[data-testid="feature-hit-candidate-button"]')
+      ?.focus?.()
+  })
 }
 
 const sanitizeLayerFilename = (layerName) => {
@@ -2397,6 +2407,7 @@ const handleMapClick = (event = {}) => {
     candidates,
     style: buildHitCandidateMenuStyle(event),
   }
+  focusFirstHitCandidateButton()
 }
 
 const resolveEditTargetType = (feature) => {
