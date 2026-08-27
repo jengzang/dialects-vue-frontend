@@ -87,13 +87,18 @@ export function useTabularImportPreview(options = {}) {
     }
   }
 
-  watch([selectedSheetId, headerRowIndex, schema], () => {
+  watch([selectedSheetId, headerRowIndex, schema], ([nextSheetId], [previousSheetId] = []) => {
     if (!parsedFile.value) {
       return
     }
 
     const nextSourceColumns = previewTable.value.sourceColumns
     const autoMapping = autoMatchColumns(schema.value, nextSourceColumns)
+    if (previousSheetId !== undefined && nextSheetId !== previousSheetId) {
+      mapping.value = autoMapping
+      return
+    }
+
     mapping.value = {
       ...autoMapping,
       ...mapping.value
