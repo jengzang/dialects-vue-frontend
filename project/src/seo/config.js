@@ -262,6 +262,18 @@ const SEO_CONFIG = {
         en: 'Explore phonological status data of Chinese characters across Middle Chinese, Old Chinese, Early Modern Chinese, and Cantonese rhyme books.',
       },
     },
+    '/explore/yc/overview': {
+      title: {
+        'zh-Hant': '陽春方言概覽｜方音圖鑑',
+        'zh-CN': '阳春方言概览｜方音图鉴',
+        en: 'Yangchun Dialect Overview | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '了解陽春方言的分佈、接觸關係與音系特徵，從地理與材料來源角度瀏覽陽春方言概況。',
+        'zh-CN': '了解阳春方言的分布、接触关系与音系特征，从地理与材料来源角度浏览阳春方言概况。',
+        en: 'Explore the distribution, contact patterns, and phonological features of Yangchun dialects through geographic and source-based overview materials.',
+      },
+    },
     '/explore/yc/words': {
       title: {
         'zh-Hant': '陽春口語詞｜方音圖鑑',
@@ -272,6 +284,18 @@ const SEO_CONFIG = {
         'zh-Hant': '查閱廣東陽春口語詞資料，了解字音、詞性、釋義與例詞例句等內容。',
         'zh-CN': '查阅广东阳春口语词资料，了解字音、词性、释义与例词例句等内容。',
         en: 'Browse Yangchun colloquial word materials, including pronunciation, part of speech, definitions, and usage examples.',
+      },
+    },
+    '/explore/yc/expressions': {
+      title: {
+        'zh-Hant': '陽春熟語與疊式詞｜方音圖鑑',
+        'zh-CN': '阳春熟语与叠式词｜方音图鉴',
+        en: 'Yangchun Expressions and Reduplicatives | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '瀏覽陽春熟語、歇後語、農諺與疊式詞示例，按類型與詞形模式查看地方語言材料。',
+        'zh-CN': '浏览阳春熟语、歇后语、农谚与叠式词示例，按类型与词形模式查看地方语言材料。',
+        en: 'Browse Yangchun expressions, sayings, proverbs, and reduplicative forms by category and word pattern.',
       },
     },
     '/explore/villages/gd': {
@@ -296,6 +320,18 @@ const SEO_CONFIG = {
         'zh-Hant': '查閱廣東省自然村表格資料，查看地級、縣級、鎮級、自然村與方言等信息。',
         'zh-CN': '查阅广东省自然村表格资料，查看地级、县级、镇级、自然村与方言等信息。',
         en: 'Browse tabular data of Guangdong natural villages, including prefecture, county, town, village, and dialect information.',
+      },
+    },
+    '/explore/villages/all': {
+      title: {
+        'zh-Hant': '全部自然村資料｜方音圖鑑',
+        'zh-CN': '全部自然村资料｜方音图鉴',
+        en: 'All Village Data | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '管理員使用的全部自然村資料入口，支持按城市載入與查看自然村資料。',
+        'zh-CN': '管理员使用的全部自然村资料入口，支持按城市加载与查看自然村资料。',
+        en: 'Admin-facing entry for browsing all village records by city and inspecting village data.',
       },
     },
     '/explore/villages/yc': {
@@ -520,6 +556,30 @@ const SEO_CONFIG = {
         en: 'Explore interactive tools and datasets in Dialects Atlas, including map drawing, table tools, village data, and phonetic analysis.',
       },
     },
+    '/explore/features': {
+      title: {
+        'zh-Hant': '功能索引｜方音圖鑑',
+        'zh-CN': '功能索引｜方音图鉴',
+        en: 'Feature Index | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '方音圖鑑的功能索引入口；此入口不作為搜尋結果收錄頁。',
+        'zh-CN': '方音图鉴的功能索引入口；此入口不作为搜索结果收录页。',
+        en: 'Feature index entry for Dialects Atlas; this entry is not intended for search result indexing.',
+      },
+    },
+    '/explore/history': {
+      title: {
+        'zh-Hant': '歷史入口｜方音圖鑑',
+        'zh-CN': '历史入口｜方音图鉴',
+        en: 'History Entry | Dialects Atlas',
+      },
+      description: {
+        'zh-Hant': '方音圖鑑的歷史入口頁；此入口不作為搜尋結果收錄頁。',
+        'zh-CN': '方音图鉴的历史入口页；此入口不作为搜索结果收录页。',
+        en: 'History entry for Dialects Atlas; this entry is not intended for search result indexing.',
+      },
+    },
     '/explore/gis': {
       title: {
         'zh-Hant': '地圖繪製｜方音圖鑑',
@@ -655,12 +715,12 @@ export const SITEMAP_PATHS = [
   '/menu/map/divide',
   '/menu/map/custom',
   '/explore/gis',
-  '/menu/result',
   '/menu/tools',
-  '/menu/words',
-  '/menu/vocabulary',
+  '/menu/vocabulary/view',
   '/menu/yubao',
+  '/explore/yc/overview',
   '/explore/yc/words',
+  '/explore/yc/expressions',
   '/menu/villages',
   '/menu/cluster',
   '/explore',
@@ -669,12 +729,10 @@ export const SITEMAP_PATHS = [
   '/explore/tools/merge',
   '/explore/tools/derive',
   '/explore/tools/praat',
-  '/explore/manage',
   '/explore/char-class',
   '/explore/yc/villages',
   '/explore/villages/gd',
   '/explore/villages/table',
-  '/explore/villages/yc',
   '/explore/villages/ml',
   '/explore/villages/toponyms',
   '/explore/villages/search',
@@ -684,6 +742,11 @@ export const NOINDEX_PATHS = new Set([
   '/intro',
   '/auth/data',
   '/auth/regions',
+  '/menu/result',
+  '/explore/manage',
+  '/explore/villages/all',
+  '/explore/features',
+  '/explore/history',
 ])
 
 export default SEO_CONFIG

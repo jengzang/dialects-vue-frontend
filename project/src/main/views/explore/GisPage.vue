@@ -1,14 +1,11 @@
 <template>
   <div ref="drawTabRoot" class="map-draw-tab page-content-stack">
     <div class="page-footer draw-tab-header glass-panel">
-      <!-- <div class="draw-tab-copy">
-        <h3 class="draw-tab-title">
-          {{ t('map.drawTab.title') }}
-        </h3>
-        <p class="hint draw-tab-hint">
-          {{ t('map.drawTab.hint') }}
-        </p>
-      </div> -->
+      <div class="draw-tab-copy">
+        <h1 class="draw-tab-title">
+          <BarIcon icon="🗺️" />{{ t('navigation.pageTitles.gis.main') }}
+        </h1>
+      </div>
 
       <div
         class="draw-toolbar draw-toolbar--header"
@@ -784,6 +781,7 @@
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { onBeforeUnmount, onMounted, ref, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';

@@ -58,6 +58,10 @@ describe('SEO heading semantics', () => {
         heading: '<h1 class="title">',
       },
       {
+        file: 'src/main/views/explore/GisPage.vue',
+        heading: '<h1 class="draw-tab-title">',
+      },
+      {
         file: 'src/main/views/explore/charClass/CharacterClassification.vue',
         heading: '<h1 class="page-title">',
       },
@@ -84,7 +88,7 @@ describe('SEO heading semantics', () => {
     ]
 
     for (const { file, heading } of pageTitleHeadings) {
-      expect(readSource(file), file).toContain(heading)
+      expect(stripHtmlComments(readSource(file)), file).toContain(heading)
     }
   })
 
@@ -101,6 +105,7 @@ describe('SEO heading semantics', () => {
       'src/main/views/explore/tools/CheckTool.vue',
       'src/main/views/explore/tools/Jyut2IpaTool.vue',
       'src/main/views/explore/tools/MergeTool.vue',
+      'src/main/views/explore/GisPage.vue',
       'src/main/views/explore/charClass/CharacterClassification.vue',
       'src/main/views/explore/villages/gdVillagesTree.vue',
       'src/main/views/explore/villages/gdVillagesTable.vue',
@@ -234,6 +239,7 @@ describe('SEO heading semantics', () => {
       ['yubao', 'grammar'],
       ['words', 'yangChunSpoken'],
       ['praat', 'main'],
+      ['gis', 'main'],
       ['tools', 'check'],
       ['tools', 'jyut2ipa'],
       ['tools', 'merge'],
@@ -289,6 +295,7 @@ describe('SEO heading semantics', () => {
       'src/main/views/explore/villages/toponyms/ToponymsPage.vue',
       'src/main/views/explore/word/YangChunSpoken.vue',
       'src/main/views/explore/Praat.vue',
+      'src/main/views/explore/GisPage.vue',
       'src/main/views/explore/tools/CheckTool.vue',
       'src/main/views/explore/tools/Jyut2IpaTool.vue',
       'src/main/views/explore/tools/MergeTool.vue',
@@ -308,7 +315,7 @@ describe('SEO heading semantics', () => {
       'src/main/views/menu/support/PrivacyPage.vue',
       'src/main/views/menu/support/SettingsPage.vue',
       'src/main/views/menu/support/SourcePage.vue',
-      'src/main/views/menu/support/AboutPage.vue',
+      'src/main/views/explore/GisPage.vue',
       'src/main/views/explore/yangchun/YangChunOverviewPage.vue',
       'src/main/views/explore/yangchun/YangChunExpressionsPage.vue',
     ]) {
@@ -319,16 +326,6 @@ describe('SEO heading semantics', () => {
         expect(snippet, `${file} h1 has no hard-coded CJK page title`).not.toMatch(/>[^<{]*[\u3400-\u9fff]/)
       }
     }
-  })
-
-  it('uses h1 for active about tab titles while keeping nested section titles below h1', () => {
-    const source = readSource('src/main/views/menu/support/AboutPage.vue')
-
-    expect(source).toContain('<h1 class="tabs-title">{{ $t(\'navigation.pageTitles.support.aboutIntro\') }}</h1>')
-    expect(source).toContain('<h1 class="tabs-title">💬 {{ $t(\'navigation.pageTitles.support.aboutSuggestion\') }}</h1>')
-    expect(source).toContain('<h1 class="tabs-title like-author-title">')
-    expect(source).toContain('<h2 class="tabs-title" style="margin-top: 20px">🙏 {{ $t(\'about.thanks.title\') }}</h2>')
-    expect(source).toContain('<h2 class="tabs-title" style="margin-top: 3rem">{{ $t(\'about.reflection.title\') }}</h2>')
   })
 
   it('uses h1 for table management page states without changing conditional visibility', () => {

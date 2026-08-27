@@ -151,6 +151,9 @@
     "praat": {
       "main": "Praat Acoustic Analysis"
     },
+    "gis": {
+      "main": "Map Drawing"
+    },
     "tools": {
       "check": "Dialect Table Check Tool",
       "jyut2ipa": "Jyutping-to-IPA Tool",

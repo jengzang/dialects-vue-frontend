@@ -151,6 +151,9 @@
     "praat": {
       "main": "Praat 声学分析"
     },
+    "gis": {
+      "main": "地图绘制"
+    },
     "tools": {
       "check": "方言字表检查工具",
       "jyut2ipa": "粤拼转IPA工具",

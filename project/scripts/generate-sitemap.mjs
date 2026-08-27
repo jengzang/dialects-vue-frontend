@@ -40,7 +40,7 @@ function getMeta(pathname) {
 
 function buildUrl(pathname, locale) {
   const localizedPath = buildLocalePath(locale, pathname)
-  return `${siteOrigin}${localizedPath}/`
+  return `${siteOrigin}${localizedPath}`
 }
 
 const localizedPaths = SITEMAP_PATHS.flatMap((pathname) => SUPPORTED_LOCALES.map((locale) => ({ pathname, locale })))
