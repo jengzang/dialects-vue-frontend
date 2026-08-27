@@ -165,6 +165,22 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyPage).not.toContain('previewEntries')
   })
 
+  it('keeps vocabulary location item controls together below the unchanged info block in portrait layout', () => {
+    const vocabularyScss = readSource('src/main/views/explore/word/vocabulary/vocabulary.scss')
+    const portraitBlockStart = vocabularyScss.indexOf('@media (max-aspect-ratio: 1 / 1)')
+    const locationItemHeadBlock = vocabularyScss.match(/\.location-item-head\s*\{[^}]*\}/s)?.[0] || ''
+    const stackedLocationSelectors = vocabularyScss.match(/\.upload-location-summary,\s*\n\s*\.upload-location-modal-layout,\s*\n\s*\.locations-head,[^{]*\{[^}]*flex-direction:\s*column/s)?.[0] || ''
+    const portraitBlock = vocabularyScss.slice(portraitBlockStart)
+
+    expect(portraitBlockStart).toBeGreaterThan(-1)
+    expect(locationItemHeadBlock).toContain('flex-wrap: nowrap')
+    expect(locationItemHeadBlock).toMatch(/\.location-item-username,\s*\n\s*>\s*button\s*\{[^}]*flex:\s*0 0 auto/s)
+    expect(stackedLocationSelectors).not.toContain('.location-item-head')
+    expect(stackedLocationSelectors).toContain('.location-item-info')
+    expect(portraitBlock).toMatch(/\.location-item-head\s*\{[^}]*flex-wrap:\s*wrap/s)
+    expect(portraitBlock).toMatch(/\.location-item-info\s*\{[^}]*flex:\s*0 0 100%/s)
+  })
+
   it('feeds VocabularyMap drawable aggregate points and a fixed-height canvas', () => {
     const vocabularyPage = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
     const vocabularyMap = readSource('src/main/components/map/VocabularyMap.vue')

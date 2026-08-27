@@ -704,6 +704,12 @@
   gap: 8px;
   align-items: center;
   justify-content: center;
+  flex-wrap: nowrap;
+
+  .location-item-username,
+  > button {
+    flex: 0 0 auto;
+  }
 }
 
 .location-item-username {
@@ -955,10 +961,17 @@
   .upload-location-summary,
   .upload-location-modal-layout,
   .locations-head,
-  .location-item-head,
   .location-item-info {
     align-items: center;
     flex-direction: column;
+  }
+
+  .location-item-head {
+    flex-wrap: wrap;
+  }
+
+  .location-item-info {
+    flex: 0 0 100%;
   }
 
   .pagination-row {

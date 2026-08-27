@@ -56,7 +56,7 @@
         "detail": "详细释义",
         "ipa": "音标",
         "notes": "注释",
-        "location": "地点"
+        "location": "方言点"
       },
       "settings": "设置",
       "filterTitle": "搜索筛选",
@@ -104,7 +104,7 @@
       "definition": "标准词",
       "pronunciation": "音标",
       "pronunciationType": "注音类型",
-      "location": "地点",
+      "location": "方言点",
       "locationFull": "完整地点",
       "informations": "附加信息",
       "sourceFilename": "来源文件",
