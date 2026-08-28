@@ -12,53 +12,62 @@
     <div
       class="footer-content"
     >
-      <div
-        class="footer-actions"
-        aria-label="layout footer actions"
-      >
-        <button
-          type="button"
-          class="text-action footer-action"
-          :disabled="!context.hasTutorial"
-          @click="openTutorial"
+      <div class="footer-primary">
+        <div class="footer-brand-copy">
+          <span class="info-text footer-brand-name"><strong>{{ t('layoutFooter.pages.generic.title') }}</strong></span>
+          <span class="hint footer-page-description">{{ t(context.pageDescriptionKey) }}</span>
+        </div>
+
+        <div
+          class="footer-actions"
+          aria-label="layout footer actions"
         >
-          {{ t('layoutFooter.actions.tutorial') }}
-        </button>
-        <button
-          type="button"
-          class="text-action footer-action"
-          @click="isFeedbackOpen = true"
-        >
-          {{ t('layoutFooter.actions.feedback') }}
-        </button>
-        <button
-          type="button"
-          class="text-action footer-action"
-          @click="shareCurrentPage"
-        >
-          {{ t('layoutFooter.actions.share') }}
-        </button>
-        <button
-          type="button"
-          class="text-action footer-action"
-          @click="goToSettings"
-        >
-          {{ t('layoutFooter.actions.settings') }}
-        </button>
+          <button
+            type="button"
+            class="text-action footer-action"
+            :disabled="!context.hasTutorial"
+            @click="openTutorial"
+          >
+            {{ t('layoutFooter.actions.tutorial') }}
+          </button>
+          <button
+            type="button"
+            class="text-action footer-action"
+            @click="isFeedbackOpen = true"
+          >
+            {{ t('layoutFooter.actions.feedback') }}
+          </button>
+          <button
+            type="button"
+            class="text-action footer-action"
+            @click="shareCurrentPage"
+          >
+            {{ t('layoutFooter.actions.share') }}
+          </button>
+          <button
+            type="button"
+            class="text-action footer-action"
+            @click="goToSettings"
+          >
+            {{ t('layoutFooter.actions.settings') }}
+          </button>
+        </div>
       </div>
 
-      <div class="page-footer footer-stats">
-        <span class="info-text">
-          {{ t(context.languageLabelKey) }} · {{ t(context.themeLabelKey) }}
-        </span>
-        <span class="info-text">{{ t('layoutFooter.stats.visits', { today: todayVisits, total: totalVisits }) }}</span>
-        <span class="info-text">{{ t('layoutFooter.stats.source', { locationCount: sourceLocationCount, dataCount: sourceDataCount }) }}</span>
-        <span class="info-text">{{ t('layoutFooter.stats.databaseVersion', { version: sourceDbVersion }) }}</span>
-      </div>
+      <div class="footer-meta">
+        <div class="page-footer footer-stats">
+          <span class="info-text">
+            {{ t(context.languageLabelKey) }} · {{ t(context.themeLabelKey) }}
+          </span>
+          <span class="info-text">{{ t('layoutFooter.stats.visits', { today: todayVisits, total: totalVisits }) }}</span>
+          <span class="info-text">{{ t('layoutFooter.stats.source', { locationCount: sourceLocationCount, dataCount: sourceDataCount }) }}</span>
+          <span class="info-text">{{ t('layoutFooter.stats.databaseVersion', { version: sourceDbVersion }) }}</span>
+        </div>
 
-      <div class="page-footer footer-legal">
-        <span class="info-text">{{ t('layoutFooter.legal.copyright') }}</span>
-        <span class="info-text">{{ t('layoutFooter.legal.icp') }}</span>
+        <div class="page-footer footer-legal">
+          <span class="info-text">{{ t('layoutFooter.legal.copyright') }}</span>
+          <span class="info-text">{{ t('layoutFooter.legal.icp') }}</span>
+        </div>
       </div>
     </div>
 
@@ -248,7 +257,39 @@ onMounted(fetchFooterStats)
   padding-top: 26px;
 }
 
-.footer-actions,
+.footer-primary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px 32px;
+}
+
+.footer-brand-copy {
+  @include flex-col;
+  align-items: flex-start;
+  min-width: 0;
+  gap: 4px;
+}
+
+.footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px 18px;
+}
+
+.footer-action {
+  min-width: 0;
+}
+
+.footer-meta {
+  @include flex-col;
+  align-items: center;
+  margin-top: 14px;
+  gap: 8px;
+}
+
 .footer-stats,
 .footer-legal {
   display: flex;
@@ -258,18 +299,6 @@ onMounted(fetchFooterStats)
   gap: 8px 18px;
 }
 
-.footer-action {
-  min-width: 0;
-}
-
-.footer-stats {
-  margin-top: 14px;
-}
-
-.footer-legal {
-  margin-top: 8px;
-}
-
 @media (max-aspect-ratio: 1 / 1) {
   .app-footer {
     margin-top: 18px;
@@ -277,6 +306,17 @@ onMounted(fetchFooterStats)
 
   .footer-content {
     padding-top: 22px;
+  }
+
+  .footer-primary {
+    @include flex-col;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .footer-brand-copy {
+    align-items: center;
+    text-align: center;
   }
 
   .footer-actions {

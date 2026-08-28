@@ -23,6 +23,7 @@ vi.mock('vue-i18n', () => ({
   useI18n: () => ({
     locale: { value: 'zh-CN' },
     t: (key, values = {}) => {
+      if (key === 'layoutFooter.pages.generic.title') return '方音图鉴'
       if (key === 'layoutFooter.pages.menuQueryZhonggu.title') return '查中古'
       if (key === 'layoutFooter.pages.menuQueryZhonggu.description') return '按中古地位整理各方言点读音。'
       if (key === 'layoutFooter.language.zhCN') return '简体'
@@ -151,9 +152,12 @@ describe('AppFooter actions', () => {
     expect(footer.classList.contains('glass-panel')).toBe(false)
     expect(footer.querySelector('.footer-brand-line')?.getAttribute('aria-hidden')).toBe('true')
     expect(footer.querySelector('.footer-content')).toBeTruthy()
-    expect(footer.querySelector('.footer-content .footer-actions')).toBeTruthy()
-    expect(footer.querySelector('.footer-content .footer-stats')).toBeTruthy()
-    expect(footer.querySelector('.footer-content .footer-legal')).toBeTruthy()
+    expect(footer.querySelector('.footer-primary')).toBeTruthy()
+    expect(footer.querySelector('.footer-brand-name')?.textContent).toBe('方音图鉴')
+    expect(footer.querySelector('.footer-page-description')?.textContent).toBe('按中古地位整理各方言点读音。')
+    expect(footer.querySelector('.footer-primary .footer-actions')).toBeTruthy()
+    expect(footer.querySelector('.footer-meta .footer-stats')).toBeTruthy()
+    expect(footer.querySelector('.footer-meta .footer-legal')).toBeTruthy()
     expect(footer.querySelector('.page-copy')).toBeNull()
     expect([...footer.querySelectorAll('.footer-action')]
       .some(button => button.classList.contains('glass-button'))).toBe(false)
