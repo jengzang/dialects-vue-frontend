@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
@@ -13,11 +13,20 @@ function readSource(path) {
 describe('home and intro internal links', () => {
   it('uses RouterLink for homepage internal navigation entries', () => {
     const homePage = readSource('src/main/views/HomePage.vue')
+    const homeFeaturedToolsPath = resolve(projectRoot, 'src/main/components/HomeFeaturedTools.vue')
     const featuresSection = readSource('src/main/components/FeaturesSection.vue')
+
+    expect(existsSync(homeFeaturedToolsPath)).toBe(true)
+    const homeFeaturedTools = readSource('src/main/components/HomeFeaturedTools.vue')
 
     expect(homePage).toContain('<RouterLink')
     expect(homePage).toContain(':to="localeTo(\'/menu/query/zhonggu\')"')
-    expect(homePage).toContain(':to="localeTo(item.route)"')
+    expect(homePage).toContain('<HomeFeaturedTools')
+    expect(homePage).not.toContain('class="featured-section glass-panel"')
+    expect(homeFeaturedTools).toContain('<RouterLink')
+    expect(homeFeaturedTools).toContain(':to="localeTo(item.route)"')
+    expect(homeFeaturedTools).toContain("route: '/menu/query/zhonggu'")
+    expect(homeFeaturedTools).toContain("emit('view-all')")
     expect(homePage).toContain(':to="localeTo(\'/menu/about/intro\')"')
     expect(homePage).not.toContain('@click="navigateTo(item.route)"')
     expect(featuresSection).toContain('<RouterLink')
