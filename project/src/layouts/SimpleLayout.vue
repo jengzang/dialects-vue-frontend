@@ -13,6 +13,8 @@
       </router-view>
     </div>
 
+    <AppFooter layout-kind="simple" />
+
     <!-- 悬浮按钮组 -->
     <FloatingButtons
       :auth-button-position="authButtonPosition"
@@ -41,6 +43,7 @@ import FloatingButtons from '@/components/bar/FloatingButtons.vue';
 import SimpleSidebar from '@/components/bar/SimpleSidebar.vue';
 import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 import ScrollToTop from '@/components/common/ScrollToTop.vue'
+import AppFooter from '@/components/footer/AppFooter.vue'
 
 const route = useRoute();
 const isSidebarOpen = ref(false);
@@ -62,14 +65,16 @@ watch(() => route.path, (newPath) => {
 
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $portrait-ratio: 1;
 
 /* 页面背景 */
 .simple-layout {
   min-height: 100dvh;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
+  @include flex-col;
+  align-items: center;
+  justify-content: flex-start;
   box-sizing: border-box;
 
   padding:
@@ -115,5 +120,4 @@ $portrait-ratio: 1;
   }
 }
 </style>
-
 

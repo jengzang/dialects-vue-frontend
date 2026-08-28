@@ -6,7 +6,7 @@
 
 **Architecture:** Build one shared footer component and small focused helpers. The footer reuses existing stats composables, existing common controls, existing design tokens, and the existing tutorial modal through a tiny global request bridge. Feedback submits directly to the confirmed backend suggestions API with optional screenshot upload; link sharing ships in the first pass, while branded image sharing stays as a phase-2 enhancement.
 
-**Tech Stack:** Vue 3, Vue Router, Vue I18n, SCSS scoped component styles, existing `api()` client, existing `AppModal`, existing selector controls, existing `glass-button` / `glass-field` / `glass-panel` / `surface-subpanel` / info utility classes, existing design tokens, existing `useVisitStats()` and `useSourceStats()`, Vitest.
+**Tech Stack:** Vue 3, Vue Router, Vue I18n, SCSS scoped component styles, existing `api()` client, existing `AppModal`, existing selector controls, existing `glass-button` / `glass-field` for dialog controls, existing `surface-subpanel` / info utility classes, existing design tokens, existing `useVisitStats()` and `useSourceStats()`, Vitest.
 
 ---
 
@@ -107,9 +107,9 @@ These constraints are part of the plan, not optional style advice:
   - `AppModal` for feedback.
   - `ChoiceSelector` for compact feedback category selection.
   - `CheckBox` for optional screenshot consent.
-  - `glass-button` for footer actions, modal submit buttons, and screenshot retake buttons.
+  - A shared low-emphasis text action utility for footer actions.
+  - `glass-button` for modal submit buttons and screenshot retake buttons.
   - `glass-field` for feedback title, content, and contact fields.
-  - `glass-panel` for the footer shell.
   - `surface-subpanel` for inline screenshot preview/status blocks.
   - `page-footer`, `info-text`, and `hint` for footer copy, meta, and helper text.
   - `page-title` remains the shared page-heading utility; avoid it inside the compact footer unless the footer deliberately needs page-heading treatment.
@@ -130,9 +130,11 @@ These constraints are part of the plan, not optional style advice:
 
 Use this contract while executing every task in this plan:
 
-- `glass-button` is the only footer/modal action-button skin. Use its `data-variant` and `data-size` API before considering any local CSS custom property override.
+- The footer shell must be flat and full-width. Do not use `glass-panel` on `AppFooter`.
+- Footer actions must use a low-emphasis shared text-action/link utility. Do not use `glass-button` for footer actions.
+- `glass-button` remains valid inside dialogs and tool panels, but not for the shared layout footer surface.
+- The footer shell may use a single top border token and layout spacing only. Do not add backdrop blur, radius, shadow, or hover lift.
 - `glass-field` is the only feedback text input and textarea skin. Component SCSS may set textarea behavior such as `resize`, but must not draw field borders, fills, text colors, or focus states.
-- `glass-panel` is the footer shell surface. The footer component may set width, margin, padding, and internal layout, but the shell fill, blur, border, radius, and shadow come from `glass-panel`.
 - `surface-subpanel` is the nested screenshot preview/status surface. The feedback component may set preview spacing and image sizing, but the preview surface itself comes from the shared class.
 - `page-footer` is the shared inline footer/meta row utility. Use it for the stats/legal/language row, then add local wrapping and spacing only where the layout requires it.
 - `info-text` is the shared neutral text row utility. Use it for stats items, language/theme metadata, and compact page identity text.
@@ -1130,7 +1132,7 @@ Create `project/src/components/footer/AppFooter.vue`:
 
 ```vue
 <template>
-  <footer class="app-footer glass-panel" data-app-footer :data-layout-kind="layoutKind">
+  <footer class="app-footer" data-app-footer :data-layout-kind="layoutKind">
     <div class="footer-primary">
       <p class="info-text page-copy">
         <strong>{{ t(context.pageTitleKey) }}</strong>
@@ -1140,20 +1142,19 @@ Create `project/src/components/footer/AppFooter.vue`:
       <div class="footer-actions" aria-label="layout footer actions">
         <button
           type="button"
-          class="glass-button footer-action"
-          data-size="compact"
+          class="text-action footer-action"
           :disabled="!context.hasTutorial"
           @click="openTutorial"
         >
           {{ t('layoutFooter.actions.tutorial') }}
         </button>
-        <button type="button" class="glass-button footer-action" data-size="compact" @click="isFeedbackOpen = true">
+        <button type="button" class="text-action footer-action" @click="isFeedbackOpen = true">
           {{ t('layoutFooter.actions.feedback') }}
         </button>
-        <button type="button" class="glass-button footer-action" data-size="compact" @click="shareCurrentPage">
+        <button type="button" class="text-action footer-action" @click="shareCurrentPage">
           {{ t('layoutFooter.actions.share') }}
         </button>
-        <button type="button" class="glass-button footer-action" data-size="compact" @click="goToSettings">
+        <button type="button" class="text-action footer-action" @click="goToSettings">
           {{ t('layoutFooter.actions.settings') }}
         </button>
       </div>
@@ -1434,8 +1435,8 @@ CR checklist:
 - Existing `PageTutorialGuide`, `PanelManager`, `FloatingButtons`, and `SimpleSidebar` remain mounted.
 - `SimpleLayout` behavior changes only enough to stack footer after content.
 - Styles use `<style scoped lang="scss">` and project mixins.
-- Footer action buttons reuse `glass-button` with `data-size="compact"`; footer SCSS does not draw button visual skin.
-- Footer shell reuses `glass-panel`; footer copy and metadata reuse `info-text`, `hint`, and `page-footer`.
+- Footer action buttons reuse a shared low-emphasis text action utility; footer SCSS does not draw button visual skin.
+- Footer shell is a flat full-width surface with a single top border; footer copy and metadata reuse `info-text`, `hint`, and `page-footer`.
 - Component-local footer SCSS contains only layout glue and no `background`, `border`, `border-radius`, `box-shadow`, `color`, or focus-ring styling.
 - Footer surfaces, text, borders, and states come from shared classes and existing `var(--...)` design tokens.
 - `source_path` passed to feedback is `route.path`; `route.fullPath`, query, hash, locale, theme, layout, app version, and database version stay in feedback context.

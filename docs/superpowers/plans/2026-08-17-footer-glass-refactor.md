@@ -68,7 +68,7 @@
   - 移除页脚可见的页面标题/描述。
   - 拆分 actions / stats / legal 三行。
   - 保持 `openTutorial`、`shareCurrentPage`、`goToSettings`、`fetchFooterStats` 逻辑不变。
-- `project/src/styles/main/_info.scss`
+- `project/src/styles/global/_info.scss`
   - 仅在没有可复用低强调文字按钮 utility 时新增共享 `.text-action`。
 - `project/src/i18n/locales/zh-CN/layoutFooter.json`
 - `project/src/i18n/locales/zh-Hant/layoutFooter.json`
@@ -133,9 +133,9 @@ Confirm: 只修订 footer 样式契约，不改 API、反馈、截图、统计�
 ## Task 2: 确认或新增共享文字 Action Utility
 
 **Files:**
-- Inspect: `project/src/styles/main/_info.scss`
+- Inspect: `project/src/styles/global/_info.scss`
 - Inspect: `project/src/styles/global/_tokens.scss`
-- Modify only if needed: `project/src/styles/main/_info.scss`
+- Modify only if needed: `project/src/styles/global/_info.scss`
 
 - [ ] **Step 1: 查找现有 utility**
 
@@ -149,7 +149,7 @@ Expected: 找到 `page-footer`、`info-text`、`hint` 等弱文本工具。若�
 
 - [ ] **Step 2: 如需新增，添加共享 utility**
 
-在 `project/src/styles/main/_info.scss` 中新增：
+在 `project/src/styles/global/_info.scss` 中新增：
 
 ```scss
 .text-action {
@@ -180,7 +180,7 @@ If `--text-deep` is not appropriate after inspecting tokens, use the closest exi
 Run:
 
 ```bash
-git diff -- project/src/styles/main/_info.scss
+git diff -- project/src/styles/global/_info.scss
 ```
 
 Confirm: utility 是共享样式，不是 `AppFooter.vue` 私有视觉；无填充背景、实边框、圆角、阴影、transform。
@@ -489,7 +489,7 @@ Expected: no matches.
 Run:
 
 ```bash
-git diff -- docs/superpowers/plans/2026-08-06-layout-footer-actions.md project/src/styles/main/_info.scss project/src/components/footer/AppFooter.vue project/src/i18n/locales/zh-CN/layoutFooter.json project/src/i18n/locales/zh-Hant/layoutFooter.json project/src/i18n/locales/en/layoutFooter.json project/tests/appFooterActions.test.js project/tests/layoutFooterMounting.test.js project/tests/layoutFooterContext.test.js
+git diff -- docs/superpowers/plans/2026-08-06-layout-footer-actions.md project/src/styles/global/_info.scss project/src/components/footer/AppFooter.vue project/src/i18n/locales/zh-CN/layoutFooter.json project/src/i18n/locales/zh-Hant/layoutFooter.json project/src/i18n/locales/en/layoutFooter.json project/tests/appFooterActions.test.js project/tests/layoutFooterMounting.test.js project/tests/layoutFooterContext.test.js
 ```
 
 Confirm:
@@ -507,7 +507,7 @@ Suggested commit:
 
 ```bash
 git add docs/superpowers/plans/2026-08-06-layout-footer-actions.md \
-  project/src/styles/main/_info.scss \
+  project/src/styles/global/_info.scss \
   project/src/components/footer/AppFooter.vue \
   project/src/i18n/locales/zh-CN/layoutFooter.json \
   project/src/i18n/locales/zh-Hant/layoutFooter.json \

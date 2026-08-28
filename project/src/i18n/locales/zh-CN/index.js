@@ -24,6 +24,7 @@ import user from './user.json'
 import cluster from './cluster.json'
 import tutorial from './tutorial.json'
 import customEntry from './customEntry.json'
+import layoutFooter from './layoutFooter.json'
 
 export default {
   common,
@@ -48,5 +49,6 @@ export default {
   user,
   cluster,
   customEntry,
+  layoutFooter,
   tutorial
 }

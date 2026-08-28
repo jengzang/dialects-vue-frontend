@@ -1,3 +1,5 @@
+@use '@/styles/global/mixins' as *;
+
 // Info text utilities — migrated from _legacy.scss
 
 .tabs-title {
@@ -46,4 +48,24 @@
 
 .info-text strong {
   color: var(--color-primary-hover);
+}
+
+.text-action {
+  padding: 0;
+  color: var(--text-muted);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+
+  &:hover:not(:disabled) {
+    color: var(--text-primary);
+    text-decoration: underline;
+  }
+
+  &:disabled {
+    @include disabled-state;
+    text-decoration: none;
+  }
 }

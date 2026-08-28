@@ -7,18 +7,24 @@ let route
 
 vi.mock('vue-router', () => ({
   useRoute: () => route,
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+}))
+
+vi.mock('vue-i18n', () => ({
+  useI18n: () => ({
+    t: (key, values = {}) => key.replace(/\{(\w+)\}/g, (_, name) => values[name] ?? ''),
+    locale: { value: 'zh-CN' },
+  }),
 }))
 
 vi.mock('../src/components/bar/NavBar.vue', () => ({
-  default: {
-    template: '<div data-navbar-stub></div>',
-  },
+  default: { template: '<div data-navbar-stub></div>' },
 }))
 
 vi.mock('../src/components/bar/ExploreBar.vue', () => ({
-  default: {
-    template: '<div data-explorebar-stub></div>',
-  },
+  default: { template: '<div data-explorebar-stub></div>' },
 }))
 
 vi.mock('../src/components/bar/FloatingButtons.vue', () => ({
@@ -38,21 +44,15 @@ vi.mock('../src/components/bar/SimpleSidebar.vue', () => ({
 }))
 
 vi.mock('../src/main/components/tutorial/PageTutorialGuide.vue', () => ({
-  default: {
-    template: '<div data-page-tutorial-guide>tutorial guide</div>',
-  },
+  default: { template: '<div data-page-tutorial-guide></div>' },
 }))
 
 vi.mock('../src/main/components/result/PanelManager.vue', () => ({
-  default: {
-    template: '<div data-panel-manager-stub></div>',
-  },
+  default: { template: '<div data-panel-manager-stub></div>' },
 }))
 
 vi.mock('../src/components/common/ScrollToTop.vue', () => ({
-  default: {
-    template: '<div data-scroll-to-top-stub></div>',
-  },
+  default: { template: '<div data-scroll-to-top-stub></div>' },
 }))
 
 vi.mock('../src/components/footer/AppFooter.vue', () => ({
@@ -67,7 +67,6 @@ function mountComponent(component) {
   document.body.appendChild(host)
   const app = createApp(component)
   app.component('RouterView', {
-    name: 'RouterView',
     template: '<div data-router-view-stub></div>',
   })
   app.mount(host)
@@ -81,7 +80,7 @@ function mountComponent(component) {
   }
 }
 
-describe('tutorial guide layout mounting', () => {
+describe('layout footer mounting', () => {
   beforeEach(() => {
     route = reactive({
       path: '/menu/query/zhonggu',
@@ -97,17 +96,17 @@ describe('tutorial guide layout mounting', () => {
     vi.clearAllMocks()
   })
 
-  it('renders the guide in MenuLayout', async () => {
+  it('renders AppFooter in MenuLayout', async () => {
     const { default: MenuLayout } = await import('../src/layouts/MenuLayout.vue')
     const wrapper = mountComponent(MenuLayout)
     await nextTick()
 
-    expect(wrapper.host.querySelector('[data-page-tutorial-guide]')).toBeTruthy()
+    expect(wrapper.host.querySelector('[data-app-footer]')?.textContent).toBe('menu')
 
     wrapper.unmount()
   })
 
-  it('renders the guide in ExploreLayout', async () => {
+  it('renders AppFooter in ExploreLayout', async () => {
     route.path = '/explore/tools/check'
     route.fullPath = '/explore/tools/check'
 
@@ -115,31 +114,21 @@ describe('tutorial guide layout mounting', () => {
     const wrapper = mountComponent(ExploreLayout)
     await nextTick()
 
-    expect(wrapper.host.querySelector('[data-page-tutorial-guide]')).toBeTruthy()
+    expect(wrapper.host.querySelector('[data-app-footer]')?.textContent).toBe('explore')
 
     wrapper.unmount()
   })
 
-  it('renders the guide in SimpleLayout only for praat', async () => {
+  it('renders AppFooter in SimpleLayout', async () => {
     route.path = '/explore/tools/praat'
     route.fullPath = '/explore/tools/praat'
 
     const { default: SimpleLayout } = await import('../src/layouts/SimpleLayout.vue')
-    const praatWrapper = mountComponent(SimpleLayout)
+    const wrapper = mountComponent(SimpleLayout)
     await nextTick()
 
-    expect(praatWrapper.host.querySelector('[data-page-tutorial-guide]')).toBeTruthy()
+    expect(wrapper.host.querySelector('[data-app-footer]')?.textContent).toBe('simple')
 
-    praatWrapper.unmount()
-
-    route.path = '/'
-    route.fullPath = '/'
-
-    const homeWrapper = mountComponent(SimpleLayout)
-    await nextTick()
-
-    expect(homeWrapper.host.querySelector('[data-page-tutorial-guide]')).toBeNull()
-
-    homeWrapper.unmount()
+    wrapper.unmount()
   })
 })

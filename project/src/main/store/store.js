@@ -50,6 +50,14 @@ export function setTutorialEnabled(value) {
     writeTutorialEnabledState(nextValue)
 }
 
+export const tutorialGuideRequestState = reactive({
+    openToken: 0
+})
+
+export function requestCurrentTutorialGuideOpen() {
+    tutorialGuideRequestState.openToken += 1
+}
+
 const {
     state: zhongguInputModeState,
     write: writeZhongguInputModeState

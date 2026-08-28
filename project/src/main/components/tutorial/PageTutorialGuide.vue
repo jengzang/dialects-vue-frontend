@@ -45,7 +45,11 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { tutorialEnabled, requestTutorialAssistApply } from '@/main/store/store.js'
+import {
+  tutorialEnabled,
+  requestTutorialAssistApply,
+  tutorialGuideRequestState,
+} from '@/main/store/store.js'
 import { tutorialManifest } from './tutorialManifest'
 import { resolveTutorialDocument } from './tutorialMarkdown'
 import { tutorialDiceConfig } from '@/main/config/tutorial/tutorialDiceConfig.js'
@@ -247,6 +251,13 @@ function openGuide() {
   isOpen.value = true
   scrollSelectionIntoView()
 }
+
+watch(
+  () => tutorialGuideRequestState.openToken,
+  () => {
+    openGuide()
+  }
+)
 
 function handleModalChange(value) {
   isOpen.value = value

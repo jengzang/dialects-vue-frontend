@@ -132,6 +132,13 @@ export {
   getToponymDetails,
 } from './main/toponyms.js';
 
+// ==================== 站点反馈 ====================
+export {
+  SUGGESTION_CATEGORY_OPTIONS,
+  normalizeSuggestionPayload,
+  submitSuggestion,
+} from './main/suggestions.js';
+
 // ==================== 比较模块 ====================
 export { compareChars, compareZhongGu, compareTones } from './main/core/compare.js';
 

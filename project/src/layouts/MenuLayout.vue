@@ -16,6 +16,7 @@
         </transition>
       </router-view>
     </div>
+    <AppFooter layout-kind="menu" />
     <ScrollToTop />
     <PageTutorialGuide />
     <PanelManager />
@@ -31,6 +32,7 @@ import NavBar from "@/components/bar/NavBar.vue";
 import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 import PanelManager from '@/main/components/result/PanelManager.vue'
 import ScrollToTop from '@/components/common/ScrollToTop.vue'
+import AppFooter from '@/components/footer/AppFooter.vue'
 
 const keepAliveViewNames = [
   'ComparePage',
