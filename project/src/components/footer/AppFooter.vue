@@ -61,7 +61,9 @@
       <div class="footer-meta">
         <div class="page-footer footer-stats">
           <span class="info-text">
-            {{ t(context.languageLabelKey) }} · {{ t(context.themeLabelKey) }}
+            <span>{{ t(context.languageLabelKey) }}</span>
+            <span aria-hidden="true">·</span>
+            <span class="footer-theme-label">{{ t(context.themeLabelKey) }}</span>
           </span>
           <span class="info-text">{{ t('layoutFooter.stats.visits', { today: todayVisits, total: totalVisits }) }}</span>
           <span class="info-text">{{ t('layoutFooter.stats.source', { locationCount: sourceLocationCount, dataCount: sourceDataCount }) }}</span>
@@ -314,6 +316,10 @@ onMounted(fetchFooterStats)
 .footer-meta .info-text {
   color: var(--text-secondary);
   font-size: 13px;
+}
+
+.footer-theme-label {
+  color: var(--color-primary-hover);
 }
 
 .footer-stats,

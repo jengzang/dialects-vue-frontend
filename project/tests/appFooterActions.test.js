@@ -166,6 +166,7 @@ describe('AppFooter actions', () => {
     expect(footer.querySelector('.footer-primary .footer-actions')).toBeTruthy()
     expect(footer.querySelector('.footer-meta .footer-stats')).toBeTruthy()
     expect(footer.querySelector('.footer-meta .footer-legal')).toBeTruthy()
+    expect(footer.querySelector('.footer-meta .footer-theme-label')?.textContent).toBe('绿色')
     expect(footer.querySelector('.page-copy')).toBeNull()
     expect([...footer.querySelectorAll('.footer-action')]
       .some(button => button.classList.contains('glass-button'))).toBe(false)
@@ -194,10 +195,13 @@ describe('AppFooter actions', () => {
     const source = appFooterSource()
     const actionBlock = source.match(/\.footer-action\s*\{[\s\S]*?\n\}/)?.[0]
     const metaInfoBlock = source.match(/\.footer-meta \.info-text\s*\{[\s\S]*?\n\}/)?.[0]
+    const themeLabelBlock = source.match(/\.footer-theme-label\s*\{[\s\S]*?\n\}/)?.[0]
 
     expect(actionBlock).toContain('color: var(--color-primary-hover);')
     expect(actionBlock).toContain('font-weight: 600;')
     expect(metaInfoBlock).toContain('color: var(--text-secondary);')
     expect(metaInfoBlock).toContain('font-size: 13px;')
+    expect(themeLabelBlock).toBeTruthy()
+    expect(themeLabelBlock).toContain('color: var(--color-primary-hover);')
   })
 })
