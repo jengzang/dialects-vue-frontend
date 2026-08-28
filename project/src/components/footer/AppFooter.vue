@@ -14,7 +14,11 @@
     >
       <div class="footer-primary">
         <div class="footer-brand-copy">
-          <span class="info-text footer-brand-name"><strong>{{ t('layoutFooter.pages.generic.title') }}</strong></span>
+          <img
+            src="/brand/title.webp"
+            :alt="t('layoutFooter.pages.generic.title')"
+            class="footer-brand-title title-logo"
+          >
           <span class="hint footer-page-description">{{ t(context.pageDescriptionKey) }}</span>
         </div>
 
@@ -269,6 +273,12 @@ onMounted(fetchFooterStats)
   align-items: flex-start;
   min-width: 0;
   gap: 4px;
+}
+
+.footer-brand-title {
+  display: block;
+  width: auto;
+  height: 22px;
 }
 
 .footer-actions {
