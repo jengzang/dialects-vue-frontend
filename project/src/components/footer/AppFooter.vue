@@ -291,6 +291,16 @@ onMounted(fetchFooterStats)
 
 .footer-action {
   min-width: 0;
+  color: var(--color-primary-hover);
+  font-weight: 600;
+
+  &:hover:not(:disabled) {
+    color: var(--color-primary);
+  }
+
+  &:disabled {
+    color: var(--text-secondary);
+  }
 }
 
 .footer-meta {
@@ -298,6 +308,12 @@ onMounted(fetchFooterStats)
   align-items: center;
   margin-top: 14px;
   gap: 8px;
+  color: var(--text-secondary);
+}
+
+.footer-meta .info-text {
+  color: var(--text-secondary);
+  font-size: 13px;
 }
 
 .footer-stats,

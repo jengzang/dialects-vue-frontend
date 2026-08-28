@@ -1,7 +1,13 @@
+import { readFileSync } from 'node:fs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApp, nextTick, reactive } from 'vue'
 
 globalThis.__WEB_BASE__ = ''
+
+const appFooterSource = () => readFileSync(
+  'src/components/footer/AppFooter.vue',
+  'utf8',
+)
 
 let route
 const routerPushMock = vi.fn()
@@ -182,5 +188,16 @@ describe('AppFooter actions', () => {
     expect(showErrorMock).not.toHaveBeenCalled()
 
     wrapper.unmount()
+  })
+
+  it('keeps footer action and meta visual hierarchy tokenized', () => {
+    const source = appFooterSource()
+    const actionBlock = source.match(/\.footer-action\s*\{[\s\S]*?\n\}/)?.[0]
+    const metaInfoBlock = source.match(/\.footer-meta \.info-text\s*\{[\s\S]*?\n\}/)?.[0]
+
+    expect(actionBlock).toContain('color: var(--color-primary-hover);')
+    expect(actionBlock).toContain('font-weight: 600;')
+    expect(metaInfoBlock).toContain('color: var(--text-secondary);')
+    expect(metaInfoBlock).toContain('font-size: 13px;')
   })
 })
