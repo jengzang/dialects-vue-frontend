@@ -5,52 +5,61 @@
     :data-layout-kind="layoutKind"
   >
     <div
-      class="footer-actions"
-      aria-label="layout footer actions"
+      class="footer-brand-line"
+      aria-hidden="true"
+    />
+
+    <div
+      class="footer-content"
     >
-      <button
-        type="button"
-        class="text-action footer-action"
-        :disabled="!context.hasTutorial"
-        @click="openTutorial"
+      <div
+        class="footer-actions"
+        aria-label="layout footer actions"
       >
-        {{ t('layoutFooter.actions.tutorial') }}
-      </button>
-      <button
-        type="button"
-        class="text-action footer-action"
-        @click="isFeedbackOpen = true"
-      >
-        {{ t('layoutFooter.actions.feedback') }}
-      </button>
-      <button
-        type="button"
-        class="text-action footer-action"
-        @click="shareCurrentPage"
-      >
-        {{ t('layoutFooter.actions.share') }}
-      </button>
-      <button
-        type="button"
-        class="text-action footer-action"
-        @click="goToSettings"
-      >
-        {{ t('layoutFooter.actions.settings') }}
-      </button>
-    </div>
+        <button
+          type="button"
+          class="text-action footer-action"
+          :disabled="!context.hasTutorial"
+          @click="openTutorial"
+        >
+          {{ t('layoutFooter.actions.tutorial') }}
+        </button>
+        <button
+          type="button"
+          class="text-action footer-action"
+          @click="isFeedbackOpen = true"
+        >
+          {{ t('layoutFooter.actions.feedback') }}
+        </button>
+        <button
+          type="button"
+          class="text-action footer-action"
+          @click="shareCurrentPage"
+        >
+          {{ t('layoutFooter.actions.share') }}
+        </button>
+        <button
+          type="button"
+          class="text-action footer-action"
+          @click="goToSettings"
+        >
+          {{ t('layoutFooter.actions.settings') }}
+        </button>
+      </div>
 
-    <div class="page-footer footer-stats">
-      <span class="info-text">
-        {{ t(context.languageLabelKey) }} · {{ t(context.themeLabelKey) }}
-      </span>
-      <span class="info-text">{{ t('layoutFooter.stats.visits', { today: todayVisits, total: totalVisits }) }}</span>
-      <span class="info-text">{{ t('layoutFooter.stats.source', { locationCount: sourceLocationCount, dataCount: sourceDataCount }) }}</span>
-      <span class="info-text">{{ t('layoutFooter.stats.databaseVersion', { version: sourceDbVersion }) }}</span>
-    </div>
+      <div class="page-footer footer-stats">
+        <span class="info-text">
+          {{ t(context.languageLabelKey) }} · {{ t(context.themeLabelKey) }}
+        </span>
+        <span class="info-text">{{ t('layoutFooter.stats.visits', { today: todayVisits, total: totalVisits }) }}</span>
+        <span class="info-text">{{ t('layoutFooter.stats.source', { locationCount: sourceLocationCount, dataCount: sourceDataCount }) }}</span>
+        <span class="info-text">{{ t('layoutFooter.stats.databaseVersion', { version: sourceDbVersion }) }}</span>
+      </div>
 
-    <div class="page-footer footer-legal">
-      <span class="info-text">{{ t('layoutFooter.legal.copyright') }}</span>
-      <span class="info-text">{{ t('layoutFooter.legal.icp') }}</span>
+      <div class="page-footer footer-legal">
+        <span class="info-text">{{ t('layoutFooter.legal.copyright') }}</span>
+        <span class="info-text">{{ t('layoutFooter.legal.icp') }}</span>
+      </div>
     </div>
 
     <LayoutFeedbackModal
@@ -207,8 +216,36 @@ onMounted(fetchFooterStats)
 .app-footer {
   width: 100%;
   margin-top: 24px;
-  padding: 28px max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
-  border-top: 1px solid var(--border-glass);
+  padding: 0 max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  border-top: 1px solid var(--border-control);
+  background: linear-gradient(
+    180deg,
+    var(--surface-panel-subtle) 0%,
+    transparent 100%
+  );
+}
+
+.footer-brand-line {
+  width: min(520px, 100%);
+  height: 2px;
+  margin: -1px auto 0;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(var(--color-primary-rgb), 0.08) 12%,
+    var(--color-primary) 38%,
+    var(--color-primary-hover) 62%,
+    rgba(var(--color-primary-rgb), 0.08) 88%,
+    transparent 100%
+  );
+  opacity: 0.72;
+}
+
+.footer-content {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding-top: 26px;
 }
 
 .footer-actions,
@@ -236,6 +273,9 @@ onMounted(fetchFooterStats)
 @media (max-aspect-ratio: 1 / 1) {
   .app-footer {
     margin-top: 18px;
+  }
+
+  .footer-content {
     padding-top: 22px;
   }
 

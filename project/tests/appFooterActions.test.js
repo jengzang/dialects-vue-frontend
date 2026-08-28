@@ -149,9 +149,11 @@ describe('AppFooter actions', () => {
 
     const footer = wrapper.host.querySelector('[data-app-footer]')
     expect(footer.classList.contains('glass-panel')).toBe(false)
-    expect(footer.querySelector('.footer-actions')).toBeTruthy()
-    expect(footer.querySelector('.footer-stats')).toBeTruthy()
-    expect(footer.querySelector('.footer-legal')).toBeTruthy()
+    expect(footer.querySelector('.footer-brand-line')?.getAttribute('aria-hidden')).toBe('true')
+    expect(footer.querySelector('.footer-content')).toBeTruthy()
+    expect(footer.querySelector('.footer-content .footer-actions')).toBeTruthy()
+    expect(footer.querySelector('.footer-content .footer-stats')).toBeTruthy()
+    expect(footer.querySelector('.footer-content .footer-legal')).toBeTruthy()
     expect(footer.querySelector('.page-copy')).toBeNull()
     expect([...footer.querySelectorAll('.footer-action')]
       .some(button => button.classList.contains('glass-button'))).toBe(false)
