@@ -102,7 +102,8 @@ $portrait-ratio: 1;
 /* 内容区域 */
 .content-area {
   width: 98%;
-  min-height: 100dvh;
+  box-sizing: border-box;
+  min-height: calc(100dvh - max(16px, env(safe-area-inset-top)));
   display: flex;
   justify-content: center;
   padding: 10px 6px;

@@ -79,7 +79,8 @@ $portrait-ratio: 1;
 .glass-content {
   position: relative;
   width: 100%;
-  min-height: 100dvh;
+  box-sizing: border-box;
+  min-height: calc(100dvh - max(16px, env(safe-area-inset-top)));
   display: flex;
   align-items: flex-start;
   justify-content: center;

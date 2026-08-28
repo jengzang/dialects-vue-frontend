@@ -156,7 +156,7 @@ describe('layout footer mounting', () => {
     wrapper.unmount()
   })
 
-  it('keeps shared layout content at least one viewport tall before the footer', () => {
+  it('keeps shared layout content within the first viewport before the footer', () => {
     const layoutContentContracts = [
       ['src/layouts/MenuLayout.vue', '.glass-content'],
       ['src/layouts/ExploreLayout.vue', '.content-area'],
@@ -165,7 +165,9 @@ describe('layout footer mounting', () => {
 
     layoutContentContracts.forEach(([path, selector]) => {
       const block = selectorBlock(readSource(path), selector)
-      expect(block, `${path} ${selector}`).toContain('min-height: 100dvh;')
+      expect(block, `${path} ${selector}`).toContain('box-sizing: border-box;')
+      expect(block, `${path} ${selector}`).toContain('min-height: calc(100dvh - max(16px, env(safe-area-inset-top)));')
+      expect(block, `${path} ${selector}`).not.toContain('min-height: 100dvh;')
     })
   })
 })
