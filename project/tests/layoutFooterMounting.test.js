@@ -131,4 +131,18 @@ describe('layout footer mounting', () => {
 
     wrapper.unmount()
   })
+
+  it('does not render the shared AppFooter on the localized homepage', async () => {
+    route.path = '/zh-CN'
+    route.fullPath = '/zh-CN'
+    route.params = { locale: 'zh-CN' }
+
+    const { default: SimpleLayout } = await import('../src/layouts/SimpleLayout.vue')
+    const wrapper = mountComponent(SimpleLayout)
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-app-footer]')).toBeNull()
+
+    wrapper.unmount()
+  })
 })

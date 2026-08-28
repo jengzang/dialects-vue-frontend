@@ -13,7 +13,10 @@
       </router-view>
     </div>
 
-    <AppFooter layout-kind="simple" />
+    <AppFooter
+      v-if="showAppFooter"
+      layout-kind="simple"
+    />
 
     <!-- 悬浮按钮组 -->
     <FloatingButtons
@@ -44,12 +47,14 @@ import SimpleSidebar from '@/components/bar/SimpleSidebar.vue';
 import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 import ScrollToTop from '@/components/common/ScrollToTop.vue'
 import AppFooter from '@/components/footer/AppFooter.vue'
+import { stripLocaleFromPath } from '@/i18n/localeRouting.js'
 
 const route = useRoute();
 const isSidebarOpen = ref(false);
 const authButtonPosition = ref('top-right');
 const floatButtonsPosition = ref('bottom-right');
 const showTutorialGuide = computed(() => route.path.endsWith('/explore/tools/praat'))
+const showAppFooter = computed(() => stripLocaleFromPath(route.path) !== '/')
 
 // 根据路由自动设置浮动按钮位置
 watch(() => route.path, (newPath) => {
@@ -120,4 +125,3 @@ $portrait-ratio: 1;
   }
 }
 </style>
-
