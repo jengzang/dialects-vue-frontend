@@ -53,6 +53,8 @@ const keepAliveViewNames = [
 
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $fade-duration: 0.14s;
 $portrait-ratio: 1;
 
@@ -77,6 +79,7 @@ $portrait-ratio: 1;
 .glass-content {
   position: relative;
   width: 100%;
+  min-height: 100dvh;
   display: flex;
   align-items: flex-start;
   justify-content: center;

@@ -1,9 +1,19 @@
+import { readFileSync } from 'node:fs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApp, nextTick, reactive } from 'vue'
 
 globalThis.__WEB_BASE__ = ''
 
 let route
+
+function readSource(relativePath) {
+  return readFileSync(relativePath, 'utf8')
+}
+
+function selectorBlock(source, selector) {
+  const escapedSelector = selector.replace('.', '\\.')
+  return source.match(new RegExp(`${escapedSelector}\\s*\\{([\\s\\S]*?)\\n\\}`, 'm'))?.[1] ?? ''
+}
 
 vi.mock('vue-router', () => ({
   useRoute: () => route,
@@ -144,5 +154,18 @@ describe('layout footer mounting', () => {
     expect(wrapper.host.querySelector('[data-app-footer]')).toBeNull()
 
     wrapper.unmount()
+  })
+
+  it('keeps shared layout content at least one viewport tall before the footer', () => {
+    const layoutContentContracts = [
+      ['src/layouts/MenuLayout.vue', '.glass-content'],
+      ['src/layouts/ExploreLayout.vue', '.content-area'],
+      ['src/layouts/SimpleLayout.vue', '.content-area'],
+    ]
+
+    layoutContentContracts.forEach(([path, selector]) => {
+      const block = selectorBlock(readSource(path), selector)
+      expect(block, `${path} ${selector}`).toContain('min-height: 100dvh;')
+    })
   })
 })

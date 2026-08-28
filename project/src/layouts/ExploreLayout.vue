@@ -74,6 +74,7 @@ $portrait-ratio: 1;
   justify-content: center;
   flex: 1;
   width: 100%;
+  min-height: 100dvh;
   padding: 10px 6px;
   padding-top: calc(7dvh - 15px);
   color: var(--text-deep);
