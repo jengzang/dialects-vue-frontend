@@ -99,6 +99,14 @@ vi.mock('../src/main/components/footer/LayoutFeedbackModal.vue', () => ({
   },
 }))
 
+vi.mock('../src/components/bar/SimpleSidebar.vue', () => ({
+  default: {
+    props: ['isOpen'],
+    emits: ['close'],
+    template: '<aside v-if="isOpen" data-simple-sidebar-stub><button type="button" data-close-sidebar @click="$emit(\'close\')">close</button></aside>',
+  },
+}))
+
 function mountFooter(component) {
   const host = document.createElement('div')
   document.body.appendChild(host)
@@ -179,7 +187,10 @@ describe('AppFooter actions', () => {
     const wrapper = mountFooter(AppFooter)
     await nextTick()
 
-    wrapper.host.querySelectorAll('button')[2].click()
+    const shareButton = [...wrapper.host.querySelectorAll('.footer-action')]
+      .find(button => button.textContent.trim() === 'layoutFooter.actions.share')
+
+    shareButton.click()
     await nextTick()
     await new Promise(resolve => setTimeout(resolve, 0))
 
@@ -187,6 +198,30 @@ describe('AppFooter actions', () => {
     expect(HTMLAnchorElement.prototype.click).toHaveBeenCalled()
     expect(showSuccessMock).toHaveBeenCalledWith('layoutFooter.share.imageReady')
     expect(showErrorMock).not.toHaveBeenCalled()
+
+    wrapper.unmount()
+  })
+
+  it('opens SimpleSidebar from the i18n menu action', async () => {
+    const { default: AppFooter } = await import('../src/components/footer/AppFooter.vue')
+    const wrapper = mountFooter(AppFooter)
+    await nextTick()
+
+    const menuButton = [...wrapper.host.querySelectorAll('.footer-action')]
+      .find(button => button.textContent.trim() === 'layoutFooter.actions.menu')
+
+    expect(menuButton).toBeTruthy()
+    expect(wrapper.host.querySelector('[data-simple-sidebar-stub]')).toBeNull()
+
+    menuButton.click()
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-simple-sidebar-stub]')).toBeTruthy()
+
+    wrapper.host.querySelector('[data-close-sidebar]').click()
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-simple-sidebar-stub]')).toBeNull()
 
     wrapper.unmount()
   })
@@ -203,5 +238,7 @@ describe('AppFooter actions', () => {
     expect(metaInfoBlock).toContain('font-size: 13px;')
     expect(themeLabelBlock).toBeTruthy()
     expect(themeLabelBlock).toContain('color: var(--color-primary-hover);')
+    expect(source).not.toContain('grid-template-columns:')
+    expect(source).toContain('v-if="isMenuOpen"')
   })
 })

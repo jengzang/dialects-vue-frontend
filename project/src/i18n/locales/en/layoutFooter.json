@@ -1,5 +1,6 @@
 {
   "actions": {
+    "menu": "Menu",
     "tutorial": "Tutorial",
     "feedback": "Feedback",
     "share": "Share",

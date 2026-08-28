@@ -29,6 +29,13 @@
           <button
             type="button"
             class="text-action footer-action"
+            @click="isMenuOpen = true"
+          >
+            {{ t('layoutFooter.actions.menu') }}
+          </button>
+          <button
+            type="button"
+            class="text-action footer-action"
             :disabled="!context.hasTutorial"
             @click="openTutorial"
           >
@@ -83,6 +90,12 @@
       :source-path="route.path"
       :context="feedbackContext"
     />
+
+    <SimpleSidebar
+      v-if="isMenuOpen"
+      :is-open="true"
+      @close="isMenuOpen = false"
+    />
   </footer>
 </template>
 
@@ -100,6 +113,7 @@ import { currentColorTheme } from '@/composables/core/uiPreferences.js'
 import { createShareCardDataUrl } from '@/utils/share/shareCard.js'
 import { showError, showSuccess } from '@/utils/ui/message.js'
 import LayoutFeedbackModal from '@/main/components/footer/LayoutFeedbackModal.vue'
+import SimpleSidebar from '@/components/bar/SimpleSidebar.vue'
 
 const props = defineProps({
   layoutKind: {
@@ -118,6 +132,7 @@ const cachedSourceStats = getCachedSourceStats()
 const sourceLocationCount = ref(cachedSourceStats.locationCount)
 const sourceDataCount = ref(cachedSourceStats.dataCount)
 const isFeedbackOpen = ref(false)
+const isMenuOpen = ref(false)
 
 const {
   todayVisits,
@@ -352,10 +367,8 @@ onMounted(fetchFooterStats)
   }
 
   .footer-actions {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    width: 100%;
-    gap: 8px;
+    justify-content: center;
+    gap: 8px 16px;
   }
 }
 </style>
