@@ -1,11 +1,12 @@
 <template>
   <div
-    v-if="tutorialEnabled && currentMatchedEntry"
+    v-if="currentMatchedEntry"
     class="page-tutorial-guide"
     :style="guideStyle"
     data-page-tutorial-guide
   >
     <TutorialDiceTrigger
+      v-if="tutorialEnabled"
       :entry="currentMatchedEntry"
       :has-dice-config="Boolean(currentDiceEntry)"
       :show-dice-tooltip="showDiceTooltip"
