@@ -58,6 +58,13 @@
           <button
             type="button"
             class="text-action footer-action"
+            @click="isSupportOpen = true"
+          >
+            {{ t('layoutFooter.actions.support') }}
+          </button>
+          <button
+            type="button"
+            class="text-action footer-action"
             @click="goToSettings"
           >
             {{ t('layoutFooter.actions.settings') }}
@@ -96,6 +103,12 @@
       :is-open="true"
       @close="isMenuOpen = false"
     />
+
+    <SupportPopup
+      v-if="isSupportOpen"
+      :visible="true"
+      @close="isSupportOpen = false"
+    />
   </footer>
 </template>
 
@@ -114,6 +127,7 @@ import { createShareCardDataUrl } from '@/utils/share/shareCard.js'
 import { showError, showSuccess } from '@/utils/ui/message.js'
 import LayoutFeedbackModal from '@/main/components/footer/LayoutFeedbackModal.vue'
 import SimpleSidebar from '@/components/bar/SimpleSidebar.vue'
+import SupportPopup from '@/main/components/user/popups/SupportPopup.vue'
 
 const props = defineProps({
   layoutKind: {
@@ -133,6 +147,7 @@ const sourceLocationCount = ref(cachedSourceStats.locationCount)
 const sourceDataCount = ref(cachedSourceStats.dataCount)
 const isFeedbackOpen = ref(false)
 const isMenuOpen = ref(false)
+const isSupportOpen = ref(false)
 
 const {
   todayVisits,

@@ -107,6 +107,14 @@ vi.mock('../src/components/bar/SimpleSidebar.vue', () => ({
   },
 }))
 
+vi.mock('../src/main/components/user/popups/SupportPopup.vue', () => ({
+  default: {
+    props: ['visible'],
+    emits: ['close'],
+    template: '<div v-if="visible" data-support-popup-stub><button type="button" data-close-support @click="$emit(\'close\')">close</button></div>',
+  },
+}))
+
 function mountFooter(component) {
   const host = document.createElement('div')
   document.body.appendChild(host)
@@ -226,6 +234,30 @@ describe('AppFooter actions', () => {
     wrapper.unmount()
   })
 
+  it('opens SupportPopup from the i18n support action', async () => {
+    const { default: AppFooter } = await import('../src/components/footer/AppFooter.vue')
+    const wrapper = mountFooter(AppFooter)
+    await nextTick()
+
+    const supportButton = [...wrapper.host.querySelectorAll('.footer-action')]
+      .find(button => button.textContent.trim() === 'layoutFooter.actions.support')
+
+    expect(supportButton).toBeTruthy()
+    expect(wrapper.host.querySelector('[data-support-popup-stub]')).toBeNull()
+
+    supportButton.click()
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-support-popup-stub]')).toBeTruthy()
+
+    wrapper.host.querySelector('[data-close-support]').click()
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-support-popup-stub]')).toBeNull()
+
+    wrapper.unmount()
+  })
+
   it('keeps footer action and meta visual hierarchy tokenized', () => {
     const source = appFooterSource()
     const actionBlock = source.match(/\.footer-action\s*\{[\s\S]*?\n\}/)?.[0]
@@ -240,5 +272,6 @@ describe('AppFooter actions', () => {
     expect(themeLabelBlock).toContain('color: var(--color-primary-hover);')
     expect(source).not.toContain('grid-template-columns:')
     expect(source).toContain('v-if="isMenuOpen"')
+    expect(source).toContain('v-if="isSupportOpen"')
   })
 })
