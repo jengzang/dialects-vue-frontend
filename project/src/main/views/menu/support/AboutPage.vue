@@ -584,7 +584,7 @@ $ease-standard: 0.3s ease;@mixin glass-card(
 .page2 {
   @include flex-col;
 
-  max-width: 500px;
+  max-width: 900px;
   align-items: center;
   justify-content: center;
   margin: 0 auto;
@@ -990,7 +990,7 @@ em {
 
 /* 建议入口 */
 .suggestion-box {
-  max-width: 700px;
+  max-width: 500px;
   margin: 0 auto;
   justify-content: center;
   color: var(--text-deep);

@@ -28,11 +28,15 @@
         </div>
       </div>
 
-      <HomeFeaturedTools @view-all="scrollToFeatures" />
+      <!-- Showcase Section (lazy mounted) -->
+      <!-- <section class="showcase-section" ref="showcaseSectionRef"> -->
+        <HeroShowcase v-if="showShowcase" />
+      <!-- </section> -->
+      
     </section>
 
     <!-- Platform Section -->
-    <section class="platform-section reveal">
+    <!-- <section class="platform-section reveal">
       <article class="platform-card">
         <span class="platform-eyebrow">{{ $t('home.platform.eyebrow') }}</span>
         <h2 class="platform-title">{{ $t('home.platform.title') }}</h2>
@@ -52,14 +56,11 @@
           </div>
         </div>
       </article>
-    </section>
+    </section> -->
+
+    <!-- <HomeFeaturedTools @view-all="scrollToFeatures" /> -->
 
     <FeaturesSection />
-
-    <!-- Showcase Section (lazy mounted) -->
-    <section class="showcase-section" ref="showcaseSectionRef">
-      <HeroShowcase v-if="showShowcase" />
-    </section>
 
     <!-- Roadmap Section -->
     <!-- <section class="roadmap-section">
