@@ -148,6 +148,105 @@
               </a>
             </div>
           </div>
+
+          <div
+            class="surface-panel suggestion-form-section"
+            data-about-suggestion-form
+          >
+            <h2 class="tabs-title">{{ $t('layoutFooter.feedback.title') }}</h2>
+            <form
+              class="suggestion-page-form"
+              @submit.prevent="submitSuggestionForm"
+            >
+              <div class="field feedback-category">
+                <span>{{ $t('layoutFooter.feedback.category') }}</span>
+                <SimpleSelectDropdown
+                  v-model="suggestionCategory"
+                  :options="suggestionCategoryOptions"
+                  :disabled="isSubmittingSuggestion || isCapturingSuggestionScreenshot"
+                  width="100%"
+                />
+              </div>
+
+              <label class="field">
+                <span>{{ $t('layoutFooter.feedback.titleLabel') }}</span>
+                <input
+                  v-model.trim="suggestionTitle"
+                  class="glass-field"
+                  name="title"
+                  maxlength="200"
+                  :placeholder="$t('layoutFooter.feedback.titlePlaceholder')"
+                >
+              </label>
+
+              <label class="field">
+                <span>{{ $t('layoutFooter.feedback.contentLabel') }}</span>
+                <textarea
+                  v-model.trim="suggestionContent"
+                  class="glass-field"
+                  name="content"
+                  maxlength="5000"
+                  rows="5"
+                  :placeholder="$t('layoutFooter.feedback.contentPlaceholder')"
+                />
+              </label>
+
+              <label class="field">
+                <span>{{ $t('layoutFooter.feedback.contactLabel') }}</span>
+                <input
+                  v-model.trim="suggestionContact"
+                  class="glass-field"
+                  name="contact"
+                  maxlength="200"
+                  :placeholder="$t('layoutFooter.feedback.contactPlaceholder')"
+                >
+              </label>
+
+              <CheckBox
+                v-model="includeSuggestionScreenshot"
+                class="screenshot-field"
+                data-include-screenshot
+              >
+                {{ $t('layoutFooter.feedback.screenshot.label') }}
+              </CheckBox>
+              <p class="hint screenshot-hint">
+                {{ $t('layoutFooter.feedback.screenshot.hint') }}
+              </p>
+              <div
+                v-if="includeSuggestionScreenshot"
+                class="surface-subpanel screenshot-preview"
+              >
+                <img
+                  v-if="suggestionScreenshotDataUrl"
+                  :src="suggestionScreenshotDataUrl"
+                  :alt="$t('layoutFooter.feedback.screenshot.previewAlt')"
+                >
+                <span v-else>{{ $t('layoutFooter.feedback.screenshot.capturing') }}</span>
+                <button
+                  type="button"
+                  class="glass-button screenshot-retake"
+                  data-size="compact"
+                  :disabled="isCapturingSuggestionScreenshot"
+                  @click="captureSuggestionScreenshotPreview"
+                >
+                  {{ $t('layoutFooter.feedback.screenshot.retake') }}
+                </button>
+              </div>
+
+              <div class="suggestion-form-actions">
+                <button
+                  type="submit"
+                  class="glass-button suggestion-submit-button"
+                  data-variant="primary"
+                  data-size="small"
+                  data-submit-feedback
+                  :disabled="isSubmittingSuggestion || isCapturingSuggestionScreenshot || !canSubmitSuggestion"
+                >
+                  {{ $t('layoutFooter.feedback.submit') }}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
 
         <!-- 新的"喜歡"页面 -->
@@ -255,11 +354,42 @@ import i18n from '@/i18n/index.js'
 // import BarIcon from '@/components/common/BarIcon.vue'
 import SupportPopup from '@/main/components/user/popups/SupportPopup.vue'
 import TabsContainer from '@/components/common/TabsContainer.vue'
+import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import { useSuggestionForm } from '@/composables/suggestions/useSuggestionForm.js'
 
 const { t, locale } = useI18n()
 const route = useRoute()
 const showQRCodes = ref(false)
+
+const suggestionPageContext = computed(() => ({
+  path: route.path,
+  fullPath: route.fullPath,
+  query: route.query,
+  hash: route.hash,
+  locale: locale.value,
+}))
+
+const {
+  category: suggestionCategory,
+  title: suggestionTitle,
+  content: suggestionContent,
+  contact: suggestionContact,
+  includeScreenshot: includeSuggestionScreenshot,
+  screenshotDataUrl: suggestionScreenshotDataUrl,
+  isSubmitting: isSubmittingSuggestion,
+  isCapturingScreenshot: isCapturingSuggestionScreenshot,
+  categoryOptions: suggestionCategoryOptions,
+  canSubmit: canSubmitSuggestion,
+  captureScreenshotPreview: captureSuggestionScreenshotPreview,
+  submit: submitSuggestionForm,
+} = useSuggestionForm({
+  t,
+  pageTitle: () => t('navigation.pageTitles.support.aboutSuggestion'),
+  sourcePath: () => route.path,
+  context: () => suggestionPageContext.value,
+})
 
 const zhihuFallback = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="4" fill="#0066FF"/><text x="12" y="17" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="sans-serif">知</text></svg>')
 const githubFallback = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#24292f"/><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.78.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12c0-5.52-4.48-10-10-10z" fill="white"/></svg>')
@@ -452,8 +582,10 @@ $ease-standard: 0.3s ease;@mixin glass-card(
 
 /* 建议页面 */
 .page2 {
+  @include flex-col;
+
   max-width: 500px;
-  display: flex;
+  align-items: center;
   justify-content: center;
   margin: 0 auto;
   padding: 1dvw 8dvw;
@@ -927,6 +1059,70 @@ em {
   margin-bottom: 4px;
 }
 
+.suggestion-form-section {
+  @include flex-col;
+  gap: 14px;
+  max-width: 640px;
+  margin: 28px auto 0;
+  padding: 20px;
+  text-align: left;
+
+  .tabs-title {
+    margin-bottom: 0;
+  }
+}
+
+.suggestion-page-form {
+  @include flex-col;
+  gap: 12px;
+
+  textarea {
+    resize: vertical;
+  }
+}
+
+.suggestion-page-form .field {
+  @include flex-col;
+  gap: 6px;
+}
+
+.suggestion-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.suggestion-submit-button {
+  min-width: 96px;
+}
+
+.screenshot-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.screenshot-hint {
+  margin: -6px 0 0;
+}
+
+.screenshot-preview {
+  @include flex-col;
+  gap: 8px;
+  padding: 8px;
+}
+
+.screenshot-preview img {
+  display: block;
+  width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+}
+
+.screenshot-retake {
+  align-self: flex-start;
+}
+
 /* 竖屏 */
 @media (max-aspect-ratio: #{1 / 1}) {
   .page2 {
@@ -1076,6 +1272,19 @@ em {
     width: 24px;
     height: 24px;
     margin-bottom: 2px;
+  }
+
+  .suggestion-form-section {
+    margin-top: 22px;
+    padding: 16px;
+  }
+
+  .suggestion-form-actions {
+    justify-content: stretch;
+  }
+
+  .suggestion-submit-button {
+    width: 100%;
   }
 }
 </style>

@@ -13,10 +13,11 @@
     >
       <div class="field feedback-category">
         <span>{{ t('layoutFooter.feedback.category') }}</span>
-        <ChoiceSelector
+        <SimpleSelectDropdown
           v-model="category"
           :options="categoryOptions"
-          :aria-label="t('layoutFooter.feedback.category')"
+          :disabled="isSubmitting || isCapturingScreenshot"
+          width="100%"
         />
       </div>
 
@@ -103,14 +104,12 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
-import ChoiceSelector from '@/components/selector/ChoiceSelector.vue'
+import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
-import { SUGGESTION_CATEGORY_OPTIONS, submitSuggestion } from '@/api/main/suggestions.js'
-import { capturePageSnapshot } from '@/utils/share/pageSnapshot.js'
-import { showError, showSuccess } from '@/utils/ui/message.js'
+import { useSuggestionForm } from '@/composables/suggestions/useSuggestionForm.js'
 
 const props = defineProps({
   modelValue: {
@@ -134,95 +133,26 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 const { t } = useI18n()
 
-const category = ref('general')
-const title = ref('')
-const content = ref('')
-const contact = ref('')
-const includeScreenshot = ref(false)
-const screenshotDataUrl = ref('')
-const isSubmitting = ref(false)
-const isCapturingScreenshot = ref(false)
-
-const categoryOptions = computed(() => SUGGESTION_CATEGORY_OPTIONS.map(value => ({
-  value,
-  label: t(`layoutFooter.feedback.categories.${value}`),
-})))
-
-const canSubmit = computed(() => title.value.trim() && content.value.trim())
-
-function resetForm() {
-  category.value = 'general'
-  title.value = ''
-  content.value = ''
-  contact.value = ''
-  includeScreenshot.value = false
-  screenshotDataUrl.value = ''
-  isCapturingScreenshot.value = false
-}
-
-async function captureScreenshotPreview() {
-  if (!includeScreenshot.value || isCapturingScreenshot.value) {
-    return
-  }
-
-  isCapturingScreenshot.value = true
-  try {
-    screenshotDataUrl.value = await capturePageSnapshot()
-  } catch (error) {
-    screenshotDataUrl.value = ''
-    includeScreenshot.value = false
-    const errorKey = error?.message === 'screenshot_too_large'
-      ? 'layoutFooter.feedback.validationFailed'
-      : 'layoutFooter.feedback.failed'
-    showError(t(errorKey))
-  } finally {
-    isCapturingScreenshot.value = false
-  }
-}
-
-async function submit() {
-  if (!canSubmit.value || isSubmitting.value || isCapturingScreenshot.value) {
-    return
-  }
-
-  isSubmitting.value = true
-  try {
-    const imageBase64 = includeScreenshot.value
-      ? screenshotDataUrl.value || await capturePageSnapshot()
-      : ''
-
-    await submitSuggestion({
-      title: title.value,
-      content: content.value,
-      category: category.value,
-      source_path: props.sourcePath,
-      contact: contact.value,
-      context: {
-        ...props.context,
-        pageTitle: props.pageTitle,
-      },
-      image_base64: imageBase64,
-    })
-    showSuccess(t('layoutFooter.feedback.success'))
-    emit('update:modelValue', false)
-    resetForm()
-  } catch (error) {
-    const errorKey = error?.status === 422 || error?.message === 'screenshot_too_large'
-      ? 'layoutFooter.feedback.validationFailed'
-      : 'layoutFooter.feedback.failed'
-    showError(t(errorKey))
-  } finally {
-    isSubmitting.value = false
-  }
-}
-
-watch(includeScreenshot, (checked) => {
-  if (!checked) {
-    screenshotDataUrl.value = ''
-    return
-  }
-
-  captureScreenshotPreview()
+const {
+  category,
+  title,
+  content,
+  contact,
+  includeScreenshot,
+  screenshotDataUrl,
+  isSubmitting,
+  isCapturingScreenshot,
+  categoryOptions,
+  canSubmit,
+  resetForm,
+  captureScreenshotPreview,
+  submit,
+} = useSuggestionForm({
+  t,
+  pageTitle: () => props.pageTitle,
+  sourcePath: () => props.sourcePath,
+  context: () => props.context,
+  onSubmitted: () => emit('update:modelValue', false),
 })
 
 watch(

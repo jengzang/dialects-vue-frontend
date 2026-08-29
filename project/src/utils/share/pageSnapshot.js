@@ -78,6 +78,7 @@ export async function capturePageSnapshot({
     ignoreElements: (element) => {
       return Boolean(
         element.closest?.('[data-layout-feedback-modal]') ||
+        element.closest?.('[data-about-suggestion-form]') ||
         element.closest?.('[data-page-tutorial-guide]') ||
         element.closest?.('[data-app-footer]') ||
         element.closest?.('.app-modal')

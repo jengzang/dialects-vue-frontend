@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApp, nextTick } from 'vue'
 
@@ -34,12 +35,12 @@ vi.mock('../src/components/common/AppModal.vue', () => ({
   },
 }))
 
-vi.mock('../src/components/selector/ChoiceSelector.vue', () => ({
+vi.mock('../src/components/selector/SimpleSelectDropdown.vue', () => ({
   default: {
-    props: ['modelValue', 'options', 'ariaLabel', 'disabled'],
+    props: ['modelValue', 'options', 'disabled'],
     emits: ['update:modelValue'],
     template: `
-      <div role="tablist" :aria-label="ariaLabel">
+      <div data-simple-select-dropdown>
         <button
           v-for="option in options"
           :key="option.value"
@@ -132,6 +133,13 @@ describe('LayoutFeedbackModal', () => {
     expect(showSuccessMock).toHaveBeenCalledWith('layoutFooter.feedback.success')
 
     wrapper.unmount()
+  })
+
+  it('uses SimpleSelectDropdown for the feedback category control', () => {
+    const source = readFileSync('src/main/components/footer/LayoutFeedbackModal.vue', 'utf8')
+
+    expect(source).toContain('SimpleSelectDropdown')
+    expect(source).not.toContain('ChoiceSelector')
   })
 
   it('shows a validation message for backend 422 responses', async () => {

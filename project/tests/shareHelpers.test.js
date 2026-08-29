@@ -80,6 +80,30 @@ describe('page snapshot helper', () => {
     expect(drawImageMock).toHaveBeenCalledWith(canvas, 0, 0, resizedCanvas.width, resizedCanvas.height)
   })
 
+  it('ignores the in-page suggestion form during screenshot capture', async () => {
+    const canvas = {
+      width: 1200,
+      height: 300,
+      toDataURL: vi.fn().mockReturnValue('data:image/webp;base64,abc'),
+    }
+    html2canvasMock.mockResolvedValue(canvas)
+
+    const suggestionForm = document.createElement('form')
+    suggestionForm.dataset.aboutSuggestionForm = ''
+    const typedField = document.createElement('input')
+    suggestionForm.appendChild(typedField)
+    document.body.appendChild(suggestionForm)
+
+    const { capturePageSnapshot } = await import('../src/utils/share/pageSnapshot.js')
+    await capturePageSnapshot()
+
+    const [, options] = html2canvasMock.mock.calls[0]
+
+    expect(options.ignoreElements(suggestionForm)).toBe(true)
+    expect(options.ignoreElements(typedField)).toBe(true)
+    expect(options.ignoreElements(document.body)).toBe(false)
+  })
+
   it('lowers webp quality until the screenshot is below the target size', async () => {
     const largeDataUrl = `data:image/webp;base64,${'a'.repeat(1200)}`
     const smallDataUrl = 'data:image/webp;base64,abc'
