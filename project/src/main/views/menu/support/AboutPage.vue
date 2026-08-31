@@ -158,26 +158,28 @@
               class="suggestion-page-form"
               @submit.prevent="submitSuggestionForm"
             >
-              <div class="field feedback-category">
-                <span>{{ $t('layoutFooter.feedback.category') }}</span>
-                <SimpleSelectDropdown
-                  v-model="suggestionCategory"
-                  :options="suggestionCategoryOptions"
-                  :disabled="isSubmittingSuggestion || isCapturingSuggestionScreenshot"
-                  width="100%"
-                />
-              </div>
+              <div class="suggestion-form-row suggestion-form-row--identity">
+                <div class="field feedback-category">
+                  <span>{{ $t('layoutFooter.feedback.category') }}</span>
+                  <SimpleSelectDropdown
+                    v-model="suggestionCategory"
+                    :options="suggestionCategoryOptions"
+                    :disabled="isSubmittingSuggestion || isCapturingSuggestionScreenshot"
+                    width="100%"
+                  />
+                </div>
 
-              <label class="field">
-                <span>{{ $t('layoutFooter.feedback.titleLabel') }}</span>
-                <input
-                  v-model.trim="suggestionTitle"
-                  class="glass-field"
-                  name="title"
-                  maxlength="200"
-                  :placeholder="$t('layoutFooter.feedback.titlePlaceholder')"
-                >
-              </label>
+                <label class="field">
+                  <span>{{ $t('layoutFooter.feedback.titleLabel') }}</span>
+                  <input
+                    v-model.trim="suggestionTitle"
+                    class="glass-field"
+                    name="title"
+                    maxlength="200"
+                    :placeholder="$t('layoutFooter.feedback.titlePlaceholder')"
+                  >
+                </label>
+              </div>
 
               <label class="field">
                 <span>{{ $t('layoutFooter.feedback.contentLabel') }}</span>
@@ -191,27 +193,31 @@
                 />
               </label>
 
-              <label class="field">
-                <span>{{ $t('layoutFooter.feedback.contactLabel') }}</span>
-                <input
-                  v-model.trim="suggestionContact"
-                  class="glass-field"
-                  name="contact"
-                  maxlength="200"
-                  :placeholder="$t('layoutFooter.feedback.contactPlaceholder')"
-                >
-              </label>
+              <div class="suggestion-form-row suggestion-form-row--meta">
+                <label class="field">
+                  <span>{{ $t('layoutFooter.feedback.contactLabel') }}</span>
+                  <input
+                    v-model.trim="suggestionContact"
+                    class="glass-field"
+                    name="contact"
+                    maxlength="200"
+                    :placeholder="$t('layoutFooter.feedback.contactPlaceholder')"
+                  >
+                </label>
 
-              <CheckBox
-                v-model="includeSuggestionScreenshot"
-                class="screenshot-field"
-                data-include-screenshot
-              >
-                {{ $t('layoutFooter.feedback.screenshot.label') }}
-              </CheckBox>
-              <p class="hint screenshot-hint">
-                {{ $t('layoutFooter.feedback.screenshot.hint') }}
-              </p>
+                <div class="suggestion-screenshot-control">
+                  <CheckBox
+                    v-model="includeSuggestionScreenshot"
+                    class="screenshot-field"
+                    data-include-screenshot
+                  >
+                    {{ $t('layoutFooter.feedback.screenshot.label') }}
+                  </CheckBox>
+                  <p class="hint screenshot-hint">
+                    {{ $t('layoutFooter.feedback.screenshot.hint') }}
+                  </p>
+                </div>
+              </div>
               <div
                 v-if="includeSuggestionScreenshot"
                 class="surface-subpanel screenshot-preview"
@@ -1062,7 +1068,8 @@ em {
 .suggestion-form-section {
   @include flex-col;
   gap: 14px;
-  max-width: 640px;
+  // width: 100%;
+  max-width: 820px;
   margin: 28px auto 0;
   padding: 20px;
   text-align: left;
@@ -1086,6 +1093,27 @@ em {
   gap: 6px;
 }
 
+.suggestion-form-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.8fr) minmax(0, 1.4fr);
+  gap: 12px;
+  align-items: end;
+}
+
+.suggestion-form-row > * {
+  min-width: 0;
+}
+
+.suggestion-form-row--meta {
+  grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.8fr);
+}
+
+.suggestion-screenshot-control {
+  @include flex-col;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
 .suggestion-form-actions {
   display: flex;
   justify-content: flex-end;
@@ -1103,7 +1131,7 @@ em {
 }
 
 .screenshot-hint {
-  margin: -6px 0 0;
+  margin: 0;
 }
 
 .screenshot-preview {
@@ -1277,6 +1305,12 @@ em {
   .suggestion-form-section {
     margin-top: 22px;
     padding: 16px;
+  }
+
+  .suggestion-form-row,
+  .suggestion-form-row--meta {
+    grid-template-columns: 1fr;
+    align-items: stretch;
   }
 
   .suggestion-form-actions {

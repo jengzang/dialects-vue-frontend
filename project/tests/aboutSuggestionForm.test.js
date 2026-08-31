@@ -226,6 +226,23 @@ describe('AboutPage suggestion form', () => {
     expect(source).not.toContain('<AppModal')
   })
 
+  it('lays out the suggestion page form wider with paired fields on landscape', () => {
+    const source = aboutPageSource()
+    const portraitStart = source.indexOf('@media (max-aspect-ratio: #{1 / 1})')
+    expect(portraitStart).toBeGreaterThanOrEqual(0)
+    const portraitBlock = source.slice(portraitStart)
+
+    expect(source).toContain('class="suggestion-form-row suggestion-form-row--identity"')
+    expect(source).toContain('class="suggestion-form-row suggestion-form-row--meta"')
+    expect(source).toContain('class="suggestion-screenshot-control"')
+    expect(source).toContain('max-width: 820px;')
+    expect(source).toContain('grid-template-columns: minmax(180px, 0.8fr) minmax(0, 1.4fr);')
+    expect(source).toContain('grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.8fr);')
+    expect(portraitBlock).toContain('.suggestion-form-row,')
+    expect(portraitBlock).toContain('.suggestion-form-row--meta {')
+    expect(portraitBlock).toContain('grid-template-columns: 1fr;')
+  })
+
   it('stacks the external cards above the in-page feedback form', () => {
     const source = aboutPageSource()
     const pageBlock = source.match(/\.page2\s*\{[\s\S]*?\n\}/)?.[0]
