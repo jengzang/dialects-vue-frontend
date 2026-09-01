@@ -12,6 +12,12 @@ beforeEach(() => {
 })
 
 describe('suggestions API client', () => {
+  it('exposes vocabulary permission as a stable feedback category', async () => {
+    const { SUGGESTION_CATEGORY_OPTIONS } = await import('../src/api/main/suggestions.js')
+
+    expect(SUGGESTION_CATEGORY_OPTIONS).toContain('vocabulary_permission')
+  })
+
   it('submits trimmed suggestion payload with page context and optional screenshot', async () => {
     apiMock.mockResolvedValue({ success: true, id: 9, message: '建议已提交' })
 

@@ -456,7 +456,13 @@ onMounted(async () => {
 })
 
 function navigateToSuggestion() {
-  router.push(buildLocalePath(resolveRouteLocale(route), '/menu/about/suggestion'))
+  router.push({
+    path: buildLocalePath(resolveRouteLocale(route), '/menu/about/suggestion'),
+    query: {
+      category: 'vocabulary_permission',
+      from: 'vocabulary_import',
+    },
+  })
 }
 
 const isUploading = ref(false)

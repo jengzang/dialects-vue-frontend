@@ -39,7 +39,7 @@ vi.mock('../src/i18n/index.js', () => ({
 }))
 
 vi.mock('../src/api/main/suggestions.js', () => ({
-  SUGGESTION_CATEGORY_OPTIONS: ['general', 'bug', 'feature', 'data_issue', 'ui'],
+  SUGGESTION_CATEGORY_OPTIONS: ['general', 'bug', 'feature', 'data_issue', 'ui', 'vocabulary_permission'],
   submitSuggestion: submitSuggestionMock,
 }))
 
@@ -210,6 +210,44 @@ describe('AboutPage suggestion form', () => {
     })
     expect(showSuccessMock).toHaveBeenCalledWith('layoutFooter.feedback.success')
     expect(showErrorMock).not.toHaveBeenCalled()
+
+    wrapper.unmount()
+  })
+
+  it('preselects vocabulary permission feedback from the route query', async () => {
+    route.fullPath = '/menu/about/suggestion?category=vocabulary_permission&from=vocabulary_import'
+    route.query = {
+      category: 'vocabulary_permission',
+      from: 'vocabulary_import',
+    }
+    submitSuggestionMock.mockResolvedValue({ success: true, id: 32 })
+
+    const wrapper = await mountAboutPage()
+    await nextTick()
+
+    expect(wrapper.host.querySelector('[data-feedback-category="vocabulary_permission"]')?.dataset.active).toBe('true')
+
+    wrapper.host.querySelector('[name="title"]').value = '申请词表编辑权限'
+    wrapper.host.querySelector('[name="title"]').dispatchEvent(new Event('input'))
+    wrapper.host.querySelector('[name="content"]').value = '我想协助维护语保词表。'
+    wrapper.host.querySelector('[name="content"]').dispatchEvent(new Event('input'))
+    await nextTick()
+
+    wrapper.host.querySelector('[data-submit-feedback]').click()
+    await nextTick()
+    await nextTick()
+
+    expect(submitSuggestionMock).toHaveBeenCalledWith(expect.objectContaining({
+      category: 'vocabulary_permission',
+      source_path: '/menu/about/suggestion',
+      context: expect.objectContaining({
+        fullPath: '/menu/about/suggestion?category=vocabulary_permission&from=vocabulary_import',
+        query: {
+          category: 'vocabulary_permission',
+          from: 'vocabulary_import',
+        },
+      }),
+    }))
 
     wrapper.unmount()
   })

@@ -6,6 +6,7 @@ export const SUGGESTION_CATEGORY_OPTIONS = [
   'feature',
   'data_issue',
   'ui',
+  'vocabulary_permission',
 ]
 
 function trimText(value) {

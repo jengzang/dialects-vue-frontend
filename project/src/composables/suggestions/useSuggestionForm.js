@@ -17,14 +17,21 @@ function resolveContext(value) {
   return resolved && typeof resolved === 'object' ? resolved : {}
 }
 
+function normalizeSuggestionCategory(value) {
+  const resolved = resolveValue(value)
+  const category = Array.isArray(resolved) ? resolved[0] : resolved
+  return SUGGESTION_CATEGORY_OPTIONS.includes(category) ? category : 'general'
+}
+
 export function useSuggestionForm({
   t,
   pageTitle = '',
   sourcePath = '',
   context = {},
+  initialCategory = 'general',
   onSubmitted,
 } = {}) {
-  const category = ref('general')
+  const category = ref(normalizeSuggestionCategory(initialCategory))
   const title = ref('')
   const content = ref('')
   const contact = ref('')
@@ -43,7 +50,7 @@ export function useSuggestionForm({
   const canSubmit = computed(() => Boolean(title.value.trim() && content.value.trim()))
 
   function resetForm() {
-    category.value = 'general'
+    category.value = normalizeSuggestionCategory(initialCategory)
     title.value = ''
     content.value = ''
     contact.value = ''
@@ -118,6 +125,13 @@ export function useSuggestionForm({
 
     captureScreenshotPreview()
   })
+
+  watch(
+    () => normalizeSuggestionCategory(initialCategory),
+    (nextCategory) => {
+      category.value = nextCategory
+    }
+  )
 
   return {
     category,
