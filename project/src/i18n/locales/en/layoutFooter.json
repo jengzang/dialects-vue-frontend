@@ -266,11 +266,12 @@
       "bug": "Bug",
       "feature": "Feature",
       "data_issue": "Data issue",
-      "ui": "UI"
+      "ui": "UI",
+      "vocabulary_permission": "Vocabulary access"
     },
     "screenshot": {
       "label": "Attach current page screenshot",
-      "hint": "When checked, a compressed preview is generated and submitted with the feedback. Cross-origin map tiles may be incomplete.",
+      "hint": "When checked, a compressed preview is generated and submitted with the feedback.",
       "capturing": "Generating screenshot preview...",
       "retake": "Retake screenshot",
       "previewAlt": "Current page screenshot preview"

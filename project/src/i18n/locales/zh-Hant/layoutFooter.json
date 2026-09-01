@@ -266,11 +266,12 @@
       "bug": "問題",
       "feature": "功能建議",
       "data_issue": "資料問題",
-      "ui": "界面體驗"
+      "ui": "界面體驗",
+      "vocabulary_permission": "詞表權限"
     },
     "screenshot": {
       "label": "附帶當前頁面截圖",
-      "hint": "勾選後會生成壓縮預覽，並隨反饋提交。若頁面含跨域地圖瓦片，截圖可能不完整。",
+      "hint": "勾選後會生成壓縮預覽，並隨反饋提交",
       "capturing": "正在生成截圖預覽...",
       "retake": "重新截圖",
       "previewAlt": "當前頁面截圖預覽"

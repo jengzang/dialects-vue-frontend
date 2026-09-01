@@ -395,6 +395,7 @@ const {
   pageTitle: () => t('navigation.pageTitles.support.aboutSuggestion'),
   sourcePath: () => route.path,
   context: () => suggestionPageContext.value,
+  initialCategory: () => route.query.category,
 })
 
 const zhihuFallback = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="4" fill="#0066FF"/><text x="12" y="17" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="sans-serif">知</text></svg>')
@@ -1074,6 +1075,10 @@ em {
   padding: 20px;
   text-align: left;
 
+  @media (max-aspect-ratio: #{1 / 1}) {
+    min-width: 80dvw;
+  }
+
   .tabs-title {
     margin-bottom: 0;
   }
@@ -1131,6 +1136,8 @@ em {
 }
 
 .screenshot-hint {
+    white-space: nowrap;
+  font-size: 12px;
   margin: 0;
 }
 

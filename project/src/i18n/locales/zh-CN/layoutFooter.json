@@ -266,11 +266,12 @@
       "bug": "问题",
       "feature": "功能建议",
       "data_issue": "资料问题",
-      "ui": "界面体验"
+      "ui": "界面体验",
+      "vocabulary_permission": "词表权限"
     },
     "screenshot": {
       "label": "附带当前页面截图",
-      "hint": "勾选后会生成压缩预览，并随反馈提交。若页面含跨域地图瓦片，截图可能不完整。",
+      "hint": "勾选后会生成压缩预览，并随反馈提交",
       "capturing": "正在生成截图预览...",
       "retake": "重新截图",
       "previewAlt": "当前页面截图预览"
