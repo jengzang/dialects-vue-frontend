@@ -2,7 +2,7 @@
   <div style="width: 100%;justify-content: center;align-items:center;display: flex;flex-direction: column">
     <div class="title-row">
       <h1><BarIcon icon="💬" />{{ t('navigation.pageTitles.words.yangChunSpoken') }}</h1>
-      <RouterLink class="cross-link" :to="localeTo('/explore/villages/yc')">{{ t('villages.ycVillages.name') }} →</RouterLink>
+      <RouterLink class="cross-link" :to="localeTo('/explore/yc/villages')">{{ t('villages.ycVillages.name') }} →</RouterLink>
     </div>
     <UniversalTable
         db-key="spoken"

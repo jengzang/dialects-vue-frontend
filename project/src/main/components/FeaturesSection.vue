@@ -170,7 +170,7 @@ const groups = [
       { icon: '📍', labelKey: 'home.features.villages.toponyms', route: '/explore/villages/toponyms' },
       { icon: '🤖', labelKey: 'home.features.villages.villagesML', route: '/explore/villages/ml' },
       { icon: '🏘️', labelKey: 'home.features.villages.gdVillages', route: '/explore/villages/gd' },
-      { icon: '🌾', labelKey: 'home.features.villages.ycVillages', route: '/explore/villages/yc' },
+      { icon: '🌾', labelKey: 'home.features.villages.ycVillages', route: '/explore/yc/villages' },
     ],
   },
   {

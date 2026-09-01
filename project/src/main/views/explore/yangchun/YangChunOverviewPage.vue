@@ -301,8 +301,24 @@ const pageEl = ref(null)
 const groupScroller = ref(null)
 const groupRefs = ref([])
 const { t } = useI18n()
-const activeGroupId = ref(dialectGroups[0].id)
-const activePhonologyId = ref(phonologyDetails[0].id)
+const FALLBACK_MARKER_POSITION = { left: 50, top: 50 }
+const FALLBACK_DIALECT_GROUP = {
+  id: '',
+  name: '',
+  badge: '',
+  distribution: '',
+  detail: '',
+  traits: [],
+  sources: [],
+}
+const FALLBACK_PHONOLOGY_DETAIL = {
+  id: '',
+  title: '',
+  summary: '',
+  points: [],
+}
+const activeGroupId = ref(dialectGroups[0]?.id || '')
+const activePhonologyId = ref(phonologyDetails[0]?.id || '')
 const groupCanPrev = ref(false)
 const groupCanNext = ref(false)
 
@@ -315,11 +331,11 @@ const pageSections = [
 ]
 
 const selectedGroup = computed(() => (
-  dialectGroups.find((group) => group.id === activeGroupId.value) || dialectGroups[0]
+  dialectGroups.find((group) => group.id === activeGroupId.value) || dialectGroups[0] || FALLBACK_DIALECT_GROUP
 ))
 
 const activePhonology = computed(() => (
-  phonologyDetails.find((item) => item.id === activePhonologyId.value) || phonologyDetails[0]
+  phonologyDetails.find((item) => item.id === activePhonologyId.value) || phonologyDetails[0] || FALLBACK_PHONOLOGY_DETAIL
 ))
 
 let revealObserver = null
@@ -330,9 +346,12 @@ function setGroupRef(el, index) {
 }
 
 function markerStyle(group) {
+  const left = Number(group?.marker?.left)
+  const top = Number(group?.marker?.top)
+
   return {
-    left: `${group.marker.left}%`,
-    top: `${group.marker.top}%`,
+    left: `${Number.isFinite(left) ? left : FALLBACK_MARKER_POSITION.left}%`,
+    top: `${Number.isFinite(top) ? top : FALLBACK_MARKER_POSITION.top}%`,
   }
 }
 

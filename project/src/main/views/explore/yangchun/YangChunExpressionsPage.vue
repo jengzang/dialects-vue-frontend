@@ -151,8 +151,8 @@ import { useI18n } from 'vue-i18n'
 import GlassTable from '@/components/common/GlassTable.vue'
 import {
   yangchunExpressionCategories,
-  yangchunExpressionItems,
   yangchunExpressionPatterns,
+  normalizedYangchunExpressionItems,
 } from './yangchunExpressionsMock.js'
 
 const activeCategory = ref('all')
@@ -173,7 +173,7 @@ const tableColumns = [
 const filteredItems = computed(() => {
   const query = searchQuery.value.trim().toLowerCase()
 
-  return yangchunExpressionItems.filter((item) => {
+  return normalizedYangchunExpressionItems.filter((item) => {
     const categoryMatched = activeCategory.value === 'all' || item.category === activeCategory.value
     const patternMatched = activePattern.value === '全部' || item.pattern === activePattern.value
     const searchable = [
@@ -289,6 +289,8 @@ const filteredItems = computed(() => {
 }
 
 .yc-expression-card {
+  @include flex-col;
+  gap: 10px;
   cursor: default;
 
   strong {

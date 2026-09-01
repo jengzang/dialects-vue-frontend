@@ -43,7 +43,7 @@
         </div>
       </RouterLink>
 
-      <RouterLink class="portal-entry-card glass-card" data-interactive="true" :to="localeTo('/explore/villages/yc')">
+      <RouterLink class="portal-entry-card glass-card" data-interactive="true" :to="localeTo('/explore/yc/villages')">
         <div class="portal-entry-card__icon"><InlineIcon icon="🌾" /></div>
         <div class="portal-entry-card__name">
           {{ $t('villages.ycVillages.name') }}

@@ -135,6 +135,13 @@ describe('Yangchun Explore pages', () => {
     expect(source).toContain('@include scrollbars.hidden-scrollbar-webkit;')
   })
 
+  it('links Yangchun village entry cards directly to the canonical Yangchun route', () => {
+    const source = readSource('src/main/views/menu/portals/VillagesPage.vue')
+
+    expect(source).toContain("localeTo('/explore/yc/villages')")
+    expect(source).not.toContain("localeTo('/explore/villages/yc')")
+  })
+
   it('scrolls the dialect group carousel and centers the selected group card', async () => {
     const wrapper = await mountOverviewPage()
 
@@ -235,5 +242,41 @@ describe('Yangchun Explore pages', () => {
     expect(source).toContain('AABB')
     expect(source).toContain('歇后语')
     expect(source).toContain('农谚')
+  })
+
+  it('keeps expression cards in a stable vertical layout', () => {
+    const source = readSource('src/main/views/explore/yangchun/YangChunExpressionsPage.vue')
+    const cardBlock = source.match(/\.yc-expression-card\s*\{[\s\S]*?\n\}/)?.[0]
+
+    expect(cardBlock).toContain('@include flex-col;')
+    expect(cardBlock).toContain('gap: 10px;')
+  })
+
+  it('normalizes expression rows so missing backend fields remain searchable', async () => {
+    const { normalizeYangchunExpressionItem } = await import('../src/main/views/explore/yangchun/yangchunExpressionsMock.js')
+
+    expect(normalizeYangchunExpressionItem({
+      id: 'api-row-1',
+      expression: '转屋下',
+      tags: null,
+    })).toMatchObject({
+      id: 'api-row-1',
+      expression: '转屋下',
+      pronunciation: '',
+      meaning: '',
+      example: '',
+      area: '',
+      source: '',
+      note: '',
+      tags: [],
+    })
+  })
+
+  it('keeps overview marker rendering safe for incomplete backend rows', () => {
+    const source = readSource('src/main/views/explore/yangchun/YangChunOverviewPage.vue')
+
+    expect(source).toContain('const FALLBACK_MARKER_POSITION')
+    expect(source).toContain('group?.marker?.left')
+    expect(source).toContain('group?.marker?.top')
   })
 })

@@ -502,7 +502,7 @@ const lazyLoadChildren = async (node) => {
   }
 };
 const goToYCVillages = () => {
-  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/yc'));
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/yc/villages'));
 };
 
 const localeTo = (path) => buildLocalePath(resolveRouteLocale(route), path);

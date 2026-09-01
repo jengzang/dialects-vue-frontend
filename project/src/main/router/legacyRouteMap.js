@@ -130,7 +130,7 @@ export const EXPLORE_LEGACY_ROUTES = {
     path: '/explore/villages/table'
   },
   ycVillages: {
-    path: '/explore/villages/yc'
+    path: '/explore/yc/villages'
   },
   VillagesML: {
     path: '/explore/villages/ml'

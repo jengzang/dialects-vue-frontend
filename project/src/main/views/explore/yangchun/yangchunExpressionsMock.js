@@ -101,3 +101,28 @@ export const yangchunExpressionItems = [
     note: '春西白话相关文章提到“转屋下”类词汇。',
   },
 ]
+
+export function normalizeYangchunExpressionItem(item = {}, index = 0) {
+  const rawTags = item.tags
+  const tags = Array.isArray(rawTags)
+    ? rawTags.filter(Boolean).map((tag) => String(tag))
+    : rawTags
+      ? [String(rawTags)]
+      : []
+
+  return {
+    id: item.id || `expression-${index}`,
+    category: item.category || '',
+    pattern: item.pattern || '',
+    expression: item.expression || '',
+    pronunciation: item.pronunciation || '',
+    meaning: item.meaning || '',
+    example: item.example || '',
+    area: item.area || '',
+    tags,
+    source: item.source || '',
+    note: item.note || '',
+  }
+}
+
+export const normalizedYangchunExpressionItems = yangchunExpressionItems.map(normalizeYangchunExpressionItem)
