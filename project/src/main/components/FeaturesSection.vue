@@ -87,6 +87,7 @@ import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t } = useI18n()
 const route = useRoute()
+const SEARCH_LOCALES = ['zh-CN', 'zh-Hant', 'en']
 
 const groups = [
   {
@@ -208,15 +209,46 @@ const groups = [
   },
 ]
 
-function resolveItem(item) {
+function translateForLocale(key, targetLocale) {
+  return t(key, undefined, { locale: targetLocale })
+}
+
+function normalizeSearchText(value) {
+  return value.trim().toLowerCase()
+}
+
+function resolveItem(item, targetLocale) {
+  const translate = targetLocale
+    ? (key) => translateForLocale(key, targetLocale)
+    : t
   if (item.labelKey) {
-    const raw = t(item.labelKey)
+    const raw = translate(item.labelKey)
     const idx = raw.indexOf(' - ')
     return idx >= 0
       ? { title: raw.slice(0, idx), desc: raw.slice(idx + 3) }
       : { title: raw, desc: '' }
   }
-  return { title: t(item.titleKey), desc: item.descKey ? t(item.descKey) : '' }
+  return { title: translate(item.titleKey), desc: item.descKey ? translate(item.descKey) : '' }
+}
+
+function resolveItemSearchText(item) {
+  return SEARCH_LOCALES
+    .flatMap((targetLocale) => {
+      const resolved = resolveItem(item, targetLocale)
+      return [resolved.title, resolved.desc]
+    })
+    .join(' ')
+    .toLowerCase()
+}
+
+function resolveGroupSearchText(group) {
+  return SEARCH_LOCALES
+    .flatMap((targetLocale) => [
+      translateForLocale(group.titleKey, targetLocale),
+      group.descKey ? translateForLocale(group.descKey, targetLocale) : '',
+    ])
+    .join(' ')
+    .toLowerCase()
 }
 
 const resolvedGroups = computed(() =>
@@ -225,19 +257,26 @@ const resolvedGroups = computed(() =>
     icon: g.icon,
     title: t(g.titleKey),
     desc: g.descKey ? t(g.descKey) : '',
-    items: g.items.map((item) => ({ ...item, ...resolveItem(item) })),
+    searchText: resolveGroupSearchText(g),
+    items: g.items.map((item) => ({
+      ...item,
+      ...resolveItem(item),
+      searchText: resolveItemSearchText(item),
+    })),
   }))
 )
 
 const query = ref('')
 
 const visibleGroups = computed(() => {
-  const q = query.value.trim().toLowerCase()
+  const q = normalizeSearchText(query.value)
   if (!q) return resolvedGroups.value
   return resolvedGroups.value
     .map((g) => ({
       ...g,
-      items: g.items.filter((it) => `${it.title} ${it.desc}`.toLowerCase().includes(q)),
+      items: g.searchText.includes(q)
+        ? g.items
+        : g.items.filter((it) => it.searchText.includes(q)),
     }))
     .filter((g) => g.items.length)
 })
@@ -308,7 +347,7 @@ $text-primary: var(--text-primary);
 }
 
 .section-title {
-  margin-bottom: 0.5rem;
+  margin: 0.5rem;
   text-align: center;
   font-size: clamp(1.75rem, 4vw, 2.5rem);
   font-weight: 700;
@@ -511,7 +550,7 @@ $text-primary: var(--text-primary);
 .feature-tile {
   display: flex;
   align-items: center;
-  flex: 1 1 250px;
+  flex: 1 1 200px;
   max-width: 360px;
   gap: 0.75rem;
   padding: 0.875rem 1rem;

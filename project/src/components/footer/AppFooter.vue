@@ -33,13 +33,13 @@
           >
             {{ t('layoutFooter.actions.features') }}
           </button>
-          <button
+          <!-- <button
             type="button"
             class="text-action footer-action"
             @click="isMenuOpen = true"
           >
             {{ t('layoutFooter.actions.menu') }}
-          </button>
+          </button> -->
           <button
             type="button"
             class="text-action footer-action"
@@ -51,16 +51,16 @@
           <button
             type="button"
             class="text-action footer-action"
-            @click="isFeedbackOpen = true"
+            @click="shareCurrentPage"
           >
-            {{ t('layoutFooter.actions.feedback') }}
+            {{ t('layoutFooter.actions.share') }}
           </button>
           <button
             type="button"
             class="text-action footer-action"
-            @click="shareCurrentPage"
+            @click="isFeedbackOpen = true"
           >
-            {{ t('layoutFooter.actions.share') }}
+            {{ t('layoutFooter.actions.feedback') }}
           </button>
           <button
             type="button"
@@ -346,6 +346,7 @@ onMounted(fetchFooterStats)
   min-width: 0;
   color: var(--color-primary-hover);
   font-weight: 600;
+  font-size: 16px;
 
   &:hover:not(:disabled) {
     color: var(--color-primary);
@@ -377,6 +378,10 @@ onMounted(fetchFooterStats)
   :deep(.features-section) {
     max-width: none;
     padding: 0;
+  }
+
+  :deep(.feature-tile) {
+    flex: 1 1 100px;
   }
 }
 

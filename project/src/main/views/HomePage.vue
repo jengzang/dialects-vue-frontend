@@ -29,9 +29,9 @@
       </div>
 
       <!-- Showcase Section (lazy mounted) -->
-      <!-- <section class="showcase-section" ref="showcaseSectionRef"> -->
+      <section class="showcase-section" ref="showcaseSectionRef">
         <HeroShowcase v-if="showShowcase" />
-      <!-- </section> -->
+      </section>
       
     </section>
 
@@ -832,11 +832,10 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
 /* Showcase (lazy) */
 .showcase-section {
-  @include section-container;
-
-  padding:
-    clamp(2rem, 6vw, 4rem)
-    clamp(1rem, 4vw, 2rem);
+  align-self: stretch;
+  box-sizing: border-box;
+  min-height: 1px;
+  width: 100%;
 }
 
 /* Roadmap */
