@@ -29,6 +29,13 @@
           <button
             type="button"
             class="text-action footer-action"
+            @click="isFeaturesOpen = true"
+          >
+            {{ t('layoutFooter.actions.features') }}
+          </button>
+          <button
+            type="button"
+            class="text-action footer-action"
             @click="isMenuOpen = true"
           >
             {{ t('layoutFooter.actions.menu') }}
@@ -98,6 +105,17 @@
       :context="feedbackContext"
     />
 
+    <AppModal
+      v-model="isFeaturesOpen"
+      :title="t('layoutFooter.actions.features')"
+      :close-label="t('common.button.close')"
+      size="lg"
+    >
+      <div class="footer-features-modal">
+        <FeaturesSection />
+      </div>
+    </AppModal>
+
     <SimpleSidebar
       v-if="isMenuOpen"
       :is-open="true"
@@ -125,7 +143,9 @@ import { useVisitStats } from '@/composables/data/useVisitStats.js'
 import { currentColorTheme } from '@/composables/core/uiPreferences.js'
 import { createShareCardDataUrl } from '@/utils/share/shareCard.js'
 import { showError, showSuccess } from '@/utils/ui/message.js'
+import AppModal from '@/components/common/AppModal.vue'
 import LayoutFeedbackModal from '@/main/components/footer/LayoutFeedbackModal.vue'
+import FeaturesSection from '@/main/components/FeaturesSection.vue'
 import SimpleSidebar from '@/components/bar/SimpleSidebar.vue'
 import SupportPopup from '@/main/components/user/popups/SupportPopup.vue'
 
@@ -145,6 +165,7 @@ const sourceDbVersion = homeUpdateNotice.dbVersion
 const cachedSourceStats = getCachedSourceStats()
 const sourceLocationCount = ref(cachedSourceStats.locationCount)
 const sourceDataCount = ref(cachedSourceStats.dataCount)
+const isFeaturesOpen = ref(false)
 const isFeedbackOpen = ref(false)
 const isMenuOpen = ref(false)
 const isSupportOpen = ref(false)
@@ -350,6 +371,13 @@ onMounted(fetchFooterStats)
 
 .footer-theme-label {
   color: var(--color-primary-hover);
+}
+
+.footer-features-modal {
+  :deep(.features-section) {
+    max-width: none;
+    padding: 0;
+  }
 }
 
 .footer-stats,

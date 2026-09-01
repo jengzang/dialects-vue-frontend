@@ -1,5 +1,6 @@
 {
   "actions": {
+    "features": "功能入口",
     "menu": "菜单",
     "tutorial": "教程",
     "feedback": "反馈",

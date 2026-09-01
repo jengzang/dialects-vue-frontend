@@ -1,5 +1,6 @@
 {
   "actions": {
+    "features": "Features",
     "menu": "Menu",
     "tutorial": "Tutorial",
     "feedback": "Feedback",

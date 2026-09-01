@@ -115,6 +115,20 @@ vi.mock('../src/main/components/user/popups/SupportPopup.vue', () => ({
   },
 }))
 
+vi.mock('../src/components/common/AppModal.vue', () => ({
+  default: {
+    props: ['modelValue', 'title'],
+    emits: ['update:modelValue'],
+    template: '<section v-if="modelValue" data-app-modal-stub><h2>{{ title }}</h2><slot /></section>',
+  },
+}))
+
+vi.mock('../src/main/components/FeaturesSection.vue', () => ({
+  default: {
+    template: '<section data-features-section-stub></section>',
+  },
+}))
+
 function mountFooter(component) {
   const host = document.createElement('div')
   document.body.appendChild(host)
@@ -230,6 +244,26 @@ describe('AppFooter actions', () => {
     await nextTick()
 
     expect(wrapper.host.querySelector('[data-simple-sidebar-stub]')).toBeNull()
+
+    wrapper.unmount()
+  })
+
+  it('opens the shared FeaturesSection in an AppModal from the first footer action', async () => {
+    const { default: AppFooter } = await import('../src/components/footer/AppFooter.vue')
+    const wrapper = mountFooter(AppFooter)
+    await nextTick()
+
+    const actions = [...wrapper.host.querySelectorAll('.footer-action')]
+    expect(actions[0]?.textContent.trim()).toBe('layoutFooter.actions.features')
+    expect(wrapper.host.querySelector('[data-app-modal-stub]')).toBeNull()
+
+    actions[0].click()
+    await nextTick()
+
+    const modal = wrapper.host.querySelector('[data-app-modal-stub]')
+    expect(modal).toBeTruthy()
+    expect(modal.textContent).toContain('layoutFooter.actions.features')
+    expect(modal.querySelector('[data-features-section-stub]')).toBeTruthy()
 
     wrapper.unmount()
   })
