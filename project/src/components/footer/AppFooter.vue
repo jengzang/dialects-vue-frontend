@@ -14,11 +14,13 @@
     >
       <div class="footer-primary">
         <div class="footer-brand-copy">
-          <img
-            src="/brand/title.webp"
-            :alt="t('layoutFooter.pages.generic.title')"
-            class="footer-brand-title title-logo"
+          <button
+            type="button"
+            class="info-text footer-brand-name footer-brand-button"
+            @click="goToHome"
           >
+            <strong>{{ t('layoutFooter.pages.generic.title') }}</strong>
+          </button>
           <span class="hint footer-page-description">{{ t(context.pageDescriptionKey) }}</span>
         </div>
 
@@ -219,6 +221,10 @@ function goToSettings() {
   router.push(buildLocalePath(resolveRouteLocale(route), '/menu/settings'))
 }
 
+function goToHome() {
+  router.push(buildLocalePath(resolveRouteLocale(route), '/'))
+}
+
 function downloadDataUrl(dataUrl, filename) {
   const link = document.createElement('a')
   link.href = dataUrl
@@ -327,7 +333,7 @@ onMounted(fetchFooterStats)
 
 .app-footer {
   width: 100%;
-  margin-top: 24px;
+  margin-top: 2px;
   padding: 0 max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
   border-top: 1px solid var(--border-control);
   background: linear-gradient(
@@ -355,9 +361,9 @@ onMounted(fetchFooterStats)
 }
 
 .footer-content {
-  max-width: 1040px;
+  // max-width: 1040px;
   margin: 0 auto;
-  padding-top: 26px;
+  padding-top: 18px;
 }
 
 .footer-primary {
@@ -374,10 +380,13 @@ onMounted(fetchFooterStats)
   gap: 4px;
 }
 
-.footer-brand-title {
-  display: block;
-  width: auto;
-  height: 22px;
+.footer-brand-button {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
 }
 
 .footer-actions {
