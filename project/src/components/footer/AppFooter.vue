@@ -131,7 +131,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n/localeRouting.js'
@@ -169,6 +169,13 @@ const isFeaturesOpen = ref(false)
 const isFeedbackOpen = ref(false)
 const isMenuOpen = ref(false)
 const isSupportOpen = ref(false)
+
+watch(
+  () => route.fullPath,
+  () => {
+    isFeaturesOpen.value = false
+  },
+)
 
 const {
   todayVisits,
