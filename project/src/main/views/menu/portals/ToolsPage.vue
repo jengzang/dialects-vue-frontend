@@ -1,136 +1,83 @@
 <template>
   <div class="tools-page">
-    <h2 class="page-title">{{ $t('tools.title') }}</h2>
+    <h1 class="page-title"><BarIcon icon="🛠️" />{{ $t('navigation.pageTitles.portals.tools') }}</h1>
 
     <div class="tools-grid">
-      <button class="entry-button" @click="handleDataCheck">
-        <div class="entry-button__icon"><InlineIcon icon="📋" /></div>
-        <div class="entry-button__name">
+      <RouterLink class="portal-entry-card glass-card" data-interactive="true" :to="localeTo('/explore/tools/check')">
+        <div class="portal-entry-card__icon"><InlineIcon icon="📋" /></div>
+        <div class="portal-entry-card__name">
           {{ $t('tools.dataCheck.name') }}
         </div>
-        <div class="entry-button__desc">
+        <div class="portal-entry-card__desc">
           {{ $t('tools.dataCheck.desc') }}
         </div>
-      </button>
+      </RouterLink>
 
-      <button class="entry-button" @click="handleJyutpingToIpa">
-        <div class="entry-button__icon"><InlineIcon icon="🔤" /></div>
-        <div class="entry-button__name">
+      <RouterLink class="portal-entry-card glass-card" data-interactive="true" :to="localeTo('/explore/tools/jyut2ipa')">
+        <div class="portal-entry-card__icon"><InlineIcon icon="🔤" /></div>
+        <div class="portal-entry-card__name">
           {{ $t('tools.jyutpingToIpa.name') }}
         </div>
-        <div class="entry-button__desc">
+        <div class="portal-entry-card__desc">
           {{ $t('tools.jyutpingToIpa.desc') }}
         </div>
-      </button>
+      </RouterLink>
 
-      <button class="entry-button" @click="handleMergeTables">
-        <div class="entry-button__icon"><InlineIcon icon="🔗" /></div>
-        <div class="entry-button__name">
+      <RouterLink class="portal-entry-card glass-card" data-interactive="true" :to="localeTo('/explore/tools/merge')">
+        <div class="portal-entry-card__icon"><InlineIcon icon="🔗" /></div>
+        <div class="portal-entry-card__name">
           {{ $t('tools.mergeTables.name') }}
         </div>
-        <div class="entry-button__desc">
+        <div class="portal-entry-card__desc">
           {{ $t('tools.mergeTables.desc') }}
         </div>
-      </button>
+      </RouterLink>
 
-      <!-- <button class="entry-button" @click="handleDeriveTables">
-        <div class="entry-button__icon"><InlineIcon icon="🧪" /></div>
-        <div class="entry-button__name">
+      <!-- <button class="portal-entry-card glass-card" data-interactive="true" @click="handleDeriveTables">
+        <div class="portal-entry-card__icon"><InlineIcon icon="🧪" /></div>
+        <div class="portal-entry-card__name">
           {{ $t('tools.deriveTables.name') }}
         </div>
-        <div class="entry-button__desc">
+        <div class="portal-entry-card__desc">
           {{ $t('tools.deriveTables.desc') }}
         </div>
       </button> -->
 
-      <button class="entry-button" @click="handlePraatTables">
-        <div class="entry-button__icon"><InlineIcon icon="🎙️" /></div>
-        <div class="entry-button__name">
+      <RouterLink class="portal-entry-card glass-card" data-interactive="true" :to="localeTo('/explore/tools/praat')">
+        <div class="portal-entry-card__icon"><InlineIcon icon="🎙️" /></div>
+        <div class="portal-entry-card__name">
           {{ $t('tools.praatAnalysis.name') }}
         </div>
-        <div class="entry-button__desc">
+        <div class="portal-entry-card__desc">
           {{ $t('tools.praatAnalysis.desc') }}
         </div>
-      </button>
+      </RouterLink>
 
-      <button class="entry-button" @click="handleGis">
-        <div class="entry-button__icon"><InlineIcon icon="🗺" /></div>
-        <div class="entry-button__name">
+      <RouterLink class="portal-entry-card glass-card" data-interactive="true" :to="localeTo('/explore/gis')">
+        <div class="portal-entry-card__icon"><InlineIcon icon="🗺" /></div>
+        <div class="portal-entry-card__name">
           {{ $t('tools.gis.name') }}
         </div>
-        <div class="entry-button__desc">
+        <div class="portal-entry-card__desc">
           {{ $t('tools.gis.desc') }}
         </div>
-      </button>
+      </RouterLink>
     </div>
   </div>
 </template>
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import { useRoute, useRouter } from 'vue-router'
+import BarIcon from '@/components/common/BarIcon.vue'
+import { useRoute } from 'vue-router'
 import {
   buildLocalePath,
   resolveRouteLocale
 } from '@/i18n/localeRouting.js'
 
-const router = useRouter()
 const route = useRoute()
 
-// 跳转到对应的工具页面
-const handleDataCheck = () => {
-  router.push(
-    buildLocalePath(
-      resolveRouteLocale(route),
-      '/explore/tools/check'
-    )
-  )
-}
-
-const handleJyutpingToIpa = () => {
-  router.push(
-    buildLocalePath(
-      resolveRouteLocale(route),
-      '/explore/tools/jyut2ipa'
-    )
-  )
-}
-
-const handleMergeTables = () => {
-  router.push(
-    buildLocalePath(
-      resolveRouteLocale(route),
-      '/explore/tools/merge'
-    )
-  )
-}
-
-// const handleDeriveTables = () => {
-//   router.push(
-//     buildLocalePath(
-//       resolveRouteLocale(route),
-//       '/explore/tools/derive'
-//     )
-//   )
-// }
-
-const handlePraatTables = () => {
-  router.push(
-    buildLocalePath(
-      resolveRouteLocale(route),
-      '/explore/tools/praat'
-    )
-  )
-}
-
-const handleGis = () => {
-  router.push(
-    buildLocalePath(
-      resolveRouteLocale(route),
-      '/explore/gis'
-    )
-  )
-}
+const localeTo = (path) => buildLocalePath(resolveRouteLocale(route), path)
 </script>
 
 <style scoped lang="scss">

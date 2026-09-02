@@ -1,6 +1,6 @@
 <template>
   <section
-    class="panel main-glass-panel"
+    class="panel glass-panel"
     data-step="preview"
   >
     <div class="panel-header">
@@ -14,27 +14,27 @@
       v-if="workspaceState.previewData"
       class="summary-card-grid"
     >
-      <div class="summary-card main-glass-panel-inner">
+      <div class="summary-card glass-subpanel">
         <span class="summary-card__label">{{ t('cluster.preview.metrics.groupCount') }}</span>
         <strong>{{ workspaceState.previewData.group_count ?? 0 }}</strong>
       </div>
-      <div class="summary-card main-glass-panel-inner">
+      <div class="summary-card glass-subpanel">
         <span class="summary-card__label">{{ t('cluster.preview.metrics.uniqueCharCount') }}</span>
         <strong>{{ workspaceState.previewData.unique_char_count ?? 0 }}</strong>
       </div>
-      <div class="summary-card main-glass-panel-inner">
+      <div class="summary-card glass-subpanel">
         <span class="summary-card__label">{{ t('cluster.preview.metrics.requestedLocationCount') }}</span>
         <strong>{{ workspaceState.previewData.requested_location_count ?? 0 }}</strong>
       </div>
-      <div class="summary-card main-glass-panel-inner">
+      <div class="summary-card glass-subpanel">
         <span class="summary-card__label">{{ t('cluster.preview.metrics.matchedLocationCount') }}</span>
         <strong>{{ workspaceState.previewData.matched_location_count ?? 0 }}</strong>
       </div>
-      <div class="summary-card main-glass-panel-inner">
+      <div class="summary-card glass-subpanel">
         <span class="summary-card__label">{{ t('cluster.preview.metrics.pairCount') }}</span>
         <strong>{{ workspaceState.previewData.estimated_pair_count ?? 0 }}</strong>
       </div>
-      <div class="summary-card main-glass-panel-inner">
+      <div class="summary-card glass-subpanel">
         <span class="summary-card__label">{{ t('cluster.preview.metrics.matrixMb') }}</span>
         <strong>{{ formatNumeric(workspaceState.previewData.estimated_dense_matrix_mb) }}</strong>
       </div>
@@ -54,7 +54,7 @@
 
     <div class="panel-actions">
       <button
-        class="global-action-btn global-action-btn-primary"
+        class="action-btn action-btn-primary"
         type="button"
         :disabled="!workspaceState.prepareHash || isPreparePending"
         @click="handlePrepare"
@@ -65,7 +65,7 @@
   </section>
 
   <section
-    class="panel main-glass-panel"
+    class="panel glass-panel"
     data-step="prepare"
   >
     <div class="panel-header">
@@ -86,7 +86,7 @@
   </section>
 
   <section
-    class="panel main-glass-panel"
+    class="panel glass-panel"
     data-step="distance"
   >
     <div class="panel-header">
@@ -96,7 +96,7 @@
       </div>
     </div>
 
-    <div class="mode-panel main-glass-panel-inner">
+    <div class="mode-panel glass-subpanel">
       <RadioGroup
         v-model="workspaceState.selectedPhonemeMode"
         name="phoneme-mode"
@@ -118,7 +118,7 @@
 
     <div class="panel-actions">
       <button
-        class="global-action-btn global-action-btn-primary"
+        class="action-btn action-btn-primary"
         type="button"
         :disabled="!workspaceState.prepareCompleted || isDistancePending"
         @click="handleDistance"
@@ -129,7 +129,7 @@
   </section>
 
   <section
-    class="panel main-glass-panel"
+    class="panel glass-panel"
     data-step="cluster"
   >
     <div class="panel-header">
@@ -139,7 +139,7 @@
       </div>
     </div>
 
-    <div class="cluster-form main-glass-panel-inner">
+    <div class="cluster-form glass-subpanel">
       <div class="form-grid">
         <div class="field">
           <span>{{ t('cluster.clustering.algorithm') }}</span>
@@ -231,7 +231,7 @@
 
     <div class="panel-actions">
       <button
-        class="global-action-btn global-action-btn-primary"
+        class="action-btn action-btn-primary"
         type="button"
         :disabled="!currentDistanceHash || isClusterPending"
         @click="handleCluster"
@@ -242,7 +242,7 @@
   </section>
 
   <section
-    class="panel main-glass-panel quick-run-panel"
+    class="panel glass-panel quick-run-panel"
     data-step="quick-run"
   >
     <details :open="quickRunOpen">
@@ -257,7 +257,7 @@
         <h2>{{ t('cluster.quickRun.title') }}</h2>
         <p>{{ t('cluster.quickRun.description') }}</p>
         <button
-          class="global-action-btn global-action-btn-secondary"
+          class="action-btn action-btn-secondary"
           type="button"
           :disabled="isQuickRunPending"
           @click="handleQuickRun"

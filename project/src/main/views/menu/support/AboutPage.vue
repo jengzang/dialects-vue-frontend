@@ -9,12 +9,22 @@
       <template #default="{ currentTab }">
         <!-- 新的"簡介"页面 -->
         <div v-if="currentTab === 'intro'" class="thanks-container">
-          <h2 class="tabs-title">{{ $t('about.intro.title') }}</h2>
+          <h1 class="tabs-title">{{ $t('navigation.pageTitles.support.aboutIntro') }}</h1>
           <p style=" text-align: left;">{{ $t('about.intro.description') }}</p>
           <ul class="customlist">
             <li v-for="(feature, idx) in featureList" :key="idx" class="feature-item">
-              <h3 class="feature-heading">{{ feature.heading }}</h3>
-              <p class="feature-subtitle">{{ feature.subtitle }}</p>
+              <h3 class="feature-heading">
+                <RouterLink v-if="feature.route" :to="localeTo(feature.route)" class="feature-link feature-heading-link">
+                  {{ feature.heading }}
+                </RouterLink>
+                <span v-else>{{ feature.heading }}</span>
+              </h3>
+              <p class="feature-subtitle">
+                <RouterLink v-if="feature.route" :to="localeTo(feature.route)" class="feature-link feature-subtitle-link">
+                  {{ feature.subtitle }}
+                </RouterLink>
+                <span v-else>{{ feature.subtitle }}</span>
+              </p>
               <p class="feature-intro">{{ feature.intro }}</p>
               <ul v-if="feature.items.length" class="subfeature-list">
                 <li
@@ -22,7 +32,12 @@
                   :key="i"
                   class="subfeature-item"
                 >
-                  <h4 class="subfeature-title">{{ item.title }}</h4>
+                  <h4 class="subfeature-title">
+                    <RouterLink v-if="item.route" :to="localeTo(item.route)" class="feature-link subfeature-title-link">
+                      {{ item.title }}
+                    </RouterLink>
+                    <span v-else>{{ item.title }}</span>
+                  </h4>
                   <p class="subfeature-body">{{ item.body }}</p>
                 </li>
               </ul>
@@ -94,7 +109,7 @@
         <!-- 新的"建議"页面 -->
         <div v-if="currentTab === 'suggestion'" class="page2">
           <div class="suggestion-box">
-            <h2 class="tabs-title">💬 {{ $t('about.suggestion.title') }}</h2>
+            <h1 class="tabs-title">💬 {{ $t('navigation.pageTitles.support.aboutSuggestion') }}</h1>
             <p v-html="$t('about.suggestion.description')"></p>
             <p class="subtext">👇 {{ $t('about.suggestion.subtext') }}</p>
             <div class="card-links">
@@ -102,7 +117,8 @@
                 href="https://github.com/jengzang/dialects-js-frontend/issues"
                 target="_blank"
                 rel="noopener"
-                class="card"
+                class="card glass-card"
+                data-interactive="true"
               >
                 <img class="card-icon" src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" />
                 <span v-html="$t('about.suggestion.frontend.title')"></span>
@@ -112,7 +128,8 @@
                 href="https://github.com/jengzang/dialects-build/issues"
                 target="_blank"
                 rel="noopener"
-                class="card"
+                class="card glass-card"
+                data-interactive="true"
               >
                 <img class="card-icon" src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" />
                 <span v-html="$t('about.suggestion.backend.title')"></span>
@@ -122,7 +139,8 @@
                 href="https://www.zhihu.com/project/detail/60225"
                 target="_blank"
                 rel="noopener"
-                class="card"
+                class="card glass-card"
+                data-interactive="true"
               >
                 <img class="card-icon" src="https://static.zhihu.com/heifetz/favicon.ico" alt="Zhihu" />
                 <span v-html="$t('about.suggestion.zhihu.title')"></span>
@@ -130,12 +148,117 @@
               </a>
             </div>
           </div>
+
+          <div
+            class="surface-panel suggestion-form-section"
+            data-about-suggestion-form
+          >
+            <h2 class="tabs-title">{{ $t('layoutFooter.feedback.title') }}</h2>
+            <form
+              class="suggestion-page-form"
+              @submit.prevent="submitSuggestionForm"
+            >
+              <div class="suggestion-form-row suggestion-form-row--identity">
+                <div class="field feedback-category">
+                  <span>{{ $t('layoutFooter.feedback.category') }}</span>
+                  <SimpleSelectDropdown
+                    v-model="suggestionCategory"
+                    :options="suggestionCategoryOptions"
+                    :disabled="isSubmittingSuggestion || isCapturingSuggestionScreenshot"
+                    width="100%"
+                  />
+                </div>
+
+                <label class="field">
+                  <span>{{ $t('layoutFooter.feedback.titleLabel') }}</span>
+                  <input
+                    v-model.trim="suggestionTitle"
+                    class="glass-field"
+                    name="title"
+                    maxlength="200"
+                    :placeholder="$t('layoutFooter.feedback.titlePlaceholder')"
+                  >
+                </label>
+              </div>
+
+              <label class="field">
+                <span>{{ $t('layoutFooter.feedback.contentLabel') }}</span>
+                <textarea
+                  v-model.trim="suggestionContent"
+                  class="glass-field"
+                  name="content"
+                  maxlength="5000"
+                  rows="5"
+                  :placeholder="$t('layoutFooter.feedback.contentPlaceholder')"
+                />
+              </label>
+
+              <div class="suggestion-form-row suggestion-form-row--meta">
+                <label class="field">
+                  <span>{{ $t('layoutFooter.feedback.contactLabel') }}</span>
+                  <input
+                    v-model.trim="suggestionContact"
+                    class="glass-field"
+                    name="contact"
+                    maxlength="200"
+                    :placeholder="$t('layoutFooter.feedback.contactPlaceholder')"
+                  >
+                </label>
+
+                <div class="suggestion-screenshot-control">
+                  <CheckBox
+                    v-model="includeSuggestionScreenshot"
+                    class="screenshot-field"
+                    data-include-screenshot
+                  >
+                    {{ $t('layoutFooter.feedback.screenshot.label') }}
+                  </CheckBox>
+                  <p class="hint screenshot-hint">
+                    {{ $t('layoutFooter.feedback.screenshot.hint') }}
+                  </p>
+                </div>
+              </div>
+              <div
+                v-if="includeSuggestionScreenshot"
+                class="surface-subpanel screenshot-preview"
+              >
+                <img
+                  v-if="suggestionScreenshotDataUrl"
+                  :src="suggestionScreenshotDataUrl"
+                  :alt="$t('layoutFooter.feedback.screenshot.previewAlt')"
+                >
+                <span v-else>{{ $t('layoutFooter.feedback.screenshot.capturing') }}</span>
+                <button
+                  type="button"
+                  class="glass-button screenshot-retake"
+                  data-size="compact"
+                  :disabled="isCapturingSuggestionScreenshot"
+                  @click="captureSuggestionScreenshotPreview"
+                >
+                  {{ $t('layoutFooter.feedback.screenshot.retake') }}
+                </button>
+              </div>
+
+              <div class="suggestion-form-actions">
+                <button
+                  type="submit"
+                  class="glass-button suggestion-submit-button"
+                  data-variant="primary"
+                  data-size="small"
+                  data-submit-feedback
+                  :disabled="isSubmittingSuggestion || isCapturingSuggestionScreenshot || !canSubmitSuggestion"
+                >
+                  {{ $t('layoutFooter.feedback.submit') }}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
 
         <!-- 新的"喜歡"页面 -->
         <div v-if="currentTab === 'like'" class="cards-container">
-          <h2 class="tabs-title like-author-title">
-            {{ $t('about.like.title') }}
+          <h1 class="tabs-title like-author-title">
+            {{ $t('navigation.pageTitles.support.aboutLike') }}
             <span class="follow-buttons">
               <button class="follow-button zhihu-follow" @click="followClicked">
                 <img
@@ -156,12 +279,13 @@
                 GitHub
               </a>
             </span>
-          </h2>
+          </h1>
           <p style="display: block; width: 100%; clear: both; margin: 0 0 0.8rem;">
             {{ $t('about.like.starMessage') }}
           </p>
           <a
-            class="project-card"
+            class="project-card glass-card"
+            data-interactive="true"
             v-for="project in githubProjects"
             :key="project.name"
             :href="project.url"
@@ -180,7 +304,8 @@
             {{ $t('about.like.zhihuLike') }}
           </p>
           <a
-            class="project-card"
+            class="project-card glass-card"
+            data-interactive="true"
             v-for="project in zhihuProjects"
             :key="project.name"
             :href="project.url"
@@ -228,35 +353,120 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import i18n from '@/i18n/index.js'
+// import BarIcon from '@/components/common/BarIcon.vue'
 import SupportPopup from '@/main/components/user/popups/SupportPopup.vue'
 import TabsContainer from '@/components/common/TabsContainer.vue'
+import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import { useSuggestionForm } from '@/composables/suggestions/useSuggestionForm.js'
 
 const { t, locale } = useI18n()
 const route = useRoute()
 const showQRCodes = ref(false)
 
+const suggestionPageContext = computed(() => ({
+  path: route.path,
+  fullPath: route.fullPath,
+  query: route.query,
+  hash: route.hash,
+  locale: locale.value,
+}))
+
+const {
+  category: suggestionCategory,
+  title: suggestionTitle,
+  content: suggestionContent,
+  contact: suggestionContact,
+  includeScreenshot: includeSuggestionScreenshot,
+  screenshotDataUrl: suggestionScreenshotDataUrl,
+  isSubmitting: isSubmittingSuggestion,
+  isCapturingScreenshot: isCapturingSuggestionScreenshot,
+  categoryOptions: suggestionCategoryOptions,
+  canSubmit: canSubmitSuggestion,
+  captureScreenshotPreview: captureSuggestionScreenshotPreview,
+  submit: submitSuggestionForm,
+} = useSuggestionForm({
+  t,
+  pageTitle: () => t('navigation.pageTitles.support.aboutSuggestion'),
+  sourcePath: () => route.path,
+  context: () => suggestionPageContext.value,
+  initialCategory: () => route.query.category,
+})
+
 const zhihuFallback = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="4" fill="#0066FF"/><text x="12" y="17" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="sans-serif">知</text></svg>')
 const githubFallback = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#24292f"/><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.78.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12c0-5.52-4.48-10-10-10z" fill="white"/></svg>')
 
+const featureRouteMap = {
+  feature1: '/menu/query/zhonggu',
+  feature2: '/menu/map/view',
+  feature3: '/menu/compare/zhonggu',
+  feature4: '/menu/pho/matrix',
+  feature5: '/explore/char-class?tab=zhonggu',
+  feature6: '/explore/tools/check',
+  feature7: '/menu/yubao?tab=vocabulary',
+  feature8: '/menu/villages',
+  feature9: '/explore/tools/praat',
+  feature10: '/menu/cluster'
+}
+
+const subfeatureRouteMap = {
+  feature1: ['/menu/query/zhonggu', '/menu/query/yinwei', '/menu/query/char', '/menu/query/tone'],
+  feature2: ['/menu/map/view', '/menu/map/divide', '/menu/map/custom', '/explore/gis'],
+  feature3: ['/menu/compare/char', '/menu/compare/zhonggu', '/menu/compare/tone', '/menu/compare/phonetic'],
+  feature4: ['/menu/pho/matrix', '/menu/pho/custom', '/menu/pho/count', '/menu/pho/evolution'],
+  feature5: [
+    '/explore/char-class?tab=zhonggu',
+    '/explore/char-class?tab=shanggu',
+    '/explore/char-class?tab=jingu',
+    '/explore/char-class?tab=yueyun'
+  ],
+  feature6: ['/explore/tools/check', '/explore/tools/jyut2ipa', '/explore/tools/merge', '/explore/tools/derive'],
+  feature7: ['/menu/yubao?tab=vocabulary', '/menu/yubao?tab=grammar', '/explore/yc/words'],
+  feature8: [
+    '/explore/villages/gd',
+    '/explore/villages/toponyms',
+    '/explore/villages/table',
+    '/explore/yc/villages',
+    '/explore/villages/ml'
+  ],
+  feature9: [
+    '/explore/tools/praat',
+    '/explore/tools/praat',
+    '/explore/tools/praat',
+    '/explore/tools/praat',
+    '/explore/tools/praat',
+    '/explore/tools/praat'
+  ],
+  feature10: ['/menu/cluster']
+}
+
 const featureList = computed(() => {
   const messages = i18n.global.messages.value[locale.value]
-  return Array.from({ length: 9 }, (_, i) => {
-    const n = i + 1
-    const f = messages.about.intro.features[`feature${n}`]
+  const featureKeys = Object.keys(messages.about.intro.features)
+  return featureKeys.map((key) => {
+    const f = messages.about.intro.features[key]
     return {
       heading: f.heading,
       subtitle: f.subtitle,
       intro: f.intro,
-      items: f.items || [],
+      route: featureRouteMap[key] || '',
+      items: (f.items || []).map((item, index) => ({
+        ...item,
+        route: subfeatureRouteMap[key]?.[index] || ''
+      })),
       zhihuLink: f.zhihuLink || '',
     }
   })
 })
+
+function localeTo(path) {
+  return buildLocalePath(resolveRouteLocale(route), path)
+}
 
 const pathSectionToTab = {
   intro: 'intro',
@@ -277,6 +487,17 @@ const currentTab = computed(() => {
   }
 
   return 'intro'
+})
+
+onMounted(() => {
+  if (route.query.from === 'vocabulary_import') {
+    nextTick(() => {
+      document.querySelector('[data-about-suggestion-form]')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    })
+  }
 })
 
 const tabs = computed(() => [
@@ -379,8 +600,10 @@ $ease-standard: 0.3s ease;@mixin glass-card(
 
 /* 建议页面 */
 .page2 {
-  max-width: 500px;
-  display: flex;
+  @include flex-col;
+
+  max-width: 900px;
+  align-items: center;
   justify-content: center;
   margin: 0 auto;
   padding: 1dvw 8dvw;
@@ -549,6 +772,15 @@ em {
   font-weight: 500;
 }
 
+.feature-link {
+  color: inherit;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .feature-intro {
   margin: 0 0 12px;
   color: $text-secondary;
@@ -639,22 +871,20 @@ em {
   margin: 0 auto;
   padding: 1.1rem;
   box-sizing: border-box;
+  background: var(--glass-70);
 
-  @include glass-card;
+  // @include glass-card;
 
-  border-radius: var(--radius-md);
+  // border-radius: var(--radius-md);
   box-shadow: 0 2px 10px rgba(var(--color-primary-rgb), 0.08);
   color: inherit;
   text-decoration: none;
-  transition:
-    transform $ease-standard,
-    box-shadow $ease-standard;
 
-  &:hover {
-    background: var(--glass-80);
-    box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.15);
-    transform: translateY(-6px) scale(1.01);
-  }
+  // &:hover {
+    // background: var(--glass-80);
+    // box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.15);
+    // transform: translateY(-6px) scale(1.01);
+  // }
 
   p {
     margin: 0.5rem 0.5rem 0.2rem;
@@ -778,7 +1008,7 @@ em {
 
 /* 建议入口 */
 .suggestion-box {
-  max-width: 700px;
+  max-width: 500px;
   margin: 0 auto;
   justify-content: center;
   color: var(--text-deep);
@@ -812,25 +1042,26 @@ em {
   align-items: center;
   padding: 20px;
   overflow: hidden;
+  // background: var(--glass-50);
 
-  @include glass-card;
+  // @include glass-card;
 
-  border-radius: var(--radius-lg);
-  box-shadow: 0 6px 12px rgba(var(--color-primary-rgb), 0.1);
+  // border-radius: var(--radius-lg);
+  // box-shadow: 0 6px 12px rgba(var(--color-primary-rgb), 0.1);
   color: var(--text-primary);
   font-size: 18px;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
-  transform: scale(1);
-  transition: all $ease-standard;
+  // transform: scale(1);
+  // transition: all $ease-standard;
 
-  &:hover {
-    background: var(--glass-80);
-    border-color: rgba(var(--color-primary-rgb), 0.35);
-    box-shadow: 0 10px 20px rgba(var(--color-primary-rgb), 0.2);
-    transform: scale(1.02) translateY(-2px);
-  }
+  // &:hover {
+  //   background: var(--glass-80);
+  //   border-color: rgba(var(--color-primary-rgb), 0.35);
+  //   box-shadow: 0 10px 20px rgba(var(--color-primary-rgb), 0.2);
+  //   transform: scale(1.02) translateY(-2px);
+  // }
 
   span {
     margin-top: 10px;
@@ -844,6 +1075,98 @@ em {
   width: 28px;
   height: 28px;
   margin-bottom: 4px;
+}
+
+.suggestion-form-section {
+  @include flex-col;
+  gap: 14px;
+  // width: 100%;
+  max-width: 820px;
+  margin: 28px auto 0;
+  padding: 20px;
+  text-align: left;
+
+  @media (max-aspect-ratio: #{1 / 1}) {
+    min-width: 80dvw;
+  }
+
+  .tabs-title {
+    margin-bottom: 0;
+  }
+}
+
+.suggestion-page-form {
+  @include flex-col;
+  gap: 12px;
+
+  textarea {
+    resize: vertical;
+  }
+}
+
+.suggestion-page-form .field {
+  @include flex-col;
+  gap: 6px;
+}
+
+.suggestion-form-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.8fr) minmax(0, 1.4fr);
+  gap: 12px;
+  align-items: end;
+}
+
+.suggestion-form-row > * {
+  min-width: 0;
+}
+
+.suggestion-form-row--meta {
+  grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.8fr);
+}
+
+.suggestion-screenshot-control {
+  @include flex-col;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.suggestion-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.suggestion-submit-button {
+  min-width: 96px;
+}
+
+.screenshot-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.screenshot-hint {
+    white-space: nowrap;
+  font-size: 12px;
+  margin: 0;
+}
+
+.screenshot-preview {
+  @include flex-col;
+  gap: 8px;
+  padding: 8px;
+}
+
+.screenshot-preview img {
+  display: block;
+  width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+}
+
+.screenshot-retake {
+  align-self: flex-start;
 }
 
 /* 竖屏 */
@@ -995,6 +1318,25 @@ em {
     width: 24px;
     height: 24px;
     margin-bottom: 2px;
+  }
+
+  .suggestion-form-section {
+    margin-top: 22px;
+    padding: 16px;
+  }
+
+  .suggestion-form-row,
+  .suggestion-form-row--meta {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .suggestion-form-actions {
+    justify-content: stretch;
+  }
+
+  .suggestion-submit-button {
+    width: 100%;
   }
 }
 </style>

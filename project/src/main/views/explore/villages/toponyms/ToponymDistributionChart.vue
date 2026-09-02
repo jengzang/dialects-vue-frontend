@@ -8,9 +8,9 @@
     />
     <div
       v-if="statusText"
-      class="toponym-distribution-chart__status"
+      class="toponym-distribution-chart__status main-list-state glass-subpanel"
     >
-      {{ statusText }}
+      <span class="main-list-state-text">{{ statusText }}</span>
     </div>
 
     <AppModal
@@ -26,10 +26,12 @@
             <span>{{ t('villages.pages.toponyms.chart.configSize') }}</span>
             <input
               v-model.number="pointConfig.size"
+              class="glass-range"
               type="range"
               min="1"
               max="20"
               step="1"
+              :style="{ '--glass-range-progress': (((pointConfig.size - 1) / 19) * 100) + '%' }"
             >
             <small>{{ pointConfig.size }}px</small>
           </label>
@@ -42,22 +44,6 @@
               match-trigger-width
               @update:model-value="pointConfig.shape = $event"
             />
-          </label>
-
-          <label class="chart-config__field">
-            <span>{{ t('villages.pages.toponyms.chart.configColor') }}</span>
-            <input
-              v-model="pointConfig.color"
-              type="color"
-            >
-          </label>
-
-          <label class="chart-config__field">
-            <span>{{ t('villages.pages.toponyms.chart.configBackground') }}</span>
-            <input
-              v-model="pointConfig.backgroundColor"
-              type="color"
-            >
           </label>
         </fieldset>
 
@@ -91,6 +77,7 @@ import {
 const COUNTRY_MAP_NAME = 'toponyms-country';
 const BOUNDARY_LAYER_KEYS = ['provinces', 'cities'];
 const TOPONYM_LARGE_RENDER_THRESHOLD = 2000;
+const POINT_COLOR_TOKEN = '--color-primary';
 const POINT_CLICK_FILTER = {
   seriesType: 'scatter',
 };
@@ -156,8 +143,6 @@ const registeredLayers = new Set();
 const pointConfig = reactive({
   size: 6,
   shape: 'rect',
-  color: '#1a73e8',
-  backgroundColor: '#ffffff',
 });
 
 const statusText = computed(() => {
@@ -234,7 +219,7 @@ function renderChart() {
   }
 
   const option = {
-    backgroundColor: pointConfig.backgroundColor || 'transparent',
+    backgroundColor: 'transparent',
     animation: false,
     tooltip: buildTooltipOption(),
     geo: {
@@ -324,7 +309,7 @@ function buildPointSeries() {
     progressive: 0,
     progressiveThreshold: Number.MAX_SAFE_INTEGER,
     itemStyle: {
-      color: pointConfig.color,
+      color: cssToken(POINT_COLOR_TOKEN),
       opacity: 0.72,
     },
     emphasis: {
@@ -401,13 +386,6 @@ defineExpose({ showConfigModal });
     max-inline-size: 340px;
     block-size: fit-content;
     padding: 8px 10px;
-    border: 1px solid var(--border-glass);
-    border-radius: var(--radius-sm2);
-    background: var(--surface-panel-strong);
-    color: var(--text-secondary);
-    font-size: 13px;
-    line-height: 1.5;
-    text-align: center;
     pointer-events: none;
   }
 }
@@ -446,19 +424,9 @@ defineExpose({ showConfigModal });
       font-size: 13px;
     }
 
-    input[type="range"] {
+    .glass-range {
       flex: 1;
       margin: 0;
-    }
-
-    input[type="color"] {
-      inline-size: 36px;
-      block-size: 28px;
-      padding: 0;
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-sm2);
-      background: none;
-      cursor: pointer;
     }
 
     small {

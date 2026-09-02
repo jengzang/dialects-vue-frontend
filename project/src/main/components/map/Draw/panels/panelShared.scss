@@ -133,7 +133,7 @@
 .draw-tool-button-grid {
   @include draw-button-grid(2);
 
-  .main-glass-button:last-child:nth-child(odd) {
+  .glass-button:last-child:nth-child(odd) {
     grid-column: 1 / -1;
   }
 }
@@ -142,8 +142,44 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-.draw-tool-button-grid--three .main-glass-button {
+.draw-tool-button-grid--three .glass-button {
   padding: 0.4rem 0.3rem !important;
+}
+
+.draw-tool-wide-control {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 0.45rem;
+}
+
+.draw-tool-wide-control > .draw-field-label {
+  grid-column: 1 / -1;
+}
+
+.draw-tool-wide-select {
+  min-width: 0;
+}
+
+.draw-tool-context-cluster {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  padding: 0.55rem;
+  border: 1px solid var(--glass-50);
+  border-radius: var(--radius-sm2);
+  background: var(--glass-40);
+}
+
+.draw-tool-context-stack {
+  @include flex-col;
+  gap: 0.6rem;
+  padding: 0.55rem;
+  border: 1px solid var(--glass-50);
+  border-radius: var(--radius-sm2);
+  background: var(--glass-40);
 }
 
 .draw-tool-mode-button {
@@ -152,9 +188,8 @@
 }
 
 .draw-shape-edit-status {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  @include flex-col;
+  align-items: stretch;
   gap: 0.45rem;
   padding: 0.45rem 0.6rem;
   border: 1px solid rgba(var(--color-primary-rgb), 0.24);
@@ -164,8 +199,68 @@
   font-size: 0.78rem;
 }
 
+.draw-shape-edit-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.draw-shape-edit-target {
+  min-width: 0;
+  font-weight: 700;
+  color: var(--text-deep);
+  @include text-truncate;
+}
+
+.draw-shape-edit-count {
+  color: rgba(var(--text-deep-rgb), 0.68);
+  white-space: nowrap;
+}
+
+.draw-shape-edit-hint {
+  color: rgba(var(--text-deep-rgb), 0.68);
+}
+
+.draw-shape-edit-tips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.draw-shape-edit-tips span {
+  padding: 0.18rem 0.42rem;
+  border-radius: var(--radius-sm2);
+  background: var(--glass-50);
+  color: rgba(var(--text-deep-rgb), 0.68);
+}
+
+.draw-shape-edit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+.draw-shape-edit-coordinate {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: end;
+  gap: 0.4rem;
+}
+
+.draw-shape-edit-coordinate > .draw-field-label {
+  grid-column: 1 / -1;
+}
+
+.draw-shape-edit-coordinate-field {
+  @include flex-col;
+  align-items: stretch;
+  gap: 0.25rem;
+}
+
 @media (hover: hover) and (pointer: fine) {
-  .draw-tool-button-grid .main-glass-button:hover:not(:disabled) {
+  .draw-tool-button-grid .glass-button:hover:not(:disabled) {
     background: var(--color-primary);
     color: var(--action-primary-text);
   }
@@ -181,6 +276,7 @@
   min-width: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.45rem;
 }
 
@@ -464,10 +560,6 @@ div.draw-layer-row-button {
 }
 
 .draw-input {
-  border-radius: var(--radius-md);
-  border: 1px solid var(--glass-70);
-  background: var(--glass-70);
-  color: var(--text-deep);
   padding: 0.5rem 0.75rem;
 }
 
@@ -497,9 +589,6 @@ div.draw-layer-row-button {
 
 .draw-color-input {
   height: 2.8rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--glass-70);
-  background: var(--glass-70);
   padding: 0.3rem;
 }
 
@@ -516,9 +605,8 @@ div.draw-layer-row-button {
   font-size: 0.92rem;
 }
 
-@media (max-width: 900px) {
+@media (max-aspect-ratio: 1/1) {
   .draw-tool-section-header {
     @include flex-col;
   }
-
 }

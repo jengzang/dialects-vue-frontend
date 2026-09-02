@@ -1,9 +1,9 @@
 <template>
   <div class="ngram-stats-page">
-    <h3 class="villagesml-subtab-title">
-      模式分析 - N-gram 統計
+    <h1 class="villagesml-subtab-title">
+      <BarIcon icon="📈" />模式分析 - N-gram 統計
       <HelpIcon content="分析2-3字N-gram的區域分布、傾向性和顯著性。支持按位置（前綴/中間/後綴）篩選。Z分數衡量N-gram在特定區域的使用傾向，P值<0.05表示統計顯著" />
-    </h3>
+    </h1>
 
     <!-- Info Banner (if coming from explore page) -->
     <div v-if="route.query.ngram" class="info-banner vml-glass-panel">
@@ -350,6 +350,7 @@ import { useRoute, useRouter } from 'vue-router'
 import RegionDisplay from '@/VillagesML/components/RegionDisplay.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import {
   getNgramTendency,
   getNgramSignificance,

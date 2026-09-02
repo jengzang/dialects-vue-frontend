@@ -42,6 +42,36 @@ export function extractToponymPointFromChartParams(params) {
   return { id, coordinates };
 }
 
+export function findNearestToponymPoint(scatterData = [], targetCoordinates = [], tolerance = 0) {
+  const target = toCoordinatePair(targetCoordinates?.[0], targetCoordinates?.[1]);
+  const maxDistance = Number(tolerance);
+  if (!target || !Number.isFinite(maxDistance) || maxDistance <= 0) return null;
+
+  const [targetLng, targetLat] = target;
+  const maxDistanceSquared = maxDistance * maxDistance;
+  let nearest = null;
+  let nearestDistanceSquared = Infinity;
+
+  (Array.isArray(scatterData) ? scatterData : []).forEach((item) => {
+    const id = String(item?.id || item?.name || '').trim();
+    const coordinates = toCoordinatePair(item?.value?.[0], item?.value?.[1]);
+    if (!id || !coordinates) return;
+
+    const lngDelta = coordinates[0] - targetLng;
+    const latDelta = coordinates[1] - targetLat;
+    const distanceSquared = lngDelta * lngDelta + latDelta * latDelta;
+    if (distanceSquared > maxDistanceSquared || distanceSquared >= nearestDistanceSquared) return;
+
+    nearest = {
+      id,
+      coordinates,
+    };
+    nearestDistanceSquared = distanceSquared;
+  });
+
+  return nearest;
+}
+
 function pushLineString(lines, feature, coordinates) {
   const cleanCoords = (Array.isArray(coordinates) ? coordinates : [])
     .map((coord) => toCoordinatePair(coord?.[0], coord?.[1]))
@@ -120,30 +150,6 @@ export function buildRiverLineSeriesData(geoJson) {
   });
 
   return lines;
-}
-
-export function findNearestToponymPoint(data, target, tolerance) {
-  if (!Array.isArray(data) || !Array.isArray(target) || target.length < 2) return null;
-  const maxDist = Number(tolerance);
-  if (!Number.isFinite(maxDist) || maxDist <= 0) return null;
-
-  let best = null;
-  let bestDist = Infinity;
-
-  for (let i = 0; i < data.length; i++) {
-    const item = data[i];
-    const value = item?.value;
-    if (!Array.isArray(value) || value.length < 2) continue;
-    const dlng = Number(value[0]) - Number(target[0]);
-    const dlat = Number(value[1]) - Number(target[1]);
-    const dist = Math.sqrt(dlng * dlng + dlat * dlat);
-    if (dist <= maxDist && dist < bestDist) {
-      bestDist = dist;
-      best = { id: String(item.id || ''), coordinates: [Number(value[0]), Number(value[1])] };
-    }
-  }
-
-  return best;
 }
 
 export function getToponymPointExtent(scatterData = []) {

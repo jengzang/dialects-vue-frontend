@@ -1,9 +1,9 @@
 <template>
   <div class="category-tendency-page">
-    <h3 class="villagesml-subtab-title">
-      區域分析 - 類別傾向性
+    <h1 class="villagesml-subtab-title">
+      <BarIcon icon="📊" />區域分析 - 類別傾向性
       <HelpIcon content="分析區域對語義類別的偏好。Z分數衡量該區域使用某語義類別的傾向，Lift值表示相對於全局平均的提升倍數。同時提供區域N-gram排行榜功能" />
-    </h3>
+    </h1>
 
     <div class="vml-glass-panel">
       <div class="tendency-section" style="flex-direction: column; gap: 12px;">
@@ -166,6 +166,7 @@ import { ref, computed, watch } from 'vue'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { getSemanticCategoryTendency, getNgramRegional } from '@/api/index.js'
 import { showError } from '@/utils/ui/message.js'
 import { getCategoryName } from '@/VillagesML/config/villagesML.js'

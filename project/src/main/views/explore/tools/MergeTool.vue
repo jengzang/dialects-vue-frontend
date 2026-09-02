@@ -1,8 +1,8 @@
 <template>
   <div class="merge-tool-container">
-    <div class="glass-container glass-container-shell" style="max-height: 80dvh;overflow: auto;">
+    <div class="glass-container glass-shell" style="max-height: 80dvh;overflow: auto;">
       <div class="header-section">
-        <h2 class="title">{{ t('tools.merge.page.title') }}</h2>
+        <h1 class="title"><BarIcon icon="🔗" />{{ t('navigation.pageTitles.tools.merge') }}</h1>
         <p class="subtitle">{{ t('tools.merge.page.subtitle') }}</p>
       </div>
 
@@ -106,7 +106,7 @@
 
           <div class="step-actions">
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="secondary"
               @click="previewDefaultReference"
               :disabled="isLoadingRef"
@@ -117,7 +117,7 @@
               </span>
             </button>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="primary"
               data-size="large"
               :disabled="!referenceFile"
@@ -133,7 +133,7 @@
           <p class="step-desc">
             {{ t('tools.merge.files.descPrefix') }}
             <button
-                class="main-glass-button"
+                class="glass-button"
                 data-size="small"
                 style="display: inline-block; padding: 2px 8px; margin: 0 2px; vertical-align: middle;background: var(--color-primary);"
                 @click="$router.push(buildLocalePath(resolveRouteLocale(route), '/explore/tools/check'))"
@@ -225,11 +225,11 @@
           </div>
 
           <div class="step-actions">
-            <button class="main-glass-button" data-variant="secondary" @click="prevStep">
+            <button class="glass-button" data-variant="secondary" @click="prevStep">
               ← {{ t('tools.merge.files.previous') }}
             </button>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="primary"
               data-size="large"
               :disabled="!canStartMerge"
@@ -300,11 +300,11 @@
             </div>
 
             <div class="result-actions">
-              <button class="main-glass-button" data-variant="primary" data-size="large" @click="downloadMerged">
+              <button class="glass-button" data-variant="primary" data-size="large" @click="downloadMerged">
                 <span class="icon"><InlineIcon icon="⬇️" /></span>
                 <span>{{ t('tools.merge.actions.downloadResult') }}</span>
               </button>
-              <button class="main-glass-button" data-variant="secondary" @click="reset">
+              <button class="glass-button" data-variant="secondary" @click="reset">
                 <span class="icon"><InlineIcon icon="🔄" /></span>
                 <span>{{ t('tools.merge.actions.resetTask') }}</span>
               </button>
@@ -332,6 +332,7 @@
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
@@ -1123,7 +1124,7 @@ $color-danger: var(--color-error-light);
   font-size: 14px;
   color: rgba(var(--text-deep-rgb), 0.7);
   text-align: center;
- .main-glass-button{
+ .glass-button{
   color: var(--action-primary-text)
  }
 }
@@ -1786,8 +1787,8 @@ $color-danger: var(--color-error-light);
     padding-top: 16px;
   }
 
-  .main-glass-button,
-  .main-glass-button[data-size='large'] {
+  .glass-button,
+  .glass-button[data-size='large'] {
     width: 100%;
     justify-content: center;
     padding: 8px 24px;
@@ -1891,7 +1892,7 @@ $color-danger: var(--color-error-light);
       margin-bottom: -20px;
       padding: 12px 16px;
 
-      .main-glass-button {
+      .glass-button {
         width: 100%;
       }
     }

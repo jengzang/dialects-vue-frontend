@@ -1,7 +1,8 @@
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { useI18n } from 'vue-i18n'
 import UniversalTable from "@/main/components/TableAndTree/UniversalTable.vue";
@@ -9,7 +10,6 @@ import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 import { getCachedSourceStats, getSourceStats } from '@/composables/data/useSourceStats.js'
 
 const { t } = useI18n()
-const router = useRouter()
 const route = useRoute()
 const sourceDbVersion = getHomeUpdateNotice(t).dbVersion
 
@@ -52,19 +52,17 @@ const defaultFilter = { '存儲標記': 1 }
 // 示例4：筛选多个值（数组形式）
 // const defaultFilter = { '省': ['廣東', '廣西'] }
 
-const goToPrivacy = () => {
-  router.push(buildLocalePath(resolveRouteLocale(route), '/menu/privacy'))
-}
+const localeTo = (path) => buildLocalePath(resolveRouteLocale(route), path)
 </script>
 
 <template>
   <div style="width: 100%;justify-content: center;align-items:center;display: flex;flex-direction: column">
     <div class="header-row">
 
-      <h2 class="tabs-title" style="font-size: 1.5rem;"><InlineIcon icon="🔗" />{{ t('source.title') }}</h2>
-      <a class="privacy-link" @click="goToPrivacy">
+      <h1 class="tabs-title" style="font-size: 1.5rem;"><BarIcon icon="📎" />{{ t('navigation.pageTitles.support.source') }}</h1>
+      <RouterLink class="privacy-link" :to="localeTo('/menu/privacy')">
         {{ t('source.privacyLink') }}
-      </a>
+      </RouterLink>
 
     </div>
 <!--    <UniversalTable-->
@@ -132,4 +130,3 @@ $transition-fast: 0.2s;
 }
 
 </style>
-

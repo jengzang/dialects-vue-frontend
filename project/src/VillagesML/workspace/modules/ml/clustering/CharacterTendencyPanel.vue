@@ -1,9 +1,9 @@
 <template>
   <div class="char-tendency-panel">
-    <h3 class="villagesml-subtab-title">
-      ML計算 - 字符傾向性聚類
+    <h1 class="villagesml-subtab-title">
+      <BarIcon icon="📊" />ML計算 - 字符傾向性聚類
       <HelpIcon content="基於字符使用傾向性的區域聚類。特徵為每個區域的字符Z分數向量（標準化偏差），衡量該區域對特定字符的偏好程度。算法：K-Means（質心聚類）、DBSCAN（密度聚類）、GMM（高斯混合模型）" />
-    </h3>
+    </h1>
     <!-- 左側：參數設置 -->
     <div class="vml-two-col">
     <div class="vml-glass-panel">
@@ -146,6 +146,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed } from 'vue'
 import { villagesMLStore } from '@/VillagesML/store/villagesMLStore.js'
 import { userStore } from '@/main/store/store.js'

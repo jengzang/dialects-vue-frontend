@@ -2,9 +2,9 @@
   <div class="check-tool-container">
     <!-- 欢迎屏幕 -->
     <div v-if="!fileUploaded" class="welcome-screen">
-      <div class="glass-container-shell welcome-card">
+      <div class="glass-shell welcome-card">
         <div class="welcome-icon"><InlineIcon icon="📋" /></div>
-        <h2 class="title">{{ t('tools.checkTool.welcome.title') }}</h2>
+        <h1 class="title"><BarIcon icon="📝" />{{ t('navigation.pageTitles.tools.check') }}</h1>
 <!--        <p class="subtitle">上傳文件開始檢查和編輯</p>-->
 
         <div class="welcome-features">
@@ -25,7 +25,7 @@
         <div class="format-selector">
           <div class="format-label-row">
             <label class="format-label">{{ t('tools.checkTool.welcome.formatLabel') }}</label>
-            <button class="main-glass-button info-help-btn" data-size="small" @click="showFormatHelpModal = true"><InlineIcon icon="📋" />{{ t('tools.checkTool.welcome.formatHelp') }}
+            <button class="pill-btn info-help-btn" @click="showFormatHelpModal = true"><InlineIcon icon="📋" />{{ t('tools.checkTool.welcome.formatHelp') }}
             </button>
           </div>
           <div class="format-options">
@@ -102,7 +102,7 @@
       <aside v-if="!isPortrait && !sidebarCollapsed" class="sidebar glass-panel">
         <div class="sidebar-header">
           <h3><InlineIcon icon="📋" />{{ t('tools.checkTool.sidebar.title') }}</h3>
-          <button class="main-glass-button" data-size="small" @click="toggleShowAll">
+          <button class="glass-button" data-size="small" @click="toggleShowAll">
             {{ showingAll ? '👁️ ' + t('tools.checkTool.sidebar.showErrorsOnly') : '👁️ ' + t('tools.checkTool.sidebar.showAll') }}
           </button>
           <button class="collapse-btn" @click="toggleSidebar">
@@ -140,11 +140,12 @@
                 <input
                   v-model="searchQuery"
                   type="text"
-                  class="glass-input search-input"
+                  class="glass-field search-input"
+                  data-shape="search"
                   :placeholder="`🔍 ${t('tools.checkTool.sidebar.searchPlaceholder')}`"
                   @input="handleSearch"
                 />
-                <button class="main-glass-button" data-size="small" @click="resetFilter">{{ t('tools.checkTool.sidebar.clearFilter') }}</button>
+                <button class="glass-button" data-size="small" @click="resetFilter">{{ t('tools.checkTool.sidebar.clearFilter') }}</button>
               </div>
 
               <!-- 错误列表 -->
@@ -284,8 +285,8 @@
             <span class="file-name"><InlineIcon icon="📁" />{{ fileName }}</span>
             <span class="file-rows">{{ t('tools.checkTool.fileBar.rows', { count: totalRows }) }}</span>
           </div>
-          <button v-if="!isPortrait" class="main-glass-button" data-variant="secondary" data-size="small" @click="resetUpload">{{ t('tools.checkTool.fileBar.changeFile') }}</button>
-          <button v-if="!isPortrait" class="main-glass-button info-help-btn" data-size="small" @click="showHelpModal = true"><InlineIcon icon="❓" />{{ t('tools.checkTool.fileBar.help') }}
+          <button v-if="!isPortrait" class="glass-button" data-variant="secondary" data-size="small" @click="resetUpload">{{ t('tools.checkTool.fileBar.changeFile') }}</button>
+          <button v-if="!isPortrait" class="pill-btn info-help-btn" @click="showHelpModal = true"><InlineIcon icon="❓" />{{ t('tools.checkTool.fileBar.help') }}
           </button>
           <!-- 模式切换 -->
           <div class="mode-tabs glass-panel">
@@ -317,7 +318,7 @@
             </div>
             <div class="table-actions">
               <button
-                class="main-glass-button"
+                class="glass-button"
                 data-size="small"
                 :data-active="isEditMode ? 'true' : null"
                 @click="toggleEditMode"
@@ -326,7 +327,7 @@
               </button>
               <button
                 v-show="isEditMode"
-                class="main-glass-button"
+                class="glass-button"
                 data-size="small"
                 data-variant="primary"
                 :disabled="totalPendingChanges === 0"
@@ -335,14 +336,14 @@
               </button>
               <button
                 v-show="isEditMode"
-                class="main-glass-button"
+                class="glass-button"
                 data-size="small"
                 @click="cancelEdit"
               ><InlineIcon icon="❌" />{{ t('tools.checkTool.table.cancel') }}
               </button>
-              <button v-show="!isEditMode" class="main-glass-button" data-size="small" @click="showBatchReplaceModal = true"><InlineIcon icon="🔄" />{{ t('tools.checkTool.table.batchReplace') }}
+              <button v-show="!isEditMode" class="glass-button" data-size="small" @click="showBatchReplaceModal = true"><InlineIcon icon="🔄" />{{ t('tools.checkTool.table.batchReplace') }}
               </button>
-              <button v-show="!isEditMode" class="main-glass-button" data-size="small" @click="downloadFile"><InlineIcon icon="⬇️" />{{ t('tools.checkTool.table.download') }}
+              <button v-show="!isEditMode" class="glass-button" data-size="small" @click="downloadFile"><InlineIcon icon="⬇️" />{{ t('tools.checkTool.table.download') }}
               </button>
             </div>
           </div>
@@ -417,7 +418,7 @@
                     v-if="editingCell.row === row.row && editingCell.field === 'char'"
                     :id="`edit-input-${row.row}-char`"
                     type="text"
-                    class="glass-input row-input"
+                    class="glass-field row-input"
                     :value="getPendingValue(row.row, 'char') ?? row.char ?? ''"
                     @blur="finishEditing(row, 'char', $event.target.value)"
                     @keydown.enter.prevent="$event.target.blur()"
@@ -442,7 +443,7 @@
                     v-if="editingCell.row === row.row && editingCell.field === 'ipa'"
                     :id="`edit-input-${row.row}-ipa`"
                     type="text"
-                    class="glass-input row-input"
+                    class="glass-field row-input"
                     :value="getPendingValue(row.row, 'ipa') ?? row.ipa ?? ''"
                     @blur="finishEditing(row, 'ipa', $event.target.value)"
                     @keydown.enter.prevent="$event.target.blur()"
@@ -464,7 +465,7 @@
                     v-if="editingCell.row === row.row && editingCell.field === 'onset'"
                     :id="`edit-input-${row.row}-onset`"
                     type="text"
-                    class="glass-input row-input"
+                    class="glass-field row-input"
                     :value="getPendingValue(row.row, 'onset') ?? row.onset ?? ''"
                     @blur="finishEditing(row, 'onset', $event.target.value)"
                     @keydown.enter.prevent="$event.target.blur()"
@@ -485,7 +486,7 @@
                     v-if="editingCell.row === row.row && editingCell.field === 'rime'"
                     :id="`edit-input-${row.row}-rime`"
                     type="text"
-                    class="glass-input row-input"
+                    class="glass-field row-input"
                     :value="getPendingValue(row.row, 'rime') ?? row.rime ?? ''"
                     @blur="finishEditing(row, 'rime', $event.target.value)"
                     @keydown.enter.prevent="$event.target.blur()"
@@ -509,7 +510,7 @@
                     v-if="editingCell.row === row.row && editingCell.field === 'tone'"
                     :id="`edit-input-${row.row}-tone`"
                     type="text"
-                    class="glass-input row-input"
+                    class="glass-field row-input"
                     :value="getPendingValue(row.row, 'tone') ?? row.tone ?? ''"
                     @blur="finishEditing(row, 'tone', $event.target.value)"
                     @keydown.enter.prevent="$event.target.blur()"
@@ -531,7 +532,7 @@
                     v-if="editingCell.row === row.row && editingCell.field === 'note'"
                     :id="`edit-input-${row.row}-note`"
                     type="text"
-                    class="glass-input row-input"
+                    class="glass-field row-input"
                     style="text-align: left;"
                     :value="getPendingValue(row.row, 'note') ?? row.note ?? ''"
                     @blur="finishEditing(row, 'note', $event.target.value)"
@@ -564,7 +565,7 @@
           <div class="command-panel glass-panel">
             <div class="command-header">
               <h3><InlineIcon icon="💻" />{{ t('tools.checkTool.command.title') }}</h3>
-              <button v-if="!isPortrait" class="main-glass-button info-help-btn" data-size="small" @click="showHelpModal = true"><InlineIcon icon="❓" />{{ t('tools.checkTool.command.help') }}
+              <button v-if="!isPortrait" class="pill-btn info-help-btn" @click="showHelpModal = true"><InlineIcon icon="❓" />{{ t('tools.checkTool.command.help') }}
               </button>
             </div>
 
@@ -575,15 +576,15 @@
             ></textarea>
 
             <div class="command-actions">
-              <button class="main-glass-button" @click="clearCommand"><InlineIcon icon="🗑️" />{{ t('tools.checkTool.command.clear') }}</button>
-              <button class="main-glass-button" data-variant="primary" @click="executeCommand">▶️ {{ t('tools.checkTool.command.execute') }}</button>
+              <button class="glass-button" @click="clearCommand"><InlineIcon icon="🗑️" />{{ t('tools.checkTool.command.clear') }}</button>
+              <button class="glass-button" data-variant="primary" @click="executeCommand">▶️ {{ t('tools.checkTool.command.execute') }}</button>
             </div>
 
             <!-- 执行结果 -->
             <div v-if="commandLog.length > 0" class="command-result glass-panel">
               <div class="result-header">
                 <h4><InlineIcon icon="📋" />{{ t('tools.checkTool.command.resultTitle') }}</h4>
-                <button class="main-glass-button" data-size="small" @click="clearCommandLog">{{ t('tools.checkTool.command.clearResult') }}</button>
+                <button class="glass-button" data-size="small" @click="clearCommandLog">{{ t('tools.checkTool.command.clearResult') }}</button>
               </div>
               <div class="result-log ui-scrollbar">
                 <div
@@ -616,19 +617,19 @@
           <SimpleSelectDropdown
             v-model="replaceType"
             :options="replaceTypeOptions"
-            class="glass-input"
+            class="glass-field"
           />
         </div>
 
         <div v-if="replaceType === 'p'" class="form-group">
           <label>{{ t('tools.checkTool.batchReplace.sourceChar') }}</label>
-          <input v-model="replaceFrom" type="text" class="glass-input" :placeholder="t('tools.checkTool.batchReplace.sourceCharPlaceholder')" />
+          <input v-model="replaceFrom" type="text" class="glass-field" :placeholder="t('tools.checkTool.batchReplace.sourceCharPlaceholder')" />
           <div class="hint">{{ t('tools.checkTool.batchReplace.sourceCharHint') }}</div>
         </div>
 
         <div v-if="replaceType !== 'p'" class="form-group">
           <label>{{ t('tools.checkTool.batchReplace.sourceTone') }}</label>
-          <input v-model="replaceFrom" type="text" class="glass-input" :placeholder="t('tools.checkTool.batchReplace.sourceTonePlaceholder')" />
+          <input v-model="replaceFrom" type="text" class="glass-field" :placeholder="t('tools.checkTool.batchReplace.sourceTonePlaceholder')" />
           <div class="hint">{{ t('tools.checkTool.batchReplace.sourceToneHint') }}</div>
         </div>
 
@@ -637,7 +638,7 @@
           <input
             v-model="replaceTo"
             type="text"
-            class="glass-input"
+            class="glass-field"
             :placeholder="replaceType === 'p' ? t('tools.checkTool.batchReplace.targetCharPlaceholder') : t('tools.checkTool.batchReplace.targetTonePlaceholder')"
           />
           <div class="hint">{{ replaceType === 'p' ? t('tools.checkTool.batchReplace.targetCharHint') : t('tools.checkTool.batchReplace.targetToneHint') }}</div>
@@ -654,14 +655,14 @@
 
         <div class="form-group">
           <label>{{ t('tools.checkTool.batchReplace.previewCommand') }}</label>
-          <input :value="commandPreview" type="text" class="glass-input" readonly style="background: rgba(0,0,0,0.1);" />
+          <input :value="commandPreview" type="text" class="glass-field" readonly />
         </div>
       </div>
 
       <template #footer>
 <!--        <div class="check-tool-simple-modal-footer">-->
-          <button class="main-glass-button" data-variant="secondary" @click="showBatchReplaceModal = false">{{ t('tools.checkTool.batchReplace.cancel') }}</button>
-          <button class="main-glass-button" data-variant="primary" @click="executeBatchReplace"><InlineIcon icon="🔄" />{{ t('tools.checkTool.batchReplace.execute') }}</button>
+          <button class="glass-button" data-variant="secondary" @click="showBatchReplaceModal = false">{{ t('tools.checkTool.batchReplace.cancel') }}</button>
+          <button class="glass-button" data-variant="primary" @click="executeBatchReplace"><InlineIcon icon="🔄" />{{ t('tools.checkTool.batchReplace.execute') }}</button>
 <!--        </div>-->
       </template>
     </AppModal>
@@ -753,7 +754,7 @@
 
       <template #footer>
         <div class="check-tool-modal-footer-actions">
-          <button class="main-glass-button" data-variant="primary" @click="showHelpModal = false">{{ t('tools.checkTool.help.gotIt') }}</button>
+          <button class="glass-button" data-variant="primary" @click="showHelpModal = false">{{ t('tools.checkTool.help.gotIt') }}</button>
         </div>
       </template>
     </AppModal>
@@ -832,7 +833,7 @@
       </div>
       <template #footer>
         <div class="check-tool-modal-footer-actions">
-          <button class="main-glass-button" data-variant="primary" @click="showFormatHelpModal = false">{{ t('tools.checkTool.formatHelp.gotIt') }}</button>
+          <button class="glass-button" data-variant="primary" @click="showFormatHelpModal = false">{{ t('tools.checkTool.formatHelp.gotIt') }}</button>
         </div>
       </template>
     </AppModal>
@@ -852,7 +853,7 @@
 
       <template #footer>
 <!--        <div class="check-tool-simple-modal-footer">-->
-          <button class="main-glass-button" data-variant="primary" @click="showToneCharsModal = false">{{ t('tools.checkTool.toneChars.close') }}</button>
+          <button class="glass-button" data-variant="primary" @click="showToneCharsModal = false">{{ t('tools.checkTool.toneChars.close') }}</button>
 <!--        </div>-->
       </template>
     </AppModal>
@@ -868,10 +869,10 @@
     >
       <div class="filter-modal-body">
         <div class="filter-actions">
-          <button class="main-glass-button" data-size="small" @click="toggleSelectAll">
+          <button class="glass-button" data-size="small" @click="toggleSelectAll">
             {{ isAllSelected ? t('tools.checkTool.filter.clearAll') : t('tools.checkTool.filter.selectAll') }}
           </button>
-          <button class="main-glass-button" data-size="small" data-variant="secondary" @click="invertSelection">
+          <button class="glass-button" data-size="small" data-variant="secondary" @click="invertSelection">
             {{ t('tools.checkTool.filter.invert') }}
           </button>
         </div>
@@ -895,8 +896,8 @@
 
       <template #footer>
 <!--        <div class="check-tool-simple-modal-footer">-->
-          <button class="main-glass-button" data-variant="secondary" @click="showFilterModal = false">{{ t('tools.checkTool.filter.close') }}</button>
-          <button class="main-glass-button" data-variant="primary" @click="showFilterModal = false">{{ t('tools.checkTool.filter.confirm') }}</button>
+          <button class="glass-button" data-variant="secondary" @click="showFilterModal = false">{{ t('tools.checkTool.filter.close') }}</button>
+          <button class="glass-button" data-variant="primary" @click="showFilterModal = false">{{ t('tools.checkTool.filter.confirm') }}</button>
 <!--        </div>-->
       </template>
     </AppModal>
@@ -904,6 +905,7 @@
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -2160,12 +2162,12 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     height: 90%;
     @include flex-col;
     padding-top: 30px;
-    --main-glass-button-padding: 8px 16px;
-    --main-glass-button-border-radius: var(--radius-md);
-    --main-glass-button-font-size: 13px;
-    --main-glass-button-small-padding: 6px 12px;
-    --main-glass-button-small-font-size: 12px;
-    --main-glass-button-white-space: nowrap;
+    --glass-button-padding: 8px 16px;
+    --glass-button-border-radius: var(--radius-md);
+    --glass-button-font-size: 13px;
+    --glass-button-small-padding: 6px 12px;
+    --glass-button-small-font-size: 12px;
+    --glass-button-white-space: nowrap;
   }
 
   &-tool-simple-modal-footer {
@@ -3648,7 +3650,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
       flex-direction: column;
       gap: 6px;
 
-      .main-glass-button {
+      .glass-button {
         width: 100%;
         padding: 8px 12px;
       }
@@ -3661,11 +3663,9 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     }
   }
 
-  .main {
-    &-glass-button[data-size="small"] {
-      padding: 8px 12px;
-      font-size: 12px;
-    }
+  .glass-button[data-size="small"] {
+    padding: 8px 12px;
+    font-size: 12px;
   }
 
   .stat {
@@ -4009,7 +4009,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     &-section {
       gap: 4px;
 
-      .main-glass-button {
+      .glass-button {
         padding: 6px 12px;
         font-size: 12px;
       }
@@ -4112,19 +4112,15 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   }
 }
 
-// "说明" help buttons — stand out from the glass background with a visible border and hover glow
+// "说明" help buttons — 视觉见 main/_buttons.scss 的 .pill-btn, 仅颜色覆盖
 .info-help-btn {
-  border: 1px dashed rgba(var(--color-primary-rgb), 0.45) !important;
-  background: rgba(var(--color-primary-rgb), 0.07) !important;
-  color: var(--color-primary-hover) !important;
-  font-weight: 600 !important;
-  transition: all 0.22s ease !important;
-
-  &:hover:not(:disabled) {
-    background: rgba(var(--color-primary-rgb), 0.14) !important;
-    border-color: rgba(var(--color-primary-rgb), 0.65) !important;
-    box-shadow: 0 2px 12px rgba(var(--color-primary-rgb), 0.18) !important;
-    transform: translateY(-2px) !important;
-  }
+  --pill-btn-border: 1px dashed rgba(var(--color-primary-rgb), 0.45);
+  --pill-btn-bg: rgba(var(--color-primary-rgb), 0.07);
+  --pill-btn-color: var(--color-primary-hover);
+  --pill-btn-font-weight: 600;
+  --pill-btn-hover-bg: rgba(var(--color-primary-rgb), 0.14);
+  --pill-btn-hover-border: rgba(var(--color-primary-rgb), 0.65);
+  --pill-btn-hover-shadow: 0 2px 12px rgba(var(--color-primary-rgb), 0.18);
+  --pill-btn-hover-transform: translateY(-2px);
 }
 </style>

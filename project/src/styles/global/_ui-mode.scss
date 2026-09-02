@@ -36,9 +36,8 @@
 }
 
 
-:root[data-ui-mode='compact'] .main-glass-panel,
-:root[data-ui-mode='compact'] .main-glass-panel-inner,
 :root[data-ui-mode='compact'] .glass-panel,
+:root[data-ui-mode='compact'] .glass-subpanel,
 :root[data-ui-mode='compact'] .glass-container,
 :root[data-ui-mode='compact'] .ui-surface,
 :root[data-ui-mode='compact'] .ui-floating-surface,
@@ -62,10 +61,9 @@
   background-image: none !important;
 }
 
-// :root[data-ui-mode='compact'] .main-glass-button,
-// :root[data-ui-mode='compact'] .main-glass-panel,
-// :root[data-ui-mode='compact'] .main-glass-panel-inner,
+// :root[data-ui-mode='compact'] .glass-button,
 // :root[data-ui-mode='compact'] .glass-panel,
+// :root[data-ui-mode='compact'] .glass-subpanel,
 // :root[data-ui-mode='compact'] .glass-container,
 // :root[data-ui-mode='compact'] .ui-surface,
 // :root[data-ui-mode='compact'] .ui-floating-surface,

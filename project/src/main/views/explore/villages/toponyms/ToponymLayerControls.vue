@@ -10,22 +10,20 @@
     </div>
 
     <div class="toponym-layer-controls__list">
-      <label
+      <CheckBox
         v-for="layer in optionalLayers"
         :key="layer.key"
+        :model-value="Boolean(layerState[layer.key])"
+        :disabled="Boolean(loadingLayers[layer.key])"
         class="toponym-layer-controls__toggle"
-        :class="{ 'toponym-layer-controls__toggle--active': layerState[layer.key] }"
+        :font-size="compact ? 12 : 13"
+        :size="compact ? 16 : 18"
+        @update:model-value="handleToggle(layer.key, $event)"
       >
-        <input
-          type="checkbox"
-          :checked="layerState[layer.key]"
-          :disabled="loadingLayers[layer.key]"
-          @change="handleToggle(layer.key, $event.target.checked)"
-        >
         <span>{{ t(layer.labelKey) }}</span>
         <small v-if="loadingLayers[layer.key]">{{ t('villages.pages.toponyms.layers.loading') }}</small>
         <small v-else-if="layerErrors[layer.key]">{{ layerErrors[layer.key] }}</small>
-      </label>
+      </CheckBox>
     </div>
   </section>
 </template>
@@ -33,6 +31,7 @@
 <script setup>
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import CheckBox from '@/components/selector/CheckBox.vue';
 import { TOPONYMS_GIS_ASSETS } from './toponymsGisAssets.js';
 
 defineProps({
@@ -100,36 +99,12 @@ function handleToggle(key, visible) {
   }
 
   &__toggle {
-    display: inline-flex;
-    align-items: center;
     gap: 6px;
     min-block-size: 32px;
     padding: 6px 10px;
-    border: 1px solid var(--border-glass);
-    border-radius: var(--radius-sm2);
-    background: var(--surface-glass-button);
-    color: var(--text-slate);
-    font-size: 13px;
-    cursor: pointer;
-
-    input {
-      margin: 0;
-      accent-color: var(--color-primary);
-    }
 
     small {
-      color: var(--text-tertiary);
       font-size: 12px;
-    }
-
-    &--active {
-      border-color: var(--action-active-border);
-      background: var(--action-active-bg);
-      color: var(--text-deep);
-    }
-
-    &:has(input:disabled) {
-      @include disabled-state;
     }
   }
 
@@ -157,7 +132,6 @@ function handleToggle(key, visible) {
       &__toggle {
         min-block-size: 28px;
         padding: 4px 8px;
-        font-size: 12px;
       }
     }
   }

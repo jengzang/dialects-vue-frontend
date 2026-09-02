@@ -7,7 +7,7 @@
     @update:modelValue="handleClose"
   >
     <div class="image-export-modal">
-      <div class="feature-scope-summary main-glass-panel-inner">
+      <div class="feature-scope-summary glass-subpanel">
         <div class="summary-item">
           <span class="summary-label">{{ t('map.drawTab.imageExport.summary.layers') }}</span>
           <span class="summary-value summary-number">{{ layers.length }}</span>
@@ -23,7 +23,7 @@
       </div>
 
       <div class="scope-grid image-export-grid">
-        <section class="scope-panel main-glass-panel-inner">
+        <section class="scope-panel glass-subpanel">
           <div class="scope-panel-title">{{ t('map.drawTab.imageExport.sections.range') }}</div>
           <label v-for="option in rangeOptions" :key="option.value" class="scope-radio-item">
             <input v-model="form.rangeMode" type="radio" name="image-export-range" :value="option.value">
@@ -34,15 +34,16 @@
           </label>
         </section>
 
-        <section class="scope-panel main-glass-panel-inner">
+        <section class="scope-panel glass-subpanel">
           <div class="scope-panel-title">{{ t('map.drawTab.imageExport.sections.size') }}</div>
           <label class="draw-field">
             <!-- <span class="draw-field-label">{{ t('map.drawTab.imageExport.labels.sizePreset') }}</span> -->
-            <select v-model="form.sizePreset" class="draw-select-input" style="width: 100%;">
-              <option v-for="option in sizeOptions" :key="option.value" :value="option.value">
-                {{ option.label }}
-              </option>
-            </select>
+            <SimpleSelectDropdown
+              v-model="form.sizePreset"
+              :options="sizeOptions"
+              width="100%"
+              match-trigger-width
+            />
           </label>
 
           <div v-if="form.sizePreset === 'custom'" class="image-export-custom-size">
@@ -57,7 +58,7 @@
           </div>
         </section>
 
-        <section class="scope-panel main-glass-panel-inner">
+        <section class="scope-panel glass-subpanel">
           <div class="scope-panel-title">{{ t('map.drawTab.imageExport.sections.zoom') }}</div>
           <label v-for="option in zoomOptions" :key="option.value" class="scope-radio-item">
             <input v-model="form.zoomMode" type="radio" name="image-export-zoom" :value="option.value">
@@ -72,7 +73,7 @@
           </label>
         </section>
 
-        <section class="scope-panel main-glass-panel-inner">
+        <section class="scope-panel glass-subpanel">
           <div class="scope-panel-title">{{ t('map.drawTab.imageExport.sections.content') }}</div>
           <CheckBox
             :model-value="form.includeBasemap"
@@ -122,11 +123,11 @@
 
     <template #footer>
       <div class="scope-modal-footer">
-        <button class="main-glass-button" type="button" @click="handleClose(false)">
+        <button class="glass-button" type="button" @click="handleClose(false)">
           {{ t('common.button.cancel') }}
         </button>
         <button
-          class="main-glass-button scope-confirm-btn"
+          class="glass-button scope-confirm-btn"
           data-variant="primary"
           type="button"
           @click="handleConfirm"
@@ -143,6 +144,7 @@ import { computed, reactive, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
+import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },

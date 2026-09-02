@@ -1,7 +1,7 @@
 <template>
   <div class="settings-page-wrapper">
     <div class="settings-container">
-      <h2 class="page-title">{{ $t('navigation.tabs.settings') }}</h2>
+      <h1 class="page-title"><BarIcon icon="⚙️" />{{ $t('navigation.pageTitles.support.settings') }}</h1>
       <div class="setting-section">
         <h3 class="section-title">{{ $t('navigation.settings.language.title') }}</h3>
         <div class="language-options">
@@ -152,7 +152,7 @@
             class="settings-radio-group"
           />
           <button
-            class="main-glass-button"
+            class="glass-button"
             data-variant="secondary"
             @click="showUpdateNotice = true"
             style="white-space: nowrap;"
@@ -180,6 +180,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -380,12 +381,9 @@ $text-muted: var(--text-tertiary);
 }
 
 .page-title {
-  width: 100%;
   margin-top: 0;
   margin-bottom: 1.5rem;
   font-size: 1.8rem;
-  font-weight: bold;
-  text-align: center;
   color: $text-primary;
 }
 

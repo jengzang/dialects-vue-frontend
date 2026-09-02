@@ -37,7 +37,7 @@
       "phonologyMatrix": "音系查詢",
       "phonologyCustom": "音素分類",
       "Countphos": "音節統計",
-      "evolution": "演變"
+      "evolution": "演化"
     },
     "charClass": {
       "zhonggu": "中古漢語",
@@ -51,8 +51,13 @@
       "wordList": "詞表",
       "ycSpoken": "陽春口語詞"
     },
+    "yangchun": {
+      "overview": "方言概覽",
+      "expressions": "陽春熟語"
+    },
     "villages": {
       "toponyms": "地名分佈",
+      "toponymSearch": "地名查詢",
       "gdVillages": "廣東自然村",
       "VillagesML": "機器學習",
       "gdVillagesTable": "廣東村莊表格",
@@ -79,6 +84,101 @@
       "suggestion": "提出建議",
       "like": "支持作者",
       "setting": "設置"
+    }
+  },
+  "pageTitles": {
+    "user": {
+      "data": "個人數據管理",
+      "region": "個人分區管理"
+    },
+    "support": {
+      "privacy": "隱私政策與引用說明",
+      "settings": "設置",
+      "source": "資料來源",
+      "aboutIntro": "ℹ️ 關於網站",
+      "aboutSuggestion": "我有建議",
+      "aboutLike": "❤️ 喜歡作者"
+    },
+    "portals": {
+      "tools": "工具箱",
+      "villages": "自然村分析"
+    },
+    "result": {
+      "pleaseQuery": "請先查詢",
+      "tab1": "查字",
+      "tab2": "查中古",
+      "tab3": "查音位",
+      "tab4": "查調"
+    },
+    "cluster": {
+      "workspace": "方言聚類工作台"
+    },
+    "query": {
+      "tab1": "查詢漢字讀音",
+      "tab2": "按韻書地位查詢",
+      "tab3": "分析音位的來源",
+      "tab4": "查詢調值調類"
+    },
+    "compare": {
+      "tab1": "漢字聲韻調對比",
+      "tab2": "按韻書地位對比",
+      "tab4": "調類合流與否對比",
+      "tab5": "音值對應關係圖"
+    },
+    "map": {
+      "view": "主地圖",
+      "divide": "分區著色",
+      "custom": "自定義數據"
+    },
+    "pho": {
+      "matrix": "音系查詢",
+      "custom": "按韻書分類聲韻調",
+      "count": "統計音節數量",
+      "evolution": "韻書演化分析"
+    },
+    "vocabulary": {
+      "view": "詞表查詢",
+      "import": "詞表上傳",
+      "manage": "詞表管理"
+    },
+    "yubao": {
+      "vocabulary": "語保1000詞",
+      "grammar": "語保五十句"
+    },
+    "words": {
+      "yangChunSpoken": "陽春口語詞"
+    },
+    "praat": {
+      "main": "Praat 聲學分析"
+    },
+    "gis": {
+      "main": "地圖繪製"
+    },
+    "tools": {
+      "check": "方言字表檢查工具",
+      "jyut2ipa": "粵拼轉IPA工具",
+      "merge": "字表合併工具",
+      "tableManage": "表格管理面板",
+      "tableManageAccessDenied": "權限不足"
+    },
+    "villages": {
+      "dashboard": "自然村分析系統",
+      "gdTree": "廣東自然村樹狀圖",
+      "gdTable": "廣東自然村表格",
+      "yangChun": "陽春行政規劃",
+      "all": "全部自然村",
+      "toponyms": "自然村地名分佈",
+      "toponymSearch": "地名查詢"
+    },
+    "charClass": {
+      "zhonggu": "中古音韻數據",
+      "shanggu": "上古音數據",
+      "jingu": "近古音數據",
+      "yueyun": "粵語韻書數據"
+    },
+    "yangchun": {
+      "overview": "陽春方言概覽",
+      "expressions": "陽春熟語與疊式詞"
     }
   },
   "tabs": {

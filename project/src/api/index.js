@@ -96,6 +96,7 @@ export {
   searchTones,
   getCharList,
   getFeatureCounts,
+  getSyllableCounts,
   getFeatureStats,
 } from './main/core/query.js';
 
@@ -104,6 +105,7 @@ export {
   getLocations,
   getLocationDetail,
   getLocationPartitions,
+  getLocationPoints,
   batchMatch,
   getPartitions,
   getRegions,
@@ -125,9 +127,17 @@ export { postPhoPieByValue, postPhoPieByStatus } from './main/core/phoPie.js';
 export {
   getToponymNames,
   getToponymPoints,
+  getToponymSearch,
   getToponymOfficialDetail,
   getToponymDetails,
 } from './main/toponyms.js';
+
+// ==================== 站点反馈 ====================
+export {
+  SUGGESTION_CATEGORY_OPTIONS,
+  normalizeSuggestionPayload,
+  submitSuggestion,
+} from './main/suggestions.js';
 
 // ==================== 比较模块 ====================
 export { compareChars, compareZhongGu, compareTones } from './main/core/compare.js';

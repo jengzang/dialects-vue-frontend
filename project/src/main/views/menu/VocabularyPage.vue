@@ -1,5 +1,10 @@
 <template>
   <div class="vocabulary-page">
+    <h1 class="page-title">
+      <BarIcon :icon="activePageIcon" />
+      {{ activePageTitle }}
+    </h1>
+
     <div class="page-tab-navigation">
       <div class="page-tab-container" role="tablist" :aria-label="t('words.wordList.tabs.label')">
         <button
@@ -59,6 +64,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { getVocabularyMe } from '@/api'
 import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n/localeRouting.js'
 import { userStore } from '@/main/store/store.js'
+import BarIcon from '@/components/common/BarIcon.vue'
 import ChoiceSelector from '@/components/selector/ChoiceSelector.vue'
 import { showError } from '@/utils/ui/message.js'
 
@@ -83,6 +89,28 @@ const pageTabs = computed(() => {
     { label: t('words.wordList.tabs.contribute'), path: '/menu/vocabulary/import' },
   ]
 })
+
+const pageTitleKeyByPath = {
+  '/menu/vocabulary/view': 'navigation.pageTitles.vocabulary.view',
+  '/menu/vocabulary/import': 'navigation.pageTitles.vocabulary.import',
+  '/menu/vocabulary/manage': 'navigation.pageTitles.vocabulary.manage',
+}
+
+const pageTitleIconByPath = {
+  '/menu/vocabulary/view': '📋',
+  '/menu/vocabulary/import': '📤',
+  '/menu/vocabulary/manage': '⚙️',
+}
+
+const activeVocabularyPath = computed(() => {
+  const currentPath = stripLocaleFromPath(route.path)
+  if (currentPath.startsWith('/menu/vocabulary/manage')) return '/menu/vocabulary/manage'
+  if (currentPath.startsWith('/menu/vocabulary/import')) return '/menu/vocabulary/import'
+  return '/menu/vocabulary/view'
+})
+
+const activePageTitle = computed(() => t(pageTitleKeyByPath[activeVocabularyPath.value]))
+const activePageIcon = computed(() => pageTitleIconByPath[activeVocabularyPath.value])
 
 function createEmptyVocabularyMe() {
   return {

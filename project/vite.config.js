@@ -154,6 +154,7 @@ export default defineConfig(async ({ mode }) => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, 'src'),
+        'globe.gl': path.resolve(__dirname, 'node_modules/globe.gl/dist/globe.gl.min.js'),
       },
     },
     define: {
@@ -187,7 +188,13 @@ export default defineConfig(async ({ mode }) => {
         },
         output: {
           entryFileNames: 'assets/[name].[hash].js',
-          chunkFileNames: 'assets/[name].[hash].js',
+          chunkFileNames(chunkInfo) {
+            const stableChunks = ['globe-gl', 'echarts', 'maplibre', 'xlsx', 'wavesurfer', 'opencc'];
+            if (stableChunks.includes(chunkInfo.name)) {
+              return 'assets/[name]-v2.js';
+            }
+            return 'assets/[name].[hash].js';
+          },
           assetFileNames: 'assets/[name].[hash].[ext]',
           manualChunks(id) {
             if (id.includes('/api/logs/')) {
@@ -207,6 +214,12 @@ export default defineConfig(async ({ mode }) => {
             }
             if (id.includes('wavesurfer')) {
               return 'wavesurfer';
+            }
+            if (id.includes('opencc')) {
+              return 'opencc';
+            }
+            if (id.includes('globe.gl') || id.includes('three')) {
+              return 'globe-gl';
             }
             if (
               id.includes('node_modules/vue/') ||

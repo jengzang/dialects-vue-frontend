@@ -24,6 +24,7 @@
       role="switch"
       :aria-checked="String(modelValue)"
       :aria-label="ariaLabel || undefined"
+      :title="labelPosition === 'inside' && resolvedShowLabel ? currentLabel : undefined"
       @click="toggle"
     >
       <span
@@ -99,6 +100,10 @@ const props = defineProps({
     type: [Number, String],
     default: 10,
   },
+  autoWidth: {
+    type: Boolean,
+    default: false,
+  },
   ariaLabel: {
     type: String,
     default: '',
@@ -126,7 +131,32 @@ const thumbNumber = computed(() => {
   return Math.max(heightNumber.value - 4, 0)
 })
 const insetNumber = computed(() => Math.max((heightNumber.value - thumbNumber.value) / 2, 0))
-const translateXNumber = computed(() => Math.max(widthNumber.value - thumbNumber.value - insetNumber.value * 2, 0))
+
+const estimateTextWidth = (text) => {
+  if (!text) return 0
+  const fontSize = 11
+  let width = 0
+  for (const ch of String(text)) {
+    width += ch.charCodeAt(0) > 0xff ? fontSize : fontSize * 0.6
+  }
+  return width
+}
+
+const shouldAutoWidth = computed(
+  () =>
+    props.autoWidth &&
+    props.labelPosition === 'inside' &&
+    (props.showLabel || props.activeText !== '' || props.inactiveText !== '')
+)
+
+const resolvedWidthNumber = computed(() => {
+  if (!shouldAutoWidth.value) return widthNumber.value
+  const currentText = props.modelValue ? props.activeText : props.inactiveText
+  const needed = thumbNumber.value + insetNumber.value * 2 + estimateTextWidth(currentText) + 16
+  return Math.max(widthNumber.value, Math.min(needed, 180))
+})
+
+const translateXNumber = computed(() => Math.max(resolvedWidthNumber.value - thumbNumber.value - insetNumber.value * 2, 0))
 
 const colorPresets = {
   blue: 'var(--color-primary)',
@@ -153,7 +183,7 @@ const rootStyle = computed(() => ({
 }))
 
 const buttonStyle = computed(() => ({
-  width: toPx(props.width),
+  width: toPx(resolvedWidthNumber.value),
   height: toPx(props.height),
   borderRadius: `${heightNumber.value / 2}px`,
 }))
@@ -192,7 +222,7 @@ $transition-ease: ease;
   position: relative;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   padding: 0;
   cursor: pointer;
   background: var(
@@ -204,15 +234,21 @@ $transition-ease: ease;
     background $transition-duration $transition-ease,
     box-shadow $transition-duration $transition-ease,
     transform $transition-duration $transition-ease,
-    opacity $transition-duration $transition-ease;
+    opacity $transition-duration $transition-ease,
+    width $transition-duration $transition-ease;
 
   &.is-on {
     background: var(--switch-toggle-active-color, $active-blue);
+    justify-content: flex-start;
   }
 
   &.is-disabled {
     cursor: not-allowed;
     opacity: 0.5;
+  }
+
+  &:active:not(.is-disabled) {
+    box-shadow: inset 0 0 0 30px rgba(0, 0, 0, 0.1);
   }
 }
 
@@ -220,13 +256,14 @@ $transition-ease: ease;
   position: absolute;
   inset: 0;
   border-radius: inherit;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.25);
 }
 
 .switch-toggle__thumb {
   position: absolute;
   background: $thumb-background;
   border-radius: var(--radius-full);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.25);
   transition: transform $transition-duration $transition-ease;
 }
 
@@ -239,6 +276,12 @@ $transition-ease: ease;
     z-index: 1;
     white-space: nowrap;
     pointer-events: none;
+    padding: 0 8px;
+    font-size: 11px;
+    font-weight: 500;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 

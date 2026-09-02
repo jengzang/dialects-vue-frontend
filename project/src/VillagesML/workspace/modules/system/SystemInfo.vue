@@ -1,6 +1,6 @@
 <template>
   <div class="system-info-page">
-    <h3 class="villagesml-subtab-title">數據庫概覽與系統健康指標</h3>
+    <h1 class="villagesml-subtab-title"><BarIcon icon="🖥️" />數據庫概覽與系統健康指標</h1>
 
     <!-- Header -->
 <!--    <div class="page-header">-->
@@ -270,6 +270,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed, onMounted } from 'vue'
 import { getVillagesOverview, getVillagesNgrams, getVillagesTables, getCachedVillagesOverview, getCachedVillagesNgrams, getCachedVillagesTables } from '@/composables/data/useVillagesCache.js'
 import { showError, showSuccess } from '@/utils/ui/message.js'

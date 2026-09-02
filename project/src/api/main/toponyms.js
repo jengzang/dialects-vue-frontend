@@ -2,10 +2,12 @@ import { api } from '../auth/httpClient.js';
 
 export const TOPONYM_DEFAULT_POINT_LIMIT = 0;
 export const TOPONYM_DEFAULT_NAME_LIMIT = 20;
+export const TOPONYM_DEFAULT_SEARCH_LIMIT = 50;
 export const TOPONYM_DETAILS_ID_LIMIT = 10;
 
 const OFFICIAL_DETAIL_URL = 'https://dmfw.mca.gov.cn/9095/stname/detailsPub';
 const MATCH_MODES = new Set(['prefix', 'suffix', 'exact', 'contains']);
+const AREA_SCOPES = new Set(['descendants', 'exact']);
 
 function normalizeMatchMode(value) {
   return MATCH_MODES.has(value) ? value : 'prefix';
@@ -14,6 +16,10 @@ function normalizeMatchMode(value) {
 function normalizeLimit(value, fallback) {
   const numericValue = Number(value);
   return Number.isFinite(numericValue) && numericValue >= 0 ? numericValue : fallback;
+}
+
+function normalizeAreaScope(value) {
+  return AREA_SCOPES.has(value) ? value : 'descendants';
 }
 
 function appendCommonSearchParams(query, params = {}, defaultLimit) {
@@ -27,7 +33,7 @@ function appendCommonSearchParams(query, params = {}, defaultLimit) {
   query.set('limit', String(normalizeLimit(params.limit, defaultLimit)));
 
   if (params.place_type_code !== undefined && params.place_type_code !== null && params.place_type_code !== '') {
-    query.set('place_type_code', String(params.place_type_code));
+    appendRepeatedParams(query, 'place_type_code', params.place_type_code);
   }
 
   if (params.bbox) {
@@ -45,6 +51,35 @@ function appendRepeatedParams(query, key, value) {
     .map((item) => String(item || '').trim())
     .filter(Boolean)
     .forEach((item) => query.append(key, item));
+}
+
+function appendToponymSearchParams(query, params = {}) {
+  const keyword = String(params.q || '').trim();
+  if (!keyword) {
+    throw new Error('toponyms query cannot be empty');
+  }
+
+  query.set('q', keyword);
+  query.set('match_mode', normalizeMatchMode(params.match_mode));
+  query.set('limit', String(normalizeLimit(params.limit, TOPONYM_DEFAULT_SEARCH_LIMIT)));
+
+  if (params.place_type_code !== undefined && params.place_type_code !== null && params.place_type_code !== '') {
+    appendRepeatedParams(query, 'place_type_code', params.place_type_code);
+  }
+
+  const areaCode = String(params.area_code || '').trim();
+  if (areaCode) {
+    query.set('area_code', areaCode);
+    query.set('area_scope', normalizeAreaScope(params.area_scope));
+  }
+
+  if (params.include_place_type_code) {
+    query.set('include_place_type_code', 'true');
+  }
+
+  if (params.include_area_code) {
+    query.set('include_area_code', 'true');
+  }
 }
 
 function getFastApiErrorMessage(error, fallback) {
@@ -140,6 +175,23 @@ export async function getToponymPoints(params = {}) {
     };
   } catch (error) {
     throw new Error(getFastApiErrorMessage(error, 'failed to load toponym points'));
+  }
+}
+
+export async function getToponymSearch(params = {}) {
+  const query = new URLSearchParams();
+  appendToponymSearchParams(query, params);
+
+  try {
+    const payload = await api(`/api/toponyms/search?${query.toString()}`);
+    const items = Array.isArray(payload?.items) ? payload.items : [];
+    return {
+      items,
+      count: Number(payload?.count ?? items.length),
+      truncated: Boolean(payload?.truncated),
+    };
+  } catch (error) {
+    throw new Error(getFastApiErrorMessage(error, 'failed to search toponyms'));
   }
 }
 

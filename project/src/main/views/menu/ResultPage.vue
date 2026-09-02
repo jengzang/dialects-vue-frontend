@@ -1,7 +1,7 @@
 <template>
   <div class="result-page-container">
     <div class="header-row">
-      <h2 class="tabs-title">{{ pageTitle }}</h2>
+      <h1 class="tabs-title"><BarIcon icon="📊" />{{ pageTitle }}</h1>
       <div v-if="currentTabRef === 'tab1'" class="dropdown-wrapper" style="flex:none;">
         <SimpleSelectDropdown
           v-model="selectedTab1Type"
@@ -32,13 +32,13 @@
           :mode="currentTabRef"
           :tone_for_chars="tone_for_chars"
           :selected-tone-type="selectedTab1Type"
-          :show-char-nav="isResultPageActive && currentTabRef === 'tab1' && !isLoading && latestResults.length > 0"
+          :show-char-nav="isResultPageActive && (currentTabRef === 'tab1' || currentTabRef === 'tab4') && !isLoading && latestResults.length > 0"
       />
     </template>
 
     <div v-else-if="!isLoading && latestResults.length === 0" class="empty-state">
       <p>{{ $t('result.noData') }}</p>
-      <button class="go-query-btn" @click="goToQuery">
+      <button class="action-btn" @click="goToQuery">
         {{ $t('result.goToQuery') }}
       </button>
     </div>
@@ -56,6 +56,7 @@ import { showInfo, hideMessage } from '@/utils/ui/message.js';
 import ResultList from "@/main/components/result/ResultList.vue";
 import CharsAndTones from "@/main/components/result/CharsAndTones.vue";
 import SimpleSelectDropdown from "@/components/selector/SimpleSelectDropdown.vue";
+import BarIcon from '@/components/common/BarIcon.vue'
 import {generateTonesMergedData,generateCharsMergedData,func_mergeData,requestMapFitView} from "@/utils/map/MapData.js";
 import { DEFAULT_CHARACTER_TABLE } from '@/main/config/index.js'
 
@@ -93,15 +94,15 @@ const showLongWaitWarning = ref(false);
 let timerInterval = null;
 
 const tabMap = computed(() => ({
-  'tab1': t('result.tabs.tab1'),
-  'tab2': t('result.tabs.tab2'),
-  'tab3': t('result.tabs.tab3'),
-  'tab4': t('result.tabs.tab4')
+  'tab1': t('navigation.pageTitles.result.tab1'),
+  'tab2': t('navigation.pageTitles.result.tab2'),
+  'tab3': t('navigation.pageTitles.result.tab3'),
+  'tab4': t('navigation.pageTitles.result.tab4')
 }));
 
 const pageTitle = computed(() => {
   const p = globalPayload.value;
-  if (!p) return t('result.pleaseQuery');
+  if (!p) return t('navigation.pageTitles.result.pleaseQuery');
   const sourceTab = p._sourceTab || 'tab2';
   const tabName = tabMap.value[sourceTab] || sourceTab;
   let featureText = '';
@@ -453,26 +454,11 @@ $transition-fast: 0.2s;
   text-align: center;
 }
 
-.go-query-btn {
-  padding: 10px 24px;
-  color: $white;
-  font-size: 15px;
-  cursor: pointer;
-  background-color: $primary-blue;
-  border: none;
-  border-radius: var(--radius-xl);
-  box-shadow: 0 4px 6px rgba(var(--color-primary-rgb), 0.2);
-  transition: all $transition-fast ease;
-
-  &:hover {
-    background-color: $primary-blue-hover;
-    box-shadow: 0 6px 8px rgba(var(--color-primary-rgb), 0.3);
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(1px);
-  }
+/* 空态跳转按钮: 仅尺寸覆盖, 视觉见 main/_buttons.scss 的 .action-btn */
+.action-btn {
+  --action-btn-padding: 10px 24px;
+  --action-btn-font-size: 15px;
+  --action-btn-radius: var(--radius-xl);
 }
 
 /* SimpleSelectDropdown 外层 */

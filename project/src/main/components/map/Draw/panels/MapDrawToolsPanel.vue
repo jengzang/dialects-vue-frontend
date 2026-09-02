@@ -2,7 +2,7 @@
   <Transition name="draw-panel-slide">
     <aside
       v-show="isOpen"
-      class="draw-tool-panel main-glass-panel"
+      class="draw-tool-panel glass-panel"
       :class="{ 'offset-left': offsetLeft }"
     >
       <div class="draw-tool-panel-header">
@@ -20,13 +20,16 @@
       </div>
 
       <div class="draw-tool-panel-body">
-        <section class="draw-tool-section">
+        <section
+          class="draw-tool-section"
+          data-testid="draw-tool-mode-section"
+        >
           <div class="draw-tool-section-title">
             {{ t('map.drawTab.buttons.drawingTools') }}
           </div>
           <div class="draw-tool-button-grid draw-tool-button-grid--three">
             <button
-              class="main-glass-button draw-tool-mode-button"
+              class="glass-button draw-tool-mode-button"
               :data-variant="currentMode === 'simple_select' ? 'primary' : 'secondary'"
               :data-active="currentMode === 'simple_select'"
               type="button"
@@ -41,7 +44,7 @@
             </button>
             <button
               v-if="!activeLayer || activeLayer.geometryType === 'Point'"
-              class="main-glass-button draw-tool-mode-button"
+              class="glass-button draw-tool-mode-button"
               :data-variant="currentMode === 'draw_point' ? 'primary' : 'secondary'"
               :data-active="currentMode === 'draw_point'"
               type="button"
@@ -56,8 +59,24 @@
               {{ t('map.drawTab.buttons.drawPoint') }}
             </button>
             <button
+              v-if="activeLayer?.geometryType === 'Text'"
+              class="glass-button draw-tool-mode-button"
+              :data-variant="currentMode === 'draw_point' ? 'primary' : 'secondary'"
+              :data-active="currentMode === 'draw_point'"
+              type="button"
+              :disabled="!canModifyActiveLayer"
+              @click="$emit('set-mode', 'draw_point')"
+            >
+              <span
+                v-if="currentMode === 'draw_point'"
+                class="draw-tool-check"
+                aria-hidden="true"
+              >✓</span>
+              {{ t('map.drawTab.buttons.drawText') }}
+            </button>
+            <button
               v-if="!activeLayer || activeLayer.geometryType === 'LineString'"
-              class="main-glass-button draw-tool-mode-button"
+              class="glass-button draw-tool-mode-button"
               :data-variant="currentMode === 'draw_line_string' ? 'primary' : 'secondary'"
               :data-active="currentMode === 'draw_line_string'"
               type="button"
@@ -73,7 +92,7 @@
             </button>
             <button
               v-if="!activeLayer || activeLayer.geometryType === 'Polygon'"
-              class="main-glass-button draw-tool-mode-button"
+              class="glass-button draw-tool-mode-button"
               :data-variant="currentMode === 'draw_polygon' ? 'primary' : 'secondary'"
               :data-active="currentMode === 'draw_polygon'"
               type="button"
@@ -88,7 +107,7 @@
               {{ t('map.drawTab.buttons.drawPolygon') }}
             </button>
             <button
-              class="main-glass-button draw-tool-mode-button"
+              class="glass-button draw-tool-mode-button"
               :data-variant="currentMode === 'direct_select' ? 'primary' : 'secondary'"
               :data-active="currentMode === 'direct_select'"
               type="button"
@@ -103,7 +122,7 @@
               {{ currentMode === 'direct_select' ? t('map.drawTab.buttons.finishShapeEdit') : t('map.drawTab.buttons.editShape') }}
             </button>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="secondary"
               type="button"
               :disabled="!canDuplicateFeature"
@@ -111,26 +130,197 @@
             >
               {{ t('map.drawTab.buttons.duplicateFeature') }}
             </button>
+            <div
+              v-if="showSelectedGeometryControls"
+              class="draw-tool-context-cluster"
+              data-testid="draw-tool-selected-geometry-section"
+            >
+              <button
+                class="glass-button"
+                data-variant="secondary"
+                data-testid="draw-tool-reverse-geometry"
+                type="button"
+                :disabled="!canUseSelectedGeometryTools"
+                @click="$emit('reverse-selected-geometry')"
+              >
+                {{ t('map.drawTab.buttons.reverseGeometry') }}
+              </button>
+              <button
+                class="glass-button"
+                data-variant="secondary"
+                data-testid="draw-tool-simplify-geometry"
+                type="button"
+                :disabled="!canUseSelectedGeometryTools"
+                @click="$emit('simplify-selected-geometry')"
+              >
+                {{ t('map.drawTab.buttons.simplifyGeometry') }}
+              </button>
+              <div
+                class="draw-tool-wide-control"
+                data-testid="draw-tool-buffer-controls"
+              >
+                <label class="draw-field">
+                  <span class="draw-field-label">{{ t('map.drawTab.labels.bufferDistanceKm') }}：{{ selectedBufferDistanceKm }}</span>
+                  <input
+                    class="draw-input glass-field"
+                    type="number"
+                    min="0.01"
+                    step="0.1"
+                    :value="selectedBufferDistanceKm"
+                    @input="$emit('update:selected-buffer-distance-km', normalizePositiveNumber($event.target.value, selectedBufferDistanceKm))"
+                  >
+                </label>
+                <button
+                  class="glass-button draw-tool-inline-button"
+                  data-variant="secondary"
+                  data-testid="draw-tool-buffer-selected"
+                  type="button"
+                  :disabled="!canBufferSelectedFeature"
+                  @click="$emit('buffer-selected-feature')"
+                >
+                  {{ t('map.drawTab.buttons.bufferSelectedFeature') }}
+                </button>
+              </div>
+              <button
+                v-if="selectedFeatureGeometryType === 'LineString'"
+                class="glass-button"
+                data-variant="secondary"
+                data-testid="draw-tool-close-line"
+                type="button"
+                :disabled="!canCloseSelectedLine"
+                @click="$emit('close-selected-line')"
+              >
+                {{ t('map.drawTab.buttons.closeLine') }}
+              </button>
+              <button
+                v-if="selectedFeatureGeometryType === 'LineString'"
+                class="glass-button"
+                data-variant="secondary"
+                data-testid="draw-tool-split-line"
+                type="button"
+                :disabled="!canSplitSelectedLine"
+                @click="$emit('split-selected-line')"
+              >
+                {{ t('map.drawTab.buttons.splitLine') }}
+              </button>
+              <button
+                v-if="selectedFeatureGeometryType === 'LineString'"
+                class="glass-button"
+                data-variant="secondary"
+                data-testid="draw-tool-line-to-polygon"
+                type="button"
+                :disabled="!canConvertSelectedLineToPolygon"
+                @click="$emit('convert-selected-line-to-polygon')"
+              >
+                {{ t('map.drawTab.buttons.lineToPolygon') }}
+              </button>
+              <div
+                v-if="selectedFeatureGeometryType === 'Polygon'"
+                class="draw-tool-wide-control"
+                data-testid="draw-tool-polygon-split-tool"
+              >
+                <span class="draw-field-label">{{ t('map.drawTab.labels.polygonSplitLine') }}</span>
+                <SimpleSelectDropdown
+                  class="draw-tool-wide-select"
+                  data-testid="draw-tool-polygon-split-line-select"
+                  :model-value="selectedPolygonSplitLineId"
+                  :options="polygonSplitLineOptions"
+                  :placeholder="t('map.drawTab.labels.polygonSplitLine')"
+                  :disabled="!canUseSelectedGeometryTools || polygonSplitLineOptions.length === 0"
+                  @update:model-value="$emit('update:selected-polygon-split-line-id', $event)"
+                />
+                <button
+                  class="glass-button draw-tool-inline-button"
+                  data-variant="secondary"
+                  data-testid="draw-tool-split-polygon"
+                  type="button"
+                  :disabled="!canSplitSelectedPolygon"
+                  @click="$emit('split-selected-polygon')"
+                >
+                  {{ t('map.drawTab.buttons.splitPolygon') }}
+                </button>
+                <button
+                  v-if="!polygonSplitSketchActive"
+                  class="glass-button draw-tool-inline-button"
+                  data-variant="secondary"
+                  data-testid="draw-tool-start-polygon-split-sketch"
+                  type="button"
+                  :disabled="!canStartPolygonSplitSketch"
+                  @click="$emit('start-polygon-split-sketch')"
+                >
+                  {{ t('map.drawTab.buttons.drawPolygonSplitLine') }}
+                </button>
+                <button
+                  v-else
+                  class="glass-button draw-tool-inline-button"
+                  data-variant="secondary"
+                  data-testid="draw-tool-cancel-polygon-split-sketch"
+                  type="button"
+                  @click="$emit('cancel-polygon-split-sketch')"
+                >
+                  {{ t('map.drawTab.buttons.cancelPolygonSplitLine') }}
+                </button>
+              </div>
+              <button
+                v-if="selectedFeatureGeometryType === 'Polygon'"
+                class="glass-button"
+                data-variant="secondary"
+                data-testid="draw-tool-merge-polygons"
+                type="button"
+                :disabled="!canMergeSelectedPolygons"
+                @click="$emit('merge-selected-polygons')"
+              >
+                {{ t('map.drawTab.buttons.mergePolygons') }}
+              </button>
+              <button
+                v-if="selectedFeatureGeometryType === 'Polygon'"
+                class="glass-button"
+                data-variant="secondary"
+                data-testid="draw-tool-intersect-polygons"
+                type="button"
+                :disabled="!canIntersectSelectedPolygons"
+                @click="$emit('intersect-selected-polygons')"
+              >
+                {{ t('map.drawTab.buttons.intersectPolygons') }}
+              </button>
+              <button
+                v-if="selectedFeatureGeometryType === 'Polygon'"
+                class="glass-button"
+                data-variant="secondary"
+                data-testid="draw-tool-difference-polygons"
+                type="button"
+                :disabled="!canDifferenceSelectedPolygons"
+                @click="$emit('difference-selected-polygons')"
+              >
+                {{ t('map.drawTab.buttons.differencePolygons') }}
+              </button>
+            </div>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="secondary"
+              data-testid="draw-tool-undo"
               type="button"
+              :title="undoButtonTitle"
+              :aria-label="undoButtonTitle"
               :disabled="!canUndo"
               @click="$emit('undo')"
             >
               {{ t('map.drawTab.buttons.undo') }}
             </button>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="secondary"
+              data-testid="draw-tool-redo"
               type="button"
+              :title="redoButtonTitle"
+              :aria-label="redoButtonTitle"
               :disabled="!canRedo"
               @click="$emit('redo')"
             >
               {{ t('map.drawTab.buttons.redo') }}
             </button>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="secondary"
               type="button"
               :disabled="!canDeleteSelection"
@@ -139,7 +329,7 @@
               {{ currentMode === 'direct_select' && selectedVertexCount > 0 ? t('map.drawTab.buttons.deleteSelectedVertices') : t('map.drawTab.buttons.deleteSelected') }}
             </button>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="secondary"
               type="button"
               :disabled="!canModifyActiveLayer"
@@ -148,7 +338,7 @@
               {{ t('map.drawTab.buttons.clearAll') }}
             </button>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="secondary"
               type="button"
               @click="$emit('reset-view')"
@@ -156,7 +346,7 @@
               {{ t('map.mapLibre.buttons.reset') }}
             </button>
             <button
-              class="main-glass-button"
+              class="glass-button"
               :data-variant="isFullscreen ? 'primary' : 'secondary'"
               :data-active="isFullscreen"
               type="button"
@@ -165,17 +355,318 @@
               {{ isFullscreen ? t('map.mapLibre.buttons.exitFullscreen') : t('map.mapLibre.buttons.fullscreen') }}
             </button>
           </div>
-          <div
-            v-if="currentMode === 'direct_select'"
-            class="draw-shape-edit-status"
-            data-testid="shape-edit-status"
+          <button
+            v-if="polygonSplitSketchActive && isDrawingMode"
+            class="glass-button draw-tool-inline-button"
+            data-variant="secondary"
+            data-testid="draw-tool-cancel-polygon-split-sketch"
+            type="button"
+            @click="$emit('cancel-polygon-split-sketch')"
           >
-            <span>{{ t('map.drawTab.labels.shapeEditing') }}</span>
-            <span>{{ t('map.drawTab.labels.selectedVertexCount', { count: selectedVertexCount }) }}</span>
+            {{ t('map.drawTab.buttons.cancelPolygonSplitLine') }}
+          </button>
+          <div
+            v-if="showPrecisionControls"
+            class="draw-tool-context-stack"
+            data-testid="draw-tool-precision-section"
+          >
+            <label class="draw-field">
+              <span class="draw-field-label">{{ t('map.drawTab.labels.snapping') }}</span>
+              <SwitchToggle
+                :model-value="snappingEnabled"
+                data-testid="toggle-snapping"
+                @update:model-value="$emit('update:snappingEnabled', $event)"
+              />
+            </label>
+            <template v-if="snappingEnabled">
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.snapTolerance') }}：{{ snapTolerance }}</span>
+                <input
+                  data-testid="snap-tolerance-input"
+                  class="draw-range-input glass-range"
+                  type="range"
+                  min="0"
+                  max="48"
+                  step="1"
+                  :value="snapTolerance"
+                  @input="$emit('update:snapTolerance', Number($event.target.value))"
+                >
+              </label>
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.snapGridSize') }}：{{ snapGridSize }}</span>
+                <input
+                  data-testid="snap-grid-input"
+                  class="draw-input glass-field"
+                  type="number"
+                  min="0"
+                  step="0.05"
+                  :value="snapGridSize"
+                  @input="$emit('update:snapGridSize', Number($event.target.value))"
+                >
+              </label>
+              <div
+                class="draw-tool-wide-control"
+                data-testid="snap-target-controls"
+              >
+                <span class="draw-field-label">{{ t('map.drawTab.labels.snapTargets') }}</span>
+                <CheckBox
+                  v-for="option in snapTargetOptions"
+                  :key="option.key"
+                  class="draw-toggle-field"
+                  :data-testid="`snap-target-${option.key}`"
+                  :model-value="normalizedSnapTargets[option.key]"
+                  @update:modelValue="emitSnapTargetUpdate(option.key, $event)"
+                >
+                  {{ option.label }}
+                </CheckBox>
+              </div>
+            </template>
+            <div
+              v-if="showTopologyControls"
+              class="draw-tool-wide-control"
+              data-testid="topology-controls"
+            >
+              <span class="draw-field-label">{{ t('map.drawTab.labels.topologyEditing') }}</span>
+              <CheckBox
+                class="draw-toggle-field"
+                data-testid="topology-editing-toggle"
+                :model-value="topologyEditingEnabled"
+                @update:modelValue="$emit('update:topologyEditingEnabled', $event)"
+              >
+                {{ t('map.drawTab.labels.topologyEditingEnabled') }}
+              </CheckBox>
+              <CheckBox
+                class="draw-toggle-field"
+                data-testid="shared-boundary-protection-toggle"
+                :model-value="sharedBoundaryProtectionEnabled"
+                :disabled="!topologyEditingEnabled"
+                @update:modelValue="$emit('update:sharedBoundaryProtectionEnabled', $event)"
+              >
+                {{ t('map.drawTab.labels.sharedBoundaryProtection') }}
+              </CheckBox>
+            </div>
+            <div
+              v-if="editSessionStatus"
+              class="draw-shape-edit-status"
+              data-testid="edit-session-status"
+              :data-state="editSessionStatus.feedback?.type || 'idle'"
+            >
+              <div class="draw-shape-edit-main">
+                <span
+                  class="draw-shape-edit-target"
+                  data-testid="edit-session-mode"
+                >
+                  {{ editSessionStatus.modeLabel }}
+                </span>
+                <span
+                  class="draw-shape-edit-count"
+                  data-testid="edit-session-layer"
+                >
+                  {{ editSessionStatus.layerLabel }}
+                </span>
+              </div>
+              <div class="draw-shape-edit-tips">
+                <span data-testid="edit-session-feature">
+                  {{ editSessionStatus.featureLabel }}
+                </span>
+                <span data-testid="edit-session-vertex">
+                  {{ editSessionStatus.vertexLabel }}
+                </span>
+                <span data-testid="edit-session-snap">
+                  {{ editSessionStatus.snapLabel }}
+                </span>
+                <span
+                  v-if="editSessionStatus.hoverLabel"
+                  data-testid="edit-session-hover"
+                >
+                  {{ editSessionStatus.hoverLabel }}
+                </span>
+              </div>
+              <div
+                v-if="editSessionStatus.feedback?.message"
+                class="draw-shape-edit-hint"
+                data-testid="edit-session-feedback"
+              >
+                {{ editSessionStatus.feedback.message }}
+              </div>
+            </div>
+            <div
+              v-if="currentMode === 'direct_select'"
+              class="draw-shape-edit-status"
+              data-testid="shape-edit-status"
+            >
+              <div class="draw-shape-edit-main">
+                <span
+                  class="draw-shape-edit-target"
+                  data-testid="shape-edit-target"
+                >
+                  {{ t('map.drawTab.labels.shapeEditTarget', { name: selectedShapeEditLabel }) }}
+                </span>
+                <span
+                  class="draw-shape-edit-count"
+                  data-testid="shape-edit-selected-count"
+                >
+                  {{ t('map.drawTab.labels.selectedVertexCount', { count: selectedVertexCount }) }}
+                </span>
+              </div>
+              <div
+                class="draw-shape-edit-hint"
+                data-testid="shape-edit-hint"
+              >
+                {{ shapeEditHintText }}
+              </div>
+              <div class="draw-shape-edit-tips">
+                <span data-testid="shape-edit-insert-hint">
+                  {{ t('map.drawTab.labels.shapeEditInsertVertexHint') }}
+                </span>
+                <span data-testid="shape-edit-move-hint">
+                  {{ t('map.drawTab.labels.shapeEditMoveVertexHint') }}
+                </span>
+                <span data-testid="shape-edit-history-hint">
+                  {{ t('map.drawTab.labels.shapeEditHistoryHint') }}
+                </span>
+              </div>
+              <div
+                v-if="canEditSelectedVertexCoordinate"
+                class="draw-shape-edit-coordinate"
+                data-testid="shape-edit-coordinate-editor"
+              >
+                <span class="draw-field-label">
+                  {{ t('map.drawTab.labels.selectedVertexCoordinate') }}
+                </span>
+                <label class="draw-field draw-shape-edit-coordinate-field">
+                  <span class="draw-field-label">{{ t('map.drawTab.labels.longitude') }}</span>
+                  <input
+                    v-model="vertexLongitudeInput"
+                    class="draw-input glass-field"
+                    data-testid="shape-edit-longitude-input"
+                    type="number"
+                    step="0.000001"
+                  >
+                </label>
+                <label class="draw-field draw-shape-edit-coordinate-field">
+                  <span class="draw-field-label">{{ t('map.drawTab.labels.latitude') }}</span>
+                  <input
+                    v-model="vertexLatitudeInput"
+                    class="draw-input glass-field"
+                    data-testid="shape-edit-latitude-input"
+                    type="number"
+                    step="0.000001"
+                  >
+                </label>
+                <button
+                  class="glass-button draw-tool-inline-button"
+                  data-variant="secondary"
+                  data-testid="shape-edit-apply-coordinate"
+                  type="button"
+                  :disabled="!canApplySelectedVertexCoordinate"
+                  @click="applySelectedVertexCoordinate"
+                >
+                  {{ t('map.drawTab.buttons.applyVertexCoordinate') }}
+                </button>
+              </div>
+              <div class="draw-shape-edit-actions">
+                <button
+                  class="glass-button draw-tool-inline-button"
+                  data-variant="secondary"
+                  data-testid="shape-edit-delete-vertices"
+                  type="button"
+                  :disabled="!canDeleteSelectedVertices"
+                  @click="$emit('delete-selected')"
+                >
+                  {{ t('map.drawTab.buttons.deleteSelectedVertices') }}
+                </button>
+                <button
+                  class="glass-button draw-tool-inline-button"
+                  data-variant="secondary"
+                  data-testid="shape-edit-finish"
+                  type="button"
+                  @click="$emit('set-mode', 'simple_select')"
+                >
+                  {{ t('map.drawTab.buttons.finishShapeEdit') }}
+                </button>
+              </div>
+            </div>
+          </div>
+          <div
+            v-if="geometryEditStatus?.message"
+            class="draw-shape-edit-status"
+            data-testid="geometry-edit-status"
+            :data-state="geometryEditStatus.type"
+          >
+            <div class="draw-shape-edit-hint">
+              {{ geometryEditStatus.message }}
+            </div>
+          </div>
+          <div
+            v-if="showGeometryQualityStatus"
+            class="draw-shape-edit-status"
+            data-testid="geometry-quality-status"
+          >
+            <div class="draw-shape-edit-main">
+              <span
+                class="draw-shape-edit-target"
+                data-testid="geometry-quality-title"
+              >
+                {{ t('map.drawTab.labels.geometryQuality') }}
+              </span>
+              <span
+                class="draw-shape-edit-count"
+                data-testid="geometry-quality-count"
+              >
+                {{ geometryQualitySummary.hasIssues ? t('map.drawTab.labels.geometryQualityIssueCount', { count: geometryQualitySummary.issueCount }) : t('map.drawTab.labels.geometryQualityOk') }}
+              </span>
+            </div>
+            <div
+              v-if="geometryQualitySummary.hasIssues"
+              class="draw-shape-edit-tips"
+            >
+              <span
+                v-for="item in geometryQualitySummary.items"
+                :key="item.id"
+                data-testid="geometry-quality-item"
+                :data-level="item.level"
+              >
+                {{ item.label }}
+              </span>
+            </div>
+          </div>
+          <div
+            v-if="textLabelSummary?.hasLabels"
+            class="draw-shape-edit-status"
+            data-testid="text-label-diagnostics-status"
+          >
+            <div class="draw-shape-edit-main">
+              <span
+                class="draw-shape-edit-target"
+                data-testid="text-label-diagnostics-title"
+              >
+                {{ t('map.drawTab.labels.textLabelDiagnostics') }}
+              </span>
+              <span
+                class="draw-shape-edit-count"
+                data-testid="text-label-diagnostics-count"
+              >
+                {{ t('map.drawTab.labels.textLabelDiagnosticsCount', { count: textLabelSummary.totalCount || 0 }) }}
+              </span>
+            </div>
+            <div class="draw-shape-edit-tips">
+              <span
+                v-for="item in textLabelSummary.items"
+                :key="item.id"
+                data-testid="text-label-diagnostics-item"
+              >
+                {{ item.label }}
+              </span>
+            </div>
           </div>
         </section>
 
-        <section class="draw-tool-section">
+        <section
+          v-if="showFeatureListSection"
+          class="draw-tool-section"
+          data-testid="draw-tool-feature-list-section"
+        >
           <div class="draw-tool-section-header">
             <div class="draw-tool-section-title">
               {{ t('map.drawTab.labels.featureList') }}
@@ -188,7 +679,7 @@
                 {{ t('map.drawTab.labels.selectedFeatureCount', { count: selectedFeatureIds.length }) }}
               </span>
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
                 :disabled="!canModifyActiveLayer || featureItems.length === 0"
@@ -197,7 +688,7 @@
                 {{ t('map.drawTab.buttons.selectAllFeatures') }}
               </button>
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
                 :disabled="!canModifyActiveLayer || featureItems.length === 0"
@@ -206,7 +697,7 @@
                 {{ t('map.drawTab.buttons.invertFeatureSelection') }}
               </button>
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 :data-variant="isFeatureBoxSelectMode ? 'primary' : 'secondary'"
                 :data-active="isFeatureBoxSelectMode"
                 type="button"
@@ -216,7 +707,7 @@
                 {{ t('map.drawTab.buttons.boxSelectFeatures') }}
               </button>
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
                 :disabled="selectedFeatureIds.length === 0"
@@ -225,7 +716,7 @@
                 {{ t('map.drawTab.buttons.clearFeatureSelection') }}
               </button>
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
                 :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
@@ -234,7 +725,7 @@
                 {{ t('map.drawTab.buttons.deleteSelectedFeatures') }}
               </button>
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
                 :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
@@ -243,7 +734,7 @@
                 {{ t('map.drawTab.buttons.hideSelectedFeatures') }}
               </button>
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
                 :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
@@ -252,7 +743,7 @@
                 {{ t('map.drawTab.buttons.showSelectedFeatures') }}
               </button>
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
                 :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
@@ -261,7 +752,7 @@
                 {{ t('map.drawTab.buttons.lockSelectedFeatures') }}
               </button>
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
                 :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0"
@@ -323,7 +814,11 @@
           </div>
         </section>
 
-        <section class="draw-tool-section">
+        <section
+          v-if="showFeatureTableSection"
+          class="draw-tool-section"
+          data-testid="draw-tool-feature-table-section"
+        >
           <div class="draw-tool-section-header">
             <div class="draw-tool-section-title">
               {{ t('map.drawTab.labels.featureDataTable') }}
@@ -338,14 +833,14 @@
                 {{ t('map.drawTab.labels.batchFeatureName') }}
               </span>
               <input
-                class="draw-input"
+                class="draw-input glass-field"
                 type="text"
                 :value="selectedFeatureBatchName"
                 @input="$emit('update:selected-feature-batch-name', $event.target.value)"
               >
             </label>
             <button
-              class="main-glass-button draw-tool-inline-button"
+              class="glass-button draw-tool-inline-button"
               data-variant="secondary"
               type="button"
               :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0 || !selectedFeatureBatchName.trim()"
@@ -369,7 +864,7 @@
                 @update:model-value="$emit('update:selected-feature-batch-property-key', $event)"
               />
               <input
-                class="draw-input draw-feature-table-batch-value"
+                class="draw-input draw-feature-table-batch-value glass-field"
                 type="text"
                 :value="selectedFeatureBatchPropertyValue"
                 :placeholder="t('map.drawTab.labels.batchFeaturePropertyValue')"
@@ -377,7 +872,7 @@
                 @input="$emit('update:selected-feature-batch-property-value', $event.target.value)"
               >
               <button
-                class="main-glass-button draw-tool-inline-button"
+                class="glass-button draw-tool-inline-button"
                 data-variant="secondary"
                 type="button"
                 :disabled="!canModifyActiveLayer || selectedFeatureIds.length === 0 || !canApplySelectedFeatureBatchProperty"
@@ -413,7 +908,7 @@
                 >
                   <td>
                     <input
-                      class="draw-input draw-feature-table-input"
+                      class="draw-input draw-feature-table-input glass-field"
                       type="text"
                       :value="row.name"
                       :disabled="!canModifyActiveLayer"
@@ -425,7 +920,7 @@
                     :key="column.key"
                   >
                     <input
-                      class="draw-input draw-feature-table-input"
+                      class="draw-input draw-feature-table-input glass-field"
                       type="text"
                       :value="row.properties?.[column.key] ?? ''"
                       :disabled="!canModifyActiveLayer"
@@ -451,7 +946,11 @@
           </div>
         </section>
 
-        <section class="draw-tool-section">
+        <section
+          v-if="showPropertyEditorSection"
+          class="draw-tool-section"
+          data-testid="draw-tool-property-section"
+        >
           <div class="draw-tool-section-title">
             {{ selectedFeatureId ? t('map.drawTab.labels.featureEditor') : t('map.drawTab.labels.layerEditor') }}
           </div>
@@ -464,12 +963,323 @@
                 {{ selectedFeatureId ? t('map.drawTab.labels.featureName') : t('map.drawTab.labels.layerName') }}
               </span>
               <input
-                class="draw-input"
+                class="draw-input glass-field"
                 type="text"
                 :value="selectedFeatureProperties.name"
                 @input="$emit('update-feature-property', 'name', $event.target.value)"
               >
             </label>
+
+            <template v-if="selectedFeatureGeometryType === 'Text'">
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.annotationText') }}</span>
+                <textarea
+                  class="draw-input glass-field"
+                  data-testid="text-annotation-input"
+                  rows="3"
+                  :value="selectedFeatureProperties.annotationText"
+                  @input="$emit('update-feature-property', 'annotationText', $event.target.value)"
+                />
+              </label>
+
+              <div class="draw-basemap-select">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textLabelField') }}</span>
+                <SimpleSelectDropdown
+                  data-testid="text-label-field-select"
+                  :model-value="selectedTextLabelFieldKey"
+                  :options="featureTableBatchPropertyOptions"
+                  :placeholder="t('map.drawTab.labels.textLabelField')"
+                  @update:model-value="$emit('update:selected-text-label-field-key', $event)"
+                />
+                <button
+                  class="glass-button draw-tool-inline-button"
+                  data-variant="secondary"
+                  data-testid="apply-text-label-field"
+                  type="button"
+                  :disabled="!canApplyTextLabelField"
+                  @click="$emit('apply-text-label-field')"
+                >
+                  {{ t('map.drawTab.buttons.applyTextLabelField') }}
+                </button>
+              </div>
+
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textSize') }}：{{ selectedFeatureProperties.textSize }}</span>
+                <input
+                  class="draw-range-input glass-range"
+                  type="range"
+                  min="8"
+                  max="48"
+                  step="1"
+                  :value="selectedFeatureProperties.textSize"
+                  :style="{ '--glass-range-progress': (((selectedFeatureProperties.textSize - 8) / 40) * 100) + '%' }"
+                  @input="$emit('update-feature-property', 'textSize', Number($event.target.value))"
+                >
+              </label>
+
+              <label class="draw-field draw-color-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textColor') }}</span>
+                <input
+                  class="draw-color-input glass-field"
+                  type="color"
+                  :value="selectedFeatureProperties.textColor"
+                  @input="$emit('update-feature-property', 'textColor', $event.target.value)"
+                >
+              </label>
+
+              <label class="draw-field draw-color-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textHaloColor') }}</span>
+                <input
+                  class="draw-color-input glass-field"
+                  type="color"
+                  :value="selectedFeatureProperties.textHaloColor"
+                  @input="$emit('update-feature-property', 'textHaloColor', $event.target.value)"
+                >
+              </label>
+
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textHaloWidth') }}：{{ selectedFeatureProperties.textHaloWidth }}</span>
+                <input
+                  class="draw-range-input glass-range"
+                  type="range"
+                  min="0"
+                  max="4"
+                  step="0.25"
+                  :value="selectedFeatureProperties.textHaloWidth"
+                  :style="{ '--glass-range-progress': ((selectedFeatureProperties.textHaloWidth / 4) * 100) + '%' }"
+                  @input="$emit('update-feature-property', 'textHaloWidth', Number($event.target.value))"
+                >
+              </label>
+
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textRotate') }}：{{ selectedFeatureProperties.textRotate }}°</span>
+                <input
+                  class="draw-range-input glass-range"
+                  type="range"
+                  min="-180"
+                  max="180"
+                  step="1"
+                  :value="selectedFeatureProperties.textRotate"
+                  :style="{ '--glass-range-progress': (((selectedFeatureProperties.textRotate + 180) / 360) * 100) + '%' }"
+                  @input="$emit('update-feature-property', 'textRotate', Number($event.target.value))"
+                >
+              </label>
+
+              <div class="draw-basemap-select">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textAnchor') }}</span>
+                <SimpleSelectDropdown
+                  :model-value="selectedFeatureProperties.textAnchor"
+                  :options="textAnchorOptions"
+                  @update:model-value="$emit('update-feature-property', 'textAnchor', $event)"
+                />
+              </div>
+
+              <div class="draw-basemap-select">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textFontWeight') }}</span>
+                <SimpleSelectDropdown
+                  :model-value="selectedFeatureProperties.textFontWeight"
+                  :options="textFontWeightOptions"
+                  @update:model-value="$emit('update-feature-property', 'textFontWeight', $event)"
+                />
+              </div>
+
+              <div class="draw-basemap-select">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textAlign') }}</span>
+                <SimpleSelectDropdown
+                  :model-value="selectedFeatureProperties.textAlign"
+                  :options="textAlignOptions"
+                  @update:model-value="$emit('update-feature-property', 'textAlign', $event)"
+                />
+              </div>
+
+              <label class="draw-toggle-field">
+                <input
+                  data-testid="text-allow-overlap-input"
+                  type="checkbox"
+                  :checked="selectedFeatureProperties.textAllowOverlap"
+                  @change="$emit('update-feature-property', 'textAllowOverlap', $event.target.checked)"
+                >
+                {{ t('map.drawTab.labels.textAllowOverlap') }}
+              </label>
+
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textPriority') }}：{{ selectedFeatureProperties.textPriority }}</span>
+                <input
+                  class="draw-input glass-field"
+                  data-testid="text-priority-input"
+                  type="number"
+                  step="1"
+                  :value="selectedFeatureProperties.textPriority"
+                  @input="$emit('update-feature-property', 'textPriority', Number($event.target.value))"
+                >
+              </label>
+
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textLineHeight') }}：{{ selectedFeatureProperties.textLineHeight }}</span>
+                <input
+                  class="draw-range-input glass-range"
+                  type="range"
+                  min="0.8"
+                  max="2"
+                  step="0.05"
+                  :value="selectedFeatureProperties.textLineHeight"
+                  @input="$emit('update-feature-property', 'textLineHeight', Number($event.target.value))"
+                >
+              </label>
+
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textLetterSpacing') }}：{{ selectedFeatureProperties.textLetterSpacing }}</span>
+                <input
+                  class="draw-range-input glass-range"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  :value="selectedFeatureProperties.textLetterSpacing"
+                  @input="$emit('update-feature-property', 'textLetterSpacing', Number($event.target.value))"
+                >
+              </label>
+
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textMaxWidth') }}：{{ selectedFeatureProperties.textMaxWidth }}</span>
+                <input
+                  class="draw-range-input glass-range"
+                  type="range"
+                  min="4"
+                  max="32"
+                  step="1"
+                  :value="selectedFeatureProperties.textMaxWidth"
+                  @input="$emit('update-feature-property', 'textMaxWidth', Number($event.target.value))"
+                >
+              </label>
+
+              <div class="draw-tool-wide-control">
+                <label class="draw-field">
+                  <span class="draw-field-label">{{ t('map.drawTab.labels.textMinZoom') }}</span>
+                  <input
+                    class="draw-input glass-field"
+                    type="number"
+                    min="0"
+                    max="24"
+                    step="1"
+                    :value="selectedFeatureProperties.textMinZoom"
+                    @input="$emit('update-feature-property', 'textMinZoom', Number($event.target.value))"
+                  >
+                </label>
+                <label class="draw-field">
+                  <span class="draw-field-label">{{ t('map.drawTab.labels.textMaxZoom') }}</span>
+                  <input
+                    class="draw-input glass-field"
+                    type="number"
+                    min="0"
+                    max="24"
+                    step="1"
+                    :value="selectedFeatureProperties.textMaxZoom"
+                    @input="$emit('update-feature-property', 'textMaxZoom', Number($event.target.value))"
+                  >
+                </label>
+              </div>
+
+              <label class="draw-toggle-field">
+                <input
+                  type="checkbox"
+                  :checked="selectedFeatureProperties.textBackgroundEnabled"
+                  @change="$emit('update-feature-property', 'textBackgroundEnabled', $event.target.checked)"
+                >
+                {{ t('map.drawTab.labels.textBackgroundEnabled') }}
+              </label>
+
+              <label class="draw-field draw-color-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textBackgroundColor') }}</span>
+                <input
+                  class="draw-color-input glass-field"
+                  type="color"
+                  :value="selectedFeatureProperties.textBackgroundColor"
+                  @input="$emit('update-feature-property', 'textBackgroundColor', $event.target.value)"
+                >
+              </label>
+
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textBackgroundOpacity') }}：{{ selectedFeatureProperties.textBackgroundOpacity }}</span>
+                <input
+                  class="draw-range-input glass-range"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  :value="selectedFeatureProperties.textBackgroundOpacity"
+                  @input="$emit('update-feature-property', 'textBackgroundOpacity', Number($event.target.value))"
+                >
+              </label>
+
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textBackgroundPadding') }}：{{ selectedFeatureProperties.textBackgroundPadding }}</span>
+                <input
+                  class="draw-range-input glass-range"
+                  type="range"
+                  min="0"
+                  max="8"
+                  step="0.25"
+                  :value="selectedFeatureProperties.textBackgroundPadding"
+                  @input="$emit('update-feature-property', 'textBackgroundPadding', Number($event.target.value))"
+                >
+              </label>
+
+              <label class="draw-toggle-field">
+                <input
+                  type="checkbox"
+                  :checked="selectedFeatureProperties.textLeaderLine"
+                  @change="$emit('update-feature-property', 'textLeaderLine', $event.target.checked)"
+                >
+                {{ t('map.drawTab.labels.textLeaderLine') }}
+              </label>
+
+              <label class="draw-field draw-color-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textLeaderColor') }}</span>
+                <input
+                  class="draw-color-input glass-field"
+                  type="color"
+                  :value="selectedFeatureProperties.textLeaderColor"
+                  @input="$emit('update-feature-property', 'textLeaderColor', $event.target.value)"
+                >
+              </label>
+
+              <label class="draw-field">
+                <span class="draw-field-label">{{ t('map.drawTab.labels.textLeaderWidth') }}：{{ selectedFeatureProperties.textLeaderWidth }}</span>
+                <input
+                  class="draw-range-input glass-range"
+                  type="range"
+                  min="0.5"
+                  max="8"
+                  step="0.5"
+                  :value="selectedFeatureProperties.textLeaderWidth"
+                  @input="$emit('update-feature-property', 'textLeaderWidth', Number($event.target.value))"
+                >
+              </label>
+
+              <div class="draw-tool-wide-control">
+                <label class="draw-field">
+                  <span class="draw-field-label">{{ t('map.drawTab.labels.textOffsetX') }}</span>
+                  <input
+                    class="draw-input glass-field"
+                    type="number"
+                    step="0.1"
+                    :value="getTextOffsetValue(0)"
+                    @input="emitTextOffsetUpdate(0, $event.target.value)"
+                  >
+                </label>
+                <label class="draw-field">
+                  <span class="draw-field-label">{{ t('map.drawTab.labels.textOffsetY') }}</span>
+                  <input
+                    class="draw-input glass-field"
+                    type="number"
+                    step="0.1"
+                    :value="getTextOffsetValue(1)"
+                    @input="emitTextOffsetUpdate(1, $event.target.value)"
+                  >
+                </label>
+              </div>
+            </template>
 
             <div
               v-if="selectedFeatureId && featureMoveLayerOptions.length"
@@ -484,12 +1294,12 @@
             </div>
 
             <label
-              v-if="selectedFeatureGeometryType !== 'Point'"
+              v-if="selectedFeatureGeometryType !== 'Point' && selectedFeatureGeometryType !== 'Text'"
               class="draw-field draw-color-field"
             >
               <span class="draw-field-label">{{ t('map.drawTab.labels.strokeColor') }}</span>
               <input
-                class="draw-color-input"
+                class="draw-color-input glass-field"
                 type="color"
                 :value="selectedFeatureProperties.stroke"
                 @input="$emit('update-feature-property', 'stroke', $event.target.value)"
@@ -502,7 +1312,7 @@
             >
               <span class="draw-field-label">{{ t('map.drawTab.labels.pointColor') }}</span>
               <input
-                class="draw-color-input"
+                class="draw-color-input glass-field"
                 type="color"
                 :value="selectedFeatureProperties.pointColor"
                 @input="$emit('update-feature-property', 'pointColor', $event.target.value)"
@@ -515,7 +1325,7 @@
             >
               <span class="draw-field-label">{{ t('map.drawTab.labels.pointStrokeColor') }}</span>
               <input
-                class="draw-color-input"
+                class="draw-color-input glass-field"
                 type="color"
                 :value="selectedFeatureProperties.pointStrokeColor"
                 @input="$emit('update-feature-property', 'pointStrokeColor', $event.target.value)"
@@ -528,7 +1338,7 @@
             >
               <span class="draw-field-label">{{ t('map.drawTab.labels.fillColor') }}</span>
               <input
-                class="draw-color-input"
+                class="draw-color-input glass-field"
                 type="color"
                 :value="selectedFeatureProperties.fill"
                 @input="$emit('update-feature-property', 'fill', $event.target.value)"
@@ -536,17 +1346,18 @@
             </label>
 
             <label
-              v-if="selectedFeatureGeometryType !== 'Point'"
+              v-if="selectedFeatureGeometryType !== 'Point' && selectedFeatureGeometryType !== 'Text'"
               class="draw-field"
             >
               <span class="draw-field-label">{{ t('map.drawTab.labels.strokeWidth') }}：{{ selectedFeatureProperties.strokeWidth }}</span>
               <input
-                class="draw-range-input"
+                class="draw-range-input glass-range"
                 type="range"
                 min="1"
                 max="12"
                 step="1"
                 :value="selectedFeatureProperties.strokeWidth"
+                :style="{ '--glass-range-progress': (((selectedFeatureProperties.strokeWidth - 1) / 11) * 100) + '%' }"
                 @input="$emit('update-feature-property', 'strokeWidth', Number($event.target.value))"
               >
             </label>
@@ -557,12 +1368,13 @@
             >
               <span class="draw-field-label">{{ t('map.drawTab.labels.pointRadius') }}：{{ selectedFeatureProperties.pointRadius }}</span>
               <input
-                class="draw-range-input"
+                class="draw-range-input glass-range"
                 type="range"
                 min="3"
                 max="24"
                 step="1"
                 :value="selectedFeatureProperties.pointRadius"
+                :style="{ '--glass-range-progress': (((selectedFeatureProperties.pointRadius - 3) / 21) * 100) + '%' }"
                 @input="$emit('update-feature-property', 'pointRadius', Number($event.target.value))"
               >
             </label>
@@ -573,12 +1385,13 @@
             >
               <span class="draw-field-label">{{ t('map.drawTab.labels.fillOpacity') }}：{{ selectedFeatureProperties.fillOpacity }}</span>
               <input
-                class="draw-range-input"
+                class="draw-range-input glass-range"
                 type="range"
                 min="0"
                 max="1"
                 step="0.05"
                 :value="selectedFeatureProperties.fillOpacity"
+                :style="{ '--glass-range-progress': (selectedFeatureProperties.fillOpacity * 100) + '%' }"
                 @input="$emit('update-feature-property', 'fillOpacity', Number($event.target.value))"
               >
             </label>
@@ -612,10 +1425,11 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import SwitchToggle from '@/components/common/SwitchToggle.vue'
 
 const { t } = useI18n()
 
@@ -632,24 +1446,79 @@ const props = defineProps({
   selectedFeatureId: { type: String, default: '' },
   selectedFeatureIds: { type: Array, default: () => [] },
   selectedVertexCount: { type: Number, default: 0 },
+  selectedVertex: { type: Object, default: null },
+  selectedVertexDeleteBlockCode: { type: String, default: '' },
+  polygonSplitLineOptions: { type: Array, default: () => [] },
+  selectedPolygonSplitLineId: { type: String, default: '' },
+  canStartPolygonSplitSketch: { type: Boolean, default: false },
+  canMergeSelectedPolygons: { type: Boolean, default: false },
+  polygonSplitSketchActive: { type: Boolean, default: false },
+  geometryEditStatus: { type: Object, default: null },
   selectedFeatureBatchName: { type: String, default: '' },
   selectedFeatureBatchPropertyKey: { type: String, default: '' },
   selectedFeatureBatchPropertyValue: { type: String, default: '' },
+  selectedTextLabelFieldKey: { type: String, default: '' },
   canApplySelectedFeatureBatchProperty: { type: Boolean, default: false },
+  canApplyTextLabelField: { type: Boolean, default: false },
   selectedFeatureProperties: { type: Object, default: null },
   selectedFeatureGeometryType: { type: String, default: '' },
   isFullscreen: { type: Boolean, default: false },
   canUndo: { type: Boolean, default: false },
   canRedo: { type: Boolean, default: false },
   canEditShape: { type: Boolean, default: false },
+  canUseSelectedGeometryTools: { type: Boolean, default: false },
+  selectedBufferDistanceKm: { type: Number, default: 1 },
+  canBufferSelectedFeature: { type: Boolean, default: false },
+  canCloseSelectedLine: { type: Boolean, default: false },
+  canSplitSelectedLine: { type: Boolean, default: false },
+  canSplitSelectedPolygon: { type: Boolean, default: false },
+  canConvertSelectedLineToPolygon: { type: Boolean, default: false },
+  canIntersectSelectedPolygons: { type: Boolean, default: false },
+  canDifferenceSelectedPolygons: { type: Boolean, default: false },
+  geometryQualitySummary: {
+    type: Object,
+    default: () => ({
+      hasIssues: false,
+      issueCount: 0,
+      items: [],
+    }),
+  },
+  textLabelSummary: {
+    type: Object,
+    default: () => ({
+      hasLabels: false,
+      totalCount: 0,
+      items: [],
+    }),
+  },
+  editSessionStatus: {
+    type: Object,
+    default: null,
+  },
   canDeleteSelection: { type: Boolean, default: false },
+  canDeleteSelectedVertices: { type: Boolean, default: false },
   canDuplicateFeature: { type: Boolean, default: false },
   isFeatureBoxSelectMode: { type: Boolean, default: false },
   canUseFeatureBoxSelect: { type: Boolean, default: false },
   canModifyActiveLayer: { type: Boolean, default: false },
+  snappingEnabled: { type: Boolean, default: true },
+  snapTolerance: { type: Number, default: 12 },
+  snapGridSize: { type: Number, default: 0 },
+  topologyEditingEnabled: { type: Boolean, default: true },
+  sharedBoundaryProtectionEnabled: { type: Boolean, default: true },
+  snapTargets: {
+    type: Object,
+    default: () => ({
+      vertex: true,
+      midpoint: true,
+      edge: true,
+      grid: true,
+      reference: true,
+    }),
+  },
 })
 
-defineEmits([
+const emit = defineEmits([
   'set-mode',
   'select-feature',
   'toggle-feature-selection',
@@ -659,6 +1528,21 @@ defineEmits([
   'toggle-feature-box-select',
   'edit-shape',
   'duplicate-feature',
+  'reverse-selected-geometry',
+  'simplify-selected-geometry',
+  'update:selected-buffer-distance-km',
+  'buffer-selected-feature',
+  'close-selected-line',
+  'split-selected-line',
+  'update:selected-polygon-split-line-id',
+  'split-selected-polygon',
+  'start-polygon-split-sketch',
+  'cancel-polygon-split-sketch',
+  'merge-selected-polygons',
+  'intersect-selected-polygons',
+  'difference-selected-polygons',
+  'convert-selected-line-to-polygon',
+  'move-selected-vertex',
   'undo',
   'redo',
   'delete-selected',
@@ -673,17 +1557,43 @@ defineEmits([
   'update:selected-feature-batch-property-key',
   'update:selected-feature-batch-property-value',
   'apply-selected-feature-batch-property',
+  'update:selected-text-label-field-key',
+  'apply-text-label-field',
   'move-feature-to-layer',
   'move-selected-features-to-layer',
   'set-selected-features-visible',
   'set-selected-features-locked',
+  'update:snappingEnabled',
+  'update:snapTolerance',
+  'update:snapGridSize',
+  'update:topologyEditingEnabled',
+  'update:sharedBoundaryProtectionEnabled',
+  'update:snap-targets',
 ])
 
 const getGeometryLabel = (geometryType) => {
   if (geometryType === 'Point') return t('map.drawTab.geometry.point')
-  if (geometryType === 'Polygon') return t('map.drawTab.geometry.polygon')
+  if (geometryType === 'Text') return t('map.drawTab.geometry.text')
+  if (geometryType === 'Polygon' || geometryType === 'MultiPolygon') return t('map.drawTab.geometry.polygon')
   return t('map.drawTab.geometry.line')
 }
+
+const textAnchorOptions = computed(() => [
+  { label: t('map.drawTab.labels.textAnchorCenter'), value: 'center' },
+  { label: t('map.drawTab.labels.textAnchorTop'), value: 'top' },
+  { label: t('map.drawTab.labels.textAnchorBottom'), value: 'bottom' },
+])
+
+const textAlignOptions = computed(() => [
+  { label: t('map.drawTab.labels.textAlignLeft'), value: 'left' },
+  { label: t('map.drawTab.labels.textAlignCenter'), value: 'center' },
+  { label: t('map.drawTab.labels.textAlignRight'), value: 'right' },
+])
+
+const textFontWeightOptions = computed(() => [
+  { label: t('map.drawTab.labels.textFontWeightRegular'), value: 'regular' },
+  { label: t('map.drawTab.labels.textFontWeightBold'), value: 'bold' },
+])
 
 const getFeatureStateLabel = (feature) => {
   const visibleLabel = feature?.visible ? t('map.drawTab.labels.visibleShort') : t('map.drawTab.labels.hiddenShort')
@@ -694,6 +1604,197 @@ const featureTableBatchPropertyOptions = computed(() => props.featureTableColumn
   label: column.label,
   value: column.key,
 })))
+
+const isDrawingMode = computed(() => typeof props.currentMode === 'string' && props.currentMode.startsWith('draw_'))
+
+const isDirectEditMode = computed(() => props.currentMode === 'direct_select')
+
+const isTextAnnotationContext = computed(() => (
+  props.selectedFeatureGeometryType === 'Text'
+  || props.activeLayer?.geometryType === 'Text'
+))
+
+const geometryToolContextType = computed(() => (
+  props.selectedFeatureGeometryType
+  || props.activeLayer?.geometryType
+  || ''
+))
+
+const isLineOrPolygonContext = computed(() => [
+  'LineString',
+  'Polygon',
+  'MultiPolygon',
+].includes(geometryToolContextType.value))
+
+const isLineOrPolygonDrawingMode = computed(() => [
+  'draw_line_string',
+  'draw_polygon',
+].includes(props.currentMode))
+
+const hasSelectedFeatureContext = computed(() => (
+  Boolean(props.selectedFeatureId)
+  || props.selectedFeatureIds.length > 0
+  || Boolean(props.selectedFeatureGeometryType)
+))
+
+const showSelectedGeometryControls = computed(() => (
+  !isDrawingMode.value
+  && !isTextAnnotationContext.value
+  && hasSelectedFeatureContext.value
+))
+
+const showPrecisionControls = computed(() => (
+  isDrawingMode.value
+  || isDirectEditMode.value
+  || props.polygonSplitSketchActive
+))
+
+const showTopologyControls = computed(() => (
+  showPrecisionControls.value
+  && (isLineOrPolygonContext.value || isLineOrPolygonDrawingMode.value)
+))
+
+const showGeometryQualityStatus = computed(() => isLineOrPolygonContext.value || isLineOrPolygonDrawingMode.value)
+
+const showFeatureListSection = computed(() => props.currentMode === 'simple_select' && !props.polygonSplitSketchActive)
+
+const showFeatureTableSection = computed(() => showFeatureListSection.value && props.featureTableRows.length > 0)
+
+const showPropertyEditorSection = computed(() => props.currentMode === 'simple_select')
+
+const normalizePositiveNumber = (value, fallback = 1) => {
+  const nextValue = Number(value)
+  return Number.isFinite(nextValue) && nextValue > 0 ? nextValue : fallback
+}
+
+const defaultSnapTargets = {
+  vertex: true,
+  midpoint: true,
+  edge: true,
+  grid: true,
+  reference: true,
+}
+
+const normalizedSnapTargets = computed(() => Object.fromEntries(
+  Object.entries(defaultSnapTargets).map(([key, defaultValue]) => [key, props.snapTargets?.[key] ?? defaultValue])
+))
+
+const snapTargetOptions = computed(() => [
+  { key: 'vertex', label: t('map.drawTab.labels.snapTargetVertex') },
+  { key: 'midpoint', label: t('map.drawTab.labels.snapTargetMidpoint') },
+  { key: 'edge', label: t('map.drawTab.labels.snapTargetEdge') },
+  { key: 'grid', label: t('map.drawTab.labels.snapTargetGrid') },
+  { key: 'reference', label: t('map.drawTab.labels.snapTargetReference') },
+])
+
+const emitSnapTargetUpdate = (key, value) => {
+  emit('update:snap-targets', {
+    ...normalizedSnapTargets.value,
+    [key]: value,
+  })
+}
+
+const undoButtonTitle = computed(() => (
+  props.canUndo
+    ? t('map.drawTab.labels.undoAvailableHint')
+    : t('map.drawTab.labels.undoUnavailableHint')
+))
+
+const redoButtonTitle = computed(() => (
+  props.canRedo
+    ? t('map.drawTab.labels.redoAvailableHint')
+    : t('map.drawTab.labels.redoUnavailableHint')
+))
+
+const selectedShapeEditLabel = computed(() => {
+  const selectedFeature = props.featureItems.find((feature) => feature.id === props.selectedFeatureId)
+  return selectedFeature?.label
+    || props.selectedFeatureProperties?.name
+    || props.selectedLayerLabel
+    || t('map.drawTab.labels.feature')
+})
+
+const shapeEditHintText = computed(() => {
+  if (props.selectedVertexCount <= 0) return t('map.drawTab.labels.shapeEditNoVertexHint')
+  if (props.canDeleteSelectedVertices) {
+    return t('map.drawTab.labels.shapeEditSelectedVertexHint', { count: props.selectedVertexCount })
+  }
+  if (props.selectedVertexDeleteBlockCode === 'sharedBoundaryDeleteBlocked') {
+    return t('map.drawTab.labels.sharedBoundaryDeleteBlocked')
+  }
+  return t('map.drawTab.labels.shapeEditCannotDeleteHint')
+})
+
+const vertexLongitudeInput = ref('')
+const vertexLatitudeInput = ref('')
+
+const selectedVertexCoordinate = computed(() => {
+  const coordinate = props.selectedVertex?.coordinate
+  const longitude = Number(coordinate?.[0])
+  const latitude = Number(coordinate?.[1])
+  if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return null
+  return [longitude, latitude]
+})
+
+const canEditSelectedVertexCoordinate = computed(() => (
+  props.currentMode === 'direct_select'
+  && props.selectedVertexCount === 1
+  && Boolean(props.selectedVertex?.featureId)
+  && typeof props.selectedVertex?.coordPath === 'string'
+  && Boolean(selectedVertexCoordinate.value)
+))
+
+const parsedVertexCoordinateInput = computed(() => {
+  const longitude = Number(vertexLongitudeInput.value)
+  const latitude = Number(vertexLatitudeInput.value)
+  if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return null
+  return [longitude, latitude]
+})
+
+const canApplySelectedVertexCoordinate = computed(() => {
+  if (!canEditSelectedVertexCoordinate.value) return false
+  const currentCoordinate = selectedVertexCoordinate.value
+  const nextCoordinate = parsedVertexCoordinateInput.value
+  if (!currentCoordinate || !nextCoordinate) return false
+  return currentCoordinate[0] !== nextCoordinate[0] || currentCoordinate[1] !== nextCoordinate[1]
+})
+
+const getTextOffsetValue = (index) => {
+  const splitOffset = index === 0
+    ? props.selectedFeatureProperties?.textOffsetX
+    : props.selectedFeatureProperties?.textOffsetY
+  if (splitOffset !== undefined) {
+    const splitValue = Number(splitOffset)
+    return Number.isFinite(splitValue) ? splitValue : (index === 0 ? 0 : 1.1)
+  }
+  const offset = props.selectedFeatureProperties?.textOffset
+  const value = Array.isArray(offset) ? Number(offset[index]) : Number(index === 0 ? 0 : 1.1)
+  return Number.isFinite(value) ? value : (index === 0 ? 0 : 1.1)
+}
+
+const emitTextOffsetUpdate = (index, value) => {
+  const nextValue = Number(value)
+  if (!Number.isFinite(nextValue)) return
+  const nextOffset = [getTextOffsetValue(0), getTextOffsetValue(1)]
+  nextOffset[index] = nextValue
+  emit('update-feature-property', 'textOffset', nextOffset)
+}
+
+watch(() => props.selectedVertex, () => {
+  const coordinate = selectedVertexCoordinate.value
+  vertexLongitudeInput.value = coordinate ? String(coordinate[0]) : ''
+  vertexLatitudeInput.value = coordinate ? String(coordinate[1]) : ''
+}, { immediate: true, deep: true })
+
+const applySelectedVertexCoordinate = () => {
+  const coordinate = parsedVertexCoordinateInput.value
+  if (!canApplySelectedVertexCoordinate.value || !coordinate) return
+  emit('move-selected-vertex', {
+    featureId: props.selectedVertex.featureId,
+    coordPath: props.selectedVertex.coordPath,
+    coordinate,
+  })
+}
 </script>
 
 <style scoped lang="scss">

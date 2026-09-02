@@ -1,5 +1,5 @@
 <template>
-  <div class="pitch-tone-panel main-glass-panel">
+  <div class="pitch-tone-panel glass-panel">
     <h2 class="panel-title" style="margin:0">{{ t('praat.pitchTone.title') }}</h2>
 
     <!-- Step 1: Select and Label -->
@@ -14,7 +14,7 @@
 
       <div ref="pitchChartContainer" class="chart-container"></div>
 
-      <div class="controls-section main-glass-panel-inner">
+      <div class="controls-section glass-subpanel">
         <div class="input-group">
           <div class="selection-info">
             <span v-if="currentSelection.length > 0" class="status-active"><InlineIcon icon="✅" />{{ t('praat.pitchTone.step1.controls.selectionStatus.active', { count: currentSelection.length }) }}
@@ -911,10 +911,10 @@ const initElevenPointChart = () => {
       textStyle: { color: '#000', fontSize: 12 },
       formatter: (params) => {
         let result = t('praat.pitchTone.step3.chart.tooltipTimeElevenPoint', {
-          percent: params[0].value[0].toFixed(0)
+          percent: (params[0]?.value[0] ?? 0).toFixed(0)
         }) + '<br/>'
         params.forEach(param => {
-          result += `${param.seriesName}: ${param.value[1].toFixed(2)}<br/>`
+          result += `${param.seriesName}: ${(param.value[1] ?? 0).toFixed(2)}<br/>`
         })
         return result
       },
@@ -1002,10 +1002,10 @@ const initContinuousChart = (isZScore) => {
       trigger: 'axis',
       formatter: (params) => {
         let result = t('praat.pitchTone.step3.chart.tooltipTime', {
-          time: params[0].value[0].toFixed(1)
+          time: (params[0]?.value[0] ?? 0).toFixed(1)
         }) + '<br/>'
         params.forEach(param => {
-          result += `${param.seriesName}: ${param.value[1].toFixed(2)}<br/>`
+          result += `${param.seriesName}: ${(param.value[1] ?? 0).toFixed(2)}<br/>`
         })
         return result
       }

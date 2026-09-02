@@ -1,9 +1,9 @@
 <template>
   <div class="hierarchical-panel">
-    <h3 class="villagesml-subtab-title">
-      ML計算 - 層次聚類
+    <h1 class="villagesml-subtab-title">
+      <BarIcon icon="🌳" />ML計算 - 層次聚類
       <HelpIcon content="市-縣-鎮三級層次聚類分析。先對市級聚類，再在每個市級聚類內對縣級聚類，最後在每個縣級聚類內對鎮級聚類。特徵包括語義類別、字符嵌入、結構特徵。適合發現多尺度的地名模式" />
-    </h3>
+    </h1>
     <div class="vml-two-col">
     <div class="vml-glass-panel">
       <h3 class="panel-title">層次聚類</h3>
@@ -76,6 +76,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed } from 'vue'
 import { villagesMLStore } from '@/VillagesML/store/villagesMLStore.js'
 import { userStore } from '@/main/store/store.js'

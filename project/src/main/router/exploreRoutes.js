@@ -13,9 +13,15 @@ const GdVillagesTreePage = () => import('@/main/views/explore/villages/gdVillage
 const GdVillagesTablePage = () => import('@/main/views/explore/villages/gdVillagesTable.vue')
 const YangChunVillagesPage = () => import('@/main/views/explore/villages/YangChunVillages.vue')
 const YangChunSpokenPage = () => import('@/main/views/explore/word/YangChunSpoken.vue')
+const YangChunOverviewPage = () => import('@/main/views/explore/yangchun/YangChunOverviewPage.vue')
+const YangChunExpressionsPage = () => import('@/main/views/explore/yangchun/YangChunExpressionsPage.vue')
 const AllVillagesPage = () => import('@/main/views/explore/villages/AllVillages.vue')
 const VillagesMLPage = () => import('@/main/views/explore/villages/VillagesML.vue')
 const ToponymsPage = () => import('@/main/views/explore/villages/toponyms/ToponymsPage.vue')
+const ToponymSearchPage = () => import('@/main/views/explore/villages/toponyms/ToponymSearchPage.vue')
+const G6DemoPage = () => import('@/main/components/g6-demo/index.vue')
+const FeaturesGraphPage = () => import('@/main/views/explore/features/FeaturesGraph.vue')
+const HistoryGraphPage = () => import('@/main/views/explore/history/HistoryGraph.vue')
 
 export const exploreRoutes = [
   {
@@ -36,11 +42,13 @@ export const exploreRoutes = [
   },
   {
     path: 'explore/tools/praat',
-    component: PraatPage
+    component: PraatPage,
+    meta: { queryAllowlist: ['tab'] }
   },
   {
     path: 'explore/gis',
-    component: GisPage
+    component: GisPage,
+    meta: { queryAllowlist: ['scrollTo'] }
   },
   {
     path: 'explore/manage',
@@ -64,7 +72,8 @@ export const exploreRoutes = [
   },
   {
     path: 'explore/char-class',
-    component: CharacterClassificationPage
+    component: CharacterClassificationPage,
+    meta: { queryAllowlist: ['tab', 'table', 'levels'] }
   },
   {
     path: 'explore/yc-spoken',
@@ -75,8 +84,24 @@ export const exploreRoutes = [
     })
   },
   {
+    path: 'explore/yc',
+    redirect: (to) => ({
+      path: buildLocalePath(resolveRouteLocale(to), '/explore/yc/overview'),
+      query: to.query,
+      hash: to.hash,
+    })
+  },
+  {
+    path: 'explore/yc/overview',
+    component: YangChunOverviewPage
+  },
+  {
     path: 'explore/yc/words',
     component: YangChunSpokenPage
+  },
+  {
+    path: 'explore/yc/expressions',
+    component: YangChunExpressionsPage
   },
   {
     path: 'explore/yc/villages',
@@ -85,6 +110,10 @@ export const exploreRoutes = [
   {
     path: 'explore/villages/toponyms',
     component: ToponymsPage
+  },
+  {
+    path: 'explore/villages/search',
+    component: ToponymSearchPage
   },
   {
     path: 'explore/villages/gd',
@@ -105,6 +134,18 @@ export const exploreRoutes = [
   {
     path: 'explore/villages/ml',
     component: VillagesMLPage
+  },
+  {
+    path: 'explore/g6-demo',
+    component: G6DemoPage
+  },
+  {
+    path: 'explore/features',
+    component: FeaturesGraphPage
+  },
+  {
+    path: 'explore/history',
+    component: HistoryGraphPage
   },
   {
     path: 'explore/villages/all',

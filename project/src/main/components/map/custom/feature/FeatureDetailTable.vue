@@ -2,7 +2,7 @@
   <section class="feature-detail-table">
     <div class="feature-detail-header">
       <button
-        class="main-glass-button"
+        class="glass-button"
         type="button"
         @click="$emit('back')"
       >
@@ -18,7 +18,7 @@
             <input
               v-model="localFeatureName"
               type="text"
-              class="header-text-input"
+              class="header-text-input glass-field"
               :placeholder="t('customEntry.pointDetail.placeholders.feature')"
             >
           </label>
@@ -27,11 +27,11 @@
             <input
               v-model="localPhonology"
               type="text"
-              class="header-text-input"
+              class="header-text-input glass-field"
               :placeholder="t('customEntry.pointDetail.placeholders.phonology')"
             >
           </label>
-          <button class="main-glass-button field-notice-trigger" type="button" @click="isFieldNoticeOpen = true">
+          <button class="pill-btn field-notice-trigger" type="button" @click="isFieldNoticeOpen = true">
             {{ t('customEntry.pointDetail.rows.noticeTrigger') }}
           </button>
         </div>
@@ -46,7 +46,7 @@
         </p>
       </div>
       <button
-        class="main-glass-button"
+        class="glass-button"
         data-variant="primary"
         type="button"
         @click="openCreateModal"
@@ -56,7 +56,7 @@
     </div>
 
     <div class="feature-detail-layout">
-      <div class="feature-detail-main main-glass-panel-inner">
+      <div class="feature-detail-main glass-subpanel">
         <div
           v-if="loading"
           class="feature-detail-state"
@@ -69,7 +69,7 @@
         >
           <div>{{ errorMessage }}</div>
           <button
-            class="main-glass-button"
+            class="glass-button"
             type="button"
             @click="loadRecords"
           >
@@ -147,7 +147,7 @@
         </div>
       </div>
 
-      <div class="feature-detail-side main-glass-panel-inner">
+      <div class="feature-detail-side glass-subpanel">
         <div class="feature-detail-map-title">
           {{ t('customEntry.featureDetail.mapTitle') }}
         </div>
@@ -322,7 +322,7 @@ const detailTitle = computed(() => {
 const mapPoints = computed(() =>
   rows.value
     .map((row) => {
-      const [latText, lngText] = String(row['經緯度'] || '').split(',');
+      const [lngText, latText] = String(row['經緯度'] || '').split(',');
       const lat = Number(String(latText).trim());
       const lng = Number(String(lngText).trim());
       if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
@@ -474,8 +474,6 @@ watch(
 
 @use '../../_map-variables' as *;
 
-@use '@/styles/main/_surfaces.scss';
-
 .feature-detail-table {
   @include flex-col;
   gap: $spacing-lg;
@@ -512,7 +510,7 @@ watch(
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.85fr);
   gap: $spacing-lg;
 
-  @media (max-width: 1100px) {
+  @media (max-width: 1000px) {
     grid-template-columns: 1fr;
   }
 }
@@ -659,28 +657,7 @@ watch(
 }
 
 .header-text-input {
-  padding: $radius-sm $radius-md;
-  border: 1px solid $muted-ring;
-  border-radius: $spacing-sm;
-  background: $glass-medium;
-  color: $text-strong;
-  font-size: 14px;
-  outline: none;
-  transition:
-    border-color 0.18s ease,
-    box-shadow 0.18s ease,
-    background-color 0.18s ease;
   width: 160px;
-
-  &::placeholder {
-    color: $text-light;
-  }
-
-  &:focus {
-    border-color: $primary-focus;
-    background: var(--text-white);
-    box-shadow: 0 0 0 3px $primary-glass;
-  }
 }
 
 // -- Point detail modal --
@@ -749,17 +726,21 @@ watch(
   }
 }
 
+/* 字段提示触发钮: 仅尺寸/颜色覆盖, 视觉见 main/_buttons.scss 的 .pill-btn */
 .field-notice-trigger {
-  --main-glass-button-padding: 2px 10px;
-  font-size: 11px;
-  color: $warning;
-  border-color: rgba(var(--color-warning-rgb), 0.3);
-  background: rgba(var(--color-warning-rgb), 0.06);
+  --pill-btn-padding: 6px 14px;
+  --pill-btn-font-size: 12px;
+  --pill-btn-font-weight: 600;
+  --pill-btn-color: #fff;
+  --pill-btn-border: 1px solid rgb(var(--color-warning-rgb));
+  --pill-btn-bg: rgb(var(--color-warning-rgb));
+  --pill-btn-hover-bg: var(--color-warning-dark);
+  --pill-btn-hover-border: var(--color-warning-dark);
+  --pill-btn-shadow: 0 4px 14px rgba(var(--color-warning-rgb), 0.35);
 
-  &:hover:not(:disabled) {
-    background: rgba(var(--color-warning-rgb), 0.12);
-    border-color: $warning;
-    color: $warning;
+  &::before {
+    content: "⚠️";
+    font-size: 13px;
   }
 }
 

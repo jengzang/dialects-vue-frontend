@@ -2,7 +2,7 @@
   <Transition name="draw-panel-slide">
     <aside
       v-show="isOpen"
-      class="draw-tool-panel main-glass-panel voronoi-panel"
+      class="draw-tool-panel glass-panel voronoi-panel"
       :class="offsetClass"
     >
       <div class="draw-tool-panel-header">
@@ -30,7 +30,7 @@
           </div>
           <div class="voronoi-data-source-actions">
             <button
-              class="main-glass-button"
+              class="glass-button"
               :data-variant="hasCustomImport ? 'primary' : 'secondary'"
               type="button"
               @click="$emit('open-custom-import')"
@@ -41,7 +41,7 @@
             </button>
             <button
               v-if="hasCustomImport"
-              class="main-glass-button"
+              class="glass-button"
               data-variant="secondary"
               type="button"
               @click="$emit('clear-custom-import')"
@@ -58,11 +58,11 @@
             </CheckBox>
           </div>
           <div class="voronoi-source-summary-grid">
-            <div class="voronoi-summary-card">
+            <div class="voronoi-summary-card glass-card">
               <span class="voronoi-summary-label">{{ t('map.drawTab.voronoi.officialPoints') }}</span>
               <strong class="voronoi-summary-value">{{ officialPointCount }}</strong>
             </div>
-            <div class="voronoi-summary-card">
+            <div class="voronoi-summary-card glass-card">
               <span class="voronoi-summary-label">{{ t('map.drawTab.voronoi.customPoints') }}</span>
               <strong class="voronoi-summary-value">{{ customPointCount }}</strong>
             </div>
@@ -83,13 +83,33 @@
               :options="partitionModeOptions"
               @update:model-value="$emit('update:partition-mode', $event)"
             />
+            <SwitchToggle
+              :model-value="showDialectIslands"
+              class="voronoi-dialect-island-checkbox"
+              label-position="inside"
+              auto-width
+              :active-text="t('map.drawTab.voronoi.showDialectIslandsOn')"
+              :inactive-text="t('map.drawTab.voronoi.showDialectIslandsOff')"
+              @update:model-value="$emit('update:show-dialect-islands', $event)"
+            />
           </div>
           <div class="draw-basemap-select">
             <span class="draw-field-label">{{ t('map.divideTab.labels.regionLevel') }}</span>
             <SimpleSelectDropdown
               :model-value="regionLevel"
               :options="regionLevelOptions"
+              :disabled="enableYindianAdjust"
               @update:model-value="$emit('update:region-level', $event)"
+            />
+            <SwitchToggle
+              v-if="partitionMode === 'yindian'"
+              :model-value="enableYindianAdjust"
+              class="voronoi-adjust-checkbox"
+              label-position="inside"
+              auto-width
+              :active-text="t('map.drawTab.voronoi.yindianAdjust')"
+              :inactive-text="t('map.drawTab.voronoi.yindianAdjustOff')"
+              @update:model-value="$emit('update:enable-yindian-adjust', $event)"
             />
           </div>
         </section>
@@ -99,19 +119,19 @@
             {{ t('map.drawTab.voronoi.summaryTitle') }}
           </div>
           <div class="voronoi-summary-grid">
-            <div class="voronoi-summary-card">
+            <div class="voronoi-summary-card glass-card">
               <span class="voronoi-summary-label">{{ t('map.drawTab.voronoi.totalPoints') }}</span>
               <strong class="voronoi-summary-value">{{ totalPoints }}</strong>
             </div>
-            <div class="voronoi-summary-card">
+            <div class="voronoi-summary-card glass-card">
               <span class="voronoi-summary-label">{{ t('map.drawTab.voronoi.activePoints') }}</span>
               <strong class="voronoi-summary-value">{{ activePoints }}</strong>
             </div>
-            <div class="voronoi-summary-card">
+            <div class="voronoi-summary-card glass-card">
               <span class="voronoi-summary-label">{{ t('map.drawTab.voronoi.ignoredPoints') }}</span>
               <strong class="voronoi-summary-value">{{ ignoredCount }}</strong>
             </div>
-            <div class="voronoi-summary-card">
+            <div class="voronoi-summary-card glass-card">
               <span class="voronoi-summary-label">{{ t('map.drawTab.voronoi.partitionGroups') }}</span>
               <strong class="voronoi-summary-value">{{ groupCount }}</strong>
             </div>
@@ -123,28 +143,32 @@
             {{ t('map.drawTab.voronoi.actionsTitle') }}
           </div>
           <div class="draw-basemap-select">
-            <CheckBox
+            <span class="draw-field-label">{{ t('map.drawTab.voronoi.boundaryClip') }}</span>
+            <SwitchToggle
               :model-value="enableExpand"
+              label-position="inside"
+              auto-width
+              :active-text="t('map.drawTab.voronoi.enableExpandOn')"
+              :inactive-text="t('map.drawTab.voronoi.enableExpandOff')"
               @update:model-value="$emit('update:enable-expand', $event)"
-            >
-              {{ t('map.drawTab.voronoi.enableExpand') }}
-            </CheckBox>
+            />
           </div>
           <div v-if="enableExpand" class="draw-basemap-select">
             <span class="draw-field-label">{{ t('map.drawTab.voronoi.expandRatio', { ratio: expandRatio }) }}</span>
             <input
               type="range"
-              class="expand-ratio-slider"
+              class="expand-ratio-slider glass-range"
               min="0"
               max="100"
               :value="expandRatio"
+              :style="{ '--glass-range-progress': expandRatio + '%' }"
               @input="$emit('update:expand-ratio', Number($event.target.value))"
             >
           </div>
           <div class="draw-tool-button-grid">
             <button
               v-if="hasFieldMerge"
-              class="main-glass-button"
+              class="glass-button"
               data-variant="secondary"
               type="button"
               @click="$emit('open-field-merge')"
@@ -152,7 +176,7 @@
               {{ t('map.drawTab.voronoi.fieldMergeOpenButton') }}
             </button>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="secondary"
               type="button"
               @click="$emit('open-ignore-modal')"
@@ -160,7 +184,7 @@
               {{ t('map.drawTab.voronoi.ignorePointsAction') }}
             </button>
             <button
-              class="main-glass-button draw-tool-mode-button"
+              class="glass-button draw-tool-mode-button"
               :data-variant="isAddingPoints ? 'primary' : 'secondary'"
               :data-active="isAddingPoints"
               type="button"
@@ -175,7 +199,7 @@
               {{ isAddingPoints ? t('map.drawTab.voronoi.addDialectPointExit') : t('map.drawTab.voronoi.addDialectPoint') }}
             </button>
             <button
-              class="main-glass-button draw-tool-mode-button"
+              class="glass-button draw-tool-mode-button"
               :data-variant="isPointsPreviewActive ? 'primary' : 'secondary'"
               :data-active="isPointsPreviewActive"
               type="button"
@@ -190,7 +214,7 @@
               {{ t('map.drawTab.voronoi.previewPoints') }}
             </button>
             <button
-              class="main-glass-button draw-tool-mode-button"
+              class="glass-button draw-tool-mode-button"
               :data-variant="isPolygonPreviewActive ? 'primary' : 'secondary'"
               :data-active="isPolygonPreviewActive"
               type="button"
@@ -205,7 +229,7 @@
               {{ isCalculating ? t('map.drawTab.buttons.voronoiRunning') : t('map.drawTab.voronoi.calculate') }}
             </button>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="secondary"
               type="button"
               :disabled="!activePoints"
@@ -240,6 +264,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
+import SwitchToggle from '@/components/common/SwitchToggle.vue'
 
 const props = defineProps({
   isOpen: { type: Boolean, default: false },
@@ -265,6 +290,8 @@ const props = defineProps({
   expandRatio: { type: Number, default: 50 },
   enableExpand: { type: Boolean, default: false },
   isAddingPoints: { type: Boolean, default: false },
+  enableYindianAdjust: { type: Boolean, default: false },
+  showDialectIslands: { type: Boolean, default: true },
 })
 
 defineEmits([
@@ -281,6 +308,8 @@ defineEmits([
   'update:enable-expand',
   'update:expand-ratio',
   'toggle-add-points',
+  'update:enable-yindian-adjust',
+  'update:show-dialect-islands',
 ])
 
 const { t } = useI18n()
@@ -364,9 +393,9 @@ const offsetClass = computed(() => {
   align-items: center;
   gap: 0.25rem;
   padding: 0.8rem;
-  border-radius: 14px;
-  background: var(--glass-50);
-  border: 1px solid var(--glass-60);
+  // border-radius: 14px;
+  // background: var(--glass-50);
+  // border: 1px solid var(--glass-60);
 
   .voronoi-summary-label {
     font-size: 0.78rem;
@@ -379,9 +408,13 @@ const offsetClass = computed(() => {
   }
 }
 
+.voronoi-adjust-checkbox,
+.voronoi-dialect-island-checkbox {
+  flex-shrink: 0;
+}
+
 .expand-ratio-slider {
   flex: 1;
-  accent-color: var(--color-primary);
 }
 
 .draw-tool-panel-body {

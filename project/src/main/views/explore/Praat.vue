@@ -3,7 +3,7 @@
   <div class="praat-page">
 <!--    &lt;!&ndash; Login Button (top right) &ndash;&gt;-->
 <!--    <div v-if="!userStore.isAuthenticated" class="login-prompt">-->
-<!--      <button class="login-button main-glass-button" @click="goToLogin">-->
+<!--      <button class="login-button glass-button" @click="goToLogin">-->
 <!--        <span><InlineIcon icon="🔒" /></span>-->
 <!--        <span>請先登錄</span>-->
 <!--      </button>-->
@@ -46,7 +46,7 @@
     </div>
 
     <div class="page-header">
-      <h1 class="page-title">{{ t('praat.main.title') }}</h1>
+      <h1 class="page-title"><BarIcon icon="🎙️" />{{ t('navigation.pageTitles.praat.main') }}</h1>
       <p v-if="activeTab === 'upload'" class="page-description">{{ t('praat.main.description') }}</p>
     </div>
 
@@ -56,18 +56,18 @@
       <div v-show="activeTab === 'upload'" class="page-content" :class="{ 'tab-hidden': activeTab !== 'upload' }">
           <!-- Settings Button and Mode Selector -->
           <div class="settings-trigger">
-            <button class="settings-button main-glass-button" @click="showSettings = true">
+            <button class="settings-button glass-button" @click="showSettings = true">
               <span class="settings-icon"><InlineIcon icon="⚙️" /></span>
               <span>{{ t('praat.main.settings.button') }}</span>
             </button>
 
             <div class="mode-selector-inline">
               <div class="mode-options">
-                <label class="radio-option main-glass-button" :class="{ active: settings.mode === 'single' }">
+                <label class="radio-option glass-button" :class="{ active: settings.mode === 'single' }">
                   <input type="radio" value="single" v-model="settings.mode" />
                   <span>{{ t('praat.main.mode.single') }}</span>
                 </label>
-                <label class="radio-option main-glass-button" :class="{ active: settings.mode === 'continuous' }">
+                <label class="radio-option glass-button" :class="{ active: settings.mode === 'continuous' }">
                   <input type="radio" value="continuous" v-model="settings.mode" />
                   <span>{{ t('praat.main.mode.continuous') }}</span>
                 </label>
@@ -87,7 +87,7 @@
 <!--          <div v-if="audioFile && !jobId" class="action-section">-->
           <div  class="action-section">
             <button
-                class="start-button main-glass-button"
+                class="start-button glass-button"
                 @click="startAnalysis"
                 :disabled="isActionLocked"
                 :class="{ 'disabled-state': !audioFile }"
@@ -114,7 +114,7 @@
           />
 
           <!-- No Results Message -->
-          <div v-else-if="!analysisResults" class="no-results-state main-glass-panel">
+          <div v-else-if="!analysisResults" class="no-results-state glass-panel">
             <div class="no-results-icon"><InlineIcon icon="📊" /></div>
             <h3 class="no-results-title">{{ t('praat.main.noResults.title') }}</h3>
             <p class="no-results-text">{{ t('praat.main.noResults.text') }}</p>
@@ -173,6 +173,7 @@
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, reactive, onBeforeUnmount, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
@@ -973,9 +974,9 @@ onBeforeUnmount(() => {
 
 .page-title {
   font-size: 2rem;
-  font-weight: 700;
   margin-bottom: 0.5rem;
   margin-top: 1rem;
+  // color: linear-gradient(135deg, #007aff, #6e00ff);
   background: linear-gradient(135deg, #007aff, #6e00ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

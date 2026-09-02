@@ -51,8 +51,13 @@
       "wordList": "Vocabulary List",
       "ycSpoken": "Yangchun Colloquial Vocabulary"
     },
+    "yangchun": {
+      "overview": "Dialect Overview",
+      "expressions": "Yangchun Expressions"
+    },
     "villages": {
       "toponyms": "Village Toponym Distribution",
+      "toponymSearch": "Toponym Search",
       "gdVillages": "Guangdong Villages",
       "VillagesML": "Machine Learning",
       "gdVillagesTable": "Guangdong Village Table",
@@ -79,6 +84,101 @@
       "suggestion": "Send Feedback",
       "like": "Support the Author",
       "setting": "Settings"
+    }
+  },
+  "pageTitles": {
+    "user": {
+      "data": "Personal Data Management",
+      "region": "Personal Region Management"
+    },
+    "support": {
+      "privacy": "Privacy Policy & Citation",
+      "settings": "Settings",
+      "source": "Data Sources",
+      "aboutIntro": "ℹ️ About This Site",
+      "aboutSuggestion": "Share Feedback",
+      "aboutLike": "❤️ Support the Author"
+    },
+    "portals": {
+      "tools": "Toolbox",
+      "villages": "Natural Village Analysis"
+    },
+    "result": {
+      "pleaseQuery": "Please query first",
+      "tab1": "Search Characters",
+      "tab2": "Search Middle Chinese",
+      "tab3": "Search Phonemes",
+      "tab4": "Search Tones"
+    },
+    "cluster": {
+      "workspace": "Dialect Clustering Workspace"
+    },
+    "query": {
+      "tab1": "Character Readings Query",
+      "tab2": "Rime-Book Category Query",
+      "tab3": "Reading Source Analysis",
+      "tab4": "Tone Value & Class Query"
+    },
+    "compare": {
+      "tab1": "Initial, Final & Tone Comparison",
+      "tab2": "Rime-Book Category Comparison",
+      "tab4": "Tone-Class Merger Comparison",
+      "tab5": "Phonetic Value Correspondence"
+    },
+    "map": {
+      "view": "Main Map",
+      "divide": "Regional Coloring",
+      "custom": "Custom Data"
+    },
+    "pho": {
+      "matrix": "Phonological System Query",
+      "custom": "Rime-Book Sound Classification",
+      "count": "Count Syllables",
+      "evolution": "Rime-Book Evolution Analysis"
+    },
+    "vocabulary": {
+      "view": "Vocabulary Query",
+      "import": "Vocabulary Upload",
+      "manage": "Vocabulary Management"
+    },
+    "yubao": {
+      "vocabulary": "Language Preservation 1000 Words",
+      "grammar": "Language Preservation 50 Sentences"
+    },
+    "words": {
+      "yangChunSpoken": "Yangchun Spoken Words"
+    },
+    "praat": {
+      "main": "Praat Acoustic Analysis"
+    },
+    "gis": {
+      "main": "Map Drawing"
+    },
+    "tools": {
+      "check": "Dialect Table Check Tool",
+      "jyut2ipa": "Jyutping-to-IPA Tool",
+      "merge": "Table Merge Tool",
+      "tableManage": "Table Management Panel",
+      "tableManageAccessDenied": "Access Denied"
+    },
+    "villages": {
+      "dashboard": "Village Analysis System",
+      "gdTree": "Guangdong Village Tree",
+      "gdTable": "Guangdong Village Overview",
+      "yangChun": "Yangchun Administrative Divisions",
+      "all": "All Villages",
+      "toponyms": "Village Toponym Distribution",
+      "toponymSearch": "Toponym Search"
+    },
+    "charClass": {
+      "zhonggu": "Middle Chinese Phonology Data",
+      "shanggu": "Old Chinese Data",
+      "jingu": "Early Modern Phonology Data",
+      "yueyun": "Cantonese Rime Book Data"
+    },
+    "yangchun": {
+      "overview": "Yangchun Dialect Overview",
+      "expressions": "Yangchun Expressions and Reduplicatives"
     }
   },
   "tabs": {

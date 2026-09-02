@@ -10,6 +10,14 @@ import {
 // ========================================
 export const globalPayload = ref(null)
 
+// 音節統計跨頁跳轉的「待填地點」。不寫 URL（countphos 最多 100 個地點，會撐爆查詢串），
+// 改由彈窗寫入此共享 ref，Countphos 掛載/激活時消費後清空。
+export const pendingCountphosLocations = ref([])
+
+// 音節統計跨頁跳轉時,由彈窗一併寫入的統計方式勾選配置（featureCounts / syllableCounts）。
+// LocationDetailPopup 傳單一地點時預設兩者皆勾;Countphos 消費後清空。
+export const pendingCountphosQueryMode = ref(null)
+
 const {
     state: preferredCharacterTableState,
     write: writePreferredCharacterTableState
@@ -40,6 +48,14 @@ export function setTutorialEnabled(value) {
     const nextValue = Boolean(value)
     tutorialEnabled.value = nextValue
     writeTutorialEnabledState(nextValue)
+}
+
+export const tutorialGuideRequestState = reactive({
+    openToken: 0
+})
+
+export function requestCurrentTutorialGuideOpen() {
+    tutorialGuideRequestState.openToken += 1
 }
 
 const {
@@ -90,9 +106,11 @@ export const userStore = reactive({
 // 地图状态管理
 // ========================================
 export const mapStore = reactive({
-    mode: 'base',             // 默认模式: 'base' | 'dot' | 'feature' | 'compare'
+    mode: 'base',             // 默认模式: 'base' | 'dot' | 'heatmap' | 'feature' | 'compare' | 'isopleth'
+    divideMapView: false,     // 从 DivideTab 进入地图的上下文标记，控制三模式 RadioGroup 显隐
     mapData: null,            // 存放基础地图数据 (center, zoom, locations)
     mergedData: [],           // 存放特征数据 (results)
+    isoplethPayload: null, // 等值線專用數據，避免污染 mergedData
     loading: false,           // 共享加载状态
     selectedFeature: '',      // 当前选中的特征
     selectedFeaturePhonology: '', // 当前选中的特征的声韵调类型

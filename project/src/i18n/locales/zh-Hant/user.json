@@ -286,7 +286,7 @@
           "matrix": "查音系",
           "classification": "查音素",
           "counts": "音節統計",
-          "pie": "演變"
+          "pie": "演化"
         }
       },
       "tools": {
@@ -301,17 +301,34 @@
       "other": {
         "label": "其他查詢",
         "items": {
-          "coordinates": "坐標查詢",
           "table": "表格查詢",
-          "tree": "樹形查詢",
+          "tree": "樹形查詢"
+        },
+        "tooltips": {
+          "table": "包含各種表格查詢，例如語保詞彙語法、資料來源、全粵村情表格與陽春口語詞等。",
+          "tree": "包含各種樹狀圖查詢，例如廣東自然村樹狀圖與中古地位等。"
+        }
+      },
+      "villageGeography": {
+        "label": "地理村落",
+        "items": {
+          "coordinates": "坐標查詢",
+          "locations": "地點信息",
           "villages": "村落機器學習",
-          "locations": "地點信息"
+          "toponyms": "地名查詢",
+          "gis": "GIS 查詢"
         },
         "tooltips": {
           "coordinates": "用於取得地圖繪製所需的坐標資料，查中古、查音位、查字、查調、分區圖與自定繪圖等都會使用。",
-          "table": "包含各種表格查詢，例如語保詞彙語法、資料來源、全粵村情表格與陽春口語詞等。",
-          "tree": "包含各種樹狀圖查詢，例如廣東自然村樹狀圖與中古地位等。",
           "locations": "包括獲取單個地點的詳情信息，以及獲取完整分區信息"
+        }
+      },
+      "customData": {
+        "label": "自定義數據",
+        "items": {
+          "customRegions": "自定義區域",
+          "customDataQuery": "自定義數據查詢",
+          "customDataEdit": "自定義數據編輯"
         }
       },
       "vocabulary": {

@@ -1,11 +1,12 @@
 <!-- ✅ App.vue -->
 <template>
   <!-- 🧱 動態載入 layout -->
-  <component :is="layoutComponent">
-    <router-view />
-  </component>
+  <ErrorBoundary>
+    <component :is="layoutComponent">
+      <router-view />
+    </component>
+  </ErrorBoundary>
 
-  <RateLimitNotice />
   <GlobalToast />
 
   <!-- 🍎 全局确认对话框 -->
@@ -23,7 +24,7 @@
 
 <script>
 import { computed, onMounted, onBeforeUnmount } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 // import IntroLayout from '../layouts/IntroLayout.vue'
 import MenuLayout from '../layouts/MenuLayout.vue'
@@ -31,12 +32,16 @@ import SimpleLayout from '../layouts/SimpleLayout.vue'
 import ExploreLayout from '../layouts/ExploreLayout.vue'
 import GlobalToast from '../components/ToastAndHelp/GlobalToast.vue'
 import GlobalConfirm from '../components/ToastAndHelp/GlobalConfirm.vue'
-import RateLimitNotice from '../components/ToastAndHelp/RateLimitNotice.vue'
+
+import ErrorBoundary from '../components/ToastAndHelp/ErrorBoundary.vue'
 import { initOnlineTimeTracker, stopOnlineTimeTracker } from '../utils/user/onlineTimeTracker.js'
 import { initLoginPromptTracker, stopLoginPromptTracker } from '../utils/user/loginPromptTracker.js'
 import { getToken } from '../api/auth/auth.js'
 import { stripLocaleFromPath } from '../i18n/localeRouting.js'
 import { isRouteLoading } from '../utils/ui/routeLoading.js'
+import { showRateLimitNotice } from '../utils/user/rateLimitNotice.js'
+
+window.__showRateLimitNotice = showRateLimitNotice
 
 // // 🌉 建立 bridge 用於跨組件共享 iframe 狀態
 // const nativeFrame = ref(null)
@@ -52,12 +57,14 @@ import { isRouteLoading } from '../utils/ui/routeLoading.js'
 
 export default {
   components: {
+    ErrorBoundary,
     GlobalToast,
     GlobalConfirm,
-    RateLimitNotice
+
   },
   setup() {
     const route = useRoute()
+    const router = useRouter()
 
     const layoutComponent = computed(() => {
       const normalizedPath = stripLocaleFromPath(route.path)
@@ -96,6 +103,15 @@ export default {
 
       // 其他使用 MenuLayout（带 navbar）
       return MenuLayout
+    })
+
+    // ErrorBoundary 强刷后跳转反馈页
+    onMounted(() => {
+      const redirect = sessionStorage.getItem('__error_boundary_redirect')
+      if (redirect) {
+        sessionStorage.removeItem('__error_boundary_redirect')
+        router.replace(redirect)
+      }
     })
 
     // 初始化在线时长统计

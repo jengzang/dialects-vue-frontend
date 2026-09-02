@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 function defaultFileFactory(file) {
   return file
@@ -30,6 +30,12 @@ export function useTabularImportFlow(options = {}) {
   const isReady = computed(() => !!previewPayload.value?.isComplete)
   const shouldShowPreview = computed(() => !!pendingFile.value)
   const canAutoApply = computed(() => !!previewState.canAutoApply?.value)
+
+  watch(() => previewState.summary.value, (summary) => {
+    if (pendingFile.value) {
+      previewPayload.value = summary
+    }
+  })
 
   async function loadPreview(file) {
     if (typeof beforePreview === 'function') {

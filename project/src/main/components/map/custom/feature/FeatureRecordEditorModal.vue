@@ -34,7 +34,7 @@
           <div class="location-input-wrapper">
             <input
               v-model="location"
-              class="feature-record-input"
+              class="feature-record-input glass-field"
               type="text"
               :placeholder="t('customEntry.featureRecord.placeholders.location')"
               @input="handleLocationInput"
@@ -63,7 +63,7 @@
           <span>{{ t('customEntry.featureRecord.labels.region') }}</span>
           <input
             v-model="region"
-            class="feature-record-input"
+            class="feature-record-input glass-field"
             type="text"
             :placeholder="t('customEntry.featureRecord.placeholders.region')"
           />
@@ -91,11 +91,11 @@
           <span>{{ t('customEntry.featureRecord.labels.value') }}</span>
           <input
             v-model="valueField"
-            class="feature-record-input"
+            class="feature-record-input glass-field"
             type="text"
             :placeholder="t('customEntry.featureRecord.placeholders.value')"
           />
-          <button class="main-glass-button field-notice-trigger field-notice-trigger--inline" type="button" @click="isFieldNoticeOpen = true">
+          <button class="pill-btn field-notice-trigger field-notice-trigger--inline" type="button" @click="isFieldNoticeOpen = true">
             {{ t('customEntry.pointDetail.rows.noticeTrigger') }}
           </button>
         </label>
@@ -103,7 +103,7 @@
           <span>{{ t('customEntry.featureRecord.labels.note') }}</span>
           <input
             v-model="noteField"
-            class="feature-record-input"
+            class="feature-record-input glass-field"
             type="text"
             :placeholder="t('customEntry.featureRecord.placeholders.note')"
           />
@@ -114,7 +114,7 @@
           <span>{{ t('customEntry.featureRecord.labels.coord') }}</span>
           <input
             :value="coordText"
-            class="feature-record-input"
+            class="feature-record-input glass-field"
             type="text"
             readonly
             :placeholder="t('customEntry.featureRecord.placeholders.coord')"
@@ -133,11 +133,11 @@
     </div>
 
     <template #footer>
-      <button class="main-glass-button" type="button" @click="closeModal">
+      <button class="glass-button" type="button" @click="closeModal">
         {{ t('customEntry.featureRecord.actions.cancel') }}
       </button>
       <button
-        class="main-glass-button"
+        class="glass-button"
         data-variant="primary"
         type="button"
         :disabled="isSaving"
@@ -559,8 +559,6 @@ watch(
 
 @use '../../_map-variables' as *;
 
-@use '@/styles/main/_surfaces.scss';
-
 .feature-record-header {
   display: flex;
   align-items: center;
@@ -607,6 +605,10 @@ watch(
   &-full {
     grid-column: 1 / -1;
   }
+}
+
+.feature-record-input {
+  width: 100%;
 }
 
 .location-input-wrapper {
@@ -754,17 +756,21 @@ watch(
   color: $text-strong;
 }
 
+/* 字段提示触发钮: 仅尺寸/颜色覆盖, 视觉见 main/_buttons.scss 的 .pill-btn */
 .field-notice-trigger {
-  --main-glass-button-padding: 2px 10px;
-  font-size: 11px;
-  color: $warning;
-  border-color: rgba(var(--color-warning-rgb), 0.3);
-  background: rgba(var(--color-warning-rgb), 0.06);
+  --pill-btn-padding: 6px 14px;
+  --pill-btn-font-size: 12px;
+  --pill-btn-font-weight: 600;
+  --pill-btn-color: #fff;
+  --pill-btn-border: 1px solid rgb(var(--color-warning-rgb));
+  --pill-btn-bg: rgb(var(--color-warning-rgb));
+  --pill-btn-hover-bg: var(--color-warning-dark);
+  --pill-btn-hover-border: var(--color-warning-dark);
+  --pill-btn-shadow: 0 4px 14px rgba(var(--color-warning-rgb), 0.35);
 
-  &:hover:not(:disabled) {
-    background: rgba(var(--color-warning-rgb), 0.12);
-    border-color: $warning;
-    color: $warning;
+  &::before {
+    content: "⚠️";
+    font-size: 13px;
   }
 
   &--inline {

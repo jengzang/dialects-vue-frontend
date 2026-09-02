@@ -8,20 +8,20 @@
       class="contribute-mode-switch"
     />
     <section v-if="shouldShowAccessGate" class="content-area">
-      <div class="access-gate main-glass-panel">
+      <div class="access-gate glass-panel">
         <h3>{{ accessGateTitle }}</h3>
         <p>{{ accessGateDescription }}</p>
         <div class="access-gate-actions">
           <button
             v-if="requiresLogin"
-            class="main-glass-button"
+            class="glass-button"
             data-variant="primary"
             type="button"
             @click="navigateToAuth()"
           >
             {{ t('words.wordList.access.loginAction') }}
           </button>
-          <button class="main-glass-button" data-variant="secondary" type="button" @click="navigateToList">
+          <button class="glass-button" data-variant="secondary" type="button" @click="navigateToList">
             {{ t('words.wordList.access.backToList') }}
           </button>
         </div>

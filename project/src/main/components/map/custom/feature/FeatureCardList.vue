@@ -2,30 +2,30 @@
   <section class="feature-card-list">
     <div class="feature-card-toolbar">
       <div class="feature-card-heading">
-        <input v-model="keyword" class="feature-card-search main-search-field" type="text" :placeholder="t('customEntry.featureList.searchPlaceholder')" />
+        <input v-model="keyword" class="feature-card-search glass-field" data-shape="search" type="text" :placeholder="t('customEntry.featureList.searchPlaceholder')" />
         <h4 class="feature-card-title">{{ t('customEntry.featureList.title') }}</h4>
         <p class="feature-card-description">{{ t('customEntry.featureList.description') }}</p>
       </div>
-      <button class="main-glass-button" data-variant="primary" type="button" @click="$emit('create')">
+      <button class="glass-button" data-variant="primary" type="button" @click="$emit('create')">
         {{ t('customEntry.featureList.create') }}
       </button>
     </div>
 
     <div v-if="loading" class="feature-grid main-card-grid">
-      <div v-for="index in 3" :key="index" class="feature-card feature-card-skeleton main-data-card main-glass-panel-inner" aria-hidden="true">
+      <div v-for="index in 3" :key="index" class="feature-card feature-card-skeleton glass-card" aria-hidden="true">
         <div class="skeleton-line skeleton-line-lg"></div>
         <div class="skeleton-chip"></div>
         <div class="skeleton-line skeleton-line-sm"></div>
       </div>
     </div>
 
-    <div v-else-if="errorMessage" class="feature-list-state main-list-state main-glass-panel-inner" data-state="error">
+    <div v-else-if="errorMessage" class="feature-list-state main-list-state glass-subpanel" data-state="error">
       <div class="feature-list-state-title main-list-state-title">{{ t('customEntry.featureList.loadFailed') }}</div>
       <p class="feature-list-state-text main-list-state-text">{{ errorMessage }}</p>
-      <button class="main-glass-button" type="button" @click="$emit('retry')">{{ t('customEntry.featureList.retry') }}</button>
+      <button class="glass-button" type="button" @click="$emit('retry')">{{ t('customEntry.featureList.retry') }}</button>
     </div>
 
-    <div v-else-if="filteredItems.length === 0" class="feature-list-state main-list-state main-glass-panel-inner">
+    <div v-else-if="filteredItems.length === 0" class="feature-list-state main-list-state glass-subpanel">
       <div class="feature-list-state-title main-list-state-title">{{ t('customEntry.featureList.emptyTitle') }}</div>
       <p class="feature-list-state-text main-list-state-text">{{ t('customEntry.featureList.emptyText') }}</p>
     </div>
@@ -34,7 +34,8 @@
       <button
         v-for="item in filteredItems"
         :key="item.feature_key || `${item['特徵'] || ''}-${item['聲韻調'] || ''}`"
-        class="feature-card main-data-card main-glass-panel-inner"
+        class="feature-card glass-card"
+        data-interactive="true"
         type="button"
         @click="$emit('select', item)"
       >
@@ -97,8 +98,6 @@ function resolveToneType(item) {
 
 @use '../../_map-variables' as *;
 
-@use '@/styles/main/_surfaces.scss';
-
 .feature-card-list {
   @include flex-col;
   gap: 18px;
@@ -139,7 +138,11 @@ function resolveToneType(item) {
 }
 
 .feature-card {
-  --main-data-card-gap: 10px;
+  @include flex-col;
+  align-items: flex-start;
+  gap: var(--feature-card-gap, 10px);
+  padding: var(--feature-card-padding, 18px);
+  text-align: left;
 }
 
 .feature-card-name {

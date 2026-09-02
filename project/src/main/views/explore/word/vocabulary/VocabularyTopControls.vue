@@ -17,7 +17,7 @@
 
         <div class="field-filter">
           <button
-            class="gear-btn main-glass-button"
+            class="gear-btn glass-button"
             type="button"
             :title="t('words.wordList.search.settings')"
             @click="searchFieldModalOpen = true"
@@ -52,6 +52,8 @@
                 :show-label="true"
                 :active-text="t('words.wordList.search.filterByRegion')"
                 :inactive-text="t('words.wordList.search.filterByLocation')"
+                label-position="inside"
+                auto-width
                 @update:model-value="emit('update:filterByRegion', $event)"
               />
             </div>
@@ -64,6 +66,8 @@
                 :show-label="true"
                 :active-text="t('words.wordList.search.singleSelect')"
                 :inactive-text="t('words.wordList.search.multiSelect')"
+                label-position="inside"
+                auto-width
               />
             </div>
           </AppModal>
@@ -91,7 +95,7 @@
         <template v-else>
           <button
             ref="standardWordTriggerEl"
-            class="select-trigger global-select-trigger standard-word-select-trigger"
+            class="select-trigger standard-word-select-trigger"
             :class="{ 'is-open': standardWordDropdownOpen, 'is-disabled': standardWordOptions.length === 0 }"
             type="button"
             :disabled="standardWordOptions.length === 0"
@@ -122,7 +126,7 @@
       >
         <button
           ref="locationTriggerEl"
-          class="select-trigger global-select-trigger location-select-trigger"
+          class="select-trigger location-select-trigger"
           :class="{ 'is-open': locationDropdownOpen, 'is-disabled': locationOptions.length === 0 }"
           type="button"
           :disabled="locationOptions.length === 0"
@@ -317,6 +321,7 @@ const standardWordTriggerLabel = computed(() => {
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
+@use '@/components/selector/selector' as *;
 
 .top-controls {
   // border: 1px solid var(--glass-30);

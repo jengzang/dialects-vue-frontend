@@ -1,12 +1,12 @@
 <template>
-  <main class="toponyms-page glass-container glass-container-shell">
-    <section class="toponyms-page__hero">
-      <h1>{{ t('villages.pages.toponyms.title') }}</h1>
-      <p>{{ t('villages.pages.toponyms.subtitle') }}</p>
-    </section>
+  <main class="toponyms-page glass-container glass-shell">
+    <section class="toponyms-page__controls glass-panel">
+      <div class="toponyms-page__controls-inner glass-subpanel">
+        <div class="toponyms-page__toolbar-copy">
+          <h1><BarIcon icon="📍" />{{ t('navigation.pageTitles.villages.toponyms') }}</h1>
+          <p>{{ t('villages.pages.toponyms.subtitle') }}</p>
+        </div>
 
-    <section class="toponyms-page__controls main-glass-panel">
-      <div class="toponyms-page__controls-inner main-glass-panel-inner">
         <ToponymSearchBar
           v-model:query="query"
           v-model:match-mode="matchMode"
@@ -15,20 +15,22 @@
         >
           <template #actions>
             <button
-              class="main-glass-button"
+              class="glass-button"
               type="button"
               data-variant="secondary"
               :aria-label="t('villages.pages.toponyms.chart.configAriaLabel')"
               @click="openChartConfig"
-            ><InlineIcon icon="⚙" /></button>
+            >
+              <InlineIcon icon="⚙" />
+            </button>
           </template>
         </ToponymSearchBar>
       </div>
     </section>
 
     <section class="toponyms-page__workspace">
-      <div class="toponyms-page__chart main-glass-panel">
-        <div class="toponyms-page__chart-inner main-glass-panel-inner">
+      <div class="toponyms-page__chart glass-panel">
+        <div class="toponyms-page__chart-inner glass-subpanel">
           <div class="toponyms-page__chart-header">
             <div class="toponyms-page__stat-strip">
               <span>{{ t('villages.pages.toponyms.chart.pointsSeries') }}</span>
@@ -114,9 +116,11 @@
 </template>
 
 <script setup>
-import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
+import InlineIcon from '@/components/common/InlineIcon.vue';
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
 import {
   getToponymDetails,
   getToponymNames,
@@ -133,7 +137,10 @@ import { buildToponymScatterData } from './toponymsChartData.js';
 import { getDefaultToponymsLayerState, loadToponymsGisAsset } from './toponymsGisAssets.js';
 
 const { t } = useI18n();
+const route = useRoute();
 const TOPONYM_NAME_TREE_PAGE_SIZE = 100;
+const TOPONYM_MATCH_MODES = new Set(['prefix', 'suffix', 'exact', 'contains']);
+const TOPONYM_VILLAGE_PLACE_TYPE_CODES = ['22200', '21610', '27610'];
 
 const chartRef = ref(null);
 const query = ref('');
@@ -192,6 +199,10 @@ const countryLayer = computed(() => loadedLayers.country || null);
 onMounted(() => {
   setupLayoutWatcher();
   loadCountryLayer();
+
+  if (hydrateSearchFromRouteQuery()) {
+    handleSearch();
+  }
 });
 
 onBeforeUnmount(() => {
@@ -220,6 +231,26 @@ async function loadCountryLayer() {
   }
 }
 
+function hydrateSearchFromRouteQuery() {
+  const rawRouteQuery = Array.isArray(route.query.q) ? route.query.q[0] : route.query.q;
+  const routeQuery = typeof rawRouteQuery === 'string' ? rawRouteQuery.trim() : '';
+
+  if (!routeQuery) return false;
+
+  query.value = routeQuery;
+
+  const rawRouteMatchMode = Array.isArray(route.query.match_mode)
+    ? route.query.match_mode[0]
+    : route.query.match_mode;
+  const routeMatchMode = typeof rawRouteMatchMode === 'string' ? rawRouteMatchMode : '';
+
+  if (TOPONYM_MATCH_MODES.has(routeMatchMode)) {
+    matchMode.value = routeMatchMode;
+  }
+
+  return true;
+}
+
 async function handleSearch() {
   const keyword = query.value.trim();
   hasSearched.value = true;
@@ -239,6 +270,7 @@ async function handleSearch() {
   const searchParams = {
     q: keyword,
     match_mode: matchMode.value,
+    place_type_code: TOPONYM_VILLAGE_PLACE_TYPE_CODES,
   };
   const requestId = pointsRequestId.value + 1;
   pointsRequestId.value = requestId;
@@ -491,17 +523,6 @@ function updateNameTreeMeta(payload) {
 }
 
 function mergeLazyTreePayload(node, payload) {
-  if (Array.isArray(payload.children)) {
-    node.children = buildToponymTreeNodes(payload.children, {
-      parentPath: node.path,
-      lazy: true,
-      levels: nameTreeMeta.levels,
-    });
-    node.loaded = true;
-    node.expanded = true;
-    return;
-  }
-
   if (Array.isArray(payload.names)) {
     node.names = payload.page && payload.page > 1
       ? [...node.names, ...payload.names]
@@ -511,6 +532,16 @@ function mergeLazyTreePayload(node, payload) {
     node.loaded = true;
     node.expanded = true;
     node.lazy = false;
+  }
+
+  if (Array.isArray(payload.children)) {
+    node.children = buildToponymTreeNodes(payload.children, {
+      parentPath: node.path,
+      lazy: true,
+      levels: nameTreeMeta.levels,
+    });
+    node.loaded = true;
+    node.expanded = true;
   }
 }
 
@@ -643,9 +674,21 @@ async function handleToggleLayer({ key, visible }) {
   min-height: 70dvh;
   padding: 20px;
 
-  &__hero {
+  &__controls {
+    width: 100%;
+  }
+
+  &__controls-inner {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.34fr) minmax(0, 1fr);
+    gap: 16px;
+    align-items: center;
+  }
+
+  &__toolbar-copy {
     @include flex-col;
-    gap: 6px;
+    gap: 4px;
+    min-inline-size: 0;
 
     h1,
     p {
@@ -654,25 +697,15 @@ async function handleToggleLayer({ key, visible }) {
 
     h1 {
       color: var(--text-deep);
-      font-size: 26px;
+      font-size: 18px;
       line-height: 1.25;
     }
 
     p {
-      max-inline-size: 760px;
       color: var(--text-secondary);
-      font-size: 14px;
-      line-height: 1.6;
+      font-size: 12px;
+      line-height: 1.5;
     }
-  }
-
-  &__controls {
-    width: 100%;
-  }
-
-  &__controls-inner {
-    @include flex-col;
-    gap: 14px;
   }
 
   &__workspace {
@@ -726,12 +759,6 @@ async function handleToggleLayer({ key, visible }) {
     }
   }
 
-  &__chart-toolbar {
-    display: flex;
-    justify-content: flex-end;
-    min-inline-size: 0;
-  }
-
   &__detail-card-header {
     @include flex-col;
     gap: 4px;
@@ -763,12 +790,13 @@ async function handleToggleLayer({ key, visible }) {
       grid-template-columns: 1fr;
     }
 
-    &__chart-header {
-      @include flex-col;
+    &__controls-inner {
+      grid-template-columns: 1fr;
+      align-items: stretch;
     }
 
-    &__chart-toolbar {
-      justify-content: flex-start;
+    &__chart-header {
+      @include flex-col;
     }
 
     &__chart,

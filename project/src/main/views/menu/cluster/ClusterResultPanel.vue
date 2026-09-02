@@ -1,6 +1,6 @@
 <template>
   <section
-    class="panel main-glass-panel"
+    class="panel glass-panel"
     data-step="result"
   >
     <div class="panel-header">
@@ -10,7 +10,7 @@
       </div>
       <button
         v-if="canReloadResult"
-        class="global-action-btn global-action-btn-secondary reload-result-btn"
+        class="action-btn action-btn-secondary reload-result-btn"
         type="button"
         @click="reloadCurrentResult"
       >
@@ -26,7 +26,7 @@
         <div
           v-for="card in resultSummaryCards"
           :key="card.label"
-          class="summary-card main-glass-panel-inner"
+          class="summary-card glass-subpanel"
         >
           <span class="summary-card__label">{{ card.label }}</span>
           <strong>{{ card.value }}</strong>
@@ -34,7 +34,7 @@
       </div>
 
       <div class="result-reading-grid">
-        <div class="result-section main-glass-panel-inner">
+        <div class="result-section glass-subpanel">
           <div class="section-heading section-heading--dense">
             <div>
               <h3>{{ t('cluster.result.assignments') }}</h3>
@@ -74,7 +74,7 @@
           </div>
         </div>
 
-        <div class="result-section main-glass-panel-inner">
+        <div class="result-section glass-subpanel">
           <div class="section-heading section-heading--dense">
             <div>
               <h3>{{ t('cluster.result.groups') }}</h3>
@@ -109,7 +109,7 @@
         </div>
       </div>
 
-      <details class="result-section main-glass-panel-inner">
+      <details class="result-section glass-subpanel">
         <summary>{{ t('cluster.result.advanced') }}</summary>
         <div class="advanced-stack">
           <div>

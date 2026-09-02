@@ -1,5 +1,5 @@
 <template>
-  <div class="audio-input-panel main-glass-panel">
+  <div class="audio-input-panel glass-panel">
 <!--    <h2 class="panel-title">音頻輸入</h2>-->
 
     <!-- File Upload Area -->
@@ -31,7 +31,7 @@
         </div>
 
         <button
-          class="record-button main-glass-button"
+          class="record-button glass-button"
           :class="{ 'recording': isRecording }"
           @click="toggleRecording"
           :disabled="isProcessing"
@@ -47,7 +47,7 @@
     </div>
 
     <!-- Selected File Info -->
-    <div v-if="displayFile" class="file-info main-glass-panel-inner">
+    <div v-if="displayFile" class="file-info glass-subpanel">
       <div class="file-details">
         <span class="file-name"><InlineIcon icon="📁" />{{ displayFile.name }}</span>
         <span class="file-size">{{ formatFileSize(displayFile.size) }}</span>

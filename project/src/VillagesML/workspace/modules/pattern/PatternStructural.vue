@@ -1,12 +1,12 @@
 <template>
   <div class="pattern-structural-page">
-    <h3 class="villagesml-subtab-title">
-      模式分析 - 結構分析
+    <h1 class="villagesml-subtab-title">
+      <BarIcon icon="🏗️" />模式分析 - 結構分析
       <HelpIcon content="分析村名的結構模式。前綴模式：以特定字符開頭（如「新X」）。後綴模式：以特定字符結尾（如「X村」）。複合模式：包含特定字符組合的模式" />
-    </h3>
+    </h1>
 
     <div class="vml-glass-panel">
-      <h2><InlineIcon icon="🏗️" />模式結構分析</h2>
+      <h2><BarIcon icon="🏗️" />模式結構分析</h2>
 
       <!-- Controls -->
       <div class="controls vml-control-surface vml-control-row">
@@ -71,6 +71,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'

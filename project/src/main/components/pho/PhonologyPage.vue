@@ -13,7 +13,7 @@
         @update:isMatching="handleIsMatching"
       />
       <button
-        class="load-btn"
+        class="action-btn"
         @click="loadData"
         :disabled="matchedLocations.length === 0 || loading || isMatching"
       >
@@ -34,17 +34,22 @@
     </div>
 
     <div v-else-if="matrixData" class="matrix-container">
-      <PhonologyMatrix
-        v-for="location in displayLocations"
-        :key="location"
-        :location="location"
-        :initials="matrixData[location].initials"
-        :finals="matrixData[location].finals"
-        :tones="matrixData[location].tones"
-        :matrix="matrixData[location].matrix"
-        :cell-detail-enabled="true"
-        :cell-details="matrixData[location].cellDetails"
-      />
+      <template v-for="location in displayLocations" :key="location">
+        <PhonologyMatrix
+          :location="location"
+          :initials="matrixData[location].initials"
+          :finals="matrixData[location].finals"
+          :tones="matrixData[location].tones"
+          :matrix="matrixData[location].matrix"
+          :cell-detail-enabled="true"
+          :cell-details="matrixData[location].cellDetails"
+        />
+        <HomophoneLexicon
+          :location="location"
+          :data="matrixData[location]"
+          show-copy
+        />
+      </template>
     </div>
 
     <div v-else class="empty">
@@ -59,7 +64,9 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getPhonologyMatrix } from '@/api'
 import PhonologyMatrix from '@/main/components/TableAndTree/PhonologyTable.vue'
+import HomophoneLexicon from '@/main/components/pho/HomophoneLexicon.vue'
 import LocationMultiInput from '@/main/components/geo/LocationMultiInput.vue'
+import { transformMatrixReadStats } from '@/main/utils/phonology/readingStats.js'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
@@ -98,7 +105,7 @@ const serializeMatrixLocationQuery = (locations) => {
     .map((location) => encodeQueryValueBase64Url(location))
 }
 
-const { state: locationQuery, set: setLocationQuery } = useRouteQueryState('loc', {
+const { state: locationQuery, set: setLocationQuery } = useRouteQueryState('mloc', {
   defaultValue: [],
   parse: parseMatrixLocationQuery,
   serialize: serializeMatrixLocationQuery,
@@ -115,57 +122,6 @@ const displayLocations = computed(() => {
   if (!matrixData.value) return []
   return Object.keys(matrixData.value)
 })
-
-const transformMatrixReadStats = (matrixReadStats = {}) => {
-  const transformedCellDetails = {}
-
-  Object.entries(matrixReadStats || {}).forEach(([initial, finalMap]) => {
-    transformedCellDetails[initial] = {}
-
-    Object.entries(finalMap || {}).forEach(([final, toneMap]) => {
-      transformedCellDetails[initial][final] = {}
-
-      Object.entries(toneMap || {}).forEach(([tone, readStats]) => {
-        const polyphonicDetails = readStats?.polyphonic?.details || {}
-
-        const items = [
-          ['polyphonic', '多音字'],
-          ['wendu', '文讀'],
-          ['baidu', '白讀'],
-          ['wenbai', '文白讀']
-        ]
-          .map(([key, label]) => {
-            const bucket = readStats?.[key]
-            const item = {
-              label,
-              count: Number(bucket?.count || 0),
-              chars: Array.isArray(bucket?.chars) ? bucket.chars : []
-            }
-
-            if (key === 'polyphonic') {
-              const detailEntries = Object.entries(polyphonicDetails).map(([char, values]) => ({
-                char,
-                values: Array.isArray(values) ? values : []
-              }))
-
-              if (detailEntries.length > 0) {
-                item.details = detailEntries
-              }
-            }
-
-            return item
-          })
-          .filter((item) => item.count > 0 || item.chars.length > 0 || item.details?.length > 0)
-
-        if (items.length > 0) {
-          transformedCellDetails[initial][final][tone] = items
-        }
-      })
-    })
-  })
-
-  return transformedCellDetails
-}
 
 // 处理匹配到的地点列表
 const handleMatchedLocations = (locations) => {
@@ -214,31 +170,43 @@ const loadData = async () => {
   })
 }
 
+// URL 中的 loc 已是规范地点名（loadData 写入的是 matchedLocations），
+// 直接用它初始化 matchedLocations 并自动查询，不再依赖 LocationMultiInput 的异步匹配
+const runUrlAutoQuery = () => {
+  const urlLocations = Array.isArray(locationQuery.value)
+    ? locationQuery.value.slice(0, PHONOLOGY_LOCATION_LIMITS.matrix)
+    : []
+
+  if (urlLocations.length === 0) return
+
+  matchedLocations.value = [...urlLocations]
+  loadData()
+}
+
 // 页面加载时自动查询
 onMounted(() => {
-  if (locationQuery.value.length > 0) {
-    // 等待 LocationMultiInput 完成地点匹配
-    const unwatch = watch(matchedLocations, (locations) => {
-      if (locations.length > 0) {
-        loadData()
-        unwatch() // 只自动查询一次
-      }
-    })
-  }
+  runUrlAutoQuery()
 })
 
-// 处理浏览器前进/后退
+// 处理浏览器前进/后退 + 跨页跳转（含 KeepAlive 重新激活时 URL 变化）
 watch(locationQuery, (urlLocations) => {
   const limitedUrlLocations = Array.isArray(urlLocations)
     ? urlLocations.slice(0, PHONOLOGY_LOCATION_LIMITS.matrix)
     : []
 
-  // 只有当 URL 的地点和当前匹配的地点不同时，才需要清空数据
+  // 只有当 URL 的地点和当前匹配的地点不同时，才需要清空数据并重新查询
   // 这样可以避免在查询成功更新 URL 后误清空数据
-  if (JSON.stringify(limitedUrlLocations) !== JSON.stringify(matchedLocations.value)) {
-    queryStrings.value = [...limitedUrlLocations]
-    matrixData.value = null
-    error.value = null
+  if (JSON.stringify(limitedUrlLocations) === JSON.stringify(matchedLocations.value)) {
+    return
+  }
+
+  queryStrings.value = [...limitedUrlLocations]
+  matrixData.value = null
+  error.value = null
+
+  if (limitedUrlLocations.length > 0) {
+    matchedLocations.value = [...limitedUrlLocations]
+    loadData()
   }
 })
 </script>
@@ -256,53 +224,6 @@ watch(locationQuery, (urlLocations) => {
     justify-content: center;
     gap: 5px;
     margin: 0 auto 30px;
-  }
-
-  /* 查询按钮 */
-  .load-btn {
-    max-width: 100px;
-    @include flex-center;
-    gap: 8px;
-    padding: 12px 24px;
-    background: linear-gradient(
-      135deg,
-      var(--color-primary) 0%,
-      var(--color-primary-hover) 100%
-    );
-    border: none;
-    border-radius: var(--radius-md);
-    box-shadow:
-      0 4px 12px var(--color-primary-shadow),
-      0 2px 4px var(--bg-overlay-light2);
-    color: var(--action-primary-text);
-    white-space: nowrap;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-
-    &:hover:not(:disabled) {
-      background: linear-gradient(
-        135deg,
-        var(--color-primary-hover) 0%,
-        var(--color-primary-hover) 100%
-      );
-      box-shadow:
-        0 6px 16px var(--color-primary-shadow-light),
-        var(--shadow-sm-dark);
-      transform: translateY(-1px);
-    }
-
-    &:active:not(:disabled) {
-      transform: translateY(0);
-    }
-
-    &:disabled {
-      background: var(--bg-hover-medium);
-      box-shadow: none;
-      color: var(--text-secondary);
-      cursor: not-allowed;
-    }
   }
 
   /* 加载与错误状态 */
@@ -353,6 +274,12 @@ watch(locationQuery, (urlLocations) => {
   .matrix-container {
     @include flex-col;
     gap: 30px;
+    padding: 32px;
+
+    @media (max-aspect-ratio: 1/1) {
+      padding: 16px;
+    }
+
   }
 
   /* 空状态 */
@@ -369,9 +296,9 @@ watch(locationQuery, (urlLocations) => {
       max-width: 100%;
     }
 
-    .load-btn {
-      padding: 10px 20px;
-      font-size: 14px;
+    .action-btn {
+      --action-btn-padding: 10px 20px;
+      --action-btn-font-size: 14px;
     }
   }
 }

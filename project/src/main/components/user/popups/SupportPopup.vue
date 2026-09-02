@@ -51,8 +51,8 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
-import weixinQR from '@/assets/picture/weixin.png'
-import alipayQR from '@/assets/picture/zfb.jpg'
+const weixinQR = '/brand/weixin.webp'
+const alipayQR = '/brand/zfb.webp'
 
 defineProps({
   visible: {

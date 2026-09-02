@@ -11,23 +11,55 @@
   "showcase": {
     "nav": "產品展示",
     "switchTo": "切換到",
-    "yinxi": { "title": "方言音系", "action": "查看音系" },
-    "zhonggu": { "title": "中古查詢地圖", "action": "查看地圖" },
-    "result": { "title": "查詢結果", "action": "查看結果" },
-    "villages": { "title": "廣東自然村", "action": "瀏覽村落" },
-    "compare": { "title": "方言比較", "action": "進入比較" },
-    "gis": { "title": "GIS 繪圖", "action": "開始繪圖" },
-    "evolution": { "title": "語音演化", "action": "查看演化" },
-    "photiccompare": { "title": "比較音值", "action": "查看桑基圖" }
+    "yinxi": {
+      "title": "方言音系",
+      "action": "查看音系"
+    },
+    "zhonggu": {
+      "title": "地理語言學",
+      "action": "開始查中古"
+    },
+    "result": {
+      "title": "查中古結果",
+      "action": "查看結果"
+    },
+    "villages": {
+      "title": "廣東自然村",
+      "action": "瀏覽村落"
+    },
+    "compare": {
+      "title": "方言比較",
+      "action": "進入比較"
+    },
+    "gis": {
+      "title": "GIS 繪圖",
+      "action": "開始繪圖"
+    },
+    "evolution": {
+      "title": "語音演化",
+      "action": "查看演化"
+    },
+    "photiccompare": {
+      "title": "比較音值",
+      "action": "查看桑基圖"
+    },
+    "praat": {
+      "title": "在線Praat",
+      "action": "開始聲學分析"
+    }
   },
   "features": {
     "sectionTitle": "核心功能",
+    "searchPlaceholder": "搜尋功能…",
+    "recent": "最近使用",
+    "clearRecent": "清除",
+    "noResults": "沒有符合的功能",
     "query": {
       "title": "查詢分析",
       "desc": "多維度查詢方言音韻資料",
       "searchChar": "查字 - 查詢字音、地位",
-      "searchMiddle": "查中古 - 按中古地位整理讀音",
-      "searchPhoneme": "查音位 - 分析音位的中古來源",
+      "searchMiddle": "查中古 - 按韻書地位整理讀音",
+      "searchPhoneme": "查音位 - 分析音位的韻書來源",
       "searchTone": "查調 - 查詢調值、調類"
     },
     "compare": {
@@ -53,7 +85,7 @@
       "phonemeClassify": "音素分類 - 按自定義類別分析音素",
       "syllableCount": "音節統計 - 統計音節數量",
       "middlePosition": "中古地位 - 查詢漢字中古地位",
-      "evolution": "演變 - 餅圖桑基圖展示方言演變"
+      "evolution": "演化 - 餅圖桑基圖展示方言演化"
     },
     "words": {
       "title": "詞句資料",
@@ -108,6 +140,30 @@
       "desc": "方言聚類流程頁面占位"
     }
   },
+  "platform": {
+    "eyebrow": "方音圖鑑平台",
+    "title": "保存語言多樣性之美，一次一個方言",
+    "desc": "一個專注於中古地位分析、方言比較與地理語言學的線上工具，讓各方言點的聲韻層次與音位分合更容易被探索。",
+    "stats": {
+      "visits": "累計訪問",
+      "locations": "方言地點",
+      "records": "字表記錄"
+    }
+  },
+  "featured": {
+    "sectionTitle": "特色工具",
+    "sectionSubtitle": "精選核心功能，一鍵直達",
+    "viewAll": "查看全部 →",
+    "discover": "進入工具 →",
+    "items": {
+      "zhonggu": { "name": "查中古", "desc": "按中古地位整理各方言點讀音", "tag": "查詢" },
+      "compare": { "name": "方言比較", "desc": "對比各方言點聲韻調的字音差異", "tag": "比較" },
+      "gis": { "name": "GIS 繪圖", "desc": "GIS 在線繪圖 · 泰森多邊形", "tag": "地圖" },
+      "phonology": { "name": "音系查詢", "desc": "查看各方言點音系表", "tag": "音系" },
+      "tableProcess": { "name": "字表處理", "desc": "字表檢查與格式轉換", "tag": "工具" },
+      "praat": { "name": "Praat 聲學分析", "desc": "實驗語音學工具與數據分析", "tag": "聲學" }
+    }
+  },
   "roadmap": {
     "sectionTitle": "開發中的功能",
     "sectionSubtitle": "即將推出的新特性",
@@ -150,6 +206,7 @@
     "loginNow": "立即登錄",
     "viewDetails": "查看詳情"
   },
+  "viewDetails": "詳情",
   "intro": {
     "thanks": {
       "aboutTitle": "ℹ️ 關於網站",
@@ -202,7 +259,7 @@
       "follow": "關注",
       "starText": "「如果你覺得項目不錯，可以給個 ⭐️ 嗎！」",
       "zhihuLike": "「喜歡的話，也歡迎去知乎點個讚 👍」",
-      "frontendRepo":"前端倉庫 - 基於 Vue3 + js + scss 開發",
+      "frontendRepo": "前端倉庫 - 基於 Vue3 + js + scss 開發",
       "backendRepo": "後端倉庫 - 基於 FastAPI + Python + SQLAlchemy",
       "buildRepo": "字表預處理倉庫 - 提取字表的聲韻調",
       "zhihuProjectName": "方音圖鑑",

@@ -1,6 +1,6 @@
 <template>
   <div class="derive-tool-page">
-    <div class="glass-container glass-container-shell derive-tool-shell">
+    <div class="glass-container glass-shell derive-tool-shell">
       <div class="derive-tool-placeholder">
         <p class="derive-tool-placeholder__text">当前页面仅为占位，功能尚未实现。</p>
       </div>

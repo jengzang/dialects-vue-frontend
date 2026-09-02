@@ -242,6 +242,66 @@
         "official": "無法加載民政部詳情。"
       }
     },
+    "toponymSearch": {
+      "title": "地名查詢",
+      "subtitle": "查詢具體自然村地名條目，點擊結果後查看本地詳情。",
+      "search": {
+        "keyword": "關鍵詞",
+        "placeholder": "例如：樊家、黃、村",
+        "matchMode": "匹配方式",
+        "placeType": "地名類型",
+        "areaCode": "行政區 code",
+        "areaCodePlaceholder": "例如：44",
+        "areaScope": "行政區範圍",
+        "limit": "返回數量",
+        "submit": "搜索地名",
+        "searching": "搜索中...",
+        "reset": "重置"
+      },
+      "areaScopes": {
+        "descendants": "包含下級",
+        "exact": "僅當前行政區"
+      },
+      "limits": {
+        "50": "50 條",
+        "100": "100 條",
+        "200": "200 條"
+      },
+      "results": {
+        "title": "查詢結果",
+        "idle": "輸入關鍵詞後點擊搜索。",
+        "loading": "正在查詢地名...",
+        "empty": "沒有找到匹配條目。",
+        "loadFailed": "查詢失敗",
+        "count": "找到 {count} 條，當前顯示 {shown} 條。",
+        "truncated": "結果已截斷，請縮小範圍或使用更嚴格的匹配方式。"
+      },
+      "detail": {
+        "title": "條目詳情",
+        "empty": "點擊結果後查看詳情。",
+        "loading": "正在加載詳情...",
+        "loadFailed": "詳情加載失敗",
+        "source": "來源",
+        "sourceName": "本地地名庫",
+        "id": "ID",
+        "name": "標準地名",
+        "placeType": "類型",
+        "coordinates": "經緯度",
+        "divisionPath": "行政區劃",
+        "unknown": "未知",
+        "viewDistribution": "查看分佈"
+      },
+      "placeTypes": {
+        "22200": "自然村/農村居民點",
+        "21610": "行政村",
+        "27610": "村委會"
+      },
+      "errors": {
+        "emptyQuery": "請輸入關鍵詞後再搜索。",
+        "search": "無法查詢地名。",
+        "details": "無法加載本地詳情。"
+      }
+    },
     "allVillages": {
       "title": "全部自然村",
       "searchPlaceholder": "搜索已加載的村落...",

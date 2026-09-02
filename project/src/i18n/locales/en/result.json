@@ -46,6 +46,14 @@
     "displayMode": {
       "full": "Full",
       "main": "Main"
+    },
+    "export": {
+      "button": "Copy/Export",
+      "copy": "Copy",
+      "export": "Export",
+      "copied": "Copied to clipboard",
+      "exported": "CSV exported",
+      "copyFailed": "Copy failed"
     }
   },
   "valuePopup": {
@@ -78,6 +86,13 @@
   },
   "locationDetailPopup": {
     "title": "Location {name}",
+    "phonologyActions": {
+      "title": "Quick View",
+      "matrix": "View Phonology",
+      "evolution": "Middle Chinese Evolution",
+      "count": "Syllable Statistics",
+      "homophone": "Homophone Lexicon"
+    },
     "loading": "Loading...",
     "noData": "No data",
     "fields": {
@@ -147,6 +162,13 @@
     "charNav": {
       "title": "Character navigation",
       "jumpToChar": "Jump to \"{char}\""
+    },
+    "export": {
+      "copy": "Copy",
+      "export": "Export",
+      "copied": "Copied to clipboard",
+      "exported": "CSV exported",
+      "copyFailed": "Copy failed"
     }
   },
   "phonologyTable": {

@@ -1,14 +1,14 @@
 <template>
   <div class="semantic-ngrams-page">
-    <h3 class="villagesml-subtab-title">
-      語義分析 - N-gram分析
+    <h1 class="villagesml-subtab-title">
+      <BarIcon icon="🔤" />語義分析 - N-gram分析
       <HelpIcon
         content="分析語義類別的Bigram（二元）和Trigram（三元）組合模式。PMI（互信息）衡量類別間關聯強度，PMI>2表示強關聯。支持詳細模式（76子類）和普通模式（9大類）"
         size="md"
         fontSize="16px"
         trigger="both"
       />
-    </h3>
+    </h1>
 
     <!-- Detail Mode Toggle -->
     <SemanticDetailToolbar v-model="detailMode" />
@@ -193,6 +193,7 @@
 import { ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import SemanticDetailToolbar from '@/VillagesML/components/SemanticDetailToolbar.vue'
 import {
   getSemanticBigrams,

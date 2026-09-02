@@ -46,6 +46,14 @@
     "displayMode": {
       "full": "全顯",
       "main": "主體"
+    },
+    "export": {
+      "button": "複製/導出",
+      "copy": "複製",
+      "export": "導出",
+      "copied": "已複製到剪貼板",
+      "exported": "已導出 CSV",
+      "copyFailed": "複製失敗"
     }
   },
   "valuePopup": {
@@ -78,6 +86,13 @@
   },
   "locationDetailPopup": {
     "title": "地點 {name}",
+    "phonologyActions": {
+      "title": "快速查看",
+      "matrix": "查看音系",
+      "evolution": "中古演化",
+      "count": "音節統計",
+      "homophone": "同音字彙"
+    },
     "loading": "載入中...",
     "noData": "暫無數據",
     "fields": {
@@ -147,6 +162,13 @@
     "charNav": {
       "title": "漢字導航",
       "jumpToChar": "跳轉到「{char}」"
+    },
+    "export": {
+      "copy": "複製",
+      "export": "導出",
+      "copied": "已複製到剪貼板",
+      "exported": "已導出 CSV",
+      "copyFailed": "複製失敗"
     }
   },
   "phonologyTable": {

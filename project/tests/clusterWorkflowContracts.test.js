@@ -25,7 +25,8 @@ describe('cluster workflow contracts', () => {
     expect(pageSource).toContain('ClusterTaskSidebar')
     expect(pageSource).toContain('useClusterWorkspace')
     expect(pageSource).toContain('provideClusterWorkspace')
-    expect(pageSource).toContain('main-glass-panel')
+    expect(pageSource).toContain('glass-panel')
+    expect(pageSource).not.toContain('main-glass-panel')
 
     expect(workspaceSource).toContain('usePollingTask')
     expect(workspaceSource).toContain('useStorageState')

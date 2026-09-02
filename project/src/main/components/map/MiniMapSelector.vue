@@ -278,7 +278,6 @@ onBeforeUnmount(() => {
 @use '@/styles/global/mixins' as *;
 
 @use './_map-variables' as *;
-@use '@/styles/main/_surfaces.scss';
 
 .mini-map-wrapper {
   position: relative;

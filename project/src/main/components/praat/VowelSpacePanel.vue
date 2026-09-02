@@ -1,5 +1,5 @@
 <template>
-  <div class="vowel-space-panel main-glass-panel">
+  <div class="vowel-space-panel glass-panel">
     <div style="display: flex;align-items: center;flex-direction: column;justify-content: center;">
       <h2 class="panel-title">{{ t('praat.vowelSpace.title') }}</h2>
 
@@ -56,7 +56,7 @@
         <CheckBox
           :model-value="showAll"
           :label="t('praat.vowelSpace.segments.selectAll')"
-          class="segment-checkbox main-glass-panel-inner"
+          class="segment-checkbox glass-subpanel"
           @update:modelValue="toggleAll"
         />
 
@@ -64,7 +64,7 @@
         <div
           v-for="seg in vowelSegments"
           :key="seg.id"
-          class="segment-checkbox main-glass-panel-inner"
+          class="segment-checkbox glass-subpanel"
         >
           <CheckBox
             :model-value="selectedSegments.has(seg.id)"
@@ -99,7 +99,7 @@
         <div
           v-for="data in segmentVowelData.filter(d => selectedSegments.has(d.segment.id))"
           :key="data.segment.id"
-          class="stat-card main-glass-panel-inner"
+          class="stat-card glass-subpanel"
         >
           <div class="stat-header">
             <span class="segment-color-dot" :style="{ backgroundColor: getSegmentColor(data.segment.id) }"></span>
@@ -446,7 +446,7 @@ const initChart = () => {
       minInterval: 1,
       // 【新增】标签格式化，强制去掉小数点
       axisLabel: {
-        formatter: (value) => value.toFixed(0)
+        formatter: (value) => value?.toFixed(0) ?? ''
       },
       max: (value) => {
         // 1. 先计算出带缓冲的最大值
@@ -474,7 +474,7 @@ const initChart = () => {
       minInterval: 1,
       // 【新增】
       axisLabel: {
-        formatter: (value) => value.toFixed(0)
+        formatter: (value) => value?.toFixed(0) ?? ''
       },
       max: (value) => {
         let val = value.max + 50;

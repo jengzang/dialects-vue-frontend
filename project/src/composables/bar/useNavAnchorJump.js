@@ -19,11 +19,17 @@ export function useNavAnchorJump(options = {}) {
     aggregatedData,
     hasChartData,
     hasResultData,
+    extraLocationData,
     isEnabled = true,
 
     chartsLabel = '圖表',
     totalLabelPrefix = '總',
     formatTotalLabel = null,
+
+    hasSyllableData,
+    syllableLabel = '匯總',
+    syllableNavId = 'count-syllable',
+    syllableAnchorId = 'count-syllable-anchor',
 
     chartsNavId = 'count-charts',
     chartsAnchorId = 'count-charts-anchor',
@@ -65,6 +71,8 @@ export function useNavAnchorJump(options = {}) {
 
   const getChartsAnchorId = () => chartsAnchorId
 
+  const getSyllableAnchorId = () => syllableAnchorId
+
   const getAggregatedAnchorId = (featureType) => {
     return `${totalAnchorPrefix}-${featureType}`
   }
@@ -78,8 +86,13 @@ export function useNavAnchorJump(options = {}) {
 
     const dataByLocation = getResolvedValue(featureData, {})
     const dataByFeatureType = getResolvedValue(aggregatedData, {})
+    const extraByLocation = getResolvedValue(extraLocationData, {})
 
     const orderedLocations = Object.keys(dataByLocation)
+
+    Object.keys(extraByLocation)
+      .filter((location) => !orderedLocations.includes(location))
+      .forEach((location) => orderedLocations.push(location))
     const totalItems = []
 
     if (Boolean(unref(hasChartData))) {
@@ -102,6 +115,15 @@ export function useNavAnchorJump(options = {}) {
       })
     })
 
+    if (unref(hasSyllableData)) {
+      totalItems.push({
+        id: syllableNavId,
+        fullLabel: syllableLabel,
+        targetKey: 'syllable',
+        kind: 'syllable'
+      })
+    }
+
     orderedLocations.forEach((location, index) => {
       totalItems.push({
         id: `${locationNavPrefix}-${index}`,
@@ -119,6 +141,10 @@ export function useNavAnchorJump(options = {}) {
 
     if (nav.kind === 'charts') {
       return document.getElementById(getChartsAnchorId())
+    }
+
+    if (nav.kind === 'syllable') {
+      return document.getElementById(getSyllableAnchorId())
     }
 
     if (nav.kind === 'total') {
@@ -239,6 +265,7 @@ export function useNavAnchorJump(options = {}) {
     currentVisibleNavId,
 
     getChartsAnchorId,
+    getSyllableAnchorId,
     getAggregatedAnchorId,
     getLocationAnchorId,
 

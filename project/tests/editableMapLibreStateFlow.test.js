@@ -85,6 +85,9 @@ vi.mock('maplibre-gl', () => {
       })
     }
     removeSource(sourceId) {
+      if ([...this.layers.values()].some((layer) => layer.source === sourceId)) {
+        throw new Error(`Source "${sourceId}" is still in use`)
+      }
       this.sources.delete(sourceId)
     }
     setLayoutProperty() {}
@@ -106,6 +109,11 @@ vi.mock('maplibre-gl', () => {
     }
     project([longitude, latitude]) {
       return { x: longitude, y: latitude }
+    }
+    unproject(point) {
+      const x = Array.isArray(point) ? point[0] : point?.x
+      const y = Array.isArray(point) ? point[1] : point?.y
+      return { toArray: () => [x, y] }
     }
   }
 
@@ -192,6 +200,18 @@ function mountEditableMapLibre(modelValue, options = {}) {
   const previewLayers = ref(options.previewLayers ?? [])
   const enablePreviewHover = ref(options.enablePreviewHover ?? false)
   const featureBoxSelectEnabled = ref(options.featureBoxSelectEnabled ?? false)
+  const snappingEnabled = ref(options.snappingEnabled ?? true)
+  const snapTolerance = ref(options.snapTolerance ?? 12)
+  const snapGridSize = ref(options.snapGridSize ?? 0)
+  const topologyEditingEnabled = ref(options.topologyEditingEnabled ?? true)
+  const sharedBoundaryProtectionEnabled = ref(options.sharedBoundaryProtectionEnabled ?? true)
+  const snapTargets = ref(options.snapTargets ?? {
+    vertex: true,
+    midpoint: true,
+    edge: true,
+    grid: true,
+    reference: true,
+  })
 
   const Root = defineComponent({
     components: { EditableMapLibre },
@@ -205,6 +225,12 @@ function mountEditableMapLibre(modelValue, options = {}) {
         previewLayers,
         enablePreviewHover,
         featureBoxSelectEnabled,
+        snappingEnabled,
+        snapTolerance,
+        snapGridSize,
+        snapTargets,
+        topologyEditingEnabled,
+        sharedBoundaryProtectionEnabled,
         events,
       }
     },
@@ -218,12 +244,22 @@ function mountEditableMapLibre(modelValue, options = {}) {
         :preview-layers="previewLayers"
         :enable-preview-hover="enablePreviewHover"
         :feature-box-select-enabled="featureBoxSelectEnabled"
+        :snapping-enabled="snappingEnabled"
+        :snap-tolerance="snapTolerance"
+        :snap-grid-size="snapGridSize"
+        :snap-targets="snapTargets"
+        :topology-editing-enabled="topologyEditingEnabled"
+        :shared-boundary-protection-enabled="sharedBoundaryProtectionEnabled"
         @before-features-change="events.push(['before-features-change'])"
         @features-change="events.push(['features-change', $event])"
         @feature-select="events.push(['feature-select', $event])"
         @shape-edit-state-change="events.push(['shape-edit-state-change', $event])"
         @feature-box-select="events.push(['feature-box-select', $event])"
         @mode-change="events.push(['mode-change', $event])"
+        @geometry-edit-feedback="events.push(['geometry-edit-feedback', $event])"
+        @snap-state-change="events.push(['snap-state-change', $event])"
+        @edit-target-hover="events.push(['edit-target-hover', $event])"
+        @map-click="events.push(['map-click', $event])"
       />
     `,
   })
@@ -243,7 +279,10 @@ function mountEditableMapLibre(modelValue, options = {}) {
       return mapInstances.at(-1)
     },
     currentStyleKey,
+    activeLayer,
+    allLayers,
     featureBoxSelectEnabled,
+    snapTargets,
     host,
     unmount() {
       app.unmount()
@@ -268,8 +307,19 @@ describe('EditableMapLibre state flow', () => {
         id: 'polygon-1',
         type: 'Feature',
         properties: { visible: true, locked: false },
-        geometry: { type: 'Polygon', coordinates: [] },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [0, 0],
+            [2, 0],
+            [2, 2],
+            [0, 2],
+            [0, 0],
+          ]],
+        },
       }],
+    }, {
+      snappingEnabled: false,
     })
     await nextTick()
 
@@ -367,7 +417,7 @@ describe('EditableMapLibre state flow', () => {
     wrapper.unmount()
   })
 
-  it('keeps locked or hidden features out of direct edit mode', async () => {
+  it('keeps locked or hidden features out of map selection modes', async () => {
     const wrapper = mountEditableMapLibre({
       type: 'FeatureCollection',
       features: [{
@@ -381,10 +431,515 @@ describe('EditableMapLibre state flow', () => {
 
     wrapper.exposed.selectFeature('hidden-1', { directEdit: true })
 
-    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select')
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: [] })
     expect(wrapper.draw.changeMode).not.toHaveBeenCalledWith('direct_select', { featureId: 'hidden-1' })
+    expect(wrapper.draw.changeMode).not.toHaveBeenCalledWith('simple_select', { featureIds: ['hidden-1'] })
     expect(wrapper.events).toContainEqual(['mode-change', 'simple_select'])
-    expect(wrapper.events).toContainEqual(['feature-select', 'hidden-1'])
+    expect(wrapper.events).not.toContainEqual(['feature-select', 'hidden-1'])
+
+    wrapper.draw.changeMode.mockClear()
+    wrapper.events.length = 0
+    wrapper.exposed.selectFeature('hidden-1', { directEdit: false })
+
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: [] })
+    expect(wrapper.draw.changeMode).not.toHaveBeenCalledWith('simple_select', { featureIds: ['hidden-1'] })
+    expect(wrapper.events).toContainEqual(['mode-change', 'simple_select'])
+    expect(wrapper.events).not.toContainEqual(['feature-select', 'hidden-1'])
+
+    wrapper.unmount()
+  })
+
+  it('treats hidden or locked active layers as non-selectable even when feature properties are stale', async () => {
+    const featureCollection = {
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }],
+    }
+    const wrapper = mountEditableMapLibre(featureCollection, {
+      activeLayer: {
+        id: 'active-layer',
+        visible: false,
+        locked: false,
+        featureCollection,
+      },
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    wrapper.exposed.selectFeature('polygon-1', { directEdit: false })
+
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: [] })
+    expect(wrapper.events).toContainEqual(['mode-change', 'simple_select'])
+    expect(wrapper.events).not.toContainEqual(['feature-select', 'polygon-1'])
+
+    wrapper.draw.changeMode.mockClear()
+    wrapper.events.length = 0
+    wrapper.activeLayer.value = {
+      id: 'active-layer',
+      visible: true,
+      locked: true,
+      featureCollection,
+    }
+    await nextTick()
+
+    wrapper.exposed.selectFeature('polygon-1', { directEdit: true })
+
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: [] })
+    expect(wrapper.draw.changeMode).not.toHaveBeenCalledWith('direct_select', { featureId: 'polygon-1' })
+    expect(wrapper.events).toContainEqual(['mode-change', 'simple_select'])
+    expect(wrapper.events).not.toContainEqual(['feature-select', 'polygon-1'])
+
+    wrapper.unmount()
+  })
+
+  it('refuses draw modes and ignores draw mutations while the active layer is hidden or locked', async () => {
+    const featureCollection = {
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }],
+    }
+    const wrapper = mountEditableMapLibre(featureCollection, {
+      activeLayer: {
+        id: 'active-layer',
+        visible: false,
+        locked: false,
+        featureCollection,
+      },
+    })
+    await nextTick()
+    wrapper.draw.changeMode.mockClear()
+    wrapper.draw.set.mockClear()
+    wrapper.events.length = 0
+
+    wrapper.exposed.setDrawMode('draw_polygon')
+
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: [] })
+    expect(wrapper.draw.changeMode).not.toHaveBeenCalledWith('draw_polygon')
+    expect(wrapper.events).toContainEqual(['mode-change', 'simple_select'])
+
+    wrapper.draw.changeMode.mockClear()
+    wrapper.draw.set.mockClear()
+    wrapper.events.length = 0
+    wrapper.draw.features.set('drawn-polygon', {
+      id: 'drawn-polygon',
+      type: 'Feature',
+      properties: { visible: true, locked: false },
+      geometry: { type: 'Polygon', coordinates: [[[0, 0], [1, 0], [0, 0]]] },
+    })
+
+    wrapper.map.emit('draw.create', {
+      type: 'draw.create',
+      features: [wrapper.draw.get('drawn-polygon')],
+    })
+
+    expect(wrapper.events.some(([eventName]) => eventName === 'features-change')).toBe(false)
+    const restoredFeatureCollection = wrapper.draw.set.mock.calls.at(-1)?.[0]
+    expect(restoredFeatureCollection.features.map((feature) => feature.id)).toEqual(['polygon-1'])
+    expect(restoredFeatureCollection.features.some((feature) => feature.id === 'drawn-polygon')).toBe(false)
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: [] })
+
+    wrapper.draw.changeMode.mockClear()
+    wrapper.draw.set.mockClear()
+    wrapper.events.length = 0
+    wrapper.activeLayer.value = {
+      id: 'active-layer',
+      visible: true,
+      locked: true,
+      featureCollection,
+    }
+    await nextTick()
+
+    wrapper.exposed.setDrawMode('draw_line_string')
+
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: [] })
+    expect(wrapper.draw.changeMode).not.toHaveBeenCalledWith('draw_line_string')
+    expect(wrapper.events).toContainEqual(['mode-change', 'simple_select'])
+
+    wrapper.unmount()
+  })
+
+  it('filters hidden and locked features out of natural Draw selection changes', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'visible-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'hidden-1',
+        type: 'Feature',
+        properties: { visible: false, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'locked-1',
+        type: 'Feature',
+        properties: { visible: true, locked: true },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    wrapper.draw.selectedIds = ['hidden-1', 'locked-1', 'visible-1']
+    wrapper.map.emit('draw.selectionchange')
+
+    expect(wrapper.events).toContainEqual(['feature-select', 'visible-1'])
+    expect(wrapper.events).not.toContainEqual(['feature-select', ['hidden-1', 'locked-1', 'visible-1']])
+
+    wrapper.unmount()
+  })
+
+  it('filters hidden and locked features out of programmatic multi-selection', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'visible-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'hidden-1',
+        type: 'Feature',
+        properties: { visible: false, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'locked-1',
+        type: 'Feature',
+        properties: { visible: true, locked: true },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    wrapper.exposed.selectFeatures(['hidden-1', 'visible-1', 'locked-1'])
+
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: ['visible-1'] })
+    expect(wrapper.events).toContainEqual(['mode-change', 'simple_select'])
+
+    wrapper.unmount()
+  })
+
+  it('opens a de-duplicated hit-candidate menu for overlapping selectable features', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { name: '面 A', visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'line-1',
+        type: 'Feature',
+        properties: { name: '线 A', visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [] },
+      }],
+    }, {
+      activeLayer: {
+        id: 'active-layer',
+        name: '绘制图层',
+        visible: true,
+        locked: false,
+      },
+    })
+    await nextTick()
+    ;['gl-draw-polygon-fill', 'gl-draw-polygon-stroke', 'gl-draw-line'].forEach((layerId) => {
+      wrapper.map.addLayer({ id: layerId, type: 'line' })
+    })
+    wrapper.map.queryRenderedFeatures.mockReturnValueOnce([
+      { id: 'polygon-1', layer: { id: 'gl-draw-polygon-fill' }, properties: { id: 'polygon-1' } },
+      { id: 'polygon-1', layer: { id: 'gl-draw-polygon-stroke' }, properties: { id: 'polygon-1' } },
+      { id: 'line-1', layer: { id: 'gl-draw-line' }, properties: { id: 'line-1' } },
+    ])
+    wrapper.events.length = 0
+
+    wrapper.map.emit('click', {
+      point: { x: 24, y: 32 },
+      lngLat: { lng: 113, lat: 23 },
+    })
+    await nextTick()
+
+    const menu = wrapper.host.querySelector('[data-testid="feature-hit-candidate-menu"]')
+    const buttons = [...wrapper.host.querySelectorAll('[data-testid="feature-hit-candidate-button"]')]
+    expect(menu).toBeTruthy()
+    expect(buttons).toHaveLength(2)
+    expect(buttons.map((button) => button.textContent)).toEqual([
+      expect.stringContaining('面 A'),
+      expect.stringContaining('线 A'),
+    ])
+    expect(wrapper.draw.changeMode).not.toHaveBeenCalledWith('simple_select', { featureIds: ['polygon-1'] })
+    expect(wrapper.events).toContainEqual(['map-click', { lng: 113, lat: 23 }])
+
+    buttons[1].click()
+    await nextTick()
+
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: ['line-1'] })
+    expect(wrapper.events).toContainEqual(['feature-select', 'line-1'])
+    expect(wrapper.host.querySelector('[data-testid="feature-hit-candidate-menu"]')).toBeFalsy()
+
+    wrapper.unmount()
+  })
+
+  it('keeps the hit-candidate menu authoritative over stale native Draw selection changes', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { name: '面 A', visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'line-1',
+        type: 'Feature',
+        properties: { name: '线 A', visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [] },
+      }],
+    })
+    await nextTick()
+    ;['gl-draw-polygon-fill', 'gl-draw-line'].forEach((layerId) => {
+      wrapper.map.addLayer({ id: layerId, type: 'line' })
+    })
+    wrapper.map.queryRenderedFeatures.mockReturnValueOnce([
+      { id: 'polygon-1', layer: { id: 'gl-draw-polygon-fill' }, properties: { id: 'polygon-1' } },
+      { id: 'line-1', layer: { id: 'gl-draw-line' }, properties: { id: 'line-1' } },
+    ])
+
+    wrapper.map.emit('click', {
+      point: { x: 24, y: 32 },
+      lngLat: { lng: 113, lat: 23 },
+    })
+    await nextTick()
+    expect(wrapper.host.querySelector('[data-testid="feature-hit-candidate-menu"]')).toBeTruthy()
+
+    wrapper.events.length = 0
+    wrapper.draw.selectedIds = ['polygon-1']
+    wrapper.map.emit('draw.selectionchange')
+    await nextTick()
+
+    expect(wrapper.events.some(([eventName]) => eventName === 'feature-select')).toBe(false)
+    expect(wrapper.host.querySelector('[data-testid="feature-hit-candidate-menu"]')).toBeTruthy()
+
+    wrapper.unmount()
+  })
+
+  it('closes the hit-candidate menu with Escape without selecting a feature', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { name: '面 A', visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'line-1',
+        type: 'Feature',
+        properties: { name: '线 A', visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [] },
+      }],
+    })
+    await nextTick()
+    ;['gl-draw-polygon-fill', 'gl-draw-line'].forEach((layerId) => {
+      wrapper.map.addLayer({ id: layerId, type: 'line' })
+    })
+    wrapper.map.queryRenderedFeatures.mockReturnValueOnce([
+      { id: 'polygon-1', layer: { id: 'gl-draw-polygon-fill' }, properties: { id: 'polygon-1' } },
+      { id: 'line-1', layer: { id: 'gl-draw-line' }, properties: { id: 'line-1' } },
+    ])
+
+    wrapper.map.emit('click', {
+      point: { x: 24, y: 32 },
+      lngLat: { lng: 113, lat: 23 },
+    })
+    await nextTick()
+    expect(wrapper.host.querySelector('[data-testid="feature-hit-candidate-menu"]')).toBeTruthy()
+
+    wrapper.events.length = 0
+    const escapeEvent = new KeyboardEvent('keydown', {
+      key: 'Escape',
+      cancelable: true,
+    })
+    document.dispatchEvent(escapeEvent)
+    await nextTick()
+
+    expect(escapeEvent.defaultPrevented).toBe(true)
+    expect(wrapper.events.some(([eventName]) => eventName === 'feature-select')).toBe(false)
+    expect(wrapper.host.querySelector('[data-testid="feature-hit-candidate-menu"]')).toBeFalsy()
+
+    wrapper.unmount()
+  })
+
+  it('focuses the first hit candidate when the overlap picker opens', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { name: '面 A', visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'line-1',
+        type: 'Feature',
+        properties: { name: '线 A', visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [] },
+      }],
+    })
+    await nextTick()
+    ;['gl-draw-polygon-fill', 'gl-draw-line'].forEach((layerId) => {
+      wrapper.map.addLayer({ id: layerId, type: 'line' })
+    })
+    wrapper.map.queryRenderedFeatures.mockReturnValueOnce([
+      { id: 'polygon-1', layer: { id: 'gl-draw-polygon-fill' }, properties: { id: 'polygon-1' } },
+      { id: 'line-1', layer: { id: 'gl-draw-line' }, properties: { id: 'line-1' } },
+    ])
+
+    wrapper.map.emit('click', {
+      point: { x: 24, y: 32 },
+      lngLat: { lng: 113, lat: 23 },
+    })
+    await nextTick()
+    await nextTick()
+
+    const firstButton = wrapper.host.querySelector('[data-testid="feature-hit-candidate-button"]')
+    expect(document.activeElement).toBe(firstButton)
+
+    wrapper.unmount()
+  })
+
+  it('moves focus between overlap picker candidates with arrow keys', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { name: '面 A', visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'line-1',
+        type: 'Feature',
+        properties: { name: '线 A', visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [] },
+      }],
+    })
+    await nextTick()
+    ;['gl-draw-polygon-fill', 'gl-draw-line'].forEach((layerId) => {
+      wrapper.map.addLayer({ id: layerId, type: 'line' })
+    })
+    wrapper.map.queryRenderedFeatures.mockReturnValueOnce([
+      { id: 'polygon-1', layer: { id: 'gl-draw-polygon-fill' }, properties: { id: 'polygon-1' } },
+      { id: 'line-1', layer: { id: 'gl-draw-line' }, properties: { id: 'line-1' } },
+    ])
+
+    wrapper.map.emit('click', {
+      point: { x: 24, y: 32 },
+      lngLat: { lng: 113, lat: 23 },
+    })
+    await nextTick()
+    await nextTick()
+
+    const buttons = [...wrapper.host.querySelectorAll('[data-testid="feature-hit-candidate-button"]')]
+    buttons[0].dispatchEvent(new KeyboardEvent('keydown', {
+      key: 'ArrowDown',
+      bubbles: true,
+      cancelable: true,
+    }))
+    await nextTick()
+    expect(document.activeElement).toBe(buttons[1])
+
+    buttons[1].dispatchEvent(new KeyboardEvent('keydown', {
+      key: 'ArrowUp',
+      bubbles: true,
+      cancelable: true,
+    }))
+    await nextTick()
+    expect(document.activeElement).toBe(buttons[0])
+
+    wrapper.unmount()
+  })
+
+  it('selects the only visible unlocked hit candidate without opening the candidate menu', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'visible-1',
+        type: 'Feature',
+        properties: { name: '可选', visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'hidden-1',
+        type: 'Feature',
+        properties: { name: '隐藏', visible: false, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }, {
+        id: 'locked-1',
+        type: 'Feature',
+        properties: { name: '锁定', visible: true, locked: true },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }],
+    })
+    await nextTick()
+    wrapper.map.addLayer({ id: 'gl-draw-polygon-fill', type: 'fill' })
+    wrapper.map.queryRenderedFeatures.mockReturnValueOnce([
+      { id: 'hidden-1', layer: { id: 'gl-draw-polygon-fill' }, properties: { id: 'hidden-1' } },
+      { id: 'locked-1', layer: { id: 'gl-draw-polygon-fill' }, properties: { id: 'locked-1' } },
+      { id: 'visible-1', layer: { id: 'gl-draw-polygon-fill' }, properties: { id: 'visible-1' } },
+    ])
+    wrapper.events.length = 0
+
+    wrapper.map.emit('click', {
+      point: { x: 12, y: 16 },
+      lngLat: { lng: 114, lat: 24 },
+    })
+    await nextTick()
+
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: ['visible-1'] })
+    expect(wrapper.events).toContainEqual(['feature-select', 'visible-1'])
+    expect(wrapper.host.querySelector('[data-testid="feature-hit-candidate-menu"]')).toBeFalsy()
+
+    wrapper.unmount()
+  })
+
+  it('ignores hit candidates while the active layer is hidden', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'visible-1',
+        type: 'Feature',
+        properties: { name: '可选', visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [] },
+      }],
+    }, {
+      activeLayer: {
+        id: 'active-layer',
+        name: '绘制图层',
+        visible: false,
+        locked: false,
+      },
+    })
+    await nextTick()
+    wrapper.map.addLayer({ id: 'gl-draw-polygon-fill', type: 'fill' })
+    wrapper.map.queryRenderedFeatures.mockClear()
+    wrapper.draw.changeMode.mockClear()
+    wrapper.events.length = 0
+
+    wrapper.map.emit('click', {
+      point: { x: 12, y: 16 },
+      lngLat: { lng: 114, lat: 24 },
+    })
+    await nextTick()
+
+    expect(wrapper.map.queryRenderedFeatures).not.toHaveBeenCalled()
+    expect(wrapper.draw.changeMode).not.toHaveBeenCalled()
+    expect(wrapper.events).toEqual([['map-click', { lng: 114, lat: 24 }]])
+    expect(wrapper.host.querySelector('[data-testid="feature-hit-candidate-menu"]')).toBeFalsy()
 
     wrapper.unmount()
   })
@@ -462,6 +1017,9 @@ describe('EditableMapLibre state flow', () => {
         mode: 'direct_select',
         featureId: 'polygon-1',
         selectedVertexCount: 1,
+        selectedVertex: null,
+        canDeleteSelectedVertices: true,
+        deleteBlockCode: '',
       },
     ])
 
@@ -499,6 +1057,9 @@ describe('EditableMapLibre state flow', () => {
         mode: 'simple_select',
         featureId: '',
         selectedVertexCount: 0,
+        selectedVertex: null,
+        canDeleteSelectedVertices: false,
+        deleteBlockCode: '',
       },
     ])
 
@@ -639,6 +1200,1498 @@ describe('EditableMapLibre state flow', () => {
       }),
     ]))
     expect(JSON.stringify(wrapper.draw.options.styles)).toContain('"midpoint"')
+
+    wrapper.unmount()
+  })
+
+  it('selects a specific line vertex by coordinate path', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1], [2, 2]] },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didSelect = wrapper.exposed.selectVertex('line-1', '1')
+
+    expect(didSelect).toBe(true)
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('direct_select', {
+      featureId: 'line-1',
+      coordPath: '1',
+    })
+    expect(wrapper.events).toContainEqual(['feature-select', 'line-1'])
+    expect(wrapper.events).toContainEqual([
+      'shape-edit-state-change',
+      {
+        mode: 'direct_select',
+        featureId: 'line-1',
+        selectedVertexCount: 1,
+        selectedVertex: {
+          featureId: 'line-1',
+          coordPath: '1',
+          coordinate: [1, 1],
+        },
+        canDeleteSelectedVertices: true,
+        deleteBlockCode: '',
+      },
+    ])
+
+    wrapper.unmount()
+  })
+
+  it('emits selected vertex coordinates for exact coordinate editing', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [113, 23],
+            [114, 23],
+            [114, 24],
+            [113, 23],
+          ]],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didSelect = wrapper.exposed.selectVertex('polygon-1', '0.2')
+
+    expect(didSelect).toBe(true)
+    expect(wrapper.events).toContainEqual([
+      'shape-edit-state-change',
+      {
+        mode: 'direct_select',
+        featureId: 'polygon-1',
+        selectedVertexCount: 1,
+        selectedVertex: {
+          featureId: 'polygon-1',
+          coordPath: '0.2',
+          coordinate: [114, 24],
+        },
+        canDeleteSelectedVertices: false,
+        deleteBlockCode: '',
+      },
+    ])
+
+    wrapper.unmount()
+  })
+
+  it('inserts a line vertex on an edge and keeps the inserted vertex selected', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [2, 2]] },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didInsert = wrapper.exposed.insertVertex('line-1', '1', [1, 1])
+
+    expect(didInsert).toBe(true)
+    expect(wrapper.events.map(([eventName]) => eventName)).toEqual(expect.arrayContaining([
+      'before-features-change',
+      'features-change',
+    ]))
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [1, 1], [2, 2]])
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('direct_select', {
+      featureId: 'line-1',
+      coordPath: '1',
+    })
+
+    wrapper.unmount()
+  })
+
+  it('moves a polygon vertex while keeping the ring closed', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [0, 0],
+            [2, 0],
+            [1, 1],
+            [0, 0],
+          ]],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didMove = wrapper.exposed.moveVertex('polygon-1', '0.0', [0, 2])
+
+    expect(didMove).toBe(true)
+    const nextRing = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1]
+      .features[0].geometry.coordinates[0]
+    expect(nextRing).toEqual([
+      [0, 2],
+      [2, 0],
+      [1, 1],
+      [0, 2],
+    ])
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('direct_select', {
+      featureId: 'polygon-1',
+      coordPath: '0.0',
+    })
+
+    wrapper.unmount()
+  })
+
+  it('moves matching shared vertices in editable active-layer features when topology editing is on', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [
+        {
+          id: 'polygon-1',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[0, 0], [2, 0], [1, 1], [0, 0]]],
+          },
+        },
+        {
+          id: 'polygon-2',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[2, 0], [4, 0], [3, 1], [2, 0]]],
+          },
+        },
+      ],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didMove = wrapper.exposed.moveVertex('polygon-1', '0.1', [2.2, 0.2])
+
+    expect(didMove).toBe(true)
+    const nextFeatures = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features
+    expect(nextFeatures[0].geometry.coordinates[0]).toEqual([[0, 0], [2.2, 0.2], [1, 1], [0, 0]])
+    expect(nextFeatures[1].geometry.coordinates[0]).toEqual([[2.2, 0.2], [4, 0], [3, 1], [2.2, 0.2]])
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('direct_select', {
+      featureId: 'polygon-1',
+      coordPath: '0.1',
+    })
+
+    wrapper.unmount()
+  })
+
+  it('does not move matching shared vertices when topology editing is off', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [
+        {
+          id: 'polygon-1',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[0, 0], [2, 0], [1, 1], [0, 0]]],
+          },
+        },
+        {
+          id: 'polygon-2',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[2, 0], [4, 0], [3, 1], [2, 0]]],
+          },
+        },
+      ],
+    }, {
+      snappingEnabled: false,
+      topologyEditingEnabled: false,
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didMove = wrapper.exposed.moveVertex('polygon-1', '0.1', [2.2, 0.2])
+
+    expect(didMove).toBe(true)
+    const nextFeatures = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features
+    expect(nextFeatures[0].geometry.coordinates[0]).toEqual([[0, 0], [2.2, 0.2], [1, 1], [0, 0]])
+    expect(nextFeatures[1].geometry.coordinates[0]).toEqual([[2, 0], [4, 0], [3, 1], [2, 0]])
+
+    wrapper.unmount()
+  })
+
+  it('does not topology-edit hidden or locked active-layer features', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [
+        {
+          id: 'polygon-1',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[0, 0], [2, 0], [1, 1], [0, 0]]],
+          },
+        },
+        {
+          id: 'polygon-hidden',
+          type: 'Feature',
+          properties: { visible: false, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[2, 0], [4, 0], [3, 1], [2, 0]]],
+          },
+        },
+        {
+          id: 'polygon-locked',
+          type: 'Feature',
+          properties: { visible: true, locked: true },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[2, 0], [4, 2], [3, 3], [2, 0]]],
+          },
+        },
+      ],
+    }, {
+      snappingEnabled: false,
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didMove = wrapper.exposed.moveVertex('polygon-1', '0.1', [2.2, 0.2])
+
+    expect(didMove).toBe(true)
+    const nextFeatures = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features
+    expect(nextFeatures[0].geometry.coordinates[0]).toEqual([[0, 0], [2.2, 0.2], [1, 1], [0, 0]])
+    expect(nextFeatures[1].geometry.coordinates[0]).toEqual([[2, 0], [4, 0], [3, 1], [2, 0]])
+    expect(nextFeatures[2].geometry.coordinates[0]).toEqual([[2, 0], [4, 2], [3, 3], [2, 0]])
+
+    wrapper.unmount()
+  })
+
+  it('traces snapped active-layer edges by inserting the same vertex into the snapped feature', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [
+        {
+          id: 'line-1',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: { type: 'LineString', coordinates: [[0, 0], [10, 0]] },
+        },
+        {
+          id: 'line-2',
+          type: 'Feature',
+          properties: { name: '共享边', visible: true, locked: false },
+          geometry: { type: 'LineString', coordinates: [[0, 5], [10, 5]] },
+        },
+      ],
+    }, {
+      snapTargets: {
+        vertex: false,
+        midpoint: false,
+        edge: true,
+        grid: false,
+        reference: true,
+      },
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didInsert = wrapper.exposed.insertVertex('line-1', '1', [5.2, 5.1])
+
+    expect(didInsert).toBe(true)
+    const nextFeatures = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features
+    expect(nextFeatures[0].geometry.coordinates).toEqual([[0, 0], [5.2, 5], [10, 0]])
+    expect(nextFeatures[1].geometry.coordinates).toEqual([[0, 5], [5.2, 5], [10, 5]])
+    expect(wrapper.events).toContainEqual(['snap-state-change', expect.objectContaining({
+      active: true,
+      type: 'edge',
+      featureName: '共享边',
+    })])
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('direct_select', {
+      featureId: 'line-1',
+      coordPath: '1',
+    })
+
+    wrapper.unmount()
+  })
+
+  it('does not trace snapped active-layer edges when topology editing is off', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [
+        {
+          id: 'line-1',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: { type: 'LineString', coordinates: [[0, 0], [10, 0]] },
+        },
+        {
+          id: 'line-2',
+          type: 'Feature',
+          properties: { name: '共享边', visible: true, locked: false },
+          geometry: { type: 'LineString', coordinates: [[0, 5], [10, 5]] },
+        },
+      ],
+    }, {
+      topologyEditingEnabled: false,
+      snapTargets: {
+        vertex: false,
+        midpoint: false,
+        edge: true,
+        grid: false,
+        reference: true,
+      },
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didInsert = wrapper.exposed.insertVertex('line-1', '1', [5.2, 5.1])
+
+    expect(didInsert).toBe(true)
+    const nextFeatures = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features
+    expect(nextFeatures[0].geometry.coordinates).toEqual([[0, 0], [5.2, 5], [10, 0]])
+    expect(nextFeatures[1].geometry.coordinates).toEqual([[0, 5], [10, 5]])
+
+    wrapper.unmount()
+  })
+
+  it('snaps inserted vertices to visible reference points', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [10, 0]] },
+      }],
+    }, {
+      allLayers: [{
+        id: 'reference-points',
+        visible: true,
+        locked: true,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [{
+            id: 'reference-point-1',
+            type: 'Feature',
+            properties: { visible: true, locked: true },
+            geometry: { type: 'Point', coordinates: [5, 5] },
+          }],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didInsert = wrapper.exposed.insertVertex('line-1', '1', [5.4, 5.3])
+
+    expect(didInsert).toBe(true)
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [5, 5], [10, 0]])
+
+    wrapper.unmount()
+  })
+
+  it('snaps moved vertices to visible reference edges', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [0, 0],
+            [10, 0],
+            [5, 8],
+            [0, 0],
+          ]],
+        },
+      }],
+    }, {
+      allLayers: [{
+        id: 'reference-lines',
+        visible: true,
+        locked: true,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [{
+            id: 'reference-line-1',
+            type: 'Feature',
+            properties: { visible: true, locked: true },
+            geometry: { type: 'LineString', coordinates: [[0, 5], [10, 5]] },
+          }],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didMove = wrapper.exposed.moveVertex('polygon-1', '0.2', [3, 5.4])
+
+    expect(didMove).toBe(true)
+    const nextRing = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1]
+      .features[0].geometry.coordinates[0]
+    expect(nextRing).toEqual([
+      [0, 0],
+      [10, 0],
+      [3, 5],
+      [0, 0],
+    ])
+
+    wrapper.unmount()
+  })
+
+  it('renders a snap preview marker and guide line when a vertex edit snaps', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [0, 0],
+            [10, 0],
+            [5, 8],
+            [0, 0],
+          ]],
+        },
+      }],
+    }, {
+      allLayers: [{
+        id: 'reference-lines',
+        visible: true,
+        locked: true,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [{
+            id: 'reference-line-1',
+            type: 'Feature',
+            properties: { visible: true, locked: true },
+            geometry: { type: 'LineString', coordinates: [[0, 5], [10, 5]] },
+          }],
+        },
+      }],
+    })
+    await nextTick()
+
+    wrapper.exposed.moveVertex('polygon-1', '0.2', [3, 5.4])
+
+    expect(wrapper.map.getLayer('draw-snap-preview-guide')).toBeTruthy()
+    expect(wrapper.map.getLayer('draw-snap-preview-point')).toBeTruthy()
+    const snapPreview = wrapper.map.getSource('draw-snap-preview-source')?.data
+    expect(snapPreview.features.map((feature) => feature.geometry.type)).toEqual(['LineString', 'Point'])
+    expect(snapPreview.features[0].geometry.coordinates).toEqual([[3, 5.4], [3, 5]])
+    expect(snapPreview.features[1].properties.snapType).toBe('edge')
+    expect(snapPreview.features[1].geometry.coordinates).toEqual([3, 5])
+
+    wrapper.unmount()
+  })
+
+  it('reports hovered edit targets for vertices, midpoints, and edges while direct editing', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false, name: '边界线' },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [2, 2], [4, 0]] },
+      }],
+    })
+    await nextTick()
+    wrapper.exposed.selectFeature('line-1', { directEdit: true })
+    ;[
+      'gl-draw-active-vertex',
+      'gl-draw-vertex',
+      'gl-draw-midpoint',
+      'gl-draw-line',
+      'gl-draw-polygon-stroke',
+    ].forEach((layerId) => {
+      wrapper.map.addLayer({ id: layerId, type: 'circle' })
+    })
+    wrapper.events.length = 0
+
+    wrapper.map.queryRenderedFeatures.mockReturnValueOnce([{
+      layer: { id: 'gl-draw-vertex' },
+      properties: { meta: 'vertex', parent: 'line-1', coord_path: '1' },
+    }])
+    wrapper.map.emit('mousemove', { point: { x: 2, y: 2 } })
+
+    expect(wrapper.events).toContainEqual(['edit-target-hover', {
+      active: true,
+      type: 'vertex',
+      featureId: 'line-1',
+      coordPath: '1',
+      featureName: '边界线',
+    }])
+
+    wrapper.events.length = 0
+    wrapper.map.queryRenderedFeatures.mockReturnValueOnce([{
+      layer: { id: 'gl-draw-midpoint' },
+      properties: { meta: 'midpoint', parent: 'line-1', coord_path: '2' },
+    }])
+    wrapper.map.emit('mousemove', { point: { x: 3, y: 1 } })
+
+    expect(wrapper.events).toContainEqual(['edit-target-hover', {
+      active: true,
+      type: 'midpoint',
+      featureId: 'line-1',
+      coordPath: '2',
+      featureName: '边界线',
+    }])
+
+    wrapper.events.length = 0
+    wrapper.map.queryRenderedFeatures.mockReturnValueOnce([{
+      id: 'line-1',
+      layer: { id: 'gl-draw-line' },
+      properties: { id: 'line-1', meta: 'feature' },
+    }])
+    wrapper.map.emit('mousemove', { point: { x: 1, y: 1 } })
+
+    expect(wrapper.events).toContainEqual(['edit-target-hover', {
+      active: true,
+      type: 'edge',
+      featureId: 'line-1',
+      coordPath: '',
+      featureName: '边界线',
+    }])
+
+    wrapper.events.length = 0
+    wrapper.map.queryRenderedFeatures.mockReturnValueOnce([])
+    wrapper.map.emit('mousemove', { point: { x: 99, y: 99 } })
+
+    expect(wrapper.events).toContainEqual(['edit-target-hover', { active: false }])
+
+    wrapper.unmount()
+  })
+
+  it('prefers snap midpoints over nearby reference edges and reports the snap target', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [10, 0]] },
+      }],
+    }, {
+      allLayers: [{
+        id: 'reference-lines',
+        name: '参考线',
+        visible: true,
+        locked: true,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [{
+            id: 'reference-line-1',
+            type: 'Feature',
+            properties: { name: '边界线', visible: true, locked: true },
+            geometry: { type: 'LineString', coordinates: [[0, 5], [10, 5]] },
+          }],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didInsert = wrapper.exposed.insertVertex('line-1', '1', [5.2, 5.1])
+
+    expect(didInsert).toBe(true)
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [5, 5], [10, 0]])
+    expect(wrapper.events).toContainEqual(['snap-state-change', {
+      active: true,
+      type: 'midpoint',
+      source: 'reference-lines',
+      layerName: '参考线',
+      featureName: '边界线',
+      coordinate: [5, 5],
+      originalCoordinate: [5.2, 5.1],
+      distancePixels: expect.any(Number),
+    }])
+
+    wrapper.unmount()
+  })
+
+  it('respects snap target type toggles when choosing edge and grid candidates', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [10, 0]] },
+      }],
+    }, {
+      snapGridSize: 1,
+      snapTargets: {
+        vertex: false,
+        midpoint: false,
+        edge: true,
+        grid: true,
+        reference: true,
+      },
+      allLayers: [{
+        id: 'reference-lines',
+        name: '参考线',
+        visible: true,
+        locked: true,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [{
+            id: 'reference-line-1',
+            type: 'Feature',
+            properties: { name: '边界线', visible: true, locked: true },
+            geometry: { type: 'LineString', coordinates: [[0, 5], [10, 5]] },
+          }],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    wrapper.exposed.insertVertex('line-1', '1', [5.2, 5.1])
+
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [5.2, 5], [10, 0]])
+    expect(wrapper.events).toContainEqual(['snap-state-change', {
+      active: true,
+      type: 'edge',
+      source: 'reference-lines',
+      layerName: '参考线',
+      featureName: '边界线',
+      coordinate: [5.2, 5],
+      originalCoordinate: [5.2, 5.1],
+      distancePixels: expect.any(Number),
+    }])
+
+    wrapper.unmount()
+
+    const gridOnlyWrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-2',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [10, 0]] },
+      }],
+    }, {
+      snapGridSize: 1,
+      snapTargets: {
+        vertex: false,
+        midpoint: false,
+        edge: false,
+        grid: true,
+        reference: true,
+      },
+    })
+    await nextTick()
+    gridOnlyWrapper.events.length = 0
+
+    gridOnlyWrapper.exposed.insertVertex('line-2', '1', [5.2, 5.1])
+
+    expect(gridOnlyWrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [5, 5], [10, 0]])
+    expect(gridOnlyWrapper.events).toContainEqual(['snap-state-change', {
+      active: true,
+      type: 'grid',
+      source: 'grid',
+      layerName: '',
+      featureName: '',
+      coordinate: [5, 5],
+      originalCoordinate: [5.2, 5.1],
+      distancePixels: expect.any(Number),
+    }])
+
+    gridOnlyWrapper.unmount()
+  })
+
+  it('can disable cross-layer reference snapping while keeping active-layer edits enabled', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [10, 0]] },
+      }],
+    }, {
+      snapTargets: {
+        vertex: true,
+        midpoint: true,
+        edge: true,
+        grid: false,
+        reference: false,
+      },
+      allLayers: [{
+        id: 'reference-points',
+        visible: true,
+        locked: true,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [{
+            id: 'reference-point-1',
+            type: 'Feature',
+            properties: { visible: true, locked: true },
+            geometry: { type: 'Point', coordinates: [5, 5] },
+          }],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    wrapper.exposed.insertVertex('line-1', '1', [5.2, 5.1])
+
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [5.2, 5.1], [10, 0]])
+    expect(wrapper.events).toContainEqual(['snap-state-change', { active: false }])
+
+    wrapper.unmount()
+  })
+
+  it('does not snap to hidden reference layers or hidden reference features', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [10, 0]] },
+      }],
+    }, {
+      allLayers: [{
+        id: 'hidden-reference',
+        visible: false,
+        locked: false,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [{
+            id: 'hidden-point',
+            type: 'Feature',
+            properties: { visible: true, locked: false },
+            geometry: { type: 'Point', coordinates: [5, 5] },
+          }],
+        },
+      }, {
+        id: 'hidden-feature-reference',
+        visible: true,
+        locked: false,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [{
+            id: 'hidden-feature-point',
+            type: 'Feature',
+            properties: { visible: false, locked: false },
+            geometry: { type: 'Point', coordinates: [6, 6] },
+          }],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    wrapper.exposed.insertVertex('line-1', '1', [5.2, 5.1])
+
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [5.2, 5.1], [10, 0]])
+    expect(wrapper.events).toContainEqual(['snap-state-change', { active: false }])
+
+    wrapper.unmount()
+  })
+
+  it('reports grid snap targets when grid snapping wins', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [10, 0]] },
+      }],
+    }, {
+      snapGridSize: 1,
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    wrapper.exposed.insertVertex('line-1', '1', [5.2, 5.1])
+
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [5, 5], [10, 0]])
+    expect(wrapper.events).toContainEqual(['snap-state-change', {
+      active: true,
+      type: 'grid',
+      source: 'grid',
+      layerName: '',
+      featureName: '',
+      coordinate: [5, 5],
+      originalCoordinate: [5.2, 5.1],
+      distancePixels: expect.any(Number),
+    }])
+
+    wrapper.unmount()
+  })
+
+  it('does not snap to hidden reference features or when snapping is disabled', async () => {
+    const referenceLayer = {
+      id: 'reference-points',
+      visible: true,
+      locked: true,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [{
+          id: 'hidden-reference-point',
+          type: 'Feature',
+          properties: { visible: false, locked: true },
+          geometry: { type: 'Point', coordinates: [5, 5] },
+        }],
+      },
+    }
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [10, 0]] },
+      }],
+    }, { allLayers: [referenceLayer] })
+    await nextTick()
+    wrapper.events.length = 0
+
+    wrapper.exposed.insertVertex('line-1', '1', [5.4, 5.3])
+
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [5.4, 5.3], [10, 0]])
+    wrapper.unmount()
+
+    const disabledWrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-2',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [10, 0]] },
+      }],
+    }, {
+      snappingEnabled: false,
+      allLayers: [{
+        ...referenceLayer,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [{
+            id: 'visible-reference-point',
+            type: 'Feature',
+            properties: { visible: true, locked: true },
+            geometry: { type: 'Point', coordinates: [5, 5] },
+          }],
+        },
+      }],
+    })
+    await nextTick()
+    disabledWrapper.events.length = 0
+
+    disabledWrapper.exposed.insertVertex('line-2', '1', [5.4, 5.3])
+
+    expect(disabledWrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [5.4, 5.3], [10, 0]])
+
+    disabledWrapper.unmount()
+  })
+
+  it('snaps coordinates emitted by Draw create and update events before syncing state', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [],
+    }, {
+      allLayers: [{
+        id: 'reference-points',
+        visible: true,
+        locked: true,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [{
+            id: 'reference-point-1',
+            type: 'Feature',
+            properties: { visible: true, locked: true },
+            geometry: { type: 'Point', coordinates: [50, 50] },
+          }],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.draw.set.mockClear()
+    wrapper.events.length = 0
+    wrapper.draw.features.set('drawn-line-1', {
+      id: 'drawn-line-1',
+      type: 'Feature',
+      properties: { visible: true, locked: false },
+      geometry: { type: 'LineString', coordinates: [[0, 0], [50.4, 50.3], [100, 0]] },
+    })
+
+    wrapper.map.emit('draw.create')
+
+    const syncedFeatureCollection = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1]
+    expect(syncedFeatureCollection.features[0].geometry.coordinates)
+      .toEqual([[0, 0], [50, 50], [100, 0]])
+    expect(wrapper.draw.set).toHaveBeenCalledWith(syncedFeatureCollection)
+
+    wrapper.events.length = 0
+    wrapper.draw.set.mockClear()
+    wrapper.draw.features.set('drawn-line-1', {
+      id: 'drawn-line-1',
+      type: 'Feature',
+      properties: { visible: true, locked: false },
+      geometry: { type: 'LineString', coordinates: [[0, 0], [50.2, 50.1], [100, 0]] },
+    })
+
+    wrapper.map.emit('draw.update')
+
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [50, 50], [100, 0]])
+    expect(wrapper.draw.set).toHaveBeenCalledTimes(1)
+
+    wrapper.unmount()
+  })
+
+  it('does not snap Draw event coordinates when snapping is disabled', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [],
+    }, {
+      snappingEnabled: false,
+      allLayers: [{
+        id: 'reference-points',
+        visible: true,
+        locked: true,
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [{
+            id: 'reference-point-1',
+            type: 'Feature',
+            properties: { visible: true, locked: true },
+            geometry: { type: 'Point', coordinates: [5, 5] },
+          }],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.draw.set.mockClear()
+    wrapper.events.length = 0
+    wrapper.draw.features.set('drawn-line-1', {
+      id: 'drawn-line-1',
+      type: 'Feature',
+      properties: { visible: true, locked: false },
+      geometry: { type: 'LineString', coordinates: [[0, 0], [5.4, 5.3], [10, 0]] },
+    })
+
+    wrapper.map.emit('draw.create')
+
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [5.4, 5.3], [10, 0]])
+    expect(wrapper.draw.set).not.toHaveBeenCalled()
+
+    wrapper.unmount()
+  })
+
+  it('deletes a selected line vertex by coordinate path and reconnects the line', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1], [2, 2]] },
+      }],
+    })
+    await nextTick()
+    wrapper.exposed.selectVertex('line-1', '1')
+    wrapper.events.length = 0
+
+    const didDelete = wrapper.exposed.deleteSelected()
+
+    expect(didDelete).toBe(true)
+    expect(wrapper.draw.trash).not.toHaveBeenCalled()
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
+      .toEqual([[0, 0], [2, 2]])
+    expect(wrapper.events).toContainEqual([
+      'shape-edit-state-change',
+      {
+        mode: 'direct_select',
+        featureId: 'line-1',
+        selectedVertexCount: 0,
+        selectedVertex: null,
+        canDeleteSelectedVertices: false,
+        deleteBlockCode: '',
+      },
+    ])
+
+    wrapper.unmount()
+  })
+
+  it('blocks shared boundary vertex deletion when shared boundary protection is on', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [
+        {
+          id: 'polygon-1',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]]],
+          },
+        },
+        {
+          id: 'polygon-2',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[2, 0], [4, 0], [4, 2], [2, 2], [2, 0]]],
+          },
+        },
+      ],
+    })
+    await nextTick()
+    wrapper.exposed.selectVertex('polygon-1', '0.1')
+    wrapper.events.length = 0
+
+    const didDelete = wrapper.exposed.deleteSelected()
+
+    expect(didDelete).toBe(false)
+    expect(wrapper.exposed.canDeleteSelected()).toBe(false)
+    expect(wrapper.draw.trash).not.toHaveBeenCalled()
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')).toBeUndefined()
+    expect(wrapper.events).toContainEqual([
+      'geometry-edit-feedback',
+      { type: 'error', code: 'sharedBoundaryDeleteBlocked' },
+    ])
+
+    wrapper.unmount()
+  })
+
+  it('reports shared boundary deletion blocks for Draw selected vertex points', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [
+        {
+          id: 'polygon-1',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]]],
+          },
+        },
+        {
+          id: 'polygon-2',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[2, 0], [4, 0], [4, 2], [2, 2], [2, 0]]],
+          },
+        },
+      ],
+    })
+    await nextTick()
+    wrapper.exposed.selectFeature('polygon-1', { directEdit: true })
+    wrapper.draw.selectedIds = []
+    wrapper.draw.selectedPoints = [{
+      type: 'Feature',
+      properties: {},
+      geometry: { type: 'Point', coordinates: [2, 0] },
+    }]
+    wrapper.map.emit('draw.selectionchange')
+    wrapper.events.length = 0
+
+    const didDelete = wrapper.exposed.deleteSelected()
+
+    expect(didDelete).toBe(false)
+    expect(wrapper.events.find(([eventName]) => eventName === 'features-change')).toBeUndefined()
+    expect(wrapper.events).toContainEqual([
+      'geometry-edit-feedback',
+      { type: 'error', code: 'sharedBoundaryDeleteBlocked' },
+    ])
+
+    wrapper.unmount()
+  })
+
+  it('allows shared boundary vertex deletion when shared boundary protection is off', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [
+        {
+          id: 'polygon-1',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]]],
+          },
+        },
+        {
+          id: 'polygon-2',
+          type: 'Feature',
+          properties: { visible: true, locked: false },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [[[2, 0], [4, 0], [4, 2], [2, 2], [2, 0]]],
+          },
+        },
+      ],
+    }, {
+      sharedBoundaryProtectionEnabled: false,
+    })
+    await nextTick()
+    wrapper.exposed.selectVertex('polygon-1', '0.1')
+    wrapper.events.length = 0
+
+    const didDelete = wrapper.exposed.deleteSelected()
+
+    expect(didDelete).toBe(true)
+    const nextFeatures = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features
+    expect(nextFeatures[0].geometry.coordinates[0]).toEqual([[0, 0], [2, 2], [0, 2], [0, 0]])
+    expect(nextFeatures[1].geometry.coordinates[0]).toEqual([[2, 0], [4, 0], [4, 2], [2, 2], [2, 0]])
+
+    wrapper.unmount()
+  })
+
+  it('splits a selected line at a middle vertex and keeps both resulting lines valid', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false, name: '边界线' },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1], [2, 2], [3, 3]] },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didSplit = wrapper.exposed.splitLineAtVertex('line-1', '2')
+
+    expect(didSplit).toBe(true)
+    const nextFeatures = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features
+    expect(nextFeatures).toHaveLength(2)
+    expect(nextFeatures.map((feature) => feature.geometry.coordinates)).toEqual([
+      [[0, 0], [1, 1], [2, 2]],
+      [[2, 2], [3, 3]],
+    ])
+    expect(nextFeatures[0].id).toBe('line-1')
+    expect(nextFeatures[1].id).toBe('line-1-split-1')
+    expect(nextFeatures[1].properties.name).toBe('边界线')
+    expect(wrapper.events).toContainEqual(['mode-change', 'simple_select'])
+    expect(wrapper.events).toContainEqual([
+      'shape-edit-state-change',
+      {
+        mode: 'simple_select',
+        featureId: '',
+        selectedVertexCount: 0,
+        selectedVertex: null,
+        canDeleteSelectedVertices: false,
+        deleteBlockCode: '',
+      },
+    ])
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', {
+      featureIds: ['line-1', 'line-1-split-1'],
+    })
+
+    wrapper.unmount()
+  })
+
+  it('blocks line splitting at endpoints or invalid coordinate paths', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1], [2, 2]] },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    expect(wrapper.exposed.splitLineAtVertex('line-1', '0')).toBe(false)
+    expect(wrapper.exposed.splitLineAtVertex('line-1', '2')).toBe(false)
+    expect(wrapper.exposed.splitLineAtVertex('line-1', 'x')).toBe(false)
+    expect(wrapper.events.some(([eventName]) => eventName === 'features-change')).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('splits a selected polygon with a crossing cutter line', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false, name: '分区' },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [0, 0],
+            [4, 0],
+            [4, 4],
+            [0, 4],
+            [0, 0],
+          ]],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didSplit = wrapper.exposed.splitPolygonWithLine('polygon-1', {
+      id: 'line-1',
+      type: 'Feature',
+      properties: { visible: true, locked: false },
+      geometry: { type: 'LineString', coordinates: [[2, -1], [2, 5]] },
+    })
+
+    expect(didSplit).toBe(true)
+    const nextFeatures = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features
+    expect(nextFeatures).toHaveLength(2)
+    expect(nextFeatures[0].id).toBe('polygon-1')
+    expect(nextFeatures[1].id).toBe('polygon-1-split-1')
+    expect(nextFeatures.every((feature) => feature.geometry.type === 'Polygon')).toBe(true)
+    expect(nextFeatures.every((feature) => feature.properties.name === '分区')).toBe(true)
+    expect(nextFeatures.map((feature) => feature.geometry.coordinates[0].length)).toEqual([5, 5])
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', {
+      featureIds: ['polygon-1', 'polygon-1-split-1'],
+    })
+
+    wrapper.unmount()
+  })
+
+  it('draws a temporary cutter line to split a selected polygon without keeping the cutter feature', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false, name: '分区' },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [0, 0],
+            [4, 0],
+            [4, 4],
+            [0, 4],
+            [0, 0],
+          ]],
+        },
+      }],
+    })
+    await nextTick()
+
+    const didStart = wrapper.exposed.startPolygonSplitSketch('polygon-1')
+    expect(didStart).toBe(true)
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('draw_line_string')
+    expect(wrapper.events).toContainEqual([
+      'geometry-edit-feedback',
+      { type: 'info', code: 'polygonSplitSketchStarted' },
+    ])
+
+    wrapper.events.length = 0
+    const cutterFeature = {
+      id: 'temporary-cutter',
+      type: 'Feature',
+      properties: { visible: true, locked: false },
+      geometry: { type: 'LineString', coordinates: [[2, -1], [2, 5]] },
+    }
+    wrapper.draw.features.set('temporary-cutter', cutterFeature)
+    wrapper.map.emit('draw.create', { features: [cutterFeature] })
+
+    const eventNames = wrapper.events.map(([eventName]) => eventName)
+    expect(eventNames.indexOf('before-features-change')).toBeGreaterThanOrEqual(0)
+    expect(eventNames.indexOf('features-change')).toBeGreaterThan(eventNames.indexOf('before-features-change'))
+    const nextFeatures = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features
+    expect(nextFeatures).toHaveLength(2)
+    expect(nextFeatures.every((feature) => feature.geometry.type === 'Polygon')).toBe(true)
+    expect(nextFeatures.some((feature) => feature.id === 'temporary-cutter')).toBe(false)
+    expect(wrapper.events).toContainEqual([
+      'geometry-edit-feedback',
+      { type: 'success', code: 'polygonSplitSuccess' },
+    ])
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', {
+      featureIds: ['polygon-1', 'polygon-1-split-1'],
+    })
+
+    wrapper.unmount()
+  })
+
+  it('removes an invalid temporary cutter line and reports why polygon splitting failed', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [0, 0],
+            [4, 0],
+            [4, 4],
+            [0, 4],
+            [0, 0],
+          ]],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.exposed.startPolygonSplitSketch('polygon-1')
+    wrapper.events.length = 0
+
+    const cutterFeature = {
+      id: 'temporary-cutter',
+      type: 'Feature',
+      properties: { visible: true, locked: false },
+      geometry: { type: 'LineString', coordinates: [[5, 5], [6, 6]] },
+    }
+    wrapper.draw.features.set('temporary-cutter', cutterFeature)
+    wrapper.map.emit('draw.create', { features: [cutterFeature] })
+
+    expect(wrapper.events.some(([eventName]) => eventName === 'before-features-change')).toBe(false)
+    expect(wrapper.events.some(([eventName]) => eventName === 'features-change')).toBe(false)
+    expect(wrapper.draw.getAll().features.map((feature) => feature.id)).toEqual(['polygon-1'])
+    expect(wrapper.events).toContainEqual([
+      'geometry-edit-feedback',
+      { type: 'error', code: 'polygonSplitNoPieces' },
+    ])
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: ['polygon-1'] })
+
+    wrapper.unmount()
+  })
+
+  it('blocks polygon splitting when the cutter line does not cross the polygon', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [0, 0],
+            [4, 0],
+            [4, 4],
+            [0, 4],
+            [0, 0],
+          ]],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    const didSplit = wrapper.exposed.splitPolygonWithLine('polygon-1', {
+      id: 'line-1',
+      type: 'Feature',
+      properties: { visible: true, locked: false },
+      geometry: { type: 'LineString', coordinates: [[5, 5], [6, 6]] },
+    })
+
+    expect(didSplit).toBe(false)
+    expect(wrapper.events.some(([eventName]) => eventName === 'features-change')).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('reports selected vertices as not deletable when deletion would invalidate a line', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'line-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'LineString', coordinates: [[0, 0], [1, 1]] },
+      }],
+    })
+    await nextTick()
+    wrapper.events.length = 0
+
+    wrapper.exposed.selectVertex('line-1', '1')
+
+    expect(wrapper.events).toContainEqual([
+      'shape-edit-state-change',
+      {
+        mode: 'direct_select',
+        featureId: 'line-1',
+        selectedVertexCount: 1,
+        selectedVertex: {
+          featureId: 'line-1',
+          coordPath: '1',
+          coordinate: [1, 1],
+        },
+        canDeleteSelectedVertices: false,
+        deleteBlockCode: '',
+      },
+    ])
+
+    wrapper.unmount()
+  })
+
+  it('blocks selected coordinate-path deletion when geometry would become invalid', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [[
+            [0, 0],
+            [1, 0],
+            [0, 1],
+            [0, 0],
+          ]],
+        },
+      }],
+    })
+    await nextTick()
+    wrapper.exposed.selectVertex('polygon-1', '0.1')
+    wrapper.events.length = 0
+
+    const didDelete = wrapper.exposed.deleteSelected()
+
+    expect(didDelete).toBe(false)
+    expect(wrapper.draw.trash).not.toHaveBeenCalled()
+    expect(wrapper.events.some(([eventName]) => eventName === 'features-change')).toBe(false)
+    expect(wrapper.events).toContainEqual([
+      'geometry-edit-feedback',
+      { type: 'error', code: 'vertexDeleteFailed' },
+    ])
 
     wrapper.unmount()
   })
@@ -797,6 +2850,326 @@ describe('EditableMapLibre state flow', () => {
     ])
     expect(wrapper.events.some(([eventName]) => eventName === 'before-features-change')).toBe(false)
     expect(wrapper.events.some(([eventName]) => eventName === 'features-change')).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('lets the page own box-selection merging instead of replacing map selection early', async () => {
+    const wrapper = mountEditableMapLibre({
+      type: 'FeatureCollection',
+      features: [{
+        id: 'polygon-1',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [[[20, 20], [30, 20], [30, 30], [20, 20]]] },
+      }, {
+        id: 'polygon-2',
+        type: 'Feature',
+        properties: { visible: true, locked: false },
+        geometry: { type: 'Polygon', coordinates: [[[60, 60], [70, 60], [70, 70], [60, 60]]] },
+      }],
+    }, { featureBoxSelectEnabled: true })
+    await nextTick()
+    wrapper.exposed.selectFeatures(['polygon-2'])
+    wrapper.draw.changeMode.mockClear()
+    wrapper.events.length = 0
+
+    const captureLayer = wrapper.host.querySelector('.editable-map-box-select-capture')
+    captureLayer.dispatchEvent(new MouseEvent('mousedown', {
+      bubbles: true,
+      cancelable: true,
+      button: 0,
+      shiftKey: true,
+      clientX: 10,
+      clientY: 10,
+    }))
+    document.dispatchEvent(new MouseEvent('mouseup', {
+      bubbles: true,
+      cancelable: true,
+      clientX: 40,
+      clientY: 40,
+    }))
+    await nextTick()
+
+    expect(wrapper.events).toContainEqual([
+      'feature-box-select',
+      { featureIds: ['polygon-1'], selectionMode: 'add' },
+    ])
+    expect(wrapper.draw.changeMode).not.toHaveBeenCalled()
+    expect(wrapper.events.some(([eventName]) => eventName === 'feature-select')).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('refreshes readonly overlays when the active layer changes', async () => {
+    const firstLayer = {
+      id: 'first-layer',
+      geometryType: 'Polygon',
+      visible: true,
+      locked: false,
+      stroke: '#111111',
+      strokeWidth: 2,
+      fill: '#222222',
+      fillOpacity: 0.2,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [{
+          id: 'first-polygon-1',
+          type: 'Feature',
+          properties: {},
+          geometry: { type: 'Polygon', coordinates: [] },
+        }],
+      },
+    }
+    const secondLayer = {
+      id: 'second-layer',
+      geometryType: 'Polygon',
+      visible: true,
+      locked: false,
+      stroke: '#333333',
+      strokeWidth: 2,
+      fill: '#444444',
+      fillOpacity: 0.2,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [{
+          id: 'second-polygon-1',
+          type: 'Feature',
+          properties: {},
+          geometry: { type: 'Polygon', coordinates: [] },
+        }],
+      },
+    }
+    const wrapper = mountEditableMapLibre(firstLayer.featureCollection, {
+      activeLayer: firstLayer,
+      allLayers: [firstLayer, secondLayer],
+    })
+    await nextTick()
+
+    expect(wrapper.map.getSource('readonly-draw-source-first-layer')).toBeNull()
+    expect(wrapper.map.getSource('readonly-draw-source-second-layer')).toBeTruthy()
+
+    wrapper.activeLayer.value = secondLayer
+    await nextTick()
+
+    expect(wrapper.map.getSource('readonly-draw-source-first-layer')).toBeTruthy()
+    expect(wrapper.map.getSource('readonly-draw-source-second-layer')).toBeNull()
+
+    wrapper.unmount()
+  })
+
+  it('renders layer opacity through active draw styles and readonly overlays', async () => {
+    const activeLayer = {
+      id: 'active-layer',
+      geometryType: 'Polygon',
+      visible: true,
+      locked: false,
+      opacity: 0.4,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    }
+    const readonlyLayer = {
+      id: 'readonly-layer',
+      geometryType: 'Polygon',
+      visible: true,
+      locked: false,
+      stroke: '#111111',
+      strokeWidth: 2,
+      fill: '#222222',
+      fillOpacity: 0.2,
+      opacity: 0.35,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [{
+          id: 'readonly-polygon-1',
+          type: 'Feature',
+          properties: {},
+          geometry: { type: 'Polygon', coordinates: [] },
+        }],
+      },
+    }
+    const wrapper = mountEditableMapLibre(activeLayer.featureCollection, {
+      activeLayer,
+      allLayers: [activeLayer, readonlyLayer],
+    })
+    await nextTick()
+
+    expect(JSON.stringify(wrapper.draw.options.styles)).toContain('user_opacity')
+    expect(wrapper.map.getSource('readonly-draw-source-readonly-layer').data.features[0].properties.opacity).toBe(0.35)
+    expect(JSON.stringify(wrapper.map.getLayer('readonly-draw-fill-readonly-layer').paint['fill-opacity'])).toContain('opacity')
+    expect(JSON.stringify(wrapper.map.getLayer('readonly-draw-line-readonly-layer').paint['line-opacity'])).toContain('opacity')
+
+    wrapper.unmount()
+  })
+
+  it('renders optional layer labels through active draw styles and readonly overlays', async () => {
+    const activeLayer = {
+      id: 'active-layer',
+      geometryType: 'Point',
+      visible: true,
+      locked: false,
+      labelsVisible: true,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    }
+    const readonlyLayer = {
+      id: 'readonly-layer',
+      geometryType: 'Point',
+      visible: true,
+      locked: false,
+      labelsVisible: true,
+      textAllowOverlap: false,
+      textPriority: 4,
+      textLineHeight: 1.25,
+      textLetterSpacing: 0.05,
+      textAlign: 'center',
+      textMaxWidth: 10,
+      textMinZoom: 0,
+      textMaxZoom: 12,
+      textBackgroundEnabled: true,
+      textBackgroundColor: '#ffffff',
+      textBackgroundOpacity: 0.75,
+      textBackgroundPadding: 2,
+      textLeaderLine: true,
+      textLeaderColor: '#111111',
+      textLeaderWidth: 2,
+      textOffsetX: 0.5,
+      textOffsetY: 1.2,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [{
+          id: 'readonly-point-1',
+          type: 'Feature',
+          properties: { name: '标注 A' },
+          geometry: { type: 'Point', coordinates: [113, 23] },
+        }],
+      },
+    }
+    const wrapper = mountEditableMapLibre(activeLayer.featureCollection, {
+      activeLayer,
+      allLayers: [activeLayer, readonlyLayer],
+    })
+    await nextTick()
+
+    expect(JSON.stringify(wrapper.draw.options.styles)).toContain('user_labelsVisible')
+    expect(JSON.stringify(wrapper.draw.options.styles)).toContain('user_textScaleVisible')
+    expect(JSON.stringify(wrapper.draw.options.styles)).toContain('user_textPriority')
+    expect(JSON.stringify(wrapper.draw.options.styles)).toContain('user_textBackgroundEnabled')
+    expect(wrapper.map.getSource('readonly-draw-source-readonly-layer').data.features[0].properties.labelsVisible).toBe(true)
+    expect(wrapper.map.getLayer('readonly-draw-label-readonly-layer').type).toBe('symbol')
+    expect(JSON.stringify(wrapper.map.getLayer('readonly-draw-label-readonly-layer').layout['text-field'])).toContain('name')
+    expect(wrapper.map.getLayer('readonly-draw-label-readonly-layer').layout['text-allow-overlap']).toBe(false)
+    expect(wrapper.map.getLayer('readonly-draw-label-readonly-layer').layout['text-line-height']).toBe(1.25)
+    expect(JSON.stringify(wrapper.map.getLayer('readonly-draw-label-readonly-layer').layout['symbol-sort-key'])).toContain('textPriority')
+    expect(JSON.stringify(wrapper.map.getLayer('readonly-draw-label-readonly-layer').paint['text-opacity'])).toContain('textScaleVisible')
+    expect(wrapper.map.getSource('readonly-draw-source-readonly-layer').data.features[0].properties.textScaleVisible).toBe(true)
+    expect(wrapper.map.getLayer('readonly-draw-label-background-readonly-layer').type).toBe('symbol')
+    expect(wrapper.map.getLayer('draw-text-background-fill').type).toBe('fill')
+    expect(wrapper.map.getLayer('draw-text-background-line').type).toBe('line')
+    const backgroundSource = wrapper.map.getSource('draw-text-background-source')?.data
+    expect(backgroundSource.features[0].geometry.type).toBe('Polygon')
+    expect(backgroundSource.features[0].properties.textBackgroundColor).toBe('#ffffff')
+    expect(wrapper.map.getLayer('draw-text-leader-line').type).toBe('line')
+    const leaderSource = wrapper.map.getSource('draw-text-leader-source')?.data
+    expect(leaderSource.features[0].geometry.type).toBe('LineString')
+    expect(leaderSource.features[0].properties.textLeaderColor).toBe('#111111')
+
+    wrapper.unmount()
+  })
+
+  it('removes readonly overlays for layers that are replaced from all layers', async () => {
+    const activeLayer = {
+      id: 'active-layer',
+      geometryType: 'Polygon',
+      visible: true,
+      locked: false,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    }
+    const removedLayer = {
+      id: 'removed-layer',
+      geometryType: 'Polygon',
+      visible: true,
+      locked: false,
+      stroke: '#111111',
+      strokeWidth: 2,
+      fill: '#222222',
+      fillOpacity: 0.2,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [{
+          id: 'removed-polygon-1',
+          type: 'Feature',
+          properties: {},
+          geometry: { type: 'Polygon', coordinates: [] },
+        }],
+      },
+    }
+    const wrapper = mountEditableMapLibre(activeLayer.featureCollection, {
+      activeLayer,
+      allLayers: [activeLayer, removedLayer],
+    })
+    await nextTick()
+
+    expect(wrapper.map.getSource('readonly-draw-source-removed-layer')).toBeTruthy()
+
+    wrapper.allLayers.value = [activeLayer]
+    await nextTick()
+
+    expect(wrapper.map.getSource('readonly-draw-source-removed-layer')).toBeNull()
+
+    wrapper.unmount()
+  })
+
+  it('removes readonly overlays when a layer id starts with the preview source prefix', async () => {
+    const activeLayer = {
+      id: 'active-layer',
+      geometryType: 'Polygon',
+      visible: true,
+      locked: false,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [],
+      },
+    }
+    const removedLayer = {
+      id: 'preview-draw-source-shadow',
+      geometryType: 'Polygon',
+      visible: true,
+      locked: false,
+      stroke: '#111111',
+      strokeWidth: 2,
+      fill: '#222222',
+      fillOpacity: 0.2,
+      featureCollection: {
+        type: 'FeatureCollection',
+        features: [{
+          id: 'shadow-polygon-1',
+          type: 'Feature',
+          properties: {},
+          geometry: { type: 'Polygon', coordinates: [] },
+        }],
+      },
+    }
+    const wrapper = mountEditableMapLibre(activeLayer.featureCollection, {
+      activeLayer,
+      allLayers: [activeLayer, removedLayer],
+    })
+    await nextTick()
+
+    expect(wrapper.map.getLayer('readonly-draw-fill-preview-draw-source-shadow')).toBeTruthy()
+
+    wrapper.allLayers.value = [activeLayer]
+    await nextTick()
+
+    expect(wrapper.map.getLayer('readonly-draw-fill-preview-draw-source-shadow')).toBe(false)
+    expect(wrapper.map.getSource('readonly-draw-source-preview-draw-source-shadow')).toBeNull()
 
     wrapper.unmount()
   })

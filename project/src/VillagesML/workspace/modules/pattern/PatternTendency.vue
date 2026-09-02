@@ -1,12 +1,12 @@
 <template>
   <div class="pattern-tendency-page">
-    <h3 class="villagesml-subtab-title">
-      模式分析 - 傾向性分析
+    <h1 class="villagesml-subtab-title">
+      <BarIcon icon="📊" />模式分析 - 傾向性分析
       <HelpIcon content="分析模式在不同區域的傾向性。Z分數≥2表示強傾向性，≥1表示中等傾向性。Z分數衡量該模式在特定區域的使用頻率是否顯著高於或低於全局平均" />
-    </h3>
+    </h1>
 
     <div class="vml-glass-panel">
-      <h2><InlineIcon icon="📊" />模式傾向性分析</h2>
+      <h2><BarIcon icon="📊" />模式傾向性分析</h2>
 
       <!-- Controls -->
       <div class="controls vml-control-surface vml-control-row vml-control-row--center">
@@ -92,6 +92,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'

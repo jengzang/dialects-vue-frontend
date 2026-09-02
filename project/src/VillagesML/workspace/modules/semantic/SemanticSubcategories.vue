@@ -1,9 +1,9 @@
 <template>
   <div class="semantic-subcategories-page">
-    <h3 class="villagesml-subtab-title">
-      語義分析 - 子類別分析
+    <h1 class="villagesml-subtab-title">
+      <BarIcon icon="🏷️" />語義分析 - 子類別分析
       <HelpIcon content="分析76個語義子類別的區域分布。區域對比模式：用雷達圖展示特定區域內某父類別下各子類別的VTF和傾向值（Z-score）。傾向排行模式：找出全省範圍內傾向值最高的Top N子類別" />
-    </h3>
+    </h1>
 
     <!-- Mode Selector -->
     <div class="mode-selector vml-control-surface vml-control-row vml-control-row--center">
@@ -223,6 +223,7 @@ import * as echarts from 'echarts'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { SEMANTIC_SUBCATEGORY_NAMES, getCategoryDisplayName } from '@/VillagesML/config/villagesML.js'
 import RadioGroup from "@/components/selector/RadioGroup.vue";
 
@@ -233,6 +234,7 @@ export default {
     FilterableSelect,
     SimpleSelectDropdown,
     HelpIcon,
+    BarIcon,
   },
   setup() {
     // Helper: 獲取子類別中文名（支持 v4 帶父前綴格式如 terrain_peak_ridge）

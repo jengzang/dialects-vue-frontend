@@ -33,7 +33,7 @@
           <article
             v-for="entry in entries"
             :key="entry.id"
-            class="card vocabulary-card"
+            class="card glass-card"
           >
             <div class="card-row row-1">
               <span class="location-chain">{{ entry.location }}</span>
@@ -83,7 +83,7 @@
 
       <button
         v-if="canLoadMore"
-        class="load-more-btn main-glass-button"
+        class="load-more-btn glass-button"
         data-variant="secondary"
         type="button"
         :disabled="isLoadingMore"
@@ -140,7 +140,7 @@
           </article>
           <button
             v-if="canLoadMoreMapDetail"
-            class="load-more-btn main-glass-button"
+            class="load-more-btn glass-button"
             data-variant="secondary"
             type="button"
             :disabled="isLoadingMapDetail"

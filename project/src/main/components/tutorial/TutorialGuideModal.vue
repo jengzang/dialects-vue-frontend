@@ -190,6 +190,7 @@
             v-if="selectedDocument?.html"
             class="tutorial-article__content"
             data-tutorial-content
+            @click="handleArticleClick"
             v-html="selectedDocument.html"
           />
           <!-- eslint-enable vue/no-v-html -->
@@ -241,6 +242,14 @@
   </AppModal>
 
   <ScrollToTop :container="scrollContainer" :show-after="200" />
+
+  <ImagePreviewOverlay
+    :src="previewImageSrc"
+    :alt="previewImageAlt"
+    :sibling-images="previewSiblingImages"
+    @close="closeImagePreview"
+    @navigate="onImageNavigate"
+  />
 </template>
 
 <script setup>
@@ -248,6 +257,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
 import ScrollToTop from '@/components/common/ScrollToTop.vue'
+import ImagePreviewOverlay from '@/components/common/ImagePreviewOverlay.vue'
 import { tutorialEnabled, setTutorialEnabled } from '@/main/store/store.js'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { showInfo } from '@/utils/ui/message.js'
@@ -323,6 +333,44 @@ const articleTopRef = ref(null)
 const articleScrollRef = ref(null)
 const scrollContainer = computed(() => articleScrollRef.value)
 
+const previewImageSrc = ref('')
+const previewImageAlt = ref('')
+const previewSiblingImages = ref([])
+
+function collectArticleImages() {
+  const container = articleScrollRef.value
+  if (!container) return []
+  return [...container.querySelectorAll('.tutorial-article__content img')].map((img) => ({
+    src: img.src,
+    alt: img.alt || '',
+  }))
+}
+
+function handleArticleClick(e) {
+  const img = e.target.closest('img')
+  if (!img) return
+
+  const siblings = collectArticleImages()
+  previewSiblingImages.value = siblings
+  openImagePreview(img.src, img.alt || '')
+}
+
+function openImagePreview(src, alt) {
+  previewImageSrc.value = src
+  previewImageAlt.value = alt
+}
+
+function closeImagePreview() {
+  previewImageSrc.value = ''
+  previewImageAlt.value = ''
+  previewSiblingImages.value = []
+}
+
+function onImageNavigate({ src, alt }) {
+  previewImageSrc.value = src
+  previewImageAlt.value = alt
+}
+
 const shouldShowCatalog = computed(() => {
   return !props.isCompact || props.isMobileLandscape || props.isCatalogOpen
 })
@@ -365,7 +413,7 @@ const modalMaxHeight = computed(() => {
     return 'min(88dvh, 720px)'
   }
 
-  return 'min(82dvh, 780px)'
+  return 'min(88dvh, 800px)'
 })
 
 function scrollSelectionIntoView() {
@@ -564,9 +612,12 @@ $float-catalog-button-left:0;
       gap: 12px;
     }
 
-    .tutorial-catalog,
-    .tutorial-article {
+    .tutorial-catalog {
       max-height: none;
+    }
+
+    .tutorial-article {
+      max-height: var(--tutorial-content-max-height);
     }
 
     .tutorial-article {
@@ -870,6 +921,7 @@ $float-catalog-button-left:0;
 
   &__content {
     font-family: var(--font-serif);
+    font-size: 0.95rem;
     color: var(--text-primary);
     line-height: 1.72;
 
@@ -878,6 +930,14 @@ $float-catalog-button-left:0;
     :deep(h3) {
       color: var(--color-primary-hover);
       line-height: 1.3;
+    }
+
+    :deep(h2) {
+      font-size: 1.2rem;
+    }
+
+    :deep(h3) {
+      font-size: 1.05rem;
     }
 
     :deep(p) {
@@ -905,11 +965,13 @@ $float-catalog-button-left:0;
 
     :deep(img) {
       display: block;
-      max-width: 100%;
+      max-width: min(100%, 95dvw);
+      max-height: 50dvh;
       height: auto;
       margin: 12px 0;
       border-radius: var(--radius-lg);
       border: 1px solid rgba(110, 160, 214, 0.12);
+      object-fit: contain;
     }
   }
 }
@@ -1085,5 +1147,11 @@ $float-catalog-button-left:0;
   .tutorial-article {
     padding-top: 52px;
   }
+}
+</style>
+
+<style>
+.content.ui-scrollbar:has([data-tutorial-modal]) {
+  overflow: visible;
 }
 </style>

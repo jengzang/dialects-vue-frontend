@@ -7,6 +7,7 @@ const FIELD_KEYS = {
   coordinate: ['經緯度', '经纬度', 'coordinates', 'coordinate', 'coord', 'lnglat', 'lonlat'],
   mapPartition: ['地圖集二分區', '地圖集分區', '地图集二分区', '地图集分区', 'mapPartition'],
   yindianPartition: ['音典分區', '音典分区', 'yindianPartition'],
+  dialectIsland: ['方言島', '方言岛', 'dialectIsland'],
 }
 
 export const PARTITION_MODE_MAP = 'map'
@@ -87,6 +88,7 @@ export function normalizePartitionPoint(row, options = {}) {
     partitionLevel1: getPartitionKeyFromParts(partitionParts, 1),
     partitionLevel2: getPartitionKeyFromParts(partitionParts, 2),
     partitionLevel3: getPartitionKeyFromParts(partitionParts, 3),
+    isDialectIsland: getStringField(row, FIELD_KEYS.dialectIsland) === '1',
     raw: row,
   }
 }
@@ -402,6 +404,143 @@ function buildConcaveHullRing(compIndices, validFeatures, delaunay, alpha) {
   return ring
 }
 
+// 归一化点坐标数组(过滤非法值),泰森多边形与等值线图共用
+function normalizeCoordinates(coordinates) {
+  return (coordinates || [])
+    .map((c) => (Array.isArray(c) && c.length >= 2
+      && Number.isFinite(Number(c[0]))
+      && Number.isFinite(Number(c[1])))
+      ? [Number(c[0]), Number(c[1])]
+      : null)
+    .filter(Boolean)
+}
+
+// 计算每个点往外扩张的半径 radius(由 expandFactor 控制)。
+// 等值线图用它扩展网格 bbox 以容纳边界;泰森多边形则按原始逻辑自行计算 radius。
+export function computeVoronoiRadius(coordinates, expandFactor = 0.3) {
+  const coords = normalizeCoordinates(coordinates)
+  if (coords.length < 2) return 0.1
+
+  const features = coords.map((c) => point(c))
+  const delaunay = Delaunay.from(
+    features,
+    (f) => f.geometry.coordinates[0],
+    (f) => f.geometry.coordinates[1],
+  )
+  const n = coords.length
+
+  // 每个点与 Delaunay 邻居的中位距离 → globalMedian → radius
+  const neighborDists = []
+  for (let i = 0; i < n; i += 1) {
+    const pi = coords[i]
+    const dists = []
+    for (const j of delaunay.neighbors(i)) {
+      const pj = coords[j]
+      dists.push(Math.hypot(pi[0] - pj[0], pi[1] - pj[1]))
+    }
+    neighborDists.push(dists.length ? dists.sort((a, b) => a - b)[Math.floor(dists.length / 2)] : 0)
+  }
+
+  const globalMedian = (() => {
+    const sorted = neighborDists.filter((d) => d > 0).sort((a, b) => a - b)
+    if (!sorted.length) return 0.1
+    const mid = Math.floor(sorted.length / 2)
+    return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2
+  })()
+
+  return globalMedian * (0.05 + expandFactor * 8) * 2
+}
+
+// 从点坐标与给定 radius 构建裁剪边界(泰森多边形与等值线图共用)。
+// 每个点往外扩张 radius,小分量取圆并集,大分量取 hull+buffer,
+// 得到「与点保持一定距离」的外边界。
+export function buildVoronoiClipBoundary(coordinates, radius) {
+  const coords = normalizeCoordinates(coordinates)
+  if (coords.length < 2) return { boundary: null, radius: 0.1 }
+
+  const features = coords.map((c) => point(c))
+  const delaunay = Delaunay.from(
+    features,
+    (f) => f.geometry.coordinates[0],
+    (f) => f.geometry.coordinates[1],
+  )
+  const n = coords.length
+
+  const alpha = radius * 3
+
+  // BFS 找连通分量(Delaunay 边 < 2*radius 视为连通)
+  const compVisited = new Uint8Array(n)
+  const components = []
+  for (let i = 0; i < n; i += 1) {
+    if (compVisited[i]) continue
+    const comp = []
+    const queue = [i]
+    compVisited[i] = 1
+    while (queue.length > 0) {
+      const idx = queue.shift()
+      comp.push(idx)
+      const pi = coords[idx]
+      for (const j of delaunay.neighbors(idx)) {
+        if (compVisited[j]) continue
+        const pj = coords[j]
+        if (Math.hypot(pi[0] - pj[0], pi[1] - pj[1]) < 2 * radius) {
+          compVisited[j] = 1
+          queue.push(j)
+        }
+      }
+    }
+    components.push(comp)
+  }
+
+  // 对每个分量:大分量 hull+buffer,小分量圆并集
+  const boundaries = []
+  for (const comp of components) {
+    if (comp.length < 3) {
+      for (const i of comp) boundaries.push(createCirclePolygon(coords[i], radius))
+    } else if (comp.length <= 30) {
+      const compCircles = comp.map((i) => createCirclePolygon(coords[i], radius))
+      try {
+        const merged = union(featureCollection(compCircles))
+        if (merged) boundaries.push(merged)
+      } catch {
+        boundaries.push(...compCircles)
+      }
+    } else {
+      const compPoints = comp.map((i) => coords[i])
+      const concaveRing = buildConcaveHullRing(comp, features, delaunay, alpha)
+      if (concaveRing && concaveRing.length >= 4) {
+        try {
+          const buf = buffer(polygon([concaveRing]), radius, { units: 'degrees' })
+          if (buf) { boundaries.push(buf); continue }
+        } catch { /* fallback */ }
+      }
+      const hull = convexHull(compPoints)
+      if (hull.length >= 3) {
+        const hullRing = [...hull, hull[0]]
+        try {
+          const buf = buffer(polygon([hullRing]), radius, { units: 'degrees' })
+          if (buf) boundaries.push(buf)
+        } catch {
+          for (const p of hull) boundaries.push(createCirclePolygon(p, radius))
+        }
+      }
+    }
+  }
+
+  let boundary = null
+  if (boundaries.length === 1) {
+    boundary = boundaries[0]
+  } else if (boundaries.length > 1) {
+    try {
+      boundary = union(featureCollection(boundaries))
+    } catch {
+      boundary = featureCollection(boundaries)
+    }
+  }
+
+  return { boundary, radius }
+}
+
 function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) {
   const originalFeatures = pointCollection?.features ?? []
   const validFeatures = []
@@ -474,21 +613,22 @@ function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) 
 
     polygonFeatures.push(polygon([coords], sourceFeature?.properties ?? {}))
 
-    // 计算 cell 到中心的最大距离（用于预过滤）和邻居距离（用于计算半径）
+    // 记录该 cell 与 Delaunay 邻居的中位距离（用于计算扩张半径，仅统计有效 cell）
     const pi = getPointCoordinate(sourceFeature)
-    let maxDist = 0
-    for (let ci = 0; ci < coords.length; ci += 1) {
-      const d = Math.hypot(coords[ci][0] - pi[0], coords[ci][1] - pi[1])
-      if (d > maxDist) maxDist = d
-    }
-    cellMaxDists.push(maxDist)
-
     const dists = []
     for (const j of delaunay.neighbors(index)) {
       const pj = getPointCoordinate(validFeatures[j])
       dists.push(Math.hypot(pi[0] - pj[0], pi[1] - pj[1]))
     }
     neighborDists.push(dists.length ? dists.sort((a, b) => a - b)[Math.floor(dists.length / 2)] : 0)
+
+    // 计算 cell 到中心的最大距离（用于裁剪预过滤）
+    let maxDist = 0
+    for (let ci = 0; ci < coords.length; ci += 1) {
+      const d = Math.hypot(coords[ci][0] - pi[0], coords[ci][1] - pi[1])
+      if (d > maxDist) maxDist = d
+    }
+    cellMaxDists.push(maxDist)
   }
 
   // 未启用延伸 → 跳过裁剪，直接返回
@@ -500,105 +640,22 @@ function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) 
     return featureCollection(polygonFeatures)
   }
 
-  // 第二步：用连通分量构建裁剪边界
+  // 第二步：按原始逻辑计算扩张半径（仅统计有效 cell 的邻居中位距离）
   const globalMedian = (() => {
     const sorted = neighborDists.filter((d) => d > 0).sort((a, b) => a - b)
     if (!sorted.length) return 0.1
     const mid = Math.floor(sorted.length / 2)
     return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2
   })()
-
   const radius = globalMedian * (0.05 + expandFactor * 8) * 2
 
-  // BFS 找连通分量（Delaunay 边 < 2*radius 的视为连通）
-  const n = validFeatures.length
-  const compVisited = new Uint8Array(n)
-  const components = []
+  // 第三步：用连通分量构建裁剪边界（复用共享函数）
+  const { boundary: clipBoundary } = buildVoronoiClipBoundary(
+    validFeatures.map((feature) => getPointCoordinate(feature)).filter(Boolean),
+    radius,
+  )
 
-  for (let i = 0; i < n; i += 1) {
-    if (compVisited[i]) continue
-    const comp = []
-    const queue = [i]
-    compVisited[i] = 1
-    while (queue.length > 0) {
-      const idx = queue.shift()
-      comp.push(idx)
-      const pi = getPointCoordinate(validFeatures[idx])
-      if (!pi) continue
-      for (const j of delaunay.neighbors(idx)) {
-        if (compVisited[j]) continue
-        const pj = getPointCoordinate(validFeatures[j])
-        if (!pj) continue
-        if (Math.hypot(pi[0] - pj[0], pi[1] - pj[1]) < 2 * radius) {
-          compVisited[j] = 1
-          queue.push(j)
-        }
-      }
-    }
-    components.push(comp)
-  }
-
-  // 对每个分量：大分量 buffer(凸包)，小分量 union(圆)
-  const boundaries = []
-  for (const comp of components) {
-    if (comp.length < 3) {
-      for (const i of comp) {
-        const pi = getPointCoordinate(validFeatures[i])
-        if (pi) boundaries.push(createCirclePolygon(pi, radius))
-      }
-    } else if (comp.length <= 30) {
-      const compCircles = comp
-        .map((i) => {
-          const pi = getPointCoordinate(validFeatures[i])
-          return pi ? createCirclePolygon(pi, radius) : null
-        })
-        .filter(Boolean)
-      if (compCircles.length > 0) {
-        try {
-          const merged = union(featureCollection(compCircles))
-          if (merged) boundaries.push(merged)
-        } catch {
-          boundaries.push(...compCircles)
-        }
-      }
-    } else {
-      const compPoints = comp.map((i) => getPointCoordinate(validFeatures[i])).filter(Boolean)
-      if (compPoints.length < 3) continue
-      // 尝试用 alpha shape 构建凹边界，alpha 取半径的 3 倍
-      const alpha = radius * 3
-      const concaveRing = buildConcaveHullRing(comp, validFeatures, delaunay, alpha)
-      if (concaveRing && concaveRing.length >= 4) {
-        try {
-          const buf = buffer(polygon([concaveRing]), radius, { units: 'degrees' })
-          if (buf) { boundaries.push(buf); continue }
-        } catch { /* fallback */ }
-      }
-      // fallback: convex hull + buffer
-      const hull = convexHull(compPoints)
-      if (hull.length >= 3) {
-        const hullRing = [...hull, hull[0]]
-        try {
-          const buf = buffer(polygon([hullRing]), radius, { units: 'degrees' })
-          if (buf) boundaries.push(buf)
-        } catch {
-          for (const p of hull) boundaries.push(createCirclePolygon(p, radius))
-        }
-      }
-    }
-  }
-
-  let clipBoundary = null
-  if (boundaries.length === 1) {
-    clipBoundary = boundaries[0]
-  } else if (boundaries.length > 1) {
-    try {
-      clipBoundary = union(featureCollection(boundaries))
-    } catch {
-      clipBoundary = featureCollection(boundaries)
-    }
-  }
-
-  // 第三步：用并集边界裁剪
+  // 第四步：用并集边界裁剪
   let statInside = 0
   let statNoIntersect = 0
   let statIntersected = 0
@@ -632,12 +689,8 @@ function buildSafeVoronoiFeatureCollection(pointCollection, expandFactor = 0.3) 
       })
     : polygonFeatures
 
-  const compSizes = components.map((c) => c.length).sort((a, b) => b - a)
   console.log('[partitionVoronoi] component clip', {
     totalCells: polygonFeatures.length,
-    components: compSizes.length,
-    compSizes: compSizes.slice(0, 5),
-    boundaries: boundaries.length,
     radius,
     expandFactor,
     clipStats: `${statInside} inside, ${statNoIntersect} noIntersect, ${statIntersected} intersected, ${statFailed} failed`,

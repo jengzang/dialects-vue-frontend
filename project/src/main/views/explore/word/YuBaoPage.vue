@@ -1,5 +1,10 @@
 <template>
   <div class="yubao-page">
+    <h1 class="page-title">
+      <BarIcon :icon="activePageIcon" />
+      {{ activePageTitle }}
+    </h1>
+
     <!-- 顶部控制栏 -->
     <div class="top-controls">
       <!-- Tab 切换 + 查看全部按钮 -->
@@ -139,7 +144,7 @@
 
     <!-- 内容区 -->
     <!-- 加载状态 -->
-    <div v-if="isLoading" class="content-area">
+    <div v-if="isLoading" class="content-area glass-panel">
       <div class="loading-state loading-state-base">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <span>{{ t('words.yuBaoPage.states.loadingData') }}</span>
@@ -157,7 +162,7 @@
     />
 
     <!-- 表格模式 - 输入无效时的提示 -->
-    <div v-else-if="viewMode === 'table'" class="content-area">
+    <div v-else-if="viewMode === 'table'" class="content-area glass-panel">
       <div class="empty-state empty-state-base">
         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
           <circle cx="12" cy="12" r="10"/>
@@ -174,7 +179,7 @@
     </div>
 
     <!-- 卡片/地图模式 -->
-    <div v-else-if="viewMode === 'card'" class="content-area">
+    <div v-else-if="viewMode === 'card'" class="content-area glass-panel">
       <!-- 卡片模式 -->
       <div class="card-mode">
 
@@ -207,7 +212,7 @@
             <div
                 v-for="(item, idx) in visibleCards"
                 :key="activeTab + idx"
-                class="card"
+                class="card glass-card"
                 :class="activeTab === 'vocabulary' ? 'vocabulary-card' : 'grammar-card'"
             >
               <template v-if="activeTab === 'vocabulary'">
@@ -350,6 +355,7 @@ import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 import { watchDebounced } from '@vueuse/core'
 import YuBaoMap from '@/main/components/map/YuBaoMap.vue'
 import AppModal from '@/components/common/AppModal.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 import { useStorageState } from '@/composables/core/useStorageState.js'
 
@@ -448,6 +454,16 @@ const activeTabLabel = computed(() => (
   activeTab.value === 'vocabulary'
     ? t('words.yuBaoVocabulary.name')
     : t('words.yuBaoGrammar.name')
+))
+
+const activePageTitle = computed(() => (
+  activeTab.value === 'vocabulary'
+    ? t('navigation.pageTitles.yubao.vocabulary')
+    : t('navigation.pageTitles.yubao.grammar')
+))
+
+const activePageIcon = computed(() => (
+  activeTab.value === 'vocabulary' ? '📖' : '🗣️'
 ))
 
 // 检查输入是否有效（是否在数据列表中完全匹配）
@@ -1160,12 +1176,12 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   max-height: 69dvh;
   padding: 25px;
   overflow: auto;
-  background: var(--glass-60);
-  border: 1px solid var(--border-gray-light);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  // background: var(--glass-60);
+  // border: 1px solid var(--border-gray-light);
+  // border-radius: var(--radius-lg);
+  // box-shadow: var(--shadow-md);
 
-  @include glass-blur(20px);
+  // @include glass-blur(20px);
 
   @media (max-width: 768px) {
     padding: 20px;
@@ -1309,16 +1325,16 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   gap: 14px;
   padding: 18px 20px;
   overflow: hidden;
-  background: var(--glass-80);
-  border: 0.5px solid var(--glass-90);
-  border-radius: var(--radius-lg);
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.06),
-    0 2px 8px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 var(--text-white);
-  transition: all $transition-base $ease-standard;
+  // background: var(--glass-80);
+  // border: 0.5px solid var(--glass-90);
+  // border-radius: var(--radius-lg);
+  // box-shadow:
+  //   0 8px 32px rgba(0, 0, 0, 0.06),
+  //   0 2px 8px rgba(0, 0, 0, 0.04),
+  //   inset 0 1px 0 var(--text-white);
+  // transition: all $transition-base $ease-standard;
 
-  @include saturated-glass;
+  // @include saturated-glass;
 
   &:hover {
     border-color: rgba(var(--color-primary-rgb), 0.2);

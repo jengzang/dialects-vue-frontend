@@ -200,7 +200,7 @@
       <Transition name="tab-tooltip-fade">
         <div
           v-if="tooltip.visible"
-          class="tab-tooltip global-tooltip-surface"
+          class="tab-tooltip tooltip-surface"
           :style="tooltipStyle"
         >{{ tooltip.label }}</div>
       </Transition>
@@ -235,8 +235,8 @@ import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPrefe
 
 const faviconSrc = computed(() =>
   currentColorTheme.value === COLOR_THEME_GREEN
-    ? new URL('@/assets/favicon_green.ico', import.meta.url).href
-    : new URL('@/assets/favicon.ico', import.meta.url).href
+    ? '/brand/favicon_green.ico'
+    : '/brand/favicon.ico'
 )
 
 // Props definition

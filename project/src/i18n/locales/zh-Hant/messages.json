@@ -37,12 +37,12 @@
   "rateLimit": {
     "defaultMessage": "請求過於頻繁，請稍後再試。",
     "retryIn": "恢復倒數",
-    "guestHint": "登錄帳號後可繼續查詢，不必一直等到遊客額度恢復。",
-    "userHint": "請等待倒數結束後再試，無需重複提交。",
+    "guestHint": "登錄帳號後可繼續查詢。",
+    "userHint": "請等待 {duration} 後再試，無需重複提交。",
     "limitTypes": {
-      "guest_ip_limit": "遊客額度已滿",
-      "authenticated_ip_limit": "目前 IP 額度已滿",
-      "authenticated_user_limit": "目前帳號額度已滿",
+      "guest_ip_limit": "您的查詢額度已滿",
+      "authenticated_ip_limit": "您目前查詢次數過多",
+      "authenticated_user_limit": "您的帳號查詢次數過多",
       "login_ip_limit": "登錄請求過於頻繁",
       "default": "目前請求已被限流"
     },

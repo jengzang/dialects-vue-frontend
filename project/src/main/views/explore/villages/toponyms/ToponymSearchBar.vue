@@ -6,7 +6,8 @@
     <label class="toponym-search-bar__field toponym-search-bar__field--query">
       <span>{{ t('villages.pages.toponyms.search.keyword') }}</span>
       <input
-        class="main-search-field"
+        class="glass-field"
+        data-shape="search"
         :value="query"
         :placeholder="t('villages.pages.toponyms.search.placeholder')"
         autocomplete="off"
@@ -28,7 +29,7 @@
     </label>
 
     <button
-      class="main-glass-button toponym-search-bar__submit"
+      class="glass-button toponym-search-bar__submit"
       type="submit"
       :disabled="loading"
     >

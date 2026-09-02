@@ -3,7 +3,8 @@
     class="tutorial-trigger"
     :class="{
       'has-dice': hasDiceConfig,
-      'is-text-only': !hasDiceConfig
+      'is-text-only': !hasDiceConfig,
+      'is-breathing': breathing,
     }"
     data-tutorial-trigger
   >
@@ -21,6 +22,12 @@
       >
         🎲
       </span>
+      <span
+        v-if="showDiceTooltip"
+        class="tutorial-trigger__dice-tooltip"
+      >
+        {{ t('tutorial.assist.diceTooltip') }}
+      </span>
     </button>
 
     <button
@@ -34,12 +41,18 @@
         <span class="tutorial-trigger__eyebrow">{{ t('tutorial.assist.badge') }}</span>
         <span class="tutorial-trigger__label">{{ t('tutorial.ui.triggerLabel') }}</span>
       </span>
+      <span
+        v-if="showFingerHint"
+        class="tutorial-trigger__finger-hint"
+      >
+        {{ t('tutorial.assist.fingerHint') }}
+      </span>
     </button>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const props = defineProps({
@@ -51,14 +64,29 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  showDiceTooltip: {
+    type: Boolean,
+    default: false,
+  },
+  showFingerHint: {
+    type: Boolean,
+    default: false,
+  },
 })
 
-defineEmits(['open', 'applyDice'])
+defineEmits(['open', 'applyDice', 'dismissDiceTooltip', 'dismissFingerHint'])
 
 const { t } = useI18n()
 
 const diceTitle = computed(() => {
   return t('tutorial.assist.badge')
+})
+
+const breathing = ref(true)
+onMounted(() => {
+  setTimeout(() => {
+    breathing.value = false
+  }, 2200)
 })
 </script>
 
@@ -133,7 +161,6 @@ $shadow-hover:
   box-shadow: $shadow-base;
 
   color: var(--color-primary-hover);
-  overflow: hidden;
 
   @include glass-bg;
 
@@ -141,6 +168,10 @@ $shadow-hover:
     transform 0.22s ease,
     box-shadow 0.22s ease,
     border-color 0.22s ease;
+
+  &.is-breathing {
+    animation: tutorial-breathe 2.2s ease-in-out 1;
+  }
 
   &::before {
     content: '';
@@ -181,6 +212,10 @@ $shadow-hover:
       transform 0.18s ease,
       filter 0.18s ease;
 
+    .is-breathing & {
+      animation: dice-glow 2.2s ease-in-out 1;
+    }
+
     &:hover {
       transform: rotate(-10deg) scale(1.12);
       filter: drop-shadow(0 5px 10px rgba(var(--color-primary-rgb), 0.22));
@@ -202,6 +237,33 @@ $shadow-hover:
     filter:
       drop-shadow(0 2px 3px rgba(var(--color-primary-hover-rgb), 0.18))
       drop-shadow(0 8px 12px rgba(var(--color-primary-rgb), 0.16));
+  }
+
+  &__dice-tooltip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    background: var(--color-primary);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    pointer-events: none;
+    z-index: 10;
+    animation: dice-tooltip-in 0.3s ease-out;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: var(--color-primary);
+    }
   }
 
   &__main {
@@ -237,6 +299,33 @@ $shadow-hover:
     letter-spacing: 0.01em;
 
     @include text-truncate;
+  }
+
+  &__finger-hint {
+    position: absolute;
+    right: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%);
+    white-space: nowrap;
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    background: var(--color-primary);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    pointer-events: none;
+    z-index: 10;
+    animation: finger-hint-in 0.3s ease-out;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 6px solid transparent;
+      border-left-color: var(--color-primary);
+    }
   }
 
   /* 竖屏 / 接近竖屏：宽高比 <= 1，统一隐藏骰子，只保留打开教程入口 */
@@ -293,6 +382,52 @@ $shadow-hover:
       font-size: 0.78rem;
       line-height: 1.1;
     }
+  }
+}
+
+@keyframes tutorial-breathe {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes dice-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--color-primary-rgb), 0);
+  }
+  50% {
+    box-shadow: 0 0 14px 3px rgba(var(--color-primary-rgb), 0.28);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--color-primary-rgb), 0);
+  }
+}
+
+@keyframes dice-tooltip-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes finger-hint-in {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
   }
 }
 </style>

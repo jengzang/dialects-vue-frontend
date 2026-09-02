@@ -79,22 +79,40 @@
 
     <Teleport to="body">
       <nav
-          v-if="props.showCharNav && mode === 'tab1' && charNavItems.length > 1"
-          class="char-nav-teleport"
-          :aria-label="t('result.charsAndTones.charNav.title')"
-        >
+        v-if="props.showCharNav"
+        class="char-nav-teleport"
+        :aria-label="t('result.charsAndTones.charNav.title')"
+      >
+        <template v-if="charNavItems.length > 1">
+          <button
+            v-for="nav in charNavItems"
+            :key="nav.id"
+            type="button"
+            class="char-nav-node"
+            :class="{ active: activeCharNavId === nav.id }"
+            :title="t('result.charsAndTones.charNav.jumpToChar', { char: nav.char })"
+            :aria-label="t('result.charsAndTones.charNav.jumpToChar', { char: nav.char })"
+            :aria-current="activeCharNavId === nav.id ? 'true' : undefined"
+            @click="jumpToChar(nav.id)"
+          >
+            <span class="char-nav-char">{{ nav.char }}</span>
+          </button>
+          <div class="char-nav-divider"></div>
+        </template>
+
         <button
-          v-for="nav in charNavItems"
-          :key="nav.id"
           type="button"
-          class="char-nav-node"
-          :class="{ active: activeCharNavId === nav.id }"
-          :title="t('result.charsAndTones.charNav.jumpToChar', { char: nav.char })"
-          :aria-label="t('result.charsAndTones.charNav.jumpToChar', { char: nav.char })"
-          :aria-current="activeCharNavId === nav.id ? 'true' : undefined"
-          @click="jumpToChar(nav.id)"
+          class="char-nav-action"
+          @click="handleCopy"
         >
-          <span class="char-nav-char">{{ nav.char }}</span>
+          {{ t('result.charsAndTones.export.copy') }}
+        </button>
+        <button
+          type="button"
+          class="char-nav-action"
+          @click="handleExport"
+        >
+          {{ t('result.charsAndTones.export.export') }}
         </button>
       </nav>
     </Teleport>
@@ -127,6 +145,8 @@ import { getReadingClass, getSearchCharReadingType } from '@/main/utils/query/Re
 import { READING_COLORS } from '@/main/config/colors/readingColors.js';
 import { getLocationDetail } from '@/api';
 import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue';
+import { showSuccess, showError } from '@/utils/ui/message.js';
+import { copyText, downloadText, toCsv, toTsv } from '@/main/utils/export/resultExport.js';
 
 const props = defineProps({
   data: {
@@ -526,6 +546,55 @@ const handleLocationClick = async (locationName) => {
   }
 };
 
+// ================= 複製/導出 =================
+const TAB1_HEADERS = ['字', '地點', '讀音', '注'];
+
+const buildTab1Rows = () => {
+  return processedData.value
+    .filter(item => item.音节 && item.音节.length > 0)
+    .map(item => {
+      const syllables = item.音节.map(syl => getDisplaySyllable(syl, item.location)).join(' ');
+      const notes = (item.notes || [])
+        .map(n => (n && n !== '_' ? n : ''))
+        .filter(n => n.trim())
+        .join(' ');
+      return [item.char, item.location, syllables, notes];
+    });
+};
+
+const buildTab4Rows = () => {
+  return processedData.value.map(item => {
+    const values = getToneValues(item.tones).map(formatToneText);
+    return [item['簡稱'], ...values];
+  });
+};
+
+const buildExportData = () => {
+  if (props.mode === 'tab4') {
+    return { headers: toneHeaders.value, rows: buildTab4Rows() };
+  }
+  return { headers: TAB1_HEADERS, rows: buildTab1Rows() };
+};
+
+const handleCopy = async () => {
+  const { headers, rows } = buildExportData();
+  const ok = await copyText(toTsv([headers, ...rows]));
+  if (ok) {
+    showSuccess(t('result.charsAndTones.export.copied'));
+  } else {
+    showError(t('result.charsAndTones.export.copyFailed'));
+  }
+};
+
+const handleExport = () => {
+  const { headers, rows } = buildExportData();
+  const fileName = props.mode === 'tab4'
+    ? `查調結果_${Date.now()}.csv`
+    : `查字結果_${Date.now()}.csv`;
+  downloadText(toCsv([headers, ...rows]), fileName);
+  showSuccess(t('result.charsAndTones.export.exported'));
+};
+
 onMounted(() => {
   nextTick(() => updateActiveCharNav());
 });
@@ -629,7 +698,7 @@ $glass-blur: 8px;
  */
 .char-nav-teleport {
   position: fixed;
-  top: 50%;
+  top: calc(50% + 32px);
   right: 18px;
   z-index: 9998;
   @include flex-col;
@@ -699,6 +768,40 @@ $glass-blur: 8px;
 
   @media (max-aspect-ratio: 1/1) {
     font-size: 16px;
+  }
+}
+
+.char-nav-divider {
+  width: 20px;
+  height: 1px;
+  margin: 2px 0;
+  background: var(--border-glass);
+}
+
+.char-nav-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  padding: 3px 2px;
+  color: var(--text-slate);
+  font-size: 12px;
+  line-height: 1.2;
+  cursor: pointer;
+  background: var(--glass-60);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  border-radius: var(--radius-pill);
+  transition:
+    transform 0.18s ease,
+    color 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease;
+
+  &:hover {
+    color: $deep-blue;
+    background: var(--glass-90);
+    border-color: rgba(var(--color-primary-rgb), 0.45);
+    transform: translateX(-2px);
   }
 }
 

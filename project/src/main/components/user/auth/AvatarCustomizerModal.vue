@@ -157,7 +157,14 @@
             <span>{{
               $t('auth.profile.avatar.gradientAngle', { angle: avatarConfig.gradientAngle })
             }}</span>
-            <input v-model.number="avatarConfig.gradientAngle" type="range" min="0" max="360" />
+            <input
+              v-model.number="avatarConfig.gradientAngle"
+              class="glass-range"
+              type="range"
+              min="0"
+              max="360"
+              :style="{ '--glass-range-progress': (avatarConfig.gradientAngle / 360 * 100) + '%' }"
+            />
           </div>
         </div>
 
@@ -777,29 +784,8 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   font-size: 13px;
   font-weight: 550;
 
-  input[type="range"] {
+  .glass-range {
     flex: 1;
-    height: 6px;
-    background: rgba(0, 0, 0, 0.08);
-    border-radius: 3px;
-    outline: none;
-    -webkit-appearance: none;
-
-    &::-webkit-slider-thumb {
-      width: 18px;
-      height: 18px;
-      cursor: pointer;
-      background: $white;
-      border: 1px solid rgba(0, 0, 0, 0.15);
-      border-radius: var(--radius-full);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-      transition: transform 0.1s ease;
-      -webkit-appearance: none;
-
-      &:active {
-        transform: scale(1.2);
-      }
-    }
   }
 }
 

@@ -301,17 +301,34 @@
       "other": {
         "label": "Other Queries",
         "items": {
-          "coordinates": "Coordinate Lookup",
           "table": "Table Queries",
-          "tree": "Tree Queries",
+          "tree": "Tree Queries"
+        },
+        "tooltips": {
+          "table": "Includes various table-based queries, such as language-preservation vocabulary and grammar data, data sources, Guangdong village datasets, and Yangchun colloquial vocabulary.",
+          "tree": "Includes various tree-based queries, such as the Guangdong natural-village hierarchy and Middle Chinese phonological categories."
+        }
+      },
+      "villageGeography": {
+        "label": "Village & Geography",
+        "items": {
+          "coordinates": "Coordinate Lookup",
+          "locations": "Location Information",
           "villages": "Village Machine Learning",
-          "locations": "Location Information"
+          "toponyms": "Toponym Queries",
+          "gis": "GIS Queries"
         },
         "tooltips": {
           "coordinates": "Used to retrieve the coordinates required for map rendering. Middle Chinese, phonetic-value, character, tone, regional-map, and custom-map queries may all use this feature.",
-          "table": "Includes various table-based queries, such as language-preservation vocabulary and grammar data, data sources, Guangdong village datasets, and Yangchun colloquial vocabulary.",
-          "tree": "Includes various tree-based queries, such as the Guangdong natural-village hierarchy and Middle Chinese phonological categories.",
           "locations": "Includes retrieving details for individual locations and complete information about dialect regions."
+        }
+      },
+      "customData": {
+        "label": "Custom Data",
+        "items": {
+          "customRegions": "Custom Regions",
+          "customDataQuery": "Custom Data Query",
+          "customDataEdit": "Custom Data Edit"
         }
       },
       "vocabulary": {

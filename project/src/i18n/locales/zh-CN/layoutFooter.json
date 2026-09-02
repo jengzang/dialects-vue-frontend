@@ -1,0 +1,283 @@
+{
+  "actions": {
+    "features": "功能入口",
+    "menu": "菜单",
+    "tutorial": "教程",
+    "feedback": "反馈",
+    "share": "分享",
+    "support": "支持",
+    "settings": "设置",
+    "copyLink": "复制链接",
+    "downloadShareImage": "下载分享图"
+  },
+  "stats": {
+    "visits": "今日 {today} · 总访问 {total}",
+    "source": "字表 {locationCount} · 数据 {dataCount}",
+    "databaseVersion": "数据库 {version}"
+  },
+  "language": {
+    "zhCN": "简体",
+    "zhHant": "繁体",
+    "en": "English"
+  },
+  "theme": {
+    "blue": "蓝色",
+    "light": "浅色",
+    "dark": "深色",
+    "green": "绿色"
+  },
+  "pages": {
+    "generic": {
+      "title": "方音图鉴",
+      "description": "探索方言音韵、词句资料与地理分布。"
+    },
+    "menuEntry": {
+      "title": "功能导航",
+      "description": "进入查询、比较、地图、音系、词句、村落以及工具入口。"
+    },
+    "menuAboutIntro": {
+      "title": "关于方音图鉴",
+      "description": "查看网站功能介绍、发展历史等"
+    },
+    "menuAboutSuggestion": {
+      "title": "反馈入口",
+      "description": "跳转github或知乎提出issue，或直接在本站内提交反馈。"
+    },
+    "menuAboutLike": {
+      "title": "支持项目",
+      "description": "查看项目仓库、相关知乎介绍文章以及作者的开发感悟。"
+    },
+    "menuQueryZhonggu": {
+      "title": "查中古",
+      "description": "韵书 → 读音 • 按韵书地位分别整理声韵调的读音"
+    },
+    "menuQueryChar": {
+      "title": "查字",
+      "description": "查询汉字的读音、地位及注释"
+    },
+    "menuQueryYinwei": {
+      "title": "查音位",
+      "description": "读音 → 韵书 • 分析各声韵调的音位来源于什么韵书地位"
+    },
+    "menuQueryTone": {
+      "title": "查调",
+      "description": "查询各点的调类、调值"
+    },
+    "menuMapView": {
+      "title": "地图显示",
+      "description": "地理语言学直观呈现。即在地图上查看查询、比较结果，及绘制音节等值线图、热力图等。"
+    },
+    "menuMapDivide": {
+      "title": "地图分区",
+      "description": "查询各方言点所属的分区，并跳转地图绘制查看。"
+    },
+    "menuMapCustom": {
+      "title": "个人地图数据",
+      "description": "查看、管理自定义方言数据，并绘制到地图上。与账号绑定，多设备同步。"
+    },
+    "menuCompareChar": {
+      "title": "比较字",
+      "description": "比较同一汉字在不同地点的读音差异。"
+    },
+    "menuCompareZhonggu": {
+      "title": "比较中古",
+      "description": "比较同一中古地位在不同地点的演变情况。"
+    },
+    "menuCompareTone": {
+      "title": "比较声调",
+      "description": "比较两个调类在不同地点是合流还是分立。"
+    },
+    "menuComparePhonetic": {
+      "title": "比较音系",
+      "description": "比较所选各点的音值对应关系（请输入2~5个地点）。"
+    },
+    "menuResult": {
+      "title": "查询结果",
+      "description": "查字、查中古、查音位、查调的结果页面，支持分享与导出。"
+    },
+    "menuPhoMatrix": {
+      "title": "音系查询",
+      "description": "查看方言点的完整音系表和同音字汇，以表格的形式呈现声韵调拼合关系。"
+    },
+    "menuPhoCustom": {
+      "title": "音素分类",
+      "description": "按韵书地位特征，分类整理方言点的声韵调数据"
+    },
+    "menuPhoCount": {
+      "title": "音节统计",
+      "description": "统计方言点的音节数量，并绘制图表与等值线地图。含独立统计声韵调、不带调音节、带调音节三种模式。"
+    },
+    "menuPhoEvolution": {
+      "title": "演化",
+      "description": "查看单个方言点的当今音系与韵书地位之间的对应关系，并用饼图和桑基图展示声母、韵母、声调的历史演化。"
+    },
+    "menuSettings": {
+      "title": "设置",
+      "description": "配置语言、主题、查询输入方式、教程开关等。"
+    },
+    "menuSource": {
+      "title": "资料来源",
+      "description": "查看方言数据的字表来源、参考文献、地点行政区划等。"
+    },
+    "menuPrivacy": {
+      "title": "隐私说明",
+      "description": "了解本站的隐私政策与引用说明"
+    },
+    "menuTools": {
+      "title": "工具入口",
+      "description": "字表检查、合并，粤拼转换，在线praat工具，GIS绘图工具等入口。"
+    },
+    "menuVocabularyView": {
+      "title": "词表浏览",
+      "description": "浏览和搜索所有协作者提交的词表数据，支持卡片、地图、表格三种展示模式。"
+    },
+    "menuVocabularyImport": {
+      "title": "词表导入",
+      "description": "上传新的词表数据，需要先申请权限，并填写地点信息，再按标准格式提交词表。"
+    },
+    "menuVocabularyManage": {
+      "title": "词表管理",
+      "description": "管理上传的词表，可进行在线编辑、批量替换、增删词条等操作。"
+    },
+    "menuYubao": {
+      "title": "语保资料",
+      "description": "查询语保工程的词汇（1000词）与语法例句（50句）数据，支持地图、卡片、表格三种展示模式。"
+    },
+    "menuVillages": {
+      "title": "村落入口",
+      "description": "进入自然村树状图、表格，机器学习分析工具等。"
+    },
+    "menuCluster": {
+      "title": "方言聚类",
+      "description": "按方言特征数据探索方言点聚类关系。"
+    },
+    "exploreEntry": {
+      "title": "探索导航",
+      "description": "进入工具、字表、自然村和专题资料页面。"
+    },
+    "exploreCheck": {
+      "title": "字表检查",
+      "description": "上传方言字表文件，自动检查「非单字」「异常音标」「缺声调」等常见问题，并提供在线编辑修正功能。"
+    },
+    "exploreJyut2Ipa": {
+      "title": "粤拼转IPA",
+      "description": "批量将Excel表格中的粤拼转换为国际音标(ipa)，支持自定义配置规则。"
+    },
+    "exploreMerge": {
+      "title": "字表合并",
+      "description": "上传参考表与待合并字表，将按参考表的汉字顺序，批量完成对齐与合并。"
+    },
+    "exploreDerive": {
+      "title": "音系推导",
+      "description": "辅助推导生成字表。"
+    },
+    "explorePraat": {
+      "title": "Praat 声学分析",
+      "description": "上传音频或直接录音，查看声学分析结果（包含基频、共振峰、频谱图、元音空间等），支持按照石锋T值法自动生成声调图。"
+    },
+    "exploreGis": {
+      "title": "地图绘制",
+      "description": "在线GIS地图编辑器，支持添加、编辑和删除地理要素，同时支持泰森多边形自动绘制方言分布图。"
+    },
+    "exploreManage": {
+      "title": "资料管理",
+      "description": "管理和维护站点数据库。"
+    },
+    "exploreCharClass": {
+      "title": "汉字字集",
+      "description": "按韵书地位逐级展开汉字，可查看各地位所包含的汉字及注释，支持自定义顺序。"
+    },
+    "exploreYcOverview": {
+      "title": "阳春专题",
+      "description": "查看阳春方言资料的专题概览。"
+    },
+    "exploreYcWords": {
+      "title": "阳春词句",
+      "description": "浏览阳春方言词汇与例句资料。"
+    },
+    "exploreYcExpressions": {
+      "title": "阳春表达",
+      "description": "浏览阳春方言表达和语法资料。"
+    },
+    "exploreYcVillages": {
+      "title": "阳春自然村",
+      "description": "查看阳春自然村资料与分布。"
+    },
+    "exploreVillagesToponyms": {
+      "title": "地名检索",
+      "description": "检索自然村地名和相关行政信息。"
+    },
+    "exploreVillagesGd": {
+      "title": "广东自然村树",
+      "description": "按行政区划层级浏览广东自然村资料，支持树状展开和方言地图可视化。"
+    },
+    "exploreVillagesTable": {
+      "title": "广东自然村表",
+      "description": "以表格形式浏览和查询广东自然村数据，支持排序、筛选、分页。"
+    },
+    "exploreVillagesMl": {
+      "title": "自然村机器学习",
+      "description": "使用机器学习方法分析自然村名的模式和规律。"
+    },
+    "exploreVillagesAll": {
+      "title": "全部自然村",
+      "description": "浏览站点收录的自然村资料。"
+    },
+    "villagesML": {
+      "title": "自然村分析工作台",
+      "description": "分析自然村字符、语义、空间、聚类等特征。"
+    },
+    "auth": {
+      "title": "账号",
+      "description": "登录、注册或查看账号信息、排行榜等。"
+    },
+    "authData": {
+      "title": "个人数据",
+      "description": "查看与管理个人添加的方言数据。"
+    },
+    "authRegions": {
+      "title": "个人分区",
+      "description": "管理账号保存的自定义方言分区。"
+    }
+  },
+  "legal": {
+    "copyright": "© 2026 方音图鉴",
+    "icp": "粤ICP备2025466875号"
+  },
+  "share": {
+    "copied": "已复制当前页面链接",
+    "imageReady": "已生成分享图，当前浏览器未允许复制链接",
+    "qrHint": "扫码打开当前页面",
+    "failed": "分享失败，请稍后再试",
+    "stats": "字表数量: {locationCount} · 数据条数: {dataCount}"
+  },
+  "feedback": {
+    "title": "提交反馈",
+    "category": "类型",
+    "titleLabel": "标题",
+    "titlePlaceholder": "简要说明问题或建议",
+    "contentLabel": "内容",
+    "contentPlaceholder": "请描述你看到的问题、想法或期待的改进。",
+    "contactLabel": "联系方式",
+    "contactPlaceholder": "邮箱或其他联系方式，可留空",
+    "submit": "提交",
+    "success": "反馈已提交，感谢你的帮助",
+    "validationFailed": "反馈内容或截图不符合要求，请检查后再提交",
+    "failed": "反馈提交失败，请稍后再试",
+    "categories": {
+      "general": "其他",
+      "bug": "问题",
+      "feature": "功能建议",
+      "data_issue": "资料问题",
+      "ui": "界面体验",
+      "vocabulary_permission": "词表权限"
+    },
+    "screenshot": {
+      "label": "附带当前页面截图",
+      "hint": "勾选后会生成压缩预览，并随反馈提交",
+      "capturing": "正在生成截图预览...",
+      "retake": "重新截图",
+      "previewAlt": "当前页面截图预览"
+    }
+  }
+}

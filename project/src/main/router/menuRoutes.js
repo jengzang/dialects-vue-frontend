@@ -19,11 +19,26 @@ const DialectClusteringPage = () => import('@/main/views/menu/DialectClustering.
 export const menuRoutes = [
   {
     path: 'menu/pho/:section(matrix|custom|count|evolution)',
-    component: PhoPage
+    component: PhoPage,
+    meta: {
+      queryAllowlist: {
+        base: [],
+        variantKey: 'section',
+        variants: {
+          matrix: ['mloc'],
+          custom: ['cloc', 'feature', 'h', 'v', 'c'],
+          count: [],
+          evolution: ['eloc']
+        }
+      }
+    }
   },
   {
     path: 'menu/about/:section(intro|suggestion|like)',
-    component: AboutPage
+    component: AboutPage,
+    meta: {
+      queryAllowlist: ['category', 'from']
+    }
   },
   {
     path: 'menu/query',
@@ -47,7 +62,19 @@ export const menuRoutes = [
   },
   {
     path: 'menu/compare/:sub(char|zhonggu|tone|phonetic)',
-    component: ComparePage
+    component: ComparePage,
+    meta: {
+      queryAllowlist: {
+        base: [],
+        variantKey: 'sub',
+        variants: {
+          char: [],
+          zhonggu: [],
+          tone: [],
+          phonetic: ['ploc']
+        }
+      }
+    }
   },
   {
     path: 'menu/map',
@@ -59,7 +86,18 @@ export const menuRoutes = [
   },
   {
     path: 'menu/map/:sub(view|divide|custom)',
-    component: MapPage
+    component: MapPage,
+    meta: {
+      queryAllowlist: {
+        base: [],
+        variantKey: 'sub',
+        variants: {
+          view: ['feature', 'locations', 'regions', 'regionMode', 'openPanel', 'phonology', 'mode', 'toneMode', 'syllable'],
+          divide: [],
+          custom: []
+        }
+      }
+    }
   },
   {
     path: 'menu/result',
@@ -100,7 +138,8 @@ export const menuRoutes = [
     children: [
       {
         path: 'view',
-        component: VocabularyViewPage
+        component: VocabularyViewPage,
+        meta: { queryAllowlist: ['tab'] }
       },
       {
         path: 'import',
@@ -114,7 +153,8 @@ export const menuRoutes = [
   },
   {
     path: 'menu/yubao',
-    component: YuBaoMenuPage
+    component: YuBaoMenuPage,
+    meta: { queryAllowlist: ['tab'] }
   },
   {
     path: 'menu/villages',

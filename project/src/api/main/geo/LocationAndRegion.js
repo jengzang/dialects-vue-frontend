@@ -1,6 +1,7 @@
 // api/query/LocationAndRegion.js - 地点查询 API
 import { api } from '../../auth/httpClient.js'
 import { showError } from '@/utils/ui/message.js'
+import { getCachedLocationDetail, cacheLocationDetail } from '@/composables/data/useLocationDetailCache.js'
 
 /**
  * @typedef {Object} GetLocationsParams
@@ -29,18 +30,25 @@ import { showError } from '@/utils/ui/message.js'
 export async function getLocations(params = {}) {
   try {
     const query = new URLSearchParams()
+    let hasQuery = false
 
     // 处理 locations 参数（数组形式）
     if (params.locations && Array.isArray(params.locations)) {
       params.locations.forEach(loc => {
-        if (loc) query.append('locations', loc)
+        if (loc && /[一-鿿0-9]/.test(loc)) {
+          query.append('locations', loc)
+          hasQuery = true
+        }
       })
     }
 
     // 处理 regions 参数（数组形式）
     if (params.regions && Array.isArray(params.regions)) {
       params.regions.forEach(reg => {
-        if (reg) query.append('regions', reg)
+        if (reg && /[一-鿿0-9]/.test(reg)) {
+          query.append('regions', reg)
+          hasQuery = true
+        }
       })
     }
 
@@ -48,6 +56,9 @@ export async function getLocations(params = {}) {
     if (params.region_mode) {
       query.append('region_mode', params.region_mode)
     }
+
+    // 过滤后无有效地点/区域则不请求后端
+    if (!hasQuery) return { success: false, locations_result: [] }
 
     return await api(`/api/get_locs/?${query.toString()}`)
   } catch (error) {
@@ -59,11 +70,18 @@ export async function getLocations(params = {}) {
 
 export async function getLocationDetail(name) {
   try {
+    const cached = getCachedLocationDetail(name)
+    if (cached) {
+      return cached
+    }
+
     const query = new URLSearchParams()
     if (name) {
       query.append('name', name)
     }
-    return await api(`/api/locations/detail?${query.toString()}`)
+    const result = await api(`/api/locations/detail?${query.toString()}`)
+    cacheLocationDetail(name, result)
+    return result
   } catch (error) {
     console.error('Get location detail error:', error)
     showError(error.message || 'Failed to fetch location detail')
@@ -82,6 +100,20 @@ export async function getLocationPartitions() {
 }
 
 /**
+ * 获取地点坐标点（地图打点、Voronoi 图）
+ * @returns {Promise<Object>} { data: [...] }，每行含 簡稱、經緯度、地圖集二分區、音典分區，方言島時含 方言島: 1
+ */
+export async function getLocationPoints() {
+  try {
+    return await api('/api/locations/points')
+  } catch (error) {
+    console.error('Get location points error:', error)
+    showError(error.message || 'Failed to fetch location points')
+    throw new Error(error.message || 'Failed to fetch location points')
+  }
+}
+
+/**
  * 批量匹配地点
  * @param {string} inputString - 输入字符串（多个地点用逗号或空格分隔）
  * @param {boolean} [filterValidAbbrs=false] - 是否只过滤有效简称
@@ -91,6 +123,9 @@ export async function getLocationPartitions() {
  * const matches = await batchMatch('广州,香港,深圳', false)
  */
 export async function batchMatch(inputString, filterValidAbbrs = false) {
+  // 纯英文（既无中文也无数字）不请求后端
+  if (!/[一-鿿0-9]/.test(inputString)) return []
+
   try {
     const params = new URLSearchParams({
       input_string: inputString,

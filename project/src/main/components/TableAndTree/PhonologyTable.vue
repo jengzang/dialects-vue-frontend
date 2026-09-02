@@ -3,10 +3,10 @@
     <div v-if="location" class="location-header">
       <div class="location-title"><InlineIcon icon="📍" />{{ location }}</div>
       <div class="header-actions">
-        <button class="tone-search-btn" @click="handleShowDetails" :disabled="isLoading">
+        <button class="tone-search-btn glass-button" @click="handleShowDetails" :disabled="isLoading">
           {{ isLoading ? t('result.phonologyTable.loadingButton') : t('result.phonologyTable.detailButton') }}
         </button>
-        <button class="fullscreen-btn" @click="toggleFullScreen">
+        <button class="fullscreen-btn glass-button" @click="toggleFullScreen">
           {{ t('result.phonologyTable.fullscreen') }}
         </button>
       </div>
@@ -453,6 +453,28 @@ $transition-duration: 0.25s;
       max-height: 100dvh;
       margin: 0;
       border-radius: 0;
+      background: var(--surface-elevation-0);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    // .corner-cell,
+    // .initial-header,
+    // .final-header {
+    //   &::before {
+    //     backdrop-filter: none;
+    //     -webkit-backdrop-filter: none;
+    //   }
+    // }
+
+    // .corner-cell,
+    // .initial-header,
+    // .final-header {
+    //   background: var(--surface-elevation-1);
+    // }
+
+    .matrix-cell {
+      background: var(--surface-elevation-0);
     }
   }
 }
@@ -470,7 +492,7 @@ $transition-duration: 0.25s;
 }
 
 .matrix-wrapper {
-  max-height: 60dvh;
+  max-height: 66dvh;
   margin-bottom: 15px;
   overflow-x: auto;
   overflow-y: auto;
@@ -484,6 +506,9 @@ $transition-duration: 0.25s;
   /* GPU acceleration for smooth scrolling */
   will-change: transform;
   contain: layout style;
+  @media (max-aspect-ratio: 1/1) {
+    max-height: 60dvh;
+  }
 }
 
 .matrix-table {

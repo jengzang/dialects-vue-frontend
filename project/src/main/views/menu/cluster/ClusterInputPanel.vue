@@ -1,6 +1,6 @@
 <template>
   <section
-    class="panel main-glass-panel"
+    class="panel glass-panel"
     data-step="input"
   >
     <div class="panel-header">
@@ -9,7 +9,7 @@
         <p>{{ t('cluster.input.description') }}</p>
       </div>
       <button
-        class="global-action-btn global-action-btn-secondary add-group-btn"
+        class="action-btn action-btn-secondary add-group-btn"
         type="button"
         @click="addGroup"
       >
@@ -24,7 +24,7 @@
       {{ formErrorMessage }}
     </div>
 
-    <div class="location-section main-glass-panel-inner">
+    <div class="location-section glass-subpanel">
       <div class="section-heading">
         <h3>{{ t('cluster.input.locationTitle') }}</h3>
         <p>{{ t('cluster.input.locationDescription') }}</p>
@@ -48,7 +48,7 @@
       <article
         v-for="(group, index) in workspaceState.requestDraft.groups"
         :key="group.id"
-        class="group-panel main-glass-panel-inner"
+        class="group-panel glass-subpanel"
       >
         <div class="group-panel__header group-panel__header--compact">
           <button
@@ -67,7 +67,7 @@
             <span class="group-summary-arrow">{{ isGroupExpanded(group.id) ? '−' : '+' }}</span>
           </button>
           <button
-            class="global-action-btn global-action-btn-secondary group-remove-btn"
+            class="action-btn action-btn-secondary group-remove-btn"
             type="button"
             :disabled="workspaceState.requestDraft.groups.length === 1"
             @click="removeGroup(index)"
@@ -183,7 +183,7 @@
 
     <div class="panel-actions">
       <button
-        class="global-action-btn global-action-btn-primary"
+        class="action-btn action-btn-primary"
         type="button"
         :disabled="isPreviewPending"
         @click="handlePreview"

@@ -7,7 +7,7 @@ import {
   stripLocaleFromPath,
 } from '@/i18n/localeRouting.js'
 
-const DEFAULT_OG_IMAGE = '/og-cover.png'
+const DEFAULT_OG_IMAGE = '/brand/title.webp'
 const DEFAULT_JSON_LD = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
@@ -78,11 +78,11 @@ function updateHreflangLinks(pathname) {
   const normalizedPath = normalizePathname(pathname)
 
   for (const locale of SUPPORTED_LOCALES) {
-    const href = `${origin}${buildLocalePath(locale, normalizedPath)}/`
+    const href = `${origin}${buildLocalePath(locale, normalizedPath)}`
     ensureAlternateLink(locale).setAttribute('href', href)
   }
 
-  ensureAlternateLink('x-default').setAttribute('href', `${origin}${buildLocalePath(SEO_CONFIG.defaultLocale, normalizedPath)}/`)
+  ensureAlternateLink('x-default').setAttribute('href', `${origin}${buildLocalePath(SEO_CONFIG.defaultLocale, normalizedPath)}`)
 }
 function ensureJsonLd() {
   let script = document.head.querySelector('script[data-hermes-seo="jsonld"]')
@@ -115,10 +115,7 @@ function getCanonicalUrl(pathname, locale) {
   const origin = SEO_CONFIG.siteOrigin || window.location.origin
   const normalizedPath = normalizePathname(pathname)
   const localizedPath = buildLocalePath(locale, normalizedPath)
-  if (localizedPath === `/${locale}`) {
-    return `${origin}${localizedPath}/`
-  }
-  return `${origin}${localizedPath}/`
+  return `${origin}${localizedPath}`
 }
 
 function getOgImageUrl() {

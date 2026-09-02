@@ -1,26 +1,24 @@
 <template>
-  <div class="home-page">
+  <div class="home-page" ref="homePageRef">
     <!-- Animated Background -->
     <div class="bg-gradient"></div>
 
     <!-- Hero Section -->
     <section class="hero-section">
+      <GlobeBackground :points="globePoints" />
+
       <div class="hero-content">
-        <img src="@/assets/picture/title.png" :alt="$t('home.hero.logoAlt')" class="hero-logo title-logo" />
+        <img src="/brand/title.webp" :alt="$t('home.hero.logoAlt')" class="hero-logo title-logo" />
         <div class="hero-title-row">
           <h1 class="hero-title">{{ $t('home.hero.title') }}</h1>
         </div>
         <p class="hero-subtitle">{{ $t('home.hero.subtitle') }}</p>
         <div class="hero-bottom-row">
           <div class="hero-actions">
-            <button class="btn-primary" @click="navigateTo('/menu/query/zhonggu')">
+            <RouterLink class="btn-primary" :to="localeTo('/menu/query/zhonggu')">
               <span class="btn-icon"><InlineIcon icon="🚀" /></span>
               <span class="btn-text">{{ $t('home.hero.startExploring') }}</span>
-            </button>
-            <!-- <button class="btn-primary btn-explore" @click="navigateTo('/explore?page=YuBao')">
-              <span class="btn-icon"><InlineIcon icon="🧰" /></span>
-              <span class="btn-text">{{ $t('home.hero.expandTools') }}</span>
-            </button> -->
+            </RouterLink>
             <button class="btn-secondary" @click="scrollToFeatures">
               <span class="btn-icon"><InlineIcon icon="📖" /></span>
               <span class="btn-text">{{ $t('home.hero.featuresIntro') }}</span>
@@ -30,360 +28,42 @@
         </div>
       </div>
 
-      <HeroShowcase />
+      <!-- Showcase Section (lazy mounted) -->
+      <section class="showcase-section" ref="showcaseSectionRef">
+        <HeroShowcase v-if="showShowcase" />
+      </section>
+      
     </section>
 
-    <!-- Features Section -->
-    <section class="features-section" ref="featuresSection">
-      <h2 class="section-title">{{ $t('home.features.sectionTitle') }}</h2>
-
-      <div class="features-grid">
-        <!-- 查詢功能 -->
-        <div class="feature-card" :class="{ expanded: expandedCard === 'query' }">
-          <div class="card-header" @click="toggleCard('query')">
-            <div class="card-icon"><InlineIcon icon="🔍" /></div>
-            <div class="card-info">
-              <h3 class="card-title">{{ $t('home.features.query.title') }}</h3>
-              <p class="card-desc">{{ $t('home.features.query.desc') }}</p>
-            </div>
-            <button class="expand-toggle">
-              <span class="toggle-icon">{{ expandedCard === 'query' ? '−' : '+' }}</span>
-            </button>
+    <!-- Platform Section -->
+    <!-- <section class="platform-section reveal">
+      <article class="platform-card">
+        <span class="platform-eyebrow">{{ $t('home.platform.eyebrow') }}</span>
+        <h2 class="platform-title">{{ $t('home.platform.title') }}</h2>
+        <p class="platform-desc">{{ $t('home.platform.desc') }}</p>
+        <div class="platform-stats">
+          <div class="platform-stat">
+            <span>{{ $t('home.platform.stats.visits') }}</span>
+            <strong>{{ totalVisits }}</strong>
           </div>
-          <transition name="expand">
-            <div v-if="expandedCard === 'query'" class="card-body">
-              <a @click.stop="navigateTo('/menu/query/char')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="📝" /></span>
-                <span class="link-text">{{ $t('home.features.query.searchChar') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/menu/query/zhonggu')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="📜" /></span>
-                <span class="link-text">{{ $t('home.features.query.searchMiddle') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/menu/query/yinwei')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="🗣️" /></span>
-                <span class="link-text">{{ $t('home.features.query.searchPhoneme') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/menu/query/tone')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="🎶" /></span>
-                <span class="link-text">{{ $t('home.features.query.searchTone') }}</span>
-              </a>
-            </div>
-          </transition>
-        </div>
-
-        <!-- 比較功能 -->
-        <div class="feature-card" :class="{ expanded: expandedCard === 'compare' }">
-          <div class="card-header" @click="toggleCard('compare')">
-            <div class="card-icon"><InlineIcon icon="🔀" /></div>
-            <div class="card-info">
-              <h3 class="card-title">{{ $t('home.features.compare.title') }}</h3>
-              <p class="card-desc">{{ $t('home.features.compare.desc') }}</p>
-            </div>
-            <button class="expand-toggle">
-              <span class="toggle-icon">{{ expandedCard === 'compare' ? '−' : '+' }}</span>
-            </button>
+          <div class="platform-stat">
+            <span>{{ $t('home.platform.stats.locations') }}</span>
+            <strong>{{ sourceLocationCount }}</strong>
           </div>
-          <transition name="expand">
-            <div v-if="expandedCard === 'compare'" class="card-body">
-              <a @click.stop="navigateTo('/menu/compare/char')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="📊" /></span>
-                <span class="link-text">{{ $t('home.features.compare.compareChar') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/menu/compare/zhonggu')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="🎯" /></span>
-                <span class="link-text">{{ $t('home.features.compare.compareMiddle') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/menu/compare/tone')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="🎹" /></span>
-                <span class="link-text">{{ $t('home.features.compare.compareTone') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/menu/compare/phonetic')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="⚖️" /></span>
-                <span class="link-text">{{ $t('home.features.compare.comparePhonetic') }}</span>
-              </a>
-            </div>
-          </transition>
-        </div>
-
-        <!-- 地圖可視化 -->
-        <div class="feature-card" :class="{ expanded: expandedCard === 'map' }">
-          <div class="card-header" @click="toggleCard('map')">
-            <div class="card-icon"><InlineIcon icon="🗺️" /></div>
-            <div class="card-info">
-              <h3 class="card-title">{{ $t('home.features.map.title') }}</h3>
-              <p class="card-desc">{{ $t('home.features.map.desc') }}</p>
-            </div>
-            <button class="expand-toggle">
-              <span class="toggle-icon">{{ expandedCard === 'map' ? '−' : '+' }}</span>
-            </button>
-          </div>
-          <transition name="expand">
-            <div v-if="expandedCard === 'map'" class="card-body">
-              <a @click.stop="navigateTo('/menu/map/view')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="📍" /></span>
-                <span class="link-text">{{ $t('home.features.map.dialectMap') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/menu/map/divide')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="🧭" /></span>
-                <span class="link-text">{{ $t('home.features.map.regionMap') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/menu/map/custom')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="📁" /></span>
-                <span class="link-text">{{ $t('home.features.map.customMap') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/explore/gis')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="✏️" /></span>
-                <span class="link-text">{{ $t('home.features.map.drawMap') }}</span>
-              </a>
-            </div>
-          </transition>
-        </div>
-
-        <!-- 音系分析 -->
-        <div class="feature-card" :class="{ expanded: expandedCard === 'pho' }">
-          <div class="card-header" @click="toggleCard('pho')">
-            <div class="card-icon"><InlineIcon icon="🧬" /></div>
-            <div class="card-info">
-              <h3 class="card-title">{{ $t('home.features.phonology.title') }}</h3>
-              <p class="card-desc">{{ $t('home.features.phonology.desc') }}</p>
-            </div>
-            <button class="expand-toggle">
-              <span class="toggle-icon">{{ expandedCard === 'pho' ? '−' : '+' }}</span>
-            </button>
-          </div>
-          <transition name="expand">
-            <div v-if="expandedCard === 'pho'" class="card-body">
-              <a @click.stop="navigateTo('/menu/pho/matrix')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="⚗️" /></span>
-                <span class="link-text">{{ $t('home.features.phonology.phonologyQuery') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/menu/pho/custom')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="🔬" /></span>
-                <span class="link-text">{{ $t('home.features.phonology.phonemeClassify') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/menu/pho/count')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="📊" /></span>
-                <span class="link-text">{{ $t('home.features.phonology.syllableCount') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/menu/pho/evolution')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="🥧" /></span>
-                <span class="link-text">{{ $t('home.features.phonology.evolution') }}</span>
-              </a>
-            </div>
-          </transition>
-        </div>
-
-        <!-- 漢字字表 -->
-        <div class="feature-card" :class="{ expanded: expandedCard === 'charClass' }">
-          <div class="card-header" @click="toggleCard('charClass')">
-            <div class="card-icon"><InlineIcon icon="📜" /></div>
-            <div class="card-info">
-              <h3 class="card-title">{{ $t('home.features.charClass.title') }}</h3>
-              <p class="card-desc">{{ $t('home.features.charClass.desc') }}</p>
-            </div>
-            <button class="expand-toggle">
-              <span class="toggle-icon">{{ expandedCard === 'charClass' ? '−' : '+' }}</span>
-            </button>
-          </div>
-          <transition name="expand">
-            <div v-if="expandedCard === 'charClass'" class="card-body">
-              <a @click.stop="navigateTo('/explore/char-class?tab=zhonggu')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="🏛️" /></span>
-                <span class="link-text">{{ $t('home.features.charClass.zhonggu') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/explore/char-class?tab=shanggu')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="📿" /></span>
-                <span class="link-text">{{ $t('home.features.charClass.shanggu') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/explore/char-class?tab=jingu')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="📖" /></span>
-                <span class="link-text">{{ $t('home.features.charClass.jingu') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/explore/char-class?tab=yueyun')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="🎵" /></span>
-                <span class="link-text">{{ $t('home.features.charClass.yueyun') }}</span>
-              </a>
-            </div>
-          </transition>
-        </div>
-
-        <!-- 詞句資料 -->
-        <div class="feature-card" :class="{ expanded: expandedCard === 'words' }">
-          <div class="card-header" @click="toggleCard('words')">
-            <div class="card-icon"><InlineIcon icon="📖" /></div>
-            <div class="card-info">
-              <h3 class="card-title">{{ $t('home.features.words.title') }}</h3>
-              <p class="card-desc">{{ $t('home.features.words.desc') }}</p>
-            </div>
-            <button class="expand-toggle">
-              <span class="toggle-icon">{{ expandedCard === 'words' ? '−' : '+' }}</span>
-            </button>
-          </div>
-          <transition name="expand">
-            <div v-if="expandedCard === 'words'" class="card-body">
-              <a @click.stop="navigateTo('/menu/vocabulary')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="📋" /></span>
-                <span class="link-text">{{ $t('home.features.words.wordList') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/menu/yubao?tab=vocabulary')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="📖" /></span>
-                <span class="link-text">{{ $t('home.features.words.yubaoVocab') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/menu/yubao?tab=grammar')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="🗣️" /></span>
-                <span class="link-text">{{ $t('home.features.words.yubaoGrammar') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/explore/yc/words')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="💬" /></span>
-                <span class="link-text">{{ $t('home.features.words.ycSpoken') }}</span>
-              </a>
-            </div>
-          </transition>
-        </div>
-
-        <!-- 自然村資料 -->
-        <div class="feature-card" :class="{ expanded: expandedCard === 'villages' }">
-          <div class="card-header" @click="toggleCard('villages')">
-            <div class="card-icon"><InlineIcon icon="🏘️" /></div>
-            <div class="card-info">
-              <h3 class="card-title">{{ $t('home.features.villages.title') }}</h3>
-              <p class="card-desc">{{ $t('home.features.villages.desc') }}</p>
-            </div>
-            <button class="expand-toggle">
-              <span class="toggle-icon">{{ expandedCard === 'villages' ? '−' : '+' }}</span>
-            </button>
-          </div>
-          <transition name="expand">
-            <div v-if="expandedCard === 'villages'" class="card-body">
-              <a @click.stop="navigateTo('/explore/villages/toponyms')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="📍" /></span>
-                <span class="link-text">{{ $t('home.features.villages.toponyms') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/explore/villages/ml')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="🤖" /></span>
-                <span class="link-text">{{ $t('home.features.villages.villagesML') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/explore/villages/gd')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="🏘️" /></span>
-                <span class="link-text">{{ $t('home.features.villages.gdVillages') }}</span>
-              </a>
-              <!-- <a @click.stop="navigateTo('/explore/villages/table')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="📊" /></span>
-                <span class="link-text">{{ $t('home.features.villages.gdVillagesTable') }}</span>
-              </a> -->
-              <a @click.stop="navigateTo('/explore/villages/yc')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="🌾" /></span>
-                <span class="link-text">{{ $t('home.features.villages.ycVillages') }}</span>
-              </a>
-            </div>
-          </transition>
-        </div>
-
-        <!-- 專業工具 -->
-        <div class="feature-card" :class="{ expanded: expandedCard === 'tools' }">
-          <div class="card-header" @click="toggleCard('tools')">
-            <div class="card-icon"><InlineIcon icon="🧰" /></div>
-            <div class="card-info">
-              <h3 class="card-title">{{ $t('home.features.tools.title') }}</h3>
-              <p class="card-desc">{{ $t('home.features.tools.desc') }}</p>
-            </div>
-            <button class="expand-toggle">
-              <span class="toggle-icon">{{ expandedCard === 'tools' ? '−' : '+' }}</span>
-            </button>
-          </div>
-          <transition name="expand">
-            <div v-if="expandedCard === 'tools'" class="card-body">
-              <a @click.stop="navigateTo('/explore/tools/check')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="📋" /></span>
-                <span class="link-text">{{ $t('home.features.tools.tableProcess') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/explore/tools/jyut2ipa')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="🔤" /></span>
-                <span class="link-text">{{ $t('home.features.tools.jyut2ipa') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/explore/tools/merge')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="🔗" /></span>
-                <span class="link-text">{{ $t('home.features.tools.tableMerge') }}</span>
-              </a>
-              <!-- <a @click.stop="navigateTo('/explore/tools/derive')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="🧪" /></span>
-                <span class="link-text">{{ $t('home.features.tools.tableDerive') }}</span>
-              </a> -->
-              <!-- <a @click.stop="navigateTo('/explore?page=praat')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="🎙️" /></span>
-                <span class="link-text">聲學分析 - 實驗語音學工具</span>
-              </a> -->
-            </div>
-          </transition>
-        </div>
-
-        <!-- Praat 聲學分析 -->
-        <div class="feature-card clickable" @click="navigateTo('/explore/tools/praat')">
-          <div class="card-header">
-            <div class="card-icon"><InlineIcon icon="🎙️" /></div>
-            <div class="card-info">
-              <h3 class="card-title">{{ $t('home.features.praat.title') }}</h3>
-              <p class="card-desc">{{ $t('home.features.praat.desc') }}</p>
-            </div>
-            <div class="card-arrow">→</div>
+          <div class="platform-stat">
+            <span>{{ $t('home.platform.stats.records') }}</span>
+            <strong>{{ sourceDataCount }}</strong>
           </div>
         </div>
+      </article>
+    </section> -->
 
-        <!-- 方言聚类 -->
-<!--        <div class="feature-card clickable" @click="navigateTo('/menu/luster')">-->
-<!--          <div class="card-header">-->
-<!--            <div class="card-icon"><InlineIcon icon="🧩" /></div>-->
-<!--            <div class="card-info">-->
-<!--              <h3 class="card-title">{{ $t('home.features.dialectClustering.title') }}</h3>-->
-<!--              <p class="card-desc">{{ $t('home.features.dialectClustering.desc') }}</p>-->
-<!--            </div>-->
-<!--            <div class="card-arrow">→</div>-->
-<!--          </div>-->
-<!--        </div>-->
+    <!-- <HomeFeaturedTools @view-all="scrollToFeatures" /> -->
 
-        <!-- 關於網站 -->
-        <div class="feature-card" :class="{ expanded: expandedCard === 'about' }">
-          <div class="card-header" @click="toggleCard('about')">
-            <div class="card-icon"><InlineIcon icon="🌐" /></div>
-            <div class="card-info">
-              <h3 class="card-title">{{ $t('home.features.about.title') }}</h3>
-              <p class="card-desc">{{ $t('home.features.about.desc') }}</p>
-            </div>
-            <button class="expand-toggle">
-              <span class="toggle-icon">{{ expandedCard === 'about' ? '−' : '+' }}</span>
-            </button>
-          </div>
-          <transition name="expand">
-            <div v-if="expandedCard === 'about'" class="card-body">
-              <a @click.stop="navigateTo('/menu/about/intro')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="ℹ️" /></span>
-                <span class="link-text">{{ $t('home.features.about.intro') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/menu/about/suggestion')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="💬" /></span>
-                <span class="link-text">{{ $t('home.features.about.suggestion') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/menu/about/like')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="❤️" /></span>
-                <span class="link-text">{{ $t('home.features.about.likeAuthor') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/menu/settings')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="⚙️" /></span>
-                <span class="link-text">{{ $t('home.features.about.setting') }}</span>
-              </a>
-              <a @click.stop="navigateTo('/menu/source')" class="feature-link">
-                <span class="link-icon"><InlineIcon icon="🔗" /></span>
-                <span class="link-text">{{ $t('home.features.about.source') }}</span>
-              </a>
-            </div>
-          </transition>
-        </div>
-      </div>
-    </section>
+    <FeaturesSection />
 
     <!-- Roadmap Section -->
-    <section class="roadmap-section">
+    <!-- <section class="roadmap-section">
       <h2 class="section-title">{{ $t('home.roadmap.sectionTitle') }}</h2>
       <p class="section-subtitle">{{ $t('home.roadmap.sectionSubtitle') }}</p>
       <div class="roadmap-list">
@@ -430,10 +110,10 @@
           <p class="roadmap-desc">{{ $t('home.roadmap.dialectBot.desc') }}</p>
         </div>
       </div>
-    </section>
+    </section> -->
 
     <!-- Login Benefits Section -->
-    <section class="login-section">
+    <section class="login-section reveal">
       <div class="login-card">
         <div class="login-icon"><InlineIcon icon="🔐" /></div>
         <div class="login-content">
@@ -467,9 +147,9 @@
           </div>
         </div>
         <div class="login-actions">
-          <button class="login-btn primary" @click="navigateTo('/auth')">
+          <RouterLink class="login-btn primary" :to="localeTo('/auth')">
             {{ $t('home.login.loginNow') }}
-          </button>
+          </RouterLink>
           <button class="login-btn secondary" @click="showBenefitsPopup = true">
             {{ $t('home.login.viewDetails') }}
           </button>
@@ -478,7 +158,7 @@
     </section>
 
     <!-- Projects Section -->
-    <section class="projects-section">
+    <section class="projects-section reveal">
       <h2 class="section-title">{{ $t('home.projects.sectionTitle') }}</h2>
       <p class="section-subtitle">{{ $t('home.projects.sectionSubtitle') }}</p>
       <div class="projects-grid">
@@ -519,13 +199,13 @@
     <footer class="footer">
       <div class="footer-content">
         <div class="footer-links">
-          <a @click="navigateTo('/menu/about/intro')" class="footer-link">{{ $t('home.footer.links.about') }}</a>
+          <RouterLink :to="localeTo('/menu/about/intro')" class="footer-link">{{ $t('home.footer.links.about') }}</RouterLink>
           <span class="footer-divider">·</span>
-          <a @click="navigateTo('/menu/source')" class="footer-link">{{ $t('home.footer.links.source') }}</a>
+          <RouterLink :to="localeTo('/menu/source')" class="footer-link">{{ $t('home.footer.links.source') }}</RouterLink>
           <span class="footer-divider">·</span>
-          <a @click="navigateTo('/menu/privacy')" class="footer-link">{{ $t('home.footer.links.privacy') }}</a>
+          <RouterLink :to="localeTo('/menu/privacy')" class="footer-link">{{ $t('home.footer.links.privacy') }}</RouterLink>
           <span class="footer-divider">·</span>
-          <a @click="navigateTo('/menu/settings')" class="footer-link">{{ $t('home.footer.links.setting') }}</a>
+          <RouterLink :to="localeTo('/menu/settings')" class="footer-link">{{ $t('home.footer.links.setting') }}</RouterLink>
           <span class="footer-divider">·</span>
           <a href="https://dialects.yzup.top/detail/" target="_blank" class="footer-link">{{ $t('home.footer.links.oldSite') }}</a>
           <span class="footer-divider">·</span>
@@ -566,7 +246,9 @@
       :last-update-date="homeUpdateNotice.lastUpdateDate"
       :title="homeUpdateNotice.title"
       :items="homeUpdateNotice.items"
+      :view-detail-text="$t('home.viewDetails')"
       @close="showUpdateNotice = false"
+      @show-detail="showUpdateNotice = true"
     />
 
     <!-- Support Modal -->
@@ -580,11 +262,11 @@
             <p class="home-support-subtitle">{{ $t('home.supportModal.subtitle') }}</p>
             <div class="donate-qr-grid">
               <div class="donate-qr-box">
-                <img src="@/assets/picture/weixin.png" :alt="$t('home.supportModal.weixinAlt')" />
+                <img src="/brand/weixin.webp" :alt="$t('home.supportModal.weixinAlt')" />
                 <p class="donate-qr-label">{{ $t('home.supportModal.weixinLabel') }}</p>
               </div>
               <div class="donate-qr-box">
-                <img src="@/assets/picture/zfb.jpg" :alt="$t('home.supportModal.alipayAlt')" />
+                <img src="/brand/zfb.webp" :alt="$t('home.supportModal.alipayAlt')" />
                 <p class="donate-qr-label">{{ $t('home.supportModal.alipayLabel') }}</p>
               </div>
             </div>
@@ -596,25 +278,33 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import HeroShowcase from '@/main/components/HeroShowcase.vue'
-import { computed, ref, onMounted, defineAsyncComponent } from 'vue'
+import FeaturesSection from '@/main/components/FeaturesSection.vue'
+import HomeFeaturedTools from '@/main/components/HomeFeaturedTools.vue'
+import { computed, ref, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
 import { useVisitStats } from '@/composables/data/useVisitStats.js'
+import { useClickParticles } from '@/main/composables/useClickParticles.js'
 import { getCachedSourceStats, getSourceStats } from '@/composables/data/useSourceStats.js'
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 
-// ✅ 条件渲染的组件懒加载
+// ✅ 懒加载：先弹窗 → 地球 → Hero 展示
+const UpdateNoticeModal = defineAsyncComponent(() =>
+  import('@/main/components/user/popups/UpdateNoticeModal.vue')
+)
+const GlobeBackground = defineAsyncComponent(() =>
+  import('@/main/components/globe/GlobeBackground.vue')
+)
+const HeroShowcase = defineAsyncComponent(() =>
+  import('@/main/components/HeroShowcase.vue')
+)
 const UserBenefitsPopup = defineAsyncComponent(() =>
   import('@/main/components/user/popups/UserBenefitsPopup.vue')
 )
 const SupportPopup = defineAsyncComponent(() =>
   import('@/main/components/user/popups/SupportPopup.vue')
-)
-const UpdateNoticeModal = defineAsyncComponent(() =>
-  import('@/main/components/user/popups/UpdateNoticeModal.vue')
 )
 
 const { t, locale } = useI18n()
@@ -625,8 +315,10 @@ const {
   totalVisits,
   ensureVisitStats
 } = useVisitStats()
-const featuresSection = ref(null)
-const expandedCard = ref(null)
+const homePageRef = ref(null)
+const globePoints = ref([])
+const showShowcase = ref(false)
+const showcaseSectionRef = ref(null)
 const showSupport = ref(false)
 const showBenefitsPopup = ref(false)
 const showUpdateNotice = ref(false)
@@ -637,14 +329,14 @@ const sourceDataCount = ref(cachedSourceStats.dataCount)
 
 // 当前版本号和更新时间
 const homeUpdateNotice = computed(() => getHomeUpdateNotice((key, values) => t(key, values, { locale: locale.value })))
-const updateNoticeMode = computed(() => localStorage.getItem('update-notice-mode') || 'modal')
+const updateNoticeMode = computed(() => localStorage.getItem('update-notice-mode') || 'showinfo')
 const CURRENT_VERSION = computed(() => homeUpdateNotice.value.version)
 const LAST_UPDATE_DATE = computed(() => homeUpdateNotice.value.lastUpdateDate)
 
 const heroDecorationSrc = computed(() =>
   currentColorTheme.value === COLOR_THEME_GREEN
-    ? new URL('@/assets/picture/GreenCircle.png', import.meta.url).href
-    : new URL('@/assets/picture/BlueCircle.png', import.meta.url).href
+    ? '/brand/GreenCircle.webp'
+    : '/brand/BlueCircle.webp'
 )
 
 const projects = [
@@ -697,12 +389,50 @@ function navigateTo(path) {
   })
 }
 
-function scrollToFeatures() {
-  featuresSection.value?.scrollIntoView({ behavior: 'smooth' })
+function localeTo(path) {
+  return buildLocalePath(resolveRouteLocale(route), path)
 }
 
-function toggleCard(cardName) {
-  expandedCard.value = expandedCard.value === cardName ? null : cardName
+// reveal 淡入
+let revealObserver = null
+const initReveal = () => {
+  const root = homePageRef.value
+  if (!root) return
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
+  const nodes = root.querySelectorAll('.reveal')
+  if (reduced) {
+    nodes.forEach(n => n.classList.add('visible'))
+    return
+  }
+  revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible')
+        revealObserver.unobserve(entry.target)
+      }
+    })
+  }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' })
+  nodes.forEach(n => revealObserver.observe(n))
+}
+
+// HeroShowcase 延迟挂载
+let showcaseObserver = null
+const initShowcaseLazy = () => {
+  const target = showcaseSectionRef.value
+  if (!target) return
+  showcaseObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        showShowcase.value = true
+        showcaseObserver.disconnect()
+      }
+    })
+  }, { rootMargin: '400px 0px' })
+  showcaseObserver.observe(target)
+}
+
+function scrollToFeatures() {
+  document.getElementById('features-section')?.scrollIntoView({ behavior: 'smooth' })
 }
 
 function openZhihu() {
@@ -728,15 +458,46 @@ async function fetchSourceStats() {
   }
 }
 
+async function fetchGlobePoints() {
+  try {
+    const res = await fetch('/data/dots.json')
+    const json = await res.json()
+    const lonIdx = json.fields.indexOf('lon')
+    const latIdx = json.fields.indexOf('lat')
+    const nameIdx = json.fields.indexOf('語言')
+    globePoints.value = json.data.map(row => ({
+      lng: row[lonIdx],
+      lat: row[latIdx],
+      name: row[nameIdx],
+    }))
+  } catch (error) {
+    console.error('获取地球散点数据失败:', error)
+  }
+}
+
+useClickParticles()
+
 onMounted(() => {
-  fetchVisitStats()
-  fetchSourceStats()
+  fetchGlobePoints()
+  setTimeout(() => {
+    fetchVisitStats()
+    fetchSourceStats()
+  }, 1000)
+  initReveal()
+  initShowcaseLazy()
+})
+
+onBeforeUnmount(() => {
+  revealObserver?.disconnect()
+  showcaseObserver?.disconnect()
 })
 </script>
 
 
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
 $primary-deep: var(--color-primary-hover);
@@ -762,13 +523,10 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 /* Base */
 .home-page {
   position: relative;
-  width: 90dvw;
-  min-height: 100vh;
-  margin: 0 auto;
+  width: 100%;
+  min-height: 100dvh;
   overflow-x: hidden;
   background: linear-gradient(135deg, var(--bg-body) 0%, var(--bg-light-gray) 100%);
-  border-radius: var(--radius-2xl);
-  box-shadow: 0 8px 32px rgba(var(--color-primary-rgb), 0.12);
 }
 
 .bg-gradient {
@@ -797,25 +555,39 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &-section {
     position: relative;
     z-index: 1;
-    min-height: 85vh;
-    padding: 2rem 1.5rem;
+    min-height: 100dvh;
+    overflow: hidden;
+    border-radius: var(--radius-2xl);
 
     @include flex-col;
-    @include flex-center;
+    align-items: flex-start;
+    justify-content: center;
     gap: 1rem;
+    padding: 2rem 1.5rem;
   }
 
   &-content {
-    max-width: 700px;
-    text-align: center;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+    max-width: 520px;
+    margin-right: auto;
+    margin-left: 1rem;
+    margin-bottom: 5rem;
+    text-align: left;
     animation: heroFadeIn 1s $ease-apple;
+    backdrop-filter: blur(8px) saturate(180%);
+    border-radius: var(--radius-lg);
+    // background: var(--bg-blue-hover);
+    border: 1px solid var(--glass-40);
+    background: color-mix(in srgb, var(--bg-body) 50%, transparent);
   }
 
   &-logo {
+    display: block;
     width: clamp(220px, 40vw, 380px);
     height: auto;
-    margin-top: 2rem;
-    margin-bottom: 0.6rem;
+    margin: 1rem auto 0.6rem;
     filter: drop-shadow(0 4px 12px rgba(var(--color-primary-rgb), 0.15));
   }
 
@@ -856,7 +628,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     align-items: center;
     justify-content: center;
     gap: 1.5rem;
-    margin-bottom: 3rem;
+    // margin-bottom: 5rem;
   }
 
   &-decoration {
@@ -900,6 +672,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   border-radius: var(--radius-md);
   font-size: 1.1rem;
   font-weight: 600;
+  text-decoration: none;
   cursor: pointer;
   transition: all 0.3s $ease-apple;
 }
@@ -941,13 +714,102 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   }
 }
 
-/* Features */
-.features-section {
+/* Reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity 0.8s $ease-apple,
+    transform 0.8s $ease-apple;
+
+  &.visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Platform */
+.platform-section {
   @include section-container;
 
   padding:
-    clamp(3rem, 8vw, 6rem)
-    clamp(1.5rem, 4vw, 2.5rem);
+    clamp(3rem, 6dvw, 6rem)
+    clamp(1.5rem, 4dvw, 2.5rem);
+}
+
+.platform-card {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(2rem, 4vw, 3.5rem);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--color-primary-rgb), 0.08) 0%,
+    rgba(var(--color-primary-hover-rgb), 0.04) 100%
+  );
+  border: 1px solid rgba(var(--color-primary-rgb), 0.18);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.08);
+}
+
+.platform-eyebrow {
+  display: inline-block;
+  padding: 0.4rem 1rem;
+  background: rgba(var(--color-primary-rgb), 0.1);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  border-radius: var(--radius-full);
+  color: $primary;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.platform-title {
+  margin: 1.25rem 0 0;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.2;
+  color: $text-primary;
+}
+
+.platform-desc {
+  max-width: 64ch;
+  margin: 1rem 0 0;
+  color: var(--text-dark-lighter);
+  line-height: 1.7;
+}
+
+.platform-stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 2rem;
+
+  @media (min-aspect-ratio: 1/1) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.platform-stat {
+  padding: 1.25rem 1.5rem;
+  background: var(--glass-60);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.12);
+  border-radius: var(--radius-lg);
+
+  span {
+    display: block;
+    color: var(--text-dark-lighter);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  strong {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 700;
+    color: $primary;
+  }
 }
 
 .section {
@@ -968,254 +830,12 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   }
 }
 
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(
-    auto-fill,
-    minmax(min(350px, 100%), 1fr)
-  );
-  align-items: start;
-  gap: 1.25rem;
-}
-
-.feature-card {
-  overflow: hidden;
-  background: var(--glass-70);
-  border: 1px solid rgba(var(--color-primary-rgb), 0.15);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.08);
-  animation: cardFadeIn 0.4s ease backwards;
-  transition: all 0.25s ease;
-
-  @for $index from 1 through 9 {
-    &:nth-child(#{$index}) {
-      animation-delay: 0.02s * $index;
-    }
-  }
-
-  &:hover {
-    background: var(--glass-90);
-    border-color: rgba(var(--color-primary-rgb), 0.3);
-    box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.15);
-    transform: translateY(-2px);
-
-    .card-icon {
-      transform: scale(1.2);
-    }
-  }
-
-  &.expanded {
-    background: var(--glass-90);
-    border-color: rgba(var(--color-primary-rgb), 0.35);
-    box-shadow: 0 6px 18px rgba(var(--color-primary-rgb), 0.18);
-
-    .card-icon {
-      transform: scale(1.1);
-    }
-
-    .expand-toggle {
-      background: $primary;
-      color: var(--action-primary-text);
-      transform: rotate(180deg);
-
-      &:hover {
-        transform: rotate(180deg) scale(1.1);
-      }
-    }
-  }
-
-  &.clickable {
-    cursor: pointer;
-
-    &:hover {
-      .card-arrow {
-        transform: translateX(6px);
-      }
-    }
-  }
-}
-
-@keyframes cardFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.card {
-  &-header {
-    display: flex;
-    align-items: center;
-    gap: 0.875rem;
-    padding: 1.25rem;
-    cursor: pointer;
-    user-select: none;
-    transition: all 0.3s $ease-apple;
-
-    &:hover {
-      background: rgba(var(--color-primary-rgb), 0.03);
-    }
-
-    &:active {
-      transform: scale(0.98);
-    }
-  }
-
-  &-icon {
-    flex-shrink: 0;
-    width: 48px;
-    height: 48px;
-    background: linear-gradient(
-      135deg,
-      rgba(var(--color-primary-rgb), 0.1) 0%,
-      rgba(var(--color-primary-hover-rgb), 0.15) 100%
-    );
-    border-radius: var(--radius-md);
-    font-size: 2rem;
-    transition: transform 0.25s ease;
-
-    @include flex-center;
-  }
-
-  &-info {
-    flex: 1;
-    min-width: 0;
-  }
-
-  &-title {
-    margin-bottom: 0.25rem;
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: $text-primary;
-  }
-
-  &-desc {
-    margin: 0;
-    font-size: 0.875rem;
-    color: var(--text-dark-lighter);
-  }
-
-  &-arrow {
-    flex-shrink: 0;
-    font-size: 1.5rem;
-    color: $primary;
-    transition: transform 0.3s ease;
-  }
-
-  &-body {
-    @include flex-col;
-    gap: 0.5rem;
-    padding: 0 1.25rem 1.25rem;
-    transform-origin: top;
-  }
-}
-
-.expand-toggle {
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  background: rgba(var(--color-primary-rgb), 0.1);
-  border: 2px solid $primary;
-  border-radius: var(--radius-full);
-  color: $primary;
-  font-size: 1.25rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s ease;
-
-  @include flex-center;
-
-  &:hover {
-    background: rgba(var(--color-primary-rgb), 0.2);
-    transform: scale(1.1);
-  }
-}
-
-.feature-link {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background: var(--glass-80);
-  border: 1px solid rgba(var(--color-primary-rgb), 0.1);
-  border-radius: var(--radius-md);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  color: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &::after {
-    content: '→';
-    margin-left: auto;
-    color: rgba(var(--color-primary-rgb), 0.6);
-    font-size: 1.4rem;
-    font-weight: bold;
-    transition: all 0.2s ease;
-  }
-
-  &:hover {
-    background: rgba(var(--color-primary-rgb), 0.08);
-    border-color: rgba(var(--color-primary-rgb), 0.3);
-    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.15);
-    transform: translateX(4px);
-
-    &::after {
-      color: rgba(var(--color-primary-rgb), 1);
-      transform: translateX(3px);
-    }
-
-    .link-icon {
-      transform: scale(1.1);
-    }
-
-    .link-text {
-      color: $primary;
-    }
-  }
-}
-
-.link {
-  &-icon {
-    flex-shrink: 0;
-    font-size: 1.25rem;
-    transition: transform 0.2s ease;
-  }
-
-  &-text {
-    font-size: 0.9375rem;
-    font-weight: 500;
-    color: $text-primary;
-    transition: color 0.2s ease;
-  }
-}
-
-.expand {
-  &-enter-active,
-  &-leave-active {
-    transition:
-      opacity 0.3s ease,
-      transform 0.3s $ease-apple;
-    will-change: opacity, transform;
-  }
-
-  &-enter-from,
-  &-leave-to {
-    opacity: 0;
-    transform: translateY(-10px) scaleY(0.95);
-  }
-
-  &-enter-to,
-  &-leave-from {
-    opacity: 1;
-    transform: translateY(0) scaleY(1);
-  }
+/* Showcase (lazy) */
+.showcase-section {
+  align-self: stretch;
+  box-sizing: border-box;
+  min-height: 1px;
+  width: 100%;
 }
 
 /* Roadmap */
@@ -1531,12 +1151,16 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   }
 
   &-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 0.875rem 1.75rem;
     border: none;
     border-radius: var(--radius-md);
     white-space: nowrap;
     font-size: 0.9375rem;
     font-weight: 600;
+    text-decoration: none;
     cursor: pointer;
     transition: all 0.3s $ease-apple;
 
@@ -1752,11 +1376,33 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 @media (orientation: portrait) {
   .hero {
     &-section {
-      min-height: 75vh;
+      min-height: 100dvh;
+    }
+
+    &-title {
+      margin: 0;
+    }
+
+    &-subtitle {
+      margin-top: 0;
+      font-size: clamp(0.7rem, 3dvw, 1.1rem);
+    }
+
+    &-content {
+      margin: 0 auto 6rem;
+      padding: 1rem;
+      text-align: center;
+      background: var(--glass-30);
+      backdrop-filter: blur(8px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--glass-40);
     }
 
     &-logo {
-      width: clamp(260px, 50vw, 400px);
+      display: block;
+      width: clamp(180px, 50vw, 340px);
+      margin: 0 auto;
     }
 
     &-actions {
@@ -1766,7 +1412,6 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     }
   }
 
-  .features-grid,
   .projects-grid {
     grid-template-columns: 1fr;
   }
@@ -1861,26 +1506,6 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     font-size: 0.9375rem;
   }
 
-  .card {
-    &-header {
-      padding: 1rem;
-    }
-
-    &-body {
-      padding: 0 1rem 1rem;
-    }
-
-    &-title {
-      font-size: 1.0625rem;
-    }
-
-    &-icon {
-      width: 44px;
-      height: 44px;
-      font-size: 1.75rem;
-    }
-  }
-
   .projects-grid {
     gap: 0.625rem;
   }
@@ -1915,6 +1540,17 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   .hero-logo {
     animation: none;
+  }
+}
+</style>
+
+<style lang="scss">
+.simple-layout:has(.home-page) {
+  padding: 0 !important;
+
+  .content-area {
+    width: 100%;
+    padding: 0;
   }
 }
 </style>

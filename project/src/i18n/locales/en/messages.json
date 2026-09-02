@@ -37,12 +37,12 @@
   "rateLimit": {
     "defaultMessage": "Too many requests. Please try again later.",
     "retryIn": "Retry in",
-    "guestHint": "Signing in can unlock the next query immediately once the guest limit is hit.",
-    "userHint": "Please wait for the timer to finish before trying again.",
+    "guestHint": "Sign in to continue querying.",
+    "userHint": "Please wait {duration} before trying again.",
     "limitTypes": {
-      "guest_ip_limit": "Guest quota reached",
-      "authenticated_ip_limit": "IP quota reached",
-      "authenticated_user_limit": "Account quota reached",
+      "guest_ip_limit": "Your query quota has been reached",
+      "authenticated_ip_limit": "You've made too many queries",
+      "authenticated_user_limit": "Your account has made too many queries",
       "login_ip_limit": "Login requests limited",
       "default": "Request rate limited"
     },

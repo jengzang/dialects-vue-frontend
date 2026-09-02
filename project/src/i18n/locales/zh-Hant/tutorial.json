@@ -16,12 +16,13 @@
     "hideTutorialTip": "你可以在「關於 - 設定」頁面重新開啟教程。"
   },
   "categories": {
-    "account": "賬戶與個人數據",
     "multiCompare": "多方言點對比分析",
     "singleAnalysis": "單方言點深入探索",
     "corpusAndCharClass": "詞句與字集",
     "practicalTools": "實用工具",
-    "villages": "自然村"
+    "villages": "自然村",
+    "yangchun": "陽春相關",
+    "account": "賬戶與個人數據"
   },
   "groups": {
     "authAccount": "賬戶管理",
@@ -31,6 +32,7 @@
     "menuCompare": "比較",
     "menuMapOverview": "地圖與結果",
     "menuPhonology": "音系分析",
+    "menuVocabulary": "詞表",
     "exploreYubao": "語保詞句",
     "exploreCharClass": "字集",
     "exploreYcSpoken": "陽春口語",
@@ -47,6 +49,8 @@
   },
   "assist": {
     "badge": "新手指引",
+    "diceTooltip": "點擊一鍵體驗",
+    "fingerHint": "🫵 點擊檢視教程",
     "experience": {
       "badge": "快速體驗",
       "queryChar": {

@@ -1,8 +1,8 @@
 <template>
   <div class="jyut2ipa-container">
-    <div class="glass-container glass-container-shell">
+    <div class="glass-container glass-shell">
       <div class="header-section">
-        <h2 class="title">{{ t('tools.jyut2ipa.page.title') }}</h2>
+        <h1 class="title"><BarIcon icon="🔤" />{{ t('navigation.pageTitles.tools.jyut2ipa') }}</h1>
         <p class="subtitle">{{ t('tools.jyut2ipa.page.subtitle') }}</p>
       </div>
 
@@ -115,11 +115,11 @@
 <!--        </div>-->
 
         <div class="action-buttons">
-          <button class="main-glass-button" data-variant="primary" data-size="large" @click="downloadResult">
+          <button class="glass-button" data-variant="primary" data-size="large" @click="downloadResult">
             <span class="icon"><InlineIcon icon="⬇️" /></span>
             <span>{{ t('tools.jyut2ipa.actions.downloadResult') }}</span>
           </button>
-          <button class="main-glass-button" data-variant="secondary" @click="reset">
+          <button class="glass-button" data-variant="secondary" @click="reset">
             <span class="icon"><InlineIcon icon="🔄" /></span>
             <span>{{ t('tools.jyut2ipa.actions.resetTask') }}</span>
           </button>
@@ -280,9 +280,9 @@
       </div>
 
       <template #footer>
-          <button class="main-glass-button" data-variant="secondary" @click="resetConfigConfirm"><InlineIcon icon="🔄" />{{ t('tools.jyut2ipa.actions.resetDefault') }}
+          <button class="glass-button" data-variant="secondary" @click="resetConfigConfirm"><InlineIcon icon="🔄" />{{ t('tools.jyut2ipa.actions.resetDefault') }}
           </button>
-          <button class="main-glass-button" data-variant="primary" @click="saveConfig"><InlineIcon icon="💾" />{{ t('tools.jyut2ipa.actions.saveConfig') }}
+          <button class="glass-button" data-variant="primary" @click="saveConfig"><InlineIcon icon="💾" />{{ t('tools.jyut2ipa.actions.saveConfig') }}
           </button>
       </template>
     </AppModal>
@@ -298,6 +298,7 @@
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -1634,7 +1635,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     gap: 12px;
   }
 
-  .main-glass-button {
+  .glass-button {
     width: 100%;
     justify-content: center;
     padding: 14px 24px;
@@ -1720,7 +1721,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     justify-content: stretch;
     gap: 8px;
 
-    .main-glass-button {
+    .glass-button {
       flex: 1;
     }
   }

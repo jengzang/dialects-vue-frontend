@@ -13,7 +13,8 @@
             <input
               v-model="searchText"
               type="text"
-              class="scope-search-input"
+              class="scope-search-input glass-field"
+              data-shape="search"
               :placeholder="t('map.drawTab.voronoi.searchPlaceholder')"
             >
           </div>
@@ -31,7 +32,7 @@
 
     <template #default>
       <div class="voronoi-ignore-modal">
-        <div class="feature-scope-summary main-glass-panel-inner">
+        <div class="feature-scope-summary glass-subpanel">
           <div class="summary-item">
             <span class="summary-label">{{ t('map.drawTab.voronoi.totalPoints') }}</span>
             <span class="summary-value summary-number">{{ locations.length }}</span>
@@ -46,19 +47,19 @@
           </div>
         </div>
 
-        <div class="scope-toolbar main-glass-panel-inner">
+        <div class="scope-toolbar glass-subpanel">
           <div class="scope-toolbar-main">
             <div class="scope-toolbar-info">
               {{ t('map.drawTab.voronoi.ignoreSelectedCount', { count: selectedLocations.length }) }}
             </div>
           </div>
-          <button class="scope-clear-btn" type="button" @click="clearSelection">
+          <button class="pill-btn scope-clear-btn" type="button" @click="clearSelection">
             {{ t('map.drawTab.voronoi.clearSelection') }}
           </button>
         </div>
 
         <div class="scope-grid">
-          <section class="scope-panel main-glass-panel-inner">
+          <section class="scope-panel glass-subpanel">
             <div class="scope-panel-title">{{ t('map.drawTab.voronoi.regionTitle') }}</div>
             <div v-if="filteredRegionTree.length === 0" class="feature-scope-state main-list-state">
               <div class="main-list-state-title">{{ t('map.drawTab.voronoi.emptyRegions') }}</div>
@@ -88,7 +89,7 @@
             </div>
           </section>
 
-          <section class="scope-panel main-glass-panel-inner">
+          <section class="scope-panel glass-subpanel">
             <div class="scope-panel-title">{{ t('map.drawTab.voronoi.locationTitle') }}</div>
             <div v-if="filteredLocations.length === 0" class="feature-scope-state main-list-state">
               <div class="main-list-state-title">{{ t('map.drawTab.voronoi.emptyLocations') }}</div>
@@ -118,11 +119,11 @@
 
     <template #footer>
       <div class="scope-modal-footer">
-        <button class="main-glass-button" type="button" @click="handleClose(false)">
+        <button class="glass-button" type="button" @click="handleClose(false)">
           取消
         </button>
         <button
-          class="main-glass-button scope-confirm-btn"
+          class="glass-button scope-confirm-btn"
           data-variant="primary"
           type="button"
           @click="handleConfirm"
@@ -416,18 +417,7 @@ function formatRegionNames(regionNames) {
   .scope-search-input {
     width: 80%;
     height: 38px;
-    border: 1px solid $muted-active;
-    border-radius: var(--radius-md);
-    padding: 0 14px;
     font-size: 13px;
-    color: $text-strong;
-    background: $glass-strong;
-
-    &:focus {
-      outline: none;
-      border-color: rgba(var(--color-primary-rgb), 0.48);
-      box-shadow: 0 0 0 3px $primary-border;
-    }
   }
 }
 
@@ -481,12 +471,10 @@ function formatRegionNames(regionNames) {
   }
 }
 
+/* 清空选择: 仅尺寸/颜色覆盖, 视觉见 main/_buttons.scss 的 .pill-btn */
 .scope-clear-btn {
-  border: none;
-  background: transparent;
-  color: $primary;
-  font-weight: 700;
-  cursor: pointer;
+  --pill-btn-color: $primary;
+  --pill-btn-font-weight: 700;
 }
 
 .scope-grid {
@@ -621,7 +609,7 @@ function formatRegionNames(regionNames) {
   gap: 12px;
 }
 
-.main-glass-panel-inner {
+.glass-subpanel {
   padding: 10px 20px;
 }
 </style>

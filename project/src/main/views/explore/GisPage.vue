@@ -1,15 +1,11 @@
 <template>
   <div ref="drawTabRoot" class="map-draw-tab page-content-stack">
-    <div class="page-footer draw-tab-header main-glass-panel">
-      <!-- <div class="draw-tab-copy">
-        <h3 class="draw-tab-title">
-          {{ t('map.drawTab.title') }}
-        </h3>
-        <p class="hint draw-tab-hint">
-          {{ t('map.drawTab.hint') }}
-        </p>
-      </div> -->
-
+      <div class="draw-tab-copy">
+        <h1 class="draw-tab-title">
+          <BarIcon icon="🗺️" />{{ t('navigation.pageTitles.gis.main') }}
+        </h1>
+      </div>
+    <div class="page-footer draw-tab-header glass-panel">
       <div
         class="draw-toolbar draw-toolbar--header"
       >
@@ -17,14 +13,14 @@
           {{ t('map.drawTab.labels.featureCount', { count: featureCount }) }}
         </span>
         <button
-          class="main-glass-button"
+          class="glass-button"
           data-variant="secondary"
           type="button"
           @click="showAddLayerModal = true"
         ><InlineIcon icon="➕" />{{ t('map.drawTab.buttons.addLayer') }}
         </button>
         <button
-          class="main-glass-button"
+          class="glass-button"
           :data-variant="isVoronoiPanelOpen ? 'primary' : 'secondary'"
           :data-active="isVoronoiPanelOpen"
           type="button"
@@ -32,21 +28,21 @@
         ><InlineIcon icon="⬡" />{{ t('map.drawTab.buttons.voronoi') }}
         </button>
         <button
-          class="main-glass-button"
+          class="glass-button"
           data-variant="secondary"
           type="button"
           @click="showExportModal = true"
         ><InlineIcon icon="📤" />{{ t('map.drawTab.buttons.export') }}
         </button>
         <button
-          class="main-glass-button"
+          class="glass-button"
           data-variant="secondary"
           type="button"
           @click="showLocalStorageModal = true"
         ><InlineIcon icon="💾" />{{ t('map.drawTab.buttons.saveToLocal') }}
         </button>
         <button
-          class="main-glass-button"
+          class="glass-button"
           :data-variant="isDrawingPanelOpen ? 'primary' : 'secondary'"
           :data-active="isDrawingPanelOpen"
           type="button"
@@ -54,7 +50,7 @@
         ><InlineIcon icon="🛠️" />{{ t('map.drawTab.buttons.drawingTools') }}
         </button>
         <button
-          class="main-glass-button"
+          class="glass-button"
           :data-variant="isLayersPanelOpen ? 'primary' : 'secondary'"
           :data-active="isLayersPanelOpen"
           type="button"
@@ -74,7 +70,8 @@
           {{ t('map.drawTab.auth.loginRequired') }}
         </p>
         <button
-          class="enter-btn"
+          class="glass-button"
+          data-variant="enter"
           type="button"
           @click="handleLogin"
         >
@@ -88,19 +85,29 @@
         <div class="draw-map-area">
           <EditableMapLibre
             ref="editableMapRef"
-            v-model="activeLayerFeatureCollection"
             v-model:current-style-key="currentStyleKey"
+            :model-value="activeLayerFeatureCollection"
             :active-layer="activeLayer"
             :all-layers="layers"
             :preview-layers="voronoiPreviewLayers"
             :enable-preview-hover="voronoiPreviewLayers.length > 0"
             :feature-box-select-enabled="isFeatureBoxSelectMode"
-            @before-features-change="commitHistory"
+            :snapping-enabled="snappingEnabled"
+            :snap-tolerance="snapTolerance"
+            :snap-grid-size="snapGridSize"
+            :snap-targets="snapTargets"
+            :topology-editing-enabled="topologyEditingEnabled"
+            :shared-boundary-protection-enabled="sharedBoundaryProtectionEnabled"
+            @update:model-value="handleActiveLayerModelUpdate"
+            @before-features-change="handleBeforeFeaturesChange"
             @features-change="handleActiveLayerFeaturesChange"
             @feature-select="handleFeatureSelect"
             @feature-box-select="handleFeatureBoxSelect"
             @mode-change="handleDrawModeChange"
             @shape-edit-state-change="handleShapeEditStateChange"
+            @geometry-edit-feedback="handleGeometryEditFeedback"
+            @snap-state-change="handleSnapStateChange"
+            @edit-target-hover="handleEditTargetHover"
             @export-image="handleImageExported"
             @export-layer="handleLayerExported"
             @export-selection-bounds-change="boxSelectionBounds = $event"
@@ -127,6 +134,12 @@
           :active-layer="activeLayer"
           :selected-layer-label="selectedLayerLabel"
           :current-mode="currentMode"
+          v-model:snapping-enabled="snappingEnabled"
+          v-model:snap-tolerance="snapTolerance"
+          v-model:snap-grid-size="snapGridSize"
+          v-model:topology-editing-enabled="topologyEditingEnabled"
+          v-model:shared-boundary-protection-enabled="sharedBoundaryProtectionEnabled"
+          :snap-targets="snapTargets"
           :feature-items="activeLayerFeatureItems"
           :feature-table-columns="activeLayerFeatureTableColumns"
           :feature-table-rows="activeLayerFeatureTableRows"
@@ -134,22 +147,45 @@
           :selected-feature-id="selectedEditorFeatureId"
           :selected-feature-ids="selectedFeatureIds"
           :selected-vertex-count="selectedVertexCount"
+          :selected-vertex="selectedVertex"
+          :selected-vertex-delete-block-code="selectedVertexDeleteBlockCode"
+          :polygon-split-line-options="polygonSplitLineOptions"
+          :selected-polygon-split-line-id="selectedPolygonSplitLineId"
+          :can-start-polygon-split-sketch="canStartPolygonSplitSketch"
+          :can-merge-selected-polygons="canMergeSelectedPolygons"
+          :polygon-split-sketch-active="polygonSplitSketchActive"
+          :geometry-edit-status="geometryEditStatus"
+          :edit-session-status="editSessionStatus"
+          :can-delete-selected-vertices="canDeleteSelectedVertices"
           :selected-feature-batch-name="selectedFeatureBatchName"
           :selected-feature-batch-property-key="selectedFeatureBatchPropertyKey"
           :selected-feature-batch-property-value="selectedFeatureBatchPropertyValue"
           :can-apply-selected-feature-batch-property="canApplySelectedFeatureBatchProperty"
+          :selected-text-label-field-key="selectedTextLabelFieldKey"
+          :can-apply-text-label-field="canApplyTextLabelField"
           :selected-feature-properties="selectedEditorProperties"
           :selected-feature-geometry-type="selectedEditorGeometryType"
           :is-fullscreen="isMapFullscreen"
           :can-undo="canUndoHistory"
           :can-redo="canRedoHistory"
           :can-edit-shape="canEditSelectedShape"
+          :can-use-selected-geometry-tools="canUseSelectedGeometryTools"
+          :selected-buffer-distance-km="selectedBufferDistanceKm"
+          :can-buffer-selected-feature="canBufferSelectedFeature"
+          :can-close-selected-line="canCloseSelectedLine"
+          :can-split-selected-line="canSplitSelectedLine"
+          :can-split-selected-polygon="canSplitSelectedPolygon"
+          :can-convert-selected-line-to-polygon="canConvertSelectedLineToPolygon"
+          :can-intersect-selected-polygons="canIntersectSelectedPolygons"
+          :can-difference-selected-polygons="canDifferenceSelectedPolygons"
+          :geometry-quality-summary="geometryQualitySummary"
+          :text-label-summary="textLabelSummary"
           :can-delete-selection="canDeleteSelection"
           :can-duplicate-feature="canDuplicateSelectedFeature"
           :is-feature-box-select-mode="isFeatureBoxSelectMode"
           :can-use-feature-box-select="canUseFeatureBoxSelect"
           :can-modify-active-layer="canModifyActiveLayer"
-          @set-mode="setMode"
+          @set-mode="handleSetMode"
           @select-feature="handleSelectFeatureFromPanel"
           @toggle-feature-selection="handleToggleFeatureSelection"
           @select-all-features="handleSelectAllFeatures"
@@ -158,8 +194,23 @@
           @toggle-feature-box-select="handleToggleFeatureBoxSelect"
           @edit-shape="handleEditSelectedShape"
           @duplicate-feature="handleDuplicateSelectedFeature"
-          @undo="undoHistory"
-          @redo="redoHistory"
+          @reverse-selected-geometry="handleReverseSelectedGeometry"
+          @simplify-selected-geometry="handleSimplifySelectedGeometry"
+          @update:selected-buffer-distance-km="selectedBufferDistanceKm = $event"
+          @buffer-selected-feature="handleBufferSelectedFeature"
+          @close-selected-line="handleCloseSelectedLine"
+          @split-selected-line="handleSplitSelectedLine"
+          @update:selected-polygon-split-line-id="selectedPolygonSplitLineId = $event"
+          @split-selected-polygon="handleSplitSelectedPolygon"
+          @start-polygon-split-sketch="handleStartPolygonSplitSketch"
+          @cancel-polygon-split-sketch="handleCancelPolygonSplitSketch"
+          @merge-selected-polygons="handleMergeSelectedPolygons"
+          @intersect-selected-polygons="handleIntersectSelectedPolygons"
+          @difference-selected-polygons="handleDifferenceSelectedPolygons"
+          @convert-selected-line-to-polygon="handleConvertSelectedLineToPolygon"
+          @move-selected-vertex="handleMoveSelectedVertex"
+          @undo="handleUndoHistory"
+          @redo="handleRedoHistory"
           @delete-selected="handleDeleteSelected"
           @delete-selected-features="handleDeleteSelectedFeatures"
           @clear-all="handleClearAll"
@@ -172,10 +223,13 @@
           @update:selected-feature-batch-property-key="selectedFeatureBatchPropertyKey = $event"
           @update:selected-feature-batch-property-value="selectedFeatureBatchPropertyValue = $event"
           @apply-selected-feature-batch-property="handleApplySelectedFeatureBatchProperty"
+          @update:selected-text-label-field-key="selectedTextLabelFieldKey = $event"
+          @apply-text-label-field="handleApplyTextLabelField"
           @move-feature-to-layer="handleMoveSelectedFeatureToLayer"
           @move-selected-features-to-layer="handleMoveSelectedFeaturesToLayer"
           @set-selected-features-visible="handleSetSelectedFeaturesVisible"
           @set-selected-features-locked="handleSetSelectedFeaturesLocked"
+          @update:snap-targets="snapTargets = $event"
         />
 
         <MapDrawLayersPanel
@@ -190,6 +244,8 @@
           @move-layer-to-bottom="moveLayerToBottom"
           @toggle-layer-visibility="toggleLayerVisibility"
           @toggle-layer-lock="toggleLayerLock"
+          @toggle-layer-labels="toggleLayerLabels"
+          @update-layer-opacity="handleUpdateLayerOpacity"
           @rename-layer="handleRenameLayer"
           @duplicate-layer="handleDuplicateLayer"
           @delete-layer="handleDeleteLayer"
@@ -232,6 +288,10 @@
           @calculate="handleBuildVoronoi"
           @open-field-merge="showFieldMergeModal = true"
           @update:expand-ratio="voronoiExpandRatio = $event"
+          :enable-yindian-adjust="voronoiEnableYindianAdjust"
+          @update:enable-yindian-adjust="voronoiEnableYindianAdjust = $event"
+          :show-dialect-islands="voronoiShowDialectIslands"
+          @update:show-dialect-islands="voronoiShowDialectIslands = $event"
           :is-adding-points="isAddingDialectPoints"
           @toggle-add-points="toggleAddDialectPoints"
         />
@@ -264,6 +324,22 @@
               </div>
               <div class="draw-card-desc">
                 {{ t('map.drawTab.buttons.createPointLayerDesc') }}
+              </div>
+            </div>
+          </button>
+
+          <button
+            class="draw-modal-card-btn"
+            type="button"
+            @click="onCreateLayerClicked('Text')"
+          >
+            <span class="draw-card-icon">T</span>
+            <div class="draw-card-text">
+              <div class="draw-card-title">
+                {{ t('map.drawTab.buttons.createTextLayer') }}
+              </div>
+              <div class="draw-card-desc">
+                {{ t('map.drawTab.buttons.createTextLayerDesc') }}
               </div>
             </div>
           </button>
@@ -319,7 +395,7 @@
           <button
             class="draw-modal-card-btn"
             type="button"
-            @click="onAdminBoundaryClicked"
+            @click="onAdminBoundaryImportClicked"
           >
             <span class="draw-card-icon"><InlineIcon icon="🗺️" /></span>
             <div class="draw-card-text">
@@ -335,7 +411,7 @@
           <button
             class="draw-modal-card-btn"
             type="button"
-            @click="onRiverImportClicked"
+            @click="onRiverLayerImportClicked"
           >
             <span class="draw-card-icon"><InlineIcon icon="🌊" /></span>
             <div class="draw-card-text">
@@ -501,11 +577,11 @@
 
         <template #footer>
           <div class="scope-modal-footer">
-            <button class="main-glass-button" type="button" @click="showSaveLocalDraftModal = false">
+            <button class="glass-button" type="button" @click="showSaveLocalDraftModal = false">
               {{ t('common.button.cancel') }}
             </button>
             <button
-              class="main-glass-button scope-confirm-btn"
+              class="glass-button scope-confirm-btn"
               data-variant="primary"
               type="button"
               @click="confirmSaveAsNewLocal"
@@ -551,7 +627,7 @@
         @confirm="confirmVoronoiExport"
       />
 
-      <ClipBoundaryModal
+      <AdminBoundaryModal
         v-model="showClipBoundaryModal"
         :boundary-config="clipBoundaryConfig"
         :boundary-options="boundaryOptionsMap"
@@ -561,7 +637,7 @@
         @confirm="handleClipBoundaryConfirm"
       />
 
-      <ClipBoundaryModal
+      <AdminBoundaryModal
         v-model="showImportBoundaryModal"
         mode="import"
         :boundary-config="importBoundaryConfig"
@@ -579,7 +655,7 @@
       />
 
       <div v-if="showVoronoiExportProgressOverlay" class="voronoi-export-progress-overlay">
-        <div class="voronoi-export-progress-panel main-glass-panel-inner">
+        <div class="voronoi-export-progress-panel glass-subpanel">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <div class="voronoi-export-progress-title">
             {{ t('map.drawTab.voronoi.exportLoadingTitle') }}
@@ -634,7 +710,7 @@
             <span class="add-point-partition-key">{{ item.key }}</span>
             <span class="add-point-partition-count">{{ item.count }}</span>
             <button
-              class="main-glass-button add-point-delete-btn"
+              class="glass-button add-point-delete-btn"
               type="button"
               data-variant="secondary"
               @click="deleteCustomPointsByPartition(item.key)"
@@ -653,14 +729,14 @@
         <template #footer>
           <div class="scope-modal-footer">
             <button
-              class="main-glass-button"
+              class="glass-button"
               type="button"
               @click="showAddDialectPartitionModal = false"
             >
               {{ t('common.button.cancel') }}
             </button>
             <button
-              class="main-glass-button scope-confirm-btn"
+              class="glass-button scope-confirm-btn"
               data-variant="primary"
               type="button"
               :disabled="!pendingAddPartitionKey"
@@ -704,6 +780,7 @@
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { onBeforeUnmount, onMounted, ref, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -711,12 +788,12 @@ import { useRoute, useRouter } from 'vue-router';
 import { showConfirm } from '@/utils/ui/message.js';
 
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
-import { useGisMapCore } from '@/composables/gis/useGisMapCore.js';
-import { useGisHistory } from '@/composables/gis/useGisHistory.js';
-import { useGisLayers } from '@/composables/gis/useGisLayers.js';
-import { useGisFeatures } from '@/composables/gis/useGisFeatures.js';
-import { useGisDrafts } from '@/composables/gis/useGisDrafts.js';
-import { useGisVoronoi } from '@/composables/gis/useGisVoronoi.js';
+import { useGisMapCore } from '@/main/composables/gis/useGisMapCore.js';
+import { useGisHistory } from '@/main/composables/gis/useGisHistory.js';
+import { useGisLayers } from '@/main/composables/gis/useGisLayers.js';
+import { useGisFeatures } from '@/main/composables/gis/useGisFeatures.js';
+import { useGisDrafts } from '@/main/composables/gis/useGisDrafts.js';
+import { useGisVoronoi } from '@/main/composables/gis/useGisVoronoi.js';
 
 import EditableMapLibre from '@/main/components/map/EditableMapLibre.vue';
 import MapDrawLayersPanel from '@/main/components/map/Draw/panels/MapDrawLayersPanel.vue';
@@ -727,7 +804,7 @@ import MapDrawImagePreviewModal from '@/main/components/map/Draw/modals/MapDrawI
 import VoronoiExportLayersModal from '@/main/components/map/Draw/modals/VoronoiExportLayersModal.vue';
 import VoronoiIgnorePointsModal from '@/main/components/map/Draw/modals/VoronoiIgnorePointsModal.vue';
 import VoronoiFieldMergeModal from '@/main/components/map/Draw/modals/VoronoiFieldMergeModal.vue';
-import ClipBoundaryModal from '@/main/components/map/Draw/modals/ClipBoundaryModal.vue';
+import AdminBoundaryModal from '@/main/components/map/Draw/modals/AdminBoundaryModal.vue';
 import RiverImportModal from '@/main/components/map/Draw/modals/RiverImportModal.vue';
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue';
@@ -766,21 +843,32 @@ const { setCommitHistory } = core;
 
 const {
   layers, activeLayerId, currentMode, currentStyleKey,
-  selectedFeatureId, selectedFeatureIds, selectedVertexCount, isFeatureBoxSelectMode,
+  selectedFeatureId, selectedFeatureIds, selectedVertexCount, selectedVertex, canDeleteSelectedVertices, selectedVertexDeleteBlockCode, isFeatureBoxSelectMode,
   isDrawingPanelOpen, isLayersPanelOpen, isMapFullscreen,
   selectedFeatureBatchName, selectedFeatureBatchPropertyKey, selectedFeatureBatchPropertyValue,
+  selectedTextLabelFieldKey,
+  selectedPolygonSplitLineId, polygonSplitSketchActive, geometryEditStatus,
+  snappingEnabled, snapTolerance, snapGridSize, snapTargets,
+  topologyEditingEnabled, sharedBoundaryProtectionEnabled,
+  selectedBufferDistanceKm,
   mapStyleOptions, activeLayer, activeLayerFeatureCollection, featureCount,
   activeLayerFeatures, selectedFeature, activeLayerFeatureIdSet,
   activeLayerFeatureItems, activeLayerSelectableFeatureIds,
   activeLayerFeatureTableColumns, activeLayerFeatureTableRows,
-  canApplySelectedFeatureBatchProperty, featureMoveLayerOptions,
+  canApplySelectedFeatureBatchProperty, canApplyTextLabelField, featureMoveLayerOptions,
   selectedEditorProperties, selectedEditorFeatureId, selectedEditorGeometryType,
   canModifyActiveLayer, canEditSelectedShape, canDeleteSelection, canDuplicateSelectedFeature,
-  canUseFeatureBoxSelect, canMoveSelectedFeatures, selectedLayerLabel,
+  canUseSelectedGeometryTools, canBufferSelectedFeature, canCloseSelectedLine, canSplitSelectedLine,
+  polygonSplitLineOptions, selectedPolygonSplitLineFeature, canSplitSelectedPolygon,
+  canStartPolygonSplitSketch, canMergeSelectedPolygons, canIntersectSelectedPolygons, canDifferenceSelectedPolygons,
+  canConvertSelectedLineToPolygon, geometryQualitySummary,
+  textLabelSummary,
+  canUseFeatureBoxSelect, canMoveSelectedFeatures, selectedLayerLabel, editSessionStatus,
   createEmptyLayer, getFeatureId, getFeatureLabel, getLayerLabel,
   syncLayerIdSeedFromLayers, applyLayerPropertyToFeatures,
   setMode, handleDrawModeChange, handleShapeEditStateChange, handleFeatureSelect,
-  handleFeatureBoxSelect, handleToggleFeatureBoxSelect,
+  handleFeatureBoxSelect, handleGeometryEditFeedback, handleSnapStateChange, handleToggleFeatureBoxSelect,
+  handleEditTargetHover,
   handleSelectFeatureFromPanel, handleToggleFeatureSelection,
   handleSelectAllFeatures, handleInvertFeatureSelection,
   setFeatureSelection, clearFeatureSelection, resetDrawSelectionMode,
@@ -798,6 +886,24 @@ setCommitHistory(history.commitHistory);
 
 const { canUndoHistory, canRedoHistory, commitHistory, undoHistory, redoHistory } = history;
 
+const handleUndoHistory = () => {
+  const canApply = canUndoHistory.value;
+  undoHistory();
+  handleGeometryEditFeedback({
+    type: canApply ? 'success' : 'info',
+    code: canApply ? 'historyUndoSuccess' : 'historyUndoUnavailable',
+  });
+};
+
+const handleRedoHistory = () => {
+  const canApply = canRedoHistory.value;
+  redoHistory();
+  handleGeometryEditFeedback({
+    type: canApply ? 'success' : 'info',
+    code: canApply ? 'historyRedoSuccess' : 'historyRedoUnavailable',
+  });
+};
+
 // ---- Layers ----
 const gisLayers = useGisLayers({
   layers, activeLayerId, editableMapRef, currentMode,
@@ -811,6 +917,8 @@ const gisLayers = useGisLayers({
 const {
   handleCreateLayer, handleSelectLayer, moveLayer, moveLayerToTop, moveLayerToBottom,
   toggleLayerVisibility, setAllLayersVisibility, toggleLayerLock,
+  toggleLayerLabels,
+  handleUpdateLayerOpacity,
   handleRenameLayer, handleDuplicateLayer, handleDeleteLayer,
   triggerImportLayer, handleImportAsNewLayer,
   handleExportLayer, handleExportAllLayers,
@@ -821,28 +929,41 @@ const {
 
 // ---- Features ----
 const gisFeatures = useGisFeatures({
-  layers, activeLayerId, activeLayer, selectedFeatureId, selectedFeatureIds,
+  layers, activeLayerId, activeLayer, selectedFeatureId, selectedFeatureIds, selectedVertexCount, selectedVertex, selectedVertexDeleteBlockCode,
   editableMapRef, currentMode, getFeatureId,
   canModifyActiveLayer, canDuplicateSelectedFeature,
   canEditSelectedShape, canDeleteSelection, canMoveSelectedFeatures,
+  canUseSelectedGeometryTools, canBufferSelectedFeature, canCloseSelectedLine, canSplitSelectedLine,
+  canSplitSelectedPolygon, canStartPolygonSplitSketch, canMergeSelectedPolygons,
+  canIntersectSelectedPolygons, canDifferenceSelectedPolygons, canConvertSelectedLineToPolygon,
   setFeatureSelection, clearFeatureSelection,
   syncAllLayersAfterMutation, syncFeatureSelectionToMap,
   resetDrawSelectionMode, commitHistory,
   activeLayerFeatureIdSet, activeLayerFeatureTableColumns,
   selectedEditorProperties, selectedEditorGeometryType,
+  selectedPolygonSplitLineFeature,
   canApplySelectedFeatureBatchProperty,
   selectedFeatureBatchName, selectedFeatureBatchPropertyKey, selectedFeatureBatchPropertyValue,
+  selectedTextLabelFieldKey,
   featureMoveLayerOptions,
+  selectedBufferDistanceKm,
+  canApplyTextLabelField,
   isAuthenticated, onAuthRequired: guardWrite,
+  onGeometryEditFeedback: handleGeometryEditFeedback,
 });
 
 const {
   handleEditSelectedShape, handleDuplicateSelectedFeature,
+  handleReverseSelectedGeometry, handleSimplifySelectedGeometry, handleBufferSelectedFeature,
+  handleCloseSelectedLine, handleConvertSelectedLineToPolygon,
+  handleMoveSelectedVertex, handleSplitSelectedLine, handleSplitSelectedPolygon,
+  handleStartPolygonSplitSketch, handleCancelPolygonSplitSketch,
+  handleMergeSelectedPolygons, handleIntersectSelectedPolygons, handleDifferenceSelectedPolygons,
   handleDeleteSelected, handleDeleteSelectedFeatures, handleClearAll,
   updateFeatureProperty, updateSelectedFeatureProperty,
   updateSelectedFeaturesProperty,
   handleUpdateFeatureTableCell,
-  handleApplySelectedFeatureBatchName, handleApplySelectedFeatureBatchProperty,
+  handleApplySelectedFeatureBatchName, handleApplySelectedFeatureBatchProperty, handleApplyTextLabelField,
   handleSetSelectedFeaturesVisible, handleSetSelectedFeaturesLocked,
   handleMoveSelectedFeatureToLayer, handleMoveSelectedFeaturesToLayer,
 } = gisFeatures;
@@ -850,7 +971,10 @@ const {
 // ---- Drafts ----
 const drafts = useGisDrafts({
   layers, activeLayerId, currentStyleKey,
-  isDrawingPanelOpen, isLayersPanelOpen, isAuthenticated,
+  isDrawingPanelOpen, isLayersPanelOpen,
+  snappingEnabled, snapTolerance, snapGridSize, snapTargets,
+  topologyEditingEnabled, sharedBoundaryProtectionEnabled,
+  isAuthenticated,
   clearFeatureSelection, syncLayerIdSeedFromLayers,
   syncAllLayersAfterMutation, commitHistory,
   onAuthRequired: guardWrite,
@@ -890,7 +1014,7 @@ const {
   useVoronoiOfficialData, hasVoronoiCustomImport,
   voronoiOfficialPointCount, voronoiCustomPointCount,
   voronoiCustomImportSummaryText, isVillageDataSource, hasFieldMerge,
-  voronoiExpandRatio, voronoiEnableExpand,
+  voronoiExpandRatio, voronoiEnableExpand, voronoiEnableYindianAdjust, voronoiShowDialectIslands,
   voronoiTotalPointCount, voronoiActivePointCount,
   ignoredVoronoiLocations, voronoiGroupCount, voronoiPanelOffsetMode,
   voronoiSelectionOptions, voronoiColorMap, voronoiExportGroups,
@@ -942,9 +1066,99 @@ const handlePanelStyleUpdate = (value) => {
   handleStyleChange();
 };
 
+const handleSetMode = async (mode) => {
+  if (mode !== 'simple_select' && !await guardWrite()) return;
+  setMode(mode);
+};
+
 // ---- Feature change handler ----
-const handleActiveLayerFeaturesChange = (nextValue) => {
-  activeLayerFeatureCollection.value = nextValue;
+let isRejectingUnauthenticatedFeatureChange = false;
+
+const rejectUnauthenticatedFeatureChange = async () => {
+  if (isRejectingUnauthenticatedFeatureChange) {
+    syncActiveLayerToMap();
+    return;
+  }
+  isRejectingUnauthenticatedFeatureChange = true;
+  try {
+    await guardWrite();
+    syncActiveLayerToMap();
+  } finally {
+    isRejectingUnauthenticatedFeatureChange = false;
+  }
+};
+
+const handleBeforeFeaturesChange = () => {
+  if (!isAuthenticated.value) return;
+  commitHistory();
+};
+
+function applyActiveLayerDefaultsToFeatureCollection(featureCollection) {
+  if (!featureCollection || !Array.isArray(featureCollection.features)) return featureCollection;
+  return {
+    ...featureCollection,
+    features: featureCollection.features.map((feature) => {
+      const props = feature?.properties ?? {};
+      return {
+        ...feature,
+        properties: {
+          ...props,
+          stroke: props.stroke ?? activeLayer.value?.stroke,
+          strokeWidth: props.strokeWidth ?? activeLayer.value?.strokeWidth,
+          fill: props.fill ?? activeLayer.value?.fill,
+          fillOpacity: props.fillOpacity ?? activeLayer.value?.fillOpacity,
+          opacity: props.opacity ?? activeLayer.value?.opacity ?? 1,
+          labelsVisible: props.labelsVisible ?? activeLayer.value?.labelsVisible ?? false,
+          pointRadius: props.pointRadius ?? activeLayer.value?.pointRadius,
+          pointColor: props.pointColor ?? activeLayer.value?.pointColor,
+          pointStrokeColor: props.pointStrokeColor ?? activeLayer.value?.pointStrokeColor,
+          annotationText: props.annotationText ?? activeLayer.value?.annotationText,
+          textSize: props.textSize ?? activeLayer.value?.textSize,
+          textColor: props.textColor ?? activeLayer.value?.textColor,
+          textHaloColor: props.textHaloColor ?? activeLayer.value?.textHaloColor,
+          textHaloWidth: props.textHaloWidth ?? activeLayer.value?.textHaloWidth,
+          textRotate: props.textRotate ?? activeLayer.value?.textRotate,
+          textAnchor: props.textAnchor ?? activeLayer.value?.textAnchor,
+          textAllowOverlap: props.textAllowOverlap ?? activeLayer.value?.textAllowOverlap,
+          textPriority: props.textPriority ?? activeLayer.value?.textPriority,
+          textLineHeight: props.textLineHeight ?? activeLayer.value?.textLineHeight,
+          textLetterSpacing: props.textLetterSpacing ?? activeLayer.value?.textLetterSpacing,
+          textAlign: props.textAlign ?? activeLayer.value?.textAlign,
+          textMaxWidth: props.textMaxWidth ?? activeLayer.value?.textMaxWidth,
+          textMinZoom: props.textMinZoom ?? activeLayer.value?.textMinZoom,
+          textMaxZoom: props.textMaxZoom ?? activeLayer.value?.textMaxZoom,
+          textBackgroundEnabled: props.textBackgroundEnabled ?? activeLayer.value?.textBackgroundEnabled,
+          textBackgroundColor: props.textBackgroundColor ?? activeLayer.value?.textBackgroundColor,
+          textBackgroundOpacity: props.textBackgroundOpacity ?? activeLayer.value?.textBackgroundOpacity,
+          textBackgroundPadding: props.textBackgroundPadding ?? activeLayer.value?.textBackgroundPadding,
+          textLeaderLine: props.textLeaderLine ?? activeLayer.value?.textLeaderLine,
+          textLeaderColor: props.textLeaderColor ?? activeLayer.value?.textLeaderColor,
+          textLeaderWidth: props.textLeaderWidth ?? activeLayer.value?.textLeaderWidth,
+          textOffset: props.textOffset ?? activeLayer.value?.textOffset,
+          textFontWeight: props.textFontWeight ?? activeLayer.value?.textFontWeight,
+          visible: props.visible ?? activeLayer.value?.visible ?? true,
+          locked: props.locked ?? activeLayer.value?.locked ?? false,
+        },
+      };
+    }),
+  };
+}
+
+const handleActiveLayerModelUpdate = async (nextValue) => {
+  if (!isAuthenticated.value) {
+    await rejectUnauthenticatedFeatureChange();
+    return;
+  }
+
+  activeLayerFeatureCollection.value = applyActiveLayerDefaultsToFeatureCollection(nextValue);
+};
+
+const handleActiveLayerFeaturesChange = async () => {
+  if (!isAuthenticated.value) {
+    await rejectUnauthenticatedFeatureChange();
+    return;
+  }
+
   if (selectedFeatureIds.value.length > 0 || selectedFeatureId.value) {
     const fids = selectedFeatureIds.value.length > 0
       ? selectedFeatureIds.value
@@ -992,10 +1206,14 @@ const handleDrawHistoryKeydown = (event) => {
   const isDelete = event.key === 'Delete' || event.key === 'Backspace';
   const isEscape = event.key === 'Escape';
 
-  if (isUndo) { event.preventDefault(); undoHistory(); return; }
-  if (isRedo) { event.preventDefault(); redoHistory(); return; }
+  if (isUndo) { event.preventDefault(); handleUndoHistory(); return; }
+  if (isRedo) { event.preventDefault(); handleRedoHistory(); return; }
   if (isSelectAll && canModifyActiveLayer.value) { event.preventDefault(); handleSelectAllFeatures(); return; }
-  if (isDelete && canDeleteSelection.value) { event.preventDefault(); handleDeleteSelected(); return; }
+  const hasBlockedDirectVertex = currentMode.value === 'direct_select'
+    && selectedVertexCount.value > 0
+    && Boolean(selectedVertexDeleteBlockCode.value)
+    && canModifyActiveLayer.value;
+  if (isDelete && (canDeleteSelection.value || hasBlockedDirectVertex)) { event.preventDefault(); handleDeleteSelected(); return; }
   if (isEscape && (isFeatureBoxSelectMode.value || selectedFeatureIds.value.length > 0
     || selectedFeatureId.value || currentMode.value !== 'simple_select')) {
     event.preventDefault(); resetDrawSelectionMode();
@@ -1018,6 +1236,16 @@ const onCreateLayerClicked = (type) => {
 const onImportLayerClicked = () => {
   triggerImportLayer();
   showAddLayerModal.value = false;
+};
+
+const onAdminBoundaryImportClicked = async () => {
+  showAddLayerModal.value = false;
+  await onAdminBoundaryClicked();
+};
+
+const onRiverLayerImportClicked = async () => {
+  showAddLayerModal.value = false;
+  await onRiverImportClicked();
 };
 
 const onExportCurrentClicked = () => {
@@ -1105,6 +1333,10 @@ watch(getCurrentWorkbenchSignature, () => {
 
     &-title {
       margin: 0;
+      display: flex;
+      font-size: 25px;
+      justify-content: center;
+      align-items: center;
     }
 
     &-hint {
@@ -1112,7 +1344,7 @@ watch(getCurrentWorkbenchSignature, () => {
     }
   }
 
-  .main-glass-button {
+  .glass-button {
     padding: 12px 16px;
   }
 
@@ -1125,7 +1357,7 @@ watch(getCurrentWorkbenchSignature, () => {
       justify-content: flex-end;
 
       @media (hover: hover) and (pointer: fine) {
-        .main-glass-button:hover:not(:disabled) {
+        .glass-button:hover:not(:disabled) {
           background: var(--color-primary);
           color: var(--action-primary-text);
         }
@@ -1240,7 +1472,7 @@ watch(getCurrentWorkbenchSignature, () => {
         gap: 0.45rem;
         width: 100%;
 
-        .main-glass-button,
+        .glass-button,
         .draw-feature-count-badge {
           justify-content: center;
           min-width: auto;

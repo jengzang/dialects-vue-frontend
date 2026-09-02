@@ -99,6 +99,43 @@
         "locations": "地点详情",
         "locationsSubtitle": "每个地点的音节统计"
       },
+      "syllables": {
+        "title": "音节数统计",
+        "subtitle": "统计不带调与带调音节的总量、独立音节数和各音节数量。",
+        "modeSwitch": "切换不带调与带调音节统计",
+        "currentMode": "模式",
+        "unique": "独立音节",
+        "tokens": "音节总数",
+        "viewLocations": "地点",
+        "heatmap": "热力图",
+        "viewIsopleth": "等值线图",
+        "loadMore": "加载更多",
+        "loadAllConfirm": "加载全部卡片可能造成卡顿,确定继续?",
+        "minCharCount": "最少字数",
+        "qualifiedSyllables": "字数≥{min}音节",
+        "minShare": "最少占比",
+        "qualifiedSyllablesByShare": "占比≥{min}%音节",
+        "filterMode": {
+          "label": "过滤方式",
+          "count": "按字数",
+          "share": "按占比"
+        },
+        "ignoreHistorical": "忽略历史音",
+        "allLocations": "全部地点",
+        "expandAll": "展开全部",
+        "collapse": "收起",
+        "modes": {
+          "toneless": "不带调",
+          "toned": "带调"
+        }
+      },
+      "queryModes": {
+        "title": "统计模式",
+        "featureCounts": "声韵调独立",
+        "syllableCounts": "整体音节",
+        "singleHint": "单一地点可同时勾选两种统计方式",
+        "multiHint": "多地点时仅能勾选一种统计方式"
+      },
       "charts": {
         "pie": {
           "title": "音节总量占比",
@@ -127,6 +164,7 @@
       "nav": {
         "navLabel": "音节统计页面导航",
         "chartsLabel": "图表",
+        "syllableSummary": "汇总",
         "totalInitial": "总声母",
         "totalFinal": "总韵母",
         "totalTone": "总声调",
@@ -147,7 +185,7 @@
       }
     },
     "evolution": {
-      "title": "演变",
+      "title": "演化",
       "queryMode": {
         "label": "统计模式",
         "byValue": "按今音统计",
@@ -200,8 +238,8 @@
       },
       "errors": {
         "minLocation": "请至少选择一个地点",
-        "maxLocation": "演变分析只支持单个地点，请删除多余的地点",
-        "autoLimitLocation": "演变分析只支持单个地点，已自动保留第一个地点",
+        "maxLocation": "演化分析只支持单个地点，请删除多余的地点",
+        "autoLimitLocation": "演化分析只支持单个地点，已自动保留第一个地点",
         "selectDimensions": "请选择两个维度",
         "sameDimensions": "两个维度不能相同",
         "queryFailed": "查询失败"
@@ -217,6 +255,18 @@
         "empty": "当前特征没有数据"
       }
     },
+    "homophoneLexicon": {
+      "title": "同音字汇",
+      "modeLabel": "展示方式",
+      "modeFinalGrouped": "按韵母",
+      "modeSyllable": "按音节",
+      "copy": "复制",
+      "copied": "已复制",
+      "toneCategory": "调类",
+      "toneValue": "调值",
+      "toneNumber": "调号",
+      "toneSwitch": "切换调值"
+    },
     "compare": {
       "options": {
         "optimizeLinks": "优化连线"
@@ -227,6 +277,6 @@
     "matrix": "音系",
     "custom": "音素分类",
     "count": "音节统计",
-    "evolution": "演变"
+    "evolution": "演化"
   }
 }

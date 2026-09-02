@@ -52,7 +52,7 @@
       <label class="input-label">{{ $t('query.components.zhongguDirectInput.charLabel') }}</label>
       <input
         v-model="charInput"
-        class="main-input-field"
+        class="glass-field"
         type="text"
         maxlength="500"
         :placeholder="$t('query.components.zhongguDirectInput.charPlaceholder')"

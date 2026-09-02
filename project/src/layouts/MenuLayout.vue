@@ -16,6 +16,7 @@
         </transition>
       </router-view>
     </div>
+    <AppFooter layout-kind="menu" />
     <ScrollToTop />
     <PageTutorialGuide />
     <PanelManager />
@@ -31,6 +32,7 @@ import NavBar from "@/components/bar/NavBar.vue";
 import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 import PanelManager from '@/main/components/result/PanelManager.vue'
 import ScrollToTop from '@/components/common/ScrollToTop.vue'
+import AppFooter from '@/components/footer/AppFooter.vue'
 
 const keepAliveViewNames = [
   'ComparePage',
@@ -51,6 +53,8 @@ const keepAliveViewNames = [
 
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $fade-duration: 0.14s;
 $portrait-ratio: 1;
 
@@ -75,6 +79,8 @@ $portrait-ratio: 1;
 .glass-content {
   position: relative;
   width: 100%;
+  box-sizing: border-box;
+  min-height: calc(100dvh - max(16px, env(safe-area-inset-top)));
   display: flex;
   align-items: flex-start;
   justify-content: center;

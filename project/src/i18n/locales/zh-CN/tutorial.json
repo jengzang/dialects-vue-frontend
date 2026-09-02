@@ -16,12 +16,13 @@
     "hideTutorialTip": "你可以在「关于 - 设置」页面重新开启教程。"
   },
   "categories": {
-    "account": "账户与个人数据",
     "multiCompare": "多方言点对比分析",
     "singleAnalysis": "单方言点深入探索",
     "corpusAndCharClass": "词句与字集",
     "practicalTools": "实用工具",
-    "villages": "自然村"
+    "villages": "自然村",
+    "yangchun": "阳春相关",
+    "account": "账户与个人数据"
   },
   "groups": {
     "authAccount": "账户管理",
@@ -31,6 +32,7 @@
     "menuCompare": "比较",
     "menuMapOverview": "地图与结果",
     "menuPhonology": "音系分析",
+    "menuVocabulary": "词表",
     "exploreYubao": "语保词句",
     "exploreCharClass": "字集",
     "exploreYcSpoken": "阳春口语",
@@ -47,6 +49,8 @@
   },
   "assist": {
     "badge": "新手指导",
+    "diceTooltip": "点击一键体验",
+    "fingerHint": "🫵 点击查看教程",
     "experience": {
       "badge": "快速体验",
       "queryChar": {

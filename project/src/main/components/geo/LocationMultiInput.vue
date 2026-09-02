@@ -17,7 +17,7 @@
           <span class="count-inline">{{ $t('query.components.locationMultiInput.locationCount', { count: matchedLocations.length }) }}</span>
           <span class="preview-inline">{{ previewText }}</span>
           <button
-            v-if="matchedLocations.length > 3"
+            v-if="matchedLocations.length > 0"
             class="expand-btn-inline"
             @click="showModal = true"
             type="button"
@@ -70,11 +70,11 @@
     >
       <div class="locations-list">
         <span
-          v-for="(loc, idx) in matchedLocations"
+          v-for="(item, idx) in matchedLocationsWithPartitions"
           :key="idx"
           class="location-chip"
         >
-          {{ loc }}
+          <span class="location-chip-name">{{ item.name }}</span><span v-if="item.hasPartition" class="location-chip-partition"><span class="part-val">{{ item.map }}</span> · <span class="part-val">{{ item.yindian }}</span></span>
         </span>
       </div>
     </AppModal>
@@ -122,6 +122,7 @@ const suggestions = ref([])
 const successMessage = ref('')
 const showSuccessCheckmark = ref(false)
 const matchedLocations = ref([])
+const locationsPartitions = ref({})
 const showModal = ref(false)
 const warningMessage = ref('')
 const isMatching = ref(false) // 添加匹配中的状态
@@ -140,6 +141,22 @@ const previewText = computed(() => {
   if (!matchedLocations.value.length) return ''
   const first3 = matchedLocations.value.slice(0, 3).join('、')
   return matchedLocations.value.length > 3 ? `${first3}…` : first3
+})
+
+// 展开弹层用的地点列表（简称 + 分区）
+const matchedLocationsWithPartitions = computed(() => {
+  const partitions = locationsPartitions.value || {}
+  return (matchedLocations.value || []).map(name => {
+    const p = partitions[name]
+    const map = p?.['地圖集二分區']
+    const yindian = p?.['音典分區']
+    return {
+      name,
+      map: map || '',
+      yindian: yindian || '',
+      hasPartition: Boolean(map || yindian)
+    }
+  })
 })
 
 // 解析输入值为查询字符串数组
@@ -288,6 +305,7 @@ function applySuggestion(item) {
 async function fetchMatchedLocations(queries) {
   if (!queries.length) {
     matchedLocations.value = []
+    locationsPartitions.value = {}
     warningMessage.value = ''
     isMatching.value = false
     emit('update:matchedLocations', [])
@@ -305,6 +323,9 @@ async function fetchMatchedLocations(queries) {
     const locations = Array.isArray(data?.locations_result) ? data.locations_result : []
     const uniqueLocations = [...new Set(locations)]
 
+    // 保存分區映射（用於彈層顯示分區）
+    locationsPartitions.value = data?.locations_partitions || {}
+
     // 检查是否超过最大限制
     if (uniqueLocations.length > props.maxLocations) {
       warningMessage.value = t('query.components.locationMultiInput.warningMaxLocations', {
@@ -321,6 +342,7 @@ async function fetchMatchedLocations(queries) {
   } catch (err) {
     console.error(t('query.components.locationMultiInput.errorFetchLocations'), err)
     matchedLocations.value = []
+    locationsPartitions.value = {}
     warningMessage.value = ''
     emit('update:matchedLocations', [])
   } finally {
@@ -661,6 +683,24 @@ $portrait-ratio: 1;
   box-shadow: var(--shadow-sm2);
   color: var(--text-dark-lightest);
   font-size: 14px;
+
+  .location-chip-name {
+    color: var(--color-primary-hover);
+    font-weight: 600;
+  }
+
+  .location-chip-partition {
+    margin-left: 6px;
+    color: var(--text-dark-medium);
+    font-size: 11px;
+
+    .part-val {
+      display: inline-block;
+      padding: 1px 2px;
+      background: var(--color-primary-light);
+      border-radius: var(--radius-sm);
+    }
+  }
 }
 
 /* 竖屏 */

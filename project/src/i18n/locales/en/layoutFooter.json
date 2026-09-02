@@ -1,0 +1,283 @@
+{
+  "actions": {
+    "features": "Features",
+    "menu": "Menu",
+    "tutorial": "Tutorial",
+    "feedback": "Feedback",
+    "share": "Share",
+    "support": "Support",
+    "settings": "Settings",
+    "copyLink": "Copy link",
+    "downloadShareImage": "Download share image"
+  },
+  "stats": {
+    "visits": "Today {today} · Total {total}",
+    "source": "{locationCount} tables · {dataCount} records",
+    "databaseVersion": "Database {version}"
+  },
+  "language": {
+    "zhCN": "Simplified",
+    "zhHant": "Traditional",
+    "en": "English"
+  },
+  "theme": {
+    "blue": "Blue",
+    "light": "Light",
+    "dark": "Dark",
+    "green": "Green"
+  },
+  "pages": {
+    "generic": {
+      "title": "Chinese Dialect Atlas",
+      "description": "Explore dialect phonology, lexical resources, and geographic patterns."
+    },
+    "menuEntry": {
+      "title": "Feature Navigation",
+      "description": "Open query, comparison, map, phonology, corpus, village, and tool entries."
+    },
+    "menuAboutIntro": {
+      "title": "About Chinese Dialect Atlas",
+      "description": "View the site's feature introduction, development history, and more."
+    },
+    "menuAboutSuggestion": {
+      "title": "Feedback Entry",
+      "description": "Open GitHub or Zhihu to file an issue, or submit feedback directly on this site."
+    },
+    "menuAboutLike": {
+      "title": "Support",
+      "description": "View the project repository, related Zhihu articles, and the author's development insights."
+    },
+    "menuQueryZhonggu": {
+      "title": "Middle Chinese Query",
+      "description": "Rime Book → Readings · Organize readings by rime-book category, separated into initials, finals, and tones"
+    },
+    "menuQueryChar": {
+      "title": "Character Query",
+      "description": "View character readings, Middle Chinese categories, and annotations"
+    },
+    "menuQueryYinwei": {
+      "title": "Phoneme Query",
+      "description": "Readings → Rime Book · Analyze which rime-book category each initial, final, and tone reading comes from"
+    },
+    "menuQueryTone": {
+      "title": "Tone Query",
+      "description": "View tone classes and tone values across locations"
+    },
+    "menuMapView": {
+      "title": "Map View",
+      "description": "Geo-linguistic visualization: view query and comparison results on the map, and draw syllable isogloss maps, heatmaps, and more."
+    },
+    "menuMapDivide": {
+      "title": "Map Regions",
+      "description": "Look up the region each dialect location belongs to, and jump to the map to draw it."
+    },
+    "menuMapCustom": {
+      "title": "Personal Map Data",
+      "description": "View and manage custom dialect data and plot it on the map. Bound to your account and synced across devices."
+    },
+    "menuCompareChar": {
+      "title": "Character Comparison",
+      "description": "Compare how the same character is pronounced across locations."
+    },
+    "menuCompareZhonggu": {
+      "title": "Middle Chinese Comparison",
+      "description": "Compare how the same Middle Chinese position develops across locations."
+    },
+    "menuCompareTone": {
+      "title": "Tone Comparison",
+      "description": "Compare whether two tone classes merge or stay distinct across locations."
+    },
+    "menuComparePhonetic": {
+      "title": "Phonology Comparison",
+      "description": "Compare the phonetic value correspondence of the selected locations (2 to 5 locations)."
+    },
+    "menuResult": {
+      "title": "Results",
+      "description": "Result pages for character, Middle Chinese, phoneme, and tone queries."
+    },
+    "menuPhoMatrix": {
+      "title": "Phonology Query",
+      "description": "View the full phonology table and homophone lexicon for a dialect location, presented as a grid of initial–final–tone combinations."
+    },
+    "menuPhoCustom": {
+      "title": "Phoneme Classification",
+      "description": "Classify a dialect location's initials, finals, and tones by rhyme-book category features."
+    },
+    "menuPhoCount": {
+      "title": "Syllable Statistics",
+      "description": "Count syllables for a dialect location and render charts and isogloss maps, with separate modes for initials/finals/tones, toneless syllables, and toned syllables."
+    },
+    "menuPhoEvolution": {
+      "title": "Evolution",
+      "description": "Trace a dialect location's current phonology against rhyme-book categories, visualizing the historical evolution of initials, finals, and tones with pie and Sankey charts."
+    },
+    "menuSettings": {
+      "title": "Settings",
+      "description": "Configure language, theme, query input mode, tutorial toggles, and more."
+    },
+    "menuSource": {
+      "title": "Sources",
+      "description": "View the character-table sources, references, and administrative divisions behind the dialect data."
+    },
+    "menuPrivacy": {
+      "title": "Privacy",
+      "description": "Learn about this site's privacy policy and citation notes."
+    },
+    "menuTools": {
+      "title": "Tools",
+      "description": "Entries for character-table checking and merging, Jyutping conversion, the online Praat tool, GIS drawing tools, and more."
+    },
+    "menuVocabularyView": {
+      "title": "Vocabulary Browser",
+      "description": "Browse and search all collaborator-submitted vocabulary data, with card, map, and table views."
+    },
+    "menuVocabularyImport": {
+      "title": "Vocabulary Import",
+      "description": "Upload new vocabulary data. Request access first, fill in location information, then submit the vocabulary in the standard format."
+    },
+    "menuVocabularyManage": {
+      "title": "Vocabulary Management",
+      "description": "Manage uploaded vocabulary with online editing, bulk replacement, and adding or removing entries."
+    },
+    "menuYubao": {
+      "title": "Language Protection Data",
+      "description": "Query Language Protection Project vocabulary (1000 words) and grammar sentences (50 sentences), with map, card, and table views."
+    },
+    "menuVillages": {
+      "title": "Village Entry",
+      "description": "Open the natural-village tree, tables, and machine-learning analysis tools."
+    },
+    "menuCluster": {
+      "title": "Dialect Clustering",
+      "description": "Explore clustering relationships between dialect locations by dialect feature data."
+    },
+    "exploreEntry": {
+      "title": "Explore Navigation",
+      "description": "Open tools, character tables, village data, and topic pages."
+    },
+    "exploreCheck": {
+      "title": "Character Table Check",
+      "description": "Upload a dialect character-table file to automatically flag common issues such as non-single characters, abnormal transcriptions, and missing tones, with online editing to fix them."
+    },
+    "exploreJyut2Ipa": {
+      "title": "Jyutping to IPA",
+      "description": "Batch-convert Jyutping in Excel spreadsheets into IPA, with custom rule configuration."
+    },
+    "exploreMerge": {
+      "title": "Character Table Merge",
+      "description": "Upload a reference table and the table to merge; characters are aligned and merged in the reference table's order."
+    },
+    "exploreDerive": {
+      "title": "Phonology Derivation",
+      "description": "Assist in deriving and generating character tables."
+    },
+    "explorePraat": {
+      "title": "Praat Acoustic Analysis",
+      "description": "Upload audio or record directly to inspect acoustic results (fundamental frequency, formants, spectrogram, vowel space, and more), with automatic tone-chart generation via the Shi Feng T-value method."
+    },
+    "exploreGis": {
+      "title": "Map Drawing",
+      "description": "An online GIS map editor for adding, editing, and deleting geographic features, with Thiessen-polygon auto-generation of dialect distribution maps."
+    },
+    "exploreManage": {
+      "title": "Data Management",
+      "description": "Manage and maintain the site database."
+    },
+    "exploreCharClass": {
+      "title": "Character Set",
+      "description": "Expand characters level by level by rhyme-book category, view the characters and notes in each category, and customize the order."
+    },
+    "exploreYcOverview": {
+      "title": "Yangchun Topic",
+      "description": "View an overview of Yangchun dialect resources."
+    },
+    "exploreYcWords": {
+      "title": "Yangchun Words",
+      "description": "Browse Yangchun dialect words and example sentences."
+    },
+    "exploreYcExpressions": {
+      "title": "Yangchun Expressions",
+      "description": "Browse Yangchun dialect expressions and grammar data."
+    },
+    "exploreYcVillages": {
+      "title": "Yangchun Villages",
+      "description": "View Yangchun village data and distribution."
+    },
+    "exploreVillagesToponyms": {
+      "title": "Toponym Search",
+      "description": "Search village place names and administrative information."
+    },
+    "exploreVillagesGd": {
+      "title": "Guangdong Village Tree",
+      "description": "Browse Guangdong village data by administrative hierarchy, with tree expansion and dialect-map visualization."
+    },
+    "exploreVillagesTable": {
+      "title": "Guangdong Village Table",
+      "description": "Browse and query Guangdong village data in a table, with sorting, filtering, and pagination."
+    },
+    "exploreVillagesMl": {
+      "title": "Village Machine Learning",
+      "description": "Analyze the patterns and regularities of village names using machine learning."
+    },
+    "exploreVillagesAll": {
+      "title": "All Villages",
+      "description": "Browse the village records collected by the site."
+    },
+    "villagesML": {
+      "title": "Village Analysis Workspace",
+      "description": "Analyze the character, semantic, spatial, and clustering features of villages."
+    },
+    "auth": {
+      "title": "Account",
+      "description": "Sign in, register, or view account information, leaderboards, and more."
+    },
+    "authData": {
+      "title": "Personal Data",
+      "description": "View and manage dialect data you have added."
+    },
+    "authRegions": {
+      "title": "Personal Regions",
+      "description": "Manage custom dialect regions saved to your account."
+    }
+  },
+  "legal": {
+    "copyright": "© 2026 Chinese Dialect Atlas",
+    "icp": "粤ICP备2025466875号"
+  },
+  "share": {
+    "copied": "Current page link copied",
+    "imageReady": "Share image generated. This browser did not allow link copying.",
+    "qrHint": "Scan to open this page",
+    "failed": "Sharing failed. Please try again later.",
+    "stats": "Tables: {locationCount} · Records: {dataCount}"
+  },
+  "feedback": {
+    "title": "Submit Feedback",
+    "category": "Type",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Briefly describe the issue or idea",
+    "contentLabel": "Details",
+    "contentPlaceholder": "Describe what you saw, what you expected, or what could be improved.",
+    "contactLabel": "Contact",
+    "contactPlaceholder": "Email or another contact method, optional",
+    "submit": "Submit",
+    "success": "Feedback submitted. Thank you for helping.",
+    "validationFailed": "The feedback or screenshot is invalid. Please check and submit again.",
+    "failed": "Feedback submission failed. Please try again later.",
+    "categories": {
+      "general": "General",
+      "bug": "Bug",
+      "feature": "Feature",
+      "data_issue": "Data issue",
+      "ui": "UI",
+      "vocabulary_permission": "Vocabulary access"
+    },
+    "screenshot": {
+      "label": "Attach current page screenshot",
+      "hint": "When checked, a compressed preview is generated and submitted with the feedback.",
+      "capturing": "Generating screenshot preview...",
+      "retake": "Retake screenshot",
+      "previewAlt": "Current page screenshot preview"
+    }
+  }
+}

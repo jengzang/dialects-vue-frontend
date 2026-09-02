@@ -35,6 +35,52 @@
         <div class="app-boot-text">頁面載入中...</div>
       </div>
     </div>
+    <script>
+        (function() {
+            var p = location.pathname;
+            var m = p.match(/^\/(zh-CN|zh-Hant|en)(\/|$)/);
+            var loc = m ? m[1] : 'zh-Hant';
+            var page = p.replace(/^\/(zh-CN|zh-Hant|en)/, '').replace(/\/+$/, '') || '/';
+            var base = 'https://dialects.yzup.top';
+
+            document.documentElement.lang = loc;
+
+            var c = document.createElement('link');
+            c.rel = 'canonical';
+            c.href = base + '/' + loc + (page === '/' ? '' : page);
+            document.head.appendChild(c);
+
+            ['zh-Hant', 'zh-CN', 'en'].forEach(function(l) {
+                var a = document.createElement('link');
+                a.rel = 'alternate';
+                a.hreflang = l;
+                a.href = base + '/' + l + (page === '/' ? '' : page);
+                document.head.appendChild(a);
+            });
+            var x = document.createElement('link');
+            x.rel = 'alternate';
+            x.hreflang = 'x-default';
+            x.href = base + '/zh-Hant' + (page === '/' ? '' : page);
+            document.head.appendChild(x);
+
+            var titles = { 'zh-Hant': '方音圖鑑｜方言比較 · 地理語言學', 'zh-CN': '方音图鉴｜方言比较 · 地理语言学', 'en': 'Dialects Atlas | Dialect Comparison · Geolinguistics' };
+            if (titles[loc]) document.title = titles[loc];
+
+            var oldDm = document.querySelector('meta[name="description"]');
+            if (oldDm) oldDm.remove();
+            var descs = { 'zh-Hant': '方音圖鑑深入分析中古地位、方言比較、地理語言學，呈現各方言點的聲韻層次及音位分合。支持按中古地位整理讀音、分析音位的中古來源、查詢調值調類、查詢漢字讀音、用戶自定義繪圖等。', 'zh-CN': '方音图鉴深入分析中古地位、方言比较、地理语言学，呈现各方言点的声韵层次及音位分合。支持按中古地位整理读音、分析音位的中古来源、查询调值调类、查询汉字读音、用户自定义绘图等。', 'en': 'Dialects Atlas offers Middle Chinese position analysis, dialect comparison, and geolinguistic visualization. Explore phoneme distribution, tone systems, character lookup, and custom map drawing across Chinese dialect locations.' };
+            if (descs[loc]) {
+                var dm = document.createElement('meta');
+                dm.name = 'description';
+                dm.content = descs[loc];
+                document.head.appendChild(dm);
+            }
+
+            var lt = document.querySelector('.app-boot-text');
+            var loadingTexts = { 'zh-Hant': '頁面載入中...', 'zh-CN': '页面加载中...', 'en': 'Loading...' };
+            if (lt && loadingTexts[loc]) lt.textContent = loadingTexts[loc];
+        })();
+    </script>
     <script type="module" src="/src/main/main.js"></script>
   </body>
 </html>

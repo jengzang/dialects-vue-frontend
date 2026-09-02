@@ -1,7 +1,7 @@
 <template>
   <section class="point-detail-form">
     <div class="point-detail-header">
-      <button class="main-glass-button" type="button" @click="$emit('back')">
+      <button class="glass-button" type="button" @click="$emit('back')">
         {{ t('customEntry.pointDetail.back') }}
       </button>
       <div class="point-detail-heading">
@@ -19,7 +19,7 @@
     </div>
 
     <div class="point-detail-layout">
-      <div class="point-detail-main main-glass-panel-inner">
+      <div class="point-detail-main glass-subpanel">
         <div class="point-base-fields">
           <div class="point-field">
             <span class="point-field-label">{{
@@ -28,7 +28,7 @@
             <div class="location-input-wrapper">
               <input
                 v-model="location"
-                class="point-field-input"
+                class="point-field-input glass-field"
                 type="text"
                 :placeholder="t('customEntry.pointDetail.placeholders.location')"
                 @input="handleLocationInput"
@@ -61,7 +61,7 @@
             <span class="point-field-label">{{ t('customEntry.pointDetail.labels.region') }}</span>
             <input
               v-model="region"
-              class="point-field-input"
+              class="point-field-input glass-field"
               type="text"
               :placeholder="t('customEntry.pointDetail.placeholders.region')"
             />
@@ -90,7 +90,7 @@
           <p class="point-rows-description">
             {{ t('customEntry.pointDetail.rows.description') }}
           </p>
-          <button class="main-glass-button field-notice-trigger" type="button" @click="isFieldNoticeOpen = true">
+          <button class="pill-btn field-notice-trigger" type="button" @click="isFieldNoticeOpen = true">
             {{ t('customEntry.pointDetail.rows.noticeTrigger') }}
           </button>
         </div>
@@ -110,7 +110,7 @@
             >
               <input
                 v-model="row.聲韻調"
-                class="point-row-input"
+                class="point-row-input glass-field"
                 type="text"
                 :placeholder="t('customEntry.pointDetail.placeholders.phonology')"
               />
@@ -119,7 +119,7 @@
               <div class="feature-input-wrapper">
                 <input
                   v-model="row.特徵"
-                  class="point-row-input"
+                  class="point-row-input glass-field"
                   type="text"
                   :placeholder="t('customEntry.pointDetail.placeholders.feature')"
                 />
@@ -135,7 +135,7 @@
             <div class="point-cell" :data-label="t('customEntry.pointDetail.rows.headers.value')">
               <input
                 v-model="row.值"
-                class="point-row-input"
+                class="point-row-input glass-field"
                 type="text"
                 :placeholder="t('customEntry.pointDetail.placeholders.value')"
               />
@@ -143,7 +143,7 @@
             <div class="point-cell" :data-label="t('customEntry.pointDetail.rows.headers.note')">
               <input
                 v-model="row.說明"
-                class="point-row-input"
+                class="point-row-input glass-field"
                 type="text"
                 :placeholder="t('customEntry.pointDetail.placeholders.note')"
               />
@@ -154,14 +154,14 @@
           </div>
         </div>
           <div class="action-group">
-            <button class="main-glass-button add-row-btn" type="button" @click="addRow">
+            <button class="glass-button add-row-btn" type="button" @click="addRow">
               {{ t('customEntry.pointDetail.rows.add') }}
             </button>
-            <button class="main-glass-button" type="button" @click="$emit('back')">
+            <button class="glass-button" type="button" @click="$emit('back')">
               {{ t('customEntry.pointDetail.actions.cancel') }}
             </button>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="primary"
               type="button"
               :disabled="isSaving"
@@ -174,7 +174,7 @@
           </div>
       </div>
 
-      <div class="point-detail-side main-glass-panel-inner">
+      <div class="point-detail-side glass-subpanel">
         <div class="point-map-title">
           {{
             isCreateMode
@@ -186,7 +186,7 @@
           <span class="point-field-label">{{ t('customEntry.pointDetail.labels.coord') }}</span>
           <input
             :value="coordText"
-            class="point-field-input"
+            class="point-field-input glass-field"
             type="text"
             readonly
             :placeholder="t('customEntry.pointDetail.placeholders.coord')"
@@ -826,16 +826,14 @@ watch(
 
 @use '../../_map-variables' as *;
 
-@use '@/styles/main/_surfaces.scss';
-
 .point-detail-form {
   @include flex-col;
   gap: $spacing-lg;
 }
 
 .point-detail-header {
-  --main-glass-button-white-space: nowrap;
-  --main-glass-button-padding: 12px 20px;
+  --glass-button-white-space: nowrap;
+  --glass-button-padding: 12px 20px;
   display: flex;
   align-items: flex-start;
   gap: 14px;
@@ -864,7 +862,7 @@ watch(
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.85fr);
   gap: $spacing-lg;
 
-  @media (max-width: 1100px) {
+  @media (max-width: 1000px) {
     grid-template-columns: 1fr;
   }
 }
@@ -916,28 +914,6 @@ watch(
 .point-field-input,
 .point-row-input {
   width: 100%;
-  padding: 10px 14px;
-  border: 1px solid $muted-ring;
-  border-radius: $radius-md;
-  background: $glass-medium;
-  color: $text-strong;
-  font-size: 14px;
-  outline: none;
-  transition:
-    border-color 0.18s ease,
-    box-shadow 0.18s ease,
-    background-color 0.18s ease;
-  box-sizing: border-box;
-
-  &::placeholder {
-    color: $text-light;
-  }
-
-  &:focus {
-    border-color: $primary-focus;
-    background: var(--text-white);
-    box-shadow: 0 0 0 4px $primary-glass;
-  }
 }
 
 // -- Location autocomplete --
@@ -1200,8 +1176,8 @@ watch(
   gap: $radius-md;
   margin-top: $spacing-lg;
   flex-wrap: wrap;
-  --main-glass-button-padding: 12px 20px;
-  --main-glass-button-white-space: nowrap;
+  --glass-button-padding: 12px 20px;
+  --glass-button-white-space: nowrap;
 
   @media (max-width: 480px) {
     flex-direction: row;
@@ -1233,17 +1209,21 @@ watch(
   color: $text-secondary;
 }
 
+/* 字段提示触发钮: 仅尺寸/颜色覆盖, 视觉见 main/_buttons.scss 的 .pill-btn */
 .field-notice-trigger {
-  --main-glass-button-padding: 2px 10px;
-  font-size: 11px;
-  color: $warning;
-  border-color: rgba(var(--color-warning-rgb), 0.3);
-  background: rgba(var(--color-warning-rgb), 0.06);
+  --pill-btn-padding: 6px 14px;
+  --pill-btn-font-size: 12px;
+  --pill-btn-font-weight: 600;
+  --pill-btn-color: #fff;
+  --pill-btn-border: 1px solid rgb(var(--color-warning-rgb));
+  --pill-btn-bg: rgb(var(--color-warning-rgb));
+  --pill-btn-hover-bg: var(--color-warning-dark);
+  --pill-btn-hover-border: var(--color-warning-dark);
+  --pill-btn-shadow: 0 4px 14px rgba(var(--color-warning-rgb), 0.35);
 
-  &:hover:not(:disabled) {
-    background: rgba(var(--color-warning-rgb), 0.12);
-    border-color: $warning;
-    color: $warning;
+  &::before {
+    content: "⚠️";
+    font-size: 13px;
   }
 }
 

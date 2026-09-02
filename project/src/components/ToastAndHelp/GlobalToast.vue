@@ -3,7 +3,7 @@
     <Transition name="toast-fade">
       <div
         v-if="messageState.show"
-        :class="['global-toast', 'global-toast-shell', messageState.type, { 'has-action': messageState.actionText, 'changelog-toast': messageState.changelogMode }]"
+        :class="['global-toast', 'toast-shell', messageState.type, { 'has-action': messageState.actionText, 'changelog-toast': messageState.changelogMode, 'position-right': messageState.positionRight }]"
         @mouseenter="persistMessageUntilDismiss"
         @click="persistMessageUntilDismiss"
       >
@@ -36,11 +36,61 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, watch, onBeforeUnmount } from 'vue'
 import { messageState, triggerMessageAction, hideMessage, persistMessageUntilDismiss } from '@/utils/ui/message.js'
 
+const dynamicMessage = ref('')
+
+let tickerId = null
+
+function startTicker() {
+  stopTicker()
+  const d = messageState.value.dynamic
+  if (!d || typeof d.fn !== 'function') return
+  dynamicMessage.value = d.fn()
+  tickerId = setInterval(() => {
+    const text = d.fn()
+    if (!text) {
+      hideMessage()
+      return
+    }
+    dynamicMessage.value = text
+  }, d.interval)
+}
+
+function stopTicker() {
+  if (tickerId) {
+    clearInterval(tickerId)
+    tickerId = null
+  }
+}
+
+watch(
+  () => messageState.value.dynamic,
+  (d) => {
+    if (d && typeof d.fn === 'function') {
+      startTicker()
+    } else {
+      stopTicker()
+      dynamicMessage.value = ''
+    }
+  },
+  { immediate: true }
+)
+
+watch(
+  () => messageState.value.show,
+  (show) => {
+    if (!show) {
+      stopTicker()
+    }
+  }
+)
+
+onBeforeUnmount(() => stopTicker())
+
 const messageLines = computed(() => {
-  const msg = messageState.value.message || ''
+  const msg = dynamicMessage.value || messageState.value.message || ''
   return msg.split('\n')
 })
 
@@ -68,6 +118,27 @@ $text-action-info: rgba(20, 34, 56, 0.88);
 
 $toast-enter-easing: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+/* 基础玻璃壳，.global-toast 在其后覆写共享属性 */
+.toast-shell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 28px;
+  border-radius: 18px;
+  font-size: 15px;
+  font-weight: 500;
+  background: var(--surface-glass-floating);
+  backdrop-filter: blur(16px) saturate(145%);
+  -webkit-backdrop-filter: blur(16px) saturate(145%);
+  box-shadow:
+    0 6px 22px var(--bg-hover-strong),
+    0 2px 6px var(--bg-hover-medium),
+    inset 0 0 0 0.5px var(--glass-20);
+  max-width: 90dvw;
+  word-break: break-word;
+  border: 1px solid var(--glass-30);
+}
 
 @mixin toast-icon($background, $font-size, $color: null) {
   width: 24px;
@@ -115,7 +186,7 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
   @include glass-blur(22px, 180%);
 
-  &.has-action {
+  &.position-right {
     top: 20dvh;
     right: 28px;
     left: auto;
@@ -229,7 +300,7 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
       font-size: 13px;
     }
 
-    &.has-action {
+    &.position-right {
       top: auto;
       right: 16px;
       bottom: 20dvh;

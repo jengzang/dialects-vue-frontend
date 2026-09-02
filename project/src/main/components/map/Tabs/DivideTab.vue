@@ -66,6 +66,15 @@
             name="divide-all-data-partition-mode"
             :options="partitionModeOptions"
           />
+          <SwitchToggle
+            v-model="showDialectIslands"
+            class="all-data-toggle"
+            label-position="inside"
+            auto-width
+            :aria-label="t('map.divideTab.labels.ignoreDialectIslands')"
+            :active-text="t('map.divideTab.labels.showDialectIslandsOn')"
+            :inactive-text="t('map.divideTab.labels.showDialectIslandsOff')"
+          />
           <small class="all-data-hint">
             {{ allDataStatusText }}
           </small>
@@ -104,8 +113,9 @@ import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput
 import SimpleSelectDropdown from "@/components/selector/SimpleSelectDropdown.vue";
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
+import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import { mapStore, uiStore, userStore, isDivideButtonDisabled, setRunning } from "@/main/store/store.js";
-import { getCoordinates, getLocationPartitions } from '@/api'
+import { getCoordinates, getLocationPoints } from '@/api'
 import { showError, showWarning } from '@/utils/ui/message.js';
 import { usePartitionCache } from '@/composables/data/usePartitionCache.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
@@ -114,7 +124,7 @@ import { requestMapFitView } from '@/utils/map/MapData.js'
 const router = useRouter()
 const route = useRouter()
 const { t } = useI18n()
-const { getPartitionData } = usePartitionCache()
+const { getPartitionPoints } = usePartitionCache()
 
 const locationRef = ref(null)
 const buttonState = uiStore.buttonStates.divide
@@ -125,6 +135,11 @@ const allDataPartitionMode = ref('map')
 const allPartitionRows = ref([])
 const isLoadingAllData = ref(false)
 const allDataLoadError = ref('')
+const ignoreDialectIslands = ref(false)
+const showDialectIslands = computed({
+  get: () => !ignoreDialectIslands.value,
+  set: (val) => { ignoreDialectIslands.value = !val },
+})
 const locationModel = ref({
   locations: [],
   regions: [],
@@ -145,11 +160,21 @@ const partitionModeOptions = computed(() => [
   { label: t('map.divideTab.options.yindianPartition'), value: 'yindian' }
 ])
 
+const effectiveDrawableCount = computed(() => {
+  if (allPartitionRows.value.length === 0) return 0
+  if (!ignoreDialectIslands.value) return allPartitionRows.value.length
+  let count = 0
+  allPartitionRows.value.forEach((row) => {
+    if (getStringField(row, ['方言島', '方言岛']) !== '1') count++
+  })
+  return count
+})
+
 const allDataStatusText = computed(() => {
   if (isLoadingAllData.value) return t('map.divideTab.messages.allDataLoading')
   if (allDataLoadError.value) return allDataLoadError.value
   if (allPartitionRows.value.length > 0) {
-    return t('map.divideTab.messages.allDataLoaded', { count: allPartitionRows.value.length })
+    return t('map.divideTab.messages.allDataLoaded', { count: effectiveDrawableCount.value })
   }
   return t('map.divideTab.messages.allDataNotLoaded')
 })
@@ -212,6 +237,10 @@ const buildAllDataMapData = () => {
   const coordinateByName = new Set()
 
   allPartitionRows.value.forEach((row) => {
+    if (ignoreDialectIslands.value && getStringField(row, ['方言島', '方言岛']) === '1') {
+      return
+    }
+
     const name = getStringField(row, ['簡稱', '简称'])
     const coordinate = parseCoordinate(getStringField(row, ['經緯度', '经纬度']))
     const region = resolvePartitionField(row)
@@ -248,7 +277,7 @@ const loadAllPartitionData = async () => {
   isLoadingAllData.value = true
   allDataLoadError.value = ''
   try {
-    allPartitionRows.value = await getPartitionData(() => getLocationPartitions())
+    allPartitionRows.value = await getPartitionPoints(() => getLocationPoints())
   } catch (error) {
     console.error('Failed to fetch all partition data:', error)
     allDataLoadError.value = t('map.divideTab.messages.allDataLoadFailed', { error: error.message })
@@ -269,6 +298,7 @@ const runAllDataAction = async () => {
   mapStore.mapData = buildAllDataMapData()
   mapStore.mergedData = []
   mapStore.mode = 'dot'
+  mapStore.divideMapView = true
   requestMapFitView()
 
   await router.replace({
@@ -313,6 +343,7 @@ const runAction = async () => {
     mapStore.mapData = data;
     mapStore.mergedData = [];
     mapStore.mode = 'dot';
+    mapStore.divideMapView = true;
     requestMapFitView()
 
     // 切換回地圖 Tab
@@ -343,7 +374,7 @@ $text-secondary: var(--text-secondary);
 }
 
 .page {
-  width: max(50%, 500px);
+  width: min(90%, 500px);
   min-width: 0;
 }
 

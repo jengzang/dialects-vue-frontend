@@ -1,7 +1,7 @@
 <template>
   <div class="evolution-page">
     <!-- 控制面板 -->
-    <div class="main-glass-panel" data-panel="control">
+    <div class="glass-panel" data-panel="control">
       <!-- 统计模式选择 -->
       <div class="control-row">
         <label class="control-label">{{ t('phonology.phonology.evolution.queryMode.label', '统计模式') }}：</label>
@@ -78,7 +78,7 @@
         <button
           @click="handleQuery"
           :disabled="isLoading || isMatching || !canQuery"
-          class="query-button"
+          class="action-btn"
         >
           {{ isLoading ? t('phonology.phonology.evolution.controls.loading') : t('phonology.phonology.evolution.controls.query') }}
         </button>
@@ -101,7 +101,7 @@
         {{ feature }} ({{ pieCountByFeature[feature] || 0 }})
       </button>
 
-      <div v-if="currentDataLocationName" class="feature-tabs-location" @click.stop="handleLocationClick(currentDataLocationName)"><InlineIcon icon="📍" />{{ currentDataLocationName }}
+      <div v-if="currentDataLocationName" class="feature-tabs-location glass-button" @click.stop="handleLocationClick(currentDataLocationName)"><InlineIcon icon="📍" />{{ currentDataLocationName }}
       </div>
     </div>
 
@@ -261,7 +261,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, onActivated, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
@@ -314,7 +314,7 @@ const serializeEvolutionLocationQuery = (locations) => {
     .map((location) => encodeQueryValueBase64Url(location))
 }
 
-const { state: locationQuery, set: setLocationQuery } = useRouteQueryState('loc', {
+const { state: locationQuery, set: setLocationQuery } = useRouteQueryState('eloc', {
   defaultValue: [],
   parse: parseEvolutionLocationQuery,
   serialize: serializeEvolutionLocationQuery,
@@ -548,7 +548,7 @@ const getInitialFeature = (data) => {
   return features.find(feature => featureKeys.includes(feature) && (data.data[feature]?.length || 0) > 0) || features[0]
 }
 
-const applyDemoData = async ({ syncLocations = locationQuery.value.length === 0 } = {}) => {
+const applyDemoData = async ({ syncLocations = false } = {}) => {
   const demoData = await getDemoData()
   closeMobilePieDetail()
   syncControlsFromData(demoData, { syncLocations })
@@ -1461,6 +1461,12 @@ onMounted(async () => {
   window.addEventListener('resize', handleWindowResize)
 })
 
+// KeepAlive 缓存恢复激活时重新渲染，避免容器隐藏后图表尺寸归零导致空白
+onActivated(async () => {
+  if (!rawData.value) return
+  await renderCurrentVisualizationWithLoading()
+})
+
 onUnmounted(() => {
   clearPieCharts()
   clearSankeyChart()
@@ -1500,15 +1506,15 @@ $portrait-ratio: 1;
 }
 
 /* 控制面板 */
-.main-glass-panel {
-  --main-glass-panel-background: var(--glass-60);
-  --main-glass-panel-backdrop-filter: blur(12px);
-  --main-glass-panel-border-radius: var(--radius-lg);
-  --main-glass-panel-border: 1px solid var(--glass-30);
-  --main-glass-panel-shadow:
+.glass-panel {
+  --glass-panel-background: var(--glass-60);
+  --glass-panel-backdrop-filter: blur(12px);
+  --glass-panel-radius: var(--radius-lg);
+  --glass-panel-border: 1px solid var(--glass-30);
+  --glass-panel-shadow:
     0 4px 16px rgba(0, 0, 0, 0.08),
     inset 0 0 0 1px var(--glass-30);
-  --main-glass-panel-hover-shadow:
+  --glass-panel-hover-shadow:
     0 4px 16px rgba(0, 0, 0, 0.08),
     inset 0 0 0 1px var(--glass-30);
 
@@ -1608,28 +1614,11 @@ $portrait-ratio: 1;
   }
 }
 
-/* 查询按钮 */
-.query-button {
-  padding: 10px 24px;
-  background: var(--color-primary);
-  border: none;
-  border-radius: var(--radius-md);
-  box-shadow: 0 2px 8px var(--color-primary-shadow);
-  color: var(--action-primary-text);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s $ease-fluid;
-
-  &:hover:not(:disabled) {
-    background: var(--color-primary-hover);
-    box-shadow: 0 4px 12px var(--color-primary-shadow-light);
-    transform: translateY(-1px);
-  }
-
-  &:disabled {
-    @include disabled-state;
-  }
+/* 查询按钮: 仅尺寸覆盖, 视觉见 main/_buttons.scss 的 .action-btn */
+.action-btn {
+  --action-btn-padding: 10px 24px;
+  --action-btn-font-size: 14px;
+  --action-btn-font-weight: 500;
 }
 
 /* 错误提示 */
@@ -1730,7 +1719,7 @@ $portrait-ratio: 1;
 /* 图表区域 */
 .pie-container {
   position: relative;
-  width: 100%;
+  /*width: 100%;*/
 
   &.is-rendering {
     .pie-grid,
@@ -1869,7 +1858,7 @@ $portrait-ratio: 1;
     padding: 3px;
   }
 
-  .main-glass-panel {
+  .glass-panel {
     padding: 16px;
   }
 

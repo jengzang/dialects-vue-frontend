@@ -24,14 +24,14 @@
     <template #footer>
       <div class="river-import-footer">
         <button
-          class="main-glass-button"
+          class="glass-button"
           type="button"
           @click="handleClose"
         >
           {{ t('map.drawTab.buttons.cancel') }}
         </button>
         <button
-          class="main-glass-button"
+          class="glass-button"
           data-variant="primary"
           type="button"
           :disabled="selected.length === 0 || importing"

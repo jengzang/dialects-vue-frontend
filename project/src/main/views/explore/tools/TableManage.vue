@@ -6,7 +6,7 @@
     </div>
 
     <div v-else-if="!isAdmin" class="access-denied">
-      <h2><InlineIcon icon="⚠️" />{{ t('tools.tableManage.accessDenied.title') }}</h2>
+      <h1><BarIcon icon="⚠️" />{{ t('navigation.pageTitles.tools.tableManageAccessDenied') }}</h1>
       <p>{{ t('tools.tableManage.accessDenied.desc') }}</p>
       <button @click="goHome">{{ t('tools.tableManage.accessDenied.goHome') }}</button>
     </div>
@@ -26,7 +26,7 @@
       </div>
 
       <div v-show="!showUniversalTable || showConfigPanel" class="config-panel">
-        <h2 v-if="!showUniversalTable">{{ t('tools.tableManage.page.title') }}</h2>
+        <h1 v-if="!showUniversalTable"><BarIcon icon="📈" />{{ t('navigation.pageTitles.tools.tableManage') }}</h1>
 
         <div class="config-actions">
           <button @click="saveCurrentConfig" class="btn-action-small">{{ t('tools.tableManage.actions.saveConfig') }}</button>
@@ -172,6 +172,7 @@
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
@@ -195,7 +196,29 @@ const isAdmin = computed(() => userStore.role === 'admin')
 // 数据库和表映射
 const DB_TABLE_MAPPING = {
   spoken: ['口语字'],
-  village: ['广东省自然村'],
+  village: [
+      'active_run_ids', 'analysis_runs', 'char_embeddings', 'char_frequency_global',
+      'char_regional_analysis', 'char_similarity', 'cluster_assignments',
+      'cluster_profiles', 'clustering_metrics', 'embedding_runs',
+      'metadata_overview_stats', 'ngram_frequency', 'ngram_significance',
+      'ngram_tendency', 'pattern_frequency_global', 'pattern_regional_analysis',
+      'query_logs', 'query_policy_config', 'region_hierarchy_stats',
+      'region_similarity', 'region_spatial_aggregates', 'regional_basic_stats',
+      'regional_centroids', 'regional_ngram_frequency', 'semantic_bigrams',
+      'semantic_bigrams_detailed', 'semantic_composition_patterns',
+      'semantic_composition_patterns_detailed', 'semantic_conflicts',
+      'semantic_conflicts_detailed', 'semantic_indices', 'semantic_indices_detailed',
+      'semantic_pmi', 'semantic_pmi_detailed', 'semantic_regional_analysis',
+      'semantic_subcategory_labels', 'semantic_subcategory_vtf_global',
+      'semantic_subcategory_vtf_regional', 'semantic_trigrams',
+      'semantic_trigrams_detailed', 'semantic_vtf_global', 'spatial_clusters',
+      'spatial_hotspots', 'spatial_tendency_integration', 'structural_patterns',
+      'temp_regional_totals_raw', 'tendency_significance',
+      'village_cluster_assignments', 'village_features', 'village_ngrams',
+      'village_semantic_structure', 'village_spatial_features',
+      '广东省自然村', '广东省自然村_预处理',
+    ],
+  village_admin: ['divisions', 'gd', 'place_type_mapping', 'toponyms'],
   chars: ['characters', 'old_chinese', 'zhongyuan', 'menggu', 'hongwu', 'fenyun'],
   query: ['dialects'],
   query_admin: ['dialects'],
@@ -203,6 +226,11 @@ const DB_TABLE_MAPPING = {
   dialects_admin: ['dialects'],
   yubao: ['grammar', 'vocabulary'],
   logs: ['api_keyword_log', 'api_statistics', 'api_visit_log', 'api_usage_daily', 'api_usage_hourly', 'api_diagnostic_events'],
+  vocabulary: ['vocabulary_entries', 'vocabulary_locations', 'vocabulary_logs', 'vocabulary_permissions'],
+  auth: ['_migration_lock', 'api_usage_logs', 'api_usage_summary', 'auth_action_tokens', 'refresh_tokens', 'secret_keys', 'sessions', 'user_auth_identities', 'user_db_permissions', 'users'],
+  supplements: ['api_usage_logs', 'api_usage_summary', 'auth_action_tokens', 'informations', 'refresh_tokens', 'secret_keys', 'sessions', 'user_auth_identities', 'user_db_permissions', 'user_regions', 'users'],
+  toponyms: ['divisions', 'multi', 'place_type_mapping', 'single'],
+  gis: ['features', 'feature_parts', 'meta'],
   // auth: ['api_usage_logs', 'api_usage_summary', 'users', 'refresh_tokens', 'user_db_permissions']
 }
 
@@ -704,7 +732,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);@mixin glass-panel(
 .admin-panel {
   width: 100%;
 
-  h2 {
+  h1 {
     margin-bottom: 24px;
     font-size: 32px;
     font-weight: 800;
@@ -754,7 +782,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);@mixin glass-panel(
 
   @include glass-blur(20px, 180%);
 
-  h2 {
+  h1 {
     margin-bottom: 10px;
     color: var(--color-warning-dark);
     font-weight: 700;
@@ -1250,7 +1278,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);@mixin glass-panel(
   }
 
   .admin-panel {
-    h2 {
+    h1 {
       font-size: 24px;
     }
   }

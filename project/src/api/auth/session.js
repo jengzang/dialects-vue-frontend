@@ -2,6 +2,7 @@ import i18n from '../../i18n/index.js';
 import { showWarning } from '../../utils/ui/message.js';
 import { WEB_BASE } from '../../env-config.js';
 import { userStore } from '../../main/store/store.js';
+import { createSingleFlight } from '../../composables/core/singleFlight.js';
 
 import {
   clearStoredTokens,
@@ -18,7 +19,7 @@ export const AUTH_API_BASE = '/api/auth';
 
 const REQUEST_TIMEOUT = 300000;
 
-let refreshPromise = null;
+const refreshSingleFlight = createSingleFlight();
 let authReadyPromise = Promise.resolve({ user: null, role: 'anonymous' });
 let backgroundValidationPromise = null;
 let degradedNoticeShown = false;
@@ -229,11 +230,7 @@ function resolveRefreshFailure(result, fallbackUser = null) {
 }
 
 export async function refreshAccessToken() {
-  if (refreshPromise) {
-    return refreshPromise;
-  }
-
-  refreshPromise = (async () => {
+  return refreshSingleFlight(async () => {
     const refreshToken = getRefreshToken();
 
     if (!refreshToken) {
@@ -277,12 +274,8 @@ export async function refreshAccessToken() {
     } catch (error) {
       markSessionDegraded();
       return { ok: false, reason: 'network_error', error };
-    } finally {
-      refreshPromise = null;
     }
-  })();
-
-  return refreshPromise;
+  });
 }
 
 export async function initUserByToken({ forceRefresh = false, console_log = false } = {}) {

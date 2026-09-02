@@ -12,7 +12,7 @@
     "title": "Middle Chinese",
     "placeholder": "Enter Middle Chinese categories",
     "button": "Query",
-    "description": "Middle Chinese → Readings · Organize readings by Middle Chinese categories",
+    "description": "Rime Book → Readings · Organize readings by rime-book category, separated into initials, finals, and tones",
     "noExclude": "No Exclusions",
     "selectAll": "Select All",
     "cards": {
@@ -31,10 +31,10 @@
     "title": "Readings",
     "placeholder": "Enter readings",
     "button": "Query",
-    "description": "Readings → Middle Chinese · Trace readings back to their Middle Chinese sources",
+    "description": "Readings → Rime Book · Analyze which rime-book category each initial, final, and tone reading comes from",
     "noExclude": "No Exclusions",
     "selectAll": "Select All",
-    "analysisText": "Trace characters sharing the selected <strong>{card}</strong> to their <strong>{keys}</strong> categories.",
+    "analysisText": "Analyze the rime-book sources of the <strong>{card}</strong> syllable, i.e. which rime books the modern characters sharing the same <strong>{card}</strong> come from [<strong>{keys}</strong>].",
     "inputPlaceholder": "Enter/select [{key}]",
     "cards": {
       "initial": "Initial",

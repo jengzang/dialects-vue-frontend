@@ -4,7 +4,6 @@
 
 import { ref } from 'vue'
 import i18n from '@/i18n'
-import { rateLimitNoticeState } from '@/utils/user/rateLimitNotice.js'
 
 // 获取 i18n 的 t 函数
 const getTranslate = () => {
@@ -41,15 +40,6 @@ function translateMessage(message) {
   return message
 }
 
-function shouldSuppressRateLimitToast(type, message) {
-  return (
-    type === 'error' &&
-    rateLimitNoticeState.visible &&
-    typeof message === 'string' &&
-    message === rateLimitNoticeState.message
-  )
-}
-
 // ========================================
 // 全局消息状态（Toast）
 // ========================================
@@ -57,13 +47,15 @@ export const messageState = ref({
     show: false,
     type: 'info',        // 'success' | 'error' | 'warning' | 'info'
     message: '',
+    dynamic: null,       // { fn: () => string, interval: number } — 动态刷新模式，fn 返回空串表示终止
     duration: 3000,
     actionText: '',
     dismissText: '',
     onAction: null,
     onDismiss: null,
     timerId: null,
-    changelogMode: false
+    changelogMode: false,
+    positionRight: false
 })
 
 // ========================================
@@ -217,10 +209,6 @@ function showMessage(message, type, duration, options = {}) {
     const translatedActionText = options.actionText ? translateMessage(options.actionText) : ''
     const translatedDismissText = options.dismissText ? translateMessage(options.dismissText) : ''
 
-    if (shouldSuppressRateLimitToast(type, translatedMessage)) {
-        return
-    }
-
     clearMessageTimer()
     const timerId = setTimeout(() => {
         hideMessage()
@@ -230,23 +218,14 @@ function showMessage(message, type, duration, options = {}) {
         show: true,
         type,
         message: translatedMessage,
+        dynamic: options.dynamic || null,
         duration,
         actionText: translatedActionText,
         dismissText: translatedDismissText,
         onAction: typeof options.onAction === 'function' ? options.onAction : null,
         onDismiss: typeof options.onDismiss === 'function' ? options.onDismiss : null,
         timerId,
-        changelogMode: Boolean(options.changelogMode)
+        changelogMode: Boolean(options.changelogMode),
+        positionRight: Boolean(options.positionRight)
     }
-}
-
-// ========================================
-// 向后兼容：挂载到 window（可选）
-// ========================================
-if (typeof window !== 'undefined') {
-    window.showSuccessToast = showSuccess
-    window.showErrorToast = showError
-    window.showWarningToast = showWarning
-    window.showInfoToast = showInfo
-    window.showConfirm = showConfirm
 }

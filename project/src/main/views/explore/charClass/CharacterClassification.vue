@@ -4,7 +4,7 @@
       <section class="config-panel glass-panel">
         <div class="panel-header">
           <div class="panel-title-group">
-            <h2 class="page-title">{{ t(currentPageConfig.titleKey) }}</h2>
+            <h1 class="page-title"><BarIcon :icon="activePageIcon" />{{ t(currentPageConfig.titleKey) }}</h1>
             <!-- <p class="page-subtitle">{{ t('charClass.common.subtitle') }}</p> -->
           </div>
         </div>
@@ -38,7 +38,7 @@
 
             <button
               type="button"
-              class="glass-button add-level-button"
+              class="action-btn add-level-button"
               :disabled="!canAddLevel"
               @click="addLevel"
             >
@@ -50,7 +50,7 @@
             <div
               v-for="(levelKey, index) in levels"
               :key="`${selectedTableKey}-${index}-${levelKey}`"
-              class="level-row glass-panel-inner"
+              class="level-row glass-subpanel"
             >
               <div class="level-row-header">
                 <span class="level-badge">{{ t('charClass.common.level', { index: index + 1 }) }}</span>
@@ -131,7 +131,8 @@
               <input
                 v-model="searchQuery"
                 type="text"
-                class="glass-input"
+                class="glass-field"
+                data-shape="search"
                 :placeholder="t('charClass.search.placeholder')"
                 :disabled="loading"
               />
@@ -179,6 +180,7 @@
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -230,7 +232,15 @@ const loadingCacheKey = ref('')
 
 let loadRequestId = 0
 
+const pageTitleIcons = {
+  zhonggu: '📜',
+  shanggu: '🏛️',
+  jingu: '📖',
+  yueyun: '🎵'
+}
+
 const currentPageConfig = computed(() => getCharClassPageConfig(activeTab.value))
+const activePageIcon = computed(() => pageTitleIcons[activeTab.value] || pageTitleIcons.zhonggu)
 const hasMultipleTables = computed(() => Object.keys(currentPageConfig.value.tables).length > 1)
 const currentTableConfig = computed(() => {
   const normalizedTableKey = sanitizeCharClassTableKey(currentPageConfig.value, selectedTableKey.value)
@@ -676,7 +686,6 @@ $panel-radius-portrait: 24px;.char-class-page {
   gap: 6px;
 }
 
-.page-title,
 .tree-title {
   margin: 0;
   color: $text-primary;
@@ -684,6 +693,8 @@ $panel-radius-portrait: 24px;.char-class-page {
 }
 
 .page-title {
+  margin: 0;
+  color: $text-primary;
   font-size: 25px;
 
   @media (orientation: portrait) {
@@ -768,6 +779,8 @@ $panel-radius-portrait: 24px;.char-class-page {
 
 .add-level-button {
   color: var(--action-primary-text);
+  padding: 4px;
+  font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
   background: var(--color-primary);
@@ -948,25 +961,9 @@ $panel-radius-portrait: 24px;.char-class-page {
   transform: translateY(-50%);
 }
 
-.glass-input {
-  width: auto;
-  padding: 11px 14px 11px 40px;
-  color: $text-primary;
-  background: var(--glass-30);
-  border: 1px solid var(--glass-30);
-  border-radius: var(--radius-lg);
-  outline: none;
-  transition:
-    border-color $transition-fast ease,
-    box-shadow $transition-fast ease,
-    background $transition-fast ease;
-
-  @include glass-blur(16px, 180%);
-
-  &:focus {
-    border-color: rgba(var(--color-primary-rgb), 0.35);
-    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.08);
-  }
+.search-wrapper .glass-field {
+  --glass-field-width: auto;
+  --glass-field-padding: 11px 14px 11px 40px;
 }
 
 .tree-body {

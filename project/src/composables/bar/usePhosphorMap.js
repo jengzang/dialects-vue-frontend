@@ -174,6 +174,7 @@ export const PHOSPHOR_MAP = {
   '🏡': PhHouseSimple,
   '🏷️': PhTagSimple,
   '🏺': PhHourglassHigh,
+  '🫵': PhHandPointing,
   '👆': PhHandPointing,
   '👇': PhHandPointing,
   '👉': PhHandPointing,

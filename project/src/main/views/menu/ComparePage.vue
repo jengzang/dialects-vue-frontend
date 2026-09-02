@@ -1,12 +1,19 @@
 <template>
   <TabsContainer
-    v-slot="{ currentTab }"
     :tabs="tabs"
     :model-value="currentTab"
     :route-value="currentTab"
     :resolve-route="resolveTabRoute"
   >
-    <div class="tab-content-inner compare-page-root">
+    <template #header>
+      <h1 class="page-title">
+        <BarIcon :icon="activePageIcon" />
+        {{ activePageTitle }}
+      </h1>
+    </template>
+
+    <template #default="{ currentTab }">
+      <div class="tab-content-inner compare-page-root">
       <!-- Tab1: 比較漢字 -->
       <div
         v-show="currentTab === 'tab1'"
@@ -101,13 +108,13 @@
                 <Teleport to="body">
                   <div
                     v-if="excludeDropdownOpen === 'tab2_current'"
-                    class="dropdown-panel choice-dropdown-panel"
+                    class="dropdown-panel glass-dropdown-panel"
                     :style="excludeDropdownStyle"
                   >
                     <div
                       v-for="option in excludeOptions"
                       :key="option.value"
-                      class="dropdown-item choice-dropdown-item"
+                      class="dropdown-item glass-dropdown-item"
                       :class="{ active: isExcludeSelected(option.value, 'tab2', 'current') }"
                       @click="toggleExcludeOption(option.value, 'tab2', 'current')"
                     >
@@ -215,13 +222,13 @@
                 <Teleport to="body">
                   <div
                     v-if="excludeDropdownOpen === 'tab2_current'"
-                    class="dropdown-panel choice-dropdown-panel"
+                    class="dropdown-panel glass-dropdown-panel"
                     :style="excludeDropdownStyle"
                   >
                     <div
                       v-for="option in excludeOptions"
                       :key="option.value"
-                      class="dropdown-item choice-dropdown-item"
+                      class="dropdown-item glass-dropdown-item"
                       :class="{ active: isExcludeSelected(option.value, 'tab2', 'current') }"
                       @click="toggleExcludeOption(option.value, 'tab2', 'current')"
                     >
@@ -406,11 +413,12 @@
                   </span>
                   <input
                     v-model.number="tabStates.tab5.minLinkCharCountDraft"
+                    class="glass-range"
                     type="range"
                     min="0"
                     max="50"
                     step="1"
-                    :style="{ '--progress': (tabStates.tab5.minLinkCharCountDraft / 50 * 100) + '%' }"
+                    :style="{ '--glass-range-progress': (tabStates.tab5.minLinkCharCountDraft / 50 * 100) + '%' }"
                     @change="scheduleTab5SankeyFilterApply"
                   >
                 </label>
@@ -422,11 +430,12 @@
                   </span>
                   <input
                     v-model.number="tabStates.tab5.minNodeCharCountDraft"
+                    class="glass-range"
                     type="range"
                     min="0"
                     max="100"
                     step="1"
-                    :style="{ '--progress': (tabStates.tab5.minNodeCharCountDraft / 100 * 100) + '%' }"
+                    :style="{ '--glass-range-progress': (tabStates.tab5.minNodeCharCountDraft / 100 * 100) + '%' }"
                     @change="scheduleTab5SankeyFilterApply"
                   >
                 </label>
@@ -436,6 +445,7 @@
         </div>
         <PhoneticCompare
           :query-locations="tabStates.tab5.queryLocations"
+          :active="currentTab === 'tab5'"
           :enable-link-optimization="tabStates.tab5.enableLinkOptimization"
           :ignore-polyphonic-chars="tabStates.tab5.ignorePolyphonicChars"
           :min-link-char-count="tabStates.tab5.minLinkCharCount"
@@ -481,7 +491,7 @@
       </div>
 
       <!-- 提示區 -->
-      <div
+      <!-- <div
         v-if="currentTab === 'tab1'"
         class="page-footer"
         style="margin-top: 20px"
@@ -508,12 +518,14 @@
         style="margin-top: 20px"
       >
         <small class="hint">{{ $t('compare.messages.tab5Hint') }}</small>
+      </div> -->
       </div>
-    </div>
+    </template>
   </TabsContainer>
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, nextTick, reactive, ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -548,6 +560,8 @@ import { getCoordinates } from '@/api'
 import { requestMapFitView } from '@/utils/map/MapData.js'
 import { showWarning } from '@/utils/ui/message.js'
 import { useQueryConfig } from '@/composables/data/useQueryConfig.js'
+import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
+import { encodeQueryValueBase64Url, parseLocationsFromUrl } from '@/utils/urlParams.js'
 
 const { t } = useI18n()
 const selectedCharacterTable = preferredCharacterTable
@@ -576,6 +590,23 @@ const tabs = computed(() => [
   { name: 'tab4', label: t('compare.tabs.tab4') },
   { name: 'tab5', label: t('compare.tabs.tab5') }
 ])
+
+const pageTitleKeys = {
+  tab1: 'navigation.pageTitles.compare.tab1',
+  tab2: 'navigation.pageTitles.compare.tab2',
+  tab4: 'navigation.pageTitles.compare.tab4',
+  tab5: 'navigation.pageTitles.compare.tab5'
+}
+
+const pageTitleIcons = {
+  tab1: '↔️',
+  tab2: '📜',
+  tab4: '📈',
+  tab5: '🎵'
+}
+
+const activePageTitle = computed(() => t(pageTitleKeys[currentTab.value] || pageTitleKeys.tab2))
+const activePageIcon = computed(() => pageTitleIcons[currentTab.value] || pageTitleIcons.tab2)
 
 // Compute limit context based on current tab
 const locationLimitContext = computed(() => {
@@ -664,8 +695,8 @@ const tabStates = reactive({
     matchedLocations: [],
     queryLocations: [],
 
-    enableLinkOptimization: false,
-    ignorePolyphonicChars: false,
+    enableLinkOptimization: true,
+    ignorePolyphonicChars: true,
 
     // 真正传给 PhoneticCompare 的值
     minLinkCharCount: 3,
@@ -675,6 +706,57 @@ const tabStates = reactive({
     minLinkCharCountDraft: 3,
     minNodeCharCountDraft: 10
   }
+})
+
+// ========== Tab5 地点 URL 状态（与 Evolution 对齐） ==========
+const COMPARE_LOCATION_LIMIT = 5
+
+const parseCompareLocationQuery = (value) => {
+  return parseLocationsFromUrl(
+    { query: { loc: value } },
+    { limit: COMPARE_LOCATION_LIMIT }
+  )
+}
+
+const serializeCompareLocationQuery = (locations) => {
+  if (!Array.isArray(locations)) return []
+
+  return locations
+    .filter(Boolean)
+    .slice(0, COMPARE_LOCATION_LIMIT)
+    .map((location) => encodeQueryValueBase64Url(location))
+}
+
+const { state: locationQuery, set: setLocationQuery } = useRouteQueryState('ploc', {
+  defaultValue: [],
+  parse: parseCompareLocationQuery,
+  serialize: serializeCompareLocationQuery,
+  replace: true,
+  removeIf: (locations) => !Array.isArray(locations) || locations.length === 0,
+})
+
+const syncTab5FromUrl = (urlLocations) => {
+  const limited = (Array.isArray(urlLocations) ? urlLocations : []).slice(0, COMPARE_LOCATION_LIMIT)
+
+  tabStates.tab5.locations = [...limited]
+  tabStates.tab5.matchedLocations = [...limited]
+  tabStates.tab5.queryLocations = [...limited]
+}
+
+// 初始同步：URL 已带 loc 时，填充输入并触发真实查询
+const initialUrlLocations = locationQuery.value
+if (Array.isArray(initialUrlLocations) && initialUrlLocations.length > 0) {
+  syncTab5FromUrl(initialUrlLocations)
+}
+
+watch(locationQuery, (urlLocations) => {
+  const limited = (Array.isArray(urlLocations) ? urlLocations : []).slice(0, COMPARE_LOCATION_LIMIT)
+
+  if (JSON.stringify(limited) === JSON.stringify(tabStates.tab5.queryLocations)) {
+    return
+  }
+
+  syncTab5FromUrl(limited)
 })
 
 // Tab2 相關方法
@@ -1323,6 +1405,7 @@ const runTab5Action = () => {
   }
 
   tabStates.tab5.queryLocations = [...tabStates.tab5.matchedLocations]
+  setLocationQuery(tabStates.tab5.matchedLocations.slice(0, COMPARE_LOCATION_LIMIT))
 }
 
 // 點擊按鈕行為
@@ -1796,6 +1879,7 @@ export default {
 
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
 $group1-primary: #4caf50;
@@ -1806,7 +1890,6 @@ $danger: #f44336;
 $text-primary: var(--text-dark);
 $text-muted: var(--text-lightest);
 
-/* 页面主体 */
 .tab-content-inner {
   display: flex;
   flex-direction: column;
@@ -2284,7 +2367,7 @@ $text-muted: var(--text-lightest);
   }
 
   &-sankey-controls {
-    flex: 0 0 190px;
+    flex: 0 0 230px;
     @include flex-col;
     justify-content: center;
     gap: 8px;
@@ -2308,64 +2391,6 @@ $text-muted: var(--text-lightest);
     color: var(--text-secondary, var(--text-tertiary));
     font-size: 12px;
     line-height: 1.35;
-
-    input[type='range'] {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 100%;
-      background: transparent;
-      cursor: pointer;
-
-      &::-webkit-slider-runnable-track {
-        height: 4px;
-        border-radius: 2px;
-        background: linear-gradient(
-          to right,
-          var(--color-primary) 0%,
-          var(--color-primary) var(--progress, 0%),
-          var(--bg-hover-strong) var(--progress, 0%),
-          var(--bg-hover-strong) 100%
-        );
-      }
-
-      &::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        background: var(--color-primary);
-        margin-top: -5px;
-        cursor: pointer;
-        transition: background 0.2s, box-shadow 0.2s;
-
-        &:hover {
-          background: var(--color-primary-hover);
-          box-shadow: 0 0 6px var(--color-primary-shadow);
-        }
-      }
-
-      &::-moz-range-track {
-        height: 4px;
-        border-radius: 2px;
-        background: linear-gradient(
-          to right,
-          var(--color-primary) 0%,
-          var(--color-primary) var(--progress, 0%),
-          var(--bg-hover-strong) var(--progress, 0%),
-          var(--bg-hover-strong) 100%
-        );
-      }
-
-      &::-moz-range-thumb {
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        background: var(--color-primary);
-        border: none;
-        cursor: pointer;
-      }
-    }
   }
 
   &-sankey-slider-label {

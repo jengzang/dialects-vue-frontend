@@ -1,9 +1,9 @@
 <template>
   <div class="spatial-aware-panel">
-    <h3 class="villagesml-subtab-title">
-      ML計算 - 空間感知聚類
+    <h1 class="villagesml-subtab-title">
+      <BarIcon icon="🌐" />ML計算 - 空間感知聚類
       <HelpIcon content="基於空間聚類結果的二次聚類。先進行空間聚類（DBSCAN/HDBSCAN），再對每個空間聚類提取特徵（語義、字符、結構、空間統計）進行二次聚類。發現空間聚集區域的語言模式差異" />
-    </h3>
+    </h1>
     <div class="vml-two-col">
     <div class="vml-glass-panel">
       <h3 class="panel-title">空間感知聚類</h3>
@@ -59,6 +59,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed } from 'vue'
 import { villagesMLStore } from '@/VillagesML/store/villagesMLStore.js'
 import { SPATIAL_CLUSTERING_RUN_LABELS } from '@/VillagesML/config/villagesML.js'

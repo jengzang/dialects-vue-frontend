@@ -1,7 +1,7 @@
 <template>
   <div class="vocabulary-import-page">
     <section class="content-area">
-      <div class="upload-mode main-glass-panel">
+      <div class="upload-mode glass-panel">
         <div class="upload-head">
             <h3>{{ t('words.wordList.upload.title') }}</h3>
             <div class="upload-head-counts">
@@ -13,7 +13,7 @@
             <div v-if="requiresLogin" class="upload-access-notice">
               <p>{{ uploadAccessNotice }}</p>
               <button
-                class="main-glass-button"
+                class="glass-button"
                 data-variant="primary"
                 type="button"
                 @click="navigateToSuggestion"
@@ -29,7 +29,7 @@
             <strong>{{ uploadLocation.location_name || t('words.wordList.upload.locationName') }}</strong>
             <p>{{ uploadLocationSummaryText }}</p>
           </div>
-          <button class="main-glass-button" data-variant="primary" type="button" @click="openUploadLocationEditor">
+          <button class="glass-button" data-variant="primary" type="button" @click="openUploadLocationEditor">
             {{ uploadLocation.location_name ? t('common.button.edit') : t('words.wordList.upload.enterLocationInfo') }}
           </button>
         </div>
@@ -59,7 +59,7 @@
         <div class="upload-parser-row">
           <div class="upload-parser-head">
             <h3 class="upload-section-title">{{ t('words.wordList.upload.chooseFile') }}</h3>
-            <button class="main-glass-button info-help-btn" data-size="small" type="button" @click="showFormatHelp = true">
+            <button class="pill-btn" type="button" @click="showFormatHelp = true">
               ? {{ t('words.wordList.upload.formatHelp') }}
             </button>
           </div>
@@ -122,10 +122,11 @@
           <p v-if="(backendPreview.would_delete_existing_count ?? 0) > 0" class="backend-preview-warning">
             {{ t('words.wordList.upload.replaceWarning', { count: backendPreview.would_delete_existing_count }) }}
           </p>
-          <label v-if="shouldConfirmOverwrite" class="backend-preview-overwrite">
-            <input v-model="isOverwriteConfirmed" type="checkbox" />
-            <span>{{ t('words.wordList.upload.confirmOverwrite') }}</span>
-          </label>
+          <CheckBox
+            v-if="shouldConfirmOverwrite"
+            v-model="isOverwriteConfirmed"
+            :label="t('words.wordList.upload.confirmOverwrite')"
+          />
           <ul v-if="backendPreview.errors?.length" class="backend-preview-errors">
             <li v-for="error in backendPreview.errors" :key="error">{{ error }}</li>
           </ul>
@@ -155,7 +156,7 @@
         <div class="upload-actions">
           <button
             v-if="selectedUploadFile"
-            class="main-glass-button"
+            class="glass-button"
             data-variant="secondary"
             type="button"
             :disabled="isUploading"
@@ -164,7 +165,7 @@
             {{ t('common.importPreview.actions.reselect') }}
           </button>
           <button
-            class="main-glass-button"
+            class="glass-button"
             data-variant="primary"
             type="button"
             :disabled="!canImportAfterPreview"
@@ -212,7 +213,7 @@
               </div>
             </div>
             <button
-              class="main-glass-button"
+              class="glass-button"
               data-variant="primary"
               type="button"
               :disabled="!yindianQuery.trim() || isLoadingYindian"
@@ -252,10 +253,10 @@
 
       <template #footer>
         <div class="location-edit-modal-actions">
-          <button class="main-glass-button" data-variant="secondary" type="button" @click="closeUploadLocationEditor">
+          <button class="glass-button" data-variant="secondary" type="button" @click="closeUploadLocationEditor">
             {{ t('common.button.cancel') }}
           </button>
-          <button class="main-glass-button" data-variant="primary" type="button" @click="confirmUploadLocationEditor">
+          <button class="glass-button" data-variant="primary" type="button" @click="confirmUploadLocationEditor">
             {{ t('common.button.confirm') }}
           </button>
         </div>
@@ -386,7 +387,7 @@
       </div>
 
       <template #footer>
-        <button class="main-glass-button" data-variant="primary" type="button" @click="showFormatHelp = false">
+        <button class="glass-button" data-variant="primary" type="button" @click="showFormatHelp = false">
           {{ t('tools.checkTool.help.gotIt') }}
         </button>
       </template>
@@ -407,6 +408,7 @@ import RadioGroup from '@/components/selector/RadioGroup.vue'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
+import { transformTabularFile } from '@/utils/import/transformTabularFile.js'
 import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue'
 import { formatCoord } from '@/main/utils/drawMap/formatCoord.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
@@ -454,7 +456,13 @@ onMounted(async () => {
 })
 
 function navigateToSuggestion() {
-  router.push(buildLocalePath(resolveRouteLocale(route), '/menu/about/suggestion'))
+  router.push({
+    path: buildLocalePath(resolveRouteLocale(route), '/menu/about/suggestion'),
+    query: {
+      category: 'vocabulary_permission',
+      from: 'vocabulary_import',
+    },
+  })
 }
 
 const isUploading = ref(false)
@@ -489,6 +497,7 @@ const yindianSuggestions = ref([])
 const isLoadingYindian = ref(false)
 const uploadLocationEditorStatus = ref('')
 let yindianDebounceTimer = null
+let preserveBackendPreviewOnFilePromotion = false
 
 const uploadLocationFields = computed(() => [
   {
@@ -826,6 +835,10 @@ watch(fillStandardFromLocal, (val) => {
 })
 
 watch([uploadParserMode, selectedUploadFile, uploadLocation], () => {
+  if (preserveBackendPreviewOnFilePromotion) {
+    preserveBackendPreviewOnFilePromotion = false
+    return
+  }
   backendPreview.value = null
   isOverwriteConfirmed.value = false
 }, { deep: true })
@@ -834,11 +847,36 @@ function buildUploadLocation() {
   return normalizeUploadLocation(uploadLocation.value)
 }
 
-async function handlePreviewImport() {
-  const file = uploadFile.value || importFlow.pendingFile.value
+function buildVocabularyImportColumnMap() {
+  const mapping = importPreview.mapping.value
+  return [
+    { sourceKey: mapping.standard_word, header: 'standard_word' },
+    { sourceKey: mapping.local_expression, header: 'local_expression' },
+    { sourceKey: mapping.ipa, header: 'ipa' },
+    { sourceKey: mapping.notes, header: 'notes' },
+  ].filter((entry) => entry.sourceKey)
+}
+
+function buildMappedVocabularyImportFile(file) {
+  const columnMap = buildVocabularyImportColumnMap()
+  if (!columnMap.length) {
+    return file
+  }
+
+  return transformTabularFile({
+    parsedFile: importPreview.parsedFile.value,
+    columnMap,
+    selectedSheetId: importPreview.selectedSheetId.value,
+    headerRowIndex: importPreview.headerRowIndex.value,
+    mode: 'replace'
+  })
+}
+
+async function handlePreviewImport(fileOverride = null) {
+  const file = fileOverride || uploadFile.value || importFlow.pendingFile.value
 
   if (!file || isUploading.value || isPreviewingImport.value) {
-    return
+    return null
   }
 
   const location = buildUploadLocation()
@@ -846,13 +884,13 @@ async function handlePreviewImport() {
   if (!location.location_name || !location.coordinates) {
     uploadStatusText.value = t('words.wordList.upload.missingLocation')
     showWarning(t('words.wordList.upload.missingLocation'))
-    return
+    return null
   }
 
   if (!canUploadVocabulary.value) {
     uploadStatusText.value = t('words.wordList.upload.permissionRequired')
     showWarning(uploadStatusText.value)
-    return
+    return null
   }
 
   isPreviewingImport.value = true
@@ -873,9 +911,11 @@ async function handlePreviewImport() {
       uploadStatusText.value = previewResponse.errors?.join('；') || t('words.wordList.upload.previewFailed')
       showError(uploadStatusText.value)
     }
+    return previewResponse
   } catch (error) {
     uploadStatusText.value = error.message || t('words.wordList.upload.previewFailed')
     showError(uploadStatusText.value)
+    return null
   } finally {
     isPreviewingImport.value = false
   }
@@ -883,9 +923,16 @@ async function handlePreviewImport() {
 
 async function handleConfirmUpload() {
   const file = importFlow.pendingFile.value
-  await handlePreviewImport()
-  if (backendPreview.value?.success && file) {
-    uploadFile.value = file
+  if (!file || !importPreview.diagnostics.value.isComplete) {
+    showError(t('common.importPreview.messages.mappingIncomplete'))
+    return
+  }
+
+  const transformedFile = buildMappedVocabularyImportFile(file)
+  const previewResponse = await handlePreviewImport(transformedFile)
+  if (previewResponse?.success) {
+    preserveBackendPreviewOnFilePromotion = true
+    uploadFile.value = transformedFile
     importFlow.pendingFile.value = null
   }
 }

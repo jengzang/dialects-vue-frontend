@@ -1,7 +1,7 @@
 <template>
 <!--  <ExploreLayout>-->
     <div class="village-deep-dive-page">
-      <h1 class="page-title"><InlineIcon icon="🏘️" />村名深度分析</h1>
+      <h1 class="page-title"><BarIcon icon="🏘️" />村名深度分析</h1>
 
       <!-- Village Selector -->
       <div class="village-selector vml-glass-panel">
@@ -87,6 +87,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import {

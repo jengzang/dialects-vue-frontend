@@ -2,7 +2,7 @@
   <div class="simple-select-dropdown" :style="containerStyle">
     <div
       ref="triggerRef"
-      class="select-trigger global-select-trigger"
+      class="select-trigger"
       :class="{ 'is-open': isOpen, 'is-disabled': disabled }"
       @click="handleToggle"
     >
@@ -123,6 +123,7 @@ defineExpose({
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
+@use './selector' as *;
 
 $arrow-transition: 0.2s ease;
 

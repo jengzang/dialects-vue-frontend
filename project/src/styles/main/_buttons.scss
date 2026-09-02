@@ -1,112 +1,5 @@
 @use '@/styles/global/mixins' as *;
 
-.main-glass-button {
-  padding: var(--main-glass-button-padding, 12px 18px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 8px;
-  background: var(--surface-glass-button);
-  border: 1px solid var(--border-glass);
-  border-radius: var(--main-glass-button-border-radius, var(--radius-lg));
-  color: var(--text-deep);
-  font-size: var(--main-glass-button-font-size, 15px);
-  font-weight: var(--main-glass-button-font-weight, 500);
-  white-space: var(--main-glass-button-white-space, normal);
-  text-align: center;
-  cursor: pointer;
-  transition:
-    background-color 0.18s ease,
-    box-shadow 0.18s ease,
-    transform 0.18s ease,
-    border-color 0.18s ease;
-
-  &:hover:not(:disabled) {
-    background: var(--surface-glass-button-hover);
-    transform: translateY(-1px);
-  }
-
-  &:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-
-  &[data-variant='primary'] {
-    background: var(--action-primary-bg);
-    border-color: var(--action-primary-border);
-    color: var(--action-primary-text);
-
-    &:hover:not(:disabled) {
-      background: var(--action-primary-bg-hover);
-      box-shadow: var(--action-primary-shadow);
-      transform: translateY(-1px);
-    }
-  }
-
-  &[data-variant='secondary'] {
-    background: var(--surface-panel);
-
-    &:hover:not(:disabled) {
-      background: var(--surface-panel-hover);
-    }
-  }
-
-  &[data-variant='danger'] {
-    background: var(--color-error);
-    border-color: var(--color-error);
-    color: #fff;
-
-    &:hover:not(:disabled) {
-      background: var(--color-error-dark, #c62828);
-      border-color: var(--color-error-dark, #c62828);
-      box-shadow: 0 4px 12px rgba(211, 47, 47, 0.35);
-    }
-  }
-
-  &[data-size='large'] {
-    padding: var(--main-glass-button-large-padding, 14px 40px);
-    font-size: var(--main-glass-button-large-font-size, 16px);
-  }
-
-  &[data-size='small'] {
-    padding: var(--main-glass-button-small-padding, 8px 16px);
-    font-size: var(--main-glass-button-small-font-size, 13px);
-  }
-
-  &[data-active='true'] {
-    background: var(--action-active-bg);
-    border-color: var(--action-active-border);
-    color: var(--text-deep);
-  }
-}
-
-.glass-button {
-  background: var(--surface-panel-subtle);
-  border: 1px solid var(--border-glass-subtle);
-  border-radius: var(--radius-md);
-  white-space: nowrap;
-  cursor: pointer;
-  transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    border-color 0.18s ease,
-    background-color 0.18s ease;
-
-  &:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-glass-hover);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0);
-  }
-
-  &:disabled {
-    @include disabled-state;
-  }
-}
-
 .run-container {
   position: fixed;
   bottom: 25px;
@@ -123,32 +16,38 @@
 
 .run-btn {
   position: relative;
-  padding: 14px 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--run-btn-gap, 8px);
+  padding: var(--run-btn-padding, 12px 24px);
   overflow: hidden;
   background: var(--color-gradient);
-  border: none;
-  border-radius: 30px;
+  border: 0;
+  border-radius: var(--run-btn-radius, var(--radius-pill));
   box-shadow: var(--shadow-glow-sm);
-  color: white;
-  font-size: 18px;
-  font-weight: bold;
-  letter-spacing: 1px;
+  color: var(--text-white);
+  font-size: var(--run-btn-font-size, 18px);
+  font-weight: var(--run-btn-font-weight, 700);
+  letter-spacing: var(--run-btn-letter-spacing, 1px);
   white-space: nowrap;
   cursor: pointer;
   pointer-events: auto;
-  transition: all 0.3s ease-in-out;
+  transition:
+    background-color 0.3s ease-in-out,
+    box-shadow 0.3s ease-in-out,
+    transform 0.3s ease-in-out;
 
-  &:hover {
-    transform: scale(1.2);
+  &:hover:not(:disabled) {
+    background: var(--color-gradient);
     box-shadow: var(--shadow-glow);
+    transform: scale(1.2);
   }
 
   &:disabled {
     background: var(--border-gray);
-    box-shadow: none;
     opacity: 0.7;
     cursor: not-allowed;
-    transform: none;
   }
 
   span {
@@ -156,93 +55,92 @@
   }
 }
 
-.enter-btn {
-  padding: 0.5rem 1rem;
-  background: var(--enter-button-bg);
+.action-btn {
+  @include flex-center;
+  gap: var(--action-btn-gap, 8px);
+  max-width: var(--action-btn-max-width, none);
+  padding: var(--action-btn-padding, 12px 24px);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-primary-hover) 100%
+  );
   border: none;
-  border-radius: var(--radius-md);
-  box-shadow: var(--enter-button-shadow);
-  color: var(--enter-button-text);
-  font-size: 13px;
-  font-weight: 500;
+  border-radius: var(--action-btn-radius, var(--radius-md));
+  box-shadow:
+    0 4px 12px var(--color-primary-shadow),
+    0 2px 4px var(--bg-overlay-light2);
+  color: var(--action-primary-text);
   white-space: nowrap;
+  font-size: var(--action-btn-font-size, 16px);
+  font-weight: var(--action-btn-font-weight, 600);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 
-  &:hover {
-    background: var(--enter-button-bg-hover);
+  &:hover:not(:disabled) {
+    background: linear-gradient(
+      135deg,
+      var(--color-primary-hover) 0%,
+      var(--color-primary-hover) 100%
+    );
+    box-shadow:
+      0 6px 16px var(--color-primary-shadow-light),
+      var(--shadow-sm-dark);
+    transform: translateY(-1px);
   }
 
-  @media (max-width: 600px) {
-    padding: 5px !important;
-    font-size: 12px !important;
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    background: var(--bg-hover-medium);
+    box-shadow: none;
+    color: var(--text-secondary);
+    cursor: not-allowed;
   }
 }
 
-.entry-button {
-  padding: 24px 16px;
-  @include flex-col;
-  align-items: center;
-  gap: 12px;
-  background: linear-gradient(145deg, var(--glass-30), var(--glass-20));
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 2px solid var(--glass-40);
-  border-radius: var(--radius-xl);
-  box-shadow:
-    0 6px 12px rgba(0, 0, 0, 0.08),
-    0 2px 4px rgba(0, 0, 0, 0.04);
-  text-align: center;
+.action-btn--sm {
+  --action-btn-padding: 8px 16px;
+  --action-btn-font-size: 14px;
+  --action-btn-font-weight: 500;
+}
+
+.pill-btn {
+  @include flex-center;
+  gap: var(--pill-btn-gap, 6px);
+  padding: var(--pill-btn-padding, 9px 14px);
+  background: var(--pill-btn-bg, var(--surface-glass-button));
+  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+  border-radius: var(--pill-btn-radius, var(--radius-pill));
+  box-shadow: var(--pill-btn-shadow, none);
+  color: var(--pill-btn-color, var(--color-primary));
+  font-size: var(--pill-btn-font-size, 12px);
+  font-weight: var(--pill-btn-font-weight, 600);
+  line-height: 1;
+  white-space: nowrap;
   cursor: pointer;
   transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease,
-    background 0.3s ease,
-    border-color 0.3s ease;
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 
-  &:hover {
-    background: linear-gradient(145deg, var(--glass-50), var(--glass-30));
-    border-color: rgba(var(--color-primary-rgb), 0.3);
-    box-shadow:
-      0 12px 24px rgba(0, 0, 0, 0.15),
-      0 4px 8px rgba(0, 0, 0, 0.08);
-    transform: translateY(-4px);
+  &:hover:not(:disabled) {
+    background: var(--pill-btn-hover-bg, var(--glass-60));
+    border-color: var(--pill-btn-hover-border, var(--border-control));
+    box-shadow: var(--pill-btn-hover-shadow, none);
+    transform: var(--pill-btn-hover-transform, translateY(-1px));
   }
 
-  &:active {
-    transform: translateY(-2px);
+  &:active:not(:disabled) {
+    transform: translateY(0);
   }
 
-  &__icon {
-    font-size: 48px;
-    line-height: 1;
-  }
-
-  &__name {
-    color: var(--color-primary-hover);
-    font-size: 20px;
-    font-weight: 700;
-  }
-
-  &__desc {
-    color: var(--text-tertiary);
-    font-size: 13px;
-    line-height: 1.4;
-  }
-
-  @media (max-aspect-ratio: 1 / 1) {
-    padding: 12px;
-
-    &__icon {
-      font-size: 30px;
-    }
-
-    &__name {
-      font-size: 18px;
-    }
-
-    &__desc {
-      font-size: 12px;
-    }
+  &:disabled {
+    @include disabled-state;
+    box-shadow: none;
+    transform: none;
   }
 }

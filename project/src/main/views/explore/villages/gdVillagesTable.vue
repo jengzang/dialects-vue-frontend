@@ -1,8 +1,8 @@
 <template>
   <div style="width: 100%;justify-content: center;align-items:center;display: flex;flex-direction: column">
     <div class="title-row">
-      <h2 style="margin: 0;">{{ t('villages.pages.gdTable.title') }}</h2>
-      <span class="cross-link" @click="goToGdTree">{{ t('villages.pages.gdTree.title') }} →</span>
+      <h1 style="margin: 0;font-size: 1.5em;"><BarIcon icon="📋" />{{ t('navigation.pageTitles.villages.gdTable') }}</h1>
+      <RouterLink class="cross-link" :to="localeTo('/explore/villages/gd')">{{ t('villages.pages.gdTree.title') }} →</RouterLink>
     </div>
     <UniversalTable
         db-key="village"
@@ -15,11 +15,11 @@
 <script setup>
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter, useRoute } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue';
+import BarIcon from '@/components/common/BarIcon.vue'
 const { t } = useI18n();
-const router = useRouter();
 const route = useRoute();
 
 const spokenColumns = computed(() => [
@@ -34,9 +34,7 @@ const spokenColumns = computed(() => [
 
 ]);
 
-const goToGdTree = () => {
-  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/gd'));
-};
+const localeTo = (path) => buildLocalePath(resolveRouteLocale(route), path);
 
 </script>
 
@@ -58,6 +56,7 @@ const goToGdTree = () => {
   font-size: 0.9rem;
   font-weight: 500;
   white-space: nowrap;
+  text-decoration: none;
   cursor: pointer;
   user-select: none;
   transition: opacity 0.2s;

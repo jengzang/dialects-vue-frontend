@@ -17,7 +17,7 @@
         <div class="tabular-import-preview__header-actions">
           <button
             v-if="canExport"
-            class="main-glass-button"
+            class="glass-button"
             data-variant="secondary"
             data-size="small"
             type="button"
@@ -28,7 +28,7 @@
           </button>
           <button
             v-if="file"
-            class="main-glass-button"
+            class="glass-button"
             data-variant="secondary"
             data-size="small"
             type="button"
@@ -92,7 +92,7 @@
         </div>
 
         <div v-else class="tabular-import-preview__body">
-          <div v-if="mappingEnabled" class="tabular-import-preview__mapping main-glass-panel-inner">
+          <div v-if="mappingEnabled" class="tabular-import-preview__mapping glass-subpanel">
             <div class="tabular-import-preview__section-head">
               <div class="tabular-import-preview__section-head-row">
                 <h4>{{ t('common.importPreview.mapping.title') }}</h4>
@@ -146,7 +146,7 @@
             </div>
           </div>
 
-          <div class="tabular-import-preview__preview main-glass-panel-inner">
+          <div class="tabular-import-preview__preview glass-subpanel">
             <div class="tabular-import-preview__table-wrap ui-scrollbar" :style="tableStyle">
               <div class="tabular-import-preview__table">
                 <div class="tabular-import-preview__table-header">
@@ -190,11 +190,11 @@
     </div>
 
     <template #footer>
-      <button class="main-glass-button" data-variant="secondary" type="button" @click="handleCancel">
+      <button class="glass-button" data-variant="secondary" type="button" @click="handleCancel">
         {{ t('common.button.cancel') }}
       </button>
       <button
-        class="main-glass-button"
+        class="glass-button"
         data-variant="primary"
         type="button"
         :disabled="mappingEnabled && !diagnostics.isComplete"
@@ -205,7 +205,7 @@
     </template>
   </AppModal>
 
-  <div v-else class="tabular-import-preview main-glass-panel">
+  <div v-else class="tabular-import-preview glass-panel">
     <div class="tabular-import-preview__embedded-header">
       <div>
         <p class="tabular-import-preview__eyebrow">{{ title }}</p>
@@ -214,7 +214,7 @@
       <div class="tabular-import-preview__header-actions">
         <button
           v-if="canExport"
-          class="main-glass-button"
+          class="glass-button"
           data-variant="secondary"
           data-size="small"
           type="button"
@@ -225,7 +225,7 @@
         </button>
         <button
           v-if="file"
-          class="main-glass-button"
+          class="glass-button"
           data-variant="secondary"
           data-size="small"
           type="button"
@@ -279,7 +279,7 @@
       </div>
 
       <div v-else class="tabular-import-preview__body">
-        <div v-if="mappingEnabled" class="tabular-import-preview__mapping main-glass-panel-inner">
+        <div v-if="mappingEnabled" class="tabular-import-preview__mapping glass-subpanel">
           <div class="tabular-import-preview__section-head">
             <div class="tabular-import-preview__section-head-row">
               <h4>{{ t('common.importPreview.mapping.title') }}</h4>
@@ -333,7 +333,7 @@
           </div>
         </div>
 
-        <div class="tabular-import-preview__preview main-glass-panel-inner">
+        <div class="tabular-import-preview__preview glass-subpanel">
           <div class="tabular-import-preview__table-wrap ui-scrollbar" :style="tableStyle">
             <div class="tabular-import-preview__table">
               <div class="tabular-import-preview__table-header">

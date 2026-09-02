@@ -1,9 +1,11 @@
 @use './global/tokens' as global-tokens;
 @use './global/base' as global-base;
 
-@use './global/close-buttons' as global-close-buttons;
+@use './global/buttons' as global-buttons;
+@use './global/forms' as global-forms;
+@use './global/info' as global-info;
 @use './global/loading' as global-loading;
 @use './global/scrollbars' as global-scrollbars;
 @use './global/utilities' as global-utilities;
-@use './global/glass' as global-glass;
+@use './global/surfaces' as global-surfaces;
 @use './global/ui-mode' as global-ui-mode;

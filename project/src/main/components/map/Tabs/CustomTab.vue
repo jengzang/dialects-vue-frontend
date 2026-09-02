@@ -6,9 +6,9 @@
     >
       <!-- Header Area -->
       <div class="page-footer">
-        <h3 style="margin: 0">
+        <h1 class="page-title" style="font-size: 20px;">
           {{ t('map.customTab.title') }}
-        </h3>
+        </h1>
 
         <div class="header-actions">
           <button
@@ -36,7 +36,8 @@
           </p>
 
           <button
-            class="enter-btn"
+            class="glass-button"
+            data-variant="enter"
             @click="handleLogin"
           >
             {{ t('map.customTab.labels.login') }}
@@ -104,7 +105,7 @@
           :class="{ 'search-open': showFloatingSearchInput }"
         >
           <!-- Collapsible Tree Selector -->
-          <div class="tree-selector-container">
+          <div class="tree-selector-container glass-panel">
             <div
               v-if="loadingFeatures"
               class="loading-state-base"
@@ -151,7 +152,7 @@
               <div
                 v-for="group in groupedFeatures"
                 :key="group.category"
-                class="tree-category-node"
+                class="tree-category-node glass-subpanel"
                 :class="{ collapsed: !expandedCategories[group.category] }"
               >
                 <button
@@ -171,7 +172,8 @@
                   <button
                     v-for="item in group.features"
                     :key="item.feature_key || `${item['特徵']}-${item['聲韻調']}`"
-                    class="feature-leaf-node"
+                    class="feature-leaf-node glass-card"
+                    data-interactive="true"
                     type="button"
                     @click="selectFeatureItem(item)"
                   >
@@ -982,12 +984,13 @@ const openEntryModal = () => {
   min-height: 220px;
   padding: 12px;
   overflow-y: auto;
-  border: 1px solid var(--glass-40);
-  border-radius: var(--radius-lg);
-  background: $glass-white;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: var(--shadow-inset-subtle);
+  background: none;
+  // border: 1px solid var(--glass-40);
+  // border-radius: var(--radius-lg);
+  // background: $glass-white;
+  // backdrop-filter: blur(10px);
+  // -webkit-backdrop-filter: blur(10px);
+  // box-shadow: var(--shadow-inset-subtle);
   box-sizing: border-box;
 }
 
@@ -1054,13 +1057,13 @@ const openEntryModal = () => {
   @include flex-col;
   justify-content: center;
   overflow: hidden;
-  border: 1px solid var(--glass-40);
-  border-radius: var(--radius-md);
-  background: var(--glass-40);
-  transition: $motion-fast;
+  // border: 1px solid var(--glass-40);
+  // border-radius: var(--radius-md);
+  background: var(--glass-50);
+  // transition: $motion-fast;
 
   &:hover {
-    background: var(--glass-60);
+    // background: var(--glass-60);
   }
 
   &.collapsed {
@@ -1123,22 +1126,22 @@ const openEntryModal = () => {
   justify-content: space-between;
   min-height: 52px;
   padding: 10px 12px;
-  border: 1px solid var(--glass-60);
-  border-radius: var(--radius-md);
-  background: var(--glass-80);
+  // border: 1px solid var(--glass-60);
+  // border-radius: var(--radius-md);
+  // background: var(--glass-80);
   font-family: inherit;
   text-align: left;
   cursor: pointer;
   box-sizing: border-box;
-  box-shadow: var(--shadow-hairline);
-  transition: $motion-fast;
+  // box-shadow: var(--shadow-hairline);
+  // transition: $motion-fast;
 
-  &:hover {
-    transform: translateY(-1.5px);
-    border-color: $primary;
-    background: var(--bg-white);
-    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.12);
-  }
+  // &:hover {
+  //   transform: translateY(-1.5px);
+  //   border-color: $primary;
+  //   background: var(--bg-white);
+  //   box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.12);
+  // }
 
   &:active {
     transform: translateY(0);

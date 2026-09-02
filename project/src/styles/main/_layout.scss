@@ -1,0 +1,21 @@
+@use '@/styles/global/mixins' as *;
+
+.main-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--main-card-min-width, 220px), 1fr));
+  gap: var(--main-card-grid-gap, 14px);
+}
+
+.main-card-title {
+  color: var(--text-primary);
+  font-size: 16px;
+}
+
+.main-card-meta {
+  max-width: 100%;
+  color: var(--text-secondary);
+  font-family: var(--font-monospace);
+  font-size: 12px;
+
+  @include text-truncate;
+}

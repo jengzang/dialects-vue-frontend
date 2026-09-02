@@ -99,6 +99,43 @@
         "locations": "地點詳情",
         "locationsSubtitle": "每個地點的音節統計"
       },
+      "syllables": {
+        "title": "音節數統計",
+        "subtitle": "統計不帶調與帶調音節的總量、獨立音節數和各音節數量。",
+        "modeSwitch": "切換不帶調與帶調音節統計",
+        "currentMode": "模式",
+        "unique": "獨立音節",
+        "tokens": "音節總數",
+        "viewLocations": "地點",
+        "heatmap": "熱力圖",
+        "viewIsopleth": "等值線圖",
+        "loadMore": "載入更多",
+        "loadAllConfirm": "載入全部卡片可能造成卡頓,確定繼續?",
+        "minCharCount": "最少字數",
+        "qualifiedSyllables": "字數≥{min}音節",
+        "minShare": "最少佔比",
+        "qualifiedSyllablesByShare": "佔比≥{min}%音節",
+        "filterMode": {
+          "label": "過濾方式",
+          "count": "按字數",
+          "share": "按佔比"
+        },
+        "ignoreHistorical": "忽略歷史音",
+        "allLocations": "全部地點",
+        "expandAll": "展開全部",
+        "collapse": "收起",
+        "modes": {
+          "toneless": "不帶調",
+          "toned": "帶調"
+        }
+      },
+      "queryModes": {
+        "title": "統計模式",
+        "featureCounts": "聲韻調獨立",
+        "syllableCounts": "整體音節",
+        "singleHint": "單一地點可同時勾選兩種統計方式",
+        "multiHint": "多地點時僅能勾選一種統計方式"
+      },
       "charts": {
         "pie": {
           "title": "音節總量佔比",
@@ -127,6 +164,7 @@
       "nav": {
         "navLabel": "音節統計頁面導航",
         "chartsLabel": "圖表",
+        "syllableSummary": "匯總",
         "totalInitial": "總聲母",
         "totalFinal": "總韻母",
         "totalTone": "總聲調",
@@ -147,7 +185,7 @@
       }
     },
     "evolution": {
-      "title": "演變",
+      "title": "演化",
       "queryMode": {
         "label": "統計模式",
         "byValue": "按今音統計",
@@ -200,8 +238,8 @@
       },
       "errors": {
         "minLocation": "請至少選擇一個地點",
-        "maxLocation": "演變分析只支持單個地點，請刪除多餘的地點",
-        "autoLimitLocation": "演變分析只支持單個地點，已自動保留第一個地點",
+        "maxLocation": "演化分析只支持單個地點，請刪除多餘的地點",
+        "autoLimitLocation": "演化分析只支持單個地點，已自動保留第一個地點",
         "selectDimensions": "請選擇兩個維度",
         "sameDimensions": "兩個維度不能相同",
         "queryFailed": "查詢失敗"
@@ -217,6 +255,18 @@
         "empty": "當前特徵沒有數據"
       }
     },
+    "homophoneLexicon": {
+      "title": "同音字彙",
+      "modeLabel": "展示方式",
+      "modeFinalGrouped": "按韻母",
+      "modeSyllable": "按音節",
+      "copy": "複製",
+      "copied": "已複製",
+      "toneCategory": "調類",
+      "toneValue": "調值",
+      "toneNumber": "調號",
+      "toneSwitch": "切換調值"
+    },
     "compare": {
       "options": {
         "optimizeLinks": "優化連線"
@@ -227,6 +277,6 @@
     "matrix": "音系",
     "custom": "音素分類",
     "count": "音節統計",
-    "evolution": "演變"
+    "evolution": "演化"
   }
 }

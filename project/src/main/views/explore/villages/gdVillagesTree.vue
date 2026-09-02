@@ -1,22 +1,19 @@
 <template>
-  <div class="glass-container glass-container-shell">
+  <div class="glass-container glass-shell">
     <!-- Header Section -->
     <div class="header-section">
       <div class="title-row">
-        <h2 style="margin: 0;">{{ t('villages.pages.gdTree.title') }}</h2>
-        <span class="cross-link" @click="goToGdTable">{{ t('villages.pages.gdTable.title') }} →</span>
-      </div>
-      <!-- <p class="subtitle">{{ t('villages.pages.gdTree.subtitle') }}</p> -->
-      <div class="search-wrapper">
-        <span class="search-icon"><InlineIcon icon="🔍" /></span>
-        <input
-            type="text"
-            v-model="searchQuery"
-            :placeholder="t('villages.pages.gdTree.searchPlaceholder')"
-            class="glass-input"
-        />
+        <h1 style="margin: 0;font-size: 1.5em;"><BarIcon icon="🏘️" />{{ t('navigation.pageTitles.villages.gdTree') }}</h1>
+        <RouterLink class="cross-link" :to="localeTo('/explore/villages/table')">{{ t('villages.pages.gdTable.title') }} →</RouterLink>
       </div>
     </div>
+
+    <!-- Floating Search -->
+    <FloatingSearch
+      v-model="searchQuery"
+      :placeholder="t('villages.pages.gdTree.searchPlaceholder')"
+      :close-label="t('common.button.close')"
+    />
 
     <!-- Content Area -->
     <div class="content-area ui-scrollbar">
@@ -51,7 +48,7 @@
                   v-if="!loadedCitiesData[city]"
                   @click="loadCityData(city)"
                   :disabled="loadingStates[city]"
-                  class="load-btn"
+                  class="action-btn action-btn--sm"
               >
                 {{ loadingStates[city] ? t('villages.pages.gdTree.loading') : t('villages.pages.gdTree.load') }}
               </button>
@@ -112,9 +109,11 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import FloatingSearch from '@/components/common/FloatingSearch.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import VillagesTreeItem from '@/main/components/TableAndTree/VillagesTreeItem.vue';
 import VillageMapPopup from '@/main/components/map/popups/VillageMapPopup.vue';
 import { lazyLoadTree, loadFullTree } from '@/api';
@@ -146,6 +145,20 @@ const API_CONFIG = computed(() => {
 const topLevelCities = ref([]);
 const loadedCitiesData = ref({});
 const searchQuery = ref('');
+const debouncedSearchQuery = ref('');
+let searchDebounceTimer = null;
+
+watch(searchQuery, (val) => {
+  clearTimeout(searchDebounceTimer);
+  if (!val.trim()) {
+    debouncedSearchQuery.value = '';
+    return;
+  }
+  searchDebounceTimer = setTimeout(() => {
+    debouncedSearchQuery.value = val;
+  }, 300);
+});
+
 const loadingStates = ref({});
 const isInitialLoading = ref(false);
 const initialLoadError = ref(null);
@@ -426,7 +439,7 @@ const getFilteredCityData = (cityName) => {
     return [];
   }
 
-  const query = searchQuery.value.trim();
+  const query = debouncedSearchQuery.value.trim();
   if (!query) {
     return cityData;
   }
@@ -489,8 +502,10 @@ const lazyLoadChildren = async (node) => {
   }
 };
 const goToYCVillages = () => {
-  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/yc'));
+  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/yc/villages'));
 };
+
+const localeTo = (path) => buildLocalePath(resolveRouteLocale(route), path);
 
 /**
  * Open map popup with villages data
@@ -560,9 +575,6 @@ onMounted(() => {
   loadInitialCities();
 });
 
-const goToGdTable = () => {
-  router.push(buildLocalePath(resolveRouteLocale(route), '/explore/villages/table'));
-};
 </script>
 
 
@@ -587,21 +599,24 @@ $transition-base: 0.3s;
   @include flex-col;
   width: 90dvw;
   max-width: 1400px;
-  height: 90dvh;
+  min-height: 90dvh;
   margin: 10px auto;
-  overflow: hidden;
+  background: var(--glass-50);
   color: $text-primary;
 
   @media (max-aspect-ratio: 1/1) {
     width: 92dvw;
-    height: 88dvh;
+    min-height: 88dvh;
     border-radius: var(--radius-xl);
   }
 }
 
 /* Header Section */
 .header-section {
-  padding: 24px 28px;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background: var(--glass-30);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 
@@ -628,6 +643,7 @@ $transition-base: 0.3s;
   font-size: 0.9rem;
   font-weight: 500;
   white-space: nowrap;
+  text-decoration: none;
   cursor: pointer;
   user-select: none;
   transition: opacity 0.2s;
@@ -650,24 +666,9 @@ $transition-base: 0.3s;
   font-size: 14px;
 }
 
-.search-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.search-icon {
-  position: absolute;
-  left: 14px;
-  font-size: 16px;
-  opacity: 0.5;
-}
-
 /* Content Area */
 .content-area {
-  flex: 1;
   padding: 24px;
-  overflow-y: auto;
 
   @media (max-aspect-ratio: 1/1) {
     padding: 16px;
@@ -748,34 +749,6 @@ $transition-base: 0.3s;
   display: flex;
   gap: 8px;
   align-items: center;
-}
-
-/* Load Button */
-.load-btn {
-  padding: 8px 16px;
-  color: $white;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  background: linear-gradient(
-    135deg,
-    $primary-blue 0%,
-    $primary-blue-dark 100%
-  );
-  border: none;
-  border-radius: var(--radius-md);
-  box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
-  transition: all $transition-fast;
-
-  &:hover:not(:disabled) {
-    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.4);
-    transform: scale(1.05);
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
-  }
 }
 
 /* Loaded Badge */

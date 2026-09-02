@@ -11,7 +11,7 @@
         </div>
 
         <div
-          v-if="hasCustomData && mapStore.mapData"
+          v-if="mapStore.mode !== 'isopleth' && hasCustomData && mapStore.mapData"
           id="custom-switch-container"
           class="custom-switch-container1"
         >
@@ -24,6 +24,7 @@
         </div>
 
         <div
+          v-if="mapStore.mode !== 'isopleth' && !mapStore.divideMapView"
           id="base-switch-container"
           class="custom-switch-container1"
         >
@@ -34,6 +35,57 @@
             @change="() => toggleBaseMode()"
           />
         </div>
+        <div
+          v-if="mapStore.divideMapView && isDivideDisplayMode"
+          class="display-mode-radios"
+        >
+          <RadioGroup
+            v-model="divideDisplayMode"
+            name="map-display-mode"
+            :options="divideDisplayModes"
+            :size="13"
+          />
+        </div>
+        <div v-if="mapStore.mode === 'heatmap'" class="heatmap-sliders">
+          <label class="heatmap-slider">
+            <span class="heatmap-slider-label">{{ t('map.mapLibre.heatmap.radius') }}：{{ heatmapRadiusScale.toFixed(1) }}×</span>
+            <input
+              class="glass-range"
+              type="range"
+              min="0.1"
+              max="3"
+              step="0.1"
+              :value="heatmapRadiusScale"
+              :style="{ '--glass-range-progress': ((heatmapRadiusScale - 0.1) / 2.9 * 100) + '%' }"
+              @input="onHeatmapRadiusChange"
+            />
+          </label>
+          <label class="heatmap-slider">
+            <span class="heatmap-slider-label">{{ t('map.mapLibre.heatmap.intensity') }}：{{ heatmapIntensityScale.toFixed(1) }}×</span>
+            <input
+              class="glass-range"
+              type="range"
+              min="0.1"
+              max="3"
+              step="0.1"
+              :value="heatmapIntensityScale"
+              :style="{ '--glass-range-progress': ((heatmapIntensityScale - 0.1) / 2.9 * 100) + '%' }"
+              @input="onHeatmapIntensityChange"
+            />
+          </label>
+        </div>
+        <div v-if="mapStore.mode === 'isopleth' && isoplethLegend" class="isopleth-legend">
+          <div class="isopleth-legend-title">{{ t('map.mapLibre.isopleth.title') }}</div>
+          <div
+            class="isopleth-legend-bar"
+            :style="{ background: `linear-gradient(to right, ${isoplethLegend.colors.join(', ')})` }"
+          ></div>
+          <div class="isopleth-legend-labels">
+            <span>{{ isoplethLegend.p3 }}</span>
+            <span>{{ isoplethLegend.p97 }}</span>
+          </div>
+        </div>
+        <button v-if="mapStore.mode === 'isopleth'" class="glass-button admin-boundary-btn" @click="openAdminBoundaryModal"><InlineIcon icon="🗺️" />{{ t('map.mapLibre.buttons.adminBoundary') }}</button>
         <div class="button-row">
           <button class="action-btn" @click="resetView"><InlineIcon icon="🎯" />{{ t('map.mapLibre.buttons.reset') }}</button>
           <button class="action-btn fullscreen-btn" @click="toggleFullScreen"><InlineIcon icon="⛶" />{{ t('map.mapLibre.buttons.fullscreen') }}</button>
@@ -52,76 +104,27 @@
       <span>{{ t('map.mapLibre.loading.rendering') }}</span>
     </div>
 
-    <Teleport to="body">
-      <div v-if="locationPopup.visible" class="location-popup-overlay" @click="closeLocationPopup">
-        <div class="location-popup-content" @click.stop>
-          <div class="location-popup-header">
-            <h3><InlineIcon icon="📍" />{{ t('map.mapLibre.locationPopup.title', { location: locationPopup.locationName }) }}</h3>
-            <button
-              class="close-btn close-btn-lg close-btn-inline"
-              @click="closeLocationPopup"
-              :title="t('common.button.close')"
-              :aria-label="t('common.button.close')"
-            >
-              &times;
-            </button>
-          </div>
-          <div class="location-popup-body">
-            <div v-if="locationPopup.loading" class="popup-loading">
-              <div class="ui-loading--page" aria-hidden="true"></div>
-              <span>{{ t('map.mapLibre.locationPopup.loading') }}</span>
-            </div>
-            <div v-else-if="locationPopup.data && locationPopup.data.data && locationPopup.data.data.length > 0" class="data-display">
-              <div class="dialect-info">
-                <div class="info-line title-line">
-                  {{ locationPopup.data.data[0]['語言'] }}
-                </div>
-                <div class="info-line">
-                  <strong>{{ t('map.mapLibre.locationPopup.fields.mapRegion2') }}</strong>{{ locationPopup.data.data[0]['地圖集二分區'] || t('map.mapLibre.common.none') }}
-                </div>
-                <div class="info-line">
-                  <strong>{{ t('map.mapLibre.locationPopup.fields.phoneticRegion') }}</strong>{{ locationPopup.data.data[0]['音典分區'] || t('map.mapLibre.common.none') }}
-                </div>
-                <div class="info-line">
-                  <strong>{{ t('map.mapLibre.locationPopup.fields.characterSource') }}</strong>{{ locationPopup.data.data[0]['字表來源（母本）'] || t('map.mapLibre.common.none') }}
-                </div>
-                <div class="info-line">
-                  <strong>{{ t('map.mapLibre.locationPopup.fields.coordinates') }}</strong>{{ formatCoordinates(locationPopup.data.data[0]['經緯度']) }}
-                </div>
-                <div class="info-line">
-                  <strong>{{ t('map.mapLibre.locationPopup.fields.adminRegion') }}</strong>{{ formatAdministrativeRegion(locationPopup.data.data[0]) }}
-                </div>
+    <LocationDetailPopup
+      :visible="locationPopup.visible"
+      :location-name="locationPopup.locationName"
+      :data="locationPopup.data"
+      :loading="locationPopup.loading"
+      @close="closeLocationPopup"
+    />
 
-                <div class="tone-table-container">
-                  <table class="tone-table">
-                    <thead>
-                      <tr>
-                        <th>{{ t('map.mapLibre.locationPopup.fields.toneCategory') }}</th>
-                        <th>{{ t('map.mapLibre.locationPopup.fields.toneValue') }}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(tone, index) in getToneData(locationPopup.data.data[0])" :key="index">
-                        <td>{{ tone.label }}</td>
-                        <td>{{ tone.value }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-            <div v-else class="no-data">
-              {{ t('map.mapLibre.locationPopup.noData') }}
-            </div>
-          </div>
-        </div>
-      </div>
-    </Teleport>
+    <AdminBoundaryModal
+      v-model="showAdminBoundaryModal"
+      mode="import"
+      :boundary-options="adminBoundaryOptions"
+      :loading="isAdminBoundaryOptionsLoading"
+      @confirm="handleAdminBoundaryConfirm"
+    />
   </div>
 </template>
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import RadioGroup from '@/components/selector/RadioGroup.vue'
 import { ref, onMounted, onActivated, onBeforeUnmount, shallowRef, nextTick, watch, computed, h, render } from 'vue';
 import { useI18n } from 'vue-i18n';
 import maplibregl from 'maplibre-gl';
@@ -138,6 +141,16 @@ import CheckBox from '@/components/selector/CheckBox.vue'
 import MapLegend from './MapLegend.vue'
 import CompareMapPopup from './popups/CompareMapPopup.vue'
 import FeatureMapPopup from './popups/FeatureMapPopup.vue'
+import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue'
+import { contours } from 'd3-contour';
+import { booleanPointInPolygon } from '@turf/turf';
+import { buildVoronoiClipBoundary, computeVoronoiRadius } from '@/main/utils/drawMap/partitionVoronoi.js';
+import AdminBoundaryModal from '@/main/components/map/Draw/modals/AdminBoundaryModal.vue';
+import { api } from '@/api/auth/httpClient.js';
+import nationalBorderGeoJsonUrl from '/data/gis/china_country.geojson?url';
+import provincesGeoJsonUrl from '/data/gis/china_provinces.geojson?url';
+import citiesGeoJsonUrl from '/data/gis/china_cities_simplified_balanced.geojson?url';
+import countiesGeoJsonUrl from '/data/gis/china_counties_simplified_light.geojson?url';
 
 // --- Props: 只接收數據，不負責請求 ---
 const props = defineProps({
@@ -159,6 +172,16 @@ const props = defineProps({
 
 // --- Emits ---
 const emit = defineEmits(['map-click']);
+
+const ISOPLETH_SOURCE_ID = 'isopleth-source';
+const ISOPLETH_POINT_SOURCE_ID = 'isopleth-point-source';
+const ISOPLETH_FILL_LAYER_ID = 'isopleth-fill-layer';
+const ISOPLETH_POINT_LAYER_ID = 'isopleth-point-layer';
+const ISOPLETH_EXPAND_FACTOR = 0.5;
+const DOT_HEATMAP_SOURCE_ID = 'dot-heatmap-source';
+const DOT_HEATMAP_LAYER_ID = 'dot-heatmap-layer';
+const ADMIN_BOUNDARY_SOURCE_ID = 'admin-boundary-source';
+const ADMIN_BOUNDARY_LAYER_ID = 'admin-boundary-line-layer';
 
 const mapContainer = ref(null);
 const map = shallowRef(null);
@@ -223,6 +246,18 @@ const lastNonBaseMode = ref('feature');
 // 只要當前 store 是 base 模式，開關就是開的
 const isBaseModeActive = computed(() => mapStore.mode === 'base');
 
+// DivideTab 三模式切换：热力图 / 查看地名 / 圆点图
+const isDivideDisplayMode = computed(() => ['base', 'dot', 'heatmap'].includes(mapStore.mode));
+const divideDisplayModes = computed(() => [
+  { label: t('map.mapLibre.displayModes.heatmap'), value: 'heatmap' },
+  { label: t('map.mapLibre.displayModes.placeNames'), value: 'base' },
+  { label: t('map.mapLibre.displayModes.dot'), value: 'dot' }
+]);
+const divideDisplayMode = computed({
+  get: () => mapStore.mode,
+  set: (value) => { mapStore.mode = value; }
+});
+
 // 4. 切換邏輯
 const toggleBaseMode = (e) => {
   if (e) e.stopPropagation();
@@ -238,6 +273,52 @@ const toggleBaseMode = (e) => {
 // 管理所有的 Marker 實例，用於清除
 let currentMarkers = [];
 let currentPopupMountTargets = [];
+let isoplethClickHandler = null;
+const isoplethLegend = ref(null);
+
+const showAdminBoundaryModal = ref(false);
+const adminBoundaryOptions = ref({ country: [], provinces: [], cities: [], counties: [] });
+const isAdminBoundaryOptionsLoading = ref(false);
+
+let provincesGeoJsonCache = null;
+let citiesGeoJsonCache = null;
+let countiesGeoJsonCache = null;
+
+async function loadProvincesGeoJson() {
+  if (provincesGeoJsonCache) return provincesGeoJsonCache;
+  const res = await fetch(provincesGeoJsonUrl);
+  if (!res.ok) throw new Error(`Failed to load provinces GeoJSON: ${res.status}`);
+  provincesGeoJsonCache = await res.json();
+  return provincesGeoJsonCache;
+}
+
+async function loadCitiesGeoJson() {
+  if (citiesGeoJsonCache) return citiesGeoJsonCache;
+  const res = await fetch(citiesGeoJsonUrl);
+  if (!res.ok) throw new Error(`Failed to load cities GeoJSON: ${res.status}`);
+  citiesGeoJsonCache = await res.json();
+  return citiesGeoJsonCache;
+}
+
+async function loadCountiesGeoJson() {
+  if (countiesGeoJsonCache) return countiesGeoJsonCache;
+  const res = await fetch(countiesGeoJsonUrl);
+  if (!res.ok) throw new Error(`Failed to load counties GeoJSON: ${res.status}`);
+  countiesGeoJsonCache = await res.json();
+  return countiesGeoJsonCache;
+}
+
+async function fetchHighPrecisionBoundaries(selectedIds) {
+  const features = [];
+  for (const id of selectedIds) {
+    const data = await api(`/api/gis/boundary/by-id?feature_id=${id}`);
+    if (data?.geometry) {
+      features.push({ type: 'Feature', properties: data.feature || {}, geometry: data.geometry });
+    }
+  }
+  if (!features.length) return null;
+  return { type: 'FeatureCollection', features };
+}
 
 // 地名點擊彈窗狀態
 const locationPopup = ref({
@@ -255,20 +336,6 @@ const handleLocationClick = async (locationName) => {
   locationPopup.value.data = null;
 
   try {
-    const payload = {
-      db_key: "query",
-      table_name: "dialects",
-      page: 1,
-      page_size: 50,
-      sort_by: null,
-      sort_desc: false,
-      search_columns: [],
-      search_text: "",
-      filters: {
-        '簡稱': [locationName]
-      }
-    };
-
     const response = await getLocationDetail(locationName);
 
     locationPopup.value.data = response;
@@ -285,60 +352,11 @@ const closeLocationPopup = () => {
   locationPopup.value.visible = false;
 };
 
-// 格式化行政區劃
-const formatAdministrativeRegion = (data) => {
-  const parts = [];
-  if (data['省']) parts.push(data['省']);
-  if (data['市']) parts.push(data['市']);
-  if (data['縣']) parts.push(data['縣']);
-  if (data['鎮']) parts.push(data['鎮']);
-  if (data['行政村']) parts.push(data['行政村']);
-  if (data['自然村']) parts.push(data['自然村']);
-  return parts.length > 0 ? parts.join('-') : t('map.mapLibre.common.none');
-};
-
-// 格式化經緯度（保留6位小數）
-const formatCoordinates = (coords) => {
-  if (!coords) return t('map.mapLibre.common.none');
-  const parts = coords.split(',');
-  if (parts.length !== 2) return coords;
-
-  const lng = parseFloat(parts[0]);
-  const lat = parseFloat(parts[1]);
-
-  if (isNaN(lng) || isNaN(lat)) return coords;
-
-  return `${lng.toFixed(6)}, ${lat.toFixed(6)}`;
-};
-
 const isValidCoordinatePair = (coord) => {
   return Array.isArray(coord) &&
     coord.length >= 2 &&
     Number.isFinite(coord[0]) &&
     Number.isFinite(coord[1]);
-};
-
-// 提取調值數據
-const getToneData = (data) => {
-  const tones = [
-    { key: 'T1陰平', label: 'T1' },
-    { key: 'T2陽平', label: 'T2' },
-    { key: 'T3陰上', label: 'T3' },
-    { key: 'T4陽上', label: 'T4' },
-    { key: 'T5陰去', label: 'T5' },
-    { key: 'T6陽去', label: 'T6' },
-    { key: 'T7陰入', label: 'T7' },
-    { key: 'T8陽入', label: 'T8' },
-    { key: 'T9其他調', label: 'T9' },
-    { key: 'T10輕聲', label: 'T10' }
-  ];
-
-  return tones
-    .map(tone => ({
-      label: tone.label,
-      value: data[tone.key] || t('map.mapLibre.common.none')
-    }))
-    .filter(tone => tone.value !== t('map.mapLibre.common.none'));
 };
 
 import { CATEGORY_PALETTE } from '@/main/config/colors/mapColors.js'
@@ -355,7 +373,10 @@ onActivated(() => {
 });
 
 onBeforeUnmount(() => {
+  clearIsoplethLayers();
+  clearDotHeatmapLayers();
   clearMarkers();
+  clearAdminBoundaryLayers();
   if (map.value) {
     map.value.remove();
     map.value = null;
@@ -365,7 +386,7 @@ onBeforeUnmount(() => {
 // --- 監聽數據變化，自動重繪 ---
 watch(
   // 監聽源改成 store 裡的數據
-    [() => mapStore.mapData, () => mapStore.mergedData, () => mapStore.mode, () => props.activeFeature],
+    [() => mapStore.mapData, () => mapStore.mergedData, () => mapStore.isoplethPayload, () => mapStore.mode, () => props.activeFeature],
     () => {
       // 視圖內容變更時只重繪，不在這裡自行判斷是否 reset；
       // reset 邊界統一由 requestMapFitView -> fitViewKey watcher 控制。
@@ -425,6 +446,11 @@ const initMap = () => {
   map.value.on('load', () => {
     // 地圖加載完畢，如果有數據，立即渲染
     renderMapContent();
+    // 首次進入地圖視圖時若已帶模式數據(如等值線跳轉),依數據範圍校正視口；
+    // fitViewKey 可能在掛載前就遞增,此處補一次 fit 避免視口停在默認中心。
+    if (mapStore.mode !== 'base') {
+      applyResetView(AUTO_RESET_DENSITY_PERCENTILE);
+    }
   });
 
   // 監聽地圖點擊事件，傳遞坐標給父組件
@@ -442,6 +468,9 @@ const renderMapContent = async (shouldResetView = true) => {
 
   // 清除舊標記
   clearMarkers();
+  clearIsoplethLayers();
+  clearDotHeatmapLayers();
+  clearAdminBoundaryLayers();
 
   // 視角統一由 requestMapFitView -> resetView 控制，這裡不再消費入口側預計算的 center/zoom。
   void shouldResetView;
@@ -455,6 +484,10 @@ const renderMapContent = async (shouldResetView = true) => {
     drawFeatureMap();
   } else if (mapStore.mode === 'compare') {
     drawCompareMap();
+  } else if (mapStore.mode === 'isopleth') {
+    drawIsopleth();
+  } else if (mapStore.mode === 'heatmap') {
+    drawDotHeatmap();
   }
 };
 
@@ -463,6 +496,53 @@ const clearMarkers = () => {
   currentPopupMountTargets = [];
   currentMarkers.forEach(marker => marker.remove());
   currentMarkers = [];
+};
+
+const clearIsoplethLayers = () => {
+  if (!map.value) return;
+
+  isoplethLegend.value = null;
+
+  if (isoplethClickHandler) {
+    map.value.off('click', ISOPLETH_POINT_LAYER_ID, isoplethClickHandler);
+    isoplethClickHandler = null;
+  }
+
+  [ISOPLETH_POINT_LAYER_ID, ISOPLETH_FILL_LAYER_ID].forEach((layerId) => {
+    if (map.value.getLayer(layerId)) {
+      map.value.removeLayer(layerId);
+    }
+  });
+
+  [ISOPLETH_SOURCE_ID, ISOPLETH_POINT_SOURCE_ID].forEach((sourceId) => {
+    if (map.value.getSource(sourceId)) {
+      map.value.removeSource(sourceId);
+    }
+  });
+};
+
+const clearAdminBoundaryLayers = () => {
+  if (!map.value) return;
+
+  if (map.value.getLayer(ADMIN_BOUNDARY_LAYER_ID)) {
+    map.value.removeLayer(ADMIN_BOUNDARY_LAYER_ID);
+  }
+
+  if (map.value.getSource(ADMIN_BOUNDARY_SOURCE_ID)) {
+    map.value.removeSource(ADMIN_BOUNDARY_SOURCE_ID);
+  }
+};
+
+const clearDotHeatmapLayers = () => {
+  if (!map.value) return;
+
+  if (map.value.getLayer(DOT_HEATMAP_LAYER_ID)) {
+    map.value.removeLayer(DOT_HEATMAP_LAYER_ID);
+  }
+
+  if (map.value.getSource(DOT_HEATMAP_SOURCE_ID)) {
+    map.value.removeSource(DOT_HEATMAP_SOURCE_ID);
+  }
 };
 
 // =======================================================
@@ -832,6 +912,489 @@ const drawCompareMap = () => {
   // console.log(`✅ 绘制完成，共添加 ${currentMarkers.length} 个标记`)
 };
 
+// =======================================================
+// 邏輯: 點位密度熱力圖 (dot 模式数据的 heatmap 展示)
+// =======================================================
+
+// 热力图半径/强度缩放比例（默认 1 保持原有 zoom 插值不变）
+const heatmapRadiusScale = ref(1)
+const heatmapIntensityScale = ref(1)
+
+const buildHeatmapRadiusPaint = () => [
+  'interpolate',
+  ['linear'],
+  ['zoom'],
+  3, 32 * heatmapRadiusScale.value,
+  11, 72 * heatmapRadiusScale.value
+]
+
+const buildHeatmapIntensityPaint = () => [
+  'interpolate',
+  ['linear'],
+  ['zoom'],
+  3, 0.3 * heatmapIntensityScale.value,
+  11, 0.7 * heatmapIntensityScale.value
+]
+
+const updateDotHeatmapPaint = () => {
+  if (!map.value || !map.value.getLayer(DOT_HEATMAP_LAYER_ID)) return
+  map.value.setPaintProperty(DOT_HEATMAP_LAYER_ID, 'heatmap-radius', buildHeatmapRadiusPaint())
+  map.value.setPaintProperty(DOT_HEATMAP_LAYER_ID, 'heatmap-intensity', buildHeatmapIntensityPaint())
+}
+
+const onHeatmapRadiusChange = (event) => {
+  heatmapRadiusScale.value = Number(event.target.value)
+  updateDotHeatmapPaint()
+}
+
+const onHeatmapIntensityChange = (event) => {
+  heatmapIntensityScale.value = Number(event.target.value)
+  updateDotHeatmapPaint()
+}
+
+const getDotHeatmapFeatureCollection = () => {
+  const locations = mapStore.mapData?.coordinates_locations || [];
+
+  return {
+    type: 'FeatureCollection',
+    features: locations
+      .filter(([, coord]) => isValidCoordinatePair(coord))
+      .map(([location, coord]) => ({
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: coord
+        },
+        properties: {
+          location: location || '',
+          count: 1
+        }
+      }))
+  };
+};
+
+const drawDotHeatmap = () => {
+  const featureCollection = getDotHeatmapFeatureCollection();
+  if (featureCollection.features.length === 0) return;
+
+  map.value.addSource(DOT_HEATMAP_SOURCE_ID, {
+    type: 'geojson',
+    data: featureCollection
+  });
+
+  map.value.addLayer({
+    id: DOT_HEATMAP_LAYER_ID,
+    type: 'heatmap',
+    source: DOT_HEATMAP_SOURCE_ID,
+    maxzoom: 14,
+    paint: {
+      'heatmap-weight': 1,
+      'heatmap-intensity': buildHeatmapIntensityPaint(),
+      'heatmap-color': [
+        'interpolate',
+        ['linear'],
+        ['heatmap-density'],
+        0, 'rgba(33,102,172,0)',
+        0.2, '#67a9cf',
+        0.4, '#d1e5f0',
+        0.6, '#fddbc7',
+        0.8, '#ef8a62',
+        1, '#b2182b'
+      ],
+      'heatmap-radius': buildHeatmapRadiusPaint(),
+      'heatmap-opacity': 0.9
+    }
+  });
+};
+
+const getIsoplethPointFeatureCollection = () => {
+  const payload = mapStore.isoplethPayload || {};
+  const toneMode = payload.toneMode === 'toned' ? 'toned' : 'toneless';
+  const points = Array.isArray(payload.points) ? payload.points : [];
+  console.log('[MapLibre] getIsoplethPointFeatureCollection payload =', payload);
+
+  return {
+    type: 'FeatureCollection',
+    features: points
+      .map((point) => {
+        const uniqueSyllables = Number(point?.unique_syllables?.[toneMode] || 0);
+        const qualifiedSyllableCount = Number(point?.qualified_syllable_count?.[toneMode] || 0);
+        const count = qualifiedSyllableCount > 0 ? qualifiedSyllableCount : uniqueSyllables;
+        if (count <= 0 || !isValidCoordinatePair(point?.coordinate)) return null;
+
+        return {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: point.coordinate
+          },
+          properties: {
+            location: point.location || '',
+            toneMode,
+            count,
+            uniqueSyllables,
+            qualifiedSyllableCount,
+            filterMode: payload.filterMode === 'share' ? 'share' : 'count',
+            minCharCount: Number(payload.minCharCount || 1),
+            minShare: Number(payload.minShare || 0.1),
+            totalTokens: Number(point?.total_tokens?.[toneMode] || 0)
+          }
+        };
+      })
+      .filter(Boolean)
+  };
+};
+
+const createIsoplethPopupNode = (properties) => {
+  const toneModeText = properties.toneMode === 'toned'
+    ? t('phonology.phonology.countphos.syllables.modes.toned')
+    : t('phonology.phonology.countphos.syllables.modes.toneless');
+
+  const container = document.createElement('div');
+  const title = document.createElement('strong');
+  title.textContent = properties.location || '';
+  const mode = document.createElement('div');
+  mode.textContent = `${t('phonology.phonology.countphos.syllables.currentMode')}: ${toneModeText}`;
+  const unique = document.createElement('div');
+  unique.textContent = `${t('phonology.phonology.countphos.syllables.unique')}: ${properties.uniqueSyllables}`;
+  const tokens = document.createElement('div');
+  tokens.textContent = `${t('phonology.phonology.countphos.syllables.tokens')}: ${properties.totalTokens}`;
+
+  container.append(title, mode, unique, tokens);
+
+  if (Number(properties.qualifiedSyllableCount) > 0) {
+    const qualified = document.createElement('div');
+    const qualifiedLabel = properties.filterMode === 'share'
+      ? t('phonology.phonology.countphos.syllables.qualifiedSyllablesByShare', { min: properties.minShare })
+      : t('phonology.phonology.countphos.syllables.qualifiedSyllables', { min: properties.minCharCount });
+    qualified.textContent = `${qualifiedLabel}: ${properties.qualifiedSyllableCount}`;
+    container.append(qualified);
+  }
+
+  return container;
+};
+
+// ---- isopleth(等值线)插值与绘制 ----
+const percentile = (sorted, p) => {
+  if (!sorted.length) return 0;
+  const idx = (sorted.length - 1) * p;
+  const lo = Math.floor(idx);
+  const hi = Math.ceil(idx);
+  if (lo === hi) return sorted[lo];
+  return sorted[lo] + (sorted[hi] - sorted[lo]) * (idx - lo);
+};
+
+const hexToRgb = (hex) => {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+};
+
+const rgbToHex = (r, g, b) =>
+  '#' + [r, g, b].map((x) => Math.round(x).toString(16).padStart(2, '0')).join('');
+
+const ISOPLETH_RAMP_STOPS = ['#67a9cf', '#d1e5f0', '#fddbc7', '#ef8a62', '#b2182b'].map(hexToRgb);
+
+const rampColor = (t) => {
+  const clamped = Math.max(0, Math.min(1, t));
+  const scaled = clamped * (ISOPLETH_RAMP_STOPS.length - 1);
+  const i = Math.min(Math.floor(scaled), ISOPLETH_RAMP_STOPS.length - 2);
+  const f = scaled - i;
+  const a = ISOPLETH_RAMP_STOPS[i];
+  const b = ISOPLETH_RAMP_STOPS[i + 1];
+  return rgbToHex(a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f);
+};
+
+const isPointInsideBoundary = (lng, lat, boundary) => {
+  if (!boundary) return true;
+  const feats = boundary?.type === 'FeatureCollection' ? boundary.features : [boundary];
+  return feats.some((f) => {
+    try {
+      return booleanPointInPolygon([lng, lat], f);
+    } catch {
+      return false;
+    }
+  });
+};
+
+const buildIsopleth = (features) => {
+  // 1. 取点并去重(重合点会使 IDW 权重爆炸)
+  const seen = new Set();
+  const samples = [];
+  features.forEach((feature) => {
+    const coord = feature.geometry?.coordinates;
+    const count = Number(feature.properties?.count || 0);
+    if (!isValidCoordinatePair(coord) || count <= 0) return;
+    const key = `${coord[0].toFixed(6)},${coord[1].toFixed(6)}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    samples.push({ lng: coord[0], lat: coord[1], count });
+  });
+
+  if (samples.length < 2) return null;
+
+  // 2. p3–p97 二十等份断点,退化时回退 [min, max]
+  const counts = samples.map((s) => s.count).sort((a, b) => a - b);
+  let p3 = percentile(counts, 0.03);
+  let p97 = percentile(counts, 0.97);
+  if (p97 - p3 < 1e-9) {
+    p3 = counts[0];
+    p97 = counts[counts.length - 1];
+    if (p97 - p3 < 1e-9) p97 = p3 + 1;
+  }
+
+  const bandCount = 20;
+  const delta = (p97 - p3) / bandCount;
+  const breaks = Array.from({ length: bandCount }, (_, k) => p3 + k * delta);
+  const colors = Array.from({ length: bandCount }, (_, k) => rampColor((k + 1) / bandCount));
+
+  // 3. 原始包围盒
+  const lngs = samples.map((s) => s.lng);
+  const lats = samples.map((s) => s.lat);
+  const minLng = Math.min(...lngs);
+  const maxLng = Math.max(...lngs);
+  const minLat = Math.min(...lats);
+  const maxLat = Math.max(...lats);
+  const cosLat = Math.max(0.2, Math.cos(((minLat + maxLat) / 2) * (Math.PI / 180)));
+
+  // 4. 泰森同款裁剪边界(每个点往外扩张 radius),网格 bbox 按 radius 外扩以容纳该边界
+  const isoplethCoords = samples.map((s) => [s.lng, s.lat]);
+  const radius = computeVoronoiRadius(isoplethCoords, ISOPLETH_EXPAND_FACTOR);
+  const { boundary } = buildVoronoiClipBoundary(isoplethCoords, radius);
+  const pad = radius > 0 ? radius : 0;
+  const gridMinLng = minLng - pad;
+  const gridMaxLng = maxLng + pad;
+  const gridMinLat = minLat - pad;
+  const gridMaxLat = maxLat + pad;
+
+  const width = Math.max(1e-6, (gridMaxLng - gridMinLng) * cosLat);
+  const height = Math.max(1e-6, gridMaxLat - gridMinLat);
+  const target = 150 * 150;
+  const nx = Math.max(10, Math.min(200, Math.round(Math.sqrt(target * (width / height)))));
+  const ny = Math.max(10, Math.min(200, Math.round(target / nx)));
+
+  // 5. IDW 插值
+  const samplesScaled = samples.map((s) => ({ x: s.lng * cosLat, y: s.lat, count: s.count }));
+  const idw = (lng, lat) => {
+    const x = lng * cosLat;
+    const y = lat;
+    let weightedSum = 0;
+    let weightTotal = 0;
+    for (const s of samplesScaled) {
+      const dx = x - s.x;
+      const dy = y - s.y;
+      const d2 = dx * dx + dy * dy;
+      if (d2 < 1e-12) return s.count;
+      const w = 1 / d2;
+      weightedSum += w * s.count;
+      weightTotal += w;
+    }
+    return weightTotal ? weightedSum / weightTotal : 0;
+  };
+
+  // 6. 网格值(d3-contour 语义 value >= 阈值;掩码用 -Infinity 而非 NaN)
+  const grid = new Float64Array(nx * ny);
+  const stepX = (gridMaxLng - gridMinLng) / nx;
+  const stepY = (gridMaxLat - gridMinLat) / ny;
+  for (let j = 0; j < ny; j++) {
+    for (let i = 0; i < nx; i++) {
+      const lng = gridMinLng + (i + 0.5) * stepX;
+      const lat = gridMinLat + (j + 0.5) * stepY;
+      if (boundary && !isPointInsideBoundary(lng, lat, boundary)) {
+        grid[j * nx + i] = -Infinity;
+      } else {
+        grid[j * nx + i] = Math.max(p3, Math.min(p97, idw(lng, lat)));
+      }
+    }
+  }
+
+  // 7. 抽等值面
+  const mapCoord = (pt) => [
+    gridMinLng + (pt[0] / nx) * (gridMaxLng - gridMinLng),
+    gridMinLat + (pt[1] / ny) * (gridMaxLat - gridMinLat)
+  ];
+  const contourFeatures = contours()
+    .size([nx, ny])
+    .thresholds(breaks)(grid)
+    .filter((geom) => geom.coordinates.length > 0)
+    .map((geom) => ({
+      type: 'Feature',
+      properties: { value: geom.value },
+      geometry: {
+        type: 'MultiPolygon',
+        coordinates: geom.coordinates.map((polygon) => polygon.map((ring) => ring.map(mapCoord)))
+      }
+    }));
+
+  return { features: contourFeatures, breaks, colors, p3, p97 };
+};
+
+const drawIsopleth = () => {
+  const pointCollection = getIsoplethPointFeatureCollection();
+  console.log('[MapLibre] drawIsopleth pointCount =', pointCollection.features.length);
+  if (pointCollection.features.length === 0) return;
+
+  const result = buildIsopleth(pointCollection.features);
+  console.log('[MapLibre] drawIsopleth buildIsopleth result =', result && {
+    featureCount: result.features?.length,
+    breaks: result.breaks,
+    colors: result.colors,
+    p3: result.p3,
+    p97: result.p97
+  });
+  if (!result) return;
+
+  map.value.addSource(ISOPLETH_SOURCE_ID, {
+    type: 'geojson',
+    data: {
+      type: 'FeatureCollection',
+      features: result.features
+    }
+  });
+
+  map.value.addSource(ISOPLETH_POINT_SOURCE_ID, {
+    type: 'geojson',
+    data: {
+      type: 'FeatureCollection',
+      features: pointCollection.features
+    }
+  });
+
+  const fillColorStops = [];
+  result.breaks.forEach((brk, k) => fillColorStops.push(brk, result.colors[k]));
+
+  map.value.addLayer({
+    id: ISOPLETH_FILL_LAYER_ID,
+    type: 'fill',
+    source: ISOPLETH_SOURCE_ID,
+    paint: {
+      'fill-color': ['interpolate', ['linear'], ['get', 'value'], ...fillColorStops],
+      'fill-outline-color': ['interpolate', ['linear'], ['get', 'value'], ...fillColorStops],
+      'fill-opacity': 0.5
+    }
+  });
+
+  map.value.addLayer({
+    id: ISOPLETH_POINT_LAYER_ID,
+    type: 'circle',
+    source: ISOPLETH_POINT_SOURCE_ID,
+    minzoom: 7,
+    paint: {
+      'circle-radius': [
+        'interpolate',
+        ['linear'],
+        ['get', 'count'],
+        0, 3,
+        200, 6,
+        500, 10,
+        1500, 16
+      ],
+      'circle-color': '#ef8a62',
+      'circle-stroke-color': '#ffffff',
+      'circle-stroke-width': 1.5,
+      'circle-opacity': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        7, 0,
+        11, 0.85
+      ]
+    }
+  });
+
+  isoplethClickHandler = (event) => {
+    const feature = event.features?.[0];
+    if (!feature) return;
+
+    new maplibregl.Popup({ offset: 12 })
+      .setLngLat(feature.geometry.coordinates)
+      .setDOMContent(createIsoplethPopupNode(feature.properties || {}))
+      .addTo(map.value);
+  };
+
+  map.value.on('click', ISOPLETH_POINT_LAYER_ID, isoplethClickHandler);
+
+  isoplethLegend.value = {
+    colors: result.colors,
+    p3: Math.round(result.p3),
+    p97: Math.round(result.p97)
+  };
+};
+
+function openAdminBoundaryModal() {
+  showAdminBoundaryModal.value = true;
+  ensureAdminBoundaryOptions();
+}
+
+async function ensureAdminBoundaryOptions() {
+  isAdminBoundaryOptionsLoading.value = true;
+  try {
+    const countryOpts = [{ label: '中国', value: '中国' }];
+    const [prov, city, county] = await Promise.all([
+      loadProvincesGeoJson().catch(() => null),
+      loadCitiesGeoJson().catch(() => null),
+      loadCountiesGeoJson().catch(() => null),
+    ]);
+    adminBoundaryOptions.value = {
+      country: countryOpts,
+      provinces: (prov?.features ?? []).map((f) => f?.properties?.name).filter(Boolean).map((n) => ({ label: n, value: n })),
+      cities: (city?.features ?? []).map((f) => f?.properties?.name).filter(Boolean).map((n) => ({ label: n, value: n })),
+      counties: (county?.features ?? []).map((f) => f?.properties?.name).filter(Boolean).map((n) => ({ label: n, value: n })),
+    };
+  } finally {
+    isAdminBoundaryOptionsLoading.value = false;
+  }
+}
+
+async function handleAdminBoundaryConfirm(config) {
+  const { level, selectedNames, selectedIds, highPrecision } = config;
+  let geoJson;
+  try {
+    if (highPrecision && level !== 'country') {
+      geoJson = await fetchHighPrecisionBoundaries(selectedIds);
+      if (!geoJson) { showError(t('map.drawTab.voronoi.clipBoundaryNoOptions')); return; }
+    } else if (level === 'country') {
+      const res = await fetch(nationalBorderGeoJsonUrl);
+      if (!res.ok) throw new Error(`Failed to load country GeoJSON: ${res.status}`);
+      geoJson = await res.json();
+    } else if (level === 'provinces') {
+      geoJson = await loadProvincesGeoJson();
+    } else if (level === 'cities') {
+      geoJson = await loadCitiesGeoJson();
+    } else {
+      geoJson = await loadCountiesGeoJson();
+    }
+  } catch (error) {
+    showError(error.message || 'Failed to load boundary');
+    return;
+  }
+
+  const filtered = (geoJson.features ?? []).filter(
+    (f) => level === 'country' || selectedNames.includes(f?.properties?.name)
+  );
+  if (!filtered.length) { showError(t('map.drawTab.voronoi.clipBoundaryNoOptions')); return; }
+
+  drawAdminBoundary({ type: 'FeatureCollection', features: filtered });
+}
+
+function drawAdminBoundary(featureCollection) {
+  if (!map.value) return;
+  clearAdminBoundaryLayers();
+  map.value.addSource(ADMIN_BOUNDARY_SOURCE_ID, {
+    type: 'geojson',
+    data: featureCollection
+  });
+  map.value.addLayer({
+    id: ADMIN_BOUNDARY_LAYER_ID,
+    type: 'line',
+    source: ADMIN_BOUNDARY_SOURCE_ID,
+    paint: {
+      'line-color': '#4a4a4a',
+      'line-width': 1.5,
+      'line-opacity': 0.9
+    }
+  });
+}
+
 // 創建比較模式的彈窗內容
 function createComparePopupNode(item) {
   const statusMap = {
@@ -882,6 +1445,9 @@ const handleStyleChange = () => {
   if (!map.value) return;
   const newStyle = mapStyle(currentStyleKey.value);
   map.value.setStyle(newStyle);
+  map.value.once('style.load', () => {
+    renderMapContent(false);
+  });
 };
 
 const AUTO_RESET_DENSITY_PERCENTILE = 0.98;
@@ -891,7 +1457,12 @@ const collectResetViewPoints = () => {
   let points = [];
 
   // compare / feature 模式优先按当前结果坐标复位，避免退回到 mapData 全量范围
-  if ((mapStore.mode === 'compare' || mapStore.mode === 'feature') && mapStore.mergedData && mapStore.mergedData.length > 0) {
+  if (mapStore.mode === 'isopleth') {
+    points = getIsoplethPointFeatureCollection().features
+      .map(feature => feature.geometry?.coordinates)
+      .filter(isValidCoordinatePair);
+  }
+  else if ((mapStore.mode === 'compare' || mapStore.mode === 'feature') && mapStore.mergedData && mapStore.mergedData.length > 0) {
     points = mapStore.mergedData
       .map(item => item.coordinate)
       .filter(isValidCoordinatePair);
@@ -939,10 +1510,11 @@ const resetView = () => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $map-border-radius: var(--radius-2xl);
 $map-transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 $control-panel-width: 160px;
-$popup-max-width: 800px;
 $glass-transition: all 0.3s ease;
 
 .map-page-container {
@@ -1039,6 +1611,75 @@ $glass-transition: all 0.3s ease;
   gap: 12px;
 
   width: 100%;
+}
+
+.display-mode-radios {
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+
+  width: 100%;
+  padding: 4px 0;
+
+  :deep(.liquid-radio-group) {
+    gap: 4px 10px;
+  }
+}
+
+.heatmap-sliders {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 0;
+}
+
+.heatmap-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.heatmap-slider-label {
+  color: var(--text-tertiary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.isopleth-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  width: 100%;
+  padding: 6px 4px;
+
+  &-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  &-bar {
+    width: 100%;
+    height: 10px;
+
+    border-radius: 4px;
+  }
+
+  &-labels {
+    display: flex;
+    justify-content: space-between;
+
+    font-size: 11px;
+  }
+}
+
+.admin-boundary-btn {
+  width: 100%;
+  margin-bottom: 10px;
+  border: 2px solid var(--color-primary-border);
 }
 
 .button-row {
@@ -1147,167 +1788,6 @@ $glass-transition: all 0.3s ease;
   font-weight: 700;
 
   background: var(--glass-80);
-}
-
-/* =========================
- * 地点详情弹窗
- * ========================= */
-
-.location-popup-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.location-popup-content {
-  display: flex;
-  flex-direction: column;
-
-  width: 90%;
-  max-width: $popup-max-width;
-  max-height: 80vh;
-
-  overflow: hidden;
-
-  background: var(--bg-white);
-  border-radius: var(--radius-md);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-}
-
-.location-popup-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  padding: 20px;
-
-  border-bottom: 1px solid var(--border-divider);
-
-  h3 {
-    margin: 0;
-
-    color: var(--text-dark);
-    font-size: 18px;
-  }
-}
-
-.location-popup-body {
-  flex: 1;
-
-  padding: 20px;
-  overflow-y: auto;
-}
-
-.popup-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  padding: 40px;
-
-  color: var(--text-tertiary);
-}
-
-.dialect-info {
-  font-size: 14px;
-  line-height: 1.8;
-}
-
-.info-line {
-  padding: 8px 0;
-
-  border-bottom: 1px solid var(--bg-light);
-
-  strong {
-    margin-right: 8px;
-
-    color: var(--text-medium);
-  }
-
-  &:last-of-type {
-    margin-bottom: 20px;
-
-    border-bottom: 0;
-  }
-
-  &.title-line {
-    margin-bottom: 16px;
-    padding: 12px 0;
-
-    color: var(--text-dark);
-    font-size: 20px;
-    font-weight: 700;
-
-    border-bottom: 2px solid var(--color-primary);
-  }
-}
-
-.tone-table-container {
-  margin-top: 20px;
-}
-
-.tone-table {
-  width: 100%;
-
-  font-size: 14px;
-
-  border-collapse: collapse;
-
-  th,
-  td {
-    padding: 10px;
-
-    text-align: left;
-
-    border: 1px solid var(--border-light-gray);
-  }
-
-  th {
-    color: var(--text-dark);
-    font-weight: 600;
-
-    background: var(--bg-light);
-  }
-
-  tbody {
-    tr {
-      &:hover {
-        background: var(--bg-light-gray);
-      }
-    }
-  }
-}
-
-.data-display {
-  pre {
-    margin: 0;
-    padding: 16px;
-
-    overflow-x: auto;
-
-    font-size: 13px;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    overflow-wrap: break-word;
-
-    background: var(--bg-light);
-    border-radius: var(--radius-sm2);
-  }
-}
-
-.no-data {
-  padding: 40px;
-
-  color: var(--text-lightest);
-  font-size: 16px;
-  text-align: center;
 }
 
 /* =========================

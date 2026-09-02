@@ -20,6 +20,10 @@ const mocks = vi.hoisted(() => {
     mapSelectFeatures: vi.fn(),
     mapCanDeleteSelected: vi.fn(),
     mapDeleteSelected: vi.fn(),
+    mapImportGeoJson: vi.fn(),
+    latestToolsPanelProps: null,
+    routerPush: vi.fn(),
+    isAuthenticated: { value: true },
     AUTO_DRAFT_ID: '__map_draw_auto_draft__',
   }
 })
@@ -32,11 +36,12 @@ vi.mock('vue-i18n', () => ({
 
 vi.mock('vue-router', () => ({
   useRoute: () => ({ query: {} }),
+  useRouter: () => ({ push: mocks.routerPush }),
 }))
 
 vi.mock('@/composables/router/useAuthGuard.js', () => ({
   useAuthGuard: () => ({
-    isAuthenticated: ref(true),
+    isAuthenticated: mocks.isAuthenticated,
     requireAuth: vi.fn(),
   }),
 }))
@@ -83,7 +88,17 @@ vi.mock('@/main/utils/drawMap/draftStorage.js', async () => {
 vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
   default: defineComponent({
     name: 'EditableMapLibreStub',
-    props: ['modelValue', 'activeLayer', 'featureBoxSelectEnabled'],
+    props: [
+      'modelValue',
+      'activeLayer',
+      'featureBoxSelectEnabled',
+      'snappingEnabled',
+      'snapTolerance',
+      'snapGridSize',
+      'snapTargets',
+      'topologyEditingEnabled',
+      'sharedBoundaryProtectionEnabled',
+    ],
     emits: [
       'update:modelValue',
       'before-features-change',
@@ -101,11 +116,12 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         selectFeatures: mocks.mapSelectFeatures,
         canDeleteSelected: mocks.mapCanDeleteSelected,
         deleteSelected: mocks.mapDeleteSelected,
-        importGeoJson: vi.fn((_featureCollection, options = {}) => {
+        importGeoJson: (featureCollection, options = {}) => {
+          mocks.mapImportGeoJson(featureCollection, options)
           if (options.emitSelection !== false) {
             emit('feature-select', '')
           }
-        }),
+        },
         syncReadonlyLayers: vi.fn(),
         removeReadonlyLayerById: vi.fn(),
         resetView: vi.fn(),
@@ -116,6 +132,7 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         const nextIndex = (props.modelValue?.features?.length ?? 0) + 1
         const previousFeatures = props.modelValue?.features ?? []
         const activeLayerId = props.activeLayer?.id || ''
+        const geometryType = props.activeLayer?.geometryType || 'Polygon'
         if (!firstLayerId && activeLayerId) firstLayerId = activeLayerId
         const isFollowupLayer = activeLayerId && firstLayerId && activeLayerId !== firstLayerId
         const featureProperties = isFollowupLayer
@@ -124,13 +141,18 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
               region: `Region ${nextIndex}`,
               user_id: `user-${nextIndex}`,
             }
-        const collection = {
-          type: 'FeatureCollection',
-          features: [...previousFeatures, {
-            id: `feature-${nextIndex}`,
-            type: 'Feature',
-            properties: featureProperties,
-            geometry: {
+        const geometry = geometryType === 'LineString'
+          ? {
+              type: 'LineString',
+              coordinates: [
+                [0, 0],
+                [0.5, 0],
+                [1, 0],
+                [1, 1],
+                [0, 0],
+              ],
+            }
+          : {
               type: 'Polygon',
               coordinates: [[
                 [0, 0],
@@ -138,7 +160,14 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
                 [1, 1],
                 [0, 0],
               ]],
-            },
+            }
+        const collection = {
+          type: 'FeatureCollection',
+          features: [...previousFeatures, {
+            id: `feature-${nextIndex}`,
+            type: 'Feature',
+            properties: featureProperties,
+            geometry,
           }],
         }
         emit('update:modelValue', collection)
@@ -166,12 +195,49 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         emit('update:modelValue', collection)
         emit('features-change', collection)
       }
-      return { addPolygonFeature, emitGeometryUpdate }
+      const emitDuplicateLineUpdate = () => {
+        const [firstFeature, ...remainingFeatures] = props.modelValue?.features ?? []
+        if (!firstFeature) return
+        const collection = {
+          type: 'FeatureCollection',
+          features: [{
+            ...firstFeature,
+            geometry: {
+              type: 'LineString',
+              coordinates: [[0, 0], [0, 0], [1, 1]],
+            },
+          }, ...remainingFeatures],
+        }
+        emit('before-features-change')
+        emit('update:modelValue', collection)
+        emit('features-change', collection)
+      }
+      const emitOpenLineUpdate = () => {
+        const [firstFeature, ...remainingFeatures] = props.modelValue?.features ?? []
+        if (!firstFeature) return
+        const collection = {
+          type: 'FeatureCollection',
+          features: [{
+            ...firstFeature,
+            geometry: {
+              type: 'LineString',
+              coordinates: [[0, 0], [2, 0], [2, 2]],
+            },
+          }, ...remainingFeatures],
+        }
+        emit('before-features-change')
+        emit('update:modelValue', collection)
+        emit('features-change', collection)
+      }
+      const stringify = (value) => JSON.stringify(value)
+      return { addPolygonFeature, emitGeometryUpdate, emitDuplicateLineUpdate, emitOpenLineUpdate, stringify }
     },
     template: `
       <div>
         <button data-testid="editable-map" type="button" @click="addPolygonFeature">draw polygon</button>
         <button data-testid="emit-geometry-update" type="button" @click="emitGeometryUpdate">emit geometry update</button>
+        <button data-testid="emit-duplicate-line-update" type="button" @click="emitDuplicateLineUpdate">emit duplicate line update</button>
+        <button data-testid="emit-open-line-update" type="button" @click="emitOpenLineUpdate">emit open line update</button>
         <button
           data-testid="emit-direct-select"
           type="button"
@@ -182,19 +248,43 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         <button
           data-testid="emit-direct-select-vertex"
           type="button"
-          @click="$emit('shape-edit-state-change', { mode: 'direct_select', featureId: 'feature-1', selectedVertexCount: 1 })"
+          @click="$emit('shape-edit-state-change', { mode: 'direct_select', featureId: 'feature-1', selectedVertexCount: 1, canDeleteSelectedVertices: true })"
         >
           emit selected vertex
         </button>
         <button
+          data-testid="emit-direct-select-invalid-vertex"
+          type="button"
+          @click="$emit('shape-edit-state-change', { mode: 'direct_select', featureId: 'feature-1', selectedVertexCount: 1, canDeleteSelectedVertices: false })"
+        >
+          emit invalid selected vertex
+        </button>
+        <button
+          data-testid="emit-direct-select-shared-boundary-vertex"
+          type="button"
+          @click="$emit('shape-edit-state-change', { mode: 'direct_select', featureId: 'feature-1', selectedVertexCount: 1, canDeleteSelectedVertices: false, deleteBlockCode: 'sharedBoundaryDeleteBlocked' })"
+        >
+          emit protected shared boundary vertex
+        </button>
+        <button
           data-testid="emit-direct-select-no-vertex"
           type="button"
-          @click="$emit('shape-edit-state-change', { mode: 'direct_select', featureId: 'feature-1', selectedVertexCount: 0 })"
+          @click="$emit('shape-edit-state-change', { mode: 'direct_select', featureId: 'feature-1', selectedVertexCount: 0, canDeleteSelectedVertices: false })"
         >
           emit no selected vertex
         </button>
         <span data-testid="first-feature-coordinate">{{ modelValue?.features?.[0]?.geometry?.coordinates?.[0]?.[1]?.[0] ?? '' }}</span>
+        <span data-testid="first-feature-geometry-type">{{ modelValue?.features?.[0]?.geometry?.type || '' }}</span>
+        <span data-testid="first-feature-coordinates">{{ stringify(modelValue?.features?.[0]?.geometry?.coordinates ?? null) }}</span>
+        <span data-testid="first-feature-opacity">{{ modelValue?.features?.[0]?.properties?.opacity ?? '' }}</span>
+        <span data-testid="first-feature-labels-visible">{{ modelValue?.features?.[0]?.properties?.labelsVisible ? 'true' : 'false' }}</span>
         <span data-testid="box-select-mode">{{ featureBoxSelectEnabled ? 'on' : 'off' }}</span>
+        <span data-testid="snapping-enabled">{{ snappingEnabled ? 'on' : 'off' }}</span>
+        <span data-testid="snap-tolerance">{{ snapTolerance }}</span>
+        <span data-testid="snap-grid-size">{{ snapGridSize }}</span>
+        <span data-testid="snap-target-edge">{{ snapTargets?.edge === false ? 'off' : 'on' }}</span>
+        <span data-testid="topology-editing-enabled">{{ topologyEditingEnabled ? 'on' : 'off' }}</span>
+        <span data-testid="shared-boundary-protection-enabled">{{ sharedBoundaryProtectionEnabled ? 'on' : 'off' }}</span>
         <button
           data-testid="emit-box-selection"
           type="button"
@@ -244,6 +334,13 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
         >
           emit feature mixed selection
         </button>
+        <button
+          data-testid="emit-feature-priority-selection"
+          type="button"
+          @click="$emit('feature-select', ['feature-3', 'feature-2', 'feature-2', 'feature-1'])"
+        >
+          emit feature priority selection
+        </button>
       </div>
     `,
   }),
@@ -261,15 +358,35 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       selectedFeatureBatchName: { type: String, default: '' },
       selectedFeatureBatchPropertyKey: { type: String, default: '' },
       selectedFeatureBatchPropertyValue: { type: String, default: '' },
+      selectedFeatureId: { type: String, default: '' },
       selectedFeatureIds: { type: Array, default: () => [] },
+      selectedFeatureGeometryType: { type: String, default: '' },
       currentMode: { type: String, default: 'simple_select' },
       selectedVertexCount: { type: Number, default: 0 },
+      selectedVertexDeleteBlockCode: { type: String, default: '' },
+      canDeleteSelectedVertices: { type: Boolean, default: false },
+      geometryEditStatus: { type: Object, default: null },
       canApplySelectedFeatureBatchProperty: { type: Boolean, default: false },
       isFeatureBoxSelectMode: { type: Boolean, default: false },
       canUseFeatureBoxSelect: { type: Boolean, default: false },
       canModifyActiveLayer: { type: Boolean, default: false },
+      canUseSelectedGeometryTools: { type: Boolean, default: false },
+      canCloseSelectedLine: { type: Boolean, default: false },
+      canConvertSelectedLineToPolygon: { type: Boolean, default: false },
+      geometryQualitySummary: {
+        type: Object,
+        default: () => ({ hasIssues: false, issueCount: 0, items: [] }),
+      },
+      snappingEnabled: { type: Boolean, default: true },
+      snapTolerance: { type: Number, default: 12 },
+      snapGridSize: { type: Number, default: 0 },
+      snapTargets: { type: Object, default: () => ({ vertex: true, midpoint: true, edge: true, grid: true, reference: true }) },
+      topologyEditingEnabled: { type: Boolean, default: true },
+      sharedBoundaryProtectionEnabled: { type: Boolean, default: true },
     },
     emits: [
+      'set-mode',
+      'select-feature',
       'toggle-feature-selection',
       'select-all-features',
       'invert-feature-selection',
@@ -279,18 +396,125 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
       'move-selected-features-to-layer',
       'set-selected-features-visible',
       'set-selected-features-locked',
+      'reverse-selected-geometry',
+      'simplify-selected-geometry',
+      'close-selected-line',
+      'convert-selected-line-to-polygon',
+      'update-feature-property',
       'update-feature-table-cell',
       'update:selected-feature-batch-name',
       'apply-selected-feature-batch-name',
       'update:selected-feature-batch-property-key',
       'update:selected-feature-batch-property-value',
       'apply-selected-feature-batch-property',
+      'update:snappingEnabled',
+      'update:snapTolerance',
+      'update:snapGridSize',
+      'update:snap-targets',
+      'update:topologyEditingEnabled',
+      'update:sharedBoundaryProtectionEnabled',
     ],
+    setup(props) {
+      mocks.latestToolsPanelProps = props
+      return { props }
+    },
     template: `
       <div data-testid="tools-panel">
         <span data-testid="active-layer-id">{{ activeLayer?.id || '' }}</span>
         <span data-testid="current-mode">{{ currentMode }}</span>
+        <button
+          data-testid="toggle-snapping"
+          type="button"
+          @click="$emit('update:snappingEnabled', !snappingEnabled)"
+        >
+          toggle snapping
+        </button>
+        <input
+          data-testid="snap-tolerance-input"
+          type="range"
+          :value="snapTolerance"
+          @input="$emit('update:snapTolerance', Number($event.target.value))"
+        >
+        <input
+          data-testid="snap-grid-input"
+          type="number"
+          :value="snapGridSize"
+          @input="$emit('update:snapGridSize', Number($event.target.value))"
+        >
+        <button
+          data-testid="toggle-snap-edge"
+          type="button"
+          @click="$emit('update:snap-targets', { ...snapTargets, edge: !snapTargets.edge })"
+        >
+          toggle edge snap
+        </button>
+        <button
+          data-testid="toggle-topology-editing"
+          type="button"
+          @click="$emit('update:topologyEditingEnabled', !topologyEditingEnabled)"
+        >
+          toggle topology editing
+        </button>
+        <button
+          data-testid="toggle-shared-boundary-protection"
+          type="button"
+          @click="$emit('update:sharedBoundaryProtectionEnabled', !sharedBoundaryProtectionEnabled)"
+        >
+          toggle shared boundary protection
+        </button>
         <span data-testid="selected-vertex-count">{{ selectedVertexCount }}</span>
+        <span data-testid="can-delete-selected-vertices">{{ canDeleteSelectedVertices ? 'true' : 'false' }}</span>
+        <span data-testid="geometry-edit-status-code">{{ geometryEditStatus?.code || '' }}</span>
+        <span data-testid="geometry-edit-status-message">{{ geometryEditStatus?.message || '' }}</span>
+        <button
+          data-testid="editor-hide-active-layer"
+          type="button"
+          @click="$emit('update-feature-property', 'visible', false)"
+        >
+          editor hide active layer
+        </button>
+        <button
+          data-testid="editor-lock-active-layer"
+          type="button"
+          @click="$emit('update-feature-property', 'locked', true)"
+        >
+          editor lock active layer
+        </button>
+        <button
+          data-testid="draw-polygon-mode"
+          type="button"
+          @click="$emit('set-mode', 'draw_polygon')"
+        >
+          draw polygon mode
+        </button>
+        <button
+          data-testid="reverse-selected-geometry"
+          type="button"
+          @click="$emit('reverse-selected-geometry')"
+        >
+          reverse geometry
+        </button>
+        <button
+          data-testid="simplify-selected-geometry"
+          type="button"
+          @click="$emit('simplify-selected-geometry')"
+        >
+          simplify geometry
+        </button>
+        <button
+          data-testid="close-selected-line"
+          type="button"
+          @click="$emit('close-selected-line')"
+        >
+          close line
+        </button>
+        <button
+          data-testid="convert-selected-line-to-polygon"
+          type="button"
+          @click="$emit('convert-selected-line-to-polygon')"
+        >
+          convert line to polygon
+        </button>
         <label v-for="feature in featureItems" :key="feature.id" data-testid="feature-row">
           <input
             data-testid="feature-checkbox"
@@ -306,6 +530,14 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawToolsPanel.vue', () => ({
           >
             {{ feature.visible ? 'visible' : 'hidden' }} {{ feature.locked ? 'locked' : 'unlocked' }}
           </span>
+          <button
+            data-testid="feature-select-row"
+            type="button"
+            :data-active="selectedFeatureId === feature.id ? 'true' : 'false'"
+            @click.stop="$emit('select-feature', feature.id)"
+          >
+            select row
+          </button>
         </label>
         <button
           data-testid="toggle-feature-box-select"
@@ -460,7 +692,7 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawLayersPanel.vue', () => ({
       layers: { type: Array, default: () => [] },
       activeLayerId: { type: String, default: '' },
     },
-    emits: ['select-layer', 'toggle-layer-visibility', 'toggle-layer-lock'],
+    emits: ['select-layer', 'toggle-layer-visibility', 'toggle-layer-lock', 'toggle-layer-labels', 'update-layer-opacity'],
     template: `
       <div data-testid="layers-panel">
         <div v-for="layer in layers" :key="layer.id">
@@ -486,6 +718,23 @@ vi.mock('@/main/components/map/Draw/panels/MapDrawLayersPanel.vue', () => ({
           >
             lock
           </button>
+          <button
+            data-testid="toggle-layer-labels"
+            type="button"
+            :data-active="layer.labelsVisible ? 'true' : 'false'"
+            @click="$emit('toggle-layer-labels', layer.id)"
+          >
+            labels
+          </button>
+          <input
+            data-testid="layer-opacity-input"
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            :value="layer.opacity ?? 1"
+            @input="$emit('update-layer-opacity', layer.id, Number($event.target.value))"
+          >
         </div>
       </div>
     `,
@@ -589,6 +838,13 @@ vi.mock('@/main/utils/drawMap/export.js', () => ({
 }))
 
 vi.mock('/data/国界面.kmz?url', () => ({ default: '/data/border.kmz' }))
+vi.mock('/data/gis/china_country.geojson?url', () => ({ default: '/data/gis/china_country.geojson' }))
+vi.mock('/data/gis/china_provinces.geojson?url', () => ({ default: '/data/gis/china_provinces.geojson' }))
+vi.mock('/data/gis/china_cities_simplified_balanced.geojson?url', () => ({ default: '/data/gis/china_cities_simplified_balanced.geojson' }))
+vi.mock('/data/gis/china_counties_simplified_light.geojson?url', () => ({ default: '/data/gis/china_counties_simplified_light.geojson' }))
+vi.mock('/data/gis/china_rivers_l1.geojson?url', () => ({ default: '/data/gis/china_rivers_l1.geojson' }))
+vi.mock('/data/gis/china_rivers_l2.geojson?url', () => ({ default: '/data/gis/china_rivers_l2.geojson' }))
+vi.mock('/data/gis/china_rivers_l3.geojson?url', () => ({ default: '/data/gis/china_rivers_l3.geojson' }))
 
 import { buildAutoDraftRecord } from '../src/main/utils/drawMap/draftStorage.js'
 import { readImportedLayerFile, splitFeatureCollectionByGeometryType } from '../src/main/utils/drawMap/export.js'
@@ -656,6 +912,10 @@ describe('MapDrawTab draft safety', () => {
     mocks.mapCanDeleteSelected.mockReset()
     mocks.mapCanDeleteSelected.mockReturnValue(true)
     mocks.mapDeleteSelected.mockReset()
+    mocks.mapImportGeoJson.mockReset()
+    mocks.latestToolsPanelProps = null
+    mocks.routerPush.mockReset()
+    mocks.isAuthenticated.value = true
     readImportedLayerFile.mockReset()
     splitFeatureCollectionByGeometryType.mockReset()
 
@@ -665,6 +925,93 @@ describe('MapDrawTab draft safety', () => {
 
   afterEach(() => {
     document.body.innerHTML = ''
+  })
+
+  it('keeps drawing tools visible but blocks unauthenticated draw-mode writes', async () => {
+    mocks.isAuthenticated.value = false
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.showConfirm.mockResolvedValue(false)
+
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="tools-panel"]')).toBeTruthy()
+
+    wrapper.host.querySelector('[data-testid="draw-polygon-mode"]').click()
+    await flushTicks()
+
+    expect(mocks.showConfirm).toHaveBeenCalledWith('map.drawTab.auth.loginRequired')
+    expect(wrapper.host.querySelector('[data-testid="active-layer-id"]').textContent).toBe('')
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('simple_select')
+    expect(mocks.mapSetDrawMode).not.toHaveBeenCalledWith('draw_polygon')
+
+    wrapper.unmount()
+  })
+
+  it('blocks unauthenticated draw-mode writes when an editable layer already exists', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="active-layer-id"]').textContent).not.toBe('')
+
+    mocks.mapSetDrawMode.mockClear()
+    mocks.isAuthenticated.value = false
+    mocks.showConfirm.mockResolvedValue(false)
+    wrapper.host.querySelector('[data-testid="draw-polygon-mode"]').click()
+    await flushTicks()
+
+    expect(mocks.showConfirm).toHaveBeenCalledWith('map.drawTab.auth.loginRequired')
+    expect(mocks.mapSetDrawMode).not.toHaveBeenCalledWith('draw_polygon')
+
+    wrapper.unmount()
+  })
+
+  it('rejects unauthenticated feature changes emitted by the map canvas', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinate"]').textContent).toBe('1')
+
+    mocks.isAuthenticated.value = false
+    mocks.showConfirm.mockResolvedValue(false)
+    wrapper.host.querySelector('[data-testid="emit-geometry-update"]').click()
+    await flushTicks()
+
+    expect(mocks.showConfirm).toHaveBeenCalledWith('map.drawTab.auth.loginRequired')
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinate"]').textContent).toBe('1')
+    expect(mocks.mapImportGeoJson).toHaveBeenCalled()
+    const [syncedFeatureCollection, syncOptions] = mocks.mapImportGeoJson.mock.calls.at(-1)
+    expect(syncOptions).toEqual({ emitChanges: false, emitSelection: false })
+    expect(syncedFeatureCollection.features[0].geometry.coordinates[0][1][0]).toBe(1)
+
+    document.dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      key: 'z',
+      metaKey: true,
+    }))
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="active-layer-id"]').textContent).toBe('')
+
+    wrapper.unmount()
   })
 
   it('prompts to restore the hidden auto draft when one is available', async () => {
@@ -680,6 +1027,12 @@ describe('MapDrawTab draft safety', () => {
       }],
       activeLayerId: 'layer-1',
       currentStyleKey: 'gaode',
+      snappingEnabled: false,
+      snapTolerance: 28,
+      snapGridSize: 0.5,
+      snapTargets: { vertex: true, midpoint: true, edge: false, grid: true, reference: true },
+      topologyEditingEnabled: false,
+      sharedBoundaryProtectionEnabled: false,
     })
     mocks.getDraftRecordById.mockImplementation(async (id) => (id === mocks.AUTO_DRAFT_ID ? autoDraft : null))
     mocks.showConfirm.mockResolvedValue(false)
@@ -689,6 +1042,43 @@ describe('MapDrawTab draft safety', () => {
 
     expect(mocks.showConfirm).toHaveBeenCalledWith('map.drawTab.messages.autoDraftRestoreConfirm')
     expect(mocks.deleteDraftRecord).toHaveBeenCalledWith(mocks.AUTO_DRAFT_ID)
+    expect(wrapper.host.querySelector('[data-testid="snapping-enabled"]').textContent).toBe('on')
+
+    wrapper.unmount()
+  })
+
+  it('restores snapping settings from an accepted hidden auto draft', async () => {
+    const autoDraft = buildAutoDraftRecord({
+      layers: [{
+        id: 'layer-1',
+        name: 'Recovered Layer',
+        geometryType: 'Polygon',
+        featureCollection: {
+          type: 'FeatureCollection',
+          features: [{ id: 'feature-1', type: 'Feature', properties: {}, geometry: null }],
+        },
+      }],
+      activeLayerId: 'layer-1',
+      currentStyleKey: 'gaode',
+      snappingEnabled: false,
+      snapTolerance: 28,
+      snapGridSize: 0.5,
+      snapTargets: { vertex: true, midpoint: true, edge: false, grid: true, reference: true },
+      topologyEditingEnabled: false,
+      sharedBoundaryProtectionEnabled: false,
+    })
+    mocks.getDraftRecordById.mockImplementation(async (id) => (id === mocks.AUTO_DRAFT_ID ? autoDraft : null))
+    mocks.showConfirm.mockResolvedValue(true)
+
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="snapping-enabled"]').textContent).toBe('off')
+    expect(wrapper.host.querySelector('[data-testid="snap-tolerance"]').textContent).toBe('28')
+    expect(wrapper.host.querySelector('[data-testid="snap-grid-size"]').textContent).toBe('0.5')
+    expect(wrapper.host.querySelector('[data-testid="snap-target-edge"]').textContent).toBe('off')
+    expect(wrapper.host.querySelector('[data-testid="topology-editing-enabled"]').textContent).toBe('off')
+    expect(wrapper.host.querySelector('[data-testid="shared-boundary-protection-enabled"]').textContent).toBe('off')
 
     wrapper.unmount()
   })
@@ -750,7 +1140,7 @@ describe('MapDrawTab draft safety', () => {
     clickButtonContaining(wrapper.host, 'map.drawTab.buttons.saveToLocal')
     await nextTick()
     clickButtonContaining(wrapper.host, 'map.drawTab.buttons.saveAsNewLocal')
-    await nextTick()
+    await flushTicks()
     const input = wrapper.host.querySelector('input[type="text"]')
     expect(input).toBeTruthy()
     input.value = 'Saved draft'
@@ -789,7 +1179,7 @@ describe('MapDrawTab draft safety', () => {
     clickButtonContaining(wrapper.host, 'map.drawTab.buttons.saveToLocal')
     await nextTick()
     clickButtonContaining(wrapper.host, 'map.drawTab.buttons.saveAsNewLocal')
-    await nextTick()
+    await flushTicks()
     const input = wrapper.host.querySelector('input[type="text"]')
     expect(input).toBeTruthy()
     input.value = 'Saved draft'
@@ -838,7 +1228,7 @@ describe('MapDrawTab draft safety', () => {
     clickButtonContaining(wrapper.host, 'map.drawTab.buttons.saveToLocal')
     await nextTick()
     clickButtonContaining(wrapper.host, 'map.drawTab.buttons.saveAsNewLocal')
-    await nextTick()
+    await flushTicks()
     const input = wrapper.host.querySelector('input[type="text"]')
     expect(input).toBeTruthy()
     input.value = 'Saved draft'
@@ -933,6 +1323,108 @@ describe('MapDrawTab draft safety', () => {
     wrapper.host.querySelector('[data-testid="delete-selected-features"]').click()
     await flushTicks()
     expect(wrapper.host.querySelectorAll('[data-testid="feature-row"]')).toHaveLength(2)
+
+    wrapper.unmount()
+  })
+
+  it('applies active layer opacity to newly drawn features', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+
+    const opacityInput = wrapper.host.querySelector('[data-testid="layer-opacity-input"]')
+    opacityInput.value = '0.35'
+    opacityInput.dispatchEvent(new Event('input', { bubbles: true }))
+    await flushTicks()
+
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="first-feature-opacity"]').textContent).toBe('0.35')
+
+    wrapper.unmount()
+  })
+
+  it('applies active layer label visibility to newly drawn features', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="toggle-layer-labels"]').dataset.active).toBe('false')
+    wrapper.host.querySelector('[data-testid="toggle-layer-labels"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="toggle-layer-labels"]').dataset.active).toBe('true')
+
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="first-feature-labels-visible"]').textContent).toBe('true')
+
+    wrapper.unmount()
+  })
+
+  it('passes snapping controls from the drawing tools panel into the map editor', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="snapping-enabled"]').textContent).toBe('on')
+    expect(wrapper.host.querySelector('[data-testid="snap-tolerance"]').textContent).toBe('12')
+    expect(wrapper.host.querySelector('[data-testid="snap-grid-size"]').textContent).toBe('0')
+
+    wrapper.host.querySelector('[data-testid="toggle-snapping"]').click()
+    await nextTick()
+    expect(wrapper.host.querySelector('[data-testid="snapping-enabled"]').textContent).toBe('off')
+
+    const toleranceInput = wrapper.host.querySelector('[data-testid="snap-tolerance-input"]')
+    toleranceInput.value = '24'
+    toleranceInput.dispatchEvent(new Event('input', { bubbles: true }))
+    await nextTick()
+    expect(wrapper.host.querySelector('[data-testid="snap-tolerance"]').textContent).toBe('24')
+
+    const gridInput = wrapper.host.querySelector('[data-testid="snap-grid-input"]')
+    gridInput.value = '0.25'
+    gridInput.dispatchEvent(new Event('input', { bubbles: true }))
+    await nextTick()
+    expect(wrapper.host.querySelector('[data-testid="snap-grid-size"]').textContent).toBe('0.25')
+
+    expect(wrapper.host.querySelector('[data-testid="snap-target-edge"]').textContent).toBe('on')
+    wrapper.host.querySelector('[data-testid="toggle-snap-edge"]').click()
+    await nextTick()
+    expect(wrapper.host.querySelector('[data-testid="snap-target-edge"]').textContent).toBe('off')
+
+    wrapper.unmount()
+  })
+
+  it('passes topology editing controls from the drawing tools panel into the map editor', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="topology-editing-enabled"]').textContent).toBe('on')
+    expect(wrapper.host.querySelector('[data-testid="shared-boundary-protection-enabled"]').textContent).toBe('on')
+
+    wrapper.host.querySelector('[data-testid="toggle-topology-editing"]').click()
+    await nextTick()
+    expect(wrapper.host.querySelector('[data-testid="topology-editing-enabled"]').textContent).toBe('off')
+
+    wrapper.host.querySelector('[data-testid="toggle-shared-boundary-protection"]').click()
+    await nextTick()
+    expect(wrapper.host.querySelector('[data-testid="shared-boundary-protection-enabled"]').textContent).toBe('off')
 
     wrapper.unmount()
   })
@@ -1464,6 +1956,140 @@ describe('MapDrawTab draft safety', () => {
     wrapper.unmount()
   })
 
+  it('normalizes natural map selection to active-layer order and resyncs stale hits', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    const checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[0].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="hide-selected-features"]').click()
+    await flushTicks()
+
+    mocks.mapSelectFeatures.mockClear()
+    wrapper.host.querySelector('[data-testid="emit-feature-priority-selection"]').click()
+    await flushTicks()
+
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((item) => item.checked)).toEqual([false, true, true])
+    expect(mocks.latestToolsPanelProps.selectedFeatureIds).toEqual(['feature-2', 'feature-3'])
+    expect(mocks.latestToolsPanelProps.selectedFeatureId).toBe('feature-2')
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith(['feature-2', 'feature-3'])
+
+    wrapper.unmount()
+  })
+
+  it('clears map and panel selection when switching active layers', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+
+    const layerButtons = wrapper.host.querySelectorAll('[data-testid="layer-button"]')
+    layerButtons[0].click()
+    await flushTicks()
+
+    wrapper.host.querySelector('[data-testid="feature-checkbox"]').click()
+    await flushTicks()
+    expect(mocks.latestToolsPanelProps.selectedFeatureIds).toEqual(['feature-1'])
+
+    mocks.mapSelectFeatures.mockClear()
+    layerButtons[1].click()
+    await flushTicks()
+
+    expect(mocks.latestToolsPanelProps.selectedFeatureIds).toEqual([])
+    expect(mocks.latestToolsPanelProps.selectedFeatureId).toBe('')
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+
+    wrapper.unmount()
+  })
+
+  it('keeps hidden and locked panel row selection out of map selection state', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    let checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[0].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="hide-selected-features"]').click()
+    await flushTicks()
+
+    checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[1].click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="lock-selected-features"]').click()
+    await flushTicks()
+
+    mocks.mapSelectFeature.mockClear()
+    mocks.mapSelectFeatures.mockClear()
+
+    let rowButtons = wrapper.host.querySelectorAll('[data-testid="feature-select-row"]')
+    rowButtons[0].click()
+    await flushTicks()
+
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((item) => item.checked)).toEqual([true, false, false])
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+    expect(mocks.mapSelectFeature).not.toHaveBeenCalled()
+
+    rowButtons = wrapper.host.querySelectorAll('[data-testid="feature-select-row"]')
+    rowButtons[1].click()
+    await flushTicks()
+
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((item) => item.checked)).toEqual([false, true, false])
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+    expect(mocks.mapSelectFeature).not.toHaveBeenCalled()
+
+    rowButtons = wrapper.host.querySelectorAll('[data-testid="feature-select-row"]')
+    rowButtons[2].click()
+    await flushTicks()
+
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')]
+      .map((item) => item.checked)).toEqual([false, false, true])
+    expect(mocks.mapSelectFeature).toHaveBeenLastCalledWith('feature-3', { directEdit: false })
+
+    wrapper.unmount()
+  })
+
   it('box selects only visible unlocked active-layer features and exits box mode after selection', async () => {
     mocks.getDraftRecordById.mockResolvedValue(null)
     mocks.saveDraftRecord.mockResolvedValue({})
@@ -1871,6 +2497,175 @@ describe('MapDrawTab draft safety', () => {
     wrapper.unmount()
   })
 
+  it('applies selected geometry tools and keeps them undoable', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createLineLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    wrapper.host.querySelector('[data-testid="feature-checkbox"]').click()
+    await flushTicks()
+    expect(mocks.latestToolsPanelProps.canUseSelectedGeometryTools).toBe(true)
+    expect(mocks.latestToolsPanelProps.canConvertSelectedLineToPolygon).toBe(true)
+    expect(wrapper.host.querySelector('[data-testid="first-feature-geometry-type"]').textContent).toBe('LineString')
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinates"]').textContent)
+      .toBe('[[0,0],[0.5,0],[1,0],[1,1],[0,0]]')
+
+    wrapper.host.querySelector('[data-testid="reverse-selected-geometry"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinates"]').textContent)
+      .toBe('[[0,0],[1,1],[1,0],[0.5,0],[0,0]]')
+
+    document.dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      key: 'z',
+      metaKey: true,
+    }))
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinates"]').textContent)
+      .toBe('[[0,0],[0.5,0],[1,0],[1,1],[0,0]]')
+
+    wrapper.host.querySelector('[data-testid="simplify-selected-geometry"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinates"]').textContent)
+      .toBe('[[0,0],[1,0],[1,1],[0,0]]')
+
+    wrapper.host.querySelector('[data-testid="convert-selected-line-to-polygon"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="first-feature-geometry-type"]').textContent).toBe('Polygon')
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinates"]').textContent)
+      .toBe('[[[0,0],[1,0],[1,1],[0,0]]]')
+    expect(mocks.latestToolsPanelProps.selectedFeatureGeometryType).toBe('Polygon')
+    expect(mocks.latestToolsPanelProps.selectedFeatureIds).toEqual(['feature-1'])
+    expect(mocks.mapSelectFeature).toHaveBeenLastCalledWith('feature-1', { directEdit: false })
+
+    wrapper.unmount()
+  })
+
+  it('closes an open selected line and keeps the change undoable', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createLineLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="feature-checkbox"]').click()
+    await flushTicks()
+
+    wrapper.host.querySelector('[data-testid="emit-open-line-update"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinates"]').textContent)
+      .toBe('[[0,0],[2,0],[2,2]]')
+
+    expect(mocks.latestToolsPanelProps.canCloseSelectedLine).toBe(true)
+    expect(mocks.latestToolsPanelProps.canConvertSelectedLineToPolygon).toBe(false)
+
+    wrapper.host.querySelector('[data-testid="close-selected-line"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinates"]').textContent)
+      .toBe('[[0,0],[2,0],[2,2],[0,0]]')
+    expect(mocks.latestToolsPanelProps.canCloseSelectedLine).toBe(false)
+    expect(mocks.latestToolsPanelProps.canConvertSelectedLineToPolygon).toBe(true)
+
+    document.dispatchEvent(new KeyboardEvent('keydown', {
+      bubbles: true,
+      key: 'z',
+      metaKey: true,
+    }))
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinates"]').textContent)
+      .toBe('[[0,0],[2,0],[2,2]]')
+
+    wrapper.unmount()
+  })
+
+  it('keeps selected geometry tools out of multi-selection and avoids mixed line polygon layers', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createLineLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    const checkboxes = wrapper.host.querySelectorAll('[data-testid="feature-checkbox"]')
+    checkboxes[0].click()
+    await flushTicks()
+
+    expect(mocks.latestToolsPanelProps.canUseSelectedGeometryTools).toBe(true)
+    expect(mocks.latestToolsPanelProps.canConvertSelectedLineToPolygon).toBe(false)
+
+    wrapper.host.querySelector('[data-testid="convert-selected-line-to-polygon"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="first-feature-geometry-type"]').textContent).toBe('LineString')
+    expect(mocks.latestToolsPanelProps.selectedFeatureGeometryType).toBe('LineString')
+
+    checkboxes[1].click()
+    await flushTicks()
+
+    expect(mocks.latestToolsPanelProps.selectedFeatureIds).toEqual(['feature-1', 'feature-2'])
+    expect(mocks.latestToolsPanelProps.canUseSelectedGeometryTools).toBe(false)
+    expect(mocks.latestToolsPanelProps.canConvertSelectedLineToPolygon).toBe(false)
+
+    wrapper.host.querySelector('[data-testid="reverse-selected-geometry"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="first-feature-coordinates"]').textContent)
+      .toBe('[[0,0],[0.5,0],[1,0],[1,1],[0,0]]')
+    expect(mocks.latestToolsPanelProps.selectedFeatureIds).toEqual(['feature-1', 'feature-2'])
+
+    wrapper.unmount()
+  })
+
+  it('surfaces active layer geometry quality diagnostics in the tools panel', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createLineLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    expect(mocks.latestToolsPanelProps.geometryQualitySummary).toMatchObject({
+      hasIssues: false,
+      issueCount: 0,
+      items: [],
+    })
+
+    wrapper.host.querySelector('[data-testid="emit-duplicate-line-update"]').click()
+    await flushTicks()
+
+    expect(mocks.latestToolsPanelProps.geometryQualitySummary.hasIssues).toBe(true)
+    expect(mocks.latestToolsPanelProps.geometryQualitySummary.items.map((item) => item.id))
+      .toContain('duplicate-coordinate')
+
+    wrapper.unmount()
+  })
+
   it('keeps direct select active while deleting selected vertices', async () => {
     mocks.getDraftRecordById.mockResolvedValue(null)
     mocks.saveDraftRecord.mockResolvedValue({})
@@ -1890,6 +2685,7 @@ describe('MapDrawTab draft safety', () => {
     await flushTicks()
     expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('direct_select')
     expect(wrapper.host.querySelector('[data-testid="selected-vertex-count"]').textContent).toBe('0')
+    expect(wrapper.host.querySelector('[data-testid="can-delete-selected-vertices"]').textContent).toBe('false')
 
     const emptyDeleteEvent = new KeyboardEvent('keydown', {
       bubbles: true,
@@ -1906,6 +2702,7 @@ describe('MapDrawTab draft safety', () => {
     wrapper.host.querySelector('[data-testid="emit-direct-select-vertex"]').click()
     await flushTicks()
     expect(wrapper.host.querySelector('[data-testid="selected-vertex-count"]').textContent).toBe('1')
+    expect(wrapper.host.querySelector('[data-testid="can-delete-selected-vertices"]').textContent).toBe('true')
 
     const deleteEvent = new KeyboardEvent('keydown', {
       bubbles: true,
@@ -1920,6 +2717,83 @@ describe('MapDrawTab draft safety', () => {
     expect(wrapper.host.querySelectorAll('[data-testid="feature-row"]')).toHaveLength(1)
     expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('direct_select')
     expect(wrapper.host.querySelectorAll('[data-testid="feature-row"]')).toHaveLength(1)
+
+    wrapper.unmount()
+  })
+
+  it('does not advertise or run vertex deletion when selected vertices would invalidate geometry', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="emit-direct-select"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="emit-direct-select-invalid-vertex"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('direct_select')
+    expect(wrapper.host.querySelector('[data-testid="selected-vertex-count"]').textContent).toBe('1')
+    expect(wrapper.host.querySelector('[data-testid="can-delete-selected-vertices"]').textContent).toBe('false')
+
+    const deleteEvent = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Delete',
+    })
+    document.dispatchEvent(deleteEvent)
+    await flushTicks()
+
+    expect(deleteEvent.defaultPrevented).toBe(false)
+    expect(mocks.mapCanDeleteSelected).not.toHaveBeenCalled()
+    expect(mocks.mapDeleteSelected).not.toHaveBeenCalled()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('direct_select')
+
+    wrapper.unmount()
+  })
+
+  it('reports shared boundary protection when Delete is pressed on a protected vertex', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="emit-direct-select"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="emit-direct-select-shared-boundary-vertex"]').click()
+    await flushTicks()
+
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('direct_select')
+    expect(wrapper.host.querySelector('[data-testid="selected-vertex-count"]').textContent).toBe('1')
+    expect(wrapper.host.querySelector('[data-testid="can-delete-selected-vertices"]').textContent).toBe('false')
+
+    const deleteEvent = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      key: 'Delete',
+    })
+    document.dispatchEvent(deleteEvent)
+    await flushTicks()
+
+    expect(deleteEvent.defaultPrevented).toBe(true)
+    expect(mocks.mapCanDeleteSelected).not.toHaveBeenCalled()
+    expect(mocks.mapDeleteSelected).not.toHaveBeenCalled()
+    expect(wrapper.host.querySelector('[data-testid="geometry-edit-status-code"]').textContent)
+      .toBe('sharedBoundaryDeleteBlocked')
+    expect(wrapper.host.querySelector('[data-testid="geometry-edit-status-message"]').textContent)
+      .toBe('map.drawTab.labels.sharedBoundaryDeleteBlocked')
 
     wrapper.unmount()
   })
@@ -2004,6 +2878,123 @@ describe('MapDrawTab draft safety', () => {
     await flushTicks()
     expect(lockedBackspaceEvent.defaultPrevented).toBe(false)
     expect(mocks.mapDeleteSelected).not.toHaveBeenCalled()
+
+    wrapper.unmount()
+  })
+
+  it('ignores stale direct-select map events after the active layer is hidden or locked', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="emit-direct-select"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('direct_select')
+
+    wrapper.host.querySelector('[data-testid="toggle-layer-visibility"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('simple_select')
+    expect(wrapper.host.querySelector('[data-testid="feature-checkbox"]').checked).toBe(false)
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+
+    wrapper.host.querySelector('[data-testid="emit-direct-select"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('simple_select')
+    expect(wrapper.host.querySelector('[data-testid="feature-checkbox"]').checked).toBe(false)
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+
+    wrapper.host.querySelector('[data-testid="toggle-layer-visibility"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="emit-direct-select"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('direct_select')
+
+    wrapper.host.querySelector('[data-testid="toggle-layer-lock"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('simple_select')
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+
+    wrapper.host.querySelector('[data-testid="emit-direct-select"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('simple_select')
+    expect(wrapper.host.querySelector('[data-testid="feature-checkbox"]').checked).toBe(false)
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+
+    wrapper.unmount()
+  })
+
+  it('exits drawing mode when the layer editor hides the active layer', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    wrapper.host.querySelector('[data-testid="draw-polygon-mode"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('draw_polygon')
+
+    wrapper.host.querySelector('[data-testid="editor-hide-active-layer"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('simple_select')
+    expect(wrapper.host.querySelector('[data-testid="box-select-mode"]').textContent).toBe('off')
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+
+    const setDrawModeCallCountAfterHide = mocks.mapSetDrawMode.mock.calls.length
+    wrapper.host.querySelector('[data-testid="draw-polygon-mode"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('simple_select')
+    expect(mocks.mapSetDrawMode).toHaveBeenCalledTimes(setDrawModeCallCountAfterHide)
+
+    wrapper.unmount()
+  })
+
+  it('exits box selection when the layer editor hides or locks the active layer', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    mocks.saveDraftRecord.mockResolvedValue({})
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="editable-map"]').click()
+    await flushTicks()
+
+    wrapper.host.querySelector('[data-testid="toggle-feature-box-select"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="box-select-mode"]').textContent).toBe('on')
+
+    wrapper.host.querySelector('[data-testid="editor-hide-active-layer"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="box-select-mode"]').textContent).toBe('off')
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
+
+    wrapper.host.querySelector('[data-testid="toggle-layer-visibility"]').click()
+    await flushTicks()
+    wrapper.host.querySelector('[data-testid="toggle-feature-box-select"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="box-select-mode"]').textContent).toBe('on')
+
+    wrapper.host.querySelector('[data-testid="editor-lock-active-layer"]').click()
+    await flushTicks()
+    expect(wrapper.host.querySelector('[data-testid="current-mode"]').textContent).toBe('simple_select')
+    expect(wrapper.host.querySelector('[data-testid="box-select-mode"]').textContent).toBe('off')
+    expect(mocks.mapSelectFeatures).toHaveBeenLastCalledWith([])
 
     wrapper.unmount()
   })

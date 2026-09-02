@@ -12,6 +12,22 @@
     </div>
 
     <div v-else-if="data && data.data && data.data.length > 0" class="location-content">
+      <div class="section-title">{{ t('result.locationDetailPopup.phonologyActions.title') }}</div>
+      <div class="phono-actions">
+        <button type="button" class="quick-search pill-btn" @click="goToPhonology('matrix')">
+          <BarIcon :icon="'⚛️'" />{{ t('result.locationDetailPopup.phonologyActions.matrix') }}
+        </button>
+        <button type="button" class="quick-search pill-btn" @click="openHomophoneLexicon">
+          <BarIcon :icon="'📖'" />{{ t('result.locationDetailPopup.phonologyActions.homophone') }}
+        </button>
+        <button type="button" class="quick-search pill-btn" @click="goToPhonology('evolution')">
+          <BarIcon :icon="'🥧'" />{{ t('result.locationDetailPopup.phonologyActions.evolution') }}
+        </button>
+        <button type="button" class="quick-search pill-btn" @click="goToPhonology('count')">
+          <BarIcon :icon="'🧮'" />{{ t('result.locationDetailPopup.phonologyActions.count') }}
+        </button>
+      </div>
+
       <div class="info-section">
         <div class="info-title">{{ data.data[0]['語言'] || locationName }}</div>
 
@@ -79,14 +95,26 @@
     :location-name="data?.data?.[0]?.['語言'] || locationName"
     @close="showMapPopup = false"
   />
+
+  <HomophoneLexiconModal
+    :visible="showLexiconModal"
+    :location="locationText"
+    @close="showLexiconModal = false"
+  />
 </template>
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { useI18n } from 'vue-i18n';
 import { computed, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import { encodeQueryValueBase64Url } from '@/utils/urlParams.js'
+import { pendingCountphosLocations, pendingCountphosQueryMode } from '@/main/store/store.js'
 import AppModal from '@/components/common/AppModal.vue'
 import LocationMapPopup from './LocationMapPopup.vue'
+import HomophoneLexiconModal from '@/main/components/pho/popups/HomophoneLexiconModal.vue'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -98,9 +126,14 @@ const props = defineProps({
 
 const emit = defineEmits(['close']);
 const { t } = useI18n();
+const route = useRoute()
+const router = useRouter()
 const showMapPopup = ref(false)
+const showLexiconModal = ref(false)
 
 const modalTitle = computed(() => `📍 ${t('result.locationDetailPopup.title', { name: props.locationName })}`)
+
+const locationText = computed(() => props.data?.data?.[0]?.['簡稱'] || props.locationName)
 
 const parsedCoord = computed(() => {
   const raw = props.data?.data?.[0]?.['經緯度']
@@ -165,6 +198,34 @@ const getToneData = (data) => {
 
 const handleClose = () => {
   emit('close');
+};
+
+const openHomophoneLexicon = () => {
+  if (!locationText.value) return
+  showLexiconModal.value = true
+};
+
+const PHONOLOGY_LOC_KEY_BY_SECTION = { matrix: 'mloc', evolution: 'eloc' }
+
+const goToPhonology = (section) => {
+  const loc = locationText.value
+  if (!loc) return
+
+  emit('close')
+
+  if (section === 'count') {
+    pendingCountphosLocations.value = [loc]
+    pendingCountphosQueryMode.value = { featureCounts: true, syllableCounts: true }
+    router.push({
+      path: buildLocalePath(resolveRouteLocale(route), '/menu/pho/count')
+    })
+    return
+  }
+
+  router.push({
+    path: buildLocalePath(resolveRouteLocale(route), `/menu/pho/${section}`),
+    query: { [PHONOLOGY_LOC_KEY_BY_SECTION[section]]: encodeQueryValueBase64Url(loc) }
+  })
 };
 </script>
 
@@ -243,6 +304,31 @@ $transition-fast: 0.2s;
     margin-left: 12px;
     color: $text-main;
     word-break: break-all;
+  }
+}
+
+/* 音系跳转按钮 */
+.phono-actions {
+  flex-wrap: wrap;
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.quick-search {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: 1;
+  padding: 8px 0;
+  border: 1px solid $primary-divider;
+  color: $primary;
+  font-size: 13px;
+  font-weight: 600;
+  &:hover {
+    background: $primary-background-medium;
+    border-color: $primary;
   }
 }
 

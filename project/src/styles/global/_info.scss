@@ -1,0 +1,71 @@
+@use '@/styles/global/mixins' as *;
+
+// Info text utilities — migrated from _legacy.scss
+
+.tabs-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.2rem;
+  margin-top: 0.5rem;
+  letter-spacing: 0.03em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.page-title {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  // margin: 0 0 12px;
+  margin: 0 auto;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.page-footer {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 auto;
+}
+
+.hint {
+  font-size: 14px;
+  color: var(--text-muted);
+  // white-space: nowrap;
+}
+
+.info-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: pre-wrap;
+  font-size: 15px;
+}
+
+.info-text strong {
+  color: var(--color-primary-hover);
+}
+
+.text-action {
+  padding: 0;
+  color: var(--text-muted);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+
+  &:hover:not(:disabled) {
+    color: var(--text-primary);
+    text-decoration: underline;
+  }
+
+  &:disabled {
+    @include disabled-state;
+    text-decoration: none;
+  }
+}

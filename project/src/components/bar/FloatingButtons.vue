@@ -56,8 +56,8 @@ import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPrefe
 
 const faviconSrc = computed(() =>
   currentColorTheme.value === COLOR_THEME_GREEN
-    ? new URL('@/assets/favicon_green.ico', import.meta.url).href
-    : new URL('@/assets/favicon.ico', import.meta.url).href
+    ? '/brand/favicon_green.ico'
+    : '/brand/favicon.ico'
 )
 
 const props = defineProps({

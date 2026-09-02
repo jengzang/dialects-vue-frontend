@@ -1,9 +1,9 @@
 <template>
   <div class="region-similarity-page">
-    <h3 class="villagesml-subtab-title">
-      區域分析 - 相似度分析
+    <h1 class="villagesml-subtab-title">
+      <BarIcon icon="🔍" />區域分析 - 相似度分析
       <HelpIcon content="基於村名字符分布計算區域相似度。Cosine相似度：向量夾角余弦值（0-1）。Jaccard相似度：交集/並集比例。支持查找相似區域、兩區域對比和相似度矩陣熱力圖" />
-    </h3>
+    </h1>
 <!--    <h1 class="page-title"><InlineIcon icon="🔍" />區域相似度分析</h1>-->
 
     <!-- Mode Selector -->
@@ -299,6 +299,7 @@
 
 <script>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed, onBeforeUnmount, onMounted, watch, nextTick } from 'vue'
 import {
   getRegionSimilaritySearch,
@@ -319,6 +320,7 @@ export default {
     FilterableSelect,
     SimpleSelectDropdown,
     HelpIcon,
+    BarIcon,
   },
   setup() {
     // State

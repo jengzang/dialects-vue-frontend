@@ -16,6 +16,7 @@
         </transition>
       </router-view>
     </div>
+    <AppFooter layout-kind="explore" />
     <ScrollToTop />
     <PageTutorialGuide />
   </div>
@@ -25,6 +26,7 @@
 import ExploreBar from '@/components/bar/ExploreBar.vue'
 import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 import ScrollToTop from '@/components/common/ScrollToTop.vue'
+import AppFooter from '@/components/footer/AppFooter.vue'
 
 const keepAliveViewNames = [
   'AllVillages',
@@ -72,6 +74,8 @@ $portrait-ratio: 1;
   justify-content: center;
   flex: 1;
   width: 100%;
+  box-sizing: border-box;
+  min-height: calc(100dvh - max(16px, env(safe-area-inset-top)));
   padding: 10px 6px;
   padding-top: calc(7dvh - 15px);
   color: var(--text-deep);
@@ -106,5 +110,4 @@ $portrait-ratio: 1;
   }
 }
 </style>
-
 

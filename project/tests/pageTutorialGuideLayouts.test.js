@@ -43,6 +43,25 @@ vi.mock('../src/main/components/tutorial/PageTutorialGuide.vue', () => ({
   },
 }))
 
+vi.mock('../src/main/components/result/PanelManager.vue', () => ({
+  default: {
+    template: '<div data-panel-manager-stub></div>',
+  },
+}))
+
+vi.mock('../src/components/common/ScrollToTop.vue', () => ({
+  default: {
+    template: '<div data-scroll-to-top-stub></div>',
+  },
+}))
+
+vi.mock('../src/components/footer/AppFooter.vue', () => ({
+  default: {
+    props: ['layoutKind'],
+    template: '<footer data-app-footer>{{ layoutKind }}</footer>',
+  },
+}))
+
 function mountComponent(component) {
   const host = document.createElement('div')
   document.body.appendChild(host)

@@ -4,30 +4,62 @@
     "subtitle": "✨ Explore the Historical Layers of Dialects · 🎵 Discover the Phonological Beauty of Chinese Characters",
     "startExploring": "Start Exploring",
     "expandTools": "More Tools",
-    "featuresIntro": "Feature Overview",
+    "featuresIntro": "Features",
     "logoAlt": "Dialect Pronunciation Atlas",
     "decorationAlt": "Blue ring"
   },
   "showcase": {
     "nav": "Product showcase",
     "switchTo": "Switch to",
-    "yinxi": { "title": "Phonological System", "action": "View System" },
-    "zhonggu": { "title": "Query Map", "action": "View Map" },
-    "result": { "title": "Query Results", "action": "View Results" },
-    "villages": { "title": "Guangdong Villages", "action": "Browse" },
-    "compare": { "title": "Dialect Comparison", "action": "Compare" },
-    "gis": { "title": "GIS Drawing", "action": "Start Drawing" },
-    "evolution": { "title": "Sound Evolution", "action": "View Evolution" },
-    "photiccompare": { "title": "Phonetic Comparison", "action": "View Sankey" }
+    "yinxi": {
+      "title": "Phonological System",
+      "action": "View System"
+    },
+    "zhonggu": {
+      "title": "Geolinguistics",
+      "action": "Query MC"
+    },
+    "result": {
+      "title": "Query Results",
+      "action": "View Results"
+    },
+    "villages": {
+      "title": "Guangdong Villages",
+      "action": "Browse"
+    },
+    "compare": {
+      "title": "Dialect Comparison",
+      "action": "Compare"
+    },
+    "gis": {
+      "title": "GIS Drawing",
+      "action": "Start Drawing"
+    },
+    "evolution": {
+      "title": "Sound Evolution",
+      "action": "View Evolution"
+    },
+    "photiccompare": {
+      "title": "Phonetic Comparison",
+      "action": "View Sankey"
+    },
+    "praat": {
+      "title": "Online Praat",
+      "action": "Start Analysis"
+    }
   },
   "features": {
     "sectionTitle": "Core Features",
+    "searchPlaceholder": "Search features…",
+    "recent": "Recent",
+    "clearRecent": "Clear",
+    "noResults": "No matching features",
     "query": {
       "title": "Query & Analysis",
       "desc": "Explore dialect phonology from multiple perspectives",
       "searchChar": "Characters - View character readings and Middle Chinese categories",
-      "searchMiddle": "Middle Chinese - Organize readings by Middle Chinese categories",
-      "searchPhoneme": "Readings - Trace dialect readings back to their Middle Chinese categories",
+      "searchMiddle": "Middle Chinese - Organize readings by rime-book categories",
+      "searchPhoneme": "Readings - Trace dialect readings back to their rime-book categories",
       "searchTone": "Tones - View tone values and tone classes"
     },
     "compare": {
@@ -150,6 +182,7 @@
     "loginNow": "Log In Now",
     "viewDetails": "View Details"
   },
+  "viewDetails": "Details",
   "intro": {
     "thanks": {
       "aboutTitle": "ℹ️ About This Site",

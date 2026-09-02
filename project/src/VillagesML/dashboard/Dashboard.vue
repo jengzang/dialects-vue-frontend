@@ -2,7 +2,7 @@
 <!--  <ExploreLayout>-->
     <div class="dashboard-page">
       <div class="page-header">
-        <h1 class="page-title"><InlineIcon icon="📊" />{{ t('villages.dashboard.pageTitle') }}</h1>
+        <h1 class="page-title"><BarIcon icon="📊" />{{ t('navigation.pageTitles.villages.dashboard') }}</h1>
         <SimpleSelectDropdown
           v-model="activeDataset"
           :options="datasetOptions"
@@ -42,7 +42,7 @@
 
       <!-- Section Header: Features -->
       <div class="section-header">
-        <h2><InlineIcon icon="🧭" />{{ t('villages.dashboard.featuresHeader') }}</h2>
+        <h2><BarIcon icon="🧭" />{{ t('villages.dashboard.featuresHeader') }}</h2>
         <p class="section-description">{{ t('villages.dashboard.featuresDesc') }}</p>
       </div>
 
@@ -92,7 +92,7 @@
         </div>
       </div>
       <div class="section-header">
-        <h2><InlineIcon icon="📈" />{{ t('villages.dashboard.statsHeader') }}</h2>
+        <h2><BarIcon icon="📈" />{{ t('villages.dashboard.statsHeader') }}</h2>
         <p class="section-description">{{ t('villages.dashboard.statsDesc') }}</p>
       </div>
       <!-- Statistics Cards -->
@@ -126,6 +126,7 @@
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -357,6 +358,7 @@ onMounted(() => {
   font-weight: 600;
   color: var(--text-primary);
   margin: 5px;
+  width: auto;
   text-align: center;
 }
 

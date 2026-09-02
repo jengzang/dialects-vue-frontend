@@ -1,9 +1,9 @@
 <template>
   <div class="feature-extraction-page">
-      <h3 class="villagesml-subtab-title">
-        ML計算 - 特徵提取
+      <h1 class="villagesml-subtab-title">
+        <BarIcon icon="🧬" />ML計算 - 特徵提取
         <HelpIcon content="為自訂村莊集合提取多維特徵向量。特徵包括：語義類別（9維VTF）、字符嵌入（100維Word2Vec）、結構特徵（長度、前後綴）、空間特徵（坐標、密度）。支持導出特徵矩陣用於外部分析" />
-      </h3>
+      </h1>
     <!-- Header -->
     <div class="page-header">
 <!--      <h2><InlineIcon icon="🔐" />特徵提取 Feature Extraction</h2>-->
@@ -386,6 +386,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { useRoute, useRouter } from 'vue-router'

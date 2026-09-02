@@ -21,6 +21,78 @@ function functionBody(source, functionName) {
 }
 
 describe('toponyms page shell', () => {
+  it('builds the independent toponym catalog search page with shared glass and selector primitives', () => {
+    const page = readSource('src/main/views/explore/villages/toponyms/ToponymSearchPage.vue');
+    const surfaces = readSource('src/styles/global/_surfaces.scss');
+    const mainLayout = readSource('src/styles/main/_layout.scss');
+
+    expect(page).toContain('getToponymSearch');
+    expect(page).toContain("import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'");
+    expect(page).toContain("import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'");
+    expect(page).toContain('class="toponym-search-page glass-shell"');
+    expect(page).toContain('class="toponym-search-page__header glass-panel"');
+    expect(page).toContain('class="toponym-search-page__results glass-panel"');
+    expect(page).toContain('class="toponym-search-page__detail glass-panel"');
+    expect(page).toContain('class="toponym-search-page__result-grid main-card-grid"');
+    expect(page).toContain('class="toponym-search-page__result-card glass-card"');
+    expect(page).toContain('data-interactive="true"');
+    expect(page).toContain(':data-active="selectedItem?.id === item.id"');
+    expect(page).toContain('class="main-card-title"');
+    expect(page).toContain('class="main-card-meta"');
+    expect(surfaces).toContain(".glass-card[data-active='true']");
+    expect(mainLayout).toContain('.main-card-title');
+    expect(mainLayout).toContain('.main-card-meta');
+    expect(page).toContain('<SimpleSelectDropdown');
+    expect(page).toContain('<MultiSelectDropdown');
+    expect(page).toContain('v-model="selectedPlaceTypeCodes"');
+    expect(page).toContain(':placeholder="t(\'villages.pages.toponymSearch.search.placeType\')"');
+    expect(page).toContain('@submit.prevent="handleSearch"');
+    expect(page).toContain('const selectedPlaceTypeCodes = ref([');
+    expect(page).toContain('place_type_code: selectedPlaceTypeCodes.value');
+    expect(page).toContain('const limit = ref(50)');
+    expect(page).not.toContain('placeTypeTriggerEl');
+    expect(page).not.toContain('placeTypeDropdownOpen');
+    expect(page).not.toContain('formatMultiSelectLabel');
+    expect(page).not.toContain('toponym-search-page__select-trigger');
+    expect(page).not.toContain('getToponymPoints');
+    expect(page).not.toContain('/api/toponyms/points');
+    expect(page).not.toContain('watch([query');
+    expect(page).not.toContain('main-glass');
+    expect(page).not.toContain('main-search-field');
+    expect(page).not.toContain("&[aria-pressed='true']");
+    expect(page).not.toContain('font-family: var(--font-monospace)');
+    expect(page).not.toMatch(/@media\s*\((?:max|min)-width/);
+  });
+
+  it('loads catalog entry details only after result clicks and keeps distribution navigation separate', () => {
+    const page = readSource('src/main/views/explore/villages/toponyms/ToponymSearchPage.vue');
+    const searchBody = functionBody(page, 'handleSearch');
+    const detailBody = functionBody(page, 'handleSelectResult');
+    const distributionBody = functionBody(page, 'handleViewDistribution');
+
+    expect(page).toContain("import { getToponymDetails, getToponymSearch } from '@/api'");
+    expect(page).toContain('const router = useRouter()');
+    expect(page).toContain('@click="handleSelectResult(item)"');
+    expect(page).toContain(':aria-pressed="selectedItem?.id === item.id"');
+    expect(page).toContain('selectedLocalDetail');
+    expect(page).toContain('detailsLoading');
+    expect(page).toContain('detailsError');
+    expect(page).toContain('class="toponym-search-page__detail-list main-detail-list glass-subpanel"');
+    expect(page).not.toContain('dt {');
+    expect(page).not.toContain('dd {');
+    expect(page).toContain('@click="handleViewDistribution"');
+    expect(searchBody).not.toContain('getToponymDetails');
+    expect(detailBody).toContain('const id = item?.id');
+    expect(detailBody).toContain('const payload = await getToponymDetails(id)');
+    expect(detailBody).not.toContain('getToponymPoints');
+    expect(distributionBody).toContain("path: '/explore/villages/toponyms'");
+    expect(distributionBody).toContain('q: query.value.trim()');
+    expect(distributionBody).toContain('match_mode: matchMode.value');
+    expect(distributionBody).not.toContain('place_type_code');
+    expect(distributionBody).not.toContain('area_code');
+    expect(page).not.toContain('/api/toponyms/points');
+  });
+
   it('wires split toponyms APIs without first-paint point loading', () => {
     const page = readSource('src/main/views/explore/villages/toponyms/ToponymsPage.vue');
 
@@ -39,6 +111,21 @@ describe('toponyms page shell', () => {
     expect(page).not.toContain('onMounted(handleSearch');
   });
 
+  it('hydrates distribution searches from catalog navigation query parameters', () => {
+    const page = readSource('src/main/views/explore/villages/toponyms/ToponymsPage.vue');
+    const routeHydrationBody = functionBody(page, 'hydrateSearchFromRouteQuery');
+
+    expect(page).toContain("import { useRoute } from 'vue-router';");
+    expect(page).toContain('const route = useRoute();');
+    expect(page).toContain('function hydrateSearchFromRouteQuery');
+    expect(routeHydrationBody).toContain('route.query.q');
+    expect(routeHydrationBody).toContain('route.query.match_mode');
+    expect(routeHydrationBody).toContain('query.value = routeQuery');
+    expect(routeHydrationBody).toContain('matchMode.value = routeMatchMode');
+    expect(page).toContain('if (hydrateSearchFromRouteQuery())');
+    expect(page).toContain('handleSearch();');
+  });
+
   it('uses dedicated shell components for horizontal search, optional layers, results, and details', () => {
     const page = readSource('src/main/views/explore/villages/toponyms/ToponymsPage.vue');
     const chart = readSource('src/main/views/explore/villages/toponyms/ToponymDistributionChart.vue');
@@ -46,9 +133,14 @@ describe('toponyms page shell', () => {
     const layerControls = readSource('src/main/views/explore/villages/toponyms/ToponymLayerControls.vue');
     const resultsPanel = readSource('src/main/views/explore/villages/toponyms/ToponymResultsPanel.vue');
     const detailPanel = readSource('src/main/views/explore/villages/toponyms/ToponymDetailPanel.vue');
+    const mainStates = readSource('src/styles/main/_states.scss');
 
     expect(page).toContain('<ToponymSearchBar');
     expect(chart).toContain('<ToponymLayerControls');
+    expect(chart).toContain('class="toponym-distribution-chart__status main-list-state glass-subpanel"');
+    expect(chart).not.toContain('background: var(--surface-panel-strong)');
+    expect(chart).not.toContain('border: 1px solid var(--border-glass)');
+    expect(chart).not.toContain('border-radius: var(--radius-sm2)');
     expect(page).toContain('<ToponymResultsPanel');
     expect(page).toContain(':name-tree="nameTree"');
     expect(page).toContain(':name-tree-meta="nameTreeMeta"');
@@ -64,6 +156,11 @@ describe('toponyms page shell', () => {
     expect(searchBar).not.toContain('placeTypeCode');
     expect(searchBar).not.toContain('placeTypeOptions');
     expect(searchBar).not.toContain('toponyms.search.placeType');
+    expect(layerControls).toContain("import CheckBox from '@/components/selector/CheckBox.vue'");
+    expect(layerControls).toContain('<CheckBox');
+    expect(layerControls).not.toContain('<input');
+    expect(layerControls).not.toContain('accent-color');
+    expect(layerControls).not.toContain('toponym-layer-controls__toggle--active');
     expect(layerControls).toContain('riverL1');
     expect(layerControls).toContain('riverL2');
     expect(layerControls).toContain('riverL3');
@@ -74,8 +171,21 @@ describe('toponyms page shell', () => {
     expect(resultsPanel).toContain('toponym-results-panel__name-tree');
     expect(resultsPanel).toContain('flattenNameTreeNodes');
     expect(resultsPanel).toContain('!nameTreeLoading && !nameTreeRows.length');
+    expect(resultsPanel).toContain('class="toponym-results-panel__tree-node glass-subpanel"');
+    expect(resultsPanel).toContain('class="glass-button toponym-results-panel__tree-toggle"');
+    expect(resultsPanel).toContain('data-size="compact"');
+    expect(resultsPanel).not.toContain('background: var(--surface-panel-subtle)');
+    expect(resultsPanel).not.toContain('background: var(--surface-glass-button)');
+    expect(resultsPanel).not.toContain('border: 1px solid var(--border-glass-subtle)');
     expect(detailPanel).toContain("emit('request-local-detail')");
     expect(detailPanel).toContain("emit('request-official-detail')");
+    expect(detailPanel).toContain('class="toponym-detail-panel__selected glass-subpanel"');
+    expect(detailPanel).toContain('class="toponym-detail-panel__list main-detail-list glass-subpanel"');
+    expect(detailPanel).not.toContain('background: var(--surface-panel-subtle)');
+    expect(detailPanel).not.toContain('border: 1px solid var(--border-glass-subtle)');
+    expect(detailPanel).not.toContain('dt {');
+    expect(detailPanel).not.toContain('dd {');
+    expect(mainStates).toContain('.main-detail-list');
   });
 
   it('loads full point results and only fetches name trees on explicit request', () => {
@@ -85,6 +195,8 @@ describe('toponyms page shell', () => {
     const nameTreeBody = functionBody(page, 'handleNameTreeRequest');
 
     expect(searchBody).toContain('limit: 0');
+    expect(page).toContain("const TOPONYM_VILLAGE_PLACE_TYPE_CODES = ['22200', '21610', '27610']");
+    expect(searchBody).toContain('place_type_code: TOPONYM_VILLAGE_PLACE_TYPE_CODES');
     expect(searchBody).toContain('lastPointSearchParams.value = searchParams');
     expect(searchBody).not.toContain('pointLimit.value');
     expect(nameTreeBody).toContain('getToponymNames');
@@ -97,6 +209,9 @@ describe('toponyms page shell', () => {
     expect(page).toContain('parent_path: node.path');
     expect(page).toContain('page_size: TOPONYM_NAME_TREE_PAGE_SIZE');
     expect(page).toContain('mergeLazyTreePayload');
+    expect(functionBody(page, 'mergeLazyTreePayload').indexOf('Array.isArray(payload.names)')).toBeLessThan(
+      functionBody(page, 'mergeLazyTreePayload').indexOf('Array.isArray(payload.children)')
+    );
     expect(page).toContain('lazy_bootstrap');
     expect(page).toContain('lazyBootstrap: true');
     expect(page).toContain('expanded: true');
@@ -140,8 +255,10 @@ describe('toponyms page shell', () => {
     const detailPanel = readSource('src/main/views/explore/villages/toponyms/ToponymDetailPanel.vue');
 
     expect(page).toContain('toponyms-page__workspace');
+    expect(page).toContain('toponyms-page__toolbar-copy');
     expect(page).toContain('toponyms-page__chart-header');
     expect(page).toContain('toponyms-page__stat-strip');
+    expect(page).not.toContain('toponyms-page__hero');
     expect(searchBar).toContain('toponym-search-bar__hint');
     expect(resultsPanel).toContain('toponym-results-panel__inspector');
     expect(resultsPanel).toContain('toponym-results-panel__name-tree-note');
@@ -155,6 +272,7 @@ describe('toponyms page shell', () => {
       'src/main/views/explore/villages/toponyms/ToponymLayerControls.vue',
       'src/main/views/explore/villages/toponyms/ToponymResultsPanel.vue',
       'src/main/views/explore/villages/toponyms/ToponymDetailPanel.vue',
+      'src/main/views/explore/villages/toponyms/ToponymDistributionChart.vue',
     ];
 
     for (const file of files) {

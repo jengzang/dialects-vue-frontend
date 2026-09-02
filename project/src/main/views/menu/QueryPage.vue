@@ -4,9 +4,16 @@
     :model-value="currentTab"
     :route-value="currentTab"
     :resolve-route="resolveTabRoute"
-    v-slot="{ currentTab }"
   >
-    <div class="tab-content-inner query-page-root">
+    <template #header>
+      <h1 class="page-title">
+        <BarIcon :icon="activePageIcon" />
+        {{ activePageTitle }}
+      </h1>
+    </template>
+
+    <template #default="{ currentTab }">
+      <div class="tab-content-inner query-page-root">
       <div v-show="currentTab === 'tab1'" class="page">
         <div class="page-content-stack">
           <!-- 🔹 輸入框區塊 -->
@@ -14,7 +21,7 @@
             <label class="query-label" for="hanzi-input">{{ $t('query.tab1.label') }}</label>
             <textarea
                 id="hanzi-input"
-                style="height: 5dvh;white-space:nowrap;width:min(80dvw,600px)"
+                style="height: 5dvh;white-space:nowrap;width:min(80dvw,500px)"
                 :placeholder="$t('query.tab1.placeholder')"
                 v-model="hanziInput"
                 @input="handleHanziInput"
@@ -47,11 +54,11 @@
               <Teleport to="body">
                 <div
                     v-if="excludeDropdownOpen === 'tab2'"
-                    class="dropdown-panel choice-dropdown-panel"
+                    class="dropdown-panel glass-dropdown-panel"
                     :style="excludeDropdownStyle"
                 >
                   <div
-                      class="dropdown-item choice-dropdown-item"
+                      class="dropdown-item glass-dropdown-item"
                       v-for="option in excludeOptions"
                       :key="option.value"
                       :class="{ active: isExcludeSelected(option.value, 'tab2') }"
@@ -94,11 +101,11 @@
                 <Teleport to="body">
                   <div
                       v-if="excludeDropdownOpen === 'tab2'"
-                      class="dropdown-panel choice-dropdown-panel"
+                      class="dropdown-panel glass-dropdown-panel"
                       :style="excludeDropdownStyle"
                   >
                     <div
-                        class="dropdown-item choice-dropdown-item"
+                        class="dropdown-item glass-dropdown-item"
                         v-for="option in excludeOptions"
                         :key="option.value"
                         :class="{ active: isExcludeSelected(option.value, 'tab2') }"
@@ -169,12 +176,12 @@
                 <Teleport to="body">
                   <div
                       v-if="excludeDropdownOpen === 'tab3'"
-                      class="dropdown-panel choice-dropdown-panel"
+                      class="dropdown-panel glass-dropdown-panel"
                       :style="excludeDropdownStyle"
                   >
 
                     <div
-                        class="dropdown-item choice-dropdown-item"
+                        class="dropdown-item glass-dropdown-item"
                         v-for="option in excludeOptions"
                         :key="option.value"
                         :class="{ active: isExcludeSelected(option.value, 'tab3') }"
@@ -235,7 +242,7 @@
         </button>
       </div>
       <!-- 🔹 建議與操作區 -->
-      <div v-if="currentTab === 'tab1'" class="page-footer" style="margin-top: 20px">
+      <!-- <div v-if="currentTab === 'tab1'" class="page-footer" style="margin-top: 20px">
         <small class="hint">{{ $t('query.tab1.description') }}</small>
       </div>
       <div v-else-if="currentTab === 'tab2'" class="page-footer" style="margin-top: 20px">
@@ -246,12 +253,14 @@
       </div>
       <div v-else-if="currentTab === 'tab4'" class="page-footer" style="margin-top: 20px">
         <small class="hint">{{ $t('query.tab4.description') }}</small>
+      </div> -->
       </div>
-    </div>
+    </template>
   </TabsContainer>
 </template>
 
 <script setup>
+import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import {computed, nextTick, reactive, ref, onMounted, onBeforeUnmount, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
@@ -312,6 +321,23 @@ const tabs = [
   { name: 'tab3', label: t('query.tab3.title') },
   { name: 'tab4', label: t('query.tab4.title') }
 ]
+
+const pageTitleKeys = {
+  tab1: 'navigation.pageTitles.query.tab1',
+  tab2: 'navigation.pageTitles.query.tab2',
+  tab3: 'navigation.pageTitles.query.tab3',
+  tab4: 'navigation.pageTitles.query.tab4'
+}
+
+const pageTitleIcons = {
+  tab1: '🔣',
+  tab2: '📜',
+  tab3: '🗣️',
+  tab4: '🎼'
+}
+
+const activePageTitle = computed(() => t(pageTitleKeys[currentTab.value] || pageTitleKeys.tab2))
+const activePageIcon = computed(() => pageTitleIcons[currentTab.value] || pageTitleIcons.tab2)
 
 // Compute limit context based on current tab
 const locationLimitContext = computed(() => {
@@ -818,8 +844,8 @@ export default {
 
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
-/* 📄 內容區塊動畫 */
 .tab-content-inner {
   display: flex;
   flex-direction: column;

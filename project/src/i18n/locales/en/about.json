@@ -2,7 +2,7 @@
   "tabs": {
     "intro": "Introduction",
     "suggestion": "Feedback",
-    "like": "Support the Author",
+    "like": "Contact",
     "setting": "Settings"
   },
   "intro": {
@@ -16,11 +16,11 @@
         "items": [
           {
             "title": "Middle Chinese",
-            "body": "Organize modern dialect readings by Middle Chinese categories. Users can freely combine rime group, rime, division, openness, tone, initial series, initial group, initial, voicing, place of articulation, and manner of articulation; the site automatically calculates the Cartesian product and removes invalid combinations. Location input supports fuzzy matching across simplified and traditional Chinese, as well as batch selection by region (Atlas Regions or MCPDict Regions). Results are displayed in tables, with multiple readings shown for polyphonic characters and distinct colors for literary and colloquial readings (red for literary, blue for colloquial, purple when the two share the same form, and green for ordinary polyphony). Statistics buttons open drill-down queries—for example, showing initial and tone distributions when examining finals. Clicking a phonetic value traces the source syllables, while clicking a place name opens detailed information about that dialect location. Multiple query windows can be compared in parallel, with phonetic-value filtering and Full or Primary display modes. The map view layers phonetic values by proportion, and map points also open drill-down queries. The phonological dataset can be switched; current options include Guangyun, the Dialect Survey Character List, Jiyun, Hongwu Zhengyun, and Old Chinese datasets."
+            "body": "Organize modern dialect readings by rime-book categories. Users can freely combine rime group, rime, division, openness, tone, initial series, initial group, initial, voicing, place of articulation, and manner of articulation; the site automatically calculates the Cartesian product and removes invalid combinations. Location input supports fuzzy matching across simplified and traditional Chinese, as well as batch selection by region (Atlas Regions or MCPDict Regions). Results are displayed in tables, with multiple readings shown for polyphonic characters and distinct colors for literary and colloquial readings (red for literary, blue for colloquial, purple when the two share the same form, and green for ordinary polyphony). Statistics buttons open drill-down queries—for example, showing initial and tone distributions when examining finals. Clicking a phonetic value traces the source syllables, while clicking a place name opens detailed information about that dialect location. Multiple query windows can be compared in parallel, with phonetic-value filtering and Full or Primary display modes. The map view layers phonetic values by proportion, and map points also open drill-down queries. The phonological dataset can be switched; current options include Guangyun, the Dialect Survey Character List, Jiyun, Hongwu Zhengyun, and Old Chinese datasets."
           },
           {
             "title": "Readings",
-            "body": "Analyze the Middle Chinese sources of specific dialect readings. After entering syllables and locations, the results are presented in the same table and map formats. This query is computationally intensive, so using fewer locations is recommended."
+            "body": "Analyze the rime-book sources of specific dialect readings. After entering syllables and locations, the results are presented in the same table and map formats. This query is computationally intensive, so using fewer locations is recommended."
           },
           {
             "title": "Characters",

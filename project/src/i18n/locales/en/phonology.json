@@ -99,6 +99,43 @@
         "locations": "Location Details",
         "locationsSubtitle": "Syllable statistics for each location"
       },
+      "syllables": {
+        "title": "Syllable Count Statistics",
+        "subtitle": "Counts toneless and toned syllables, including total tokens, unique syllables, and per-syllable counts.",
+        "modeSwitch": "Switch between toneless and toned syllable statistics",
+        "currentMode": "Mode",
+        "unique": "Unique syllables",
+        "tokens": "Syllable tokens",
+        "viewLocations": "Locations",
+        "heatmap": "Heatmap",
+        "viewIsopleth": "Isopleth map",
+        "loadMore": "Load more",
+        "loadAllConfirm": "Loading all cards may cause lag. Continue?",
+        "minCharCount": "Min. characters",
+        "qualifiedSyllables": "Syllables ≥{min} chars",
+        "minShare": "Min. share",
+        "qualifiedSyllablesByShare": "Syllables ≥{min}% share",
+        "filterMode": {
+          "label": "Filter by",
+          "count": "By count",
+          "share": "By share"
+        },
+        "ignoreHistorical": "Ignore historical",
+        "allLocations": "All locations",
+        "expandAll": "Expand all",
+        "collapse": "Collapse",
+        "modes": {
+          "toneless": "Toneless",
+          "toned": "Toned"
+        }
+      },
+      "queryModes": {
+        "title": "Statistics Mode",
+        "featureCounts": "Initials, finals and tones",
+        "syllableCounts": "Overall syllables",
+        "singleHint": "A single location can select both statistics at once",
+        "multiHint": "Multiple locations allow only one statistics selection at a time"
+      },
       "charts": {
         "pie": {
           "title": "Syllable Share by Total Count",
@@ -127,6 +164,7 @@
       "nav": {
         "navLabel": "Syllable statistics page navigation",
         "chartsLabel": "Charts",
+        "syllableSummary": "Summary",
         "totalInitial": "Total Initials",
         "totalFinal": "Total Finals",
         "totalTone": "Total Tones",
@@ -217,6 +255,18 @@
         "empty": "No data for the current feature"
       }
     },
+    "homophoneLexicon": {
+      "title": "Homophone Lexicon",
+      "modeLabel": "Display",
+      "modeFinalGrouped": "By final",
+      "modeSyllable": "By syllable",
+      "copy": "Copy",
+      "copied": "Copied",
+      "toneCategory": "Tone category",
+      "toneValue": "Tone value",
+      "toneNumber": "Tone number",
+      "toneSwitch": "Switch tone"
+    },
     "compare": {
       "options": {
         "optimizeLinks": "Optimize links"
@@ -225,7 +275,7 @@
   },
   "tabs": {
     "matrix": "Phonology",
-    "custom": "Phoneme Class",
+    "custom": "Pho-Class",
     "count": "Syllable Count",
     "evolution": "Evolution"
   }

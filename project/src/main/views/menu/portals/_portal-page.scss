@@ -1,10 +1,10 @@
 // Shared styles for portal entry pages (ToolsPage, VillagesPage, etc.)
+@use '@/styles/global/mixins' as *;
 
 @mixin portal-page {
   min-width: 80dvw;
   padding: 20px;
-  display: flex;
-  flex-direction: column;
+  @include flex-col;
   align-items: center;
   justify-content: center;
 }
@@ -16,7 +16,7 @@
   font-weight: 700;
   text-align: center;
 
-  @media (max-width: 768px) {
+  @media (max-aspect-ratio: 1 / 1) {
     font-size: 24px;
   }
 }
@@ -28,7 +28,59 @@
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 20px;
 
-  @media (max-width: 768px) {
+  @media (max-aspect-ratio: 1 / 1) {
     grid-template-columns: 1fr;
+  }
+}
+
+.portal-entry-card {
+  padding: var(--portal-entry-card-padding, 24px 16px);
+  @include flex-col;
+  align-items: center;
+  gap: var(--portal-entry-card-gap, 12px);
+  border-width: var(--portal-entry-card-border-width, 2px);
+  text-align: center;
+  color: inherit;
+  text-decoration: none;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+
+  &:active {
+    transform: translateY(-2px);
+  }
+
+  &__icon {
+    font-size: 48px;
+    line-height: 1;
+  }
+
+  &__name {
+    color: var(--color-primary-hover);
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  &__desc {
+    color: var(--text-tertiary);
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  @media (max-aspect-ratio: 1 / 1) {
+    padding: var(--portal-entry-card-portrait-padding, 12px);
+
+    &__icon {
+      font-size: 30px;
+    }
+
+    &__name {
+      font-size: 18px;
+    }
+
+    &__desc {
+      font-size: 12px;
+    }
   }
 }

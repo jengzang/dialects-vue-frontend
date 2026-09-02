@@ -1,12 +1,12 @@
 <template>
   <div class="dialect-clustering-page">
-    <header class="page-header main-glass-panel">
+    <header class="page-header glass-panel">
       <div>
-        <h1>{{ t('cluster.page.title') }}</h1>
+        <h1><BarIcon icon="🕸️" />{{ t('navigation.pageTitles.cluster.workspace') }}</h1>
         <p>{{ t('cluster.page.description') }}</p>
       </div>
       <button
-        class="global-action-btn global-action-btn-secondary reset-btn"
+        class="action-btn action-btn-secondary reset-btn"
         type="button"
         @click="showResetModal = true"
       >
@@ -15,7 +15,7 @@
     </header>
 
     <nav
-      class="step-nav main-glass-panel-inner"
+      class="step-nav glass-subpanel"
       aria-label="Cluster workflow steps"
     >
       <button
@@ -32,7 +32,7 @@
       </button>
     </nav>
 
-    <section class="workspace-stage-shell main-glass-panel">
+    <section class="workspace-stage-shell glass-panel">
       <div class="workspace-stage-head">
         <div>
           <p class="stage-kicker">
@@ -65,14 +65,14 @@
       <p>{{ t('cluster.page.description') }}</p>
       <template #footer>
         <button
-          class="global-action-btn global-action-btn-secondary"
+          class="action-btn action-btn-secondary"
           type="button"
           @click="showResetModal = false"
         >
           {{ t('common.button.cancel') }}
         </button>
         <button
-          class="global-action-btn global-action-btn-primary"
+          class="action-btn action-btn-primary"
           type="button"
           @click="confirmResetWorkspace"
         >
@@ -86,6 +86,7 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import ClusterInputPanel from '@/main/views/menu/cluster/ClusterInputPanel.vue'
 import ClusterResultPanel from '@/main/views/menu/cluster/ClusterResultPanel.vue'
 import ClusterTaskSidebar from '@/main/views/menu/cluster/ClusterTaskSidebar.vue'

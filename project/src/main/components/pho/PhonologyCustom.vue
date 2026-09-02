@@ -55,7 +55,7 @@
         </div>
 
         <button
-          class="load-btn"
+          class="action-btn"
           @click="loadData"
           :disabled="matchedLocations.length === 0 || loading || isMatching"
         >
@@ -252,7 +252,7 @@ const serializeCustomLocationQuery = (locations) => {
     .map((location) => encodeQueryValueBase64Url(location))
 }
 
-const locationQueryState = useRouteQueryState('loc', {
+const locationQueryState = useRouteQueryState('cloc', {
   defaultValue: [],
   parse: parseCustomLocationQuery,
   serialize: serializeCustomLocationQuery,
@@ -708,53 +708,6 @@ watch(
     }
   }
 
-  /* 查询按钮 */
-  .load-btn {
-    max-width: 100px;
-    @include flex-center;
-    gap: 8px;
-    padding: 12px 24px;
-    background: linear-gradient(
-      135deg,
-      var(--color-primary) 0%,
-      var(--color-primary-hover) 100%
-    );
-    border: none;
-    border-radius: var(--radius-md);
-    box-shadow:
-      0 4px 12px var(--color-primary-shadow),
-      0 2px 4px var(--bg-overlay-light2);
-    color: var(--action-primary-text);
-    white-space: nowrap;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-
-    &:hover:not(:disabled) {
-      background: linear-gradient(
-        135deg,
-        var(--color-primary-hover) 0%,
-        var(--color-primary-hover) 100%
-      );
-      box-shadow:
-        0 6px 16px var(--color-primary-shadow-light),
-        var(--shadow-sm-dark);
-      transform: translateY(-1px);
-    }
-
-    &:active:not(:disabled) {
-      transform: translateY(0);
-    }
-
-    &:disabled {
-      background: var(--bg-hover-medium);
-      box-shadow: none;
-      color: var(--text-secondary);
-      cursor: not-allowed;
-    }
-  }
-
   /* 加载和错误状态 */
   .loading,
   .error {
@@ -803,6 +756,12 @@ watch(
   .matrix-container {
     @include flex-col;
     gap: 30px;
+    padding: 32px;
+
+    @media (max-aspect-ratio: 1/1) {
+      padding: 16px;
+    }
+
   }
 
   /* 空状态 */
@@ -818,9 +777,9 @@ watch(
       max-width: 100%;
     }
 
-    .load-btn {
-      padding: 10px 20px;
-      font-size: 14px;
+    .action-btn {
+      --action-btn-padding: 10px 20px;
+      --action-btn-font-size: 14px;
     }
   }
 }

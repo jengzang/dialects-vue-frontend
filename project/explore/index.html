@@ -35,6 +35,52 @@
       </div>
     </div>
 
+    <script>
+        (function() {
+            var p = location.pathname;
+            var m = p.match(/^\/(zh-CN|zh-Hant|en)(\/|$)/);
+            var loc = m ? m[1] : 'zh-Hant';
+            var page = p.replace(/^\/(zh-CN|zh-Hant|en)/, '').replace(/\/+$/, '') || '/';
+            var base = 'https://dialects.yzup.top';
+
+            document.documentElement.lang = loc;
+
+            var c = document.createElement('link');
+            c.rel = 'canonical';
+            c.href = base + '/' + loc + (page === '/' ? '' : page);
+            document.head.appendChild(c);
+
+            ['zh-Hant', 'zh-CN', 'en'].forEach(function(l) {
+                var a = document.createElement('link');
+                a.rel = 'alternate';
+                a.hreflang = l;
+                a.href = base + '/' + l + (page === '/' ? '' : page);
+                document.head.appendChild(a);
+            });
+            var x = document.createElement('link');
+            x.rel = 'alternate';
+            x.hreflang = 'x-default';
+            x.href = base + '/zh-Hant' + (page === '/' ? '' : page);
+            document.head.appendChild(x);
+
+            var titles = { 'zh-Hant': '探索工具｜方音圖鑑', 'zh-CN': '探索工具｜方音图鉴', 'en': 'Explore Tools | Dialects Atlas' };
+            if (titles[loc]) document.title = titles[loc];
+
+            var oldDm = document.querySelector('meta[name="description"]');
+            if (oldDm) oldDm.remove();
+            var descs = { 'zh-Hant': '探索方音圖鑑的互動工具與資料集，包括地圖繪製、字表工具、自然村資料與語音分析等功能。', 'zh-CN': '探索方音图鉴的交互工具与数据集，包括地图绘制、字表工具、自然村资料与语音分析等功能。', 'en': 'Explore interactive tools and datasets in Dialects Atlas, including map drawing, table tools, village data, and phonetic analysis.' };
+            if (descs[loc]) {
+                var dm = document.createElement('meta');
+                dm.name = 'description';
+                dm.content = descs[loc];
+                document.head.appendChild(dm);
+            }
+
+            var lt = document.querySelector('.app-boot-text');
+            var loadingTexts = { 'zh-Hant': '頁面載入中...', 'zh-CN': '页面加载中...', 'en': 'Loading...' };
+            if (lt && loadingTexts[loc]) lt.textContent = loadingTexts[loc];
+        })();
+    </script>
     <script type="module" src="/src/main/main.js"></script>
   </body>
 </html>

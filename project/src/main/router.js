@@ -55,12 +55,55 @@ const routes = [
       },
       {
         path: 'menu',
-        component: MenuEntry
+        component: MenuEntry,
+        meta: {
+          queryAllowlist: {
+            base: ['tab'],
+            variantKey: 'tab',
+            variants: {
+              query: ['sub'],
+              compare: ['sub'],
+              result: [],
+              map: ['sub', 'feature', 'locations', 'regions', 'regionMode', 'openPanel', 'phonology'],
+              pho: ['sub', 'mloc', 'cloc', 'eloc', 'feature', 'h', 'v', 'c'],
+              about: ['sub'],
+              source: [],
+              privacy: [],
+              tools: [],
+              vocabulary: [],
+              yubao: [],
+              villages: []
+            }
+          }
+        }
       },
       ...menuRoutes,
       {
         path: 'explore',
-        component: ExploreEntry
+        component: ExploreEntry,
+        meta: {
+          queryAllowlist: {
+            base: ['page'],
+            variantKey: 'page',
+            variants: {
+              CharacterClassification: ['sub', 'table', 'levels'],
+              praat: ['tab'],
+              VillagesML: ['module', 'subtab', 'pattern', 'ngram', 'villageId', 'detail'],
+              ycOverview: [],
+              ycSpoken: [],
+              ycExpressions: [],
+              ycVillages: [],
+              manage: [],
+              gdVillages: [],
+              gdVillagesTable: [],
+              allVillages: [],
+              check: [],
+              jyut2ipa: [],
+              merge: [],
+              derive: []
+            }
+          }
+        }
       },
       ...exploreRoutes,
       {
@@ -72,28 +115,19 @@ const routes = [
         redirect: createLocaleRedirect('/explore/gis')
       },
       {
-        path: 'explore/yubao',
-        redirect: createLocaleRedirect('/menu/yubao')
-      },
-      {
-        path: 'explore/vocabulary/:child?',
-        redirect: createLocaleRedirect('/menu/vocabulary')
-      },
-      {
-        path: 'explore/yc-spoken',
-        redirect: createLocaleRedirect('/explore/yc/words')
-      },
-      {
         path: 'auth',
-        component: Auth
+        component: Auth,
+        meta: { queryAllowlist: ['view', 'redirect'] }
       },
       {
         path: 'auth/data',
-        component: UserDataPage
+        component: UserDataPage,
+        meta: { queryAllowlist: ['username'] }
       },
       {
         path: 'auth/regions',
-        component: UserRegionPage
+        component: UserRegionPage,
+        meta: { queryAllowlist: ['username'] }
       },
     ]
   },
@@ -136,7 +170,8 @@ const routes = [
   },
   {
     path: '/villagesML/:pathMatch(.*)*',
-    component: VillagesMLBridge
+    component: VillagesMLBridge,
+    meta: { queryAllowlist: ['module', 'subtab', 'pattern', 'ngram', 'villageId'] }
   },
   {
     path: '/:pathMatch(.*)*',
@@ -177,193 +212,36 @@ const router = createRouter({
   }
 })
 
-const ROUTE_QUERY_ALLOWLIST = {
-  '/menu': {
-    base: ['tab'],
-    variantKey: 'tab',
-    variants: {
-      query: ['sub'],
-      compare: ['sub'],
-      result: [],
-      map: ['sub', 'feature', 'locations', 'regions', 'regionMode', 'openPanel', 'phonology'],
-      pho: ['sub', 'loc', 'feature', 'h', 'v', 'c'],
-      about: ['sub'],
-      source: [],
-      privacy: [],
-      tools: [],
-      vocabulary: [],
-      yubao: [],
-      villages: []
+function resolveQueryAllowlistConfig(to) {
+  for (const record of [...to.matched].reverse()) {
+    if (record.meta?.queryAllowlist) {
+      return record.meta.queryAllowlist
     }
-  },
-  '/explore': {
-    base: ['page'],
-    variantKey: 'page',
-    variants: {
-      CharacterClassification: ['sub', 'table', 'levels'],
-      praat: ['tab'],
-      VillagesML: ['module', 'subtab', 'pattern', 'ngram', 'villageId', 'detail'],
-      ycVillages: [],
-      manage: [],
-      gdVillages: [],
-      gdVillagesTable: [],
-      allVillages: [],
-      check: [],
-      jyut2ipa: [],
-      merge: [],
-      derive: []
-    }
-  },
-  '/villagesML': {
-    base: ['module', 'subtab', 'pattern', 'ngram', 'villageId']
-  },
-  '/auth': {
-    base: ['view', 'redirect']
-  },
-  '/auth/data': {
-    base: ['username']
-  },
-  '/auth/regions': {
-    base: ['username']
-  },
-  '/explore/tools/praat': {
-    base: ['tab']
-  },
-  '/explore/gis': {
-    base: ['scrollTo']
-  },
-  '/explore/manage': {
-    base: []
-  },
-  '/explore/char-class': {
-    base: ['tab', 'table', 'levels']
-  },
-  '/explore/villages/gd': {
-    base: []
-  },
-  '/explore/villages/table': {
-    base: []
-  },
-  '/explore/villages/yc': {
-    base: []
-  },
-  '/explore/yc/words': {
-    base: []
-  },
-  '/explore/yc/villages': {
-    base: []
-  },
-  '/explore/villages/ml': {
-    base: []
-  },
-  '/explore/villages/all': {
-    base: []
-  },
-  '/menu/pho/matrix': {
-    base: ['loc']
-  },
-  '/menu/pho/custom': {
-    base: ['loc', 'feature', 'h', 'v', 'c']
-  },
-  '/menu/pho/count': {
-    base: []
-  },
-  '/menu/pho/evolution': {
-    base: ['loc']
-  },
-  '/menu/about/intro': {
-    base: []
-  },
-  '/menu/about/suggestion': {
-    base: []
-  },
-  '/menu/about/like': {
-    base: []
-  },
-  '/menu/settings': {
-    base: []
-  },
-  '/menu/result': {
-    base: []
-  },
-  '/menu/source': {
-    base: []
-  },
-  '/menu/privacy': {
-    base: []
-  },
-  '/menu/tools': {
-    base: []
-  },
-  '/menu/words': {
-    base: []
-  },
-  '/menu/vocabulary': {
-    base: []
-  },
-  '/menu/vocabulary/view': {
-    base: ['tab']
-  },
-  '/menu/vocabulary/import': {
-    base: []
-  },
-  '/menu/vocabulary/manage': {
-    base: []
-  },
-  '/menu/yubao': {
-    base: ['tab']
-  },
-  '/menu/villages': {
-    base: []
-  },
-  '/menu/cluster': {
-    base: []
-  },
-  '/menu/query/char': {
-    base: []
-  },
-  '/menu/query/zhonggu': {
-    base: []
-  },
-  '/menu/query/yinwei': {
-    base: []
-  },
-  '/menu/query/tone': {
-    base: []
-  },
-  '/menu/compare/char': {
-    base: []
-  },
-  '/menu/compare/zhonggu': {
-    base: []
-  },
-  '/menu/compare/tone': {
-    base: []
-  },
-  '/menu/compare/phonetic': {
-    base: []
-  },
-  '/menu/map/view': {
-    base: ['feature', 'locations', 'regions', 'regionMode', 'openPanel', 'phonology']
-  },
-  '/menu/map/divide': {
-    base: []
-  },
-  '/menu/map/custom': {
-    base: []
   }
+  return null
 }
 
 function sanitizeQueryByRoute(to) {
-  const normalizedPath = stripLocaleFromPath(to.path)
-  const config = ROUTE_QUERY_ALLOWLIST[normalizedPath]
+  const config = resolveQueryAllowlistConfig(to)
   if (!config) {
-    return to.query
+    return {}
+  }
+
+  if (Array.isArray(config)) {
+    const sanitized = {}
+    config.forEach((key) => {
+      if (to.query[key] !== undefined && to.query[key] !== null && to.query[key] !== '') {
+        sanitized[key] = to.query[key]
+      }
+    })
+    return sanitized
   }
 
   const allowedKeys = new Set(config.base || [])
   const variantKey = config.variantKey
-  const variantValue = variantKey ? to.query?.[variantKey] : null
+  const variantValue = variantKey
+    ? (to.params?.[variantKey] || to.query?.[variantKey])
+    : null
   const variantAllowedKeys = variantValue && config.variants?.[variantValue]
     ? config.variants[variantValue]
     : []
