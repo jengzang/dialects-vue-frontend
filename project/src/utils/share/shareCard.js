@@ -1,5 +1,131 @@
 import qrcode from 'qrcode-generator'
 
+const CARD_CONFIGS = {
+  landscape: {
+    width: 1200,
+    height: 630,
+
+    brandLogo: {
+      x: 80,
+      y: 50,
+      width: 66,
+      height: 66,
+    },
+
+    brandTitle: {
+      x: 158,
+      y: 30,
+      width: 300,
+      height: 110,
+    },
+
+    contentTitle: {
+      x: 80,
+      y: 210,
+      maxWidth: 720,
+    },
+
+    description: {
+      x: 80,
+      y: 280,
+      maxWidth: 700,
+      lineHeight: 48,
+    },
+
+    meta: {
+      x: 80,
+      y: 465,
+    },
+
+    url: {
+      x: 80,
+      y: 555,
+      maxWidth: 800,
+    },
+
+    divider: {
+      x: 80,
+      y: 500,
+      width: 710,
+    },
+
+    qr: {
+      x: 890,
+      y: 292,
+      size: 220,
+    },
+
+    qrHint: {
+      x: 1000,
+      y: 550,
+      maxWidth: 300,
+    },
+  },
+
+
+  portrait: {
+    width: 630,
+    height: 900,
+
+    brandLogo: {
+      x: 60,
+      y: 50,
+      width: 70,
+      height: 70,
+    },
+
+    brandTitle: {
+      x: 150,
+      y: 40,
+      width: 300,
+      height: 100,
+    },
+
+    contentTitle: {
+      x: 60,
+      y: 230,
+      maxWidth: 510,
+    },
+
+    description: {
+      x: 60,
+      y: 300,
+      maxWidth: 510,
+      lineHeight: 48,
+    },
+
+    meta: {
+      x: 60,
+      y: 480,
+    },
+
+    url: {
+      x: 60,
+      y: 840,
+      maxWidth: 700,
+    },
+
+    divider: {
+      x: 60,
+      y: 800,
+      width: 510,
+    },
+
+    qr: {
+      x: 205,
+      y: 520,
+      size: 220,
+    },
+
+    qrHint: {
+      x: 315,
+      y: 780,
+      maxWidth: 300,
+    },
+  },
+}
+
+
 const THEME_COLOR_TOKENS = {
   blue: '--color-primary',
   green: '--color-success',
@@ -7,14 +133,25 @@ const THEME_COLOR_TOKENS = {
   dark: '--text-deep',
 }
 
+
 const BRAND_TITLE_SRC = '/brand/title.webp'
 
+
 const BRAND_LOGO_SRCS = {
+  green: '/brand/favicon_green.ico',
+  blue: '/brand/favicon.ico',
+  light: '/brand/favicon.ico',
+  dark: '/brand/favicon.ico',
+}
+
+
+const QR_CENTER_SRCS = {
   green: '/brand/GreenCircle.webp',
   blue: '/brand/BlueCircle.webp',
   light: '/brand/BlueCircle.webp',
   dark: '/brand/BlueCircle.webp',
 }
+
 
 function readCssToken(tokenName, fallback) {
   if (typeof window === 'undefined') {
@@ -26,6 +163,7 @@ function readCssToken(tokenName, fallback) {
     .trim() || fallback
 }
 
+
 function wrapText(ctx, text, maxWidth) {
   const chars = Array.from(text)
   const lines = []
@@ -33,6 +171,7 @@ function wrapText(ctx, text, maxWidth) {
 
   for (const char of chars) {
     const next = current + char
+
     if (ctx.measureText(next).width > maxWidth && current) {
       lines.push(current)
       current = char
@@ -41,9 +180,13 @@ function wrapText(ctx, text, maxWidth) {
     }
   }
 
-  if (current) lines.push(current)
+  if (current) {
+    lines.push(current)
+  }
+
   return lines.slice(0, 3)
 }
+
 
 function fitText(ctx, text, maxWidth) {
   if (ctx.measureText(text).width <= maxWidth) {
@@ -52,15 +195,22 @@ function fitText(ctx, text, maxWidth) {
 
   const suffix = '...'
   let current = ''
+
   for (const char of Array.from(text)) {
     const next = current + char
-    if (ctx.measureText(next + suffix).width > maxWidth) {
+
+    if (
+      ctx.measureText(next + suffix).width > maxWidth
+    ) {
       break
     }
+
     current = next
   }
+
   return `${current}${suffix}`
 }
+
 
 function loadCanvasImage(src) {
   if (typeof Image === 'undefined') {
@@ -69,18 +219,36 @@ function loadCanvasImage(src) {
 
   return new Promise((resolve) => {
     const image = new Image()
+
     image.onload = () => resolve(image)
     image.onerror = () => resolve(null)
+
     image.src = src
   })
 }
 
-function drawContainedImage(ctx, image, x, y, maxWidth, maxHeight) {
-  if (!image) return false
 
-  const ratio = Math.min(maxWidth / image.width, maxHeight / image.height)
+function drawContainedImage(
+  ctx,
+  image,
+  x,
+  y,
+  maxWidth,
+  maxHeight,
+) {
+  if (!image) {
+    return false
+  }
+
+  const ratio = Math.min(
+    maxWidth / image.width,
+    maxHeight / image.height,
+  )
+
   const width = image.width * ratio
   const height = image.height * ratio
+
+
   ctx.drawImage(
     image,
     x + (maxWidth - width) / 2,
@@ -88,28 +256,129 @@ function drawContainedImage(ctx, image, x, y, maxWidth, maxHeight) {
     width,
     height,
   )
+
   return true
 }
 
-function drawQrCode(ctx, url, x, y, size, foreground, background) {
-  const qr = qrcode(0, 'M')
+
+function drawCircleImage(
+  ctx,
+  image,
+  centerX,
+  centerY,
+  outerSize,
+  imageSize,
+  background,
+) {
+  if (!image) {
+    return
+  }
+
+
+  ctx.fillStyle = background
+
+  ctx.beginPath()
+  ctx.arc(
+    centerX,
+    centerY,
+    outerSize / 2,
+    0,
+    Math.PI * 2,
+  )
+  ctx.fill()
+
+
+  ctx.save()
+
+  ctx.beginPath()
+  ctx.arc(
+    centerX,
+    centerY,
+    imageSize / 2,
+    0,
+    Math.PI * 2,
+  )
+
+  ctx.clip()
+
+
+  drawContainedImage(
+    ctx,
+    image,
+    centerX - imageSize / 2,
+    centerY - imageSize / 2,
+    imageSize,
+    imageSize,
+  )
+
+
+  ctx.restore()
+}
+function drawQrCode(
+  ctx,
+  url,
+  x,
+  y,
+  size,
+  foreground,
+  background,
+  centerImage,
+) {
+  const qr = qrcode(0, 'H')
+
   qr.addData(url)
   qr.make()
 
+
   const moduleCount = qr.getModuleCount()
   const quietModules = 4
-  const moduleSize = Math.floor(size / (moduleCount + quietModules * 2))
-  const qrSize = moduleSize * (moduleCount + quietModules * 2)
-  const offset = Math.floor((size - qrSize) / 2)
-  const startX = x + offset + quietModules * moduleSize
-  const startY = y + offset + quietModules * moduleSize
+
+  const moduleSize = Math.floor(
+    size / (moduleCount + quietModules * 2),
+  )
+
+  const qrSize =
+    moduleSize *
+    (moduleCount + quietModules * 2)
+
+
+  const offset = Math.floor(
+    (size - qrSize) / 2,
+  )
+
+
+  const startX =
+    x +
+    offset +
+    quietModules * moduleSize
+
+  const startY =
+    y +
+    offset +
+    quietModules * moduleSize
+
 
   ctx.fillStyle = background
-  ctx.fillRect(x, y, size, size)
+  ctx.fillRect(
+    x,
+    y,
+    size,
+    size,
+  )
+
 
   ctx.fillStyle = foreground
-  for (let row = 0; row < moduleCount; row += 1) {
-    for (let col = 0; col < moduleCount; col += 1) {
+
+  for (
+    let row = 0;
+    row < moduleCount;
+    row += 1
+  ) {
+    for (
+      let col = 0;
+      col < moduleCount;
+      col += 1
+    ) {
       if (qr.isDark(row, col)) {
         ctx.fillRect(
           startX + col * moduleSize,
@@ -120,93 +389,404 @@ function drawQrCode(ctx, url, x, y, size, foreground, background) {
       }
     }
   }
+
+
+  drawCircleImage(
+    ctx,
+    centerImage,
+    x + size / 2,
+    y + size / 2,
+    64,
+    48,
+    background,
+  )
 }
+
+
 
 export async function createShareCardDataUrl({
   title,
   description,
   url,
-  languageLabel,
-  themeLabel,
+  statsLabel,
   colorTheme,
+
+  orientation = 'landscape',
+
   brandName = '方音图鉴',
   qrHint = '',
+
   brandTitleSrc = BRAND_TITLE_SRC,
-  brandLogoSrc = BRAND_LOGO_SRCS[colorTheme] || BRAND_LOGO_SRCS.blue,
+
+  brandLogoSrc =
+    BRAND_LOGO_SRCS[colorTheme] ||
+    BRAND_LOGO_SRCS.blue,
+
+  qrCenterSrc =
+    QR_CENTER_SRCS[colorTheme] ||
+    QR_CENTER_SRCS.blue,
+
   loadImage = loadCanvasImage,
 }) {
-  const [brandTitleImage, brandLogoImage] = await Promise.all([
+
+  const [
+    brandTitleImage,
+    brandLogoImage,
+    qrCenterImage,
+  ] = await Promise.all([
     loadImage(brandTitleSrc),
     loadImage(brandLogoSrc),
+    loadImage(qrCenterSrc),
   ])
-  const canvas = document.createElement('canvas')
-  canvas.width = 1200
-  canvas.height = 630
-  const ctx = canvas.getContext('2d')
-  const accent = readCssToken(THEME_COLOR_TOKENS[colorTheme] || THEME_COLOR_TOKENS.blue, '#2f74c0')
-  const panel = readCssToken('--surface-panel-strong', '#f7fbf8')
-  const textDeep = readCssToken('--text-deep', '#203026')
-  const textSlate = readCssToken('--text-slate', '#637268')
+
+
+
+  const config =
+    CARD_CONFIGS[orientation] ||
+    CARD_CONFIGS.landscape
+
+
+
+  const canvas =
+    document.createElement('canvas')
+
+
+  canvas.width = config.width
+  canvas.height = config.height
+
+
+  const ctx =
+    canvas.getContext('2d')
+
+
+
+  const accent =
+    readCssToken(
+      THEME_COLOR_TOKENS[colorTheme] ||
+      THEME_COLOR_TOKENS.blue,
+      '#2f74c0',
+    )
+
+
+  const panel =
+    readCssToken(
+      '--surface-panel-strong',
+      '#f7fbf8',
+    )
+
+
+  const textDeep =
+    readCssToken(
+      '--text-deep',
+      '#203026',
+    )
+
+
+  const textSlate =
+    readCssToken(
+      '--text-slate',
+      '#637268',
+    )
+
+
+
+  /*
+   * background
+   */
 
   ctx.fillStyle = panel
-  ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+  ctx.fillRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height,
+  )
+
+
+
+  /*
+   * decorative background
+   */
 
   ctx.globalAlpha = 0.08
+
   ctx.fillStyle = accent
-  ctx.fillRect(0, 18, canvas.width, 138)
-  ctx.fillRect(80, 500, 710, 2)
-  for (let x = 0; x < canvas.width; x += 80) {
-    ctx.fillRect(x, 156, 1, canvas.height - 156)
+
+
+  ctx.fillRect(
+    0,
+    18,
+    canvas.width,
+    138,
+  )
+
+
+  ctx.fillRect(
+    config.divider.x,
+    config.divider.y,
+    config.divider.width,
+    2,
+  )
+
+
+  if (orientation === 'landscape') {
+    for (
+      let x = 0;
+      x < canvas.width;
+      x += 80
+    ) {
+      ctx.fillRect(
+        x,
+        156,
+        1,
+        canvas.height - 156,
+      )
+    }
+
   }
+
+
   ctx.globalAlpha = 1
 
-  ctx.fillStyle = accent
-  ctx.fillRect(0, 0, canvas.width, 18)
-  ctx.fillRect(0, canvas.height - 12, canvas.width, 12)
 
-  if (!drawContainedImage(ctx, brandLogoImage, 80, 72, 66, 66)) {
+
+  /*
+   * accent bars
+   */
+
+  ctx.fillStyle = accent
+
+  ctx.fillRect(
+    0,
+    0,
+    canvas.width,
+    18,
+  )
+
+  ctx.fillRect(
+    0,
+    canvas.height - 12,
+    canvas.width,
+    12,
+  )
+
+
+
+  /*
+   * brand logo
+   */
+
+  if (
+    !drawContainedImage(
+      ctx,
+      brandLogoImage,
+      config.brandLogo.x,
+      config.brandLogo.y,
+      config.brandLogo.width,
+      config.brandLogo.height,
+    )
+  ) {
+
     ctx.fillStyle = accent
-    ctx.fillRect(80, 76, 58, 58)
+
+    ctx.fillRect(
+      config.brandLogo.x,
+      config.brandLogo.y + 26,
+      58,
+      58,
+    )
+
+
     ctx.fillStyle = panel
-    ctx.font = '600 32px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+
+    ctx.font =
+      '600 32px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+
+
     ctx.textAlign = 'center'
-    ctx.fillText(Array.from(brandName)[0] || '方', 109, 115)
+
+
+    ctx.fillText(
+      Array.from(brandName)[0] || '音',
+      config.brandLogo.x +
+        config.brandLogo.width / 2,
+      config.brandLogo.y +
+        config.brandLogo.height / 2 +
+        16,
+    )
+
+
     ctx.textAlign = 'left'
   }
 
-  if (!drawContainedImage(ctx, brandTitleImage, 158, 82, 170, 62)) {
+
+
+  /*
+   * brand title
+   */
+
+  if (
+    !drawContainedImage(
+      ctx,
+      brandTitleImage,
+      config.brandTitle.x,
+      config.brandTitle.y,
+      config.brandTitle.width,
+      config.brandTitle.height,
+    )
+  ) {
+
     ctx.fillStyle = textSlate
-    ctx.font = '500 28px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-    ctx.fillText(fitText(ctx, brandName, 560), 154, 113)
+
+    ctx.font =
+      '500 28px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+
+
+    ctx.fillText(
+      fitText(
+        ctx,
+        brandName,
+        config.brandTitle.width,
+      ),
+      config.brandTitle.x,
+      config.brandTitle.y +
+        config.brandTitle.height / 2 +
+        14,
+    )
   }
+
+
+  /*
+   * content title
+   */
 
   ctx.fillStyle = textDeep
-  ctx.font = '500 54px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-  ctx.fillText(fitText(ctx, title, 720), 80, 210)
 
-  ctx.font = '400 34px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-  const descLines = wrapText(ctx, description, 700)
+  ctx.font =
+    '500 54px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+
+
+  ctx.fillText(
+    fitText(ctx, title, config.contentTitle.maxWidth),
+    config.contentTitle.x,
+    config.contentTitle.y,
+  )
+
+
+
+  /*
+   * description
+   */
+
+  ctx.font =
+    '400 34px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+
+
+  const descLines =
+    wrapText(
+      ctx,
+      description,
+      config.description.maxWidth,
+    )
+
+
   descLines.forEach((line, index) => {
-    ctx.fillText(line, 80, 280 + index * 48)
+
+    ctx.fillText(
+      line,
+      config.description.x,
+      config.description.y + index * config.description.lineHeight,
+    )
+
   })
 
+
+
+  /*
+   * source stats
+   */
+
   ctx.fillStyle = accent
-  ctx.font = '500 30px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-  ctx.fillText(`${languageLabel} · ${themeLabel}`, 80, 465)
+
+  ctx.font =
+    '500 30px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+
+
+  ctx.fillText(
+    statsLabel,
+    config.meta.x,
+    config.meta.y,
+  )
+
+
+
+  /*
+   * url
+   */
 
   ctx.fillStyle = textSlate
-  ctx.font = '400 28px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-  ctx.fillText(fitText(ctx, url, 700), 80, 555)
 
-  drawQrCode(ctx, url, 890, 292, 220, '#17212b', '#ffffff')
+  ctx.font =
+    '400 28px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+
+
+  ctx.fillText(
+    fitText(ctx, url, config.url.maxWidth),
+    config.url.x,
+    config.url.y,
+  )
+
+
+
+  /*
+   * QR Code
+   */
+
+  drawQrCode(
+    ctx,
+    url,
+    config.qr.x,
+    config.qr.y,
+    config.qr.size,
+    '#17212b',
+    '#ffffff',
+    qrCenterImage,
+  )
+
+
+
+  /*
+   * QR hint
+   */
 
   if (qrHint) {
+
     ctx.fillStyle = textSlate
-    ctx.font = '500 24px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+
+    ctx.font =
+      '500 24px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+
+
     ctx.textAlign = 'center'
-    ctx.fillText(fitText(ctx, qrHint, 300), 1000, 550)
+
+
+    ctx.fillText(
+      fitText(
+        ctx,
+        qrHint,
+        config.qrHint.maxWidth,
+      ),
+      config.qrHint.x,
+      config.qrHint.y,
+    )
+
+
     ctx.textAlign = 'left'
+
   }
+
+
 
   return canvas.toDataURL('image/png')
 }

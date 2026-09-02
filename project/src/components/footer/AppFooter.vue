@@ -134,7 +134,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n/localeRouting.js'
 import { requestCurrentTutorialGuideOpen } from '@/main/store/store.js'
 import { resolveLayoutFooterContext } from '@/main/config/layoutFooter.js'
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
@@ -232,15 +232,13 @@ function dataUrlToFile(dataUrl, filename) {
   return new File([bytes], filename, { type: mime })
 }
 
-async function shareImageFile({ title, text, url, dataUrl, filename }) {
+async function shareImageFile({ dataUrl, filename }) {
   if (!navigator.share || !navigator.canShare) {
     return false
   }
 
   const imageFile = dataUrlToFile(dataUrl, filename)
   const shareData = {
-    title,
-    text,
     files: [imageFile],
   }
 
@@ -259,9 +257,12 @@ async function copyShareUrl(url) {
 }
 
 async function shareCurrentPage() {
-  const url = window.location.href
+  const target = new URL(window.location.href)
+  target.pathname = stripLocaleFromPath(target.pathname)
+  const url = target.toString()
   const title = t(context.value.pageTitleKey)
   const text = t(context.value.pageDescriptionKey)
+  const orientation = window.innerHeight >= window.innerWidth ? 'portrait' : 'landscape'
 
   try {
     const filename = 'dialects-share.png'
@@ -269,14 +270,17 @@ async function shareCurrentPage() {
       title,
       description: text,
       url,
-      languageLabel: t(context.value.languageLabelKey),
-      themeLabel: t(context.value.themeLabelKey),
+      statsLabel: t('layoutFooter.share.stats', {
+        locationCount: sourceLocationCount.value,
+        dataCount: sourceDataCount.value,
+      }),
       colorTheme: currentColorTheme.value,
+      orientation,
       brandName: t('layoutFooter.pages.generic.title'),
       qrHint: t('layoutFooter.share.qrHint'),
     })
 
-    if (await shareImageFile({ title, text, url, dataUrl, filename })) {
+    if (await shareImageFile({ dataUrl, filename })) {
       return
     }
 

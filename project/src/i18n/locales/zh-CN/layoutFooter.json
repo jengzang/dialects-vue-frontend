@@ -248,7 +248,8 @@
     "copied": "已复制当前页面链接",
     "imageReady": "已生成分享图，当前浏览器未允许复制链接",
     "qrHint": "扫码打开当前页面",
-    "failed": "分享失败，请稍后再试"
+    "failed": "分享失败，请稍后再试",
+    "stats": "字表数量: {locationCount} · 数据条数: {dataCount}"
   },
   "feedback": {
     "title": "提交反馈",
