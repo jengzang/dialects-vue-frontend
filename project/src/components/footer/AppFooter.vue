@@ -443,6 +443,7 @@ onMounted(fetchFooterStats)
 @media (max-aspect-ratio: 1 / 1) {
   .app-footer {
     margin-top: 18px;
+    width:auto;
   }
 
   .footer-content {

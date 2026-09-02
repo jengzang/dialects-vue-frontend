@@ -1,12 +1,11 @@
 <template>
   <div ref="drawTabRoot" class="map-draw-tab page-content-stack">
-    <div class="page-footer draw-tab-header glass-panel">
       <div class="draw-tab-copy">
         <h1 class="draw-tab-title">
           <BarIcon icon="🗺️" />{{ t('navigation.pageTitles.gis.main') }}
         </h1>
       </div>
-
+    <div class="page-footer draw-tab-header glass-panel">
       <div
         class="draw-toolbar draw-toolbar--header"
       >
@@ -1334,6 +1333,10 @@ watch(getCurrentWorkbenchSignature, () => {
 
     &-title {
       margin: 0;
+      display: flex;
+      font-size: 25px;
+      justify-content: center;
+      align-items: center;
     }
 
     &-hint {

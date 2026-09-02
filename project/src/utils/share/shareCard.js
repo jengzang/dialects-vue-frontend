@@ -127,10 +127,10 @@ const CARD_CONFIGS = {
 
 
 const THEME_COLOR_TOKENS = {
-  blue: '--color-primary',
-  green: '--color-success',
-  light: '--text-slate',
-  dark: '--text-deep',
+  blue: '--color-primary-hover',
+  green: '--color-primary-hover',
+  light: '--color-primary-hover',
+  dark: '--color-primary-hover',
 }
 
 
@@ -680,7 +680,7 @@ export async function createShareCardDataUrl({
    */
 
   ctx.font =
-    '400 34px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+    '400 32px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
 
 
   const descLines =
@@ -710,7 +710,7 @@ export async function createShareCardDataUrl({
   ctx.fillStyle = accent
 
   ctx.font =
-    '500 30px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+    '500 28px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
 
 
   ctx.fillText(

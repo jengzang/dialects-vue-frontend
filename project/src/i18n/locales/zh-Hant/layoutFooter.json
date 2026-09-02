@@ -33,159 +33,159 @@
     },
     "menuEntry": {
       "title": "功能導航",
-      "description": "進入查詢、比較、地圖、音系、詞句與資料管理入口。"
+      "description": "進入查詢、比較、地圖、音系、詞句、村落以及工具入口。"
     },
     "menuAboutIntro": {
       "title": "關於方音圖鑑",
-      "description": "查看項目說明、資料來源與使用邊界。"
+      "description": "查看網站功能介紹、發展歷史等"
     },
     "menuAboutSuggestion": {
       "title": "反饋入口",
-      "description": "查看原有反饋頁，或使用頁腳直接提交站點反饋。"
+      "description": "跳轉github或知乎提出issue，或直接在本站內提交反饋。"
     },
     "menuAboutLike": {
       "title": "支持項目",
-      "description": "查看支持作者、項目連結與致謝信息。"
+      "description": "查看項目倉庫、相關知乎介紹文章以及作者的開發感悟。"
     },
     "menuQueryZhonggu": {
       "title": "查中古",
-      "description": "按中古地位整理各方言點讀音。"
+      "description": "韻書 → 讀音 • 按韻書地位分別整理聲韻調的讀音"
     },
     "menuQueryChar": {
       "title": "查字",
-      "description": "按漢字查詢讀音、地位與注釋。"
+      "description": "查詢漢字的讀音、地位及注釋"
     },
     "menuQueryYinwei": {
       "title": "查音位",
-      "description": "分析音位對應字的中古來源。"
+      "description": "讀音 → 韻書 • 分析各聲韻調的音位來源於什麼韻書地位"
     },
     "menuQueryTone": {
       "title": "查調",
-      "description": "查詢調值、調類與聲調分佈。"
+      "description": "查詢各點的調類、調值"
     },
     "menuMapView": {
       "title": "地圖顯示",
-      "description": "在地圖上查看查詢和比較結果。"
+      "description": "地理語言學直觀呈現。即在地圖上查看查詢、比較結果，及繪製音節等值線圖、熱力圖等。"
     },
     "menuMapDivide": {
       "title": "地圖分區",
-      "description": "查看和管理方言地理分區。"
+      "description": "查詢各方言點所屬的分區，並跳轉地圖繪製查看。"
     },
     "menuMapCustom": {
       "title": "個人地圖資料",
-      "description": "管理登入用戶的自定義地圖資料。"
+      "description": "查看、管理自定義方言數據，並繪製到地圖上。與賬號綁定，多設備同步。"
     },
     "menuCompareChar": {
       "title": "比較字",
-      "description": "對比多個方言點的單字讀音差異。"
+      "description": "比較同一漢字在不同地點的讀音差異。"
     },
     "menuCompareZhonggu": {
       "title": "比較中古",
-      "description": "按中古地位比較多個方言點讀音。"
+      "description": "比較同一中古地位在不同地點的演變情況。"
     },
     "menuCompareTone": {
       "title": "比較聲調",
-      "description": "對比多個方言點的調值與調類。"
+      "description": "比較兩個調類在不同地點是合流還是分立。"
     },
     "menuComparePhonetic": {
       "title": "比較音系",
-      "description": "對比音系特徵與讀音對應。"
+      "description": "比較所選各點的音值對應關係（请輸入2~5個地點）。"
     },
     "menuResult": {
       "title": "查詢結果",
-      "description": "查看最近一次查詢或比較的結果。"
+      "description": "查字、查中古、查音位、查調的結果頁面，支持分享與導出。"
     },
     "menuPhoMatrix": {
-      "title": "音系矩陣",
-      "description": "查看單個方言點的音系矩陣。"
+      "title": "音系查詢",
+      "description": "查看方言點的完整音系表和同音字彙，以表格的形式呈現聲韻調拼合關係。"
     },
     "menuPhoCustom": {
-      "title": "自定義音系",
-      "description": "按自定義維度整理單點音系資料。"
+      "title": "音素分類",
+      "description": "按韻書地位特徵，分類整理方言點的聲韻調數據"
     },
     "menuPhoCount": {
-      "title": "音系統計",
-      "description": "統計單個方言點的音系數量與分佈。"
+      "title": "音節統計",
+      "description": "統計方言點的音節數量，並繪製圖表與等值線地圖。含獨立統計聲韻調、不帶調音節、帶調音節三種模式。"
     },
     "menuPhoEvolution": {
-      "title": "音系演變",
-      "description": "查看單點音系與中古來源的對應。"
+      "title": "演化",
+      "description": "查看單個方言點的當今音系與韻書地位之間的對應關係，並用餅圖和桑基圖展示聲母、韻母、聲調的歷史演化。"
     },
     "menuSettings": {
       "title": "設置",
-      "description": "調整語言、主題、輸入方式與教程開關。"
+      "description": "配置語言、主題、查詢輸入方式、教程開關等。"
     },
     "menuSource": {
       "title": "資料來源",
-      "description": "查看資料庫、引用來源與版本信息。"
+      "description": "查看方言數據的字表來源、參考文獻、地點行政區劃等。"
     },
     "menuPrivacy": {
       "title": "隱私說明",
-      "description": "了解賬號、日誌與個人資料的處理方式。"
+      "description": "了解本站的隱私政策與引用說明"
     },
     "menuTools": {
       "title": "工具入口",
-      "description": "進入格式轉換、校驗、合併等實用工具。"
+      "description": "字表檢查、合併，粵拼轉換，在線praat工具，GIS繪圖工具等入口。"
     },
     "menuVocabularyView": {
-      "title": "詞句瀏覽",
-      "description": "瀏覽詞彙、例句與相關方言點資料。"
+      "title": "詞表瀏覽",
+      "description": "瀏覽和搜索所有協作者提交的詞表數據，支持卡片、地圖、表格三種展示模式。"
     },
     "menuVocabularyImport": {
-      "title": "詞句導入",
-      "description": "導入並預覽詞句資料表。"
+      "title": "詞表導入",
+      "description": "上傳新的詞表數據，需要先申請權限，並填寫地點信息，再按標準格式提交詞表。"
     },
     "menuVocabularyManage": {
-      "title": "詞句管理",
-      "description": "管理已導入的詞句資料。"
+      "title": "詞表管理",
+      "description": "管理上傳的詞表，可進行在線編輯、批量替換、增刪詞條等操作。"
     },
     "menuYubao": {
       "title": "語保資料",
-      "description": "瀏覽語保工程相關詞句和語法資料。"
+      "description": "查詢語保工程的詞彙（1000詞）與語法例句（50句）數據，支持地圖、卡片、表格三種展示模式。"
     },
     "menuVillages": {
-      "title": "自然村入口",
-      "description": "進入自然村資料、表格、樹圖和分析工具。"
+      "title": "村落入口",
+      "description": "進入自然村樹狀圖、表格，機器學習分析工具等。"
     },
     "menuCluster": {
       "title": "方言聚類",
-      "description": "按讀音資料探索方言點聚類關係。"
+      "description": "按方言特徵數據探索方言點聚類關係。"
     },
     "exploreEntry": {
       "title": "探索導航",
       "description": "進入工具、字表、自然村和專題資料頁面。"
     },
     "exploreCheck": {
-      "title": "格式校驗",
-      "description": "校驗和清理方言資料表格式。"
+      "title": "字表檢查",
+      "description": "上傳方言字表文件，自動檢查「非單字」「異常音標」「缺聲調」等常見問題，並提供在線編輯修正功能。"
     },
     "exploreJyut2Ipa": {
-      "title": "粵拼轉 IPA",
-      "description": "將粵拼批量轉換為 IPA 標音。"
+      "title": "粵拼轉IPA",
+      "description": "批量將Excel表格中的粵拼轉換為國際音標(ipa)，支持自定義配置規則。"
     },
     "exploreMerge": {
-      "title": "表格合併",
-      "description": "合併多份方言資料表。"
+      "title": "字表合併",
+      "description": "上傳參考表與待合併字表，將按參考表的漢字順序，批量完成對齊與合併。"
     },
     "exploreDerive": {
       "title": "音系推導",
-      "description": "輔助推導和整理音系對應。"
+      "description": "輔助推導生成字表。"
     },
     "explorePraat": {
       "title": "Praat 聲學分析",
-      "description": "上傳或錄音並查看聲學分析結果。"
+      "description": "上傳音頻或直接錄音，查看聲學分析結果（包含基頻、共振峰、頻譜圖、元音空間等），支持按照石鋒T值法自動生成聲調圖。"
     },
     "exploreGis": {
       "title": "地圖繪製",
-      "description": "繪製、編輯並導出方言地圖。"
+      "description": "在線GIS地圖編輯器，支持添加、編輯和刪除地理要素，同時支持泰森多邊形自動繪製方言分佈圖。"
     },
     "exploreManage": {
       "title": "資料管理",
-      "description": "管理和維護站點資料表。"
+      "description": "管理和維護站點資料庫。"
     },
     "exploreCharClass": {
-      "title": "字表分類",
-      "description": "按歷史層次和分類維度整理字表。"
+      "title": "漢字字集",
+      "description": "按韻書地位逐級展開漢字，可查看各地位所包含的漢字及注釋，支持自定義順序。"
     },
     "exploreYcOverview": {
       "title": "陽春專題",
@@ -209,15 +209,15 @@
     },
     "exploreVillagesGd": {
       "title": "廣東自然村樹",
-      "description": "按層級瀏覽廣東自然村資料。"
+      "description": "按行政區劃層級瀏覽廣東自然村資料，支持樹狀展開和方言地圖可視化。"
     },
     "exploreVillagesTable": {
-      "title": "自然村表格",
-      "description": "以表格方式查看自然村資料。"
+      "title": "廣東自然村表",
+      "description": "以表格形式瀏覽和查詢廣東自然村數據，支持排序、篩選、分頁。"
     },
     "exploreVillagesMl": {
       "title": "自然村機器學習",
-      "description": "進入自然村資料分析與機器學習入口。"
+      "description": "使用機器學習方法分析自然村名的模式和規律。"
     },
     "exploreVillagesAll": {
       "title": "全部自然村",
@@ -225,19 +225,19 @@
     },
     "villagesML": {
       "title": "自然村分析工作台",
-      "description": "分析自然村語義、空間和聚類特徵。"
+      "description": "分析自然村字符、語義、空間、聚類等特徵。"
     },
     "auth": {
       "title": "賬號",
-      "description": "登入、註冊或查看賬號概覽。"
+      "description": "登入、註冊或查看賬號信息、排行榜等。"
     },
     "authData": {
       "title": "個人資料",
-      "description": "管理與賬號關聯的個人資料。"
+      "description": "查看與管理個人添加的方言數據。"
     },
     "authRegions": {
       "title": "個人分區",
-      "description": "管理賬號保存的自定義地理分區。"
+      "description": "管理賬號保存的自定義方言分區。"
     }
   },
   "legal": {

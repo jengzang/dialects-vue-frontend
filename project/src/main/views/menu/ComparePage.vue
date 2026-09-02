@@ -491,7 +491,7 @@
       </div>
 
       <!-- 提示區 -->
-      <div
+      <!-- <div
         v-if="currentTab === 'tab1'"
         class="page-footer"
         style="margin-top: 20px"
@@ -518,7 +518,7 @@
         style="margin-top: 20px"
       >
         <small class="hint">{{ $t('compare.messages.tab5Hint') }}</small>
-      </div>
+      </div> -->
       </div>
     </template>
   </TabsContainer>

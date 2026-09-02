@@ -242,7 +242,7 @@
         </button>
       </div>
       <!-- 🔹 建議與操作區 -->
-      <div v-if="currentTab === 'tab1'" class="page-footer" style="margin-top: 20px">
+      <!-- <div v-if="currentTab === 'tab1'" class="page-footer" style="margin-top: 20px">
         <small class="hint">{{ $t('query.tab1.description') }}</small>
       </div>
       <div v-else-if="currentTab === 'tab2'" class="page-footer" style="margin-top: 20px">
@@ -253,7 +253,7 @@
       </div>
       <div v-else-if="currentTab === 'tab4'" class="page-footer" style="margin-top: 20px">
         <small class="hint">{{ $t('query.tab4.description') }}</small>
-      </div>
+      </div> -->
       </div>
     </template>
   </TabsContainer>
