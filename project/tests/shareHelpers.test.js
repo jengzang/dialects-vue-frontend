@@ -165,6 +165,50 @@ describe('share card helper', () => {
     expect(calls.some(call => call.includes('简体 · 绿色'))).toBe(true)
   })
 
+  it('draws localized brand copy and QR blocks on the share card', async () => {
+    const calls = []
+    const context = {
+      fillStyle: '',
+      font: '',
+      textAlign: '',
+      fillRect: (...args) => calls.push(['fillRect', ...args]),
+      fillText: (...args) => calls.push(['fillText', ...args]),
+      measureText: (text) => ({ width: text.length * 12 }),
+    }
+    const canvas = {
+      width: 0,
+      height: 0,
+      getContext: () => context,
+      toDataURL: vi.fn().mockReturnValue('data:image/png;base64,card'),
+    }
+    const createElement = document.createElement.bind(document)
+    vi.spyOn(document, 'createElement').mockImplementation((tagName) => {
+      if (tagName === 'canvas') return canvas
+      return createElement(tagName)
+    })
+
+    const { createShareCardDataUrl } = await import('../src/utils/share/shareCard.js')
+    createShareCardDataUrl({
+      title: 'Middle Chinese Query',
+      description: 'Organize dialect readings by Middle Chinese categories.',
+      url: 'https://dialects.yzup.top/en/menu/query/zhonggu',
+      languageLabel: 'English',
+      themeLabel: 'Green',
+      colorTheme: 'green',
+      brandName: 'Chinese Dialect Atlas',
+      qrHint: 'Scan to open this page',
+    })
+
+    const drawnTexts = calls
+      .filter(call => call[0] === 'fillText')
+      .map(call => call[1])
+    const qrBlocks = calls.filter(call => call[0] === 'fillRect' && call[1] >= 870 && call[2] >= 300)
+
+    expect(drawnTexts).toContain('Chinese Dialect Atlas')
+    expect(drawnTexts).toContain('Scan to open this page')
+    expect(qrBlocks.length).toBeGreaterThan(80)
+  })
+
   it('truncates oversized share-card title and URL before drawing', async () => {
     const calls = []
     const context = {

@@ -243,6 +243,8 @@ async function shareCurrentPage() {
       languageLabel: t(context.value.languageLabelKey),
       themeLabel: t(context.value.themeLabelKey),
       colorTheme: currentColorTheme.value,
+      brandName: t('layoutFooter.pages.generic.title'),
+      qrHint: t('layoutFooter.share.qrHint'),
     })
 
     downloadDataUrl(dataUrl, 'dialects-share.png')

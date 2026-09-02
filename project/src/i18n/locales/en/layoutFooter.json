@@ -247,6 +247,7 @@
   "share": {
     "copied": "Current page link copied",
     "imageReady": "Share image generated. This browser did not allow link copying.",
+    "qrHint": "Scan to open this page",
     "failed": "Sharing failed. Please try again later."
   },
   "feedback": {

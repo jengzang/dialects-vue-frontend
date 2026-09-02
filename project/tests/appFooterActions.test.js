@@ -36,6 +36,7 @@ vi.mock('vue-i18n', () => ({
       if (key === 'layoutFooter.theme.green') return '绿色'
       if (key === 'layoutFooter.share.imageReady') return 'layoutFooter.share.imageReady'
       if (key === 'layoutFooter.share.copied') return 'layoutFooter.share.copied'
+      if (key === 'layoutFooter.share.qrHint') return '扫码打开当前页面'
       return key.replace(/\{(\w+)\}/g, (_, name) => values[name] ?? '')
     },
   }),
@@ -217,6 +218,10 @@ describe('AppFooter actions', () => {
     await new Promise(resolve => setTimeout(resolve, 0))
 
     expect(createShareCardDataUrlMock).toHaveBeenCalled()
+    expect(createShareCardDataUrlMock).toHaveBeenCalledWith(expect.objectContaining({
+      brandName: '方音图鉴',
+      qrHint: '扫码打开当前页面',
+    }))
     expect(HTMLAnchorElement.prototype.click).toHaveBeenCalled()
     expect(showSuccessMock).toHaveBeenCalledWith('layoutFooter.share.imageReady')
     expect(showErrorMock).not.toHaveBeenCalled()
