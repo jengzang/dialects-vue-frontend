@@ -35,7 +35,10 @@ export const menuRoutes = [
   },
   {
     path: 'menu/about/:section(intro|suggestion|like)',
-    component: AboutPage
+    component: AboutPage,
+    meta: {
+      queryAllowlist: ['category', 'from']
+    }
   },
   {
     path: 'menu/query',

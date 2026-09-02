@@ -353,7 +353,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import i18n from '@/i18n/index.js'
@@ -487,6 +487,17 @@ const currentTab = computed(() => {
   }
 
   return 'intro'
+})
+
+onMounted(() => {
+  if (route.query.from === 'vocabulary_import') {
+    nextTick(() => {
+      document.querySelector('[data-about-suggestion-form]')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    })
+  }
 })
 
 const tabs = computed(() => [
