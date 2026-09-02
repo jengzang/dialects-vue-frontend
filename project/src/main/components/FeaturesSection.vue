@@ -96,10 +96,54 @@ const groups = [
     titleKey: 'home.features.query.title',
     descKey: 'home.features.query.desc',
     items: [
-      { icon: '📝', labelKey: 'home.features.query.searchChar', route: '/menu/query/char' },
-      { icon: '📜', labelKey: 'home.features.query.searchMiddle', route: '/menu/query/zhonggu' },
-      { icon: '🗣️', labelKey: 'home.features.query.searchPhoneme', route: '/menu/query/yinwei' },
-      { icon: '🎶', labelKey: 'home.features.query.searchTone', route: '/menu/query/tone' },
+      {
+        icon: '📝',
+        labelKey: 'home.features.query.searchChar',
+        route: '/menu/query/char',
+        search: {
+          keywords: ['汉字', '字典', '查音', '读音', 'character'],
+          i18nKeys: [
+            'layoutFooter.pages.menuQueryChar.description',
+            'navigation.pageTitles.query.tab1',
+          ],
+        },
+      },
+      {
+        icon: '📜',
+        labelKey: 'home.features.query.searchMiddle',
+        route: '/menu/query/zhonggu',
+        search: {
+          keywords: ['中古音', '广韵', '韵书', '声韵调', 'Middle Chinese'],
+          i18nKeys: [
+            'layoutFooter.pages.menuQueryZhonggu.description',
+            'navigation.pageTitles.query.tab2',
+          ],
+        },
+      },
+      {
+        icon: '🗣️',
+        labelKey: 'home.features.query.searchPhoneme',
+        route: '/menu/query/yinwei',
+        search: {
+          keywords: ['音位', '韵书来源', 'phoneme'],
+          i18nKeys: [
+            'layoutFooter.pages.menuQueryYinwei.description',
+            'navigation.pageTitles.query.tab3',
+          ],
+        },
+      },
+      {
+        icon: '🎶',
+        labelKey: 'home.features.query.searchTone',
+        route: '/menu/query/tone',
+        search: {
+          keywords: ['声调', '调值', '调类', '四声', 'tone'],
+          i18nKeys: [
+            'layoutFooter.pages.menuQueryTone.description',
+            'navigation.pageTitles.query.tab4',
+          ],
+        },
+      },
     ],
   },
   {
@@ -108,10 +152,54 @@ const groups = [
     titleKey: 'home.features.compare.title',
     descKey: 'home.features.compare.desc',
     items: [
-      { icon: '📊', labelKey: 'home.features.compare.compareChar', route: '/menu/compare/char' },
-      { icon: '🎯', labelKey: 'home.features.compare.compareMiddle', route: '/menu/compare/zhonggu' },
-      { icon: '🎹', labelKey: 'home.features.compare.compareTone', route: '/menu/compare/tone' },
-      { icon: '⚖️', labelKey: 'home.features.compare.comparePhonetic', route: '/menu/compare/phonetic' },
+      {
+        icon: '📊',
+        labelKey: 'home.features.compare.compareChar',
+        route: '/menu/compare/char',
+        search: {
+          keywords: ['字音', '异读', '读音差异', 'compare'],
+          i18nKeys: [
+            'layoutFooter.pages.menuCompareChar.description',
+            'navigation.pageTitles.compare.tab1',
+          ],
+        },
+      },
+      {
+        icon: '🎯',
+        labelKey: 'home.features.compare.compareMiddle',
+        route: '/menu/compare/zhonggu',
+        search: {
+          keywords: ['中古', '韵书', '演变', '音变', 'comparison'],
+          i18nKeys: [
+            'layoutFooter.pages.menuCompareZhonggu.description',
+            'navigation.pageTitles.compare.tab2',
+          ],
+        },
+      },
+      {
+        icon: '🎹',
+        labelKey: 'home.features.compare.compareTone',
+        route: '/menu/compare/tone',
+        search: {
+          keywords: ['调类', '合流', '分立', '声调', 'tone'],
+          i18nKeys: [
+            'layoutFooter.pages.menuCompareTone.description',
+            'navigation.pageTitles.compare.tab4',
+          ],
+        },
+      },
+      {
+        icon: '⚖️',
+        labelKey: 'home.features.compare.comparePhonetic',
+        route: '/menu/compare/phonetic',
+        search: {
+          keywords: ['音值', '对应关系', '音系', '桑基图', 'phonetic'],
+          i18nKeys: [
+            'layoutFooter.pages.menuComparePhonetic.description',
+            'navigation.pageTitles.compare.tab5',
+          ],
+        },
+      },
     ],
   },
   {
@@ -120,10 +208,54 @@ const groups = [
     titleKey: 'home.features.map.title',
     descKey: 'home.features.map.desc',
     items: [
-      { icon: '📍', labelKey: 'home.features.map.dialectMap', route: '/menu/map/view' },
-      { icon: '🧭', labelKey: 'home.features.map.regionMap', route: '/menu/map/divide' },
-      { icon: '📁', labelKey: 'home.features.map.customMap', route: '/menu/map/custom' },
-      { icon: '✏️', labelKey: 'home.features.map.drawMap', route: '/explore/gis' },
+      {
+        icon: '📍',
+        labelKey: 'home.features.map.dialectMap',
+        route: '/menu/map/view',
+        search: {
+          keywords: ['地图', '方言地图', 'map'],
+          i18nKeys: [
+            'layoutFooter.pages.menuMapView.description',
+            'navigation.pageTitles.map.view',
+          ],
+        },
+      },
+      {
+        icon: '🧭',
+        labelKey: 'home.features.map.regionMap',
+        route: '/menu/map/divide',
+        search: {
+          keywords: ['分区', '方言区', '分区着色', 'region', '等值线'],
+          i18nKeys: [
+            'layoutFooter.pages.menuMapDivide.description',
+            'navigation.pageTitles.map.divide',
+          ],
+        },
+      },
+      {
+        icon: '📁',
+        labelKey: 'home.features.map.customMap',
+        route: '/menu/map/custom',
+        search: {
+          keywords: ['自定义', '个人数据', '上传', 'custom'],
+          i18nKeys: [
+            'layoutFooter.pages.menuMapCustom.description',
+            'navigation.pageTitles.map.custom',
+          ],
+        },
+      },
+      {
+        icon: '✏️',
+        labelKey: 'home.features.map.drawMap',
+        route: '/explore/gis',
+        search: {
+          keywords: ['GIS', '泰森多边形', '绘制', '地理要素', 'draw', 'voronoi'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreGis.description',
+            'navigation.pageTitles.gis.main',
+          ],
+        },
+      },
     ],
   },
   {
@@ -132,10 +264,54 @@ const groups = [
     titleKey: 'home.features.phonology.title',
     descKey: 'home.features.phonology.desc',
     items: [
-      { icon: '⚗️', labelKey: 'home.features.phonology.phonologyQuery', route: '/menu/pho/matrix' },
-      { icon: '🔬', labelKey: 'home.features.phonology.phonemeClassify', route: '/menu/pho/custom' },
-      { icon: '🥧', labelKey: 'home.features.phonology.evolution', route: '/menu/pho/evolution' },
-      { icon: '📊', labelKey: 'home.features.phonology.syllableCount', route: '/menu/pho/count' },
+      {
+        icon: '⚗️',
+        labelKey: 'home.features.phonology.phonologyQuery',
+        route: '/menu/pho/matrix',
+        search: {
+          keywords: ['音系', '同音字汇', '声韵调拼合', '音节表', 'phonology'],
+          i18nKeys: [
+            'layoutFooter.pages.menuPhoMatrix.description',
+            'navigation.pageTitles.pho.matrix',
+          ],
+        },
+      },
+      {
+        icon: '🔬',
+        labelKey: 'home.features.phonology.phonemeClassify',
+        route: '/menu/pho/custom',
+        search: {
+          keywords: ['音素', '分类', '地位分类', '声韵调', 'classify'],
+          i18nKeys: [
+            'layoutFooter.pages.menuPhoCustom.description',
+            'navigation.pageTitles.pho.custom',
+          ],
+        },
+      },
+      {
+        icon: '🥧',
+        labelKey: 'home.features.phonology.evolution',
+        route: '/menu/pho/evolution',
+        search: {
+          keywords: ['演化', '历史音变', '饼图', '桑基图', 'evolution'],
+          i18nKeys: [
+            'layoutFooter.pages.menuPhoEvolution.description',
+            'navigation.pageTitles.pho.evolution',
+          ],
+        },
+      },
+      {
+        icon: '📊',
+        labelKey: 'home.features.phonology.syllableCount',
+        route: '/menu/pho/count',
+        search: {
+          keywords: ['音节', '统计', '音节数', '等值线', 'syllable'],
+          i18nKeys: [
+            'layoutFooter.pages.menuPhoCount.description',
+            'navigation.pageTitles.pho.count',
+          ],
+        },
+      },
     ],
   },
   {
@@ -144,10 +320,54 @@ const groups = [
     titleKey: 'home.features.charClass.title',
     descKey: 'home.features.charClass.desc',
     items: [
-      { icon: '🏛️', labelKey: 'home.features.charClass.zhonggu', route: '/explore/char-class?tab=zhonggu' },
-      { icon: '📿', labelKey: 'home.features.charClass.shanggu', route: '/explore/char-class?tab=shanggu' },
-      { icon: '📖', labelKey: 'home.features.charClass.jingu', route: '/explore/char-class?tab=jingu' },
-      { icon: '🎵', labelKey: 'home.features.charClass.yueyun', route: '/explore/char-class?tab=yueyun' },
+      {
+        icon: '🏛️',
+        labelKey: 'home.features.charClass.zhonggu',
+        route: '/explore/char-class?tab=zhonggu',
+        search: {
+          keywords: ['中古', '广韵', '切韵', 'Middle Chinese'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreCharClass.description',
+            'navigation.pageTitles.charClass.zhonggu',
+          ],
+        },
+      },
+      {
+        icon: '📿',
+        labelKey: 'home.features.charClass.shanggu',
+        route: '/explore/char-class?tab=shanggu',
+        search: {
+          keywords: ['上古', '诗经', '谐声', '上古音', 'Old Chinese'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreCharClass.description',
+            'navigation.pageTitles.charClass.shanggu',
+          ],
+        },
+      },
+      {
+        icon: '📖',
+        labelKey: 'home.features.charClass.jingu',
+        route: '/explore/char-class?tab=jingu',
+        search: {
+          keywords: ['近古', '中原音韵', '洪武正韵', '近代音', 'Early Mandarin'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreCharClass.description',
+            'navigation.pageTitles.charClass.jingu',
+          ],
+        },
+      },
+      {
+        icon: '🎵',
+        labelKey: 'home.features.charClass.yueyun',
+        route: '/explore/char-class?tab=yueyun',
+        search: {
+          keywords: ['粤语', '分韵撮要', '韵书', '粤音', 'Cantonese'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreCharClass.description',
+            'navigation.pageTitles.charClass.yueyun',
+          ],
+        },
+      },
     ],
   },
   {
@@ -156,10 +376,54 @@ const groups = [
     titleKey: 'home.features.words.title',
     descKey: 'home.features.words.desc',
     items: [
-      { icon: '📋', labelKey: 'home.features.words.wordList', route: '/menu/vocabulary' },
-      { icon: '📖', labelKey: 'home.features.words.yubaoVocab', route: '/menu/yubao?tab=vocabulary' },
-      { icon: '🗣️', labelKey: 'home.features.words.yubaoGrammar', route: '/menu/yubao?tab=grammar' },
-      { icon: '💬', labelKey: 'home.features.words.ycSpoken', route: '/explore/yc/words' },
+      {
+        icon: '📋',
+        labelKey: 'home.features.words.wordList',
+        route: '/menu/vocabulary',
+        search: {
+          keywords: ['词表', '词汇', '方言词', '词语', 'vocabulary'],
+          i18nKeys: [
+            'layoutFooter.pages.menuVocabularyView.description',
+            'navigation.pageTitles.vocabulary.view',
+          ],
+        },
+      },
+      {
+        icon: '📖',
+        labelKey: 'home.features.words.yubaoVocab',
+        route: '/menu/yubao?tab=vocabulary',
+        search: {
+          keywords: ['语保', '1000','一千', '词汇', '方言词', 'vocabulary'],
+          i18nKeys: [
+            'layoutFooter.pages.menuYubao.description',
+            'navigation.pageTitles.yubao.vocabulary',
+          ],
+        },
+      },
+      {
+        icon: '🗣️',
+        labelKey: 'home.features.words.yubaoGrammar',
+        route: '/menu/yubao?tab=grammar',
+        search: {
+          keywords: ['语保', '语法', '例句', '50','五十', 'grammar'],
+          i18nKeys: [
+            'layoutFooter.pages.menuYubao.description',
+            'navigation.pageTitles.yubao.grammar',
+          ],
+        },
+      },
+      {
+        icon: '💬',
+        labelKey: 'home.features.words.ycSpoken',
+        route: '/explore/yc/words',
+        search: {
+          keywords: ['阳春', '口语', '词汇', '方言词', 'Yangchun'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreYcWords.description',
+            'navigation.pageTitles.words.yangChunSpoken',
+          ],
+        },
+      },
     ],
   },
   {
@@ -168,10 +432,54 @@ const groups = [
     titleKey: 'home.features.villages.title',
     descKey: 'home.features.villages.desc',
     items: [
-      { icon: '📍', labelKey: 'home.features.villages.toponyms', route: '/explore/villages/toponyms' },
-      { icon: '🤖', labelKey: 'home.features.villages.villagesML', route: '/explore/villages/ml' },
-      { icon: '🏘️', labelKey: 'home.features.villages.gdVillages', route: '/explore/villages/gd' },
-      { icon: '🌾', labelKey: 'home.features.villages.ycVillages', route: '/explore/yc/villages' },
+      {
+        icon: '📍',
+        labelKey: 'home.features.villages.toponyms',
+        route: '/explore/villages/toponyms',
+        search: {
+          keywords: ['地名', '自然村', '分布', '地名检索', 'toponym'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreVillagesToponyms.description',
+            'navigation.pageTitles.villages.toponyms',
+          ],
+        },
+      },
+      {
+        icon: '🤖',
+        labelKey: 'home.features.villages.villagesML',
+        route: '/explore/villages/ml',
+        search: {
+          keywords: ['机器学习', '村名', '聚类', '分析', 'machine learning'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreVillagesMl.description',
+            'layoutFooter.pages.exploreVillagesMl.title',
+          ],
+        },
+      },
+      {
+        icon: '🏘️',
+        labelKey: 'home.features.villages.gdVillages',
+        route: '/explore/villages/gd',
+        search: {
+          keywords: ['广东', '自然村', '树状图', '行政区划', 'Guangdong'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreVillagesGd.description',
+            'navigation.pageTitles.villages.gdTree',
+          ],
+        },
+      },
+      {
+        icon: '🌾',
+        labelKey: 'home.features.villages.ycVillages',
+        route: '/explore/yc/villages',
+        search: {
+          keywords: ['阳春', '自然村', '村落', '分布', 'Yangchun'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreYcVillages.description',
+            'navigation.pageTitles.villages.yangChun',
+          ],
+        },
+      },
     ],
   },
   {
@@ -180,9 +488,42 @@ const groups = [
     titleKey: 'home.features.tools.title',
     descKey: 'home.features.tools.desc',
     items: [
-      { icon: '📋', labelKey: 'home.features.tools.tableProcess', route: '/explore/tools/check' },
-      { icon: '🔤', labelKey: 'home.features.tools.jyut2ipa', route: '/explore/tools/jyut2ipa' },
-      { icon: '🔗', labelKey: 'home.features.tools.tableMerge', route: '/explore/tools/merge' },
+      {
+        icon: '📋',
+        labelKey: 'home.features.tools.tableProcess',
+        route: '/explore/tools/check',
+        search: {
+          keywords: ['字表', '检查', '格式', '校验', 'check'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreCheck.description',
+            'navigation.pageTitles.tools.check',
+          ],
+        },
+      },
+      {
+        icon: '🔤',
+        labelKey: 'home.features.tools.jyut2ipa',
+        route: '/explore/tools/jyut2ipa',
+        search: {
+          keywords: ['粤拼', 'IPA', '国际音标', '拼音', 'Jyutping'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreJyut2Ipa.description',
+            'navigation.pageTitles.tools.jyut2ipa',
+          ],
+        },
+      },
+      {
+        icon: '🔗',
+        labelKey: 'home.features.tools.tableMerge',
+        route: '/explore/tools/merge',
+        search: {
+          keywords: ['字表', '合并', '对齐', '参考表', 'merge'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreMerge.description',
+            'navigation.pageTitles.tools.merge',
+          ],
+        },
+      },
     ],
   },
   {
@@ -191,7 +532,19 @@ const groups = [
     titleKey: 'home.features.praat.title',
     descKey: null,
     items: [
-      { icon: '🎙️', titleKey: 'home.features.praat.title', descKey: 'home.features.praat.desc', route: '/explore/tools/praat' },
+      {
+        icon: '🎙️',
+        titleKey: 'home.features.praat.title',
+        descKey: 'home.features.praat.desc',
+        route: '/explore/tools/praat',
+        search: {
+          keywords: ['Praat', '声学', '基频', '共振峰', '声调图'],
+          i18nKeys: [
+            'layoutFooter.pages.explorePraat.description',
+            'navigation.pageTitles.praat.main',
+          ],
+        },
+      },
     ],
   },
   {
@@ -200,11 +553,66 @@ const groups = [
     titleKey: 'home.features.about.title',
     descKey: 'home.features.about.desc',
     items: [
-      { icon: 'ℹ️', labelKey: 'home.features.about.intro', route: '/menu/about/intro' },
-      { icon: '💬', labelKey: 'home.features.about.suggestion', route: '/menu/about/suggestion' },
-      { icon: '❤️', labelKey: 'home.features.about.likeAuthor', route: '/menu/about/like' },
-      { icon: '⚙️', labelKey: 'home.features.about.setting', route: '/menu/settings' },
-      { icon: '🔗', labelKey: 'home.features.about.source', route: '/menu/source' },
+      {
+        icon: 'ℹ️',
+        labelKey: 'home.features.about.intro',
+        route: '/menu/about/intro',
+        search: {
+          keywords: ['关于', '介绍', '简介', '网站', 'about'],
+          i18nKeys: [
+            'layoutFooter.pages.menuAboutIntro.description',
+            'navigation.pageTitles.support.aboutIntro',
+          ],
+        },
+      },
+      {
+        icon: '💬',
+        labelKey: 'home.features.about.suggestion',
+        route: '/menu/about/suggestion',
+        search: {
+          keywords: ['建议', '反馈', 'issue', '知乎', 'feedback'],
+          i18nKeys: [
+            'layoutFooter.pages.menuAboutSuggestion.description',
+            'navigation.pageTitles.support.aboutSuggestion',
+          ],
+        },
+      },
+      {
+        icon: '❤️',
+        labelKey: 'home.features.about.likeAuthor',
+        route: '/menu/about/like',
+        search: {
+          keywords: ['支持', '作者', '打赏', '关注', 'support'],
+          i18nKeys: [
+            'layoutFooter.pages.menuAboutLike.description',
+            'navigation.pageTitles.support.aboutLike',
+          ],
+        },
+      },
+      {
+        icon: '⚙️',
+        labelKey: 'home.features.about.setting',
+        route: '/menu/settings',
+        search: {
+          keywords: ['设置', '语言', '主题', '教程', 'settings'],
+          i18nKeys: [
+            'layoutFooter.pages.menuSettings.description',
+            'navigation.pageTitles.support.settings',
+          ],
+        },
+      },
+      {
+        icon: '🔗',
+        labelKey: 'home.features.about.source',
+        route: '/menu/source',
+        search: {
+          keywords: ['资料', '来源', '参考文献', '字表来源', 'source'],
+          i18nKeys: [
+            'layoutFooter.pages.menuSource.description',
+            'navigation.pageTitles.support.source',
+          ],
+        },
+      },
     ],
   },
 ]
@@ -232,11 +640,46 @@ function resolveItem(item, targetLocale) {
 }
 
 function resolveItemSearchText(item) {
-  return SEARCH_LOCALES
-    .flatMap((targetLocale) => {
-      const resolved = resolveItem(item, targetLocale)
-      return [resolved.title, resolved.desc]
+
+  // 1. 原本的多语言标题和描述
+  const translatedTexts =
+    SEARCH_LOCALES.flatMap((targetLocale) => {
+      const resolved = resolveItem(
+        item,
+        targetLocale
+      )
+
+      return [
+        resolved.title,
+        resolved.desc
+      ]
     })
+
+
+  // 2. 手写关键词
+  const customKeywords =
+    item.search?.keywords || []
+
+
+  // 3. i18n关键词
+  const translatedKeywords =
+    SEARCH_LOCALES.flatMap((targetLocale) => {
+      return (
+        item.search?.i18nKeys || []
+      ).map((key) =>
+        translateForLocale(
+          key,
+          targetLocale
+        )
+      )
+    })
+
+
+  return [
+    ...translatedTexts,
+    ...customKeywords,
+    ...translatedKeywords
+  ]
     .join(' ')
     .toLowerCase()
 }
