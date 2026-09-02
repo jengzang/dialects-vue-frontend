@@ -219,6 +219,39 @@ function downloadDataUrl(dataUrl, filename) {
   link.click()
 }
 
+function dataUrlToFile(dataUrl, filename) {
+  const [header = '', payload = ''] = dataUrl.split(',')
+  const mime = header.match(/^data:([^;]+)/)?.[1] || 'image/png'
+  const binary = atob(payload)
+  const bytes = new Uint8Array(binary.length)
+
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index)
+  }
+
+  return new File([bytes], filename, { type: mime })
+}
+
+async function shareImageFile({ title, text, url, dataUrl, filename }) {
+  if (!navigator.share || !navigator.canShare) {
+    return false
+  }
+
+  const imageFile = dataUrlToFile(dataUrl, filename)
+  const shareData = {
+    title,
+    text: `${text}\n${url}`,
+    files: [imageFile],
+  }
+
+  if (!navigator.canShare(shareData)) {
+    return false
+  }
+
+  await navigator.share(shareData)
+  return true
+}
+
 async function copyShareUrl(url) {
   if (navigator.clipboard?.writeText) {
     await navigator.clipboard.writeText(url)
@@ -231,11 +264,7 @@ async function shareCurrentPage() {
   const text = t(context.value.pageDescriptionKey)
 
   try {
-    if (navigator.share) {
-      await navigator.share({ title, text, url })
-      return
-    }
-
+    const filename = 'dialects-share.png'
     const dataUrl = createShareCardDataUrl({
       title,
       description: text,
@@ -247,7 +276,11 @@ async function shareCurrentPage() {
       qrHint: t('layoutFooter.share.qrHint'),
     })
 
-    downloadDataUrl(dataUrl, 'dialects-share.png')
+    if (await shareImageFile({ title, text, url, dataUrl, filename })) {
+      return
+    }
+
+    downloadDataUrl(dataUrl, filename)
     try {
       await copyShareUrl(url)
       showSuccess(t('layoutFooter.share.copied'))

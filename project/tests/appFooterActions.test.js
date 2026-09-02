@@ -168,6 +168,10 @@ describe('AppFooter actions', () => {
       value: undefined,
       configurable: true,
     })
+    Object.defineProperty(navigator, 'canShare', {
+      value: undefined,
+      configurable: true,
+    })
     Object.defineProperty(navigator, 'clipboard', {
       value: { writeText: clipboardWriteTextMock },
       configurable: true,
@@ -225,6 +229,48 @@ describe('AppFooter actions', () => {
     expect(HTMLAnchorElement.prototype.click).toHaveBeenCalled()
     expect(showSuccessMock).toHaveBeenCalledWith('layoutFooter.share.imageReady')
     expect(showErrorMock).not.toHaveBeenCalled()
+
+    wrapper.unmount()
+  })
+
+  it('shares the generated image file when native file sharing is available', async () => {
+    const nativeShareMock = vi.fn().mockResolvedValue(undefined)
+    const canShareMock = vi.fn().mockReturnValue(true)
+    Object.defineProperty(navigator, 'share', {
+      value: nativeShareMock,
+      configurable: true,
+    })
+    Object.defineProperty(navigator, 'canShare', {
+      value: canShareMock,
+      configurable: true,
+    })
+
+    const { default: AppFooter } = await import('../src/components/footer/AppFooter.vue')
+    const wrapper = mountFooter(AppFooter)
+    await nextTick()
+
+    const shareButton = [...wrapper.host.querySelectorAll('.footer-action')]
+      .find(button => button.textContent.trim() === 'layoutFooter.actions.share')
+
+    shareButton.click()
+    await nextTick()
+    await new Promise(resolve => setTimeout(resolve, 0))
+
+    expect(createShareCardDataUrlMock).toHaveBeenCalled()
+    expect(canShareMock).toHaveBeenCalledWith(expect.objectContaining({
+      files: expect.any(Array),
+    }))
+    expect(nativeShareMock).toHaveBeenCalledWith(expect.objectContaining({
+      title: '查中古',
+      files: expect.any(Array),
+    }))
+    const [shareData] = nativeShareMock.mock.calls[0]
+    expect(shareData.text).toContain('按中古地位整理各方言点读音。')
+    expect(shareData.text).toContain(window.location.href)
+    expect(shareData.files[0].name).toBe('dialects-share.png')
+    expect(shareData.files[0].type).toBe('image/png')
+    expect(HTMLAnchorElement.prototype.click).not.toHaveBeenCalled()
+    expect(clipboardWriteTextMock).not.toHaveBeenCalled()
 
     wrapper.unmount()
   })
