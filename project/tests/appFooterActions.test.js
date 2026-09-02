@@ -358,5 +358,7 @@ describe('AppFooter actions', () => {
     expect(source).not.toContain('grid-template-columns:')
     expect(source).toContain('v-if="isMenuOpen"')
     expect(source).toContain('v-if="isSupportOpen"')
+    expect(source).toContain(':deep(.feature-tile)')
+    expect(source).toContain('flex: 1 1 100px;')
   })
 })

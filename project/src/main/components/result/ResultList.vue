@@ -573,10 +573,9 @@ $transition-duration: 0.2s;
 }
 
 .Panel {
-  position: fixed;
-  right: 2dvw;
-  bottom: 1dvh;
-  left: 2dvw;
+  position: relative;
+  width: calc(100% - 4dvw);
+  margin: 0 2dvw 1dvh;
   z-index: 1;
   @include flex-col;
   height: 85dvh;
@@ -590,9 +589,8 @@ $transition-duration: 0.2s;
     border-color 0.3s ease;
 
   @media (orientation: portrait) {
-    right: 1dvw;
-    bottom: 2dvh;
-    left: 1dvw;
+    width: calc(100% - 2dvw);
+    margin: 0 1dvw 2dvh;
     height: 74dvh;
   }
 }
