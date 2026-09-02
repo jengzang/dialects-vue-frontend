@@ -265,8 +265,8 @@ describe('AppFooter actions', () => {
       files: expect.any(Array),
     }))
     const [shareData] = nativeShareMock.mock.calls[0]
-    expect(shareData.text).toContain('按中古地位整理各方言点读音。')
-    expect(shareData.text).toContain(window.location.href)
+    expect(shareData.text).toBe('按中古地位整理各方言点读音。')
+    expect(shareData.text).not.toContain(window.location.href)
     expect(shareData.files[0].name).toBe('dialects-share.png')
     expect(shareData.files[0].type).toBe('image/png')
     expect(HTMLAnchorElement.prototype.click).not.toHaveBeenCalled()

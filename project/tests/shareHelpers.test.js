@@ -149,13 +149,14 @@ describe('share card helper', () => {
     })
 
     const { createShareCardDataUrl } = await import('../src/utils/share/shareCard.js')
-    const result = createShareCardDataUrl({
+    const result = await createShareCardDataUrl({
       title: '查中古',
       description: '按中古地位整理各方言点读音。',
       url: 'https://dialects.yzup.top/menu/query/zhonggu',
       languageLabel: '简体',
       themeLabel: '绿色',
       colorTheme: 'green',
+      loadImage: () => Promise.resolve(null),
     })
 
     expect(result).toBe('data:image/png;base64,card')
@@ -188,7 +189,7 @@ describe('share card helper', () => {
     })
 
     const { createShareCardDataUrl } = await import('../src/utils/share/shareCard.js')
-    createShareCardDataUrl({
+    await createShareCardDataUrl({
       title: 'Middle Chinese Query',
       description: 'Organize dialect readings by Middle Chinese categories.',
       url: 'https://dialects.yzup.top/en/menu/query/zhonggu',
@@ -197,6 +198,7 @@ describe('share card helper', () => {
       colorTheme: 'green',
       brandName: 'Chinese Dialect Atlas',
       qrHint: 'Scan to open this page',
+      loadImage: () => Promise.resolve(null),
     })
 
     const drawnTexts = calls
@@ -207,6 +209,53 @@ describe('share card helper', () => {
     expect(drawnTexts).toContain('Chinese Dialect Atlas')
     expect(drawnTexts).toContain('Scan to open this page')
     expect(qrBlocks.length).toBeGreaterThan(80)
+  })
+
+  it('draws brand title and themed logo images when they load', async () => {
+    const calls = []
+    const context = {
+      fillStyle: '',
+      font: '',
+      textAlign: '',
+      drawImage: (...args) => calls.push(['drawImage', ...args]),
+      fillRect: (...args) => calls.push(['fillRect', ...args]),
+      fillText: (...args) => calls.push(['fillText', ...args]),
+      measureText: (text) => ({ width: text.length * 12 }),
+    }
+    const canvas = {
+      width: 0,
+      height: 0,
+      getContext: () => context,
+      toDataURL: vi.fn().mockReturnValue('data:image/png;base64,card'),
+    }
+    const createElement = document.createElement.bind(document)
+    vi.spyOn(document, 'createElement').mockImplementation((tagName) => {
+      if (tagName === 'canvas') return canvas
+      return createElement(tagName)
+    })
+    const loadImage = vi.fn(src => Promise.resolve({
+      src,
+      width: src.includes('title') ? 6391 : 900,
+      height: src.includes('title') ? 2335 : 900,
+    }))
+
+    const { createShareCardDataUrl } = await import('../src/utils/share/shareCard.js')
+    await createShareCardDataUrl({
+      title: '查中古',
+      description: '按中古地位整理各方言点读音。',
+      url: 'https://dialects.yzup.top/menu/query/zhonggu',
+      languageLabel: '简体',
+      themeLabel: '绿色',
+      colorTheme: 'green',
+      brandName: '方音图鉴',
+      qrHint: '扫码打开当前页面',
+      loadImage,
+    })
+
+    expect(loadImage).toHaveBeenCalledWith('/brand/title.webp')
+    expect(loadImage).toHaveBeenCalledWith('/brand/GreenCircle.webp')
+    expect(calls.some(call => call[0] === 'drawImage' && call[1].src === '/brand/title.webp')).toBe(true)
+    expect(calls.some(call => call[0] === 'drawImage' && call[1].src === '/brand/GreenCircle.webp')).toBe(true)
   })
 
   it('truncates oversized share-card title and URL before drawing', async () => {
@@ -234,13 +283,14 @@ describe('share card helper', () => {
     const longUrl = `https://dialects.yzup.top/${'very-long-path/'.repeat(40)}`
 
     const { createShareCardDataUrl } = await import('../src/utils/share/shareCard.js')
-    createShareCardDataUrl({
+    await createShareCardDataUrl({
       title: longTitle,
       description: '按中古地位整理各方言点读音。',
       url: longUrl,
       languageLabel: '简体',
       themeLabel: '绿色',
       colorTheme: 'green',
+      loadImage: () => Promise.resolve(null),
     })
 
     const drawnTexts = calls

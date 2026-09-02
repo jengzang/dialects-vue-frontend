@@ -7,6 +7,15 @@ const THEME_COLOR_TOKENS = {
   dark: '--text-deep',
 }
 
+const BRAND_TITLE_SRC = '/brand/title.webp'
+
+const BRAND_LOGO_SRCS = {
+  green: '/brand/GreenCircle.webp',
+  blue: '/brand/BlueCircle.webp',
+  light: '/brand/BlueCircle.webp',
+  dark: '/brand/BlueCircle.webp',
+}
+
 function readCssToken(tokenName, fallback) {
   if (typeof window === 'undefined') {
     return fallback
@@ -53,6 +62,35 @@ function fitText(ctx, text, maxWidth) {
   return `${current}${suffix}`
 }
 
+function loadCanvasImage(src) {
+  if (typeof Image === 'undefined') {
+    return Promise.resolve(null)
+  }
+
+  return new Promise((resolve) => {
+    const image = new Image()
+    image.onload = () => resolve(image)
+    image.onerror = () => resolve(null)
+    image.src = src
+  })
+}
+
+function drawContainedImage(ctx, image, x, y, maxWidth, maxHeight) {
+  if (!image) return false
+
+  const ratio = Math.min(maxWidth / image.width, maxHeight / image.height)
+  const width = image.width * ratio
+  const height = image.height * ratio
+  ctx.drawImage(
+    image,
+    x + (maxWidth - width) / 2,
+    y + (maxHeight - height) / 2,
+    width,
+    height,
+  )
+  return true
+}
+
 function drawQrCode(ctx, url, x, y, size, foreground, background) {
   const qr = qrcode(0, 'M')
   qr.addData(url)
@@ -84,7 +122,7 @@ function drawQrCode(ctx, url, x, y, size, foreground, background) {
   }
 }
 
-export function createShareCardDataUrl({
+export async function createShareCardDataUrl({
   title,
   description,
   url,
@@ -93,7 +131,14 @@ export function createShareCardDataUrl({
   colorTheme,
   brandName = '方音图鉴',
   qrHint = '',
+  brandTitleSrc = BRAND_TITLE_SRC,
+  brandLogoSrc = BRAND_LOGO_SRCS[colorTheme] || BRAND_LOGO_SRCS.blue,
+  loadImage = loadCanvasImage,
 }) {
+  const [brandTitleImage, brandLogoImage] = await Promise.all([
+    loadImage(brandTitleSrc),
+    loadImage(brandLogoSrc),
+  ])
   const canvas = document.createElement('canvas')
   canvas.width = 1200
   canvas.height = 630
@@ -119,17 +164,21 @@ export function createShareCardDataUrl({
   ctx.fillRect(0, 0, canvas.width, 18)
   ctx.fillRect(0, canvas.height - 12, canvas.width, 12)
 
-  ctx.fillStyle = accent
-  ctx.fillRect(80, 76, 58, 58)
-  ctx.fillStyle = panel
-  ctx.font = '600 32px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-  ctx.textAlign = 'center'
-  ctx.fillText(Array.from(brandName)[0] || '方', 109, 115)
-  ctx.textAlign = 'left'
+  if (!drawContainedImage(ctx, brandLogoImage, 80, 72, 66, 66)) {
+    ctx.fillStyle = accent
+    ctx.fillRect(80, 76, 58, 58)
+    ctx.fillStyle = panel
+    ctx.font = '600 32px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+    ctx.textAlign = 'center'
+    ctx.fillText(Array.from(brandName)[0] || '方', 109, 115)
+    ctx.textAlign = 'left'
+  }
 
-  ctx.fillStyle = textSlate
-  ctx.font = '500 28px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-  ctx.fillText(fitText(ctx, brandName, 560), 154, 113)
+  if (!drawContainedImage(ctx, brandTitleImage, 158, 82, 170, 62)) {
+    ctx.fillStyle = textSlate
+    ctx.font = '500 28px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+    ctx.fillText(fitText(ctx, brandName, 560), 154, 113)
+  }
 
   ctx.fillStyle = textDeep
   ctx.font = '500 54px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'

@@ -240,7 +240,7 @@ async function shareImageFile({ title, text, url, dataUrl, filename }) {
   const imageFile = dataUrlToFile(dataUrl, filename)
   const shareData = {
     title,
-    text: `${text}\n${url}`,
+    text,
     files: [imageFile],
   }
 
@@ -265,7 +265,7 @@ async function shareCurrentPage() {
 
   try {
     const filename = 'dialects-share.png'
-    const dataUrl = createShareCardDataUrl({
+    const dataUrl = await createShareCardDataUrl({
       title,
       description: text,
       url,
