@@ -7,20 +7,26 @@
       ref="globeHostRef"
       class="globegl-canvas-host"
     />
-    <div
-      v-if="shouldUseGlobeJoystick"
-      ref="joystickRef"
-      class="globe-joystick"
-      role="application"
-      aria-label="地球旋转摇杆"
-      :style="joystickThumbStyle"
-      @pointerdown="handleJoystickPointerDown"
-      @pointermove="handleJoystickPointerMove"
-      @pointerup="handleJoystickPointerUp"
-      @pointercancel="handleJoystickPointerCancel"
-    >
-      <div class="globe-joystick__thumb" />
-    </div>
+    <template v-if="shouldUseGlobeJoystick">
+      <Teleport
+        v-if="joystickMountTarget"
+        :to="joystickMountTarget"
+      >
+        <div
+          ref="joystickRef"
+          class="globe-joystick"
+          role="application"
+          aria-label="地球旋转摇杆"
+          :style="joystickThumbStyle"
+          @pointerdown="handleJoystickPointerDown"
+          @pointermove="handleJoystickPointerMove"
+          @pointerup="handleJoystickPointerUp"
+          @pointercancel="handleJoystickPointerCancel"
+        >
+          <div class="globe-joystick__thumb" />
+        </div>
+      </Teleport>
+    </template>
   </div>
 </template>
 
@@ -38,6 +44,7 @@ const props = defineProps({
 const containerRef = ref(null)
 const globeHostRef = ref(null)
 const joystickRef = ref(null)
+const joystickMountTarget = ref(null)
 const isPortrait = ref(false)
 const hasFinePointer = ref(false)
 const hasHover = ref(false)
@@ -65,6 +72,7 @@ const GLOBE_JOYSTICK_MAX_RADIUS = 42
 const GLOBE_JOYSTICK_DEAD_ZONE = 5
 const GLOBE_JOYSTICK_ROTATION_SPEED = 55
 const GLOBE_MAX_LATITUDE = 75
+const HOME_GLOBE_JOYSTICK_ANCHOR_ID = 'home-globe-joystick-anchor'
 
 function getCssRgb(varName, fallback) {
   return getComputedStyle(document.documentElement)
@@ -379,6 +387,7 @@ watch([shouldUseGlobeJoystick, hasFinePointer, hasHover], () => {
 })
 
 onMounted(() => {
+  joystickMountTarget.value = document.getElementById(HOME_GLOBE_JOYSTICK_ANCHOR_ID)
   setupInputCapabilityListeners()
   render()
 })
@@ -410,11 +419,9 @@ onBeforeUnmount(() => {
   @include flex-center;
   @include glass-blur(14px, 145%);
 
-  position: absolute;
-  right: max(1rem, env(safe-area-inset-right));
-  bottom: max(1rem, env(safe-area-inset-bottom));
+  position: relative;
   z-index: 2;
-  width: 6.5rem;
+  width: var(--home-globe-joystick-size, 6.5rem);
   aspect-ratio: 1;
   color: var(--color-primary);
   background: var(--surface-glass-floating);

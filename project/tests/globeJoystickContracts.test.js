@@ -148,6 +148,8 @@ describe('globe joystick interaction contracts', () => {
     const containerBlock = selectorBlock(styleSource, '.globegl-container')
     const joystickBlock = selectorBlock(styleSource, '.globe-joystick')
 
+    expect(source).toContain('<Teleport')
+    expect(source).toContain(':to="joystickMountTarget"')
     expect(source).toContain('v-if="shouldUseGlobeJoystick"')
     expect(source).toContain('@pointerdown="handleJoystickPointerDown"')
     expect(source).toContain('@pointermove="handleJoystickPointerMove"')
@@ -158,6 +160,8 @@ describe('globe joystick interaction contracts', () => {
     expect(source).toContain('releasePointerCapture')
     expect(source).toContain('event.preventDefault()')
     expect(containerBlock).not.toContain('touch-action: none')
+    expect(joystickBlock).not.toContain('right:')
+    expect(joystickBlock).not.toContain('bottom:')
     expect(joystickBlock).toContain('touch-action: none')
   })
 
@@ -223,5 +227,28 @@ describe('globe joystick interaction contracts', () => {
     app.unmount()
     root.remove()
     expect(media.getQuery('(any-pointer: fine)').listeners.size).toBe(0)
+  })
+
+  it('mounts the portrait touch joystick in the home hero anchor instead of the canvas container', async () => {
+    createMediaQueryHarness({
+      '(orientation: portrait)': true,
+      '(any-pointer: fine)': false,
+      '(any-hover: hover)': false,
+    })
+    const root = document.createElement('div')
+    const anchor = document.createElement('div')
+    anchor.id = 'home-globe-joystick-anchor'
+    document.body.append(root, anchor)
+    const app = createApp(GlobeGLRenderer, { points: [] })
+
+    app.mount(root)
+    await nextTick()
+
+    expect(anchor.querySelector('.globe-joystick')).not.toBeNull()
+    expect(root.querySelector('.globegl-container > .globe-joystick')).toBeNull()
+
+    app.unmount()
+    root.remove()
+    anchor.remove()
   })
 })

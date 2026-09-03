@@ -28,6 +28,11 @@
         </div>
       </div>
 
+      <div
+        id="home-globe-joystick-anchor"
+        class="globe-joystick-anchor"
+      />
+
       <!-- Showcase Section (lazy mounted) -->
       <section class="showcase-section" ref="showcaseSectionRef">
         <HeroShowcase v-if="showShowcase" />
@@ -831,6 +836,21 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 }
 
 /* Showcase (lazy) */
+.globe-joystick-anchor {
+  @include flex-center;
+
+  position: relative;
+  z-index: 2;
+  align-self: center;
+  width: var(--home-globe-joystick-size, 6.5rem);
+  min-height: var(--home-globe-joystick-size, 6.5rem);
+  margin: 0 auto 2rem;
+
+  &:empty {
+    display: none;
+  }
+}
+
 .showcase-section {
   align-self: stretch;
   box-sizing: border-box;
@@ -1397,6 +1417,10 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
       -webkit-backdrop-filter: blur(24px) saturate(180%);
       border-radius: var(--radius-xl);
       border: 1px solid var(--glass-40);
+    }
+
+    &-content:has(+ .globe-joystick-anchor:not(:empty)) {
+      margin-bottom: 1rem;
     }
 
     &-logo {
