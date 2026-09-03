@@ -68,9 +68,9 @@ let lastJoystickFrameTime = 0
 let projShiftX = -0.3
 let projShiftY = -0.1
 
-const GLOBE_JOYSTICK_MAX_RADIUS = 42
-const GLOBE_JOYSTICK_DEAD_ZONE = 5
-const GLOBE_JOYSTICK_ROTATION_SPEED = 55
+const GLOBE_JOYSTICK_TRAVEL_RATIO = 0.38
+const GLOBE_JOYSTICK_DEAD_ZONE = 3
+const GLOBE_JOYSTICK_ROTATION_SPEED = 30
 const GLOBE_MAX_LATITUDE = 75
 const HOME_GLOBE_JOYSTICK_ANCHOR_ID = 'home-globe-joystick-anchor'
 
@@ -132,6 +132,11 @@ function render() {
   globe.controls().enableZoom = false
   globe.controls().enablePan = true
 
+  // Sync interaction mode before the initial pointOfView: in joystick mode this
+  // disables OrbitControls, so pointOfView must orient via camera.lookAt (the render
+  // loop skips controls.update while disabled, leaving the camera un-oriented otherwise).
+  syncGlobePointerInteraction()
+
   globe.pointOfView({ lat: 24, lng: 110, altitude: 1.5 })
 
   patchCameraProjection()
@@ -146,8 +151,6 @@ function render() {
   if (globe.scene()) {
     globe.scene().background = null
   }
-
-  syncGlobePointerInteraction()
 
   resizeObserver = new ResizeObserver(() => {
     if (containerRef.value && globe) {
@@ -165,15 +168,25 @@ function render() {
 function syncGlobePointerInteraction() {
   if (!globe) return
   const hasMouseLikeInput = hasFinePointer.value || hasHover.value
-  const directPointerInteractionEnabled = !shouldUseGlobeJoystick.value && hasMouseLikeInput
+  const controlsInteractionEnabled = !shouldUseGlobeJoystick.value
+  const directPointerInteractionEnabled = controlsInteractionEnabled && hasMouseLikeInput
   globe.enablePointerInteraction(directPointerInteractionEnabled)
-  syncCanvasTouchAction(directPointerInteractionEnabled)
+  syncOrbitControlsInteraction(controlsInteractionEnabled)
+  syncCanvasTouchAction(controlsInteractionEnabled)
 }
 
-function syncCanvasTouchAction(directPointerInteractionEnabled) {
+function syncOrbitControlsInteraction(controlsInteractionEnabled) {
+  const controls = globe?.controls()
+  if (!controls) return
+  controls.enabled = controlsInteractionEnabled
+  controls.enableRotate = controlsInteractionEnabled
+  controls.enablePan = controlsInteractionEnabled
+}
+
+function syncCanvasTouchAction(controlsInteractionEnabled) {
   const canvas = globeHostRef.value?.querySelector('canvas')
   if (!canvas) return
-  canvas.style.touchAction = directPointerInteractionEnabled ? '' : 'auto'
+  canvas.style.touchAction = controlsInteractionEnabled ? 'none' : 'auto'
 }
 
 function onWheel(e) {
@@ -216,6 +229,22 @@ function onKeyDown(e) {
   // console.log('[Proj shift]', { x: projShiftX.toFixed(3), y: projShiftY.toFixed(3) }, '| pov:', globe.pointOfView())
 }
 
+function getJoystickMaxRadius(rect) {
+  return Math.max(rect.width * GLOBE_JOYSTICK_TRAVEL_RATIO, 1)
+}
+
+function curveJoystickVector(input) {
+  const strength = Math.hypot(input.x, input.y)
+  if (strength === 0) return input
+
+  const curvedStrength = strength * strength
+  const scale = curvedStrength / strength
+  return {
+    x: input.x * scale,
+    y: input.y * scale,
+  }
+}
+
 function normalizeJoystickInput(event) {
   const rect = joystickRef.value?.getBoundingClientRect()
   if (!rect) return { x: 0, y: 0, thumbX: 0, thumbY: 0 }
@@ -223,20 +252,26 @@ function normalizeJoystickInput(event) {
   let dx = event.clientX - (rect.left + rect.width / 2)
   let dy = event.clientY - (rect.top + rect.height / 2)
   const distance = Math.hypot(dx, dy)
+  const maxRadius = getJoystickMaxRadius(rect)
 
   if (distance < GLOBE_JOYSTICK_DEAD_ZONE) {
     return { x: 0, y: 0, thumbX: 0, thumbY: 0 }
   }
 
-  if (distance > GLOBE_JOYSTICK_MAX_RADIUS) {
-    const scale = GLOBE_JOYSTICK_MAX_RADIUS / distance
+  if (distance > maxRadius) {
+    const scale = maxRadius / distance
     dx *= scale
     dy *= scale
   }
 
+  const vector = curveJoystickVector({
+    x: dx / maxRadius,
+    y: dy / maxRadius,
+  })
+
   return {
-    x: dx / GLOBE_JOYSTICK_MAX_RADIUS,
-    y: dy / GLOBE_JOYSTICK_MAX_RADIUS,
+    x: vector.x,
+    y: vector.y,
     thumbX: dx,
     thumbY: dy,
   }
@@ -417,7 +452,7 @@ onBeforeUnmount(() => {
 
 .globe-joystick {
   @include flex-center;
-  @include glass-blur(14px, 145%);
+  // @include glass-blur(14px, 145%);
 
   position: relative;
   z-index: 2;
@@ -436,7 +471,7 @@ onBeforeUnmount(() => {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 2.125rem;
+  width: 1.6rem;
   aspect-ratio: 1;
   background: var(--color-primary);
   border: 1px solid var(--border-glass-subtle);

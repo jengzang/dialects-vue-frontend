@@ -601,7 +601,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    margin-bottom: 0.75rem;
+    margin-bottom:0.5rem;
   }
 
   &-title {
@@ -618,6 +618,11 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     line-height: 1.5;
     font-weight: 500;
     color: var(--text-dark-lighter);
+
+
+    @media (orientation: portrait) {
+      margin-bottom: 1.5rem;
+    }
   }
 
   &-actions {
@@ -837,6 +842,8 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
 /* Showcase (lazy) */
 .globe-joystick-anchor {
+  --home-globe-joystick-size: 5rem;
+
   @include flex-center;
 
   position: relative;
@@ -844,7 +851,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   align-self: center;
   width: var(--home-globe-joystick-size, 6.5rem);
   min-height: var(--home-globe-joystick-size, 6.5rem);
-  margin: 0 auto 2rem;
+  margin: 0 auto 2rem 1rem;
 
   &:empty {
     display: none;
@@ -1409,7 +1416,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     }
 
     &-content {
-      margin: 0 auto 6rem;
+      margin: 0 auto 10rem;
       padding: 1rem;
       text-align: center;
       background: var(--glass-30);
@@ -1526,7 +1533,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 @media (max-width: 600px) {
   .btn-primary,
   .btn-secondary {
-    padding: 0.75rem 1.75rem;
+    padding: 0.7rem 1.5rem;
     font-size: 0.9375rem;
   }
 

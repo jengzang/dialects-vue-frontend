@@ -1,3 +1,4 @@
+/* eslint-disable vue/one-component-per-file */
 import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -122,6 +123,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  document.body.innerHTML = ''
   vi.restoreAllMocks()
 })
 
@@ -155,7 +157,10 @@ describe('globe joystick interaction contracts', () => {
     expect(source).toContain('@pointermove="handleJoystickPointerMove"')
     expect(source).toContain('@pointerup="handleJoystickPointerUp"')
     expect(source).toContain('@pointercancel="handleJoystickPointerCancel"')
-    expect(source).toContain("canvas.style.touchAction = directPointerInteractionEnabled ? '' : 'auto'")
+    expect(source).toContain("canvas.style.touchAction = controlsInteractionEnabled ? 'none' : 'auto'")
+    expect(source).toContain('controls.enabled = controlsInteractionEnabled')
+    expect(source).toContain('controls.enableRotate = controlsInteractionEnabled')
+    expect(source).toContain('controls.enablePan = controlsInteractionEnabled')
     expect(source).toContain('setPointerCapture')
     expect(source).toContain('releasePointerCapture')
     expect(source).toContain('event.preventDefault()')
@@ -169,13 +174,30 @@ describe('globe joystick interaction contracts', () => {
     const source = readSource('src/main/components/globe/GlobeGLRenderer.vue')
 
     expect(source).toContain('Math.hypot(dx, dy)')
-    expect(source).toContain('const scale = GLOBE_JOYSTICK_MAX_RADIUS / distance')
-    expect(source).toContain('x: dx / GLOBE_JOYSTICK_MAX_RADIUS')
-    expect(source).toContain('y: dy / GLOBE_JOYSTICK_MAX_RADIUS')
+    expect(source).toContain('const maxRadius = getJoystickMaxRadius(rect)')
+    expect(source).toContain('const scale = maxRadius / distance')
+    expect(source).toContain('x: dx / maxRadius')
+    expect(source).toContain('y: dy / maxRadius')
+    expect(source).toContain('function curveJoystickVector')
+    expect(source).toContain('const curvedStrength = strength * strength')
     expect(source).toContain('GLOBE_JOYSTICK_DEAD_ZONE')
     expect(source).toContain('requestAnimationFrame(applyJoystickRotation)')
     expect(source).toContain('cancelAnimationFrame')
     expect(source).toContain('globe.pointOfView')
+  })
+
+  it('derives joystick travel from the home joystick size variable instead of a fixed pixel radius', () => {
+    const source = readSource('src/main/components/globe/GlobeGLRenderer.vue')
+    const homePage = readSource('src/main/views/HomePage.vue')
+    const anchorBlock = selectorBlock(homePage, '.globe-joystick-anchor')
+    const joystickBlock = selectorBlock(source.slice(source.indexOf('<style')), '.globe-joystick')
+
+    expect(source).toContain('GLOBE_JOYSTICK_TRAVEL_RATIO')
+    expect(source).toContain('rect.width * GLOBE_JOYSTICK_TRAVEL_RATIO')
+    expect(source).not.toContain('GLOBE_JOYSTICK_MAX_RADIUS')
+    expect(anchorBlock).toContain('--home-globe-joystick-size:')
+    expect(anchorBlock).toContain('width: var(--home-globe-joystick-size')
+    expect(joystickBlock).toContain('width: var(--home-globe-joystick-size')
   })
 
   it('styles the joystick with existing design tokens and scoped SCSS', () => {
@@ -210,23 +232,70 @@ describe('globe joystick interaction contracts', () => {
 
     const { canvas, globe } = globeInstances.at(-1)
     expect(globe.enablePointerInteraction).toHaveBeenLastCalledWith(false)
+    const controls = globe.controls()
+    expect(controls.enabled).toBe(true)
+    expect(controls.enableRotate).toBe(true)
+    expect(controls.enablePan).toBe(true)
+    expect(canvas.style.touchAction).toBe('none')
+
+    media.set('(any-pointer: fine)', true)
+    await nextTick()
+
+    expect(globe.enablePointerInteraction).toHaveBeenLastCalledWith(true)
+    expect(controls.enabled).toBe(true)
+    expect(controls.enableRotate).toBe(true)
+    expect(controls.enablePan).toBe(true)
+    expect(canvas.style.touchAction).toBe('none')
+
+    media.set('(any-pointer: fine)', false)
+    await nextTick()
+
+    expect(globe.enablePointerInteraction).toHaveBeenLastCalledWith(false)
+    expect(controls.enabled).toBe(true)
+    expect(controls.enableRotate).toBe(true)
+    expect(controls.enablePan).toBe(true)
+    expect(canvas.style.touchAction).toBe('none')
+
+    app.unmount()
+    root.remove()
+    expect(media.getQuery('(any-pointer: fine)').listeners.size).toBe(0)
+  })
+
+  it('disables orbit controls and restores canvas scrolling while the portrait touch joystick replaces direct globe drag', async () => {
+    const media = createMediaQueryHarness({
+      '(orientation: portrait)': true,
+      '(any-pointer: fine)': false,
+      '(any-hover: hover)': false,
+    })
+    const root = document.createElement('div')
+    const anchor = document.createElement('div')
+    anchor.id = 'home-globe-joystick-anchor'
+    document.body.append(root, anchor)
+    const app = createApp(GlobeGLRenderer, { points: [] })
+
+    app.mount(root)
+    await nextTick()
+
+    const { canvas, globe } = globeInstances.at(-1)
+    const controls = globe.controls()
+    expect(globe.enablePointerInteraction).toHaveBeenLastCalledWith(false)
+    expect(controls.enabled).toBe(false)
+    expect(controls.enableRotate).toBe(false)
+    expect(controls.enablePan).toBe(false)
     expect(canvas.style.touchAction).toBe('auto')
 
     media.set('(any-pointer: fine)', true)
     await nextTick()
 
     expect(globe.enablePointerInteraction).toHaveBeenLastCalledWith(true)
-    expect(canvas.style.touchAction).toBe('')
-
-    media.set('(any-pointer: fine)', false)
-    await nextTick()
-
-    expect(globe.enablePointerInteraction).toHaveBeenLastCalledWith(false)
-    expect(canvas.style.touchAction).toBe('auto')
+    expect(controls.enabled).toBe(true)
+    expect(controls.enableRotate).toBe(true)
+    expect(controls.enablePan).toBe(true)
+    expect(canvas.style.touchAction).toBe('none')
 
     app.unmount()
     root.remove()
-    expect(media.getQuery('(any-pointer: fine)').listeners.size).toBe(0)
+    anchor.remove()
   })
 
   it('mounts the portrait touch joystick in the home hero anchor instead of the canvas container', async () => {
