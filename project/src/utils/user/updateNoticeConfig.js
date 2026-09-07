@@ -3,7 +3,7 @@ export function getHomeUpdateNotice(t) {
         {
             icon: '📊',
             strong: '更新方言數據庫',
-            text: '方言點數量增加至3127個，總條目934万條。'
+            text: '方言點數量增加至3126個，總條目933万條。'
         },
         {
             icon: '📚',

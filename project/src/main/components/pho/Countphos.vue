@@ -18,9 +18,9 @@ import { useNavAnchorJump } from '@/composables/bar/useNavAnchorJump.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { requestMapFitView } from '@/utils/map/MapData.js'
 import { showConfirm } from '@/utils/ui/message.js'
-import all_feature_counts from '/data/feature_counts_20260814.json?url'
-import all_syllable_counts from '/data/syllable_counts_20260814.json?url'
-import all_points from '/data/points_20260814.json?url'
+import all_feature_counts from '/data/feature_counts_20260907.json?url'
+import all_syllable_counts from '/data/syllable_counts_20260907.json?url'
+import all_points from '/data/points_20260907.json?url'
 import { resolveStatsLocations } from '@/main/utils/countData.js'
 
 const { t } = useI18n()
