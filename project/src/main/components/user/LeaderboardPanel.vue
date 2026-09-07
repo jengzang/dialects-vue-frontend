@@ -205,10 +205,10 @@ const categoryConfigs = computed(() => [
     label: t('user.leaderboard.categories.customData.label'),
     categoryKey: 'category_用户自定义',
     endpoints: [
-      {
-        key: 'endpoint_group_custom_regions',
-        label: t('user.leaderboard.categories.customData.items.customRegions')
-      },
+      // {
+      //   key: 'endpoint_group_custom_regions',
+      //   label: t('user.leaderboard.categories.customData.items.customRegions')
+      // },
       {
         key: 'endpoint_group_custom_data_query',
         label: t('user.leaderboard.categories.customData.items.customDataQuery')

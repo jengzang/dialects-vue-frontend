@@ -796,6 +796,7 @@
   max-height: 200px;
   overflow-y: auto;
   background: var(--surface-panel);
+  backdrop-filter: blur(4px);
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-glass-hover);
@@ -808,7 +809,7 @@
   cursor: pointer;
 
   &:hover {
-    background: var(--surface-panel-hover);
+    background: var(--border-control-focus);
   }
 }
 

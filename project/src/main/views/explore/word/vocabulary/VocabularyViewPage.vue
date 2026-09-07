@@ -184,7 +184,7 @@ import VocabularyTopControls from './VocabularyTopControls.vue'
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
-const STANDARD_WORD_OPTIONS_LIMIT = 200
+const STANDARD_WORD_OPTIONS_LIMIT = 1000
 
 const props = defineProps({
   vocabularyMe: { type: Object, default: null },
