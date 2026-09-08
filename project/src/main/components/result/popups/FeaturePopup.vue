@@ -110,6 +110,7 @@ $animation-duration: 0.4s;/* 弹窗基本样式 */
     font-size: 14px;
     font-weight: 700;
     line-height: 1.2;
+    white-space: nowrap;
   }
 }
 

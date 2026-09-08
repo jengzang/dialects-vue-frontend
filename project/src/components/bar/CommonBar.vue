@@ -619,7 +619,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   border-bottom: 1px solid var(--glass-50);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
-  @include glass-blur(8px, 160%);
+  @include glass-blur(12px, 160%);
   will-change: backdrop-filter;
 }
 

@@ -357,8 +357,8 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   background: linear-gradient(135deg, var(--glass-20), var(--glass-10));
   border: 1px solid var(--glass-30);
   box-shadow: var(--shadow-glass-inset);
-  backdrop-filter: blur(6px) saturate(160%);
-  -webkit-backdrop-filter: blur(6px) saturate(160%);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
   will-change: backdrop-filter;
   transition:
     transform 0.3s ease,

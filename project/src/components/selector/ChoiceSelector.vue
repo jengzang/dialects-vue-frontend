@@ -82,25 +82,33 @@ $transition-fast: 0.2s ease;
   align-items: center;
   justify-content: center;
   padding: 10px 16px;
+
   color: inherit;
   font-size: inherit;
   font-weight: 500;
   line-height: inherit;
+
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
+
   cursor: pointer;
   user-select: none;
+
   border: 1px solid var(--color-primary-medium);
   border-right-color: var(--border-gray-medium);
   border-left-color: var(--border-gray-medium);
+
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  transition: background $transition-fast;
 
-  /* overflow: hidden; */
+  transition:
+    background-color $transition-fast,
+    color $transition-fast,
+    border-color $transition-fast;
 
-  &:hover:not(.disabled) {
+  &:hover:not(.disabled):not(.active) {
+    color: var(--color-primary);
     background: var(--glass-60);
   }
 
@@ -127,10 +135,6 @@ $transition-fast: 0.2s ease;
     &:hover:not(.disabled) {
       background: var(--color-primary-medium2);
     }
-  }
-
-  @media (max-aspect-ratio: 1/1) {
-    padding: 12px;
   }
 }
 

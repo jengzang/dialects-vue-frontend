@@ -432,18 +432,18 @@ const groups = [
     titleKey: 'home.features.villages.title',
     descKey: 'home.features.villages.desc',
     items: [
-      {
-        icon: '📍',
-        labelKey: 'home.features.villages.toponyms',
-        route: '/explore/villages/toponyms',
-        search: {
-          keywords: ['地名', '自然村', '分布', '地名检索', 'toponym'],
-          i18nKeys: [
-            'layoutFooter.pages.exploreVillagesToponyms.description',
-            'navigation.pageTitles.villages.toponyms',
-          ],
-        },
-      },
+      // {
+      //   icon: '📍',
+      //   labelKey: 'home.features.villages.toponyms',
+      //   route: '/explore/villages/toponyms',
+      //   search: {
+      //     keywords: ['地名', '自然村', '分布', '地名检索', 'toponym'],
+      //     i18nKeys: [
+      //       'layoutFooter.pages.exploreVillagesToponyms.description',
+      //       'navigation.pageTitles.villages.toponyms',
+      //     ],
+      //   },
+      // },
       {
         icon: '🤖',
         labelKey: 'home.features.villages.villagesML',
