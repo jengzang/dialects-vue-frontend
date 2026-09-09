@@ -4,7 +4,7 @@ import { ref, computed, nextTick, onMounted, onBeforeUnmount, onActivated, onDea
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
-import { getFeatureCounts, getLocationDetail, getSyllableCounts } from '@/api'
+import { getFeatureCounts, getLocationDetail, getLocations, getSyllableCounts } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue'
 import LocationAndRegionInput from '@/main/components/geo/LocationAndRegionInput.vue'
@@ -22,6 +22,7 @@ import all_feature_counts from '/data/feature_counts_20260907.json?url'
 import all_syllable_counts from '/data/syllable_counts_20260907.json?url'
 import all_points from '/data/points_20260907.json?url'
 import { resolveStatsLocations } from '@/main/utils/countData.js'
+import { resolvePhonologyActionLocations } from '@/main/utils/phonology/actionLocationResolver.js'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -1228,7 +1229,7 @@ const closeLocationModal = () => {
 
 const isActive = ref(true)
 
-const consumePendingCountphosLocations = () => {
+const consumePendingCountphosLocations = async () => {
   const pending = pendingCountphosLocations.value
   if (!Array.isArray(pending) || pending.length === 0) return
 
@@ -1237,7 +1238,22 @@ const consumePendingCountphosLocations = () => {
     queryMode.value = { ...queryMode.value, ...pendingQueryMode }
   }
 
-  const locations = pending.slice(0, PHONOLOGY_LOCATION_LIMITS.countphos)
+  let locations = []
+  try {
+    locations = await resolvePhonologyActionLocations(
+      pending,
+      getLocations,
+      { limit: PHONOLOGY_LOCATION_LIMITS.countphos }
+    )
+  } catch (error) {
+    console.error('Resolve count phonology locations failed:', error)
+  }
+
+  pendingCountphosLocations.value = []
+  pendingCountphosQueryMode.value = null
+
+  if (locations.length === 0) return
+
   countphosLocationQuery.value = {
     locations: [...locations],
     regions: [],
@@ -1245,8 +1261,6 @@ const consumePendingCountphosLocations = () => {
   }
   matchedLocations.value = [...locations]
   isLocationInputDisabled.value = false
-  pendingCountphosLocations.value = []
-  pendingCountphosQueryMode.value = null
 
   loadData()
 }
@@ -1389,7 +1403,7 @@ onMounted(async () => {
   window.addEventListener('resize', resizeCharts)
 
   if (pendingCountphosLocations.value.length > 0) {
-    consumePendingCountphosLocations()
+    await consumePendingCountphosLocations()
   } else {
     await loadDefaultCountsData()
   }

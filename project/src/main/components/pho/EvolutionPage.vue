@@ -366,6 +366,7 @@ const handleLocationClick = async (locationName) => {
 }
 const hasQueriedRealData = ref(false)
 const pendingUrlAutoQuery = ref(false)
+const pendingUrlMatchAttempted = ref(false)
 
 // 当前展示
 const features = ['聲母', '韻母', '聲調']
@@ -537,10 +538,19 @@ const handleMatchedLocations = (locations) => {
   matchedLocations.value = Array.isArray(locations)
     ? locations.slice(0, EVOLUTION_LOCATION_LIMIT)
     : []
+
+  tryRunUrlAutoQuery()
 }
 
 const handleIsMatching = (matching) => {
   isMatching.value = matching
+
+  if (matching) {
+    pendingUrlMatchAttempted.value = true
+    return
+  }
+
+  tryRunUrlAutoQuery()
 }
 
 const getInitialFeature = (data) => {
@@ -1340,10 +1350,20 @@ const tryRunUrlAutoQuery = async () => {
   if (!pendingUrlAutoQuery.value) return
   if (isLoading.value) return
   if (isMatching.value) return
-  if (!matchedLocations.value.length) return
+
+  if (!matchedLocations.value.length) {
+    if (!pendingUrlMatchAttempted.value) return
+
+    pendingUrlAutoQuery.value = false
+    pendingUrlMatchAttempted.value = false
+    errorMessage.value = t('phonology.phonology.evolution.errors.minLocation')
+    return
+  }
 
   pendingUrlAutoQuery.value = false
+  pendingUrlMatchAttempted.value = false
   matchedLocations.value = matchedLocations.value.slice(0, EVOLUTION_LOCATION_LIMIT)
+  selectedLocations.value = [...matchedLocations.value]
 
   await handleQuery()
 }
@@ -1426,12 +1446,12 @@ watch(locationQuery, async (urlLocations) => {
   }
 
   selectedLocations.value = [...limitedUrlLocations]
-  matchedLocations.value = [...limitedUrlLocations]
   errorMessage.value = ''
   closeMobilePieDetail()
 
   if (limitedUrlLocations.length === 0) {
     pendingUrlAutoQuery.value = false
+    pendingUrlMatchAttempted.value = false
     hasQueriedRealData.value = false
     await applyDemoData()
     return
@@ -1439,6 +1459,7 @@ watch(locationQuery, async (urlLocations) => {
 
   await applyDemoData({ syncLocations: false })
   pendingUrlAutoQuery.value = true
+  pendingUrlMatchAttempted.value = false
   await nextTick()
   await tryRunUrlAutoQuery()
 })
@@ -1452,6 +1473,7 @@ onMounted(async () => {
     selectedLocations.value = [...urlLocations]
     await applyDemoData({ syncLocations: false })
     pendingUrlAutoQuery.value = true
+    pendingUrlMatchAttempted.value = false
     await nextTick()
     await tryRunUrlAutoQuery()
   } else {

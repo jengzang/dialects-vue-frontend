@@ -117,6 +117,8 @@ const queryStrings = ref([...locationQuery.value])
 
 const matchedLocations = ref([])
 const isMatching = ref(false) // 添加匹配状态
+const pendingUrlAutoQuery = ref(false)
+const pendingUrlMatchAttempted = ref(false)
 
 const displayLocations = computed(() => {
   if (!matrixData.value) return []
@@ -128,11 +130,52 @@ const handleMatchedLocations = (locations) => {
   matchedLocations.value = Array.isArray(locations)
     ? locations.slice(0, PHONOLOGY_LOCATION_LIMITS.matrix)
     : []
+
+  runPendingUrlAutoQuery()
 }
 
 // 处理匹配状态
 const handleIsMatching = (matching) => {
   isMatching.value = matching
+
+  if (matching) {
+    pendingUrlMatchAttempted.value = true
+    return
+  }
+
+  runPendingUrlAutoQuery()
+}
+
+const queueUrlAutoQuery = (urlLocations) => {
+  const limitedUrlLocations = Array.isArray(urlLocations)
+    ? urlLocations.slice(0, PHONOLOGY_LOCATION_LIMITS.matrix)
+    : []
+
+  if (limitedUrlLocations.length === 0) return
+
+  queryStrings.value = [...limitedUrlLocations]
+  matchedLocations.value = []
+  pendingUrlAutoQuery.value = true
+  pendingUrlMatchAttempted.value = false
+}
+
+const runPendingUrlAutoQuery = () => {
+  if (!pendingUrlAutoQuery.value) return
+  if (loading.value || isMatching.value) return
+
+  if (matchedLocations.value.length === 0) {
+    if (!pendingUrlMatchAttempted.value) return
+
+    pendingUrlAutoQuery.value = false
+    pendingUrlMatchAttempted.value = false
+    error.value = t('phonology.phonology.matrix.states.minLocationError')
+    return
+  }
+
+  pendingUrlAutoQuery.value = false
+  pendingUrlMatchAttempted.value = false
+  queryStrings.value = matchedLocations.value.slice(0, PHONOLOGY_LOCATION_LIMITS.matrix)
+  loadData()
 }
 
 const loadData = async () => {
@@ -170,17 +213,8 @@ const loadData = async () => {
   })
 }
 
-// URL 中的 loc 已是规范地点名（loadData 写入的是 matchedLocations），
-// 直接用它初始化 matchedLocations 并自动查询，不再依赖 LocationMultiInput 的异步匹配
 const runUrlAutoQuery = () => {
-  const urlLocations = Array.isArray(locationQuery.value)
-    ? locationQuery.value.slice(0, PHONOLOGY_LOCATION_LIMITS.matrix)
-    : []
-
-  if (urlLocations.length === 0) return
-
-  matchedLocations.value = [...urlLocations]
-  loadData()
+  queueUrlAutoQuery(locationQuery.value)
 }
 
 // 页面加载时自动查询
@@ -196,17 +230,23 @@ watch(locationQuery, (urlLocations) => {
 
   // 只有当 URL 的地点和当前匹配的地点不同时，才需要清空数据并重新查询
   // 这样可以避免在查询成功更新 URL 后误清空数据
-  if (JSON.stringify(limitedUrlLocations) === JSON.stringify(matchedLocations.value)) {
+  if (JSON.stringify(limitedUrlLocations) === JSON.stringify(queryStrings.value)) {
     return
   }
 
-  queryStrings.value = [...limitedUrlLocations]
   matrixData.value = null
   error.value = null
 
+  if (limitedUrlLocations.length === 0) {
+    queryStrings.value = []
+    matchedLocations.value = []
+    pendingUrlAutoQuery.value = false
+    pendingUrlMatchAttempted.value = false
+    return
+  }
+
   if (limitedUrlLocations.length > 0) {
-    matchedLocations.value = [...limitedUrlLocations]
-    loadData()
+    queueUrlAutoQuery(limitedUrlLocations)
   }
 })
 </script>
