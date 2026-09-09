@@ -214,6 +214,20 @@
       "loadFailed": "Failed to load vocabulary location metadata",
       "saveSuccess": "Location metadata saved.",
       "saveFailed": "Failed to save location metadata",
+      "transfer": {
+        "action": "Transfer",
+        "title": "Transfer \"{name}\"",
+        "desc": "Current owner: {user}",
+        "target": "Target username or ID",
+        "placeholder": "Enter username or ID",
+        "unknownUser": "Unknown user",
+        "success": "Transferred \"{name}\" to {user}, including {count} entries.",
+        "failed": "Failed to transfer location",
+        "targetUserid": "Target UserID",
+        "IDplaceholder": "Please enter the target userid",
+        "targetUsername": "Target Username",
+        "NAMEplaceholder": "Please enter the target username"
+      },
       "filters": {
         "userId": "User ID",
         "locationName": "Location name"

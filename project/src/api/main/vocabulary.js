@@ -413,6 +413,53 @@ export async function updateVocabularyLocation(locationName, data, params = {}) 
   }
 }
 
+function buildVocabularyLocationTransferBody(location = {}, target = {}) {
+  const body = {
+    location_name: String(location.location_name || '').trim(),
+  }
+
+  const sourceUserId = String(location.user_id ?? '').trim()
+  const targetUserId = String(target.target_user_id ?? '').trim()
+  const targetUsername = String(target.target_username ?? '').trim()
+
+  if (sourceUserId) {
+    body.user_id = Number(sourceUserId)
+  }
+
+  if (targetUserId) {
+    body.target_user_id = Number(targetUserId)
+  }
+
+  if (targetUsername) {
+    body.target_username = targetUsername
+  }
+
+  return body
+}
+
+/**
+ * 移交词表地点及其词条归属。
+ *
+ * 后端接口：POST /api/vocabulary/locations/transfer
+ * 请求体：location_name + 源用户(user_id/username) + 目标用户(target_user_id/target_username)。
+ *
+ * @param {{location_name: string, user_id?: number|string, username?: string}} location
+ * @param {number|string} targetUser 目标用户名或用户 ID。
+ * @returns {Promise<{success: boolean, location_name: string, permission_level: string, source_user_id: number, source_username: string, target_user_id: number, target_username: string, transferred_entries_count: number}>}
+ */
+export async function transferVocabularyLocation(location, target) {
+  try {
+    return await api(`${VOCABULARY_LOCATIONS_ENDPOINT}/transfer`, {
+      method: 'POST',
+      body: buildVocabularyLocationTransferBody(location, target),
+    })
+  } catch (error) {
+    console.error('Transfer vocabulary location error:', error)
+    showError(error.message || '移交詞表地點失敗')
+    throw new Error(error.message || '移交詞表地點失敗')
+  }
+}
+
 /**
  * 删除词表地点（级联删除该地点下所有词条）。
  *

@@ -217,6 +217,20 @@
       "deleteConfirm": "確定刪除地點「{name}」及其所有詞條？此操作不可撤銷。",
       "deleteSuccess": "已刪除地點，共移除 {count} 條詞條。",
       "deleteFailed": "刪除地點失敗",
+      "transfer": {
+        "action": "移交",
+        "title": "移交「{name}」",
+        "desc": "目前歸屬：{user}",
+        "target": "目標用戶名或 ID",
+        "placeholder": "輸入用戶名或 ID",
+        "unknownUser": "未知用戶",
+        "success": "已將「{name}」移交給 {user}，共移交 {count} 條詞條。",
+        "failed": "移交地點失敗",
+        "targetUserid": "目標用戶ID",
+        "targetUsername": "目標用戶名",
+        "IDplaceholder": "請輸入目標用戶ID",
+        "NAMEplaceholder": "請輸入目標用戶名"
+      },
       "filters": {
         "userName": "用戶名",
         "locationName": "地點簡稱"

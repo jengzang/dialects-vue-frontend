@@ -214,6 +214,20 @@
       "loadFailed": "获取词表地点信息失败",
       "saveSuccess": "地点信息已保存。",
       "saveFailed": "保存地点信息失败",
+      "transfer": {
+        "action": "移交",
+        "title": "移交「{name}」",
+        "desc": "目前归属：{user}",
+        "target": "目标用户名或 ID",
+        "placeholder": "输入用户名或 ID",
+        "unknownUser": "未知用户",
+        "success": "已将「{name}」移交给 {user}，共移交 {count} 条词条。",
+        "failed": "移交地点失败",
+        "targetUserid": "目标用户ID",
+        "IDplaceholder": "请输入目标用户ID",
+        "targetUsername": "目标用户名",
+        "NAMEplaceholder": "请输入目标用户名"
+      },
       "filters": {
         "userId": "用户 ID",
         "locationName": "地点简称"
