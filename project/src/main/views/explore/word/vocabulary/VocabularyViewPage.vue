@@ -119,9 +119,9 @@
       @close="clearMapDetailModal"
     >
       <div class="map-detail-modal">
-        <p class="map-meta" v-if="mapDetailEntries.length">
+        <!-- <p class="map-meta" v-if="mapDetailEntries.length">
           {{ t('words.wordList.map.pointCount', { count: mapDetailEntries.length }) }}
-        </p>
+        </p> -->
         <div v-if="isLoadingMapDetail && !mapDetailEntries.length" class="loading-state loading-state-base">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <span>{{ t('words.wordList.states.loadingData') }}</span>
@@ -329,10 +329,10 @@ const mapDataForVocabularyMap = computed(() => {
       longitude: point.longitude,
       latitude: point.latitude,
       entryCount: point.entryCount,
+
       locationName: point.locationName,
-      location: point.locationName,
-      county: point.locationName,
-      province: point.locationLabel,
+      locationLabel: point.locationLabel,
+
       pronunciation: point.pronunciation || point.markerLabel,
       localExpression: point.localExpression || '',
       standardWord: point.definition || '',

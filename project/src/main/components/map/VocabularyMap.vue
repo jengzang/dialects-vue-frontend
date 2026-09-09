@@ -238,14 +238,18 @@ const getMarkerText = (item) => {
 // 获取地点链
 const getLocationText = (item) => {
   if (props.activeTab === 'vocabulary') {
+    if (item.locationLabel) {
+      return item.locationLabel
+    }
+
     return [item.province, item.city, item.county, item.village, item.location]
       .filter(Boolean)
       .join('-') || '-'
-  } else {
-    return [item.form_a, item.form_b, item.form_c, item.form_d, item.form_e]
-      .filter(Boolean)
-      .join('-') || '-'
   }
+
+  return [item.form_a, item.form_b, item.form_c, item.form_d, item.form_e]
+    .filter(Boolean)
+    .join('-') || '-'
 }
 
 // 转换数据为 GeoJSON 格式
