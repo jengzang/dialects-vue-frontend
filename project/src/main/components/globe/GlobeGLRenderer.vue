@@ -46,14 +46,14 @@ const globeHostRef = ref(null)
 const joystickRef = ref(null)
 const joystickMountTarget = ref(null)
 const isPortrait = ref(false)
-const hasFinePointer = ref(false)
-const hasHover = ref(false)
+const hasPrimaryFinePointer = ref(false)
+const hasPrimaryHover = ref(false)
 const joystickThumb = ref({ x: 0, y: 0 })
 const joystickVector = ref({ x: 0, y: 0 })
 const shouldUseGlobeJoystick = computed(() => (
   isPortrait.value &&
-  !hasFinePointer.value &&
-  !hasHover.value
+  !hasPrimaryFinePointer.value &&
+  !hasPrimaryHover.value
 ))
 const joystickThumbStyle = computed(() => ({
   '--globe-joystick-thumb-x': `${joystickThumb.value.x}px`,
@@ -83,8 +83,8 @@ function getCssRgb(varName, fallback) {
 function setupInputCapabilityListeners() {
   inputCapabilityMediaQueries = [
     { ref: isPortrait, mql: window.matchMedia('(orientation: portrait)') },
-    { ref: hasFinePointer, mql: window.matchMedia('(any-pointer: fine)') },
-    { ref: hasHover, mql: window.matchMedia('(any-hover: hover)') },
+    { ref: hasPrimaryFinePointer, mql: window.matchMedia('(pointer: fine)') },
+    { ref: hasPrimaryHover, mql: window.matchMedia('(hover: hover)') },
   ]
   inputCapabilityMediaQueries.forEach(({ mql }) => {
     mql.addEventListener('change', updateInputCapabilities)
@@ -167,7 +167,7 @@ function render() {
 
 function syncGlobePointerInteraction() {
   if (!globe) return
-  const hasMouseLikeInput = hasFinePointer.value || hasHover.value
+  const hasMouseLikeInput = hasPrimaryFinePointer.value || hasPrimaryHover.value
   const controlsInteractionEnabled = !shouldUseGlobeJoystick.value
   const directPointerInteractionEnabled = controlsInteractionEnabled && hasMouseLikeInput
   globe.enablePointerInteraction(directPointerInteractionEnabled)
@@ -416,7 +416,7 @@ watch(() => props.points, () => {
   updatePoints()
 }, { deep: true })
 
-watch([shouldUseGlobeJoystick, hasFinePointer, hasHover], () => {
+watch([shouldUseGlobeJoystick, hasPrimaryFinePointer, hasPrimaryHover], () => {
   cancelJoystickInteraction()
   syncGlobePointerInteraction()
 })

@@ -132,12 +132,12 @@ describe('globe joystick interaction contracts', () => {
     const source = readSource('src/main/components/globe/GlobeGLRenderer.vue')
 
     expect(source).toContain("matchMedia('(orientation: portrait)')")
-    expect(source).toContain("matchMedia('(any-pointer: fine)')")
-    expect(source).toContain("matchMedia('(any-hover: hover)')")
+    expect(source).toContain("matchMedia('(pointer: fine)')")
+    expect(source).toContain("matchMedia('(hover: hover)')")
     expect(source).toContain('shouldUseGlobeJoystick')
-    expect(source).toContain('!hasFinePointer.value')
-    expect(source).toContain('!hasHover.value')
-    expect(source).toContain('watch([shouldUseGlobeJoystick, hasFinePointer, hasHover]')
+    expect(source).toContain('!hasPrimaryFinePointer.value')
+    expect(source).toContain('!hasPrimaryHover.value')
+    expect(source).toContain('watch([shouldUseGlobeJoystick, hasPrimaryFinePointer, hasPrimaryHover]')
     expect(source).not.toContain('ontouchstart')
     expect(source).not.toContain('maxTouchPoints')
     expect(source).not.toContain('innerWidth')
@@ -220,8 +220,8 @@ describe('globe joystick interaction contracts', () => {
   it('syncs direct globe drag when mouse-like media query state changes at runtime', async () => {
     const media = createMediaQueryHarness({
       '(orientation: portrait)': false,
-      '(any-pointer: fine)': false,
-      '(any-hover: hover)': false,
+      '(pointer: fine)': false,
+      '(hover: hover)': false,
     })
     const root = document.createElement('div')
     document.body.appendChild(root)
@@ -238,7 +238,7 @@ describe('globe joystick interaction contracts', () => {
     expect(controls.enablePan).toBe(true)
     expect(canvas.style.touchAction).toBe('none')
 
-    media.set('(any-pointer: fine)', true)
+    media.set('(pointer: fine)', true)
     await nextTick()
 
     expect(globe.enablePointerInteraction).toHaveBeenLastCalledWith(true)
@@ -247,7 +247,7 @@ describe('globe joystick interaction contracts', () => {
     expect(controls.enablePan).toBe(true)
     expect(canvas.style.touchAction).toBe('none')
 
-    media.set('(any-pointer: fine)', false)
+    media.set('(pointer: fine)', false)
     await nextTick()
 
     expect(globe.enablePointerInteraction).toHaveBeenLastCalledWith(false)
@@ -258,14 +258,14 @@ describe('globe joystick interaction contracts', () => {
 
     app.unmount()
     root.remove()
-    expect(media.getQuery('(any-pointer: fine)').listeners.size).toBe(0)
+    expect(media.getQuery('(pointer: fine)').listeners.size).toBe(0)
   })
 
   it('disables orbit controls and restores canvas scrolling while the portrait touch joystick replaces direct globe drag', async () => {
     const media = createMediaQueryHarness({
       '(orientation: portrait)': true,
-      '(any-pointer: fine)': false,
-      '(any-hover: hover)': false,
+      '(pointer: fine)': false,
+      '(hover: hover)': false,
     })
     const root = document.createElement('div')
     const anchor = document.createElement('div')
@@ -284,7 +284,7 @@ describe('globe joystick interaction contracts', () => {
     expect(controls.enablePan).toBe(false)
     expect(canvas.style.touchAction).toBe('auto')
 
-    media.set('(any-pointer: fine)', true)
+    media.set('(pointer: fine)', true)
     await nextTick()
 
     expect(globe.enablePointerInteraction).toHaveBeenLastCalledWith(true)
@@ -301,8 +301,8 @@ describe('globe joystick interaction contracts', () => {
   it('mounts the portrait touch joystick in the home hero anchor instead of the canvas container', async () => {
     createMediaQueryHarness({
       '(orientation: portrait)': true,
-      '(any-pointer: fine)': false,
-      '(any-hover: hover)': false,
+      '(pointer: fine)': false,
+      '(hover: hover)': false,
     })
     const root = document.createElement('div')
     const anchor = document.createElement('div')
@@ -315,6 +315,37 @@ describe('globe joystick interaction contracts', () => {
 
     expect(anchor.querySelector('.globe-joystick')).not.toBeNull()
     expect(root.querySelector('.globegl-container > .globe-joystick')).toBeNull()
+
+    app.unmount()
+    root.remove()
+    anchor.remove()
+  })
+
+  it('keeps the portrait touch joystick when any-input media queries report optional fine or hover capability', async () => {
+    createMediaQueryHarness({
+      '(orientation: portrait)': true,
+      '(pointer: fine)': false,
+      '(hover: hover)': false,
+      '(any-pointer: fine)': true,
+      '(any-hover: hover)': true,
+    })
+    const root = document.createElement('div')
+    const anchor = document.createElement('div')
+    anchor.id = 'home-globe-joystick-anchor'
+    document.body.append(root, anchor)
+    const app = createApp(GlobeGLRenderer, { points: [] })
+
+    app.mount(root)
+    await nextTick()
+
+    const { canvas, globe } = globeInstances.at(-1)
+    const controls = globe.controls()
+    expect(anchor.querySelector('.globe-joystick')).not.toBeNull()
+    expect(globe.enablePointerInteraction).toHaveBeenLastCalledWith(false)
+    expect(controls.enabled).toBe(false)
+    expect(controls.enableRotate).toBe(false)
+    expect(controls.enablePan).toBe(false)
+    expect(canvas.style.touchAction).toBe('auto')
 
     app.unmount()
     root.remove()
