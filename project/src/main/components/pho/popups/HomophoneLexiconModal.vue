@@ -22,10 +22,10 @@
     </div>
 
     <template v-else-if="lexiconData">
-      <div v-if="location" class="lexicon-location-title">{{ location }}</div>
+      <div v-if="resolvedLocation" class="lexicon-location-title">{{ resolvedLocation }}</div>
 
       <HomophoneLexicon
-        :location="location"
+        :location="resolvedLocation"
         :data="lexiconData"
         :show-copy="false"
         :show-title="false"
@@ -45,8 +45,9 @@ import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
 import HomophoneLexicon from '@/main/components/pho/HomophoneLexicon.vue'
-import { getPhonologyMatrix, getLocationDetail } from '@/api'
+import { getLocations, getPhonologyMatrix, getLocationDetail } from '@/api'
 import { buildToneMapFromDetail } from '@/main/utils/phonology/toneMap.js'
+import { resolvePhonologyActionLocations } from '@/main/utils/phonology/actionLocationResolver.js'
 
 const { t } = useI18n()
 
@@ -67,6 +68,7 @@ const loading = ref(false)
 const lexiconData = ref(null)
 const toneMap = ref(null)
 const toolbarTarget = ref(null)
+const resolvedLocation = ref('')
 
 const loadLexicon = async () => {
   if (!props.location) return
@@ -74,13 +76,22 @@ const loadLexicon = async () => {
   loading.value = true
   lexiconData.value = null
   toneMap.value = null
+  resolvedLocation.value = ''
 
   try {
+    const [location = ''] = await resolvePhonologyActionLocations(
+      [props.location],
+      getLocations,
+      { limit: 1 }
+    )
+    if (!location) return
+
+    resolvedLocation.value = location
     const [result, detail] = await Promise.all([
-      getPhonologyMatrix({ locations: [props.location] }),
-      getLocationDetail(props.location)
+      getPhonologyMatrix({ locations: [location] }),
+      getLocationDetail(location)
     ])
-    lexiconData.value = result?.data?.[props.location] || null
+    lexiconData.value = result?.data?.[location] || null
     toneMap.value = buildToneMapFromDetail(detail?.data?.[0])
   } catch (err) {
     console.error('加載同音字匯失敗:', err)

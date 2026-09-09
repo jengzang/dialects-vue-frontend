@@ -27,11 +27,10 @@ export async function resolvePhonologyActionLocations(locations, getLocations, {
 }
 
 export async function resolvePhonologyActionLocation({ detailRow, fallbackName }, getLocations) {
-  const detailLocation = String(detailRow?.['簡稱'] || '').trim()
-  if (detailLocation) return detailLocation
+  const candidate = String(detailRow?.['簡稱'] || fallbackName || '').trim()
 
   const [resolvedLocation = ''] = await resolvePhonologyActionLocations(
-    [fallbackName],
+    [candidate],
     getLocations,
     { limit: 1 }
   )

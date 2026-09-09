@@ -15,6 +15,20 @@ describe('phonology action auto query contracts', () => {
     expect(source).toContain('resolvePhonologyActionLocation');
     expect(source).toContain('getLocations');
     expect(source).toContain(':location="lexiconLocation"');
+    expect(source.indexOf('class="action-section"')).toBeLessThan(
+      source.indexOf('data && data.data && data.data.length > 0')
+    );
+  });
+
+  it('normalizes the homophone lexicon modal location before loading phonology data', () => {
+    const source = readSource('src/main/components/pho/popups/HomophoneLexiconModal.vue');
+
+    expect(source).toContain('resolvePhonologyActionLocations');
+    expect(source).toContain('getLocations');
+    expect(source).toContain('resolvedLocation');
+    expect(source.indexOf('resolvePhonologyActionLocations')).toBeLessThan(
+      source.indexOf('getPhonologyMatrix({')
+    );
   });
 
   it('does not let matrix URL locations bypass LocationMultiInput matching', () => {
