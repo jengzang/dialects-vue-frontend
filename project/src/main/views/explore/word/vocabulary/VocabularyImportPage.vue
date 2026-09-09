@@ -10,7 +10,7 @@
               <span>{{ t('words.wordList.upload.totalLocations', { count: vocabLocationCount ?? '…' }) }}</span>
             </div>
             <!-- <p>{{ t('words.wordList.upload.desc') }}</p> -->
-            <div v-if="requiresLogin" class="upload-access-notice">
+            <div v-if="shouldShowPermissionRequest" class="upload-access-notice">
               <p>{{ uploadAccessNotice }}</p>
               <button
                 class="glass-button"
@@ -435,6 +435,9 @@ const requiresVocabularyPermission = computed(() => (
   && !props.isLoadingVocabularyMe
   && !canUploadVocabulary.value
   && !props.vocabularyMeError
+))
+const shouldShowPermissionRequest = computed(() => (
+  requiresLogin.value || requiresVocabularyPermission.value
 ))
 const uploadAccessNotice = computed(() => {
   if (isWaitingForAuth.value) return t('words.wordList.access.loadingDesc')

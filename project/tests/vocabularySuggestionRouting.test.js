@@ -11,6 +11,14 @@ function readSource(path) {
 }
 
 describe('vocabulary suggestion routing', () => {
+  it('shows the permission request action for guests and signed-in users without upload permission', () => {
+    const vocabularyImportPage = readSource('src/main/views/explore/word/vocabulary/VocabularyImportPage.vue')
+
+    expect(vocabularyImportPage).toContain('v-if="shouldShowPermissionRequest"')
+    expect(vocabularyImportPage).toMatch(/const shouldShowPermissionRequest = computed\(\(\) => \(\s*requiresLogin\.value\s*\|\|\s*requiresVocabularyPermission\.value\s*\)\)/)
+    expect(vocabularyImportPage).not.toContain('v-if="requiresLogin" class="upload-access-notice"')
+  })
+
   it('routes vocabulary permission requests to the site feedback form with category context', () => {
     const vocabularyImportPage = readSource('src/main/views/explore/word/vocabulary/VocabularyImportPage.vue')
 
