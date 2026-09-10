@@ -327,15 +327,14 @@ const convertToGeoJSON = (data) => {
       locationChain: aggregateField(item => getLocationText(item)),
       locationName: aggregateField(item => item.locationName || item.location),
       locationNames: JSON.stringify(Array.from(new Set(items.map(item => item.locationName || item.location).filter(Boolean)))),
-      pronunciation: aggregateField(item => item.pronunciation),
-      phonetic: aggregateField(item => item.phonetic),
-      word: aggregateField(item => item.standardWord || item.word),
-      memo: aggregateField(item => item.memo),
-      sentence: aggregateField(item => item.sentence),
-      category: aggregateField(item => {
-        const cats = [item.lang_cat1, item.lang_cat2, item.lang_cat3].filter(Boolean)
-        return cats.length > 0 ? cats.join('-') : ''
-      })
+      province: aggregateField(item => item.province),
+      city: aggregateField(item => item.city),
+      county: aggregateField(item => item.county),
+      town: aggregateField(item => item.town),
+      administrativeVillage: aggregateField(item => item.administrativeVillage),
+      naturalVillage: aggregateField(item => item.naturalVillage),
+      yindianRegion: aggregateField(item => item.yindianRegion),
+      atlasRegion: aggregateField(item => item.atlasRegion),
     }
 
     // 计算颜色（基于合并后的文字）
@@ -359,19 +358,9 @@ const convertToGeoJSON = (data) => {
         bgColor: bgColor,
         textColor: textColor,
         // 使用聚合后的数据用于弹窗
-        locationChain: aggregatedData.locationChain,
-        locationName: aggregatedData.locationName,
-        locationNames: aggregatedData.locationNames,
-        pronunciation: aggregatedData.pronunciation,
-        phonetic: aggregatedData.phonetic,
-        word: aggregatedData.word,
-        note1: aggregatedData.note1,
-        memo: aggregatedData.memo,
-        sentence: aggregatedData.sentence,
-        category: aggregatedData.category,
+        ...aggregatedData,
         // 添加额外信息：此位置的数据点数量
-        itemCount: items.length,
-        uniqueTextCount: textSet.size
+        itemCount: items.length
       }
     })
   }
@@ -434,6 +423,14 @@ const handleMarkerClick = (properties) => {
     locationName: properties.locationName,
     locationNames: properties.locationNames,
     locationLabel: properties.locationChain,
+    province: properties.province,
+    city: properties.city,
+    county: properties.county,
+    town: properties.town,
+    administrativeVillage: properties.administrativeVillage,
+    naturalVillage: properties.naturalVillage,
+    yindianRegion: properties.yindianRegion,
+    atlasRegion: properties.atlasRegion,
     itemCount: Number(properties.itemCount) || 0,
   })
 }

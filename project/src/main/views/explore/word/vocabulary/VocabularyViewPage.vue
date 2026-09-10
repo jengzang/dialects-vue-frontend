@@ -119,9 +119,12 @@
       @close="clearMapDetailModal"
     >
       <div class="map-detail-modal">
-        <!-- <p class="map-meta" v-if="mapDetailEntries.length">
-          {{ t('words.wordList.map.pointCount', { count: mapDetailEntries.length }) }}
-        </p> -->
+        <dl v-if="mapDetailMetaRows.length" class="map-detail-meta">
+          <div v-for="row in mapDetailMetaRows" :key="row.key" class="map-detail-meta-item">
+            <dt v-if="row.label" class="map-detail-meta-label">{{ row.label }}</dt>
+            <dd class="map-detail-meta-value">{{ row.value }}</dd>
+          </div>
+        </dl>
         <div v-if="isLoadingMapDetail && !mapDetailEntries.length" class="loading-state loading-state-base">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <span>{{ t('words.wordList.states.loadingData') }}</span>
@@ -186,6 +189,19 @@ const route = useRoute()
 const router = useRouter()
 const STANDARD_WORD_OPTIONS_LIMIT = 1000
 
+const MAP_POINT_META_GROUPS = [
+  {
+    keys: ['province', 'city', 'county'],
+    labelKeys: ['words.wordList.upload.province', 'words.wordList.upload.city', 'words.wordList.upload.county'],
+  },
+  {
+    keys: ['town', 'administrativeVillage', 'naturalVillage'],
+    labelKeys: ['words.wordList.upload.town', 'words.wordList.upload.administrativeVillage', 'words.wordList.upload.naturalVillage'],
+  },
+  { keys: ['yindianRegion'], labelKeys: ['words.wordList.upload.yindianRegion'] },
+  { keys: ['atlasRegion'], labelKeys: ['words.wordList.upload.atlasRegion'] },
+]
+
 const props = defineProps({
   vocabularyMe: { type: Object, default: null },
   isLoadingVocabularyMe: { type: Boolean, default: false },
@@ -240,6 +256,32 @@ const mapDetailPage = ref(1)
 const selectedMapPointLabel = ref('')
 const activeMapPointLocations = ref([])
 const activeMapPointBaseLabel = ref('')
+const activeMapPointMeta = ref(null)
+
+const mapDetailMetaRows = computed(() => {
+  const meta = activeMapPointMeta.value
+  if (!meta) {
+    return []
+  }
+  const rows = MAP_POINT_META_GROUPS
+    .map(({ keys, labelKeys }) => ({
+      key: keys.join('-'),
+      label: labelKeys.map((labelKey) => t(labelKey)).join(' / '),
+      value: keys
+        .map((key) => String(meta[key] || '').trim())
+        .filter((value) => value && value !== '-')
+        .join(' · '),
+    }))
+    .filter(({ value }) => value)
+
+  rows.push({
+    key: 'count',
+    label: '',
+    value: t('words.wordList.map.pointCount', { count: mapDetailEntries.value.length }),
+  })
+
+  return rows
+})
 
 
 const searchFieldOptions = computed(() => [
@@ -332,6 +374,14 @@ const mapDataForVocabularyMap = computed(() => {
 
       locationName: point.locationName,
       locationLabel: point.locationLabel,
+      province: point.province,
+      city: point.city,
+      county: point.county,
+      town: point.town,
+      administrativeVillage: point.administrativeVillage,
+      naturalVillage: point.naturalVillage,
+      yindianRegion: point.yindianRegion,
+      atlasRegion: point.atlasRegion,
 
       pronunciation: point.pronunciation || point.markerLabel,
       localExpression: point.localExpression || '',
@@ -390,9 +440,6 @@ function normalizeVocabularyEntry(item, index = 0, locationContext = '') {
     detail: [...new Set(detailParts)].join(' · '),
     information: item.informations || '',
     location: item.location_label || item.location || item.location_name || '',
-    locationName,
-    longitude: normalizeNumber(item.longitude),
-    latitude: normalizeNumber(item.latitude),
   }
 }
 
@@ -439,12 +486,27 @@ function buildVocabularyMapItemsParams() {
 
 function normalizeVocabularyMapPoint(point) {
   const locationName = point.location_name || ''
-  const locationLabel = point.location_label || locationName
   const entryCount = Number(point.entry_count) || 0
+  const locationLabel = [
+    point.province,
+    point.city,
+    point.county,
+    point.town,
+    point.administrative_village,
+    point.natural_village,
+  ].filter(Boolean).join(' · ') || locationName
 
   return {
     locationName,
     locationLabel,
+    province: point.province || '',
+    city: point.city || '',
+    county: point.county || '',
+    town: point.town || '',
+    administrativeVillage: point.administrative_village || '',
+    naturalVillage: point.natural_village || '',
+    yindianRegion: point.yindian_region || '',
+    atlasRegion: point.atlas_region || '',
     longitude: normalizeNumber(point.longitude),
     latitude: normalizeNumber(point.latitude),
     entryCount,
@@ -592,15 +654,6 @@ async function loadVocabularyStandardWords() {
   }
 }
 
-function buildMapDetailTitle(baseLabel, count) {
-  const parts = [baseLabel]
-  if (selectedStandardWords.value.length > 0) {
-    parts.push(selectedStandardWords.value.join('、'))
-  }
-  parts.push(t('words.wordList.map.pointCount', { count }))
-  return parts.join(' · ')
-}
-
 async function handleMapPointClick(point) {
   const locations = normalizeMapPointLocations(point)
 
@@ -608,8 +661,9 @@ async function handleMapPointClick(point) {
     return
   }
 
-  const baseLabel = point.locationLabel || point.locationName || locations[0]
+  const baseLabel = point.locationName || point.locationLabel || locations[0]
   activeMapPointBaseLabel.value = baseLabel
+  activeMapPointMeta.value = point
   isMapDetailModalOpen.value = true
   isLoadingMapDetail.value = true
   mapDetailError.value = ''
@@ -625,7 +679,7 @@ async function handleMapPointClick(point) {
     const allItems = matchingPoints.flatMap((p) => (Array.isArray(p.items) ? p.items : []))
     mapDetailEntries.value = allItems
     mapDetailTotal.value = allItems.length
-    selectedMapPointLabel.value = buildMapDetailTitle(baseLabel, allItems.length)
+    selectedMapPointLabel.value = baseLabel
     isLoadingMapDetail.value = false
     return
   }
@@ -641,7 +695,7 @@ async function handleMapPointClick(point) {
     mapDetailEntries.value = Array.isArray(response.items) ? response.items.map((item, index) => normalizeVocabularyEntry(item, index)) : []
     mapDetailTotal.value = Number(response.total) || mapDetailEntries.value.length
     mapDetailPage.value = Number(response.page) || 1
-    selectedMapPointLabel.value = buildMapDetailTitle(baseLabel, mapDetailEntries.value.length)
+    selectedMapPointLabel.value = baseLabel
   } catch (error) {
     mapDetailError.value = error.message || t('words.wordList.states.loadItemsFailed')
     mapDetailEntries.value = []
@@ -671,7 +725,7 @@ async function loadMoreMapDetail() {
     mapDetailEntries.value = mapDetailEntries.value.concat(nextEntries)
     mapDetailTotal.value = Number(response.total) || mapDetailEntries.value.length
     mapDetailPage.value = Number(response.page) || nextPage
-    selectedMapPointLabel.value = buildMapDetailTitle(activeMapPointBaseLabel.value, mapDetailEntries.value.length)
+    selectedMapPointLabel.value = activeMapPointBaseLabel.value
   } catch (error) {
     mapDetailError.value = error.message || t('words.wordList.states.loadItemsFailed')
   } finally {
@@ -684,6 +738,7 @@ function clearMapDetailModal() {
   mapDetailError.value = ''
   activeMapPointLocations.value = []
   activeMapPointBaseLabel.value = ''
+  activeMapPointMeta.value = null
 }
 
 function loadActiveViewMode() {

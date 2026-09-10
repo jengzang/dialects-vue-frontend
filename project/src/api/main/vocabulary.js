@@ -99,7 +99,14 @@ function stripVocabularyBatchReplaceParams(params = {}) {
 /**
  * @typedef {object} VocabularyMapPoint
  * @property {string} location_name 地点简称，也用于点击地图点后回查词条详情。
- * @property {string} location_label 完整地点链。
+ * @property {string} province 省；地点无元数据时为空串。
+ * @property {string} city 市；地点无元数据时为空串。
+ * @property {string} county 县/区；地点无元数据时为空串。
+ * @property {string} town 乡镇；地点无元数据时为空串。
+ * @property {string} administrative_village 行政村；地点无元数据时为空串。
+ * @property {string} natural_village 自然村；地点无元数据时为空串。
+ * @property {string} yindian_region 音典分区；地点无元数据时为空串。
+ * @property {string} atlas_region 地图集分区；地点无元数据时为空串。
  * @property {number | null} longitude 经度；地图模式需要容忍空值。
  * @property {number | null} latitude 纬度；地图模式需要容忍空值。
  * @property {number} entry_count 当前搜索条件下该地点命中的词条数。
