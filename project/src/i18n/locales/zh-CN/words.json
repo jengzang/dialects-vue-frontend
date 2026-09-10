@@ -214,6 +214,7 @@
       "loadFailed": "获取词表地点信息失败",
       "saveSuccess": "地点信息已保存。",
       "saveFailed": "保存地点信息失败",
+      "renameEmpty": "地点简称不能为空",
       "transfer": {
         "action": "移交",
         "title": "移交「{name}」",

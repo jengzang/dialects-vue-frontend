@@ -286,6 +286,7 @@ const transferSourceLabel = computed(() => (
 ))
 
 const locationEditFields = computed(() => [
+  { key: 'location_name', label: t('words.wordList.upload.locationName') },
   { key: 'coordinates', label: t('words.wordList.upload.coordinates') },
   { key: 'province', label: t('words.wordList.upload.province') },
   { key: 'city', label: t('words.wordList.upload.city') },
@@ -471,19 +472,32 @@ function confirmYindianQuery() {
   return fillFromYindian(name)
 }
 
-async function handleSaveLocation(location) {
-  if (!location?.location_name) {
+async function handleSaveLocation(location, originalLocationName) {
+  const sourceName = String(originalLocationName || '').trim()
+  if (!location || !sourceName) {
+    return
+  }
+
+  const nextName = String(location.location_name || '').trim()
+  if (!nextName) {
+    locationsStatusText.value = t('words.wordList.locations.renameEmpty')
+    showError(locationsStatusText.value)
     return
   }
 
   const payload = Object.fromEntries(
-    locationEditFields.value.map((field) => [field.key, String(location[field.key] || '').trim()])
+    locationEditFields.value
+      .filter((field) => field.key !== 'location_name')
+      .map((field) => [field.key, String(location[field.key] || '').trim()])
   )
+  if (nextName !== sourceName) {
+    payload.new_location_name = nextName
+  }
   const params = location.user_id ? { user_id: location.user_id } : {}
   locationsStatusText.value = ''
 
   try {
-    await updateVocabularyLocation(location.location_name, payload, params)
+    await updateVocabularyLocation(sourceName, payload, params)
     locationsStatusText.value = t('words.wordList.locations.saveSuccess')
     showSuccess(locationsStatusText.value)
     await loadVocabularyLocations()
@@ -540,7 +554,10 @@ async function handleConfirmTransferLocation() {
 }
 
 function handleSaveEditingLocation() {
-  return handleSaveLocation(editingLocationDraft.value || editingLocationSource.value)
+  return handleSaveLocation(
+    editingLocationDraft.value || editingLocationSource.value,
+    editingLocationSource.value?.location_name,
+  )
 }
 
 async function handleDeleteLocation(location) {

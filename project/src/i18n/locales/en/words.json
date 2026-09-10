@@ -214,6 +214,7 @@
       "loadFailed": "Failed to load vocabulary location metadata",
       "saveSuccess": "Location metadata saved.",
       "saveFailed": "Failed to save location metadata",
+      "renameEmpty": "Location name cannot be empty",
       "transfer": {
         "action": "Transfer",
         "title": "Transfer \"{name}\"",
