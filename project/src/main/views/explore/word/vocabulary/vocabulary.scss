@@ -254,6 +254,10 @@
   border-radius: var(--radius-md, 8px);
 }
 
+.map-empty-state {
+  height: 100%;
+}
+
 .map-detail-modal {
   display: grid;
   gap: 12px;
@@ -272,15 +276,6 @@
   background: var(--glass-10);
   border: 1px solid var(--glass-30);
   border-radius: var(--radius-md, 8px);
-}
-
-.map-detail-item:first-child {
-  padding-top: 4px;
-}
-
-.map-detail-item:last-child {
-  padding-bottom: 4px;
-  border-bottom: none;
 }
 
 .map-detail-item-head {

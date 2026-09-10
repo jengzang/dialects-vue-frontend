@@ -210,10 +210,8 @@ const getMarkerText = (item) => {
   } else if (displayMode.value === 'location') {
     // 地名模式
     if (props.activeTab === 'vocabulary') {
-      // 優先順序: county -> village -> city
-      text = isEmpty(item.county)
-          ? (isEmpty(item.village) ? item.city : item.village)
-          : item.county
+      // 地圖點只帶 locationName / locationLabel，沒有 county/village
+      text = isEmpty(item.locationName) ? item.locationLabel : item.locationName
     } else {
       // 優先順序: form_c -> form_d -> form_b
       text = isEmpty(item.form_c)
