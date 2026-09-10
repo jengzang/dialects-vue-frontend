@@ -321,8 +321,11 @@
 }
 
 .load-more-btn {
+  display: flex;
+  width: fit-content;
   align-self: center;
-  margin-top: 6px;
+  justify-self: center;
+  margin: 6px auto 0;
 }
 
 .btn-loading-dot {

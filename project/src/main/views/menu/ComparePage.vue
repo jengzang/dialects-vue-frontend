@@ -1575,27 +1575,27 @@ const runAction = async () => {
       if (compareType === 'chars') {
         // 漢字比較：4種狀態
         mapStore.compareGroups = {
-          same: { color: 'var(--color-success)', label: t('compare.legend.same') },
-          partial: { color: 'var(--color-warning)', label: t('compare.legend.partial') },
-          diff: { color: 'var(--color-error)', label: t('compare.legend.diff') },
-          unknown: { color: 'var(--text-lightest)', label: t('compare.legend.unknown') }
+          same: { color: '#4CAF50', label: t('compare.legend.same') },
+          partial: { color: '#FFC107', label: t('compare.legend.partial') },
+          diff: { color: '#F44336', label: t('compare.legend.diff') },
+          unknown: { color: '#9E9E9E', label: t('compare.legend.unknown') }
         }
       } else if (compareType === 'zhonggu') {
         // 中古比較：相似度百分比
         mapStore.compareGroups = {
-          same: { color: 'var(--color-success)', label: t('compare.legend.samePercent') },
-          high_similar: { color: 'var(--text-slate)', label: t('compare.legend.highSimilar') },
-          partial: { color: 'var(--color-warning)', label: t('compare.legend.partialSimilar') },
-          diff: { color: 'var(--color-error)', label: t('compare.legend.diffPercent') },
-          unknown: { color: 'var(--text-lightest)', label: t('compare.legend.unknown') }
+          same: { color: '#4CAF50', label: t('compare.legend.samePercent') },
+          high_similar: { color: '#8BC34A', label: t('compare.legend.highSimilar') },
+          partial: { color: '#FFC107', label: t('compare.legend.partialSimilar') },
+          diff: { color: '#F44336', label: t('compare.legend.diffPercent') },
+          unknown: { color: '#9E9E9E', label: t('compare.legend.unknown') }
         }
       } else if (compareType === 'tones') {
         // 調類比較：合併狀態
         mapStore.compareGroups = {
-          same: { color: 'var(--color-success)', label: t('compare.legend.merged') },
-          maybe: { color: 'var(--text-slate)', label: t('compare.legend.maybeMerged') },  // 使用中性色 token，保持与其他状态一致的 token 约束
-          diff: { color: 'var(--color-error)', label: t('compare.legend.notMerged') },
-          unknown: { color: 'var(--text-lightest)', label: t('compare.legend.unknown') }
+          same: { color: '#4CAF50', label: t('compare.legend.merged') },
+          maybe: { color: '#8BC34A', label: t('compare.legend.maybeMerged') },  // 使用黃綠色，與中古比較的高度相似顏色一致
+          diff: { color: '#F44336', label: t('compare.legend.notMerged') },
+          unknown: { color: '#9E9E9E', label: t('compare.legend.unknown') }
         }
       }
 
@@ -1696,10 +1696,10 @@ function createComparisonItem(location, coordinate, feature, status, data, pair)
   let displayValue = ''
 
   if (status === 'same') {
-    color = 'var(--color-success)'
+    color = '#4CAF50'
     displayValue = data.value || t('compare.legend.same')
   } else if (status === 'diff') {
-    color = 'var(--color-error)'
+    color = '#F44336'
     if (data.values) {
       const values = Object.entries(data.values)
         .map(([char, vals]) => `${char}:${vals.join('/')}`)
@@ -1713,7 +1713,7 @@ function createComparisonItem(location, coordinate, feature, status, data, pair)
       displayValue = t('compare.legend.diff')
     }
   } else if (status === 'partial') {
-    color = 'var(--color-warning)'
+    color = '#FFC107'
     if (data.t1_value || data.t2_value) {
       const t1 = data.t1_value?.join('/') || t('common.label.noData')
       const t2 = data.t2_value?.join('/') || t('common.label.noData')
@@ -1784,7 +1784,7 @@ function createZhongGuComparisonItem(location, coordinate, feature, featureData)
 
   let color, status, statusText
   if (overlap >= 80) {
-    color = 'var(--color-success)'
+    color = '#4CAF50'
     status = 'same'
     statusText = t('compare.legend.samePercent')
   } else if (overlap >= 60) {
@@ -1792,11 +1792,11 @@ function createZhongGuComparisonItem(location, coordinate, feature, featureData)
     status = 'high_similar'
     statusText = t('compare.legend.highSimilar')
   } else if (overlap >= 30) {
-    color = 'var(--color-warning)'
+    color = '#FFC107'
     status = 'partial'
     statusText = t('compare.legend.partialSimilar')
   } else {
-    color = 'var(--color-error)'
+    color = '#F44336'
     status = 'diff'
     statusText = t('compare.legend.diffPercent')
   }

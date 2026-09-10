@@ -213,6 +213,17 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyScss).toContain('max-height: 69dvh')
   })
 
+  it('centers vocabulary load-more buttons in card and map detail layouts', () => {
+    const vocabularyPage = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
+    const vocabularyScss = readSource('src/main/views/explore/word/vocabulary/vocabulary.scss')
+    const loadMoreRule = vocabularyScss.match(/\.load-more-btn\s*\{[^}]*\}/)?.[0] || ''
+
+    expect(vocabularyPage.match(/class="load-more-btn glass-button"/g)).toHaveLength(2)
+    expect(loadMoreRule).toContain('width: fit-content')
+    expect(loadMoreRule).toContain('margin: 6px auto 0')
+    expect(loadMoreRule).toContain('justify-self: center')
+  })
+
   it('uses dedicated vocabulary locations APIs for location metadata management', () => {
     const vocabularyPage = readSource('src/main/views/explore/word/vocabulary/VocabularyManagePage.vue')
 
