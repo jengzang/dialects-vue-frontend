@@ -7,7 +7,7 @@
       @click="toggle"
     >
       <div class="node-label">
-        <span class="icon"><InlineIcon :icon="isLeafNode ? '✍️' : '📁'" /></span>
+        <span class="icon"><InlineIcon :icon="hasChildren ? '📁' : '✍️'" /></span>
         <span class="text" v-if="isMatch" v-html="highlightName"></span>
         <span class="text" v-else>{{ displayName }}</span>
         <span v-if="node._loadingChildren" class="lazy-indicator">↻</span>
@@ -130,7 +130,6 @@ const hasLeafContent = computed(() => Array.isArray(props.node?.chars) && props.
 const hasChildNodes = computed(
   () => Array.isArray(props.node?.children) && props.node.children.length > 0
 )
-const isLeafNode = computed(() => props.node?.isLeaf === true && !props.node?._lazy)
 const hasChildren = computed(() => {
   if (props.node._lazy && !props.node._childrenLoaded && !props.node._loadError) {
     return true
