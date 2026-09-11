@@ -250,6 +250,8 @@ const getLocationText = (item) => {
     .join('-') || '-'
 }
 
+const TONE_FIELD_KEYS = Array.from({ length: 10 }, (_, index) => `t${index + 1}`)
+
 // 转换数据为 GeoJSON 格式
 const convertToGeoJSON = (data) => {
   if (!data || data.length === 0) {
@@ -335,6 +337,7 @@ const convertToGeoJSON = (data) => {
       naturalVillage: aggregateField(item => item.naturalVillage),
       yindianRegion: aggregateField(item => item.yindianRegion),
       atlasRegion: aggregateField(item => item.atlasRegion),
+      ...Object.fromEntries(TONE_FIELD_KEYS.map(key => [key, aggregateField(item => item[key])])),
     }
 
     // 计算颜色（基于合并后的文字）
@@ -431,6 +434,7 @@ const handleMarkerClick = (properties) => {
     naturalVillage: properties.naturalVillage,
     yindianRegion: properties.yindianRegion,
     atlasRegion: properties.atlasRegion,
+    ...Object.fromEntries(TONE_FIELD_KEYS.map(key => [key, properties[key]])),
     itemCount: Number(properties.itemCount) || 0,
   })
 }

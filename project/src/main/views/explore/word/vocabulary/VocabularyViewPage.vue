@@ -123,7 +123,15 @@
         <dl v-if="mapDetailMetaRows.length" class="map-detail-meta">
           <div v-for="row in mapDetailMetaRows" :key="row.key" class="map-detail-meta-item">
             <dt v-if="row.label" class="map-detail-meta-label">{{ row.label }}</dt>
-            <dd class="map-detail-meta-value">{{ row.value }}</dd>
+            <dd class="map-detail-meta-value" :class="{ 'map-detail-meta-value--tones': row.tones }">
+              <template v-if="row.tones">
+                <span v-for="tone in row.tones" :key="tone.key" class="tone-pill">
+                  <span class="tone-pill-name">{{ tone.name }}</span>
+                  <span class="tone-pill-value">{{ tone.value }}</span>
+                </span>
+              </template>
+              <template v-else>{{ row.value }}</template>
+            </dd>
           </div>
         </dl>
         <div v-if="isLoadingMapDetail && !mapDetailEntries.length" class="loading-state loading-state-base">
@@ -205,7 +213,15 @@
             <dl v-if="expandedLocationKeys.has(point.locationName)" class="map-detail-meta">
               <div v-for="row in pointMetaRows(point)" :key="row.key" class="map-detail-meta-item">
                 <dt v-if="row.label" class="map-detail-meta-label">{{ row.label }}</dt>
-                <dd class="map-detail-meta-value">{{ row.value }}</dd>
+                <dd class="map-detail-meta-value" :class="{ 'map-detail-meta-value--tones': row.tones }">
+              <template v-if="row.tones">
+                <span v-for="tone in row.tones" :key="tone.key" class="tone-pill">
+                  <span class="tone-pill-name">{{ tone.name }}</span>
+                  <span class="tone-pill-value">{{ tone.value }}</span>
+                </span>
+              </template>
+              <template v-else>{{ row.value }}</template>
+            </dd>
               </div>
             </dl>
           </article>
@@ -241,6 +257,8 @@ const route = useRoute()
 const router = useRouter()
 const STANDARD_WORD_OPTIONS_LIMIT = 1000
 
+const TONE_FIELD_KEYS = Array.from({ length: 10 }, (_, index) => `t${index + 1}`)
+
 const MAP_POINT_META_GROUPS = [
   {
     keys: ['province', 'city', 'county'],
@@ -253,6 +271,23 @@ const MAP_POINT_META_GROUPS = [
   { keys: ['yindianRegion'], labelKeys: ['words.wordList.upload.yindianRegion'] },
   { keys: ['atlasRegion'], labelKeys: ['words.wordList.upload.atlasRegion'] },
 ]
+
+function buildToneMetaRow(source) {
+  if (!source) {
+    return null
+  }
+
+  const tones = TONE_FIELD_KEYS
+    .map((key) => {
+      const value = String(source[key] || '').trim()
+      return value && value !== '-'
+        ? { key, name: t(`words.wordList.upload.toneNames.${key}`), value }
+        : null
+    })
+    .filter(Boolean)
+
+  return tones.length ? { key: 'tones', label: t('words.wordList.upload.toneValues'), tones } : null
+}
 
 const props = defineProps({
   vocabularyMe: { type: Object, default: null },
@@ -331,6 +366,11 @@ const mapDetailMetaRows = computed(() => {
     }))
     .filter(({ value }) => value)
 
+  const toneRow = buildToneMetaRow(meta)
+  if (toneRow) {
+    rows.push(toneRow)
+  }
+
   rows.push({
     key: 'count',
     label: '',
@@ -346,7 +386,7 @@ function pointMetaRows(point) {
     return []
   }
 
-  return MAP_POINT_META_GROUPS
+  const rows = MAP_POINT_META_GROUPS
     .map(({ keys, labelKeys }) => ({
       key: keys.join('-'),
       label: labelKeys.map((labelKey) => t(labelKey)).join(' / '),
@@ -356,6 +396,13 @@ function pointMetaRows(point) {
         .join(' · '),
     }))
     .filter(({ value }) => value)
+
+  const toneRow = buildToneMetaRow(point)
+  if (toneRow) {
+    rows.push(toneRow)
+  }
+
+  return rows
 }
 
 const locationDetailsSourcePoints = computed(() => {
@@ -460,6 +507,7 @@ const mapDataForVocabularyMap = computed(() => {
       naturalVillage: point.naturalVillage,
       yindianRegion: point.yindianRegion,
       atlasRegion: point.atlasRegion,
+      ...Object.fromEntries(TONE_FIELD_KEYS.map((key) => [key, point[key] || ''])),
 
       pronunciation: point.pronunciation || point.markerLabel,
       localExpression: point.localExpression || '',
@@ -585,6 +633,7 @@ function normalizeVocabularyMapPoint(point) {
     naturalVillage: point.natural_village || '',
     yindianRegion: point.yindian_region || '',
     atlasRegion: point.atlas_region || '',
+    ...Object.fromEntries(TONE_FIELD_KEYS.map((key) => [key, point[key] || ''])),
     longitude: normalizeNumber(point.longitude),
     latitude: normalizeNumber(point.latitude),
     entryCount,

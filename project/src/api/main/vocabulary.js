@@ -110,6 +110,16 @@ function stripVocabularyBatchReplaceParams(params = {}) {
  * @property {number | null} longitude 经度；地图模式需要容忍空值。
  * @property {number | null} latitude 纬度；地图模式需要容忍空值。
  * @property {number} entry_count 当前搜索条件下该地点命中的词条数。
+ * @property {string} t1 阴平调值；地点无该调值时为空串。
+ * @property {string} t2 阳平调值；地点无该调值时为空串。
+ * @property {string} t3 阴上调值；地点无该调值时为空串。
+ * @property {string} t4 阳上调值；地点无该调值时为空串。
+ * @property {string} t5 阴去调值；地点无该调值时为空串。
+ * @property {string} t6 阳去调值；地点无该调值时为空串。
+ * @property {string} t7 阴入调值；地点无该调值时为空串。
+ * @property {string} t8 阳入调值；地点无该调值时为空串。
+ * @property {string} t9 其他调调值；地点无该调值时为空串。
+ * @property {string} t10 轻声调值；地点无该调值时为空串。
  */
 
 /**

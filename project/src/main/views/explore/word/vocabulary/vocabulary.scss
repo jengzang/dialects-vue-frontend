@@ -292,7 +292,7 @@
 .map-detail-meta-label {
   flex-shrink: 0;
   margin: 0;
-  color: var(--text-secondary);
+  color: var(--color-primary-hover);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -304,6 +304,36 @@
   font-size: 13px;
   line-height: 1.6;
   word-break: break-word;
+}
+
+/* 调值行：每个调一个小胶囊 */
+.map-detail-meta-value--tones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tone-pill {
+  display: inline-flex;
+  gap: 4px;
+  align-items: baseline;
+  padding: 1px 8px;
+  color: var(--text-primary);
+  font-size: 12px;
+  line-height: 1.8;
+  background: var(--glass-30);
+  border: 1px solid var(--glass-40);
+  border-radius: 999px;
+}
+
+.tone-pill-name {
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.tone-pill-value {
+  font-variant-numeric: tabular-nums;
 }
 
 /* 末行是「共 N 条」，作为低调的页脚 */
@@ -462,6 +492,8 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
+  max-height: 50dvh;
+  overflow-y: auto;
 }
 
 .upload-location-summary {

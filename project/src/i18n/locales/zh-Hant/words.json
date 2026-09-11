@@ -153,6 +153,7 @@
       "naturalVillage": "自然村",
       "yindianRegion": "音典分區",
       "atlasRegion": "地圖集分區",
+      "toneValues": "調值",
       "toneNames": {
         "t1": "陰平",
         "t2": "陽平",
