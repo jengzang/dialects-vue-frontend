@@ -48,6 +48,10 @@
       "title": "Custom Conversion Rules",
       "desc": "Configure mapping rules for initials, finals, codas, and tones."
     },
+    "mode": {
+      "multiLabel": "Multi-syllable mode",
+      "multiHint": "Convert each syllable split by spaces; non-syllable symbols (brackets, slashes, 或, etc.) are kept as-is. Single-syllable input yields the same result as the default mode."
+    },
     "processing": {
       "title": "Converting...",
       "preparingUpload": "Preparing upload...",

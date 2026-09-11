@@ -57,14 +57,16 @@ export async function uploadJyutFile(file, options = {}) {
 /**
  * 开始粤拼转IPA处理
  * @param {string} taskId - 任务ID
+ * @param {Array} [customRules] - 自定义转换规则
+ * @param {'single'|'multi'} [mode] - 转换模式：single 单音节(默认)，multi 多音节(按空格分隔)
  * @returns {Promise<{message: string}>} 处理结果
  * @throws {Error} 处理失败
  * @example
- * await processJyut2Ipa(taskId)
+ * await processJyut2Ipa(taskId, [], 'multi')
  */
-export async function processJyut2Ipa(taskId, customRules = []) {
+export async function processJyut2Ipa(taskId, customRules = [], mode = 'single') {
   try {
-    const body = { task_id: taskId }
+    const body = { task_id: taskId, mode }
     if (Array.isArray(customRules) && customRules.length > 0) {
       body.custom_rules = customRules.map(({ to_replace, replacement, category, enabled }) => ({
         to_replace,
