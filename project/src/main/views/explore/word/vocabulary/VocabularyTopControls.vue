@@ -17,12 +17,20 @@
 
         <div class="field-filter">
           <button
-            class="gear-btn glass-button"
+            class="gear-btn"
             type="button"
             :title="t('words.wordList.search.settings')"
             @click="searchFieldModalOpen = true"
           >
             <span aria-hidden="true"><InlineIcon icon="⚙️" /></span>
+          </button>
+          <button
+            class="pill-btn location-details-btn"
+            type="button"
+            :title="t('words.wordList.search.locationDetails')"
+            @click="emit('openLocationDetails')"
+          >
+            {{ t('words.wordList.search.locationDetailsButton') }}
           </button>
           <AppModal
             v-model="searchFieldModalOpen"
@@ -218,6 +226,7 @@ const emit = defineEmits([
   'update:filterByRegion',
   'update:selectedProvince',
   'update:selectedCity',
+  'openLocationDetails',
 ])
 
 const searchInputEl = ref(null)
@@ -368,15 +377,65 @@ const standardWordTriggerLabel = computed(() => {
 }
 
 .field-filter {
+  display: flex;
   flex: 0 0 auto;
+  gap: 10px;
+  align-items: center;
 }
 
 .gear-btn {
-  min-width: 40px;
-  min-height: 40px;
-  padding: 0;
-  font-size: 18px;
+  appearance: none;
+  border: 1px solid transparent;
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+
+  margin: 0;
+  padding: 5px;
+
+  width: 32px;
+  height: 32px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 6px;
+
+  font-size: 20px;
   line-height: 1;
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+
+  span {
+    display: inline-flex;
+    transition: transform 0.4s ease;
+  }
+
+  &:hover {
+    background: var(--glass-10);
+    border-color: var(--color-primary-border);
+    color: var(--color-primary);
+  }
+
+  &:hover span {
+    transform: rotate(90deg);
+  }
+
+  &:active {
+    transform: scale(0.92);
+  }
+}
+
+.location-details-btn {
+  // padding: 0 4px;
+  font-size: 14px;
+  white-space: nowrap;
 }
 
 .search-field-modal {

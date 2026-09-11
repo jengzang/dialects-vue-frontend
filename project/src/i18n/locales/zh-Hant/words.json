@@ -69,7 +69,9 @@
       "provincePlaceholder": "選擇省",
       "cityPlaceholder": "選擇市",
       "allProvinces": "全部省份",
-      "allCities": "全部城市"
+      "allCities": "全部城市",
+      "locationDetails": "地點詳情",
+      "locationDetailsButton": "方言點"
     },
     "sort": {
       "label": "排序",

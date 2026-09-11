@@ -362,6 +362,74 @@
   line-height: 1.55;
 }
 
+.location-details-modal {
+  display: grid;
+  gap: 10px;
+  min-height: 30dvh;
+  align-content: start;
+}
+
+.location-details-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.location-details-item {
+  background: var(--glass-10);
+  border: 1px solid var(--glass-30);
+  border-radius: var(--radius-md, 8px);
+  overflow: hidden;
+}
+
+.location-details-head {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  padding: 10px 12px;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+}
+
+.location-details-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.location-details-count {
+  flex: 0 0 auto;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.location-details-chevron {
+  flex: 0 0 auto;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  transition: transform 0.18s ease;
+}
+
+.location-details-chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.location-details-item .map-detail-meta {
+  margin: 0 12px 12px;
+}
+
+/* 折叠区复用 .map-detail-meta 的排版，但不使用「末行置灰」的页脚样式 */
+.location-details-item .map-detail-meta-item:last-child .map-detail-meta-value {
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
 .load-more-btn {
   display: flex;
   width: fit-content;

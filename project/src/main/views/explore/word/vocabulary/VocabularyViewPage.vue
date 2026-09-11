@@ -16,6 +16,7 @@
       :standard-word-options="standardWordOptions"
       :province-options="provinceOptions"
       :city-options="cityOptions"
+      @open-location-details="openLocationDetails"
     />
 
     <section v-if="viewMode !== 'table'" class="content-area">
@@ -164,6 +165,57 @@
       </div>
     </AppModal>
 
+    <AppModal
+      v-model="isLocationDetailsModalOpen"
+      size="lg"
+      width="720px"
+      max-height="80dvh"
+      :title="t('words.wordList.search.locationDetails')"
+      :close-label="t('common.button.close')"
+      @close="clearLocationDetailsModal"
+    >
+      <div class="location-details-modal">
+        <div v-if="isLoadingLocationDetails && !locationDetailsSourcePoints.length" class="loading-state loading-state-base">
+          <div class="ui-loading--page" aria-hidden="true"></div>
+          <span>{{ t('words.wordList.states.loadingData') }}</span>
+        </div>
+        <div v-else-if="locationDetailsError" class="empty-state empty-state-base">
+          <p>{{ locationDetailsError }}</p>
+        </div>
+        <div v-else-if="locationDetailsSourcePoints.length" class="location-details-list">
+          <article
+            v-for="(point, index) in locationDetailsSourcePoints"
+            :key="`${point.locationName}-${index}`"
+            class="location-details-item"
+          >
+            <button
+              class="location-details-head"
+              type="button"
+              :aria-expanded="expandedLocationKeys.has(point.locationName)"
+              @click="toggleLocationDetail(point.locationName)"
+            >
+              <span class="location-details-name">{{ point.locationLabel || point.locationName }}</span>
+              <span class="location-details-count">{{ t('words.wordList.map.pointCount', { count: point.entryCount || 0 }) }}</span>
+              <span
+                class="location-details-chevron"
+                :class="{ 'is-open': expandedLocationKeys.has(point.locationName) }"
+                aria-hidden="true"
+              >⌄</span>
+            </button>
+            <dl v-if="expandedLocationKeys.has(point.locationName)" class="map-detail-meta">
+              <div v-for="row in pointMetaRows(point)" :key="row.key" class="map-detail-meta-item">
+                <dt v-if="row.label" class="map-detail-meta-label">{{ row.label }}</dt>
+                <dd class="map-detail-meta-value">{{ row.value }}</dd>
+              </div>
+            </dl>
+          </article>
+        </div>
+        <div v-else class="empty-state empty-state-base">
+          <p>{{ t('words.wordList.states.noData') }}</p>
+        </div>
+      </div>
+    </AppModal>
+
   </div>
 </template>
 
@@ -242,6 +294,11 @@ const mapStats = ref({
   totalPoints: 0,
   omittedWithoutCoordinates: 0,
 })
+const isLocationDetailsModalOpen = ref(false)
+const isLoadingLocationDetails = ref(false)
+const locationDetailsError = ref('')
+const locationDetailsPoints = ref([])
+const expandedLocationKeys = ref(new Set())
 const total = ref(0)
 const page = ref(1)
 const pageSize = ref(50)
@@ -283,6 +340,27 @@ const mapDetailMetaRows = computed(() => {
   return rows
 })
 
+
+function pointMetaRows(point) {
+  if (!point) {
+    return []
+  }
+
+  return MAP_POINT_META_GROUPS
+    .map(({ keys, labelKeys }) => ({
+      key: keys.join('-'),
+      label: labelKeys.map((labelKey) => t(labelKey)).join(' / '),
+      value: keys
+        .map((key) => String(point[key] || '').trim())
+        .filter((value) => value && value !== '-')
+        .join(' · '),
+    }))
+    .filter(({ value }) => value)
+}
+
+const locationDetailsSourcePoints = computed(() => {
+  return viewMode.value === 'map' ? mapPoints.value : locationDetailsPoints.value
+})
 
 const searchFieldOptions = computed(() => [
   { value: 'definition', label: t('words.wordList.search.fields.definition') },
@@ -746,6 +824,46 @@ function clearMapDetailModal() {
   activeMapPointLocations.value = []
   activeMapPointBaseLabel.value = ''
   activeMapPointMeta.value = null
+}
+
+function toggleLocationDetail(locationName) {
+  const next = new Set(expandedLocationKeys.value)
+  if (next.has(locationName)) {
+    next.delete(locationName)
+  } else {
+    next.add(locationName)
+  }
+  expandedLocationKeys.value = next
+}
+
+function clearLocationDetailsModal() {
+  expandedLocationKeys.value = new Set()
+  locationDetailsError.value = ''
+}
+
+async function openLocationDetails() {
+  expandedLocationKeys.value = new Set()
+  locationDetailsError.value = ''
+  isLocationDetailsModalOpen.value = true
+
+  // 地图模式已加载 mapPoints，直接复用，避免重复请求
+  if (viewMode.value === 'map') {
+    return
+  }
+
+  isLoadingLocationDetails.value = true
+
+  try {
+    const response = await getVocabularyMapPoints(buildVocabularyMapPointsParams())
+    locationDetailsPoints.value = Array.isArray(response.points)
+      ? response.points.map(normalizeVocabularyMapPoint)
+      : []
+  } catch (error) {
+    locationDetailsError.value = error.message || t('words.wordList.states.loadMapFailed')
+    locationDetailsPoints.value = []
+  } finally {
+    isLoadingLocationDetails.value = false
+  }
 }
 
 function loadActiveViewMode() {

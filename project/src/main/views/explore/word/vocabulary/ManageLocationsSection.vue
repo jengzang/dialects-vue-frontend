@@ -44,8 +44,8 @@
             <div class="location-item-info">
               <strong>{{ location.location_name }}</strong>
               <p>{{ location.location_label || location.location_name }}</p>
+              <span class="location-item-username">{{ location.username }}</span>
             </div>
-            <span class="location-item-username">{{ location.username }}</span>
             <button class="glass-button" data-variant="primary" type="button" @click="openLocationEditor(location)">
               {{ t('common.button.edit') }}
             </button>

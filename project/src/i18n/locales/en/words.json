@@ -69,7 +69,9 @@
       "provincePlaceholder": "Select Province",
       "cityPlaceholder": "Select City",
       "allProvinces": "All Provinces",
-      "allCities": "All Cities"
+      "allCities": "All Cities",
+      "locationDetails": "Location details",
+      "locationDetailsButton": "Locations"
     },
     "sort": {
       "label": "Sort",
