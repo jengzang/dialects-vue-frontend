@@ -153,6 +153,18 @@
       "naturalVillage": "自然村",
       "yindianRegion": "音典分區",
       "atlasRegion": "地圖集分區",
+      "toneNames": {
+        "t1": "陰平",
+        "t2": "陽平",
+        "t3": "陰上",
+        "t4": "陽上",
+        "t5": "陰去",
+        "t6": "陽去",
+        "t7": "陰入",
+        "t8": "陽入",
+        "t9": "其他調",
+        "t10": "輕聲"
+      },
       "parserMode": "解析方式",
       "parserModes": {
         "auto": "自動識別",

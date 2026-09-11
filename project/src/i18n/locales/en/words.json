@@ -153,6 +153,18 @@
       "naturalVillage": "Natural Village",
       "yindianRegion": "Yindian Region",
       "atlasRegion": "Atlas Region",
+      "toneNames": {
+        "t1": "Yin Ping",
+        "t2": "Yang Ping",
+        "t3": "Yin Shang",
+        "t4": "Yang Shang",
+        "t5": "Yin Qu",
+        "t6": "Yang Qu",
+        "t7": "Yin Ru",
+        "t8": "Yang Ru",
+        "t9": "Other Tone",
+        "t10": "Neutral Tone"
+      },
       "parserMode": "Parser Mode",
       "parserModes": {
         "auto": "Auto",

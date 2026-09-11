@@ -296,6 +296,12 @@ const transferSourceLabel = computed(() => (
   || t('words.wordList.locations.transfer.unknownUser')
 ))
 
+const TONE_FIELD_KEYS = Array.from({ length: 10 }, (_, index) => `t${index + 1}`)
+const TONE_SOURCE_KEYS = [
+  'T1陰平', 'T2陽平', 'T3陰上', 'T4陽上', 'T5陰去',
+  'T6陽去', 'T7陰入', 'T8陽入', 'T9其他調', 'T10輕聲',
+]
+
 const locationEditFields = computed(() => [
   { key: 'location_name', label: t('words.wordList.upload.locationName') },
   { key: 'coordinates', label: t('words.wordList.upload.coordinates') },
@@ -307,6 +313,10 @@ const locationEditFields = computed(() => [
   { key: 'natural_village', label: t('words.wordList.upload.naturalVillage') },
   { key: 'yindian_region', label: t('words.wordList.upload.yindianRegion') },
   { key: 'atlas_region', label: t('words.wordList.upload.atlasRegion') },
+  ...TONE_FIELD_KEYS.map((key) => ({
+    key,
+    label: t(`words.wordList.upload.toneNames.${key}`),
+  })),
 ])
 
 function appendFilledFilters(target, filters) {
@@ -414,18 +424,26 @@ function getLocationDetailRow(response) {
 
 function applyYindianDetail(detail) {
   if (!editingLocationDraft.value || !detail) return
-  editingLocationDraft.value = {
-    ...editingLocationDraft.value,
-    location_name: editingLocationDraft.value.location_name || detail?.['語言'] || '',
-    coordinates: detail?.['經緯度'] || editingLocationDraft.value.coordinates,
-    province: detail?.['省'] || editingLocationDraft.value.province,
-    city: detail?.['市'] || editingLocationDraft.value.city,
-    county: detail?.['縣'] || editingLocationDraft.value.county,
-    town: detail?.['鎮'] || editingLocationDraft.value.town,
-    administrative_village: detail?.['行政村'] || editingLocationDraft.value.administrative_village,
-    natural_village: detail?.['自然村'] || editingLocationDraft.value.natural_village,
-    yindian_region: detail?.['音典分區'] || editingLocationDraft.value.yindian_region,
+  const draft = editingLocationDraft.value
+  const next = {
+    ...draft,
+    location_name: draft.location_name || detail?.['語言'] || '',
+    coordinates: detail?.['經緯度'] || draft.coordinates,
+    province: detail?.['省'] || draft.province,
+    city: detail?.['市'] || draft.city,
+    county: detail?.['縣'] || draft.county,
+    town: detail?.['鎮'] || draft.town,
+    administrative_village: detail?.['行政村'] || draft.administrative_village,
+    natural_village: detail?.['自然村'] || draft.natural_village,
+    yindian_region: detail?.['音典分區'] || draft.yindian_region,
   }
+
+  TONE_SOURCE_KEYS.forEach((sourceKey, index) => {
+    const key = `t${index + 1}`
+    next[key] = detail?.[sourceKey] || draft[key]
+  })
+
+  editingLocationDraft.value = next
 }
 
 async function fillFromYindian(name) {

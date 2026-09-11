@@ -480,6 +480,12 @@ const fillStandardFromLocal = ref(false)
 const uploadFile = ref(null)
 const fileInputEl = ref(null)
 const isDragOver = ref(false)
+const TONE_FIELD_KEYS = Array.from({ length: 10 }, (_, index) => `t${index + 1}`)
+const TONE_SOURCE_KEYS = [
+  'T1陰平', 'T2陽平', 'T3陰上', 'T4陽上', 'T5陰去',
+  'T6陽去', 'T7陰入', 'T8陽入', 'T9其他調', 'T10輕聲',
+]
+
 const createEmptyUploadLocation = () => ({
   location_name: '',
   coordinates: '',
@@ -491,6 +497,16 @@ const createEmptyUploadLocation = () => ({
   natural_village: '',
   yindian_region: '',
   atlas_region: '',
+  t1: '',
+  t2: '',
+  t3: '',
+  t4: '',
+  t5: '',
+  t6: '',
+  t7: '',
+  t8: '',
+  t9: '',
+  t10: '',
 })
 const uploadLocation = ref(createEmptyUploadLocation())
 const uploadLocationDraft = ref(createEmptyUploadLocation())
@@ -523,6 +539,12 @@ const uploadLocationFields = computed(() => [
   { key: 'natural_village', label: t('words.wordList.upload.naturalVillage'), placeholder: t('words.wordList.upload.naturalVillage'), required: false },
   { key: 'yindian_region', label: t('words.wordList.upload.yindianRegion'), placeholder: t('words.wordList.upload.yindianRegion'), required: false },
   { key: 'atlas_region', label: t('words.wordList.upload.atlasRegion'), placeholder: t('words.wordList.upload.atlasRegion'), required: false },
+  ...TONE_FIELD_KEYS.map((key) => ({
+    key,
+    label: t(`words.wordList.upload.toneNames.${key}`),
+    placeholder: t(`words.wordList.upload.toneNames.${key}`),
+    required: false,
+  })),
 ])
 
 const parserModeOptions = computed(() => [
@@ -704,19 +726,27 @@ function getLocationDetailRow(response) {
 }
 
 function applyYindianLocationDetail(detail) {
-  uploadLocationDraft.value = {
-    ...uploadLocationDraft.value,
-    location_name: uploadLocationDraft.value.location_name || detail?.['語言'] || '',
-    coordinates: detail?.['經緯度'] || uploadLocationDraft.value.coordinates,
-    province: detail?.['省'] || uploadLocationDraft.value.province,
-    city: detail?.['市'] || uploadLocationDraft.value.city,
-    county: detail?.['縣'] || uploadLocationDraft.value.county,
-    town: detail?.['鎮'] || uploadLocationDraft.value.town,
-    administrative_village: detail?.['行政村'] || uploadLocationDraft.value.administrative_village,
-    natural_village: detail?.['自然村'] || uploadLocationDraft.value.natural_village,
-    yindian_region: detail?.['音典分區'] || uploadLocationDraft.value.yindian_region,
-    atlas_region: detail?.['地圖集二分區'] || uploadLocationDraft.value.atlas_region,
+  const draft = uploadLocationDraft.value
+  const next = {
+    ...draft,
+    location_name: draft.location_name || detail?.['語言'] || '',
+    coordinates: detail?.['經緯度'] || draft.coordinates,
+    province: detail?.['省'] || draft.province,
+    city: detail?.['市'] || draft.city,
+    county: detail?.['縣'] || draft.county,
+    town: detail?.['鎮'] || draft.town,
+    administrative_village: detail?.['行政村'] || draft.administrative_village,
+    natural_village: detail?.['自然村'] || draft.natural_village,
+    yindian_region: detail?.['音典分區'] || draft.yindian_region,
+    atlas_region: detail?.['地圖集二分區'] || draft.atlas_region,
   }
+
+  TONE_SOURCE_KEYS.forEach((sourceKey, index) => {
+    const key = `t${index + 1}`
+    next[key] = detail?.[sourceKey] || draft[key]
+  })
+
+  uploadLocationDraft.value = next
 }
 
 async function fillFromYindian(name) {
