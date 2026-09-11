@@ -625,6 +625,10 @@ async function loadVocabularyLocationOptions() {
 }
 
 async function loadVocabularyStandardWords() {
+  if (viewMode.value !== 'map') {
+    return
+  }
+
   try {
     const response = await getVocabularyStandardWords(buildVocabularyStandardWordsParams())
     const standardWords = Array.isArray(response.standard_words) ? response.standard_words : []
@@ -647,7 +651,10 @@ async function loadVocabularyStandardWords() {
     if (selectedStandardWord.value && !optionValues.has(selectedStandardWord.value)) {
       selectedStandardWord.value = ''
     }
-    selectedStandardWordsModel.value = selectedStandardWordsModel.value.filter((value) => optionValues.has(value))
+    const filteredStandardWords = selectedStandardWordsModel.value.filter((value) => optionValues.has(value))
+    if (filteredStandardWords.length !== selectedStandardWordsModel.value.length) {
+      selectedStandardWordsModel.value = filteredStandardWords
+    }
   } catch {
     vocabularyStandardWordOptions.value = []
     selectedStandardWord.value = ''
@@ -765,6 +772,7 @@ watch(() => route.query.tab, (tab) => {
 })
 
 watch(viewMode, () => {
+  loadVocabularyStandardWords()
   loadActiveViewMode()
 })
 
