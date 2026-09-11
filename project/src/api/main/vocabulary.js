@@ -487,6 +487,27 @@ export async function deleteVocabularyLocation(locationName, params = {}) {
 }
 
 /**
+ * 導出詞表地點（單 sheet：标准词 / 方言词 / 音标 / 详细释义）。
+ *
+ * 後端接口：GET /api/vocabulary/locations/{location_name}/export
+ *
+ * @param {string} locationName
+ * @param {{user_id?: number|string}} [params={}]
+ * @returns {Promise<Blob>}
+ */
+export async function exportVocabularyLocation(locationName, params = {}) {
+  try {
+    return await api(`${VOCABULARY_LOCATIONS_ENDPOINT}/${encodeURIComponent(locationName)}/export${appendQueryParams(params)}`, {
+      responseType: 'blob',
+    })
+  } catch (error) {
+    console.error('Export vocabulary location error:', error)
+    showError(error.message || '導出詞表失敗')
+    throw new Error(error.message || '導出詞表失敗')
+  }
+}
+
+/**
  * 获取词表操作日志。
  *
  * @param {{user_id?: number|string, permission_level?: string, source?: string, action?: string, table_name?: string, status?: string, page?: number, page_size?: number}} [params={}]

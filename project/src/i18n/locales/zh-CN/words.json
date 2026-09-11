@@ -140,7 +140,7 @@
       "confirmOverwrite": "我确认用这次导入替换该地点已有词条",
       "previewReady": "预览完成，请确认后提交词表。",
       "permissionRequired": "当前账号没有词表上传权限。",
-      "locationName": "地点简称",
+      "locationName": "方言点",
       "locationNamePlaceholder": "例如：息烽",
       "enterLocationInfo": "输入地点信息",
       "coordinates": "经纬度",
@@ -217,6 +217,9 @@
       "saveSuccess": "地点信息已保存。",
       "saveFailed": "保存地点信息失败",
       "renameEmpty": "地点简称不能为空",
+      "export": "导出",
+      "exportSuccess": "已导出「{name}」词表。",
+      "exportFailed": "导出词表失败",
       "transfer": {
         "action": "移交",
         "title": "移交「{name}」",

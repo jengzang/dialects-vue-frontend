@@ -82,6 +82,7 @@ export {
   updateVocabularyLocation,
   transferVocabularyLocation,
   deleteVocabularyLocation,
+  exportVocabularyLocation,
   setVocabularyPermission,
   previewVocabularyImport,
   uploadVocabulary,

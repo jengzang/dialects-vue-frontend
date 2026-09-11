@@ -49,6 +49,16 @@
             <button class="glass-button" data-variant="primary" type="button" @click="openLocationEditor(location)">
               {{ t('common.button.edit') }}
             </button>
+            <button
+              v-if="hasVocabularyPermission"
+              class="glass-button"
+              data-variant="success"
+              type="button"
+              :disabled="isExportingLocation"
+              @click="handleExportLocation(location)"
+            >
+              {{ t('words.wordList.locations.export') }}
+            </button>
             <button v-if="canDeleteLocation" class="glass-button" data-variant="danger" type="button" @click="handleDeleteLocation(location)">
               {{ t('common.button.delete') }}
             </button>
@@ -231,7 +241,7 @@
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { batchMatch, deleteVocabularyLocation, getLocationDetail, getVocabularyLocations, transferVocabularyLocation, updateVocabularyLocation } from '@/api'
+import { batchMatch, deleteVocabularyLocation, exportVocabularyLocation, getLocationDetail, getVocabularyLocations, transferVocabularyLocation, updateVocabularyLocation } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 import { showConfirm, showError, showSuccess, showWarning } from '@/utils/ui/message.js'
 
@@ -257,6 +267,7 @@ const transferTargetUserId = ref('')
 const transferTargetUsername = ref('')
 const transferErrorText = ref('')
 const isTransferringLocation = ref(false)
+const isExportingLocation = ref(false)
 const yindianQuery = ref('')
 const yindianSuggestions = ref([])
 const isLoadingYindian = ref(false)
@@ -558,6 +569,39 @@ function handleSaveEditingLocation() {
     editingLocationDraft.value || editingLocationSource.value,
     editingLocationSource.value?.location_name,
   )
+}
+
+function triggerBlobDownload(blob, fileName) {
+  const url = URL.createObjectURL(blob)
+  try {
+    const anchor = document.createElement('a')
+    anchor.href = url
+    anchor.download = fileName
+    document.body.appendChild(anchor)
+    anchor.click()
+    document.body.removeChild(anchor)
+  } finally {
+    URL.revokeObjectURL(url)
+  }
+}
+
+async function handleExportLocation(location) {
+  if (!location?.location_name || isExportingLocation.value) return
+
+  isExportingLocation.value = true
+  locationsStatusText.value = ''
+  try {
+    const params = location.user_id ? { user_id: location.user_id } : {}
+    const blob = await exportVocabularyLocation(location.location_name, params)
+    triggerBlobDownload(blob, `${location.location_name}词表.xlsx`)
+    locationsStatusText.value = t('words.wordList.locations.exportSuccess', { name: location.location_name })
+    showSuccess(locationsStatusText.value)
+  } catch (error) {
+    locationsStatusText.value = error.message || t('words.wordList.locations.exportFailed')
+    showError(locationsStatusText.value)
+  } finally {
+    isExportingLocation.value = false
+  }
 }
 
 async function handleDeleteLocation(location) {

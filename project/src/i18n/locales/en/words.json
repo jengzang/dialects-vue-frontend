@@ -217,6 +217,9 @@
       "saveSuccess": "Location metadata saved.",
       "saveFailed": "Failed to save location metadata",
       "renameEmpty": "Location name cannot be empty",
+      "export": "Export",
+      "exportSuccess": "Exported \"{name}\" vocabulary.",
+      "exportFailed": "Failed to export vocabulary",
       "transfer": {
         "action": "Transfer",
         "title": "Transfer \"{name}\"",
