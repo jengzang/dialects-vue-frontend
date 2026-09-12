@@ -1,3 +1,5 @@
+@use '@/styles/global/mixins' as *;
+
 .vocabulary-page {
   width: 90dvw;
   max-width: 1200px;
@@ -160,6 +162,96 @@
   }
 }
 
+.vocabulary-entry-card {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 0.8fr) minmax(72px, 1.1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.card-location,
+.card-definition {
+  min-width: 0;
+  line-height: 1.5;
+  text-align: center;
+
+  @include text-truncate;
+}
+
+.card-location {
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.card-definition {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.card-pronunciation-pair {
+  display: inline-grid;
+  grid-template-rows: auto auto;
+  justify-self: center;
+  width: max-content;
+  max-width: 150px;
+  min-width: 0;
+  gap: 4px;
+}
+
+.card-pronunciation-pair > span {
+  min-width: 100%;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  line-height: 1.45;
+  text-align: justify;
+  text-align-last: justify;
+}
+
+.card-note {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  gap: 6px;
+}
+
+.card-note-text {
+  max-width: 130px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.6;
+
+  @include text-truncate;
+}
+
+.vocabulary-entry-card.is-note-expanded .card-note-text {
+  max-width: 180px;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.card-note-toggle {
+  @include flex-center;
+
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  color: var(--color-primary);
+  background: var(--glass-80);
+  border: 1px solid var(--border-light-gray);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &.is-expanded {
+    transform: rotate(90deg);
+  }
+}
+
 .card-row {
   display: flex;
   gap: 12px;
@@ -213,7 +305,7 @@
 
 .pronunciation-text {
   color: var(--color-primary);
-  font-family: var(--font-mono);
+  font-family: var(--font-monospace, var(--font-mono));
   font-size: 14px;
   font-weight: 500;
 }

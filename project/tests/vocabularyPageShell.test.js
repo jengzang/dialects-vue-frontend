@@ -224,6 +224,35 @@ describe('vocabulary explore page shell wiring', () => {
     expect(loadMoreRule).toContain('justify-self: center')
   })
 
+  it('keeps vocabulary card internals in a centered four-column word-note layout', () => {
+    const vocabularyPage = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
+    const vocabularyScss = readSource('src/main/views/explore/word/vocabulary/vocabulary.scss')
+    const cardGridRule = vocabularyScss.match(/\.cards-grid\s*\{[^}]*\}/)?.[0] || ''
+    const entryCardRule = vocabularyScss.match(/\.vocabulary-entry-card\s*\{[^}]*\}/)?.[0] || ''
+    const noteTextRule = vocabularyScss.match(/\.card-note-text\s*\{[^}]*\}/)?.[0] || ''
+
+    expect(vocabularyPage).toContain('class="card glass-card vocabulary-entry-card"')
+    expect(vocabularyPage).toContain('class="card-location"')
+    expect(vocabularyPage).toContain('class="card-definition"')
+    expect(vocabularyPage).toContain('class="card-pronunciation-pair"')
+    expect(vocabularyPage).toContain('class="card-note"')
+    expect(vocabularyPage).toContain('class="card-note-toggle"')
+    expect(vocabularyPage).toContain('toggleVocabularyCardNote(entry.id)')
+    expect(vocabularyPage).toContain('isVocabularyCardNoteExpanded(entry.id)')
+    expect(vocabularyPage).not.toContain('class="card-row row-1"')
+    expect(vocabularyPage).not.toContain('class="card-row row-2"')
+    expect(vocabularyPage).not.toContain('class="card-row row-3"')
+
+    expect(cardGridRule).toContain('grid-template-columns: repeat(auto-fill, minmax(250px, 1fr))')
+    expect(entryCardRule).toContain('grid-template-columns:')
+    expect(entryCardRule).toContain('align-items: center')
+    expect(vocabularyScss).toContain('.card-pronunciation-pair')
+    expect(vocabularyScss).toContain('grid-template-rows: auto auto')
+    expect(noteTextRule).toContain('@include text-truncate')
+    expect(noteTextRule).toContain('max-width:')
+    expect(vocabularyScss).toContain('&.is-expanded')
+  })
+
   it('uses dedicated vocabulary locations APIs for location metadata management', () => {
     const vocabularyPage = readSource('src/main/views/explore/word/vocabulary/VocabularyManagePage.vue')
 

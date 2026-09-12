@@ -34,24 +34,31 @@
           <article
             v-for="entry in entries"
             :key="entry.id"
-            class="card glass-card"
+            class="card glass-card vocabulary-entry-card"
+            :class="{ 'is-note-expanded': isVocabularyCardNoteExpanded(entry.id) }"
           >
-            <div class="card-row row-1">
-              <span class="location-chain">{{ entry.location }}</span>
-              <span class="category-chain">{{ entry.pronunciationType }}</span>
+            <div class="card-location">
+              {{ entry.location }}
             </div>
-            <div class="card-row row-2">
-              <span class="word-text">{{ entry.headword }}</span>
+            <div class="card-definition">
+              {{ entry.definition }}
+            </div>
+            <div class="card-pronunciation-pair">
               <span class="pronunciation-text">{{ entry.pronunciation }}</span>
+              <span class="word-text">{{ entry.headword }}</span>
             </div>
-            <div class="card-row row-3">
-              <span class="definition-text">{{ entry.definition }}</span>
-              <span
-                v-if="entry.definition && entry.detail"
-                class="card-dot-sep"
-                aria-hidden="true"
-              >·</span>
-              <span class="memo-text">{{ entry.detail }}</span>
+            <div class="card-note">
+              <span class="card-note-text">{{ entry.detail }}</span>
+              <button
+                v-if="entry.detail"
+                class="card-note-toggle"
+                :class="{ 'is-expanded': isVocabularyCardNoteExpanded(entry.id) }"
+                type="button"
+                :aria-expanded="isVocabularyCardNoteExpanded(entry.id)"
+                @click="toggleVocabularyCardNote(entry.id)"
+              >
+                <span aria-hidden="true">&rsaquo;</span>
+              </button>
             </div>
           </article>
         </div>
@@ -391,6 +398,7 @@ const selectedMapPointLabel = ref('')
 const activeMapPointLocations = ref([])
 const activeMapPointBaseLabel = ref('')
 const activeMapPointMeta = ref(null)
+const expandedVocabularyCardNoteIds = ref(new Set())
 
 const mapDetailMetaRows = computed(() => {
   const meta = activeMapPointMeta.value
@@ -445,6 +453,20 @@ function pointMetaRows(point) {
   }
 
   return rows
+}
+
+function isVocabularyCardNoteExpanded(entryId) {
+  return expandedVocabularyCardNoteIds.value.has(entryId)
+}
+
+function toggleVocabularyCardNote(entryId) {
+  const nextExpandedIds = new Set(expandedVocabularyCardNoteIds.value)
+  if (nextExpandedIds.has(entryId)) {
+    nextExpandedIds.delete(entryId)
+  } else {
+    nextExpandedIds.add(entryId)
+  }
+  expandedVocabularyCardNoteIds.value = nextExpandedIds
 }
 
 const locationDetailsSourcePoints = computed(() => {
