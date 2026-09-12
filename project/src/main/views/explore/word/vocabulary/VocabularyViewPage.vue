@@ -199,14 +199,27 @@
               :placeholder="t('words.wordList.search.locationDetailsSearchPlaceholder')"
             />
             <button
-              class="location-details-sort-btn glass-button"
+              class="location-details-sort-btn"
               :class="{ active: locationDetailsSortByRegion }"
-              data-variant="secondary"
               type="button"
               :title="t('words.wordList.search.locationDetailsSortByRegion')"
               @click="locationDetailsSortByRegion = !locationDetailsSortByRegion"
             >
-              {{ t('words.wordList.search.locationDetailsSortByRegion') }}
+              <svg
+                class="location-details-sort-icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M7 4v14m0 0 3-3m-3 3-3-3M17 20V6m0 0-3 3m3-3 3 3"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                />
+              </svg>
             </button>
           </div>
           <div v-if="locationDetailsDisplayPoints.length" class="location-details-list">

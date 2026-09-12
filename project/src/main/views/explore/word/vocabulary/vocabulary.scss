@@ -411,9 +411,35 @@
 }
 
 .location-details-sort-btn {
+  @include flex-center;
   flex: 0 0 auto;
-  min-height: 36px;
-  white-space: nowrap;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  color: var(--text-secondary);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm2, 6px);
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+
+  &:hover,
+  &.active {
+    color: var(--color-primary);
+    background: var(--glass-15);
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.location-details-sort-icon {
+  width: 25px;
+  height: 25px;
 }
 
 .location-details-list {
@@ -1202,10 +1228,6 @@
   .location-details-toolbar {
     align-items: stretch;
     flex-direction: column;
-  }
-
-  .location-details-sort-btn {
-    width: 100%;
   }
 }
 
