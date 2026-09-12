@@ -71,7 +71,9 @@
       "allProvinces": "全部省份",
       "allCities": "全部城市",
       "locationDetails": "地點詳情",
-      "locationDetailsButton": "方言點"
+      "locationDetailsButton": "方言點",
+      "locationDetailsSearchPlaceholder": "搜索地點名",
+      "locationDetailsSortByRegion": "按省市縣排序"
     },
     "sort": {
       "label": "排序",

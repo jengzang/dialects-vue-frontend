@@ -71,7 +71,9 @@
       "allProvinces": "All Provinces",
       "allCities": "All Cities",
       "locationDetails": "Location details",
-      "locationDetailsButton": "Locations"
+      "locationDetailsButton": "Locations",
+      "locationDetailsSearchPlaceholder": "Search location names",
+      "locationDetailsSortByRegion": "Sort by province/city/county"
     },
     "sort": {
       "label": "Sort",

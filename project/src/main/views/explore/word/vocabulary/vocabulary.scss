@@ -399,6 +399,23 @@
   align-content: start;
 }
 
+.location-details-toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.location-details-search {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.location-details-sort-btn {
+  flex: 0 0 auto;
+  min-height: 36px;
+  white-space: nowrap;
+}
+
 .location-details-list {
   display: flex;
   flex-direction: column;
@@ -1180,6 +1197,15 @@
   .map-canvas-shell {
     height: 60dvh;
     min-height: 420px;
+  }
+
+  .location-details-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .location-details-sort-btn {
+    width: 100%;
   }
 }
 

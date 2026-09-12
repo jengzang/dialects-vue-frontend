@@ -190,42 +190,65 @@
         <div v-else-if="locationDetailsError" class="empty-state empty-state-base">
           <p>{{ locationDetailsError }}</p>
         </div>
-        <div v-else-if="locationDetailsSourcePoints.length" class="location-details-list">
-          <article
-            v-for="(point, index) in locationDetailsSourcePoints"
-            :key="`${point.locationName}-${index}`"
-            class="location-details-item"
-          >
+        <template v-else-if="locationDetailsSourcePoints.length">
+          <div class="location-details-toolbar">
+            <input
+              v-model="locationDetailsSearchQuery"
+              class="location-details-search glass-field"
+              type="search"
+              :placeholder="t('words.wordList.search.locationDetailsSearchPlaceholder')"
+            />
             <button
-              class="location-details-head"
+              class="location-details-sort-btn glass-button"
+              :class="{ active: locationDetailsSortByRegion }"
+              data-variant="secondary"
               type="button"
-              :aria-expanded="expandedLocationKeys.has(point.locationName)"
-              @click="toggleLocationDetail(point.locationName)"
+              :title="t('words.wordList.search.locationDetailsSortByRegion')"
+              @click="locationDetailsSortByRegion = !locationDetailsSortByRegion"
             >
-              <span class="location-details-name">{{ point.locationLabel || point.locationName }}</span>
-              <span class="location-details-count">{{ t('words.wordList.map.pointCount', { count: point.entryCount || 0 }) }}</span>
-              <span
-                class="location-details-chevron"
-                :class="{ 'is-open': expandedLocationKeys.has(point.locationName) }"
-                aria-hidden="true"
-              >⌄</span>
+              {{ t('words.wordList.search.locationDetailsSortByRegion') }}
             </button>
-            <dl v-if="expandedLocationKeys.has(point.locationName)" class="map-detail-meta">
-              <div v-for="row in pointMetaRows(point)" :key="row.key" class="map-detail-meta-item">
-                <dt v-if="row.label" class="map-detail-meta-label">{{ row.label }}</dt>
-                <dd class="map-detail-meta-value" :class="{ 'map-detail-meta-value--tones': row.tones }">
-              <template v-if="row.tones">
-                <span v-for="tone in row.tones" :key="tone.key" class="tone-pill">
-                  <span class="tone-pill-name">{{ tone.name }}</span>
-                  <span class="tone-pill-value">{{ tone.value }}</span>
-                </span>
-              </template>
-              <template v-else>{{ row.value }}</template>
-            </dd>
-              </div>
-            </dl>
-          </article>
-        </div>
+          </div>
+          <div v-if="locationDetailsDisplayPoints.length" class="location-details-list">
+            <article
+              v-for="(point, index) in locationDetailsDisplayPoints"
+              :key="`${point.locationName}-${index}`"
+              class="location-details-item"
+            >
+              <button
+                class="location-details-head"
+                type="button"
+                :aria-expanded="expandedLocationKeys.has(point.locationName)"
+                @click="toggleLocationDetail(point.locationName)"
+              >
+                <span class="location-details-name">{{ point.locationLabel || point.locationName }}</span>
+                <span class="location-details-count">{{ t('words.wordList.map.pointCount', { count: point.entryCount || 0 }) }}</span>
+                <span
+                  class="location-details-chevron"
+                  :class="{ 'is-open': expandedLocationKeys.has(point.locationName) }"
+                  aria-hidden="true"
+                >⌄</span>
+              </button>
+              <dl v-if="expandedLocationKeys.has(point.locationName)" class="map-detail-meta">
+                <div v-for="row in pointMetaRows(point)" :key="row.key" class="map-detail-meta-item">
+                  <dt v-if="row.label" class="map-detail-meta-label">{{ row.label }}</dt>
+                  <dd class="map-detail-meta-value" :class="{ 'map-detail-meta-value--tones': row.tones }">
+                <template v-if="row.tones">
+                  <span v-for="tone in row.tones" :key="tone.key" class="tone-pill">
+                    <span class="tone-pill-name">{{ tone.name }}</span>
+                    <span class="tone-pill-value">{{ tone.value }}</span>
+                  </span>
+                </template>
+                <template v-else>{{ row.value }}</template>
+              </dd>
+                </div>
+              </dl>
+            </article>
+          </div>
+          <div v-else class="empty-state empty-state-base">
+            <p>{{ t('words.wordList.states.noData') }}</p>
+          </div>
+        </template>
         <div v-else class="empty-state empty-state-base">
           <p>{{ t('words.wordList.states.noData') }}</p>
         </div>
@@ -240,6 +263,8 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { watchDebounced } from '@vueuse/core'
+import * as OpenCCCN2T from 'opencc-js/cn2t'
+import * as OpenCCT2CN from 'opencc-js/t2cn'
 import {
   getVocabularyItems,
   getVocabularyLocationOptions,
@@ -258,6 +283,8 @@ const router = useRouter()
 const STANDARD_WORD_OPTIONS_LIMIT = 1000
 
 const TONE_FIELD_KEYS = Array.from({ length: 10 }, (_, index) => `t${index + 1}`)
+const locationDetailsT2S = OpenCCT2CN.Converter({ from: 'tw', to: 'cn' })
+const locationDetailsS2T = OpenCCCN2T.Converter({ from: 'cn', to: 'tw' })
 
 const MAP_POINT_META_GROUPS = [
   {
@@ -333,6 +360,8 @@ const isLocationDetailsModalOpen = ref(false)
 const isLoadingLocationDetails = ref(false)
 const locationDetailsError = ref('')
 const locationDetailsPoints = ref([])
+const locationDetailsSearchQuery = ref('')
+const locationDetailsSortByRegion = ref(false)
 const expandedLocationKeys = ref(new Set())
 const total = ref(0)
 const page = ref(1)
@@ -407,6 +436,22 @@ function pointMetaRows(point) {
 
 const locationDetailsSourcePoints = computed(() => {
   return viewMode.value === 'map' ? mapPoints.value : locationDetailsPoints.value
+})
+
+const locationDetailsDisplayPoints = computed(() => {
+  const queryParts = normalizeLocationDetailsSearchText(locationDetailsSearchQuery.value)
+  const points = queryParts.length
+    ? locationDetailsSourcePoints.value.filter((point) => {
+      const pointParts = normalizeLocationDetailsSearchText(buildLocationDetailsSearchText(point))
+      return queryParts.some((queryPart) => pointParts.some((pointPart) => pointPart.includes(queryPart)))
+    })
+    : [...locationDetailsSourcePoints.value]
+
+  if (locationDetailsSortByRegion.value) {
+    points.sort(compareLocationDetailsByRegion)
+  }
+
+  return points
 })
 
 const searchFieldOptions = computed(() => [
@@ -540,6 +585,57 @@ function normalizeSelectedSearchFields() {
 function normalizeNumber(value) {
   const numberValue = Number(value)
   return Number.isFinite(numberValue) ? numberValue : null
+}
+
+function normalizeLocationDetailsSearchText(value) {
+  const raw = String(value || '').trim().toLowerCase()
+  if (!raw) {
+    return []
+  }
+
+  return [
+    raw,
+    locationDetailsT2S(raw).toLowerCase(),
+    locationDetailsS2T(raw).toLowerCase(),
+  ].filter((part, index, parts) => part && parts.indexOf(part) === index)
+}
+
+function buildLocationDetailsSearchText(point) {
+  return [
+    point?.locationName,
+    point?.locationLabel,
+    point?.province,
+    point?.city,
+    point?.county,
+    point?.town,
+    point?.administrativeVillage,
+    point?.naturalVillage,
+  ].filter(Boolean).join(' ')
+}
+
+function compareLocationDetailsByRegion(a, b) {
+  const aParts = [
+    a?.province,
+    a?.city,
+    a?.county,
+    a?.town,
+    a?.administrativeVillage,
+    a?.naturalVillage,
+    a?.locationName,
+  ]
+  const bParts = [
+    b?.province,
+    b?.city,
+    b?.county,
+    b?.town,
+    b?.administrativeVillage,
+    b?.naturalVillage,
+    b?.locationName,
+  ]
+
+  return aParts
+    .map((part, index) => String(part || '').localeCompare(String(bParts[index] || ''), 'zh-Hans-CN'))
+    .find((result) => result !== 0) || 0
 }
 
 function normalizeVocabularyEntry(item, index = 0, locationContext = '') {
@@ -887,11 +983,13 @@ function toggleLocationDetail(locationName) {
 
 function clearLocationDetailsModal() {
   expandedLocationKeys.value = new Set()
+  locationDetailsSearchQuery.value = ''
   locationDetailsError.value = ''
 }
 
 async function openLocationDetails() {
   expandedLocationKeys.value = new Set()
+  locationDetailsSearchQuery.value = ''
   locationDetailsError.value = ''
   isLocationDetailsModalOpen.value = true
 
