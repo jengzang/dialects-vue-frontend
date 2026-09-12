@@ -3,19 +3,25 @@ const maptilerKey = "HSnYXzpfPRlVp7fkOywW"
 // 统一的地图样式配置
 const mapStyleConfigData = {
 
-    // 天地图服务
     tianditu: {
         name: '天地图',
         custom: true,
         tiles: [
-            'https://t0.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=9a516b0f2a8179bb68f73172cff4bd22', // 无标注路网图
+            'https://t0.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=9a516b0f2a8179bb68f73172cff4bd22',
+        ],
+        labelTiles: [
+            'https://t0.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=9a516b0f2a8179bb68f73172cff4bd22',
         ],
     },
+
     tianditu_img: {
         name: '天地图卫星图',
         custom: true,
         tiles: [
-            'https://t0.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=9a516b0f2a8179bb68f73172cff4bd22', // 卫星图
+            'https://t0.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=9a516b0f2a8179bb68f73172cff4bd22',
+        ],
+        labelTiles: [
+            'https://t0.tianditu.gov.cn/cia_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cia&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=9a516b0f2a8179bb68f73172cff4bd22',
         ],
     },
 
@@ -124,37 +130,62 @@ export const mapStyleConfig = Object.fromEntries(
 );
 
 export const mapStyle = (name) => {
-    const config = mapStyleConfigData;
-    if (!config[name].custom) {
-        return config[name].url
-    } else {
+    const config = mapStyleConfigData[name];
 
-
-        return {
-            version: 8, // MapLibre样式版本
-            name: name,
-            sources: {
-                [name]: { // 自定义源名称
-                    type: 'raster',
-                    tiles: config[name].tiles,
-                    tileSize: 256, // 确保与瓦片服务一致
-                    maxzoom: 18, // 根据实际需求调整最大缩放级别
-                    minzoom: 0 // 添加最小缩放级别
-                }
-            },
-            layers: [
-                {
-                    id: `${name}-layer`, // 图层ID
-                    type: 'raster',
-                    source: name, // 关联到定义的源
-                    paint: {
-                        'raster-opacity': 1 // 确保图层完全可见
-                    }
-                }
-            ]
-        }
+    if (!config.custom) {
+        return config.url;
     }
-}
+
+    const sources = {
+        [name]: {
+            type: 'raster',
+            tiles: config.tiles,
+            tileSize: 256,
+            maxzoom: 18,
+            minzoom: 0,
+        }
+    };
+
+    const layers = [
+        {
+            id: `${name}-layer`,
+            type: 'raster',
+            source: name,
+            paint: {
+                'raster-opacity': 1,
+            },
+        }
+    ];
+
+    // 如果还有独立标注层
+    if (config.labelTiles) {
+        const labelSourceName = `${name}-label`;
+
+        sources[labelSourceName] = {
+            type: 'raster',
+            tiles: config.labelTiles,
+            tileSize: 256,
+            maxzoom: 18,
+            minzoom: 0,
+        };
+
+        layers.push({
+            id: `${name}-label-layer`,
+            type: 'raster',
+            source: labelSourceName,
+            paint: {
+                'raster-opacity': 1,
+            },
+        });
+    }
+
+    return {
+        version: 8,
+        name,
+        sources,
+        layers,
+    };
+};
 
 export function calculateDenseMapCenterAndZoom(coords, densityPercentile = 0.85) {
     return calculateMapCenterAndZoom(coords, { densityPercentile });

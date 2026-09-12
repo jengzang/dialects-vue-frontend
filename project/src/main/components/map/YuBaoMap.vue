@@ -155,7 +155,7 @@ const emit = defineEmits(['marker-click'])
 // --- State ---
 const mapContainer = ref(null)
 const map = shallowRef(null)
-const currentStyleKey = ref('gaode')
+const currentStyleKey = ref('tianditu')
 const displayMode = ref('pronunciation')
 const isFullScreen = ref(false)
 const popupData = ref(null)

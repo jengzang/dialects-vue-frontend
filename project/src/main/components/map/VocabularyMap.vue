@@ -75,7 +75,7 @@ const displayMode = defineModel('displayMode', { default: 'overview' })
 // --- State ---
 const mapContainer = ref(null)
 const map = shallowRef(null)
-const currentStyleKey = ref('gaode')
+const currentStyleKey = ref('tianditu')
 const isFullScreen = ref(false)
 const mapLoaded = ref(false)  // 跟踪地图是否已加载
 const isLoadingMarkers = ref(false)  // 跟踪标记是否正在加载

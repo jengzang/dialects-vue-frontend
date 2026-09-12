@@ -89,7 +89,7 @@ const DISPLAY_MODE_LABELS = {
 
 const mapContainer = ref(null)
 const map = shallowRef(null)
-const currentStyle = ref('gaode')
+const currentStyle = ref('tianditu')
 const displayModeIndex = ref(0)
 const isFullscreen = ref(false)
 let clusteredPopup = null
