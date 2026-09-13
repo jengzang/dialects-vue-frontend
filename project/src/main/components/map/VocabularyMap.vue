@@ -71,6 +71,32 @@ const props = defineProps({
 })
 const emit = defineEmits(['marker-click'])
 const displayMode = defineModel('displayMode', { default: 'overview' })
+const OVERVIEW_MARKER_COLORS = [
+  '#fef08a',
+  '#fde047',
+  '#facc15',
+  '#f59e0b',
+  '#f97316',
+  '#ea580c',
+  '#dc2626',
+  '#b91c1c',
+  '#991b1b',
+  '#7f1d1d',
+]
+const OVERVIEW_MARKER_TEXT_COLORS = [
+  '#1d1d1f',
+  '#1d1d1f',
+  '#1d1d1f',
+  '#1d1d1f',
+  '#fff',
+  '#fff',
+  '#fff',
+  '#fff',
+  '#fff',
+  '#fff',
+]
+const OVERVIEW_MARKER_MIN_FONT_SIZE = 12
+const OVERVIEW_MARKER_MAX_FONT_SIZE = 20
 
 // --- State ---
 const mapContainer = ref(null)
@@ -252,6 +278,109 @@ const getLocationText = (item) => {
 
 const TONE_FIELD_KEYS = Array.from({ length: 10 }, (_, index) => `t${index + 1}`)
 
+function clampNumber(value, min, max) {
+  return Math.min(Math.max(value, min), max)
+}
+
+function calculatePercentile(values, percentile) {
+  const sortedValues = values
+    .filter((value) => Number.isFinite(value))
+    .sort((a, b) => a - b)
+
+  if (!sortedValues.length) {
+    return 0
+  }
+
+  const index = (sortedValues.length - 1) * percentile
+  const lowerIndex = Math.floor(index)
+  const upperIndex = Math.ceil(index)
+
+  if (lowerIndex === upperIndex) {
+    return sortedValues[lowerIndex]
+  }
+
+  const weight = index - lowerIndex
+  return sortedValues[lowerIndex] * (1 - weight) + sortedValues[upperIndex] * weight
+}
+
+function getOverviewCount(item) {
+  const count = Number(item?.entryCount)
+  return Number.isFinite(count) && count > 0 ? count : 0
+}
+
+function getOverviewScaleValue(count) {
+  return Math.log1p(count)
+}
+
+function getOverviewLocationName(items) {
+  const names = new Set()
+
+  for (const item of items) {
+    const name = item.locationName || item.locationLabel || item.location || getLocationText(item)
+    if (name && name !== '-' && String(name).trim() !== '') {
+      names.add(String(name).trim())
+    }
+  }
+
+  return truncateText(Array.from(names).join(' / '), 6) || '-'
+}
+
+function calculateOverviewMarkerScaleBounds(values) {
+  const counts = values
+    .map((value) => getOverviewScaleValue(value))
+    .filter((value) => Number.isFinite(value) && value > 0)
+    .sort((a, b) => a - b)
+
+  if (!counts.length) {
+    return { p5: 0, p95: 0 }
+  }
+
+  const p5 = calculatePercentile(counts, 0.05)
+  const p95 = calculatePercentile(counts, 0.95)
+
+  if (counts.length < 4 || Math.floor(counts.length * 0.05) >= 1) {
+    return { p5, p95 }
+  }
+
+  const sortedValues = counts
+  const trimCount = Math.max(1, Math.floor(sortedValues.length * 0.05))
+
+  return {
+    p5: sortedValues[trimCount],
+    p95: sortedValues[sortedValues.length - 1 - trimCount],
+  }
+}
+
+function buildOverviewMarkerScale(counts) {
+  return calculateOverviewMarkerScaleBounds(counts)
+}
+
+function normalizeOverviewCount(count, scale) {
+  if (!scale || scale.p95 <= scale.p5) {
+    return 0.5
+  }
+
+  const scaledCount = getOverviewScaleValue(count)
+
+  return clampNumber((scaledCount - scale.p5) / (scale.p95 - scale.p5), 0, 1)
+}
+
+function getOverviewMarkerStyle(count, scale) {
+  const normalized = normalizeOverviewCount(count, scale)
+  const colorIndex = Math.min(
+    OVERVIEW_MARKER_COLORS.length - 1,
+    Math.floor(normalized * OVERVIEW_MARKER_COLORS.length),
+  )
+  const fontSize = OVERVIEW_MARKER_MIN_FONT_SIZE +
+    (OVERVIEW_MARKER_MAX_FONT_SIZE - OVERVIEW_MARKER_MIN_FONT_SIZE) * normalized
+
+  return {
+    color: OVERVIEW_MARKER_COLORS[colorIndex],
+    textColor: OVERVIEW_MARKER_TEXT_COLORS[colorIndex],
+    fontSize: `${fontSize.toFixed(1)}px`,
+  }
+}
+
 // 转换数据为 GeoJSON 格式
 const convertToGeoJSON = (data) => {
   if (!data || data.length === 0) {
@@ -267,6 +396,7 @@ const convertToGeoJSON = (data) => {
     const lat = parseFloat(item.latitude)
     return Number.isFinite(lng) && Number.isFinite(lat)
   })
+  const isOverviewMode = displayMode.value === 'overview'
 
   // 第二步：按经纬度分组，合并相同坐标的不同文字
   const coordinatesMap = new Map()
@@ -285,6 +415,10 @@ const convertToGeoJSON = (data) => {
     }
     coordinatesMap.get(coordKey).items.push(item)
   }
+  const overviewCounts = Array.from(coordinatesMap.values())
+    .map(({ items }) => items.reduce((sum, item) => sum + getOverviewCount(item), 0))
+    .filter((count) => count > 0)
+  const overviewScale = buildOverviewMarkerScale(overviewCounts)
 
   // 第三步：对每个坐标位置，合并不同的显示文字
   const deduplicatedFeatures = []
@@ -292,22 +426,23 @@ const convertToGeoJSON = (data) => {
   for (const [coordKey, coordData] of coordinatesMap) {
     const { lng, lat, items } = coordData
 
+    const overviewCount = items.reduce((sum, item) => sum + getOverviewCount(item), 0)
+
     // 收集所有不同的显示文字
     const textSet = new Set()
-    const textToItem = new Map() // 记录每个文字对应的第一个数据项
 
-    for (const item of items) {
-      const text = getMarkerText(item)
-      if (text && text !== '-') {
-        if (!textSet.has(text)) {
+    if (!isOverviewMode) {
+      for (const item of items) {
+        const text = getMarkerText(item)
+        if (text && text !== '-') {
           textSet.add(text)
-          textToItem.set(text, item)
         }
       }
     }
 
     // 如果没有有效文字，跳过
-    if (textSet.size === 0) continue
+    if (isOverviewMode && overviewCount <= 0) continue
+    if (!isOverviewMode && textSet.size === 0) continue
 
     // 合并文字（用 / 分隔）
     const mergedText = Array.from(textSet).join(' / ')
@@ -342,7 +477,10 @@ const convertToGeoJSON = (data) => {
 
     // 计算颜色（基于合并后的文字）
     let bgColor, textColor
-    if (displayMode.value === 'location') {
+    if (isOverviewMode) {
+      bgColor = 'transparent'
+      textColor = ''
+    } else if (displayMode.value === 'location') {
        bgColor = '#1b2e2b'
        textColor = '#a6ffdc'
     } else {
@@ -357,9 +495,12 @@ const convertToGeoJSON = (data) => {
         coordinates: [lng, lat]
       },
       properties: {
-        label: mergedText,
+        label: isOverviewMode ? String(overviewCount) : mergedText,
+        overviewLocationName: isOverviewMode ? getOverviewLocationName(items) : null,
+        markerMode: displayMode.value,
         bgColor: bgColor,
         textColor: textColor,
+        overviewStyle: isOverviewMode ? getOverviewMarkerStyle(overviewCount, overviewScale) : null,
         // 使用聚合后的数据用于弹窗
         ...aggregatedData,
         // 添加额外信息：此位置的数据点数量
@@ -397,13 +538,29 @@ const renderMarkers = () => {
 
   geojsonData.features.forEach(feature => {
     const [lng, lat] = feature.geometry.coordinates
-    const { label, bgColor, textColor } = feature.properties
+    const { label, overviewLocationName, bgColor, textColor, markerMode, overviewStyle } = feature.properties
 
     const el = document.createElement('div')
-    el.className = 'vocabulary-marker'
-    el.textContent = label
-    el.style.backgroundColor = bgColor
-    el.style.color = textColor
+    el.className = `vocabulary-marker vocabulary-marker--${markerMode}`
+    if (overviewStyle) {
+      el.style.setProperty('--overview-marker-font-size', overviewStyle.fontSize)
+
+      const nameEl = document.createElement('div')
+      nameEl.className = 'vocabulary-marker__overview-name'
+      nameEl.textContent = overviewLocationName || '-'
+      nameEl.style.backgroundColor = overviewStyle.color
+      nameEl.style.color = overviewStyle.textColor
+
+      const countEl = document.createElement('div')
+      countEl.className = 'vocabulary-marker__overview-count'
+      countEl.textContent = label
+
+      el.append(nameEl, countEl)
+    } else {
+      el.textContent = label
+      el.style.backgroundColor = bgColor
+      el.style.color = textColor
+    }
 
     el.addEventListener('click', () => {
       handleMarkerClick(feature.properties)
@@ -786,6 +943,44 @@ watch(displayMode, () => {
   font-weight: 500;
   cursor: pointer;
   border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+:deep(.vocabulary-marker--overview) {
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  @include flex-col;
+  align-items: center;
+  gap: 1px;
+  font-size: var(--overview-marker-font-size);
+  line-height: 1.25;
+}
+
+:deep(.vocabulary-marker__overview-name),
+:deep(.vocabulary-marker__overview-count) {
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: 72px;
+  margin: 0 auto;
+  padding: 2px 4px;
+  border-radius: 3px;
+  text-align: center;
+  @include text-truncate;
+}
+
+:deep(.vocabulary-marker__overview-name) {
+  color: var(--text-primary);
+  font-size: 1em;
+  font-weight: 700;
+}
+
+:deep(.vocabulary-marker__overview-count) {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.68);
+  font-size: 0.9em;
+  font-weight: 600;
 }
 
 </style>
