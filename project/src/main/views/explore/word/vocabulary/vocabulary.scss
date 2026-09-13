@@ -198,7 +198,7 @@
   display: inline-grid;
   grid-template-rows: auto auto;
   width: fit-content;
-  max-width: 100%;
+  max-width: 150px;
   min-width: 0;
   gap: 4px;
 }
@@ -206,7 +206,8 @@
 .card-pronunciation-pair > span {
   min-width: 100%;
   max-width: 100%;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: normal;
   line-height: 1.45;
   text-align: justify;
   text-align-last: justify;

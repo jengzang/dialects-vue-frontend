@@ -229,6 +229,8 @@ describe('vocabulary explore page shell wiring', () => {
     const vocabularyScss = readSource('src/main/views/explore/word/vocabulary/vocabulary.scss')
     const cardGridRule = vocabularyScss.match(/\.cards-grid\s*\{[^}]*\}/)?.[0] || ''
     const entryCardRule = vocabularyScss.match(/\.vocabulary-entry-card\s*\{[^}]*\}/)?.[0] || ''
+    const pronunciationPairRule = vocabularyScss.match(/\.card-pronunciation-pair\s*\{[^}]*\}/)?.[0] || ''
+    const pronunciationPairTextRule = vocabularyScss.match(/\.card-pronunciation-pair\s*>\s*span\s*\{[^}]*\}/)?.[0] || ''
     const cardNoteRule = vocabularyScss.match(/\.card-note\s*\{[^}]*\}/)?.[0] || ''
     const noteTextRule = vocabularyScss.match(/\.card-note-text\s*\{[^}]*\}/)?.[0] || ''
     const noteToggleRule = vocabularyScss.match(/\.card-note-toggle\s*\{[^}]*\}/)?.[0] || ''
@@ -261,6 +263,8 @@ describe('vocabulary explore page shell wiring', () => {
     expect(entryCardRule).not.toContain('flex-wrap')
     expect(vocabularyScss).toContain('.card-pronunciation-pair')
     expect(vocabularyScss).toContain('grid-template-rows: auto auto')
+    expect(pronunciationPairRule).toContain('max-width: 150px')
+    expect(pronunciationPairTextRule).not.toContain('overflow-wrap: anywhere')
     expect(cardNoteRule).toContain('display: inline-flex')
     expect(cardNoteRule).toContain('align-items: center')
     expect(cardNoteRule).toContain('max-width:')
