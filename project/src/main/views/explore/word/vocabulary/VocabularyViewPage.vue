@@ -375,6 +375,7 @@ const vocabularyLocationOptions = ref([])
 const vocabularyStandardWordOptions = ref([])
 const entries = ref([])
 const mapPoints = ref([])
+const mapPointsCacheKey = ref('')
 const mapStats = ref({
   totalEntries: 0,
   totalPoints: 0,
@@ -384,9 +385,11 @@ const isLocationDetailsModalOpen = ref(false)
 const isLoadingLocationDetails = ref(false)
 const locationDetailsError = ref('')
 const locationDetailsPoints = ref([])
+const locationDetailsPointsCacheKey = ref('')
 const locationDetailsSearchQuery = ref('')
 const locationDetailsSortByRegion = ref(false)
 const expandedLocationKeys = ref(new Set())
+const pendingVocabularyMapPointRequests = new Map()
 const total = ref(0)
 const page = ref(1)
 const pageSize = ref(50)
@@ -761,6 +764,50 @@ function buildVocabularyMapItemsParams() {
   }
 }
 
+function normalizeVocabularyMapRequestValue(value) {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item))
+  }
+
+  return value
+}
+
+function buildVocabularyMapRequestKey(kind, params) {
+  const normalizedEntries = Object.entries(params)
+    .filter(([, value]) => Array.isArray(value) ? value.length : value !== '' && value != null)
+    .map(([key, value]) => [key, normalizeVocabularyMapRequestValue(value)])
+
+  return `${kind}:${JSON.stringify(normalizedEntries)}`
+}
+
+async function requestVocabularyMapPoints(params = buildVocabularyMapPointsParams()) {
+  const requestKey = buildVocabularyMapRequestKey('map-points', params)
+  if (pendingVocabularyMapPointRequests.has(requestKey)) {
+    return pendingVocabularyMapPointRequests.get(requestKey)
+  }
+
+  const requestPromise = getVocabularyMapPoints(params)
+    .finally(() => {
+      pendingVocabularyMapPointRequests.delete(requestKey)
+    })
+  pendingVocabularyMapPointRequests.set(requestKey, requestPromise)
+  return requestPromise
+}
+
+async function requestVocabularyMapItems(params = buildVocabularyMapItemsParams()) {
+  const requestKey = buildVocabularyMapRequestKey('map-items', params)
+  if (pendingVocabularyMapPointRequests.has(requestKey)) {
+    return pendingVocabularyMapPointRequests.get(requestKey)
+  }
+
+  const requestPromise = getVocabularyMapItems(params)
+    .finally(() => {
+      pendingVocabularyMapPointRequests.delete(requestKey)
+    })
+  pendingVocabularyMapPointRequests.set(requestKey, requestPromise)
+  return requestPromise
+}
+
 function normalizeVocabularyMapPoint(point) {
   const locationName = point.location_name || ''
   const entryCount = Number(point.entry_count) || 0
@@ -863,19 +910,29 @@ async function loadVocabularyMapPoints() {
     return
   }
 
+  const shouldLoadMapItems = shouldUseVocabularyMapItemsApi()
+  const requestParams = shouldLoadMapItems
+    ? buildVocabularyMapItemsParams()
+    : buildVocabularyMapPointsParams()
+  const requestKey = buildVocabularyMapRequestKey(shouldLoadMapItems ? 'map-items' : 'map-points', requestParams)
+
+  if (mapPointsCacheKey.value === requestKey) {
+    return
+  }
+
   isLoadingItems.value = true
   loadError.value = ''
   entries.value = []
   total.value = 0
 
   try {
-    const shouldLoadMapItems = shouldUseVocabularyMapItemsApi()
     const response = shouldLoadMapItems
-      ? await getVocabularyMapItems(buildVocabularyMapItemsParams())
-      : await getVocabularyMapPoints(buildVocabularyMapPointsParams())
+      ? await requestVocabularyMapItems(requestParams)
+      : await requestVocabularyMapPoints(requestParams)
     mapPoints.value = Array.isArray(response.points)
       ? response.points.map(shouldLoadMapItems ? normalizeVocabularyMapItemPoint : normalizeVocabularyMapPoint)
       : []
+    mapPointsCacheKey.value = requestKey
     mapStats.value = {
       totalEntries: Number(response.total_entries) || 0,
       totalPoints: Number(response.total_points) || mapPoints.value.length,
@@ -884,6 +941,7 @@ async function loadVocabularyMapPoints() {
   } catch (error) {
     loadError.value = error.message || t('words.wordList.states.loadMapFailed')
     mapPoints.value = []
+    mapPointsCacheKey.value = ''
     mapStats.value = {
       totalEntries: 0,
       totalPoints: 0,
@@ -1053,16 +1111,31 @@ async function openLocationDetails() {
     return
   }
 
+  const requestParams = buildVocabularyMapPointsParams()
+  const requestKey = buildVocabularyMapRequestKey('map-points', requestParams)
+
+  if (locationDetailsPointsCacheKey.value === requestKey) {
+    return
+  }
+
+  if (mapPointsCacheKey.value === requestKey) {
+    locationDetailsPoints.value = mapPoints.value
+    locationDetailsPointsCacheKey.value = requestKey
+    return
+  }
+
   isLoadingLocationDetails.value = true
 
   try {
-    const response = await getVocabularyMapPoints(buildVocabularyMapPointsParams())
+    const response = await requestVocabularyMapPoints(requestParams)
     locationDetailsPoints.value = Array.isArray(response.points)
       ? response.points.map(normalizeVocabularyMapPoint)
       : []
+    locationDetailsPointsCacheKey.value = requestKey
   } catch (error) {
     locationDetailsError.value = error.message || t('words.wordList.states.loadMapFailed')
     locationDetailsPoints.value = []
+    locationDetailsPointsCacheKey.value = ''
   } finally {
     isLoadingLocationDetails.value = false
   }

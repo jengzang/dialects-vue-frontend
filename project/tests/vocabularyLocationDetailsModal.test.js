@@ -55,4 +55,22 @@ describe('vocabulary location details modal', () => {
     expect(styles).toContain('border: none')
     expect(styles).toContain('&:hover')
   })
+
+  it('caches vocabulary map point requests used by the location details modal', () => {
+    const source = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
+
+    expect(source).toContain('const mapPointsCacheKey = ref(\'\')')
+    expect(source).toContain('const locationDetailsPointsCacheKey = ref(\'\')')
+    expect(source).toContain('const pendingVocabularyMapPointRequests = new Map()')
+    expect(source).toContain('function buildVocabularyMapRequestKey(kind, params)')
+    expect(source).toContain('async function requestVocabularyMapPoints(params = buildVocabularyMapPointsParams())')
+    expect(source).toContain("const requestKey = buildVocabularyMapRequestKey('map-points', requestParams)")
+    expect(source).toContain('if (locationDetailsPointsCacheKey.value === requestKey) {')
+    expect(source).toContain('if (mapPointsCacheKey.value === requestKey) {')
+    expect(source).toContain('locationDetailsPointsCacheKey.value = requestKey')
+    expect(source).toContain('mapPointsCacheKey.value = requestKey')
+    expect(source).toContain('pendingVocabularyMapPointRequests.set(requestKey, requestPromise)')
+    expect(source).toContain('pendingVocabularyMapPointRequests.delete(requestKey)')
+    expect(source).not.toContain('const response = await getVocabularyMapPoints(buildVocabularyMapPointsParams())')
+  })
 })
