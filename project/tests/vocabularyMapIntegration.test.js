@@ -28,6 +28,8 @@ describe('vocabulary map integration', () => {
     expect(vocabularyMap).toContain("'#fef08a'")
     expect(vocabularyMap).toContain("'#ea580c'")
     expect(vocabularyMap).toContain("'#991b1b'")
+    expect(vocabularyMap).toContain('const OVERVIEW_MARKER_FONT_SIZE = 12')
+    expect(vocabularyMap).not.toContain('OVERVIEW_MARKER_MAX_FONT_SIZE')
     expect(vocabularyMap).toContain('function calculatePercentile')
     expect(vocabularyMap).toContain('function getOverviewScaleValue(count)')
     expect(vocabularyMap).toContain('return Math.log1p(count)')
@@ -54,5 +56,18 @@ describe('vocabulary map integration', () => {
     expect(vocabularyMap).toContain(':deep(.vocabulary-marker__overview-count)')
     expect(vocabularyMap).not.toContain('-webkit-text-stroke')
     expect(vocabularyMap).not.toContain("if (displayMode.value === 'overview') {\n       bgColor = assignColor")
+  })
+
+  it('keeps overview markers fixed-size and hides mode switching before detail data is available', () => {
+    const vocabularyMap = readSource('src/main/components/map/VocabularyMap.vue')
+
+    expect(vocabularyMap).toContain('<div v-if="showDisplayModeSwitcher" class="control-group mode-switcher">')
+    expect(vocabularyMap).toContain("const overviewDisplayModeOptions = computed(() => [")
+    expect(vocabularyMap).toContain("{ value: 'overview', label: t('map.vocabularyMap.controls.overview') }")
+    expect(vocabularyMap).not.toContain("{ value: 'location', label: t('map.vocabularyMap.controls.location') }\n])\nconst detailDisplayModeOptions")
+    expect(vocabularyMap).toContain('const showDisplayModeSwitcher = computed(() => canShowDetailModes.value && displayModeOptions.value.length > 1)')
+    expect(vocabularyMap).toContain("displayMode.value = displayModeOptions.value[0]?.value || 'overview'")
+    expect(vocabularyMap).toContain('fontSize: `${OVERVIEW_MARKER_FONT_SIZE}px`')
+    expect(vocabularyMap).not.toContain('(OVERVIEW_MARKER_MAX_FONT_SIZE - OVERVIEW_MARKER_MIN_FONT_SIZE) * normalized')
   })
 })

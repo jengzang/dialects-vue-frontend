@@ -17,7 +17,7 @@
           />
         </div>
 
-        <div class="control-group mode-switcher">
+        <div v-if="showDisplayModeSwitcher" class="control-group mode-switcher">
           <button
             v-for="mode in displayModeOptions"
             :key="mode.value"
@@ -95,8 +95,7 @@ const OVERVIEW_MARKER_TEXT_COLORS = [
   '#fff',
   '#fff',
 ]
-const OVERVIEW_MARKER_MIN_FONT_SIZE = 12
-const OVERVIEW_MARKER_MAX_FONT_SIZE = 20
+const OVERVIEW_MARKER_FONT_SIZE = 12
 
 // --- State ---
 const mapContainer = ref(null)
@@ -115,8 +114,7 @@ function clearMarkers() {
 }
 
 const overviewDisplayModeOptions = computed(() => [
-  { value: 'overview', label: t('map.vocabularyMap.controls.overview') },
-  { value: 'location', label: t('map.vocabularyMap.controls.location') }
+  { value: 'overview', label: t('map.vocabularyMap.controls.overview') }
 ])
 const detailDisplayModeOptions = computed(() => [
   { value: 'location', label: t('map.vocabularyMap.controls.location') },
@@ -131,10 +129,11 @@ const canShowDetailModes = computed(() => {
 const displayModeOptions = computed(() => {
   return canShowDetailModes.value ? detailDisplayModeOptions.value : overviewDisplayModeOptions.value
 })
+const showDisplayModeSwitcher = computed(() => canShowDetailModes.value && displayModeOptions.value.length > 1)
 
 function ensureValidDisplayMode() {
   if (!displayModeOptions.value.some((option) => option.value === displayMode.value)) {
-    displayMode.value = 'overview'
+    displayMode.value = displayModeOptions.value[0]?.value || 'overview'
   }
 }
 
@@ -371,13 +370,11 @@ function getOverviewMarkerStyle(count, scale) {
     OVERVIEW_MARKER_COLORS.length - 1,
     Math.floor(normalized * OVERVIEW_MARKER_COLORS.length),
   )
-  const fontSize = OVERVIEW_MARKER_MIN_FONT_SIZE +
-    (OVERVIEW_MARKER_MAX_FONT_SIZE - OVERVIEW_MARKER_MIN_FONT_SIZE) * normalized
 
   return {
     color: OVERVIEW_MARKER_COLORS[colorIndex],
     textColor: OVERVIEW_MARKER_TEXT_COLORS[colorIndex],
-    fontSize: `${fontSize.toFixed(1)}px`,
+    fontSize: `${OVERVIEW_MARKER_FONT_SIZE}px`,
   }
 }
 
