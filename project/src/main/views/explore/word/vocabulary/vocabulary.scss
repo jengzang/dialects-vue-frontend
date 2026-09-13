@@ -164,18 +164,29 @@
 
 .vocabulary-entry-card {
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 0.85fr) minmax(0, 1.1fr) minmax(0, 0.75fr);
+  grid-template-columns: auto auto auto;
   grid-auto-flow: column;
   align-items: center;
-  justify-content: stretch;
+  justify-content: center;
   box-sizing: border-box;
-  gap: 6px;
+  column-gap: 12px;
+  row-gap: 8px;
   width: 100%;
+}
+
+.card-location-definition-pair {
+  display: inline-grid;
+  grid-template-rows: auto auto;
+  justify-items: center;
+  justify-self: center;
+  width: max-content;
+  max-width: calc(6em + 20px);
+  min-width: 0;
+  gap: 4px;
 }
 
 .card-location,
 .card-definition {
-  justify-self: stretch;
   min-width: 0;
   line-height: 1.5;
   text-align: center;
@@ -183,7 +194,8 @@
 }
 
 .card-location {
-  max-width: 100%;
+  width: max-content;
+  max-width: calc(6em + 20px);
   color: var(--text-primary);
   font-size: 12px;
   font-weight: 500;
@@ -191,22 +203,28 @@
 
 .card-location-pill {
   justify-self: center;
-  max-width: 100%;
   min-width: 0;
+  color: var(--action-primary-text, var(--text-white));
   --pill-btn-padding: 5px 10px;
+  --pill-btn-bg: var(--color-primary);
+  --pill-btn-color: var(--action-primary-text, var(--text-white));
   --pill-btn-font-size: 12px;
   --pill-btn-font-weight: 600;
+  --pill-btn-hover-bg: var(--color-primary-hover);
+  --pill-btn-hover-border: var(--color-primary-hover);
+  border-color: var(--color-primary);
 }
 
 .card-location-pill-text {
   @include text-truncate;
 
   min-width: 0;
-  max-width: 100%;
+  max-width: 6em;
 }
 
 .card-definition {
-  max-width: 100%;
+  width: 100%;
+  max-width: calc(6em + 20px);
   color: var(--text-primary);
   font-weight: 600;
 }
@@ -214,9 +232,9 @@
 .card-pronunciation-pair {
   display: inline-grid;
   grid-template-rows: auto auto;
-  justify-self: stretch;
-  width: 100%;
-  max-width: none;
+  justify-self: center;
+  width: max-content;
+  max-width: 150px;
   min-width: 0;
   gap: 4px;
 }
@@ -234,10 +252,10 @@
 .card-note {
   display: inline-flex;
   align-items: center;
-  grid-column: 4;
+  grid-column: 3;
   justify-content: center;
-  justify-self: stretch;
-  width: 100%;
+  justify-self: end;
+  width: fit-content;
   min-width: 0;
   max-width: 100%;
   gap: 2px;

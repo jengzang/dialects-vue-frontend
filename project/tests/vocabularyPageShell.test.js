@@ -229,6 +229,9 @@ describe('vocabulary explore page shell wiring', () => {
     const vocabularyScss = readSource('src/main/views/explore/word/vocabulary/vocabulary.scss')
     const cardGridRule = vocabularyScss.match(/\.cards-grid\s*\{[^}]*\}/)?.[0] || ''
     const entryCardRule = vocabularyScss.match(/\.vocabulary-entry-card\s*\{[^}]*\}/)?.[0] || ''
+    const locationDefinitionPairRule = vocabularyScss.match(/\.card-location-definition-pair\s*\{[^}]*\}/)?.[0] || ''
+    const locationPillRule = vocabularyScss.match(/\.card-location-pill\s*\{[^}]*\}/)?.[0] || ''
+    const locationPillTextRule = vocabularyScss.match(/\.card-location-pill-text\s*\{[^}]*\}/)?.[0] || ''
     const pronunciationPairRule = vocabularyScss.match(/\.card-pronunciation-pair\s*\{[^}]*\}/)?.[0] || ''
     const pronunciationPairTextRule = vocabularyScss.match(/\.card-pronunciation-pair\s*>\s*span\s*\{[^}]*\}/)?.[0] || ''
     const cardNoteRule = vocabularyScss.match(/\.card-note\s*\{[^}]*\}/)?.[0] || ''
@@ -237,6 +240,7 @@ describe('vocabulary explore page shell wiring', () => {
     const expandedNoteRule = vocabularyScss.match(/\.vocabulary-entry-card\.is-note-expanded\s+\.card-note\s*\{[^}]*\}/)?.[0] || ''
 
     expect(vocabularyPage).toContain('class="card glass-card vocabulary-entry-card"')
+    expect(vocabularyPage).toContain('class="card-location-definition-pair"')
     expect(vocabularyPage).toContain('class="card-location pill-btn card-location-pill"')
     expect(vocabularyPage).toContain('@click="openLocationDetails(entry.locationName)"')
     expect(vocabularyPage).toContain('{{ entry.locationName }}')
@@ -257,23 +261,30 @@ describe('vocabulary explore page shell wiring', () => {
 
     expect(cardGridRule).toContain('grid-template-columns: repeat(auto-fill, minmax(250px, 1fr))')
     expect(entryCardRule).toContain('display: grid')
-    expect(entryCardRule).toContain('grid-template-columns: minmax(0, 0.95fr) minmax(0, 0.85fr) minmax(0, 1.1fr) minmax(0, 0.75fr)')
+    expect(entryCardRule).toContain('grid-template-columns: auto auto auto')
     expect(entryCardRule).toContain('grid-auto-flow: column')
     expect(entryCardRule).toContain('align-items: center')
-    expect(entryCardRule).toContain('justify-content: stretch')
+    expect(entryCardRule).toContain('justify-content: center')
     expect(entryCardRule).toContain('box-sizing: border-box')
     expect(entryCardRule).not.toContain('fit-content')
     expect(entryCardRule).not.toContain('flex-wrap')
+    expect(locationDefinitionPairRule).toContain('display: inline-grid')
+    expect(locationDefinitionPairRule).toContain('grid-template-rows: auto auto')
+    expect(locationDefinitionPairRule).toContain('max-width: calc(6em + 20px)')
+    expect(locationPillRule).toContain('--pill-btn-bg: var(--color-primary)')
+    expect(locationPillRule).toContain('color: var(--action-primary-text, var(--text-white))')
+    expect(locationPillRule).toContain('--pill-btn-hover-bg: var(--color-primary-hover)')
+    expect(locationPillTextRule).toContain('max-width: 6em')
     expect(vocabularyScss).toContain('.card-pronunciation-pair')
     expect(vocabularyScss).toContain('grid-template-rows: auto auto')
-    expect(pronunciationPairRule).toContain('justify-self: stretch')
-    expect(pronunciationPairRule).toContain('width: 100%')
-    expect(pronunciationPairRule).toContain('max-width: none')
+    expect(pronunciationPairRule).toContain('justify-self: center')
+    expect(pronunciationPairRule).toContain('width: max-content')
+    expect(pronunciationPairRule).toContain('max-width: 150px')
     expect(pronunciationPairTextRule).not.toContain('overflow-wrap: anywhere')
     expect(cardNoteRule).toContain('display: inline-flex')
     expect(cardNoteRule).toContain('align-items: center')
-    expect(cardNoteRule).toContain('grid-column: 4')
-    expect(cardNoteRule).toContain('justify-self: stretch')
+    expect(cardNoteRule).toContain('grid-column: 3')
+    expect(cardNoteRule).toContain('justify-self: end')
     expect(cardNoteRule).toContain('justify-content: center')
     expect(cardNoteRule).toContain('gap: 2px')
     expect(cardNoteRule).toContain('max-width:')

@@ -56,6 +56,24 @@ describe('vocabulary location details modal', () => {
     expect(styles).toContain('&:hover')
   })
 
+  it('opens location details from a vocabulary card with the location name searched and expanded', () => {
+    const source = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
+    const styles = readSource('src/main/views/explore/word/vocabulary/vocabulary.scss')
+
+    expect(source).toContain('class="card-location pill-btn card-location-pill"')
+    expect(source).toContain('class="card-location-pill-text"')
+    expect(source).toContain('@click="openLocationDetails(entry.locationName)"')
+    expect(source).toContain('{{ entry.locationName }}')
+    expect(source).toContain('const locationName = item.location_name || locationContext || \'\'')
+    expect(source).toContain('locationName,')
+    expect(source).toContain('location: item.location_name || item.location || item.location_label || locationContext || \'\'')
+    expect(source).toContain('async function openLocationDetails(focusedLocationName = \'\')')
+    expect(source).toContain('const normalizedFocusedLocationName = String(focusedLocationName || \'\').trim()')
+    expect(source).toContain('locationDetailsSearchQuery.value = normalizedFocusedLocationName')
+    expect(source).toContain('expandedLocationKeys.value = normalizedFocusedLocationName ? new Set([normalizedFocusedLocationName]) : new Set()')
+    expect(styles).toContain('.card-location-pill')
+  })
+
   it('caches vocabulary map point requests used by the location details modal', () => {
     const source = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
 
@@ -72,5 +90,32 @@ describe('vocabulary location details modal', () => {
     expect(source).toContain('pendingVocabularyMapPointRequests.set(requestKey, requestPromise)')
     expect(source).toContain('pendingVocabularyMapPointRequests.delete(requestKey)')
     expect(source).not.toContain('const response = await getVocabularyMapPoints(buildVocabularyMapPointsParams())')
+  })
+
+  it('deduplicates vocabulary request lifecycles and ignores stale responses', () => {
+    const source = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
+
+    expect(source).toContain('const itemsCacheKey = ref(\'\')')
+    expect(source).toContain('const standardWordsCacheKey = ref(\'\')')
+    expect(source).toContain('const activeVocabularyItemsRequestKey = ref(\'\')')
+    expect(source).toContain('const activeStandardWordsRequestKey = ref(\'\')')
+    expect(source).toContain('const activeMapPointsRequestKey = ref(\'\')')
+    expect(source).toContain('const activeMapDetailRequestKey = ref(\'\')')
+    expect(source).toContain('const pendingVocabularyItemRequests = new Map()')
+    expect(source).toContain('const pendingVocabularyStandardWordRequests = new Map()')
+    expect(source).toContain('const mapDetailItemsCache = new Map()')
+    expect(source).toContain('async function requestVocabularyItems(params)')
+    expect(source).toContain('async function requestVocabularyStandardWords(params = buildVocabularyStandardWordsParams())')
+    expect(source).toContain('async function requestVocabularyMapDetailItems(params)')
+    expect(source).toContain('if (!append && itemsCacheKey.value === requestKey) {')
+    expect(source).toContain('if (standardWordsCacheKey.value === requestKey) {')
+    expect(source).toContain('if (activeVocabularyItemsRequestKey.value !== requestKey || !shouldUseVocabularyItemsApi()) {')
+    expect(source).toContain('if (activeStandardWordsRequestKey.value !== requestKey || viewMode.value !== \'map\') {')
+    expect(source).toContain('if (activeMapPointsRequestKey.value !== requestKey || (!shouldUseVocabularyMapPointsApi() && !shouldUseVocabularyMapItemsApi())) {')
+    expect(source).toContain('if (activeMapDetailRequestKey.value !== requestKey) {')
+    expect(source).toContain('async function refreshVocabularyMapData()')
+    expect(source).toContain('await loadVocabularyStandardWords()')
+    expect(source).toContain('loadVocabularyMapPoints()')
+    expect(source).toContain('const requestKey = buildVocabularyMapRequestKey(\'map-detail-items\', params)')
   })
 })

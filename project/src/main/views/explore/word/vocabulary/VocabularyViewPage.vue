@@ -37,16 +37,20 @@
             class="card glass-card vocabulary-entry-card"
             :class="{ 'is-note-expanded': isVocabularyCardNoteExpanded(entry.id) }"
           >
-            <button
-              class="card-location pill-btn card-location-pill"
-              type="button"
-              :title="entry.locationName"
-              @click="openLocationDetails(entry.locationName)"
-            >
-              <span class="card-location-pill-text">{{ entry.locationName }}</span>
-            </button>
-            <div class="card-definition">
-              {{ entry.definition }}
+            <div class="card-location-definition-pair">
+              <button
+                class="card-location pill-btn card-location-pill"
+                type="button"
+                :title="entry.locationName"
+                @click="openLocationDetails(entry.locationName)"
+              >
+                <span class="card-location-pill-text">
+                  {{ entry.locationName }}
+                </span>
+              </button>
+              <span class="card-definition">
+                {{ entry.definition }}
+              </span>
             </div>
             <div class="card-pronunciation-pair">
               <span class="pronunciation-text">{{ entry.pronunciation }}</span>
@@ -779,6 +783,15 @@ function buildVocabularyMapItemsParams() {
   }
 }
 
+function buildMapDetailItemsParams(locations, pageNumber) {
+  return {
+    ...buildVocabularyQueryParams(),
+    locations,
+    page: pageNumber,
+    page_size: pageSize.value,
+  }
+}
+
 function normalizeVocabularyMapRequestValue(value) {
   if (Array.isArray(value)) {
     return value.map((item) => String(item))
@@ -793,6 +806,20 @@ function buildVocabularyMapRequestKey(kind, params) {
     .map(([key, value]) => [key, normalizeVocabularyMapRequestValue(value)])
 
   return `${kind}:${JSON.stringify(normalizedEntries)}`
+}
+
+async function requestVocabularyItems(params) {
+  const requestKey = buildVocabularyMapRequestKey('items', params)
+  if (pendingVocabularyItemRequests.has(requestKey)) {
+    return pendingVocabularyItemRequests.get(requestKey)
+  }
+
+  const requestPromise = getVocabularyItems(params)
+    .finally(() => {
+      pendingVocabularyItemRequests.delete(requestKey)
+    })
+  pendingVocabularyItemRequests.set(requestKey, requestPromise)
+  return requestPromise
 }
 
 async function requestVocabularyMapPoints(params = buildVocabularyMapPointsParams()) {
@@ -821,6 +848,31 @@ async function requestVocabularyMapItems(params = buildVocabularyMapItemsParams(
     })
   pendingVocabularyMapPointRequests.set(requestKey, requestPromise)
   return requestPromise
+}
+
+async function requestVocabularyStandardWords(params = buildVocabularyStandardWordsParams()) {
+  const requestKey = buildVocabularyMapRequestKey('standard-words', params)
+  if (pendingVocabularyStandardWordRequests.has(requestKey)) {
+    return pendingVocabularyStandardWordRequests.get(requestKey)
+  }
+
+  const requestPromise = getVocabularyStandardWords(params)
+    .finally(() => {
+      pendingVocabularyStandardWordRequests.delete(requestKey)
+    })
+  pendingVocabularyStandardWordRequests.set(requestKey, requestPromise)
+  return requestPromise
+}
+
+async function requestVocabularyMapDetailItems(params) {
+  const requestKey = buildVocabularyMapRequestKey('map-detail-items', params)
+  if (mapDetailItemsCache.has(requestKey)) {
+    return mapDetailItemsCache.get(requestKey)
+  }
+
+  const response = await requestVocabularyItems(params)
+  mapDetailItemsCache.set(requestKey, response)
+  return response
 }
 
 function normalizeVocabularyMapPoint(point) {
@@ -898,25 +950,52 @@ async function loadVocabularyItems({ append = false } = {}) {
   }
 
   const nextPage = append ? page.value + 1 : 1
+  const requestParams = buildVocabularyItemsParams({ page: nextPage })
+  const requestKey = buildVocabularyMapRequestKey('items', requestParams)
+
+  if (!append && itemsCacheKey.value === requestKey) {
+    return
+  }
+
+  if (append) {
+    itemsCacheKey.value = ''
+  }
+
+  activeVocabularyItemsRequestKey.value = requestKey
+  activeMapPointsRequestKey.value = ''
   page.value = nextPage
   isLoadingItems.value = true
   loadError.value = ''
 
   try {
-    const response = await getVocabularyItems(buildVocabularyItemsParams())
+    const response = await requestVocabularyItems(requestParams)
+    if (activeVocabularyItemsRequestKey.value !== requestKey || !shouldUseVocabularyItemsApi()) {
+      return
+    }
+
     const nextEntries = Array.isArray(response.items) ? response.items.map((item, index) => normalizeVocabularyEntry(item, index)) : []
     entries.value = append ? entries.value.concat(nextEntries) : nextEntries
     total.value = Number(response.total) || entries.value.length
     page.value = Number(response.page) || nextPage
     pageSize.value = Number(response.page_size) || pageSize.value
+    if (!append) {
+      itemsCacheKey.value = requestKey
+    }
   } catch (error) {
+    if (activeVocabularyItemsRequestKey.value !== requestKey || !shouldUseVocabularyItemsApi()) {
+      return
+    }
+
     loadError.value = error.message || t('words.wordList.states.loadItemsFailed')
+    itemsCacheKey.value = ''
     if (!append) {
       entries.value = []
       total.value = 0
     }
   } finally {
-    isLoadingItems.value = false
+    if (activeVocabularyItemsRequestKey.value === requestKey) {
+      isLoadingItems.value = false
+    }
   }
 }
 
@@ -935,15 +1014,22 @@ async function loadVocabularyMapPoints() {
     return
   }
 
+  activeMapPointsRequestKey.value = requestKey
+  activeVocabularyItemsRequestKey.value = ''
   isLoadingItems.value = true
   loadError.value = ''
   entries.value = []
+  itemsCacheKey.value = ''
   total.value = 0
 
   try {
     const response = shouldLoadMapItems
       ? await requestVocabularyMapItems(requestParams)
       : await requestVocabularyMapPoints(requestParams)
+    if (activeMapPointsRequestKey.value !== requestKey || (!shouldUseVocabularyMapPointsApi() && !shouldUseVocabularyMapItemsApi())) {
+      return
+    }
+
     mapPoints.value = Array.isArray(response.points)
       ? response.points.map(shouldLoadMapItems ? normalizeVocabularyMapItemPoint : normalizeVocabularyMapPoint)
       : []
@@ -954,6 +1040,10 @@ async function loadVocabularyMapPoints() {
       omittedWithoutCoordinates: Number(response.omitted_without_coordinates) || 0,
     }
   } catch (error) {
+    if (activeMapPointsRequestKey.value !== requestKey || (!shouldUseVocabularyMapPointsApi() && !shouldUseVocabularyMapItemsApi())) {
+      return
+    }
+
     loadError.value = error.message || t('words.wordList.states.loadMapFailed')
     mapPoints.value = []
     mapPointsCacheKey.value = ''
@@ -963,7 +1053,9 @@ async function loadVocabularyMapPoints() {
       omittedWithoutCoordinates: 0,
     }
   } finally {
-    isLoadingItems.value = false
+    if (activeMapPointsRequestKey.value === requestKey) {
+      isLoadingItems.value = false
+    }
   }
 }
 
@@ -980,8 +1072,21 @@ async function loadVocabularyStandardWords() {
     return
   }
 
+  const requestParams = buildVocabularyStandardWordsParams()
+  const requestKey = buildVocabularyMapRequestKey('standard-words', requestParams)
+
+  if (standardWordsCacheKey.value === requestKey) {
+    return
+  }
+
+  activeStandardWordsRequestKey.value = requestKey
+
   try {
-    const response = await getVocabularyStandardWords(buildVocabularyStandardWordsParams())
+    const response = await requestVocabularyStandardWords(requestParams)
+    if (activeStandardWordsRequestKey.value !== requestKey || viewMode.value !== 'map') {
+      return
+    }
+
     const standardWords = Array.isArray(response.standard_words) ? response.standard_words : []
     vocabularyStandardWordOptions.value = standardWords
       .map((item) => {
@@ -1006,9 +1111,15 @@ async function loadVocabularyStandardWords() {
     if (filteredStandardWords.length !== selectedStandardWordsModel.value.length) {
       selectedStandardWordsModel.value = filteredStandardWords
     }
+    standardWordsCacheKey.value = requestKey
   } catch {
+    if (activeStandardWordsRequestKey.value !== requestKey || viewMode.value !== 'map') {
+      return
+    }
+
     vocabularyStandardWordOptions.value = []
     selectedStandardWord.value = ''
+    standardWordsCacheKey.value = ''
   }
 }
 
@@ -1032,6 +1143,7 @@ async function handleMapPointClick(point) {
 
   // map-items mode: count entries from the matching points directly
   if (selectedStandardWords.value.length > 0) {
+    activeMapDetailRequestKey.value = ''
     const locationSet = new Set(locations)
     const matchingPoints = mapPoints.value.filter((p) => locationSet.has(p.locationName))
     const allItems = matchingPoints.flatMap((p) => (Array.isArray(p.items) ? p.items : []))
@@ -1043,22 +1155,31 @@ async function handleMapPointClick(point) {
   }
 
   // overview mode: fetch entries, then set title with real count
+  const requestParams = buildMapDetailItemsParams(locations, 1)
+  const requestKey = buildVocabularyMapRequestKey('map-detail-items', requestParams)
+  activeMapDetailRequestKey.value = requestKey
+
   try {
-    const response = await getVocabularyItems({
-      ...buildVocabularyQueryParams(),
-      locations,
-      page: 1,
-      page_size: pageSize.value,
-    })
+    const response = await requestVocabularyMapDetailItems(requestParams)
+    if (activeMapDetailRequestKey.value !== requestKey) {
+      return
+    }
+
     mapDetailEntries.value = Array.isArray(response.items) ? response.items.map((item, index) => normalizeVocabularyEntry(item, index)) : []
     mapDetailTotal.value = Number(response.total) || mapDetailEntries.value.length
     mapDetailPage.value = Number(response.page) || 1
     selectedMapPointLabel.value = baseLabel
   } catch (error) {
+    if (activeMapDetailRequestKey.value !== requestKey) {
+      return
+    }
+
     mapDetailError.value = error.message || t('words.wordList.states.loadItemsFailed')
     mapDetailEntries.value = []
   } finally {
-    isLoadingMapDetail.value = false
+    if (activeMapDetailRequestKey.value === requestKey) {
+      isLoadingMapDetail.value = false
+    }
   }
 }
 
@@ -1068,15 +1189,17 @@ async function loadMoreMapDetail() {
   }
 
   const nextPage = mapDetailPage.value + 1
+  const requestParams = buildMapDetailItemsParams(activeMapPointLocations.value, nextPage)
+  const requestKey = buildVocabularyMapRequestKey('map-detail-items', requestParams)
+  activeMapDetailRequestKey.value = requestKey
   isLoadingMapDetail.value = true
 
   try {
-    const response = await getVocabularyItems({
-      ...buildVocabularyQueryParams(),
-      locations: activeMapPointLocations.value,
-      page: nextPage,
-      page_size: pageSize.value,
-    })
+    const response = await requestVocabularyMapDetailItems(requestParams)
+    if (activeMapDetailRequestKey.value !== requestKey) {
+      return
+    }
+
     const nextEntries = Array.isArray(response.items)
       ? response.items.map((item, index) => normalizeVocabularyEntry(item, mapDetailEntries.value.length + index))
       : []
@@ -1085,9 +1208,15 @@ async function loadMoreMapDetail() {
     mapDetailPage.value = Number(response.page) || nextPage
     selectedMapPointLabel.value = activeMapPointBaseLabel.value
   } catch (error) {
+    if (activeMapDetailRequestKey.value !== requestKey) {
+      return
+    }
+
     mapDetailError.value = error.message || t('words.wordList.states.loadItemsFailed')
   } finally {
-    isLoadingMapDetail.value = false
+    if (activeMapDetailRequestKey.value === requestKey) {
+      isLoadingMapDetail.value = false
+    }
   }
 }
 
@@ -1157,19 +1286,23 @@ async function openLocationDetails(focusedLocationName = '') {
   }
 }
 
+async function refreshVocabularyMapData() {
+  await loadVocabularyStandardWords()
+  loadVocabularyMapPoints()
+}
+
 function loadActiveViewMode() {
   if (shouldUseVocabularyItemsApi()) {
     loadVocabularyItems()
   } else if (shouldUseVocabularyMapPointsApi()) {
-    loadVocabularyMapPoints()
+    refreshVocabularyMapData()
   } else if (shouldUseVocabularyMapItemsApi()) {
-    loadVocabularyMapPoints()
+    refreshVocabularyMapData()
   }
 }
 
 onMounted(async () => {
   await loadVocabularyLocationOptions()
-  loadVocabularyStandardWords()
   loadActiveViewMode()
 })
 
@@ -1186,7 +1319,6 @@ watch(() => route.query.tab, (tab) => {
 })
 
 watch(viewMode, () => {
-  loadVocabularyStandardWords()
   loadActiveViewMode()
 })
 
@@ -1206,15 +1338,13 @@ watch(singleSelect, (val) => {
   localStorage.setItem('vocabulary_single_select', val ? 'true' : 'false')
 })
 
-watchDebounced([query, selectedSearchFields, selectedLocations, filterByRegion, selectedProvince, selectedCity], () => {
-  loadVocabularyStandardWords()
-
+watchDebounced([query, selectedSearchFields, selectedLocations, filterByRegion, selectedProvince, selectedCity], async () => {
   if (shouldUseVocabularyItemsApi()) {
     loadVocabularyItems()
   } else if (shouldUseVocabularyMapPointsApi()) {
-    loadVocabularyMapPoints()
+    await refreshVocabularyMapData()
   } else if (shouldUseVocabularyMapItemsApi()) {
-    loadVocabularyMapPoints()
+    await refreshVocabularyMapData()
   }
 }, { debounce: 250, maxWait: 800 })
 
