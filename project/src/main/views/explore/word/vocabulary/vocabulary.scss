@@ -164,10 +164,10 @@
 
 .vocabulary-entry-card {
   display: grid;
-  grid-template-columns: fit-content(22%) fit-content(18%) fit-content(150px) fit-content(18%);
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 0.85fr) minmax(0, 1.1fr) minmax(0, 0.75fr);
   grid-auto-flow: column;
   align-items: center;
-  justify-content: center;
+  justify-content: stretch;
   box-sizing: border-box;
   gap: 6px;
   width: 100%;
@@ -175,6 +175,7 @@
 
 .card-location,
 .card-definition {
+  justify-self: stretch;
   min-width: 0;
   line-height: 1.5;
   text-align: center;
@@ -197,8 +198,9 @@
 .card-pronunciation-pair {
   display: inline-grid;
   grid-template-rows: auto auto;
-  width: fit-content;
-  max-width: 150px;
+  justify-self: stretch;
+  width: 100%;
+  max-width: none;
   min-width: 0;
   gap: 4px;
 }
@@ -217,8 +219,9 @@
   display: inline-flex;
   align-items: center;
   grid-column: 4;
-  justify-self: end;
-  width: fit-content;
+  justify-content: center;
+  justify-self: stretch;
+  width: 100%;
   min-width: 0;
   max-width: 100%;
   gap: 2px;
@@ -246,7 +249,7 @@
 .vocabulary-entry-card.is-note-expanded .card-note {
   grid-column: 1 / -1;
   grid-row: 2;
-  justify-self: center;
+  justify-self: stretch;
 }
 
 .card-note-toggle {
