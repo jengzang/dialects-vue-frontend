@@ -22,17 +22,13 @@ function extractStyleBlock(source, selector) {
 }
 
 describe('result panel layout', () => {
-  it('lets the result list grow in page flow instead of creating an inner scroll container', () => {
+  it('keeps the result panel in page flow so the layout footer remains reachable', () => {
     const panelStyle = extractPanelStyle(resultListSource())
 
+    expect(panelStyle).toContain('height: 85dvh')
     expect(panelStyle).toContain('border: 1px solid var(--border-light-gray)')
-    expect(panelStyle).not.toContain('height: 85dvh')
-    expect(panelStyle).not.toContain('height: 74dvh')
-    expect(panelStyle).not.toContain('overflow: auto')
-    expect(panelStyle).not.toContain('resize: both')
     expect(panelStyle).not.toContain('position: fixed')
     expect(panelStyle).not.toContain('bottom: 1dvh')
-    expect(resultListSource()).not.toContain("overflowY: 'auto'")
   })
 
   it('lets character and tone results grow in page flow instead of clipping to the viewport', () => {

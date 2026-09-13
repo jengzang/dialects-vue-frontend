@@ -5,6 +5,7 @@
         class="panel-content"
         ref="scrollContainerRef"
         :style="{
+          overflowY: 'auto',
           marginBottom: isCondensedMode ? '0' : '50px'
         }"
     >
@@ -144,7 +145,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import { ref, computed, watch, onActivated, onDeactivated, onMounted, nextTick, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, nextTick, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DataRow from './DataRow.vue';
 import { parseFeatureString,get_detail } from '@/main/utils/query/ResultTable.js';
@@ -197,7 +198,6 @@ const popupDataValue = ref({});
 const showPopupFeature = ref(false);
 const popupDataFeature = ref({});
 const popupPos = ref({ top: 0, left: 0 });
-let removeScrollObserver = null;
 
 const hasData = computed(() => tableData.value && tableData.value.length > 0);
 
@@ -318,37 +318,21 @@ const initScrollObserver = () => {
   // ... (保留原本的 initScrollObserver 代码，太长省略)
   const content = scrollContainerRef.value;
   if (!content) return;
-  if (removeScrollObserver) {
-    removeScrollObserver();
-    removeScrollObserver = null;
-  }
   let lastScrollTop = 0;
   const visibleLocations = [];
-
-  const getScrollMetrics = () => {
-    const scrollElement = document.scrollingElement || document.documentElement;
-
-    return {
-      scrollTop: window.scrollY || scrollElement.scrollTop || 0,
-      scrollHeight: scrollElement.scrollHeight || 0,
-      clientHeight: window.innerHeight || scrollElement.clientHeight || 0
-    };
-  };
-
-  const handleScroll = () => {
-    const { scrollTop, scrollHeight, clientHeight } = getScrollMetrics();
-    const scrollDirection = scrollTop > lastScrollTop ? 'down' : 'up';
-    lastScrollTop = scrollTop;
-    if (Math.abs(scrollHeight - scrollTop - clientHeight) < 200 && visibleRows.value < sortedData.value.length) {
+  const handleScroll = (event) => {
+    const el = event.target;
+    const scrollDirection = el.scrollTop > lastScrollTop ? 'down' : 'up';
+    lastScrollTop = el.scrollTop;
+    if (Math.abs(el.scrollHeight - el.scrollTop - el.clientHeight) < 50 && visibleRows.value < sortedData.value.length) {
       visibleRows.value += 20;
     }
-    const viewportTop = 0;
-    const viewportBottom = window.innerHeight || document.documentElement.clientHeight || 0;
+    const contentRect = content.getBoundingClientRect();
     const locations = [...content.querySelectorAll('.locations-vue')];
     let lastVisibleLocation = null;
     for (const loc of locations) {
       const rect = loc.getBoundingClientRect();
-      if (rect.top >= viewportTop && rect.top <= viewportBottom) {
+      if (rect.top >= contentRect.top && rect.top <= contentRect.bottom) {
         lastVisibleLocation = loc;
       }
     }
@@ -356,24 +340,18 @@ const initScrollObserver = () => {
       const locName = lastVisibleLocation.textContent.trim();
       currentStickyLocation.value = locName;
       if (!visibleLocations.some(l => l.name === locName)) {
-        visibleLocations.push({ name: locName, scrollHeight: scrollTop });
+        visibleLocations.push({ name: locName, scrollHeight: content.scrollTop });
       }
     } else if (scrollDirection === 'up') {
       for (let i = visibleLocations.length - 1; i >= 0; i--) {
-        if (scrollTop > visibleLocations[i].scrollHeight - 50) {
+        if (content.scrollTop > visibleLocations[i].scrollHeight - 50) {
           currentStickyLocation.value = visibleLocations[i].name;
           break;
         }
       }
     }
   };
-  window.addEventListener('scroll', handleScroll, { passive: true });
-  window.addEventListener('resize', handleScroll, { passive: true });
-  handleScroll();
-  removeScrollObserver = () => {
-    window.removeEventListener('scroll', handleScroll);
-    window.removeEventListener('resize', handleScroll);
-  };
+  content.addEventListener('scroll', handleScroll);
 };
 
 // === 🌟 修改点：Event Handlers ===
@@ -560,24 +538,8 @@ onMounted(() => {
   initScrollObserver();
 });
 
-onActivated(() => {
-  nextTick(() => initScrollObserver());
-});
-
-const removePageScrollObserver = () => {
-  if (removeScrollObserver) {
-    removeScrollObserver();
-    removeScrollObserver = null;
-  }
-};
-
-onDeactivated(() => {
-  removePageScrollObserver();
-});
-
 onUnmounted(() => {
   document.removeEventListener('click', handleGlobalClickForStickybar);
-  removePageScrollObserver();
 });
 </script>
 
@@ -616,6 +578,9 @@ $transition-duration: 0.2s;
   margin: 0 2dvw 1dvh;
   z-index: 1;
   @include flex-col;
+  height: 85dvh;
+  overflow: auto;
+  resize: both;
   border: 1px solid var(--border-light-gray);
   border-radius: $panel-radius;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
@@ -626,6 +591,7 @@ $transition-duration: 0.2s;
   @media (orientation: portrait) {
     width: calc(100% - 2dvw);
     margin: 0 1dvw 2dvh;
+    height: 74dvh;
   }
 }
 
@@ -637,6 +603,7 @@ $transition-duration: 0.2s;
   gap: 15px;
   padding: 13px;
   overflow: visible;
+  overflow-y: auto;
   color: $text-dark;
 }
 
@@ -679,8 +646,10 @@ $transition-duration: 0.2s;
 }
 
 .sticky-label2 {
-  position: sticky;
+  position: absolute;
+  right: 0;
   bottom: 0;
+  left: 0;
   z-index: 999;
   display: flex;
   align-items: center;
