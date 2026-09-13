@@ -164,7 +164,7 @@
 
 .vocabulary-entry-card {
   display: grid;
-  grid-template-columns: fit-content(22%) fit-content(18%) fit-content(32%) fit-content(18%);
+  grid-template-columns: fit-content(22%) fit-content(18%) fit-content(150px) fit-content(18%);
   grid-auto-flow: column;
   align-items: center;
   justify-content: center;

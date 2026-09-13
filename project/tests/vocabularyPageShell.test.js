@@ -255,7 +255,7 @@ describe('vocabulary explore page shell wiring', () => {
 
     expect(cardGridRule).toContain('grid-template-columns: repeat(auto-fill, minmax(250px, 1fr))')
     expect(entryCardRule).toContain('display: grid')
-    expect(entryCardRule).toContain('grid-template-columns: fit-content(22%) fit-content(18%) fit-content(32%) fit-content(18%)')
+    expect(entryCardRule).toContain('grid-template-columns: fit-content(22%) fit-content(18%) fit-content(150px) fit-content(18%)')
     expect(entryCardRule).toContain('grid-auto-flow: column')
     expect(entryCardRule).toContain('align-items: center')
     expect(entryCardRule).toContain('justify-content: center')
