@@ -237,7 +237,9 @@ describe('vocabulary explore page shell wiring', () => {
     const expandedNoteRule = vocabularyScss.match(/\.vocabulary-entry-card\.is-note-expanded\s+\.card-note\s*\{[^}]*\}/)?.[0] || ''
 
     expect(vocabularyPage).toContain('class="card glass-card vocabulary-entry-card"')
-    expect(vocabularyPage).toContain('class="card-location"')
+    expect(vocabularyPage).toContain('class="card-location pill-btn card-location-pill"')
+    expect(vocabularyPage).toContain('@click="openLocationDetails(entry.locationName)"')
+    expect(vocabularyPage).toContain('{{ entry.locationName }}')
     expect(vocabularyPage).toContain('class="card-definition"')
     expect(vocabularyPage).toContain('class="card-pronunciation-pair"')
     expect(vocabularyPage).toContain('class="card-note"')

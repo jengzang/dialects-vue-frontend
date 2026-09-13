@@ -37,9 +37,14 @@
             class="card glass-card vocabulary-entry-card"
             :class="{ 'is-note-expanded': isVocabularyCardNoteExpanded(entry.id) }"
           >
-            <div class="card-location">
-              {{ entry.location }}
-            </div>
+            <button
+              class="card-location pill-btn card-location-pill"
+              type="button"
+              :title="entry.locationName"
+              @click="openLocationDetails(entry.locationName)"
+            >
+              <span class="card-location-pill-text">{{ entry.locationName }}</span>
+            </button>
             <div class="card-definition">
               {{ entry.definition }}
             </div>
@@ -374,8 +379,10 @@ const mapDisplayMode = ref('overview')
 const vocabularyLocationOptions = ref([])
 const vocabularyStandardWordOptions = ref([])
 const entries = ref([])
+const itemsCacheKey = ref('')
 const mapPoints = ref([])
 const mapPointsCacheKey = ref('')
+const standardWordsCacheKey = ref('')
 const mapStats = ref({
   totalEntries: 0,
   totalPoints: 0,
@@ -389,7 +396,14 @@ const locationDetailsPointsCacheKey = ref('')
 const locationDetailsSearchQuery = ref('')
 const locationDetailsSortByRegion = ref(false)
 const expandedLocationKeys = ref(new Set())
+const activeVocabularyItemsRequestKey = ref('')
+const activeStandardWordsRequestKey = ref('')
+const activeMapPointsRequestKey = ref('')
+const activeMapDetailRequestKey = ref('')
+const pendingVocabularyItemRequests = new Map()
 const pendingVocabularyMapPointRequests = new Map()
+const pendingVocabularyStandardWordRequests = new Map()
+const mapDetailItemsCache = new Map()
 const total = ref(0)
 const page = ref(1)
 const pageSize = ref(50)
@@ -719,7 +733,8 @@ function normalizeVocabularyEntry(item, index = 0, locationContext = '') {
     pronunciationType: item.pronunciation_type || '',
     detail: [...new Set(detailParts)].join(' · '),
     information: item.informations || '',
-    location: item.location_label || item.location || item.location_name || '',
+    locationName,
+    location: item.location_name || item.location || item.location_label || locationContext || '',
   }
 }
 
@@ -1100,9 +1115,10 @@ function clearLocationDetailsModal() {
   locationDetailsError.value = ''
 }
 
-async function openLocationDetails() {
-  expandedLocationKeys.value = new Set()
-  locationDetailsSearchQuery.value = ''
+async function openLocationDetails(focusedLocationName = '') {
+  const normalizedFocusedLocationName = String(focusedLocationName || '').trim()
+  expandedLocationKeys.value = normalizedFocusedLocationName ? new Set([normalizedFocusedLocationName]) : new Set()
+  locationDetailsSearchQuery.value = normalizedFocusedLocationName
   locationDetailsError.value = ''
   isLocationDetailsModalOpen.value = true
 

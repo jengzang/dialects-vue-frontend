@@ -189,6 +189,22 @@
   font-weight: 500;
 }
 
+.card-location-pill {
+  justify-self: center;
+  max-width: 100%;
+  min-width: 0;
+  --pill-btn-padding: 5px 10px;
+  --pill-btn-font-size: 12px;
+  --pill-btn-font-weight: 600;
+}
+
+.card-location-pill-text {
+  @include text-truncate;
+
+  min-width: 0;
+  max-width: 100%;
+}
+
 .card-definition {
   max-width: 100%;
   color: var(--text-primary);
@@ -323,8 +339,8 @@
 
 .pronunciation-text {
   color: var(--color-primary);
-  font-family: var(--font-monospace, var(--font-mono));
-  font-size: 14px;
+  // font-family: var(--font-monospace, var(--font-mono));
+  font-size: 12px;
   font-weight: 500;
 }
 
