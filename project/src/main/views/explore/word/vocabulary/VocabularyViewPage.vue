@@ -47,10 +47,13 @@
               <span class="pronunciation-text">{{ entry.pronunciation }}</span>
               <span class="word-text">{{ entry.headword }}</span>
             </div>
-            <div class="card-note">
-              <span class="card-note-text">{{ entry.detail }}</span>
+            <div
+              class="card-note"
+              :class="{ 'has-toggle': shouldShowVocabularyCardNoteToggle(entry) }"
+            >
+              <span class="card-note-text">{{ getVocabularyCardNoteText(entry) }}</span>
               <button
-                v-if="entry.detail"
+                v-if="shouldShowVocabularyCardNoteToggle(entry)"
                 class="card-note-toggle"
                 :class="{ 'is-expanded': isVocabularyCardNoteExpanded(entry.id) }"
                 type="button"
@@ -301,6 +304,7 @@ const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const STANDARD_WORD_OPTIONS_LIMIT = 1000
+const VOCABULARY_CARD_NOTE_PREVIEW_LENGTH = 4
 
 const TONE_FIELD_KEYS = Array.from({ length: 10 }, (_, index) => `t${index + 1}`)
 const locationDetailsT2S = OpenCCT2CN.Converter({ from: 'tw', to: 'cn' })
@@ -457,6 +461,22 @@ function pointMetaRows(point) {
 
 function isVocabularyCardNoteExpanded(entryId) {
   return expandedVocabularyCardNoteIds.value.has(entryId)
+}
+
+function getVocabularyCardNoteCharacters(entry) {
+  return Array.from(String(entry?.detail || ''))
+}
+
+function shouldShowVocabularyCardNoteToggle(entry) {
+  return getVocabularyCardNoteCharacters(entry).length > VOCABULARY_CARD_NOTE_PREVIEW_LENGTH
+}
+
+function getVocabularyCardNoteText(entry) {
+  const detailCharacters = getVocabularyCardNoteCharacters(entry)
+  if (!shouldShowVocabularyCardNoteToggle(entry) || isVocabularyCardNoteExpanded(entry.id)) {
+    return detailCharacters.join('')
+  }
+  return `${detailCharacters.slice(0, VOCABULARY_CARD_NOTE_PREVIEW_LENGTH).join('')}...`
 }
 
 function toggleVocabularyCardNote(entryId) {
@@ -1062,6 +1082,11 @@ onMounted(async () => {
   await loadVocabularyLocationOptions()
   loadVocabularyStandardWords()
   loadActiveViewMode()
+})
+
+watch(entries, () => {
+  const entryIds = new Set(entries.value.map((entry) => entry.id))
+  expandedVocabularyCardNoteIds.value = new Set([...expandedVocabularyCardNoteIds.value].filter((entryId) => entryIds.has(entryId)))
 })
 
 watch(() => route.query.tab, (tab) => {

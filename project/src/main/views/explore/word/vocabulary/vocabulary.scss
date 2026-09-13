@@ -164,9 +164,12 @@
 
 .vocabulary-entry-card {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 0.8fr) minmax(72px, 1.1fr) minmax(0, 1fr);
+  grid-template-columns: fit-content(22%) fit-content(18%) fit-content(32%) fit-content(18%);
+  grid-auto-flow: column;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  box-sizing: border-box;
+  gap: 6px;
   width: 100%;
 }
 
@@ -175,17 +178,18 @@
   min-width: 0;
   line-height: 1.5;
   text-align: center;
-
-  @include text-truncate;
+  overflow-wrap: anywhere;
 }
 
 .card-location {
+  max-width: 100%;
   color: var(--text-primary);
   font-size: 12px;
   font-weight: 500;
 }
 
 .card-definition {
+  max-width: 100%;
   color: var(--text-primary);
   font-weight: 600;
 }
@@ -193,9 +197,8 @@
 .card-pronunciation-pair {
   display: inline-grid;
   grid-template-rows: auto auto;
-  justify-self: center;
-  width: max-content;
-  max-width: 150px;
+  width: fit-content;
+  max-width: 100%;
   min-width: 0;
   gap: 4px;
 }
@@ -210,40 +213,43 @@
 }
 
 .card-note {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: flex-end;
+  width: fit-content;
   min-width: 0;
-  gap: 6px;
+  max-width: 100%;
+  gap: 2px;
 }
 
 .card-note-text {
-  max-width: 130px;
+  display: block;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
   color: var(--text-secondary);
   font-size: 13px;
   line-height: 1.6;
+  overflow-wrap: anywhere;
+}
 
-  @include text-truncate;
+.vocabulary-entry-card:not(.is-note-expanded) .card-note-text {
+  white-space: nowrap;
 }
 
 .vocabulary-entry-card.is-note-expanded .card-note-text {
-  max-width: 180px;
-  overflow: visible;
-  text-overflow: clip;
   white-space: normal;
 }
 
 .card-note-toggle {
   @include flex-center;
 
+  width: 14px;
+  height: 18px;
   flex: 0 0 auto;
-  width: 22px;
-  height: 22px;
   padding: 0;
   color: var(--color-primary);
-  background: var(--glass-80);
-  border: 1px solid var(--border-light-gray);
-  border-radius: var(--radius-sm);
+  background: transparent;
+  border: none;
   cursor: pointer;
   transition: transform 0.2s ease;
 
