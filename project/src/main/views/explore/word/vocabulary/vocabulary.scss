@@ -216,6 +216,8 @@
 .card-note {
   display: inline-flex;
   align-items: center;
+  grid-column: 4;
+  justify-self: end;
   width: fit-content;
   min-width: 0;
   max-width: 100%;
@@ -239,6 +241,12 @@
 
 .vocabulary-entry-card.is-note-expanded .card-note-text {
   white-space: normal;
+}
+
+.vocabulary-entry-card.is-note-expanded .card-note {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  justify-self: center;
 }
 
 .card-note-toggle {

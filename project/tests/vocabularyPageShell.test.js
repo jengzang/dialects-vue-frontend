@@ -234,6 +234,7 @@ describe('vocabulary explore page shell wiring', () => {
     const cardNoteRule = vocabularyScss.match(/\.card-note\s*\{[^}]*\}/)?.[0] || ''
     const noteTextRule = vocabularyScss.match(/\.card-note-text\s*\{[^}]*\}/)?.[0] || ''
     const noteToggleRule = vocabularyScss.match(/\.card-note-toggle\s*\{[^}]*\}/)?.[0] || ''
+    const expandedNoteRule = vocabularyScss.match(/\.vocabulary-entry-card\.is-note-expanded\s+\.card-note\s*\{[^}]*\}/)?.[0] || ''
 
     expect(vocabularyPage).toContain('class="card glass-card vocabulary-entry-card"')
     expect(vocabularyPage).toContain('class="card-location"')
@@ -267,9 +268,16 @@ describe('vocabulary explore page shell wiring', () => {
     expect(pronunciationPairTextRule).not.toContain('overflow-wrap: anywhere')
     expect(cardNoteRule).toContain('display: inline-flex')
     expect(cardNoteRule).toContain('align-items: center')
+    expect(cardNoteRule).toContain('grid-column: 4')
+    expect(cardNoteRule).toContain('justify-self: end')
+    expect(cardNoteRule).toContain('gap: 2px')
     expect(cardNoteRule).toContain('max-width:')
     expect(noteTextRule).toContain('max-width:')
+    expect(noteToggleRule).toContain('flex: 0 0 auto')
     expect(noteToggleRule).not.toContain('position: absolute')
+    expect(expandedNoteRule).toContain('grid-column: 1 / -1')
+    expect(expandedNoteRule).toContain('grid-row: 2')
+    expect(expandedNoteRule).toContain('justify-self: center')
     expect(vocabularyScss).toContain('.vocabulary-entry-card.is-note-expanded .card-note-text')
   })
 
