@@ -20,7 +20,7 @@
     />
 
     <section v-if="viewMode !== 'table'" class="content-area">
-      <div v-if="isInitialLoading" class="loading-state loading-state-base">
+      <div v-if="viewMode === 'card' && isInitialLoading" class="loading-state loading-state-base">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <span>{{ t('words.wordList.states.loadingCards') }}</span>
       </div>
@@ -94,7 +94,7 @@
       </div>
 
       <div v-else-if="viewMode === 'map'" class="map-mode">
-        <div v-if="isInitialLoading" class="empty-state empty-state-base map-empty-state">
+        <div v-if="isMapInitialLoading" class="empty-state empty-state-base map-empty-state">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <span>{{ t('words.wordList.states.loadingData') }}</span>
         </div>
@@ -426,6 +426,7 @@ const total = ref(0)
 const page = ref(1)
 const pageSize = ref(50)
 const isLoadingItems = ref(false)
+const isLoadingStandardWords = ref(false)
 const loadError = ref('')
 const isMapDetailModalOpen = ref(false)
 const isLoadingMapDetail = ref(false)
@@ -593,6 +594,7 @@ const standardWordOptions = computed(() => {
 })
 
 const isInitialLoading = computed(() => isLoadingItems.value && !entries.value.length && !loadError.value)
+const isMapInitialLoading = computed(() => (isLoadingItems.value || isLoadingStandardWords.value) && !mapDataForVocabularyMap.value.length && !loadError.value)
 const isLoadingMore = computed(() => isLoadingItems.value && entries.value.length > 0)
 
 const canLoadMore = computed(() => {
@@ -1094,6 +1096,7 @@ async function loadVocabularyStandardWords() {
   }
 
   activeStandardWordsRequestKey.value = requestKey
+  isLoadingStandardWords.value = true
 
   try {
     const response = await requestVocabularyStandardWords(requestParams)
@@ -1134,6 +1137,10 @@ async function loadVocabularyStandardWords() {
     vocabularyStandardWordOptions.value = []
     selectedStandardWord.value = ''
     standardWordsCacheKey.value = ''
+  } finally {
+    if (activeStandardWordsRequestKey.value === requestKey) {
+      isLoadingStandardWords.value = false
+    }
   }
 }
 
