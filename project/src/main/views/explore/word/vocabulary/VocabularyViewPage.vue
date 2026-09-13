@@ -34,7 +34,7 @@
           <article
             v-for="entry in entries"
             :key="entry.id"
-            class="card glass-card vocabulary-entry-card"
+            class="glass-card vocabulary-entry-card"
             :class="{ 'is-note-expanded': isVocabularyCardNoteExpanded(entry.id) }"
           >
             <div class="card-location-definition-pair">
@@ -69,7 +69,21 @@
                 :aria-expanded="isVocabularyCardNoteExpanded(entry.id)"
                 @click="toggleVocabularyCardNote(entry.id)"
               >
-                <span aria-hidden="true">&rsaquo;</span>
+                <svg
+                  class="card-note-toggle-icon"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="m9 6 6 6-6 6"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2.5"
+                  />
+                </svg>
               </button>
             </div>
           </article>
@@ -313,7 +327,7 @@ const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const STANDARD_WORD_OPTIONS_LIMIT = 1000
-const VOCABULARY_CARD_NOTE_PREVIEW_LENGTH = 4
+const VOCABULARY_CARD_NOTE_PREVIEW_LENGTH = 3
 
 const TONE_FIELD_KEYS = Array.from({ length: 10 }, (_, index) => `t${index + 1}`)
 const locationDetailsT2S = OpenCCT2CN.Converter({ from: 'tw', to: 'cn' })

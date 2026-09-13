@@ -135,22 +135,19 @@
   padding: 20px 0;
 }
 
-.card {
-  display: flex;
-  flex-direction: column;
+.vocabulary-entry-card {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-auto-flow: column;
   align-items: center;
-  gap: 14px;
-  padding: 18px 20px;
+  justify-content: center;
+  box-sizing: border-box;
+  column-gap: 16px;
+  row-gap: 8px;
+  width: 100%;
+  padding: 15px 10px;
   overflow: hidden;
   background: var(--glass-80);
-  // border: 0.5px solid var(--glass-90);
-  // border-radius: var(--radius-lg);
-  // box-shadow:
-  //   0 8px 32px rgba(0, 0, 0, 0.06),
-  //   0 2px 8px rgba(0, 0, 0, 0.04),
-  //   inset 0 1px 0 var(--text-white);
-  // backdrop-filter: blur(20px) saturate(180%);
-  // transition: all 0.2s ease;
 
   &:hover {
     border-color: rgba(var(--color-primary-rgb), 0.2);
@@ -160,18 +157,6 @@
       inset 0 1px 0 var(--text-white);
     transform: translateY(-2px);
   }
-}
-
-.vocabulary-entry-card {
-  display: grid;
-  grid-template-columns: auto auto auto;
-  grid-auto-flow: column;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  column-gap: 12px;
-  row-gap: 8px;
-  width: 100%;
 }
 
 .card-location-definition-pair {
@@ -204,15 +189,15 @@
 .card-location-pill {
   justify-self: center;
   min-width: 0;
-  color: var(--action-primary-text, var(--text-white));
-  --pill-btn-padding: 5px 10px;
-  --pill-btn-bg: var(--color-primary);
-  --pill-btn-color: var(--action-primary-text, var(--text-white));
+  color: var(--color-primary-hover);
+  --pill-btn-padding: 2px 4px;
+  --pill-btn-bg: var(--color-primary-light3);
+  --pill-btn-color: var(--color-primary);
   --pill-btn-font-size: 12px;
   --pill-btn-font-weight: 600;
-  --pill-btn-hover-bg: var(--color-primary-hover);
-  --pill-btn-hover-border: var(--color-primary-hover);
-  border-color: var(--color-primary);
+  --pill-btn-hover-bg: var(--color-primary-medium);
+  --pill-btn-hover-border: var(--color-primary-medium);
+  border-color: var(--color-primary-border);
 }
 
 .card-location-pill-text {
@@ -226,7 +211,8 @@
   width: 100%;
   max-width: calc(6em + 20px);
   color: var(--text-primary);
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 14px;
 }
 
 .card-pronunciation-pair {
@@ -234,9 +220,9 @@
   grid-template-rows: auto auto;
   justify-self: center;
   width: max-content;
-  max-width: 150px;
+  max-width: 120px;
   min-width: 0;
-  gap: 4px;
+  gap: 3px;
 }
 
 .card-pronunciation-pair > span {
@@ -250,6 +236,7 @@
 }
 
 .card-note {
+  position: relative;
   display: inline-flex;
   align-items: center;
   grid-column: 3;
@@ -259,6 +246,13 @@
   min-width: 0;
   max-width: 100%;
   gap: 2px;
+}
+
+// 折叠态：整条注释作为箭头的点击热区；展开后取消，避免挡住文字选中
+.vocabulary-entry-card:not(.is-note-expanded) .card-note.has-toggle .card-note-toggle::after {
+  content: '';
+  position: absolute;
+  inset: 0;
 }
 
 .card-note-text {
@@ -294,14 +288,28 @@
   flex: 0 0 auto;
   padding: 0;
   color: var(--color-primary);
-  background: transparent;
+  background: rgba(var(--color-primary-rgb), 0.08);
   border: none;
+  border-radius: var(--radius-sm, 4px);
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    background-color 0.18s ease;
+
+  &:hover,
+  &:focus-visible {
+    background: rgba(var(--color-primary-rgb), 0.18);
+  }
 
   &.is-expanded {
     transform: rotate(90deg);
   }
+}
+
+.card-note-toggle-icon {
+  display: block;
+  width: 14px;
+  height: 14px;
 }
 
 .card-row {
@@ -347,7 +355,9 @@
 
 .word-text {
   color: var(--text-primary);
-  font-size: 20px;
+  font-size: 17px;
+  text-decoration: underline wavy 0.5px;
+  text-underline-offset: 3px;
 }
 
 .definition-text {
@@ -1282,7 +1292,7 @@
     padding-bottom: 12px;
   }
   .vocabulary-page {
-    padding: 9px;
+    padding: 7px;
   }
 
   // .vocabulary-view-page > .content-area {
@@ -1343,25 +1353,34 @@
   }
 
   .cards-grid {
-    grid-template-columns: 1fr;
+    // grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 12px;
   }
 
-  .card {
+  .card-pronunciation-pair {
+    max-width: 90px;
+  }
+
+  .vocabulary-entry-card {
     gap: 12px;
-    padding: 14px 16px;
+    padding: 8px 6px;
   }
 
   .row-1 {
     font-size: 11px;
   }
 
+  .card-definition {
+    font-size: 13px;
+  }
+
   .word-text {
-    font-size: 16px;
+    font-size: 13px;
   }
 
   .pronunciation-text {
-    font-size: 13px;
+    font-size: 11.5px;
   }
 
   .map-canvas-shell {
