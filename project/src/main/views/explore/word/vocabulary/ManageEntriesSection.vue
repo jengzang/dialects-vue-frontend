@@ -1,19 +1,39 @@
 <template>
-    <UniversalTable
-      db-key="vocabulary"
-      table-name="vocabulary_entries"
-      :columns="tableColumns"
-      primary-key="id"
-      api-adapter="vocabulary"
-      :can-edit="hasVocabularyPermission"
-      :default-filter="defaultFilter"
+  <div
+    v-if="shouldScopeToOwnLocations && userLocationNames.length > 1"
+    class="vocabulary-entry-create-location"
+  >
+    <label
+      class="field-label"
+      for="vocabulary-entry-create-location"
+    >
+      {{ t('words.wordList.columns.location') }}
+    </label>
+    <SimpleSelectDropdown
+      v-model="selectedCreateLocationName"
+      style="margin-left: 10px;"
+      :options="userLocationOptions"
+
+      match-trigger-width
     />
+  </div>
+  <UniversalTable
+    v-if="canRenderEntriesTable"
+    db-key="vocabulary"
+    table-name="vocabulary_entries"
+    :columns="tableColumns"
+    primary-key="id"
+    api-adapter="vocabulary"
+    :can-edit="hasVocabularyPermission"
+    :default-filter="defaultFilter"
+  />
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onActivated, onDeactivated, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getVocabularyLocations } from '@/api'
+import { getVocabularyLocations, setVocabularyEntryCreateLocationName } from '@/api'
+import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 
 const { t } = useI18n()
@@ -26,20 +46,85 @@ const props = defineProps({
 })
 
 const userLocationNames = ref([])
+const selectedCreateLocationName = ref('')
+const hasLoadedUserLocations = ref(false)
+const emptyLocationFilterValue = '__vocabulary_no_edit_locations__'
 
-onMounted(async () => {
-  try {
-    const response = await getVocabularyLocations({ page_size: 200 })
-    const locations = Array.isArray(response.locations) ? response.locations : []
-    userLocationNames.value = locations.map((l) => l.location_name).filter(Boolean)
-  } catch {
-    // no-op
+const shouldScopeToOwnLocations = computed(() => props.managePermissionLevel !== 'manage')
+const canRenderEntriesTable = computed(() => (
+  !shouldScopeToOwnLocations.value || hasLoadedUserLocations.value
+))
+const userLocationOptions = computed(() => (
+  userLocationNames.value.map((name) => ({ label: name, value: name }))
+))
+
+async function loadUserLocations() {
+  userLocationNames.value = []
+  selectedCreateLocationName.value = ''
+
+  if (!shouldScopeToOwnLocations.value) {
+    hasLoadedUserLocations.value = true
+    return
   }
+
+  hasLoadedUserLocations.value = false
+
+  if (!props.manageUserId) {
+    hasLoadedUserLocations.value = true
+    return
+  }
+
+  try {
+    const response = await getVocabularyLocations({
+      user_id: props.manageUserId,
+      page_size: 200,
+    })
+    const locations = Array.isArray(response.locations) ? response.locations : []
+    userLocationNames.value = Array.from(new Set(locations.map((l) => l.location_name).filter(Boolean)))
+    if (!userLocationNames.value.includes(selectedCreateLocationName.value)) {
+      selectedCreateLocationName.value = userLocationNames.value[0] || ''
+    }
+  } catch {
+    userLocationNames.value = []
+    selectedCreateLocationName.value = ''
+  } finally {
+    hasLoadedUserLocations.value = true
+  }
+}
+
+watch(() => [props.managePermissionLevel, props.manageUserId], () => {
+  loadUserLocations()
+}, { immediate: true })
+
+const scopedLocationNames = computed(() => {
+  if (!shouldScopeToOwnLocations.value) return []
+  if (selectedCreateLocationName.value) return [selectedCreateLocationName.value]
+  return [emptyLocationFilterValue]
 })
 
 const defaultFilter = computed(() => {
-  if (!userLocationNames.value.length) return null
-  return { location_name: [...userLocationNames.value] }
+  if (!shouldScopeToOwnLocations.value) return null
+  return { location_name: scopedLocationNames.value }
+})
+
+watch(selectedCreateLocationName, (locationName) => {
+  if (shouldScopeToOwnLocations.value) {
+    setVocabularyEntryCreateLocationName(locationName)
+  }
+})
+
+onActivated(() => {
+  if (shouldScopeToOwnLocations.value) {
+    setVocabularyEntryCreateLocationName(selectedCreateLocationName.value)
+  }
+})
+
+onDeactivated(() => {
+  setVocabularyEntryCreateLocationName('')
+})
+
+onUnmounted(() => {
+  setVocabularyEntryCreateLocationName('')
 })
 
 const tableColumns = computed(() => {

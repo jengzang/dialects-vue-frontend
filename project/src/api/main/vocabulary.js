@@ -14,6 +14,7 @@ const VOCABULARY_ME_ENDPOINT = '/api/vocabulary/me'
 const VOCABULARY_ADMIN_PERMISSIONS_ENDPOINT = '/api/vocabulary/admin/permissions'
 const VOCABULARY_SQL_ENDPOINT = '/api/vocabulary/sql'
 const VOCABULARY_ENTRIES_TABLE = 'vocabulary_entries'
+let vocabularyEntryCreateLocationName = ''
 
 function stripVocabularyDbKey(params = {}) {
   const rest = { ...params }
@@ -67,6 +68,30 @@ function stripVocabularyBatchReplaceParams(params = {}) {
   const rest = stripAndValidateVocabularySqlParams(params)
   delete rest.pk_column
   return rest
+}
+
+export function setVocabularyEntryCreateLocationName(locationName = '') {
+  vocabularyEntryCreateLocationName = String(locationName || '').trim()
+}
+
+function withVocabularyEntryCreateLocation(params = {}) {
+  const body = stripAndValidateVocabularySqlParams(params)
+  if (
+    body.table_name !== VOCABULARY_ENTRIES_TABLE
+    || body.action !== 'create'
+    || !vocabularyEntryCreateLocationName
+    || body.data?.location_name
+  ) {
+    return body
+  }
+
+  return {
+    ...body,
+    data: {
+      ...(body.data || {}),
+      location_name: vocabularyEntryCreateLocationName,
+    },
+  }
 }
 
 /**
@@ -627,7 +652,7 @@ export const vocabularySqlApi = {
   async mutateSingle(params) {
     return api(`${VOCABULARY_SQL_ENDPOINT}/mutate`, {
       method: 'POST',
-      body: stripAndValidateVocabularySqlParams(params),
+      body: withVocabularyEntryCreateLocation(params),
     })
   },
 

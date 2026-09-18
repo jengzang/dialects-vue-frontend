@@ -33,6 +33,7 @@ const {
   getVocabularyLogs,
   updateVocabularyLocation,
   setVocabularyPermission,
+  setVocabularyEntryCreateLocationName,
   vocabularySqlApi,
   previewVocabularyImport,
   uploadVocabulary,
@@ -48,6 +49,7 @@ function readSource(path) {
 
 beforeEach(() => {
   apiMock.mockClear()
+  setVocabularyEntryCreateLocationName('')
 })
 
 describe('vocabulary items API', () => {
@@ -270,6 +272,52 @@ describe('vocabulary table API adapter', () => {
         data: { ipa: 'new' },
       },
     })
+  })
+
+  it('adds the selected manage-page location only when creating vocabulary entries', async () => {
+    setVocabularyEntryCreateLocationName('甲地')
+
+    apiMock.mockResolvedValueOnce({ status: 'success' })
+    await vocabularySqlApi.mutateSingle({
+      db_key: 'vocabulary',
+      table_name: 'vocabulary_entries',
+      action: 'create',
+      data: { standard_word: '太阳' },
+    })
+
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/sql/mutate', {
+      method: 'POST',
+      body: {
+        table_name: 'vocabulary_entries',
+        action: 'create',
+        data: {
+          standard_word: '太阳',
+          location_name: '甲地',
+        },
+      },
+    })
+
+    apiMock.mockResolvedValueOnce({ status: 'success' })
+    await vocabularySqlApi.mutateSingle({
+      table_name: 'vocabulary_entries',
+      action: 'update',
+      pk_column: 'id',
+      pk_value: 1,
+      data: { standard_word: '月亮' },
+    })
+
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/sql/mutate', {
+      method: 'POST',
+      body: {
+        table_name: 'vocabulary_entries',
+        action: 'update',
+        pk_column: 'id',
+        pk_value: 1,
+        data: { standard_word: '月亮' },
+      },
+    })
+
+    setVocabularyEntryCreateLocationName('')
   })
 
   it('loads vocabulary location options from the public lightweight endpoint', async () => {

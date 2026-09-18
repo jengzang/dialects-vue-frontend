@@ -1173,7 +1173,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 /* 内容区 */
 .content-area {
   min-height: 300px;
-  max-height: 69dvh;
+  // max-height: 69dvh;
   padding: 25px;
   overflow: auto;
   // background: var(--glass-60);

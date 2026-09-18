@@ -1359,12 +1359,13 @@
   }
 
   .card-pronunciation-pair {
-    max-width: 90px;
+    max-width: 85px;
   }
 
   .vocabulary-entry-card {
-    gap: 12px;
+    gap: 6px;
     padding: 8px 6px;
+    overflow-x:auto;
   }
 
   .row-1 {
@@ -1372,7 +1373,8 @@
   }
 
   .card-definition {
-    font-size: 13px;
+    font-size: 12px;
+    max-width: calc(4em + 10px);
   }
 
   .word-text {
@@ -1380,7 +1382,7 @@
   }
 
   .pronunciation-text {
-    font-size: 11.5px;
+    font-size: 11px;
   }
 
   .map-canvas-shell {

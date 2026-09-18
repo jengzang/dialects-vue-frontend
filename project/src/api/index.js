@@ -84,6 +84,7 @@ export {
   deleteVocabularyLocation,
   exportVocabularyLocation,
   setVocabularyPermission,
+  setVocabularyEntryCreateLocationName,
   previewVocabularyImport,
   uploadVocabulary,
   vocabularySqlApi,
