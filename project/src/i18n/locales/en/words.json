@@ -36,9 +36,9 @@
       "loginManageTitle": "Sign in to manage vocabulary",
       "loginManageDesc": "Vocabulary management, location metadata, and operation logs require signing in.",
       "noUploadPermissionTitle": "No vocabulary upload access",
-      "noUploadPermissionDesc": "This account does not have vocabulary edit or manage access. Please contact an administrator.",
+      "noUploadPermissionDesc": "This account does not have vocabulary access. Please contact an administrator.",
       "noManagePermissionTitle": "No vocabulary management access",
-      "noManagePermissionDesc": "This account does not have vocabulary edit or manage access. Please contact an administrator.",
+      "noManagePermissionDesc": "This account does not have vocabulary manage access. Please contact an administrator.",
       "permissionLoadFailedTitle": "Failed to load vocabulary access",
       "loginAction": "Sign in",
       "backToList": "Back to vocabulary"

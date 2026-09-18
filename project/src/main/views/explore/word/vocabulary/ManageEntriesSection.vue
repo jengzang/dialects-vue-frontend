@@ -11,7 +11,6 @@
     </label>
     <SimpleSelectDropdown
       v-model="selectedCreateLocationName"
-      style="margin-left: 10px;"
       :options="userLocationOptions"
 
       match-trigger-width

@@ -36,9 +36,9 @@
       "loginManageTitle": "登入後管理詞表",
       "loginManageDesc": "詞表管理、地點元數據和操作日誌需要登入後查看。",
       "noUploadPermissionTitle": "暫無詞表上傳權限",
-      "noUploadPermissionDesc": "當前賬號尚未開通詞表 edit 或 manage 權限，請聯繫管理員。",
+      "noUploadPermissionDesc": "當前賬號尚未開通詞表",
       "noManagePermissionTitle": "暫無詞表管理權限",
-      "noManagePermissionDesc": "當前賬號尚未開通詞表 edit 或 manage 權限，請聯繫管理員。",
+      "noManagePermissionDesc": "當前賬號尚未開通詞表管理權限，請聯繫管理員。",
       "permissionLoadFailedTitle": "詞表權限狀態加載失敗",
       "loginAction": "去登入",
       "backToList": "返回詞表"

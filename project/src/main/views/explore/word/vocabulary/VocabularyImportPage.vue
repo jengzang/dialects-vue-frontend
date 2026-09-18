@@ -9,55 +9,43 @@
             <span class="count-sep">·</span>
             <span>{{ t('words.wordList.upload.totalLocations', { count: vocabLocationCount ?? '…' }) }}</span>
           </div>
-          <button
-            v-if="canShowRefreshVocabularyPermission"
-            class="action-btn action-btn--sm"
-            type="button"
-            :disabled="isLoadingVocabularyMe"
-            @click="refreshVocabularyMe"
-          >
-            <PhArrowsClockwise
-              :size="16"
-              aria-hidden="true"
-            />
-            {{ t('words.wordList.access.refreshPermission') }}
-          </button>
-          <!-- <p>{{ t('words.wordList.upload.desc') }}</p> -->
-          <div
-            v-if="shouldShowPermissionRequest"
-            class="upload-access-notice"
-          >
-            <p>{{ uploadAccessNotice }}</p>
+
+          <div class="upload-head-actions">
+            <div
+              v-if="shouldShowPermissionRequest"
+              class="upload-access-notice"
+            >
+              <p>{{ uploadAccessNotice }}</p>
+              <button
+                class="action-btn action-btn--sm"
+                type="button"
+                @click="navigateToSuggestion"
+              >
+                {{ t('words.wordList.access.requestEditPermission') }}
+              </button>
+            </div>
+
+            <p
+              v-else-if="uploadAccessNotice"
+              class="upload-status"
+            >
+              {{ uploadAccessNotice }}
+            </p>
+
             <button
+              v-if="canShowRefreshVocabularyPermission"
               class="action-btn action-btn--sm"
               type="button"
-              @click="navigateToSuggestion"
+              :disabled="isLoadingVocabularyMe"
+              @click="refreshVocabularyMe"
             >
-              {{ t('words.wordList.access.requestEditPermission') }}
+              <PhArrowsClockwise
+                :size="16"
+                aria-hidden="true"
+              />
+              {{ t('words.wordList.access.refreshPermission') }}
             </button>
           </div>
-          <p
-            v-else-if="uploadAccessNotice"
-            class="upload-status"
-          >
-            {{ uploadAccessNotice }}
-          </p>
-        </div>
-
-        <div class="upload-location-summary">
-          <div>
-            <strong>{{ uploadLocation.location_name || t('words.wordList.upload.locationName') }}</strong>
-            <p>{{ uploadLocationSummaryText }}</p>
-          </div>
-          <button class="glass-button" data-variant="primary" type="button" @click="openUploadLocationEditor">
-            {{ uploadLocation.location_name ? t('common.button.edit') : t('words.wordList.upload.enterLocationInfo') }}
-          </button>
-        </div>
-
-        <div class="upload-location-summary-grid">
-          <span v-for="item in uploadLocationSummaryItems" :key="item.key">
-            {{ item.label }}：{{ item.value }}
-          </span>
         </div>
 
         <div class="upload-example">
@@ -74,6 +62,22 @@
             <span class="upload-example__item"><b class="upload-example__label upload-example__label--ipa">{{ t('words.wordList.columns.pronunciation') }}</b>kʰuəŋ34kɔ34</span>
             <span class="upload-example__item"><b class="upload-example__label upload-example__label--note">{{ t('words.wordList.columns.detail') }}</b>多见于吴语淮官等</span>
           </div>
+        </div>
+
+        <div class="upload-location-summary">
+          <div>
+            <strong>{{ uploadLocation.location_name || t('words.wordList.upload.locationName') }}</strong>
+            <p>{{ uploadLocationSummaryText }}</p>
+          </div>
+          <button class="glass-button" data-variant="primary" type="button" @click="openUploadLocationEditor">
+            {{ uploadLocation.location_name ? t('common.button.edit') : t('words.wordList.upload.enterLocationInfo') }}
+          </button>
+        </div>
+
+        <div class="upload-location-summary-grid">
+          <span v-for="item in uploadLocationSummaryItems" :key="item.key">
+            {{ item.label }}：{{ item.value }}
+          </span>
         </div>
 
         <div class="upload-parser-row">

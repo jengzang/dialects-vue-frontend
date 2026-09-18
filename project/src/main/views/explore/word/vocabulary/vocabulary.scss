@@ -682,7 +682,15 @@
 
 .vocabulary-manage-page {
   display: grid;
-  gap: 16px;
+  gap: 12px;
+}
+
+.vocabulary-entry-create-location {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
 }
 
 .upload-location-grid {
@@ -827,6 +835,7 @@
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
+  justify-content: center;
   padding: 12px 14px;
   margin-bottom: 14px;
   background: rgba(var(--color-error-light-rgb), 0.12);
@@ -999,6 +1008,7 @@
 
   p {
     margin: 6px 0 0;
+    font-size: 14px;
     color: var(--text-secondary);
   }
 }
@@ -1014,6 +1024,25 @@
 
   .count-sep {
     color: var(--text-muted, var(--text-secondary));
+  }
+}
+
+.upload-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-head {
+  gap: 30px;
+}
+
+@media (min-aspect-ratio: 1 / 1) {
+  .upload-head {
+    flex-wrap: nowrap;
+    gap: 12px;
   }
 }
 
@@ -1328,6 +1357,10 @@
 
   .upload-head {
     align-items: center;
+  }
+
+  .upload-head-actions {
+    flex: 1 0 100%;
   }
 
   .upload-location-summary,
