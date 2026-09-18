@@ -32,6 +32,7 @@
       "loginUploadTitle": "登入後上傳詞表",
       "loginUploadDesc": "上傳詞表需要登入，並向管理員申請編輯權限。",
       "requestEditPermission": "申請編輯權限",
+      "refreshPermission": "權限",
       "loginManageTitle": "登入後管理詞表",
       "loginManageDesc": "詞表管理、地點元數據和操作日誌需要登入後查看。",
       "noUploadPermissionTitle": "暫無詞表上傳權限",

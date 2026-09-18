@@ -746,7 +746,7 @@
 
 .manage-filter-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
   gap: 12px;
   align-items: end;
   padding: 12px;
@@ -771,6 +771,13 @@
 
 .filter-actions {
   justify-content: flex-end;
+  @media (max-aspect-ratio: 1/1) {
+    justify-content: center;
+    flex-wrap: nowrap;
+    * {
+      white-space: nowrap;
+    }
+  }
 }
 
 .pagination-row {
@@ -1569,12 +1576,12 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 1rem;
+  gap: 4px 10px;
 
   & + & {
-    margin-top: 0.4rem;
-    padding-top: 0.4rem;
-    border-top: 1px dashed var(--border-light);
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border-medium);
   }
 }
 

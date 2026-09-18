@@ -6,7 +6,11 @@
     </h1>
 
     <div class="page-tab-navigation">
-      <div class="page-tab-container" role="tablist" :aria-label="t('words.wordList.tabs.label')">
+      <div
+        class="page-tab-container"
+        role="tablist"
+        :aria-label="t('words.wordList.tabs.label')"
+      >
         <button
           class="page-tab-btn"
           :class="{ active: isActivePage(pageTabs[0].path) }"
@@ -58,7 +62,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, provide, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { getVocabularyMe } from '@/api'
@@ -78,9 +82,10 @@ const vocabularyMeError = ref('')
 const isAuthReady = computed(() => userStore.authReady)
 const isAuthenticated = computed(() => userStore.isAuthenticated)
 const contributeTabPaths = ['/menu/vocabulary/import', '/menu/vocabulary/manage']
+const VOCABULARY_ME_CACHE_KEY = 'vocabulary_me'
 
 function isContributePath(path) {
-  return path === '/menu/vocabulary/import' || path.startsWith('/menu/vocabulary/manage')
+  return path === contributeTabPaths[0] || path.startsWith(contributeTabPaths[1])
 }
 
 const pageTabs = computed(() => {
@@ -122,32 +127,101 @@ function createEmptyVocabularyMe() {
   }
 }
 
-async function loadVocabularyMe() {
+function getVocabularyMeCacheOwnerKey() {
+  if (userStore.id !== null && userStore.id !== undefined) {
+    return `id:${userStore.id}`
+  }
+  if (userStore.username) {
+    return `username:${userStore.username}`
+  }
+  return ''
+}
+
+function readCachedVocabularyMe() {
+  const ownerKey = getVocabularyMeCacheOwnerKey()
+  if (!ownerKey) return null
+
+  try {
+    const cached = JSON.parse(localStorage.getItem(VOCABULARY_ME_CACHE_KEY) || 'null')
+    if (cached?.owner_key === ownerKey && cached?.data && typeof cached.data === 'object') {
+      return cached.data
+    }
+  } catch {
+    localStorage.removeItem(VOCABULARY_ME_CACHE_KEY)
+  }
+
+  return null
+}
+
+function writeCachedVocabularyMe(value) {
+  const ownerKey = getVocabularyMeCacheOwnerKey()
+  if (!ownerKey) return
+
+  try {
+    localStorage.setItem(VOCABULARY_ME_CACHE_KEY, JSON.stringify({
+      owner_key: ownerKey,
+      data: value,
+    }))
+  } catch {
+    // Permission data is still usable for the current render even if persistence fails.
+  }
+}
+
+function clearCachedVocabularyMe() {
+  try {
+    localStorage.removeItem(VOCABULARY_ME_CACHE_KEY)
+  } catch {
+    // Ignore storage cleanup failures; auth state below remains authoritative.
+  }
+}
+
+async function loadVocabularyMe({ force = false } = {}) {
   if (!userStore.authReady) {
     isLoadingVocabularyMe.value = true
     return
   }
 
   if (!userStore.isAuthenticated) {
+    clearCachedVocabularyMe()
     vocabularyMe.value = createEmptyVocabularyMe()
     vocabularyMeError.value = ''
     isLoadingVocabularyMe.value = false
     return
   }
 
+  if (!force) {
+    const cachedVocabularyMe = readCachedVocabularyMe()
+    if (cachedVocabularyMe) {
+      vocabularyMe.value = cachedVocabularyMe
+      vocabularyMeError.value = ''
+      isLoadingVocabularyMe.value = false
+      return
+    }
+  }
+
   isLoadingVocabularyMe.value = true
   vocabularyMeError.value = ''
 
   try {
-    vocabularyMe.value = await getVocabularyMe()
+    const loadedVocabularyMe = await getVocabularyMe()
+    vocabularyMe.value = loadedVocabularyMe
+    writeCachedVocabularyMe(loadedVocabularyMe)
   } catch (error) {
-    vocabularyMe.value = createEmptyVocabularyMe()
+    if (!vocabularyMe.value) {
+      vocabularyMe.value = createEmptyVocabularyMe()
+    }
     vocabularyMeError.value = error.message || ''
     showError(vocabularyMeError.value)
   } finally {
     isLoadingVocabularyMe.value = false
   }
 }
+
+function refreshVocabularyMe() {
+  return loadVocabularyMe({ force: true })
+}
+
+provide('refreshVocabularyMe', refreshVocabularyMe)
 
 function isActivePage(tabPath) {
   const currentPath = stripLocaleFromPath(route.path)

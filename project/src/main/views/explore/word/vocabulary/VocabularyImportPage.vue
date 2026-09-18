@@ -3,25 +3,45 @@
     <section class="content-area">
       <div class="upload-mode glass-panel">
         <div class="upload-head">
-            <h3>{{ t('words.wordList.upload.title') }}</h3>
-            <div class="upload-head-counts">
-              <span>{{ t('words.wordList.upload.totalEntries', { count: vocabTotalCount ?? '…' }) }}</span>
-              <span class="count-sep">·</span>
-              <span>{{ t('words.wordList.upload.totalLocations', { count: vocabLocationCount ?? '…' }) }}</span>
-            </div>
-            <!-- <p>{{ t('words.wordList.upload.desc') }}</p> -->
-            <div v-if="shouldShowPermissionRequest" class="upload-access-notice">
-              <p>{{ uploadAccessNotice }}</p>
-              <button
-                class="glass-button"
-                data-variant="primary"
-                type="button"
-                @click="navigateToSuggestion"
-              >
-                {{ t('words.wordList.access.requestEditPermission') }}
-              </button>
-            </div>
-            <p v-else-if="uploadAccessNotice" class="upload-status">{{ uploadAccessNotice }}</p>
+          <h3>{{ t('words.wordList.upload.title') }}</h3>
+          <div class="upload-head-counts">
+            <span>{{ t('words.wordList.upload.totalEntries', { count: vocabTotalCount ?? '…' }) }}</span>
+            <span class="count-sep">·</span>
+            <span>{{ t('words.wordList.upload.totalLocations', { count: vocabLocationCount ?? '…' }) }}</span>
+          </div>
+          <button
+            v-if="canShowRefreshVocabularyPermission"
+            class="action-btn action-btn--sm"
+            type="button"
+            :disabled="isLoadingVocabularyMe"
+            @click="refreshVocabularyMe"
+          >
+            <PhArrowsClockwise
+              :size="16"
+              aria-hidden="true"
+            />
+            {{ t('words.wordList.access.refreshPermission') }}
+          </button>
+          <!-- <p>{{ t('words.wordList.upload.desc') }}</p> -->
+          <div
+            v-if="shouldShowPermissionRequest"
+            class="upload-access-notice"
+          >
+            <p>{{ uploadAccessNotice }}</p>
+            <button
+              class="action-btn action-btn--sm"
+              type="button"
+              @click="navigateToSuggestion"
+            >
+              {{ t('words.wordList.access.requestEditPermission') }}
+            </button>
+          </div>
+          <p
+            v-else-if="uploadAccessNotice"
+            class="upload-status"
+          >
+            {{ uploadAccessNotice }}
+          </p>
         </div>
 
         <div class="upload-location-summary">
@@ -398,7 +418,8 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, inject, onMounted, ref, watch } from 'vue'
+import { PhArrowsClockwise } from '@phosphor-icons/vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { batchMatch, getLocationDetail, getVocabularyCounts, previewVocabularyImport, uploadVocabulary } from '@/api'
@@ -426,6 +447,7 @@ const props = defineProps({
   isAuthReady: { type: Boolean, default: false },
 })
 
+const refreshVocabularyMe = inject('refreshVocabularyMe', null)
 const canUploadVocabulary = computed(() => props.vocabularyMe?.can_upload === true)
 const isWaitingForAuth = computed(() => !props.isAuthReady || props.isLoadingVocabularyMe)
 const requiresLogin = computed(() => props.isAuthReady && !props.isAuthenticated)
@@ -438,6 +460,9 @@ const requiresVocabularyPermission = computed(() => (
 ))
 const shouldShowPermissionRequest = computed(() => (
   requiresLogin.value || requiresVocabularyPermission.value
+))
+const canShowRefreshVocabularyPermission = computed(() => (
+  props.isAuthReady && props.isAuthenticated && Boolean(refreshVocabularyMe)
 ))
 const uploadAccessNotice = computed(() => {
   if (isWaitingForAuth.value) return t('words.wordList.access.loadingDesc')

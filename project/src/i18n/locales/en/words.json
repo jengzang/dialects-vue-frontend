@@ -32,6 +32,7 @@
       "loginUploadTitle": "Sign in to upload vocabulary",
       "loginUploadDesc": "Please log in to upload vocabulary and request edit permission from an administrator.",
       "requestEditPermission": "Request Edit Permission",
+      "refreshPermission": "Permission",
       "loginManageTitle": "Sign in to manage vocabulary",
       "loginManageDesc": "Vocabulary management, location metadata, and operation logs require signing in.",
       "noUploadPermissionTitle": "No vocabulary upload access",
