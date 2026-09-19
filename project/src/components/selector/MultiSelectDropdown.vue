@@ -123,6 +123,10 @@ const props = defineProps({
     type: String,
     default: 'down',
     validator: (value) => ['up', 'down'].includes(value)
+  },
+  searchNormalizer: {
+    type: Function,
+    default: (value) => String(value || '').toLowerCase()
   }
 })
 
@@ -164,13 +168,19 @@ const containerStyle = computed(() => {
   return {}
 })
 
+// 选项可附带 searchText，用于展示文案之外的额外匹配文本
+function buildOptionSearchText(option) {
+  return [option?.label, option?.searchText].filter(Boolean).join(' ')
+}
+
 // Filtered options based on search
 const filteredOptions = computed(() => {
-  if (!searchQuery.value.trim()) return props.options
+  const rawQuery = searchQuery.value.trim()
+  if (!rawQuery) return props.options
 
-  const query = searchQuery.value.toLowerCase()
-  return props.options.filter(opt =>
-    opt.label.toLowerCase().includes(query)
+  const query = props.searchNormalizer(rawQuery)
+  return props.options.filter((opt) =>
+    props.searchNormalizer(buildOptionSearchText(opt)).includes(query)
   )
 })
 

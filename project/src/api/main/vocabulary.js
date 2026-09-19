@@ -367,7 +367,9 @@ export async function setVocabularyPermission(userId, permissionLevel) {
 /**
  * 获取词表地点筛选候选值，供卡片/地图模式的地点多选筛选使用。
  *
- * @returns {Promise<Array<{value: string, label: string, province: string, city: string}>>}
+ * label 用于展示（地点简称 location_name），locationLabel 保留完整地点链用于搜索匹配。
+ *
+ * @returns {Promise<Array<{value: string, label: string, locationLabel: string, province: string, city: string}>>}
  */
 export async function getVocabularyLocationOptions() {
   try {
@@ -384,7 +386,8 @@ export async function getVocabularyLocationOptions() {
       seenLocationNames.add(locationName)
       options.push({
         value: locationName,
-        label: location.location_label || locationName,
+        label: locationName,
+        locationLabel: location.location_label || locationName,
         province: location.province || '',
         city: location.city || '',
       })

@@ -553,7 +553,12 @@ const searchFieldOptions = computed(() => [
 ])
 
 const locationOptions = computed(() => {
-  return vocabularyLocationOptions.value
+  return [...vocabularyLocationOptions.value]
+    .sort((a, b) => String(a.label || '').localeCompare(String(b.label || ''), 'zh-Hans-CN'))
+    .map((opt) => ({
+      ...opt,
+      searchText: opt.locationLabel || '',
+    }))
 })
 
 const provinceOptions = computed(() => {
@@ -565,6 +570,7 @@ const provinceOptions = computed(() => {
       return true
     })
     .map((opt) => ({ value: opt.province, label: opt.province }))
+    .sort((a, b) => a.label.localeCompare(b.label, 'zh-Hans-CN'))
   return [
     { value: '', label: t('words.wordList.search.allProvinces') },
     ...provinces,
@@ -576,6 +582,7 @@ const cityOptions = computed(() => {
   const cities = vocabularyLocationOptions.value
     .filter((opt) => opt.province === selectedProvince.value && opt.city && !seen.has(opt.city) && seen.add(opt.city))
     .map((opt) => ({ value: opt.city, label: opt.city }))
+    .sort((a, b) => a.label.localeCompare(b.label, 'zh-Hans-CN'))
   return [
     { value: '', label: t('words.wordList.search.allCities') },
     ...cities,

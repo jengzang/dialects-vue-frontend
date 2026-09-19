@@ -151,6 +151,7 @@
           :model-value="selectedLocations"
           :options="locationOptions"
           :trigger-el="locationTriggerEl"
+          :search-normalizer="normalizeLocationSearchText"
           align="left"
           direction="down"
           @update:model-value="emit('update:selectedLocations', $event)"
@@ -166,7 +167,6 @@
           :model-value="selectedProvince"
           :options="provinceOptions"
           :placeholder="t('words.wordList.search.provincePlaceholder')"
-          searchable
           match-trigger-width
           width="100%"
           @update:model-value="emit('update:selectedProvince', $event)"
@@ -176,7 +176,6 @@
           :options="cityOptions"
           :placeholder="t('words.wordList.search.cityPlaceholder')"
           :disabled="!selectedProvince"
-          searchable
           match-trigger-width
           width="100%"
           @update:model-value="emit('update:selectedCity', $event)"
@@ -190,6 +189,7 @@
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import * as OpenCCT2CN from 'opencc-js/t2cn'
 import AppModal from '@/components/common/AppModal.vue'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
@@ -197,6 +197,13 @@ import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 
 const { t } = useI18n()
+
+const locationSearchT2S = OpenCCT2CN.Converter({ from: 'tw', to: 'cn' })
+
+// 地点候选可能混用繁简，统一转简体后匹配，避免输入简体搜不到繁体地点。
+function normalizeLocationSearchText(value) {
+  return locationSearchT2S(String(value || '')).toLowerCase()
+}
 
 const props = defineProps({
   query: { type: String, default: '' },

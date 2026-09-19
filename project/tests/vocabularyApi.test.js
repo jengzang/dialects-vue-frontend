@@ -332,8 +332,8 @@ describe('vocabulary table API adapter', () => {
     const values = await getVocabularyLocationOptions()
 
     expect(values).toEqual([
-      { value: '息烽', label: '贵州 / 贵阳 / 息烽' },
-      { value: '天柱', label: '贵州 / 黔东南 / 天柱' },
+      { value: '息烽', label: '息烽', locationLabel: '贵州 / 贵阳 / 息烽', province: '', city: '' },
+      { value: '天柱', label: '天柱', locationLabel: '贵州 / 黔东南 / 天柱', province: '', city: '' },
     ])
     expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/search/location-options')
   })
