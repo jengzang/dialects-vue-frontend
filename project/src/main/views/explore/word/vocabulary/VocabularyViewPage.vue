@@ -346,8 +346,8 @@ const MAP_POINT_META_GROUPS = [
   { keys: ['atlasRegion'], labelKeys: ['words.wordList.upload.atlasRegion'] },
   { keys: ['vocabularySource'], labelKeys: ['words.wordList.upload.vocabularySource'] },
   { keys: ['description'], labelKeys: ['words.wordList.upload.description'] },
-  { keys: ['other'], labelKeys: ['words.wordList.upload.other'] },
 ]
+const TRAILING_MAP_POINT_META_GROUP = { keys: ['other'], labelKey: 'words.wordList.upload.other' }
 
 function buildToneMetaRow(source) {
   if (!source) {
@@ -364,6 +364,24 @@ function buildToneMetaRow(source) {
     .filter(Boolean)
 
   return tones.length ? { key: 'tones', label: t('words.wordList.upload.toneValues'), tones } : null
+}
+
+function appendTrailingMapPointMetaRow(rows, source) {
+  const value = TRAILING_MAP_POINT_META_GROUP.keys
+    .map((key) => String(source?.[key] || '').trim())
+    .filter((item) => item && item !== '-')
+    .join(' · ')
+
+  if (!value) {
+    return rows
+  }
+
+  rows.push({
+    key: TRAILING_MAP_POINT_META_GROUP.keys.join('-'),
+    label: t('words.wordList.upload.other'),
+    value,
+  })
+  return rows
 }
 
 const props = defineProps({
@@ -470,6 +488,8 @@ const mapDetailMetaRows = computed(() => {
     value: t('words.wordList.map.pointCount', { count: mapDetailEntries.value.length }),
   })
 
+  appendTrailingMapPointMetaRow(rows, meta)
+
   return rows
 })
 
@@ -494,6 +514,8 @@ function pointMetaRows(point) {
   if (toneRow) {
     rows.push(toneRow)
   }
+
+  appendTrailingMapPointMetaRow(rows, point)
 
   return rows
 }
