@@ -20,7 +20,7 @@ describe('vocabulary import location modal', () => {
     expect(importPage).toContain('getLocationDetail')
     expect(importPage).toContain('openUploadLocationEditor')
     expect(importPage).toContain('confirmUploadLocationEditor')
-    expect(importPage).toContain('useYindianLocationData')
+    expect(importPage).toContain('useYindianData')
     expect(importPage).toContain('uploadLocationDraft')
     expect(importPage).toContain('uploadLocationCoord')
     expect(importPage).toContain('uploadLocationSummaryItems')
@@ -28,5 +28,22 @@ describe('vocabulary import location modal', () => {
     expect(vocabularyScss).toContain('.upload-location-summary')
     expect(vocabularyScss).toContain('.upload-location-modal-layout')
     expect(vocabularyScss).toContain('.upload-location-map-panel')
+  })
+
+  it('keeps source, description, and other metadata in upload and location edit fields', () => {
+    const importPage = readSource('src/main/views/explore/word/vocabulary/VocabularyImportPage.vue')
+    const locationsSection = readSource('src/main/views/explore/word/vocabulary/ManageLocationsSection.vue')
+
+    for (const key of ['vocabulary_source', 'description', 'other']) {
+      expect(importPage).toContain(`${key}: ''`)
+      expect(importPage).toContain(`key: '${key}'`)
+      expect(locationsSection).toContain(`key: '${key}'`)
+    }
+
+    expect(importPage).toContain("t('words.wordList.upload.vocabularySource')")
+    expect(importPage).toContain("t('words.wordList.upload.description')")
+    expect(importPage).toContain("t('words.wordList.upload.other')")
+    expect(locationsSection).toContain('locationEditFields.value')
+    expect(locationsSection).toContain('updateVocabularyLocation(sourceName, payload, params)')
   })
 })

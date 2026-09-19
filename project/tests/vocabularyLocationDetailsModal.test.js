@@ -92,6 +92,24 @@ describe('vocabulary location details modal', () => {
     expect(source).not.toContain('const response = await getVocabularyMapPoints(buildVocabularyMapPointsParams())')
   })
 
+  it('keeps vocabulary source metadata from map-points while leaving lightweight option endpoints alone', () => {
+    const source = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
+    const apiSource = readSource('src/api/main/vocabulary.js')
+
+    expect(source).toContain("keys: ['vocabularySource']")
+    expect(source).toContain("labelKeys: ['words.wordList.upload.vocabularySource']")
+    expect(source).toContain("keys: ['description']")
+    expect(source).toContain("keys: ['other']")
+    expect(source).toContain('vocabularySource: point.vocabulary_source || \'\'')
+    expect(source).toContain('description: point.description || \'\'')
+    expect(source).toContain('other: point.other || \'\'')
+    expect(source).toContain('vocabularySource: point.vocabularySource')
+    expect(source).toContain('description: point.description')
+    expect(source).toContain('other: point.other')
+    expect(apiSource).toContain('/api/vocabulary/search/location-options')
+    expect(apiSource).toContain('/api/vocabulary/search/map-items')
+  })
+
   it('deduplicates vocabulary request lifecycles and ignores stale responses', () => {
     const source = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
 

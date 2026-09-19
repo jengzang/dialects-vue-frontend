@@ -166,6 +166,9 @@
       "naturalVillage": "自然村",
       "yindianRegion": "音典分区",
       "atlasRegion": "地图集分区",
+      "vocabularySource": "词表来源",
+      "description": "说明",
+      "other": "其他",
       "toneValues": "调值",
       "toneNames": {
         "t1": "阴平",

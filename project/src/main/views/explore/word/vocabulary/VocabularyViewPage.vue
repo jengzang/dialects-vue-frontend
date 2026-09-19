@@ -344,6 +344,9 @@ const MAP_POINT_META_GROUPS = [
   },
   { keys: ['yindianRegion'], labelKeys: ['words.wordList.upload.yindianRegion'] },
   { keys: ['atlasRegion'], labelKeys: ['words.wordList.upload.atlasRegion'] },
+  { keys: ['vocabularySource'], labelKeys: ['words.wordList.upload.vocabularySource'] },
+  { keys: ['description'], labelKeys: ['words.wordList.upload.description'] },
+  { keys: ['other'], labelKeys: ['words.wordList.upload.other'] },
 ]
 
 function buildToneMetaRow(source) {
@@ -651,6 +654,9 @@ const mapDataForVocabularyMap = computed(() => {
       naturalVillage: point.naturalVillage,
       yindianRegion: point.yindianRegion,
       atlasRegion: point.atlasRegion,
+      vocabularySource: point.vocabularySource,
+      description: point.description,
+      other: point.other,
       ...Object.fromEntries(TONE_FIELD_KEYS.map((key) => [key, point[key] || ''])),
 
       pronunciation: point.pronunciation || point.markerLabel,
@@ -921,6 +927,9 @@ function normalizeVocabularyMapPoint(point) {
     naturalVillage: point.natural_village || '',
     yindianRegion: point.yindian_region || '',
     atlasRegion: point.atlas_region || '',
+    vocabularySource: point.vocabulary_source || '',
+    description: point.description || '',
+    other: point.other || '',
     ...Object.fromEntries(TONE_FIELD_KEYS.map((key) => [key, point[key] || ''])),
     longitude: normalizeNumber(point.longitude),
     latitude: normalizeNumber(point.latitude),

@@ -166,6 +166,9 @@
       "naturalVillage": "Natural Village",
       "yindianRegion": "Yindian Region",
       "atlasRegion": "Atlas Region",
+      "vocabularySource": "Vocabulary Source",
+      "description": "Description",
+      "other": "Other",
       "toneValues": "Tones",
       "toneNames": {
         "t1": "Yin Ping",

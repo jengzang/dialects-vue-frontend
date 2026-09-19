@@ -319,6 +319,9 @@ const locationEditFields = computed(() => [
   { key: 'natural_village', label: t('words.wordList.upload.naturalVillage') },
   { key: 'yindian_region', label: t('words.wordList.upload.yindianRegion') },
   { key: 'atlas_region', label: t('words.wordList.upload.atlasRegion') },
+  { key: 'vocabulary_source', label: t('words.wordList.upload.vocabularySource') },
+  { key: 'description', label: t('words.wordList.upload.description') },
+  { key: 'other', label: t('words.wordList.upload.other') },
   ...TONE_FIELD_KEYS.map((key) => ({
     key,
     label: t(`words.wordList.upload.toneNames.${key}`),
