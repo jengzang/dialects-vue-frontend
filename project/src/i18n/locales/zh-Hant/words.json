@@ -33,6 +33,16 @@
       "loginUploadDesc": "上傳詞表需要登入，並向管理員申請編輯權限。",
       "requestEditPermission": "申請編輯權限",
       "refreshPermission": "權限",
+      "permissionRefreshed": "當前權限：{permission}",
+      "refreshCooldown": "請 {seconds} 秒之後再刷新",
+      "noPermission": "無權限",
+      "permissionLabels": {
+        "manage": "詞表管理員",
+        "edit": "詞表貢獻者(不限制數量）",
+        "one": "詞表貢獻者(1個)",
+        "two": "詞表貢獻者(2個)",
+        "three": "詞表貢獻者(3個)"
+      },
       "loginManageTitle": "登入後管理詞表",
       "loginManageDesc": "詞表管理、地點元數據和操作日誌需要登入後查看。",
       "noUploadPermissionTitle": "暫無詞表上傳權限",

@@ -33,6 +33,16 @@
       "loginUploadDesc": "上传词表需要登录，并向管理员申请编辑权限。",
       "requestEditPermission": "申请编辑权限",
       "refreshPermission": "权限",
+      "permissionRefreshed": "当前权限：{permission}",
+      "refreshCooldown": "请 {seconds} 秒之后再刷新",
+      "noPermission": "无权限",
+      "permissionLabels": {
+        "manage": "词表管理员",
+        "edit": "词表贡献者(不限制数量）",
+        "one": "词表贡献者(1个)",
+        "two": "词表贡献者(2个)",
+        "three": "词表贡献者(3个)"
+      },
       "loginManageTitle": "登录后管理词表",
       "loginManageDesc": "词表管理、地点元数据和操作日志需要登录后查看。",
       "noUploadPermissionTitle": "暂无词表上传权限",

@@ -16,6 +16,12 @@ const apiMocks = vi.hoisted(() => ({
   getVocabularyMe: vi.fn(),
 }))
 
+const messageMocks = vi.hoisted(() => ({
+  showError: vi.fn(),
+  showSuccess: vi.fn(),
+  showWarning: vi.fn(),
+}))
+
 const routerMocks = vi.hoisted(() => ({
   push: vi.fn(),
   replace: vi.fn(),
@@ -29,7 +35,19 @@ vi.mock('@/api', () => apiMocks)
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
-    t: (key) => key,
+    t: (key, params) => {
+      const permissionLabels = {
+        'words.wordList.access.permissionLabels.manage': '词表管理员',
+        'words.wordList.access.permissionLabels.edit': '词表贡献者(不限制数量）',
+        'words.wordList.access.permissionLabels.one': '词表贡献者(1个)',
+        'words.wordList.access.permissionLabels.two': '词表贡献者(2个)',
+        'words.wordList.access.permissionLabels.three': '词表贡献者(3个)',
+      }
+      if (permissionLabels[key]) return permissionLabels[key]
+      if (params?.permission) return `${key}:${params.permission}`
+      if (params?.seconds) return `${key}:${params.seconds}`
+      return key
+    },
   }),
 }))
 
@@ -57,9 +75,7 @@ vi.mock('@/components/selector/ChoiceSelector.vue', () => ({
   },
 }))
 
-vi.mock('@/utils/ui/message.js', () => ({
-  showError: vi.fn(),
-}))
+vi.mock('@/utils/ui/message.js', () => messageMocks)
 
 const { default: VocabularyPage } = await import('../src/main/views/menu/VocabularyPage.vue')
 
@@ -140,7 +156,11 @@ function resetUserStore() {
 }
 
 beforeEach(() => {
+  vi.useRealTimers()
   apiMocks.getVocabularyMe.mockReset()
+  messageMocks.showError.mockReset()
+  messageMocks.showSuccess.mockReset()
+  messageMocks.showWarning.mockReset()
   routerMocks.push.mockReset()
   routerMocks.replace.mockReset()
   routerMocks.route.path = '/menu/vocabulary/manage'
@@ -194,6 +214,66 @@ describe('vocabulary permission cache', () => {
     wrapper.unmount()
   })
 
+  it('shows the refreshed permission and blocks another refresh for one minute', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-09-19T00:00:00Z'))
+
+    const cachedPermission = {
+      user_id: 42,
+      permission_level: 'edit',
+      can_upload: true,
+      can_manage_entries: true,
+      can_view_logs: false,
+    }
+    const refreshedPermission = {
+      user_id: 42,
+      permission_level: 'manage',
+      can_upload: true,
+      can_manage_entries: true,
+      can_view_logs: true,
+    }
+    const laterPermission = {
+      ...refreshedPermission,
+      permission_level: 'edit',
+      can_view_logs: false,
+    }
+    localStorage.setItem('vocabulary_me', JSON.stringify({
+      owner_key: 'id:42',
+      data: cachedPermission,
+    }))
+    apiMocks.getVocabularyMe
+      .mockResolvedValueOnce(refreshedPermission)
+      .mockResolvedValueOnce(laterPermission)
+
+    const wrapper = mountVocabularyPage()
+    await flushPromises()
+
+    const refreshButton = [...wrapper.host.querySelectorAll('button')]
+      .find((button) => button.textContent.includes('权限'))
+    refreshButton.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await flushPromises()
+
+    expect(apiMocks.getVocabularyMe).toHaveBeenCalledTimes(1)
+    expect(messageMocks.showSuccess).toHaveBeenCalledWith('words.wordList.access.permissionRefreshed:词表管理员')
+
+    refreshButton.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await flushPromises()
+
+    expect(apiMocks.getVocabularyMe).toHaveBeenCalledTimes(1)
+    expect(messageMocks.showSuccess).toHaveBeenCalledTimes(1)
+    expect(messageMocks.showWarning).toHaveBeenCalledWith('words.wordList.access.refreshCooldown:60')
+
+    vi.setSystemTime(new Date('2026-09-19T00:01:00Z'))
+    refreshButton.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await flushPromises()
+
+    expect(apiMocks.getVocabularyMe).toHaveBeenCalledTimes(2)
+    expect(messageMocks.showSuccess).toHaveBeenLastCalledWith('words.wordList.access.permissionRefreshed:词表贡献者(不限制数量）')
+
+    wrapper.unmount()
+    vi.useRealTimers()
+  })
+
   it('keeps the refresh permission action near the edit permission request action', () => {
     const vocabularyPage = readSource('src/main/views/menu/VocabularyPage.vue')
     const vocabularyImportPage = readSource('src/main/views/explore/word/vocabulary/VocabularyImportPage.vue')
@@ -215,5 +295,23 @@ describe('vocabulary permission cache', () => {
     expect(zhHantWords.wordList.access.refreshPermission).toBe('權限')
     expect(zhCnWords.wordList.access.refreshPermission).toBe('权限')
     expect(enWords.wordList.access.refreshPermission).toBe('Permission')
+    expect(zhHantWords.wordList.access.permissionRefreshed).toBeTruthy()
+    expect(zhCnWords.wordList.access.permissionRefreshed).toBeTruthy()
+    expect(enWords.wordList.access.permissionRefreshed).toBeTruthy()
+    expect(zhHantWords.wordList.access.refreshCooldown).toBeTruthy()
+    expect(zhCnWords.wordList.access.refreshCooldown).toBeTruthy()
+    expect(enWords.wordList.access.refreshCooldown).toBeTruthy()
+    expect(zhCnWords.wordList.access.permissionLabels.manage).toBe('词表管理员')
+    expect(zhCnWords.wordList.access.permissionLabels.edit).toBe('词表贡献者(不限制数量）')
+    expect(zhCnWords.wordList.access.permissionLabels.one).toBe('词表贡献者(1个)')
+    expect(zhCnWords.wordList.access.permissionLabels.two).toBe('词表贡献者(2个)')
+    expect(zhCnWords.wordList.access.permissionLabels.three).toBe('词表贡献者(3个)')
+    for (const words of [zhHantWords, enWords]) {
+      expect(words.wordList.access.permissionLabels.manage).toBeTruthy()
+      expect(words.wordList.access.permissionLabels.edit).toBeTruthy()
+      expect(words.wordList.access.permissionLabels.one).toBeTruthy()
+      expect(words.wordList.access.permissionLabels.two).toBeTruthy()
+      expect(words.wordList.access.permissionLabels.three).toBeTruthy()
+    }
   })
 })

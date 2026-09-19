@@ -33,6 +33,16 @@
       "loginUploadDesc": "Please log in to upload vocabulary and request edit permission from an administrator.",
       "requestEditPermission": "Request Edit Permission",
       "refreshPermission": "Permission",
+      "permissionRefreshed": "Current permission: {permission}",
+      "refreshCooldown": "Please refresh again in {seconds} seconds",
+      "noPermission": "No access",
+      "permissionLabels": {
+        "manage": "Vocabulary admin",
+        "edit": "Vocabulary contributor (unlimited)",
+        "one": "Vocabulary contributor (1)",
+        "two": "Vocabulary contributor (2)",
+        "three": "Vocabulary contributor (3)"
+      },
       "loginManageTitle": "Sign in to manage vocabulary",
       "loginManageDesc": "Vocabulary management, location metadata, and operation logs require signing in.",
       "noUploadPermissionTitle": "No vocabulary upload access",
