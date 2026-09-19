@@ -38,6 +38,7 @@
       <ManageLocationsSection
         v-else-if="manageSection === 'locations'"
         :has-vocabulary-permission="hasVocabularyPermission"
+        :manage-permission-level="effectiveVocabularyMe?.permission_level"
         :can-delete-location="canViewVocabularyLogs"
       />
       <ManageLogsSection

@@ -49,7 +49,28 @@
         </div>
 
         <div class="upload-example">
-          <div class="upload-example__title">{{ t('words.wordList.upload.dataExample') }}</div>
+          <div class="upload-example__title">
+            <span>{{ t('words.wordList.upload.dataExample') }}</span>
+            <span class="upload-example__actions">
+              <a
+                class="action-btn action-btn--sm upload-example__template-btn"
+                :href="SURVEY_TEMPLATE_URL"
+                :download="SURVEY_TEMPLATE_FILE_NAME"
+              >
+                <PhDownloadSimple
+                  :size="16"
+                  aria-hidden="true"
+                />
+                {{ t('words.wordList.upload.surveyTemplate') }}
+              </a>
+              <HelpIcon
+                :content="t('words.wordList.upload.surveyTemplateHelp')"
+                size="sm"
+                placement="bottom"
+                icon-color="var(--color-primary)"
+              />
+            </span>
+          </div>
           <div class="upload-example__row">
             <span class="upload-example__item"><b class="upload-example__label upload-example__label--def">{{ t('words.wordList.columns.definition') }}</b>吃饭</span>
             <span class="upload-example__item"><b class="upload-example__label upload-example__label--head">{{ t('words.wordList.columns.headword') }}</b>食饭</span>
@@ -422,8 +443,9 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { computed, inject, onMounted, ref, watch } from 'vue'
-import { PhArrowsClockwise } from '@phosphor-icons/vue'
+import { PhArrowsClockwise, PhDownloadSimple } from '@phosphor-icons/vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { batchMatch, getLocationDetail, getVocabularyCounts, previewVocabularyImport, uploadVocabulary } from '@/api'
@@ -442,6 +464,8 @@ import { showError, showInfo, showSuccess, showWarning } from '@/utils/ui/messag
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const SURVEY_TEMPLATE_URL = '/data/sample/方言调查词表(语保).xlsx'
+const SURVEY_TEMPLATE_FILE_NAME = '方言调查词表(语保).xlsx'
 
 const props = defineProps({
   vocabularyMe: { type: Object, default: null },

@@ -198,6 +198,8 @@
       "success": "上傳完成，導入 {count} 條。",
       "failed": "上傳詞表失敗",
       "dataExample": "數據示例",
+      "surveyTemplate": "詞表",
+      "surveyTemplateHelp": "下載方言調查詞表，記錄你的方言詞彙，讓鄉音被看見、被保存、被傳承。",
       "fillStandardFromLocal": "方言詞自動填充標準詞",
       "fillStandardFromLocalHint": "已開啟用方言詞自動填充標準詞，僅針對沒有標準詞的詞表。建議在上傳成功後，前往管理頁面自行更正標準詞。標準詞用於地圖繪製，不統一可能影響地圖繪製效果",
       "downloadSample": "下載示例文件",

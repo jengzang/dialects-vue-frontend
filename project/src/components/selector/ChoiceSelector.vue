@@ -132,9 +132,9 @@ $transition-fast: 0.2s ease;
     font-weight: 600;
     background: var(--color-primary-medium);
 
-    &:hover:not(.disabled) {
-      background: var(--color-primary-medium2);
-    }
+    // &:hover:not(.disabled) {
+    //   background: var(--color-primary-medium2);
+    // }
   }
 }
 

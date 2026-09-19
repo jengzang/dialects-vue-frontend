@@ -198,6 +198,8 @@
       "success": "Upload complete. Imported {count} rows.",
       "failed": "Upload failed",
       "dataExample": "Data Example",
+      "surveyTemplate": "Word List",
+      "surveyTemplateHelp": "Download the dialect survey word list, record your dialect vocabulary, and help preserve voices for the future.",
       "fillStandardFromLocal": "Auto-fill Standard Word from Local Expression",
       "fillStandardFromLocalHint": "Enabled: empty Standard Words will be auto-filled from Local Expressions. We recommend reviewing and correcting auto-filled Standard Words on the Manage page after upload — inconsistent Standard Words may affect map rendering.",
       "downloadSample": "Download sample",

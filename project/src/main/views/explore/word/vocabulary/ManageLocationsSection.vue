@@ -9,7 +9,11 @@
           </div>
         </div>
 
-        <form class="manage-filter-grid locations-filter-grid" @submit.prevent="applyLocationFilters">
+        <form
+          v-if="canShowLocationFilters"
+          class="manage-filter-grid locations-filter-grid"
+          @submit.prevent="applyLocationFilters"
+        >
           <label class="upload-field">
             <span>{{ t('words.wordList.locations.filters.userName') }}</span>
             <input v-model="locationFilters.username" type="text" :placeholder="t('words.wordList.locations.filters.userName')" />
@@ -252,6 +256,7 @@ const props = defineProps({
   hasVocabularyPermission: { type: Boolean, default: false },
   canViewVocabularyLogs: { type: Boolean, default: false },
   canDeleteLocation: { type: Boolean, default: false },
+  managePermissionLevel: { type: String, default: null },
 })
 
 const isLoadingLocations = ref(false)
@@ -284,6 +289,7 @@ const locationPagination = reactive({
 
 const canGoPreviousLocationPage = computed(() => locationPagination.page > 1)
 const canGoNextLocationPage = computed(() => locationPagination.page * locationPagination.pageSize < locationPagination.total)
+const canShowLocationFilters = computed(() => props.managePermissionLevel === 'manage')
 const transferModalTitle = computed(() => {
   const locationName = transferLocationSource.value?.location_name
   return locationName
