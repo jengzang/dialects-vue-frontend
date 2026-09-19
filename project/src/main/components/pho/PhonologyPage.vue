@@ -228,6 +228,11 @@ watch(locationQuery, (urlLocations) => {
     ? urlLocations.slice(0, PHONOLOGY_LOCATION_LIMITS.matrix)
     : []
 
+  // 地點參數被清空（切頁 / 清空輸入）時保留現有結果，只有收到新地點才重置
+  if (limitedUrlLocations.length === 0) {
+    return
+  }
+
   // 只有当 URL 的地点和当前匹配的地点不同时，才需要清空数据并重新查询
   // 这样可以避免在查询成功更新 URL 后误清空数据
   if (JSON.stringify(limitedUrlLocations) === JSON.stringify(queryStrings.value)) {
@@ -237,17 +242,7 @@ watch(locationQuery, (urlLocations) => {
   matrixData.value = null
   error.value = null
 
-  if (limitedUrlLocations.length === 0) {
-    queryStrings.value = []
-    matchedLocations.value = []
-    pendingUrlAutoQuery.value = false
-    pendingUrlMatchAttempted.value = false
-    return
-  }
-
-  if (limitedUrlLocations.length > 0) {
-    queueUrlAutoQuery(limitedUrlLocations)
-  }
+  queueUrlAutoQuery(limitedUrlLocations)
 })
 </script>
 

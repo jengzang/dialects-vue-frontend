@@ -1441,6 +1441,11 @@ watch(locationQuery, async (urlLocations) => {
     ? urlLocations.slice(0, EVOLUTION_LOCATION_LIMIT)
     : []
 
+  // 地點參數被清空（切頁 / 清空輸入）時保留現有結果，只有收到新地點才重置
+  if (limitedUrlLocations.length === 0) {
+    return
+  }
+
   if (JSON.stringify(limitedUrlLocations) === JSON.stringify(selectedLocations.value)) {
     return
   }
@@ -1448,14 +1453,6 @@ watch(locationQuery, async (urlLocations) => {
   selectedLocations.value = [...limitedUrlLocations]
   errorMessage.value = ''
   closeMobilePieDetail()
-
-  if (limitedUrlLocations.length === 0) {
-    pendingUrlAutoQuery.value = false
-    pendingUrlMatchAttempted.value = false
-    hasQueriedRealData.value = false
-    await applyDemoData()
-    return
-  }
 
   await applyDemoData({ syncLocations: false })
   pendingUrlAutoQuery.value = true

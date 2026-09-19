@@ -616,6 +616,11 @@ watch(
       ? locationQuery.value.slice(0, CUSTOM_LOCATION_LIMIT)
       : []
 
+    // 地點參數被清空（切頁 / 清空輸入）時保留現有結果與分類字段，只有收到新地點才重置
+    if (nextLocations.length === 0) {
+      return
+    }
+
     isApplyingRouteQuery.value = true
 
     // 更新特征

@@ -752,6 +752,11 @@ if (Array.isArray(initialUrlLocations) && initialUrlLocations.length > 0) {
 watch(locationQuery, (urlLocations) => {
   const limited = (Array.isArray(urlLocations) ? urlLocations : []).slice(0, COMPARE_LOCATION_LIMIT)
 
+  // 地點參數被清空（切頁 / 清空輸入）時保留現有結果，只有收到新地點才重置
+  if (limited.length === 0) {
+    return
+  }
+
   if (JSON.stringify(limited) === JSON.stringify(tabStates.tab5.queryLocations)) {
     return
   }
