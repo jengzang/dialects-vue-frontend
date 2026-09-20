@@ -678,9 +678,7 @@ const shouldConfirmOverwrite = computed(() => {
   return Number(backendPreview.value?.would_delete_existing_count) > 0
 })
 
-const previewErrors = computed(() => (
-  Array.isArray(backendPreview.value?.errors) ? backendPreview.value.errors : []
-))
+const previewErrors = computed(() => parseErrorDetails(backendPreview.value?.errors))
 
 const hasImportableRows = computed(() => isPreviewImportable(backendPreview.value))
 
@@ -866,7 +864,10 @@ async function handlePreviewImport(fileOverride = null) {
     if (isPreviewImportable(previewResponse)) {
       uploadStatusText.value = t('words.wordList.upload.previewReady')
     } else {
-      uploadStatusText.value = previewResponse.errors?.join('；') || t('words.wordList.upload.previewFailed')
+      const details = parseErrorDetails(previewResponse.errors)
+      uploadStatusText.value = details.length
+        ? details.join('；')
+        : t('words.wordList.upload.noImportableData')
       showError(uploadStatusText.value)
     }
     return previewResponse
@@ -924,13 +925,6 @@ async function handleImportAfterPreview() {
     const importedCount = Number(response.imported_count) || 0
     const skippedCount = Number(response.skipped_count) || 0
     const errors = Array.isArray(response.errors) ? response.errors : []
-
-    if (response.success === false) {
-      uploadStatusText.value = errors.join('；') || t('words.wordList.upload.noImportableData')
-      showError(uploadStatusText.value)
-      return
-    }
-
     const locationName = location.location_name
     clearUploadFile()
     importResult.value = { importedCount, skippedCount, errors, locationName }
@@ -943,11 +937,22 @@ async function handleImportAfterPreview() {
       showSuccess(uploadStatusText.value)
     }
   } catch (error) {
-    uploadStatusText.value = error.message || t('words.wordList.upload.failed')
+    uploadStatusText.value = isNoImportableRowsMessage(error?.message)
+      ? t('words.wordList.upload.noImportableData')
+      : (error.message || t('words.wordList.upload.failed'))
     showError(uploadStatusText.value)
   } finally {
     isUploading.value = false
   }
+}
+
+// 后端在没有可导入行时用这句英文兜底（preview 放进 errors，import 抛 400）
+function isNoImportableRowsMessage(message) {
+  return /no valid vocabulary rows/i.test(String(message || ''))
+}
+
+function parseErrorDetails(errors) {
+  return (Array.isArray(errors) ? errors : []).filter((message) => !isNoImportableRowsMessage(message))
 }
 </script>
 

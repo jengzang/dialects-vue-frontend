@@ -592,8 +592,9 @@ export async function previewVocabularyImport({ file, location, parser_mode = 'a
 /**
  * 上传词表文件。
  *
- * 格式错误的行会被跳过而非整份失败：HTTP 200，imported_count 为实际导入行数，
- * skipped_count / errors 为被跳过的行明细。仅当没有任何可导入行时 success 为 false。
+ * 格式错误的行会被跳过而非整份失败：HTTP 200，success 恒为 true，
+ * imported_count 为实际导入行数，skipped_count / errors 为被跳过的行明细。
+ * 没有任何可导入行时后端抛 400（detail: "No valid vocabulary rows found"），不返回 success=false。
  *
  * @param {{file: File, location: object, parser_mode?: 'auto' | 'table' | 'doc_whitespace' | 'doc_bracket', overwrite?: boolean}} params
  * @returns {Promise<{success: boolean, location_id: number, location_name: string, permission_level: string, imported_count: number, deleted_existing_count: number, skipped_count: number, errors: string[], parser_mode: string}>}
