@@ -104,44 +104,21 @@
     </div>
   </section>
 
-  <AppModal
+  <LocationEditorModal
     v-model="isLocationEditorOpen"
-    size="lg"
+    v-model:draft="editingLocationDraft"
     width="720px"
     max-height="80dvh"
     :title="editingLocationDraft?.location_name || t('words.wordList.locations.title')"
+    :description="editingLocationDraft?.location_label || editingLocationDraft?.location_name"
     :close-label="t('common.button.close')"
+    :fields="locationEditFields"
+    :cancel-text="t('common.button.cancel')"
+    :confirm-text="t('words.wordList.locations.save')"
     @close="closeLocationEditor"
-  >
-    <div v-if="editingLocationDraft" class="location-edit-modal">
-      <p class="location-edit-modal-desc">
-        {{ editingLocationDraft.location_label || editingLocationDraft.location_name }}
-      </p>
-
-      <YindianLocationMatch
-        :draft="editingLocationDraft"
-        @apply="editingLocationDraft = $event"
-      />
-
-      <div class="locations-edit-grid">
-        <label v-for="field in locationEditFields" :key="field.key" class="upload-field">
-          <span>{{ field.label }}</span>
-          <input v-model="editingLocationDraft[field.key]" type="text" />
-        </label>
-      </div>
-    </div>
-
-    <template #footer>
-      <div class="location-edit-modal-actions">
-        <button class="glass-button" data-variant="secondary" type="button" @click="closeLocationEditor">
-          {{ t('common.button.cancel') }}
-        </button>
-        <button class="glass-button" data-variant="primary" type="button" @click="handleSaveEditingLocation">
-          {{ t('words.wordList.locations.save') }}
-        </button>
-      </div>
-    </template>
-  </AppModal>
+    @cancel="closeLocationEditor"
+    @confirm="handleSaveEditingLocation"
+  />
 
   <AppModal
     v-model="isTransferModalOpen"
@@ -216,7 +193,7 @@ import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { deleteVocabularyLocation, exportVocabularyLocation, getVocabularyLocations, transferVocabularyLocation, updateVocabularyLocation } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
-import YindianLocationMatch from './YindianLocationMatch.vue'
+import LocationEditorModal from './LocationEditorModal.vue'
 import { LOCATION_BASE_FIELDS, TONE_FIELDS } from './vocabularyLocationFields.js'
 import { showConfirm, showError, showSuccess } from '@/utils/ui/message.js'
 

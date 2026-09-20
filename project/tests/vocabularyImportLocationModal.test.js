@@ -11,14 +11,18 @@ function readSource(path) {
 }
 
 describe('vocabulary import location modal', () => {
-  it('keeps upload location details in an AppModal with map and Yindian autofill helpers', () => {
+  it('keeps upload location details in a shared location editor modal with map and Yindian autofill helpers', () => {
     const importPage = readSource('src/main/views/explore/word/vocabulary/VocabularyImportPage.vue')
+    // 弹窗外壳、字段网格、页脚都收在共享组件里，两个入口只传配置和插槽
+    const editorModal = readSource('src/main/views/explore/word/vocabulary/LocationEditorModal.vue')
     const yindianMatch = readSource('src/main/views/explore/word/vocabulary/YindianLocationMatch.vue')
     const vocabularyScss = readSource('src/main/views/explore/word/vocabulary/vocabulary.scss')
 
-    expect(importPage).toContain('<AppModal')
+    expect(importPage).toContain('<LocationEditorModal')
     expect(importPage).toContain('<MiniMapSelector')
-    expect(importPage).toContain('<YindianLocationMatch')
+    expect(editorModal).toContain('<AppModal')
+    expect(editorModal).toContain('<YindianLocationMatch')
+    expect(editorModal).toContain('<slot name="map" />')
     expect(yindianMatch).toContain('getLocationDetail')
     expect(importPage).toContain('openUploadLocationEditor')
     expect(importPage).toContain('confirmUploadLocationEditor')
@@ -28,8 +32,8 @@ describe('vocabulary import location modal', () => {
     expect(importPage).toContain('uploadLocationSummaryItems')
     expect(importPage).not.toContain('v-model="uploadLocation[field.key]"')
     expect(vocabularyScss).toContain('.upload-location-summary')
-    expect(vocabularyScss).toContain('.upload-location-modal-layout')
-    expect(vocabularyScss).toContain('.upload-location-map-panel')
+    expect(editorModal).toContain('.location-editor-layout')
+    expect(editorModal).toContain('.location-editor-map')
   })
 
   it('keeps source, description, and other metadata in upload and location edit fields', () => {
@@ -37,6 +41,9 @@ describe('vocabulary import location modal', () => {
     const locationsSection = readSource('src/main/views/explore/word/vocabulary/ManageLocationsSection.vue')
     // 字段定义是单一事实来源，两个表单都从这里生成，不再各自维护一份
     const locationFields = readSource('src/main/views/explore/word/vocabulary/vocabularyLocationFields.js')
+
+    expect(importPage).toContain('<LocationEditorModal')
+    expect(locationsSection).toContain('<LocationEditorModal')
 
     for (const key of ['vocabulary_source', 'description', 'other']) {
       expect(locationFields).toContain(`key: '${key}'`)

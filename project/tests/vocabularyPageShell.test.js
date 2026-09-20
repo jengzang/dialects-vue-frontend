@@ -169,7 +169,7 @@ describe('vocabulary explore page shell wiring', () => {
     const vocabularyScss = readSource('src/main/views/explore/word/vocabulary/vocabulary.scss')
     const portraitBlockStart = vocabularyScss.indexOf('@media (max-aspect-ratio: 1 / 1)')
     const locationItemHeadBlock = vocabularyScss.match(/\.location-item-head\s*\{[^}]*\}/s)?.[0] || ''
-    const stackedLocationSelectors = vocabularyScss.match(/\.upload-location-summary,\s*\n\s*\.upload-location-modal-layout,\s*\n\s*\.locations-head,[^{]*\{[^}]*flex-direction:\s*column/s)?.[0] || ''
+    const stackedLocationSelectors = vocabularyScss.match(/\.upload-location-summary,\s*\n\s*\.locations-head,\s*\n\s*\.location-item-info[^{]*\{[^}]*flex-direction:\s*column/s)?.[0] || ''
     const portraitBlock = vocabularyScss.slice(portraitBlockStart)
 
     expect(portraitBlockStart).toBeGreaterThan(-1)

@@ -693,14 +693,6 @@
   justify-content: center;
 }
 
-.upload-location-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
-  max-height: 50dvh;
-  overflow-y: auto;
-}
-
 .upload-location-summary {
   display: flex;
   gap: 14px;
@@ -950,11 +942,6 @@
   justify-content: flex-end;
 }
 
-.upload-location-modal {
-  display: grid;
-  gap: 14px;
-}
-
 .upload-location-modal-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -970,24 +957,6 @@
   margin: 0;
   color: var(--text-secondary);
   font-size: 0.85rem;
-}
-
-.upload-location-modal-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
-  gap: 16px;
-  align-items: start;
-}
-
-.upload-location-map-panel {
-  display: grid;
-  gap: 10px;
-  color: var(--text-primary);
-
-  :deep(.mini-map-wrapper) {
-    height: 320px;
-    border-radius: var(--radius-md, 8px);
-  }
 }
 
 .upload-head,
@@ -1129,13 +1098,6 @@
   }
 }
 
-.locations-edit-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
-}
-
-.location-edit-modal,
 .location-transfer-modal {
   display: grid;
   gap: 14px;
@@ -1297,7 +1259,6 @@
   }
 
   .upload-location-summary,
-  .upload-location-modal-layout,
   .locations-head,
   .location-item-info {
     align-items: center;
@@ -1319,10 +1280,6 @@
 
   .upload-parser-row {
     max-width: none;
-  }
-
-  .upload-location-modal-layout {
-    grid-template-columns: 1fr;
   }
 
   .cards-grid {

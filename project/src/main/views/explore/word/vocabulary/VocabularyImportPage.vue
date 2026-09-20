@@ -223,58 +223,31 @@
       </div>
     </section>
 
-    <AppModal
+    <LocationEditorModal
       v-model="isUploadLocationEditorOpen"
-      size="lg"
+      v-model:draft="uploadLocationDraft"
       width="860px"
       max-height="84dvh"
       :title="uploadLocationDraft.location_name || t('words.wordList.upload.locationName')"
       :close-label="t('common.button.close')"
+      :fields="uploadLocationFields"
+      :cancel-text="t('common.button.cancel')"
+      :confirm-text="t('common.button.confirm')"
+      :map-label="t('words.wordList.upload.coordinates')"
       @close="closeUploadLocationEditor"
+      @cancel="closeUploadLocationEditor"
+      @confirm="confirmUploadLocationEditor"
     >
-      <div class="upload-location-modal">
-        <YindianLocationMatch
-          :draft="uploadLocationDraft"
-          @apply="uploadLocationDraft = $event"
+      <template #map>
+        <MiniMapSelector
+          v-model:coord="uploadLocationCoord"
+          :visible="isUploadLocationEditorOpen"
+          mode="picker"
+          :points="uploadLocationMapPoints"
+          :hint-text="t('words.wordList.upload.mapPickerHint')"
         />
-
-        <div class="upload-location-modal-layout">
-          <div class="upload-location-grid">
-            <label v-for="field in uploadLocationFields" :key="field.key" class="upload-field">
-              <span>{{ field.label }}</span>
-              <input
-                v-model="uploadLocationDraft[field.key]"
-                type="text"
-                :required="field.required"
-                :placeholder="field.placeholder"
-              />
-            </label>
-          </div>
-
-          <div class="upload-location-map-panel">
-            <strong>{{ t('words.wordList.upload.coordinates') }}</strong>
-            <MiniMapSelector
-              v-model:coord="uploadLocationCoord"
-              :visible="isUploadLocationEditorOpen"
-              mode="picker"
-              :points="uploadLocationMapPoints"
-              :hint-text="t('words.wordList.upload.mapPickerHint')"
-            />
-          </div>
-        </div>
-      </div>
-
-      <template #footer>
-        <div class="location-edit-modal-actions">
-          <button class="glass-button" data-variant="secondary" type="button" @click="closeUploadLocationEditor">
-            {{ t('common.button.cancel') }}
-          </button>
-          <button class="glass-button" data-variant="primary" type="button" @click="confirmUploadLocationEditor">
-            {{ t('common.button.confirm') }}
-          </button>
-        </div>
       </template>
-    </AppModal>
+    </LocationEditorModal>
 
     <AppModal
       :model-value="showFormatHelp"
@@ -425,7 +398,7 @@ import { useTabularImportPreview } from '@/composables/import/useTabularImportPr
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
 import { transformTabularFile } from '@/utils/import/transformTabularFile.js'
 import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue'
-import YindianLocationMatch from './YindianLocationMatch.vue'
+import LocationEditorModal from './LocationEditorModal.vue'
 import { LOCATION_BASE_FIELDS, TONE_FIELDS } from './vocabularyLocationFields.js'
 import { formatCoord } from '@/main/utils/drawMap/formatCoord.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
