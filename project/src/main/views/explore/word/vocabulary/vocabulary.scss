@@ -849,6 +849,14 @@
   border-radius: var(--radius-lg);
 }
 
+.backend-preview--empty {
+  border-color: var(--color-warning, rgba(var(--color-warning-rgb), 0.45));
+}
+
+.backend-preview--empty .backend-preview-icon {
+  background: var(--color-warning, rgba(var(--color-warning-rgb), 0.25));
+}
+
 .backend-preview-head {
   display: flex;
   align-items: center;
@@ -886,7 +894,7 @@
 
 .backend-preview-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
   gap: 12px;
 }
 
@@ -913,6 +921,11 @@
   text-align: center;
 }
 
+.backend-preview-stat--error .backend-preview-stat-value,
+.backend-preview-stat--error .backend-preview-stat-label {
+  color: var(--color-warning, var(--color-primary));
+}
+
 .backend-preview-meta {
   font-size: 0.85rem;
   color: var(--text-secondary);
@@ -934,6 +947,17 @@
 
 .backend-preview-errors {
   padding-left: 18px;
+}
+
+.backend-preview-errors-block {
+  display: grid;
+  gap: 6px;
+}
+
+.backend-preview-errors-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
 }
 
 .upload-actions {

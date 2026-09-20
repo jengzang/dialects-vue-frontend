@@ -139,10 +139,14 @@
           @reset="importFlow.clearPreview"
           @confirm="handleConfirmUpload"
         />
-        <div v-if="backendPreview" class="backend-preview">
+        <div
+          v-if="backendPreview"
+          class="backend-preview"
+          :class="{ 'backend-preview--empty': !hasImportableRows }"
+        >
           <div class="backend-preview-head">
             <div class="backend-preview-title-row">
-              <span class="backend-preview-icon">&#10003;</span>
+              <span class="backend-preview-icon">{{ hasImportableRows ? '✓' : '!' }}</span>
               <strong>{{ t('words.wordList.upload.backendPreviewTitle') }}</strong>
             </div>
             <span class="backend-preview-location">{{ backendPreview.location_name || uploadLocation.location_name }}</span>
@@ -160,6 +164,13 @@
               <span class="backend-preview-stat-value">{{ backendPreview.would_delete_existing_count ?? 0 }}</span>
               <span class="backend-preview-stat-label">{{ t('words.wordList.upload.previewDeleteCount') }}</span>
             </div>
+            <div
+              v-if="previewErrors.length"
+              class="backend-preview-stat backend-preview-stat--error"
+            >
+              <span class="backend-preview-stat-value">{{ previewErrors.length }}</span>
+              <span class="backend-preview-stat-label">{{ t('words.wordList.upload.previewErrorCount') }}</span>
+            </div>
           </div>
           <div class="backend-preview-meta">
             <span>{{ t('words.wordList.upload.previewParserMode') }}：{{ backendPreview.parser_mode || uploadParserMode }}</span>
@@ -172,9 +183,54 @@
             v-model="isOverwriteConfirmed"
             :label="t('words.wordList.upload.confirmOverwrite')"
           />
-          <ul v-if="backendPreview.errors?.length" class="backend-preview-errors">
-            <li v-for="error in backendPreview.errors" :key="error">{{ error }}</li>
-          </ul>
+          <div
+            v-if="previewErrors.length"
+            class="backend-preview-errors-block"
+          >
+            <ul class="backend-preview-errors">
+              <li
+                v-for="error in previewErrors"
+                :key="error"
+              >
+                {{ error }}
+              </li>
+            </ul>
+            <p class="backend-preview-errors-hint">
+              {{ t('words.wordList.upload.previewErrorsHint') }}
+            </p>
+          </div>
+        </div>
+        <div
+          v-if="importResult"
+          class="backend-preview"
+          :class="{ 'backend-preview--empty': importResult.skippedCount > 0 }"
+        >
+          <div class="backend-preview-head">
+            <div class="backend-preview-title-row">
+              <span class="backend-preview-icon">{{ importResult.skippedCount > 0 ? '!' : '✓' }}</span>
+              <strong>{{ t('words.wordList.upload.importResultTitle') }}</strong>
+            </div>
+            <span class="backend-preview-location">{{ importResult.locationName }}</span>
+          </div>
+          <p class="backend-preview-meta">
+            {{ t('words.wordList.upload.importResultSummary', { imported: importResult.importedCount, skipped: importResult.skippedCount }) }}
+          </p>
+          <div
+            v-if="importResult.errors.length"
+            class="backend-preview-errors-block"
+          >
+            <ul class="backend-preview-errors">
+              <li
+                v-for="error in importResult.errors"
+                :key="error"
+              >
+                {{ error }}
+              </li>
+            </ul>
+            <p class="backend-preview-errors-hint">
+              {{ t('words.wordList.upload.importResultErrorsHint') }}
+            </p>
+          </div>
         </div>
         <p v-if="uploadStatusText" class="upload-status">{{ uploadStatusText }}</p>
 
@@ -470,6 +526,7 @@ const showFormatHelp = ref(false)
 const uploadStatusText = ref('')
 const backendPreview = ref(null)
 const isOverwriteConfirmed = ref(false)
+const importResult = ref(null)
 
 const uploadParserMode = ref('auto')
 const fillStandardFromLocal = ref(false)
@@ -621,11 +678,21 @@ const shouldConfirmOverwrite = computed(() => {
   return Number(backendPreview.value?.would_delete_existing_count) > 0
 })
 
+const previewErrors = computed(() => (
+  Array.isArray(backendPreview.value?.errors) ? backendPreview.value.errors : []
+))
+
+const hasImportableRows = computed(() => isPreviewImportable(backendPreview.value))
+
 const canImportAfterPreview = computed(() => {
   return canConfirmUpload.value
-    && backendPreview.value?.success === true
+    && hasImportableRows.value
     && (!shouldConfirmOverwrite.value || isOverwriteConfirmed.value)
 })
+
+function isPreviewImportable(response) {
+  return Number(response?.parsed_count) > 0
+}
 
 function isVocabularyPreviewFile(file) {
   return Boolean(file?.name && /\.(xlsx|xls|csv|tsv)$/i.test(file.name))
@@ -669,6 +736,7 @@ function clearUploadFile() {
   uploadFile.value = null
   backendPreview.value = null
   isOverwriteConfirmed.value = false
+  importResult.value = null
   importFlow.clearPreview()
 }
 
@@ -795,7 +863,7 @@ async function handlePreviewImport(fileOverride = null) {
       fill_standard_from_local: fillStandardFromLocal.value,
     })
     backendPreview.value = previewResponse
-    if (previewResponse.success) {
+    if (isPreviewImportable(previewResponse)) {
       uploadStatusText.value = t('words.wordList.upload.previewReady')
     } else {
       uploadStatusText.value = previewResponse.errors?.join('；') || t('words.wordList.upload.previewFailed')
@@ -820,7 +888,7 @@ async function handleConfirmUpload() {
 
   const transformedFile = buildMappedVocabularyImportFile(file)
   const previewResponse = await handlePreviewImport(transformedFile)
-  if (previewResponse?.success) {
+  if (isPreviewImportable(previewResponse)) {
     preserveBackendPreviewOnFilePromotion = true
     uploadFile.value = transformedFile
     importFlow.pendingFile.value = null
@@ -830,7 +898,7 @@ async function handleConfirmUpload() {
 async function handleImportAfterPreview() {
   const file = uploadFile.value || importFlow.pendingFile.value
 
-  if (!file || isUploading.value || backendPreview.value?.success !== true) {
+  if (!file || isUploading.value || !hasImportableRows.value) {
     return
   }
 
@@ -853,9 +921,27 @@ async function handleImportAfterPreview() {
       overwrite: shouldConfirmOverwrite.value ? isOverwriteConfirmed.value : false,
       fill_standard_from_local: fillStandardFromLocal.value,
     })
-    uploadStatusText.value = t('words.wordList.upload.success', { count: response.imported_count || 0 })
-    showSuccess(uploadStatusText.value)
+    const importedCount = Number(response.imported_count) || 0
+    const skippedCount = Number(response.skipped_count) || 0
+    const errors = Array.isArray(response.errors) ? response.errors : []
+
+    if (response.success === false) {
+      uploadStatusText.value = errors.join('；') || t('words.wordList.upload.noImportableData')
+      showError(uploadStatusText.value)
+      return
+    }
+
+    const locationName = location.location_name
     clearUploadFile()
+    importResult.value = { importedCount, skippedCount, errors, locationName }
+    uploadStatusText.value = skippedCount > 0
+      ? t('words.wordList.upload.successWithSkipped', { imported: importedCount, skipped: skippedCount })
+      : t('words.wordList.upload.success', { count: importedCount })
+    if (skippedCount > 0) {
+      showWarning(uploadStatusText.value)
+    } else {
+      showSuccess(uploadStatusText.value)
+    }
   } catch (error) {
     uploadStatusText.value = error.message || t('words.wordList.upload.failed')
     showError(uploadStatusText.value)

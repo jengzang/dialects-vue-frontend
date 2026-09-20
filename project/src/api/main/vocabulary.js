@@ -564,6 +564,9 @@ export async function getVocabularyLogs(params = {}) {
 /**
  * 预览词表导入结果。
  *
+ * success 仅在没有任何可导入行时为 false；errors 非空表示部分行会被跳过，
+ * 此时 parsed_count 仍是真实可导入的行数，前端应以 parsed_count > 0 作为可提交判据。
+ *
  * @param {{file: File, location: object, parser_mode?: 'auto' | 'table' | 'doc_whitespace' | 'doc_bracket'}} params
  * @returns {Promise<{success: boolean, location_name: string, permission_level: string, parsed_count: number, would_delete_existing_count: number, skipped_count: number, errors: string[], parser_mode: string}>}
  */
@@ -588,6 +591,9 @@ export async function previewVocabularyImport({ file, location, parser_mode = 'a
 
 /**
  * 上传词表文件。
+ *
+ * 格式错误的行会被跳过而非整份失败：HTTP 200，imported_count 为实际导入行数，
+ * skipped_count / errors 为被跳过的行明细。仅当没有任何可导入行时 success 为 false。
  *
  * @param {{file: File, location: object, parser_mode?: 'auto' | 'table' | 'doc_whitespace' | 'doc_bracket', overwrite?: boolean}} params
  * @returns {Promise<{success: boolean, location_id: number, location_name: string, permission_level: string, imported_count: number, deleted_existing_count: number, skipped_count: number, errors: string[], parser_mode: string}>}
