@@ -118,41 +118,10 @@
         {{ editingLocationDraft.location_label || editingLocationDraft.location_name }}
       </p>
 
-      <div class="yindian-match-section">
-        <h4 class="yindian-match-title">{{ t('words.wordList.upload.useYindianData') }}</h4>
-        <div class="yindian-match-row">
-          <div class="yindian-input-wrapper">
-            <input
-              v-model="yindianQuery"
-              type="text"
-              :placeholder="t('words.wordList.upload.yindianHint')"
-              autocomplete="off"
-              @input="onYindianInput"
-              @keydown.enter.prevent="confirmYindianQuery"
-              @blur="onYindianBlur"
-            />
-            <div v-if="yindianSuggestions.length" class="yindian-suggestions">
-              <div
-                v-for="item in yindianSuggestions"
-                :key="item"
-                class="yindian-suggest-item"
-                @mousedown.prevent="applyYindianSuggestion(item)"
-              >
-                {{ item }}
-              </div>
-            </div>
-          </div>
-          <button
-            class="glass-button"
-            data-variant="primary"
-            type="button"
-            :disabled="!yindianQuery.trim() || isLoadingYindian"
-            @click="confirmYindianQuery"
-          >
-            {{ isLoadingYindian ? t('common.label.loading') : t('common.button.confirm') }}
-          </button>
-        </div>
-      </div>
+      <YindianLocationMatch
+        :draft="editingLocationDraft"
+        @apply="editingLocationDraft = $event"
+      />
 
       <div class="locations-edit-grid">
         <label v-for="field in locationEditFields" :key="field.key" class="upload-field">
@@ -245,9 +214,11 @@
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { batchMatch, deleteVocabularyLocation, exportVocabularyLocation, getLocationDetail, getVocabularyLocations, transferVocabularyLocation, updateVocabularyLocation } from '@/api'
+import { deleteVocabularyLocation, exportVocabularyLocation, getVocabularyLocations, transferVocabularyLocation, updateVocabularyLocation } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
-import { showConfirm, showError, showSuccess, showWarning } from '@/utils/ui/message.js'
+import YindianLocationMatch from './YindianLocationMatch.vue'
+import { LOCATION_BASE_FIELDS, TONE_FIELDS } from './vocabularyLocationFields.js'
+import { showConfirm, showError, showSuccess } from '@/utils/ui/message.js'
 
 const { t } = useI18n()
 const pageSizeOptions = [20, 50, 100, 200]
@@ -273,10 +244,6 @@ const transferTargetUsername = ref('')
 const transferErrorText = ref('')
 const isTransferringLocation = ref(false)
 const isExportingLocation = ref(false)
-const yindianQuery = ref('')
-const yindianSuggestions = ref([])
-const isLoadingYindian = ref(false)
-let yindianDebounceTimer = null
 const locationFilters = reactive({
   username: '',
   location_name: '',
@@ -302,30 +269,9 @@ const transferSourceLabel = computed(() => (
   || t('words.wordList.locations.transfer.unknownUser')
 ))
 
-const TONE_FIELD_KEYS = Array.from({ length: 10 }, (_, index) => `t${index + 1}`)
-const TONE_SOURCE_KEYS = [
-  'T1陰平', 'T2陽平', 'T3陰上', 'T4陽上', 'T5陰去',
-  'T6陽去', 'T7陰入', 'T8陽入', 'T9其他調', 'T10輕聲',
-]
-
 const locationEditFields = computed(() => [
-  { key: 'location_name', label: t('words.wordList.upload.locationName') },
-  { key: 'coordinates', label: t('words.wordList.upload.coordinates') },
-  { key: 'province', label: t('words.wordList.upload.province') },
-  { key: 'city', label: t('words.wordList.upload.city') },
-  { key: 'county', label: t('words.wordList.upload.county') },
-  { key: 'town', label: t('words.wordList.upload.town') },
-  { key: 'administrative_village', label: t('words.wordList.upload.administrativeVillage') },
-  { key: 'natural_village', label: t('words.wordList.upload.naturalVillage') },
-  { key: 'yindian_region', label: t('words.wordList.upload.yindianRegion') },
-  { key: 'atlas_region', label: t('words.wordList.upload.atlasRegion') },
-  { key: 'vocabulary_source', label: t('words.wordList.upload.vocabularySource') },
-  { key: 'description', label: t('words.wordList.upload.description') },
-  { key: 'other', label: t('words.wordList.upload.other') },
-  ...TONE_FIELD_KEYS.map((key) => ({
-    key,
-    label: t(`words.wordList.upload.toneNames.${key}`),
-  })),
+  ...LOCATION_BASE_FIELDS.map((field) => ({ key: field.key, label: t(field.labelKey) })),
+  ...TONE_FIELDS.map((field) => ({ key: field.key, label: t(field.labelKey) })),
 ])
 
 function appendFilledFilters(target, filters) {
@@ -403,8 +349,6 @@ function closeLocationEditor() {
   isLocationEditorOpen.value = false
   editingLocationSource.value = null
   editingLocationDraft.value = null
-  yindianQuery.value = ''
-  yindianSuggestions.value = []
 }
 
 function openTransferModal(location) {
@@ -423,91 +367,6 @@ function closeTransferModal() {
   transferTargetUserId.value = ''
   transferTargetUsername.value = ''
   transferErrorText.value = ''
-}
-
-function getLocationDetailRow(response) {
-  if (Array.isArray(response?.data)) return response.data[0] || null
-  if (response?.data && typeof response.data === 'object') return response.data
-  return response && typeof response === 'object' ? response : null
-}
-
-function applyYindianDetail(detail) {
-  if (!editingLocationDraft.value || !detail) return
-  const draft = editingLocationDraft.value
-  const next = {
-    ...draft,
-    location_name: draft.location_name || detail?.['語言'] || '',
-    coordinates: detail?.['經緯度'] || draft.coordinates,
-    province: detail?.['省'] || draft.province,
-    city: detail?.['市'] || draft.city,
-    county: detail?.['縣'] || draft.county,
-    town: detail?.['鎮'] || draft.town,
-    administrative_village: detail?.['行政村'] || draft.administrative_village,
-    natural_village: detail?.['自然村'] || draft.natural_village,
-    yindian_region: detail?.['音典分區'] || draft.yindian_region,
-  }
-
-  TONE_SOURCE_KEYS.forEach((sourceKey, index) => {
-    const key = `t${index + 1}`
-    next[key] = detail?.[sourceKey] || draft[key]
-  })
-
-  editingLocationDraft.value = next
-}
-
-async function fillFromYindian(name) {
-  if (!name || isLoadingYindian.value) return
-  isLoadingYindian.value = true
-  try {
-    const response = await getLocationDetail(name)
-    const detail = getLocationDetailRow(response)
-    if (!detail) {
-      showWarning(t('words.wordList.upload.yindianNotFound'))
-      return
-    }
-    applyYindianDetail(detail)
-    showSuccess(t('words.wordList.upload.yindianFilled'))
-  } catch (error) {
-    showError(error.message || t('words.wordList.upload.yindianFailed'))
-  } finally {
-    isLoadingYindian.value = false
-  }
-}
-
-function onYindianInput() {
-  clearTimeout(yindianDebounceTimer)
-  const query = yindianQuery.value.trim()
-  if (!query) {
-    yindianSuggestions.value = []
-    return
-  }
-  yindianDebounceTimer = setTimeout(async () => {
-    try {
-      const results = await batchMatch(query, false)
-      const items = Array.isArray(results) ? results.flatMap((r) => r.items || []) : []
-      yindianSuggestions.value = [...new Set(items)]
-    } catch {
-      yindianSuggestions.value = []
-    }
-  }, 300)
-}
-
-function onYindianBlur() {
-  setTimeout(() => {
-    yindianSuggestions.value = []
-  }, 200)
-}
-
-function applyYindianSuggestion(item) {
-  yindianQuery.value = item
-  yindianSuggestions.value = []
-  return fillFromYindian(item)
-}
-
-function confirmYindianQuery() {
-  const name = yindianQuery.value.trim()
-  if (!name || isLoadingYindian.value) return
-  return fillFromYindian(name)
 }
 
 async function handleSaveLocation(location, originalLocationName) {

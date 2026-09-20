@@ -233,42 +233,10 @@
       @close="closeUploadLocationEditor"
     >
       <div class="upload-location-modal">
-        <div class="yindian-match-section">
-          <h4 class="yindian-match-title">{{ t('words.wordList.upload.useYindianData') }}</h4>
-          <div class="yindian-match-row">
-            <div class="yindian-input-wrapper">
-              <input
-                v-model="yindianQuery"
-                type="text"
-                :placeholder="t('words.wordList.upload.yindianHint')"
-                autocomplete="off"
-                @input="onYindianInput"
-                @keydown.enter.prevent="confirmYindianQuery"
-                @blur="onYindianBlur"
-              />
-              <div v-if="yindianSuggestions.length" class="yindian-suggestions">
-                <div
-                  v-for="item in yindianSuggestions"
-                  :key="item"
-                  class="yindian-suggest-item"
-                  @mousedown.prevent="applyYindianSuggestion(item)"
-                >
-                  {{ item }}
-                </div>
-              </div>
-            </div>
-            <button
-              class="glass-button"
-              data-variant="primary"
-              type="button"
-              :disabled="!yindianQuery.trim() || isLoadingYindian"
-              @click="confirmYindianQuery"
-            >
-              {{ isLoadingYindian ? t('common.label.loading') : t('common.button.confirm') }}
-            </button>
-          </div>
-          <span v-if="uploadLocationEditorStatus">{{ uploadLocationEditorStatus }}</span>
-        </div>
+        <YindianLocationMatch
+          :draft="uploadLocationDraft"
+          @apply="uploadLocationDraft = $event"
+        />
 
         <div class="upload-location-modal-layout">
           <div class="upload-location-grid">
@@ -448,7 +416,7 @@ import { computed, inject, onMounted, ref, watch } from 'vue'
 import { PhArrowsClockwise, PhDownloadSimple } from '@phosphor-icons/vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { batchMatch, getLocationDetail, getVocabularyCounts, previewVocabularyImport, uploadVocabulary } from '@/api'
+import { getVocabularyCounts, previewVocabularyImport, uploadVocabulary } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
@@ -457,6 +425,8 @@ import { useTabularImportPreview } from '@/composables/import/useTabularImportPr
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
 import { transformTabularFile } from '@/utils/import/transformTabularFile.js'
 import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue'
+import YindianLocationMatch from './YindianLocationMatch.vue'
+import { LOCATION_BASE_FIELDS, TONE_FIELDS } from './vocabularyLocationFields.js'
 import { formatCoord } from '@/main/utils/drawMap/formatCoord.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { showError, showInfo, showSuccess, showWarning } from '@/utils/ui/message.js'
@@ -533,75 +503,26 @@ const fillStandardFromLocal = ref(false)
 const uploadFile = ref(null)
 const fileInputEl = ref(null)
 const isDragOver = ref(false)
-const TONE_FIELD_KEYS = Array.from({ length: 10 }, (_, index) => `t${index + 1}`)
-const TONE_SOURCE_KEYS = [
-  'T1陰平', 'T2陽平', 'T3陰上', 'T4陽上', 'T5陰去',
-  'T6陽去', 'T7陰入', 'T8陽入', 'T9其他調', 'T10輕聲',
-]
 
-const createEmptyUploadLocation = () => ({
-  location_name: '',
-  coordinates: '',
-  province: '',
-  city: '',
-  county: '',
-  town: '',
-  administrative_village: '',
-  natural_village: '',
-  yindian_region: '',
-  atlas_region: '',
-  vocabulary_source: '',
-  description: '',
-  other: '',
-  t1: '',
-  t2: '',
-  t3: '',
-  t4: '',
-  t5: '',
-  t6: '',
-  t7: '',
-  t8: '',
-  t9: '',
-  t10: '',
-})
+const createEmptyUploadLocation = () => Object.fromEntries(
+  [...LOCATION_BASE_FIELDS, ...TONE_FIELDS].map((field) => [field.key, ''])
+)
 const uploadLocation = ref(createEmptyUploadLocation())
 const uploadLocationDraft = ref(createEmptyUploadLocation())
 const isUploadLocationEditorOpen = ref(false)
-const yindianQuery = ref('')
-const yindianSuggestions = ref([])
-const isLoadingYindian = ref(false)
-const uploadLocationEditorStatus = ref('')
-let yindianDebounceTimer = null
 let preserveBackendPreviewOnFilePromotion = false
 
 const uploadLocationFields = computed(() => [
-  {
-    key: 'location_name',
-    label: t('words.wordList.upload.locationName'),
-    placeholder: t('words.wordList.upload.locationNamePlaceholder'),
-    required: true
-  },
-  {
-    key: 'coordinates',
-    label: t('words.wordList.upload.coordinates'),
-    placeholder: t('words.wordList.upload.coordinatesPlaceholder'),
-    required: true
-  },
-  { key: 'province', label: t('words.wordList.upload.province'), placeholder: t('words.wordList.upload.province'), required: false },
-  { key: 'city', label: t('words.wordList.upload.city'), placeholder: t('words.wordList.upload.city'), required: false },
-  { key: 'county', label: t('words.wordList.upload.county'), placeholder: t('words.wordList.upload.county'), required: false },
-  { key: 'town', label: t('words.wordList.upload.town'), placeholder: t('words.wordList.upload.town'), required: false },
-  { key: 'administrative_village', label: t('words.wordList.upload.administrativeVillage'), placeholder: t('words.wordList.upload.administrativeVillage'), required: false },
-  { key: 'natural_village', label: t('words.wordList.upload.naturalVillage'), placeholder: t('words.wordList.upload.naturalVillage'), required: false },
-  { key: 'yindian_region', label: t('words.wordList.upload.yindianRegion'), placeholder: t('words.wordList.upload.yindianRegion'), required: false },
-  { key: 'atlas_region', label: t('words.wordList.upload.atlasRegion'), placeholder: t('words.wordList.upload.atlasRegion'), required: false },
-  { key: 'vocabulary_source', label: t('words.wordList.upload.vocabularySource'), placeholder: t('words.wordList.upload.vocabularySource'), required: false },
-  { key: 'description', label: t('words.wordList.upload.description'), placeholder: t('words.wordList.upload.description'), required: false },
-  { key: 'other', label: t('words.wordList.upload.other'), placeholder: t('words.wordList.upload.other'), required: false },
-  ...TONE_FIELD_KEYS.map((key) => ({
-    key,
-    label: t(`words.wordList.upload.toneNames.${key}`),
-    placeholder: t(`words.wordList.upload.toneNames.${key}`),
+  ...LOCATION_BASE_FIELDS.map((field) => ({
+    key: field.key,
+    label: t(field.labelKey),
+    placeholder: t(field.placeholderKey || field.labelKey),
+    required: Boolean(field.required),
+  })),
+  ...TONE_FIELDS.map((field) => ({
+    key: field.key,
+    label: t(field.labelKey),
+    placeholder: t(field.labelKey),
     required: false,
   })),
 ])
@@ -700,7 +621,6 @@ const uploadLocationCoord = computed({
   set(coord) {
     if (!Array.isArray(coord) || coord.length < 2) return
     uploadLocationDraft.value.coordinates = formatCoord(coord[0], coord[1])
-    uploadLocationEditorStatus.value = ''
   }
 })
 
@@ -759,112 +679,17 @@ function normalizeUploadLocation(location) {
 
 function openUploadLocationEditor() {
   uploadLocationDraft.value = { ...uploadLocation.value }
-  uploadLocationEditorStatus.value = ''
-  yindianQuery.value = ''
-  yindianSuggestions.value = []
   isUploadLocationEditorOpen.value = true
 }
 
 function closeUploadLocationEditor() {
   isUploadLocationEditorOpen.value = false
   uploadLocationDraft.value = createEmptyUploadLocation()
-  uploadLocationEditorStatus.value = ''
-  yindianQuery.value = ''
-  yindianSuggestions.value = []
 }
 
 function confirmUploadLocationEditor() {
   uploadLocation.value = normalizeUploadLocation(uploadLocationDraft.value)
   closeUploadLocationEditor()
-}
-
-function getLocationDetailRow(response) {
-  if (Array.isArray(response?.data)) return response.data[0] || null
-  if (response?.data && typeof response.data === 'object') return response.data
-  return response && typeof response === 'object' ? response : null
-}
-
-function applyYindianLocationDetail(detail) {
-  const draft = uploadLocationDraft.value
-  const next = {
-    ...draft,
-    location_name: draft.location_name || detail?.['語言'] || '',
-    coordinates: detail?.['經緯度'] || draft.coordinates,
-    province: detail?.['省'] || draft.province,
-    city: detail?.['市'] || draft.city,
-    county: detail?.['縣'] || draft.county,
-    town: detail?.['鎮'] || draft.town,
-    administrative_village: detail?.['行政村'] || draft.administrative_village,
-    natural_village: detail?.['自然村'] || draft.natural_village,
-    yindian_region: detail?.['音典分區'] || draft.yindian_region,
-    atlas_region: detail?.['地圖集二分區'] || draft.atlas_region,
-  }
-
-  TONE_SOURCE_KEYS.forEach((sourceKey, index) => {
-    const key = `t${index + 1}`
-    next[key] = detail?.[sourceKey] || draft[key]
-  })
-
-  uploadLocationDraft.value = next
-}
-
-async function fillFromYindian(name) {
-  if (!name || isLoadingYindian.value) return
-  isLoadingYindian.value = true
-  uploadLocationEditorStatus.value = ''
-  try {
-    const response = await getLocationDetail(name)
-    const detail = getLocationDetailRow(response)
-    if (!detail) {
-      uploadLocationEditorStatus.value = t('words.wordList.upload.yindianNotFound')
-      showWarning(uploadLocationEditorStatus.value)
-      return
-    }
-    applyYindianLocationDetail(detail)
-    uploadLocationEditorStatus.value = t('words.wordList.upload.yindianFilled')
-    showSuccess(uploadLocationEditorStatus.value)
-  } catch (error) {
-    uploadLocationEditorStatus.value = error.message || t('words.wordList.upload.yindianFailed')
-    showError(uploadLocationEditorStatus.value)
-  } finally {
-    isLoadingYindian.value = false
-  }
-}
-
-function onYindianInput() {
-  clearTimeout(yindianDebounceTimer)
-  const query = yindianQuery.value.trim()
-  if (!query) {
-    yindianSuggestions.value = []
-    return
-  }
-  yindianDebounceTimer = setTimeout(async () => {
-    try {
-      const results = await batchMatch(query, false)
-      const items = Array.isArray(results) ? results.flatMap((r) => r.items || []) : []
-      yindianSuggestions.value = [...new Set(items)]
-    } catch {
-      yindianSuggestions.value = []
-    }
-  }, 300)
-}
-
-function onYindianBlur() {
-  setTimeout(() => {
-    yindianSuggestions.value = []
-  }, 200)
-}
-
-function applyYindianSuggestion(item) {
-  yindianQuery.value = item
-  yindianSuggestions.value = []
-  return fillFromYindian(item)
-}
-
-function confirmYindianQuery() {
-  const name = yindianQuery.value.trim()
-  if (!name || isLoadingYindian.value) return
-  return fillFromYindian(name)
 }
 
 function clearUploadFile() {
