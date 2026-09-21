@@ -45,15 +45,15 @@ const containerRef = ref(null)
 const globeHostRef = ref(null)
 const joystickRef = ref(null)
 const joystickMountTarget = ref(null)
-const isPortrait = ref(false)
+const isPortraitLayout = ref(false)
+const hasTouchInput = ref(false)
 const hasPrimaryFinePointer = ref(false)
 const hasPrimaryHover = ref(false)
 const joystickThumb = ref({ x: 0, y: 0 })
 const joystickVector = ref({ x: 0, y: 0 })
 const shouldUseGlobeJoystick = computed(() => (
-  isPortrait.value &&
-  !hasPrimaryFinePointer.value &&
-  !hasPrimaryHover.value
+  isPortraitLayout.value &&
+  hasTouchInput.value
 ))
 const joystickThumbStyle = computed(() => ({
   '--globe-joystick-thumb-x': `${joystickThumb.value.x}px`,
@@ -82,7 +82,8 @@ function getCssRgb(varName, fallback) {
 
 function setupInputCapabilityListeners() {
   inputCapabilityMediaQueries = [
-    { ref: isPortrait, mql: window.matchMedia('(orientation: portrait)') },
+    { ref: isPortraitLayout, mql: window.matchMedia('(max-aspect-ratio: 1 / 1)') },
+    { ref: hasTouchInput, mql: window.matchMedia('(any-pointer: coarse)') },
     { ref: hasPrimaryFinePointer, mql: window.matchMedia('(pointer: fine)') },
     { ref: hasPrimaryHover, mql: window.matchMedia('(hover: hover)') },
   ]
@@ -416,7 +417,7 @@ watch(() => props.points, () => {
   updatePoints()
 }, { deep: true })
 
-watch([shouldUseGlobeJoystick, hasPrimaryFinePointer, hasPrimaryHover], () => {
+watch([shouldUseGlobeJoystick, hasPrimaryFinePointer, hasPrimaryHover, hasTouchInput], () => {
   cancelJoystickInteraction()
   syncGlobePointerInteraction()
 })

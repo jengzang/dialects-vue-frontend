@@ -128,18 +128,22 @@ afterEach(() => {
 })
 
 describe('globe joystick interaction contracts', () => {
-  it('uses live input capability media queries instead of UA, width, or touch-only checks', () => {
+  it('uses portrait touch input as the positive joystick condition instead of excluding hover or fine pointers', () => {
     const source = readSource('src/main/components/globe/GlobeGLRenderer.vue')
 
-    expect(source).toContain("matchMedia('(orientation: portrait)')")
+    expect(source).toContain("matchMedia('(max-aspect-ratio: 1 / 1)')")
+    expect(source).toContain("matchMedia('(any-pointer: coarse)')")
     expect(source).toContain("matchMedia('(pointer: fine)')")
     expect(source).toContain("matchMedia('(hover: hover)')")
     expect(source).toContain('shouldUseGlobeJoystick')
-    expect(source).toContain('!hasPrimaryFinePointer.value')
-    expect(source).toContain('!hasPrimaryHover.value')
-    expect(source).toContain('watch([shouldUseGlobeJoystick, hasPrimaryFinePointer, hasPrimaryHover]')
+    expect(source).toContain('isPortraitLayout.value')
+    expect(source).toContain('hasTouchInput.value')
+    expect(source).not.toContain('!hasPrimaryFinePointer.value')
+    expect(source).not.toContain('!hasPrimaryHover.value')
+    expect(source).toContain('watch([shouldUseGlobeJoystick, hasPrimaryFinePointer, hasPrimaryHover, hasTouchInput]')
     expect(source).not.toContain('ontouchstart')
     expect(source).not.toContain('maxTouchPoints')
+    expect(source).not.toContain('orientation: portrait')
     expect(source).not.toContain('innerWidth')
     expect(source).not.toContain('userAgent')
   })
@@ -219,7 +223,8 @@ describe('globe joystick interaction contracts', () => {
 
   it('syncs direct globe drag when mouse-like media query state changes at runtime', async () => {
     const media = createMediaQueryHarness({
-      '(orientation: portrait)': false,
+      '(max-aspect-ratio: 1 / 1)': false,
+      '(any-pointer: coarse)': false,
       '(pointer: fine)': false,
       '(hover: hover)': false,
     })
@@ -263,7 +268,8 @@ describe('globe joystick interaction contracts', () => {
 
   it('disables orbit controls and restores canvas scrolling while the portrait touch joystick replaces direct globe drag', async () => {
     const media = createMediaQueryHarness({
-      '(orientation: portrait)': true,
+      '(max-aspect-ratio: 1 / 1)': true,
+      '(any-pointer: coarse)': true,
       '(pointer: fine)': false,
       '(hover: hover)': false,
     })
@@ -284,10 +290,10 @@ describe('globe joystick interaction contracts', () => {
     expect(controls.enablePan).toBe(false)
     expect(canvas.style.touchAction).toBe('auto')
 
-    media.set('(pointer: fine)', true)
+    media.set('(max-aspect-ratio: 1 / 1)', false)
     await nextTick()
 
-    expect(globe.enablePointerInteraction).toHaveBeenLastCalledWith(true)
+    expect(globe.enablePointerInteraction).toHaveBeenLastCalledWith(false)
     expect(controls.enabled).toBe(true)
     expect(controls.enableRotate).toBe(true)
     expect(controls.enablePan).toBe(true)
@@ -300,7 +306,8 @@ describe('globe joystick interaction contracts', () => {
 
   it('mounts the portrait touch joystick in the home hero anchor instead of the canvas container', async () => {
     createMediaQueryHarness({
-      '(orientation: portrait)': true,
+      '(max-aspect-ratio: 1 / 1)': true,
+      '(any-pointer: coarse)': true,
       '(pointer: fine)': false,
       '(hover: hover)': false,
     })
@@ -321,13 +328,12 @@ describe('globe joystick interaction contracts', () => {
     anchor.remove()
   })
 
-  it('keeps the portrait touch joystick when any-input media queries report optional fine or hover capability', async () => {
+  it('keeps the portrait touch joystick when the primary input also reports fine pointer or hover capability', async () => {
     createMediaQueryHarness({
-      '(orientation: portrait)': true,
-      '(pointer: fine)': false,
-      '(hover: hover)': false,
-      '(any-pointer: fine)': true,
-      '(any-hover: hover)': true,
+      '(max-aspect-ratio: 1 / 1)': true,
+      '(any-pointer: coarse)': true,
+      '(pointer: fine)': true,
+      '(hover: hover)': true,
     })
     const root = document.createElement('div')
     const anchor = document.createElement('div')
