@@ -1622,9 +1622,11 @@ $mobile-breakpoint: 768px;
   gap: 6px;
   height: var(--ut-height, 85dvh);
   width: min(88dvw,100%);
+  margin: 0 auto;
   overflow: hidden;
 
   @media (max-aspect-ratio: 1 / 1) {
+    width: min(95dvw, 100%);
     height: var(--ut-height-mobile, var(--ut-height, 85dvh));
   }
 }

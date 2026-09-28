@@ -240,14 +240,14 @@ const SEO_CONFIG = {
     },
     '/menu/yubao': {
       title: {
-        'zh-Hant': '詞彙與語法｜方音圖鑑',
-        'zh-CN': '词汇与语法｜方音图鉴',
-        en: 'Vocabulary & Grammar | Dialects Atlas',
+        'zh-Hant': '語保詞句｜方音圖鑑',
+        'zh-CN': '语保词句｜方音图鉴',
+        en: 'Language Protection Words & Sentences | Dialects Atlas',
       },
       description: {
         'zh-Hant': '查閱語保詞彙與語保語法資料，支持詞彙、語法句式的查詢、篩選與地圖展示。',
         'zh-CN': '查阅语保词汇与语保语法资料，支持词汇、语法句式的查询、筛选与地图展示。',
-        en: 'Browse language preservation vocabulary and grammar materials with search, filtering, and map-based views.',
+        en: 'Browse language resource protection materials, including vocabulary and grammar sentences, with search, filtering, and map-based views.',
       },
     },
     '/explore/char-class': {

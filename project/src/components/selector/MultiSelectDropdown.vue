@@ -399,7 +399,7 @@ $arrow-transition: 0.2s ease;
 }
 
 .search-input {
-  width: 100%;
+  // width: 100%;
   padding: 6px 10px;
   color: $text-primary;
   font-size: 13px;
