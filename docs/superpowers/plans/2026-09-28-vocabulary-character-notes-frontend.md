@@ -1,738 +1,662 @@
-# Vocabulary Character-Notes Search Frontend Implementation Plan
+# Vocabulary Character-Note Search Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (- [ ]) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add a default-on source switch to the vocabulary card page. It switches between the unchanged vocabulary experience and character-note cards backed by dialects_user.db, without changing map, table, or contribution behavior.
+**Goal:** Add a default-on `词表` switch to the vocabulary card view; when switched off, search and render raw `dialects_user.db` `notes` rows by IPA and/or annotation, while preserving the existing vocabulary experience unchanged.
 
-**Architecture:** Route state owns the source: the absence of `source` means vocabulary; `source=character-notes` means character-note cards. `VocabularyPage` derives that state to hide its page-tab navigation. `VocabularyTopControls` is presentational and retains only the keyword input and source switch in character-note mode. `VocabularyViewPage` gives both sources isolated request state, and every vocabulary-only request predicate explicitly excludes character-note mode, so a late card/map/table response cannot affect the active source.
+**Architecture:** The route owns the source selection: no `source` query selects the existing vocabulary experience, and `source=character-notes` selects the new card-only character-note experience. The backend adds one public, rate-limited read endpoint that queries the existing `notes` FTS5 index in `dialects_user.db`. The frontend keeps both sources' result, pagination, errors, request tokens, and field preferences independent, so an in-flight response cannot overwrite the currently displayed source.
 
-**Tech Stack:** Vue 3 script setup, Vue Router, SwitchToggle.vue, Vue I18n, existing api() client, Vitest, scoped SCSS, project mixins/tokens.
+**Tech Stack:** FastAPI, Pydantic, SQLite/FTS5, `run_in_threadpool`, Vue 3 `<script setup>`, Vue Router, Vue I18n, the existing `api()` client, Vitest, pytest, scoped SCSS and project style mixins.
 
 ---
 
-## Confirmed Product Rules
+## Scope and confirmed decisions
 
-- The switch is on by default. On is 词表; off is 字表注释.
-- Vocabulary source preserves the current card, map, table, filters, location details, and contribution navigation exactly.
-- Character-note source is card-only and exposes one card for every returned source row. It never deduplicates different location or IPA rows.
-- The character-note mapping is location_name to the non-clickable left-top location label, character to the word, ipa to the pronunciation, and notes to the existing expandable note area. There is no definition row.
-- Character-note source hides the search-field gear/modal, location-details action, standard-word selector, location selector, province/city selector, and the parent page-tab-navigation.
-- Only dialects_user.db is searched. The frontend never selects or merges dialects_admin.db.
-- Character-note deep links use source=character-notes. No source query means the current vocabulary source.
+- The switch defaults to on: `词表`. Switching off selects `字表注释` and writes `source=character-notes` to the current route.
+- Character-note mode is card-only. It always uses `tab=card`, hides the parent `page-tab-navigation`, and normalizes malformed `source=character-notes&tab=map` or `tab=table` deep links with `router.replace`.
+- Existing vocabulary cards, table, map, filters, location navigation, contribution navigation, and data requests must retain their current behavior when `source` is absent or unknown.
+- A character-note card maps `簡稱` to a non-clickable location label, `漢字` to the main word text, `音節` to IPA, and `註釋` to the existing notes area. It has no standard-word/definition row. IPA is mandatory whenever the raw value exists.
+- The source is specifically `dialects_user.db` table `notes`, not `dialects`, `vocabulary.db`, or a client-selected database. Source row identity is `notes.rowid`.
+- Source rows are never deduplicated. A row that matches both configured fields appears once; two different rows with the same displayed values both appear.
+- Character-note mode keeps the search gear. It contains only `音标` (`pronunciation`) and `注释` (`detail`), and persists its independent selection in `localStorage` under `vocabulary_notes_search_fields`. `[]` retains the existing meaning “all available fields”.
+- A malformed or obsolete saved note-field value is discarded and falls back to `[]` (both fields); it must never be sent to the API as an unsupported field.
+- In this mode hide only the location-detail action, region filter mode, standard-word selector, and the whole external location/province/city filter strip. Do not clear the vocabulary source's filters or field selection.
+- Entering character-note mode closes the vocabulary location/map detail modals and any open field selector, then forces card mode. It does not erase the query or either source's saved filters.
+- A blank query causes no frontend request and displays a dedicated “enter a query” state. Direct API requests with a blank query are rejected with HTTP 400.
+- One- and two-character annotation queries must work. For annotations, `文白` must match literal stored `文 白`; the rendered annotation text remains unchanged.
 
-## Required Backend Contract
+## One-endpoint backend contract
 
-This plan makes no backend changes. The frontend implementation needs this contract before the API step is integrated:
+Exactly one new public HTTP endpoint is required. Existing `/api/vocabulary/search/*` queries `vocabulary.db`; `/api/search_chars/` needs location context and has the wrong response shape; `/sql/query` is not a stable public FTS contract. No count, map, autocomplete, filter-option, FTS-rebuild, or database-selector endpoint is needed.
 
-~~~http
-GET /api/vocabulary/search/character-notes?q=<trimmed-query>&page=<1-based>&page_size=<1..200>
-~~~
+```http
+GET /api/vocabulary/notes?q=文白&search_fields=detail&page=1&page_size=50
+```
 
-~~~json
+```json
 {
   "items": [
     {
-      "id": 12345,
-      "location_name": "广州",
-      "character": "字",
-      "ipa": "tsiː33",
-      "notes": "文读"
+      "id": 519,
+      "location_name": "1883廈門",
+      "character": "□",
+      "ipa": "lo3",
+      "notes": "高,原文作“高”白读,应为训读"
     }
   ],
   "total": 1,
   "page": 1,
   "page_size": 50
 }
-~~~
+```
 
-The frontend relies on these rules:
+Request rules:
 
-- id is an opaque stable row identifier for Vue keys.
-- The endpoint searches notes only in dialects_user.db and excludes blank, _, and - notes.
-- total is the raw source-row count, not a deduplicated count.
-- The frontend sends only q, page, and page_size; it never sends vocabulary search_fields, locations, province, city, or standard_words.
-- A blank or whitespace-only q makes no request. The UI shows a dedicated enter-query state, preventing a request for roughly 1.49 million annotated rows.
-- The frontend accepts every non-empty trimmed query, including one and two CJK characters. It must not add a client-side minimum-length rule; the backend's character-token FTS index is responsible for those searches.
-- The frontend passes q unchanged after trim. The backend removes Unicode whitespace for note-query matching, so `文白` matches a stored `文 白`; the displayed annotation remains the literal response value.
+| Parameter | Rules |
+| --- | --- |
+| `q` | Required after outer trimming; blank is 400. `pronunciation` retains internal whitespace and uses literal escaped `LIKE`; `detail` removes every Unicode whitespace character and uses a quoted character-token FTS phrase. |
+| `search_fields` | Omitted, empty, or `all` means both fields. Valid values are repeated or comma-separated `pronunciation` and `detail`. Any other value is 400. |
+| `page` | One-based integer, at least 1. |
+| `page_size` | Integer 1–200, default 50. |
 
-## Confirmed Backend Whitespace Contract
+Response rules:
 
-The frontend deliberately does no character splitting or internal whitespace rewriting. The backend must remove Unicode whitespace from both the indexed `notes` text and the incoming query before character-token FTS matching. Therefore, a request with `q=文白` must return a row whose literal `notes` value is `文 白`; the response must not rewrite the stored annotation. Add this case to the backend endpoint's contract test before integrating Task 1.
+- Search only rows whose `註釋` is nonblank and not the sentinel `_` or `-`, even if an IPA query would otherwise match them.
+- For `detail`, turn a whitespace-normalized query such as `文白` into the FTS phrase `"文 白"`, since `rebuild_notes_fts` indexed every annotation as space-separated characters. Escape a literal double quote before constructing the phrase.
+- For `pronunciation`, escape `\\`, `%`, and `_` before `LIKE '%' || :ipa || '%' ESCAPE '\\'`; do not interpret user input as a wildcard.
+- When both fields are searched, use `UNION` of matched `notes.rowid` values, not `UNION ALL` and not a display-column `DISTINCT`. This prevents one source row from appearing twice while retaining different raw rows.
+- Return source order deterministically with `ORDER BY notes.rowid ASC`; compute `total` from the same matched-row CTE; return that `rowid` as `id`.
 
-## Boundary Conditions
+## File map
 
-- source=character-notes always wins over tab. A direct source=character-notes with tab=map/table is normalized with router.replace to tab=card.
-- `resolveViewModeFromRoute` returns card immediately when source=character-notes, before the router normalization completes. This prevents a map/table flash for a malformed deep link.
-- Switching off forces tab=card, closes the vocabulary search-field dropdown/modal and location/map-detail modals, invalidates any in-flight character-note request, and clears the character-note card region before the new request resolves.
-- Switching on removes source and retains tab=card. It does not erase stored vocabulary search fields or filters.
-- Vocabulary and character-note requests have separate entries, total, page, loading, error, active-request-key, and pending-request-map state.
-- A source response is ignored unless both its own request key is active and its source is still displayed.
-- Query changes reset character-note pagination to page 1. Character-note "load more" stays visible but disabled while its request is pending, and is visible only while loaded source rows are below that source's total.
-- In character-note mode, missing location_name, character, ipa, or notes must safely render as empty text. Location is not clickable because vocabulary_locations is a different dataset.
-- `id` is required by the backend contract. If a malformed response omits it, the UI uses a page-and-index fallback key solely to keep raw duplicate rows renderable; it never deduplicates data.
-- Long-note expansion, current glass-card primitives, Chinese/emoji text, and the aspect-ratio-only responsive convention remain unchanged.
+Backend repository: `/Users/jengzang/CodeProject/dialects/dialects-backend`
 
-## File Map
+- Create `app/service/vocabulary/notes.py` — isolated parameter validation, FTS/IPA SQL, and data mapping against `DIALECTS_DB_USER`.
+- Modify `app/schemas/vocabulary.py` — response item/list Pydantic models for the endpoint.
+- Modify `app/routes/vocabulary.py` — async `/notes` route using `run_in_threadpool` and the new service.
+- Modify `app/common/api_config.py` — exact public, rate-limited rule before generic `/api/vocabulary/*` policy.
+- Create `tests/test_vocabulary_notes.py` — temporary SQLite FTS fixture plus service behavior tests.
+- Modify `tests/test_vocabulary_routes.py` — route signature/registration and public-policy tests.
 
-- project/src/api/main/vocabulary.js — endpoint constant, JSDoc, path builder, client function.
-- project/src/api/index.js — re-export public API helpers.
-- project/src/main/router/menuRoutes.js — allow source on the vocabulary view.
-- project/src/main/views/menu/VocabularyPage.vue — hide parent navigation from route state.
-- project/src/main/views/explore/word/vocabulary/VocabularyTopControls.vue — switch and conditional vocabulary-only controls.
-- project/src/main/views/explore/word/vocabulary/VocabularyViewPage.vue — source state, cards, request isolation, pagination.
-- project/src/main/views/explore/word/vocabulary/vocabulary.scss — location-only card layout modifier only.
-- project/src/i18n/locales/zh-CN/words.json, project/src/i18n/locales/zh-Hant/words.json, project/src/i18n/locales/en/words.json — source labels and blank-query copy.
-- project/tests/vocabularyApi.test.js — URL/client helper contract.
-- project/tests/vocabularyCharacterNotesMode.test.js — route, UI wiring, raw-row mapping, and catalog source contracts.
+Frontend repository: `/Users/jengzang/CodeProject/dialects/dialects-vue-frontend`
 
----
+- Modify `project/src/api/main/vocabulary.js` — `/api/vocabulary/notes` query builder and client helper.
+- Modify `project/src/api/index.js` — helper re-export.
+- Modify `project/src/main/router/menuRoutes.js` — permit `source` on vocabulary route.
+- Modify `project/src/main/views/menu/VocabularyPage.vue` — hide only the parent tab navigation in note mode.
+- Modify `project/src/main/views/explore/word/vocabulary/VocabularyTopControls.vue` — source switch and source-specific search-field modal/filter visibility.
+- Modify `project/src/main/views/explore/word/vocabulary/VocabularyViewPage.vue` — source routing, isolated request state, card data mapping, and pagination.
+- Modify `project/src/main/views/explore/word/vocabulary/vocabulary.scss` — only the location-only card layout modifier.
+- Modify `project/src/i18n/locales/zh-CN/words.json`, `project/src/i18n/locales/zh-Hant/words.json`, and `project/src/i18n/locales/en/words.json` — new source and blank-query strings.
+- Modify `project/tests/vocabularyApi.test.js` and create or extend `project/tests/vocabularyCharacterNotesMode.test.js` — helper and source-mode contracts.
 
-### Task 1: Add the Character-Notes API Client
+## Task 1: Add and test the backend note-query service
 
 **Files:**
-- Modify: project/src/api/main/vocabulary.js
-- Modify: project/src/api/index.js
-- Modify: project/tests/vocabularyApi.test.js
 
-- [ ] **Step 1: Write the failing API test**
+- Create: `/Users/jengzang/CodeProject/dialects/dialects-backend/app/service/vocabulary/notes.py`
+- Create: `/Users/jengzang/CodeProject/dialects/dialects-backend/tests/test_vocabulary_notes.py`
 
-Import buildVocabularyCharacterNotesPath and getVocabularyCharacterNotes in project/tests/vocabularyApi.test.js, then add:
+- [ ] **Step 1: Write a temporary SQLite FTS5 fixture and failing service tests.**
 
-~~~js
-it('serializes one- and two-character character-note queries without vocabulary filters', async () => {
-  const path = buildVocabularyCharacterNotesPath({
-    q: '白',
-    page: 2,
-    page_size: 50,
-    locations: ['广州'],
-    search_fields: ['detail'],
-  })
-  const params = paramsFromPath(path)
+  In `tests/test_vocabulary_notes.py`, create a temporary `notes` table with the raw source column names and a contentless `notes_fts` table. Insert rows that deliberately cover source duplicates, whitespace annotations, an IPA-only match, `_`/`-` annotations, and a literal `%` IPA. Populate FTS with the same build invariant: `" ".join(note)`.
 
-  expect(path).toContain('/api/vocabulary/search/character-notes?')
-  expect(params.get('q')).toBe('白')
-  expect(params.get('page')).toBe('2')
-  expect(params.get('page_size')).toBe('50')
-  expect(params.has('locations')).toBe(false)
-  expect(params.has('search_fields')).toBe(false)
+  ```python
+  @pytest.fixture
+  def notes_db(tmp_path: Path) -> Path:
+      path = tmp_path / "dialects_user.db"
+      conn = sqlite3.connect(path)
+      conn.executescript("""
+          CREATE TABLE notes (簡稱 TEXT, 漢字 TEXT, 音節 TEXT, 註釋 TEXT);
+          CREATE VIRTUAL TABLE notes_fts USING fts5(註釋, content='', columnsize=0, tokenize='unicode61');
+      """)
+      rows = [
+          ("1883廈門", "□", "lo3", "文 白"),
+          ("1884廈門", "□", "lo3", "文 白"),
+          ("1901福州", "□", "pa%", "IPA only"),
+          ("skip-1", "□", "lo3", "_"),
+          ("skip-2", "□", "lo3", "-"),
+      ]
+      conn.executemany("INSERT INTO notes VALUES (?, ?, ?, ?)", rows)
+      for rowid, note in conn.execute("SELECT rowid, 註釋 FROM notes"):
+          conn.execute("INSERT INTO notes_fts(rowid, 註釋) VALUES (?, ?)", (rowid, " ".join(note)))
+      conn.commit()
+      conn.close()
+      return path
+  ```
 
-  apiMock.mockResolvedValueOnce({ items: [], total: 0, page: 1, page_size: 50 })
-  await getVocabularyCharacterNotes({ q: '文白' })
-  expect(apiMock).toHaveBeenLastCalledWith(
-    '/api/vocabulary/search/character-notes?q=%E6%96%87%E7%99%BD',
+  Write exact assertions for: `文白` and `文 白` both finding the first two literal `文 白` records; `pronunciation=lo3` excluding `_` and `-`; `pronunciation=pa%` not matching values merely containing `paX`; `all` returning one row when one row matches both fields; two identical-display source rows staying distinct; page 2 returning the stable next `rowid`; blank query and invalid fields raising `ValueError`.
+
+- [ ] **Step 2: Run the new tests and confirm they fail because the service module does not exist.**
+
+  ```bash
+  cd /Users/jengzang/CodeProject/dialects/dialects-backend
+  pytest tests/test_vocabulary_notes.py -q
+  ```
+
+  Expected: collection fails with `ModuleNotFoundError` for `app.service.vocabulary.notes`.
+
+- [ ] **Step 3: Implement the standalone query service.**
+
+  Define the supported fields, normalizers, response mapper, and public function in `notes.py`. Keep `DIALECTS_DB_USER` as a server-side argument/default resolved from the backend configuration; never accept a database name from the request.
+
+  ```python
+  SEARCH_FIELDS = frozenset({"pronunciation", "detail"})
+
+  def parse_search_fields(values: list[str] | None) -> set[str]:
+      parts = {part.strip() for value in values or [] for part in value.split(",") if part.strip()}
+      if not parts or parts == {"all"}:
+          return set(SEARCH_FIELDS)
+      if "all" in parts or not parts <= SEARCH_FIELDS:
+          raise ValueError("search_fields 仅支持 pronunciation、detail 或 all")
+      return parts
+
+  def normalize_detail_query(value: str) -> str:
+      normalized = "".join(char for char in value if not char.isspace())
+      if not normalized:
+          raise ValueError("q 不能为空")
+      return '"' + " ".join(normalized.replace('"', '""')) + '"'
+
+  def escape_like(value: str) -> str:
+      return value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+  ```
+
+  Build a `matched` CTE from selected branches. The detail branch must use `notes_fts MATCH :detail_phrase`; the IPA branch must use the escaped `LIKE`. Both must include the annotation validity predicate. Use `UNION` between branches. Execute a count query against `matched`, then retrieve the requested page by joining `notes` on `rowid`, ordered ascending. Return raw values with `or ""` only at response mapping time.
+
+  ```sql
+  WITH matched AS (
+      SELECT notes.rowid AS rowid FROM notes
+      JOIN notes_fts ON notes_fts.rowid = notes.rowid
+      WHERE notes_fts MATCH :detail_phrase
+        AND TRIM(COALESCE(notes.註釋, '')) NOT IN ('', '_', '-')
+      UNION
+      SELECT notes.rowid AS rowid FROM notes
+      WHERE notes.音節 LIKE '%' || :ipa || '%' ESCAPE '\\'
+        AND TRIM(COALESCE(notes.註釋, '')) NOT IN ('', '_', '-')
   )
-})
-~~~
+  SELECT notes.rowid, notes.簡稱, notes.漢字, notes.音節, notes.註釋
+  FROM matched JOIN notes ON notes.rowid = matched.rowid
+  ORDER BY notes.rowid ASC LIMIT :limit OFFSET :offset
+  ```
 
-- [ ] **Step 2: Confirm it fails**
+  Construct only the active branch/parameters rather than passing unused bindings. Use the same CTE text for `SELECT COUNT(*) FROM matched`, with no invalid unrestricted scan of the contentless FTS table.
 
-Run:
+- [ ] **Step 4: Run focused backend service tests, inspect the query behavior, and review the change.**
 
-~~~bash
-cd project
-npm test -- vocabularyApi.test.js
-~~~
+  ```bash
+  cd /Users/jengzang/CodeProject/dialects/dialects-backend
+  pytest tests/test_vocabulary_notes.py -q
+  git diff --check
+  git diff -- app/service/vocabulary/notes.py tests/test_vocabulary_notes.py
+  ```
 
-Expected: FAIL because the builder and client helper do not exist.
+  Expected: all fixture tests pass, and the diff contains no schema migration or FTS rebuild work.
 
-- [ ] **Step 3: Implement only the API surface**
+- [ ] **Step 5: Commit the isolated service step.**
 
-Add VOCABULARY_CHARACTER_NOTES_ENDPOINT next to the current vocabulary search endpoints. Define JSDoc types CharacterNotesQuery, CharacterNoteItem, and CharacterNotesResponse using the required backend contract. Add:
+  ```bash
+  cd /Users/jengzang/CodeProject/dialects/dialects-backend
+  git add app/service/vocabulary/notes.py tests/test_vocabulary_notes.py
+  git commit -m "feat: query vocabulary character notes"
+  ```
 
-~~~js
-export function buildVocabularyCharacterNotesPath(params = {}) {
-  return VOCABULARY_CHARACTER_NOTES_ENDPOINT + appendQueryParams({
-    q: params.q,
-    page: params.page,
-    page_size: params.page_size,
+## Task 2: Expose the one public backend endpoint
+
+**Files:**
+
+- Modify: `/Users/jengzang/CodeProject/dialects/dialects-backend/app/schemas/vocabulary.py`
+- Modify: `/Users/jengzang/CodeProject/dialects/dialects-backend/app/routes/vocabulary.py`
+- Modify: `/Users/jengzang/CodeProject/dialects/dialects-backend/app/common/api_config.py`
+- Modify: `/Users/jengzang/CodeProject/dialects/dialects-backend/tests/test_vocabulary_routes.py`
+
+- [ ] **Step 1: Add failing endpoint registration, contract, and policy tests.**
+
+  Extend `tests/test_vocabulary_routes.py` to assert the route is registered, its signature contains `q`, `search_fields`, `page`, and `page_size`, and `match_route_config("/api/vocabulary/notes")` is rate-limited but does not require login. Test a `TestClient` request with a blank `q` and with `search_fields=unknown` returns 400; override the service/database dependency or monkeypatch the service for the success-shape assertion.
+
+  ```python
+  def test_notes_api_config_is_public_but_rate_limited() -> None:
+      from app.service.logging.utils.route_matcher import match_route_config
+      config = match_route_config("/api/vocabulary/notes")
+      assert config["rate_limit"] is True
+      assert config["require_login"] is False
+
+  def test_main_routes_registers_notes_endpoint() -> None:
+      from app.main import app
+      assert "/api/vocabulary/notes" in {route.path for route in app.routes if getattr(route, "path", None)}
+  ```
+
+- [ ] **Step 2: Run the route tests and confirm the new assertions fail.**
+
+  ```bash
+  cd /Users/jengzang/CodeProject/dialects/dialects-backend
+  pytest tests/test_vocabulary_routes.py -q
+  ```
+
+  Expected: failures show the absent route and that generic `/api/vocabulary/*` still requires login.
+
+- [ ] **Step 3: Add Pydantic response models and the async route.**
+
+  Add models that exactly match the frontend contract:
+
+  ```python
+  class VocabularyNoteItemResponse(BaseModel):
+      id: int
+      location_name: str
+      character: str
+      ipa: str
+      notes: str
+
+  class VocabularyNotesResponse(BaseModel):
+      items: list[VocabularyNoteItemResponse]
+      total: int
+      page: int
+      page_size: int
+  ```
+
+  Import `run_in_threadpool`, `get_db_pool`, `DIALECTS_DB_USER`, `query_vocabulary_notes`, and `VocabularyNotesResponse`. Add this route outside `/search/*` using the exact endpoint name:
+
+  ```python
+  @router.get("/notes", response_model=VocabularyNotesResponse)
+  async def get_vocabulary_notes(
+      q: str = Query(...),
+      search_fields: list[str] | None = Query(default=None),
+      page: int = Query(1, ge=1),
+      page_size: int = Query(50, ge=1, le=200),
+  ):
+      try:
+          return await run_in_threadpool(
+              query_vocabulary_notes,
+              db_pool=get_db_pool(DIALECTS_DB_USER),
+              q=q,
+              search_fields=search_fields,
+              page=page,
+              page_size=page_size,
+          )
+      except ValueError as exc:
+          raise HTTPException(status_code=400, detail=str(exc)) from exc
+  ```
+
+  Add the exact-policy entry before the generic `/api/vocabulary/*` match in `api_config.py`:
+
+  ```python
+  "/api/vocabulary/notes": {
+      "rate_limit": True,
+      "require_login": False,
+      "log_params": True,
+      "log_body": False,
+  },
+  ```
+
+  Preserve the existing generic policy and all existing routes. The endpoint does not expose an admin/user database selector.
+
+- [ ] **Step 4: Run backend endpoint tests and inspect the complete backend diff.**
+
+  ```bash
+  cd /Users/jengzang/CodeProject/dialects/dialects-backend
+  pytest tests/test_vocabulary_notes.py tests/test_vocabulary_routes.py -q
+  git diff --check
+  git diff -- app/schemas/vocabulary.py app/routes/vocabulary.py app/common/api_config.py tests/test_vocabulary_routes.py
+  ```
+
+  Expected: contract/policy tests pass; `/api/vocabulary/notes` is public and rate limited while private vocabulary APIs retain their existing policy.
+
+- [ ] **Step 5: Commit the endpoint step with only its listed files.**
+
+  ```bash
+  cd /Users/jengzang/CodeProject/dialects/dialects-backend
+  git add app/schemas/vocabulary.py app/routes/vocabulary.py app/common/api_config.py tests/test_vocabulary_routes.py
+  git commit -m "feat: expose vocabulary notes search"
+  ```
+
+## Task 3: Add the frontend API client contract
+
+**Files:**
+
+- Modify: `project/src/api/main/vocabulary.js`
+- Modify: `project/src/api/index.js`
+- Modify: `project/tests/vocabularyApi.test.js`
+
+- [ ] **Step 1: Write failing URL/client tests.**
+
+  Add tests that request a one-character annotation query, a two-character IPA query, and a `search_fields` list. Assert the builder uses `/api/vocabulary/notes`, serializes only `q`, `search_fields`, `page`, and `page_size`, and does not serialize locations, province, city, or standard words.
+
+  ```js
+  it('builds notes requests without vocabulary-only filters', async () => {
+    const path = buildVocabularyNotesPath({
+      q: '文白', search_fields: ['detail'], page: 2, page_size: 50,
+      locations: ['广州'], standard_words: ['白'],
+    })
+    const params = paramsFromPath(path)
+    expect(path).toContain('/api/vocabulary/notes?')
+    expect(params.get('q')).toBe('文白')
+    expect(params.getAll('search_fields')).toEqual(['detail'])
+    expect(params.has('locations')).toBe(false)
+    expect(params.has('standard_words')).toBe(false)
   })
-}
+  ```
 
-export async function getVocabularyCharacterNotes(params = {}) {
-  try {
-    return await api(buildVocabularyCharacterNotesPath(params))
-  } catch (error) {
-    showError(error.message || '獲取字表註釋失敗')
-    throw error
+- [ ] **Step 2: Run the focused frontend API test and confirm it fails.**
+
+  ```bash
+  cd project
+  npm test -- vocabularyApi.test.js
+  ```
+
+  Expected: failure because `buildVocabularyNotesPath` and `getVocabularyNotes` do not exist.
+
+- [ ] **Step 3: Implement the smallest helper/export surface.**
+
+  Add `VOCABULARY_NOTES_ENDPOINT = '/api/vocabulary/notes'`, JSDoc response types, and the following builder/client alongside the existing vocabulary helpers. Reuse the repository's existing repeated-query serialization utility so `search_fields` follows the established vocabulary-search convention.
+
+  ```js
+  export function buildVocabularyNotesPath(params = {}) {
+    return VOCABULARY_NOTES_ENDPOINT + appendQueryParams({
+      q: params.q,
+      search_fields: params.search_fields,
+      page: params.page,
+      page_size: params.page_size,
+    })
   }
-}
-~~~
 
-Re-export both names from the vocabulary section of project/src/api/index.js. Do not alter existing API path builders.
-
-- [ ] **Step 4: Verify and review**
-
-Run:
-
-~~~bash
-cd project
-npm test -- vocabularyApi.test.js
-git diff --check
-git diff -- src/api/main/vocabulary.js src/api/index.js tests/vocabularyApi.test.js
-~~~
-
-Expected: test passes and the diff contains only the new helper/export/test.
-
-- [ ] **Step 5: Commit this reviewable API step**
-
-~~~bash
-git add project/src/api/main/vocabulary.js project/src/api/index.js project/tests/vocabularyApi.test.js
-git commit -m "feat: add character notes vocabulary API client"
-~~~
-
-### Task 2: Make Source State Routable and Hide Parent Navigation
-
-**Files:**
-- Modify: project/src/main/router/menuRoutes.js
-- Modify: project/src/main/views/menu/VocabularyPage.vue
-- Create: project/tests/vocabularyCharacterNotesMode.test.js
-
-- [ ] **Step 1: Write failing source-contract tests**
-
-Use the readFileSync test pattern from project/tests/vocabularyPageShell.test.js. Read the current files and assert:
-
-~~~js
-expect(menuRoutes).toContain("meta: { queryAllowlist: ['tab', 'source'] }")
-expect(vocabularyShell).toContain("route.query.source === 'character-notes'")
-expect(vocabularyShell).toContain('v-if="!isCharacterNotesMode"')
-expect(vocabularyShell).toContain('class="page-tab-navigation"')
-~~~
-
-- [ ] **Step 2: Confirm failure**
-
-~~~bash
-cd project
-npm test -- vocabularyCharacterNotesMode.test.js
-~~~
-
-Expected: FAIL because source is not allowlisted and the parent shell has no source state.
-
-- [ ] **Step 3: Implement the strict route state**
-
-Change the vocabulary view child route to:
-
-~~~js
-meta: { queryAllowlist: ['tab', 'source'] }
-~~~
-
-In VocabularyPage.vue define:
-
-~~~js
-const isCharacterNotesMode = computed(() => route.query.source === 'character-notes')
-~~~
-
-Wrap only the existing page-tab-navigation element with v-if="!isCharacterNotesMode". Do not move the page title, router view, permission loading, tab definitions, or existing viewModeQuery behavior. Unknown source values must keep the normal vocabulary shell.
-
-- [ ] **Step 4: Verify, review, and commit**
-
-~~~bash
-cd project
-npm test -- vocabularyCharacterNotesMode.test.js
-git diff --check
-git diff -- src/main/router/menuRoutes.js src/main/views/menu/VocabularyPage.vue tests/vocabularyCharacterNotesMode.test.js
-git add project/src/main/router/menuRoutes.js project/src/main/views/menu/VocabularyPage.vue project/tests/vocabularyCharacterNotesMode.test.js
-git commit -m "feat: hide vocabulary navigation for character notes"
-~~~
-
-Before committing, inspect git status and stage only the listed files.
-
-### Task 3: Add the Source Switch and Scope Top Controls
-
-**Files:**
-- Modify: project/src/main/views/explore/word/vocabulary/VocabularyTopControls.vue
-- Modify: project/tests/vocabularyCharacterNotesMode.test.js
-
-- [ ] **Step 1: Add failing top-control contracts**
-
-Add these assertions:
-
-~~~js
-expect(topControls).toContain('showVocabularySource: { type: Boolean, default: true }')
-expect(topControls).toContain("'update:showVocabularySource'")
-expect(topControls).toContain('v-model="showVocabularySourceModel"')
-expect(topControls).toContain('v-if="showVocabularySource"')
-expect(topControls).toContain(':placeholder="searchPlaceholder"')
-expect(topControls).toContain("active-text=\"t('words.wordList.sourceMode.vocabulary')\"")
-expect(topControls).toContain("inactive-text=\"t('words.wordList.sourceMode.characterNotes')\"")
-~~~
-
-- [ ] **Step 2: Confirm failure**
-
-~~~bash
-cd project
-npm test -- vocabularyCharacterNotesMode.test.js
-~~~
-
-Expected: FAIL because the source-switch prop, emit, and conditional rendering do not exist.
-
-- [ ] **Step 3: Implement the presentational control**
-
-Add this prop and computed bridge:
-
-~~~js
-showVocabularySource: { type: Boolean, default: true },
-~~~
-
-~~~js
-const showVocabularySourceModel = computed({
-  get: () => props.showVocabularySource,
-  set: (value) => emit('update:showVocabularySource', value),
-})
-~~~
-
-Add a source-aware input placeholder so the new catalog copy is used:
-
-~~~js
-const searchPlaceholder = computed(() => props.showVocabularySource
-  ? t('words.wordList.search.placeholder')
-  : t('words.wordList.characterNotes.placeholder'))
-~~~
-
-Add update:showVocabularySource to defineEmits. Put this existing shared component next to the textarea:
-
-~~~vue
-<SwitchToggle
-  v-model="showVocabularySourceModel"
-  :show-label="true"
-  :active-text="t('words.wordList.sourceMode.vocabulary')"
-  :inactive-text="t('words.wordList.sourceMode.characterNotes')"
-  :aria-label="t('words.wordList.sourceMode.ariaLabel')"
-  label-position="inside"
-  auto-width
-/>
-~~~
-
-Replace the textarea's existing placeholder binding with `:placeholder="searchPlaceholder"`. Use `v-if="showVocabularySource"` around the existing gear/location-details/modal group and the entire filter-strip. Keep the textarea and new switch outside those branches. Preserve composition handlers and the current delayed query emit. Add a watcher which closes `searchFieldModalOpen`, `locationDropdownOpen`, and `standardWordDropdownOpen` when the source becomes character-notes; it must not clear any vocabulary filter value, because those values resume when the switch is turned back on.
-
-If placement needs CSS, add only local layout glue such as a source-switch class. Retain scoped SCSS, the existing mixins import, shared SwitchToggle visuals, and the existing max-aspect-ratio portrait block; do not add a width breakpoint.
-
-- [ ] **Step 4: Verify, inspect text safety, and commit**
-
-~~~bash
-cd project
-npm test -- vocabularyCharacterNotesMode.test.js
-git diff --check
-git diff -- src/main/views/explore/word/vocabulary/VocabularyTopControls.vue tests/vocabularyCharacterNotesMode.test.js
-git add project/src/main/views/explore/word/vocabulary/VocabularyTopControls.vue project/tests/vocabularyCharacterNotesMode.test.js
-git commit -m "feat: add vocabulary source switch"
-~~~
-
-Confirm existing Chinese/emoji literal characters are byte-for-byte unaffected outside the intentional new i18n references.
-
-### Task 4: Implement Isolated Character-Note Cards and Pagination
-
-**Files:**
-- Modify: project/src/main/views/explore/word/vocabulary/VocabularyViewPage.vue
-- Modify: project/src/main/views/explore/word/vocabulary/vocabulary.scss
-- Modify: project/tests/vocabularyCharacterNotesMode.test.js
-
-- [ ] **Step 1: Add failing page contracts**
-
-Add source-level assertions:
-
-~~~js
-expect(viewPage).toContain('getVocabularyCharacterNotes')
-expect(viewPage).toContain("route.query.source === 'character-notes'")
-expect(viewPage).toContain("nextQuery.source = 'character-notes'")
-expect(viewPage).toContain("if (route.query.source === 'character-notes') return 'card'")
-expect(viewPage).toContain('function normalizeCharacterNoteEntry(item, index)')
-expect(viewPage).toContain("locationName: item.location_name ?? ''")
-expect(viewPage).toContain("headword: item.character ?? ''")
-expect(viewPage).toContain("pronunciation: item.ipa ?? ''")
-expect(viewPage).toContain("detail: item.notes ?? ''")
-expect(viewPage).toContain('activeCharacterNotesRequestKey')
-expect(viewPage).toContain('pendingCharacterNoteRequests')
-expect(viewPage).toContain('const activeCardEntries = computed')
-expect(viewPage).toContain('function loadMoreActiveCards()')
-expect(viewPage).toContain("t('words.wordList.characterNotes.enterQuery')")
-expect(vocabularyScss).toContain('.card-location-definition-pair--location-only')
-~~~
-
-- [ ] **Step 2: Confirm failure**
-
-~~~bash
-cd project
-npm test -- vocabularyCharacterNotesMode.test.js
-~~~
-
-Expected: FAIL because no character-note data path exists.
-
-- [ ] **Step 3: Add route-backed source state**
-
-Import getVocabularyCharacterNotes. In VocabularyViewPage.vue add:
-
-~~~js
-const isCharacterNotesMode = computed(() => route.query.source === 'character-notes')
-const showVocabularySource = computed({
-  get: () => !isCharacterNotesMode.value,
-  set: (showVocabulary) => {
-    const nextQuery = { ...route.query, tab: 'card' }
-    if (showVocabulary) {
-      delete nextQuery.source
-    } else {
-      nextQuery.source = 'character-notes'
+  export async function getVocabularyNotes(params = {}) {
+    try {
+      return await api(buildVocabularyNotesPath(params))
+    } catch (error) {
+      showError(error.message || '获取字表注释失败')
+      throw error
     }
-    router.replace({ query: nextQuery })
-  },
-})
-~~~
-
-Pass v-model:show-vocabulary-source="showVocabularySource" to VocabularyTopControls. Watch character-note route state. A direct character-note URL with a non-card tab must be replaced with card. On entry to character-note mode, close both location-detail and map-detail modals using their existing cleanup functions.
-
-Make the existing route resolver source-aware before it reads `tab` or session storage:
-
-~~~js
-function resolveViewModeFromRoute() {
-  if (route.query.source === 'character-notes') return 'card'
-  const tab = route.query.tab
-  // retain the current map/table/session-storage logic below this line
-}
-~~~
-
-When the switch setter writes the route, mutate the copied query exactly as follows so the test and implementation agree:
-
-~~~js
-const nextQuery = { ...route.query, tab: 'card' }
-if (showVocabulary) {
-  delete nextQuery.source
-} else {
-  nextQuery.source = 'character-notes'
-}
-router.replace({ query: nextQuery })
-~~~
-
-- [ ] **Step 4: Add completely separate request state**
-
-Leave existing vocabulary entries, map points, request keys, and pagination untouched. Add:
-
-~~~js
-const characterNoteEntries = ref([])
-const characterNotesTotal = ref(0)
-const characterNotesPage = ref(1)
-const characterNotesPageSize = ref(50)
-const isLoadingCharacterNotes = ref(false)
-const characterNotesError = ref('')
-const activeCharacterNotesRequestKey = ref('')
-const pendingCharacterNoteRequests = new Map()
-~~~
-
-Map response rows without changing their literal values:
-
-~~~js
-function normalizeCharacterNoteEntry(item, index) {
-  const responseId = item?.id ?? `${characterNotesPage.value}:${index}`
-  return {
-    id: `character-note:${responseId}`,
-    definition: '',
-    headword: item.character ?? '',
-    pronunciation: item.ipa ?? '',
-    detail: item.notes ?? '',
-    information: '',
-    locationName: item.location_name ?? '',
-    location: item.location_name ?? '',
   }
-}
-~~~
+  ```
 
-Create requestCharacterNotes and loadCharacterNotes with source-specific request keys based only on trimmed q, page, and pageSize. Use this shape; do not reuse the vocabulary query builder because it could later leak filters into the note endpoint:
+  Re-export both functions from `project/src/api/index.js`. Do not modify an existing path builder.
 
-~~~js
-function buildCharacterNotesParams(pageNumber) {
-  return {
-    q: query.value.trim(),
-    page: pageNumber,
-    page_size: characterNotesPageSize.value,
-  }
-}
+- [ ] **Step 4: Verify and review the frontend API-only diff.**
 
-function buildCharacterNotesRequestKey(params) {
-  return `character-notes:${JSON.stringify([params.q, params.page, params.page_size])}`
-}
+  ```bash
+  cd project
+  npm test -- vocabularyApi.test.js
+  git diff --check
+  git diff -- src/api/main/vocabulary.js src/api/index.js tests/vocabularyApi.test.js
+  ```
 
-async function requestCharacterNotes(params) {
-  const requestKey = buildCharacterNotesRequestKey(params)
-  if (pendingCharacterNoteRequests.has(requestKey)) {
-    return pendingCharacterNoteRequests.get(requestKey)
-  }
-  const requestPromise = getVocabularyCharacterNotes(params)
-    .finally(() => pendingCharacterNoteRequests.delete(requestKey))
-  pendingCharacterNoteRequests.set(requestKey, requestPromise)
-  return requestPromise
-}
-~~~
+  Expected: test passes and the output contains no change to existing vocabulary request URLs.
 
-`loadCharacterNotes({ append = false } = {})` must:
+- [ ] **Step 5: Commit the frontend API client step.**
 
-1. Make no API request for blank q; clear only character-note cards/total/loading/error and select the enter-query state.
-2. Reset page to 1 and clear only character-note cards for a new non-append query.
-3. Call getVocabularyCharacterNotes with q, page, and page_size only.
-4. Clear `activeCharacterNotesRequestKey` before returning for a blank query and before leaving the source, so an old response cannot repopulate the cleared panel.
-5. Ignore a result/error unless its request key is still active and isCharacterNotesMode is true.
-6. Normalize raw rows, append only for load-more, and update only character-notes total/page/pageSize/error/loading. Use `Math.max(Number(response.total) || 0, characterNoteEntries.value.length)` as the displayed total so a malformed smaller total cannot offer a duplicate page.
+  ```bash
+  git add project/src/api/main/vocabulary.js project/src/api/index.js project/tests/vocabularyApi.test.js
+  git commit -m "feat: add vocabulary notes API client"
+  ```
 
-Create the following source-aware computed values and leave the existing `entries`, `total`, `page`, and `loadError` vocabulary refs intact:
-
-~~~js
-const isCharacterNotesQueryEmpty = computed(() => !query.value.trim())
-const activeCardEntries = computed(() => isCharacterNotesMode.value ? characterNoteEntries.value : entries.value)
-const activeCardError = computed(() => isCharacterNotesMode.value ? characterNotesError.value : loadError.value)
-const isActiveCardInitialLoading = computed(() => isCharacterNotesMode.value
-  ? isLoadingCharacterNotes.value && !characterNoteEntries.value.length && !characterNotesError.value
-  : isInitialLoading.value)
-const canLoadMoreActiveCards = computed(() => isCharacterNotesMode.value
-  ? characterNoteEntries.value.length < characterNotesTotal.value
-  : canLoadMore.value)
-const isLoadingMoreActiveCards = computed(() => isCharacterNotesMode.value
-  ? isLoadingCharacterNotes.value && characterNoteEntries.value.length > 0
-  : isLoadingMore.value)
-
-function loadMoreActiveCards() {
-  return isCharacterNotesMode.value
-    ? loadCharacterNotes({ append: true })
-    : loadVocabularyItems({ append: true })
-}
-~~~
-
-All `shouldUseVocabulary*Api` predicates must start with `!isCharacterNotesMode.value && ...`; map/table templates and their state calculations must continue to use vocabulary state only.
-
-- [ ] **Step 5: Render the card data without a second visual system**
-
-Replace only the card-state and card-loop bindings as follows: use `isActiveCardInitialLoading`, `activeCardError`, and `activeCardEntries`; put the `isCharacterNotesMode && isCharacterNotesQueryEmpty` enter-query branch before the generic no-data branch; bind the load-more button to `canLoadMoreActiveCards`, `isLoadingMoreActiveCards`, and `loadMoreActiveCards`.
-
-In the existing card loop, preserve the vocabulary location button and add this mutually exclusive static label for character-note rows. The `pill-btn` class gives the unchanged shared pill treatment but a `span` cannot invoke `openLocationDetails`:
-
-~~~vue
-<div
-  class="card-location-definition-pair"
-  :class="{ 'card-location-definition-pair--location-only': !entry.definition }"
->
-  <template v-if="isCharacterNotesMode">
-    <span class="card-location pill-btn card-location-pill" :title="entry.locationName">
-      <span class="card-location-pill-text">{{ entry.locationName }}</span>
-    </span>
-  </template>
-  <button
-    v-else
-    class="card-location pill-btn card-location-pill"
-    type="button"
-    :title="entry.locationName"
-    @click="openLocationDetails(entry.locationName)"
-  >
-    <span class="card-location-pill-text">{{ entry.locationName }}</span>
-  </button>
-  <span v-if="entry.definition" class="card-definition">{{ entry.definition }}</span>
-</div>
-~~~
-
-Render definition only when entry.definition is non-empty, and apply a modifier class when it is absent. Preserve current IPA/word markup, note-preview length, note-toggle SVG, empty/error/loading cards, and glass-card primitives.
-
-Add only this local layout rule:
-
-~~~scss
-.card-location-definition-pair--location-only {
-  grid-template-rows: auto;
-}
-~~~
-
-Do not hardcode colors, create a separate card component, alter shared glass-card styling, or alter map/table templates.
-
-- [ ] **Step 6: Wire lifecycle and watchers exactly once per source**
-
-Add `hasLoadedVocabularyLocationOptions` so a valid empty location list is also cached, but a failed request is retried when the user returns to vocabulary mode. On mount, call `loadVocabularyLocationOptions` only when the source is vocabulary. When returning to vocabulary source, await that helper only if it has not loaded, then execute the existing vocabulary branch.
-
-Keep the following watcher ownership so a source change and a forced card tab do not invoke duplicate request paths:
-
-1. `watch(viewMode, ...)` loads only when `!isCharacterNotesMode.value`.
-2. `watch(isCharacterNotesMode, ...)` closes the two detail modals, clears/invalidate character-note state, normalizes `tab` to card, and invokes `loadCharacterNotes()` when entering. When leaving, it invalidates the character-note request key, lazily loads vocabulary locations if required, then calls `loadActiveViewMode()`.
-3. The existing `watch(() => route.query.tab, ...)` resolves to card while the character-note source is active.
-4. The debounced query/filter watcher calls `loadCharacterNotes()` only in character-note mode; otherwise it retains the existing vocabulary/map branches. Do not involve character-note source in standard-word or map watchers.
-
-Implement that ownership with the existing modal-clear helpers and the following functions. `resetCharacterNoteResults` intentionally does not touch vocabulary state:
-
-~~~js
-const hasLoadedVocabularyLocationOptions = ref(false)
-
-async function ensureVocabularyLocationOptions() {
-  if (hasLoadedVocabularyLocationOptions.value) return
-  hasLoadedVocabularyLocationOptions.value = await loadVocabularyLocationOptions()
-}
-
-function resetCharacterNoteResults() {
-  activeCharacterNotesRequestKey.value = ''
-  characterNoteEntries.value = []
-  characterNotesTotal.value = 0
-  characterNotesPage.value = 1
-  characterNotesError.value = ''
-  isLoadingCharacterNotes.value = false
-}
-
-function normalizeCharacterNotesRoute() {
-  if (!isCharacterNotesMode.value || route.query.tab === 'card') return
-  router.replace({ query: { ...route.query, tab: 'card' } })
-}
-
-onMounted(async () => {
-  normalizeCharacterNotesRoute()
-  if (!isCharacterNotesMode.value) {
-    await ensureVocabularyLocationOptions()
-  }
-  loadActiveViewMode()
-})
-
-watch(isCharacterNotesMode, async (isCharacterNotes) => {
-  if (isCharacterNotes) {
-    viewMode.value = 'card'
-    normalizeCharacterNotesRoute()
-    isLocationDetailsModalOpen.value = false
-    clearLocationDetailsModal()
-    isMapDetailModalOpen.value = false
-    clearMapDetailModal()
-    resetCharacterNoteResults()
-    loadCharacterNotes()
-    return
-  }
-
-  activeCharacterNotesRequestKey.value = ''
-  await ensureVocabularyLocationOptions()
-  loadActiveViewMode()
-})
-~~~
-
-Make the existing `loadVocabularyLocationOptions` return `true` after assigning a successful response (including `[]`) and `false` after its existing catch assigns `[]`. Update the relevant existing watchers to these branch conditions:
-
-~~~js
-watch(viewMode, () => {
-  if (!isCharacterNotesMode.value) loadActiveViewMode()
-})
-
-watch(() => route.query.tab, (tab) => {
-  const nextMode = isCharacterNotesMode.value
-    ? 'card'
-    : (tab ? normalizeViewMode(tab) : resolveViewModeFromRoute())
-  if (viewMode.value !== nextMode) viewMode.value = nextMode
-})
-
-watchDebounced([query, selectedSearchFields, selectedLocations, filterByRegion, selectedProvince, selectedCity], async () => {
-  if (isCharacterNotesMode.value) return loadCharacterNotes()
-  if (shouldUseVocabularyItemsApi()) return loadVocabularyItems()
-  if (shouldUseVocabularyMapPointsApi() || shouldUseVocabularyMapItemsApi()) {
-    return refreshVocabularyMapData()
-  }
-}, { debounce: 250, maxWait: 800 })
-~~~
-
-With those guards, use this exclusive active loader:
-
-~~~js
-function loadActiveViewMode() {
-  if (isCharacterNotesMode.value) {
-    return loadCharacterNotes()
-  }
-  if (shouldUseVocabularyItemsApi()) {
-    return loadVocabularyItems()
-  }
-  if (shouldUseVocabularyMapPointsApi() || shouldUseVocabularyMapItemsApi()) {
-    return refreshVocabularyMapData()
-  }
-}
-~~~
-
-- [ ] **Step 7: Verify and commit the page step**
-
-~~~bash
-cd project
-npm test -- vocabularyCharacterNotesMode.test.js vocabularyApi.test.js
-git diff --check
-git diff -- src/main/views/explore/word/vocabulary/VocabularyViewPage.vue src/main/views/explore/word/vocabulary/vocabulary.scss tests/vocabularyCharacterNotesMode.test.js
-git add project/src/main/views/explore/word/vocabulary/VocabularyViewPage.vue project/src/main/views/explore/word/vocabulary/vocabulary.scss project/tests/vocabularyCharacterNotesMode.test.js
-git commit -m "feat: show character note cards in vocabulary view"
-~~~
-
-Review that map/table behavior has not changed, response races are source-safe, styles remain scoped SCSS, no width media query exists, and no Chinese/emoji corruption appears.
-
-### Task 5: Add Copy and Run Final Frontend Verification
+## Task 4: Make character-note mode routable and card-only
 
 **Files:**
-- Modify: project/src/i18n/locales/zh-CN/words.json
-- Modify: project/src/i18n/locales/zh-Hant/words.json
-- Modify: project/src/i18n/locales/en/words.json
-- Modify: project/tests/vocabularyCharacterNotesMode.test.js
 
-- [ ] **Step 1: Add failing catalog checks**
+- Modify: `project/src/main/router/menuRoutes.js`
+- Modify: `project/src/main/views/menu/VocabularyPage.vue`
+- Modify: `project/src/main/views/explore/word/vocabulary/VocabularyViewPage.vue`
+- Create or modify: `project/tests/vocabularyCharacterNotesMode.test.js`
 
-Parse each locale JSON in vocabularyCharacterNotesMode.test.js and assert these keys exist at that file's root object (the locale loader supplies the `words` namespace):
+- [ ] **Step 1: Write failing route-mode contract tests.**
 
-~~~js
-for (const locale of ['zh-CN', 'zh-Hant', 'en']) {
-  const words = JSON.parse(readSource('src/i18n/locales/' + locale + '/words.json'))
-  expect(words.wordList.sourceMode.vocabulary).toBeTruthy()
-  expect(words.wordList.sourceMode.characterNotes).toBeTruthy()
-  expect(words.wordList.sourceMode.ariaLabel).toBeTruthy()
-  expect(words.wordList.characterNotes.placeholder).toBeTruthy()
-  expect(words.wordList.characterNotes.enterQuery).toBeTruthy()
-}
-~~~
+  Assert the router allowlist includes exactly both `tab` and `source`; the parent page derives `route.query.source === 'character-notes'` and conditionally hides only `page-tab-navigation`; and the view page resolves character-note mode to `card` before normal `tab` logic.
 
-- [ ] **Step 2: Confirm failure**
+  ```js
+  expect(menuRoutes).toContain("queryAllowlist: ['tab', 'source']")
+  expect(vocabularyPage).toContain("route.query.source === 'character-notes'")
+  expect(vocabularyPage).toContain('v-if="!isCharacterNotesMode"')
+  expect(vocabularyViewPage).toContain("if (isCharacterNotesMode.value) return 'card'")
+  ```
 
-~~~bash
-cd project
-npm test -- vocabularyCharacterNotesMode.test.js
-~~~
+- [ ] **Step 2: Run the source-mode test and confirm it fails.**
 
-Expected: FAIL because the catalog entries are absent.
+  ```bash
+  cd project
+  npm test -- vocabularyCharacterNotesMode.test.js
+  ```
 
-- [ ] **Step 3: Add exactly the required copy**
+  Expected: assertions fail before the new route state exists.
 
-Within each existing `wordList` object, add `sourceMode` and `characterNotes` keys. Use these values:
+- [ ] **Step 3: Implement the strict, backward-compatible route behavior.**
 
-~~~json
-{
-  "sourceMode": {
-    "vocabulary": "词表",
-    "characterNotes": "字表注释",
-    "ariaLabel": "数据来源"
-  },
-  "characterNotes": {
-    "placeholder": "搜索字表注释",
-    "enterQuery": "请输入字表注释进行搜索"
+  In `menuRoutes.js`, change only the vocabulary child allowlist to `['tab', 'source']`. In `VocabularyPage.vue`, add:
+
+  ```js
+  const isCharacterNotesMode = computed(() => route.query.source === 'character-notes')
+  ```
+
+  Add `v-if="!isCharacterNotesMode"` to the existing `.page-tab-navigation` element only. Do not move the title, router view, permission loading, or existing tab metadata.
+
+  In `VocabularyViewPage.vue`, define the same computed source test. Make `resolveViewModeFromRoute()` return `'card'` before reading `route.query.tab` when it is true. The source-switch handler uses `router.push` to set/remove `source` and set `tab=card`; a route watcher uses `router.replace` only to normalize malformed `source=character-notes&tab=map` or `table`, retaining every unrelated allowlisted query. Unknown `source` values retain existing behavior.
+
+- [ ] **Step 4: Verify, inspect, and commit this routing-only step.**
+
+  ```bash
+  cd project
+  npm test -- vocabularyCharacterNotesMode.test.js
+  git diff --check
+  git diff -- src/main/router/menuRoutes.js src/main/views/menu/VocabularyPage.vue src/main/views/explore/word/vocabulary/VocabularyViewPage.vue tests/vocabularyCharacterNotesMode.test.js
+  git add project/src/main/router/menuRoutes.js project/src/main/views/menu/VocabularyPage.vue project/src/main/views/explore/word/vocabulary/VocabularyViewPage.vue project/tests/vocabularyCharacterNotesMode.test.js
+  git commit -m "feat: add vocabulary character notes route mode"
+  ```
+
+## Task 5: Add the source switch and split the search-field controls
+
+**Files:**
+
+- Modify: `project/src/main/views/explore/word/vocabulary/VocabularyTopControls.vue`
+- Modify: `project/src/main/views/explore/word/vocabulary/VocabularyViewPage.vue`
+- Modify: `project/tests/vocabularyCharacterNotesMode.test.js`
+
+- [ ] **Step 1: Write failing top-control contracts.**
+
+  Cover an explicit default-on `showVocabularySource` prop/emitter bridge, the two source-specific field option arrays, and vocabulary-only conditional controls. Assert the character-note options are `pronunciation` and `detail`, while the current vocabulary options remain present.
+
+  ```js
+  expect(topControls).toContain('showVocabularySource: { type: Boolean, default: true }')
+  expect(topControls).toContain("'update:showVocabularySource'")
+  expect(topControls).toContain('v-model="showVocabularySourceModel"')
+  expect(topControls).toContain("value: 'pronunciation'")
+  expect(topControls).toContain("value: 'detail'")
+  expect(topControls).toContain('v-if="showVocabularySource"')
+  ```
+
+- [ ] **Step 2: Run the focused test and confirm the switch/field contracts fail.**
+
+  ```bash
+  cd project
+  npm test -- vocabularyCharacterNotesMode.test.js
+  ```
+
+  Expected: source prop, note field list, and source-specific visibility do not yet exist.
+
+- [ ] **Step 3: Implement the UI behavior without resetting vocabulary state.**
+
+  Add `showVocabularySource` prop/default and an `update:showVocabularySource` computed bridge in `VocabularyTopControls.vue`. Keep the gear visible. Make its model/options source-aware:
+
+  ```js
+  const noteSearchFieldOptions = computed(() => [
+    { value: 'pronunciation', label: t('words.wordList.search.fields.pronunciation') },
+    { value: 'detail', label: t('words.wordList.search.fields.notes') },
+  ])
+  const displayedSearchFieldOptions = computed(() =>
+    props.showVocabularySource ? searchFieldOptions.value : noteSearchFieldOptions.value,
+  )
+  ```
+
+  Bind the gear to a source-specific `selectedCharacterNoteSearchFields` model when off. Reuse the existing final-uncheck behavior that emits `[]` to mean all fields. Retain a separate `vocabulary_notes_search_fields` local-storage value; do not overwrite the existing vocabulary search-fields key. On read, filter saved values against `noteSearchFieldOptions`; malformed, unknown, or non-array storage falls back to `[]`.
+
+  Conditionalize only the location-details button, region-mode section, standard-word section, and external filter strip on `showVocabularySource`. The search input and gear remain visible in both modes. The parent passes `showVocabularySource="!isCharacterNotesMode"`; when its value changes, close the field selector and location/map detail modals, then update only `source`/`tab=card`, preserving existing vocabulary filters in memory.
+
+- [ ] **Step 4: Verify controls and inspect source-scoped template/style changes.**
+
+  ```bash
+  cd project
+  npm test -- vocabularyCharacterNotesMode.test.js
+  git diff --check
+  git diff -- src/main/views/explore/word/vocabulary/VocabularyTopControls.vue src/main/views/explore/word/vocabulary/VocabularyViewPage.vue tests/vocabularyCharacterNotesMode.test.js
+  ```
+
+  Expected: only requested controls hide; the modal still exposes two selectable note fields when source is off.
+
+- [ ] **Step 5: Commit the source-control step.**
+
+  ```bash
+  git add project/src/main/views/explore/word/vocabulary/VocabularyTopControls.vue project/src/main/views/explore/word/vocabulary/VocabularyViewPage.vue project/tests/vocabularyCharacterNotesMode.test.js
+  git commit -m "feat: add character notes source controls"
+  ```
+
+## Task 6: Add isolated character-note requests, cards, and pagination
+
+**Files:**
+
+- Modify: `project/src/main/views/explore/word/vocabulary/VocabularyViewPage.vue`
+- Modify: `project/src/main/views/explore/word/vocabulary/vocabulary.scss`
+- Modify: `project/tests/vocabularyCharacterNotesMode.test.js`
+
+- [ ] **Step 1: Write failing source-state/card contracts.**
+
+  Add tests that assert a dedicated `characterNoteEntries`, `characterNoteTotal`, `characterNotePage`, `characterNoteLoadError`, `characterNoteActiveRequestKey`, and `characterNotePendingRequestMap`; a `getVocabularyNotes` call with only API-supported parameters; the static location label in note mode; IPA rendering; no definition row; and the location-only layout modifier.
+
+  ```js
+  expect(vocabularyViewPage).toContain('const characterNoteEntries = ref([])')
+  expect(vocabularyViewPage).toContain('getVocabularyNotes({')
+  expect(vocabularyViewPage).toContain('search_fields: selectedCharacterNoteSearchFields.value')
+  expect(vocabularyViewPage).toContain('class="card-location pill-btn card-location-pill"')
+  expect(vocabularyViewPage).toContain('card-location-definition-pair--location-only')
+  expect(vocabularyScss).toContain('.card-location-definition-pair--location-only')
+  ```
+
+- [ ] **Step 2: Run the test and confirm it fails before request isolation exists.**
+
+  ```bash
+  cd project
+  npm test -- vocabularyCharacterNotesMode.test.js
+  ```
+
+  Expected: assertions for dedicated note state, API call, and card modifier fail.
+
+- [ ] **Step 3: Implement isolated note state and stale-response protection.**
+
+  Keep all existing vocabulary refs and map/table predicates intact. Add independent note refs plus a request key and a pending-request map. The request function must trim only outer whitespace, skip if blank, set page 1 for query/field changes, and call exactly:
+
+  ```js
+  await getVocabularyNotes({
+    q: normalizedQuery,
+    search_fields: selectedCharacterNoteSearchFields.value,
+    page: requestedPage,
+    page_size: PAGE_SIZE,
+  })
+  ```
+
+  Do not send locations, province, city, or standard words. Before committing a response, check both `characterNoteActiveRequestKey.value === requestKey` and `isCharacterNotesMode.value`; otherwise discard it. On source switch or blank query, invalidate the active key and clear only note entries/total/page/error. A load-more request appends returned `items` exactly as received; it must not use a `Set`, keyed data merge, or display-value deduplication.
+
+  Ensure every existing `shouldUseVocabulary*Api` predicate includes `!isCharacterNotesMode.value`. Also guard the initial and source-change calls to `loadVocabularyLocationOptions`, so a direct character-note deep link does not fetch vocabulary filter data. This prevents vocabulary card/map/table/location-option requests from running in note mode or updating its UI. Keep note load-more visible only when `entries.length < total`, disabled while its own request is pending.
+
+  Render raw rows through the existing card primitives. In note mode, use a static `<span class="card-location pill-btn card-location-pill">` instead of the vocabulary location button; render `item.character`, `item.ipa`, and the existing expandable note area; conditionally omit the definition row. Vue keys use `item.id ?? `${page}-${index}`` only as a malformed-response fallback, never as a dedupe key.
+
+  Add only this scoped SCSS layout correction (with the required mixin import left in place):
+
+  ```scss
+  .card-location-definition-pair--location-only {
+    grid-template-rows: auto;
   }
-}
-~~~
+  ```
 
-Use established Traditional Chinese equivalents: 詞表, 字表註釋, 資料來源, 搜尋字表註釋, 請輸入字表註釋進行搜尋. Use English: Vocabulary, Character Notes, Data source, Search character notes, Enter character notes to search. Do not rewrite adjacent translations.
+  Preserve all existing shared card visuals, long-note expansion, Chinese strings, emojis, and aspect-ratio-based responsive styling.
 
-- [ ] **Step 4: Run all final checks**
+- [ ] **Step 4: Verify logic contracts, run the build, and review encoding/style scope.**
 
-~~~bash
-cd project
-npm test -- vocabularyCharacterNotesMode.test.js vocabularyApi.test.js
-npm run lint
-npx vite build
-~~~
+  ```bash
+  cd project
+  npm test -- vocabularyCharacterNotesMode.test.js vocabularyApi.test.js
+  npm run build
+  git diff --check
+  git diff -- src/main/views/explore/word/vocabulary/VocabularyViewPage.vue src/main/views/explore/word/vocabulary/vocabulary.scss tests/vocabularyCharacterNotesMode.test.js
+  ```
 
-Expected: all commands exit 0. Use npx vite build rather than npm run build so verification does not regenerate the user-owned sitemap.
+  Expected: tests and build pass. Review confirms raw duplicate preservation, IPA display, no location click in note mode, and no width-based media query or unrelated visual change.
 
-- [ ] **Step 5: Final code review and commit**
+- [ ] **Step 5: Commit the cards/request step.**
 
-~~~bash
-git diff --check
-git diff -- project/src/i18n/locales/zh-CN/words.json project/src/i18n/locales/zh-Hant/words.json project/src/i18n/locales/en/words.json project/tests/vocabularyCharacterNotesMode.test.js
-git status --short
-git add project/src/i18n/locales/zh-CN/words.json project/src/i18n/locales/zh-Hant/words.json project/src/i18n/locales/en/words.json project/tests/vocabularyCharacterNotesMode.test.js
-git commit -m "feat: localize character notes vocabulary search"
-~~~
+  ```bash
+  git add project/src/main/views/explore/word/vocabulary/VocabularyViewPage.vue project/src/main/views/explore/word/vocabulary/vocabulary.scss project/tests/vocabularyCharacterNotesMode.test.js
+  git commit -m "feat: render vocabulary character note cards"
+  ```
 
-Before staging, explicitly confirm that pre-existing user changes in project/public/sitemap.xml, project/src/api/main/toponyms.js, project/src/main/router.js, project/src/main/router/exploreRoutes.js, and the unrelated existing plan are not staged.
+## Task 7: Add translations and perform end-to-end verification
 
-## Final Acceptance Checklist
+**Files:**
 
-- /menu/vocabulary/view?tab=card starts in the unchanged vocabulary card experience with the switch on.
-- Turning the switch off produces source=character-notes with tab=card, hides page-tab-navigation and all vocabulary-only controls, and leaves only input plus switch.
-- Blank input shows the dedicated prompt and makes no character-note request.
-- One- and two-character queries use the existing IME-safe/debounced flow and render every returned row as location, character, IPA, and note.
-- A `文白` query returns annotations such as the literal `文 白`; the frontend does not change the returned spacing.
-- Long-note expansion works in both sources. Source switching cannot leave stale cards, a late response, a location modal, a map, or a table visible in character-note mode.
-- Returning to vocabulary removes source, restores navigation/controls, and preserves current vocabulary API/map/table behavior.
-- Deep links with character-notes plus map/table normalize to card.
-- Focused tests, lint, Vite build, diff review, and Chinese/emoji encoding checks pass.
+- Modify: `project/src/i18n/locales/zh-CN/words.json`
+- Modify: `project/src/i18n/locales/zh-Hant/words.json`
+- Modify: `project/src/i18n/locales/en/words.json`
+- Modify: `project/tests/vocabularyCharacterNotesMode.test.js`
+
+- [ ] **Step 1: Add failing locale-key tests.**
+
+  Assert each locale contains the same keys under `words.wordList.sourceMode` for `vocabulary`, `characterNotes`, and `enterCharacterNoteQuery`. Include a test that selecting the two note fields creates an API request containing only `pronunciation` and `detail` values rather than vocabulary field names.
+
+- [ ] **Step 2: Run locale/source tests and confirm they fail.**
+
+  ```bash
+  cd project
+  npm test -- vocabularyCharacterNotesMode.test.js
+  ```
+
+  Expected: new locale keys and source-mode behavior are not yet fully covered.
+
+- [ ] **Step 3: Add literal translations without rewriting existing copy.**
+
+  Add only these source-mode values in the three locale files:
+
+  ```json
+  {
+    "sourceMode": {
+      "vocabulary": "词表",
+      "characterNotes": "字表注释",
+      "enterCharacterNoteQuery": "请输入音标或注释进行搜索"
+    }
+  }
+  ```
+
+  Use the established Traditional Chinese and English equivalents in their respective files. Keep all current locale content byte-for-byte unchanged outside the inserted keys.
+
+- [ ] **Step 4: Run complete automated verification and inspect every changed file.**
+
+  ```bash
+  cd /Users/jengzang/CodeProject/dialects/dialects-backend
+  pytest tests/test_vocabulary_notes.py tests/test_vocabulary_routes.py -q
+  cd /Users/jengzang/CodeProject/dialects/dialects-vue-frontend/project
+  npm test -- vocabularyApi.test.js vocabularyCharacterNotesMode.test.js
+  npm run build
+  cd /Users/jengzang/CodeProject/dialects/dialects-vue-frontend
+  git diff --check
+  git diff -- project/src/i18n/locales/zh-CN/words.json project/src/i18n/locales/zh-Hant/words.json project/src/i18n/locales/en/words.json project/tests/vocabularyCharacterNotesMode.test.js
+  ```
+
+  Then manually verify these URLs and interactions against a backend containing the `notes` endpoint:
+
+  1. `/vocabulary/view?tab=card` opens unchanged with the switch on.
+  2. Switching off changes to `?tab=card&source=character-notes`, hides parent tabs and vocabulary-only filters, and leaves the gear with only IPA/annotation fields.
+  3. Direct `/vocabulary/view?source=character-notes&tab=map` settles to card mode without a map flash.
+  4. `文白` and `文 白` both return the stored `文 白` annotation; result cards show location, character, IPA, and literal note text.
+  5. IPA-only search works; `_` and `-` source annotations do not appear.
+  6. A page with duplicate display values renders every raw source row; a new query/source switch while a request is pending cannot show stale results.
+  7. A blank query sends no request and shows the prompt; switching back restores the untouched vocabulary filters and field selection.
+
+- [ ] **Step 5: Commit the translations and final test contracts.**
+
+  ```bash
+  git add project/src/i18n/locales/zh-CN/words.json project/src/i18n/locales/zh-Hant/words.json project/src/i18n/locales/en/words.json project/tests/vocabularyCharacterNotesMode.test.js
+  git commit -m "feat: localize vocabulary character notes mode"
+  ```
+
+## Final review checklist
+
+- [ ] The only new public backend route is `GET /api/vocabulary/notes`; it is public/rate-limited by an exact rule and never selects the database from client input.
+- [ ] Annotation search uses existing `notes_fts`, including one- and two-character queries and Unicode-whitespace normalization; IPA search is literal and escaped.
+- [ ] Both configured fields use a rowid `UNION`, raw duplicate records are retained, pagination and total derive from the same matched CTE, and output order is stable.
+- [ ] In character-note mode IPA is displayed, the definition row is absent, location is non-clickable, the parent tab navigation is hidden, and map/table are impossible.
+- [ ] The notes source's state and `localStorage` fields are isolated from the existing vocabulary source; all current vocabulary APIs are excluded while character-note mode is active.
+- [ ] The final diff contains no unrelated router, sitemap, toponym API, locale, style, Chinese-text, emoji, or encoding changes. Inspect both staged and unstaged work before every commit so pre-existing user modifications remain outside this work.
