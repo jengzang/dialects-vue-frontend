@@ -53,11 +53,11 @@ The frontend relies on these rules:
 - The frontend sends only q, page, and page_size; it never sends vocabulary search_fields, locations, province, city, or standard_words.
 - A blank or whitespace-only q makes no request. The UI shows a dedicated enter-query state, preventing a request for roughly 1.49 million annotated rows.
 - The frontend accepts every non-empty trimmed query, including one and two CJK characters. It must not add a client-side minimum-length rule; the backend's character-token FTS index is responsible for those searches.
-- The frontend passes q unchanged after trim. Backend whitespace-normalization semantics remain a separately confirmed backend choice; the displayed annotation is always the literal response value.
+- The frontend passes q unchanged after trim. The backend removes Unicode whitespace for note-query matching, so `文白` matches a stored `文 白`; the displayed annotation remains the literal response value.
 
-## Backend Decision Still Required
+## Confirmed Backend Whitespace Contract
 
-The frontend deliberately does no character splitting or whitespace rewriting. Before implementing the backend endpoint, confirm whether a query such as `文白` should match an annotation stored as `文 白`. The proposed frontend works with either policy, but the API contract and its backend test must make that choice explicit; this plan currently assumes only trim-at-the-ends on the request value.
+The frontend deliberately does no character splitting or internal whitespace rewriting. The backend must remove Unicode whitespace from both the indexed `notes` text and the incoming query before character-token FTS matching. Therefore, a request with `q=文白` must return a row whose literal `notes` value is `文 白`; the response must not rewrite the stored annotation. Add this case to the backend endpoint's contract test before integrating Task 1.
 
 ## Boundary Conditions
 
@@ -731,6 +731,7 @@ Before staging, explicitly confirm that pre-existing user changes in project/pub
 - Turning the switch off produces source=character-notes with tab=card, hides page-tab-navigation and all vocabulary-only controls, and leaves only input plus switch.
 - Blank input shows the dedicated prompt and makes no character-note request.
 - One- and two-character queries use the existing IME-safe/debounced flow and render every returned row as location, character, IPA, and note.
+- A `文白` query returns annotations such as the literal `文 白`; the frontend does not change the returned spacing.
 - Long-note expansion works in both sources. Source switching cannot leave stale cards, a late response, a location modal, a map, or a table visible in character-note mode.
 - Returning to vocabulary removes source, restores navigation/controls, and preserves current vocabulary API/map/table behavior.
 - Deep links with character-notes plus map/table normalize to card.
