@@ -137,10 +137,13 @@ const searchQuery = ref('')
 const internalTriggerEl = ref(null)
 const dropdownPanel = ref(null)
 const dropdownStyle = ref({
-  position: 'absolute',
+  position: 'fixed',
   top: '0px',
   left: '0px',
-  zIndex: 30001
+  zIndex: 30001,
+  // 首屏就带上高度上限：否则第一次 updatePosition 量到的是未封顶的完整列表高度，
+  // 翻转判定会被撑爆（视口再高也会判成"下方放不下"，上翻后底部离 trigger 很远）
+  maxHeight: props.maxHeight
 })
 
 const hasExternalTrigger = computed(() => Boolean(props.triggerEl))
@@ -249,34 +252,28 @@ const updatePosition = () => {
     const triggerRect = triggerElement.getBoundingClientRect()
     const panelWidth = props.matchTriggerWidth ? triggerRect.width : (dropdownPanel.value.offsetWidth || 200)
     const panelHeight = dropdownPanel.value.offsetHeight || 300
-    const viewportHeight = window.innerHeight
-    const viewportWidth = window.innerWidth
+    // 用 clientHeight/clientWidth 而非 inner*：后者把滚动条和固定栏也算进可用空间
+    const viewportHeight = document.documentElement.clientHeight
+    const viewportWidth = document.documentElement.clientWidth
 
-    let top = 0
-    let left = 0
+    const spaceBelow = viewportHeight - triggerRect.bottom
+    const spaceAbove = triggerRect.top
 
-    // Calculate vertical position based on direction
+    // 双侧判定：哪边放得下就放哪边；只有一侧放得下就翻到那侧；两侧都放不下才挑空间大的一侧，
+    // 并由下面的夹取保证面板整体留在视口内
+    let placeAbove
     if (props.direction === 'down') {
-      // Default: position below trigger
-      top = triggerRect.bottom
-
-      // Check if dropdown would go off bottom of screen
-      if (triggerRect.bottom + panelHeight > viewportHeight) {
-        // Not enough space below, position above instead
-        top = triggerRect.top - panelHeight
-      }
+      if (spaceBelow >= panelHeight) placeAbove = false
+      else if (spaceAbove >= panelHeight) placeAbove = true
+      else placeAbove = spaceAbove > spaceBelow
     } else {
-      // direction === 'up': position above trigger
-      top = triggerRect.top - panelHeight
-
-      // Check if dropdown would go off top of screen
-      if (top < 0) {
-        // Not enough space above, position below instead
-        top = triggerRect.bottom
-      }
+      if (spaceAbove >= panelHeight) placeAbove = true
+      else if (spaceBelow >= panelHeight) placeAbove = false
+      else placeAbove = spaceAbove > spaceBelow
     }
 
     // Calculate horizontal position based on align
+    let left = triggerRect.left
     if (props.align === 'right') {
       // Right-align: dropdown's right edge aligns with trigger's right edge
       left = triggerRect.right - panelWidth
@@ -285,19 +282,26 @@ const updatePosition = () => {
       if (left < 0) {
         left = 0
       }
-    } else {
-      // Left-align: dropdown's left edge aligns with trigger's left edge
-      left = triggerRect.left
-
+    } else if (left + panelWidth > viewportWidth) {
       // Check if dropdown would go off right edge of screen
-      if (left + panelWidth > viewportWidth) {
-        left = viewportWidth - panelWidth
-      }
+      left = viewportWidth - panelWidth
+    }
+
+    let topStyle
+    let bottomStyle = 'auto'
+    if (placeAbove) {
+      // 上翻时以底边对齐 trigger 顶边：面板高度变化时不会脱开
+      topStyle = 'auto'
+      bottomStyle = `${(viewportHeight - triggerRect.top) - Math.max(0, panelHeight - triggerRect.top)}px`
+    } else {
+      // 夹取到视口内，避免面板被裁掉
+      topStyle = `${Math.max(0, Math.min(triggerRect.bottom, viewportHeight - panelHeight))}px`
     }
 
     dropdownStyle.value = {
-      position: 'absolute',
-      top: `${top}px`,
+      position: 'fixed',
+      top: topStyle,
+      bottom: bottomStyle,
       left: `${left}px`,
       zIndex: 30001,
       maxHeight: props.maxHeight

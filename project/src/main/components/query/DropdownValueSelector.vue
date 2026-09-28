@@ -60,7 +60,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { S2T_T2S_MAPPING } from '@/main/config'
 
@@ -118,18 +118,25 @@ watch(() => props.selectedKeys, (newKeys) => {
 }, { immediate: true, deep: true })
 
 // Dropdown positioning
-const dropdownStyle = computed(() => {
-  if (!dropdownOpen.value) return {}
+const dropdownStyle = ref({})
+
+const updatePosition = () => {
   const triggerEl = triggerRefs.value[dropdownOpen.value]
-  if (!triggerEl) return {}
+  if (!triggerEl) return
+
   const rect = triggerEl.getBoundingClientRect()
-  return {
+  dropdownStyle.value = {
     position: 'fixed',
     top: `${rect.bottom + 4}px`,
     left: `${rect.left}px`,
     width: `${rect.width}px`,
     zIndex: 99999
   }
+}
+
+// 打开后定位一次；之后靠 scroll/resize 监听持续跟随 trigger
+watch(dropdownOpen, (key) => {
+  if (key) nextTick(updatePosition)
 })
 
 // Get input display value
@@ -265,10 +272,15 @@ function onClickOutside(event) {
 
 onMounted(() => {
   document.addEventListener('click', onClickOutside)
+  window.addEventListener('resize', updatePosition)
+  // 捕获阶段：内层滚动容器的滚动不会冒泡到 window，靠捕获才能截到
+  window.addEventListener('scroll', updatePosition, true)
 })
 
 onUnmounted(() => {
   document.removeEventListener('click', onClickOutside)
+  window.removeEventListener('resize', updatePosition)
+  window.removeEventListener('scroll', updatePosition, true)
 })
 </script>
 

@@ -1247,7 +1247,8 @@
     padding-bottom: 12px;
   }
   .vocabulary-page {
-    padding: 7px;
+    padding: 1px;
+    width: 98dvw;
   }
 
   // .vocabulary-view-page > .content-area {
@@ -1272,6 +1273,9 @@
   .tab-view-mode-selector {
     margin-left: 4px;
     // padding-left: 8px;
+    :deep(.card-group-item) {
+      padding: 12px 10px; // 原 10px 16px
+    }
   }
 
   .upload-head {
