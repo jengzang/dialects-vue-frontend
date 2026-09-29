@@ -90,6 +90,9 @@ export {
   vocabularySqlApi,
 } from './main/vocabulary.js';
 
+// ==================== 字表注释搜索 ====================
+export { buildNotesSearchPath, searchNotes } from './main/notes.js';
+
 // ==================== 查询模块 ====================
 // 核心查询
 export {
