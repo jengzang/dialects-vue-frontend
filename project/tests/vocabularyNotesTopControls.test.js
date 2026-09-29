@@ -54,6 +54,16 @@ describe('VocabularyTopControls character-notes mode', () => {
     expect(refreshButtonStart).toBeLessThan(searchContainerEnd)
   })
 
+  it('uses the shared action button with a refresh SVG for notes refresh', () => {
+    const source = readComponentSource()
+
+    expect(source).toContain("import ActionButton from '@/main/components/user/auth/ActionButton.vue'")
+    expect(source).toContain('<ActionButton')
+    expect(source).toContain('variant="blue"')
+    expect(source).toContain('viewBox="0 0 24 24"')
+    expect(source).toContain("{{ t('words.wordList.notes.refreshResults') }}")
+  })
+
   it('keeps vocabulary-only filters out of notes mode while reusing passed field options', () => {
     const source = readComponentSource()
     const vocabularyBranch = source.indexOf("v-if=\"source === 'vocabulary'\"")

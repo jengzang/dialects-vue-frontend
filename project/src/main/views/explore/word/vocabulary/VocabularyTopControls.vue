@@ -15,16 +15,27 @@
           />
         </div>
 
-        <button
+        <ActionButton
           v-if="source === 'character-notes'"
-          class="glass-button"
-          data-variant="secondary"
-          type="button"
+          variant="blue"
           :disabled="notesRefreshDisabled || isNotesScopeResolving || isNotesScopeDisabled"
           @click="emit('refreshNotes')"
         >
-          {{ t('words.wordList.notes.refreshResults') }}
-        </button>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5" />
+          </svg>
+          <span>{{ t('words.wordList.notes.refreshResults') }}</span>
+        </ActionButton>
 
         <div class="field-filter">
           <button
@@ -229,6 +240,7 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import * as OpenCCT2CN from 'opencc-js/t2cn'
 import AppModal from '@/components/common/AppModal.vue'
+import ActionButton from '@/main/components/user/auth/ActionButton.vue'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import LocationAndRegionInput from '@/main/components/geo/LocationAndRegionInput.vue'

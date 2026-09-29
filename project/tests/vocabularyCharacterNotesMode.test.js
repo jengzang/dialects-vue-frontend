@@ -67,16 +67,16 @@ describe('Vocabulary character-notes mode', () => {
   })
 
   it('localizes the notes source controls in every supported locale', () => {
-    const localePaths = [
-      'src/i18n/locales/zh-CN/words.json',
-      'src/i18n/locales/zh-Hant/words.json',
-      'src/i18n/locales/en/words.json',
-    ]
+    const localeRefreshLabels = {
+      'src/i18n/locales/zh-CN/words.json': '刷新',
+      'src/i18n/locales/zh-Hant/words.json': '刷新',
+      'src/i18n/locales/en/words.json': 'Refresh',
+    }
 
-    localePaths.forEach((path) => {
+    Object.entries(localeRefreshLabels).forEach(([path, refreshLabel]) => {
       const source = readSource(path)
       expect(source).toContain('"characterNotes"')
-      expect(source).toContain('"refreshResults"')
+      expect(source).toContain(`"refreshResults": "${refreshLabel}"`)
       expect(source).toContain('"enterSearch"')
       expect(source).toContain('"noMatches"')
     })
