@@ -8,7 +8,7 @@
             :value="inputText"
             class="search-input"
             rows="1"
-            :placeholder="t('words.wordList.search.placeholder')"
+            :placeholder="source === 'character-notes' ? t('words.wordList.notes.searchPlaceholder') : t('words.wordList.search.placeholder')"
             @compositionstart="handleCompositionStart"
             @compositionend="handleCompositionEnd"
             @input="handleInput"

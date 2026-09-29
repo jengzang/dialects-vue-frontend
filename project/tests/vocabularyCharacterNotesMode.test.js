@@ -32,6 +32,12 @@ describe('Vocabulary character-notes mode', () => {
     expect(source).not.toContain(':notes-refresh-disabled="!notesQuery.trim()"')
   })
 
+  it('uses a notes-only keyword placeholder in the shared top controls', () => {
+    const source = readSource('src/main/views/explore/word/vocabulary/VocabularyTopControls.vue')
+
+    expect(source).toContain(":placeholder=\"source === 'character-notes' ? t('words.wordList.notes.searchPlaceholder') : t('words.wordList.search.placeholder')\"")
+  })
+
   it('uses only the applied scope until the user refreshes notes results', () => {
     const source = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
 
@@ -132,6 +138,17 @@ describe('Vocabulary character-notes mode', () => {
       expect(source).toContain(`"refreshResults": "${refreshLabel}"`)
       expect(source).toContain('"enterSearch"')
       expect(source).toContain('"noMatches"')
+    })
+
+    const localeSearchPlaceholderLabels = {
+      'src/i18n/locales/zh-CN/words.json': '搜索音标、注释',
+      'src/i18n/locales/zh-Hant/words.json': '搜尋音標、註釋',
+      'src/i18n/locales/en/words.json': 'Search pronunciation or notes',
+    }
+
+    Object.entries(localeSearchPlaceholderLabels).forEach(([path, placeholder]) => {
+      const source = readSource(path)
+      expect(source).toContain(`"searchPlaceholder": "${placeholder}"`)
     })
   })
 })

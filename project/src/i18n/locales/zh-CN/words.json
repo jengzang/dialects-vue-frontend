@@ -18,6 +18,7 @@
     },
     "notes": {
       "refreshResults": "刷新",
+      "searchPlaceholder": "搜索音标、注释",
       "enterSearch": "请输入搜索词",
       "noMatches": "无匹配结果"
     },
