@@ -171,6 +171,14 @@
   .notes-card-pronunciation-pair {
     grid-column: 2;
     text-align: start;
+
+    .word-text {
+      font-size: 18px;
+    }
+
+    .pronunciation-text {
+      font-size: 16px;
+    }
   }
 
   .notes-card-note {
@@ -206,7 +214,6 @@
     display: block;
     min-width: 0;
     color: var(--text-primary);
-    font-size: 13px;
     line-height: 1.6;
     overflow-wrap: anywhere;
   }
@@ -1410,6 +1417,18 @@
 
   .pronunciation-text {
     font-size: 11px;
+  }
+
+  .notes-entry-card {
+    .notes-card-pronunciation-pair {
+      .word-text {
+        font-size: 14px;
+      }
+
+      .pronunciation-text {
+        font-size: 12px;
+      }
+    }
   }
 
   .map-canvas-shell {

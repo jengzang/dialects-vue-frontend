@@ -70,6 +70,10 @@ describe('Vocabulary character-notes mode', () => {
       styles.indexOf('.notes-entry-card'),
       styles.indexOf('.card-location-definition-pair'),
     )
+    const portraitStyles = styles.slice(
+      styles.indexOf('@media (max-aspect-ratio: 1 / 1)'),
+      styles.indexOf('// 格式说明弹窗'),
+    )
 
     expect(notesSection).toContain('class="card-location pill-btn card-location-pill"')
     expect(notesSection).toContain('@click="openNotesLocationDetail(entry.locationName)"')
@@ -86,6 +90,10 @@ describe('Vocabulary character-notes mode', () => {
     expect(styles).toContain('.notes-card-note')
     expect(notesCardStyles).not.toContain('.card-location {')
     expect(notesCardStyles).toContain('text-align: start;')
+    expect(notesCardStyles).toContain('.word-text {\n      font-size: 18px;')
+    expect(notesCardStyles).toContain('.pronunciation-text {\n      font-size: 13px;')
+    expect(portraitStyles).toContain('.word-text {\n        font-size: 14px;')
+    expect(portraitStyles).toContain('.pronunciation-text {\n        font-size: 12px;')
     expect(vocabularySection).toContain('class="card-location-definition-pair"')
     expect(vocabularySection).toContain('shouldShowVocabularyCardNoteToggle')
   })
