@@ -64,6 +64,13 @@ describe('VocabularyTopControls character-notes mode', () => {
     expect(source).toContain("{{ t('words.wordList.notes.refreshResults') }}")
   })
 
+  it('uses a compact, notes-only style for the refresh action', () => {
+    const source = readComponentSource()
+
+    expect(source).toContain('class="notes-refresh-action"')
+    expect(source).toMatch(/\.notes-refresh-action\.action-button\s*\{\s*padding:\s*10px 14px;/)
+  })
+
   it('keeps vocabulary-only filters out of notes mode while reusing passed field options', () => {
     const source = readComponentSource()
     const vocabularyBranch = source.indexOf("v-if=\"source === 'vocabulary'\"")

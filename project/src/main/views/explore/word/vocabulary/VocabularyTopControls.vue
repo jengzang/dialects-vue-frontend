@@ -17,6 +17,7 @@
 
         <ActionButton
           v-if="source === 'character-notes'"
+          class="notes-refresh-action"
           variant="blue"
           :disabled="notesRefreshDisabled || isNotesScopeResolving || isNotesScopeDisabled"
           @click="emit('refreshNotes')"
@@ -463,6 +464,10 @@ const standardWordTriggerLabel = computed(() => {
   border: 1px solid var(--color-primary-border);
   border-radius: var(--radius-md, 8px);
   resize: vertical;
+}
+
+.notes-refresh-action.action-button {
+  padding: 10px 14px;
 }
 
 .field-filter {
