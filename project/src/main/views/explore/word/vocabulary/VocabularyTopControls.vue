@@ -324,6 +324,11 @@ watch(() => props.query, (val) => {
   inputText.value = val
 })
 
+watch(() => props.source, () => {
+  clearTimeout(searchTimer)
+  inputText.value = props.query
+})
+
 function handleCompositionStart() {
   isComposing.value = true
   clearTimeout(searchTimer)

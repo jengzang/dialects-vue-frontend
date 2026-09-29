@@ -22,6 +22,12 @@ describe('VocabularyTopControls character-notes mode', () => {
     expect(source).toContain(':model-value="source === \'vocabulary\'"')
   })
 
+  it('cancels uncommitted keyword input when its source changes', () => {
+    const source = readComponentSource()
+
+    expect(source).toMatch(/watch\(\(\) => props\.source, \(\) => \{\s*clearTimeout\(searchTimer\)\s*inputText\.value = props\.query\s*\}\)/)
+  })
+
   it('keeps the source switch in the filter strip for vocabulary controls', () => {
     const source = readComponentSource()
     const filterStripStart = source.indexOf('<div\n      class="filter-strip"')
@@ -77,7 +83,7 @@ describe('VocabularyTopControls character-notes mode', () => {
     const source = readComponentSource()
 
     expect(source).toContain('class="notes-refresh-action"')
-    expect(source).toMatch(/\.notes-refresh-action\.action-button\s*\{\s*padding:\s*10px 14px;/)
+    expect(source).toMatch(/\.notes-refresh-action\.action-button\s*\{\s*padding:\s*6px 10px;/)
   })
 
   it('keeps vocabulary-only filters out of notes mode while reusing passed field options', () => {
