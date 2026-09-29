@@ -22,14 +22,16 @@ describe('VocabularyTopControls character-notes mode', () => {
     expect(source).toContain(':model-value="source === \'vocabulary\'"')
   })
 
-  it('places the source switch in the filter strip with the location filter', () => {
+  it('keeps the source switch in the filter strip for vocabulary controls', () => {
     const source = readComponentSource()
     const filterStripStart = source.indexOf('<div\n      class="filter-strip"')
-    const sourceSwitchStart = source.indexOf(':model-value="source === \'vocabulary\'"')
+    const vocabularyBranchStart = source.indexOf('<template v-else>')
+    const sourceSwitchStart = source.indexOf(':model-value="source === \'vocabulary\'"', vocabularyBranchStart)
     const locationFilterStart = source.indexOf('class="location-filter"')
 
     expect(filterStripStart).toBeGreaterThan(-1)
-    expect(sourceSwitchStart).toBeGreaterThan(filterStripStart)
+    expect(vocabularyBranchStart).toBeGreaterThan(filterStripStart)
+    expect(sourceSwitchStart).toBeGreaterThan(vocabularyBranchStart)
     expect(locationFilterStart).toBeGreaterThan(sourceSwitchStart)
   })
 
@@ -44,14 +46,21 @@ describe('VocabularyTopControls character-notes mode', () => {
     expect(source).toContain('isNotesScopeResolving')
   })
 
-  it('places notes refresh beside the keyword input', () => {
+  it('stacks the source switch below notes refresh beside the keyword input', () => {
     const source = readComponentSource()
     const searchContainerStart = source.indexOf('<div class="search-container">')
     const searchContainerEnd = source.indexOf('\n    </div>\n\n    <div\n      class="filter-strip"')
+    const notesActionsStart = source.indexOf('class="notes-mode-actions"')
+    const notesActionsEnd = source.indexOf('</div>', notesActionsStart)
+    const sourceSwitchStart = source.indexOf(':model-value="source === \'vocabulary\'"', notesActionsStart)
     const refreshButtonStart = source.indexOf("{{ t('words.wordList.notes.refreshResults') }}")
 
-    expect(refreshButtonStart).toBeGreaterThan(searchContainerStart)
-    expect(refreshButtonStart).toBeLessThan(searchContainerEnd)
+    expect(notesActionsStart).toBeGreaterThan(searchContainerStart)
+    expect(notesActionsStart).toBeLessThan(searchContainerEnd)
+    expect(refreshButtonStart).toBeGreaterThan(notesActionsStart)
+    expect(sourceSwitchStart).toBeGreaterThan(refreshButtonStart)
+    expect(sourceSwitchStart).toBeLessThan(notesActionsEnd)
+    expect(source).toMatch(/\.notes-mode-actions\s*\{[\s\S]*@include flex-col;/)
   })
 
   it('uses the shared action button with a refresh SVG for notes refresh', () => {

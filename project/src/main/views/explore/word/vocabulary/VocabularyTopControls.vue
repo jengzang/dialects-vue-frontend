@@ -15,28 +15,38 @@
           />
         </div>
 
-        <ActionButton
-          v-if="source === 'character-notes'"
-          class="notes-refresh-action"
-          variant="blue"
-          :disabled="notesRefreshDisabled || isNotesScopeResolving || isNotesScopeDisabled"
-          @click="emit('refreshNotes')"
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
+        <div v-if="source === 'character-notes'" class="notes-mode-actions">
+          <ActionButton
+            class="notes-refresh-action"
+            variant="blue"
+            :disabled="notesRefreshDisabled || isNotesScopeResolving || isNotesScopeDisabled"
+            @click="emit('refreshNotes')"
           >
-            <path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5" />
-          </svg>
-          <span>{{ t('words.wordList.notes.refreshResults') }}</span>
-        </ActionButton>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5" />
+            </svg>
+            <span>{{ t('words.wordList.notes.refreshResults') }}</span>
+          </ActionButton>
+          <SwitchToggle
+            :model-value="source === 'vocabulary'"
+            :show-label="true"
+            :active-text="t('words.wordList.source.vocabulary')"
+            :inactive-text="t('words.wordList.source.characterNotes')"
+            label-position="inside"
+            auto-width
+            @update:model-value="emit('update:source', $event ? 'vocabulary' : 'character-notes')"
+          />
+        </div>
 
         <div class="field-filter">
           <button
@@ -112,16 +122,6 @@
       class="filter-strip"
       :class="{ 'notes-scope-filter': source === 'character-notes' }"
     >
-      <SwitchToggle
-        :model-value="source === 'vocabulary'"
-        :show-label="true"
-        :active-text="t('words.wordList.source.vocabulary')"
-        :inactive-text="t('words.wordList.source.characterNotes')"
-        label-position="inside"
-        auto-width
-        @update:model-value="emit('update:source', $event ? 'vocabulary' : 'character-notes')"
-      />
-
       <template v-if="source === 'character-notes'">
         <LocationAndRegionInput
           :model-value="notesScope"
@@ -134,6 +134,15 @@
       </template>
 
       <template v-else>
+        <SwitchToggle
+          :model-value="source === 'vocabulary'"
+          :show-label="true"
+          :active-text="t('words.wordList.source.vocabulary')"
+          :inactive-text="t('words.wordList.source.characterNotes')"
+          label-position="inside"
+          auto-width
+          @update:model-value="emit('update:source', $event ? 'vocabulary' : 'character-notes')"
+        />
         <div
           v-if="viewMode === 'map'"
           class="standard-word-filter"
@@ -467,7 +476,15 @@ const standardWordTriggerLabel = computed(() => {
 }
 
 .notes-refresh-action.action-button {
-  padding: 10px 14px;
+  padding: 8px 10px;
+  font-size: 14px;
+}
+
+.notes-mode-actions {
+  @include flex-col;
+  flex: 0 0 auto;
+  gap: 10px;
+  align-items: center;
 }
 
 .field-filter {
