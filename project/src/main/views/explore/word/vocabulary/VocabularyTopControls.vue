@@ -15,6 +15,16 @@
           />
         </div>
 
+        <SwitchToggle
+          :model-value="source === 'vocabulary'"
+          :show-label="true"
+          :active-text="t('words.wordList.source.vocabulary')"
+          :inactive-text="t('words.wordList.source.characterNotes')"
+          label-position="inside"
+          auto-width
+          @update:model-value="emit('update:source', $event ? 'vocabulary' : 'character-notes')"
+        />
+
         <div class="field-filter">
           <button
             class="gear-btn"
@@ -25,6 +35,7 @@
             <span aria-hidden="true"><InlineIcon icon="⚙️" /></span>
           </button>
           <button
+            v-if="source === 'vocabulary'"
             class="pill-btn location-details-btn"
             type="button"
             :title="t('words.wordList.search.locationDetails')"
@@ -51,7 +62,7 @@
                 @update:model-value="(val) => toggleField(field.value, val)"
               />
             </div>
-            <div class="search-field-mode-section">
+            <div v-if="source === 'vocabulary'" class="search-field-mode-section">
               <h4 class="search-field-modal-title">
                 {{ t('words.wordList.search.filterModeTitle') }}
               </h4>
@@ -65,7 +76,7 @@
                 @update:model-value="emit('update:filterByRegion', $event)"
               />
             </div>
-            <div class="search-field-mode-section">
+            <div v-if="source === 'vocabulary'" class="search-field-mode-section">
               <h4 class="search-field-modal-title">
                 {{ t('words.wordList.search.standardWordFilterMode') }}
               </h4>
@@ -84,7 +95,30 @@
 
     </div>
 
-    <div class="filter-strip">
+    <div
+      v-if="source === 'character-notes'"
+      class="filter-strip notes-scope-filter"
+    >
+      <LocationAndRegionInput
+        :model-value="notesScope"
+        allow-empty-scope
+        disable-location-limit
+        @update:model-value="handleNotesScopeUpdate"
+        @update:run-disabled="handleNotesScopeDisabled"
+        @locations-resolved="handleNotesLocationsResolved"
+      />
+      <button
+        class="glass-button"
+        data-variant="secondary"
+        type="button"
+        :disabled="notesRefreshDisabled || isNotesScopeResolving || isNotesScopeDisabled"
+        @click="emit('refreshNotes')"
+      >
+        {{ t('words.wordList.notes.refreshResults') }}
+      </button>
+    </div>
+
+    <div v-else class="filter-strip">
       <div
         v-if="viewMode === 'map'"
         class="standard-word-filter"
@@ -193,6 +227,7 @@ import * as OpenCCT2CN from 'opencc-js/t2cn'
 import AppModal from '@/components/common/AppModal.vue'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
+import LocationAndRegionInput from '@/main/components/geo/LocationAndRegionInput.vue'
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 
@@ -206,6 +241,7 @@ function normalizeLocationSearchText(value) {
 }
 
 const props = defineProps({
+  source: { type: String, default: 'vocabulary' },
   query: { type: String, default: '' },
   selectedSearchFields: { type: Array, default: () => [] },
   selectedLocations: { type: Array, default: () => [] },
@@ -221,9 +257,15 @@ const props = defineProps({
   selectedCity: { type: String, default: '' },
   provinceOptions: { type: Array, default: () => [] },
   cityOptions: { type: Array, default: () => [] },
+  notesScope: {
+    type: Object,
+    default: () => ({ locations: [], regions: [], regionUsing: 'map' }),
+  },
+  notesRefreshDisabled: { type: Boolean, default: false },
 })
 
 const emit = defineEmits([
+  'update:source',
   'update:query',
   'update:selectedSearchFields',
   'update:selectedLocations',
@@ -233,6 +275,9 @@ const emit = defineEmits([
   'update:filterByRegion',
   'update:selectedProvince',
   'update:selectedCity',
+  'update:notesScope',
+  'locationsResolved',
+  'refreshNotes',
   'openLocationDetails',
 ])
 
@@ -242,6 +287,8 @@ const standardWordTriggerEl = ref(null)
 const searchFieldModalOpen = ref(false)
 const locationDropdownOpen = ref(false)
 const standardWordDropdownOpen = ref(false)
+const isNotesScopeResolving = ref(false)
+const isNotesScopeDisabled = ref(false)
 
 const inputText = ref(props.query)
 const isComposing = ref(false)
@@ -273,6 +320,25 @@ function scheduleSearchEmit() {
   searchTimer = setTimeout(() => {
     emit('update:query', inputText.value)
   }, 500)
+}
+
+function handleNotesScopeUpdate(scope) {
+  isNotesScopeResolving.value = true
+  isNotesScopeDisabled.value = false
+  emit('update:notesScope', scope)
+}
+
+function handleNotesScopeDisabled(disabled) {
+  isNotesScopeDisabled.value = disabled
+  if (disabled) {
+    isNotesScopeResolving.value = false
+  }
+}
+
+function handleNotesLocationsResolved(scope) {
+  isNotesScopeResolving.value = false
+  isNotesScopeDisabled.value = false
+  emit('locationsResolved', scope)
 }
 
 function formatMultiSelectLabel(selectedValues, options, placeholder) {
