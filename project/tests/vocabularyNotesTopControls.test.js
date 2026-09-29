@@ -22,6 +22,17 @@ describe('VocabularyTopControls character-notes mode', () => {
     expect(source).toContain(':model-value="source === \'vocabulary\'"')
   })
 
+  it('places the source switch in the filter strip with the location filter', () => {
+    const source = readComponentSource()
+    const filterStripStart = source.indexOf('<div\n      class="filter-strip"')
+    const sourceSwitchStart = source.indexOf(':model-value="source === \'vocabulary\'"')
+    const locationFilterStart = source.indexOf('class="location-filter"')
+
+    expect(filterStripStart).toBeGreaterThan(-1)
+    expect(sourceSwitchStart).toBeGreaterThan(filterStripStart)
+    expect(locationFilterStart).toBeGreaterThan(sourceSwitchStart)
+  })
+
   it('uses the shared geographic input as an unlimited notes scope and refreshes manually', () => {
     const source = readComponentSource()
 

@@ -15,16 +15,6 @@
           />
         </div>
 
-        <SwitchToggle
-          :model-value="source === 'vocabulary'"
-          :show-label="true"
-          :active-text="t('words.wordList.source.vocabulary')"
-          :inactive-text="t('words.wordList.source.characterNotes')"
-          label-position="inside"
-          auto-width
-          @update:model-value="emit('update:source', $event ? 'vocabulary' : 'character-notes')"
-        />
-
         <div class="field-filter">
           <button
             class="gear-btn"
@@ -96,125 +86,137 @@
     </div>
 
     <div
-      v-if="source === 'character-notes'"
-      class="filter-strip notes-scope-filter"
+      class="filter-strip"
+      :class="{ 'notes-scope-filter': source === 'character-notes' }"
     >
-      <LocationAndRegionInput
-        :model-value="notesScope"
-        allow-empty-scope
-        disable-location-limit
-        @update:model-value="handleNotesScopeUpdate"
-        @update:run-disabled="handleNotesScopeDisabled"
-        @locations-resolved="handleNotesLocationsResolved"
+      <SwitchToggle
+        :model-value="source === 'vocabulary'"
+        :show-label="true"
+        :active-text="t('words.wordList.source.vocabulary')"
+        :inactive-text="t('words.wordList.source.characterNotes')"
+        label-position="inside"
+        auto-width
+        @update:model-value="emit('update:source', $event ? 'vocabulary' : 'character-notes')"
       />
-      <button
-        class="glass-button"
-        data-variant="secondary"
-        type="button"
-        :disabled="notesRefreshDisabled || isNotesScopeResolving || isNotesScopeDisabled"
-        @click="emit('refreshNotes')"
-      >
-        {{ t('words.wordList.notes.refreshResults') }}
-      </button>
-    </div>
 
-    <div v-else class="filter-strip">
-      <div
-        v-if="viewMode === 'map'"
-        class="standard-word-filter"
-      >
-        <SimpleSelectDropdown
-          v-if="singleSelect"
-          :model-value="selectedStandardWord"
-          :options="standardWordOptions"
-          :placeholder="t('words.wordList.search.standardWordPlaceholder')"
-          :disabled="standardWordOptions.length === 0"
-          searchable
-          match-trigger-width
-          width="100%"
-          @update:model-value="emit('update:selectedStandardWord', $event)"
+      <template v-if="source === 'character-notes'">
+        <LocationAndRegionInput
+          :model-value="notesScope"
+          allow-empty-scope
+          disable-location-limit
+          @update:model-value="handleNotesScopeUpdate"
+          @update:run-disabled="handleNotesScopeDisabled"
+          @locations-resolved="handleNotesLocationsResolved"
         />
-        <template v-else>
-          <button
-            ref="standardWordTriggerEl"
-            class="select-trigger standard-word-select-trigger"
-            :class="{ 'is-open': standardWordDropdownOpen, 'is-disabled': standardWordOptions.length === 0 }"
-            type="button"
+        <button
+          class="glass-button"
+          data-variant="secondary"
+          type="button"
+          :disabled="notesRefreshDisabled || isNotesScopeResolving || isNotesScopeDisabled"
+          @click="emit('refreshNotes')"
+        >
+          {{ t('words.wordList.notes.refreshResults') }}
+        </button>
+      </template>
+
+      <template v-else>
+        <div
+          v-if="viewMode === 'map'"
+          class="standard-word-filter"
+        >
+          <SimpleSelectDropdown
+            v-if="singleSelect"
+            :model-value="selectedStandardWord"
+            :options="standardWordOptions"
+            :placeholder="t('words.wordList.search.standardWordPlaceholder')"
             :disabled="standardWordOptions.length === 0"
-            @click="standardWordDropdownOpen = !standardWordDropdownOpen"
+            searchable
+            match-trigger-width
+            width="100%"
+            @update:model-value="emit('update:selectedStandardWord', $event)"
+          />
+          <template v-else>
+            <button
+              ref="standardWordTriggerEl"
+              class="select-trigger standard-word-select-trigger"
+              :class="{ 'is-open': standardWordDropdownOpen, 'is-disabled': standardWordOptions.length === 0 }"
+              type="button"
+              :disabled="standardWordOptions.length === 0"
+              @click="standardWordDropdownOpen = !standardWordDropdownOpen"
+            >
+              <span class="select-label">{{ standardWordTriggerLabel }}</span>
+              <span
+                class="select-arrow"
+                aria-hidden="true"
+              >⌄</span>
+            </button>
+            <MultiSelectDropdown
+              v-if="standardWordDropdownOpen"
+              :model-value="selectedStandardWords"
+              :options="multiStandardWordOptions"
+              :trigger-el="standardWordTriggerEl"
+              align="left"
+              direction="down"
+              @update:model-value="emit('update:selectedStandardWords', $event)"
+              @close="standardWordDropdownOpen = false"
+            />
+          </template>
+        </div>
+
+        <div
+          v-if="!filterByRegion"
+          class="location-filter"
+        >
+          <button
+            ref="locationTriggerEl"
+            class="select-trigger location-select-trigger"
+            :class="{ 'is-open': locationDropdownOpen, 'is-disabled': locationOptions.length === 0 }"
+            type="button"
+            :disabled="locationOptions.length === 0"
+            @click="locationDropdownOpen = !locationDropdownOpen"
           >
-            <span class="select-label">{{ standardWordTriggerLabel }}</span>
+            <span class="select-label">{{ locationTriggerLabel }}</span>
             <span
               class="select-arrow"
               aria-hidden="true"
             >⌄</span>
           </button>
           <MultiSelectDropdown
-            v-if="standardWordDropdownOpen"
-            :model-value="selectedStandardWords"
-            :options="multiStandardWordOptions"
-            :trigger-el="standardWordTriggerEl"
+            v-if="locationDropdownOpen"
+            :model-value="selectedLocations"
+            :options="locationOptions"
+            :trigger-el="locationTriggerEl"
+            :search-normalizer="normalizeLocationSearchText"
             align="left"
             direction="down"
-            @update:model-value="emit('update:selectedStandardWords', $event)"
-            @close="standardWordDropdownOpen = false"
+            @update:model-value="emit('update:selectedLocations', $event)"
+            @close="locationDropdownOpen = false"
           />
-        </template>
-      </div>
+        </div>
 
-      <div
-        v-if="!filterByRegion"
-        class="location-filter"
-      >
-        <button
-          ref="locationTriggerEl"
-          class="select-trigger location-select-trigger"
-          :class="{ 'is-open': locationDropdownOpen, 'is-disabled': locationOptions.length === 0 }"
-          type="button"
-          :disabled="locationOptions.length === 0"
-          @click="locationDropdownOpen = !locationDropdownOpen"
+        <div
+          v-else
+          class="location-filter"
         >
-          <span class="select-label">{{ locationTriggerLabel }}</span>
-          <span
-            class="select-arrow"
-            aria-hidden="true"
-          >⌄</span>
-        </button>
-        <MultiSelectDropdown
-          v-if="locationDropdownOpen"
-          :model-value="selectedLocations"
-          :options="locationOptions"
-          :trigger-el="locationTriggerEl"
-          :search-normalizer="normalizeLocationSearchText"
-          align="left"
-          direction="down"
-          @update:model-value="emit('update:selectedLocations', $event)"
-          @close="locationDropdownOpen = false"
-        />
-      </div>
-
-      <div
-        v-else
-        class="location-filter"
-      >
-        <SimpleSelectDropdown
-          :model-value="selectedProvince"
-          :options="provinceOptions"
-          :placeholder="t('words.wordList.search.provincePlaceholder')"
-          match-trigger-width
-          width="100%"
-          @update:model-value="emit('update:selectedProvince', $event)"
-        />
-        <SimpleSelectDropdown
-          :model-value="selectedCity"
-          :options="cityOptions"
-          :placeholder="t('words.wordList.search.cityPlaceholder')"
-          :disabled="!selectedProvince"
-          match-trigger-width
-          width="100%"
-          @update:model-value="emit('update:selectedCity', $event)"
-        />
-      </div>
+          <SimpleSelectDropdown
+            :model-value="selectedProvince"
+            :options="provinceOptions"
+            :placeholder="t('words.wordList.search.provincePlaceholder')"
+            match-trigger-width
+            width="100%"
+            @update:model-value="emit('update:selectedProvince', $event)"
+          />
+          <SimpleSelectDropdown
+            :model-value="selectedCity"
+            :options="cityOptions"
+            :placeholder="t('words.wordList.search.cityPlaceholder')"
+            :disabled="!selectedProvince"
+            match-trigger-width
+            width="100%"
+            @update:model-value="emit('update:selectedCity', $event)"
+          />
+        </div>
+      </template>
     </div>
   </div>
 </template>
