@@ -160,17 +160,74 @@
 }
 
 .notes-entry-card {
-  @include flex-col;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 120px);
+  gap: 8px 16px;
   align-items: center;
+  justify-content: center;
+  padding: 15px 10px;
   text-align: center;
 
   .card-location {
     color: var(--text-secondary);
   }
 
-  .card-note-text {
+  .notes-card-pronunciation-pair {
+    grid-column: 2;
+  }
+
+  .notes-card-note {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1fr) 14px;
+    align-items: center;
+    justify-self: stretch;
+    width: 100%;
+    min-width: 0;
+    gap: 2px;
+  }
+
+  .notes-card-note-content {
+    position: relative;
+    min-width: 0;
+  }
+
+  .notes-card-note-measure {
+    position: absolute;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    color: transparent;
+    pointer-events: none;
+    visibility: hidden;
+    white-space: nowrap;
+  }
+
+  .notes-card-note-text {
+    @include text-truncate;
+
+    display: block;
+    min-width: 0;
     color: var(--text-primary);
+    font-size: 13px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+
+  .notes-card-note.is-expanded .notes-card-note-text {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .notes-card-note-toggle-spacer {
+    display: block;
+    width: 14px;
+    height: 18px;
+  }
+
+  .notes-card-note-toggle {
+    justify-self: stretch;
   }
 }
 

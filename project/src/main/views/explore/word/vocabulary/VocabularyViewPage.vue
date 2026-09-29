@@ -33,12 +33,64 @@
         <p>{{ notesLoadError }}</p>
       </div>
       <div v-else-if="notesEntries.length" class="card-mode">
-        <div class="cards-grid">
+        <div ref="notesCardGridEl" class="cards-grid">
           <article v-for="entry in notesEntries" :key="entry.id" class="glass-card notes-entry-card">
-            <span class="card-location">{{ entry.locationName }}</span>
-            <span class="word-text">{{ entry.character }}</span>
-            <span class="pronunciation-text">{{ entry.pronunciation }}</span>
-            <span class="card-note-text">{{ entry.notes }}</span>
+            <button
+              v-if="entry.locationName"
+              class="card-location pill-btn card-location-pill"
+              type="button"
+              :title="entry.locationName"
+              @click="openNotesLocationDetail(entry.locationName)"
+            >
+              <span class="card-location-pill-text">{{ entry.locationName }}</span>
+            </button>
+            <div class="card-pronunciation-pair notes-card-pronunciation-pair">
+              <span class="pronunciation-text">{{ entry.pronunciation }}</span>
+              <span class="word-text">{{ entry.character }}</span>
+            </div>
+            <div
+              v-if="entry.notes"
+              class="notes-card-note"
+              :class="{ 'is-expanded': isNotesCardNoteExpanded(entry.id) }"
+            >
+              <div class="notes-card-note-content">
+                <span
+                  :ref="(el) => setNotesCardNoteMeasureEl(entry.id, el)"
+                  class="notes-card-note-measure"
+                  aria-hidden="true"
+                >{{ entry.notes }}</span>
+                <span class="notes-card-note-text">{{ entry.notes }}</span>
+              </div>
+              <button
+                v-if="shouldShowNotesCardNoteToggle(entry.id)"
+                class="card-note-toggle notes-card-note-toggle"
+                :class="{ 'is-expanded': isNotesCardNoteExpanded(entry.id) }"
+                type="button"
+                :aria-expanded="isNotesCardNoteExpanded(entry.id)"
+                @click="toggleNotesCardNote(entry.id)"
+              >
+                <svg
+                  class="card-note-toggle-icon notes-card-note-toggle-icon"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="m9 6 6 6-6 6"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2.5"
+                  />
+                </svg>
+              </button>
+              <span
+                v-else
+                class="notes-card-note-toggle-spacer"
+                aria-hidden="true"
+              />
+            </div>
           </article>
         </div>
       </div>
@@ -339,11 +391,19 @@
       </div>
     </AppModal>
 
+    <LocationDetailPopup
+      :visible="notesLocationPopup.visible"
+      :location-name="notesLocationPopup.locationName"
+      :data="notesLocationPopup.data"
+      :loading="notesLocationPopup.loading"
+      @close="closeNotesLocationPopup"
+    />
+
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { watchDebounced } from '@vueuse/core'
@@ -354,10 +414,12 @@ import {
   getVocabularyLocationOptions,
   getVocabularyMapItems,
   getVocabularyMapPoints,
-  getVocabularyStandardWords
+  getVocabularyStandardWords,
+  getLocationDetail,
+  searchNotes,
 } from '@/api'
-import { searchNotes } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
+import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 import VocabularyMap from '@/main/components/map/VocabularyMap.vue'
 import VocabularyTopControls from './VocabularyTopControls.vue'
@@ -491,6 +553,18 @@ const notesPageSize = ref(50)
 const isLoadingNotes = ref(false)
 const notesLoadError = ref('')
 const activeNotesRequestKey = ref('')
+const notesCardGridEl = ref(null)
+const notesCardNoteMeasureEls = new Map()
+const notesCardNoteOverflowIds = ref(new Set())
+const expandedNotesCardNoteIds = ref(new Set())
+const notesLocationPopup = ref({
+  visible: false,
+  locationName: '',
+  data: null,
+  loading: false,
+})
+let notesCardResizeObserver = null
+let notesLocationPopupRequestId = 0
 function resolveViewModeFromRoute() {
   if (route.query.source === 'character-notes') return 'card'
   const tab = route.query.tab
@@ -908,6 +982,79 @@ function normalizeNotesEntry(item) {
     pronunciation: item.ipa || '',
     notes: item.notes || '',
   }
+}
+
+function setNotesCardNoteMeasureEl(entryId, element) {
+  if (element) {
+    notesCardNoteMeasureEls.set(entryId, element)
+  } else {
+    notesCardNoteMeasureEls.delete(entryId)
+  }
+}
+
+function measureNotesCardNoteOverflow() {
+  const overflowedIds = new Set()
+
+  notesCardNoteMeasureEls.forEach((element, entryId) => {
+    if (element.clientWidth > 0 && element.scrollWidth > element.clientWidth + 1) {
+      overflowedIds.add(entryId)
+    }
+  })
+
+  notesCardNoteOverflowIds.value = overflowedIds
+  expandedNotesCardNoteIds.value = new Set(
+    [...expandedNotesCardNoteIds.value].filter((entryId) => overflowedIds.has(entryId)),
+  )
+}
+
+function isNotesCardNoteExpanded(entryId) {
+  return expandedNotesCardNoteIds.value.has(entryId)
+}
+
+function shouldShowNotesCardNoteToggle(entryId) {
+  return notesCardNoteOverflowIds.value.has(entryId)
+}
+
+function toggleNotesCardNote(entryId) {
+  const expandedIds = new Set(expandedNotesCardNoteIds.value)
+  if (expandedIds.has(entryId)) {
+    expandedIds.delete(entryId)
+  } else {
+    expandedIds.add(entryId)
+  }
+  expandedNotesCardNoteIds.value = expandedIds
+}
+
+async function openNotesLocationDetail(locationName) {
+  const normalizedLocationName = String(locationName || '').trim()
+  if (!normalizedLocationName) return
+
+  const requestId = ++notesLocationPopupRequestId
+  notesLocationPopup.value = {
+    visible: true,
+    locationName: normalizedLocationName,
+    data: null,
+    loading: true,
+  }
+
+  try {
+    const data = await getLocationDetail(normalizedLocationName)
+    if (requestId !== notesLocationPopupRequestId) return
+    notesLocationPopup.value.data = data
+  } catch {
+    if (requestId !== notesLocationPopupRequestId) return
+    notesLocationPopup.value.data = null
+  } finally {
+    if (requestId === notesLocationPopupRequestId) {
+      notesLocationPopup.value.loading = false
+    }
+  }
+}
+
+function closeNotesLocationPopup() {
+  notesLocationPopupRequestId += 1
+  notesLocationPopup.value.visible = false
+  notesLocationPopup.value.loading = false
 }
 
 async function loadNotes({ append = false } = {}) {
@@ -1541,6 +1688,35 @@ watch(entries, () => {
   expandedVocabularyCardNoteIds.value = new Set([...expandedVocabularyCardNoteIds.value].filter((entryId) => entryIds.has(entryId)))
 })
 
+watch(notesCardGridEl, (gridElement) => {
+  notesCardResizeObserver?.disconnect()
+  notesCardResizeObserver = null
+
+  if (!gridElement) return
+
+  notesCardResizeObserver = new ResizeObserver(() => {
+    nextTick(measureNotesCardNoteOverflow)
+  })
+  notesCardResizeObserver.observe(gridElement)
+  nextTick(measureNotesCardNoteOverflow)
+}, { flush: 'post' })
+
+watch(notesEntries, () => {
+  const entryIds = new Set(notesEntries.value.map((entry) => entry.id))
+  notesCardNoteMeasureEls.forEach((_, entryId) => {
+    if (!entryIds.has(entryId)) {
+      notesCardNoteMeasureEls.delete(entryId)
+    }
+  })
+  notesCardNoteOverflowIds.value = new Set(
+    [...notesCardNoteOverflowIds.value].filter((entryId) => entryIds.has(entryId)),
+  )
+  expandedNotesCardNoteIds.value = new Set(
+    [...expandedNotesCardNoteIds.value].filter((entryId) => entryIds.has(entryId)),
+  )
+  nextTick(measureNotesCardNoteOverflow)
+}, { flush: 'post' })
+
 watch(() => route.query.tab, (tab) => {
   const nextMode = isCharacterNotesMode.value ? 'card' : (tab ? normalizeViewMode(tab) : resolveViewModeFromRoute())
   if (viewMode.value !== nextMode) {
@@ -1579,6 +1755,7 @@ watch(isCharacterNotesMode, async (isNotes) => {
     await router.replace({ query: { ...route.query, source: 'character-notes', tab: 'card' } })
     loadNotes()
   } else {
+    closeNotesLocationPopup()
     await loadVocabularyLocationOptions()
     loadActiveViewMode()
   }
@@ -1615,6 +1792,11 @@ watch(selectedStandardWords, (words) => {
   if (shouldUseVocabularyMapPointsApi() || shouldUseVocabularyMapItemsApi()) {
     loadVocabularyMapPoints()
   }
+})
+
+onBeforeUnmount(() => {
+  notesCardResizeObserver?.disconnect()
+  notesCardResizeObserver = null
 })
 </script>
 

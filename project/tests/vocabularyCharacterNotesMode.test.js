@@ -59,6 +59,31 @@ describe('Vocabulary character-notes mode', () => {
     expect(source).toContain(':key="entry.id"')
   })
 
+  it('uses the vocabulary card hierarchy only for character-notes cards', () => {
+    const page = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
+    const styles = readSource('src/main/views/explore/word/vocabulary/vocabulary.scss')
+    const notesSectionStart = page.indexOf('<section v-if="isCharacterNotesMode"')
+    const notesSectionEnd = page.indexOf('\n    <section v-else-if="viewMode !== \'table\'"', notesSectionStart)
+    const notesSection = page.slice(notesSectionStart, notesSectionEnd)
+    const vocabularySection = page.slice(notesSectionEnd)
+
+    expect(notesSection).toContain('class="card-location pill-btn card-location-pill"')
+    expect(notesSection).toContain('@click="openNotesLocationDetail(entry.locationName)"')
+    expect(notesSection).toContain('class="card-pronunciation-pair notes-card-pronunciation-pair"')
+    expect(notesSection).toContain('class="notes-card-note"')
+    expect(notesSection).toContain('class="notes-card-note-measure"')
+    expect(page).toContain('new ResizeObserver')
+    expect(page).toContain('watch(notesCardGridEl')
+    expect(page).toContain('watch(notesEntries')
+    expect(page).toContain('onBeforeUnmount(() =>')
+    expect(page).toContain('LocationDetailPopup')
+    expect(page).toContain('getLocationDetail')
+    expect(page).toContain('function openNotesLocationDetail')
+    expect(styles).toContain('.notes-card-note')
+    expect(vocabularySection).toContain('class="card-location-definition-pair"')
+    expect(vocabularySection).toContain('shouldShowVocabularyCardNoteToggle')
+  })
+
   it('hides page tabs only for notes source routes', () => {
     const shell = readSource('src/main/views/menu/VocabularyPage.vue')
 
