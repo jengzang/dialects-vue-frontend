@@ -463,8 +463,8 @@ import { showError, showInfo, showSuccess, showWarning } from '@/utils/ui/messag
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
-const SURVEY_TEMPLATE_URL = '/data/sample/方言调查词表(语保).xlsx'
-const SURVEY_TEMPLATE_FILE_NAME = '方言调查词表(语保).xlsx'
+const SURVEY_TEMPLATE_URL = '/data/sample/方音圖鑑詞彙模板.xlsx'
+const SURVEY_TEMPLATE_FILE_NAME = '方音圖鑑詞彙模板.xlsx'
 
 const props = defineProps({
   vocabularyMe: { type: Object, default: null },
