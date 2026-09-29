@@ -1,8 +1,9 @@
 <template>
   <div class="vocabulary-view-page">
     <VocabularyTopControls
-      v-model:query="query"
-      v-model:selected-search-fields="selectedSearchFields"
+      v-model:source="source"
+      v-model:query="activeQuery"
+      v-model:selected-search-fields="activeSearchFields"
       v-model:selected-locations="selectedLocations"
       v-model:selected-standard-word="selectedStandardWord"
       v-model:selected-standard-words="selectedStandardWordsModel"
@@ -11,15 +12,56 @@
       v-model:selected-province="selectedProvince"
       v-model:selected-city="selectedCity"
       :view-mode="viewMode"
-      :search-field-options="searchFieldOptions"
+      :search-field-options="activeSearchFieldOptions"
       :location-options="locationOptions"
       :standard-word-options="standardWordOptions"
       :province-options="provinceOptions"
       :city-options="cityOptions"
+      :notes-scope="draftScope"
+      :notes-refresh-disabled="!notesQuery.trim()"
+      @update:notes-scope="draftScope = cloneNotesScope($event)"
+      @locations-resolved="handleNotesScopeResolved"
+      @refresh-notes="refreshNotes"
       @open-location-details="openLocationDetails"
     />
 
-    <section v-if="viewMode !== 'table'" class="content-area">
+    <section v-if="isCharacterNotesMode" class="content-area">
+      <div v-if="isNotesInitialLoading" class="loading-state loading-state-base">
+        <div class="ui-loading--page" aria-hidden="true"></div>
+        <span>{{ t('words.wordList.states.loadingCards') }}</span>
+      </div>
+      <div v-else-if="notesLoadError && !notesEntries.length" class="empty-state empty-state-base">
+        <p>{{ notesLoadError }}</p>
+      </div>
+      <div v-else-if="!notesQuery.trim()" class="empty-state empty-state-base">
+        <p>{{ t('words.wordList.notes.enterSearch') }}</p>
+      </div>
+      <div v-else-if="notesEntries.length" class="card-mode">
+        <div class="cards-grid">
+          <article v-for="entry in notesEntries" :key="entry.id" class="glass-card notes-entry-card">
+            <span class="card-location">{{ entry.locationName }}</span>
+            <span class="word-text">{{ entry.character }}</span>
+            <span class="pronunciation-text">{{ entry.pronunciation }}</span>
+            <span class="card-note-text">{{ entry.notes }}</span>
+          </article>
+        </div>
+      </div>
+      <div v-else class="empty-state empty-state-base">
+        <p>{{ t('words.wordList.notes.noMatches') }}</p>
+      </div>
+      <button
+        v-if="canLoadMoreNotes"
+        class="load-more-btn glass-button"
+        data-variant="secondary"
+        type="button"
+        :disabled="isLoadingNotes"
+        @click="loadNotes({ append: true })"
+      >
+        {{ isLoadingNotes ? t('words.wordList.states.loadingData') : t('words.wordList.states.loadingMore') }}
+      </button>
+    </section>
+
+    <section v-else-if="viewMode !== 'table'" class="content-area">
       <div v-if="viewMode === 'card' && isInitialLoading" class="loading-state loading-state-base">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <span>{{ t('words.wordList.states.loadingCards') }}</span>
@@ -318,6 +360,7 @@ import {
   getVocabularyMapPoints,
   getVocabularyStandardWords
 } from '@/api'
+import { searchNotes } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 import VocabularyMap from '@/main/components/map/VocabularyMap.vue'
@@ -391,7 +434,69 @@ const props = defineProps({
 })
 
 const query = ref('')
+const notesQuery = ref('')
+const source = computed({
+  get: () => route.query.source === 'character-notes' ? 'character-notes' : 'vocabulary',
+  set: (value) => {
+    const isNotes = value === 'character-notes'
+    router.replace({
+      query: {
+        ...route.query,
+        source: isNotes ? 'character-notes' : undefined,
+        tab: isNotes ? 'card' : route.query.tab,
+      },
+    })
+  },
+})
+const isCharacterNotesMode = computed(() => source.value === 'character-notes')
+const activeQuery = computed({
+  get: () => isCharacterNotesMode.value ? notesQuery.value : query.value,
+  set: (value) => {
+    if (isCharacterNotesMode.value) notesQuery.value = value
+    else query.value = value
+  },
+})
+
+function normalizeNotesSearchFields(value) {
+  const valid = ['pronunciation', 'detail']
+  const selected = Array.isArray(value) ? value.filter((field) => valid.includes(field)) : []
+  return selected.length === valid.length || !selected.length ? [] : selected
+}
+
+let storedNotesSearchFields = []
+try {
+  storedNotesSearchFields = JSON.parse(localStorage.getItem('vocabulary_notes_search_fields') || '[]')
+} catch {
+  storedNotesSearchFields = []
+}
+const notesSearchFields = ref(normalizeNotesSearchFields(storedNotesSearchFields))
+const activeSearchFields = computed({
+  get: () => isCharacterNotesMode.value ? notesSearchFields.value : selectedSearchFields.value,
+  set: (value) => {
+    if (isCharacterNotesMode.value) notesSearchFields.value = normalizeNotesSearchFields(value)
+    else selectedSearchFields.value = value
+  },
+})
+
+function cloneNotesScope(scope = {}) {
+  return {
+    locations: Array.isArray(scope.locations) ? [...scope.locations] : [],
+    regions: Array.isArray(scope.regions) ? [...scope.regions] : [],
+    regionUsing: scope.regionUsing || 'map',
+  }
+}
+
+const draftScope = ref(cloneNotesScope())
+const appliedScope = ref(cloneNotesScope())
+const notesEntries = ref([])
+const notesTotal = ref(0)
+const notesPage = ref(1)
+const notesPageSize = ref(50)
+const isLoadingNotes = ref(false)
+const notesLoadError = ref('')
+const activeNotesRequestKey = ref('')
 function resolveViewModeFromRoute() {
+  if (route.query.source === 'character-notes') return 'card'
   const tab = route.query.tab
   if (tab === 'map' || tab === 'table') return tab
   const stored = sessionStorage.getItem('vocabulary_view_mode')
@@ -576,6 +681,12 @@ const searchFieldOptions = computed(() => [
   { value: 'pronunciation', label: t('words.wordList.search.fields.ipa') },
   { value: 'detail', label: t('words.wordList.search.fields.notes') }
 ])
+const activeSearchFieldOptions = computed(() => isCharacterNotesMode.value
+  ? searchFieldOptions.value.filter((field) => ['pronunciation', 'detail'].includes(field.value))
+  : searchFieldOptions.value)
+
+const isNotesInitialLoading = computed(() => isLoadingNotes.value && !notesEntries.value.length && !notesLoadError.value)
+const canLoadMoreNotes = computed(() => !isLoadingNotes.value && notesEntries.value.length < notesTotal.value)
 
 const locationOptions = computed(() => {
   return [...vocabularyLocationOptions.value]
@@ -689,15 +800,15 @@ const mapDataForVocabularyMap = computed(() => {
 })
 
 function shouldUseVocabularyItemsApi() {
-  return viewMode.value === 'card'
+  return !isCharacterNotesMode.value && viewMode.value === 'card'
 }
 
 function shouldUseVocabularyMapPointsApi() {
-  return viewMode.value === 'map' && !selectedStandardWords.value.length
+  return !isCharacterNotesMode.value && viewMode.value === 'map' && !selectedStandardWords.value.length
 }
 
 function shouldUseVocabularyMapItemsApi() {
-  return viewMode.value === 'map' && selectedStandardWords.value.length > 0
+  return !isCharacterNotesMode.value && viewMode.value === 'map' && selectedStandardWords.value.length > 0
 }
 
 function normalizeSelectedSearchFields() {
@@ -791,6 +902,69 @@ function normalizeVocabularyEntry(item, index = 0, locationContext = '') {
     locationName,
     location: item.location_name || item.location || item.location_label || locationContext || '',
   }
+}
+
+function normalizeNotesEntry(item) {
+  return {
+    id: item.id,
+    locationName: item.location_name || '',
+    character: item.character || '',
+    pronunciation: item.ipa || '',
+    notes: item.notes || '',
+  }
+}
+
+async function loadNotes({ append = false } = {}) {
+  if (!isCharacterNotesMode.value) return
+  if (!notesQuery.value.trim()) {
+    notesEntries.value = []
+    notesTotal.value = 0
+    notesLoadError.value = ''
+    return
+  }
+
+  const nextPage = append ? notesPage.value + 1 : 1
+  const params = {
+    q: notesQuery.value.trim(),
+    search_fields: normalizeNotesSearchFields(notesSearchFields.value),
+    locations: appliedScope.value.locations,
+    regions: appliedScope.value.regions,
+    region_mode: appliedScope.value.regionUsing,
+    page: nextPage,
+    page_size: notesPageSize.value,
+  }
+  const requestKey = JSON.stringify(params)
+  activeNotesRequestKey.value = requestKey
+  isLoadingNotes.value = true
+  notesLoadError.value = ''
+  try {
+    const response = await searchNotes(params)
+    if (activeNotesRequestKey.value !== requestKey || !isCharacterNotesMode.value) return
+    const nextEntries = Array.isArray(response.items) ? response.items.map(normalizeNotesEntry) : []
+    notesEntries.value = append ? notesEntries.value.concat(nextEntries) : nextEntries
+    notesTotal.value = Number(response.total) || notesEntries.value.length
+    notesPage.value = Number(response.page) || nextPage
+    notesPageSize.value = Number(response.page_size) || notesPageSize.value
+  } catch (error) {
+    if (activeNotesRequestKey.value !== requestKey || !isCharacterNotesMode.value) return
+    notesLoadError.value = error.message || t('words.wordList.states.loadItemsFailed')
+    if (!append) {
+      notesEntries.value = []
+      notesTotal.value = 0
+    }
+  } finally {
+    if (activeNotesRequestKey.value === requestKey) isLoadingNotes.value = false
+  }
+}
+
+function refreshNotes() {
+  appliedScope.value = cloneNotesScope(draftScope.value)
+  notesPage.value = 1
+  loadNotes()
+}
+
+function handleNotesScopeResolved(scope) {
+  draftScope.value = cloneNotesScope(scope)
 }
 
 function buildVocabularyQueryParams() {
@@ -1361,6 +1535,13 @@ function loadActiveViewMode() {
 }
 
 onMounted(async () => {
+  if (isCharacterNotesMode.value) {
+    if (route.query.tab !== 'card') {
+      await router.replace({ query: { ...route.query, source: 'character-notes', tab: 'card' } })
+    }
+    loadNotes()
+    return
+  }
   await loadVocabularyLocationOptions()
   loadActiveViewMode()
 })
@@ -1371,13 +1552,14 @@ watch(entries, () => {
 })
 
 watch(() => route.query.tab, (tab) => {
-  const nextMode = tab ? normalizeViewMode(tab) : resolveViewModeFromRoute()
+  const nextMode = isCharacterNotesMode.value ? 'card' : (tab ? normalizeViewMode(tab) : resolveViewModeFromRoute())
   if (viewMode.value !== nextMode) {
     viewMode.value = nextMode
   }
 })
 
 watch(viewMode, () => {
+  if (isCharacterNotesMode.value) return
   loadActiveViewMode()
 })
 
@@ -1397,6 +1579,21 @@ watch(singleSelect, (val) => {
   localStorage.setItem('vocabulary_single_select', val ? 'true' : 'false')
 })
 
+watch(notesSearchFields, (val) => {
+  localStorage.setItem('vocabulary_notes_search_fields', JSON.stringify(normalizeNotesSearchFields(val)))
+}, { deep: true })
+
+watch(isCharacterNotesMode, async (isNotes) => {
+  if (isNotes) {
+    if (viewMode.value !== 'card') viewMode.value = 'card'
+    await router.replace({ query: { ...route.query, source: 'character-notes', tab: 'card' } })
+    loadNotes()
+  } else {
+    await loadVocabularyLocationOptions()
+    loadActiveViewMode()
+  }
+})
+
 watchDebounced([query, selectedSearchFields, selectedLocations, filterByRegion, selectedProvince, selectedCity], async () => {
   if (shouldUseVocabularyItemsApi()) {
     loadVocabularyItems()
@@ -1405,6 +1602,10 @@ watchDebounced([query, selectedSearchFields, selectedLocations, filterByRegion, 
   } else if (shouldUseVocabularyMapItemsApi()) {
     await refreshVocabularyMapData()
   }
+}, { debounce: 250, maxWait: 800 })
+
+watchDebounced([notesQuery, notesSearchFields], () => {
+  loadNotes()
 }, { debounce: 250, maxWait: 800 })
 
 watch(singleSelect, (isSingle) => {

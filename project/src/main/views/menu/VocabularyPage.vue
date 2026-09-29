@@ -5,7 +5,7 @@
       {{ activePageTitle }}
     </h1>
 
-    <div class="page-tab-navigation">
+    <div v-if="!isCharacterNotesMode" class="page-tab-navigation">
       <div
         class="page-tab-container"
         role="tablist"
@@ -126,6 +126,7 @@ const activeVocabularyPath = computed(() => {
 
 const activePageTitle = computed(() => t(pageTitleKeyByPath[activeVocabularyPath.value]))
 const activePageIcon = computed(() => pageTitleIconByPath[activeVocabularyPath.value])
+const isCharacterNotesMode = computed(() => route.query.source === 'character-notes')
 
 function createEmptyVocabularyMe() {
   return {

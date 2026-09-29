@@ -159,6 +159,21 @@
   }
 }
 
+.notes-entry-card {
+  @include flex-col;
+  gap: 6px;
+  align-items: center;
+  text-align: center;
+
+  .card-location {
+    color: var(--text-secondary);
+  }
+
+  .card-note-text {
+    color: var(--text-primary);
+  }
+}
+
 .card-location-definition-pair {
   display: inline-grid;
   grid-template-rows: auto auto;
