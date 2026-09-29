@@ -46,7 +46,7 @@
 }
 ```
 
-之后 `/api/vocabulary/notes` 接收同一份 `locations`、`regions`、`region_mode`，在服务端按 `/api/search_chars` 的同一地点匹配和分区展开逻辑解析。选择大分区时不用把整个最终简称列表写进 GET URL；个人自定义分区也会以其已经展开的显式地点传递，无需向 notes 接口暴露用户分区名称或用户数据。
+之后 `/api/notes` 接收同一份 `locations`、`regions`、`region_mode`。它独立实现地点精确匹配与分区展开，只以 `/api/search_chars` 的已验证行为作为语义参照，绝不导入或调用其路由/查询编排函数。选择大分区时不用把整个最终简称列表写进 GET URL；个人自定义分区也会以其已经展开的显式地点传递，无需向 notes 接口暴露用户分区名称或用户数据。
 
 `/get_locs` 与 notes 请求之间可能有短暂的数据差异；两者都以同一数据库、同一解析规则为准，正常情况下解析结果相同。服务器执行第二次解析是有意的：它使 notes 接口本身可以直接、完整地支持地点与分区参数，并防止客户端伪造“已解析”的地点范围。
 
@@ -101,7 +101,7 @@ appliedScope // 当前 notes 请求所用的冻结范围
 只新增一个公共、受限流的只读接口：
 
 ```http
-GET /api/vocabulary/notes
+GET /api/notes
   ?q=文白
   &search_fields=pronunciation,detail
   &locations=广州
@@ -120,7 +120,7 @@ GET /api/vocabulary/notes
 | `search_fields` | 可重复或逗号分隔；仅 `pronunciation`、`detail`、`all`。缺失、空值或 `all` 表示两者；未知值为 400。 |
 | `locations` | 可重复；按现有地点精确匹配规则解析。 |
 | `regions` | 可重复；按 `region_mode` 的现有分区规则解析。 |
-| `region_mode` | 与 `/api/search_chars` 采用完全相同的 `map`/`yindian` 语义及默认处理。 |
+| `region_mode` | 以 `/api/search_chars` 的 `map`/`yindian` 语义及默认处理为参照；由 notes 服务独立实现。 |
 | `page` | 从 1 开始。 |
 | `page_size` | 默认 50，范围 1～200。 |
 
@@ -134,7 +134,7 @@ dialects_user.db.notes.簡稱
   → 地圖集二分區 / 音典分區
 ```
 
-接口先复用 `/api/search_chars` 已有的地点与分区解析服务，获得最终简称，再筛选 `notes.簡稱`。notes 表没有分区列，不能直接在它上面过滤分区。
+notes 服务独立解析地点与分区以获得最终简称；实现和测试要对照 `/api/search_chars` 的语义，但不得复用其路由或查询编排函数。再以这些简称筛选 `notes.簡稱`。notes 表没有分区列，不能直接在它上面过滤分区。
 
 ### 搜索与响应
 
