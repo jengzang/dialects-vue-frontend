@@ -85,6 +85,7 @@ describe('Vocabulary character-notes mode', () => {
     expect(page).toContain('function openNotesLocationDetail')
     expect(styles).toContain('.notes-card-note')
     expect(notesCardStyles).not.toContain('.card-location {')
+    expect(notesCardStyles).toContain('text-align: start;')
     expect(vocabularySection).toContain('class="card-location-definition-pair"')
     expect(vocabularySection).toContain('shouldShowVocabularyCardNoteToggle')
   })
