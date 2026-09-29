@@ -77,13 +77,15 @@
               <h4 class="search-field-modal-title">
                 {{ t('words.wordList.search.filterTitle') }}
               </h4>
-              <CheckBox
-                v-for="field in searchFieldOptions"
-                :key="field.value"
-                :model-value="isFieldChecked(field.value)"
-                :label="field.label"
-                @update:model-value="(val) => toggleField(field.value, val)"
-              />
+              <div class="search-field-options">
+                <CheckBox
+                  v-for="field in searchFieldOptions"
+                  :key="field.value"
+                  :model-value="isFieldChecked(field.value)"
+                  :label="field.label"
+                  @update:model-value="(val) => toggleField(field.value, val)"
+                />
+              </div>
             </div>
             <div v-if="source === 'vocabulary'" class="search-field-mode-section">
               <h4 class="search-field-modal-title">
@@ -556,9 +558,14 @@ const standardWordTriggerLabel = computed(() => {
 
 .search-field-modal {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 12px;
-  justify-items: center;
+}
+
+.search-field-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
 }
 
 .search-field-modal-title {

@@ -86,6 +86,13 @@ describe('VocabularyTopControls character-notes mode', () => {
     expect(source).toMatch(/\.notes-refresh-action\.action-button\s*\{\s*padding:\s*6px 10px;/)
   })
 
+  it('centers every row of shared search fields', () => {
+    const source = readComponentSource()
+
+    expect(source).toContain('class="search-field-options"')
+    expect(source).toMatch(/\.search-field-options\s*\{[\s\S]*?display:\s*flex;[\s\S]*?flex-wrap:\s*wrap;[\s\S]*?justify-content:\s*center;/)
+  })
+
   it('keeps vocabulary-only filters out of notes mode while reusing passed field options', () => {
     const source = readComponentSource()
     const vocabularyBranch = source.indexOf("v-if=\"source === 'vocabulary'\"")
