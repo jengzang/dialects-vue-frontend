@@ -235,6 +235,14 @@ const props = defineProps({
   limitContext: {
     type: String,
     default: 'default'
+  },
+  allowEmptyScope: {
+    type: Boolean,
+    default: false
+  },
+  disableLocationLimit: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -284,7 +292,8 @@ const suggestionStyle = ref({
 // 已選擇地點數（來自 /get_locs/ 返回）
 const selectedCount = ref(null)
 // 定义事件，用于通知父组件禁用/启用按钮
-const emit = defineEmits(['update:runDisabled', 'update:modelValue'])
+const emit = defineEmits(['update:runDisabled', 'update:modelValue', 'locationsResolved'])
+let locationResolutionToken = 0
 
 // 自定義分區狀態
 const customRegionLocations = ref([])
@@ -397,7 +406,7 @@ async function handleCustomRegionQuery(locations) {
 
   const explicitLocations = buildExplicitLocationsForGetLocs({ locations })
 
-  if (isExplicitLocationsLimitExceeded(explicitLocations)) {
+  if (!props.disableLocationLimit && isExplicitLocationsLimitExceeded(explicitLocations)) {
     limitHint.value = t('query.components.locationAndRegionInput.tooManyLocations')
     selectedCount.value = explicitLocations.length
     updateDisabledState(true)
@@ -435,6 +444,12 @@ async function handleCustomRegionQuery(locations) {
 
 // 檢查地點數量限制
 function checkLocationLimit(count) {
+  if (props.disableLocationLimit) {
+    limitHint.value = ''
+    updateDisabledState(false)
+    return
+  }
+
   const contextLimits = LOCATION_LIMITS[props.limitContext] || LOCATION_LIMITS.default
   const limits = contextLimits[userStore.role] || contextLimits.anonymous
 
@@ -679,6 +694,7 @@ onMounted(() => {
 //   reset()
 // })
 async function fetchLocationsResult() {
+  const resolutionToken = ++locationResolutionToken
   // 1️⃣ locations ← inputValue（地點輸入）
   const locations = (inputValue.value ?? '')
       .trim()
@@ -698,6 +714,26 @@ async function fetchLocationsResult() {
 
   // 3️⃣ 若兩者皆空，直接返回（對齊 isEmptyInput 判斷）
   if (locations.length === 0 && regions.length === 0 && customRegionLocationsArray.length === 0) {
+    if (props.allowEmptyScope) {
+      limitHint.value = ''
+      selectedCount.value = 0
+      locationsResult.value = []
+      locationsPartitions.value = {}
+      if (props.useInputMode) {
+        customFeatureLocations.value = []
+      }
+      updateDisabledState(false)
+      emit('locationsResolved', {
+        locations: [],
+        regions: [],
+        regionMode: regionUsing.value,
+        resolvedLocations: [],
+        locationsPartitions: {},
+        hasScope: false
+      })
+      return
+    }
+
     limitHint.value = t('query.components.locationAndRegionInput.requireInput')
     selectedCount.value = null
     locationsResult.value = []
@@ -721,7 +757,7 @@ async function fetchLocationsResult() {
       && regionSelectionChangedSinceLastFetch.value
       && !isRestoringRegionSelection.value
 
-    if (isExplicitLocationsLimitExceeded(explicitLocations)) {
+    if (!props.disableLocationLimit && isExplicitLocationsLimitExceeded(explicitLocations)) {
       if (isRegionSelectionValidation) {
         revertRegionSelectionForLocationLimit(explicitLocations.length)
         return
@@ -739,6 +775,10 @@ async function fetchLocationsResult() {
       region_mode: regionUsing.value
     })
 
+    if (resolutionToken !== locationResolutionToken) {
+      return
+    }
+
     // ✅ 拿到結果後立即使用 Set 去重
     const uniqueLocations = Array.isArray(data?.locations_result)
         ? [...new Set(data.locations_result)]
@@ -752,22 +792,36 @@ async function fetchLocationsResult() {
     selectedCount.value = count
 
     // 7️⃣ 對齊原來的限制邏輯（showToast 對應 bottom-hint）
-    // Get limits for current context and user role
-    const contextLimits = LOCATION_LIMITS[props.limitContext] || LOCATION_LIMITS.default
-    const limits = contextLimits[userStore.role] || contextLimits.anonymous
-
-    if (count > limits.MAX_LOCATIONS) {
-      limitHint.value = limits.MESSAGE.replace('{limit}', limits.MAX_LOCATIONS)
-      updateDisabledState(true)
-    } else {
+    if (props.disableLocationLimit) {
       limitHint.value = ''
       updateDisabledState(false)
+    } else {
+      // Get limits for current context and user role
+      const contextLimits = LOCATION_LIMITS[props.limitContext] || LOCATION_LIMITS.default
+      const limits = contextLimits[userStore.role] || contextLimits.anonymous
+
+      if (count > limits.MAX_LOCATIONS) {
+        limitHint.value = limits.MESSAGE.replace('{limit}', limits.MAX_LOCATIONS)
+        updateDisabledState(true)
+      } else {
+        limitHint.value = ''
+        updateDisabledState(false)
+      }
     }
 
     if (isRegionSelectionValidation) {
       commitLastValidRegionSelection()
       regionSelectionChangedSinceLastFetch.value = false
     }
+
+    emit('locationsResolved', {
+      locations: explicitLocations,
+      regions,
+      regionMode: regionUsing.value,
+      resolvedLocations: uniqueLocations,
+      locationsPartitions: data?.locations_partitions || {},
+      hasScope: true
+    })
 
     // ✅ 若你後面還有「正常處理」，從這裡往下接
 
@@ -779,6 +833,9 @@ async function fetchLocationsResult() {
     return data
 
   } catch (err) {
+    if (resolutionToken !== locationResolutionToken) {
+      return
+    }
     console.error('❌ 請求錯誤:', err)
     limitHint.value = t('query.components.locationMultiInput.errorFetchLocations')
     selectedCount.value = null
@@ -908,6 +965,7 @@ watch(
       })
 
       // 2. 處理後端查詢邏輯 (防抖)
+      locationResolutionToken += 1
       if (debounceTimer2) clearTimeout(debounceTimer2)
       debounceTimer2 = setTimeout(async () => {
         await fetchLocationsResult()
@@ -937,6 +995,10 @@ watch(
 
 // Max locations allowed for the partition modal selection
 const maxSelectionForModal = computed(() => {
+  if (props.disableLocationLimit) {
+    return null
+  }
+
   const contextLimits = LOCATION_LIMITS[props.limitContext] || LOCATION_LIMITS.default
   const limits = contextLimits[userStore.role] || contextLimits.anonymous
   return limits.MAX_LOCATIONS === Infinity ? null : limits.MAX_LOCATIONS
