@@ -21,7 +21,15 @@ describe('Vocabulary character-notes mode', () => {
     expect(source).toContain("localStorage.getItem('vocabulary_notes_search_fields')")
     expect(source).toContain('router.replace')
     expect(source).toContain("tab: 'card'")
-    expect(source).toContain("if (!notesQuery.value.trim())")
+  })
+
+  it('loads the latest notes when the query is blank', () => {
+    const source = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
+
+    expect(source).toContain('q: notesQuery.value.trim()')
+    expect(source).not.toContain("if (!notesQuery.value.trim())")
+    expect(source).not.toContain('v-else-if="!notesQuery.trim()"')
+    expect(source).not.toContain(':notes-refresh-disabled="!notesQuery.trim()"')
   })
 
   it('uses only the applied scope until the user refreshes notes results', () => {

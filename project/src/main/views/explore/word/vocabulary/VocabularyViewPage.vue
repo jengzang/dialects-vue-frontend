@@ -18,7 +18,6 @@
       :province-options="provinceOptions"
       :city-options="cityOptions"
       :notes-scope="draftScope"
-      :notes-refresh-disabled="!notesQuery.trim()"
       @update:notes-scope="draftScope = cloneNotesScope($event)"
       @locations-resolved="handleNotesScopeResolved"
       @refresh-notes="refreshNotes"
@@ -32,9 +31,6 @@
       </div>
       <div v-else-if="notesLoadError && !notesEntries.length" class="empty-state empty-state-base">
         <p>{{ notesLoadError }}</p>
-      </div>
-      <div v-else-if="!notesQuery.trim()" class="empty-state empty-state-base">
-        <p>{{ t('words.wordList.notes.enterSearch') }}</p>
       </div>
       <div v-else-if="notesEntries.length" class="card-mode">
         <div class="cards-grid">
@@ -916,12 +912,6 @@ function normalizeNotesEntry(item) {
 
 async function loadNotes({ append = false } = {}) {
   if (!isCharacterNotesMode.value) return
-  if (!notesQuery.value.trim()) {
-    notesEntries.value = []
-    notesTotal.value = 0
-    notesLoadError.value = ''
-    return
-  }
 
   const nextPage = append ? notesPage.value + 1 : 1
   const params = {

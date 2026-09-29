@@ -56,6 +56,25 @@ describe('notes search API', () => {
     expect(searchParams.get('page_size')).toBe('200')
   })
 
+  it('omits a blank keyword while preserving the applied scope and pagination', () => {
+    const path = buildNotesSearchPath({
+      q: '',
+      search_fields: ['detail'],
+      locations: ['甲地'],
+      regions: ['音典-甲'],
+      region_mode: 'yindian',
+      page: 1,
+      page_size: 50,
+    })
+    const searchParams = paramsFromPath(path)
+
+    expect(searchParams.has('q')).toBe(false)
+    expect(searchParams.getAll('locations')).toEqual(['甲地'])
+    expect(searchParams.getAll('regions')).toEqual(['音典-甲'])
+    expect(searchParams.get('page')).toBe('1')
+    expect(searchParams.get('page_size')).toBe('50')
+  })
+
   it('delegates notes requests to the common API client', async () => {
     apiMock.mockResolvedValueOnce({ items: [], total: 0, page: 1, page_size: 50 })
 
