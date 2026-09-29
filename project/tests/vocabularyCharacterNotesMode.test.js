@@ -34,6 +34,12 @@ describe('Vocabulary character-notes mode', () => {
     expect(source).toContain('region_mode: appliedScope.value.regionUsing')
   })
 
+  it('keeps the partition source reported by the shared location resolver', () => {
+    const source = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
+
+    expect(source).toContain("regionUsing: scope.regionUsing || scope.regionMode || 'map'")
+  })
+
   it('renders note cards with location, character, IPA and annotation only', () => {
     const source = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
 

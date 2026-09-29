@@ -482,7 +482,7 @@ function cloneNotesScope(scope = {}) {
   return {
     locations: Array.isArray(scope.locations) ? [...scope.locations] : [],
     regions: Array.isArray(scope.regions) ? [...scope.regions] : [],
-    regionUsing: scope.regionUsing || 'map',
+    regionUsing: scope.regionUsing || scope.regionMode || 'map',
   }
 }
 
