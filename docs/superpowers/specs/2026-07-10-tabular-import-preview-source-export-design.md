@@ -135,7 +135,7 @@ Required changes:
 5. Keep `handleReferenceConfirm()` in the page; confirmation/apply remains business logic.
 
 Recommended source object in MergeTool:
-- `defaultReferenceSource` with `kind: 'preset'`, `fileName`, `downloadable: true`, and `resolveFile()` fetching `/data/参考表.xlsx`.
+- `defaultReferenceSource` with `kind: 'preset'`, `fileName`, `downloadable: true`, and `resolveFile()` fetching `/data/sample/参考表.xlsx`.
 
 ## Styling constraints
 

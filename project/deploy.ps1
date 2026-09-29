@@ -19,7 +19,7 @@ $FilesToUpload = @(
     "index.html",
     "config.js",
     "vite.svg",
-    "参考表.xlsx",
+    "data/",
     "auth/",
     "detail/",
     "explore/",

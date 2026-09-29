@@ -14,7 +14,7 @@
 - `index.html` - 覆盖
 - `config.js` - 覆盖
 - `vite.svg` - 覆盖
-- `参考表.xlsx` - 覆盖
+- `data/` - 覆盖
 - `auth/` - 覆盖
 - `detail/` - 覆盖
 - `explore/` - 覆盖
@@ -117,7 +117,7 @@ npm run build
 
 ### 不会变动的文件：
 - `config.js`（无hash）
-- `vite.svg`、`参考表.xlsx` 等静态资源
+- `vite.svg`、`data/` 等静态资源
 - `detail/` 目录（如果没修改）
 
 rsync会自动识别这些变化，只上传变动的文件。
@@ -133,7 +133,7 @@ FILES_TO_UPLOAD=(
     "index.html"
     "config.js"
     "vite.svg"
-    "参考表.xlsx"
+    "data/"
     "auth/"
     "detail/"
     "explore/"
@@ -151,7 +151,7 @@ $FilesToUpload = @(
     "index.html",
     "config.js",
     "vite.svg",
-    "参考表.xlsx",
+    "data/",
     "auth/",
     "detail/",
     "explore/",

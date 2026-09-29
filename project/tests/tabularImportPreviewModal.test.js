@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
@@ -170,6 +170,15 @@ describe('tabular import preview modal shell', () => {
     expect(source).toContain('forceReferencePreview.value || requireExplicitConfirmation.value')
     expect(source).toContain('forceReferencePreview.value = true')
     expect(source).toContain("showError(t('tools.merge.messages.readDefaultFailed'")
+  })
+
+  it('loads the moved default reference workbook from the sample directory', () => {
+    const source = readSource(mergeToolPath)
+
+    expect(existsSync(resolve(projectRoot, 'public/data/sample/参考表.xlsx'))).toBe(true)
+    expect(existsSync(resolve(projectRoot, 'public/data/参考表.xlsx'))).toBe(false)
+    expect(source).toContain("from '/data/sample/参考表.xlsx?url'")
+    expect(source).not.toContain("from '/data/参考表.xlsx?url'")
   })
 
   it('keeps the MergeTool default reference preview out of manual column mapping', () => {

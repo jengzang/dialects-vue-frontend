@@ -212,7 +212,7 @@
     },
     "export": {
       "resultFileName": "方音圖鑑_合併字表.xlsx",
-      "defaultReferencePath": "/参考表.xlsx",
+      "defaultReferencePath": "/data/sample/参考表.xlsx",
       "defaultReferenceFileName": "参考表.xlsx",
       "mainSheetName": "主表",
       "supplementSheetName": "補充表"
