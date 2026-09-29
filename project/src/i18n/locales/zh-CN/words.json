@@ -12,6 +12,15 @@
     "name": "词表",
     "desc": "方言词表页面",
     "placeholder": "词表页面壳子",
+    "source": {
+      "vocabulary": "词表",
+      "characterNotes": "字表注释"
+    },
+    "notes": {
+      "refreshResults": "刷新结果",
+      "enterSearch": "请输入搜索词",
+      "noMatches": "无匹配结果"
+    },
     "tabs": {
       "label": "词表工作流",
       "list": "词表",

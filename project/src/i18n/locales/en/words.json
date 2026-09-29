@@ -12,6 +12,15 @@
     "name": "Vocabulary List",
     "desc": "Dialect vocabulary list page",
     "placeholder": "Vocabulary page shell",
+    "source": {
+      "vocabulary": "Vocabulary",
+      "characterNotes": "Character Notes"
+    },
+    "notes": {
+      "refreshResults": "Refresh results",
+      "enterSearch": "Enter a search term",
+      "noMatches": "No matches found"
+    },
     "tabs": {
       "label": "Vocabulary workflows",
       "list": "List",

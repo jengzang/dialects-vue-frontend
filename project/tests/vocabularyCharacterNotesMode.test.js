@@ -51,4 +51,20 @@ describe('Vocabulary character-notes mode', () => {
     expect(shell).toContain('v-if="!isCharacterNotesMode"')
     expect(shell).toContain('const isCharacterNotesMode = computed')
   })
+
+  it('localizes the notes source controls in every supported locale', () => {
+    const localePaths = [
+      'src/i18n/locales/zh-CN/words.json',
+      'src/i18n/locales/zh-Hant/words.json',
+      'src/i18n/locales/en/words.json',
+    ]
+
+    localePaths.forEach((path) => {
+      const source = readSource(path)
+      expect(source).toContain('"characterNotes"')
+      expect(source).toContain('"refreshResults"')
+      expect(source).toContain('"enterSearch"')
+      expect(source).toContain('"noMatches"')
+    })
+  })
 })
