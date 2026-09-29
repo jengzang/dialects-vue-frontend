@@ -135,6 +135,10 @@
   padding: 20px 0;
 }
 
+.cards-grid--notes {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
 .vocabulary-entry-card {
   display: grid;
   grid-template-columns: auto auto auto;
@@ -1391,6 +1395,10 @@
     // grid-template-columns: 1fr;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 12px;
+  }
+
+  .cards-grid--notes {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
 
   .card-pronunciation-pair {

@@ -51,12 +51,24 @@ describe('Vocabulary character-notes mode', () => {
   it('renders note cards with location, character, IPA and annotation only', () => {
     const source = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
 
+    expect(source).toContain('ref="notesCardGridEl" class="cards-grid cards-grid--notes"')
     expect(source).toContain('class="glass-card notes-entry-card"')
     expect(source).toContain('{{ entry.locationName }}')
     expect(source).toContain('{{ entry.character }}')
     expect(source).toContain('{{ entry.pronunciation }}')
     expect(source).toContain('{{ entry.notes }}')
     expect(source).toContain(':key="entry.id"')
+  })
+
+  it('uses narrower grid minima only for character-notes cards', () => {
+    const styles = readSource('src/main/views/explore/word/vocabulary/vocabulary.scss')
+    const portraitStyles = styles.slice(
+      styles.indexOf('@media (max-aspect-ratio: 1 / 1)'),
+      styles.indexOf('// 格式说明弹窗'),
+    )
+
+    expect(styles).toMatch(/\.cards-grid--notes\s*\{\s*grid-template-columns:\s*repeat\(auto-fill, minmax\(200px, 1fr\)\);/)
+    expect(portraitStyles).toMatch(/\.cards-grid--notes\s*\{\s*grid-template-columns:\s*repeat\(auto-fill, minmax\(150px, 1fr\)\);/)
   })
 
   it('uses the vocabulary card hierarchy only for character-notes cards', () => {

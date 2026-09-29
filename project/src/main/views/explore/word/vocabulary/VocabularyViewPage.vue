@@ -33,7 +33,7 @@
         <p>{{ notesLoadError }}</p>
       </div>
       <div v-else-if="notesEntries.length" class="card-mode">
-        <div ref="notesCardGridEl" class="cards-grid">
+        <div ref="notesCardGridEl" class="cards-grid cards-grid--notes">
           <article v-for="entry in notesEntries" :key="entry.id" class="glass-card notes-entry-card">
             <button
               v-if="entry.locationName"
