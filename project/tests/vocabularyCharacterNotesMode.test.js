@@ -66,6 +66,10 @@ describe('Vocabulary character-notes mode', () => {
     const notesSectionEnd = page.indexOf('\n    <section v-else-if="viewMode !== \'table\'"', notesSectionStart)
     const notesSection = page.slice(notesSectionStart, notesSectionEnd)
     const vocabularySection = page.slice(notesSectionEnd)
+    const notesCardStyles = styles.slice(
+      styles.indexOf('.notes-entry-card'),
+      styles.indexOf('.card-location-definition-pair'),
+    )
 
     expect(notesSection).toContain('class="card-location pill-btn card-location-pill"')
     expect(notesSection).toContain('@click="openNotesLocationDetail(entry.locationName)"')
@@ -80,6 +84,7 @@ describe('Vocabulary character-notes mode', () => {
     expect(page).toContain('getLocationDetail')
     expect(page).toContain('function openNotesLocationDetail')
     expect(styles).toContain('.notes-card-note')
+    expect(notesCardStyles).not.toContain('.card-location {')
     expect(vocabularySection).toContain('class="card-location-definition-pair"')
     expect(vocabularySection).toContain('shouldShowVocabularyCardNoteToggle')
   })
