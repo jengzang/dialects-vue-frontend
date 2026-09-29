@@ -44,6 +44,16 @@ describe('VocabularyTopControls character-notes mode', () => {
     expect(source).toContain('isNotesScopeResolving')
   })
 
+  it('places notes refresh beside the keyword input', () => {
+    const source = readComponentSource()
+    const searchContainerStart = source.indexOf('<div class="search-container">')
+    const searchContainerEnd = source.indexOf('\n    </div>\n\n    <div\n      class="filter-strip"')
+    const refreshButtonStart = source.indexOf("{{ t('words.wordList.notes.refreshResults') }}")
+
+    expect(refreshButtonStart).toBeGreaterThan(searchContainerStart)
+    expect(refreshButtonStart).toBeLessThan(searchContainerEnd)
+  })
+
   it('keeps vocabulary-only filters out of notes mode while reusing passed field options', () => {
     const source = readComponentSource()
     const vocabularyBranch = source.indexOf("v-if=\"source === 'vocabulary'\"")

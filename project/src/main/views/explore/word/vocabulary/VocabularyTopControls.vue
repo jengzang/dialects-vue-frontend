@@ -15,6 +15,17 @@
           />
         </div>
 
+        <button
+          v-if="source === 'character-notes'"
+          class="glass-button"
+          data-variant="secondary"
+          type="button"
+          :disabled="notesRefreshDisabled || isNotesScopeResolving || isNotesScopeDisabled"
+          @click="emit('refreshNotes')"
+        >
+          {{ t('words.wordList.notes.refreshResults') }}
+        </button>
+
         <div class="field-filter">
           <button
             class="gear-btn"
@@ -108,15 +119,6 @@
           @update:run-disabled="handleNotesScopeDisabled"
           @locations-resolved="handleNotesLocationsResolved"
         />
-        <button
-          class="glass-button"
-          data-variant="secondary"
-          type="button"
-          :disabled="notesRefreshDisabled || isNotesScopeResolving || isNotesScopeDisabled"
-          @click="emit('refreshNotes')"
-        >
-          {{ t('words.wordList.notes.refreshResults') }}
-        </button>
       </template>
 
       <template v-else>
