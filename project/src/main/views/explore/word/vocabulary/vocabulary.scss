@@ -173,16 +173,33 @@
   text-align: center;
 
   .notes-card-pronunciation-pair {
+    display: grid;
     grid-column: 2;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: none;
+    align-items: baseline;
+    justify-self: stretch;
+    width: 100%;
+    gap: 8px;
     text-align: start;
 
     .word-text {
+      justify-self: end;
+      white-space: nowrap;
       font-size: 18px;
     }
 
     .pronunciation-text {
+      overflow-x: auto;
       font-size: 16px;
     }
+  }
+
+  .notes-card-pronunciation-pair > span {
+    min-width: 0;
+    max-width: none;
+    text-align: start;
+    text-align-last: auto;
   }
 
   .notes-card-note {
