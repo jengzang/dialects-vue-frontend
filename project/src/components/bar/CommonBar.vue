@@ -643,7 +643,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
       var(--glass-80) var(--liquid-glass-glint-shift),
       transparent calc(var(--liquid-glass-glint-shift) + 18%)
     ),
-    linear-gradient(135deg, var(--surface-panel-strong), var(--surface-panel-subtle));
+    linear-gradient(135deg, var(--surface-glass-floating), var(--surface-glass-floating-subtle));
   background-position: var(--liquid-glass-glint-shift) 0, center;
   background-size: 180% 100%, 100% 100%;
   border: 1px solid var(--glass-80);

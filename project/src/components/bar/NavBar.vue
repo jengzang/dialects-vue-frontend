@@ -392,7 +392,7 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
       var(--glass-80) var(--liquid-glass-glint-shift),
       transparent calc(var(--liquid-glass-glint-shift) + 18%)
     ),
-    linear-gradient(135deg, var(--surface-panel-strong), var(--surface-panel-subtle));
+    linear-gradient(135deg, var(--surface-glass-floating), var(--surface-glass-floating-subtle));
   background-position: var(--liquid-glass-glint-shift) 0, center;
   background-size: 180% 100%, 100% 100%;
   border: 1px solid var(--glass-80);
