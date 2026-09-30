@@ -1,5 +1,5 @@
 <template>
-  <div class="navbar">
+  <div ref="navbarRef" class="navbar">
     <!-- 桌面端的布局 -->
     <div ref="desktopRef" class="navbar-desktop">
       <div  class="navbar-item logo-and-title" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
@@ -192,7 +192,7 @@
 
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import {
@@ -226,9 +226,38 @@ const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const isSidebarVisible = ref(false)
+const navbarRef = ref(null)
 const desktopRef = ref(null)
 const navRef = ref(null)
 const mobileNavRef = ref(null)
+let liquidGlassScrollFrame = null
+
+const updateLiquidGlassGlint = () => {
+  liquidGlassScrollFrame = null
+
+  const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
+  const progress = Math.min(window.scrollY / maxScroll, 1)
+  navbarRef.value?.style.setProperty('--liquid-glass-glint-shift', `${20 + progress * 60}%`)
+}
+
+const scheduleLiquidGlassGlint = () => {
+  if (liquidGlassScrollFrame !== null) return
+
+  liquidGlassScrollFrame = window.requestAnimationFrame(updateLiquidGlassGlint)
+}
+
+onMounted(() => {
+  updateLiquidGlassGlint()
+  window.addEventListener('scroll', scheduleLiquidGlassGlint, { passive: true })
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', scheduleLiquidGlassGlint)
+
+  if (liquidGlassScrollFrame !== null) {
+    window.cancelAnimationFrame(liquidGlassScrollFrame)
+  }
+})
 
 // Tab label tooltip
 const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
@@ -346,24 +375,45 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
 /* 导航栏根容器 */
 .navbar {
   position: fixed;
-  top: 0;
-  left: 0;
+  top: 12px;
+  right: 16px;
+  left: 16px;
   z-index: 999;
-  width: 100%;
+  width: auto;
   box-sizing: border-box;
+  --liquid-glass-glint-shift: 20%;
 
   @include flex-center;
 
-  background: linear-gradient(135deg, var(--glass-20), var(--glass-10));
-  border: 1px solid var(--glass-30);
+  background:
+    linear-gradient(
+      110deg,
+      transparent calc(var(--liquid-glass-glint-shift) - 18%),
+      var(--glass-80) var(--liquid-glass-glint-shift),
+      transparent calc(var(--liquid-glass-glint-shift) + 18%)
+    ),
+    linear-gradient(135deg, var(--surface-panel-strong), var(--surface-panel-subtle));
+  background-position: var(--liquid-glass-glint-shift) 0, center;
+  background-size: 180% 100%, 100% 100%;
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-glass-inset);
-  backdrop-filter: blur(12px) saturate(160%);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
-  will-change: backdrop-filter;
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  will-change: backdrop-filter, background-position;
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease,
-    border-color 0.3s ease;
+    border-color 0.3s ease,
+    background-position 0.2s ease-out;
+}
+
+@media (prefers-contrast: more) {
+  .navbar {
+    background: var(--surface-panel-strong);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }
 
 /* 桌面端 */
@@ -732,6 +782,13 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
 
 /* 横竖屏切换 */
 @media (max-aspect-ratio: $mobile-aspect-ratio) {
+  .navbar {
+    top: max(8px, env(safe-area-inset-top));
+    right: 8px;
+    left: 8px;
+    border-radius: var(--radius-lg);
+  }
+
   .navbar-desktop {
     display: none;
   }

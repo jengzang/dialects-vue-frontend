@@ -482,9 +482,9 @@ $portrait-ratio: 1;
 .overlay {
   position: fixed;
   top: 0;
-  left: min(40dvw + 40px, 340px);
+  left: calc(min(40dvw + 40px, 340px) + 12px);
   z-index: 1000;
-  width: calc(100dvw - min(40dvw + 40px, 340px));
+  width: calc(100dvw - min(40dvw + 40px, 340px) - 12px);
   height: 100dvh;
 
   background: rgba(0, 0, 0, 0.5);
@@ -898,7 +898,7 @@ $portrait-ratio: 1;
   &-leave-to {
     opacity: 0;
 
-    transform: translateX(-100%);
+    transform: translateX(calc(-100% - 12px));
   }
 }
 
@@ -938,6 +938,21 @@ $portrait-ratio: 1;
 
 
 /* 移动端保持 SimpleSidebar 原逻辑 */
+
+@media (max-aspect-ratio: $portrait-ratio) {
+
+  .overlay {
+    left: min(40dvw + 40px, 340px);
+    width: calc(100dvw - min(40dvw + 40px, 340px));
+  }
+
+  .slide-fade {
+    &-enter-from,
+    &-leave-to {
+      transform: translateX(-100%);
+    }
+  }
+}
 
 @media (max-aspect-ratio: $portrait-ratio) and (any-pointer: coarse) {
 
@@ -979,4 +994,3 @@ $portrait-ratio: 1;
 }
 
 </style>
-
