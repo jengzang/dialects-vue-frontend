@@ -149,7 +149,6 @@
 
     <SimpleSidebar
       :is-open="isSidebarVisible"
-      :show-title="isMobile"
       @close="isSidebarVisible = false"
     />
 

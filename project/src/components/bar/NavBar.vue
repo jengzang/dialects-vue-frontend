@@ -98,7 +98,6 @@
 
     <SimpleSidebar
       :is-open="isSidebarVisible"
-      :show-title="false"
       @close="isSidebarVisible = false"
     />
 
