@@ -1,10 +1,17 @@
 <template>
   <Teleport :to="teleportTo">
-    <Transition :name="transitionName">
+    <Transition
+      :name="transitionName"
+      @before-enter="prepareFlipEnter"
+      @before-leave="prepareFlipLeave"
+    >
       <div
         v-if="modelValue"
         class="app-modal"
-        :class="{ 'is-frameless': frameless }"
+        :class="{
+          'is-frameless': frameless,
+          'uses-flip-detail': transitionName === 'flip-to-detail'
+        }"
         :data-size="resolvedSize"
         :style="rootStyle"
         @mousedown.self="handleBackdropClose"
@@ -14,39 +21,49 @@
         <div
           class="panel"
           :style="panelStyle"
-          :role="dialogRole"
-          :aria-modal="dialogRole === 'dialog' ? 'true' : undefined"
           @click.stop
           @wheel.stop
           @touchmove.stop
         >
-          <div v-if="hasHeader" class="header">
-            <slot name="header">
-              <component
-                :is="titleTag"
-                v-if="title"
-                class="title"
-              >
-                {{ title }}
-              </component>
-              <button
-                v-if="showClose"
-                type="button"
-                :class="resolvedCloseButtonClass"
-                :aria-label="closeLabel"
-                @click="close"
-              >
-                {{ closeText }}
-              </button>
-            </slot>
-          </div>
+          <div
+            class="panel-detail"
+            :role="dialogRole"
+            :aria-modal="dialogRole === 'dialog' ? 'true' : undefined"
+          >
+            <div
+              v-if="hasHeader"
+              class="header"
+            >
+              <slot name="header">
+                <component
+                  :is="titleTag"
+                  v-if="title"
+                  class="title"
+                >
+                  {{ title }}
+                </component>
+                <button
+                  v-if="showClose"
+                  type="button"
+                  :class="resolvedCloseButtonClass"
+                  :aria-label="closeLabel"
+                  @click="close"
+                >
+                  {{ closeText }}
+                </button>
+              </slot>
+            </div>
 
-          <div class="content ui-scrollbar">
-            <slot />
-          </div>
+            <div class="content ui-scrollbar">
+              <slot />
+            </div>
 
-          <div v-if="hasFooter" class="footer">
-            <slot name="footer" />
+            <div
+              v-if="hasFooter"
+              class="footer"
+            >
+              <slot name="footer" />
+            </div>
           </div>
         </div>
       </div>
@@ -82,7 +99,7 @@ const props = defineProps({
   },
   transitionName: {
     type: String,
-    default: 'modal-fade'
+    default: 'flip-to-detail'
   },
   teleportTo: {
     type: String,
@@ -168,6 +185,54 @@ const panelStyle = computed(() => ({
 
 const resolvedCloseButtonClass = computed(() => defaultCloseButtonClassMap[resolvedSize.value])
 
+let originElement = null
+
+function captureOrigin() {
+  const activeElement = document.activeElement
+  originElement = activeElement instanceof HTMLElement && activeElement !== document.body
+    ? activeElement
+    : null
+}
+
+function getFlipOrigin(panel) {
+  if (!originElement?.isConnected) {
+    return { x: 0, y: 0, scale: 0.92 }
+  }
+
+  const origin = originElement.getBoundingClientRect()
+  const target = panel.getBoundingClientRect()
+
+  if (!origin.width || !origin.height || !target.width || !target.height) {
+    return { x: 0, y: 0, scale: 0.92 }
+  }
+
+  return {
+    x: origin.left + origin.width / 2 - (target.left + target.width / 2),
+    y: origin.top + origin.height / 2 - (target.top + target.height / 2),
+    scale: Math.min(origin.width / target.width, origin.height / target.height)
+  }
+}
+
+function applyFlipOrigin(root) {
+  const panel = root.querySelector('.panel')
+  if (!panel) return
+
+  const { x, y, scale } = getFlipOrigin(panel)
+  root.style.setProperty('--flip-origin-x', `${x}px`)
+  root.style.setProperty('--flip-origin-y', `${y}px`)
+  root.style.setProperty('--flip-origin-scale', String(scale))
+}
+
+function prepareFlipEnter(root) {
+  if (props.transitionName !== 'flip-to-detail') return
+  applyFlipOrigin(root)
+}
+
+function prepareFlipLeave(root) {
+  if (props.transitionName !== 'flip-to-detail') return
+  applyFlipOrigin(root)
+}
+
 function close() {
   emit('update:modelValue', false)
   emit('close')
@@ -189,6 +254,7 @@ watch(
     if (typeof document === 'undefined') return
 
     if (visible && !isOpen) {
+      captureOrigin()
       isOpen = true
       if (modalCount === 0) {
         savedBodyOverflow = document.body.style.overflow
@@ -250,6 +316,7 @@ $panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
   z-index: var(--app-modal-z-index, 20000);
   @include flex-center;
   padding: 18px;
+  perspective: 1200px;
   overscroll-behavior: contain;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(8px);
@@ -304,7 +371,6 @@ $panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .panel {
   position: relative;
-  @include flex-col;
   width: var(--modal-width);
   max-height: var(--modal-max-height);
   overflow: hidden;
@@ -315,6 +381,25 @@ $panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
   box-shadow: var(--modal-shadow);
   backdrop-filter: var(--modal-backdrop-filter);
   -webkit-backdrop-filter: var(--modal-backdrop-filter);
+}
+
+.panel-detail {
+  @include flex-col;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.uses-flip-detail .panel {
+  transform: rotateY(180deg);
+  transform-style: preserve-3d;
+}
+
+.uses-flip-detail .panel-detail {
+  transform: rotateY(180deg);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .header {
@@ -409,6 +494,78 @@ $panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
   .panel {
     opacity: 0;
     transform: translateY(12px) scale(0.98);
+  }
+}
+
+.flip-to-detail-enter-active,
+.flip-to-detail-leave-active {
+  transition: opacity 0.32s ease;
+
+  .panel {
+    animation-duration: 0.62s;
+    animation-fill-mode: both;
+  }
+}
+
+.flip-to-detail-enter-active .panel {
+  animation-name: flip-to-detail-enter;
+}
+
+.flip-to-detail-leave-active .panel {
+  animation-name: flip-to-detail-leave;
+}
+
+.flip-to-detail-enter-from,
+.flip-to-detail-leave-to {
+  opacity: 0;
+}
+
+@keyframes flip-to-detail-enter {
+  0% {
+    transform: translate3d(var(--flip-origin-x), var(--flip-origin-y), 0)
+      scale(var(--flip-origin-scale)) rotateY(0deg);
+  }
+
+  70% {
+    transform: translate3d(0, 0, 0) scale(1.035) rotateY(192deg);
+  }
+
+  85% {
+    transform: translate3d(0, 0, 0) scale(0.99) rotateY(176deg);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotateY(180deg);
+  }
+}
+
+@keyframes flip-to-detail-leave {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotateY(180deg);
+  }
+
+  15% {
+    transform: translate3d(0, 0, 0) scale(0.99) rotateY(176deg);
+  }
+
+  30% {
+    transform: translate3d(0, 0, 0) scale(1.035) rotateY(192deg);
+  }
+
+  100% {
+    transform: translate3d(var(--flip-origin-x), var(--flip-origin-y), 0)
+      scale(var(--flip-origin-scale)) rotateY(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flip-to-detail-enter-active,
+  .flip-to-detail-leave-active {
+    transition: none;
+
+    .panel {
+      animation: none;
+    }
   }
 }
 
