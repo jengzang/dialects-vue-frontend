@@ -25,16 +25,24 @@ describe('AppModal Flip to Detail transition', () => {
     expect(source.match(/:role="dialogRole"/g)).toHaveLength(1)
   })
 
+  it('uses the real pointer target only as the modal position origin', () => {
+    const source = readSource('src/components/common/AppModal.vue')
+
+    expect(source).toContain("document.addEventListener('pointerdown'")
+    expect(source).toContain('lastPointerOrigin')
+    expect(source).not.toContain('cloneNode(true)')
+    expect(source).not.toContain('panel-front')
+    expect(source).toContain('rotateY(360deg)')
+  })
+
   it('defines reversible three-dimensional motion while compact mode suppresses animation globally', () => {
     const modal = readSource('src/components/common/AppModal.vue')
     const uiMode = readSource('src/styles/global/_ui-mode.scss')
 
     expect(modal).toContain('@keyframes flip-to-detail-enter')
     expect(modal).toContain('@keyframes flip-to-detail-leave')
-    expect(modal).toContain('rotateY(180deg)')
-    expect(modal).toContain('transform-style: preserve-3d')
-    expect(modal).toContain('backface-visibility: hidden')
-    expect(modal).toContain('.uses-flip-detail .panel {\n  transform: rotateY(180deg);')
+    expect(modal).toContain('rotateY(360deg)')
+    expect(modal).toContain('perspective: 1200px')
     expect(uiMode).toContain(":root[data-ui-mode='compact'] *")
     expect(uiMode).toContain('animation: none !important;')
     expect(uiMode).toContain('transition: none !important;')

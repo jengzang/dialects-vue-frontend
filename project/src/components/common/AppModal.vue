@@ -8,10 +8,7 @@
       <div
         v-if="modelValue"
         class="app-modal"
-        :class="{
-          'is-frameless': frameless,
-          'uses-flip-detail': transitionName === 'flip-to-detail'
-        }"
+        :class="{ 'is-frameless': frameless }"
         :data-size="resolvedSize"
         :style="rootStyle"
         @mousedown.self="handleBackdropClose"
@@ -21,49 +18,45 @@
         <div
           class="panel"
           :style="panelStyle"
+          :role="dialogRole"
+          :aria-modal="dialogRole === 'dialog' ? 'true' : undefined"
           @click.stop
           @wheel.stop
           @touchmove.stop
         >
           <div
-            class="panel-detail"
-            :role="dialogRole"
-            :aria-modal="dialogRole === 'dialog' ? 'true' : undefined"
+            v-if="hasHeader"
+            class="header"
           >
-            <div
-              v-if="hasHeader"
-              class="header"
-            >
-              <slot name="header">
-                <component
-                  :is="titleTag"
-                  v-if="title"
-                  class="title"
-                >
-                  {{ title }}
-                </component>
-                <button
-                  v-if="showClose"
-                  type="button"
-                  :class="resolvedCloseButtonClass"
-                  :aria-label="closeLabel"
-                  @click="close"
-                >
-                  {{ closeText }}
-                </button>
-              </slot>
-            </div>
+            <slot name="header">
+              <component
+                :is="titleTag"
+                v-if="title"
+                class="title"
+              >
+                {{ title }}
+              </component>
+              <button
+                v-if="showClose"
+                type="button"
+                :class="resolvedCloseButtonClass"
+                :aria-label="closeLabel"
+                @click="close"
+              >
+                {{ closeText }}
+              </button>
+            </slot>
+          </div>
 
-            <div class="content ui-scrollbar">
-              <slot />
-            </div>
+          <div class="content ui-scrollbar">
+            <slot />
+          </div>
 
-            <div
-              v-if="hasFooter"
-              class="footer"
-            >
-              <slot name="footer" />
-            </div>
+          <div
+            v-if="hasFooter"
+            class="footer"
+          >
+            <slot name="footer" />
           </div>
         </div>
       </div>
@@ -75,10 +68,38 @@
 // module-level state shared across all AppModal instances
 let modalCount = 0
 let savedBodyOverflow = ''
+let pointerTrackingCount = 0
+let lastPointerOrigin = null
+let lastPointerAt = 0
+
+function trackPointerOrigin(event) {
+  const target = event.target
+  if (!(target instanceof Element)) return
+
+  const interactiveTarget = target.closest('button, a, [role="button"], [data-modal-trigger]')
+  lastPointerOrigin = interactiveTarget instanceof HTMLElement
+    ? interactiveTarget
+    : target instanceof HTMLElement ? target : null
+  lastPointerAt = Date.now()
+}
+
+function startPointerTracking() {
+  if (pointerTrackingCount === 0) {
+    document.addEventListener('pointerdown', trackPointerOrigin, true)
+  }
+  pointerTrackingCount++
+}
+
+function stopPointerTracking() {
+  pointerTrackingCount = Math.max(0, pointerTrackingCount - 1)
+  if (pointerTrackingCount === 0) {
+    document.removeEventListener('pointerdown', trackPointerOrigin, true)
+  }
+}
 </script>
 
 <script setup>
-import { computed, useSlots, watch, onBeforeUnmount } from 'vue'
+import { computed, useSlots, watch, onMounted, onBeforeUnmount } from 'vue'
 
 const props = defineProps({
   modelValue: {
@@ -189,9 +210,13 @@ let originElement = null
 
 function captureOrigin() {
   const activeElement = document.activeElement
-  originElement = activeElement instanceof HTMLElement && activeElement !== document.body
-    ? activeElement
-    : null
+  const pointerOriginIsFresh = lastPointerOrigin?.isConnected
+    && Date.now() - lastPointerAt < 1000
+  originElement = pointerOriginIsFresh
+    ? lastPointerOrigin
+    : activeElement instanceof HTMLElement && activeElement !== document.body
+      ? activeElement
+      : null
 }
 
 function getFlipOrigin(panel) {
@@ -248,6 +273,10 @@ function handleBackdropClose() {
 
 let isOpen = false
 
+onMounted(() => {
+  startPointerTracking()
+})
+
 watch(
   () => props.modelValue,
   (visible) => {
@@ -273,6 +302,8 @@ watch(
 )
 
 onBeforeUnmount(() => {
+  stopPointerTracking()
+
   if (isOpen) {
     modalCount = Math.max(0, modalCount - 1)
     isOpen = false
@@ -371,6 +402,7 @@ $panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .panel {
   position: relative;
+  @include flex-col;
   width: var(--modal-width);
   max-height: var(--modal-max-height);
   overflow: hidden;
@@ -381,25 +413,6 @@ $panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
   box-shadow: var(--modal-shadow);
   backdrop-filter: var(--modal-backdrop-filter);
   -webkit-backdrop-filter: var(--modal-backdrop-filter);
-}
-
-.panel-detail {
-  @include flex-col;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-}
-
-.uses-flip-detail .panel {
-  transform: rotateY(180deg);
-  transform-style: preserve-3d;
-}
-
-.uses-flip-detail .panel-detail {
-  transform: rotateY(180deg);
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
 }
 
 .header {
@@ -527,29 +540,29 @@ $panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 
   70% {
-    transform: translate3d(0, 0, 0) scale(1.035) rotateY(192deg);
+    transform: translate3d(0, 0, 0) scale(1.035) rotateY(372deg);
   }
 
   85% {
-    transform: translate3d(0, 0, 0) scale(0.99) rotateY(176deg);
+    transform: translate3d(0, 0, 0) scale(0.99) rotateY(356deg);
   }
 
   100% {
-    transform: translate3d(0, 0, 0) scale(1) rotateY(180deg);
+    transform: translate3d(0, 0, 0) scale(1) rotateY(360deg);
   }
 }
 
 @keyframes flip-to-detail-leave {
   0% {
-    transform: translate3d(0, 0, 0) scale(1) rotateY(180deg);
+    transform: translate3d(0, 0, 0) scale(1) rotateY(360deg);
   }
 
   15% {
-    transform: translate3d(0, 0, 0) scale(0.99) rotateY(176deg);
+    transform: translate3d(0, 0, 0) scale(0.99) rotateY(356deg);
   }
 
   30% {
-    transform: translate3d(0, 0, 0) scale(1.035) rotateY(192deg);
+    transform: translate3d(0, 0, 0) scale(1.035) rotateY(372deg);
   }
 
   100% {
