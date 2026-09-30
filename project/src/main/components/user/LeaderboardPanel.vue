@@ -76,6 +76,10 @@ const categoryConfigs = computed(() => [
       {
         key: 'endpoint__api_compare_tones',
         label: t('user.leaderboard.categories.charsTones.items.compareTones')
+      },
+      {
+        key: 'endpoint__api_notes',
+        label: t('user.leaderboard.categories.charsTones.items.notes')
       }
     ]
   },

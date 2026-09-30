@@ -277,7 +277,8 @@
           "chars": "Character Queries",
           "tones": "Tone Queries",
           "compareChars": "Character Comparisons",
-          "compareTones": "Tone-Class Comparisons"
+          "compareTones": "Tone-Class Comparisons",
+          "notes": "Annotation Queries"
         }
       },
       "analysis": {
