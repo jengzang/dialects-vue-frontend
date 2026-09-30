@@ -203,6 +203,7 @@
 
   .notes-card-note-measure {
     position: absolute;
+    inset-inline-start: 0;
     width: 100%;
     min-width: 0;
     overflow: hidden;

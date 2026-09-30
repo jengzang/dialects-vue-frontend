@@ -108,6 +108,7 @@ describe('Vocabulary character-notes mode', () => {
     expect(styles).toContain('.notes-card-note')
     expect(notesCardStyles).not.toContain('.card-location {')
     expect(notesCardStyles).toContain('text-align: start;')
+    expect(notesCardStyles).toMatch(/\.notes-card-note-measure\s*\{[\s\S]*?inset-inline-start:\s*0;/)
     expect(notesCardStyles).toContain('.word-text {\n      font-size: 18px;')
     expect(notesCardStyles).toContain('.pronunciation-text {\n      font-size: 16px;')
     expect(notesCardStyles).toMatch(/\.notes-card-note-text\s*\{[\s\S]*?font-size:\s*15px;/)
