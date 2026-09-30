@@ -591,6 +591,8 @@ const selectedStandardWords = computed(() => {
 })
 const mapDisplayMode = ref('overview')
 const vocabularyLocationOptions = ref([])
+const vocabularyLocationOptionsLoaded = ref(false)
+let vocabularyLocationOptionsRequest = null
 const vocabularyStandardWordOptions = ref([])
 const entries = ref([])
 const itemsCacheKey = ref('')
@@ -1425,11 +1427,29 @@ async function loadVocabularyMapPoints() {
 }
 
 async function loadVocabularyLocationOptions() {
-  try {
-    vocabularyLocationOptions.value = await getVocabularyLocationOptions()
-  } catch {
-    vocabularyLocationOptions.value = []
+  if (vocabularyLocationOptionsLoaded.value) {
+    return vocabularyLocationOptions.value
   }
+
+  if (vocabularyLocationOptionsRequest) {
+    return vocabularyLocationOptionsRequest
+  }
+
+  vocabularyLocationOptionsRequest = getVocabularyLocationOptions()
+    .then((options) => {
+      vocabularyLocationOptions.value = options
+      vocabularyLocationOptionsLoaded.value = true
+      return options
+    })
+    .catch(() => {
+      vocabularyLocationOptions.value = []
+      return []
+    })
+    .finally(() => {
+      vocabularyLocationOptionsRequest = null
+    })
+
+  return vocabularyLocationOptionsRequest
 }
 
 async function loadVocabularyStandardWords() {

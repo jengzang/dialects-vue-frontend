@@ -114,6 +114,18 @@ describe('vocabulary location details modal', () => {
     expect(apiSource).toContain('/api/vocabulary/search/map-items')
   })
 
+  it('caches vocabulary location options and reuses the in-flight request', () => {
+    const source = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
+
+    expect(source).toContain('const vocabularyLocationOptionsLoaded = ref(false)')
+    expect(source).toContain('let vocabularyLocationOptionsRequest = null')
+    expect(source).toContain('if (vocabularyLocationOptionsLoaded.value) {')
+    expect(source).toContain('if (vocabularyLocationOptionsRequest) {')
+    expect(source).toContain('vocabularyLocationOptionsRequest = getVocabularyLocationOptions()')
+    expect(source).toContain('vocabularyLocationOptionsLoaded.value = true')
+    expect(source).toContain('vocabularyLocationOptionsRequest = null')
+  })
+
   it('deduplicates vocabulary request lifecycles and ignores stale responses', () => {
     const source = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
 
