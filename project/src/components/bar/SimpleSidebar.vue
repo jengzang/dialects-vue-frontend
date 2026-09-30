@@ -484,12 +484,14 @@ $portrait-ratio: 1;
 .overlay {
   position: fixed;
   top: 0;
-  left: calc(min(40dvw + 40px, 330px) + 12px);
+  // left: calc(min(40dvw + 40px, 330px) + 12px);
+  left: 0;
   z-index: 1000;
-  width: calc(100dvw - min(40dvw + 40px, 340px) - 12px);
+  // width: calc(100dvw - min(40dvw + 40px, 340px) - 12px);
+  width: 100dvw;
   height: 100dvh;
 
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 
@@ -943,10 +945,10 @@ $portrait-ratio: 1;
 
 @media (max-aspect-ratio: $portrait-ratio) {
 
-  .overlay {
-    left: min(40dvw + 40px, 340px);
-    width: calc(100dvw - min(40dvw + 40px, 340px));
-  }
+  // .overlay {
+  //   left: min(40dvw + 40px, 340px);
+  //   width: calc(100dvw - min(40dvw + 40px, 340px));
+  // }
 
   .slide-fade {
     &-enter-from,
