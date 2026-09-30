@@ -584,17 +584,17 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   width: auto;
   box-sizing: border-box;
   --liquid-glass-glint-shift: 20%;
-  background:
-    linear-gradient(
-      110deg,
-      transparent calc(var(--liquid-glass-glint-shift) - 18%),
-      var(--glass-80) var(--liquid-glass-glint-shift),
-      transparent calc(var(--liquid-glass-glint-shift) + 18%)
-    ),
-    linear-gradient(135deg, var(--surface-glass-floating), var(--surface-glass-floating-subtle));
+  // background:
+  //   linear-gradient(
+  //     110deg,
+  //     transparent calc(var(--liquid-glass-glint-shift) - 18%),
+  //     var(--glass-80) var(--liquid-glass-glint-shift),
+  //     transparent calc(var(--liquid-glass-glint-shift) + 18%)
+  //   ),
+  //   linear-gradient(135deg, var(--surface-glass-floating), var(--surface-glass-floating-subtle));
   background-position: var(--liquid-glass-glint-shift) 0, center;
   background-size: 180% 100%, 100% 100%;
-  border: 1px solid var(--glass-80);
+  border: 2px solid var(--glass-40);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-glass-inset);
 

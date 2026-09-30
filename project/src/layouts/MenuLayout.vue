@@ -84,7 +84,7 @@ $portrait-ratio: 1;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 6.5dvh 12px 12px;
+  padding: 7dvh 12px 12px;
   overflow-x: hidden;
   color: var(--text-deep);
   font-family: var(--font-sans);

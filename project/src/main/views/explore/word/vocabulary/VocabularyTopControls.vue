@@ -151,6 +151,7 @@
 
       <template v-else>
         <SwitchToggle
+          v-if="viewMode === 'card'"
           :model-value="source === 'vocabulary'"
           :show-label="true"
           :active-text="t('words.wordList.source.vocabulary')"

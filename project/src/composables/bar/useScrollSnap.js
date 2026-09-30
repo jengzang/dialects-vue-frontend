@@ -67,6 +67,7 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = DEFAULT_SNAP_
   // 容器内容宽度（用于计算主 tab 像素级 flex-basis）
   const navContentWidth = ref(0)
   const scrollGestures = new WeakMap()
+  const lastNavWidths = new WeakMap()
   let _observer = null
   let _settleFrame = null
 
@@ -119,6 +120,7 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = DEFAULT_SNAP_
       const w = getPrimaryContentWidth(el)
       if (w > 0) {
         navContentWidth.value = w
+        lastNavWidths.set(el, el.clientWidth)
         scrollToRest(el)
       }
     }
@@ -226,8 +228,10 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = DEFAULT_SNAP_
 
       // 用一个 ResizeObserver 同时观察桌面端和移动端 nav，
       // 只取可见 nav 的宽度（隐藏的 nav clientWidth 为 0，会被跳过）
+      // 仅当宽度变化时才重算并复位，避免 dvh 变化（纯高度变化）把横向滚动拽回起点
       _observer = new ResizeObserver(() => {
-        updateNavContentWidth(els)
+        const widthChanged = els.some((el) => el.clientWidth > 0 && lastNavWidths.get(el) !== el.clientWidth)
+        if (widthChanged) updateNavContentWidth(els)
       })
       for (const el of els) {
         scrollToRest(el)
