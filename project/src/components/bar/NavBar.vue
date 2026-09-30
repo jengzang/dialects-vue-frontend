@@ -395,11 +395,11 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
     linear-gradient(135deg, var(--surface-panel-strong), var(--surface-panel-subtle));
   background-position: var(--liquid-glass-glint-shift) 0, center;
   background-size: 180% 100%, 100% 100%;
-  border: 1px solid var(--border-glass);
+  border: 1px solid var(--glass-80);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-glass-inset);
-  backdrop-filter: blur(18px) saturate(160%);
-  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
   will-change: backdrop-filter, background-position;
   transition:
     transform 0.3s ease,
