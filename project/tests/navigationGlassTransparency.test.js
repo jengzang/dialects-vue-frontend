@@ -25,11 +25,15 @@ describe('navigation glass transparency', () => {
     }
   })
 
-  it('keeps the sidebar shell readable with a stronger translucent glass layer', () => {
-    const source = readSource('src/styles/global/_tokens.scss')
+  it('keeps the sidebar shell fully transparent with a stronger background blur', () => {
+    const tokenSource = readSource('src/styles/global/_tokens.scss')
+    const toolbarSource = readSource('src/styles/main/_toolbars.scss')
+    const sidebarSource = readSource('src/components/bar/SimpleSidebar.vue')
 
-    expect(source).toContain(
-      '--sidebar-shell-background: linear-gradient(135deg, var(--surface-glass-floating-strong), var(--surface-glass-floating));',
-    )
+    expect(tokenSource.match(/--sidebar-shell-background: transparent;/g)).toHaveLength(4)
+    expect(toolbarSource).toContain('backdrop-filter: blur(24px) saturate(145%);')
+    expect(toolbarSource).toContain('-webkit-backdrop-filter: blur(24px) saturate(145%);')
+    expect(sidebarSource).toMatch(/<Teleport to="body">[\s\S]*?<Transition name="fade">/)
+    expect(sidebarSource).toMatch(/<Transition name="slide-fade">\s*<div v-if="isOpen" class="sidebar main-sidebar-shell"/)
   })
 })

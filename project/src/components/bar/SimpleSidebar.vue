@@ -1,13 +1,14 @@
 <!-- SimpleSidebar.vue - 简化的侧边栏 -->
 <template>
-  <!-- 遮罩层 -->
-  <Transition name="fade">
-    <div v-if="isOpen" class="overlay main-sidebar-overlay" @click="$emit('close')" @wheel.prevent @touchmove.prevent></div>
-  </Transition>
+  <Teleport to="body">
+    <!-- 遮罩层 -->
+    <Transition name="fade">
+      <div v-if="isOpen" class="overlay main-sidebar-overlay" @click="$emit('close')" @wheel.prevent @touchmove.prevent></div>
+    </Transition>
 
-  <!-- 侧边栏 -->
-  <Transition name="slide-fade">
-    <div v-if="isOpen" class="sidebar main-sidebar-shell" @touchmove.stop>
+    <!-- 侧边栏 -->
+    <Transition name="slide-fade">
+      <div v-if="isOpen" class="sidebar main-sidebar-shell" @touchmove.stop>
       <!-- 标题图片 (可选) -->
       <div v-if="showTitle" class="sidebar-header">
         <img src="/brand/title.webp" alt="Title" class="title-img title-logo" />
@@ -53,8 +54,9 @@
 
         <div class="icp-number">粤ICP备2025466875号</div>
       </div>
-    </div>
-  </Transition>
+      </div>
+    </Transition>
+  </Teleport>
 
   <!-- 访问历史弹窗 -->
   <AppModal
@@ -482,7 +484,7 @@ $portrait-ratio: 1;
 .overlay {
   position: fixed;
   top: 0;
-  left: calc(min(40dvw + 40px, 340px) + 12px);
+  left: calc(min(40dvw + 40px, 330px) + 12px);
   z-index: 1000;
   width: calc(100dvw - min(40dvw + 40px, 340px) - 12px);
   height: 100dvh;

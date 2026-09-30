@@ -22,8 +22,8 @@
   background: var(--sidebar-shell-background);
   border: 1px solid var(--sidebar-shell-border);
   border-radius: var(--radius-xl);
-  backdrop-filter: blur(18px) saturate(145%);
-  -webkit-backdrop-filter: blur(18px) saturate(145%);
+  backdrop-filter: blur(24px) saturate(145%);
+  -webkit-backdrop-filter: blur(24px) saturate(145%);
   z-index: 1001;
   @include flex-col;
   justify-content: flex-end;
