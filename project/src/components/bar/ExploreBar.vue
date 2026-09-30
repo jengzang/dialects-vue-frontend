@@ -1,5 +1,5 @@
 <template>
-  <div class="explorebar">
+  <div ref="explorebarRef" class="explorebar">
     <div ref="desktopRef" class="explorebar-desktop">
       <div class="logo-and-title" @click="toggleSidebar" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
         <div class="logo-container">
@@ -245,9 +245,25 @@ const tabs = computed(() => {
 
 const isSidebarVisible = ref(false)
 const activeSubmenu = ref(null)
+const explorebarRef = ref(null)
 const desktopRef = ref(null)
 const navRef = ref(null)
 const mobileNavRef = ref(null)
+let explorebarScrollFrame = null
+
+const updateExplorebarLiquidGlassGlint = () => {
+  explorebarScrollFrame = null
+
+  const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
+  const progress = Math.min(window.scrollY / maxScroll, 1)
+  explorebarRef.value?.style.setProperty('--liquid-glass-glint-shift', `${20 + progress * 60}%`)
+}
+
+const scheduleExplorebarLiquidGlassGlint = () => {
+  if (explorebarScrollFrame !== null) return
+
+  explorebarScrollFrame = window.requestAnimationFrame(updateExplorebarLiquidGlassGlint)
+}
 
 // Tab label tooltip
 const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
@@ -375,10 +391,16 @@ watch(
 onMounted(async () => {
   checkMobile()
   document.addEventListener('click', closeSubmenu)
+  updateExplorebarLiquidGlassGlint()
+  window.addEventListener('scroll', scheduleExplorebarLiquidGlassGlint, { passive: true })
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', closeSubmenu)
+  window.removeEventListener('scroll', scheduleExplorebarLiquidGlassGlint)
+  if (explorebarScrollFrame !== null) {
+    window.cancelAnimationFrame(explorebarScrollFrame)
+  }
   if (portraitMediaQuery) {
     portraitMediaQuery.removeEventListener('change', onPortraitChange)
     portraitMediaQuery = null
@@ -556,20 +578,42 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .explorebar {
   position: fixed;
-  top: 0;
-  left: 0;
+  top: 12px;
+  right: 16px;
+  left: 16px;
   z-index: 999;
-  width: 100%;
-  background: linear-gradient(
-    145deg,
-    var(--glass-30),
-    var(--glass-20)
-  );
-  border-bottom: 1px solid var(--glass-50);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  width: auto;
+  box-sizing: border-box;
+  --liquid-glass-glint-shift: 20%;
+  background:
+    linear-gradient(
+      110deg,
+      transparent calc(var(--liquid-glass-glint-shift) - 18%),
+      var(--glass-80) var(--liquid-glass-glint-shift),
+      transparent calc(var(--liquid-glass-glint-shift) + 18%)
+    ),
+    linear-gradient(135deg, var(--surface-panel-strong), var(--surface-panel-subtle));
+  background-position: var(--liquid-glass-glint-shift) 0, center;
+  background-size: 180% 100%, 100% 100%;
+  border: 1px solid var(--glass-80);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-glass-inset);
 
-  @include glass-blur(12px, 160%);
-  will-change: backdrop-filter;
+  @include glass-blur(14px, 160%);
+  will-change: backdrop-filter, background-position;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease,
+    background-position 0.2s ease-out;
+}
+
+@media (prefers-contrast: more) {
+  .explorebar {
+    background: var(--surface-panel-strong);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }
 
 .explorebar-desktop {
@@ -821,6 +865,13 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 @media (max-aspect-ratio: 1/1) {
+  .explorebar {
+    top: max(8px, env(safe-area-inset-top));
+    right: 8px;
+    left: 8px;
+    border-radius: var(--radius-lg);
+  }
+
   .explorebar-desktop {
     display: none;
   }
