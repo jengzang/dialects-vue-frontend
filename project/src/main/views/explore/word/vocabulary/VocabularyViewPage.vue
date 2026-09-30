@@ -11,7 +11,7 @@
       v-model:filter-by-region="filterByRegion"
       v-model:selected-province="selectedProvince"
       v-model:selected-city="selectedCity"
-      :view-mode="viewMode"
+      v-model:view-mode="viewMode"
       :search-field-options="activeSearchFieldOptions"
       :location-options="locationOptions"
       :standard-word-options="standardWordOptions"
@@ -33,7 +33,7 @@
         <p>{{ notesLoadError }}</p>
       </div>
       <div v-else-if="notesEntries.length" class="card-mode">
-        <div ref="notesCardGridEl" class="cards-grid cards-grid--notes">
+        <div v-if="viewMode === 'card'" ref="notesCardGridEl" class="cards-grid cards-grid--notes">
           <article v-for="entry in notesEntries" :key="entry.id" class="glass-card notes-entry-card">
             <button
               v-if="entry.locationName"
@@ -51,6 +51,64 @@
             <div
               v-if="entry.notes"
               class="notes-card-note"
+              :class="{ 'is-expanded': isNotesCardNoteExpanded(entry.id) }"
+            >
+              <div class="notes-card-note-content">
+                <span
+                  :ref="(el) => setNotesCardNoteMeasureEl(entry.id, el)"
+                  class="notes-card-note-measure"
+                  aria-hidden="true"
+                >{{ entry.notes }}</span>
+                <span class="notes-card-note-text">{{ entry.notes }}</span>
+              </div>
+              <button
+                v-if="shouldShowNotesCardNoteToggle(entry.id)"
+                class="card-note-toggle notes-card-note-toggle"
+                :class="{ 'is-expanded': isNotesCardNoteExpanded(entry.id) }"
+                type="button"
+                :aria-expanded="isNotesCardNoteExpanded(entry.id)"
+                @click="toggleNotesCardNote(entry.id)"
+              >
+                <svg
+                  class="card-note-toggle-icon notes-card-note-toggle-icon"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="m9 6 6 6-6 6"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2.5"
+                  />
+                </svg>
+              </button>
+              <span
+                v-else
+                class="notes-card-note-toggle-spacer"
+                aria-hidden="true"
+              />
+            </div>
+          </article>
+        </div>
+        <div v-else ref="notesCardGridEl" class="notes-list">
+          <article v-for="entry in notesEntries" :key="entry.id" class="notes-row">
+            <button
+              v-if="entry.locationName"
+              class="card-location pill-btn card-location-pill notes-row-location"
+              type="button"
+              :title="entry.locationName"
+              @click="openNotesLocationDetail(entry.locationName)"
+            >
+              <span class="card-location-pill-text">{{ entry.locationName }}</span>
+            </button>
+            <span class="pronunciation-text notes-row-pronunciation">{{ entry.pronunciation }}</span>
+            <span class="word-text notes-row-character">{{ entry.character }}</span>
+            <div
+              v-if="entry.notes"
+              class="notes-card-note notes-row-note"
               :class="{ 'is-expanded': isNotesCardNoteExpanded(entry.id) }"
             >
               <div class="notes-card-note-content">
@@ -497,11 +555,13 @@ const source = computed({
   get: () => route.query.source === 'character-notes' ? 'character-notes' : 'vocabulary',
   set: (value) => {
     const isNotes = value === 'character-notes'
+    const currentTab = route.query.tab
+    const nextTab = isNotes || currentTab === 'list' ? 'card' : currentTab
     router.replace({
       query: {
         ...route.query,
         source: isNotes ? 'character-notes' : undefined,
-        tab: isNotes ? 'card' : route.query.tab,
+        tab: nextTab,
       },
     })
   },
@@ -565,8 +625,12 @@ const notesLocationPopup = ref({
 })
 let notesCardResizeObserver = null
 let notesLocationPopupRequestId = 0
+const NOTES_VIEW_MODES = ['card', 'list']
+function resolveNotesViewMode(tab) {
+  return tab === 'list' ? 'list' : 'card'
+}
 function resolveViewModeFromRoute() {
-  if (route.query.source === 'character-notes') return 'card'
+  if (route.query.source === 'character-notes') return resolveNotesViewMode(route.query.tab)
   const tab = route.query.tab
   if (tab === 'map' || tab === 'table') return tab
   const stored = sessionStorage.getItem('vocabulary_view_mode')
@@ -1693,7 +1757,7 @@ function loadActiveViewMode() {
 
 onMounted(async () => {
   if (isCharacterNotesMode.value) {
-    if (route.query.tab !== 'card') {
+    if (!NOTES_VIEW_MODES.includes(route.query.tab)) {
       await router.replace({ query: { ...route.query, source: 'character-notes', tab: 'card' } })
     }
     loadNotes()
@@ -1738,7 +1802,9 @@ watch(notesEntries, () => {
 }, { flush: 'post' })
 
 watch(() => route.query.tab, (tab) => {
-  const nextMode = isCharacterNotesMode.value ? 'card' : (tab ? normalizeViewMode(tab) : resolveViewModeFromRoute())
+  const nextMode = isCharacterNotesMode.value
+    ? resolveNotesViewMode(tab)
+    : (tab ? normalizeViewMode(tab) : resolveViewModeFromRoute())
   if (viewMode.value !== nextMode) {
     viewMode.value = nextMode
   }
@@ -1771,10 +1837,14 @@ watch(notesSearchFields, (val) => {
 
 watch(isCharacterNotesMode, async (isNotes) => {
   if (isNotes) {
-    if (viewMode.value !== 'card') viewMode.value = 'card'
-    await router.replace({ query: { ...route.query, source: 'character-notes', tab: 'card' } })
+    const nextMode = resolveNotesViewMode(route.query.tab)
+    if (viewMode.value !== nextMode) viewMode.value = nextMode
+    if (!NOTES_VIEW_MODES.includes(route.query.tab)) {
+      await router.replace({ query: { ...route.query, source: 'character-notes', tab: 'card' } })
+    }
     loadNotes()
   } else {
+    if (viewMode.value === 'list') viewMode.value = 'card'
     closeNotesLocationPopup()
     await loadVocabularyLocationOptions()
     loadActiveViewMode()

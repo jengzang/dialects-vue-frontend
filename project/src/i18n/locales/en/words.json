@@ -106,6 +106,7 @@
     "viewModes": {
       "label": "View mode",
       "card": "Cards",
+      "list": "List",
       "table": "Table",
       "map": "Map"
     },

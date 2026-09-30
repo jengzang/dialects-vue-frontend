@@ -114,6 +114,20 @@
                 auto-width
               />
             </div>
+            <div v-if="source === 'character-notes'" class="search-field-mode-section">
+              <h4 class="search-field-modal-title">
+                {{ t('words.wordList.viewModes.label') }}
+              </h4>
+              <SwitchToggle
+                :model-value="viewMode === 'list'"
+                :show-label="true"
+                :active-text="t('words.wordList.viewModes.list')"
+                :inactive-text="t('words.wordList.viewModes.card')"
+                label-position="inside"
+                auto-width
+                @update:model-value="emit('update:viewMode', $event ? 'list' : 'card')"
+              />
+            </div>
           </AppModal>
         </div>
       </div>
@@ -300,6 +314,7 @@ const emit = defineEmits([
   'update:selectedStandardWord',
   'update:selectedStandardWords',
   'update:singleSelect',
+  'update:viewMode',
   'update:filterByRegion',
   'update:selectedProvince',
   'update:selectedCity',

@@ -106,6 +106,7 @@
     "viewModes": {
       "label": "展示方式",
       "card": "卡片",
+      "list": "列表",
       "table": "表格",
       "map": "地圖"
     },

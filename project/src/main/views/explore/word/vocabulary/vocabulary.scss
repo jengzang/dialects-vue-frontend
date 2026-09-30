@@ -203,8 +203,15 @@
   }
 
   .notes-card-note {
-    display: grid;
     grid-column: 1 / -1;
+  }
+}
+
+// 注释单元格：卡片与按行列表共用
+.notes-entry-card,
+.notes-list {
+  .notes-card-note {
+    display: grid;
     grid-template-columns: minmax(0, 1fr) 14px;
     align-items: center;
     justify-self: stretch;
@@ -255,6 +262,64 @@
 
   .notes-card-note-toggle {
     justify-self: stretch;
+  }
+}
+
+// 字表注释按行列表：四列跨行对齐（地点名 / 音标 / 字 / 注释）
+.notes-list {
+  display: grid;
+  gap: 6px;
+  // 收缩到内容宽度再居中，整行可见：注释列若用 1fr 会吃掉全部余量，行就没法居中
+  width: max-content;
+  max-width: 100%;
+  min-height: 100px;
+  margin-inline: auto;
+  padding: 20px 0;
+  text-align: start;
+
+  .notes-row {
+    // 注释列必须定宽：跨行对齐要它各行一致，而「展开」箭头是 JS 按溢出渲染的，
+    // 用 max-content 会与箭头互相依赖、卡在一个偏窄的定点上
+    display: grid;
+    grid-template-columns: minmax(0, 6em) minmax(0, 5em) 2.5em minmax(0, 18em);
+    align-items: center;
+    gap: 16px;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--glass-30);
+    border-radius: var(--radius-sm, 4px);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background: var(--glass-10);
+    }
+  }
+
+  .notes-row-location {
+    grid-column: 1;
+    justify-self: start;
+  }
+
+  .notes-row-pronunciation {
+    grid-column: 2;
+    min-width: 0;
+    overflow-x: auto;
+    font-size: 15px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .notes-row-character {
+    grid-column: 3;
+    font-size: 18px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .notes-row-note {
+    grid-column: 4;
   }
 }
 
@@ -1455,6 +1520,28 @@
       .pronunciation-text {
         font-size: 12px;
       }
+    }
+
+    .notes-card-note-text {
+      font-size: 13px;
+    }
+  }
+
+  .notes-list {
+    width: 100%;
+
+    .notes-row {
+      grid-template-columns: minmax(0, 4.5em) minmax(0, 4.5em) 1.6em minmax(0, 1fr);
+      gap: 8px;
+      padding: 6px;
+    }
+
+    .notes-row-pronunciation {
+      font-size: 12px;
+    }
+
+    .notes-row-character {
+      font-size: 14px;
     }
 
     .notes-card-note-text {
