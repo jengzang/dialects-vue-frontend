@@ -515,7 +515,7 @@ $panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
   transition: opacity 0.32s ease;
 
   .panel {
-    animation-duration: 0.62s;
+    animation-duration: 1.2s;
     animation-fill-mode: both;
   }
 }
