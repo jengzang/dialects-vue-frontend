@@ -17,7 +17,6 @@
   max-width: none;
   height: calc(100dvh - 24px);
   box-sizing: border-box;
-  overscroll-behavior: contain;
   box-shadow: var(--sidebar-shell-shadow);
   background: var(--sidebar-shell-background);
   border: 1px solid var(--sidebar-shell-border);
@@ -41,8 +40,8 @@
   align-items: center;
   gap: 15px;
   flex-grow: 1;
-  max-height: 100dvh;
-  overflow: auto;
+  max-height: 100%;
+  overflow: hidden;
   margin-top: 10px;
 }
 
@@ -55,8 +54,10 @@
   align-items: center;
   gap: 12px;
   width: 100%;
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  overscroll-behavior: contain;
 }
 
 .main-sidebar-item {
@@ -95,7 +96,7 @@
   width: 100%;
   margin-top: 10px;
   margin-bottom: 15px;
-  overflow-x: auto;
+  flex-shrink: 0;
 }
 
 .main-sidebar-stats-summary {

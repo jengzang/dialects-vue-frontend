@@ -77,7 +77,7 @@ $portrait-ratio: 1;
   box-sizing: border-box;
   min-height: calc(100dvh - max(16px, env(safe-area-inset-top)));
   padding: 10px 6px;
-  padding-top: calc(7dvh - 15px);
+  padding-top: calc(7.5dvh - 15px);
   color: var(--text-deep);
   font-family: var(--font-sans);
 }

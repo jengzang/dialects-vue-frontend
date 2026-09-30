@@ -263,6 +263,23 @@ watch(() => route.fullPath, () => {
   }
 })
 
+// 侧边栏打开时锁定页面滚动，避免滚轮/触摸滚动穿透到背后页面
+let savedBodyOverflow = ''
+
+watch(
+  () => props.isOpen,
+  (open) => {
+    if (typeof document === 'undefined') return
+    if (open) {
+      savedBodyOverflow = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = savedBodyOverflow
+    }
+  },
+  { immediate: true }
+)
+
 // 访问统计相关
 const isStatsExpanded = ref(false);
 
@@ -434,6 +451,7 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
+  if (props.isOpen) document.body.style.overflow = savedBodyOverflow;
   document.removeEventListener('click', closeSubmenu);
   if (hoverMediaQuery) {
     hoverMediaQuery.removeEventListener('change', updateInputCapabilities);
@@ -514,7 +532,7 @@ $portrait-ratio: 1;
   width: 100%;
   margin-top: 10px;
   margin-bottom: 15px;
-  overflow-x: auto;
+  flex-shrink: 0;
 }
 
 
@@ -596,6 +614,7 @@ $portrait-ratio: 1;
   text-align: center;
   color: var(--text-gray);
   font-size: 14px;
+  flex-shrink: 0;
 }
 
 

@@ -84,7 +84,7 @@ $portrait-ratio: 1;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 6dvh 12px 12px;
+  padding: 6.5dvh 12px 12px;
   overflow-x: hidden;
   color: var(--text-deep);
   font-family: var(--font-sans);
@@ -114,7 +114,7 @@ $portrait-ratio: 1;
   }
 
   .glass-content {
-    padding: 15dvh 8px 8px;
+    padding: 16dvh 8px 8px;
     font-size: 1.1rem;
     line-height: 1.6;
   }
