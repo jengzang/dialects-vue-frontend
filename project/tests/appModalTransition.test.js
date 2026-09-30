@@ -32,7 +32,20 @@ describe('AppModal Flip to Detail transition', () => {
     expect(source).toContain('lastPointerOrigin')
     expect(source).not.toContain('cloneNode(true)')
     expect(source).not.toContain('panel-front')
-    expect(source).toContain('rotateY(360deg)')
+    expect(source).toContain('rotateY(180deg)')
+  })
+
+  it('keeps the original flex layout around the detail face', () => {
+    const source = readSource('src/components/common/AppModal.vue')
+
+    expect(source).toMatch(/\.panel \{\s+position: relative;\s+@include flex-col;/)
+    expect(source).toMatch(/\.panel-detail \{[\s\S]*?@include flex-col;[\s\S]*?flex: 1;/)
+  })
+
+  it('does not hide the detail face behind the glass panel after the flip', () => {
+    const source = readSource('src/components/common/AppModal.vue')
+
+    expect(source).not.toContain('backface-visibility: hidden')
   })
 
   it('defines reversible three-dimensional motion while compact mode suppresses animation globally', () => {
@@ -41,9 +54,9 @@ describe('AppModal Flip to Detail transition', () => {
 
     expect(modal).toContain('@keyframes flip-to-detail-enter')
     expect(modal).toContain('@keyframes flip-to-detail-leave')
-    expect(modal).toContain('rotateY(360deg)')
+    expect(modal).toContain('rotateY(180deg)')
     expect(modal).toContain('perspective: 1200px')
-    expect(modal).toContain('animation-duration: 1.2s')
+    expect(modal).toContain('animation-duration: 0.8s')
     expect(uiMode).toContain(":root[data-ui-mode='compact'] *")
     expect(uiMode).toContain('animation: none !important;')
     expect(uiMode).toContain('transition: none !important;')

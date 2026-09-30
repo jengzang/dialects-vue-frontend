@@ -8,7 +8,10 @@
       <div
         v-if="modelValue"
         class="app-modal"
-        :class="{ 'is-frameless': frameless }"
+        :class="{
+          'is-frameless': frameless,
+          'uses-flip-detail': transitionName === 'flip-to-detail'
+        }"
         :data-size="resolvedSize"
         :style="rootStyle"
         @mousedown.self="handleBackdropClose"
@@ -18,45 +21,49 @@
         <div
           class="panel"
           :style="panelStyle"
-          :role="dialogRole"
-          :aria-modal="dialogRole === 'dialog' ? 'true' : undefined"
           @click.stop
           @wheel.stop
           @touchmove.stop
         >
           <div
-            v-if="hasHeader"
-            class="header"
+            class="panel-detail"
+            :role="dialogRole"
+            :aria-modal="dialogRole === 'dialog' ? 'true' : undefined"
           >
-            <slot name="header">
-              <component
-                :is="titleTag"
-                v-if="title"
-                class="title"
-              >
-                {{ title }}
-              </component>
-              <button
-                v-if="showClose"
-                type="button"
-                :class="resolvedCloseButtonClass"
-                :aria-label="closeLabel"
-                @click="close"
-              >
-                {{ closeText }}
-              </button>
-            </slot>
-          </div>
+            <div
+              v-if="hasHeader"
+              class="header"
+            >
+              <slot name="header">
+                <component
+                  :is="titleTag"
+                  v-if="title"
+                  class="title"
+                >
+                  {{ title }}
+                </component>
+                <button
+                  v-if="showClose"
+                  type="button"
+                  :class="resolvedCloseButtonClass"
+                  :aria-label="closeLabel"
+                  @click="close"
+                >
+                  {{ closeText }}
+                </button>
+              </slot>
+            </div>
 
-          <div class="content ui-scrollbar">
-            <slot />
-          </div>
+            <div class="content ui-scrollbar">
+              <slot />
+            </div>
 
-          <div
-            v-if="hasFooter"
-            class="footer"
-          >
-            <slot name="footer" />
+            <div
+              v-if="hasFooter"
+              class="footer"
+            >
+              <slot name="footer" />
+            </div>
           </div>
         </div>
       </div>
@@ -322,7 +329,7 @@ onBeforeUnmount(() => {
 
 $transition-duration: 0.3s;
 $transition-ease: ease;
-$panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
+$panel-transition-ease: cubic-bezier(0.25, 1, 0.25, 1);
 
 .app-modal {
   --modal-width: min(720px, 94dvw);
@@ -413,6 +420,23 @@ $panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
   box-shadow: var(--modal-shadow);
   backdrop-filter: var(--modal-backdrop-filter);
   -webkit-backdrop-filter: var(--modal-backdrop-filter);
+}
+
+.panel-detail {
+  @include flex-col;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+
+.uses-flip-detail .panel {
+  transform: rotateY(180deg);
+  transform-style: preserve-3d;
+}
+
+.uses-flip-detail .panel-detail {
+  transform: rotateY(180deg);
+  transform-style: preserve-3d;
 }
 
 .header {
@@ -515,7 +539,7 @@ $panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
   transition: opacity 0.32s ease;
 
   .panel {
-    animation-duration: 1.2s;
+    animation-duration: 1s;
     animation-fill-mode: both;
   }
 }
@@ -540,29 +564,29 @@ $panel-transition-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 
   70% {
-    transform: translate3d(0, 0, 0) scale(1.035) rotateY(372deg);
+    transform: translate3d(0, 0, 0) scale(1.035) rotateY(192deg);
   }
 
   85% {
-    transform: translate3d(0, 0, 0) scale(0.99) rotateY(356deg);
+    transform: translate3d(0, 0, 0) scale(0.99) rotateY(176deg);
   }
 
   100% {
-    transform: translate3d(0, 0, 0) scale(1) rotateY(360deg);
+    transform: translate3d(0, 0, 0) scale(1) rotateY(180deg);
   }
 }
 
 @keyframes flip-to-detail-leave {
   0% {
-    transform: translate3d(0, 0, 0) scale(1) rotateY(360deg);
+    transform: translate3d(0, 0, 0) scale(1) rotateY(180deg);
   }
 
   15% {
-    transform: translate3d(0, 0, 0) scale(0.99) rotateY(356deg);
+    transform: translate3d(0, 0, 0) scale(0.99) rotateY(176deg);
   }
 
   30% {
-    transform: translate3d(0, 0, 0) scale(1.035) rotateY(372deg);
+    transform: translate3d(0, 0, 0) scale(1.035) rotateY(192deg);
   }
 
   100% {
