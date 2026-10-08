@@ -135,6 +135,7 @@ function createEmptyVocabularyMe() {
     can_upload: false,
     can_manage_entries: false,
     can_view_logs: false,
+    can_delete_locations: false,
   }
 }
 
@@ -148,6 +149,10 @@ function getVocabularyMeCacheOwnerKey() {
   return ''
 }
 
+function hasVocabularyDeleteCapability(value) {
+  return typeof value?.can_delete_locations === 'boolean'
+}
+
 function readCachedVocabularyMe() {
   const ownerKey = getVocabularyMeCacheOwnerKey()
   if (!ownerKey) return null
@@ -155,6 +160,10 @@ function readCachedVocabularyMe() {
   try {
     const cached = JSON.parse(localStorage.getItem(VOCABULARY_ME_CACHE_KEY) || 'null')
     if (cached?.owner_key === ownerKey && cached?.data && typeof cached.data === 'object') {
+      if (!hasVocabularyDeleteCapability(cached.data)) {
+        localStorage.removeItem(VOCABULARY_ME_CACHE_KEY)
+        return null
+      }
       return cached.data
     }
   } catch {

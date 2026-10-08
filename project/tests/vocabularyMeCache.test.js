@@ -171,6 +171,37 @@ beforeEach(() => {
 })
 
 describe('vocabulary permission cache', () => {
+  it('refreshes a cached permission response that lacks the location deletion capability', async () => {
+    const legacyCachedPermission = {
+      user_id: 42,
+      permission_level: 'edit',
+      can_upload: true,
+      can_manage_entries: false,
+      can_view_logs: false,
+    }
+    const refreshedPermission = {
+      ...legacyCachedPermission,
+      can_delete_locations: true,
+    }
+    localStorage.setItem('vocabulary_me', JSON.stringify({
+      owner_key: 'id:42',
+      data: legacyCachedPermission,
+    }))
+    apiMocks.getVocabularyMe.mockResolvedValueOnce(refreshedPermission)
+
+    const wrapper = mountVocabularyPage()
+    await flushPromises()
+
+    expect(apiMocks.getVocabularyMe).toHaveBeenCalledTimes(1)
+    expect(JSON.parse(localStorage.getItem('vocabulary_me'))).toEqual({
+      owner_key: 'id:42',
+      data: refreshedPermission,
+    })
+    expect(JSON.parse(wrapper.host.querySelector('[data-testid="permission-sink"]').dataset.vocabularyMe)).toEqual(refreshedPermission)
+
+    wrapper.unmount()
+  })
+
   it('uses cached permissions until the refresh permission button is clicked', async () => {
     const cachedPermission = {
       user_id: 42,
@@ -178,6 +209,7 @@ describe('vocabulary permission cache', () => {
       can_upload: true,
       can_manage_entries: true,
       can_view_logs: false,
+      can_delete_locations: true,
     }
     const refreshedPermission = {
       user_id: 42,
@@ -185,6 +217,7 @@ describe('vocabulary permission cache', () => {
       can_upload: true,
       can_manage_entries: true,
       can_view_logs: true,
+      can_delete_locations: true,
     }
     localStorage.setItem('vocabulary_me', JSON.stringify({
       owner_key: 'id:42',
@@ -224,6 +257,7 @@ describe('vocabulary permission cache', () => {
       can_upload: true,
       can_manage_entries: true,
       can_view_logs: false,
+      can_delete_locations: true,
     }
     const refreshedPermission = {
       user_id: 42,
@@ -231,11 +265,13 @@ describe('vocabulary permission cache', () => {
       can_upload: true,
       can_manage_entries: true,
       can_view_logs: true,
+      can_delete_locations: true,
     }
     const laterPermission = {
       ...refreshedPermission,
       permission_level: 'edit',
       can_view_logs: false,
+      can_delete_locations: true,
     }
     localStorage.setItem('vocabulary_me', JSON.stringify({
       owner_key: 'id:42',

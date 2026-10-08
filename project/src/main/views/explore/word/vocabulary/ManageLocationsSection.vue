@@ -67,7 +67,7 @@
               {{ t('common.button.delete') }}
             </button>
             <button
-              v-if="canDeleteLocation"
+              v-if="canTransferLocation"
               class="glass-button"
               style="background-color: var(--color-primary-light);"
               data-variant="secondary"
@@ -204,6 +204,7 @@ const props = defineProps({
   hasVocabularyPermission: { type: Boolean, default: false },
   canViewVocabularyLogs: { type: Boolean, default: false },
   canDeleteLocation: { type: Boolean, default: false },
+  canTransferLocation: { type: Boolean, default: false },
   managePermissionLevel: { type: String, default: null },
 })
 
@@ -468,7 +469,7 @@ async function handleExportLocation(location) {
 }
 
 async function handleDeleteLocation(location) {
-  if (!location?.location_name) return
+  if (!location?.location_name || location.user_id === null || location.user_id === undefined) return
 
   const confirmed = await showConfirm(
     t('words.wordList.locations.deleteConfirm', { name: location.location_name }),
@@ -478,7 +479,7 @@ async function handleDeleteLocation(location) {
 
   locationsStatusText.value = ''
   try {
-    const params =  {}
+    const params = { user_id: location.user_id }
     const result = await deleteVocabularyLocation(location.location_name, params)
     locationsStatusText.value = t('words.wordList.locations.deleteSuccess', { count: result.deleted_entries })
     showSuccess(locationsStatusText.value)

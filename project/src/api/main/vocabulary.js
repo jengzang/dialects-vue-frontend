@@ -320,7 +320,7 @@ export async function getVocabularyMapItems(params = {}) {
  *
  * 该接口是 vocabulary 前端权限 UI 的唯一来源；公开展示失败时可按无权限处理。
  *
- * @returns {Promise<{user_id: number, permission_level: 'edit' | 'manage' | null, can_upload: boolean, can_manage_entries: boolean, can_view_logs: boolean}>}
+ * @returns {Promise<{user_id: number, permission_level: 'edit' | 'manage' | null, can_upload: boolean, can_manage_entries: boolean, can_view_logs: boolean, can_delete_locations: boolean}>}
  */
 export async function getVocabularyMe() {
   return api(VOCABULARY_ME_ENDPOINT)

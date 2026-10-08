@@ -31,6 +31,7 @@ const {
   getVocabularyLocationOptions,
   getVocabularyLocations,
   getVocabularyLogs,
+  deleteVocabularyLocation,
   updateVocabularyLocation,
   setVocabularyPermission,
   setVocabularyEntryCreateLocationName,
@@ -70,6 +71,7 @@ describe('vocabulary items API', () => {
       can_upload: true,
       can_manage_entries: false,
       can_view_logs: false,
+      can_delete_locations: true,
     })
 
     await getVocabularyMe()
@@ -359,6 +361,16 @@ describe('vocabulary table API adapter', () => {
     expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/locations/%E6%81%AF%E7%83%BD?user_id=7', {
       method: 'PATCH',
       body: { coordinates: '106,27' },
+    })
+
+    apiMock.mockResolvedValueOnce({
+      status: 'deleted',
+      location_name: '息烽',
+      deleted_entries: 2,
+    })
+    await deleteVocabularyLocation('息烽', { user_id: 7 })
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/locations/%E6%81%AF%E7%83%BD?user_id=7', {
+      method: 'DELETE',
     })
 
     apiMock.mockResolvedValueOnce({ logs: [], total: 0, page: 1, page_size: 50 })

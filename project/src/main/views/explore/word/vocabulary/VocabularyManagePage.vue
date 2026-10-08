@@ -39,7 +39,8 @@
         v-else-if="manageSection === 'locations'"
         :has-vocabulary-permission="hasVocabularyPermission"
         :manage-permission-level="effectiveVocabularyMe?.permission_level"
-        :can-delete-location="canViewVocabularyLogs"
+        :can-delete-location="canDeleteVocabularyLocations"
+        :can-transfer-location="canManageVocabularyEntries"
       />
       <ManageLogsSection
         v-else-if="manageSection === 'logs'"
@@ -77,6 +78,12 @@ const localVocabularyMe = ref(null)
 const effectiveVocabularyMe = computed(() => props.vocabularyMe || localVocabularyMe.value)
 const hasVocabularyPermission = computed(() => Boolean(effectiveVocabularyMe.value?.permission_level))
 const canViewVocabularyLogs = computed(() => effectiveVocabularyMe.value?.can_view_logs === true)
+const canDeleteVocabularyLocations = computed(() => (
+  effectiveVocabularyMe.value?.can_delete_locations === true
+))
+const canManageVocabularyEntries = computed(() => (
+  effectiveVocabularyMe.value?.can_manage_entries === true
+))
 
 const entriesTabLabel = computed(() => {
   if (effectiveVocabularyMe.value?.permission_level === 'edit') {
@@ -171,6 +178,8 @@ watch(() => [
   props.isAuthenticated,
   props.vocabularyMe?.permission_level,
   props.vocabularyMe?.can_view_logs,
+  props.vocabularyMe?.can_delete_locations,
+  props.vocabularyMe?.can_manage_entries,
 ], () => {
   if (shouldShowAccessGate.value) {
     return
