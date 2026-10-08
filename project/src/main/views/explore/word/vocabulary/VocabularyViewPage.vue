@@ -581,11 +581,11 @@ function normalizeNotesSearchFields(value) {
   return selected.length === valid.length || !selected.length ? [] : selected
 }
 
-let storedNotesSearchFields = []
+let storedNotesSearchFields = ['detail']
 try {
-  storedNotesSearchFields = JSON.parse(localStorage.getItem('vocabulary_notes_search_fields') || '[]')
+  storedNotesSearchFields = JSON.parse(localStorage.getItem('vocabulary_notes_search_fields') || '["detail"]')
 } catch {
-  storedNotesSearchFields = []
+  storedNotesSearchFields = ['detail']
 }
 const notesSearchFields = ref(normalizeNotesSearchFields(storedNotesSearchFields))
 const activeSearchFields = computed({
