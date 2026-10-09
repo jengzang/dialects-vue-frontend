@@ -115,13 +115,12 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = DEFAULT_SNAP_
     return Math.max(0, w - gap * (visiblePrimaryCount - 1) - primaryInlineExtras)
   }
 
-  const updateNavContentWidth = (els) => {
+  const updateNavContentWidth = (els, resetScroll = true) => {
     for (const el of els) {
       const w = getPrimaryContentWidth(el)
       if (w > 0) {
         navContentWidth.value = w
-        lastNavWidths.set(el, el.clientWidth)
-        scrollToRest(el)
+        if (resetScroll) scrollToRest(el)
       }
     }
   }
@@ -228,10 +227,15 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = DEFAULT_SNAP_
 
       // 用一个 ResizeObserver 同时观察桌面端和移动端 nav，
       // 只取可见 nav 的宽度（隐藏的 nav clientWidth 为 0，会被跳过）
-      // 仅当宽度变化时才重算并复位，避免 dvh 变化（纯高度变化）把横向滚动拽回起点
+      // 宽度始终重算（保证 tab 宽度跟随 resize），但仅在宽度变化时才复位滚动，
+      // 避免 dvh 变化（纯高度变化）把横向滚动拽回起点
       _observer = new ResizeObserver(() => {
-        const widthChanged = els.some((el) => el.clientWidth > 0 && lastNavWidths.get(el) !== el.clientWidth)
-        if (widthChanged) updateNavContentWidth(els)
+        const visibleEls = els.filter((el) => el.clientWidth > 0)
+        const widthChanged = visibleEls.some((el) => lastNavWidths.get(el) !== el.clientWidth)
+        for (const el of visibleEls) {
+          lastNavWidths.set(el, el.clientWidth)
+        }
+        updateNavContentWidth(els, widthChanged)
       })
       for (const el of els) {
         scrollToRest(el)
