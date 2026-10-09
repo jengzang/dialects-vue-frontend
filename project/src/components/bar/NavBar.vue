@@ -462,16 +462,12 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   left: 0;
   top: 50%;
   pointer-events: none;
-  background: linear-gradient(
-    155deg,
-    color-mix(in srgb, var(--text-primary) 18%, var(--glass-40)),
-    color-mix(in srgb, var(--text-primary) 24%, var(--glass-20))
-  );
+  background: linear-gradient(155deg, var(--glass-30), var(--glass-05));
   border-radius: 25px;
   box-shadow:
     inset 0 1px 0 var(--glass-90),
     inset 0 0 0 1px var(--glass-60),
-    inset 0 -3px 8px color-mix(in srgb, var(--text-primary) 8%, transparent),
+    inset 0 -3px 8px rgba(var(--color-shadow-rgb), 0.08),
     0 5px 12px rgba(var(--color-shadow-rgb), 0.15);
   @include glass-blur(8px, 150%);
   opacity: 1 !important;
