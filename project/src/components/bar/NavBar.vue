@@ -65,7 +65,7 @@
               class="label"
               v-if="!t.showLabelOnlyWhenActive || isMenuTabActive(t.tab)"
             >{{ t.label }}</span>
-            <svg v-if="t.to?.path && !t.to.path.includes('/menu/')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+            <svg v-if="t.to?.path && !t.to.path.includes('/menu/')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </span>
           </a>
         </RouterLink>
@@ -163,7 +163,7 @@
             <span class="tab-icon-label" :class="{ 'tab-icon-label--stack': !isMenuTabActive(t.tab) && (t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) !== false }">
               <span class="tab-icon-row">
                 <BarIcon :icon="t.icon" class="nav-icon" :weight="isMenuTabActive(t.tab) ? 'fill' : 'bold'" />
-                <svg v-if="t.to?.path && !t.to.path.includes('/menu/')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
+                <svg v-if="t.to?.path && !t.to.path.includes('/menu/')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
               </span>
               <span
                 class="label"
@@ -561,7 +561,7 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   @include flex-center;
 
   border-radius: var(--radius-md);
-  color: $primary;
+  color: var(--text-gray);
   white-space: nowrap;
   text-align: center;
   text-decoration: none;
