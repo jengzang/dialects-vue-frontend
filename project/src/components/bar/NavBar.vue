@@ -385,13 +385,16 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   @include flex-center;
 
   background:
-    linear-gradient(110deg, transparent 35%, var(--glass-30) 50%, transparent 65%),
-    linear-gradient(145deg, var(--glass-30), var(--glass-10));
+    linear-gradient(110deg, transparent 35%, var(--glass-50) 50%, transparent 65%),
+    linear-gradient(180deg, var(--glass-40), var(--glass-10));
   background-position: var(--liquid-glass-glint-shift) 0, center;
   background-size: 180% 100%, 100% 100%;
-  border: 2px solid var(--glass-30);
+  border: 2px solid var(--glass-50);
   border-radius: var(--radius-xl);
-  box-shadow: inset 0 1px 0 var(--glass-70), var(--shadow-glass);
+  box-shadow:
+    inset 0 1px 0 var(--glass-90),
+    inset 0 -1px 0 var(--glass-30),
+    0 10px 24px rgba(var(--color-shadow-rgb), 0.18);
   backdrop-filter: blur(14px) saturate(160%);
   -webkit-backdrop-filter: blur(14px) saturate(160%);
   transition:
@@ -459,9 +462,17 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   left: 0;
   top: 50%;
   pointer-events: none;
-  background: linear-gradient(155deg, var(--glass-60), var(--glass-20) 60%, var(--glass-10));
+  background: linear-gradient(
+    155deg,
+    color-mix(in srgb, var(--text-primary) 18%, var(--glass-40)),
+    color-mix(in srgb, var(--text-primary) 24%, var(--glass-20))
+  );
   border-radius: 25px;
-  box-shadow: inset 0 1px 0 var(--glass-80), inset 0 0 0 1px var(--glass-40), var(--shadow-glass);
+  box-shadow:
+    inset 0 1px 0 var(--glass-90),
+    inset 0 0 0 1px var(--glass-60),
+    inset 0 -3px 8px color-mix(in srgb, var(--text-primary) 8%, transparent),
+    0 5px 12px rgba(var(--color-shadow-rgb), 0.15);
   @include glass-blur(8px, 150%);
   opacity: 1 !important;
   transition:
