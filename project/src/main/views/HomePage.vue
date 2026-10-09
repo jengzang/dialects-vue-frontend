@@ -581,11 +581,11 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     margin-bottom: 5rem;
     text-align: left;
     animation: heroFadeIn 1s $ease-apple;
-    backdrop-filter: blur(8px) saturate(180%);
+    backdrop-filter: blur(8px) saturate(160%);
     border-radius: var(--radius-lg);
     // background: var(--bg-blue-hover);
-    border: 1px solid var(--glass-40);
-    background: color-mix(in srgb, var(--bg-body) 50%, transparent);
+    border: 2px solid var(--glass-40);
+    background: var(--glass-20);
   }
 
   &-logo {
@@ -1419,11 +1419,6 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
       margin: 0 auto 10rem;
       padding: 1rem;
       text-align: center;
-      background: var(--glass-30);
-      backdrop-filter: blur(8px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
-      border-radius: var(--radius-xl);
-      border: 1px solid var(--glass-40);
     }
 
     &-content:has(+ .globe-joystick-anchor:not(:empty)) {
