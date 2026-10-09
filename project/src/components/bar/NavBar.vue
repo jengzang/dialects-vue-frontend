@@ -262,7 +262,7 @@ onBeforeUnmount(() => {
 const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
 
 const { pillStyle: desktopPillStyle } = useTabPill(navRef, '.menu-inner.active', route)
-const { pillStyle: mobilePillStyle } = useTabPill(mobileNavRef, '.menu-item.active', route)
+const { pillStyle: mobilePillStyle, updatePill: updateMobilePill } = useTabPill(mobileNavRef, '.menu-item.active', route)
 
 // ===== sessionStorage 管理：记住每个 tab 的最后访问的 sub =====
 watch(() => route.path, () => {
@@ -279,13 +279,19 @@ const getTabScroll = (tab, isMobile) => getDefaultTabScroll(tab, isMobile)
 const orderedTabs = computed(() => sortTabsByScroll(tabs.value, false, getTabScroll))
 const orderedMobileTabs = computed(() => sortTabsByScroll(tabs.value, true, getTabScroll))
 
-const { hasOverflowDesktop, hasOverflowMobile, scrollClass, scrollClassMobile, onScroll, onScrollEnd, navContentWidth } = useScrollSnap(
+const { hasOverflowDesktop, hasOverflowMobile, scrollClass, scrollClassMobile, onScroll, onScrollEnd, scrollToRest, navContentWidth } = useScrollSnap(
   navRef,
   orderedTabs,
   { desktop: 30, portrait: 18 },
   mobileNavRef,
   orderedMobileTabs
 )
+
+watch(() => orderedMobileTabs.value.map(tab => tab.tab).join('|'), () => {
+  if (!mobileNavRef.value) return
+  scrollToRest(mobileNavRef.value)
+  updateMobilePill()
+}, { flush: 'post' })
 
 const { canScrollLeft, canScrollRight, isScrolling, arrowLeftPx, arrowRightPx, startScroll, stopScroll } = useScrollArrows(
   navRef,
@@ -814,7 +820,7 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
       border-radius: 30px;
       color: var(--color-primary-hover);
       font-weight: 700;
-      transition: 0.3s ease 0.6s;
+      transition: color 0.3s ease 0.6s;
 
       .nav-icon, .label {
         font-size: 1.1em;
