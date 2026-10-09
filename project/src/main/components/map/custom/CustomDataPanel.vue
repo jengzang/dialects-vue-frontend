@@ -4,7 +4,7 @@
       {{ isPanelOpen ? t('map.customDataPanel.buttons.collapse') : t('map.customDataPanel.buttons.expand') }}
     </button>
 
-    <div v-if="shouldShowPanel" :class="['custom-data-panel', { open: isPanelOpen }]">
+    <div v-if="shouldShowPanel" :class="['custom-data-panel', 'glass-panel', { open: isPanelOpen }]">
       <div v-if="isPanelOpen" class="panelContent">
         <h3 class="panel-title">{{ t('map.customDataPanel.title') }}</h3>
 
@@ -374,19 +374,13 @@ const resetForm = () => {
   right: 0;
   transform: translateY(-50%) translateX(100%);
   width: 300px;
+  box-sizing: border-box;
   max-height: 90vh;
-  background: linear-gradient(
-      135deg,
-      var(--glass-90),
-      var(--glass-90)
-  );
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border-radius: var(--radius-xl) 0 0 var(--radius-xl);
-  box-shadow:
-      0 8px 32px rgba(0, 0, 0, 0.15),
-      inset 0 0 0 0.5px var(--glass-50);
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.22s ease,
+    border-color 0.22s ease,
+    background-color 0.22s ease;
   z-index: 9999;
   overflow-y: auto;
 }
@@ -556,7 +550,6 @@ const resetForm = () => {
   .custom-data-panel {
     width: calc(100vw - 80px);
     max-width: none;
-    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
     top: 40%;
   }
 
