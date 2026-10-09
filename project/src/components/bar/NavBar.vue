@@ -384,22 +384,16 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
 
   @include flex-center;
 
-  // background:
-  //   linear-gradient(
-  //     110deg,
-  //     transparent calc(var(--liquid-glass-glint-shift) - 18%),
-  //     var(--glass-80) var(--liquid-glass-glint-shift),
-  //     transparent calc(var(--liquid-glass-glint-shift) + 18%)
-  //   ),
-  //   linear-gradient(135deg, var(--surface-glass-floating), var(--surface-glass-floating-subtle));
+  background:
+    linear-gradient(110deg, transparent 35%, var(--glass-30) 50%, transparent 65%),
+    linear-gradient(145deg, var(--glass-30), var(--glass-10));
   background-position: var(--liquid-glass-glint-shift) 0, center;
   background-size: 180% 100%, 100% 100%;
-  border: 2px solid var(--glass-40);
+  border: 2px solid var(--glass-30);
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-glass-inset);
+  box-shadow: inset 0 1px 0 var(--glass-70), var(--shadow-glass);
   backdrop-filter: blur(14px) saturate(160%);
   -webkit-backdrop-filter: blur(14px) saturate(160%);
-  will-change: backdrop-filter, background-position;
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease,
@@ -465,19 +459,14 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   left: 0;
   top: 50%;
   pointer-events: none;
-  background: linear-gradient(
-    145deg,
-    var(--glass-20),
-    var(--glass-10)
-  );
+  background: linear-gradient(155deg, var(--glass-60), var(--glass-20) 60%, var(--glass-10));
   border-radius: 25px;
-  box-shadow:
-    0 6px 10px rgba(0, 0, 0, 0.1),
-    0 1px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: inset 0 1px 0 var(--glass-80), inset 0 0 0 1px var(--glass-40), var(--shadow-glass);
+  @include glass-blur(8px, 150%);
+  opacity: 1 !important;
   transition:
     transform 0.6s cubic-bezier(0.25, 0.1, 0.0, 1.0),
-    width 0.6s cubic-bezier(0.25, 0.1, 0.0, 1.0),
-    opacity 0.15s ease;
+    width 0.6s cubic-bezier(0.25, 0.1, 0.0, 1.0);
 
   &--mobile {
     border-radius: 30px;
@@ -606,18 +595,16 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   }
 
   .menu-item:hover & {
-    background: rgba(var(--color-primary-rgb), 0.12);
+    background: var(--glass-10);
   }
 
   &.active {
     position: relative;
-    @include soft-glass-background;
-    @include soft-glass-shadow;
-
-    border: 3px solid var(--glass-40);
+    background: transparent;
+    border: 3px solid transparent;
     border-radius: 25px;
     color: var(--color-primary-hover);
-    font-weight: 1000;
+    font-weight: 700;
     font-size: 1.1em;
     transition:
       background 0.3s ease 0.6s,
@@ -627,26 +614,8 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
       box-shadow 0.3s ease 0.6s,
       font-size 0.3s ease 0.6s;
 
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 3px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 65%;
-      height: 2px;
-      background: var(--color-primary-hover);
-      border-radius: 2px;
-      opacity: 0.5;
-    }
-
     &:hover {
-      background: linear-gradient(
-        145deg,
-        var(--glass-50),
-        var(--glass-30)
-      );
-      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+      background: transparent;
     }
   }
 }
@@ -833,30 +802,15 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
     &.active {
       position: relative;
       z-index: 1;
-      @include soft-glass-background;
-      @include soft-glass-shadow;
-
-      border: 3px solid var(--glass-40);
+      background: transparent;
+      border: 3px solid transparent;
       border-radius: 30px;
       color: var(--color-primary-hover);
-      font-weight: 1000;
+      font-weight: 700;
       transition: 0.3s ease 0.6s;
 
       .nav-icon, .label {
         font-size: 1.1em;
-      }
-
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: 3px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 65%;
-        height: 2px;
-        background: var(--color-primary-hover);
-        border-radius: 2px;
-        opacity: 0.5;
       }
     }
   }
