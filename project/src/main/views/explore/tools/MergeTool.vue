@@ -1,6 +1,6 @@
 <template>
   <div class="merge-tool-container">
-    <div class="glass-container glass-shell" style="max-height: 80dvh;overflow: auto;">
+    <div class="glass-container glass-shell">
       <div class="header-section">
         <h1 class="title"><BarIcon icon="🔗" />{{ t('navigation.pageTitles.tools.merge') }}</h1>
         <p class="subtitle">{{ t('tools.merge.page.subtitle') }}</p>

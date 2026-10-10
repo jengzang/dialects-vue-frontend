@@ -1079,17 +1079,9 @@ onBeforeUnmount(() => {
   align-items: center;
   flex-direction: column;
   gap: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  max-height: 80dvh;
+  overflow: clip;
   border-radius: 25px;
   width: 90dvw;
-}
-@media (max-aspect-ratio: 1/1) {
-  .page-content{
-    max-height: 80dvh;
-  }
-
 }
 
 .action-section {
