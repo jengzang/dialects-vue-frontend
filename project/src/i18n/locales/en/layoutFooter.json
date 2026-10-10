@@ -65,11 +65,11 @@
     },
     "menuMapView": {
       "title": "Map View",
-      "description": "Map results from character, Middle Chinese, phoneme, and tone queries; character, historical-category, and tone-category comparisons; and dialect divisions. Click locations for details and draw syllable contour maps and heatmaps."
+      "description": "Map results from character, Middle Chinese, phoneme, and tone queries; character, historical-category, and tone-category comparisons; and dialect divisions. Click locations for details and draw syllable contour maps, heatmaps, and more. Explore and visualize dialect distribution from a geolinguistic perspective."
     },
     "menuMapDivide": {
       "title": "Map Regions",
-      "description": "Look up atlas or Yindian classifications for dialect locations, draw dialect division maps by classification level, and explore their geographic distribution."
+      "description": "Look up atlas or Yindian classifications for dialect locations, draw dialect division maps by classification level, and explore dialect divisions and their geographic distribution from a geolinguistic perspective."
     },
     "menuMapCustom": {
       "title": "Personal Map Data",

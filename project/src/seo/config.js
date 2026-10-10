@@ -463,9 +463,9 @@ const SEO_CONFIG = {
         en: { main: 'Map', subtitle: 'Map dialect queries, comparisons, and syllable contours' },
       },
       description: {
-        'zh-Hant': '在地圖上查看查詢（查字、查中古、查音位、查調），比較（比較漢字、比較中古、比較調類），方言分區等的結果，點選地點查看詳情，同時支援繪製音節等值線圖、熱力圖。',
-        'zh-CN': '在地图上查看查询（查字、查中古、查音位、查调），比较（比较汉字、比较中古、比较调类），方言分区等的结果，点击地点查看详情，同时支持绘制音节等值线图、热力图。',
-        en: 'Map results from character, Middle Chinese, phoneme, and tone queries; character, historical-category, and tone-category comparisons; and dialect divisions. Click locations for details and draw syllable contour maps and heatmaps.',
+        'zh-Hant': '在地圖上查看查詢（查字、查中古、查音位、查調），比較（比較漢字、比較中古、比較調類），方言分區等的結果，點選地點可查看詳情，同時支援繪製音節等值線圖、熱力圖等。從地理語言學視角探索方言分佈並直觀呈現。',
+        'zh-CN': '在地图上查看查询（查字、查中古、查音位、查调），比较（比较汉字、比较中古、比较调类），方言分区等的结果，点击地点可查看详情，同时支持绘制音节等值线图、热力图等。从地理语言学视角探索方言分布并直观呈现。',
+        en: 'Map results from character, Middle Chinese, phoneme, and tone queries; character, historical-category, and tone-category comparisons; and dialect divisions. Click locations for details and draw syllable contour maps, heatmaps, and more. Explore and visualize dialect distribution from a geolinguistic perspective.',
       },
     },
     '/menu/map/divide': {
@@ -475,9 +475,9 @@ const SEO_CONFIG = {
         en: { main: 'Dialect Division Map', subtitle: 'Look up dialect divisions, including atlas and Yindian classifications' },
       },
       description: {
-        'zh-Hant': '查詢方言點所屬的地圖集或音典分區，按分區層級繪製方言分區地圖，查看各方言分區的地理分佈。',
-        'zh-CN': '查询方言点所属的地图集或音典分区，按分区层级绘制方言分区地图，查看各方言分区的地理分布。',
-        en: 'Look up atlas or Yindian classifications for dialect locations, draw dialect division maps by classification level, and explore their geographic distribution.',
+        'zh-Hant': '查詢方言點所屬的地圖集或音典分區，按分區層級繪製方言分區地圖，查看各方言分區的地理分佈，從地理語言學視角探索方言分區與分佈。',
+        'zh-CN': '查询方言点所属的地图集或音典分区，按分区层级绘制方言分区地图，查看各方言分区的地理分布,从地理语言学视角探索方言分区与分布。。',
+        en: 'Look up atlas or Yindian classifications for dialect locations, draw dialect division maps by classification level, and explore dialect divisions and their geographic distribution from a geolinguistic perspective.',
       },
     },
     '/menu/map/custom': {
