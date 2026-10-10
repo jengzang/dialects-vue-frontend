@@ -17,7 +17,7 @@
 
 :root:not([data-color-theme='dark']) {
   --app-scrollbar-thumb: rgba(var(--color-primary-hover-rgb), 0.42);
-  --app-scrollbar-thumb-hover: rgba(var(--color-primary-hover-rgb), 1);
+  --app-scrollbar-thumb-hover: rgba(var(--color-primary-hover-rgb), 0.6);
 
   @media (max-aspect-ratio: 1 / 1) {
     --app-scrollbar-thumb: rgba(var(--color-primary-hover-rgb), 0.34);
