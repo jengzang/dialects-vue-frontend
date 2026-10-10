@@ -18,12 +18,13 @@ const allLayers = ref([])
 const snappingEnabled = ref(false)
 const snapTolerance = ref(12)
 const autoSwitchHits = ref(true)
+const sketchState = ref({ active: false })
 const events = []
 const history = []
 createApp(defineComponent({
   setup() {
     window.gisSmoke = {
-      editor, model, activeLayer, allLayers, snappingEnabled, snapTolerance, autoSwitchHits, events, history, nextTick,
+      editor, model, activeLayer, allLayers, snappingEnabled, snapTolerance, autoSwitchHits, sketchState, events, history, nextTick,
       load: async (features, type = 'Polygon') => {
         activeLayer.value = { ...activeLayer.value, geometryType: type }
         model.value = { type: 'FeatureCollection', features }
@@ -50,6 +51,7 @@ createApp(defineComponent({
       onGeometryEditFeedback: (value) => { events.push(value) },
       onSnapStateChange: (value) => { events.push({ event: 'snap', ...value }) },
       onMapClick: (value) => { events.push({ event: 'click', ...value }) },
+      onSketchStateChange: (value) => { sketchState.value = value },
       onFeatureHitSelect: async (value) => {
         events.push({ event: 'hit', ...value })
         if (!autoSwitchHits.value) return

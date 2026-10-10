@@ -24,6 +24,11 @@ const mocks = vi.hoisted(() => {
     latestToolsPanelProps: null,
     emitFeatureHit: null,
     latestMapProps: null,
+    emitSketchState: null,
+    mapUndoSketchPoint: vi.fn(),
+    mapRedoSketchPoint: vi.fn(),
+    mapFinishSketch: vi.fn(),
+    mapCancelSketch: vi.fn(),
     routerPush: vi.fn(),
     isAuthenticated: { value: true },
     AUTO_DRAFT_ID: '__map_draw_auto_draft__',
@@ -111,12 +116,18 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
       'feature-box-select',
       'mode-change',
       'shape-edit-state-change',
+      'sketch-state-change',
     ],
     setup(props, { emit, expose }) {
       mocks.latestMapProps = props
       mocks.emitFeatureHit = (payload) => emit('feature-hit-select', payload)
+      mocks.emitSketchState = (payload) => emit('sketch-state-change', payload)
       let firstLayerId = ''
       expose({
+        undoSketchPoint: mocks.mapUndoSketchPoint,
+        redoSketchPoint: mocks.mapRedoSketchPoint,
+        finishSketch: mocks.mapFinishSketch,
+        cancelSketch: mocks.mapCancelSketch,
         setDrawMode: mocks.mapSetDrawMode,
         selectFeature: mocks.mapSelectFeature,
         selectFeatures: mocks.mapSelectFeatures,
@@ -902,6 +913,39 @@ function createDeferred() {
 }
 
 describe('MapDrawTab draft safety', () => {
+  it('routes sketch shortcuts locally rather than undoing completed layer history', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+    mocks.emitSketchState({ active: true, pointCount: 3, canUndo: true, canRedo: false, canFinish: true })
+    await nextTick()
+    for (const options of [{ key: 'z', ctrlKey: true }, { key: 'z', ctrlKey: true, shiftKey: true }, { key: 'Backspace' }, { key: 'Enter' }, { key: 'Escape' }]) {
+      document.dispatchEvent(new KeyboardEvent('keydown', { ...options, bubbles: true, cancelable: true }))
+    }
+    expect(mocks.mapUndoSketchPoint).toHaveBeenCalledTimes(2)
+    expect(mocks.mapRedoSketchPoint).toHaveBeenCalledTimes(1)
+    expect(mocks.mapFinishSketch).toHaveBeenCalledTimes(1)
+    expect(mocks.mapCancelSketch).toHaveBeenCalledTimes(1)
+    wrapper.unmount()
+  })
+
+  it('starts a newly created layer sketch only after the map receives that active layer', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+    const contexts = []
+    mocks.mapSetDrawMode.mockImplementation((mode) => {
+      if (mode === 'draw_polygon') contexts.push(mocks.latestMapProps.activeLayer?.geometryType)
+    })
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    expect(contexts).toEqual(['Polygon'])
+    mocks.mapSetDrawMode.mockReset()
+    wrapper.unmount()
+  })
+
   it('switches to an editable cross-layer hit after map sync and keeps map and panel selection aligned', async () => {
     mocks.getDraftRecordById.mockResolvedValue(null)
     const wrapper = mountMapDrawTab()

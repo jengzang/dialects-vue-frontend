@@ -103,6 +103,7 @@
             @features-change="handleActiveLayerFeaturesChange"
             @feature-select="handleFeatureSelect"
             @feature-hit-select="handleCrossLayerFeatureSelect"
+            @sketch-state-change="sketchState = $event"
             @feature-box-select="handleFeatureBoxSelect"
             @mode-change="handleDrawModeChange"
             @shape-edit-state-change="handleShapeEditStateChange"
@@ -167,8 +168,9 @@
           :selected-feature-properties="selectedEditorProperties"
           :selected-feature-geometry-type="selectedEditorGeometryType"
           :is-fullscreen="isMapFullscreen"
-          :can-undo="canUndoHistory"
-          :can-redo="canRedoHistory"
+          :sketch-state="sketchState"
+          :can-undo="sketchState.active ? sketchState.canUndo : canUndoHistory"
+          :can-redo="sketchState.active ? sketchState.canRedo : canRedoHistory"
           :can-edit-shape="canEditSelectedShape"
           :can-use-selected-geometry-tools="canUseSelectedGeometryTools"
           :selected-buffer-distance-km="selectedBufferDistanceKm"
@@ -214,6 +216,8 @@
           @repair-feature-geometry="handleRepairFeatureGeometry"
           @undo="handleUndoHistory"
           @redo="handleRedoHistory"
+          @finish-sketch="editableMapRef?.finishSketch?.()"
+          @cancel-sketch="editableMapRef?.cancelSketch?.()"
           @delete-selected="handleDeleteSelected"
           @delete-selected-features="handleDeleteSelectedFeatures"
           @clear-all="handleClearAll"
@@ -835,6 +839,7 @@ async function handleRepairFeatureGeometry(featureId) {
 // ---- Template refs ----
 const drawTabRoot = ref(null);
 const editableMapRef = ref(null);
+const sketchState = ref({ active: false, pointCount: 0, canUndo: false, canRedo: false, canFinish: false });
 const importInputRef = ref(null);
 
 // ---- Modal state (page-owned) ----
@@ -895,6 +900,7 @@ setCommitHistory(history.commitHistory);
 const { canUndoHistory, canRedoHistory, commitHistory, undoHistory, redoHistory } = history;
 
 const handleUndoHistory = () => {
+  if (sketchState.value.active) { editableMapRef.value?.undoSketchPoint?.(); return; }
   const canApply = canUndoHistory.value;
   undoHistory();
   handleGeometryEditFeedback({
@@ -904,6 +910,7 @@ const handleUndoHistory = () => {
 };
 
 const handleRedoHistory = () => {
+  if (sketchState.value.active) { editableMapRef.value?.redoSketchPoint?.(); return; }
   const canApply = canRedoHistory.value;
   redoHistory();
   handleGeometryEditFeedback({
@@ -1230,6 +1237,13 @@ const handleDrawHistoryKeydown = (event) => {
 
   if (isUndo) { event.preventDefault(); handleUndoHistory(); return; }
   if (isRedo) { event.preventDefault(); handleRedoHistory(); return; }
+  if (sketchState.value.active) {
+    if (isDelete) { event.preventDefault(); editableMapRef.value?.undoSketchPoint?.(); }
+    else if (event.key === 'Enter') { event.preventDefault(); editableMapRef.value?.finishSketch?.(); }
+    else if (isEscape) { event.preventDefault(); editableMapRef.value?.cancelSketch?.(); }
+    else if (isSelectAll) event.preventDefault();
+    return;
+  }
   if (isSelectAll && canModifyActiveLayer.value) { event.preventDefault(); handleSelectAllFeatures(); return; }
   const hasBlockedDirectVertex = currentMode.value === 'direct_select'
     && selectedVertexCount.value > 0

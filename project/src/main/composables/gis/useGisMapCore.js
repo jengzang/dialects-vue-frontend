@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { pickDrawColor } from '@/main/config/colors/mapColors.js';
 import { mapStyleConfig } from '@/utils/map/MapSource.js';
@@ -932,7 +932,7 @@ export function useGisMapCore(options = {}) {
     }
   };
 
-  const handleCreateLayer = (geometryType) => {
+  const handleCreateLayer = async (geometryType) => {
     commitHistory();
     const layer = createEmptyLayer(geometryType);
     layers.value.push(layer);
@@ -946,6 +946,8 @@ export function useGisMapCore(options = {}) {
         : 'draw_line_string';
     const full = editableMapRef;
     isFeatureBoxSelectMode.value = false;
+    await nextTick();
+    if (activeLayerId.value !== layer.id || !canModifyActiveLayer.value) return;
     full.value?.setDrawMode?.(mode);
     currentMode.value = mode;
   };
@@ -1122,6 +1124,9 @@ export function useGisMapCore(options = {}) {
       vertexDeleteFailed: 'map.drawTab.labels.vertexDeleteFailed',
       sharedBoundaryDeleteBlocked: 'map.drawTab.labels.sharedBoundaryDeleteBlocked',
       historyUndoSuccess: 'map.drawTab.labels.historyUndoSuccess',
+      sketchUndoSuccess: 'map.drawTab.labels.sketchUndoSuccess',
+      sketchRedoSuccess: 'map.drawTab.labels.sketchRedoSuccess',
+      sketchCanceled: 'map.drawTab.labels.sketchCanceled',
       historyUndoUnavailable: 'map.drawTab.labels.historyUndoUnavailable',
       historyRedoSuccess: 'map.drawTab.labels.historyRedoSuccess',
       historyRedoUnavailable: 'map.drawTab.labels.historyRedoUnavailable',
@@ -1135,7 +1140,7 @@ export function useGisMapCore(options = {}) {
     const code = String(payload.code || '');
     if (code === 'polygonSplitSketchStarted') {
       polygonSplitSketchActive.value = true;
-    } else if (code) {
+    } else if (code && !code.startsWith('sketch')) {
       polygonSplitSketchActive.value = false;
     }
     const message = resolveGeometryEditStatusMessage(code);

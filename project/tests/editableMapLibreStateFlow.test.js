@@ -267,6 +267,7 @@ function mountEditableMapLibre(modelValue, options = {}) {
         @snap-state-change="events.push(['snap-state-change', $event])"
         @edit-target-hover="events.push(['edit-target-hover', $event])"
         @map-click="events.push(['map-click', $event])"
+        @sketch-state-change="events.push(['sketch-state-change', $event])"
       />
     `,
   })
@@ -300,6 +301,55 @@ function mountEditableMapLibre(modelValue, options = {}) {
 }
 
 describe('EditableMapLibre state flow', () => {
+  it.each(['draw_line_string', 'draw_polygon'])('keeps %s point undo/redo local and only publishes explicit completion', async (name) => {
+    const wrapper = mountEditableMapLibre({ type: 'FeatureCollection', features: [] }, { snappingEnabled: false })
+    await nextTick()
+    const mode = wrapper.draw.options.modes[name]
+    const polygon = name === 'draw_polygon'
+    const feature = {
+      id: 'sketch', type: 'Feature', properties: {}, coordinates: polygon ? [[]] : [],
+      get geometry() { return { type: polygon ? 'Polygon' : 'LineString', coordinates: polygon ? this.coordinates.map((ring) => [...ring, ring[0]]) : this.coordinates } },
+      setCoordinates(coordinates) { this.coordinates = coordinates },
+      updateCoordinate(path, lng, lat) { if (polygon) this.coordinates[0][Number(String(path).split('.')[1])] = [lng, lat]; else this.coordinates[Number(path)] = [lng, lat] },
+      removeCoordinate(path) { if (polygon) this.coordinates[0].splice(Number(path.split('.')[1]), 1); else this.coordinates.splice(Number(path), 1) },
+      isValid() { return (polygon ? this.coordinates[0] : this.coordinates).length >= (polygon ? 3 : 2) },
+      toGeoJSON() { return { id: this.id, type: 'Feature', properties: {}, geometry: this.geometry } },
+    }
+    let state
+    const context = { ...mode, newFeature: () => feature, addFeature: () => wrapper.draw.features.set(feature.id, feature), clearSelectedFeatures: vi.fn(),
+      updateUIClasses: vi.fn(), activateUIButton: vi.fn(), setActionableState: vi.fn(), getFeature: () => wrapper.draw.features.get(feature.id),
+      deleteFeature: () => wrapper.draw.features.delete(feature.id), fire: (event, payload) => wrapper.map.emit(event, payload),
+      changeMode: (next, options) => { mode.onStop.call(context, state); wrapper.draw.changeMode(next, options) },
+    }
+    state = mode.onSetup.call(context)
+    wrapper.draw.mode = name
+    const click = (coordinate) => mode.onClick.call(context, state, { lngLat: { lng: coordinate[0], lat: coordinate[1] }, originalEvent: {} })
+    click([0, 0]); click([2, 0]); click([2, 2])
+    expect(wrapper.exposed.undoSketchPoint()).toBe(true)
+    expect(state.currentVertexPosition).toBe(2)
+    expect(wrapper.events.some(([event]) => event === 'before-features-change')).toBe(false)
+    expect(wrapper.exposed.redoSketchPoint()).toBe(true)
+    expect(state.currentVertexPosition).toBe(3)
+    expect(wrapper.exposed.undoSketchPoint()).toBe(true)
+    click([1, 2])
+    expect(wrapper.exposed.redoSketchPoint()).toBe(false)
+    expect(wrapper.exposed.finishSketch()).toBe(true)
+    expect(wrapper.events.filter(([event]) => event === 'before-features-change')).toHaveLength(1)
+    expect(wrapper.draw.get('sketch').geometry.coordinates).toEqual(polygon ? [[[0, 0], [2, 0], [1, 2], [0, 0]]] : [[0, 0], [2, 0], [1, 2]])
+    feature.coordinates = polygon ? [[]] : []
+    state = mode.onSetup.call(context)
+    wrapper.draw.mode = name
+    click([0, 0]); click([2, 2]); click([0, 2]); click([2, 0])
+    if (polygon) {
+      expect(wrapper.exposed.finishSketch()).toBe(false)
+      expect(wrapper.exposed.undoSketchPoint()).toBe(true)
+      expect(wrapper.exposed.cancelSketch()).toBe(true)
+    } else mode.onStop.call(context, state)
+    expect(wrapper.draw.get('sketch')).toBeUndefined()
+    expect(wrapper.events.filter(([event]) => event === 'before-features-change')).toHaveLength(1)
+    wrapper.unmount()
+  })
+
   it('identifies same-id cross-layer hits using actual Draw suffixes and layer permissions', async () => {
     const feature = (name) => ({ id: 'shared', type: 'Feature', properties: { name }, geometry: { type: 'Point', coordinates: [20, 20] } })
     const wrapper = mountEditableMapLibre({ type: 'FeatureCollection', features: [feature('Active point')] }, {

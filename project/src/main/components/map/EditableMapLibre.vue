@@ -371,6 +371,7 @@ const emit = defineEmits([
   'snap-state-change',
   'edit-target-hover',
   'feature-hit-select',
+  'sketch-state-change',
 ])
 
 const mapContainer = ref(null)
@@ -399,6 +400,7 @@ let isDeletingSelected = false
 let featureBoxDragPanWasEnabled = true
 let lastEditTargetHoverKey = ''
 let consumedHitGesture = null
+let sketchSession = null
 
 const clearHitCandidateMenu = () => {
   hitCandidateMenu.value = null
@@ -2213,6 +2215,78 @@ const syncFeaturesFromDraw = (options = {}) => {
   }
 }
 
+const getSketchPoints = (session = sketchSession) => {
+  if (!session) return []
+  const feature = session.state.polygon ?? session.state.line
+  return (session.state.polygon ? feature.coordinates[0] ?? [] : feature.coordinates).slice(0, session.state.currentVertexPosition).map((point) => [...point])
+}
+
+const getSketchFeature = (session = sketchSession) => {
+  const points = getSketchPoints(session)
+  return { id: session.featureId, type: 'Feature', properties: {}, geometry: session.state.polygon
+    ? { type: 'Polygon', coordinates: [points.length ? [...points, [...points[0]]] : []] }
+    : { type: 'LineString', coordinates: points } }
+}
+
+const syncSketchState = () => {
+  const count = getSketchPoints().length
+  const enoughPoints = count >= (sketchSession?.state.polygon ? 3 : 2)
+  emit('sketch-state-change', { active: Boolean(sketchSession), pointCount: count,
+    canUndo: count > 0, canRedo: Boolean(sketchSession?.redo.length),
+    canFinish: Boolean(sketchSession && enoughPoints && !analyzeEditableGeometry(getSketchFeature()).some((issue) => issue.level === 'error')) })
+}
+
+const setSketchPoints = (points) => {
+  const state = sketchSession.state
+  const feature = state.polygon ?? state.line
+  const preview = (state.polygon ? feature.coordinates[0] : feature.coordinates)?.[state.currentVertexPosition] ?? points.at(-1)
+  const coordinates = [...points.map((point) => [...point]), ...(preview ? [[...preview]] : [])]
+  feature.setCoordinates(state.polygon ? [coordinates] : coordinates)
+  state.currentVertexPosition = points.length
+  clearSnapPreview()
+  syncSketchState()
+}
+
+const undoSketchPoint = () => {
+  if (!sketchSession || !canInteractWithActiveDrawLayer()) return false
+  const points = getSketchPoints()
+  if (!points.length) return false
+  sketchSession.redo.push(points.pop())
+  setSketchPoints(points)
+  emitGeometryEditFeedback('success', 'sketchUndoSuccess')
+  return true
+}
+
+const redoSketchPoint = () => {
+  if (!sketchSession?.redo.length || !canInteractWithActiveDrawLayer()) return false
+  setSketchPoints([...getSketchPoints(), sketchSession.redo.pop()])
+  emitGeometryEditFeedback('success', 'sketchRedoSuccess')
+  return true
+}
+
+const finishSketch = () => {
+  if (!sketchSession || !canInteractWithActiveDrawLayer()) return false
+  const issues = analyzeEditableGeometry(getSketchFeature()).filter((issue) => issue.level === 'error')
+  if (issues.length) {
+    emit('geometry-edit-feedback', { type: 'error', code: 'geometryInvalid', issues })
+    return false
+  }
+  sketchSession.finishApproved = true
+  sketchSession.context.changeMode('simple_select', { featureIds: [sketchSession.featureId] })
+  return true
+}
+
+const cancelSketch = () => {
+  if (!sketchSession) return false
+  const session = sketchSession
+  const wasSplitSketch = Boolean(pendingPolygonSplitSketchFeatureId.value)
+  clearPendingPolygonSplitSketch()
+  session.context.deleteFeature([session.featureId], { silent: true })
+  session.context.changeMode('simple_select', { featureIds: session.previousSelection.filter(isDrawFeatureSelectableById) })
+  emitGeometryEditFeedback('info', wasSplitSketch ? 'polygonSplitSketchCanceled' : 'sketchCanceled')
+  return true
+}
+
 const setDrawMode = (mode) => {
   suppressedProgrammaticFeatureSelectionIds = null
   clearHitCandidateMenu()
@@ -3097,6 +3171,7 @@ const deleteSelected = () => {
 }
 
 const clearAll = () => {
+  cancelSketch()
   draw.value?.deleteAll?.()
   clearPendingPolygonSplitSketch()
   clearSnapPreview()
@@ -3107,6 +3182,7 @@ const clearAll = () => {
 
 const importGeoJson = (featureCollection, options = {}) => {
   if (!draw.value) return
+  cancelSketch()
 
   clearPendingPolygonSplitSketch()
   clearSnapPreview()
@@ -3182,6 +3258,15 @@ const buildLiveSnappingModes = () => {
     const original = modes[name]
     if (!original) continue
     const wrapped = { ...original }
+    if (name !== 'draw_point') {
+      wrapped.onSetup = function (options) {
+        const previousSelection = getSelectedFeatureIdsFromDraw()
+        const state = original.onSetup.call(this, options)
+        sketchSession = { state, context: this, featureId: (state.polygon ?? state.line).id, redo: [], previousSelection, finishApproved: false }
+        syncSketchState()
+        return state
+      }
+    }
     for (const handler of ['onMouseMove', 'onClick', 'onTap']) {
       wrapped[handler] = function (state, event) {
         if (!canInteractWithActiveDrawLayer()) return
@@ -3192,6 +3277,7 @@ const buildLiveSnappingModes = () => {
           if (coordinate) {
             setSnapPreview({ coordinate, originalCoordinate: coordinate, snapped: true, type: 'vertex',
               source: String(props.activeLayer?.id || 'active-layer'), layerName: String(props.activeLayer?.name || ''), featureId: String(sketch.id), isActiveLayer: true })
+            if (handler !== 'onMouseMove' && sketchSession?.state === state) return finishSketch()
             return original[handler]?.call(this, state, { ...event, lngLat: { lng: coordinate[0], lat: coordinate[1] } })
           }
         }
@@ -3204,14 +3290,29 @@ const buildLiveSnappingModes = () => {
         })
         setSnapPreview(snap)
         if (name === 'draw_polygon' && handler !== 'onMouseMove' && canClose && areCoordinatesEqual(snap.coordinate, start)) {
+          if (sketchSession?.state === state) return finishSketch()
           return this.changeMode('simple_select', { featureIds: [sketch.id] })
         }
+        if (name !== 'draw_point' && handler !== 'onMouseMove' && sketchSession?.state === state
+          && state.currentVertexPosition > 0 && areCoordinatesEqual(snap.coordinate, getSketchPoints().at(-1))) return finishSketch()
         const snappedEvent = { ...event, lngLat: { lng: snap.coordinate[0], lat: snap.coordinate[1] }, point: projectCoordinate(snap.coordinate) }
-        return original[handler]?.call(this, state, snappedEvent)
+        const previousPosition = state.currentVertexPosition
+        const result = original[handler]?.call(this, state, snappedEvent)
+        if (handler !== 'onMouseMove' && sketchSession?.state === state && state.currentVertexPosition !== previousPosition) {
+          sketchSession.redo = []
+          syncSketchState()
+        }
+        return result
       }
     }
     wrapped.onStop = function (state) {
       clearSnapPreview()
+      if (sketchSession?.state === state) {
+        const session = sketchSession
+        sketchSession = null
+        if (!session.finishApproved) this.deleteFeature([session.featureId], { silent: true })
+        syncSketchState()
+      }
       return original.onStop?.call(this, state)
     }
     modes[name] = wrapped
@@ -3831,6 +3932,7 @@ watch(
   () => props.modelValue,
   (nextValue) => {
     if (!draw.value || !nextValue) return
+    cancelSketch()
     const normalized = normalizeFeatureCollection(nextValue)
     clearHitCandidateMenu()
     acceptedFeatureCollection = JSON.parse(JSON.stringify(normalized))
@@ -3944,6 +4046,10 @@ onBeforeUnmount(() => {
 })
 
 defineExpose({
+  undoSketchPoint,
+  redoSketchPoint,
+  finishSketch,
+  cancelSketch,
   exportLayer,
   exportAllLayers,
   exportImage,

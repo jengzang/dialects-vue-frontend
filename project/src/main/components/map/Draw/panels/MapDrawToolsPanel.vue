@@ -307,6 +307,15 @@
             >
               {{ t('map.drawTab.buttons.undo') }}
             </button>
+            <div v-if="sketchState.active" class="draw-tool-context-cluster" data-testid="draw-tool-sketch-controls">
+              <span class="draw-tool-wide-control">{{ t('map.drawTab.labels.sketchPointCount', { count: sketchState.pointCount }) }}</span>
+              <button class="glass-button" type="button" data-testid="draw-tool-finish-sketch" :disabled="!sketchState.canFinish" @click="$emit('finish-sketch')">
+                {{ t('map.drawTab.buttons.finishSketch') }}
+              </button>
+              <button class="glass-button" type="button" data-testid="draw-tool-cancel-sketch" @click="$emit('cancel-sketch')">
+                {{ t('map.drawTab.buttons.cancelSketch') }}
+              </button>
+            </div>
             <button
               class="glass-button"
               data-variant="secondary"
@@ -1452,6 +1461,7 @@ const props = defineProps({
   activeLayer: { type: Object, default: null },
   selectedLayerLabel: { type: String, default: '' },
   currentMode: { type: String, default: 'simple_select' },
+  sketchState: { type: Object, default: () => ({ active: false }) },
   featureItems: { type: Array, default: () => [] },
   featureTableColumns: { type: Array, default: () => [] },
   featureTableRows: { type: Array, default: () => [] },
@@ -1532,6 +1542,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits([
+  'finish-sketch',
+  'cancel-sketch',
   'focus-geometry-issue',
   'repair-feature-geometry',
   'set-mode',
