@@ -462,7 +462,7 @@ describe('Map draw editor contracts', () => {
     const editableSource = readSource(editableMapLibrePath)
 
     expect(editableSource).toContain('const snapPreviewLayerIds = new Set')
-    expect(editableSource).toMatch(/if \(snapPreviewLayerIds\.has\(layer\.id\) \|\| geometryIssueLayerIds\.includes\(layer\.id\)\) \{[\s\S]*setLayerVisibility\(layer\.id, false\)/)
+    expect(editableSource).toMatch(/if \(snapPreviewLayerIds\.has\(layer\.id\) \|\| geometryIssueLayerIds\.includes\(layer\.id\) \|\| hitPreviewLayerIds\.includes\(layer\.id\)\) \{[\s\S]*setLayerVisibility\(layer\.id, false\)/)
   })
 
   it('surfaces an explicit edit session status with snapping and history feedback', () => {

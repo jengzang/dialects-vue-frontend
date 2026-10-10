@@ -953,6 +953,8 @@
       "visibleShort": "顯示",
       "hiddenShort": "隱藏",
       "lockedShort": "鎖定",
+      "editableShort": "可編輯",
+      "readonlyShort": "僅查看",
       "basemap": "底圖",
       "viewSettings": "視圖設定",
       "localDraftSelection": "選擇本地草稿",

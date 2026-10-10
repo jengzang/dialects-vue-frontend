@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createApp, defineComponent, nextTick, ref } from 'vue'
 
+vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: (key) => key }) }))
+
 const drawInstances = []
 const mapInstances = []
 
@@ -257,6 +259,7 @@ function mountEditableMapLibre(modelValue, options = {}) {
         @before-features-change="events.push(['before-features-change'])"
         @features-change="events.push(['features-change', $event])"
         @feature-select="events.push(['feature-select', $event])"
+        @feature-hit-select="events.push(['feature-hit-select', $event])"
         @shape-edit-state-change="events.push(['shape-edit-state-change', $event])"
         @feature-box-select="events.push(['feature-box-select', $event])"
         @mode-change="events.push(['mode-change', $event])"
@@ -297,6 +300,111 @@ function mountEditableMapLibre(modelValue, options = {}) {
 }
 
 describe('EditableMapLibre state flow', () => {
+  it('identifies same-id cross-layer hits using actual Draw suffixes and layer permissions', async () => {
+    const feature = (name) => ({ id: 'shared', type: 'Feature', properties: { name }, geometry: { type: 'Point', coordinates: [20, 20] } })
+    const wrapper = mountEditableMapLibre({ type: 'FeatureCollection', features: [feature('Active point')] }, {
+      activeLayer: { id: 'active', name: 'Active layer', visible: true, locked: false },
+      allLayers: [
+        { id: 'reference', name: 'Reference layer', visible: true, locked: false, featureCollection: { type: 'FeatureCollection', features: [feature('Reference point')] } },
+        { id: 'locked', name: 'Locked layer', visible: true, locked: true, featureCollection: { type: 'FeatureCollection', features: [feature('Locked point')] } },
+        { id: 'hidden', visible: false, featureCollection: { type: 'FeatureCollection', features: [feature('Hidden point')] } },
+      ],
+    })
+    await nextTick()
+    wrapper.map.addLayer({ id: 'gl-draw-point.cold', type: 'circle' })
+    wrapper.map.queryRenderedFeatures.mockReturnValueOnce([
+      { properties: { id: 'shared' }, layer: { id: 'gl-draw-point.cold' } },
+      { id: 0, properties: { id: 'shared' }, layer: { id: 'readonly-draw-point-reference' } },
+      { id: 'shared', layer: { id: 'readonly-draw-point-locked' } },
+      { id: 'shared', layer: { id: 'readonly-draw-point-hidden' } },
+    ])
+    wrapper.map.emit('click', { point: { x: 20, y: 20 } })
+    await nextTick()
+    const buttons = [...wrapper.host.querySelectorAll('[data-testid="feature-hit-candidate-button"]')]
+    expect(buttons).toHaveLength(3)
+    expect(buttons.map((button) => button.textContent)).toEqual([expect.stringContaining('Active layer'), expect.stringContaining('Reference layer'), expect.stringContaining('Locked layer')])
+    buttons[1].focus()
+    expect(wrapper.map.getSource('draw-hit-preview-source').data.features[0].geometry).toEqual(feature('').geometry)
+    buttons[1].click()
+    expect(wrapper.events).toContainEqual(['feature-hit-select', expect.objectContaining({ layerId: 'reference', featureId: 'shared' })])
+    wrapper.unmount()
+  })
+
+  it('inspects locked candidates without replacing the active selection and clears stale candidates', async () => {
+    const feature = { id: 'active-point', type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [20, 20] } }
+    const wrapper = mountEditableMapLibre({ type: 'FeatureCollection', features: [feature] }, {
+      activeLayer: { id: 'active', visible: true, locked: false },
+      allLayers: [{ id: 'locked', name: 'Locked', visible: true, locked: true, featureCollection: { type: 'FeatureCollection', features: [{ ...feature, id: 'locked-point' }] } }],
+    })
+    await nextTick()
+    wrapper.exposed.selectFeatures(['active-point'])
+    wrapper.map.queryRenderedFeatures.mockReturnValueOnce([{ id: 'locked-point', layer: { id: 'readonly-draw-point-locked' } }])
+    wrapper.map.emit('click', { point: { x: 20, y: 20 } })
+    await nextTick()
+    wrapper.events.length = 0
+    wrapper.host.querySelector('[data-testid="feature-hit-candidate-button"]').click()
+    expect(wrapper.draw.getSelectedIds()).toEqual(['active-point'])
+    expect(wrapper.events.some(([event]) => event === 'feature-hit-select' || event === 'feature-select')).toBe(false)
+    wrapper.allLayers.value[0].visible = false
+    await nextTick()
+    expect(wrapper.host.querySelector('[data-testid="feature-hit-candidate-menu"]')).toBeFalsy()
+    expect(wrapper.map.getSource('draw-hit-preview-source').data.features).toEqual([])
+    wrapper.unmount()
+  })
+
+  it('consumes a native mouseup plus a distinct map click as one identification gesture', async () => {
+    const feature = { id: 'point', type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [20, 20] } }
+    const wrapper = mountEditableMapLibre({ type: 'FeatureCollection', features: [feature] }, {
+      allLayers: [{ id: 'locked', visible: true, locked: true, featureCollection: { type: 'FeatureCollection', features: [feature] } }],
+    })
+    await nextTick()
+    const mode = wrapper.draw.options.modes.simple_select
+    wrapper.map.queryRenderedFeatures.mockReturnValue([{ id: 'point', layer: { id: 'readonly-draw-point-locked' } }])
+    mode.onClick.call({ ...mode, map: wrapper.map }, {}, { point: { x: 20, y: 20 }, lngLat: { lng: 20, lat: 20 }, originalEvent: { type: 'mouseup' } })
+    wrapper.map.emit('click', { point: { x: 20, y: 20 }, lngLat: { lng: 20, lat: 20 }, originalEvent: { type: 'click' } })
+    expect(wrapper.events.filter(([event]) => event === 'map-click')).toHaveLength(1)
+    mode.onTap.call({ ...mode, map: wrapper.map }, {}, { point: { x: 20, y: 20 }, lngLat: { lng: 20, lat: 20 } })
+    wrapper.map.emit('mousedown', { originalEvent: { type: 'mousedown', sourceCapabilities: { firesTouchEvents: true } } })
+    wrapper.map.emit('click', { point: { x: 20, y: 20 }, lngLat: { lng: 20, lat: 20 } })
+    expect(wrapper.events.filter(([event]) => event === 'map-click')).toHaveLength(2)
+    wrapper.unmount()
+  })
+
+  it.each(['mousedown', 'touchstart'])('does not swallow a new %s gesture when the preceding gesture has no map click', async (startEvent) => {
+    const feature = { id: 'point', type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [20, 20] } }
+    const wrapper = mountEditableMapLibre({ type: 'FeatureCollection', features: [feature] }, {
+      allLayers: [{ id: 'locked', visible: true, locked: true, featureCollection: { type: 'FeatureCollection', features: [feature] } }],
+    })
+    await nextTick()
+    const mode = wrapper.draw.options.modes.simple_select
+    wrapper.map.queryRenderedFeatures.mockReturnValue([{ id: 'point', layer: { id: 'readonly-draw-point-locked' } }])
+    mode.onClick.call({ ...mode, map: wrapper.map }, {}, { point: { x: 20, y: 20 }, lngLat: { lng: 20, lat: 20 } })
+    wrapper.map.emit(startEvent, { originalEvent: {} })
+    wrapper.map.emit('click', { point: { x: 20, y: 20 }, lngLat: { lng: 20, lat: 20 } })
+    expect(wrapper.events.filter(([event]) => event === 'map-click')).toHaveLength(2)
+    wrapper.unmount()
+  })
+
+  it('keeps id-less preview features individually identifiable across source rebuilds', async () => {
+    const wrapper = mountEditableMapLibre({ type: 'FeatureCollection', features: [] }, { previewLayers: [{
+      id: 'preview', name: 'Preview', type: 'points', featureCollection: { type: 'FeatureCollection', features: [
+        { type: 'Feature', properties: { partitionKey: 'same', name: 'First point' }, geometry: { type: 'Point', coordinates: [20, 20] } },
+        { type: 'Feature', properties: { partitionKey: 'same', name: 'Second point' }, geometry: { type: 'Point', coordinates: [20, 20] } },
+      ] },
+    }] })
+    await nextTick()
+    const source = wrapper.map.getSource('preview-draw-source-preview')
+    const ids = source.data.features.map((feature) => feature.properties.id)
+    wrapper.map.queryRenderedFeatures.mockReturnValue(source.data.features.map((feature) => ({ id: 'same', properties: { id: feature.properties.id }, layer: { id: 'preview-draw-point-preview' } })))
+    wrapper.map.emit('click', { point: { x: 20, y: 20 } })
+    await nextTick()
+    expect([...wrapper.host.querySelectorAll('[data-testid="feature-hit-candidate-button"]')].map((button) => button.textContent)).toEqual([expect.stringContaining('First point'), expect.stringContaining('Second point')])
+    wrapper.exposed.syncReadonlyLayers()
+    expect(source.data.features.map((feature) => feature.properties.id)).toEqual(ids)
+    wrapper.unmount()
+  })
+
+
   it('previews and commits snapped mouse and touch coordinates using the installed Draw modes', async () => {
     const wrapper = mountEditableMapLibre({ type: 'FeatureCollection', features: [] }, {
       allLayers: [{ id: 'reference', name: 'Reference', featureCollection: { type: 'FeatureCollection', features: [{ id: 'point', type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [50, 50] } }] } }],
@@ -1011,7 +1119,7 @@ describe('EditableMapLibre state flow', () => {
     wrapper.unmount()
   })
 
-  it('selects the only visible unlocked hit candidate without opening the candidate menu', async () => {
+  it('offers visible locked hits for inspection while keeping hidden hits out of selection', async () => {
     const wrapper = mountEditableMapLibre({
       type: 'FeatureCollection',
       features: [{
@@ -1046,9 +1154,12 @@ describe('EditableMapLibre state flow', () => {
     })
     await nextTick()
 
+    const buttons = [...wrapper.host.querySelectorAll('[data-testid="feature-hit-candidate-button"]')]
+    expect(buttons).toHaveLength(2)
+    expect(buttons.some((button) => button.textContent.includes('隐藏'))).toBe(false)
+    buttons.find((button) => button.textContent.includes('可选')).click()
     expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('simple_select', { featureIds: ['visible-1'] })
     expect(wrapper.events).toContainEqual(['feature-select', 'visible-1'])
-    expect(wrapper.host.querySelector('[data-testid="feature-hit-candidate-menu"]')).toBeFalsy()
 
     wrapper.unmount()
   })

@@ -1,5 +1,8 @@
 import { createApp, defineComponent, h, nextTick, ref } from 'vue'
 import maplibregl from 'maplibre-gl'
+import { createI18n } from 'vue-i18n'
+import mapMessages from '../../src/i18n/locales/en/map.json'
+import '../../src/styles/main-entry.scss'
 import EditableMapLibre from '../../src/main/components/map/EditableMapLibre.vue'
 
 const addControl = maplibregl.Map.prototype.addControl
@@ -13,12 +16,14 @@ const editor = ref(null)
 const activeLayer = ref({ id: 'active', name: 'Active layer', geometryType: 'Polygon', visible: true, locked: false })
 const allLayers = ref([])
 const snappingEnabled = ref(false)
+const snapTolerance = ref(12)
+const autoSwitchHits = ref(true)
 const events = []
 const history = []
 createApp(defineComponent({
   setup() {
     window.gisSmoke = {
-      editor, model, activeLayer, allLayers, snappingEnabled, events, history, nextTick,
+      editor, model, activeLayer, allLayers, snappingEnabled, snapTolerance, autoSwitchHits, events, history, nextTick,
       load: async (features, type = 'Polygon') => {
         activeLayer.value = { ...activeLayer.value, geometryType: type }
         model.value = { type: 'FeatureCollection', features }
@@ -39,10 +44,22 @@ createApp(defineComponent({
       activeLayer: activeLayer.value,
       allLayers: allLayers.value,
       snappingEnabled: snappingEnabled.value,
+      snapTolerance: snapTolerance.value,
       'onUpdate:modelValue': (value) => { model.value = value },
       onBeforeFeaturesChange: () => { history.push(JSON.parse(JSON.stringify(model.value))) },
       onGeometryEditFeedback: (value) => { events.push(value) },
       onSnapStateChange: (value) => { events.push({ event: 'snap', ...value }) },
+      onMapClick: (value) => { events.push({ event: 'click', ...value }) },
+      onFeatureHitSelect: async (value) => {
+        events.push({ event: 'hit', ...value })
+        if (!autoSwitchHits.value) return
+        const layer = allLayers.value.find((item) => item.id === value.layerId)
+        if (!layer || layer.visible === false || layer.locked === true) return
+        activeLayer.value = layer
+        model.value = layer.featureCollection
+        await nextTick()
+        editor.value.selectFeatures([value.featureId])
+      },
     })
   },
-})).mount('#app')
+})).use(createI18n({ legacy: false, locale: 'en', messages: { en: { map: mapMessages } } })).mount('#app')

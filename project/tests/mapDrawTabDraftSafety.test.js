@@ -22,6 +22,8 @@ const mocks = vi.hoisted(() => {
     mapDeleteSelected: vi.fn(),
     mapImportGeoJson: vi.fn(),
     latestToolsPanelProps: null,
+    emitFeatureHit: null,
+    latestMapProps: null,
     routerPush: vi.fn(),
     isAuthenticated: { value: true },
     AUTO_DRAFT_ID: '__map_draw_auto_draft__',
@@ -91,6 +93,7 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
     props: [
       'modelValue',
       'activeLayer',
+      'allLayers',
       'featureBoxSelectEnabled',
       'snappingEnabled',
       'snapTolerance',
@@ -104,11 +107,14 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
       'before-features-change',
       'features-change',
       'feature-select',
+      'feature-hit-select',
       'feature-box-select',
       'mode-change',
       'shape-edit-state-change',
     ],
     setup(props, { emit, expose }) {
+      mocks.latestMapProps = props
+      mocks.emitFeatureHit = (payload) => emit('feature-hit-select', payload)
       let firstLayerId = ''
       expose({
         setDrawMode: mocks.mapSetDrawMode,
@@ -896,6 +902,39 @@ function createDeferred() {
 }
 
 describe('MapDrawTab draft safety', () => {
+  it('switches to an editable cross-layer hit after map sync and keeps map and panel selection aligned', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+    for (let index = 0; index < 2; index += 1) {
+      clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+      await nextTick()
+      clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+      await flushTicks()
+      wrapper.host.querySelector('[data-testid="editable-map"]').click()
+      await flushTicks()
+    }
+    const first = mocks.latestMapProps.allLayers[0]
+    const second = mocks.latestMapProps.allLayers[1]
+    mocks.mapSelectFeatures.mockClear()
+    mocks.emitFeatureHit({ layerId: first.id, featureId: 'feature-1' })
+    await flushTicks()
+    expect(mocks.latestMapProps.activeLayer.id).toBe(first.id)
+    expect(wrapper.host.querySelector('[data-testid="feature-checkbox"]').checked).toBe(true)
+    expect(mocks.mapSelectFeature).toHaveBeenLastCalledWith('feature-1', { directEdit: false })
+    for (const property of ['locked', 'visible']) {
+      second[property] = property === 'locked'
+      mocks.emitFeatureHit({ layerId: second.id, featureId: 'feature-1' })
+      await flushTicks()
+      expect(mocks.latestMapProps.activeLayer.id).toBe(first.id)
+      second[property] = property === 'visible'
+    }
+    mocks.emitFeatureHit({ layerId: second.id, featureId: 'missing' })
+    await flushTicks()
+    expect(mocks.latestMapProps.activeLayer.id).toBe(first.id)
+    wrapper.unmount()
+  })
+
   beforeEach(() => {
     mocks.showConfirm.mockReset()
     mocks.showError.mockReset()

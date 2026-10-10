@@ -102,6 +102,7 @@
             @before-features-change="handleBeforeFeaturesChange"
             @features-change="handleActiveLayerFeaturesChange"
             @feature-select="handleFeatureSelect"
+            @feature-hit-select="handleCrossLayerFeatureSelect"
             @feature-box-select="handleFeatureBoxSelect"
             @mode-change="handleDrawModeChange"
             @shape-edit-state-change="handleShapeEditStateChange"
@@ -933,6 +934,20 @@ const {
   handleImportBoundaryConfirm,
   handleRiverImportConfirm,
 } = gisLayers;
+
+let crossLayerSelectionRequest = 0;
+async function handleCrossLayerFeatureSelect({ layerId, featureId } = {}) {
+  const request = ++crossLayerSelectionRequest;
+  const layer = layers.value.find((item) => item.id === layerId);
+  const feature = layer?.featureCollection?.features?.find((item) => getFeatureId(item) === String(featureId));
+  if (!layer || layer.visible === false || layer.locked === true || !feature || feature.properties?.visible === false || feature.properties?.locked === true) return;
+  handleSelectLayer(layerId);
+  await nextTick();
+  if (request !== crossLayerSelectionRequest || activeLayerId.value !== layerId || layer.visible === false || layer.locked === true
+    || !layers.value.includes(layer) || !layer.featureCollection.features.includes(feature)
+    || feature.properties?.visible === false || feature.properties?.locked === true) return;
+  handleSelectFeatureFromPanel(String(featureId));
+}
 
 // ---- Features ----
 const gisFeatures = useGisFeatures({

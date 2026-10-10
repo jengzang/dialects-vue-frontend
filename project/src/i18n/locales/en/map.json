@@ -953,6 +953,8 @@
       "visibleShort": "Shown",
       "hiddenShort": "Hidden",
       "lockedShort": "Locked",
+      "editableShort": "Editable",
+      "readonlyShort": "View only",
       "basemap": "Basemap",
       "viewSettings": "View Settings",
       "localDraftSelection": "Select Local Draft",

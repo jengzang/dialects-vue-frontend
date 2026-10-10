@@ -1,6 +1,50 @@
 import assert from 'node:assert/strict'
 import { chromium } from 'playwright-core'
 
+async function verifyCrowdedHitMenu(page, touch = false) {
+  const point = await page.evaluate(async () => {
+    const smoke = window.gisSmoke
+    await smoke.load([])
+    smoke.allLayers.value = Array.from({ length: 16 }, (_, index) => ({
+      id: `crowded-${index}`, name: `Reference layer ${index}: ${'Long descriptive layer name '.repeat(4)}`,
+      visible: true, locked: true,
+      featureCollection: { type: 'FeatureCollection', features: [{
+        id: `area-${index}`, type: 'Feature', properties: { name: 'Long descriptive area name '.repeat(4) },
+        geometry: { type: 'Polygon', coordinates: [[[112, 22], [115, 22], [115, 25], [112, 25], [112, 22]]] },
+      }] },
+    }))
+    await smoke.nextTick()
+    const rect = window.gisSmokeMap.getCanvas().getBoundingClientRect()
+    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+  })
+  await page.waitForFunction(() => window.gisSmokeMap.isSourceLoaded('readonly-draw-source-crowded-15'))
+  if (touch) await page.touchscreen.tap(point.x, point.y)
+  else await page.mouse.click(point.x, point.y)
+  const menu = page.locator('[data-testid="feature-hit-candidate-menu"]')
+  await menu.waitFor()
+  assert.equal(await menu.locator('button').count(), 16)
+  assert.equal(await page.evaluate(() => window.gisSmoke.events.filter((event) => event.event === 'click').length), 1)
+  const layout = await menu.evaluate((element) => {
+    const rect = element.getBoundingClientRect()
+    const shell = element.parentElement.getBoundingClientRect()
+    return { bounds: { menu: rect.toJSON(), shell: shell.toJSON() }, contained: rect.left >= shell.left && rect.right <= shell.right && rect.top >= shell.top && rect.bottom <= shell.bottom,
+      scrollable: element.scrollHeight > element.clientHeight }
+  })
+  assert.equal(layout.contained, true, JSON.stringify(layout.bounds))
+  assert.equal(layout.scrollable, true)
+  assert.equal(await menu.locator('button').last().evaluate((button) => {
+    const bounds = button.getBoundingClientRect()
+    return [...button.querySelectorAll('span')].every((span) => {
+      const rect = span.getBoundingClientRect()
+      return rect.top >= bounds.top && rect.bottom <= bounds.bottom && rect.left >= bounds.left && rect.right <= bounds.right
+    })
+  }), true)
+  await menu.locator('button').last().scrollIntoViewIfNeeded()
+  await menu.locator('button').last().click()
+  assert.equal(await page.evaluate(() => window.gisSmokeMap.getSource('draw-hit-preview-source').serialize().data.features.length), 1)
+  await page.screenshot({ path: `/tmp/gis-editor-${touch ? 'mobile' : 'desktop'}-crowded-menu.png` })
+}
+
 const browser = await chromium.launch({
   executablePath: process.env.GIS_CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
   headless: true,
@@ -77,7 +121,82 @@ try {
   const ring = await page.evaluate(() => window.gisSmoke.model.value.features[0].geometry.coordinates[0])
   assert.equal(ring.length, 4)
   assert.deepEqual(ring[0], ring.at(-1))
+  const hitPoint = await page.evaluate(async () => {
+    const smoke = window.gisSmoke
+    const feature = (name) => ({ id: 'shared', type: 'Feature', properties: { name }, geometry: { type: 'Polygon', coordinates: [[[113, 23], [114, 23], [114, 24], [113, 24], [113, 23]]] } })
+    await smoke.load([feature('Active area')])
+    smoke.snappingEnabled.value = false
+    smoke.allLayers.value = [
+      { ...smoke.activeLayer.value, name: 'Active layer', featureCollection: smoke.model.value },
+      { id: 'reference', name: 'Reference layer', visible: true, locked: false, geometryType: 'Polygon', featureCollection: { type: 'FeatureCollection', features: [feature('Reference area')] } },
+      { id: 'locked', name: 'Locked layer', visible: true, locked: true, geometryType: 'Polygon', featureCollection: { type: 'FeatureCollection', features: [feature('Locked area')] } },
+      { id: 'hidden', name: 'Hidden layer', visible: false, featureCollection: { type: 'FeatureCollection', features: [feature('Hidden area')] } },
+    ]
+    await smoke.nextTick()
+    smoke.editor.value.selectFeatures(['shared'])
+    const map = window.gisSmokeMap
+    const point = map.project([113.5, 23.5])
+    const rect = map.getCanvas().getBoundingClientRect()
+    return { x: point.x + rect.left, y: point.y + rect.top }
+  })
+  await page.waitForFunction(() => window.gisSmokeMap.isSourceLoaded('readonly-draw-source-reference') && window.gisSmokeMap.isSourceLoaded('readonly-draw-source-locked'))
+  await page.mouse.click(hitPoint.x, hitPoint.y)
+  const candidates = page.locator('[data-testid="feature-hit-candidate-button"]')
+  await candidates.first().waitFor()
+  assert.equal(await candidates.count(), 3)
+  assert.equal(await page.evaluate(() => window.gisSmoke.events.filter((event) => event.event === 'click').length), 1)
+  const locked = candidates.filter({ hasText: 'Locked layer' })
+  await locked.hover()
+  await locked.click()
+  assert.equal(await page.evaluate(() => window.gisSmoke.activeLayer.value.id), 'active')
+  assert.deepEqual(await page.evaluate(() => window.gisSmokeDraw.getSelectedIds()), ['shared'])
+  assert.equal(await page.evaluate(() => {
+    const data = window.gisSmokeMap.getSource('draw-hit-preview-source').serialize().data
+    return (typeof data === 'string' ? JSON.parse(data) : data).features.length
+  }), 1)
+  await page.screenshot({ path: '/tmp/gis-editor-selection-smoke.png' })
+  await candidates.filter({ hasText: 'Reference layer' }).click()
+  await page.waitForFunction(() => window.gisSmoke.activeLayer.value.id === 'reference' && window.gisSmokeDraw.getSelectedIds()[0] === 'shared')
+  assert.deepEqual(await page.evaluate(() => window.gisSmokeDraw.get('shared').properties.name), 'Reference area')
+  assert.equal(await page.locator('[data-testid="feature-hit-candidate-menu"]').count(), 0)
+  await page.evaluate(async () => {
+    const smoke = window.gisSmoke
+    await smoke.load([{ id: 'small', type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [[[113, 23], [114, 23], [114, 24], [113, 24], [113, 23]]] } }])
+    smoke.snappingEnabled.value = true
+    smoke.snapTolerance.value = 60
+    smoke.allLayers.value = [{ id: 'snap-reference', visible: true, locked: true, featureCollection: { type: 'FeatureCollection', features: [{ id: 'target', type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [113, 23] } }] } }]
+    await smoke.nextTick()
+    smoke.editor.value.selectVertex('small', '0.0')
+  })
+  await page.waitForFunction(() => window.gisSmokeMap.queryRenderedFeatures().some((feature) => feature.properties?.meta === 'midpoint' && feature.properties.coord_path === '0.4'))
+  const midpoint = await page.evaluate(() => {
+    const map = window.gisSmokeMap
+    const feature = map.queryRenderedFeatures().find((item) => item.properties?.meta === 'midpoint' && item.properties.coord_path === '0.4')
+    const point = map.project(feature.geometry.coordinates)
+    const rect = map.getCanvas().getBoundingClientRect()
+    return { x: point.x + rect.left, y: point.y + rect.top }
+  })
+  await page.mouse.click(midpoint.x, midpoint.y)
+  await page.waitForFunction(() => window.gisSmoke.events.some((event) => event.code === 'geometryInvalid'))
+  assert.equal(await page.evaluate(() => window.gisSmokeDraw.get('small').geometry.coordinates[0].length), 5)
+  assert.equal(await page.evaluate(() => window.gisSmoke.history.length), 0)
+  await page.evaluate(async () => {
+    window.gisSmoke.snappingEnabled.value = false
+    await window.gisSmoke.nextTick()
+  })
+  const vertex = await page.evaluate(() => {
+    const point = window.gisSmokeMap.project([113, 23])
+    const rect = window.gisSmokeMap.getCanvas().getBoundingClientRect()
+    return { x: point.x + rect.left, y: point.y + rect.top }
+  })
+  await page.mouse.move(vertex.x, vertex.y)
+  await page.mouse.down()
+  await page.mouse.move(vertex.x - 25, vertex.y + 25, { steps: 5 })
+  await page.mouse.up()
+  await page.waitForFunction(() => window.gisSmoke.history.length === 1)
+  assert.notDeepEqual(await page.evaluate(() => window.gisSmoke.model.value.features[0].geometry.coordinates[0][0]), [113, 23])
   await page.screenshot({ path: process.env.GIS_SMOKE_SCREENSHOT || '/tmp/gis-editor-smoke.png' })
+  await verifyCrowdedHitMenu(page)
   const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })
   mobile.on('pageerror', (error) => errors.push(error.message))
   await mobile.route('https://api.maptiler.com/**', (route) => route.fulfill({ contentType: 'application/json', body: JSON.stringify({ version: 8, sources: {}, layers: [{ id: 'background', type: 'background', paint: { 'background-color': '#ffffff' } }] }) }))
@@ -99,6 +218,7 @@ try {
   await mobile.waitForFunction(() => window.gisSmoke.model.value.features.length === 1)
   assert.deepEqual(await mobile.evaluate(() => window.gisSmoke.model.value.features[0].geometry.coordinates), [113, 23])
   await mobile.screenshot({ path: '/tmp/gis-editor-mobile-smoke.png' })
+  await verifyCrowdedHitMenu(mobile, true)
   await mobile.close()
   assert.deepEqual(errors, [])
   console.log('Real MapLibre/Draw geometry, live mouse snapping and mobile touch smoke passed:', result)

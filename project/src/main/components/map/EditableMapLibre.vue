@@ -23,15 +23,23 @@
     >
       <button
         v-for="candidate in hitCandidateMenu.candidates"
-        :key="candidate.featureId"
+        :key="candidate.key"
         type="button"
         class="glass-button small editable-map-hit-candidate"
         data-testid="feature-hit-candidate-button"
-        @click.stop="selectHitCandidate(candidate.featureId)"
+        :title="`${candidate.layerName} · ${candidate.featureName}`"
+        :aria-pressed="hitCandidateMenu.inspectedKey === candidate.key"
+        @click.stop="selectHitCandidate(candidate)"
+        @mouseenter="previewHitCandidate(candidate)"
+        @focus="previewHitCandidate(candidate)"
         @keydown="handleHitCandidateButtonKeydown"
       >
         <span class="editable-map-hit-candidate__type">{{ candidate.geometryType }}</span>
-        <span class="editable-map-hit-candidate__name">{{ candidate.featureName }}</span>
+        <span class="editable-map-hit-candidate__details">
+          <span class="editable-map-hit-candidate__name">{{ candidate.layerName }}</span>
+          <span class="editable-map-hit-candidate__name">{{ candidate.featureName }}</span>
+        </span>
+        <span class="editable-map-hit-candidate__type">{{ t(`map.drawTab.labels.${candidate.permission}Short`) }}</span>
       </button>
     </div>
   </div>
@@ -39,6 +47,7 @@
 
 <script setup>
 import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import maplibregl from 'maplibre-gl'
 import MapboxDraw from '@mapbox/mapbox-gl-draw'
 import 'maplibre-gl/dist/maplibre-gl.css'
@@ -63,6 +72,7 @@ import {
 import { pickDrawColor } from '@/main/config/colors/mapColors.js'
 
 const [drawFallbackStroke, drawFallbackPointColor] = pickDrawColor(0)
+const { t } = useI18n()
 
 const drawControlContainerClass = 'draw-control-container'
 const activeLayerOpacityExpression = ['coalesce', ['get', 'user_opacity'], 1]
@@ -254,6 +264,8 @@ const editTargetHoverLayerIds = [
 const snapPreviewSourceId = 'draw-snap-preview-source'
 const geometryIssueSourceId = 'draw-geometry-issue-source'
 const geometryIssueLayerIds = ['draw-geometry-issue-edge', 'draw-geometry-issue-point']
+const hitPreviewSourceId = 'draw-hit-preview-source'
+const hitPreviewLayerIds = ['draw-hit-preview-fill', 'draw-hit-preview-line', 'draw-hit-preview-point']
 const snapPreviewGuideLayerId = 'draw-snap-preview-guide'
 const snapPreviewPointLayerId = 'draw-snap-preview-point'
 const snapPreviewLayerIds = new Set([snapPreviewGuideLayerId, snapPreviewPointLayerId])
@@ -358,6 +370,7 @@ const emit = defineEmits([
   'geometry-edit-feedback',
   'snap-state-change',
   'edit-target-hover',
+  'feature-hit-select',
 ])
 
 const mapContainer = ref(null)
@@ -385,10 +398,18 @@ let suppressedProgrammaticFeatureSelectionIds = null
 let isDeletingSelected = false
 let featureBoxDragPanWasEnabled = true
 let lastEditTargetHoverKey = ''
+let consumedHitGesture = null
 
 const clearHitCandidateMenu = () => {
   hitCandidateMenu.value = null
+  map.value?.getSource?.(hitPreviewSourceId)?.setData?.(featureCollection([]))
 }
+
+const getDrawRenderLayerIds = (baseIds) => baseIds
+  .flatMap((id) => [id, `${id}.cold`, `${id}.hot`])
+  .filter((id) => map.value?.getLayer?.(id))
+
+const getDrawBaseLayerId = (id) => String(id || '').replace(/\.(cold|hot)$/, '')
 
 const focusFirstHitCandidateButton = () => {
   nextTick(() => {
@@ -425,11 +446,19 @@ const sanitizeLayerFilename = (layerName) => {
     || 'map-draw-layer'
 }
 
+const getLayerHitFeatureCollection = (layer, namespace = 'draw', layerIndex = 0) => normalizeFeatureCollection({
+  type: 'FeatureCollection',
+  features: (layer?.featureCollection?.features ?? []).map((feature, index) => ({
+    ...feature,
+    id: feature.id ?? feature.properties?.id ?? `${namespace}-${layer?.id ?? layerIndex}-feature-${index}`,
+  })),
+})
+
 const buildReadonlyLayerDescriptors = () => {
   return (props.allLayers ?? [])
     .filter((layer) => layer && layer.id !== props.activeLayer?.id)
     .map((layer, layerIndex) => {
-      const featureCollection = normalizeFeatureCollection(layer.featureCollection)
+      const featureCollection = getLayerHitFeatureCollection(layer, 'draw', layerIndex)
       const features = (featureCollection.features ?? []).map((feature) => ({
         ...feature,
         properties: {
@@ -499,7 +528,7 @@ const buildReadonlyLayerDescriptors = () => {
 
 const buildPreviewLayerDescriptors = () => {
   return (props.previewLayers ?? []).map((layer, layerIndex) => {
-    const featureCollection = normalizeFeatureCollection(layer?.featureCollection)
+    const featureCollection = getLayerHitFeatureCollection(layer, 'preview', layerIndex)
     const previewStroke = '#ff3b30'
     const previewFill = '#f97316'
     const style = layer?.type === 'polygons'
@@ -870,7 +899,7 @@ const syncActiveTextLayoutConstants = () => {
   if (!map.value) return
   const textLineHeight = getFiniteTextStyleNumber(props.activeLayer?.textLineHeight, defaultTextLineHeight)
   const textAllowOverlap = props.activeLayer?.textAllowOverlap === true
-  ;['gl-draw-label-background', 'gl-draw-label'].forEach((layerId) => {
+  getDrawRenderLayerIds(['gl-draw-label-background', 'gl-draw-label']).forEach((layerId) => {
     if (!map.value.getLayer(layerId)) return
     map.value.setLayoutProperty?.(layerId, 'text-line-height', textLineHeight)
     map.value.setLayoutProperty?.(layerId, 'text-allow-overlap', textAllowOverlap)
@@ -958,7 +987,7 @@ const ensureTextBackgroundLayers = () => {
         'fill-color': ['coalesce', ['get', 'textBackgroundColor'], '#ffffff'],
         'fill-opacity': ['coalesce', ['get', 'textBackgroundOpacity'], 0.75],
       },
-    }, map.value.getLayer('gl-draw-label') ? 'gl-draw-label' : undefined)
+    }, getDrawRenderLayerIds(['gl-draw-label'])[0])
   }
   if (!map.value.getLayer(textBackgroundLineLayerId)) {
     map.value.addLayer({
@@ -970,7 +999,7 @@ const ensureTextBackgroundLayers = () => {
         'line-opacity': ['coalesce', ['get', 'textBackgroundOpacity'], 0.75],
         'line-width': 1,
       },
-    }, map.value.getLayer('gl-draw-label') ? 'gl-draw-label' : undefined)
+    }, getDrawRenderLayerIds(['gl-draw-label'])[0])
   }
 }
 
@@ -2054,13 +2083,13 @@ const syncShapeEditState = () => {
   })
 }
 
-const clearDrawSelectionForHitCandidateMenu = () => {
-  const selectedIds = normalizeFeatureIds(draw.value?.getSelectedIds?.() ?? [])
-  if (selectedIds.length > 0) {
-    suppressedProgrammaticFeatureSelectionIds = []
-    draw.value?.changeMode?.('simple_select', { featureIds: [] })
+const restoreHitCandidateSelection = () => {
+  const selectedIds = (hitCandidateMenu.value?.previousSelection ?? []).filter(isDrawFeatureSelectableById)
+  if (!areFeatureIdsEqual(getSelectedFeatureIdsFromDraw(), selectedIds)) {
+    suppressedProgrammaticFeatureSelectionIds = selectedIds
+    draw.value?.changeMode?.('simple_select', { featureIds: selectedIds })
   }
-  selectedFeatureId.value = ''
+  selectedFeatureId.value = selectedIds.includes(hitCandidateMenu.value?.previousPrimary) ? hitCandidateMenu.value.previousPrimary : selectedIds[0] || ''
   selectedVertexCoordPaths.value = []
   syncShapeEditState()
 }
@@ -2069,13 +2098,13 @@ const handleHitCandidateKeydown = (event) => {
   if (event?.key !== 'Escape' || !hitCandidateMenu.value) return
   event.preventDefault?.()
   event.stopPropagation?.()
+  restoreHitCandidateSelection()
   clearHitCandidateMenu()
-  clearDrawSelectionForHitCandidateMenu()
 }
 
 const syncSelectedFeature = () => {
   if (hitCandidateMenu.value) {
-    clearDrawSelectionForHitCandidateMenu()
+    restoreHitCandidateSelection()
     return
   }
 
@@ -2319,7 +2348,12 @@ const getDrawFeatureId = (feature) => String(feature?.id ?? feature?.properties?
 
 const getHitCandidateLayerIds = () => {
   if (!map.value) return []
-  return featureBoxSelectableLayerIds.filter((layerId) => map.value.getLayer?.(layerId))
+  const active = props.activeLayer?.visible === false ? [] : getDrawRenderLayerIds(featureBoxSelectableLayerIds)
+  const references = buildAllLayerDescriptors()
+    .filter((descriptor) => (descriptor.isPreview ? props.previewLayers : props.allLayers)?.find((layer) => layer.id === descriptor.layerId)?.visible !== false)
+    .flatMap((descriptor) => [descriptor.fillLayerId, descriptor.lineLayerId, descriptor.pointLayerId])
+    .filter((id) => map.value.getLayer?.(id))
+  return [...active, ...references]
 }
 
 const getHitCandidateGeometryType = (feature) => String(feature?.geometry?.type || 'Feature')
@@ -2331,9 +2365,14 @@ const buildHitCandidateMenuStyle = (event) => {
   const height = Number(mapContainer.value?.clientHeight || rect?.height || 0)
   const horizontalKey = width > 0 && point.x > width / 2 ? 'right' : 'left'
   const verticalKey = height > 0 && point.y > height / 2 ? 'bottom' : 'top'
+  const availableWidth = Math.max(0, (horizontalKey === 'right' ? point.x : width - point.x) - 16)
+  const availableHeight = Math.max(0, (verticalKey === 'bottom' ? point.y : height - point.y) - 16)
   return {
     [horizontalKey]: `${horizontalKey === 'right' ? Math.max(width - point.x + 8, 8) : point.x + 8}px`,
     [verticalKey]: `${verticalKey === 'bottom' ? Math.max(height - point.y + 8, 8) : point.y + 8}px`,
+    width: `${Math.min(340, availableWidth)}px`,
+    minWidth: '0',
+    maxHeight: `${availableHeight}px`,
   }
 }
 
@@ -2352,16 +2391,26 @@ const buildHitCandidatesFromClick = (event) => {
   }
 
   const seenFeatureIds = new Set()
+  const descriptors = buildAllLayerDescriptors()
   return renderedFeatures.reduce((candidates, renderedFeature) => {
-    const featureId = getDrawFeatureId(renderedFeature)
-    if (!featureId || seenFeatureIds.has(featureId) || !isDrawFeatureSelectableById(featureId)) {
-      return candidates
-    }
-
-    seenFeatureIds.add(featureId)
-    const drawFeature = draw.value?.get?.(featureId)
-    const feature = drawFeature ?? renderedFeature
+    const featureId = String(renderedFeature.properties?.id ?? renderedFeature.id ?? '')
+    const renderLayerId = String(renderedFeature.layer?.id || '')
+    const isActiveLayer = featureBoxSelectableLayerIds.includes(getDrawBaseLayerId(renderLayerId))
+    const descriptor = isActiveLayer ? null : descriptors.find((item) => [item.fillLayerId, item.lineLayerId, item.pointLayerId].includes(renderLayerId))
+    const isPreview = descriptor?.isPreview === true
+    const layer = isActiveLayer ? props.activeLayer : (isPreview ? props.previewLayers : props.allLayers)?.find((item) => item.id === descriptor?.layerId)
+    if (!isActiveLayer && (!descriptor || !layer)) return candidates
+    const layerId = String(layer?.id || 'active-layer')
+    const layerIndex = (isPreview ? props.previewLayers : props.allLayers)?.indexOf(layer)
+    const feature = isActiveLayer ? draw.value?.get?.(featureId) : getLayerHitFeatureCollection(layer, isPreview ? 'preview' : 'draw', layerIndex).features.find((item) => getDrawFeatureId(item) === featureId)
+    const key = JSON.stringify([isPreview ? 'preview' : 'draw', layerId, featureId])
+    if (!featureId || !feature || seenFeatureIds.has(key) || layer?.visible === false || feature.properties?.visible === false) return candidates
+    seenFeatureIds.add(key)
+    const editable = !isPreview && layer?.locked !== true && feature.properties?.locked !== true
     candidates.push({
+      key, layerId, isActiveLayer, editable, feature,
+      permission: editable ? 'editable' : isPreview ? 'readonly' : 'locked',
+      layerName: String(layer?.name || layerId),
       featureId,
       featureName: getSnapFeatureName(feature) || featureId,
       geometryType: getHitCandidateGeometryType(feature),
@@ -2370,12 +2419,40 @@ const buildHitCandidatesFromClick = (event) => {
   }, [])
 }
 
-const selectHitCandidate = (featureId) => {
-  clearHitCandidateMenu()
-  selectFeature(featureId, { directEdit: false })
+const previewHitCandidate = (candidate) => {
+  if (!map.value || !candidate?.feature?.geometry) return
+  if (!map.value.getSource(hitPreviewSourceId)) map.value.addSource(hitPreviewSourceId, { type: 'geojson', data: featureCollection([]) })
+  const layers = [
+    { id: hitPreviewLayerIds[0], type: 'fill', filter: ['==', '$type', 'Polygon'], paint: { 'fill-color': drawFallbackStroke, 'fill-opacity': 0.15 } },
+    { id: hitPreviewLayerIds[1], type: 'line', filter: ['!=', '$type', 'Point'], paint: { 'line-color': drawFallbackStroke, 'line-width': 5 } },
+    { id: hitPreviewLayerIds[2], type: 'circle', filter: ['==', '$type', 'Point'], paint: { 'circle-color': drawFallbackStroke, 'circle-radius': 9, 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 2 } },
+  ]
+  layers.forEach((layer) => { if (!map.value.getLayer(layer.id)) map.value.addLayer({ ...layer, source: hitPreviewSourceId }) })
+  map.value.getSource(hitPreviewSourceId).setData(featureCollection([{ ...candidate.feature, properties: {} }]))
 }
 
-const handleMapClick = (event = {}) => {
+const selectHitCandidate = (candidate) => {
+  if (!candidate?.editable) {
+    if (hitCandidateMenu.value) hitCandidateMenu.value.inspectedKey = candidate.key
+    previewHitCandidate(candidate)
+    restoreHitCandidateSelection()
+    return
+  }
+  clearHitCandidateMenu()
+  if (candidate.isActiveLayer) selectFeature(candidate.featureId, { directEdit: false })
+  else emit('feature-hit-select', { layerId: candidate.layerId, featureId: candidate.featureId })
+}
+
+const handleMapClick = (event = {}, resolvedCandidates = null, fromDrawMode = false) => {
+  if (event.gisHitHandled) return
+  const gesturePoint = normalizeFeatureBoxPoint(event.point ?? event)
+  if (!fromDrawMode && consumedHitGesture && performance.now() <= consumedHitGesture.expires
+    && getSquaredScreenDistance(gesturePoint, consumedHitGesture.point) <= 4) {
+    consumedHitGesture = null
+    return
+  }
+  consumedHitGesture = fromDrawMode ? { point: gesturePoint, expires: performance.now() + 1000 } : null
+  event.gisHitHandled = true
   if (event?.lngLat) {
     emit('map-click', { lng: event.lngLat.lng, lat: event.lngLat.lat })
   }
@@ -2383,33 +2460,38 @@ const handleMapClick = (event = {}) => {
   if (
     props.featureBoxSelectEnabled
     || draw.value?.getMode?.() !== 'simple_select'
-    || !canInteractWithActiveDrawLayer()
   ) {
     clearHitCandidateMenu()
     return
   }
 
-  const candidates = buildHitCandidatesFromClick(event)
+  const candidates = resolvedCandidates ?? buildHitCandidatesFromClick(event)
   if (candidates.length === 0) {
     clearHitCandidateMenu()
     return
   }
 
-  if (candidates.length === 1) {
-    selectFeature(candidates[0].featureId, { directEdit: false })
+  if (candidates.length === 1 && candidates[0].editable) {
+    selectHitCandidate(candidates[0])
     return
   }
 
-  clearDrawSelectionForHitCandidateMenu()
   hitCandidateMenu.value = {
     candidates,
+    previousSelection: getSelectedFeatureIdsFromDraw(),
+    previousPrimary: selectedFeatureId.value,
     style: buildHitCandidateMenuStyle(event),
   }
   focusFirstHitCandidateButton()
 }
 
+const beginMapHitGesture = (event) => {
+  if (event?.originalEvent?.type === 'mousedown' && event.originalEvent.sourceCapabilities?.firesTouchEvents) return
+  consumedHitGesture = null
+}
+
 const resolveEditTargetType = (feature) => {
-  const layerId = String(feature?.layer?.id || '')
+  const layerId = getDrawBaseLayerId(feature?.layer?.id)
   const meta = String(feature?.properties?.meta || '')
   if (layerId === 'gl-draw-active-vertex' || layerId === 'gl-draw-vertex' || meta === 'vertex') return 'vertex'
   if (layerId === 'gl-draw-midpoint' || meta === 'midpoint') return 'midpoint'
@@ -2448,8 +2530,7 @@ const clearEditTargetHover = () => {
   emitEditTargetHover({ active: false })
 }
 
-const getEditableHoverLayerIds = () => editTargetHoverLayerIds
-  .filter((layerId) => map.value?.getLayer?.(layerId))
+const getEditableHoverLayerIds = () => getDrawRenderLayerIds(editTargetHoverLayerIds)
 
 const resolveEditTargetHoverFeature = (event = {}) => {
   const layerIds = getEditableHoverLayerIds()
@@ -2514,8 +2595,7 @@ const featureIntersectsScreenBox = (feature, box) => {
 
 const buildRenderedFeatureIdsInScreenBox = (box) => {
   if (!map.value) return []
-  const layerIds = featureBoxSelectableLayerIds
-    .filter((layerId) => map.value.getLayer?.(layerId))
+  const layerIds = getDrawRenderLayerIds(featureBoxSelectableLayerIds)
   if (layerIds.length === 0) return []
 
   try {
@@ -3082,6 +3162,22 @@ const bindDrawEvents = () => {
 
 const buildLiveSnappingModes = () => {
   const modes = { ...MapboxDraw.modes }
+  if (modes.simple_select) {
+    const original = modes.simple_select
+    const wrapped = { ...original }
+    for (const handler of ['onClick', 'onTap']) {
+      wrapped[handler] = function (state, event) {
+        const candidates = props.featureBoxSelectEnabled ? [] : buildHitCandidatesFromClick(event)
+        if (candidates.length > 1 || (candidates.length === 1 && (!candidates[0].editable || !candidates[0].isActiveLayer))) {
+          this.stopExtendedInteractions(state)
+          handleMapClick(event, candidates, true)
+          return
+        }
+        return original[handler].call(this, state, event)
+      }
+    }
+    modes.simple_select = wrapped
+  }
   for (const name of ['draw_point', 'draw_line_string', 'draw_polygon']) {
     const original = modes[name]
     if (!original) continue
@@ -3339,7 +3435,7 @@ const buildLayerIdFilter = (layerIds = []) => {
 }
 
 const buildDrawLayerIdSet = () => {
-  const layerIds = new Set(drawStyles.map((style) => style.id))
+  const layerIds = new Set(getDrawRenderLayerIds(drawStyles.map((style) => style.id)))
   layerIds.add(textBackgroundFillLayerId)
   layerIds.add(textBackgroundLineLayerId)
   layerIds.add(textLeaderLayerId)
@@ -3373,7 +3469,7 @@ const applyExportContentVisibility = (options = {}) => {
       previousFilters.set(layer.id, map.value.getFilter(layer.id))
     }
 
-    if (snapPreviewLayerIds.has(layer.id) || geometryIssueLayerIds.includes(layer.id)) {
+    if (snapPreviewLayerIds.has(layer.id) || geometryIssueLayerIds.includes(layer.id) || hitPreviewLayerIds.includes(layer.id)) {
       setLayerVisibility(layer.id, false)
       return
     }
@@ -3399,7 +3495,7 @@ const applyExportContentVisibility = (options = {}) => {
         return
       }
 
-      if (drawStyles.some((style) => style.id === layer.id)) {
+      if (drawStyles.some((style) => style.id === getDrawBaseLayerId(layer.id))) {
         setLayerVisibility(layer.id, activeLayerIsSelected)
         return
       }
@@ -3558,6 +3654,8 @@ const initializeMap = async () => {
   map.value.addControl(new maplibregl.FullscreenControl({ container: mapContainer.value }), 'top-left')
   map.value.on('load', initializeDraw)
   map.value.on('click', handleMapClick)
+  map.value.on('mousedown', beginMapHitGesture)
+  map.value.on('touchstart', beginMapHitGesture)
   map.value.on('style.load', restoreLayersAfterStyleLoad)
   map.value.on('styledata', () => {
     syncReadonlyLayers()
@@ -3734,6 +3832,7 @@ watch(
   (nextValue) => {
     if (!draw.value || !nextValue) return
     const normalized = normalizeFeatureCollection(nextValue)
+    clearHitCandidateMenu()
     acceptedFeatureCollection = JSON.parse(JSON.stringify(normalized))
     clearGeometryIssue()
     draw.value.deleteAll()
@@ -3752,6 +3851,7 @@ watch(
   () => props.allLayers,
   () => {
     if (!map.value) return
+    clearHitCandidateMenu()
     syncReadonlyLayers()
   },
   { deep: true }
@@ -3761,6 +3861,7 @@ watch(
   () => props.activeLayer?.id,
   () => {
     if (!map.value) return
+    clearHitCandidateMenu()
     clearGeometryIssue()
     syncReadonlyLayers()
     syncActiveTextLayoutConstants()
@@ -3797,6 +3898,7 @@ watch(
   () => props.previewLayers,
   () => {
     if (!map.value) return
+    clearHitCandidateMenu()
     syncReadonlyLayers()
   },
   { deep: true }
@@ -3920,16 +4022,23 @@ defineExpose({
 
 .editable-map-hit-candidates {
   @include flex-col;
+  box-sizing: border-box;
   position: absolute;
   z-index: 5;
   gap: 4px;
   min-width: 160px;
-  max-width: min(260px, calc(100% - 24px));
+  max-width: min(340px, calc(100% - 24px));
+  max-height: 50dvh;
+  overflow-y: auto;
   padding: 6px;
   pointer-events: auto;
 }
 
 .editable-map-hit-candidate {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   justify-content: flex-start;
   width: 100%;
   min-height: 32px;
@@ -3941,11 +4050,21 @@ defineExpose({
   flex: 0 0 auto;
   font-size: 11px;
   color: var(--text-muted);
+  grid-row: 2;
+  overflow-wrap: anywhere;
 }
 
 .editable-map-hit-candidate__name {
   @include text-truncate;
   min-width: 0;
+}
+
+.editable-map-hit-candidate__details {
+  @include flex-col;
+  flex: 1;
+  min-width: 0;
+  grid-row: 1;
+  grid-column: 1 / -1;
 }
 
 :deep(.draw-control-container) {
