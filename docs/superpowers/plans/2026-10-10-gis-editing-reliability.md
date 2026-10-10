@@ -15,10 +15,10 @@
 
 ## Step 2: Live Snapping
 
-- [ ] Test mouse, click, and touch events using custom wrappers around installed Draw modes.
-- [ ] Show snap targets before committing points and use the same coordinate on click. Include the sketch start point for closing rings; keep finalized vertices unchanged.
-- [ ] Use explicit vertex > midpoint > edge > grid priority, deterministic active/reference tie breaking, and a temporary Alt bypass.
-- [ ] Verify regressions, review diff, and commit only this step.
+- [x] Test mouse, click, and touch events using custom wrappers around installed Draw modes.
+- [x] Show snap targets before committing points and use the same coordinate on click. Include the sketch start point for closing rings; keep finalized vertices unchanged.
+- [x] Use explicit vertex > midpoint > edge > grid priority, deterministic active/reference tie breaking, and a temporary Alt bypass.
+- [x] Verify regressions, review diff, and commit only this step. Independent CR finish-handle finding fixed; real desktop mouse and mobile touch checks passed.
 
 ## Step 3: Cross-Layer Identification
 

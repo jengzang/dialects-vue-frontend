@@ -126,8 +126,11 @@ vi.mock('maplibre-gl', () => {
   }
 })
 
-vi.mock('@mapbox/mapbox-gl-draw', () => ({
+vi.mock('@mapbox/mapbox-gl-draw', async (importOriginal) => {
+  const original = await importOriginal()
+  return {
   default: class MockMapboxDraw {
+    static modes = original.default.modes
     constructor(options = {}) {
       this.options = options
       this.features = new Map()
@@ -183,7 +186,8 @@ vi.mock('@mapbox/mapbox-gl-draw', () => ({
       this.selectedPoints = []
     }
   },
-}))
+  }
+})
 
 vi.mock('maplibre-gl/dist/maplibre-gl.css', () => ({}))
 
@@ -283,6 +287,7 @@ function mountEditableMapLibre(modelValue, options = {}) {
     allLayers,
     featureBoxSelectEnabled,
     snapTargets,
+    snapTolerance,
     host,
     unmount() {
       app.unmount()
@@ -292,6 +297,96 @@ function mountEditableMapLibre(modelValue, options = {}) {
 }
 
 describe('EditableMapLibre state flow', () => {
+  it('previews and commits snapped mouse and touch coordinates using the installed Draw modes', async () => {
+    const wrapper = mountEditableMapLibre({ type: 'FeatureCollection', features: [] }, {
+      allLayers: [{ id: 'reference', name: 'Reference', featureCollection: { type: 'FeatureCollection', features: [{ id: 'point', type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [50, 50] } }] } }],
+    })
+    await nextTick()
+    const mode = wrapper.draw.options.modes.draw_line_string
+    const coordinates = []
+    const state = { line: { id: 'sketch', coordinates, updateCoordinate: (path, lng, lat) => { coordinates[Number(path)] = [lng, lat] } }, currentVertexPosition: 0, direction: 'forward' }
+    const context = { ...mode, updateUIClasses: vi.fn(), changeMode: vi.fn() }
+    const event = { lngLat: { lng: 50.4, lat: 50.3 }, point: { x: 50.4, y: 50.3 }, originalEvent: {} }
+    mode.onMouseMove.call(context, state, event)
+    expect(coordinates[0]).toEqual([50, 50])
+    expect(wrapper.events).toContainEqual(['snap-state-change', expect.objectContaining({ active: true, type: 'vertex', source: 'reference' })])
+    mode.onTap.call(context, state, event)
+    expect(coordinates[0]).toEqual([50, 50])
+    expect(state.currentVertexPosition).toBe(1)
+    mode.onClick.call(context, state, { ...event, lngLat: { lng: 55, lat: 54 }, originalEvent: { altKey: true } })
+    expect(coordinates[1]).toEqual([55, 54])
+    expect(event.lngLat).toEqual({ lng: 50.4, lat: 50.3 })
+    wrapper.unmount()
+  })
+
+  it('closes a polygon at its snapped sketch start without adding a duplicate vertex', async () => {
+    const wrapper = mountEditableMapLibre({ type: 'FeatureCollection', features: [] })
+    await nextTick()
+    const mode = wrapper.draw.options.modes.draw_polygon
+    const coordinates = [[[0, 0], [30, 0], [30, 30], [29, 29]]]
+    const state = { polygon: { id: 'sketch', coordinates, updateCoordinate: vi.fn() }, currentVertexPosition: 3 }
+    const context = { ...mode, updateUIClasses: vi.fn(), changeMode: vi.fn() }
+    mode.onMouseMove.call(context, state, { lngLat: { lng: 0.4, lat: 0.3 }, originalEvent: {} })
+    mode.onClick.call(context, state, { lngLat: { lng: 0.4, lat: 0.3 }, originalEvent: {} })
+    expect(context.changeMode).toHaveBeenCalledWith('simple_select', { featureIds: ['sketch'] })
+    expect(state.currentVertexPosition).toBe(3)
+    wrapper.unmount()
+  })
+
+  it('prioritizes vertices over closer midpoints and does not exclude same-id cross-layer references', async () => {
+    const wrapper = mountEditableMapLibre({ type: 'FeatureCollection', features: [] }, {
+      allLayers: [{ id: 'reference', featureCollection: { type: 'FeatureCollection', features: [
+        { id: 'sketch', type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [51, 50] } },
+        { id: 'reference-line', type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [[30, 50], [70, 50]] } },
+      ] } }],
+    })
+    await nextTick()
+    const mode = wrapper.draw.options.modes.draw_point
+    const updateCoordinate = vi.fn()
+    mode.onTap.call({ ...mode, updateUIClasses: vi.fn(), fire: vi.fn(), changeMode: vi.fn() }, { point: { id: 'sketch', updateCoordinate, toGeoJSON: () => ({}) } }, { lngLat: { lng: 50.1, lat: 50 }, originalEvent: {} })
+    expect(updateCoordinate).toHaveBeenCalledWith('', 51, 50)
+    wrapper.unmount()
+  })
+
+  it('snaps native vertex dragging without accumulating pointer-offset drift', async () => {
+    const wrapper = mountEditableMapLibre({ type: 'FeatureCollection', features: [] }, {
+      allLayers: [{ id: 'reference', featureCollection: { type: 'FeatureCollection', features: [{ id: 'target', type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [50, 50] } }] } }],
+    })
+    await nextTick()
+    const mode = wrapper.draw.options.modes.direct_select
+    const coordinates = [[0, 0], [30, 30]]
+    wrapper.draw.features.set('line', { id: 'line', properties: {}, geometry: { type: 'LineString', coordinates } })
+    const state = { canDragMove: true, selectedCoordPaths: ['1'], featureId: 'line', dragMoveLocation: { lng: 31, lat: 31 }, feature: {
+      getCoordinate: (path) => coordinates[Number(path)], updateCoordinate: (path, lng, lat) => { coordinates[Number(path)] = [lng, lat] },
+    } }
+    const context = { ...mode }
+    const event = { lngLat: { lng: 51.3, lat: 51.2 }, originalEvent: { stopPropagation: vi.fn() } }
+    mode.onDrag.call(context, state, event)
+    expect(coordinates[1]).toEqual([50, 50])
+    mode.onDrag.call(context, state, { ...event, lngLat: { lng: 53, lat: 52 }, originalEvent: { ...event.originalEvent, altKey: true } })
+    expect(coordinates[1]).toEqual([52, 51])
+    wrapper.unmount()
+  })
+
+  it('keeps native finish-handle mouse and touch previews on the committed endpoint', async () => {
+    const wrapper = mountEditableMapLibre({ type: 'FeatureCollection', features: [] }, {
+      allLayers: [{ id: 'reference', featureCollection: { type: 'FeatureCollection', features: [{ id: 'other', type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: [6, 5] } }] } }],
+    })
+    await nextTick()
+    const mode = wrapper.draw.options.modes.draw_line_string
+    for (const handler of ['onClick', 'onTap']) {
+      const state = { line: { id: 'sketch', coordinates: [[0, 0], [5, 5], [5, 5]], updateCoordinate: vi.fn() }, currentVertexPosition: 2, direction: 'forward' }
+      const context = { ...mode, changeMode: vi.fn(), updateUIClasses: vi.fn() }
+      const event = { lngLat: { lng: 5.3, lat: 5.1 }, originalEvent: {}, featureTarget: { properties: { meta: 'vertex', parent: 'sketch' }, geometry: { type: 'Point', coordinates: [5, 5] } } }
+      mode.onMouseMove.call(context, state, event)
+      expect(state.line.updateCoordinate).toHaveBeenCalledWith(2, 5, 5)
+      mode[handler].call(context, state, event)
+      expect(context.changeMode).toHaveBeenCalledWith('simple_select', { featureIds: ['sketch'] })
+      expect(wrapper.events.at(-1)).toEqual(['snap-state-change', expect.objectContaining({ coordinate: [5, 5], source: 'active-layer' })])
+    }
+    wrapper.unmount()
+  })
+
   it('rejects crossing and collapsed vertex edits before publishing changes', async () => {
     const feature = { id: 'polygon-1', type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [[[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]]] } }
     const wrapper = mountEditableMapLibre({ type: 'FeatureCollection', features: [feature] }, { snappingEnabled: false })
@@ -1699,6 +1794,8 @@ describe('EditableMapLibre state flow', () => {
     await nextTick()
     wrapper.events.length = 0
 
+    wrapper.snapTolerance.value = 1
+    await nextTick()
     const didMove = wrapper.exposed.moveVertex('polygon-1', '0.2', [3, 5.4])
 
     expect(didMove).toBe(true)
@@ -1749,6 +1846,8 @@ describe('EditableMapLibre state flow', () => {
     })
     await nextTick()
 
+    wrapper.snapTolerance.value = 1
+    await nextTick()
     wrapper.exposed.moveVertex('polygon-1', '0.2', [3, 5.4])
 
     expect(wrapper.map.getLayer('draw-snap-preview-guide')).toBeTruthy()
@@ -1868,6 +1967,8 @@ describe('EditableMapLibre state flow', () => {
     await nextTick()
     wrapper.events.length = 0
 
+    wrapper.snapTolerance.value = 1
+    await nextTick()
     const didInsert = wrapper.exposed.insertVertex('line-1', '1', [5.2, 5.1])
 
     expect(didInsert).toBe(true)
@@ -2174,7 +2275,7 @@ describe('EditableMapLibre state flow', () => {
     disabledWrapper.unmount()
   })
 
-  it('snaps coordinates emitted by Draw create and update events before syncing state', async () => {
+  it('does not re-snap finalized vertices in Draw create and update events', async () => {
     const wrapper = mountEditableMapLibre({
       type: 'FeatureCollection',
       features: [],
@@ -2208,8 +2309,8 @@ describe('EditableMapLibre state flow', () => {
 
     const syncedFeatureCollection = wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1]
     expect(syncedFeatureCollection.features[0].geometry.coordinates)
-      .toEqual([[0, 0], [50, 50], [100, 0]])
-    expect(wrapper.draw.set).toHaveBeenCalledWith(syncedFeatureCollection)
+      .toEqual([[0, 0], [50.4, 50.3], [100, 0]])
+    expect(wrapper.draw.set).not.toHaveBeenCalled()
 
     wrapper.events.length = 0
     wrapper.draw.set.mockClear()
@@ -2223,8 +2324,8 @@ describe('EditableMapLibre state flow', () => {
     wrapper.map.emit('draw.update')
 
     expect(wrapper.events.find(([eventName]) => eventName === 'features-change')?.[1].features[0].geometry.coordinates)
-      .toEqual([[0, 0], [50, 50], [100, 0]])
-    expect(wrapper.draw.set).toHaveBeenCalledTimes(1)
+      .toEqual([[0, 0], [50.2, 50.1], [100, 0]])
+    expect(wrapper.draw.set).not.toHaveBeenCalled()
 
     wrapper.unmount()
   })

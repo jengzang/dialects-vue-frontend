@@ -263,7 +263,6 @@ const textBackgroundSourceId = 'draw-text-background-source'
 const textBackgroundFillLayerId = 'draw-text-background-fill'
 const textBackgroundLineLayerId = 'draw-text-background-line'
 const textHelperLayerIds = new Set([textLeaderLayerId, textBackgroundFillLayerId, textBackgroundLineLayerId])
-const snapPriorityBiasSquared = 1
 const createDefaultSnapTargets = () => ({
   vertex: true,
   midpoint: true,
@@ -1243,7 +1242,7 @@ const getSnapReferenceItems = (options = {}) => {
       const featureId = getDrawFeatureId(item.feature)
       return item.feature?.geometry
         && isSnapReferenceFeatureVisible(item.feature)
-        && !excludedFeatureIds.has(featureId)
+        && !(item.isActiveLayer && excludedFeatureIds.has(featureId))
     })
 }
 
@@ -1362,13 +1361,14 @@ const clearSnapPreview = () => {
 }
 
 const getNearestPointOnProjectedSegment = (targetPoint, startPoint, endPoint, startCoordinate, endCoordinate) => {
+  if (!startPoint || !endPoint) return null
   const segmentX = endPoint.x - startPoint.x
   const segmentY = endPoint.y - startPoint.y
   const segmentLengthSquared = (segmentX ** 2) + (segmentY ** 2)
   if (segmentLengthSquared <= 0) return null
   const rawT = (((targetPoint.x - startPoint.x) * segmentX) + ((targetPoint.y - startPoint.y) * segmentY)) / segmentLengthSquared
   const t = Math.max(0, Math.min(1, rawT))
-  return [
+  return map.value?.unproject?.({ x: startPoint.x + segmentX * t, y: startPoint.y + segmentY * t })?.toArray?.() ?? [
     startCoordinate[0] + ((endCoordinate[0] - startCoordinate[0]) * t),
     startCoordinate[1] + ((endCoordinate[1] - startCoordinate[1]) * t),
   ]
@@ -1406,7 +1406,6 @@ const resolveSnapResult = (coordinate, options = {}) => {
   let best = {
     coordinate: normalized,
     distanceSquared: Infinity,
-    score: Infinity,
     priority: -1,
     type: '',
     source: '',
@@ -1422,16 +1421,18 @@ const resolveSnapResult = (coordinate, options = {}) => {
     if (!candidatePoint) return
     const distanceSquared = getSquaredScreenDistance(targetPoint, candidatePoint)
     if (distanceSquared > toleranceSquared) return
-    const score = distanceSquared - (priority * snapPriorityBiasSquared)
+    const candidateKey = `${item.source || ''}:${getDrawFeatureId(item.feature)}:${candidate.join(',')}`
+    const bestKey = `${best.source}:${best.featureId}:${best.coordinate.join(',')}`
     if (
-      score < best.score
-      || (score === best.score && distanceSquared < best.distanceSquared)
-      || (score === best.score && distanceSquared === best.distanceSquared && priority > best.priority)
+      priority > best.priority
+      || (priority === best.priority && distanceSquared < best.distanceSquared)
+      || (priority === best.priority && distanceSquared === best.distanceSquared
+        && ((item.isActiveLayer === true && !best.isActiveLayer)
+          || (Boolean(item.isActiveLayer) === best.isActiveLayer && candidateKey < bestKey)))
     ) {
       best = {
         coordinate: candidate,
         distanceSquared,
-        score,
         priority,
         type,
         source: item.source || '',
@@ -1451,11 +1452,15 @@ const resolveSnapResult = (coordinate, options = {}) => {
     }
     if (isSnapTargetEnabled('midpoint') || isSnapTargetEnabled('edge')) {
       getCoordinateSegments(item.feature.geometry).forEach(([startCoordinate, endCoordinate]) => {
+        const projectedStart = projectCoordinate(startCoordinate)
+        const projectedEnd = projectCoordinate(endCoordinate)
+        if (!projectedStart || !projectedEnd) return
         if (isSnapTargetEnabled('midpoint')) {
-          acceptCandidate([
+          const midpoint = map.value?.unproject?.({ x: (projectedStart.x + projectedEnd.x) / 2, y: (projectedStart.y + projectedEnd.y) / 2 })?.toArray?.() ?? [
             (Number(startCoordinate[0]) + Number(endCoordinate[0])) / 2,
             (Number(startCoordinate[1]) + Number(endCoordinate[1])) / 2,
-          ], 3, 'midpoint', item)
+          ]
+          acceptCandidate(midpoint, 3, 'midpoint', item)
         }
         if (isSnapTargetEnabled('edge')) {
           const startPoint = projectCoordinate(startCoordinate)
@@ -1466,6 +1471,11 @@ const resolveSnapResult = (coordinate, options = {}) => {
       })
     }
   })
+
+  ;(options.sketchCoordinates ?? []).forEach((candidate) => acceptCandidate(candidate, 4, 'vertex', {
+    feature: { id: options.excludeFeatureId }, source: String(props.activeLayer?.id || 'active-layer'),
+    layerName: String(props.activeLayer?.name || ''), isActiveLayer: true,
+  }))
 
   if (isSnapTargetEnabled('grid')) {
     acceptCandidate(maybeSnapCoordinateToGrid(normalized), 1, 'grid', {
@@ -1492,73 +1502,10 @@ const resolveSnappedCoordinate = (coordinate, options = {}) => {
   return resolveSnapResult(coordinate, options).coordinate
 }
 
-const closeSnappedRingIfNeeded = (originalRing = [], nextRing = []) => {
-  if (originalRing.length > 1 && areCoordinatesEqual(originalRing[0], originalRing.at(-1)) && nextRing.length > 1) {
-    return [
-      ...nextRing.slice(0, -1),
-      [...nextRing[0]],
-    ]
-  }
-  return nextRing
-}
-
-const snapCoordinateForFeature = (featureId, coordinate) => {
-  return resolveSnappedCoordinate(coordinate, { excludeFeatureId: featureId }) ?? coordinate
-}
-
-const snapGeometryCoordinatesForFeature = (geometry, featureId) => {
-  if (!geometry?.type) return geometry
-
-  if (geometry.type === 'Point') {
-    return { ...geometry, coordinates: snapCoordinateForFeature(featureId, geometry.coordinates) }
-  }
-
-  if (geometry.type === 'LineString') {
-    return {
-      ...geometry,
-      coordinates: (geometry.coordinates ?? []).map((coordinate) => snapCoordinateForFeature(featureId, coordinate)),
-    }
-  }
-
-  if (geometry.type === 'Polygon') {
-    return {
-      ...geometry,
-      coordinates: (geometry.coordinates ?? []).map((ring) => {
-        const nextRing = (ring ?? []).map((coordinate) => snapCoordinateForFeature(featureId, coordinate))
-        return closeSnappedRingIfNeeded(ring, nextRing)
-      }),
-    }
-  }
-
-  return geometry
-}
-
 const getDrawEventFeatureIds = (event = {}) => {
   return new Set((event?.features ?? [])
     .map((feature) => getDrawFeatureId(feature))
     .filter(Boolean))
-}
-
-const snapFeatureCollectionCoordinates = (featureCollection, options = {}) => {
-  if (props.snappingEnabled === false || options.snapFeatures !== true || options.type === 'draw.delete') {
-    return { featureCollection, changed: false }
-  }
-
-  const targetIds = getDrawEventFeatureIds(options)
-  let changed = false
-  const features = (featureCollection.features ?? []).map((feature) => {
-    const featureId = getDrawFeatureId(feature)
-    if (targetIds.size > 0 && !targetIds.has(featureId)) return feature
-    const geometry = snapGeometryCoordinatesForFeature(feature.geometry, featureId)
-    if (JSON.stringify(geometry) === JSON.stringify(feature.geometry)) return feature
-    changed = true
-    return { ...feature, geometry }
-  })
-
-  return {
-    featureCollection: changed ? { ...featureCollection, features } : featureCollection,
-    changed,
-  }
 }
 
 const parseCoordPath = (coordPath) => {
@@ -2192,8 +2139,7 @@ const syncFeaturesFromDraw = (options = {}) => {
     return
   }
 
-  const normalized = normalizeFeatureCollection(options.featureCollection ?? draw.value?.getAll?.())
-  const { featureCollection, changed } = snapFeatureCollectionCoordinates(normalized, options)
+  const featureCollection = normalizeFeatureCollection(options.featureCollection ?? draw.value?.getAll?.())
   if (isDrawMutationSyncEvent(options) && options.type !== 'draw.delete') {
     const targetIds = getDrawEventFeatureIds(options)
     const issues = featureCollection.features
@@ -2221,9 +2167,6 @@ const syncFeaturesFromDraw = (options = {}) => {
       syncShapeEditState()
       return false
     }
-  }
-  if (changed) {
-    draw.value?.set?.(featureCollection)
   }
   const shouldCommitHistory = options.commitHistory !== false && !isDeletingSelected
   if (shouldCommitHistory) {
@@ -3121,7 +3064,7 @@ const handleDrawCreate = (event) => {
     finishPendingPolygonSplitSketch(event)
     return
   }
-  syncFeaturesFromDraw({ ...event, type: 'draw.create', snapFeatures: true })
+  syncFeaturesFromDraw({ ...event, type: 'draw.create' })
 }
 
 const mountHiddenDrawControls = () => {
@@ -3131,14 +3074,92 @@ const mountHiddenDrawControls = () => {
 
 const bindDrawEvents = () => {
   map.value.on('draw.create', handleDrawCreate)
-  map.value.on('draw.update', (event) => syncFeaturesFromDraw({ ...event, type: 'draw.update', snapFeatures: true }))
+  map.value.on('draw.update', (event) => syncFeaturesFromDraw({ ...event, type: 'draw.update' }))
   map.value.on('draw.delete', (event) => syncFeaturesFromDraw({ ...event, type: 'draw.delete' }))
   map.value.on('draw.selectionchange', syncSelectedFeature)
   map.value.on('draw.modechange', syncDrawMode)
 }
 
+const buildLiveSnappingModes = () => {
+  const modes = { ...MapboxDraw.modes }
+  for (const name of ['draw_point', 'draw_line_string', 'draw_polygon']) {
+    const original = modes[name]
+    if (!original) continue
+    const wrapped = { ...original }
+    for (const handler of ['onMouseMove', 'onClick', 'onTap']) {
+      wrapped[handler] = function (state, event) {
+        if (!canInteractWithActiveDrawLayer()) return
+        const sketch = state.polygon ?? state.line ?? state.point
+        const handle = event.featureTarget
+        if (handle?.properties?.meta === 'vertex' && String(handle.properties.parent) === String(sketch.id)) {
+          const coordinate = normalizeVertexCoordinate(handle.geometry?.coordinates)
+          if (coordinate) {
+            setSnapPreview({ coordinate, originalCoordinate: coordinate, snapped: true, type: 'vertex',
+              source: String(props.activeLayer?.id || 'active-layer'), layerName: String(props.activeLayer?.name || ''), featureId: String(sketch.id), isActiveLayer: true })
+            return original[handler]?.call(this, state, { ...event, lngLat: { lng: coordinate[0], lat: coordinate[1] } })
+          }
+        }
+        const start = name === 'draw_polygon' ? sketch.coordinates?.[0]?.[0] : sketch.coordinates?.[0]
+        const canClose = name === 'draw_polygon' ? state.currentVertexPosition >= 3 : state.currentVertexPosition >= 2
+        const snap = resolveSnapResult([event.lngLat.lng, event.lngLat.lat], {
+          excludeFeatureId: sketch.id,
+          snapping: !event.originalEvent?.altKey,
+          sketchCoordinates: canClose && isSnapTargetEnabled('vertex') && Array.isArray(start) ? [start] : [],
+        })
+        setSnapPreview(snap)
+        if (name === 'draw_polygon' && handler !== 'onMouseMove' && canClose && areCoordinatesEqual(snap.coordinate, start)) {
+          return this.changeMode('simple_select', { featureIds: [sketch.id] })
+        }
+        const snappedEvent = { ...event, lngLat: { lng: snap.coordinate[0], lat: snap.coordinate[1] }, point: projectCoordinate(snap.coordinate) }
+        return original[handler]?.call(this, state, snappedEvent)
+      }
+    }
+    wrapped.onStop = function (state) {
+      clearSnapPreview()
+      return original.onStop?.call(this, state)
+    }
+    modes[name] = wrapped
+  }
+  const original = modes.direct_select
+  if (original) {
+    const wrapped = { ...original }
+    for (const handler of ['onMouseDown', 'onTouchStart']) {
+      wrapped[handler] = function (state, event) {
+        if (!isDrawFeatureSelectableById(state.featureId)) return
+        if (event.featureTarget?.properties?.meta !== 'midpoint') return original[handler].call(this, state, event)
+        const about = event.featureTarget.properties
+        const snap = resolveSnapResult([about.lng, about.lat], { excludeFeatureId: state.featureId, snapping: !event.originalEvent?.altKey })
+        setSnapPreview(snap)
+        return original[handler].call(this, state, {
+          ...event, lngLat: { lng: snap.coordinate[0], lat: snap.coordinate[1] },
+          featureTarget: { ...event.featureTarget, properties: { ...about, lng: snap.coordinate[0], lat: snap.coordinate[1] } },
+        })
+      }
+    }
+    wrapped.onDrag = function (state, event) {
+      if (!isDrawFeatureSelectableById(state.featureId)) return
+      if (!state.canDragMove || state.selectedCoordPaths.length !== 1) return original.onDrag.call(this, state, event)
+      const coordinate = state.feature.getCoordinate(state.selectedCoordPaths[0])
+      const proposed = [coordinate[0] + event.lngLat.lng - state.dragMoveLocation.lng, coordinate[1] + event.lngLat.lat - state.dragMoveLocation.lat]
+      const snap = resolveSnapResult(proposed, { excludeFeatureId: state.featureId, snapping: !event.originalEvent?.altKey })
+      setSnapPreview(snap)
+      return original.onDrag.call(this, state, { ...event, lngLat: {
+        lng: state.dragMoveLocation.lng + snap.coordinate[0] - coordinate[0],
+        lat: state.dragMoveLocation.lat + snap.coordinate[1] - coordinate[1],
+      } })
+    }
+    wrapped.onStop = function (state) {
+      clearSnapPreview()
+      return original.onStop.call(this, state)
+    }
+    modes.direct_select = wrapped
+  }
+  return modes
+}
+
 const initializeDraw = () => {
   draw.value = new MapboxDraw({
+    modes: buildLiveSnappingModes(),
     displayControlsDefault: false,
     keybindings: false,
     controls: {
