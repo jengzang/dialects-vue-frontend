@@ -15,6 +15,15 @@
   }
 }
 
+:root:not([data-color-theme='dark']) {
+  --app-scrollbar-thumb: rgba(var(--color-primary-hover-rgb), 0.42);
+  --app-scrollbar-thumb-hover: rgba(var(--color-primary-hover-rgb), 1);
+
+  @media (max-aspect-ratio: 1 / 1) {
+    --app-scrollbar-thumb: rgba(var(--color-primary-hover-rgb), 0.34);
+  }
+}
+
 @mixin visible-scrollbar {
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
@@ -206,6 +215,14 @@
   .glass-panel[data-surface='table-container']
 ) {
   @include visible-scrollbar-webkit;
+}
+
+// Standard scrollbar colors override WebKit thumb hover styling.
+@supports selector(::-webkit-scrollbar) {
+  :where(:root:not([data-color-theme='dark']), :root:not([data-color-theme='dark']) *) {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
 }
 
 :where(
