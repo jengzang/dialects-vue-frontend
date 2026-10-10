@@ -20,7 +20,9 @@
       "refreshResults": "刷新",
       "searchPlaceholder": "搜尋音標、註釋",
       "enterSearch": "請輸入搜尋詞",
-      "noMatches": "無匹配結果"
+      "noMatches": "無匹配結果",
+      "ipaSearchConfirmTitle": "啟用音標搜尋",
+      "ipaSearchConfirm": "音標搜尋可能耗時較長。如果只需要查詢註釋，可以不勾選音標。是否繼續啟用音標搜尋？"
     },
     "tabs": {
       "label": "詞表工作流",

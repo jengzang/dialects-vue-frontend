@@ -273,6 +273,7 @@ import CheckBox from '@/components/selector/CheckBox.vue'
 import LocationAndRegionInput from '@/main/components/geo/LocationAndRegionInput.vue'
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import { showConfirm } from '@/utils/ui/message.js'
 
 const { t } = useI18n()
 
@@ -419,7 +420,11 @@ function isFieldChecked(value) {
   return props.selectedSearchFields.length === 0 || props.selectedSearchFields.includes(value)
 }
 
-function toggleField(value, checked) {
+let isConfirmingNotesPronunciation = false
+
+async function toggleField(value, checked) {
+  if (isConfirmingNotesPronunciation) return
+
   const allValues = props.searchFieldOptions.map((o) => o.value)
   const current = props.selectedSearchFields.length === 0
     ? [...allValues]
@@ -430,6 +435,19 @@ function toggleField(value, checked) {
     : current.filter((v) => v !== value)
 
   const allChecked = allValues.every((v) => updated.includes(v))
+  if (props.source === 'character-notes'
+    && !current.includes('pronunciation')
+    && (!updated.length || updated.includes('pronunciation'))) {
+    isConfirmingNotesPronunciation = true
+    try {
+      const confirmed = await showConfirm(t('words.wordList.notes.ipaSearchConfirm'), {
+        title: t('words.wordList.notes.ipaSearchConfirmTitle'),
+      })
+      if (!confirmed) return
+    } finally {
+      isConfirmingNotesPronunciation = false
+    }
+  }
   emit('update:selectedSearchFields', allChecked ? [] : updated)
 }
 
