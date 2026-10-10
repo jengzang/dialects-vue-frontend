@@ -126,6 +126,8 @@ function mountToolsPanel(overrides = {}) {
         @update:selected-text-label-field-key="events.push(['update:selected-text-label-field-key', $event]); props.selectedTextLabelFieldKey = $event"
         @apply-text-label-field="events.push(['apply-text-label-field'])"
         @delete-selected="events.push(['delete-selected'])"
+        @focus-geometry-issue="events.push(['focus-geometry-issue', $event])"
+        @repair-feature-geometry="events.push(['repair-feature-geometry', $event])"
         @update:snap-targets="events.push(['update:snap-targets', $event]); props.snapTargets = $event"
       />
     `,
@@ -146,6 +148,16 @@ function mountToolsPanel(overrides = {}) {
 }
 
 describe('MapDrawToolsPanel editing affordances', () => {
+  it('locates and repairs the feature reported by a geometry diagnostic', async () => {
+    const issue = { id: 'poly:self-intersection:0.1', featureId: 'poly', featureName: 'Area', code: 'self-intersection', label: 'Crossing', location: '0.1 / 0.3', coordPaths: ['0.1', '0.3'], coordinate: [1, 1], repairable: true }
+    const wrapper = mountToolsPanel({ geometryQualitySummary: { hasIssues: true, issueCount: 1, items: [issue] } })
+    await nextTick()
+    wrapper.host.querySelector('[data-testid="geometry-issue-focus"]').click()
+    wrapper.host.querySelector('[data-testid="geometry-issue-repair"]').click()
+    expect(wrapper.events).toContainEqual(['focus-geometry-issue', issue])
+    expect(wrapper.events).toContainEqual(['repair-feature-geometry', 'poly'])
+    wrapper.unmount()
+  })
   afterEach(() => {
     document.body.innerHTML = ''
   })

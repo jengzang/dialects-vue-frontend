@@ -597,6 +597,14 @@
             <div class="draw-shape-edit-hint">
               {{ geometryEditStatus.message }}
             </div>
+            <button
+              v-for="issue in geometryEditStatus.issues || []"
+              :key="issue.id"
+              type="button"
+              class="glass-button small"
+              :disabled="!canModifyActiveLayer"
+              @click="$emit('focus-geometry-issue', issue)"
+            >{{ issue.featureName }} · {{ issue.label }} · {{ issue.location }}</button>
           </div>
           <div
             v-if="showGeometryQualityStatus"
@@ -621,14 +629,19 @@
               v-if="geometryQualitySummary.hasIssues"
               class="draw-shape-edit-tips"
             >
-              <span
+              <div
                 v-for="item in geometryQualitySummary.items"
                 :key="item.id"
                 data-testid="geometry-quality-item"
                 :data-level="item.level"
               >
-                {{ item.label }}
-              </span>
+                <button class="glass-button small" type="button" data-testid="geometry-issue-focus" :disabled="!canModifyActiveLayer" @click="$emit('focus-geometry-issue', item)">
+                  {{ [item.featureName, item.label, item.location].filter(Boolean).join(' · ') }}
+                </button>
+                <button v-if="item.repairable" class="glass-button small" type="button" data-testid="geometry-issue-repair" :disabled="!canModifyActiveLayer" @click="$emit('repair-feature-geometry', item.featureId)">
+                  {{ t('map.drawTab.labels.geometryRepair') }}
+                </button>
+              </div>
             </div>
           </div>
           <div
@@ -1519,6 +1532,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits([
+  'focus-geometry-issue',
+  'repair-feature-geometry',
   'set-mode',
   'select-feature',
   'toggle-feature-selection',

@@ -209,6 +209,8 @@
           @difference-selected-polygons="handleDifferenceSelectedPolygons"
           @convert-selected-line-to-polygon="handleConvertSelectedLineToPolygon"
           @move-selected-vertex="handleMoveSelectedVertex"
+          @focus-geometry-issue="editableMapRef?.focusGeometryIssue?.($event)"
+          @repair-feature-geometry="handleRepairFeatureGeometry"
           @undo="handleUndoHistory"
           @redo="handleRedoHistory"
           @delete-selected="handleDeleteSelected"
@@ -822,6 +824,11 @@ async function guardWrite() {
     router.push({ path: '/auth', query: { redirect: route.fullPath } });
   }
   return false;
+}
+
+async function handleRepairFeatureGeometry(featureId) {
+  if (!await guardWrite()) return;
+  editableMapRef.value?.repairFeatureGeometry?.(featureId);
 }
 
 // ---- Template refs ----

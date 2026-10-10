@@ -831,7 +831,8 @@ vi.mock('@/main/utils/drawMap/partitionVoronoi.js', () => ({
   calculatePartitionVoronoi: vi.fn(),
 }))
 
-vi.mock('@/main/utils/drawMap/export.js', () => ({
+vi.mock('@/main/utils/drawMap/export.js', async (importOriginal) => ({
+  ...await importOriginal(),
   readImportedLayerFile: vi.fn(),
   readKmzArrayBuffer: vi.fn(),
   splitFeatureCollectionByGeometryType: vi.fn(),
@@ -2660,7 +2661,7 @@ describe('MapDrawTab draft safety', () => {
     await flushTicks()
 
     expect(mocks.latestToolsPanelProps.geometryQualitySummary.hasIssues).toBe(true)
-    expect(mocks.latestToolsPanelProps.geometryQualitySummary.items.map((item) => item.id))
+    expect(mocks.latestToolsPanelProps.geometryQualitySummary.items.map((item) => item.code))
       .toContain('duplicate-coordinate')
 
     wrapper.unmount()

@@ -292,6 +292,57 @@ function mountEditableMapLibre(modelValue, options = {}) {
 }
 
 describe('EditableMapLibre state flow', () => {
+  it('rejects crossing and collapsed vertex edits before publishing changes', async () => {
+    const feature = { id: 'polygon-1', type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [[[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]]] } }
+    const wrapper = mountEditableMapLibre({ type: 'FeatureCollection', features: [feature] }, { snappingEnabled: false })
+    await nextTick()
+    wrapper.exposed.selectVertex('polygon-1', '0.1')
+    wrapper.events.length = 0
+    expect(wrapper.exposed.moveVertex('polygon-1', '0.1', [-1, 1])).toBe(false)
+    expect(wrapper.draw.get('polygon-1').geometry).toEqual(feature.geometry)
+    expect(wrapper.events.some(([event]) => event === 'features-change' || event === 'before-features-change')).toBe(false)
+    expect(wrapper.events).toContainEqual(['geometry-edit-feedback', expect.objectContaining({ code: 'geometryInvalid', issues: expect.arrayContaining([expect.objectContaining({ code: 'self-intersection' })]) })])
+    wrapper.unmount()
+  })
+
+  it('rolls back invalid native Draw edits to the last accepted geometry', async () => {
+    const feature = { id: 'polygon-1', type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [[[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]]] } }
+    const wrapper = mountEditableMapLibre({ type: 'FeatureCollection', features: [feature] }, { snappingEnabled: false })
+    await nextTick()
+    wrapper.exposed.selectVertex('polygon-1', '0.1')
+    wrapper.draw.set({ type: 'FeatureCollection', features: [{ ...feature, geometry: { ...feature.geometry, coordinates: [[[0, 0], [-1, 1], [2, 2], [0, 2], [0, 0]]] } }] })
+    wrapper.events.length = 0
+    wrapper.map.emit('draw.update', { features: [wrapper.draw.get('polygon-1')] })
+    expect(wrapper.draw.get('polygon-1').geometry).toEqual(feature.geometry)
+    expect(wrapper.draw.getMode()).toBe('direct_select')
+    expect(wrapper.events.some(([event]) => event === 'features-change' || event === 'before-features-change')).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('repairs invalid imported geometry as one undoable change', async () => {
+    const feature = { id: 'polygon-1', type: 'Feature', properties: { name: 'Area' }, geometry: { type: 'Polygon', coordinates: [[[0, 0], [2, 2], [0, 2], [2, 0], [0, 0]]] } }
+    const wrapper = mountEditableMapLibre({ type: 'FeatureCollection', features: [feature] }, { snappingEnabled: false })
+    await nextTick()
+    wrapper.events.length = 0
+    expect(wrapper.exposed.repairFeatureGeometry('polygon-1')).toBe(true)
+    expect(wrapper.draw.getAll().features).toHaveLength(2)
+    expect(new Set(wrapper.draw.getAll().features.map((item) => item.id)).size).toBe(2)
+    expect(wrapper.events.filter(([event]) => event === 'before-features-change')).toHaveLength(1)
+    wrapper.unmount()
+  })
+
+  it('preserves untouched authoritative unclosed polygons during another repair', async () => {
+    const feature = { id: 'polygon-1', type: 'Feature', properties: { name: 'Area' }, geometry: { type: 'Polygon', coordinates: [[[0, 0], [2, 2], [0, 2], [2, 0], [0, 0]]] } }
+    const untouched = { ...feature, id: 'untouched', geometry: { type: 'Polygon', coordinates: [[[4, 4], [6, 4], [6, 6], [4, 6]]] } }
+    const wrapper = mountEditableMapLibre({ type: 'FeatureCollection', features: [feature, untouched] }, { snappingEnabled: false })
+    await nextTick()
+    wrapper.draw.features.set('untouched', { ...untouched, geometry: { type: 'Polygon', coordinates: [[[4, 4], [6, 4], [6, 6], [4, 4]]] } })
+    wrapper.events.length = 0
+    expect(wrapper.exposed.repairFeatureGeometry('polygon-1')).toBe(true)
+    expect(wrapper.events.find(([event]) => event === 'features-change')[1].features.find((item) => item.id === 'untouched').geometry).toEqual(untouched.geometry)
+    wrapper.unmount()
+  })
+
   afterEach(() => {
     vi.useRealTimers()
     vi.clearAllMocks()
@@ -951,7 +1002,7 @@ describe('EditableMapLibre state flow', () => {
         id: 'polygon-1',
         type: 'Feature',
         properties: { visible: true, locked: false },
-        geometry: { type: 'Polygon', coordinates: [] },
+        geometry: { type: 'Polygon', coordinates: [[[0, 0], [2, 0], [0, 2], [0, 0]]] },
       }],
     })
     await nextTick()
@@ -973,7 +1024,7 @@ describe('EditableMapLibre state flow', () => {
         id: 'polygon-1',
         type: 'Feature',
         properties: { visible: true, locked: false },
-        geometry: { type: 'Polygon', coordinates: [] },
+        geometry: { type: 'Polygon', coordinates: [[[0, 0], [2, 0], [0, 2], [0, 0]]] },
       }],
     })
     await nextTick()

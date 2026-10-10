@@ -56,6 +56,8 @@ import {
 import {
   exportCurrentMapAsPng,
   exportFeatureCollectionAsGeoJson,
+  analyzeEditableGeometry,
+  repairEditableGeometry,
   normalizeFeatureCollection,
 } from '@/main/utils/drawMap/export.js'
 import { pickDrawColor } from '@/main/config/colors/mapColors.js'
@@ -250,6 +252,8 @@ const editTargetHoverLayerIds = [
   'gl-draw-polygon-stroke',
 ]
 const snapPreviewSourceId = 'draw-snap-preview-source'
+const geometryIssueSourceId = 'draw-geometry-issue-source'
+const geometryIssueLayerIds = ['draw-geometry-issue-edge', 'draw-geometry-issue-point']
 const snapPreviewGuideLayerId = 'draw-snap-preview-guide'
 const snapPreviewPointLayerId = 'draw-snap-preview-point'
 const snapPreviewLayerIds = new Set([snapPreviewGuideLayerId, snapPreviewPointLayerId])
@@ -362,6 +366,7 @@ const map = shallowRef(null)
 const draw = shallowRef(null)
 const selectedFeatureId = ref('')
 const selectedVertexCoordPaths = ref([])
+let acceptedFeatureCollection = null
 const pendingPolygonSplitSketchFeatureId = ref('')
 const currentStyleKey = ref(props.currentStyleKey || 'gaode')
 const isFullscreen = ref(false)
@@ -2187,8 +2192,36 @@ const syncFeaturesFromDraw = (options = {}) => {
     return
   }
 
-  const normalized = normalizeFeatureCollection(draw.value?.getAll?.())
+  const normalized = normalizeFeatureCollection(options.featureCollection ?? draw.value?.getAll?.())
   const { featureCollection, changed } = snapFeatureCollectionCoordinates(normalized, options)
+  if (isDrawMutationSyncEvent(options) && options.type !== 'draw.delete') {
+    const targetIds = getDrawEventFeatureIds(options)
+    const issues = featureCollection.features
+      .filter((feature) => targetIds.size === 0 || targetIds.has(getDrawFeatureId(feature)))
+      .flatMap(analyzeEditableGeometry).filter((issue) => issue.level === 'error')
+    if (issues.length > 0) {
+      const featureId = selectedFeatureId.value
+      const coordPath = selectedVertexCoordPaths.value[0]
+      const wasDirectSelect = draw.value?.getMode?.() === 'direct_select'
+      draw.value?.set?.(acceptedFeatureCollection ?? normalizeFeatureCollection(props.modelValue))
+      // Draw assigns midpoint selection after firing update; rebuild it after that callback.
+      const currentDraw = draw.value
+      queueMicrotask(() => {
+        if (draw.value !== currentDraw || !map.value) return
+        const feature = currentDraw?.get?.(featureId)
+        const safePath = coordPath ? normalizeExistingCoordPath(feature, coordPath) : ''
+        currentDraw?.changeMode?.('simple_select', { featureIds: feature ? [featureId] : [] })
+        if (wasDirectSelect && isDrawFeatureSelectable(feature)) {
+          currentDraw.changeMode?.('direct_select', { featureId, ...(safePath ? { coordPath: safePath } : {}) })
+        }
+        selectedVertexCoordPaths.value = safePath ? [safePath] : []
+        syncShapeEditState()
+      })
+      emit('geometry-edit-feedback', { type: 'error', code: 'geometryInvalid', issues })
+      syncShapeEditState()
+      return false
+    }
+  }
   if (changed) {
     draw.value?.set?.(featureCollection)
   }
@@ -2198,6 +2231,8 @@ const syncFeaturesFromDraw = (options = {}) => {
   }
   emit('update:modelValue', featureCollection)
   emit('features-change', featureCollection)
+  acceptedFeatureCollection = JSON.parse(JSON.stringify(featureCollection))
+  clearGeometryIssue()
   syncActiveTextScaleVisibility()
   syncTextBackgroundBoxes()
   syncTextLeaderLines()
@@ -2698,6 +2733,11 @@ const replaceFeaturesInDraw = (nextFeaturesForReplacement = [], options = {}) =>
     .map((feature) => [getDrawFeatureId(feature), feature])
     .filter(([featureId, feature]) => featureId && feature))
   if (replacementFeatureById.size === 0) return false
+  const issues = [...replacementFeatureById.values()].flatMap(analyzeEditableGeometry).filter((issue) => issue.level === 'error')
+  if (issues.length > 0) {
+    emit('geometry-edit-feedback', { type: 'error', code: 'geometryInvalid', issues })
+    return false
+  }
 
   const featureCollection = normalizeFeatureCollection(draw.value.getAll?.() ?? props.modelValue)
   const nextFeatures = (featureCollection.features ?? []).map((feature) => (
@@ -2734,6 +2774,66 @@ const selectVertex = (featureId, coordPath) => {
   selectedFeatureId.value = String(featureId)
   emit('feature-select', selectedFeatureId.value)
   syncShapeEditState()
+  return true
+}
+
+const focusGeometryIssue = (issue) => {
+  const feature = draw.value?.get?.(issue?.featureId)
+  if (!isDrawFeatureSelectable(feature)) return false
+  if (issue.coordPaths?.[0]) selectVertex(issue.featureId, issue.coordPaths[0])
+  else selectFeature(issue.featureId, { directEdit: false })
+  if (normalizeVertexCoordinate(issue.coordinate)) map.value?.flyTo?.({ center: issue.coordinate, duration: 0 })
+  showGeometryIssue(issue, feature)
+  return true
+}
+
+const clearGeometryIssue = () => map.value?.getSource?.(geometryIssueSourceId)?.setData?.(featureCollection([]))
+
+const showGeometryIssue = (issue, feature) => {
+  if (!map.value) return
+  if (!map.value.getSource(geometryIssueSourceId)) {
+    map.value.addSource(geometryIssueSourceId, { type: 'geojson', data: featureCollection([]) })
+  }
+  if (!map.value.getLayer(geometryIssueLayerIds[0])) {
+    map.value.addLayer({ id: geometryIssueLayerIds[0], type: 'line', source: geometryIssueSourceId,
+      filter: ['==', '$type', 'LineString'], paint: { 'line-color': '#ef4444', 'line-width': 5 } })
+  }
+  if (!map.value.getLayer(geometryIssueLayerIds[1])) {
+    map.value.addLayer({ id: geometryIssueLayerIds[1], type: 'circle', source: geometryIssueSourceId,
+      filter: ['==', '$type', 'Point'], paint: { 'circle-color': '#ef4444', 'circle-radius': 8, 'circle-stroke-color': '#ffffff', 'circle-stroke-width': 2 } })
+  }
+  const features = []
+  if (normalizeVertexCoordinate(issue.coordinate)) features.push({ type: 'Feature', properties: {}, geometry: { type: 'Point', coordinates: issue.coordinate } })
+  ;(issue.coordPaths ?? []).forEach((coordPath) => {
+    const parts = parseCoordPath(coordPath)
+    const path = feature.geometry?.type === 'Polygon' ? feature.geometry.coordinates?.[parts?.[0]] : feature.geometry?.coordinates
+    const index = parts?.at(-1)
+    if (path?.[index] && path?.[index + 1]) features.push({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [path[index], path[index + 1]] } })
+  })
+  map.value.getSource(geometryIssueSourceId).setData(featureCollection(features))
+}
+
+const repairFeatureGeometry = (featureId) => {
+  const feature = acceptedFeatureCollection?.features?.find((item) => getDrawFeatureId(item) === String(featureId)) ?? draw.value?.get?.(featureId)
+  if (!isDrawFeatureSelectable(feature)) return false
+  const repaired = repairEditableGeometry(feature)
+  if (repaired.length === 0) {
+    emitGeometryEditFeedback('error', 'geometryRepairFailed')
+    return false
+  }
+  if (repaired.length === 1 && JSON.stringify(repaired[0].geometry) === JSON.stringify(feature.geometry)) return false
+  const collection = normalizeFeatureCollection(acceptedFeatureCollection ?? draw.value.getAll())
+  const reservedIds = new Set()
+  const parts = repaired.map((part, index) => {
+    const id = index === 0 ? String(featureId) : buildSplitFeatureId(collection, featureId, reservedIds)
+    reservedIds.add(id)
+    return { ...part, id, properties: { ...part.properties, id } }
+  })
+  const repairedCollection = { ...collection, features: collection.features.flatMap((item) => getDrawFeatureId(item) === String(featureId) ? parts : [item]) }
+  draw.value.set(repairedCollection)
+  syncFeaturesFromDraw({ syncSelection: false, featureCollection: repairedCollection })
+  selectFeatures(parts.map((part) => part.id))
+  emitGeometryEditFeedback('success', 'geometryRepairSuccess')
   return true
 }
 
@@ -2989,6 +3089,7 @@ const importGeoJson = (featureCollection, options = {}) => {
   clearSnapPreview()
   clearEditTargetHover()
   const normalized = normalizeFeatureCollection(featureCollection)
+  clearGeometryIssue()
   const mergeImportedFeatures = options.merge === true
   const shouldEmitChanges = options.emitChanges !== false
   const nextFeatureCollection = mergeImportedFeatures
@@ -3000,6 +3101,7 @@ const importGeoJson = (featureCollection, options = {}) => {
         ],
       })
     : normalized
+  acceptedFeatureCollection = JSON.parse(JSON.stringify(nextFeatureCollection))
 
   draw.value.deleteAll()
   if (nextFeatureCollection.features.length > 0) {
@@ -3008,7 +3110,7 @@ const importGeoJson = (featureCollection, options = {}) => {
   selectedFeatureId.value = ''
   selectedVertexCoordPaths.value = []
   if (shouldEmitChanges) {
-    syncFeaturesFromDraw()
+    syncFeaturesFromDraw({ featureCollection: nextFeatureCollection })
   } else if (options.emitSelection !== false) {
     syncSelectedFeature()
   }
@@ -3058,6 +3160,7 @@ const initializeDraw = () => {
   syncActiveTextLayoutConstants()
 
   const initialFeatures = normalizeFeatureCollection(props.modelValue)
+  acceptedFeatureCollection = JSON.parse(JSON.stringify(initialFeatures))
   if (initialFeatures.features.length > 0) {
     draw.value.set(initialFeatures)
   }
@@ -3249,7 +3352,7 @@ const applyExportContentVisibility = (options = {}) => {
       previousFilters.set(layer.id, map.value.getFilter(layer.id))
     }
 
-    if (snapPreviewLayerIds.has(layer.id)) {
+    if (snapPreviewLayerIds.has(layer.id) || geometryIssueLayerIds.includes(layer.id)) {
       setLayerVisibility(layer.id, false)
       return
     }
@@ -3610,6 +3713,8 @@ watch(
   (nextValue) => {
     if (!draw.value || !nextValue) return
     const normalized = normalizeFeatureCollection(nextValue)
+    acceptedFeatureCollection = JSON.parse(JSON.stringify(normalized))
+    clearGeometryIssue()
     draw.value.deleteAll()
     if (normalized.features.length > 0) {
       draw.value.set(normalized)
@@ -3635,6 +3740,7 @@ watch(
   () => props.activeLayer?.id,
   () => {
     if (!map.value) return
+    clearGeometryIssue()
     syncReadonlyLayers()
     syncActiveTextLayoutConstants()
   }
@@ -3709,6 +3815,8 @@ onBeforeUnmount(() => {
   unbindPreviewHover()
   if (map.value) {
     map.value.remove()
+    map.value = null
+    draw.value = null
   }
 })
 
@@ -3721,6 +3829,8 @@ defineExpose({
   selectFeature,
   selectFeatures,
   selectVertex,
+  focusGeometryIssue,
+  repairFeatureGeometry,
   insertVertex,
   moveVertex,
   canSplitLineAtVertex,
