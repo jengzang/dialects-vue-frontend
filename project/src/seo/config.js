@@ -92,9 +92,9 @@ const SEO_CONFIG = {
     },
     '/menu/privacy': {
       title: {
-        'zh-Hant': { main: '隱私政策與引用說明', subtitle: '了解資料使用與學術引用規範' },
-        'zh-CN': { main: '隐私政策与引用说明', subtitle: '了解资料使用与学术引用规范' },
-        en: { main: 'Privacy Policy & Citation', subtitle: 'Read data usage and citation guidance' },
+        'zh-Hant': { main: '隱私與引用', subtitle: '了解隱私政策、資料使用與學術引用規範' },
+        'zh-CN': { main: '隐私与引用', subtitle: '了解隐私政策、资料使用与学术引用规范' },
+        en: { main: 'Privacy Policy & Citation', subtitle: 'Read privacy policies, data usage, and citation guidance' },
       },
       description: {
         'zh-Hant': '了解方音圖鑑的隱私政策、資料使用方式與引用建議，查閱網站資料使用與學術引用的相關說明。',
@@ -128,9 +128,9 @@ const SEO_CONFIG = {
     },
     '/menu/query/yinwei': {
       title: {
-        'zh-Hant': { main: '查音位', subtitle: '反查方言聲韻調的韻書地位來源' },
-        'zh-CN': { main: '查音位', subtitle: '反查方言声韵调的韵书地位来源' },
-        en: { main: 'Phoneme Query', subtitle: 'Trace dialect sounds to rhyme-book categories' },
+        'zh-Hant': { main: '查音位', subtitle: '反查方言今音的韻書地位來源' },
+        'zh-CN': { main: '查音位', subtitle: '反查方言今音的韵书地位来源' },
+        en: { main: 'Phoneme Query', subtitle: 'Trace modern dialect sounds to rhyme-book categories' },
       },
       description: {
         'zh-Hant': '輸入方言聲母、韻母或聲調的實際音值，反查其韻書地位來源，如反查今音的中古來源，具體來源於《廣韻》的哪些攝、韻、母、呼等。支援查看各來源的字數、比例和字例。',
@@ -236,8 +236,8 @@ const SEO_CONFIG = {
     },
     '/menu/pho/evolution': {
       title: {
-        'zh-Hant': { main: '演變', subtitle: '分析方言今音來源與歷史音類分化' },
-        'zh-CN': { main: '演变', subtitle: '分析方言今音来源与历史音类分化' },
+        'zh-Hant': { main: '韻書演化', subtitle: '分析方言今音來源與歷史音類分化' },
+        'zh-CN': { main: '韵书演化', subtitle: '分析方言今音来源与历史音类分化' },
         en: { main: 'Evolution', subtitle: 'Trace modern dialect sounds and historical splits' },
       },
       description: {
@@ -308,9 +308,9 @@ const SEO_CONFIG = {
     },
     '/explore/villages/gd': {
       title: {
-        'zh-Hant': { main: '廣東自然村', subtitle: '樹狀查詢村名、方言與經緯度' },
-        'zh-CN': { main: '广东自然村', subtitle: '树状查询村名、方言与经纬度' },
-        en: { main: 'Guangdong Villages', subtitle: 'Browse village names, dialects, and coordinates in a tree' },
+        'zh-Hant': { main: '廣東自然村', subtitle: '樹狀查詢村名、方言、行政區劃' },
+        'zh-CN': { main: '广东自然村', subtitle: '树状查询村名、方言、行政区划' },
+        en: { main: 'Guangdong Villages', subtitle: 'Browse village names, dialects, and administrative areas in a tree' },
       },
       description: {
         'zh-Hant': '按市、縣、鄉鎮等行政層級樹狀瀏覽廣東自然村名錄，查詢村名、方言分佈及經緯度，並在地圖上查看村莊。支援跳轉地圖繪製頁面，根據泰森多邊形繪製方言分佈圖。',
@@ -320,9 +320,9 @@ const SEO_CONFIG = {
     },
     '/explore/villages/table': {
       title: {
-        'zh-Hant': { main: '全粵村情表格', subtitle: '按村名、行政區劃或方言篩選村落' },
-        'zh-CN': { main: '全粤村情表格', subtitle: '按村名、行政区划或方言筛选村落' },
-        en: { main: 'Guangdong Villages Table', subtitle: 'Filter villages by name, administrative area, or dialect' },
+        'zh-Hant': { main: '廣東村落表格', subtitle: '按表格查看廣東自然村名錄、行政區劃、方言' },
+        'zh-CN': { main: '广东村落表格', subtitle: '按表格查看广东自然村名录、行政区划、方言' },
+        en: { main: 'Guangdong Villages Table', subtitle: 'View Guangdong village directories, administrative areas, and dialects in a table' },
       },
       description: {
         'zh-Hant': '按照表格查看廣東自然村名錄，可按村名、行政區劃或方言篩選，查看經緯度，支援表格排序與分頁。',
@@ -347,9 +347,9 @@ const SEO_CONFIG = {
     },
     '/explore/yc/villages': {
       title: {
-        'zh-Hant': { main: '陽春自然村', subtitle: '查詢村委會與村莊行政隸屬關係' },
-        'zh-CN': { main: '阳春自然村', subtitle: '查询村委会与村庄行政隶属关系' },
-        en: { main: 'Yangchun Villages', subtitle: 'Explore village committees and administrative hierarchy' },
+        'zh-Hant': { main: '陽春自然村', subtitle: '按樹狀圖查看陽春自然村名錄及行政層級' },
+        'zh-CN': { main: '阳春自然村', subtitle: '按树状图查看阳春自然村名录及行政层级' },
+        en: { main: 'Yangchun Villages', subtitle: 'Browse Yangchun village directories and administrative hierarchy in a tree' },
       },
       description: {
         'zh-Hant': '查詢陽春自然村與村委會資料，查看各村莊所屬鄉鎮、社區及行政層級。',
@@ -470,9 +470,9 @@ const SEO_CONFIG = {
     },
     '/menu/map/divide': {
       title: {
-        'zh-Hant': { main: '分區地圖', subtitle: '查詢地圖集與音典方言分區' },
-        'zh-CN': { main: '分区地图', subtitle: '查询地图集与音典方言分区' },
-        en: { main: 'Dialect Division Map', subtitle: 'Explore atlas and Yindian dialect divisions' },
+        'zh-Hant': { main: '分區地圖', subtitle: '查詢方言分區，包括地圖集與音典' },
+        'zh-CN': { main: '分区地图', subtitle: '查询方言分区，包括地图集与音典' },
+        en: { main: 'Dialect Division Map', subtitle: 'Look up dialect divisions, including atlas and Yindian classifications' },
       },
       description: {
         'zh-Hant': '查詢方言點所屬的地圖集或音典分區，按分區層級繪製方言分區地圖，查看各方言分區的地理分佈。',
@@ -614,9 +614,9 @@ const SEO_CONFIG = {
     },
     '/explore/tools/check': {
       title: {
-        'zh-Hant': { main: '字表檢查', subtitle: '線上檢查IPA音標與字表格式' },
-        'zh-CN': { main: '字表检查', subtitle: '在线检查IPA音标与字表格式' },
-        en: { main: 'Table Check', subtitle: 'Check IPA transcriptions and character table formats online' },
+        'zh-Hant': { main: '字表檢查', subtitle: '線上檢查字表格式、調類情況及修正錄入錯誤' },
+        'zh-CN': { main: '字表检查', subtitle: '线上检查字表格式、调类情况及修正录入错误' },
+        en: { main: 'Table Check', subtitle: 'Check table formats and tone categories online and correct data entry errors' },
       },
       description: {
         'zh-Hant': '上傳方言字表，線上檢查非單字、異常 IPA 音標和缺聲調等問題，編輯修正後下載結果。（需登入）',
@@ -626,9 +626,9 @@ const SEO_CONFIG = {
     },
     '/explore/tools/jyut2ipa': {
       title: {
-        'zh-Hant': { main: '粵拼轉 IPA', subtitle: '線上批量轉換Excel粵語拼音' },
-        'zh-CN': { main: '粤拼转 IPA', subtitle: '在线批量转换Excel粤语拼音' },
-        en: { main: 'Jyutping to IPA', subtitle: 'Batch-convert Cantonese romanization in Excel online' },
+        'zh-Hant': { main: '粵拼轉 IPA', subtitle: '線上批量轉換粵語拼音為國際音標' },
+        'zh-CN': { main: '粤拼转 IPA', subtitle: '在线批量转换粤语拼音为国际音标' },
+        en: { main: 'Jyutping to IPA', subtitle: 'Batch-convert Cantonese romanization to IPA online' },
       },
       description: {
         'zh-Hant': '上傳含粵拼欄的 Excel 字表，線上批量將粵語拼音轉換為 IPA 國際音標，支援自訂轉換規則、預覽並下載結果。（需登入）',
@@ -662,9 +662,9 @@ const SEO_CONFIG = {
     },
     '/explore/tools/praat': {
       title: {
-        'zh-Hant': { main: '聲學分析', subtitle: '在線Praat分析基頻、共振峰與聲調' },
-        'zh-CN': { main: '声学分析', subtitle: '在线Praat分析基频、共振峰与声调' },
-        en: { main: 'Acoustic Analysis', subtitle: 'Use Praat online to analyze pitch, formants, and tones' },
+        'zh-Hant': { main: '聲學分析', subtitle: '在線Praat分析基頻、共振峰與調值' },
+        'zh-CN': { main: '声学分析', subtitle: '在线Praat分析基频、共振峰与调值' },
+        en: { main: 'Acoustic Analysis', subtitle: 'Use Praat online to analyze pitch, formants, and tone values' },
       },
       description: {
         'zh-Hant': '在線Praat語音聲學分析：上傳音檔或直接錄音，查看基頻曲線、共振峰、頻譜圖和母音空間等，手動選取樣本後用石鋒T值法生成五度制聲調圖。（需登入）',
