@@ -23,11 +23,21 @@
 
 ## Step 3: Simplified Chinese User Tutorial
 
-- [ ] Read current panels, modals, composables, locale labels, and peer tutorials; build a feature coverage inventory.
-- [ ] Replace the short existing `project/src/main/components/tutorial/content/zh-CN/menu-map-draw.md` with a detailed task-oriented guide: prerequisites, feature/layer distinction, drawing, selection, editing, snapping/topology, geometry tools/quality, text, styling, attributes, all import/export and Voronoi workflows, drafts, view controls, keyboard shortcuts, and troubleshooting.
-- [ ] Verify every documented control against the implementation and preserve existing tutorials/translations. Do not claim unsupported operations or fabricate screenshots.
-- [ ] Validate Markdown rendering/tutorial tests, links and UTF-8. Record the existing single-file Traditional Chinese conversion command for later use; do not overwrite the current Traditional Chinese tutorial in this step.
-- [ ] CR and commit the tutorial separately.
+- [x] Read current panels, modals, composables, locale labels, and peer tutorials; build a feature coverage inventory.
+- [x] Replace the short existing `project/src/main/components/tutorial/content/zh-CN/menu-map-draw.md` with a detailed task-oriented guide: prerequisites, feature/layer distinction, drawing, selection, editing, snapping/topology, geometry tools/quality, text, styling, attributes, all import/export and Voronoi workflows, drafts, view controls, keyboard shortcuts, and troubleshooting.
+- [x] Verify documented controls against implementation and preserve existing tutorials/translations. CR corrected clear-all scope (active layer, not all layers), clarified selection-scoped field labels, degree-based grid size, kilometer buffers, destructive geometry replacement, and browser-storage limitations. No fabricated screenshots or unsupported tools.
+- [x] Validate Markdown rendering, coverage and UTF-8. 276 GIS/tutorial tests passed across 12 files; real Chrome desktop/mobile smoke and production build passed. The expanded run of existing `pageTutorialGuide.test.js` has 11 failures in unchanged tests/components (missing matchMedia mock and trigger assertions); these are recorded, not silently reported as passing or changed outside this task.
+- [x] CR complete; tutorial, focused document tests and this plan are the separate Step 3 commit scope. Traditional Chinese remains unchanged.
+
+### Later Traditional Chinese Conversion
+
+Existing OpenCC executable is available. From the repository root, run:
+
+```sh
+python3 scripts/convert_tutorial.py project/src/main/components/tutorial/content/zh-CN/menu-map-draw.md
+```
+
+This writes the corresponding `zh-Hant/menu-map-draw.md`. Run only after approval to convert; inspect the resulting diff and terminology before committing. The script does not validate OpenCC's exit status, so verify its output rather than relying solely on its printed completion message. No conversion was run in this step.
 
 ## Verification
 
