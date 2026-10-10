@@ -14,10 +14,10 @@ const SEO_CONFIG = {
   },
   defaultDescription: {
     'zh-Hant':
-      '方音圖鑑提供線上方言查詢比較：查漢字讀音、中古音與音位來源、各地調值，對比方言聲韻調，並查看音系表、方言地圖、詞彙和自然村資料。',
+      '方音圖鑑是一個專注於方言比較與地理語言學的線上平台，提供查字、查中古、查音位、查調、音系分析、方言比較、地圖可視化與自然村資料等功能。',
     'zh-CN':
-      '方音图鉴提供在线方言查询比较：查汉字读音、中古音与音位来源、各地调值，对比方言声韵调，并查看音系表、方言地图、词汇和自然村资料。',
-    en: 'Look up Chinese character pronunciations, Middle Chinese categories, phoneme origins, and tone values. Compare dialect sounds and explore phonology tables, maps, vocabulary, and village data.',
+      '方音图鉴是一个专注于方言比较与地理语言学的在线平台，提供查字、查中古、查音位、查调、音系分析、方言比较、地图可视化与自然村资料等功能。',
+    en: 'Dialects Atlas is an online platform focused on dialect comparison and geolinguistics, offering character lookup, Middle Chinese query, phoneme analysis, tone query, phonology analysis, dialect comparison, map visualization, and village datasets.',
   },
   routes: {
     '/': {
@@ -28,10 +28,10 @@ const SEO_CONFIG = {
       },
       description: {
         'zh-Hant':
-          '方音圖鑑提供線上方言查詢比較：查漢字讀音、中古音與音位來源、各地調值，對比方言聲韻調，並查看音系表、方言地圖、詞彙和自然村資料。',
+          '方音圖鑑是一個專注於方言比較與地理語言學的線上平台，提供查字、查中古、查音位、查調、音系分析、方言比較、地圖可視化與自然村資料等功能。',
         'zh-CN':
-          '方音图鉴提供在线方言查询比较：查汉字读音、中古音与音位来源、各地调值，对比方言声韵调，并查看音系表、方言地图、词汇和自然村资料。',
-        en: 'Look up Chinese character pronunciations, Middle Chinese categories, phoneme origins, and tone values. Compare dialect sounds and explore phonology tables, maps, vocabulary, and village data.',
+          '方音图鉴是一个专注于方言比较与地理语言学的在线平台，提供查字、查中古、查音位、查调、音系分析、方言比较、地图可视化与自然村资料等功能。',
+        en: 'Dialects Atlas is an online platform focused on dialect comparison and geolinguistics, offering character lookup, Middle Chinese query, phoneme analysis, tone query, phonology analysis, dialect comparison, map visualization, and village datasets.',
       },
     },
     '/auth': {
