@@ -32,6 +32,11 @@
 
 @mixin visible-scrollbar-webkit {
   &::-webkit-scrollbar {
+    width: calc(var(--app-scrollbar-size) / 2);
+    height: calc(var(--app-scrollbar-size) / 2);
+  }
+
+  &:hover::-webkit-scrollbar {
     width: var(--app-scrollbar-size);
     height: var(--app-scrollbar-size);
   }
@@ -217,11 +222,17 @@
   @include visible-scrollbar-webkit;
 }
 
-// Standard scrollbar colors override WebKit thumb hover styling.
+// Standard scrollbar properties override WebKit dimensions and hover styling.
 @supports selector(::-webkit-scrollbar) {
-  :where(:root:not([data-color-theme='dark']), :root:not([data-color-theme='dark']) *) {
+  :where(*) {
     scrollbar-width: auto;
     scrollbar-color: auto;
+  }
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  :where(*:hover) {
+    scrollbar-width: auto;
   }
 }
 
