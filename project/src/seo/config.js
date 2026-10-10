@@ -113,9 +113,9 @@ const SEO_CONFIG = {
         en: 'Middle Chinese Query | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '查中古音類在現代方言中怎麼讀：按《廣韻》攝、韻、等、呼、聲母或調類查詢對應漢字與各地今讀，觀察音韻分化及地理分佈。',
-        'zh-CN': '查中古音类在现代方言中怎么读：按《广韵》摄、韵、等、呼、声母或调类查询对应汉字与各地今读，观察音韵分化及地理分布。',
-        en: 'Find how Middle Chinese sound categories are pronounced in modern dialects. Search Guangyun rimes, initials, divisions, and tones to compare characters and regional readings.',
+        'zh-Hant': '按照各韻書的地位，如《廣韻》中古音的攝、韻、等、呼、母等，查詢整理對應漢字在各地方言中的今讀及地理分佈。支援多個地點查詢、繪製地圖，並進行歷史音韻、地理語言學分析。',
+        'zh-CN': '按照各韵书的地位，如《广韵》中古音的摄、韵、等、呼、母等，查询整理对应汉字在各地方言中的今读及地理分布。支持多个地点查询、绘制地图，并进行历史音韵、地理语言学分析。',
+        en: 'Search historical phonological categories in rhyme books, such as Guangyun rime groups, rimes, divisions, openness, and initials, to organize modern character readings across dialects and their geographic distribution. Query multiple locations and draw maps for historical phonology and geolinguistic analysis.',
       },
     },
     '/menu/query/yinwei': {
@@ -125,9 +125,9 @@ const SEO_CONFIG = {
         en: 'Phoneme Query | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '方言中的某個聲母、韻母或音節來自哪些中古音類？輸入實際音值，反查其中古音來源，查看各來源的字數、比例與字例。',
-        'zh-CN': '方言中的某个声母、韵母或音节来自哪些中古音类？输入实际音值，反查其中古音来源，查看各来源的字数、比例与字例。',
-        en: 'Trace a dialect sound, initial, final, or syllable back to its Middle Chinese sources. See the source categories, character counts, proportions, and examples.',
+        'zh-Hant': '輸入方言聲母、韻母或聲調的實際音值，反查其韻書地位來源，如反查今音的中古來源，具體來源於《廣韻》的哪些攝、韻、母、呼等。支援查看各來源的字數、比例和字例。',
+        'zh-CN': '输入方言声母、韵母或声调的实际音值，反查其韵书地位来源，如反查今音的中古来源，具体来源于《广韵》的哪些摄、韵、母、呼等。支持查看各来源的字数、比例和字例。',
+        en: 'Enter the actual sound values of dialect initials, finals, or tones to trace their rhyme-book sources, including Middle Chinese rime groups, rimes, initials, and openness categories in Guangyun. View character counts, proportions, and examples for each source.',
       },
     },
     '/menu/query/tone': {
@@ -137,9 +137,9 @@ const SEO_CONFIG = {
         en: 'Tone Query | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '查詢各地方言的聲調和調值：選擇方言點，查看陰平、陽平、上聲、去聲、入聲等調類的調值，對比調類合併及地圖分佈。',
-        'zh-CN': '查询各地方言的声调和调值：选择方言点，查看阴平、阳平、上声、去声、入声等调类的调值，对比调类合并及地图分布。',
-        en: 'Look up Chinese dialect tone values by location. Compare yinping, yangping, rising, departing, and entering tone categories, their mergers, and their map distribution.',
+        'zh-Hant': '查詢各地方言的聲調情況，如查看各調類的合併情況及具體調值的地理分佈。',
+        'zh-CN': '查询各地方言的声调情况，如查看各调类的合并情况及具体调值的地理分布。',
+        en: 'Look up tones across dialects, including tone-category mergers and the geographic distribution of specific pitch values.',
       },
     },
     '/menu/compare/char': {
@@ -149,9 +149,9 @@ const SEO_CONFIG = {
         en: 'Character Comparison | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '比較兩個漢字在各地方言的讀音是否相同。按聲母、韻母或聲調對比兩字，查看哪些方言點在所選維度相同、部分相同或不同。',
-        'zh-CN': '比较两个汉字在各地方言的读音是否相同。按声母、韵母或声调对比两字，查看哪些方言点在所选维度相同、部分相同或不同。',
-        en: 'Compare how two Chinese characters are pronounced across dialects. See where their initials, finals, or tones match, partly match, or differ.',
+        'zh-Hant': '比較兩個漢字在各地方言中的聲母、韻母或聲調情況，查看相同、部分相同或不同的地點及分佈地圖。',
+        'zh-CN': '比较两个汉字在各地方言中的声母、韵母或声调情况，查看相同、部分相同或不同的地点及分布地图。',
+        en: 'Compare the initials, finals, or tones of two Chinese characters across dialects, and map locations where they match, partly match, or differ.',
       },
     },
     '/menu/compare/zhonggu': {
@@ -161,9 +161,9 @@ const SEO_CONFIG = {
         en: 'Middle Chinese Comparison | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '比較兩組中古音類在現代方言中的讀音，查看聲母、韻母或聲調在哪些地區合流或分化，並用地圖對照各地差異。',
-        'zh-CN': '比较两组中古音类在现代方言中的读音，查看声母、韵母或声调在哪些地区合流或分化，并用地图对照各地差异。',
-        en: 'Compare how two Middle Chinese sound categories developed across modern dialects. Map where their initials, finals, or tones merged or remained distinct.',
+        'zh-Hant': '比較兩組歷史韻書音類條件（如中古廣韻）在現代方言中的聲母、韻母或聲調，查看各地音類合流、分化及地圖分佈。',
+        'zh-CN': '比较两组历史韵书音类条件（如中古广韵）在现代方言中的声母、韵母或声调，查看各地音类合流、分化及地图分布。',
+        en: 'Compare two sets of historical rhyme-book category conditions, such as Middle Chinese categories in Guangyun, in modern dialect initials, finals, or tones. Explore mergers, splits, and their geographic distribution.',
       },
     },
     '/menu/compare/tone': {
@@ -173,9 +173,9 @@ const SEO_CONFIG = {
         en: 'Tone Category Comparison | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '查方言調類是否合併：比較陰上、陽上等兩個調類在各地的調值，查看合流、可能合流與分立的分佈地圖。',
-        'zh-CN': '查方言调类是否合并：比较阴上、阳上等两个调类在各地的调值，查看合流、可能合流与分立的分布地图。',
-        en: 'Where have two dialect tone categories merged? Compare their pitch values across locations and map mergers, possible mergers, and distinctions.',
+        'zh-Hant': '比較兩個調類在各地方言中的合併情況，查看合流、可能合流或分立的地點及分佈地圖。',
+        'zh-CN': '比较两个调类在各地方言中的合并情况，查看合流、可能合流或分立的地点及分布地图。',
+        en: 'Compare mergers between two tone categories across dialects, and map locations with mergers, possible mergers, or distinctions.',
       },
     },
     '/menu/compare/phonetic': {
@@ -185,9 +185,9 @@ const SEO_CONFIG = {
         en: 'Phonetic Value Comparison | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '比較不同方言點的音值對應關係：選擇 2 至 5 個地點，對照相同漢字的聲母、韻母或聲調，用桑基圖分析音類合流與分化。',
-        'zh-CN': '比较不同方言点的音值对应关系：选择 2 至 5 个地点，对照相同汉字的声母、韵母或声调，用桑基图分析音类合流与分化。',
-        en: 'Compare sound correspondences across Chinese dialects. Match initials, finals, or tones through shared characters and view mergers in a Sankey diagram.',
+        'zh-Hant': '選擇 2 至 5 個方言點，對照聲母、韻母或聲調的音值對應關係，透過桑基圖呈現音類合流與分化。',
+        'zh-CN': '选择 2 至 5 个方言点，对照声母、韵母或声调的音值对应关系，通过桑基图呈现音类合流与分化。',
+        en: 'Select 2 to 5 dialect locations and compare initial, final, or tone correspondences, using Sankey diagrams to show sound-category mergers and splits.',
       },
     },
     '/menu/pho/matrix': {
@@ -197,9 +197,9 @@ const SEO_CONFIG = {
         en: 'Phonology Query | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '查詢某地的方言音系表與同音字彙：查看聲母、韻母、聲調及音節拼合，對照多個方言點的音系，並查每個音節對應的漢字。',
-        'zh-CN': '查询某地的方言音系表与同音字汇：查看声母、韵母、声调及音节拼合，对照多个方言点的音系，并查每个音节对应的汉字。',
-        en: 'Look up a Chinese dialect phonology table and homophone lexicon. Explore initials, finals, tones, syllable combinations, and the characters sharing each syllable.',
+        'zh-Hant': '查看方言點的完整音系表、聲韻調配合關係以及方言同音字彙，以表格的形式呈現聲韻調拼合關係。',
+        'zh-CN': '查看方言点的完整音系表、声韵调配合关系以及方言同音字汇，以表格的形式呈现声韵调拼合关系。',
+        en: 'View a dialect location\'s complete phonology table, initial-final-tone combinations, and homophone lexicon, with tables showing how initials, finals, and tones combine.',
       },
     },
     '/menu/pho/custom': {
@@ -209,9 +209,9 @@ const SEO_CONFIG = {
         en: 'Phoneme Classification | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '按清濁、發音部位、開合口或韻攝查詢方言音素分類。自選三個維度整理聲母、韻母或聲調，查看分類數量與字例。',
-        'zh-CN': '按清浊、发音部位、开合口或韵摄查询方言音素分类。自选三个维度整理声母、韵母或声调，查看分类数量与字例。',
-        en: 'Classify Chinese dialect phonemes by voicing, articulation, openness, or rime group. Build a custom table of initials, finals, or tones with counts and example characters.',
+        'zh-Hant': '按清濁、發音部位、開合口、韻攝等韻書地位特徵，自選三個分類維度整理方言聲韻調，進行聲母、韻母、聲調分類以及方言音類統計，支援查看各分類數量與字例。',
+        'zh-CN': '按清浊、发音部位、开合口、韵摄等韵书地位特征，自选三个分类维度整理方言声韵调，进行声母、韵母、声调分类以及方言音类统计，支持查看各分类数量与字例。',
+        en: 'Choose three rhyme-book classification dimensions, such as voicing, articulation, openness, or rime group, to organize dialect initials, finals, and tones. Classify sound categories and view their counts and example characters.',
       },
     },
     '/menu/pho/count': {
@@ -233,9 +233,9 @@ const SEO_CONFIG = {
         en: 'Evolution | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '研究中古音到現代方言如何演變：選擇一個方言點，查看今音的歷史來源及中古音類的分化，以餅圖和桑基圖分析聲韻調對應。',
-        'zh-CN': '研究中古音到现代方言如何演变：选择一个方言点，查看今音的历史来源及中古音类的分化，以饼图和桑基图分析声韵调对应。',
-        en: 'Explore how Middle Chinese sounds developed in a modern dialect. Trace present-day initials, finals, and tones to historical categories in charts.',
+        'zh-Hant': '透過查看單個方言點的聲母、韻母、聲調與中古音及韻書地位的對應關係，用餅圖和桑基圖分析今音來源與音類分化，乃至方言語音演變。',
+        'zh-CN': '通过查看单个方言点的声母、韵母、声调与中古音及韵书地位的对应关系，用饼图和桑基图分析今音来源与音类分化，乃至方言语音演变。',
+        en: 'Examine how a dialect location\'s initials, finals, and tones correspond to Middle Chinese and rhyme-book categories. Use pie and Sankey charts to analyze modern sound origins, category splits, and dialect sound change.',
       },
     },
     '/menu/yubao': {
@@ -257,9 +257,9 @@ const SEO_CONFIG = {
         en: 'Character Phonological Status | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '查漢字的中古音韻地位與《廣韻》分類：按攝、韻、等、呼和聲母瀏覽字集，查看各音類收錄的漢字與註釋，並可切換其他韻書。',
-        'zh-CN': '查汉字的中古音韵地位与《广韵》分类：按摄、韵、等、呼和声母浏览字集，查看各音类收录的汉字与注释，并可切换其他韵书。',
-        en: 'Look up Chinese characters by their Middle Chinese phonological categories in Guangyun. Browse rimes, divisions, openness, and initials to find characters and annotations.',
+        'zh-Hant': '按韻書的音韻地位逐級瀏覽漢字字集，查看各音類的漢字及註釋，並自訂分類層級和順序。具體支援《廣韻》、上古音、《洪武正韻》、《中原音韻》、《蒙古字韻》、《分韻撮要》。',
+        'zh-CN': '按韵书的音韵地位逐级浏览汉字字集，查看各音类的汉字及注释，并自定义分类层级和顺序。具体支持《广韵》、上古音、《洪武正韵》、《中原音韵》、《蒙古字韵》、《分韵撮要》。',
+        en: 'Browse Chinese character sets by rhyme-book phonological categories, view characters and annotations, and customize the classification hierarchy and order. Supports Guangyun, Old Chinese, Hongwu Zhengyun, Zhongyuan Yinyun, Menggu Ziyun, and Fenyun Cuoyao.',
       },
     },
     '/explore/yc/overview': {
@@ -281,9 +281,9 @@ const SEO_CONFIG = {
         en: 'Yangchun Colloquial Words | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '查陽春話詞語與口語說法：瀏覽陽春口語詞表，查看本字考、IPA 讀音、粵拼、釋義和例詞例句，按欄位篩選語料。',
-        'zh-CN': '查阳春话词语与口语说法：浏览阳春口语词表，查看本字考、IPA 读音、粤拼、释义和例词例句，按字段筛选语料。',
-        en: 'Search Yangchun dialect words and colloquial expressions. Browse proposed characters, IPA pronunciations, Jyutping, meanings, and usage examples in a filterable word list.',
+        'zh-Hant': '查詢陽春話口語詞，包含本字、IPA 讀音、粵拼、釋義和例詞例句等資訊，支援按欄位篩選詞表。',
+        'zh-CN': '查询阳春话口语词，包含本字、IPA 读音、粤拼、释义和例词例句等信息，支持按字段筛选词表。',
+        en: 'Look up Yangchun colloquial words with written characters, IPA readings, Jyutping, meanings, and example words and sentences. Filter the vocabulary table by field.',
       },
     },
     '/explore/yc/expressions': {
@@ -305,9 +305,9 @@ const SEO_CONFIG = {
         en: 'Guangdong Villages | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '查詢廣東自然村名稱、所屬市縣鄉鎮及方言分佈。沿行政層級展開村落資料，查看位置與經緯度，並在地圖上定位村莊。',
-        'zh-CN': '查询广东自然村名称、所属市县乡镇及方言分布。沿行政层级展开村落数据，查看位置与经纬度，并在地图上定位村庄。',
-        en: 'Look up Guangdong natural villages by administrative area. Explore village names, dialect distribution, and coordinates in a tree and locate villages on a map.',
+        'zh-Hant': '按市、縣、鄉鎮等行政層級樹狀瀏覽廣東自然村名錄，查詢村名、方言分佈及經緯度，並在地圖上查看村莊。支援跳轉地圖繪製頁面，根據泰森多邊形繪製方言分佈圖。',
+        'zh-CN': '按市、县、乡镇等行政层级树状浏览广东自然村名录，查询村名、方言分布及经纬度，并在地图上查看村庄。支持跳转地图绘制页面，根据泰森多边形绘制方言分布图。',
+        en: 'Browse Guangdong natural villages in a tree by city, county, and town. Look up village names, dialect distribution, and coordinates, view villages on a map, and open the map editor to create dialect distribution maps with Voronoi polygons.',
       },
     },
     '/explore/villages/table': {
@@ -317,9 +317,9 @@ const SEO_CONFIG = {
         en: 'Guangdong Villages Table | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '搜尋《全粵村情》廣東自然村名錄，按村名、行政區劃或方言分佈篩選資料，查看村莊所屬市縣鄉鎮及經緯度。',
-        'zh-CN': '搜索《全粤村情》广东自然村名录，按村名、行政区划或方言分布筛选数据，查看村庄所属市县乡镇及经纬度。',
-        en: 'Search the Quanyue Village Survey directory of Guangdong natural villages. Filter by village name, administrative area, or dialect and inspect coordinates.',
+        'zh-Hant': '按照表格查看廣東自然村名錄，可按村名、行政區劃或方言篩選，查看經緯度，支援表格排序與分頁。',
+        'zh-CN': '按照表格查看广东自然村名录，可按村名、行政区划或方言筛选，查看经纬度，支持表格排序与分页。',
+        en: 'Browse Guangdong natural villages in a table, filter by village name, administrative area, or dialect, and view coordinates, with sorting and pagination.',
       },
     },
     '/explore/villages/all': {
@@ -329,9 +329,9 @@ const SEO_CONFIG = {
         en: 'All Village Data | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '管理員使用的全部自然村資料入口，支持按城市載入與查看自然村資料。',
-        'zh-CN': '管理员使用的全部自然村资料入口，支持按城市加载与查看自然村资料。',
-        en: 'Admin-facing entry for browsing all village records by city and inspecting village data.',
+        'zh-Hant': '按樹狀圖查看全國自然村名錄、村落總資料庫。（僅管理員）',
+        'zh-CN': '按树状图查看全国自然村名录、村落总数据库。（仅管理员）',
+        en: 'Browse the nationwide natural village directory and complete village database in a tree. Administrators only.',
       },
     },
     '/explore/villages/yc': {
@@ -395,9 +395,9 @@ const SEO_CONFIG = {
         en: 'Vocabulary Browser | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '一個詞在各地方言怎麼說？搜尋方言詞表，查標準詞對應的地方說法、IPA 讀音與釋義，並在地圖上比較不同地區的用詞。',
-        'zh-CN': '一个词在各地方言怎么说？搜索方言词表，查标准词对应的地方说法、IPA 读音与释义，并在地图上比较不同地区的用词。',
-        en: 'How do different Chinese dialects say the same word? Search dialect vocabulary for local expressions, IPA pronunciations, meanings, and regional distribution.',
+        'zh-Hant': '線上查詢全國各地方言詞彙，比較同一詞語在不同地區的方言說法、IPA和詞義解釋等。支援按書面語標準詞、方言詞、音標或釋義搜尋，並透過卡片、地圖和表格三種模式瀏覽方言詞表。',
+        'zh-CN': '在线查询全国各地方言词汇，比较同一词语在不同地区的方言说法、IPA和词义解释等。支持按书面语标准词、方言词、音标或释义搜索，并通过卡片、地图和表格三种模式浏览方言词表。',
+        en: 'Look up dialect vocabulary across China online and compare local expressions, IPA pronunciations, and meanings for the same word across regions. Search standard written words, dialect words, transcriptions, or meanings, and browse vocabulary in card, map, and table views.',
       },
     },
     '/menu/vocabulary/import': {
@@ -431,9 +431,9 @@ const SEO_CONFIG = {
         en: 'Villages | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '查廣東自然村資料與村名：從自然村入口瀏覽《全粵村情》、陽春村落、村莊方言分佈及村名分析工具。',
-        'zh-CN': '查广东自然村数据与村名：从自然村入口浏览《全粤村情》、阳春村落、村庄方言分布及村名分析工具。',
-        en: 'Explore Guangdong natural village records, names, and dialect distribution. Find Quanyue Village Survey data, Yangchun villages, and village-name analysis tools.',
+        'zh-Hant': '自然村查詢、村落資料庫、村名查詢、村落方言分佈等入口。',
+        'zh-CN': '自然村查询、村落数据库、村名查询、村落方言分布等入口。',
+        en: 'Access natural village lookup, village databases, village-name searches, and village dialect distribution.',
       },
     },
     '/menu/cluster': {
@@ -455,9 +455,9 @@ const SEO_CONFIG = {
         en: 'Map | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '在方言地圖上看讀音與聲調的地理分佈。本頁呈現查字、查中古、查調和方言比較的地圖結果，可點選方言點查看詳情。',
-        'zh-CN': '在方言地图上看读音与声调的地理分布。本页呈现查字、查中古、查调和方言比较的地图结果，可点击方言点查看详情。',
-        en: 'View Chinese dialect pronunciation and tone patterns on a map. This page displays results from character, historical sound, tone, and dialect comparison queries.',
+        'zh-Hant': '在地圖上查看查詢（查字、查中古、查音位、查調），比較（比較漢字、比較中古、比較調類），方言分區等的結果，點選地點查看詳情，同時支援繪製音節等值線圖、熱力圖。',
+        'zh-CN': '在地图上查看查询（查字、查中古、查音位、查调），比较（比较汉字、比较中古、比较调类），方言分区等的结果，点击地点查看详情，同时支持绘制音节等值线图、热力图。',
+        en: 'Map results from character, Middle Chinese, phoneme, and tone queries; character, historical-category, and tone-category comparisons; and dialect divisions. Click locations for details and draw syllable contour maps and heatmaps.',
       },
     },
     '/menu/map/divide': {
@@ -467,9 +467,9 @@ const SEO_CONFIG = {
         en: 'Dialect Division Map | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '查看方言分區地圖：按地圖集或音典分區選擇方言點，依分區層級著色，對照不同方言區的地理位置與範圍。',
-        'zh-CN': '查看方言分区地图：按地图集或音典分区选择方言点，依分区层级着色，对照不同方言区的地理位置与范围。',
-        en: 'Explore a map of Chinese dialect regions. Select dialect locations or atlas classifications and color the map by division level to compare regional distribution.',
+        'zh-Hant': '查詢方言點所屬的地圖集或音典分區，按分區層級繪製方言分區地圖，查看各方言分區的地理分佈。',
+        'zh-CN': '查询方言点所属的地图集或音典分区，按分区层级绘制方言分区地图，查看各方言分区的地理分布。',
+        en: 'Look up atlas or Yindian classifications for dialect locations, draw dialect division maps by classification level, and explore their geographic distribution.',
       },
     },
     '/menu/map/custom': {
@@ -479,9 +479,9 @@ const SEO_CONFIG = {
         en: 'Custom Map | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '建立自己的方言調查點地圖：新增方言點、音韻特徵和註釋，補充未收錄資料，按地點或特徵查看個人方言分佈。需登入。',
-        'zh-CN': '建立自己的方言调查点地图：新增方言点、音韵特征和注释，补充未收录数据，按地点或特征查看个人方言分布。需登录。',
-        en: 'Create a personal dialect survey map. Add your own locations, phonological features, and notes, then explore their distribution by location or feature. Sign-in required.',
+        'zh-Hant': '登入後新增和管理個人方言調查資料，如音韻特徵、漢字發音、調值資訊等，支援繪製自訂方言地圖；資料與帳號綁定，支援多裝置同步。',
+        'zh-CN': '登录后新增和管理个人方言调查数据，如音韵特征、汉字发音、调值信息等，支持绘制自定义方言地图；数据与账号绑定，支持多设备同步。',
+        en: 'Sign in to add and manage personal dialect survey data, including phonological features, character pronunciations, and tone values, and create custom dialect maps. Data is linked to your account and synchronized across devices.',
       },
     },
     '/menu/settings': {
@@ -491,9 +491,9 @@ const SEO_CONFIG = {
         en: 'Settings | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '管理方音圖鑑的帳號設定、語言偏好與個人化選項。',
-        'zh-CN': '管理方音图鉴的账号设置、语言偏好与个性化选项。',
-        en: 'Manage your Dialects Atlas account settings, language preferences, and personalization options.',
+        'zh-Hant': '配置語言、主題、中古查詢輸入方式、教程開關等。',
+        'zh-CN': '配置语言、主题、中古查询输入方式、教程开关等。',
+        en: 'Configure language, theme, Middle Chinese query input methods, tutorial visibility, and more.',
       },
     },
     '/menu/result': {
@@ -515,9 +515,9 @@ const SEO_CONFIG = {
         en: 'About | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '了解方音圖鑑項目的背景、目標與功能介紹。',
-        'zh-CN': '了解方音图鉴项目的背景、目标与功能介绍。',
-        en: 'Learn about the background, goals, and features of the Dialects Atlas project.',
+        'zh-Hant': '查看網站功能介紹、發展歷史、特別鳴謝等',
+        'zh-CN': '查看网站功能介绍、发展历史、特别鸣谢等',
+        en: 'View the site\'s features, development history, acknowledgments, and more.',
       },
     },
     '/menu/about/suggestion': {
@@ -527,9 +527,9 @@ const SEO_CONFIG = {
         en: 'Feedback | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '向方音圖鑑提交意見反饋、功能建議或問題回報。',
-        'zh-CN': '向方音图鉴提交意见反馈、功能建议或问题回报。',
-        en: 'Submit feedback, feature suggestions, or bug reports to the Dialects Atlas team.',
+        'zh-Hant': '跳轉github提出issue或透過知乎 AI-works 反映建議，或直接在本站內提交回饋。',
+        'zh-CN': '跳转github提出issue或通过知乎 AI-works 反映建议，或直接在本站内提交反馈。',
+        en: 'Open an issue on GitHub, send suggestions through Zhihu AI-works, or submit feedback directly on this site.',
       },
     },
     '/menu/about/like': {
@@ -539,9 +539,9 @@ const SEO_CONFIG = {
         en: 'Support Us | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '以按讚、分享或贊助的方式支持方音圖鑑的持續開發與維護。',
-        'zh-CN': '以点赞、分享或赞助的方式支持方音图鉴的持续开发与维护。',
-        en: 'Support the ongoing development and maintenance of Dialects Atlas through likes, shares, or sponsorship.',
+        'zh-Hant': '查看專案倉庫、作者的開發感悟，以及掃碼支持作者。',
+        'zh-CN': '查看项目仓库、作者的开发感悟，以及扫码支持作者。',
+        en: 'View the project repository and the author\'s development reflections, or scan a QR code to support the author.',
       },
     },
     '/explore': {
@@ -587,9 +587,9 @@ const SEO_CONFIG = {
         en: 'Map Drawing | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '線上 GIS 方言地圖繪製工具：繪製調查點、線和區域，生成泰森多邊形製作方言分佈地圖，並匯出 GeoJSON 資料或 PNG 圖片。',
-        'zh-CN': '在线 GIS 方言地图绘制工具：绘制调查点、线和区域，生成泰森多边形制作方言分布地图，并导出 GeoJSON 数据或 PNG 图片。',
-        en: 'Draw dialect distribution maps in an online GIS editor. Create survey points, lines, and regions, generate Voronoi polygons, and export GeoJSON or PNG.',
+        'zh-Hant': '線上GIS地圖編輯器：可匯入地理資料（如行政區劃、河流等），分圖層編輯點、線、面和文字標註，並匯出 GeoJSON 或圖片。支援透過泰森多邊形（voronoi圖）繪製方言分佈圖，可使用網站資料或自訂上傳方言點資料。（需登入）',
+        'zh-CN': '在线GIS地图编辑器：可导入地理数据（如行政区划、河流等），分图层编辑点、线、面和文字标注，并导出 GeoJSON 或图片。支持通过泰森多边形（voronoi图）绘制方言分布图，可使用网站数据或自定义上传方言点数据。（需登录）',
+        en: 'Use an online GIS map editor to import geographic data, such as administrative divisions and rivers, edit points, lines, polygons, and text labels in layers, and export GeoJSON or images. Create dialect distribution maps with Voronoi polygons using site data or uploaded dialect locations. Sign-in required.',
       },
     },
     '/explore/manage': {
@@ -599,9 +599,9 @@ const SEO_CONFIG = {
         en: 'Table Management | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '管理方言字表資料，支持上傳、編輯與整理方言字音對照表。',
-        'zh-CN': '管理方言字表资料，支持上传、编辑与整理方言字音对照表。',
-        en: 'Manage dialect character tables with support for uploading, editing, and organizing dialect-character pronunciation mappings.',
+        'zh-Hant': '管理和維護站點資料庫（僅管理員）。',
+        'zh-CN': '管理和维护站点数据库（仅管理员）。',
+        en: 'Manage and maintain the site database. Administrators only.',
       },
     },
     '/explore/tools/check': {
@@ -611,9 +611,9 @@ const SEO_CONFIG = {
         en: 'Table Check | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '線上檢查方言字表格式與 IPA 音標：上傳字表，找出非單字、異常音標和缺聲調資料，修正後下載結果。需登入。',
-        'zh-CN': '在线检查方言字表格式与 IPA 音标：上传字表，找出非单字、异常音标和缺声调数据，修正后下载结果。需登录。',
-        en: 'Check a Chinese dialect pronunciation table online for invalid characters, unusual IPA, and missing tones. Edit and download the corrected table. Sign-in required.',
+        'zh-Hant': '上傳方言字表，線上檢查非單字、異常 IPA 音標和缺聲調等問題，編輯修正後下載結果。（需登入）',
+        'zh-CN': '上传方言字表，在线检查非单字、异常 IPA 音标和缺声调等问题，编辑修正后下载结果。（需登录）',
+        en: 'Upload dialect character tables to check for non-single-character entries, unusual IPA, and missing tones online. Edit corrections and download the results. Sign-in required.',
       },
     },
     '/explore/tools/jyut2ipa': {
@@ -623,9 +623,9 @@ const SEO_CONFIG = {
         en: 'Jyutping to IPA | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '線上將粵拼 Jyutping 批量轉成 IPA 國際音標：上傳含粵拼欄的 Excel 字表，自訂轉換規則、預覽結果並下載。需登入。',
-        'zh-CN': '在线将粤拼 Jyutping 批量转成 IPA 国际音标：上传含粤拼列的 Excel 字表，自定义转换规则、预览结果并下载。需登录。',
-        en: 'Convert Jyutping to IPA online in bulk. Upload an Excel table with Cantonese romanization, adjust conversion rules, preview results, and download the file. Sign-in required.',
+        'zh-Hant': '上傳含粵拼欄的 Excel 字表，線上批量將粵語拼音轉換為 IPA 國際音標，支援自訂轉換規則、預覽並下載結果。（需登入）',
+        'zh-CN': '上传含粤拼列的 Excel 字表，在线批量将粤语拼音转换为 IPA 国际音标，支持自定义转换规则、预览并下载结果。（需登录）',
+        en: 'Upload an Excel character table with a Jyutping column to batch-convert Cantonese romanization to IPA online. Customize conversion rules, preview, and download results. Sign-in required.',
       },
     },
     '/explore/tools/merge': {
@@ -635,9 +635,9 @@ const SEO_CONFIG = {
         en: 'Table Merge | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '線上合併多份方言字表 Excel：按參考表對齊漢字，整合各表的 IPA 讀音與註釋，保留一字多音並下載合併結果。需登入。',
-        'zh-CN': '在线合并多份方言字表 Excel：按参考表对齐汉字，整合各表的 IPA 读音与注释，保留一字多音并下载合并结果。需登录。',
-        en: 'Merge Chinese dialect pronunciation tables online. Align characters, combine IPA readings and notes, and download an Excel file. Sign-in required.',
+        'zh-Hant': '上傳參考表與多份方言 Excel 字表，按參考表漢字順序對齊讀音和註釋，保留一字多音並下載合併結果。（需登入）',
+        'zh-CN': '上传参考表与多份方言 Excel 字表，按参考表汉字顺序对齐读音和注释，保留一字多音并下载合并结果。（需登录）',
+        en: 'Upload a reference table and multiple dialect Excel tables to align readings and notes by the reference character order, preserve multiple pronunciations, and download the merged results. Sign-in required.',
       },
     },
     '/explore/tools/derive': {
@@ -659,9 +659,9 @@ const SEO_CONFIG = {
         en: 'Acoustic Analysis | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '在線Praat語音聲學分析：上傳音檔或錄音，查看音高曲線、共振峰、頻譜圖和母音空間，選取樣本後用石鋒 T 值法計算五度制調值。需登入。',
-        'zh-CN': '在线Praat语音声学分析：上传音频或录音，查看音高曲线、共振峰、频谱图和元音空间，选取样本后用石锋 T 值法计算五度制调值。需登录。',
-        en: 'Use Praat online to analyze pitch, formants, spectrograms, and vowel space from uploaded or recorded audio. Select samples for five-level tones using Shi Feng\'s T-value method. Sign-in required.',
+        'zh-Hant': '在線Praat語音聲學分析：上傳音檔或直接錄音，查看基頻曲線、共振峰、頻譜圖和母音空間等，手動選取樣本後用石鋒T值法生成五度制聲調圖。（需登入）',
+        'zh-CN': '在线Praat语音声学分析：上传音频或直接录音，查看基频曲线、共振峰、频谱图和元音空间等，手动选取样本后用石锋T值法生成五度制声调图。（需登录）',
+        en: 'Use Praat online for speech acoustic analysis: upload or record audio to view pitch curves, formants, spectrograms, vowel space, and more. Manually select samples to generate five-level tone charts using Shi Feng\'s T-value method. Sign-in required.',
       },
     },
     '/explore/villages/toponyms': {
