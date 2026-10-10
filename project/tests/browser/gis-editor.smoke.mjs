@@ -119,7 +119,10 @@ try {
     const rect = map.getCanvas().getBoundingClientRect()
     return [[113, 23], [114, 23], [114, 24]].map((coordinate) => { const point = map.project(coordinate); return { x: point.x + rect.left, y: point.y + rect.top } })
   })
-  for (const point of ringScreen) await page.mouse.click(point.x, point.y)
+  for (const [index, point] of ringScreen.entries()) {
+    await page.mouse.click(point.x, point.y)
+    await page.waitForFunction((count) => window.gisSmoke.sketchState.value.pointCount === count, index + 1)
+  }
   await page.mouse.move(ringScreen[0].x + 6, ringScreen[0].y + 4)
   await page.mouse.click(ringScreen[0].x + 6, ringScreen[0].y + 4)
   await page.waitForFunction(() => window.gisSmoke.model.value.features.length === 1)
@@ -215,6 +218,38 @@ try {
   await page.waitForFunction(() => window.gisSmoke.history.length === 1)
   assert.notDeepEqual(await page.evaluate(() => window.gisSmoke.model.value.features[0].geometry.coordinates[0][0]), [113, 23])
   await page.screenshot({ path: process.env.GIS_SMOKE_SCREENSHOT || '/tmp/gis-editor-smoke.png' })
+  const vertexHistory = await page.evaluate(async () => {
+    const smoke = window.gisSmoke
+    await smoke.load([{ id: 'continuous', type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [[[113, 23], [114, 23], [114, 24], [113, 24], [113, 23]]] } }])
+    smoke.editor.value.selectVertex('continuous', '0.1')
+    smoke.commitHistory()
+    const deleted = smoke.editor.value.deleteSelected()
+    await smoke.nextTick()
+    const adjacent = smoke.editor.value.getEditContext()
+    const adjacentPoint = window.gisSmokeDraw.getSelectedPoints().features[0]?.geometry.coordinates
+    await smoke.undo()
+    const undoPoint = window.gisSmokeDraw.getSelectedPoints().features[0]?.geometry.coordinates
+    await smoke.redo()
+    const redoPoint = window.gisSmokeDraw.getSelectedPoints().features[0]?.geometry.coordinates
+    return { deleted, adjacentPath: adjacent.coordPaths[0], adjacentPoint, undoPoint, redoPoint }
+  })
+  assert.deepEqual(vertexHistory, { deleted: true, adjacentPath: '0.1', adjacentPoint: [114, 24], undoPoint: [114, 23], redoPoint: [114, 24] })
+  const adjacentScreen = await page.evaluate(async () => {
+    const smoke = window.gisSmoke
+    await smoke.load([{ id: 'drag-after-delete', type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [[[113, 23], [114, 23], [114, 24], [113, 24], [113, 23]]] } }])
+    smoke.editor.value.selectVertex('drag-after-delete', '0.1')
+    smoke.editor.value.deleteSelected()
+    await smoke.nextTick()
+    const point = window.gisSmokeMap.project([114, 24])
+    const rect = window.gisSmokeMap.getCanvas().getBoundingClientRect()
+    return { x: point.x + rect.left, y: point.y + rect.top }
+  })
+  await page.waitForFunction(() => window.gisSmokeMap.queryRenderedFeatures().some((feature) => feature.properties?.parent === 'drag-after-delete' && feature.properties.coord_path === '0.1'))
+  await page.mouse.move(adjacentScreen.x, adjacentScreen.y)
+  await page.mouse.down()
+  await page.mouse.move(adjacentScreen.x + 20, adjacentScreen.y + 10, { steps: 5 })
+  await page.mouse.up()
+  assert.notDeepEqual(await page.evaluate(() => window.gisSmoke.model.value.features[0].geometry.coordinates[0][1]), [114, 24])
   await verifyCrowdedHitMenu(page)
   const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })
   mobile.on('pageerror', (error) => errors.push(error.message))

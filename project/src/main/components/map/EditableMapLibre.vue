@@ -401,6 +401,7 @@ let featureBoxDragPanWasEnabled = true
 let lastEditTargetHoverKey = ''
 let consumedHitGesture = null
 let sketchSession = null
+let loadedLayerId = ''
 
 const clearHitCandidateMenu = () => {
   hitCandidateMenu.value = null
@@ -3015,11 +3016,39 @@ const deleteVertices = (featureId, coordPaths, options = {}) => {
   const didReplace = replaceFeatureInDraw(nextFeature, options)
   if (!didReplace) return false
   clearSnapPreview()
-  selectedVertexCoordPaths.value = []
-  draw.value?.changeMode?.('direct_select', { featureId })
+  const [path] = coordPaths.map((item) => normalizeExistingCoordPath(feature, item)).filter(Boolean)
+    .sort((left, right) => { const a = parseCoordPath(left); const b = parseCoordPath(right); return a[0] - b[0] || (a[1] ?? 0) - (b[1] ?? 0) })
+  const parts = parseCoordPath(path)
+  const nextPath = nextFeature.geometry.type === 'Polygon'
+    ? `${parts[0]}.${parts[1] % getEditableRingCoordinates(nextFeature.geometry.coordinates[parts[0]]).length}`
+    : String(Math.min(parts[0], nextFeature.geometry.coordinates.length - 1))
+  selectVertex(featureId, nextPath)
+  emitGeometryEditFeedback('success', 'vertexDeleteSuccess')
+  return true
+}
+
+const getEditContext = () => ({
+  layerId: loadedLayerId,
+  mode: draw.value?.getMode?.() === 'direct_select' ? 'direct_select' : 'simple_select',
+  featureId: selectedFeatureId.value,
+  featureIds: getSelectedFeatureIdsFromDraw(),
+  coordPaths: [...selectedVertexCoordPaths.value],
+})
+
+const restoreEditContext = (context) => {
+  if (!context || context.layerId !== String(props.activeLayer?.id || '')) return false
+  if (!canInteractWithActiveDrawLayer()) { resetDrawInteractionState(); return false }
+  const feature = draw.value?.get?.(context.featureId)
+  if (context.mode !== 'direct_select' || !isDrawFeatureSelectable(feature) || !['LineString', 'Polygon'].includes(feature.geometry?.type)) {
+    selectFeatures(context.featureIds ?? [])
+    return true
+  }
+  const paths = [...new Set((context.coordPaths ?? []).map((path) => normalizeExistingCoordPath(feature, path)).filter(Boolean))]
+  selectFeature(context.featureId, { directEdit: false })
+  draw.value.changeMode('direct_select', { featureId: context.featureId, ...(paths[0] ? { coordPath: paths[0] } : {}), coordPaths: paths })
+  selectedFeatureId.value = String(context.featureId)
+  selectedVertexCoordPaths.value = paths
   emit('mode-change', 'direct_select')
-  selectedFeatureId.value = String(featureId)
-  emit('feature-select', selectedFeatureId.value)
   syncShapeEditState()
   return true
 }
@@ -3201,6 +3230,7 @@ const importGeoJson = (featureCollection, options = {}) => {
       })
     : normalized
   acceptedFeatureCollection = JSON.parse(JSON.stringify(nextFeatureCollection))
+  loadedLayerId = String(props.activeLayer?.id || '')
 
   draw.value.deleteAll()
   if (nextFeatureCollection.features.length > 0) {
@@ -3320,6 +3350,14 @@ const buildLiveSnappingModes = () => {
   const original = modes.direct_select
   if (original) {
     const wrapped = { ...original }
+    wrapped.onSetup = function (options) {
+      const state = original.onSetup.call(this, options)
+      if (Array.isArray(options.coordPaths)) {
+        state.selectedCoordPaths = options.coordPaths
+        this.setSelectedCoordinates(this.pathsToCoordinates(state.featureId, state.selectedCoordPaths))
+      }
+      return state
+    }
     for (const handler of ['onMouseDown', 'onTouchStart']) {
       wrapped[handler] = function (state, event) {
         if (!isDrawFeatureSelectableById(state.featureId)) return
@@ -3379,6 +3417,7 @@ const initializeDraw = () => {
 
   const initialFeatures = normalizeFeatureCollection(props.modelValue)
   acceptedFeatureCollection = JSON.parse(JSON.stringify(initialFeatures))
+  loadedLayerId = String(props.activeLayer?.id || '')
   if (initialFeatures.features.length > 0) {
     draw.value.set(initialFeatures)
   }
@@ -3932,10 +3971,12 @@ watch(
   () => props.modelValue,
   (nextValue) => {
     if (!draw.value || !nextValue) return
+    const editContext = getEditContext()
     cancelSketch()
     const normalized = normalizeFeatureCollection(nextValue)
     clearHitCandidateMenu()
     acceptedFeatureCollection = JSON.parse(JSON.stringify(normalized))
+    loadedLayerId = String(props.activeLayer?.id || '')
     clearGeometryIssue()
     draw.value.deleteAll()
     if (normalized.features.length > 0) {
@@ -3944,7 +3985,9 @@ watch(
     syncActiveTextScaleVisibility()
     syncTextBackgroundBoxes()
     syncTextLeaderLines()
-    syncSelectedFeature()
+    if (editContext.mode === 'direct_select') {
+      if (!restoreEditContext(editContext)) resetDrawInteractionState()
+    } else syncSelectedFeature()
   },
   { deep: true }
 )
@@ -4046,6 +4089,8 @@ onBeforeUnmount(() => {
 })
 
 defineExpose({
+  getEditContext,
+  restoreEditContext,
   undoSketchPoint,
   redoSketchPoint,
   finishSketch,

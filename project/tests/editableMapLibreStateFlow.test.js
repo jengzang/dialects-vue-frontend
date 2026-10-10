@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { createApp, defineComponent, nextTick, ref } from 'vue'
+import { createApp, defineComponent, nextTick, ref, shallowRef } from 'vue'
 
 vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: (key) => key }) }))
 
@@ -301,6 +301,39 @@ function mountEditableMapLibre(modelValue, options = {}) {
 }
 
 describe('EditableMapLibre state flow', () => {
+  it('does not carry direct vertex selection into another layer with the same feature id', async () => {
+    const feature = { id: 'shared', type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [[0, 0], [1, 0], [2, 0]] } }
+    const collection = shallowRef({ type: 'FeatureCollection', features: [feature] })
+    const wrapper = mountEditableMapLibre(collection, { activeLayer: { id: 'first', visible: true } })
+    await nextTick()
+    wrapper.exposed.selectVertex('shared', '1')
+    wrapper.activeLayer.value = { id: 'second', visible: true }
+    collection.value = { type: 'FeatureCollection', features: [{ ...feature, geometry: { type: 'LineString', coordinates: [[10, 0], [11, 0], [12, 0]] } }] }
+    await nextTick()
+    expect(wrapper.draw.getMode()).toBe('simple_select')
+    expect(wrapper.exposed.getEditContext()).toMatchObject({ layerId: 'second', coordPaths: [] })
+    expect(wrapper.draw.getSelectedIds()).toEqual([])
+    wrapper.unmount()
+  })
+
+  it('selects the neighboring vertex after deletion and restores a saved vertex context safely', async () => {
+    const feature = { id: 'line', type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [[0, 0], [1, 0], [2, 0], [3, 0]] } }
+    const wrapper = mountEditableMapLibre({ type: 'FeatureCollection', features: [feature] }, { snappingEnabled: false, activeLayer: { id: 'layer', visible: true } })
+    await nextTick()
+    wrapper.exposed.selectVertex('line', '1')
+    const original = wrapper.exposed.getEditContext()
+    expect(wrapper.exposed.deleteSelected()).toBe(true)
+    expect(wrapper.exposed.getEditContext()).toMatchObject({ featureId: 'line', coordPaths: ['1'] })
+    expect(wrapper.events.at(-2)).toEqual(['shape-edit-state-change', expect.objectContaining({ selectedVertex: { featureId: 'line', coordPath: '1', coordinate: [2, 0] } })])
+    wrapper.exposed.importGeoJson({ type: 'FeatureCollection', features: [feature] }, { emitChanges: false })
+    expect(wrapper.exposed.restoreEditContext(original)).toBe(true)
+    expect(wrapper.draw.changeMode).toHaveBeenLastCalledWith('direct_select', expect.objectContaining({ featureId: 'line', coordPath: '1' }))
+    wrapper.activeLayer.value.locked = true
+    await nextTick()
+    expect(wrapper.exposed.restoreEditContext(original)).toBe(false)
+    expect(wrapper.draw.getSelectedIds()).toEqual([])
+    wrapper.unmount()
+  })
   it.each(['draw_line_string', 'draw_polygon'])('keeps %s point undo/redo local and only publishes explicit completion', async (name) => {
     const wrapper = mountEditableMapLibre({ type: 'FeatureCollection', features: [] }, { snappingEnabled: false })
     await nextTick()
@@ -2556,8 +2589,8 @@ describe('EditableMapLibre state flow', () => {
       {
         mode: 'direct_select',
         featureId: 'line-1',
-        selectedVertexCount: 0,
-        selectedVertex: null,
+        selectedVertexCount: 1,
+        selectedVertex: { featureId: 'line-1', coordPath: '1', coordinate: [2, 2] },
         canDeleteSelectedVertices: false,
         deleteBlockCode: '',
       },

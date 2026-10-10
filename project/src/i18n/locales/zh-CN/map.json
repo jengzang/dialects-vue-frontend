@@ -845,6 +845,7 @@
       "vertexDeleteFailed": "无法删除顶点，否则几何会失效",
       "sharedBoundaryDeleteBlocked": "该顶点属于共享边界，已阻止删除",
       "historyUndoSuccess": "已撤回上一步",
+      "vertexDeleteSuccess": "已删除顶点并重新连接，已选中相邻顶点",
       "sketchPointCount": "草图已落点：{count}",
       "sketchUndoSuccess": "已撤回草图的最后一个点",
       "sketchRedoSuccess": "已恢复草图的一个点",

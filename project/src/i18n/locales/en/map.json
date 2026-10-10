@@ -845,6 +845,7 @@
       "vertexDeleteFailed": "Cannot delete this vertex without invalidating the geometry",
       "sharedBoundaryDeleteBlocked": "This vertex belongs to a shared boundary, so deletion was blocked",
       "historyUndoSuccess": "Undid the last edit",
+      "vertexDeleteSuccess": "Vertex deleted and reconnected; adjacent vertex selected",
       "sketchPointCount": "Sketch points: {count}",
       "sketchUndoSuccess": "Removed the last sketch point",
       "sketchRedoSuccess": "Restored a sketch point",

@@ -1122,6 +1122,7 @@ export function useGisMapCore(options = {}) {
       vertexMoveSuccess: 'map.drawTab.labels.vertexMoveSuccess',
       vertexMoveFailed: 'map.drawTab.labels.vertexMoveFailed',
       vertexDeleteFailed: 'map.drawTab.labels.vertexDeleteFailed',
+      vertexDeleteSuccess: 'map.drawTab.labels.vertexDeleteSuccess',
       sharedBoundaryDeleteBlocked: 'map.drawTab.labels.sharedBoundaryDeleteBlocked',
       historyUndoSuccess: 'map.drawTab.labels.historyUndoSuccess',
       sketchUndoSuccess: 'map.drawTab.labels.sketchUndoSuccess',

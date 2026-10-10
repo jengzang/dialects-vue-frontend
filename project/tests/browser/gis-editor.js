@@ -21,10 +21,13 @@ const autoSwitchHits = ref(true)
 const sketchState = ref({ active: false })
 const events = []
 const history = []
+const historyContexts = []
+const redoSnapshots = []
+const commitHistory = () => { history.push(JSON.parse(JSON.stringify(model.value))); historyContexts.push(editor.value.getEditContext()); redoSnapshots.length = 0 }
 createApp(defineComponent({
   setup() {
     window.gisSmoke = {
-      editor, model, activeLayer, allLayers, snappingEnabled, snapTolerance, autoSwitchHits, sketchState, events, history, nextTick,
+      editor, model, activeLayer, allLayers, snappingEnabled, snapTolerance, autoSwitchHits, sketchState, events, history, nextTick, commitHistory,
       load: async (features, type = 'Polygon') => {
         activeLayer.value = { ...activeLayer.value, geometryType: type }
         model.value = { type: 'FeatureCollection', features }
@@ -32,10 +35,23 @@ createApp(defineComponent({
         editor.value.setDrawMode('simple_select')
         events.length = 0
         history.length = 0
+        historyContexts.length = 0
+        redoSnapshots.length = 0
       },
       undo: async () => {
+        redoSnapshots.push({ model: JSON.parse(JSON.stringify(model.value)), context: editor.value.getEditContext() })
         model.value = history.pop()
+        const context = historyContexts.pop()
         await nextTick()
+        editor.value.restoreEditContext(context)
+      },
+      redo: async () => {
+        const snapshot = redoSnapshots.pop()
+        history.push(JSON.parse(JSON.stringify(model.value)))
+        historyContexts.push(editor.value.getEditContext())
+        model.value = snapshot.model
+        await nextTick()
+        editor.value.restoreEditContext(snapshot.context)
       },
     }
     return () => h(EditableMapLibre, {
@@ -47,7 +63,7 @@ createApp(defineComponent({
       snappingEnabled: snappingEnabled.value,
       snapTolerance: snapTolerance.value,
       'onUpdate:modelValue': (value) => { model.value = value },
-      onBeforeFeaturesChange: () => { history.push(JSON.parse(JSON.stringify(model.value))) },
+      onBeforeFeaturesChange: commitHistory,
       onGeometryEditFeedback: (value) => { events.push(value) },
       onSnapStateChange: (value) => { events.push({ event: 'snap', ...value }) },
       onMapClick: (value) => { events.push({ event: 'click', ...value }) },

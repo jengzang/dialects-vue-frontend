@@ -187,7 +187,7 @@ describe('Map draw editor contracts', () => {
     const historySource = readSource(useGisHistoryPath)
 
     expect(coreSource).toContain('const syncLayerIdSeedFromLayers')
-    expect(historySource).toMatch(/const applyHistorySnapshot = \(snapshot\) => \{[\s\S]*syncLayerIdSeedFromLayers\(layers\.value\)/)
+    expect(historySource).toMatch(/const applyHistorySnapshot = async \(snapshot\) => \{[\s\S]*syncLayerIdSeedFromLayers\(layers\.value\)/)
   })
 
   it('guards history restore state with finally and skips no-op all-layer visibility commits', () => {
@@ -202,7 +202,7 @@ describe('Map draw editor contracts', () => {
     const source = readSource(useGisHistoryPath)
 
     expect(source).toContain(`const restoredSelectedFeatureId = snapshot.selectedFeatureId || '';`)
-    expect(source).toContain(`const restoredMode = snapshot.currentMode || 'simple_select';`)
+    expect(source).toContain(`const restoredMode = snapshot.currentMode === 'direct_select' ? 'direct_select' : 'simple_select';`)
     expect(source).toContain('selectedFeatureIds: selectedFeatureIds.value,')
     expect(source).toContain('const restoredSelectedFeatureIds = Array.isArray(snapshot.selectedFeatureIds)')
     expect(source).toContain('setFeatureSelection(restoredSelectedFeatureIds, restoredSelectedFeatureId);')

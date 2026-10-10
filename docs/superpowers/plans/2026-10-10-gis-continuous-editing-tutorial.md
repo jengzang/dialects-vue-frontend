@@ -16,10 +16,10 @@
 
 ## Step 2: Continuous Vertex Context
 
-- [ ] Add failing tests for neighboring vertex selection after deletion and edit-context restoration through undo/redo.
-- [ ] Capture feature ID and coordinate paths in existing history snapshots; restore after model synchronization, validating paths and permissions.
-- [ ] Preserve selection of newly inserted vertices; explicitly distinguish vertex deletion from feature deletion.
-- [ ] Run focused history/page/map tests and real Draw checks; inspect diff, CR, and commit only Step 2 files.
+- [x] Add failing tests for neighboring vertex selection after deletion and edit-context restoration through undo/redo.
+- [x] Capture feature ID and coordinate paths in existing history snapshots; restore after model synchronization, validating paths and permissions. Consecutive undo requests restore only the latest context; history never restarts a saved unfinished drawing mode.
+- [x] Preserve selection of newly inserted vertices; explicitly distinguish vertex deletion from feature deletion. Deleted line endpoints choose the nearest survivor; polygon deletion wraps to the adjacent surviving ring vertex.
+- [x] Run focused history/page/map tests and real Draw checks; inspect diff, CR, and commit only Step 2 files. 269 tests and real Chrome checks passed, including deletion followed by native dragging and undo/redo vertex selection. Browser CR exposed model回写 rebuilding Draw and clearing selection; the watcher now restores direct context only for the loaded layer, and cross-layer same-ID regression is covered.
 
 ## Step 3: Simplified Chinese User Tutorial
 
