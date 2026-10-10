@@ -14,10 +14,10 @@ const SEO_CONFIG = {
   },
   defaultDescription: {
     'zh-Hant':
-      '線上方言查詢比較：查各地漢字讀音、調值與音系，對比不同方言的聲韻調。方音圖鑑還提供中古音對應、方言詞彙與方言分佈地圖。',
+      '方音圖鑑提供線上方言查詢比較：查漢字讀音、中古音與音位來源、各地調值，對比方言聲韻調，並查看音系表、方言地圖、詞彙和自然村資料。',
     'zh-CN':
-      '在线方言查询比较：查各地汉字读音、调值与音系，对比不同方言的声韵调。方音图鉴还提供中古音对应、方言词汇与方言分布地图。',
-    en: 'Look up Chinese dialect pronunciations, tones, and phonology online. Compare dialect sounds and explore Middle Chinese correspondences, regional vocabulary, and dialect maps.',
+      '方音图鉴提供在线方言查询比较：查汉字读音、中古音与音位来源、各地调值，对比方言声韵调，并查看音系表、方言地图、词汇和自然村资料。',
+    en: 'Look up Chinese character pronunciations, Middle Chinese categories, phoneme origins, and tone values. Compare dialect sounds and explore phonology tables, maps, vocabulary, and village data.',
   },
   routes: {
     '/': {
@@ -28,10 +28,10 @@ const SEO_CONFIG = {
       },
       description: {
         'zh-Hant':
-          '線上方言查詢比較：查各地漢字讀音、調值與音系，對比不同方言的聲韻調。方音圖鑑還提供中古音對應、方言詞彙與方言分佈地圖。',
+          '方音圖鑑提供線上方言查詢比較：查漢字讀音、中古音與音位來源、各地調值，對比方言聲韻調，並查看音系表、方言地圖、詞彙和自然村資料。',
         'zh-CN':
-          '在线方言查询比较：查各地汉字读音、调值与音系，对比不同方言的声韵调。方音图鉴还提供中古音对应、方言词汇与方言分布地图。',
-        en: 'Look up Chinese dialect pronunciations, tones, and phonology online. Compare dialect sounds and explore Middle Chinese correspondences, regional vocabulary, and dialect maps.',
+          '方音图鉴提供在线方言查询比较：查汉字读音、中古音与音位来源、各地调值，对比方言声韵调，并查看音系表、方言地图、词汇和自然村资料。',
+        en: 'Look up Chinese character pronunciations, Middle Chinese categories, phoneme origins, and tone values. Compare dialect sounds and explore phonology tables, maps, vocabulary, and village data.',
       },
     },
     '/auth': {
