@@ -82,7 +82,7 @@ const props = defineProps({
 
 const mapContainer = ref(null)
 const map = shallowRef(null)
-const currentStyleKey = ref('gaode')
+const currentStyleKey = ref('tianditu')
 const loading = ref(false)
 const isFullScreen = ref(false)
 let villageLayerInteractionsBound = false

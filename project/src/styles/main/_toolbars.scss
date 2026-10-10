@@ -11,17 +11,18 @@
 
 .main-sidebar-shell {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 40dvw;
-  max-width: 300px;
-  height: 100dvh;
-  overscroll-behavior: contain;
+  top: 12px;
+  left: 12px;
+  width: min(40dvw + 40px, 340px);
+  max-width: none;
+  height: calc(100dvh - 24px);
+  box-sizing: border-box;
   box-shadow: var(--sidebar-shell-shadow);
   background: var(--sidebar-shell-background);
-  border: 1px solid var(--sidebar-shell-border);
-  backdrop-filter: blur(6px) saturate(145%);
-  -webkit-backdrop-filter: blur(6px) saturate(145%);
+  border: 3px solid var(--sidebar-shell-border);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(24px) saturate(145%);
+  -webkit-backdrop-filter: blur(24px) saturate(145%);
   z-index: 1001;
   @include flex-col;
   justify-content: flex-end;
@@ -39,8 +40,8 @@
   align-items: center;
   gap: 15px;
   flex-grow: 1;
-  max-height: 100dvh;
-  overflow: auto;
+  max-height: 100%;
+  overflow: hidden;
   margin-top: 10px;
 }
 
@@ -53,8 +54,10 @@
   align-items: center;
   gap: 12px;
   width: 100%;
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  overscroll-behavior: contain;
 }
 
 .main-sidebar-item {
@@ -93,7 +96,7 @@
   width: 100%;
   margin-top: 10px;
   margin-bottom: 15px;
-  overflow-x: auto;
+  flex-shrink: 0;
 }
 
 .main-sidebar-stats-summary {
@@ -172,6 +175,15 @@
 }
 
 @media (max-aspect-ratio: 1/1) {
+  .main-sidebar-shell {
+    top: 0;
+    left: 0;
+    width: min(40dvw + 40px, 340px);
+    max-width: none;
+    height: 100dvh;
+    border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
+  }
+
   .main-sidebar-empty {
     height: 8dvh;
   }

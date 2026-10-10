@@ -10,6 +10,7 @@ This repository has strict collaboration and change-control rules. Read this bef
 - Prefer distributed execution: finish one step, CR it, commit it, then move to the next step.
 - Do not batch many unrelated changes into one opaque pass when the user asked for stepwise delivery.
 - Before each new step, re-check current workspace state because the user may have edited or reorganized files.
+- Never run `npm install`, `npm ci`, or any automatic dependency installation command. Use only the repository's existing dependencies and scripts unless the user explicitly revokes this rule.
 
 ## 2. Review Requirements
 

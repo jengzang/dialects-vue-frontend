@@ -37,59 +37,59 @@
     },
     "menuAboutIntro": {
       "title": "About Chinese Dialect Atlas",
-      "description": "View the site's feature introduction, development history, and more."
+      "description": "View the site's features, development history, acknowledgments, and more."
     },
     "menuAboutSuggestion": {
       "title": "Feedback Entry",
-      "description": "Open GitHub or Zhihu to file an issue, or submit feedback directly on this site."
+      "description": "Open an issue on GitHub, send suggestions through Zhihu AI-works, or submit feedback directly on this site."
     },
     "menuAboutLike": {
       "title": "Support",
-      "description": "View the project repository, related Zhihu articles, and the author's development insights."
+      "description": "View the project repository and the author's development reflections, or scan a QR code to support the author."
     },
     "menuQueryZhonggu": {
       "title": "Middle Chinese Query",
-      "description": "Rime Book → Readings · Organize readings by rime-book category, separated into initials, finals, and tones"
+      "description": "Search historical phonological categories in rhyme books, such as Guangyun rime groups, rimes, divisions, openness, and initials, to organize modern character readings across dialects and their geographic distribution. Query multiple locations and draw maps for historical phonology and geolinguistic analysis."
     },
     "menuQueryChar": {
       "title": "Character Query",
-      "description": "View character readings, Middle Chinese categories, and annotations"
+      "description": "Look up Chinese character IPA readings, historical phonological categories, and notes across dialects, including multiple readings, literary and colloquial forms, and maps."
     },
     "menuQueryYinwei": {
       "title": "Phoneme Query",
-      "description": "Readings → Rime Book · Analyze which rime-book category each initial, final, and tone reading comes from"
+      "description": "Enter the actual sound values of dialect initials, finals, or tones to trace their rhyme-book sources, including Middle Chinese rime groups, rimes, initials, and openness categories in Guangyun. View character counts, proportions, and examples for each source."
     },
     "menuQueryTone": {
       "title": "Tone Query",
-      "description": "View tone classes and tone values across locations"
+      "description": "Look up tones across dialects, including tone-category mergers and the geographic distribution of specific pitch values."
     },
     "menuMapView": {
       "title": "Map View",
-      "description": "Geo-linguistic visualization: view query and comparison results on the map, and draw syllable isogloss maps, heatmaps, and more."
+      "description": "Map results from character, Middle Chinese, phoneme, and tone queries; character, historical-category, and tone-category comparisons; and dialect divisions. Click locations for details and draw syllable contour maps, heatmaps, and more. Explore and visualize dialect distribution from a geolinguistic perspective."
     },
     "menuMapDivide": {
       "title": "Map Regions",
-      "description": "Look up the region each dialect location belongs to, and jump to the map to draw it."
+      "description": "Look up atlas or Yindian classifications for dialect locations, draw dialect division maps by classification level, and explore dialect divisions and their geographic distribution from a geolinguistic perspective."
     },
     "menuMapCustom": {
       "title": "Personal Map Data",
-      "description": "View and manage custom dialect data and plot it on the map. Bound to your account and synced across devices."
+      "description": "Sign in to add and manage personal dialect survey data, including phonological features, character pronunciations, and tone values, and create custom dialect maps. Data is linked to your account and synchronized across devices."
     },
     "menuCompareChar": {
       "title": "Character Comparison",
-      "description": "Compare how the same character is pronounced across locations."
+      "description": "Compare the initials, finals, or tones of two Chinese characters across dialects, and map locations where they match, partly match, or differ."
     },
     "menuCompareZhonggu": {
       "title": "Middle Chinese Comparison",
-      "description": "Compare how the same Middle Chinese position develops across locations."
+      "description": "Compare two sets of historical rhyme-book category conditions, such as Middle Chinese categories in Guangyun, in modern dialect initials, finals, or tones. Explore mergers, splits, and their geographic distribution."
     },
     "menuCompareTone": {
       "title": "Tone Comparison",
-      "description": "Compare whether two tone classes merge or stay distinct across locations."
+      "description": "Compare mergers between two tone categories across dialects, and map locations with mergers, possible mergers, or distinctions."
     },
     "menuComparePhonetic": {
       "title": "Phonology Comparison",
-      "description": "Compare the phonetic value correspondence of the selected locations (2 to 5 locations)."
+      "description": "Select 2 to 5 dialect locations and compare initial, final, or tone correspondences, using Sankey diagrams to show sound-category mergers and splits."
     },
     "menuResult": {
       "title": "Results",
@@ -97,11 +97,11 @@
     },
     "menuPhoMatrix": {
       "title": "Phonology Query",
-      "description": "View the full phonology table and homophone lexicon for a dialect location, presented as a grid of initial–final–tone combinations."
+      "description": "View a dialect location's complete phonology table, initial-final-tone combinations, and homophone lexicon, with tables showing how initials, finals, and tones combine."
     },
     "menuPhoCustom": {
       "title": "Phoneme Classification",
-      "description": "Classify a dialect location's initials, finals, and tones by rhyme-book category features."
+      "description": "Choose three rhyme-book classification dimensions, such as voicing, articulation, openness, or rime group, to organize dialect initials, finals, and tones. Classify sound categories and view their counts and example characters."
     },
     "menuPhoCount": {
       "title": "Syllable Statistics",
@@ -109,11 +109,11 @@
     },
     "menuPhoEvolution": {
       "title": "Evolution",
-      "description": "Trace a dialect location's current phonology against rhyme-book categories, visualizing the historical evolution of initials, finals, and tones with pie and Sankey charts."
+      "description": "Examine how a dialect location's initials, finals, and tones correspond to Middle Chinese and rhyme-book categories. Use pie and Sankey charts to analyze modern sound origins, category splits, and dialect sound change."
     },
     "menuSettings": {
       "title": "Settings",
-      "description": "Configure language, theme, query input mode, tutorial toggles, and more."
+      "description": "Configure language, theme, Middle Chinese query input methods, tutorial visibility, and more."
     },
     "menuSource": {
       "title": "Sources",
@@ -129,27 +129,27 @@
     },
     "menuVocabularyView": {
       "title": "Vocabulary Browser",
-      "description": "Browse and search all collaborator-submitted vocabulary data, with card, map, and table views."
+      "description": "Look up dialect vocabulary across China online and compare local expressions, IPA pronunciations, and meanings for the same word across regions. Search standard written words, dialect words, transcriptions, or meanings, and browse vocabulary in card, map, and table views."
     },
     "menuVocabularyImport": {
       "title": "Vocabulary Import",
-      "description": "Upload new vocabulary data. Request access first, fill in location information, then submit the vocabulary in the standard format."
+      "description": "Request vocabulary editing permission, provide dialect location details, and upload words, IPA readings, and meanings in the standard format with validation."
     },
     "menuVocabularyManage": {
       "title": "Vocabulary Management",
-      "description": "Manage uploaded vocabulary with online editing, bulk replacement, and adding or removing entries."
+      "description": "Users with editing permission can manage their own dialect vocabulary submissions, edit entries and locations online, replace text in bulk, and add or delete entries."
     },
     "menuYubao": {
       "title": "Language Protection Data",
-      "description": "Query Language Protection Project vocabulary (1000 words) and grammar sentences (50 sentences), with map, card, and table views."
+      "description": "Sign in to browse 1,000 vocabulary items and 50 grammar sentences from the Chinese Language Resources Protection Project, comparing expressions, pronunciations, and notes in maps, cards, and tables."
     },
     "menuVillages": {
       "title": "Village Entry",
-      "description": "Open the natural-village tree, tables, and machine-learning analysis tools."
+      "description": "Access natural village lookup, village databases, village-name searches, and village dialect distribution."
     },
     "menuCluster": {
       "title": "Dialect Clustering",
-      "description": "Explore clustering relationships between dialect locations by dialect feature data."
+      "description": "Select dialect locations and phonological features to calculate dialect distance and similarity, run clustering, and view groups and charts."
     },
     "exploreEntry": {
       "title": "Explore Navigation",
@@ -157,71 +157,71 @@
     },
     "exploreCheck": {
       "title": "Character Table Check",
-      "description": "Upload a dialect character-table file to automatically flag common issues such as non-single characters, abnormal transcriptions, and missing tones, with online editing to fix them."
+      "description": "Upload dialect character tables to check for non-single-character entries, unusual IPA, and missing tones online. Edit corrections and download the results. Sign-in required."
     },
     "exploreJyut2Ipa": {
       "title": "Jyutping to IPA",
-      "description": "Batch-convert Jyutping in Excel spreadsheets into IPA, with custom rule configuration."
+      "description": "Upload an Excel character table with a Jyutping column to batch-convert Cantonese romanization to IPA online. Customize conversion rules, preview, and download results. Sign-in required."
     },
     "exploreMerge": {
       "title": "Character Table Merge",
-      "description": "Upload a reference table and the table to merge; characters are aligned and merged in the reference table's order."
+      "description": "Upload a reference table and multiple dialect Excel tables to align readings and notes by the reference character order, preserve multiple pronunciations, and download the merged results. Sign-in required."
     },
     "exploreDerive": {
       "title": "Phonology Derivation",
-      "description": "Assist in deriving and generating character tables."
+      "description": "The character table derivation page is a placeholder; derivation is not yet available."
     },
     "explorePraat": {
       "title": "Praat Acoustic Analysis",
-      "description": "Upload audio or record directly to inspect acoustic results (fundamental frequency, formants, spectrogram, vowel space, and more), with automatic tone-chart generation via the Shi Feng T-value method."
+      "description": "Use Praat online for speech acoustic analysis: upload or record audio to view pitch curves, formants, spectrograms, vowel space, and more. Manually select samples to generate five-level tone charts using Shi Feng's T-value method. Sign-in required."
     },
     "exploreGis": {
       "title": "Map Drawing",
-      "description": "An online GIS map editor for adding, editing, and deleting geographic features, with Thiessen-polygon auto-generation of dialect distribution maps."
+      "description": "Use an online GIS map editor to import geographic data, such as administrative divisions and rivers, edit points, lines, polygons, and text labels in layers, and export GeoJSON or images. Create dialect distribution maps with Voronoi polygons using site data or uploaded dialect locations. Sign-in required."
     },
     "exploreManage": {
       "title": "Data Management",
-      "description": "Manage and maintain the site database."
+      "description": "Manage and maintain the site database. Administrators only."
     },
     "exploreCharClass": {
       "title": "Character Set",
-      "description": "Expand characters level by level by rhyme-book category, view the characters and notes in each category, and customize the order."
+      "description": "Browse Chinese character sets by rhyme-book phonological categories, view characters and annotations, and customize the classification hierarchy and order. Supports Guangyun, Old Chinese, Hongwu Zhengyun, Zhongyuan Yinyun, Menggu Ziyun, and Fenyun Cuoyao."
     },
     "exploreYcOverview": {
       "title": "Yangchun Topic",
-      "description": "View an overview of Yangchun dialect resources."
+      "description": "Browse a draft overview of Yangchun Yue and Hakka distribution, contact, and phonology. Under development; current AI-generated content requires source verification."
     },
     "exploreYcWords": {
       "title": "Yangchun Words",
-      "description": "Browse Yangchun dialect words and example sentences."
+      "description": "Look up Yangchun colloquial words with written characters, IPA readings, Jyutping, meanings, and example words and sentences. Filter the vocabulary table by field."
     },
     "exploreYcExpressions": {
       "title": "Yangchun Expressions",
-      "description": "Browse Yangchun dialect expressions and grammar data."
+      "description": "Browse draft Yangchun idioms, proverbs, and reduplicated expressions by type and pattern. Under development; current AI-generated content requires verification."
     },
     "exploreYcVillages": {
       "title": "Yangchun Villages",
-      "description": "View Yangchun village data and distribution."
+      "description": "Look up Yangchun natural villages and village committees, browsing their hierarchy within towns and communities."
     },
     "exploreVillagesToponyms": {
       "title": "Toponym Search",
-      "description": "Search village place names and administrative information."
+      "description": "Natural village place-name search and distribution maps are under development. Village and administrative searches are planned; place-name data is currently unavailable."
     },
     "exploreVillagesGd": {
       "title": "Guangdong Village Tree",
-      "description": "Browse Guangdong village data by administrative hierarchy, with tree expansion and dialect-map visualization."
+      "description": "Browse Guangdong natural villages in a tree by city, county, and town. Look up village names, dialect distribution, and coordinates, view villages on a map, and open the map editor to create dialect distribution maps with Voronoi polygons."
     },
     "exploreVillagesTable": {
       "title": "Guangdong Village Table",
-      "description": "Browse and query Guangdong village data in a table, with sorting, filtering, and pagination."
+      "description": "Browse Guangdong natural villages in a table, filter by village name, administrative area, or dialect, and view coordinates, with sorting and pagination."
     },
     "exploreVillagesMl": {
       "title": "Village Machine Learning",
-      "description": "Analyze the patterns and regularities of village names using machine learning."
+      "description": "Analyze Guangdong village naming patterns through character frequencies, semantic categories, geographic hotspots, regional differences, and machine learning clusters."
     },
     "exploreVillagesAll": {
       "title": "All Villages",
-      "description": "Browse the village records collected by the site."
+      "description": "Browse the nationwide natural village directory and complete village database in a tree. Administrators only."
     },
     "villagesML": {
       "title": "Village Analysis Workspace",

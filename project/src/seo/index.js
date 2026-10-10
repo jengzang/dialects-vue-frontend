@@ -100,6 +100,19 @@ function pickLocalizedValue(values, locale) {
   return values[locale] || values[SEO_CONFIG.defaultLocale] || Object.values(values)[0] || ''
 }
 
+function formatTitle(values, locale) {
+  const title = pickLocalizedValue(values, locale)
+  // Home and fallback titles retain their authored full-title strings.
+  if (typeof title === 'string') return title
+
+  const heading = [title.main, title.subtitle]
+    .filter(Boolean)
+    .join(SEO_CONFIG.titleSeparators.subtitle)
+  const suffix = pickLocalizedValue(SEO_CONFIG.siteNameLocales, locale)
+  const separator = pickLocalizedValue(SEO_CONFIG.titleSeparators.suffix, locale)
+  return `${heading}${separator}${suffix}`
+}
+
 function getRouteSeo(pathname) {
   const normalizedPath = normalizePathname(pathname)
   return SEO_CONFIG.routes[normalizedPath] || null
@@ -133,8 +146,8 @@ export function updateSeo({ path, locale }) {
   const routeSeo = getRouteSeo(normalizedPath)
 
   const title = routeSeo
-    ? pickLocalizedValue(routeSeo.title, normalizedLocale)
-    : pickLocalizedValue(SEO_CONFIG.defaultTitle, normalizedLocale)
+    ? formatTitle(routeSeo.title, normalizedLocale)
+    : formatTitle(SEO_CONFIG.defaultTitle, normalizedLocale)
   const description = routeSeo
     ? pickLocalizedValue(routeSeo.description, normalizedLocale)
     : pickLocalizedValue(SEO_CONFIG.defaultDescription, normalizedLocale)

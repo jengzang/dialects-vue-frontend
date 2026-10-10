@@ -174,13 +174,21 @@ $animation-duration: 0.4s;/* 弹窗基本样式 */
     line-height: 1.2;
   }
 
-  span {
-    display: block;
-    margin: 1px 0;
-    font-size: 13px;
-    font-weight: 400;
-    line-height: 1.1;
-  }
+  // span {
+  //   display: block;
+  //   margin: 1px 0;
+  //   font-size: 13px;
+  //   font-weight: 400;
+  //   line-height: 1.1;
+  // }
+}
+
+.popup-content > span {
+  display: block;
+  margin: 1px 0;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.1;
 }
 
 /* 弹窗入场动画 */

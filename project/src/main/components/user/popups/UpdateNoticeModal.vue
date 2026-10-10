@@ -167,9 +167,10 @@ const shouldAutoShow = () => {
 }
 
 watch(() => props.visible, (val) => {
-  if (val && props.mode === 'showinfo') {
+  // forceModal 为 true 说明 visible 是被 toast 的「查看详情」推上来的，此时不该再弹回 toast
+  if (val && props.mode === 'showinfo' && !forceModal.value) {
     emit('update:visible', false)
-    showInfo(buildSummaryText(), 8000, {
+    showInfo(buildSummaryText(), 20000, {
       changelogMode: true,
       actionText: props.viewDetailText,
       onAction: () => {
@@ -186,7 +187,7 @@ onMounted(() => {
 
   setTimeout(() => {
     if (props.mode === 'showinfo') {
-      showInfo(buildSummaryText(), 8000, {
+      showInfo(buildSummaryText(), 20000, {
         changelogMode: true,
         actionText: props.viewDetailText,
         onAction: () => {

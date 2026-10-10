@@ -169,7 +169,7 @@ describe('vocabulary explore page shell wiring', () => {
     const vocabularyScss = readSource('src/main/views/explore/word/vocabulary/vocabulary.scss')
     const portraitBlockStart = vocabularyScss.indexOf('@media (max-aspect-ratio: 1 / 1)')
     const locationItemHeadBlock = vocabularyScss.match(/\.location-item-head\s*\{[^}]*\}/s)?.[0] || ''
-    const stackedLocationSelectors = vocabularyScss.match(/\.upload-location-summary,\s*\n\s*\.upload-location-modal-layout,\s*\n\s*\.locations-head,[^{]*\{[^}]*flex-direction:\s*column/s)?.[0] || ''
+    const stackedLocationSelectors = vocabularyScss.match(/\.upload-location-summary,\s*\n\s*\.locations-head,\s*\n\s*\.location-item-info[^{]*\{[^}]*flex-direction:\s*column/s)?.[0] || ''
     const portraitBlock = vocabularyScss.slice(portraitBlockStart)
 
     expect(portraitBlockStart).toBeGreaterThan(-1)
@@ -211,6 +211,102 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyPage).toContain('markerLabel: entryCount ? String(entryCount) : (locationLabel || locationName)')
     expect(vocabularyScss).toContain('height: 69dvh')
     expect(vocabularyScss).toContain('max-height: 69dvh')
+  })
+
+  it('centers vocabulary load-more buttons in card and map detail layouts', () => {
+    const vocabularyPage = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
+    const vocabularyScss = readSource('src/main/views/explore/word/vocabulary/vocabulary.scss')
+    const loadMoreRule = vocabularyScss.match(/\.load-more-btn\s*\{[^}]*\}/)?.[0] || ''
+
+    expect(vocabularyPage.match(/class="load-more-btn glass-button"/g)).toHaveLength(2)
+    expect(loadMoreRule).toContain('width: fit-content')
+    expect(loadMoreRule).toContain('margin: 6px auto 0')
+    expect(loadMoreRule).toContain('justify-self: center')
+  })
+
+  it('keeps vocabulary card internals in a stretched field layout', () => {
+    const vocabularyPage = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
+    const vocabularyScss = readSource('src/main/views/explore/word/vocabulary/vocabulary.scss')
+    const cardGridRule = vocabularyScss.match(/\.cards-grid\s*\{[^}]*\}/)?.[0] || ''
+    const entryCardRule = vocabularyScss.match(/\.vocabulary-entry-card\s*\{[^}]*\}/)?.[0] || ''
+    const locationDefinitionPairRule = vocabularyScss.match(/\.card-location-definition-pair\s*\{[^}]*\}/)?.[0] || ''
+    const locationPillRule = vocabularyScss.match(/\.card-location-pill\s*\{[^}]*\}/)?.[0] || ''
+    const locationPillTextRule = vocabularyScss.match(/\.card-location-pill-text\s*\{[^}]*\}/)?.[0] || ''
+    const pronunciationPairRule = vocabularyScss.match(/\.card-pronunciation-pair\s*\{[^}]*\}/)?.[0] || ''
+    const pronunciationPairTextRule = vocabularyScss.match(/\.card-pronunciation-pair\s*>\s*span\s*\{[^}]*\}/)?.[0] || ''
+    const cardNoteRule = vocabularyScss.match(/\.card-note\s*\{[^}]*\}/)?.[0] || ''
+    const noteTextRule = vocabularyScss.match(/\.card-note-text\s*\{[^}]*\}/)?.[0] || ''
+    const noteToggleRule = vocabularyScss.match(/\.card-note-toggle\s*\{[^}]*\}/)?.[0] || ''
+    const expandedNoteRule = vocabularyScss.match(/\.vocabulary-entry-card\.is-note-expanded\s+\.card-note\s*\{[^}]*\}/)?.[0] || ''
+
+    expect(vocabularyPage).toContain('class="card glass-card vocabulary-entry-card"')
+    expect(vocabularyPage).toContain('class="card-location-definition-pair"')
+    expect(vocabularyPage).toContain('class="card-location pill-btn card-location-pill"')
+    expect(vocabularyPage).toContain('@click="openLocationDetails(entry.locationName)"')
+    expect(vocabularyPage).toContain('{{ entry.locationName }}')
+    expect(vocabularyPage).toContain('class="card-definition"')
+    expect(vocabularyPage).toContain('class="card-pronunciation-pair"')
+    expect(vocabularyPage).toContain('class="card-note"')
+    expect(vocabularyPage).toContain('class="card-note-toggle"')
+    expect(vocabularyPage).toContain('getVocabularyCardNoteText(entry)')
+    expect(vocabularyPage).toContain('toggleVocabularyCardNote(entry.id)')
+    expect(vocabularyPage).toContain('isVocabularyCardNoteExpanded(entry.id)')
+    expect(vocabularyPage).toContain('shouldShowVocabularyCardNoteToggle(entry)')
+    expect(vocabularyPage).toContain('VOCABULARY_CARD_NOTE_PREVIEW_LENGTH = 4')
+    expect(vocabularyPage).not.toContain('ResizeObserver')
+    expect(vocabularyPage).not.toContain('setVocabularyCardNoteRef')
+    expect(vocabularyPage).not.toContain('class="card-row row-1"')
+    expect(vocabularyPage).not.toContain('class="card-row row-2"')
+    expect(vocabularyPage).not.toContain('class="card-row row-3"')
+
+    expect(cardGridRule).toContain('grid-template-columns: repeat(auto-fill, minmax(250px, 1fr))')
+    expect(entryCardRule).toContain('display: grid')
+    expect(entryCardRule).toContain('grid-template-columns: auto auto auto')
+    expect(entryCardRule).toContain('grid-auto-flow: column')
+    expect(entryCardRule).toContain('align-items: center')
+    expect(entryCardRule).toContain('justify-content: center')
+    expect(entryCardRule).toContain('box-sizing: border-box')
+    expect(entryCardRule).not.toContain('fit-content')
+    expect(entryCardRule).not.toContain('flex-wrap')
+    expect(locationDefinitionPairRule).toContain('display: inline-grid')
+    expect(locationDefinitionPairRule).toContain('grid-template-rows: auto auto')
+    expect(locationDefinitionPairRule).toContain('max-width: calc(6em + 20px)')
+    expect(locationPillRule).toContain('--pill-btn-bg: var(--color-primary)')
+    expect(locationPillRule).toContain('color: var(--action-primary-text, var(--text-white))')
+    expect(locationPillRule).toContain('--pill-btn-hover-bg: var(--color-primary-hover)')
+    expect(locationPillTextRule).toContain('max-width: 6em')
+    expect(vocabularyScss).toContain('.card-pronunciation-pair')
+    expect(vocabularyScss).toContain('grid-template-rows: auto auto')
+    expect(pronunciationPairRule).toContain('justify-self: center')
+    expect(pronunciationPairRule).toContain('width: max-content')
+    expect(pronunciationPairRule).toContain('max-width: 150px')
+    expect(pronunciationPairTextRule).not.toContain('overflow-wrap: anywhere')
+    expect(cardNoteRule).toContain('display: inline-flex')
+    expect(cardNoteRule).toContain('align-items: center')
+    expect(cardNoteRule).toContain('grid-column: 3')
+    expect(cardNoteRule).toContain('justify-self: end')
+    expect(cardNoteRule).toContain('justify-content: center')
+    expect(cardNoteRule).toContain('gap: 2px')
+    expect(cardNoteRule).toContain('max-width:')
+    expect(noteTextRule).toContain('max-width:')
+    expect(noteToggleRule).toContain('flex: 0 0 auto')
+    expect(noteToggleRule).not.toContain('position: absolute')
+    expect(expandedNoteRule).toContain('grid-column: 1 / -1')
+    expect(expandedNoteRule).toContain('grid-row: 2')
+    expect(expandedNoteRule).toContain('justify-self: stretch')
+    expect(vocabularyScss).toContain('.vocabulary-entry-card.is-note-expanded .card-note-text')
+  })
+
+  it('keeps vocabulary entry card internals stretched without forcing portrait-only stacking', () => {
+    const vocabularyScss = readSource('src/main/views/explore/word/vocabulary/vocabulary.scss')
+    const portraitBlockStart = vocabularyScss.indexOf('@media (max-aspect-ratio: 1 / 1)')
+    const portraitBlock = vocabularyScss.slice(portraitBlockStart)
+
+    expect(portraitBlockStart).toBeGreaterThan(-1)
+    expect(portraitBlock).not.toMatch(/\.vocabulary-entry-card\s*\{[^}]*grid-auto-flow:\s*row/s)
+    expect(portraitBlock).not.toMatch(/\.vocabulary-entry-card\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/s)
+    expect(portraitBlock).not.toMatch(/\.card-location,\s*\n\s*\.card-definition\s*\{[^}]*text-align:\s*start/s)
+    expect(portraitBlock).not.toMatch(/\.card-pronunciation-pair\s*>\s*span\s*\{[^}]*text-align:\s*start/s)
   })
 
   it('uses dedicated vocabulary locations APIs for location metadata management', () => {

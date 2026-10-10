@@ -3,25 +3,86 @@
     <section class="content-area">
       <div class="upload-mode glass-panel">
         <div class="upload-head">
-            <h3>{{ t('words.wordList.upload.title') }}</h3>
-            <div class="upload-head-counts">
-              <span>{{ t('words.wordList.upload.totalEntries', { count: vocabTotalCount ?? '…' }) }}</span>
-              <span class="count-sep">·</span>
-              <span>{{ t('words.wordList.upload.totalLocations', { count: vocabLocationCount ?? '…' }) }}</span>
-            </div>
-            <!-- <p>{{ t('words.wordList.upload.desc') }}</p> -->
-            <div v-if="requiresLogin" class="upload-access-notice">
+          <h3>{{ t('words.wordList.upload.title') }}</h3>
+          <div class="upload-head-counts">
+            <span>{{ t('words.wordList.upload.totalEntries', { count: vocabTotalCount ?? '…' }) }}</span>
+            <span class="count-sep">·</span>
+            <span>{{ t('words.wordList.upload.totalLocations', { count: vocabLocationCount ?? '…' }) }}</span>
+          </div>
+
+          <div class="upload-head-actions">
+            <div
+              v-if="shouldShowPermissionRequest"
+              class="upload-access-notice"
+            >
               <p>{{ uploadAccessNotice }}</p>
               <button
-                class="glass-button"
-                data-variant="primary"
+                class="action-btn action-btn--sm"
                 type="button"
                 @click="navigateToSuggestion"
               >
                 {{ t('words.wordList.access.requestEditPermission') }}
               </button>
             </div>
-            <p v-else-if="uploadAccessNotice" class="upload-status">{{ uploadAccessNotice }}</p>
+
+            <p
+              v-else-if="uploadAccessNotice"
+              class="upload-status"
+            >
+              {{ uploadAccessNotice }}
+            </p>
+
+            <button
+              v-if="canShowRefreshVocabularyPermission"
+              class="action-btn action-btn--sm"
+              type="button"
+              :disabled="isLoadingVocabularyMe"
+              @click="refreshVocabularyMe"
+            >
+              <PhArrowsClockwise
+                :size="16"
+                aria-hidden="true"
+              />
+              {{ t('words.wordList.access.refreshPermission') }}
+            </button>
+          </div>
+        </div>
+
+        <div class="upload-example">
+          <div class="upload-example__title">
+            <span>{{ t('words.wordList.upload.dataExample') }}</span>
+            <span class="upload-example__actions">
+              <a
+                class="action-btn action-btn--sm upload-example__template-btn"
+                :href="SURVEY_TEMPLATE_URL"
+                :download="SURVEY_TEMPLATE_FILE_NAME"
+              >
+                <PhDownloadSimple
+                  :size="16"
+                  aria-hidden="true"
+                />
+                {{ t('words.wordList.upload.surveyTemplate') }}
+              </a>
+              <HelpIcon
+                :content="t('words.wordList.upload.surveyTemplateHelp')"
+                size="sm"
+                placement="bottom"
+                icon-color="var(--color-primary)"
+              />
+            </span>
+          </div>
+          <div class="upload-example__row">
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--def">{{ t('words.wordList.columns.definition') }}</b>吃饭</span>
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--head">{{ t('words.wordList.columns.headword') }}</b>食饭</span>
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--ipa">{{ t('words.wordList.columns.pronunciation') }}</b>sek2fan22</span>
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--note">{{ t('words.wordList.columns.detail') }}</b>也可说喫饭</span>
+          </div>
+          <div class="upload-example__row">
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--def">{{ t('words.wordList.columns.definition') }}</b>睡觉</span>
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--head">{{ t('words.wordList.columns.headword') }}</b>睏觉</span>
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--ipa">{{ t('words.wordList.columns.pronunciation') }}</b>kʰuəŋ34kɔ34</span>
+            <span class="upload-example__item"><b class="upload-example__label upload-example__label--note">{{ t('words.wordList.columns.detail') }}</b>多见于吴语淮官等</span>
+          </div>
         </div>
 
         <div class="upload-location-summary">
@@ -38,22 +99,6 @@
           <span v-for="item in uploadLocationSummaryItems" :key="item.key">
             {{ item.label }}：{{ item.value }}
           </span>
-        </div>
-
-        <div class="upload-example">
-          <div class="upload-example__title">{{ t('words.wordList.upload.dataExample') }}</div>
-          <div class="upload-example__row">
-            <span class="upload-example__item"><b class="upload-example__label upload-example__label--def">{{ t('words.wordList.columns.definition') }}</b>吃饭</span>
-            <span class="upload-example__item"><b class="upload-example__label upload-example__label--head">{{ t('words.wordList.columns.headword') }}</b>食饭</span>
-            <span class="upload-example__item"><b class="upload-example__label upload-example__label--ipa">{{ t('words.wordList.columns.pronunciation') }}</b>sek2fan22</span>
-            <span class="upload-example__item"><b class="upload-example__label upload-example__label--note">{{ t('words.wordList.columns.detail') }}</b>也可说喫饭</span>
-          </div>
-          <div class="upload-example__row">
-            <span class="upload-example__item"><b class="upload-example__label upload-example__label--def">{{ t('words.wordList.columns.definition') }}</b>睡觉</span>
-            <span class="upload-example__item"><b class="upload-example__label upload-example__label--head">{{ t('words.wordList.columns.headword') }}</b>睏觉</span>
-            <span class="upload-example__item"><b class="upload-example__label upload-example__label--ipa">{{ t('words.wordList.columns.pronunciation') }}</b>kʰuəŋ34kɔ34</span>
-            <span class="upload-example__item"><b class="upload-example__label upload-example__label--note">{{ t('words.wordList.columns.detail') }}</b>多见于吴语淮官等</span>
-          </div>
         </div>
 
         <div class="upload-parser-row">
@@ -94,10 +139,14 @@
           @reset="importFlow.clearPreview"
           @confirm="handleConfirmUpload"
         />
-        <div v-if="backendPreview" class="backend-preview">
+        <div
+          v-if="backendPreview"
+          class="backend-preview"
+          :class="{ 'backend-preview--empty': !hasImportableRows }"
+        >
           <div class="backend-preview-head">
             <div class="backend-preview-title-row">
-              <span class="backend-preview-icon">&#10003;</span>
+              <span class="backend-preview-icon">{{ hasImportableRows ? '✓' : '!' }}</span>
               <strong>{{ t('words.wordList.upload.backendPreviewTitle') }}</strong>
             </div>
             <span class="backend-preview-location">{{ backendPreview.location_name || uploadLocation.location_name }}</span>
@@ -115,6 +164,13 @@
               <span class="backend-preview-stat-value">{{ backendPreview.would_delete_existing_count ?? 0 }}</span>
               <span class="backend-preview-stat-label">{{ t('words.wordList.upload.previewDeleteCount') }}</span>
             </div>
+            <div
+              v-if="previewErrors.length"
+              class="backend-preview-stat backend-preview-stat--error"
+            >
+              <span class="backend-preview-stat-value">{{ previewErrors.length }}</span>
+              <span class="backend-preview-stat-label">{{ t('words.wordList.upload.previewErrorCount') }}</span>
+            </div>
           </div>
           <div class="backend-preview-meta">
             <span>{{ t('words.wordList.upload.previewParserMode') }}：{{ backendPreview.parser_mode || uploadParserMode }}</span>
@@ -127,9 +183,54 @@
             v-model="isOverwriteConfirmed"
             :label="t('words.wordList.upload.confirmOverwrite')"
           />
-          <ul v-if="backendPreview.errors?.length" class="backend-preview-errors">
-            <li v-for="error in backendPreview.errors" :key="error">{{ error }}</li>
-          </ul>
+          <div
+            v-if="previewErrors.length"
+            class="backend-preview-errors-block"
+          >
+            <ul class="backend-preview-errors">
+              <li
+                v-for="error in previewErrors"
+                :key="error"
+              >
+                {{ error }}
+              </li>
+            </ul>
+            <p class="backend-preview-errors-hint">
+              {{ t('words.wordList.upload.previewErrorsHint') }}
+            </p>
+          </div>
+        </div>
+        <div
+          v-if="importResult"
+          class="backend-preview"
+          :class="{ 'backend-preview--empty': importResult.skippedCount > 0 }"
+        >
+          <div class="backend-preview-head">
+            <div class="backend-preview-title-row">
+              <span class="backend-preview-icon">{{ importResult.skippedCount > 0 ? '!' : '✓' }}</span>
+              <strong>{{ t('words.wordList.upload.importResultTitle') }}</strong>
+            </div>
+            <span class="backend-preview-location">{{ importResult.locationName }}</span>
+          </div>
+          <p class="backend-preview-meta">
+            {{ t('words.wordList.upload.importResultSummary', { imported: importResult.importedCount, skipped: importResult.skippedCount }) }}
+          </p>
+          <div
+            v-if="importResult.errors.length"
+            class="backend-preview-errors-block"
+          >
+            <ul class="backend-preview-errors">
+              <li
+                v-for="error in importResult.errors"
+                :key="error"
+              >
+                {{ error }}
+              </li>
+            </ul>
+            <p class="backend-preview-errors-hint">
+              {{ t('words.wordList.upload.importResultErrorsHint') }}
+            </p>
+          </div>
         </div>
         <p v-if="uploadStatusText" class="upload-status">{{ uploadStatusText }}</p>
 
@@ -178,90 +279,31 @@
       </div>
     </section>
 
-    <AppModal
+    <LocationEditorModal
       v-model="isUploadLocationEditorOpen"
-      size="lg"
+      v-model:draft="uploadLocationDraft"
       width="860px"
       max-height="84dvh"
       :title="uploadLocationDraft.location_name || t('words.wordList.upload.locationName')"
       :close-label="t('common.button.close')"
+      :fields="uploadLocationFields"
+      :cancel-text="t('common.button.cancel')"
+      :confirm-text="t('common.button.confirm')"
+      :map-label="t('words.wordList.upload.coordinates')"
       @close="closeUploadLocationEditor"
+      @cancel="closeUploadLocationEditor"
+      @confirm="confirmUploadLocationEditor"
     >
-      <div class="upload-location-modal">
-        <div class="yindian-match-section">
-          <h4 class="yindian-match-title">{{ t('words.wordList.upload.useYindianData') }}</h4>
-          <div class="yindian-match-row">
-            <div class="yindian-input-wrapper">
-              <input
-                v-model="yindianQuery"
-                type="text"
-                :placeholder="t('words.wordList.upload.yindianHint')"
-                autocomplete="off"
-                @input="onYindianInput"
-                @keydown.enter.prevent="confirmYindianQuery"
-                @blur="onYindianBlur"
-              />
-              <div v-if="yindianSuggestions.length" class="yindian-suggestions">
-                <div
-                  v-for="item in yindianSuggestions"
-                  :key="item"
-                  class="yindian-suggest-item"
-                  @mousedown.prevent="applyYindianSuggestion(item)"
-                >
-                  {{ item }}
-                </div>
-              </div>
-            </div>
-            <button
-              class="glass-button"
-              data-variant="primary"
-              type="button"
-              :disabled="!yindianQuery.trim() || isLoadingYindian"
-              @click="confirmYindianQuery"
-            >
-              {{ isLoadingYindian ? t('common.label.loading') : t('common.button.confirm') }}
-            </button>
-          </div>
-          <span v-if="uploadLocationEditorStatus">{{ uploadLocationEditorStatus }}</span>
-        </div>
-
-        <div class="upload-location-modal-layout">
-          <div class="upload-location-grid">
-            <label v-for="field in uploadLocationFields" :key="field.key" class="upload-field">
-              <span>{{ field.label }}</span>
-              <input
-                v-model="uploadLocationDraft[field.key]"
-                type="text"
-                :required="field.required"
-                :placeholder="field.placeholder"
-              />
-            </label>
-          </div>
-
-          <div class="upload-location-map-panel">
-            <strong>{{ t('words.wordList.upload.coordinates') }}</strong>
-            <MiniMapSelector
-              v-model:coord="uploadLocationCoord"
-              :visible="isUploadLocationEditorOpen"
-              mode="picker"
-              :points="uploadLocationMapPoints"
-              :hint-text="t('words.wordList.upload.mapPickerHint')"
-            />
-          </div>
-        </div>
-      </div>
-
-      <template #footer>
-        <div class="location-edit-modal-actions">
-          <button class="glass-button" data-variant="secondary" type="button" @click="closeUploadLocationEditor">
-            {{ t('common.button.cancel') }}
-          </button>
-          <button class="glass-button" data-variant="primary" type="button" @click="confirmUploadLocationEditor">
-            {{ t('common.button.confirm') }}
-          </button>
-        </div>
+      <template #map>
+        <MiniMapSelector
+          v-model:coord="uploadLocationCoord"
+          :visible="isUploadLocationEditorOpen"
+          mode="picker"
+          :points="uploadLocationMapPoints"
+          :hint-text="t('words.wordList.upload.mapPickerHint')"
+        />
       </template>
-    </AppModal>
+    </LocationEditorModal>
 
     <AppModal
       :model-value="showFormatHelp"
@@ -398,10 +440,12 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import { computed, onMounted, ref, watch } from 'vue'
+import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import { computed, inject, onMounted, ref, watch } from 'vue'
+import { PhArrowsClockwise, PhDownloadSimple } from '@phosphor-icons/vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { batchMatch, getLocationDetail, getVocabularyCounts, previewVocabularyImport, uploadVocabulary } from '@/api'
+import { getVocabularyCounts, previewVocabularyImport, uploadVocabulary } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
@@ -410,6 +454,8 @@ import { useTabularImportPreview } from '@/composables/import/useTabularImportPr
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
 import { transformTabularFile } from '@/utils/import/transformTabularFile.js'
 import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue'
+import LocationEditorModal from './LocationEditorModal.vue'
+import { LOCATION_BASE_FIELDS, TONE_FIELDS } from './vocabularyLocationFields.js'
 import { formatCoord } from '@/main/utils/drawMap/formatCoord.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { showError, showInfo, showSuccess, showWarning } from '@/utils/ui/message.js'
@@ -417,6 +463,8 @@ import { showError, showInfo, showSuccess, showWarning } from '@/utils/ui/messag
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const SURVEY_TEMPLATE_URL = '/data/sample/方音圖鑑詞彙模板.xlsx'
+const SURVEY_TEMPLATE_FILE_NAME = '方音圖鑑詞彙模板.xlsx'
 
 const props = defineProps({
   vocabularyMe: { type: Object, default: null },
@@ -426,6 +474,7 @@ const props = defineProps({
   isAuthReady: { type: Boolean, default: false },
 })
 
+const refreshVocabularyMe = inject('refreshVocabularyMe', null)
 const canUploadVocabulary = computed(() => props.vocabularyMe?.can_upload === true)
 const isWaitingForAuth = computed(() => !props.isAuthReady || props.isLoadingVocabularyMe)
 const requiresLogin = computed(() => props.isAuthReady && !props.isAuthenticated)
@@ -435,6 +484,12 @@ const requiresVocabularyPermission = computed(() => (
   && !props.isLoadingVocabularyMe
   && !canUploadVocabulary.value
   && !props.vocabularyMeError
+))
+const shouldShowPermissionRequest = computed(() => (
+  requiresLogin.value || requiresVocabularyPermission.value
+))
+const canShowRefreshVocabularyPermission = computed(() => (
+  props.isAuthReady && props.isAuthenticated && Boolean(refreshVocabularyMe)
 ))
 const uploadAccessNotice = computed(() => {
   if (isWaitingForAuth.value) return t('words.wordList.access.loadingDesc')
@@ -471,55 +526,35 @@ const showFormatHelp = ref(false)
 const uploadStatusText = ref('')
 const backendPreview = ref(null)
 const isOverwriteConfirmed = ref(false)
+const importResult = ref(null)
 
 const uploadParserMode = ref('auto')
 const fillStandardFromLocal = ref(false)
 const uploadFile = ref(null)
 const fileInputEl = ref(null)
 const isDragOver = ref(false)
-const createEmptyUploadLocation = () => ({
-  location_name: '',
-  coordinates: '',
-  province: '',
-  city: '',
-  county: '',
-  town: '',
-  administrative_village: '',
-  natural_village: '',
-  yindian_region: '',
-  atlas_region: '',
-})
+
+const createEmptyUploadLocation = () => Object.fromEntries(
+  [...LOCATION_BASE_FIELDS, ...TONE_FIELDS].map((field) => [field.key, ''])
+)
 const uploadLocation = ref(createEmptyUploadLocation())
 const uploadLocationDraft = ref(createEmptyUploadLocation())
 const isUploadLocationEditorOpen = ref(false)
-const yindianQuery = ref('')
-const yindianSuggestions = ref([])
-const isLoadingYindian = ref(false)
-const uploadLocationEditorStatus = ref('')
-let yindianDebounceTimer = null
 let preserveBackendPreviewOnFilePromotion = false
 
 const uploadLocationFields = computed(() => [
-  {
-    key: 'location_name',
-    label: t('words.wordList.upload.locationName'),
-    placeholder: t('words.wordList.upload.locationNamePlaceholder'),
-    required: true
-  },
-  {
-    key: 'coordinates',
-    label: t('words.wordList.upload.coordinates'),
-    placeholder: t('words.wordList.upload.coordinatesPlaceholder'),
-    required: true
-  },
-  { key: 'province', label: t('words.wordList.upload.province'), placeholder: t('words.wordList.upload.province'), required: false },
-  { key: 'city', label: t('words.wordList.upload.city'), placeholder: t('words.wordList.upload.city'), required: false },
-  { key: 'county', label: t('words.wordList.upload.county'), placeholder: t('words.wordList.upload.county'), required: false },
-  { key: 'town', label: t('words.wordList.upload.town'), placeholder: t('words.wordList.upload.town'), required: false },
-  { key: 'administrative_village', label: t('words.wordList.upload.administrativeVillage'), placeholder: t('words.wordList.upload.administrativeVillage'), required: false },
-  { key: 'natural_village', label: t('words.wordList.upload.naturalVillage'), placeholder: t('words.wordList.upload.naturalVillage'), required: false },
-  { key: 'yindian_region', label: t('words.wordList.upload.yindianRegion'), placeholder: t('words.wordList.upload.yindianRegion'), required: false },
-  { key: 'atlas_region', label: t('words.wordList.upload.atlasRegion'), placeholder: t('words.wordList.upload.atlasRegion'), required: false },
+  ...LOCATION_BASE_FIELDS.map((field) => ({
+    key: field.key,
+    label: t(field.labelKey),
+    placeholder: t(field.placeholderKey || field.labelKey),
+    required: Boolean(field.required),
+  })),
+  ...TONE_FIELDS.map((field) => ({
+    key: field.key,
+    label: t(field.labelKey),
+    placeholder: t(field.labelKey),
+    required: false,
+  })),
 ])
 
 const parserModeOptions = computed(() => [
@@ -616,7 +651,6 @@ const uploadLocationCoord = computed({
   set(coord) {
     if (!Array.isArray(coord) || coord.length < 2) return
     uploadLocationDraft.value.coordinates = formatCoord(coord[0], coord[1])
-    uploadLocationEditorStatus.value = ''
   }
 })
 
@@ -644,11 +678,19 @@ const shouldConfirmOverwrite = computed(() => {
   return Number(backendPreview.value?.would_delete_existing_count) > 0
 })
 
+const previewErrors = computed(() => parseErrorDetails(backendPreview.value?.errors))
+
+const hasImportableRows = computed(() => isPreviewImportable(backendPreview.value))
+
 const canImportAfterPreview = computed(() => {
   return canConfirmUpload.value
-    && backendPreview.value?.success === true
+    && hasImportableRows.value
     && (!shouldConfirmOverwrite.value || isOverwriteConfirmed.value)
 })
+
+function isPreviewImportable(response) {
+  return Number(response?.parsed_count) > 0
+}
 
 function isVocabularyPreviewFile(file) {
   return Boolean(file?.name && /\.(xlsx|xls|csv|tsv)$/i.test(file.name))
@@ -675,18 +717,12 @@ function normalizeUploadLocation(location) {
 
 function openUploadLocationEditor() {
   uploadLocationDraft.value = { ...uploadLocation.value }
-  uploadLocationEditorStatus.value = ''
-  yindianQuery.value = ''
-  yindianSuggestions.value = []
   isUploadLocationEditorOpen.value = true
 }
 
 function closeUploadLocationEditor() {
   isUploadLocationEditorOpen.value = false
   uploadLocationDraft.value = createEmptyUploadLocation()
-  uploadLocationEditorStatus.value = ''
-  yindianQuery.value = ''
-  yindianSuggestions.value = []
 }
 
 function confirmUploadLocationEditor() {
@@ -694,91 +730,11 @@ function confirmUploadLocationEditor() {
   closeUploadLocationEditor()
 }
 
-function getLocationDetailRow(response) {
-  if (Array.isArray(response?.data)) return response.data[0] || null
-  if (response?.data && typeof response.data === 'object') return response.data
-  return response && typeof response === 'object' ? response : null
-}
-
-function applyYindianLocationDetail(detail) {
-  uploadLocationDraft.value = {
-    ...uploadLocationDraft.value,
-    location_name: uploadLocationDraft.value.location_name || detail?.['語言'] || '',
-    coordinates: detail?.['經緯度'] || uploadLocationDraft.value.coordinates,
-    province: detail?.['省'] || uploadLocationDraft.value.province,
-    city: detail?.['市'] || uploadLocationDraft.value.city,
-    county: detail?.['縣'] || uploadLocationDraft.value.county,
-    town: detail?.['鎮'] || uploadLocationDraft.value.town,
-    administrative_village: detail?.['行政村'] || uploadLocationDraft.value.administrative_village,
-    natural_village: detail?.['自然村'] || uploadLocationDraft.value.natural_village,
-    yindian_region: detail?.['音典分區'] || uploadLocationDraft.value.yindian_region,
-    atlas_region: detail?.['地圖集二分區'] || uploadLocationDraft.value.atlas_region,
-  }
-}
-
-async function fillFromYindian(name) {
-  if (!name || isLoadingYindian.value) return
-  isLoadingYindian.value = true
-  uploadLocationEditorStatus.value = ''
-  try {
-    const response = await getLocationDetail(name)
-    const detail = getLocationDetailRow(response)
-    if (!detail) {
-      uploadLocationEditorStatus.value = t('words.wordList.upload.yindianNotFound')
-      showWarning(uploadLocationEditorStatus.value)
-      return
-    }
-    applyYindianLocationDetail(detail)
-    uploadLocationEditorStatus.value = t('words.wordList.upload.yindianFilled')
-    showSuccess(uploadLocationEditorStatus.value)
-  } catch (error) {
-    uploadLocationEditorStatus.value = error.message || t('words.wordList.upload.yindianFailed')
-    showError(uploadLocationEditorStatus.value)
-  } finally {
-    isLoadingYindian.value = false
-  }
-}
-
-function onYindianInput() {
-  clearTimeout(yindianDebounceTimer)
-  const query = yindianQuery.value.trim()
-  if (!query) {
-    yindianSuggestions.value = []
-    return
-  }
-  yindianDebounceTimer = setTimeout(async () => {
-    try {
-      const results = await batchMatch(query, false)
-      const items = Array.isArray(results) ? results.flatMap((r) => r.items || []) : []
-      yindianSuggestions.value = [...new Set(items)]
-    } catch {
-      yindianSuggestions.value = []
-    }
-  }, 300)
-}
-
-function onYindianBlur() {
-  setTimeout(() => {
-    yindianSuggestions.value = []
-  }, 200)
-}
-
-function applyYindianSuggestion(item) {
-  yindianQuery.value = item
-  yindianSuggestions.value = []
-  return fillFromYindian(item)
-}
-
-function confirmYindianQuery() {
-  const name = yindianQuery.value.trim()
-  if (!name || isLoadingYindian.value) return
-  return fillFromYindian(name)
-}
-
 function clearUploadFile() {
   uploadFile.value = null
   backendPreview.value = null
   isOverwriteConfirmed.value = false
+  importResult.value = null
   importFlow.clearPreview()
 }
 
@@ -905,10 +861,13 @@ async function handlePreviewImport(fileOverride = null) {
       fill_standard_from_local: fillStandardFromLocal.value,
     })
     backendPreview.value = previewResponse
-    if (previewResponse.success) {
+    if (isPreviewImportable(previewResponse)) {
       uploadStatusText.value = t('words.wordList.upload.previewReady')
     } else {
-      uploadStatusText.value = previewResponse.errors?.join('；') || t('words.wordList.upload.previewFailed')
+      const details = parseErrorDetails(previewResponse.errors)
+      uploadStatusText.value = details.length
+        ? details.join('；')
+        : t('words.wordList.upload.noImportableData')
       showError(uploadStatusText.value)
     }
     return previewResponse
@@ -930,7 +889,7 @@ async function handleConfirmUpload() {
 
   const transformedFile = buildMappedVocabularyImportFile(file)
   const previewResponse = await handlePreviewImport(transformedFile)
-  if (previewResponse?.success) {
+  if (isPreviewImportable(previewResponse)) {
     preserveBackendPreviewOnFilePromotion = true
     uploadFile.value = transformedFile
     importFlow.pendingFile.value = null
@@ -940,7 +899,7 @@ async function handleConfirmUpload() {
 async function handleImportAfterPreview() {
   const file = uploadFile.value || importFlow.pendingFile.value
 
-  if (!file || isUploading.value || backendPreview.value?.success !== true) {
+  if (!file || isUploading.value || !hasImportableRows.value) {
     return
   }
 
@@ -963,15 +922,37 @@ async function handleImportAfterPreview() {
       overwrite: shouldConfirmOverwrite.value ? isOverwriteConfirmed.value : false,
       fill_standard_from_local: fillStandardFromLocal.value,
     })
-    uploadStatusText.value = t('words.wordList.upload.success', { count: response.imported_count || 0 })
-    showSuccess(uploadStatusText.value)
+    const importedCount = Number(response.imported_count) || 0
+    const skippedCount = Number(response.skipped_count) || 0
+    const errors = Array.isArray(response.errors) ? response.errors : []
+    const locationName = location.location_name
     clearUploadFile()
+    importResult.value = { importedCount, skippedCount, errors, locationName }
+    uploadStatusText.value = skippedCount > 0
+      ? t('words.wordList.upload.successWithSkipped', { imported: importedCount, skipped: skippedCount })
+      : t('words.wordList.upload.success', { count: importedCount })
+    if (skippedCount > 0) {
+      showWarning(uploadStatusText.value)
+    } else {
+      showSuccess(uploadStatusText.value)
+    }
   } catch (error) {
-    uploadStatusText.value = error.message || t('words.wordList.upload.failed')
+    uploadStatusText.value = isNoImportableRowsMessage(error?.message)
+      ? t('words.wordList.upload.noImportableData')
+      : (error.message || t('words.wordList.upload.failed'))
     showError(uploadStatusText.value)
   } finally {
     isUploading.value = false
   }
+}
+
+// 后端在没有可导入行时用这句英文兜底（preview 放进 errors，import 抛 400）
+function isNoImportableRowsMessage(message) {
+  return /no valid vocabulary rows/i.test(String(message || ''))
+}
+
+function parseErrorDetails(errors) {
+  return (Array.isArray(errors) ? errors : []).filter((message) => !isNoImportableRowsMessage(message))
 }
 </script>
 

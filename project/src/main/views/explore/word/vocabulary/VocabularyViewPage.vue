@@ -1,8 +1,9 @@
 <template>
   <div class="vocabulary-view-page">
     <VocabularyTopControls
-      v-model:query="query"
-      v-model:selected-search-fields="selectedSearchFields"
+      v-model:source="source"
+      v-model:query="activeQuery"
+      v-model:selected-search-fields="activeSearchFields"
       v-model:selected-locations="selectedLocations"
       v-model:selected-standard-word="selectedStandardWord"
       v-model:selected-standard-words="selectedStandardWordsModel"
@@ -10,16 +11,164 @@
       v-model:filter-by-region="filterByRegion"
       v-model:selected-province="selectedProvince"
       v-model:selected-city="selectedCity"
-      :view-mode="viewMode"
-      :search-field-options="searchFieldOptions"
+      v-model:view-mode="viewMode"
+      :search-field-options="activeSearchFieldOptions"
       :location-options="locationOptions"
       :standard-word-options="standardWordOptions"
       :province-options="provinceOptions"
       :city-options="cityOptions"
+      :notes-scope="draftScope"
+      @update:notes-scope="draftScope = cloneNotesScope($event)"
+      @locations-resolved="handleNotesScopeResolved"
+      @refresh-notes="refreshNotes"
+      @open-location-details="openLocationDetails"
     />
 
-    <section v-if="viewMode !== 'table'" class="content-area">
-      <div v-if="isInitialLoading" class="loading-state loading-state-base">
+    <section v-if="isCharacterNotesMode" class="content-area">
+      <div v-if="isNotesInitialLoading" class="loading-state loading-state-base">
+        <div class="ui-loading--page" aria-hidden="true"></div>
+        <span>{{ t('words.wordList.states.loadingCards') }}</span>
+      </div>
+      <div v-else-if="notesLoadError && !notesEntries.length" class="empty-state empty-state-base">
+        <p>{{ notesLoadError }}</p>
+      </div>
+      <div v-else-if="notesEntries.length" class="card-mode">
+        <div v-if="viewMode === 'card'" ref="notesCardGridEl" class="cards-grid cards-grid--notes">
+          <article v-for="entry in notesEntries" :key="entry.id" class="glass-card notes-entry-card">
+            <button
+              v-if="entry.locationName"
+              class="card-location pill-btn card-location-pill"
+              type="button"
+              :title="entry.locationName"
+              @click="openNotesLocationDetail(entry.locationName)"
+            >
+              <span class="card-location-pill-text">{{ entry.locationName }}</span>
+            </button>
+            <div class="card-pronunciation-pair notes-card-pronunciation-pair">
+              <span class="pronunciation-text">{{ entry.pronunciation }}</span>
+              <span class="word-text">{{ entry.character }}</span>
+            </div>
+            <div
+              v-if="entry.notes"
+              class="notes-card-note"
+              :class="{ 'is-expanded': isNotesCardNoteExpanded(entry.id) }"
+            >
+              <div class="notes-card-note-content">
+                <span
+                  :ref="(el) => setNotesCardNoteMeasureEl(entry.id, el)"
+                  class="notes-card-note-measure"
+                  aria-hidden="true"
+                >{{ entry.notes }}</span>
+                <span class="notes-card-note-text">{{ entry.notes }}</span>
+              </div>
+              <button
+                v-if="shouldShowNotesCardNoteToggle(entry.id)"
+                class="card-note-toggle notes-card-note-toggle"
+                :class="{ 'is-expanded': isNotesCardNoteExpanded(entry.id) }"
+                type="button"
+                :aria-expanded="isNotesCardNoteExpanded(entry.id)"
+                @click="toggleNotesCardNote(entry.id)"
+              >
+                <svg
+                  class="card-note-toggle-icon notes-card-note-toggle-icon"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="m9 6 6 6-6 6"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2.5"
+                  />
+                </svg>
+              </button>
+              <span
+                v-else
+                class="notes-card-note-toggle-spacer"
+                aria-hidden="true"
+              />
+            </div>
+          </article>
+        </div>
+        <div v-else ref="notesCardGridEl" class="notes-list">
+          <article v-for="entry in notesEntries" :key="entry.id" class="notes-row">
+            <button
+              v-if="entry.locationName"
+              class="card-location pill-btn card-location-pill notes-row-location"
+              type="button"
+              :title="entry.locationName"
+              @click="openNotesLocationDetail(entry.locationName)"
+            >
+              <span class="card-location-pill-text">{{ entry.locationName }}</span>
+            </button>
+            <span class="pronunciation-text notes-row-pronunciation">{{ entry.pronunciation }}</span>
+            <span class="word-text notes-row-character">{{ entry.character }}</span>
+            <div
+              v-if="entry.notes"
+              class="notes-card-note notes-row-note"
+              :class="{ 'is-expanded': isNotesCardNoteExpanded(entry.id) }"
+            >
+              <div class="notes-card-note-content">
+                <span
+                  :ref="(el) => setNotesCardNoteMeasureEl(entry.id, el)"
+                  class="notes-card-note-measure"
+                  aria-hidden="true"
+                >{{ entry.notes }}</span>
+                <span class="notes-card-note-text">{{ entry.notes }}</span>
+              </div>
+              <button
+                v-if="shouldShowNotesCardNoteToggle(entry.id)"
+                class="card-note-toggle notes-card-note-toggle"
+                :class="{ 'is-expanded': isNotesCardNoteExpanded(entry.id) }"
+                type="button"
+                :aria-expanded="isNotesCardNoteExpanded(entry.id)"
+                @click="toggleNotesCardNote(entry.id)"
+              >
+                <svg
+                  class="card-note-toggle-icon notes-card-note-toggle-icon"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="m9 6 6 6-6 6"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2.5"
+                  />
+                </svg>
+              </button>
+              <span
+                v-else
+                class="notes-card-note-toggle-spacer"
+                aria-hidden="true"
+              />
+            </div>
+          </article>
+        </div>
+      </div>
+      <div v-else class="empty-state empty-state-base">
+        <p>{{ t('words.wordList.notes.noMatches') }}</p>
+      </div>
+      <button
+        v-if="canLoadMoreNotes"
+        class="load-more-btn glass-button"
+        data-variant="secondary"
+        type="button"
+        :disabled="isLoadingNotes"
+        @click="loadNotes({ append: true })"
+      >
+        {{ isLoadingNotes ? t('words.wordList.states.loadingData') : t('words.wordList.states.loadingMore') }}
+      </button>
+    </section>
+
+    <section v-else-if="viewMode !== 'table'" class="content-area">
+      <div v-if="viewMode === 'card' && isInitialLoading" class="loading-state loading-state-base">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <span>{{ t('words.wordList.states.loadingCards') }}</span>
       </div>
@@ -33,24 +182,57 @@
           <article
             v-for="entry in entries"
             :key="entry.id"
-            class="card glass-card"
+            class="glass-card vocabulary-entry-card"
+            :class="{ 'is-note-expanded': isVocabularyCardNoteExpanded(entry.id) }"
           >
-            <div class="card-row row-1">
-              <span class="location-chain">{{ entry.location }}</span>
-              <span class="category-chain">{{ entry.pronunciationType }}</span>
+            <div class="card-location-definition-pair">
+              <button
+                class="card-location pill-btn card-location-pill"
+                type="button"
+                :title="entry.locationName"
+                @click="openLocationDetails(entry.locationName)"
+              >
+                <span class="card-location-pill-text">
+                  {{ entry.locationName }}
+                </span>
+              </button>
+              <span class="card-definition">
+                {{ entry.definition }}
+              </span>
             </div>
-            <div class="card-row row-2">
-              <span class="word-text">{{ entry.headword }}</span>
+            <div class="card-pronunciation-pair">
               <span class="pronunciation-text">{{ entry.pronunciation }}</span>
+              <span class="word-text">{{ entry.headword }}</span>
             </div>
-            <div class="card-row row-3">
-              <span class="definition-text">{{ entry.definition }}</span>
-              <span
-                v-if="entry.definition && entry.detail"
-                class="card-dot-sep"
-                aria-hidden="true"
-              >·</span>
-              <span class="memo-text">{{ entry.detail }}</span>
+            <div
+              class="card-note"
+              :class="{ 'has-toggle': shouldShowVocabularyCardNoteToggle(entry) }"
+            >
+              <span class="card-note-text">{{ getVocabularyCardNoteText(entry) }}</span>
+              <button
+                v-if="shouldShowVocabularyCardNoteToggle(entry)"
+                class="card-note-toggle"
+                :class="{ 'is-expanded': isVocabularyCardNoteExpanded(entry.id) }"
+                type="button"
+                :aria-expanded="isVocabularyCardNoteExpanded(entry.id)"
+                @click="toggleVocabularyCardNote(entry.id)"
+              >
+                <svg
+                  class="card-note-toggle-icon"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    d="m9 6 6 6-6 6"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2.5"
+                  />
+                </svg>
+              </button>
             </div>
           </article>
         </div>
@@ -60,7 +242,7 @@
       </div>
 
       <div v-else-if="viewMode === 'map'" class="map-mode">
-        <div v-if="isInitialLoading" class="empty-state empty-state-base map-empty-state">
+        <div v-if="isMapInitialLoading" class="empty-state empty-state-base map-empty-state">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <span>{{ t('words.wordList.states.loadingData') }}</span>
         </div>
@@ -99,7 +281,7 @@
       </button>
     </section>
 
-    <section v-else-if="viewMode === 'table'">
+    <section v-else-if="viewMode === 'table'" class="content-area">
       <UniversalTable
         db-key="vocabulary"
         table-name="vocabulary_entries"
@@ -119,9 +301,20 @@
       @close="clearMapDetailModal"
     >
       <div class="map-detail-modal">
-        <p class="map-meta" v-if="mapDetailEntries.length">
-          {{ t('words.wordList.map.pointCount', { count: mapDetailEntries.length }) }}
-        </p>
+        <dl v-if="mapDetailMetaRows.length" class="map-detail-meta">
+          <div v-for="row in mapDetailMetaRows" :key="row.key" class="map-detail-meta-item">
+            <dt v-if="row.label" class="map-detail-meta-label">{{ row.label }}</dt>
+            <dd class="map-detail-meta-value" :class="{ 'map-detail-meta-value--tones': row.tones }">
+              <template v-if="row.tones">
+                <span v-for="tone in row.tones" :key="tone.key" class="tone-pill">
+                  <span class="tone-pill-name">{{ tone.name }}</span>
+                  <span class="tone-pill-value">{{ tone.value }}</span>
+                </span>
+              </template>
+              <template v-else>{{ row.value }}</template>
+            </dd>
+          </div>
+        </dl>
         <div v-if="isLoadingMapDetail && !mapDetailEntries.length" class="loading-state loading-state-base">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <span>{{ t('words.wordList.states.loadingData') }}</span>
@@ -161,22 +354,130 @@
       </div>
     </AppModal>
 
+    <AppModal
+      v-model="isLocationDetailsModalOpen"
+      size="lg"
+      width="720px"
+      max-height="80dvh"
+      :title="t('words.wordList.search.locationDetails')"
+      :close-label="t('common.button.close')"
+      @close="clearLocationDetailsModal"
+    >
+      <div class="location-details-modal">
+        <div v-if="isLoadingLocationDetails && !locationDetailsSourcePoints.length" class="loading-state loading-state-base">
+          <div class="ui-loading--page" aria-hidden="true"></div>
+          <span>{{ t('words.wordList.states.loadingData') }}</span>
+        </div>
+        <div v-else-if="locationDetailsError" class="empty-state empty-state-base">
+          <p>{{ locationDetailsError }}</p>
+        </div>
+        <template v-else-if="locationDetailsSourcePoints.length">
+          <div class="location-details-toolbar">
+            <input
+              v-model="locationDetailsSearchQuery"
+              class="location-details-search glass-field"
+              type="search"
+              :placeholder="t('words.wordList.search.locationDetailsSearchPlaceholder')"
+            />
+            <button
+              class="location-details-sort-btn"
+              :class="{ active: locationDetailsSortByRegion }"
+              type="button"
+              :title="t('words.wordList.search.locationDetailsSortByRegion')"
+              @click="locationDetailsSortByRegion = !locationDetailsSortByRegion"
+            >
+              <svg
+                class="location-details-sort-icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M7 4v14m0 0 3-3m-3 3-3-3M17 20V6m0 0-3 3m3-3 3 3"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                />
+              </svg>
+            </button>
+          </div>
+          <div v-if="locationDetailsDisplayPoints.length" class="location-details-list">
+            <article
+              v-for="(point, index) in locationDetailsDisplayPoints"
+              :key="`${point.locationName}-${index}`"
+              class="location-details-item"
+            >
+              <button
+                class="location-details-head"
+                type="button"
+                :aria-expanded="expandedLocationKeys.has(point.locationName)"
+                @click="toggleLocationDetail(point.locationName)"
+              >
+                <span class="location-details-name">{{ point.locationLabel || point.locationName }}</span>
+                <span class="location-details-count">{{ t('words.wordList.map.pointCount', { count: point.entryCount || 0 }) }}</span>
+                <span
+                  class="location-details-chevron"
+                  :class="{ 'is-open': expandedLocationKeys.has(point.locationName) }"
+                  aria-hidden="true"
+                >⌄</span>
+              </button>
+              <dl v-if="expandedLocationKeys.has(point.locationName)" class="map-detail-meta">
+                <div v-for="row in pointMetaRows(point)" :key="row.key" class="map-detail-meta-item">
+                  <dt v-if="row.label" class="map-detail-meta-label">{{ row.label }}</dt>
+                  <dd class="map-detail-meta-value" :class="{ 'map-detail-meta-value--tones': row.tones }">
+                <template v-if="row.tones">
+                  <span v-for="tone in row.tones" :key="tone.key" class="tone-pill">
+                    <span class="tone-pill-name">{{ tone.name }}</span>
+                    <span class="tone-pill-value">{{ tone.value }}</span>
+                  </span>
+                </template>
+                <template v-else>{{ row.value }}</template>
+              </dd>
+                </div>
+              </dl>
+            </article>
+          </div>
+          <div v-else class="empty-state empty-state-base">
+            <p>{{ t('words.wordList.states.noData') }}</p>
+          </div>
+        </template>
+        <div v-else class="empty-state empty-state-base">
+          <p>{{ t('words.wordList.states.noData') }}</p>
+        </div>
+      </div>
+    </AppModal>
+
+    <LocationDetailPopup
+      :visible="notesLocationPopup.visible"
+      :location-name="notesLocationPopup.locationName"
+      :data="notesLocationPopup.data"
+      :loading="notesLocationPopup.loading"
+      @close="closeNotesLocationPopup"
+    />
+
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { watchDebounced } from '@vueuse/core'
+import * as OpenCCCN2T from 'opencc-js/cn2t'
+import * as OpenCCT2CN from 'opencc-js/t2cn'
 import {
   getVocabularyItems,
   getVocabularyLocationOptions,
   getVocabularyMapItems,
   getVocabularyMapPoints,
-  getVocabularyStandardWords
+  getVocabularyStandardWords,
+  getLocationDetail,
+  searchNotes,
 } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
+import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue'
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 import VocabularyMap from '@/main/components/map/VocabularyMap.vue'
 import VocabularyTopControls from './VocabularyTopControls.vue'
@@ -184,7 +485,63 @@ import VocabularyTopControls from './VocabularyTopControls.vue'
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
-const STANDARD_WORD_OPTIONS_LIMIT = 200
+const STANDARD_WORD_OPTIONS_LIMIT = 1000
+const VOCABULARY_CARD_NOTE_PREVIEW_LENGTH = 3
+
+const TONE_FIELD_KEYS = Array.from({ length: 10 }, (_, index) => `t${index + 1}`)
+const locationDetailsT2S = OpenCCT2CN.Converter({ from: 'tw', to: 'cn' })
+const locationDetailsS2T = OpenCCCN2T.Converter({ from: 'cn', to: 'tw' })
+
+const MAP_POINT_META_GROUPS = [
+  {
+    keys: ['province', 'city', 'county'],
+    labelKeys: ['words.wordList.upload.province', 'words.wordList.upload.city', 'words.wordList.upload.county'],
+  },
+  {
+    keys: ['town', 'administrativeVillage', 'naturalVillage'],
+    labelKeys: ['words.wordList.upload.town', 'words.wordList.upload.administrativeVillage', 'words.wordList.upload.naturalVillage'],
+  },
+  { keys: ['yindianRegion'], labelKeys: ['words.wordList.upload.yindianRegion'] },
+  { keys: ['atlasRegion'], labelKeys: ['words.wordList.upload.atlasRegion'] },
+  { keys: ['vocabularySource'], labelKeys: ['words.wordList.upload.vocabularySource'] },
+  { keys: ['description'], labelKeys: ['words.wordList.upload.description'] },
+]
+const TRAILING_MAP_POINT_META_GROUP = { keys: ['other'], labelKey: 'words.wordList.upload.other' }
+
+function buildToneMetaRow(source) {
+  if (!source) {
+    return null
+  }
+
+  const tones = TONE_FIELD_KEYS
+    .map((key) => {
+      const value = String(source[key] || '').trim()
+      return value && value !== '-'
+        ? { key, name: t(`words.wordList.upload.toneNames.${key}`), value }
+        : null
+    })
+    .filter(Boolean)
+
+  return tones.length ? { key: 'tones', label: t('words.wordList.upload.toneValues'), tones } : null
+}
+
+function appendTrailingMapPointMetaRow(rows, source) {
+  const value = TRAILING_MAP_POINT_META_GROUP.keys
+    .map((key) => String(source?.[key] || '').trim())
+    .filter((item) => item && item !== '-')
+    .join(' · ')
+
+  if (!value) {
+    return rows
+  }
+
+  rows.push({
+    key: TRAILING_MAP_POINT_META_GROUP.keys.join('-'),
+    label: t('words.wordList.upload.other'),
+    value,
+  })
+  return rows
+}
 
 const props = defineProps({
   vocabularyMe: { type: Object, default: null },
@@ -193,7 +550,87 @@ const props = defineProps({
 })
 
 const query = ref('')
+const notesQuery = ref('')
+const source = computed({
+  get: () => route.query.source === 'character-notes' ? 'character-notes' : 'vocabulary',
+  set: (value) => {
+    const isNotes = value === 'character-notes'
+    const currentTab = route.query.tab
+    const nextTab = isNotes || currentTab === 'list' ? 'card' : currentTab
+    router.replace({
+      query: {
+        ...route.query,
+        source: isNotes ? 'character-notes' : undefined,
+        tab: nextTab,
+      },
+    })
+  },
+})
+const isCharacterNotesMode = computed(() => source.value === 'character-notes')
+const activeQuery = computed({
+  get: () => isCharacterNotesMode.value ? notesQuery.value : query.value,
+  set: (value) => {
+    if (isCharacterNotesMode.value) notesQuery.value = value
+    else query.value = value
+  },
+})
+
+function normalizeNotesSearchFields(value) {
+  const valid = ['pronunciation', 'detail']
+  const selected = Array.isArray(value) ? value.filter((field) => valid.includes(field)) : []
+  return selected.length === valid.length || !selected.length ? [] : selected
+}
+
+let storedNotesSearchFields = ['detail']
+try {
+  storedNotesSearchFields = JSON.parse(localStorage.getItem('vocabulary_notes_search_fields') || '["detail"]')
+} catch {
+  storedNotesSearchFields = ['detail']
+}
+const notesSearchFields = ref(normalizeNotesSearchFields(storedNotesSearchFields))
+const activeSearchFields = computed({
+  get: () => isCharacterNotesMode.value ? notesSearchFields.value : selectedSearchFields.value,
+  set: (value) => {
+    if (isCharacterNotesMode.value) notesSearchFields.value = normalizeNotesSearchFields(value)
+    else selectedSearchFields.value = value
+  },
+})
+
+function cloneNotesScope(scope = {}) {
+  return {
+    locations: Array.isArray(scope.locations) ? [...scope.locations] : [],
+    regions: Array.isArray(scope.regions) ? [...scope.regions] : [],
+    regionUsing: scope.regionUsing || scope.regionMode || 'map',
+  }
+}
+
+const draftScope = ref(cloneNotesScope())
+const appliedScope = ref(cloneNotesScope())
+const notesEntries = ref([])
+const notesTotal = ref(0)
+const notesPage = ref(1)
+const notesPageSize = ref(50)
+const isLoadingNotes = ref(false)
+const notesLoadError = ref('')
+const activeNotesRequestKey = ref('')
+const notesCardGridEl = ref(null)
+const notesCardNoteMeasureEls = new Map()
+const notesCardNoteOverflowIds = ref(new Set())
+const expandedNotesCardNoteIds = ref(new Set())
+const notesLocationPopup = ref({
+  visible: false,
+  locationName: '',
+  data: null,
+  loading: false,
+})
+let notesCardResizeObserver = null
+let notesLocationPopupRequestId = 0
+const NOTES_VIEW_MODES = ['card', 'list']
+function resolveNotesViewMode(tab) {
+  return tab === 'list' ? 'list' : 'card'
+}
 function resolveViewModeFromRoute() {
+  if (route.query.source === 'character-notes') return resolveNotesViewMode(route.query.tab)
   const tab = route.query.tab
   if (tab === 'map' || tab === 'table') return tab
   const stored = sessionStorage.getItem('vocabulary_view_mode')
@@ -218,18 +655,40 @@ const selectedStandardWords = computed(() => {
 })
 const mapDisplayMode = ref('overview')
 const vocabularyLocationOptions = ref([])
+const vocabularyLocationOptionsLoaded = ref(false)
+let vocabularyLocationOptionsRequest = null
 const vocabularyStandardWordOptions = ref([])
 const entries = ref([])
+const itemsCacheKey = ref('')
 const mapPoints = ref([])
+const mapPointsCacheKey = ref('')
+const standardWordsCacheKey = ref('')
 const mapStats = ref({
   totalEntries: 0,
   totalPoints: 0,
   omittedWithoutCoordinates: 0,
 })
+const isLocationDetailsModalOpen = ref(false)
+const isLoadingLocationDetails = ref(false)
+const locationDetailsError = ref('')
+const locationDetailsPoints = ref([])
+const locationDetailsPointsCacheKey = ref('')
+const locationDetailsSearchQuery = ref('')
+const locationDetailsSortByRegion = ref(false)
+const expandedLocationKeys = ref(new Set())
+const activeVocabularyItemsRequestKey = ref('')
+const activeStandardWordsRequestKey = ref('')
+const activeMapPointsRequestKey = ref('')
+const activeMapDetailRequestKey = ref('')
+const pendingVocabularyItemRequests = new Map()
+const pendingVocabularyMapPointRequests = new Map()
+const pendingVocabularyStandardWordRequests = new Map()
+const mapDetailItemsCache = new Map()
 const total = ref(0)
 const page = ref(1)
 const pageSize = ref(50)
 const isLoadingItems = ref(false)
+const isLoadingStandardWords = ref(false)
 const loadError = ref('')
 const isMapDetailModalOpen = ref(false)
 const isLoadingMapDetail = ref(false)
@@ -240,7 +699,117 @@ const mapDetailPage = ref(1)
 const selectedMapPointLabel = ref('')
 const activeMapPointLocations = ref([])
 const activeMapPointBaseLabel = ref('')
+const activeMapPointMeta = ref(null)
+const expandedVocabularyCardNoteIds = ref(new Set())
 
+const mapDetailMetaRows = computed(() => {
+  const meta = activeMapPointMeta.value
+  if (!meta) {
+    return []
+  }
+  const rows = MAP_POINT_META_GROUPS
+    .map(({ keys, labelKeys }) => ({
+      key: keys.join('-'),
+      label: labelKeys.map((labelKey) => t(labelKey)).join(' / '),
+      value: keys
+        .map((key) => String(meta[key] || '').trim())
+        .filter((value) => value && value !== '-')
+        .join(' · '),
+    }))
+    .filter(({ value }) => value)
+
+  const toneRow = buildToneMetaRow(meta)
+  if (toneRow) {
+    rows.push(toneRow)
+  }
+
+  rows.push({
+    key: 'count',
+    label: '',
+    value: t('words.wordList.map.pointCount', { count: mapDetailEntries.value.length }),
+  })
+
+  appendTrailingMapPointMetaRow(rows, meta)
+
+  return rows
+})
+
+
+function pointMetaRows(point) {
+  if (!point) {
+    return []
+  }
+
+  const rows = MAP_POINT_META_GROUPS
+    .map(({ keys, labelKeys }) => ({
+      key: keys.join('-'),
+      label: labelKeys.map((labelKey) => t(labelKey)).join(' / '),
+      value: keys
+        .map((key) => String(point[key] || '').trim())
+        .filter((value) => value && value !== '-')
+        .join(' · '),
+    }))
+    .filter(({ value }) => value)
+
+  const toneRow = buildToneMetaRow(point)
+  if (toneRow) {
+    rows.push(toneRow)
+  }
+
+  appendTrailingMapPointMetaRow(rows, point)
+
+  return rows
+}
+
+function isVocabularyCardNoteExpanded(entryId) {
+  return expandedVocabularyCardNoteIds.value.has(entryId)
+}
+
+function getVocabularyCardNoteCharacters(entry) {
+  return Array.from(String(entry?.detail || ''))
+}
+
+function shouldShowVocabularyCardNoteToggle(entry) {
+  return getVocabularyCardNoteCharacters(entry).length > VOCABULARY_CARD_NOTE_PREVIEW_LENGTH
+}
+
+function getVocabularyCardNoteText(entry) {
+  const detailCharacters = getVocabularyCardNoteCharacters(entry)
+  if (!shouldShowVocabularyCardNoteToggle(entry) || isVocabularyCardNoteExpanded(entry.id)) {
+    return detailCharacters.join('')
+  }
+  return `${detailCharacters.slice(0, VOCABULARY_CARD_NOTE_PREVIEW_LENGTH).join('')}...`
+}
+
+function toggleVocabularyCardNote(entryId) {
+  const nextExpandedIds = new Set(expandedVocabularyCardNoteIds.value)
+  if (nextExpandedIds.has(entryId)) {
+    nextExpandedIds.delete(entryId)
+  } else {
+    nextExpandedIds.add(entryId)
+  }
+  expandedVocabularyCardNoteIds.value = nextExpandedIds
+}
+
+const locationDetailsSourcePoints = computed(() => {
+  return viewMode.value === 'map' ? mapPoints.value : locationDetailsPoints.value
+})
+
+const locationDetailsDisplayPoints = computed(() => {
+  const queryParts = normalizeLocationDetailsSearchText(locationDetailsSearchQuery.value)
+  const points = queryParts.length
+    ? locationDetailsSourcePoints.value.filter((point) => {
+      const pointParts = normalizeLocationDetailsSearchText(buildLocationDetailsSearchText(point))
+      return queryParts.some((queryPart) => pointParts.some((pointPart) => pointPart.includes(queryPart)))
+    })
+    : [...locationDetailsSourcePoints.value]
+
+  if (locationDetailsSortByRegion.value) {
+    points.sort(compareLocationDetailsByRegion)
+  }
+
+  return points
+})
 
 const searchFieldOptions = computed(() => [
   { value: 'definition', label: t('words.wordList.search.fields.definition') },
@@ -248,9 +817,20 @@ const searchFieldOptions = computed(() => [
   { value: 'pronunciation', label: t('words.wordList.search.fields.ipa') },
   { value: 'detail', label: t('words.wordList.search.fields.notes') }
 ])
+const activeSearchFieldOptions = computed(() => isCharacterNotesMode.value
+  ? searchFieldOptions.value.filter((field) => ['pronunciation', 'detail'].includes(field.value))
+  : searchFieldOptions.value)
+
+const isNotesInitialLoading = computed(() => isLoadingNotes.value && !notesEntries.value.length && !notesLoadError.value)
+const canLoadMoreNotes = computed(() => !isLoadingNotes.value && notesEntries.value.length < notesTotal.value)
 
 const locationOptions = computed(() => {
-  return vocabularyLocationOptions.value
+  return [...vocabularyLocationOptions.value]
+    .sort((a, b) => String(a.label || '').localeCompare(String(b.label || ''), 'zh-Hans-CN'))
+    .map((opt) => ({
+      ...opt,
+      searchText: opt.locationLabel || '',
+    }))
 })
 
 const provinceOptions = computed(() => {
@@ -262,6 +842,7 @@ const provinceOptions = computed(() => {
       return true
     })
     .map((opt) => ({ value: opt.province, label: opt.province }))
+    .sort((a, b) => a.label.localeCompare(b.label, 'zh-Hans-CN'))
   return [
     { value: '', label: t('words.wordList.search.allProvinces') },
     ...provinces,
@@ -273,6 +854,7 @@ const cityOptions = computed(() => {
   const cities = vocabularyLocationOptions.value
     .filter((opt) => opt.province === selectedProvince.value && opt.city && !seen.has(opt.city) && seen.add(opt.city))
     .map((opt) => ({ value: opt.city, label: opt.city }))
+    .sort((a, b) => a.label.localeCompare(b.label, 'zh-Hans-CN'))
   return [
     { value: '', label: t('words.wordList.search.allCities') },
     ...cities,
@@ -291,6 +873,7 @@ const standardWordOptions = computed(() => {
 })
 
 const isInitialLoading = computed(() => isLoadingItems.value && !entries.value.length && !loadError.value)
+const isMapInitialLoading = computed(() => (isLoadingItems.value || isLoadingStandardWords.value) && !mapDataForVocabularyMap.value.length && !loadError.value)
 const isLoadingMore = computed(() => isLoadingItems.value && entries.value.length > 0)
 
 const canLoadMore = computed(() => {
@@ -329,10 +912,22 @@ const mapDataForVocabularyMap = computed(() => {
       longitude: point.longitude,
       latitude: point.latitude,
       entryCount: point.entryCount,
+
       locationName: point.locationName,
-      location: point.locationName,
-      county: point.locationName,
-      province: point.locationLabel,
+      locationLabel: point.locationLabel,
+      province: point.province,
+      city: point.city,
+      county: point.county,
+      town: point.town,
+      administrativeVillage: point.administrativeVillage,
+      naturalVillage: point.naturalVillage,
+      yindianRegion: point.yindianRegion,
+      atlasRegion: point.atlasRegion,
+      vocabularySource: point.vocabularySource,
+      description: point.description,
+      other: point.other,
+      ...Object.fromEntries(TONE_FIELD_KEYS.map((key) => [key, point[key] || ''])),
+
       pronunciation: point.pronunciation || point.markerLabel,
       localExpression: point.localExpression || '',
       standardWord: point.definition || '',
@@ -341,15 +936,15 @@ const mapDataForVocabularyMap = computed(() => {
 })
 
 function shouldUseVocabularyItemsApi() {
-  return viewMode.value === 'card'
+  return !isCharacterNotesMode.value && viewMode.value === 'card'
 }
 
 function shouldUseVocabularyMapPointsApi() {
-  return viewMode.value === 'map' && !selectedStandardWords.value.length
+  return !isCharacterNotesMode.value && viewMode.value === 'map' && !selectedStandardWords.value.length
 }
 
 function shouldUseVocabularyMapItemsApi() {
-  return viewMode.value === 'map' && selectedStandardWords.value.length > 0
+  return !isCharacterNotesMode.value && viewMode.value === 'map' && selectedStandardWords.value.length > 0
 }
 
 function normalizeSelectedSearchFields() {
@@ -364,6 +959,57 @@ function normalizeSelectedSearchFields() {
 function normalizeNumber(value) {
   const numberValue = Number(value)
   return Number.isFinite(numberValue) ? numberValue : null
+}
+
+function normalizeLocationDetailsSearchText(value) {
+  const raw = String(value || '').trim().toLowerCase()
+  if (!raw) {
+    return []
+  }
+
+  return [
+    raw,
+    locationDetailsT2S(raw).toLowerCase(),
+    locationDetailsS2T(raw).toLowerCase(),
+  ].filter((part, index, parts) => part && parts.indexOf(part) === index)
+}
+
+function buildLocationDetailsSearchText(point) {
+  return [
+    point?.locationName,
+    point?.locationLabel,
+    point?.province,
+    point?.city,
+    point?.county,
+    point?.town,
+    point?.administrativeVillage,
+    point?.naturalVillage,
+  ].filter(Boolean).join(' ')
+}
+
+function compareLocationDetailsByRegion(a, b) {
+  const aParts = [
+    a?.province,
+    a?.city,
+    a?.county,
+    a?.town,
+    a?.administrativeVillage,
+    a?.naturalVillage,
+    a?.locationName,
+  ]
+  const bParts = [
+    b?.province,
+    b?.city,
+    b?.county,
+    b?.town,
+    b?.administrativeVillage,
+    b?.naturalVillage,
+    b?.locationName,
+  ]
+
+  return aParts
+    .map((part, index) => String(part || '').localeCompare(String(bParts[index] || ''), 'zh-Hans-CN'))
+    .find((result) => result !== 0) || 0
 }
 
 function normalizeVocabularyEntry(item, index = 0, locationContext = '') {
@@ -389,11 +1035,139 @@ function normalizeVocabularyEntry(item, index = 0, locationContext = '') {
     pronunciationType: item.pronunciation_type || '',
     detail: [...new Set(detailParts)].join(' · '),
     information: item.informations || '',
-    location: item.location_label || item.location || item.location_name || '',
     locationName,
-    longitude: normalizeNumber(item.longitude),
-    latitude: normalizeNumber(item.latitude),
+    location: item.location_name || item.location || item.location_label || locationContext || '',
   }
+}
+
+function normalizeNotesEntry(item) {
+  return {
+    id: item.id,
+    locationName: item.location_name || '',
+    character: item.character || '',
+    pronunciation: item.ipa || '',
+    notes: item.notes || '',
+  }
+}
+
+function setNotesCardNoteMeasureEl(entryId, element) {
+  if (element) {
+    notesCardNoteMeasureEls.set(entryId, element)
+  } else {
+    notesCardNoteMeasureEls.delete(entryId)
+  }
+}
+
+function measureNotesCardNoteOverflow() {
+  const overflowedIds = new Set()
+
+  notesCardNoteMeasureEls.forEach((element, entryId) => {
+    if (element.clientWidth > 0 && element.scrollWidth > element.clientWidth + 1) {
+      overflowedIds.add(entryId)
+    }
+  })
+
+  notesCardNoteOverflowIds.value = overflowedIds
+  expandedNotesCardNoteIds.value = new Set(
+    [...expandedNotesCardNoteIds.value].filter((entryId) => overflowedIds.has(entryId)),
+  )
+}
+
+function isNotesCardNoteExpanded(entryId) {
+  return expandedNotesCardNoteIds.value.has(entryId)
+}
+
+function shouldShowNotesCardNoteToggle(entryId) {
+  return notesCardNoteOverflowIds.value.has(entryId)
+}
+
+function toggleNotesCardNote(entryId) {
+  const expandedIds = new Set(expandedNotesCardNoteIds.value)
+  if (expandedIds.has(entryId)) {
+    expandedIds.delete(entryId)
+  } else {
+    expandedIds.add(entryId)
+  }
+  expandedNotesCardNoteIds.value = expandedIds
+}
+
+async function openNotesLocationDetail(locationName) {
+  const normalizedLocationName = String(locationName || '').trim()
+  if (!normalizedLocationName) return
+
+  const requestId = ++notesLocationPopupRequestId
+  notesLocationPopup.value = {
+    visible: true,
+    locationName: normalizedLocationName,
+    data: null,
+    loading: true,
+  }
+
+  try {
+    const data = await getLocationDetail(normalizedLocationName)
+    if (requestId !== notesLocationPopupRequestId) return
+    notesLocationPopup.value.data = data
+  } catch {
+    if (requestId !== notesLocationPopupRequestId) return
+    notesLocationPopup.value.data = null
+  } finally {
+    if (requestId === notesLocationPopupRequestId) {
+      notesLocationPopup.value.loading = false
+    }
+  }
+}
+
+function closeNotesLocationPopup() {
+  notesLocationPopupRequestId += 1
+  notesLocationPopup.value.visible = false
+  notesLocationPopup.value.loading = false
+}
+
+async function loadNotes({ append = false } = {}) {
+  if (!isCharacterNotesMode.value) return
+
+  const nextPage = append ? notesPage.value + 1 : 1
+  const params = {
+    q: notesQuery.value.trim(),
+    search_fields: normalizeNotesSearchFields(notesSearchFields.value),
+    locations: appliedScope.value.locations,
+    regions: appliedScope.value.regions,
+    region_mode: appliedScope.value.regionUsing,
+    page: nextPage,
+    page_size: notesPageSize.value,
+  }
+  const requestKey = JSON.stringify(params)
+  activeNotesRequestKey.value = requestKey
+  isLoadingNotes.value = true
+  notesLoadError.value = ''
+  try {
+    const response = await searchNotes(params)
+    if (activeNotesRequestKey.value !== requestKey || !isCharacterNotesMode.value) return
+    const nextEntries = Array.isArray(response.items) ? response.items.map(normalizeNotesEntry) : []
+    notesEntries.value = append ? notesEntries.value.concat(nextEntries) : nextEntries
+    notesTotal.value = Number(response.total) || notesEntries.value.length
+    notesPage.value = Number(response.page) || nextPage
+    notesPageSize.value = Number(response.page_size) || notesPageSize.value
+  } catch (error) {
+    if (activeNotesRequestKey.value !== requestKey || !isCharacterNotesMode.value) return
+    notesLoadError.value = error.message || t('words.wordList.states.loadItemsFailed')
+    if (!append) {
+      notesEntries.value = []
+      notesTotal.value = 0
+    }
+  } finally {
+    if (activeNotesRequestKey.value === requestKey) isLoadingNotes.value = false
+  }
+}
+
+function refreshNotes() {
+  appliedScope.value = cloneNotesScope(draftScope.value)
+  notesPage.value = 1
+  loadNotes()
+}
+
+function handleNotesScopeResolved(scope) {
+  draftScope.value = cloneNotesScope(scope)
 }
 
 function buildVocabularyQueryParams() {
@@ -437,14 +1211,125 @@ function buildVocabularyMapItemsParams() {
   }
 }
 
+function buildMapDetailItemsParams(locations, pageNumber) {
+  return {
+    ...buildVocabularyQueryParams(),
+    locations,
+    page: pageNumber,
+    page_size: pageSize.value,
+  }
+}
+
+function normalizeVocabularyMapRequestValue(value) {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item))
+  }
+
+  return value
+}
+
+function buildVocabularyMapRequestKey(kind, params) {
+  const normalizedEntries = Object.entries(params)
+    .filter(([, value]) => Array.isArray(value) ? value.length : value !== '' && value != null)
+    .map(([key, value]) => [key, normalizeVocabularyMapRequestValue(value)])
+
+  return `${kind}:${JSON.stringify(normalizedEntries)}`
+}
+
+async function requestVocabularyItems(params) {
+  const requestKey = buildVocabularyMapRequestKey('items', params)
+  if (pendingVocabularyItemRequests.has(requestKey)) {
+    return pendingVocabularyItemRequests.get(requestKey)
+  }
+
+  const requestPromise = getVocabularyItems(params)
+    .finally(() => {
+      pendingVocabularyItemRequests.delete(requestKey)
+    })
+  pendingVocabularyItemRequests.set(requestKey, requestPromise)
+  return requestPromise
+}
+
+async function requestVocabularyMapPoints(params = buildVocabularyMapPointsParams()) {
+  const requestKey = buildVocabularyMapRequestKey('map-points', params)
+  if (pendingVocabularyMapPointRequests.has(requestKey)) {
+    return pendingVocabularyMapPointRequests.get(requestKey)
+  }
+
+  const requestPromise = getVocabularyMapPoints(params)
+    .finally(() => {
+      pendingVocabularyMapPointRequests.delete(requestKey)
+    })
+  pendingVocabularyMapPointRequests.set(requestKey, requestPromise)
+  return requestPromise
+}
+
+async function requestVocabularyMapItems(params = buildVocabularyMapItemsParams()) {
+  const requestKey = buildVocabularyMapRequestKey('map-items', params)
+  if (pendingVocabularyMapPointRequests.has(requestKey)) {
+    return pendingVocabularyMapPointRequests.get(requestKey)
+  }
+
+  const requestPromise = getVocabularyMapItems(params)
+    .finally(() => {
+      pendingVocabularyMapPointRequests.delete(requestKey)
+    })
+  pendingVocabularyMapPointRequests.set(requestKey, requestPromise)
+  return requestPromise
+}
+
+async function requestVocabularyStandardWords(params = buildVocabularyStandardWordsParams()) {
+  const requestKey = buildVocabularyMapRequestKey('standard-words', params)
+  if (pendingVocabularyStandardWordRequests.has(requestKey)) {
+    return pendingVocabularyStandardWordRequests.get(requestKey)
+  }
+
+  const requestPromise = getVocabularyStandardWords(params)
+    .finally(() => {
+      pendingVocabularyStandardWordRequests.delete(requestKey)
+    })
+  pendingVocabularyStandardWordRequests.set(requestKey, requestPromise)
+  return requestPromise
+}
+
+async function requestVocabularyMapDetailItems(params) {
+  const requestKey = buildVocabularyMapRequestKey('map-detail-items', params)
+  if (mapDetailItemsCache.has(requestKey)) {
+    return mapDetailItemsCache.get(requestKey)
+  }
+
+  const response = await requestVocabularyItems(params)
+  mapDetailItemsCache.set(requestKey, response)
+  return response
+}
+
 function normalizeVocabularyMapPoint(point) {
   const locationName = point.location_name || ''
-  const locationLabel = point.location_label || locationName
   const entryCount = Number(point.entry_count) || 0
+  const locationLabel = [
+    point.province,
+    point.city,
+    point.county,
+    point.town,
+    point.administrative_village,
+    point.natural_village,
+  ].filter(Boolean).join(' · ') || locationName
 
   return {
     locationName,
     locationLabel,
+    province: point.province || '',
+    city: point.city || '',
+    county: point.county || '',
+    town: point.town || '',
+    administrativeVillage: point.administrative_village || '',
+    naturalVillage: point.natural_village || '',
+    yindianRegion: point.yindian_region || '',
+    atlasRegion: point.atlas_region || '',
+    vocabularySource: point.vocabulary_source || '',
+    description: point.description || '',
+    other: point.other || '',
+    ...Object.fromEntries(TONE_FIELD_KEYS.map((key) => [key, point[key] || ''])),
     longitude: normalizeNumber(point.longitude),
     latitude: normalizeNumber(point.latitude),
     entryCount,
@@ -496,25 +1381,52 @@ async function loadVocabularyItems({ append = false } = {}) {
   }
 
   const nextPage = append ? page.value + 1 : 1
+  const requestParams = buildVocabularyItemsParams({ page: nextPage })
+  const requestKey = buildVocabularyMapRequestKey('items', requestParams)
+
+  if (!append && itemsCacheKey.value === requestKey) {
+    return
+  }
+
+  if (append) {
+    itemsCacheKey.value = ''
+  }
+
+  activeVocabularyItemsRequestKey.value = requestKey
+  activeMapPointsRequestKey.value = ''
   page.value = nextPage
   isLoadingItems.value = true
   loadError.value = ''
 
   try {
-    const response = await getVocabularyItems(buildVocabularyItemsParams())
+    const response = await requestVocabularyItems(requestParams)
+    if (activeVocabularyItemsRequestKey.value !== requestKey || !shouldUseVocabularyItemsApi()) {
+      return
+    }
+
     const nextEntries = Array.isArray(response.items) ? response.items.map((item, index) => normalizeVocabularyEntry(item, index)) : []
     entries.value = append ? entries.value.concat(nextEntries) : nextEntries
     total.value = Number(response.total) || entries.value.length
     page.value = Number(response.page) || nextPage
     pageSize.value = Number(response.page_size) || pageSize.value
+    if (!append) {
+      itemsCacheKey.value = requestKey
+    }
   } catch (error) {
+    if (activeVocabularyItemsRequestKey.value !== requestKey || !shouldUseVocabularyItemsApi()) {
+      return
+    }
+
     loadError.value = error.message || t('words.wordList.states.loadItemsFailed')
+    itemsCacheKey.value = ''
     if (!append) {
       entries.value = []
       total.value = 0
     }
   } finally {
-    isLoadingItems.value = false
+    if (activeVocabularyItemsRequestKey.value === requestKey) {
+      isLoadingItems.value = false
+    }
   }
 }
 
@@ -523,48 +1435,108 @@ async function loadVocabularyMapPoints() {
     return
   }
 
+  const shouldLoadMapItems = shouldUseVocabularyMapItemsApi()
+  const requestParams = shouldLoadMapItems
+    ? buildVocabularyMapItemsParams()
+    : buildVocabularyMapPointsParams()
+  const requestKey = buildVocabularyMapRequestKey(shouldLoadMapItems ? 'map-items' : 'map-points', requestParams)
+
+  if (mapPointsCacheKey.value === requestKey) {
+    return
+  }
+
+  activeMapPointsRequestKey.value = requestKey
+  activeVocabularyItemsRequestKey.value = ''
   isLoadingItems.value = true
   loadError.value = ''
   entries.value = []
+  itemsCacheKey.value = ''
   total.value = 0
 
   try {
-    const shouldLoadMapItems = shouldUseVocabularyMapItemsApi()
     const response = shouldLoadMapItems
-      ? await getVocabularyMapItems(buildVocabularyMapItemsParams())
-      : await getVocabularyMapPoints(buildVocabularyMapPointsParams())
+      ? await requestVocabularyMapItems(requestParams)
+      : await requestVocabularyMapPoints(requestParams)
+    if (activeMapPointsRequestKey.value !== requestKey || (!shouldUseVocabularyMapPointsApi() && !shouldUseVocabularyMapItemsApi())) {
+      return
+    }
+
     mapPoints.value = Array.isArray(response.points)
       ? response.points.map(shouldLoadMapItems ? normalizeVocabularyMapItemPoint : normalizeVocabularyMapPoint)
       : []
+    mapPointsCacheKey.value = requestKey
     mapStats.value = {
       totalEntries: Number(response.total_entries) || 0,
       totalPoints: Number(response.total_points) || mapPoints.value.length,
       omittedWithoutCoordinates: Number(response.omitted_without_coordinates) || 0,
     }
   } catch (error) {
+    if (activeMapPointsRequestKey.value !== requestKey || (!shouldUseVocabularyMapPointsApi() && !shouldUseVocabularyMapItemsApi())) {
+      return
+    }
+
     loadError.value = error.message || t('words.wordList.states.loadMapFailed')
     mapPoints.value = []
+    mapPointsCacheKey.value = ''
     mapStats.value = {
       totalEntries: 0,
       totalPoints: 0,
       omittedWithoutCoordinates: 0,
     }
   } finally {
-    isLoadingItems.value = false
+    if (activeMapPointsRequestKey.value === requestKey) {
+      isLoadingItems.value = false
+    }
   }
 }
 
 async function loadVocabularyLocationOptions() {
-  try {
-    vocabularyLocationOptions.value = await getVocabularyLocationOptions()
-  } catch {
-    vocabularyLocationOptions.value = []
+  if (vocabularyLocationOptionsLoaded.value) {
+    return vocabularyLocationOptions.value
   }
+
+  if (vocabularyLocationOptionsRequest) {
+    return vocabularyLocationOptionsRequest
+  }
+
+  vocabularyLocationOptionsRequest = getVocabularyLocationOptions()
+    .then((options) => {
+      vocabularyLocationOptions.value = options
+      vocabularyLocationOptionsLoaded.value = true
+      return options
+    })
+    .catch(() => {
+      vocabularyLocationOptions.value = []
+      return []
+    })
+    .finally(() => {
+      vocabularyLocationOptionsRequest = null
+    })
+
+  return vocabularyLocationOptionsRequest
 }
 
 async function loadVocabularyStandardWords() {
+  if (viewMode.value !== 'map') {
+    return
+  }
+
+  const requestParams = buildVocabularyStandardWordsParams()
+  const requestKey = buildVocabularyMapRequestKey('standard-words', requestParams)
+
+  if (standardWordsCacheKey.value === requestKey) {
+    return
+  }
+
+  activeStandardWordsRequestKey.value = requestKey
+  isLoadingStandardWords.value = true
+
   try {
-    const response = await getVocabularyStandardWords(buildVocabularyStandardWordsParams())
+    const response = await requestVocabularyStandardWords(requestParams)
+    if (activeStandardWordsRequestKey.value !== requestKey || viewMode.value !== 'map') {
+      return
+    }
+
     const standardWords = Array.isArray(response.standard_words) ? response.standard_words : []
     vocabularyStandardWordOptions.value = standardWords
       .map((item) => {
@@ -585,20 +1557,24 @@ async function loadVocabularyStandardWords() {
     if (selectedStandardWord.value && !optionValues.has(selectedStandardWord.value)) {
       selectedStandardWord.value = ''
     }
-    selectedStandardWordsModel.value = selectedStandardWordsModel.value.filter((value) => optionValues.has(value))
+    const filteredStandardWords = selectedStandardWordsModel.value.filter((value) => optionValues.has(value))
+    if (filteredStandardWords.length !== selectedStandardWordsModel.value.length) {
+      selectedStandardWordsModel.value = filteredStandardWords
+    }
+    standardWordsCacheKey.value = requestKey
   } catch {
+    if (activeStandardWordsRequestKey.value !== requestKey || viewMode.value !== 'map') {
+      return
+    }
+
     vocabularyStandardWordOptions.value = []
     selectedStandardWord.value = ''
+    standardWordsCacheKey.value = ''
+  } finally {
+    if (activeStandardWordsRequestKey.value === requestKey) {
+      isLoadingStandardWords.value = false
+    }
   }
-}
-
-function buildMapDetailTitle(baseLabel, count) {
-  const parts = [baseLabel]
-  if (selectedStandardWords.value.length > 0) {
-    parts.push(selectedStandardWords.value.join('、'))
-  }
-  parts.push(t('words.wordList.map.pointCount', { count }))
-  return parts.join(' · ')
 }
 
 async function handleMapPointClick(point) {
@@ -608,8 +1584,9 @@ async function handleMapPointClick(point) {
     return
   }
 
-  const baseLabel = point.locationLabel || point.locationName || locations[0]
+  const baseLabel = point.locationName || point.locationLabel || locations[0]
   activeMapPointBaseLabel.value = baseLabel
+  activeMapPointMeta.value = point
   isMapDetailModalOpen.value = true
   isLoadingMapDetail.value = true
   mapDetailError.value = ''
@@ -620,33 +1597,43 @@ async function handleMapPointClick(point) {
 
   // map-items mode: count entries from the matching points directly
   if (selectedStandardWords.value.length > 0) {
+    activeMapDetailRequestKey.value = ''
     const locationSet = new Set(locations)
     const matchingPoints = mapPoints.value.filter((p) => locationSet.has(p.locationName))
     const allItems = matchingPoints.flatMap((p) => (Array.isArray(p.items) ? p.items : []))
     mapDetailEntries.value = allItems
     mapDetailTotal.value = allItems.length
-    selectedMapPointLabel.value = buildMapDetailTitle(baseLabel, allItems.length)
+    selectedMapPointLabel.value = baseLabel
     isLoadingMapDetail.value = false
     return
   }
 
   // overview mode: fetch entries, then set title with real count
+  const requestParams = buildMapDetailItemsParams(locations, 1)
+  const requestKey = buildVocabularyMapRequestKey('map-detail-items', requestParams)
+  activeMapDetailRequestKey.value = requestKey
+
   try {
-    const response = await getVocabularyItems({
-      ...buildVocabularyQueryParams(),
-      locations,
-      page: 1,
-      page_size: pageSize.value,
-    })
+    const response = await requestVocabularyMapDetailItems(requestParams)
+    if (activeMapDetailRequestKey.value !== requestKey) {
+      return
+    }
+
     mapDetailEntries.value = Array.isArray(response.items) ? response.items.map((item, index) => normalizeVocabularyEntry(item, index)) : []
     mapDetailTotal.value = Number(response.total) || mapDetailEntries.value.length
     mapDetailPage.value = Number(response.page) || 1
-    selectedMapPointLabel.value = buildMapDetailTitle(baseLabel, mapDetailEntries.value.length)
+    selectedMapPointLabel.value = baseLabel
   } catch (error) {
+    if (activeMapDetailRequestKey.value !== requestKey) {
+      return
+    }
+
     mapDetailError.value = error.message || t('words.wordList.states.loadItemsFailed')
     mapDetailEntries.value = []
   } finally {
-    isLoadingMapDetail.value = false
+    if (activeMapDetailRequestKey.value === requestKey) {
+      isLoadingMapDetail.value = false
+    }
   }
 }
 
@@ -656,26 +1643,34 @@ async function loadMoreMapDetail() {
   }
 
   const nextPage = mapDetailPage.value + 1
+  const requestParams = buildMapDetailItemsParams(activeMapPointLocations.value, nextPage)
+  const requestKey = buildVocabularyMapRequestKey('map-detail-items', requestParams)
+  activeMapDetailRequestKey.value = requestKey
   isLoadingMapDetail.value = true
 
   try {
-    const response = await getVocabularyItems({
-      ...buildVocabularyQueryParams(),
-      locations: activeMapPointLocations.value,
-      page: nextPage,
-      page_size: pageSize.value,
-    })
+    const response = await requestVocabularyMapDetailItems(requestParams)
+    if (activeMapDetailRequestKey.value !== requestKey) {
+      return
+    }
+
     const nextEntries = Array.isArray(response.items)
       ? response.items.map((item, index) => normalizeVocabularyEntry(item, mapDetailEntries.value.length + index))
       : []
     mapDetailEntries.value = mapDetailEntries.value.concat(nextEntries)
     mapDetailTotal.value = Number(response.total) || mapDetailEntries.value.length
     mapDetailPage.value = Number(response.page) || nextPage
-    selectedMapPointLabel.value = buildMapDetailTitle(activeMapPointBaseLabel.value, mapDetailEntries.value.length)
+    selectedMapPointLabel.value = activeMapPointBaseLabel.value
   } catch (error) {
+    if (activeMapDetailRequestKey.value !== requestKey) {
+      return
+    }
+
     mapDetailError.value = error.message || t('words.wordList.states.loadItemsFailed')
   } finally {
-    isLoadingMapDetail.value = false
+    if (activeMapDetailRequestKey.value === requestKey) {
+      isLoadingMapDetail.value = false
+    }
   }
 }
 
@@ -684,32 +1679,139 @@ function clearMapDetailModal() {
   mapDetailError.value = ''
   activeMapPointLocations.value = []
   activeMapPointBaseLabel.value = ''
+  activeMapPointMeta.value = null
+}
+
+function toggleLocationDetail(locationName) {
+  const next = new Set(expandedLocationKeys.value)
+  if (next.has(locationName)) {
+    next.delete(locationName)
+  } else {
+    next.add(locationName)
+  }
+  expandedLocationKeys.value = next
+}
+
+function clearLocationDetailsModal() {
+  expandedLocationKeys.value = new Set()
+  locationDetailsSearchQuery.value = ''
+  locationDetailsError.value = ''
+}
+
+async function openLocationDetails(focusedLocationName = '') {
+  const normalizedFocusedLocationName = String(focusedLocationName || '').trim()
+  expandedLocationKeys.value = normalizedFocusedLocationName ? new Set([normalizedFocusedLocationName]) : new Set()
+  locationDetailsSearchQuery.value = normalizedFocusedLocationName
+  locationDetailsError.value = ''
+  isLocationDetailsModalOpen.value = true
+
+  // 地图模式已加载 mapPoints，直接复用，避免重复请求
+  if (viewMode.value === 'map') {
+    return
+  }
+
+  const requestParams = buildVocabularyMapPointsParams()
+  const requestKey = buildVocabularyMapRequestKey('map-points', requestParams)
+
+  if (locationDetailsPointsCacheKey.value === requestKey) {
+    return
+  }
+
+  if (mapPointsCacheKey.value === requestKey) {
+    locationDetailsPoints.value = mapPoints.value
+    locationDetailsPointsCacheKey.value = requestKey
+    return
+  }
+
+  isLoadingLocationDetails.value = true
+
+  try {
+    const response = await requestVocabularyMapPoints(requestParams)
+    locationDetailsPoints.value = Array.isArray(response.points)
+      ? response.points.map(normalizeVocabularyMapPoint)
+      : []
+    locationDetailsPointsCacheKey.value = requestKey
+  } catch (error) {
+    locationDetailsError.value = error.message || t('words.wordList.states.loadMapFailed')
+    locationDetailsPoints.value = []
+    locationDetailsPointsCacheKey.value = ''
+  } finally {
+    isLoadingLocationDetails.value = false
+  }
+}
+
+async function refreshVocabularyMapData() {
+  await loadVocabularyStandardWords()
+  loadVocabularyMapPoints()
 }
 
 function loadActiveViewMode() {
   if (shouldUseVocabularyItemsApi()) {
     loadVocabularyItems()
   } else if (shouldUseVocabularyMapPointsApi()) {
-    loadVocabularyMapPoints()
+    refreshVocabularyMapData()
   } else if (shouldUseVocabularyMapItemsApi()) {
-    loadVocabularyMapPoints()
+    refreshVocabularyMapData()
   }
 }
 
 onMounted(async () => {
+  if (isCharacterNotesMode.value) {
+    if (!NOTES_VIEW_MODES.includes(route.query.tab)) {
+      await router.replace({ query: { ...route.query, source: 'character-notes', tab: 'card' } })
+    }
+    loadNotes()
+    return
+  }
   await loadVocabularyLocationOptions()
-  loadVocabularyStandardWords()
   loadActiveViewMode()
 })
 
+watch(entries, () => {
+  const entryIds = new Set(entries.value.map((entry) => entry.id))
+  expandedVocabularyCardNoteIds.value = new Set([...expandedVocabularyCardNoteIds.value].filter((entryId) => entryIds.has(entryId)))
+})
+
+watch(notesCardGridEl, (gridElement) => {
+  notesCardResizeObserver?.disconnect()
+  notesCardResizeObserver = null
+
+  if (!gridElement) return
+
+  notesCardResizeObserver = new ResizeObserver(() => {
+    nextTick(measureNotesCardNoteOverflow)
+  })
+  notesCardResizeObserver.observe(gridElement)
+  nextTick(measureNotesCardNoteOverflow)
+}, { flush: 'post' })
+
+watch(notesEntries, () => {
+  const entryIds = new Set(notesEntries.value.map((entry) => entry.id))
+  notesCardNoteMeasureEls.forEach((_, entryId) => {
+    if (!entryIds.has(entryId)) {
+      notesCardNoteMeasureEls.delete(entryId)
+    }
+  })
+  notesCardNoteOverflowIds.value = new Set(
+    [...notesCardNoteOverflowIds.value].filter((entryId) => entryIds.has(entryId)),
+  )
+  expandedNotesCardNoteIds.value = new Set(
+    [...expandedNotesCardNoteIds.value].filter((entryId) => entryIds.has(entryId)),
+  )
+  nextTick(measureNotesCardNoteOverflow)
+}, { flush: 'post' })
+
 watch(() => route.query.tab, (tab) => {
-  const nextMode = tab ? normalizeViewMode(tab) : resolveViewModeFromRoute()
+  const nextMode = isCharacterNotesMode.value
+    ? resolveNotesViewMode(tab)
+    : (tab ? normalizeViewMode(tab) : resolveViewModeFromRoute())
   if (viewMode.value !== nextMode) {
     viewMode.value = nextMode
   }
 })
 
 watch(viewMode, () => {
+  if (isCharacterNotesMode.value) return
   loadActiveViewMode()
 })
 
@@ -729,16 +1831,38 @@ watch(singleSelect, (val) => {
   localStorage.setItem('vocabulary_single_select', val ? 'true' : 'false')
 })
 
-watchDebounced([query, selectedSearchFields, selectedLocations, filterByRegion, selectedProvince, selectedCity], () => {
-  loadVocabularyStandardWords()
+watch(notesSearchFields, (val) => {
+  localStorage.setItem('vocabulary_notes_search_fields', JSON.stringify(normalizeNotesSearchFields(val)))
+}, { deep: true })
 
+watch(isCharacterNotesMode, async (isNotes) => {
+  if (isNotes) {
+    const nextMode = resolveNotesViewMode(route.query.tab)
+    if (viewMode.value !== nextMode) viewMode.value = nextMode
+    if (!NOTES_VIEW_MODES.includes(route.query.tab)) {
+      await router.replace({ query: { ...route.query, source: 'character-notes', tab: 'card' } })
+    }
+    loadNotes()
+  } else {
+    if (viewMode.value === 'list') viewMode.value = 'card'
+    closeNotesLocationPopup()
+    await loadVocabularyLocationOptions()
+    loadActiveViewMode()
+  }
+})
+
+watchDebounced([query, selectedSearchFields, selectedLocations, filterByRegion, selectedProvince, selectedCity], async () => {
   if (shouldUseVocabularyItemsApi()) {
     loadVocabularyItems()
   } else if (shouldUseVocabularyMapPointsApi()) {
-    loadVocabularyMapPoints()
+    await refreshVocabularyMapData()
   } else if (shouldUseVocabularyMapItemsApi()) {
-    loadVocabularyMapPoints()
+    await refreshVocabularyMapData()
   }
+}, { debounce: 250, maxWait: 800 })
+
+watchDebounced([notesQuery, notesSearchFields], () => {
+  loadNotes()
 }, { debounce: 250, maxWait: 800 })
 
 watch(singleSelect, (isSingle) => {
@@ -758,6 +1882,11 @@ watch(selectedStandardWords, (words) => {
   if (shouldUseVocabularyMapPointsApi() || shouldUseVocabularyMapItemsApi()) {
     loadVocabularyMapPoints()
   }
+})
+
+onBeforeUnmount(() => {
+  notesCardResizeObserver?.disconnect()
+  notesCardResizeObserver = null
 })
 </script>
 

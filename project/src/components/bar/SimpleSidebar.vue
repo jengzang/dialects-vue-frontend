@@ -1,13 +1,14 @@
 <!-- SimpleSidebar.vue - 简化的侧边栏 -->
 <template>
-  <!-- 遮罩层 -->
-  <Transition name="fade">
-    <div v-if="isOpen" class="overlay main-sidebar-overlay" @click="$emit('close')" @wheel.prevent @touchmove.prevent></div>
-  </Transition>
+  <Teleport to="body">
+    <!-- 遮罩层 -->
+    <Transition name="fade">
+      <div v-if="isOpen" class="overlay main-sidebar-overlay" @click="$emit('close')" @wheel.prevent @touchmove.prevent></div>
+    </Transition>
 
-  <!-- 侧边栏 -->
-  <Transition name="slide-fade">
-    <div v-if="isOpen" class="sidebar main-sidebar-shell" @touchmove.stop>
+    <!-- 侧边栏 -->
+    <Transition name="slide-fade">
+      <div v-if="isOpen" class="sidebar main-sidebar-shell" @touchmove.stop>
       <!-- 标题图片 (可选) -->
       <div v-if="showTitle" class="sidebar-header">
         <img src="/brand/title.webp" alt="Title" class="title-img title-logo" />
@@ -53,8 +54,9 @@
 
         <div class="icp-number">粤ICP备2025466875号</div>
       </div>
-    </div>
-  </Transition>
+      </div>
+    </Transition>
+  </Teleport>
 
   <!-- 访问历史弹窗 -->
   <AppModal
@@ -261,6 +263,23 @@ watch(() => route.fullPath, () => {
   }
 })
 
+// 侧边栏打开时锁定页面滚动，避免滚轮/触摸滚动穿透到背后页面
+let savedBodyOverflow = ''
+
+watch(
+  () => props.isOpen,
+  (open) => {
+    if (typeof document === 'undefined') return
+    if (open) {
+      savedBodyOverflow = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = savedBodyOverflow
+    }
+  },
+  { immediate: true }
+)
+
 // 访问统计相关
 const isStatsExpanded = ref(false);
 
@@ -432,6 +451,7 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
+  if (props.isOpen) document.body.style.overflow = savedBodyOverflow;
   document.removeEventListener('click', closeSubmenu);
   if (hoverMediaQuery) {
     hoverMediaQuery.removeEventListener('change', updateInputCapabilities);
@@ -482,12 +502,14 @@ $portrait-ratio: 1;
 .overlay {
   position: fixed;
   top: 0;
-  left: min(40dvw + 40px, 340px);
+  // left: calc(min(40dvw + 40px, 330px) + 12px);
+  left: 0;
   z-index: 1000;
-  width: calc(100dvw - min(40dvw + 40px, 340px));
+  // width: calc(100dvw - min(40dvw + 40px, 340px) - 12px);
+  width: 100dvw;
   height: 100dvh;
 
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 
@@ -510,7 +532,7 @@ $portrait-ratio: 1;
   width: 100%;
   margin-top: 10px;
   margin-bottom: 15px;
-  overflow-x: auto;
+  flex-shrink: 0;
 }
 
 
@@ -592,6 +614,7 @@ $portrait-ratio: 1;
   text-align: center;
   color: var(--text-gray);
   font-size: 14px;
+  flex-shrink: 0;
 }
 
 
@@ -898,7 +921,7 @@ $portrait-ratio: 1;
   &-leave-to {
     opacity: 0;
 
-    transform: translateX(-100%);
+    transform: translateX(calc(-100% - 12px));
   }
 }
 
@@ -938,6 +961,21 @@ $portrait-ratio: 1;
 
 
 /* 移动端保持 SimpleSidebar 原逻辑 */
+
+@media (max-aspect-ratio: $portrait-ratio) {
+
+  // .overlay {
+  //   left: min(40dvw + 40px, 340px);
+  //   width: calc(100dvw - min(40dvw + 40px, 340px));
+  // }
+
+  .slide-fade {
+    &-enter-from,
+    &-leave-to {
+      transform: translateX(-100%);
+    }
+  }
+}
 
 @media (max-aspect-ratio: $portrait-ratio) and (any-pointer: coarse) {
 
@@ -979,4 +1017,3 @@ $portrait-ratio: 1;
 }
 
 </style>
-

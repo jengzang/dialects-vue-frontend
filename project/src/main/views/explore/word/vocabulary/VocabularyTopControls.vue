@@ -8,21 +8,63 @@
             :value="inputText"
             class="search-input"
             rows="1"
-            :placeholder="t('words.wordList.search.placeholder')"
+            :placeholder="source === 'character-notes' ? t('words.wordList.notes.searchPlaceholder') : t('words.wordList.search.placeholder')"
             @compositionstart="handleCompositionStart"
             @compositionend="handleCompositionEnd"
             @input="handleInput"
           />
         </div>
 
+        <div v-if="source === 'character-notes'" class="notes-mode-actions">
+          <ActionButton
+            class="notes-refresh-action"
+            variant="blue"
+            :disabled="notesRefreshDisabled || isNotesScopeResolving || isNotesScopeDisabled"
+            @click="emit('refreshNotes')"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5" />
+            </svg>
+            <span>{{ t('words.wordList.notes.refreshResults') }}</span>
+          </ActionButton>
+          <SwitchToggle
+            :model-value="source === 'vocabulary'"
+            :show-label="true"
+            :active-text="t('words.wordList.source.vocabulary')"
+            :inactive-text="t('words.wordList.source.characterNotes')"
+            label-position="inside"
+            auto-width
+            @update:model-value="emit('update:source', $event ? 'vocabulary' : 'character-notes')"
+          />
+        </div>
+
         <div class="field-filter">
           <button
-            class="gear-btn glass-button"
+            class="gear-btn"
             type="button"
             :title="t('words.wordList.search.settings')"
             @click="searchFieldModalOpen = true"
           >
             <span aria-hidden="true"><InlineIcon icon="⚙️" /></span>
+          </button>
+          <button
+            v-if="source === 'vocabulary'"
+            class="pill-btn location-details-btn"
+            type="button"
+            :title="t('words.wordList.search.locationDetails')"
+            @click="emit('openLocationDetails')"
+          >
+            {{ t('words.wordList.search.locationDetailsButton') }}
           </button>
           <AppModal
             v-model="searchFieldModalOpen"
@@ -35,15 +77,17 @@
               <h4 class="search-field-modal-title">
                 {{ t('words.wordList.search.filterTitle') }}
               </h4>
-              <CheckBox
-                v-for="field in searchFieldOptions"
-                :key="field.value"
-                :model-value="isFieldChecked(field.value)"
-                :label="field.label"
-                @update:model-value="(val) => toggleField(field.value, val)"
-              />
+              <div class="search-field-options">
+                <CheckBox
+                  v-for="field in searchFieldOptions"
+                  :key="field.value"
+                  :model-value="isFieldChecked(field.value)"
+                  :label="field.label"
+                  @update:model-value="(val) => toggleField(field.value, val)"
+                />
+              </div>
             </div>
-            <div class="search-field-mode-section">
+            <div v-if="source === 'vocabulary'" class="search-field-mode-section">
               <h4 class="search-field-modal-title">
                 {{ t('words.wordList.search.filterModeTitle') }}
               </h4>
@@ -57,7 +101,7 @@
                 @update:model-value="emit('update:filterByRegion', $event)"
               />
             </div>
-            <div class="search-field-mode-section">
+            <div v-if="source === 'vocabulary'" class="search-field-mode-section">
               <h4 class="search-field-modal-title">
                 {{ t('words.wordList.search.standardWordFilterMode') }}
               </h4>
@@ -70,110 +114,149 @@
                 auto-width
               />
             </div>
+            <div v-if="source === 'character-notes'" class="search-field-mode-section">
+              <h4 class="search-field-modal-title">
+                {{ t('words.wordList.viewModes.label') }}
+              </h4>
+              <SwitchToggle
+                :model-value="viewMode === 'list'"
+                :show-label="true"
+                :active-text="t('words.wordList.viewModes.list')"
+                :inactive-text="t('words.wordList.viewModes.card')"
+                label-position="inside"
+                auto-width
+                @update:model-value="emit('update:viewMode', $event ? 'list' : 'card')"
+              />
+            </div>
           </AppModal>
         </div>
       </div>
 
     </div>
 
-    <div class="filter-strip">
-      <div
-        v-if="viewMode === 'map'"
-        class="standard-word-filter"
-      >
-        <SimpleSelectDropdown
-          v-if="singleSelect"
-          :model-value="selectedStandardWord"
-          :options="standardWordOptions"
-          :placeholder="t('words.wordList.search.standardWordPlaceholder')"
-          :disabled="standardWordOptions.length === 0"
-          searchable
-          match-trigger-width
-          width="100%"
-          @update:model-value="emit('update:selectedStandardWord', $event)"
+    <div
+      class="filter-strip"
+      :class="{ 'notes-scope-filter': source === 'character-notes' }"
+    >
+      <template v-if="source === 'character-notes'">
+        <LocationAndRegionInput
+          :model-value="notesScope"
+          allow-empty-scope
+          disable-location-limit
+          @update:model-value="handleNotesScopeUpdate"
+          @update:run-disabled="handleNotesScopeDisabled"
+          @locations-resolved="handleNotesLocationsResolved"
         />
-        <template v-else>
-          <button
-            ref="standardWordTriggerEl"
-            class="select-trigger standard-word-select-trigger"
-            :class="{ 'is-open': standardWordDropdownOpen, 'is-disabled': standardWordOptions.length === 0 }"
-            type="button"
+      </template>
+
+      <template v-else>
+        <SwitchToggle
+          v-if="viewMode === 'card'"
+          :model-value="source === 'vocabulary'"
+          :show-label="true"
+          :active-text="t('words.wordList.source.vocabulary')"
+          :inactive-text="t('words.wordList.source.characterNotes')"
+          label-position="inside"
+          auto-width
+          @update:model-value="emit('update:source', $event ? 'vocabulary' : 'character-notes')"
+        />
+        <div
+          v-if="viewMode === 'map'"
+          class="standard-word-filter"
+        >
+          <SimpleSelectDropdown
+            v-if="singleSelect"
+            :model-value="selectedStandardWord"
+            :options="standardWordOptions"
+            :placeholder="t('words.wordList.search.standardWordPlaceholder')"
             :disabled="standardWordOptions.length === 0"
-            @click="standardWordDropdownOpen = !standardWordDropdownOpen"
+            searchable
+            match-trigger-width
+            width="100%"
+            @update:model-value="emit('update:selectedStandardWord', $event)"
+          />
+          <template v-else>
+            <button
+              ref="standardWordTriggerEl"
+              class="select-trigger standard-word-select-trigger"
+              :class="{ 'is-open': standardWordDropdownOpen, 'is-disabled': standardWordOptions.length === 0 }"
+              type="button"
+              :disabled="standardWordOptions.length === 0"
+              @click="standardWordDropdownOpen = !standardWordDropdownOpen"
+            >
+              <span class="select-label">{{ standardWordTriggerLabel }}</span>
+              <span
+                class="select-arrow"
+                aria-hidden="true"
+              >⌄</span>
+            </button>
+            <MultiSelectDropdown
+              v-if="standardWordDropdownOpen"
+              :model-value="selectedStandardWords"
+              :options="multiStandardWordOptions"
+              :trigger-el="standardWordTriggerEl"
+              align="left"
+              direction="down"
+              @update:model-value="emit('update:selectedStandardWords', $event)"
+              @close="standardWordDropdownOpen = false"
+            />
+          </template>
+        </div>
+
+        <div
+          v-if="!filterByRegion"
+          class="location-filter"
+        >
+          <button
+            ref="locationTriggerEl"
+            class="select-trigger location-select-trigger"
+            :class="{ 'is-open': locationDropdownOpen, 'is-disabled': locationOptions.length === 0 }"
+            type="button"
+            :disabled="locationOptions.length === 0"
+            @click="locationDropdownOpen = !locationDropdownOpen"
           >
-            <span class="select-label">{{ standardWordTriggerLabel }}</span>
+            <span class="select-label">{{ locationTriggerLabel }}</span>
             <span
               class="select-arrow"
               aria-hidden="true"
             >⌄</span>
           </button>
           <MultiSelectDropdown
-            v-if="standardWordDropdownOpen"
-            :model-value="selectedStandardWords"
-            :options="multiStandardWordOptions"
-            :trigger-el="standardWordTriggerEl"
+            v-if="locationDropdownOpen"
+            :model-value="selectedLocations"
+            :options="locationOptions"
+            :trigger-el="locationTriggerEl"
+            :search-normalizer="normalizeLocationSearchText"
             align="left"
             direction="down"
-            @update:model-value="emit('update:selectedStandardWords', $event)"
-            @close="standardWordDropdownOpen = false"
+            @update:model-value="emit('update:selectedLocations', $event)"
+            @close="locationDropdownOpen = false"
           />
-        </template>
-      </div>
+        </div>
 
-      <div
-        v-if="!filterByRegion"
-        class="location-filter"
-      >
-        <button
-          ref="locationTriggerEl"
-          class="select-trigger location-select-trigger"
-          :class="{ 'is-open': locationDropdownOpen, 'is-disabled': locationOptions.length === 0 }"
-          type="button"
-          :disabled="locationOptions.length === 0"
-          @click="locationDropdownOpen = !locationDropdownOpen"
+        <div
+          v-else
+          class="location-filter"
         >
-          <span class="select-label">{{ locationTriggerLabel }}</span>
-          <span
-            class="select-arrow"
-            aria-hidden="true"
-          >⌄</span>
-        </button>
-        <MultiSelectDropdown
-          v-if="locationDropdownOpen"
-          :model-value="selectedLocations"
-          :options="locationOptions"
-          :trigger-el="locationTriggerEl"
-          align="left"
-          direction="down"
-          @update:model-value="emit('update:selectedLocations', $event)"
-          @close="locationDropdownOpen = false"
-        />
-      </div>
-
-      <div
-        v-else
-        class="location-filter"
-      >
-        <SimpleSelectDropdown
-          :model-value="selectedProvince"
-          :options="provinceOptions"
-          :placeholder="t('words.wordList.search.provincePlaceholder')"
-          searchable
-          match-trigger-width
-          width="100%"
-          @update:model-value="emit('update:selectedProvince', $event)"
-        />
-        <SimpleSelectDropdown
-          :model-value="selectedCity"
-          :options="cityOptions"
-          :placeholder="t('words.wordList.search.cityPlaceholder')"
-          :disabled="!selectedProvince"
-          searchable
-          match-trigger-width
-          width="100%"
-          @update:model-value="emit('update:selectedCity', $event)"
-        />
-      </div>
+          <SimpleSelectDropdown
+            :model-value="selectedProvince"
+            :options="provinceOptions"
+            :placeholder="t('words.wordList.search.provincePlaceholder')"
+            match-trigger-width
+            width="100%"
+            @update:model-value="emit('update:selectedProvince', $event)"
+          />
+          <SimpleSelectDropdown
+            :model-value="selectedCity"
+            :options="cityOptions"
+            :placeholder="t('words.wordList.search.cityPlaceholder')"
+            :disabled="!selectedProvince"
+            match-trigger-width
+            width="100%"
+            @update:model-value="emit('update:selectedCity', $event)"
+          />
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -182,15 +265,27 @@
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import * as OpenCCT2CN from 'opencc-js/t2cn'
 import AppModal from '@/components/common/AppModal.vue'
+import ActionButton from '@/main/components/user/auth/ActionButton.vue'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
+import LocationAndRegionInput from '@/main/components/geo/LocationAndRegionInput.vue'
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import { showConfirm } from '@/utils/ui/message.js'
 
 const { t } = useI18n()
 
+const locationSearchT2S = OpenCCT2CN.Converter({ from: 'tw', to: 'cn' })
+
+// 地点候选可能混用繁简，统一转简体后匹配，避免输入简体搜不到繁体地点。
+function normalizeLocationSearchText(value) {
+  return locationSearchT2S(String(value || '')).toLowerCase()
+}
+
 const props = defineProps({
+  source: { type: String, default: 'vocabulary' },
   query: { type: String, default: '' },
   selectedSearchFields: { type: Array, default: () => [] },
   selectedLocations: { type: Array, default: () => [] },
@@ -206,18 +301,29 @@ const props = defineProps({
   selectedCity: { type: String, default: '' },
   provinceOptions: { type: Array, default: () => [] },
   cityOptions: { type: Array, default: () => [] },
+  notesScope: {
+    type: Object,
+    default: () => ({ locations: [], regions: [], regionUsing: 'map' }),
+  },
+  notesRefreshDisabled: { type: Boolean, default: false },
 })
 
 const emit = defineEmits([
+  'update:source',
   'update:query',
   'update:selectedSearchFields',
   'update:selectedLocations',
   'update:selectedStandardWord',
   'update:selectedStandardWords',
   'update:singleSelect',
+  'update:viewMode',
   'update:filterByRegion',
   'update:selectedProvince',
   'update:selectedCity',
+  'update:notesScope',
+  'locationsResolved',
+  'refreshNotes',
+  'openLocationDetails',
 ])
 
 const searchInputEl = ref(null)
@@ -226,6 +332,8 @@ const standardWordTriggerEl = ref(null)
 const searchFieldModalOpen = ref(false)
 const locationDropdownOpen = ref(false)
 const standardWordDropdownOpen = ref(false)
+const isNotesScopeResolving = ref(false)
+const isNotesScopeDisabled = ref(false)
 
 const inputText = ref(props.query)
 const isComposing = ref(false)
@@ -233,6 +341,11 @@ let searchTimer = null
 
 watch(() => props.query, (val) => {
   inputText.value = val
+})
+
+watch(() => props.source, () => {
+  clearTimeout(searchTimer)
+  inputText.value = props.query
 })
 
 function handleCompositionStart() {
@@ -257,6 +370,25 @@ function scheduleSearchEmit() {
   searchTimer = setTimeout(() => {
     emit('update:query', inputText.value)
   }, 500)
+}
+
+function handleNotesScopeUpdate(scope) {
+  isNotesScopeResolving.value = true
+  isNotesScopeDisabled.value = false
+  emit('update:notesScope', scope)
+}
+
+function handleNotesScopeDisabled(disabled) {
+  isNotesScopeDisabled.value = disabled
+  if (disabled) {
+    isNotesScopeResolving.value = false
+  }
+}
+
+function handleNotesLocationsResolved(scope) {
+  isNotesScopeResolving.value = false
+  isNotesScopeDisabled.value = false
+  emit('locationsResolved', scope)
 }
 
 function formatMultiSelectLabel(selectedValues, options, placeholder) {
@@ -288,7 +420,11 @@ function isFieldChecked(value) {
   return props.selectedSearchFields.length === 0 || props.selectedSearchFields.includes(value)
 }
 
-function toggleField(value, checked) {
+let isConfirmingNotesPronunciation = false
+
+async function toggleField(value, checked) {
+  if (isConfirmingNotesPronunciation) return
+
   const allValues = props.searchFieldOptions.map((o) => o.value)
   const current = props.selectedSearchFields.length === 0
     ? [...allValues]
@@ -299,6 +435,19 @@ function toggleField(value, checked) {
     : current.filter((v) => v !== value)
 
   const allChecked = allValues.every((v) => updated.includes(v))
+  if (props.source === 'character-notes'
+    && !current.includes('pronunciation')
+    && (!updated.length || updated.includes('pronunciation'))) {
+    isConfirmingNotesPronunciation = true
+    try {
+      const confirmed = await showConfirm(t('words.wordList.notes.ipaSearchConfirm'), {
+        title: t('words.wordList.notes.ipaSearchConfirmTitle'),
+      })
+      if (!confirmed) return
+    } finally {
+      isConfirmingNotesPronunciation = false
+    }
+  }
   emit('update:selectedSearchFields', allChecked ? [] : updated)
 }
 
@@ -367,23 +516,90 @@ const standardWordTriggerLabel = computed(() => {
   resize: vertical;
 }
 
-.field-filter {
+.notes-refresh-action.action-button {
+  padding: 6px 10px;
+  font-size: 14px;
+}
+
+.notes-mode-actions {
+  @include flex-col;
   flex: 0 0 auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.field-filter {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 10px;
+  align-items: center;
 }
 
 .gear-btn {
-  min-width: 40px;
-  min-height: 40px;
-  padding: 0;
-  font-size: 18px;
+  appearance: none;
+  border: 1px solid transparent;
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+
+  margin: 0;
+  padding: 5px;
+
+  width: 32px;
+  height: 32px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 6px;
+
+  font-size: 20px;
   line-height: 1;
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+
+  span {
+    display: inline-flex;
+    transition: transform 0.4s ease;
+  }
+
+  &:hover {
+    background: var(--glass-10);
+    border-color: var(--color-primary-border);
+    color: var(--color-primary);
+  }
+
+  &:hover span {
+    transform: rotate(90deg);
+  }
+
+  &:active {
+    transform: scale(0.92);
+  }
+}
+
+.location-details-btn {
+  // padding: 0 4px;
+  font-size: 14px;
+  white-space: nowrap;
 }
 
 .search-field-modal {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 12px;
-  justify-items: center;
+}
+
+.search-field-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
 }
 
 .search-field-modal-title {

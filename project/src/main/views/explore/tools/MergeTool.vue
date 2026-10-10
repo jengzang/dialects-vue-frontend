@@ -346,7 +346,7 @@ import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import { transformTabularFile } from '@/utils/import/transformTabularFile.js'
-import defaultReferenceWorkbookUrl from '/data/参考表.xlsx?url'
+import defaultReferenceWorkbookUrl from '/data/sample/参考表.xlsx?url'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t } = useI18n()

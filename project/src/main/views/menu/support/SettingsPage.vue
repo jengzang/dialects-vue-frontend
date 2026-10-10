@@ -108,56 +108,58 @@
         </div>
       </div>
 
-      <div class="setting-section tutorial-toggle-section">
-        <div class="tutorial-toggle-copy">
-          <h3 class="section-title">{{ $t('about.settings.tutorialToggle.title') }}</h3>
-          <p class="section-description">{{ $t('about.settings.tutorialToggle.description') }}</p>
-        </div>
-        <SwitchToggle
-          :model-value="tutorialGuideEnabled"
-          :width="100"
-          :height="40"
-          :thumb-size="32"
-          color="var(--color-primary)"
-          variant="solid"
-          show-label
-          :active-text="$t('about.settings.tutorialToggle.enabled')"
-          :inactive-text="$t('about.settings.tutorialToggle.disabled')"
-          label-position="inside"
-          :gap="20"
-          :aria-label="$t('about.settings.tutorialToggle.title')"
-          class="tutorial-switch-toggle"
-          @update:modelValue="handleTutorialToggle"
-        />
-      </div>
-
-      <div class="setting-section update-notice-section">
-        <div class="update-notice-copy">
-          <h3 class="section-title">
-            {{ $t('about.settings.updateNotice.title') }}
-            <HelpIcon
-              :content="$t('about.settings.updateNotice.description')"
-              size="sm"
-              placement="right"
-              icon="?"
-              icon-color="var(--color-primary)"
-            />
-          </h3>
-        </div>
-        <div class="update-notice-controls">
-          <RadioGroup
-            v-model="updateNoticeModeModel"
-            :options="updateNoticeModeOptions"
-            name="settings-update-notice-mode"
-            class="settings-radio-group"
+      <div class="setting-section setting-split">
+        <div class="setting-split-item tutorial-toggle-section">
+          <div class="tutorial-toggle-copy">
+            <h3 class="section-title">{{ $t('about.settings.tutorialToggle.title') }}</h3>
+            <p class="section-description">{{ $t('about.settings.tutorialToggle.description') }}</p>
+          </div>
+          <SwitchToggle
+            :model-value="tutorialGuideEnabled"
+            :width="100"
+            :height="40"
+            :thumb-size="32"
+            color="var(--color-primary)"
+            variant="solid"
+            show-label
+            :active-text="$t('about.settings.tutorialToggle.enabled')"
+            :inactive-text="$t('about.settings.tutorialToggle.disabled')"
+            label-position="inside"
+            :gap="20"
+            :aria-label="$t('about.settings.tutorialToggle.title')"
+            class="tutorial-switch-toggle"
+            @update:modelValue="handleTutorialToggle"
           />
-          <button
-            class="glass-button"
-            data-variant="secondary"
-            @click="showUpdateNotice = true"
-            style="white-space: nowrap;"
-          ><InlineIcon icon="📋" />{{ $t('about.settings.viewUpdateLog') }}
-          </button>
+        </div>
+        <hr class="setting-split-divider">
+        <div class="setting-split-item update-notice-section">
+          <div class="update-notice-copy">
+            <h3 class="section-title">
+              {{ $t('about.settings.updateNotice.title') }}
+              <HelpIcon
+                :content="$t('about.settings.updateNotice.description')"
+                size="sm"
+                placement="right"
+                icon="?"
+                icon-color="var(--color-primary)"
+              />
+            </h3>
+          </div>
+          <div class="update-notice-controls">
+            <RadioGroup
+              v-model="updateNoticeModeModel"
+              :options="updateNoticeModeOptions"
+              name="settings-update-notice-mode"
+              class="settings-radio-group"
+            />
+            <button
+              class="glass-button"
+              data-variant="secondary"
+              @click="showUpdateNotice = true"
+              style="white-space: nowrap;"
+            ><InlineIcon icon="📋" />{{ $t('about.settings.viewUpdateLog') }}
+            </button>
+          </div>
         </div>
       </div>
     </div>

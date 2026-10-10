@@ -14,6 +14,7 @@ const VOCABULARY_ME_ENDPOINT = '/api/vocabulary/me'
 const VOCABULARY_ADMIN_PERMISSIONS_ENDPOINT = '/api/vocabulary/admin/permissions'
 const VOCABULARY_SQL_ENDPOINT = '/api/vocabulary/sql'
 const VOCABULARY_ENTRIES_TABLE = 'vocabulary_entries'
+let vocabularyEntryCreateLocationName = ''
 
 function stripVocabularyDbKey(params = {}) {
   const rest = { ...params }
@@ -69,6 +70,30 @@ function stripVocabularyBatchReplaceParams(params = {}) {
   return rest
 }
 
+export function setVocabularyEntryCreateLocationName(locationName = '') {
+  vocabularyEntryCreateLocationName = String(locationName || '').trim()
+}
+
+function withVocabularyEntryCreateLocation(params = {}) {
+  const body = stripAndValidateVocabularySqlParams(params)
+  if (
+    body.table_name !== VOCABULARY_ENTRIES_TABLE
+    || body.action !== 'create'
+    || !vocabularyEntryCreateLocationName
+    || body.data?.location_name
+  ) {
+    return body
+  }
+
+  return {
+    ...body,
+    data: {
+      ...(body.data || {}),
+      location_name: vocabularyEntryCreateLocationName,
+    },
+  }
+}
+
 /**
  * @typedef {'all' | 'definition' | 'headword' | 'pronunciation' | 'detail' | 'location'} VocabularySearchField
  */
@@ -99,10 +124,27 @@ function stripVocabularyBatchReplaceParams(params = {}) {
 /**
  * @typedef {object} VocabularyMapPoint
  * @property {string} location_name 地点简称，也用于点击地图点后回查词条详情。
- * @property {string} location_label 完整地点链。
+ * @property {string} province 省；地点无元数据时为空串。
+ * @property {string} city 市；地点无元数据时为空串。
+ * @property {string} county 县/区；地点无元数据时为空串。
+ * @property {string} town 乡镇；地点无元数据时为空串。
+ * @property {string} administrative_village 行政村；地点无元数据时为空串。
+ * @property {string} natural_village 自然村；地点无元数据时为空串。
+ * @property {string} yindian_region 音典分区；地点无元数据时为空串。
+ * @property {string} atlas_region 地图集分区；地点无元数据时为空串。
  * @property {number | null} longitude 经度；地图模式需要容忍空值。
  * @property {number | null} latitude 纬度；地图模式需要容忍空值。
  * @property {number} entry_count 当前搜索条件下该地点命中的词条数。
+ * @property {string} t1 阴平调值；地点无该调值时为空串。
+ * @property {string} t2 阳平调值；地点无该调值时为空串。
+ * @property {string} t3 阴上调值；地点无该调值时为空串。
+ * @property {string} t4 阳上调值；地点无该调值时为空串。
+ * @property {string} t5 阴去调值；地点无该调值时为空串。
+ * @property {string} t6 阳去调值；地点无该调值时为空串。
+ * @property {string} t7 阴入调值；地点无该调值时为空串。
+ * @property {string} t8 阳入调值；地点无该调值时为空串。
+ * @property {string} t9 其他调调值；地点无该调值时为空串。
+ * @property {string} t10 轻声调值；地点无该调值时为空串。
  */
 
 /**
@@ -278,7 +320,7 @@ export async function getVocabularyMapItems(params = {}) {
  *
  * 该接口是 vocabulary 前端权限 UI 的唯一来源；公开展示失败时可按无权限处理。
  *
- * @returns {Promise<{user_id: number, permission_level: 'edit' | 'manage' | null, can_upload: boolean, can_manage_entries: boolean, can_view_logs: boolean}>}
+ * @returns {Promise<{user_id: number, permission_level: 'edit' | 'manage' | null, can_upload: boolean, can_manage_entries: boolean, can_view_logs: boolean, can_delete_locations: boolean}>}
  */
 export async function getVocabularyMe() {
   return api(VOCABULARY_ME_ENDPOINT)
@@ -325,7 +367,9 @@ export async function setVocabularyPermission(userId, permissionLevel) {
 /**
  * 获取词表地点筛选候选值，供卡片/地图模式的地点多选筛选使用。
  *
- * @returns {Promise<Array<{value: string, label: string, province: string, city: string}>>}
+ * label 用于展示（地点简称 location_name），locationLabel 保留完整地点链用于搜索匹配。
+ *
+ * @returns {Promise<Array<{value: string, label: string, locationLabel: string, province: string, city: string}>>}
  */
 export async function getVocabularyLocationOptions() {
   try {
@@ -342,7 +386,8 @@ export async function getVocabularyLocationOptions() {
       seenLocationNames.add(locationName)
       options.push({
         value: locationName,
-        label: location.location_label || locationName,
+        label: locationName,
+        locationLabel: location.location_label || locationName,
         province: location.province || '',
         city: location.city || '',
       })
@@ -413,6 +458,53 @@ export async function updateVocabularyLocation(locationName, data, params = {}) 
   }
 }
 
+function buildVocabularyLocationTransferBody(location = {}, target = {}) {
+  const body = {
+    location_name: String(location.location_name || '').trim(),
+  }
+
+  const sourceUserId = String(location.user_id ?? '').trim()
+  const targetUserId = String(target.target_user_id ?? '').trim()
+  const targetUsername = String(target.target_username ?? '').trim()
+
+  if (sourceUserId) {
+    body.user_id = Number(sourceUserId)
+  }
+
+  if (targetUserId) {
+    body.target_user_id = Number(targetUserId)
+  }
+
+  if (targetUsername) {
+    body.target_username = targetUsername
+  }
+
+  return body
+}
+
+/**
+ * 移交词表地点及其词条归属。
+ *
+ * 后端接口：POST /api/vocabulary/locations/transfer
+ * 请求体：location_name + 源用户(user_id/username) + 目标用户(target_user_id/target_username)。
+ *
+ * @param {{location_name: string, user_id?: number|string, username?: string}} location
+ * @param {number|string} targetUser 目标用户名或用户 ID。
+ * @returns {Promise<{success: boolean, location_name: string, permission_level: string, source_user_id: number, source_username: string, target_user_id: number, target_username: string, transferred_entries_count: number}>}
+ */
+export async function transferVocabularyLocation(location, target) {
+  try {
+    return await api(`${VOCABULARY_LOCATIONS_ENDPOINT}/transfer`, {
+      method: 'POST',
+      body: buildVocabularyLocationTransferBody(location, target),
+    })
+  } catch (error) {
+    console.error('Transfer vocabulary location error:', error)
+    showError(error.message || '移交詞表地點失敗')
+    throw new Error(error.message || '移交詞表地點失敗')
+  }
+}
+
 /**
  * 删除词表地点（级联删除该地点下所有词条）。
  *
@@ -429,6 +521,27 @@ export async function deleteVocabularyLocation(locationName, params = {}) {
     console.error('Delete vocabulary location error:', error)
     showError(error.message || '刪除詞表地點失敗')
     throw new Error(error.message || '刪除詞表地點失敗')
+  }
+}
+
+/**
+ * 導出詞表地點（單 sheet：标准词 / 方言词 / 音标 / 详细释义）。
+ *
+ * 後端接口：GET /api/vocabulary/locations/{location_name}/export
+ *
+ * @param {string} locationName
+ * @param {{user_id?: number|string}} [params={}]
+ * @returns {Promise<Blob>}
+ */
+export async function exportVocabularyLocation(locationName, params = {}) {
+  try {
+    return await api(`${VOCABULARY_LOCATIONS_ENDPOINT}/${encodeURIComponent(locationName)}/export${appendQueryParams(params)}`, {
+      responseType: 'blob',
+    })
+  } catch (error) {
+    console.error('Export vocabulary location error:', error)
+    showError(error.message || '導出詞表失敗')
+    throw new Error(error.message || '導出詞表失敗')
   }
 }
 
@@ -450,6 +563,9 @@ export async function getVocabularyLogs(params = {}) {
 
 /**
  * 预览词表导入结果。
+ *
+ * success 仅在没有任何可导入行时为 false；errors 非空表示部分行会被跳过，
+ * 此时 parsed_count 仍是真实可导入的行数，前端应以 parsed_count > 0 作为可提交判据。
  *
  * @param {{file: File, location: object, parser_mode?: 'auto' | 'table' | 'doc_whitespace' | 'doc_bracket'}} params
  * @returns {Promise<{success: boolean, location_name: string, permission_level: string, parsed_count: number, would_delete_existing_count: number, skipped_count: number, errors: string[], parser_mode: string}>}
@@ -475,6 +591,10 @@ export async function previewVocabularyImport({ file, location, parser_mode = 'a
 
 /**
  * 上传词表文件。
+ *
+ * 格式错误的行会被跳过而非整份失败：HTTP 200，success 恒为 true，
+ * imported_count 为实际导入行数，skipped_count / errors 为被跳过的行明细。
+ * 没有任何可导入行时后端抛 400（detail: "No valid vocabulary rows found"），不返回 success=false。
  *
  * @param {{file: File, location: object, parser_mode?: 'auto' | 'table' | 'doc_whitespace' | 'doc_bracket', overwrite?: boolean}} params
  * @returns {Promise<{success: boolean, location_id: number, location_name: string, permission_level: string, imported_count: number, deleted_existing_count: number, skipped_count: number, errors: string[], parser_mode: string}>}
@@ -542,7 +662,7 @@ export const vocabularySqlApi = {
   async mutateSingle(params) {
     return api(`${VOCABULARY_SQL_ENDPOINT}/mutate`, {
       method: 'POST',
-      body: stripAndValidateVocabularySqlParams(params),
+      body: withVocabularyEntryCreateLocation(params),
     })
   },
 

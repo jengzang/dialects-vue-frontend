@@ -37,59 +37,59 @@
     },
     "menuAboutIntro": {
       "title": "關於方音圖鑑",
-      "description": "查看網站功能介紹、發展歷史等"
+      "description": "查看網站功能介紹、發展歷史、特別鳴謝等"
     },
     "menuAboutSuggestion": {
       "title": "反饋入口",
-      "description": "跳轉github或知乎提出issue，或直接在本站內提交反饋。"
+      "description": "跳轉github提出issue或透過知乎 AI-works 反映建議，或直接在本站內提交回饋。"
     },
     "menuAboutLike": {
       "title": "支持項目",
-      "description": "查看項目倉庫、相關知乎介紹文章以及作者的開發感悟。"
+      "description": "查看專案倉庫、作者的開發感悟，以及掃碼支持作者。"
     },
     "menuQueryZhonggu": {
       "title": "查中古",
-      "description": "韻書 → 讀音 • 按韻書地位分別整理聲韻調的讀音"
+      "description": "按照各韻書的地位，如《廣韻》中古音的攝、韻、等、呼、母等，查詢整理對應漢字在各地方言中的今讀及地理分佈。支援多個地點查詢、繪製地圖，並進行歷史音韻、地理語言學分析。"
     },
     "menuQueryChar": {
       "title": "查字",
-      "description": "查詢漢字的讀音、地位及注釋"
+      "description": "查詢漢字在各地方言中的 IPA 讀音、中古音韻地位及註釋，查看多音字、文白讀和字音分佈地圖。"
     },
     "menuQueryYinwei": {
       "title": "查音位",
-      "description": "讀音 → 韻書 • 分析各聲韻調的音位來源於什麼韻書地位"
+      "description": "輸入方言聲母、韻母或聲調的實際音值，反查其韻書地位來源，如反查今音的中古來源，具體來源於《廣韻》的哪些攝、韻、母、呼等。支援查看各來源的字數、比例和字例。"
     },
     "menuQueryTone": {
       "title": "查調",
-      "description": "查詢各點的調類、調值"
+      "description": "查詢各地方言的聲調情況，如查看各調類的合併情況及具體調值的地理分佈。"
     },
     "menuMapView": {
       "title": "地圖顯示",
-      "description": "地理語言學直觀呈現。即在地圖上查看查詢、比較結果，及繪製音節等值線圖、熱力圖等。"
+      "description": "在地圖上查看查詢（查字、查中古、查音位、查調），比較（比較漢字、比較中古、比較調類），方言分區等的結果，點選地點可查看詳情，同時支援繪製音節等值線圖、熱力圖等。從地理語言學視角探索方言分佈並直觀呈現。"
     },
     "menuMapDivide": {
       "title": "地圖分區",
-      "description": "查詢各方言點所屬的分區，並跳轉地圖繪製查看。"
+      "description": "查詢方言點所屬的地圖集或音典分區，按分區層級繪製方言分區地圖，查看各方言分區的地理分佈，從地理語言學視角探索方言分區與分佈。"
     },
     "menuMapCustom": {
       "title": "個人地圖資料",
-      "description": "查看、管理自定義方言數據，並繪製到地圖上。與賬號綁定，多設備同步。"
+      "description": "登入後新增和管理個人方言調查資料，如音韻特徵、漢字發音、調值資訊等，支援繪製自訂方言地圖；資料與帳號綁定，支援多裝置同步。"
     },
     "menuCompareChar": {
       "title": "比較字",
-      "description": "比較同一漢字在不同地點的讀音差異。"
+      "description": "比較兩個漢字在各地方言中的聲母、韻母或聲調情況，查看相同、部分相同或不同的地點及分佈地圖。"
     },
     "menuCompareZhonggu": {
       "title": "比較中古",
-      "description": "比較同一中古地位在不同地點的演變情況。"
+      "description": "比較兩組歷史韻書音類條件（如中古廣韻）在現代方言中的聲母、韻母或聲調，查看各地音類合流、分化及地圖分佈。"
     },
     "menuCompareTone": {
       "title": "比較聲調",
-      "description": "比較兩個調類在不同地點是合流還是分立。"
+      "description": "比較兩個調類在各地方言中的合併情況，查看合流、可能合流或分立的地點及分佈地圖。"
     },
     "menuComparePhonetic": {
       "title": "比較音系",
-      "description": "比較所選各點的音值對應關係（请輸入2~5個地點）。"
+      "description": "選擇 2 至 5 個方言點，對照聲母、韻母或聲調的音值對應關係，透過桑基圖呈現音類合流與分化。"
     },
     "menuResult": {
       "title": "查詢結果",
@@ -97,11 +97,11 @@
     },
     "menuPhoMatrix": {
       "title": "音系查詢",
-      "description": "查看方言點的完整音系表和同音字彙，以表格的形式呈現聲韻調拼合關係。"
+      "description": "查看方言點的完整音系表、聲韻調配合關係以及方言同音字彙，以表格的形式呈現聲韻調拼合關係。"
     },
     "menuPhoCustom": {
       "title": "音素分類",
-      "description": "按韻書地位特徵，分類整理方言點的聲韻調數據"
+      "description": "按清濁、發音部位、開合口、韻攝等韻書地位特徵，自選三個分類維度整理方言聲韻調，進行聲母、韻母、聲調分類以及方言音類統計，支援查看各分類數量與字例。"
     },
     "menuPhoCount": {
       "title": "音節統計",
@@ -109,11 +109,11 @@
     },
     "menuPhoEvolution": {
       "title": "演化",
-      "description": "查看單個方言點的當今音系與韻書地位之間的對應關係，並用餅圖和桑基圖展示聲母、韻母、聲調的歷史演化。"
+      "description": "透過查看單個方言點的聲母、韻母、聲調與中古音及韻書地位的對應關係，用餅圖和桑基圖分析今音來源與音類分化，乃至方言語音演變。"
     },
     "menuSettings": {
       "title": "設置",
-      "description": "配置語言、主題、查詢輸入方式、教程開關等。"
+      "description": "配置語言、主題、中古查詢輸入方式、教程開關等。"
     },
     "menuSource": {
       "title": "資料來源",
@@ -129,27 +129,27 @@
     },
     "menuVocabularyView": {
       "title": "詞表瀏覽",
-      "description": "瀏覽和搜索所有協作者提交的詞表數據，支持卡片、地圖、表格三種展示模式。"
+      "description": "線上查詢全國各地方言詞彙，比較同一詞語在不同地區的方言說法、IPA和詞義解釋等。支援按書面語標準詞、方言詞、音標或釋義搜尋，並透過卡片、地圖和表格三種模式瀏覽方言詞表。"
     },
     "menuVocabularyImport": {
       "title": "詞表導入",
-      "description": "上傳新的詞表數據，需要先申請權限，並填寫地點信息，再按標準格式提交詞表。"
+      "description": "申請詞表編輯權限後，填寫方言點資訊，按標準格式批量上傳方言詞彙、IPA 讀音與釋義，並校驗匯入資料。"
     },
     "menuVocabularyManage": {
       "title": "詞表管理",
-      "description": "管理上傳的詞表，可進行在線編輯、批量替換、增刪詞條等操作。"
+      "description": "擁有編輯權限的使用者可管理自己提交的方言詞表，線上編輯詞條和地點資料，批量替換內容或增刪詞條。"
     },
     "menuYubao": {
       "title": "語保資料",
-      "description": "查詢語保工程的詞彙（1000詞）與語法例句（50句）數據，支持地圖、卡片、表格三種展示模式。"
+      "description": "登入後查詢中國語言資源保護工程（語保）的 1000 條詞彙和 50 個語法例句，比較各地方言說法、發音及註釋，支援地圖、卡片和表格。"
     },
     "menuVillages": {
       "title": "村落入口",
-      "description": "進入自然村樹狀圖、表格，機器學習分析工具等。"
+      "description": "自然村查詢、村落資料庫、村名查詢、村落方言分佈等入口。"
     },
     "menuCluster": {
       "title": "方言聚類",
-      "description": "按方言特徵數據探索方言點聚類關係。"
+      "description": "選擇方言點與音韻特徵，計算方言距離和相似度，進行方言聚類分析，查看分組結果與圖表。"
     },
     "exploreEntry": {
       "title": "探索導航",
@@ -157,71 +157,71 @@
     },
     "exploreCheck": {
       "title": "字表檢查",
-      "description": "上傳方言字表文件，自動檢查「非單字」「異常音標」「缺聲調」等常見問題，並提供在線編輯修正功能。"
+      "description": "上傳方言字表，線上檢查非單字、異常 IPA 音標和缺聲調等問題，編輯修正後下載結果。（需登入）"
     },
     "exploreJyut2Ipa": {
       "title": "粵拼轉IPA",
-      "description": "批量將Excel表格中的粵拼轉換為國際音標(ipa)，支持自定義配置規則。"
+      "description": "上傳含粵拼欄的 Excel 字表，線上批量將粵語拼音轉換為 IPA 國際音標，支援自訂轉換規則、預覽並下載結果。（需登入）"
     },
     "exploreMerge": {
       "title": "字表合併",
-      "description": "上傳參考表與待合併字表，將按參考表的漢字順序，批量完成對齊與合併。"
+      "description": "上傳參考表與多份方言 Excel 字表，按參考表漢字順序對齊讀音和註釋，保留一字多音並下載合併結果。（需登入）"
     },
     "exploreDerive": {
       "title": "音系推導",
-      "description": "輔助推導生成字表。"
+      "description": "字表推導頁面目前僅為佔位，推導功能尚未實現。"
     },
     "explorePraat": {
       "title": "Praat 聲學分析",
-      "description": "上傳音頻或直接錄音，查看聲學分析結果（包含基頻、共振峰、頻譜圖、元音空間等），支持按照石鋒T值法自動生成聲調圖。"
+      "description": "在線Praat語音聲學分析：上傳音檔或直接錄音，查看基頻曲線、共振峰、頻譜圖和母音空間等，手動選取樣本後用石鋒T值法生成五度制聲調圖。（需登入）"
     },
     "exploreGis": {
       "title": "地圖繪製",
-      "description": "在線GIS地圖編輯器，支持添加、編輯和刪除地理要素，同時支持泰森多邊形自動繪製方言分佈圖。"
+      "description": "線上GIS地圖編輯器：可匯入地理資料（如行政區劃、河流等），分圖層編輯點、線、面和文字標註，並匯出 GeoJSON 或圖片。支援透過泰森多邊形（voronoi圖）繪製方言分佈圖，可使用網站資料或自訂上傳方言點資料。（需登入）"
     },
     "exploreManage": {
       "title": "資料管理",
-      "description": "管理和維護站點資料庫。"
+      "description": "管理和維護站點資料庫（僅管理員）。"
     },
     "exploreCharClass": {
       "title": "漢字字集",
-      "description": "按韻書地位逐級展開漢字，可查看各地位所包含的漢字及注釋，支持自定義順序。"
+      "description": "按韻書的音韻地位逐級瀏覽漢字字集，查看各音類的漢字及註釋，並自訂分類層級和順序。具體支援《廣韻》、上古音、《洪武正韻》、《中原音韻》、《蒙古字韻》、《分韻撮要》。"
     },
     "exploreYcOverview": {
       "title": "陽春專題",
-      "description": "查看陽春方言資料的專題概覽。"
+      "description": "瀏覽陽春白話、涯話等方言的分佈、接觸與音系概覽。頁面開發中，目前內容由 AI 生成，需結合來源核對。"
     },
     "exploreYcWords": {
       "title": "陽春詞句",
-      "description": "瀏覽陽春方言詞彙與例句資料。"
+      "description": "查詢陽春話口語詞，包含本字、IPA 讀音、粵拼、釋義和例詞例句等資訊，支援按欄位篩選詞表。"
     },
     "exploreYcExpressions": {
       "title": "陽春表達",
-      "description": "瀏覽陽春方言表達和語法資料。"
+      "description": "瀏覽陽春方言熟語、歇後語、農諺和疊式詞示例，按類型與詞形模式查找。頁面開發中，目前內容由 AI 生成，需核對。"
     },
     "exploreYcVillages": {
       "title": "陽春自然村",
-      "description": "查看陽春自然村資料與分佈。"
+      "description": "查詢陽春自然村與村委會資料，按鄉鎮、社區等行政層級展開村落，查看村莊的隸屬關係。"
     },
     "exploreVillagesToponyms": {
       "title": "地名檢索",
-      "description": "檢索自然村地名和相關行政信息。"
+      "description": "自然村地名檢索與分佈地圖開發中，規劃按村名及行政資訊查詢村落；目前地名資料功能暫不可用。"
     },
     "exploreVillagesGd": {
       "title": "廣東自然村樹",
-      "description": "按行政區劃層級瀏覽廣東自然村資料，支持樹狀展開和方言地圖可視化。"
+      "description": "按市、縣、鄉鎮等行政層級樹狀瀏覽廣東自然村名錄，查詢村名、方言分佈及經緯度，並在地圖上查看村莊。支援跳轉地圖繪製頁面，根據泰森多邊形繪製方言分佈圖。"
     },
     "exploreVillagesTable": {
       "title": "廣東自然村表",
-      "description": "以表格形式瀏覽和查詢廣東自然村數據，支持排序、篩選、分頁。"
+      "description": "按照表格查看廣東自然村名錄，可按村名、行政區劃或方言篩選，查看經緯度，支援表格排序與分頁。"
     },
     "exploreVillagesMl": {
       "title": "自然村機器學習",
-      "description": "使用機器學習方法分析自然村名的模式和規律。"
+      "description": "分析廣東自然村名的命名規律，查看村名字頻、語義類別、地理熱點與區域差異，探索機器學習聚類結果。"
     },
     "exploreVillagesAll": {
       "title": "全部自然村",
-      "description": "瀏覽站點收錄的自然村資料。"
+      "description": "按樹狀圖查看全國自然村名錄、村落總資料庫。（僅管理員）"
     },
     "villagesML": {
       "title": "自然村分析工作台",

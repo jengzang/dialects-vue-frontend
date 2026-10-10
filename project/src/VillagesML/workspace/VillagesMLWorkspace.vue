@@ -6,7 +6,7 @@
       :navigation-schema="commonBarSchema"
       :show-login-button="false"
       :sidebar-component="SimpleSidebar"
-      :show-sidebar-title="false"
+      :show-sidebar-title="true"
       height="7dvh"
       mobile-height="7dvh"
     />

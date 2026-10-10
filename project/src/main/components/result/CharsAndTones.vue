@@ -139,7 +139,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onActivated, onDeactivated, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getReadingClass, getSearchCharReadingType } from '@/main/utils/query/ResultTable.js';
 import { READING_COLORS } from '@/main/config/colors/readingColors.js';
@@ -183,6 +183,7 @@ const processedData = computed(() => {
 // ================= TAB 1 漢字導航 =================
 const contentSearchRef = ref(null);
 const activeCharNavId = ref('');
+let removePageScrollListeners = null;
 
 const getCharNavId = (index) => `char-nav-${index}`;
 
@@ -212,16 +213,15 @@ const updateActiveCharNav = () => {
     return;
   }
 
-  const containerTop = container.getBoundingClientRect().top;
+  const isInnerScrollable = container.scrollHeight > container.clientHeight + 1;
+  const activationTop = isInnerScrollable ? container.getBoundingClientRect().top + 36 : 96;
   let currentId = charNavItems.value[0].id;
 
   charNavItems.value.forEach((nav) => {
     const target = container.querySelector(`[data-char-nav-id="${nav.id}"]`);
     if (!target) return;
 
-    const offsetTop = target.getBoundingClientRect().top - containerTop;
-
-    if (offsetTop <= 36) {
+    if (target.getBoundingClientRect().top <= activationTop) {
       currentId = nav.id;
     }
   });
@@ -240,10 +240,17 @@ const jumpToChar = async (id) => {
   const containerRect = container.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
 
-  container.scrollTo({
-    top: container.scrollTop + targetRect.top - containerRect.top - 12,
-    behavior: 'smooth'
-  });
+  if (container.scrollHeight > container.clientHeight + 1) {
+    container.scrollTo({
+      top: container.scrollTop + targetRect.top - containerRect.top - 12,
+      behavior: 'smooth'
+    });
+  } else {
+    target.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
+  }
 
   activeCharNavId.value = id;
 };
@@ -595,32 +602,58 @@ const handleExport = () => {
   showSuccess(t('result.charsAndTones.export.exported'));
 };
 
+const removePageScrollObserver = () => {
+  if (removePageScrollListeners) {
+    removePageScrollListeners();
+    removePageScrollListeners = null;
+  }
+};
+
+const attachPageScrollObserver = () => {
+  removePageScrollObserver();
+  window.addEventListener('scroll', updateActiveCharNav, { passive: true });
+  window.addEventListener('resize', updateActiveCharNav, { passive: true });
+  removePageScrollListeners = () => {
+    window.removeEventListener('scroll', updateActiveCharNav);
+    window.removeEventListener('resize', updateActiveCharNav);
+  };
+  updateActiveCharNav();
+};
+
 onMounted(() => {
-  nextTick(() => updateActiveCharNav());
+  nextTick(() => attachPageScrollObserver());
+});
+
+onActivated(() => {
+  nextTick(() => attachPageScrollObserver());
+});
+
+onDeactivated(() => {
+  removePageScrollObserver();
+});
+
+onUnmounted(() => {
+  removePageScrollObserver();
 });
 
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 .chartonepage {
   display: flex;
   min-width: 60dvw;
   max-width: 85dvw;
-  height: 66dvh;
   margin: 0 auto;
   padding: 8px;
   overflow-x: auto;
-  overflow-y: auto;
   font-size: 18px;
   background: var(--glass-05);
   border: 2px solid var(--glass-10);
   border-radius: var(--radius-md);
   box-shadow: 0 8px 24px var(--bg-hover);
   backdrop-filter: blur(8px);
-
-  @media (max-aspect-ratio: 1/1) {
-    height: 60dvh;
-  }
 }
 
 $primary-blue: var(--color-primary);
@@ -633,9 +666,7 @@ $glass-blur: 8px;
 .content-search {
   position: relative;
   flex-grow: 1;
-  max-height: calc(100% - 70px);
   padding: 20px;
-  overflow-y: auto;
   border-radius: var(--radius-md);
   scroll-behavior: smooth;
 }

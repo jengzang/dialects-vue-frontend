@@ -72,7 +72,7 @@ const emit = defineEmits(['point-click'])
 
 const mapContainer = ref(null)
 const map = shallowRef(null)
-const currentStyleKey = ref('gaode')
+const currentStyleKey = ref('tianditu')
 const loading = ref(false)
 const isFullScreen = ref(false)
 const layerInteractionHandlers = new Map()

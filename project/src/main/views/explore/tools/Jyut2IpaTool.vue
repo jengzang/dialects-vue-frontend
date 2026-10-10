@@ -52,6 +52,15 @@
         <div class="info-section">
           <p class="info-text">{{ t('tools.jyut2ipa.upload.info') }}</p>
           <p v-if="jyutImportSummary" class="info-text info-text--summary">{{ jyutImportSummary }}</p>
+          
+          <div class="mode-toggle">
+            <CheckBox v-model="multiSyllableMode">
+              {{ t('tools.jyut2ipa.mode.multiLabel') }}
+            </CheckBox>
+            <span v-if="multiSyllableMode" class="mode-toggle__hint">
+              {{ t('tools.jyut2ipa.mode.multiHint') }}
+            </span>
+          </div>
 
           <div class="config-card" @click="showConfigModal = true">
             <div class="config-icon"><InlineIcon icon="⚙️" /></div>
@@ -303,6 +312,7 @@ import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import { usePollingTask } from '@/composables/core/usePollingTask.js'
@@ -338,6 +348,7 @@ const completed = ref(false)
 const progress = ref(0)
 const processingText = ref(t('tools.jyut2ipa.processing.preparingUpload'))
 const showConfigModal = ref(false)
+const multiSyllableMode = ref(false)
 const currentTab = ref('wf')
 const rulesStorage = useStorageState('jyut2ipa_custom_rules', {
   defaultValue: null,
@@ -692,7 +703,7 @@ const processFile = async (file, options = {}) => {
     taskId.value = uploadData.task_id
 
     processingText.value = t('tools.jyut2ipa.processing.preparingConvert')
-    await processJyut2Ipa(taskId.value, rules.value)
+    await processJyut2Ipa(taskId.value, rules.value, multiSyllableMode.value ? 'multi' : 'single')
     processingText.value = t('tools.jyut2ipa.processing.running')
 
     await progressPolling.start(
@@ -1535,6 +1546,20 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     line-height: 1;
     color: rgba(var(--color-primary-rgb), 0.8);
     transition: transform 0.3s ease;
+  }
+}
+
+.mode-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+
+  &__hint {
+    font-size: 13px;
+    line-height: 1.5;
+    color: $text-70;
+    text-align: center;
   }
 }
 

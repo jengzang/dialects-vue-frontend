@@ -277,7 +277,8 @@
           "chars": "查字",
           "tones": "查调",
           "compareChars": "比较汉字",
-          "compareTones": "比较调类"
+          "compareTones": "比较调类",
+          "notes": "查注释"
         }
       },
       "analysis": {

@@ -94,6 +94,18 @@
     }
   }
 
+  &[data-variant='success'] {
+    background: var(--color-success);
+    border-color: var(--color-success);
+    color: var(--text-white);
+
+    &:hover:not(:disabled) {
+      background: var(--color-success-dark, var(--color-success));
+      border-color: var(--color-success-dark, var(--color-success));
+      box-shadow: 0 4px 12px rgba(var(--color-success-rgb), 0.35);
+    }
+  }
+
   &[data-variant='enter'] {
     padding: var(--glass-button-enter-padding, 0.5rem 1rem);
     background: var(--enter-button-bg);

@@ -45,4 +45,18 @@ describe('home showcase layout', () => {
     expect(showcaseBlock).not.toContain('@include section-container')
     expect(showcaseBlock).not.toContain('padding:')
   })
+
+  it('places the globe joystick mount between hero content and showcase content', () => {
+    const homePage = readSource('src/main/views/HomePage.vue')
+    const heroContentIndex = homePage.indexOf('<div class="hero-content">')
+    const joystickAnchorIndex = homePage.indexOf('id="home-globe-joystick-anchor"')
+    const showcaseIndex = homePage.indexOf('<section class="showcase-section" ref="showcaseSectionRef">')
+    const joystickAnchorBlock = selectorBlock(homePage, '.globe-joystick-anchor')
+
+    expect(heroContentIndex).toBeGreaterThan(-1)
+    expect(joystickAnchorIndex).toBeGreaterThan(heroContentIndex)
+    expect(showcaseIndex).toBeGreaterThan(joystickAnchorIndex)
+    expect(joystickAnchorBlock).toContain('@include flex-center;')
+    expect(joystickAnchorBlock).toContain(':empty')
+  })
 })

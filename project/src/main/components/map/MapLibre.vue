@@ -185,7 +185,7 @@ const ADMIN_BOUNDARY_LAYER_ID = 'admin-boundary-line-layer';
 
 const mapContainer = ref(null);
 const map = shallowRef(null);
-const currentStyleKey = ref('gaode');
+const currentStyleKey = ref('tianditu');
 const loading = ref(false);
 const isFullScreen = ref(false);
 const { t } = useI18n();

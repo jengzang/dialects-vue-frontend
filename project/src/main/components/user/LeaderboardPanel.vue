@@ -76,6 +76,10 @@ const categoryConfigs = computed(() => [
       {
         key: 'endpoint__api_compare_tones',
         label: t('user.leaderboard.categories.charsTones.items.compareTones')
+      },
+      {
+        key: 'endpoint__api_notes',
+        label: t('user.leaderboard.categories.charsTones.items.notes')
       }
     ]
   },
@@ -205,10 +209,10 @@ const categoryConfigs = computed(() => [
     label: t('user.leaderboard.categories.customData.label'),
     categoryKey: 'category_用户自定义',
     endpoints: [
-      {
-        key: 'endpoint_group_custom_regions',
-        label: t('user.leaderboard.categories.customData.items.customRegions')
-      },
+      // {
+      //   key: 'endpoint_group_custom_regions',
+      //   label: t('user.leaderboard.categories.customData.items.customRegions')
+      // },
       {
         key: 'endpoint_group_custom_data_query',
         label: t('user.leaderboard.categories.customData.items.customDataQuery')
@@ -355,6 +359,7 @@ const tableData = computed(() => {
 
     endpointRows[0].isFirstEndpointInCategory = true
     endpointRows[0].categoryEndpointCount = endpointRows.length
+    endpointRows[endpointRows.length - 1].isLastEndpointInCategory = true
 
     rows.push({
       ...createRow(
@@ -464,6 +469,10 @@ const tableData = computed(() => {
                 <tr
                   v-if="!row.isCategorySummary"
                   class="data-row"
+                  :class="{
+                    'category-group-start': row.isFirstEndpointInCategory,
+                    'category-group-end': row.isLastEndpointInCategory
+                  }"
                 >
                   <template v-if="row.isFirstEndpointInCategory">
                     <td
@@ -1002,6 +1011,8 @@ $warning: var(--color-warning);
       rgba($primary, 0.06)
     );
     border-right: 2px solid rgba($primary, 0.3);
+    border-top: 1px solid var(--border-gray);
+    border-bottom: 1px solid var(--border-gray);
     vertical-align: middle;
     text-align: center;
     font-size: 14px;
@@ -1047,6 +1058,8 @@ $warning: var(--color-warning);
       rgba($primary, 0.03)
     );
     border-right: 1px solid rgba($primary, 0.15);
+    border-top: 1px solid var(--border-gray);
+    border-bottom: 1px solid var(--border-gray);
     font-weight: 600;
 
     &.category-gold {
@@ -1136,6 +1149,14 @@ $warning: var(--color-warning);
         border-left: 3px solid $bronze;
       }
     }
+  }
+
+  &.category-group-start > td {
+    border-top: 1px solid var(--border-gray);
+  }
+
+  &.category-group-end > td {
+    border-bottom: 1px solid var(--border-gray);
   }
 
   &.first-place {

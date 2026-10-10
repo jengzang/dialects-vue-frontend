@@ -1,5 +1,5 @@
 <template>
-  <div class="navbar">
+  <div ref="navbarRef" class="navbar">
     <!-- 桌面端的布局 -->
     <div ref="desktopRef" class="navbar-desktop">
       <div  class="navbar-item logo-and-title" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
@@ -98,7 +98,6 @@
 
     <SimpleSidebar
       :is-open="isSidebarVisible"
-      :show-title="false"
       @close="isSidebarVisible = false"
     />
 
@@ -192,7 +191,7 @@
 
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import {
@@ -226,15 +225,44 @@ const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const isSidebarVisible = ref(false)
+const navbarRef = ref(null)
 const desktopRef = ref(null)
 const navRef = ref(null)
 const mobileNavRef = ref(null)
+let liquidGlassScrollFrame = null
+
+const updateLiquidGlassGlint = () => {
+  liquidGlassScrollFrame = null
+
+  const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
+  const progress = Math.min(window.scrollY / maxScroll, 1)
+  navbarRef.value?.style.setProperty('--liquid-glass-glint-shift', `${20 + progress * 60}%`)
+}
+
+const scheduleLiquidGlassGlint = () => {
+  if (liquidGlassScrollFrame !== null) return
+
+  liquidGlassScrollFrame = window.requestAnimationFrame(updateLiquidGlassGlint)
+}
+
+onMounted(() => {
+  updateLiquidGlassGlint()
+  window.addEventListener('scroll', scheduleLiquidGlassGlint, { passive: true })
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', scheduleLiquidGlassGlint)
+
+  if (liquidGlassScrollFrame !== null) {
+    window.cancelAnimationFrame(liquidGlassScrollFrame)
+  }
+})
 
 // Tab label tooltip
 const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
 
 const { pillStyle: desktopPillStyle } = useTabPill(navRef, '.menu-inner.active', route)
-const { pillStyle: mobilePillStyle } = useTabPill(mobileNavRef, '.menu-item.active', route)
+const { pillStyle: mobilePillStyle, updatePill: updateMobilePill } = useTabPill(mobileNavRef, '.menu-item.active', route)
 
 // ===== sessionStorage 管理：记住每个 tab 的最后访问的 sub =====
 watch(() => route.path, () => {
@@ -251,13 +279,19 @@ const getTabScroll = (tab, isMobile) => getDefaultTabScroll(tab, isMobile)
 const orderedTabs = computed(() => sortTabsByScroll(tabs.value, false, getTabScroll))
 const orderedMobileTabs = computed(() => sortTabsByScroll(tabs.value, true, getTabScroll))
 
-const { hasOverflowDesktop, hasOverflowMobile, scrollClass, scrollClassMobile, onScroll, onScrollEnd, navContentWidth } = useScrollSnap(
+const { hasOverflowDesktop, hasOverflowMobile, scrollClass, scrollClassMobile, onScroll, onScrollEnd, scrollToRest, navContentWidth } = useScrollSnap(
   navRef,
   orderedTabs,
   { desktop: 30, portrait: 18 },
   mobileNavRef,
   orderedMobileTabs
 )
+
+watch(() => orderedMobileTabs.value.map(tab => tab.tab).join('|'), () => {
+  if (!mobileNavRef.value) return
+  scrollToRest(mobileNavRef.value)
+  updateMobilePill()
+}, { flush: 'post' })
 
 const { canScrollLeft, canScrollRight, isScrolling, arrowLeftPx, arrowRightPx, startScroll, stopScroll } = useScrollArrows(
   navRef,
@@ -346,24 +380,42 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
 /* 导航栏根容器 */
 .navbar {
   position: fixed;
-  top: 0;
-  left: 0;
+  top: 12px;
+  right: 16px;
+  left: 16px;
   z-index: 999;
-  width: 100%;
+  width: auto;
   box-sizing: border-box;
+  --liquid-glass-glint-shift: 20%;
 
   @include flex-center;
 
-  background: linear-gradient(135deg, var(--glass-20), var(--glass-10));
-  border: 1px solid var(--glass-30);
-  box-shadow: var(--shadow-glass-inset);
-  backdrop-filter: blur(6px) saturate(160%);
-  -webkit-backdrop-filter: blur(6px) saturate(160%);
-  will-change: backdrop-filter;
+  background:
+    linear-gradient(110deg, transparent 35%, var(--glass-50) 50%, transparent 65%),
+    linear-gradient(180deg, var(--glass-40), var(--glass-10));
+  background-position: var(--liquid-glass-glint-shift) 0, center;
+  background-size: 180% 100%, 100% 100%;
+  border: 2px solid var(--glass-50);
+  border-radius: var(--radius-xl);
+  box-shadow:
+    inset 0 1px 0 var(--glass-90),
+    inset 0 -1px 0 var(--glass-30),
+    0 10px 24px rgba(var(--color-shadow-rgb), 0.18);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease,
-    border-color 0.3s ease;
+    border-color 0.3s ease,
+    background-position 0.2s ease-out;
+}
+
+@media (prefers-contrast: more) {
+  .navbar {
+    background: var(--surface-panel-strong);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }
 
 /* 桌面端 */
@@ -416,19 +468,18 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   left: 0;
   top: 50%;
   pointer-events: none;
-  background: linear-gradient(
-    145deg,
-    var(--glass-20),
-    var(--glass-10)
-  );
+  background: linear-gradient(155deg, var(--glass-30), var(--glass-05));
   border-radius: 25px;
   box-shadow:
-    0 6px 10px rgba(0, 0, 0, 0.1),
-    0 1px 4px rgba(0, 0, 0, 0.08);
+    inset 0 1px 0 var(--glass-90),
+    inset 0 0 0 1px var(--glass-60),
+    inset 0 -3px 8px rgba(var(--color-shadow-rgb), 0.08),
+    0 5px 12px rgba(var(--color-shadow-rgb), 0.15);
+  @include glass-blur(8px, 150%);
+  opacity: 1 !important;
   transition:
     transform 0.6s cubic-bezier(0.25, 0.1, 0.0, 1.0),
-    width 0.6s cubic-bezier(0.25, 0.1, 0.0, 1.0),
-    opacity 0.15s ease;
+    width 0.6s cubic-bezier(0.25, 0.1, 0.0, 1.0);
 
   &--mobile {
     border-radius: 30px;
@@ -557,18 +608,16 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   }
 
   .menu-item:hover & {
-    background: rgba(var(--color-primary-rgb), 0.12);
+    background: var(--glass-10);
   }
 
   &.active {
     position: relative;
-    @include soft-glass-background;
-    @include soft-glass-shadow;
-
-    border: 3px solid var(--glass-40);
+    background: transparent;
+    border: 3px solid transparent;
     border-radius: 25px;
     color: var(--color-primary-hover);
-    font-weight: 1000;
+    font-weight: 700;
     font-size: 1.1em;
     transition:
       background 0.3s ease 0.6s,
@@ -578,26 +627,8 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
       box-shadow 0.3s ease 0.6s,
       font-size 0.3s ease 0.6s;
 
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 3px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 65%;
-      height: 2px;
-      background: var(--color-primary-hover);
-      border-radius: 2px;
-      opacity: 0.5;
-    }
-
     &:hover {
-      background: linear-gradient(
-        145deg,
-        var(--glass-50),
-        var(--glass-30)
-      );
-      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+      background: transparent;
     }
   }
 }
@@ -732,6 +763,13 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
 
 /* 横竖屏切换 */
 @media (max-aspect-ratio: $mobile-aspect-ratio) {
+  .navbar {
+    top: max(8px, env(safe-area-inset-top));
+    right: 8px;
+    left: 8px;
+    border-radius: var(--radius-lg);
+  }
+
   .navbar-desktop {
     display: none;
   }
@@ -777,30 +815,15 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
     &.active {
       position: relative;
       z-index: 1;
-      @include soft-glass-background;
-      @include soft-glass-shadow;
-
-      border: 3px solid var(--glass-40);
+      background: transparent;
+      border: 3px solid transparent;
       border-radius: 30px;
       color: var(--color-primary-hover);
-      font-weight: 1000;
-      transition: 0.3s ease 0.6s;
+      font-weight: 700;
+      transition: color 0.3s ease 0.6s;
 
       .nav-icon, .label {
         font-size: 1.1em;
-      }
-
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: 3px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 65%;
-        height: 2px;
-        background: var(--color-primary-hover);
-        border-radius: 2px;
-        opacity: 0.5;
       }
     }
   }

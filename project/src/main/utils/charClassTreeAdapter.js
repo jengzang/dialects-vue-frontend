@@ -208,10 +208,44 @@ const normalizeNode = (data, name, path, options) => {
   }
 }
 
-export const normalizeCharClassTree = (rawTree, options = {}) =>
-  Object.entries(rawTree || {})
+const normalizeCollapsedLeafLevel = (rawTree, options) => {
+  const promotedLeafContent = {
+    chars: [],
+    annotations: []
+  }
+
+  Object.entries(rawTree || {}).forEach(([topKey, value], index) => {
+    const node = normalizeNode(value, topKey, `node.${index}`, options)
+    if (!node) {
+      return
+    }
+
+    appendLeafContent(promotedLeafContent, node)
+  })
+
+  if (!promotedLeafContent.chars.length) {
+    return []
+  }
+
+  return [{
+    id: 'node.leaf-content',
+    name: '',
+    _normalizedName: '',
+    ...promotedLeafContent,
+    children: [],
+    isLeaf: true
+  }]
+}
+
+export const normalizeCharClassTree = (rawTree, options = {}) => {
+  if (options.collapseLeafLevel) {
+    return normalizeCollapsedLeafLevel(rawTree, options)
+  }
+
+  return Object.entries(rawTree || {})
     .map(([topKey, value], index) => normalizeNode(value, topKey, `node.${index}`, options))
     .filter(Boolean)
+}
 
 export const filterCharClassTree = (nodes, query) => {
   if (!nodes?.length) {

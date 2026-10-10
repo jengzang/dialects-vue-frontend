@@ -11,82 +11,106 @@
       <span>{{ t('result.locationDetailPopup.loading') }}</span>
     </div>
 
-    <div v-else-if="data && data.data && data.data.length > 0" class="location-content">
-      <div class="section-title">{{ t('result.locationDetailPopup.phonologyActions.title') }}</div>
-      <div class="phono-actions">
-        <button type="button" class="quick-search pill-btn" @click="goToPhonology('matrix')">
-          <BarIcon :icon="'⚛️'" />{{ t('result.locationDetailPopup.phonologyActions.matrix') }}
-        </button>
-        <button type="button" class="quick-search pill-btn" @click="openHomophoneLexicon">
-          <BarIcon :icon="'📖'" />{{ t('result.locationDetailPopup.phonologyActions.homophone') }}
-        </button>
-        <button type="button" class="quick-search pill-btn" @click="goToPhonology('evolution')">
-          <BarIcon :icon="'🥧'" />{{ t('result.locationDetailPopup.phonologyActions.evolution') }}
-        </button>
-        <button type="button" class="quick-search pill-btn" @click="goToPhonology('count')">
-          <BarIcon :icon="'🧮'" />{{ t('result.locationDetailPopup.phonologyActions.count') }}
-        </button>
-      </div>
-
-      <div class="info-section">
-        <div class="info-title">{{ data.data[0]['語言'] || locationName }}</div>
-
-        <div class="info-item">
-          <span class="info-label">{{ t('result.locationDetailPopup.fields.mapPartition') }}</span>
-          <span class="info-value">{{ data.data[0]['地圖集二分區'] || t('result.terms.none') }}</span>
-        </div>
-
-        <div class="info-item">
-          <span class="info-label">{{ t('result.locationDetailPopup.fields.yindianPartition') }}</span>
-          <span class="info-value">{{ data.data[0]['音典分區'] || t('result.terms.none') }}</span>
-        </div>
-
-        <div class="info-item">
-          <span class="info-label">{{ t('result.locationDetailPopup.fields.source') }}</span>
-          <span class="info-value">{{ data.data[0]['字表來源（母本）'] || t('result.terms.none') }}</span>
-        </div>
-
-        <div class="info-item">
-          <span class="info-label">{{ t('result.locationDetailPopup.fields.coordinates') }}</span>
-          <span class="info-value">
-            {{ formatCoordinates(data.data[0]['經緯度']) }}
-            <button
-              v-if="parsedCoord"
-              class="map-lookup-btn"
-              :title="t('result.locationMapPopup.titleFallback')"
-              @click="showMapPopup = true"
-            ><InlineIcon icon="🔍" /></button>
-          </span>
-        </div>
-
-        <div class="info-item">
-          <span class="info-label">{{ t('result.locationDetailPopup.fields.region') }}</span>
-          <span class="info-value">{{ formatAdministrativeRegion(data.data[0]) }}</span>
+    <template v-else>
+      <div v-if="locationName" class="action-section">
+        <div class="section-title">{{ t('result.locationDetailPopup.phonologyActions.title') }}</div>
+        <div class="phono-actions">
+          <button
+            type="button"
+            class="quick-search pill-btn"
+            :disabled="resolvingAction"
+            @click="goToPhonology('matrix')"
+          >
+            <BarIcon :icon="'⚛️'" />{{ t('result.locationDetailPopup.phonologyActions.matrix') }}
+          </button>
+          <button
+            type="button"
+            class="quick-search pill-btn"
+            :disabled="resolvingAction"
+            @click="openHomophoneLexicon"
+          >
+            <BarIcon :icon="'📖'" />{{ t('result.locationDetailPopup.phonologyActions.homophone') }}
+          </button>
+          <button
+            type="button"
+            class="quick-search pill-btn"
+            :disabled="resolvingAction"
+            @click="goToPhonology('evolution')"
+          >
+            <BarIcon :icon="'🥧'" />{{ t('result.locationDetailPopup.phonologyActions.evolution') }}
+          </button>
+          <button
+            type="button"
+            class="quick-search pill-btn"
+            :disabled="resolvingAction"
+            @click="goToPhonology('count')"
+          >
+            <BarIcon :icon="'🧮'" />{{ t('result.locationDetailPopup.phonologyActions.count') }}
+          </button>
         </div>
       </div>
 
-      <div class="tone-section" v-if="getToneData(data.data[0]).length > 0">
-        <div class="section-title">{{ t('result.locationDetailPopup.toneSection.title') }}</div>
-        <table class="tone-table">
-          <thead>
-            <tr>
-              <th>{{ t('result.locationDetailPopup.toneSection.headers.class') }}</th>
-              <th>{{ t('result.locationDetailPopup.toneSection.headers.value') }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(tone, index) in getToneData(data.data[0])" :key="index">
-              <td>{{ tone.label }}</td>
-              <td>{{ tone.value }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+      <div v-if="data && data.data && data.data.length > 0" class="location-content">
+        <div class="info-section">
+          <div class="info-title">{{ data.data[0]['語言'] || locationName }}</div>
 
-    <div v-else class="error-state main-modal-error-state">
-      <span>{{ t('result.locationDetailPopup.noData') }}</span>
-    </div>
+          <div class="info-item">
+            <span class="info-label">{{ t('result.locationDetailPopup.fields.mapPartition') }}</span>
+            <span class="info-value">{{ data.data[0]['地圖集二分區'] || t('result.terms.none') }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">{{ t('result.locationDetailPopup.fields.yindianPartition') }}</span>
+            <span class="info-value">{{ data.data[0]['音典分區'] || t('result.terms.none') }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">{{ t('result.locationDetailPopup.fields.source') }}</span>
+            <span class="info-value">{{ data.data[0]['字表來源（母本）'] || t('result.terms.none') }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">{{ t('result.locationDetailPopup.fields.coordinates') }}</span>
+            <span class="info-value">
+              {{ formatCoordinates(data.data[0]['經緯度']) }}
+              <button
+                v-if="parsedCoord"
+                class="map-lookup-btn"
+                :title="t('result.locationMapPopup.titleFallback')"
+                @click="showMapPopup = true"
+              ><InlineIcon icon="🔍" /></button>
+            </span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">{{ t('result.locationDetailPopup.fields.region') }}</span>
+            <span class="info-value">{{ formatAdministrativeRegion(data.data[0]) }}</span>
+          </div>
+        </div>
+
+        <div class="tone-section" v-if="getToneData(data.data[0]).length > 0">
+          <div class="section-title">{{ t('result.locationDetailPopup.toneSection.title') }}</div>
+          <table class="tone-table">
+            <thead>
+              <tr>
+                <th>{{ t('result.locationDetailPopup.toneSection.headers.class') }}</th>
+                <th>{{ t('result.locationDetailPopup.toneSection.headers.value') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(tone, index) in getToneData(data.data[0])" :key="index">
+                <td>{{ tone.label }}</td>
+                <td>{{ tone.value }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div v-else class="error-state main-modal-error-state">
+        <span>{{ t('result.locationDetailPopup.noData') }}</span>
+      </div>
+    </template>
   </AppModal>
 
   <LocationMapPopup
@@ -98,7 +122,7 @@
 
   <HomophoneLexiconModal
     :visible="showLexiconModal"
-    :location="locationText"
+    :location="lexiconLocation"
     @close="showLexiconModal = false"
   />
 </template>
@@ -115,6 +139,8 @@ import { pendingCountphosLocations, pendingCountphosQueryMode } from '@/main/sto
 import AppModal from '@/components/common/AppModal.vue'
 import LocationMapPopup from './LocationMapPopup.vue'
 import HomophoneLexiconModal from '@/main/components/pho/popups/HomophoneLexiconModal.vue'
+import { getLocations } from '@/api'
+import { resolvePhonologyActionLocation } from '@/main/utils/phonology/actionLocationResolver.js'
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
@@ -130,10 +156,12 @@ const route = useRoute()
 const router = useRouter()
 const showMapPopup = ref(false)
 const showLexiconModal = ref(false)
+const lexiconLocation = ref('')
+const resolvingAction = ref(false)
 
 const modalTitle = computed(() => `📍 ${t('result.locationDetailPopup.title', { name: props.locationName })}`)
 
-const locationText = computed(() => props.data?.data?.[0]?.['簡稱'] || props.locationName)
+const detailRow = computed(() => props.data?.data?.[0] || null)
 
 const parsedCoord = computed(() => {
   const raw = props.data?.data?.[0]?.['經緯度']
@@ -200,15 +228,38 @@ const handleClose = () => {
   emit('close');
 };
 
-const openHomophoneLexicon = () => {
-  if (!locationText.value) return
+const resolveActionLocation = async () => {
+  if (resolvingAction.value) return ''
+
+  resolvingAction.value = true
+  try {
+    return await resolvePhonologyActionLocation(
+      {
+        detailRow: detailRow.value,
+        fallbackName: props.locationName
+      },
+      getLocations
+    )
+  } catch (error) {
+    console.error('Resolve phonology action location failed:', error)
+    return ''
+  } finally {
+    resolvingAction.value = false
+  }
+}
+
+const openHomophoneLexicon = async () => {
+  const loc = await resolveActionLocation()
+  if (!loc) return
+
+  lexiconLocation.value = loc
   showLexiconModal.value = true
 };
 
 const PHONOLOGY_LOC_KEY_BY_SECTION = { matrix: 'mloc', evolution: 'eloc' }
 
-const goToPhonology = (section) => {
-  const loc = locationText.value
+const goToPhonology = async (section) => {
+  const loc = await resolveActionLocation()
   if (!loc) return
 
   emit('close')

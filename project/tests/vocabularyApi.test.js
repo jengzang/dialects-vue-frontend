@@ -31,8 +31,10 @@ const {
   getVocabularyLocationOptions,
   getVocabularyLocations,
   getVocabularyLogs,
+  deleteVocabularyLocation,
   updateVocabularyLocation,
   setVocabularyPermission,
+  setVocabularyEntryCreateLocationName,
   vocabularySqlApi,
   previewVocabularyImport,
   uploadVocabulary,
@@ -48,6 +50,7 @@ function readSource(path) {
 
 beforeEach(() => {
   apiMock.mockClear()
+  setVocabularyEntryCreateLocationName('')
 })
 
 describe('vocabulary items API', () => {
@@ -68,6 +71,7 @@ describe('vocabulary items API', () => {
       can_upload: true,
       can_manage_entries: false,
       can_view_logs: false,
+      can_delete_locations: true,
     })
 
     await getVocabularyMe()
@@ -272,6 +276,52 @@ describe('vocabulary table API adapter', () => {
     })
   })
 
+  it('adds the selected manage-page location only when creating vocabulary entries', async () => {
+    setVocabularyEntryCreateLocationName('甲地')
+
+    apiMock.mockResolvedValueOnce({ status: 'success' })
+    await vocabularySqlApi.mutateSingle({
+      db_key: 'vocabulary',
+      table_name: 'vocabulary_entries',
+      action: 'create',
+      data: { standard_word: '太阳' },
+    })
+
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/sql/mutate', {
+      method: 'POST',
+      body: {
+        table_name: 'vocabulary_entries',
+        action: 'create',
+        data: {
+          standard_word: '太阳',
+          location_name: '甲地',
+        },
+      },
+    })
+
+    apiMock.mockResolvedValueOnce({ status: 'success' })
+    await vocabularySqlApi.mutateSingle({
+      table_name: 'vocabulary_entries',
+      action: 'update',
+      pk_column: 'id',
+      pk_value: 1,
+      data: { standard_word: '月亮' },
+    })
+
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/sql/mutate', {
+      method: 'POST',
+      body: {
+        table_name: 'vocabulary_entries',
+        action: 'update',
+        pk_column: 'id',
+        pk_value: 1,
+        data: { standard_word: '月亮' },
+      },
+    })
+
+    setVocabularyEntryCreateLocationName('')
+  })
+
   it('loads vocabulary location options from the public lightweight endpoint', async () => {
     apiMock.mockResolvedValueOnce({
       locations: [
@@ -284,8 +334,8 @@ describe('vocabulary table API adapter', () => {
     const values = await getVocabularyLocationOptions()
 
     expect(values).toEqual([
-      { value: '息烽', label: '贵州 / 贵阳 / 息烽' },
-      { value: '天柱', label: '贵州 / 黔东南 / 天柱' },
+      { value: '息烽', label: '息烽', locationLabel: '贵州 / 贵阳 / 息烽', province: '', city: '' },
+      { value: '天柱', label: '天柱', locationLabel: '贵州 / 黔东南 / 天柱', province: '', city: '' },
     ])
     expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/search/location-options')
   })
@@ -311,6 +361,16 @@ describe('vocabulary table API adapter', () => {
     expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/locations/%E6%81%AF%E7%83%BD?user_id=7', {
       method: 'PATCH',
       body: { coordinates: '106,27' },
+    })
+
+    apiMock.mockResolvedValueOnce({
+      status: 'deleted',
+      location_name: '息烽',
+      deleted_entries: 2,
+    })
+    await deleteVocabularyLocation('息烽', { user_id: 7 })
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/locations/%E6%81%AF%E7%83%BD?user_id=7', {
+      method: 'DELETE',
     })
 
     apiMock.mockResolvedValueOnce({ logs: [], total: 0, page: 1, page_size: 50 })

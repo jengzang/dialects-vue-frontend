@@ -139,7 +139,7 @@ export const menuRoutes = [
       {
         path: 'view',
         component: VocabularyViewPage,
-        meta: { queryAllowlist: ['tab'] }
+        meta: { queryAllowlist: ['tab', 'source'] }
       },
       {
         path: 'import',

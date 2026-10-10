@@ -188,7 +188,7 @@ $primary-blue: var(--color-primary);
 $primary-blue-dark: var(--color-primary-hover);
 $text-primary: var(--text-primary);
 $text-secondary: var(--text-secondary);
-$text-muted: var(--text-secondary);
+$text-muted: var(--action-primary-bg);
 $white: var(--text-white);
 
 $radius-sm: 8px;

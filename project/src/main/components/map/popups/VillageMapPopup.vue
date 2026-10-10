@@ -100,7 +100,7 @@ const route = useRoute()
 // 状态管理
 const mapContainer = ref(null)
 const map = shallowRef(null)
-const currentStyle = ref('gaode')
+const currentStyle = ref('tianditu')
 const displayMode = ref('name') // 'name' | 'dialect'
 const isFullscreen = ref(false)
 let clusteredPopup = null

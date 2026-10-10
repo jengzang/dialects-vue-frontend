@@ -492,7 +492,7 @@ const currentTab = computed(() => {
 onMounted(() => {
   if (route.query.from === 'vocabulary_import') {
     nextTick(() => {
-      document.querySelector('[data-about-suggestion-form]')?.scrollIntoView({
+      document.querySelector('[data-about-suggestion-form]')?.scrollIntoView?.({
         behavior: 'smooth',
         block: 'start',
       })

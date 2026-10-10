@@ -544,6 +544,7 @@ const lazyLoadCharClassChildren = async (node) => {
       node.children = normalizeCharClassTree(subtree || {}, {
         leafLevelColumnName: tableConfig?.leafLevelColumnName,
         leafData: tableConfig?.leafData,
+        collapseLeafLevel: levels.value.length === 1,
       })
     }
     node._childrenLoaded = true

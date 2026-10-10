@@ -12,6 +12,18 @@
     "name": "Vocabulary List",
     "desc": "Dialect vocabulary list page",
     "placeholder": "Vocabulary page shell",
+    "source": {
+      "vocabulary": "Vocabulary",
+      "characterNotes": "Character Notes"
+    },
+    "notes": {
+      "refreshResults": "Refresh",
+      "searchPlaceholder": "Search pronunciation or notes",
+      "enterSearch": "Enter a search term",
+      "noMatches": "No matches found",
+      "ipaSearchConfirmTitle": "Enable pronunciation search",
+      "ipaSearchConfirm": "Pronunciation searches may take longer. Leave pronunciation unchecked if you only need to search notes. Enable pronunciation search?"
+    },
     "tabs": {
       "label": "Vocabulary workflows",
       "list": "List",
@@ -32,12 +44,23 @@
       "loginUploadTitle": "Sign in to upload vocabulary",
       "loginUploadDesc": "Please log in to upload vocabulary and request edit permission from an administrator.",
       "requestEditPermission": "Request Edit Permission",
+      "refreshPermission": "Permission",
+      "permissionRefreshed": "Current permission: {permission}",
+      "refreshCooldown": "Please refresh again in {seconds} seconds",
+      "noPermission": "No access",
+      "permissionLabels": {
+        "manage": "Vocabulary admin",
+        "edit": "Vocabulary contributor (unlimited)",
+        "one": "Vocabulary contributor (1)",
+        "two": "Vocabulary contributor (2)",
+        "three": "Vocabulary contributor (3)"
+      },
       "loginManageTitle": "Sign in to manage vocabulary",
       "loginManageDesc": "Vocabulary management, location metadata, and operation logs require signing in.",
       "noUploadPermissionTitle": "No vocabulary upload access",
-      "noUploadPermissionDesc": "This account does not have vocabulary edit or manage access. Please contact an administrator.",
+      "noUploadPermissionDesc": "This account does not have vocabulary access. Please contact an administrator.",
       "noManagePermissionTitle": "No vocabulary management access",
-      "noManagePermissionDesc": "This account does not have vocabulary edit or manage access. Please contact an administrator.",
+      "noManagePermissionDesc": "This account does not have vocabulary manage access. Please contact an administrator.",
       "permissionLoadFailedTitle": "Failed to load vocabulary access",
       "loginAction": "Sign in",
       "backToList": "Back to vocabulary"
@@ -69,7 +92,11 @@
       "provincePlaceholder": "Select Province",
       "cityPlaceholder": "Select City",
       "allProvinces": "All Provinces",
-      "allCities": "All Cities"
+      "allCities": "All Cities",
+      "locationDetails": "Location details",
+      "locationDetailsButton": "Locations",
+      "locationDetailsSearchPlaceholder": "Search location names",
+      "locationDetailsSortByRegion": "Sort by province/city/county"
     },
     "sort": {
       "label": "Sort",
@@ -81,6 +108,7 @@
     "viewModes": {
       "label": "View mode",
       "card": "Cards",
+      "list": "List",
       "table": "Table",
       "map": "Map"
     },
@@ -134,6 +162,8 @@
       "previewParsedCount": "Will import",
       "previewSkippedCount": "Will skip",
       "previewDeleteCount": "Will overwrite",
+      "previewErrorCount": "Errors",
+      "previewErrorsHint": "These rows are missing required fields or are malformed; they will be skipped on import. Fix the source file and upload again if needed.",
       "replaceWarning": "Importing will delete {count} old entries for this user and location before writing the new entries.",
       "confirmOverwrite": "I confirm this import should replace the existing entries for this location",
       "previewReady": "Preview ready. Confirm to submit the vocabulary.",
@@ -151,6 +181,22 @@
       "naturalVillage": "Natural Village",
       "yindianRegion": "Yindian Region",
       "atlasRegion": "Atlas Region",
+      "vocabularySource": "Vocabulary Source",
+      "description": "Description",
+      "other": "Other",
+      "toneValues": "Tones",
+      "toneNames": {
+        "t1": "Yin Ping",
+        "t2": "Yang Ping",
+        "t3": "Yin Shang",
+        "t4": "Yang Shang",
+        "t5": "Yin Qu",
+        "t6": "Yang Qu",
+        "t7": "Yin Ru",
+        "t8": "Yang Ru",
+        "t9": "Other Tone",
+        "t10": "Neutral Tone"
+      },
       "parserMode": "Parser Mode",
       "parserModes": {
         "auto": "Auto",
@@ -168,8 +214,15 @@
       "yindianFailed": "Failed to get Yindian data",
       "yindianHint": "Enter the standard place name (traditional Chinese) from the Yindian archive to match",
       "success": "Upload complete. Imported {count} rows.",
+      "successWithSkipped": "Imported {imported} rows, skipped {skipped} due to format issues.",
+      "noImportableData": "No importable data.",
+      "importResultTitle": "Import result",
+      "importResultSummary": "Imported {imported} rows, skipped {skipped}.",
+      "importResultErrorsHint": "These rows were skipped due to format issues. Fix the source file and import again.",
       "failed": "Upload failed",
       "dataExample": "Data Example",
+      "surveyTemplate": "Word List",
+      "surveyTemplateHelp": "Download the dialect survey word list, record your dialect vocabulary, and help preserve voices for the future.",
       "fillStandardFromLocal": "Auto-fill Standard Word from Local Expression",
       "fillStandardFromLocalHint": "Enabled: empty Standard Words will be auto-filled from Local Expressions. We recommend reviewing and correcting auto-filled Standard Words on the Manage page after upload — inconsistent Standard Words may affect map rendering.",
       "downloadSample": "Download sample",
@@ -214,6 +267,24 @@
       "loadFailed": "Failed to load vocabulary location metadata",
       "saveSuccess": "Location metadata saved.",
       "saveFailed": "Failed to save location metadata",
+      "renameEmpty": "Location name cannot be empty",
+      "export": "Export",
+      "exportSuccess": "Exported \"{name}\" vocabulary.",
+      "exportFailed": "Failed to export vocabulary",
+      "transfer": {
+        "action": "Transfer",
+        "title": "Transfer \"{name}\"",
+        "desc": "Current owner: {user}",
+        "target": "Target username or ID",
+        "placeholder": "Enter username or ID",
+        "unknownUser": "Unknown user",
+        "success": "Transferred \"{name}\" to {user}, including {count} entries.",
+        "failed": "Failed to transfer location",
+        "targetUserid": "Target UserID",
+        "IDplaceholder": "Please enter the target userid",
+        "targetUsername": "Target Username",
+        "NAMEplaceholder": "Please enter the target username"
+      },
       "filters": {
         "userId": "User ID",
         "locationName": "Location name"

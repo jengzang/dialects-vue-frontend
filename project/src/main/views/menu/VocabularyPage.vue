@@ -5,8 +5,12 @@
       {{ activePageTitle }}
     </h1>
 
-    <div class="page-tab-navigation">
-      <div class="page-tab-container" role="tablist" :aria-label="t('words.wordList.tabs.label')">
+    <div v-if="!isCharacterNotesMode" class="page-tab-navigation">
+      <div
+        class="page-tab-container"
+        role="tablist"
+        :aria-label="t('words.wordList.tabs.label')"
+      >
         <button
           class="page-tab-btn"
           :class="{ active: isActivePage(pageTabs[0].path) }"
@@ -58,7 +62,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, provide, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { getVocabularyMe } from '@/api'
@@ -66,7 +70,7 @@ import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n
 import { userStore } from '@/main/store/store.js'
 import BarIcon from '@/components/common/BarIcon.vue'
 import ChoiceSelector from '@/components/selector/ChoiceSelector.vue'
-import { showError } from '@/utils/ui/message.js'
+import { showError, showSuccess, showWarning } from '@/utils/ui/message.js'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -78,9 +82,20 @@ const vocabularyMeError = ref('')
 const isAuthReady = computed(() => userStore.authReady)
 const isAuthenticated = computed(() => userStore.isAuthenticated)
 const contributeTabPaths = ['/menu/vocabulary/import', '/menu/vocabulary/manage']
+const VOCABULARY_ME_CACHE_KEY = 'vocabulary_me'
+const VOCABULARY_ME_REFRESH_COOLDOWN_MS = 60 * 1000
+const VOCABULARY_PERMISSION_LABEL_KEYS = {
+  manage: 'words.wordList.access.permissionLabels.manage',
+  edit: 'words.wordList.access.permissionLabels.edit',
+  one: 'words.wordList.access.permissionLabels.one',
+  two: 'words.wordList.access.permissionLabels.two',
+  three: 'words.wordList.access.permissionLabels.three',
+}
+const lastVocabularyMeRefreshAt = ref(0)
+const lastVocabularyMeRefreshOwnerKey = ref('')
 
 function isContributePath(path) {
-  return path === '/menu/vocabulary/import' || path.startsWith('/menu/vocabulary/manage')
+  return path === contributeTabPaths[0] || path.startsWith(contributeTabPaths[1])
 }
 
 const pageTabs = computed(() => {
@@ -111,6 +126,7 @@ const activeVocabularyPath = computed(() => {
 
 const activePageTitle = computed(() => t(pageTitleKeyByPath[activeVocabularyPath.value]))
 const activePageIcon = computed(() => pageTitleIconByPath[activeVocabularyPath.value])
+const isCharacterNotesMode = computed(() => route.query.source === 'character-notes')
 
 function createEmptyVocabularyMe() {
   return {
@@ -119,35 +135,148 @@ function createEmptyVocabularyMe() {
     can_upload: false,
     can_manage_entries: false,
     can_view_logs: false,
+    can_delete_locations: false,
   }
 }
 
-async function loadVocabularyMe() {
+function getVocabularyMeCacheOwnerKey() {
+  if (userStore.id !== null && userStore.id !== undefined) {
+    return `id:${userStore.id}`
+  }
+  if (userStore.username) {
+    return `username:${userStore.username}`
+  }
+  return ''
+}
+
+function hasVocabularyDeleteCapability(value) {
+  return typeof value?.can_delete_locations === 'boolean'
+}
+
+function readCachedVocabularyMe() {
+  const ownerKey = getVocabularyMeCacheOwnerKey()
+  if (!ownerKey) return null
+
+  try {
+    const cached = JSON.parse(localStorage.getItem(VOCABULARY_ME_CACHE_KEY) || 'null')
+    if (cached?.owner_key === ownerKey && cached?.data && typeof cached.data === 'object') {
+      if (!hasVocabularyDeleteCapability(cached.data)) {
+        localStorage.removeItem(VOCABULARY_ME_CACHE_KEY)
+        return null
+      }
+      return cached.data
+    }
+  } catch {
+    localStorage.removeItem(VOCABULARY_ME_CACHE_KEY)
+  }
+
+  return null
+}
+
+function writeCachedVocabularyMe(value) {
+  const ownerKey = getVocabularyMeCacheOwnerKey()
+  if (!ownerKey) return
+
+  try {
+    localStorage.setItem(VOCABULARY_ME_CACHE_KEY, JSON.stringify({
+      owner_key: ownerKey,
+      data: value,
+    }))
+  } catch {
+    // Permission data is still usable for the current render even if persistence fails.
+  }
+}
+
+function clearCachedVocabularyMe() {
+  try {
+    localStorage.removeItem(VOCABULARY_ME_CACHE_KEY)
+  } catch {
+    // Ignore storage cleanup failures; auth state below remains authoritative.
+  }
+}
+
+async function loadVocabularyMe({ force = false } = {}) {
   if (!userStore.authReady) {
     isLoadingVocabularyMe.value = true
-    return
+    return null
   }
 
   if (!userStore.isAuthenticated) {
+    clearCachedVocabularyMe()
     vocabularyMe.value = createEmptyVocabularyMe()
     vocabularyMeError.value = ''
     isLoadingVocabularyMe.value = false
-    return
+    return vocabularyMe.value
+  }
+
+  if (!force) {
+    const cachedVocabularyMe = readCachedVocabularyMe()
+    if (cachedVocabularyMe) {
+      vocabularyMe.value = cachedVocabularyMe
+      vocabularyMeError.value = ''
+      isLoadingVocabularyMe.value = false
+      return cachedVocabularyMe
+    }
   }
 
   isLoadingVocabularyMe.value = true
   vocabularyMeError.value = ''
 
   try {
-    vocabularyMe.value = await getVocabularyMe()
+    const loadedVocabularyMe = await getVocabularyMe()
+    vocabularyMe.value = loadedVocabularyMe
+    writeCachedVocabularyMe(loadedVocabularyMe)
+    return loadedVocabularyMe
   } catch (error) {
-    vocabularyMe.value = createEmptyVocabularyMe()
+    if (!vocabularyMe.value) {
+      vocabularyMe.value = createEmptyVocabularyMe()
+    }
     vocabularyMeError.value = error.message || ''
     showError(vocabularyMeError.value)
+    return null
   } finally {
     isLoadingVocabularyMe.value = false
   }
 }
+
+function formatVocabularyPermission(permissionContext) {
+  const permissionLevel = permissionContext?.permission_level
+  if (!permissionLevel) return t('words.wordList.access.noPermission')
+
+  const labelKey = VOCABULARY_PERMISSION_LABEL_KEYS[permissionLevel]
+  return labelKey ? t(labelKey) : permissionLevel
+}
+
+async function refreshVocabularyMe() {
+  const ownerKey = getVocabularyMeCacheOwnerKey()
+  const now = Date.now()
+  if (
+    ownerKey
+    && lastVocabularyMeRefreshOwnerKey.value === ownerKey
+    && now - lastVocabularyMeRefreshAt.value < VOCABULARY_ME_REFRESH_COOLDOWN_MS
+  ) {
+    const remainingSeconds = Math.ceil(
+      (VOCABULARY_ME_REFRESH_COOLDOWN_MS - (now - lastVocabularyMeRefreshAt.value)) / 1000
+    )
+    showWarning(t('words.wordList.access.refreshCooldown', {
+      seconds: remainingSeconds,
+    }))
+    return vocabularyMe.value
+  }
+
+  lastVocabularyMeRefreshOwnerKey.value = ownerKey
+  lastVocabularyMeRefreshAt.value = now
+
+  const refreshedVocabularyMe = await loadVocabularyMe({ force: true })
+  if (refreshedVocabularyMe) {
+    showSuccess(t('words.wordList.access.permissionRefreshed', {
+      permission: formatVocabularyPermission(refreshedVocabularyMe),
+    }))
+  }
+  return refreshedVocabularyMe
+}
+
+provide('refreshVocabularyMe', refreshVocabularyMe)
 
 function isActivePage(tabPath) {
   const currentPath = stripLocaleFromPath(route.path)

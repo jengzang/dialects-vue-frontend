@@ -9,7 +9,11 @@
           </div>
         </div>
 
-        <form class="manage-filter-grid locations-filter-grid" @submit.prevent="applyLocationFilters">
+        <form
+          v-if="canShowLocationFilters"
+          class="manage-filter-grid locations-filter-grid"
+          @submit.prevent="applyLocationFilters"
+        >
           <label class="upload-field">
             <span>{{ t('words.wordList.locations.filters.userName') }}</span>
             <input v-model="locationFilters.username" type="text" :placeholder="t('words.wordList.locations.filters.userName')" />
@@ -44,13 +48,33 @@
             <div class="location-item-info">
               <strong>{{ location.location_name }}</strong>
               <p>{{ location.location_label || location.location_name }}</p>
+              <span class="location-item-username">{{ location.username }}</span>
             </div>
-            <span class="location-item-username">{{ location.username }}</span>
             <button class="glass-button" data-variant="primary" type="button" @click="openLocationEditor(location)">
               {{ t('common.button.edit') }}
             </button>
+            <button
+              v-if="hasVocabularyPermission"
+              class="glass-button"
+              data-variant="success"
+              type="button"
+              :disabled="isExportingLocation"
+              @click="handleExportLocation(location)"
+            >
+              {{ t('words.wordList.locations.export') }}
+            </button>
             <button v-if="canDeleteLocation" class="glass-button" data-variant="danger" type="button" @click="handleDeleteLocation(location)">
               {{ t('common.button.delete') }}
+            </button>
+            <button
+              v-if="canTransferLocation"
+              class="glass-button"
+              style="background-color: var(--color-primary-light);"
+              data-variant="secondary"
+              type="button"
+              @click="openTransferModal(location)"
+            >
+              {{ t('words.wordList.locations.transfer.action') }}
             </button>
           </div>
         </article>
@@ -80,71 +104,84 @@
     </div>
   </section>
 
-  <AppModal
+  <LocationEditorModal
     v-model="isLocationEditorOpen"
-    size="lg"
+    v-model:draft="editingLocationDraft"
     width="720px"
     max-height="80dvh"
     :title="editingLocationDraft?.location_name || t('words.wordList.locations.title')"
+    :description="editingLocationDraft?.location_label || editingLocationDraft?.location_name"
     :close-label="t('common.button.close')"
+    :fields="locationEditFields"
+    :cancel-text="t('common.button.cancel')"
+    :confirm-text="t('words.wordList.locations.save')"
     @close="closeLocationEditor"
+    @cancel="closeLocationEditor"
+    @confirm="handleSaveEditingLocation"
+  />
+
+  <AppModal
+    v-model="isTransferModalOpen"
+    size="sm"
+    width="420px"
+    max-height="70dvh"
+    :title="transferModalTitle"
+    :close-label="t('common.button.close')"
+    @close="closeTransferModal"
   >
-    <div v-if="editingLocationDraft" class="location-edit-modal">
+    <div
+      v-if="transferLocationSource"
+      class="location-transfer-modal"
+    >
       <p class="location-edit-modal-desc">
-        {{ editingLocationDraft.location_label || editingLocationDraft.location_name }}
+        {{ t('words.wordList.locations.transfer.desc', { user: transferSourceLabel }) }}
       </p>
-
-      <div class="yindian-match-section">
-        <h4 class="yindian-match-title">{{ t('words.wordList.upload.useYindianData') }}</h4>
-        <div class="yindian-match-row">
-          <div class="yindian-input-wrapper">
-            <input
-              v-model="yindianQuery"
-              type="text"
-              :placeholder="t('words.wordList.upload.yindianHint')"
-              autocomplete="off"
-              @input="onYindianInput"
-              @keydown.enter.prevent="confirmYindianQuery"
-              @blur="onYindianBlur"
-            />
-            <div v-if="yindianSuggestions.length" class="yindian-suggestions">
-              <div
-                v-for="item in yindianSuggestions"
-                :key="item"
-                class="yindian-suggest-item"
-                @mousedown.prevent="applyYindianSuggestion(item)"
-              >
-                {{ item }}
-              </div>
-            </div>
-          </div>
-          <button
-            class="glass-button"
-            data-variant="primary"
-            type="button"
-            :disabled="!yindianQuery.trim() || isLoadingYindian"
-            @click="confirmYindianQuery"
-          >
-            {{ isLoadingYindian ? t('common.label.loading') : t('common.button.confirm') }}
-          </button>
-        </div>
-      </div>
-
-      <div class="locations-edit-grid">
-        <label v-for="field in locationEditFields" :key="field.key" class="upload-field">
-          <span>{{ field.label }}</span>
-          <input v-model="editingLocationDraft[field.key]" type="text" />
-        </label>
-      </div>
+      <label class="upload-field">
+        <span>{{ t('words.wordList.locations.transfer.targetUserid') }}</span>
+        <input
+          v-model="transferTargetUserId"
+          type="text"
+          :placeholder="t('words.wordList.locations.transfer.IDplaceholder')"
+          autocomplete="off"
+          @keydown.enter.prevent="handleConfirmTransferLocation"
+        >
+      </label>
+      <label class="upload-field">
+        <span>{{ t('words.wordList.locations.transfer.targetUsername') }}</span>
+        <input
+          v-model="transferTargetUsername"
+          type="text"
+          :placeholder="t('words.wordList.locations.transfer.NAMEplaceholder')"
+          autocomplete="off"
+          @keydown.enter.prevent="handleConfirmTransferLocation"
+        >
+      </label>
+      <p
+        v-if="transferErrorText"
+        class="upload-status"
+      >
+        {{ transferErrorText }}
+      </p>
     </div>
 
     <template #footer>
       <div class="location-edit-modal-actions">
-        <button class="glass-button" data-variant="secondary" type="button" @click="closeLocationEditor">
+        <button
+          class="glass-button"
+          data-variant="secondary"
+          type="button"
+          @click="closeTransferModal"
+        >
           {{ t('common.button.cancel') }}
         </button>
-        <button class="glass-button" data-variant="primary" type="button" @click="handleSaveEditingLocation">
-          {{ t('words.wordList.locations.save') }}
+        <button
+          class="glass-button"
+          data-variant="primary"
+          type="button"
+          :disabled="isTransferringLocation || (!transferTargetUserId.trim() && !transferTargetUsername.trim())"
+          @click="handleConfirmTransferLocation"
+        >
+          {{ isTransferringLocation ? t('common.label.loading') : t('common.button.confirm') }}
         </button>
       </div>
     </template>
@@ -154,9 +191,11 @@
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { batchMatch, deleteVocabularyLocation, getLocationDetail, getVocabularyLocations, updateVocabularyLocation } from '@/api'
+import { deleteVocabularyLocation, exportVocabularyLocation, getVocabularyLocations, transferVocabularyLocation, updateVocabularyLocation } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
-import { showConfirm, showError, showSuccess, showWarning } from '@/utils/ui/message.js'
+import LocationEditorModal from './LocationEditorModal.vue'
+import { LOCATION_BASE_FIELDS, TONE_FIELDS } from './vocabularyLocationFields.js'
+import { showConfirm, showError, showSuccess } from '@/utils/ui/message.js'
 
 const { t } = useI18n()
 const pageSizeOptions = [20, 50, 100, 200]
@@ -165,6 +204,8 @@ const props = defineProps({
   hasVocabularyPermission: { type: Boolean, default: false },
   canViewVocabularyLogs: { type: Boolean, default: false },
   canDeleteLocation: { type: Boolean, default: false },
+  canTransferLocation: { type: Boolean, default: false },
+  managePermissionLevel: { type: String, default: null },
 })
 
 const isLoadingLocations = ref(false)
@@ -174,10 +215,13 @@ const locationRows = ref([])
 const isLocationEditorOpen = ref(false)
 const editingLocationSource = ref(null)
 const editingLocationDraft = ref(null)
-const yindianQuery = ref('')
-const yindianSuggestions = ref([])
-const isLoadingYindian = ref(false)
-let yindianDebounceTimer = null
+const isTransferModalOpen = ref(false)
+const transferLocationSource = ref(null)
+const transferTargetUserId = ref('')
+const transferTargetUsername = ref('')
+const transferErrorText = ref('')
+const isTransferringLocation = ref(false)
+const isExportingLocation = ref(false)
 const locationFilters = reactive({
   username: '',
   location_name: '',
@@ -190,17 +234,22 @@ const locationPagination = reactive({
 
 const canGoPreviousLocationPage = computed(() => locationPagination.page > 1)
 const canGoNextLocationPage = computed(() => locationPagination.page * locationPagination.pageSize < locationPagination.total)
+const canShowLocationFilters = computed(() => props.managePermissionLevel === 'manage')
+const transferModalTitle = computed(() => {
+  const locationName = transferLocationSource.value?.location_name
+  return locationName
+    ? t('words.wordList.locations.transfer.title', { name: locationName })
+    : t('words.wordList.locations.transfer.action')
+})
+const transferSourceLabel = computed(() => (
+  transferLocationSource.value?.username
+  || transferLocationSource.value?.user_id
+  || t('words.wordList.locations.transfer.unknownUser')
+))
 
 const locationEditFields = computed(() => [
-  { key: 'coordinates', label: t('words.wordList.upload.coordinates') },
-  { key: 'province', label: t('words.wordList.upload.province') },
-  { key: 'city', label: t('words.wordList.upload.city') },
-  { key: 'county', label: t('words.wordList.upload.county') },
-  { key: 'town', label: t('words.wordList.upload.town') },
-  { key: 'administrative_village', label: t('words.wordList.upload.administrativeVillage') },
-  { key: 'natural_village', label: t('words.wordList.upload.naturalVillage') },
-  { key: 'yindian_region', label: t('words.wordList.upload.yindianRegion') },
-  { key: 'atlas_region', label: t('words.wordList.upload.atlasRegion') },
+  ...LOCATION_BASE_FIELDS.map((field) => ({ key: field.key, label: t(field.labelKey) })),
+  ...TONE_FIELDS.map((field) => ({ key: field.key, label: t(field.labelKey) })),
 ])
 
 function appendFilledFilters(target, filters) {
@@ -278,100 +327,52 @@ function closeLocationEditor() {
   isLocationEditorOpen.value = false
   editingLocationSource.value = null
   editingLocationDraft.value = null
-  yindianQuery.value = ''
-  yindianSuggestions.value = []
 }
 
-function getLocationDetailRow(response) {
-  if (Array.isArray(response?.data)) return response.data[0] || null
-  if (response?.data && typeof response.data === 'object') return response.data
-  return response && typeof response === 'object' ? response : null
+function openTransferModal(location) {
+  transferLocationSource.value = location
+  transferTargetUserId.value = ''
+  transferTargetUsername.value = ''
+  transferErrorText.value = ''
+  locationsStatusText.value = ''
+  isTransferModalOpen.value = Boolean(location)
 }
 
-function applyYindianDetail(detail) {
-  if (!editingLocationDraft.value || !detail) return
-  editingLocationDraft.value = {
-    ...editingLocationDraft.value,
-    location_name: editingLocationDraft.value.location_name || detail?.['語言'] || '',
-    coordinates: detail?.['經緯度'] || editingLocationDraft.value.coordinates,
-    province: detail?.['省'] || editingLocationDraft.value.province,
-    city: detail?.['市'] || editingLocationDraft.value.city,
-    county: detail?.['縣'] || editingLocationDraft.value.county,
-    town: detail?.['鎮'] || editingLocationDraft.value.town,
-    administrative_village: detail?.['行政村'] || editingLocationDraft.value.administrative_village,
-    natural_village: detail?.['自然村'] || editingLocationDraft.value.natural_village,
-    yindian_region: detail?.['音典分區'] || editingLocationDraft.value.yindian_region,
-  }
+function closeTransferModal() {
+  if (isTransferringLocation.value) return
+  isTransferModalOpen.value = false
+  transferLocationSource.value = null
+  transferTargetUserId.value = ''
+  transferTargetUsername.value = ''
+  transferErrorText.value = ''
 }
 
-async function fillFromYindian(name) {
-  if (!name || isLoadingYindian.value) return
-  isLoadingYindian.value = true
-  try {
-    const response = await getLocationDetail(name)
-    const detail = getLocationDetailRow(response)
-    if (!detail) {
-      showWarning(t('words.wordList.upload.yindianNotFound'))
-      return
-    }
-    applyYindianDetail(detail)
-    showSuccess(t('words.wordList.upload.yindianFilled'))
-  } catch (error) {
-    showError(error.message || t('words.wordList.upload.yindianFailed'))
-  } finally {
-    isLoadingYindian.value = false
-  }
-}
-
-function onYindianInput() {
-  clearTimeout(yindianDebounceTimer)
-  const query = yindianQuery.value.trim()
-  if (!query) {
-    yindianSuggestions.value = []
+async function handleSaveLocation(location, originalLocationName) {
+  const sourceName = String(originalLocationName || '').trim()
+  if (!location || !sourceName) {
     return
   }
-  yindianDebounceTimer = setTimeout(async () => {
-    try {
-      const results = await batchMatch(query, false)
-      const items = Array.isArray(results) ? results.flatMap((r) => r.items || []) : []
-      yindianSuggestions.value = [...new Set(items)]
-    } catch {
-      yindianSuggestions.value = []
-    }
-  }, 300)
-}
 
-function onYindianBlur() {
-  setTimeout(() => {
-    yindianSuggestions.value = []
-  }, 200)
-}
-
-function applyYindianSuggestion(item) {
-  yindianQuery.value = item
-  yindianSuggestions.value = []
-  return fillFromYindian(item)
-}
-
-function confirmYindianQuery() {
-  const name = yindianQuery.value.trim()
-  if (!name || isLoadingYindian.value) return
-  return fillFromYindian(name)
-}
-
-async function handleSaveLocation(location) {
-  if (!location?.location_name) {
+  const nextName = String(location.location_name || '').trim()
+  if (!nextName) {
+    locationsStatusText.value = t('words.wordList.locations.renameEmpty')
+    showError(locationsStatusText.value)
     return
   }
 
   const payload = Object.fromEntries(
-    locationEditFields.value.map((field) => [field.key, String(location[field.key] || '').trim()])
+    locationEditFields.value
+      .filter((field) => field.key !== 'location_name')
+      .map((field) => [field.key, String(location[field.key] || '').trim()])
   )
+  if (nextName !== sourceName) {
+    payload.new_location_name = nextName
+  }
   const params = location.user_id ? { user_id: location.user_id } : {}
   locationsStatusText.value = ''
 
   try {
-    await updateVocabularyLocation(location.location_name, payload, params)
+    await updateVocabularyLocation(sourceName, payload, params)
     locationsStatusText.value = t('words.wordList.locations.saveSuccess')
     showSuccess(locationsStatusText.value)
     await loadVocabularyLocations()
@@ -382,12 +383,93 @@ async function handleSaveLocation(location) {
   }
 }
 
+async function handleConfirmTransferLocation() {
+  const targetUserId = transferTargetUserId.value.trim()
+  const targetUsername = transferTargetUsername.value.trim()
+
+  if (
+    !transferLocationSource.value
+    || (!targetUserId && !targetUsername)
+    || isTransferringLocation.value
+  ) return
+
+  transferErrorText.value = ''
+  locationsStatusText.value = ''
+  isTransferringLocation.value = true
+
+  try {
+    const result = await transferVocabularyLocation(
+      {
+        location_name: transferLocationSource.value.location_name,
+        user_id: transferLocationSource.value.user_id,
+      },
+      {
+        target_user_id: targetUserId,
+        target_username: targetUsername,
+      },
+    )
+    locationsStatusText.value = t('words.wordList.locations.transfer.success', {
+      name: result.location_name || transferLocationSource.value.location_name,
+      user: result.target_username || result.target_user_id || targetUsername || targetUserId,
+      count: result.transferred_entries_count ?? 0,
+    })
+    showSuccess(locationsStatusText.value)
+    await loadVocabularyLocations()
+    isTransferModalOpen.value = false
+    transferLocationSource.value = null
+    transferTargetUserId.value = ''
+    transferTargetUsername.value = ''
+  } catch (error) {
+    transferErrorText.value = error.message || t('words.wordList.locations.transfer.failed')
+    locationsStatusText.value = transferErrorText.value
+    showError(transferErrorText.value)
+  } finally {
+    isTransferringLocation.value = false
+  }
+}
+
 function handleSaveEditingLocation() {
-  return handleSaveLocation(editingLocationDraft.value || editingLocationSource.value)
+  return handleSaveLocation(
+    editingLocationDraft.value || editingLocationSource.value,
+    editingLocationSource.value?.location_name,
+  )
+}
+
+function triggerBlobDownload(blob, fileName) {
+  const url = URL.createObjectURL(blob)
+  try {
+    const anchor = document.createElement('a')
+    anchor.href = url
+    anchor.download = fileName
+    document.body.appendChild(anchor)
+    anchor.click()
+    document.body.removeChild(anchor)
+  } finally {
+    URL.revokeObjectURL(url)
+  }
+}
+
+async function handleExportLocation(location) {
+  if (!location?.location_name || isExportingLocation.value) return
+
+  isExportingLocation.value = true
+  locationsStatusText.value = ''
+  try {
+    const params = location.user_id ? { user_id: location.user_id } : {}
+    const blob = await exportVocabularyLocation(location.location_name, params)
+    triggerBlobDownload(blob, `${location.location_name}词表.xlsx`)
+    locationsStatusText.value = t('words.wordList.locations.exportSuccess', { name: location.location_name })
+    showSuccess(locationsStatusText.value)
+  } catch (error) {
+    locationsStatusText.value = error.message || t('words.wordList.locations.exportFailed')
+    showError(locationsStatusText.value)
+  } finally {
+    isExportingLocation.value = false
+  }
 }
 
 async function handleDeleteLocation(location) {
-  if (!location?.location_name) return
+  if (!location?.location_name || location.user_id === null || location.user_id === undefined) return
 
   const confirmed = await showConfirm(
     t('words.wordList.locations.deleteConfirm', { name: location.location_name }),
@@ -397,7 +479,7 @@ async function handleDeleteLocation(location) {
 
   locationsStatusText.value = ''
   try {
-    const params = location.user_id ? { user_id: location.user_id } : {}
+    const params = { user_id: location.user_id }
     const result = await deleteVocabularyLocation(location.location_name, params)
     locationsStatusText.value = t('words.wordList.locations.deleteSuccess', { count: result.deleted_entries })
     showSuccess(locationsStatusText.value)
