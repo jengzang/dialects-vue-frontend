@@ -197,9 +197,9 @@ const SEO_CONFIG = {
         en: 'Phonology Query | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '查詢某地的方言音系表：查看聲母、韻母、聲調及音節拼合，對照多個方言點的音系，並查每個音節對應的漢字。',
-        'zh-CN': '查询某地的方言音系表：查看声母、韵母、声调及音节拼合，对照多个方言点的音系，并查每个音节对应的汉字。',
-        en: 'Look up a Chinese dialect phonology table by location. Explore initials, finals, tones, and their syllable combinations, with characters for each syllable.',
+        'zh-Hant': '查詢某地的方言音系表與同音字彙：查看聲母、韻母、聲調及音節拼合，對照多個方言點的音系，並查每個音節對應的漢字。',
+        'zh-CN': '查询某地的方言音系表与同音字汇：查看声母、韵母、声调及音节拼合，对照多个方言点的音系，并查每个音节对应的汉字。',
+        en: 'Look up a Chinese dialect phonology table and homophone lexicon. Explore initials, finals, tones, syllable combinations, and the characters sharing each syllable.',
       },
     },
     '/menu/pho/custom': {
@@ -221,9 +221,9 @@ const SEO_CONFIG = {
         en: 'Syllable Statistics | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '統計各地方言的音節、聲母、韻母與聲調出現頻率。選擇方言點，比較音系數據與分佈，查看餅圖、柱狀圖和散點圖。',
-        'zh-CN': '统计各地方言的音节、声母、韵母与声调出现频率。选择方言点，比较音系数据与分布，查看饼图、柱状图和散点图。',
-        en: 'Compare syllable, initial, final, and tone frequencies across Chinese dialect locations. Explore phonological statistics with pie, bar, and scatter charts.',
+        'zh-Hant': '查方言有多少音節：統計聲母、韻母、聲調以及不帶調、帶調音節的數量與頻率，比較各地音系，查看圖表和音節等值線地圖。',
+        'zh-CN': '查方言有多少音节：统计声母、韵母、声调以及不带调、带调音节的数量与频率，比较各地音系，查看图表和音节等值线地图。',
+        en: 'How many syllables does a dialect have? Count initials, finals, tones, and syllables with or without tones, compare frequencies, and view charts and contour maps.',
       },
     },
     '/menu/pho/evolution': {
@@ -245,9 +245,9 @@ const SEO_CONFIG = {
         en: 'Language Protection Words & Sentences | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '查詢中國語言資源保護工程的方言詞彙與語法例句，比較同一詞句在各方言點的說法、發音和釋義，並在地圖上看分佈。',
-        'zh-CN': '查询中国语言资源保护工程的方言词汇与语法例句，比较同一词句在各方言点的说法、发音和释义，并在地图上看分布。',
-        en: 'Search dialect words and grammar sentences from the Chinese Language Resources Protection Project. Compare local expressions, pronunciations, and meanings across locations.',
+        'zh-Hant': '查詢中國語言資源保護工程（語保）的 1000 條方言詞彙與 50 個語法例句，比較各地說法、發音及註釋，並在地圖上看分佈。需登入。',
+        'zh-CN': '查询中国语言资源保护工程（语保）的 1000 条方言词汇与 50 个语法例句，比较各地说法、发音及注释，并在地图上看分布。需登录。',
+        en: 'Search 1,000 dialect vocabulary items and 50 grammar sentences from the Chinese Language Resources Protection Project. Compare expressions, pronunciations, and notes on a map. Sign-in required.',
       },
     },
     '/explore/char-class': {
@@ -407,9 +407,9 @@ const SEO_CONFIG = {
         en: 'Vocabulary Import | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '匯入方言詞彙資料，支持批量上傳與格式校驗。',
-        'zh-CN': '导入方言词汇资料，支持批量上传与格式校验。',
-        en: 'Import dialect vocabulary data with batch upload and format validation.',
+        'zh-Hant': '線上匯入方言詞表：申請編輯權限後填寫方言點資訊，按標準格式批量上傳詞彙、IPA 讀音與釋義，並校驗資料格式。',
+        'zh-CN': '在线导入方言词表：申请编辑权限后填写方言点信息，按标准格式批量上传词汇、IPA 读音与释义，并校验数据格式。',
+        en: 'Import dialect vocabulary online. Request editing permission, enter location details, and batch-upload words, IPA readings, and meanings with format validation.',
       },
     },
     '/menu/vocabulary/manage': {
@@ -419,9 +419,9 @@ const SEO_CONFIG = {
         en: 'Vocabulary Management | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '管理方言詞彙資料庫，支持編輯、刪除與批量操作。',
-        'zh-CN': '管理方言词汇数据库，支持编辑、删除与批量操作。',
-        en: 'Manage the dialect vocabulary database with editing, deletion, and batch operations.',
+        'zh-Hant': '線上管理自己提交的方言詞表：編輯詞彙、讀音、釋義及地點資料，批量替換內容或增刪詞條。需詞表編輯權限。',
+        'zh-CN': '在线管理自己提交的方言词表：编辑词汇、读音、释义及地点资料，批量替换内容或增删词条。需词表编辑权限。',
+        en: 'Manage your own dialect vocabulary submissions online: edit words, readings, meanings, and locations, replace text in bulk, and add or delete entries. Editing permission required.',
       },
     },
     '/menu/villages': {
@@ -587,9 +587,9 @@ const SEO_CONFIG = {
         en: 'Map Drawing | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '在線製作方言分佈地圖：繪製調查點、線和區域，生成泰森多邊形，並將地圖匯出為 GeoJSON 資料或 PNG 圖片。',
-        'zh-CN': '在线制作方言分布地图：绘制调查点、线和区域，生成泰森多边形，并将地图导出为 GeoJSON 数据或 PNG 图片。',
-        en: 'Create a Chinese dialect distribution map online. Draw survey points, lines, and regions, generate Voronoi polygons, and export GeoJSON or PNG.',
+        'zh-Hant': '線上 GIS 方言地圖繪製工具：繪製調查點、線和區域，生成泰森多邊形製作方言分佈地圖，並匯出 GeoJSON 資料或 PNG 圖片。',
+        'zh-CN': '在线 GIS 方言地图绘制工具：绘制调查点、线和区域，生成泰森多边形制作方言分布地图，并导出 GeoJSON 数据或 PNG 图片。',
+        en: 'Draw dialect distribution maps in an online GIS editor. Create survey points, lines, and regions, generate Voronoi polygons, and export GeoJSON or PNG.',
       },
     },
     '/explore/manage': {
@@ -659,9 +659,9 @@ const SEO_CONFIG = {
         en: 'Acoustic Analysis | Dialects Atlas',
       },
       description: {
-        'zh-Hant': '在線Praat語音聲學分析：網頁上傳音檔或錄音，查看音高曲線、共振峰與頻譜圖，分析母音空間並計算五度制調值。需登入。',
-        'zh-CN': '在线Praat语音声学分析：网页上传音频或录音，查看音高曲线、共振峰与频谱图，分析元音空间并计算五度制调值。需登录。',
-        en: 'Use Praat online for speech analysis. Upload or record audio to view pitch, formants, spectrograms, vowel space, and tone values. Sign-in required.',
+        'zh-Hant': '在線Praat語音聲學分析：上傳音檔或錄音，查看音高曲線、共振峰、頻譜圖和母音空間，選取樣本後用石鋒 T 值法計算五度制調值。需登入。',
+        'zh-CN': '在线Praat语音声学分析：上传音频或录音，查看音高曲线、共振峰、频谱图和元音空间，选取样本后用石锋 T 值法计算五度制调值。需登录。',
+        en: 'Use Praat online to analyze pitch, formants, spectrograms, and vowel space from uploaded or recorded audio. Select samples for five-level tones using Shi Feng\'s T-value method. Sign-in required.',
       },
     },
     '/explore/villages/toponyms': {

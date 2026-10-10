@@ -49,47 +49,47 @@
     },
     "menuQueryZhonggu": {
       "title": "查中古",
-      "description": "韵书 → 读音 • 按韵书地位分别整理声韵调的读音"
+      "description": "按《广韵》等韵书的摄、韵、等、呼、声母和调类查询中古音类，查看对应汉字在各地方言中的今读及地理分布。"
     },
     "menuQueryChar": {
       "title": "查字",
-      "description": "查询汉字的读音、地位及注释"
+      "description": "查询汉字在各地方言中的 IPA 读音、中古音韵地位及注释，查看多音字、文白读和字音分布地图。"
     },
     "menuQueryYinwei": {
       "title": "查音位",
-      "description": "读音 → 韵书 • 分析各声韵调的音位来源于什么韵书地位"
+      "description": "输入方言声母、韵母或音节的实际音值，反查其中古音及韵书地位来源，查看各来源的字数、比例和字例。"
     },
     "menuQueryTone": {
       "title": "查调",
-      "description": "查询各点的调类、调值"
+      "description": "查询各地方言的声调、调类和调值，查看阴平、阳平、上声、去声、入声等调类的合并情况及地理分布。"
     },
     "menuMapView": {
       "title": "地图显示",
-      "description": "地理语言学直观呈现。即在地图上查看查询、比较结果，及绘制音节等值线图、热力图等。"
+      "description": "在方言地图上查看查字、查中古、查调和方言比较的结果，点击地点查看详情，并绘制音节等值线图、热力图。"
     },
     "menuMapDivide": {
       "title": "地图分区",
-      "description": "查询各方言点所属的分区，并跳转地图绘制查看。"
+      "description": "查询方言点所属的地图集或音典分区，按分区层级绘制方言分区地图，查看各方言区的地理分布。"
     },
     "menuMapCustom": {
       "title": "个人地图数据",
-      "description": "查看、管理自定义方言数据，并绘制到地图上。与账号绑定，多设备同步。"
+      "description": "登录后新增和管理个人方言调查点、音韵特征及注释，绘制自定义方言地图；数据与账号绑定，支持多设备同步。"
     },
     "menuCompareChar": {
       "title": "比较字",
-      "description": "比较同一汉字在不同地点的读音差异。"
+      "description": "比较两个汉字在各地方言中的声母、韵母或声调，查看所选维度相同、部分相同或不同的地点及分布地图。"
     },
     "menuCompareZhonggu": {
       "title": "比较中古",
-      "description": "比较同一中古地位在不同地点的演变情况。"
+      "description": "比较两组中古音类条件在现代方言中的声母、韵母或声调，查看各地音类合流、分化及地图分布。"
     },
     "menuCompareTone": {
       "title": "比较声调",
-      "description": "比较两个调类在不同地点是合流还是分立。"
+      "description": "比较阴上、阳上等两个调类在各地方言中的调值，查看合流、可能合流或分立的地点及分布地图。"
     },
     "menuComparePhonetic": {
       "title": "比较音系",
-      "description": "比较所选各点的音值对应关系（请输入2~5个地点）。"
+      "description": "选择 2 至 5 个方言点，通过相同汉字对照声母、韵母或声调的音值对应关系，用桑基图查看音类合流与分化。"
     },
     "menuResult": {
       "title": "查询结果",
@@ -101,7 +101,7 @@
     },
     "menuPhoCustom": {
       "title": "音素分类",
-      "description": "按韵书地位特征，分类整理方言点的声韵调数据"
+      "description": "按清浊、发音部位、开合口、韵摄等韵书地位特征，自选三个分类维度整理方言声韵调，查看分类数量与字例。"
     },
     "menuPhoCount": {
       "title": "音节统计",
@@ -109,7 +109,7 @@
     },
     "menuPhoEvolution": {
       "title": "演化",
-      "description": "查看单个方言点的当今音系与韵书地位之间的对应关系，并用饼图和桑基图展示声母、韵母、声调的历史演化。"
+      "description": "查看单个方言点的声母、韵母、声调与中古音及韵书地位的对应关系，用饼图和桑基图分析今音来源与音类分化。"
     },
     "menuSettings": {
       "title": "设置",
@@ -129,19 +129,19 @@
     },
     "menuVocabularyView": {
       "title": "词表浏览",
-      "description": "浏览和搜索所有协作者提交的词表数据，支持卡片、地图、表格三种展示模式。"
+      "description": "无需登录即可搜索协作者提交的方言词表，按标准词、方言词、IPA 音标或释义查询各地说法，支持卡片、地图和表格。"
     },
     "menuVocabularyImport": {
       "title": "词表导入",
-      "description": "上传新的词表数据，需要先申请权限，并填写地点信息，再按标准格式提交词表。"
+      "description": "申请词表编辑权限后，填写方言点信息，按标准格式批量上传方言词汇、IPA 读音与释义，并校验导入数据。"
     },
     "menuVocabularyManage": {
       "title": "词表管理",
-      "description": "管理上传的词表，可进行在线编辑、批量替换、增删词条等操作。"
+      "description": "拥有编辑权限的用户可管理自己提交的方言词表，在线编辑词条和地点资料，批量替换内容或增删词条。"
     },
     "menuYubao": {
       "title": "语保资料",
-      "description": "查询语保工程的词汇（1000词）与语法例句（50句）数据，支持地图、卡片、表格三种展示模式。"
+      "description": "登录后查询中国语言资源保护工程（语保）的 1000 条词汇和 50 个语法例句，比较各地方言说法、发音及注释，支持地图、卡片和表格。"
     },
     "menuVillages": {
       "title": "村落入口",
@@ -149,7 +149,7 @@
     },
     "menuCluster": {
       "title": "方言聚类",
-      "description": "按方言特征数据探索方言点聚类关系。"
+      "description": "选择方言点与音韵特征，计算方言距离和相似度，进行方言聚类分析，查看分组结果与图表。"
     },
     "exploreEntry": {
       "title": "探索导航",
@@ -157,27 +157,27 @@
     },
     "exploreCheck": {
       "title": "字表检查",
-      "description": "上传方言字表文件，自动检查「非单字」「异常音标」「缺声调」等常见问题，并提供在线编辑修正功能。"
+      "description": "登录后上传方言字表，在线检查非单字、异常 IPA 音标和缺声调等问题，编辑修正后下载结果。"
     },
     "exploreJyut2Ipa": {
       "title": "粤拼转IPA",
-      "description": "批量将Excel表格中的粤拼转换为国际音标(ipa)，支持自定义配置规则。"
+      "description": "登录后上传含粤拼列的 Excel 字表，在线批量将粤拼 Jyutping 转换为 IPA 国际音标，自定义转换规则、预览并下载结果。"
     },
     "exploreMerge": {
       "title": "字表合并",
-      "description": "上传参考表与待合并字表，将按参考表的汉字顺序，批量完成对齐与合并。"
+      "description": "登录后上传参考表与多份方言 Excel 字表，按参考表汉字顺序对齐读音和注释，保留一字多音并下载合并结果。"
     },
     "exploreDerive": {
       "title": "音系推导",
-      "description": "辅助推导生成字表。"
+      "description": "字表推导页面目前仅为占位，推导功能尚未实现。"
     },
     "explorePraat": {
       "title": "Praat 声学分析",
-      "description": "上传音频或直接录音，查看声学分析结果（包含基频、共振峰、频谱图、元音空间等），支持按照石锋T值法自动生成声调图。"
+      "description": "在线Praat语音声学分析：登录后上传音频或直接录音，查看基频曲线、共振峰、频谱图和元音空间，手动选取样本后用石锋 T 值法生成五度制声调图。"
     },
     "exploreGis": {
       "title": "地图绘制",
-      "description": "在线GIS地图编辑器，支持添加、编辑和删除地理要素，同时支持泰森多边形自动绘制方言分布图。"
+      "description": "在线 GIS 方言地图编辑器：添加、编辑或删除点、线和多边形，生成泰森多边形绘制方言分布图，导出 GeoJSON 数据或 PNG 图片。"
     },
     "exploreManage": {
       "title": "资料管理",
@@ -185,39 +185,39 @@
     },
     "exploreCharClass": {
       "title": "汉字字集",
-      "description": "按韵书地位逐级展开汉字，可查看各地位所包含的汉字及注释，支持自定义顺序。"
+      "description": "按《广韵》等韵书的中古音韵地位逐级浏览汉字字集，查看各音类的汉字及注释，并自定义分类层级和顺序。"
     },
     "exploreYcOverview": {
       "title": "阳春专题",
-      "description": "查看阳春方言资料的专题概览。"
+      "description": "浏览阳春白话、涯话等方言的分布、接触与音系概览。页面开发中，当前内容由 AI 生成，需结合来源核对。"
     },
     "exploreYcWords": {
       "title": "阳春词句",
-      "description": "浏览阳春方言词汇与例句资料。"
+      "description": "查询阳春话口语词，浏览本字考、IPA 读音、粤拼、释义和例词例句，支持按字段筛选词表。"
     },
     "exploreYcExpressions": {
       "title": "阳春表达",
-      "description": "浏览阳春方言表达和语法资料。"
+      "description": "浏览阳春方言熟语、歇后语、农谚和叠式词示例，按类型与词形模式查找。页面开发中，当前内容由 AI 生成，需核对。"
     },
     "exploreYcVillages": {
       "title": "阳春自然村",
-      "description": "查看阳春自然村资料与分布。"
+      "description": "查询阳春自然村与村委会资料，按乡镇、社区等行政层级展开村落，查看村庄的隶属关系。"
     },
     "exploreVillagesToponyms": {
       "title": "地名检索",
-      "description": "检索自然村地名和相关行政信息。"
+      "description": "自然村地名检索与分布地图开发中，规划按村名及行政信息查询村落；目前地名数据功能暂不可用。"
     },
     "exploreVillagesGd": {
       "title": "广东自然村树",
-      "description": "按行政区划层级浏览广东自然村资料，支持树状展开和方言地图可视化。"
+      "description": "按市、县、乡镇等行政层级浏览广东自然村名录，查询村名、方言分布及经纬度，并在地图上定位村庄。"
     },
     "exploreVillagesTable": {
       "title": "广东自然村表",
-      "description": "以表格形式浏览和查询广东自然村数据，支持排序、筛选、分页。"
+      "description": "搜索《全粤村情》广东自然村名录，按村名、行政区划或方言筛选，查看经纬度，支持表格排序与分页。"
     },
     "exploreVillagesMl": {
       "title": "自然村机器学习",
-      "description": "使用机器学习方法分析自然村名的模式和规律。"
+      "description": "分析广东自然村名的命名规律，查看村名字频、语义类别、地理热点与区域差异，探索机器学习聚类结果。"
     },
     "exploreVillagesAll": {
       "title": "全部自然村",
