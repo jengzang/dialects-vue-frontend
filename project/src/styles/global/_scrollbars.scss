@@ -36,9 +36,7 @@
     height: calc(var(--app-scrollbar-size) / 2);
   }
 
-  &:hover::-webkit-scrollbar,
-  &::-webkit-scrollbar:hover,
-  &::-webkit-scrollbar:active {
+  &.ui-scrollbar--expanded::-webkit-scrollbar {
     width: var(--app-scrollbar-size);
     height: var(--app-scrollbar-size);
   }
@@ -224,17 +222,15 @@
   @include visible-scrollbar-webkit;
 }
 
+:where(.ui-scrollbar--expanded) {
+  scrollbar-width: auto;
+}
+
 // Standard scrollbar properties override WebKit dimensions and hover styling.
 @supports selector(::-webkit-scrollbar) {
   :where(*) {
     scrollbar-width: auto;
     scrollbar-color: auto;
-  }
-}
-
-@supports not selector(::-webkit-scrollbar) {
-  :where(*:hover) {
-    scrollbar-width: auto;
   }
 }
 

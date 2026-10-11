@@ -14,6 +14,7 @@ import '../utils/ui/message.js'
 import i18n from '../i18n'
 import { initSeo } from '../seo'
 import { initializeUiPreferences } from '../composables/core/uiPreferences.js'
+import { initializeScrollbarHover } from '../utils/ui/scrollbarHover.js'
 import { bootstrapAuthSession } from '../api/auth/auth.js'
 
 // 1. 導入你的組件
@@ -25,6 +26,8 @@ bootstrapAuthSession()
 const app = createApp(App)
 
 initializeUiPreferences()
+const disposeScrollbarHover = initializeScrollbarHover()
+if (import.meta.hot) import.meta.hot.dispose(disposeScrollbarHover)
 
 // 3. 使用插件 (Router, i18n)
 app.use(router)
