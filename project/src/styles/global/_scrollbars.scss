@@ -36,7 +36,9 @@
     height: calc(var(--app-scrollbar-size) / 2);
   }
 
-  &:hover::-webkit-scrollbar {
+  &:hover::-webkit-scrollbar,
+  &::-webkit-scrollbar:hover,
+  &::-webkit-scrollbar:active {
     width: var(--app-scrollbar-size);
     height: var(--app-scrollbar-size);
   }
