@@ -575,3 +575,100 @@ VillagesML 的 `/villagesML/gd` 使用資料集路徑，`module`、`subtab` 等 
 問題反饋：[GitHub Issues](https://github.com/jengzang/dialects-vue-frontend/issues)
 
 聯繫方式：jengzang@outlook.com · [知乎](https://www.zhihu.com/people/da-shu-18-11)
+
+## SEO 邏輯與策略分析
+
+目前的 SEO 以「品牌首頁 + 專業功能頁 + 三種語言入口」為核心：首頁承接「方音圖鑑／Dialects Atlas」等品牌搜尋，查字、查中古、方言比較、音系分析、Praat 與村名資料等功能頁承接具體使用需求。功能使用獨立 path，查詢條件與工作區狀態放在 query；搜尋引擎主要接觸穩定的功能入口，而不是每一組查詢結果。
+
+以下依據倉庫當前實作分析，並非線上收錄、排名或流量審計；服務器 HTTP 狀態、實際爬取結果與搜尋曝光仍需另外驗證。
+
+### 實作位置與責任
+
+| 檔案 | SEO 責任 |
+| --- | --- |
+| [`project/src/seo/config.js`](./project/src/seo/config.js) | 站點名稱、逐頁三語 title／description、sitemap 白名單與 noindex 清單 |
+| [`project/src/seo/index.js`](./project/src/seo/index.js) | 初次載入、路由切換及語言切換時更新 metadata、canonical、hreflang、社交分享標籤與 JSON-LD |
+| [`project/src/i18n/localeRouting.js`](./project/src/i18n/localeRouting.js) | 統一語言前綴、語言路徑生成與移除前綴的規則 |
+| [`project/index.html`](./project/index.html) 等 5 個 HTML 入口 | 提供初始 title／description；以內嵌 JavaScript 補上入口級語言資訊與連結，等待 Vue 更新到具體功能頁 |
+| [`project/scripts/generate-sitemap.mjs`](./project/scripts/generate-sitemap.mjs) | 將白名單路徑展開為三種語言的 sitemap URL |
+| [`project/public/robots.txt`](./project/public/robots.txt) | 通用爬蟲路徑限制、AI 爬蟲許可與 sitemap 地址 |
+
+### 頁面 metadata 的更新流程
+
+主站與 VillagesML 都呼叫 `initSeo`。載入時先更新當前路徑，之後透過 `router.afterEach` 跟隨頁面切換；語言改變時也會重新套用當前頁面的 SEO 資料。
+
+1. 移除語言前綴與結尾斜線，取得功能路徑，例如 `/en/menu/query/char` 對應 `/menu/query/char`。
+2. 從 `SEO_CONFIG.routes` 選取該頁的 title／description，再取目前語言版本；未配置的路徑使用全站預設文案。
+3. 更新 `document.title`、description 與 robots。一般功能標題採「主標題 - 補充說明｜方音圖鑑」，英文使用 ` | Dialects Atlas`；首頁保留完整的自訂標題。
+4. 同步 canonical、三語 hreflang、Open Graph、Twitter Card 與 JSON-LD，避免站內切換後仍沿用上一頁的標籤。
+
+標題與描述以功能語義為主，有助於覆蓋「方言查字」「中古音」「聲韻調比較」「Praat 聲學分析」等不同搜尋意圖。描述也會交代登入限制或開發狀態；這些文案需要隨功能演進維護，不能只更新路由而保留過時介紹。
+
+### canonical 與多語 URL
+
+主站的繁中、簡中、英文版本分別使用 `/zh-Hant`、`/zh-CN`、`/en`。每種語言都指向自己的 canonical，並透過 hreflang 互相標示等價頁面；`x-default` 指向繁中版本。這保留各語言的獨立收錄機會，也讓搜尋引擎辨識語言關係。
+
+canonical 固定使用 `https://dialects.yzup.top`，保留語言與功能 path，移除尾斜線。SEO 呼叫傳入 `to.path`，因此 query 與 hash 不進入 canonical。例如 `/zh-Hant/menu/query/char?字=山` 的 canonical 是 `https://dialects.yzup.top/zh-Hant/menu/query/char`。
+
+這種策略可歸併大量篩選、查詢與分頁 URL，適合互動工具。不過，它也表示目前沒有為每個漢字、方言點或查詢結果建立獨立的可索引內容頁；若未來希望承接這類資料搜尋，需要另行設計具有固定 URL、獨立描述與可讀正文的公開資料頁。
+
+### sitemap 與索引邊界
+
+`SITEMAP_PATHS` 目前有 **44 個功能路徑**，生成腳本乘以 3 種語言，產生 **132 個 URL**。這是腳本生成規則的數量；已部署的 sitemap 是否同步，需以線上檔案為準。XML 使用與 runtime canonical 相同的無尾斜線路徑；語言關係目前放在 HTML hreflang，XML 未另外輸出 hreflang。
+
+| 路徑分類 | priority | changefreq |
+| --- | --- | --- |
+| 首頁 | 1.0 | daily |
+| `/menu/query/*` | 0.9 | daily |
+| `/menu/compare/*`、`/menu/pho/*`、`/menu/cluster`、Praat | 0.8 | weekly |
+| `/menu/map/*` | 0.7 | weekly |
+| 其餘 `/explore/tools/*` | 0.6 | monthly |
+| 其餘 `/explore/*`（包括 GIS） | 0.5 | monthly |
+| `/menu/tools`、`/menu/villages` | 0.2 | yearly |
+| 其餘白名單頁面 | 0.4 | monthly |
+
+這些值表達站內功能的相對重要性與預期更新頻率，不代表搜尋排名，也不保證爬蟲依此安排抓取。目前所有 `lastmod` 都寫成生成當天的 UTC 日期，表示檔案重新生成時間，並非各頁內容實際更新時間。
+
+索引控制採「sitemap 白名單 + noindex 排除清單」兩套規則。以下路徑輸出 `noindex,nofollow`，且不列入 sitemap：`/intro`、`/auth/data`、`/auth/regions`、`/menu/result`、`/explore/manage`、`/explore/villages/all`、`/explore/features`、`/explore/history`。其他路徑預設為 `index,follow`，因此**未列入 sitemap 不等於禁止索引**。
+
+這能排除個人資料、結果容器與部分低價值入口，將搜尋入口集中到功能頁。但公開介紹與實際使用權限仍需分開判斷：例如 `/menu/map/custom` 需要登入，卻列入 sitemap；`/auth` 沒有列入 sitemap，也沒有 noindex。應依頁面是否提供足夠的公開介紹決定是否索引，而不是只按是否需要登入一概處理。
+
+### 爬蟲、分享預覽與結構化資料
+
+`robots.txt` 的通用規則允許抓取網站，並禁止 `/api/`、`/logs/`、`/sql/`、`/upload/`、`/download/`、`/files/`，同時提供 sitemap 地址。它還為 GPTBot、ChatGPT-User、Claude-Web、anthropic-ai、Google-Extended 與 CCBot 分別配置 `Allow: /`，表達允許 AI 相關抓取的策略。這些指定群組通常不繼承通用群組的 Disallow，因此兩者的路徑限制並不相同。
+
+robots 管理爬取許可，noindex 管理索引意圖；兩者都不能代替登入與服務器權限控制。AI 爬蟲許可也不代表內容必然被引用、納入訓練或帶來搜尋曝光。
+
+社交分享使用 Open Graph 與 Twitter `summary` Card，title／description 跟隨路由語言，圖片統一為 `/brand/title.webp`。這有助於保持品牌一致，但目前標籤由 JavaScript 寫入；不執行 JavaScript 的分享抓取器可能無法取得具體功能頁的預覽資訊。
+
+JSON-LD 依路徑分配類型：首頁為 `WebSite`，資料來源為 `CollectionPage`，查詢／比較／音系頁為 `SoftwareApplication`，`/explore/villages/*` 為 `Dataset`，其餘為 `WebPage`。現有資料主要包含站點名稱、語言、URL 與描述；類型分類只是基礎語義，不能保證豐富搜尋結果。資料集入口也不一定等於具體 Dataset，仍需依實際內容補充或調整語義。
+
+### 策略優勢與目前缺口
+
+目前的優勢是功能頁路徑穩定、三語 metadata 集中管理、canonical 與 sitemap 共用語言路徑工具，且已有標題、配置一致性與 H1 語義測試。首頁原始 HTML 提供 H1、功能介紹、實際 `<a href>` 連結與 noscript 文案，在 Vue 啟動前已有可讀內容；這些內容會在掛載後被應用替換。
+
+後續改善可按以下順序處理；本節記錄分析，尚未修改這些實作：
+
+| 優先方向 | 倉庫中可確認的現況 | 建議 |
+| --- | --- | --- |
+| 深層功能頁的初始內容 | 5 個 HTML 入口是入口殼層；除首頁外主要是載入提示，沒有逐路由預渲染正文，精確 metadata 也依賴 runtime | 優先為重要公開功能頁提供可直接取得的介紹、H1 與 metadata，再評估預渲染或 SSR；多 HTML 入口本身不等於逐頁靜態化 |
+| VillagesML 的 URL 一致性 | `/villagesML/gd` 未配置獨立 SEO 文案，也未列入 sitemap；共用算法會生成 `/zh-Hant/villagesML/gd` 等 canonical／hreflang，但獨立工作區路由使用無語言前綴的 `/villagesML/*` | 明確決定獨立應用的語言 URL 與索引策略，令 metadata、canonical、hreflang、路由保持一致，並驗證實際 HTTP 回應 |
+| 部署產物一致性 | Bash 白名單包含 `robots.txt`、`sitemap.xml`、`brand/`；PowerShell 白名單未包含這三項 | 同步部署清單，避免換用部署腳本後 SEO 檔案或分享圖片沒有更新；是否已有舊檔需查服務器 |
+| 公開頁與開發中頁面的選擇 | sitemap 包含推導工具 `/explore/tools/derive` 與仍受開發限制的 `/explore/villages/toponyms`，也包含需登入的自訂地圖 | 按可讀公開內容逐頁決定索引，排除只有佔位內容的入口，為有價值的工具提供公開介紹 |
+| `lastmod` 的可信度 | 每次生成將全部 URL 更新為同一天 | 改用各頁內容或資料的實際修改日期；若無可靠日期，可不提供 `lastmod` |
+| 結構化資料一致性 | 首頁已有未標記的靜態 `WebSite` JSON-LD，runtime 另建一個帶標記的 script；各頁 schema 欄位較少 | 統一靜態與動態資料來源，核對重複實體及 Dataset／SoftwareApplication 語義，再補充與可見內容一致的資訊 |
+| 爬蟲政策一致性 | 指定 AI 群組只有 `Allow: /`，沒有通用群組的目錄限制 | 確認這是否符合預期；若希望相同限制，需在相應群組明確配置 |
+
+還需在線上核對語言入口與舊路徑的 HTTP 跳轉、深層路徑重新整理是否返回正確 HTML，以及不存在的路徑是否返回合適狀態。Vue Router 的前端跳轉不能直接視為 HTTP 301／308。可配合搜尋站長工具檢查 sitemap 處理、canonical 選擇、渲染後內容與各語言曝光，驗證策略是否真正生效。
+
+### 維護與驗證
+
+新增公開功能頁時，應同步核對實際路由、三語 title／description、頁面 H1、內部連結，再決定加入 `SITEMAP_PATHS` 或 `NOINDEX_PATHS`。功能重命名、合併或下線時，也需檢查舊入口跳轉與上述配置，避免 metadata、教程分類與當前功能不一致。
+
+在 `project/` 目錄可執行現有 SEO 測試：
+
+```bash
+npm test -- tests/seoConfigConsistency.test.js tests/seoTitles.test.js tests/seoHeadingSemantics.test.js
+```
+
+這些測試檢查白名單與 noindex／redirect 的一致性、標題格式與語言、分享標題及頁面標題語義，不能替代線上爬取驗證。`npm run seo:sitemap` 會寫入 `public/sitemap.xml`，`npm run build` 會先生成 sitemap 再打包；執行前應確認工作區中的 sitemap 修改是否需要保留，部署後再核對線上產物。
