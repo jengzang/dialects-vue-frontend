@@ -52,7 +52,6 @@
 | [分區繪圖](./project/src/main/components/tutorial/content/zh-Hant/menu-map-divide.md) | 直接繪製方言點或分區，以分區著色觀察地理分佈。 |
 | [結果頁](./project/src/main/components/tutorial/content/zh-Hant/menu-result.md) | 承接查詢與比較結果，提供音值篩選、細分查詢、統計、字例與地點詳情。 |
 
-此外，主站提供 `/menu/cluster` 方言聚類工作台，可配置分析參數、管理任務並查看結果；目前尚未列入教程目錄。
 
 ### 單方言點深入探索
 
@@ -108,7 +107,7 @@
 
 [地圖繪製](./project/src/main/components/tutorial/content/zh-Hant/menu-map-draw.md)位於 `/explore/gis`，可在線編輯點、線、面與文字，管理圖層、屬性和資料表，編輯頂點與精確坐標，使用吸附、共享邊界、幾何運算及質量檢查工具。支持導入 GeoJSON、JSON、KML、KMZ、CSV，載入行政區劃與河流水系，利用方言點生成泰森多邊形，導出 GeoJSON 或 PNG，並保存本地草稿。
 
-教程目錄以外，`/explore/manage` 提供管理員專用的資料表管理工具。字表推導頁 `/explore/tools/derive` 目前僅為佔位，功能尚未實現。
+`/explore/manage` 提供管理員專用的資料表管理工具。字表推導頁 `/explore/tools/derive` 目前僅為佔位，功能尚未實現。
 
 ### 自然村
 
@@ -129,7 +128,7 @@
 
 [陽春口語](./project/src/main/components/tutorial/content/zh-Hant/explore-yc-spoken.md)位於 `/explore/yc/words`，以表格展示本字考、IPA 讀音、粵拼、詞性、釋義及例詞例句。
 
-另有 `/explore/yc/villages` 陽春自然村資料頁，目前尚未列入教程目錄。
+另有 `/explore/yc/villages` 陽春自然村資料。
 
 ### 賬戶與個人數據
 
@@ -162,10 +161,6 @@
 功能操作與限制詳見各篇教程；資料來源頁為 `/menu/source`。
 
 ## 更新歷史
-
-v4.2.0 起的更新歷史以 [`project/src/utils/user/updateNoticeConfig.js`](./project/src/utils/user/updateNoticeConfig.js) 及其 Git 歷史中的公告為準，包含原 `project/src/main/config/updateNoticeConfig.js` 路徑下的記錄。版本號與日期使用公告欄位，不以提交標題或提交日期替代；同一版本採用最近一份公告，最新版本採用當前配置。保留各版公告原文及 emoji，公告中沿用前版的項目也一併保留。
-
-v4.2.0 之前依據 `main` 分支的版本提交整理，日期為對應提交日期，功能細節參照該次提交的改動。每版附上來源連結，不套用舊 README 中與提交記錄不符的版本號。
 
 ### v5.2.1 · 2026-10-01
 
@@ -579,8 +574,6 @@ VillagesML 的 `/villagesML/gd` 使用資料集路徑，`module`、`subtab` 等 
 ## SEO 邏輯與策略分析
 
 目前的 SEO 以「品牌首頁 + 專業功能頁 + 三種語言入口」為核心：首頁承接「方音圖鑑／Dialects Atlas」等品牌搜尋，查字、查中古、方言比較、音系分析、Praat 與村名資料等功能頁承接具體使用需求。功能使用獨立 path，查詢條件與工作區狀態放在 query；搜尋引擎主要接觸穩定的功能入口，而不是每一組查詢結果。
-
-以下依據倉庫當前實作分析，並非線上收錄、排名或流量審計；服務器 HTTP 狀態、實際爬取結果與搜尋曝光仍需另外驗證。
 
 ### 實作位置與責任
 
