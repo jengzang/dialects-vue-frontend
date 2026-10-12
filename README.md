@@ -12,9 +12,17 @@
 
 本倉庫是前端工程，實際工程目錄為 `project/`。查詢、賬戶、資料存取及聲學計算等功能需要配合[後端](https://github.com/jengzang/dialects-backend)使用。
 
-## 功能與教程
+## 文檔與相關倉庫
 
-以下分類與順序沿用站內教程目錄。點擊功能名稱可閱讀對應教程；在線上頁面也可使用「教程」按鈕查看操作說明，部分查詢與比較頁提供骰子按鈕填入體驗示例。
+- [站內教程原文](./project/src/main/components/tutorial/content/zh-Hant) · [簡體中文教程](./project/src/main/components/tutorial/content/zh-CN)
+- [文檔中心](./docs/README.md) · [英文文檔中心](./docs/README.en.md)
+- [架構文檔](./docs/ARCHITECTURE.md) · [API 文檔](./docs/API.md) · [設計系統](./docs/DESIGN_SYSTEM.md)
+- [VillagesML 功能總覽](./docs/VillagesML/FEATURE_OVERVIEW.md) · [VillagesML 使用指南](./docs/VillagesML/USER_GUIDE.md)
+- [部署說明](./docs/DEPLOY.md) · [i18n 說明](./project/src/i18n/README.md)
+- [貢獻指南](./docs/CONTRIBUTING.md) · [倉庫協作規範](./AGENTS.md)
+- [前端倉庫](https://github.com/jengzang/dialects-vue-frontend) · [後端倉庫](https://github.com/jengzang/dialects-backend) · [數據預處理倉庫](https://github.com/jengzang/dialects-build)
+
+## 功能與教程
 
 ### 多方言點對比分析
 
@@ -153,15 +161,323 @@
 
 功能操作與限制詳見各篇教程；資料來源頁為 `/menu/source`。
 
-## 最新更新
+## 更新歷史
 
-更新資訊以 [`project/src/utils/user/updateNoticeConfig.js`](./project/src/utils/user/updateNoticeConfig.js) 為準。該檔案目前保存最新一版公告，以下保留公告原文，不另行推定歷史版本。
+v4.2.0 起的更新歷史以 [`project/src/utils/user/updateNoticeConfig.js`](./project/src/utils/user/updateNoticeConfig.js) 及其 Git 歷史中的公告為準，包含原 `project/src/main/config/updateNoticeConfig.js` 路徑下的記錄。版本號與日期使用公告欄位，不以提交標題或提交日期替代；同一版本採用最近一份公告，最新版本採用當前配置。保留各版公告原文及 emoji，公告中沿用前版的項目也一併保留。
 
-**版本：v5.2.1 · 更新日期：2026-10-01 · 資料庫版本：2026-09-30**
+v4.2.0 之前依據 `main` 分支的版本提交整理，日期為對應提交日期，功能細節參照該次提交的改動。每版附上來源連結，不套用舊 README 中與提交記錄不符的版本號。
+
+### v5.2.1 · 2026-10-01
+
+**資料庫版本：2026-09-30**
+
+[當前公告配置](./project/src/utils/user/updateNoticeConfig.js)
 
 - 🗂️ **增加查注釋功能**：支持通過注釋或音標檢索字表
 - 📖 **詞表展示優化、支持導出**：增加詞表方言點詳情展示（包含調值、行政區劃等信息），支持導出詞表為Excel文件，方便用戶在線編輯後與本地同步。
 - 👀 **優化用戶體驗**：增加頁腳導航欄、建議反饋入口、網站功能檢索、快速分享等。
+
+### v5.2.0 · 2026-09-30
+
+**資料庫版本：2026-09-30**
+
+[公告快照](https://github.com/jengzang/dialects-vue-frontend/blob/b45a714a32f2dd0b647f5c8b070ba06aefb6338f/project/src/utils/user/updateNoticeConfig.js)
+
+- 🗂️ **增加查注釋功能**：支持通過注釋或音標檢索字表
+- 📖 **詞表展示優化、支持導出**：增加詞表方言點詳情展示（包含調值、行政區劃等信息），支持導出詞表為Excel文件，方便用戶在線編輯後與本地同步。
+- 👀 **優化用戶體驗**：增加頁腳導航欄、建議反饋入口、網站功能檢索、快速分享等。
+
+### v5.1.6 · 2026-09-11
+
+**資料庫版本：2026-09-07**
+
+[公告快照](https://github.com/jengzang/dialects-vue-frontend/blob/780de82de4f9957aa74f05dba8c0700e60cfd055/project/src/utils/user/updateNoticeConfig.js)
+
+- 📖 **詞表展示優化、支持導出**：增加詞表方言點詳情展示（包含調值、行政區劃等信息），支持導出詞表為Excel文件，方便用戶在線編輯後與本地同步。
+- 📊 **更新方言數據庫**：方言點數量增加至3126個，總條目933万條。
+- 👀 **優化用戶體驗**：增加頁腳導航欄、建議反饋入口、網站功能檢索、快速分享等。
+
+### v5.1.5 · 2026-09-07
+
+**資料庫版本：2026-09-07**
+
+[公告快照](https://github.com/jengzang/dialects-vue-frontend/blob/ae06bed68a0bbaa2d131607ebe1a54e53c6131c8/project/src/utils/user/updateNoticeConfig.js)
+
+- 📊 **更新方言數據庫**：方言點數量增加至3126個，總條目933万條。
+- 📚 **同音字匯，查詢支持複製導出**：音系頁面增加同音字匯格式展示，地點詳情彈窗也可以直接查看同音字匯；查字、查中古、查音位、查調均支持複製、導出功能
+- 👀 **優化用戶體驗**：增加頁腳導航欄、建議反饋入口、網站功能檢索、快速分享等。
+
+### v5.1.2 · 2026-08-17
+
+**資料庫版本：2026-06-22**
+
+[公告快照](https://github.com/jengzang/dialects-vue-frontend/blob/e95f74a667572b299332ea01451c895ecb9499d1/project/src/utils/user/updateNoticeConfig.js)
+
+- 📚 **同音字匯，查詢支持複製導出**：音系頁面增加同音字匯格式展示，地點詳情彈窗也可以直接查看同音字匯；查字、查中古、查音位、查調均支持複製、導出功能
+- 👀 **音節統計、熱力圖、等值線圖**：音節統計增加完整音節統計，並可繪製音節總數等值線圖，地圖-分區圖增加熱力圖，地點詳情彈窗可以直接跳轉查看音系、演化、音節統計等。
+- 🎲 **教程完善與優化用戶體驗**：各個頁面均配備教程指引用戶操作，並且教程簡單校對過一遍了，不再是毫無價值的AI文章了。
+
+### v5.1.0 · 2026-08-13
+
+**資料庫版本：2026-06-22**
+
+[公告快照](https://github.com/jengzang/dialects-vue-frontend/blob/9e16b08d31fc494114758bfa1035ff3288d20e68/project/src/utils/user/updateNoticeConfig.js)
+
+- 👀 **音節統計、熱力圖、等值線圖**：音節統計增加完整音節統計，並可繪製音節總數等值線圖，地圖-分區圖增加熱力圖，地點詳情彈窗可以直接跳轉查看音系、演化、音節統計等。
+- 🎲 **教程完善與優化用戶體驗**：各個頁面均配備教程指引用戶操作，並且教程簡單校對過一遍了，不再是毫無價值的AI文章了。
+- 📖 **增加詞表展示、貢獻功能**：支持地圖、卡片、表格展示詞表；用戶可以申請編輯權限，參與詞表貢獻，支持線上更改
+
+### v5.0.8 · 2026-08-09
+
+**資料庫版本：2026-06-22**
+
+[公告快照](https://github.com/jengzang/dialects-vue-frontend/blob/0644eefaa138e896b37bd6b028ae39e9049dc814/project/src/utils/user/updateNoticeConfig.js)
+
+- 🎲 **教程完善**：各個頁面均配備教程指引用戶操作，並且教程簡單校對過一遍了，不再是毫無價值的AI文章了。
+- 👀 **優化用戶體驗(首頁、導航欄)**：首頁增加地球和燈箱展示網站圖片，導航欄圖標與動畫優化，字體優化
+- 📖 **增加詞表展示、貢獻功能**：支持地圖、卡片、表格展示詞表；用戶可以申請編輯權限，參與詞表貢獻，支持線上更改
+
+### v5.0.5 · 2026-08-08
+
+**資料庫版本：2026-06-22**
+
+[公告快照](https://github.com/jengzang/dialects-vue-frontend/blob/1c3c97e9a3736642d431f7f0ef643adfe9bff1e1/project/src/utils/user/updateNoticeConfig.js)
+
+- 👀 **優化用戶體驗(首頁、導航欄)**：首頁增加燈箱展示網站圖片，導航欄圖標與動畫優化，字體優化
+- 📖 **增加詞表展示、貢獻功能**：支持地圖、卡片、表格展示詞表；用戶可以申請編輯權限，參與詞表貢獻，支持線上更改
+- 🗺️ **泰森多邊形繪圖完善**：支持豐富的篩選、合併、排除等規則，泰森多邊形外邊界支持滑塊選擇範圍；可直接從廣東省自然村頁面導出方言數據到泰森多邊形進行繪圖
+
+### v5.0.0 · 2026-07-31
+
+**資料庫版本：2026-06-22**
+
+[公告快照](https://github.com/jengzang/dialects-vue-frontend/blob/02f415f4531b56cc3df8881507af3a3d32bf0314/project/src/utils/user/updateNoticeConfig.js)
+
+- 📖 **增加詞表展示、貢獻功能**：支持地圖、卡片、表格展示詞表；用戶可以申請編輯權限，參與詞表貢獻，支持線上更改
+- 🗺️ **泰森多邊形繪圖完善**：支持豐富的篩選、合併、排除等規則，泰森多邊形外邊界支持滑塊選擇範圍；可直接從廣東省自然村頁面導出方言數據到泰森多邊形進行繪圖
+- 👀 **優化用戶體驗**：導航欄支持橫向滾動，增加主題色切換（藍色、綠色、淺色、深色）
+
+### v4.7.0 · 2026-07-18
+
+**資料庫版本：2026-06-22**
+
+[公告快照](https://github.com/jengzang/dialects-vue-frontend/blob/0d1cf195628bd040ba634aae814c74b5ff49a245/project/src/utils/user/updateNoticeConfig.js)
+
+- 🗺️ **泰森多邊形繪圖完善**：支持豐富的篩選、合併、排除等規則，泰森多邊形外邊界支持滑塊選擇範圍；可直接從廣東省自然村頁面導出方言數據到泰森多邊形進行繪圖
+- 👀 **優化用戶體驗**：導航欄支持橫向滾動，增加主題色切換（藍色、綠色、淺色、深色）
+- 📊 **更新數據並增加文白讀展示**：文讀、白讀、多音字分別用不同的顏色展示，點擊也可以查看詳情
+
+### v4.6.8 · 2026-07-15
+
+**資料庫版本：2026-06-22**
+
+[公告快照](https://github.com/jengzang/dialects-vue-frontend/blob/8f537bb763242654d395e613fc747a840badfbb4/project/src/utils/user/updateNoticeConfig.js)
+
+- 🏠 **更新廣東省自然村機器學習數據**：重新劃分語義的類別，並優化各種聚類、特徵分析功能
+- 👀 **優化用戶體驗**：導航欄支持橫向滾動，增加主題色切換（藍色、綠色、淺色、深色）
+- 📊 **更新數據並增加文白讀展示**：文讀、白讀、多音字分別用不同的顏色展示，點擊也可以查看詳情
+
+### v4.6.5 · 2026-07-13
+
+**資料庫版本：2026-06-22**
+
+[公告快照](https://github.com/jengzang/dialects-vue-frontend/blob/b36b5dde4d8d093f101c9078156a554f3cd55b6f/project/src/main/config/updateNoticeConfig.js)
+
+- 🏠 **更新廣東省自然村機器學習數據**：重新劃分語義的類別，並優化各種聚類、特徵分析功能
+- ⌨️ **中古模式支持手動輸入**：可以在設置頁面中啟用“手動輸入”功能，然後在中古模式下直接輸入地位或漢字集合
+- 📊 **更新數據並增加文白讀展示**：文讀、白讀、多音字分別用不同的顏色展示，點擊也可以查看詳情
+
+### v4.6.0 · 2026-07-02
+
+**資料庫版本：2026-06-22**
+
+[公告快照](https://github.com/jengzang/dialects-vue-frontend/blob/866fe68ed6dfb859cc2f147a25b8934ad400a1a7/project/src/main/config/updateNoticeConfig.js)
+
+- ⌨️ **中古模式支持手動輸入**：可以在設置頁面中啟用“手動輸入”功能，然後在中古模式下直接輸入地位或漢字集合
+- 📊 **更新數據並增加文白讀展示**：文讀、白讀、多音字分別用不同的顏色展示，點擊也可以查看詳情
+- 🔢 **優化“查音位”、“音值統計”頁面**：“查音位”支持匹配音節；“音值統計”頁面增加餅圖、柱狀圖、散點圖等
+
+### v4.5.2 · 2026-06-24
+
+**資料庫版本：2026-06-22**
+
+[公告快照](https://github.com/jengzang/dialects-vue-frontend/blob/ea04bd91576ceb3a14f0c7176540e37dcc1fb9d2/project/src/main/config/updateNoticeConfig.js)
+
+- 📊 **更新數據並增加文白讀展示**：文讀、白讀、多音字分別用不同的顏色展示，點擊也可以查看詳情
+- 🔢 **優化“查音位”、“音值統計”頁面**：“查音位”支持匹配音節；“音值統計”頁面增加餅圖、柱狀圖、散點圖等
+- 🆚 **增加音值比較功能**：新增桑基圖可視化，支持多方言間的音值對比呈現
+
+### v4.5.0 · 2026-06-17
+
+**資料庫版本：2026-06-20**
+
+[公告快照](https://github.com/jengzang/dialects-vue-frontend/blob/786b17ad01f01a0a8070720de1978f61a5c48091/project/src/main/config/updateNoticeConfig.js)
+
+- 📊 **增加音值比較功能**：新增桑基圖可視化，支持多方言間的音值對比呈現
+- 🗺️ **新增地圖繪製功能**：支持手動繪製點、線、面等圖層，也可根據泰森多邊形自動計算方言分布圖，並支持導出圖層、圖片等功能（功能測試中）
+- 👤 **優化用戶自定義數據頁面**：優化「地圖 -> 自定義」用戶個人數據創建於展示
+
+### v4.4.8 · 2026-06-15
+
+**資料庫版本：2026-03-19**
+
+[公告快照](https://github.com/jengzang/dialects-vue-frontend/blob/5e48915a230b618a9ec38c57aa50249df7aa3d7a/project/src/main/config/updateNoticeConfig.js)
+
+- 📊 **增加音值比較功能**：新增桑基圖可視化，支持多方言間的音值對比呈現
+- 🗺️ **新增地圖繪製功能**：支持手動繪製點、線、面等圖層，也可根據泰森多邊形自動計算方言分布圖，並支持導出圖層、圖片等功能（功能測試中）
+- 👤 **優化用戶自定義數據頁面**：優化「地圖 -> 自定義」用戶個人數據創建於展示
+
+### v4.4.7 · 2026-06-09
+
+[公告快照](https://github.com/jengzang/dialects-vue-frontend/blob/2eb0a76bf7d8e850603ac89c1d2b29160ef109ab/project/src/main/config/updateNoticeConfig.js)
+
+- 📊 **增加音值比較功能**：新增桑基圖可視化，支持多方言間的音值對比呈現
+- 👤 **優化用戶個人資訊頁面**：全新升級個人中心，新增用戶頭像自定义與展示功能
+- 🗺️ **優化用戶自定義數據頁面**：優化「地圖 -> 自定義」用戶個人數據創建於展示
+
+### v4.4.6 · 2026-06-07
+
+[公告快照](https://github.com/jengzang/dialects-vue-frontend/blob/a0cd8f80b0d0481a039e48057782f6ebd7e2b492/project/src/main/config/updateNoticeConfig.js)
+
+- 📊 **增加音值比較功能**：新增桑基圖可視化，支持多方言間的音值對比呈現
+- 👤 **優化用戶個人資訊頁面**：全新升級個人中心，新增用戶頭像自定义與展示功能
+- 🗺️ **優化用戶自定義數據頁面**：優化「地圖 -> 自定義」數據配置流程（目前功能仍在測試階段）
+
+### v4.4.5 · 2026-04-16
+
+[公告快照](https://github.com/jengzang/dialects-vue-frontend/blob/d02274f9d8b5db50d332b99107ecdbb7b6e0a33e/project/src/main/config/updateNoticeConfig.js)
+
+- 📚 **支援多套音韻字集切換**：於「關於 -> 設置」新增字集切換功能，支援中古、上古、洪武正韻、蒙古字韻、中原音韻及分韻撮要等多樣化文獻系統
+- 🎁 **上線捐贈者致謝名錄**：新增捐贈者名單頁面，衷心感謝所有支持並資助本項目持續發展的朋友，您的貢獻是推動開發的重要動力
+- 🩹 **系統穩定性優化**：深度修復多項已知 Bug 並優化程式碼邏輯，提升頁面加載速度與互動流暢度，確保更穩定的使用體驗
+
+### v4.4.0 · 2026-04-03
+
+[公告快照](https://github.com/jengzang/dialects-vue-frontend/blob/15d92d8d8229ed67322cad90d304290787fe8d6a/project/src/main/config/updateNoticeConfig.js)
+
+- 🎯 **單點演變查詢功能**：新增單點演變查詢與相關演化可視化能力，支援追蹤特定音韻地位的歷時變化，並持續補強互動與展示細節
+- 🏛️ **擴充漢字地位分類**：補充並整理漢字音韻分類頁的層級與資料表現，支援更完整的音韻地位檢索、展開與對照
+- 🛠️ **整理路由與介面體驗**：集中修復多項路由跳轉、頁面記憶、彈窗與介面樣式問題，並統一多處彈窗與共用元件，提升整體穩定性與一致性
+
+### v4.3.0 · 2026-04-03
+
+[公告快照](https://github.com/jengzang/dialects-vue-frontend/blob/81307f6cc97b1e0a27970b535f72d6674de55f79/project/src/main/config/updateNoticeConfig.js)
+
+- 🚀 **後端重構**：大幅提升 API 響應速度，提供更流暢的操作體驗
+- 🗂️ **重整目錄結構**：優化整體導航，包含將「簡介」與「感悟」合併、獨立「漢字」音韻資料為專屬分頁，並同步更新首頁卡片
+- 🌐 **新增多語言支持**：現已支持繁體中文、簡體中文與英文。用戶可至「關於 - 設置」中自由切換介面顯示語言
+
+### v4.2.0 · 2026-03-19
+
+[公告快照](https://github.com/jengzang/dialects-vue-frontend/blob/45191d1e514cab2e349ac53d0286d2771af3140f/project/src/main/config/updateNoticeConfig.js)
+
+- 🚀 **後端重構**：大幅提升 API 響應速度，提供更流暢的操作體驗
+- 🗂️ **重整目錄結構**：優化整體導航，包含將「簡介」與「感悟」合併、獨立「漢字」音韻資料為專屬分頁，並同步更新首頁卡片
+- 🌐 **新增多語言支持**：現已支持繁體中文、簡體中文與英文。用戶可至「關於 - 設置」中自由切換介面顯示語言
+
+### v4.1.0 · 2026-03-06
+
+[main 版本提交](https://github.com/jengzang/dialects-vue-frontend/commit/8acc84c085328541a29cd5b93df2bcaedc3e84c7)：增加首頁、漢字、中古、調類比較功能。
+
+- 新增首頁，集中展示網站功能與入口，並加入更新公告彈窗。
+- 新增比較漢字、比較中古條件、比較調類三種功能及比較 API，將比較結果接入地圖展示。
+- 調整導航、音系頁與自定義分區狀態管理，完善主站與村名分析的入口銜接。
+
+### v4.0.5 · 2026-03-03
+
+[main 版本提交](https://github.com/jengzang/dialects-vue-frontend/commit/e831ad6bea12e1c682e6a6b67684ecdf57049f08)：合併 master 分支，統一版本歷史。
+
+- 整合原有分支的前端內容，清理重複頁面、組件與舊資源，統一倉庫結構。
+- 補充 VillagesML 功能總覽與前端部署說明。
+- 完善村名分析的特徵提取、子集分析、區域向量及語義、空間等模組，調整 API 與共享狀態組織。
+
+### v4.0.0 · 2026-03-01
+
+[main 版本提交](https://github.com/jengzang/dialects-vue-frontend/commit/659fe7c1dc968dc94359cb8e13c725aae0a33294)：新增自然村機器學習功能。
+
+- 上線 VillagesML 自然村名分析，提供搜尋、字頻、語義、空間、命名模式、區域分析及機器學習計算。
+- 新增村落深度分析、特徵向量、聚類與子集分析相關頁面及 API。
+- 增加 VillagesML 獨立 HTML 入口、導航與狀態管理，並補充功能總覽和使用指南。
+
+### v3.5.0 · 2026-02-19
+
+[main 版本提交](https://github.com/jengzang/dialects-vue-frontend/commit/e467686ba887af6491582303e896bfb601fddd9b)：詳細的說明文檔。
+
+- 建立中英文文檔中心，補充架構、API、用戶指南、設計系統與貢獻指南。
+- 完善賬戶登入、註冊、資料修改與個人資料頁的組件組織，補充自定義分區管理及 API。
+- 調整地點、分區選擇與 Praat 波形、母音空間等交互，整理共用提示與用戶統計。
+
+### v3.4.0 · 2026-02-15
+
+[main 版本提交](https://github.com/jengzang/dialects-vue-frontend/commit/78ca5f49d5d6e6a780ffd909d867bcebfb29c8df)：結果界面直接查詢對應的聲韻調。
+
+- 在結果行增加統計入口，可直接查詢當前字例對應的聲母、韻母、聲調分佈，並查看統計詳情彈窗。
+- 新增 Explore 導航欄和布局，集中組織字表工具、音系、詞句與自然村等入口。
+- 新增排行榜與用戶權益提示，整理共用提示、確認彈窗和地點詳情交互。
+
+### v3.3.0 · 2026-02-11
+
+[main 版本提交](https://github.com/jengzang/dialects-vue-frontend/commit/6a7fbe01045f649546f451a23855e9ec0f89a043)：Praat 功能。
+
+- 新增 Praat 網頁聲學分析，包含音頻輸入、波形預覽、分析設定、任務狀態與結果展示。
+- 提供母音空間、基頻定調與 T 值五度曲線，支持分析結果的 Excel 導出。
+- 建立統一 API 層，按認證、查詢、字表工具、Praat、SQL 與個人數據等用途整理請求。
+
+### v3.2.0 · 2026-02-06
+
+[main 版本提交](https://github.com/jengzang/dialects-vue-frontend/commit/a35aa4f71cbd17321bf4852a592e7fdadf77260f)：語保地圖以及音系功能。
+
+- 新增語保詞句的地圖展示，將卡片、表格資料與地理分佈銜接。
+- 新增音系查詢、自選維度的音素分類與音節統計，配套音系表格和音系入口頁。
+- 增加地點詳情彈窗、個人數據管理頁與在線時長記錄，完善查詢結果和地圖交互。
+
+### v3.1.0 · 2026-02-01
+
+[main 版本提交](https://github.com/jengzang/dialects-vue-frontend/commit/eb3579697c1a5736ed971c5c27618f71eede016f)：增加語保功能。
+
+- 新增語保詞彙與語法例句查詢，提供卡片和表格展示；此時地圖模式仍為開發中的佔位。
+- 增加廣東自然村樹狀圖、表格與村落地圖彈窗，支持按行政層級瀏覽資料。
+- 補充漢字音韻分類樹與通用表格、資料管理工具，完善地點和分區選擇。
+
+### v3.0.0 · 2026-01-27
+
+[main 版本提交](https://github.com/jengzang/dialects-vue-frontend/commit/70471b776aaeb1b98415205800db518459749c2b)：完成相關字表工具。
+
+- 新增字表檢查、粵拼轉 IPA、字表合併三種工具，提供文件上傳、處理和結果下載。
+- 增加 Explore 工具入口、側欄與工具頁布局，整理工具導航。
+- 擴展陽春自然村及陽春口語資料頁，調整查詢和認證相關交互。
+
+### v2.1.0 · 2026-01-22
+
+[main 版本提交](https://github.com/jengzang/dialects-vue-frontend/commit/ec794d334f33a02d4916da629ed4f86f5af6b59d)：通用表格組件完成。
+
+- 完成通用表格組件，支持資料搜尋、排序、篩選及具權限的新增、編輯、刪除操作。
+- 增加自定義地圖資料面板，完善地圖、自定義資料及查詢結果的交互。
+- 新增陽春自然村樹狀資料和相關頁面，補充全局提示與確認彈窗。
+
+### v2.0.0 · 2026-01-16
+
+[main 版本提交](https://github.com/jengzang/dialects-vue-frontend/commit/92f52366769b7667fc6e8cc1afeb510ae6b1d2f0)：徹底遷移到 Vue，新界面。
+
+- 將主查詢與結果展示遷移至 Vue，拆分結果行、列表、字調展示及詳情彈窗。
+- 新增 Vue 地圖組件、分區繪圖與自定義地圖頁，整理底圖與地圖資料處理。
+- 重整主站布局、路由、查詢輸入及共享狀態，建立後續功能擴展的框架。
+
+### v1.1.0 · 2026-01-11
+
+[main 版本提交](https://github.com/jengzang/dialects-vue-frontend/commit/c61fab703160fb577b74875df73a7e010103d358)：基礎查詢界面。
+
+- 建立主站查詢、結果、地圖與說明頁的基礎界面。
+- 增加地點和分區選擇、中古與音位條件輸入，銜接原有查詢結果頁。
+- 整理認證、主站與介紹入口及導航，保留原有 detail 查詢頁資源。
+
+### v1.0.0 · 2025-09-01
+
+[main 版本提交](https://github.com/jengzang/dialects-vue-frontend/commit/6e431e76ad4e87fed390a95455bf414be129f01a)：初版原生 JavaScript。
+
+- 建立原生 JavaScript 查詢、結果與地圖展示，包含輸入面板、資料處理和詳情彈窗。
+- 提供登入認證，以及建議、支持與鳴謝等頁面。
+- 建立初始前端倉庫、靜態資源與項目說明。
 
 ## 本地開發
 
@@ -251,15 +567,6 @@ VillagesML 的 `/villagesML/gd` 使用資料集路徑，`module`、`subtab` 等 
 
 保留 `/menu?tab=...`、`/explore?page=...` 等舊入口轉譯，以及 `/menu/map/draw` → `/explore/gis`、`/explore/yubao` → `/menu/yubao`、`/explore/yc-spoken` → `/explore/yc/words` 等兼容跳轉；新書籤與文檔應使用當前功能路徑。
 
-## 文檔與相關倉庫
-
-- [站內教程原文](./project/src/main/components/tutorial/content/zh-Hant) · [簡體中文教程](./project/src/main/components/tutorial/content/zh-CN)
-- [文檔中心](./docs/README.md) · [英文文檔中心](./docs/README.en.md)
-- [架構文檔](./docs/ARCHITECTURE.md) · [API 文檔](./docs/API.md) · [設計系統](./docs/DESIGN_SYSTEM.md)
-- [VillagesML 功能總覽](./docs/VillagesML/FEATURE_OVERVIEW.md) · [VillagesML 使用指南](./docs/VillagesML/USER_GUIDE.md)
-- [部署說明](./docs/DEPLOY.md) · [i18n 說明](./project/src/i18n/README.md)
-- [貢獻指南](./docs/CONTRIBUTING.md) · [倉庫協作規範](./AGENTS.md)
-- [前端倉庫](https://github.com/jengzang/dialects-vue-frontend) · [後端倉庫](https://github.com/jengzang/dialects-backend) · [數據預處理倉庫](https://github.com/jengzang/dialects-build)
 
 ## 許可證與支持
 
