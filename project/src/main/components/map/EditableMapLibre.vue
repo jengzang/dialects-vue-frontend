@@ -4003,9 +4003,14 @@ watch(
 )
 
 watch(
-  () => props.activeLayer?.id,
-  () => {
+  () => [props.activeLayer?.id, props.activeLayer?.visible, props.activeLayer?.locked],
+  ([layerId, visible, locked], [previousLayerId, previousVisible, previousLocked]) => {
     if (!map.value) return
+    if (layerId === previousLayerId && visible === previousVisible && locked === previousLocked) return
+    if (layerId !== previousLayerId || !canInteractWithActiveDrawLayer()) {
+      cancelSketch()
+      resetDrawInteractionState()
+    }
     clearHitCandidateMenu()
     clearGeometryIssue()
     syncReadonlyLayers()

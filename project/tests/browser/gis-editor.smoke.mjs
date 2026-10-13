@@ -143,6 +143,37 @@ try {
   for (const point of ringScreen) await page.mouse.click(point.x, point.y)
   await page.evaluate(() => window.gisSmoke.editor.value.setDrawMode('simple_select'))
   assert.equal(await page.evaluate(() => window.gisSmoke.model.value.features.length), 0)
+  for (const transition of ['hide', 'lock', 'switch']) {
+    await page.evaluate(async () => {
+      const smoke = window.gisSmoke
+      smoke.activeLayer.value = { ...smoke.activeLayer.value, visible: true, locked: false }
+      await smoke.load([], 'Polygon')
+      smoke.editor.value.setDrawMode('draw_polygon')
+    })
+    for (const point of ringScreen) await page.mouse.click(point.x, point.y)
+    assert.equal(await page.evaluate(() => window.gisSmoke.sketchState.value.canFinish), true)
+    await page.evaluate(async (transition) => {
+      const smoke = window.gisSmoke
+      if (transition === 'switch') {
+        smoke.activeLayer.value = { ...smoke.activeLayer.value, id: 'switched-layer' }
+        smoke.model.value = { type: 'FeatureCollection', features: [] }
+      } else {
+        smoke.activeLayer.value = { ...smoke.activeLayer.value, [transition === 'hide' ? 'visible' : 'locked']: transition === 'lock' }
+      }
+      await smoke.nextTick()
+    }, transition)
+    const transitionState = await page.evaluate(() => ({ active: window.gisSmoke.sketchState.value.active, layer: window.gisSmoke.activeLayer.value, mode: window.gisSmokeDraw.getMode() }))
+    assert.equal(transitionState.active, false, `${transition} must exit the sketch session: ${JSON.stringify(transitionState)} ${errors.join('; ')}`)
+    assert.equal(await page.evaluate(() => window.gisSmoke.model.value.features.length), 0, `${transition} must discard unfinished polygons`)
+    assert.equal(await page.evaluate(() => window.gisSmoke.history.length), 0, `${transition} must not publish sketch history`)
+    assert.equal(await page.evaluate(() => window.gisSmokeDraw.getMode()), 'simple_select')
+    assert.equal(await page.evaluate(() => window.gisSmoke.editor.value.finishSketch()), false)
+  }
+  await page.evaluate(async () => {
+    const smoke = window.gisSmoke
+    smoke.activeLayer.value = { ...smoke.activeLayer.value, id: 'active', visible: true, locked: false }
+    await smoke.nextTick()
+  })
   const hitPoint = await page.evaluate(async () => {
     const smoke = window.gisSmoke
     const feature = (name) => ({ id: 'shared', type: 'Feature', properties: { name }, geometry: { type: 'Polygon', coordinates: [[[113, 23], [114, 23], [114, 24], [113, 24], [113, 23]]] } })
