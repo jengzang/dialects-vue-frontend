@@ -291,6 +291,101 @@ VillagesML 的 `/villagesML/gd` 使用資料集路徑，`module`、`subtab` 等 
 
 保留 `/menu?tab=...`、`/explore?page=...` 等舊入口轉譯，以及 `/menu/map/draw` → `/explore/gis`、`/explore/yubao` → `/menu/yubao`、`/explore/yc-spoken` → `/explore/yc/words` 等兼容跳轉；新書籤與文檔應使用當前功能路徑。
 
+### 應用、頁面與業務模組
+
+主站由 [`main/main.js`](./project/src/main/main.js) 啟動，共用 router、i18n、SEO、介面偏好與認證初始化；[`main/App.vue`](./project/src/main/App.vue) 依路徑選擇布局，並掛載全局提示、確認、錯誤邊界與路由載入狀態。VillagesML 使用自己的 [`app/main.js`](./project/src/VillagesML/app/main.js)、router 與 App，同時復用全站基礎能力。
+
+| 層級／目錄 | 責任與內容 |
+| --- | --- |
+| `layouts/` | `MenuLayout`、`ExploreLayout`、`SimpleLayout` 組織導航、側欄、內容區與頁腳 |
+| `main/router.js`、`main/router/` | 主站語言路由、登入與開發功能守衛；`menuRoutes.js`、`exploreRoutes.js` 分別維護功能路由，`legacyRouteMap.js` 保存舊入口映射 |
+| `main/views/` | 路由級頁面及功能入口；`menu/` 組織查詢、比較、音系、地圖、詞表等，`explore/` 組織工具、陽春、自然村等專題 |
+| `main/components/` | 主站業務元件，包含查詢條件、結果行與面板、音系、地圖、表樹、賬戶及教程，不全部放入跨應用共用目錄 |
+| `VillagesML/app/`、`workspace/` | 獨立應用入口與工作區；`workspace/modules/` 按機器學習、區域、語義等分析領域組織頁面 |
+| `VillagesML/components/`、`config/`、`utils/` | 子應用元件、資料集與分析配置、路由資料集解析及區域快取等 |
+| `components/`、`composables/`、`utils/` | 跨頁面／應用復用的 UI、組合式邏輯與工具函數 |
+
+典型呼叫關係為「路由頁面 → 業務元件／composable → 對應 API」，視覺外觀由共享樣式與 token 提供。`@` 別名指向 `project/src`；查找實作時應先區分主站、VillagesML 與共用層。
+
+### API、共享狀態與 composable
+
+[`api/index.js`](./project/src/api/index.js) 提供統一導出入口，具體請求按 `auth/`、`main/`、`villagesML/` 分類。`api/main/` 再按 `core`、`geo`、`tools`、`sql`、`user` 及詞表、語保等業務拆分。[`api/auth/httpClient.js`](./project/src/api/auth/httpClient.js) 處理共用請求、token 更新、錯誤與限流；VillagesML 的 [`request.js`](./project/src/api/villagesML/request.js) 根據當前資料集生成 `/api/villages` 路徑與 `type` 參數，再使用共用 HTTP client。
+
+共享狀態以 Vue `ref`／`reactive` 組織：[`main/store/store.js`](./project/src/main/store/store.js) 保存用戶、查詢 payload、字集偏好與教程狀態，`customRegionStore.js` 管理自訂分區；[`villagesMLStore.js`](./project/src/VillagesML/store/villagesMLStore.js) 保存村名搜尋、區域分析與聚類等狀態。可分享的頁面條件透過路由 query 保存；本機偏好與資料快取由各自的 storage／cache 工具管理。
+
+| composable 分組 | 代表能力 |
+| --- | --- |
+| `composables/core/` | `useAsyncTask`、`useAsyncData` 統一 loading／error／reset；`usePollingTask` 管理輪詢；`useStorageState`、`localCache`、`sessionCache` 與 `singleFlight` 提供持久化、快取及請求合併工具 |
+| `composables/router/` | `useRouteQueryState` 同步 query 與頁面狀態；`useAuthGuard` 復用登入檢查 |
+| `composables/data/` | 地點詳情、分區、自然村快取，以及查詢配置、資料來源與訪問統計 |
+| `composables/import/` | 表格導入流程、預覽與泰森多邊形自訂資料導入 |
+| `composables/bar/` | 導航溢出、滾動箭頭、標籤提示、錨點跳轉與圖標映射 |
+| `composables/suggestions/` | 建議反饋表單邏輯 |
+
+### SCSS 入口與樣式分層
+
+樣式由應用入口載入：主站載入 `main-entry.scss`，VillagesML 載入 `villagesml-entry.scss`；兩者都引入 `global-entry.scss`。
+
+| 樣式入口／目錄 | 責任 |
+| --- | --- |
+| [`styles/global-entry.scss`](./project/src/styles/global-entry.scss) | 全站 token、基礎樣式、按鈕、表單、資訊、載入、滾動條、工具類、表面與介面模式 |
+| [`styles/main-entry.scss`](./project/src/styles/main-entry.scss)、`styles/main/` | 共用基礎之上的主站按鈕、布局、工具列、遮罩、彈窗與狀態樣式 |
+| [`styles/villagesml-entry.scss`](./project/src/styles/villagesml-entry.scss)、`styles/villagesml/` | 共用基礎與工具列，加上 VillagesML 專屬 token、表面、面板、控制項、表單、表格、圖表、布局、狀態及地圖 |
+| 元件內的 scoped SCSS | 組合共享原語，處理當前元件的間距、定位、尺寸及局部布局 |
+
+共享外觀依用途分類：`global/_surfaces.scss` 提供 `.glass-panel`、`.glass-card`、`.surface-panel` 等表面，`_buttons.scss` 提供 `.glass-button`，`_forms.scss` 提供 `.glass-field` 與下拉面板；`_loading.scss`、`_scrollbars.scss` 分別提供 `.ui-loading--page` 等載入狀態及 `.ui-scrollbar`。主站與 VillagesML 的樣式層再補充業務場景，不應在各頁重複定義整套按鈕、卡片或彈窗外觀。
+
+### 設計 token、mixin 與主題
+
+設計 token 是 **CSS custom properties**，主要定義在 [`styles/global/_tokens.scss`](./project/src/styles/global/_tokens.scss)，元件使用 `var(--xxx)` 讀取並響應主題覆寫。
+
+| token 類別 | 例子與用途 |
+| --- | --- |
+| 字體與文字 | `--font-sans`、`--font-serif`、`--font-mono`、`--text-primary`、`--text-secondary` |
+| 品牌與語義色 | `--color-primary`、`--color-error`、`--color-success`、`--color-warning` |
+| 表面與層級 | `--surface-elevation-0`、`--surface-panel`、`--surface-glass-floating`、`--glass-60` |
+| 控制項與互動 | `--border-control`、`--focus-ring`、`--surface-selected`、`--action-primary-bg` |
+| 圓角與陰影 | `--radius-md`、`--radius-lg`、`--shadow-glass-hover` |
+| VillagesML 專屬 | [`styles/villagesml/_tokens.scss`](./project/src/styles/villagesml/_tokens.scss) 的 `--vml-blue` 等，在共用 token 之外表達子應用的視覺語義 |
+
+[`composables/core/uiPreferences.js`](./project/src/composables/core/uiPreferences.js) 保存介面與主題偏好，初始化時設定根元素的 `data-color-theme`、`data-ui-mode`。主題包含藍、綠、淺色與深色，token 依根元素屬性覆寫；`global/_ui-mode.scss` 的 compact 模式減少動畫、過渡、模糊與陰影，讓共享樣式統一響應偏好。
+
+[`styles/global/_mixins.scss`](./project/src/styles/global/_mixins.scss) 封裝常用 SCSS 行為：
+
+| mixin | 用途 |
+| --- | --- |
+| `flex-center`、`flex-col` | 水平／垂直置中與縱向 flex 布局 |
+| `text-truncate` | 單行文字溢出省略 |
+| `disabled-state` | 禁用透明度與游標 |
+| `glass-blur($blur, $saturation)` | 帶瀏覽器前綴的背景模糊與可選飽和度 |
+| `solid-surface($elevation)` | 使用表面層級 token 設定背景 |
+
+Vite 的 SCSS `additionalData` 已注入 mixin 與 keyframe 模組；倉庫元件規範仍要求 `<style scoped lang="scss">` 並在頂部使用 `@use '@/styles/global/mixins' as *;`。新增樣式應先選共用類／元件，再使用 token 與 mixin，局部樣式以布局為主。響應式布局依倉庫規範使用 `@media (max-aspect-ratio: 1 / 1)` 判斷直向，不新增寬度斷點。
+
+### 通用 UI 與業務元件
+
+共用元件主要位於 `components/`，按用途分類，頁面可透過 props、事件與 slot 組合現有能力：
+
+| 分組 | 代表元件與責任 |
+| --- | --- |
+| `components/common/` | `AppModal` 提供 Teleport 彈窗、header／footer 具名插槽與預設內容插槽、關閉事件及背景滾動鎖定；標題區與內容滾動區分離 |
+| `components/common/` | `GlassTable` 提供列配置、排序事件、表頭／儲存格 slot、載入與空資料展示；`TabsContainer`、`SwitchToggle`、`FloatingSearch` 提供常見交互 |
+| `components/common/` | `BarIcon`、`InlineIcon` 統一圖標展示，`ImagePreviewOverlay` 與 `ScrollToTop` 提供圖片預覽及回到頂部 |
+| `components/selector/` | 下拉框、多選框、單選組、勾選框與選擇器；`_selector.scss` 保存該組共享樣式 |
+| `components/ToastAndHelp/` | `GlobalToast`、`GlobalConfirm`、`RateLimitNotice`、`ErrorBoundary`、`HelpIcon` 與 `HoverDetailCard` 提供提示、確認、限流、錯誤邊界及輔助說明 |
+| `components/bar/`、`components/footer/` | 共用導航、側欄、頭像、浮動按鈕與 `AppFooter` |
+| `components/import/` | `TabularImportPreview` 展示表格導入預覽，配合 import composable 使用 |
+| `main/components/TableAndTree/` | `UniversalTable`、`PhonologyTable` 與分類／村落樹承載主站資料交互；與只負責通用展示的 `GlassTable` 分工不同 |
+
+UI 元件負責展示與交互，composable 負責可復用狀態流程，API 模組負責請求。主站特有的音系詳情、查詢結果、地點彈窗仍放在對應業務目錄；選用既有元件時應核對其接口及共享樣式，避免另做同類外觀。
+
+### 配置、教程與國際化
+
+`main/config/` 按導航、字集／分類、顏色、教程等用途組織，`index.js` 是部分配置的導出面，不是所有內容的集中存放處。VillagesML 的資料集、分析選項與語義資源放在自己的 `config/`。
+
+教程的分類與頁面關聯由 [`tutorialManifest.js`](./project/src/main/components/tutorial/tutorialManifest.js) 維護，Markdown 內容位於 `main/components/tutorial/content/`，展示元件位於 `main/components/tutorial/`；`main/config/tutorial/tutorialDiceConfig.js` 管理骰子快速體驗的啟用條件與示例配置。功能分類與操作說明應隨這些來源同步。
+
+`i18n/locales/` 按 `zh-Hant`、`zh-CN`、`en` 及 query、map、phonology、tools 等業務拆分資源，`i18n/index.js` 組裝語言配置，`localeDetector.js` 與 `localeRouting.js` 處理語言選擇及路徑。逐頁 SEO 文案由 `seo/config.js` 管理；首頁更新公告集中在 `utils/user/updateNoticeConfig.js`。
 
 ## 許可證與支持
 
