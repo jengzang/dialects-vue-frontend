@@ -53,7 +53,7 @@ const browser = await chromium.launch({
 try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } })
   const errors = []
-  page.on('pageerror', (error) => errors.push(error.message))
+  page.on('pageerror', (error) => errors.push(error.stack || error.message))
   await page.route('https://api.maptiler.com/**', (route) => route.fulfill({
     contentType: 'application/json',
     body: JSON.stringify({ version: 8, sources: {}, glyphs: 'https://example.com/fonts/{fontstack}/{range}.pbf', layers: [{ id: 'background', type: 'background', paint: { 'background-color': '#ffffff' } }] }),
@@ -119,6 +119,7 @@ try {
     const rect = map.getCanvas().getBoundingClientRect()
     return [[113, 23], [114, 23], [114, 24]].map((coordinate) => { const point = map.project(coordinate); return { x: point.x + rect.left, y: point.y + rect.top } })
   })
+  await page.waitForFunction(() => !window.gisSmokeMap.queryRenderedFeatures().some((feature) => feature.properties?.meta === 'vertex'))
   for (const [index, point] of ringScreen.entries()) {
     await page.mouse.click(point.x, point.y)
     await page.waitForFunction((count) => window.gisSmoke.sketchState.value.pointCount === count, index + 1)
@@ -134,13 +135,21 @@ try {
     window.gisSmoke.snappingEnabled.value = false
     window.gisSmoke.editor.value.setDrawMode('draw_polygon')
   })
-  for (const point of ringScreen) await page.mouse.click(point.x, point.y)
+  await page.waitForFunction(() => !window.gisSmokeMap.queryRenderedFeatures().some((feature) => feature.properties?.meta === 'vertex'))
+  for (const [index, point] of ringScreen.entries()) {
+    await page.mouse.click(point.x, point.y)
+    await page.waitForFunction((count) => window.gisSmoke.sketchState.value.pointCount === count, index + 1)
+  }
   assert.equal(await page.evaluate(() => window.gisSmoke.sketchState.value.canFinish), true)
   assert.equal(await page.evaluate(() => window.gisSmoke.editor.value.cancelSketch()), true)
   assert.equal(await page.evaluate(() => window.gisSmoke.model.value.features.length), 0)
   assert.equal(await page.evaluate(() => window.gisSmoke.history.length), 0)
   await page.evaluate(() => window.gisSmoke.editor.value.setDrawMode('draw_polygon'))
-  for (const point of ringScreen) await page.mouse.click(point.x, point.y)
+  await page.waitForFunction(() => !window.gisSmokeMap.queryRenderedFeatures().some((feature) => feature.properties?.meta === 'vertex'))
+  for (const [index, point] of ringScreen.entries()) {
+    await page.mouse.click(point.x, point.y)
+    await page.waitForFunction((count) => window.gisSmoke.sketchState.value.pointCount === count, index + 1)
+  }
   await page.evaluate(() => window.gisSmoke.editor.value.setDrawMode('simple_select'))
   assert.equal(await page.evaluate(() => window.gisSmoke.model.value.features.length), 0)
   for (const transition of ['hide', 'lock', 'switch']) {
@@ -150,7 +159,11 @@ try {
       await smoke.load([], 'Polygon')
       smoke.editor.value.setDrawMode('draw_polygon')
     })
-    for (const point of ringScreen) await page.mouse.click(point.x, point.y)
+    await page.waitForFunction(() => !window.gisSmokeMap.queryRenderedFeatures().some((feature) => feature.properties?.meta === 'vertex'))
+    for (const [index, point] of ringScreen.entries()) {
+      await page.mouse.click(point.x, point.y)
+      await page.waitForFunction((count) => window.gisSmoke.sketchState.value.pointCount === count, index + 1)
+    }
     assert.equal(await page.evaluate(() => window.gisSmoke.sketchState.value.canFinish), true)
     await page.evaluate(async (transition) => {
       const smoke = window.gisSmoke
@@ -281,6 +294,43 @@ try {
   await page.mouse.move(adjacentScreen.x + 20, adjacentScreen.y + 10, { steps: 5 })
   await page.mouse.up()
   assert.notDeepEqual(await page.evaluate(() => window.gisSmoke.model.value.features[0].geometry.coordinates[0][1]), [114, 24])
+  await page.evaluate(async () => {
+    const smoke = window.gisSmoke
+    await smoke.load([{ id: 'insert-and-drag', type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [[[113, 23], [114, 23], [114, 24], [113, 24], [113, 23]]] } }])
+    smoke.editor.value.selectVertex('insert-and-drag', '0.0')
+  })
+  await page.waitForFunction(() => window.gisSmokeMap.queryRenderedFeatures().some((feature) => feature.properties?.meta === 'midpoint' && feature.properties.parent === 'insert-and-drag' && feature.properties.coord_path === '0.1'))
+  const midpointScreen = await page.evaluate(() => {
+    const point = window.gisSmokeMap.project([113.5, 23])
+    const rect = window.gisSmokeMap.getCanvas().getBoundingClientRect()
+    return { x: point.x + rect.left, y: point.y + rect.top }
+  })
+  await page.mouse.click(midpointScreen.x, midpointScreen.y)
+  await page.waitForFunction(() => window.gisSmoke.model.value.features[0].geometry.coordinates[0].length === 6)
+  const insertionHistory = await page.evaluate(async () => {
+    const smoke = window.gisSmoke
+    await smoke.nextTick()
+    const inserted = smoke.editor.value.getEditContext()
+    const insertedPoint = window.gisSmokeDraw.getSelectedPoints().features[0]?.geometry.coordinates
+    await smoke.undo()
+    const undone = smoke.editor.value.getEditContext()
+    const undoCount = smoke.model.value.features[0].geometry.coordinates[0].length
+    await smoke.redo()
+    const restored = smoke.editor.value.getEditContext()
+    const redoPoint = window.gisSmokeDraw.getSelectedPoints().features[0]?.geometry.coordinates
+    return { insertedPath: inserted.coordPaths[0], insertedPoint, undoPath: undone.coordPaths[0], undoCount, redoPath: restored.coordPaths[0], redoPoint }
+  })
+  assert.deepEqual(insertionHistory, { insertedPath: '0.1', insertedPoint: [113.5, 23], undoPath: '0.0', undoCount: 5, redoPath: '0.1', redoPoint: [113.5, 23] })
+  await page.waitForFunction(() => window.gisSmokeMap.queryRenderedFeatures().some((feature) => feature.properties?.meta === 'vertex' && feature.properties.parent === 'insert-and-drag' && feature.properties.coord_path === '0.1' && Math.abs(feature.geometry.coordinates[0] - 113.5) < 0.001))
+  await page.mouse.move(midpointScreen.x, midpointScreen.y)
+  await page.mouse.down()
+  await page.mouse.move(midpointScreen.x + 12, midpointScreen.y + 15, { steps: 5 })
+  await page.mouse.up()
+  const dragInsertionResult = await page.evaluate(() => ({ coordinate: window.gisSmoke.model.value.features[0].geometry.coordinates[0][1], context: window.gisSmoke.editor.value.getEditContext(), events: window.gisSmoke.events.filter((event) => event.type === 'error') }))
+  assert.notDeepEqual(dragInsertionResult.coordinate, [113.5, 23], JSON.stringify(dragInsertionResult))
+  assert.deepEqual(dragInsertionResult.context.coordPaths, ['0.1'])
+  assert.deepEqual(dragInsertionResult.events, [])
+  assert.equal(await page.evaluate(() => window.gisSmoke.model.value.features.length), 1)
   await verifyCrowdedHitMenu(page)
   const mobile = await browser.newPage({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })
   mobile.on('pageerror', (error) => errors.push(error.message))

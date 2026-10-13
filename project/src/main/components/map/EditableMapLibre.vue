@@ -3365,10 +3365,17 @@ const buildLiveSnappingModes = () => {
         const about = event.featureTarget.properties
         const snap = resolveSnapResult([about.lng, about.lat], { excludeFeatureId: state.featureId, snapping: !event.originalEvent?.altKey })
         setSnapPreview(snap)
-        return original[handler].call(this, state, {
+        const result = original[handler].call(this, state, {
           ...event, lngLat: { lng: snap.coordinate[0], lat: snap.coordinate[1] },
           featureTarget: { ...event.featureTarget, properties: { ...about, lng: snap.coordinate[0], lat: snap.coordinate[1] } },
         })
+        // Draw fires midpoint updates before publishing the new vertex selection.
+        const feature = draw.value?.get?.(state.featureId)
+        const paths = state.selectedCoordPaths.map((path) => normalizeExistingCoordPath(feature, path)).filter(Boolean)
+        this.setSelectedCoordinates(this.pathsToCoordinates(state.featureId, paths))
+        selectedVertexCoordPaths.value = paths
+        syncShapeEditState()
+        return result
       }
     }
     wrapped.onDrag = function (state, event) {
