@@ -203,15 +203,9 @@ document.getElementById("infoForm").addEventListener("submit", async function (e
                     }
                     // 检查 regions_input 和 region_submit
                     function checkRegion() {
-                        // 拆分 region_submit
-                        let regionParts = region_submit.split('-');
-                        // 检查 region_submit 中的每一部分是否能与 regions_input 中的任何元素匹配
-                        return regions_input.some(region => {
-                            // 将 regions_input 中的元素按 - 拆分成多个部分
-                            let regionPartsInRegion = region.split('-');
-                            // 检查 region_submit 的任意一部分是否能在 regions_input 中找到
-                            return regionParts.some(part => regionPartsInRegion.includes(part));
-                        });
+                        return window.regionusing === 'yindian' && regions_input.some(region =>
+                            region_submit === region || region_submit.startsWith(region + '-')
+                        );
                     }
                     const customOpen = window.isCustomOn;
                     let HowToClick = "🎉👌";
@@ -458,7 +452,8 @@ document.addEventListener("DOMContentLoaded", function () {
         // 获取输入框中的汉字
         const chars = inputBox.value.trim().split(""); // 将输入框内容拆分成字符数组
         const locations = locationsInput.value.trim().split(/\s+/); // 获取并拆分 locations
-        const regions = regionsInput.value.trim().split(/\s+/); // 获取并拆分 regions
+        const regions = await readRegionPaths();
+        if (regions === null) return;
 
         if (chars.length === 0) {
             showToast("❌ 请输入汉字！",'darkred');
@@ -686,7 +681,8 @@ document.addEventListener("DOMContentLoaded",  function () {
 
     tonesBtn.addEventListener('click', async (e) => {
         const locations = locationsInput.value.trim().split(/\s+/); // 获取并拆分 locations
-        const regions = regionsInput.value.trim().split(/\s+/); // 获取并拆分 regions
+        const regions = await readRegionPaths();
+        if (regions === null) return;
         if (isEmptyInput(locations) && isEmptyInput(regions)) {
             showToast("❌ 請輸入地點或分區！",'darkred');
             return;

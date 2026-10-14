@@ -1,5 +1,5 @@
 
-window.addEventListener('DOMContentLoaded', function () {
+window.addEventListener('DOMContentLoaded', async function () {
     const data = sessionStorage.getItem('vueToNativeData')
     if (!data) return
 
@@ -20,7 +20,7 @@ window.addEventListener('DOMContentLoaded', function () {
         if (regionEl && parsed.region) {
             // region 有可能是陣列或字串
             regionEl.value = Array.isArray(parsed.region)
-                ? parsed.region.join(' / ')
+                ? parsed.region.join(' ')
                 : parsed.region
         }
         if (parsed.region_source === 'map' || parsed.region_source === 'yindian') {
@@ -30,6 +30,10 @@ window.addEventListener('DOMContentLoaded', function () {
             const targetTab = document.querySelector(`.tab-btn[data-tab="${parsed.region_source}"]`)
             targetTab?.classList.add('active')
             window.regionusing = `${parsed.region_source}`;
+        }
+
+        if (regionEl && parsed.regions_semantics === 'path-v2') {
+            setRegionPaths(regionEl.value.trim().split(/\s+/).filter(Boolean), window.regionusing);
         }
 
         // ✅ tab1 的行為：自動填入查字 + 按按鈕
@@ -111,6 +115,7 @@ window.addEventListener('DOMContentLoaded', function () {
             // 🎯 自動選中分區級數下拉框
             const levelSelect = document.getElementById('max-level');
             if (levelSelect && parsed.level) {
+                await getDefaultRegionTree(window.regionusing);
                 levelSelect.value = String(parsed.level); // 確保是 string
             }
             const mapBtn = document.querySelector('#allmap-first')
