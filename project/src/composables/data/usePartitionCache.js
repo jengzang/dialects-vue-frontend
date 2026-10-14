@@ -4,7 +4,25 @@ export const PARTITION_DATA_CACHE_KEY = 'partition_data_cache'
 export const PARTITION_POINTS_CACHE_KEY = 'partition_points_cache'
 export const YINDIAN_TREE_CACHE_KEY = '__YINDIAN_TREE_CACHE__'
 
+// A fresh page starts a fresh cache; sessionStorage must not keep old default trees alive.
+const defaultTrees = new Map()
+const pendingTrees = new Map()
+
 export function usePartitionCache() {
+  async function getDefaultTree(mode, loadTree, { identity = 'anonymous' } = {}) {
+    const key = JSON.stringify([2, identity, mode])
+    if (defaultTrees.has(key)) return defaultTrees.get(key)
+    if (pendingTrees.has(key)) return pendingTrees.get(key)
+    const pending = Promise.resolve().then(loadTree).then(tree => {
+      if (tree?.schema_version !== 2 || tree.region_mode !== mode || !Array.isArray(tree.nodes)) {
+        throw new Error('Invalid default partition tree')
+      }
+      defaultTrees.set(key, tree)
+      return tree
+    }).finally(() => pendingTrees.delete(key))
+    pendingTrees.set(key, pending)
+    return pending
+  }
   async function getPartitionData(loadPartitionData) {
     // 分区接口返回的是 { data } 包装结构，这里统一拆成页面真正消费的数组。
     const cached = readSessionCache(PARTITION_DATA_CACHE_KEY)
@@ -58,6 +76,7 @@ export function usePartitionCache() {
   }
 
   return {
+    getDefaultTree,
     getPartitionData,
     getPartitionPoints,
     getCachedYindianTree,
