@@ -114,6 +114,7 @@ export {
   getLocationPoints,
   batchMatch,
   getPartitions,
+  resolvePartitions,
   getRegions,
 } from './main/geo/LocationAndRegion.js';
 

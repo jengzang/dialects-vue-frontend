@@ -160,6 +160,10 @@ export async function getPartitions(regionMode = 'yindian', parent) {
   }
 }
 
+export function resolvePartitions(payload) {
+  return api('/api/partitions/resolve', { method: 'POST', body: payload })
+}
+
 /**
  * 获取区域信息
  * @param {string} inputData - 输入数据（地点名称或ID）

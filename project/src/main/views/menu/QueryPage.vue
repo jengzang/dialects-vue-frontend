@@ -442,6 +442,7 @@ watch(
       const payload = tutorialAssistState.payload
       hanziInput.value = payload.chars || ''
       locationModel.value = {
+        ...payload.loc,
         locations: payload.loc?.locations || [],
         regions: payload.loc?.regions || [],
         regionUsing: payload.loc?.regionUsing || 'yindian'
@@ -464,6 +465,7 @@ watch(
     if (tutorialAssistState.target === 'query:tab4' && currentTab.value === 'tab4') {
       const payload = tutorialAssistState.payload
       locationModel.value = {
+        ...payload.loc,
         locations: payload.loc?.locations || [],
         regions: payload.loc?.regions || [],
         regionUsing: payload.loc?.regionUsing || 'yindian'
@@ -612,6 +614,7 @@ function resetRememberedMapSubToView() {
 
 // 點擊按鈕行為
 const runAction = async () => {
+  if (isRunDisabled.value || locationRef.value?.runDisabled) return
   setRunning('query', true);
 
   // 1. 獲取地點邏輯 (保持不變)
@@ -785,6 +788,7 @@ function handleApplyConfig(data) {
 
   // 2. 更新地點
   locationModel.value = {
+    ...data.loc,
     locations: data.loc.locations,
     regions: data.loc.regions,
     regionUsing: data.loc.regionUsing

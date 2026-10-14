@@ -1046,6 +1046,7 @@ const buildCountRequestPayload = () => ({
 })
 
 const loadData = async () => {
+  if (isLocationInputDisabled.value) return
   if (isCountphosQueryEmpty.value) {
     error.value = t('phonology.phonology.countphos.states.minLocationError')
     return

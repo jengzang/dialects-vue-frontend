@@ -80,6 +80,7 @@
         <RegionSelector
             :mode="regionUsing"
             v-model:selected="selectedValue"
+            @update:selected="markSelectedPaths"
             :custom-regions="selectedCustomRegions"
             :placeholder="regionUsing === 'map' ? $t('query.components.locationAndRegionInput.selectMapPartition') : $t('query.components.locationAndRegionInput.selectYindianPartition')"
             @selectCustomRegion="handleCustomRegionSelect"
@@ -94,11 +95,24 @@
           v-else
           v-model="regionInputValue"
           v-model:region-using="regionUsing"
+          :user-candidates="userRegionCandidates"
           @open-partition-info="openPartitionInfoModal"
+          @select-token="chooseTextToken"
       />
     </div>
     <!-- ✅ 底部提示欄：已選擇地點數 -->
     <div class="bottom-hint" >
+      <div v-if="regionHint" class="hint-warning">{{ regionHint }}</div>
+      <div v-for="issue in regionIssues" :key="issue.index" class="region-resolution-candidates">
+        <button
+            v-for="candidate in issue.candidates"
+            :key="candidate.path"
+            class="tab-btn region-path-candidate"
+            :title="candidate.path"
+            type="button"
+            @click="chooseRegionCandidate(issue.index, candidate.path)"
+        >{{ candidate.path.split('-').join('·') }}</button>
+      </div>
       <div class="hint-main">
         {{ $t('query.components.locationAndRegionInput.selectedCountPre') }}<span class="hint-num">{{ totalCount }}</span>{{ $t('query.components.locationAndRegionInput.selectedCountPost') }}
       </div>
@@ -185,9 +199,9 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import { ref, nextTick ,onMounted, onActivated, watch, computed,defineProps, defineAsyncComponent } from 'vue'
+import { ref, nextTick ,onMounted, onActivated, watch, computed, defineAsyncComponent, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getLocations, getCustomFeature, getLocationPartitions, batchMatch, getPartitions } from '@/api/index.js'
+import { getLocations, getCustomFeature, getLocationPartitions, batchMatch, getPartitions, resolvePartitions } from '@/api/index.js'
 import AppModal from '@/components/common/AppModal.vue'
 import { customRegionStore } from '@/main/store/customRegionStore.js'
 import RegionSelector from "@/main/components/geo/RegionSelector.vue"
@@ -195,31 +209,12 @@ import PartitionInfoModal from "@/main/components/geo/PartitionInfoModal.vue"
 import { userStore } from '@/main/store/store.js'
 import { LOCATION_LIMITS } from '@/main/config/constants.js'
 import { buildExplicitLocationsForGetLocs, isExplicitLocationsLimitExceeded } from '@/main/utils/query/queryLimits.js'
-import {STATIC_REGION_TREE, top_yindian} from "@/main/config/RegionTree.js";
 import { usePartitionCache } from '@/composables/data/usePartitionCache.js'
 
 const RegionInputMode = defineAsyncComponent(() => import('./RegionInputMode.vue'))
 
-const { getPartitionData, getYindianTree } = usePartitionCache()
+const { getPartitionData, getDefaultTree, resolveItems } = usePartitionCache()
 
-// 只保留音典允许暴露的顶级分区；不改结构，只裁掉不需要的 key。
-const filterYindianTopLevelKeys = (obj) => {
-  if (typeof obj !== 'object' || Array.isArray(obj) || obj === null) {
-    return {}
-  }
-
-  const filtered = {}
-  for (const key of top_yindian) {
-    if (Object.prototype.hasOwnProperty.call(obj, key)) {
-      filtered[key] = obj[key]
-    }
-  }
-  return filtered
-}
-
-// const API_BASE = window.API_BASE;
-// const MAP_TREE = STATIC_REGION_TREE;
-// const YINDIAN_TREE = top_yindian;
 // 接收外部传入的地點和分區
 const { t } = useI18n()
 
@@ -246,33 +241,66 @@ const props = defineProps({
   }
 })
 
-const inputValue = ref(props.modelValue.locations.join(' '))  // 初始化地點
-const selectedValue = ref(props.modelValue.regions)            // 初始化分區
-const regionUsing = ref(props.modelValue.regionUsing)
+const inputValue = ref((props.modelValue.locations || []).join(' '))
+const selectedValue = ref([...(props.modelValue.regionDraft?.values || props.modelValue.regions || [])])
+const regionUsing = ref(props.modelValue.regionUsing || 'map')
+const regionInputValue = ref(props.modelValue.regionText ?? (props.modelValue.regions || []).join(' '))
+const resolvedRegions = ref([])
+const regionResolving = ref(false)
+const regionIssues = ref([])
+const regionHint = ref('')
+const scopeDisabled = ref(true)
+const runDisabled = computed(() => scopeDisabled.value || regionResolving.value || regionIssues.value.length > 0)
+let explicitTokens = []
+const tokenRevision = ref(0)
+const userRegionCandidates = ref([])
+let regionResolutionSequence = 0
+let lastEmittedSignature = ''
 
-// Region input mode state
-const regionInputValue = ref('')  // Textarea content for regions
-// watch 外部传入的值
-watch(() => props.modelValue, (newVal) => {
-  if (!newVal) return
+function modelSignature(model) {
+  return JSON.stringify([model.locations || [], model.regions || [], model.regionUsing || 'map', model.regions_semantics, model.regionText, model.regionDraft])
+}
 
-  // 比較解析後的數組，而不是字符串，避免空格被移除
-  const currentLocations = (inputValue.value ?? '').trim().split(/\s+/).filter(Boolean)
-  const newLocations = Array.isArray(newVal.locations) ? newVal.locations : []
+function rememberPaths(paths, mode = regionUsing.value) {
+  explicitTokens = paths.map(text => ({ text, source: mode }))
+}
 
-  // 只有當解析後的數組真的不同時才更新
-  if (JSON.stringify(currentLocations) !== JSON.stringify(newLocations)) {
-    inputValue.value = newLocations.join(' ')
+if (props.modelValue.regionDraft) explicitTokens = [...(props.modelValue.regionDraft.tokens || [])]
+else if (props.modelValue.regions_semantics === 'path-v2') rememberPaths(selectedValue.value)
+
+function markSelectedPaths(paths) {
+  rememberPaths(paths)
+}
+
+function emitScope() {
+  const model = {
+    locations: inputValue.value.trim().split(/\s+/).filter(Boolean),
+    regions: [...resolvedRegions.value],
+    regionUsing: regionUsing.value,
+    regions_semantics: 'path-v2',
+    ...(props.useInputMode ? { regionText: regionInputValue.value } : {}),
+    ...((regionResolving.value || regionIssues.value.length) ? { regionDraft: {
+      values: props.useInputMode ? regionInputValue.value.trim().split(/\s+/).filter(Boolean) : [...selectedValue.value],
+      tokens: [...explicitTokens]
+    } } : {}),
   }
+  lastEmittedSignature = modelSignature(model)
+  emit('update:modelValue', model)
+}
 
-  if (JSON.stringify(selectedValue.value) !== JSON.stringify(newVal.regions)) {
-    selectedValue.value = newVal.regions
-  }
-
-  if (regionUsing.value !== newVal.regionUsing) {
-    regionUsing.value = newVal.regionUsing
-  }
-}, { deep: true, immediate: true })
+watch(() => props.modelValue, (model) => {
+  if (!model || modelSignature(model) === lastEmittedSignature) return
+  const locations = Array.isArray(model.locations) ? model.locations : []
+  if (JSON.stringify(inputValue.value.trim().split(/\s+/).filter(Boolean)) !== JSON.stringify(locations)) inputValue.value = locations.join(' ')
+  const draft = model.regionDraft?.values || model.regions || []
+  if (JSON.stringify(selectedValue.value) !== JSON.stringify(draft)) selectedValue.value = [...draft]
+  regionUsing.value = model.regionUsing || 'map'
+  if (props.useInputMode) regionInputValue.value = model.regionText ?? (model.regions || []).join(' ')
+  if (model.regionDraft) explicitTokens = [...(model.regionDraft.tokens || [])]
+  else if (model.regions_semantics === 'path-v2') rememberPaths(model.regions || [])
+  else explicitTokens = []
+  tokenRevision.value++
+}, { deep: true })
 
 
 /** 地點輸入邏輯 */
@@ -355,6 +383,7 @@ function revertRegionSelectionForLocationLimit(count) {
 
   const lastValid = lastValidRegionSelection.value
   selectedValue.value = cloneSelectionArray(lastValid.selectedValue)
+  rememberPaths(lastValid.selectedValue, lastValid.regionUsing)
   selectedCustomRegions.value = cloneSelectionArray(lastValid.selectedCustomRegions)
   regionUsing.value = lastValid.regionUsing
   regionSelectionChangedSinceLastFetch.value = false
@@ -394,9 +423,6 @@ async function loadCustomRegionsData() {
   }
 }
 
-onMounted(() => {
-  reset()
-})
 
 // 使用自定義分區地點進行查詢
 async function handleCustomRegionQuery(locations) {
@@ -464,7 +490,8 @@ function checkLocationLimit(count) {
 
 // 辅助函数：通知父组件禁用状态变更
 function updateDisabledState(isDisabled) {
-  emit('update:runDisabled', isDisabled)
+  scopeDisabled.value = isDisabled
+  emit('update:runDisabled', runDisabled.value)
 }
 
 // 底部提示欄的「限制提示文案」（對應 showToast）
@@ -579,14 +606,10 @@ function applySuggestion(item) {
 /* ========== 分區選擇邏輯 ========== */
 // const selectedValue = ref([])  // ✅ 不要 ['']
 
-const options = ref([])
-
-
 function onTabClick(tab) {
   if (regionUsing.value === tab) return
   regionUsing.value = tab
   selectedValue.value = []
-  loadTreeFor(tab)
   // console.log('tab',tab)
   // 根據 tab 設置對應的預設值
   // if (tab === 'map') {
@@ -600,100 +623,12 @@ function onSelect(values) {
   selectedValue.value = values
 }
 
-/* ========== 一次性轉換整棵樹 ========== */
-function convertToCascaderOptions(tree) {
-  if (Array.isArray(tree)) {
-    // 是 Array，直接轉成葉子節點
-    return tree.map(label => ({
-      label,
-      value: label,
-      isLeaf: true
-    }))
-  }
-
-  if (typeof tree === 'object' && tree !== null) {
-    return Object.entries(tree).map(([label, children]) => {
-      const convertedChildren = convertToCascaderOptions(children)
-
-      // 根據是否有子節點決定是否為葉子
-      const isLeaf = convertedChildren.length === 0
-
-      return {
-        label,
-        value: label,
-        ...(isLeaf ? { isLeaf: true } : { children: convertedChildren })
-      }
-    })
-  }
-
-  return []
-}
-
-/* ========== 分區資料來源 ========== */
-function loadTreeFor(mode) {
-  if (mode === 'map') {
-    options.value = convertToCascaderOptions(STATIC_REGION_TREE)
-    // console.log(options)
-  } else if (mode === 'yindian') {
-    // 统一走缓存 helper：优先复用 sessionStorage，没有命中时再请求并写回。
-    getYindianTree(() => getPartitions(), {
-      transform: filterYindianTopLevelKeys,
-    }).then((filteredTree) => {
-      options.value = convertToCascaderOptions(filteredTree)
-    })
-
-  }
-}
-// 初始加載
-loadTreeFor(regionUsing.value)
-
-
-// const cascaderRef = ref(null)
-
-// async function simulateClickPath(path) {
-//   // 1. 打開 Cascader 的彈窗
-//   cascaderRef.value?.showMenu()
-//
-//   await nextTick()
-//   // 2. 遞迴點擊每一層
-//   for (const label of path) {
-//     await nextTick()
-//     // 獲取當前展開層的選項列表
-//     const menuList = document.querySelectorAll('.n-cascader-menu')
-//
-//     // 找到當前層中 label 匹配的項
-//     let found = false
-//     for (const menu of menuList) {
-//       const items = menu.querySelectorAll('.n-cascader-option')
-//       for (const item of items) {
-//         if (item.textContent?.trim().includes(label)) {
-//           item.click()
-//           found = true
-//           break
-//         }
-//       }
-//       if (found) break
-//     }
-//
-//     if (!found) {
-//       console.warn(`❗未找到 label: ${label}`)
-//       break
-//     }
-//
-//     // 等下一層渲染
-//     await new Promise(resolve => setTimeout(resolve, 100))
-//   }
-// }
-
 onMounted(() => {
-  reset()
   commitLastValidRegionSelection()
 })
 
-// onActivated(() => {
-//   reset()
-// })
 async function fetchLocationsResult() {
+  if (regionResolving.value || regionIssues.value.length) return
   const resolutionToken = ++locationResolutionToken
   // 1️⃣ locations ← inputValue（地點輸入）
   const locations = (inputValue.value ?? '')
@@ -701,13 +636,8 @@ async function fetchLocationsResult() {
       .split(/\s+/)
       .filter(Boolean)
 
-  // 2️⃣ regions ← selectedValue（分區選擇）
-  const rawRegions = selectedValue.value
-  const regions = Array.isArray(rawRegions)
-      ? rawRegions.map(v => String(v).trim()).filter(Boolean)
-      : rawRegions
-          ? [String(rawRegions).trim()].filter(Boolean)
-          : []
+  // 預覽和主查詢共用已解析的完整路徑。
+  const regions = [...resolvedRegions.value]
 
   // 🔥 NEW: Get custom region locations from RegionSelector
   const customRegionLocationsArray = getCustomRegionLocations(selectedCustomRegions.value)
@@ -726,6 +656,7 @@ async function fetchLocationsResult() {
       emit('locationsResolved', {
         locations: [],
         regions: [],
+        regions_semantics: 'path-v2',
         regionMode: regionUsing.value,
         resolvedLocations: [],
         locationsPartitions: {},
@@ -817,6 +748,7 @@ async function fetchLocationsResult() {
     emit('locationsResolved', {
       locations: explicitLocations,
       regions,
+      regions_semantics: 'path-v2',
       regionMode: regionUsing.value,
       resolvedLocations: uniqueLocations,
       locationsPartitions: data?.locations_partitions || {},
@@ -827,7 +759,7 @@ async function fetchLocationsResult() {
 
     // 🔥 如果是輸入模式，額外調用 get_custom_feature
     if (props.useInputMode) {
-      await fetchCustomFeatureLocations(explicitLocations, regions)
+      await fetchCustomFeatureLocations(explicitLocations, regionUsing.value === 'yindian' ? regions : [], resolutionToken)
     }
 
     return data
@@ -866,7 +798,7 @@ function getCustomRegionLocations(customRegionNames) {
 }
 
 // 獲取自定義特徵地點列表
-async function fetchCustomFeatureLocations(locations, regions) {
+async function fetchCustomFeatureLocations(locations, regions, resolutionToken = locationResolutionToken) {
   // ✅ 登录检查（早返回）
   if (!userStore.isAuthenticated) {
     customFeatureLocations.value = []
@@ -889,6 +821,8 @@ async function fetchCustomFeatureLocations(locations, regions) {
     // 调用 API
     const response = await getCustomFeature(queryParams)
 
+    if (resolutionToken !== locationResolutionToken) return
+
     // 提取所有的「簡稱」
     if (Array.isArray(response)) {
       customFeatureLocations.value = response
@@ -898,6 +832,7 @@ async function fetchCustomFeatureLocations(locations, regions) {
       customFeatureLocations.value = []
     }
   } catch (err) {
+    if (resolutionToken !== locationResolutionToken) return
     console.error('❌ 獲取自定義特徵失敗:', err)
     customFeatureLocations.value = []
   }
@@ -937,41 +872,115 @@ const allLocationsArray = computed(() => {
   })
 })
 
-watch(
-    [inputValue, selectedValue, regionUsing, regionInputValue, selectedCustomRegions],
-    ([newInput, newSelected, newMode, newRegionInput, newCustomRegions]) => {
-      // 1. 立即通知父組件更新數據 (實現雙向綁定)
-      // ⚠️ IMPORTANT: Only emit textarea locations (NOT merged with custom regions)
-      // This prevents circular update that would fill the textarea
-      // Parent components should use template ref (allLocationsString) to get merged locations
-      const textareaLocations = (newInput ?? '').trim().split(/\s+/).filter(Boolean)
+function chooseTextToken({ text, index, source }) {
+  explicitTokens[index] = { text, source }
+  tokenRevision.value++
+}
 
-      // 根據模式決定使用哪個數據源
-      let regionsArr
-      if (props.useInputMode) {
-        // 新模式：從 regionInputValue 解析
-        regionsArr = (newRegionInput ?? '').trim().split(/\s+/).filter(Boolean)
-      } else {
-        // 舊模式：使用 selectedValue
-        regionsArr = newSelected
+function chooseRegionCandidate(index, path) {
+  explicitTokens[index] = { text: path, source: regionUsing.value }
+  tokenRevision.value++
+  if (props.useInputMode) {
+    const tokens = regionInputValue.value.trim().split(/\s+/).filter(Boolean)
+    tokens[index] = path
+    regionInputValue.value = tokens.join(' ')
+  } else {
+    const next = [...selectedValue.value]
+    next[index] = path
+    selectedValue.value = next
+  }
+}
+
+async function normalizeRegionInput() {
+  const sequence = ++regionResolutionSequence
+  const mode = regionUsing.value
+  const texts = props.useInputMode ? regionInputValue.value.trim().split(/\s+/).filter(Boolean) : selectedValue.value
+  regionResolving.value = texts.length > 0
+  regionIssues.value = []
+  regionHint.value = ''
+  resolvedRegions.value = []
+  emitScope()
+  if (!texts.length) { explicitTokens = []; userRegionCandidates.value = []; regionResolving.value = false; return true }
+  const identity = JSON.stringify([userStore.role, userStore.id])
+  const previousTokens = [...explicitTokens]
+  const usedTokens = new Set()
+  explicitTokens = texts.map((text, index) => {
+    const previousIndex = previousTokens[index]?.text === text && !usedTokens.has(index)
+      ? index : previousTokens.findIndex((token, tokenIndex) => token?.text === text && !usedTokens.has(tokenIndex))
+    if (previousIndex < 0) return undefined
+    usedTokens.add(previousIndex)
+    return previousTokens[previousIndex]
+  })
+  const items = texts.map((text, index) => ({ text, kind: text.includes('-') || explicitTokens[index] ? 'path' : 'name' }))
+  try {
+    let visiblePaths
+    if (!props.useInputMode) {
+      const tree = await getDefaultTree(mode, () => getPartitions(mode), { identity })
+      visiblePaths = new Set()
+      const pending = [...tree.nodes]
+      while (pending.length) { const node = pending.pop(); visiblePaths.add(node.path); pending.push(...node.children) }
+    }
+    const names = items.filter(item => props.useInputMode || item.kind === 'name')
+    const replies = names.length ? await resolveItems(mode, names, resolvePartitions, { identity, scope: props.useInputMode ? 'default_and_user' : 'default' }) : []
+    if (sequence !== regionResolutionSequence) return false
+    let replyIndex = 0
+    const paths = [], issues = []
+    for (let index = 0; index < items.length; index++) {
+      const item = items[index]
+      const reply = !props.useInputMode && item.kind === 'path'
+        ? { candidates: visiblePaths.has(item.text) ? [{ path: item.text }] : [] }
+        : replies[replyIndex++]
+      const candidates = (reply?.candidates || []).filter(candidate => !visiblePaths || visiblePaths.has(candidate.path))
+      if (props.useInputMode && explicitTokens[index]?.source && explicitTokens[index].source !== mode) {
+        issues.push({ index, text: item.text, candidates: [], status: 'mixed' })
+      } else if (candidates.length === 1) paths.push(candidates[0].path)
+      else issues.push({ index, text: item.text, candidates, status: candidates.length ? 'ambiguous' : 'not_found' })
+    }
+    userRegionCandidates.value = replies.flatMap(reply => (reply.candidates || []).filter(candidate => candidate.sources?.includes('user')))
+      .map(candidate => ({ ...candidate, name: candidate.label || candidate.path.split('-').at(-1), display: candidate.path.split('-').join('·'), source: mode }))
+    // Check missing input in the other system only to explain a mismatch; never switch or clear it.
+    if (props.useInputMode && issues.some(issue => issue.status === 'not_found')) {
+      const otherMode = mode === 'map' ? 'yindian' : 'map'
+      const missing = issues.filter(issue => issue.status === 'not_found')
+      const other = await resolveItems(otherMode, missing.map(issue => items[issue.index]), resolvePartitions, { identity, scope: 'default_and_user' })
+      if (sequence !== regionResolutionSequence) return false
+      missing.forEach((issue, index) => { if (other[index]?.candidates?.length) issue.status = 'mixed' })
+    }
+    regionIssues.value = issues
+    if (issues.length) {
+      regionHint.value = issues.some(issue => issue.status === 'mixed')
+        ? t('query.components.locationAndRegionInput.regionMixedSystems')
+        : issues.map(issue => t(`query.components.locationAndRegionInput.${issue.status === 'ambiguous' ? 'regionAmbiguous' : 'regionInvalid'}`, { name: issue.text })).join(' ')
+    } else {
+      resolvedRegions.value = [...new Set(paths)]
+      if (!props.useInputMode) {
+        rememberPaths(paths)
+        if (JSON.stringify(selectedValue.value) !== JSON.stringify(paths)) selectedValue.value = paths
       }
+    }
+    regionResolving.value = false
+    emitScope()
+    return !issues.length
+  } catch (error) {
+    if (sequence !== regionResolutionSequence) return false
+    regionIssues.value = [{ index: 0, candidates: [], status: 'error' }]
+    regionHint.value = error.message
+    regionResolving.value = false
+    return false
+  }
+}
 
-      // 🔥 發射事件！這行代碼讓父組件知道數據變了
-      // Emit ONLY textarea locations (not merged) to prevent circular update
-      emit('update:modelValue', {
-        locations: textareaLocations,
-        regions: regionsArr,
-        regionUsing: newMode
-      })
+watch(runDisabled, disabled => emit('update:runDisabled', disabled), { immediate: true, flush: 'sync' })
 
-      // 2. 處理後端查詢邏輯 (防抖)
-      locationResolutionToken += 1
-      if (debounceTimer2) clearTimeout(debounceTimer2)
-      debounceTimer2 = setTimeout(async () => {
-        await fetchLocationsResult()
-      }, 300)
+watch(
+    [inputValue, selectedValue, regionUsing, regionInputValue, selectedCustomRegions, tokenRevision, () => userStore.id, () => userStore.role],
+    async () => {
+      locationResolutionToken++
+      clearTimeout(debounceTimer2)
+      if (!await normalizeRegionInput()) return
+      debounceTimer2 = setTimeout(fetchLocationsResult, 300)
     },
-    { deep: true }
+    { deep: true, immediate: true }
 )
 
 watch(
@@ -1011,18 +1020,6 @@ watch(() => props.limitContext, () => {
   }
 })
 
-// Initialize regionInputValue from modelValue
-watch(() => props.modelValue.regions, (newRegions) => {
-  if (props.useInputMode && Array.isArray(newRegions)) {
-    // 比較解析後的數組，而不是字符串
-    const currentRegions = (regionInputValue.value ?? '').trim().split(/\s+/).filter(Boolean)
-
-    // 只有當解析後的數組真的不同時才更新
-    if (JSON.stringify(currentRegions) !== JSON.stringify(newRegions)) {
-      regionInputValue.value = newRegions.join(' ')
-    }
-  }
-}, { immediate: true })
 // ✅ 保存服務端返回的 locations_result
 const locationsResult = ref([])
 
@@ -1205,13 +1202,20 @@ defineExpose({
   inputValue,
   allLocationsString,
   allLocationsArray,
-  selectedValue,
+  selectedValue: resolvedRegions,
+  runDisabled,
   regionUsing,
   selectedCount,
   limitHint,
   locationsResult
 })
 
+onBeforeUnmount(() => {
+  regionResolutionSequence++
+  locationResolutionToken++
+  clearTimeout(debounceTimer)
+  clearTimeout(debounceTimer2)
+})
 </script>
 
 
@@ -1219,6 +1223,12 @@ defineExpose({
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
+
+.region-resolution-candidates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
 
 $primary: var(--color-primary);
 $success: var(--color-success);

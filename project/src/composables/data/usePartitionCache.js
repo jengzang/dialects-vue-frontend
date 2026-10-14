@@ -2,13 +2,40 @@ import { readSessionCache, writeSessionCache } from '@/composables/core/sessionC
 
 export const PARTITION_DATA_CACHE_KEY = 'partition_data_cache'
 export const PARTITION_POINTS_CACHE_KEY = 'partition_points_cache'
-export const YINDIAN_TREE_CACHE_KEY = '__YINDIAN_TREE_CACHE__'
 
 // A fresh page starts a fresh cache; sessionStorage must not keep old default trees alive.
 const defaultTrees = new Map()
 const pendingTrees = new Map()
+const resolvedItems = new Map()
+let resolutionIdentity
 
 export function usePartitionCache() {
+  async function resolveItems(mode, items, loadItems, { identity = 'anonymous', scope = 'default' } = {}) {
+    if (resolutionIdentity !== identity) {
+      resolvedItems.clear()
+      resolutionIdentity = identity
+    }
+    const keys = items.map(item => JSON.stringify([2, identity, mode, scope, item.kind, item.text]))
+    const missing = [...new Map(items.map((item, index) => [keys[index], item])).entries()]
+      .filter(([key]) => !resolvedItems.has(key))
+    if (missing.length) {
+      const batch = Promise.resolve().then(() => loadItems({ region_mode: mode, scope, items: missing.map(([, item]) => item) }))
+        .then(response => {
+          if (response?.schema_version !== 2 || response.region_mode !== mode || response.items?.length !== missing.length) {
+            throw new Error('Invalid partition resolution response')
+          }
+          return response.items
+        })
+      missing.forEach(([key], index) => {
+        const pending = batch.then(result => result[index]).catch(error => {
+          if (resolvedItems.get(key) === pending) resolvedItems.delete(key)
+          throw error
+        })
+        resolvedItems.set(key, pending)
+      })
+    }
+    return Promise.all(keys.map(key => resolvedItems.get(key)))
+  }
   async function getDefaultTree(mode, loadTree, { identity = 'anonymous' } = {}) {
     const key = JSON.stringify([2, identity, mode])
     if (defaultTrees.has(key)) return defaultTrees.get(key)
@@ -48,38 +75,10 @@ export function usePartitionCache() {
     return data
   }
 
-  function getCachedYindianTree(transform = (value) => value) {
-    // 允许读取缓存时再做 transform，这样同一份缓存能服务不同展示需求。
-    const cached = readSessionCache(YINDIAN_TREE_CACHE_KEY)
-    if (!cached) {
-      return null
-    }
-
-    return transform(cached)
-  }
-
-  async function getYindianTree(loadYindianTree, options = {}) {
-    const {
-      transform = (value) => value,
-    } = options
-
-    const cached = getCachedYindianTree(transform)
-    if (cached) {
-      return cached
-    }
-
-    // 只把变换后的结果落缓存，避免每个调用点重复做同样的裁剪。
-    const tree = await loadYindianTree()
-    const transformedTree = transform(tree)
-    writeSessionCache(YINDIAN_TREE_CACHE_KEY, transformedTree)
-    return transformedTree
-  }
-
   return {
+    resolveItems,
     getDefaultTree,
     getPartitionData,
     getPartitionPoints,
-    getCachedYindianTree,
-    getYindianTree,
   }
 }

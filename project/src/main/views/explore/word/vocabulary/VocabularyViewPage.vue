@@ -600,6 +600,8 @@ function cloneNotesScope(scope = {}) {
   return {
     locations: Array.isArray(scope.locations) ? [...scope.locations] : [],
     regions: Array.isArray(scope.regions) ? [...scope.regions] : [],
+    regions_semantics: scope.regions_semantics,
+    regionDraft: scope.regionDraft,
     regionUsing: scope.regionUsing || scope.regionMode || 'map',
   }
 }

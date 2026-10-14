@@ -1003,6 +1003,7 @@ watch(
       tabStates.tab1.group2.chars = normalizeSingleChar(payload.group2Char)
       tabStates.tab1.features = payload.feature || '聲母'
       locationModel.value = {
+        ...payload.loc,
         locations: payload.loc?.locations || [],
         regions: payload.loc?.regions || [],
         regionUsing: payload.loc?.regionUsing || 'yindian'
@@ -1017,6 +1018,7 @@ watch(
       tabStates.tab2.group1Items = JSON.parse(JSON.stringify(payload.group1Items || []))
       tabStates.tab2.group2Items = JSON.parse(JSON.stringify(payload.group2Items || []))
       locationModel.value = {
+        ...payload.loc,
         locations: payload.loc?.locations || [],
         regions: payload.loc?.regions || [],
         regionUsing: payload.loc?.regionUsing || 'yindian'
@@ -1029,6 +1031,7 @@ watch(
       const payload = tutorialAssistState.payload
       tabStates.tab4.selectedToneClasses = [...(payload.selectedToneClasses || [])]
       locationModel.value = {
+        ...payload.loc,
         locations: payload.loc?.locations || [],
         regions: payload.loc?.regions || [],
         regionUsing: payload.loc?.regionUsing || 'yindian'
@@ -1415,6 +1418,7 @@ const runTab5Action = () => {
 
 // 點擊按鈕行為
 const runAction = async () => {
+  if (isRunDisabled.value || locationRef.value?.runDisabled) return
   setRunning('compare', true);
 
   try {
@@ -1843,6 +1847,7 @@ function handleApplyConfig(data) {
 
   // 2. 更新地點
   locationModel.value = {
+    ...data.loc,
     locations: data.loc.locations,
     regions: data.loc.regions,
     regionUsing: data.loc.regionUsing

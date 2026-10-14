@@ -307,6 +307,7 @@ const runAllDataAction = async () => {
 }
 
 const runAction = async () => {
+  if (runDisabled.value) return
   setRunning('divide', true);
 
   try {

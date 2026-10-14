@@ -104,6 +104,8 @@ export function useClusterWorkspace() {
   const locationModel = ref({
     locations: [...workspaceState.requestDraft.locations],
     regions: [...workspaceState.requestDraft.regions],
+    regions_semantics: workspaceState.requestDraft.regions_semantics,
+    regionDraft: workspaceState.requestDraft.regionDraft,
     regionUsing: workspaceState.requestDraft.region_mode
   })
 
@@ -111,7 +113,8 @@ export function useClusterWorkspace() {
   const clusterResult = ref(null)
   const quickRunOpen = ref(false)
   const showResetModal = ref(false)
-  const locationInputDisabled = ref(false)
+  // Restored later workflow steps do not mount the input: validate their region scope there first.
+  const locationInputDisabled = ref(Boolean(workspaceState.requestDraft.regions.length || workspaceState.requestDraft.regionDraft?.values?.length))
 
   const taskPolling = usePollingTask({
     intervalMs: 800,
@@ -122,6 +125,8 @@ export function useClusterWorkspace() {
     workspaceState.requestDraft.locations = normalizeStringArray(value?.locations)
     workspaceState.requestDraft.regions = normalizeStringArray(value?.regions)
     workspaceState.requestDraft.region_mode = value?.regionUsing || 'yindian'
+    workspaceState.requestDraft.regions_semantics = value?.regions_semantics
+    workspaceState.requestDraft.regionDraft = value?.regionDraft
   }, { deep: true, immediate: true })
 
   watch(workspaceState, () => {
@@ -371,6 +376,7 @@ export function useClusterWorkspace() {
 
   function validateRequestDraft() {
     if (locationInputDisabled.value) {
+      void setCurrentStep('input')
       return t('cluster.errors.locationRequired')
     }
 

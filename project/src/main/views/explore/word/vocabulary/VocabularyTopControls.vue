@@ -20,7 +20,7 @@
             class="notes-refresh-action"
             variant="blue"
             :disabled="notesRefreshDisabled || isNotesScopeResolving || isNotesScopeDisabled"
-            @click="emit('refreshNotes')"
+            @click="refreshNotes"
           >
             <svg
               width="16"
@@ -334,6 +334,11 @@ const locationDropdownOpen = ref(false)
 const standardWordDropdownOpen = ref(false)
 const isNotesScopeResolving = ref(false)
 const isNotesScopeDisabled = ref(false)
+
+function refreshNotes() {
+  if (props.notesRefreshDisabled || isNotesScopeResolving.value || isNotesScopeDisabled.value) return
+  emit('refreshNotes')
+}
 
 const inputText = ref(props.query)
 const isComposing = ref(false)
