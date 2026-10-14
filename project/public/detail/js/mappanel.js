@@ -768,7 +768,7 @@ async function create_dot_all() {
     }
     // 如果用户没有选择 maxLevel，则通过 regions 进行计算
     if (!userSelectedLevel) {
-        maxLevel = regions.length ? Math.max(...regions.map(path => path.split('-').length)) : 3;
+        maxLevel = regions.length ? Math.min(3, Math.max(...regions.map(path => path.split('-').length))) : 3;
     }
 
     // 定义颜色数组（20种颜色）
@@ -824,7 +824,8 @@ async function create_dot_all() {
         let result = [];
 
         // 根据 mapParams.max_level 的值决定使用哪个 level
-        const levelToUse = `level${mapParams.max_level}`;
+        const levelToUse = mapParams.max_level === 1 ? "level1" :
+            mapParams.max_level === 2 ? "level2" : "level3";
 
         const uniqueLevels = new Set();  // 用来存储唯一的 level 值
         for (const [locationName, coordinates] of all_locations_dot.coordinates_locations) {
@@ -834,17 +835,21 @@ async function create_dot_all() {
 
             if (regionsData) {
                 let originalRegionsData = regionsData;
-                const segments = regionsData.split('-');
-                const levels = {};
-                for (let depth = 1; depth <= maxLevel; depth++) {
-                    levels[`level${depth}`] = segments.slice(0, depth).join('-');
-                }
-                uniqueLevels.add(levels[levelToUse]);
+                let regions = regionsData.split('-');
+                let level1 = regions[0];
+                let level2 = regions[1] || level1;
+                let level3 = regions[2] || level2;
+
+                uniqueLevels.add({ level1, level2, level3 }[levelToUse]);
 
                 result.push({
                     locationName: locationName,
                     original_regions_data: originalRegionsData,
-                    regions_data: levels,
+                    regions_data: {
+                        level1: level1,
+                        level2: level2,
+                        level3: level3
+                    },
                     coordinates: coordinates,
                     color: ""  // 初始化颜色字段
                 });

@@ -1,5 +1,5 @@
 
-window.addEventListener('DOMContentLoaded', async function () {
+window.addEventListener('DOMContentLoaded', function () {
     const data = sessionStorage.getItem('vueToNativeData')
     if (!data) return
 
@@ -115,7 +115,6 @@ window.addEventListener('DOMContentLoaded', async function () {
             // 🎯 自動選中分區級數下拉框
             const levelSelect = document.getElementById('max-level');
             if (levelSelect && parsed.level) {
-                await getDefaultRegionTree(window.regionusing);
                 levelSelect.value = String(parsed.level); // 確保是 string
             }
             const mapBtn = document.querySelector('#allmap-first')

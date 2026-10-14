@@ -759,7 +759,8 @@ async function fetchLocationsResult() {
 
     // 🔥 如果是輸入模式，額外調用 get_custom_feature
     if (props.useInputMode) {
-      await fetchCustomFeatureLocations(explicitLocations, regionUsing.value === 'yindian' ? regions : [], resolutionToken)
+      const customLocations = regionUsing.value === 'map' ? [...new Set([...explicitLocations, ...uniqueLocations])] : explicitLocations
+      await fetchCustomFeatureLocations(customLocations, regionUsing.value === 'yindian' ? regions : [], resolutionToken)
     }
 
     return data
@@ -931,9 +932,7 @@ async function normalizeRegionInput() {
         ? { candidates: visiblePaths.has(item.text) ? [{ path: item.text }] : [] }
         : replies[replyIndex++]
       const candidates = (reply?.candidates || []).filter(candidate => !visiblePaths || visiblePaths.has(candidate.path))
-      if (props.useInputMode && explicitTokens[index]?.source && explicitTokens[index].source !== mode) {
-        issues.push({ index, text: item.text, candidates: [], status: 'mixed' })
-      } else if (candidates.length === 1) paths.push(candidates[0].path)
+      if (candidates.length === 1) paths.push(candidates[0].path)
       else issues.push({ index, text: item.text, candidates, status: candidates.length ? 'ambiguous' : 'not_found' })
     }
     userRegionCandidates.value = replies.flatMap(reply => (reply.candidates || []).filter(candidate => candidate.sources?.includes('user')))

@@ -77,9 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!textarea.value.trim()) detailRegionTokens = [];
         document.getElementById('region-resolution')?.remove();
     });
-    document.getElementById('max-level')?.addEventListener('focus', () => {
-        void getDefaultRegionTree(window.regionusing).catch(error => showToast(error.message));
-    });
+
 
     document.querySelectorAll('.tab-btn').forEach(tabBtn => {
         tabBtn.addEventListener('click', () => {
@@ -153,12 +151,6 @@ async function getDefaultRegionTree(mode) {
                 if (!response.ok) throw Error('分區載入失敗');
                 const tree = await response.json();
                 if (tree.schema_version !== 2 || tree.region_mode !== mode || !Array.isArray(tree.nodes)) throw Error('分區格式錯誤');
-                const levelSelect = document.getElementById('max-level');
-                if (levelSelect) for (let depth = 1; depth <= tree.max_depth; depth++) {
-                    if (![...levelSelect.options].some(option => option.value === String(depth))) {
-                        const option = document.createElement('option'); option.value = String(depth); option.textContent = String(depth); levelSelect.append(option);
-                    }
-                }
                 return tree;
             }).catch(error => { detailPartitionTrees.delete(key); throw error; });
         detailPartitionTrees.set(key, pending);

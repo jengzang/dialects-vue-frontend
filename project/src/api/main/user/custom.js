@@ -1,6 +1,16 @@
 // api/user/custom.js - 自定义特征查询 API
 import { api } from '../../auth/httpClient.js';
 import { showError } from '@/utils/ui/message.js';
+import { getLocations } from '../geo/LocationAndRegion.js';
+
+async function resolveCustomScope(params) {
+  const list = value => (Array.isArray(value) ? value : [value]).filter(Boolean);
+  const locations = list(params.locations);
+  const regions = list(params.regions);
+  if (params.region_mode !== 'map' || !regions.length) return { locations, regions };
+  const result = await getLocations({ locations, regions, region_mode: 'map' });
+  return { locations: [...new Set([...locations, ...(result.locations_result || [])])], regions: [] };
+}
 
 /**
  * @typedef {Object} CustomDataParams
@@ -40,26 +50,19 @@ import { showError } from '@/utils/ui/message.js';
  */
 export async function getCustomData(params) {
   try {
+    const scope = await resolveCustomScope(params);
     const query = new URLSearchParams();
 
     // locations 和 regions 是 List[str]，需要多次添加同一个参数
-    if (params.locations && Array.isArray(params.locations)) {
-      params.locations.forEach((loc) => {
-        query.append('locations', loc);
-      });
-    }
+    (scope.locations.length ? scope.locations : ['']).forEach(loc => query.append('locations', loc));
 
-    if (params.regions && Array.isArray(params.regions)) {
-      params.regions.forEach((reg) => {
-        query.append('regions', reg);
-      });
-    }
+    (scope.regions.length ? scope.regions : ['']).forEach(path => query.append('regions', path));
 
     // need_features 需要用逗号分隔成单个字符串
     if (params.need_features && Array.isArray(params.need_features)) {
       query.append('need_features', params.need_features.join(','));
-    } else if (params.need_features) {
-      query.append('need_features', params.need_features);
+    } else {
+      query.append('need_features', params.need_features || '');
     }
 
     if (params.phonology && Array.isArray(params.phonology)) {
@@ -94,10 +97,11 @@ export async function getCustomData(params) {
  */
 export async function getCustomFeature(params) {
   try {
+    const scope = await resolveCustomScope(params);
     const query = new URLSearchParams();
 
-    query.append('locations', params.locations || '');
-    query.append('regions', params.regions || '');
+    (scope.locations.length ? scope.locations : ['']).forEach(location => query.append('locations', location));
+    (scope.regions.length ? scope.regions : ['']).forEach(path => query.append('regions', path));
 
     if (params.word !== undefined) {
       query.append('word', params.word);

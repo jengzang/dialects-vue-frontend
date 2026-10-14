@@ -74,6 +74,15 @@ describe('partition input canonical paths and execution gating', () => {
     expect(mocks.getCustomFeature.mock.calls.at(-1)[0].regions).toEqual(['私人-額外'])
   })
 
+  it('retains direct user-only locations alongside resolved map locations in the custom preview', async () => {
+    mocks.user.isAuthenticated = true; mocks.user.id = 81
+    mocks.getLocations.mockResolvedValue({ locations_result: ['地圖地點'] })
+    await mount(['唯一'], true)
+    state.model = { ...state.model, regionUsing: 'map' }
+    await flush()
+    expect(mocks.getCustomFeature.mock.calls.at(-1)[0]).toMatchObject({ locations: ['明選', '地圖地點'], regions: [] })
+  })
+
   it('validates saved path values without guessing an old final name', async () => {
     await mount(['舊根-唯一'], false, 'path-v2')
     expect(state.disabled).toBe(true)
@@ -140,7 +149,7 @@ describe('partition input canonical paths and execution gating', () => {
     expect(state.model.regions).toEqual(['甲-唯一'])
   })
 
-  it('retains a conflicting source when restoring text and removing the previous token', async () => {
+  it('uses the explicit system for a shared full path when restoring and moving a token', async () => {
     const normal = mocks.resolvePartitions.getMockImplementation()
     mocks.resolvePartitions.mockImplementation(async payload => {
       const reply = await normal(payload)
@@ -150,10 +159,11 @@ describe('partition input canonical paths and execution gating', () => {
     await mount([], true)
     state.model = { ...state.model, regionText: '唯一 甲', regionDraft: { values: ['唯一', '甲'], tokens: [null, { text: '甲', source: 'map' }] } }
     await flush()
-    expect(state.disabled).toBe(true)
+    expect(state.disabled).toBe(false)
     const textarea = document.querySelector('.region-text')
     textarea.value = '甲'; textarea.dispatchEvent(new Event('input')); await flush()
-    expect(state.disabled).toBe(true)
-    expect(state.model.regionDraft.tokens[0]).toEqual({ text: '甲', source: 'map' })
+    expect(state.disabled).toBe(false)
+    expect(state.model.regions).toEqual(['甲'])
+    expect(state.model.regionUsing).toBe('yindian')
   })
 })
