@@ -476,10 +476,12 @@ const scrollToLocation = async (locationName, dataIndex) => {
   );
 
   if (targetElement) {
-    // Scroll to the element
-    targetElement.scrollIntoView({
+    const containerRect = content.getBoundingClientRect();
+    const targetRect = targetElement.getBoundingClientRect();
+
+    content.scrollTo({
+      top: content.scrollTop + targetRect.top - containerRect.top - content.clientTop,
       behavior: 'smooth',
-      block: 'start'
     });
 
     // Update current location
