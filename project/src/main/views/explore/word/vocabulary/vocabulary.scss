@@ -1,5 +1,12 @@
 @use '@/styles/global/mixins' as *;
 
+.upload-existing-location {
+  display: grid;
+  gap: 8px;
+  padding: 8px 0;
+  min-width: 0;
+}
+
 .vocabulary-page {
   width: 90dvw;
   max-width: 1200px;

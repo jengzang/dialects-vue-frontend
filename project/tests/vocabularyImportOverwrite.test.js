@@ -30,6 +30,7 @@ function mountPage(me = { user_id: 7, permission_level: 'edit', can_upload: true
   const host = document.createElement('div')
   document.body.appendChild(host)
   const app = createApp(ImportPage, { vocabularyMe: me, isAuthenticated: true, isAuthReady: true })
+  app.config.globalProperties.$t = (key) => key
   app.mount(host)
   wrapper = { app, host, state: app._instance.setupState }
   return wrapper
@@ -86,5 +87,180 @@ describe('vocabulary import feedback', () => {
     await state.handleImportAfterPreview()
     expect(state.importResult.skippedCount).toBe(blankCount)
     expect(blankCount ? mocks.showWarning : mocks.showSuccess).toHaveBeenCalled()
+  })
+})
+
+describe('existing upload location selection', () => {
+  const first = { user_id: 7, username: 'alice', location_name: '甲村', coordinates: '113,23', province: '广东', vocabulary_source: '调查手稿', t1: '55' }
+  const second = { user_id: 8, username: 'bob', location_name: '甲村', coordinates: '114,24', province: '广西', t1: '33' }
+
+  it('fills the draft through the real SimpleSelectDropdown click event', async () => {
+    mocks.getVocabularyLocations.mockResolvedValue({ locations: [second], total: 1 })
+    const { state, host } = mountPage({ user_id: 1, permission_level: 'manage', can_upload: true })
+    state.openUploadLocationEditor()
+    await flush()
+    host.querySelector('.upload-existing-location .select-trigger').click()
+    await flush()
+    await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
+    const option = [...document.body.querySelectorAll('.dropdown-item')].find((item) => item.textContent.includes('bob'))
+    expect(option).toBeTruthy()
+    option.click()
+    await flush()
+    expect(state.uploadLocationDraft).toMatchObject({ location_name: '甲村', province: '广西', t1: '33' })
+  })
+
+  it('loads every management location page and distinguishes same-name owners', async () => {
+    mocks.getVocabularyLocations.mockResolvedValueOnce({ locations: [first], total: 2, page: 1, page_size: 1 })
+      .mockResolvedValueOnce({ locations: [second], total: 2, page: 2, page_size: 1 })
+    const { state, host } = mountPage({ user_id: 1, permission_level: 'manage', can_upload: true })
+    state.openUploadLocationEditor()
+    await flush()
+    expect(mocks.getVocabularyLocations).toHaveBeenNthCalledWith(1, { page: 1, page_size: 200 })
+    expect(mocks.getVocabularyLocations).toHaveBeenNthCalledWith(2, { page: 2, page_size: 200 })
+    const locations = state.existingLocationOptions.filter((option) => option.value)
+    expect(locations).toHaveLength(2)
+    expect(locations[0].value).not.toBe(locations[1].value)
+    expect(locations.map((option) => option.label).join(' ')).toMatch(/alice.*bob/)
+    expect(host.textContent).toContain('words.wordList.upload.overwriteExistingLocation')
+  })
+
+  it('prefills metadata and uses the confirmed owner for preview and import', async () => {
+    mocks.getVocabularyLocations.mockResolvedValue({ locations: [second], total: 1 })
+    const { state } = mountPage({ user_id: 1, permission_level: 'manage', can_upload: true })
+    state.openUploadLocationEditor()
+    await flush()
+    state.selectExistingLocation(state.existingLocationOptions.find((option) => option.value).value)
+    expect(state.uploadLocationDraft).toMatchObject({ location_name: '甲村', province: '广西', t1: '33' })
+    state.confirmUploadLocationEditor()
+    state.uploadFile = new File(['content'], 'words.docx')
+    await flush()
+    mocks.previewVocabularyImport.mockResolvedValue({ parsed_count: 1, would_delete_existing_count: 3 })
+    await state.handlePreviewImport()
+    expect(mocks.previewVocabularyImport.mock.calls[0][0].target_user_id).toBe(8)
+    state.isOverwriteConfirmed = true
+    mocks.uploadVocabulary.mockResolvedValue({ imported_count: 1, skipped_count: 0, errors: [] })
+    await state.handleImportAfterPreview()
+    expect(mocks.uploadVocabulary.mock.calls[0][0].target_user_id).toBe(8)
+  })
+
+  it('does not change the confirmed upload when the location modal is cancelled', async () => {
+    mocks.getVocabularyLocations.mockResolvedValue({ locations: [first, second], total: 2 })
+    const { state } = mountPage({ user_id: 1, permission_level: 'manage', can_upload: true })
+    state.openUploadLocationEditor()
+    await flush()
+    state.selectExistingLocation(state.existingLocationOptions[1].value)
+    state.confirmUploadLocationEditor()
+    state.openUploadLocationEditor()
+    await flush()
+    state.selectExistingLocation(state.existingLocationOptions[2].value)
+    state.closeUploadLocationEditor()
+    expect(state.uploadLocation.province).toBe('广东')
+    expect(state.uploadTargetLocation.user_id).toBe(7)
+  })
+
+  it('clears an existing target when choosing to enter a new location', async () => {
+    mocks.getVocabularyLocations.mockResolvedValue({ locations: [first], total: 1 })
+    const { state } = mountPage()
+    state.openUploadLocationEditor()
+    await flush()
+    state.selectExistingLocation(state.existingLocationOptions[1].value)
+    state.selectExistingLocation('')
+    expect(state.uploadLocationDraft.location_name).toBe('')
+    state.uploadLocationDraft = { location_name: '乙村', coordinates: '115,25' }
+    state.confirmUploadLocationEditor()
+    expect(state.uploadTargetLocation).toBeNull()
+  })
+
+  it('does not offer a partial list when a later management page fails', async () => {
+    mocks.getVocabularyLocations.mockResolvedValueOnce({ locations: [first], total: 2 })
+      .mockRejectedValueOnce(new Error('network error'))
+    const { state } = mountPage()
+    state.openUploadLocationEditor()
+    await flush()
+    expect(state.existingLocationOptions.filter((option) => option.value)).toHaveLength(0)
+    expect(mocks.showError).toHaveBeenCalled()
+  })
+
+  it('invalidates preview when selecting a different owner with identical location metadata', async () => {
+    mocks.getVocabularyLocations.mockResolvedValue({ locations: [first, { ...first, user_id: 8, username: 'bob' }], total: 2 })
+    const { state } = mountPage({ user_id: 1, permission_level: 'manage', can_upload: true })
+    state.openUploadLocationEditor()
+    await flush()
+    state.selectExistingLocation(state.existingLocationOptions[1].value)
+    state.confirmUploadLocationEditor()
+    await flush()
+    state.backendPreview = { parsed_count: 1, would_delete_existing_count: 2 }
+    state.isOverwriteConfirmed = true
+    state.openUploadLocationEditor()
+    await flush()
+    state.selectExistingLocation(state.existingLocationOptions[2].value)
+    state.confirmUploadLocationEditor()
+    await flush()
+    expect(state.backendPreview).toBeNull()
+    expect(state.isOverwriteConfirmed).toBe(false)
+  })
+
+  it('discards location results and the selected target after permission changes', async () => {
+    let resolve
+    const request = new Promise((done) => { resolve = done })
+    mocks.getVocabularyLocations.mockReturnValueOnce(request)
+    const { state, app } = mountPage({ user_id: 1, permission_level: 'manage', can_upload: true })
+    state.openUploadLocationEditor()
+    app._instance.props.vocabularyMe = { user_id: 1, permission_level: null, can_upload: false }
+    await flush()
+    resolve({ locations: [second], total: 1 })
+    await flush()
+    expect(state.isUploadLocationEditorOpen).toBe(false)
+    expect(state.existingLocationOptions.filter((option) => option.value)).toHaveLength(0)
+    expect(state.uploadTargetLocation).toBeNull()
+  })
+
+  it('does not confirm a previously selected target when reloading the list fails', async () => {
+    mocks.getVocabularyLocations.mockResolvedValueOnce({ locations: [first], total: 1 })
+      .mockRejectedValueOnce(new Error('network error'))
+    const { state } = mountPage()
+    state.openUploadLocationEditor()
+    await flush()
+    state.selectExistingLocation(state.existingLocationOptions[1].value)
+    state.confirmUploadLocationEditor()
+    state.openUploadLocationEditor()
+    await flush()
+    state.confirmUploadLocationEditor()
+    expect(state.isUploadLocationEditorOpen).toBe(true)
+    expect(state.uploadTargetLocation.user_id).toBe(7)
+    expect(mocks.showWarning).toHaveBeenCalled()
+  })
+
+  it('returns to new-location mode when the selected location name is changed', async () => {
+    mocks.getVocabularyLocations.mockResolvedValue({ locations: [first], total: 1 })
+    const { state } = mountPage()
+    state.openUploadLocationEditor()
+    await flush()
+    state.selectExistingLocation(state.existingLocationOptions[1].value)
+    state.uploadLocationDraft.location_name = '乙村'
+    await flush()
+    state.confirmUploadLocationEditor()
+    expect(state.uploadTargetLocation).toBeNull()
+    expect(state.uploadLocation.location_name).toBe('乙村')
+  })
+
+  it('does not combine an old owner with a name edited while the list reloads', async () => {
+    let resolve
+    const request = new Promise((done) => { resolve = done })
+    mocks.getVocabularyLocations.mockResolvedValueOnce({ locations: [second], total: 1 })
+      .mockReturnValueOnce(request)
+    const { state } = mountPage({ user_id: 1, permission_level: 'manage', can_upload: true })
+    state.openUploadLocationEditor()
+    await flush()
+    state.selectExistingLocation(state.existingLocationOptions[1].value)
+    state.confirmUploadLocationEditor()
+    state.openUploadLocationEditor()
+    state.uploadLocationDraft.location_name = '乙村'
+    await flush()
+    resolve({ locations: [second], total: 1 })
+    await flush()
+    state.confirmUploadLocationEditor()
+    expect(state.uploadTargetLocation).toBeNull()
+    expect(state.uploadLocation.location_name).toBe('乙村')
   })
 })

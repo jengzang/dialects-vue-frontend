@@ -472,6 +472,16 @@ describe('vocabulary table API adapter', () => {
 })
 
 describe('vocabulary upload API', () => {
+  it.each([previewVocabularyImport, uploadVocabulary])('serializes the selected owner only when supplied', async (operation) => {
+    const file = new File(['data'], 'words.csv')
+    const location = { location_name: '甲村', coordinates: '113,23' }
+    apiMock.mockResolvedValue({ success: true })
+    await operation({ file, location, target_user_id: 8 })
+    expect(apiMock.mock.calls.at(-1)[1].body.get('target_user_id')).toBe('8')
+    await operation({ file, location })
+    expect(apiMock.mock.calls.at(-1)[1].body.has('target_user_id')).toBe(false)
+  })
+
   it('previews file, location JSON and parser mode through the imports preview endpoint', async () => {
     apiMock.mockResolvedValueOnce({ success: true, parsed_count: 1 })
     const file = new File(['definition,headword'], 'vocabulary.csv', { type: 'text/csv' })

@@ -294,6 +294,29 @@
       @cancel="closeUploadLocationEditor"
       @confirm="confirmUploadLocationEditor"
     >
+      <template #location-helper>
+        <div class="upload-existing-location">
+          <h4 class="upload-section-title">
+            {{ t('words.wordList.upload.overwriteExistingLocation') }}
+          </h4>
+          <SimpleSelectDropdown
+            :model-value="existingLocationKey"
+            :options="existingLocationOptions"
+            :title="t('words.wordList.upload.overwriteExistingLocation')"
+            :placeholder="t('words.wordList.upload.selectExistingLocation')"
+            :disabled="isLoadingExistingLocations || !canUploadVocabulary"
+            searchable
+            match-trigger-width
+            @update:model-value="selectExistingLocation"
+          />
+          <p
+            v-if="existingLocationsError"
+            class="upload-status"
+          >
+            {{ existingLocationsError }}
+          </p>
+        </div>
+      </template>
       <template #map>
         <MiniMapSelector
           v-model:coord="uploadLocationCoord"
@@ -441,14 +464,15 @@
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import { computed, inject, onMounted, ref, watch } from 'vue'
+import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { PhArrowsClockwise, PhDownloadSimple } from '@phosphor-icons/vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { getVocabularyCounts, previewVocabularyImport, uploadVocabulary } from '@/api'
+import { getVocabularyCounts, getVocabularyLocations, previewVocabularyImport, uploadVocabulary } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
+import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
@@ -540,7 +564,25 @@ const createEmptyUploadLocation = () => Object.fromEntries(
 const uploadLocation = ref(createEmptyUploadLocation())
 const uploadLocationDraft = ref(createEmptyUploadLocation())
 const isUploadLocationEditorOpen = ref(false)
+const existingLocations = ref([])
+const existingLocationKey = ref('')
+const uploadTargetLocation = ref(null)
+const isLoadingExistingLocations = ref(false)
+const existingLocationsError = ref('')
+let existingLocationsRequest = 0
 let preserveBackendPreviewOnFilePromotion = false
+
+function getExistingLocationKey(location) {
+  return JSON.stringify([location.user_id, location.location_name])
+}
+
+const existingLocationOptions = computed(() => [
+  { value: '', label: t('words.wordList.upload.newLocation') },
+  ...existingLocations.value.map((location) => ({
+    value: getExistingLocationKey(location),
+    label: `${location.location_name} (${location.username || location.user_id})`,
+  })),
+])
 
 const uploadLocationFields = computed(() => [
   ...LOCATION_BASE_FIELDS.map((field) => ({
@@ -718,18 +760,82 @@ function normalizeUploadLocation(location) {
 
 function openUploadLocationEditor() {
   uploadLocationDraft.value = { ...uploadLocation.value }
+  existingLocationKey.value = uploadTargetLocation.value ? getExistingLocationKey(uploadTargetLocation.value) : ''
   isUploadLocationEditorOpen.value = true
+  loadExistingLocations()
 }
 
 function closeUploadLocationEditor() {
+  existingLocationsRequest += 1
+  isLoadingExistingLocations.value = false
   isUploadLocationEditorOpen.value = false
   uploadLocationDraft.value = createEmptyUploadLocation()
 }
 
 function confirmUploadLocationEditor() {
-  uploadLocation.value = normalizeUploadLocation(uploadLocationDraft.value)
+  const target = existingLocations.value.find((location) => getExistingLocationKey(location) === existingLocationKey.value)
+  if (existingLocationKey.value && (!target || isLoadingExistingLocations.value)) {
+    showWarning(existingLocationsError.value || t('common.label.loading'))
+    return
+  }
+  const draft = normalizeUploadLocation(uploadLocationDraft.value)
+  const matchingTarget = target?.location_name === draft.location_name ? target : null
+  uploadTargetLocation.value = matchingTarget ? { user_id: matchingTarget.user_id, location_name: matchingTarget.location_name } : null
+  uploadLocation.value = draft
   closeUploadLocationEditor()
 }
+
+async function loadExistingLocations() {
+  const request = ++existingLocationsRequest
+  existingLocations.value = []
+  existingLocationsError.value = ''
+  if (!canUploadVocabulary.value) return
+  isLoadingExistingLocations.value = true
+  try {
+    const locations = []
+    let page = 1
+    let total = 0
+    do {
+      const response = await getVocabularyLocations({ page, page_size: 200 })
+      if (request !== existingLocationsRequest) return
+      const rows = Array.isArray(response.locations) ? response.locations : []
+      total = Number(response.total) || 0
+      if (!rows.length && locations.length < total) throw new Error(t('words.wordList.locations.loadFailed'))
+      locations.push(...rows)
+      page += 1
+    } while (locations.length < total)
+    existingLocations.value = locations
+  } catch (error) {
+    if (request !== existingLocationsRequest) return
+    existingLocationsError.value = error.message || t('words.wordList.locations.loadFailed')
+    showError(existingLocationsError.value)
+  } finally {
+    if (request === existingLocationsRequest) isLoadingExistingLocations.value = false
+  }
+}
+
+function selectExistingLocation(key) {
+  const location = existingLocations.value.find((item) => getExistingLocationKey(item) === key)
+  existingLocationKey.value = location ? key : ''
+  uploadLocationDraft.value = location ? normalizeUploadLocation(location) : createEmptyUploadLocation()
+}
+
+watch(() => uploadLocationDraft.value.location_name, (name) => {
+  const target = existingLocations.value.find((location) => getExistingLocationKey(location) === existingLocationKey.value)
+  if (target && name !== target.location_name) existingLocationKey.value = ''
+})
+
+watch([() => props.vocabularyMe?.user_id, () => props.vocabularyMe?.permission_level, canUploadVocabulary], () => {
+  closeUploadLocationEditor()
+  existingLocations.value = []
+  existingLocationKey.value = ''
+  if (uploadTargetLocation.value) uploadLocation.value = createEmptyUploadLocation()
+  uploadTargetLocation.value = null
+  backendPreview.value = null
+  isOverwriteConfirmed.value = false
+})
+
+onBeforeUnmount(() => { existingLocationsRequest += 1 })
 
 function clearUploadFile() {
   uploadFile.value = null
@@ -791,7 +897,7 @@ watch(fillStandardFromLocal, (val) => {
   }
 })
 
-watch([uploadParserMode, selectedUploadFile, uploadLocation], () => {
+watch([uploadParserMode, selectedUploadFile, uploadLocation, uploadTargetLocation], () => {
   if (preserveBackendPreviewOnFilePromotion) {
     preserveBackendPreviewOnFilePromotion = false
     return
@@ -858,6 +964,7 @@ async function handlePreviewImport(fileOverride = null) {
     const previewResponse = await previewVocabularyImport({
       file,
       location,
+      target_user_id: uploadTargetLocation.value?.user_id,
       parser_mode: uploadParserMode.value,
       fill_standard_from_local: fillStandardFromLocal.value,
     })
@@ -919,6 +1026,7 @@ async function handleImportAfterPreview() {
     const response = await uploadVocabulary({
       file,
       location,
+      target_user_id: uploadTargetLocation.value?.user_id,
       parser_mode: uploadParserMode.value,
       overwrite: shouldConfirmOverwrite.value ? isOverwriteConfirmed.value : false,
       fill_standard_from_local: fillStandardFromLocal.value,

@@ -13,10 +13,16 @@
         {{ description }}
       </p>
 
-      <YindianLocationMatch
-        :draft="draft"
-        @apply="applyDraft"
-      />
+      <div
+        class="location-editor-helpers"
+        :class="{ 'has-extra-helper': slots['location-helper'] }"
+      >
+        <YindianLocationMatch
+          :draft="draft"
+          @apply="applyDraft"
+        />
+        <slot name="location-helper" />
+      </div>
 
       <div class="location-editor-layout" :class="{ 'has-map': hasMap }">
         <div class="location-editor-grid">
@@ -82,6 +88,15 @@ function applyDraft(next) {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+.location-editor-helpers.has-extra-helper {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
 .location-editor-modal {
   display: grid;
   gap: 14px;
@@ -152,6 +167,10 @@ function applyDraft(next) {
 
 // 竖屏时地图列折到字段下方
 @media (max-aspect-ratio: 1/1) {
+  .location-editor-helpers.has-extra-helper {
+    grid-template-columns: 1fr;
+  }
+
   .location-editor-layout.has-map {
     grid-template-columns: 1fr;
     align-items: center;
