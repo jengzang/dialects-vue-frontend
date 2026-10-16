@@ -199,7 +199,15 @@ const showPopupFeature = ref(false);
 const popupDataFeature = ref({});
 const popupPos = ref({ top: 0, left: 0 });
 
-const hasData = computed(() => tableData.value && tableData.value.length > 0);
+const isEmptyZhongguResult = (item) => {
+  if (props.readingSource !== 'zhonggu') return false;
+
+  const groupValues = item?.分組值;
+  const hasGroupValues = groupValues && typeof groupValues === 'object' && Object.keys(groupValues).length > 0;
+  return !hasGroupValues && Number(item?.字數) === 0;
+};
+
+const hasData = computed(() => tableData.value.some(item => !isEmptyZhongguResult(item)));
 
 // === 筛选与排序 (保持不变) ===
 const availableValueStats = ref([]);
@@ -243,6 +251,8 @@ function calculateStats() {
 const filteredData = computed(() => {
   const selected = selectedValues.value;
   return tableData.value.filter(item => {
+    if (isEmptyZhongguResult(item)) return false;
+
     const groupValues = item.分組值 || {};
     const feature = Object.keys(groupValues)[0] || '';
     const value = groupValues[feature];
