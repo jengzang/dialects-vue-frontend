@@ -2,9 +2,10 @@
 
 .upload-existing-location {
   display: grid;
-  gap: 8px;
+  gap: 0;
   padding: 8px 0;
   min-width: 0;
+  border-bottom: 1px solid var(--color-primary-border);
 }
 
 .vocabulary-page {

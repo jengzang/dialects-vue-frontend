@@ -304,6 +304,8 @@
             :options="existingLocationOptions"
             :title="t('words.wordList.upload.overwriteExistingLocation')"
             :placeholder="t('words.wordList.upload.selectExistingLocation')"
+            width="fit-content"
+            style="max-width: 100%"
             :disabled="isLoadingExistingLocations || !canUploadVocabulary"
             searchable
             match-trigger-width

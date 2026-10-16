@@ -126,7 +126,7 @@ function applyDraft(next) {
 
 // 只有带地图的版本需要给字段列单独滚动，纯表单版交给弹窗自身滚动
 .location-editor-layout.has-map .location-editor-grid {
-  max-height: 50dvh;
+  max-height: 47dvh;
   overflow-y: auto;
 }
 
@@ -169,11 +169,13 @@ function applyDraft(next) {
 @media (max-aspect-ratio: 1/1) {
   .location-editor-helpers.has-extra-helper {
     grid-template-columns: 1fr;
+    gap: 6px;
   }
 
   .location-editor-layout.has-map {
     grid-template-columns: 1fr;
     align-items: center;
+    
   }
 }
 </style>
