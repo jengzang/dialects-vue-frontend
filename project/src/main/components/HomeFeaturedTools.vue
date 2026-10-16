@@ -193,6 +193,7 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
+@use '@/styles/global/scrollbars' as scrollbars;
 
 $primary: var(--color-primary);
 $text-primary: var(--text-primary);
@@ -338,12 +339,8 @@ $text-primary: var(--text-primary);
   overflow-x: auto;
   padding: 24px max(1.5rem, calc(50% - 170px));
   scroll-behavior: smooth;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  @include scrollbars.hidden-scrollbar;
+  @include scrollbars.hidden-scrollbar-webkit;
 }
 
 .featured-item {

@@ -434,7 +434,7 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   position: relative;
   flex: 1 1 auto;
   min-width: 0;
-  max-width: 1200px;
+  // max-width: 1200px;
   height: 100%;
   margin: 0 clamp(10px, 1vw, 20px);
 

@@ -1,3 +1,5 @@
+$use-native-scrollbars: true;
+
 :root {
   --app-scrollbar-size: 8px;
   --app-scrollbar-track: rgba(var(--color-shadow-rgb), 0.06);
@@ -25,48 +27,56 @@
 }
 
 @mixin visible-scrollbar {
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: var(--app-scrollbar-thumb) var(--app-scrollbar-track);
+  @if not $use-native-scrollbars {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--app-scrollbar-thumb) var(--app-scrollbar-track);
+  }
 }
 
 @mixin visible-scrollbar-webkit {
-  &::-webkit-scrollbar {
-    width: calc(var(--app-scrollbar-size) / 2);
-    height: calc(var(--app-scrollbar-size) / 2);
-  }
+  @if not $use-native-scrollbars {
+    &::-webkit-scrollbar {
+      width: calc(var(--app-scrollbar-size) / 2);
+      height: calc(var(--app-scrollbar-size) / 2);
+    }
 
-  &.ui-scrollbar--expanded::-webkit-scrollbar {
-    width: var(--app-scrollbar-size);
-    height: var(--app-scrollbar-size);
-  }
+    &.ui-scrollbar--expanded::-webkit-scrollbar {
+      width: var(--app-scrollbar-size);
+      height: var(--app-scrollbar-size);
+    }
 
-  &::-webkit-scrollbar-track {
-    background: var(--app-scrollbar-track);
-    border-radius: var(--app-scrollbar-radius);
-  }
+    &::-webkit-scrollbar-track {
+      background: var(--app-scrollbar-track);
+      border-radius: var(--app-scrollbar-radius);
+    }
 
-  &::-webkit-scrollbar-thumb {
-    background: var(--app-scrollbar-thumb);
-    border-radius: var(--app-scrollbar-radius);
-  }
+    &::-webkit-scrollbar-thumb {
+      background: var(--app-scrollbar-thumb);
+      border-radius: var(--app-scrollbar-radius);
+    }
 
-  &::-webkit-scrollbar-thumb:hover {
-    background: var(--app-scrollbar-thumb-hover);
+    &::-webkit-scrollbar-thumb:hover {
+      background: var(--app-scrollbar-thumb-hover);
+    }
   }
 }
 
 @mixin hidden-scrollbar {
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  @if not $use-native-scrollbars {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
 }
 
 @mixin hidden-scrollbar-webkit {
-  &::-webkit-scrollbar {
-    display: none;
-    width: 0;
-    height: 0;
+  @if not $use-native-scrollbars {
+    &::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
   }
 }
 
