@@ -157,7 +157,7 @@
               <span class="backend-preview-stat-label">{{ t('words.wordList.upload.previewParsedCount') }}</span>
             </div>
             <div class="backend-preview-stat">
-              <span class="backend-preview-stat-value">{{ backendPreview.skipped_count ?? 0 }}</span>
+              <span class="backend-preview-stat-value">{{ previewSkippedCount }}</span>
               <span class="backend-preview-stat-label">{{ t('words.wordList.upload.previewSkippedCount') }}</span>
             </div>
             <div class="backend-preview-stat">
@@ -679,6 +679,7 @@ const shouldConfirmOverwrite = computed(() => {
 })
 
 const previewErrors = computed(() => parseErrorDetails(backendPreview.value?.errors))
+const previewSkippedCount = computed(() => (Number(backendPreview.value?.skipped_count) || 0) + previewErrors.value.length)
 
 const hasImportableRows = computed(() => isPreviewImportable(backendPreview.value))
 
@@ -923,8 +924,8 @@ async function handleImportAfterPreview() {
       fill_standard_from_local: fillStandardFromLocal.value,
     })
     const importedCount = Number(response.imported_count) || 0
-    const skippedCount = Number(response.skipped_count) || 0
-    const errors = Array.isArray(response.errors) ? response.errors : []
+    const errors = parseErrorDetails(response.errors)
+    const skippedCount = (Number(response.skipped_count) || 0) + errors.length
     const locationName = location.location_name
     clearUploadFile()
     importResult.value = { importedCount, skippedCount, errors, locationName }

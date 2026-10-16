@@ -214,7 +214,7 @@
       "yindianFailed": "Failed to get Yindian data",
       "yindianHint": "Enter the standard place name (traditional Chinese) from the Yindian archive to match",
       "success": "Upload complete. Imported {count} rows.",
-      "successWithSkipped": "Imported {imported} rows, skipped {skipped} due to format issues.",
+      "successWithSkipped": "Imported {imported} rows, skipped {skipped} blank or malformed rows.",
       "noImportableData": "No importable data.",
       "importResultTitle": "Import result",
       "importResultSummary": "Imported {imported} rows, skipped {skipped}.",

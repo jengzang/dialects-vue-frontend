@@ -214,7 +214,7 @@
       "yindianFailed": "获取音典数据失败",
       "yindianHint": "请输入音典档案里的标准地名简称（繁体）以匹配",
       "success": "上传完成，导入 {count} 条。",
-      "successWithSkipped": "已导入 {imported} 条，{skipped} 条因格式问题被跳过。",
+      "successWithSkipped": "已导入 {imported} 条，{skipped} 条因空行或格式问题被跳过。",
       "noImportableData": "没有可导入的数据。",
       "importResultTitle": "导入结果",
       "importResultSummary": "已导入 {imported} 条，跳过 {skipped} 条。",
