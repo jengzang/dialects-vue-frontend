@@ -178,6 +178,10 @@
       </div>
 
       <div v-else-if="viewMode === 'card'" class="card-mode">
+        <div v-if="isLoadingItems && entries.length" class="loading-state loading-state-base">
+          <div class="ui-loading--page" aria-hidden="true"></div>
+          <span>{{ t('words.wordList.states.loadingCards') }}</span>
+        </div>
         <div v-if="entries.length" class="cards-grid">
           <article
             v-for="entry in entries"
