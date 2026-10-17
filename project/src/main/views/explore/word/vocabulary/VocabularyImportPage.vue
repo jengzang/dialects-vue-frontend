@@ -232,8 +232,6 @@
             </p>
           </div>
         </div>
-        <p v-if="uploadStatusText" class="upload-status">{{ uploadStatusText }}</p>
-
         <input
           type="file"
           ref="fileInputEl"
@@ -256,14 +254,24 @@
 
         <div class="upload-actions">
           <button
-            v-if="selectedUploadFile"
+            v-if="selectedUploadFile || importResult"
             class="glass-button"
             data-variant="secondary"
             type="button"
             :disabled="isUploading"
-            @click="clearUploadFile()"
+            @click="fileInputEl?.click()"
           >
             {{ t('common.importPreview.actions.reselect') }}
+          </button>
+          <button
+            v-if="uploadFile && !backendPreview"
+            class="glass-button"
+            data-variant="secondary"
+            type="button"
+            :disabled="!canConfirmUpload"
+            @click="handlePreviewImport()"
+          >
+            {{ isPreviewingImport ? t('common.label.loading') : t('words.wordList.upload.previewAction') }}
           </button>
           <button
             class="glass-button"
@@ -549,7 +557,6 @@ function navigateToSuggestion() {
 const isUploading = ref(false)
 const isPreviewingImport = ref(false)
 const showFormatHelp = ref(false)
-const uploadStatusText = ref('')
 const backendPreview = ref(null)
 const isOverwriteConfirmed = ref(false)
 const importResult = ref(null)
@@ -851,13 +858,11 @@ function handleDrop(event) {
   isDragOver.value = false
   const file = event.dataTransfer?.files?.[0]
   if (!file) return
-  uploadStatusText.value = ''
   backendPreview.value = null
   clearUploadFile()
 
   if (!isVocabularyUploadFile(file)) {
-    uploadStatusText.value = t('words.wordList.upload.unsupportedFile')
-    showWarning(uploadStatusText.value)
+    showWarning(t('words.wordList.upload.unsupportedFile'))
     return
   }
 
@@ -872,13 +877,11 @@ function handleDrop(event) {
 function handleUploadFile(event) {
   const file = event.target.files?.[0]
   if (!file) return
-  uploadStatusText.value = ''
   backendPreview.value = null
   clearUploadFile()
 
   if (!isVocabularyUploadFile(file)) {
-    uploadStatusText.value = t('words.wordList.upload.unsupportedFile')
-    showWarning(uploadStatusText.value)
+    showWarning(t('words.wordList.upload.unsupportedFile'))
     event.target.value = ''
     return
   }
@@ -947,19 +950,16 @@ async function handlePreviewImport(fileOverride = null) {
   const location = buildUploadLocation()
 
   if (!location.location_name || !location.coordinates) {
-    uploadStatusText.value = t('words.wordList.upload.missingLocation')
     showWarning(t('words.wordList.upload.missingLocation'))
     return null
   }
 
   if (!canUploadVocabulary.value) {
-    uploadStatusText.value = t('words.wordList.upload.permissionRequired')
-    showWarning(uploadStatusText.value)
+    showWarning(t('words.wordList.upload.permissionRequired'))
     return null
   }
 
   isPreviewingImport.value = true
-  uploadStatusText.value = ''
   backendPreview.value = null
 
   try {
@@ -971,19 +971,16 @@ async function handlePreviewImport(fileOverride = null) {
       fill_standard_from_local: fillStandardFromLocal.value,
     })
     backendPreview.value = previewResponse
-    if (isPreviewImportable(previewResponse)) {
-      uploadStatusText.value = t('words.wordList.upload.previewReady')
-    } else {
+    if (!isPreviewImportable(previewResponse)) {
       const details = parseErrorDetails(previewResponse.errors)
-      uploadStatusText.value = details.length
+      const message = details.length
         ? details.join('；')
         : t('words.wordList.upload.noImportableData')
-      showError(uploadStatusText.value)
+      showError(message)
     }
     return previewResponse
   } catch (error) {
-    uploadStatusText.value = error.message || t('words.wordList.upload.previewFailed')
-    showError(uploadStatusText.value)
+    showError(error.message || t('words.wordList.upload.previewFailed'))
     return null
   } finally {
     isPreviewingImport.value = false
@@ -1016,13 +1013,11 @@ async function handleImportAfterPreview() {
   const location = buildUploadLocation()
 
   if (!location.location_name || !location.coordinates) {
-    uploadStatusText.value = t('words.wordList.upload.missingLocation')
     showWarning(t('words.wordList.upload.missingLocation'))
     return
   }
 
   isUploading.value = true
-  uploadStatusText.value = ''
 
   try {
     const response = await uploadVocabulary({
@@ -1045,19 +1040,19 @@ async function handleImportAfterPreview() {
     uploadParserMode.value = 'auto'
     fillStandardFromLocal.value = false
     importResult.value = { importedCount, skippedCount, errors, locationName }
-    uploadStatusText.value = skippedCount > 0
+    const message = skippedCount > 0
       ? t('words.wordList.upload.successWithSkipped', { imported: importedCount, skipped: skippedCount })
       : t('words.wordList.upload.success', { count: importedCount })
     if (skippedCount > 0) {
-      showWarning(uploadStatusText.value)
+      showWarning(message)
     } else {
-      showSuccess(uploadStatusText.value)
+      showSuccess(message)
     }
   } catch (error) {
-    uploadStatusText.value = isNoImportableRowsMessage(error?.message)
+    const message = isNoImportableRowsMessage(error?.message)
       ? t('words.wordList.upload.noImportableData')
       : (error.message || t('words.wordList.upload.failed'))
-    showError(uploadStatusText.value)
+    showError(message)
   } finally {
     isUploading.value = false
   }

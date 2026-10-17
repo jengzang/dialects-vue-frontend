@@ -84,8 +84,56 @@ describe('vocabulary import feedback', () => {
       expect(state.backendPreview).toBeNull()
       expect(state.isOverwriteConfirmed).toBe(false)
       expect(state.importResult).toEqual({ importedCount: 1, skippedCount: 1, errors: ['第 3 行缺少字段'], locationName: '甲村' })
-      expect(state.uploadStatusText).toContain('successWithSkipped')
+      expect(mocks.showWarning).toHaveBeenCalledWith(expect.stringContaining('successWithSkipped'))
     }
+  })
+
+  it.each([false, true])('can upload again with the location entered after the file: %s', async (fileFirst) => {
+    const { state, host } = mountPage()
+    state.uploadFile = new File(['first'], 'first.docx')
+    state.uploadLocation = { location_name: '甲村', coordinates: '113,23' }
+    await flush()
+    state.backendPreview = { parsed_count: 1, errors: [] }
+    mocks.uploadVocabulary.mockResolvedValue({ imported_count: 1, errors: [] })
+    await state.handleImportAfterPreview()
+    await flush()
+
+    const reselect = [...host.querySelectorAll('button')].find((button) => button.textContent.includes('common.importPreview.actions.reselect'))
+    expect(reselect).toBeTruthy()
+    const input = host.querySelector('input[type="file"]')
+    const openPicker = vi.spyOn(input, 'click').mockImplementation(() => {})
+    reselect.click()
+    expect(openPicker).toHaveBeenCalledOnce()
+    expect(host.querySelectorAll('.backend-preview')).toHaveLength(1)
+    expect(host.textContent).not.toContain('words.wordList.upload.success')
+
+    async function enterNextLocation() {
+      state.openUploadLocationEditor()
+      await flush()
+      state.uploadLocationDraft = { location_name: '乙村', coordinates: '114,24' }
+      state.confirmUploadLocationEditor()
+      await flush()
+    }
+    if (!fileFirst) await enterNextLocation()
+    const nextFile = new File(['second'], 'second.docx')
+    Object.defineProperty(input, 'files', { value: [nextFile], configurable: true })
+    mocks.previewVocabularyImport.mockResolvedValue({ parsed_count: 1, errors: [] })
+    input.dispatchEvent(new Event('change', { bubbles: true }))
+    await flush()
+    expect(state.importResult).toBeNull()
+    if (fileFirst) {
+      await enterNextLocation()
+      const preview = [...host.querySelectorAll('button')].find((button) => button.textContent.includes('words.wordList.upload.previewAction'))
+      expect(preview).toBeTruthy()
+      preview.click()
+      await flush()
+    }
+    expect(state.canImportAfterPreview).toBe(true)
+    await state.handleImportAfterPreview()
+    await flush()
+    expect(mocks.uploadVocabulary).toHaveBeenCalledTimes(2)
+    expect(mocks.uploadVocabulary.mock.calls[1][0]).toMatchObject({ file: nextFile, location: { location_name: '乙村' } })
+    expect(state.importResult.locationName).toBe('乙村')
   })
 
   it('counts both blank and malformed rows in the preview while allowing partial overwrite', async () => {
