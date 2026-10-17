@@ -27,7 +27,7 @@
 
             <p
               v-else-if="uploadAccessNotice"
-              class="upload-status"
+              class="upload-access-notice"
             >
               {{ uploadAccessNotice }}
             </p>
@@ -319,12 +319,6 @@
             match-trigger-width
             @update:model-value="selectExistingLocation"
           />
-          <p
-            v-if="existingLocationsError"
-            class="upload-status"
-          >
-            {{ existingLocationsError }}
-          </p>
         </div>
       </template>
       <template #map>
