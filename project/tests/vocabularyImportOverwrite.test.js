@@ -48,6 +48,46 @@ beforeEach(() => {
 afterEach(() => { wrapper?.app.unmount(); wrapper?.host.remove() })
 
 describe('vocabulary import feedback', () => {
+  it.each([false, true])('resets the form only after a successful upload (%s)', async (fails) => {
+    const { state } = mountPage()
+    const file = new File(['content'], 'words.docx')
+    state.uploadFile = file
+    state.uploadLocation = { location_name: '甲村', coordinates: '113,23', t1: '55' }
+    state.uploadTargetLocation = { user_id: 7, location_name: '甲村' }
+    state.existingLocationKey = '7:甲村'
+    state.uploadParserMode = 'table'
+    state.fillStandardFromLocal = true
+    await flush()
+    state.backendPreview = { parsed_count: 1, skipped_count: 0, errors: [], would_delete_existing_count: 3 }
+    state.isOverwriteConfirmed = true
+    if (fails) mocks.uploadVocabulary.mockRejectedValue(new Error('上传失败'))
+    else mocks.uploadVocabulary.mockResolvedValue({ imported_count: 1, skipped_count: 0, errors: ['第 3 行缺少字段'] })
+
+    await state.handleImportAfterPreview()
+    await flush()
+
+    if (fails) {
+      expect(state.uploadFile).toBe(file)
+      expect(state.uploadLocation.location_name).toBe('甲村')
+      expect(state.uploadTargetLocation).toEqual({ user_id: 7, location_name: '甲村' })
+      expect(state.uploadParserMode).toBe('table')
+      expect(state.fillStandardFromLocal).toBe(true)
+      expect(state.backendPreview).not.toBeNull()
+      expect(state.isOverwriteConfirmed).toBe(true)
+    } else {
+      expect(state.uploadFile).toBeNull()
+      expect(Object.values(state.uploadLocation).every((value) => value === '')).toBe(true)
+      expect(state.uploadTargetLocation).toBeNull()
+      expect(state.existingLocationKey).toBe('')
+      expect(state.uploadParserMode).toBe('auto')
+      expect(state.fillStandardFromLocal).toBe(false)
+      expect(state.backendPreview).toBeNull()
+      expect(state.isOverwriteConfirmed).toBe(false)
+      expect(state.importResult).toEqual({ importedCount: 1, skippedCount: 1, errors: ['第 3 行缺少字段'], locationName: '甲村' })
+      expect(state.uploadStatusText).toContain('successWithSkipped')
+    }
+  })
+
   it('counts both blank and malformed rows in the preview while allowing partial overwrite', async () => {
     const { state, host } = mountPage()
     state.uploadFile = new File(['content'], 'words.docx')

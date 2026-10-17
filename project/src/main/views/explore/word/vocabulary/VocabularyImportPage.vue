@@ -1038,6 +1038,12 @@ async function handleImportAfterPreview() {
     const skippedCount = (Number(response.skipped_count) || 0) + errors.length
     const locationName = location.location_name
     clearUploadFile()
+    uploadLocation.value = createEmptyUploadLocation()
+    uploadTargetLocation.value = null
+    existingLocationKey.value = ''
+    closeUploadLocationEditor()
+    uploadParserMode.value = 'auto'
+    fillStandardFromLocal.value = false
     importResult.value = { importedCount, skippedCount, errors, locationName }
     uploadStatusText.value = skippedCount > 0
       ? t('words.wordList.upload.successWithSkipped', { imported: importedCount, skipped: skippedCount })
