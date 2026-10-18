@@ -1,100 +1,103 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApp, h, nextTick, reactive } from 'vue'
-import { createI18n } from 'vue-i18n'
 import QuerySearchEntrance from '../src/components/common/QuerySearchEntrance.vue'
 
 let app
 let host
+let scrollPosition
+let entrance
 const settle = async () => { await nextTick(); await nextTick() }
 
 async function mountEntrance(overrides = {}) {
-  const submit = vi.fn()
-  const props = reactive({ query: '吃饭', title: '词表查询', placeholder: '输入词语', ...overrides })
+  const props = reactive({ title: '词表查询', ...overrides })
+  const state = reactive({ text: '吃饭' })
   host = document.createElement('div')
   document.body.append(host)
-  app = createApp({ render: () => h(QuerySearchEntrance, { ...props, onSubmit: submit }, {
-    default: () => h('textarea', { class: 'original-query', value: props.query }),
+  app = createApp({ render: () => h(QuerySearchEntrance, { ...props, ref: value => { entrance = value } }, {
+    controls: ({ expanded, collapse }) => h('div', { class: 'original-controls' }, [
+      h('textarea', { class: 'original-query', value: state.text, onInput: event => { state.text = event.target.value } }),
+      h('select', { class: 'original-filter' }, [h('option', '全部地点')]),
+      expanded ? h('button', { class: 'search', onClick: collapse }, '搜索') : null,
+    ]),
+    default: () => h('div', { class: 'results' }, '查询结果'),
   }) })
-  app.use(createI18n({ legacy: false, locale: 'zh-CN', messages: {
-    'zh-CN': { common: { button: { search: '搜索' } } },
-  } }))
   app.mount(host)
   await settle()
-  return { submit, props }
+  return props
 }
 
 beforeEach(() => {
+  scrollPosition = 0
+  vi.spyOn(window, 'scrollY', 'get').mockImplementation(() => scrollPosition)
   vi.stubGlobal('matchMedia', () => ({ matches: false }))
-  HTMLElement.prototype.scrollIntoView = vi.fn()
+  vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
+  let frameId = 0
+  vi.spyOn(window, 'requestAnimationFrame').mockImplementation(fn => { queueMicrotask(fn); return ++frameId })
+  vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
+    if (this.classList.contains('query-intro')) return { top: 180 - scrollPosition, height: 240 }
+    return { top: 420 - scrollPosition, height: 140 }
+  })
 })
 afterEach(() => {
   app?.unmount()
   host?.remove()
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
-  delete HTMLElement.prototype.scrollIntoView
 })
 
-describe('centered query entrance', () => {
-  it('keeps typing local until clicking search and preserves the existing compact input', async () => {
-    const { submit } = await mountEntrance()
-    const input = host.querySelector('.query-entrance-input')
+describe('one query panel morphing with scroll', () => {
+  it('renders the original input and conditions together, without a second input', async () => {
+    await mountEntrance()
+    expect(host.querySelectorAll('textarea')).toHaveLength(1)
+    const panel = host.querySelector('.query-search-panel')
+    expect(panel.contains(host.querySelector('.original-query'))).toBe(true)
+    expect(panel.contains(host.querySelector('.original-filter'))).toBe(true)
+  })
+
+  it('continuously morphs the same controls and restores them when scrolling back', async () => {
+    await mountEntrance()
+    const input = host.querySelector('.original-query')
+    const filter = host.querySelector('.original-filter')
     input.value = '饮水'
     input.dispatchEvent(new Event('input', { bubbles: true }))
+    const end = 420 - window.innerHeight * 0.12
+    scrollPosition = end - 120
+    window.dispatchEvent(new Event('scroll'))
     await settle()
-    expect(submit).not.toHaveBeenCalled()
-    expect(host.querySelector('.original-query').value).toBe('吃饭')
-    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
-    expect(submit).not.toHaveBeenCalled()
-    host.querySelector('.query-entrance-submit').click()
+    expect(entrance.progress).toBeCloseTo(0.5)
+    scrollPosition = Math.floor(end)
+    window.dispatchEvent(new Event('scroll'))
     await settle()
-    expect(submit).toHaveBeenCalledExactlyOnceWith('饮水')
-    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start', inline: 'nearest' })
-    expect(host.querySelector('.query-hero')).not.toBeNull()
+    expect(entrance.progress).toBe(1)
+    expect(host.querySelector('.query-search-panel').classList.contains('is-compact')).toBe(true)
+    scrollPosition = 0
+    window.dispatchEvent(new Event('scroll'))
+    await settle()
+    expect(entrance.progress).toBe(0)
+    expect(host.querySelector('.original-query')).toBe(input)
+    expect(host.querySelector('.original-filter')).toBe(filter)
+    expect(input.value).toBe('饮水')
   })
 
-  it('selects a suggestion without submitting and blocks invalid Yubao entries', async () => {
-    const { submit } = await mountEntrance({
-      query: '吃', getSuggestions: () => ['吃饭'], validateQuery: query => query === '吃饭',
-    })
-    const input = host.querySelector('.query-entrance-input')
-    input.dispatchEvent(new FocusEvent('focus'))
+  it('scrolls the existing panel to its compact position only on clicking search', async () => {
+    await mountEntrance()
+    expect(window.scrollTo).not.toHaveBeenCalled()
+    host.querySelector('.search').click()
     await settle()
-    expect(host.querySelector('.query-entrance-submit').disabled).toBe(true)
-    const suggestion = host.querySelector('.query-suggestion')
-    const pointerDown = new MouseEvent('mousedown', { bubbles: true, cancelable: true })
-    suggestion.dispatchEvent(pointerDown)
-    expect(pointerDown.defaultPrevented).toBe(true)
-    suggestion.click()
-    await settle()
-    expect(input.value).toBe('吃饭')
-    expect(submit).not.toHaveBeenCalled()
-    host.querySelector('.query-entrance-submit').click()
-    await settle()
-    expect(submit).toHaveBeenCalledExactlyOnceWith('吃饭')
+    expect(window.scrollTo).toHaveBeenCalledWith({ top: 420 - window.innerHeight * 0.12, behavior: 'smooth' })
   })
 
-  it('synchronizes compact edits and tab changes back into the large input', async () => {
-    const { props } = await mountEntrance()
-    props.query = '走路'
-    await settle()
-    expect(host.querySelector('.query-entrance-input').value).toBe('走路')
-    props.queryKey = 'grammar'
-    props.query = ''
-    await settle()
-    expect(host.querySelector('.query-entrance-input').value).toBe('')
-  })
-
-  it('honors reduced motion and can bypass the entrance for character notes', async () => {
+  it('honors reduced motion and bypasses expansion for character notes', async () => {
     vi.stubGlobal('matchMedia', () => ({ matches: true }))
-    const { props } = await mountEntrance()
-    host.querySelector('.query-entrance-submit').click()
+    const props = await mountEntrance()
+    host.querySelector('.search').click()
     await settle()
-    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledWith({ behavior: 'instant', block: 'start', inline: 'nearest' })
-    const original = host.querySelector('.original-query')
+    expect(window.scrollTo).toHaveBeenCalledWith(expect.objectContaining({ behavior: 'instant' }))
+    const input = host.querySelector('.original-query')
     props.enabled = false
     await settle()
-    expect(host.querySelector('.query-hero')).toBeNull()
-    expect(host.querySelector('.original-query')).toBe(original)
+    expect(host.querySelector('.query-intro')).toBeNull()
+    expect(host.querySelector('.original-query')).toBe(input)
+    expect(host.querySelectorAll('textarea')).toHaveLength(1)
   })
 })

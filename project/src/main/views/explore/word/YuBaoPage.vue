@@ -6,16 +6,11 @@
     </h1>
 
     <QuerySearchEntrance
-      :query="currentInputValue"
-      :query-key="activeTab"
+      ref="queryEntrance"
       :title="activePageTitle"
-      :placeholder="t(activeTab === 'vocabulary' ? 'words.yuBaoPage.search.vocabularyPlaceholder' : 'words.yuBaoPage.search.grammarPlaceholder')"
-      :disabled="isLoading"
-      :get-suggestions="getEntranceSuggestions"
-      :validate-query="validateEntranceQuery"
-      :validation-hint="t('words.yuBaoPage.states.chooseSuggestion')"
-      @submit="submitEntranceQuery"
+      @progress="entranceProgress = $event"
     >
+    <template #controls="{ expanded }">
     <!-- 顶部控制栏 -->
     <div class="top-controls">
       <!-- Tab 切换 + 查看全部按钮 -->
@@ -50,7 +45,7 @@
             <textarea
                 v-if="activeTab === 'vocabulary'"
                 ref="vocabularyInputEl"
-                v-model="vocabularyInput"
+                v-model="vocabularyDraftInput"
                 @input="onVocabularyInput"
                 @focus="onVocabularyFocus"
                 @blur="onBlur"
@@ -63,7 +58,7 @@
             <textarea
                 v-else
                 ref="grammarInputEl"
-                v-model="grammarInput"
+                v-model="grammarDraftInput"
                 @input="onGrammarInput"
                 @focus="onGrammarFocus"
                 @blur="onBlur"
@@ -107,11 +102,38 @@
           </div>
         </div>
       </div>
+      <button
+        v-if="expanded"
+        class="query-submit glass-button"
+        data-variant="primary"
+        type="button"
+        :disabled="isLoading || !isDraftValid"
+        @click="submitEntranceQuery"
+      >{{ t('common.button.search') }}</button>
     </div>
 
     <div class="condition-bar">
       <ResultViewSwitcher v-model="viewMode" label-prefix="words.yuBaoPage.viewModes" />
+      <div v-if="viewMode === 'card'" class="local-filter-bar">
+        <div class="filter-input-wrapper">
+          <svg class="filter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            v-model="localFilterQuery"
+            type="text"
+            :placeholder="t('words.yuBaoPage.search.localFilterPlaceholder')"
+            class="local-filter-input"
+          />
+          <button v-if="localFilterQuery" @click="localFilterQuery = ''" class="clear-filter-btn">×</button>
+        </div>
+        <span class="filter-count" v-if="localFilterQuery">
+          {{ t('words.yuBaoPage.filter.showingCount', { visible: filteredCardData.length, total: cardData.length }) }}
+        </span>
+      </div>
     </div>
+    </template>
 
     <!-- 内容区 -->
     <!-- 加载状态 -->
@@ -161,24 +183,6 @@
 
         <template v-else-if="cardData.length > 0">
 
-          <div class="local-filter-bar">
-            <div class="filter-input-wrapper">
-              <svg class="filter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              <input
-                  v-model="localFilterQuery"
-                  type="text"
-                  :placeholder="t('words.yuBaoPage.search.localFilterPlaceholder')"
-                  class="local-filter-input"
-              />
-              <button v-if="localFilterQuery" @click="localFilterQuery = ''" class="clear-filter-btn">×</button>
-            </div>
-            <span class="filter-count" v-if="localFilterQuery">
-        {{ t('words.yuBaoPage.filter.showingCount', { visible: filteredCardData.length, total: cardData.length }) }}
-      </span>
-          </div>
           <div class="cards-grid">
             <div
                 v-for="(item, idx) in visibleCards"
@@ -348,6 +352,26 @@ const { state: activeTab, set: setActiveTab } = useRouteQueryState('tab', {
 })
 const vocabularyInput = ref('')
 const grammarInput = ref('')
+const queryEntrance = ref(null)
+const entranceProgress = ref(0)
+const vocabularyDraft = ref('')
+const grammarDraft = ref('')
+const vocabularyDraftInput = computed({
+  get: () => vocabularyDraft.value,
+  set: value => {
+    vocabularyDraft.value = value
+    if (entranceProgress.value === 1) vocabularyInput.value = value
+  },
+})
+const grammarDraftInput = computed({
+  get: () => grammarDraft.value,
+  set: value => {
+    grammarDraft.value = value
+    if (entranceProgress.value === 1) grammarInput.value = value
+  },
+})
+watch(vocabularyInput, value => { vocabularyDraft.value = value })
+watch(grammarInput, value => { grammarDraft.value = value })
 const vocabularyInputEl = ref(null)
 const grammarInputEl = ref(null)
 const vocabularySuggestions = ref([])
@@ -573,29 +597,27 @@ function localMatch(query, dataArray) {
   return matches.slice(0, 50)
 }
 
-function getEntranceSuggestions(query) {
-  return localMatch(query, activeTab.value === 'vocabulary' ? allVocabulary.value : allGrammar.value)
-}
+const isDraftValid = computed(() => activeTab.value === 'vocabulary'
+  ? allVocabulary.value.includes(vocabularyDraft.value.trim())
+  : allGrammar.value.includes(grammarDraft.value.trim()))
 
-function validateEntranceQuery(query) {
-  return (activeTab.value === 'vocabulary' ? allVocabulary.value : allGrammar.value).includes(query)
-}
-
-function submitEntranceQuery(query) {
+function submitEntranceQuery() {
+  if (!isDraftValid.value || isLoading.value) return
   if (activeTab.value === 'vocabulary') {
-    vocabularyInput.value = query
+    vocabularyInput.value = vocabularyDraft.value.trim()
   } else {
-    grammarInput.value = query
+    grammarInput.value = grammarDraft.value.trim()
   }
   vocabularySuggestions.value = []
   grammarSuggestions.value = []
+  queryEntrance.value?.collapse()
 }
 
 // 词汇输入处理
 function onVocabularyInput() {
   clearTimeout(vocabularyDebounceTimer)
   vocabularyDebounceTimer = setTimeout(() => {
-    const query = vocabularyInput.value.trim()
+    const query = vocabularyDraft.value.trim()
     // console.log('🔍 词汇输入:', query)
 
     if (!query) {
@@ -615,7 +637,7 @@ function onVocabularyInput() {
 
 // 词汇聚焦处理
 function onVocabularyFocus() {
-  if (vocabularyInput.value.trim()) {
+  if (vocabularyDraft.value.trim()) {
     onVocabularyInput()
   }
 }
@@ -624,7 +646,7 @@ function onVocabularyFocus() {
 function onGrammarInput() {
   clearTimeout(grammarDebounceTimer)
   grammarDebounceTimer = setTimeout(() => {
-    const query = grammarInput.value.trim()
+    const query = grammarDraft.value.trim()
     if (!query) {
       grammarSuggestions.value = []
       return
@@ -640,7 +662,7 @@ function onGrammarInput() {
 
 // 语法聚焦处理
 function onGrammarFocus() {
-  if (grammarInput.value.trim()) {
+  if (grammarDraft.value.trim()) {
     onGrammarInput()
   }
 }
@@ -685,9 +707,14 @@ function updateGrammarSuggestionPosition() {
   })
 }
 
+watch(entranceProgress, () => {
+  if (vocabularySuggestions.value.length) updateVocabularySuggestionPosition()
+  if (grammarSuggestions.value.length) updateGrammarSuggestionPosition()
+}, { flush: 'post' })
+
 // 应用词汇建议
 function applyVocabularySuggestion(item) {
-  vocabularyInput.value = item
+  vocabularyDraftInput.value = item
   vocabularySuggestions.value = []
   nextTick(() => {
     if (vocabularyInputEl.value) {
@@ -698,7 +725,7 @@ function applyVocabularySuggestion(item) {
 
 // 应用语法建议
 function applyGrammarSuggestion(item) {
-  grammarInput.value = item
+  grammarDraftInput.value = item
   grammarSuggestions.value = []
   nextTick(() => {
     if (grammarInputEl.value) {
@@ -710,9 +737,9 @@ function applyGrammarSuggestion(item) {
 // 从弹窗中选择条目
 function selectFromModal(item) {
   if (activeTab.value === 'vocabulary') {
-    vocabularyInput.value = item
+    vocabularyDraftInput.value = item
   } else {
-    grammarInput.value = item
+    grammarDraftInput.value = item
   }
   showAllModal.value = false
   modalSearchQuery.value = ''
@@ -1104,7 +1131,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 
 .search-input {
   width: 100%;
-  min-height: 48px;
+  min-height: calc(48px + var(--query-input-growth, 0px));
   max-height: 200px;
   padding: 12px 16px;
   overflow: hidden;
@@ -1135,7 +1162,19 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 16px;
+
+  .local-filter-bar {
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    min-width: 0;
+    margin-bottom: 0;
+  }
+
+  .filter-input-wrapper { min-width: 0; }
+  .local-filter-input { width: 100%; box-sizing: border-box; }
 }
 
 /* 内容区 */

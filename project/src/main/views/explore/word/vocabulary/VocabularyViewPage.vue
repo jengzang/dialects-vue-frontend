@@ -2,12 +2,9 @@
   <div class="vocabulary-view-page">
     <QuerySearchEntrance
       :enabled="!isCharacterNotesMode"
-      :query="activeQuery"
-      :query-key="source"
       :title="t('navigation.pageTitles.vocabulary.view')"
-      :placeholder="t('words.wordList.search.placeholder')"
-      @submit="activeQuery = $event"
     >
+    <template #controls="{ expanded, collapse }">
     <VocabularyTopControls
       v-model:source="source"
       v-model:query="activeQuery"
@@ -26,11 +23,14 @@
       :province-options="provinceOptions"
       :city-options="cityOptions"
       :notes-scope="draftScope"
+      :defer-query="expanded"
       @update:notes-scope="draftScope = cloneNotesScope($event)"
       @locations-resolved="handleNotesScopeResolved"
       @refresh-notes="refreshNotes"
       @open-location-details="openLocationDetails"
+      @search="collapse"
     />
+    </template>
 
     <section v-if="isCharacterNotesMode" class="content-area">
       <div v-if="isNotesInitialLoading" class="loading-state loading-state-base">

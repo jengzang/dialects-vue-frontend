@@ -15,6 +15,16 @@
           />
         </div>
 
+        <button
+          v-if="deferQuery"
+          class="query-submit glass-button"
+          data-variant="primary"
+          type="button"
+          @click="submitSearch"
+        >
+          {{ t('common.button.search') }}
+        </button>
+
         <div v-if="source === 'character-notes'" class="notes-mode-actions">
           <ActionButton
             class="notes-refresh-action"
@@ -291,6 +301,7 @@ function normalizeLocationSearchText(value) {
 }
 
 const props = defineProps({
+  deferQuery: { type: Boolean, default: false },
   source: { type: String, default: 'vocabulary' },
   query: { type: String, default: '' },
   selectedSearchFields: { type: Array, default: () => [] },
@@ -315,6 +326,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits([
+  'search',
   'update:source',
   'update:query',
   'update:selectedSearchFields',
@@ -359,6 +371,10 @@ watch(() => props.source, () => {
   inputText.value = props.query
 })
 
+watch(() => props.deferQuery, (defer) => {
+  if (defer) clearTimeout(searchTimer)
+})
+
 function handleCompositionStart() {
   isComposing.value = true
   clearTimeout(searchTimer)
@@ -378,9 +394,17 @@ function handleInput(e) {
 
 function scheduleSearchEmit() {
   clearTimeout(searchTimer)
+  if (props.deferQuery) return
   searchTimer = setTimeout(() => {
-    emit('update:query', inputText.value)
+    if (!props.deferQuery) emit('update:query', inputText.value)
   }, 500)
+}
+
+function submitSearch() {
+  if (isComposing.value) return
+  clearTimeout(searchTimer)
+  emit('update:query', inputText.value)
+  emit('search')
 }
 
 function handleNotesScopeUpdate(scope) {
@@ -518,7 +542,7 @@ const standardWordTriggerLabel = computed(() => {
 
 .search-input {
   width: 100%;
-  min-height: 40px;
+  min-height: calc(40px + var(--query-input-growth, 0px));
   padding: 10px 12px;
   color: var(--text-primary);
   background: var(--glass-10);

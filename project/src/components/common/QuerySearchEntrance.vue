@@ -1,124 +1,77 @@
 <template>
-  <section v-if="enabled" ref="heroEl" class="query-hero" :aria-label="title" :style="heroStyle">
-    <h2 class="query-entrance-title">{{ title }}</h2>
-    <form class="query-entrance-panel glass-panel" @submit.prevent @focusout="handleFocusOut">
-      <div class="query-entrance-field">
-        <textarea
-          v-model="draft"
-          class="query-entrance-input glass-field"
-          :aria-label="placeholder"
-          :placeholder="placeholder"
-          rows="2"
-          @focus="showSuggestions = true"
-          @input="showSuggestions = true"
-          @keydown.esc="showSuggestions = false"
-        />
-        <div v-if="visibleSuggestions.length" class="query-suggestions glass-dropdown-panel" :aria-label="placeholder">
-          <button
-            v-for="item in visibleSuggestions"
-            :key="item"
-            class="query-suggestion glass-dropdown-item ui-tab-item"
-            type="button"
-            @mousedown.prevent
-            @click="selectSuggestion(item)"
-          >{{ item }}</button>
-        </div>
-      </div>
-      <button
-        class="query-entrance-submit glass-button"
-        data-variant="primary"
-        type="button"
-        :disabled="disabled || !isDraftValid"
-        @click="submitQuery"
-      >
-        <PhMagnifyingGlass :size="18" aria-hidden="true" />
-        {{ t('common.button.search') }}
-      </button>
-      <p v-if="validationHint && draft.trim() && !isDraftValid" class="query-validation-hint" role="status">{{ validationHint }}</p>
-    </form>
+  <section class="query-search-entrance" :style="panelStyle">
+    <div v-if="enabled" ref="introEl" class="query-intro" :aria-hidden="progress === 1">
+      <h2>{{ title }}</h2>
+    </div>
+    <div
+      ref="panelEl"
+      class="query-search-panel"
+      :class="{ 'glass-panel': enabled, 'is-compact': !expanded }"
+    >
+      <slot name="controls" :progress="progress" :expanded="expanded" :collapse="collapse" />
+    </div>
   </section>
-  <div ref="compactEl" class="query-compact" :class="{ 'query-compact--enabled': enabled }">
+  <div class="query-results" :class="{ 'query-results--enabled': enabled }">
     <slot />
   </div>
 </template>
 
 <script setup>
 import { computed, nextTick, onActivated, onBeforeUnmount, onDeactivated, onMounted, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { PhMagnifyingGlass } from '@phosphor-icons/vue'
 
 const props = defineProps({
-  query: { type: String, default: '' },
-  queryKey: { type: String, default: '' },
   title: { type: String, required: true },
-  placeholder: { type: String, required: true },
   enabled: { type: Boolean, default: true },
-  disabled: { type: Boolean, default: false },
-  getSuggestions: { type: Function, default: null },
-  validateQuery: { type: Function, default: null },
-  validationHint: { type: String, default: '' },
 })
-const emit = defineEmits(['submit'])
-const { t } = useI18n()
-const heroEl = ref(null)
-const compactEl = ref(null)
-const draft = ref(props.query)
-const showSuggestions = ref(false)
+const emit = defineEmits(['progress'])
+const introEl = ref(null)
+const panelEl = ref(null)
 const progress = ref(0)
+const expanded = computed(() => props.enabled && progress.value < 1)
+const panelStyle = computed(() => ({
+  '--query-progress': props.enabled ? progress.value : 1,
+  '--query-expansion': props.enabled ? 1 - progress.value : 0,
+}))
 let scrollFrame = null
 
-const isDraftValid = computed(() => props.validateQuery ? props.validateQuery(draft.value.trim()) : true)
-const visibleSuggestions = computed(() => (
-  showSuggestions.value && draft.value.trim() && props.getSuggestions
-    ? props.getSuggestions(draft.value.trim())
-    : []
-))
-const heroStyle = computed(() => ({ '--query-entrance-progress': progress.value }))
-
-watch(() => [props.query, props.queryKey], () => {
-  draft.value = props.query
-  showSuggestions.value = false
-})
-
-function selectSuggestion(item) {
-  draft.value = item
-  showSuggestions.value = false
-}
-
-function handleFocusOut(event) {
-  if (!event.currentTarget.contains(event.relatedTarget)) showSuggestions.value = false
-}
-
-async function submitQuery() {
-  if (props.disabled || !isDraftValid.value) return
-  showSuggestions.value = false
-  emit('submit', draft.value.trim())
-  await nextTick()
-  compactEl.value?.scrollIntoView({
-    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
-    block: 'start',
-    inline: 'nearest',
-  })
+function compactPosition() {
+  const inset = window.innerHeight * (window.matchMedia('(max-aspect-ratio: 1 / 1)').matches ? 0.16 : 0.12)
+  return Math.max(0, window.scrollY + (panelEl.value?.getBoundingClientRect().top || 0) - inset)
 }
 
 function updateProgress() {
   scrollFrame = null
-  const rect = heroEl.value?.getBoundingClientRect()
-  progress.value = rect?.height ? Math.max(0, Math.min(1, -rect.top / rect.height)) : 0
+  const distance = introEl.value?.getBoundingClientRect().height || 0
+  const remaining = compactPosition() - window.scrollY
+  progress.value = props.enabled && distance
+    ? remaining <= 1 ? 1 : Math.max(0, Math.min(1, 1 - remaining / distance))
+    : 1
 }
 
 function handleScroll() {
   if (scrollFrame === null) scrollFrame = window.requestAnimationFrame(updateProgress)
 }
 
+async function collapse() {
+  if (!props.enabled) return
+  await nextTick()
+  window.scrollTo({
+    top: compactPosition(),
+    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+  })
+}
+
+watch(progress, value => emit('progress', value))
+watch(() => props.enabled, async () => { await nextTick(); updateProgress() })
+
 function startListening() {
-  window.addEventListener('scroll', handleScroll, { passive: true, capture: true })
+  window.addEventListener('scroll', handleScroll, { passive: true })
   window.addEventListener('resize', handleScroll, { passive: true })
   updateProgress()
 }
 
 function stopListening() {
-  window.removeEventListener('scroll', handleScroll, true)
+  window.removeEventListener('scroll', handleScroll)
   window.removeEventListener('resize', handleScroll)
   if (scrollFrame !== null) window.cancelAnimationFrame(scrollFrame)
   scrollFrame = null
@@ -128,102 +81,75 @@ onMounted(startListening)
 onActivated(startListening)
 onDeactivated(stopListening)
 onBeforeUnmount(stopListening)
+defineExpose({ collapse, progress })
 </script>
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
 
-.query-hero {
+.query-intro {
   @include flex-col;
+  justify-content: flex-end;
   align-items: center;
-  justify-content: center;
-  gap: 28px;
-  min-height: 66dvh;
-  padding: 48px 0 64px;
+  height: 26dvh;
+  min-height: 160px;
+  padding-bottom: 28px;
   box-sizing: border-box;
-  opacity: calc(1 - var(--query-entrance-progress, 0) * 0.65);
-  transform: translateY(calc(var(--query-entrance-progress, 0) * -24px));
+  opacity: var(--query-expansion);
+
+  h2 { margin: 0; text-align: center; }
 }
 
-.query-entrance-title {
-  margin: 0;
-  text-align: center;
-}
-
-.query-entrance-panel {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 16px;
-  width: min(100%, 760px);
-  padding: 24px;
+.query-search-panel {
+  --glass-panel-background: color-mix(in srgb, var(--surface-panel) calc(var(--query-expansion) * 100%), transparent);
+  --glass-panel-border: 0;
+  --glass-panel-radius: calc(var(--radius-xl) * var(--query-expansion));
+  --glass-panel-shadow: 0 4px 14px rgba(var(--color-shadow-rgb), calc(0.08 * var(--query-expansion)));
+  --glass-panel-hover-shadow: var(--glass-panel-shadow);
+  --glass-panel-backdrop-filter: none;
+  --query-input-growth: calc(48px * var(--query-expansion));
+  width: min(100%, calc(760px + (100% - 760px) * var(--query-progress)));
+  margin: 0 auto;
+  padding: calc(24px * var(--query-expansion));
   box-sizing: border-box;
+  transition: none;
+
+  :deep(.search-input) {
+    transition-property: background-color, border-color, box-shadow;
+  }
+
+  :deep(.query-submit) {
+    flex: 0 0 auto;
+    width: calc(94px * var(--query-expansion));
+    min-width: 0;
+    min-height: 44px;
+    align-self: center;
+    padding: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: var(--query-expansion);
+  }
+
+  &:not(.is-compact) {
+    :deep(.top-controls) { margin-bottom: 0; }
+    :deep(.top-controls > .search-container) { flex-basis: calc(100% * var(--query-expansion)); }
+    :deep(.filter-strip) { min-width: 0; }
+  }
+
+  &.is-compact { width: 100%; }
 }
 
-.query-entrance-field {
-  position: relative;
-  min-width: 0;
-}
-
-.query-entrance-input {
-  --glass-field-font-size: 16px;
-  display: block;
-  min-height: 72px;
-  resize: vertical;
-}
-
-.query-entrance-submit {
-  min-height: 44px;
-}
-
-.query-suggestions {
-  top: calc(100% + 6px);
-  right: 0;
-  left: 0;
-}
-
-.query-suggestion {
-  display: block;
-  width: 100%;
-  text-align: left;
-}
-
-.query-validation-hint {
-  grid-column: 1 / -1;
-  margin: 0;
-}
-
-.query-compact--enabled {
-  min-height: 86dvh;
-  scroll-margin-top: 12dvh;
+.query-results--enabled {
+  min-height: 84dvh;
 }
 
 @media (max-aspect-ratio: 1 / 1) {
-  .query-hero {
-    min-height: 62dvh;
-    gap: 20px;
-    padding: 32px 0 48px;
+  .query-intro {
+    height: 22dvh;
+    min-height: 120px;
+    padding-bottom: 20px;
   }
 
-  .query-entrance-panel {
-    gap: 10px;
-    padding: 16px;
-  }
-
-  .query-entrance-submit {
-    --glass-button-padding: 12px;
-  }
-
-  .query-compact--enabled {
-    min-height: 82dvh;
-    scroll-margin-top: 16dvh;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .query-hero {
-    opacity: 1;
-    transform: none;
-  }
+  .query-search-panel { padding: calc(16px * var(--query-expansion)); }
 }
 </style>
