@@ -90,10 +90,6 @@
           :cell-details="matrixData.cellDetails"
         />
       </div>
-
-      <div v-else class="empty">
-        <p>{{ $t('phonology.phonology.custom.states.emptyInput') }}</p>
-      </div>
     </template>
   </div>
 </template>
@@ -767,13 +763,6 @@ watch(
       padding: 16px;
     }
 
-  }
-
-  /* 空状态 */
-  .empty {
-    @include flex-center;
-    color: var(--text-secondary);
-    font-size: 16px;
   }
 
   /* 竖屏 */

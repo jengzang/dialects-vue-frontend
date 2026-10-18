@@ -5,15 +5,13 @@
     :route-value="currentTab"
     :resolve-route="resolveTabRoute"
   >
-    <template #header>
+    <template #default="{ currentTab }">
+      <div class="tab-content-inner compare-page-root">
       <h1 class="page-title">
         <BarIcon :icon="activePageIcon" />
         {{ activePageTitle }}
       </h1>
-    </template>
 
-    <template #default="{ currentTab }">
-      <div class="tab-content-inner compare-page-root">
       <!-- Tab1: 比較漢字 -->
       <div
         v-show="currentTab === 'tab1'"
@@ -1902,6 +1900,7 @@ $text-muted: var(--text-lightest);
 
 .tab-content-inner {
   display: flex;
+  flex: 1;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -1910,6 +1909,10 @@ $text-muted: var(--text-lightest);
   padding: 1rem 0;
   text-align: center;
   animation: fade 0.6s ease;
+}
+
+.page-title {
+  margin-bottom: 1.5dvh;
 }
 
 .page {

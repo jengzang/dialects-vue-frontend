@@ -179,6 +179,9 @@ $transition-duration: 0.5s;
 }
 
 .tab-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   width: 100%;
   animation: fade 0.6s ease;
 }

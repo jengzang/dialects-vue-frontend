@@ -5,15 +5,13 @@
     :route-value="currentTab"
     :resolve-route="resolveTabRoute"
   >
-    <template #header>
+    <template #default="{ currentTab }">
+      <div class="tab-content-inner query-page-root">
       <h1 class="page-title">
         <BarIcon :icon="activePageIcon" />
         {{ activePageTitle }}
       </h1>
-    </template>
 
-    <template #default="{ currentTab }">
-      <div class="tab-content-inner query-page-root">
       <div v-show="currentTab === 'tab1'" class="page">
         <div class="page-content-stack">
           <!-- 🔹 輸入框區塊 -->
@@ -852,6 +850,7 @@ export default {
 
 .tab-content-inner {
   display: flex;
+  flex: 1;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -860,6 +859,10 @@ export default {
   padding: 1rem 0;
   text-align: center;
   animation: fade 0.6s ease;
+}
+
+.page-title {
+  margin-bottom: 1.5dvh;
 }
 
 

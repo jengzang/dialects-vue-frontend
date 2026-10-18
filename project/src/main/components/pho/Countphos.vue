@@ -1842,11 +1842,6 @@ onBeforeUnmount(() => {
       </section>
     </div>
 
-    <div v-else class="empty">
-      <p>{{ $t('phonology.phonology.countphos.states.emptyInput') }}</p>
-      <p>{{ $t('phonology.phonology.countphos.states.hint') }}</p>
-    </div>
-
     <LocationDetailPopup
       :visible="locationPopup.visible"
       :location-name="locationPopup.locationName"
@@ -2470,22 +2465,6 @@ $primary-deep: #003d9e;
     color: var(--color-primary);
     font-size: 12px;
     font-weight: 700;
-  }
-
-  /* 空状态 */
-  .empty {
-    @include flex-col;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    color: var(--text-secondary);
-    text-align: center;
-    font-size: 16px;
-
-    p {
-      margin: 0;
-      line-height: 1.6;
-    }
   }
 
   /* 移动端 */

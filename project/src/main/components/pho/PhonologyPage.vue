@@ -51,10 +51,6 @@
         />
       </template>
     </div>
-
-    <div v-else class="empty">
-      <p>{{ $t('phonology.phonology.matrix.states.emptyInput') }}</p>
-    </div>
   </div>
 </template>
 
@@ -315,14 +311,6 @@ watch(locationQuery, (urlLocations) => {
       padding: 16px;
     }
 
-  }
-
-  /* 空状态 */
-  .empty {
-    min-height: 30dvh;
-    @include flex-center;
-    color: var(--text-secondary);
-    font-size: 16px;
   }
 
   /* 竖屏 */

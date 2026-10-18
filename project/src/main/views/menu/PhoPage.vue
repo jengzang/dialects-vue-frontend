@@ -6,15 +6,13 @@
       :route-value="currentTab"
       :resolve-route="resolveTabRoute"
     >
-      <template #header>
-        <h1 class="page-title">
-          <BarIcon :icon="activePageIcon" />
-          {{ activePageTitle }}
-        </h1>
-      </template>
-
       <template #default="{ currentTab }">
         <div class="pho-content">
+          <h1 class="page-title">
+            <BarIcon :icon="activePageIcon" />
+            {{ activePageTitle }}
+          </h1>
+
           <KeepAlive>
             <component :is="getTabComponent(currentTab)" />
           </KeepAlive>
@@ -115,7 +113,13 @@ const resolveTabRoute = (tabName) => {
 .pho-content {
   align-items: center;
   display: flex;
+  flex: 1;
   flex-direction: column;
+  justify-content: center;
   width: 100%;
+}
+
+.page-title {
+  margin-bottom: 1.5dvh;
 }
 </style>
