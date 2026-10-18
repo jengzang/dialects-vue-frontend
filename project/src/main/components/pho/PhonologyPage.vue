@@ -12,6 +12,7 @@
         @update:matchedLocations="handleMatchedLocations"
         @update:isMatching="handleIsMatching"
       />
+      <LocationQuickFillPill @apply="applyQuickLocations" />
       <button
         class="action-btn"
         @click="loadData"
@@ -62,6 +63,7 @@ import { getPhonologyMatrix } from '@/api'
 import PhonologyMatrix from '@/main/components/TableAndTree/PhonologyTable.vue'
 import HomophoneLexicon from '@/main/components/pho/HomophoneLexicon.vue'
 import LocationMultiInput from '@/main/components/geo/LocationMultiInput.vue'
+import LocationQuickFillPill from '@/main/components/geo/LocationQuickFillPill.vue'
 import { transformMatrixReadStats } from '@/main/utils/phonology/readingStats.js'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
@@ -120,6 +122,15 @@ const displayLocations = computed(() => {
   if (!matrixData.value) return []
   return Object.keys(matrixData.value)
 })
+
+// 快速填入预置地点，等同于用户手动输入（不触发查询）
+const applyQuickLocations = (location) => {
+  if (queryStrings.value.includes(location)) {
+    return
+  }
+
+  queryStrings.value = [...queryStrings.value, location]
+}
 
 // 处理匹配到的地点列表
 const handleMatchedLocations = (locations) => {
