@@ -903,6 +903,9 @@ function normalizeViewMode(value) {
 }
 
 watch(viewMode, (nextMode) => {
+  if (!isCharacterNotesMode.value) {
+    sessionStorage.setItem('vocabulary_view_mode', nextMode)
+  }
   router.replace({
     query: {
       ...route.query,

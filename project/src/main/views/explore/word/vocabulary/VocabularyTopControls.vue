@@ -138,6 +138,11 @@
       class="filter-strip"
       :class="{ 'notes-scope-filter': source === 'character-notes' }"
     >
+      <ResultViewSwitcher
+        v-if="source === 'vocabulary'"
+        :model-value="viewMode"
+        @update:model-value="emit('update:viewMode', $event)"
+      />
       <template v-if="source === 'character-notes'">
         <LocationAndRegionInput
           :model-value="notesScope"
@@ -263,6 +268,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import ResultViewSwitcher from '@/components/common/ResultViewSwitcher.vue'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import * as OpenCCT2CN from 'opencc-js/t2cn'
@@ -665,6 +671,7 @@ const standardWordTriggerLabel = computed(() => {
 
 .filter-strip {
   flex: 0 0 auto;
+  flex-wrap: wrap;
   min-width: 180px;
 }
 

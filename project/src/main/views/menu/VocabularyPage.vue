@@ -21,12 +21,6 @@
         >
           {{ pageTabs[0].label }}
         </button>
-        <ChoiceSelector
-          v-if="isQueryTabActive"
-          v-model="viewModeQuery"
-          :options="viewModeOptions"
-          class="tab-view-mode-selector"
-        />
         <button
           class="page-tab-btn"
           :class="{ active: isActivePage(pageTabs[1].path) }"
@@ -286,34 +280,8 @@ function isActivePage(tabPath) {
   return currentPath === tabPath
 }
 
-const isQueryTabActive = computed(() => {
-  return stripLocaleFromPath(route.path) === '/menu/vocabulary/view'
-})
-
 const isContributeTabActive = computed(() => {
   return isContributePath(stripLocaleFromPath(route.path))
-})
-
-const viewModeOptions = computed(() => [
-  { value: 'card', label: t('words.wordList.viewModes.card') },
-  { value: 'map', label: t('words.wordList.viewModes.map') },
-  { value: 'table', label: t('words.wordList.viewModes.table') },
-])
-
-const STORED_VIEW_MODE_KEY = 'vocabulary_view_mode'
-
-const viewModeQuery = computed({
-  get: () => {
-    const tab = route.query.tab
-    if (tab === 'map' || tab === 'table') return tab
-    const stored = sessionStorage.getItem(STORED_VIEW_MODE_KEY)
-    if (stored === 'map' || stored === 'table') return stored
-    return 'card'
-  },
-  set: (val) => {
-    sessionStorage.setItem(STORED_VIEW_MODE_KEY, val)
-    router.replace({ query: { ...route.query, tab: val } })
-  },
 })
 
 const contributeSubModeOptions = computed(() => [

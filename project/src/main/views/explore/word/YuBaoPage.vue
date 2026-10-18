@@ -95,51 +95,11 @@
             </Teleport>
           </div>
         </div>
-
-        <!-- 视图模式选择器 -->
-        <div class="view-mode-selector">
-          <button
-              class="mode-btn"
-              :class="{ active: viewMode === 'table' }"
-              @click="viewMode = 'table'"
-              :title="t('words.yuBaoPage.viewModes.table')"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="18" height="18" rx="2"/>
-              <line x1="3" y1="9" x2="21" y2="9"/>
-              <line x1="3" y1="15" x2="21" y2="15"/>
-              <line x1="9" y1="9" x2="9" y2="21"/>
-              <line x1="15" y1="9" x2="15" y2="21"/>
-            </svg>
-          </button>
-
-          <button
-              class="mode-btn"
-              :class="{ active: viewMode === 'card' }"
-              @click="viewMode = 'card'"
-              :title="t('words.yuBaoPage.viewModes.card')"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="7" height="7" rx="1"/>
-              <rect x="14" y="3" width="7" height="7" rx="1"/>
-              <rect x="3" y="14" width="7" height="7" rx="1"/>
-              <rect x="14" y="14" width="7" height="7" rx="1"/>
-            </svg>
-          </button>
-
-          <button
-              class="mode-btn"
-              :class="{ active: viewMode === 'map' }"
-              @click="viewMode = 'map'"
-              :title="t('words.yuBaoPage.viewModes.map')"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-              <circle cx="12" cy="10" r="3"/>
-            </svg>
-          </button>
-        </div>
       </div>
+    </div>
+
+    <div class="condition-bar">
+      <ResultViewSwitcher v-model="viewMode" label-prefix="words.yuBaoPage.viewModes" />
     </div>
 
     <!-- 内容区 -->
@@ -356,6 +316,7 @@ import { watchDebounced } from '@vueuse/core'
 import YuBaoMap from '@/main/components/map/YuBaoMap.vue'
 import AppModal from '@/components/common/AppModal.vue'
 import BarIcon from '@/components/common/BarIcon.vue'
+import ResultViewSwitcher from '@/components/common/ResultViewSwitcher.vue'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 import { useStorageState } from '@/composables/core/useStorageState.js'
 
@@ -1139,35 +1100,11 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 }
 
 /* 视图模式选择器 */
-.view-mode-selector {
+.condition-bar {
   display: flex;
-  flex-shrink: 0;
-  gap: 4px;
-
-  @include segmented-shell;
-}
-
-.mode-btn {
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  color: $text-secondary;
-  cursor: pointer;
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-sm2);
-  transition: all $transition-control $ease-standard;
-
-  @include flex-center;
-
-  &:hover:not(.active) {
-    color: $text-primary;
-    background: rgba(0, 0, 0, 0.04);
-  }
-
-  &.active {
-    @include control-active;
-  }
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-bottom: 16px;
 }
 
 /* 内容区 */
