@@ -34,7 +34,7 @@
 
             <button
               v-if="canShowRefreshVocabularyPermission"
-              class="action-btn action-btn--sm"
+              class="pill-btn"
               type="button"
               :disabled="isLoadingVocabularyMe"
               @click="refreshVocabularyMe"
@@ -43,7 +43,15 @@
                 :size="16"
                 aria-hidden="true"
               />
-              {{ t('words.wordList.access.refreshPermission') }}
+              {{ vocabularyPermissionLabel }}
+            </button>
+
+            <button
+              class="pill-btn"
+              type="button"
+              @click="showLicense = true"
+            >
+              © {{ t('words.wordList.upload.licenseButton') }}
             </button>
           </div>
         </div>
@@ -462,6 +470,50 @@
       </template>
     </AppModal>
 
+    <AppModal
+      :model-value="showLicense"
+      size="lg"
+      :title="t('words.wordList.upload.license.title')"
+      :close-label="t('common.button.close')"
+      @update:modelValue="showLicense = false"
+    >
+      <div class="license-content">
+        <h4>{{ t('words.wordList.upload.license.sectionProject') }}</h4>
+        <p>{{ t('words.wordList.upload.license.projectIntro') }}</p>
+        <p>{{ t('words.wordList.upload.license.collaboration') }}</p>
+        <h4>{{ t('words.wordList.upload.license.sectionLicense') }}</h4>
+        <p>{{ t('words.wordList.upload.license.intro') }}</p>
+        <p>
+          <a
+            class="license-link"
+            :href="t('words.wordList.upload.license.linkHref')"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {{ t('words.wordList.upload.license.linkText') }}
+          </a>
+        </p>
+        <p>{{ t('words.wordList.upload.license.agreement') }}</p>
+        <p>
+          {{ t('words.wordList.upload.license.contact') }}
+          <button type="button" class="license-contact-btn" @click="navigateToContactAuthor">
+            {{ t('words.wordList.upload.license.contactAction') }}
+          </button>
+          {{ t('words.wordList.upload.license.contactExternal') }}
+          <button type="button" class="license-contact-btn" @click="navigateToSupportAuthor">
+            {{ t('words.wordList.upload.license.contactExternalAction') }}
+          </button>
+          {{ t('words.wordList.upload.license.contactExternalSuffix') }}
+        </p>
+      </div>
+
+      <template #footer>
+        <button class="glass-button" data-variant="primary" type="button" @click="showLicense = false">
+          {{ t('tools.checkTool.help.gotIt') }}
+        </button>
+      </template>
+    </AppModal>
+
   </div>
 </template>
 
@@ -519,6 +571,17 @@ const shouldShowPermissionRequest = computed(() => (
 const canShowRefreshVocabularyPermission = computed(() => (
   props.isAuthReady && props.isAuthenticated && Boolean(refreshVocabularyMe)
 ))
+const VOCABULARY_PERMISSION_LABEL_KEYS = {
+  manage: 'words.wordList.access.permissionLabels.manage',
+  edit: 'words.wordList.access.permissionLabels.edit',
+  one: 'words.wordList.access.permissionLabels.one',
+  two: 'words.wordList.access.permissionLabels.two',
+  three: 'words.wordList.access.permissionLabels.three',
+}
+const vocabularyPermissionLabel = computed(() => {
+  const key = VOCABULARY_PERMISSION_LABEL_KEYS[props.vocabularyMe?.permission_level]
+  return key ? t(key) : t('words.wordList.access.noPermission')
+})
 const uploadAccessNotice = computed(() => {
   if (isWaitingForAuth.value) return t('words.wordList.access.loadingDesc')
   if (requiresLogin.value) return t('words.wordList.access.loginUploadDesc')
@@ -550,9 +613,25 @@ function navigateToSuggestion() {
   })
 }
 
+function navigateToContactAuthor() {
+  showLicense.value = false
+  router.push({
+    path: buildLocalePath(resolveRouteLocale(route), '/menu/about/suggestion'),
+    query: {
+      from: 'vocabulary_import',
+    },
+  })
+}
+
+function navigateToSupportAuthor() {
+  showLicense.value = false
+  router.push(buildLocalePath(resolveRouteLocale(route), '/menu/about/like'))
+}
+
 const isUploading = ref(false)
 const isPreviewingImport = ref(false)
 const showFormatHelp = ref(false)
+const showLicense = ref(false)
 const backendPreview = ref(null)
 const isOverwriteConfirmed = ref(false)
 const importResult = ref(null)

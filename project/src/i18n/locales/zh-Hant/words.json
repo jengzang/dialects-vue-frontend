@@ -49,11 +49,11 @@
       "refreshCooldown": "請 {seconds} 秒之後再刷新",
       "noPermission": "無權限",
       "permissionLabels": {
-        "manage": "詞表管理員",
-        "edit": "詞表貢獻者(不限制數量）",
-        "one": "詞表貢獻者(1個)",
-        "two": "詞表貢獻者(2個)",
-        "three": "詞表貢獻者(3個)"
+        "manage": "管理員",
+        "edit": "協作者",
+        "one": "協作者(1)",
+        "two": "協作者(2)",
+        "three": "協作者(3)"
       },
       "loginManageTitle": "登入後管理詞表",
       "loginManageDesc": "詞表管理、地點元數據和操作日誌需要登入後查看。",
@@ -231,6 +231,23 @@
       "downloadSample": "下載示例文件",
       "formatHelp": "格式說明",
       "formatHelpTitle": "詞彙上傳格式說明",
+      "licenseButton": "簡介",
+      "license": {
+        "title": "詞表簡介",
+        "sectionProject": "項目簡介",
+        "sectionLicense": "開源協議",
+        "projectIntro": "「詞表」頁面是方音圖鑑的在線詞表協作平台，用於整理、展示和檢索各方言點的詞彙。傳統協作往往需要進群提交表格、由負責人統一入庫，任何細小改動都要重新上傳整份文件；本站希望提供一種更輕便的方式：在線協作、上傳便捷、改動即時生效。",
+        "collaboration": "方言數字化最難的是從 0 到 1 的基礎設施建設，本項目的初衷正源於此：先把詞表整理、校驗與共享的基礎打好，之後再靠大家的力量從 1 到 100 逐步豐富。希望未來有越來越多人參與進來，一起為方言詞彙的記錄、檢索與傳承盡一份力。",
+        "intro": "本站詞表資料以 CC BY-SA 4.0（知識共享 署名—相同方式共享 4.0 國際）協議公開發佈，允許在署名並以相同方式共享的前提下自由使用。",
+        "linkText": "查看 CC BY-SA 4.0 協議官方說明",
+        "linkHref": "https://creativecommons.org/licenses/by-sa/4.0/deed.zh-hant",
+        "agreement": "上傳詞表即視為你確認擁有所上傳內容的數據來源分享權利，並同意以 CC BY-SA 4.0 協議共享該詞表。",
+        "contact": "對協議或數據來源有疑問？想要使用「方音圖鑑」詞表數據？",
+        "contactAction": "站內聯繫作者",
+        "contactExternal": "，也可通過",
+        "contactExternalAction": "GitHub / 知乎",
+        "contactExternalSuffix": "聯繫作者"
+      },
       "formatHelpTable": {
         "title": "表格格式",
         "desc": "適用文件：.xlsx、.xls、.csv、.tsv",
