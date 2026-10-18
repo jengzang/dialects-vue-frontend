@@ -16,7 +16,7 @@
         </div>
 
         <button
-          v-if="deferQuery"
+          v-if="deferQuery && source !== 'character-notes'"
           class="query-submit glass-button"
           data-variant="primary"
           type="button"
@@ -43,9 +43,10 @@
               stroke-linejoin="round"
               aria-hidden="true"
             >
-              <path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5" />
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <span>{{ t('words.wordList.notes.refreshResults') }}</span>
+            <span>{{ t('common.button.search') }}</span>
           </ActionButton>
         </div>
 
@@ -334,8 +335,11 @@ const isNotesScopeResolving = ref(false)
 const isNotesScopeDisabled = ref(false)
 
 function refreshNotes() {
-  if (props.notesRefreshDisabled || isNotesScopeResolving.value || isNotesScopeDisabled.value) return
+  if (props.notesRefreshDisabled || isNotesScopeResolving.value || isNotesScopeDisabled.value || isComposing.value) return
+  clearTimeout(searchTimer)
+  emit('update:query', inputText.value)
   emit('refreshNotes')
+  if (props.deferQuery) emit('search')
 }
 
 const inputText = ref(props.query)
