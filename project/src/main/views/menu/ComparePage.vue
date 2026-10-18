@@ -459,6 +459,8 @@
         @update:run-disabled="uiStore.buttonStates.compare.isLocationDisabled = $event"
       />
 
+      <TutorialQuickStartPill :target="`compare:${currentTab}`" />
+
       <!-- 運行按鈕 -->
       <div class="run-container">
         <!-- Tab1, Tab2, Tab4 运行按钮 -->
@@ -531,6 +533,7 @@ import { useI18n } from 'vue-i18n'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import TabsContainer from "@/components/common/TabsContainer.vue";
 import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput.vue";
+import TutorialQuickStartPill from "@/main/components/tutorial/TutorialQuickStartPill.vue";
 import LocationMultiInput from "@/main/components/geo/LocationMultiInput.vue";
 import PhoneticCompare from "@/main/components/pho/PhoneticCompare.vue";
 import ZhongguSelector from "@/main/components/query/ZhongguSelector.vue";

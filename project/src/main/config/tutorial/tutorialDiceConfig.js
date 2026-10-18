@@ -1,3 +1,4 @@
+import { reactive } from 'vue'
 import { uiStore, zhongguInputMode } from '@/main/store/store.js'
 
 function createLocation(locations = ['廣州'], regions = [], regionUsing = 'yindian') {
@@ -106,17 +107,23 @@ const presets_tab3 = [
   },
 ]
 
-let diceIndex = 0
+// entryKey -> 下一组预置的 0-based 索引，骰子与页面上的快速开始按钮共用
+const diceCursor = reactive({})
 
-function createQueryTab2Payload() {
-  const config = presets_tab2[diceIndex % presets_tab2.length]
+function takeNextPreset(entryKey, total) {
+  const index = diceCursor[entryKey] ?? 0
+  diceCursor[entryKey] = (index + 1) % total
+  return index
+}
+
+function createQueryTab2Payload(entryKey) {
+  const config = presets_tab2[takeNextPreset(entryKey, presets_tab2.length)]
   const valuesMap = {}
   if (config.values) {
     for (const k in config.values) {
       valuesMap[k] = [...config.values[k]]
     }
   }
-  diceIndex++
   return {
     card: config.card,
     keys: [...config.keys],
@@ -126,15 +133,14 @@ function createQueryTab2Payload() {
   }
 }
 
-function createQueryTab2DirectPayload() {
-  const config = presets_tab2[diceIndex % presets_tab2.length]
+function createQueryTab2DirectPayload(entryKey) {
+  const config = presets_tab2[takeNextPreset(entryKey, presets_tab2.length)]
   const valuesMap = {}
   if (config.values) {
     for (const k in config.values) {
       valuesMap[k] = [...config.values[k]]
     }
   }
-  diceIndex++
   return {
     mode: 'direct',
     card: config.card,
@@ -144,9 +150,8 @@ function createQueryTab2DirectPayload() {
   }
 }
 
-function createQueryTab3Payload() {
-  const config = presets_tab3[diceIndex % presets_tab3.length]
-  diceIndex++
+function createQueryTab3Payload(entryKey) {
+  const config = presets_tab3[takeNextPreset(entryKey, presets_tab3.length)]
   return {
     card: config.card,
     keys: [...config.keys],
@@ -281,11 +286,12 @@ export const tutorialDiceConfig = {
     buttonKey: 'tutorial.assist.experience.queryZhonggu.button',
     target: 'query:tab2',
     when: shouldEnableCharacterDice,
+    presetCount: presets_tab2.length,
     createPayload: () => {
       if (zhongguInputMode.value === 'direct') {
-        return createQueryTab2DirectPayload()
+        return createQueryTab2DirectPayload('menu-query-zhonggu')
       }
-      return createQueryTab2Payload()
+      return createQueryTab2Payload('menu-query-zhonggu')
     },
   },
   'menu-query-yinwei': {
@@ -295,7 +301,8 @@ export const tutorialDiceConfig = {
     buttonKey: 'tutorial.assist.experience.queryYinwei.button',
     target: 'query:tab3',
     when: shouldEnableCharacterDice,
-    createPayload: createQueryTab3Payload,
+    presetCount: presets_tab3.length,
+    createPayload: () => createQueryTab3Payload('menu-query-yinwei'),
   },
   'menu-query-tone': {
     enabled: true,
@@ -336,4 +343,26 @@ export const tutorialDiceConfig = {
     target: 'compare:tab4',
     createPayload: createCompareTab4Payload,
   },
+}
+
+export function getTutorialDiceEntryByTarget(target) {
+  const entryKey = Object.keys(tutorialDiceConfig).find((key) => {
+    const entry = tutorialDiceConfig[key]
+    return entry.enabled && entry.target === target
+  })
+
+  return entryKey ? { key: entryKey, ...tutorialDiceConfig[entryKey] } : null
+}
+
+// 只有多组预置时才返回进度；单组返回 null，按钮不显示数字
+export function getTutorialDicePresetState(entryKey) {
+  const total = tutorialDiceConfig[entryKey]?.presetCount ?? 0
+  if (total <= 1) {
+    return null
+  }
+
+  return {
+    index: (diceCursor[entryKey] ?? 0) + 1,
+    total,
+  }
 }

@@ -226,6 +226,8 @@
           :limitContext="locationLimitContext"
       />
 
+      <TutorialQuickStartPill :target="`query:${currentTab}`" />
+
       <!-- ✅ 炫酷按鈕 -->
       <div class="run-container">
         <button
@@ -265,6 +267,7 @@ import {useRoute, useRouter} from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import TabsContainer from "@/components/common/TabsContainer.vue";
 import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput.vue";
+import TutorialQuickStartPill from "@/main/components/tutorial/TutorialQuickStartPill.vue";
 import ZhongguSelector from "@/main/components/query/ZhongguSelector.vue";
 import ZhongGuDirectInput from "@/main/components/query/ZhongGuDirectInput.vue";
 import YinweiSelector from "@/main/components/query/YinweiSelector.vue";
