@@ -18,7 +18,11 @@
     </div>
 
     <!-- Tab Switcher -->
-    <TabSwitcher
+    <TabsContainer
+      mode="segmented"
+      navigation-only
+      :use-router="false"
+      :aria-label="$t('auth.profile.buttons.modifyProfile')"
       :tabs="tabs"
       :modelValue="modeType"
       @update:modelValue="$emit('update:modeType', $event)"
@@ -105,7 +109,7 @@ import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import FormInput from './FormInput.vue'
-import TabSwitcher from './TabSwitcher.vue'
+import TabsContainer from '@/components/common/TabsContainer.vue'
 import UserAvatarEditor from './UserAvatarEditor.vue'
 
 const { t, te } = useI18n()
@@ -148,8 +152,8 @@ const avatarEditText = computed(() => (
 ))
 
 const tabs = computed(() => [
-  { label: '👤 ' + t('auth.modifyProfile.tabs.username'), value: 'username' },
-  { label: '🔒 ' + t('auth.modifyProfile.tabs.password'), value: 'password' }
+  { label: '👤 ' + t('auth.modifyProfile.tabs.username'), name: 'username' },
+  { label: '🔒 ' + t('auth.modifyProfile.tabs.password'), name: 'password' }
 ])
 
 const localNewUsername = ref('')
