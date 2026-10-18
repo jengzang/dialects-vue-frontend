@@ -77,13 +77,25 @@
                                                        target="_blank" rel="noopener noreferrer" class="thanks-link">{{ $t('about.thanks.mcpdictData') }}</a>
             </li>
             <li>
-              ✔ <a href="https://jyutjam.org/" target="_blank" rel="noopener noreferrer"
-                   class="thanks-link">{{ $t('about.thanks.jyutjam') }}</a> - {{ $t('about.thanks.jyutjamDesc') }}<a href="https://jyutdict.org/"
-                                                                                                                    target="_blank" rel="noopener noreferrer" class="thanks-link">{{ $t('about.thanks.jyutdict') }}</a>
+              ✔ <RouterLink :to="localeTo('/menu/vocabulary')" class="thanks-link">{{ $t('about.thanks.contributors') }}</RouterLink>
+              - {{ $t('about.thanks.contributorsDesc') }}
             </li>
             <li>
               ✔ <a href="https://zhongguoyuyan.cn/" target="_blank" rel="noopener noreferrer"
                    class="thanks-link">{{ $t('about.thanks.yuyan') }}</a> - {{ $t('about.thanks.yuyanDesc') }}
+            </li>
+            <li>
+              ✔ <a href="https://zhuanlan.zhihu.com/p/1890022649830290824" target="_blank" rel="noopener noreferrer"
+                   class="thanks-link">{{ $t('about.thanks.quanyue') }}</a> - {{ $t('about.thanks.quanyueDesc') }}
+            </li>
+            <li>
+              ✔ <a href="https://dmfw.mca.gov.cn/" target="_blank" rel="noopener noreferrer"
+                   class="thanks-link">{{ $t('about.thanks.diming') }}</a> - {{ $t('about.thanks.dimingDesc') }}
+            </li>
+            <li>
+              ✔ <a href="https://jyutjam.org/" target="_blank" rel="noopener noreferrer"
+                   class="thanks-link">{{ $t('about.thanks.jyutjam') }}</a> - {{ $t('about.thanks.jyutjamDesc') }}<a href="https://jyutdict.org/"
+                                                                                                                    target="_blank" rel="noopener noreferrer" class="thanks-link">{{ $t('about.thanks.jyutdict') }}</a>
             </li>
             <li>
               ✔ <a href="https://xiaoxue.iis.sinica.edu.tw/ccrdata/" target="_blank" rel="noopener noreferrer"
