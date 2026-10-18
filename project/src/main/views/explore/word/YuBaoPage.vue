@@ -5,6 +5,17 @@
       {{ activePageTitle }}
     </h1>
 
+    <QuerySearchEntrance
+      :query="currentInputValue"
+      :query-key="activeTab"
+      :title="activePageTitle"
+      :placeholder="t(activeTab === 'vocabulary' ? 'words.yuBaoPage.search.vocabularyPlaceholder' : 'words.yuBaoPage.search.grammarPlaceholder')"
+      :disabled="isLoading"
+      :get-suggestions="getEntranceSuggestions"
+      :validate-query="validateEntranceQuery"
+      :validation-hint="t('words.yuBaoPage.states.chooseSuggestion')"
+      @submit="submitEntranceQuery"
+    >
     <!-- 顶部控制栏 -->
     <div class="top-controls">
       <!-- Tab 切换 + 查看全部按钮 -->
@@ -302,6 +313,7 @@
         {{ t('words.yuBaoPage.modal.total', { count: filteredAllItems.length }) }}
       </div>
     </AppModal>
+    </QuerySearchEntrance>
   </div>
 </template>
 
@@ -317,6 +329,7 @@ import YuBaoMap from '@/main/components/map/YuBaoMap.vue'
 import AppModal from '@/components/common/AppModal.vue'
 import BarIcon from '@/components/common/BarIcon.vue'
 import ResultViewSwitcher from '@/components/common/ResultViewSwitcher.vue'
+import QuerySearchEntrance from '@/components/common/QuerySearchEntrance.vue'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 import { useStorageState } from '@/composables/core/useStorageState.js'
 
@@ -558,6 +571,24 @@ function localMatch(query, dataArray) {
 
   // 限制返回数量（最多50条）
   return matches.slice(0, 50)
+}
+
+function getEntranceSuggestions(query) {
+  return localMatch(query, activeTab.value === 'vocabulary' ? allVocabulary.value : allGrammar.value)
+}
+
+function validateEntranceQuery(query) {
+  return (activeTab.value === 'vocabulary' ? allVocabulary.value : allGrammar.value).includes(query)
+}
+
+function submitEntranceQuery(query) {
+  if (activeTab.value === 'vocabulary') {
+    vocabularyInput.value = query
+  } else {
+    grammarInput.value = query
+  }
+  vocabularySuggestions.value = []
+  grammarSuggestions.value = []
 }
 
 // 词汇输入处理

@@ -95,7 +95,7 @@
   margin: 0 auto;
 }
 
-.vocabulary-view-page > .content-area {
+.vocabulary-view-page :deep(.query-compact) > .content-area {
   min-height: 300px;
   // max-height: 70dvh;
   padding: 0;

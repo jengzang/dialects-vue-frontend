@@ -207,7 +207,15 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior() {
+  scrollBehavior(to, from) {
+    if (
+      to.path === from.path
+      && stripLocaleFromPath(to.path) === '/menu/vocabulary/view'
+      && to.query.source !== 'character-notes'
+      && to.query.source === from.query.source
+    ) {
+      return false
+    }
     return { top: 0 }
   }
 })

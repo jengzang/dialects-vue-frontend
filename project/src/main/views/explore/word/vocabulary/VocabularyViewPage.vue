@@ -1,5 +1,13 @@
 <template>
   <div class="vocabulary-view-page">
+    <QuerySearchEntrance
+      :enabled="!isCharacterNotesMode"
+      :query="activeQuery"
+      :query-key="source"
+      :title="t('navigation.pageTitles.vocabulary.view')"
+      :placeholder="t('words.wordList.search.placeholder')"
+      @submit="activeQuery = $event"
+    >
     <VocabularyTopControls
       v-model:source="source"
       v-model:query="activeQuery"
@@ -460,7 +468,7 @@
       :loading="notesLocationPopup.loading"
       @close="closeNotesLocationPopup"
     />
-
+    </QuerySearchEntrance>
   </div>
 </template>
 
@@ -485,6 +493,7 @@ import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopu
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 import VocabularyMap from '@/main/components/map/VocabularyMap.vue'
 import VocabularyTopControls from './VocabularyTopControls.vue'
+import QuerySearchEntrance from '@/components/common/QuerySearchEntrance.vue'
 
 const { t } = useI18n()
 const route = useRoute()
