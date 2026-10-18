@@ -868,6 +868,18 @@ export default {
   margin-bottom: 1.5dvh;
 }
 
+@media (max-aspect-ratio: 1/1) {
+  .tab-content-inner {
+    padding-bottom: calc(1rem + 8dvh);
+  }
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .tab-content-inner {
+    padding-bottom: calc(1rem + 4dvh);
+  }
+}
+
 
 @keyframes fade {
   from {

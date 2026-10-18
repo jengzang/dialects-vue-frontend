@@ -777,6 +777,10 @@ watch(
 
   }
 
+  .action-btn {
+    margin-top: 12px;
+  }
+
   /* 竖屏 */
   @media (max-aspect-ratio: 1/1) {
     .input-section {

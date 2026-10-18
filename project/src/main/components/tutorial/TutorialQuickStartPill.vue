@@ -66,7 +66,7 @@ function apply() {
 <style lang="scss" scoped>
 .tutorial-quick-start {
   align-self: center;
-  margin-top: 1.5dvh;
+  // margin-top: 1.5dvh;
 }
 
 .tutorial-quick-start__progress {

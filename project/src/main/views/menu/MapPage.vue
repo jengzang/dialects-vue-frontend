@@ -345,6 +345,18 @@ $transition-base: 0.3s;
   margin-bottom: 1.5dvh;
 }
 
+@media (max-aspect-ratio: 1/1) {
+  .tab-content--divide {
+    padding-bottom: calc(1rem + 8dvh);
+  }
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .tab-content--divide {
+    padding-bottom: calc(1rem + 4dvh);
+  }
+}
+
 /* 地图上方的特征控制区 */
 .feature-control-area {
   position: relative;

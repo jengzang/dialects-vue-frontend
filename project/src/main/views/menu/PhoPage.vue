@@ -122,4 +122,16 @@ const resolveTabRoute = (tabName) => {
 .page-title {
   margin-bottom: 1.5dvh;
 }
+
+@media (max-aspect-ratio: 1/1) {
+  .pho-content {
+    padding-bottom: 8dvh;
+  }
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .pho-content {
+    padding-bottom: 4dvh;
+  }
+}
 </style>
