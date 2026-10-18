@@ -1,0 +1,86 @@
+@use './mixins' as *;
+
+.ui-tab-item {
+  appearance: none;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--text-dark);
+  white-space: nowrap;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  background: transparent;
+  border: 0;
+  transition: color 0.2s ease, background-color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    color: var(--color-primary-hover);
+    background: var(--bg-hover-light);
+  }
+
+  &.active {
+    color: var(--color-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--border-control-focus);
+    outline-offset: -2px;
+  }
+
+  &:disabled {
+    @include disabled-state;
+  }
+}
+
+.ui-tabs-navigation--underline {
+  border-bottom: 1px solid var(--border-control);
+
+  .ui-tab-item {
+    border-bottom: 3px solid transparent;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+
+    &.active {
+      border-bottom-color: var(--color-primary);
+    }
+  }
+}
+
+.ui-tabs-navigation--adaptive {
+  @include glass-blur(60px, 200%);
+  background: var(--surface-glass-floating);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card-sm);
+
+  .ui-tab-item {
+    font-size: 14px;
+    color: var(--text-secondary);
+    border-radius: var(--radius-sm2);
+
+    &.active {
+      color: var(--color-primary);
+      background: var(--surface-elevation-0);
+      box-shadow: var(--shadow-sm);
+      font-weight: 600;
+    }
+  }
+}
+
+@media (max-aspect-ratio: 1 / 1) {
+  .ui-tab-item {
+    font-size: 14px;
+  }
+
+  .ui-tabs-navigation--adaptive .ui-tab-item {
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-tab-item {
+    transition: none;
+  }
+}

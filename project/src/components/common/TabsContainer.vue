@@ -1,23 +1,47 @@
 <template>
-  <div class="tabs-wrapper">
-    <div class="tabs ui-scrollbar--hidden">
+  <div :class="['tabs-wrapper', `tabs-wrapper--${mode}`]">
+    <div :class="['tabs-navigation', 'ui-tabs-navigation', `ui-tabs-navigation--${mode}`]">
       <!-- 额外的 tab 左侧内容插槽 -->
       <slot name="tab-extra"></slot>
-      <div
-        v-for="tab in tabs"
-        :key="tab.name"
-        :class="['tab', { active: currentTab === tab.name }]"
-        @click="handleTabClick(tab.name)"
+      <nav
+        ref="tabList"
+        class="tabs ui-scrollbar--hidden"
+        :role="useRouter ? undefined : 'tablist'"
+        :aria-orientation="useRouter ? undefined : mode === 'adaptive' && !isPortrait ? 'vertical' : 'horizontal'"
       >
-        {{ tab.label }}
-      </div>
+        <component
+          :is="useRouter && !tab.disabled ? RouterLink : 'button'"
+          v-for="tab in tabs"
+          :id="tabId(tab.name)"
+          :key="tab.name"
+          :to="useRouter && !tab.disabled ? resolveTabLocation(tab.name) : undefined"
+          :replace="useRouter && !tab.disabled ? true : undefined"
+          :type="!useRouter || tab.disabled ? 'button' : undefined"
+          :class="['tab', 'ui-tab-item', { active: currentTab === tab.name }]"
+          :disabled="tab.disabled || undefined"
+          :role="useRouter ? undefined : 'tab'"
+          :aria-current="useRouter && currentTab === tab.name ? 'page' : undefined"
+          :aria-selected="useRouter ? undefined : currentTab === tab.name"
+          :aria-controls="useRouter ? undefined : panelId"
+          :tabindex="useRouter ? undefined : tab.name === focusableTab ? 0 : -1"
+          @click="handleTabClick(tab, $event)"
+          @keydown="handleTabKeydown"
+        >
+          {{ tab.label }}
+        </component>
+      </nav>
     </div>
 
     <div v-if="$slots.header" class="tabs-header">
       <slot name="header"></slot>
     </div>
 
-    <div class="tab-content">
+    <div
+      :id="panelId"
+      class="tab-content"
+      :role="useRouter ? undefined : 'tabpanel'"
+      :aria-labelledby="useRouter ? undefined : tabId(currentTab)"
+    >
       <!-- 使用具名插槽渲染每个 tab 的内容 -->
       <slot :current-tab="currentTab"></slot>
     </div>
@@ -25,13 +49,16 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useRoute, useRouter as useVueRouter } from 'vue-router'
-
-const { t } = useI18n()
+import { computed, ref, useId, watch } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
+import { useMediaQuery } from '@vueuse/core'
 
 const props = defineProps({
+  mode: {
+    type: String,
+    default: 'underline',
+    validator: (value) => ['underline', 'adaptive'].includes(value)
+  },
   // Tab 配置数组: [{ name: 'tab1', label: '标签1' }, ...]
   tabs: {
     type: Array,
@@ -75,7 +102,11 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'tab-change'])
 
 const route = useRoute()
-const router = useVueRouter()
+const tabList = ref(null)
+const isPortrait = useMediaQuery('(max-aspect-ratio: 1 / 1)')
+const id = useId()
+const panelId = `${id}-panel`
+const tabId = (name) => `${id}-tab-${name}`
 
 // 计算当前选中的 tab
 const currentTab = computed(() => {
@@ -86,91 +117,90 @@ const currentTab = computed(() => {
   }
 })
 
-// 处理 tab 点击
-const handleTabClick = (tabName) => {
-  if (props.useRouter) {
-    const location = typeof props.resolveRoute === 'function'
-      ? props.resolveRoute(tabName, route)
-      : { query: { ...route.query, sub: tabName } }
+const focusableTab = computed(() => {
+  const enabled = props.tabs.filter(tab => !tab.disabled)
+  return enabled.find(tab => tab.name === currentTab.value)?.name || enabled[0]?.name
+})
 
-    router.replace(location)
+const resolveTabLocation = (tabName) => {
+  return typeof props.resolveRoute === 'function'
+    ? props.resolveRoute(tabName, route)
+    : { query: { ...route.query, sub: tabName } }
+}
+
+// 路由链接自行 replace；内部切换由父页面接收事件后处理。
+const handleTabClick = (tab, event) => {
+  if (tab.disabled) return
+  if (props.useRouter && (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button > 0)) {
+    return
   }
 
-  emit('update:modelValue', tabName)
-  emit('tab-change', tabName)
+  emit('update:modelValue', tab.name)
+  emit('tab-change', tab.name)
 }
+
+const handleTabKeydown = (event) => {
+  if (props.useRouter) return
+  const enabled = [...tabList.value.querySelectorAll('[role="tab"]:not(:disabled)')]
+  const index = enabled.indexOf(event.currentTarget)
+  if (index < 0) return
+  const vertical = window.getComputedStyle(tabList.value).flexDirection === 'column'
+  const previous = vertical ? 'ArrowUp' : 'ArrowLeft'
+  const next = vertical ? 'ArrowDown' : 'ArrowRight'
+  let target
+  if (event.key === previous) target = enabled[(index - 1 + enabled.length) % enabled.length]
+  else if (event.key === next) target = enabled[(index + 1) % enabled.length]
+  else if (event.key === 'Home') target = enabled[0]
+  else if (event.key === 'End') target = enabled.at(-1)
+  if (!target) return
+  event.preventDefault()
+  target.focus()
+}
+
+watch(currentTab, () => {
+  const nav = tabList.value
+  const active = nav?.querySelector('.active')
+  if (!active || nav.scrollWidth <= nav.clientWidth) return
+  const left = active.offsetLeft
+  if (left < nav.scrollLeft) nav.scrollTo?.({ left })
+  else if (left + active.offsetWidth > nav.scrollLeft + nav.clientWidth) {
+    nav.scrollTo?.({ left: left + active.offsetWidth - nav.clientWidth })
+  }
+}, { flush: 'post' })
 </script>
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
 
-$primary-blue: var(--color-primary);
-$text-default: var(--text-dark);
-$white: var(--text-white);
-$transition-duration: 0.5s;
-
 .tabs-wrapper {
   @include flex-col;
   align-items: center;
   width: 100%;
-  min-height: 80dvh;
+  min-width: 0;
   padding: 0;
+}
+
+.tabs-navigation {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 100%;
+  margin-bottom: 12px;
 }
 
 .tabs {
   display: flex;
   flex-wrap: nowrap;
   gap: 16px;
-  justify-content: flex-start;
+  min-width: 0;
   max-width: 100%;
-  padding: 3px 8px 12px 8px;
   overflow-x: auto;
-
-  @media (max-width: 600px) {
-    gap: 6px;
-    padding: 2px 6px 8px 6px;
-  }
+  position: relative;
 }
 
 .tab {
   flex-shrink: 0;
-  padding: 12px 24px;
-  color: $text-default;
-  font-size: 16px;
-  font-weight: 500;
-  white-space: nowrap;
-  cursor: pointer;
-  user-select: none;
-  background: var(--glass-05);
-  border: 1px solid $primary-blue;
-  border-radius: var(--radius-lg);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  transition: all $transition-duration ease;
-
-  &:hover {
-    color: var(--color-primary-hover);
-    background: var(--glass-10);
-  }
-
-  &.active {
-    color: var(--action-primary-text);
-    background: rgba(var(--color-primary-rgb), 0.7);
-    box-shadow: 0 4px 20px rgba(var(--color-primary-rgb), 0.3);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-
-    &:hover {
-      background: rgba(var(--color-primary-hover-rgb), 0.7);
-      box-shadow: 0 4px 20px rgba(var(--color-primary-hover-rgb), 0.3);
-    }
-  }
-
-  @media (max-width: 600px) {
-    padding: 12px 14px;
-    font-size: 14px;
-    border-radius: var(--radius-md);
-  }
+  padding: 12px 8px;
 }
 
 .tabs-header {
@@ -179,22 +209,74 @@ $transition-duration: 0.5s;
 }
 
 .tab-content {
-  display: flex;
+  @include flex-col;
   flex: 1;
-  flex-direction: column;
   width: 100%;
-  animation: fade 0.6s ease;
+  min-width: 0;
 }
 
-@keyframes fade {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+.tabs-wrapper--adaptive {
+  box-sizing: border-box;
+  padding-left: calc(136px + 2rem);
+
+  .tabs-navigation {
+    @include flex-col;
+    align-items: stretch;
+    position: fixed;
+    top: 140px;
+    left: 2rem;
+    width: 136px;
+    max-height: calc(100dvh - 160px);
+    overflow-y: auto;
+    padding: 4px;
+    z-index: 100;
   }
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  .tabs {
+    @include flex-col;
+    gap: 4px;
+  }
+
+  .tab {
+    padding: 12px 16px;
+  }
+
+  .tab-content {
+    align-items: center;
+  }
+}
+
+@media (max-aspect-ratio: 1 / 1) {
+  .tabs {
+    gap: 6px;
+  }
+
+  .tab {
+    padding: 10px 8px;
+  }
+
+  .tabs-wrapper--adaptive {
+    padding-left: 0;
+
+    .tabs-navigation {
+      position: static;
+      flex-direction: row;
+      width: 100%;
+      max-height: none;
+      overflow-y: visible;
+      box-sizing: border-box;
+    }
+
+    .tabs {
+      flex-direction: row;
+      flex: 1;
+      gap: 4px;
+    }
+
+    .tab {
+      flex: 1 0 auto;
+      padding: 10px 8px;
+    }
   }
 }
 </style>
