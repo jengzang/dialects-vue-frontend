@@ -53,8 +53,8 @@
 </template>
 
 <script setup>
-import { computed, ref, useId, watch } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
+import { computed, inject, ref, useId, watch } from 'vue'
+import { RouterLink, routeLocationKey } from 'vue-router'
 import { useMediaQuery } from '@vueuse/core'
 
 const props = defineProps({
@@ -123,7 +123,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'tab-change'])
 
-const route = useRoute()
+const route = inject(routeLocationKey, undefined)
 const tabList = ref(null)
 const isPortrait = useMediaQuery('(max-aspect-ratio: 1 / 1)')
 const id = useId()
@@ -328,10 +328,11 @@ watch(currentTab, () => {
 
 .tabs-wrapper--navigation-only {
   display: inline-flex;
+  flex-shrink: 0;
   width: auto;
   max-width: 100%;
   vertical-align: middle;
 
-  .tabs-navigation { margin-bottom: 0; }
+  .tabs-navigation { margin-bottom: 0; box-sizing: border-box; }
 }
 </style>

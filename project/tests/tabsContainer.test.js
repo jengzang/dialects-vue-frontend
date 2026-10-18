@@ -8,7 +8,7 @@ let app
 let host
 const settle = async () => { await Promise.resolve(); await nextTick(); await nextTick() }
 
-async function mountTabs(overrides = {}) {
+async function mountTabs(overrides = {}, withRouter = true) {
   const router = createRouter({
     history: createMemoryHistory(),
     routes: [{ path: '/:pathMatch(.*)*', component: { render: () => null } }],
@@ -44,7 +44,7 @@ async function mountTabs(overrides = {}) {
     }),
   })
   app.use(createI18n({ legacy: false, locale: 'zh-Hant', messages: {} }))
-  app.use(router)
+  if (withRouter) app.use(router)
   app.mount(host)
   await settle()
   return { props, router, update, change }
@@ -53,6 +53,14 @@ async function mountTabs(overrides = {}) {
 afterEach(() => { app?.unmount(); host?.remove(); vi.restoreAllMocks() })
 
 describe('TabsContainer modes and interaction', () => {
+  it('supports controlled switches without installing a router', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const { change } = await mountTabs({ mode: 'segmented', navigationOnly: true }, false)
+    host.querySelectorAll('.tab')[2].click()
+    expect(change).toHaveBeenCalledExactlyOnceWith('vowelspace')
+    expect(warn).not.toHaveBeenCalled()
+  })
+
   it('renders navigation-only segmented choices without dangling panels or layout content', async () => {
     const { props, update, change, router } = await mountTabs({
       mode: 'segmented', navigationOnly: true, ariaLabel: '分區', size: 'compact', variant: 'solid',
