@@ -1,13 +1,14 @@
 <template>
-  <div :class="['tabs-wrapper', `tabs-wrapper--${mode}`]">
-    <div :class="['tabs-navigation', 'ui-tabs-navigation', `ui-tabs-navigation--${mode}`]">
+  <div :class="['tabs-wrapper', `tabs-wrapper--${mode}`, { 'tabs-wrapper--navigation-only': navigationOnly }, `tabs-wrapper--${size}`]">
+    <div :class="['tabs-navigation', 'ui-tabs-navigation', `ui-tabs-navigation--${mode}`, `ui-tabs-navigation--${variant}`]">
       <!-- 额外的 tab 左侧内容插槽 -->
       <slot name="tab-extra"></slot>
       <nav
         ref="tabList"
         class="tabs ui-scrollbar--hidden"
-        :role="useRouter ? undefined : 'tablist'"
-        :aria-orientation="useRouter ? undefined : mode === 'adaptive' && !isPortrait ? 'vertical' : 'horizontal'"
+        :role="useRouter ? undefined : navigationOnly ? 'group' : 'tablist'"
+        :aria-label="ariaLabel || undefined"
+        :aria-orientation="useRouter || navigationOnly ? undefined : mode === 'adaptive' && !isPortrait ? 'vertical' : 'horizontal'"
       >
         <component
           :is="useRouter && !tab.disabled ? RouterLink : 'button'"
@@ -19,11 +20,13 @@
           :type="!useRouter || tab.disabled ? 'button' : undefined"
           :class="['tab', 'ui-tab-item', { active: currentTab === tab.name }]"
           :disabled="tab.disabled || undefined"
-          :role="useRouter ? undefined : 'tab'"
+          :role="useRouter || navigationOnly ? undefined : 'tab'"
           :aria-current="useRouter && currentTab === tab.name ? 'page' : undefined"
-          :aria-selected="useRouter ? undefined : currentTab === tab.name"
-          :aria-controls="useRouter ? undefined : panelId"
-          :tabindex="useRouter ? undefined : tab.name === focusableTab ? 0 : -1"
+          :aria-selected="useRouter || navigationOnly ? undefined : currentTab === tab.name"
+          :aria-pressed="!useRouter && navigationOnly ? currentTab === tab.name : undefined"
+          :aria-controls="useRouter || navigationOnly ? undefined : panelId"
+          :tabindex="useRouter || navigationOnly ? undefined : tab.name === focusableTab ? 0 : -1"
+          :data-label="mode === 'segmented' ? tab.label : undefined"
           @click="handleTabClick(tab, $event)"
           @keydown="handleTabKeydown"
         >
@@ -32,11 +35,12 @@
       </nav>
     </div>
 
-    <div v-if="$slots.header" class="tabs-header">
+    <div v-if="!navigationOnly && $slots.header" class="tabs-header">
       <slot name="header"></slot>
     </div>
 
     <div
+      v-if="!navigationOnly"
       :id="panelId"
       class="tab-content"
       :role="useRouter ? undefined : 'tabpanel'"
@@ -57,7 +61,25 @@ const props = defineProps({
   mode: {
     type: String,
     default: 'underline',
-    validator: (value) => ['underline', 'adaptive'].includes(value)
+    validator: (value) => ['underline', 'adaptive', 'segmented'].includes(value)
+  },
+  navigationOnly: {
+    type: Boolean,
+    default: false
+  },
+  size: {
+    type: String,
+    default: 'default',
+    validator: (value) => ['default', 'compact'].includes(value)
+  },
+  variant: {
+    type: String,
+    default: 'surface',
+    validator: (value) => ['surface', 'solid'].includes(value)
+  },
+  ariaLabel: {
+    type: String,
+    default: ''
   },
   // Tab 配置数组: [{ name: 'tab1', label: '标签1' }, ...]
   tabs: {
@@ -141,7 +163,7 @@ const handleTabClick = (tab, event) => {
 
 const handleTabKeydown = (event) => {
   if (props.useRouter) return
-  const enabled = [...tabList.value.querySelectorAll('[role="tab"]:not(:disabled)')]
+  const enabled = [...tabList.value.querySelectorAll('.ui-tab-item:not(:disabled)')]
   const index = enabled.indexOf(event.currentTarget)
   if (index < 0) return
   const vertical = window.getComputedStyle(tabList.value).flexDirection === 'column'
@@ -278,5 +300,38 @@ watch(currentTab, () => {
       padding: 10px 8px;
     }
   }
+}
+
+.tabs-wrapper--segmented {
+  .tabs-navigation { padding: 4px; }
+  .tabs { gap: 0; }
+  .tab { padding: 10px 16px; }
+
+  @media (max-aspect-ratio: 1 / 1) {
+    .tabs { gap: 8px; }
+    .tab { padding: 12px 6px; }
+  }
+
+  &.tabs-wrapper--compact {
+    .tabs { gap: 4px; }
+    .tab { min-width: 60px; padding: 3px 6px; }
+
+    @media (max-aspect-ratio: 1 / 1) {
+      .tab { min-width: 50px; padding: 4px 2px; }
+    }
+  }
+
+  @media (pointer: coarse) {
+    .tab { min-height: 44px; }
+  }
+}
+
+.tabs-wrapper--navigation-only {
+  display: inline-flex;
+  width: auto;
+  max-width: 100%;
+  vertical-align: middle;
+
+  .tabs-navigation { margin-bottom: 0; }
 }
 </style>

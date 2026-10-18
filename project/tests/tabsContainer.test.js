@@ -53,6 +53,36 @@ async function mountTabs(overrides = {}) {
 afterEach(() => { app?.unmount(); host?.remove(); vi.restoreAllMocks() })
 
 describe('TabsContainer modes and interaction', () => {
+  it('renders navigation-only segmented choices without dangling panels or layout content', async () => {
+    const { props, update, change, router } = await mountTabs({
+      mode: 'segmented', navigationOnly: true, ariaLabel: '分區', size: 'compact', variant: 'solid',
+    })
+    const group = host.querySelector('[role="group"]')
+    expect(group).not.toBeNull()
+    expect(group.getAttribute('aria-label')).toBe('分區')
+    expect(host.querySelector('.tab-content')).toBeNull()
+    expect(host.querySelector('.tabs-header')).toBeNull()
+    const buttons = group.querySelectorAll('button')
+    expect(buttons[0].getAttribute('type')).toBe('button')
+    expect(buttons[0].getAttribute('aria-pressed')).toBe('true')
+    expect(buttons[0].hasAttribute('aria-controls')).toBe(false)
+    expect(buttons[0].hasAttribute('role')).toBe(false)
+    buttons[0].focus()
+    buttons[0].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }))
+    expect(document.activeElement).toBe(buttons[2])
+    expect(change).not.toHaveBeenCalled()
+    buttons[1].click()
+    expect(change).not.toHaveBeenCalled()
+    buttons[2].click()
+    expect(update).toHaveBeenCalledExactlyOnceWith('vowelspace')
+    expect(change).toHaveBeenCalledExactlyOnceWith('vowelspace')
+    expect(buttons[0].getAttribute('aria-pressed')).toBe('true')
+    props.modelValue = 'vowelspace'
+    await settle()
+    expect(buttons[2].getAttribute('aria-pressed')).toBe('true')
+    expect(router.currentRoute.value.fullPath).toBe('/tools?keep=yes')
+  })
+
   it('defaults to underline and accepts adaptive without changing slot content', async () => {
     const { props } = await mountTabs()
     expect(host.querySelector('.tabs-wrapper--underline')).not.toBeNull()

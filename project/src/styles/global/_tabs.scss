@@ -79,8 +79,61 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
+.ui-tabs-navigation--segmented {
+  background: var(--bg-light);
+  border: 1px solid var(--border-gray);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-inset);
+
   .ui-tab-item {
+    display: inline-grid;
+    font-size: 16px;
+    line-height: normal;
+    border-radius: var(--radius-md);
+    transition: color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+
+    // Reserve the selected label's width without duplicating its accessible text.
+    &::after {
+      content: attr(data-label);
+      height: 0;
+      visibility: hidden;
+      font-weight: 600;
+    }
+
+    &.active {
+      color: var(--color-primary);
+      font-weight: 600;
+      background: var(--surface-elevation-0);
+      box-shadow: var(--shadow-sm);
+
+    }
+  }
+
+  &.ui-tabs-navigation--surface {
+    :root[data-color-theme='dark'] & .ui-tab-item.active {
+      background: var(--color-primary-light2);
+    }
+  }
+
+  &.ui-tabs-navigation--solid {
+    background: var(--bg-light-gray);
+    border-color: var(--border-medium);
+    border-radius: var(--radius-lg);
+
+    .ui-tab-item.active {
+      background: var(--color-primary);
+      color: var(--action-primary-text);
+      box-shadow: 0 0 0 1px var(--color-primary-shadow-light), 0 4px 12px var(--color-primary-shadow);
+    }
+  }
+}
+
+.tabs-wrapper--segmented.tabs-wrapper--compact .ui-tab-item {
+  font-size: 15px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-tabs-navigation .ui-tab-item {
     transition: none;
   }
 }
