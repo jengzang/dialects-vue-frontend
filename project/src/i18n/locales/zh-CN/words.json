@@ -68,8 +68,8 @@
     "search": {
       "label": "搜索",
       "placeholder": "搜索标准词、方言词、音标、详细释义",
-      "standardWordPlaceholder": "按标准词筛选地图",
-      "locationPlaceholder": "按地点筛选当前结果",
+      "standardWordPlaceholder": "按标准词筛选",
+      "locationPlaceholder": "按地点筛选",
       "fieldCount": "已选 {count} 列",
       "fields": {
         "all": "全部内容",

@@ -532,11 +532,13 @@ const uploadAccessNotice = computed(() => {
 const vocabTotalCount = ref(null)
 const vocabLocationCount = ref(null)
 
-onMounted(async () => {
+async function refreshVocabularyCounts() {
   const counts = await getVocabularyCounts()
-  vocabTotalCount.value = counts.total
-  vocabLocationCount.value = counts.locations
-})
+  if (counts.total != null) vocabTotalCount.value = counts.total
+  if (counts.locations != null) vocabLocationCount.value = counts.locations
+}
+
+onMounted(refreshVocabularyCounts)
 
 function navigateToSuggestion() {
   router.push({
@@ -1022,6 +1024,7 @@ async function handleImportAfterPreview() {
       overwrite: shouldConfirmOverwrite.value ? isOverwriteConfirmed.value : false,
       fill_standard_from_local: fillStandardFromLocal.value,
     })
+    void refreshVocabularyCounts()
     const importedCount = Number(response.imported_count) || 0
     const errors = parseErrorDetails(response.errors)
     const skippedCount = (Number(response.skipped_count) || 0) + errors.length

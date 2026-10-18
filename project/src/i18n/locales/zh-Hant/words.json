@@ -68,8 +68,8 @@
     "search": {
       "label": "搜索",
       "placeholder": "搜索標準詞、方言詞、音標、詳細釋義",
-      "standardWordPlaceholder": "按標準詞篩選地圖",
-      "locationPlaceholder": "按地點篩選當前結果",
+      "standardWordPlaceholder": "按標準詞篩選",
+      "locationPlaceholder": "按地點篩選",
       "fieldCount": "已選 {count} 列",
       "fields": {
         "all": "全部內容",

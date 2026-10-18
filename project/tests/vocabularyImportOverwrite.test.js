@@ -63,9 +63,15 @@ describe('vocabulary import feedback', () => {
     if (fails) mocks.uploadVocabulary.mockRejectedValue(new Error('上传失败'))
     else mocks.uploadVocabulary.mockResolvedValue({ imported_count: 1, skipped_count: 0, errors: ['第 3 行缺少字段'] })
 
+    mocks.getVocabularyCounts.mockResolvedValue({ total: 123, locations: 8 })
     await state.handleImportAfterPreview()
     await flush()
 
+    expect(mocks.getVocabularyCounts).toHaveBeenCalledTimes(fails ? 1 : 2)
+    if (!fails) {
+      expect(state.vocabTotalCount).toBe(123)
+      expect(state.vocabLocationCount).toBe(8)
+    }
     if (fails) {
       expect(state.uploadFile).toBe(file)
       expect(state.uploadLocation.location_name).toBe('甲村')
