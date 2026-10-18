@@ -54,7 +54,7 @@
         <div class="region-header"
              style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; margin-bottom: 6px; white-space: nowrap; gap: 4px;">
 
-          <TabsContainer
+          <TabSwitcher
               mode="segmented"
               size="compact"
               variant="solid"
@@ -199,7 +199,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import TabsContainer from '@/components/common/TabsContainer.vue'
+import TabSwitcher from '@/components/common/TabSwitcher.vue'
 import { ref, nextTick ,onMounted, onActivated, watch, computed, defineAsyncComponent, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getLocations, getCustomFeature, getLocationPartitions, batchMatch, getPartitions, resolvePartitions } from '@/api/index.js'

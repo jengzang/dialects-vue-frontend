@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createApp, h, nextTick, reactive } from 'vue'
 import { createI18n } from 'vue-i18n'
 import { createMemoryHistory, createRouter } from 'vue-router'
-import TabsContainer from '../src/components/common/TabsContainer.vue'
+import TabSwitcher from '../src/components/common/TabSwitcher.vue'
 
 let app
 let host
@@ -30,7 +30,7 @@ async function mountTabs(overrides = {}, withRouter = true) {
   host = document.createElement('div')
   document.body.append(host)
   app = createApp({
-    render: () => h(TabsContainer, {
+    render: () => h(TabSwitcher, {
       ...props,
       'onUpdate:modelValue': update,
       onTabChange: change,
@@ -52,7 +52,7 @@ async function mountTabs(overrides = {}, withRouter = true) {
 
 afterEach(() => { app?.unmount(); host?.remove(); vi.restoreAllMocks() })
 
-describe('TabsContainer modes and interaction', () => {
+describe('TabSwitcher modes and interaction', () => {
   it('supports controlled switches without installing a router', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     const { change } = await mountTabs({ mode: 'segmented', navigationOnly: true }, false)

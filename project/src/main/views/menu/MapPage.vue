@@ -1,5 +1,5 @@
 <template>
-  <TabsContainer
+  <TabSwitcher
     :tabs="tabs"
     :model-value="currentTab"
     :route-value="currentTab"
@@ -90,7 +90,7 @@
         />
       </div>
     </template>
-  </TabsContainer>
+  </TabSwitcher>
 </template>
 
 <script setup>
@@ -102,7 +102,7 @@ import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { mapStore } from '@/main/store/store.js'
 
 import BarIcon from '@/components/common/BarIcon.vue'
-import TabsContainer from '@/components/common/TabsContainer.vue'
+import TabSwitcher from '@/components/common/TabSwitcher.vue'
 import DivideTab from "@/main/components/map/Tabs/DivideTab.vue";
 import CustomTab from '@/main/components/map/Tabs/CustomTab.vue'
 import MapLibre from "@/main/components/map/MapLibre.vue";

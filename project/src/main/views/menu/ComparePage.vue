@@ -1,5 +1,5 @@
 <template>
-  <TabsContainer
+  <TabSwitcher
     :tabs="tabs"
     :model-value="currentTab"
     :route-value="currentTab"
@@ -521,7 +521,7 @@
       </div> -->
       </div>
     </template>
-  </TabsContainer>
+  </TabSwitcher>
 </template>
 
 <script setup>
@@ -531,7 +531,7 @@ import { computed, nextTick, reactive, ref, onMounted, onBeforeUnmount, watch } 
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
-import TabsContainer from "@/components/common/TabsContainer.vue";
+import TabSwitcher from "@/components/common/TabSwitcher.vue";
 import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput.vue";
 import TutorialQuickStartPill from "@/main/components/tutorial/TutorialQuickStartPill.vue";
 import LocationMultiInput from "@/main/components/geo/LocationMultiInput.vue";

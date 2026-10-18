@@ -8,7 +8,7 @@
 <!--        <span>請先登錄</span>-->
 <!--      </button>-->
 <!--    </div>-->
-    <TabsContainer
+    <TabSwitcher
       mode="adaptive"
       :tabs="tabs"
       :model-value="activeTab"
@@ -105,7 +105,7 @@
         <PitchTonePanel :results="analysisResults" />
       </div>
 <!--    </div>-->
-    </TabsContainer>
+    </TabSwitcher>
 
     <!-- Job Status (Left Floating Window) - REMOVED, now inline in Tab 2 -->
 
@@ -147,7 +147,7 @@
 <script setup>
 import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import TabsContainer from '@/components/common/TabsContainer.vue'
+import TabSwitcher from '@/components/common/TabSwitcher.vue'
 import { ref, reactive, onBeforeUnmount, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'

@@ -132,7 +132,7 @@ describe('SEO heading semantics', () => {
   })
 
   it('provides a header slot for tabbed pages to render their h1 above tabs', () => {
-    const tabsContainer = readSource('src/components/common/TabsContainer.vue')
+    const tabSwitcher = readSource('src/components/common/TabSwitcher.vue')
     const tabbedMenuPages = [
       'src/main/views/menu/PhoPage.vue',
       'src/main/views/menu/QueryPage.vue',
@@ -140,12 +140,12 @@ describe('SEO heading semantics', () => {
       'src/main/views/menu/MapPage.vue',
     ]
 
-    expect(tabsContainer).toContain('<slot name="header"></slot>')
+    expect(tabSwitcher).toContain('<slot name="header"></slot>')
 
     for (const file of tabbedMenuPages) {
       const source = readSource(file)
 
-      expect(source, `${file} renders a TabsContainer header`).toContain('<template #header>')
+      expect(source, `${file} renders a TabSwitcher header`).toContain('<template #header>')
       expect(source, `${file} renders a page h1 with BarIcon`).toMatch(/<h1 class="page-title">[\s\S]*?<BarIcon[\s\S]*?<\/h1>/)
     }
   })

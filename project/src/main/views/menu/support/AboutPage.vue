@@ -1,6 +1,6 @@
 <template>
   <div class="about-page-wrapper">
-    <TabsContainer
+    <TabSwitcher
       :tabs="tabs"
       :model-value="currentTab"
       :route-value="currentTab"
@@ -355,7 +355,7 @@
         </div>
 
       </template>
-    </TabsContainer>
+    </TabSwitcher>
 
     <SupportPopup
       :visible="showQRCodes"
@@ -371,7 +371,7 @@ import { useRoute } from 'vue-router'
 import i18n from '@/i18n/index.js'
 // import BarIcon from '@/components/common/BarIcon.vue'
 import SupportPopup from '@/main/components/user/popups/SupportPopup.vue'
-import TabsContainer from '@/components/common/TabsContainer.vue'
+import TabSwitcher from '@/components/common/TabSwitcher.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'

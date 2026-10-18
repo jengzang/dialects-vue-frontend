@@ -11,7 +11,7 @@
     </h3>
 
     <!-- Tab Switcher -->
-    <TabsContainer
+    <TabSwitcher
       mode="segmented"
       navigation-only
       :use-router="false"
@@ -81,7 +81,7 @@ import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import FormInput from './FormInput.vue'
-import TabsContainer from '@/components/common/TabsContainer.vue'
+import TabSwitcher from '@/components/common/TabSwitcher.vue'
 
 const { t } = useI18n()
 

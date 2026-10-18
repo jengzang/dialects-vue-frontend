@@ -18,7 +18,7 @@
     </div>
 
     <!-- Tab Switcher -->
-    <TabsContainer
+    <TabSwitcher
       mode="segmented"
       navigation-only
       :use-router="false"
@@ -109,7 +109,7 @@ import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import FormInput from './FormInput.vue'
-import TabsContainer from '@/components/common/TabsContainer.vue'
+import TabSwitcher from '@/components/common/TabSwitcher.vue'
 import UserAvatarEditor from './UserAvatarEditor.vue'
 
 const { t, te } = useI18n()

@@ -5,7 +5,7 @@
 
     <!-- Tab Switcher + Benefits Button -->
     <div class="header-controls">
-      <TabsContainer
+      <TabSwitcher
         mode="segmented"
         navigation-only
         :use-router="false"
@@ -124,7 +124,7 @@ import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ActionButton from './ActionButton.vue'
-import TabsContainer from '@/components/common/TabsContainer.vue'
+import TabSwitcher from '@/components/common/TabSwitcher.vue'
 import UserAvatarEditor from './UserAvatarEditor.vue'
 import LeaderboardPanel from '@/main/components/user/LeaderboardPanel.vue'
 import { formatOnlineTime, fmt } from '@/main/utils/userStats.js'

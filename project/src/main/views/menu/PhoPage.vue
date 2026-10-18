@@ -1,6 +1,6 @@
 <template>
   <div class="pho-page">
-    <TabsContainer
+    <TabSwitcher
       :tabs="tabs"
       :model-value="currentTab"
       :route-value="currentTab"
@@ -18,7 +18,7 @@
           </KeepAlive>
         </div>
       </template>
-    </TabsContainer>
+    </TabSwitcher>
   </div>
 </template>
 
@@ -28,7 +28,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import BarIcon from '@/components/common/BarIcon.vue'
-import TabsContainer from '@/components/common/TabsContainer.vue'
+import TabSwitcher from '@/components/common/TabSwitcher.vue'
 import PhonologyMatrixPage from '@/main/components/pho/PhonologyPage.vue'
 import PhonologyCustomPage from '@/main/components/pho/PhonologyCustom.vue'
 import CountphosPage from '@/main/components/pho/Countphos.vue'

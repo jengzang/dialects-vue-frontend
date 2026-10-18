@@ -1,5 +1,5 @@
 <template>
-  <TabsContainer
+  <TabSwitcher
     :tabs="tabs"
     :model-value="currentTab"
     :route-value="currentTab"
@@ -256,7 +256,7 @@
       </div> -->
       </div>
     </template>
-  </TabsContainer>
+  </TabSwitcher>
 </template>
 
 <script setup>
@@ -265,7 +265,7 @@ import InlineIcon from '@/components/common/InlineIcon.vue'
 import {computed, nextTick, reactive, ref, onMounted, onBeforeUnmount, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import TabsContainer from "@/components/common/TabsContainer.vue";
+import TabSwitcher from "@/components/common/TabSwitcher.vue";
 import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput.vue";
 import TutorialQuickStartPill from "@/main/components/tutorial/TutorialQuickStartPill.vue";
 import ZhongguSelector from "@/main/components/query/ZhongguSelector.vue";
