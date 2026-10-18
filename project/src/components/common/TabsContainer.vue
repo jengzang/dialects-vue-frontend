@@ -1,7 +1,5 @@
 <template>
   <div class="tabs-wrapper">
-    <slot name="header"></slot>
-
     <div class="tabs ui-scrollbar--hidden">
       <!-- 额外的 tab 左侧内容插槽 -->
       <slot name="tab-extra"></slot>
@@ -13,6 +11,10 @@
       >
         {{ tab.label }}
       </div>
+    </div>
+
+    <div v-if="$slots.header" class="tabs-header">
+      <slot name="header"></slot>
     </div>
 
     <div class="tab-content">
@@ -169,6 +171,11 @@ $transition-duration: 0.5s;
     font-size: 14px;
     border-radius: var(--radius-md);
   }
+}
+
+.tabs-header {
+  width: 100%;
+  padding: 6px 0 2px;
 }
 
 .tab-content {
