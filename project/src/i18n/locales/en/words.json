@@ -238,6 +238,7 @@
         "sectionLicense": "Open License",
         "projectIntro": "The Vocabulary page is Fangyin Tujian's online collaborative platform for organizing, displaying, and searching dialect vocabulary. Traditional collaboration meant submitting spreadsheets through chat groups and waiting for a coordinator to import them—any small edit required re-uploading the whole file. This site offers a lighter workflow: online collaboration, quick uploads, and changes that take effect immediately.",
         "collaboration": "The hardest part of digitizing dialects is building the from-0-to-1 infrastructure, and that is what this project sets out to do: lay a solid foundation for collecting, checking, and sharing vocabulary, so that growing from 1 to 100 can be carried forward by the community. We hope more and more people will join in and help preserve dialect vocabulary for the future.",
+        "stats": "As of {date}, there are {locations} vocabulary lists with {entries} entries in total.",
         "intro": "Vocabulary data on this site is published under the CC BY-SA 4.0 (Creative Commons Attribution-ShareAlike 4.0 International) license, free to use with attribution and under the same terms.",
         "linkText": "View the official CC BY-SA 4.0 license",
         "linkHref": "https://creativecommons.org/licenses/by-sa/4.0/",

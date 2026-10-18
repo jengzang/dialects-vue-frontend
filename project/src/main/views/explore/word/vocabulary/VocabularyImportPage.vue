@@ -481,6 +481,7 @@
         <h4>{{ t('words.wordList.upload.license.sectionProject') }}</h4>
         <p>{{ t('words.wordList.upload.license.projectIntro') }}</p>
         <p>{{ t('words.wordList.upload.license.collaboration') }}</p>
+        <p v-if="vocabularyCountsSummary" class="license-stats">{{ vocabularyCountsSummary }}</p>
         <h4>{{ t('words.wordList.upload.license.sectionLicense') }}</h4>
         <p>{{ t('words.wordList.upload.license.intro') }}</p>
         <p>
@@ -540,7 +541,7 @@ import { formatCoord } from '@/main/utils/drawMap/formatCoord.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { showError, showInfo, showSuccess, showWarning } from '@/utils/ui/message.js'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const SURVEY_TEMPLATE_URL = '/data/sample/方音圖鑑詞彙模板.xlsx'
@@ -594,12 +595,33 @@ const uploadAccessNotice = computed(() => {
 
 const vocabTotalCount = ref(null)
 const vocabLocationCount = ref(null)
+const vocabCountsFetchedAt = ref(null)
 
 async function refreshVocabularyCounts() {
   const counts = await getVocabularyCounts()
   if (counts.total != null) vocabTotalCount.value = counts.total
   if (counts.locations != null) vocabLocationCount.value = counts.locations
+  vocabCountsFetchedAt.value = new Date()
 }
+
+function formatCountsDate(date) {
+  const pad = (value) => String(value).padStart(2, '0')
+  const datePart = locale.value.startsWith('en')
+    ? `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+    : `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`
+  return `${datePart} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+}
+
+const vocabularyCountsSummary = computed(() => {
+  if (vocabLocationCount.value == null || vocabTotalCount.value == null || !vocabCountsFetchedAt.value) {
+    return ''
+  }
+  return t('words.wordList.upload.license.stats', {
+    date: formatCountsDate(vocabCountsFetchedAt.value),
+    locations: vocabLocationCount.value,
+    entries: vocabTotalCount.value,
+  })
+})
 
 onMounted(refreshVocabularyCounts)
 

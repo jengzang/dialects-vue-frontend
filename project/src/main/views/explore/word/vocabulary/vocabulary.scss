@@ -1578,6 +1578,14 @@
   }
 }
 
+.license-stats {
+  padding: 8px 12px;
+  background: var(--glass-10);
+  border-radius: var(--radius-md);
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
 .license-link {
   color: var(--color-primary, #409eff);
   text-decoration: none;
