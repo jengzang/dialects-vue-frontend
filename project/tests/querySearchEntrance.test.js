@@ -20,6 +20,7 @@ async function mountEntrance(overrides = {}) {
       expanded ? h('button', { class: 'search', onClick: collapse }, '搜索') : null,
     ]),
     default: () => h('div', { class: 'results' }, '查询结果'),
+    'after-panel': () => h('div', { class: 'source-choice' }, '词表 / 字表注释'),
   }) })
   app.mount(host)
   await settle()
@@ -87,7 +88,27 @@ describe('one query panel morphing with scroll', () => {
     expect(window.scrollTo).toHaveBeenCalledWith({ top: 420 - window.innerHeight * 0.12, behavior: 'smooth' })
   })
 
-  it('honors reduced motion and bypasses expansion for character notes', async () => {
+  it('places source choices below the panel, hides them when compact and updates the heading', async () => {
+    const props = await mountEntrance()
+    const footer = host.querySelector('.query-panel-footer')
+    const panel = host.querySelector('.query-search-panel')
+    expect(panel.nextElementSibling).toBe(footer)
+    expect(panel.contains(host.querySelector('.source-choice'))).toBe(false)
+    expect(footer.style.display).not.toBe('none')
+    props.title = '字表注释'
+    await settle()
+    expect(host.querySelector('.query-intro h2').textContent).toBe('字表注释')
+    scrollPosition = 420 - window.innerHeight * 0.12
+    window.dispatchEvent(new Event('scroll'))
+    await settle()
+    expect(footer.style.display).toBe('none')
+    scrollPosition = 0
+    window.dispatchEvent(new Event('scroll'))
+    await settle()
+    expect(footer.style.display).not.toBe('none')
+  })
+
+  it('honors reduced motion and supports disabling expansion', async () => {
     vi.stubGlobal('matchMedia', () => ({ matches: true }))
     const props = await mountEntrance()
     host.querySelector('.search').click()

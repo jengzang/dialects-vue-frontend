@@ -10,6 +10,9 @@
     >
       <slot name="controls" :progress="progress" :expanded="expanded" :collapse="collapse" />
     </div>
+    <div v-if="enabled && $slots['after-panel']" v-show="expanded" class="query-panel-footer">
+      <slot name="after-panel" />
+    </div>
   </section>
   <div class="query-results" :class="{ 'query-results--enabled': enabled }">
     <slot />
@@ -141,6 +144,13 @@ defineExpose({ collapse, progress })
 
 .query-results--enabled {
   min-height: 84dvh;
+}
+
+.query-panel-footer {
+  max-height: calc(100px * var(--query-expansion));
+  padding: calc(16px * var(--query-expansion)) 0;
+  overflow: hidden;
+  opacity: var(--query-expansion);
 }
 
 @media (max-aspect-ratio: 1 / 1) {

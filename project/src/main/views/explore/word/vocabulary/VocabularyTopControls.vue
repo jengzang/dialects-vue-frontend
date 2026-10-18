@@ -47,15 +47,6 @@
             </svg>
             <span>{{ t('words.wordList.notes.refreshResults') }}</span>
           </ActionButton>
-          <SwitchToggle
-            :model-value="source === 'vocabulary'"
-            :show-label="true"
-            :active-text="t('words.wordList.source.vocabulary')"
-            :inactive-text="t('words.wordList.source.characterNotes')"
-            label-position="inside"
-            auto-width
-            @update:model-value="emit('update:source', $event ? 'vocabulary' : 'character-notes')"
-          />
         </div>
 
         <div class="field-filter">
@@ -165,16 +156,6 @@
       </template>
 
       <template v-else>
-        <SwitchToggle
-          v-if="viewMode === 'card'"
-          :model-value="source === 'vocabulary'"
-          :show-label="true"
-          :active-text="t('words.wordList.source.vocabulary')"
-          :inactive-text="t('words.wordList.source.characterNotes')"
-          label-position="inside"
-          auto-width
-          @update:model-value="emit('update:source', $event ? 'vocabulary' : 'character-notes')"
-        />
         <div
           v-if="viewMode === 'map'"
           class="standard-word-filter"
@@ -327,7 +308,6 @@ const props = defineProps({
 
 const emit = defineEmits([
   'search',
-  'update:source',
   'update:query',
   'update:selectedSearchFields',
   'update:selectedLocations',

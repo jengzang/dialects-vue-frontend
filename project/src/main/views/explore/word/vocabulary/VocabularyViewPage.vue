@@ -1,12 +1,11 @@
 <template>
   <div class="vocabulary-view-page">
     <QuerySearchEntrance
-      :enabled="!isCharacterNotesMode"
-      :title="t('navigation.pageTitles.vocabulary.view')"
+      :title="isCharacterNotesMode ? t('words.wordList.source.characterNotes') : t('navigation.pageTitles.vocabulary.view')"
     >
     <template #controls="{ expanded, collapse }">
     <VocabularyTopControls
-      v-model:source="source"
+      :source="source"
       v-model:query="activeQuery"
       v-model:selected-search-fields="activeSearchFields"
       v-model:selected-locations="selectedLocations"
@@ -30,6 +29,13 @@
       @open-location-details="openLocationDetails"
       @search="collapse"
     />
+    </template>
+    <template #after-panel>
+      <RadioGroup
+        v-model="source"
+        name="vocabulary-query-source"
+        :options="sourceOptions"
+      />
     </template>
 
     <section v-if="isCharacterNotesMode" class="content-area">
@@ -494,6 +500,7 @@ import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 import VocabularyMap from '@/main/components/map/VocabularyMap.vue'
 import VocabularyTopControls from './VocabularyTopControls.vue'
 import QuerySearchEntrance from '@/components/common/QuerySearchEntrance.vue'
+import RadioGroup from '@/components/selector/RadioGroup.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -580,6 +587,10 @@ const source = computed({
   },
 })
 const isCharacterNotesMode = computed(() => source.value === 'character-notes')
+const sourceOptions = computed(() => [
+  { value: 'vocabulary', label: t('words.wordList.source.vocabulary') },
+  { value: 'character-notes', label: t('words.wordList.source.characterNotes') },
+])
 const activeQuery = computed({
   get: () => isCharacterNotesMode.value ? notesQuery.value : query.value,
   set: (value) => {
