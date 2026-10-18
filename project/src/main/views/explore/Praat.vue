@@ -8,42 +8,13 @@
 <!--        <span>請先登錄</span>-->
 <!--      </button>-->
 <!--    </div>-->
-    <!-- Tab Navigation -->
-    <div class="tab-navigation">
-      <div class="tab-container">
-        <button
-          class="tab-btn"
-          :class="{ active: activeTab === 'upload' }"
-          @click="switchTab('upload')"
-        >
-          {{ t('praat.main.tabs.upload') }}
-        </button>
-        <button
-          class="tab-btn"
-          :class="{ active: activeTab === 'results', disabled: !resultsTabEnabled }"
-          :disabled="!resultsTabEnabled"
-          @click="switchTab('results')"
-        >
-          {{ t('praat.main.tabs.results') }}
-        </button>
-        <button
-          class="tab-btn"
-          :class="{ active: activeTab === 'vowelspace', disabled: !vowelspaceTabEnabled }"
-          :disabled="!vowelspaceTabEnabled"
-          @click="switchTab('vowelspace')"
-        >
-          {{ t('praat.main.tabs.vowelSpace') }}
-        </button>
-        <button
-          class="tab-btn"
-          :class="{ active: activeTab === 'pitchtone', disabled: !pitchtoneTabEnabled }"
-          :disabled="!pitchtoneTabEnabled"
-          @click="switchTab('pitchtone')"
-        >
-          {{ t('praat.main.tabs.pitchTone') }}
-        </button>
-      </div>
-    </div>
+    <TabsContainer
+      mode="adaptive"
+      :tabs="tabs"
+      :model-value="activeTab"
+      :use-router="false"
+      @tab-change="switchTab"
+    >
 
     <div class="page-header">
       <h1 class="page-title"><BarIcon icon="🎙️" />{{ t('navigation.pageTitles.praat.main') }}</h1>
@@ -134,6 +105,7 @@
         <PitchTonePanel :results="analysisResults" />
       </div>
 <!--    </div>-->
+    </TabsContainer>
 
     <!-- Job Status (Left Floating Window) - REMOVED, now inline in Tab 2 -->
 
@@ -175,6 +147,7 @@
 <script setup>
 import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import TabsContainer from '@/components/common/TabsContainer.vue'
 import { ref, reactive, onBeforeUnmount, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -224,6 +197,13 @@ const pitchtoneTabEnabled = computed(() => {
          analysisResults.value.timeseries?.pitch_hz &&
          analysisResults.value.timeseries.pitch_hz.length > 0
 })
+
+const tabs = computed(() => [
+  { name: 'upload', label: t('praat.main.tabs.upload') },
+  { name: 'results', label: t('praat.main.tabs.results'), disabled: !resultsTabEnabled.value },
+  { name: 'vowelspace', label: t('praat.main.tabs.vowelSpace'), disabled: !vowelspaceTabEnabled.value },
+  { name: 'pitchtone', label: t('praat.main.tabs.pitchTone'), disabled: !pitchtoneTabEnabled.value },
+])
 
 // UI state
 const showSettings = ref(false)
@@ -929,6 +909,7 @@ onBeforeUnmount(() => {
 @use '@/styles/global/mixins' as *;
 
 .praat-page {
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0;
@@ -995,63 +976,6 @@ onBeforeUnmount(() => {
   }
 }
 
-/* Tab Navigation - Floating Left */
-.tab-navigation {
-  position: fixed;
-  top: 140px;
-  left: 2rem;
-  z-index: 100;
-}
-
-.tab-container {
-  @include flex-col;
-  gap: 4px;
-  padding: 4px;
-  background: var(--glass-80);
-  backdrop-filter: blur(60px) saturate(200%);
-  -webkit-backdrop-filter: blur(60px) saturate(200%);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--glass-40);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12),
-              inset 0 1px 0 var(--glass-60);
-}
-
-.tab-btn {
-  padding: 12px 16px;
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  border-radius: var(--radius-sm2);
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  white-space: nowrap;
-  min-width: 100px;
-  text-align: center;
-}
-
-.tab-btn:hover:not(.active):not(:disabled) {
-  background: rgba(0, 0, 0, 0.04);
-  color: var(--text-primary);
-  transform: translateX(2px);
-}
-
-.tab-btn.active {
-  background: var(--bg-white);
-  color: var(--color-primary);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
-              0 1px 2px rgba(0, 0, 0, 0.06);
-  font-weight: 600;
-}
-
-.tab-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-
 /* Tab Hidden (for v-show keep-alive) */
 .tab-hidden {
   display: none !important;
@@ -1082,6 +1006,7 @@ onBeforeUnmount(() => {
   overflow: clip;
   border-radius: 25px;
   width: 90dvw;
+  max-width: 100%;
 }
 
 .action-section {
@@ -1337,23 +1262,6 @@ onBeforeUnmount(() => {
   .page-title {
     font-size: 1.8rem;
     margin:0;
-  }
-
-  .tab-navigation {
-    position: static;
-    width: 100%;
-  }
-
-  .tab-container {
-    flex-direction: row;
-    width: auto;
-  }
-
-  .tab-btn {
-    flex: 1;
-    font-size: 13px;
-    padding: 10px 4px;
-    min-width: 60px;
   }
 
   .settings-sidebar {
