@@ -2,6 +2,8 @@
   <div class="vocabulary-view-page">
     <QuerySearchEntrance
       :title="isCharacterNotesMode ? t('words.wordList.source.characterNotes') : t('navigation.pageTitles.vocabulary.view')"
+      :results-visible="hasSubmittedSearch && !isSearchExpanded"
+      @progress="handleSearchProgress"
     >
     <template #controls="{ expanded, collapse }">
     <VocabularyTopControls
@@ -27,7 +29,7 @@
       @locations-resolved="handleNotesScopeResolved"
       @refresh-notes="refreshNotes"
       @open-location-details="openLocationDetails"
-      @search="collapse"
+      @search="submitSearch(collapse)"
     />
     </template>
     <template #after-panel>
@@ -308,6 +310,7 @@
         api-adapter="vocabulary"
       />
     </section>
+    </QuerySearchEntrance>
 
     <AppModal
       v-model="isMapDetailModalOpen"
@@ -474,7 +477,6 @@
       :loading="notesLocationPopup.loading"
       @close="closeNotesLocationPopup"
     />
-    </QuerySearchEntrance>
   </div>
 </template>
 
@@ -571,6 +573,21 @@ const props = defineProps({
 
 const query = ref('')
 const notesQuery = ref('')
+const hasSubmittedSearch = ref(false)
+const isSearchExpanded = ref(true)
+
+function handleSearchProgress(progress) {
+  const expanded = progress < 1
+  if (expanded && !isSearchExpanded.value) hasSubmittedSearch.value = false
+  isSearchExpanded.value = expanded
+}
+
+function submitSearch(collapse) {
+  hasSubmittedSearch.value = true
+  // Notes apply their draft scope and start the query in refreshNotes.
+  if (!isCharacterNotesMode.value) loadActiveViewMode()
+  collapse()
+}
 const source = computed({
   get: () => route.query.source === 'character-notes' ? 'character-notes' : 'vocabulary',
   set: (value) => {
@@ -1153,7 +1170,7 @@ function closeNotesLocationPopup() {
 }
 
 async function loadNotes({ append = false } = {}) {
-  if (!isCharacterNotesMode.value) return
+  if (!hasSubmittedSearch.value || !isCharacterNotesMode.value) return
 
   const nextPage = append ? notesPage.value + 1 : 1
   const params = {
@@ -1190,6 +1207,7 @@ async function loadNotes({ append = false } = {}) {
 }
 
 function refreshNotes() {
+  hasSubmittedSearch.value = true
   appliedScope.value = cloneNotesScope(draftScope.value)
   notesPage.value = 1
   loadNotes()
@@ -1405,7 +1423,7 @@ function normalizeMapPointLocations(point) {
 }
 
 async function loadVocabularyItems({ append = false } = {}) {
-  if (!shouldUseVocabularyItemsApi()) {
+  if (!hasSubmittedSearch.value || !shouldUseVocabularyItemsApi()) {
     return
   }
 
@@ -1460,6 +1478,7 @@ async function loadVocabularyItems({ append = false } = {}) {
 }
 
 async function loadVocabularyMapPoints() {
+  if (!hasSubmittedSearch.value) return
   if (!shouldUseVocabularyMapPointsApi() && !shouldUseVocabularyMapItemsApi()) {
     return
   }
@@ -1546,7 +1565,7 @@ async function loadVocabularyLocationOptions() {
 }
 
 async function loadVocabularyStandardWords() {
-  if (viewMode.value !== 'map') {
+  if (!hasSubmittedSearch.value || viewMode.value !== 'map') {
     return
   }
 
@@ -1865,6 +1884,7 @@ watch(notesSearchFields, (val) => {
 }, { deep: true })
 
 watch(isCharacterNotesMode, async (isNotes) => {
+  hasSubmittedSearch.value = false
   if (isNotes) {
     const nextMode = resolveNotesViewMode(route.query.tab)
     if (viewMode.value !== nextMode) viewMode.value = nextMode

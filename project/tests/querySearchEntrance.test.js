@@ -47,6 +47,15 @@ afterEach(() => {
 })
 
 describe('one query panel morphing with scroll', () => {
+  it('does not mount results until the page allows them, retaining the scroll runway', async () => {
+    const props = await mountEntrance({ resultsVisible: false })
+    expect(host.querySelector('.results')).toBeNull()
+    expect(host.querySelector('.query-results--enabled')).not.toBeNull()
+    props.resultsVisible = true
+    await settle()
+    expect(host.querySelector('.results')).not.toBeNull()
+  })
+
   it('renders the original input and conditions together, without a second input', async () => {
     await mountEntrance()
     expect(host.querySelectorAll('textarea')).toHaveLength(1)

@@ -15,7 +15,7 @@
     </div>
   </section>
   <div class="query-results" :class="{ 'query-results--enabled': enabled }">
-    <slot />
+    <slot v-if="resultsVisible" />
   </div>
 </template>
 
@@ -25,6 +25,7 @@ import { computed, nextTick, onActivated, onBeforeUnmount, onDeactivated, onMoun
 const props = defineProps({
   title: { type: String, required: true },
   enabled: { type: Boolean, default: true },
+  resultsVisible: { type: Boolean, default: true },
 })
 const emit = defineEmits(['progress'])
 const introEl = ref(null)
