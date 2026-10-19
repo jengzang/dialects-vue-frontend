@@ -1,15 +1,14 @@
 <template>
   <div class="yubao-page">
-    <h1 class="page-title">
-      <BarIcon :icon="activePageIcon" />
-      {{ activePageTitle }}
-    </h1>
-
     <QuerySearchEntrance
       ref="queryEntrance"
       :title="activePageTitle"
       @progress="entranceProgress = $event"
     >
+    <template #title>
+      <BarIcon :icon="activePageIcon" />
+      {{ activePageTitle }}
+    </template>
     <template #controls="{ expanded }">
     <!-- 顶部控制栏 -->
     <div class="top-controls">
@@ -154,25 +153,8 @@
         :key="`${activeTab}-${currentInputValue}`"
     />
 
-    <!-- 表格模式 - 输入无效时的提示 -->
-    <div v-else-if="viewMode === 'table'" class="content-area glass-panel">
-      <div class="empty-state empty-state-base">
-        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <circle cx="12" cy="12" r="10"/>
-          <line x1="12" y1="8" x2="12" y2="12"/>
-          <line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-        <p v-if="!currentInputValue">{{ t('words.yuBaoPage.states.enterSearch') }}</p>
-        <p v-else>{{ t('words.yuBaoPage.states.chooseSuggestion') }}</p>
-        <small v-if="!currentInputValue">
-          {{ t('words.yuBaoPage.states.queryHint', { type: currentSearchTypeLabel }) }}
-        </small>
-        <small v-else>{{ t('words.yuBaoPage.states.clickSuggestion') }}</small>
-      </div>
-    </div>
-
     <!-- 卡片/地图模式 -->
-    <div v-else-if="viewMode === 'card'" class="content-area glass-panel">
+    <div v-else-if="viewMode === 'card' && (isLoadingCards || cardData.length > 0)" class="content-area glass-panel">
       <!-- 卡片模式 -->
       <div class="card-mode">
 
@@ -233,53 +215,20 @@
             <span v-else-if="filteredCardData.length > 0" class="no-more">{{ t('words.yuBaoPage.states.loadedAll') }}</span>
           </div>
 
-          <div v-if="filteredCardData.length === 0" class="empty-state empty-state-base">
-            <p>{{ t('words.yuBaoPage.states.noFilterResult', { query: localFilterQuery }) }}</p>
-          </div>
-
         </template>
 
-        <div v-else class="empty-state empty-state-base">
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="8" x2="12" y2="12"/>
-            <line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
-          <p v-if="!currentInputValue">{{ t('words.yuBaoPage.states.enterSearch') }}</p>
-          <p v-else-if="!isValidInput">{{ t('words.yuBaoPage.states.chooseSuggestion') }}</p>
-          <p v-else>{{ t('words.yuBaoPage.states.noData') }}</p>
-          <small v-if="!currentInputValue">
-            {{ t('words.yuBaoPage.states.queryHint', { type: currentSearchTypeLabel }) }}
-          </small>
-          <small v-else>{{ t('words.yuBaoPage.states.clickSuggestion') }}</small>
-        </div>
       </div>
 
     </div>
 
     <!-- 地图模式 -->
-    <div v-else-if="viewMode === 'map'" class="map-mode">
+    <div v-else-if="viewMode === 'map' && (isLoadingCards || (isValidInput && cardData.length > 0))" class="map-mode">
       <div v-if="isLoadingCards" class="cards-loading">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <span>{{ t('words.yuBaoPage.states.loadingData') }}</span>
       </div>
       <template v-else>
-        <div v-if="!isValidInput || cardData.length === 0" class="empty-state empty-state-base">
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="8" x2="12" y2="12"/>
-            <line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
-          <p v-if="!currentInputValue">{{ t('words.yuBaoPage.states.enterSearch') }}</p>
-          <p v-else-if="!isValidInput">{{ t('words.yuBaoPage.states.chooseSuggestion') }}</p>
-          <p v-else>{{ t('words.yuBaoPage.states.noData') }}</p>
-          <small v-if="!currentInputValue">
-            {{ t('words.yuBaoPage.states.queryHint', { type: currentSearchTypeLabel }) }}
-          </small>
-          <small v-else>{{ t('words.yuBaoPage.states.clickSuggestion') }}</small>
-        </div>
         <YuBaoMap
-            v-else
             :map-data="cardData"
             :active-tab="activeTab"
         />
@@ -440,12 +389,6 @@ const currentInputValue = computed(() => (
   activeTab.value === 'vocabulary'
     ? vocabularyInput.value.trim()
     : grammarInput.value.trim()
-))
-
-const currentSearchTypeLabel = computed(() => (
-  activeTab.value === 'vocabulary'
-    ? t('words.yuBaoPage.types.vocabulary')
-    : t('words.yuBaoPage.types.grammar')
 ))
 
 const activeTabLabel = computed(() => (
@@ -1461,29 +1404,6 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   color: $text-secondary;
   font-size: 13px;
   line-height: 1.6;
-}
-
-/* 空状态 */
-.empty-state {
-  gap: 12px;
-  padding: 80px 20px;
-  color: $text-secondary;
-
-  svg {
-    opacity: 0.5;
-  }
-
-  p {
-    margin: 0;
-    color: $text-primary;
-    font-size: 16px;
-    font-weight: 500;
-  }
-
-  small {
-    color: $text-secondary;
-    font-size: 13px;
-  }
 }
 
 /* 本地筛选 */

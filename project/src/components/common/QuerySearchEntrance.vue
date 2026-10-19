@@ -1,7 +1,7 @@
 <template>
   <section class="query-search-entrance" :style="panelStyle">
     <div v-if="enabled" ref="introEl" class="query-intro" :aria-hidden="progress === 1">
-      <h2>{{ title }}</h2>
+      <h2><slot name="title">{{ title }}</slot></h2>
     </div>
     <div
       ref="panelEl"
