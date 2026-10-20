@@ -5,6 +5,10 @@
       :results-visible="hasSubmittedSearch && !isSearchExpanded"
       @progress="handleSearchProgress"
     >
+    <template #title>
+      <BarIcon icon="📋" />
+      {{ isCharacterNotesMode ? t('words.wordList.source.characterNotes') : t('navigation.pageTitles.vocabulary.view') }}
+    </template>
     <template #controls="{ expanded, collapse }">
     <VocabularyTopControls
       :source="source"
@@ -502,6 +506,7 @@ import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 import VocabularyMap from '@/main/components/map/VocabularyMap.vue'
 import VocabularyTopControls from './VocabularyTopControls.vue'
 import QuerySearchEntrance from '@/components/common/QuerySearchEntrance.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 
 const { t } = useI18n()

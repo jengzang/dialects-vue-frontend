@@ -1,10 +1,5 @@
 <template>
   <div class="vocabulary-page">
-    <h1 class="page-title">
-      <BarIcon :icon="activePageIcon" />
-      {{ activePageTitle }}
-    </h1>
-
     <div v-if="!isCharacterNotesMode" class="page-tab-navigation">
       <div
         class="page-tab-container"
@@ -39,6 +34,11 @@
         />
       </div>
     </div>
+
+    <h1 v-if="activeVocabularyPath !== '/menu/vocabulary/view'" class="page-title">
+      <BarIcon :icon="activePageIcon" />
+      {{ activePageTitle }}
+    </h1>
 
     <router-view v-slot="{ Component }">
       <KeepAlive :include="['VocabularyViewPage', 'VocabularyImportPage', 'VocabularyManagePage']">
