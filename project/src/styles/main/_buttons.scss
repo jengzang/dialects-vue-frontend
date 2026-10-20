@@ -107,6 +107,17 @@
   --action-btn-font-weight: 500;
 }
 
+.pill-btn--history {
+  --pill-btn-bg: rgba(var(--color-teal-rgb), 0.08);
+  --pill-btn-color: var(--color-teal);
+  --pill-btn-hover-bg: rgba(var(--color-teal-rgb), 0.14);
+  --pill-btn-hover-border: rgba(var(--color-teal-rgb), 0.4);
+}
+
+.pill-btn.pill-btn--history {
+  border-color: rgba(var(--color-teal-rgb), 0.24);
+}
+
 .pill-btn {
   @include flex-center;
   gap: var(--pill-btn-gap, 6px);
