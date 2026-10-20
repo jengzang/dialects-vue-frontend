@@ -103,6 +103,8 @@
       "customRegionSelectPlaceholder": "選擇自定義分區",
       "expandChildren": "展開",
       "messages": {
+        "selectionLimit": "最多選擇 {max} 條分區路徑",
+        "pathTooLong": "每條分區路徑最多 {max} 個字元",
         "loadCustomRegionsFailed": "加載自定義分區失敗：{message}",
         "loginRequired": "請先登錄以使用自定義分區功能",
         "noCustomRegionsConfirm": "您還沒有建立自定義分區，是否前往建立？",

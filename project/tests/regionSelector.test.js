@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApp, defineComponent, nextTick, reactive } from 'vue'
 
-const mocks = vi.hoisted(() => ({ getPartitions: vi.fn(), user: { isAuthenticated: false, role: 'anonymous', id: null } }))
+const mocks = vi.hoisted(() => ({ getPartitions: vi.fn(), showError: vi.fn(), user: { isAuthenticated: false, role: 'anonymous', id: null } }))
 vi.mock('@/api/index.js', () => ({ getPartitions: mocks.getPartitions }))
 vi.mock('vue-router', () => ({ useRouter: () => ({ push: vi.fn(), currentRoute: { value: {} } }) }))
 vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: value => value }) }))
@@ -11,7 +11,7 @@ vi.mock('@/main/store/customRegionStore.js', async () => {
   const { ref } = await import('vue')
   return { customRegionStore: () => ({ customRegions: ref([]), loading: ref(false), fetchCustomRegions: vi.fn() }) }
 })
-vi.mock('@/utils/ui/message.js', () => ({ showError: vi.fn(), showSuccess: vi.fn(), showConfirm: vi.fn() }))
+vi.mock('@/utils/ui/message.js', () => ({ showError: mocks.showError, showSuccess: vi.fn(), showConfirm: vi.fn() }))
 vi.mock('@/components/common/AppModal.vue', () => ({ default: { template: '<div />' } }))
 
 import RegionSelector from '../src/main/components/geo/RegionSelector.vue'
@@ -24,11 +24,11 @@ function click(element) { element.dispatchEvent(new MouseEvent('click', { bubble
 function item(path) { return [...document.querySelectorAll('.partition-item')].find(el => el.title === path) }
 function expand(path) { click(item(path).closest('.partition-line').querySelector('.partition-arrow')) }
 
-async function mount(mode = 'yindian', selected = []) {
-  state = reactive({ mode, selected })
+async function mount(mode = 'yindian', selected = [], options = {}) {
+  state = reactive({ mode, selected, options })
   const host = document.createElement('div'); document.body.append(host)
   app = createApp(defineComponent({ components: { RegionSelector }, setup: () => ({ state }),
-    template: '<RegionSelector :mode="state.mode" v-model:selected="state.selected" />' }))
+    template: '<RegionSelector :mode="state.mode" v-model:selected="state.selected" v-bind="state.options" />' }))
   app.config.globalProperties.$t = value => value
   app.mount(host)
   await settle()
@@ -39,6 +39,49 @@ async function mount(mode = 'yindian', selected = []) {
 describe('complete-path default selector', () => {
   beforeEach(() => { mocks.getPartitions.mockImplementation(async mode => ({ schema_version: 2, region_mode: mode, nodes, max_depth: 5 })) })
   afterEach(() => { app?.unmount(); app = null; mocks.user.id = null; document.body.innerHTML = ''; vi.clearAllMocks() })
+
+  it('uses vocabulary-provided nodes without loading default trees or showing custom regions', async () => {
+    await mount('map', [], { nodes: [node('詞表專屬')], allowCustomRegions: false })
+    expect(mocks.getPartitions).not.toHaveBeenCalled()
+    expect(item('詞表專屬')).toBeDefined()
+    expect(item('甲')).toBeUndefined()
+    expect(document.querySelector('.custom-region-trigger')).toBeNull()
+    expect(document.querySelector('.custom-region-btn')).toBeNull()
+    click(item('詞表專屬')); click(document.querySelector('.topbar-btn:not(.ghost)')); await nextTick()
+    expect(state.selected).toEqual(['詞表專屬'])
+  })
+
+  it('keeps an external empty/loading/error tree separate from defaults', async () => {
+    await mount('yindian', [], { nodes: [], loading: true, allowCustomRegions: false })
+    expect(mocks.getPartitions).not.toHaveBeenCalled()
+    expect(document.querySelector('.partition-tree-state')).not.toBeNull()
+    state.options.loading = false; state.options.error = '詞表載入失敗'; await nextTick()
+    expect(document.querySelector('.partition-tree-state').textContent).toBe('詞表載入失敗')
+    expect(document.querySelectorAll('.partition-item')).toHaveLength(0)
+  })
+
+  it('clears external nodes while switching to a delayed default source', async () => {
+    mocks.user.id = 1234
+    let resolveDefault
+    mocks.getPartitions.mockImplementation(() => new Promise(resolve => { resolveDefault = resolve }))
+    await mount('map', [], { nodes: [node('詞表舊樹')], allowCustomRegions: false })
+    state.options.nodes = null; await settle()
+    expect(item('詞表舊樹')).toBeUndefined()
+    resolveDefault({ schema_version: 2, region_mode: 'map', nodes: [node('通用新樹')] }); await settle(); await settle()
+    expect(item('通用新樹')).toBeDefined()
+  })
+
+  it('rejects excess paths and long paths while still allowing deselection', async () => {
+    const tooLong = '甲'.repeat(201)
+    await mount('map', [], { nodes: [node('甲'), node('乙'), node(tooLong)], maxSelected: 1, maxPathLength: 200 })
+    click(item('甲')); click(item('乙')); click(item(tooLong))
+    click(document.querySelector('.topbar-btn:not(.ghost)')); await nextTick()
+    expect(state.selected).toEqual(['甲'])
+    expect(mocks.showError).toHaveBeenCalledTimes(2)
+    click(document.querySelector('.region-select-box')); await nextTick()
+    click(item('甲')); click(item('乙')); click(document.querySelector('.topbar-btn:not(.ghost)')); await nextTick()
+    expect(state.selected).toEqual(['乙'])
+  })
 
   it('expands five levels, keeps parent/child selections and confirms complete paths', async () => {
     await mount()

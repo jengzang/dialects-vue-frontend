@@ -103,6 +103,8 @@
       "customRegionSelectPlaceholder": "Select a custom region",
       "expandChildren": "Expand",
       "messages": {
+        "selectionLimit": "Select up to {max} partition paths",
+        "pathTooLong": "Each partition path supports up to {max} characters",
         "loadCustomRegionsFailed": "Failed to load custom regions: {message}",
         "loginRequired": "Please log in to use custom regions",
         "noCustomRegionsConfirm": "You have not created any custom regions yet. Would you like to create one?",

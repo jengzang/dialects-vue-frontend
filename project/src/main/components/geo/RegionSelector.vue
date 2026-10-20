@@ -98,7 +98,7 @@
             </div>
 
             <!-- Right: Custom Region Button -->
-            <div class="topbar-right-actions">
+            <div v-if="allowCustomRegions" class="topbar-right-actions">
               <button
                   ref="customRegionButtonRef"
                   class="custom-region-btn"
@@ -128,13 +128,13 @@
 
         <!-- 分區列橫向滾動；確認欄保持固定，各列獨立縱向滾動。 -->
         <div ref="stageEl" class="partition-stage ui-scrollbar" @mousedown.stop>
-          <div class="custom-region-trigger" @click.stop="openCustomRegionPopup">
+          <div v-if="allowCustomRegions" class="custom-region-trigger" @click.stop="openCustomRegionPopup">
             <div class="custom-region-icon"><InlineIcon icon="🗂️" /></div>
             <div class="custom-region-label">{{ $t('query.components.regionSelector.myCustomRegions') }}</div>
             <div class="custom-region-arrow">→</div>
           </div>
-          <div v-if="treeLoading || treeError" class="partition-tree-state">
-            {{ treeError || $t('common.label.loading') }}
+          <div v-if="loading || error || treeLoading || treeError" class="partition-tree-state">
+            {{ error || treeError || $t('common.label.loading') }}
           </div>
           <div
               v-for="(column, index) in columns"
@@ -173,6 +173,7 @@
 
     <!-- 自定義分區彈窗 -->
     <AppModal
+      v-if="allowCustomRegions"
       :model-value="showCustomRegionPopup"
       size="sm"
       :title="`🗂️ ${$t('query.components.regionSelector.customRegionModal.title')}`"
@@ -242,6 +243,12 @@ const props = defineProps({
   mode: { type: String, required: true },
   selected: { type: Array, default: () => [] },
   customRegions: { type: Array, default: () => [] },
+  nodes: { type: Array, default: null },
+  loading: { type: Boolean, default: false },
+  error: { type: String, default: '' },
+  allowCustomRegions: { type: Boolean, default: true },
+  maxSelected: { type: Number, default: Infinity },
+  maxPathLength: { type: Number, default: Infinity },
   placeholder: { type: String, default: '' }
 })
 
@@ -293,7 +300,7 @@ function clearHover() {
    selected
    ========================= */
 const selectedLeafs = computed(() => (Array.isArray(props.selected) ? props.selected : []))
-const externalCustomRegions = computed(() => (Array.isArray(props.customRegions) ? props.customRegions : []))
+const externalCustomRegions = computed(() => (props.allowCustomRegions && Array.isArray(props.customRegions) ? props.customRegions : []))
 const draftSelected = ref([])
 
 const loadedTree = ref([])
@@ -358,7 +365,14 @@ function onDocMouseDown(e) {
 async function loadTreeFor(mode) {
   const sequence = ++loadSequence
   loadedTree.value = []
+  columns.value = []
   treeError.value = ''
+  if (props.nodes !== null) {
+    treeLoading.value = false
+    loadedTree.value = props.nodes
+    if (popupOpen.value) columns.value = [{ nodes: props.nodes, offset: 0 }]
+    return
+  }
   treeLoading.value = true
   try {
     const tree = await getDefaultTree(mode, () => getPartitions(mode), {
@@ -382,6 +396,12 @@ watch(
     },
     { immediate: true }
 )
+
+watch(() => props.nodes, () => {
+  clearHover()
+  activePaths.value = []
+  loadTreeFor(props.mode)
+})
 
 watch(
     externalCustomRegions,
@@ -407,7 +427,7 @@ function openPopup() {
   bindEsc()
   document.addEventListener('mousedown', onDocMouseDown, true)
   if (treeError.value) loadTreeFor(props.mode)
-  if (userStore.isAuthenticated && storedCustomRegions.value.length === 0) loadCustomRegions()
+  if (props.allowCustomRegions && userStore.isAuthenticated && storedCustomRegions.value.length === 0) loadCustomRegions()
 }
 
 function closePopup() {
@@ -609,7 +629,17 @@ function toggleLeaf(label) {
   const arr = draftSelected.value.slice()
   const idx = arr.indexOf(label)
   if (idx >= 0) arr.splice(idx, 1)
-  else arr.push(label)
+  else {
+    if (Array.from(label).length > props.maxPathLength) {
+      showError(t('query.components.regionSelector.messages.pathTooLong', { max: props.maxPathLength }))
+      return
+    }
+    if (arr.length >= props.maxSelected) {
+      showError(t('query.components.regionSelector.messages.selectionLimit', { max: props.maxSelected }))
+      return
+    }
+    arr.push(label)
+  }
   draftSelected.value = arr
 }
 
