@@ -337,9 +337,16 @@ function onDocMouseDown(e) {
     t.closest('.dropdown-panel') ||
     t.closest('.dropdown-overlay')
 
+  const stage = stageEl.value
+  const isInsideStagePanel = stage?.contains(t) &&
+      t.closest('.partition-popup, .custom-region-trigger, .partition-tree-state')
+  const isStageScrollbar = t === stage && stage.scrollWidth > stage.clientWidth &&
+      e.clientY >= stage.getBoundingClientRect().top + stage.clientTop + stage.clientHeight
+
   const allow =
       topbarEl.value?.contains(t) ||
-      stageEl.value?.contains(t) ||
+      isInsideStagePanel ||
+      isStageScrollbar ||
       isInsideCustomDropdown
 
   if (!allow) {

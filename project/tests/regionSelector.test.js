@@ -67,6 +67,36 @@ describe('complete-path default selector', () => {
     expect(state.selected).toEqual(['乙-同名'])
   })
 
+  it.each(['.partition-stage', '.partition-overlay'])('confirms and closes on blank space in %s', async target => {
+    await mount()
+    click(item('甲'))
+    document.querySelector('.partition-popup').dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+    document.querySelector('.partition-topbar').dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+    await nextTick()
+    expect(document.querySelector('.partition-overlay')).not.toBeNull()
+    expect(state.selected).toEqual([])
+
+    document.querySelector(target).dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+    await nextTick()
+    expect(document.querySelector('.partition-overlay')).toBeNull()
+    expect(state.selected).toEqual(['甲'])
+  })
+
+  it('keeps the horizontal scrollbar usable while closing on the stage blank space', async () => {
+    await mount()
+    const stage = document.querySelector('.partition-stage')
+    Object.defineProperties(stage, {
+      scrollWidth: { value: 800 }, clientWidth: { value: 400 }, clientHeight: { value: 280 },
+    })
+    vi.spyOn(stage, 'getBoundingClientRect').mockReturnValue({ top: 0 })
+    stage.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, clientY: 290 }))
+    await nextTick()
+    expect(document.querySelector('.partition-overlay')).not.toBeNull()
+    stage.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, clientY: 100 }))
+    await nextTick()
+    expect(document.querySelector('.partition-overlay')).toBeNull()
+  })
+
   it('invalidates delayed hover on close', async () => {
     vi.useFakeTimers()
     try {
