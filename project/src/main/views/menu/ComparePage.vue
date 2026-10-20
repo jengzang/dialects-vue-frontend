@@ -459,7 +459,15 @@
         @update:run-disabled="uiStore.buttonStates.compare.isLocationDisabled = $event"
       />
 
-      <TutorialQuickStartPill :target="`compare:${currentTab}`" />
+      <RecentQueryPills
+        v-if="currentTab !== 'tab5'"
+        :entries="recentQueries.entries.value"
+        :disabled="buttonState.isRunning || isRestoringHistory"
+        @restore="restoreRecentQuery"
+      >
+        <TutorialQuickStartPill :target="`compare:${currentTab}`" />
+      </RecentQueryPills>
+      <TutorialQuickStartPill v-else :target="`compare:${currentTab}`" />
 
       <!-- 運行按鈕 -->
       <div class="run-container">
@@ -467,7 +475,7 @@
         <button
           v-if="currentTab !== 'tab5'"
           class="run-btn"
-          :disabled="buttonState.isRunning || isRunDisabled"
+          :disabled="buttonState.isRunning || isRunDisabled || isRestoringHistory"
           :class="{ disabled: isRunDisabled }"
           @click="runAction"
         >
@@ -534,6 +542,8 @@ import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import TabSwitcher from "@/components/common/TabSwitcher.vue";
 import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput.vue";
 import TutorialQuickStartPill from "@/main/components/tutorial/TutorialQuickStartPill.vue";
+import RecentQueryPills from '@/components/common/RecentQueryPills.vue'
+import { useRecentQueryHistory } from '@/composables/core/useRecentQueryHistory.js'
 import LocationMultiInput from "@/main/components/geo/LocationMultiInput.vue";
 import PhoneticCompare from "@/main/components/pho/PhoneticCompare.vue";
 import ZhongguSelector from "@/main/components/query/ZhongguSelector.vue";
@@ -555,6 +565,8 @@ import {
   tutorialAssistState,
   clearTutorialAssistRequest,
   zhongguInputMode,
+  setZhongguInputMode,
+  setPreferredCharacterTable,
 } from '@/main/store/store.js'
 import { compareChars, compareZhongGu, compareTones } from '@/api/index.js'
 import { getCoordinates } from '@/api'
@@ -1125,6 +1137,61 @@ const locationModel = ref({
   regionUsing: 'map'
 })
 
+const recentQueries = useRecentQueryHistory(() => `compare:${currentTab.value}`)
+const isRestoringHistory = ref(false)
+
+function rememberRecentQuery(locationList) {
+  const tab = currentTab.value
+  const loc = { ...locationModel.value }
+  if (!loc.locations.length && !loc.regions.length) loc.locations = locationList
+  const snapshot = { table: selectedCharacterTable.value, loc, state: tabStates[tab] }
+  let summary = ''
+  if (tab === 'tab1') {
+    summary = `${snapshot.state.group1.chars} ↔ ${snapshot.state.group2.chars} · ${snapshot.state.features}`
+  } else if (tab === 'tab2') {
+    snapshot.mode = zhongguInputMode.value
+    if (snapshot.mode === 'direct') {
+      snapshot.direct = {
+        positionInput: CompareDirectInputRef.value?.positionInput || '',
+        charInput: CompareDirectInputRef.value?.charInput || '',
+      }
+    }
+    summary = [snapshot.state.group1Items, snapshot.state.group2Items]
+      .map(group => group.map(formatSelectedItem).join('、')).join(' ↔ ')
+  } else if (tab === 'tab4') {
+    summary = snapshot.state.selectedToneClasses.join('、')
+  }
+  recentQueries.record(snapshot, [summary, [...loc.locations, ...loc.regions].join(' ')].filter(Boolean).join(' · '))
+}
+
+async function restoreRecentQuery(snapshot) {
+  if (buttonState.isRunning || isRestoringHistory.value) return
+  const tab = currentTab.value
+  isRestoringHistory.value = true
+  try {
+    setPreferredCharacterTable(snapshot.table)
+    if (tab === 'tab2') setZhongguInputMode(snapshot.mode)
+    await nextTick()
+    if (tab !== currentTab.value) return
+    if (tab === 'tab2') {
+      tabStates.tab2.current = snapshot.state.current
+      await nextTick()
+      if (tab !== currentTab.value) return
+      tabStates.tab2.group1Items = snapshot.state.group1Items
+      tabStates.tab2.group2Items = snapshot.state.group2Items
+      if (snapshot.mode === 'direct' && CompareDirectInputRef.value) {
+        CompareDirectInputRef.value.positionInput = snapshot.direct.positionInput
+        CompareDirectInputRef.value.charInput = snapshot.direct.charInput
+      }
+    } else {
+      tabStates[tab] = snapshot.state
+    }
+    locationModel.value = snapshot.loc
+  } finally {
+    isRestoringHistory.value = false
+  }
+}
+
 const dropdownStyle = reactive({
   value: {
     top: '0px',
@@ -1419,7 +1486,7 @@ const runTab5Action = () => {
 
 // 點擊按鈕行為
 const runAction = async () => {
-  if (isRunDisabled.value || locationRef.value?.runDisabled) return
+  if (isRunDisabled.value || locationRef.value?.runDisabled || isRestoringHistory.value) return
   setRunning('compare', true);
 
   try {
@@ -1460,6 +1527,7 @@ const runAction = async () => {
         region_mode: locationRef.value?.regionUsing || 'yindian'
       }
 
+      rememberRecentQuery(locationList)
       compareResponse = await compareChars(params)
     }
     else if (currentTab.value === 'tab2') {
@@ -1534,6 +1602,7 @@ const runAction = async () => {
         }
       }
 
+      rememberRecentQuery(locationList)
       compareResponse = await compareZhongGu(params)
     }
     else if (currentTab.value === 'tab4') {
@@ -1546,6 +1615,7 @@ const runAction = async () => {
         region_mode: locationRef.value?.regionUsing || 'yindian'
       }
 
+      rememberRecentQuery(locationList)
       compareResponse = await compareTones(params)
     }
 

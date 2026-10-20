@@ -14,7 +14,10 @@ vi.mock('@/api/index.js', () => ({
   compareChars: mocks.compareChars, compareZhongGu: mocks.compareZhongGu, compareTones: mocks.compareTones,
   getCoordinates: vi.fn().mockResolvedValue({ coordinates_locations: [] }),
 }))
-vi.mock('@/api', () => ({ getCoordinates: vi.fn().mockResolvedValue({ coordinates_locations: [] }) }))
+vi.mock('@/api', () => ({
+  compareChars: mocks.compareChars, compareZhongGu: mocks.compareZhongGu, compareTones: mocks.compareTones,
+  getCoordinates: vi.fn().mockResolvedValue({ coordinates_locations: [] }),
+}))
 vi.mock('@/composables/router/useRouteQueryState.js', () => ({ useRouteQueryState: (_key, options) => ({ state: ref(options.defaultValue), set: vi.fn(), applyToQuery: vi.fn() }) }))
 vi.mock('@/components/common/TabSwitcher.vue', () => ({ default: defineComponent({ inheritAttrs: false, props: ['modelValue'], setup: (props, { slots }) => () => slots.default({ currentTab: props.modelValue }) }) }))
 vi.mock('@/main/components/tutorial/TutorialQuickStartPill.vue', () => ({ default: { template: '<button class="existing-quick-start">Quick start</button>' } }))
@@ -53,6 +56,7 @@ vi.mock('@/main/components/query/KeyButtonGroup.vue', () => ({ default: { templa
 vi.mock('@/main/components/query/DropdownValueSelector.vue', () => ({ default: { template: '<div />' } }))
 
 import QueryPage from '../src/main/views/menu/QueryPage.vue'
+import ComparePage from '../src/main/views/menu/ComparePage.vue'
 import { globalPayload, preferredCharacterTable, setZhongguInputMode, uiStore, tutorialEnabled } from '../src/main/store/store.js'
 
 let app
@@ -74,7 +78,12 @@ function enable(group, tab) {
   buttons.isLocationDisabled = false
   buttons.tabContentDisabled[tab] = false
 }
-beforeEach(() => { localStorage.clear(); globalPayload.value = null; preferredCharacterTable.value = 'characters'; setZhongguInputMode('selector'); tutorialEnabled.value = false; mocks.replace.mockResolvedValue(); vi.clearAllMocks() })
+beforeEach(() => {
+  localStorage.clear(); globalPayload.value = null; preferredCharacterTable.value = 'characters'; setZhongguInputMode('selector'); tutorialEnabled.value = false
+  vi.clearAllMocks()
+  mocks.replace.mockResolvedValue()
+  for (const api of [mocks.compareChars, mocks.compareZhongGu, mocks.compareTones]) api.mockResolvedValue({ results: [] })
+})
 afterEach(() => { app?.unmount(); app = null; document.body.innerHTML = '' })
 
 describe('query recent conditions', () => {
@@ -151,5 +160,71 @@ describe('query recent conditions', () => {
     expect(vm.ZhongguDirectInputRef.positionInput).toBe('流攝')
     expect(vm.ZhongguDirectInputRef.charInput).toBe('山')
     expect(vm.tabStates.tab2.excludeColumns).toEqual(['多韻'])
+  })
+})
+
+describe('compare recent conditions', () => {
+  it.each(['char', 'zhonggu', 'tone'])('restores both groups and all %s conditions without comparing', async sub => {
+    await mount(ComparePage, sub)
+    vm.locationModel = loc()
+    vm.tabStates.tab1 = { group1: { chars: '包' }, group2: { chars: '好' }, features: '韻母' }
+    vm.tabStates.tab4.selectedToneClasses = ['陰平', '陽平']
+    vm.tabStates.tab2.current = { card: '聲母', keys: ['母'], valueMap: { 母: ['精'] }, excludeColumns: ['多韻'] }
+    await settle()
+    const group = { card: '聲母', keys: ['母'], valueMap: { 母: ['精'] }, excludeColumns: ['多韻'], combinations: ['精[母]'] }
+    vm.tabStates.tab2.group1Items = [group]
+    vm.tabStates.tab2.group2Items = [{ ...group, valueMap: { 母: ['幫'] }, combinations: ['幫[母]'] }]
+    await settle()
+    const expected = JSON.parse(JSON.stringify(vm.tabStates[vm.currentTab]))
+    enable('compare', vm.currentTab)
+    await vm.runAction()
+    const key = `recent-query:v1:compare:${vm.currentTab}`
+    expect(JSON.parse(localStorage.getItem(key))?.entries).toHaveLength(1)
+    vm.tabStates.tab1.group1.chars = '水'
+    vm.tabStates.tab4.selectedToneClasses = []
+    vm.tabStates.tab2.current.card = '韻母'
+    vm.locationModel = { locations: [], regions: [], regionUsing: 'map' }
+    await settle()
+    mocks.replace.mockClear()
+    for (const api of [mocks.compareChars, mocks.compareZhongGu, mocks.compareTones]) api.mockClear()
+    document.querySelector('.pill-btn--history')?.click()
+    await settle()
+    expect(vm.tabStates[vm.currentTab]).toEqual(expected)
+    expect(vm.locationModel).toEqual(loc())
+    expect(mocks.replace).not.toHaveBeenCalled()
+    for (const api of [mocks.compareChars, mocks.compareZhongGu, mocks.compareTones]) expect(api).not.toHaveBeenCalled()
+  })
+
+  it('restores direct drafts and groups after table and input-mode reset watchers', async () => {
+    setZhongguInputMode('direct')
+    await mount(ComparePage, 'zhonggu')
+    vm.locationModel = loc()
+    vm.tabStates.tab2.current.card = '聲母'
+    await settle()
+    const group = { type: 'direct', card: '聲母', pathStrings: ['流攝'], chars: '山', excludeColumns: ['多韻'] }
+    vm.tabStates.tab2.group1Items = [group]
+    vm.tabStates.tab2.group2Items = [{ ...group, chars: '水' }]
+    vm.CompareDirectInputRef.positionInput = '深攝'
+    vm.CompareDirectInputRef.charInput = '火'
+    await settle()
+    enable('compare', 'tab2')
+    await vm.runAction()
+    setZhongguInputMode('selector')
+    preferredCharacterTable.value = 'other'
+    await settle()
+    document.querySelector('.pill-btn--history')?.click()
+    await settle()
+    expect(preferredCharacterTable.value).toBe('characters')
+    expect(vm.tabStates.tab2.group1Items).toEqual([group])
+    expect(vm.tabStates.tab2.group2Items[0].chars).toBe('水')
+    expect(vm.CompareDirectInputRef.positionInput).toBe('深攝')
+    expect(vm.CompareDirectInputRef.charInput).toBe('火')
+  })
+
+  it('does not add history to phonetic comparison', async () => {
+    localStorage.setItem('recent-query:v1:compare:tab5', JSON.stringify({ version: 1, entries: [{ snapshot: {}, summary: 'excluded' }] }))
+    await mount(ComparePage, 'phonetic')
+    expect(document.querySelector('.pill-btn--history')).toBeNull()
+    expect(document.querySelector('.existing-quick-start')).not.toBeNull()
   })
 })
