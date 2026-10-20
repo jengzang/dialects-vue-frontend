@@ -5,10 +5,17 @@ import VocabularyTopControls from '../src/main/views/explore/word/vocabulary/Voc
 
 vi.mock('../src/env-config.js', () => ({ WEB_BASE: '', API_BASE: '/api' }))
 vi.mock('../src/main/components/geo/LocationAndRegionInput.vue', () => ({ default: { render: () => null } }))
+vi.mock('../src/main/components/geo/RegionSelector.vue', () => ({ default: {
+  props: ['mode', 'nodes', 'allowCustomRegions', 'maxSelected', 'maxPathLength'],
+  setup: props => () => h('div', { class: 'test-region-selector', 'data-mode': props.mode }),
+} }))
+vi.mock('../src/components/common/AppModal.vue', () => ({ default: {
+  props: ['modelValue'], setup: (props, { slots }) => () => props.modelValue ? h('div', slots.default?.()) : null,
+} }))
 
 let app
 let host
-afterEach(() => { app?.unmount(); host?.remove(); vi.useRealTimers() })
+afterEach(() => { app?.unmount(); host?.remove(); document.body.innerHTML = ''; vi.useRealTimers() })
 
 async function mountControls(expanded, overrides = {}) {
   vi.useFakeTimers()
@@ -20,6 +27,7 @@ async function mountControls(expanded, overrides = {}) {
   document.body.append(host)
   app = createApp({ render: () => h(VocabularyTopControls, {
     ...props, 'onUpdate:query': updateQuery, onSearch: search, onRefreshNotes: refresh,
+    'onUpdate:filterMode': value => { props.filterMode = value },
   }) })
   app.use(createI18n({ legacy: false, locale: 'zh-CN', missingWarn: false, fallbackWarn: false, messages: { 'zh-CN': { common: { button: { search: '搜索' } } } } }))
   app.mount(host)
@@ -30,6 +38,22 @@ async function mountControls(expanded, overrides = {}) {
 }
 
 describe('vocabulary query submission in the same input', () => {
+  it('offers four parallel radio modes and displays only the active filter', async () => {
+    await mountControls(false, { filterMode: 'location' })
+    host.querySelector('.gear-btn').click(); await nextTick()
+    const radios = () => [...host.querySelectorAll('input[type=radio][name="vocabulary-filter-mode"]')]
+    expect(radios().map(input => input.value)).toEqual(['location', 'administrative', 'yindian', 'map'])
+    expect(host.querySelector('.location-select-trigger')).not.toBeNull()
+    expect(host.querySelector('.test-region-selector')).toBeNull()
+    for (const mode of ['administrative', 'yindian', 'map', 'location']) {
+      const radio = radios().find(input => input.value === mode)
+      radio.checked = true; radio.dispatchEvent(new Event('change', { bubbles: true })); await nextTick()
+      expect(radios().filter(input => input.checked)).toHaveLength(1)
+      expect(!!host.querySelector('.location-select-trigger')).toBe(mode === 'location')
+      expect(!!host.querySelector('.test-region-selector')).toBe(['yindian', 'map'].includes(mode))
+      if (['yindian', 'map'].includes(mode)) expect(host.querySelector('.test-region-selector').dataset.mode).toBe(mode)
+    }
+  })
   it('uses only the existing notes action to search the latest input and apply the scope', async () => {
     const { type, updateQuery, search, refresh } = await mountControls(true, { source: 'character-notes' })
     expect(host.querySelector('.query-submit')).toBeNull()

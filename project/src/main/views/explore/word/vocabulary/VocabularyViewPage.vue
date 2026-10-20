@@ -18,7 +18,12 @@
       v-model:selected-standard-word="selectedStandardWord"
       v-model:selected-standard-words="selectedStandardWordsModel"
       v-model:single-select="singleSelect"
-      v-model:filter-by-region="filterByRegion"
+      v-model:filter-mode="filterMode"
+      v-model:selected-regions="selectedRegions"
+      :partition-nodes="partitionNodes"
+      :partition-loading="partitionLoading"
+      :partition-error="partitionError"
+      @retry-partitions="loadVocabularyPartitionTree"
       v-model:selected-province="selectedProvince"
       v-model:selected-city="selectedCity"
       v-model:view-mode="viewMode"
@@ -494,6 +499,7 @@ import * as OpenCCT2CN from 'opencc-js/t2cn'
 import {
   getVocabularyItems,
   getVocabularyLocationOptions,
+  getVocabularyPartitionOptions,
   getVocabularyMapItems,
   getVocabularyMapPoints,
   getVocabularyStandardWords,
@@ -689,7 +695,17 @@ function resolveViewModeFromRoute() {
 const viewMode = ref(resolveViewModeFromRoute())
 const selectedSearchFields = ref(JSON.parse(localStorage.getItem('vocabulary_search_fields') || '[]'))
 const selectedLocations = ref([])
-const filterByRegion = ref(localStorage.getItem('vocabulary_filter_by_region') === 'true')
+const FILTER_MODES = ['location', 'administrative', 'yindian', 'map']
+const savedFilterMode = localStorage.getItem('vocabulary_filter_mode')
+const filterMode = ref(FILTER_MODES.includes(savedFilterMode)
+  ? savedFilterMode
+  : localStorage.getItem('vocabulary_filter_by_region') === 'true' ? 'administrative' : 'location')
+const selectedRegions = ref([])
+const partitionNodes = ref([])
+const partitionLoading = ref(false)
+const partitionError = ref('')
+const partitionTrees = new Map()
+let partitionRequestId = 0
 const selectedProvince = ref('')
 const selectedCity = ref('')
 const selectedStandardWord = ref('')
@@ -703,8 +719,8 @@ const selectedStandardWords = computed(() => {
 })
 const mapDisplayMode = ref('overview')
 const vocabularyLocationOptions = ref([])
-const vocabularyLocationOptionsLoaded = ref(false)
-let vocabularyLocationOptionsRequest = null
+const administrativeLocationOptions = ref([])
+const pendingLocationOptionRequests = new Map()
 const vocabularyStandardWordOptions = ref([])
 const entries = ref([])
 const itemsCacheKey = ref('')
@@ -883,7 +899,7 @@ const locationOptions = computed(() => {
 
 const provinceOptions = computed(() => {
   const seen = new Set()
-  const provinces = vocabularyLocationOptions.value
+  const provinces = administrativeLocationOptions.value
     .filter((opt) => {
       if (!opt.province || seen.has(opt.province)) return false
       seen.add(opt.province)
@@ -899,7 +915,7 @@ const provinceOptions = computed(() => {
 
 const cityOptions = computed(() => {
   const seen = new Set()
-  const cities = vocabularyLocationOptions.value
+  const cities = administrativeLocationOptions.value
     .filter((opt) => opt.province === selectedProvince.value && opt.city && !seen.has(opt.city) && seen.add(opt.city))
     .map((opt) => ({ value: opt.city, label: opt.city }))
     .sort((a, b) => a.label.localeCompare(b.label, 'zh-Hans-CN'))
@@ -1087,6 +1103,8 @@ function normalizeVocabularyEntry(item, index = 0, locationContext = '') {
     detail: [...new Set(detailParts)].join(' · '),
     information: item.informations || '',
     locationName,
+    yindianRegion: item.yindian_region || '',
+    atlasRegion: item.atlas_region || '',
     location: item.location_name || item.location || item.location_label || locationContext || '',
   }
 }
@@ -1222,18 +1240,26 @@ function handleNotesScopeResolved(scope) {
   draftScope.value = cloneNotesScope(scope)
 }
 
-function buildVocabularyQueryParams() {
-  const params = {
-    q: query.value.trim(),
-    search_fields: normalizeSelectedSearchFields(),
-  }
-  if (filterByRegion.value) {
+function buildVocabularyFilterParams() {
+  const params = {}
+  if (filterMode.value === 'administrative') {
     if (selectedProvince.value) params.province = selectedProvince.value
     if (selectedCity.value) params.city = selectedCity.value
-  } else {
+  } else if (filterMode.value === 'location') {
     params.locations = selectedLocations.value
+  } else {
+    params.region_mode = filterMode.value
+    params.regions = [...selectedRegions.value]
   }
   return params
+}
+
+function buildVocabularyQueryParams() {
+  return {
+    q: query.value.trim(),
+    search_fields: normalizeSelectedSearchFields(),
+    ...buildVocabularyFilterParams(),
+  }
 }
 
 function buildVocabularyItemsParams(overrides = {}) {
@@ -1543,30 +1569,64 @@ async function loadVocabularyMapPoints() {
   }
 }
 
-async function loadVocabularyLocationOptions() {
-  if (vocabularyLocationOptionsLoaded.value) {
-    return vocabularyLocationOptions.value
-  }
+function buildVocabularyLocationOptionsParams() {
+  const params = buildVocabularyFilterParams()
+  delete params.locations
+  return params
+}
 
-  if (vocabularyLocationOptionsRequest) {
-    return vocabularyLocationOptionsRequest
+async function loadVocabularyLocationOptions({ unfiltered = false } = {}) {
+  const params = unfiltered ? {} : buildVocabularyLocationOptionsParams()
+  const requestKey = buildVocabularyMapRequestKey('location-options', params)
+  if (!pendingLocationOptionRequests.has(requestKey)) {
+    const pending = getVocabularyLocationOptions(params)
+      .finally(() => pendingLocationOptionRequests.delete(requestKey))
+    pendingLocationOptionRequests.set(requestKey, pending)
   }
-
-  vocabularyLocationOptionsRequest = getVocabularyLocationOptions()
-    .then((options) => {
-      vocabularyLocationOptions.value = options
-      vocabularyLocationOptionsLoaded.value = true
-      return options
-    })
-    .catch(() => {
+  try {
+    const options = await pendingLocationOptionRequests.get(requestKey)
+    if (unfiltered || !Object.keys(params).length) administrativeLocationOptions.value = options
+    if (requestKey !== buildVocabularyMapRequestKey('location-options', buildVocabularyLocationOptionsParams())) return options
+    vocabularyLocationOptions.value = options
+    if (filterMode.value === 'location') {
+      const valid = new Set(options.map(option => option.value))
+      const next = selectedLocations.value.filter(location => valid.has(location))
+      if (next.length !== selectedLocations.value.length) selectedLocations.value = next
+    }
+    return options
+  } catch {
+    if (requestKey === buildVocabularyMapRequestKey('location-options', buildVocabularyLocationOptionsParams())) {
       vocabularyLocationOptions.value = []
-      return []
-    })
-    .finally(() => {
-      vocabularyLocationOptionsRequest = null
-    })
+    }
+    return []
+  }
+}
 
-  return vocabularyLocationOptionsRequest
+async function loadVocabularyPartitionTree() {
+  const requestId = ++partitionRequestId
+  const mode = filterMode.value
+  partitionNodes.value = []
+  partitionError.value = ''
+  partitionLoading.value = false
+  if (!['yindian', 'map'].includes(mode) || isCharacterNotesMode.value) return
+  if (partitionTrees.has(mode)) {
+    partitionNodes.value = partitionTrees.get(mode)
+    return
+  }
+  partitionLoading.value = true
+  try {
+    const tree = await getVocabularyPartitionOptions(mode)
+    if (requestId !== partitionRequestId) return
+    if (tree?.schema_version !== 2 || tree.region_mode !== mode || !Array.isArray(tree.nodes)) {
+      throw new Error('Invalid vocabulary partition tree')
+    }
+    partitionTrees.set(mode, tree.nodes)
+    partitionNodes.value = tree.nodes
+  } catch {
+    if (requestId === partitionRequestId) partitionError.value = t('words.wordList.search.partitionLoadFailed')
+  } finally {
+    if (requestId === partitionRequestId) partitionLoading.value = false
+  }
 }
 
 async function loadVocabularyStandardWords() {
@@ -1816,7 +1876,8 @@ onMounted(async () => {
     loadNotes()
     return
   }
-  await loadVocabularyLocationOptions()
+  await loadVocabularyLocationOptions({ unfiltered: true })
+  if (filterMode.value !== 'location') await loadVocabularyLocationOptions()
   loadActiveViewMode()
 })
 
@@ -1872,9 +1933,14 @@ watch(selectedProvince, () => {
   selectedCity.value = ''
 })
 
-watch(filterByRegion, (val) => {
-  localStorage.setItem('vocabulary_filter_by_region', val ? 'true' : 'false')
-})
+watch(filterMode, (mode) => {
+  localStorage.setItem('vocabulary_filter_mode', mode)
+  selectedLocations.value = []
+  selectedProvince.value = ''
+  selectedCity.value = ''
+  selectedRegions.value = []
+  loadVocabularyPartitionTree()
+}, { immediate: true })
 
 watch(selectedSearchFields, (val) => {
   localStorage.setItem('vocabulary_search_fields', JSON.stringify(val))
@@ -1900,12 +1966,36 @@ watch(isCharacterNotesMode, async (isNotes) => {
   } else {
     if (viewMode.value === 'list') viewMode.value = 'card'
     closeNotesLocationPopup()
+    loadVocabularyPartitionTree()
+    await loadVocabularyLocationOptions({ unfiltered: true })
     await loadVocabularyLocationOptions()
     loadActiveViewMode()
   }
 })
 
-watchDebounced([query, selectedSearchFields, selectedLocations, filterByRegion, selectedProvince, selectedCity], async () => {
+watch([query, selectedSearchFields, selectedLocations, filterMode, selectedProvince, selectedCity, selectedRegions], () => {
+  if (isCharacterNotesMode.value) return
+  page.value = 1
+  mapDetailPage.value = 1
+  activeVocabularyItemsRequestKey.value = ''
+  activeMapPointsRequestKey.value = ''
+  activeStandardWordsRequestKey.value = ''
+  activeMapDetailRequestKey.value = ''
+  itemsCacheKey.value = ''
+  mapPointsCacheKey.value = ''
+  standardWordsCacheKey.value = ''
+  entries.value = []
+  mapPoints.value = []
+  total.value = 0
+  isLoadingItems.value = hasSubmittedSearch.value && viewMode.value !== 'table'
+  isLoadingStandardWords.value = false
+  isMapDetailModalOpen.value = false
+  isLocationDetailsModalOpen.value = false
+}, { deep: true })
+
+watchDebounced([query, selectedSearchFields, selectedLocations, filterMode, selectedProvince, selectedCity, selectedRegions], async () => {
+  if (isCharacterNotesMode.value) return
+  loadVocabularyLocationOptions()
   if (shouldUseVocabularyItemsApi()) {
     loadVocabularyItems()
   } else if (shouldUseVocabularyMapPointsApi()) {

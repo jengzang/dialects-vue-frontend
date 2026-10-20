@@ -76,6 +76,7 @@ export {
   getVocabularyStandardWords,
   getVocabularyLocationNames,
   getVocabularyLocationOptions,
+  getVocabularyPartitionOptions,
   getVocabularyLocations,
   getVocabularyLogs,
   getVocabularyCounts,

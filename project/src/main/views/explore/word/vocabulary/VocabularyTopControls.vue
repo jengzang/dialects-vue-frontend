@@ -101,14 +101,11 @@
               <h4 class="search-field-modal-title">
                 {{ t('words.wordList.search.filterModeTitle') }}
               </h4>
-              <SwitchToggle
-                :model-value="filterByRegion"
-                :show-label="true"
-                :active-text="t('words.wordList.search.filterByRegion')"
-                :inactive-text="t('words.wordList.search.filterByLocation')"
-                label-position="inside"
-                auto-width
-                @update:model-value="emit('update:filterByRegion', $event)"
+              <RadioGroup
+                :model-value="filterMode"
+                name="vocabulary-filter-mode"
+                :options="filterModeOptions"
+                @update:model-value="emit('update:filterMode', $event)"
               />
             </div>
             <div v-if="source === 'vocabulary'" class="search-field-mode-section">
@@ -204,7 +201,7 @@
         </div>
 
         <div
-          v-if="!filterByRegion"
+          v-if="filterMode === 'location'"
           class="location-filter"
         >
           <button
@@ -235,7 +232,7 @@
         </div>
 
         <div
-          v-else
+          v-else-if="filterMode === 'administrative'"
           class="location-filter"
         >
           <SimpleSelectDropdown
@@ -255,6 +252,22 @@
             width="100%"
             @update:model-value="emit('update:selectedCity', $event)"
           />
+        </div>
+        <div v-else class="location-filter">
+          <RegionSelector
+            :mode="filterMode"
+            :selected="selectedRegions"
+            :nodes="partitionNodes"
+            :loading="partitionLoading"
+            :error="partitionError"
+            :allow-custom-regions="false"
+            :max-selected="50"
+            :max-path-length="200"
+            @update:selected="emit('update:selectedRegions', $event)"
+          />
+          <button v-if="partitionError" class="pill-btn" type="button" @click="emit('retryPartitions')">
+            {{ t('common.errorBoundary.retry') }}
+          </button>
         </div>
       </div>
       <div v-if="source === 'vocabulary'" class="query-mode-controls">
@@ -278,6 +291,8 @@ import AppModal from '@/components/common/AppModal.vue'
 import ActionButton from '@/main/components/user/auth/ActionButton.vue'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
+import RadioGroup from '@/components/selector/RadioGroup.vue'
+import RegionSelector from '@/main/components/geo/RegionSelector.vue'
 import LocationAndRegionInput from '@/main/components/geo/LocationAndRegionInput.vue'
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
@@ -305,7 +320,11 @@ const props = defineProps({
   searchFieldOptions: { type: Array, default: () => [] },
   locationOptions: { type: Array, default: () => [] },
   standardWordOptions: { type: Array, default: () => [] },
-  filterByRegion: { type: Boolean, default: false },
+  filterMode: { type: String, default: 'location' },
+  selectedRegions: { type: Array, default: () => [] },
+  partitionNodes: { type: Array, default: () => [] },
+  partitionLoading: { type: Boolean, default: false },
+  partitionError: { type: String, default: '' },
   selectedProvince: { type: String, default: '' },
   selectedCity: { type: String, default: '' },
   provinceOptions: { type: Array, default: () => [] },
@@ -326,7 +345,9 @@ const emit = defineEmits([
   'update:selectedStandardWords',
   'update:singleSelect',
   'update:viewMode',
-  'update:filterByRegion',
+  'update:filterMode',
+  'update:selectedRegions',
+  'retryPartitions',
   'update:selectedProvince',
   'update:selectedCity',
   'update:notesScope',
@@ -341,6 +362,14 @@ const standardWordTriggerEl = ref(null)
 const searchFieldModalOpen = ref(false)
 const locationDropdownOpen = ref(false)
 const standardWordDropdownOpen = ref(false)
+const filterModeOptions = computed(() => [
+  { value: 'location', label: t('words.wordList.search.filterByLocation') },
+  { value: 'administrative', label: t('words.wordList.search.filterByAdministrative') },
+  { value: 'yindian', label: t('words.wordList.search.filterByYindian') },
+  { value: 'map', label: t('words.wordList.search.filterByAtlas') },
+])
+
+watch(() => props.filterMode, () => { locationDropdownOpen.value = false })
 const isNotesScopeResolving = ref(false)
 const isNotesScopeDisabled = ref(false)
 
@@ -669,6 +698,10 @@ const standardWordTriggerLabel = computed(() => {
 }
 
 .standard-word-filter {
+  width: 100%;
+}
+
+.location-filter > .region-select {
   width: 100%;
 }
 
