@@ -699,6 +699,8 @@ watch(displayMode, () => {
 
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 .vocabulary-map-container {
   width: 100%;
   height: 100%;
@@ -716,7 +718,7 @@ watch(displayMode, () => {
   width: 100vw;
   height: 100dvh;
   border-radius: 0;
-  z-index: 99999;
+  z-index: var(--z-index-vocabulary-map-fullscreen);
 }
 
 .map-container {
