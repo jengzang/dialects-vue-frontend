@@ -1,5 +1,5 @@
 <template>
-  <div class="top-controls">
+  <div class="top-controls query-controls-layout query-controls--vocabulary">
     <div class="search-container">
       <div class="search-section">
         <div class="input-wrapper">
@@ -17,18 +17,26 @@
 
         <button
           v-if="deferQuery && source !== 'character-notes'"
-          class="query-submit glass-button"
+          class="query-submit query-search-action glass-button"
           data-variant="primary"
           type="button"
           @click="submitSearch"
         >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
           {{ t('common.button.search') }}
         </button>
 
         <div v-if="source === 'character-notes'" class="notes-mode-actions">
-          <ActionButton
+          <component
+            :is="deferQuery ? 'button' : ActionButton"
             class="notes-refresh-action"
-            variant="blue"
+            :class="{ 'query-search-action glass-button': deferQuery }"
+            :data-variant="deferQuery ? 'primary' : undefined"
+            :variant="deferQuery ? undefined : 'blue'"
+            type="button"
             :disabled="notesRefreshDisabled || isNotesScopeResolving || isNotesScopeDisabled"
             @click="refreshNotes"
           >
@@ -47,7 +55,7 @@
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
             <span>{{ t('common.button.search') }}</span>
-          </ActionButton>
+          </component>
         </div>
 
         <div class="field-filter">
@@ -140,12 +148,7 @@
       class="filter-strip"
       :class="{ 'notes-scope-filter': source === 'character-notes' }"
     >
-      <ResultViewSwitcher
-        v-if="source === 'vocabulary'"
-        :model-value="viewMode"
-        @update:model-value="emit('update:viewMode', $event)"
-      />
-      <template v-if="source === 'character-notes'">
+      <div v-if="source === 'character-notes'" class="query-range query-range--notes">
         <LocationAndRegionInput
           :model-value="notesScope"
           allow-empty-scope
@@ -154,9 +157,9 @@
           @update:run-disabled="handleNotesScopeDisabled"
           @locations-resolved="handleNotesLocationsResolved"
         />
-      </template>
+      </div>
 
-      <template v-else>
+      <div v-else class="query-range">
         <div
           v-if="viewMode === 'map'"
           class="standard-word-filter"
@@ -253,7 +256,14 @@
             @update:model-value="emit('update:selectedCity', $event)"
           />
         </div>
-      </template>
+      </div>
+      <div v-if="source === 'vocabulary'" class="query-mode-controls">
+        <span v-if="deferQuery" class="query-condition-label">{{ t('words.wordList.viewModes.label') }}</span>
+        <ResultViewSwitcher
+          :model-value="viewMode"
+          @update:model-value="emit('update:viewMode', $event)"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -507,6 +517,15 @@ const standardWordTriggerLabel = computed(() => {
   display: flex;
   gap: 10px;
   align-items: center;
+}
+
+.query-range,
+.query-mode-controls {
+  display: contents;
+}
+
+.query-mode-controls > .result-view-switcher {
+  order: -1;
 }
 
 .search-container {

@@ -138,6 +138,125 @@ defineExpose({ collapse, progress })
     :deep(.top-controls) { margin-bottom: 0; }
     :deep(.top-controls > .search-container) { flex-basis: calc(100% * var(--query-expansion)); }
     :deep(.filter-strip) { min-width: 0; }
+
+    :deep(.query-controls-layout) {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: calc(10px + 8px * var(--query-expansion));
+      align-items: center;
+      width: 100%;
+      padding: 0;
+      border-bottom: 0;
+    }
+
+    :deep(.query-controls--vocabulary) {
+      grid-template-areas: 'input action' 'range range' 'modes tools';
+    }
+
+    :deep(.query-controls--yubao) {
+      grid-template-areas: 'category category' 'input action';
+    }
+
+    :deep(.query-controls-layout > .search-container),
+    :deep(.query-controls-layout .search-section),
+    :deep(.query-controls-layout > .filter-strip) {
+      display: contents;
+    }
+
+    :deep(.query-controls-layout .input-wrapper) {
+      grid-area: input;
+      min-width: 0;
+      width: 100%;
+    }
+
+    :deep(.query-controls-layout .search-input) {
+      display: block;
+      box-sizing: border-box;
+      max-width: none;
+    }
+
+    :deep(.query-search-action) {
+      width: 94px;
+      min-height: 44px;
+      padding: 0;
+      align-self: center;
+      justify-self: end;
+    }
+
+    :deep(.query-controls-layout .query-submit),
+    :deep(.query-controls-layout .notes-mode-actions) {
+      grid-area: action;
+    }
+
+    :deep(.query-controls-layout .field-filter) {
+      grid-area: tools;
+      justify-self: end;
+    }
+
+    :deep(.query-range) {
+      grid-area: range;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    :deep(.query-range > .location-filter),
+    :deep(.query-range > .standard-word-filter) {
+      flex: 1 1 220px;
+      min-width: 0;
+      width: auto;
+    }
+
+    :deep(.query-range .location-select-trigger) {
+      width: 100%;
+      max-width: none;
+    }
+
+    :deep(.query-range--notes .input-row) {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+    }
+
+    :deep(.query-range--notes .location-input),
+    :deep(.query-range--notes .region-input) {
+      max-width: none;
+    }
+
+    :deep(.query-range--notes .bottom-hint) {
+      width: 100%;
+      box-sizing: border-box;
+      margin: 12px 0 0;
+    }
+
+    :deep(.query-mode-controls) {
+      grid-area: modes;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    :deep(.query-mode-controls > .result-view-switcher) { order: 0; }
+
+    :deep(.query-controls-layout > .header-container) {
+      grid-area: category;
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    :deep(.condition-bar) {
+      justify-content: flex-start;
+      margin: calc(18px * var(--query-expansion)) 0 0;
+    }
+
+    :deep(.query-condition-label) {
+      color: var(--text-secondary);
+      font-size: 14px;
+      white-space: nowrap;
+    }
   }
 
   &.is-compact { width: 100%; }
@@ -162,5 +281,17 @@ defineExpose({ collapse, progress })
   }
 
   .query-search-panel { padding: calc(16px * var(--query-expansion)); }
+
+  .query-search-panel:not(.is-compact) {
+    :deep(.query-controls--vocabulary) {
+      grid-template-areas: 'input input' 'action action' 'range range' 'modes tools';
+    }
+    :deep(.query-controls--yubao) {
+      grid-template-areas: 'category category' 'input input' 'action action';
+    }
+    :deep(.query-search-action),
+    :deep(.query-controls-layout .notes-mode-actions) { justify-self: end; }
+    :deep(.query-condition-label) { display: none; }
+  }
 }
 </style>

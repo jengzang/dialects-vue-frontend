@@ -11,7 +11,7 @@
     </template>
     <template #controls="{ expanded }">
     <!-- 顶部控制栏 -->
-    <div class="top-controls">
+    <div class="top-controls query-controls-layout query-controls--yubao">
       <!-- Tab 切换 + 查看全部按钮 -->
       <div class="header-container">
         <div class="tab-container">
@@ -103,17 +103,24 @@
       </div>
       <button
         v-if="expanded"
-        class="query-submit glass-button"
+        class="query-submit query-search-action glass-button"
         data-variant="primary"
         type="button"
         :disabled="isLoading || !isDraftValid"
         @click="submitEntranceQuery"
-      >{{ t('common.button.search') }}</button>
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        {{ t('common.button.search') }}
+      </button>
     </div>
 
     <div class="condition-bar">
+      <span v-if="expanded" class="query-condition-label">{{ t('words.wordList.viewModes.label') }}</span>
       <ResultViewSwitcher v-model="viewMode" label-prefix="words.yuBaoPage.viewModes" />
-      <div v-if="viewMode === 'card'" class="local-filter-bar">
+      <div v-if="viewMode === 'card' && !expanded && cardData.length > 0" class="local-filter-bar">
         <div class="filter-input-wrapper">
           <svg class="filter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8"></circle>
@@ -135,6 +142,7 @@
     </template>
 
     <!-- 内容区 -->
+    <div v-show="entranceProgress === 1">
     <!-- 加载状态 -->
     <div v-if="isLoading" class="content-area glass-panel">
       <div class="loading-state loading-state-base">
@@ -236,6 +244,9 @@
 
     </div>
 
+    </div>
+    </QuerySearchEntrance>
+
     <!-- 查看全部弹窗 -->
     <AppModal
       :model-value="showAllModal"
@@ -266,7 +277,6 @@
         {{ t('words.yuBaoPage.modal.total', { count: filteredAllItems.length }) }}
       </div>
     </AppModal>
-    </QuerySearchEntrance>
   </div>
 </template>
 
