@@ -5,6 +5,7 @@
       :key="location"
       type="button"
       class="pill-btn location-quick-fill"
+      :class="{ 'location-quick-fill--landscape': location === '北京' || location === '成都' }"
       @click="emit('apply', location)"
     >
       <span>{{ location }}</span>
@@ -33,7 +34,9 @@ const QUICK_LOCATIONS = ['北京', '上海', '廣州', '成都']
 const emit = defineEmits(['apply'])
 </script>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 .location-quick-fill-list {
   display: flex;
   flex-wrap: wrap;
@@ -48,5 +51,11 @@ const emit = defineEmits(['apply'])
 
 .location-quick-fill__arrow {
   flex: 0 0 auto;
+}
+
+@media (max-aspect-ratio: 1 / 1) {
+  .location-quick-fill--landscape {
+    display: none;
+  }
 }
 </style>
