@@ -226,14 +226,20 @@
           :limitContext="locationLimitContext"
       />
 
-      <TutorialQuickStartPill :target="`query:${currentTab}`" />
+      <RecentQueryPills
+        :entries="recentQueries.entries.value"
+        :disabled="buttonState.isRunning || isRestoringHistory"
+        @restore="restoreRecentQuery"
+      >
+        <TutorialQuickStartPill :target="`query:${currentTab}`" />
+      </RecentQueryPills>
 
       <!-- ✅ 炫酷按鈕 -->
       <div class="run-container">
         <button
             class="run-btn"
             @click="runAction"
-            :disabled="buttonState.isRunning || isRunDisabled"
+            :disabled="buttonState.isRunning || isRunDisabled || isRestoringHistory"
             :class="{ disabled: isRunDisabled }"
         >
           <span v-if="buttonState.isRunning"><InlineIcon icon="🔄" />{{ $t('query.button.running') }}</span>
@@ -268,6 +274,8 @@ import { useI18n } from 'vue-i18n'
 import TabSwitcher from "@/components/common/TabSwitcher.vue";
 import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput.vue";
 import TutorialQuickStartPill from "@/main/components/tutorial/TutorialQuickStartPill.vue";
+import RecentQueryPills from '@/components/common/RecentQueryPills.vue'
+import { useRecentQueryHistory } from '@/composables/core/useRecentQueryHistory.js'
 import ZhongguSelector from "@/main/components/query/ZhongguSelector.vue";
 import ZhongGuDirectInput from "@/main/components/query/ZhongGuDirectInput.vue";
 import YinweiSelector from "@/main/components/query/YinweiSelector.vue";
@@ -286,6 +294,8 @@ import {
   tutorialAssistState,
   clearTutorialAssistRequest,
   zhongguInputMode,
+  setZhongguInputMode,
+  setPreferredCharacterTable,
 } from '@/main/store/store.js'
 import { useQueryConfig } from '@/composables/data/useQueryConfig.js'
 
@@ -525,6 +535,68 @@ const locationModel = ref({
   regionUsing: 'map'
 })
 
+const recentQueries = useRecentQueryHistory(() => `query:${currentTab.value}`)
+const isRestoringHistory = ref(false)
+
+function rememberRecentQuery(locationList) {
+  const tab = currentTab.value
+  const loc = { ...locationModel.value }
+  if (!loc.locations.length && !loc.regions.length) loc.locations = locationList
+  const snapshot = { table: selectedCharacterTable.value, loc }
+  let summary = ''
+  if (tab === 'tab1') {
+    snapshot.chars = hanziInput.value
+    summary = snapshot.chars
+  } else if (tab === 'tab2') {
+    snapshot.mode = zhongguInputMode.value
+    snapshot.state = tabStates.tab2
+    if (snapshot.mode === 'direct') {
+      snapshot.direct = {
+        positionInput: ZhongguDirectInputRef.value?.positionInput || '',
+        charInput: ZhongguDirectInputRef.value?.charInput || '',
+      }
+      summary = [snapshot.direct.positionInput, snapshot.direct.charInput].filter(Boolean).join(' ')
+    } else {
+      summary = Object.values(snapshot.state.valueMap).flat().join('、')
+    }
+    summary = [summary, snapshot.state.card].filter(Boolean).join(' · ')
+  } else if (tab === 'tab3') {
+    snapshot.state = tabStates.tab3
+    snapshot.phoInput = YinweiSelectorRef.value?.tab3KeyInput || ''
+    summary = [snapshot.phoInput, snapshot.state.card].filter(Boolean).join(' · ')
+  }
+  recentQueries.record(snapshot, [summary, [...loc.locations, ...loc.regions].join(' ')].filter(Boolean).join(' · '))
+}
+
+async function restoreRecentQuery(snapshot) {
+  if (buttonState.isRunning || isRestoringHistory.value) return
+  const tab = currentTab.value
+  isRestoringHistory.value = true
+  try {
+    setPreferredCharacterTable(snapshot.table)
+    if (tab === 'tab2') setZhongguInputMode(snapshot.mode)
+    await nextTick()
+    if (tab !== currentTab.value) return
+    locationModel.value = snapshot.loc
+    if (tab === 'tab1') hanziInput.value = snapshot.chars
+    if (tab === 'tab2') {
+      tabStates.tab2 = snapshot.state
+      if (snapshot.mode === 'direct' && ZhongguDirectInputRef.value) {
+        ZhongguDirectInputRef.value.positionInput = snapshot.direct.positionInput
+        ZhongguDirectInputRef.value.charInput = snapshot.direct.charInput
+      }
+    }
+    if (tab === 'tab3') {
+      tabStates.tab3 = snapshot.state
+      await nextTick()
+      if (tab !== currentTab.value) return
+      YinweiSelectorRef.value?.restoreInput(snapshot.phoInput)
+    }
+  } finally {
+    isRestoringHistory.value = false
+  }
+}
+
 function onClickOutside(event) {
   const isInsideTrigger = [
     keyTriggerEl.value,
@@ -615,7 +687,7 @@ function resetRememberedMapSubToView() {
 
 // 點擊按鈕行為
 const runAction = async () => {
-  if (isRunDisabled.value || locationRef.value?.runDisabled) return
+  if (isRunDisabled.value || locationRef.value?.runDisabled || isRestoringHistory.value) return
   setRunning('query', true);
 
   // 1. 獲取地點邏輯 (保持不變)
@@ -759,6 +831,7 @@ const runAction = async () => {
     // 2. 存入全局仓库
     globalPayload.value = JSON.parse(JSON.stringify(finalPayload))
   }
+  rememberRecentQuery(locationList)
   resetRememberedMapSubToView()
   // 3. 纯净跳转
   await router.replace({

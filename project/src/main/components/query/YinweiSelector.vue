@@ -110,6 +110,8 @@ const aggregatedCardStats = ref({})
 const cardSuggestions = ref([])
 const hasFetchedFeatureCounts = ref(false)
 let fetchSuggestionsTimer = null
+let blurTimer = null
+let hasRestoredInput = false
 let featureRequestToken = 0
 let helpPopupAnimationTimer = null
 
@@ -148,12 +150,15 @@ watch(legalState, (state) => {
 }, { immediate: true })
 
 watch(locationList, () => {
+  featureRequestToken += 1
+  isFetchingSuggestions.value = false
   aggregatedFeatureData.value = {}
   aggregatedCardStats.value = {}
   cardSuggestions.value = []
   hasFetchedFeatureCounts.value = false
   suggestions.value = []
   apiResults.value = {}
+  if (hasRestoredInput) void ensureFeatureCountsLoaded()
 }, { deep: true })
 
 watch(() => props.selectedCard, () => {
@@ -217,7 +222,7 @@ async function ensureFeatureCountsLoaded() {
     hasFetchedFeatureCounts.value = true
 
     const normalized = normalizeYinweiTokens(tab3KeyInput.value, cardSuggestions.value, 3)
-    if (normalized.normalizedInput !== tab3KeyInput.value.trim()) {
+    if (!hasRestoredInput && normalized.normalizedInput !== tab3KeyInput.value.trim()) {
       tab3KeyInput.value = normalized.normalizedInput
     }
   } catch (error) {
@@ -269,6 +274,7 @@ async function fetchSuggestion() {
 }
 
 function onKeyup() {
+  hasRestoredInput = false
   showSuccessCheckmark.value = legalState.value.legalTokens.length > 0
   clearTimeout(fetchSuggestionsTimer)
   fetchSuggestionsTimer = setTimeout(() => {
@@ -277,7 +283,8 @@ function onKeyup() {
 }
 
 function onBlur() {
-  setTimeout(() => {
+  clearTimeout(blurTimer)
+  blurTimer = setTimeout(() => {
     suggestions.value = []
     const normalized = normalizeYinweiTokens(tab3KeyInput.value, cardSuggestions.value, 3)
     if (normalized.normalizedInput !== tab3KeyInput.value.trim()) {
@@ -286,7 +293,17 @@ function onBlur() {
   }, 200)
 }
 
+function restoreInput(value) {
+  clearTimeout(blurTimer)
+  clearTimeout(fetchSuggestionsTimer)
+  suggestions.value = []
+  tab3KeyInput.value = value
+  hasRestoredInput = true
+  void ensureFeatureCountsLoaded()
+}
+
 function applySuggestion(item) {
+  hasRestoredInput = false
   const parts = String(tab3KeyInput.value)
     .split(/[\s,;，；、\n\t]+/)
     .map(part => part.trim())
@@ -316,6 +333,7 @@ function getSuggestionStats(item) {
 }
 
 defineExpose({
+  restoreInput,
   tab3KeyInput,
   legalPhoValues: computed(() => legalState.value.legalTokens),
   normalizedPhoInput: computed(() => legalState.value.normalizedInput),
