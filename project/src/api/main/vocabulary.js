@@ -7,6 +7,7 @@ const VOCABULARY_MAP_POINTS_ENDPOINT = '/api/vocabulary/search/map-points'
 const VOCABULARY_STANDARD_WORDS_ENDPOINT = '/api/vocabulary/search/standard-words'
 const VOCABULARY_MAP_ITEMS_ENDPOINT = '/api/vocabulary/search/map-items'
 const VOCABULARY_LOCATION_OPTIONS_ENDPOINT = '/api/vocabulary/search/location-options'
+const VOCABULARY_PARTITION_OPTIONS_ENDPOINT = '/api/vocabulary/search/partition-options'
 const VOCABULARY_LOCATIONS_ENDPOINT = '/api/vocabulary/locations'
 const VOCABULARY_LOGS_ENDPOINT = '/api/vocabulary/logs'
 const VOCABULARY_IMPORTS_ENDPOINT = '/api/vocabulary/imports'
@@ -44,7 +45,15 @@ function appendListIfPresent(params, key, value) {
 function appendQueryParams(values = {}) {
   const query = new URLSearchParams()
   Object.entries(values).forEach(([key, value]) => {
-    appendListIfPresent(query, key, value)
+    if (key === 'regions') {
+      const paths = value == null ? [] : Array.isArray(value) ? value : [value]
+      if (paths.length > 50 || paths.some(path => typeof path !== 'string' || Array.from(path).length > 200)) {
+        throw new Error('Regions support at most 50 paths of 200 characters each')
+      }
+      paths.forEach(path => query.append(key, path))
+    } else {
+      appendListIfPresent(query, key, value)
+    }
   })
   const suffix = query.toString()
   return suffix ? `?${suffix}` : ''
@@ -105,6 +114,8 @@ function withVocabularyEntryCreateLocation(params = {}) {
  * @property {string | string[]} [locations] 独立地点筛选，多个地点之间为 OR；该筛选与 q 内容匹配是 AND 关系。
  * @property {string} [province] 按省筛选，与 locations 互斥。
  * @property {string} [city] 按市筛选，与 locations 互斥。
+ * @property {'yindian' | 'map'} [region_mode] 分区体系。
+ * @property {string[]} [regions] 完整分区路径，使用重复参数，保留原文。
  * @property {number} [page=1] 卡片模式结果页码；后端默认 1。
  * @property {number} [page_size=50] 卡片模式每页数量；后端默认 50，最大 200。
  */
@@ -119,6 +130,8 @@ function withVocabularyEntryCreateLocation(params = {}) {
  * @property {string} informations 补充信息。
  * @property {string} location_name 地点简称。
  * @property {string} location_label 完整地点链。
+ * @property {string} yindian_region 音典分区。
+ * @property {string} atlas_region 地图集分区。
  */
 
 /**
@@ -190,6 +203,8 @@ export function buildVocabularyItemsPath(params = {}) {
     locations: params.locations,
     province: params.province,
     city: params.city,
+    region_mode: params.region_mode,
+    regions: params.regions,
     page: params.page,
     page_size: params.page_size,
   })}`
@@ -210,6 +225,8 @@ export function buildVocabularyMapPointsPath(params = {}) {
     locations: params.locations,
     province: params.province,
     city: params.city,
+    region_mode: params.region_mode,
+    regions: params.regions,
   })}`
 }
 
@@ -228,6 +245,8 @@ export function buildVocabularyStandardWordsPath(params = {}) {
     locations: params.locations,
     province: params.province,
     city: params.city,
+    region_mode: params.region_mode,
+    regions: params.regions,
     limit: params.limit,
   })}`
 }
@@ -248,6 +267,8 @@ export function buildVocabularyMapItemsPath(params = {}) {
     locations: params.locations,
     province: params.province,
     city: params.city,
+    region_mode: params.region_mode,
+    regions: params.regions,
   })}`
 }
 
@@ -371,9 +392,14 @@ export async function setVocabularyPermission(userId, permissionLevel) {
  *
  * @returns {Promise<Array<{value: string, label: string, locationLabel: string, province: string, city: string}>>}
  */
-export async function getVocabularyLocationOptions() {
+export async function getVocabularyLocationOptions(params = {}) {
   try {
-    const response = await api(VOCABULARY_LOCATION_OPTIONS_ENDPOINT)
+    const response = await api(`${VOCABULARY_LOCATION_OPTIONS_ENDPOINT}${appendQueryParams({
+      region_mode: params.region_mode,
+      regions: params.regions,
+      province: params.province,
+      city: params.city,
+    })}`)
     const seenLocationNames = new Set()
     const locations = Array.isArray(response.locations) ? response.locations : []
 
@@ -390,6 +416,10 @@ export async function getVocabularyLocationOptions() {
         locationLabel: location.location_label || locationName,
         province: location.province || '',
         city: location.city || '',
+        yindianRegion: location.yindian_region || '',
+        atlasRegion: location.atlas_region || '',
+        yindianRegions: Array.isArray(location.yindian_regions) ? location.yindian_regions : [],
+        atlasRegions: Array.isArray(location.atlas_regions) ? location.atlas_regions : [],
       })
       return options
     }, [])
@@ -398,6 +428,10 @@ export async function getVocabularyLocationOptions() {
     showError(error.message || '獲取詞表地點失敗')
     throw new Error(error.message || '獲取詞表地點失敗')
   }
+}
+
+export async function getVocabularyPartitionOptions(regionMode = 'yindian') {
+  return api(`${VOCABULARY_PARTITION_OPTIONS_ENDPOINT}${appendQueryParams({ region_mode: regionMode })}`)
 }
 
 export async function getVocabularyLocationNames() {

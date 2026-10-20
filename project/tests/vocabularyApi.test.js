@@ -29,6 +29,7 @@ const {
   getVocabularyStandardWords,
   getVocabularyLocationNames,
   getVocabularyLocationOptions,
+  getVocabularyPartitionOptions,
   getVocabularyLocations,
   getVocabularyLogs,
   deleteVocabularyLocation,
@@ -49,11 +50,36 @@ function readSource(path) {
 }
 
 beforeEach(() => {
-  apiMock.mockClear()
+  apiMock.mockReset()
   setVocabularyEntryCreateLocationName('')
 })
 
 describe('vocabulary items API', () => {
+  it.each([buildVocabularyItemsPath, buildVocabularyMapPointsPath, buildVocabularyStandardWordsPath, buildVocabularyMapItemsPath])('preserves repeated full region paths for %s', buildPath => {
+    const regions = ['嶺南-珠江', '閩-閩南', '原文-含,逗號']
+    const params = paramsFromPath(buildPath({ region_mode: 'map', regions }))
+    expect(params.get('region_mode')).toBe('map')
+    expect(params.getAll('regions')).toEqual(regions)
+    expect(() => buildPath({ regions: Array(51).fill('甲') })).toThrow()
+    expect(() => buildPath({ regions: ['甲'.repeat(201)] })).toThrow()
+  })
+
+  it('loads vocabulary-owned partition trees for both modes', async () => {
+    for (const region_mode of ['yindian', 'map']) {
+      apiMock.mockResolvedValueOnce({ schema_version: 2, region_mode, nodes: [] })
+      await getVocabularyPartitionOptions(region_mode)
+      expect(apiMock).toHaveBeenLastCalledWith(`/api/vocabulary/search/partition-options?region_mode=${region_mode}`)
+    }
+  })
+
+  it('filters location options by repeated region paths and retains same-name region arrays', async () => {
+    apiMock.mockResolvedValueOnce({ locations: [{ location_name: '同名', yindian_regions: ['甲-乙', '丙-乙'], atlas_regions: ['粵語-廣府片', '吳語-太湖片'] }] })
+    const options = await getVocabularyLocationOptions({ region_mode: 'yindian', regions: ['甲-乙', '丙-乙'] })
+    expect(paramsFromPath(apiMock.mock.calls.at(-1)[0]).getAll('regions')).toEqual(['甲-乙', '丙-乙'])
+    expect(options[0].yindianRegions).toEqual(['甲-乙', '丙-乙'])
+    expect(options[0].atlasRegions).toEqual(['粵語-廣府片', '吳語-太湖片'])
+  })
+
   it('does not reference backend-deleted vocabulary compatibility paths', () => {
     const source = readSource('src/api/main/vocabulary.js')
 
@@ -334,8 +360,8 @@ describe('vocabulary table API adapter', () => {
     const values = await getVocabularyLocationOptions()
 
     expect(values).toEqual([
-      { value: '息烽', label: '息烽', locationLabel: '贵州 / 贵阳 / 息烽', province: '', city: '' },
-      { value: '天柱', label: '天柱', locationLabel: '贵州 / 黔东南 / 天柱', province: '', city: '' },
+      { value: '息烽', label: '息烽', locationLabel: '贵州 / 贵阳 / 息烽', province: '', city: '', yindianRegion: '', atlasRegion: '', yindianRegions: [], atlasRegions: [] },
+      { value: '天柱', label: '天柱', locationLabel: '贵州 / 黔东南 / 天柱', province: '', city: '', yindianRegion: '', atlasRegion: '', yindianRegions: [], atlasRegions: [] },
     ])
     expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/search/location-options')
   })
