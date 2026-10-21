@@ -16,7 +16,7 @@
 - Modify: `project/src/layouts/MenuLayout.vue`
 - Modify: `project/src/main/views/explore/word/vocabulary/vocabulary.scss`
 
-- [ ] **Step 1: Mark vocabulary routes in the layout and allow viewport sticky positioning**
+- [x] **Step 1: Mark vocabulary routes in the layout and allow viewport sticky positioning**
 
 In `MenuLayout.vue`, import `useRoute`, initialize `const route = useRoute()` in `<script setup>`, and add a route-specific class to the content wrapper:
 
@@ -35,7 +35,7 @@ Add this rule inside its existing scoped SCSS block. Keep the default overflow b
 }
 ```
 
-- [ ] **Step 2: Pin the vocabulary tabs at the requested offsets**
+- [x] **Step 2: Pin the vocabulary tabs at the requested offsets**
 
 In `vocabulary.scss`, change the base `.page-tab-navigation` sticky inset from `top: 0` to the initial landscape position:
 
@@ -45,11 +45,11 @@ top: calc(max(16px, env(safe-area-inset-top)) + 7dvh + 6px);
 
 In the existing `@media (max-aspect-ratio: 1 / 1)` block, change `.page-tab-navigation` from `position: static` to `position: sticky` and add `top: 0`. Keep its current alignment and margins.
 
-- [ ] **Step 3: Review the scoped diff**
+- [x] **Step 3: Review the scoped diff**
 
 Run `git diff -- project/src/layouts/MenuLayout.vue project/src/main/views/explore/word/vocabulary/vocabulary.scss` and confirm the only behavior changes are the vocabulary route's scroll context and the two orientation-specific sticky offsets. Do not run or add tests for this request.
 
-- [ ] **Step 4: Commit only the implementation files**
+- [x] **Step 4: Commit only the implementation files**
 
 ```bash
 git commit --only project/src/layouts/MenuLayout.vue project/src/main/views/explore/word/vocabulary/vocabulary.scss -m "fix(vocabulary): keep page tabs visible while scrolling"
