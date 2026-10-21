@@ -599,9 +599,7 @@ const hasSubmittedSearch = ref(false)
 const isSearchExpanded = ref(true)
 
 function handleSearchProgress(progress) {
-  const expanded = progress < 1
-  if (expanded && !isSearchExpanded.value) hasSubmittedSearch.value = false
-  isSearchExpanded.value = expanded
+  isSearchExpanded.value = progress < 1
 }
 
 function submitSearch(collapse) {

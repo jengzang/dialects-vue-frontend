@@ -101,11 +101,11 @@ describe('one query panel morphing with scroll', () => {
     expect(host.querySelector('.original-query')).toBe(input)
     expect(host.querySelector('.original-filter')).toBe(filter)
     expect(input.value).toBe('饮水')
-    expect(host.querySelector('.query-results--enabled')).toBeNull()
+    expect(host.querySelector('.query-results--enabled')).not.toBeNull()
     scrollPosition = Math.floor(end)
     window.dispatchEvent(new Event('scroll'))
     await settle()
-    expect(entrance.progress).toBe(0)
+    expect(entrance.progress).toBe(1)
   })
 
   it('keeps the panel expanded when scrolling before submitting a query', async () => {

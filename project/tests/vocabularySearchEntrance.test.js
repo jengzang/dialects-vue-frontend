@@ -284,13 +284,14 @@ describe('vocabulary configuration entrance', () => {
     const request = source === 'vocabulary' ? mocks.items : mocks.notes
     expect(request).toHaveBeenCalledWith(expect.objectContaining({ q: '' }))
     expect(host.querySelector('.content-area')).not.toBeNull()
-    // Returning to the large panel suspends queries and removes results.
+    // Returning to the large panel hides results but preserves the submitted query.
     entrance.$.exposed.progress.value = 0
     await settle()
     expect(host.querySelector('.content-area')).toBeNull()
     request.mockClear()
-    host.querySelector('.filter').click()
-    await new Promise(resolve => setTimeout(resolve, 850))
+    entrance.$.exposed.progress.value = 1
+    await settle()
+    expect(host.querySelector('.content-area')).not.toBeNull()
     expect(request).not.toHaveBeenCalled()
   })
 

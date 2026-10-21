@@ -59,7 +59,6 @@ function updateProgress() {
   const nextProgress = props.enabled && distance
     ? remaining <= 1 ? 1 : Math.max(0, Math.min(1, 1 - remaining / distance))
     : 1
-  if (props.enabled && progress.value > 0 && nextProgress === 0) hasSubmittedQuery.value = false
   progress.value = nextProgress
 }
 
