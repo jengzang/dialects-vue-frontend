@@ -46,11 +46,18 @@ const transitionDuration = 400
 const boundaryHoldDuration = 100
 let transitionUnlocked = false
 let boundaryDirection = 0
-let boundaryStartTime = 0
+let lastBoundaryInputTime = 0
+let boundaryScrollPosition = null
 let lastScrollPosition = 0
 let inputDirection = 0
 let touchY = null
+let touchCanReleaseBoundary = false
 const hasSubmittedQuery = ref(false)
+
+function clearBoundary() {
+  boundaryDirection = 0
+  boundaryScrollPosition = null
+}
 
 function animateProgress(time) {
   const step = Math.max(0, time - lastAnimationTime) / transitionDuration
@@ -64,7 +71,7 @@ function animateProgress(time) {
     : window.requestAnimationFrame(animateProgress)
   if (progress.value === 0 || progress.value === 1) {
     transitionUnlocked = false
-    boundaryDirection = 0
+    clearBoundary()
   }
 }
 
@@ -75,7 +82,7 @@ function setTargetProgress(value, immediate = false) {
     animationFrame = null
     progress.value = value
     transitionUnlocked = false
-    boundaryDirection = 0
+    clearBoundary()
     return
   }
   if (animationFrame === null && progress.value !== value) {
@@ -104,51 +111,86 @@ function updateProgress(fromScroll = false) {
   const nextProgress = props.enabled && distance
     ? remaining <= 1 ? 1 : Math.max(0, Math.min(1, 1 - remaining / distance))
     : 1
-  if (props.enabled && hasSubmittedQuery.value && !transitionUnlocked && nextProgress !== progress.value) {
+  if (props.enabled && hasSubmittedQuery.value && !transitionUnlocked && progress.value === 1 && nextProgress < 1) {
     if (!fromScroll) return
     const direction = Math.sign(nextProgress - progress.value)
-    const now = window.performance.now()
     if (inputDirection && inputDirection !== direction) {
       boundaryDirection = 0
       return
     }
-    // Keep a fixed hold: continued scrolling must not restart the timer.
-    transitionUnlocked = boundaryDirection === direction && now - boundaryStartTime >= boundaryHoldDuration
-    if (boundaryDirection !== direction) {
-      boundaryDirection = direction
-      boundaryStartTime = now
-    }
-    if (!transitionUnlocked) return
+    boundaryDirection = direction
+    lastBoundaryInputTime = window.performance.now()
+    boundaryScrollPosition = window.scrollY
+    touchCanReleaseBoundary = false
+    window.scrollTo({ top: boundaryScrollPosition, behavior: 'instant' })
+    return
   }
   setTargetProgress(nextProgress, !props.enabled)
 }
 
 function handleScroll() {
   const position = window.scrollY
+  if (boundaryScrollPosition !== null) {
+    if (position !== boundaryScrollPosition) {
+      lastBoundaryInputTime = window.performance.now()
+      window.scrollTo({ top: boundaryScrollPosition, behavior: 'instant' })
+    }
+    return
+  }
   if (position !== lastScrollPosition) inputDirection = Math.sign(position - lastScrollPosition)
   lastScrollPosition = position
   if (inputDirection && boundaryDirection !== inputDirection) boundaryDirection = 0
   if (scrollFrame === null) scrollFrame = window.requestAnimationFrame(() => updateProgress(true))
 }
 
+function acceptScrollInput(event, direction, canRelease = true) {
+  // Leave dropdowns, text areas and modal content free to scroll internally.
+  for (let element = event.target instanceof Element ? event.target : null; element && element !== document.body && element !== document.documentElement; element = element.parentElement) {
+    const canScroll = direction < 0 ? element.scrollTop > 0 : element.scrollTop + element.clientHeight < element.scrollHeight - 1
+    if (canScroll && /auto|scroll/.test(window.getComputedStyle(element).overflowY)) return false
+  }
+  inputDirection = direction
+  if (boundaryScrollPosition === null) return true
+  if (direction !== boundaryDirection) {
+    clearBoundary()
+    return true
+  }
+  const now = window.performance.now()
+  const freshGesture = canRelease && now - lastBoundaryInputTime >= boundaryHoldDuration
+  lastBoundaryInputTime = now
+  if (freshGesture) {
+    transitionUnlocked = true
+    clearBoundary()
+    return true
+  }
+  if (event.cancelable) event.preventDefault()
+  return false
+}
+
 function handleWheel(event) {
   if (!event.deltaY || event.ctrlKey || event.defaultPrevented) return
-  inputDirection = Math.sign(event.deltaY)
-  handleScroll()
+  if (acceptScrollInput(event, Math.sign(event.deltaY))) handleScroll()
 }
 
 function handleTouchStart(event) {
   touchY = event.touches[0]?.clientY ?? null
+  touchCanReleaseBoundary = true
 }
 
 function handleTouchMove(event) {
   if (event.defaultPrevented) return
   const nextY = event.touches[0]?.clientY
   if (touchY !== null && nextY !== undefined && nextY !== touchY) {
-    inputDirection = Math.sign(touchY - nextY)
-    handleScroll()
+    if (acceptScrollInput(event, Math.sign(touchY - nextY), touchCanReleaseBoundary)) handleScroll()
   }
   touchY = nextY ?? null
+}
+
+function handleKeyDown(event) {
+  if (boundaryScrollPosition === null || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return
+  if (event.target instanceof Element && event.target.closest('input, textarea, select, [contenteditable]')) return
+  const direction = { ArrowUp: -1, PageUp: -1, Home: -1, ArrowDown: 1, PageDown: 1, End: 1, ' ': event.shiftKey ? -1 : 1 }[event.key]
+  if (direction && acceptScrollInput(event, direction, !event.repeat)) handleScroll()
 }
 
 function handleResize() {
@@ -159,7 +201,7 @@ async function collapse() {
   if (!props.enabled) return
   hasSubmittedQuery.value = true
   transitionUnlocked = true
-  boundaryDirection = 0
+  clearBoundary()
   await nextTick()
   window.scrollTo({
     top: compactPosition(),
@@ -173,9 +215,10 @@ watch(() => props.enabled, async () => { await nextTick(); updateProgress() })
 function startListening() {
   lastScrollPosition = window.scrollY
   window.addEventListener('scroll', handleScroll, { passive: true })
-  window.addEventListener('wheel', handleWheel, { passive: true })
+  window.addEventListener('wheel', handleWheel, { passive: false })
   window.addEventListener('touchstart', handleTouchStart, { passive: true })
-  window.addEventListener('touchmove', handleTouchMove, { passive: true })
+  window.addEventListener('touchmove', handleTouchMove, { passive: false })
+  window.addEventListener('keydown', handleKeyDown)
   window.addEventListener('resize', handleResize, { passive: true })
   updateProgress()
 }
@@ -185,11 +228,13 @@ function stopListening() {
   window.removeEventListener('wheel', handleWheel)
   window.removeEventListener('touchstart', handleTouchStart)
   window.removeEventListener('touchmove', handleTouchMove)
+  window.removeEventListener('keydown', handleKeyDown)
   window.removeEventListener('resize', handleResize)
   if (scrollFrame !== null) window.cancelAnimationFrame(scrollFrame)
   if (animationFrame !== null) window.cancelAnimationFrame(animationFrame)
   scrollFrame = null
   animationFrame = null
+  clearBoundary()
 }
 
 onMounted(startListening)

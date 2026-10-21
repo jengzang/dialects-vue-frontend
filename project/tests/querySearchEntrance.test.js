@@ -131,8 +131,6 @@ describe('one query panel morphing with scroll', () => {
     scrollPosition = Math.floor(end)
     window.dispatchEvent(new Event('scroll'))
     await settle()
-    expect(entrance.progress).toBe(0)
-    await resumeScroll(100)
     expect(entrance.progress).toBe(1)
   })
 
