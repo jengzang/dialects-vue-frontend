@@ -57,6 +57,11 @@
         @locations-resolved="handleNotesScopeResolved"
       />
       </Teleport>
+      <div v-if="!isCharacterNotesMode" class="vocabulary-counts-footer" aria-live="polite">
+        <span>{{ t('words.wordList.upload.totalLocations', { count: vocabularyCounts.locations ?? '…' }) }}</span>
+        <span class="vocabulary-counts-separator" aria-hidden="true">·</span>
+        <span>{{ t('words.wordList.upload.totalEntries', { count: vocabularyCounts.total ?? '…' }) }}</span>
+      </div>
     </template>
     <template #after-panel>
       <RadioGroup
@@ -337,12 +342,6 @@
       />
     </section>
     </QuerySearchEntrance>
-
-    <div v-if="!isCharacterNotesMode" class="vocabulary-counts-footer" aria-live="polite">
-      <span>{{ t('words.wordList.upload.totalLocations', { count: vocabularyCounts.locations ?? '…' }) }}</span>
-      <span class="vocabulary-counts-separator" aria-hidden="true">·</span>
-      <span>{{ t('words.wordList.upload.totalEntries', { count: vocabularyCounts.total ?? '…' }) }}</span>
-    </div>
 
     <AppModal
       v-model="isMapDetailModalOpen"
