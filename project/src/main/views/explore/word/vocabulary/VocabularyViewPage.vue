@@ -338,6 +338,12 @@
     </section>
     </QuerySearchEntrance>
 
+    <div v-if="!isCharacterNotesMode" class="vocabulary-counts-footer" aria-live="polite">
+      <span>{{ t('words.wordList.upload.totalLocations', { count: vocabularyCounts.locations ?? '…' }) }}</span>
+      <span class="vocabulary-counts-separator" aria-hidden="true">·</span>
+      <span>{{ t('words.wordList.upload.totalEntries', { count: vocabularyCounts.total ?? '…' }) }}</span>
+    </div>
+
     <AppModal
       v-model="isMapDetailModalOpen"
       size="lg"
@@ -516,6 +522,7 @@ import * as OpenCCT2CN from 'opencc-js/t2cn'
 import {
   getVocabularyItems,
   getVocabularyLocationOptions,
+  getVocabularyCounts,
   getVocabularyPartitionOptions,
   getVocabularyMapItems,
   getVocabularyMapPoints,
@@ -773,6 +780,7 @@ const pendingVocabularyMapPointRequests = new Map()
 const pendingVocabularyStandardWordRequests = new Map()
 const mapDetailItemsCache = new Map()
 const total = ref(0)
+const vocabularyCounts = ref({ total: null, locations: null })
 const page = ref(1)
 const pageSize = ref(50)
 const isLoadingItems = ref(false)
@@ -1925,6 +1933,13 @@ function loadActiveViewMode() {
   }
 }
 
+async function loadVocabularyCounts() {
+  const counts = await getVocabularyCounts()
+  if (counts.total != null && counts.locations != null) {
+    vocabularyCounts.value = counts
+  }
+}
+
 onMounted(async () => {
   if (isCharacterNotesMode.value) {
     if (!NOTES_VIEW_MODES.includes(route.query.tab)) {
@@ -1933,6 +1948,7 @@ onMounted(async () => {
     loadNotes()
     return
   }
+  void loadVocabularyCounts()
   await loadVocabularyLocationOptions({ unfiltered: true })
   if (filterMode.value !== 'location') await loadVocabularyLocationOptions()
   loadActiveViewMode()
@@ -2026,6 +2042,7 @@ watch(isCharacterNotesMode, async (isNotes) => {
   } else {
     if (viewMode.value === 'list') viewMode.value = 'card'
     closeNotesLocationPopup()
+    void loadVocabularyCounts()
     loadVocabularyPartitionTree()
     await loadVocabularyLocationOptions({ unfiltered: true })
     await loadVocabularyLocationOptions()

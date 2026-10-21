@@ -266,8 +266,8 @@ $card-radius: 8px;
 
 /* 最外层容器：次主色边框 */
 .query-result-box {
-  --surface-panel-fill: var(--color-secondary-bg);
-  --surface-panel-border: 1px solid var(--color-secondary-border);
+  --surface-panel-fill: var(--color-primary-light);
+  --surface-panel-border: 1px solid var(--color-primary-border);
   --surface-panel-shadow: none;
   --surface-panel-hover-shadow: none;
   @include flex-col;
