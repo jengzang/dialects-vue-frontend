@@ -40,7 +40,8 @@ export function useViewportPinnedElement(options = {}) {
   const placeholderStyle = ref({})
   const isPinned = ref(false)
 
-  let isActive = false
+  let isComponentActive = false
+  let isListening = false
   let scrollEventTarget = null
   let orientationQuery = null
   let resizeObserver = null
@@ -53,7 +54,7 @@ export function useViewportPinnedElement(options = {}) {
   }
 
   function updatePosition() {
-    if (!isActive) return
+    if (!isListening) return
 
     const element = unref(elementRef)
     const placeholder = unref(placeholderRef)
@@ -107,10 +108,10 @@ export function useViewportPinnedElement(options = {}) {
     }
   }
 
-  function activate() {
-    if (isActive || typeof window === 'undefined') return
+  function startListening() {
+    if (isListening || typeof window === 'undefined') return
 
-    isActive = true
+    isListening = true
     scrollEventTarget = resolveValue(scrollTarget) || window
     scrollEventTarget.addEventListener('scroll', updatePosition, { passive: true })
     window.addEventListener('resize', updatePosition, { passive: true })
@@ -122,10 +123,13 @@ export function useViewportPinnedElement(options = {}) {
     updatePosition()
   }
 
-  function deactivate() {
-    if (!isActive) return
+  function stopListening() {
+    if (!isListening) {
+      clearPosition()
+      return
+    }
 
-    isActive = false
+    isListening = false
     scrollEventTarget?.removeEventListener('scroll', updatePosition)
     window.removeEventListener('resize', updatePosition)
     window.removeEventListener('orientationchange', updatePosition)
@@ -134,10 +138,36 @@ export function useViewportPinnedElement(options = {}) {
     clearPosition()
   }
 
+  function activate() {
+    if (isComponentActive || typeof window === 'undefined') return
+
+    isComponentActive = true
+    if (resolveValue(enabled)) {
+      startListening()
+    } else {
+      clearPosition()
+    }
+  }
+
+  function deactivate() {
+    if (!isComponentActive && !isListening) return
+
+    isComponentActive = false
+    stopListening()
+  }
+
   watch(
     () => [unref(elementRef), unref(placeholderRef), Boolean(resolveValue(enabled))],
     () => {
-      if (!isActive) return
+      if (!isComponentActive) return
+      if (!resolveValue(enabled)) {
+        stopListening()
+        return
+      }
+      if (!isListening) {
+        startListening()
+        return
+      }
       observeElement()
       updatePosition()
     },

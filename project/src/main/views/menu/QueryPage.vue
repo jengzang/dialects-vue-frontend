@@ -1,6 +1,7 @@
 <template>
   <TabSwitcher
     class="page-tabs--vertically-centered"
+    pin-navigation
     :tabs="tabs"
     :model-value="currentTab"
     :route-value="currentTab"

@@ -1,6 +1,7 @@
 <template>
   <div class="pho-page">
     <TabSwitcher
+      pin-navigation
       :class="{ 'pho-tabs--query': ['phonologyMatrix', 'phonologyCustom'].includes(currentTab) }"
       :tabs="tabs"
       :model-value="currentTab"

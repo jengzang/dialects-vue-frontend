@@ -1,38 +1,48 @@
 <template>
   <div :class="['tabs-wrapper', `tabs-wrapper--${mode}`, { 'tabs-wrapper--navigation-only': navigationOnly }, `tabs-wrapper--${size}`]">
-    <div :class="['tabs-navigation', 'ui-tabs-navigation', `ui-tabs-navigation--${mode}`, `ui-tabs-navigation--${variant}`]">
-      <!-- 额外的 tab 左侧内容插槽 -->
-      <slot name="tab-extra"></slot>
-      <nav
-        ref="tabList"
-        class="tabs ui-scrollbar--hidden"
-        :role="useRouter ? undefined : navigationOnly ? 'group' : 'tablist'"
-        :aria-label="ariaLabel || undefined"
-        :aria-orientation="useRouter || navigationOnly ? undefined : mode === 'adaptive' && !isPortrait ? 'vertical' : 'horizontal'"
+    <div
+      ref="navigationPlaceholder"
+      :class="{ 'tabs-navigation-slot': pinNavigation }"
+      :style="pinNavigation ? navigationPlaceholderStyle : { display: 'contents' }"
+    >
+      <div
+        ref="navigationElement"
+        :class="['tabs-navigation', 'ui-tabs-navigation', `ui-tabs-navigation--${mode}`, `ui-tabs-navigation--${variant}`]"
+        :style="navigationStyle"
       >
-        <component
-          :is="useRouter && !tab.disabled ? RouterLink : 'button'"
-          v-for="tab in tabs"
-          :id="tabId(tab.name)"
-          :key="tab.name"
-          :to="useRouter && !tab.disabled ? resolveTabLocation(tab.name) : undefined"
-          :replace="useRouter && !tab.disabled ? true : undefined"
-          :type="!useRouter || tab.disabled ? 'button' : undefined"
-          :class="['tab', 'ui-tab-item', { active: currentTab === tab.name }]"
-          :disabled="tab.disabled || undefined"
-          :role="useRouter || navigationOnly ? undefined : 'tab'"
-          :aria-current="useRouter && currentTab === tab.name ? 'page' : undefined"
-          :aria-selected="useRouter || navigationOnly ? undefined : currentTab === tab.name"
-          :aria-pressed="!useRouter && navigationOnly ? currentTab === tab.name : undefined"
-          :aria-controls="useRouter || navigationOnly ? undefined : panelId"
-          :tabindex="useRouter || navigationOnly ? undefined : tab.name === focusableTab ? 0 : -1"
-          :data-label="mode === 'segmented' ? tab.label : undefined"
-          @click="handleTabClick(tab, $event)"
-          @keydown="handleTabKeydown"
+        <!-- 额外的 tab 左侧内容插槽 -->
+        <slot name="tab-extra"></slot>
+        <nav
+          ref="tabList"
+          class="tabs ui-scrollbar--hidden"
+          :role="useRouter ? undefined : navigationOnly ? 'group' : 'tablist'"
+          :aria-label="ariaLabel || undefined"
+          :aria-orientation="useRouter || navigationOnly ? undefined : mode === 'adaptive' && !isPortrait ? 'vertical' : 'horizontal'"
         >
-          {{ tab.label }}
-        </component>
-      </nav>
+          <component
+            :is="useRouter && !tab.disabled ? RouterLink : 'button'"
+            v-for="tab in tabs"
+            :id="tabId(tab.name)"
+            :key="tab.name"
+            :to="useRouter && !tab.disabled ? resolveTabLocation(tab.name) : undefined"
+            :replace="useRouter && !tab.disabled ? true : undefined"
+            :type="!useRouter || tab.disabled ? 'button' : undefined"
+            :class="['tab', 'ui-tab-item', { active: currentTab === tab.name }]"
+            :disabled="tab.disabled || undefined"
+            :role="useRouter || navigationOnly ? undefined : 'tab'"
+            :aria-current="useRouter && currentTab === tab.name ? 'page' : undefined"
+            :aria-selected="useRouter || navigationOnly ? undefined : currentTab === tab.name"
+            :aria-pressed="!useRouter && navigationOnly ? currentTab === tab.name : undefined"
+            :aria-controls="useRouter || navigationOnly ? undefined : panelId"
+            :tabindex="useRouter || navigationOnly ? undefined : tab.name === focusableTab ? 0 : -1"
+            :data-label="mode === 'segmented' ? tab.label : undefined"
+            @click="handleTabClick(tab, $event)"
+            @keydown="handleTabKeydown"
+          >
+            {{ tab.label }}
+          </component>
+        </nav>
+      </div>
     </div>
 
     <div v-if="!navigationOnly && $slots.header" class="tabs-header">
@@ -56,6 +66,7 @@
 import { computed, inject, ref, useId, watch } from 'vue'
 import { RouterLink, routeLocationKey } from 'vue-router'
 import { useMediaQuery } from '@vueuse/core'
+import { useViewportPinnedElement } from '@/composables/ui/useViewportPinnedElement.js'
 
 const props = defineProps({
   mode: {
@@ -118,6 +129,10 @@ const props = defineProps({
   defaultTab: {
     type: String,
     default: ''
+  },
+  pinNavigation: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -125,10 +140,20 @@ const emit = defineEmits(['update:modelValue', 'tab-change'])
 
 const route = inject(routeLocationKey, undefined)
 const tabList = ref(null)
+const navigationElement = ref(null)
+const navigationPlaceholder = ref(null)
 const isPortrait = useMediaQuery('(max-aspect-ratio: 1 / 1)')
 const id = useId()
 const panelId = `${id}-panel`
 const tabId = (name) => `${id}-tab-${name}`
+const {
+  elementStyle: navigationStyle,
+  placeholderStyle: navigationPlaceholderStyle,
+} = useViewportPinnedElement({
+  elementRef: navigationElement,
+  placeholderRef: navigationPlaceholder,
+  enabled: () => props.pinNavigation,
+})
 
 // 计算当前选中的 tab
 const currentTab = computed(() => {
@@ -208,6 +233,17 @@ watch(currentTab, () => {
   gap: 12px;
   max-width: 100%;
   margin-bottom: 12px;
+}
+
+.tabs-navigation-slot {
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 12px;
+
+  .tabs-navigation {
+    margin-bottom: 0;
+    z-index: 20;
+  }
 }
 
 .tabs {
@@ -334,5 +370,7 @@ watch(currentTab, () => {
   vertical-align: middle;
 
   .tabs-navigation { margin-bottom: 0; box-sizing: border-box; }
+
+  .tabs-navigation-slot { margin-bottom: 0; }
 }
 </style>
