@@ -41,7 +41,9 @@ const panelStyle = computed(() => ({
 let scrollFrame = null
 
 function compactPosition() {
-  const inset = window.innerHeight * (window.matchMedia('(max-aspect-ratio: 1 / 1)').matches ? 0.16 : 0.12)
+  const viewportInset = window.innerHeight * (window.matchMedia('(max-aspect-ratio: 1 / 1)').matches ? 0.16 : 0.12)
+  const navbarBottom = document.querySelector('.navbar')?.getBoundingClientRect().bottom || 0
+  const inset = Math.max(viewportInset, navbarBottom + 12)
   return Math.max(0, window.scrollY + (panelEl.value?.getBoundingClientRect().top || 0) - inset)
 }
 
