@@ -56,7 +56,7 @@ function updateProgress() {
   }
   const target = compactPosition()
   const compactHoldDistance = Math.min(64, target / 2)
-  const distance = Math.min(introEl.value?.getBoundingClientRect().height || 0, target - compactHoldDistance)
+  const distance = Math.min((introEl.value?.getBoundingClientRect().height || 0) * 1.5, target - compactHoldDistance)
   const remaining = target - window.scrollY - compactHoldDistance
   const nextProgress = props.enabled && distance
     ? remaining <= 1 ? 1 : Math.max(0, Math.min(1, 1 - remaining / distance))

@@ -5,6 +5,7 @@ import QuerySearchEntrance from '../src/components/common/QuerySearchEntrance.vu
 let app
 let host
 let scrollPosition
+let panelTop
 let entrance
 const settle = async () => { await nextTick(); await nextTick() }
 
@@ -29,6 +30,7 @@ async function mountEntrance(overrides = {}) {
 
 beforeEach(() => {
   scrollPosition = 0
+  panelTop = 420
   vi.spyOn(window, 'scrollY', 'get').mockImplementation(() => scrollPosition)
   vi.stubGlobal('matchMedia', () => ({ matches: false }))
   vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
@@ -36,7 +38,7 @@ beforeEach(() => {
   vi.spyOn(window, 'requestAnimationFrame').mockImplementation(fn => { queueMicrotask(fn); return ++frameId })
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
     if (this.classList.contains('query-intro')) return { top: 180 - scrollPosition, height: 240 }
-    return { top: 420 - scrollPosition, height: 140 }
+    return { top: panelTop - scrollPosition, height: 140 }
   })
 })
 afterEach(() => {
@@ -85,7 +87,7 @@ describe('one query panel morphing with scroll', () => {
     input.value = '饮水'
     input.dispatchEvent(new Event('input', { bubbles: true }))
     const end = 420 - window.innerHeight * 0.12
-    scrollPosition = end - 64 - 120
+    scrollPosition = end - 64 - 132
     window.dispatchEvent(new Event('scroll'))
     await settle()
     expect(entrance.progress).toBeCloseTo(0.5)
@@ -109,10 +111,11 @@ describe('one query panel morphing with scroll', () => {
   })
 
   it('holds compact through a short upward scroll, then expands progressively', async () => {
+    panelTop = 720
     await mountEntrance()
     await entrance.collapse()
-    const end = 420 - window.innerHeight * 0.12
-    for (const [offset, expected] of [[0, 1], [32, 1], [64, 1], [88, 0.9], [184, 0.5]]) {
+    const end = panelTop - window.innerHeight * 0.12
+    for (const [offset, expected] of [[0, 1], [32, 1], [64, 1], [88, 1 - 24 / 360], [244, 0.5]]) {
       scrollPosition = end - offset
       window.dispatchEvent(new Event('scroll'))
       await settle()
