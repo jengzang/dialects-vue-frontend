@@ -38,13 +38,16 @@ async function mountControls(expanded, overrides = {}) {
 }
 
 describe('vocabulary query submission in the same input', () => {
-  it('restores the original segmented switcher only in compact mode without a source toggle', async () => {
+  it('keeps the same local view buttons in compact and expanded modes without a source toggle', async () => {
     const { props } = await mountControls(false)
-    expect(host.querySelector('.result-view-switcher.ui-tabs-navigation--segmented')).not.toBeNull()
+    const switcher = host.querySelector('.result-view-switcher.view-mode-selector')
+    expect(switcher).not.toBeNull()
+    expect(switcher.querySelectorAll('.mode-btn')).toHaveLength(3)
+    expect(host.querySelector('.ui-tabs-navigation')).toBeNull()
     expect(host.querySelector('.filter-strip [role="switch"]')).toBeNull()
     props.deferQuery = true
     await nextTick()
-    expect(host.querySelector('.result-view-switcher.view-mode-selector')).not.toBeNull()
+    expect(host.querySelector('.result-view-switcher.view-mode-selector')).toBe(switcher)
     expect(host.querySelector('.filter-strip [role="switch"]')).toBeNull()
   })
   it('offers four parallel radio modes and displays only the active filter', async () => {
