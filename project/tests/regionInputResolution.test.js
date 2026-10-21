@@ -54,14 +54,12 @@ describe('partition input canonical paths and execution gating', () => {
     expect(state.model.regions_semantics).toBe('path-v2')
   })
 
-  it('shares compact partition navigation and clears selection only when a different source is confirmed', async () => {
+  it('uses local partition buttons and clears selection only when a different source is confirmed', async () => {
     await mount(['唯一'])
-    const navigation = document.querySelector('.tabs-wrapper--segmented.tabs-wrapper--compact')
+    const navigation = document.querySelector('.region-tabs')
     expect(navigation).not.toBeNull()
-    const buttons = navigation.querySelectorAll('.tab')
-    expect(buttons[1].getAttribute('aria-pressed')).toBe('true')
-    buttons[1].dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }))
-    expect(document.activeElement).toBe(buttons[0])
+    const buttons = navigation.querySelectorAll('.tab-btn')
+    expect(buttons[1].classList.contains('active')).toBe(true)
     expect(state.model.regionUsing).toBe('yindian')
     expect(state.model.regions).toEqual(['甲-唯一'])
     buttons[1].click()
@@ -72,7 +70,7 @@ describe('partition input canonical paths and execution gating', () => {
     expect(state.model.regionUsing).toBe('map')
     expect(state.model.regions).toEqual([])
     expect(document.querySelector('.region-raw').textContent).toBe('')
-    expect(buttons[0].getAttribute('aria-pressed')).toBe('true')
+    expect(buttons[0].classList.contains('active')).toBe(true)
   })
 
   it('retains ambiguous text and blocks preview and execution until a full path is chosen', async () => {

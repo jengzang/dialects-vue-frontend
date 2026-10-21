@@ -52,19 +52,19 @@
       <!-- OLD MODE: Cascader with tabs (default) -->
       <div v-if="!useInputMode" class="region-input" style="flex: 1;">
         <div class="region-header"
-             style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; margin-bottom: 6px; white-space: nowrap; gap: 4px;">
+             style="display: flex; align-items: center; justify-content: center; margin-bottom: 6px; white-space: nowrap; gap: 4px;">
 
-          <TabSwitcher
-              mode="segmented"
-              size="compact"
-              variant="solid"
-              navigation-only
-              :use-router="false"
-              :aria-label="$t('query.components.locationAndRegionInput.partitionLabel')"
-              :tabs="partitionTabs"
-              :model-value="regionUsing"
-              @update:model-value="onTabClick"
-          />
+          <div class="region-tabs" style="margin:0;align-items: center;">
+            <button
+                v-for="tab in ['map', 'yindian']"
+                :key="tab"
+                class="tab-btn"
+                :class="{ active: regionUsing === tab }"
+                @click="onTabClick(tab)"
+            >
+              {{ tab === 'map' ? $t('query.components.locationAndRegionInput.mapTab') : $t('query.components.locationAndRegionInput.yindianTab') }}
+            </button>
+          </div>
 
           <!-- 新增：分区详情按钮 -->
           <button
@@ -199,7 +199,6 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import TabSwitcher from '@/components/common/TabSwitcher.vue'
 import { ref, nextTick ,onMounted, onActivated, watch, computed, defineAsyncComponent, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getLocations, getCustomFeature, getLocationPartitions, batchMatch, getPartitions, resolvePartitions } from '@/api/index.js'
@@ -218,11 +217,6 @@ const { getPartitionData, getDefaultTree, resolveItems } = usePartitionCache()
 
 // 接收外部传入的地點和分區
 const { t } = useI18n()
-
-const partitionTabs = computed(() => [
-  { name: 'map', label: t('query.components.locationAndRegionInput.mapTab') },
-  { name: 'yindian', label: t('query.components.locationAndRegionInput.yindianTab') }
-])
 
 const props = defineProps({
   modelValue: {
@@ -1260,6 +1254,48 @@ $portrait-ratio: 1;
   transition: background-color 0.2s ease;
 }
 
+/* 分区 Tab */
+.region-tabs {
+  display: inline-flex;
+  gap: 4px;
+  max-width: 250px;
+  margin-bottom: 24px;
+  padding: 4px;
+  background-color: var(--bg-light-gray);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-inset);
+
+  button {
+    min-width: 60px;
+    padding: 3px 6px;
+    appearance: none;
+    background: none;
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--text-dark);
+    text-align: center;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background-color: var(--bg-hover-light);
+    }
+
+    &.active {
+      background-color: var(--color-primary);
+      box-shadow:
+        0 0 0 1px var(--color-primary-shadow-light),
+        0 4px 12px var(--color-primary-shadow);
+      color: var(--action-primary-text);
+      font-weight: 600;
+    }
+  }
+}
+
 /* 地点即时建议 */
 .inline-suggestion {
   @include suggestion-panel(100px, 20dvh);
@@ -1569,4 +1605,13 @@ $portrait-ratio: 1;
   }
 }
 
+/* 竖屏 */
+@media (max-aspect-ratio: $portrait-ratio) {
+  .region-tabs {
+    button {
+      min-width: 50px;
+      padding: 4px 2px;
+    }
+  }
+}
 </style>
