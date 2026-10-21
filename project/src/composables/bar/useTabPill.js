@@ -5,6 +5,7 @@ export function useTabPill(containerRef, activeSelector, route) {
   let hideTimer = null
   let resizeObserver = null
   let observedActive = null
+  let observedContainer = null
   let disposed = false
 
   const update = () => {
@@ -41,23 +42,51 @@ export function useTabPill(containerRef, activeSelector, route) {
     })
   }
 
+  const bindContainer = (container) => {
+    if (observedContainer === container) {
+      if (container) resizeObserver?.observe(container)
+      if (observedActive) resizeObserver?.observe(observedActive)
+      update()
+      return
+    }
+
+    if (observedContainer) {
+      observedContainer.removeEventListener('scroll', update)
+      resizeObserver?.unobserve(observedContainer)
+    }
+    if (observedActive) {
+      resizeObserver?.unobserve(observedActive)
+      observedActive = null
+    }
+
+    observedContainer = container
+    if (!container) {
+      pillStyle.value = { display: 'none' }
+      return
+    }
+
+    resizeObserver?.observe(container)
+    container.addEventListener('scroll', update, { passive: true })
+    update()
+  }
+
   onMounted(() => {
     // Selection transitions and initially hidden bars can settle after nextTick.
     if (typeof ResizeObserver !== 'undefined') {
       resizeObserver = new ResizeObserver(update)
-      if (containerRef.value) resizeObserver.observe(containerRef.value)
     }
-    update()
     window.addEventListener('resize', update)
-    containerRef.value?.addEventListener('scroll', update, { passive: true })
+    bindContainer(containerRef.value)
   })
+
+  watch(() => containerRef.value, bindContainer, { flush: 'post' })
 
   onBeforeUnmount(() => {
     disposed = true
+    bindContainer(null)
     resizeObserver?.disconnect()
     clearTimeout(hideTimer)
     window.removeEventListener('resize', update)
-    containerRef.value?.removeEventListener('scroll', update)
   })
 
   watch(() => route.fullPath, update, { flush: 'post' })

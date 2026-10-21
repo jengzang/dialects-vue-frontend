@@ -6,7 +6,11 @@
     :style="navbarStyle"
   >
     <!-- 桌面端的布局 -->
-    <div ref="desktopRef" class="navbar-desktop">
+    <div
+      v-if="collapseProgress < 1"
+      ref="desktopRef"
+      class="navbar-desktop"
+    >
       <div  class="navbar-item logo-and-title" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
         <div @click="toggleSidebar" class="logo-container desktop-brand-logo">
           <img class="logo" :src="faviconSrc" alt="Logo" />
@@ -102,11 +106,15 @@
     </div>
 
     <SimpleSidebar
+      v-if="collapseProgress < 1"
       :is-open="isSidebarVisible"
       @close="isSidebarVisible = false"
     />
 
-    <div class="navbar-content">
+    <div
+      v-if="collapseProgress < 1"
+      class="navbar-content"
+    >
       <!-- 第一部分：Logo、标题和登录按钮 -->
       <div class="navbar-top">
         <div class="navbar-item logo-and-title" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
@@ -181,6 +189,20 @@
       </div>
     </div>
 
+    <!-- Tab label tooltip -->
+    <Teleport
+      v-if="collapseProgress < 1"
+      to="body"
+    >
+      <Transition name="tab-tooltip-fade">
+        <div
+          v-if="tooltip.visible"
+          class="tab-tooltip tooltip-surface"
+          :style="tooltipStyle"
+        >{{ tooltip.label }}</div>
+      </Transition>
+    </Teleport>
+
     <button
       v-if="collapseProgress >= 1"
       type="button"
@@ -204,17 +226,6 @@
         />
       </svg>
     </button>
-
-    <!-- Tab label tooltip -->
-    <Teleport to="body">
-      <Transition name="tab-tooltip-fade">
-        <div
-          v-if="tooltip.visible"
-          class="tab-tooltip tooltip-surface"
-          :style="tooltipStyle"
-        >{{ tooltip.label }}</div>
-      </Transition>
-    </Teleport>
   </div>
 </template>
 
@@ -266,8 +277,8 @@ let manualExpandScrollStart = null
 const navbarStyle = computed(() => {
   if (collapseProgress.value <= 0) return {}
 
-  const expandedWidth = Math.max(viewportWidth.value - 16, 20)
-  const collapsedWidth = 20 + (expandedWidth - 20) * (1 - collapseProgress.value)
+  const expandedWidth = Math.max(viewportWidth.value - 16, 30)
+  const collapsedWidth = 30 + (expandedWidth - 30) * (1 - collapseProgress.value)
   return { width: `${collapsedWidth}px` }
 })
 
@@ -333,6 +344,10 @@ onBeforeUnmount(() => {
 
 // Tab label tooltip
 const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
+
+watch(() => collapseProgress.value >= 1, (isCollapsed) => {
+  if (isCollapsed) tooltip.value = { ...tooltip.value, visible: false }
+})
 
 const { pillStyle: desktopPillStyle } = useTabPill(navRef, '.menu-inner.active', route)
 const { pillStyle: mobilePillStyle, updatePill: updateMobilePill } = useTabPill(mobileNavRef, '.menu-item.active', route)
@@ -858,13 +873,11 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   }
 
   .navbar-expand-control {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
+    width: 100%;
     z-index: 2;
-    width: 20px;
-    min-width: 20px;
+    min-width: 0;
+    height: 16.5dvh;
+    box-sizing: border-box;
     padding: 0;
     border: 0;
     @include flex-center;
