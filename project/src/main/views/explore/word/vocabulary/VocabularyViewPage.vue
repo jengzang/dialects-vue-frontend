@@ -66,6 +66,7 @@
       />
       </Teleport>
       <div v-if="!isCharacterNotesMode && isSearchExpanded" class="vocabulary-quick-start-list">
+        <span>{{ t('words.wordList.quickStartPrompt') }}</span>
         <button
           v-for="quickStart in VOCABULARY_QUICK_STARTS"
           :key="quickStart.id"

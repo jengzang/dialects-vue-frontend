@@ -12,6 +12,7 @@
     "name": "Vocabulary List",
     "desc": "Dialect vocabulary list page",
     "placeholder": "Vocabulary page shell",
+    "quickStartPrompt": "Try:",
     "source": {
       "vocabulary": "Vocabulary",
       "characterNotes": "Character Notes"

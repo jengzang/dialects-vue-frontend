@@ -12,6 +12,7 @@
     "name": "詞表",
     "desc": "方言詞表頁面",
     "placeholder": "詞表頁面殼子",
+    "quickStartPrompt": "試試：",
     "source": {
       "vocabulary": "詞表",
       "characterNotes": "字表註釋"

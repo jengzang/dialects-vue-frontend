@@ -39,7 +39,37 @@ const panelStyle = computed(() => ({
   '--query-expansion': props.enabled ? 1 - progress.value : 0,
 }))
 let scrollFrame = null
+let animationFrame = null
+let targetProgress = 0
+let lastAnimationTime = 0
+const transitionDuration = 600
 const hasSubmittedQuery = ref(false)
+
+function animateProgress(time) {
+  const step = Math.max(0, time - lastAnimationTime) / transitionDuration
+  lastAnimationTime = time
+  const difference = targetProgress - progress.value
+  progress.value = Math.abs(difference) <= step
+    ? targetProgress
+    : progress.value + Math.sign(difference) * step
+  animationFrame = progress.value === targetProgress
+    ? null
+    : window.requestAnimationFrame(animateProgress)
+}
+
+function setTargetProgress(value, immediate = false) {
+  targetProgress = value
+  if (immediate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (animationFrame !== null) window.cancelAnimationFrame(animationFrame)
+    animationFrame = null
+    progress.value = value
+    return
+  }
+  if (animationFrame === null && progress.value !== value) {
+    lastAnimationTime = window.performance.now()
+    animationFrame = window.requestAnimationFrame(animateProgress)
+  }
+}
 
 function compactPosition() {
   const viewportInset = window.innerHeight * (window.matchMedia('(max-aspect-ratio: 1 / 1)').matches ? 0.16 : 0.12)
@@ -51,7 +81,7 @@ function compactPosition() {
 function updateProgress() {
   scrollFrame = null
   if (props.enabled && !hasSubmittedQuery.value) {
-    progress.value = 0
+    setTargetProgress(0, true)
     return
   }
   const target = compactPosition()
@@ -61,7 +91,7 @@ function updateProgress() {
   const nextProgress = props.enabled && distance
     ? remaining <= 1 ? 1 : Math.max(0, Math.min(1, 1 - remaining / distance))
     : 1
-  progress.value = nextProgress
+  setTargetProgress(nextProgress, !props.enabled)
 }
 
 function handleScroll() {
@@ -91,7 +121,9 @@ function stopListening() {
   window.removeEventListener('scroll', handleScroll)
   window.removeEventListener('resize', handleScroll)
   if (scrollFrame !== null) window.cancelAnimationFrame(scrollFrame)
+  if (animationFrame !== null) window.cancelAnimationFrame(animationFrame)
   scrollFrame = null
+  animationFrame = null
 }
 
 onMounted(startListening)
