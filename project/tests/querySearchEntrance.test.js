@@ -56,13 +56,17 @@ describe('one query panel morphing with scroll', () => {
     expect(host.querySelector('.query-intro h1')).toBeNull()
   })
 
-  it('does not mount results until the page allows them, retaining the scroll runway', async () => {
+  it('does not reserve result space before submission, even when results are allowed', async () => {
     const props = await mountEntrance({ resultsVisible: false })
     expect(host.querySelector('.results')).toBeNull()
-    expect(host.querySelector('.query-results--enabled')).not.toBeNull()
+    expect(host.querySelector('.query-results--enabled')).toBeNull()
     props.resultsVisible = true
     await settle()
     expect(host.querySelector('.results')).not.toBeNull()
+    expect(host.querySelector('.query-results--enabled')).toBeNull()
+    await entrance.collapse()
+    await settle()
+    expect(host.querySelector('.query-results--enabled')).not.toBeNull()
   })
 
   it('renders the original input and conditions together, without a second input', async () => {
@@ -97,6 +101,7 @@ describe('one query panel morphing with scroll', () => {
     expect(host.querySelector('.original-query')).toBe(input)
     expect(host.querySelector('.original-filter')).toBe(filter)
     expect(input.value).toBe('饮水')
+    expect(host.querySelector('.query-results--enabled')).toBeNull()
     scrollPosition = Math.floor(end)
     window.dispatchEvent(new Event('scroll'))
     await settle()
@@ -117,8 +122,12 @@ describe('one query panel morphing with scroll', () => {
   it('scrolls the existing panel to its compact position only on clicking search', async () => {
     await mountEntrance()
     expect(window.scrollTo).not.toHaveBeenCalled()
+    const input = host.querySelector('.original-query')
+    input.value = ''
+    input.dispatchEvent(new Event('input', { bubbles: true }))
     host.querySelector('.search').click()
     await settle()
+    expect(host.querySelector('.query-results--enabled')).not.toBeNull()
     expect(window.scrollTo).toHaveBeenCalledWith({ top: 420 - window.innerHeight * 0.12, behavior: 'smooth' })
   })
 

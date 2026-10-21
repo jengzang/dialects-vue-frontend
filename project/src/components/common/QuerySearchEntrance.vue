@@ -15,7 +15,7 @@
       <slot name="after-panel" />
     </div>
   </section>
-  <div class="query-results" :class="{ 'query-results--enabled': enabled }">
+  <div class="query-results" :class="{ 'query-results--enabled': enabled && hasSubmittedQuery }">
     <slot v-if="resultsVisible" />
   </div>
 </template>
@@ -39,7 +39,7 @@ const panelStyle = computed(() => ({
   '--query-expansion': props.enabled ? 1 - progress.value : 0,
 }))
 let scrollFrame = null
-let hasSubmittedQuery = false
+const hasSubmittedQuery = ref(false)
 
 function compactPosition() {
   const viewportInset = window.innerHeight * (window.matchMedia('(max-aspect-ratio: 1 / 1)').matches ? 0.16 : 0.12)
@@ -50,7 +50,7 @@ function compactPosition() {
 
 function updateProgress() {
   scrollFrame = null
-  if (props.enabled && !hasSubmittedQuery) {
+  if (props.enabled && !hasSubmittedQuery.value) {
     progress.value = 0
     return
   }
@@ -59,7 +59,7 @@ function updateProgress() {
   const nextProgress = props.enabled && distance
     ? remaining <= 1 ? 1 : Math.max(0, Math.min(1, 1 - remaining / distance))
     : 1
-  if (props.enabled && progress.value > 0 && nextProgress === 0) hasSubmittedQuery = false
+  if (props.enabled && progress.value > 0 && nextProgress === 0) hasSubmittedQuery.value = false
   progress.value = nextProgress
 }
 
@@ -69,7 +69,7 @@ function handleScroll() {
 
 async function collapse() {
   if (!props.enabled) return
-  hasSubmittedQuery = true
+  hasSubmittedQuery.value = true
   await nextTick()
   window.scrollTo({
     top: compactPosition(),
