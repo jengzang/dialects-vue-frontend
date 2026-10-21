@@ -43,11 +43,15 @@ let animationFrame = null
 let targetProgress = 0
 let lastAnimationTime = 0
 const transitionDuration = 400
-const boundaryHoldDuration = 100
+const boundaryWindowDuration = 5000
+const wheelGestureGap = 180
 let transitionUnlocked = false
 let boundaryDirection = 0
-let lastBoundaryInputTime = 0
+let boundaryExpiresAt = 0
 let boundaryScrollPosition = null
+let lastWheelTime = -Infinity
+let lastWheelDelta = 0
+let wheelDecayCount = 0
 let lastScrollPosition = 0
 let inputDirection = 0
 let touchY = null
@@ -119,7 +123,9 @@ function updateProgress(fromScroll = false) {
       return
     }
     boundaryDirection = direction
-    lastBoundaryInputTime = window.performance.now()
+    boundaryExpiresAt = window.performance.now() + boundaryWindowDuration
+    lastWheelTime = window.performance.now()
+    wheelDecayCount = 0
     boundaryScrollPosition = window.scrollY
     touchCanReleaseBoundary = false
     window.scrollTo({ top: boundaryScrollPosition, behavior: 'instant' })
@@ -132,7 +138,6 @@ function handleScroll() {
   const position = window.scrollY
   if (boundaryScrollPosition !== null) {
     if (position !== boundaryScrollPosition) {
-      lastBoundaryInputTime = window.performance.now()
       window.scrollTo({ top: boundaryScrollPosition, behavior: 'instant' })
     }
     return
@@ -156,12 +161,15 @@ function acceptScrollInput(event, direction, canRelease = true) {
     return true
   }
   const now = window.performance.now()
-  const freshGesture = canRelease && now - lastBoundaryInputTime >= boundaryHoldDuration
-  lastBoundaryInputTime = now
-  if (freshGesture) {
+  if (canRelease && now <= boundaryExpiresAt) {
     transitionUnlocked = true
     clearBoundary()
     return true
+  }
+  if (canRelease) {
+    boundaryExpiresAt = now + boundaryWindowDuration
+    touchCanReleaseBoundary = false
+    window.scrollTo({ top: boundaryScrollPosition, behavior: 'instant' })
   }
   if (event.cancelable) event.preventDefault()
   return false
@@ -169,7 +177,16 @@ function acceptScrollInput(event, direction, canRelease = true) {
 
 function handleWheel(event) {
   if (!event.deltaY || event.ctrlKey || event.defaultPrevented) return
-  if (acceptScrollInput(event, Math.sign(event.deltaY))) handleScroll()
+  const now = window.performance.now()
+  const delta = Math.abs(event.deltaY)
+  // Wheel events have no gesture-start flag. Treat a pause or a new impulse
+  // after a decaying tail as a new gesture; do not delay touch or key input.
+  const newGesture = event.deltaMode !== 0 || now - lastWheelTime >= wheelGestureGap
+    || (wheelDecayCount >= 2 && delta >= Math.max(4, lastWheelDelta * 2))
+  wheelDecayCount = delta < lastWheelDelta ? wheelDecayCount + 1 : 0
+  lastWheelTime = now
+  lastWheelDelta = delta
+  if (acceptScrollInput(event, Math.sign(event.deltaY), newGesture)) handleScroll()
 }
 
 function handleTouchStart(event) {

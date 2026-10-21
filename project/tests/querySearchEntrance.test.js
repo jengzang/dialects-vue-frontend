@@ -30,8 +30,8 @@ async function mountEntrance(overrides = {}) {
 }
 
 async function resumeScroll(direction) {
-  now += 100
-  window.dispatchEvent(new WheelEvent('wheel', { deltaY: direction }))
+  now += 1
+  window.dispatchEvent(new WheelEvent('wheel', { deltaY: direction, deltaMode: 1 }))
   await settle()
 }
 
