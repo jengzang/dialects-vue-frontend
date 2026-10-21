@@ -487,17 +487,19 @@
   --text-slate-light: #8eae96;
   --text-slate-light-rgb: 142, 174, 150;
 
-  /* ── 毛玻璃（森林綠基底）── */
-  --glass-05: rgba(23, 60, 38, 0.05);
-  --glass-10: rgba(23, 60, 38, 0.14);
-  --glass-20: rgba(23, 60, 38, 0.26);
-  --glass-30: rgba(23, 60, 38, 0.38);
-  --glass-40: rgba(23, 60, 38, 0.50);
-  --glass-50: rgba(23, 60, 38, 0.62);
-  --glass-60: rgba(23, 60, 38, 0.72);
-  --glass-70: rgba(23, 60, 38, 0.80);
-  --glass-80: rgba(23, 60, 38, 0.88);
-  --glass-90: rgba(23, 60, 38, 0.94);
+  /* ── 毛玻璃（提亮森林綠表面，保留浮層遮擋能力）── */
+  --glass-05: rgba(38, 76, 50, 0.05);
+  --glass-10: rgba(38, 76, 50, 0.14);
+  --glass-20: rgba(38, 76, 50, 0.26);
+  --glass-30: rgba(38, 76, 50, 0.38);
+  --glass-40: rgba(38, 76, 50, 0.50);
+  --glass-50: rgba(38, 76, 50, 0.62);
+  --glass-60: rgba(38, 76, 50, 0.72);
+  --glass-70: rgba(38, 76, 50, 0.80);
+  --glass-80: rgba(38, 76, 50, 0.88);
+  --glass-90: rgba(38, 76, 50, 0.94);
+  --glass-highlight: rgba(186, 220, 193, 0.22);
+  --bar-background: linear-gradient(145deg, rgba(186, 220, 193, 0.12), rgba(186, 220, 193, 0.04));
 
   --surface-panel: rgba(23, 60, 38, 0.88);
   --surface-panel-hover: rgba(23, 60, 38, 0.94);
@@ -546,9 +548,9 @@
   --enter-button-text: #102519;
   --enter-button-shadow: 0 2px 8px rgba(134, 217, 155, 0.22);
 
-  --sidebar-shell-background: var(--glass-10);
+  --sidebar-shell-background: linear-gradient(145deg, rgba(38, 76, 50, 0.90), rgba(23, 60, 38, 0.78));
   --sidebar-shell-border: rgba(114, 167, 128, 0.42);
-  --sidebar-shell-shadow: inset 0 0 0.5px rgba(23, 60, 38, 0.82), 0 14px 34px rgba(2, 12, 6, 0.07), 0 0 0 0.5px rgba(114, 167, 128, 0.14);
+  --sidebar-shell-shadow: inset 0 1px 0 rgba(186, 220, 193, 0.22), 0 14px 34px rgba(2, 12, 6, 0.38), 0 0 0 0.5px rgba(186, 220, 193, 0.10);
   --sidebar-item-background: rgba(23, 60, 38, 0.84);
   --sidebar-item-background-hover: rgba(23, 60, 38, 0.96);
   --sidebar-item-text: #e5eee7;
@@ -570,11 +572,15 @@
 
   --color-shadow-rgb: 2, 12, 6;
 
-  --shadow-card: 0 14px 30px rgba(2, 12, 6, 0.07);
-  --shadow-popup: 0 18px 48px rgba(2, 12, 6, 0.10);
-  --shadow-glass: 0 8px 22px rgba(2, 12, 6, 0.06), inset 0 0 0.5px rgba(23, 60, 38, 0.52);
-  --shadow-glass-hover: 0 12px 28px rgba(2, 12, 6, 0.10);
-  --shadow-glass-inset: inset 0 0 0.5px rgba(23, 60, 38, 0.62), 0 8px 22px rgba(2, 12, 6, 0.08), 0 0 0 0.5px rgba(23, 60, 38, 0.22);
+  --shadow-card: 0 14px 30px rgba(2, 12, 6, 0.32);
+  --shadow-popup: 0 18px 48px rgba(2, 12, 6, 0.44);
+  --shadow-glass: 0 8px 22px rgba(2, 12, 6, 0.32), inset 0 1px 0 rgba(186, 220, 193, 0.18);
+  --shadow-glass-hover: 0 12px 28px rgba(2, 12, 6, 0.42), inset 0 1px 0 rgba(186, 220, 193, 0.22);
+  --shadow-glass-inset: inset 0 1px 0 rgba(186, 220, 193, 0.22), 0 8px 22px rgba(2, 12, 6, 0.38), 0 0 0 0.5px rgba(186, 220, 193, 0.10);
+  --glass-card-shadow: var(--shadow-glass);
+  --glass-card-hover-shadow: var(--shadow-glass-hover);
+  --glass-panel-shadow: var(--shadow-glass);
+  --glass-panel-hover-shadow: var(--shadow-glass-hover);
 }
 
 :root[data-color-theme='dark'] {

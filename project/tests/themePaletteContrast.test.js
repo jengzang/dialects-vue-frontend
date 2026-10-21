@@ -4,7 +4,7 @@ import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { pathToFileURL } from 'node:url'
 import { compileString } from 'sass'
-import { parse as parseVue } from '@vue/compiler-sfc'
+import { compileStyle, parse as parseVue } from '@vue/compiler-sfc'
 import { parse as parseCss } from 'postcss'
 
 const source = readFileSync(resolve(import.meta.dirname, '../src/styles/global/_tokens.scss'), 'utf8')
@@ -50,17 +50,22 @@ function contrast(a, b) {
   return (levels[0] + 0.05) / (levels[1] + 0.05)
 }
 
-function compiledRule(path, selector) {
+function compiledCss(path) {
   const filename = resolve(import.meta.dirname, '../src', path)
   const content = readFileSync(filename, 'utf8')
   const scss = path.endsWith('.vue') ? parseVue(content).descriptor.styles[0].content : content
-  const css = compileString(scss, {
+  return compileString(scss, {
     url: pathToFileURL(filename),
     importers: [{ findFileUrl: url => url.startsWith('@/') ? pathToFileURL(resolve(import.meta.dirname, '../src', url.slice(2))) : null }],
     logger: { warn() {}, debug() {} },
   }).css
+}
+
+function compiledRule(path, selector, unconditional = false) {
+  const css = compiledCss(path)
   let result
   parseCss(css).walkRules(rule => {
+    if (unconditional && rule.parent.type !== 'root') return
     if (rule.selector.split(',').map(s => s.trim()).includes(selector)) result = { ...result, ...Object.fromEntries(rule.nodes.filter(n => n.type === 'decl').map(n => [n.prop, n.value])) }
   })
   expect(result, `${path}: ${selector}`).toBeDefined()
@@ -78,6 +83,48 @@ function resolved(input, tokens) {
 }
 
 describe('approved theme palette readability', () => {
+  it('limits compiled green settings surface overrides to the setting sections', () => {
+    const result = compileStyle({
+      source: compiledCss('main/views/menu/support/SettingsPage.vue'),
+      id: 'data-v-settings-palette',
+      scoped: true,
+    })
+    expect(result.errors).toEqual([])
+    const selectors = []
+    parseCss(result.code).walkRules(rule => {
+      if (rule.nodes.some(n => n.prop === '--glass-panel-background' && n.value.includes('linear-gradient'))) selectors.push(rule.selector)
+    })
+    expect(selectors).toEqual([":root[data-color-theme='green'] .setting-section"])
+  })
+
+  it('keeps green floating fills readable above a light map', () => {
+    const tokens = palette('green')
+    for (const name of ['--glass-80', '--glass-90']) {
+      const fill = rgba(value(tokens, name))
+      expect(fill[3], name).toBeGreaterThanOrEqual(0.85)
+      expect(contrast(rgba(value(tokens, '--text-primary')), over(fill, [255, 255, 255, 1])), name).toBeGreaterThanOrEqual(4.5)
+    }
+  })
+
+  it('separates green glass fills and specular highlights from the night canvas', () => {
+    const tokens = palette('green')
+    const page = rgba(value(tokens, '--bg-body'))
+    const glass = over(rgba(value(tokens, '--glass-50')), page)
+    expect(luminance(glass) - luminance(page)).toBeGreaterThan(0.018)
+    const highlight = value(tokens, '--shadow-glass-inset').match(/inset[^,]*rgba\([^)]+\)/)?.[0].match(/rgba\([^)]+\)/)?.[0]
+    expect(highlight).toBeDefined()
+    expect(luminance(over(rgba(highlight), page)) - luminance(page)).toBeGreaterThan(0.025)
+  })
+
+  it('gives both secondary navigation bars a green glass fill', () => {
+    const tokens = palette('green')
+    for (const [component, selector] of [['CommonBar', '.commonbar'], ['ExploreBar', '.explorebar']]) {
+      const rule = compiledRule(`components/bar/${component}.vue`, selector, true)
+      const background = resolved(rule.background || 'none', tokens)
+      expect(background, component).toContain('linear-gradient')
+    }
+  })
+
   it('uses an actual dark forest canvas with readable green-theme surface text', () => {
     const tokens = palette('green')
     const page = rgba(value(tokens, '--bg-body'))

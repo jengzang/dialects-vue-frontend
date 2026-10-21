@@ -351,6 +351,7 @@ const goToSettings = () => {
 
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 @use './bar-shared' as *;
 
 $primary: var(--color-primary);
@@ -391,15 +392,15 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   @include flex-center;
 
   background:
-    linear-gradient(110deg, transparent 35%, var(--glass-50) 50%, transparent 65%),
-    linear-gradient(180deg, var(--glass-40), var(--glass-10));
+    linear-gradient(110deg, transparent 35%, var(--glass-highlight, var(--glass-50)) 50%, transparent 65%),
+    var(--bar-background, linear-gradient(180deg, var(--glass-40), var(--glass-10)));
   background-position: var(--liquid-glass-glint-shift) 0, center;
   background-size: 180% 100%, 100% 100%;
-  border: 2px solid var(--glass-50);
+  border: 2px solid var(--glass-highlight, var(--glass-50));
   border-radius: var(--radius-xl);
   box-shadow:
-    inset 0 1px 0 var(--glass-90),
-    inset 0 -1px 0 var(--glass-30),
+    inset 0 1px 0 var(--glass-highlight, var(--glass-90)),
+    inset 0 -1px 0 var(--glass-highlight, var(--glass-30)),
     0 10px 24px rgba(var(--color-shadow-rgb), 0.18);
   backdrop-filter: blur(14px) saturate(160%);
   -webkit-backdrop-filter: blur(14px) saturate(160%);
@@ -471,8 +472,8 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   background: linear-gradient(155deg, var(--glass-30), var(--glass-05));
   border-radius: 25px;
   box-shadow:
-    inset 0 1px 0 var(--glass-90),
-    inset 0 0 0 1px var(--glass-60),
+    inset 0 1px 0 var(--glass-highlight, var(--glass-90)),
+    inset 0 0 0 1px var(--glass-highlight, var(--glass-60)),
     inset 0 -3px 8px rgba(var(--color-shadow-rgb), 0.08),
     0 5px 12px rgba(var(--color-shadow-rgb), 0.15);
   @include glass-blur(8px, 150%);

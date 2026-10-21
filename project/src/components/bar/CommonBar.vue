@@ -636,6 +636,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   width: auto;
   box-sizing: border-box;
   --liquid-glass-glint-shift: 20%;
+  background: var(--bar-background, none);
   // background:
   //   linear-gradient(
   //     110deg,

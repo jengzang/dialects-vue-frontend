@@ -2,7 +2,7 @@
   <div class="settings-page-wrapper">
     <div class="settings-container">
       <h1 class="page-title"><BarIcon icon="⚙️" />{{ $t('navigation.pageTitles.support.settings') }}</h1>
-      <div class="setting-section">
+      <div class="setting-section glass-panel">
         <h3 class="section-title">{{ $t('navigation.settings.language.title') }}</h3>
         <div class="language-options">
           <div
@@ -21,7 +21,7 @@
         </div>
       </div>
 
-      <div class="setting-section setting-split">
+      <div class="setting-section setting-split glass-panel">
         <div class="setting-split-item">
           <h3 class="section-title">{{ $t('navigation.settings.characterTable.title') }}</h3>
           <p class="section-description">{{ $t('navigation.settings.characterTable.description') }}</p>
@@ -52,7 +52,7 @@
         </div>
       </div>
 
-      <div class="setting-section setting-split">
+      <div class="setting-section setting-split glass-panel">
         <div class="setting-split-item">
           <h3 class="section-title">
             {{ $t('navigation.settings.colorTheme.title') }}
@@ -108,7 +108,7 @@
         </div>
       </div>
 
-      <div class="setting-section setting-split">
+      <div class="setting-section setting-split glass-panel">
         <div class="setting-split-item tutorial-toggle-section">
           <div class="tutorial-toggle-copy">
             <h3 class="section-title">{{ $t('about.settings.tutorialToggle.title') }}</h3>
@@ -396,12 +396,21 @@ $text-muted: var(--text-tertiary);
 }
 
 .setting-section {
+  --glass-panel-background: transparent;
+  --glass-panel-border: none;
+  --glass-panel-radius: var(--radius-lg);
+  --glass-panel-backdrop-filter: blur(10px);
+  --glass-panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --glass-panel-hover-shadow: var(--glass-panel-shadow);
   margin-bottom: 24px;
   padding: 24px;
-  border-radius: var(--radius-lg);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 
-  @include glass-blur(10px);
+}
+
+:global(:root[data-color-theme='green'] .setting-section) {
+  --glass-panel-background: linear-gradient(145deg, var(--glass-50), var(--glass-20));
+  --glass-panel-border: 1px solid var(--border-glass-subtle);
+  --glass-panel-shadow: var(--shadow-glass);
 }
 
 .setting-split {
