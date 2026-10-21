@@ -724,7 +724,10 @@ function resolveViewModeFromRoute() {
 }
 
 const viewMode = ref(resolveViewModeFromRoute())
-const selectedSearchFields = ref(JSON.parse(localStorage.getItem('vocabulary_search_fields') || '[]'))
+const savedSearchFields = localStorage.getItem('vocabulary_search_fields')
+const selectedSearchFields = ref(savedSearchFields === null
+  ? ['definition', 'headword']
+  : JSON.parse(savedSearchFields))
 const selectedLocations = ref([])
 const FILTER_MODES = ['location', 'administrative', 'yindian', 'map']
 const savedFilterMode = localStorage.getItem('vocabulary_filter_mode')

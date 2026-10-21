@@ -48,7 +48,7 @@ vi.mock('@/components/common/AppModal.vue', () => ({ default: {
 } }))
 vi.mock('../src/main/views/explore/word/vocabulary/VocabularyTopControls.vue', () => ({
   default: {
-    props: ['source', 'filterMode', 'selectedRegions', 'selectedLocations', 'partitionNodes', 'partitionLoading', 'partitionError', 'notesRefreshDisabled'],
+    props: ['source', 'filterMode', 'selectedRegions', 'selectedLocations', 'selectedSearchFields', 'partitionNodes', 'partitionLoading', 'partitionError', 'notesRefreshDisabled'],
     emits: ['search', 'refreshNotes', 'openLocationDetails', 'filterOpenChange', 'update:query', 'update:selectedLocations', 'update:viewMode', 'update:filterMode', 'update:selectedRegions', 'update:selectedProvince', 'update:selectedCity', 'update:selectedStandardWord'],
     setup(props, { emit }) {
       controlProps = props
@@ -100,6 +100,12 @@ beforeEach(() => {
 afterEach(() => { app?.unmount(); host?.remove(); vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.useRealTimers() })
 
 describe('vocabulary configuration entrance', () => {
+  it('defaults vocabulary search fields to definition and headword only', async () => {
+    await mount()
+
+    expect(controlProps.selectedSearchFields).toEqual(['definition', 'headword'])
+  })
+
   it('moves the same notes scope into the compact panel and blocks refresh while resolving', async () => {
     await mount({ source: 'character-notes' })
     const scopeInput = host.querySelector('.notes-scope-input')
