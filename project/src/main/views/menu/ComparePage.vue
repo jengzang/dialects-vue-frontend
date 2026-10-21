@@ -1,5 +1,6 @@
 <template>
   <TabSwitcher
+    class="page-tabs--vertically-centered"
     :tabs="tabs"
     :model-value="currentTab"
     :route-value="currentTab"
@@ -1970,6 +1971,10 @@ $group2-text: #1565c0;
 $danger: #f44336;
 $text-primary: var(--text-dark);
 $text-muted: var(--text-lightest);
+
+.page-tabs--vertically-centered {
+  min-height: 80dvh;
+}
 
 .tab-content-inner {
   display: flex;

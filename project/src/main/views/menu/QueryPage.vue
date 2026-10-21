@@ -1,5 +1,6 @@
 <template>
   <TabSwitcher
+    class="page-tabs--vertically-centered"
     :tabs="tabs"
     :model-value="currentTab"
     :route-value="currentTab"
@@ -923,6 +924,10 @@ export default {
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
+
+.page-tabs--vertically-centered {
+  min-height: 80dvh;
+}
 
 .tab-content-inner {
   display: flex;
