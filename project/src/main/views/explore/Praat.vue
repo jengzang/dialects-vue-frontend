@@ -957,8 +957,7 @@ onBeforeUnmount(() => {
   font-size: 2rem;
   margin-bottom: 0.5rem;
   margin-top: 1rem;
-  // color: linear-gradient(135deg, #007aff, #6e00ff);
-  background: linear-gradient(135deg, #007aff, #6e00ff);
+  background: var(--color-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1020,15 +1019,15 @@ onBeforeUnmount(() => {
   font-weight: 600;
   border: none;
   cursor: pointer;
-  background: linear-gradient(135deg, #007aff, #6e00ff);
-  color: white;
+  background: var(--action-primary-bg);
+  color: var(--action-primary-text);
   transition: all 0.3s ease;
 }
 
 .start-button:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.3);
-  background: linear-gradient(135deg, #0056b3, #4b00b3);
+  background: var(--action-primary-bg-hover);
 }
 
 .start-button:disabled {
@@ -1104,8 +1103,8 @@ onBeforeUnmount(() => {
 }
 
 .mode-options .radio-option.active {
-  background: linear-gradient(135deg, #007aff, #6e00ff);
-  color: white;
+  background: var(--action-primary-bg);
+  color: var(--action-primary-text);
   box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
 }
 

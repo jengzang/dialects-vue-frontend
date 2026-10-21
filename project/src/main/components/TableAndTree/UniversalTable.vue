@@ -2027,11 +2027,11 @@ td {
 }
 
 .toggle-select {
-  color: var(--color-accent-purple);
+  color: var(--color-secondary);
   font-weight: bold;
 
   &:hover {
-    background: var(--color-accent-purple-light);
+    background: var(--color-secondary-bg);
   }
 }
 

@@ -61,7 +61,7 @@ function compiledRule(path, selector) {
   }).css
   let result
   parseCss(css).walkRules(rule => {
-    if (rule.selector.split(',').map(s => s.trim()).includes(selector)) result = Object.fromEntries(rule.nodes.filter(n => n.type === 'decl').map(n => [n.prop, n.value]))
+    if (rule.selector.split(',').map(s => s.trim()).includes(selector)) result = { ...result, ...Object.fromEntries(rule.nodes.filter(n => n.type === 'decl').map(n => [n.prop, n.value])) }
   })
   expect(result, `${path}: ${selector}`).toBeDefined()
   return result
@@ -136,6 +136,10 @@ describe('approved theme palette readability', () => {
     ['main/views/explore/tools/CheckTool.vue', '.tab-btn.active'],
     ['main/components/geo/RegionSelector.vue', '.region-tag.custom-region-tag'],
     ['main/components/geo/RegionSelector.vue', '.topbar-btn'],
+    ['main/views/explore/Praat.vue', '.start-button'],
+    ['main/views/explore/Praat.vue', '.mode-options .radio-option.active'],
+    ['main/components/praat/PitchTonePanel.vue', '.analyze-btn'],
+    ['main/components/praat/PitchTonePanel.vue', '.step-header .step-number'],
   ]) {
     it(`keeps actual compiled ${selector} labels readable in all four themes`, () => {
       const rule = compiledRule(path, selector)
@@ -152,4 +156,23 @@ describe('approved theme palette readability', () => {
       }
     })
   }
+
+  it('uses each selected theme for Praat actions and decorative gradient endpoints', () => {
+    const start = compiledRule('main/views/explore/Praat.vue', '.start-button')
+    const analyze = compiledRule('main/components/praat/PitchTonePanel.vue', '.analyze-btn')
+    const title = compiledRule('main/views/explore/Praat.vue', '.page-title')
+    const steps = compiledRule('main/components/praat/PitchTonePanel.vue', '.step-header .step-number')
+    for (const theme of ['blue', 'green', 'light', 'dark']) {
+      const tokens = palette(theme)
+      for (const action of [start, analyze]) {
+        expect(resolved(action.background, tokens)).toBe(value(tokens, '--action-primary-bg'))
+        expect(resolved(action.color, tokens)).toBe(value(tokens, '--action-primary-text'))
+      }
+      for (const decoration of [title, steps]) {
+        const gradient = resolved(decoration.background, tokens)
+        expect(gradient).toContain(value(tokens, '--color-primary'))
+        expect(gradient).toContain(value(tokens, '--color-secondary'))
+      }
+    }
+  })
 })

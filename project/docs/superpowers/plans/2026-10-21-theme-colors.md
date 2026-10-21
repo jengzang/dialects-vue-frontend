@@ -21,20 +21,20 @@ Primary identifies main actions, focus and selection. Secondary is a limited int
 
 ## Task 1: Palette and roles
 
-- [ ] Add `tests/themePaletteContrast.test.js`: read actual theme declarations, resolve aliases and alpha composites, check dark green surfaces, readable text/actions, secondary foreground on tinted surfaces, RGB consistency and VillagesML green text.
-- [ ] Run `./node_modules/.bin/vitest run tests/themePaletteContrast.test.js`; verify expected failures before changing source.
-- [ ] Update `src/styles/global/_tokens.scss`: lighten blue page; apply approved primary/secondary values; map all green surface/text/sidebar/interaction overrides to night colors; preserve legacy accent names as compatibility aliases.
-- [ ] Update only corresponding primary mappings in `src/styles/villagesml/_tokens.scss`.
-- [ ] Update intentionally changed blue/light palette expectations in `tests/colorThemeTokens.test.js`. Preserve assertions for unrelated pre-existing failures.
-- [ ] Run contrast tests and existing theme/Praat tests. Baseline has three obsolete theme-style assertions and two obsolete Praat-path failures; do not restore removed structure.
-- [ ] Inspect scoped and full diffs, UTF-8, independent CR; fix introduced issues, stage only task files, inspect index and commit.
+- [x] Add `tests/themePaletteContrast.test.js`: read actual theme declarations, resolve aliases and alpha composites, check dark green surfaces, readable text/actions, secondary foreground on tinted surfaces, RGB consistency and VillagesML green text.
+- [x] Run `./node_modules/.bin/vitest run tests/themePaletteContrast.test.js`; verify expected failures before changing source.
+- [x] Update `src/styles/global/_tokens.scss`: lighten blue page; apply approved primary/secondary values; map all green surface/text/sidebar/interaction overrides to night colors; preserve legacy accent names as compatibility aliases.
+- [x] Update only corresponding primary mappings in `src/styles/villagesml/_tokens.scss`.
+- [x] Update intentionally changed blue/light palette expectations in `tests/colorThemeTokens.test.js`. Preserve assertions for unrelated pre-existing failures.
+- [x] Run contrast tests and existing theme/Praat tests. Baseline has three obsolete theme-style assertions and two obsolete Praat-path failures; do not restore removed structure.
+- [x] Inspect scoped and full diffs, UTF-8, independent CR; fix introduced issues, stage only task files, inspect index and commit (`e0c2832d`).
 
 ## Task 2: Interface accent adoption
 
-- [ ] Recheck worktree. Replace fixed blue-purple decorations in `src/main/views/explore/Praat.vue` and `src/main/components/praat/PitchTonePanel.vue` with primary/secondary roles. Use semantic action pairing for the start button and action pairing for filled step numbers. Leave chart palettes intact.
-- [ ] Change `src/main/components/TableAndTree/UniversalTable.vue` selection utility foreground and hover background to secondary roles.
-- [ ] Verify compiled SCSS and Vue build using existing Vite (`--outDir` in task artifact directory; avoid sitemap generation), inspect actual browser rendering for four theme/component combinations and narrow layout.
-- [ ] Inspect scoped/full diffs and UTF-8; independent CR; stage only task files, inspect index and commit.
+- [x] Recheck worktree. Replace fixed blue-purple decorations in `src/main/views/explore/Praat.vue` and `src/main/components/praat/PitchTonePanel.vue` with primary/secondary roles. Use semantic action pairing for the start button and action pairing for filled step numbers. Leave chart palettes intact.
+- [x] Change `src/main/components/TableAndTree/UniversalTable.vue` selection utility foreground and hover background to secondary roles.
+- [x] Verify compiled SCSS and Vue build using existing Vite (`--outDir` in task artifact directory; avoid sitemap generation), inspect actual browser rendering for four theme/component combinations and narrow layout.
+- [x] Inspect scoped/full diffs and UTF-8; independent CR; stage only task files, inspect index and commit.
 
 No dependency installation, structural refactors, token consolidation, or unrelated fixes.
 
@@ -45,3 +45,12 @@ No dependency installation, structural refactors, token consolidation, or unrela
 - Independent CR found fixed-white primary labels, dark close-button foreground and dark-only white-surface exceptions. Corrected these, including RegionSelector's confirmation action; preserved its ghost variant.
 - Contrast suite: 17 passed, including compiled SCSS consumers in all four themes. Praat tabs: 5 passed. Existing theme/risk suites retain their five baseline failures (obsolete switch/sidebar assertions and old Praat paths).
 - Vite web production build succeeded. Existing bundle-size and globe.gl browser-externalization warnings remain.
+
+## Task 2 verification and review
+
+- Praat heading and step-marker gradients now resolve the selected primary/secondary pair. Start/analyze buttons and the selected analysis mode use semantic primary action colors. Table selection utility uses secondary foreground/background explicitly.
+- Added compiled-SCSS regression checks: the original hardcoded Praat gradient failed the new role/readability checks before implementation; the final 22 palette tests pass. Praat tabs remain 5/5 passing.
+- Final targeted run: 39 passed, the same five documented baseline failures remain. No unrelated test assertions or obsolete paths were restored.
+- Final Vite web build succeeded in 39.42 seconds with existing bundle-size/externalization warnings.
+- Actual Praat page rendered at 1280px and 390px in all four themes: expected title gradient and action colors, no horizontal overflow, no page errors. Desktop light/dark/green and portrait green screenshots inspected. These checks cover the touched Praat UI; they are not an exhaustive visual audit of the application.
+- Independent step-2 code review approved: no actionable introduced issues; templates, scripts, charts, Chinese and emoji unchanged.
