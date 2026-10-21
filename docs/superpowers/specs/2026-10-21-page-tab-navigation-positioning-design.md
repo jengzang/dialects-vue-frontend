@@ -2,18 +2,24 @@
 
 ## Goal
 
-Keep the vocabulary page tab navigation visible while the page scrolls, with the requested behavior changing by orientation.
+Keep the vocabulary page tabs visible while scrolling, with different behavior in landscape and portrait, using logic that other components can reuse.
 
 ## Behavior
 
-- In landscape orientation, keep the navigation at its initial on-screen position below the global navigation bar as the page scrolls. Preserve its original layout space so page content does not jump.
-- In portrait orientation, let the navigation scroll normally until it reaches the top of the viewport, then keep it pinned there.
-- Apply the behavior only to `.page-tab-navigation` in the vocabulary page and use the existing `max-aspect-ratio: 1 / 1` orientation convention.
+- In landscape orientation, pin the navigation at its configured initial screen position for the current layout.
+- In portrait orientation, let it scroll in normal flow until its placeholder reaches the viewport top, then pin the navigation there.
+- Keep the navigation's placeholder in document flow while pinned so the surrounding content does not jump.
+
+## Architecture
+
+Create a reusable Vue composable in `src/composables/ui/useViewportPinnedElement.js`. It accepts refs for the target and its placeholder, an enabled value, orientation offsets, and an optional scroll target. It applies fixed positioning from the target's measured geometry, maintains the placeholder height, responds to scrolling and viewport changes, and removes listeners/styles when disabled or deactivated.
+
+Use the composable from `VocabularyPage.vue`. Keep the vocabulary navigation's appearance and responsive placement in its existing scoped SCSS. Do not change `MenuLayout.vue` or any other layout.
 
 ## Scope
 
-Keep the change to the vocabulary page navigation and only adjust its scroll context if required for sticky positioning. Do not change tab content, route behavior, or other page layouts.
+Only the reusable composable, its vocabulary page integration, and the vocabulary tab's local layout styles are in scope. Preserve any unrelated current workspace edits.
 
 ## Verification
 
-Review the final diff to confirm the change stays within scope and preserves the existing navigation styles. Check the rendered behavior in both orientations if the local UI can be opened.
+Review the final diff and check that `MenuLayout.vue` matches its state before this feature. Do not add or run tests for this request.
