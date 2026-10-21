@@ -583,6 +583,9 @@ const canUseTableActions = computed(() => {
 const tableData = ref([]);
 const total = ref(0);
 const currentPage = ref(1);
+const PAGE_FETCH_DEBOUNCE_MS = 800;
+let pageFetchTimeout = null;
+let fetchRequestVersion = 0;
 const searchText = ref('');
 const sortCol = ref(null);
 const sortDesc = ref(false);
@@ -657,6 +660,13 @@ const totalPages = computed(() => {
   return Math.ceil(total.value / TABLE_CONFIG.PAGE_SIZE) || 1;
 });
 
+const clearPendingPageFetch = () => {
+  if (pageFetchTimeout !== null) {
+    clearTimeout(pageFetchTimeout);
+    pageFetchTimeout = null;
+  }
+};
+
 // 初始化篩選狀態
 props.columns.forEach(col => {
   if (col.filterable) filterState[col.key] = [];
@@ -695,6 +705,8 @@ watch(() => props.defaultFilter, (next) => {
 
 // 獲取數據
 const fetchData = async () => {
+  clearPendingPageFetch();
+  const requestVersion = ++fetchRequestVersion;
   isLoading.value = true; // 開啟 loading
   const searchCols = props.columns.map(c => c.key);
   const filters = { ...filterState }
@@ -719,6 +731,8 @@ const fetchData = async () => {
 
   try {
     const response = await tableApi.value.query(payload);
+
+    if (requestVersion !== fetchRequestVersion) return;
 
     tableData.value = response.data;
     total.value = response.total;
@@ -775,9 +789,13 @@ const fetchData = async () => {
       }
     }
   } catch (e) {
-    console.error("Data Load Error:", e);
+    if (requestVersion === fetchRequestVersion) {
+      console.error("Data Load Error:", e);
+    }
   }finally {
-    isLoading.value = false; // 請求結束（無論成功失敗）都關閉
+    if (requestVersion === fetchRequestVersion) {
+      isLoading.value = false; // 請求結束（無論成功失敗）都關閉
+    }
   }
 };
 
@@ -1021,8 +1039,21 @@ const exportToExcel = () => {
 
 // 翻頁
 const changePage = (delta) => {
-  currentPage.value += delta;
-  fetchData();
+  const targetPage = Math.min(Math.max(currentPage.value + delta, 1), totalPages.value);
+  if (targetPage === currentPage.value) return;
+
+  currentPage.value = targetPage;
+  schedulePageFetch();
+};
+
+const schedulePageFetch = () => {
+  clearPendingPageFetch();
+  fetchRequestVersion += 1;
+  isLoading.value = true;
+  pageFetchTimeout = setTimeout(() => {
+    pageFetchTimeout = null;
+    fetchData();
+  }, PAGE_FETCH_DEBOUNCE_MS);
 };
 
 // 页码输入相关函数
@@ -1059,7 +1090,7 @@ const confirmPageJump = () => {
 
   // 跳转到目标页
   currentPage.value = targetPage;
-  fetchData();
+  schedulePageFetch();
 };
 
 // 切換全屏模式
@@ -1582,6 +1613,8 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  clearPendingPageFetch();
+  fetchRequestVersion += 1;
   // 組件銷毀時移除監聽，防止內存洩漏
   document.removeEventListener('click', handleGlobalClick);
   // 恢復背景滾動
