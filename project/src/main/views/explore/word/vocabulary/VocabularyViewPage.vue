@@ -1,6 +1,7 @@
 <template>
   <div class="vocabulary-view-page">
     <QuerySearchEntrance
+      title-tag="h1"
       :title="isCharacterNotesMode ? t('words.wordList.source.characterNotes') : t('navigation.pageTitles.vocabulary.view')"
       :results-visible="hasSubmittedSearch && !isSearchExpanded"
       @progress="handleSearchProgress"

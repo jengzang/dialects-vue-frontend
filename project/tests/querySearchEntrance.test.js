@@ -47,6 +47,15 @@ afterEach(() => {
 })
 
 describe('one query panel morphing with scroll', () => {
+  it('allows a page h1 using shared title styles and keeps the default h2', async () => {
+    const props = await mountEntrance({ titleTag: 'h1' })
+    expect(host.querySelector('.query-intro h1.page-title')?.textContent).toBe('词表查询')
+    props.titleTag = undefined
+    await settle()
+    expect(host.querySelector('.query-intro h2')?.textContent).toBe('词表查询')
+    expect(host.querySelector('.query-intro h1')).toBeNull()
+  })
+
   it('does not mount results until the page allows them, retaining the scroll runway', async () => {
     const props = await mountEntrance({ resultsVisible: false })
     expect(host.querySelector('.results')).toBeNull()

@@ -1,7 +1,7 @@
 <template>
   <section class="query-search-entrance" :style="panelStyle">
     <div v-if="enabled" ref="introEl" class="query-intro" :aria-hidden="progress === 1">
-      <h2><slot name="title">{{ title }}</slot></h2>
+      <component :is="titleTag" :class="{ 'page-title': titleTag === 'h1' }"><slot name="title">{{ title }}</slot></component>
     </div>
     <div
       ref="panelEl"
@@ -25,6 +25,7 @@ import { computed, nextTick, onActivated, onBeforeUnmount, onDeactivated, onMoun
 
 const props = defineProps({
   title: { type: String, required: true },
+  titleTag: { type: String, default: 'h2', validator: value => ['h1', 'h2'].includes(value) },
   enabled: { type: Boolean, default: true },
   resultsVisible: { type: Boolean, default: true },
 })
@@ -102,7 +103,7 @@ defineExpose({ collapse, progress })
   box-sizing: border-box;
   opacity: var(--query-expansion);
 
-  h2 { margin: 0; text-align: center; }
+  h1, h2 { margin: 0; text-align: center; }
 }
 
 .query-search-panel {
