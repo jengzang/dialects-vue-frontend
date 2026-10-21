@@ -2139,7 +2139,7 @@ $text-muted: var(--text-lightest);
 .compare-group {
   padding: 1rem;
   border-radius: var(--radius-md);
-  @include glass-blur;
+  // @include glass-blur;
 }
 
 .group-label {

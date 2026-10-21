@@ -96,8 +96,8 @@
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 var(--glass-60);
-  // backdrop-filter: blur(30px) saturate(180%);
-  // -webkit-backdrop-filter: blur(30px) saturate(180%);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
 }
 
 .page-tab-btn {
@@ -1465,13 +1465,13 @@
     margin-bottom: 14px;
   }
 
-  .page-tab-navigation {
-    justify-content: flex-start;
-  }
+  // .page-tab-navigation {
+  //   justify-content: flex-start;
+  // }
 
-  .page-tab-container {
-    width: 100%;
-  }
+  // .page-tab-container {
+  //   width: 100%;
+  // }
 
   .page-tab-btn {
     flex: 1 0 auto;

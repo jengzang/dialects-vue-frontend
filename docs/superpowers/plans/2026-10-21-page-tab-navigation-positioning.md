@@ -15,7 +15,7 @@
 **Files:**
 - Create: `project/src/composables/ui/useViewportPinnedElement.js`
 
-- [ ] **Step 1: Implement the reusable positioning contract**
+- [x] **Step 1: Implement the reusable positioning contract**
 
 Export `useViewportPinnedElement({ elementRef, placeholderRef, enabled = true, landscapeTop = null, portraitTop = 0, scrollTarget = () => window })`. Return `elementStyle`, `placeholderStyle`, and `isPinned` refs.
 
@@ -26,7 +26,7 @@ On mount and activation, attach a passive scroll listener to `scrollTarget`, plu
 **Files:**
 - Modify: `project/src/main/views/menu/VocabularyPage.vue`
 
-- [ ] **Step 1: Add a flow placeholder and connect the refs**
+- [x] **Step 1: Add a flow placeholder and connect the refs**
 
 Wrap the existing `.page-tab-navigation` in `.page-tab-navigation-slot`, bind refs and the two style refs, and preserve the existing `v-if="!isCharacterNotesMode"` condition. Call the composable with `enabled: () => !isCharacterNotesMode.value`, `landscapeTop: 'calc(max(16px, env(safe-area-inset-top)) + 7dvh + 6px)'`, and `portraitTop: 0`.
 
@@ -36,11 +36,11 @@ Wrap the existing `.page-tab-navigation` in `.page-tab-navigation-slot`, bind re
 - Modify: `project/src/main/views/explore/word/vocabulary/vocabulary.scss`
 - Modify: `project/src/layouts/MenuLayout.vue`
 
-- [ ] **Step 1: Move the navigation spacing to its placeholder**
+- [x] **Step 1: Move the navigation spacing to its placeholder**
 
 Give `.page-tab-navigation-slot` `width: 100%` and the existing desktop `margin-bottom: 18px`; set `.page-tab-navigation` to normal flow with `margin: 0`. In the portrait aspect-ratio block, set the slot `margin-bottom: 14px` and keep the existing left alignment on `.page-tab-navigation`. Remove sticky `top` rules. Preserve all tab appearance rules and unrelated current SCSS edits.
 
-- [ ] **Step 2: Remove the earlier layout-level change**
+- [x] **Step 2: Remove the earlier layout-level change**
 
 In `MenuLayout.vue`, remove the route class binding, `useRoute` import and initialization, and `.glass-content--vocabulary` overflow override. Leave its original `.glass-content { overflow-x: hidden; }` rule intact.
 
@@ -52,12 +52,16 @@ In `MenuLayout.vue`, remove the route class binding, `useRoute` import and initi
 - Review: `project/src/main/views/explore/word/vocabulary/vocabulary.scss`
 - Review: `project/src/layouts/MenuLayout.vue`
 
-- [ ] **Step 1: Review scope and whitespace**
+- [x] **Step 1: Review scope and whitespace**
 
 Run `git diff -- project/src/composables/ui/useViewportPinnedElement.js project/src/main/views/menu/VocabularyPage.vue project/src/main/views/explore/word/vocabulary/vocabulary.scss project/src/layouts/MenuLayout.vue` and `git diff --check`. Confirm `MenuLayout.vue` has no net change relative to the state before the previous implementation commit, and preserve unrelated user edits. Do not add or run tests for this request.
 
-- [ ] **Step 2: Commit only these implementation files**
+- [x] **Step 2: Commit only these implementation files**
 
 ```bash
-git commit --only project/src/composables/ui/useViewportPinnedElement.js project/src/main/views/menu/VocabularyPage.vue project/src/main/views/explore/word/vocabulary/vocabulary.scss project/src/layouts/MenuLayout.vue -m "refactor(vocabulary): use reusable pinned element composable"
+git add project/src/composables/ui/useViewportPinnedElement.js project/src/main/views/menu/VocabularyPage.vue project/src/layouts/MenuLayout.vue
+git add -p project/src/main/views/explore/word/vocabulary/vocabulary.scss
+git diff --cached --name-only
+git diff --cached --check
+git commit -m "refactor(vocabulary): use reusable pinned element composable"
 ```

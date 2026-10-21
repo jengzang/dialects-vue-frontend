@@ -2,14 +2,15 @@
   <div class="yubao-page">
     <QuerySearchEntrance
       ref="queryEntrance"
+      title-tag="h1"
       :title="activePageTitle"
       @progress="entranceProgress = $event"
     >
     <template #intro>
-      <h2>
+      <h1 class="page-title">
         <BarIcon :icon="activePageIcon" />
         {{ activePageTitle }}
-      </h2>
+      </h1>
     </template>
     <template #controls="{ expanded }">
     <div class="yubao-compact-controls" :class="{ 'is-compact': !expanded }">
