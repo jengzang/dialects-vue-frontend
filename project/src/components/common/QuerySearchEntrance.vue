@@ -3,6 +3,9 @@
     <div v-if="enabled" ref="introEl" class="query-intro" :aria-hidden="progress === 1">
       <component :is="titleTag" :class="{ 'page-title': titleTag === 'h1' }"><slot name="title">{{ title }}</slot></component>
     </div>
+    <div v-if="enabled && $slots['after-panel']" v-show="expanded" class="query-panel-footer">
+      <slot name="after-panel" />
+    </div>
     <div
       ref="panelEl"
       class="query-search-panel"
@@ -11,9 +14,6 @@
       <slot name="controls" :progress="progress" :expanded="expanded" :collapse="collapse" />
     </div>
     <slot name="outside-panel" />
-    <div v-if="enabled && $slots['after-panel']" v-show="expanded" class="query-panel-footer">
-      <slot name="after-panel" />
-    </div>
   </section>
   <div class="query-results" :class="{ 'query-results--enabled': enabled && hasSubmittedQuery }">
     <slot v-if="resultsVisible" />
@@ -56,7 +56,7 @@ function updateProgress() {
   }
   const target = compactPosition()
   const compactHoldDistance = Math.min(64, target / 2)
-  const distance = Math.min((introEl.value?.getBoundingClientRect().height || 0) * 1.5, target - compactHoldDistance)
+  const distance = Math.min((introEl.value?.getBoundingClientRect().height || 0) * 3, target - compactHoldDistance)
   const remaining = target - window.scrollY - compactHoldDistance
   const nextProgress = props.enabled && distance
     ? remaining <= 1 ? 1 : Math.max(0, Math.min(1, 1 - remaining / distance))
@@ -108,9 +108,8 @@ defineExpose({ collapse, progress })
   @include flex-col;
   justify-content: flex-end;
   align-items: center;
-  height: 26dvh;
   min-height: 160px;
-  padding-bottom: 28px;
+  // padding-bottom: 28px;
   box-sizing: border-box;
   opacity: var(--query-expansion);
 
@@ -305,9 +304,8 @@ defineExpose({ collapse, progress })
 
 @media (max-aspect-ratio: 1 / 1) {
   .query-intro {
-    height: 22dvh;
     min-height: 120px;
-    padding-bottom: 20px;
+    // padding-bottom: 20px;
   }
 
   .query-search-panel { padding: calc(16px * var(--query-expansion)); }

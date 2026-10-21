@@ -617,15 +617,15 @@ $ease-standard: 0.3s ease;@mixin glass-card(
   max-width: 900px;
   align-items: center;
   justify-content: center;
-  margin: 0 auto;
+  // margin: 0 auto;
   padding: 1dvw 8dvw;
-  background: var(--glass-05);
-  border: 1px solid var(--glass-10);
-  border-radius: var(--radius-md);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  // background: var(--glass-05);
+  // border: 1px solid var(--glass-10);
+  // border-radius: var(--radius-md);
+  // box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
   font-size: 18px;
 
-  @include glass-blur(8px);
+  // @include glass-blur(8px);
 }
 
 /* 通用正文 */

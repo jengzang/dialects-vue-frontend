@@ -16,7 +16,7 @@
         <div class="footer-brand-copy">
           <button
             type="button"
-            class="info-text footer-brand-name footer-brand-button"
+            class="footer-brand-name footer-brand-button"
             @click="goToHome"
           >
             <strong>{{ t('layoutFooter.pages.generic.title') }}</strong>
@@ -371,6 +371,21 @@ onMounted(fetchFooterStats)
   align-items: flex-start;
   justify-content: space-between;
   gap: 18px 32px;
+}
+
+.footer-brand-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: pre-wrap;
+  font-size: 15px;
+  color: var(--color-primary-hover);
+
+  &:hover:not(:disabled) {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
 }
 
 .footer-brand-copy {

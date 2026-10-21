@@ -396,8 +396,6 @@ $text-muted: var(--text-tertiary);
 }
 
 .setting-section {
-  --glass-panel-background: transparent;
-  --glass-panel-border: none;
   --glass-panel-radius: var(--radius-lg);
   --glass-panel-backdrop-filter: blur(10px);
   --glass-panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
