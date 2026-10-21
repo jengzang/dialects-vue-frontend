@@ -1,5 +1,10 @@
 <template>
-  <div ref="navbarRef" class="navbar">
+  <div
+    ref="navbarRef"
+    class="navbar"
+    :class="{ 'navbar--collapsing': collapseProgress > 0 }"
+    :style="navbarStyle"
+  >
     <!-- 桌面端的布局 -->
     <div ref="desktopRef" class="navbar-desktop">
       <div  class="navbar-item logo-and-title" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
@@ -176,6 +181,30 @@
       </div>
     </div>
 
+    <button
+      v-if="collapseProgress >= 1"
+      type="button"
+      class="navbar-expand-control"
+      :aria-label="t('navigation.actions.openMenu')"
+      @click="expandNavbar"
+    >
+      <svg
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="m9 5 7 7-7 7"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </button>
+
     <!-- Tab label tooltip -->
     <Teleport to="body">
       <Transition name="tab-tooltip-fade">
@@ -229,7 +258,48 @@ const navbarRef = ref(null)
 const desktopRef = ref(null)
 const navRef = ref(null)
 const mobileNavRef = ref(null)
+const collapseProgress = ref(0)
+const viewportWidth = ref(0)
 let liquidGlassScrollFrame = null
+let manualExpandScrollStart = null
+
+const navbarStyle = computed(() => {
+  if (collapseProgress.value <= 0) return {}
+
+  const expandedWidth = Math.max(viewportWidth.value - 16, 20)
+  const collapsedWidth = 20 + (expandedWidth - 20) * (1 - collapseProgress.value)
+  return { width: `${collapsedWidth}px` }
+})
+
+const updateNavbarCollapse = () => {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop
+  viewportWidth.value = document.documentElement.clientWidth
+
+  if (!window.matchMedia('(max-aspect-ratio: 1/1)').matches) {
+    manualExpandScrollStart = null
+    collapseProgress.value = 0
+    return
+  }
+
+  if (manualExpandScrollStart !== null) {
+    if (scrollTop <= 120) {
+      manualExpandScrollStart = null
+    } else {
+      collapseProgress.value = Math.min(
+        Math.max((scrollTop - manualExpandScrollStart - 30) / 100, 0),
+        1
+      )
+      return
+    }
+  }
+
+  collapseProgress.value = Math.min(Math.max((scrollTop - 120) / 100, 0), 1)
+}
+
+const expandNavbar = () => {
+  manualExpandScrollStart = window.scrollY || document.documentElement.scrollTop
+  collapseProgress.value = 0
+}
 
 const updateLiquidGlassGlint = () => {
   liquidGlassScrollFrame = null
@@ -237,6 +307,7 @@ const updateLiquidGlassGlint = () => {
   const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
   const progress = Math.min(window.scrollY / maxScroll, 1)
   navbarRef.value?.style.setProperty('--liquid-glass-glint-shift', `${20 + progress * 60}%`)
+  updateNavbarCollapse()
 }
 
 const scheduleLiquidGlassGlint = () => {
@@ -248,10 +319,12 @@ const scheduleLiquidGlassGlint = () => {
 onMounted(() => {
   updateLiquidGlassGlint()
   window.addEventListener('scroll', scheduleLiquidGlassGlint, { passive: true })
+  window.addEventListener('resize', scheduleLiquidGlassGlint, { passive: true })
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', scheduleLiquidGlassGlint)
+  window.removeEventListener('resize', scheduleLiquidGlassGlint)
 
   if (liquidGlassScrollFrame !== null) {
     window.cancelAnimationFrame(liquidGlassScrollFrame)
@@ -777,6 +850,32 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
 
   .navbar-content {
     display: flex;
+  }
+
+  .navbar--collapsing .navbar-content {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .navbar-expand-control {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    width: 20px;
+    min-width: 20px;
+    padding: 0;
+    border: 0;
+    @include flex-center;
+    background: transparent;
+    color: var(--color-primary);
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: -2px;
+    }
   }
 
   .menu-item {
