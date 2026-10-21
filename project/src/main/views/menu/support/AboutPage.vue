@@ -161,11 +161,13 @@
             </div>
           </div>
 
+          <h2 class="tabs-title" 
+              style="margin-top: 2rem;">{{ $t('layoutFooter.feedback.title') }}
+          </h2>
           <div
             class="surface-panel suggestion-form-section"
             data-about-suggestion-form
           >
-            <h2 class="tabs-title">{{ $t('layoutFooter.feedback.title') }}</h2>
             <form
               class="suggestion-page-form"
               @submit.prevent="submitSuggestionForm"
@@ -599,8 +601,8 @@ $ease-standard: 0.3s ease;@mixin glass-card(
 
 .tabs-title {
   width: 100%;
-  margin-top: 1rem !important;
-  margin-bottom: 0.5rem !important;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
   font-size: 1.8rem;
   font-weight: bold;
 }
@@ -1094,12 +1096,12 @@ em {
   gap: 14px;
   // width: 100%;
   max-width: 820px;
-  margin: 28px auto 0;
+  margin: 4px auto 0;
   padding: 20px;
   text-align: left;
 
   @media (max-aspect-ratio: #{1 / 1}) {
-    min-width: 80dvw;
+    min-width: 75dvw;
   }
 
   .tabs-title {

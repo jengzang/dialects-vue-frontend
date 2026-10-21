@@ -71,6 +71,18 @@ describe('one query panel morphing with scroll', () => {
     expect(host.querySelector('.query-results--enabled')).not.toBeNull()
   })
 
+  it('releases reserved result space when scrolling back to the expanded panel', async () => {
+    const props = await mountEntrance()
+    await entrance.collapse()
+    expect(host.querySelector('.query-results--enabled')).not.toBeNull()
+
+    props.resultsVisible = false
+    await settle()
+
+    expect(host.querySelector('.results')).toBeNull()
+    expect(host.querySelector('.query-results--enabled')).toBeNull()
+  })
+
   it('renders the original input and conditions together, without a second input', async () => {
     await mountEntrance()
     expect(host.querySelectorAll('textarea')).toHaveLength(1)
@@ -150,13 +162,13 @@ describe('one query panel morphing with scroll', () => {
     expect(window.scrollTo).toHaveBeenCalledWith({ top: 420 - window.innerHeight * 0.12, behavior: 'smooth' })
   })
 
-  it('places source choices below the panel, hides them when compact and updates the heading', async () => {
+  it('groups the heading and source choices in one intro slot and hides them when compact', async () => {
     const props = await mountEntrance()
     const footer = host.querySelector('.query-panel-footer')
     const panel = host.querySelector('.query-search-panel')
-    expect(panel.nextElementSibling).toBe(footer)
-    expect(panel.contains(host.querySelector('.source-choice'))).toBe(false)
-    expect(footer.style.display).not.toBe('none')
+    expect(footer.nextElementSibling).toBe(panel)
+    expect(footer.contains(host.querySelector('.source-choice'))).toBe(true)
+    expect(footer.getAttribute('aria-hidden')).toBe('false')
     props.title = '字表注释'
     await settle()
     expect(host.querySelector('.query-intro h2').textContent).toBe('字表注释')
@@ -164,11 +176,11 @@ describe('one query panel morphing with scroll', () => {
     scrollPosition = 420 - window.innerHeight * 0.12
     window.dispatchEvent(new Event('scroll'))
     await settle()
-    expect(footer.style.display).toBe('none')
+    expect(footer.getAttribute('aria-hidden')).toBe('true')
     scrollPosition = 0
     window.dispatchEvent(new Event('scroll'))
     await settle()
-    expect(footer.style.display).not.toBe('none')
+    expect(footer.getAttribute('aria-hidden')).toBe('false')
   })
 
   it('honors reduced motion and supports disabling expansion', async () => {

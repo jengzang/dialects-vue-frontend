@@ -8,6 +8,7 @@ pnpm-lock.yaml
 dist/
 dist-ssr/
 build/
+project/public/sitemap.xml
 .output/
 .nuxt/
 .next/

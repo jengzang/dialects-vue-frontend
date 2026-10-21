@@ -276,7 +276,7 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
   &.has-action {
     &.toast-fade-enter-active {
-      animation-name: toast-in-side;
+      animation-name: toast-in-fade;
     }
 
     &.toast-fade-leave-active {
@@ -374,15 +374,13 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 }
 
-@keyframes toast-in-side {
+@keyframes toast-in-fade {
   0% {
     opacity: 0;
-    transform: translateY(-18px) scale(0.96);
   }
 
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1);
   }
 }
 

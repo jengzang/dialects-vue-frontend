@@ -1,10 +1,10 @@
 <template>
   <section class="query-search-entrance" :style="panelStyle">
-    <div v-if="enabled" ref="introEl" class="query-intro" :aria-hidden="progress === 1">
-      <component :is="titleTag" :class="{ 'page-title': titleTag === 'h1' }"><slot name="title">{{ title }}</slot></component>
-    </div>
-    <div v-if="enabled && $slots['after-panel']" v-show="expanded" class="query-panel-footer">
-      <slot name="after-panel" />
+    <div v-if="enabled" ref="introEl" class="query-intro query-panel-footer" :aria-hidden="progress === 1" :inert="progress === 1">
+      <slot name="intro">
+        <component :is="titleTag" :class="{ 'page-title': titleTag === 'h1' }"><slot name="title">{{ title }}</slot></component>
+        <slot name="after-panel" />
+      </slot>
     </div>
     <div
       ref="panelEl"
@@ -15,7 +15,7 @@
     </div>
     <slot name="outside-panel" />
   </section>
-  <div class="query-results" :class="{ 'query-results--enabled': enabled && hasSubmittedQuery }">
+  <div class="query-results" :class="{ 'query-results--enabled': enabled && hasSubmittedQuery && resultsVisible }">
     <slot v-if="resultsVisible" />
   </div>
 </template>
@@ -55,7 +55,7 @@ function updateProgress() {
     return
   }
   const target = compactPosition()
-  const compactHoldDistance = Math.min(64, target / 2)
+  const compactHoldDistance = Math.min(80, target / 2)
   const distance = Math.min((introEl.value?.getBoundingClientRect().height || 0) * 3, target - compactHoldDistance)
   const remaining = target - window.scrollY - compactHoldDistance
   const nextProgress = props.enabled && distance
@@ -103,18 +103,6 @@ defineExpose({ collapse, progress })
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
-
-.query-intro {
-  @include flex-col;
-  justify-content: flex-end;
-  align-items: center;
-  min-height: 160px;
-  // padding-bottom: 28px;
-  box-sizing: border-box;
-  opacity: var(--query-expansion);
-
-  h1, h2 { margin: 0; text-align: center; }
-}
 
 .query-search-panel {
   --glass-panel-background: color-mix(in srgb, var(--surface-panel) calc(var(--query-expansion) * 100%), transparent);
@@ -332,23 +320,28 @@ defineExpose({ collapse, progress })
 }
 
 .query-panel-footer {
-  max-height: calc(100px * var(--query-expansion));
+  @include flex-col;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 160px;
+  max-height: 260px;
   padding: calc(16px * var(--query-expansion)) 0;
+  box-sizing: border-box;
   overflow: hidden;
   opacity: var(--query-expansion);
+
+  h1, h2 { margin: 0; text-align: center; }
 }
 
 @media (max-aspect-ratio: 1 / 1) {
-  .query-intro {
-    min-height: 120px;
-    // padding-bottom: 20px;
-  }
+  .query-panel-footer { min-height: 120px; }
 
   .query-search-panel { padding: calc(16px * var(--query-expansion)); }
 
   .query-search-panel {
     :deep(.yubao-compact-controls.is-compact) {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr) auto;
       grid-template-areas: 'category category' 'input modes';
     }
   }

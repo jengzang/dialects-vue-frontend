@@ -1,14 +1,22 @@
 <template>
   <div class="vocabulary-view-page">
     <QuerySearchEntrance
+      ref="querySearchEntranceRef"
       title-tag="h1"
       :title="isCharacterNotesMode ? t('words.wordList.source.characterNotes') : t('navigation.pageTitles.vocabulary.view')"
       :results-visible="hasSubmittedSearch && !isSearchExpanded"
       @progress="handleSearchProgress"
     >
-    <template #title>
-      <BarIcon icon="📋" />
-      {{ isCharacterNotesMode ? t('words.wordList.source.characterNotes') : t('navigation.pageTitles.vocabulary.view') }}
+    <template #intro>
+      <h1 class="page-title">
+        <BarIcon icon="📋" />
+        {{ isCharacterNotesMode ? t('words.wordList.source.characterNotes') : t('navigation.pageTitles.vocabulary.view') }}
+      </h1>
+      <RadioGroup
+        v-model="source"
+        name="vocabulary-query-source"
+        :options="sourceOptions"
+      />
     </template>
     <template #controls="{ expanded, collapse }">
     <VocabularyTopControls
@@ -57,7 +65,57 @@
         @locations-resolved="handleNotesScopeResolved"
       />
       </Teleport>
-      <div v-if="!isCharacterNotesMode" class="vocabulary-counts-footer" aria-live="polite">
+      <div v-if="!isCharacterNotesMode && isSearchExpanded" class="vocabulary-quick-start-list">
+        <button
+          v-for="quickStart in VOCABULARY_QUICK_STARTS"
+          :key="quickStart.id"
+          class="pill-btn vocabulary-quick-start"
+          type="button"
+          :aria-label="quickStart.label"
+          @click="runVocabularyQuickStart(quickStart)"
+        >
+          <svg
+            v-if="quickStart.icon"
+            class="vocabulary-quick-start-icon"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <template v-if="quickStart.icon === 'card'">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </template>
+            <template v-else>
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </template>
+          </svg>
+          <span>{{ quickStart.label }}</span>
+          <svg
+            class="vocabulary-quick-start-icon"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M7 17L17 7M7 7h10v10" />
+          </svg>
+        </button>
+      </div>
+      <div v-if="!isCharacterNotesMode && isSearchExpanded" class="vocabulary-counts-footer" aria-live="polite">
         <I18nT keypath="words.wordList.upload.totalLocations" tag="span" scope="global">
           <template #count><span class="vocabulary-counts-value">{{ vocabularyCounts.locations ?? '…' }}</span></template>
         </I18nT>
@@ -67,14 +125,6 @@
         </I18nT>
       </div>
     </template>
-    <template #after-panel>
-      <RadioGroup
-        v-model="source"
-        name="vocabulary-query-source"
-        :options="sourceOptions"
-      />
-    </template>
-
     <section v-if="isCharacterNotesMode" class="content-area">
       <div v-if="isNotesInitialLoading" class="loading-state loading-state-base">
         <div class="ui-loading--page" aria-hidden="true"></div>
@@ -552,6 +602,11 @@ const VOCABULARY_CARD_NOTE_PREVIEW_LENGTH = 3
 const TONE_FIELD_KEYS = Array.from({ length: 10 }, (_, index) => `t${index + 1}`)
 const locationDetailsT2S = OpenCCT2CN.Converter({ from: 'tw', to: 'cn' })
 const locationDetailsS2T = OpenCCCN2T.Converter({ from: 'cn', to: 'tw' })
+const VOCABULARY_QUICK_STARTS = [
+  { id: 'map-overview', label: '🗺️ 地图', query: '', viewMode: 'map', standardWord: '', mapDisplayMode: 'overview' },
+  { id: 'spider-cards', label: '蜘蛛', query: '蜘蛛', viewMode: 'card', icon: 'card' },
+  { id: 'earthworm-map', label: '蚯蚓', query: '', viewMode: 'map', standardWord: '蚯蚓', mapDisplayMode: 'definition', icon: 'map' },
+]
 
 const MAP_POINT_META_GROUPS = [
   {
@@ -611,6 +666,7 @@ const props = defineProps({
 })
 
 const query = ref('')
+const querySearchEntranceRef = ref(null)
 const notesQuery = ref('')
 const hasSubmittedSearch = ref(false)
 const isSearchExpanded = ref(true)
@@ -631,6 +687,18 @@ function submitSearch(collapse) {
   }
   collapse()
 }
+
+function runVocabularyQuickStart(quickStart) {
+  query.value = quickStart.query
+  viewMode.value = quickStart.viewMode
+  if (Object.hasOwn(quickStart, 'standardWord')) {
+    selectedStandardWord.value = quickStart.standardWord
+    selectedStandardWordsModel.value = quickStart.standardWord ? [quickStart.standardWord] : []
+  }
+  if (quickStart.mapDisplayMode) mapDisplayMode.value = quickStart.mapDisplayMode
+  submitSearch(() => querySearchEntranceRef.value?.collapse())
+}
+
 const source = computed({
   get: () => route.query.source === 'character-notes' ? 'character-notes' : 'vocabulary',
   set: (value) => {

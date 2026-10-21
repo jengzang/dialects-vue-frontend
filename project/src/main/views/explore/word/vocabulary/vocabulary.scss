@@ -17,12 +17,46 @@
   color: var(--text-primary);
 }
 
+.vocabulary-page--view {
+  @include flex-col;
+  min-height: calc(100dvh - 7dvh - 44px);
+  box-sizing: border-box;
+
+  :deep(.vocabulary-view-page) {
+    @include flex-col;
+    flex: 1 0 auto;
+  }
+
+  :deep(.query-search-entrance) {
+    @include flex-col;
+    flex: var(--query-expansion) 0 auto;
+    justify-content: center;
+    padding-bottom: calc((7dvh - 12px) * var(--query-expansion));
+    box-sizing: border-box;
+  }
+}
+
 .vocabulary-counts-footer {
   @include flex-center;
   gap: 8px;
   padding: 14px 12px 24px;
   color: var(--text-secondary);
   font-size: 0.9rem;
+}
+
+.vocabulary-quick-start-list {
+  @include flex-center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 1.5dvh;
+}
+
+.vocabulary-quick-start {
+  gap: 6px;
+}
+
+.vocabulary-quick-start-icon {
+  flex: 0 0 auto;
 }
 
 .vocabulary-counts-value {
@@ -48,6 +82,7 @@
   display: inline-flex;
   gap: 4px;
   max-width: 100%;
+  margin-top: 1dvh;
   padding: 4px;
   overflow-x: auto;
   pointer-events: auto;
@@ -1405,6 +1440,12 @@
 }
 
 @media (max-aspect-ratio: 1 / 1) {
+  .vocabulary-page--view { min-height: calc(100dvh - 16dvh - 44px); }
+
+  .vocabulary-page--view :deep(.query-search-entrance) {
+    padding-bottom: calc((16dvh - 8px) * var(--query-expansion));
+  }
+
   .top-controls{
     padding-bottom: 12px;
   }

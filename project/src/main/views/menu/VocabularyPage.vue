@@ -1,5 +1,5 @@
 <template>
-  <div class="vocabulary-page">
+  <div class="vocabulary-page" :class="{ 'vocabulary-page--view': activeVocabularyPath === '/menu/vocabulary/view' }">
     <div v-if="!isCharacterNotesMode" class="page-tab-navigation">
       <div
         class="page-tab-container"

@@ -5,9 +5,11 @@
       :title="activePageTitle"
       @progress="entranceProgress = $event"
     >
-    <template #title>
-      <BarIcon :icon="activePageIcon" />
-      {{ activePageTitle }}
+    <template #intro>
+      <h2>
+        <BarIcon :icon="activePageIcon" />
+        {{ activePageTitle }}
+      </h2>
     </template>
     <template #controls="{ expanded }">
     <div class="yubao-compact-controls" :class="{ 'is-compact': !expanded }">
@@ -104,7 +106,7 @@
       </div>
       <button
         v-if="expanded"
-        class="query-submit query-search-action glass-button"
+        class="query-submit query-search-action action-btn"
         data-variant="primary"
         type="button"
         :disabled="isLoading || !isDraftValid"

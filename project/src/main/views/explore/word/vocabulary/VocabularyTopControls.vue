@@ -20,7 +20,7 @@
 
         <button
           v-if="deferQuery && source !== 'character-notes'"
-          class="query-submit query-search-action glass-button"
+          class="query-submit query-search-action action-btn"
           data-variant="primary"
           type="button"
           @click="submitSearch"
@@ -565,7 +565,7 @@ const standardWordTriggerLabel = computed(() => {
 .top-controls {
   // border: 1px solid var(--glass-30);
   display: flex;
-  flex-wrap: wrap;
+  // flex-wrap: wrap;
   gap: 12px;
   align-items: center;
   width: min(100%, 1180px);
@@ -827,6 +827,9 @@ const standardWordTriggerLabel = computed(() => {
     min-width: 0;
     width: auto;
   }
+  .partition-filter {
+    min-width: 200px;
+  }
 
   .location-select-trigger,
   .standard-word-select-trigger { min-width: 0; max-width: 100%; }
@@ -851,7 +854,7 @@ const standardWordTriggerLabel = computed(() => {
 
   .search-section {
     flex: 1 1 100%;
-    min-width: 100%;
+    // min-width: 100%;
   }
 
   .field-filter {
