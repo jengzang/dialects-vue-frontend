@@ -2,7 +2,7 @@
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, nextTick, onMounted, onBeforeUnmount, onActivated, onDeactivated, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
+import { I18nT, useI18n } from 'vue-i18n'
 import * as echarts from 'echarts'
 import { getFeatureCounts, getLocationDetail, getLocations, getSyllableCounts } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
@@ -1521,7 +1521,11 @@ onBeforeUnmount(() => {
         <!-- <h3 class="section-title">匯總統計</h3> -->
         <h3 class="section-title section-title--with-pill">
           <span>{{ $t('phonology.phonology.countphos.titlePrefix') }}</span>
-          <span class="section-title-pill">{{ $t('phonology.phonology.countphos.locationPill', { count: displayLocationCount }) }}</span>
+          <span class="section-title-pill">
+            <I18nT keypath="phonology.phonology.countphos.locationPill" tag="span" scope="global">
+              <template #count><span class="stat-value">{{ displayLocationCount }}</span></template>
+            </I18nT>
+          </span>
         </h3>
 
         <!-- 圖表統計部分 -->
@@ -1646,7 +1650,11 @@ onBeforeUnmount(() => {
           <div>
             <h3 class="section-title section-title--with-pill">
               <span>{{ $t('phonology.phonology.countphos.syllables.title') }}</span>
-              <span class="section-title-pill">{{ $t('phonology.phonology.countphos.locationPill', { count: resolvedLocationCount }) }}</span>
+              <span class="section-title-pill">
+                <I18nT keypath="phonology.phonology.countphos.locationPill" tag="span" scope="global">
+                  <template #count><span class="stat-value">{{ resolvedLocationCount }}</span></template>
+                </I18nT>
+              </span>
             </h3>
             <p class="section-subtitle">
               {{ $t('phonology.phonology.countphos.syllables.subtitle') }}
@@ -1657,7 +1665,7 @@ onBeforeUnmount(() => {
         <div class="syllable-summary-row">
           <span class="summary-pill">
             <span class="stat-label">{{ $t('phonology.phonology.countphos.syllables.currentMode') }}:</span>
-            <span class="stat-value">{{ syllableModeLabel }}</span>
+            <span class="stat-value stat-value--label">{{ syllableModeLabel }}</span>
           </span>
           <span class="summary-pill">
             <span class="stat-label">{{ $t('phonology.phonology.countphos.syllables.tokens') }}:</span>
@@ -2036,9 +2044,9 @@ $primary-deep: #003d9e;
     align-items: center;
     justify-content: center;
     padding: 2px 10px;
-    background: var(--color-secondary-bg);
+    background: rgba(var(--color-primary-rgb), 0.12);
     border-radius: var(--radius-pill);
-    color: var(--color-secondary-text);
+    color: var(--color-primary);
     white-space: nowrap;
     font-size: 15px;
     font-weight: 700;
@@ -2197,7 +2205,7 @@ $primary-deep: #003d9e;
     align-items: center;
     gap: 8px;
     margin: 0;
-    color: var(--color-secondary-text);
+    color: var(--color-primary-hover);
     font-size: 15px;
     font-weight: 700;
   }
@@ -2285,6 +2293,10 @@ $primary-deep: #003d9e;
   .stat-value {
     color: var(--color-secondary-text);
     font-weight: 600;
+
+    &--label {
+      color: var(--color-primary);
+    }
   }
 
   .location-tags {
@@ -2295,9 +2307,9 @@ $primary-deep: #003d9e;
 
   .location-tag {
     padding: 2px 8px;
-    background: var(--color-secondary-bg);
+    background: rgba(var(--color-primary-rgb), 0.1);
     border-radius: var(--radius-xs);
-    color: var(--color-secondary-text);
+    color: var(--color-primary);
     font-size: 12px;
   }
 
@@ -2420,7 +2432,7 @@ $primary-deep: #003d9e;
 
   .feature-type {
     margin-bottom: 10px;
-    color: var(--color-secondary-text);
+    color: var(--color-primary);
     font-size: 15px;
     font-weight: 700;
   }
@@ -2453,7 +2465,7 @@ $primary-deep: #003d9e;
   }
 
   .tag-syllable {
-    color: var(--color-secondary-text);
+    color: var(--color-primary-hover);
     font-size: 14px;
     font-weight: 700;
   }
