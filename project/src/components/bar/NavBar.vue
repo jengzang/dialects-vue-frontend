@@ -211,16 +211,16 @@
       @click="expandNavbar"
     >
       <svg
-        width="12"
-        height="12"
+        width="18"
+        height="18"
         viewBox="0 0 24 24"
         fill="none"
         aria-hidden="true"
       >
         <path
-          d="m9 5 7 7-7 7"
+          d="M5 12h14M13 6l6 6-6 6"
           stroke="currentColor"
-          stroke-width="2.5"
+          stroke-width="3.5"
           stroke-linecap="round"
           stroke-linejoin="round"
         />
@@ -271,6 +271,11 @@ const navRef = ref(null)
 const mobileNavRef = ref(null)
 const collapseProgress = ref(0)
 const viewportWidth = ref(0)
+const NORMAL_COLLAPSE_START = 200
+const COLLAPSE_DISTANCE = 200
+const MANUAL_EXPAND_MIN_SCROLL = 250
+const MANUAL_COLLAPSE_DELAY = 50
+const MIN_SCROLLABLE_DISTANCE = 500
 let liquidGlassScrollFrame = null
 let manualExpandScrollStart = null
 
@@ -282,6 +287,9 @@ const navbarStyle = computed(() => {
   return { width: `${collapsedWidth}px` }
 })
 
+const getMaxScrollableDistance = () =>
+  Math.max(document.documentElement.scrollHeight - window.innerHeight, 0)
+
 const updateNavbarCollapse = () => {
   const scrollTop = window.scrollY || document.documentElement.scrollTop
   viewportWidth.value = document.documentElement.clientWidth
@@ -292,30 +300,40 @@ const updateNavbarCollapse = () => {
     return
   }
 
-  if (manualExpandScrollStart !== null) {
-    if (scrollTop <= 120) {
-      manualExpandScrollStart = null
-    } else {
-      collapseProgress.value = Math.min(
-        Math.max((scrollTop - manualExpandScrollStart - 30) / 100, 0),
-        1
-      )
-      return
-    }
+  if (getMaxScrollableDistance() <= MIN_SCROLLABLE_DISTANCE) {
+    manualExpandScrollStart = null
+    collapseProgress.value = 0
+    return
   }
 
-  collapseProgress.value = Math.min(Math.max((scrollTop - 120) / 100, 0), 1)
+  if (manualExpandScrollStart !== null && scrollTop > NORMAL_COLLAPSE_START) {
+    collapseProgress.value = Math.min(
+      Math.max(
+        (scrollTop - manualExpandScrollStart - MANUAL_COLLAPSE_DELAY) / COLLAPSE_DISTANCE,
+        0
+      ),
+      1
+    )
+    return
+  }
+
+  manualExpandScrollStart = null
+  collapseProgress.value = Math.min(
+    Math.max((scrollTop - NORMAL_COLLAPSE_START) / COLLAPSE_DISTANCE, 0),
+    1
+  )
 }
 
 const expandNavbar = () => {
-  manualExpandScrollStart = window.scrollY || document.documentElement.scrollTop
+  const scrollTop = window.scrollY || document.documentElement.scrollTop
+  manualExpandScrollStart = scrollTop > MANUAL_EXPAND_MIN_SCROLL ? scrollTop : null
   collapseProgress.value = 0
 }
 
 const updateLiquidGlassGlint = () => {
   liquidGlassScrollFrame = null
 
-  const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
+  const maxScroll = Math.max(getMaxScrollableDistance(), 1)
   const progress = Math.min(window.scrollY / maxScroll, 1)
   navbarRef.value?.style.setProperty('--liquid-glass-glint-shift', `${20 + progress * 60}%`)
   updateNavbarCollapse()
@@ -882,7 +900,7 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
     border: 0;
     @include flex-center;
     background: transparent;
-    color: var(--color-primary);
+    color: var(--color-primary-hover);
     cursor: pointer;
 
     &:focus-visible {
