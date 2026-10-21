@@ -32,13 +32,21 @@ vi.mock('@/main/components/TableAndTree/UniversalTable.vue', () => ({
 }))
 vi.mock('@/main/components/map/VocabularyMap.vue', () => ({ default: { render: () => null } }))
 vi.mock('@/main/components/geo/popups/LocationDetailPopup.vue', () => ({ default: { render: () => null } }))
+let emitScope
+vi.mock('@/main/components/geo/LocationAndRegionInput.vue', () => ({ default: {
+  props: ['modelValue'],
+  setup(props, { emit }) {
+    emitScope = emit
+    return () => h('div', { class: 'notes-scope-input' })
+  },
+} }))
 vi.mock('@/components/common/AppModal.vue', () => ({ default: {
   props: ['modelValue'],
   setup: props => () => props.modelValue ? h('div', { class: 'open-modal' }) : null,
 } }))
 vi.mock('../src/main/views/explore/word/vocabulary/VocabularyTopControls.vue', () => ({
   default: {
-    props: ['source', 'filterMode', 'selectedRegions', 'selectedLocations', 'partitionNodes', 'partitionLoading', 'partitionError'],
+    props: ['source', 'filterMode', 'selectedRegions', 'selectedLocations', 'partitionNodes', 'partitionLoading', 'partitionError', 'notesRefreshDisabled'],
     emits: ['search', 'refreshNotes', 'openLocationDetails', 'update:query', 'update:selectedLocations', 'update:viewMode', 'update:filterMode', 'update:selectedRegions', 'update:selectedProvince', 'update:selectedCity', 'update:selectedStandardWord'],
     setup(props, { emit }) {
       controlProps = props
@@ -88,6 +96,22 @@ beforeEach(() => {
 afterEach(() => { app?.unmount(); host?.remove(); vi.restoreAllMocks(); vi.unstubAllGlobals() })
 
 describe('vocabulary configuration entrance', () => {
+  it('keeps notes scope outside the panel through collapse and blocks refresh while resolving', async () => {
+    await mount({ source: 'character-notes' })
+    const scopeInput = host.querySelector('.notes-scope-input')
+    expect(scopeInput).not.toBeNull()
+    expect(host.querySelector('.query-search-panel').contains(scopeInput)).toBe(false)
+    emitScope('update:modelValue', { locations: ['测试地点'], regions: [], regionUsing: 'map' })
+    await settle()
+    expect(controlProps.notesRefreshDisabled).toBe(true)
+    emitScope('locationsResolved', { locations: ['测试地点'], regions: [], regionUsing: 'map' })
+    await settle()
+    expect(controlProps.notesRefreshDisabled).toBe(false)
+    entrance.$.exposed.progress.value = 1
+    await settle()
+    expect(host.querySelector('.notes-scope-input')).toBe(scopeInput)
+    expect(host.querySelector('.query-search-panel').contains(scopeInput)).toBe(false)
+  })
   it('migrates the existing administrative preference', async () => {
     localStorage.setItem('vocabulary_filter_by_region', 'true')
     await mount()

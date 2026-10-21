@@ -10,6 +10,7 @@
     >
       <slot name="controls" :progress="progress" :expanded="expanded" :collapse="collapse" />
     </div>
+    <slot name="outside-panel" />
     <div v-if="enabled && $slots['after-panel']" v-show="expanded" class="query-panel-footer">
       <slot name="after-panel" />
     </div>
@@ -196,6 +197,8 @@ defineExpose({ collapse, progress })
       grid-area: tools;
       justify-self: end;
     }
+
+    :deep(.query-controls--vocabulary .field-filter) { align-self: end; }
 
     :deep(.query-range) {
       grid-area: range;

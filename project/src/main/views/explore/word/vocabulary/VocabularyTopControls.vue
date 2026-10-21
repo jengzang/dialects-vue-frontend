@@ -40,7 +40,7 @@
             :data-variant="deferQuery ? 'primary' : undefined"
             :variant="deferQuery ? undefined : 'blue'"
             type="button"
-            :disabled="notesRefreshDisabled || isNotesScopeResolving || isNotesScopeDisabled"
+            :disabled="notesRefreshDisabled"
             @click="refreshNotes"
           >
             <svg
@@ -148,18 +148,7 @@
       class="filter-strip"
       :class="{ 'notes-scope-filter': source === 'character-notes' }"
     >
-      <div v-if="source === 'character-notes'" class="query-range query-range--notes">
-        <LocationAndRegionInput
-          :model-value="notesScope"
-          allow-empty-scope
-          disable-location-limit
-          @update:model-value="handleNotesScopeUpdate"
-          @update:run-disabled="handleNotesScopeDisabled"
-          @locations-resolved="handleNotesLocationsResolved"
-        />
-      </div>
-
-      <div v-else class="query-range">
+      <div v-if="source !== 'character-notes'" class="query-range">
         <div
           v-if="viewMode === 'map'"
           class="standard-word-filter"
@@ -296,7 +285,6 @@ import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import RegionSelector from '@/main/components/geo/RegionSelector.vue'
-import LocationAndRegionInput from '@/main/components/geo/LocationAndRegionInput.vue'
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import { showConfirm } from '@/utils/ui/message.js'
@@ -332,10 +320,6 @@ const props = defineProps({
   selectedCity: { type: String, default: '' },
   provinceOptions: { type: Array, default: () => [] },
   cityOptions: { type: Array, default: () => [] },
-  notesScope: {
-    type: Object,
-    default: () => ({ locations: [], regions: [], regionUsing: 'map' }),
-  },
   notesRefreshDisabled: { type: Boolean, default: false },
 })
 
@@ -353,8 +337,6 @@ const emit = defineEmits([
   'retryPartitions',
   'update:selectedProvince',
   'update:selectedCity',
-  'update:notesScope',
-  'locationsResolved',
   'refreshNotes',
   'openLocationDetails',
 ])
@@ -373,11 +355,9 @@ const filterModeOptions = computed(() => [
 ])
 
 watch(() => props.filterMode, () => { locationDropdownOpen.value = false })
-const isNotesScopeResolving = ref(false)
-const isNotesScopeDisabled = ref(false)
 
 function refreshNotes() {
-  if (props.notesRefreshDisabled || isNotesScopeResolving.value || isNotesScopeDisabled.value || isComposing.value) return
+  if (props.notesRefreshDisabled || isComposing.value) return
   clearTimeout(searchTimer)
   emit('update:query', inputText.value)
   emit('refreshNotes')
@@ -431,25 +411,6 @@ function submitSearch() {
   clearTimeout(searchTimer)
   emit('update:query', inputText.value)
   emit('search')
-}
-
-function handleNotesScopeUpdate(scope) {
-  isNotesScopeResolving.value = true
-  isNotesScopeDisabled.value = false
-  emit('update:notesScope', scope)
-}
-
-function handleNotesScopeDisabled(disabled) {
-  isNotesScopeDisabled.value = disabled
-  if (disabled) {
-    isNotesScopeResolving.value = false
-  }
-}
-
-function handleNotesLocationsResolved(scope) {
-  isNotesScopeResolving.value = false
-  isNotesScopeDisabled.value = false
-  emit('locationsResolved', scope)
 }
 
 function formatMultiSelectLabel(selectedValues, options, placeholder) {
@@ -736,47 +697,6 @@ const standardWordTriggerLabel = computed(() => {
   flex: 0 0 auto;
   flex-wrap: wrap;
   min-width: 180px;
-}
-
-.top-controls.query-controls--vocabulary {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas: 'input input' 'modes modes' 'range tools';
-
-  .search-container,
-  .search-section,
-  .filter-strip {
-    display: contents;
-  }
-
-  .input-wrapper { grid-area: input; }
-  .field-filter { grid-area: tools; align-self: end; }
-
-  .query-mode-controls {
-    grid-area: modes;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-
-  .query-mode-controls > .result-view-switcher { order: 0; }
-
-  .query-range {
-    grid-area: range;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    min-width: 0;
-  }
-
-  .location-filter,
-  .standard-word-filter {
-    flex: 1 1 220px;
-    min-width: 0;
-    width: auto;
-  }
-
-  .location-select-trigger { width: 100%; max-width: none; }
 }
 
 @media (max-aspect-ratio: 1 / 1) {

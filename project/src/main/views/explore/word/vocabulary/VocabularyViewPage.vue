@@ -32,14 +32,23 @@
       :standard-word-options="standardWordOptions"
       :province-options="provinceOptions"
       :city-options="cityOptions"
-      :notes-scope="draftScope"
+      :notes-refresh-disabled="isNotesScopeResolving || isNotesScopeDisabled"
       :defer-query="expanded"
-      @update:notes-scope="draftScope = cloneNotesScope($event)"
-      @locations-resolved="handleNotesScopeResolved"
       @refresh-notes="refreshNotes"
       @open-location-details="openLocationDetails"
       @search="submitSearch(collapse)"
     />
+    </template>
+    <template #outside-panel>
+      <LocationAndRegionInput
+        v-if="isCharacterNotesMode"
+        :model-value="draftScope"
+        allow-empty-scope
+        disable-location-limit
+        @update:model-value="handleNotesScopeUpdate"
+        @update:run-disabled="handleNotesScopeDisabled"
+        @locations-resolved="handleNotesScopeResolved"
+      />
     </template>
     <template #after-panel>
       <RadioGroup
@@ -512,6 +521,7 @@ import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 import VocabularyMap from '@/main/components/map/VocabularyMap.vue'
 import VocabularyTopControls from './VocabularyTopControls.vue'
 import QuerySearchEntrance from '@/components/common/QuerySearchEntrance.vue'
+import LocationAndRegionInput from '@/main/components/geo/LocationAndRegionInput.vue'
 import BarIcon from '@/components/common/BarIcon.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 
@@ -659,6 +669,8 @@ function cloneNotesScope(scope = {}) {
 }
 
 const draftScope = ref(cloneNotesScope())
+const isNotesScopeResolving = ref(false)
+const isNotesScopeDisabled = ref(false)
 const appliedScope = ref(cloneNotesScope())
 const notesEntries = ref([])
 const notesTotal = ref(0)
@@ -1237,7 +1249,20 @@ function refreshNotes() {
 }
 
 function handleNotesScopeResolved(scope) {
+  isNotesScopeResolving.value = false
+  isNotesScopeDisabled.value = false
   draftScope.value = cloneNotesScope(scope)
+}
+
+function handleNotesScopeUpdate(scope) {
+  isNotesScopeResolving.value = true
+  isNotesScopeDisabled.value = false
+  draftScope.value = cloneNotesScope(scope)
+}
+
+function handleNotesScopeDisabled(disabled) {
+  isNotesScopeDisabled.value = disabled
+  if (disabled) isNotesScopeResolving.value = false
 }
 
 function buildVocabularyFilterParams() {
@@ -1956,6 +1981,8 @@ watch(notesSearchFields, (val) => {
 
 watch(isCharacterNotesMode, async (isNotes) => {
   hasSubmittedSearch.value = false
+  isNotesScopeResolving.value = false
+  isNotesScopeDisabled.value = false
   if (isNotes) {
     const nextMode = resolveNotesViewMode(route.query.tab)
     if (viewMode.value !== nextMode) viewMode.value = nextMode
