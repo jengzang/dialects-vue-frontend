@@ -698,9 +698,20 @@ const standardWordTriggerLabel = computed(() => {
 }
 
 .filter-strip {
-  flex: 0 0 auto;
-  flex-wrap: wrap;
+  flex: 0 1 auto;
+  flex-wrap: nowrap;
   min-width: 180px;
+  max-width: 100%;
+
+  .location-filter,
+  .standard-word-filter {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+  }
+
+  .location-select-trigger,
+  .standard-word-select-trigger { min-width: 0; max-width: 100%; }
 }
 
 @media (max-aspect-ratio: 1 / 1) {
