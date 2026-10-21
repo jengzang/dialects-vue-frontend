@@ -788,7 +788,7 @@ $warning: var(--color-warning);
 .retry-btn {
   padding: 10px 24px;
   background: $primary;
-  color: #ffffff;
+  color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-md);
   cursor: pointer;

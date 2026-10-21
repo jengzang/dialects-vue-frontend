@@ -297,7 +297,7 @@ $card-radius: 8px;
   transition: all $transition-duration;
 
   &:hover {
-    color: white;
+    color: var(--action-primary-text);
     background: var(--color-primary-hover);
   }
 }

@@ -929,6 +929,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
     0 1px 3px rgba(0, 0, 0, 0.08),
     0 1px 2px rgba(0, 0, 0, 0.06);
 
+  :root[data-color-theme='green'] &,
   :root[data-color-theme='dark'] & {
     color: var(--text-primary);
     background: var(--surface-panel-strong);

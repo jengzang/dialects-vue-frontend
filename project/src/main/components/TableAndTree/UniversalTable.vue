@@ -2013,7 +2013,7 @@ td {
   border-radius: var(--radius-sm);
 
   &.confirm {
-    color: white;
+    color: var(--action-primary-text);
     background: var(--color-gradient);
   }
 
@@ -2110,7 +2110,7 @@ td {
   transition: $transition-fast;
 
   &:hover {
-    color: white;
+    color: var(--action-primary-text);
     background: var(--color-primary);
   }
 
@@ -2499,7 +2499,7 @@ td {
 
 .column-checkbox-item input:checked + .custom-checkbox::after {
   content: '✓';
-  color: white;
+  color: var(--action-primary-text);
   font-size: 14px;
   font-weight: bold;
   line-height: 1;

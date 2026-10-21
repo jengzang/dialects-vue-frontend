@@ -105,6 +105,7 @@ const modes = [
       0 1px 3px rgba(var(--color-shadow-rgb), 0.08),
       0 1px 2px rgba(var(--color-shadow-rgb), 0.06);
 
+    :root[data-color-theme='green'] &,
     :root[data-color-theme='dark'] & {
       color: var(--text-primary);
       background: var(--surface-panel-strong);

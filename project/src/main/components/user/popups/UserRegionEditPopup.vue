@@ -405,7 +405,7 @@ $transition-normal: 0.3s;
 
 .btn-primary {
   background: linear-gradient(135deg, $primary, $primary-dark);
-  color: $white;
+  color: var(--action-primary-text);
 
   &:hover {
     box-shadow: 0 4px 12px $primary-shadow;

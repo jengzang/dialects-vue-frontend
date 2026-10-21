@@ -2912,10 +2912,10 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     white-space: nowrap;
 
     &.active {
-      background: rgba(var(--color-primary-rgb), 0.7);
+      background: var(--action-primary-bg);
       backdrop-filter: blur(14px);
       border-color: rgba(var(--color-primary-rgb), 0.6);
-      color: white;
+      color: var(--action-primary-text);
       box-shadow: 0 4px 20px rgba(var(--color-primary-rgb), 0.3);
     }
   }

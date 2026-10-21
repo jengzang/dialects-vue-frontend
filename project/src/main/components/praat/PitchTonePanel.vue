@@ -1260,7 +1260,7 @@ $transition-normal: 0.3s;
   &.add-btn {
     background: $primary;
     box-shadow: 0 2px 6px rgba(74, 144, 226, 0.3);
-    color: $white;
+    color: var(--action-primary-text);
 
     &:hover:not(:disabled) {
       background: $primary-hover;

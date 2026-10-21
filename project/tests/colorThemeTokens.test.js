@@ -41,20 +41,20 @@ function rootBlock(source) {
 }
 
 describe('color theme token coverage', () => {
-  it('keeps default blue values stable and maps semantic aliases to existing blue tokens', () => {
+  it('uses the blue day palette and maps semantic aliases to existing tokens', () => {
     const source = readSource(tokensPath)
     const defaultBlock = rootBlock(source)
 
-    expect(defaultBlock).toContain('--color-primary: #007aff;')
+    expect(defaultBlock).toContain('--color-primary: #0070e8;')
     expect(defaultBlock).toContain('--color-primary-hover: #0051d5;')
-    expect(defaultBlock).toContain('--color-primary-rgb: 0, 122, 255;')
-    expect(defaultBlock).toContain('--bg-page-gradient: radial-gradient(1200px 800px at 10% -10%, #dff1ff, #dff1ff00 60%),')
+    expect(defaultBlock).toContain('--color-primary-rgb: 0, 112, 232;')
+    expect(defaultBlock).toContain('--bg-page-gradient: radial-gradient(1200px 800px at 10% -10%, #edf6ff, #edf6ff00 60%),')
 
     expect(defaultBlock).toContain('--surface-glass-button: var(--surface-elevation-0);')
     expect(defaultBlock).toContain('--surface-glass-button-hover: var(--surface-elevation-1);')
     expect(defaultBlock).toContain('--surface-selected: var(--bg-blue-light);')
-    expect(defaultBlock).toContain('--action-primary-bg: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.78), rgba(var(--color-primary-rgb), 0.6));')
-    expect(defaultBlock).toContain('--action-primary-bg-hover: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.86), rgba(var(--color-primary-rgb), 0.68));')
+    expect(defaultBlock).toContain('--action-primary-bg: var(--color-primary);')
+    expect(defaultBlock).toContain('--action-primary-bg-hover: var(--color-primary-hover);')
     expect(defaultBlock).toContain('--action-primary-text: white;')
     expect(defaultBlock).toContain('--focus-ring: 0 0 0 4px rgba(var(--color-primary-rgb), 0.1);')
     expect(defaultBlock).toContain('--switch-thumb-background: white;')
@@ -92,8 +92,8 @@ describe('color theme token coverage', () => {
     const lightBlock = themeBlock(source, 'light')
     const darkBlock = themeBlock(source, 'dark')
 
-    expect(lightBlock).toContain('--color-primary: #1d1d1f;')
-    expect(lightBlock).toContain('--color-primary-rgb: 29, 29, 31;')
+    expect(lightBlock).toContain('--color-primary: #4b5563;')
+    expect(lightBlock).toContain('--color-primary-rgb: 75, 85, 99;')
     expect(lightBlock).toContain('--color-primary-cyan: #6e7681;')
     expect(lightBlock).not.toContain('--color-primary: #5f6368;')
     expect(lightBlock).not.toContain('--color-primary: #2f80ed;')
@@ -210,8 +210,8 @@ describe('color theme token coverage', () => {
     const lightBlock = themeBlock(source, 'light')
     const darkBlock = themeBlock(source, 'dark')
 
-    expect(lightBlock).toContain('--vml-blue: #1d1d1f;')
-    expect(lightBlock).toContain('--vml-blue-rgb: 29, 29, 31;')
+    expect(lightBlock).toContain('--vml-blue: #4b5563;')
+    expect(lightBlock).toContain('--vml-blue-rgb: 75, 85, 99;')
     expect(lightBlock).toContain('--vml-blue-medium: #64748b;')
     expect(lightBlock).toContain('--vml-blue-highlight: #475569;')
     expect(darkBlock).toContain('--vml-blue: #f5f5f7;')

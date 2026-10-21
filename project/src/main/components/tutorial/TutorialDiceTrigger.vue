@@ -248,7 +248,7 @@ $shadow-hover:
     padding: 6px 14px;
     border-radius: var(--radius-full);
     background: var(--color-primary);
-    color: #fff;
+    color: var(--action-primary-text);
     font-size: 0.78rem;
     font-weight: 600;
     pointer-events: none;
@@ -310,7 +310,7 @@ $shadow-hover:
     padding: 6px 14px;
     border-radius: var(--radius-full);
     background: var(--color-primary);
-    color: #fff;
+    color: var(--action-primary-text);
     font-size: 0.78rem;
     font-weight: 600;
     pointer-events: none;

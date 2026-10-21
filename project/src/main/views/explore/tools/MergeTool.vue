@@ -1052,13 +1052,9 @@ $color-danger: var(--color-error-light);
 
   &.active {
     .step-number {
-      background: linear-gradient(
-        135deg,
-        rgba(var(--color-primary-rgb), 0.8),
-        rgba(var(--color-primary-rgb), 0.6)
-      );
+      background: var(--action-primary-bg);
       border-color: rgba(var(--color-primary-rgb), 0.6);
-      color: white;
+      color: var(--action-primary-text);
       box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.3);
     }
 

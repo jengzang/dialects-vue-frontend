@@ -736,7 +736,7 @@ export default {
 
 .rank-badge {
   background: var(--color-primary, var(--vml-blue));
-  color: white;
+  color: var(--action-primary-text);
   padding: 4px 12px;
   border-radius: var(--radius-md);
   font-weight: 600;

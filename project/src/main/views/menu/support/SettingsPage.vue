@@ -572,7 +572,7 @@ $text-muted: var(--text-tertiary);
 
     &.is-on {
       background: $primary;
-      color: var(--text-white);
+      color: var(--action-primary-text);
     }
   }
 

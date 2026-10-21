@@ -899,7 +899,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
     background: var(--color-primary, #{$primary});
     border-color: var(--color-primary, #{$primary});
     box-shadow: 0 4px 10px rgba(var(--color-primary-rgb), 0.2);
-    color: var(--text-white);
+    color: var(--action-primary-text);
   }
 }
 

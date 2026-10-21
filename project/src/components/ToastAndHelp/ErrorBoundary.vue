@@ -147,7 +147,7 @@ function goToFeedback() {
 
   &--primary {
     background: var(--color-primary);
-    color: #fff;
+    color: var(--action-primary-text);
 
     &:hover {
       background: var(--color-primary-hover);

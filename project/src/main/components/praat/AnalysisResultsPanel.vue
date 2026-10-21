@@ -938,7 +938,7 @@ $transition-normal: 0.3s;
   border: none;
   border-radius: var(--radius-2xl);
   box-shadow: 0 4px 12px $blue-shadow;
-  color: var(--text-white);
+  color: var(--action-primary-text);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;

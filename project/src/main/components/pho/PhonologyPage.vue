@@ -322,7 +322,7 @@ watch(locationQuery, (urlLocations) => {
     border: none;
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-md);
-    color: var(--text-white);
+    color: var(--action-primary-text);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;

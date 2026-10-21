@@ -789,9 +789,9 @@ $portrait-ratio: 1;
   font-size: 13px;
 
   &.custom-region-tag {
-    background: rgba(var(--color-primary-rgb), 0.5);
+    background: var(--surface-selected);
     border-color: rgba(var(--color-success-rgb), 0.3);
-    color: var(--text-white);
+    color: var(--text-selected);
   }
 }
 
@@ -955,11 +955,11 @@ $portrait-ratio: 1;
 
 .topbar-btn {
   padding: 8px 12px;
-  background: rgba(var(--color-primary-rgb), 0.85);
+  background: var(--action-primary-bg);
   border: 1px solid rgba(var(--color-primary-rgb), 0.35);
   border-radius: var(--radius-md);
   box-shadow: 0 10px 26px rgba(var(--color-primary-rgb), 0.18);
-  color: var(--text-white);
+  color: var(--action-primary-text);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -1106,7 +1106,7 @@ $portrait-ratio: 1;
   background: linear-gradient(135deg, $primary, $primary-dark);
   border: none;
   border-radius: var(--radius-sm2);
-  color: var(--text-white);
+  color: var(--action-primary-text);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
