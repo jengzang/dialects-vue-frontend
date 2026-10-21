@@ -146,6 +146,42 @@ defineExpose({ collapse, progress })
     opacity: var(--query-expansion);
   }
 
+  :deep(.yubao-compact-controls.is-compact) {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'category input modes';
+    gap: 8px 12px;
+    align-items: center;
+    width: 100%;
+  }
+
+  :deep(.yubao-compact-controls.is-compact > .top-controls) {
+    display: contents;
+  }
+
+  :deep(.yubao-compact-controls.is-compact .top-controls > .search-container),
+  :deep(.yubao-compact-controls.is-compact .search-section) {
+    display: contents;
+  }
+
+  :deep(.yubao-compact-controls.is-compact .header-container) {
+    grid-area: category;
+    min-width: 0;
+  }
+
+  :deep(.yubao-compact-controls.is-compact .input-wrapper) {
+    grid-area: input;
+    min-width: 0;
+    width: 100%;
+  }
+
+  :deep(.yubao-compact-controls.is-compact > .condition-bar) {
+    grid-area: modes;
+    min-width: 0;
+    margin: 0;
+    justify-content: flex-end;
+  }
+
   &:not(.is-compact) {
     :deep(.top-controls) { margin-bottom: 0; }
     :deep(.top-controls > .search-container) { flex-basis: calc(100% * var(--query-expansion)); }
@@ -309,6 +345,13 @@ defineExpose({ collapse, progress })
   }
 
   .query-search-panel { padding: calc(16px * var(--query-expansion)); }
+
+  .query-search-panel {
+    :deep(.yubao-compact-controls.is-compact) {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-areas: 'category category' 'input modes';
+    }
+  }
 
   .query-search-panel:not(.is-compact) {
     :deep(.query-controls--vocabulary) {

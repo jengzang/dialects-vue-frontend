@@ -10,6 +10,7 @@
       {{ activePageTitle }}
     </template>
     <template #controls="{ expanded }">
+    <div class="yubao-compact-controls" :class="{ 'is-compact': !expanded }">
     <!-- 顶部控制栏 -->
     <div class="top-controls query-controls-layout query-controls--yubao">
       <!-- Tab 切换 + 查看全部按钮 -->
@@ -138,6 +139,7 @@
           {{ t('words.yuBaoPage.filter.showingCount', { visible: filteredCardData.length, total: cardData.length }) }}
         </span>
       </div>
+    </div>
     </div>
     </template>
 
