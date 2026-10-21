@@ -254,6 +254,7 @@ const props = defineProps({
 
 const emit = defineEmits([
   'update:selected',
+  'openChange',
   'selectCustomRegion',
   'update:customRegions',
   'update:customRegionData'
@@ -429,6 +430,8 @@ function openPopup() {
   if (treeError.value) loadTreeFor(props.mode)
   if (props.allowCustomRegions && userStore.isAuthenticated && storedCustomRegions.value.length === 0) loadCustomRegions()
 }
+
+watch(popupOpen, open => emit('openChange', open), { flush: 'sync' })
 
 function closePopup() {
   clearHover()
@@ -699,6 +702,7 @@ function unbindEsc() {
 }
 
 onBeforeUnmount(() => {
+  if (popupOpen.value) emit('openChange', false)
   clearHover()
   loadSequence++
   unbindEsc()

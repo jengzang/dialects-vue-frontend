@@ -25,6 +25,7 @@
       :partition-loading="partitionLoading"
       :partition-error="partitionError"
       @retry-partitions="loadVocabularyPartitionTree"
+      @filter-open-change="isVocabularyFilterOpen = $event"
       v-model:selected-province="selectedProvince"
       v-model:selected-city="selectedCity"
       v-model:view-mode="viewMode"
@@ -603,6 +604,9 @@ const query = ref('')
 const notesQuery = ref('')
 const hasSubmittedSearch = ref(false)
 const isSearchExpanded = ref(true)
+const isVocabularyFilterOpen = ref(false)
+const appliedVocabularyQueryParams = ref(null)
+let vocabularyQueryTimer = null
 
 function handleSearchProgress(progress) {
   isSearchExpanded.value = progress < 1
@@ -611,7 +615,10 @@ function handleSearchProgress(progress) {
 function submitSearch(collapse) {
   hasSubmittedSearch.value = true
   // Notes apply their draft scope and start the query in refreshNotes.
-  if (!isCharacterNotesMode.value) loadActiveViewMode()
+  if (!isCharacterNotesMode.value) {
+    if (applyVocabularyQuery()) loadVocabularyLocationOptions()
+    loadActiveViewMode()
+  }
   collapse()
 }
 const source = computed({
@@ -1276,7 +1283,7 @@ function buildVocabularyFilterParams() {
     if (selectedProvince.value) params.province = selectedProvince.value
     if (selectedCity.value) params.city = selectedCity.value
   } else if (filterMode.value === 'location') {
-    params.locations = selectedLocations.value
+    params.locations = [...selectedLocations.value]
   } else {
     params.region_mode = filterMode.value
     params.regions = [...selectedRegions.value]
@@ -1284,12 +1291,23 @@ function buildVocabularyFilterParams() {
   return params
 }
 
-function buildVocabularyQueryParams() {
+function buildDraftVocabularyQueryParams() {
   return {
     q: query.value.trim(),
     search_fields: normalizeSelectedSearchFields(),
     ...buildVocabularyFilterParams(),
   }
+}
+
+function buildVocabularyQueryParams() {
+  return appliedVocabularyQueryParams.value || buildDraftVocabularyQueryParams()
+}
+
+function buildVocabularyQueryKey(params) {
+  const normalized = Object.fromEntries(Object.entries(params).map(([key, value]) => [
+    key, Array.isArray(value) ? [...new Set(value)].sort() : value,
+  ]))
+  return buildVocabularyMapRequestKey('query', normalized)
 }
 
 function buildVocabularyItemsParams(overrides = {}) {
@@ -1599,10 +1617,19 @@ async function loadVocabularyMapPoints() {
   }
 }
 
-function buildVocabularyLocationOptionsParams() {
-  const params = buildVocabularyFilterParams()
+function buildVocabularyLocationOptionsParams(queryParams = buildVocabularyQueryParams()) {
+  const params = { ...queryParams }
+  delete params.q
+  delete params.search_fields
   delete params.locations
   return params
+}
+
+function isCurrentVocabularyLocationOptionsRequest(requestKey) {
+  const appliedParams = buildVocabularyLocationOptionsParams()
+  const draftParams = buildVocabularyLocationOptionsParams(buildDraftVocabularyQueryParams())
+  return requestKey === buildVocabularyMapRequestKey('location-options', appliedParams)
+    && buildVocabularyQueryKey(appliedParams) === buildVocabularyQueryKey(draftParams)
 }
 
 async function loadVocabularyLocationOptions({ unfiltered = false } = {}) {
@@ -1616,7 +1643,7 @@ async function loadVocabularyLocationOptions({ unfiltered = false } = {}) {
   try {
     const options = await pendingLocationOptionRequests.get(requestKey)
     if (unfiltered || !Object.keys(params).length) administrativeLocationOptions.value = options
-    if (requestKey !== buildVocabularyMapRequestKey('location-options', buildVocabularyLocationOptionsParams())) return options
+    if (!isCurrentVocabularyLocationOptionsRequest(requestKey)) return options
     vocabularyLocationOptions.value = options
     if (filterMode.value === 'location') {
       const valid = new Set(options.map(option => option.value))
@@ -1625,7 +1652,7 @@ async function loadVocabularyLocationOptions({ unfiltered = false } = {}) {
     }
     return options
   } catch {
-    if (requestKey === buildVocabularyMapRequestKey('location-options', buildVocabularyLocationOptionsParams())) {
+    if (isCurrentVocabularyLocationOptionsRequest(requestKey)) {
       vocabularyLocationOptions.value = []
     }
     return []
@@ -1985,6 +2012,7 @@ watch(notesSearchFields, (val) => {
 }, { deep: true })
 
 watch(isCharacterNotesMode, async (isNotes) => {
+  clearTimeout(vocabularyQueryTimer)
   hasSubmittedSearch.value = false
   isNotesScopeResolving.value = false
   isNotesScopeDisabled.value = false
@@ -2005,8 +2033,12 @@ watch(isCharacterNotesMode, async (isNotes) => {
   }
 })
 
-watch([query, selectedSearchFields, selectedLocations, filterMode, selectedProvince, selectedCity, selectedRegions], () => {
-  if (isCharacterNotesMode.value) return
+function applyVocabularyQuery() {
+  clearTimeout(vocabularyQueryTimer)
+  const params = buildDraftVocabularyQueryParams()
+  if (appliedVocabularyQueryParams.value
+    && buildVocabularyQueryKey(params) === buildVocabularyQueryKey(appliedVocabularyQueryParams.value)) return false
+  appliedVocabularyQueryParams.value = params
   page.value = 1
   mapDetailPage.value = 1
   activeVocabularyItemsRequestKey.value = ''
@@ -2023,19 +2055,22 @@ watch([query, selectedSearchFields, selectedLocations, filterMode, selectedProvi
   isLoadingStandardWords.value = false
   isMapDetailModalOpen.value = false
   isLocationDetailsModalOpen.value = false
-}, { deep: true })
+  return true
+}
 
-watchDebounced([query, selectedSearchFields, selectedLocations, filterMode, selectedProvince, selectedCity, selectedRegions], async () => {
-  if (isCharacterNotesMode.value) return
-  loadVocabularyLocationOptions()
-  if (shouldUseVocabularyItemsApi()) {
-    loadVocabularyItems()
-  } else if (shouldUseVocabularyMapPointsApi()) {
-    await refreshVocabularyMapData()
-  } else if (shouldUseVocabularyMapItemsApi()) {
-    await refreshVocabularyMapData()
-  }
-}, { debounce: 250, maxWait: 800 })
+appliedVocabularyQueryParams.value = buildDraftVocabularyQueryParams()
+
+watch([() => buildVocabularyQueryKey(buildDraftVocabularyQueryParams()), isVocabularyFilterOpen], () => {
+  clearTimeout(vocabularyQueryTimer)
+  if (isCharacterNotesMode.value || isVocabularyFilterOpen.value) return
+  if (buildVocabularyQueryKey(buildDraftVocabularyQueryParams()) === buildVocabularyQueryKey(appliedVocabularyQueryParams.value)) return
+  // Only a closed selector starts the delay; reopening cancels it without clearing results.
+  vocabularyQueryTimer = setTimeout(() => {
+    if (isCharacterNotesMode.value || isVocabularyFilterOpen.value || !applyVocabularyQuery()) return
+    loadVocabularyLocationOptions()
+    loadActiveViewMode()
+  }, 250)
+})
 
 watchDebounced([notesQuery, notesSearchFields], () => {
   loadNotes()
@@ -2061,6 +2096,7 @@ watch(selectedStandardWords, (words) => {
 })
 
 onBeforeUnmount(() => {
+  clearTimeout(vocabularyQueryTimer)
   notesCardResizeObserver?.disconnect()
   notesCardResizeObserver = null
 })

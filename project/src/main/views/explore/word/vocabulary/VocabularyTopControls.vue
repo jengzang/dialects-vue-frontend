@@ -250,6 +250,7 @@
             match-trigger-width
             width="100%"
             @update:model-value="emit('update:selectedProvince', $event)"
+            @open-change="setFilterDropdownOpen('province', $event)"
           />
           <SimpleSelectDropdown
             :model-value="selectedCity"
@@ -259,6 +260,7 @@
             match-trigger-width
             width="100%"
             @update:model-value="emit('update:selectedCity', $event)"
+            @open-change="setFilterDropdownOpen('city', $event)"
           />
         </div>
         <div
@@ -276,6 +278,7 @@
             :max-selected="50"
             :max-path-length="200"
             @update:selected="emit('update:selectedRegions', $event)"
+            @open-change="setFilterDropdownOpen('region', $event)"
           />
           <button v-if="partitionError" class="pill-btn" type="button" @click="emit('retryPartitions')">
             {{ t('common.errorBoundary.retry') }}
@@ -325,7 +328,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import * as OpenCCT2CN from 'opencc-js/t2cn'
 import AppModal from '@/components/common/AppModal.vue'
@@ -388,6 +391,7 @@ const emit = defineEmits([
   'update:selectedCity',
   'refreshNotes',
   'openLocationDetails',
+  'filterOpenChange',
 ])
 
 const searchInputEl = ref(null)
@@ -396,6 +400,18 @@ const standardWordTriggerEl = ref(null)
 const searchFieldModalOpen = ref(false)
 const locationDropdownOpen = ref(false)
 const standardWordDropdownOpen = ref(false)
+const filterDropdownOpen = ref({})
+const isFilterOpen = computed(() => locationDropdownOpen.value || Object.values(filterDropdownOpen.value).some(Boolean))
+
+function setFilterDropdownOpen(name, open) {
+  filterDropdownOpen.value = { ...filterDropdownOpen.value, [name]: open }
+}
+
+watch(isFilterOpen, open => emit('filterOpenChange', open), { flush: 'sync' })
+onBeforeUnmount(() => {
+  if (isFilterOpen.value) emit('filterOpenChange', false)
+  clearTimeout(searchTimer)
+})
 const filterModeOptions = computed(() => [
   { value: 'location', label: t('words.wordList.search.filterByLocation') },
   { value: 'administrative', label: t('words.wordList.search.filterByAdministrative') },
@@ -403,7 +419,10 @@ const filterModeOptions = computed(() => [
   { value: 'map', label: t('words.wordList.search.filterByAtlas') },
 ])
 
-watch(() => props.filterMode, () => { locationDropdownOpen.value = false })
+watch(() => props.filterMode, () => {
+  locationDropdownOpen.value = false
+  filterDropdownOpen.value = {}
+})
 
 function refreshNotes() {
   if (props.notesRefreshDisabled || isComposing.value) return

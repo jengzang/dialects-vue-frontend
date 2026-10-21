@@ -7,7 +7,10 @@ vi.mock('../src/env-config.js', () => ({ WEB_BASE: '', API_BASE: '/api' }))
 vi.mock('../src/main/components/geo/LocationAndRegionInput.vue', () => ({ default: { render: () => null } }))
 vi.mock('../src/main/components/geo/RegionSelector.vue', () => ({ default: {
   props: ['mode', 'nodes', 'allowCustomRegions', 'maxSelected', 'maxPathLength'],
-  setup: props => () => h('div', { class: 'test-region-selector', 'data-mode': props.mode }),
+  setup(props, { emit }) {
+    emitRegion = emit
+    return () => h('div', { class: 'test-region-selector', 'data-mode': props.mode })
+  },
 } }))
 vi.mock('../src/components/common/AppModal.vue', () => ({ default: {
   props: ['modelValue'], setup: (props, { slots }) => () => props.modelValue ? h('div', slots.default?.()) : null,
@@ -15,6 +18,7 @@ vi.mock('../src/components/common/AppModal.vue', () => ({ default: {
 
 let app
 let host
+let emitRegion
 afterEach(() => { app?.unmount(); host?.remove(); document.body.innerHTML = ''; vi.useRealTimers() })
 
 async function mountControls(expanded, overrides = {}) {
@@ -23,10 +27,11 @@ async function mountControls(expanded, overrides = {}) {
   const updateQuery = vi.fn()
   const search = vi.fn()
   const refresh = vi.fn()
+  const filterOpenChange = vi.fn()
   host = document.createElement('div')
   document.body.append(host)
   app = createApp({ render: () => h(VocabularyTopControls, {
-    ...props, 'onUpdate:query': updateQuery, onSearch: search, onRefreshNotes: refresh,
+    ...props, 'onUpdate:query': updateQuery, onSearch: search, onRefreshNotes: refresh, onFilterOpenChange: filterOpenChange,
     'onUpdate:filterMode': value => { props.filterMode = value },
   }) })
   app.use(createI18n({ legacy: false, locale: 'zh-CN', missingWarn: false, fallbackWarn: false, messages: { 'zh-CN': { common: { button: { search: '搜索' } } } } }))
@@ -34,10 +39,39 @@ async function mountControls(expanded, overrides = {}) {
   await nextTick()
   const input = host.querySelector('.search-input')
   const type = text => { input.value = text; input.dispatchEvent(new Event('input', { bubbles: true })) }
-  return { props, updateQuery, search, refresh, type }
+  return { props, updateQuery, search, refresh, type, filterOpenChange }
 }
 
 describe('vocabulary query submission in the same input', () => {
+  it('reports location opening and both trigger and outside closing', async () => {
+    const { filterOpenChange } = await mountControls(false, { locationOptions: [{ value: '甲', label: '甲' }] })
+    const trigger = host.querySelector('.location-select-trigger')
+    trigger.click(); await nextTick(); await nextTick(); await nextTick()
+    expect(filterOpenChange).toHaveBeenLastCalledWith(true)
+    trigger.click(); await nextTick()
+    expect(filterOpenChange).toHaveBeenLastCalledWith(false)
+    trigger.click(); await nextTick(); await nextTick(); await nextTick()
+    document.querySelector('.dropdown-overlay').click(); await nextTick()
+    expect(filterOpenChange).toHaveBeenLastCalledWith(false)
+  })
+
+  it('reports administrative selector closing after an option is selected', async () => {
+    const { filterOpenChange } = await mountControls(false, {
+      filterMode: 'administrative', provinceOptions: [{ value: '广东', label: '广东' }], cityOptions: [],
+    })
+    host.querySelector('.location-filter .select-trigger').click(); await nextTick()
+    expect(filterOpenChange).toHaveBeenLastCalledWith(true)
+    document.querySelector('.dropdown-item').click(); await nextTick()
+    expect(filterOpenChange).toHaveBeenLastCalledWith(false)
+  })
+
+  it('forwards partition visibility and clears it when the selector changes', async () => {
+    const { props, filterOpenChange } = await mountControls(false, { filterMode: 'yindian' })
+    emitRegion('openChange', true); await nextTick()
+    expect(filterOpenChange).toHaveBeenLastCalledWith(true)
+    props.filterMode = 'location'; await nextTick()
+    expect(filterOpenChange).toHaveBeenLastCalledWith(false)
+  })
   it('keeps the same local view buttons in compact and expanded modes without a source toggle', async () => {
     const { props } = await mountControls(false)
     const switcher = host.querySelector('.result-view-switcher.view-mode-selector')

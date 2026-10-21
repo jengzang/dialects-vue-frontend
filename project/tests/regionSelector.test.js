@@ -40,6 +40,24 @@ describe('complete-path default selector', () => {
   beforeEach(() => { mocks.getPartitions.mockImplementation(async mode => ({ schema_version: 2, region_mode: mode, nodes, max_depth: 5 })) })
   afterEach(() => { app?.unmount(); app = null; mocks.user.id = null; document.body.innerHTML = ''; vi.clearAllMocks() })
 
+  it('reports visibility for confirmation, Escape, trigger closing and unmount', async () => {
+    const onOpenChange = vi.fn()
+    await mount('map', [], { nodes, allowCustomRegions: false, onOpenChange })
+    expect(onOpenChange).toHaveBeenLastCalledWith(true)
+    click(document.querySelector('.topbar-btn:not(.ghost)')); await settle()
+    expect(onOpenChange).toHaveBeenLastCalledWith(false)
+    for (const close of [
+      () => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })),
+      () => click(document.querySelector('.region-select-box')),
+      () => { app.unmount(); app = null },
+    ]) {
+      click(document.querySelector('.region-select-box')); await settle()
+      expect(onOpenChange).toHaveBeenLastCalledWith(true)
+      close(); await settle()
+      expect(onOpenChange).toHaveBeenLastCalledWith(false)
+    }
+  })
+
   it('uses vocabulary-provided nodes without loading default trees or showing custom regions', async () => {
     await mount('map', [], { nodes: [node('詞表專屬')], allowCustomRegions: false })
     expect(mocks.getPartitions).not.toHaveBeenCalled()

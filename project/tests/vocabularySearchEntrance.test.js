@@ -47,7 +47,7 @@ vi.mock('@/components/common/AppModal.vue', () => ({ default: {
 vi.mock('../src/main/views/explore/word/vocabulary/VocabularyTopControls.vue', () => ({
   default: {
     props: ['source', 'filterMode', 'selectedRegions', 'selectedLocations', 'partitionNodes', 'partitionLoading', 'partitionError', 'notesRefreshDisabled'],
-    emits: ['search', 'refreshNotes', 'openLocationDetails', 'update:query', 'update:selectedLocations', 'update:viewMode', 'update:filterMode', 'update:selectedRegions', 'update:selectedProvince', 'update:selectedCity', 'update:selectedStandardWord'],
+    emits: ['search', 'refreshNotes', 'openLocationDetails', 'filterOpenChange', 'update:query', 'update:selectedLocations', 'update:viewMode', 'update:filterMode', 'update:selectedRegions', 'update:selectedProvince', 'update:selectedCity', 'update:selectedStandardWord'],
     setup(props, { emit }) {
       controlProps = props
       emitControl = emit
@@ -82,6 +82,7 @@ async function mount(query = {}) {
   } })
   app.mount(host)
   await settle()
+  await settle()
 }
 
 beforeEach(() => {
@@ -94,7 +95,7 @@ beforeEach(() => {
     return this.classList.contains('query-intro') ? { top: 180, height: 240 } : { top: 420, height: 140 }
   })
 })
-afterEach(() => { app?.unmount(); host?.remove(); vi.restoreAllMocks(); vi.unstubAllGlobals() })
+afterEach(() => { app?.unmount(); host?.remove(); vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.useRealTimers() })
 
 describe('vocabulary configuration entrance', () => {
   it('moves the same notes scope into the compact panel and blocks refresh while resolving', async () => {
@@ -185,12 +186,14 @@ describe('vocabulary configuration entrance', () => {
     mocks.locations.mockImplementationOnce(() => new Promise(resolve => { finishOld = resolve }))
     emitControl('update:filterMode', 'yindian'); await settle()
     emitControl('update:selectedRegions', ['舊分區']); await settle()
+    pageState.applyVocabularyQuery()
     const count = mocks.locations.mock.calls.length
     const first = pageState.loadVocabularyLocationOptions()
     const second = pageState.loadVocabularyLocationOptions()
     expect(mocks.locations.mock.calls.length).toBe(count + 1)
     emitControl('update:filterMode', 'location'); await settle()
     emitControl('update:selectedLocations', ['已不存在']); await settle()
+    pageState.applyVocabularyQuery()
     await pageState.loadVocabularyLocationOptions(); await settle()
     expect(controlProps.selectedLocations).toEqual([])
     finishOld([{ value: '舊地點' }]); await Promise.all([first, second]); await settle()
@@ -201,10 +204,45 @@ describe('vocabulary configuration entrance', () => {
     await mount()
     emitControl('update:filterMode', 'administrative'); await settle()
     emitControl('update:selectedProvince', '广东'); await settle()
+    pageState.applyVocabularyQuery()
     mocks.locations.mockResolvedValueOnce([])
     await pageState.loadVocabularyLocationOptions(); await settle()
     expect(pageState.provinceOptions.some(option => option.value === '广东')).toBe(true)
     expect(pageState.cityOptions.some(option => option.value === '广州')).toBe(true)
+  })
+
+  it('does not let pending scoped options prune a newly selected location while its selector is open', async () => {
+    vi.useFakeTimers()
+    await mount()
+    let finishOptions
+    mocks.locations.mockImplementationOnce(() => new Promise(resolve => { finishOptions = resolve }))
+    emitControl('update:filterMode', 'yindian'); await settle()
+    emitControl('update:selectedRegions', ['舊分區']); await settle()
+    host.querySelector('.submit').click(); await settle()
+    emitControl('update:filterMode', 'location'); await settle()
+    emitControl('filterOpenChange', true)
+    emitControl('update:selectedLocations', ['测试地点']); await settle()
+    finishOptions([{ value: '舊地點' }]); await settle()
+    expect(controlProps.selectedLocations).toEqual(['测试地点'])
+    expect(pageState.locationOptions.map(option => option.value)).toEqual(['测试地点'])
+  })
+
+  it('accepts pending candidates when the draft only reorders the same partition set', async () => {
+    vi.useFakeTimers()
+    localStorage.setItem('vocabulary_filter_mode', 'yindian')
+    await mount()
+    let finishOptions
+    mocks.locations.mockImplementationOnce(() => new Promise(resolve => { finishOptions = resolve }))
+    emitControl('update:selectedRegions', ['甲', '乙']); await settle()
+    host.querySelector('.submit').click(); await settle()
+    const locationsCount = mocks.locations.mock.calls.length
+    emitControl('filterOpenChange', true)
+    emitControl('update:selectedRegions', ['乙', '甲']); await settle()
+    finishOptions([{ value: '新候選', label: '新候選' }]); await settle()
+    expect(pageState.locationOptions.map(option => option.value)).toEqual(['新候選'])
+    emitControl('filterOpenChange', false); await settle()
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(mocks.locations).toHaveBeenCalledTimes(locationsCount)
   })
 
   it('carries exclusive region filters into map candidates, overview points and detailed items', async () => {
@@ -237,14 +275,160 @@ describe('vocabulary configuration entrance', () => {
     expect(pageState.entries).toEqual([])
   })
 
-  it('removes old results and disables pagination immediately while changed filters refresh', async () => {
+  it('preserves old results until changed filters take effect after the delay', async () => {
+    vi.useFakeTimers()
     mocks.items.mockResolvedValueOnce({ items: [{ id: 1, local_expression: '舊結果' }], total: 100 })
     await mount()
     host.querySelector('.submit').click(); await settle()
     expect(pageState.canLoadMore).toBe(true)
     emitControl('update:filterMode', 'map'); await settle()
+    expect(pageState.entries).toHaveLength(1)
+    expect(pageState.canLoadMore).toBe(true)
+    await vi.advanceTimersByTimeAsync(250); await settle()
     expect(pageState.canLoadMore).toBe(false)
     expect(pageState.entries).toEqual([])
+  })
+
+  it.each(['location', 'administrative', 'yindian', 'map'])('waits for %s to close before delaying any refresh', async mode => {
+    vi.useFakeTimers()
+    localStorage.setItem('vocabulary_filter_mode', mode)
+    mocks.items.mockResolvedValueOnce({ items: [{ id: 1, local_expression: '已有結果' }], total: 100 })
+    await mount()
+    host.querySelector('.submit').click(); await settle()
+    expect(mocks.items).toHaveBeenCalledTimes(1)
+    const locationsCount = mocks.locations.mock.calls.length
+    emitControl('filterOpenChange', true)
+    const event = mode === 'location' ? 'update:selectedLocations' : mode === 'administrative' ? 'update:selectedProvince' : 'update:selectedRegions'
+    const value = mode === 'administrative' ? '广东' : ['测试地点']
+    emitControl(event, value); await settle()
+    expect(pageState.isVocabularyFilterOpen).toBe(true)
+    await vi.advanceTimersByTimeAsync(1200)
+    expect(mocks.items).toHaveBeenCalledTimes(1)
+    expect(mocks.locations).toHaveBeenCalledTimes(locationsCount)
+    expect(pageState.entries).toHaveLength(1)
+    emitControl('filterOpenChange', false); await settle()
+    await vi.advanceTimersByTimeAsync(249)
+    expect(mocks.items).toHaveBeenCalledTimes(1)
+    await vi.advanceTimersByTimeAsync(1); await settle()
+    expect(mocks.items).toHaveBeenCalledTimes(2)
+    expect(mocks.locations).toHaveBeenCalledTimes(locationsCount + 1)
+  })
+
+  it.each(['card', 'map'])('does not refresh unchanged partition sets in %s mode', async tab => {
+    vi.useFakeTimers()
+    localStorage.setItem('vocabulary_filter_mode', 'yindian')
+    await mount({ tab })
+    emitControl('update:selectedRegions', ['甲', '乙']); await settle()
+    host.querySelector('.submit').click(); await settle()
+    await vi.advanceTimersByTimeAsync(300); await settle()
+    const counts = [mocks.items, mocks.points, mocks.words, mocks.locations].map(mock => mock.mock.calls.length)
+    emitControl('filterOpenChange', true)
+    emitControl('update:selectedRegions', ['乙', '甲']); await settle()
+    emitControl('filterOpenChange', false); await settle()
+    await vi.advanceTimersByTimeAsync(1000)
+    expect([mocks.items, mocks.points, mocks.words, mocks.locations].map(mock => mock.mock.calls.length)).toEqual(counts)
+  })
+
+  it('cancels the province delay while the city selector is open and submits both together', async () => {
+    vi.useFakeTimers()
+    localStorage.setItem('vocabulary_filter_mode', 'administrative')
+    await mount()
+    host.querySelector('.submit').click(); await settle()
+    emitControl('update:selectedProvince', '广东'); await settle()
+    await vi.advanceTimersByTimeAsync(100)
+    emitControl('filterOpenChange', true); await settle()
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(mocks.items).toHaveBeenCalledTimes(1)
+    emitControl('update:selectedCity', '广州')
+    emitControl('filterOpenChange', false); await settle()
+    await vi.advanceTimersByTimeAsync(250); await settle()
+    expect(mocks.items).toHaveBeenCalledTimes(2)
+    expect(mocks.items.mock.calls.at(-1)[0]).toMatchObject({ province: '广东', city: '广州' })
+  })
+
+  it('does not refresh when a pending selection returns to the applied value', async () => {
+    vi.useFakeTimers()
+    await mount()
+    host.querySelector('.submit').click(); await settle()
+    const locationsCount = mocks.locations.mock.calls.length
+    emitControl('filterOpenChange', true)
+    emitControl('update:selectedLocations', ['测试地点']); await settle()
+    emitControl('update:selectedLocations', []); await settle()
+    emitControl('filterOpenChange', false); await settle()
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(mocks.items).toHaveBeenCalledTimes(1)
+    expect(mocks.locations).toHaveBeenCalledTimes(locationsCount)
+  })
+
+  it('keeps pagination on the applied scope while a new location is being selected', async () => {
+    vi.useFakeTimers()
+    mocks.items.mockResolvedValueOnce({ items: [{ id: 1 }], total: 100 })
+    await mount()
+    host.querySelector('.submit').click(); await settle()
+    emitControl('filterOpenChange', true)
+    emitControl('update:selectedLocations', ['测试地点']); await settle()
+    await pageState.loadVocabularyItems({ append: true }); await settle()
+    expect(mocks.items.mock.calls.at(-1)[0]).toMatchObject({ locations: [], page: 2 })
+  })
+
+  it('does not leave a scheduled refresh after unmount', async () => {
+    vi.useFakeTimers()
+    await mount()
+    host.querySelector('.submit').click(); await settle()
+    emitControl('update:selectedLocations', ['测试地点']); await settle()
+    const locationsCount = mocks.locations.mock.calls.length
+    app.unmount(); app = null
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(mocks.items).toHaveBeenCalledTimes(1)
+    expect(mocks.locations).toHaveBeenCalledTimes(locationsCount)
+  })
+
+  it('does not run a pending vocabulary refresh after switching to notes', async () => {
+    vi.useFakeTimers()
+    await mount()
+    host.querySelector('.submit').click(); await settle()
+    emitControl('update:selectedLocations', ['测试地点']); await settle()
+    mocks.route.query = { source: 'character-notes', tab: 'card' }; await settle()
+    const locationsCount = mocks.locations.mock.calls.length
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(mocks.items).toHaveBeenCalledTimes(1)
+    expect(mocks.locations).toHaveBeenCalledTimes(locationsCount)
+    expect(mocks.notes).not.toHaveBeenCalled()
+  })
+
+  it('applies an explicit search immediately without a duplicate delayed refresh', async () => {
+    vi.useFakeTimers()
+    await mount()
+    host.querySelector('.submit').click(); await settle()
+    emitControl('update:selectedLocations', ['测试地点']); await settle()
+    host.querySelector('.submit').click(); await settle()
+    expect(mocks.items).toHaveBeenCalledTimes(2)
+    expect(mocks.items.mock.calls.at(-1)[0]).toMatchObject({ locations: ['测试地点'] })
+    const locationsCount = mocks.locations.mock.calls.length
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(mocks.items).toHaveBeenCalledTimes(2)
+    expect(mocks.locations).toHaveBeenCalledTimes(locationsCount)
+  })
+
+  it('keeps map view switching on the applied scope and delays draft map requests until closure', async () => {
+    vi.useFakeTimers()
+    localStorage.setItem('vocabulary_filter_mode', 'yindian')
+    await mount()
+    host.querySelector('.submit').click(); await settle()
+    emitControl('filterOpenChange', true)
+    emitControl('update:selectedRegions', ['甲-乙']); await settle()
+    emitControl('update:viewMode', 'map'); await settle()
+    expect(mocks.words).toHaveBeenCalledTimes(1)
+    expect(mocks.points).toHaveBeenCalledTimes(1)
+    expect(mocks.points.mock.calls[0][0]).toMatchObject({ regions: [] })
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(mocks.words).toHaveBeenCalledTimes(1)
+    expect(mocks.points).toHaveBeenCalledTimes(1)
+    emitControl('filterOpenChange', false); await settle()
+    await vi.advanceTimersByTimeAsync(250); await settle()
+    expect(mocks.words).toHaveBeenCalledTimes(2)
+    expect(mocks.points).toHaveBeenCalledTimes(2)
+    expect(mocks.points.mock.calls.at(-1)[0]).toMatchObject({ regions: ['甲-乙'] })
   })
 
   it('refreshes entries even when location options have not returned', async () => {
