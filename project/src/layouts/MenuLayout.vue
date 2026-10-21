@@ -4,10 +4,7 @@
     <NavBar />
     <!--    <FloatingHeader v-if="shouldShowHeader" />-->
     <!-- 內容區：注意底部留白避免被 tab 擋住 -->
-    <div
-      class="glass-content"
-      :class="{ 'glass-content--vocabulary': route.path.includes('/menu/vocabulary') }"
-    >
+    <div class="glass-content">
       <router-view v-slot="{ Component }">
         <transition
           name="fade"
@@ -36,9 +33,6 @@ import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 import PanelManager from '@/main/components/result/PanelManager.vue'
 import ScrollToTop from '@/components/common/ScrollToTop.vue'
 import AppFooter from '@/components/footer/AppFooter.vue'
-import { useRoute } from 'vue-router'
-
-const route = useRoute()
 
 const keepAliveViewNames = [
   'ComparePage',
@@ -94,10 +88,6 @@ $portrait-ratio: 1;
   overflow-x: hidden;
   color: var(--text-deep);
   font-family: var(--font-sans);
-}
-
-.glass-content--vocabulary {
-  overflow-x: clip;
 }
 
 /* 页面切换动画 */

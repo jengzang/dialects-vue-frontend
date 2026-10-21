@@ -68,13 +68,17 @@
   color: var(--text-muted);
 }
 
+.page-tab-navigation-slot {
+  width: 100%;
+  margin: 0 auto 18px;
+}
+
 .page-tab-navigation {
-  position: sticky;
-  top: calc(max(16px, env(safe-area-inset-top)) + 7dvh + 6px);
+  position: relative;
   z-index: 20;
   display: flex;
   justify-content: center;
-  margin: 0 auto 18px;
+  margin: 0;
   pointer-events: none;
 }
 
@@ -1457,11 +1461,12 @@
   // .vocabulary-view-page > .content-area {
   //   max-height: 65dvh;
   // }
-  .page-tab-navigation {
-    position: sticky;
-    top: 0;
-    justify-content: flex-start;
+  .page-tab-navigation-slot {
     margin-bottom: 14px;
+  }
+
+  .page-tab-navigation {
+    justify-content: flex-start;
   }
 
   .page-tab-container {
