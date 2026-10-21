@@ -146,9 +146,10 @@ describe('approved theme palette readability', () => {
       for (const role of ['primary', 'secondary']) {
         expect(value(tokens, `--color-${role}-rgb`).split(',').map(Number)).toEqual(rgba(value(tokens, `--color-${role}`)).slice(0, 3))
       }
-      const secondary = rgba(value(tokens, '--color-secondary'))
+      const secondary = rgba(value(tokens, '--color-secondary-text'))
       expect(contrast(secondary, panel)).toBeGreaterThanOrEqual(4.5)
       expect(contrast(secondary, over(rgba(value(tokens, '--color-secondary-bg')), panel))).toBeGreaterThanOrEqual(4.5)
+      expect(contrast(rgba(value(tokens, '--color-secondary-hover')), panel)).toBeGreaterThanOrEqual(4.5)
     })
 
     it(`${theme}: pairs filled primary and entry actions with readable labels`, () => {
@@ -218,7 +219,7 @@ describe('approved theme palette readability', () => {
       for (const decoration of [title, steps]) {
         const gradient = resolved(decoration.background, tokens)
         expect(gradient).toContain(value(tokens, '--color-primary'))
-        expect(gradient).toContain(value(tokens, '--color-secondary'))
+        expect(gradient).toContain(value(tokens, '--color-secondary-text'))
       }
     }
   })

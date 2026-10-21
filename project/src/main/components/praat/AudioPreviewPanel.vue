@@ -224,7 +224,7 @@ const regionColors = [
   'var(--color-primary)',  // Blue
   'var(--color-warning)',  // Orange
   '#ff2d55',  // Pink
-  'var(--color-purple)',  // Purple
+  'var(--color-secondary)',  // Purple
 ]
 
 const effectiveSegments = computed(() => {

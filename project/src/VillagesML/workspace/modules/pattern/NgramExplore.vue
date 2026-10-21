@@ -489,8 +489,8 @@ onMounted(async () => {
 }
 
 .position-middle {
-  background: rgba(var(--color-purple-light-rgb), 0.2);
-  color: var(--color-purple);
+  background: rgba(var(--color-secondary-rgb), 0.2);
+  color: var(--color-secondary-text);
 }
 
 .position-suffix {
@@ -599,8 +599,8 @@ onMounted(async () => {
 }
 
 .type-middle {
-  background: rgba(var(--color-purple-light-rgb), 0.2);
-  color: var(--color-purple);
+  background: rgba(var(--color-secondary-rgb), 0.2);
+  color: var(--color-secondary-text);
 }
 
 .type-all {

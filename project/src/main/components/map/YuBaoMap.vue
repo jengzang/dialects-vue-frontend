@@ -1209,7 +1209,7 @@ watch(() => props.activeTab, () => {
 
 /* 分区行特殊样式 */
 .category-row .value {
-  color: var(--color-purple-light);
+  color: var(--color-secondary-text);
   font-weight: 600;
   font-size: 14px;
 }

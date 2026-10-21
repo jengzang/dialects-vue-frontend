@@ -186,7 +186,7 @@ function resolveToneType(item) {
   }
 
   &[data-tone='lexicon'] {
-    background: rgba(var(--color-purple-light-rgb), 0.09);
+    background: rgba(var(--color-secondary-rgb), 0.09);
     color: $purple;
   }
 

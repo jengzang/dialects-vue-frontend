@@ -2036,9 +2036,9 @@ $primary-deep: #003d9e;
     align-items: center;
     justify-content: center;
     padding: 2px 10px;
-    background: rgba(var(--color-primary-rgb), 0.12);
+    background: var(--color-secondary-bg);
     border-radius: var(--radius-pill);
-    color: var(--color-primary);
+    color: var(--color-secondary-text);
     white-space: nowrap;
     font-size: 15px;
     font-weight: 700;
@@ -2197,7 +2197,7 @@ $primary-deep: #003d9e;
     align-items: center;
     gap: 8px;
     margin: 0;
-    color: var(--color-primary-hover);
+    color: var(--color-secondary-text);
     font-size: 15px;
     font-weight: 700;
   }
@@ -2283,7 +2283,7 @@ $primary-deep: #003d9e;
   }
 
   .stat-value {
-    color: var(--color-primary);
+    color: var(--color-secondary-text);
     font-weight: 600;
   }
 
@@ -2295,9 +2295,9 @@ $primary-deep: #003d9e;
 
   .location-tag {
     padding: 2px 8px;
-    background: rgba(var(--color-primary-rgb), 0.1);
+    background: var(--color-secondary-bg);
     border-radius: var(--radius-xs);
-    color: var(--color-primary);
+    color: var(--color-secondary-text);
     font-size: 12px;
   }
 
@@ -2420,7 +2420,7 @@ $primary-deep: #003d9e;
 
   .feature-type {
     margin-bottom: 10px;
-    color: var(--color-primary);
+    color: var(--color-secondary-text);
     font-size: 15px;
     font-weight: 700;
   }
@@ -2453,16 +2453,16 @@ $primary-deep: #003d9e;
   }
 
   .tag-syllable {
-    color: var(--color-primary-hover);
+    color: var(--color-secondary-text);
     font-size: 14px;
     font-weight: 700;
   }
 
   .tag-count {
     padding: 2px 8px;
-    background: rgba(var(--color-primary-rgb), 0.12);
+    background: var(--color-secondary-bg);
     border-radius: var(--radius-pill);
-    color: var(--color-primary);
+    color: var(--color-secondary-text);
     font-size: 12px;
     font-weight: 700;
   }
@@ -2568,11 +2568,11 @@ $primary-deep: #003d9e;
 }
 
 .modal-stat-value {
-  color: var(--color-primary);
+  color: var(--color-secondary-text);
   font-size: 17px;
   font-weight: 800;
   letter-spacing: 0.02em;
-  text-shadow: 0 1px 8px rgba(var(--color-primary-rgb), 0.16);
+  text-shadow: 0 1px 8px rgba(var(--color-secondary-rgb), 0.16);
 }
 
 .modal-locations-list {

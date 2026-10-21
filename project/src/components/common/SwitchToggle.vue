@@ -161,7 +161,7 @@ const translateXNumber = computed(() => Math.max(resolvedWidthNumber.value - thu
 const colorPresets = {
   blue: 'var(--color-primary)',
   green: 'var(--color-success)',
-  purple: 'var(--color-purple)',
+  purple: 'var(--color-secondary)',
   gray: 'var(--text-secondary)',
 }
 

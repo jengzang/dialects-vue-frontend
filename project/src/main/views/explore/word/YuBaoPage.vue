@@ -893,7 +893,7 @@ watch(viewMode, async (newMode) => {
 
 $primary: var(--color-primary);
 $white: var(--glass-50);
-$purple: var(--color-purple-light);
+$purple: var(--color-secondary-text);
 
 $text-primary: var(--text-primary);
 $text-secondary: var(--text-secondary);

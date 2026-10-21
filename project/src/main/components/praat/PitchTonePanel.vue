@@ -1068,7 +1068,7 @@ const initContinuousChart = (isZScore) => {
 
 $primary: var(--color-primary);
 $primary-blue: var(--color-primary);
-$primary-purple: var(--color-purple);
+$primary-purple: var(--color-secondary);
 $primary-hover: var(--vml-blue-dark);
 
 $success: var(--color-success);

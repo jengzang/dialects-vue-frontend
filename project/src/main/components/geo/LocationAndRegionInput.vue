@@ -1231,7 +1231,7 @@ onBeforeUnmount(() => {
 
 $primary: var(--color-primary);
 $success: var(--color-success);
-$custom-purple: var(--color-purple);
+$custom-purple: var(--color-secondary-text);
 $portrait-ratio: 1;
 @mixin suggestion-panel($max-width, $max-height) {
   position: absolute !important;
@@ -1454,7 +1454,7 @@ $portrait-ratio: 1;
   background: var(--color-secondary-bg);
   border: 1px solid var(--color-secondary-border);
   border-radius: var(--radius-md);
-  color: var(--color-secondary);
+  color: var(--color-secondary-text);
   font-weight: 700;
 }
 

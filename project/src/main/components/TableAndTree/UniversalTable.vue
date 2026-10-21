@@ -2132,7 +2132,7 @@ td {
 }
 
 .toggle-select {
-  color: var(--color-secondary);
+  color: var(--color-secondary-text);
   font-weight: bold;
 
   &:hover {

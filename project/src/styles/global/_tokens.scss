@@ -15,9 +15,12 @@
   /* 主题色 */
   --color-primary: #0070e8;
   --color-primary-hover: #0051d5;
-  --color-secondary: #785ca6;
-  --color-secondary-rgb: 120, 92, 166;
-  --color-secondary-bg: rgba(var(--color-secondary-rgb), 0.08);
+  --color-secondary: #a875f5;
+  --color-secondary-rgb: 168, 117, 245;
+  --color-secondary-text: #8945c8;
+  --color-secondary-hover: #6e00ff;
+  --color-secondary-light: rgba(var(--color-secondary-rgb), 0.08);
+  --color-secondary-bg: var(--color-secondary-light);
   --color-secondary-border: rgba(var(--color-secondary-rgb), 0.28);
   --color-primary-light: rgba(0, 112, 232, 0.1);
   --color-primary-light2: rgba(0, 112, 232, 0.16);
@@ -28,7 +31,7 @@
   --color-primary-border2: rgba(0, 112, 232, 0.22);
   --color-primary-shadow: rgba(0, 112, 232, 0.2);
   --color-primary-shadow-light: rgba(0, 112, 232, 0.3);
-  --color-gradient: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  --color-gradient: linear-gradient(135deg, var(--color-primary), var(--color-secondary-text));
 
   /* 自定义蓝色 - 用于特定组件 */
   --bg-blue-tint: #f0f7ff;
@@ -175,9 +178,6 @@
   --color-accent-purple: var(--color-secondary);
   --color-accent-purple-light: var(--color-secondary-bg);
 
-  /* 辅助色 */
-  --color-purple: #5856d6;
-  --color-purple-light: #af52de;
   --color-gold: #ffd700;
   --color-gold-rgb: 255, 215, 0;
   --color-silver: #c0c0c0;
@@ -195,7 +195,6 @@
   --color-error-rgb: 211, 47, 47;
   --color-error-light-rgb: 255, 59, 48;
   --color-warning-rgb: 255, 149, 0;
-  --color-purple-light-rgb: 175, 82, 222;
   --text-deep-rgb: 11, 37, 64;
   --color-shadow-rgb: 15, 23, 42;
   --color-teal: #00887a;
@@ -272,6 +271,9 @@
   --color-primary-hover: #374151;
   --color-secondary: #99663d;
   --color-secondary-rgb: 153, 102, 61;
+  --color-secondary-text: var(--color-secondary);
+  --color-secondary-hover: #81512e;
+  --color-secondary-light: rgba(var(--color-secondary-rgb), 0.04);
   --color-secondary-bg: rgba(var(--color-secondary-rgb), 0.04);
   --color-primary-light: rgba(75, 85, 99, 0.08);
   --color-primary-light2: rgba(75, 85, 99, 0.12);
@@ -425,6 +427,8 @@
   --color-primary-hover: #a2e5b3;
   --color-secondary: #d5a06f;
   --color-secondary-rgb: 213, 160, 111;
+  --color-secondary-text: var(--color-secondary);
+  --color-secondary-hover: #c99360;
   --color-primary-light: rgba(134, 217, 155, 0.10);
   --color-primary-light2: rgba(134, 217, 155, 0.15);
   --color-primary-light3: rgba(134, 217, 155, 0.11);
@@ -590,6 +594,8 @@
   --color-primary-hover: #ffffff;
   --color-secondary: #9fbce0;
   --color-secondary-rgb: 159, 188, 224;
+  --color-secondary-text: var(--color-secondary);
+  --color-secondary-hover: #8faed5;
   --color-primary-light: rgba(240, 246, 252, 0.08);
   --color-primary-light2: rgba(240, 246, 252, 0.14);
   --color-primary-light3: rgba(240, 246, 252, 0.10);
