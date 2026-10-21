@@ -1,7 +1,7 @@
 <template>
   <div class="pho-page">
     <TabSwitcher
-      :class="{ 'pho-tabs--matrix': currentTab === 'phonologyMatrix' }"
+      :class="{ 'pho-tabs--query': ['phonologyMatrix', 'phonologyCustom'].includes(currentTab) }"
       :tabs="tabs"
       :model-value="currentTab"
       :route-value="currentTab"
@@ -111,7 +111,7 @@ const resolveTabRoute = (tabName) => {
   width: 100%;
 }
 
-.pho-tabs--matrix {
+.pho-tabs--query {
   min-height: 80dvh;
 }
 
