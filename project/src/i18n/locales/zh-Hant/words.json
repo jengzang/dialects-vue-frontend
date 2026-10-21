@@ -68,7 +68,7 @@
     },
     "search": {
       "label": "搜索",
-      "placeholder": "搜索標準詞、方言詞、音標、詳細釋義",
+      "placeholder": "支持搜索標準詞、方言詞、音標、詳細釋義等",
       "standardWordPlaceholder": "按標準詞篩選",
       "locationPlaceholder": "按地點篩選",
       "fieldCount": "已選 {count} 列",

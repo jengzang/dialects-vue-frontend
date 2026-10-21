@@ -42,7 +42,7 @@ let scrollFrame = null
 let animationFrame = null
 let targetProgress = 0
 let lastAnimationTime = 0
-const transitionDuration = 600
+const transitionDuration = 400
 const hasSubmittedQuery = ref(false)
 
 function animateProgress(time) {

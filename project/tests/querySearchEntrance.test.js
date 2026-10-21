@@ -35,7 +35,7 @@ beforeEach(() => {
   vi.stubGlobal('matchMedia', () => ({ matches: false }))
   vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
   let frameId = 0
-  vi.spyOn(window, 'requestAnimationFrame').mockImplementation(fn => { queueMicrotask(fn); return ++frameId })
+  vi.spyOn(window, 'requestAnimationFrame').mockImplementation(fn => { queueMicrotask(() => fn(performance.now() + 600)); return ++frameId })
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
     if (this.classList.contains('query-intro')) return { top: 180 - scrollPosition, height: 240 }
     return { top: panelTop - scrollPosition, height: 140 }
@@ -99,7 +99,8 @@ describe('one query panel morphing with scroll', () => {
     input.value = '饮水'
     input.dispatchEvent(new Event('input', { bubbles: true }))
     const end = 420 - window.innerHeight * 0.12
-    scrollPosition = end - 64 - 132
+    const distance = Math.min(240 * 3, end - 80)
+    scrollPosition = end - 80 - distance / 2
     window.dispatchEvent(new Event('scroll'))
     await settle()
     expect(entrance.progress).toBeCloseTo(0.5)
@@ -127,7 +128,8 @@ describe('one query panel morphing with scroll', () => {
     await mountEntrance()
     await entrance.collapse()
     const end = panelTop - window.innerHeight * 0.12
-    for (const [offset, expected] of [[0, 1], [32, 1], [64, 1], [88, 1 - 24 / 360], [244, 0.5]]) {
+    const distance = Math.min(240 * 3, end - 80)
+    for (const [offset, expected] of [[0, 1], [32, 1], [80, 1], [104, 1 - 24 / distance], [80 + distance / 2, 0.5]]) {
       scrollPosition = end - offset
       window.dispatchEvent(new Event('scroll'))
       await settle()
