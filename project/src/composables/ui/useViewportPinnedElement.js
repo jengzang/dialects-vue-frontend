@@ -84,12 +84,17 @@ export function useViewportPinnedElement(options = {}) {
       top = initialLandscapeTop
     }
 
-    setStyle(placeholderStyle, { height: `${elementRect.height}px` })
+    setStyle(placeholderStyle, {
+      width: `${placeholderRect.width}px`,
+      height: `${elementRect.height}px`,
+    })
+    const navigationWidth = Math.min(elementRect.width, placeholderRect.width)
+    const navigationLeft = placeholderRect.left + (placeholderRect.width - navigationWidth) / 2
     setStyle(elementStyle, {
       position: 'fixed',
       top: toCssLength(top),
-      left: `${placeholderRect.left}px`,
-      width: `${placeholderRect.width}px`,
+      left: `${navigationLeft}px`,
+      width: `${navigationWidth}px`,
     })
     isPinned.value = true
   }

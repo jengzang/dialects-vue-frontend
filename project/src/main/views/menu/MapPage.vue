@@ -1,5 +1,6 @@
 <template>
   <TabSwitcher
+    pin-navigation
     :tabs="tabs"
     :model-value="currentTab"
     :route-value="currentTab"

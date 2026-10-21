@@ -37,10 +37,15 @@
 
 .ui-tabs-navigation--underline {
   border-bottom: 1px solid var(--border-control);
+    background: var(--glass-10);
+    backdrop-filter: blur(8px) saturate(180%);
+    -webkit-backdrop-filter: blur(8px) saturate(180%);
+    border-radius: var(--radius-sm);
 
   .ui-tab-item {
     border-bottom: 3px solid transparent;
     border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+
 
     &.active {
       border-bottom-color: var(--color-primary);

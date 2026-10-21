@@ -86,11 +86,11 @@
   display: inline-flex;
   gap: 4px;
   max-width: 100%;
-  margin-top: 1dvh;
+  // margin-top: 1dvh;
   padding: 4px;
   overflow-x: auto;
   pointer-events: auto;
-  background: var(--glass-80);
+  background: var(--glass-50);
   border: 1px solid var(--glass-40);
   border-radius: var(--radius-md);
   box-shadow:

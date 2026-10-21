@@ -236,13 +236,17 @@ watch(currentTab, () => {
 }
 
 .tabs-navigation-slot {
-  width: fit-content;
+  display: flex;
+  justify-content: center;
+  width: 100%;
   max-width: 100%;
   margin-bottom: 12px;
 
   .tabs-navigation {
+    width: fit-content;
+    max-width: 100%;
     margin-bottom: 0;
-    z-index: 20;
+    z-index: 101;
   }
 }
 
