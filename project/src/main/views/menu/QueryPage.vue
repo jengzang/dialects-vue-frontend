@@ -12,7 +12,7 @@
         {{ activePageTitle }}
       </h1>
 
-      <div v-show="currentTab === 'tab1'" class="page">
+      <div v-show="currentTab === 'tab1'" class="query-page-panel glass-panel">
         <div class="page-content-stack">
           <!-- 🔹 輸入框區塊 -->
           <div class="query-box">
@@ -30,7 +30,7 @@
       </div>
 
 
-      <div v-show="currentTab === 'tab2'" class="page">
+      <div v-show="currentTab === 'tab2'" class="query-page-panel glass-panel">
         <div class="page-content-stack">
           <!-- 直接輸入模式 -->
           <div v-if="zhongguInputMode === 'direct'" class="direct-input-box">
@@ -146,7 +146,7 @@
       </div>
 
       <!-- 📤 tab3：查音位頁面 -->
-      <div v-show="currentTab === 'tab3'" class="page">
+      <div v-show="currentTab === 'tab3'" class="query-page-panel glass-panel">
         <div class="page-content-stack">
           <!-- 三欄選擇 -->
           <div class="triple-select-box">
@@ -941,9 +941,24 @@ export default {
   margin-bottom: 1.5dvh;
 }
 
+.query-page-panel {
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+  padding: 2dvh;
+  max-height: 35dvh;
+  overflow-y: auto;
+  font-size: 18px;
+}
+
 @media (max-aspect-ratio: 1/1) {
   .tab-content-inner {
     padding-bottom: calc(1rem + 8dvh);
+  }
+
+  .query-page-panel {
+    padding: 10px;
+    font-size: 16px;
   }
 }
 

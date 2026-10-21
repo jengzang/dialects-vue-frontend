@@ -1,8 +1,7 @@
 <template>
   <div class="divide-tab-container">
     <div
-      class="page"
-      style="overflow: hidden;max-height: none;"
+      class="divide-tab-panel glass-panel"
     >
       <div class="page-content-stack">
         <div
@@ -374,12 +373,26 @@ $text-secondary: var(--text-secondary);
   min-width: 0;
 }
 
-.page {
+.divide-tab-panel {
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+  padding: 2dvh;
+  max-height: none;
+  overflow: hidden;
+  font-size: 18px;
   width: min(90%, 500px);
   min-width: 0;
 }
 
-/* 页面内字体统一，不改 page 全局布局 */
+@media (max-aspect-ratio: 1 / 1) {
+  .divide-tab-panel {
+    padding: 10px;
+    font-size: 16px;
+  }
+}
+
+/* 页面内字体统一，不改面板布局 */
 .page-content-stack,
 .page-footer,
 .horizontal-dropdown,

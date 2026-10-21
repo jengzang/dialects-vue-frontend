@@ -15,7 +15,7 @@
       <!-- Tab1: 比較漢字 -->
       <div
         v-show="currentTab === 'tab1'"
-        class="page"
+        class="compare-page-panel glass-panel"
       >
         <div class="page-content-stack tab1-layout">
           <!-- 組1 輸入 -->
@@ -76,7 +76,7 @@
       <!-- Tab2: 比較中古 --  -->
       <div
         v-show="currentTab === 'tab2'"
-        class="page"
+        class="compare-page-panel glass-panel"
         style="max-height: 50dvh;overflow-x: auto;"
       >
         <div class="page-content-stack">
@@ -340,7 +340,7 @@
       <!-- Tab4: 比較調類 -->
       <div
         v-show="currentTab === 'tab4'"
-        class="page"
+        class="compare-page-panel glass-panel"
       >
         <div class="page-content-stack">
           <div class="tone-tip">
@@ -370,7 +370,7 @@
       <!-- Tab5: 比较音值 -->
       <div
         v-show="currentTab === 'tab5'"
-        class="page tab5-page"
+        class="compare-page-panel glass-panel tab5-page"
       >
         <div class="page-content-stack">
           <!-- <div class="tone-tip">
@@ -2000,7 +2000,14 @@ $text-muted: var(--text-lightest);
   }
 }
 
-.page {
+.compare-page-panel {
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+  padding: 2dvh;
+  max-height: 35dvh;
+  overflow-y: auto;
+  font-size: 18px;
   max-width: 900px;
 }
 
@@ -2524,8 +2531,9 @@ $text-muted: var(--text-lightest);
     padding: 0.8rem;
   }
 
-  .page {
+  .compare-page-panel {
     padding: 0.5rem !important;
+    font-size: 16px;
   }
 
   .selected-groups-container {
