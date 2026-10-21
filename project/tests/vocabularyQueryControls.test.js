@@ -38,6 +38,15 @@ async function mountControls(expanded, overrides = {}) {
 }
 
 describe('vocabulary query submission in the same input', () => {
+  it('restores the original segmented switcher only in compact mode without a source toggle', async () => {
+    const { props } = await mountControls(false)
+    expect(host.querySelector('.result-view-switcher.ui-tabs-navigation--segmented')).not.toBeNull()
+    expect(host.querySelector('.filter-strip [role="switch"]')).toBeNull()
+    props.deferQuery = true
+    await nextTick()
+    expect(host.querySelector('.result-view-switcher.view-mode-selector')).not.toBeNull()
+    expect(host.querySelector('.filter-strip [role="switch"]')).toBeNull()
+  })
   it('offers four parallel radio modes and displays only the active filter', async () => {
     await mountControls(false, { filterMode: 'location' })
     host.querySelector('.gear-btn').click(); await nextTick()

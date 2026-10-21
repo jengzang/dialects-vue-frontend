@@ -54,10 +54,13 @@
               stroke-linejoin="round"
               aria-hidden="true"
             >
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              <template v-if="deferQuery">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </template>
+              <path v-else d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5" />
             </svg>
-            <span>{{ t('common.button.search') }}</span>
+            <span>{{ t(deferQuery ? 'common.button.search' : 'words.wordList.notes.refreshResults') }}</span>
           </component>
         </div>
 
@@ -266,6 +269,7 @@
         <span v-if="deferQuery" class="query-condition-label">{{ t('words.wordList.viewModes.label') }}</span>
         <ResultViewSwitcher
           :model-value="viewMode"
+          :original-appearance="!deferQuery"
           @update:model-value="emit('update:viewMode', $event)"
         />
       </div>
