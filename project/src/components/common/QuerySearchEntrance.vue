@@ -43,6 +43,13 @@ let animationFrame = null
 let targetProgress = 0
 let lastAnimationTime = 0
 const transitionDuration = 400
+const boundaryHoldDuration = 100
+let transitionUnlocked = false
+let boundaryDirection = 0
+let boundaryStartTime = 0
+let lastScrollPosition = 0
+let inputDirection = 0
+let touchY = null
 const hasSubmittedQuery = ref(false)
 
 function animateProgress(time) {
@@ -55,6 +62,10 @@ function animateProgress(time) {
   animationFrame = progress.value === targetProgress
     ? null
     : window.requestAnimationFrame(animateProgress)
+  if (progress.value === 0 || progress.value === 1) {
+    transitionUnlocked = false
+    boundaryDirection = 0
+  }
 }
 
 function setTargetProgress(value, immediate = false) {
@@ -63,6 +74,8 @@ function setTargetProgress(value, immediate = false) {
     if (animationFrame !== null) window.cancelAnimationFrame(animationFrame)
     animationFrame = null
     progress.value = value
+    transitionUnlocked = false
+    boundaryDirection = 0
     return
   }
   if (animationFrame === null && progress.value !== value) {
@@ -78,7 +91,7 @@ function compactPosition() {
   return Math.max(0, window.scrollY + (panelEl.value?.getBoundingClientRect().top || 0) - inset)
 }
 
-function updateProgress() {
+function updateProgress(fromScroll = false) {
   scrollFrame = null
   if (props.enabled && !hasSubmittedQuery.value) {
     setTargetProgress(0, true)
@@ -91,16 +104,62 @@ function updateProgress() {
   const nextProgress = props.enabled && distance
     ? remaining <= 1 ? 1 : Math.max(0, Math.min(1, 1 - remaining / distance))
     : 1
+  if (props.enabled && hasSubmittedQuery.value && !transitionUnlocked && nextProgress !== progress.value) {
+    if (!fromScroll) return
+    const direction = Math.sign(nextProgress - progress.value)
+    const now = window.performance.now()
+    if (inputDirection && inputDirection !== direction) {
+      boundaryDirection = 0
+      return
+    }
+    // Keep a fixed hold: continued scrolling must not restart the timer.
+    transitionUnlocked = boundaryDirection === direction && now - boundaryStartTime >= boundaryHoldDuration
+    if (boundaryDirection !== direction) {
+      boundaryDirection = direction
+      boundaryStartTime = now
+    }
+    if (!transitionUnlocked) return
+  }
   setTargetProgress(nextProgress, !props.enabled)
 }
 
 function handleScroll() {
-  if (scrollFrame === null) scrollFrame = window.requestAnimationFrame(updateProgress)
+  const position = window.scrollY
+  if (position !== lastScrollPosition) inputDirection = Math.sign(position - lastScrollPosition)
+  lastScrollPosition = position
+  if (inputDirection && boundaryDirection !== inputDirection) boundaryDirection = 0
+  if (scrollFrame === null) scrollFrame = window.requestAnimationFrame(() => updateProgress(true))
+}
+
+function handleWheel(event) {
+  if (!event.deltaY || event.ctrlKey || event.defaultPrevented) return
+  inputDirection = Math.sign(event.deltaY)
+  handleScroll()
+}
+
+function handleTouchStart(event) {
+  touchY = event.touches[0]?.clientY ?? null
+}
+
+function handleTouchMove(event) {
+  if (event.defaultPrevented) return
+  const nextY = event.touches[0]?.clientY
+  if (touchY !== null && nextY !== undefined && nextY !== touchY) {
+    inputDirection = Math.sign(touchY - nextY)
+    handleScroll()
+  }
+  touchY = nextY ?? null
+}
+
+function handleResize() {
+  if (scrollFrame === null) scrollFrame = window.requestAnimationFrame(() => updateProgress())
 }
 
 async function collapse() {
   if (!props.enabled) return
   hasSubmittedQuery.value = true
+  transitionUnlocked = true
+  boundaryDirection = 0
   await nextTick()
   window.scrollTo({
     top: compactPosition(),
@@ -112,14 +171,21 @@ watch(progress, value => emit('progress', value))
 watch(() => props.enabled, async () => { await nextTick(); updateProgress() })
 
 function startListening() {
+  lastScrollPosition = window.scrollY
   window.addEventListener('scroll', handleScroll, { passive: true })
-  window.addEventListener('resize', handleScroll, { passive: true })
+  window.addEventListener('wheel', handleWheel, { passive: true })
+  window.addEventListener('touchstart', handleTouchStart, { passive: true })
+  window.addEventListener('touchmove', handleTouchMove, { passive: true })
+  window.addEventListener('resize', handleResize, { passive: true })
   updateProgress()
 }
 
 function stopListening() {
   window.removeEventListener('scroll', handleScroll)
-  window.removeEventListener('resize', handleScroll)
+  window.removeEventListener('wheel', handleWheel)
+  window.removeEventListener('touchstart', handleTouchStart)
+  window.removeEventListener('touchmove', handleTouchMove)
+  window.removeEventListener('resize', handleResize)
   if (scrollFrame !== null) window.cancelAnimationFrame(scrollFrame)
   if (animationFrame !== null) window.cancelAnimationFrame(animationFrame)
   scrollFrame = null

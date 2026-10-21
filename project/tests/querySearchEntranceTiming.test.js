@@ -48,18 +48,18 @@ afterEach(() => {
 })
 
 describe('query entrance transition timing', () => {
-  it('takes 600ms to collapse even when scrolling directly to the compact position', async () => {
+  it('takes 400ms to collapse even when scrolling directly to the compact position', async () => {
     scrollPosition = 1000
     window.dispatchEvent(new Event('scroll'))
     await frame(0)
     expect(entrance.progress).toBe(0)
-    await frame(150)
+    await frame(100)
     expect(entrance.progress).toBeCloseTo(0.25)
-    await frame(300)
+    await frame(200)
     expect(entrance.progress).toBeCloseTo(0.5)
-    await frame(599)
+    await frame(399)
     expect(entrance.progress).toBeLessThan(1)
-    await frame(600)
+    await frame(400)
     expect(entrance.progress).toBe(1)
     expect(frames.size).toBe(0)
   })
@@ -68,15 +68,71 @@ describe('query entrance transition timing', () => {
     scrollPosition = 1000
     window.dispatchEvent(new Event('scroll'))
     await frame(0)
-    await frame(300)
+    await frame(200)
     expect(entrance.progress).toBeCloseTo(0.5)
     scrollPosition = 0
     window.dispatchEvent(new Event('scroll'))
-    await frame(300)
+    await frame(200)
     expect(entrance.progress).toBeCloseTo(0.5)
-    await frame(450)
+    await frame(300)
     expect(entrance.progress).toBeCloseTo(0.25)
-    await frame(600)
+    await frame(400)
+    expect(entrance.progress).toBe(0)
+  })
+
+  it('accepts continued scrolling after a fixed 100ms hold at both endpoints', async () => {
+    scrollPosition = 1000
+    window.dispatchEvent(new Event('scroll'))
+    await frame(0)
+    await frame(400)
+    scrollPosition = 0
+    window.dispatchEvent(new Event('scroll'))
+    await frame(410)
+    await frame(500)
+    expect(entrance.progress).toBe(1)
+    window.dispatchEvent(new WheelEvent('wheel', { deltaY: -100 }))
+    await frame(500)
+    await frame(509)
+    window.dispatchEvent(new WheelEvent('wheel', { deltaY: -100 }))
+    await frame(509)
+    expect(entrance.progress).toBe(1)
+    await frame(510)
+    window.dispatchEvent(new WheelEvent('wheel', { deltaY: -100 }))
+    await frame(510)
+    await frame(710)
+    expect(entrance.progress).toBeCloseTo(0.5)
+    await frame(910)
+    expect(entrance.progress).toBe(0)
+    scrollPosition = 1000
+    window.dispatchEvent(new Event('scroll'))
+    await frame(920)
+    await frame(1020)
+    expect(entrance.progress).toBe(0)
+    window.dispatchEvent(new WheelEvent('wheel', { deltaY: 100 }))
+    await frame(1020)
+    await frame(1420)
+    expect(entrance.progress).toBe(1)
+  })
+
+  it('supports a second touch gesture at page top without a scroll event', async () => {
+    scrollPosition = 1000
+    window.dispatchEvent(new Event('scroll'))
+    await frame(0)
+    await frame(400)
+    scrollPosition = 0
+    window.dispatchEvent(new Event('scroll'))
+    await frame(410)
+    await frame(510)
+    window.dispatchEvent(new Event('resize'))
+    await frame(510)
+    expect(entrance.progress).toBe(1)
+    for (const [type, clientY] of [['touchstart', 100], ['touchmove', 150]]) {
+      const event = new Event(type)
+      Object.defineProperty(event, 'touches', { value: [{ clientY }] })
+      window.dispatchEvent(event)
+    }
+    await frame(510)
+    await frame(910)
     expect(entrance.progress).toBe(0)
   })
 
@@ -91,6 +147,9 @@ describe('query entrance transition timing', () => {
     scrollPosition = 0
     window.dispatchEvent(new Event('scroll'))
     await frame(16)
+    await frame(116)
+    window.dispatchEvent(new WheelEvent('wheel', { deltaY: -100 }))
+    await frame(116)
     expect(frames.size).toBe(1)
     app.unmount()
     app = null

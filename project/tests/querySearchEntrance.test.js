@@ -7,6 +7,7 @@ let host
 let scrollPosition
 let panelTop
 let entrance
+let now
 const settle = async () => { await nextTick(); await nextTick() }
 
 async function mountEntrance(overrides = {}) {
@@ -28,7 +29,15 @@ async function mountEntrance(overrides = {}) {
   return props
 }
 
+async function resumeScroll(direction) {
+  now += 100
+  window.dispatchEvent(new WheelEvent('wheel', { deltaY: direction }))
+  await settle()
+}
+
 beforeEach(() => {
+  now = 0
+  vi.spyOn(window.performance, 'now').mockImplementation(() => now)
   scrollPosition = 0
   panelTop = 420
   vi.spyOn(window, 'scrollY', 'get').mockImplementation(() => scrollPosition)
@@ -112,6 +121,8 @@ describe('one query panel morphing with scroll', () => {
     scrollPosition = 0
     window.dispatchEvent(new Event('scroll'))
     await settle()
+    expect(entrance.progress).toBe(1)
+    await resumeScroll(-100)
     expect(entrance.progress).toBe(0)
     expect(host.querySelector('.original-query')).toBe(input)
     expect(host.querySelector('.original-filter')).toBe(filter)
@@ -120,6 +131,8 @@ describe('one query panel morphing with scroll', () => {
     scrollPosition = Math.floor(end)
     window.dispatchEvent(new Event('scroll'))
     await settle()
+    expect(entrance.progress).toBe(0)
+    await resumeScroll(100)
     expect(entrance.progress).toBe(1)
   })
 
@@ -133,6 +146,7 @@ describe('one query panel morphing with scroll', () => {
       scrollPosition = end - offset
       window.dispatchEvent(new Event('scroll'))
       await settle()
+      if (offset === 104) await resumeScroll(-100)
       expect(entrance.progress).toBeCloseTo(expected)
     }
     scrollPosition = 0
@@ -182,6 +196,7 @@ describe('one query panel morphing with scroll', () => {
     scrollPosition = 0
     window.dispatchEvent(new Event('scroll'))
     await settle()
+    await resumeScroll(-100)
     expect(footer.getAttribute('aria-hidden')).toBe('false')
   })
 
