@@ -272,9 +272,10 @@ const mobileNavRef = ref(null)
 const collapseProgress = ref(0)
 const viewportWidth = ref(0)
 const NORMAL_COLLAPSE_START = 200
-const COLLAPSE_DISTANCE = 200
+const NORMAL_COLLAPSE_DISTANCE = 300
 const MANUAL_EXPAND_MIN_SCROLL = 250
 const MANUAL_COLLAPSE_DELAY = 50
+const MANUAL_COLLAPSE_DISTANCE = 200
 const MIN_SCROLLABLE_DISTANCE = 500
 let liquidGlassScrollFrame = null
 let manualExpandScrollStart = null
@@ -309,7 +310,7 @@ const updateNavbarCollapse = () => {
   if (manualExpandScrollStart !== null && scrollTop > NORMAL_COLLAPSE_START) {
     collapseProgress.value = Math.min(
       Math.max(
-        (scrollTop - manualExpandScrollStart - MANUAL_COLLAPSE_DELAY) / COLLAPSE_DISTANCE,
+        (scrollTop - manualExpandScrollStart - MANUAL_COLLAPSE_DELAY) / MANUAL_COLLAPSE_DISTANCE,
         0
       ),
       1
@@ -319,7 +320,7 @@ const updateNavbarCollapse = () => {
 
   manualExpandScrollStart = null
   collapseProgress.value = Math.min(
-    Math.max((scrollTop - NORMAL_COLLAPSE_START) / COLLAPSE_DISTANCE, 0),
+    Math.max((scrollTop - NORMAL_COLLAPSE_START) / NORMAL_COLLAPSE_DISTANCE, 0),
     1
   )
 }
