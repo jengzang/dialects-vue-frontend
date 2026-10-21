@@ -21,13 +21,17 @@
   @include flex-center;
   gap: 8px;
   padding: 14px 12px 24px;
-  color: var(--color-secondary-text);
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 
+.vocabulary-counts-value {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
 .vocabulary-counts-separator {
-  color: var(--color-secondary-text);
-  opacity: 0.5;
+  color: var(--text-muted);
 }
 
 .page-tab-navigation {

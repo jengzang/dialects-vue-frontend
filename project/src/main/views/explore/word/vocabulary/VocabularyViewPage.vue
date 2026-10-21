@@ -58,9 +58,13 @@
       />
       </Teleport>
       <div v-if="!isCharacterNotesMode" class="vocabulary-counts-footer" aria-live="polite">
-        <span>{{ t('words.wordList.upload.totalLocations', { count: vocabularyCounts.locations ?? '…' }) }}</span>
+        <I18nT keypath="words.wordList.upload.totalLocations" tag="span" scope="global">
+          <template #count><span class="vocabulary-counts-value">{{ vocabularyCounts.locations ?? '…' }}</span></template>
+        </I18nT>
         <span class="vocabulary-counts-separator" aria-hidden="true">·</span>
-        <span>{{ t('words.wordList.upload.totalEntries', { count: vocabularyCounts.total ?? '…' }) }}</span>
+        <I18nT keypath="words.wordList.upload.totalEntries" tag="span" scope="global">
+          <template #count><span class="vocabulary-counts-value">{{ vocabularyCounts.total ?? '…' }}</span></template>
+        </I18nT>
       </div>
     </template>
     <template #after-panel>
@@ -514,7 +518,7 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
+import { I18nT, useI18n } from 'vue-i18n'
 import { watchDebounced } from '@vueuse/core'
 import * as OpenCCCN2T from 'opencc-js/cn2t'
 import * as OpenCCT2CN from 'opencc-js/t2cn'
