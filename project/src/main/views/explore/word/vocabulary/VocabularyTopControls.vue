@@ -1,5 +1,8 @@
 <template>
-  <div class="top-controls query-controls-layout query-controls--vocabulary">
+  <div
+    class="top-controls query-controls-layout"
+    :class="source === 'vocabulary' ? 'query-controls--vocabulary' : 'query-controls--notes'"
+  >
     <div class="search-container">
       <div class="search-section">
         <div class="input-wrapper">
@@ -733,6 +736,47 @@ const standardWordTriggerLabel = computed(() => {
   flex: 0 0 auto;
   flex-wrap: wrap;
   min-width: 180px;
+}
+
+.top-controls.query-controls--vocabulary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: 'input input' 'modes modes' 'range tools';
+
+  .search-container,
+  .search-section,
+  .filter-strip {
+    display: contents;
+  }
+
+  .input-wrapper { grid-area: input; }
+  .field-filter { grid-area: tools; align-self: end; }
+
+  .query-mode-controls {
+    grid-area: modes;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .query-mode-controls > .result-view-switcher { order: 0; }
+
+  .query-range {
+    grid-area: range;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .location-filter,
+  .standard-word-filter {
+    flex: 1 1 220px;
+    min-width: 0;
+    width: auto;
+  }
+
+  .location-select-trigger { width: 100%; max-width: none; }
 }
 
 @media (max-aspect-ratio: 1 / 1) {

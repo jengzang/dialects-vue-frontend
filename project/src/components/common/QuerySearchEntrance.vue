@@ -150,6 +150,10 @@ defineExpose({ collapse, progress })
     }
 
     :deep(.query-controls--vocabulary) {
+      grid-template-areas: 'input action' 'modes modes' 'range tools';
+    }
+
+    :deep(.query-controls--notes) {
       grid-template-areas: 'input action' 'range range' 'modes tools';
     }
 
@@ -284,6 +288,9 @@ defineExpose({ collapse, progress })
 
   .query-search-panel:not(.is-compact) {
     :deep(.query-controls--vocabulary) {
+      grid-template-areas: 'input input' 'modes action' 'range tools';
+    }
+    :deep(.query-controls--notes) {
       grid-template-areas: 'input input' 'action action' 'range range' 'modes tools';
     }
     :deep(.query-controls--yubao) {
