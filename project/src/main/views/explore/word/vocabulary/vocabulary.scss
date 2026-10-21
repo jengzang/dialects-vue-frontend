@@ -70,7 +70,7 @@
 
 .page-tab-navigation {
   position: sticky;
-  top: 0;
+  top: calc(max(16px, env(safe-area-inset-top)) + 7dvh + 6px);
   z-index: 20;
   display: flex;
   justify-content: center;
@@ -1458,7 +1458,8 @@
   //   max-height: 65dvh;
   // }
   .page-tab-navigation {
-    position: static;
+    position: sticky;
+    top: 0;
     justify-content: flex-start;
     margin-bottom: 14px;
   }
