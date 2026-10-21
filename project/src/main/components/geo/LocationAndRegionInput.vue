@@ -1451,10 +1451,10 @@ $portrait-ratio: 1;
 
 .hint-num {
   padding: 0 6px;
-  background: var(--color-primary-light);
-  border: 1px solid var(--color-primary-border);
+  background: var(--color-secondary-bg);
+  border: 1px solid var(--color-secondary-border);
   border-radius: var(--radius-md);
-  color: var(--color-primary);
+  color: var(--color-secondary);
   font-weight: 700;
 }
 
