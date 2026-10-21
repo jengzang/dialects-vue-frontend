@@ -279,6 +279,7 @@ const MANUAL_COLLAPSE_DISTANCE = 200
 const MIN_SCROLLABLE_DISTANCE = 500
 let liquidGlassScrollFrame = null
 let manualExpandScrollStart = null
+let lastCollapseScrollTop = null
 
 const navbarStyle = computed(() => {
   if (collapseProgress.value <= 0) return {}
@@ -293,6 +294,8 @@ const getMaxScrollableDistance = () =>
 
 const updateNavbarCollapse = () => {
   const scrollTop = window.scrollY || document.documentElement.scrollTop
+  const previousScrollTop = lastCollapseScrollTop
+  lastCollapseScrollTop = scrollTop
   viewportWidth.value = document.documentElement.clientWidth
 
   if (!window.matchMedia('(max-aspect-ratio: 1/1)').matches) {
@@ -308,14 +311,16 @@ const updateNavbarCollapse = () => {
   }
 
   if (manualExpandScrollStart !== null && scrollTop > NORMAL_COLLAPSE_START) {
-    collapseProgress.value = Math.min(
-      Math.max(
-        (scrollTop - manualExpandScrollStart - MANUAL_COLLAPSE_DELAY) / MANUAL_COLLAPSE_DISTANCE,
-        0
-      ),
-      1
-    )
-    return
+    if (previousScrollTop === null || scrollTop >= previousScrollTop) {
+      collapseProgress.value = Math.min(
+        Math.max(
+          (scrollTop - manualExpandScrollStart - MANUAL_COLLAPSE_DELAY) / MANUAL_COLLAPSE_DISTANCE,
+          0
+        ),
+        1
+      )
+      return
+    }
   }
 
   manualExpandScrollStart = null
@@ -327,6 +332,7 @@ const updateNavbarCollapse = () => {
 
 const expandNavbar = () => {
   const scrollTop = window.scrollY || document.documentElement.scrollTop
+  lastCollapseScrollTop = scrollTop
   manualExpandScrollStart = scrollTop > MANUAL_EXPAND_MIN_SCROLL ? scrollTop : null
   collapseProgress.value = 0
 }
