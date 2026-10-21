@@ -32,7 +32,10 @@
           {{ t('common.button.search') }}
         </button>
 
-        <div v-if="source === 'character-notes'" class="notes-mode-actions">
+      </div>
+
+      <div v-if="source === 'character-notes'" class="notes-search-settings">
+        <div class="notes-mode-actions">
           <component
             :is="deferQuery ? 'button' : ActionButton"
             class="notes-refresh-action"
@@ -63,7 +66,6 @@
             <span>{{ t(deferQuery ? 'common.button.search' : 'words.wordList.notes.refreshResults') }}</span>
           </component>
         </div>
-
         <div class="field-filter">
           <button
             class="gear-btn"
@@ -73,81 +75,92 @@
           >
             <span aria-hidden="true"><InlineIcon icon="⚙️" /></span>
           </button>
-          <button
-            v-if="source === 'vocabulary'"
-            class="pill-btn location-details-btn"
-            type="button"
-            :title="t('words.wordList.search.locationDetails')"
-            @click="emit('openLocationDetails')"
-          >
-            {{ t('words.wordList.search.locationDetailsButton') }}
-          </button>
-          <AppModal
-            v-model="searchFieldModalOpen"
-            :title="t('words.wordList.search.settings')"
-            size="sm"
-            :close-label="t('common.button.close')"
-            @close="searchFieldModalOpen = false"
-          >
-            <div class="search-field-modal">
-              <h4 class="search-field-modal-title">
-                {{ t('words.wordList.search.filterTitle') }}
-              </h4>
-              <div class="search-field-options">
-                <CheckBox
-                  v-for="field in searchFieldOptions"
-                  :key="field.value"
-                  :model-value="isFieldChecked(field.value)"
-                  :label="field.label"
-                  @update:model-value="(val) => toggleField(field.value, val)"
-                />
-              </div>
-            </div>
-            <div v-if="source === 'vocabulary'" class="search-field-mode-section">
-              <h4 class="search-field-modal-title">
-                {{ t('words.wordList.search.filterModeTitle') }}
-              </h4>
-              <RadioGroup
-                :model-value="filterMode"
-                name="vocabulary-filter-mode"
-                :options="filterModeOptions"
-                @update:model-value="emit('update:filterMode', $event)"
-              />
-            </div>
-            <div v-if="source === 'vocabulary'" class="search-field-mode-section">
-              <h4 class="search-field-modal-title">
-                {{ t('words.wordList.search.standardWordFilterMode') }}
-              </h4>
-              <SwitchToggle
-                v-model="localSingleSelect"
-                :show-label="true"
-                :active-text="t('words.wordList.search.singleSelect')"
-                :inactive-text="t('words.wordList.search.multiSelect')"
-                label-position="inside"
-                auto-width
-              />
-            </div>
-            <div v-if="source === 'character-notes'" class="search-field-mode-section">
-              <h4 class="search-field-modal-title">
-                {{ t('words.wordList.viewModes.label') }}
-              </h4>
-              <SwitchToggle
-                :model-value="viewMode === 'list'"
-                :show-label="true"
-                :active-text="t('words.wordList.viewModes.list')"
-                :inactive-text="t('words.wordList.viewModes.card')"
-                label-position="inside"
-                auto-width
-                @update:model-value="emit('update:viewMode', $event ? 'list' : 'card')"
-              />
-            </div>
-          </AppModal>
         </div>
       </div>
+
+      <div v-else class="field-filter">
+        <button
+          class="gear-btn"
+          type="button"
+          :title="t('words.wordList.search.settings')"
+          @click="searchFieldModalOpen = true"
+        >
+          <span aria-hidden="true"><InlineIcon icon="⚙️" /></span>
+        </button>
+        <button
+          class="pill-btn location-details-btn"
+          type="button"
+          :title="t('words.wordList.search.locationDetails')"
+          @click="emit('openLocationDetails')"
+        >
+          {{ t('words.wordList.search.locationDetailsButton') }}
+        </button>
+      </div>
+      <AppModal
+        v-model="searchFieldModalOpen"
+        :title="t('words.wordList.search.settings')"
+        size="sm"
+        :close-label="t('common.button.close')"
+        @close="searchFieldModalOpen = false"
+      >
+        <div class="search-field-modal">
+          <h4 class="search-field-modal-title">
+            {{ t('words.wordList.search.filterTitle') }}
+          </h4>
+          <div class="search-field-options">
+            <CheckBox
+              v-for="field in searchFieldOptions"
+              :key="field.value"
+              :model-value="isFieldChecked(field.value)"
+              :label="field.label"
+              @update:model-value="(val) => toggleField(field.value, val)"
+            />
+          </div>
+        </div>
+        <div v-if="source === 'vocabulary'" class="search-field-mode-section">
+          <h4 class="search-field-modal-title">
+            {{ t('words.wordList.search.filterModeTitle') }}
+          </h4>
+          <RadioGroup
+            :model-value="filterMode"
+            name="vocabulary-filter-mode"
+            :options="filterModeOptions"
+            @update:model-value="emit('update:filterMode', $event)"
+          />
+        </div>
+        <div v-if="source === 'vocabulary'" class="search-field-mode-section">
+          <h4 class="search-field-modal-title">
+            {{ t('words.wordList.search.standardWordFilterMode') }}
+          </h4>
+          <SwitchToggle
+            v-model="localSingleSelect"
+            :show-label="true"
+            :active-text="t('words.wordList.search.singleSelect')"
+            :inactive-text="t('words.wordList.search.multiSelect')"
+            label-position="inside"
+            auto-width
+          />
+        </div>
+        <div v-if="source === 'character-notes'" class="search-field-mode-section">
+          <h4 class="search-field-modal-title">
+            {{ t('words.wordList.viewModes.label') }}
+          </h4>
+          <SwitchToggle
+            :model-value="viewMode === 'list'"
+            :show-label="true"
+            :active-text="t('words.wordList.viewModes.list')"
+            :inactive-text="t('words.wordList.viewModes.card')"
+            label-position="inside"
+            auto-width
+            @update:model-value="emit('update:viewMode', $event ? 'list' : 'card')"
+          />
+        </div>
+      </AppModal>
 
     </div>
 
     <div
+      :id="source === 'character-notes' ? 'vocabulary-notes-scope-filter' : undefined"
       class="filter-strip"
       :class="{ 'notes-scope-filter': source === 'character-notes' }"
     >
@@ -248,7 +261,11 @@
             @update:model-value="emit('update:selectedCity', $event)"
           />
         </div>
-        <div v-else class="location-filter">
+        <div
+          v-else
+          class="location-filter"
+          :class="{ 'partition-filter': ['yindian', 'map'].includes(filterMode) }"
+        >
           <RegionSelector
             :mode="filterMode"
             :selected="selectedRegions"
@@ -638,6 +655,13 @@ const standardWordTriggerLabel = computed(() => {
   align-items: center;
 }
 
+.notes-search-settings {
+  @include flex-col;
+  flex: 0 0 auto;
+  gap: 10px;
+  align-items: center;
+}
+
 .field-filter {
   display: flex;
   flex: 0 0 auto;
@@ -814,6 +838,8 @@ const standardWordTriggerLabel = computed(() => {
   .field-filter {
     flex: 0 0 auto;
   }
+
+  .notes-search-settings { flex-direction: row; }
 
   .filter-strip {
     flex: 1 1 100%;

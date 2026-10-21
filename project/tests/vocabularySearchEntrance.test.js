@@ -52,6 +52,7 @@ vi.mock('../src/main/views/explore/word/vocabulary/VocabularyTopControls.vue', (
       controlProps = props
       emitControl = emit
       return () => h('div', [
+        props.source === 'character-notes' ? h('div', { id: 'vocabulary-notes-scope-filter', class: 'filter-strip notes-scope-filter' }) : null,
         h('button', { class: 'submit', onClick: () => {
           emit('update:query', '')
           if (props.source === 'character-notes') emit('refreshNotes')
@@ -96,7 +97,7 @@ beforeEach(() => {
 afterEach(() => { app?.unmount(); host?.remove(); vi.restoreAllMocks(); vi.unstubAllGlobals() })
 
 describe('vocabulary configuration entrance', () => {
-  it('keeps notes scope outside the panel through collapse and blocks refresh while resolving', async () => {
+  it('moves the same notes scope into the compact panel and blocks refresh while resolving', async () => {
     await mount({ source: 'character-notes' })
     const scopeInput = host.querySelector('.notes-scope-input')
     expect(scopeInput).not.toBeNull()
@@ -108,6 +109,11 @@ describe('vocabulary configuration entrance', () => {
     await settle()
     expect(controlProps.notesRefreshDisabled).toBe(false)
     entrance.$.exposed.progress.value = 1
+    await settle()
+    expect(host.querySelector('.notes-scope-input')).toBe(scopeInput)
+    expect(host.querySelector('.query-search-panel').contains(scopeInput)).toBe(true)
+    expect(host.querySelector('.notes-scope-filter').contains(scopeInput)).toBe(true)
+    entrance.$.exposed.progress.value = 0
     await settle()
     expect(host.querySelector('.notes-scope-input')).toBe(scopeInput)
     expect(host.querySelector('.query-search-panel').contains(scopeInput)).toBe(false)

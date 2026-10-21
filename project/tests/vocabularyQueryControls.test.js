@@ -63,12 +63,15 @@ describe('vocabulary query submission in the same input', () => {
       expect(radios().filter(input => input.checked)).toHaveLength(1)
       expect(!!host.querySelector('.location-select-trigger')).toBe(mode === 'location')
       expect(!!host.querySelector('.test-region-selector')).toBe(['yindian', 'map'].includes(mode))
+      expect(!!host.querySelector('.partition-filter')).toBe(['yindian', 'map'].includes(mode))
       if (['yindian', 'map'].includes(mode)) expect(host.querySelector('.test-region-selector').dataset.mode).toBe(mode)
     }
   })
   it('uses only the existing notes action to search the latest input and apply the scope', async () => {
     const { type, updateQuery, search, refresh } = await mountControls(true, { source: 'character-notes' })
     expect(host.querySelector('.query-submit')).toBeNull()
+    expect(host.querySelector('.notes-search-settings .notes-refresh-action')).not.toBeNull()
+    expect(host.querySelector('.notes-search-settings .gear-btn')).not.toBeNull()
     const button = host.querySelector('.notes-refresh-action')
     expect(button.textContent.trim()).toBe('搜索')
     expect(button.querySelector('svg circle')).not.toBeNull()

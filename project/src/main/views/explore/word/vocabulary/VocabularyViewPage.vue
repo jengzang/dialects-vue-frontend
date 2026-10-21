@@ -41,8 +41,13 @@
     />
     </template>
     <template #outside-panel>
-      <LocationAndRegionInput
+      <Teleport
         v-if="isCharacterNotesMode"
+        to="#vocabulary-notes-scope-filter"
+        defer
+        :disabled="isSearchExpanded"
+      >
+      <LocationAndRegionInput
         :model-value="draftScope"
         allow-empty-scope
         disable-location-limit
@@ -50,6 +55,7 @@
         @update:run-disabled="handleNotesScopeDisabled"
         @locations-resolved="handleNotesScopeResolved"
       />
+      </Teleport>
     </template>
     <template #after-panel>
       <RadioGroup

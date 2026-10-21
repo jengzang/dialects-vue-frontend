@@ -167,7 +167,7 @@ defineExpose({ collapse, progress })
     }
 
     :deep(.query-controls--notes) {
-      grid-template-areas: 'input action' 'range range' 'modes tools';
+      grid-template-areas: 'input action';
     }
 
     :deep(.query-controls--yubao) {
@@ -200,15 +200,21 @@ defineExpose({ collapse, progress })
       justify-self: end;
     }
 
-    :deep(.query-controls-layout .query-submit),
-    :deep(.query-controls-layout .notes-mode-actions) {
+    :deep(.query-controls-layout .query-submit) {
       grid-area: action;
+    }
+
+    :deep(.query-controls-layout .notes-search-settings) {
+      grid-area: action;
+      justify-self: end;
     }
 
     :deep(.query-controls-layout .field-filter) {
       grid-area: tools;
       justify-self: end;
     }
+
+    :deep(.query-controls-layout .notes-search-settings .field-filter) { grid-area: auto; }
 
     :deep(.query-controls--vocabulary .field-filter) { align-self: end; }
 
@@ -225,6 +231,11 @@ defineExpose({ collapse, progress })
       flex: 1 1 220px;
       min-width: 0;
       width: auto;
+    }
+
+    :deep(.query-range > .partition-filter) {
+      flex: 0 1 420px;
+      max-width: 420px;
     }
 
     :deep(.query-range .location-select-trigger) {
@@ -306,13 +317,13 @@ defineExpose({ collapse, progress })
       grid-template-areas: 'input input' 'modes action' 'range tools';
     }
     :deep(.query-controls--notes) {
-      grid-template-areas: 'input input' 'action action' 'range range' 'modes tools';
+      grid-template-areas: 'input input' 'action action';
     }
     :deep(.query-controls--yubao) {
       grid-template-areas: 'category category' 'input input' 'action action';
     }
     :deep(.query-search-action),
-    :deep(.query-controls-layout .notes-mode-actions) { justify-self: end; }
+    :deep(.query-controls-layout .notes-search-settings) { justify-self: end; }
     :deep(.query-condition-label) { display: none; }
   }
 }
