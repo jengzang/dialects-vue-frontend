@@ -4,12 +4,6 @@
       <div class="upload-mode glass-panel">
         <div class="upload-head">
           <h3>{{ t('words.wordList.upload.title') }}</h3>
-          <div class="upload-head-counts">
-            <span>{{ t('words.wordList.upload.totalEntries', { count: vocabTotalCount ?? '…' }) }}</span>
-            <span class="count-sep">·</span>
-            <span>{{ t('words.wordList.upload.totalLocations', { count: vocabLocationCount ?? '…' }) }}</span>
-          </div>
-
           <div class="upload-head-actions">
             <div
               v-if="shouldShowPermissionRequest"
@@ -525,7 +519,7 @@ import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { PhArrowsClockwise, PhDownloadSimple } from '@phosphor-icons/vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { getVocabularyCounts, getVocabularyLocations, previewVocabularyImport, uploadVocabulary } from '@/api'
+import { getVocabularyCounts, getVocabularyLocations, invalidateVocabularyCountsCache, previewVocabularyImport, uploadVocabulary } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
@@ -623,7 +617,7 @@ const vocabularyCountsSummary = computed(() => {
   })
 })
 
-onMounted(refreshVocabularyCounts)
+onMounted(() => { void refreshVocabularyCounts() })
 
 function navigateToSuggestion() {
   router.push({
@@ -1125,6 +1119,7 @@ async function handleImportAfterPreview() {
       overwrite: shouldConfirmOverwrite.value ? isOverwriteConfirmed.value : false,
       fill_standard_from_local: fillStandardFromLocal.value,
     })
+    invalidateVocabularyCountsCache()
     void refreshVocabularyCounts()
     const importedCount = Number(response.imported_count) || 0
     const errors = parseErrorDetails(response.errors)

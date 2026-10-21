@@ -16,6 +16,9 @@ const VOCABULARY_ADMIN_PERMISSIONS_ENDPOINT = '/api/vocabulary/admin/permissions
 const VOCABULARY_SQL_ENDPOINT = '/api/vocabulary/sql'
 const VOCABULARY_ENTRIES_TABLE = 'vocabulary_entries'
 let vocabularyEntryCreateLocationName = ''
+let vocabularyCountsCache = null
+let vocabularyCountsRequest = null
+let vocabularyCountsRequestId = 0
 
 function stripVocabularyDbKey(params = {}) {
   const rest = { ...params }
@@ -456,26 +459,55 @@ export async function getVocabularyLocations(params = {}) {
 }
 
 /**
- * 更新词表地点元数据。
+ * 清除词表总数缓存，例如词表导入成功后。
+ */
+export function invalidateVocabularyCountsCache() {
+  vocabularyCountsCache = null
+  vocabularyCountsRequestId += 1
+  vocabularyCountsRequest = null
+}
+
+/**
+ * 获取词条总数及拥有词条的方言点数，并复用当前会话中的请求和结果。
  *
- * @param {string} locationName
- * @param {object} data
- * @param {{user_id?: number|string}} [params={}]
- * @returns {Promise<object>}
+ * @returns {Promise<{total: number|null, locations: number|null}>}
  */
 export async function getVocabularyCounts() {
-  try {
-    const [totalResult, locationResult] = await Promise.all([
-      api(`${VOCABULARY_SQL_ENDPOINT}/query/count?table_name=${encodeURIComponent(VOCABULARY_ENTRIES_TABLE)}`),
-      api(`${VOCABULARY_SQL_ENDPOINT}/query/count?table_name=${encodeURIComponent(VOCABULARY_ENTRIES_TABLE)}&distinct_column=location_name`),
-    ])
-    return {
-      total: totalResult.count ?? 0,
-      locations: locationResult.count ?? 0,
+  if (vocabularyCountsCache) {
+    return { ...vocabularyCountsCache }
+  }
+  if (vocabularyCountsRequest) {
+    return vocabularyCountsRequest
+  }
+
+  const requestId = ++vocabularyCountsRequestId
+  const request = (async () => {
+    try {
+      const [totalResult, locationResult] = await Promise.all([
+        api(`${VOCABULARY_SQL_ENDPOINT}/query/count?table_name=${encodeURIComponent(VOCABULARY_ENTRIES_TABLE)}`),
+        api(`${VOCABULARY_SQL_ENDPOINT}/query/count?table_name=${encodeURIComponent(VOCABULARY_ENTRIES_TABLE)}&distinct_column=location_name`),
+      ])
+      const counts = {
+        total: totalResult.count ?? 0,
+        locations: locationResult.count ?? 0,
+      }
+      if (requestId === vocabularyCountsRequestId) {
+        vocabularyCountsCache = counts
+      }
+      return counts
+    } catch (error) {
+      console.error('Get vocabulary counts error:', error)
+      return { total: null, locations: null }
     }
-  } catch (error) {
-    console.error('Get vocabulary counts error:', error)
-    return { total: null, locations: null }
+  })()
+
+  vocabularyCountsRequest = request
+  try {
+    return await request
+  } finally {
+    if (requestId === vocabularyCountsRequestId && vocabularyCountsRequest === request) {
+      vocabularyCountsRequest = null
+    }
   }
 }
 

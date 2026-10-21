@@ -17,6 +17,18 @@
   color: var(--text-primary);
 }
 
+.vocabulary-counts-footer {
+  @include flex-center;
+  gap: 8px;
+  padding: 14px 12px 24px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.vocabulary-counts-separator {
+  color: var(--text-muted, var(--text-secondary));
+}
+
 .page-tab-navigation {
   position: sticky;
   top: 0;
@@ -1163,20 +1175,6 @@
   }
 }
 
-.upload-head-counts {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-left: auto;
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-  white-space: nowrap;
-
-  .count-sep {
-    color: var(--text-muted, var(--text-secondary));
-  }
-}
-
 .upload-head-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1439,10 +1437,21 @@
 
   .upload-head {
     align-items: center;
+    flex-wrap: nowrap;
   }
 
   .upload-head-actions {
-    flex: 1 0 100%;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .upload-access-notice {
+    min-width: 0;
+    max-width: 100%;
+
+    p {
+      min-width: 0;
+    }
   }
 
   .upload-location-summary,

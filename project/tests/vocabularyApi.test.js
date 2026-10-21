@@ -31,6 +31,8 @@ const {
   getVocabularyLocationOptions,
   getVocabularyPartitionOptions,
   getVocabularyLocations,
+  getVocabularyCounts,
+  invalidateVocabularyCountsCache,
   getVocabularyLogs,
   deleteVocabularyLocation,
   updateVocabularyLocation,
@@ -51,7 +53,37 @@ function readSource(path) {
 
 beforeEach(() => {
   apiMock.mockReset()
+  invalidateVocabularyCountsCache()
   setVocabularyEntryCreateLocationName('')
+})
+
+describe('vocabulary counts API', () => {
+  it('shares count requests and cached results until invalidated', async () => {
+    apiMock
+      .mockResolvedValueOnce({ count: 120 })
+      .mockResolvedValueOnce({ count: 18 })
+
+    const [first, concurrent] = await Promise.all([
+      getVocabularyCounts(),
+      getVocabularyCounts(),
+    ])
+
+    expect(first).toEqual({ total: 120, locations: 18 })
+    expect(concurrent).toEqual(first)
+    expect(apiMock).toHaveBeenCalledTimes(2)
+    expect(apiMock).toHaveBeenNthCalledWith(1, '/api/vocabulary/sql/query/count?table_name=vocabulary_entries')
+    expect(apiMock).toHaveBeenNthCalledWith(2, '/api/vocabulary/sql/query/count?table_name=vocabulary_entries&distinct_column=location_name')
+    expect(await getVocabularyCounts()).toEqual(first)
+    expect(apiMock).toHaveBeenCalledTimes(2)
+
+    invalidateVocabularyCountsCache()
+    apiMock
+      .mockResolvedValueOnce({ count: 121 })
+      .mockResolvedValueOnce({ count: 19 })
+
+    expect(await getVocabularyCounts()).toEqual({ total: 121, locations: 19 })
+    expect(apiMock).toHaveBeenCalledTimes(4)
+  })
 })
 
 describe('vocabulary items API', () => {

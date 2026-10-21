@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   notes: vi.fn(async () => ({ items: [], total: 0 })),
   points: vi.fn(async () => ({ points: [] })),
   words: vi.fn(async () => []),
+  counts: vi.fn(async () => ({ total: 95003, locations: 29 })),
   locations: vi.fn(async () => [{ value: '测试地点', label: '测试地点', province: '广东', city: '广州' }]),
   partitions: vi.fn(async region_mode => ({ schema_version: 2, region_mode, nodes: [] })),
   tableMount: vi.fn(),
@@ -19,6 +20,7 @@ vi.mock('vue-router', () => ({
 vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: key => key }) }))
 vi.mock('@/api', () => ({
   getVocabularyItems: mocks.items,
+  getVocabularyCounts: mocks.counts,
   getVocabularyLocationOptions: mocks.locations,
   getVocabularyPartitionOptions: mocks.partitions,
   getVocabularyMapItems: mocks.points,
