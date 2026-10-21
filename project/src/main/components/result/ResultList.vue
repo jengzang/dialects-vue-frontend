@@ -91,8 +91,10 @@
               type="button"
               class="export-btn"
               @click.stop="toggleExportDropdown"
+              :aria-label="t('result.resultList.export.button')"
             >
-              {{ t('result.resultList.export.button') }}
+              <span class="export-btn-label">{{ t('result.resultList.export.button') }}</span>
+              <PhDownloadSimple class="export-btn-icon" :size="18" aria-hidden="true" />
             </button>
             <div class="export-dropdown" :class="{ open: isExportDropdownOpen }">
               <button
@@ -153,6 +155,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import { PhDownloadSimple } from '@phosphor-icons/vue'
 import { ref, computed, watch, onMounted, nextTick, onUnmounted, onActivated, onDeactivated } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DataRow from './DataRow.vue';
@@ -860,10 +863,6 @@ $transition-duration: 0.2s;
   font-family: var(--font-sans);
   font-size: 14px;
   transform: translate(-50%, -50%);
-
-  @media (orientation: portrait) {
-    left: 47% !important;
-  }
 }
 
 .stickybar-filter-trigger {
@@ -922,11 +921,6 @@ $transition-duration: 0.2s;
   gap: 12px;
   align-items: center;
   transform: translateY(-50%);
-
-  @media (orientation: portrait) {
-    right: 1%;
-    gap: 6px;
-  }
 }
 
 .export-wrapper {
@@ -954,6 +948,10 @@ $transition-duration: 0.2s;
     background: var(--glass-40);
     box-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.4);
   }
+}
+
+.export-btn-icon {
+  display: none;
 }
 
 .export-dropdown {
@@ -1009,6 +1007,43 @@ $transition-duration: 0.2s;
     &:hover:not(.is-disabled) {
       transform: scale(1.3);
     }
+  }
+}
+
+@media (max-aspect-ratio: 1 / 1) {
+  .sticky-bar-inner {
+    width: 100%;
+    height: auto;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 6px;
+  }
+
+  .stickybar-filter-wrapper,
+  .stickybar-right {
+    position: relative;
+    top: auto;
+    right: auto;
+    left: auto;
+    transform: none;
+  }
+
+  .stickybar-right {
+    gap: 6px;
+  }
+
+  .export-btn {
+    width: 34px;
+    height: 30px;
+    padding: 4px;
+  }
+
+  .export-btn-label {
+    display: none;
+  }
+
+  .export-btn-icon {
+    display: block;
   }
 }
 </style>
