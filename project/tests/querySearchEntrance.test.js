@@ -75,6 +75,7 @@ describe('one query panel morphing with scroll', () => {
 
   it('continuously morphs the same controls and restores them when scrolling back', async () => {
     await mountEntrance()
+    await entrance.collapse()
     const input = host.querySelector('.original-query')
     const filter = host.querySelector('.original-filter')
     input.value = '饮水'
@@ -96,6 +97,21 @@ describe('one query panel morphing with scroll', () => {
     expect(host.querySelector('.original-query')).toBe(input)
     expect(host.querySelector('.original-filter')).toBe(filter)
     expect(input.value).toBe('饮水')
+    scrollPosition = Math.floor(end)
+    window.dispatchEvent(new Event('scroll'))
+    await settle()
+    expect(entrance.progress).toBe(0)
+  })
+
+  it('keeps the panel expanded when scrolling before submitting a query', async () => {
+    await mountEntrance()
+    scrollPosition = 500
+    window.dispatchEvent(new Event('scroll'))
+    await settle()
+    expect(entrance.progress).toBe(0)
+    expect(host.querySelector('.query-search-panel.is-compact')).toBeNull()
+    expect(host.querySelector('.search')).not.toBeNull()
+    expect(window.scrollTo).not.toHaveBeenCalled()
   })
 
   it('scrolls the existing panel to its compact position only on clicking search', async () => {
@@ -116,6 +132,7 @@ describe('one query panel morphing with scroll', () => {
     props.title = '字表注释'
     await settle()
     expect(host.querySelector('.query-intro h2').textContent).toBe('字表注释')
+    await entrance.collapse()
     scrollPosition = 420 - window.innerHeight * 0.12
     window.dispatchEvent(new Event('scroll'))
     await settle()

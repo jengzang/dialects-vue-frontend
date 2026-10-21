@@ -39,6 +39,7 @@ const panelStyle = computed(() => ({
   '--query-expansion': props.enabled ? 1 - progress.value : 0,
 }))
 let scrollFrame = null
+let hasSubmittedQuery = false
 
 function compactPosition() {
   const viewportInset = window.innerHeight * (window.matchMedia('(max-aspect-ratio: 1 / 1)').matches ? 0.16 : 0.12)
@@ -49,11 +50,17 @@ function compactPosition() {
 
 function updateProgress() {
   scrollFrame = null
+  if (props.enabled && !hasSubmittedQuery) {
+    progress.value = 0
+    return
+  }
   const distance = introEl.value?.getBoundingClientRect().height || 0
   const remaining = compactPosition() - window.scrollY
-  progress.value = props.enabled && distance
+  const nextProgress = props.enabled && distance
     ? remaining <= 1 ? 1 : Math.max(0, Math.min(1, 1 - remaining / distance))
     : 1
+  if (props.enabled && progress.value > 0 && nextProgress === 0) hasSubmittedQuery = false
+  progress.value = nextProgress
 }
 
 function handleScroll() {
@@ -62,6 +69,7 @@ function handleScroll() {
 
 async function collapse() {
   if (!props.enabled) return
+  hasSubmittedQuery = true
   await nextTick()
   window.scrollTo({
     top: compactPosition(),
