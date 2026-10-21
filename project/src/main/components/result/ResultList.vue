@@ -1,11 +1,13 @@
 <template>
-  <div class="Panel">
+  <div
+    ref="panelRef"
+    class="Panel"
+  >
     <div
         id="resultPanelContent"
         class="panel-content"
         ref="scrollContainerRef"
         :style="{
-          overflowY: 'auto',
           marginBottom: isCondensedMode ? '0' : '50px'
         }"
     >
@@ -13,7 +15,7 @@
         {{ t('result.resultList.emptyState') }}
       </div>
 
-      <div v-else class="result-panel-vue" :style="{ height: panelHeight }">
+      <div v-else class="result-panel-vue">
         <div class="reading-legend" role="note" :aria-label="t('result.resultList.readingLegend.ariaLabel')">
           <span class="reading-legend-title">{{ t('result.resultList.readingLegend.title') }}</span>
           <span
@@ -37,7 +39,13 @@
       </div>
     </div>
 
-    <div id="stickyContextBar" class="sticky-label2" style="display: block;" v-if="hasData">
+    <div
+      id="stickyContextBar"
+      ref="stickyToolbarRef"
+      v-if="hasData"
+      class="sticky-label2"
+      style="display: block;"
+    >
       <div class="sticky-bar-inner">
         <div class="stickybar-location-wrapper" ref="locationWrapperRef">
           <div
@@ -145,7 +153,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import { ref, computed, watch, onMounted, nextTick, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, nextTick, onUnmounted, onActivated, onDeactivated } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DataRow from './DataRow.vue';
 import { parseFeatureString,get_detail } from '@/main/utils/query/ResultTable.js';
@@ -179,7 +187,9 @@ const readingLegendItems = computed(() => {
 // === 核心数据 (保持不变) ===
 const tableData = ref([]);
 const visibleRows = ref(30);
+const panelRef = ref(null);
 const scrollContainerRef = ref(null);
+const stickyToolbarRef = ref(null);
 const isCondensedMode = ref(props.isCondensed);
 const currentStickyLocation = ref('');
 const isFilterOpen = ref(false);
@@ -189,7 +199,6 @@ const filterWrapperRef = ref(null);
 const locationWrapperRef = ref(null);
 const exportWrapperRef = ref(null);
 const selectedValues = ref([]);
-const panelHeight = ref('100%');
 
 // === 🌟 修改点：弹窗状态拆分 ===
 // 不再使用单一的 popupState，而是分开管理
@@ -323,46 +332,119 @@ watch(() => props.data, (newVal) => {
   if (tableData.value.length > 0) calculateStats();
 }, { immediate: true });
 
-// === Scroll & Sticky Logic (保持不变) ===
-const initScrollObserver = () => {
-  // ... (保留原本的 initScrollObserver 代码，太长省略)
+// The result list uses the page as its scroll container. Keep the toolbar
+// pinned to the viewport while this panel is active, then clamp it to the
+// panel's bottom edge so it moves away before the page footer begins.
+let pageScrollFrame = null;
+let pageScrollObserverAttached = false;
+let panelResizeObserver = null;
+
+const updatePageScrollState = () => {
+  pageScrollFrame = null;
+
+  const panel = panelRef.value;
   const content = scrollContainerRef.value;
-  if (!content) return;
-  let lastScrollTop = 0;
-  const visibleLocations = [];
-  const handleScroll = (event) => {
-    const el = event.target;
-    const scrollDirection = el.scrollTop > lastScrollTop ? 'down' : 'up';
-    lastScrollTop = el.scrollTop;
-    if (Math.abs(el.scrollHeight - el.scrollTop - el.clientHeight) < 50 && visibleRows.value < sortedData.value.length) {
-      visibleRows.value += 20;
+  const toolbar = stickyToolbarRef.value;
+  if (!panel || !content) return;
+
+  const panelRect = panel.getBoundingClientRect();
+  const panelTop = panelRect.top + panel.clientTop;
+  const panelBottom = panelTop + panel.clientHeight;
+  const viewportHeight = window.innerHeight;
+  if (toolbar) {
+    Object.assign(toolbar.style, {
+      left: `${panelRect.left + panel.clientLeft}px`,
+      right: 'auto',
+      width: `${panel.clientWidth}px`
+    });
+  }
+  const toolbarHeight = toolbar?.offsetHeight || 0;
+
+  if (toolbar) {
+    const isPanelInViewport = panelBottom > 0 && panelTop < viewportHeight;
+    if (!isPanelInViewport) {
+      toolbar.style.visibility = 'hidden';
+    } else {
+      const top = Math.max(
+        panelTop,
+        Math.min(viewportHeight - toolbarHeight, panelBottom - toolbarHeight)
+      );
+      Object.assign(toolbar.style, {
+        top: `${top}px`,
+        visibility: 'visible'
+      });
     }
-    const contentRect = content.getBoundingClientRect();
-    const locations = [...content.querySelectorAll('.locations-vue')];
-    let lastVisibleLocation = null;
-    for (const loc of locations) {
-      const rect = loc.getBoundingClientRect();
-      if (rect.top >= contentRect.top && rect.top <= contentRect.bottom) {
-        lastVisibleLocation = loc;
-      }
+  }
+
+  const locationElements = [...content.querySelectorAll('.locations-vue')];
+  const visibleBottom = viewportHeight - toolbarHeight;
+  let currentLocation = '';
+  for (const locationElement of locationElements) {
+    const rect = locationElement.getBoundingClientRect();
+    if (rect.top <= visibleBottom) {
+      currentLocation = locationElement.textContent.trim();
+    } else {
+      break;
     }
-    if (lastVisibleLocation) {
-      const locName = lastVisibleLocation.textContent.trim();
-      currentStickyLocation.value = locName;
-      if (!visibleLocations.some(l => l.name === locName)) {
-        visibleLocations.push({ name: locName, scrollHeight: content.scrollTop });
-      }
-    } else if (scrollDirection === 'up') {
-      for (let i = visibleLocations.length - 1; i >= 0; i--) {
-        if (content.scrollTop > visibleLocations[i].scrollHeight - 50) {
-          currentStickyLocation.value = visibleLocations[i].name;
-          break;
-        }
-      }
-    }
-  };
-  content.addEventListener('scroll', handleScroll);
+  }
+  if (!currentLocation && locationElements.length > 0) {
+    currentLocation = locationElements[0].textContent.trim();
+  }
+  if (currentLocation) currentStickyLocation.value = currentLocation;
+
+  if (visibleRows.value >= sortedData.value.length) return;
+  const renderedRows = content.querySelectorAll('.data-row-vue');
+  const lastRenderedRow = renderedRows[renderedRows.length - 1];
+  if (!lastRenderedRow) return;
+
+  const lastRowRect = lastRenderedRow.getBoundingClientRect();
+  if (lastRowRect.bottom > 0 && lastRowRect.bottom <= viewportHeight + 50) {
+    visibleRows.value = Math.min(visibleRows.value + 20, sortedData.value.length);
+  }
 };
+
+const schedulePageScrollUpdate = () => {
+  if (!pageScrollObserverAttached || pageScrollFrame !== null) return;
+  pageScrollFrame = window.requestAnimationFrame(updatePageScrollState);
+};
+
+const attachPageScrollObserver = () => {
+  if (pageScrollObserverAttached) return;
+  pageScrollObserverAttached = true;
+  window.addEventListener('scroll', schedulePageScrollUpdate, { passive: true });
+  window.addEventListener('resize', schedulePageScrollUpdate);
+
+  if (typeof ResizeObserver !== 'undefined' && panelRef.value) {
+    panelResizeObserver = new ResizeObserver(schedulePageScrollUpdate);
+    panelResizeObserver.observe(panelRef.value);
+    if (stickyToolbarRef.value) panelResizeObserver.observe(stickyToolbarRef.value);
+  }
+
+  schedulePageScrollUpdate();
+};
+
+const detachPageScrollObserver = () => {
+  if (!pageScrollObserverAttached) return;
+  pageScrollObserverAttached = false;
+  window.removeEventListener('scroll', schedulePageScrollUpdate);
+  window.removeEventListener('resize', schedulePageScrollUpdate);
+  panelResizeObserver?.disconnect();
+  panelResizeObserver = null;
+  if (stickyToolbarRef.value) stickyToolbarRef.value.style.visibility = 'hidden';
+
+  if (pageScrollFrame !== null) {
+    window.cancelAnimationFrame(pageScrollFrame);
+    pageScrollFrame = null;
+  }
+};
+
+watch([hasData, visibleRows, isCondensedMode, sortedData], async () => {
+  await nextTick();
+  if (panelResizeObserver && stickyToolbarRef.value) {
+    panelResizeObserver.observe(stickyToolbarRef.value);
+  }
+  schedulePageScrollUpdate();
+});
 
 // === 🌟 修改点：Event Handlers ===
 
@@ -476,12 +558,9 @@ const scrollToLocation = async (locationName, dataIndex) => {
   );
 
   if (targetElement) {
-    const containerRect = content.getBoundingClientRect();
-    const targetRect = targetElement.getBoundingClientRect();
-
-    content.scrollTo({
-      top: content.scrollTop + targetRect.top - containerRect.top - content.clientTop,
+    targetElement.scrollIntoView({
       behavior: 'smooth',
+      block: 'start'
     });
 
     // Update current location
@@ -547,11 +626,20 @@ const handleExport = () => {
 
 onMounted(() => {
   document.addEventListener('click', handleGlobalClickForStickybar);
-  initScrollObserver();
+  attachPageScrollObserver();
+});
+
+onActivated(() => {
+  attachPageScrollObserver();
+});
+
+onDeactivated(() => {
+  detachPageScrollObserver();
 });
 
 onUnmounted(() => {
   document.removeEventListener('click', handleGlobalClickForStickybar);
+  detachPageScrollObserver();
 });
 </script>
 
@@ -590,9 +678,7 @@ $transition-duration: 0.2s;
   margin: 0 2dvw 1dvh;
   z-index: 1;
   @include flex-col;
-  height: 85dvh;
-  overflow: auto;
-  resize: both;
+  overflow: visible;
   border: 1px solid var(--border-light-gray);
   border-radius: $panel-radius;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
@@ -603,19 +689,16 @@ $transition-duration: 0.2s;
   @media (orientation: portrait) {
     width: calc(100% - 2dvw);
     margin: 0 1dvw 2dvh;
-    height: 74dvh;
   }
 }
 
 .panel-content {
   box-sizing: border-box;
-  display: flex;
-  flex: 1;
-  flex-direction: column;
+  @include flex-col;
+  flex: none;
   gap: 15px;
   padding: 13px;
   overflow: visible;
-  overflow-y: auto;
   color: $text-dark;
 }
 
@@ -658,11 +741,13 @@ $transition-duration: 0.2s;
 }
 
 .sticky-label2 {
-  position: absolute;
-  right: 0;
-  bottom: 0;
+  position: fixed;
+  top: 0;
+  right: auto;
   left: 0;
   z-index: 999;
+  box-sizing: border-box;
+  width: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -671,6 +756,7 @@ $transition-duration: 0.2s;
   font-size: 14px;
   font-weight: bold;
   background: var(--glass-30);
+  visibility: hidden;
   border-bottom: 1px solid rgba(204, 204, 204, 0.6);
   border-radius: var(--radius-md);
   backdrop-filter: blur(2px);
