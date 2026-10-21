@@ -85,7 +85,7 @@ describe('one query panel morphing with scroll', () => {
     input.value = '饮水'
     input.dispatchEvent(new Event('input', { bubbles: true }))
     const end = 420 - window.innerHeight * 0.12
-    scrollPosition = end - 120
+    scrollPosition = end - 64 - 120
     window.dispatchEvent(new Event('scroll'))
     await settle()
     expect(entrance.progress).toBeCloseTo(0.5)
@@ -106,6 +106,22 @@ describe('one query panel morphing with scroll', () => {
     window.dispatchEvent(new Event('scroll'))
     await settle()
     expect(entrance.progress).toBe(1)
+  })
+
+  it('holds compact through a short upward scroll, then expands progressively', async () => {
+    await mountEntrance()
+    await entrance.collapse()
+    const end = 420 - window.innerHeight * 0.12
+    for (const [offset, expected] of [[0, 1], [32, 1], [64, 1], [88, 0.9], [184, 0.5]]) {
+      scrollPosition = end - offset
+      window.dispatchEvent(new Event('scroll'))
+      await settle()
+      expect(entrance.progress).toBeCloseTo(expected)
+    }
+    scrollPosition = 0
+    window.dispatchEvent(new Event('scroll'))
+    await settle()
+    expect(entrance.progress).toBe(0)
   })
 
   it('keeps the panel expanded when scrolling before submitting a query', async () => {
