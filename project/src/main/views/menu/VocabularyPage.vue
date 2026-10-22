@@ -338,8 +338,9 @@ function navigateTo(path) {
 }
 
 watch(
-  () => [userStore.authReady, userStore.isAuthenticated, userStore.id, userStore.role],
+  () => [userStore.authReady, userStore.isAuthenticated, userStore.id, userStore.role, isContributeTabActive.value],
   () => {
+    if (!isContributeTabActive.value) return
     loadVocabularyMe()
   },
   { immediate: true }
