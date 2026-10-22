@@ -47,38 +47,82 @@
       </Teleport>
     </div>
 
-    <div class="lexicon-body">
-      <div v-if="groups.length === 0" class="empty-state">
-        {{ t('result.noData') }}
-      </div>
+    <div
+      :id="bodyId"
+      ref="viewportRef"
+      class="lexicon-viewport"
+      :class="{
+        'lexicon-viewport--collapsed': collapsible && !expanded,
+        'lexicon-viewport--faded': collapsible && !expanded && overflowing
+      }"
+    >
+      <div
+        ref="bodyRef"
+        class="lexicon-body"
+      >
+        <div v-if="groups.length === 0" class="empty-state">
+          {{ t('result.noData') }}
+        </div>
 
-      <template v-else>
-        <section v-for="group in groups" :key="group.key" class="lexicon-group">
-          <div v-if="group.label" class="group-label">{{ group.label }}</div>
-          <div v-for="row in group.rows" :key="row.key" class="lexicon-row">
-            <span v-if="row.prefix" class="row-prefix" :class="{ 'row-prefix--title': !group.label }">{{ row.prefix }}</span>
-            <span
-              v-for="segment in row.segments"
-              :key="segment.key"
-              class="lexicon-segment"
-            >
-              <span class="segment-tone">{{ segment.prefix }}</span>
+        <template v-else>
+          <section v-for="group in groups" :key="group.key" class="lexicon-group">
+            <div v-if="group.label" class="group-label">{{ group.label }}</div>
+            <div v-for="row in group.rows" :key="row.key" class="lexicon-row">
+              <span v-if="row.prefix" class="row-prefix" :class="{ 'row-prefix--title': !group.label }">{{ row.prefix }}</span>
               <span
-                v-for="(charItem, charIndex) in segment.chars"
-                :key="charIndex"
-                class="lexicon-char"
-                :style="charColorStyle(charItem.label)"
-              >{{ charItem.char }}<span v-if="readingMark(charItem.label)" class="reading-mark">({{ readingMark(charItem.label) }})</span></span>
-            </span>
-          </div>
-        </section>
-      </template>
+                v-for="segment in row.segments"
+                :key="segment.key"
+                class="lexicon-segment"
+              >
+                <span class="segment-tone">{{ segment.prefix }}</span>
+                <span
+                  v-for="(charItem, charIndex) in segment.chars"
+                  :key="charIndex"
+                  class="lexicon-char"
+                  :style="charColorStyle(charItem.label)"
+                >{{ charItem.char }}<span v-if="readingMark(charItem.label)" class="reading-mark">({{ readingMark(charItem.label) }})</span></span>
+              </span>
+            </div>
+          </section>
+        </template>
+      </div>
     </div>
+
+    <button
+      v-if="collapsible && overflowing"
+      type="button"
+      class="lexicon-toggle"
+      :aria-expanded="expanded"
+      :aria-controls="bodyId"
+      @click="expanded = !expanded"
+    >
+      <span
+        class="glass-button lexicon-toggle-icon"
+        aria-hidden="true"
+      >
+        <svg
+          :class="{ 'is-expanded': expanded }"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+        >
+          <path
+            d="m6 9 6 6 6-6"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </span>
+      <span>{{ t(`phonology.phonology.homophoneLexicon.${expanded ? 'collapse' : 'expandAll'}`) }}</span>
+    </button>
   </div>
 </template>
 
 <script setup>
-import { computed, ref, watch, useId } from 'vue'
+import { computed, ref, watch, useId, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
@@ -132,12 +176,46 @@ const props = defineProps({
   toolbarTo: {
     type: [String, Object],
     default: null
+  },
+  collapsible: {
+    type: Boolean,
+    default: false
   }
 })
 
 const emit = defineEmits(['update:displayMode', 'update:toneMode'])
 
 const displayModeRadioName = useId()
+const bodyId = useId()
+const viewportRef = ref(null)
+const bodyRef = ref(null)
+const expanded = ref(false)
+const overflowing = ref(false)
+let previewObserver
+
+const updatePreviewOverflow = () => {
+  if (!props.collapsible || expanded.value || !viewportRef.value) return
+  overflowing.value = viewportRef.value.scrollHeight > viewportRef.value.clientHeight + 1
+}
+
+onMounted(() => {
+  if (!props.collapsible) return
+  updatePreviewOverflow()
+  previewObserver = new ResizeObserver(updatePreviewOverflow)
+  previewObserver.observe(viewportRef.value)
+  previewObserver.observe(bodyRef.value)
+})
+
+onBeforeUnmount(() => previewObserver?.disconnect())
+
+watch(() => props.data, () => {
+  expanded.value = false
+})
+
+watch(expanded, async () => {
+  await nextTick()
+  updatePreviewOverflow()
+})
 
 const currentMode = ref(props.displayMode)
 
@@ -442,6 +520,57 @@ $text-secondary: var(--text-slate);
 
   @media (max-aspect-ratio: 1/1) {
     font-size: 13px;
+  }
+}
+
+.lexicon-viewport {
+  position: relative;
+
+  &--collapsed {
+    max-height: 66dvh;
+    overflow: hidden;
+
+    @media (max-aspect-ratio: 1/1) {
+      max-height: 60dvh;
+    }
+  }
+
+  &--faded {
+    mask-image: linear-gradient(to bottom, var(--text-primary) calc(100% - 80px), transparent);
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: auto 0 0;
+      height: 80px;
+      pointer-events: none;
+      @include glass-blur(2px);
+      mask-image: linear-gradient(to bottom, transparent, var(--text-primary));
+    }
+  }
+}
+
+.lexicon-toggle {
+  @include flex-col;
+  align-items: center;
+  gap: 8px;
+  margin: 8px auto 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+
+  .lexicon-toggle-icon {
+    --glass-button-border-radius: var(--radius-full);
+    --glass-button-padding: 8px;
+    --glass-button-shadow: var(--shadow-sm);
+
+    svg.is-expanded {
+      transform: rotate(180deg);
+    }
   }
 }
 

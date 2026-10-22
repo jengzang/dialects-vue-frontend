@@ -257,6 +257,8 @@
     },
     "homophoneLexicon": {
       "title": "Homophone Lexicon",
+      "expandAll": "Expand all",
+      "collapse": "Collapse",
       "modeLabel": "Display",
       "modeFinalGrouped": "By final",
       "modeSyllable": "By syllable",

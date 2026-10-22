@@ -56,6 +56,7 @@
           :location="location"
           :data="matrixData[location]"
           show-copy
+          collapsible
         />
       </template>
     </div>
