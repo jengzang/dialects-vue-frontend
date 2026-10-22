@@ -9,8 +9,38 @@
     >
       网站历史
     </h1>
+    <div
+      class="history-filter ui-tabs-navigation--segmented"
+      role="group"
+      aria-label="历史筛选"
+    >
+      <button
+        type="button"
+        class="ui-tab-item"
+        :class="{ active: !onlyImportant }"
+        :aria-pressed="!onlyImportant"
+        @click="onlyImportant = false"
+      >
+        全部历史
+      </button>
+      <button
+        type="button"
+        class="ui-tab-item"
+        :class="{ active: onlyImportant }"
+        :aria-pressed="onlyImportant"
+        @click="onlyImportant = true"
+      >
+        仅重要更新
+      </button>
+    </div>
+    <p
+      class="history-filter-summary hint"
+      aria-live="polite"
+    >
+      共 {{ visibleEntryCount }} 条更新
+    </p>
     <section
-      v-for="stage in historyStages"
+      v-for="stage in visibleStages"
       :key="stage.major"
       class="history-stage"
       :aria-labelledby="`history-stage-${stage.major}`"
@@ -30,10 +60,17 @@
           :key="entry.date"
           class="history-entry"
         >
-          <time
-            class="history-date"
-            :datetime="entry.dateTime"
-          >{{ entry.date }}</time>
+          <div class="history-date-column">
+            <time
+              class="history-date"
+              :datetime="entry.dateTime"
+            >{{ entry.date }}</time>
+            <span
+              v-if="entry.important"
+              class="hint"
+              :title="entry.importanceReason"
+            >重要更新</span>
+          </div>
           <p class="history-content">
             <template
               v-for="(part, partIndex) in entry.displayParts"
@@ -74,11 +111,18 @@
 </template>
 
 <script setup>
+import { computed, ref } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { historyStages } from './history.data.js'
 
 const route = useRoute()
+const onlyImportant = ref(false)
+const visibleStages = computed(() => historyStages.map(stage => ({
+  ...stage,
+  entries: onlyImportant.value ? stage.entries.filter(entry => entry.important) : stage.entries
+})))
+const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stage) => count + stage.entries.length, 0))
 </script>
 
 <style scoped lang="scss">
@@ -101,6 +145,24 @@ const route = useRoute()
     padding-top: 2rem;
     border-top: 1px solid var(--color-primary-border);
   }
+}
+
+.history-filter {
+  display: flex;
+  justify-content: center;
+  width: fit-content;
+  max-width: 100%;
+  margin: 1.5rem auto 0;
+  padding: 0.25rem;
+
+  .ui-tab-item {
+    padding: 0.6rem 1rem;
+  }
+}
+
+.history-filter-summary {
+  margin: 0.75rem 0 0;
+  text-align: center;
 }
 
 .history-stage-title {
@@ -136,6 +198,12 @@ const route = useRoute()
   &:last-child {
     padding-bottom: 0;
   }
+}
+
+.history-date-column {
+  @include flex-col;
+  gap: 0.25rem;
+  align-items: flex-start;
 }
 
 .history-date {

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { createApp } from 'vue'
+import { createApp, nextTick } from 'vue'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import HistoryPage from '../src/main/views/explore/history/HistoryGraph.vue'
 import { historyEntries } from '../src/main/views/explore/history/history.data.js'
@@ -70,6 +70,43 @@ describe('author-provided website history', () => {
     for (const stage of stages) {
       expect(stage.querySelector('.history-entry:last-child .history-connector')).toBeNull()
     }
+  })
+
+  it('identifies core capabilities and milestones rather than publicity or small refinements', () => {
+    const entryAt = date => historyEntries.find(entry => entry.date === date)
+    for (const date of ['2025.7.25', '2025.9.5', '2026.1.16', '2026.1.27', '2026.2.11', '2026.3.1', '2026.3.24']) {
+      expect(entryAt(date).important).toBe(true)
+      expect(entryAt(date).importanceReason).toBeTruthy()
+    }
+    for (const date of ['2025.5', '2025.8.2', '2025.8.27', '2025.9.2', '2025.9.19', '2026.2.8', '2026.2.17']) {
+      expect(entryAt(date).important).toBe(false)
+    }
+  })
+
+  it('filters important updates and restores all history without losing stages or links', async () => {
+    await mountHistory()
+    const allButton = [...host.querySelectorAll('button')].find(button => button.textContent.trim() === '全部历史')
+    const importantButton = [...host.querySelectorAll('button')].find(button => button.textContent.trim() === '仅重要更新')
+    expect(allButton?.getAttribute('aria-pressed')).toBe('true')
+    importantButton.click()
+    await nextTick()
+    const dates = () => [...host.querySelectorAll('.history-date')].map(time => time.textContent)
+    expect(dates()).toEqual(historyEntries.filter(entry => entry.important).map(entry => entry.date))
+    expect(dates().length).toBeLessThan(35)
+    expect(importantButton.getAttribute('aria-pressed')).toBe('true')
+    expect(allButton.getAttribute('aria-pressed')).toBe('false')
+    expect(host.querySelectorAll('.history-stage')).toHaveLength(5)
+    expect(host.querySelector('#history-stage-5').textContent).toContain('V5 完善原有功能，改进用户体验')
+    for (const stage of host.querySelectorAll('.history-stage')) {
+      const entries = stage.querySelectorAll('.history-entry')
+      expect(stage.querySelectorAll('.history-connector')).toHaveLength(Math.max(0, entries.length - 1))
+    }
+    expect(host.querySelector('a[href="/zh-Hant/explore/tools/praat"]')).not.toBeNull()
+    allButton.click()
+    await nextTick()
+    expect(dates()).toEqual(historyEntries.map(entry => entry.date))
+    expect(host.querySelectorAll('.history-connector')).toHaveLength(31)
+    expect(allButton.getAttribute('aria-pressed')).toBe('true')
   })
 
   it('uses the latest author versions and preserves the partial Vue migration wording', async () => {
