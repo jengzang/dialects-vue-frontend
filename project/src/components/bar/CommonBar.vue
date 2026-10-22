@@ -574,14 +574,14 @@ const handleSubmenuLeave = () => {
   }, 200)
 }
 
-const handleSubmenuClick = async (child) => {
+const handleSubmenuClick = (child) => {
   if (isInternalAppNavigationTarget(child.path)) {
     if (normalizedNavigationSchema.value && activeSubmenu.value) {
       writeCommonBarMemory(normalizedNavigationSchema.value, activeSubmenu.value, child.path)
     }
   }
-  await navigatePlatformLink(router, child.path, { external: child.external })
   activeSubmenu.value = null
+  return navigatePlatformLink(router, child.path, { external: child.external })
 }
 
 watch(

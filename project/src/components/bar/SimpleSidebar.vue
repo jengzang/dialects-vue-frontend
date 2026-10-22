@@ -382,10 +382,10 @@ const handleArrowClick = (item, key, event) => {
 }
 
 // Submenu item click handler
-const handleSubmenuClick = async (child) => {
+const handleSubmenuClick = (child) => {
   cancelCloseSubmenu()
-  await navigatePlatformLink(router, child.path, { external: child.external })
   closeSidebar()
+  return navigatePlatformLink(router, child.path, { external: child.external })
 }
 
 // 延遲關閉子菜單

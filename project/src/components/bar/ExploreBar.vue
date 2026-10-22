@@ -530,9 +530,9 @@ const handleSubmenuLeave = () => {
   }, 200)
 }
 
-const handleSubmenuClick = async (child) => {
-  await navigatePlatformLink(router, child.path, { external: child.external })
+const handleSubmenuClick = (child) => {
   activeSubmenu.value = null
+  return navigatePlatformLink(router, child.path, { external: child.external })
 }
 
 const toggleSidebar = () => {
