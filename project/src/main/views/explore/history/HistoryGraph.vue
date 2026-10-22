@@ -21,15 +21,26 @@
         >{{ entry.date }}</time>
         <p class="history-content">
           <template
-            v-for="(part, partIndex) in entry.parts"
+            v-for="(part, partIndex) in entry.displayParts"
             :key="partIndex"
           >
             <template v-if="typeof part === 'string'">
               {{ part }}
             </template>
+            <code
+              v-else-if="part.version"
+              class="history-version"
+            >{{ part.version }}</code>
+            <RouterLink
+              v-else-if="part.to"
+              class="text-action history-link history-link--internal"
+              :to="buildLocalePath(resolveRouteLocale(route), part.to)"
+            >
+              {{ part.text }}
+            </RouterLink>
             <a
               v-else
-              class="text-action"
+              class="text-action history-link history-link--external"
               :href="part.href"
               target="_blank"
               rel="noopener noreferrer"
@@ -47,7 +58,11 @@
 </template>
 
 <script setup>
+import { RouterLink, useRoute } from 'vue-router'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { historyEntries } from './history.data.js'
+
+const route = useRoute()
 </script>
 
 <style scoped lang="scss">
@@ -104,6 +119,43 @@ import { historyEntries } from './history.data.js'
   color: var(--text-primary);
   line-height: 1.9;
   overflow-wrap: anywhere;
+}
+
+// 本页的版本标签与两类行内链接需要在同一段原文中明显区分。
+.history-version {
+  padding: 0.1em 0.4em;
+  margin-inline: 0.15em;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.history-link {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--color-primary-hover);
+  }
+
+  &--external {
+    color: var(--color-secondary-text);
+    text-decoration-style: dotted;
+
+    &::after {
+      content: ' ↗';
+    }
+
+    &:hover,
+    &:focus-visible {
+      color: var(--color-secondary-hover);
+    }
+  }
 }
 
 // 时间线节点和箭头是本页独有的图形，其余表面与文字复用全站样式。

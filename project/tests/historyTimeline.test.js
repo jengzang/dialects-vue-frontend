@@ -1,26 +1,46 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createApp } from 'vue'
+import { createMemoryHistory, createRouter } from 'vue-router'
 import HistoryPage from '../src/main/views/explore/history/HistoryGraph.vue'
+import { historyEntries } from '../src/main/views/explore/history/history.data.js'
+import { menuRoutes } from '../src/main/router/menuRoutes.js'
+import { exploreRoutes } from '../src/main/router/exploreRoutes.js'
 
 let app
 let host
+let router
 
 afterEach(() => {
   app?.unmount()
   host?.remove()
 })
 
-function mountHistory() {
+async function mountHistory(locale = 'zh-Hant') {
+  const stubRoutes = routes => routes.map(route => ({
+    ...route,
+    component: { template: '<div />' },
+    children: route.children ? stubRoutes(route.children) : undefined
+  }))
+  router = createRouter({
+    history: createMemoryHistory(),
+    routes: [{ path: '/:locale(zh-CN|zh-Hant|en)', children: [
+      { path: '', component: { template: '<div />' } },
+      { path: 'auth/regions', component: { template: '<div />' } },
+      ...stubRoutes([...menuRoutes, ...exploreRoutes])
+    ] }]
+  })
+  await router.push(`/${locale}/explore/history`)
   host = document.createElement('div')
   document.body.append(host)
   app = createApp(HistoryPage)
+  app.use(router)
   app.mount(host)
   return [...host.querySelectorAll('ol > li')]
 }
 
 describe('author-provided website history', () => {
-  it('renders all 35 records chronologically and keeps month-only precision', () => {
-    const entries = mountHistory()
+  it('renders all 35 records chronologically and keeps month-only precision', async () => {
+    const entries = await mountHistory()
     expect(entries).toHaveLength(35)
     const dates = entries.map(entry => entry.querySelector('time').dateTime)
     expect(dates[0]).toBe('2025-05')
@@ -30,8 +50,8 @@ describe('author-provided website history', () => {
     expect(host.querySelectorAll('.history-connector')).toHaveLength(34)
   })
 
-  it('uses the latest author versions and preserves the partial Vue migration wording', () => {
-    const entries = mountHistory()
+  it('uses the latest author versions and preserves the partial Vue migration wording', async () => {
+    const entries = await mountHistory()
     const contentAt = date => entries.find(entry => entry.querySelector('time').dateTime === date).textContent
     expect(contentAt('2025-08-04')).toContain('开始部署在内网v1.0.0')
     expect(contentAt('2025-08-18')).toContain('分发exe供内测用户尝鲜。v1.0.5')
@@ -40,9 +60,9 @@ describe('author-provided website history', () => {
     expect(contentAt('2026-01-16')).toContain('原生js移至「旧版网站」入口，主站全部使用Vue3开发。v2.1.0')
   })
 
-  it('renders the four original Zhihu article URLs as safe clickable links', () => {
-    mountHistory()
-    const links = [...host.querySelectorAll('ol a')]
+  it('renders the four original Zhihu article URLs as safe clickable links', async () => {
+    await mountHistory()
+    const links = [...host.querySelectorAll('ol a[target="_blank"]')]
     expect(links.map(link => link.href)).toEqual([
       'https://zhuanlan.zhihu.com/p/1934345780199682731',
       'https://zhuanlan.zhihu.com/p/2001363637311381604',
@@ -55,5 +75,31 @@ describe('author-provided website history', () => {
     }
     expect(host.textContent).toContain('这也是我时隔近半年再次在知乎发文')
     expect(host.textContent).toContain('「方音圖鑑」总算有logo了。v1.3.0')
+  })
+
+  it('distinguishes every version while preserving all original body text', async () => {
+    await mountHistory()
+    const originalBodies = historyEntries.map(entry => entry.parts.map(part => typeof part === 'string' ? part : part.href).join(''))
+    expect([...host.querySelectorAll('.history-version')].map(el => el.textContent)).toEqual(originalBodies.flatMap(body => body.match(/v\d+\.\d+\.\d+/g) || []))
+    expect(host.querySelectorAll('.history-version').length).toBeGreaterThan(0)
+    expect([...host.querySelectorAll('.history-content')].map(el => el.textContent)).toEqual(originalBodies)
+    expect(host.querySelectorAll('.history-link--external')).toHaveLength(4)
+  })
+
+  it.each(['zh-CN', 'zh-Hant', 'en'])('links features to current routes in %s', async locale => {
+    await mountHistory(locale)
+    const links = [...host.querySelectorAll('a.history-link--internal')]
+    expect(links.length).toBeGreaterThan(30)
+    const hrefFor = text => links.find(link => link.textContent === text)?.getAttribute('href')
+    expect(hrefFor('查字')).toBe(`/${locale}/menu/query/char`)
+    expect(hrefFor('粤拼转ipa')).toBe(`/${locale}/explore/tools/jyut2ipa`)
+    expect(hrefFor('音素分类')).toBe(`/${locale}/menu/pho/custom`)
+    expect(hrefFor('中古汉字树状图')).toBe(`/${locale}/explore/char-class?tab=zhonggu`)
+    for (const link of links) {
+      expect(router.resolve(link.getAttribute('href')).matched.length).toBeGreaterThan(1)
+      expect(link.getAttribute('target')).toBeNull()
+    }
+    links.find(link => link.textContent === '查字').click()
+    await vi.waitFor(() => expect(router.currentRoute.value.path).toBe(`/${locale}/menu/query/char`))
   })
 })

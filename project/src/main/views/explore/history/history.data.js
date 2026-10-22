@@ -1,4 +1,67 @@
 // 按作者提供的日期与原文记录；月份信息不补造具体日。
+// 只为有现存页面入口的功能添加内链；短名称按所在记录消除歧义。
+const featureLinks = {
+  '按中古地位整理声韵特征': '/menu/query/zhonggu',
+  '分析音位的中古来源': '/menu/query/yinwei',
+  '查中古': '/menu/query/zhonggu',
+  '查音位': '/menu/query/yinwei',
+  '查字': '/menu/query/char',
+  '查调': '/menu/query/tone',
+  '细分查询': '/menu/query/zhonggu',
+  '结果页面': '/menu/result',
+  '分区绘图': '/menu/map/divide',
+  '地图': '/menu/map/view',
+  '阳春自然村展示': '/explore/yc/villages',
+  '阳春口语词展示页面': '/explore/yc/words',
+  '右侧面板': '/menu/map/view',
+  '用户自定义数据添加': '/menu/map/view',
+  '资料来源': '/menu/source',
+  '自然村': '/menu/villages',
+  '语保': '/menu/yubao',
+  '词表': '/menu/vocabulary/view',
+  '字表检查': '/explore/tools/check',
+  '粤拼转ipa': '/explore/tools/jyut2ipa',
+  '字表合并': '/explore/tools/merge',
+  '广东省自然村树状图': '/explore/villages/gd',
+  '中古汉字树状图': '/explore/char-class?tab=zhonggu',
+  '语保1000词': '/menu/yubao?tab=vocabulary',
+  '50句': '/menu/yubao?tab=grammar',
+  '查音系': '/menu/pho/matrix',
+  '音节统计': '/menu/pho/count',
+  '音素分类': '/menu/pho/custom',
+  '语保地图展示': '/menu/yubao',
+  'Praat': '/explore/tools/praat',
+  '按行政区划、分区等逐一查看或选择地点': '/menu/query/zhonggu',
+  '自定义分区': '/auth/regions',
+  '自然村机器学习子系统': '/explore/villages/ml',
+  '首页': '/',
+  '切换语言': '/menu/settings'
+}
+
+const contextualLinks = {
+  '2026.1.29': { '表格': '/explore/villages/table' },
+  '2026.3.6': {
+    '汉字': '/menu/compare/char',
+    '中古': '/menu/compare/zhonggu',
+    '调类比较': '/menu/compare/tone'
+  }
+}
+
+function formatParts(entry) {
+  const links = { ...featureLinks, ...contextualLinks[entry.date] }
+  const labels = Object.keys(links).sort((a, b) => b.length - a.length)
+  const escapedLabels = labels.map(label => label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+  const pattern = new RegExp(`(v\\d+\\.\\d+\\.\\d+|${escapedLabels.join('|')})`, 'g')
+  return entry.parts.flatMap(part => {
+    if (typeof part !== 'string') return [part]
+    return part.split(pattern).filter(Boolean).map(text => {
+      if (/^v\d+\.\d+\.\d+$/.test(text)) return { version: text }
+      if (links[text]) return { text, to: links[text] }
+      return text
+    })
+  })
+}
+
 export const historyEntries = [
   { date: '2025.5', parts: ['整理湘赣粤土话的声韵地位特征时，缺乏实用工具，只得一份一份字表检索汉字，手动汇总到excel表格中，顿感无力。开始萌生了实现「按中古地位整理声韵特征」功能的想法。'] },
   { date: '2025.6.12', parts: ['实现了提取「汉字音典」开源字表的声韵调，并整理、汇总到excel表格中。当时仍处在Excel的舒适区中，成果也都只是通过xlsx或腾讯文档进行分享。'] },
@@ -37,5 +100,6 @@ export const historyEntries = [
   { date: '2026.3.24', parts: ['支持切换语言（繁体、简体、英文）；优化查询速度 v4.1.5'] }
 ].map(entry => ({
   ...entry,
+  displayParts: formatParts(entry),
   dateTime: entry.date.split('.').map((part, index) => index === 0 ? part : part.padStart(2, '0')).join('-')
 }))
