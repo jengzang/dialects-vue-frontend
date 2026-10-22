@@ -875,7 +875,7 @@ $panel-radius-portrait: 24px;
 
 .level-actions {
   display: inline-flex;
-  gap: 5px;
+  gap: 2px;
   align-items: center;
   justify-self: end;
 
@@ -902,6 +902,11 @@ $panel-radius-portrait: 24px;
 
   &.danger {
     --glass-button-color: var(--color-error);
+  }
+
+  &:disabled {
+    --glass-button-color: var(--text-secondary);
+    opacity: 0.3;
   }
 }
 
