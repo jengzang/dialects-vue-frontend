@@ -92,11 +92,12 @@
               </RouterLink>
               <a
                 v-else
-                class="text-action history-link history-link--external"
+                class="glass-button history-link--external"
+                data-size="compact"
                 :href="part.href"
                 target="_blank"
                 rel="noopener noreferrer"
-              >{{ part.href }}</a>
+              ><span class="history-external-url">{{ part.href }}</span></a>
             </template>
           </p>
           <span
@@ -169,6 +170,7 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
   margin: 0;
   color: var(--text-primary);
   line-height: 1.6;
+  text-align: center;
 }
 
 .history-timeline {
@@ -242,20 +244,30 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
   &:focus-visible {
     color: var(--color-primary-hover);
   }
+}
 
-  &--external {
-    color: var(--color-secondary-text);
-    text-decoration-style: dotted;
+.history-link--external {
+  --glass-button-color: var(--color-secondary-text);
+  --glass-button-compact-font-size: 0.9em;
+  --glass-button-compact-padding: 0.2em 0.5em;
+  --glass-button-border-radius: var(--radius-sm);
 
-    &::after {
-      content: ' ↗';
-    }
+  max-width: 100%;
+  margin-inline: 0.25em;
+  box-sizing: border-box;
+  vertical-align: middle;
+  text-align: start;
+  text-decoration: none;
 
-    &:hover,
-    &:focus-visible {
-      color: var(--color-secondary-hover);
-    }
+  &::after {
+    content: '↗';
+    flex-shrink: 0;
   }
+}
+
+.history-external-url {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 // 时间线节点和箭头是本页独有的图形，其余表面与文字复用全站样式。
