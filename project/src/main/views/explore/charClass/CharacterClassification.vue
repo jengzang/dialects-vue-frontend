@@ -1,7 +1,7 @@
 <template>
   <div class="char-class-page">
     <div class="page-shell">
-      <section class="config-panel glass-panel">
+      <section class="config-panel">
         <div class="panel-header">
           <div class="panel-title-group">
             <h1 class="page-title"><BarIcon :icon="activePageIcon" />{{ t(currentPageConfig.titleKey) }}</h1>
@@ -9,7 +9,7 @@
           </div>
         </div>
 
-        <div v-if="hasMultipleTables" class="control-section">
+        <div v-if="hasMultipleTables" class="control-section table-section">
           <div class="control-heading">{{ t('charClass.common.table') }}</div>
           <SimpleSelectDropdown
             :modelValue="selectedTableKey"
@@ -29,7 +29,7 @@
           />
         </div>
 
-        <div class="control-section levels-section">
+        <div class="control-section levels-section glass-panel">
           <div class="levels-header">
             <div>
               <div class="control-heading">{{ t('charClass.common.levels') }}</div>
@@ -637,7 +637,9 @@ $panel-radius: 28px;
 $panel-radius-portrait: 24px;
 
 .char-class-page {
+  @include flex-center;
   width: 100%;
+  min-height: 80dvh;
   padding: 12px 0 24px;
 }
 
@@ -650,7 +652,15 @@ $panel-radius-portrait: 24px;
   margin: 0 auto;
 }
 
-.config-panel,
+.config-panel {
+  @include flex-col;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  min-width: 0;
+}
+
+.levels-section,
 .tree-panel {
   padding: 22px;
   color: var(--text-dark);
@@ -663,12 +673,14 @@ $panel-radius-portrait: 24px;
 }
 
 .query-actions {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
+  @include flex-center;
 }
 
-.panel-header,
+.panel-header {
+  @include flex-center;
+  text-align: center;
+}
+
 .tree-header {
   display: flex;
   gap: 16px;
@@ -740,15 +752,23 @@ $panel-radius-portrait: 24px;
 .control-section {
   @include flex-col;
   gap: 12px;
-  margin-top: 20px;
-  @media (max-aspect-ratio: 1 / 1) {
-    margin-top: 3px;
-  }
+}
+
+.table-section {
+  width: min(100%, 420px);
+  align-items: center;
+}
+
+.levels-section {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .preset-section {
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 12px 16px;
 
   .control-heading {
@@ -764,9 +784,9 @@ $panel-radius-portrait: 24px;
 }
 
 .preset-list {
-  flex: 1 1 320px;
+  flex: 0 1 auto;
   min-width: 0;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 6px 12px;
 
   :deep(.liquid-radio-label) {
@@ -782,11 +802,12 @@ $panel-radius-portrait: 24px;
 .levels-header {
   display: flex;
   gap: 14px;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
 }
 
 .add-level-button {
+  flex-shrink: 0;
   color: var(--action-primary-text);
   padding: 4px;
   font-size: 14px;
