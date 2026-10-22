@@ -184,7 +184,7 @@
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { deleteVocabularyLocation, exportVocabularyLocation, getVocabularyLocations, transferVocabularyLocation, updateVocabularyLocation } from '@/api'
+import { deleteVocabularyLocation, exportVocabularyLocation, getVocabularyLocations, invalidateVocabularyOptionsCache, transferVocabularyLocation, updateVocabularyLocation } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 import LocationEditorModal from './LocationEditorModal.vue'
 import { LOCATION_BASE_FIELDS, TONE_FIELDS } from './vocabularyLocationFields.js'
@@ -357,6 +357,7 @@ async function handleSaveLocation(location, originalLocationName) {
   const params = location.user_id ? { user_id: location.user_id } : {}
   try {
     await updateVocabularyLocation(sourceName, payload, params)
+    invalidateVocabularyOptionsCache()
     showSuccess(t('words.wordList.locations.saveSuccess'))
     await loadVocabularyLocations()
     closeLocationEditor()
@@ -388,6 +389,7 @@ async function handleConfirmTransferLocation() {
         target_username: targetUsername,
       },
     )
+    invalidateVocabularyOptionsCache()
     showSuccess(t('words.wordList.locations.transfer.success', {
       name: result.location_name || transferLocationSource.value.location_name,
       user: result.target_username || result.target_user_id || targetUsername || targetUserId,
@@ -454,6 +456,7 @@ async function handleDeleteLocation(location) {
   try {
     const params = { user_id: location.user_id }
     const result = await deleteVocabularyLocation(location.location_name, params)
+    invalidateVocabularyOptionsCache()
     showSuccess(t('words.wordList.locations.deleteSuccess', { count: result.deleted_entries }))
     await loadVocabularyLocations()
   } catch (error) {

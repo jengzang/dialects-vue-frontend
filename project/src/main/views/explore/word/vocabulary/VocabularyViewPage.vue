@@ -683,7 +683,7 @@ function submitSearch(collapse) {
   hasSubmittedSearch.value = true
   // Notes apply their draft scope and start the query in refreshNotes.
   if (!isCharacterNotesMode.value) {
-    if (applyVocabularyQuery()) loadVocabularyLocationOptions()
+    if (applyVocabularyQuery()) loadVocabularyLocationOptionsForMode()
     loadActiveViewMode()
   }
   collapse()
@@ -1715,6 +1715,11 @@ function isCurrentVocabularyLocationOptionsRequest(requestKey) {
     && buildVocabularyQueryKey(appliedParams) === buildVocabularyQueryKey(draftParams)
 }
 
+function loadVocabularyLocationOptionsForMode() {
+  // 行政区模式只需要全量地点来派生省市；其他模式只取当前区域筛选后的地点。
+  return loadVocabularyLocationOptions({ unfiltered: filterMode.value === 'administrative' })
+}
+
 async function loadVocabularyLocationOptions({ unfiltered = false } = {}) {
   const params = unfiltered ? {} : buildVocabularyLocationOptionsParams()
   const requestKey = buildVocabularyMapRequestKey('location-options', params)
@@ -2024,8 +2029,7 @@ onMounted(async () => {
     return
   }
   void loadVocabularyCounts()
-  await loadVocabularyLocationOptions({ unfiltered: true })
-  if (filterMode.value !== 'location') await loadVocabularyLocationOptions()
+  await loadVocabularyLocationOptionsForMode()
   loadActiveViewMode()
 })
 
@@ -2081,13 +2085,14 @@ watch(selectedProvince, () => {
   selectedCity.value = ''
 })
 
-watch(filterMode, (mode) => {
+watch(filterMode, (mode, previousMode) => {
   localStorage.setItem('vocabulary_filter_mode', mode)
   selectedLocations.value = []
   selectedProvince.value = ''
   selectedCity.value = ''
   selectedRegions.value = []
   loadVocabularyPartitionTree()
+  if (previousMode && previousMode !== mode) loadVocabularyLocationOptionsForMode()
 }, { immediate: true })
 
 watch(selectedSearchFields, (val) => {
@@ -2119,8 +2124,7 @@ watch(isCharacterNotesMode, async (isNotes) => {
     closeNotesLocationPopup()
     void loadVocabularyCounts()
     loadVocabularyPartitionTree()
-    await loadVocabularyLocationOptions({ unfiltered: true })
-    await loadVocabularyLocationOptions()
+    await loadVocabularyLocationOptionsForMode()
     loadActiveViewMode()
   }
 })
@@ -2159,7 +2163,8 @@ watch([() => buildVocabularyQueryKey(buildDraftVocabularyQueryParams()), isVocab
   // Only a closed selector starts the delay; reopening cancels it without clearing results.
   vocabularyQueryTimer = setTimeout(() => {
     if (isCharacterNotesMode.value || isVocabularyFilterOpen.value || !applyVocabularyQuery()) return
-    loadVocabularyLocationOptions()
+    // 行政区模式的省市候选来自全量列表，不需要随查询范围重新拉取。
+    if (filterMode.value !== 'administrative') loadVocabularyLocationOptions()
     loadActiveViewMode()
   }, 250)
 })

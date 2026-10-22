@@ -104,7 +104,7 @@ describe('useViewportPinnedElement', () => {
 
     expect(placeholder.style.width).toBe('800px')
     expect(navigation.style.width).toBe('240px')
-    expect(navigation.style.left).toBe('20px')
+    expect(navigation.style.left).toBe('300px')
   })
 
   it('waits for the portrait navigation to reach the viewport top before pinning', async () => {
@@ -141,7 +141,7 @@ describe('useViewportPinnedElement', () => {
     expect(navigation.style.position).toBe('fixed')
     expect(navigation.style.top).toBe('0px')
     expect(navigation.style.width).toBe('240px')
-    expect(navigation.style.left).toBe('300px')
+    expect(navigation.style.left).toBe('20px')
   })
 
   it('recalculates the fixed navigation center after an orientation change', async () => {
@@ -151,6 +151,7 @@ describe('useViewportPinnedElement', () => {
     let placeholderLeft = 20
     let placeholderTop = 100
     let placeholderWidth = 800
+    let intrinsicNavigationWidth = 240
     const orientationQuery = {
       matches: false,
       addEventListener: vi.fn(),
@@ -172,7 +173,7 @@ describe('useViewportPinnedElement', () => {
         }
       }
       if (this.hasAttribute('data-pinned-navigation')) {
-        const width = Number.parseFloat(this.style.width) || 240
+        const width = Number.parseFloat(this.style.width) || intrinsicNavigationWidth
         const left = Number.parseFloat(this.style.left) || 300
         return { x: left, y: 100, left, top: 100, right: left + width, bottom: 150, width, height: 50 }
       }
@@ -185,11 +186,13 @@ describe('useViewportPinnedElement', () => {
     placeholderLeft = 10
     placeholderTop = -1
     placeholderWidth = 360
+    intrinsicNavigationWidth = 160
     orientationQuery.matches = true
     window.dispatchEvent(new Event('resize'))
     await nextTick()
 
-    expect(navigation.style.left).toBe('70px')
+    expect(navigation.style.left).toBe('110px')
+    expect(navigation.style.width).toBe('160px')
   })
 
   it('uses a dynamic portrait top offset when pinning below a fixed header', async () => {

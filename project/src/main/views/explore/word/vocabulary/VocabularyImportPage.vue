@@ -519,7 +519,7 @@ import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { PhArrowsClockwise, PhDownloadSimple } from '@phosphor-icons/vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { getVocabularyCounts, getVocabularyLocations, invalidateVocabularyCountsCache, previewVocabularyImport, uploadVocabulary } from '@/api'
+import { getVocabularyCounts, getVocabularyLocations, invalidateVocabularyCountsCache, invalidateVocabularyOptionsCache, previewVocabularyImport, uploadVocabulary } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
@@ -1120,6 +1120,7 @@ async function handleImportAfterPreview() {
       fill_standard_from_local: fillStandardFromLocal.value,
     })
     invalidateVocabularyCountsCache()
+    invalidateVocabularyOptionsCache()
     void refreshVocabularyCounts()
     const importedCount = Number(response.imported_count) || 0
     const errors = parseErrorDetails(response.errors)
