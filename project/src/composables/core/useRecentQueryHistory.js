@@ -2,7 +2,7 @@ import { ref, toValue, watch } from 'vue'
 
 const CONTEXTS = new Set([
   'query:tab1', 'query:tab2', 'query:tab3', 'query:tab4',
-  'compare:tab1', 'compare:tab2', 'compare:tab4',
+  'compare:tab1', 'compare:tab2', 'compare:tab4', 'compare:tab5',
   'pho:matrix', 'pho:custom',
 ])
 const clone = value => JSON.parse(JSON.stringify(value))

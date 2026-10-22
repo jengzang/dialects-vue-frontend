@@ -372,7 +372,7 @@
       <!-- Tab5: 比较音值 -->
       <div
         v-show="currentTab === 'tab5'"
-        class="compare-page-panel glass-panel tab5-page"
+        class="tab5-page"
       >
         <div class="page-content-stack">
           <!-- <div class="tone-tip">
@@ -443,14 +443,46 @@
             </div>
           </div>
         </div>
-        <PhoneticCompare
-          :query-locations="tabStates.tab5.queryLocations"
-          :active="currentTab === 'tab5'"
-          :enable-link-optimization="tabStates.tab5.enableLinkOptimization"
-          :ignore-polyphonic-chars="tabStates.tab5.ignorePolyphonicChars"
-          :min-link-char-count="tabStates.tab5.minLinkCharCount"
-          :min-node-char-count="tabStates.tab5.minNodeCharCount"
-        />
+        <RecentQueryPills
+          class="tab5-recent-queries"
+          :entries="recentQueries.entries.value"
+          :disabled="buttonState.isRunning || isRestoringHistory"
+          @restore="restoreRecentQuery"
+        >
+          <button
+            type="button"
+            class="pill-btn"
+            :title="DEFAULT_TAB5_LOCATIONS.join('、')"
+            :aria-label="DEFAULT_TAB5_LOCATIONS.join('、')"
+            @click="applyTab5DefaultLocations"
+          >
+            <span>{{ DEFAULT_TAB5_LOCATIONS.join('、') }}</span>
+            <svg
+              class="tab5-default-location-arrow"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M7 17L17 7M7 7h10v10" />
+            </svg>
+          </button>
+        </RecentQueryPills>
+        <div class="compare-page-panel glass-panel tab5-page">
+          <PhoneticCompare
+            :query-locations="tabStates.tab5.queryLocations"
+            :active="currentTab === 'tab5'"
+            :enable-link-optimization="tabStates.tab5.enableLinkOptimization"
+            :ignore-polyphonic-chars="tabStates.tab5.ignorePolyphonicChars"
+            :min-link-char-count="tabStates.tab5.minLinkCharCount"
+            :min-node-char-count="tabStates.tab5.minNodeCharCount"
+          />
+        </div>
       </div>
 
       <LocationAndRegionInput
@@ -725,6 +757,12 @@ const tabStates = reactive({
 
 // ========== Tab5 地点 URL 状态（与 Evolution 对齐） ==========
 const COMPARE_LOCATION_LIMIT = 5
+const DEFAULT_TAB5_LOCATIONS = ['蘇州', '上海', '嘉兴']
+
+function applyTab5DefaultLocations() {
+  tabStates.tab5.locations = [...DEFAULT_TAB5_LOCATIONS]
+  tabStates.tab5.matchedLocations = [...DEFAULT_TAB5_LOCATIONS]
+}
 
 const parseCompareLocationQuery = (value) => {
   return parseLocationsFromUrl(
@@ -1171,6 +1209,16 @@ async function restoreRecentQuery(snapshot) {
   const tab = currentTab.value
   isRestoringHistory.value = true
   try {
+    if (tab === 'tab5') {
+      const locations = Array.isArray(snapshot?.locations)
+        ? snapshot.locations.filter(Boolean).slice(0, COMPARE_LOCATION_LIMIT)
+        : []
+      if (locations.length < 2) return
+      tabStates.tab5.locations = [...locations]
+      tabStates.tab5.matchedLocations = [...locations]
+      return
+    }
+
     setPreferredCharacterTable(snapshot.table)
     if (tab === 'tab2') setZhongguInputMode(snapshot.mode)
     await nextTick()
@@ -1469,6 +1517,9 @@ const ZhongguRefCurrent = ref(null);  // For tab2 current selector
 const runTab5Action = () => {
   if (isTab5RunDisabled.value) return
 
+  const locations = [...tabStates.tab5.matchedLocations]
+  recentQueries.record({ locations }, locations.join(' '))
+
   if (!userStore.authReady) {
     return
   }
@@ -1482,8 +1533,8 @@ const runTab5Action = () => {
     return
   }
 
-  tabStates.tab5.queryLocations = [...tabStates.tab5.matchedLocations]
-  setLocationQuery(tabStates.tab5.matchedLocations.slice(0, COMPARE_LOCATION_LIMIT))
+  tabStates.tab5.queryLocations = locations
+  setLocationQuery(locations.slice(0, COMPARE_LOCATION_LIMIT))
 }
 
 // 點擊按鈕行為
@@ -2017,6 +2068,18 @@ $text-muted: var(--text-lightest);
   max-width: 900px;
 }
 
+.tab5-page {
+  @include flex-col;
+  align-items: center;
+  gap: 1.5dvh;
+  width: 100%;
+  font-size: 18px;
+}
+
+.tab5-default-location-arrow {
+  flex: 0 0 auto;
+}
+
 .page-content-stack {
   @include flex-col;
   align-items: center;
@@ -2524,6 +2587,10 @@ $text-muted: var(--text-lightest);
 }
 
 @media (max-aspect-ratio: #{1 / 1}) {
+  .tab5-page {
+    font-size: 16px;
+  }
+
   .card-row {
     gap: 0;
   }
