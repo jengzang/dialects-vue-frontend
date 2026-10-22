@@ -619,7 +619,7 @@ $ease-standard: 0.3s ease;@mixin glass-card(
   max-width: 900px;
   align-items: center;
   justify-content: center;
-  // margin: 0 auto;
+  margin: 0 auto;
   padding: 1dvw 8dvw;
   // background: var(--glass-05);
   // border: 1px solid var(--glass-10);

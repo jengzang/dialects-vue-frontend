@@ -474,6 +474,7 @@ $text-secondary: var(--text-slate);
 .homophone-lexicon {
   width: 100%;
   margin-top: 20px;
+  margin-bottom: 5dvh;
 }
 
 .lexicon-toolbar {

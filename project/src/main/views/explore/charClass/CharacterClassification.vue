@@ -31,18 +31,14 @@
 
         <div class="control-section levels-section glass-panel">
           <div class="levels-header">
-            <div>
               <div class="control-heading">{{ t('charClass.common.levels') }}</div>
-              <div class="section-hint">{{ t('charClass.common.levelsHint') }}</div>
-            </div>
-
-            <button
-              type="button"
-              class="action-btn add-level-button"
-              :disabled="!canAddLevel"
-              @click="addLevel"
-            >
-              {{ t('charClass.actions.addLevel') }}
+              <button
+                type="button"
+                class="action-btn add-level-button"
+                :disabled="!canAddLevel"
+                @click="addLevel"
+              >
+                {{ t('charClass.actions.addLevel') }}
             </button>
           </div>
 
@@ -104,6 +100,7 @@
           <div v-if="!canAddLevel" class="section-hint limit-hint">
             {{ t('charClass.states.noMoreLevels') }}
           </div>
+          <div class="section-hint">{{ t('charClass.common.levelsHint') }}</div>
         </div>
 
         <div class="query-actions">
@@ -763,6 +760,7 @@ $panel-radius-portrait: 24px;
 .levels-section {
   width: 100%;
   box-sizing: border-box;
+  max-width: 600px;
 }
 
 .preset-section {
@@ -780,7 +778,7 @@ $panel-radius-portrait: 24px;
 
 .control-heading {
   color: $text-secondary;
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 700;
 }
 
@@ -804,13 +802,13 @@ $panel-radius-portrait: 24px;
   display: flex;
   gap: 14px;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 }
 
 .add-level-button {
   flex-shrink: 0;
   color: var(--action-primary-text);
-  padding: 4px;
+  padding: 8px;
   font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
@@ -831,7 +829,7 @@ $panel-radius-portrait: 24px;
 
 .levels-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
   gap: 10px;
   align-items: stretch;
 }
@@ -891,7 +889,7 @@ $panel-radius-portrait: 24px;
   --glass-button-color: var(--color-primary-hover);
   --glass-button-hover-shadow: none;
 
-  width: 36px;
+  width: 30px;
   height: 36px;
   flex-shrink: 0;
 
