@@ -1,3 +1,5 @@
+import { getCurrentRuntimePlatform } from './runtime.js'
+
 const ABSOLUTE_URL_RE = /^[a-z][a-z\d+\-.]*:\/\//i
 const DEFAULT_APP_WEB_ORIGIN = 'https://dialects.yzup.top'
 const APP_WEB_ORIGINS = [DEFAULT_APP_WEB_ORIGIN]
@@ -114,6 +116,15 @@ export function isInternalAppNavigationTarget(target, options = {}) {
 }
 
 export async function navigatePlatformLink(router, target, options = {}) {
+  const runtime = options.runtime || getCurrentRuntimePlatform()
+  if (options.external && options.reload && runtime.container !== 'native-webview' && typeof target === 'string') {
+    const location = options.location ?? (typeof window === 'undefined' ? null : window.location)
+    if (location) {
+      location.href = target.startsWith('/') ? `${options.webOrigin ?? ''}${target}` : target
+    }
+    return
+  }
+
   const internalTarget = resolveInternalNavigationTarget(target, options)
 
   if (internalTarget !== null) {

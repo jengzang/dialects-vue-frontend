@@ -147,6 +147,7 @@ import { useVisitStats, ensureVisitHistory } from '@/composables/data/useVisitSt
 import {userStore} from "@/main/store/store.js";
 import { useSidebarConfig } from '@/main/config/index.js';
 import { navigatePlatformLink } from '@/platform/index.js'
+import { WEB_BASE } from '@/env-config.js'
 
 const { t } = useI18n();
 const router = useRouter();
@@ -327,7 +328,11 @@ const handleMainClick = async (item, key, event, isTouchInteraction) => {
 
   if (!item.path) return
 
-  await navigatePlatformLink(router, item.path, { external: item.external })
+  await navigatePlatformLink(router, item.path, {
+    external: item.external,
+    reload: item.external,
+    webOrigin: WEB_BASE,
+  })
   closeSidebar()
 }
 

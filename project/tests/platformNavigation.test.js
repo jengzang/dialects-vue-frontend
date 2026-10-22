@@ -19,6 +19,42 @@ function createRouter() {
 }
 
 describe('platform navigation', () => {
+  it.each(['/en/', '/zh-Hant/explore/tools/praat'])('reloads Web sidebar destination %s at WEB_BASE', async (target) => {
+    const router = createRouter()
+    const location = { href: 'https://preview.example/en/menu/source' }
+
+    await navigatePlatformLink(router, target, {
+      external: true,
+      reload: true,
+      webOrigin: 'https://dialects.yzup.top',
+      runtime: { family: 'web', container: 'browser' },
+      location,
+    })
+
+    expect(location.href).toBe(`https://dialects.yzup.top${target}`)
+    expect(router.push).not.toHaveBeenCalled()
+  })
+
+  it('preserves an empty WEB_BASE for Web sidebar reloads', async () => {
+    const location = { href: '' }
+    await navigatePlatformLink(createRouter(), '/en/', {
+      external: true, reload: true, webOrigin: '', location,
+      runtime: { family: 'web', container: 'browser' },
+    })
+    expect(location.href).toBe('/en/')
+  })
+
+  it.each(['ios', 'android'])('keeps sidebar navigation inside the %s app', async (family) => {
+    const router = createRouter()
+    const location = { href: 'capacitor://localhost' }
+    await navigatePlatformLink(router, '/en/explore/tools/praat', {
+      external: true, reload: true, webOrigin: 'https://dialects.yzup.top', location,
+      runtime: { family, container: 'native-webview' },
+    })
+    expect(router.push).toHaveBeenCalledWith('/en/explore/tools/praat')
+    expect(location.href).toBe('capacitor://localhost')
+  })
+
   it('treats app paths as internal navigation even when a menu item is marked external', async () => {
     const router = createRouter()
     const openExternal = vi.fn()
@@ -103,11 +139,14 @@ describe('platform navigation', () => {
     })).toBe('/en/menu/privacy')
   })
 
-  it('keeps sidebar app routes out of the external-link category', () => {
+  it('preserves the Web sidebar reload flags and passes them to platform navigation', () => {
     const source = readFileSync(resolve(projectRoot, 'src/main/config/BarAndTabs/SideBarConfig.js'), 'utf8')
 
-    expect(source).not.toMatch(/path:\s*withRouteLocale\(route,\s*'\/'\),\n\s*external:\s*true/)
-    expect(source).not.toMatch(/path:\s*withRouteLocale\(route,\s*'\/explore\/tools\/praat'\),\n\s*external:\s*true/)
-    expect(source).not.toMatch(/path:\s*buildLocalePath\('zh-Hant',\s*'\/'\),\n\s*external:\s*true/)
+    expect(source).toMatch(/path:\s*withRouteLocale\(route,\s*'\/'\),\n\s*external:\s*true/)
+    expect(source).toMatch(/path:\s*withRouteLocale\(route,\s*'\/explore\/tools\/praat'\),\n\s*external:\s*true/)
+    expect(source).toMatch(/path:\s*buildLocalePath\('zh-Hant',\s*'\/'\),\n\s*external:\s*true/)
+    const sidebar = readFileSync(resolve(projectRoot, 'src/components/bar/SimpleSidebar.vue'), 'utf8')
+    expect(sidebar).toContain('reload: item.external')
+    expect(sidebar).toContain('webOrigin: WEB_BASE')
   })
 })
