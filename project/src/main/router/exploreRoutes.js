@@ -93,7 +93,8 @@ export const exploreRoutes = [
   },
   {
     path: 'explore/yc/overview',
-    component: YangChunOverviewPage
+    component: YangChunOverviewPage,
+    meta: { development: { type: 'confirm' } }
   },
   {
     path: 'explore/yc/words',
@@ -101,7 +102,8 @@ export const exploreRoutes = [
   },
   {
     path: 'explore/yc/expressions',
-    component: YangChunExpressionsPage
+    component: YangChunExpressionsPage,
+    meta: { development: { type: 'confirm' } }
   },
   {
     path: 'explore/yc/villages',
@@ -109,11 +111,13 @@ export const exploreRoutes = [
   },
   {
     path: 'explore/villages/toponyms',
-    component: ToponymsPage
+    component: ToponymsPage,
+    meta: { development: { type: 'blockApi', feature: 'toponyms' } }
   },
   {
     path: 'explore/villages/search',
-    component: ToponymSearchPage
+    component: ToponymSearchPage,
+    meta: { development: { type: 'blockApi', feature: 'toponyms' } }
   },
   {
     path: 'explore/villages/gd',

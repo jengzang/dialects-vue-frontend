@@ -1,4 +1,13 @@
 import { api } from '../auth/httpClient.js';
+import { isDevelopmentBlocked } from '@/utils/developmentGate.js';
+
+const TOPONYMS_FEATURE_KEY = 'toponyms';
+
+function assertToponymsEnabled() {
+  if (isDevelopmentBlocked(TOPONYMS_FEATURE_KEY)) {
+    throw new Error('地名功能开发中，暂不可用');
+  }
+}
 
 export const TOPONYM_DEFAULT_POINT_LIMIT = 0;
 export const TOPONYM_DEFAULT_NAME_LIMIT = 20;
@@ -122,6 +131,8 @@ function normalizeOfficialDetail(payload) {
 }
 
 export async function getToponymNames(params = {}) {
+  assertToponymsEnabled();
+
   const query = new URLSearchParams();
   appendCommonSearchParams(query, params, TOPONYM_DEFAULT_NAME_LIMIT);
 
@@ -162,6 +173,8 @@ export async function getToponymNames(params = {}) {
 }
 
 export async function getToponymPoints(params = {}) {
+  assertToponymsEnabled();
+
   const query = new URLSearchParams();
   appendCommonSearchParams(query, params, TOPONYM_DEFAULT_POINT_LIMIT);
 
@@ -179,6 +192,8 @@ export async function getToponymPoints(params = {}) {
 }
 
 export async function getToponymSearch(params = {}) {
+  assertToponymsEnabled();
+
   const query = new URLSearchParams();
   appendToponymSearchParams(query, params);
 
@@ -196,6 +211,8 @@ export async function getToponymSearch(params = {}) {
 }
 
 export async function getToponymDetails(ids) {
+  assertToponymsEnabled();
+
   const uniqueIds = Array.from(
     new Set(
       (Array.isArray(ids) ? ids : [ids])
@@ -227,6 +244,8 @@ export async function getToponymDetails(ids) {
 }
 
 export async function getToponymOfficialDetail(id, options = {}) {
+  assertToponymsEnabled();
+
   const normalizedId = String(id || '').trim();
   if (!normalizedId) {
     throw new Error('toponym id cannot be empty');

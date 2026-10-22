@@ -3,7 +3,8 @@ import { nextTick } from 'vue'
 import i18n from '@/i18n/index.js'
 import { waitForAuthReady } from '@/api/auth/auth.js'
 import { userStore } from '@/main/store/store.js'
-import { showWarning } from '@/utils/ui/message.js'
+import { showConfirm, showWarning } from '@/utils/ui/message.js'
+import { blockDevelopmentFeature } from '@/utils/developmentGate.js'
 import { showRouteLoading, hideRouteLoading } from '@/utils/ui/routeLoading.js'
 import { menuRoutes } from '@/main/router/menuRoutes.js'
 import { exploreRoutes } from '@/main/router/exploreRoutes.js'
@@ -356,6 +357,14 @@ router.beforeEach(async (to, from, next) => {
       showWarning(i18n.global.t('user.dataPage.messages.authRequired'))
       return next({ path: withLocalePath('/auth', to), replace: true })
     }
+  }
+
+  const developmentGate = to.meta?.development
+  if (developmentGate?.type === 'confirm') {
+    showConfirm('当前开发中，内容均为 AI 生成。', { title: '提示' })
+  } else if (developmentGate?.type === 'blockApi') {
+    blockDevelopmentFeature(developmentGate.feature)
+    showConfirm('地名功能开发中，暂不可用', { title: '提示' })
   }
 
   document.title = to.meta?.title || DEFAULT_TITLE
