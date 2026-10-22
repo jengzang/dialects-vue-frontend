@@ -223,7 +223,7 @@
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { getPartitions } from '@/api/index.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
@@ -261,6 +261,7 @@ const emit = defineEmits([
 ])
 
 const router = useRouter()
+const route = useRoute()
 const { requireAuth } = useAuthGuard()
 
 /* =========================
