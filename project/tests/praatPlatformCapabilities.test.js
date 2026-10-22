@@ -49,6 +49,22 @@ describe('Praat platform capabilities', () => {
     expect(isPraatFileAcceptedOnPlatform({ name: 'recording', type: 'audio/x-aac' }, 'web')).toBe(true)
   })
 
+  it.each([
+    { name: 'recording', type: 'audio/x-flac' },
+    { name: 'recording', type: 'audio/webm;codecs=opus' },
+    { name: 'recording', type: 'audio/ogg;codecs=opus' },
+    { name: 'recording', type: 'audio/x-pn-wav' },
+    { name: 'flac', type: '' },
+  ])('preserves legacy Web acceptance for $name ($type)', (file) => {
+    expect(isPraatFileAcceptedOnPlatform(file, 'web')).toBe(true)
+    expect(isPraatFileAcceptedOnPlatform(file, 'ios')).toBe(false)
+    expect(isPraatFileAcceptedOnPlatform(file, 'android')).toBe(false)
+  })
+
+  it('continues rejecting unsupported Web audio', () => {
+    expect(isPraatFileAcceptedOnPlatform({ name: 'recording.aiff', type: 'audio/aiff' }, 'web')).toBe(false)
+  })
+
   it('advertises native local Python analysis in the acceptance matrix', () => {
     expect(PLATFORM_FEATURE_MATRIX.praatTools.capabilities).toMatchObject({
       web: { preferredEngine: 'remote-api' },

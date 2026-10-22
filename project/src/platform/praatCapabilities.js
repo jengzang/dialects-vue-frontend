@@ -73,6 +73,14 @@ export function getPraatInputAccept(target = 'web') {
 
 export function isPraatFileAcceptedOnPlatform(file, target = 'web') {
   const capabilities = getPraatPlatformCapabilities(target)
+  if (capabilities.target === 'web') {
+    const fileName = typeof file?.name === 'string' ? file.name : ''
+    const fileType = typeof file?.type === 'string' ? file.type : ''
+    const fileExt = fileName.split('.').pop().toLowerCase()
+    return WEB_PRAAT_MIME_TYPES.some((format) => fileType.includes(format.split('/')[1])) ||
+      WEB_PRAAT_FORMATS.includes(fileExt)
+  }
+
   const extension = getFileExtension(file)
 
   if (extension && capabilities.inputFormats.includes(extension)) {
@@ -80,10 +88,6 @@ export function isPraatFileAcceptedOnPlatform(file, target = 'web') {
   }
 
   const mimeType = typeof file?.type === 'string' ? file.type.toLowerCase() : ''
-  if (capabilities.target === 'web' && WEB_PRAAT_MIME_TYPES.includes(mimeType)) {
-    return true
-  }
-
   if (capabilities.inputFormats.includes('wav')) {
     return mimeType === 'audio/wav' || mimeType === 'audio/x-wav' || mimeType === 'audio/wave'
   }
