@@ -68,33 +68,33 @@
                 <div class="level-actions">
                   <button
                     type="button"
-                    class="level-action level-action-up"
+                    class="glass-button level-action level-action-up"
                     :aria-label="t('charClass.actions.moveUp')"
                     :disabled="index === 0"
                     :title="t('charClass.actions.moveUp')"
                     @click="moveLevel(index, -1)"
                   >
-                    ↑
+                    <PhArrowUp :size="22" weight="bold" aria-hidden="true" />
                   </button>
                   <button
                     type="button"
-                    class="level-action level-action-down"
+                    class="glass-button level-action level-action-down"
                     :aria-label="t('charClass.actions.moveDown')"
                     :disabled="index === levels.length - 1"
                     :title="t('charClass.actions.moveDown')"
                     @click="moveLevel(index, 1)"
                   >
-                    ↓
+                    <PhArrowDown :size="22" weight="bold" aria-hidden="true" />
                   </button>
                   <button
                     type="button"
-                    class="level-action danger level-action-close"
+                    class="glass-button level-action danger level-action-close"
                     :aria-label="t('charClass.actions.removeLevel')"
                     :disabled="levels.length <= 1"
                     :title="t('charClass.actions.removeLevel')"
                     @click="removeLevel(index)"
                   >
-                    −
+                    <PhX :size="22" weight="bold" aria-hidden="true" />
                   </button>
                 </div>
               </div>
@@ -196,6 +196,7 @@
 <script setup>
 import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import { PhArrowDown, PhArrowUp, PhX } from '@phosphor-icons/vue'
 import { computed, nextTick, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -885,83 +886,22 @@ $panel-radius-portrait: 24px;
 }
 
 .level-action {
-  @include flex-center;
+  --glass-button-padding: 0;
+  --glass-button-border-radius: var(--radius-md);
+  --glass-button-color: var(--color-primary-hover);
+  --glass-button-hover-shadow: none;
 
-  width: 34px;
-  height: 34px;
-  color: $dark-blue;
-  font-size: 0;
-  font-weight: 700;
-  line-height: 1;
-  cursor: pointer;
-  background: linear-gradient(
-    180deg,
-    rgba(var(--color-primary-rgb), 0.18),
-    var(--glass-90)
-  );
-  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
-  border-radius: var(--radius-md);
-  box-shadow: 0 8px 18px rgba(var(--color-primary-rgb), 0.12);
-  transition:
-    transform $transition-fast ease,
-    opacity $transition-fast ease,
-    background $transition-fast ease,
-    border-color $transition-fast ease,
-    box-shadow $transition-fast ease;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
 
-  &::before {
-    font-size: 15px;
-    line-height: 1;
-  }
-
-  &-up::before {
-    content: "\2191";
-  }
-
-  &-down::before {
-    content: "\2193";
-  }
-
-  &-close::before {
-    content: "\00D7";
-  }
-
-  &:hover:not(:disabled) {
-    background: linear-gradient(
-      180deg,
-      rgba(var(--color-primary-rgb), 0.28),
-      var(--glass-90)
-    );
-    border-color: rgba(var(--color-primary-rgb), 0.38);
-    box-shadow: 0 10px 20px rgba(var(--color-primary-rgb), 0.16);
-    transform: translateY(-1px) scale(1.02);
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    box-shadow: none;
-    opacity: 0.4;
+  &:focus-visible {
+    outline: 2px solid var(--border-control-focus);
+    outline-offset: 2px;
   }
 
   &.danger {
-    color: $danger-text;
-    background: linear-gradient(
-      180deg,
-      rgba(var(--color-error-rgb), 0.16),
-      var(--glass-90)
-    );
-    border-color: rgba(var(--color-error-rgb), 0.2);
-    box-shadow: 0 8px 18px rgba(var(--color-error-rgb), 0.12);
-
-    &:hover:not(:disabled) {
-      background: linear-gradient(
-        180deg,
-        rgba(var(--color-error-rgb), 0.24),
-        var(--glass-90)
-      );
-      border-color: rgba(var(--color-error-rgb), 0.34);
-      box-shadow: 0 10px 20px rgba(var(--color-error-rgb), 0.16);
-    }
+    --glass-button-color: var(--color-error);
   }
 }
 
