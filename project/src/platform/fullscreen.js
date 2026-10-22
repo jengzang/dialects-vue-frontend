@@ -78,11 +78,11 @@ function createBrowserFullscreenController(options = {}) {
     driver: 'browser-fullscreen',
     async enter(element) {
       await requestBrowserFullscreen(element)
-      return true
+      return this.isFullscreen(element)
     },
-    async exit() {
+    async exit(element = getBrowserFullscreenElement(documentRef)) {
       await exitBrowserFullscreen(documentRef)
-      return false
+      return this.isFullscreen(element)
     },
     async toggle(element) {
       if (this.isFullscreen(element)) {
@@ -92,7 +92,7 @@ function createBrowserFullscreenController(options = {}) {
       return this.enter(element)
     },
     isFullscreen(element) {
-      return getBrowserFullscreenElement(documentRef) === element
+      return Boolean(element && getBrowserFullscreenElement(documentRef) === element)
     },
   }
 }

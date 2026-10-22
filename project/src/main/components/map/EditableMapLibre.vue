@@ -379,6 +379,7 @@ const mapContainer = ref(null)
 const map = shallowRef(null)
 const draw = shallowRef(null)
 const fullscreenController = getPlatformFullscreenController()
+const fullscreenChangeEvents = ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange']
 const selectedFeatureId = ref('')
 const selectedVertexCoordPaths = ref([])
 let acceptedFeatureCollection = null
@@ -4080,13 +4081,13 @@ watch(currentStyleKey, (nextValue) => {
 })
 
 onMounted(() => {
-  document.addEventListener('fullscreenchange', syncFullscreenState)
+  fullscreenChangeEvents.forEach((event) => document.addEventListener(event, syncFullscreenState))
   document.addEventListener('keydown', handleHitCandidateKeydown)
   initializeMap()
 })
 
 onBeforeUnmount(() => {
-  document.removeEventListener('fullscreenchange', syncFullscreenState)
+  fullscreenChangeEvents.forEach((event) => document.removeEventListener(event, syncFullscreenState))
   document.removeEventListener('keydown', handleHitCandidateKeydown)
   resetFeatureBoxSelection()
   unbindPreviewHover()
