@@ -54,7 +54,7 @@
         <div
           class="upload-zone-drop"
           :class="{ 'drag-over': isDragOver, 'uploading': isUploading }"
-          @click="!isUploading && !pendingPreviewFile && $refs.fileInput.click()"
+          @click="!isUploading && !pendingPreviewFile && chooseCheckFile()"
           @dragover.prevent="!isUploading && (isDragOver = true)"
           @dragleave.prevent="isDragOver = false"
           @drop.prevent="!isUploading && handleDrop($event)"
@@ -931,6 +931,7 @@ import {
   downloadCheckResult
 } from '@/api'
 import { showSuccess, showError, showWarning, showConfirm } from '@/utils/ui/message.js'
+import { getPlatformFileService } from '@/platform/index.js'
 
 const { t } = useI18n()
 const { requireAuth } = useAuthGuard()
@@ -1358,6 +1359,17 @@ const handleFileUpload = (event) => {
     } else {
       checkImportFlow.loadPreview(file)
     }
+  }
+}
+
+const chooseCheckFile = async () => {
+  const files = await getPlatformFileService().pickFilesOrOpenInput(fileInput.value, {
+    accept: '.xlsx,.xls,.doc,.docx,.tsv',
+    multiple: false,
+  })
+
+  if (files?.[0]) {
+    await checkImportFlow.loadPreview(files[0])
   }
 }
 
@@ -2068,17 +2080,10 @@ const downloadFile = async () => {
   try {
     const blob = await downloadCheckResult(taskId.value)
 
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
     const originalName = fileName.value
     const nameWithoutExt = originalName.substring(0, originalName.lastIndexOf('.')) || originalName
-    // 2. 强制加上 .xlsx 后缀
-    a.download = t('tools.checkTool.export.filePrefix') + nameWithoutExt + '.xlsx'
-    document.body.appendChild(a)
-    a.click()
-    window.URL.revokeObjectURL(url)
-    document.body.removeChild(a)
+    const exportFileName = t('tools.checkTool.export.filePrefix') + nameWithoutExt + '.xlsx'
+    await getPlatformFileService().saveBlob(blob, exportFileName)
   } catch (error) {
     showError(t('tools.checkTool.messages.downloadFailed', { message: error.message }))
   }

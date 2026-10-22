@@ -162,19 +162,31 @@ import { usePraatApi } from '@/api'
 import { userStore } from '@/main/store/store.js'
 import { showError, showWarning } from '@/utils/ui/message.js'
 import { usePollingTask } from '@/composables/core/usePollingTask.js'
+import { usePraatAnalysis } from '@/composables/core/usePraatAnalysis.js'
 import { useStorageState } from '@/composables/core/useStorageState.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
+import { getCurrentRuntimePlatform, isPraatFileAcceptedOnPlatform } from '@/platform/index.js'
 
 const route = useRoute()
 const { t } = useI18n()
-const { uploadAudio, createJob, getJobStatus, getJobResult, cancelJob } = usePraatApi()
+const praatRuntime = getCurrentRuntimePlatform()
+const praatApi = usePraatApi()
+const {
+  strategy: praatAnalysisStrategy,
+  remoteEngine: praatRemoteEngine,
+} = usePraatAnalysis({
+  api: praatApi,
+  runtime: praatRuntime,
+})
+const { uploadAudio, createJob, getJobStatus, getJobResult, cancelJob } = praatRemoteEngine
 const { requireAuth } = useAuthGuard({
   defaultRedirect: '/explore/tools/praat',
 })
 
 const STORAGE_KEY = 'praat_analysis_settings'
 const VALID_TABS = ['upload', 'results', 'vowelspace', 'pitchtone']
+const praatPlatformTarget = praatRuntime.family
 
 // Tab state - sync with router
 const { state: activeTab, set: setActiveTab } = useRouteQueryState('tab', {
@@ -595,6 +607,14 @@ const startAnalysis = async () => {
     showWarning(t('praat.main.errors.analysisInProgress'))
     return
   }
+  if (!isPraatFileAcceptedOnPlatform(audioFile.value, praatPlatformTarget)) {
+    showError(
+      praatPlatformTarget === 'ios' || praatPlatformTarget === 'android'
+        ? t('praat.audioInput.errors.nativeUnsupportedFormat')
+        : t('praat.audioInput.errors.unsupportedFormat')
+    )
+    return
+  }
 
   const duration = getCurrentAudioDuration()
   const hasSpectrogramModule = settings.modules && settings.modules.includes('spectrogram')
@@ -634,6 +654,8 @@ const startAnalysis = async () => {
     fileName: audioFile.value?.name ?? null,
     duration,
     hasSpectrogramModule,
+    engine: praatAnalysisStrategy.engine,
+    fallbackReason: praatAnalysisStrategy.fallbackReason,
     modules: Array.isArray(settings.modules) ? [...settings.modules] : [],
   })
 

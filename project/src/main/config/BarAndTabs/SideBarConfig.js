@@ -18,7 +18,6 @@ export function useSidebarConfig() {
             label: t('navigation.menu.home'),
             icon: '🏠',
             path: withRouteLocale(route, '/'),
-            external: true,
             children: null
         },
         query: {
@@ -129,7 +128,6 @@ export function useSidebarConfig() {
             label: t('navigation.submenu.tools.praatname'), 
             icon: '🎙️', 
             path: withRouteLocale(route, '/explore/tools/praat'),
-            external: true,
             children: null
         },
         about_ontop: {
@@ -152,7 +150,6 @@ export const SideConfig = {
         label: '首頁',
         icon: '🏠',
         path: buildLocalePath('zh-Hant', '/'),
-        external: true,
         children: null
     },
     query: {

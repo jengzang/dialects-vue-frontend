@@ -69,6 +69,7 @@ import {
   repairEditableGeometry,
   normalizeFeatureCollection,
 } from '@/main/utils/drawMap/export.js'
+import { getPlatformFullscreenController } from '@/platform/index.js'
 import { pickDrawColor } from '@/main/config/colors/mapColors.js'
 
 const [drawFallbackStroke, drawFallbackPointColor] = pickDrawColor(0)
@@ -377,6 +378,7 @@ const emit = defineEmits([
 const mapContainer = ref(null)
 const map = shallowRef(null)
 const draw = shallowRef(null)
+const fullscreenController = getPlatformFullscreenController()
 const selectedFeatureId = ref('')
 const selectedVertexCoordPaths = ref([])
 let acceptedFeatureCollection = null
@@ -3767,19 +3769,14 @@ const handleStyleChange = () => {
 }
 
 const syncFullscreenState = () => {
-  isFullscreen.value = document.fullscreenElement === mapContainer.value
+  isFullscreen.value = fullscreenController.isFullscreen(mapContainer.value)
 }
 
 const toggleFullscreen = async () => {
   if (!mapContainer.value) return isFullscreen.value
 
-  if (document.fullscreenElement === mapContainer.value) {
-    await document.exitFullscreen?.()
-    return false
-  }
-
-  await mapContainer.value.requestFullscreen?.()
-  return true
+  isFullscreen.value = await fullscreenController.toggle(mapContainer.value)
+  return isFullscreen.value
 }
 
 const initializeMap = async () => {
@@ -4162,7 +4159,17 @@ defineExpose({
 .editable-map-stage {
   width: 100%;
   min-height: 80dvh;
-  
+
+  &.is-platform-fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    width: 100dvw;
+    height: 100dvh;
+    min-height: 100dvh;
+    background: var(--color-bg);
+  }
+
   @media (max-aspect-ratio:1/1) {
     min-height: 70dvh;
   }

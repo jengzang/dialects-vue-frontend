@@ -1,11 +1,8 @@
 import { ref, watch } from 'vue'
+import { getPlatformStorage } from '@/platform/index.js'
 
 function getStorage(storageType) {
-  if (typeof window === 'undefined') {
-    return null
-  }
-
-  return storageType === 'session' ? window.sessionStorage : window.localStorage
+  return getPlatformStorage(storageType)
 }
 
 export function useStorageState(key, options = {}) {
@@ -57,7 +54,7 @@ export function useStorageState(key, options = {}) {
 
       state.value = ttl ? payload.value : payload
       return state.value
-    } catch (_error) {
+    } catch {
       storageApi?.removeItem(key)
       state.value = cloneDefault()
       return state.value

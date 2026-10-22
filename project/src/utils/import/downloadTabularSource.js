@@ -1,3 +1,5 @@
+import { getPlatformFileService } from '@/platform/index.js'
+
 export function isTabularSourceExportable(source) {
   if (!source || source.downloadable === false) {
     return false
@@ -42,18 +44,7 @@ export async function resolveTabularSourceExport(source) {
 
 export async function downloadTabularSource(source) {
   const { blob, fileName } = await resolveTabularSourceExport(source)
-  const objectUrl = window.URL.createObjectURL(blob)
-
-  try {
-    const anchor = document.createElement('a')
-    anchor.href = objectUrl
-    anchor.download = fileName || 'export.dat'
-    document.body.appendChild(anchor)
-    anchor.click()
-    document.body.removeChild(anchor)
-  } finally {
-    window.URL.revokeObjectURL(objectUrl)
-  }
+  await getPlatformFileService().saveBlob(blob, fileName || 'export.dat')
 
   return { fileName }
 }

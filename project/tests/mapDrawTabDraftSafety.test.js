@@ -897,6 +897,18 @@ function clickLastButtonContaining(host, text) {
   buttons[buttons.length - 1].click()
 }
 
+function getLocalDraftNameInput() {
+  return document.body.querySelector('.draw-local-draft-picker .draw-text-input')
+}
+
+async function openSaveAsNewLocalDraft(wrapper) {
+  clickButtonContaining(wrapper.host, 'map.drawTab.buttons.saveToLocal')
+  await flushTicks()
+  clickButtonContaining(wrapper.host, 'map.drawTab.buttons.saveAsNewLocal')
+  await flushTicks()
+  return getLocalDraftNameInput()
+}
+
 async function flushTicks(count = 3) {
   for (let index = 0; index < count; index += 1) {
     await nextTick()
@@ -1230,7 +1242,7 @@ describe('MapDrawTab draft safety', () => {
     input.value = 'Saved draft'
     input.dispatchEvent(new Event('input'))
     await nextTick()
-    clickLastButtonContaining(wrapper.host, 'map.drawTab.buttons.saveAsNewLocal')
+    clickLastButtonContaining(document.body, 'map.drawTab.buttons.saveAsNewLocal')
     await flushTicks()
 
     expect(mocks.deleteDraftRecord).toHaveBeenCalledWith(mocks.AUTO_DRAFT_ID)
@@ -1269,7 +1281,7 @@ describe('MapDrawTab draft safety', () => {
     input.value = 'Saved draft'
     input.dispatchEvent(new Event('input'))
     await nextTick()
-    clickLastButtonContaining(wrapper.host, 'map.drawTab.buttons.saveAsNewLocal')
+    clickLastButtonContaining(document.body, 'map.drawTab.buttons.saveAsNewLocal')
     await flushTicks()
 
     expect(mocks.deleteDraftRecord).not.toHaveBeenCalledWith(mocks.AUTO_DRAFT_ID)
@@ -1318,7 +1330,7 @@ describe('MapDrawTab draft safety', () => {
     input.value = 'Saved draft'
     input.dispatchEvent(new Event('input'))
     await nextTick()
-    clickLastButtonContaining(wrapper.host, 'map.drawTab.buttons.saveAsNewLocal')
+    clickLastButtonContaining(document.body, 'map.drawTab.buttons.saveAsNewLocal')
     await flushTicks()
 
     pendingThirdAutoWrite.resolve()

@@ -622,7 +622,13 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   font-weight: 1000;
   cursor: pointer;
   user-select: none;
-  transition: all 0.3s ease;
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    border-radius 0.3s ease,
+    box-shadow 0.3s ease,
+    color 0.3s ease,
+    transform 0.3s ease;
 }
 
 .desktop-brand-logo {
@@ -783,7 +789,10 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   cursor: pointer;
   user-select: none;
   border-radius: var(--radius-full);
-  transition: all 0.3s ease;
+  transition:
+    background 0.3s ease,
+    opacity 0.3s ease,
+    transform 0.3s ease;
   opacity: 0.7;
 
   &:hover {

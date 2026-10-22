@@ -214,6 +214,7 @@ import { useScrollSnap } from '@/composables/bar/useScrollSnap.js'
 import { useScrollArrows } from '@/composables/bar/useScrollArrows.js'
 import { useBarOverflow, getDefaultTabScroll, sortTabsByScroll } from '@/composables/bar/useBarOverflow.js'
 import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { navigatePlatformLink } from '@/platform/index.js'
 
 const props = defineProps({
   showScrollArrows: {
@@ -529,12 +530,8 @@ const handleSubmenuLeave = () => {
   }, 200)
 }
 
-const handleSubmenuClick = (child) => {
-  if (child.external) {
-    window.open(child.path, '_blank')
-  } else {
-    router.push(child.path)
-  }
+const handleSubmenuClick = async (child) => {
+  await navigatePlatformLink(router, child.path, { external: child.external })
   activeSubmenu.value = null
 }
 

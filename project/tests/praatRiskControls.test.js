@@ -59,6 +59,37 @@ describe('Praat front-end risk controls', () => {
     expect(source).toContain("emit('clear-selection')")
   })
 
+  it('Audio input keeps Praat available on native apps through platform file and recorder adapters', () => {
+    const source = readSource(audioInputPanelPath)
+
+    expect(source).toContain("import { getPlatformAudioRecorder, getPlatformFileService } from '@/platform/index.js'")
+    expect(source).toMatch(/getPlatformFileService\(\)\.pickFilesOrOpenInput\(fileInput\.value,\s*\{\s*accept: 'audio\/\*'/)
+    expect(source).toContain('const nativeAudioRecorder = getPlatformAudioRecorder()')
+    expect(source).toContain('if (nativeAudioRecorder.canRecord()) {')
+    expect(source).toContain('await nativeAudioRecorder.start()')
+    expect(source).toContain('const nativeRecording = await nativeAudioRecorder.stop()')
+    expect(source).toContain('mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true })')
+  })
+
+  it('Audio input handles native picker and recorder failures with explicit user-facing states', () => {
+    const source = readSource(audioInputPanelPath)
+    const enSource = readSource(enLocalePath)
+    const zhCnSource = readSource(zhCnLocalePath)
+    const zhHantSource = readSource(zhHantLocalePath)
+
+    expect(source).toContain('readData: false')
+    expect(source).toContain('showPlatformAudioInputError(error)')
+    expect(source).toContain("error?.code === 'NATIVE_MICROPHONE_PERMISSION_DENIED'")
+    expect(source).toContain("error?.code === 'NATIVE_RECORDING_READ_FAILED'")
+    expect(source).toContain("t('praat.audioInput.errors.fileSelectionFailed'")
+    expect(source).toContain("t('praat.audioInput.errors.recordingReadFailed')")
+
+    for (const localeSource of [enSource, zhCnSource, zhHantSource]) {
+      expect(localeSource).toContain('"fileSelectionFailed"')
+      expect(localeSource).toContain('"recordingReadFailed"')
+    }
+  })
+
   it('Job status panel treats processing as active and renders canceled state explicitly', () => {
     const source = readSource(jobStatusPanelPath)
 

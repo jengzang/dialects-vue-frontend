@@ -39,7 +39,7 @@
           <div
             class="upload-zone"
             :class="{ 'has-file': referenceFile }"
-            @click="!referenceFile && $refs.refInput.click()"
+            @click="!referenceFile && chooseReferenceFile()"
             @dragover.prevent="dragOver1 = true"
             @dragleave.prevent="dragOver1 = false"
             @drop.prevent="handleRefDrop"
@@ -149,7 +149,7 @@
 
           <div
             class="upload-zone multiple"
-            @click="$refs.filesInput.click()"
+            @click="chooseMergeFiles()"
             @dragover.prevent="dragOver2 = true"
             @dragleave.prevent="dragOver2 = false"
             @drop.prevent="handleFilesDrop"
@@ -348,6 +348,7 @@ import { useTabularImportPreview } from '@/composables/import/useTabularImportPr
 import { transformTabularFile } from '@/utils/import/transformTabularFile.js'
 import defaultReferenceWorkbookUrl from '/data/sample/参考表.xlsx?url'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import { getPlatformFileService } from '@/platform/index.js'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -629,6 +630,17 @@ const handleRefDrop = (event) => {
   }
 }
 
+const chooseReferenceFile = async () => {
+  const files = await getPlatformFileService().pickFilesOrOpenInput(refInput.value, {
+    accept: '.xlsx,.xls,.csv',
+    multiple: false,
+  })
+
+  if (files?.[0]) {
+    await referenceImportFlow.loadPreview(files[0])
+  }
+}
+
 const resetMergeStats = () => {
   mergeStats.total = 0
   mergeStats.processed = 0
@@ -709,6 +721,17 @@ const handleFilesDrop = (event) => {
   dragOver2.value = false
   const files = Array.from(event.dataTransfer.files)
   addFiles(files)
+}
+
+const chooseMergeFiles = async () => {
+  const files = await getPlatformFileService().pickFilesOrOpenInput(filesInput.value, {
+    accept: '.xlsx,.xls',
+    multiple: true,
+  })
+
+  if (files?.length) {
+    await addFiles(files)
+  }
 }
 
 const addFiles = async (files) => {
@@ -935,14 +958,7 @@ const downloadMerged = async () => {
 
     const blob = await downloadMerge(taskId.value)
 
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = MERGE_RESULT_FILE_NAME
-    document.body.appendChild(a)
-    a.click()
-    window.URL.revokeObjectURL(url)
-    document.body.removeChild(a)
+    await getPlatformFileService().saveBlob(blob, MERGE_RESULT_FILE_NAME)
   } catch (error) {
     showError(t('tools.merge.messages.downloadFailed', { message: error.message }))
   }

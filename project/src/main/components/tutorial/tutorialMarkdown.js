@@ -1,7 +1,10 @@
+/* global __WEB_BASE__, __IS_NATIVE_BUILD__ */
 import { marked } from 'marked'
 
 const BASE_LOCALE = 'zh-Hant'
 const SUPPORTED_LOCALES = ['zh-Hant', 'zh-CN', 'en']
+const BUILD_WEB_BASE = typeof __WEB_BASE__ === 'undefined' ? '' : __WEB_BASE__
+const BUILD_IS_NATIVE = typeof __IS_NATIVE_BUILD__ === 'undefined' ? false : __IS_NATIVE_BUILD__
 
 const markdownFiles = import.meta.glob('./content/**/*.md', {
   query: '?raw',
@@ -9,17 +12,47 @@ const markdownFiles = import.meta.glob('./content/**/*.md', {
   eager: true,
 })
 
-const renderer = new marked.Renderer()
-const defaultLinkRenderer = renderer.link.bind(renderer)
-
-renderer.link = (token) => {
-  const html = defaultLinkRenderer(token)
-
-  if (!/^https?:\/\//i.test(token.href || '')) {
-    return html
+export function resolveTutorialAssetUrl(url, options = {}) {
+  if (typeof url !== 'string' || !url.startsWith('/tutorial/')) {
+    return url
   }
 
-  return html.replace('<a ', '<a target="_blank" rel="noopener noreferrer" ')
+  const isNativeBuild = options.isNativeBuild ?? BUILD_IS_NATIVE
+  if (!isNativeBuild) {
+    return url
+  }
+
+  const webBase = String(options.webBase ?? BUILD_WEB_BASE ?? '').replace(/\/+$/, '')
+  if (!webBase) {
+    return url
+  }
+
+  return `${webBase}${url}`
+}
+
+function createTutorialRenderer(options = {}) {
+  const renderer = new marked.Renderer()
+  const defaultLinkRenderer = renderer.link.bind(renderer)
+  const defaultImageRenderer = renderer.image.bind(renderer)
+
+  renderer.link = (token) => {
+    const html = defaultLinkRenderer(token)
+
+    if (!/^https?:\/\//i.test(token.href || '')) {
+      return html
+    }
+
+    return html.replace('<a ', '<a target="_blank" rel="noopener noreferrer" ')
+  }
+
+  renderer.image = (token) => {
+    return defaultImageRenderer({
+      ...token,
+      href: resolveTutorialAssetUrl(token.href, options),
+    })
+  }
+
+  return renderer
 }
 
 function normalizeLocale(locale) {
@@ -62,7 +95,7 @@ function trimEdgeSpaces(tokens) {
   return trimmed
 }
 
-function parseMarkdownDocument(rawMarkdown) {
+function parseMarkdownDocument(rawMarkdown, options = {}) {
   const tokens = marked.lexer(rawMarkdown)
   const titleIndex = tokens.findIndex((token) => token.type === 'heading' && token.depth === 1)
   const title = titleIndex >= 0 ? tokens[titleIndex].text.trim() : ''
@@ -83,7 +116,9 @@ function parseMarkdownDocument(rawMarkdown) {
 
   const summary = summaryIndex >= 0 ? tokens[summaryIndex].text.trim() : ''
   const bodyTokens = trimEdgeSpaces(tokens.filter((_, index) => index !== titleIndex && index !== summaryIndex))
-  const html = marked.parser(bodyTokens, { renderer }).trim()
+  const html = marked.parser(bodyTokens, {
+    renderer: createTutorialRenderer(options),
+  }).trim()
 
   return {
     title,
@@ -106,9 +141,15 @@ const tutorialDocumentMap = new Map(
   })
 )
 
-export function resolveTutorialDocument(key, locale) {
+export function resolveTutorialDocument(key, locale, options = {}) {
   const normalizedLocale = normalizeLocale(locale)
-  return tutorialDocumentMap.get(`${normalizedLocale}/${key}`)
+  const document = tutorialDocumentMap.get(`${normalizedLocale}/${key}`)
     || tutorialDocumentMap.get(`${BASE_LOCALE}/${key}`)
     || null
+
+  if (!document || !(options.isNativeBuild ?? BUILD_IS_NATIVE)) {
+    return document
+  }
+
+  return parseMarkdownDocument(document.rawMarkdown, options)
 }

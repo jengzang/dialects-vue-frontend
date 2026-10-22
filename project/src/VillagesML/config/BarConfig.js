@@ -449,10 +449,10 @@ export function createVillagesMLCommonBarSchema(isAuthenticated = false) {
     const homeItem = createCommonBarItem({
         id: 'home',
         label: '首页',
-        icon: '🏠',
-        display: {
-            overrides: { mobileScroll: 'left', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 0.9 }
-        },
+         icon: '🏠',
+         display: {
+             overrides: { scroll: 'left', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 0.9 }
+         },
         navigation: {
             defaultTo: '/'
         }
