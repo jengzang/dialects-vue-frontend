@@ -43,6 +43,12 @@ describe('Praat platform capabilities', () => {
     expect(isPraatFileAcceptedOnPlatform({ name: 'sample.flac', type: 'audio/flac' }, 'web')).toBe(true)
   })
 
+  it('preserves Web MIME-only acceptance for supported audio files without recognized extensions', () => {
+    expect(isPraatFileAcceptedOnPlatform({ name: 'recording', type: 'audio/mpeg' }, 'web')).toBe(true)
+    expect(isPraatFileAcceptedOnPlatform({ name: 'recording', type: 'audio/x-m4a' }, 'web')).toBe(true)
+    expect(isPraatFileAcceptedOnPlatform({ name: 'recording', type: 'audio/x-aac' }, 'web')).toBe(true)
+  })
+
   it('advertises native local Python analysis in the acceptance matrix', () => {
     expect(PLATFORM_FEATURE_MATRIX.praatTools.capabilities).toMatchObject({
       web: { preferredEngine: 'remote-api' },

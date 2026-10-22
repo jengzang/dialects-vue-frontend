@@ -1,4 +1,16 @@
 const WEB_PRAAT_FORMATS = ['wav', 'mp3', 'm4a', 'webm', 'ogg', 'flac', 'aac']
+const WEB_PRAAT_MIME_TYPES = [
+  'audio/wav',
+  'audio/mpeg',
+  'audio/mp3',
+  'audio/ogg',
+  'audio/webm',
+  'audio/m4a',
+  'audio/x-m4a',
+  'audio/flac',
+  'audio/aac',
+  'audio/x-aac',
+]
 const NATIVE_PRAAT_FORMATS = ['wav']
 
 const NATIVE_TEMPORARY_AUDIO_POLICY = {
@@ -68,6 +80,10 @@ export function isPraatFileAcceptedOnPlatform(file, target = 'web') {
   }
 
   const mimeType = typeof file?.type === 'string' ? file.type.toLowerCase() : ''
+  if (capabilities.target === 'web' && WEB_PRAAT_MIME_TYPES.includes(mimeType)) {
+    return true
+  }
+
   if (capabilities.inputFormats.includes('wav')) {
     return mimeType === 'audio/wav' || mimeType === 'audio/x-wav' || mimeType === 'audio/wave'
   }

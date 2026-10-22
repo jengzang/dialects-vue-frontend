@@ -203,7 +203,7 @@ export function useMenuTabsConfig() {
       icon: '🏠',
       display: {
         preset: 'compactDesktop',
-        overrides: { scroll: 'left', weight: 0.7, weightIconOnly: 0.4 }
+        overrides: { mobileScroll: 'left', weight: 0.7, weightIconOnly: 0.4 }
       },
       navigation: {
         defaultTo: { path: withRouteLocale(route, '/') }
@@ -320,7 +320,7 @@ export function useMenuTabsConfig() {
       icon: '📚',
       display: {
         preset: 'compactDesktop',
-        overrides: { scroll: 'right', weight: 0.7 }
+        overrides: { mobileScroll: 'right', weight: 0.7 }
       },
       navigation: {
         defaultTo: {
