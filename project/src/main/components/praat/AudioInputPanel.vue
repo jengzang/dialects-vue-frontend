@@ -459,7 +459,11 @@ const startRecording = async () => {
     startRecordingTimer()
   } catch (error) {
     console.error('Recording error:', error)
-    showPlatformAudioInputError(error)
+    if (praatPlatformTarget === 'web') {
+      showError(t('praat.audioInput.errors.microphoneAccessDenied'))
+    } else {
+      showPlatformAudioInputError(error)
+    }
     isProcessing.value = false
   }
 }
