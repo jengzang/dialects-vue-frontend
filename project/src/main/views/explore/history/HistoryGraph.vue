@@ -9,58 +9,74 @@
     >
       网站历史
     </h1>
-    <ol class="history-timeline">
-      <li
-        v-for="(entry, index) in historyEntries"
-        :key="entry.date"
-        class="history-entry"
+    <section
+      v-for="stage in historyStages"
+      :key="stage.major"
+      class="history-stage"
+      :aria-labelledby="`history-stage-${stage.major}`"
+    >
+      <h2
+        :id="`history-stage-${stage.major}`"
+        class="history-stage-title"
       >
-        <time
-          class="history-date"
-          :datetime="entry.dateTime"
-        >{{ entry.date }}</time>
-        <p class="history-content">
-          <template
-            v-for="(part, partIndex) in entry.displayParts"
-            :key="partIndex"
-          >
-            <template v-if="typeof part === 'string'">
-              {{ part }}
-            </template>
-            <code
-              v-else-if="part.version"
-              class="history-version"
-            >{{ part.version }}</code>
-            <RouterLink
-              v-else-if="part.to"
-              class="text-action history-link history-link--internal"
-              :to="buildLocalePath(resolveRouteLocale(route), part.to)"
+        {{ stage.title }}
+      </h2>
+      <ol
+        v-if="stage.entries.length"
+        class="history-timeline"
+      >
+        <li
+          v-for="(entry, index) in stage.entries"
+          :key="entry.date"
+          class="history-entry"
+        >
+          <time
+            class="history-date"
+            :datetime="entry.dateTime"
+          >{{ entry.date }}</time>
+          <p class="history-content">
+            <template
+              v-for="(part, partIndex) in entry.displayParts"
+              :key="partIndex"
             >
-              {{ part.text }}
-            </RouterLink>
-            <a
-              v-else
-              class="text-action history-link history-link--external"
-              :href="part.href"
-              target="_blank"
-              rel="noopener noreferrer"
-            >{{ part.href }}</a>
-          </template>
-        </p>
-        <span
-          v-if="index < historyEntries.length - 1"
-          class="history-connector"
-          aria-hidden="true"
-        />
-      </li>
-    </ol>
+              <template v-if="typeof part === 'string'">
+                {{ part }}
+              </template>
+              <code
+                v-else-if="part.version"
+                class="history-version"
+              >{{ part.version }}</code>
+              <RouterLink
+                v-else-if="part.to"
+                class="text-action history-link history-link--internal"
+                :to="buildLocalePath(resolveRouteLocale(route), part.to)"
+              >
+                {{ part.text }}
+              </RouterLink>
+              <a
+                v-else
+                class="text-action history-link history-link--external"
+                :href="part.href"
+                target="_blank"
+                rel="noopener noreferrer"
+              >{{ part.href }}</a>
+            </template>
+          </p>
+          <span
+            v-if="index < stage.entries.length - 1"
+            class="history-connector"
+            aria-hidden="true"
+          />
+        </li>
+      </ol>
+    </section>
   </section>
 </template>
 
 <script setup>
 import { RouterLink, useRoute } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
-import { historyEntries } from './history.data.js'
+import { historyStages } from './history.data.js'
 
 const route = useRoute()
 </script>
@@ -76,9 +92,25 @@ const route = useRoute()
   padding: clamp(1rem, 3vw, 2rem);
 }
 
-.history-timeline {
+.history-stage {
   max-width: 60rem;
-  margin: 2rem auto 0;
+  margin: 2.5rem auto 0;
+
+  & + & {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-primary-border);
+  }
+}
+
+.history-stage-title {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.history-timeline {
+  margin: 1.5rem 0 0;
   padding: 0;
   list-style: none;
 }

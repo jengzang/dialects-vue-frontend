@@ -47,7 +47,29 @@ describe('author-provided website history', () => {
     expect(entries[0].querySelector('time').textContent).toBe('2025.5')
     expect(dates.at(-1)).toBe('2026-03-24')
     expect(dates).toEqual([...dates].sort())
-    expect(host.querySelectorAll('.history-connector')).toHaveLength(34)
+    expect(host.querySelectorAll('.history-connector')).toHaveLength(31)
+  })
+
+  it('separates major versions at their first release and reserves the V5 title', async () => {
+    await mountHistory()
+    const stages = [...host.querySelectorAll('.history-stage')]
+    expect(stages.map(stage => stage.querySelector('h2').textContent.trim())).toEqual([
+      'V1 初步尝试 - 原生js页面',
+      'V2 围绕音韵的核心查询功能 - Vue',
+      'V3 快速迭代的核心拓展功能',
+      'V4 稳步推进的功能创新',
+      'V5 完善原有功能，改进用户体验'
+    ])
+    expect(stages.map(stage => [...stage.querySelectorAll('time')].map(time => time.dateTime))).toEqual([
+      historyEntries.slice(0, 14).map(entry => entry.dateTime),
+      historyEntries.slice(14, 21).map(entry => entry.dateTime),
+      historyEntries.slice(21, 32).map(entry => entry.dateTime),
+      historyEntries.slice(32).map(entry => entry.dateTime),
+      []
+    ])
+    for (const stage of stages) {
+      expect(stage.querySelector('.history-entry:last-child .history-connector')).toBeNull()
+    }
   })
 
   it('uses the latest author versions and preserves the partial Vue migration wording', async () => {

@@ -103,3 +103,19 @@ export const historyEntries = [
   displayParts: formatParts(entry),
   dateTime: entry.date.split('.').map((part, index) => index === 0 ? part : part.padStart(2, '0')).join('-')
 }))
+
+export const historyStages = [
+  'V1 初步尝试 - 原生js页面',
+  'V2 围绕音韵的核心查询功能 - Vue',
+  'V3 快速迭代的核心拓展功能',
+  'V4 稳步推进的功能创新',
+  'V5 完善原有功能，改进用户体验'
+].map((title, index) => ({ major: index + 1, title, entries: [] }))
+
+// 未标版本的早期筹备记录归入 V1；其他无版本记录沿用所在阶段。
+let currentMajor = 1
+historyEntries.forEach(entry => {
+  const release = entry.displayParts.find(part => part.version)
+  if (release) currentMajor = Number(release.version.split('.')[0].slice(1))
+  historyStages.find(stage => stage.major === currentMajor).entries.push(entry)
+})
