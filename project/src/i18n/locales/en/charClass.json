@@ -23,6 +23,8 @@
     "noMoreLevels": "All available fields are already used in the hierarchy."
   },
   "actions": {
+    "query": "Query",
+    "querying": "Querying…",
     "retry": "Retry",
     "addLevel": "Add Level",
     "removeLevel": "Remove Level",

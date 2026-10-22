@@ -105,16 +105,30 @@
             {{ t('charClass.states.noMoreLevels') }}
           </div>
         </div>
+
+        <div class="query-actions">
+          <button
+            type="button"
+            class="action-btn query-button"
+            :disabled="loading"
+            @click="submitQuery"
+          >
+            {{ t(loading ? 'charClass.actions.querying' : 'charClass.actions.query') }}
+          </button>
+        </div>
       </section>
 
-      <section class="tree-panel glass-panel">
+      <section
+        v-if="submittedState"
+        class="tree-panel glass-panel"
+      >
         <div class="tree-header">
           <div class="tree-title-group">
             <h3 class="tree-title">{{ t('charClass.common.resultsTitle') }}</h3>
             <p class="tree-meta">
-              {{ t(currentTableConfig.labelKey) }}
+              {{ t(resultTableConfig.labelKey) }}
               <span class="tree-meta-separator">·</span>
-              {{ activePresetLabel || t('charClass.common.custom') }}
+              {{ resultPresetLabel || t('charClass.common.custom') }}
             </p>
           </div>
 
@@ -143,7 +157,7 @@
         <div class="tree-body ui-scrollbar">
           <div v-if="loading" class="state-block">
             <div class="ui-loading--page" aria-hidden="true"></div>
-            <p>{{ t('charClass.states.loading', { name: t(currentTableConfig.labelKey) }) }}</p>
+            <p>{{ t('charClass.states.loading', { name: t(resultTableConfig.labelKey) }) }}</p>
             <p class="state-hint">{{ t('charClass.states.loadingHint') }}</p>
           </div>
 
@@ -166,7 +180,7 @@
           <div v-else class="tree-container">
             <CharTreeItem
               v-for="item in displayTree"
-              :key="item.id"
+              :key="`${activeTreeCacheKey}-${item.id}`"
               :node="item"
               :search-query="searchQuery"
               :show-annotations="showAnnotations"
@@ -229,6 +243,7 @@ const levelDropdownRefs = ref([])
 const treeCache = ref({})
 const activeTreeCacheKey = ref('')
 const loadingCacheKey = ref('')
+const submittedState = ref(null)
 
 let loadRequestId = 0
 
@@ -247,8 +262,13 @@ const currentTableConfig = computed(() => {
   return currentPageConfig.value.tables[normalizedTableKey]
 })
 const activePresetKey = computed(() => findCharClassPresetKey(currentTableConfig.value, levels.value))
-const activePresetLabel = computed(() => {
-  const preset = currentTableConfig.value.presetMap[activePresetKey.value]
+const resultTableConfig = computed(() => submittedState.value
+  ? getCharClassPageConfig(submittedState.value.pageKey).tables[submittedState.value.tableKey]
+  : null)
+const resultPresetLabel = computed(() => {
+  if (!submittedState.value) return ''
+  const presetKey = findCharClassPresetKey(resultTableConfig.value, submittedState.value.levels)
+  const preset = resultTableConfig.value.presetMap[presetKey]
   return preset ? t(preset.labelKey) : ''
 })
 const currentTreeData = computed(() => treeCache.value[activeTreeCacheKey.value] || [])
@@ -279,7 +299,7 @@ const activePresetModel = computed({
 const areArraysEqual = (left, right) =>
   left.length === right.length && left.every((item, index) => item === right[index])
 
-const buildCacheKey = (tableKey, levelKeys) => `${activeTab.value}:${tableKey}:${levelKeys.join('|')}`
+const buildCacheKey = (state) => `${state.pageKey}:${state.tableKey}:${state.levels.join('|')}`
 
 const normalizeState = (tableKey, levelKeys) => {
   const normalizedTableKey = sanitizeCharClassTableKey(currentPageConfig.value, tableKey)
@@ -317,8 +337,9 @@ const syncUrlToState = (state) => {
 }
 
 const loadTreeForState = async (state) => {
-  const cacheKey = buildCacheKey(state.tableKey, state.levels)
-  const tableConfig = currentPageConfig.value.tables[state.tableKey]
+  const cacheKey = buildCacheKey(state)
+  if (loadingCacheKey.value === cacheKey) return
+  const requestId = ++loadRequestId
   activeTreeCacheKey.value = cacheKey
   loadError.value = ''
 
@@ -328,16 +349,11 @@ const loadTreeForState = async (state) => {
     return
   }
 
-  if (loadingCacheKey.value === cacheKey) {
-    return
-  }
-
-  const requestId = ++loadRequestId
   loading.value = true
   loadingCacheKey.value = cacheKey
 
   try {
-    const payload = buildCharClassTreePayload(activeTab.value, state.tableKey, state.levels)
+    const payload = buildCharClassTreePayload(state.pageKey, state.tableKey, state.levels)
     // Load only the first level lazily (same pattern as gdVillages)
     const result = await lazyLoadTree({
       db_key: payload.db_key,
@@ -390,28 +406,22 @@ const loadTreeForState = async (state) => {
   }
 }
 
-const commitState = (nextTableKey, nextLevels, options = { syncUrl: true, resetSearch: false }) => {
+const commitState = (nextTableKey, nextLevels) => {
   const normalizedState = normalizeState(nextTableKey, nextLevels)
-  const cacheKey = buildCacheKey(normalizedState.tableKey, normalizedState.levels)
-  const stateChanged =
-    selectedTableKey.value !== normalizedState.tableKey ||
-    !areArraysEqual(levels.value, normalizedState.levels)
-
   selectedTableKey.value = normalizedState.tableKey
   levels.value = [...normalizedState.levels]
-  activeTreeCacheKey.value = cacheKey
+}
 
-  if (options.resetSearch) {
-    searchQuery.value = ''
+const submitQuery = () => {
+  const state = {
+    pageKey: activeTab.value,
+    ...normalizeState(selectedTableKey.value, levels.value)
   }
-
-  if (options.syncUrl) {
-    syncUrlToState(normalizedState)
-  }
-
-  if (stateChanged || (!treeCache.value[cacheKey] && loadingCacheKey.value !== cacheKey)) {
-    loadTreeForState(normalizedState)
-  }
+  const queryChanged = !submittedState.value || buildCacheKey(submittedState.value) !== buildCacheKey(state)
+  submittedState.value = state
+  if (queryChanged) searchQuery.value = ''
+  loadTreeForState(state)
+  syncUrlToState(state)
 }
 
 const getLevelOptions = (index) => {
@@ -491,18 +501,17 @@ const addLevel = async () => {
 }
 
 const retryCurrentState = () => {
-  loadTreeForState({
-    tableKey: selectedTableKey.value,
-    levels: [...levels.value]
-  })
+  if (submittedState.value) loadTreeForState(submittedState.value)
 }
 
 const lazyLoadCharClassChildren = async (node) => {
   if (!node._lazy || node._childrenLoaded || node._loadingChildren) return
 
   node._loadingChildren = true
+  const state = submittedState.value
+  const tableConfig = getCharClassPageConfig(state.pageKey).tables[state.tableKey]
   try {
-    const payload = buildCharClassTreePayload(activeTab.value, selectedTableKey.value, levels.value)
+    const payload = buildCharClassTreePayload(state.pageKey, state.tableKey, state.levels)
     const result = await loadFullTree({
       db_key: payload.db_key,
       table_name: payload.table_name,
@@ -539,12 +548,11 @@ const lazyLoadCharClassChildren = async (node) => {
       }))
     } else {
       // mode === 'full' — tree rooted at filter level, extract by node key
-      const tableConfig = currentTableConfig.value
       const subtree = result.tree?.[node.name]
       node.children = normalizeCharClassTree(subtree || {}, {
         leafLevelColumnName: tableConfig?.leafLevelColumnName,
         leafData: tableConfig?.leafData,
-        collapseLeafLevel: levels.value.length === 1,
+        collapseLeafLevel: state.levels.length === 1,
       })
     }
     node._childrenLoaded = true
@@ -567,6 +575,7 @@ const resetPageState = () => {
   treeCache.value = {}
   activeTreeCacheKey.value = ''
   loadingCacheKey.value = ''
+  submittedState.value = null
   loadRequestId += 1
 }
 
@@ -578,14 +587,17 @@ const applyRouteState = () => {
   const parsedParams = parseCharClassParams(route)
 
   if (!parsedParams.table && !parsedParams.levels?.length) {
+    resetPageState()
+    commitState('', [])
     return
   }
 
   const normalizedState = normalizeState(parsedParams.table, parsedParams.levels)
-  commitState(normalizedState.tableKey, normalizedState.levels, {
-    syncUrl: true,
-    resetSearch: false
-  })
+  // Our own URL update must not replace edits made while navigation completes.
+  const routeState = { pageKey: activeTab.value, ...normalizedState }
+  if (submittedState.value && buildCacheKey(submittedState.value) === buildCacheKey(routeState)) return
+  commitState(normalizedState.tableKey, normalizedState.levels)
+  submitQuery()
 }
 
 watch(
@@ -622,43 +634,38 @@ $white: var(--text-white);
 
 $transition-fast: 0.2s;
 $panel-radius: 28px;
-$panel-radius-portrait: 24px;.char-class-page {
+$panel-radius-portrait: 24px;
+
+.char-class-page {
   width: 100%;
   padding: 12px 0 24px;
 }
 
 .page-shell {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 18px;
   align-items: start;
   width: min(94dvw, 1380px);
   margin: 0 auto;
-
-  @media (orientation: portrait) {
-    grid-template-columns: 1fr;
-  }
 }
 
 .config-panel,
 .tree-panel {
-  height: 80dvh !important;
   padding: 22px;
-  overflow-x: hidden;
-  overflow-y: auto;
   color: var(--text-dark);
   border-radius: $panel-radius;
 
-  @media (orientation: portrait) {
+  @media (max-aspect-ratio: 1 / 1) {
     padding: 18px;
     border-radius: $panel-radius-portrait;
   }
 }
 
-.config-panel {
-  @media (orientation: portrait) {
-    max-height: 48dvh;
-  }
+.query-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 
 .panel-header,
@@ -668,7 +675,7 @@ $panel-radius-portrait: 24px;.char-class-page {
   align-items: flex-start;
   justify-content: space-between;
 
-  @media (orientation: portrait) {
+  @media (max-aspect-ratio: 1 / 1) {
     flex-direction: column;
     align-items: stretch;
   }
@@ -679,6 +686,7 @@ $panel-radius-portrait: 24px;.char-class-page {
   flex-direction: row;
   gap: 12px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .panel-title-group,
@@ -698,7 +706,7 @@ $panel-radius-portrait: 24px;.char-class-page {
   color: $text-primary;
   font-size: 25px;
 
-  @media (orientation: portrait) {
+  @media (max-aspect-ratio: 1 / 1) {
     font-size: 20px;
   }
 }
@@ -733,7 +741,7 @@ $panel-radius-portrait: 24px;.char-class-page {
   @include flex-col;
   gap: 12px;
   margin-top: 20px;
-  @media (orientation: portrait) {
+  @media (max-aspect-ratio: 1 / 1) {
     margin-top: 3px;
   }
 }
@@ -801,7 +809,7 @@ $panel-radius-portrait: 24px;.char-class-page {
 
 .levels-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
   gap: 10px;
   align-items: stretch;
 }
@@ -821,7 +829,7 @@ $panel-radius-portrait: 24px;.char-class-page {
   width: 100%;
   min-width: 0;
 
-  @media (orientation: portrait) {
+  @media (max-aspect-ratio: 1 / 1) {
     justify-content: flex-start;
   }
 }
@@ -849,7 +857,7 @@ $panel-radius-portrait: 24px;.char-class-page {
   align-items: center;
   justify-self: end;
 
-  @media (orientation: portrait) {
+  @media (max-aspect-ratio: 1 / 1) {
     justify-content: flex-end;
     margin-left: 0;
   }
@@ -949,7 +957,7 @@ $panel-radius-portrait: 24px;.char-class-page {
   position: relative;
   min-width: 240px;
 
-  @media (orientation: portrait) {
+  @media (max-aspect-ratio: 1 / 1) {
     min-width: 100%;
   }
 }
@@ -970,9 +978,9 @@ $panel-radius-portrait: 24px;.char-class-page {
 .tree-body {
   flex: 1;
   margin-top: 18px;
-  overflow: auto;
+  overflow-x: auto;
 
-  @media (orientation: portrait) {
+  @media (max-aspect-ratio: 1 / 1) {
     min-height: 52dvh;
   }
 }
