@@ -373,6 +373,11 @@ export function getPlatformFileService(options = {}) {
       return null
     },
     async pickFilesOrOpenInput(inputElement, pickerOptions = {}) {
+      if (!hasNativeFilePickerBridge(options)) {
+        inputElement?.click?.()
+        return null
+      }
+
       const nativeFiles = await this.pickFiles(pickerOptions)
       if (nativeFiles) {
         return nativeFiles

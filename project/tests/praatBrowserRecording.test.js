@@ -40,3 +40,24 @@ describe('Praat browser recording errors', () => {
     },
   )
 })
+
+describe('Praat browser file selection', () => {
+  it('opens the file input only once per upload-area click', async () => {
+    host = document.createElement('div')
+    document.body.appendChild(host)
+    app = createApp(AudioInputPanel)
+    app.mount(host)
+    const input = host.querySelector('input[type="file"]')
+    let clicks = 0
+    input.addEventListener('click', (event) => {
+      clicks++
+      // Bound the regression so an asynchronous click loop cannot hang the test runner.
+      if (clicks >= 3) event.stopPropagation()
+    })
+
+    host.querySelector('.upload-area').click()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+
+    expect(clicks).toBe(1)
+  })
+})

@@ -19,6 +19,7 @@
             type="file"
             ref="fileInput"
             accept=".xlsx,.xls"
+            @click.stop
             @change="handleFileSelect"
             style="display: none"
           />

@@ -18,6 +18,7 @@
         ref="fileInput"
         type="file"
         :accept="fileInputAccept"
+        @click.stop
         @change="handleFileSelect"
         style="display: none"
       />

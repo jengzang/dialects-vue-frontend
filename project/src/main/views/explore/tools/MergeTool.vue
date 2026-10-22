@@ -48,6 +48,7 @@
               ref="refInput"
               type="file"
               accept=".xlsx,.xls,.csv"
+              @click.stop
               @change="handleRefSelect"
               style="display: none"
             />
@@ -159,6 +160,7 @@
               type="file"
               accept=".xlsx,.xls"
               multiple
+              @click.stop
               @change="handleFilesSelect"
               style="display: none"
             />
