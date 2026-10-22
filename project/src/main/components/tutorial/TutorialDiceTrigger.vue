@@ -91,6 +91,8 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+@use '@/styles/global/mixins' as *;
+
 $trigger-radius: 999px;
 $trigger-z-index: 1200;
 
@@ -351,6 +353,10 @@ $shadow-hover:
       max-width: 7em;
       font-size: 0.8rem;
       line-height: 1.1;
+    }
+
+    &__finger-hint {
+      display: none;
     }
   }
 
