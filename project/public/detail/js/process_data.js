@@ -2,7 +2,8 @@
 async function analysis_from_db() {
     const mode = document.querySelector('input[name="mode"]:checked').value;
     const locations = document.getElementById('locations').value.trim().split(/\s+/);
-    const regions = document.getElementById('regions').value.trim().split(/\s+/);
+    const regions = await readRegionPaths();
+    if (regions === null) return;
     const features = Array.from(document.querySelectorAll('#features-group input:checked')).map(cb => cb.value);
 
     const status_inputs = parseMultilineListInput("status_inputs");
@@ -447,13 +448,16 @@ async function func_mergeData() {
 
     // 获取前端页面数据
     const locations = document.getElementById('locations').value.trim().split(/\s+/);
-    const regions = document.getElementById('regions').value.trim().split(/\s+/);
+    const regions = await readRegionPaths();
+    if (regions === null) return;
     const uniqueFeatures = [...new Set(latestResults.map(result => result.特徵值))];
 
     // 创建请求参数
+    const customScope = await readCustomScope(regions);
+    if (!customScope) return;
     const queryParams = {
-        locations: locations,
-        regions: regions,
+        locations: customScope.locations.length ? customScope.locations : [''],
+        regions: customScope.regions,
         need_features: uniqueFeatures
     };
 
@@ -467,7 +471,10 @@ async function func_mergeData() {
             throw "用戶未登錄，不查詢個人數據";
         }
         // 用 URLSearchParams 拼接到 GET URL
-        const queryString = new URLSearchParams(queryParams).toString();
+        const queryString = new URLSearchParams();
+        queryParams.locations.forEach(loc => queryString.append('locations', loc));
+        (queryParams.regions.length ? queryParams.regions : ['']).forEach(path => queryString.append('regions', path));
+        queryString.set('need_features', queryParams.need_features.join(','));
         const response = await fetch(`${window.API_BASE}/get_custom?${queryString}`, {
             method: 'GET',
             headers: {
@@ -508,7 +515,8 @@ async function func_mergeData() {
 // 請求後端，並整理返回的數組
 async function get_custom_feature(){
     const locations = document.getElementById('locations').value.trim().split(/\s+/);
-    const regions = document.getElementById('regions').value.trim().split(/\s+/);
+    const regions = await readRegionPaths();
+    if (regions === null) return;
     if (isEmptyInput(locations) && isEmptyInput(regions)) {
         // alert("請輸入地點或分區！");
         return;
@@ -518,16 +526,18 @@ async function get_custom_feature(){
     const word = inputEl ? inputEl.value.trim() : "";
     const suggestion = document.getElementById("inlineSuggestion");  // 渲染到这里
 
+    const customScope = await readCustomScope(regions);
+    if (!customScope) return;
     const queryParams = {
-        locations: locations,
-        regions: regions,
+        locations: customScope.locations.length ? customScope.locations : [''],
+        regions: customScope.regions,
         word: word
     };
 
     try {
         const queryString = new URLSearchParams();
         queryParams.locations.forEach(loc => queryString.append("locations", loc));
-        queryParams.regions.forEach(reg => queryString.append("regions", reg));
+        (queryParams.regions.length ? queryParams.regions : ['']).forEach(reg => queryString.append("regions", reg));
         queryString.append("word", queryParams.word);
         const token = localStorage.getItem("ACCESS_TOKEN")
         const response = await fetch(`${window.API_BASE}/get_custom_feature?${queryString.toString()}`, {
@@ -592,14 +602,17 @@ async function get_custom_feature(){
 async function process_custom() {
     // 获取前端页面数据
     const locations = document.getElementById('locations').value.trim().split(/\s+/);
-    const regions = document.getElementById('regions').value.trim().split(/\s+/);
+    const regions = await readRegionPaths();
+    if (regions === null) return;
     const featuresInput = document.getElementById('tipinput2');
     const featureList = featuresInput?.value.trim().split(/\s+/).filter(Boolean) || [];
 
     // 构建请求参数
+    const customScope = await readCustomScope(regions);
+    if (!customScope) return;
     const queryParams = {
-        locations: locations,
-        regions: regions,
+        locations: customScope.locations.length ? customScope.locations : [''],
+        regions: customScope.regions,
         need_features: featureList
     };
 
@@ -609,7 +622,7 @@ async function process_custom() {
     try {
         const queryString = new URLSearchParams();
         queryParams.locations.forEach(loc => queryString.append("locations", loc));
-        queryParams.regions.forEach(reg => queryString.append("regions", reg));
+        (queryParams.regions.length ? queryParams.regions : ['']).forEach(reg => queryString.append("regions", reg));
         queryParams.need_features.forEach(f => queryString.append("need_features", f));
         const token = localStorage.getItem("ACCESS_TOKEN")
         const response = await fetch(`${window.API_BASE}/get_custom?${queryString.toString()}`, {

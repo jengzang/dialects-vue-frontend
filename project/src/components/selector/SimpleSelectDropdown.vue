@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SimpleDropdown from './SimpleDropdown.vue'
 
@@ -68,11 +68,16 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'openChange'])
 
 // State
 const isOpen = ref(false)
 const triggerRef = ref(null)
+
+watch(isOpen, open => emit('openChange', open), { flush: 'sync' })
+onBeforeUnmount(() => {
+  if (isOpen.value) emit('openChange', false)
+})
 
 // Computed
 const displayLabel = computed(() => {

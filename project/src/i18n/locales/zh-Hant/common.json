@@ -1,4 +1,8 @@
 {
+  "recentQueries": {
+    "label": "最近查詢",
+    "restore": "填入最近查詢：{summary}"
+  },
   "button": {
     "confirm": "確定",
     "cancel": "取消",

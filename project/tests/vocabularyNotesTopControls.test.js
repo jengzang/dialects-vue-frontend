@@ -48,7 +48,8 @@ describe('VocabularyTopControls character-notes mode', () => {
     expect(source).toContain('allow-empty-scope')
     expect(source).toContain('disable-location-limit')
     expect(source).toContain("@locations-resolved=\"handleNotesLocationsResolved\"")
-    expect(source).toContain("@click=\"emit('refreshNotes')\"")
+    expect(source).toContain('@click="refreshNotes"')
+    expect(source).toContain('if (props.notesRefreshDisabled || isNotesScopeResolving.value || isNotesScopeDisabled.value) return')
     expect(source).toContain('isNotesScopeResolving')
   })
 

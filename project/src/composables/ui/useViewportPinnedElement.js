@@ -1,0 +1,192 @@
+import {
+  onActivated,
+  onBeforeUnmount,
+  onDeactivated,
+  onMounted,
+  ref,
+  unref,
+  watch,
+} from 'vue'
+
+function resolveValue(value) {
+  return typeof value === 'function' ? value() : unref(value)
+}
+
+function toCssLength(value) {
+  return typeof value === 'number' ? `${value}px` : value
+}
+
+function setStyle(styleRef, nextStyle) {
+  const currentStyle = styleRef.value
+  const keys = new Set([...Object.keys(currentStyle), ...Object.keys(nextStyle)])
+  const hasChanged = [...keys].some((key) => currentStyle[key] !== nextStyle[key])
+
+  if (hasChanged) {
+    styleRef.value = nextStyle
+  }
+}
+
+export function useViewportPinnedElement(options = {}) {
+  const {
+    elementRef,
+    placeholderRef,
+    enabled = true,
+    landscapeTop = null,
+    portraitTop = 0,
+    scrollTarget = () => window,
+  } = options
+
+  const elementStyle = ref({})
+  const placeholderStyle = ref({})
+  const isPinned = ref(false)
+
+  let isComponentActive = false
+  let isListening = false
+  let scrollEventTarget = null
+  let orientationQuery = null
+  let resizeObserver = null
+  let initialLandscapeTop = null
+
+  function clearPosition() {
+    setStyle(elementStyle, {})
+    setStyle(placeholderStyle, {})
+    isPinned.value = false
+  }
+
+  function updatePosition() {
+    if (!isListening) return
+
+    const element = unref(elementRef)
+    const placeholder = unref(placeholderRef)
+    if (!resolveValue(enabled) || !element || !placeholder) {
+      clearPosition()
+      return
+    }
+
+    const placeholderRect = placeholder.getBoundingClientRect()
+    const elementRect = element.getBoundingClientRect()
+    const portrait = orientationQuery?.matches ?? false
+    const configuredPortraitTop = resolveValue(portraitTop)
+    const portraitThreshold = typeof configuredPortraitTop === 'number'
+      ? configuredPortraitTop
+      : Number.parseFloat(configuredPortraitTop) || 0
+
+    if (portrait && placeholderRect.top > portraitThreshold) {
+      clearPosition()
+      return
+    }
+
+    let top = portrait ? configuredPortraitTop : resolveValue(landscapeTop)
+    if (!portrait && (top === null || top === undefined)) {
+      if (initialLandscapeTop === null) {
+        initialLandscapeTop = elementRect.top
+      }
+      top = initialLandscapeTop
+    }
+
+    setStyle(placeholderStyle, {
+      width: `${placeholderRect.width}px`,
+      height: `${elementRect.height}px`,
+    })
+    const navigationWidth = Math.min(elementRect.width, placeholderRect.width)
+    const navigationLeft = placeholderRect.left + (placeholderRect.width - navigationWidth) / 2
+    setStyle(elementStyle, {
+      position: 'fixed',
+      top: toCssLength(top),
+      left: `${navigationLeft}px`,
+      width: `${navigationWidth}px`,
+    })
+    isPinned.value = true
+  }
+
+  function observeElement() {
+    resizeObserver?.disconnect()
+
+    const element = unref(elementRef)
+    const placeholder = unref(placeholderRef)
+    if (element && typeof ResizeObserver !== 'undefined') {
+      resizeObserver ??= new ResizeObserver(updatePosition)
+      resizeObserver.observe(element)
+      if (placeholder) {
+        resizeObserver.observe(placeholder)
+      }
+    }
+  }
+
+  function startListening() {
+    if (isListening || typeof window === 'undefined') return
+
+    isListening = true
+    scrollEventTarget = resolveValue(scrollTarget) || window
+    scrollEventTarget.addEventListener('scroll', updatePosition, { passive: true })
+    window.addEventListener('resize', updatePosition, { passive: true })
+    window.addEventListener('orientationchange', updatePosition, { passive: true })
+    orientationQuery = window.matchMedia('(max-aspect-ratio: 1 / 1)')
+    orientationQuery.addEventListener?.('change', updatePosition)
+
+    observeElement()
+    updatePosition()
+  }
+
+  function stopListening() {
+    if (!isListening) {
+      clearPosition()
+      return
+    }
+
+    isListening = false
+    scrollEventTarget?.removeEventListener('scroll', updatePosition)
+    window.removeEventListener('resize', updatePosition)
+    window.removeEventListener('orientationchange', updatePosition)
+    orientationQuery?.removeEventListener?.('change', updatePosition)
+    resizeObserver?.disconnect()
+    clearPosition()
+  }
+
+  function activate() {
+    if (isComponentActive || typeof window === 'undefined') return
+
+    isComponentActive = true
+    if (resolveValue(enabled)) {
+      startListening()
+    } else {
+      clearPosition()
+    }
+  }
+
+  function deactivate() {
+    if (!isComponentActive && !isListening) return
+
+    isComponentActive = false
+    stopListening()
+  }
+
+  watch(
+    () => [unref(elementRef), unref(placeholderRef), Boolean(resolveValue(enabled))],
+    () => {
+      if (!isComponentActive) return
+      if (!resolveValue(enabled)) {
+        stopListening()
+        return
+      }
+      if (!isListening) {
+        startListening()
+        return
+      }
+      observeElement()
+      updatePosition()
+    },
+    { flush: 'post' },
+  )
+
+  onMounted(activate)
+  onActivated(activate)
+  onDeactivated(deactivate)
+  onBeforeUnmount(deactivate)
+
+  return {
+    elementStyle,
+    placeholderStyle,
+    isPinned,
+  }
+}

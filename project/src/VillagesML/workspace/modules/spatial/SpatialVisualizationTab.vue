@@ -817,7 +817,7 @@ h2 {
   width: 100%;
   padding: 10px;
   background: var(--vml-blue);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-sm2);
   font-size: 14px;

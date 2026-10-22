@@ -116,7 +116,7 @@ function render() {
     .globeImageUrl('/showcase/earth-color-relief-dark.webp')
     .backgroundImageUrl(null)
     .showGraticules(false)
-    .backgroundColor('rgba(0,0,0,0)') 
+    .backgroundColor('rgba(0,0,0,0)')
     .atmosphereColor(`rgb(${bgTint})`)
     .atmosphereAltitude(0.2)
     .pointsData(props.points)
@@ -225,7 +225,7 @@ function onKeyDown(e) {
     default: return
   }
   e.preventDefault()
-  
+
   globe.camera().updateProjectionMatrix()
   // console.log('[Proj shift]', { x: projShiftX.toFixed(3), y: projShiftY.toFixed(3) }, '| pov:', globe.pointOfView())
 }

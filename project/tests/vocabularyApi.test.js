@@ -29,7 +29,11 @@ const {
   getVocabularyStandardWords,
   getVocabularyLocationNames,
   getVocabularyLocationOptions,
+  getVocabularyPartitionOptions,
   getVocabularyLocations,
+  getVocabularyCounts,
+  invalidateVocabularyCountsCache,
+  invalidateVocabularyOptionsCache,
   getVocabularyLogs,
   deleteVocabularyLocation,
   updateVocabularyLocation,
@@ -49,11 +53,67 @@ function readSource(path) {
 }
 
 beforeEach(() => {
-  apiMock.mockClear()
+  apiMock.mockReset()
+  invalidateVocabularyCountsCache()
+  invalidateVocabularyOptionsCache()
   setVocabularyEntryCreateLocationName('')
 })
 
+describe('vocabulary counts API', () => {
+  it('shares count requests and cached results until invalidated', async () => {
+    apiMock
+      .mockResolvedValueOnce({ count: 120 })
+      .mockResolvedValueOnce({ count: 18 })
+
+    const [first, concurrent] = await Promise.all([
+      getVocabularyCounts(),
+      getVocabularyCounts(),
+    ])
+
+    expect(first).toEqual({ total: 120, locations: 18 })
+    expect(concurrent).toEqual(first)
+    expect(apiMock).toHaveBeenCalledTimes(2)
+    expect(apiMock).toHaveBeenNthCalledWith(1, '/api/vocabulary/sql/query/count?table_name=vocabulary_entries')
+    expect(apiMock).toHaveBeenNthCalledWith(2, '/api/vocabulary/sql/query/count?table_name=vocabulary_entries&distinct_column=location_name')
+    expect(await getVocabularyCounts()).toEqual(first)
+    expect(apiMock).toHaveBeenCalledTimes(2)
+
+    invalidateVocabularyCountsCache()
+    apiMock
+      .mockResolvedValueOnce({ count: 121 })
+      .mockResolvedValueOnce({ count: 19 })
+
+    expect(await getVocabularyCounts()).toEqual({ total: 121, locations: 19 })
+    expect(apiMock).toHaveBeenCalledTimes(4)
+  })
+})
+
 describe('vocabulary items API', () => {
+  it.each([buildVocabularyItemsPath, buildVocabularyMapPointsPath, buildVocabularyStandardWordsPath, buildVocabularyMapItemsPath])('preserves repeated full region paths for %s', buildPath => {
+    const regions = ['嶺南-珠江', '閩-閩南', '原文-含,逗號']
+    const params = paramsFromPath(buildPath({ region_mode: 'map', regions }))
+    expect(params.get('region_mode')).toBe('map')
+    expect(params.getAll('regions')).toEqual(regions)
+    expect(() => buildPath({ regions: Array(51).fill('甲') })).toThrow()
+    expect(() => buildPath({ regions: ['甲'.repeat(201)] })).toThrow()
+  })
+
+  it('loads vocabulary-owned partition trees for both modes', async () => {
+    for (const region_mode of ['yindian', 'map']) {
+      apiMock.mockResolvedValueOnce({ schema_version: 2, region_mode, nodes: [] })
+      await getVocabularyPartitionOptions(region_mode)
+      expect(apiMock).toHaveBeenLastCalledWith(`/api/vocabulary/search/partition-options?region_mode=${region_mode}`)
+    }
+  })
+
+  it('filters location options by repeated region paths and retains same-name region arrays', async () => {
+    apiMock.mockResolvedValueOnce({ locations: [{ location_name: '同名', yindian_regions: ['甲-乙', '丙-乙'], atlas_regions: ['粵語-廣府片', '吳語-太湖片'] }] })
+    const options = await getVocabularyLocationOptions({ region_mode: 'yindian', regions: ['甲-乙', '丙-乙'] })
+    expect(paramsFromPath(apiMock.mock.calls.at(-1)[0]).getAll('regions')).toEqual(['甲-乙', '丙-乙'])
+    expect(options[0].yindianRegions).toEqual(['甲-乙', '丙-乙'])
+    expect(options[0].atlasRegions).toEqual(['粵語-廣府片', '吳語-太湖片'])
+  })
+
   it('does not reference backend-deleted vocabulary compatibility paths', () => {
     const source = readSource('src/api/main/vocabulary.js')
 
@@ -334,8 +394,8 @@ describe('vocabulary table API adapter', () => {
     const values = await getVocabularyLocationOptions()
 
     expect(values).toEqual([
-      { value: '息烽', label: '息烽', locationLabel: '贵州 / 贵阳 / 息烽', province: '', city: '' },
-      { value: '天柱', label: '天柱', locationLabel: '贵州 / 黔东南 / 天柱', province: '', city: '' },
+      { value: '息烽', label: '息烽', locationLabel: '贵州 / 贵阳 / 息烽', province: '', city: '', yindianRegion: '', atlasRegion: '', yindianRegions: [], atlasRegions: [] },
+      { value: '天柱', label: '天柱', locationLabel: '贵州 / 黔东南 / 天柱', province: '', city: '', yindianRegion: '', atlasRegion: '', yindianRegions: [], atlasRegions: [] },
     ])
     expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/search/location-options')
   })
@@ -472,6 +532,16 @@ describe('vocabulary table API adapter', () => {
 })
 
 describe('vocabulary upload API', () => {
+  it.each([previewVocabularyImport, uploadVocabulary])('serializes the selected owner only when supplied', async (operation) => {
+    const file = new File(['data'], 'words.csv')
+    const location = { location_name: '甲村', coordinates: '113,23' }
+    apiMock.mockResolvedValue({ success: true })
+    await operation({ file, location, target_user_id: 8 })
+    expect(apiMock.mock.calls.at(-1)[1].body.get('target_user_id')).toBe('8')
+    await operation({ file, location })
+    expect(apiMock.mock.calls.at(-1)[1].body.has('target_user_id')).toBe(false)
+  })
+
   it('previews file, location JSON and parser mode through the imports preview endpoint', async () => {
     apiMock.mockResolvedValueOnce({ success: true, parsed_count: 1 })
     const file = new File(['definition,headword'], 'vocabulary.csv', { type: 'text/csv' })

@@ -8,42 +8,13 @@
 <!--        <span>請先登錄</span>-->
 <!--      </button>-->
 <!--    </div>-->
-    <!-- Tab Navigation -->
-    <div class="tab-navigation">
-      <div class="tab-container">
-        <button
-          class="tab-btn"
-          :class="{ active: activeTab === 'upload' }"
-          @click="switchTab('upload')"
-        >
-          {{ t('praat.main.tabs.upload') }}
-        </button>
-        <button
-          class="tab-btn"
-          :class="{ active: activeTab === 'results', disabled: !resultsTabEnabled }"
-          :disabled="!resultsTabEnabled"
-          @click="switchTab('results')"
-        >
-          {{ t('praat.main.tabs.results') }}
-        </button>
-        <button
-          class="tab-btn"
-          :class="{ active: activeTab === 'vowelspace', disabled: !vowelspaceTabEnabled }"
-          :disabled="!vowelspaceTabEnabled"
-          @click="switchTab('vowelspace')"
-        >
-          {{ t('praat.main.tabs.vowelSpace') }}
-        </button>
-        <button
-          class="tab-btn"
-          :class="{ active: activeTab === 'pitchtone', disabled: !pitchtoneTabEnabled }"
-          :disabled="!pitchtoneTabEnabled"
-          @click="switchTab('pitchtone')"
-        >
-          {{ t('praat.main.tabs.pitchTone') }}
-        </button>
-      </div>
-    </div>
+    <TabSwitcher
+      mode="adaptive"
+      :tabs="tabs"
+      :model-value="activeTab"
+      :use-router="false"
+      @tab-change="switchTab"
+    >
 
     <div class="page-header">
       <h1 class="page-title"><BarIcon icon="🎙️" />{{ t('navigation.pageTitles.praat.main') }}</h1>
@@ -134,6 +105,7 @@
         <PitchTonePanel :results="analysisResults" />
       </div>
 <!--    </div>-->
+    </TabSwitcher>
 
     <!-- Job Status (Left Floating Window) - REMOVED, now inline in Tab 2 -->
 
@@ -175,6 +147,7 @@
 <script setup>
 import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import TabSwitcher from '@/components/common/TabSwitcher.vue'
 import { ref, reactive, onBeforeUnmount, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -189,19 +162,31 @@ import { usePraatApi } from '@/api'
 import { userStore } from '@/main/store/store.js'
 import { showError, showWarning } from '@/utils/ui/message.js'
 import { usePollingTask } from '@/composables/core/usePollingTask.js'
+import { usePraatAnalysis } from '@/composables/core/usePraatAnalysis.js'
 import { useStorageState } from '@/composables/core/useStorageState.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
+import { getCurrentRuntimePlatform, isPraatFileAcceptedOnPlatform } from '@/platform/index.js'
 
 const route = useRoute()
 const { t } = useI18n()
-const { uploadAudio, createJob, getJobStatus, getJobResult, cancelJob } = usePraatApi()
+const praatRuntime = getCurrentRuntimePlatform()
+const praatApi = usePraatApi()
+const {
+  strategy: praatAnalysisStrategy,
+  remoteEngine: praatRemoteEngine,
+} = usePraatAnalysis({
+  api: praatApi,
+  runtime: praatRuntime,
+})
+const { uploadAudio, createJob, getJobStatus, getJobResult, cancelJob } = praatRemoteEngine
 const { requireAuth } = useAuthGuard({
   defaultRedirect: '/explore/tools/praat',
 })
 
 const STORAGE_KEY = 'praat_analysis_settings'
 const VALID_TABS = ['upload', 'results', 'vowelspace', 'pitchtone']
+const praatPlatformTarget = praatRuntime.family
 
 // Tab state - sync with router
 const { state: activeTab, set: setActiveTab } = useRouteQueryState('tab', {
@@ -224,6 +209,13 @@ const pitchtoneTabEnabled = computed(() => {
          analysisResults.value.timeseries?.pitch_hz &&
          analysisResults.value.timeseries.pitch_hz.length > 0
 })
+
+const tabs = computed(() => [
+  { name: 'upload', label: t('praat.main.tabs.upload') },
+  { name: 'results', label: t('praat.main.tabs.results'), disabled: !resultsTabEnabled.value },
+  { name: 'vowelspace', label: t('praat.main.tabs.vowelSpace'), disabled: !vowelspaceTabEnabled.value },
+  { name: 'pitchtone', label: t('praat.main.tabs.pitchTone'), disabled: !pitchtoneTabEnabled.value },
+])
 
 // UI state
 const showSettings = ref(false)
@@ -615,6 +607,14 @@ const startAnalysis = async () => {
     showWarning(t('praat.main.errors.analysisInProgress'))
     return
   }
+  if (!isPraatFileAcceptedOnPlatform(audioFile.value, praatPlatformTarget)) {
+    showError(
+      praatPlatformTarget === 'ios' || praatPlatformTarget === 'android'
+        ? t('praat.audioInput.errors.nativeUnsupportedFormat')
+        : t('praat.audioInput.errors.unsupportedFormat')
+    )
+    return
+  }
 
   const duration = getCurrentAudioDuration()
   const hasSpectrogramModule = settings.modules && settings.modules.includes('spectrogram')
@@ -654,6 +654,8 @@ const startAnalysis = async () => {
     fileName: audioFile.value?.name ?? null,
     duration,
     hasSpectrogramModule,
+    engine: praatAnalysisStrategy.engine,
+    fallbackReason: praatAnalysisStrategy.fallbackReason,
     modules: Array.isArray(settings.modules) ? [...settings.modules] : [],
   })
 
@@ -929,6 +931,7 @@ onBeforeUnmount(() => {
 @use '@/styles/global/mixins' as *;
 
 .praat-page {
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0;
@@ -976,8 +979,7 @@ onBeforeUnmount(() => {
   font-size: 2rem;
   margin-bottom: 0.5rem;
   margin-top: 1rem;
-  // color: linear-gradient(135deg, #007aff, #6e00ff);
-  background: linear-gradient(135deg, #007aff, #6e00ff);
+  background: var(--color-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -994,63 +996,6 @@ onBeforeUnmount(() => {
     display: none;
   }
 }
-
-/* Tab Navigation - Floating Left */
-.tab-navigation {
-  position: fixed;
-  top: 140px;
-  left: 2rem;
-  z-index: 100;
-}
-
-.tab-container {
-  @include flex-col;
-  gap: 4px;
-  padding: 4px;
-  background: var(--glass-80);
-  backdrop-filter: blur(60px) saturate(200%);
-  -webkit-backdrop-filter: blur(60px) saturate(200%);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--glass-40);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12),
-              inset 0 1px 0 var(--glass-60);
-}
-
-.tab-btn {
-  padding: 12px 16px;
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  border-radius: var(--radius-sm2);
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  white-space: nowrap;
-  min-width: 100px;
-  text-align: center;
-}
-
-.tab-btn:hover:not(.active):not(:disabled) {
-  background: rgba(0, 0, 0, 0.04);
-  color: var(--text-primary);
-  transform: translateX(2px);
-}
-
-.tab-btn.active {
-  background: var(--bg-white);
-  color: var(--color-primary);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08),
-              0 1px 2px rgba(0, 0, 0, 0.06);
-  font-weight: 600;
-}
-
-.tab-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
 
 /* Tab Hidden (for v-show keep-alive) */
 .tab-hidden {
@@ -1079,17 +1024,10 @@ onBeforeUnmount(() => {
   align-items: center;
   flex-direction: column;
   gap: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  max-height: 80dvh;
+  overflow: clip;
   border-radius: 25px;
   width: 90dvw;
-}
-@media (max-aspect-ratio: 1/1) {
-  .page-content{
-    max-height: 80dvh;
-  }
-
+  max-width: 100%;
 }
 
 .action-section {
@@ -1103,15 +1041,15 @@ onBeforeUnmount(() => {
   font-weight: 600;
   border: none;
   cursor: pointer;
-  background: linear-gradient(135deg, #007aff, #6e00ff);
-  color: white;
+  background: var(--action-primary-bg);
+  color: var(--action-primary-text);
   transition: all 0.3s ease;
 }
 
 .start-button:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.3);
-  background: linear-gradient(135deg, #0056b3, #4b00b3);
+  background: var(--action-primary-bg-hover);
 }
 
 .start-button:disabled {
@@ -1187,8 +1125,8 @@ onBeforeUnmount(() => {
 }
 
 .mode-options .radio-option.active {
-  background: linear-gradient(135deg, #007aff, #6e00ff);
-  color: white;
+  background: var(--action-primary-bg);
+  color: var(--action-primary-text);
   box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
 }
 
@@ -1345,23 +1283,6 @@ onBeforeUnmount(() => {
   .page-title {
     font-size: 1.8rem;
     margin:0;
-  }
-
-  .tab-navigation {
-    position: static;
-    width: 100%;
-  }
-
-  .tab-container {
-    flex-direction: row;
-    width: auto;
-  }
-
-  .tab-btn {
-    flex: 1;
-    font-size: 13px;
-    padding: 10px 4px;
-    min-width: 60px;
   }
 
   .settings-sidebar {

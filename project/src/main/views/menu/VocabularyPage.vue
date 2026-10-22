@@ -1,50 +1,55 @@
 <template>
-  <div class="vocabulary-page">
-    <h1 class="page-title">
+  <div class="vocabulary-page" :class="{ 'vocabulary-page--view': activeVocabularyPath === '/menu/vocabulary/view' }">
+    <div
+      v-if="!isCharacterNotesMode"
+      ref="pageTabNavigationPlaceholderRef"
+      class="page-tab-navigation-slot"
+      :style="pageTabNavigationPlaceholderStyle"
+    >
+      <div
+        ref="pageTabNavigationRef"
+        class="page-tab-navigation"
+        :style="pageTabNavigationStyle"
+      >
+        <div
+          class="page-tab-container"
+          role="tablist"
+          :aria-label="t('words.wordList.tabs.label')"
+        >
+          <button
+            class="page-tab-btn"
+            :class="{ active: isActivePage(pageTabs[0].path) }"
+            type="button"
+            role="tab"
+            :aria-selected="isActivePage(pageTabs[0].path)"
+            @click="navigateTo(pageTabs[0].path)"
+          >
+            {{ pageTabs[0].label }}
+          </button>
+          <button
+            class="page-tab-btn"
+            :class="{ active: isActivePage(pageTabs[1].path) }"
+            type="button"
+            role="tab"
+            :aria-selected="isActivePage(pageTabs[1].path)"
+            @click="navigateTo(pageTabs[1].path)"
+          >
+            {{ pageTabs[1].label }}
+          </button>
+          <ChoiceSelector
+            v-if="isContributeTabActive"
+            v-model="contributeSubMode"
+            :options="contributeSubModeOptions"
+            class="tab-view-mode-selector"
+          />
+        </div>
+      </div>
+    </div>
+
+    <h1 v-if="activeVocabularyPath !== '/menu/vocabulary/view'" class="page-title">
       <BarIcon :icon="activePageIcon" />
       {{ activePageTitle }}
     </h1>
-
-    <div v-if="!isCharacterNotesMode" class="page-tab-navigation">
-      <div
-        class="page-tab-container"
-        role="tablist"
-        :aria-label="t('words.wordList.tabs.label')"
-      >
-        <button
-          class="page-tab-btn"
-          :class="{ active: isActivePage(pageTabs[0].path) }"
-          type="button"
-          role="tab"
-          :aria-selected="isActivePage(pageTabs[0].path)"
-          @click="navigateTo(pageTabs[0].path)"
-        >
-          {{ pageTabs[0].label }}
-        </button>
-        <ChoiceSelector
-          v-if="isQueryTabActive"
-          v-model="viewModeQuery"
-          :options="viewModeOptions"
-          class="tab-view-mode-selector"
-        />
-        <button
-          class="page-tab-btn"
-          :class="{ active: isActivePage(pageTabs[1].path) }"
-          type="button"
-          role="tab"
-          :aria-selected="isActivePage(pageTabs[1].path)"
-          @click="navigateTo(pageTabs[1].path)"
-        >
-          {{ pageTabs[1].label }}
-        </button>
-        <ChoiceSelector
-          v-if="isContributeTabActive"
-          v-model="contributeSubMode"
-          :options="contributeSubModeOptions"
-          class="tab-view-mode-selector"
-        />
-      </div>
-    </div>
 
     <router-view v-slot="{ Component }">
       <KeepAlive :include="['VocabularyViewPage', 'VocabularyImportPage', 'VocabularyManagePage']">
@@ -70,6 +75,7 @@ import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n
 import { userStore } from '@/main/store/store.js'
 import BarIcon from '@/components/common/BarIcon.vue'
 import ChoiceSelector from '@/components/selector/ChoiceSelector.vue'
+import { useViewportPinnedElement } from '@/composables/ui/useViewportPinnedElement.js'
 import { showError, showSuccess, showWarning } from '@/utils/ui/message.js'
 
 const { t } = useI18n()
@@ -127,6 +133,18 @@ const activeVocabularyPath = computed(() => {
 const activePageTitle = computed(() => t(pageTitleKeyByPath[activeVocabularyPath.value]))
 const activePageIcon = computed(() => pageTitleIconByPath[activeVocabularyPath.value])
 const isCharacterNotesMode = computed(() => route.query.source === 'character-notes')
+const pageTabNavigationRef = ref(null)
+const pageTabNavigationPlaceholderRef = ref(null)
+const {
+  elementStyle: pageTabNavigationStyle,
+  placeholderStyle: pageTabNavigationPlaceholderStyle,
+} = useViewportPinnedElement({
+  elementRef: pageTabNavigationRef,
+  placeholderRef: pageTabNavigationPlaceholderRef,
+  enabled: () => !isCharacterNotesMode.value,
+  landscapeTop: 'calc(max(16px, env(safe-area-inset-top)) + 7dvh + 6px)',
+  portraitTop: 0,
+})
 
 function createEmptyVocabularyMe() {
   return {
@@ -286,34 +304,8 @@ function isActivePage(tabPath) {
   return currentPath === tabPath
 }
 
-const isQueryTabActive = computed(() => {
-  return stripLocaleFromPath(route.path) === '/menu/vocabulary/view'
-})
-
 const isContributeTabActive = computed(() => {
   return isContributePath(stripLocaleFromPath(route.path))
-})
-
-const viewModeOptions = computed(() => [
-  { value: 'card', label: t('words.wordList.viewModes.card') },
-  { value: 'map', label: t('words.wordList.viewModes.map') },
-  { value: 'table', label: t('words.wordList.viewModes.table') },
-])
-
-const STORED_VIEW_MODE_KEY = 'vocabulary_view_mode'
-
-const viewModeQuery = computed({
-  get: () => {
-    const tab = route.query.tab
-    if (tab === 'map' || tab === 'table') return tab
-    const stored = sessionStorage.getItem(STORED_VIEW_MODE_KEY)
-    if (stored === 'map' || stored === 'table') return stored
-    return 'card'
-  },
-  set: (val) => {
-    sessionStorage.setItem(STORED_VIEW_MODE_KEY, val)
-    router.replace({ query: { ...route.query, tab: val } })
-  },
 })
 
 const contributeSubModeOptions = computed(() => [

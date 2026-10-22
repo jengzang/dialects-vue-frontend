@@ -1,26 +1,26 @@
 <template>
   <div class="pho-page">
-    <TabsContainer
+    <TabSwitcher
+      pin-navigation
+      :class="{ 'pho-tabs--query': ['phonologyMatrix', 'phonologyCustom'].includes(currentTab) }"
       :tabs="tabs"
       :model-value="currentTab"
       :route-value="currentTab"
       :resolve-route="resolveTabRoute"
     >
-      <template #header>
-        <h1 class="page-title">
-          <BarIcon :icon="activePageIcon" />
-          {{ activePageTitle }}
-        </h1>
-      </template>
-
       <template #default="{ currentTab }">
         <div class="pho-content">
+          <h1 class="page-title">
+            <BarIcon :icon="activePageIcon" />
+            {{ activePageTitle }}
+          </h1>
+
           <KeepAlive>
             <component :is="getTabComponent(currentTab)" />
           </KeepAlive>
         </div>
       </template>
-    </TabsContainer>
+    </TabSwitcher>
   </div>
 </template>
 
@@ -30,7 +30,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import BarIcon from '@/components/common/BarIcon.vue'
-import TabsContainer from '@/components/common/TabsContainer.vue'
+import TabSwitcher from '@/components/common/TabSwitcher.vue'
 import PhonologyMatrixPage from '@/main/components/pho/PhonologyPage.vue'
 import PhonologyCustomPage from '@/main/components/pho/PhonologyCustom.vue'
 import CountphosPage from '@/main/components/pho/Countphos.vue'
@@ -112,10 +112,32 @@ const resolveTabRoute = (tabName) => {
   width: 100%;
 }
 
+.pho-tabs--query {
+  min-height: 80dvh;
+}
+
 .pho-content {
   align-items: center;
   display: flex;
+  flex: 1;
   flex-direction: column;
+  justify-content: center;
   width: 100%;
+}
+
+.page-title {
+  margin-bottom: 1.5dvh;
+}
+
+@media (max-aspect-ratio: 1/1) {
+  .pho-content {
+    padding-bottom: 8dvh;
+  }
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .pho-content {
+    padding-bottom: 4dvh;
+  }
 }
 </style>

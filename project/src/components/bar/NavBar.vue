@@ -1,7 +1,16 @@
 <template>
-  <div ref="navbarRef" class="navbar">
+  <div
+    ref="navbarRef"
+    class="navbar"
+    :class="{ 'navbar--collapsing': collapseProgress > 0 }"
+    :style="navbarStyle"
+  >
     <!-- 桌面端的布局 -->
-    <div ref="desktopRef" class="navbar-desktop">
+    <div
+      v-if="collapseProgress < 1"
+      ref="desktopRef"
+      class="navbar-desktop"
+    >
       <div  class="navbar-item logo-and-title" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
         <div @click="toggleSidebar" class="logo-container desktop-brand-logo">
           <img class="logo" :src="faviconSrc" alt="Logo" />
@@ -97,11 +106,15 @@
     </div>
 
     <SimpleSidebar
+      v-if="collapseProgress < 1"
       :is-open="isSidebarVisible"
       @close="isSidebarVisible = false"
     />
 
-    <div class="navbar-content">
+    <div
+      v-if="collapseProgress < 1"
+      class="navbar-content"
+    >
       <!-- 第一部分：Logo、标题和登录按钮 -->
       <div class="navbar-top">
         <div class="navbar-item logo-and-title" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
@@ -177,7 +190,10 @@
     </div>
 
     <!-- Tab label tooltip -->
-    <Teleport to="body">
+    <Teleport
+      v-if="collapseProgress < 1"
+      to="body"
+    >
       <Transition name="tab-tooltip-fade">
         <div
           v-if="tooltip.visible"
@@ -186,6 +202,30 @@
         >{{ tooltip.label }}</div>
       </Transition>
     </Teleport>
+
+    <button
+      v-if="collapseProgress >= 1"
+      type="button"
+      class="navbar-expand-control"
+      :aria-label="t('navigation.actions.openMenu')"
+      @click="expandNavbar"
+    >
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path
+          d="M5 12h14M13 6l6 6-6 6"
+          stroke="currentColor"
+          stroke-width="3.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </button>
   </div>
 </template>
 
@@ -229,14 +269,81 @@ const navbarRef = ref(null)
 const desktopRef = ref(null)
 const navRef = ref(null)
 const mobileNavRef = ref(null)
+const collapseProgress = ref(0)
+const viewportWidth = ref(0)
+const NORMAL_COLLAPSE_START = 200
+const NORMAL_COLLAPSE_DISTANCE = 300
+const MANUAL_EXPAND_MIN_SCROLL = 250
+const MANUAL_COLLAPSE_DELAY = 50
+const MANUAL_COLLAPSE_DISTANCE = 200
+const MIN_SCROLLABLE_DISTANCE = 500
 let liquidGlassScrollFrame = null
+let manualExpandScrollStart = null
+let lastCollapseScrollTop = null
+
+const navbarStyle = computed(() => {
+  if (collapseProgress.value <= 0) return {}
+
+  const expandedWidth = Math.max(viewportWidth.value - 16, 30)
+  const collapsedWidth = 30 + (expandedWidth - 30) * (1 - collapseProgress.value)
+  return { width: `${collapsedWidth}px` }
+})
+
+const getMaxScrollableDistance = () =>
+  Math.max(document.documentElement.scrollHeight - window.innerHeight, 0)
+
+const updateNavbarCollapse = () => {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop
+  const previousScrollTop = lastCollapseScrollTop
+  lastCollapseScrollTop = scrollTop
+  viewportWidth.value = document.documentElement.clientWidth
+
+  if (!window.matchMedia('(max-aspect-ratio: 1/1)').matches) {
+    manualExpandScrollStart = null
+    collapseProgress.value = 0
+    return
+  }
+
+  if (getMaxScrollableDistance() <= MIN_SCROLLABLE_DISTANCE) {
+    manualExpandScrollStart = null
+    collapseProgress.value = 0
+    return
+  }
+
+  if (manualExpandScrollStart !== null && scrollTop > NORMAL_COLLAPSE_START) {
+    if (previousScrollTop === null || scrollTop >= previousScrollTop) {
+      collapseProgress.value = Math.min(
+        Math.max(
+          (scrollTop - manualExpandScrollStart - MANUAL_COLLAPSE_DELAY) / MANUAL_COLLAPSE_DISTANCE,
+          0
+        ),
+        1
+      )
+      return
+    }
+  }
+
+  manualExpandScrollStart = null
+  collapseProgress.value = Math.min(
+    Math.max((scrollTop - NORMAL_COLLAPSE_START) / NORMAL_COLLAPSE_DISTANCE, 0),
+    1
+  )
+}
+
+const expandNavbar = () => {
+  const scrollTop = window.scrollY || document.documentElement.scrollTop
+  lastCollapseScrollTop = scrollTop
+  manualExpandScrollStart = scrollTop > MANUAL_EXPAND_MIN_SCROLL ? scrollTop : null
+  collapseProgress.value = 0
+}
 
 const updateLiquidGlassGlint = () => {
   liquidGlassScrollFrame = null
 
-  const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
+  const maxScroll = Math.max(getMaxScrollableDistance(), 1)
   const progress = Math.min(window.scrollY / maxScroll, 1)
   navbarRef.value?.style.setProperty('--liquid-glass-glint-shift', `${20 + progress * 60}%`)
+  updateNavbarCollapse()
 }
 
 const scheduleLiquidGlassGlint = () => {
@@ -248,10 +355,12 @@ const scheduleLiquidGlassGlint = () => {
 onMounted(() => {
   updateLiquidGlassGlint()
   window.addEventListener('scroll', scheduleLiquidGlassGlint, { passive: true })
+  window.addEventListener('resize', scheduleLiquidGlassGlint, { passive: true })
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', scheduleLiquidGlassGlint)
+  window.removeEventListener('resize', scheduleLiquidGlassGlint)
 
   if (liquidGlassScrollFrame !== null) {
     window.cancelAnimationFrame(liquidGlassScrollFrame)
@@ -260,6 +369,10 @@ onBeforeUnmount(() => {
 
 // Tab label tooltip
 const { tooltip, tooltipStyle, handleMouseEnter: handleTabTooltipEnter, handleMouseLeave: handleTabTooltipLeave, handleTouchStart: handleTabTooltipTouch } = useTabTooltip()
+
+watch(() => collapseProgress.value >= 1, (isCollapsed) => {
+  if (isCollapsed) tooltip.value = { ...tooltip.value, visible: false }
+})
 
 const { pillStyle: desktopPillStyle } = useTabPill(navRef, '.menu-inner.active', route)
 const { pillStyle: mobilePillStyle, updatePill: updateMobilePill } = useTabPill(mobileNavRef, '.menu-item.active', route)
@@ -351,6 +464,7 @@ const goToSettings = () => {
 
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 @use './bar-shared' as *;
 
 $primary: var(--color-primary);
@@ -391,15 +505,15 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   @include flex-center;
 
   background:
-    linear-gradient(110deg, transparent 35%, var(--glass-50) 50%, transparent 65%),
-    linear-gradient(180deg, var(--glass-40), var(--glass-10));
+    linear-gradient(110deg, transparent 35%, var(--glass-highlight, var(--glass-50)) 50%, transparent 65%),
+    var(--bar-background, linear-gradient(180deg, var(--glass-40), var(--glass-10)));
   background-position: var(--liquid-glass-glint-shift) 0, center;
   background-size: 180% 100%, 100% 100%;
-  border: 2px solid var(--glass-50);
+  border: 2px solid var(--glass-highlight, var(--glass-50));
   border-radius: var(--radius-xl);
   box-shadow:
-    inset 0 1px 0 var(--glass-90),
-    inset 0 -1px 0 var(--glass-30),
+    inset 0 1px 0 var(--glass-highlight, var(--glass-90)),
+    inset 0 -1px 0 var(--glass-highlight, var(--glass-30)),
     0 10px 24px rgba(var(--color-shadow-rgb), 0.18);
   backdrop-filter: blur(14px) saturate(160%);
   -webkit-backdrop-filter: blur(14px) saturate(160%);
@@ -434,7 +548,7 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   position: relative;
   flex: 1 1 auto;
   min-width: 0;
-  max-width: 1200px;
+  // max-width: 1200px;
   height: 100%;
   margin: 0 clamp(10px, 1vw, 20px);
 
@@ -471,8 +585,8 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   background: linear-gradient(155deg, var(--glass-30), var(--glass-05));
   border-radius: 25px;
   box-shadow:
-    inset 0 1px 0 var(--glass-90),
-    inset 0 0 0 1px var(--glass-60),
+    inset 0 1px 0 var(--glass-highlight, var(--glass-90)),
+    inset 0 0 0 1px var(--glass-highlight, var(--glass-60)),
     inset 0 -3px 8px rgba(var(--color-shadow-rgb), 0.08),
     0 5px 12px rgba(var(--color-shadow-rgb), 0.15);
   @include glass-blur(8px, 150%);
@@ -508,7 +622,13 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   font-weight: 1000;
   cursor: pointer;
   user-select: none;
-  transition: all 0.3s ease;
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    border-radius 0.3s ease,
+    box-shadow 0.3s ease,
+    color 0.3s ease,
+    transform 0.3s ease;
 }
 
 .desktop-brand-logo {
@@ -669,7 +789,10 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   cursor: pointer;
   user-select: none;
   border-radius: var(--radius-full);
-  transition: all 0.3s ease;
+  transition:
+    background 0.3s ease,
+    opacity 0.3s ease,
+    transform 0.3s ease;
   opacity: 0.7;
 
   &:hover {
@@ -776,6 +899,30 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
 
   .navbar-content {
     display: flex;
+  }
+
+  .navbar--collapsing .navbar-content {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .navbar-expand-control {
+    width: 100%;
+    z-index: 2;
+    min-width: 0;
+    height: 16.5dvh;
+    box-sizing: border-box;
+    padding: 0;
+    border: 0;
+    @include flex-center;
+    background: transparent;
+    color: var(--color-primary-hover);
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: -2px;
+    }
   }
 
   .menu-item {

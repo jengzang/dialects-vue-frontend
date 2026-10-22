@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import { createMapDrawHistory } from '@/main/utils/drawMap/history.js';
 
 export function useGisHistory(options = {}) {
@@ -18,6 +18,8 @@ export function useGisHistory(options = {}) {
   const drawHistory = createMapDrawHistory({ limit: 50 });
   const historySizes = ref(drawHistory.sizes());
   const isApplyingHistory = ref(false);
+  let restoreRequest = 0;
+  let pendingEditContext = null;
 
   const canUndoHistory = computed(() => historySizes.value.undo > 0);
   const canRedoHistory = computed(() => historySizes.value.redo > 0);
@@ -32,11 +34,14 @@ export function useGisHistory(options = {}) {
     currentStyleKey: currentStyleKey.value,
     selectedFeatureId: selectedFeatureId.value,
     selectedFeatureIds: selectedFeatureIds.value,
-    currentMode: currentMode.value,
+    currentMode: currentMode.value === 'direct_select' ? 'direct_select' : 'simple_select',
+    editContext: pendingEditContext ?? editableMapRef?.value?.getEditContext?.() ?? null,
   });
 
-  const applyHistorySnapshot = (snapshot) => {
+  const applyHistorySnapshot = async (snapshot) => {
     if (!snapshot) return;
+    const request = ++restoreRequest;
+    pendingEditContext = snapshot.editContext ?? null;
     isApplyingHistory.value = true;
     try {
       layers.value = Array.isArray(snapshot.layers) ? snapshot.layers : [];
@@ -46,12 +51,17 @@ export function useGisHistory(options = {}) {
       const restoredSelectedFeatureIds = Array.isArray(snapshot.selectedFeatureIds)
         ? snapshot.selectedFeatureIds
         : (restoredSelectedFeatureId ? [restoredSelectedFeatureId] : []);
-      const restoredMode = snapshot.currentMode || 'simple_select';
+      const restoredMode = snapshot.currentMode === 'direct_select' ? 'direct_select' : 'simple_select';
+      const restoredLayerId = activeLayerId.value;
       currentMode.value = restoredMode;
       syncLayerIdSeedFromLayers(layers.value);
       syncAllLayersAfterMutation();
+      await nextTick();
+      if (request !== restoreRequest || activeLayerId.value !== restoredLayerId) return;
       setFeatureSelection(restoredSelectedFeatureIds, restoredSelectedFeatureId);
-      if (restoredMode === 'direct_select') {
+      if (snapshot.editContext && editableMapRef?.value?.restoreEditContext?.(snapshot.editContext)) {
+        // The map validates restored paths against the synchronized geometry and permissions.
+      } else if (restoredMode === 'direct_select') {
         const sid = selectedFeatureId.value;
         if (sid) {
           editableMapRef?.value?.selectFeature?.(sid);
@@ -68,7 +78,10 @@ export function useGisHistory(options = {}) {
       }
       editableMapRef?.value?.syncReadonlyLayers?.();
     } finally {
-      isApplyingHistory.value = false;
+      if (request === restoreRequest) {
+        pendingEditContext = null;
+        isApplyingHistory.value = false;
+      }
     }
   };
 
@@ -80,14 +93,16 @@ export function useGisHistory(options = {}) {
 
   const undoHistory = () => {
     const previousSnapshot = drawHistory.undo(buildHistorySnapshot());
-    applyHistorySnapshot(previousSnapshot);
+    const restoration = applyHistorySnapshot(previousSnapshot);
     refreshHistoryState();
+    return restoration;
   };
 
   const redoHistory = () => {
     const nextSnapshot = drawHistory.redo(buildHistorySnapshot());
-    applyHistorySnapshot(nextSnapshot);
+    const restoration = applyHistorySnapshot(nextSnapshot);
     refreshHistoryState();
+    return restoration;
   };
 
   return {

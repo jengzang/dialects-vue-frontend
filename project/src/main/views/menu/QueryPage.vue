@@ -1,20 +1,20 @@
 <template>
-  <TabsContainer
+  <TabSwitcher
+    class="page-tabs--vertically-centered"
+    pin-navigation
     :tabs="tabs"
     :model-value="currentTab"
     :route-value="currentTab"
     :resolve-route="resolveTabRoute"
   >
-    <template #header>
+    <template #default="{ currentTab }">
+      <div class="tab-content-inner query-page-root">
       <h1 class="page-title">
         <BarIcon :icon="activePageIcon" />
         {{ activePageTitle }}
       </h1>
-    </template>
 
-    <template #default="{ currentTab }">
-      <div class="tab-content-inner query-page-root">
-      <div v-show="currentTab === 'tab1'" class="page">
+      <div v-show="currentTab === 'tab1'" class="query-page-panel glass-panel">
         <div class="page-content-stack">
           <!-- 🔹 輸入框區塊 -->
           <div class="query-box">
@@ -32,7 +32,7 @@
       </div>
 
 
-      <div v-show="currentTab === 'tab2'" class="page">
+      <div v-show="currentTab === 'tab2'" class="query-page-panel glass-panel">
         <div class="page-content-stack">
           <!-- 直接輸入模式 -->
           <div v-if="zhongguInputMode === 'direct'" class="direct-input-box">
@@ -148,7 +148,7 @@
       </div>
 
       <!-- 📤 tab3：查音位頁面 -->
-      <div v-show="currentTab === 'tab3'" class="page">
+      <div v-show="currentTab === 'tab3'" class="query-page-panel glass-panel">
         <div class="page-content-stack">
           <!-- 三欄選擇 -->
           <div class="triple-select-box">
@@ -228,12 +228,20 @@
           :limitContext="locationLimitContext"
       />
 
+      <RecentQueryPills
+        :entries="recentQueries.entries.value"
+        :disabled="buttonState.isRunning || isRestoringHistory"
+        @restore="restoreRecentQuery"
+      >
+        <TutorialQuickStartPill :target="`query:${currentTab}`" />
+      </RecentQueryPills>
+
       <!-- ✅ 炫酷按鈕 -->
       <div class="run-container">
         <button
             class="run-btn"
             @click="runAction"
-            :disabled="buttonState.isRunning || isRunDisabled"
+            :disabled="buttonState.isRunning || isRunDisabled || isRestoringHistory"
             :class="{ disabled: isRunDisabled }"
         >
           <span v-if="buttonState.isRunning"><InlineIcon icon="🔄" />{{ $t('query.button.running') }}</span>
@@ -256,7 +264,7 @@
       </div> -->
       </div>
     </template>
-  </TabsContainer>
+  </TabSwitcher>
 </template>
 
 <script setup>
@@ -265,8 +273,11 @@ import InlineIcon from '@/components/common/InlineIcon.vue'
 import {computed, nextTick, reactive, ref, onMounted, onBeforeUnmount, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import TabsContainer from "@/components/common/TabsContainer.vue";
+import TabSwitcher from "@/components/common/TabSwitcher.vue";
 import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput.vue";
+import TutorialQuickStartPill from "@/main/components/tutorial/TutorialQuickStartPill.vue";
+import RecentQueryPills from '@/components/common/RecentQueryPills.vue'
+import { useRecentQueryHistory } from '@/composables/core/useRecentQueryHistory.js'
 import ZhongguSelector from "@/main/components/query/ZhongguSelector.vue";
 import ZhongGuDirectInput from "@/main/components/query/ZhongGuDirectInput.vue";
 import YinweiSelector from "@/main/components/query/YinweiSelector.vue";
@@ -285,6 +296,8 @@ import {
   tutorialAssistState,
   clearTutorialAssistRequest,
   zhongguInputMode,
+  setZhongguInputMode,
+  setPreferredCharacterTable,
 } from '@/main/store/store.js'
 import { useQueryConfig } from '@/composables/data/useQueryConfig.js'
 
@@ -442,6 +455,7 @@ watch(
       const payload = tutorialAssistState.payload
       hanziInput.value = payload.chars || ''
       locationModel.value = {
+        ...payload.loc,
         locations: payload.loc?.locations || [],
         regions: payload.loc?.regions || [],
         regionUsing: payload.loc?.regionUsing || 'yindian'
@@ -464,6 +478,7 @@ watch(
     if (tutorialAssistState.target === 'query:tab4' && currentTab.value === 'tab4') {
       const payload = tutorialAssistState.payload
       locationModel.value = {
+        ...payload.loc,
         locations: payload.loc?.locations || [],
         regions: payload.loc?.regions || [],
         regionUsing: payload.loc?.regionUsing || 'yindian'
@@ -521,6 +536,68 @@ const locationModel = ref({
   regions: [],
   regionUsing: 'map'
 })
+
+const recentQueries = useRecentQueryHistory(() => `query:${currentTab.value}`)
+const isRestoringHistory = ref(false)
+
+function rememberRecentQuery(locationList) {
+  const tab = currentTab.value
+  const loc = { ...locationModel.value }
+  if (!loc.locations.length && !loc.regions.length) loc.locations = locationList
+  const snapshot = { table: selectedCharacterTable.value, loc }
+  let summary = ''
+  if (tab === 'tab1') {
+    snapshot.chars = hanziInput.value
+    summary = snapshot.chars
+  } else if (tab === 'tab2') {
+    snapshot.mode = zhongguInputMode.value
+    snapshot.state = tabStates.tab2
+    if (snapshot.mode === 'direct') {
+      snapshot.direct = {
+        positionInput: ZhongguDirectInputRef.value?.positionInput || '',
+        charInput: ZhongguDirectInputRef.value?.charInput || '',
+      }
+      summary = [snapshot.direct.positionInput, snapshot.direct.charInput].filter(Boolean).join(' ')
+    } else {
+      summary = Object.values(snapshot.state.valueMap).flat().join('、')
+    }
+    summary = [summary, snapshot.state.card].filter(Boolean).join(' · ')
+  } else if (tab === 'tab3') {
+    snapshot.state = tabStates.tab3
+    snapshot.phoInput = YinweiSelectorRef.value?.tab3KeyInput || ''
+    summary = [snapshot.phoInput, snapshot.state.card].filter(Boolean).join(' · ')
+  }
+  recentQueries.record(snapshot, [summary, [...loc.locations, ...loc.regions].join(' ')].filter(Boolean).join(' · '))
+}
+
+async function restoreRecentQuery(snapshot) {
+  if (buttonState.isRunning || isRestoringHistory.value) return
+  const tab = currentTab.value
+  isRestoringHistory.value = true
+  try {
+    setPreferredCharacterTable(snapshot.table)
+    if (tab === 'tab2') setZhongguInputMode(snapshot.mode)
+    await nextTick()
+    if (tab !== currentTab.value) return
+    locationModel.value = snapshot.loc
+    if (tab === 'tab1') hanziInput.value = snapshot.chars
+    if (tab === 'tab2') {
+      tabStates.tab2 = snapshot.state
+      if (snapshot.mode === 'direct' && ZhongguDirectInputRef.value) {
+        ZhongguDirectInputRef.value.positionInput = snapshot.direct.positionInput
+        ZhongguDirectInputRef.value.charInput = snapshot.direct.charInput
+      }
+    }
+    if (tab === 'tab3') {
+      tabStates.tab3 = snapshot.state
+      await nextTick()
+      if (tab !== currentTab.value) return
+      YinweiSelectorRef.value?.restoreInput(snapshot.phoInput)
+    }
+  } finally {
+    isRestoringHistory.value = false
+  }
+}
 
 function onClickOutside(event) {
   const isInsideTrigger = [
@@ -612,6 +689,7 @@ function resetRememberedMapSubToView() {
 
 // 點擊按鈕行為
 const runAction = async () => {
+  if (isRunDisabled.value || locationRef.value?.runDisabled || isRestoringHistory.value) return
   setRunning('query', true);
 
   // 1. 獲取地點邏輯 (保持不變)
@@ -755,6 +833,7 @@ const runAction = async () => {
     // 2. 存入全局仓库
     globalPayload.value = JSON.parse(JSON.stringify(finalPayload))
   }
+  rememberRecentQuery(locationList)
   resetRememberedMapSubToView()
   // 3. 纯净跳转
   await router.replace({
@@ -785,6 +864,7 @@ function handleApplyConfig(data) {
 
   // 2. 更新地點
   locationModel.value = {
+    ...data.loc,
     locations: data.loc.locations,
     regions: data.loc.regions,
     regionUsing: data.loc.regionUsing
@@ -846,8 +926,13 @@ export default {
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
 
+.page-tabs--vertically-centered {
+  min-height: 80dvh;
+}
+
 .tab-content-inner {
   display: flex;
+  flex: 1;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -856,6 +941,37 @@ export default {
   padding: 1rem 0;
   text-align: center;
   animation: fade 0.6s ease;
+}
+
+.page-title {
+  margin-bottom: 1.5dvh;
+}
+
+.query-page-panel {
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+  padding: 2dvh;
+  max-height: 35dvh;
+  overflow-y: auto;
+  font-size: 18px;
+}
+
+@media (max-aspect-ratio: 1/1) {
+  .tab-content-inner {
+    padding-bottom: calc(1rem + 8dvh);
+  }
+
+  .query-page-panel {
+    padding: 10px;
+    font-size: 16px;
+  }
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .tab-content-inner {
+    padding-bottom: calc(1rem + 4dvh);
+  }
 }
 
 

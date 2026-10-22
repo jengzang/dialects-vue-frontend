@@ -1,23 +1,23 @@
 <template>
-  <TabsContainer
+  <TabSwitcher
+    class="page-tabs--vertically-centered"
+    pin-navigation
     :tabs="tabs"
     :model-value="currentTab"
     :route-value="currentTab"
     :resolve-route="resolveTabRoute"
   >
-    <template #header>
+    <template #default="{ currentTab }">
+      <div class="tab-content-inner compare-page-root">
       <h1 class="page-title">
         <BarIcon :icon="activePageIcon" />
         {{ activePageTitle }}
       </h1>
-    </template>
 
-    <template #default="{ currentTab }">
-      <div class="tab-content-inner compare-page-root">
       <!-- Tab1: 比較漢字 -->
       <div
         v-show="currentTab === 'tab1'"
-        class="page"
+        class="compare-page-panel glass-panel"
       >
         <div class="page-content-stack tab1-layout">
           <!-- 組1 輸入 -->
@@ -78,7 +78,7 @@
       <!-- Tab2: 比較中古 --  -->
       <div
         v-show="currentTab === 'tab2'"
-        class="page"
+        class="compare-page-panel glass-panel"
         style="max-height: 50dvh;overflow-x: auto;"
       >
         <div class="page-content-stack">
@@ -342,7 +342,7 @@
       <!-- Tab4: 比較調類 -->
       <div
         v-show="currentTab === 'tab4'"
-        class="page"
+        class="compare-page-panel glass-panel"
       >
         <div class="page-content-stack">
           <div class="tone-tip">
@@ -372,7 +372,7 @@
       <!-- Tab5: 比较音值 -->
       <div
         v-show="currentTab === 'tab5'"
-        class="page tab5-page"
+        class="tab5-page"
       >
         <div class="page-content-stack">
           <!-- <div class="tone-tip">
@@ -443,14 +443,46 @@
             </div>
           </div>
         </div>
-        <PhoneticCompare
-          :query-locations="tabStates.tab5.queryLocations"
-          :active="currentTab === 'tab5'"
-          :enable-link-optimization="tabStates.tab5.enableLinkOptimization"
-          :ignore-polyphonic-chars="tabStates.tab5.ignorePolyphonicChars"
-          :min-link-char-count="tabStates.tab5.minLinkCharCount"
-          :min-node-char-count="tabStates.tab5.minNodeCharCount"
-        />
+        <RecentQueryPills
+          class="tab5-recent-queries"
+          :entries="recentQueries.entries.value"
+          :disabled="buttonState.isRunning || isRestoringHistory"
+          @restore="restoreRecentQuery"
+        >
+          <button
+            type="button"
+            class="pill-btn"
+            :title="DEFAULT_TAB5_LOCATIONS.join('、')"
+            :aria-label="DEFAULT_TAB5_LOCATIONS.join('、')"
+            @click="applyTab5DefaultLocations"
+          >
+            <span>{{ DEFAULT_TAB5_LOCATIONS.join('、') }}</span>
+            <svg
+              class="tab5-default-location-arrow"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M7 17L17 7M7 7h10v10" />
+            </svg>
+          </button>
+        </RecentQueryPills>
+        <div class="compare-page-panel glass-panel tab5-page">
+          <PhoneticCompare
+            :query-locations="tabStates.tab5.queryLocations"
+            :active="currentTab === 'tab5'"
+            :enable-link-optimization="tabStates.tab5.enableLinkOptimization"
+            :ignore-polyphonic-chars="tabStates.tab5.ignorePolyphonicChars"
+            :min-link-char-count="tabStates.tab5.minLinkCharCount"
+            :min-node-char-count="tabStates.tab5.minNodeCharCount"
+          />
+        </div>
       </div>
 
       <LocationAndRegionInput
@@ -461,13 +493,23 @@
         @update:run-disabled="uiStore.buttonStates.compare.isLocationDisabled = $event"
       />
 
+      <RecentQueryPills
+        v-if="currentTab !== 'tab5'"
+        :entries="recentQueries.entries.value"
+        :disabled="buttonState.isRunning || isRestoringHistory"
+        @restore="restoreRecentQuery"
+      >
+        <TutorialQuickStartPill :target="`compare:${currentTab}`" />
+      </RecentQueryPills>
+      <TutorialQuickStartPill v-else :target="`compare:${currentTab}`" />
+
       <!-- 運行按鈕 -->
       <div class="run-container">
         <!-- Tab1, Tab2, Tab4 运行按钮 -->
         <button
           v-if="currentTab !== 'tab5'"
           class="run-btn"
-          :disabled="buttonState.isRunning || isRunDisabled"
+          :disabled="buttonState.isRunning || isRunDisabled || isRestoringHistory"
           :class="{ disabled: isRunDisabled }"
           @click="runAction"
         >
@@ -521,7 +563,7 @@
       </div> -->
       </div>
     </template>
-  </TabsContainer>
+  </TabSwitcher>
 </template>
 
 <script setup>
@@ -531,8 +573,11 @@ import { computed, nextTick, reactive, ref, onMounted, onBeforeUnmount, watch } 
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
-import TabsContainer from "@/components/common/TabsContainer.vue";
+import TabSwitcher from "@/components/common/TabSwitcher.vue";
 import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput.vue";
+import TutorialQuickStartPill from "@/main/components/tutorial/TutorialQuickStartPill.vue";
+import RecentQueryPills from '@/components/common/RecentQueryPills.vue'
+import { useRecentQueryHistory } from '@/composables/core/useRecentQueryHistory.js'
 import LocationMultiInput from "@/main/components/geo/LocationMultiInput.vue";
 import PhoneticCompare from "@/main/components/pho/PhoneticCompare.vue";
 import ZhongguSelector from "@/main/components/query/ZhongguSelector.vue";
@@ -554,6 +599,8 @@ import {
   tutorialAssistState,
   clearTutorialAssistRequest,
   zhongguInputMode,
+  setZhongguInputMode,
+  setPreferredCharacterTable,
 } from '@/main/store/store.js'
 import { compareChars, compareZhongGu, compareTones } from '@/api/index.js'
 import { getCoordinates } from '@/api'
@@ -710,6 +757,12 @@ const tabStates = reactive({
 
 // ========== Tab5 地点 URL 状态（与 Evolution 对齐） ==========
 const COMPARE_LOCATION_LIMIT = 5
+const DEFAULT_TAB5_LOCATIONS = ['蘇州', '上海', '嘉兴']
+
+function applyTab5DefaultLocations() {
+  tabStates.tab5.locations = [...DEFAULT_TAB5_LOCATIONS]
+  tabStates.tab5.matchedLocations = [...DEFAULT_TAB5_LOCATIONS]
+}
 
 const parseCompareLocationQuery = (value) => {
   return parseLocationsFromUrl(
@@ -1003,6 +1056,7 @@ watch(
       tabStates.tab1.group2.chars = normalizeSingleChar(payload.group2Char)
       tabStates.tab1.features = payload.feature || '聲母'
       locationModel.value = {
+        ...payload.loc,
         locations: payload.loc?.locations || [],
         regions: payload.loc?.regions || [],
         regionUsing: payload.loc?.regionUsing || 'yindian'
@@ -1017,6 +1071,7 @@ watch(
       tabStates.tab2.group1Items = JSON.parse(JSON.stringify(payload.group1Items || []))
       tabStates.tab2.group2Items = JSON.parse(JSON.stringify(payload.group2Items || []))
       locationModel.value = {
+        ...payload.loc,
         locations: payload.loc?.locations || [],
         regions: payload.loc?.regions || [],
         regionUsing: payload.loc?.regionUsing || 'yindian'
@@ -1029,6 +1084,7 @@ watch(
       const payload = tutorialAssistState.payload
       tabStates.tab4.selectedToneClasses = [...(payload.selectedToneClasses || [])]
       locationModel.value = {
+        ...payload.loc,
         locations: payload.loc?.locations || [],
         regions: payload.loc?.regions || [],
         regionUsing: payload.loc?.regionUsing || 'yindian'
@@ -1120,6 +1176,71 @@ const locationModel = ref({
   regions: [],
   regionUsing: 'map'
 })
+
+const recentQueries = useRecentQueryHistory(() => `compare:${currentTab.value}`)
+const isRestoringHistory = ref(false)
+
+function rememberRecentQuery(locationList) {
+  const tab = currentTab.value
+  const loc = { ...locationModel.value }
+  if (!loc.locations.length && !loc.regions.length) loc.locations = locationList
+  const snapshot = { table: selectedCharacterTable.value, loc, state: tabStates[tab] }
+  let summary = ''
+  if (tab === 'tab1') {
+    summary = `${snapshot.state.group1.chars} ↔ ${snapshot.state.group2.chars} · ${snapshot.state.features}`
+  } else if (tab === 'tab2') {
+    snapshot.mode = zhongguInputMode.value
+    if (snapshot.mode === 'direct') {
+      snapshot.direct = {
+        positionInput: CompareDirectInputRef.value?.positionInput || '',
+        charInput: CompareDirectInputRef.value?.charInput || '',
+      }
+    }
+    summary = [snapshot.state.group1Items, snapshot.state.group2Items]
+      .map(group => group.map(formatSelectedItem).join('、')).join(' ↔ ')
+  } else if (tab === 'tab4') {
+    summary = snapshot.state.selectedToneClasses.join('、')
+  }
+  recentQueries.record(snapshot, [summary, [...loc.locations, ...loc.regions].join(' ')].filter(Boolean).join(' · '))
+}
+
+async function restoreRecentQuery(snapshot) {
+  if (buttonState.isRunning || isRestoringHistory.value) return
+  const tab = currentTab.value
+  isRestoringHistory.value = true
+  try {
+    if (tab === 'tab5') {
+      const locations = Array.isArray(snapshot?.locations)
+        ? snapshot.locations.filter(Boolean).slice(0, COMPARE_LOCATION_LIMIT)
+        : []
+      if (locations.length < 2) return
+      tabStates.tab5.locations = [...locations]
+      tabStates.tab5.matchedLocations = [...locations]
+      return
+    }
+
+    setPreferredCharacterTable(snapshot.table)
+    if (tab === 'tab2') setZhongguInputMode(snapshot.mode)
+    await nextTick()
+    if (tab !== currentTab.value) return
+    if (tab === 'tab2') {
+      tabStates.tab2.current = snapshot.state.current
+      await nextTick()
+      if (tab !== currentTab.value) return
+      tabStates.tab2.group1Items = snapshot.state.group1Items
+      tabStates.tab2.group2Items = snapshot.state.group2Items
+      if (snapshot.mode === 'direct' && CompareDirectInputRef.value) {
+        CompareDirectInputRef.value.positionInput = snapshot.direct.positionInput
+        CompareDirectInputRef.value.charInput = snapshot.direct.charInput
+      }
+    } else {
+      tabStates[tab] = snapshot.state
+    }
+    locationModel.value = snapshot.loc
+  } finally {
+    isRestoringHistory.value = false
+  }
+}
 
 const dropdownStyle = reactive({
   value: {
@@ -1396,6 +1517,9 @@ const ZhongguRefCurrent = ref(null);  // For tab2 current selector
 const runTab5Action = () => {
   if (isTab5RunDisabled.value) return
 
+  const locations = [...tabStates.tab5.matchedLocations]
+  recentQueries.record({ locations }, locations.join(' '))
+
   if (!userStore.authReady) {
     return
   }
@@ -1409,12 +1533,13 @@ const runTab5Action = () => {
     return
   }
 
-  tabStates.tab5.queryLocations = [...tabStates.tab5.matchedLocations]
-  setLocationQuery(tabStates.tab5.matchedLocations.slice(0, COMPARE_LOCATION_LIMIT))
+  tabStates.tab5.queryLocations = locations
+  setLocationQuery(locations.slice(0, COMPARE_LOCATION_LIMIT))
 }
 
 // 點擊按鈕行為
 const runAction = async () => {
+  if (isRunDisabled.value || locationRef.value?.runDisabled || isRestoringHistory.value) return
   setRunning('compare', true);
 
   try {
@@ -1455,6 +1580,7 @@ const runAction = async () => {
         region_mode: locationRef.value?.regionUsing || 'yindian'
       }
 
+      rememberRecentQuery(locationList)
       compareResponse = await compareChars(params)
     }
     else if (currentTab.value === 'tab2') {
@@ -1529,6 +1655,7 @@ const runAction = async () => {
         }
       }
 
+      rememberRecentQuery(locationList)
       compareResponse = await compareZhongGu(params)
     }
     else if (currentTab.value === 'tab4') {
@@ -1541,6 +1668,7 @@ const runAction = async () => {
         region_mode: locationRef.value?.regionUsing || 'yindian'
       }
 
+      rememberRecentQuery(locationList)
       compareResponse = await compareTones(params)
     }
 
@@ -1843,6 +1971,7 @@ function handleApplyConfig(data) {
 
   // 2. 更新地點
   locationModel.value = {
+    ...data.loc,
     locations: data.loc.locations,
     regions: data.loc.regions,
     regionUsing: data.loc.regionUsing
@@ -1895,8 +2024,13 @@ $danger: #f44336;
 $text-primary: var(--text-dark);
 $text-muted: var(--text-lightest);
 
+.page-tabs--vertically-centered {
+  min-height: 80dvh;
+}
+
 .tab-content-inner {
   display: flex;
+  flex: 1;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -1907,8 +2041,43 @@ $text-muted: var(--text-lightest);
   animation: fade 0.6s ease;
 }
 
-.page {
+.page-title {
+  margin-bottom: 1.5dvh;
+}
+
+@media (max-aspect-ratio: 1/1) {
+  .tab-content-inner {
+    padding-bottom: calc(1rem + 8dvh);
+  }
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .tab-content-inner {
+    padding-bottom: calc(1rem + 4dvh);
+  }
+}
+
+.compare-page-panel {
+  display: flex;
+  justify-content: center;
+  margin: 0 auto;
+  padding: 2dvh;
+  max-height: 35dvh;
+  overflow-y: auto;
+  font-size: 18px;
   max-width: 900px;
+}
+
+.tab5-page {
+  @include flex-col;
+  align-items: center;
+  gap: 1.5dvh;
+  width: 100%;
+  font-size: 18px;
+}
+
+.tab5-default-location-arrow {
+  flex: 0 0 auto;
 }
 
 .page-content-stack {
@@ -2034,7 +2203,7 @@ $text-muted: var(--text-lightest);
 .compare-group {
   padding: 1rem;
   border-radius: var(--radius-md);
-  @include glass-blur;
+  // @include glass-blur;
 }
 
 .group-label {
@@ -2418,6 +2587,10 @@ $text-muted: var(--text-lightest);
 }
 
 @media (max-aspect-ratio: #{1 / 1}) {
+  .tab5-page {
+    font-size: 16px;
+  }
+
   .card-row {
     gap: 0;
   }
@@ -2431,8 +2604,9 @@ $text-muted: var(--text-lightest);
     padding: 0.8rem;
   }
 
-  .page {
+  .compare-page-panel {
     padding: 0.5rem !important;
+    font-size: 16px;
   }
 
   .selected-groups-container {

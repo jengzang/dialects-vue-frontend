@@ -2,6 +2,10 @@
   <!-- NEW MODE: Textarea input (for CustomTab) -->
   <div class="region-input-section">
     <div class="region-input-header">
+      <select v-model="regionUsing" class="select" :aria-label="$t('query.components.locationAndRegionInput.partitionLabel')">
+        <option value="map">{{ $t('query.components.locationAndRegionInput.mapSource') }}</option>
+        <option value="yindian">{{ $t('query.components.locationAndRegionInput.yindianSource') }}</option>
+      </select>
       <label class="region-label">{{ $t('query.components.locationAndRegionInput.partitionLabel') }}</label>
       <button
           class="info-btn"
@@ -37,7 +41,7 @@
               @mousedown.prevent="selectRegionSuggestion(suggestion)"
           >
             <span class="suggestion-text">{{ suggestion.display }}</span>
-            <span class="suggestion-source">{{ suggestion.source === 'map' ? $t('query.components.locationAndRegionInput.mapSource') : $t('query.components.locationAndRegionInput.yindianSource') }}</span>
+            <span class="suggestion-source">{{ suggestion.sources?.includes('user') ? $t('query.components.locationAndRegionInput.userPartitionSource') : suggestion.source === 'map' ? $t('query.components.locationAndRegionInput.mapSource') : $t('query.components.locationAndRegionInput.yindianSource') }}</span>
           </div>
         </div>
       </Teleport>
@@ -47,11 +51,11 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import { ref, nextTick, computed } from 'vue'
+import { ref, nextTick, computed, watch, onBeforeUnmount } from 'vue'
 import { getPartitions } from '@/api/index.js'
 import * as OpenCCT2CN from 'opencc-js/t2cn'
 import * as OpenCCCN2T from 'opencc-js/cn2t'
-import { STATIC_REGION_TREE, top_yindian } from '@/main/config/RegionTree.js'
+import { userStore } from '@/main/store/store.js'
 import { usePartitionCache } from '@/composables/data/usePartitionCache.js'
 
 const props = defineProps({
@@ -59,6 +63,7 @@ const props = defineProps({
     type: String,
     default: ''
   },
+  userCandidates: { type: Array, default: () => [] },
   regionUsing: {
     type: String,
     default: 'map'
@@ -68,25 +73,11 @@ const props = defineProps({
 const emit = defineEmits([
   'update:modelValue',
   'update:regionUsing',
-  'openPartitionInfo'
+  'openPartitionInfo',
+  'selectToken'
 ])
 
-const { getCachedYindianTree, getYindianTree } = usePartitionCache()
-
-// 只保留音典允许暴露的顶级分区；不改结构，只裁掉不需要的 key。
-const filterYindianTopLevelKeys = (obj) => {
-  if (typeof obj !== 'object' || Array.isArray(obj) || obj === null) {
-    return {}
-  }
-
-  const filtered = {}
-  for (const key of top_yindian) {
-    if (Object.prototype.hasOwnProperty.call(obj, key)) {
-      filtered[key] = obj[key]
-    }
-  }
-  return filtered
-}
+const { getDefaultTree } = usePartitionCache()
 
 // 创建繁简转换器
 const t2s = OpenCCT2CN.Converter({ from: 'tw', to: 'cn' })
@@ -113,77 +104,35 @@ const regionSuggestionStyle = ref({
 
 /* ========== Region Input Mode Logic ========== */
 
-// Flatten tree structure to get all matchable region names
-const flattenRegionTree = (tree, parentPath = []) => {
-  const results = []
+const flatRegions = ref([])
+let regionSequence = 0
+let blurTimeout
 
-  for (const [key, value] of Object.entries(tree)) {
-    const currentPath = [...parentPath, key]
-
-    // Add current level
-    results.push({
-      name: key,
-      path: currentPath.join('-'),
-      display: currentPath.join('·')
-    })
-
-    if (typeof value === 'object' && !Array.isArray(value)) {
-      // Recurse into nested object
-      results.push(...flattenRegionTree(value, currentPath))
-    } else if (Array.isArray(value)) {
-      // Add array items as leaf nodes
-      value.forEach(item => {
-        if (item) {
-          const leafPath = [...currentPath, item]
-          results.push({
-            name: item,
-            path: leafPath.join('-'),
-            display: leafPath.join('·')
-          })
-        }
-      })
+async function loadSuggestionTrees() {
+  const identity = JSON.stringify([userStore.role, userStore.id])
+  const trees = await Promise.all(['map', 'yindian'].map(mode => getDefaultTree(mode, () => getPartitions(mode), { identity })))
+  return trees.flatMap(tree => {
+    const regions = []
+    const pending = [...tree.nodes]
+    while (pending.length) {
+      const node = pending.pop()
+      regions.push({ name: node.label, path: node.path, display: node.path.split('-').join('·'), source: tree.region_mode })
+      pending.push(...node.children)
     }
-  }
-
-  return results
+    return regions
+  })
 }
 
-// Get flattened regions from both trees with source tagging
-const getFlattenedRegions = () => {
-  const results = []
-
-  // Add map tree regions
-  try {
-    if (typeof STATIC_REGION_TREE !== 'undefined' && STATIC_REGION_TREE) {
-      const mapRegions = flattenRegionTree(STATIC_REGION_TREE)
-      mapRegions.forEach(region => {
-        results.push({ ...region, source: 'map' })
-      })
-    }
-  } catch (e) {
-    console.warn('STATIC_REGION_TREE not available:', e)
-  }
-
-  // Add yindian tree regions
-  const cachedTree = getCachedYindianTree()
-  if (cachedTree) {
-    try {
-      const tree = cachedTree
-      const yindianRegions = flattenRegionTree(tree)
-      yindianRegions.forEach(region => {
-        results.push({ ...region, source: 'yindian' })
-      })
-    } catch (e) {
-      console.error('Failed to parse yindian tree cache:', e)
-    }
-  }
-
-  return results
-}
+watch(() => [userStore.role, userStore.id], () => {
+  regionSequence++
+  flatRegions.value = []
+  regionSuggestions.value = []
+  showRegionSuggestions.value = false
+})
 
 // Match region input against flattened tree
 const matchRegions = (input) => {
-  const flatRegions = getFlattenedRegions()
+  const candidates = [...props.userCandidates, ...flatRegions.value]
   const query = input.trim().toLowerCase()
 
   if (!query) return []
@@ -193,7 +142,7 @@ const matchRegions = (input) => {
   const queryTraditional = s2t(query).toLowerCase()
 
   // Find matches - 支持繁简双向匹配
-  const matches = flatRegions.filter(region => {
+  const matches = candidates.filter(region => {
     const nameLower = region.name.toLowerCase()
     const pathLower = region.path.toLowerCase()
 
@@ -217,7 +166,16 @@ const regionTextareaEl = ref(null)
 const onRegionInput = () => {
   clearTimeout(regionInputTimeout)
 
-  regionInputTimeout = setTimeout(() => {
+  const sequence = ++regionSequence
+  regionInputTimeout = setTimeout(async () => {
+    try {
+      const loaded = await loadSuggestionTrees()
+      if (sequence !== regionSequence) return
+      flatRegions.value = loaded
+    } catch {
+      if (sequence === regionSequence) showRegionSuggestions.value = false
+      return
+    }
     const lastWord = regionInputValue.value.split(/\s+/).pop()
 
     if (lastWord && lastWord.length > 0) {
@@ -250,41 +208,30 @@ const onRegionInput = () => {
 }
 
 const onRegionBlur = () => {
-  setTimeout(() => {
+  clearTimeout(regionInputTimeout)
+  regionSequence++
+  blurTimeout = setTimeout(() => {
     showRegionSuggestions.value = false
   }, 200)
 }
 
-// Select a suggestion and auto-detect region mode
+// Suggestions carry complete path identity; the selected system remains explicit.
 const selectRegionSuggestion = (suggestion) => {
-  const words = regionInputValue.value.split(/\s+/)
-  // Only insert the leaf level name, not the full path
-  words[words.length - 1] = suggestion.name
+  const words = regionInputValue.value.trim().split(/\s+/)
+  const index = words.length - 1
+  words[index] = suggestion.path
   regionInputValue.value = words.join(' ')
+  emit('selectToken', { text: suggestion.path, index, source: suggestion.source })
   showRegionSuggestions.value = false
-
-  // Auto-detect and update regionUsing based on suggestion source
-  if (suggestion.source) {
-    regionUsing.value = suggestion.source
-  }
+  clearTimeout(regionInputTimeout)
+  regionSequence++
 }
 
-// ✅ 新增：预加载音典分区数据到缓存，确保输入模式可以匹配所有分区
-const preloadYindianTree = async () => {
-  if (!getCachedYindianTree()) {
-    try {
-      await getYindianTree(() => getPartitions(), {
-        transform: filterYindianTopLevelKeys,
-      })
-      console.log('✅ 音典分区数据已预加载到缓存')
-    } catch (error) {
-      console.warn('⚠️ 预加载音典分区失败:', error)
-    }
-  }
-}
-
-// 预加载音典数据（异步，不阻塞页面）
-preloadYindianTree()
+onBeforeUnmount(() => {
+  regionSequence++
+  clearTimeout(regionInputTimeout)
+  clearTimeout(blurTimeout)
+})
 </script>
 
 <style scoped lang="scss">

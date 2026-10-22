@@ -111,6 +111,8 @@ function mountToolsPanel(overrides = {}) {
         @set-mode="events.push(['set-mode', $event])"
         @undo="events.push(['undo'])"
         @redo="events.push(['redo'])"
+        @finish-sketch="events.push(['finish-sketch'])"
+        @cancel-sketch="events.push(['cancel-sketch'])"
         @reverse-selected-geometry="events.push(['reverse-selected-geometry'])"
         @simplify-selected-geometry="events.push(['simplify-selected-geometry'])"
         @close-selected-line="events.push(['close-selected-line'])"
@@ -126,6 +128,8 @@ function mountToolsPanel(overrides = {}) {
         @update:selected-text-label-field-key="events.push(['update:selected-text-label-field-key', $event]); props.selectedTextLabelFieldKey = $event"
         @apply-text-label-field="events.push(['apply-text-label-field'])"
         @delete-selected="events.push(['delete-selected'])"
+        @focus-geometry-issue="events.push(['focus-geometry-issue', $event])"
+        @repair-feature-geometry="events.push(['repair-feature-geometry', $event])"
         @update:snap-targets="events.push(['update:snap-targets', $event]); props.snapTargets = $event"
       />
     `,
@@ -146,6 +150,31 @@ function mountToolsPanel(overrides = {}) {
 }
 
 describe('MapDrawToolsPanel editing affordances', () => {
+  it('shows explicit sketch completion and cancellation only while drawing', async () => {
+    const wrapper = mountToolsPanel({ sketchState: { active: true, pointCount: 2, canFinish: false } })
+    await nextTick()
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-finish-sketch"]').disabled).toBe(true)
+    wrapper.host.querySelector('[data-testid="draw-tool-cancel-sketch"]').click()
+    expect(wrapper.events).toContainEqual(['cancel-sketch'])
+    wrapper.props.sketchState = { active: true, pointCount: 3, canFinish: true }
+    await nextTick()
+    wrapper.host.querySelector('[data-testid="draw-tool-finish-sketch"]').click()
+    expect(wrapper.events).toContainEqual(['finish-sketch'])
+    wrapper.props.sketchState = { active: false }
+    await nextTick()
+    expect(wrapper.host.querySelector('[data-testid="draw-tool-sketch-controls"]')).toBeNull()
+    wrapper.unmount()
+  })
+  it('locates and repairs the feature reported by a geometry diagnostic', async () => {
+    const issue = { id: 'poly:self-intersection:0.1', featureId: 'poly', featureName: 'Area', code: 'self-intersection', label: 'Crossing', location: '0.1 / 0.3', coordPaths: ['0.1', '0.3'], coordinate: [1, 1], repairable: true }
+    const wrapper = mountToolsPanel({ geometryQualitySummary: { hasIssues: true, issueCount: 1, items: [issue] } })
+    await nextTick()
+    wrapper.host.querySelector('[data-testid="geometry-issue-focus"]').click()
+    wrapper.host.querySelector('[data-testid="geometry-issue-repair"]').click()
+    expect(wrapper.events).toContainEqual(['focus-geometry-issue', issue])
+    expect(wrapper.events).toContainEqual(['repair-feature-geometry', 'poly'])
+    wrapper.unmount()
+  })
   afterEach(() => {
     document.body.innerHTML = ''
   })

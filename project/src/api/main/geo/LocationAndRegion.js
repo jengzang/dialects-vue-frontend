@@ -142,20 +142,26 @@ export async function batchMatch(inputString, filterValidAbbrs = false) {
 
 /**
  * 获取分区树（地区分区结构）
- * @returns {Promise<Array<Object>>} 分区树节点
+ * @returns {Promise<Object>} schema_version=2 的完整路径分区树
  * @throws {Error} 获取失败
  * @example
  * const partitions = await getPartitions()
- * // Returns: [{ id: '1', name: '华南', children: [...] }, ...]
+ * // partitions.nodes: [{ label: '華北', path: '華北', depth: 1, children: [...] }]
  */
-export async function getPartitions() {
+export async function getPartitions(regionMode = 'yindian', parent) {
   try {
-    return await api('/api/partitions')
+    const query = new URLSearchParams({ region_mode: regionMode })
+    if (parent !== undefined && parent !== null) query.set('parent', parent)
+    return await api(`/api/partitions?${query}`)
   } catch (error) {
     console.error('Get partitions error:', error)
     showError(error.message || '獲取分區樹失敗')
     throw new Error(error.message || '獲取分區樹失敗')
   }
+}
+
+export function resolvePartitions(payload) {
+  return api('/api/partitions/resolve', { method: 'POST', body: payload })
 }
 
 /**

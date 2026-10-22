@@ -3,6 +3,7 @@ import { readImportedLayerFile, splitFeatureCollectionByGeometryType } from '@/m
 import { prepareNationalBorderForVoronoiClip } from '@/main/utils/drawMap/voronoiClip.js';
 import { api } from '@/api/auth/httpClient.js';
 import { useI18n } from 'vue-i18n';
+import { nextTick } from 'vue';
 
 import nationalBorderGeoJsonUrl from '/data/gis/china_country.geojson?url';
 import provincesGeoJsonUrl from '/data/gis/china_provinces.geojson?url';
@@ -62,6 +63,8 @@ export function useGisLayers(options = {}) {
       : geometryType === 'Polygon'
         ? 'draw_polygon'
         : 'draw_line_string';
+    await nextTick();
+    if (activeLayerId.value !== layer.id || layer.visible === false || layer.locked === true) return;
     editableMapRef?.value?.setDrawMode?.(mode);
     currentMode.value = mode;
   }

@@ -259,7 +259,7 @@ $overlay-transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
   width: $avatar-size;
   height: $avatar-size;
-  color: $white;
+  color: var(--action-primary-text);
   font-size: 22px;
   font-weight: 700;
   background: linear-gradient(135deg, $primary-blue, $secondary-blue);

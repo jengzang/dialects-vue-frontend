@@ -52,7 +52,7 @@ vi.mock('../src/utils/ui/message.js', () => ({
   showError: showErrorMock,
 }))
 
-vi.mock('../src/components/common/TabsContainer.vue', () => ({
+vi.mock('../src/components/common/TabSwitcher.vue', () => ({
   default: {
     props: ['tabs', 'modelValue', 'routeValue', 'resolveRoute'],
     template: '<section data-tabs-container><slot :current-tab="modelValue" /></section>',

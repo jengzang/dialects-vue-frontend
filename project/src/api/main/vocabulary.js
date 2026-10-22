@@ -1,5 +1,6 @@
 // api/main/vocabulary.js - 词表业务接口
 import { api } from '../auth/httpClient.js'
+import { readSessionCache, writeSessionCache } from '@/composables/core/sessionCache.js'
 import { showError } from '@/utils/ui/message.js'
 
 const VOCABULARY_ITEMS_ENDPOINT = '/api/vocabulary/search/entries'
@@ -7,6 +8,7 @@ const VOCABULARY_MAP_POINTS_ENDPOINT = '/api/vocabulary/search/map-points'
 const VOCABULARY_STANDARD_WORDS_ENDPOINT = '/api/vocabulary/search/standard-words'
 const VOCABULARY_MAP_ITEMS_ENDPOINT = '/api/vocabulary/search/map-items'
 const VOCABULARY_LOCATION_OPTIONS_ENDPOINT = '/api/vocabulary/search/location-options'
+const VOCABULARY_PARTITION_OPTIONS_ENDPOINT = '/api/vocabulary/search/partition-options'
 const VOCABULARY_LOCATIONS_ENDPOINT = '/api/vocabulary/locations'
 const VOCABULARY_LOGS_ENDPOINT = '/api/vocabulary/logs'
 const VOCABULARY_IMPORTS_ENDPOINT = '/api/vocabulary/imports'
@@ -15,6 +17,16 @@ const VOCABULARY_ADMIN_PERMISSIONS_ENDPOINT = '/api/vocabulary/admin/permissions
 const VOCABULARY_SQL_ENDPOINT = '/api/vocabulary/sql'
 const VOCABULARY_ENTRIES_TABLE = 'vocabulary_entries'
 let vocabularyEntryCreateLocationName = ''
+let vocabularyCountsCache = null
+let vocabularyCountsRequest = null
+let vocabularyCountsRequestId = 0
+let vocabularyOptionsCacheGeneration = 0
+const VOCABULARY_OPTIONS_CACHE_KEY = 'vocabulary_options_cache'
+const VOCABULARY_OPTIONS_CACHE_LIMIT = 20
+const vocabularyLocationOptionsCache = new Map()
+const vocabularyLocationOptionsRequests = new Map()
+const vocabularyPartitionOptionsCache = new Map()
+const vocabularyPartitionOptionsRequests = new Map()
 
 function stripVocabularyDbKey(params = {}) {
   const rest = { ...params }
@@ -44,7 +56,15 @@ function appendListIfPresent(params, key, value) {
 function appendQueryParams(values = {}) {
   const query = new URLSearchParams()
   Object.entries(values).forEach(([key, value]) => {
-    appendListIfPresent(query, key, value)
+    if (key === 'regions') {
+      const paths = value == null ? [] : Array.isArray(value) ? value : [value]
+      if (paths.length > 50 || paths.some(path => typeof path !== 'string' || Array.from(path).length > 200)) {
+        throw new Error('Regions support at most 50 paths of 200 characters each')
+      }
+      paths.forEach(path => query.append(key, path))
+    } else {
+      appendListIfPresent(query, key, value)
+    }
   })
   const suffix = query.toString()
   return suffix ? `?${suffix}` : ''
@@ -105,6 +125,8 @@ function withVocabularyEntryCreateLocation(params = {}) {
  * @property {string | string[]} [locations] 独立地点筛选，多个地点之间为 OR；该筛选与 q 内容匹配是 AND 关系。
  * @property {string} [province] 按省筛选，与 locations 互斥。
  * @property {string} [city] 按市筛选，与 locations 互斥。
+ * @property {'yindian' | 'map'} [region_mode] 分区体系。
+ * @property {string[]} [regions] 完整分区路径，使用重复参数，保留原文。
  * @property {number} [page=1] 卡片模式结果页码；后端默认 1。
  * @property {number} [page_size=50] 卡片模式每页数量；后端默认 50，最大 200。
  */
@@ -119,6 +141,8 @@ function withVocabularyEntryCreateLocation(params = {}) {
  * @property {string} informations 补充信息。
  * @property {string} location_name 地点简称。
  * @property {string} location_label 完整地点链。
+ * @property {string} yindian_region 音典分区。
+ * @property {string} atlas_region 地图集分区。
  */
 
 /**
@@ -190,6 +214,8 @@ export function buildVocabularyItemsPath(params = {}) {
     locations: params.locations,
     province: params.province,
     city: params.city,
+    region_mode: params.region_mode,
+    regions: params.regions,
     page: params.page,
     page_size: params.page_size,
   })}`
@@ -210,6 +236,8 @@ export function buildVocabularyMapPointsPath(params = {}) {
     locations: params.locations,
     province: params.province,
     city: params.city,
+    region_mode: params.region_mode,
+    regions: params.regions,
   })}`
 }
 
@@ -228,6 +256,8 @@ export function buildVocabularyStandardWordsPath(params = {}) {
     locations: params.locations,
     province: params.province,
     city: params.city,
+    region_mode: params.region_mode,
+    regions: params.regions,
     limit: params.limit,
   })}`
 }
@@ -248,6 +278,8 @@ export function buildVocabularyMapItemsPath(params = {}) {
     locations: params.locations,
     province: params.province,
     city: params.city,
+    region_mode: params.region_mode,
+    regions: params.regions,
   })}`
 }
 
@@ -364,40 +396,168 @@ export async function setVocabularyPermission(userId, permissionLevel) {
   })
 }
 
+function readPersistedOptionsCache() {
+  const persisted = readSessionCache(VOCABULARY_OPTIONS_CACHE_KEY)
+  return persisted && typeof persisted === 'object' ? persisted : null
+}
+
+function persistOptionsCache() {
+  try {
+    writeSessionCache(VOCABULARY_OPTIONS_CACHE_KEY, {
+      location: Object.fromEntries(vocabularyLocationOptionsCache),
+      partition: Object.fromEntries(vocabularyPartitionOptionsCache),
+    })
+  } catch {
+    // 存储不可用时保留内存缓存即可，不影响本次查询结果。
+  }
+}
+
+function rememberCachedOptions(cache, key, value) {
+  cache.set(key, value)
+  while (cache.size > VOCABULARY_OPTIONS_CACHE_LIMIT) {
+    cache.delete(cache.keys().next().value)
+  }
+  persistOptionsCache()
+}
+
+function readCachedOptions(cache, section, key) {
+  if (cache.has(key)) {
+    return cache.get(key)
+  }
+  const cached = readPersistedOptionsCache()?.[section]?.[key]
+  if (cached !== undefined && cached !== null) {
+    cache.set(key, cached)
+    return cached
+  }
+  return null
+}
+
+/**
+ * 清除词表筛选候选缓存，例如导入或地点维护后。
+ */
+export function invalidateVocabularyOptionsCache() {
+  vocabularyOptionsCacheGeneration += 1
+  vocabularyLocationOptionsCache.clear()
+  vocabularyLocationOptionsRequests.clear()
+  vocabularyPartitionOptionsCache.clear()
+  vocabularyPartitionOptionsRequests.clear()
+  try {
+    writeSessionCache(VOCABULARY_OPTIONS_CACHE_KEY, { location: {}, partition: {} })
+  } catch {
+    // 存储不可用时内存缓存已清空，下次请求仍会重新拉取。
+  }
+}
+
+function buildVocabularyLocationOptionsCacheKey(params = {}) {
+  const regions = Array.isArray(params.regions)
+    ? [...new Set(params.regions.map(String).filter(Boolean))].sort()
+    : []
+  return JSON.stringify([
+    regions.length ? (params.region_mode || 'yindian') : 'yindian',
+    regions,
+    params.province || '',
+    params.city || '',
+  ])
+}
+
 /**
  * 获取词表地点筛选候选值，供卡片/地图模式的地点多选筛选使用。
  *
  * label 用于展示（地点简称 location_name），locationLabel 保留完整地点链用于搜索匹配。
+ * 结果只由 region_mode/regions/province/city 决定，与搜索词 q 无关，按这些参数缓存。
  *
  * @returns {Promise<Array<{value: string, label: string, locationLabel: string, province: string, city: string}>>}
  */
-export async function getVocabularyLocationOptions() {
-  try {
-    const response = await api(VOCABULARY_LOCATION_OPTIONS_ENDPOINT)
-    const seenLocationNames = new Set()
-    const locations = Array.isArray(response.locations) ? response.locations : []
-
-    return locations.reduce((options, location) => {
-      const locationName = String(location.location_name || '').trim()
-      if (!locationName || seenLocationNames.has(locationName)) {
-        return options
-      }
-
-      seenLocationNames.add(locationName)
-      options.push({
-        value: locationName,
-        label: locationName,
-        locationLabel: location.location_label || locationName,
-        province: location.province || '',
-        city: location.city || '',
-      })
-      return options
-    }, [])
-  } catch (error) {
-    console.error('Get vocabulary locations error:', error)
-    showError(error.message || '獲取詞表地點失敗')
-    throw new Error(error.message || '獲取詞表地點失敗')
+export async function getVocabularyLocationOptions(params = {}) {
+  const cacheKey = buildVocabularyLocationOptionsCacheKey(params)
+  const cached = readCachedOptions(vocabularyLocationOptionsCache, 'location', cacheKey)
+  if (cached) {
+    return cached
   }
+  const pending = vocabularyLocationOptionsRequests.get(cacheKey)
+  if (pending) {
+    return pending
+  }
+
+  const generation = vocabularyOptionsCacheGeneration
+  const request = (async () => {
+    try {
+      const response = await api(`${VOCABULARY_LOCATION_OPTIONS_ENDPOINT}${appendQueryParams({
+        region_mode: params.region_mode,
+        regions: params.regions,
+        province: params.province,
+        city: params.city,
+      })}`)
+      const seenLocationNames = new Set()
+      const locations = Array.isArray(response.locations) ? response.locations : []
+
+      const options = locations.reduce((result, location) => {
+        const locationName = String(location.location_name || '').trim()
+        if (!locationName || seenLocationNames.has(locationName)) {
+          return result
+        }
+
+        seenLocationNames.add(locationName)
+        result.push({
+          value: locationName,
+          label: locationName,
+          locationLabel: location.location_label || locationName,
+          province: location.province || '',
+          city: location.city || '',
+          yindianRegion: location.yindian_region || '',
+          atlasRegion: location.atlas_region || '',
+          yindianRegions: Array.isArray(location.yindian_regions) ? location.yindian_regions : [],
+          atlasRegions: Array.isArray(location.atlas_regions) ? location.atlas_regions : [],
+        })
+        return result
+      }, [])
+
+      if (generation === vocabularyOptionsCacheGeneration) {
+        rememberCachedOptions(vocabularyLocationOptionsCache, cacheKey, options)
+      }
+      return options
+    } catch (error) {
+      console.error('Get vocabulary locations error:', error)
+      showError(error.message || '獲取詞表地點失敗')
+      throw new Error(error.message || '獲取詞表地點失敗')
+    } finally {
+      vocabularyLocationOptionsRequests.delete(cacheKey)
+    }
+  })()
+
+  vocabularyLocationOptionsRequests.set(cacheKey, request)
+  return request
+}
+
+export async function getVocabularyPartitionOptions(regionMode = 'yindian', parent = null) {
+  const cacheKey = `${regionMode}|${parent ?? ''}`
+  const cached = readCachedOptions(vocabularyPartitionOptionsCache, 'partition', cacheKey)
+  if (cached) {
+    return cached
+  }
+  const pending = vocabularyPartitionOptionsRequests.get(cacheKey)
+  if (pending) {
+    return pending
+  }
+
+  const generation = vocabularyOptionsCacheGeneration
+  const request = (async () => {
+    try {
+      const tree = await api(`${VOCABULARY_PARTITION_OPTIONS_ENDPOINT}${appendQueryParams({
+        region_mode: regionMode,
+        parent,
+      })}`)
+      if (generation === vocabularyOptionsCacheGeneration) {
+        rememberCachedOptions(vocabularyPartitionOptionsCache, cacheKey, tree)
+      }
+      return tree
+    } finally {
+      vocabularyPartitionOptionsRequests.delete(cacheKey)
+    }
+  })()
+
+  vocabularyPartitionOptionsRequests.set(cacheKey, request)
+  return request
 }
 
 export async function getVocabularyLocationNames() {
@@ -422,26 +582,55 @@ export async function getVocabularyLocations(params = {}) {
 }
 
 /**
- * 更新词表地点元数据。
+ * 清除词表总数缓存，例如词表导入成功后。
+ */
+export function invalidateVocabularyCountsCache() {
+  vocabularyCountsCache = null
+  vocabularyCountsRequestId += 1
+  vocabularyCountsRequest = null
+}
+
+/**
+ * 获取词条总数及拥有词条的方言点数，并复用当前会话中的请求和结果。
  *
- * @param {string} locationName
- * @param {object} data
- * @param {{user_id?: number|string}} [params={}]
- * @returns {Promise<object>}
+ * @returns {Promise<{total: number|null, locations: number|null}>}
  */
 export async function getVocabularyCounts() {
-  try {
-    const [totalResult, locationResult] = await Promise.all([
-      api(`${VOCABULARY_SQL_ENDPOINT}/query/count?table_name=${encodeURIComponent(VOCABULARY_ENTRIES_TABLE)}`),
-      api(`${VOCABULARY_SQL_ENDPOINT}/query/count?table_name=${encodeURIComponent(VOCABULARY_ENTRIES_TABLE)}&distinct_column=location_name`),
-    ])
-    return {
-      total: totalResult.count ?? 0,
-      locations: locationResult.count ?? 0,
+  if (vocabularyCountsCache) {
+    return { ...vocabularyCountsCache }
+  }
+  if (vocabularyCountsRequest) {
+    return vocabularyCountsRequest
+  }
+
+  const requestId = ++vocabularyCountsRequestId
+  const request = (async () => {
+    try {
+      const [totalResult, locationResult] = await Promise.all([
+        api(`${VOCABULARY_SQL_ENDPOINT}/query/count?table_name=${encodeURIComponent(VOCABULARY_ENTRIES_TABLE)}`),
+        api(`${VOCABULARY_SQL_ENDPOINT}/query/count?table_name=${encodeURIComponent(VOCABULARY_ENTRIES_TABLE)}&distinct_column=location_name`),
+      ])
+      const counts = {
+        total: totalResult.count ?? 0,
+        locations: locationResult.count ?? 0,
+      }
+      if (requestId === vocabularyCountsRequestId) {
+        vocabularyCountsCache = counts
+      }
+      return counts
+    } catch (error) {
+      console.error('Get vocabulary counts error:', error)
+      return { total: null, locations: null }
     }
-  } catch (error) {
-    console.error('Get vocabulary counts error:', error)
-    return { total: null, locations: null }
+  })()
+
+  vocabularyCountsRequest = request
+  try {
+    return await request
+  } finally {
+    if (requestId === vocabularyCountsRequestId && vocabularyCountsRequest === request) {
+      vocabularyCountsRequest = null
+    }
   }
 }
 
@@ -567,16 +756,17 @@ export async function getVocabularyLogs(params = {}) {
  * success 仅在没有任何可导入行时为 false；errors 非空表示部分行会被跳过，
  * 此时 parsed_count 仍是真实可导入的行数，前端应以 parsed_count > 0 作为可提交判据。
  *
- * @param {{file: File, location: object, parser_mode?: 'auto' | 'table' | 'doc_whitespace' | 'doc_bracket'}} params
+ * @param {{file: File, location: object, parser_mode?: 'auto' | 'table' | 'doc_whitespace' | 'doc_bracket', target_user_id?: number}} params
  * @returns {Promise<{success: boolean, location_name: string, permission_level: string, parsed_count: number, would_delete_existing_count: number, skipped_count: number, errors: string[], parser_mode: string}>}
  */
-export async function previewVocabularyImport({ file, location, parser_mode = 'auto', fill_standard_from_local = false }) {
+export async function previewVocabularyImport({ file, location, parser_mode = 'auto', fill_standard_from_local = false, target_user_id }) {
   try {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('location', JSON.stringify(location))
     formData.append('parser_mode', parser_mode)
     formData.append('fill_standard_from_local', fill_standard_from_local ? 'true' : 'false')
+    if (target_user_id != null) formData.append('target_user_id', String(target_user_id))
 
     return await api(`${VOCABULARY_IMPORTS_ENDPOINT}/preview`, {
       method: 'POST',
@@ -596,10 +786,10 @@ export async function previewVocabularyImport({ file, location, parser_mode = 'a
  * imported_count 为实际导入行数，skipped_count / errors 为被跳过的行明细。
  * 没有任何可导入行时后端抛 400（detail: "No valid vocabulary rows found"），不返回 success=false。
  *
- * @param {{file: File, location: object, parser_mode?: 'auto' | 'table' | 'doc_whitespace' | 'doc_bracket', overwrite?: boolean}} params
+ * @param {{file: File, location: object, parser_mode?: 'auto' | 'table' | 'doc_whitespace' | 'doc_bracket', overwrite?: boolean, target_user_id?: number}} params
  * @returns {Promise<{success: boolean, location_id: number, location_name: string, permission_level: string, imported_count: number, deleted_existing_count: number, skipped_count: number, errors: string[], parser_mode: string}>}
  */
-export async function uploadVocabulary({ file, location, parser_mode = 'auto', overwrite = false, fill_standard_from_local = false }) {
+export async function uploadVocabulary({ file, location, parser_mode = 'auto', overwrite = false, fill_standard_from_local = false, target_user_id }) {
   try {
     const formData = new FormData()
     formData.append('file', file)
@@ -607,6 +797,7 @@ export async function uploadVocabulary({ file, location, parser_mode = 'auto', o
     formData.append('parser_mode', parser_mode)
     formData.append('overwrite', overwrite ? 'true' : 'false')
     formData.append('fill_standard_from_local', fill_standard_from_local ? 'true' : 'false')
+    if (target_user_id != null) formData.append('target_user_id', String(target_user_id))
 
     return await api(VOCABULARY_IMPORTS_ENDPOINT, {
       method: 'POST',

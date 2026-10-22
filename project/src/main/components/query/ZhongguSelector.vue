@@ -1,5 +1,5 @@
 <template>
-  <div class="query-result-box glass-card">
+  <div class="query-result-box surface-panel">
 
     <div v-if="hasSelection" class="info-header">
       <div class="info-text">
@@ -264,8 +264,12 @@ $font-size-base: 14px;
 $transition-duration: 0.2s;
 $card-radius: 8px;
 
-/* 最外层容器：统一的大玻璃卡片 */
+/* 最外层容器：次主色边框 */
 .query-result-box {
+  --surface-panel-fill: var(--color-primary-light);
+  --surface-panel-border: 1px solid var(--color-primary-border);
+  --surface-panel-shadow: none;
+  --surface-panel-hover-shadow: none;
   @include flex-col;
   margin: 10px 0;
   padding: 8px;
@@ -297,7 +301,7 @@ $card-radius: 8px;
   transition: all $transition-duration;
 
   &:hover {
-    color: white;
+    color: var(--action-primary-text);
     background: var(--color-primary-hover);
   }
 }

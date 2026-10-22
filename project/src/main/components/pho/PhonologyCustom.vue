@@ -15,6 +15,11 @@
 
     <div v-if="!isTableSupported" class="empty unsupported-state">
       <p>{{ t('phonology.phonology.custom.states.unsupportedTable', { table: currentTableLabel }) }}</p>
+      <RecentQueryPills
+        :entries="recentQueries.entries.value"
+        :disabled="loading || isRestoringHistory"
+        @restore="restoreRecentQuery"
+      />
     </div>
 
     <template v-else>
@@ -26,6 +31,15 @@
           @update:matchedLocations="handleMatchedLocations"
           @update:isMatching="handleIsMatching"
         />
+
+        <RecentQueryPills
+          class="recent-query-row"
+          :entries="recentQueries.entries.value"
+          :disabled="loading || isRestoringHistory"
+          @restore="restoreRecentQuery"
+        >
+          <LocationQuickFillPill @apply="applyQuickLocations" />
+        </RecentQueryPills>
 
         <!-- 分類欄位選擇 -->
         <div class="column-selectors">
@@ -56,8 +70,8 @@
 
         <button
           class="action-btn"
-          @click="loadData"
-          :disabled="matchedLocations.length === 0 || loading || isMatching"
+          @click="loadData(true)"
+          :disabled="matchedLocations.length === 0 || loading || isMatching || isRestoringHistory"
         >
           <span v-if="isMatching" class="ui-loading--inline" aria-hidden="true">↻</span>
           <span v-else-if="loading">{{ $t('phonology.phonology.custom.actions.loading') }}</span>
@@ -72,7 +86,7 @@
 
       <div v-else-if="error" class="error">
         <p>{{ error }}</p>
-        <button @click="loadData" class="retry-btn">
+        <button @click="loadData(true)" class="retry-btn">
           {{ $t('phonology.phonology.custom.actions.retry') }}
         </button>
       </div>
@@ -90,10 +104,6 @@
           :cell-details="matrixData.cellDetails"
         />
       </div>
-
-      <div v-else class="empty">
-        <p>{{ $t('phonology.phonology.custom.states.emptyInput') }}</p>
-      </div>
     </template>
   </div>
 </template>
@@ -107,11 +117,14 @@ import { getPhonologyClassificationMatrix } from '@/api'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 import PhonologyMatrix from '@/main/components/TableAndTree/PhonologyTable.vue'
 import LocationMultiInput from '@/main/components/geo/LocationMultiInput.vue'
+import LocationQuickFillPill from '@/main/components/geo/LocationQuickFillPill.vue'
+import RecentQueryPills from '@/components/common/RecentQueryPills.vue'
+import { useRecentQueryHistory } from '@/composables/core/useRecentQueryHistory.js'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import { TABLE_COLUMN_SCHEMAS } from '@/main/config/index.js'
-import { preferredCharacterTable } from '@/main/store/store.js'
+import { preferredCharacterTable, setPreferredCharacterTable } from '@/main/store/store.js'
 import {
   decodeQueryValueBase64Url,
   encodeQueryValueBase64Url,
@@ -134,6 +147,9 @@ const selectedCharacterTable = preferredCharacterTable
 const CUSTOM_LOCATION_LIMIT = PHONOLOGY_LOCATION_LIMITS.custom
 const isApplyingRouteQuery = ref(false)
 const isApplyingFeatureDefaults = ref(false)
+const isRestoringHistory = ref(false)
+const recentQueries = useRecentQueryHistory('pho:custom')
+let stopInitialAutoQuery = null
 
 // 特徵選擇（聲母/韻母/聲調） - Keep original values for API
 const FEATURE_KEYS = ['聲母', '韻母', '聲調']
@@ -365,6 +381,36 @@ const displayLocations = computed(() => {
   return matrixData.value.locations || []
 })
 
+// 快速填入预置地点，等同于用户手动输入（不触发查询）
+const applyQuickLocations = (location) => {
+  if (queryStrings.value.includes(location)) {
+    return
+  }
+
+  queryStrings.value = [...queryStrings.value, location]
+}
+
+async function restoreRecentQuery(snapshot) {
+  if (loading.value || isRestoringHistory.value) return
+  stopInitialAutoQuery?.()
+  stopInitialAutoQuery = null
+  isRestoringHistory.value = true
+  isApplyingRouteQuery.value = true
+  try {
+    setPreferredCharacterTable(snapshot.table_name)
+    selectedFeatureChinese.value = snapshot.feature
+    horizontalColumnChinese.value = snapshot.horizontal_column
+    verticalColumnChinese.value = snapshot.vertical_column
+    cellRowColumnChinese.value = snapshot.cell_row_column
+    if (JSON.stringify(queryStrings.value) !== JSON.stringify(snapshot.locations)) matchedLocations.value = []
+    queryStrings.value = [...snapshot.locations]
+    await nextTick()
+  } finally {
+    isApplyingRouteQuery.value = false
+    isRestoringHistory.value = false
+  }
+}
+
 // 处理匹配到的地点列表
 const handleMatchedLocations = (locations) => {
   matchedLocations.value = Array.isArray(locations)
@@ -452,6 +498,7 @@ watch([horizontalColumnChinese, verticalColumnChinese, cellRowColumnChinese], as
 })
 
 watch(selectedCharacterTable, async () => {
+  if (isRestoringHistory.value) return
   matrixData.value = null
   error.value = null
 
@@ -539,7 +586,8 @@ const transformMatrixData = (apiData) => {
   }
 }
 
-const loadData = async () => {
+const loadData = async (remember = false) => {
+  if (isRestoringHistory.value) return
   if (!isTableSupported.value) {
     error.value = t('phonology.phonology.custom.states.unsupportedTable', { table: currentTableLabel.value })
     return
@@ -562,6 +610,9 @@ const loadData = async () => {
       table_name: selectedCharacterTable.value
     }
 
+    if (remember) {
+      recentQueries.record(requestBody, `${requestBody.feature} · ${requestBody.horizontal_column}/${requestBody.vertical_column}/${requestBody.cell_row_column} · ${requestBody.locations.join(' ')}`)
+    }
     const result = await getPhonologyClassificationMatrix(requestBody)
 
     // 調試：查看返回的數據結構
@@ -595,10 +646,11 @@ onMounted(() => {
     cellRowQuery.value
 
   if (hasLocations && hasAllColumns && validation.isValid) {
-    const unwatch = watch(matchedLocations, (locations) => {
+    stopInitialAutoQuery = watch(matchedLocations, (locations) => {
       if (locations.length > 0) {
         loadData()
-        unwatch()
+        stopInitialAutoQuery?.()
+        stopInitialAutoQuery = null
       }
     })
   }
@@ -665,7 +717,11 @@ watch(
 )
 </script>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+.recent-query-row { margin-top: 1.5dvh; }
+
 .phonology-matrix-page {
   width: 90dvw;
 
@@ -744,7 +800,7 @@ watch(
     border: none;
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-md);
-    color: var(--text-white);
+    color: var(--action-primary-text);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -769,11 +825,8 @@ watch(
 
   }
 
-  /* 空状态 */
-  .empty {
-    @include flex-center;
-    color: var(--text-secondary);
-    font-size: 16px;
+  .action-btn {
+    margin-top: 12px;
   }
 
   /* 竖屏 */

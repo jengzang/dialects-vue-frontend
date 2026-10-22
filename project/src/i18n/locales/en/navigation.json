@@ -127,7 +127,7 @@
     },
     "map": {
       "view": "Main Map",
-      "divide": "Regional Coloring",
+      "divide": "Chinese Dialect Region Dot Map",
       "custom": "Custom Data"
     },
     "pho": {

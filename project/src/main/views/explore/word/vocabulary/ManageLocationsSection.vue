@@ -100,7 +100,6 @@
           </button>
         </span>
       </div>
-      <p v-if="locationsStatusText" class="upload-status">{{ locationsStatusText }}</p>
     </div>
   </section>
 
@@ -156,12 +155,6 @@
           @keydown.enter.prevent="handleConfirmTransferLocation"
         >
       </label>
-      <p
-        v-if="transferErrorText"
-        class="upload-status"
-      >
-        {{ transferErrorText }}
-      </p>
     </div>
 
     <template #footer>
@@ -191,7 +184,7 @@
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { deleteVocabularyLocation, exportVocabularyLocation, getVocabularyLocations, transferVocabularyLocation, updateVocabularyLocation } from '@/api'
+import { deleteVocabularyLocation, exportVocabularyLocation, getVocabularyLocations, invalidateVocabularyOptionsCache, transferVocabularyLocation, updateVocabularyLocation } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 import LocationEditorModal from './LocationEditorModal.vue'
 import { LOCATION_BASE_FIELDS, TONE_FIELDS } from './vocabularyLocationFields.js'
@@ -210,7 +203,6 @@ const props = defineProps({
 
 const isLoadingLocations = ref(false)
 const locationsLoadError = ref('')
-const locationsStatusText = ref('')
 const locationRows = ref([])
 const isLocationEditorOpen = ref(false)
 const editingLocationSource = ref(null)
@@ -219,7 +211,6 @@ const isTransferModalOpen = ref(false)
 const transferLocationSource = ref(null)
 const transferTargetUserId = ref('')
 const transferTargetUsername = ref('')
-const transferErrorText = ref('')
 const isTransferringLocation = ref(false)
 const isExportingLocation = ref(false)
 const locationFilters = reactive({
@@ -319,7 +310,6 @@ function goToLocationPage(delta) {
 function openLocationEditor(location) {
   editingLocationSource.value = location
   editingLocationDraft.value = location ? { ...location } : null
-  locationsStatusText.value = ''
   isLocationEditorOpen.value = Boolean(location)
 }
 
@@ -333,8 +323,6 @@ function openTransferModal(location) {
   transferLocationSource.value = location
   transferTargetUserId.value = ''
   transferTargetUsername.value = ''
-  transferErrorText.value = ''
-  locationsStatusText.value = ''
   isTransferModalOpen.value = Boolean(location)
 }
 
@@ -344,7 +332,6 @@ function closeTransferModal() {
   transferLocationSource.value = null
   transferTargetUserId.value = ''
   transferTargetUsername.value = ''
-  transferErrorText.value = ''
 }
 
 async function handleSaveLocation(location, originalLocationName) {
@@ -355,8 +342,7 @@ async function handleSaveLocation(location, originalLocationName) {
 
   const nextName = String(location.location_name || '').trim()
   if (!nextName) {
-    locationsStatusText.value = t('words.wordList.locations.renameEmpty')
-    showError(locationsStatusText.value)
+    showError(t('words.wordList.locations.renameEmpty'))
     return
   }
 
@@ -369,17 +355,14 @@ async function handleSaveLocation(location, originalLocationName) {
     payload.new_location_name = nextName
   }
   const params = location.user_id ? { user_id: location.user_id } : {}
-  locationsStatusText.value = ''
-
   try {
     await updateVocabularyLocation(sourceName, payload, params)
-    locationsStatusText.value = t('words.wordList.locations.saveSuccess')
-    showSuccess(locationsStatusText.value)
+    invalidateVocabularyOptionsCache()
+    showSuccess(t('words.wordList.locations.saveSuccess'))
     await loadVocabularyLocations()
     closeLocationEditor()
   } catch (error) {
-    locationsStatusText.value = error.message || t('words.wordList.locations.saveFailed')
-    showError(locationsStatusText.value)
+    showError(error.message || t('words.wordList.locations.saveFailed'))
   }
 }
 
@@ -393,8 +376,6 @@ async function handleConfirmTransferLocation() {
     || isTransferringLocation.value
   ) return
 
-  transferErrorText.value = ''
-  locationsStatusText.value = ''
   isTransferringLocation.value = true
 
   try {
@@ -408,21 +389,19 @@ async function handleConfirmTransferLocation() {
         target_username: targetUsername,
       },
     )
-    locationsStatusText.value = t('words.wordList.locations.transfer.success', {
+    invalidateVocabularyOptionsCache()
+    showSuccess(t('words.wordList.locations.transfer.success', {
       name: result.location_name || transferLocationSource.value.location_name,
       user: result.target_username || result.target_user_id || targetUsername || targetUserId,
       count: result.transferred_entries_count ?? 0,
-    })
-    showSuccess(locationsStatusText.value)
+    }))
     await loadVocabularyLocations()
     isTransferModalOpen.value = false
     transferLocationSource.value = null
     transferTargetUserId.value = ''
     transferTargetUsername.value = ''
   } catch (error) {
-    transferErrorText.value = error.message || t('words.wordList.locations.transfer.failed')
-    locationsStatusText.value = transferErrorText.value
-    showError(transferErrorText.value)
+    showError(error.message || t('words.wordList.locations.transfer.failed'))
   } finally {
     isTransferringLocation.value = false
   }
@@ -453,16 +432,13 @@ async function handleExportLocation(location) {
   if (!location?.location_name || isExportingLocation.value) return
 
   isExportingLocation.value = true
-  locationsStatusText.value = ''
   try {
     const params = location.user_id ? { user_id: location.user_id } : {}
     const blob = await exportVocabularyLocation(location.location_name, params)
     triggerBlobDownload(blob, `${location.location_name}词表.xlsx`)
-    locationsStatusText.value = t('words.wordList.locations.exportSuccess', { name: location.location_name })
-    showSuccess(locationsStatusText.value)
+    showSuccess(t('words.wordList.locations.exportSuccess', { name: location.location_name }))
   } catch (error) {
-    locationsStatusText.value = error.message || t('words.wordList.locations.exportFailed')
-    showError(locationsStatusText.value)
+    showError(error.message || t('words.wordList.locations.exportFailed'))
   } finally {
     isExportingLocation.value = false
   }
@@ -477,16 +453,14 @@ async function handleDeleteLocation(location) {
   )
   if (!confirmed) return
 
-  locationsStatusText.value = ''
   try {
     const params = { user_id: location.user_id }
     const result = await deleteVocabularyLocation(location.location_name, params)
-    locationsStatusText.value = t('words.wordList.locations.deleteSuccess', { count: result.deleted_entries })
-    showSuccess(locationsStatusText.value)
+    invalidateVocabularyOptionsCache()
+    showSuccess(t('words.wordList.locations.deleteSuccess', { count: result.deleted_entries }))
     await loadVocabularyLocations()
   } catch (error) {
-    locationsStatusText.value = error.message || t('words.wordList.locations.deleteFailed')
-    showError(locationsStatusText.value)
+    showError(error.message || t('words.wordList.locations.deleteFailed'))
   }
 }
 

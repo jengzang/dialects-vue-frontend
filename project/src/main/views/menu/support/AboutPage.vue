@@ -1,6 +1,6 @@
 <template>
   <div class="about-page-wrapper">
-    <TabsContainer
+    <TabSwitcher
       :tabs="tabs"
       :model-value="currentTab"
       :route-value="currentTab"
@@ -77,13 +77,25 @@
                                                        target="_blank" rel="noopener noreferrer" class="thanks-link">{{ $t('about.thanks.mcpdictData') }}</a>
             </li>
             <li>
-              ✔ <a href="https://jyutjam.org/" target="_blank" rel="noopener noreferrer"
-                   class="thanks-link">{{ $t('about.thanks.jyutjam') }}</a> - {{ $t('about.thanks.jyutjamDesc') }}<a href="https://jyutdict.org/"
-                                                                                                                    target="_blank" rel="noopener noreferrer" class="thanks-link">{{ $t('about.thanks.jyutdict') }}</a>
+              ✔ <RouterLink :to="localeTo('/menu/vocabulary')" class="thanks-link">{{ $t('about.thanks.contributors') }}</RouterLink>
+              - {{ $t('about.thanks.contributorsDesc') }}
             </li>
             <li>
               ✔ <a href="https://zhongguoyuyan.cn/" target="_blank" rel="noopener noreferrer"
                    class="thanks-link">{{ $t('about.thanks.yuyan') }}</a> - {{ $t('about.thanks.yuyanDesc') }}
+            </li>
+            <li>
+              ✔ <a href="https://zhuanlan.zhihu.com/p/1890022649830290824" target="_blank" rel="noopener noreferrer"
+                   class="thanks-link">{{ $t('about.thanks.quanyue') }}</a> - {{ $t('about.thanks.quanyueDesc') }}
+            </li>
+            <li>
+              ✔ <a href="https://dmfw.mca.gov.cn/" target="_blank" rel="noopener noreferrer"
+                   class="thanks-link">{{ $t('about.thanks.diming') }}</a> - {{ $t('about.thanks.dimingDesc') }}
+            </li>
+            <li>
+              ✔ <a href="https://jyutjam.org/" target="_blank" rel="noopener noreferrer"
+                   class="thanks-link">{{ $t('about.thanks.jyutjam') }}</a> - {{ $t('about.thanks.jyutjamDesc') }}<a href="https://jyutdict.org/"
+                                                                                                                    target="_blank" rel="noopener noreferrer" class="thanks-link">{{ $t('about.thanks.jyutdict') }}</a>
             </li>
             <li>
               ✔ <a href="https://xiaoxue.iis.sinica.edu.tw/ccrdata/" target="_blank" rel="noopener noreferrer"
@@ -149,11 +161,13 @@
             </div>
           </div>
 
+          <h2 class="tabs-title" 
+              style="margin-top: 2rem;">{{ $t('layoutFooter.feedback.title') }}
+          </h2>
           <div
             class="surface-panel suggestion-form-section"
             data-about-suggestion-form
           >
-            <h2 class="tabs-title">{{ $t('layoutFooter.feedback.title') }}</h2>
             <form
               class="suggestion-page-form"
               @submit.prevent="submitSuggestionForm"
@@ -343,7 +357,7 @@
         </div>
 
       </template>
-    </TabsContainer>
+    </TabSwitcher>
 
     <SupportPopup
       :visible="showQRCodes"
@@ -359,7 +373,7 @@ import { useRoute } from 'vue-router'
 import i18n from '@/i18n/index.js'
 // import BarIcon from '@/components/common/BarIcon.vue'
 import SupportPopup from '@/main/components/user/popups/SupportPopup.vue'
-import TabsContainer from '@/components/common/TabsContainer.vue'
+import TabSwitcher from '@/components/common/TabSwitcher.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
@@ -587,8 +601,8 @@ $ease-standard: 0.3s ease;@mixin glass-card(
 
 .tabs-title {
   width: 100%;
-  margin-top: 1rem !important;
-  margin-bottom: 0.5rem !important;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
   font-size: 1.8rem;
   font-weight: bold;
 }
@@ -607,13 +621,13 @@ $ease-standard: 0.3s ease;@mixin glass-card(
   justify-content: center;
   margin: 0 auto;
   padding: 1dvw 8dvw;
-  background: var(--glass-05);
-  border: 1px solid var(--glass-10);
-  border-radius: var(--radius-md);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  // background: var(--glass-05);
+  // border: 1px solid var(--glass-10);
+  // border-radius: var(--radius-md);
+  // box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
   font-size: 18px;
 
-  @include glass-blur(8px);
+  // @include glass-blur(8px);
 }
 
 /* 通用正文 */
@@ -1082,12 +1096,12 @@ em {
   gap: 14px;
   // width: 100%;
   max-width: 820px;
-  margin: 28px auto 0;
+  margin: 4px auto 0;
   padding: 20px;
   text-align: left;
 
   @media (max-aspect-ratio: #{1 / 1}) {
-    min-width: 80dvw;
+    min-width: 75dvw;
   }
 
   .tabs-title {

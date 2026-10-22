@@ -76,9 +76,12 @@ export {
   getVocabularyStandardWords,
   getVocabularyLocationNames,
   getVocabularyLocationOptions,
+  getVocabularyPartitionOptions,
   getVocabularyLocations,
   getVocabularyLogs,
   getVocabularyCounts,
+  invalidateVocabularyCountsCache,
+  invalidateVocabularyOptionsCache,
   updateVocabularyLocation,
   transferVocabularyLocation,
   deleteVocabularyLocation,
@@ -114,6 +117,7 @@ export {
   getLocationPoints,
   batchMatch,
   getPartitions,
+  resolvePartitions,
   getRegions,
 } from './main/geo/LocationAndRegion.js';
 

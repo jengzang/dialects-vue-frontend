@@ -1,3 +1,4 @@
+import { reactive } from 'vue'
 import { uiStore, zhongguInputMode } from '@/main/store/store.js'
 
 function createLocation(locations = ['廣州'], regions = [], regionUsing = 'yindian') {
@@ -5,6 +6,7 @@ function createLocation(locations = ['廣州'], regions = [], regionUsing = 'yin
     locations,
     regions,
     regionUsing,
+    regions_semantics: 'path-v2',
   }
 }
 
@@ -44,49 +46,49 @@ const presets_tab2 = [
     card: '韻母',
     keys: ['攝'],
     values: { '攝': ['流', '深'] },
-    loc: { locations: ['广州 梅縣 汕头'], regions: ['瓊崖'], regionUsing: 'yindian' }
+    loc: { locations: ['广州 梅縣 汕头'], regions: ['嶺南-瓊崖'], regionUsing: 'yindian' }
   },
   {
     card: '聲母',
     keys: ['母'],
     values: { '母': ['精'] },
-    loc: { locations: ['鬱林 北流'], regions: ['吳化','銅容'], regionUsing: 'yindian' }
+    loc: { locations: ['鬱林 北流'], regions: ['嶺南-廉吳-吳化','嶺南-蒼梧-銅容'], regionUsing: 'yindian' }
   },
   {
     card: '聲調',
     keys: ['清濁','調'],
     values: { '清濁': ['次濁'] ,'調': ['上'] },
-    loc: { locations: ['台山台城 新會會城 東莞橋頭'], regions: ['東江'], regionUsing: 'yindian' }
+    loc: { locations: ['台山台城 新會會城 東莞橋頭'], regions: ['廣中-東江'], regionUsing: 'yindian' }
   },
   {
     card: '韻母',
     keys: ['攝', '等'],
     values: { '攝': ['蟹'], '等': ['一', '二', '三', '四'] },
-    loc: { locations: ['南雄'], regions: ['韶州'], regionUsing: 'yindian' }
+    loc: { locations: ['南雄'], regions: ['廣中-韶州'], regionUsing: 'yindian' }
   },
   {
     card: '韻母',
     keys: ['攝'],
     values: { '攝': ['山'] },
-    loc: { locations: ['博羅'], regions: ['四邑片'], regionUsing: 'map' }
+    loc: { locations: ['博羅'], regions: ['粵語-四邑片'], regionUsing: 'map' }
   },
   {
     card: '聲母',
     keys: ['組', '等'],
     values: { '組': ['見'], '等': [ '二'] },
-    loc: { locations: ['南京 鹽城 淮安 廬江'], regions: ['海泗'], regionUsing: 'yindian' }
+    loc: { locations: ['南京 鹽城 淮安 廬江'], regions: ['下江-海泗'], regionUsing: 'yindian' }
   },
   {
     card: '韻母',
     keys: ['韻'],
     values: { '韻': ['豪'] },
-    loc: { locations: ['銀川 天津 邢臺'], regions: ['魯中'], regionUsing: 'yindian' }
+    loc: { locations: ['銀川 天津 邢臺'], regions: ['華北-魯中'], regionUsing: 'yindian' }
   },
   {
     card: '聲母',
     keys: ['組', '等'],
     values: { '組': ['知'], '等': [ '三'] },
-    loc: { locations: ['髙安 修水'], regions: ['撫州'], regionUsing: 'yindian' }
+    loc: { locations: ['髙安 修水'], regions: ['湘贛-撫州'], regionUsing: 'yindian' }
   },
 ]
 
@@ -95,27 +97,33 @@ const presets_tab3 = [
     card: '韻母',
     keys: ['攝'],
     tab3KeyInput: ['a'],
-    loc: { locations: ['揭陽 饒平 永安 福州'], regions: ['莆仙'], regionUsing: 'yindian' }
+    loc: { locations: ['揭陽 饒平 永安 福州'], regions: ['閩-莆仙'], regionUsing: 'yindian' }
   },
   {
     card: '聲母',
     keys: ['組'],
     tab3KeyInput: ['h'],
-    loc: { locations: ['台山斗山墟 恩平 鶴山雅瑤 從化獅象'], regions: [''], regionUsing: 'yindian' }
+    loc: { locations: ['台山斗山墟 恩平 鶴山雅瑤 從化獅象'], regions: [], regionUsing: 'yindian' }
   },
 ]
 
-let diceIndex = 0
+// entryKey -> 下一组预置的 0-based 索引，骰子与页面上的快速开始按钮共用
+const diceCursor = reactive({})
 
-function createQueryTab2Payload() {
-  const config = presets_tab2[diceIndex % presets_tab2.length]
+function takeNextPreset(entryKey, total) {
+  const index = diceCursor[entryKey] ?? 0
+  diceCursor[entryKey] = (index + 1) % total
+  return index
+}
+
+function createQueryTab2Payload(entryKey) {
+  const config = presets_tab2[takeNextPreset(entryKey, presets_tab2.length)]
   const valuesMap = {}
   if (config.values) {
     for (const k in config.values) {
       valuesMap[k] = [...config.values[k]]
     }
   }
-  diceIndex++
   return {
     card: config.card,
     keys: [...config.keys],
@@ -125,15 +133,14 @@ function createQueryTab2Payload() {
   }
 }
 
-function createQueryTab2DirectPayload() {
-  const config = presets_tab2[diceIndex % presets_tab2.length]
+function createQueryTab2DirectPayload(entryKey) {
+  const config = presets_tab2[takeNextPreset(entryKey, presets_tab2.length)]
   const valuesMap = {}
   if (config.values) {
     for (const k in config.values) {
       valuesMap[k] = [...config.values[k]]
     }
   }
-  diceIndex++
   return {
     mode: 'direct',
     card: config.card,
@@ -143,9 +150,8 @@ function createQueryTab2DirectPayload() {
   }
 }
 
-function createQueryTab3Payload() {
-  const config = presets_tab3[diceIndex % presets_tab3.length]
-  diceIndex++
+function createQueryTab3Payload(entryKey) {
+  const config = presets_tab3[takeNextPreset(entryKey, presets_tab3.length)]
   return {
     card: config.card,
     keys: [...config.keys],
@@ -160,7 +166,7 @@ function createCompareTab1Payload() {
     group1Char: '包',
     group2Char: '好',
     feature: '韻母',
-    loc: createLocation(['台山'], ['珠江'], 'yindian'),
+    loc: createLocation(['台山'], ['嶺南-珠江'], 'yindian'),
   }
 }
 
@@ -200,7 +206,7 @@ function createCompareTab2Payload() {
         combinations: computeCombinations(group2Item.keys, group2Item.valueMap),
       },
     ],
-    loc: createLocation(['南寧'], ['鬱潯'], 'yindian'),
+    loc: createLocation(['南寧'], ['嶺南-鬱潯'], 'yindian'),
   }
 }
 
@@ -246,7 +252,7 @@ function createCompareTab2DirectPayload() {
       chars: '',
       excludeColumns: group2Item.excludeColumns,
     }],
-    loc: createLocation(['南寧'], ['鬱潯'], 'yindian'),
+    loc: createLocation(['南寧'], ['嶺南-鬱潯'], 'yindian'),
   }
 }
 
@@ -270,7 +276,7 @@ export const tutorialDiceConfig = {
     target: 'query:tab1',
     createPayload: () => ({
       chars: '发财',
-      loc: createLocation(['南京'], ['杭州小片', '上海小片', '蘇嘉湖小片'], 'map'),
+      loc: createLocation(['南京'], ['吳語-太湖片-杭州小片', '吳語-太湖片-上海小片', '吳語-太湖片-蘇嘉湖小片'], 'map'),
     }),
   },
   'menu-query-zhonggu': {
@@ -280,11 +286,12 @@ export const tutorialDiceConfig = {
     buttonKey: 'tutorial.assist.experience.queryZhonggu.button',
     target: 'query:tab2',
     when: shouldEnableCharacterDice,
+    presetCount: presets_tab2.length,
     createPayload: () => {
       if (zhongguInputMode.value === 'direct') {
-        return createQueryTab2DirectPayload()
+        return createQueryTab2DirectPayload('menu-query-zhonggu')
       }
-      return createQueryTab2Payload()
+      return createQueryTab2Payload('menu-query-zhonggu')
     },
   },
   'menu-query-yinwei': {
@@ -294,7 +301,8 @@ export const tutorialDiceConfig = {
     buttonKey: 'tutorial.assist.experience.queryYinwei.button',
     target: 'query:tab3',
     when: shouldEnableCharacterDice,
-    createPayload: createQueryTab3Payload,
+    presetCount: presets_tab3.length,
+    createPayload: () => createQueryTab3Payload('menu-query-yinwei'),
   },
   'menu-query-tone': {
     enabled: true,
@@ -335,4 +343,26 @@ export const tutorialDiceConfig = {
     target: 'compare:tab4',
     createPayload: createCompareTab4Payload,
   },
+}
+
+export function getTutorialDiceEntryByTarget(target) {
+  const entryKey = Object.keys(tutorialDiceConfig).find((key) => {
+    const entry = tutorialDiceConfig[key]
+    return entry.enabled && entry.target === target
+  })
+
+  return entryKey ? { key: entryKey, ...tutorialDiceConfig[entryKey] } : null
+}
+
+// 只有多组预置时才返回进度；单组返回 null，按钮不显示数字
+export function getTutorialDicePresetState(entryKey) {
+  const total = tutorialDiceConfig[entryKey]?.presetCount ?? 0
+  if (total <= 1) {
+    return null
+  }
+
+  return {
+    index: (diceCursor[entryKey] ?? 0) + 1,
+    total,
+  }
 }

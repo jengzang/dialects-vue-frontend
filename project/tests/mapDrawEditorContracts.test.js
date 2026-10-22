@@ -187,7 +187,7 @@ describe('Map draw editor contracts', () => {
     const historySource = readSource(useGisHistoryPath)
 
     expect(coreSource).toContain('const syncLayerIdSeedFromLayers')
-    expect(historySource).toMatch(/const applyHistorySnapshot = \(snapshot\) => \{[\s\S]*syncLayerIdSeedFromLayers\(layers\.value\)/)
+    expect(historySource).toMatch(/const applyHistorySnapshot = async \(snapshot\) => \{[\s\S]*syncLayerIdSeedFromLayers\(layers\.value\)/)
   })
 
   it('guards history restore state with finally and skips no-op all-layer visibility commits', () => {
@@ -202,7 +202,7 @@ describe('Map draw editor contracts', () => {
     const source = readSource(useGisHistoryPath)
 
     expect(source).toContain(`const restoredSelectedFeatureId = snapshot.selectedFeatureId || '';`)
-    expect(source).toContain(`const restoredMode = snapshot.currentMode || 'simple_select';`)
+    expect(source).toContain(`const restoredMode = snapshot.currentMode === 'direct_select' ? 'direct_select' : 'simple_select';`)
     expect(source).toContain('selectedFeatureIds: selectedFeatureIds.value,')
     expect(source).toContain('const restoredSelectedFeatureIds = Array.isArray(snapshot.selectedFeatureIds)')
     expect(source).toContain('setFeatureSelection(restoredSelectedFeatureIds, restoredSelectedFeatureId);')
@@ -289,8 +289,8 @@ describe('Map draw editor contracts', () => {
     const tabSource = readSource(mapDrawTabPath)
 
     expect(coreSource).toContain('const geometryQualitySummary = computed')
-    expect(coreSource).toContain('getDuplicateCoordinateCount')
-    expect(coreSource).toContain('hasRingSelfIntersection')
+    expect(coreSource).toContain('analyzeEditableGeometry')
+    expect(coreSource).toContain('describeGeometryIssue')
     expect(coreSource).toContain('geometryQualityDuplicateCoordinate')
     expect(coreSource).toContain('geometryQualitySelfIntersection')
     expect(panelSource).toContain('geometryQualitySummary')
@@ -425,11 +425,13 @@ describe('Map draw editor contracts', () => {
     expect(editableSource).toContain('const ensureSnapPreviewLayers = () =>')
     expect(editableSource).toContain('const setSnapPreview = (snapResult) =>')
     expect(editableSource).toContain("'snap-state-change'")
-    expect(editableSource).toContain('const snapPriorityBiasSquared = 1')
+    expect(editableSource).toContain('priority > best.priority')
+    expect(editableSource).toContain('modes: buildLiveSnappingModes()')
+    expect(editableSource).not.toContain('snapFeatures: true')
     expect(editableSource).toContain('snapped: Boolean(best.type)')
     expect(editableSource).toContain('distancePixels')
     expect(editableSource).toContain("acceptCandidate(candidate, 4, 'vertex', item)")
-    expect(editableSource).toContain("], 3, 'midpoint', item)")
+    expect(editableSource).toContain("acceptCandidate(midpoint, 3, 'midpoint', item)")
     expect(editableSource).toContain("acceptCandidate(candidate, 2, 'edge', item)")
     expect(editableSource).toContain("acceptCandidate(maybeSnapCoordinateToGrid(normalized), 1, 'grid'")
     expect(editableSource).toContain("isSnapTargetEnabled('reference')")
@@ -460,7 +462,7 @@ describe('Map draw editor contracts', () => {
     const editableSource = readSource(editableMapLibrePath)
 
     expect(editableSource).toContain('const snapPreviewLayerIds = new Set')
-    expect(editableSource).toMatch(/if \(snapPreviewLayerIds\.has\(layer\.id\)\) \{[\s\S]*setLayerVisibility\(layer\.id, false\)/)
+    expect(editableSource).toMatch(/if \(snapPreviewLayerIds\.has\(layer\.id\) \|\| geometryIssueLayerIds\.includes\(layer\.id\) \|\| hitPreviewLayerIds\.includes\(layer\.id\)\) \{[\s\S]*setLayerVisibility\(layer\.id, false\)/)
   })
 
   it('surfaces an explicit edit session status with snapping and history feedback', () => {

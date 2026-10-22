@@ -12,9 +12,17 @@
         @update:matchedLocations="handleMatchedLocations"
         @update:isMatching="handleIsMatching"
       />
+      <RecentQueryPills
+        class="recent-query-row"
+        :entries="recentQueries.entries.value"
+        :disabled="loading"
+        @restore="restoreRecentQuery"
+      >
+        <LocationQuickFillPill @apply="applyQuickLocations" />
+      </RecentQueryPills>
       <button
         class="action-btn"
-        @click="loadData"
+        @click="loadData(true)"
         :disabled="matchedLocations.length === 0 || loading || isMatching"
       >
         <span v-if="isMatching" class="ui-loading--inline" aria-hidden="true">↻</span>
@@ -30,7 +38,7 @@
 
     <div v-else-if="error" class="error">
       <p>{{ error }}</p>
-      <button @click="loadData" class="retry-btn">{{ $t('phonology.phonology.matrix.actions.retry') }}</button>
+      <button @click="loadData(true)" class="retry-btn">{{ $t('phonology.phonology.matrix.actions.retry') }}</button>
     </div>
 
     <div v-else-if="matrixData" class="matrix-container">
@@ -48,12 +56,9 @@
           :location="location"
           :data="matrixData[location]"
           show-copy
+          collapsible
         />
       </template>
-    </div>
-
-    <div v-else class="empty">
-      <p>{{ $t('phonology.phonology.matrix.states.emptyInput') }}</p>
     </div>
   </div>
 </template>
@@ -66,6 +71,9 @@ import { getPhonologyMatrix } from '@/api'
 import PhonologyMatrix from '@/main/components/TableAndTree/PhonologyTable.vue'
 import HomophoneLexicon from '@/main/components/pho/HomophoneLexicon.vue'
 import LocationMultiInput from '@/main/components/geo/LocationMultiInput.vue'
+import LocationQuickFillPill from '@/main/components/geo/LocationQuickFillPill.vue'
+import RecentQueryPills from '@/components/common/RecentQueryPills.vue'
+import { useRecentQueryHistory } from '@/composables/core/useRecentQueryHistory.js'
 import { transformMatrixReadStats } from '@/main/utils/phonology/readingStats.js'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
@@ -119,11 +127,29 @@ const matchedLocations = ref([])
 const isMatching = ref(false) // 添加匹配状态
 const pendingUrlAutoQuery = ref(false)
 const pendingUrlMatchAttempted = ref(false)
+const recentQueries = useRecentQueryHistory('pho:matrix')
+
+function restoreRecentQuery(snapshot) {
+  if (loading.value) return
+  pendingUrlAutoQuery.value = false
+  pendingUrlMatchAttempted.value = false
+  if (JSON.stringify(queryStrings.value) !== JSON.stringify(snapshot.locations)) matchedLocations.value = []
+  queryStrings.value = [...snapshot.locations]
+}
 
 const displayLocations = computed(() => {
   if (!matrixData.value) return []
   return Object.keys(matrixData.value)
 })
+
+// 快速填入预置地点，等同于用户手动输入（不触发查询）
+const applyQuickLocations = (location) => {
+  if (queryStrings.value.includes(location)) {
+    return
+  }
+
+  queryStrings.value = [...queryStrings.value, location]
+}
 
 // 处理匹配到的地点列表
 const handleMatchedLocations = (locations) => {
@@ -178,7 +204,7 @@ const runPendingUrlAutoQuery = () => {
   loadData()
 }
 
-const loadData = async () => {
+const loadData = async (remember = false) => {
   if (matchedLocations.value.length === 0) {
     error.value = t('phonology.phonology.matrix.states.minLocationError')
     return
@@ -191,6 +217,7 @@ const loadData = async () => {
       locations: matchedLocations.value.slice(0, PHONOLOGY_LOCATION_LIMITS.matrix)
     }
 
+    if (remember) recentQueries.record(requestBody, requestBody.locations.join(' '))
     const result = await getPhonologyMatrix(requestBody)
 
     matrixData.value = Object.fromEntries(
@@ -246,7 +273,11 @@ watch(locationQuery, (urlLocations) => {
 })
 </script>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
+.recent-query-row { margin-top: 1.5dvh; }
+
 .phonology-matrix-page {
   width: 90dvw;
   margin-top: 20px;
@@ -292,7 +323,7 @@ watch(locationQuery, (urlLocations) => {
     border: none;
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-md);
-    color: var(--text-white);
+    color: var(--action-primary-text);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -317,12 +348,8 @@ watch(locationQuery, (urlLocations) => {
 
   }
 
-  /* 空状态 */
-  .empty {
-    min-height: 30dvh;
-    @include flex-center;
-    color: var(--text-secondary);
-    font-size: 16px;
+  .action-btn {
+    margin-top: 12px;
   }
 
   /* 竖屏 */

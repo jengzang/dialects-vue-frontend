@@ -1,4 +1,8 @@
 {
+  "recentQueries": {
+    "label": "Recent searches",
+    "restore": "Fill recent search: {summary}"
+  },
   "button": {
     "confirm": "Confirm",
     "cancel": "Cancel",

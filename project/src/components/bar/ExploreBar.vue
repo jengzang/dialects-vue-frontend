@@ -214,6 +214,7 @@ import { useScrollSnap } from '@/composables/bar/useScrollSnap.js'
 import { useScrollArrows } from '@/composables/bar/useScrollArrows.js'
 import { useBarOverflow, getDefaultTabScroll, sortTabsByScroll } from '@/composables/bar/useBarOverflow.js'
 import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { navigatePlatformLink } from '@/platform/index.js'
 
 const props = defineProps({
   showScrollArrows: {
@@ -530,12 +531,8 @@ const handleSubmenuLeave = () => {
 }
 
 const handleSubmenuClick = (child) => {
-  if (child.external) {
-    window.open(child.path, '_blank')
-  } else {
-    router.push(child.path)
-  }
   activeSubmenu.value = null
+  return navigatePlatformLink(router, child.path, { external: child.external })
 }
 
 const toggleSidebar = () => {
@@ -584,6 +581,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   width: auto;
   box-sizing: border-box;
   --liquid-glass-glint-shift: 20%;
+  background: var(--bar-background, none);
   // background:
   //   linear-gradient(
   //     110deg,
@@ -641,7 +639,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   align-items: center;
   justify-content: center;
   min-width: 0;
-  max-width: 1200px;
+  // max-width: 1200px;
   height: $desktop-bar-height;
   margin: 0 10px;
   overflow-x: auto;

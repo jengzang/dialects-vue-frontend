@@ -8,6 +8,8 @@ export function useScrollArrows(navRef, hasOverflow, scrollAmount = 180, desktop
   const arrowRightPx = ref(0)
   let _interval = null
   let _arrowResizeObserver = null
+  let observedNav = null
+  let observedDesktop = null
 
   const updateVisibility = () => {
     const el = navRef?.value
@@ -73,37 +75,68 @@ export function useScrollArrows(navRef, hasOverflow, scrollAmount = 180, desktop
     navRef.value?.scrollBy({ left: e.deltaY + (e.deltaX || 0), behavior: 'auto' })
   }
 
-  onMounted(() => {
-    const el = navRef?.value
-    if (el) {
-      el.addEventListener('scroll', updateVisibility, { passive: true })
-      el.addEventListener('scroll', updateArrowPositions, { passive: true })
-      el.addEventListener('wheel', handleWheel, { passive: false })
-      updateVisibility()
-      nextTick(updateArrowPositions)
+  const bindElements = () => {
+    const nav = navRef?.value || null
+    const desktop = desktopRef?.value || null
+
+    if (desktop && !_arrowResizeObserver) {
+      _arrowResizeObserver = new ResizeObserver(updateArrowPositions)
     }
-    if (desktopRef?.value) {
-      window.addEventListener('resize', updateArrowPositions)
-      _arrowResizeObserver = new ResizeObserver(() => {
-        updateArrowPositions()
-      })
-      _arrowResizeObserver.observe(desktopRef.value)
-      if (navRef?.value) {
-        _arrowResizeObserver.observe(navRef.value)
+
+    if (observedNav !== nav) {
+      if (observedNav) {
+        stopScroll()
+        observedNav.removeEventListener('scroll', updateVisibility)
+        observedNav.removeEventListener('scroll', updateArrowPositions)
+        observedNav.removeEventListener('wheel', handleWheel)
+        _arrowResizeObserver?.unobserve(observedNav)
+      }
+      observedNav = nav
+      if (observedNav) {
+        observedNav.addEventListener('scroll', updateVisibility, { passive: true })
+        observedNav.addEventListener('scroll', updateArrowPositions, { passive: true })
+        observedNav.addEventListener('wheel', handleWheel, { passive: false })
+        _arrowResizeObserver?.observe(observedNav)
       }
     }
+
+    if (observedDesktop !== desktop) {
+      if (observedDesktop) {
+        window.removeEventListener('resize', updateArrowPositions)
+        _arrowResizeObserver?.unobserve(observedDesktop)
+      }
+      observedDesktop = desktop
+      if (observedDesktop) {
+        window.addEventListener('resize', updateArrowPositions)
+        _arrowResizeObserver?.observe(observedDesktop)
+      }
+    }
+
+    updateVisibility()
+    nextTick(updateArrowPositions)
+  }
+
+  onMounted(() => {
+    bindElements()
   })
+
+  watch(
+    [() => navRef?.value, () => desktopRef?.value],
+    bindElements,
+    { flush: 'post' }
+  )
 
   onBeforeUnmount(() => {
     stopScroll()
-    const el = navRef?.value
-    if (el) {
-      el.removeEventListener('scroll', updateVisibility)
-      el.removeEventListener('scroll', updateArrowPositions)
-      el.removeEventListener('wheel', handleWheel)
+    if (observedNav) {
+      observedNav.removeEventListener('scroll', updateVisibility)
+      observedNav.removeEventListener('scroll', updateArrowPositions)
+      observedNav.removeEventListener('wheel', handleWheel)
+      observedNav = null
     }
-    if (desktopRef?.value) {
+    if (observedDesktop) {
       window.removeEventListener('resize', updateArrowPositions)
+      observedDesktop = null
     }
     if (_arrowResizeObserver) {
       _arrowResizeObserver.disconnect()

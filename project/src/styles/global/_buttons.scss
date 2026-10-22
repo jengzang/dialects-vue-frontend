@@ -169,8 +169,8 @@
   width: var(--close-btn-size);
   height: var(--close-btn-size);
   border-radius: var(--radius-pill);
-  background: var(--glass-90);
-  color: rgba(var(--color-shadow-rgb), 0.96);
+  background: var(--surface-glass-button);
+  color: var(--text-primary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -190,9 +190,9 @@
 }
 
 .close-btn:hover {
-  background: var(--glass-90);
+  background: var(--surface-glass-button-hover);
   border-color: rgba(var(--color-error-rgb), 0.5);
-  color: var(--color-error-dark);
+  color: var(--color-error-light);
   transform: scale(1.06);
   box-shadow:
     0 8px 20px rgba(var(--color-shadow-rgb), 0.14),

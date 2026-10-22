@@ -72,6 +72,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const textarea = document.getElementById("regions");
     window.partitionPopupOpen = false;
     window.regionusing = 'map';
+    textarea.addEventListener('input', () => {
+        detailResolveSequence++;
+        if (!textarea.value.trim()) detailRegionTokens = [];
+        document.getElementById('region-resolution')?.remove();
+    });
+
 
     document.querySelectorAll('.tab-btn').forEach(tabBtn => {
         tabBtn.addEventListener('click', () => {
@@ -82,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if ((selectedType === 'yindian' || selectedType === 'map') && isSame) {
                 const existing = document.querySelector('#popupLayer .partition-container');
                 if (existing) {
-                    existing.remove();
+                    existing.dispatchEvent(new Event('close-partition'));
                 } else {
                     showRegionSelector?.(textarea, selectedType);
                 }
@@ -91,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // 切換 tab 狀態
             window.regionusing = selectedType;
-            document.getElementById('regions').value = '';
+            detailResolveSequence++; // Preserve the text while the user chooses its system.
             window.partitionPopupOpen = false; // 👈 这里设才对！
 
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -104,7 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // ⛔ 切到非音典或地圖時，保險起見自動關 popup
             if (selectedType !== 'yindian' && selectedType !== 'map') {
                 const existing = document.querySelector('#popupLayer .partition-container');
-                existing?.remove();
+                existing?.dispatchEvent(new Event('close-partition'));
             }
         });
     });
@@ -114,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (window.regionusing === 'yindian' || window.regionusing === 'map') {
             const existing = document.querySelector('#popupLayer .partition-container');
             if (existing) {
-                existing.remove();
+                existing.dispatchEvent(new Event('close-partition'));
             } else {
                 showRegionSelector?.(textarea, window.regionusing);
             }
@@ -125,405 +131,228 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // 獲取匹配到的分區列表
-function getSubregions(parentLabel, mode = 'yindian') {
-    if (mode === 'map') {
-        const tree = STATIC_REGION_TREE;
+// Trees and name resolutions live only for this page, separated by authenticated identity.
+const detailPartitionTrees = new Map();
+const detailPartitionResolutions = new Map();
+let detailRegionTokens = [];
+let detailResolveSequence = 0;
 
-        function search(node) {
-            if (!node || typeof node !== 'object') return null;
-            for (const key in node) {
-                if (key === parentLabel) {
-                    return node[key];
-                }
-                const found = search(node[key]);
-                if (found) return found;
-            }
-            return null;
-        }
-
-        if (parentLabel === null) {
-            const top = Object.keys(tree);
-            return Promise.resolve(top.map(k => {
-                const v = tree[k];
-                const hasChildren = (
-                    (Array.isArray(v) && v.length > 0) ||
-                    (typeof v === 'object' && v !== null && Object.keys(v).length > 0)
-                );
-                return { label: k, hasChildren };
-            }));
-        }
-
-        const childrenNode = search(tree);
-        if (!childrenNode) return Promise.resolve([]);
-
-        let result = [];
-        if (Array.isArray(childrenNode)) {
-            result = childrenNode.map(k => ({ label: k, hasChildren: false }));
-        } else if (typeof childrenNode === 'object') {
-            result = Object.keys(childrenNode).map(k => {
-                const child = childrenNode[k];
-                const hasChildren = (
-                    (Array.isArray(child) && child.length > 0) ||
-                    (typeof child === 'object' && child !== null && Object.keys(child).length > 0)
-                );
-                return { label: k, hasChildren };
-            });
-        }
-        return Promise.resolve(result);
-    }
-
-    else if (mode === 'yindian') {
-        const CACHE_KEY = '__YINDIAN_TREE_CACHE__';
-        // 初始化快取
-        if (!sessionStorage.getItem(CACHE_KEY)) {
-            return fetch(`${window.API_BASE}/partitions`)
-                .then(res => res.json())
-                .then(tree => {
-                    sessionStorage.setItem(CACHE_KEY, JSON.stringify(tree));
-                    return getSubregions(parentLabel, mode); // 再跑一次
-                });
-        }
-
-        const tree = JSON.parse(sessionStorage.getItem(CACHE_KEY));
-
-        function search(node) {
-            if (!node || typeof node !== 'object') return null;
-            for (const key in node) {
-                if (key === parentLabel) {
-                    return node[key];
-                }
-                const found = search(node[key]);
-                if (found) return found;
-            }
-            return null;
-        }
-
-        if (parentLabel === null) {
-            return Promise.resolve(top_yindian.map(k => {
-                const v = tree[k];
-                const hasChildren = (
-                    (Array.isArray(v) && v.length > 0) ||
-                    (typeof v === 'object' && v !== null && Object.keys(v).length > 0)
-                );
-                return { label: k, hasChildren };
-            }));
-        }
-
-        const childrenNode = search(tree);
-        if (!childrenNode) return Promise.resolve([]);
-
-        let result = [];
-        if (Array.isArray(childrenNode)) {
-            result = childrenNode.map(k => ({ label: k, hasChildren: false }));
-        } else if (typeof childrenNode === 'object') {
-            result = Object.keys(childrenNode).map(k => {
-                const child = childrenNode[k];
-                const hasChildren = (
-                    (Array.isArray(child) && child.length > 0) ||
-                    (typeof child === 'object' && child !== null && Object.keys(child).length > 0)
-                );
-                return { label: k, hasChildren };
-            });
-        }
-
-        return Promise.resolve(result);
-    }
-    // return Promise.resolve([]);
+function partitionHeaders() {
+    const token = localStorage.getItem('ACCESS_TOKEN');
+    return { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
 }
 
-
-function registerPopupCloseHandler(container, clearCallback, extraAllowedTargets = []) {
-    const escHandler = (e) => {
-        if (e.key === 'Escape') {
-            clearCallback();
-            window.partitionPopupOpen = false; // 👈 这里设才对！
-        }
-    };
-
-    const outsideClickHandler = (e) => {
-        const isInsideContainer = container.contains(e.target);
-        const isInsideExtras = extraAllowedTargets.some(target => target.contains(e.target));
-        if (!isInsideContainer && !isInsideExtras) {
-            clearCallback();
-            // window.partitionPopupOpen = false; // 👈 这里也要设
-        }
-    };
-
-    document.addEventListener('keydown', escHandler);
-    document.addEventListener('mousedown', outsideClickHandler);
-
-    return () => {
-        document.removeEventListener('keydown', escHandler);
-        document.removeEventListener('mousedown', outsideClickHandler);
-    };
+async function getDefaultRegionTree(mode) {
+    const identity = localStorage.getItem('ACCESS_TOKEN') || '';
+    const key = JSON.stringify([identity, mode]);
+    if (!detailPartitionTrees.has(key)) {
+        const pending = fetch(`${window.API_BASE}/partitions?region_mode=${encodeURIComponent(mode)}`, { headers: partitionHeaders() })
+            .then(async response => {
+                if (!response.ok) throw Error('分區載入失敗');
+                const tree = await response.json();
+                if (tree.schema_version !== 2 || tree.region_mode !== mode || !Array.isArray(tree.nodes)) throw Error('分區格式錯誤');
+                return tree;
+            }).catch(error => { detailPartitionTrees.delete(key); throw error; });
+        detailPartitionTrees.set(key, pending);
+    }
+    return detailPartitionTrees.get(key);
 }
 
-
-// 分區渲染顯示總入口
-function showRegionSelector (textarea, mode='yindian') {
-    // ✅ 若已開，則關閉並 return（toggle）
-    if (window.partitionPopupOpen) {
-        document.querySelector('#popupLayer .partition-container')?.remove();
-        window.partitionPopupOpen = false;
-        return;
+async function getSubregions(parentPath, mode = 'yindian') {
+    const tree = await getDefaultRegionTree(mode);
+    if (parentPath == null) return tree.nodes;
+    const pending = [...tree.nodes];
+    while (pending.length) {
+        const node = pending.pop();
+        if (node.path === parentPath) return node.children;
+        pending.push(...node.children);
     }
+    return [];
+}
 
-    window.partitionPopupOpen = true; // ⬅️ 開啟時標記
+function setRegionPaths(paths, mode = window.regionusing) {
+    const textarea = document.getElementById('regions');
+    textarea.value = paths.filter(Boolean).join(' ');
+    detailRegionTokens = paths.filter(Boolean).map(text => ({ text, source: mode }));
+    detailResolveSequence++;
+    document.getElementById('region-resolution')?.remove();
+}
 
-    const container = document.createElement('div');
-    container.className = 'partition-container';
+async function resolveDetailItems(mode, items) {
+    const identity = localStorage.getItem('ACCESS_TOKEN') || '';
+    const key = JSON.stringify([identity, mode, items]);
+    if (!detailPartitionResolutions.has(key)) {
+        const pending = fetch(`${window.API_BASE}/partitions/resolve`, {
+            method: 'POST', headers: partitionHeaders(),
+            body: JSON.stringify({ region_mode: mode, scope: 'default_and_user', items })
+        }).then(async response => {
+            if (!response.ok) throw Error('分區解析失敗');
+            const reply = await response.json();
+            if (reply.schema_version !== 2 || reply.region_mode !== mode || reply.items?.length !== items.length) throw Error('分區格式錯誤');
+            return reply.items;
+        }).catch(error => { detailPartitionResolutions.delete(key); throw error; });
+        detailPartitionResolutions.set(key, pending);
+    }
+    return detailPartitionResolutions.get(key);
+}
+
+async function readRegionPaths() {
+    const textarea = document.getElementById('regions');
+    const value = textarea.value;
+    const mode = window.regionusing || 'map';
+    const identity = localStorage.getItem('ACCESS_TOKEN') || '';
+    const texts = value.trim().split(/\s+/).filter(Boolean);
+    const sequence = ++detailResolveSequence;
+    remapDetailTokens(texts);
+    document.getElementById('region-resolution')?.remove();
+    if (!texts.length) return [];
+    const items = texts.map((text, index) => ({ text, kind: text.includes('-') || detailRegionTokens[index] ? 'path' : 'name' }));
+    try {
+        const replies = await resolveDetailItems(mode, items);
+        if (sequence !== detailResolveSequence || textarea.value !== value || window.regionusing !== mode || (localStorage.getItem('ACCESS_TOKEN') || '') !== identity) return null;
+        const issues = replies.map((reply, index) => ({ index, candidates: reply.candidates || [] }))
+            .filter(issue => issue.candidates.length !== 1);
+        const missing = issues.filter(issue => !issue.candidates.length);
+        if (missing.length) {
+            const other = await resolveDetailItems(mode === 'map' ? 'yindian' : 'map', missing.map(issue => items[issue.index]));
+            if (sequence !== detailResolveSequence || textarea.value !== value || window.regionusing !== mode || (localStorage.getItem('ACCESS_TOKEN') || '') !== identity) return null;
+            missing.forEach((issue, index) => { issue.mixed = Boolean(other[index]?.candidates?.length); });
+        }
+        if (issues.length) {
+            const box = document.createElement('div'); box.id = 'region-resolution';
+            for (const issue of issues) {
+                const message = document.createElement('p');
+                message.textContent = issue.mixed ? '請統一分區體系後再執行。' : issue.candidates.length ? `「${texts[issue.index]}」有多個分區，請選擇完整路徑。` : `「${texts[issue.index]}」分區不存在或已失效，請重新選擇。`;
+                box.append(message);
+                if (!issue.mixed) for (const candidate of issue.candidates) {
+                    const button = document.createElement('button'); button.type = 'button'; button.dataset.regionPath = candidate.path;
+                    button.textContent = candidate.path.split('-').join('·'); button.title = candidate.path;
+                    button.addEventListener('click', () => {
+                        if (textarea.value !== value || window.regionusing !== mode) return;
+                        const next = [...texts]; next[issue.index] = candidate.path;
+                        textarea.value = next.join(' ');
+                        detailRegionTokens[issue.index] = { text: candidate.path, source: mode };
+                        void readRegionPaths();
+                    });
+                    box.append(button);
+                }
+            }
+            textarea.insertAdjacentElement('afterend', box);
+            return null;
+        }
+        const paths = [...new Set(replies.map(reply => reply.candidates[0].path))];
+        setRegionPaths(paths, mode);
+        return paths;
+    } catch (error) {
+        if (sequence === detailResolveSequence) showToast(error.message);
+        return null;
+    }
+}
+
+function remapDetailTokens(texts) {
+    const previous = detailRegionTokens, used = new Set();
+    detailRegionTokens = texts.map((text, index) => {
+        const oldIndex = previous[index]?.text === text && !used.has(index) ? index : previous.findIndex((token, i) => token?.text === text && !used.has(i));
+        if (oldIndex < 0) return undefined;
+        used.add(oldIndex);
+        return previous[oldIndex];
+    });
+}
+
+const detailCustomScopes = new Map();
+async function readCustomScope(regions) {
+    const locations = document.getElementById('locations').value.trim().split(/\s+/).filter(Boolean);
+    if (window.regionusing === 'yindian') return { locations, regions };
+    if (!regions.length || !localStorage.getItem('ACCESS_TOKEN')) return { locations, regions: [] };
+    const mode = window.regionusing, value = document.getElementById('regions').value;
+    const identity = localStorage.getItem('ACCESS_TOKEN');
+    const key = JSON.stringify([identity, mode, locations, regions]);
+    try {
+        if (!detailCustomScopes.has(key)) {
+            const query = new URLSearchParams({ region_mode: mode });
+            locations.forEach(location => query.append('locations', location));
+            regions.forEach(path => query.append('regions', path));
+            const pending = fetch(`${window.API_BASE}/get_locs/?${query}`, { headers: partitionHeaders() })
+                .then(async response => { if (!response.ok) throw Error('地點解析失敗'); return response.json(); })
+                .catch(error => { detailCustomScopes.delete(key); throw error; });
+            detailCustomScopes.set(key, pending);
+        }
+        const reply = await detailCustomScopes.get(key);
+        if (window.regionusing !== mode || document.getElementById('regions').value !== value || localStorage.getItem('ACCESS_TOKEN') !== identity || JSON.stringify(document.getElementById('locations').value.trim().split(/\s+/).filter(Boolean)) !== JSON.stringify(locations)) return null;
+        return { locations: [...new Set([...locations, ...(reply.locations_result || [])])], regions: [] };
+    } catch (error) { showToast(error.message); return null; }
+}
+
+function showRegionSelector(textarea, mode = 'yindian') {
+    const existing = document.querySelector('#popupLayer .partition-container');
+    if (existing) { existing.dispatchEvent(new Event('close-partition')); return; }
+    window.partitionPopupOpen = true;
+    const container = document.createElement('div'); container.className = 'partition-container';
     const panelRect = document.getElementById('panelContent').getBoundingClientRect();
-    const isPortrait = window.innerWidth < window.innerHeight;
-    container.style.position = 'fixed';
-    container.style.top = isPortrait ? `10px` : `${panelRect.top}px`;
-    container.style.left = isPortrait ? `10px` : `${panelRect.right}px`;
-
-    const lvl1 = document.createElement('div');
-    const lvl2 = document.createElement('div');
-    const lvl3 = document.createElement('div');
-
-    lvl1.className = 'partition-popup partition-lvl1';
-    lvl2.className = 'partition-popup partition-lvl2';
-    lvl3.className = 'partition-popup partition-lvl3';
-    lvl2.style.display = 'none';
-    lvl3.style.display = 'none';
-
-    container.append(lvl1, lvl2, lvl3);
-    const popupLayer = document.getElementById('popupLayer');
-    popupLayer.innerHTML = "";
-    popupLayer.appendChild(container);
-
-    const clearAll = () => {
-        container.remove();
-        unregister();
-    };
-
-    const unregister = registerPopupCloseHandler(container, clearAll,[container]);
-
-    // 🔁 改這一行：改成 async 拿一級分區
-    getSubregions(null,mode).then(topLevel => {
-        renderList(topLevel, lvl1, null, textarea, clearAll, lvl2, lvl3,mode);
-    });
-}
-
-
-// 渲染分區提示框，可點擊
-function renderList(items, container, parentLabel, textarea, onClose, lvl2 = null, lvl3 = null,mode='yindian') {
-    container.innerHTML = "";
-    let activeItem = null;
-
-    if (items && typeof items === "object" && !Array.isArray(items)) {
-        const firstKey = Object.keys(items)[0];
-        const firstVal = items[firstKey];
-        if (!firstVal || !Array.isArray(firstVal) || firstVal.length === 0) {
-            container.style.display = "none";
-            return;
-        }
-        items = firstVal;
+    const portrait = window.innerWidth < window.innerHeight;
+    const left = portrait ? 10 : Math.min(panelRect.right, window.innerWidth - 180);
+    const top = portrait ? 10 : Math.max(10, panelRect.top);
+    Object.assign(container.style, { position: 'fixed', top: `${top}px`, left: `${left}px`, maxWidth: `calc(100vw - ${left + 10}px)`, maxHeight: `calc(100dvh - ${top + 10}px)`, overflowX: 'auto', alignItems: 'flex-start' });
+    document.getElementById('popupLayer').append(container);
+    const timers = new Set();
+    function close() {
+        timers.forEach(clearTimeout); container.remove(); window.partitionPopupOpen = false;
+        document.removeEventListener('keydown', escape); document.removeEventListener('mousedown', outside);
     }
-
-    if (!Array.isArray(items) || items.length === 0) {
-        container.style.display = "none";
-        return;
-    }
-    items.forEach(item => {
-        const label = typeof item === 'string' ? item : item.label;
-        const hasChildren = typeof item === 'object' && !!item.hasChildren;
-
-        const line = document.createElement('div');
-        line.className = 'partition-line';
-        line.style.display = 'flex';
-        line.style.justifyContent = 'space-between';
-        line.style.alignItems = 'center';
-
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'partition-item';
-        itemDiv.textContent = label;
-        itemDiv.style.flexGrow = '1'; // 佔滿左側空間
-
-        line.appendChild(itemDiv);
-
-        if (hasChildren) {
-            const arrow = document.createElement('div');
-            arrow.className = 'partition-arrow';
-            arrow.textContent = '⌵';
-            // ✅ 改成完全等效 hover：模拟 mouseenter 行为
-            arrow.addEventListener('click', (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                itemDiv.dispatchEvent(new Event('mouseenter', { bubbles: true }));
-            });
-            line.appendChild(arrow);
-        }
-
-        // 狀態變數
-        let hoverTimeout;
-        let isLongPress = false;
-        let touchTimer = null;
-        let startY = 0;
-        let startX = 0;
-        let hasMoved = false;
-
-        // 🐭 hover 展開
-        line.addEventListener('mouseenter', () => {
-            hoverTimeout = setTimeout(async () => {
-                if (!isLongPress) {
-                    await popup_box(label, line, parentLabel, textarea, onClose, lvl2, lvl3, mode);
-                }
-            }, 100);
-
-            if (activeItem && activeItem !== line) {
-                activeItem.classList.remove('active');
+    function escape(event) { if (event.key === 'Escape') close(); }
+    function outside(event) { if (!container.contains(event.target)) close(); }
+    container.addEventListener('close-partition', close);
+    document.addEventListener('keydown', escape); document.addEventListener('mousedown', outside);
+    function renderColumn(nodes, depth) {
+        while (container.children.length > depth) container.lastElementChild.remove();
+        if (!nodes.length || !container.isConnected) return;
+        const column = document.createElement('div'); column.className = 'partition-popup';
+        Object.assign(column.style, { flex: '0 0 auto', minWidth: '140px', maxHeight: `calc(100dvh - ${top + 12}px)`, overflowY: 'auto' });
+        container.append(column);
+        for (const node of nodes) {
+            const line = document.createElement('div'); line.className = 'partition-line'; line.dataset.regionPath = node.path;
+            const item = document.createElement('div'); item.className = 'partition-item'; item.textContent = node.label; item.title = node.path; line.append(item);
+            const expand = () => {
+                if (!line.isConnected) return;
+                for (const row of column.children) row.classList.toggle('active', row === line);
+                renderColumn(node.children, depth + 1);
+            };
+            let hoverTimer, touchTimer, moved = false, longPress = false, start;
+            line.addEventListener('mouseenter', () => { hoverTimer = setTimeout(expand, 100); timers.add(hoverTimer); });
+            line.addEventListener('mouseleave', () => clearTimeout(hoverTimer));
+            if (node.children.length) {
+                const arrow = document.createElement('div'); arrow.className = 'partition-arrow'; arrow.textContent = '⌵';
+                arrow.addEventListener('click', event => { event.stopPropagation(); expand(); }); line.append(arrow);
             }
-            line.classList.add('active');
-            activeItem = line;
-        });
-
-        line.addEventListener('mouseleave', () => {
-            clearTimeout(hoverTimeout);
-        });
-        // 📱 Touch 長按
-        itemDiv.addEventListener('touchstart', (e) => {
-            isLongPress = false;
-            hasMoved = false;
-
-            const touch = e.touches[0];
-            startY = touch.clientY;
-            startX = touch.clientX;
-
-            touchTimer = setTimeout(async () => {
-                if (!hasMoved) {
-                    isLongPress = true;
-                    const result = await popup_box(label, line, parentLabel, textarea, onClose, lvl2, lvl3, mode);
-                    if (result !== false) {
-                        if (activeItem && activeItem !== line) {
-                            activeItem.classList.remove('active');
-                        }
-                        line.classList.add('active');
-                        activeItem = line;
-                    }
-                }
-            }, 500);
-        }, { passive: false }); // ⬅️ 改 1：非被动
-
-        itemDiv.addEventListener('touchmove', (e) => {
-            const touch = e.touches[0];
-            const deltaY = Math.abs(touch.clientY - startY);
-            const deltaX = Math.abs(touch.clientX - startX);
-            if (deltaY > 10 || deltaX > 10) {
-                hasMoved = true;
+            const select = () => {
+                const paths = textarea.value.trim().split(/\s+/).filter(Boolean);
+                remapDetailTokens(paths);
+                if (!paths.includes(node.path)) paths.push(node.path);
+                // Only the newly selected token is confirmed; retain unresolved older text.
+                textarea.value = paths.join(' ');
+                detailRegionTokens[paths.indexOf(node.path)] = { text: node.path, source: mode };
+                detailResolveSequence++; close();
+            };
+            item.addEventListener('touchstart', event => {
+                moved = false; longPress = false; start = event.touches[0];
+                touchTimer = setTimeout(() => { if (!moved) { longPress = true; expand(); } }, 500); timers.add(touchTimer);
+            }, { passive: true });
+            item.addEventListener('touchmove', event => {
+                const point = event.touches[0];
+                if (Math.abs(point.clientX - start.clientX) > 10 || Math.abs(point.clientY - start.clientY) > 10) { moved = true; clearTimeout(touchTimer); }
+            }, { passive: true });
+            item.addEventListener('touchend', event => {
                 clearTimeout(touchTimer);
-            }
-        }, { passive: false }); // ⬅️ 改 1：非被动
-
-        itemDiv.addEventListener('touchend', (e) => {
-            clearTimeout(touchTimer);
-            if (isLongPress || hasMoved) return;
-
-            // ⬅️ 改 2：阻止默认/冒泡，降低合成 click/穿透风险
-            if (e.cancelable) e.preventDefault();
-            e.stopPropagation();
-
-            // ✅ 白名单判断：不允许箭头
-            const touchPoint = e.changedTouches[0];
-            const realTarget = document.elementFromPoint(touchPoint.clientX, touchPoint.clientY);
-            if (realTarget?.closest('.partition-arrow')) return;
-
-            // ⬅️ 改 3：必须仍命中当前 itemDiv（防止手指松开时落在别处）
-            if (!realTarget || !itemDiv.contains(realTarget)) return;
-            window.partitionPopupOpen = false; // 👈 这里设才对！
-            const existing = textarea.value.trim();
-            const parts = existing ? existing.split(/\s+/) : [];
-            if (!parts.includes(label)) {
-                parts.push(label);
-                textarea.value = parts.join(' ');
-            }
-            onClose();
-        }, { passive: false }); // ⬅️ 改 1：非被动
-
-
-        itemDiv.addEventListener('touchcancel', () => {
-            clearTimeout(touchTimer);
-        });
-
-        // 🖱 Click 添加標籤
-        itemDiv.addEventListener('click', (e) => {
-            // console.log("點擊了")
-            if (isLongPress) {
-                e.stopImmediatePropagation();
-                e.preventDefault();
-                return;
-            }
-            const clickedItem = e.target.closest('.partition-item');
-            const clickedArrow = e.target.closest('.partition-arrow');
-            // console.log(clickedArrow)
-            // console.log(clickedItem)
-            if (clickedArrow || clickedItem !== itemDiv) return;
-            window.partitionPopupOpen = false; // 👈 这里设才对！
-            const existing = textarea.value.trim();
-            const parts = existing ? existing.split(/\s+/) : [];
-            if (!parts.includes(label)) {
-                parts.push(label);
-                textarea.value = parts.join(' ');
-            }
-            onClose();
-        });
-
-        container.appendChild(line);
-    });
-}
-
-
-// 總的渲染子級分區提示框函數
-async function popup_box(label, item, parentLabel, textarea, onClose, lvl2, lvl3,mode='yindian') {
-    // 清空 popup 位置，保證 hover/click 不殘留內容
-    if (lvl2 && parentLabel == null) {
-        lvl2.innerHTML = "";
-        lvl2.style.display = 'none'; // <-- ✅ 保證舊內容清除
+                if (event.cancelable) event.preventDefault();
+                if (!moved && !longPress) select();
+            }, { passive: false });
+            item.addEventListener('touchcancel', () => { moved = true; clearTimeout(touchTimer); });
+            item.addEventListener('click', () => { if (!longPress) select(); });
+            column.append(line);
+        }
     }
-    if (lvl3 && parentLabel != null) {
-        lvl3.innerHTML = "";
-        lvl3.style.display = 'none'; // <-- ✅ 保證舊內容清除
-    }
-
-    const subs = await getSubregions(label,mode);
-    if (!subs || subs.length === 0) {
-        // ✅ 沒有子分區，不做任何展示，return false 表示沒展開
-        return false;
-    }
-
-    const rect = item.getBoundingClientRect();
-    const popupLeft = rect.right;
-    const popupHeight = 200;
-    let popupTop = rect.top;
-
-    const lvl1Items = document.querySelectorAll('.partition-lvl1 > div');
-    const firstItem = lvl1Items[0];
-    const lastItem = lvl1Items[lvl1Items.length - 1];
-    const anchorTop = firstItem?.getBoundingClientRect().top ?? 0;
-    const anchorBottom = lastItem?.getBoundingClientRect().bottom ?? window.innerHeight;
-
-    if (popupTop + popupHeight > anchorBottom) popupTop = anchorBottom - popupHeight;
-    if (popupTop < anchorTop) popupTop = anchorTop;
-
-    popupTop = Math.max(popupTop, 0);
-    popupTop = Math.min(popupTop, window.innerHeight - popupHeight);
-
-    if (lvl2 && parentLabel == null) {
-        lvl3.innerHTML = "";
-        lvl3.style.display = 'none';
-        lvl2.style.position = 'fixed';
-        lvl2.style.top = `${popupTop}px`;
-        lvl2.style.left = `${popupLeft}px`;
-        lvl2.style.display = 'block';
-        renderList(subs, lvl2, label, textarea, onClose, null, lvl3,mode);
-    } else if (lvl3 && parentLabel != null) {
-        lvl3.style.position = 'fixed';
-        lvl3.style.top = `${popupTop}px`;
-        lvl3.style.left = `${popupLeft}px`;
-        lvl3.style.display = 'block';
-        renderList(subs, lvl3, label, textarea, onClose,mode);
-    }
+    getSubregions(null, mode).then(nodes => { if (container.isConnected) renderColumn(nodes, 0); })
+        .catch(error => { close(); showToast(error.message); });
 }
 
 

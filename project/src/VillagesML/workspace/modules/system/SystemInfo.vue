@@ -647,7 +647,7 @@ onMounted(() => {
 .solid-button {
   padding: 8px 16px;
   background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
-  color: white;
+  color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-md);
   font-size: 14px;

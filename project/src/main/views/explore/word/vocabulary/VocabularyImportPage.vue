@@ -4,12 +4,6 @@
       <div class="upload-mode glass-panel">
         <div class="upload-head">
           <h3>{{ t('words.wordList.upload.title') }}</h3>
-          <div class="upload-head-counts">
-            <span>{{ t('words.wordList.upload.totalEntries', { count: vocabTotalCount ?? '…' }) }}</span>
-            <span class="count-sep">·</span>
-            <span>{{ t('words.wordList.upload.totalLocations', { count: vocabLocationCount ?? '…' }) }}</span>
-          </div>
-
           <div class="upload-head-actions">
             <div
               v-if="shouldShowPermissionRequest"
@@ -27,14 +21,14 @@
 
             <p
               v-else-if="uploadAccessNotice"
-              class="upload-status"
+              class="upload-access-notice"
             >
               {{ uploadAccessNotice }}
             </p>
 
             <button
               v-if="canShowRefreshVocabularyPermission"
-              class="action-btn action-btn--sm"
+              class="pill-btn"
               type="button"
               :disabled="isLoadingVocabularyMe"
               @click="refreshVocabularyMe"
@@ -43,7 +37,15 @@
                 :size="16"
                 aria-hidden="true"
               />
-              {{ t('words.wordList.access.refreshPermission') }}
+              {{ vocabularyPermissionLabel }}
+            </button>
+
+            <button
+              class="pill-btn"
+              type="button"
+              @click="showLicense = true"
+            >
+              © {{ t('words.wordList.upload.licenseButton') }}
             </button>
           </div>
         </div>
@@ -157,7 +159,7 @@
               <span class="backend-preview-stat-label">{{ t('words.wordList.upload.previewParsedCount') }}</span>
             </div>
             <div class="backend-preview-stat">
-              <span class="backend-preview-stat-value">{{ backendPreview.skipped_count ?? 0 }}</span>
+              <span class="backend-preview-stat-value">{{ previewSkippedCount }}</span>
               <span class="backend-preview-stat-label">{{ t('words.wordList.upload.previewSkippedCount') }}</span>
             </div>
             <div class="backend-preview-stat">
@@ -232,8 +234,6 @@
             </p>
           </div>
         </div>
-        <p v-if="uploadStatusText" class="upload-status">{{ uploadStatusText }}</p>
-
         <input
           type="file"
           ref="fileInputEl"
@@ -256,14 +256,24 @@
 
         <div class="upload-actions">
           <button
-            v-if="selectedUploadFile"
+            v-if="selectedUploadFile || importResult"
             class="glass-button"
             data-variant="secondary"
             type="button"
             :disabled="isUploading"
-            @click="clearUploadFile()"
+            @click="fileInputEl?.click()"
           >
             {{ t('common.importPreview.actions.reselect') }}
+          </button>
+          <button
+            v-if="uploadFile && !backendPreview"
+            class="glass-button"
+            data-variant="secondary"
+            type="button"
+            :disabled="!canConfirmUpload"
+            @click="handlePreviewImport()"
+          >
+            {{ isPreviewingImport ? t('common.label.loading') : t('words.wordList.upload.previewAction') }}
           </button>
           <button
             class="glass-button"
@@ -294,6 +304,25 @@
       @cancel="closeUploadLocationEditor"
       @confirm="confirmUploadLocationEditor"
     >
+      <template #location-helper>
+        <div class="upload-existing-location">
+          <h4 class="upload-section-title">
+            {{ t('words.wordList.upload.overwriteExistingLocation') }}
+          </h4>
+          <SimpleSelectDropdown
+            :model-value="existingLocationKey"
+            :options="existingLocationOptions"
+            :title="t('words.wordList.upload.overwriteExistingLocation')"
+            :placeholder="t('words.wordList.upload.selectExistingLocation')"
+            width="fit-content"
+            style="max-width: 100%"
+            :disabled="isLoadingExistingLocations || !canUploadVocabulary"
+            searchable
+            match-trigger-width
+            @update:model-value="selectExistingLocation"
+          />
+        </div>
+      </template>
       <template #map>
         <MiniMapSelector
           v-model:coord="uploadLocationCoord"
@@ -435,20 +464,66 @@
       </template>
     </AppModal>
 
+    <AppModal
+      :model-value="showLicense"
+      size="lg"
+      :title="t('words.wordList.upload.license.title')"
+      :close-label="t('common.button.close')"
+      @update:modelValue="showLicense = false"
+    >
+      <div class="license-content">
+        <h4>{{ t('words.wordList.upload.license.sectionProject') }}</h4>
+        <p>{{ t('words.wordList.upload.license.projectIntro') }}</p>
+        <p>{{ t('words.wordList.upload.license.collaboration') }}</p>
+        <p v-if="vocabularyCountsSummary" class="license-stats">{{ vocabularyCountsSummary }}</p>
+        <h4>{{ t('words.wordList.upload.license.sectionLicense') }}</h4>
+        <p>{{ t('words.wordList.upload.license.intro') }}</p>
+        <p>
+          <a
+            class="license-link"
+            :href="t('words.wordList.upload.license.linkHref')"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {{ t('words.wordList.upload.license.linkText') }}
+          </a>
+        </p>
+        <p>{{ t('words.wordList.upload.license.agreement') }}</p>
+        <p>
+          {{ t('words.wordList.upload.license.contact') }}
+          <button type="button" class="license-contact-btn" @click="navigateToContactAuthor">
+            {{ t('words.wordList.upload.license.contactAction') }}
+          </button>
+          {{ t('words.wordList.upload.license.contactExternal') }}
+          <button type="button" class="license-contact-btn" @click="navigateToSupportAuthor">
+            {{ t('words.wordList.upload.license.contactExternalAction') }}
+          </button>
+          {{ t('words.wordList.upload.license.contactExternalSuffix') }}
+        </p>
+      </div>
+
+      <template #footer>
+        <button class="glass-button" data-variant="primary" type="button" @click="showLicense = false">
+          {{ t('tools.checkTool.help.gotIt') }}
+        </button>
+      </template>
+    </AppModal>
+
   </div>
 </template>
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import { computed, inject, onMounted, ref, watch } from 'vue'
+import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { PhArrowsClockwise, PhDownloadSimple } from '@phosphor-icons/vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { getVocabularyCounts, previewVocabularyImport, uploadVocabulary } from '@/api'
+import { getVocabularyCounts, getVocabularyLocations, invalidateVocabularyCountsCache, invalidateVocabularyOptionsCache, previewVocabularyImport, uploadVocabulary } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
+import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import TabularImportPreview from '@/components/import/TabularImportPreview.vue'
 import { useTabularImportPreview } from '@/composables/import/useTabularImportPreview.js'
 import { useTabularImportFlow } from '@/composables/import/useTabularImportFlow.js'
@@ -460,7 +535,7 @@ import { formatCoord } from '@/main/utils/drawMap/formatCoord.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { showError, showInfo, showSuccess, showWarning } from '@/utils/ui/message.js'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const SURVEY_TEMPLATE_URL = '/data/sample/方音圖鑑詞彙模板.xlsx'
@@ -491,6 +566,17 @@ const shouldShowPermissionRequest = computed(() => (
 const canShowRefreshVocabularyPermission = computed(() => (
   props.isAuthReady && props.isAuthenticated && Boolean(refreshVocabularyMe)
 ))
+const VOCABULARY_PERMISSION_LABEL_KEYS = {
+  manage: 'words.wordList.access.permissionLabels.manage',
+  edit: 'words.wordList.access.permissionLabels.edit',
+  one: 'words.wordList.access.permissionLabels.one',
+  two: 'words.wordList.access.permissionLabels.two',
+  three: 'words.wordList.access.permissionLabels.three',
+}
+const vocabularyPermissionLabel = computed(() => {
+  const key = VOCABULARY_PERMISSION_LABEL_KEYS[props.vocabularyMe?.permission_level]
+  return key ? t(key) : t('words.wordList.access.noPermission')
+})
 const uploadAccessNotice = computed(() => {
   if (isWaitingForAuth.value) return t('words.wordList.access.loadingDesc')
   if (requiresLogin.value) return t('words.wordList.access.loginUploadDesc')
@@ -503,12 +589,35 @@ const uploadAccessNotice = computed(() => {
 
 const vocabTotalCount = ref(null)
 const vocabLocationCount = ref(null)
+const vocabCountsFetchedAt = ref(null)
 
-onMounted(async () => {
+async function refreshVocabularyCounts() {
   const counts = await getVocabularyCounts()
-  vocabTotalCount.value = counts.total
-  vocabLocationCount.value = counts.locations
+  if (counts.total != null) vocabTotalCount.value = counts.total
+  if (counts.locations != null) vocabLocationCount.value = counts.locations
+  vocabCountsFetchedAt.value = new Date()
+}
+
+function formatCountsDate(date) {
+  const pad = (value) => String(value).padStart(2, '0')
+  const datePart = locale.value.startsWith('en')
+    ? `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+    : `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`
+  return `${datePart} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+}
+
+const vocabularyCountsSummary = computed(() => {
+  if (vocabLocationCount.value == null || vocabTotalCount.value == null || !vocabCountsFetchedAt.value) {
+    return ''
+  }
+  return t('words.wordList.upload.license.stats', {
+    date: formatCountsDate(vocabCountsFetchedAt.value),
+    locations: vocabLocationCount.value,
+    entries: vocabTotalCount.value,
+  })
 })
+
+onMounted(() => { void refreshVocabularyCounts() })
 
 function navigateToSuggestion() {
   router.push({
@@ -520,10 +629,25 @@ function navigateToSuggestion() {
   })
 }
 
+function navigateToContactAuthor() {
+  showLicense.value = false
+  router.push({
+    path: buildLocalePath(resolveRouteLocale(route), '/menu/about/suggestion'),
+    query: {
+      from: 'vocabulary_import',
+    },
+  })
+}
+
+function navigateToSupportAuthor() {
+  showLicense.value = false
+  router.push(buildLocalePath(resolveRouteLocale(route), '/menu/about/like'))
+}
+
 const isUploading = ref(false)
 const isPreviewingImport = ref(false)
 const showFormatHelp = ref(false)
-const uploadStatusText = ref('')
+const showLicense = ref(false)
 const backendPreview = ref(null)
 const isOverwriteConfirmed = ref(false)
 const importResult = ref(null)
@@ -540,7 +664,25 @@ const createEmptyUploadLocation = () => Object.fromEntries(
 const uploadLocation = ref(createEmptyUploadLocation())
 const uploadLocationDraft = ref(createEmptyUploadLocation())
 const isUploadLocationEditorOpen = ref(false)
+const existingLocations = ref([])
+const existingLocationKey = ref('')
+const uploadTargetLocation = ref(null)
+const isLoadingExistingLocations = ref(false)
+const existingLocationsError = ref('')
+let existingLocationsRequest = 0
 let preserveBackendPreviewOnFilePromotion = false
+
+function getExistingLocationKey(location) {
+  return JSON.stringify([location.user_id, location.location_name])
+}
+
+const existingLocationOptions = computed(() => [
+  { value: '', label: t('words.wordList.upload.newLocation') },
+  ...existingLocations.value.map((location) => ({
+    value: getExistingLocationKey(location),
+    label: `${location.location_name} (${location.username || location.user_id})`,
+  })),
+])
 
 const uploadLocationFields = computed(() => [
   ...LOCATION_BASE_FIELDS.map((field) => ({
@@ -679,6 +821,7 @@ const shouldConfirmOverwrite = computed(() => {
 })
 
 const previewErrors = computed(() => parseErrorDetails(backendPreview.value?.errors))
+const previewSkippedCount = computed(() => (Number(backendPreview.value?.skipped_count) || 0) + previewErrors.value.length)
 
 const hasImportableRows = computed(() => isPreviewImportable(backendPreview.value))
 
@@ -717,18 +860,82 @@ function normalizeUploadLocation(location) {
 
 function openUploadLocationEditor() {
   uploadLocationDraft.value = { ...uploadLocation.value }
+  existingLocationKey.value = uploadTargetLocation.value ? getExistingLocationKey(uploadTargetLocation.value) : ''
   isUploadLocationEditorOpen.value = true
+  loadExistingLocations()
 }
 
 function closeUploadLocationEditor() {
+  existingLocationsRequest += 1
+  isLoadingExistingLocations.value = false
   isUploadLocationEditorOpen.value = false
   uploadLocationDraft.value = createEmptyUploadLocation()
 }
 
 function confirmUploadLocationEditor() {
-  uploadLocation.value = normalizeUploadLocation(uploadLocationDraft.value)
+  const target = existingLocations.value.find((location) => getExistingLocationKey(location) === existingLocationKey.value)
+  if (existingLocationKey.value && (!target || isLoadingExistingLocations.value)) {
+    showWarning(existingLocationsError.value || t('common.label.loading'))
+    return
+  }
+  const draft = normalizeUploadLocation(uploadLocationDraft.value)
+  const matchingTarget = target?.location_name === draft.location_name ? target : null
+  uploadTargetLocation.value = matchingTarget ? { user_id: matchingTarget.user_id, location_name: matchingTarget.location_name } : null
+  uploadLocation.value = draft
   closeUploadLocationEditor()
 }
+
+async function loadExistingLocations() {
+  const request = ++existingLocationsRequest
+  existingLocations.value = []
+  existingLocationsError.value = ''
+  if (!canUploadVocabulary.value) return
+  isLoadingExistingLocations.value = true
+  try {
+    const locations = []
+    let page = 1
+    let total = 0
+    do {
+      const response = await getVocabularyLocations({ page, page_size: 200 })
+      if (request !== existingLocationsRequest) return
+      const rows = Array.isArray(response.locations) ? response.locations : []
+      total = Number(response.total) || 0
+      if (!rows.length && locations.length < total) throw new Error(t('words.wordList.locations.loadFailed'))
+      locations.push(...rows)
+      page += 1
+    } while (locations.length < total)
+    existingLocations.value = locations
+  } catch (error) {
+    if (request !== existingLocationsRequest) return
+    existingLocationsError.value = error.message || t('words.wordList.locations.loadFailed')
+    showError(existingLocationsError.value)
+  } finally {
+    if (request === existingLocationsRequest) isLoadingExistingLocations.value = false
+  }
+}
+
+function selectExistingLocation(key) {
+  const location = existingLocations.value.find((item) => getExistingLocationKey(item) === key)
+  existingLocationKey.value = location ? key : ''
+  uploadLocationDraft.value = location ? normalizeUploadLocation(location) : createEmptyUploadLocation()
+}
+
+watch(() => uploadLocationDraft.value.location_name, (name) => {
+  const target = existingLocations.value.find((location) => getExistingLocationKey(location) === existingLocationKey.value)
+  if (target && name !== target.location_name) existingLocationKey.value = ''
+})
+
+watch([() => props.vocabularyMe?.user_id, () => props.vocabularyMe?.permission_level, canUploadVocabulary], () => {
+  closeUploadLocationEditor()
+  existingLocations.value = []
+  existingLocationKey.value = ''
+  if (uploadTargetLocation.value) uploadLocation.value = createEmptyUploadLocation()
+  uploadTargetLocation.value = null
+  backendPreview.value = null
+  isOverwriteConfirmed.value = false
+})
+
+onBeforeUnmount(() => { existingLocationsRequest += 1 })
 
 function clearUploadFile() {
   uploadFile.value = null
@@ -742,13 +949,11 @@ function handleDrop(event) {
   isDragOver.value = false
   const file = event.dataTransfer?.files?.[0]
   if (!file) return
-  uploadStatusText.value = ''
   backendPreview.value = null
   clearUploadFile()
 
   if (!isVocabularyUploadFile(file)) {
-    uploadStatusText.value = t('words.wordList.upload.unsupportedFile')
-    showWarning(uploadStatusText.value)
+    showWarning(t('words.wordList.upload.unsupportedFile'))
     return
   }
 
@@ -763,13 +968,11 @@ function handleDrop(event) {
 function handleUploadFile(event) {
   const file = event.target.files?.[0]
   if (!file) return
-  uploadStatusText.value = ''
   backendPreview.value = null
   clearUploadFile()
 
   if (!isVocabularyUploadFile(file)) {
-    uploadStatusText.value = t('words.wordList.upload.unsupportedFile')
-    showWarning(uploadStatusText.value)
+    showWarning(t('words.wordList.upload.unsupportedFile'))
     event.target.value = ''
     return
   }
@@ -790,7 +993,7 @@ watch(fillStandardFromLocal, (val) => {
   }
 })
 
-watch([uploadParserMode, selectedUploadFile, uploadLocation], () => {
+watch([uploadParserMode, selectedUploadFile, uploadLocation, uploadTargetLocation], () => {
   if (preserveBackendPreviewOnFilePromotion) {
     preserveBackendPreviewOnFilePromotion = false
     return
@@ -838,42 +1041,37 @@ async function handlePreviewImport(fileOverride = null) {
   const location = buildUploadLocation()
 
   if (!location.location_name || !location.coordinates) {
-    uploadStatusText.value = t('words.wordList.upload.missingLocation')
     showWarning(t('words.wordList.upload.missingLocation'))
     return null
   }
 
   if (!canUploadVocabulary.value) {
-    uploadStatusText.value = t('words.wordList.upload.permissionRequired')
-    showWarning(uploadStatusText.value)
+    showWarning(t('words.wordList.upload.permissionRequired'))
     return null
   }
 
   isPreviewingImport.value = true
-  uploadStatusText.value = ''
   backendPreview.value = null
 
   try {
     const previewResponse = await previewVocabularyImport({
       file,
       location,
+      target_user_id: uploadTargetLocation.value?.user_id,
       parser_mode: uploadParserMode.value,
       fill_standard_from_local: fillStandardFromLocal.value,
     })
     backendPreview.value = previewResponse
-    if (isPreviewImportable(previewResponse)) {
-      uploadStatusText.value = t('words.wordList.upload.previewReady')
-    } else {
+    if (!isPreviewImportable(previewResponse)) {
       const details = parseErrorDetails(previewResponse.errors)
-      uploadStatusText.value = details.length
+      const message = details.length
         ? details.join('；')
         : t('words.wordList.upload.noImportableData')
-      showError(uploadStatusText.value)
+      showError(message)
     }
     return previewResponse
   } catch (error) {
-    uploadStatusText.value = error.message || t('words.wordList.upload.previewFailed')
-    showError(uploadStatusText.value)
+    showError(error.message || t('words.wordList.upload.previewFailed'))
     return null
   } finally {
     isPreviewingImport.value = false
@@ -906,41 +1104,49 @@ async function handleImportAfterPreview() {
   const location = buildUploadLocation()
 
   if (!location.location_name || !location.coordinates) {
-    uploadStatusText.value = t('words.wordList.upload.missingLocation')
     showWarning(t('words.wordList.upload.missingLocation'))
     return
   }
 
   isUploading.value = true
-  uploadStatusText.value = ''
 
   try {
     const response = await uploadVocabulary({
       file,
       location,
+      target_user_id: uploadTargetLocation.value?.user_id,
       parser_mode: uploadParserMode.value,
       overwrite: shouldConfirmOverwrite.value ? isOverwriteConfirmed.value : false,
       fill_standard_from_local: fillStandardFromLocal.value,
     })
+    invalidateVocabularyCountsCache()
+    invalidateVocabularyOptionsCache()
+    void refreshVocabularyCounts()
     const importedCount = Number(response.imported_count) || 0
-    const skippedCount = Number(response.skipped_count) || 0
-    const errors = Array.isArray(response.errors) ? response.errors : []
+    const errors = parseErrorDetails(response.errors)
+    const skippedCount = (Number(response.skipped_count) || 0) + errors.length
     const locationName = location.location_name
     clearUploadFile()
+    uploadLocation.value = createEmptyUploadLocation()
+    uploadTargetLocation.value = null
+    existingLocationKey.value = ''
+    closeUploadLocationEditor()
+    uploadParserMode.value = 'auto'
+    fillStandardFromLocal.value = false
     importResult.value = { importedCount, skippedCount, errors, locationName }
-    uploadStatusText.value = skippedCount > 0
+    const message = skippedCount > 0
       ? t('words.wordList.upload.successWithSkipped', { imported: importedCount, skipped: skippedCount })
       : t('words.wordList.upload.success', { count: importedCount })
     if (skippedCount > 0) {
-      showWarning(uploadStatusText.value)
+      showWarning(message)
     } else {
-      showSuccess(uploadStatusText.value)
+      showSuccess(message)
     }
   } catch (error) {
-    uploadStatusText.value = isNoImportableRowsMessage(error?.message)
+    const message = isNoImportableRowsMessage(error?.message)
       ? t('words.wordList.upload.noImportableData')
       : (error.message || t('words.wordList.upload.failed'))
-    showError(uploadStatusText.value)
+    showError(message)
   } finally {
     isUploading.value = false
   }

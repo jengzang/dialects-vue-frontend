@@ -1224,16 +1224,13 @@ describe('composables', () => {
     expect(loader).not.toHaveBeenCalled()
   })
 
-  it('usePartitionCache caches transformed yindian tree', async () => {
-    const { getYindianTree, getCachedYindianTree } = usePartitionCache()
-    const loader = vi.fn(async () => ({ a: 1, b: 2 }))
-
-    const tree = await getYindianTree(loader, {
-      transform: (value) => ({ a: value.a }),
-    })
-
-    expect(tree).toEqual({ a: 1 })
-    expect(getCachedYindianTree()).toEqual({ a: 1 })
+  it('usePartitionCache caches the complete versioned tree for this page', async () => {
+    const { getDefaultTree } = usePartitionCache()
+    const data = { schema_version: 2, region_mode: 'yindian', nodes: [] }
+    const loader = vi.fn(async () => data)
+    expect(await getDefaultTree('yindian', loader)).toEqual(data)
+    expect(await getDefaultTree('yindian', loader)).toEqual(data)
+    expect(loader).toHaveBeenCalledTimes(1)
   })
 
   it('useAuthGuard redirects guests and preserves redirect path', async () => {

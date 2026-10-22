@@ -22,6 +22,13 @@ const mocks = vi.hoisted(() => {
     mapDeleteSelected: vi.fn(),
     mapImportGeoJson: vi.fn(),
     latestToolsPanelProps: null,
+    emitFeatureHit: null,
+    latestMapProps: null,
+    emitSketchState: null,
+    mapUndoSketchPoint: vi.fn(),
+    mapRedoSketchPoint: vi.fn(),
+    mapFinishSketch: vi.fn(),
+    mapCancelSketch: vi.fn(),
     routerPush: vi.fn(),
     isAuthenticated: { value: true },
     AUTO_DRAFT_ID: '__map_draw_auto_draft__',
@@ -91,6 +98,7 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
     props: [
       'modelValue',
       'activeLayer',
+      'allLayers',
       'featureBoxSelectEnabled',
       'snappingEnabled',
       'snapTolerance',
@@ -104,13 +112,22 @@ vi.mock('@/main/components/map/EditableMapLibre.vue', () => ({
       'before-features-change',
       'features-change',
       'feature-select',
+      'feature-hit-select',
       'feature-box-select',
       'mode-change',
       'shape-edit-state-change',
+      'sketch-state-change',
     ],
     setup(props, { emit, expose }) {
+      mocks.latestMapProps = props
+      mocks.emitFeatureHit = (payload) => emit('feature-hit-select', payload)
+      mocks.emitSketchState = (payload) => emit('sketch-state-change', payload)
       let firstLayerId = ''
       expose({
+        undoSketchPoint: mocks.mapUndoSketchPoint,
+        redoSketchPoint: mocks.mapRedoSketchPoint,
+        finishSketch: mocks.mapFinishSketch,
+        cancelSketch: mocks.mapCancelSketch,
         setDrawMode: mocks.mapSetDrawMode,
         selectFeature: mocks.mapSelectFeature,
         selectFeatures: mocks.mapSelectFeatures,
@@ -831,7 +848,8 @@ vi.mock('@/main/utils/drawMap/partitionVoronoi.js', () => ({
   calculatePartitionVoronoi: vi.fn(),
 }))
 
-vi.mock('@/main/utils/drawMap/export.js', () => ({
+vi.mock('@/main/utils/drawMap/export.js', async (importOriginal) => ({
+  ...await importOriginal(),
   readImportedLayerFile: vi.fn(),
   readKmzArrayBuffer: vi.fn(),
   splitFeatureCollectionByGeometryType: vi.fn(),
@@ -879,6 +897,18 @@ function clickLastButtonContaining(host, text) {
   buttons[buttons.length - 1].click()
 }
 
+function getLocalDraftNameInput() {
+  return document.body.querySelector('.draw-local-draft-picker .draw-text-input')
+}
+
+async function openSaveAsNewLocalDraft(wrapper) {
+  clickButtonContaining(wrapper.host, 'map.drawTab.buttons.saveToLocal')
+  await flushTicks()
+  clickButtonContaining(wrapper.host, 'map.drawTab.buttons.saveAsNewLocal')
+  await flushTicks()
+  return getLocalDraftNameInput()
+}
+
 async function flushTicks(count = 3) {
   for (let index = 0; index < count; index += 1) {
     await nextTick()
@@ -895,6 +925,72 @@ function createDeferred() {
 }
 
 describe('MapDrawTab draft safety', () => {
+  it('routes sketch shortcuts locally rather than undoing completed layer history', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+    mocks.emitSketchState({ active: true, pointCount: 3, canUndo: true, canRedo: false, canFinish: true })
+    await nextTick()
+    for (const options of [{ key: 'z', ctrlKey: true }, { key: 'z', ctrlKey: true, shiftKey: true }, { key: 'Backspace' }, { key: 'Enter' }, { key: 'Escape' }]) {
+      document.dispatchEvent(new KeyboardEvent('keydown', { ...options, bubbles: true, cancelable: true }))
+    }
+    expect(mocks.mapUndoSketchPoint).toHaveBeenCalledTimes(2)
+    expect(mocks.mapRedoSketchPoint).toHaveBeenCalledTimes(1)
+    expect(mocks.mapFinishSketch).toHaveBeenCalledTimes(1)
+    expect(mocks.mapCancelSketch).toHaveBeenCalledTimes(1)
+    wrapper.unmount()
+  })
+
+  it('starts a newly created layer sketch only after the map receives that active layer', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+    const contexts = []
+    mocks.mapSetDrawMode.mockImplementation((mode) => {
+      if (mode === 'draw_polygon') contexts.push(mocks.latestMapProps.activeLayer?.geometryType)
+    })
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+    await nextTick()
+    clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+    await flushTicks()
+    expect(contexts).toEqual(['Polygon'])
+    mocks.mapSetDrawMode.mockReset()
+    wrapper.unmount()
+  })
+
+  it('switches to an editable cross-layer hit after map sync and keeps map and panel selection aligned', async () => {
+    mocks.getDraftRecordById.mockResolvedValue(null)
+    const wrapper = mountMapDrawTab()
+    await flushTicks()
+    for (let index = 0; index < 2; index += 1) {
+      clickButtonContaining(wrapper.host, 'map.drawTab.buttons.addLayer')
+      await nextTick()
+      clickButtonContaining(wrapper.host, 'map.drawTab.buttons.createPolygonLayer')
+      await flushTicks()
+      wrapper.host.querySelector('[data-testid="editable-map"]').click()
+      await flushTicks()
+    }
+    const first = mocks.latestMapProps.allLayers[0]
+    const second = mocks.latestMapProps.allLayers[1]
+    mocks.mapSelectFeatures.mockClear()
+    mocks.emitFeatureHit({ layerId: first.id, featureId: 'feature-1' })
+    await flushTicks()
+    expect(mocks.latestMapProps.activeLayer.id).toBe(first.id)
+    expect(wrapper.host.querySelector('[data-testid="feature-checkbox"]').checked).toBe(true)
+    expect(mocks.mapSelectFeature).toHaveBeenLastCalledWith('feature-1', { directEdit: false })
+    for (const property of ['locked', 'visible']) {
+      second[property] = property === 'locked'
+      mocks.emitFeatureHit({ layerId: second.id, featureId: 'feature-1' })
+      await flushTicks()
+      expect(mocks.latestMapProps.activeLayer.id).toBe(first.id)
+      second[property] = property === 'visible'
+    }
+    mocks.emitFeatureHit({ layerId: second.id, featureId: 'missing' })
+    await flushTicks()
+    expect(mocks.latestMapProps.activeLayer.id).toBe(first.id)
+    wrapper.unmount()
+  })
+
   beforeEach(() => {
     mocks.showConfirm.mockReset()
     mocks.showError.mockReset()
@@ -1146,7 +1242,7 @@ describe('MapDrawTab draft safety', () => {
     input.value = 'Saved draft'
     input.dispatchEvent(new Event('input'))
     await nextTick()
-    clickLastButtonContaining(wrapper.host, 'map.drawTab.buttons.saveAsNewLocal')
+    clickLastButtonContaining(document.body, 'map.drawTab.buttons.saveAsNewLocal')
     await flushTicks()
 
     expect(mocks.deleteDraftRecord).toHaveBeenCalledWith(mocks.AUTO_DRAFT_ID)
@@ -1185,7 +1281,7 @@ describe('MapDrawTab draft safety', () => {
     input.value = 'Saved draft'
     input.dispatchEvent(new Event('input'))
     await nextTick()
-    clickLastButtonContaining(wrapper.host, 'map.drawTab.buttons.saveAsNewLocal')
+    clickLastButtonContaining(document.body, 'map.drawTab.buttons.saveAsNewLocal')
     await flushTicks()
 
     expect(mocks.deleteDraftRecord).not.toHaveBeenCalledWith(mocks.AUTO_DRAFT_ID)
@@ -1234,7 +1330,7 @@ describe('MapDrawTab draft safety', () => {
     input.value = 'Saved draft'
     input.dispatchEvent(new Event('input'))
     await nextTick()
-    clickLastButtonContaining(wrapper.host, 'map.drawTab.buttons.saveAsNewLocal')
+    clickLastButtonContaining(document.body, 'map.drawTab.buttons.saveAsNewLocal')
     await flushTicks()
 
     pendingThirdAutoWrite.resolve()
@@ -2660,7 +2756,7 @@ describe('MapDrawTab draft safety', () => {
     await flushTicks()
 
     expect(mocks.latestToolsPanelProps.geometryQualitySummary.hasIssues).toBe(true)
-    expect(mocks.latestToolsPanelProps.geometryQualitySummary.items.map((item) => item.id))
+    expect(mocks.latestToolsPanelProps.geometryQualitySummary.items.map((item) => item.code))
       .toContain('duplicate-coordinate')
 
     wrapper.unmount()

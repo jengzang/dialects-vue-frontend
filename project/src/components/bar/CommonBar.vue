@@ -232,6 +232,7 @@ import { useScrollSnap } from '@/composables/bar/useScrollSnap.js'
 import { useScrollArrows } from '@/composables/bar/useScrollArrows.js'
 import { useBarOverflow, getDefaultTabScroll, sortTabsByScroll } from '@/composables/bar/useBarOverflow.js'
 import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { isInternalAppNavigationTarget, navigatePlatformLink } from '@/platform/index.js'
 
 const faviconSrc = computed(() =>
   currentColorTheme.value === COLOR_THEME_GREEN
@@ -574,15 +575,13 @@ const handleSubmenuLeave = () => {
 }
 
 const handleSubmenuClick = (child) => {
-  if (child.external) {
-    window.open(child.path, '_blank')
-  } else {
+  if (isInternalAppNavigationTarget(child.path)) {
     if (normalizedNavigationSchema.value && activeSubmenu.value) {
       writeCommonBarMemory(normalizedNavigationSchema.value, activeSubmenu.value, child.path)
     }
-    router.push(child.path)
   }
   activeSubmenu.value = null
+  return navigatePlatformLink(router, child.path, { external: child.external })
 }
 
 watch(
@@ -636,6 +635,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   width: auto;
   box-sizing: border-box;
   --liquid-glass-glint-shift: 20%;
+  background: var(--bar-background, none);
   // background:
   //   linear-gradient(
   //     110deg,

@@ -1,3 +1,5 @@
+$use-native-scrollbars: true;
+
 :root {
   --app-scrollbar-size: 8px;
   --app-scrollbar-track: rgba(var(--color-shadow-rgb), 0.06);
@@ -6,7 +8,7 @@
   --app-scrollbar-radius: 999px;
 }
 
-@media (max-width: 768px) {
+@media (max-aspect-ratio: 1 / 1) {
   :root {
     --app-scrollbar-size: 4px;
     --app-scrollbar-track: rgba(var(--color-shadow-rgb), 0.03);
@@ -15,30 +17,48 @@
   }
 }
 
+:root:not([data-color-theme='dark']) {
+  --app-scrollbar-thumb: rgba(var(--color-primary-hover-rgb), 0.42);
+  --app-scrollbar-thumb-hover: rgba(var(--color-primary-hover-rgb), 0.6);
+
+  @media (max-aspect-ratio: 1 / 1) {
+    --app-scrollbar-thumb: rgba(var(--color-primary-hover-rgb), 0.34);
+  }
+}
+
 @mixin visible-scrollbar {
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: var(--app-scrollbar-thumb) var(--app-scrollbar-track);
+  @if not $use-native-scrollbars {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--app-scrollbar-thumb) var(--app-scrollbar-track);
+  }
 }
 
 @mixin visible-scrollbar-webkit {
-  &::-webkit-scrollbar {
-    width: var(--app-scrollbar-size);
-    height: var(--app-scrollbar-size);
-  }
+  @if not $use-native-scrollbars {
+    &::-webkit-scrollbar {
+      width: calc(var(--app-scrollbar-size) / 2);
+      height: calc(var(--app-scrollbar-size) / 2);
+    }
 
-  &::-webkit-scrollbar-track {
-    background: var(--app-scrollbar-track);
-    border-radius: var(--app-scrollbar-radius);
-  }
+    &.ui-scrollbar--expanded::-webkit-scrollbar {
+      width: var(--app-scrollbar-size);
+      height: var(--app-scrollbar-size);
+    }
 
-  &::-webkit-scrollbar-thumb {
-    background: var(--app-scrollbar-thumb);
-    border-radius: var(--app-scrollbar-radius);
-  }
+    &::-webkit-scrollbar-track {
+      background: var(--app-scrollbar-track);
+      border-radius: var(--app-scrollbar-radius);
+    }
 
-  &::-webkit-scrollbar-thumb:hover {
-    background: var(--app-scrollbar-thumb-hover);
+    &::-webkit-scrollbar-thumb {
+      background: var(--app-scrollbar-thumb);
+      border-radius: var(--app-scrollbar-radius);
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: var(--app-scrollbar-thumb-hover);
+    }
   }
 }
 
@@ -56,7 +76,10 @@
   }
 }
 
+// Cover document and nested scrollers, including containers without ui-scrollbar.
+// Keep zero specificity so intentional hidden scrollbar rules can override this.
 :where(
+  *,
   .ui-scrollbar,
   .stats-content,
   .sidebar-content,
@@ -131,6 +154,7 @@
 }
 
 :where(
+  *,
   .ui-scrollbar,
   .stats-content,
   .sidebar-content,
@@ -202,6 +226,18 @@
   .glass-panel[data-surface='table-container']
 ) {
   @include visible-scrollbar-webkit;
+}
+
+:where(.ui-scrollbar--expanded) {
+  scrollbar-width: auto;
+}
+
+// Standard scrollbar properties override WebKit dimensions and hover styling.
+@supports selector(::-webkit-scrollbar) {
+  :where(*) {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
 }
 
 :where(

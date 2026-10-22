@@ -1,14 +1,39 @@
 <template>
   <div class="vocabulary-view-page">
+    <QuerySearchEntrance
+      ref="querySearchEntranceRef"
+      title-tag="h1"
+      :title="isCharacterNotesMode ? t('words.wordList.source.characterNotes') : t('navigation.pageTitles.vocabulary.view')"
+      :results-visible="hasSubmittedSearch && !isSearchExpanded"
+      @progress="handleSearchProgress"
+    >
+    <template #intro>
+      <h1 class="page-title">
+        <BarIcon icon="📋" />
+        {{ isCharacterNotesMode ? t('words.wordList.source.characterNotes') : t('navigation.pageTitles.vocabulary.view') }}
+      </h1>
+      <RadioGroup
+        v-model="source"
+        name="vocabulary-query-source"
+        :options="sourceOptions"
+      />
+    </template>
+    <template #controls="{ expanded, collapse }">
     <VocabularyTopControls
-      v-model:source="source"
+      :source="source"
       v-model:query="activeQuery"
       v-model:selected-search-fields="activeSearchFields"
       v-model:selected-locations="selectedLocations"
       v-model:selected-standard-word="selectedStandardWord"
       v-model:selected-standard-words="selectedStandardWordsModel"
       v-model:single-select="singleSelect"
-      v-model:filter-by-region="filterByRegion"
+      v-model:filter-mode="filterMode"
+      v-model:selected-regions="selectedRegions"
+      :partition-nodes="partitionNodes"
+      :partition-loading="partitionLoading"
+      :partition-error="partitionError"
+      @retry-partitions="loadVocabularyPartitionTree"
+      @filter-open-change="isVocabularyFilterOpen = $event"
       v-model:selected-province="selectedProvince"
       v-model:selected-city="selectedCity"
       v-model:view-mode="viewMode"
@@ -17,13 +42,90 @@
       :standard-word-options="standardWordOptions"
       :province-options="provinceOptions"
       :city-options="cityOptions"
-      :notes-scope="draftScope"
-      @update:notes-scope="draftScope = cloneNotesScope($event)"
-      @locations-resolved="handleNotesScopeResolved"
+      :notes-refresh-disabled="isNotesScopeResolving || isNotesScopeDisabled"
+      :defer-query="expanded"
       @refresh-notes="refreshNotes"
       @open-location-details="openLocationDetails"
+      @search="submitSearch(collapse)"
     />
-
+    </template>
+    <template #outside-panel>
+      <Teleport
+        v-if="isCharacterNotesMode"
+        to="#vocabulary-notes-scope-filter"
+        defer
+        :disabled="isSearchExpanded"
+      >
+      <LocationAndRegionInput
+        :model-value="draftScope"
+        allow-empty-scope
+        disable-location-limit
+        @update:model-value="handleNotesScopeUpdate"
+        @update:run-disabled="handleNotesScopeDisabled"
+        @locations-resolved="handleNotesScopeResolved"
+      />
+      </Teleport>
+      <div v-if="!isCharacterNotesMode && isSearchExpanded" class="vocabulary-quick-start-list">
+        <span>{{ t('words.wordList.quickStartPrompt') }}</span>
+        <button
+          v-for="quickStart in VOCABULARY_QUICK_STARTS"
+          :key="quickStart.id"
+          class="pill-btn vocabulary-quick-start"
+          type="button"
+          :aria-label="quickStart.label"
+          @click="runVocabularyQuickStart(quickStart)"
+        >
+          <svg
+            v-if="quickStart.icon"
+            class="vocabulary-quick-start-icon"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <template v-if="quickStart.icon === 'card'">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </template>
+            <template v-else>
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </template>
+          </svg>
+          <span>{{ quickStart.label }}</span>
+          <svg
+            class="vocabulary-quick-start-icon"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M7 17L17 7M7 7h10v10" />
+          </svg>
+        </button>
+      </div>
+      <div v-if="!isCharacterNotesMode && isSearchExpanded" class="vocabulary-counts-footer" aria-live="polite">
+        <I18nT keypath="words.wordList.upload.totalLocations" tag="span" scope="global">
+          <template #count><span class="vocabulary-counts-value">{{ vocabularyCounts.locations ?? '…' }}</span></template>
+        </I18nT>
+        <span class="vocabulary-counts-separator" aria-hidden="true">·</span>
+        <I18nT keypath="words.wordList.upload.totalEntries" tag="span" scope="global">
+          <template #count><span class="vocabulary-counts-value">{{ vocabularyCounts.total ?? '…' }}</span></template>
+        </I18nT>
+      </div>
+    </template>
     <section v-if="isCharacterNotesMode" class="content-area">
       <div v-if="isNotesInitialLoading" class="loading-state loading-state-base">
         <div class="ui-loading--page" aria-hidden="true"></div>
@@ -178,6 +280,10 @@
       </div>
 
       <div v-else-if="viewMode === 'card'" class="card-mode">
+        <div v-if="isLoadingItems && entries.length" class="loading-state loading-state-base">
+          <div class="ui-loading--page" aria-hidden="true"></div>
+          <span>{{ t('words.wordList.states.loadingCards') }}</span>
+        </div>
         <div v-if="entries.length" class="cards-grid">
           <article
             v-for="entry in entries"
@@ -290,6 +396,7 @@
         api-adapter="vocabulary"
       />
     </section>
+    </QuerySearchEntrance>
 
     <AppModal
       v-model="isMapDetailModalOpen"
@@ -456,20 +563,21 @@
       :loading="notesLocationPopup.loading"
       @close="closeNotesLocationPopup"
     />
-
   </div>
 </template>
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
+import { I18nT, useI18n } from 'vue-i18n'
 import { watchDebounced } from '@vueuse/core'
 import * as OpenCCCN2T from 'opencc-js/cn2t'
 import * as OpenCCT2CN from 'opencc-js/t2cn'
 import {
   getVocabularyItems,
   getVocabularyLocationOptions,
+  getVocabularyCounts,
+  getVocabularyPartitionOptions,
   getVocabularyMapItems,
   getVocabularyMapPoints,
   getVocabularyStandardWords,
@@ -481,6 +589,10 @@ import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopu
 import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 import VocabularyMap from '@/main/components/map/VocabularyMap.vue'
 import VocabularyTopControls from './VocabularyTopControls.vue'
+import QuerySearchEntrance from '@/components/common/QuerySearchEntrance.vue'
+import LocationAndRegionInput from '@/main/components/geo/LocationAndRegionInput.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
+import RadioGroup from '@/components/selector/RadioGroup.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -491,6 +603,11 @@ const VOCABULARY_CARD_NOTE_PREVIEW_LENGTH = 3
 const TONE_FIELD_KEYS = Array.from({ length: 10 }, (_, index) => `t${index + 1}`)
 const locationDetailsT2S = OpenCCT2CN.Converter({ from: 'tw', to: 'cn' })
 const locationDetailsS2T = OpenCCCN2T.Converter({ from: 'cn', to: 'tw' })
+const VOCABULARY_QUICK_STARTS = [
+  { id: 'map-overview', label: '🗺️ 地图', query: '', viewMode: 'map', standardWord: '', mapDisplayMode: 'overview' },
+  { id: 'spider-cards', label: '蜘蛛', query: '蜘蛛', viewMode: 'card', icon: 'card' },
+  { id: 'earthworm-map', label: '蚯蚓', query: '', viewMode: 'map', standardWord: '蚯蚓', mapDisplayMode: 'definition', icon: 'map' },
+]
 
 const MAP_POINT_META_GROUPS = [
   {
@@ -550,7 +667,39 @@ const props = defineProps({
 })
 
 const query = ref('')
+const querySearchEntranceRef = ref(null)
 const notesQuery = ref('')
+const hasSubmittedSearch = ref(false)
+const isSearchExpanded = ref(true)
+const isVocabularyFilterOpen = ref(false)
+const appliedVocabularyQueryParams = ref(null)
+let vocabularyQueryTimer = null
+
+function handleSearchProgress(progress) {
+  isSearchExpanded.value = progress < 1
+}
+
+function submitSearch(collapse) {
+  hasSubmittedSearch.value = true
+  // Notes apply their draft scope and start the query in refreshNotes.
+  if (!isCharacterNotesMode.value) {
+    if (applyVocabularyQuery()) loadVocabularyLocationOptionsForMode()
+    loadActiveViewMode()
+  }
+  collapse()
+}
+
+function runVocabularyQuickStart(quickStart) {
+  query.value = quickStart.query
+  viewMode.value = quickStart.viewMode
+  if (Object.hasOwn(quickStart, 'standardWord')) {
+    selectedStandardWord.value = quickStart.standardWord
+    selectedStandardWordsModel.value = quickStart.standardWord ? [quickStart.standardWord] : []
+  }
+  if (quickStart.mapDisplayMode) mapDisplayMode.value = quickStart.mapDisplayMode
+  submitSearch(() => querySearchEntranceRef.value?.collapse())
+}
+
 const source = computed({
   get: () => route.query.source === 'character-notes' ? 'character-notes' : 'vocabulary',
   set: (value) => {
@@ -567,6 +716,10 @@ const source = computed({
   },
 })
 const isCharacterNotesMode = computed(() => source.value === 'character-notes')
+const sourceOptions = computed(() => [
+  { value: 'vocabulary', label: t('words.wordList.source.vocabulary') },
+  { value: 'character-notes', label: t('words.wordList.source.characterNotes') },
+])
 const activeQuery = computed({
   get: () => isCharacterNotesMode.value ? notesQuery.value : query.value,
   set: (value) => {
@@ -600,11 +753,15 @@ function cloneNotesScope(scope = {}) {
   return {
     locations: Array.isArray(scope.locations) ? [...scope.locations] : [],
     regions: Array.isArray(scope.regions) ? [...scope.regions] : [],
+    regions_semantics: scope.regions_semantics,
+    regionDraft: scope.regionDraft,
     regionUsing: scope.regionUsing || scope.regionMode || 'map',
   }
 }
 
 const draftScope = ref(cloneNotesScope())
+const isNotesScopeResolving = ref(false)
+const isNotesScopeDisabled = ref(false)
 const appliedScope = ref(cloneNotesScope())
 const notesEntries = ref([])
 const notesTotal = ref(0)
@@ -639,9 +796,22 @@ function resolveViewModeFromRoute() {
 }
 
 const viewMode = ref(resolveViewModeFromRoute())
-const selectedSearchFields = ref(JSON.parse(localStorage.getItem('vocabulary_search_fields') || '[]'))
+const savedSearchFields = localStorage.getItem('vocabulary_search_fields')
+const selectedSearchFields = ref(savedSearchFields === null
+  ? ['definition', 'headword']
+  : JSON.parse(savedSearchFields))
 const selectedLocations = ref([])
-const filterByRegion = ref(localStorage.getItem('vocabulary_filter_by_region') === 'true')
+const FILTER_MODES = ['location', 'administrative', 'yindian', 'map']
+const savedFilterMode = localStorage.getItem('vocabulary_filter_mode')
+const filterMode = ref(FILTER_MODES.includes(savedFilterMode)
+  ? savedFilterMode
+  : localStorage.getItem('vocabulary_filter_by_region') === 'true' ? 'administrative' : 'location')
+const selectedRegions = ref([])
+const partitionNodes = ref([])
+const partitionLoading = ref(false)
+const partitionError = ref('')
+const partitionTrees = new Map()
+let partitionRequestId = 0
 const selectedProvince = ref('')
 const selectedCity = ref('')
 const selectedStandardWord = ref('')
@@ -655,8 +825,8 @@ const selectedStandardWords = computed(() => {
 })
 const mapDisplayMode = ref('overview')
 const vocabularyLocationOptions = ref([])
-const vocabularyLocationOptionsLoaded = ref(false)
-let vocabularyLocationOptionsRequest = null
+const administrativeLocationOptions = ref([])
+const pendingLocationOptionRequests = new Map()
 const vocabularyStandardWordOptions = ref([])
 const entries = ref([])
 const itemsCacheKey = ref('')
@@ -685,6 +855,7 @@ const pendingVocabularyMapPointRequests = new Map()
 const pendingVocabularyStandardWordRequests = new Map()
 const mapDetailItemsCache = new Map()
 const total = ref(0)
+const vocabularyCounts = ref({ total: null, locations: null })
 const page = ref(1)
 const pageSize = ref(50)
 const isLoadingItems = ref(false)
@@ -835,7 +1006,7 @@ const locationOptions = computed(() => {
 
 const provinceOptions = computed(() => {
   const seen = new Set()
-  const provinces = vocabularyLocationOptions.value
+  const provinces = administrativeLocationOptions.value
     .filter((opt) => {
       if (!opt.province || seen.has(opt.province)) return false
       seen.add(opt.province)
@@ -851,7 +1022,7 @@ const provinceOptions = computed(() => {
 
 const cityOptions = computed(() => {
   const seen = new Set()
-  const cities = vocabularyLocationOptions.value
+  const cities = administrativeLocationOptions.value
     .filter((opt) => opt.province === selectedProvince.value && opt.city && !seen.has(opt.city) && seen.add(opt.city))
     .map((opt) => ({ value: opt.city, label: opt.city }))
     .sort((a, b) => a.label.localeCompare(b.label, 'zh-Hans-CN'))
@@ -897,6 +1068,9 @@ function normalizeViewMode(value) {
 }
 
 watch(viewMode, (nextMode) => {
+  if (!isCharacterNotesMode.value) {
+    sessionStorage.setItem('vocabulary_view_mode', nextMode)
+  }
   router.replace({
     query: {
       ...route.query,
@@ -1036,6 +1210,8 @@ function normalizeVocabularyEntry(item, index = 0, locationContext = '') {
     detail: [...new Set(detailParts)].join(' · '),
     information: item.informations || '',
     locationName,
+    yindianRegion: item.yindian_region || '',
+    atlasRegion: item.atlas_region || '',
     location: item.location_name || item.location || item.location_label || locationContext || '',
   }
 }
@@ -1124,7 +1300,7 @@ function closeNotesLocationPopup() {
 }
 
 async function loadNotes({ append = false } = {}) {
-  if (!isCharacterNotesMode.value) return
+  if (!hasSubmittedSearch.value || !isCharacterNotesMode.value) return
 
   const nextPage = append ? notesPage.value + 1 : 1
   const params = {
@@ -1161,27 +1337,60 @@ async function loadNotes({ append = false } = {}) {
 }
 
 function refreshNotes() {
+  hasSubmittedSearch.value = true
   appliedScope.value = cloneNotesScope(draftScope.value)
   notesPage.value = 1
   loadNotes()
 }
 
 function handleNotesScopeResolved(scope) {
+  isNotesScopeResolving.value = false
+  isNotesScopeDisabled.value = false
   draftScope.value = cloneNotesScope(scope)
 }
 
-function buildVocabularyQueryParams() {
-  const params = {
-    q: query.value.trim(),
-    search_fields: normalizeSelectedSearchFields(),
-  }
-  if (filterByRegion.value) {
+function handleNotesScopeUpdate(scope) {
+  isNotesScopeResolving.value = true
+  isNotesScopeDisabled.value = false
+  draftScope.value = cloneNotesScope(scope)
+}
+
+function handleNotesScopeDisabled(disabled) {
+  isNotesScopeDisabled.value = disabled
+  if (disabled) isNotesScopeResolving.value = false
+}
+
+function buildVocabularyFilterParams() {
+  const params = {}
+  if (filterMode.value === 'administrative') {
     if (selectedProvince.value) params.province = selectedProvince.value
     if (selectedCity.value) params.city = selectedCity.value
+  } else if (filterMode.value === 'location') {
+    params.locations = [...selectedLocations.value]
   } else {
-    params.locations = selectedLocations.value
+    params.region_mode = filterMode.value
+    params.regions = [...selectedRegions.value]
   }
   return params
+}
+
+function buildDraftVocabularyQueryParams() {
+  return {
+    q: query.value.trim(),
+    search_fields: normalizeSelectedSearchFields(),
+    ...buildVocabularyFilterParams(),
+  }
+}
+
+function buildVocabularyQueryParams() {
+  return appliedVocabularyQueryParams.value || buildDraftVocabularyQueryParams()
+}
+
+function buildVocabularyQueryKey(params) {
+  const normalized = Object.fromEntries(Object.entries(params).map(([key, value]) => [
+    key, Array.isArray(value) ? [...new Set(value)].sort() : value,
+  ]))
+  return buildVocabularyMapRequestKey('query', normalized)
 }
 
 function buildVocabularyItemsParams(overrides = {}) {
@@ -1376,7 +1585,7 @@ function normalizeMapPointLocations(point) {
 }
 
 async function loadVocabularyItems({ append = false } = {}) {
-  if (!shouldUseVocabularyItemsApi()) {
+  if (!hasSubmittedSearch.value || !shouldUseVocabularyItemsApi()) {
     return
   }
 
@@ -1431,6 +1640,7 @@ async function loadVocabularyItems({ append = false } = {}) {
 }
 
 async function loadVocabularyMapPoints() {
+  if (!hasSubmittedSearch.value) return
   if (!shouldUseVocabularyMapPointsApi() && !shouldUseVocabularyMapItemsApi()) {
     return
   }
@@ -1490,34 +1700,82 @@ async function loadVocabularyMapPoints() {
   }
 }
 
-async function loadVocabularyLocationOptions() {
-  if (vocabularyLocationOptionsLoaded.value) {
-    return vocabularyLocationOptions.value
-  }
+function buildVocabularyLocationOptionsParams(queryParams = buildVocabularyQueryParams()) {
+  const params = { ...queryParams }
+  delete params.q
+  delete params.search_fields
+  delete params.locations
+  return params
+}
 
-  if (vocabularyLocationOptionsRequest) {
-    return vocabularyLocationOptionsRequest
-  }
+function isCurrentVocabularyLocationOptionsRequest(requestKey) {
+  const appliedParams = buildVocabularyLocationOptionsParams()
+  const draftParams = buildVocabularyLocationOptionsParams(buildDraftVocabularyQueryParams())
+  return requestKey === buildVocabularyMapRequestKey('location-options', appliedParams)
+    && buildVocabularyQueryKey(appliedParams) === buildVocabularyQueryKey(draftParams)
+}
 
-  vocabularyLocationOptionsRequest = getVocabularyLocationOptions()
-    .then((options) => {
-      vocabularyLocationOptions.value = options
-      vocabularyLocationOptionsLoaded.value = true
-      return options
-    })
-    .catch(() => {
+function loadVocabularyLocationOptionsForMode() {
+  // 行政区模式只需要全量地点来派生省市；其他模式只取当前区域筛选后的地点。
+  return loadVocabularyLocationOptions({ unfiltered: filterMode.value === 'administrative' })
+}
+
+async function loadVocabularyLocationOptions({ unfiltered = false } = {}) {
+  const params = unfiltered ? {} : buildVocabularyLocationOptionsParams()
+  const requestKey = buildVocabularyMapRequestKey('location-options', params)
+  if (!pendingLocationOptionRequests.has(requestKey)) {
+    const pending = getVocabularyLocationOptions(params)
+      .finally(() => pendingLocationOptionRequests.delete(requestKey))
+    pendingLocationOptionRequests.set(requestKey, pending)
+  }
+  try {
+    const options = await pendingLocationOptionRequests.get(requestKey)
+    if (unfiltered || !Object.keys(params).length) administrativeLocationOptions.value = options
+    if (!isCurrentVocabularyLocationOptionsRequest(requestKey)) return options
+    vocabularyLocationOptions.value = options
+    if (filterMode.value === 'location') {
+      const valid = new Set(options.map(option => option.value))
+      const next = selectedLocations.value.filter(location => valid.has(location))
+      if (next.length !== selectedLocations.value.length) selectedLocations.value = next
+    }
+    return options
+  } catch {
+    if (isCurrentVocabularyLocationOptionsRequest(requestKey)) {
       vocabularyLocationOptions.value = []
-      return []
-    })
-    .finally(() => {
-      vocabularyLocationOptionsRequest = null
-    })
+    }
+    return []
+  }
+}
 
-  return vocabularyLocationOptionsRequest
+async function loadVocabularyPartitionTree() {
+  const requestId = ++partitionRequestId
+  const mode = filterMode.value
+  partitionNodes.value = []
+  partitionError.value = ''
+  partitionLoading.value = false
+  if (!['yindian', 'map'].includes(mode) || isCharacterNotesMode.value) return
+  if (partitionTrees.has(mode)) {
+    partitionNodes.value = partitionTrees.get(mode)
+    return
+  }
+  partitionLoading.value = true
+  try {
+    const tree = await getVocabularyPartitionOptions(mode)
+    if (requestId !== partitionRequestId) return
+    if (tree?.schema_version !== 2 || tree.region_mode !== mode || !Array.isArray(tree.nodes)) {
+      throw new Error('Invalid vocabulary partition tree')
+    }
+    partitionTrees.set(mode, tree.nodes)
+    partitionNodes.value = tree.nodes
+  } catch {
+    if (requestId === partitionRequestId) partitionError.value = t('words.wordList.search.partitionLoadFailed')
+  } finally {
+    if (requestId === partitionRequestId) partitionLoading.value = false
+  }
 }
 
 async function loadVocabularyStandardWords() {
-  if (viewMode.value !== 'map') {
+  if (!hasSubmittedSearch.value || viewMode.value !== 'map') {
     return
   }
 
@@ -1755,6 +2013,13 @@ function loadActiveViewMode() {
   }
 }
 
+async function loadVocabularyCounts() {
+  const counts = await getVocabularyCounts()
+  if (counts.total != null && counts.locations != null) {
+    vocabularyCounts.value = counts
+  }
+}
+
 onMounted(async () => {
   if (isCharacterNotesMode.value) {
     if (!NOTES_VIEW_MODES.includes(route.query.tab)) {
@@ -1763,7 +2028,8 @@ onMounted(async () => {
     loadNotes()
     return
   }
-  await loadVocabularyLocationOptions()
+  void loadVocabularyCounts()
+  await loadVocabularyLocationOptionsForMode()
   loadActiveViewMode()
 })
 
@@ -1819,9 +2085,15 @@ watch(selectedProvince, () => {
   selectedCity.value = ''
 })
 
-watch(filterByRegion, (val) => {
-  localStorage.setItem('vocabulary_filter_by_region', val ? 'true' : 'false')
-})
+watch(filterMode, (mode, previousMode) => {
+  localStorage.setItem('vocabulary_filter_mode', mode)
+  selectedLocations.value = []
+  selectedProvince.value = ''
+  selectedCity.value = ''
+  selectedRegions.value = []
+  loadVocabularyPartitionTree()
+  if (previousMode && previousMode !== mode) loadVocabularyLocationOptionsForMode()
+}, { immediate: true })
 
 watch(selectedSearchFields, (val) => {
   localStorage.setItem('vocabulary_search_fields', JSON.stringify(val))
@@ -1836,6 +2108,10 @@ watch(notesSearchFields, (val) => {
 }, { deep: true })
 
 watch(isCharacterNotesMode, async (isNotes) => {
+  clearTimeout(vocabularyQueryTimer)
+  hasSubmittedSearch.value = false
+  isNotesScopeResolving.value = false
+  isNotesScopeDisabled.value = false
   if (isNotes) {
     const nextMode = resolveNotesViewMode(route.query.tab)
     if (viewMode.value !== nextMode) viewMode.value = nextMode
@@ -1846,20 +2122,52 @@ watch(isCharacterNotesMode, async (isNotes) => {
   } else {
     if (viewMode.value === 'list') viewMode.value = 'card'
     closeNotesLocationPopup()
-    await loadVocabularyLocationOptions()
+    void loadVocabularyCounts()
+    loadVocabularyPartitionTree()
+    await loadVocabularyLocationOptionsForMode()
     loadActiveViewMode()
   }
 })
 
-watchDebounced([query, selectedSearchFields, selectedLocations, filterByRegion, selectedProvince, selectedCity], async () => {
-  if (shouldUseVocabularyItemsApi()) {
-    loadVocabularyItems()
-  } else if (shouldUseVocabularyMapPointsApi()) {
-    await refreshVocabularyMapData()
-  } else if (shouldUseVocabularyMapItemsApi()) {
-    await refreshVocabularyMapData()
-  }
-}, { debounce: 250, maxWait: 800 })
+function applyVocabularyQuery() {
+  clearTimeout(vocabularyQueryTimer)
+  const params = buildDraftVocabularyQueryParams()
+  if (appliedVocabularyQueryParams.value
+    && buildVocabularyQueryKey(params) === buildVocabularyQueryKey(appliedVocabularyQueryParams.value)) return false
+  appliedVocabularyQueryParams.value = params
+  page.value = 1
+  mapDetailPage.value = 1
+  activeVocabularyItemsRequestKey.value = ''
+  activeMapPointsRequestKey.value = ''
+  activeStandardWordsRequestKey.value = ''
+  activeMapDetailRequestKey.value = ''
+  itemsCacheKey.value = ''
+  mapPointsCacheKey.value = ''
+  standardWordsCacheKey.value = ''
+  entries.value = []
+  mapPoints.value = []
+  total.value = 0
+  isLoadingItems.value = hasSubmittedSearch.value && viewMode.value !== 'table'
+  isLoadingStandardWords.value = false
+  isMapDetailModalOpen.value = false
+  isLocationDetailsModalOpen.value = false
+  return true
+}
+
+appliedVocabularyQueryParams.value = buildDraftVocabularyQueryParams()
+
+watch([() => buildVocabularyQueryKey(buildDraftVocabularyQueryParams()), isVocabularyFilterOpen], () => {
+  clearTimeout(vocabularyQueryTimer)
+  if (isCharacterNotesMode.value || isVocabularyFilterOpen.value) return
+  if (buildVocabularyQueryKey(buildDraftVocabularyQueryParams()) === buildVocabularyQueryKey(appliedVocabularyQueryParams.value)) return
+  // Only a closed selector starts the delay; reopening cancels it without clearing results.
+  vocabularyQueryTimer = setTimeout(() => {
+    if (isCharacterNotesMode.value || isVocabularyFilterOpen.value || !applyVocabularyQuery()) return
+    // 行政区模式的省市候选来自全量列表，不需要随查询范围重新拉取。
+    if (filterMode.value !== 'administrative') loadVocabularyLocationOptions()
+    loadActiveViewMode()
+  }, 250)
+})
 
 watchDebounced([notesQuery, notesSearchFields], () => {
   loadNotes()
@@ -1885,6 +2193,7 @@ watch(selectedStandardWords, (words) => {
 })
 
 onBeforeUnmount(() => {
+  clearTimeout(vocabularyQueryTimer)
   notesCardResizeObserver?.disconnect()
   notesCardResizeObserver = null
 })

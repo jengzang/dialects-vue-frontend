@@ -1126,7 +1126,7 @@ onBeforeUnmount(() => {
 
 .count-badge {
   background: var(--vml-blue);
-  color: white;
+  color: var(--action-primary-text);
   padding: 4px 12px;
   border-radius: var(--radius-md);
   font-size: 14px;

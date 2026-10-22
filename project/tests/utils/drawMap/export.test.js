@@ -2,6 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   analyzeFeatureCollectionQuality,
+  analyzeEditableGeometry,
+  repairEditableGeometry,
   exportFeatureCollectionAsGeoJson,
   normalizeFeatureCollection,
   readImportedLayerFile,
@@ -16,6 +18,62 @@ function readBlobAsText(blob) {
     reader.readAsText(blob)
   })
 }
+
+describe('editable geometry diagnostics and conservative repair', () => {
+  const polygon = (rings) => ({ id: 'area-1', type: 'Feature', properties: { name: 'Area' }, geometry: { type: 'Polygon', coordinates: rings } })
+
+  it('identifies crossing edges and their intersection coordinate', () => {
+    const issues = analyzeEditableGeometry(polygon([[[0, 0], [2, 2], [0, 2], [2, 0], [0, 0]]]))
+    expect(issues).toContainEqual(expect.objectContaining({ code: 'self-intersection', featureId: 'area-1', coordinate: [1, 1], coordPaths: ['0.0', '0.2'] }))
+  })
+
+  it('rejects collapsed lines, zero-area rings and duplicate vertices', () => {
+    expect(analyzeEditableGeometry({ id: 'line', geometry: { type: 'LineString', coordinates: [[0, 0], [0, 0]] } }).map((issue) => issue.code)).toContain('zero-length-line')
+    expect(analyzeEditableGeometry(polygon([[[0, 0], [1, 0], [2, 0], [0, 0]]])).map((issue) => issue.code)).toContain('zero-area-polygon')
+    expect(analyzeEditableGeometry(polygon([[[0, 0], [2, 0], [2, 0], [0, 2], [0, 0]]]))).toContainEqual(expect.objectContaining({ code: 'duplicate-coordinate', coordPaths: ['0.1', '0.2'] }))
+  })
+
+  it('accepts a valid hole and rejects a hole outside its shell', () => {
+    const shell = [[0, 0], [4, 0], [4, 4], [0, 4], [0, 0]]
+    expect(analyzeEditableGeometry(polygon([shell, [[1, 1], [1, 2], [2, 2], [2, 1], [1, 1]]]))).toEqual([])
+    expect(analyzeEditableGeometry(polygon([shell, [[5, 5], [6, 5], [6, 6], [5, 5]]])).map((issue) => issue.code)).toContain('invalid-polygon-hole')
+  })
+
+  it('rejects closing-line duplicate segments and locates invalid vertices', () => {
+    expect(analyzeEditableGeometry({ id: 'line', geometry: { type: 'LineString', coordinates: [[0, 0], [2, 0], [0, 0], [0, 0]] } })).toContainEqual(expect.objectContaining({ code: 'duplicate-coordinate', level: 'error', coordPaths: ['2', '3'] }))
+    expect(analyzeEditableGeometry(polygon([[[0, 0], [2, 0], [2, 2], [200, 2], [0, 0]]]))).toContainEqual(expect.objectContaining({ code: 'invalid-coordinate', coordPaths: ['0.3'], coordinate: [0, 0] }))
+  })
+
+  it('rejects shell crossings, touching and overlapping or nested holes', () => {
+    const shell = [[0, 0], [4, 0], [4, 4], [0, 4], [0, 0]]
+    const hole = [[1, 1], [1, 3], [3, 3], [3, 1], [1, 1]]
+    for (const rings of [
+      [shell, [[1, 1], [5, 1], [5, 2], [1, 2], [1, 1]]],
+      [shell, [[1, 1], [4, 1], [4, 2], [1, 2], [1, 1]]],
+      [shell, hole, [[2, 2], [2, 3.5], [3.5, 3.5], [3.5, 2], [2, 2]]],
+      [shell, hole, [[1.5, 1.5], [1.5, 2], [2, 2], [2, 1.5], [1.5, 1.5]]],
+    ]) expect(analyzeEditableGeometry(polygon(rings)).map((issue) => issue.code)).toContain('invalid-polygon-hole')
+  })
+
+  it('repairs consecutive duplicates and closure without losing holes or properties', () => {
+    const feature = polygon([[[0, 0], [4, 0], [4, 0], [4, 4], [0, 4]], [[1, 1], [1, 2], [2, 2], [2, 1], [1, 1]]])
+    const original = structuredClone(feature)
+    const repaired = repairEditableGeometry(feature)
+    expect(repaired).toHaveLength(1)
+    expect(repaired[0].properties).toEqual(feature.properties)
+    expect(repaired[0].geometry.coordinates[1]).toEqual(feature.geometry.coordinates[1])
+    expect(analyzeEditableGeometry(repaired[0])).toEqual([])
+    expect(feature).toEqual(original)
+  })
+
+  it('splits a repairable crossing shell into valid polygons and refuses zero-area data', () => {
+    const repaired = repairEditableGeometry(polygon([[[0, 0], [2, 2], [0, 2], [2, 0], [0, 0]]]))
+    expect(repaired).toHaveLength(2)
+    expect(repaired.every((feature) => analyzeEditableGeometry(feature).length === 0)).toBe(true)
+    expect(repairEditableGeometry(polygon([[[0, 0], [1, 0], [2, 0], [0, 0]]]))).toEqual([])
+    expect(repairEditableGeometry(polygon([[null, [1, 0], [2, 0]]]))).toEqual([])
+  })
+})
 
 describe('draw map export helpers', () => {
   beforeEach(() => {

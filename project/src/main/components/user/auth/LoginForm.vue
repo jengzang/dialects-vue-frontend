@@ -12,6 +12,10 @@
 
     <!-- Tab Switcher -->
     <TabSwitcher
+      mode="segmented"
+      navigation-only
+      :use-router="false"
+      :aria-label="$t('auth.login.title')"
       :tabs="tabs"
       :modelValue="loginMode"
       @update:modelValue="$emit('update:loginMode', $event)"
@@ -77,7 +81,7 @@ import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import FormInput from './FormInput.vue'
-import TabSwitcher from './TabSwitcher.vue'
+import TabSwitcher from '@/components/common/TabSwitcher.vue'
 
 const { t } = useI18n()
 
@@ -103,8 +107,8 @@ const props = defineProps({
 const emit = defineEmits(['submit', 'switchToRegister', 'update:loginMode', 'showBenefits'])
 
 const tabs = computed(() => [
-  { label: '📧 ' + t('auth.login.modes.email'), value: 'email' },
-  { label: '👤 ' + t('auth.login.modes.username'), value: 'username' }
+  { label: '📧 ' + t('auth.login.modes.email'), name: 'email' },
+  { label: '👤 ' + t('auth.login.modes.username'), name: 'username' }
 ])
 
 const localEmail = ref('')

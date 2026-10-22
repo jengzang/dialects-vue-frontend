@@ -1,12 +1,21 @@
 <template>
   <div class="yubao-page">
-    <h1 class="page-title">
-      <BarIcon :icon="activePageIcon" />
-      {{ activePageTitle }}
-    </h1>
-
+    <QuerySearchEntrance
+      ref="queryEntrance"
+      title-tag="h1"
+      :title="activePageTitle"
+      @progress="entranceProgress = $event"
+    >
+    <template #intro>
+      <h1 class="page-title">
+        <BarIcon :icon="activePageIcon" />
+        {{ activePageTitle }}
+      </h1>
+    </template>
+    <template #controls="{ expanded }">
+    <div class="yubao-compact-controls" :class="{ 'is-compact': !expanded }">
     <!-- 顶部控制栏 -->
-    <div class="top-controls">
+    <div class="top-controls query-controls-layout query-controls--yubao">
       <!-- Tab 切换 + 查看全部按钮 -->
       <div class="header-container">
         <div class="tab-container">
@@ -39,7 +48,7 @@
             <textarea
                 v-if="activeTab === 'vocabulary'"
                 ref="vocabularyInputEl"
-                v-model="vocabularyInput"
+                v-model="vocabularyDraftInput"
                 @input="onVocabularyInput"
                 @focus="onVocabularyFocus"
                 @blur="onBlur"
@@ -52,7 +61,7 @@
             <textarea
                 v-else
                 ref="grammarInputEl"
-                v-model="grammarInput"
+                v-model="grammarDraftInput"
                 @input="onGrammarInput"
                 @focus="onGrammarFocus"
                 @blur="onBlur"
@@ -95,54 +104,50 @@
             </Teleport>
           </div>
         </div>
-
-        <!-- 视图模式选择器 -->
-        <div class="view-mode-selector">
-          <button
-              class="mode-btn"
-              :class="{ active: viewMode === 'table' }"
-              @click="viewMode = 'table'"
-              :title="t('words.yuBaoPage.viewModes.table')"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="18" height="18" rx="2"/>
-              <line x1="3" y1="9" x2="21" y2="9"/>
-              <line x1="3" y1="15" x2="21" y2="15"/>
-              <line x1="9" y1="9" x2="9" y2="21"/>
-              <line x1="15" y1="9" x2="15" y2="21"/>
-            </svg>
-          </button>
-
-          <button
-              class="mode-btn"
-              :class="{ active: viewMode === 'card' }"
-              @click="viewMode = 'card'"
-              :title="t('words.yuBaoPage.viewModes.card')"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="7" height="7" rx="1"/>
-              <rect x="14" y="3" width="7" height="7" rx="1"/>
-              <rect x="3" y="14" width="7" height="7" rx="1"/>
-              <rect x="14" y="14" width="7" height="7" rx="1"/>
-            </svg>
-          </button>
-
-          <button
-              class="mode-btn"
-              :class="{ active: viewMode === 'map' }"
-              @click="viewMode = 'map'"
-              :title="t('words.yuBaoPage.viewModes.map')"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-              <circle cx="12" cy="10" r="3"/>
-            </svg>
-          </button>
-        </div>
       </div>
+      <button
+        v-if="expanded"
+        class="query-submit query-search-action action-btn"
+        data-variant="primary"
+        type="button"
+        :disabled="isLoading || !isDraftValid"
+        @click="submitEntranceQuery"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        {{ t('common.button.search') }}
+      </button>
     </div>
 
+    <div class="condition-bar">
+      <span v-if="expanded" class="query-condition-label">{{ t('words.wordList.viewModes.label') }}</span>
+      <ResultViewSwitcher v-model="viewMode" label-prefix="words.yuBaoPage.viewModes" />
+      <div v-if="viewMode === 'card' && !expanded && cardData.length > 0" class="local-filter-bar">
+        <div class="filter-input-wrapper">
+          <svg class="filter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            v-model="localFilterQuery"
+            type="text"
+            :placeholder="t('words.yuBaoPage.search.localFilterPlaceholder')"
+            class="local-filter-input"
+          />
+          <button v-if="localFilterQuery" @click="localFilterQuery = ''" class="clear-filter-btn">×</button>
+        </div>
+        <span class="filter-count" v-if="localFilterQuery">
+          {{ t('words.yuBaoPage.filter.showingCount', { visible: filteredCardData.length, total: cardData.length }) }}
+        </span>
+      </div>
+    </div>
+    </div>
+    </template>
+
     <!-- 内容区 -->
+    <div v-show="entranceProgress === 1">
     <!-- 加载状态 -->
     <div v-if="isLoading" class="content-area glass-panel">
       <div class="loading-state loading-state-base">
@@ -161,25 +166,8 @@
         :key="`${activeTab}-${currentInputValue}`"
     />
 
-    <!-- 表格模式 - 输入无效时的提示 -->
-    <div v-else-if="viewMode === 'table'" class="content-area glass-panel">
-      <div class="empty-state empty-state-base">
-        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <circle cx="12" cy="12" r="10"/>
-          <line x1="12" y1="8" x2="12" y2="12"/>
-          <line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-        <p v-if="!currentInputValue">{{ t('words.yuBaoPage.states.enterSearch') }}</p>
-        <p v-else>{{ t('words.yuBaoPage.states.chooseSuggestion') }}</p>
-        <small v-if="!currentInputValue">
-          {{ t('words.yuBaoPage.states.queryHint', { type: currentSearchTypeLabel }) }}
-        </small>
-        <small v-else>{{ t('words.yuBaoPage.states.clickSuggestion') }}</small>
-      </div>
-    </div>
-
     <!-- 卡片/地图模式 -->
-    <div v-else-if="viewMode === 'card'" class="content-area glass-panel">
+    <div v-else-if="viewMode === 'card' && (isLoadingCards || cardData.length > 0)" class="content-area glass-panel">
       <!-- 卡片模式 -->
       <div class="card-mode">
 
@@ -190,24 +178,6 @@
 
         <template v-else-if="cardData.length > 0">
 
-          <div class="local-filter-bar">
-            <div class="filter-input-wrapper">
-              <svg class="filter-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              <input
-                  v-model="localFilterQuery"
-                  type="text"
-                  :placeholder="t('words.yuBaoPage.search.localFilterPlaceholder')"
-                  class="local-filter-input"
-              />
-              <button v-if="localFilterQuery" @click="localFilterQuery = ''" class="clear-filter-btn">×</button>
-            </div>
-            <span class="filter-count" v-if="localFilterQuery">
-        {{ t('words.yuBaoPage.filter.showingCount', { visible: filteredCardData.length, total: cardData.length }) }}
-      </span>
-          </div>
           <div class="cards-grid">
             <div
                 v-for="(item, idx) in visibleCards"
@@ -258,59 +228,29 @@
             <span v-else-if="filteredCardData.length > 0" class="no-more">{{ t('words.yuBaoPage.states.loadedAll') }}</span>
           </div>
 
-          <div v-if="filteredCardData.length === 0" class="empty-state empty-state-base">
-            <p>{{ t('words.yuBaoPage.states.noFilterResult', { query: localFilterQuery }) }}</p>
-          </div>
-
         </template>
 
-        <div v-else class="empty-state empty-state-base">
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="8" x2="12" y2="12"/>
-            <line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
-          <p v-if="!currentInputValue">{{ t('words.yuBaoPage.states.enterSearch') }}</p>
-          <p v-else-if="!isValidInput">{{ t('words.yuBaoPage.states.chooseSuggestion') }}</p>
-          <p v-else>{{ t('words.yuBaoPage.states.noData') }}</p>
-          <small v-if="!currentInputValue">
-            {{ t('words.yuBaoPage.states.queryHint', { type: currentSearchTypeLabel }) }}
-          </small>
-          <small v-else>{{ t('words.yuBaoPage.states.clickSuggestion') }}</small>
-        </div>
       </div>
 
     </div>
 
     <!-- 地图模式 -->
-    <div v-else-if="viewMode === 'map'" class="map-mode">
+    <div v-else-if="viewMode === 'map' && (isLoadingCards || (isValidInput && cardData.length > 0))" class="map-mode">
       <div v-if="isLoadingCards" class="cards-loading">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <span>{{ t('words.yuBaoPage.states.loadingData') }}</span>
       </div>
       <template v-else>
-        <div v-if="!isValidInput || cardData.length === 0" class="empty-state empty-state-base">
-          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="8" x2="12" y2="12"/>
-            <line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
-          <p v-if="!currentInputValue">{{ t('words.yuBaoPage.states.enterSearch') }}</p>
-          <p v-else-if="!isValidInput">{{ t('words.yuBaoPage.states.chooseSuggestion') }}</p>
-          <p v-else>{{ t('words.yuBaoPage.states.noData') }}</p>
-          <small v-if="!currentInputValue">
-            {{ t('words.yuBaoPage.states.queryHint', { type: currentSearchTypeLabel }) }}
-          </small>
-          <small v-else>{{ t('words.yuBaoPage.states.clickSuggestion') }}</small>
-        </div>
         <YuBaoMap
-            v-else
             :map-data="cardData"
             :active-tab="activeTab"
         />
       </template>
 
     </div>
+
+    </div>
+    </QuerySearchEntrance>
 
     <!-- 查看全部弹窗 -->
     <AppModal
@@ -356,6 +296,8 @@ import { watchDebounced } from '@vueuse/core'
 import YuBaoMap from '@/main/components/map/YuBaoMap.vue'
 import AppModal from '@/components/common/AppModal.vue'
 import BarIcon from '@/components/common/BarIcon.vue'
+import ResultViewSwitcher from '@/components/common/ResultViewSwitcher.vue'
+import QuerySearchEntrance from '@/components/common/QuerySearchEntrance.vue'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 import { useStorageState } from '@/composables/core/useStorageState.js'
 
@@ -374,6 +316,26 @@ const { state: activeTab, set: setActiveTab } = useRouteQueryState('tab', {
 })
 const vocabularyInput = ref('')
 const grammarInput = ref('')
+const queryEntrance = ref(null)
+const entranceProgress = ref(0)
+const vocabularyDraft = ref('')
+const grammarDraft = ref('')
+const vocabularyDraftInput = computed({
+  get: () => vocabularyDraft.value,
+  set: value => {
+    vocabularyDraft.value = value
+    if (entranceProgress.value === 1) vocabularyInput.value = value
+  },
+})
+const grammarDraftInput = computed({
+  get: () => grammarDraft.value,
+  set: value => {
+    grammarDraft.value = value
+    if (entranceProgress.value === 1) grammarInput.value = value
+  },
+})
+watch(vocabularyInput, value => { vocabularyDraft.value = value })
+watch(grammarInput, value => { grammarDraft.value = value })
 const vocabularyInputEl = ref(null)
 const grammarInputEl = ref(null)
 const vocabularySuggestions = ref([])
@@ -442,12 +404,6 @@ const currentInputValue = computed(() => (
   activeTab.value === 'vocabulary'
     ? vocabularyInput.value.trim()
     : grammarInput.value.trim()
-))
-
-const currentSearchTypeLabel = computed(() => (
-  activeTab.value === 'vocabulary'
-    ? t('words.yuBaoPage.types.vocabulary')
-    : t('words.yuBaoPage.types.grammar')
 ))
 
 const activeTabLabel = computed(() => (
@@ -599,11 +555,27 @@ function localMatch(query, dataArray) {
   return matches.slice(0, 50)
 }
 
+const isDraftValid = computed(() => activeTab.value === 'vocabulary'
+  ? allVocabulary.value.includes(vocabularyDraft.value.trim())
+  : allGrammar.value.includes(grammarDraft.value.trim()))
+
+function submitEntranceQuery() {
+  if (!isDraftValid.value || isLoading.value) return
+  if (activeTab.value === 'vocabulary') {
+    vocabularyInput.value = vocabularyDraft.value.trim()
+  } else {
+    grammarInput.value = grammarDraft.value.trim()
+  }
+  vocabularySuggestions.value = []
+  grammarSuggestions.value = []
+  queryEntrance.value?.collapse()
+}
+
 // 词汇输入处理
 function onVocabularyInput() {
   clearTimeout(vocabularyDebounceTimer)
   vocabularyDebounceTimer = setTimeout(() => {
-    const query = vocabularyInput.value.trim()
+    const query = vocabularyDraft.value.trim()
     // console.log('🔍 词汇输入:', query)
 
     if (!query) {
@@ -623,7 +595,7 @@ function onVocabularyInput() {
 
 // 词汇聚焦处理
 function onVocabularyFocus() {
-  if (vocabularyInput.value.trim()) {
+  if (vocabularyDraft.value.trim()) {
     onVocabularyInput()
   }
 }
@@ -632,7 +604,7 @@ function onVocabularyFocus() {
 function onGrammarInput() {
   clearTimeout(grammarDebounceTimer)
   grammarDebounceTimer = setTimeout(() => {
-    const query = grammarInput.value.trim()
+    const query = grammarDraft.value.trim()
     if (!query) {
       grammarSuggestions.value = []
       return
@@ -648,7 +620,7 @@ function onGrammarInput() {
 
 // 语法聚焦处理
 function onGrammarFocus() {
-  if (grammarInput.value.trim()) {
+  if (grammarDraft.value.trim()) {
     onGrammarInput()
   }
 }
@@ -693,9 +665,14 @@ function updateGrammarSuggestionPosition() {
   })
 }
 
+watch(entranceProgress, () => {
+  if (vocabularySuggestions.value.length) updateVocabularySuggestionPosition()
+  if (grammarSuggestions.value.length) updateGrammarSuggestionPosition()
+}, { flush: 'post' })
+
 // 应用词汇建议
 function applyVocabularySuggestion(item) {
-  vocabularyInput.value = item
+  vocabularyDraftInput.value = item
   vocabularySuggestions.value = []
   nextTick(() => {
     if (vocabularyInputEl.value) {
@@ -706,7 +683,7 @@ function applyVocabularySuggestion(item) {
 
 // 应用语法建议
 function applyGrammarSuggestion(item) {
-  grammarInput.value = item
+  grammarDraftInput.value = item
   grammarSuggestions.value = []
   nextTick(() => {
     if (grammarInputEl.value) {
@@ -718,9 +695,9 @@ function applyGrammarSuggestion(item) {
 // 从弹窗中选择条目
 function selectFromModal(item) {
   if (activeTab.value === 'vocabulary') {
-    vocabularyInput.value = item
+    vocabularyDraftInput.value = item
   } else {
-    grammarInput.value = item
+    grammarDraftInput.value = item
   }
   showAllModal.value = false
   modalSearchQuery.value = ''
@@ -921,7 +898,7 @@ watch(viewMode, async (newMode) => {
 
 $primary: var(--color-primary);
 $white: var(--glass-50);
-$purple: var(--color-purple-light);
+$purple: var(--color-secondary-text);
 
 $text-primary: var(--text-primary);
 $text-secondary: var(--text-secondary);
@@ -957,6 +934,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
     0 1px 3px rgba(0, 0, 0, 0.08),
     0 1px 2px rgba(0, 0, 0, 0.06);
 
+  :root[data-color-theme='green'] &,
   :root[data-color-theme='dark'] & {
     color: var(--text-primary);
     background: var(--surface-panel-strong);
@@ -1112,7 +1090,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 
 .search-input {
   width: 100%;
-  min-height: 48px;
+  min-height: calc(48px + var(--query-input-growth, 0px));
   max-height: 200px;
   padding: 12px 16px;
   overflow: hidden;
@@ -1139,35 +1117,23 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 }
 
 /* 视图模式选择器 */
-.view-mode-selector {
+.condition-bar {
   display: flex;
-  flex-shrink: 0;
-  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
 
-  @include segmented-shell;
-}
-
-.mode-btn {
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  color: $text-secondary;
-  cursor: pointer;
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-sm2);
-  transition: all $transition-control $ease-standard;
-
-  @include flex-center;
-
-  &:hover:not(.active) {
-    color: $text-primary;
-    background: rgba(0, 0, 0, 0.04);
+  .local-filter-bar {
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    min-width: 0;
+    margin-bottom: 0;
   }
 
-  &.active {
-    @include control-active;
-  }
+  .filter-input-wrapper { min-width: 0; }
+  .local-filter-input { width: 100%; box-sizing: border-box; }
 }
 
 /* 内容区 */
@@ -1454,29 +1420,6 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   color: $text-secondary;
   font-size: 13px;
   line-height: 1.6;
-}
-
-/* 空状态 */
-.empty-state {
-  gap: 12px;
-  padding: 80px 20px;
-  color: $text-secondary;
-
-  svg {
-    opacity: 0.5;
-  }
-
-  p {
-    margin: 0;
-    color: $text-primary;
-    font-size: 16px;
-    font-weight: 500;
-  }
-
-  small {
-    color: $text-secondary;
-    font-size: 13px;
-  }
 }
 
 /* 本地筛选 */

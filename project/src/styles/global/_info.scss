@@ -23,6 +23,10 @@
   color: var(--text-primary);
   font-size: 1.5rem;
   font-weight: 600;
+
+  @media (aspect-ratio > 1 / 1) {
+    font-size: var(--font-size-page-title-landscape);
+  }
 }
 
 .page-footer {
@@ -47,7 +51,7 @@
 }
 
 .info-text strong {
-  color: var(--color-primary-hover);
+  color: var(--color-secondary-text);
 }
 
 .text-action {

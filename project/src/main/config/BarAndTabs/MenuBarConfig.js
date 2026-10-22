@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { resultCache } from '@/main/store/store.js'
+import { isPlatformRouteEnabled } from '@/platform/index.js'
 
 // ========================================
 // MenuBar Configuration Guide
@@ -96,6 +97,11 @@ const MENU_CHILD_PATHS = {
   pho: ['/menu/pho/matrix', '/menu/pho/custom', '/menu/pho/count', '/menu/pho/evolution'],
   vocabulary: ['/menu/vocabulary/view', '/menu/vocabulary/import', '/menu/vocabulary/manage'],
   about: ['/menu/about/intro', '/menu/about/suggestion', '/menu/about/like']
+}
+
+function filterPlatformChildPaths(tabKey, paths) {
+  if (tabKey !== 'map') return paths
+  return paths.filter((path) => isPlatformRouteEnabled(path))
 }
 
 const createDisplayConfig = ({ preset = 'standard', overrides = {} } = {}) => ({
@@ -197,11 +203,7 @@ export function useMenuTabsConfig() {
       icon: '🏠',
       display: {
         preset: 'compactDesktop',
-        overrides: {
-          mobileScroll: 'left',
-          weight: 0.7,
-          weightIconOnly: 0.4,
-        }
+        overrides: { mobileScroll: 'left', weight: 0.7, weightIconOnly: 0.4 }
       },
       navigation: {
         defaultTo: { path: withRouteLocale(route, '/') }
@@ -318,10 +320,7 @@ export function useMenuTabsConfig() {
       icon: '📚',
       display: {
         preset: 'compactDesktop',
-        overrides: {
-          mobileScroll: 'right',
-          weight: 0.7,
-        }
+        overrides: { mobileScroll: 'right', weight: 0.7 }
       },
       navigation: {
         defaultTo: {
@@ -414,7 +413,7 @@ export function syncMenuBarMemoryFromRoute(route) {
   if (!tabKey) return
 
   const normalizedPath = stripLocaleFromPath(route?.path || '')
-  if (MENU_CHILD_PATHS[tabKey]?.includes(normalizedPath)) {
+  if (filterPlatformChildPaths(tabKey, MENU_CHILD_PATHS[tabKey] || []).includes(normalizedPath)) {
     writeMenuBarMemory(tabKey, normalizedPath)
   }
 }
@@ -450,10 +449,10 @@ export function getMenuBarActiveTab(tabs, route) {
   return tabs.find((tab) => isMenuBarRouteMatch(tab.to, route))?.tab || null
 }
 
-export function resolveMenuBarTarget(tabConfig, currentRoute = null) {
+export function resolveMenuBarTarget(tabConfig) {
   if (!tabConfig?.to) {
     const tabKey = tabConfig?.navigation?.tabKey || tabConfig?.tab
-    return MENU_CHILD_PATHS[tabKey]?.[0] || withRouteLocale(currentRoute, '/menu/query/zhonggu')
+    return filterPlatformChildPaths(tabKey, MENU_CHILD_PATHS[tabKey] || [])[0] || '/menu/query/zhonggu'
   }
 
   if (!tabConfig.navigation?.rememberChild) {
@@ -461,7 +460,8 @@ export function resolveMenuBarTarget(tabConfig, currentRoute = null) {
   }
 
   const rememberedPath = readMenuBarMemory(tabConfig.navigation.tabKey)
-  if (!rememberedPath) {
+  const childPaths = filterPlatformChildPaths(tabConfig.navigation.tabKey, MENU_CHILD_PATHS[tabConfig.navigation.tabKey] || [])
+  if (!rememberedPath || !childPaths.includes(rememberedPath)) {
     return tabConfig.to
   }
 

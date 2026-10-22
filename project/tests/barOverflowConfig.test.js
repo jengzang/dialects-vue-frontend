@@ -30,6 +30,15 @@ function menuTabBlock(source, tabName) {
   return source.slice(start, nextTab === -1 ? source.indexOf('\n  ])', start) : nextTab)
 }
 
+function exploreTabBlock(source, tabName) {
+  const start = source.indexOf(`tab: '${tabName}'`)
+  expect(start).toBeGreaterThan(-1)
+
+  const nextTab = source.indexOf('createExploreTab({', start + 1)
+  const end = nextTab === -1 ? source.length : nextTab
+  return source.slice(start, end)
+}
+
 describe('bar overflow navigation config', () => {
   it('keeps newly exposed overflow menu shortcuts as literal emoji', () => {
     const source = readSource(menuBarPath)
@@ -63,6 +72,29 @@ describe('bar overflow navigation config', () => {
 
     expect(villagesMlBarSource).toContain("id: 'home'")
     expect(villagesMlBarSource).toContain("overrides: { scroll: 'left', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 0.9 }")
+  })
+
+  it('keeps existing mobile-only overflow assignments scoped to mobile layouts', () => {
+    const cases = [
+      { path: menuBarPath, tabName: 'home', assignment: "mobileScroll: 'left'", getBlock: menuTabBlock },
+      { path: menuBarPath, tabName: 'charClass', assignment: "mobileScroll: 'right'", getBlock: menuTabBlock },
+      { path: exploreBarPath, tabName: 'pho', assignment: "mobileScroll: 'right'", getBlock: exploreTabBlock },
+      { path: exploreBarPath, tabName: 'query', assignment: "mobileScroll: 'right'", getBlock: exploreTabBlock },
+    ]
+
+    for (const { path, tabName, assignment, getBlock } of cases) {
+      const block = getBlock(readSource(path), tabName)
+      expect(block).toContain(assignment)
+      expect(block).not.toMatch(/\bscroll\s*:/)
+    }
+
+    const villagesMlSource = readSource(villagesMlBarPath)
+    const homeStart = villagesMlSource.indexOf("id: 'home'")
+    const nextItem = villagesMlSource.indexOf("id: 'search'", homeStart + 1)
+    expect(homeStart).toBeGreaterThan(-1)
+    const homeBlock = villagesMlSource.slice(homeStart, nextItem)
+    expect(homeBlock).toContain("mobileScroll: 'left'")
+    expect(homeBlock).not.toMatch(/\bscroll\s*:/)
   })
 
   it('preserves CommonBar overflow roles after schema normalization', () => {

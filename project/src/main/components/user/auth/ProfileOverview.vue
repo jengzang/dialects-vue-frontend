@@ -6,6 +6,10 @@
     <!-- Tab Switcher + Benefits Button -->
     <div class="header-controls">
       <TabSwitcher
+        mode="segmented"
+        navigation-only
+        :use-router="false"
+        :aria-label="$t('auth.profile.tabs.info')"
         :tabs="tabs"
         :model-value="currentTab"
         @update:model-value="$emit('switchTab', $event)"
@@ -120,7 +124,7 @@ import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ActionButton from './ActionButton.vue'
-import TabSwitcher from './TabSwitcher.vue'
+import TabSwitcher from '@/components/common/TabSwitcher.vue'
 import UserAvatarEditor from './UserAvatarEditor.vue'
 import LeaderboardPanel from '@/main/components/user/LeaderboardPanel.vue'
 import { formatOnlineTime, fmt } from '@/main/utils/userStats.js'
@@ -164,8 +168,8 @@ defineEmits([
 ])
 
 const tabs = computed(() => [
-  { label: '📊 ' + t('auth.profile.tabs.info'), value: 'overview' },
-  { label: '🏆 ' + t('auth.profile.tabs.ranking'), value: 'leaderboard' }
+  { label: '📊 ' + t('auth.profile.tabs.info'), name: 'overview' },
+  { label: '🏆 ' + t('auth.profile.tabs.ranking'), name: 'leaderboard' }
 ])
 
 onMounted(async () => {

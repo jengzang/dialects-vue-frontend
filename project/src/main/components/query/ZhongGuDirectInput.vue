@@ -216,7 +216,7 @@ $transition-duration: 0.2s;
   transition: all $transition-duration;
 
   &:hover {
-    color: var(--text-white);
+    color: var(--action-primary-text);
     background: $primary-color;
   }
 }

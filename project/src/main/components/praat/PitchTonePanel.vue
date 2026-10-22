@@ -1068,7 +1068,7 @@ const initContinuousChart = (isZScore) => {
 
 $primary: var(--color-primary);
 $primary-blue: var(--color-primary);
-$primary-purple: var(--color-purple);
+$primary-purple: var(--color-secondary);
 $primary-hover: var(--vml-blue-dark);
 
 $success: var(--color-success);
@@ -1085,11 +1085,7 @@ $surface-strong: var(--glass-80);
 $border-light: rgba(0, 0, 0, 0.05);
 $border-medium: rgba(0, 0, 0, 0.1);
 
-$primary-gradient: linear-gradient(
-  135deg,
-  #007aff,
-  #6e00ff
-);
+$primary-gradient: var(--color-gradient);
 
 $transition-fast: 0.2s;
 $transition-normal: 0.3s;
@@ -1136,7 +1132,7 @@ $transition-normal: 0.3s;
     background: $primary-gradient;
     border-radius: var(--radius-full);
     box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
-    color: $white;
+    color: var(--action-primary-text);
     font-size: 1.2rem;
     font-weight: 700;
   }
@@ -1260,7 +1256,7 @@ $transition-normal: 0.3s;
   &.add-btn {
     background: $primary;
     box-shadow: 0 2px 6px rgba(74, 144, 226, 0.3);
-    color: $white;
+    color: var(--action-primary-text);
 
     &:hover:not(:disabled) {
       background: $primary-hover;
@@ -1405,11 +1401,11 @@ $transition-normal: 0.3s;
   position: relative;
   overflow: hidden;
   padding: 1rem 3rem;
-  background: $primary-gradient;
+  background: var(--action-primary-bg);
   border: none;
   border-radius: var(--radius-2xl);
   box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.4);
-  color: $white;
+  color: var(--action-primary-text);
   font-size: 1.2rem;
   font-weight: 700;
   cursor: pointer;

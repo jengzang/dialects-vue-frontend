@@ -126,6 +126,13 @@ const donors = [
     name: '*？',
     amount: '100.00',
     method: '微信'
+  },
+  {
+    sortTime: '2026-09-15T09:00:00+08:00',
+    time: '2026.9.15 09:00:00',
+    name: '知乎人文',
+    amount: '1000.00',
+    method: '知乎钱包'
   }
 ]
 const sortedDonors = [...donors].sort((left, right) =>

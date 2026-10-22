@@ -70,6 +70,20 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = DEFAULT_SNAP_
   const lastNavWidths = new WeakMap()
   let _observer = null
   let _settleFrame = null
+  let _observedEls = new Set()
+
+  const getNavElements = () => [...new Set([navRef?.value, mobileNavRef?.value].filter(Boolean))]
+
+  const syncObservedElements = (els) => {
+    const nextEls = new Set(els)
+    for (const el of _observedEls) {
+      if (!nextEls.has(el)) _observer?.unobserve(el)
+    }
+    for (const el of nextEls) {
+      if (!_observedEls.has(el)) _observer?.observe(el)
+    }
+    _observedEls = nextEls
+  }
 
   // 第一个主 tab 在容器内容坐标系中的偏移
   const getRestPosition = (el) => {
@@ -220,7 +234,7 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = DEFAULT_SNAP_
 
   onMounted(() => {
     nextTick(() => {
-      const els = [navRef.value, mobileNavRef?.value].filter(Boolean)
+      const els = getNavElements()
       if (!els.length) return
 
       updateNavContentWidth(els)
@@ -230,26 +244,52 @@ export function useScrollSnap(navRef, orderedTabs, snapThreshold = DEFAULT_SNAP_
       // 宽度始终重算（保证 tab 宽度跟随 resize），但仅在宽度变化时才复位滚动，
       // 避免 dvh 变化（纯高度变化）把横向滚动拽回起点
       _observer = new ResizeObserver(() => {
-        const visibleEls = els.filter((el) => el.clientWidth > 0)
+        const currentEls = getNavElements()
+        const visibleEls = currentEls.filter((el) => el.clientWidth > 0)
         const widthChanged = visibleEls.some((el) => lastNavWidths.get(el) !== el.clientWidth)
         for (const el of visibleEls) {
           lastNavWidths.set(el, el.clientWidth)
         }
-        updateNavContentWidth(els, widthChanged)
+        updateNavContentWidth(currentEls, widthChanged)
       })
+      syncObservedElements(els)
       for (const el of els) {
         scrollToRest(el)
-        _observer.observe(el)
       }
       scrollToRestWhileSettling(els)
     })
   })
+
+  watch(
+    [() => navRef?.value, () => mobileNavRef?.value],
+    async () => {
+      if (!_observer) return
+      await nextTick()
+      const els = getNavElements()
+      syncObservedElements(els)
+      if (!els.length) {
+        if (_scrollTimer) {
+          clearTimeout(_scrollTimer)
+          _scrollTimer = null
+        }
+        if (_settleFrame) {
+          cancelAnimationFrame(_settleFrame)
+          _settleFrame = null
+        }
+        return
+      }
+      updateNavContentWidth(els)
+      scrollToRestWhileSettling(els)
+    },
+    { flush: 'post' }
+  )
 
   onBeforeUnmount(() => {
     if (_observer) {
       _observer.disconnect()
       _observer = null
     }
+    _observedEls.clear()
     if (_scrollTimer) {
       clearTimeout(_scrollTimer)
       _scrollTimer = null

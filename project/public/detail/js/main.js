@@ -535,7 +535,7 @@ const presets = [
     {
         mode: 's2p',
         locations: '广州 梅縣 汕头',
-        regions: '瓊崖',
+        regions: '嶺南-瓊崖',
         features: ['韻母'],
         status_inputs: '流',
         group_inputs: '',
@@ -544,7 +544,7 @@ const presets = [
     {
         mode: 's2p',
         locations: '鬱林 北流',
-        regions: '吳化 銅容',
+        regions: '嶺南-廉吳-吳化 嶺南-蒼梧-銅容',
         features: ['聲母'],
         status_inputs: '精母',
         group_inputs: '',
@@ -553,7 +553,7 @@ const presets = [
     {
         mode: 's2p',
         locations: '台山台城 新會會城 東莞橋頭',
-        regions: '東江',
+        regions: '廣中-東江',
         features: ['聲調'],
         status_inputs: '次濁上',
         group_inputs: '',
@@ -562,7 +562,7 @@ const presets = [
     {
         mode: 's2p',
         locations: '南雄',
-        regions: '韶州',
+        regions: '廣中-韶州',
         features: ['韻母'],
         status_inputs: '蟹-等',
         group_inputs: '',
@@ -571,7 +571,7 @@ const presets = [
     {
         mode: 's2p',
         locations: '南寧亭子 南寧那河 化州下江',
-        regions: '鬱白',
+        regions: '嶺南-鬱潯-鬱白',
         features: ['韻母'],
         status_inputs: '宕 江',
         group_inputs: '',
@@ -580,7 +580,7 @@ const presets = [
     {
         mode: 'p2s',
         locations: '揭陽 饒平 永安 福州',
-        regions: '莆仙',
+        regions: '閩-莆仙',
         features: ['韻母'],
         status_inputs: '',
         group_inputs: '攝',
@@ -589,7 +589,7 @@ const presets = [
     {
         mode: 's2p',
         locations: '南京 鹽城 淮安 廬江 ',
-        regions: '海泗',
+        regions: '下江-海泗',
         features: ['聲母'],
         status_inputs: '見組二',
         group_inputs: '',
@@ -598,7 +598,7 @@ const presets = [
     {
         mode: 'p2s',
         locations: '台山斗山墟 恩平 鶴山雅瑤 從化獅象',
-        regions: '南海',
+        regions: '嶺南-珠江-南海',
         features: ['聲母'],
         status_inputs: '',
         group_inputs: '組',
@@ -607,7 +607,7 @@ const presets = [
     {
         mode: 's2p',
         locations: '銀川 天津 邢臺',
-        regions: '魯中',
+        regions: '華北-魯中',
         features: ['韻母'],
         status_inputs: '豪',
         group_inputs: '',
@@ -616,7 +616,7 @@ const presets = [
     {
         mode: 's2p',
         locations: '髙安 修水',
-        regions: '撫州',
+        regions: '湘贛-撫州',
         features: ['聲母'],
         status_inputs: '知組三',
         group_inputs: '',
@@ -639,7 +639,7 @@ document.getElementById('dice-button').addEventListener('click', () => {
 
     // 设置文本输入框
     document.getElementById('locations').value = pick.locations;
-    document.getElementById('regions').value = pick.regions;
+    setRegionPaths(pick.regions.split(/\s+/), 'yindian');
 
     // 设置多选框（先取消全部，再勾选选中的）
     document.querySelectorAll('#features-group input[type="checkbox"]').forEach(cb => {
@@ -709,7 +709,8 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("resize", switchBindingLogic);
     document.getElementById("runBtn")?.addEventListener("click", async () => {
         const locations = document.getElementById('locations').value.trim().split(/\s+/);
-        const regions = document.getElementById('regions').value.trim().split(/\s+/);
+        const regions = await readRegionPaths();
+        if (regions === null) return;
         const mode = document.querySelector('input[name="mode"]:checked').value;
         const status_inputs = parseMultilineListInput("status_inputs");
         const pho_values = parseMultilineListInput("pho_values");

@@ -716,7 +716,7 @@ onUnmounted(() => {
 
 .region-label {
   background: linear-gradient(135deg, var(--vml-blue), var(--color-success));
-  color: white;
+  color: var(--action-primary-text);
   padding: 4px 12px;
   border-radius: var(--radius-md);
   font-size: 13px;
@@ -754,7 +754,7 @@ onUnmounted(() => {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: white;
+  color: var(--action-primary-text);
   background: linear-gradient(135deg, var(--vml-blue), var(--vml-blue-darker));
 }
 
@@ -811,7 +811,7 @@ onUnmounted(() => {
   gap: 8px;
   padding: 6px 12px;
   background: linear-gradient(135deg, var(--vml-blue), var(--vml-blue-darker));
-  color: white;
+  color: var(--action-primary-text);
   border-radius: var(--radius-lg);
   font-size: 13px;
   font-weight: 500;
@@ -825,7 +825,7 @@ onUnmounted(() => {
 .remove-btn {
   background: none;
   border: none;
-  color: white;
+  color: inherit;
   font-size: 20px;
   line-height: 1;
   cursor: pointer;
@@ -937,7 +937,7 @@ onUnmounted(() => {
 
 .region-badge.primary {
   background: linear-gradient(135deg, var(--vml-blue), var(--vml-blue-darker));
-  color: white;
+  color: var(--action-primary-text);
 }
 
 .region-badge.compare {

@@ -257,6 +257,8 @@
     },
     "homophoneLexicon": {
       "title": "同音字彙",
+      "expandAll": "展開全部",
+      "collapse": "收起",
       "modeLabel": "展示方式",
       "modeFinalGrouped": "按韻母",
       "modeSyllable": "按音節",

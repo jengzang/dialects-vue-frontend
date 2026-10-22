@@ -114,7 +114,7 @@ const copyCitation = () => {
 
 $primary-blue: var(--color-primary);
 $primary-blue-dark: var(--color-primary-hover);
-$purple: var(--color-purple);
+$purple: var(--color-secondary);
 $warning-yellow: var(--color-warning);
 
 $text-primary: var(--text-primary);

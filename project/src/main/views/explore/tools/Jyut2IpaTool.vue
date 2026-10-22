@@ -10,7 +10,7 @@
         <div
           class="upload-zone"
           :class="{ 'drag-over': isDragOver }"
-          @click="!pendingPreviewFile && $refs.fileInput.click()"
+          @click="!pendingPreviewFile && chooseJyutFile()"
           @dragover.prevent="isDragOver = true"
           @dragleave.prevent="isDragOver = false"
           @drop.prevent="handleDrop"
@@ -19,6 +19,7 @@
             type="file"
             ref="fileInput"
             accept=".xlsx,.xls"
+            @click.stop
             @change="handleFileSelect"
             style="display: none"
           />
@@ -328,6 +329,7 @@ import {
   uploadJyutFile,
 } from '@/api'
 import { showConfirm, showError, showSuccess } from '@/utils/ui/message.js'
+import { getPlatformFileService } from '@/platform/index.js'
 
 const { t } = useI18n()
 const { requireAuth } = useAuthGuard()
@@ -580,14 +582,9 @@ const saveConfig = () => {
   }
 }
 
-const exportConfig = () => {
+const exportConfig = async () => {
   const blob = new Blob([JSON.stringify(rules.value, null, 2)], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = JYUT2IPA_CONFIG_FILE_NAME
-  a.click()
-  URL.revokeObjectURL(url)
+  await getPlatformFileService().saveBlob(blob, JYUT2IPA_CONFIG_FILE_NAME)
 }
 
 const importConfig = () => {
@@ -618,6 +615,17 @@ const handleFileSelect = (event) => {
   const file = event.target.files[0]
   if (file) {
     fileImportFlow.loadPreview(file)
+  }
+}
+
+const chooseJyutFile = async () => {
+  const files = await getPlatformFileService().pickFilesOrOpenInput(fileInput.value, {
+    accept: '.xlsx,.xls',
+    multiple: false,
+  })
+
+  if (files?.[0]) {
+    await fileImportFlow.loadPreview(files[0])
   }
 }
 
@@ -776,14 +784,7 @@ const downloadResult = async () => {
 
     const blob = await downloadJyut2IpaResult(taskId.value)
 
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${JYUT2IPA_RESULT_FILE_PREFIX}${fileName.value}`
-    document.body.appendChild(a)
-    a.click()
-    window.URL.revokeObjectURL(url)
-    document.body.removeChild(a)
+    await getPlatformFileService().saveBlob(blob, `${JYUT2IPA_RESULT_FILE_PREFIX}${fileName.value}`)
   } catch (error) {
     showError(t('tools.jyut2ipa.messages.downloadFailed', { message: error.message }))
   }

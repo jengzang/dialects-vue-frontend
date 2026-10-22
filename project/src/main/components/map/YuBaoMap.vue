@@ -986,6 +986,7 @@ watch(() => props.activeTab, () => {
   font-weight: 600;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
+  :root[data-color-theme='green'] &,
   :root[data-color-theme='dark'] & {
     color: var(--text-primary);
     background: var(--surface-panel-strong);
@@ -1208,7 +1209,7 @@ watch(() => props.activeTab, () => {
 
 /* 分区行特殊样式 */
 .category-row .value {
-  color: var(--color-purple-light);
+  color: var(--color-secondary-text);
   font-weight: 600;
   font-size: 14px;
 }

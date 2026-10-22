@@ -1,10 +1,11 @@
 // Shared bar styles: overflow tabs, scroll arrows, tab tooltip
+@use '../../styles/global/scrollbars' as scrollbars;
 
 @mixin bar-has-overflow-tabs {
   justify-content: flex-start;
   overflow-x: scroll;
-  scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; width: 0; height: 0; }
+  @include scrollbars.hidden-scrollbar;
+  @include scrollbars.hidden-scrollbar-webkit;
 }
 
 @mixin bar-overflow-tabs {

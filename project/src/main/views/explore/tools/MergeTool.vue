@@ -1,6 +1,6 @@
 <template>
   <div class="merge-tool-container">
-    <div class="glass-container glass-shell" style="max-height: 80dvh;overflow: auto;">
+    <div class="glass-container glass-shell">
       <div class="header-section">
         <h1 class="title"><BarIcon icon="🔗" />{{ t('navigation.pageTitles.tools.merge') }}</h1>
         <p class="subtitle">{{ t('tools.merge.page.subtitle') }}</p>
@@ -39,7 +39,7 @@
           <div
             class="upload-zone"
             :class="{ 'has-file': referenceFile }"
-            @click="!referenceFile && $refs.refInput.click()"
+            @click="!referenceFile && chooseReferenceFile()"
             @dragover.prevent="dragOver1 = true"
             @dragleave.prevent="dragOver1 = false"
             @drop.prevent="handleRefDrop"
@@ -48,6 +48,7 @@
               ref="refInput"
               type="file"
               accept=".xlsx,.xls,.csv"
+              @click.stop
               @change="handleRefSelect"
               style="display: none"
             />
@@ -149,7 +150,7 @@
 
           <div
             class="upload-zone multiple"
-            @click="$refs.filesInput.click()"
+            @click="chooseMergeFiles()"
             @dragover.prevent="dragOver2 = true"
             @dragleave.prevent="dragOver2 = false"
             @drop.prevent="handleFilesDrop"
@@ -159,6 +160,7 @@
               type="file"
               accept=".xlsx,.xls"
               multiple
+              @click.stop
               @change="handleFilesSelect"
               style="display: none"
             />
@@ -348,6 +350,7 @@ import { useTabularImportPreview } from '@/composables/import/useTabularImportPr
 import { transformTabularFile } from '@/utils/import/transformTabularFile.js'
 import defaultReferenceWorkbookUrl from '/data/sample/参考表.xlsx?url'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import { getPlatformFileService } from '@/platform/index.js'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -629,6 +632,17 @@ const handleRefDrop = (event) => {
   }
 }
 
+const chooseReferenceFile = async () => {
+  const files = await getPlatformFileService().pickFilesOrOpenInput(refInput.value, {
+    accept: '.xlsx,.xls,.csv',
+    multiple: false,
+  })
+
+  if (files?.[0]) {
+    await referenceImportFlow.loadPreview(files[0])
+  }
+}
+
 const resetMergeStats = () => {
   mergeStats.total = 0
   mergeStats.processed = 0
@@ -709,6 +723,17 @@ const handleFilesDrop = (event) => {
   dragOver2.value = false
   const files = Array.from(event.dataTransfer.files)
   addFiles(files)
+}
+
+const chooseMergeFiles = async () => {
+  const files = await getPlatformFileService().pickFilesOrOpenInput(filesInput.value, {
+    accept: '.xlsx,.xls',
+    multiple: true,
+  })
+
+  if (files?.length) {
+    await addFiles(files)
+  }
 }
 
 const addFiles = async (files) => {
@@ -935,14 +960,7 @@ const downloadMerged = async () => {
 
     const blob = await downloadMerge(taskId.value)
 
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = MERGE_RESULT_FILE_NAME
-    document.body.appendChild(a)
-    a.click()
-    window.URL.revokeObjectURL(url)
-    document.body.removeChild(a)
+    await getPlatformFileService().saveBlob(blob, MERGE_RESULT_FILE_NAME)
   } catch (error) {
     showError(t('tools.merge.messages.downloadFailed', { message: error.message }))
   }
@@ -1052,13 +1070,9 @@ $color-danger: var(--color-error-light);
 
   &.active {
     .step-number {
-      background: linear-gradient(
-        135deg,
-        rgba(var(--color-primary-rgb), 0.8),
-        rgba(var(--color-primary-rgb), 0.6)
-      );
+      background: var(--action-primary-bg);
       border-color: rgba(var(--color-primary-rgb), 0.6);
-      color: white;
+      color: var(--action-primary-text);
       box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.3);
     }
 

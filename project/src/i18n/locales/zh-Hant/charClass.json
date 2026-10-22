@@ -23,6 +23,8 @@
     "noMoreLevels": "目前可用欄位已全部加入分層。"
   },
   "actions": {
+    "query": "查詢",
+    "querying": "查詢中…",
     "retry": "重試",
     "addLevel": "新增一層",
     "removeLevel": "刪除本層",

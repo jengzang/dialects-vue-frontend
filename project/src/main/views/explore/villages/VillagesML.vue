@@ -13,14 +13,15 @@ const Dashboard = defineAsyncComponent(() => import('@/VillagesML/dashboard/Dash
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 .villages-ml-page {
   @include flex-col;
-  height: 92dvh;
+  min-height: 92dvh;
   width: 98dvw;
   max-width: 1600px;
   margin: 0 auto;
   padding: 10px 20px;
   box-sizing: border-box;
-  overflow: auto;
 }
 </style>

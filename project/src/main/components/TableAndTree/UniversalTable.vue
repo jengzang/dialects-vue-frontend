@@ -583,6 +583,12 @@ const canUseTableActions = computed(() => {
 const tableData = ref([]);
 const total = ref(0);
 const currentPage = ref(1);
+const PAGE_FETCH_DEBOUNCE_MS = 800;
+const SORT_FETCH_DEBOUNCE_MS = 300;
+let tableFetchTimeout = null;
+let scheduledFetchSource = null;
+let searchNeedsPageReset = false;
+let fetchRequestVersion = 0;
 const searchText = ref('');
 const sortCol = ref(null);
 const sortDesc = ref(false);
@@ -644,6 +650,9 @@ const canPreview = computed(() => {
 // 篩選相關狀態
 const activeFilterCol = ref(null); // 當前激活的篩選列 Key
 const distinctValues = reactive({}); // 緩存各列的篩選選項
+const distinctQueryCache = new Map();
+let distinctCacheVersion = 0;
+let distinctRequestVersion = 0;
 const filterState = reactive({});    // 存儲選中的篩選值
 const popupPos = reactive({ top: 0, left: 0 }); // 彈窗座標
 const isLoading = ref(false);
@@ -656,6 +665,26 @@ const totalRatio = computed(() => {
 const totalPages = computed(() => {
   return Math.ceil(total.value / TABLE_CONFIG.PAGE_SIZE) || 1;
 });
+
+const clearPendingTableFetch = () => {
+  if (tableFetchTimeout !== null) {
+    clearTimeout(tableFetchTimeout);
+    tableFetchTimeout = null;
+  }
+  scheduledFetchSource = null;
+};
+
+const scheduleTableFetch = (delay, source) => {
+  clearPendingTableFetch();
+  fetchRequestVersion += 1;
+  if (source !== 'search') isLoading.value = true;
+  scheduledFetchSource = source;
+  tableFetchTimeout = setTimeout(() => {
+    tableFetchTimeout = null;
+    scheduledFetchSource = null;
+    fetchData();
+  }, delay);
+};
 
 // 初始化篩選狀態
 props.columns.forEach(col => {
@@ -695,6 +724,12 @@ watch(() => props.defaultFilter, (next) => {
 
 // 獲取數據
 const fetchData = async () => {
+  if (searchNeedsPageReset) {
+    currentPage.value = 1;
+    searchNeedsPageReset = false;
+  }
+  clearPendingTableFetch();
+  const requestVersion = ++fetchRequestVersion;
   isLoading.value = true; // 開啟 loading
   const searchCols = props.columns.map(c => c.key);
   const filters = { ...filterState }
@@ -719,6 +754,8 @@ const fetchData = async () => {
 
   try {
     const response = await tableApi.value.query(payload);
+
+    if (requestVersion !== fetchRequestVersion) return;
 
     tableData.value = response.data;
     total.value = response.total;
@@ -775,9 +812,13 @@ const fetchData = async () => {
       }
     }
   } catch (e) {
-    console.error("Data Load Error:", e);
+    if (requestVersion === fetchRequestVersion) {
+      console.error("Data Load Error:", e);
+    }
   }finally {
-    isLoading.value = false; // 請求結束（無論成功失敗）都關閉
+    if (requestVersion === fetchRequestVersion) {
+      isLoading.value = false; // 請求結束（無論成功失敗）都關閉
+    }
   }
 };
 
@@ -838,9 +879,13 @@ const getRowPrimaryKey = (row) => {
 
 // 排序切換
 const toggleSort = (key, desc) => {
+  if (searchNeedsPageReset) {
+    currentPage.value = 1;
+    searchNeedsPageReset = false;
+  }
   sortCol.value = key;
   sortDesc.value = desc;
-  fetchData();
+  scheduleTableFetch(SORT_FETCH_DEBOUNCE_MS, 'sort');
 };
 
 // 計算當前篩選彈窗的標題
@@ -850,6 +895,13 @@ const currentFilterLabel = computed(() => {
 });
 
 const popupLoading = ref(false);
+const invalidateDistinctCache = () => {
+  distinctCacheVersion += 1;
+  distinctRequestVersion += 1;
+  distinctQueryCache.clear();
+  popupLoading.value = false;
+};
+
 // 計算彈窗樣式 (PC端定位)
 const popupStyle = computed(() => {
   // 移動端樣式由 CSS class 控制 (fixed center)，這裡返回空
@@ -921,6 +973,25 @@ const openFilter = async (key, event) => {
     search_text: searchText.value || "",
     search_columns: searchCols
   };
+  const cacheKey = JSON.stringify([
+    props.apiAdapter || 'normal',
+    payload.db_key,
+    payload.table_name,
+    payload.target_column,
+    Object.entries(contextFilters).sort(([left], [right]) => left.localeCompare(right)),
+    payload.search_text,
+    payload.search_columns
+  ]);
+  const requestVersion = ++distinctRequestVersion;
+  const cacheVersion = distinctCacheVersion;
+  const cachedQuery = distinctQueryCache.get(cacheKey);
+
+  if (Array.isArray(cachedQuery)) {
+    distinctValues[key] = cachedQuery;
+    popupLoading.value = false;
+    return;
+  }
+
   // -------------------------------------------------
 
   // 5. 發送請求
@@ -928,12 +999,36 @@ const openFilter = async (key, event) => {
   distinctValues[key] = []; // 先清空
 
   try {
-    const res = await tableApi.value.distinct(payload);
-    distinctValues[key] = res.values;
+    let values;
+    if (cachedQuery) {
+      values = await cachedQuery;
+    } else {
+      const request = tableApi.value.distinct(payload).then(res => {
+        if (cacheVersion === distinctCacheVersion) {
+          distinctQueryCache.set(cacheKey, res.values);
+        }
+        return res.values;
+      }).catch(error => {
+        if (cacheVersion === distinctCacheVersion) {
+          distinctQueryCache.delete(cacheKey);
+        }
+        throw error;
+      });
+      distinctQueryCache.set(cacheKey, request);
+      values = await request;
+    }
+
+    if (cacheVersion === distinctCacheVersion && requestVersion === distinctRequestVersion) {
+      distinctValues[key] = values;
+    }
   } catch (e) {
-    console.error("Filter Load Error:", e);
+    if (requestVersion === distinctRequestVersion) {
+      console.error("Filter Load Error:", e);
+    }
   } finally {
-    popupLoading.value = false;
+    if (requestVersion === distinctRequestVersion) {
+      popupLoading.value = false;
+    }
   }
 };
 
@@ -951,16 +1046,15 @@ const closeFilter = () => {
 };
 
 // 搜索
-let timeout = null;
 const isSearchComposing = ref(false);
 
 const handleSearchCompositionStart = () => {
   isSearchComposing.value = true;
 
   // 输入法组合期间，取消已有的搜索定时器
-  if (timeout) {
-    clearTimeout(timeout);
-    timeout = null;
+  if (scheduledFetchSource === 'search') {
+    clearPendingTableFetch();
+    isLoading.value = false;
   }
 };
 
@@ -977,12 +1071,8 @@ const handleSearch = (event) => {
     return;
   }
 
-  if (timeout) clearTimeout(timeout);
-
-  timeout = setTimeout(() => {
-    currentPage.value = 1;
-    fetchData();
-  }, TABLE_CONFIG.SEARCH_DEBOUNCE);
+  searchNeedsPageReset = true;
+  scheduleTableFetch(TABLE_CONFIG.SEARCH_DEBOUNCE, 'search');
 };
 // --- 新增逻辑：全选/反选 ---
 
@@ -1021,8 +1111,16 @@ const exportToExcel = () => {
 
 // 翻頁
 const changePage = (delta) => {
-  currentPage.value += delta;
-  fetchData();
+  const shouldFetchPendingSearch = searchNeedsPageReset;
+  if (searchNeedsPageReset) {
+    currentPage.value = 1;
+    searchNeedsPageReset = false;
+  }
+  const targetPage = Math.min(Math.max(currentPage.value + delta, 1), totalPages.value);
+  if (targetPage === currentPage.value && !shouldFetchPendingSearch) return;
+
+  currentPage.value = targetPage;
+  scheduleTableFetch(PAGE_FETCH_DEBOUNCE_MS, 'page');
 };
 
 // 页码输入相关函数
@@ -1058,8 +1156,9 @@ const confirmPageJump = () => {
   }
 
   // 跳转到目标页
+  searchNeedsPageReset = false;
   currentPage.value = targetPage;
-  fetchData();
+  scheduleTableFetch(PAGE_FETCH_DEBOUNCE_MS, 'page');
 };
 
 // 切換全屏模式
@@ -1186,6 +1285,7 @@ const submitBatchEdit = async () => {
     const response = await tableApi.value.batchMutate(payload);
 
     if (response.status === 'completed') {
+      invalidateDistinctCache();
       showSuccess(t('tableTree.universalTable.messages.batchUpdateSuccess', { count: response.success_count }));
 
       if (response.error_count > 0) {
@@ -1235,6 +1335,7 @@ const handleDelete = async (row) => {
 
     await tableApi.value.mutateSingle(payload);
 
+    invalidateDistinctCache();
     showSuccess(t('tableTree.universalTable.messages.deleteSuccess'));
     await fetchData();
   } catch (error) {
@@ -1287,6 +1388,7 @@ const submitNewRecord = async () => {
 
     await tableApi.value.mutateSingle(payload);
 
+    invalidateDistinctCache();
     showSuccess(t('tableTree.universalTable.messages.addSuccess'));
     closeAddModal();
     await fetchData();
@@ -1549,6 +1651,7 @@ const executeAllPagesReplace = async () => {
     const response = await tableApi.value.batchReplaceExecute(payload)
 
     if (response.status === 'success') {
+      invalidateDistinctCache();
       showSuccess(t('tableTree.universalTable.messages.allPagesReplaceDone', { count: response.affected_rows }))
 
       // 刷新当前页数据
@@ -1582,6 +1685,8 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  clearPendingTableFetch();
+  fetchRequestVersion += 1;
   // 組件銷毀時移除監聽，防止內存洩漏
   document.removeEventListener('click', handleGlobalClick);
   // 恢復背景滾動
@@ -2013,7 +2118,7 @@ td {
   border-radius: var(--radius-sm);
 
   &.confirm {
-    color: white;
+    color: var(--action-primary-text);
     background: var(--color-gradient);
   }
 
@@ -2027,11 +2132,11 @@ td {
 }
 
 .toggle-select {
-  color: var(--color-accent-purple);
+  color: var(--color-secondary-text);
   font-weight: bold;
 
   &:hover {
-    background: var(--color-accent-purple-light);
+    background: var(--color-secondary-bg);
   }
 }
 
@@ -2110,7 +2215,7 @@ td {
   transition: $transition-fast;
 
   &:hover {
-    color: white;
+    color: var(--action-primary-text);
     background: var(--color-primary);
   }
 
@@ -2499,7 +2604,7 @@ td {
 
 .column-checkbox-item input:checked + .custom-checkbox::after {
   content: '✓';
-  color: white;
+  color: var(--action-primary-text);
   font-size: 14px;
   font-weight: bold;
   line-height: 1;

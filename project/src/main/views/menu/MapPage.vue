@@ -1,17 +1,11 @@
 <template>
-  <TabsContainer
+  <TabSwitcher
+    pin-navigation
     :tabs="tabs"
     :model-value="currentTab"
     :route-value="currentTab"
     :resolve-route="resolveTabRoute"
   >
-    <!-- <template #header>
-      <h1 class="page-title">
-        <BarIcon :icon="activePageIcon" />
-        {{ activePageTitle }}
-      </h1>
-    </template> -->
-
     <!-- Tab 右侧额外内容 -->
     <template #tab-extra>
       <!-- 比较模式：显示比较对象 -->
@@ -66,8 +60,13 @@
     <template #default="{ currentTab: activeTab }">
       <div
         class="tab-content"
+        :class="{ 'tab-content--divide': activeTab === 'divide' }"
         style="justify-items: center; position: relative;"
       >
+        <h1 v-if="activeTab === 'divide'" class="page-title">
+          <BarIcon :icon="activePageIcon" />
+          {{ activePageTitle }}
+        </h1>
         <!-- 使用 v-show 代替 v-if，保持组件状态 -->
         <MapLibre
           v-show="activeTab === 'map'"
@@ -92,7 +91,7 @@
         />
       </div>
     </template>
-  </TabsContainer>
+  </TabSwitcher>
 </template>
 
 <script setup>
@@ -104,7 +103,7 @@ import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { mapStore } from '@/main/store/store.js'
 
 import BarIcon from '@/components/common/BarIcon.vue'
-import TabsContainer from '@/components/common/TabsContainer.vue'
+import TabSwitcher from '@/components/common/TabSwitcher.vue'
 import DivideTab from "@/main/components/map/Tabs/DivideTab.vue";
 import CustomTab from '@/main/components/map/Tabs/CustomTab.vue'
 import MapLibre from "@/main/components/map/MapLibre.vue";
@@ -336,6 +335,27 @@ $transition-base: 0.3s;
   padding: 1rem 0;
   text-align: center;
   animation: fade 0.6s ease;
+}
+
+.tab-content--divide {
+  flex: 1;
+  justify-content: center;
+}
+
+.tab-content--divide .page-title {
+  margin-bottom: 1.5dvh;
+}
+
+@media (max-aspect-ratio: 1/1) {
+  .tab-content--divide {
+    padding-bottom: calc(1rem + 8dvh);
+  }
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .tab-content--divide {
+    padding-bottom: calc(1rem + 4dvh);
+  }
 }
 
 /* 地图上方的特征控制区 */

@@ -91,6 +91,8 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+@use '@/styles/global/mixins' as *;
+
 $trigger-radius: 999px;
 $trigger-z-index: 1200;
 
@@ -248,7 +250,7 @@ $shadow-hover:
     padding: 6px 14px;
     border-radius: var(--radius-full);
     background: var(--color-primary);
-    color: #fff;
+    color: var(--action-primary-text);
     font-size: 0.78rem;
     font-weight: 600;
     pointer-events: none;
@@ -310,7 +312,7 @@ $shadow-hover:
     padding: 6px 14px;
     border-radius: var(--radius-full);
     background: var(--color-primary);
-    color: #fff;
+    color: var(--action-primary-text);
     font-size: 0.78rem;
     font-weight: 600;
     pointer-events: none;
@@ -351,6 +353,10 @@ $shadow-hover:
       max-width: 7em;
       font-size: 0.8rem;
       line-height: 1.1;
+    }
+
+    &__finger-hint {
+      display: none;
     }
   }
 

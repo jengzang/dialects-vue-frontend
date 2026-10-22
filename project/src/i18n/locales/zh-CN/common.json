@@ -1,4 +1,8 @@
 {
+  "recentQueries": {
+    "label": "最近查询",
+    "restore": "填入最近查询：{summary}"
+  },
   "button": {
     "confirm": "确定",
     "cancel": "取消",

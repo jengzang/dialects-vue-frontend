@@ -787,7 +787,7 @@ const resetView = () => {
 .action-btn {
   flex: 1;
   background: var(--vml-blue);
-  color: white;
+  color: var(--action-primary-text);
   border: none;
   padding: 8px;
   border-radius: 8px;

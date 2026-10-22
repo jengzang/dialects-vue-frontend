@@ -23,6 +23,8 @@
     "noMoreLevels": "当前可用字段已全部加入分层。"
   },
   "actions": {
+    "query": "查询",
+    "querying": "查询中…",
     "retry": "重试",
     "addLevel": "新增一层",
     "removeLevel": "删除本层",

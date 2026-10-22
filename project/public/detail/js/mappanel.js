@@ -238,7 +238,8 @@ document.addEventListener('DOMContentLoaded', function () {
 //初次绘图
 async function create_map1(create_mep = false){
     const locations = document.getElementById('locations').value.trim().split(/\s+/);  // 获取地點，并拆分成数组
-    const regions = document.getElementById('regions').value.trim().split(/\s+/);  // 获取分區，并拆分成数组
+    const regions = await readRegionPaths();
+    if (regions === null) return;
     // console.log('locations', locations);
     // let textall = []
     // if (textall.length > 0) {
@@ -751,7 +752,8 @@ async function triggerDrawingFunction() {
 //繪製總的點圖函數
 async function create_dot_all() {
     const locations = document.getElementById('locations').value.trim().split(/\s+/);  // 获取地點，并拆分成数组
-    const regions = document.getElementById('regions').value.trim().split(/\s+/);  // 获取分區，并拆分成数组
+    const regions = await readRegionPaths();
+    if (regions === null) return;
     let maxLevel = 0;  // 存储最大 level
 
     if (isEmptyInput(locations) && isEmptyInput(regions)) {
@@ -766,25 +768,7 @@ async function create_dot_all() {
     }
     // 如果用户没有选择 maxLevel，则通过 regions 进行计算
     if (!userSelectedLevel) {
-        // 获取最大 level
-        for (const region of regions) {
-            try {
-                const response = await fetch(`${window.API_BASE}/partitions?parent=${encodeURIComponent(region)}`);
-                const data = await response.json();
-
-                const regionData = data[region];
-                const level = regionData ? regionData.level : 3;  // 如果有partitions，返回它的 level，否則返回 0
-
-                maxLevel = Math.max(maxLevel, level);  // 更新最大 level
-            } catch (error) {
-                console.error(`❌ 获取分区 ${region} 失败:`, error);
-                maxLevel = Math.max(maxLevel, 3);
-            }
-        }
-
-        if (maxLevel === 0) {
-            maxLevel = 3;
-        }
+        maxLevel = regions.length ? Math.min(3, Math.max(...regions.map(path => path.split('-').length))) : 3;
     }
 
     // 定义颜色数组（20种颜色）

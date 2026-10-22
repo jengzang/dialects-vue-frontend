@@ -1,4 +1,5 @@
 import { stripLocaleFromPath } from '@/i18n/localeRouting.js'
+import { isPlatformTutorialEnabled } from '@/platform/index.js'
 
 function readQueryValue(query, key) {
   const rawValue = query?.[key]
@@ -17,6 +18,10 @@ function createPathEntry({ key, categoryKey, groupKey, order, path, docKey }) {
     order,
     match: (currentRoute) => stripLocaleFromPath(currentRoute.path) === stripLocaleFromPath(path),
   }
+}
+
+function createPlatformPathEntry({ enabled, ...entry }) {
+  return enabled ? createPathEntry(entry) : null
 }
 
 function createQueryEntry({ key, categoryKey, groupKey, order, path, queryResolver, expectedValue, docKey }) {
@@ -265,7 +270,8 @@ export const tutorialManifest = [
     order: 46,
     path: '/explore/tools/merge',
   }),
-  createPathEntry({
+  createPlatformPathEntry({
+    enabled: isPlatformTutorialEnabled('menu-map-draw'),
     key: 'menu-map-draw',
     categoryKey: 'practicalTools',
     groupKey: 'menuMapDraw',
@@ -345,4 +351,4 @@ export const tutorialManifest = [
     order: 64,
     path: '/auth/regions',
   }),
-]
+].filter(Boolean)

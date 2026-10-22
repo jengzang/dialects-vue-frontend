@@ -1,6 +1,6 @@
 <template>
   <div class="region-select">
-    <!-- ✅ 選框（點擊打開三級分區） -->
+    <!-- ✅ 選框（點擊打開分區樹） -->
     <div
         ref="anchorEl"
         class="region-select-box"
@@ -19,7 +19,7 @@
             class="region-tag"
             :title="s"
         >
-          {{ s }}
+          {{ regionLabel(s) }}
           <button class="tag-remove" type="button" @click.stop="removeCommitted(s)">×</button>
         </span>
         <span
@@ -40,7 +40,7 @@
       <div class="region-caret">⌵</div>
     </div>
 
-    <!-- ✅ 彈出三級分區（全局玻璃） -->
+    <!-- ✅ 彈出分區樹（全局玻璃） -->
     <Teleport to="body">
       <div v-if="popupOpen" class="partition-overlay">
         <!-- ✅ 頂部確認欄：顯示已選 + 可刪除 + 確認 -->
@@ -78,7 +78,7 @@
                   class="topbar-tag"
                   :title="s"
               >
-                {{ s }}
+                {{ regionLabel(s) }}
                 <button class="tag-remove" type="button" @click="removeDraft(s)">×</button>
               </span>
 
@@ -98,7 +98,7 @@
             </div>
 
             <!-- Right: Custom Region Button -->
-            <div class="topbar-right-actions">
+            <div v-if="allowCustomRegions" class="topbar-right-actions">
               <button
                   ref="customRegionButtonRef"
                   class="custom-region-btn"
@@ -126,104 +126,44 @@
           </div>
         </div>
 
-        <!-- ✅ Stage：lvl1 仍放在文档流；lvl2/lvl3 以 fixed 浮層跟随 -->
-        <div class="partition-stage">
-          <!-- 自定義分區觸發按鈕 -->
-          <div class="custom-region-trigger" @click.stop="openCustomRegionPopup">
+        <!-- 分區列橫向滾動；確認欄保持固定，各列獨立縱向滾動。 -->
+        <div ref="stageEl" class="partition-stage ui-scrollbar" @mousedown.stop>
+          <div v-if="allowCustomRegions" class="custom-region-trigger" @click.stop="openCustomRegionPopup">
             <div class="custom-region-icon"><InlineIcon icon="🗂️" /></div>
             <div class="custom-region-label">{{ $t('query.components.regionSelector.myCustomRegions') }}</div>
             <div class="custom-region-arrow">→</div>
           </div>
-
-          <!-- lvl1 -->
-          <div ref="lvl1El" class="partition-popup partition-lvl1 ui-scrollbar" @mousedown.stop>
-            <div
-                v-for="item in lvl1"
-                :key="'l1_' + item.label"
-                class="partition-line"
-                :class="{ active: activeL1 === item.label }"
-                @mouseenter="onHoverL1(item, $event)"
-            >
-              <!-- ✅ 點擊=選擇（lvl1 也允許） -->
-              <div
-                  class="partition-item"
-                  :class="{ chosen: draftSelected.includes(item.label) }"
-                  @click="toggleLeaf(item.label)"
-                  :title="item.label"
-              >
-                {{ item.label }}
-              </div>
-
-              <!-- ✅ 箭頭只負責展開，不再影響選擇 -->
-              <div
-                  v-if="item.hasChildren"
-                  class="partition-arrow"
-                  @click.stop="expand(item, 1, $event)"
-                  :title="$t('query.components.regionSelector.expandChildren')"
-              >
-                ⌵
-              </div>
-            </div>
+          <div v-if="loading || error || treeLoading || treeError" class="partition-tree-state">
+            {{ error || treeError || $t('common.label.loading') }}
           </div>
-
-          <!-- lvl2：fixed，跟随 lvl1 hover 行 -->
           <div
-              ref="lvl2El"
-              v-if="lvl2.length"
-              class="partition-popup partition-lvl2 ui-scrollbar"
-              :style="lvl2Pos"
-              @mousedown.stop
+              v-for="(column, index) in columns"
+              :key="JSON.stringify([mode, index])"
+              class="partition-popup ui-scrollbar"
+              :class="{ 'partition-root': index === 0 }"
+              :style="{ marginTop: `${column.offset}px`, '--column-offset': `${column.offset}px` }"
           >
             <div
-                v-for="item in lvl2"
-                :key="'l2_' + item.label"
+                v-for="item in column.nodes"
+                :key="JSON.stringify([mode, item.path])"
                 class="partition-line"
-                :class="{ active: activeL2 === item.label }"
-                @mouseenter="onHoverL2(item, $event)"
+                :class="{ active: activePaths[index] === item.path }"
+                @mouseenter="hoverNode(item, index, $event)"
             >
-              <!-- ✅ 點擊=選擇（lvl2 也允許） -->
               <div
                   class="partition-item"
-                  :class="{ chosen: draftSelected.includes(item.label) }"
-                  @click="toggleLeaf(item.label)"
-                  :title="item.label"
+                  :class="{ chosen: draftSelected.includes(item.path) }"
+                  @click="toggleLeaf(item.path)"
+                  :title="item.path"
               >
                 {{ item.label }}
               </div>
-
               <div
-                  v-if="item.hasChildren"
+                  v-if="item.children.length"
                   class="partition-arrow"
-                  @click.stop="expand(item, 2, $event)"
+                  @click.stop="hoverNode(item, index, $event, true)"
                   :title="$t('query.components.regionSelector.expandChildren')"
-              >
-                ⌵
-              </div>
-            </div>
-          </div>
-
-          <!-- lvl3：fixed，跟随 lvl2 hover 行 -->
-          <div
-              ref="lvl3El"
-              v-if="lvl3.length"
-              class="partition-popup partition-lvl3 ui-scrollbar"
-              :style="lvl3Pos"
-              @mousedown.stop
-          >
-            <div
-                v-for="item in lvl3"
-                :key="'l3_' + item.label"
-                class="partition-line"
-            >
-              <!-- lvl3 點擊=選擇 -->
-              <div
-                  class="partition-item"
-                  :class="{ chosen: draftSelected.includes(item.label) }"
-                  @click="toggleLeaf(item.label)"
-                  :title="item.label"
-              >
-                {{ item.label }}
-              </div>
+              >⌵</div>
             </div>
           </div>
         </div>
@@ -233,6 +173,7 @@
 
     <!-- 自定義分區彈窗 -->
     <AppModal
+      v-if="allowCustomRegions"
       :model-value="showCustomRegionPopup"
       size="sm"
       :title="`🗂️ ${$t('query.components.regionSelector.customRegionModal.title')}`"
@@ -291,26 +232,29 @@ import { userStore } from '@/main/store/store.js'
 import { showError, showSuccess, showConfirm } from '@/utils/ui/message.js'
 import AppModal from '@/components/common/AppModal.vue'
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
-import {STATIC_REGION_TREE, top_yindian} from "@/main/config/RegionTree.js";
 import { usePartitionCache } from '@/composables/data/usePartitionCache.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t } = useI18n()
 
-// 全局已有（你原来 Cascader 就这么用的）
-const STATIC_TREE = STATIC_REGION_TREE ?? {}
-const TOP_YINDIAN = top_yindian ?? []
-const { getYindianTree } = usePartitionCache()
+const { getDefaultTree } = usePartitionCache()
 
 const props = defineProps({
   mode: { type: String, required: true },
   selected: { type: Array, default: () => [] },
   customRegions: { type: Array, default: () => [] },
+  nodes: { type: Array, default: null },
+  loading: { type: Boolean, default: false },
+  error: { type: String, default: '' },
+  allowCustomRegions: { type: Boolean, default: true },
+  maxSelected: { type: Number, default: Infinity },
+  maxPathLength: { type: Number, default: Infinity },
   placeholder: { type: String, default: '' }
 })
 
 const emit = defineEmits([
   'update:selected',
+  'openChange',
   'selectCustomRegion',
   'update:customRegions',
   'update:customRegionData'
@@ -340,50 +284,55 @@ const customRegionButtonRef = ref(null)  // Button element ref for dropdown posi
    UI state
    ========================= */
 const popupOpen = ref(false)
-const lvl1 = ref([])
-const lvl2 = ref([])
-const lvl3 = ref([])
-const activeL1 = ref('')
-const activeL2 = ref('')
-let hoverTimer = null
-
+const columns = ref([])
+const activePaths = ref([])
+const stageEl = ref(null)
 const anchorEl = ref(null)
+let hoverTimer = null
+let hoverSequence = 0
+let loadSequence = 0
 
-/* =========================
-   ✅ fixed 定位所需：lvl1 容器 ref + lvl2/lvl3 position
-   ========================= */
-const lvl1El = ref(null)
-const lvl2Pos = ref({ position: 'fixed', left: '0px', top: '0px' })
-const lvl3Pos = ref({ position: 'fixed', left: '0px', top: '0px' })
+function clearHover() {
+  clearTimeout(hoverTimer)
+  hoverSequence++
+}
 
 /* =========================
    selected
    ========================= */
 const selectedLeafs = computed(() => (Array.isArray(props.selected) ? props.selected : []))
-const externalCustomRegions = computed(() => (Array.isArray(props.customRegions) ? props.customRegions : []))
+const externalCustomRegions = computed(() => (props.allowCustomRegions && Array.isArray(props.customRegions) ? props.customRegions : []))
 const draftSelected = ref([])
 
-/* =========================
-   ✅ 你的原逻辑：加载整棵树（map/yindian）
-   ========================= */
-const loadedTree = ref({}) // 当前 mode 对应的 tree（对象结构）
+const loadedTree = ref([])
+const treeLoading = ref(false)
+const treeError = ref('')
+const topbarEl = ref(null)
 
-function filterTopLevelKeys(obj) {
-  if (typeof obj !== 'object' || Array.isArray(obj) || obj === null) {
-    console.warn('[Yindian Tree] invalid tree:', obj)
-    return {}
+const pathsByName = computed(() => {
+  const names = new Map()
+  const pending = [...loadedTree.value]
+  while (pending.length) {
+    const node = pending.pop()
+    if (!names.has(node.label)) names.set(node.label, [])
+    names.get(node.label).push(node.path)
+    pending.push(...node.children)
   }
-  const filtered = {}
-  for (const key of TOP_YINDIAN) {
-    if (Object.prototype.hasOwnProperty.call(obj, key)) {
-      filtered[key] = obj[key]
+  return names
+})
+
+function regionLabel(path) {
+  const parts = path.split('-')
+  const matches = pathsByName.value.get(parts.at(-1)) || []
+  if (!matches.includes(path)) return path
+  for (let count = 1; count <= parts.length; count++) {
+    const suffix = parts.slice(-count).join('-')
+    if (matches.filter(candidate => candidate === suffix || candidate.endsWith('-' + suffix)).length === 1) {
+      return parts.slice(-count).join('·')
     }
   }
-  return filtered
+  return parts.join('·')
 }
-const topbarEl = ref(null)
-const lvl2El = ref(null)
-const lvl3El = ref(null)
 
 function onDocMouseDown(e) {
   if (!popupOpen.value) return
@@ -396,11 +345,16 @@ function onDocMouseDown(e) {
     t.closest('.dropdown-panel') ||
     t.closest('.dropdown-overlay')
 
+  const stage = stageEl.value
+  const isInsideStagePanel = stage?.contains(t) &&
+      t.closest('.partition-popup, .custom-region-trigger, .partition-tree-state')
+  const isStageScrollbar = t === stage && stage.scrollWidth > stage.clientWidth &&
+      e.clientY >= stage.getBoundingClientRect().top + stage.clientTop + stage.clientHeight
+
   const allow =
       topbarEl.value?.contains(t) ||
-      lvl1El.value?.contains(t) ||
-      lvl2El.value?.contains(t) ||
-      lvl3El.value?.contains(t) ||
+      isInsideStagePanel ||
+      isStageScrollbar ||
       isInsideCustomDropdown
 
   if (!allow) {
@@ -410,28 +364,45 @@ function onDocMouseDown(e) {
 }
 
 async function loadTreeFor(mode) {
-  loadedTree.value = {};
-
-  if (mode === 'map') {
-    loadedTree.value = STATIC_TREE || {}
+  const sequence = ++loadSequence
+  loadedTree.value = []
+  columns.value = []
+  treeError.value = ''
+  if (props.nodes !== null) {
+    treeLoading.value = false
+    loadedTree.value = props.nodes
+    if (popupOpen.value) columns.value = [{ nodes: props.nodes, offset: 0 }]
     return
   }
-
-  if (mode === 'yindian') {
-    loadedTree.value = await getYindianTree(() => getPartitions(), {
-      transform: filterTopLevelKeys,
+  treeLoading.value = true
+  try {
+    const tree = await getDefaultTree(mode, () => getPartitions(mode), {
+      identity: JSON.stringify([userStore.role, userStore.id]),
     })
+    if (sequence !== loadSequence) return
+    loadedTree.value = tree.nodes
+    if (popupOpen.value) columns.value = [{ nodes: tree.nodes, offset: 0 }]
+  } catch (error) {
+    if (sequence === loadSequence) treeError.value = error.message
+  } finally {
+    if (sequence === loadSequence) treeLoading.value = false
   }
 }
 
 watch(
-    () => props.mode,
-    async (m) => {
+    () => [props.mode, userStore.role, userStore.id],
+    () => {
       closePopup()
-      await loadTreeFor(m)
+      loadTreeFor(props.mode)
     },
     { immediate: true }
 )
+
+watch(() => props.nodes, () => {
+  clearHover()
+  activePaths.value = []
+  loadTreeFor(props.mode)
+})
 
 watch(
     externalCustomRegions,
@@ -445,133 +416,35 @@ watch(
 )
 
 /* =========================
-   Tree helpers（从对象树取 children）
-   ========================= */
-function nodeHasChildren(node) {
-  if (!node) return false
-  if (Array.isArray(node)) return node.length > 0
-  if (typeof node === 'object') return Object.keys(node).length > 0
-  return false
-}
-
-function getChildrenFromTree(tree, parentLabel) {
-  if (!tree || typeof tree !== 'object') return []
-
-  function search(node) {
-    if (!node || typeof node !== 'object') return null
-    if (Array.isArray(node)) return null
-    for (const key of Object.keys(node)) {
-      if (key === parentLabel) return node[key]
-      const found = search(node[key])
-      if (found !== null) return found
-    }
-    return null
-  }
-
-  if (parentLabel === null) {
-    return Object.keys(tree).map(k => ({
-      label: k,
-      hasChildren: nodeHasChildren(tree[k])
-    }))
-  }
-
-  const childrenNode = search(tree)
-  if (!childrenNode) return []
-
-  if (Array.isArray(childrenNode)) {
-    return childrenNode.map(k => ({ label: k, hasChildren: false }))
-  }
-  if (typeof childrenNode === 'object') {
-    return Object.keys(childrenNode).map(k => ({
-      label: k,
-      hasChildren: nodeHasChildren(childrenNode[k])
-    }))
-  }
-  return []
-}
-
-function getChildren(parentLabel) {
-  return getChildrenFromTree(loadedTree.value, parentLabel)
-}
-
-/* =========================
-   ✅ 定位钳制：模仿你原生版用 lvl1 首尾 item 作为上下锚点
-   ========================= */
-function clampPopupTopByLvl1(popupTop, popupHeight = 240) {
-  const host = lvl1El.value
-  if (!host) return popupTop
-
-  const lines = host.querySelectorAll('.partition-line')
-  if (!lines.length) return popupTop
-
-  const firstRect = lines[0].getBoundingClientRect()
-  const lastRect = lines[lines.length - 1].getBoundingClientRect()
-
-  const anchorTop = firstRect.top
-  const anchorBottom = lastRect.bottom
-
-  if (popupTop + popupHeight > anchorBottom) popupTop = anchorBottom - popupHeight
-  if (popupTop < anchorTop) popupTop = anchorTop
-
-  popupTop = Math.max(popupTop, 0)
-  popupTop = Math.min(popupTop, window.innerHeight - popupHeight)
-  return popupTop
-}
-
-/* =========================
    Open/Close
    ========================= */
-async function openPopup() {
-  // ✅ 若 tree 还没加载完（或为空），先加载一次
-  if (!loadedTree.value || Object.keys(loadedTree.value).length === 0) {
-    await loadTreeFor(props.mode)
-  }
+function openPopup() {
+  clearHover()
   popupOpen.value = true
   draftSelected.value = selectedLeafs.value.slice()
-
-  lvl1.value = getChildren(null)
-  lvl2.value = []
-  lvl3.value = []
-  activeL1.value = ''
-  activeL2.value = ''
-
+  syncDraftCustomRegions()
+  columns.value = [{ nodes: loadedTree.value, offset: 0 }]
+  activePaths.value = []
   bindEsc()
   document.addEventListener('mousedown', onDocMouseDown, true)
+  if (treeError.value) loadTreeFor(props.mode)
+  if (props.allowCustomRegions && userStore.isAuthenticated && storedCustomRegions.value.length === 0) loadCustomRegions()
 }
 
+watch(popupOpen, open => emit('openChange', open), { flush: 'sync' })
+
 function closePopup() {
+  clearHover()
   popupOpen.value = false
-  lvl1.value = []
-  lvl2.value = []
-  lvl3.value = []
-  activeL1.value = ''
-  activeL2.value = ''
+  columns.value = []
+  activePaths.value = []
   unbindEsc()
   document.removeEventListener('mousedown', onDocMouseDown, true)
 }
 
 function togglePopup() {
-  if (popupOpen.value) {
-    closePopup()
-  } else {
-    popupOpen.value = true
-    draftSelected.value = selectedLeafs.value.slice()
-    syncDraftCustomRegions()  // Sync custom regions
-
-    lvl1.value = getChildren(null)
-    lvl2.value = []
-    lvl3.value = []
-    activeL1.value = ''
-    activeL2.value = ''
-
-    bindEsc()
-    document.addEventListener('mousedown', onDocMouseDown, true)
-
-    // Load custom regions if authenticated
-    if (userStore.isAuthenticated && storedCustomRegions.value.length === 0) {
-      loadCustomRegions()
-    }
-  }
+  if (popupOpen.value) closePopup()
+  else openPopup()
 }
 
 /* =========================
@@ -731,82 +604,26 @@ const syncDraftCustomRegions = () => {
 /* =========================
    Expand/Hover
    ========================= */
-function expand(item, level, e) {
-  if (!item?.hasChildren) return
-
-  // ✅ 用箭头所在的 .partition-line 作为展开基准
-  const lineEl = e?.currentTarget?.closest?.('.partition-line')
-  const fakeEvent = lineEl ? { currentTarget: lineEl } : null
-
-  // ✅ 关键：清掉两层 hover 定时器，并且让两层的旧 hover 全部失效
-  clearTimeout(hoverTimerL1)
-  clearTimeout(hoverTimerL2)
-  hoverSeqL1++
-  hoverSeqL2++
-
-  if (level === 1) onHoverL1(item, fakeEvent, true)
-  if (level === 2) onHoverL2(item, fakeEvent, true)
-}
-
-let hoverTimerL1 = null
-let hoverTimerL2 = null
-let hoverSeqL1 = 0
-let hoverSeqL2 = 0
-
-
-function onHoverL1(item, e, immediate = false) {
-  const seq = ++hoverSeqL1
-  clearTimeout(hoverTimerL1)
-
-  const rect = e?.currentTarget?.getBoundingClientRect?.()
-  const popupLeft = rect ? rect.right : null
-  const rawTop = rect ? rect.top : null
-
+function hoverNode(item, index, event, immediate = false) {
+  clearHover()
+  const sequence = hoverSequence
+  const line = event?.currentTarget?.closest?.('.partition-line')
+  const top = line?.getBoundingClientRect().top ?? 0
+  const stage = stageEl.value?.getBoundingClientRect()
+  const style = stageEl.value ? getComputedStyle(stageEl.value) : null
+  const paddingTop = parseFloat(style?.paddingTop) || 0
+  const paddingBottom = parseFloat(style?.paddingBottom) || 0
+  const availableHeight = (stageEl.value?.clientHeight || 0) - paddingTop - paddingBottom
+  const offset = stage ? Math.max(0, Math.min(top - stage.top - paddingTop, availableHeight - 240)) : 0
   const run = () => {
-    if (seq !== hoverSeqL1) return
-
-    activeL1.value = item.label
-    lvl2.value = getChildren(item.label)
-    lvl3.value = []
-    activeL2.value = ''
-
-    if (popupLeft != null && rawTop != null) {
-      const popupTop = clampPopupTopByLvl1(rawTop, 240)
-      lvl2Pos.value = { position: 'fixed', left: `${popupLeft}px`, top: `${popupTop}px` }
-    }
+    if (!popupOpen.value || sequence !== hoverSequence) return
+    activePaths.value = [...activePaths.value.slice(0, index), item.path]
+    columns.value = columns.value.slice(0, index + 1)
+    if (item.children.length) columns.value.push({ nodes: item.children, offset })
   }
-
-  if (immediate) return run()
-  hoverTimerL1 = setTimeout(run, 100)
+  if (immediate) run()
+  else hoverTimer = setTimeout(run, 100)
 }
-
-
-function onHoverL2(item, e, immediate = false) {
-  const seq = ++hoverSeqL2
-  clearTimeout(hoverTimerL2)
-
-  const rect = e?.currentTarget?.getBoundingClientRect?.()
-  const popupLeft = rect ? rect.right : null
-  const rawTop = rect ? rect.top : null
-
-  const run = () => {
-    if (seq !== hoverSeqL2) return
-
-    activeL2.value = item.label
-    lvl3.value = getChildren(item.label)
-
-    if (popupLeft != null && rawTop != null) {
-      // lvl3 贴近 hover 的 lvl2 行；仅当超出视口底部时上移
-      const popupTop = Math.max(0, Math.min(rawTop, window.innerHeight - 240))
-      lvl3Pos.value = { position: 'fixed', left: `${popupLeft}px`, top: `${popupTop}px` }
-    }
-  }
-
-  if (immediate) return run()
-  hoverTimerL2 = setTimeout(run, 100)
-}
-
-
 
 /* =========================
    Selection（叶子字符串数组）
@@ -815,7 +632,17 @@ function toggleLeaf(label) {
   const arr = draftSelected.value.slice()
   const idx = arr.indexOf(label)
   if (idx >= 0) arr.splice(idx, 1)
-  else arr.push(label)
+  else {
+    if (Array.from(label).length > props.maxPathLength) {
+      showError(t('query.components.regionSelector.messages.pathTooLong', { max: props.maxPathLength }))
+      return
+    }
+    if (arr.length >= props.maxSelected) {
+      showError(t('query.components.regionSelector.messages.selectionLimit', { max: props.maxSelected }))
+      return
+    }
+    arr.push(label)
+  }
   draftSelected.value = arr
 }
 
@@ -875,8 +702,9 @@ function unbindEsc() {
 }
 
 onBeforeUnmount(() => {
-  clearTimeout(hoverTimerL1)
-  clearTimeout(hoverTimerL2)
+  if (popupOpen.value) emit('openChange', false)
+  clearHover()
+  loadSequence++
   unbindEsc()
   document.removeEventListener('mousedown', onDocMouseDown, true)
 })
@@ -965,9 +793,9 @@ $portrait-ratio: 1;
   font-size: 13px;
 
   &.custom-region-tag {
-    background: rgba(var(--color-primary-rgb), 0.5);
+    background: var(--surface-selected);
     border-color: rgba(var(--color-success-rgb), 0.3);
-    color: var(--text-white);
+    color: var(--text-selected);
   }
 }
 
@@ -986,7 +814,8 @@ $portrait-ratio: 1;
   position: fixed;
   inset: 0;
   z-index: 20000;
-  overflow: auto;
+  @include flex-col;
+  overflow: hidden;
   background: rgba(0, 0, 0, 0.1);
 
   @include glass-blur(5px);
@@ -994,6 +823,7 @@ $portrait-ratio: 1;
 
 /* 顶部确认栏 */
 .partition-topbar {
+  flex-shrink: 0;
   position: sticky;
   top: 0;
   z-index: 20010;
@@ -1030,10 +860,12 @@ $portrait-ratio: 1;
 
 .topbar-tags {
   flex: 1;
+  max-height: 20vh;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   overflow-x: auto;
+  overflow-y: auto;
 }
 
 .topbar-empty {
@@ -1127,11 +959,11 @@ $portrait-ratio: 1;
 
 .topbar-btn {
   padding: 8px 12px;
-  background: rgba(var(--color-primary-rgb), 0.85);
+  background: var(--action-primary-bg);
   border: 1px solid rgba(var(--color-primary-rgb), 0.35);
   border-radius: var(--radius-md);
   box-shadow: 0 10px 26px rgba(var(--color-primary-rgb), 0.18);
-  color: var(--text-white);
+  color: var(--action-primary-text);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -1152,13 +984,26 @@ $portrait-ratio: 1;
 /* 分区级联区域 */
 .partition-stage {
   display: flex;
+  flex: 1;
+  min-height: 0;
+  align-items: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
   padding: 12px;
+}
+
+.partition-tree-state {
+  padding: 8px;
 }
 
 .partition-popup {
   z-index: 20020;
+  flex: 0 0 auto;
   min-width: 80px;
   max-width: 140px;
+  max-height: min(240px, calc(100% - var(--column-offset, 0px)));
+  overflow-y: auto;
+  box-sizing: border-box;
   @include flex-col;
   padding: 8px;
 
@@ -1167,11 +1012,8 @@ $portrait-ratio: 1;
   border-radius: var(--radius-md);
   user-select: none;
 
-  &.partition-lvl2,
-  &.partition-lvl3 {
-    position: fixed;
-    max-height: 240px;
-    overflow-y: auto;
+  &.partition-root {
+    max-height: 100%;
   }
 }
 
@@ -1198,17 +1040,15 @@ $portrait-ratio: 1;
   }
 }
 
-/* lvl3 末级无 active 状态，hover 直接复用前两级的激活色 */
-.partition-lvl3 .partition-line:hover {
+/* 末級 hover 復用激活色。 */
+.partition-line:not(:has(.partition-arrow)):hover {
   background: rgba(var(--color-primary-rgb), 0.25);
   box-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.28);
 }
 
 .partition-item {
   flex: 1 1 auto;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  @include text-truncate;
   font-size: 15px;
   cursor: pointer;
 
@@ -1270,7 +1110,7 @@ $portrait-ratio: 1;
   background: linear-gradient(135deg, $primary, $primary-dark);
   border: none;
   border-radius: var(--radius-sm2);
-  color: var(--text-white);
+  color: var(--action-primary-text);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;

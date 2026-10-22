@@ -2,6 +2,7 @@ import { kml as kmlToGeoJson } from '@tmcw/togeojson'
 import { DOMParser } from '@xmldom/xmldom'
 import { unzipSync, strFromU8 } from 'fflate'
 import { pickDrawColor } from '@/main/config/colors/mapColors.js'
+import { area, booleanIntersects, booleanPointInPolygon, booleanPointOnLine, booleanValid, kinks, lineString, polygon, unkinkPolygon } from '@turf/turf'
 
 const DEFAULT_FEATURE_PROPERTIES = {
   name: '',
@@ -27,6 +28,110 @@ const DRAW_STYLE_EXPORT_DEFAULT_KEYS = Object.keys(DEFAULT_FEATURE_PROPERTIES)
 const SUPPORTED_DRAW_GEOMETRY_TYPES = ['Point', 'LineString', 'Polygon']
 const CSV_LONGITUDE_KEYS = ['lng', 'lon', 'long', 'longitude', 'x', '经度']
 const CSV_LATITUDE_KEYS = ['lat', 'latitude', 'y', '纬度']
+
+const geometryCoordinatesEqual = (left, right) => Array.isArray(left) && Array.isArray(right)
+  && Number(left[0]) === Number(right[0]) && Number(left[1]) === Number(right[1])
+
+export function analyzeEditableGeometry(feature) {
+  const geometry = feature?.geometry
+  const featureId = String(feature?.id ?? feature?.properties?.id ?? '')
+  const issues = []
+  const add = (code, coordPaths = [], coordinate = null, level = 'error') => {
+    issues.push({ id: `${featureId}:${code}:${coordPaths.join(',')}`, code, featureId, coordPaths, coordinate, level })
+  }
+  if (!geometry?.type) {
+    add('empty-geometry')
+    return issues
+  }
+  const validCoordinate = (coordinate) => Array.isArray(coordinate) && coordinate.length >= 2
+    && coordinate.slice(0, 2).every((value) => typeof value === 'number' && Number.isFinite(value))
+    && Math.abs(coordinate[0]) <= 180 && Math.abs(coordinate[1]) <= 90
+  if (!['LineString', 'Polygon'].includes(geometry.type)) {
+    if (geometry.type === 'Point' && !validCoordinate(geometry.coordinates)) add('invalid-coordinate')
+    return issues
+  }
+  const paths = geometry.type === 'Polygon' ? geometry.coordinates : [geometry.coordinates]
+  if (!Array.isArray(paths) || paths.length === 0) {
+    add('empty-geometry')
+    return issues
+  }
+  paths.forEach((coordinates, ringIndex) => {
+    const coordPath = (index) => geometry.type === 'Polygon' ? `${ringIndex}.${index}` : String(index)
+    if (!Array.isArray(coordinates)) {
+      add('invalid-coordinate', [coordPath(0)])
+      return
+    }
+    const invalidIndexes = coordinates.flatMap((coordinate, index) => validCoordinate(coordinate) ? [] : [index])
+    if (invalidIndexes.length > 0) {
+      invalidIndexes.forEach((index) => add('invalid-coordinate', [coordPath(index)], coordinates.find(validCoordinate) ?? null))
+      return
+    }
+    const closed = coordinates.length > 1 && geometryCoordinatesEqual(coordinates[0], coordinates.at(-1))
+    const editable = geometry.type === 'Polygon' && closed ? coordinates.slice(0, -1) : coordinates
+    const seen = new Map()
+    editable.forEach((coordinate, index) => {
+      const key = `${coordinate[0]},${coordinate[1]}`
+      if (index > 0 && geometryCoordinatesEqual(coordinate, editable[index - 1])) {
+        add('duplicate-coordinate', [coordPath(index - 1), coordPath(index)], coordinate)
+      } else if (seen.has(key) && !(geometry.type === 'LineString' && closed && index === editable.length - 1)) {
+        const previous = seen.get(key)
+        add('duplicate-coordinate', [coordPath(previous), coordPath(index)], coordinate,
+          geometry.type === 'Polygon' || index === previous + 1 ? 'error' : 'warning')
+      } else seen.set(key, index)
+    })
+    if (geometry.type === 'LineString') {
+      if (seen.size < 2) add('zero-length-line', [coordPath(0)], coordinates[0])
+      return
+    }
+    if (!closed || seen.size < 3) add('invalid-polygon-ring', [coordPath(0)], coordinates[0])
+    if (!closed || coordinates.length < 4) return
+    const ring = polygon([coordinates])
+    const crossings = kinks(ring).features
+    crossings.forEach((crossing) => {
+      const edgePaths = coordinates.slice(0, -1).flatMap((coordinate, index) => (
+        booleanPointOnLine(crossing, lineString([coordinate, coordinates[index + 1]]), { epsilon: 1e-10 }) ? [coordPath(index)] : []
+      ))
+      add('self-intersection', edgePaths, crossing.geometry.coordinates)
+    })
+    if (area(ring) <= 1e-6) add('zero-area-polygon', [coordPath(0)], coordinates[0])
+    if (crossings.length === 0 && !booleanValid(ring)) add('invalid-polygon-ring', [coordPath(0)], coordinates[0])
+  })
+  if (geometry.type === 'Polygon' && !issues.some((issue) => issue.level === 'error')) {
+    const shell = polygon([paths[0]])
+    paths.slice(1).forEach((hole, index) => {
+      const holeIndex = index + 1
+      const invalid = !booleanPointInPolygon(hole[0], shell, { ignoreBoundary: true })
+        || booleanIntersects(lineString(paths[0]), lineString(hole))
+        || paths.slice(1, holeIndex).some((other) => booleanIntersects(polygon([hole]), polygon([other])))
+      if (invalid) add('invalid-polygon-hole', [`${holeIndex}.0`], hole[0])
+    })
+  }
+  return issues
+}
+
+export function repairEditableGeometry(feature) {
+  if (!['LineString', 'Polygon'].includes(feature?.geometry?.type)) return []
+  const copy = JSON.parse(JSON.stringify(feature))
+  const cleanPath = (path, close) => {
+    if (!Array.isArray(path)) return []
+    const next = path.filter((coordinate, index) => index === 0 || !geometryCoordinatesEqual(coordinate, path[index - 1]))
+    if (close && Array.isArray(next[0]) && next.length > 0 && !geometryCoordinatesEqual(next[0], next.at(-1))) next.push([...next[0]])
+    return next
+  }
+  try {
+    copy.geometry.coordinates = copy.geometry.type === 'Polygon'
+      ? (copy.geometry.coordinates ?? []).map((ring) => cleanPath(ring, true))
+      : cleanPath(copy.geometry.coordinates, false)
+    let repaired = [copy]
+    const issues = analyzeEditableGeometry(copy)
+    if (copy.geometry.type === 'Polygon' && copy.geometry.coordinates.length === 1 && issues.some((issue) => issue.code === 'self-intersection')) {
+      repaired = unkinkPolygon(copy).features.map((part) => ({ ...copy, geometry: part.geometry }))
+    }
+    return repaired.length > 0 && repaired.every((part) => !analyzeEditableGeometry(part).some((issue) => issue.level === 'error')) ? repaired : []
+  } catch {
+    return []
+  }
+}
 
 let featureIdSeed = 0
 
