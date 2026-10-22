@@ -33,6 +33,7 @@ const {
   getVocabularyLocations,
   getVocabularyCounts,
   invalidateVocabularyCountsCache,
+  invalidateVocabularyOptionsCache,
   getVocabularyLogs,
   deleteVocabularyLocation,
   updateVocabularyLocation,
@@ -54,6 +55,7 @@ function readSource(path) {
 beforeEach(() => {
   apiMock.mockReset()
   invalidateVocabularyCountsCache()
+  invalidateVocabularyOptionsCache()
   setVocabularyEntryCreateLocationName('')
 })
 

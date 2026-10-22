@@ -81,6 +81,7 @@ export {
   getVocabularyLogs,
   getVocabularyCounts,
   invalidateVocabularyCountsCache,
+  invalidateVocabularyOptionsCache,
   updateVocabularyLocation,
   transferVocabularyLocation,
   deleteVocabularyLocation,

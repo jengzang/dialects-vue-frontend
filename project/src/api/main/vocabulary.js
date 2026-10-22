@@ -1,5 +1,6 @@
 // api/main/vocabulary.js - 词表业务接口
 import { api } from '../auth/httpClient.js'
+import { readSessionCache, writeSessionCache } from '@/composables/core/sessionCache.js'
 import { showError } from '@/utils/ui/message.js'
 
 const VOCABULARY_ITEMS_ENDPOINT = '/api/vocabulary/search/entries'
@@ -19,6 +20,13 @@ let vocabularyEntryCreateLocationName = ''
 let vocabularyCountsCache = null
 let vocabularyCountsRequest = null
 let vocabularyCountsRequestId = 0
+let vocabularyOptionsCacheGeneration = 0
+const VOCABULARY_OPTIONS_CACHE_KEY = 'vocabulary_options_cache'
+const VOCABULARY_OPTIONS_CACHE_LIMIT = 20
+const vocabularyLocationOptionsCache = new Map()
+const vocabularyLocationOptionsRequests = new Map()
+const vocabularyPartitionOptionsCache = new Map()
+const vocabularyPartitionOptionsRequests = new Map()
 
 function stripVocabularyDbKey(params = {}) {
   const rest = { ...params }
@@ -388,53 +396,168 @@ export async function setVocabularyPermission(userId, permissionLevel) {
   })
 }
 
+function readPersistedOptionsCache() {
+  const persisted = readSessionCache(VOCABULARY_OPTIONS_CACHE_KEY)
+  return persisted && typeof persisted === 'object' ? persisted : null
+}
+
+function persistOptionsCache() {
+  try {
+    writeSessionCache(VOCABULARY_OPTIONS_CACHE_KEY, {
+      location: Object.fromEntries(vocabularyLocationOptionsCache),
+      partition: Object.fromEntries(vocabularyPartitionOptionsCache),
+    })
+  } catch {
+    // 存储不可用时保留内存缓存即可，不影响本次查询结果。
+  }
+}
+
+function rememberCachedOptions(cache, key, value) {
+  cache.set(key, value)
+  while (cache.size > VOCABULARY_OPTIONS_CACHE_LIMIT) {
+    cache.delete(cache.keys().next().value)
+  }
+  persistOptionsCache()
+}
+
+function readCachedOptions(cache, section, key) {
+  if (cache.has(key)) {
+    return cache.get(key)
+  }
+  const cached = readPersistedOptionsCache()?.[section]?.[key]
+  if (cached !== undefined && cached !== null) {
+    cache.set(key, cached)
+    return cached
+  }
+  return null
+}
+
+/**
+ * 清除词表筛选候选缓存，例如导入或地点维护后。
+ */
+export function invalidateVocabularyOptionsCache() {
+  vocabularyOptionsCacheGeneration += 1
+  vocabularyLocationOptionsCache.clear()
+  vocabularyLocationOptionsRequests.clear()
+  vocabularyPartitionOptionsCache.clear()
+  vocabularyPartitionOptionsRequests.clear()
+  try {
+    writeSessionCache(VOCABULARY_OPTIONS_CACHE_KEY, { location: {}, partition: {} })
+  } catch {
+    // 存储不可用时内存缓存已清空，下次请求仍会重新拉取。
+  }
+}
+
+function buildVocabularyLocationOptionsCacheKey(params = {}) {
+  const regions = Array.isArray(params.regions)
+    ? [...new Set(params.regions.map(String).filter(Boolean))].sort()
+    : []
+  return JSON.stringify([
+    regions.length ? (params.region_mode || 'yindian') : 'yindian',
+    regions,
+    params.province || '',
+    params.city || '',
+  ])
+}
+
 /**
  * 获取词表地点筛选候选值，供卡片/地图模式的地点多选筛选使用。
  *
  * label 用于展示（地点简称 location_name），locationLabel 保留完整地点链用于搜索匹配。
+ * 结果只由 region_mode/regions/province/city 决定，与搜索词 q 无关，按这些参数缓存。
  *
  * @returns {Promise<Array<{value: string, label: string, locationLabel: string, province: string, city: string}>>}
  */
 export async function getVocabularyLocationOptions(params = {}) {
-  try {
-    const response = await api(`${VOCABULARY_LOCATION_OPTIONS_ENDPOINT}${appendQueryParams({
-      region_mode: params.region_mode,
-      regions: params.regions,
-      province: params.province,
-      city: params.city,
-    })}`)
-    const seenLocationNames = new Set()
-    const locations = Array.isArray(response.locations) ? response.locations : []
-
-    return locations.reduce((options, location) => {
-      const locationName = String(location.location_name || '').trim()
-      if (!locationName || seenLocationNames.has(locationName)) {
-        return options
-      }
-
-      seenLocationNames.add(locationName)
-      options.push({
-        value: locationName,
-        label: locationName,
-        locationLabel: location.location_label || locationName,
-        province: location.province || '',
-        city: location.city || '',
-        yindianRegion: location.yindian_region || '',
-        atlasRegion: location.atlas_region || '',
-        yindianRegions: Array.isArray(location.yindian_regions) ? location.yindian_regions : [],
-        atlasRegions: Array.isArray(location.atlas_regions) ? location.atlas_regions : [],
-      })
-      return options
-    }, [])
-  } catch (error) {
-    console.error('Get vocabulary locations error:', error)
-    showError(error.message || '獲取詞表地點失敗')
-    throw new Error(error.message || '獲取詞表地點失敗')
+  const cacheKey = buildVocabularyLocationOptionsCacheKey(params)
+  const cached = readCachedOptions(vocabularyLocationOptionsCache, 'location', cacheKey)
+  if (cached) {
+    return cached
   }
+  const pending = vocabularyLocationOptionsRequests.get(cacheKey)
+  if (pending) {
+    return pending
+  }
+
+  const generation = vocabularyOptionsCacheGeneration
+  const request = (async () => {
+    try {
+      const response = await api(`${VOCABULARY_LOCATION_OPTIONS_ENDPOINT}${appendQueryParams({
+        region_mode: params.region_mode,
+        regions: params.regions,
+        province: params.province,
+        city: params.city,
+      })}`)
+      const seenLocationNames = new Set()
+      const locations = Array.isArray(response.locations) ? response.locations : []
+
+      const options = locations.reduce((result, location) => {
+        const locationName = String(location.location_name || '').trim()
+        if (!locationName || seenLocationNames.has(locationName)) {
+          return result
+        }
+
+        seenLocationNames.add(locationName)
+        result.push({
+          value: locationName,
+          label: locationName,
+          locationLabel: location.location_label || locationName,
+          province: location.province || '',
+          city: location.city || '',
+          yindianRegion: location.yindian_region || '',
+          atlasRegion: location.atlas_region || '',
+          yindianRegions: Array.isArray(location.yindian_regions) ? location.yindian_regions : [],
+          atlasRegions: Array.isArray(location.atlas_regions) ? location.atlas_regions : [],
+        })
+        return result
+      }, [])
+
+      if (generation === vocabularyOptionsCacheGeneration) {
+        rememberCachedOptions(vocabularyLocationOptionsCache, cacheKey, options)
+      }
+      return options
+    } catch (error) {
+      console.error('Get vocabulary locations error:', error)
+      showError(error.message || '獲取詞表地點失敗')
+      throw new Error(error.message || '獲取詞表地點失敗')
+    } finally {
+      vocabularyLocationOptionsRequests.delete(cacheKey)
+    }
+  })()
+
+  vocabularyLocationOptionsRequests.set(cacheKey, request)
+  return request
 }
 
-export async function getVocabularyPartitionOptions(regionMode = 'yindian') {
-  return api(`${VOCABULARY_PARTITION_OPTIONS_ENDPOINT}${appendQueryParams({ region_mode: regionMode })}`)
+export async function getVocabularyPartitionOptions(regionMode = 'yindian', parent = null) {
+  const cacheKey = `${regionMode}|${parent ?? ''}`
+  const cached = readCachedOptions(vocabularyPartitionOptionsCache, 'partition', cacheKey)
+  if (cached) {
+    return cached
+  }
+  const pending = vocabularyPartitionOptionsRequests.get(cacheKey)
+  if (pending) {
+    return pending
+  }
+
+  const generation = vocabularyOptionsCacheGeneration
+  const request = (async () => {
+    try {
+      const tree = await api(`${VOCABULARY_PARTITION_OPTIONS_ENDPOINT}${appendQueryParams({
+        region_mode: regionMode,
+        parent,
+      })}`)
+      if (generation === vocabularyOptionsCacheGeneration) {
+        rememberCachedOptions(vocabularyPartitionOptionsCache, cacheKey, tree)
+      }
+      return tree
+    } finally {
+      vocabularyPartitionOptionsRequests.delete(cacheKey)
+    }
+  })()
+
+  vocabularyPartitionOptionsRequests.set(cacheKey, request)
+  return request
 }
 
 export async function getVocabularyLocationNames() {
