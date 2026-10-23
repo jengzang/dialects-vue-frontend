@@ -59,7 +59,9 @@
               v-if="entry.important"
               class="hint"
               :title="entry.importanceReason"
-            >重要更新</span>
+              role="img"
+              aria-label="重要更新"
+            >⭐</span>
           </div>
           <p class="history-content">
             <template
@@ -231,9 +233,9 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
 }
 
 .history-date-column {
-  @include flex-col;
-  gap: 0.25rem;
-  align-items: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .history-date {

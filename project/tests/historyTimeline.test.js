@@ -129,6 +129,16 @@ describe('author-provided website history', () => {
     }
   })
 
+  it('marks important updates with accessible star emoji instead of text', async () => {
+    await mountHistory()
+    const importantStars = [...host.querySelectorAll('.history-date-column [role="img"]')]
+
+    expect(importantStars).toHaveLength(historyEntries.filter(entry => entry.important).length)
+    expect(importantStars.map(star => star.textContent.trim())).toEqual(Array(importantStars.length).fill('⭐'))
+    expect(importantStars.every(star => star.getAttribute('aria-label') === '重要更新')).toBe(true)
+    expect(host.querySelector('.history-date-column')?.textContent).not.toContain('重要更新')
+  })
+
   it('filters important updates and restores all history without losing stages or links', async () => {
     await mountHistory()
     const historyToggle = host.querySelector('.history-filter [role="switch"]')
