@@ -86,4 +86,19 @@ describe('features section search', () => {
 
     wrapper.unmount()
   })
+
+  it.each([
+    ['zh-CN', '开发历程'],
+    ['zh-Hant', '開發歷程'],
+    ['en', 'Development History'],
+  ])('includes the Development History route in the About group for %s', (locale, label) => {
+    const wrapper = mountFeaturesSection(locale)
+    const historyLink = [...wrapper.host.querySelectorAll('.feature-tile')]
+      .find(link => link.getAttribute('href')?.endsWith('/menu/about/history'))
+
+    expect(historyLink).toBeTruthy()
+    expect(historyLink.textContent).toContain(label)
+
+    wrapper.unmount()
+  })
 })

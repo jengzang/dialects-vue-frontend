@@ -1,15 +1,17 @@
 <template>
   <section
     class="history-page"
+    :class="{ 'history-page--featured': featured }"
     aria-labelledby="history-title"
   >
-    <h1
+    <component
+      :is="featured ? 'h2' : 'h1'"
       id="history-title"
       class="page-title"
     >
-      开发历程
-    </h1>
-    <div class="history-filter">
+      {{ props.title }}
+    </component>
+    <div v-if="!featured" class="history-filter">
       <SwitchToggle
         :model-value="onlyImportant"
         :width="50"
@@ -24,6 +26,7 @@
       />
     </div>
     <p
+      v-if="!featured"
       class="history-filter-summary hint"
       aria-live="polite"
     >
@@ -108,7 +111,20 @@
         </li>
       </ol>
     </section>
+    <div
+      v-if="featured"
+      class="history-featured-actions"
+    >
+      <RouterLink
+        class="glass-button history-featured-link"
+        data-size="compact"
+        :to="buildLocalePath(resolveRouteLocale(route), '/menu/about/history')"
+      >
+        <span>{{ $t('home.history.viewAll') }}</span>
+      </RouterLink>
+    </div>
     <section
+      v-if="!featured"
       class="thoughts-container"
       aria-labelledby="reflection-title"
     >
@@ -133,6 +149,17 @@ import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import { historyStages } from './history.data.js'
 
+const props = defineProps({
+  featured: {
+    type: Boolean,
+    default: false
+  },
+  title: {
+    type: String,
+    default: '开发历程'
+  }
+})
+
 const FOOTER_ACTION_EVENT = 'app-footer-action'
 
 const route = useRoute()
@@ -143,7 +170,9 @@ function triggerFooterAction(action) {
 
 const visibleStages = computed(() => historyStages.map(stage => ({
   ...stage,
-  entries: onlyImportant.value ? stage.entries.filter(entry => entry.important) : stage.entries
+  entries: props.featured
+    ? stage.entries.filter(entry => entry.important)
+    : onlyImportant.value ? stage.entries.filter(entry => entry.important) : stage.entries
 })))
 const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stage) => count + stage.entries.length, 0))
 </script>
@@ -157,6 +186,11 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
   width: 100%;
   max-width: 70rem;
   padding: clamp(1rem, 3vw, 2rem);
+}
+
+.history-page--featured {
+  max-width: 82rem;
+  margin-inline: auto;
 }
 
 .tabs-title {
@@ -218,6 +252,15 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
 .history-filter-summary {
   margin: 0.75rem 0 0;
   text-align: center;
+}
+
+.history-featured-actions {
+  @include flex-center;
+  margin-top: 2rem;
+}
+
+.history-featured-link {
+  text-decoration: none;
 }
 
 .history-stage-title {

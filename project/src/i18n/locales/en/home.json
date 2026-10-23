@@ -133,6 +133,7 @@
       "title": "About This Site",
       "desc": "Site introduction and data sources",
       "intro": "Introduction - Overview of the site's features",
+      "history": "Development History - Browse site releases and feature milestones",
       "reflection": "Reflections - Development reflections and acknowledgments",
       "suggestion": "Feedback - Share comments and suggestions",
       "likeAuthor": "Support the Author - Follow and support the project",
@@ -255,6 +256,10 @@
   "projects": {
     "sectionTitle": "Open-Source Projects",
     "sectionSubtitle": "Stars, forks, and code contributions are welcome"
+  },
+  "history": {
+    "title": "Development History",
+    "viewAll": "View Full History"
   },
   "contact": {
     "title": "Contact the Author",

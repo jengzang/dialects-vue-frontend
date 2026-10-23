@@ -566,6 +566,14 @@ const groups = [
         },
       },
       {
+        icon: '🕰️',
+        labelKey: 'home.features.about.history',
+        route: '/menu/about/history',
+        search: {
+          keywords: ['开发历程', '版本历史', '更新记录', 'development history', 'release history'],
+        },
+      },
+      {
         icon: '💬',
         labelKey: 'home.features.about.suggestion',
         route: '/menu/about/suggestion',

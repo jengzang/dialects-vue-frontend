@@ -162,6 +162,11 @@
       </div>
     </section>
 
+    <AboutHistory
+      featured
+      :title="$t('home.history.title')"
+    />
+
     <!-- Projects Section -->
     <section class="projects-section reveal">
       <h2 class="section-title">{{ $t('home.projects.sectionTitle') }}</h2>
@@ -284,6 +289,7 @@
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import FeaturesSection from '@/main/components/FeaturesSection.vue'
+import AboutHistory from '@/main/views/menu/support/about/AboutHistory.vue'
 import HomeFeaturedTools from '@/main/components/HomeFeaturedTools.vue'
 import { computed, ref, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue'
 import { useRouter, useRoute } from 'vue-router'

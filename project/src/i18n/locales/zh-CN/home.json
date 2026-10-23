@@ -129,6 +129,7 @@
       "title": "关于网站",
       "desc": "网站介绍与资料来源",
       "intro": "简介 - 网站功能介绍",
+      "history": "开发历程 - 查看网站版本与功能演进记录",
       "reflection": "感悟 - 开发感悟与鸣谢",
       "suggestion": "提出建议 - 反馈与建议",
       "likeAuthor": "喜欢作者 - 支持与关注",
@@ -279,6 +280,10 @@
   "projects": {
     "sectionTitle": "开源项目",
     "sectionSubtitle": "欢迎 Star、Fork 与贡献代码"
+  },
+  "history": {
+    "title": "开发历程",
+    "viewAll": "查看完整历程"
   },
   "contact": {
     "title": "联系作者",

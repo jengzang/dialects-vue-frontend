@@ -11,6 +11,7 @@ import { exploreRoutes } from '../src/main/router/exploreRoutes.js'
 
 const testsDir = dirname(fileURLToPath(import.meta.url))
 const historyPageSource = readFileSync(resolve(testsDir, '../src/main/views/menu/support/about/AboutHistory.vue'), 'utf8')
+const homePageSource = readFileSync(resolve(testsDir, '../src/main/views/HomePage.vue'), 'utf8')
 const customDataPanelSource = readFileSync(resolve(testsDir, '../src/main/components/map/custom/CustomDataPanel.vue'), 'utf8')
 const locationInputSource = readFileSync(resolve(testsDir, '../src/main/components/geo/LocationAndRegionInput.vue'), 'utf8')
 const appFooterSource = readFileSync(resolve(testsDir, '../src/components/footer/AppFooter.vue'), 'utf8')
@@ -24,7 +25,7 @@ afterEach(() => {
   host?.remove()
 })
 
-async function mountHistory(locale = 'zh-Hant') {
+async function mountHistory(locale = 'zh-Hant', props = {}) {
   const stubRoutes = routes => routes.map(route => ({
     ...route,
     component: { template: '<div />' },
@@ -41,7 +42,7 @@ async function mountHistory(locale = 'zh-Hant') {
   await router.push(`/${locale}/menu/about/history`)
   host = document.createElement('div')
   document.body.append(host)
-  app = createApp(HistoryPage)
+  app = createApp(HistoryPage, props)
   app.use(router)
   app.config.globalProperties.$t = key => key
   app.mount(host)
@@ -62,6 +63,30 @@ describe('author-provided website history', () => {
   it('titles the About section 开发历程', async () => {
     await mountHistory()
     expect(host.querySelector('#history-title').textContent.trim()).toBe('开发历程')
+  })
+
+  it('renders a homepage preview with only important updates and links to the full history', async () => {
+    await mountHistory('zh-Hant', { featured: true, title: '开发历程' })
+
+    expect(host.querySelector('.history-filter')).toBeNull()
+    expect(host.querySelector('.history-filter-summary')).toBeNull()
+    expect(host.querySelector('.thoughts-container')).toBeNull()
+    expect(host.querySelectorAll('.history-entry')).toHaveLength(historyEntries.filter(entry => entry.important).length)
+    expect([...host.querySelectorAll('.history-date')].map(time => time.textContent)).toEqual(
+      historyEntries.filter(entry => entry.important).map(entry => entry.date)
+    )
+    expect(host.querySelectorAll('.history-stage')).toHaveLength(5)
+    expect(host.querySelector('.history-featured-link')?.getAttribute('href')).toBe('/zh-Hant/menu/about/history')
+    expect(host.querySelector('.history-featured-link')?.textContent).toBe('home.history.viewAll')
+  })
+
+  it('places the important-history preview above Open-Source Projects on the homepage', () => {
+    const historyIndex = homePageSource.indexOf('<AboutHistory')
+    const projectsIndex = homePageSource.indexOf('<!-- Projects Section -->')
+
+    expect(historyIndex).toBeGreaterThan(-1)
+    expect(historyIndex).toBeLessThan(projectsIndex)
+    expect(homePageSource.slice(historyIndex, projectsIndex)).toMatch(/<AboutHistory[^>]*featured/)
   })
 
   it('uses a compact reading scale for the timeline in portrait mode', () => {
