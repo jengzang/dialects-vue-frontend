@@ -1,0 +1,108 @@
+@use '@/styles/global/mixins' as *;
+
+$primary: var(--color-primary);
+$zhihu-blue: var(--color-primary);
+$github-dark: #24292f;
+$danger: var(--color-error);
+
+$text-primary: var(--text-dark);
+$text-heading: var(--text-primary);
+$text-secondary: var(--text-medium);
+$text-light: var(--text-lightest);
+
+$ease-standard: 0.3s ease;
+@mixin glass-card(
+  $background: var(--glass-40),
+  $border: var(--glass-40)
+) {
+  background: $background;
+  border: 1px solid $border;
+
+  @include glass-blur(6px);
+}
+
+.tabs-title {
+  width: 100%;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+/* 通用正文 */
+p {
+  margin-bottom: 20px;
+  color: $text-primary;
+  font-size: 16px;
+  line-height: 1.6;
+
+  a {
+    color: $primary;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  strong {
+    padding: 2px 6px;
+    background-color: rgba(var(--color-primary-rgb), 0.1);
+    border-radius: var(--radius-xs);
+  }
+
+  em.emoji {
+    margin-left: 5px;
+    font-size: 1.2em;
+  }
+
+  + p {
+    margin-top: 8px;
+  }
+}
+
+strong {
+  color: $primary;
+  font-weight: bold;
+}
+
+em {
+  font-style: italic;
+}
+
+.thanks-link {
+  font-weight: 500;
+  color: var(--color-primary);
+  text-decoration: none;
+  position: relative;
+  transition: all 0.3s ease;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    width: 0%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-primary-cyan));
+    transition: width 0.3s ease, left 0.3s ease;
+  }
+
+  &:hover {
+    color: var(--color-primary-hover);
+    transform: scale(1.05);
+
+    &::after {
+      width: 100%;
+      left: 0;
+    }
+  }
+}
+
+@media (max-aspect-ratio: #{1 / 1}) {
+  p {
+    margin-bottom: 14px;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+}

@@ -107,7 +107,7 @@ vi.mock('../src/main/components/user/popups/SupportPopup.vue', () => ({
 }))
 
 function aboutPageSource() {
-  return readFileSync('src/main/views/menu/support/AboutPage.vue', 'utf8')
+  return readFileSync('src/main/views/menu/support/about/AboutSuggestion.vue', 'utf8')
 }
 
 async function mountAboutPage() {
