@@ -2,8 +2,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createApp, nextTick } from 'vue'
 import AboutIntro from '../src/main/views/menu/support/about/AboutIntro.vue'
 
+const push = vi.fn()
+
 vi.mock('vue-router', () => ({
   useRoute: () => ({ path: '/zh-CN/menu/about/intro', params: { locale: 'zh-CN' } }),
+  useRouter: () => ({ push }),
 }))
 
 vi.mock('vue-i18n', () => ({
@@ -31,77 +34,101 @@ vi.mock('../src/i18n/index.js', () => ({
   },
 }))
 
+vi.mock('../src/main/components/g6-demo/G6Graph.vue', () => ({
+  default: {
+    props: ['graphData', 'graphOptions'],
+    emits: ['node-click'],
+    template: `<div data-g6-graph :data-auto-fit="graphOptions.autoFit" :data-auto-resize="graphOptions.autoResize">
+      <button v-for="node in graphData.nodes" :key="node.id" :data-graph-node="node.id" @click="$emit('node-click', node.id)">{{ node.data.label }}</button>
+      <span v-for="(edge, index) in graphData.edges" :key="index" :data-graph-edge="edge.source + ':' + edge.target" />
+    </div>`,
+  },
+}))
+
 let app
 let host
-
-afterEach(() => {
-  app?.unmount()
-  host?.remove()
-  app = null
-  host = null
-})
 
 function mountIntro() {
   host = document.createElement('div')
   document.body.append(host)
   app = createApp(AboutIntro)
   app.config.globalProperties.$t = key => key
-  app.component('RouterLink', {
-    props: ['to'],
-    template: '<a :href="to"><slot /></a>',
-  })
+  app.component('RouterLink', { props: ['to'], template: '<a :href="to"><slot /></a>' })
   app.mount(host)
   return host.querySelector('[data-feature-topology]')
 }
 
+afterEach(() => {
+  app?.unmount()
+  host?.remove()
+  app = null
+  host = null
+  push.mockReset()
+})
+
 describe('About feature topology', () => {
-  it('appears above the detailed feature list and links every node', () => {
+  it('shows a compact G6 overview above the detailed introduction', () => {
     const topology = mountIntro()
     expect(topology).toBeTruthy()
     expect(topology.compareDocumentPosition(host.querySelector('.customlist')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(topology.querySelectorAll('[data-topology-node]')).toHaveLength(54)
-    expect(topology.querySelectorAll('[data-topology-node]:not(a)')).toHaveLength(0)
-    expect(topology.querySelector('[data-topology-node="phonetic-compare"]').getAttribute('href')).toBe('/zh-CN/menu/compare/phonetic')
-    expect(topology.querySelector('[data-topology-node="syllable-count"]').getAttribute('href')).toBe('/zh-CN/menu/pho/count')
-    expect(topology.querySelector('[data-topology-node="vocabulary-upload"]').getAttribute('href')).toBe('/zh-CN/menu/vocabulary/import')
-    expect(topology.querySelector('[data-topology-node="gis-voronoi"]').getAttribute('href')).toBe('/zh-CN/explore/gis')
+    expect(topology.querySelector('[data-g6-graph]')).toBeTruthy()
+    expect(topology.querySelectorAll('[data-topology-focus]')).toHaveLength(4)
+    expect(topology.querySelector('[data-graph-node="phonetic-compare"]')).toBeTruthy()
+    expect(topology.querySelector('[data-graph-node="syllable-count"]')).toBeTruthy()
+    expect(topology.querySelector('[data-graph-edge="multi-analysis:phonetic-compare"]')).toBeTruthy()
+    expect(topology.querySelector('[data-graph-edge="phonetic-compare:single-analysis"]')).toBeTruthy()
   })
 
-  it('shows every requested branch and the two cross-category relationships', () => {
+  it('reveals one group at a time while keeping every feature reachable', async () => {
     const topology = mountIntro()
-    for (const name of [
-      '多方言地理语言学分析', '单方言深入分析', '音值比较', '音节统计',
-      '查字', '查中古', '查音位', '查调', '比较汉字', '比较中古', '比较调类',
-      '特征图', '分区点图', '比较图', '地名图', '热力图', '等值线图',
-      '分区图', '泰森多边形绘制分布图', '自定义数据',
-      '音系查询', '音素查询', '演化', '1000词', '50句',
-      '卡片', '地图', '表格', '上传', '管理', '阳春口语词',
-      'Praat', '检查工具', '粤拼转IPA', '合并工具',
-      '机器学习', '地名分布', '广东自然村树状图',
-      '上古', '中古', '近古', '粤语',
-    ]) {
-      expect([...topology.querySelectorAll('[data-topology-node]')].some(node => node.textContent.trim() === name || node.textContent.trim().startsWith(`${name}上古`))).toBe(true)
+    const seen = new Set()
+    for (const branchButton of topology.querySelectorAll('[data-topology-focus]')) {
+      branchButton.click()
+      await nextTick()
+      const groupButtons = [...topology.querySelectorAll('[data-topology-group]')]
+      expect(groupButtons.length).toBeGreaterThan(0)
+      for (const groupButton of groupButtons) {
+        groupButton.click()
+        await nextTick()
+        topology.querySelectorAll('[data-graph-node]').forEach(node => seen.add(node.getAttribute('data-graph-node')))
+      }
     }
-    for (const bridge of ['phonetic-compare', 'syllable-count']) {
-      expect(topology.querySelector(`[data-topology-from="compare"][data-topology-to="${bridge}"]`)).toBeTruthy()
-      expect(topology.querySelector(`[data-topology-from="${bridge}"][data-topology-to="single-analysis"]`)).toBeTruthy()
-    }
+    expect(seen).toContain('map-isoline')
+    expect(seen).toContain('vocabulary-upload')
+    expect(seen).toContain('char-yueyun')
+    expect(seen).toContain('villages-tree')
+    expect(seen.size).toBeGreaterThanOrEqual(54)
   })
 
-  it('draws real paths between the comparison and single-dialect nodes', async () => {
+  it('keeps expanded nodes at readable scale instead of fitting the whole graph', async () => {
     const topology = mountIntro()
-    const graph = topology.querySelector('.topology-analysis')
-    graph.getBoundingClientRect = () => ({ left: 0, top: 0, right: 800, width: 800 })
-    for (const [id, left, top] of [
-      ['compare', 80, 100],
-      ['phonetic-compare', 350, 140],
-      ['syllable-count', 350, 200],
-      ['single-analysis', 620, 80],
-    ]) {
-      graph.querySelector(`[data-topology-node="${id}"]`).getBoundingClientRect = () => ({ left, top, right: left + 120, height: 32 })
-    }
-    window.dispatchEvent(new Event('resize'))
+    expect(topology.querySelector('[data-g6-graph]').dataset.autoFit).toBe('view')
+    topology.querySelector('[data-topology-focus="multi-analysis"]').click()
     await nextTick()
-    expect([...graph.querySelectorAll('[data-topology-from]')].every(path => path.getAttribute('d')?.startsWith('M '))).toBe(true)
+    topology.querySelector('[data-topology-group="dialect-map"]').click()
+    await nextTick()
+    expect(topology.querySelector('[data-g6-graph]').dataset.autoFit).toBe('center')
+    expect(topology.querySelector('[data-g6-graph]').dataset.autoResize).toBe('true')
+  })
+
+  it('keeps a keyboard accessible link to each visible graph destination', async () => {
+    const topology = mountIntro()
+    topology.querySelector('[data-topology-focus="multi-analysis"]').click()
+    await nextTick()
+    topology.querySelector('[data-topology-group="dialect-map"]').click()
+    await nextTick()
+    const links = [...topology.querySelectorAll('[data-topology-link]')]
+    const mapLink = links.find(link => link.textContent === '等值线图')
+    expect(mapLink?.getAttribute('href')).toBe('/zh-CN/menu/map/view')
+    expect(links.length).toBe(topology.querySelectorAll('[data-graph-node]').length)
+  })
+
+  it('navigates from graph nodes while expansion stays on separate controls', async () => {
+    const topology = mountIntro()
+    topology.querySelector('[data-graph-node="phonetic-compare"]').click()
+    expect(push).toHaveBeenCalledWith('/zh-CN/menu/compare/phonetic')
+    topology.querySelector('[data-topology-focus="multi-analysis"]').click()
+    await nextTick()
+    expect(push).toHaveBeenCalledTimes(1)
   })
 })

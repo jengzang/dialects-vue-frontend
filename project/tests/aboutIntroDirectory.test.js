@@ -2,6 +2,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createApp, nextTick } from 'vue'
 import AboutIntro from '../src/main/views/menu/support/about/AboutIntro.vue'
 
+vi.mock('../src/main/views/menu/support/about/AboutFeatureTopology.vue', () => ({
+  default: { template: '<div />' },
+}))
+
 vi.mock('vue-router', () => ({
   useRoute: () => ({ path: '/menu/about/intro' }),
 }))
