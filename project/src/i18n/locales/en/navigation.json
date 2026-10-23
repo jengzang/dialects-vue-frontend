@@ -77,12 +77,12 @@
       "source": "Character List Sources",
       "privacy": "Privacy Policy",
       "suggestion": "Send Feedback",
-      "like": "Support the Author"
+      "like": "Support the Project"
     },
     "about": {
       "intro": "Introduction",
       "suggestion": "Send Feedback",
-      "like": "Support the Author",
+      "like": "Support the Project",
       "setting": "Settings"
     }
   },
@@ -253,7 +253,7 @@
     "backHome": "Back to Home"
   },
   "introTabs": {
-    "like": "Support the Author",
+    "like": "Support the Project",
     "suggestions": "Send Feedback",
     "thanks": "Acknowledgements"
   }

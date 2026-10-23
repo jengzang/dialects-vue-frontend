@@ -268,7 +268,7 @@
       "privacy": "Privacy Policy",
       "setting": "Settings",
       "oldSite": "Legacy Site",
-      "support": "Support the Author"
+      "support": "Support the Project"
     },
     "stats": "Visits today: {today} · Total visits: {total}",
     "dataStats": "📚 {locationCount} dialect locations · 🗃️ {dataCount} data records",

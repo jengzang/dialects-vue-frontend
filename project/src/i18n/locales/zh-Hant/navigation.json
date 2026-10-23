@@ -77,12 +77,12 @@
       "source": "字表來源",
       "privacy": "隱私政策",
       "suggestion": "提出建議",
-      "like": "支持作者"
+      "like": "支持項目"
     },
     "about": {
       "intro": "簡介",
       "suggestion": "提出建議",
-      "like": "支持作者",
+      "like": "支持項目",
       "setting": "設置"
     }
   },
@@ -253,7 +253,7 @@
     "backHome": "返回首頁"
   },
   "introTabs": {
-    "like": "支持作者",
+    "like": "支持項目",
     "suggestions": "提出建議",
     "thanks": "鳴謝"
   }
