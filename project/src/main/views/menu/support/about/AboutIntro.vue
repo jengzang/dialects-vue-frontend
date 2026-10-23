@@ -1,10 +1,45 @@
 <template>
   <!-- 新的"簡介"页面 -->
-  <div class="thanks-container">
+  <div ref="introContainer" class="thanks-container">
+    <button
+      type="button"
+      class="intro-directory-toggle glass-button"
+      data-intro-directory-toggle
+      :aria-expanded="directoryOpen"
+      aria-controls="intro-directory"
+      @click="directoryOpen = !directoryOpen"
+    >{{ $t('about.intro.directory') }}</button>
+    <nav
+      id="intro-directory"
+      class="intro-directory glass-panel"
+      :class="{ 'is-open': directoryOpen }"
+      :aria-label="$t('about.intro.directory')"
+    >
+      <button
+        v-for="section in directorySections"
+        :key="section.id"
+        type="button"
+        class="intro-directory-item"
+        :data-intro-directory-item="section.id"
+        :aria-label="section.label"
+        :aria-current="activeSection === section.id ? 'location' : undefined"
+        :title="section.label"
+        @click="jumpToSection(section.id)"
+      >
+        <span class="intro-directory-label">{{ section.label }}</span>
+        <span class="intro-directory-dot" aria-hidden="true"></span>
+      </button>
+    </nav>
     <h1 class="tabs-title">{{ $t('navigation.pageTitles.support.aboutIntro') }}</h1>
     <p style=" text-align: left;">{{ $t('about.intro.description') }}</p>
     <ul class="customlist">
-      <li v-for="(feature, idx) in featureList" :key="idx" class="feature-item">
+      <li
+        v-for="feature in featureList"
+        :id="`intro-${feature.key.replace('feature', 'feature-')}`"
+        :key="feature.key"
+        class="feature-item"
+        data-intro-directory-target
+      >
         <h3 class="feature-heading">
           <RouterLink v-if="feature.route" :to="localeTo(feature.route)" class="feature-link feature-heading-link">
             {{ feature.heading }}
@@ -61,7 +96,7 @@
 
     <p style=" text-align: left;font-weight: bold;text-decoration: underline">{{ $t('about.intro.footer') }}</p>
 
-    <h2 class="tabs-title" style="margin-top: 20px">🙏 {{ $t('about.thanks.title') }}</h2>
+    <h2 id="intro-thanks" class="tabs-title" style="margin-top: 20px" data-intro-directory-target>🙏 {{ $t('about.thanks.title') }}</h2>
     <ul class="thanks-list">
       <li>
         ✔ <a href="https://mcpdict.vear.vip/" target="_blank" rel="noopener noreferrer" class="thanks-link">{{ $t('about.thanks.mcpdict') }}</a>
@@ -112,14 +147,17 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import i18n from '@/i18n/index.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 const route = useRoute()
+const introContainer = ref(null)
+const directoryOpen = ref(false)
+const activeSection = ref('intro-feature-1')
 
 const featureRouteMap = {
   feature1: '/menu/query/zhonggu',
@@ -171,6 +209,7 @@ const featureList = computed(() => {
   return featureKeys.map((key) => {
     const f = messages.about.intro.features[key]
     return {
+      key,
       heading: f.heading,
       subtitle: f.subtitle,
       intro: f.intro,
@@ -183,6 +222,35 @@ const featureList = computed(() => {
     }
   })
 })
+
+const directorySections = computed(() => [
+  ...featureList.value.map(feature => ({
+    id: `intro-${feature.key.replace('feature', 'feature-')}`,
+    label: feature.heading,
+  })),
+  { id: 'intro-thanks', label: t('about.thanks.title') },
+])
+
+function jumpToSection(id) {
+  introContainer.value?.querySelector(`#${id}`)?.scrollIntoView?.({ behavior: 'smooth', block: 'start' })
+  activeSection.value = id
+  directoryOpen.value = false
+}
+
+function updateActiveSection() {
+  const threshold = window.innerHeight * 0.35
+  for (const section of directorySections.value) {
+    const target = introContainer.value?.querySelector(`#${section.id}`)
+    if (target && target.getBoundingClientRect().top <= threshold) {
+      activeSection.value = section.id
+    } else {
+      break
+    }
+  }
+}
+
+onMounted(() => window.addEventListener('scroll', updateActiveSection, { passive: true, capture: true }))
+onBeforeUnmount(() => window.removeEventListener('scroll', updateActiveSection, true))
 
 function localeTo(path) {
   return buildLocalePath(resolveRouteLocale(route), path)
@@ -202,6 +270,80 @@ function localeTo(path) {
   font-family: var(--font-serif);
   font-weight: 500;
   color: var(--text-primary);
+}
+
+.intro-directory {
+  position: fixed;
+  top: 50%;
+  right: 1rem;
+  z-index: 1600;
+  width: 2.5rem;
+  max-height: 80dvh;
+  padding: 0.35rem;
+  transform: translateY(-50%);
+}
+
+.intro-directory-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 2rem;
+  padding: 0.25rem;
+  border: 0;
+  background: transparent;
+  color: var(--text-medium);
+  font: inherit;
+  text-align: right;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible,
+  &[aria-current='location'] {
+    color: var(--color-primary);
+  }
+}
+
+.intro-directory-label {
+  @include text-truncate;
+  position: absolute;
+  right: 2.35rem;
+  max-width: 0;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  background: var(--surface-glass-floating);
+  font-size: 0.8rem;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro-directory-item:hover .intro-directory-label,
+.intro-directory-item:focus-visible .intro-directory-label,
+.intro-directory-item[aria-current='location'] .intro-directory-label {
+  max-width: 11rem;
+  padding: 0.3rem 0.5rem;
+  opacity: 1;
+}
+
+.intro-directory-dot {
+  flex: 0 0 auto;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-border);
+}
+
+.intro-directory-item[aria-current='location'] .intro-directory-dot {
+  background: var(--color-primary);
+}
+
+.intro-directory-toggle {
+  display: none;
+}
+
+[data-intro-directory-target] {
+  scroll-margin-top: 7rem;
 }
 
 .thanks-list {
@@ -329,6 +471,49 @@ function localeTo(path) {
 }
 
 @media (max-aspect-ratio: #{1 / 1}) {
+  .intro-directory-toggle {
+    display: block;
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 1601;
+  }
+
+  .intro-directory {
+    display: none;
+    top: auto;
+    right: 1rem;
+    bottom: 4.5rem;
+    width: min(15rem, calc(100vw - 2rem));
+    max-height: 65dvh;
+    overflow-y: auto;
+    transform: none;
+
+    &.is-open {
+      display: block;
+    }
+  }
+
+  .intro-directory-label {
+    position: static;
+    flex: 1;
+    max-width: none;
+    padding: 0;
+    background: transparent;
+    opacity: 1;
+  }
+
+  .intro-directory-item {
+    justify-content: space-between;
+    gap: 0.6rem;
+    text-align: left;
+  }
+
+  .intro-directory-item[aria-current='location'] .intro-directory-label {
+    max-width: none;
+    padding: 0;
+  }
+
   .customlist {
     margin-left: 14px;
     padding-left: 16px;
