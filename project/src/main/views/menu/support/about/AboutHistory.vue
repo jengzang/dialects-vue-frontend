@@ -97,7 +97,7 @@
                 :href="part.href"
                 target="_blank"
                 rel="noopener noreferrer"
-              ><span class="history-external-url">{{ part.href }}</span></a>
+              ><span>{{ part.label }}</span></a>
             </template>
           </p>
           <span
@@ -305,11 +305,6 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
     content: '↗';
     flex-shrink: 0;
   }
-}
-
-.history-external-url {
-  min-width: 0;
-  overflow-wrap: anywhere;
 }
 
 // 时间线节点和箭头是本页独有的图形，其余表面与文字复用全站样式。

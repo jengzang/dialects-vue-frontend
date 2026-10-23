@@ -168,8 +168,9 @@ describe('author-provided website history', () => {
       'https://zhuanlan.zhihu.com/p/2002848348378521848',
       'https://zhuanlan.zhihu.com/p/2003637219919946701'
     ])
+    expect(links.map(link => link.textContent)).toEqual(Array(4).fill('知乎文章'))
+    expect(host.textContent).not.toContain('zhuanlan.zhihu.com')
     for (const link of links) {
-      expect(link.textContent).toBe(link.href)
       expect(link.rel).toContain('noopener')
     }
     expect(host.textContent).toContain('这也是我时隔近半年再次在知乎发文')
@@ -178,7 +179,7 @@ describe('author-provided website history', () => {
 
   it('distinguishes every version while preserving all original body text', async () => {
     await mountHistory()
-    const originalBodies = historyEntries.map(entry => entry.parts.map(part => typeof part === 'string' ? part : part.href).join(''))
+    const originalBodies = historyEntries.map(entry => entry.parts.map(part => typeof part === 'string' ? part : part.label || part.href).join(''))
     expect([...host.querySelectorAll('.history-version')].map(el => el.textContent)).toEqual(originalBodies.flatMap(body => body.match(/v\d+\.\d+\.\d+/g) || []))
     expect(host.querySelectorAll('.history-version').length).toBeGreaterThan(0)
     expect([...host.querySelectorAll('.history-content')].map(el => el.textContent)).toEqual(originalBodies)
