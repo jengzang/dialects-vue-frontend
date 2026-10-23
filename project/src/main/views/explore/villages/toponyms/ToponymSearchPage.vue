@@ -1,224 +1,313 @@
 <template>
-  <main class="toponym-search-page glass-shell">
-    <section class="toponym-search-page__header glass-panel">
-      <div class="toponym-search-page__copy">
-        <h1>{{ t('villages.pages.toponymSearch.title') }}</h1>
-        <p>{{ t('villages.pages.toponymSearch.subtitle') }}</p>
-      </div>
-
-      <form class="toponym-search-page__form" @submit.prevent="handleSearch">
-        <label class="toponym-search-page__field toponym-search-page__field--query">
-          <span>{{ t('villages.pages.toponymSearch.search.keyword') }}</span>
-          <input
-            v-model="query"
-            class="glass-field"
-            data-shape="search"
-            type="text"
-            autocomplete="off"
-            :placeholder="t('villages.pages.toponymSearch.search.placeholder')"
-          />
-        </label>
-
-        <label class="toponym-search-page__field">
-          <span>{{ t('villages.pages.toponymSearch.search.matchMode') }}</span>
-          <SimpleSelectDropdown
-            v-model="matchMode"
-            :options="matchModeOptions"
-            match-trigger-width
-            width="100%"
-          />
-        </label>
-
-        <div class="toponym-search-page__field">
-          <span>{{ t('villages.pages.toponymSearch.search.placeType') }}</span>
-          <MultiSelectDropdown
-            v-model="selectedPlaceTypeCodes"
-            :options="placeTypeOptions"
-            :placeholder="t('villages.pages.toponymSearch.search.placeType')"
-            align="left"
-            direction="down"
-            match-trigger-width
-            width="100%"
-          />
+  <main
+    class="toponym-search-page"
+    :class="{ 'is-search-expanded': isSearchExpanded && !isSearchCollapsing }"
+  >
+    <QuerySearchEntrance
+      :key="entranceKey"
+      ref="querySearchEntranceRef"
+      title-tag="h1"
+      :title="t('villages.pages.toponymSearch.title')"
+      @progress="updateSearchProgress"
+    >
+      <template #intro>
+        <div class="toponym-search-page__copy">
+          <h1 class="page-title">
+            {{ t('villages.pages.toponymSearch.title') }}
+          </h1>
+          <p>{{ t('villages.pages.toponymSearch.subtitle') }}</p>
         </div>
-
-        <label class="toponym-search-page__field">
-          <span>{{ t('villages.pages.toponymSearch.search.areaCode') }}</span>
-          <input
-            v-model="areaCode"
-            class="glass-field"
-            type="text"
-            autocomplete="off"
-            :placeholder="t('villages.pages.toponymSearch.search.areaCodePlaceholder')"
-          />
-        </label>
-
-        <label class="toponym-search-page__field">
-          <span>{{ t('villages.pages.toponymSearch.search.areaScope') }}</span>
-          <SimpleSelectDropdown
-            v-model="areaScope"
-            :options="areaScopeOptions"
-            :disabled="!areaCode.trim()"
-            match-trigger-width
-            width="100%"
-          />
-        </label>
-
-        <label class="toponym-search-page__field">
-          <span>{{ t('villages.pages.toponymSearch.search.limit') }}</span>
-          <SimpleSelectDropdown
-            v-model="limit"
-            :options="limitOptions"
-            match-trigger-width
-            width="100%"
-          />
-        </label>
-
-        <div class="toponym-search-page__actions">
-          <button
-            class="glass-button"
-            data-variant="primary"
-            type="submit"
-            :disabled="searchLoading"
-          >
-            {{ searchLoading ? t('villages.pages.toponymSearch.search.searching') : t('villages.pages.toponymSearch.search.submit') }}
-          </button>
-          <button
-            class="glass-button"
-            data-variant="secondary"
-            type="button"
-            :disabled="searchLoading"
-            @click="handleReset"
-          >
-            {{ t('villages.pages.toponymSearch.search.reset') }}
-          </button>
-        </div>
-      </form>
-    </section>
-
-    <section class="toponym-search-page__workspace">
-      <section class="toponym-search-page__results glass-panel">
-        <header class="toponym-search-page__section-header">
-          <h2>{{ t('villages.pages.toponymSearch.results.title') }}</h2>
-          <span v-if="hasSearched && !searchLoading && !searchError">
-            {{ t('villages.pages.toponymSearch.results.count', { count: searchCount, shown: searchItems.length }) }}
-          </span>
-        </header>
-
-        <div v-if="!hasSearched" class="main-list-state glass-subpanel">
-          <p class="main-list-state-text">{{ t('villages.pages.toponymSearch.results.idle') }}</p>
-        </div>
-
-        <div v-else-if="searchLoading" class="main-list-state glass-subpanel">
-          <p class="main-list-state-text">{{ t('villages.pages.toponymSearch.results.loading') }}</p>
-        </div>
-
-        <div v-else-if="searchError" class="main-list-state glass-subpanel" data-state="error">
-          <div class="main-list-state-title">{{ t('villages.pages.toponymSearch.results.loadFailed') }}</div>
-          <p class="main-list-state-text">{{ searchError }}</p>
-          <button class="glass-button" type="button" @click="handleSearch">
-            {{ t('villages.pages.toponymSearch.search.submit') }}
-          </button>
-        </div>
-
-        <div v-else-if="!searchItems.length" class="main-list-state glass-subpanel">
-          <p class="main-list-state-text">{{ t('villages.pages.toponymSearch.results.empty') }}</p>
-        </div>
-
-        <template v-else>
-          <p v-if="searchTruncated" class="toponym-search-page__notice glass-subpanel">
-            {{ t('villages.pages.toponymSearch.results.truncated') }}
-          </p>
-          <div class="toponym-search-page__result-grid main-card-grid">
-            <button
-              v-for="item in searchItems"
-              :key="item.id || item.name"
-              class="toponym-search-page__result-card glass-card"
-              data-interactive="true"
-              :data-active="selectedItem?.id === item.id"
-              type="button"
-              :aria-pressed="selectedItem?.id === item.id"
-              :disabled="!item.id"
-              @click="handleSelectResult(item)"
+      </template>
+      <template #controls="{ expanded }">
+        <form
+          class="toponym-search-page__form"
+          :class="{ 'is-expanded': expanded, 'glass-panel': !expanded }"
+          @submit.prevent="handleSearch"
+        >
+          <label class="toponym-search-page__field toponym-search-page__field--query">
+            <span>{{ t('villages.pages.toponymSearch.search.keyword') }}</span>
+            <input
+              v-model="query"
+              class="glass-field toponym-search-page__query-input"
+              data-shape="search"
+              type="text"
+              autocomplete="off"
+              :placeholder="t('villages.pages.toponymSearch.search.placeholder')"
             >
-              <strong class="main-card-title">{{ item.name || unknownLabel }}</strong>
-              <span class="main-card-meta">{{ item.id || unknownLabel }}</span>
+          </label>
+
+          <label class="toponym-search-page__field">
+            <span>{{ t('villages.pages.toponymSearch.search.matchMode') }}</span>
+            <SimpleSelectDropdown
+              v-model="matchMode"
+              :options="matchModeOptions"
+              match-trigger-width
+              width="100%"
+            />
+          </label>
+
+          <div class="toponym-search-page__field">
+            <span>{{ t('villages.pages.toponymSearch.search.placeType') }}</span>
+            <MultiSelectDropdown
+              v-model="selectedPlaceTypeCodes"
+              :options="placeTypeOptions"
+              :placeholder="t('villages.pages.toponymSearch.search.placeType')"
+              align="left"
+              direction="down"
+              match-trigger-width
+              width="100%"
+            />
+          </div>
+
+          <label class="toponym-search-page__field">
+            <span>{{ t('villages.pages.toponymSearch.search.areaCode') }}</span>
+            <input
+              v-model="areaCode"
+              class="glass-field"
+              type="text"
+              autocomplete="off"
+              :placeholder="t('villages.pages.toponymSearch.search.areaCodePlaceholder')"
+            >
+          </label>
+
+          <label class="toponym-search-page__field">
+            <span>{{ t('villages.pages.toponymSearch.search.areaScope') }}</span>
+            <SimpleSelectDropdown
+              v-model="areaScope"
+              :options="areaScopeOptions"
+              :disabled="!areaCode.trim()"
+              match-trigger-width
+              width="100%"
+            />
+          </label>
+
+          <label class="toponym-search-page__field">
+            <span>{{ t('villages.pages.toponymSearch.search.limit') }}</span>
+            <SimpleSelectDropdown
+              v-model="limit"
+              :options="limitOptions"
+              match-trigger-width
+              width="100%"
+            />
+          </label>
+
+          <div class="toponym-search-page__actions">
+            <button
+              class="glass-button"
+              data-variant="primary"
+              type="submit"
+              :disabled="searchLoading"
+            >
+              {{ searchLoading ? t('villages.pages.toponymSearch.search.searching') : t('villages.pages.toponymSearch.search.submit') }}
+            </button>
+            <button
+              class="glass-button"
+              data-variant="secondary"
+              type="button"
+              :disabled="searchLoading"
+              @click="handleReset"
+            >
+              {{ t('villages.pages.toponymSearch.search.reset') }}
             </button>
           </div>
-        </template>
-      </section>
-
-      <aside class="toponym-search-page__detail glass-panel">
-        <header class="toponym-search-page__section-header">
-          <h2>{{ t('villages.pages.toponymSearch.detail.title') }}</h2>
-          <button
-            v-if="selectedItem"
-            class="glass-button"
-            data-size="small"
-            type="button"
-            @click="handleViewDistribution"
+          <p
+            v-if="isSearchExpanded && searchError"
+            class="toponym-search-page__validation main-list-state glass-subpanel"
+            role="alert"
+            data-state="error"
           >
-            {{ t('villages.pages.toponymSearch.detail.viewDistribution') }}
-          </button>
-        </header>
+            {{ searchError }}
+          </p>
+        </form>
+      </template>
 
-        <div v-if="!selectedItem" class="main-list-state glass-subpanel">
-          <p class="main-list-state-text">{{ t('villages.pages.toponymSearch.detail.empty') }}</p>
-        </div>
+      <section
+        v-show="hasSearched && !isSearchExpanded"
+        class="toponym-search-page__workspace"
+      >
+        <section class="toponym-search-page__results glass-panel">
+          <header class="toponym-search-page__section-header">
+            <h2>{{ t('villages.pages.toponymSearch.results.title') }}</h2>
+            <span v-if="hasSearched && !searchLoading && !searchError">
+              {{ t('villages.pages.toponymSearch.results.count', { count: searchCount, shown: searchItems.length }) }}
+            </span>
+          </header>
 
-        <div v-else-if="detailsLoading" class="main-list-state glass-subpanel">
-          <p class="main-list-state-text">{{ t('villages.pages.toponymSearch.detail.loading') }}</p>
-        </div>
+          <div
+            v-if="!hasSearched"
+            class="main-list-state glass-subpanel"
+          >
+            <p class="main-list-state-text">
+              {{ t('villages.pages.toponymSearch.results.idle') }}
+            </p>
+          </div>
 
-        <div v-else-if="detailsError" class="main-list-state glass-subpanel" data-state="error">
-          <div class="main-list-state-title">{{ t('villages.pages.toponymSearch.detail.loadFailed') }}</div>
-          <p class="main-list-state-text">{{ detailsError }}</p>
-          <button class="glass-button" type="button" @click="handleSelectResult(selectedItem)">
-            {{ t('villages.pages.toponymSearch.search.submit') }}
-          </button>
-        </div>
+          <div
+            v-else-if="searchLoading"
+            class="main-list-state glass-subpanel"
+          >
+            <p class="main-list-state-text">
+              {{ t('villages.pages.toponymSearch.results.loading') }}
+            </p>
+          </div>
 
-        <dl v-else class="toponym-search-page__detail-list main-detail-list glass-subpanel">
-          <div class="toponym-search-page__detail-source">
-            <dt>{{ t('villages.pages.toponymSearch.detail.source') }}</dt>
-            <dd>{{ t('villages.pages.toponymSearch.detail.sourceName') }}</dd>
+          <div
+            v-else-if="searchError"
+            class="main-list-state glass-subpanel"
+            data-state="error"
+          >
+            <div class="main-list-state-title">
+              {{ t('villages.pages.toponymSearch.results.loadFailed') }}
+            </div>
+            <p class="main-list-state-text">
+              {{ searchError }}
+            </p>
+            <button
+              class="glass-button"
+              type="button"
+              @click="handleSearch"
+            >
+              {{ t('villages.pages.toponymSearch.search.submit') }}
+            </button>
           </div>
-          <div>
-            <dt>{{ t('villages.pages.toponymSearch.detail.id') }}</dt>
-            <dd>{{ selectedItem.id || unknownLabel }}</dd>
+
+          <div
+            v-else-if="!searchItems.length"
+            class="main-list-state glass-subpanel"
+          >
+            <p class="main-list-state-text">
+              {{ t('villages.pages.toponymSearch.results.empty') }}
+            </p>
           </div>
-          <div>
-            <dt>{{ t('villages.pages.toponymSearch.detail.name') }}</dt>
-            <dd>{{ selectedLocalDetail?.name || selectedItem.name || unknownLabel }}</dd>
+
+          <template v-else>
+            <p
+              v-if="searchTruncated"
+              class="toponym-search-page__notice glass-subpanel"
+            >
+              {{ t('villages.pages.toponymSearch.results.truncated') }}
+            </p>
+            <div class="toponym-search-page__result-grid main-card-grid">
+              <button
+                v-for="item in searchItems"
+                :key="item.id || item.name"
+                class="toponym-search-page__result-card glass-card"
+                data-interactive="true"
+                :data-active="selectedItem?.id === item.id"
+                type="button"
+                :aria-pressed="selectedItem?.id === item.id"
+                :disabled="!item.id"
+                @click="handleSelectResult(item)"
+              >
+                <strong class="main-card-title">{{ item.name || unknownLabel }}</strong>
+                <span class="main-card-meta">{{ item.id || unknownLabel }}</span>
+              </button>
+            </div>
+          </template>
+        </section>
+
+        <aside class="toponym-search-page__detail glass-panel">
+          <header class="toponym-search-page__section-header">
+            <h2>{{ t('villages.pages.toponymSearch.detail.title') }}</h2>
+            <button
+              v-if="selectedItem"
+              class="glass-button"
+              data-size="small"
+              type="button"
+              @click="handleViewDistribution"
+            >
+              {{ t('villages.pages.toponymSearch.detail.viewDistribution') }}
+            </button>
+          </header>
+
+          <div
+            v-if="!selectedItem"
+            class="main-list-state glass-subpanel"
+          >
+            <p class="main-list-state-text">
+              {{ t('villages.pages.toponymSearch.detail.empty') }}
+            </p>
           </div>
-          <div>
-            <dt>{{ t('villages.pages.toponymSearch.detail.placeType') }}</dt>
-            <dd>{{ detailPlaceTypeText }}</dd>
+
+          <div
+            v-else-if="detailsLoading"
+            class="main-list-state glass-subpanel"
+          >
+            <p class="main-list-state-text">
+              {{ t('villages.pages.toponymSearch.detail.loading') }}
+            </p>
           </div>
-          <div>
-            <dt>{{ t('villages.pages.toponymSearch.detail.coordinates') }}</dt>
-            <dd>{{ detailCoordinatesText }}</dd>
+
+          <div
+            v-else-if="detailsError"
+            class="main-list-state glass-subpanel"
+            data-state="error"
+          >
+            <div class="main-list-state-title">
+              {{ t('villages.pages.toponymSearch.detail.loadFailed') }}
+            </div>
+            <p class="main-list-state-text">
+              {{ detailsError }}
+            </p>
+            <button
+              class="glass-button"
+              type="button"
+              @click="handleSelectResult(selectedItem)"
+            >
+              {{ t('villages.pages.toponymSearch.search.submit') }}
+            </button>
           </div>
-          <div>
-            <dt>{{ t('villages.pages.toponymSearch.detail.divisionPath') }}</dt>
-            <dd>{{ detailDivisionPathText }}</dd>
-          </div>
-        </dl>
-      </aside>
-    </section>
+
+          <dl
+            v-else
+            class="toponym-search-page__detail-list main-detail-list glass-subpanel"
+          >
+            <div class="toponym-search-page__detail-source">
+              <dt>{{ t('villages.pages.toponymSearch.detail.source') }}</dt>
+              <dd>{{ t('villages.pages.toponymSearch.detail.sourceName') }}</dd>
+            </div>
+            <div>
+              <dt>{{ t('villages.pages.toponymSearch.detail.id') }}</dt>
+              <dd>{{ selectedItem.id || unknownLabel }}</dd>
+            </div>
+            <div>
+              <dt>{{ t('villages.pages.toponymSearch.detail.name') }}</dt>
+              <dd>{{ selectedLocalDetail?.name || selectedItem.name || unknownLabel }}</dd>
+            </div>
+            <div>
+              <dt>{{ t('villages.pages.toponymSearch.detail.placeType') }}</dt>
+              <dd>{{ detailPlaceTypeText }}</dd>
+            </div>
+            <div>
+              <dt>{{ t('villages.pages.toponymSearch.detail.coordinates') }}</dt>
+              <dd>{{ detailCoordinatesText }}</dd>
+            </div>
+            <div>
+              <dt>{{ t('villages.pages.toponymSearch.detail.divisionPath') }}</dt>
+              <dd>{{ detailDivisionPathText }}</dd>
+            </div>
+          </dl>
+        </aside>
+      </section>
+    </QuerySearchEntrance>
   </main>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { getToponymDetails, getToponymSearch } from '@/api';
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue';
+import QuerySearchEntrance from '@/components/common/QuerySearchEntrance.vue';
 
 const { t } = useI18n();
 const router = useRouter();
+const querySearchEntranceRef = ref(null);
+const entranceKey = ref(0);
+const isSearchExpanded = ref(true);
+const isSearchCollapsing = ref(false);
 
 const query = ref('');
 const matchMode = ref('prefix');
@@ -308,6 +397,11 @@ function buildSearchParams() {
   return params;
 }
 
+function updateSearchProgress(progress) {
+  isSearchExpanded.value = progress < 1;
+  if (progress === 0 || progress === 1) isSearchCollapsing.value = false;
+}
+
 async function handleSearch() {
   const keyword = query.value.trim();
   hasSearched.value = true;
@@ -321,6 +415,9 @@ async function handleSearch() {
     searchError.value = t('villages.pages.toponymSearch.errors.emptyQuery');
     return;
   }
+
+  isSearchCollapsing.value = isSearchExpanded.value;
+  querySearchEntranceRef.value?.collapse();
 
   const requestId = searchRequestId.value + 1;
   searchRequestId.value = requestId;
@@ -343,7 +440,7 @@ async function handleSearch() {
   }
 }
 
-function handleReset() {
+async function handleReset() {
   query.value = '';
   matchMode.value = 'prefix';
   selectedPlaceTypeCodes.value = ['22200', '21610', '27610'];
@@ -358,6 +455,14 @@ function handleReset() {
   searchLoading.value = false;
   searchRequestId.value += 1;
   clearDetailState();
+  isSearchExpanded.value = true;
+  isSearchCollapsing.value = false;
+  entranceKey.value += 1;
+  await nextTick();
+  window.scrollTo({
+    top: 0,
+    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+  });
 }
 
 async function handleSelectResult(item) {
@@ -426,40 +531,81 @@ function formatCoordinates(longitude, latitude) {
 
 .toponym-search-page {
   @include flex-col;
-  gap: 16px;
   width: 100%;
-  min-height: 70dvh;
-  padding: 20px;
-}
+  min-height: calc(100dvh - 7dvh - 44px);
+  padding: 6px 20px 24px;
+  box-sizing: border-box;
 
-.toponym-search-page__header {
-  display: grid;
-  grid-template-columns: minmax(220px, 0.32fr) minmax(0, 1fr);
-  gap: 16px;
-  align-items: start;
-  padding: 18px;
+  :deep(.query-search-entrance) {
+    @include flex-col;
+    flex: var(--query-expansion) 0 auto;
+    justify-content: center;
+    padding-bottom: calc((7dvh - 12px) * var(--query-expansion));
+    box-sizing: border-box;
+  }
+
+  &.is-search-expanded :deep(.query-results) {
+    min-height: 0;
+  }
 }
 
 .toponym-search-page__copy {
   @include flex-col;
+  align-items: center;
   gap: 8px;
+  text-align: center;
 
   h1,
   p {
     margin: 0;
   }
+
+  p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.5;
+  }
 }
 
 .toponym-search-page__form {
+  --glass-panel-background: var(--surface-glass-floating);
+  --glass-panel-radius: var(--radius-xl);
+  --glass-panel-border: 1px solid var(--border-glass);
+  --glass-panel-shadow: var(--shadow-glass-inset);
+  --glass-panel-hover-shadow: var(--shadow-glass-inset);
+  --glass-panel-backdrop-filter: blur(24px) saturate(180%);
   display: grid;
-  grid-template-columns: minmax(180px, 1.4fr) repeat(3, minmax(140px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
   align-items: end;
+  min-inline-size: 0;
+  padding: 12px;
+
+  &.is-expanded {
+    padding: 0;
+
+    .toponym-search-page__field--query {
+      grid-column: 1 / -1;
+    }
+  }
+
+  &:not(.is-expanded) .toponym-search-page__actions {
+    grid-column: 3;
+    grid-row: 1;
+    justify-content: flex-end;
+  }
 }
 
 .toponym-search-page__field {
   @include flex-col;
   gap: 6px;
+  min-inline-size: 0;
+
+  input {
+    inline-size: 100%;
+    min-inline-size: 0;
+    box-sizing: border-box;
+  }
 
   span {
     color: var(--text-secondary);
@@ -472,16 +618,29 @@ function formatCoordinates(longitude, latitude) {
   grid-column: span 2;
 }
 
+.toponym-search-page__query-input {
+  min-block-size: calc(44px + var(--query-input-growth, 0px));
+  font-size: calc(15px + 5px * var(--query-expansion, 0));
+}
+
 .toponym-search-page__actions {
   display: flex;
   gap: 10px;
   align-items: center;
+  flex-wrap: wrap;
+  min-inline-size: 0;
+}
+
+.toponym-search-page__validation {
+  grid-column: 1 / -1;
+  margin: 0;
 }
 
 .toponym-search-page__workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.35fr);
   gap: 16px;
+  margin-top: 16px;
   align-items: start;
 }
 
@@ -490,6 +649,7 @@ function formatCoordinates(longitude, latitude) {
   @include flex-col;
   gap: 14px;
   padding: 18px;
+  min-inline-size: 0;
 }
 
 .toponym-search-page__section-header {
@@ -497,6 +657,7 @@ function formatCoordinates(longitude, latitude) {
   gap: 12px;
   align-items: baseline;
   justify-content: space-between;
+  flex-wrap: wrap;
 
   h2 {
     margin: 0;
@@ -516,7 +677,7 @@ function formatCoordinates(longitude, latitude) {
 }
 
 .toponym-search-page__result-grid {
-  --main-card-min-width: 240px;
+  --main-card-min-width: min(100%, 240px);
 }
 
 .toponym-search-page__result-card {
@@ -537,24 +698,41 @@ function formatCoordinates(longitude, latitude) {
 
 @media (max-aspect-ratio: 1 / 1) {
   .toponym-search-page {
-    padding: 14px;
+    min-height: calc(100dvh - 16dvh - 44px);
+    padding: 1px 8px 16px;
+
+    :deep(.query-search-entrance) {
+      padding-bottom: calc((16dvh - 8px) * var(--query-expansion));
+    }
   }
 
-  .toponym-search-page__header,
   .toponym-search-page__workspace {
     grid-template-columns: 1fr;
   }
 
   .toponym-search-page__form {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    padding: 10px;
+
+    &:not(.is-expanded) .toponym-search-page__actions {
+      grid-column: 1 / -1;
+      grid-row: auto;
+    }
   }
 
   .toponym-search-page__field--query {
-    grid-column: auto;
+    grid-column: 1 / -1;
   }
 
   .toponym-search-page__actions {
-    flex-wrap: wrap;
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+
+  .toponym-search-page__results,
+  .toponym-search-page__detail {
+    padding: 12px;
   }
 }
 </style>

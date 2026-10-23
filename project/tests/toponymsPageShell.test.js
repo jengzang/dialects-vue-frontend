@@ -29,8 +29,9 @@ describe('toponyms page shell', () => {
     expect(page).toContain('getToponymSearch');
     expect(page).toContain("import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'");
     expect(page).toContain("import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'");
-    expect(page).toContain('class="toponym-search-page glass-shell"');
-    expect(page).toContain('class="toponym-search-page__header glass-panel"');
+    expect(page).toContain('class="toponym-search-page"');
+    expect(page).toContain('<QuerySearchEntrance');
+    expect(page).toContain("'glass-panel': !expanded");
     expect(page).toContain('class="toponym-search-page__results glass-panel"');
     expect(page).toContain('class="toponym-search-page__detail glass-panel"');
     expect(page).toContain('class="toponym-search-page__result-grid main-card-grid"');
