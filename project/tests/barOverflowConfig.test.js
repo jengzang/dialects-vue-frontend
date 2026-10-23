@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
+import { ref } from 'vue'
+import { getDefaultTabScroll, sortTabsByScroll, useBarOverflow } from '../src/composables/bar/useBarOverflow.js'
 import {
   createCommonBarItem,
   createCommonBarSchema,
@@ -46,7 +48,7 @@ describe('bar overflow navigation config', () => {
       ['tools', '🧰'],
       ['praat', '🎙️'],
       ['charClass', '📚'],
-      ['words', '📖'],
+      ['yubao', '📖'],
       ['villages', '🏘️'],
     ]
 
@@ -63,15 +65,15 @@ describe('bar overflow navigation config', () => {
     const villagesMlBarSource = readSource(villagesMlBarPath)
 
     expect(menuBarSource).toContain("tab: 'home'")
-    expect(menuBarSource).toContain("overrides: { scroll: 'left', weight: 0.7, weightIconOnly: 0.4 }")
-    expect(menuBarSource.match(/scroll: 'right'/g) || []).toHaveLength(4)
+    expect(menuBarSource).toContain("overrides: { mobileScroll: 'left', weight: 0.7, weightIconOnly: 0.4 }")
+    expect(menuBarSource.match(/scroll: 'right'/g) || []).toHaveLength(2)
 
     expect(exploreBarSource).toContain("tab: 'home'")
     expect(exploreBarSource).toContain("overrides: { scroll: 'left', weightIconOnly: 0.4 }")
     expect(exploreBarSource.match(/scroll: 'right'/g) || []).toHaveLength(5)
 
     expect(villagesMlBarSource).toContain("id: 'home'")
-    expect(villagesMlBarSource).toContain("overrides: { scroll: 'left', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 0.9 }")
+    expect(villagesMlBarSource).toContain("overrides: { mobileScroll: 'left', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 0.9 }")
   })
 
   it('keeps existing mobile-only overflow assignments scoped to mobile layouts', () => {
@@ -153,25 +155,24 @@ describe('bar overflow navigation config', () => {
     }
   })
 
-  it('uses rendered portrait primary tabs when sizing overflow layouts', () => {
-    const bars = [
-      { path: navBarPath, activeCall: 'isMenuTabActive(t.tab)' },
-      { path: commonBarPath, activeCall: 'isActiveComputed(t.tab)' },
-      { path: exploreBarComponentPath, activeCall: 'isActiveComputed(t.tab)' },
-    ]
-
-    for (const { path, activeCall } of bars) {
-      const source = readSource(path)
-
-      expect(source).toContain('const getRenderedPrimaryTabs = (isMobile) =>')
-      expect(source).toContain('.filter(t => !isMobile || !t.hideOnMobile)')
-      expect(source).toContain('const getPrimaryTotalWeight = (isMobile) =>')
-      expect(source).toContain('getRenderedPrimaryTabs(isMobile)')
-      expect(source).toContain(`reduce((s, t) => s + getFlexWeight(t, ${activeCall}, isMobile), 0) || 1`)
-      expect(source).toContain('getPrimaryTotalWeight(isMobile)')
-      expect(source).toContain('if (navContentWidth.value > 0) {')
-      expect(source).toContain('return `0 0 ${(w / totalWeight) * 100}%`')
-      expect(source).not.toContain('primaryTotalWeight.value')
+  it('sizes overflow against rendered primary tabs in both orientations', () => {
+    const primary = { tab: 'query', weight: 1 }
+    const hidden = { tab: 'hidden', weight: 1, hideOnMobile: true }
+    const edge = { tab: 'edge', weight: 1, scroll: 'right' }
+    const width = ref(600)
+    const overflow = useBarOverflow({
+      orderedTabs: ref([primary, hidden, edge]),
+      orderedMobileTabs: ref([primary, hidden, edge]),
+      hasOverflowDesktop: ref(true), hasOverflowMobile: ref(true),
+      navContentWidth: width, getTabScroll: getDefaultTabScroll, resolveIsActive: () => true,
+    })
+    expect(overflow.getOverflowFlex(primary, true, false)).toBe('0 0 300px')
+    expect(overflow.getOverflowFlex(primary, true, true)).toBe('0 0 600px')
+    expect(overflow.getOverflowFlex(edge, false, true)).toBe('0 0 auto')
+    width.value = 0
+    expect(overflow.getOverflowFlex(primary, true, true)).toBe('0 0 100%')
+    for (const path of [navBarPath, commonBarPath, exploreBarComponentPath]) {
+      expect(readSource(path)).toContain('useBarOverflow({')
     }
   })
 
@@ -200,36 +201,27 @@ describe('bar overflow navigation config', () => {
     }
   })
 
-  it('uses px overflow tab padding per orientation', () => {
-    for (const path of [navBarPath, commonBarPath, exploreBarComponentPath]) {
-      const source = readSource(path)
-
-      expect(source).toContain('@media (orientation: landscape) {')
-      expect(source).toContain('@media (orientation: portrait) {')
-      expect(source).toContain('padding-inline: 10px;')
-      expect(source).toContain('padding-inline: 14px;')
-      expect(source).not.toContain('padding-inline: 0.6rem;')
-      expect(source).not.toContain('padding-inline: 0.85rem;')
+  it('uses shared overflow spacing with local navbar placement', () => {
+    const mixins = readSource(resolve(projectRoot, 'src/components/bar/_bar-shared.scss'))
+    expect(mixins).toContain('@mixin bar-overflow-tabs')
+    for (const path of [commonBarPath, exploreBarComponentPath]) {
+      expect(readSource(path)).toContain('@include bar-overflow-tabs')
     }
+    expect(readSource(navBarPath)).toContain('padding-inline: 12px;')
   })
 
-  it('supports mobile-only overflow tab sorting in each bar', () => {
+  it('sorts mobile overflow separately while preserving desktop roles', () => {
+    const tabs = [{ tab: 'main' }, { tab: 'mobile', mobileScroll: 'left' }, { tab: 'right', scroll: 'right' }]
+    expect(sortTabsByScroll(tabs, false, getDefaultTabScroll).map(t => t.tab)).toEqual(['main', 'mobile', 'right'])
+    expect(sortTabsByScroll(tabs, true, getDefaultTabScroll).map(t => t.tab)).toEqual(['mobile', 'main', 'right'])
     for (const path of [navBarPath, commonBarPath, exploreBarComponentPath]) {
       const source = readSource(path)
-
-      expect(source).toContain('const getTabScroll = (tab, isMobile) =>')
-      expect(source).toContain("return isMobile ? (tab.mobileScroll ?? tab.scroll) : tab.scroll")
-      expect(source).toContain('const sortTabsByScroll = (tabs, isMobile) =>')
-      expect(source).toContain('const orderedTabs = computed(() => sortTabsByScroll(')
-      expect(source).toContain('const orderedMobileTabs = computed(() => sortTabsByScroll(')
-      expect(source).toContain('const hasOverflowForLayout = (isMobile) => isMobile ? hasOverflowMobile.value : hasOverflowDesktop.value')
+      expect(source).toContain('getDefaultTabScroll(tab, isMobile)')
+      expect(source).toContain('sortTabsByScroll(')
       expect(source).toContain('v-for="t in orderedMobileTabs"')
       expect(source).toContain("getTabScroll(t, true) === 'left'")
-      expect(source).toContain("getTabScroll(t, true) === 'right'")
-      expect(source).toContain("getTabScroll(t, false) === 'left'")
       expect(source).toContain("getTabScroll(t, false) === 'right'")
-      expect(source).toContain('getRenderedPrimaryTabs(isMobile)')
-      expect(source).toContain('getOverflowFlex(t,')
     }
   })
+
 })

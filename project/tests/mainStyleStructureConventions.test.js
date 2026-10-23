@@ -96,14 +96,18 @@ describe('main style structure conventions', () => {
     expect(info).not.toMatch(/@media\s*\(\s*(?:max|min)-width:/)
   })
 
-  it('uses the global page title utility for repeated tab page titles', () => {
+  it('uses global page title styles with layout-only local overrides', () => {
     for (const file of [
       'src/main/views/menu/PhoPage.vue',
       'src/main/views/menu/QueryPage.vue',
       'src/main/views/menu/ComparePage.vue',
       'src/main/views/menu/MapPage.vue',
     ]) {
-      expect(readSource(file), file).not.toContain('.page-title {')
+      for (const block of extractSelectorBlocks(readSource(file), '.page-title')) {
+        for (const declaration of topLevelDeclarations(block)) {
+          expect(declaration, file).toMatch(/^(margin(?:-(?:top|right|bottom|left))?|padding(?:-(?:top|right|bottom|left))?|position|top|right|bottom|left|width|height):/)
+        }
+      }
     }
   })
 

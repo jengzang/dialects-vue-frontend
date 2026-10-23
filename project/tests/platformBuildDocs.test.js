@@ -39,7 +39,7 @@ describe('platform build documentation', () => {
   })
 
   it('links the platform build guide from the main documentation indexes', () => {
-    expect(readRepoFile('README.md')).toContain('./docs/PLATFORM_BUILD.md')
+    expect(readRepoFile('README.md')).toContain('./docs/README.md')
     expect(readRepoFile('docs/README.md')).toContain('./PLATFORM_BUILD.md')
   })
 })

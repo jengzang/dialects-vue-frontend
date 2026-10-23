@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
   getVocabularyCounts: vi.fn(),
+  invalidateVocabularyCountsCache: vi.fn(),
+  invalidateVocabularyOptionsCache: vi.fn(),
   getVocabularyLocations: vi.fn(),
   previewVocabularyImport: vi.fn(),
   uploadVocabulary: vi.fn(),
@@ -14,6 +16,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock('@/api', () => mocks)
 vi.mock('@/utils/ui/message.js', () => mocks)
 vi.mock('vue-i18n', () => ({ useI18n: () => ({
+  locale: { value: 'zh-CN' },
   t: (key, params) => `${key}${params ? JSON.stringify(params) : ''}`,
 }) }))
 vi.mock('vue-router', () => ({ useRoute: () => ({}), useRouter: () => ({ push: vi.fn() }) }))

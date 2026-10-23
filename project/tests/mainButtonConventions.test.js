@@ -36,7 +36,7 @@ describe('main button conventions', () => {
     expect(source).toContain("&[data-variant='primary']")
     expect(source).toContain("&[data-variant='secondary']")
     expect(source).toContain("&[data-variant='danger']")
-    expect(source).toContain("&[data-variant='run']")
+    expect(source).toContain("&[data-variant='success']")
     expect(source).toContain("&[data-variant='enter']")
     expect(source).toContain("&[data-size='compact']")
   })
@@ -55,8 +55,8 @@ describe('main button conventions', () => {
     }
   })
 
-  it('does not keep legacy button tokens in tracked source files', () => {
-    const legacyTokens = ['main-glass-button', 'run-btn', 'enter-btn', 'entry-button']
+  it('rejects retired button tokens and limits the shared run button to query pages', () => {
+    const legacyTokens = ['main-glass-button', 'enter-btn', 'entry-button']
 
     for (const file of trackedStyleAndVueFilesUnder('src')) {
       const source = readFileSync(file, 'utf8')
@@ -66,6 +66,9 @@ describe('main button conventions', () => {
       }
 
       expect(source, `${file} should not contain legacy button variables`).not.toContain('--main-glass-button')
+      if (legacyTokenPattern('run-btn').test(source)) {
+        expect(['src/main/views/menu/QueryPage.vue', 'src/main/views/menu/ComparePage.vue', 'src/styles/main/_buttons.scss'].some(path => file.endsWith('/' + path)), file).toBe(true)
+      }
     }
   })
 })

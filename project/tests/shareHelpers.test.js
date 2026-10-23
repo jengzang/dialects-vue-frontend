@@ -163,7 +163,8 @@ describe('share card helper', () => {
     expect(canvas.width).toBe(1200)
     expect(canvas.height).toBe(630)
     expect(calls.some(call => call.includes('方音图鉴'))).toBe(true)
-    expect(calls.some(call => call.includes('简体 · 绿色'))).toBe(true)
+    expect(calls.some(call => call.includes('查中古'))).toBe(true)
+    expect(calls.some(call => call.includes('https://dialects.yzup.top/menu/query/zhonggu'))).toBe(true)
   })
 
   it('draws localized brand copy and QR blocks on the share card', async () => {
@@ -218,6 +219,7 @@ describe('share card helper', () => {
       font: '',
       textAlign: '',
       drawImage: (...args) => calls.push(['drawImage', ...args]),
+      beginPath: vi.fn(), arc: vi.fn(), fill: vi.fn(), clip: vi.fn(), save: vi.fn(), restore: vi.fn(),
       fillRect: (...args) => calls.push(['fillRect', ...args]),
       fillText: (...args) => calls.push(['fillText', ...args]),
       measureText: (text) => ({ width: text.length * 12 }),

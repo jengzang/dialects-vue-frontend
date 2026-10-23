@@ -9,17 +9,22 @@ const componentPath = resolve(
   '../src/main/views/explore/word/vocabulary/VocabularyTopControls.vue'
 )
 
+function readViewSource() {
+  return readFileSync(resolve(testsDir, '../src/main/views/explore/word/vocabulary/VocabularyViewPage.vue'), 'utf8')
+}
+
 function readComponentSource() {
   return readFileSync(componentPath, 'utf8')
 }
 
 describe('VocabularyTopControls character-notes mode', () => {
-  it('defaults its source switch to the existing vocabulary mode', () => {
-    const source = readComponentSource()
-
-    expect(source).toMatch(/source:\s*\{\s*type:\s*String,\s*default:\s*'vocabulary'\s*\}/)
-    expect(source).toContain("emit('update:source', $event ? 'vocabulary' : 'character-notes')")
-    expect(source).toContain(':model-value="source === \'vocabulary\'"')
+  it('defaults the source to vocabulary and exposes both modes through the page intro', () => {
+    expect(readComponentSource()).toMatch(/source:\s*\{\s*type:\s*String,\s*default:\s*'vocabulary'\s*\}/)
+    const source = readViewSource()
+    expect(source).toContain('v-model="source"')
+    expect(source).toContain('name="vocabulary-query-source"')
+    expect(source).toContain("{ value: 'vocabulary', label: t('words.wordList.source.vocabulary') }")
+    expect(source).toContain("{ value: 'character-notes', label: t('words.wordList.source.characterNotes') }")
   })
 
   it('cancels uncommitted keyword input when its source changes', () => {
@@ -28,56 +33,50 @@ describe('VocabularyTopControls character-notes mode', () => {
     expect(source).toMatch(/watch\(\(\) => props\.source, \(\) => \{\s*clearTimeout\(searchTimer\)\s*inputText\.value = props\.query\s*\}\)/)
   })
 
-  it('keeps the source switch in the filter strip for vocabulary controls', () => {
-    const source = readComponentSource()
-    const filterStripStart = source.indexOf('<div\n      class="filter-strip"')
-    const vocabularyBranchStart = source.indexOf('<template v-else>')
-    const sourceSwitchStart = source.indexOf(':model-value="source === \'vocabulary\'"', vocabularyBranchStart)
-    const locationFilterStart = source.indexOf('class="location-filter"')
-
-    expect(filterStripStart).toBeGreaterThan(-1)
-    expect(vocabularyBranchStart).toBeGreaterThan(filterStripStart)
-    expect(sourceSwitchStart).toBeGreaterThan(vocabularyBranchStart)
-    expect(locationFilterStart).toBeGreaterThan(sourceSwitchStart)
+  it('keeps source selection in the intro while the filter strip receives the notes scope', () => {
+    const view = readViewSource()
+    const intro = view.slice(view.indexOf('<template #intro>'), view.indexOf('</template>'))
+    expect(intro).toContain('name="vocabulary-query-source"')
+    expect(readComponentSource()).toContain(":id=\"source === 'character-notes' ? 'vocabulary-notes-scope-filter' : undefined\"")
+    expect(view).toContain('to="#vocabulary-notes-scope-filter"')
+    expect(view).toContain(':disabled="isSearchExpanded"')
   })
 
-  it('uses the shared geographic input as an unlimited notes scope and refreshes manually', () => {
-    const source = readComponentSource()
-
-    expect(source).toContain("import LocationAndRegionInput from '@/main/components/geo/LocationAndRegionInput.vue'")
-    expect(source).toContain('allow-empty-scope')
-    expect(source).toContain('disable-location-limit')
-    expect(source).toContain("@locations-resolved=\"handleNotesLocationsResolved\"")
-    expect(source).toContain('@click="refreshNotes"')
-    expect(source).toContain('if (props.notesRefreshDisabled || isNotesScopeResolving.value || isNotesScopeDisabled.value) return')
-    expect(source).toContain('isNotesScopeResolving')
+  it('uses a page-owned unlimited notes scope and refreshes manually after resolution', () => {
+    const view = readViewSource()
+    expect(view).toContain("import LocationAndRegionInput from '@/main/components/geo/LocationAndRegionInput.vue'")
+    expect(view).toContain('allow-empty-scope')
+    expect(view).toContain('disable-location-limit')
+    expect(view).toContain('@locations-resolved="handleNotesScopeResolved"')
+    expect(view).toContain(':notes-refresh-disabled="isNotesScopeResolving || isNotesScopeDisabled"')
+    expect(view).toContain('appliedScope.value = cloneNotesScope(draftScope.value)')
+    expect(readComponentSource()).toContain('@click="refreshNotes"')
+    expect(readComponentSource()).toContain('if (props.notesRefreshDisabled || isComposing.value) return')
   })
 
-  it('stacks the source switch below notes refresh beside the keyword input', () => {
+  it('places the notes refresh and settings beside the keyword input', () => {
     const source = readComponentSource()
-    const searchContainerStart = source.indexOf('<div class="search-container">')
-    const searchContainerEnd = source.indexOf('\n    </div>\n\n    <div\n      class="filter-strip"')
-    const notesActionsStart = source.indexOf('class="notes-mode-actions"')
-    const notesActionsEnd = source.indexOf('</div>', notesActionsStart)
-    const sourceSwitchStart = source.indexOf(':model-value="source === \'vocabulary\'"', notesActionsStart)
-    const refreshButtonStart = source.indexOf("{{ t('words.wordList.notes.refreshResults') }}")
-
-    expect(notesActionsStart).toBeGreaterThan(searchContainerStart)
-    expect(notesActionsStart).toBeLessThan(searchContainerEnd)
-    expect(refreshButtonStart).toBeGreaterThan(notesActionsStart)
-    expect(sourceSwitchStart).toBeGreaterThan(refreshButtonStart)
-    expect(sourceSwitchStart).toBeLessThan(notesActionsEnd)
+    const settings = source.indexOf('class="notes-search-settings"')
+    const actions = source.indexOf('class="notes-mode-actions"', settings)
+    const refresh = source.indexOf('@click="refreshNotes"', actions)
+    const fields = source.indexOf('class="field-filter"', refresh)
+    const strip = source.indexOf('class="filter-strip"', fields)
+    expect(settings).toBeGreaterThan(source.indexOf('<div class="search-container">'))
+    expect(actions).toBeGreaterThan(settings)
+    expect(refresh).toBeGreaterThan(actions)
+    expect(fields).toBeGreaterThan(refresh)
+    expect(strip).toBeGreaterThan(fields)
     expect(source).toMatch(/\.notes-mode-actions\s*\{[\s\S]*@include flex-col;/)
   })
 
-  it('uses the shared action button with a refresh SVG for notes refresh', () => {
+  it('uses the shared refresh action when compact and a search button when expanded', () => {
     const source = readComponentSource()
-
     expect(source).toContain("import ActionButton from '@/main/components/user/auth/ActionButton.vue'")
-    expect(source).toContain('<ActionButton')
-    expect(source).toContain('variant="blue"')
+    expect(source).toContain(':is="deferQuery ? \'button\' : ActionButton"')
+    expect(source).toContain(':variant="deferQuery ? undefined : \'blue\'"')
     expect(source).toContain('viewBox="0 0 24 24"')
-    expect(source).toContain("{{ t('words.wordList.notes.refreshResults') }}")
+    expect(source).toContain("t(deferQuery ? 'common.button.search' : 'words.wordList.notes.refreshResults')")
+    expect(source).toContain("if (props.deferQuery) emit('search')")
   })
 
   it('uses a compact, notes-only style for the refresh action', () => {

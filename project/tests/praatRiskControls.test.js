@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
 const testsDir = dirname(fileURLToPath(import.meta.url))
 const projectRoot = resolve(testsDir, '..')
 
-const praatViewPath = resolve(projectRoot, 'src/main/views/Praat.vue')
+const praatViewPath = resolve(projectRoot, 'src/main/views/explore/Praat.vue')
 const audioInputPanelPath = resolve(projectRoot, 'src/main/components/praat/AudioInputPanel.vue')
 const jobStatusPanelPath = resolve(projectRoot, 'src/main/components/praat/JobStatusPanel.vue')
 const analysisResultsPanelPath = resolve(projectRoot, 'src/main/components/praat/AnalysisResultsPanel.vue')
@@ -62,8 +62,9 @@ describe('Praat front-end risk controls', () => {
   it('Audio input keeps Praat available on native apps through platform file and recorder adapters', () => {
     const source = readSource(audioInputPanelPath)
 
-    expect(source).toContain("import { getPlatformAudioRecorder, getPlatformFileService } from '@/platform/index.js'")
-    expect(source).toMatch(/getPlatformFileService\(\)\.pickFilesOrOpenInput\(fileInput\.value,\s*\{\s*accept: 'audio\/\*'/)
+    expect(source).toMatch(/import\s*\{[^}]*getPlatformAudioRecorder,[^}]*getPlatformFileService,[^}]*\}\s*from '@\/platform\/index.js'/s)
+    expect(source).toMatch(/getPlatformFileService\(\)\.pickFilesOrOpenInput\(fileInput\.value,\s*\{\s*accept: fileInputAccept\.value/)
+    expect(source).toContain('getPraatInputAccept(praatPlatformTarget)')
     expect(source).toContain('const nativeAudioRecorder = getPlatformAudioRecorder()')
     expect(source).toContain('if (nativeAudioRecorder.canRecord()) {')
     expect(source).toContain('await nativeAudioRecorder.start()')

@@ -56,7 +56,7 @@ describe('AppModal Flip to Detail transition', () => {
     expect(modal).toContain('@keyframes flip-to-detail-leave')
     expect(modal).toContain('rotateY(180deg)')
     expect(modal).toContain('perspective: 1200px')
-    expect(modal).toContain('animation-duration: 0.8s')
+    expect(modal).toContain('animation-duration: 1s')
     expect(uiMode).toContain(":root[data-ui-mode='compact'] *")
     expect(uiMode).toContain('animation: none !important;')
     expect(uiMode).toContain('transition: none !important;')

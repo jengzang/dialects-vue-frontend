@@ -65,7 +65,7 @@ describe('home and intro internal links', () => {
     expect(villagesPage).toContain('<RouterLink class="portal-entry-card glass-card" data-interactive="true" :to="localeTo(\'/explore/villages/toponyms\')">')
     expect(villagesPage).toContain(':to="localeTo(\'/explore/villages/table\')"')
     expect(villagesPage).toContain(':to="localeTo(\'/explore/villages/gd\')"')
-    expect(villagesPage).toContain(':to="localeTo(\'/explore/villages/yc\')"')
+    expect(villagesPage).toContain(':to="localeTo(\'/explore/yc/villages\')"')
     expect(villagesPage).toContain(':to="localeTo(\'/explore/villages/ml\')"')
     expect(villagesPage).toContain('@click="handleAllVillages"')
 
@@ -75,7 +75,7 @@ describe('home and intro internal links', () => {
 
     expect(gdVillagesTable).toContain('<RouterLink class="cross-link" :to="localeTo(\'/explore/villages/gd\')">')
     expect(gdVillagesTree).toContain('<RouterLink class="cross-link" :to="localeTo(\'/explore/villages/table\')">')
-    expect(yangChunSpoken).toContain('<RouterLink class="cross-link" :to="localeTo(\'/explore/villages/yc\')">')
+    expect(yangChunSpoken).toContain('<RouterLink class="cross-link" :to="localeTo(\'/explore/yc/villages\')">')
     expect(yangChunVillages).toContain('<RouterLink class="cross-link" :to="localeTo(\'/explore/yc/words\')">')
   })
 })

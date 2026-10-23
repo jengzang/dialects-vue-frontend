@@ -2,7 +2,7 @@ import { createApp, inject, nextTick } from 'vue'
 import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { userStore } from '../src/main/store/store.js'
 
 const testsDir = dirname(fileURLToPath(import.meta.url))
@@ -37,11 +37,11 @@ vi.mock('vue-i18n', () => ({
   useI18n: () => ({
     t: (key, params) => {
       const permissionLabels = {
-        'words.wordList.access.permissionLabels.manage': '词表管理员',
-        'words.wordList.access.permissionLabels.edit': '词表贡献者(不限制数量）',
-        'words.wordList.access.permissionLabels.one': '词表贡献者(1个)',
-        'words.wordList.access.permissionLabels.two': '词表贡献者(2个)',
-        'words.wordList.access.permissionLabels.three': '词表贡献者(3个)',
+        'words.wordList.access.permissionLabels.manage': '管理员',
+        'words.wordList.access.permissionLabels.edit': '协作者',
+        'words.wordList.access.permissionLabels.one': '协作者(1)',
+        'words.wordList.access.permissionLabels.two': '协作者(2)',
+        'words.wordList.access.permissionLabels.three': '协作者(3)',
       }
       if (permissionLabels[key]) return permissionLabels[key]
       if (params?.permission) return `${key}:${params.permission}`
@@ -156,6 +156,7 @@ function resetUserStore() {
 }
 
 beforeEach(() => {
+  vi.stubGlobal('matchMedia', () => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() }))
   vi.useRealTimers()
   apiMocks.getVocabularyMe.mockReset()
   messageMocks.showError.mockReset()
@@ -169,6 +170,8 @@ beforeEach(() => {
   document.body.innerHTML = ''
   resetUserStore()
 })
+
+afterEach(() => { vi.unstubAllGlobals() })
 
 describe('vocabulary permission cache', () => {
   it('refreshes a cached permission response that lacks the location deletion capability', async () => {
@@ -290,7 +293,7 @@ describe('vocabulary permission cache', () => {
     await flushPromises()
 
     expect(apiMocks.getVocabularyMe).toHaveBeenCalledTimes(1)
-    expect(messageMocks.showSuccess).toHaveBeenCalledWith('words.wordList.access.permissionRefreshed:词表管理员')
+    expect(messageMocks.showSuccess).toHaveBeenCalledWith('words.wordList.access.permissionRefreshed:管理员')
 
     refreshButton.dispatchEvent(new MouseEvent('click', { bubbles: true }))
     await flushPromises()
@@ -304,7 +307,7 @@ describe('vocabulary permission cache', () => {
     await flushPromises()
 
     expect(apiMocks.getVocabularyMe).toHaveBeenCalledTimes(2)
-    expect(messageMocks.showSuccess).toHaveBeenLastCalledWith('words.wordList.access.permissionRefreshed:词表贡献者(不限制数量）')
+    expect(messageMocks.showSuccess).toHaveBeenLastCalledWith('words.wordList.access.permissionRefreshed:协作者')
 
     wrapper.unmount()
     vi.useRealTimers()
@@ -323,11 +326,11 @@ describe('vocabulary permission cache', () => {
     expect(vocabularyImportPage).toContain('canShowRefreshVocabularyPermission')
     expect(vocabularyImportPage).toContain('props.isAuthenticated')
     expect(vocabularyImportPage).toContain('class="action-btn action-btn--sm"')
-    expect(vocabularyImportPage).toContain("t('words.wordList.access.refreshPermission')")
+    expect(vocabularyImportPage).toContain("vocabularyPermissionLabel")
     expect(vocabularyImportPage).not.toContain('刷新权限')
     expect(vocabularyImportPage).not.toContain('requiresVocabularyPermission.value && Boolean(refreshVocabularyMe)')
     expect(vocabularyImportPage.indexOf("t('words.wordList.access.requestEditPermission')"))
-      .toBeLessThan(vocabularyImportPage.indexOf("t('words.wordList.access.refreshPermission')"))
+      .toBeLessThan(vocabularyImportPage.indexOf("vocabularyPermissionLabel"))
     expect(zhHantWords.wordList.access.refreshPermission).toBe('權限')
     expect(zhCnWords.wordList.access.refreshPermission).toBe('权限')
     expect(enWords.wordList.access.refreshPermission).toBe('Permission')
@@ -337,11 +340,11 @@ describe('vocabulary permission cache', () => {
     expect(zhHantWords.wordList.access.refreshCooldown).toBeTruthy()
     expect(zhCnWords.wordList.access.refreshCooldown).toBeTruthy()
     expect(enWords.wordList.access.refreshCooldown).toBeTruthy()
-    expect(zhCnWords.wordList.access.permissionLabels.manage).toBe('词表管理员')
-    expect(zhCnWords.wordList.access.permissionLabels.edit).toBe('词表贡献者(不限制数量）')
-    expect(zhCnWords.wordList.access.permissionLabels.one).toBe('词表贡献者(1个)')
-    expect(zhCnWords.wordList.access.permissionLabels.two).toBe('词表贡献者(2个)')
-    expect(zhCnWords.wordList.access.permissionLabels.three).toBe('词表贡献者(3个)')
+    expect(zhCnWords.wordList.access.permissionLabels.manage).toBe('管理员')
+    expect(zhCnWords.wordList.access.permissionLabels.edit).toBe('协作者')
+    expect(zhCnWords.wordList.access.permissionLabels.one).toBe('协作者(1)')
+    expect(zhCnWords.wordList.access.permissionLabels.two).toBe('协作者(2)')
+    expect(zhCnWords.wordList.access.permissionLabels.three).toBe('协作者(3)')
     for (const words of [zhHantWords, enWords]) {
       expect(words.wordList.access.permissionLabels.manage).toBeTruthy()
       expect(words.wordList.access.permissionLabels.edit).toBeTruthy()

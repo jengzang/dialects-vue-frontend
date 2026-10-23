@@ -17,7 +17,10 @@ vi.mock('vue-router', () => ({
   useRoute: () => mocks.route,
   useRouter: () => ({ replace: async ({ query }) => { mocks.route.query = query } }),
 }))
-vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: key => key }) }))
+vi.mock('vue-i18n', () => ({
+  useI18n: () => ({ t: key => key }),
+  I18nT: { setup: (_, { slots }) => () => h('span', Object.values(slots).flatMap(slot => slot())) },
+}))
 vi.mock('@/api', () => ({
   getVocabularyItems: mocks.items,
   getVocabularyCounts: mocks.counts,
@@ -191,8 +194,8 @@ describe('vocabulary configuration entrance', () => {
   it('deduplicates same-scope location requests, rejects stale scopes, and clears invalid selected locations', async () => {
     await mount()
     let finishOld
-    mocks.locations.mockImplementationOnce(() => new Promise(resolve => { finishOld = resolve }))
     emitControl('update:filterMode', 'yindian'); await settle()
+    mocks.locations.mockImplementationOnce(() => new Promise(resolve => { finishOld = resolve }))
     emitControl('update:selectedRegions', ['舊分區']); await settle()
     pageState.applyVocabularyQuery()
     const count = mocks.locations.mock.calls.length
@@ -319,7 +322,7 @@ describe('vocabulary configuration entrance', () => {
     expect(mocks.items).toHaveBeenCalledTimes(1)
     await vi.advanceTimersByTimeAsync(1); await settle()
     expect(mocks.items).toHaveBeenCalledTimes(2)
-    expect(mocks.locations).toHaveBeenCalledTimes(locationsCount + 1)
+    expect(mocks.locations).toHaveBeenCalledTimes(locationsCount + (mode === 'administrative' ? 0 : 1))
   })
 
   it.each(['card', 'map'])('does not refresh unchanged partition sets in %s mode', async tab => {

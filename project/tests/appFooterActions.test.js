@@ -194,9 +194,7 @@ describe('AppFooter actions', () => {
     expect(footer.querySelector('.footer-brand-line')?.getAttribute('aria-hidden')).toBe('true')
     expect(footer.querySelector('.footer-content')).toBeTruthy()
     expect(footer.querySelector('.footer-primary')).toBeTruthy()
-    expect(footer.querySelector('.footer-brand-title')?.getAttribute('src')).toBe('/brand/title.webp')
-    expect(footer.querySelector('.footer-brand-title')?.getAttribute('alt')).toBe('方音图鉴')
-    expect(footer.querySelector('.footer-brand-title')?.classList.contains('title-logo')).toBe(true)
+    expect(footer.querySelector('.footer-brand-button strong')?.textContent).toBe('方音图鉴')
     expect(footer.querySelector('.footer-page-description')?.textContent).toBe('按中古地位整理各方言点读音。')
     expect(footer.querySelector('.footer-primary .footer-actions')).toBeTruthy()
     expect(footer.querySelector('.footer-meta .footer-stats')).toBeTruthy()
@@ -261,12 +259,10 @@ describe('AppFooter actions', () => {
       files: expect.any(Array),
     }))
     expect(nativeShareMock).toHaveBeenCalledWith(expect.objectContaining({
-      title: '查中古',
       files: expect.any(Array),
     }))
     const [shareData] = nativeShareMock.mock.calls[0]
-    expect(shareData.text).toBe('按中古地位整理各方言点读音。')
-    expect(shareData.text).not.toContain(window.location.href)
+    expect(Object.keys(shareData)).toEqual(['files'])
     expect(shareData.files[0].name).toBe('dialects-share.png')
     expect(shareData.files[0].type).toBe('image/png')
     expect(HTMLAnchorElement.prototype.click).not.toHaveBeenCalled()
@@ -275,7 +271,7 @@ describe('AppFooter actions', () => {
     wrapper.unmount()
   })
 
-  it('opens SimpleSidebar from the i18n menu action', async () => {
+  it('keeps the retired menu action hidden', async () => {
     const { default: AppFooter } = await import('../src/components/footer/AppFooter.vue')
     const wrapper = mountFooter(AppFooter)
     await nextTick()
@@ -283,17 +279,7 @@ describe('AppFooter actions', () => {
     const menuButton = [...wrapper.host.querySelectorAll('.footer-action')]
       .find(button => button.textContent.trim() === 'layoutFooter.actions.menu')
 
-    expect(menuButton).toBeTruthy()
-    expect(wrapper.host.querySelector('[data-simple-sidebar-stub]')).toBeNull()
-
-    menuButton.click()
-    await nextTick()
-
-    expect(wrapper.host.querySelector('[data-simple-sidebar-stub]')).toBeTruthy()
-
-    wrapper.host.querySelector('[data-close-sidebar]').click()
-    await nextTick()
-
+    expect(menuButton).toBeUndefined()
     expect(wrapper.host.querySelector('[data-simple-sidebar-stub]')).toBeNull()
 
     wrapper.unmount()

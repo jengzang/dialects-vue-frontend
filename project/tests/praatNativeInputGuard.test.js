@@ -42,7 +42,7 @@ describe('Praat native input guard', () => {
   })
 
   it('keeps a second guard in the page-level start analysis action', () => {
-    const source = readSource('src/main/views/Praat.vue')
+    const source = readSource('src/main/views/explore/Praat.vue')
 
     expect(source).toContain("import { getCurrentRuntimePlatform, isPraatFileAcceptedOnPlatform } from '@/platform/index.js'")
     expect(source).toContain('isPraatFileAcceptedOnPlatform(audioFile.value, praatPlatformTarget)')

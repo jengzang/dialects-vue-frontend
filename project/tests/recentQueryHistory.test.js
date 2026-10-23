@@ -31,8 +31,8 @@ describe('recent query history', () => {
     expect(state.entries.value[0].summary).toBe('again')
   })
 
-  it('keeps all nine contexts independent and reloads when the current tab changes', async () => {
-    const contexts = ['query:tab1', 'query:tab2', 'query:tab3', 'query:tab4', 'compare:tab1', 'compare:tab2', 'compare:tab4', 'pho:matrix', 'pho:custom']
+  it('keeps all ten contexts independent and reloads when the current tab changes', async () => {
+    const contexts = ['query:tab1', 'query:tab2', 'query:tab3', 'query:tab4', 'compare:tab1', 'compare:tab2', 'compare:tab4', 'compare:tab5', 'pho:matrix', 'pho:custom']
     contexts.forEach(context => history(context).record({ context }, context))
     const context = ref(contexts[0])
     const state = history(context)
@@ -41,7 +41,7 @@ describe('recent query history', () => {
       await nextTick()
       expect(state.entries.value.map(entry => entry.snapshot.context)).toEqual([value])
     }
-    context.value = 'compare:tab5'
+    context.value = 'unsupported:tab'
     await nextTick()
     state.record({ ignored: true }, 'ignored')
     expect(state.entries.value).toEqual([])

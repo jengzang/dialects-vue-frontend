@@ -144,14 +144,14 @@ describe('useViewportPinnedElement', () => {
     expect(navigation.style.left).toBe('20px')
   })
 
-  it('recalculates the fixed navigation center after an orientation change', async () => {
+  it('recenters the rendered navigation width on orientation changes and clamps it to its parent', async () => {
     originalGetBoundingClientRect = HTMLElement.prototype.getBoundingClientRect
     originalMatchMediaDescriptor = Object.getOwnPropertyDescriptor(window, 'matchMedia')
 
     let placeholderLeft = 20
     let placeholderTop = 100
     let placeholderWidth = 800
-    let intrinsicNavigationWidth = 240
+    const intrinsicNavigationWidth = 240
     const orientationQuery = {
       matches: false,
       addEventListener: vi.fn(),
@@ -186,13 +186,18 @@ describe('useViewportPinnedElement', () => {
     placeholderLeft = 10
     placeholderTop = -1
     placeholderWidth = 360
-    intrinsicNavigationWidth = 160
     orientationQuery.matches = true
     window.dispatchEvent(new Event('resize'))
     await nextTick()
 
-    expect(navigation.style.left).toBe('110px')
-    expect(navigation.style.width).toBe('160px')
+    expect(navigation.style.left).toBe('70px')
+    expect(navigation.style.width).toBe('240px')
+
+    placeholderWidth = 120
+    window.dispatchEvent(new Event('resize'))
+    await nextTick()
+    expect(navigation.style.width).toBe('120px')
+    expect(navigation.style.left).toBe('10px')
   })
 
   it('uses a dynamic portrait top offset when pinning below a fixed header', async () => {

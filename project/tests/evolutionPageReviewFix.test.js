@@ -37,7 +37,7 @@ describe('Evolution page review fixes', () => {
 
   it('registers hover detail events only for desktop pie charts', () => {
     const source = readSource(evolutionPagePath)
-    const interactionStart = source.indexOf("// 绑定点击：钉住卡片 (注意传 index)")
+    const interactionStart = source.indexOf("chart.on('click', (params) => handleInteraction(index, params, true))")
     const interactionEnd = source.indexOf('  return chart', interactionStart)
     const interactionSection = source.slice(interactionStart, interactionEnd)
 
