@@ -62,11 +62,11 @@ describe('author-provided website history', () => {
 
   it('renders all 35 records chronologically and keeps month-only precision', async () => {
     const entries = await mountHistory()
-    expect(entries).toHaveLength(35)
+    expect(entries).toHaveLength(55)
     const dates = entries.map(entry => entry.querySelector('time').dateTime)
     expect(dates[0]).toBe('2025-05')
     expect(entries[0].querySelector('time').textContent).toBe('2025.5')
-    expect(dates.at(-1)).toBe('2026-03-24')
+    expect(dates.at(-1)).toBe('2026-10-22')
     expect(dates).toEqual([...dates].sort())
     expect(host.querySelectorAll('.history-connector')).toHaveLength(31)
   })
@@ -85,8 +85,8 @@ describe('author-provided website history', () => {
       historyEntries.slice(0, 14).map(entry => entry.dateTime),
       historyEntries.slice(14, 21).map(entry => entry.dateTime),
       historyEntries.slice(21, 32).map(entry => entry.dateTime),
-      historyEntries.slice(32).map(entry => entry.dateTime),
-      []
+      historyEntries.slice(32, 47).map(entry => entry.dateTime),
+      historyEntries.slice(47).map(entry => entry.dateTime)
     ])
     for (const stage of stages) {
       expect(stage.querySelector('.history-entry:last-child .history-connector')).toBeNull()
@@ -113,7 +113,7 @@ describe('author-provided website history', () => {
     await nextTick()
     const dates = () => [...host.querySelectorAll('.history-date')].map(time => time.textContent)
     expect(dates()).toEqual(historyEntries.filter(entry => entry.important).map(entry => entry.date))
-    expect(dates().length).toBeLessThan(35)
+    expect(dates().length).toBeLessThan(55)
     expect(importantButton.getAttribute('aria-pressed')).toBe('true')
     expect(allButton.getAttribute('aria-pressed')).toBe('false')
     expect(host.querySelectorAll('.history-stage')).toHaveLength(5)
@@ -126,7 +126,7 @@ describe('author-provided website history', () => {
     allButton.click()
     await nextTick()
     expect(dates()).toEqual(historyEntries.map(entry => entry.date))
-    expect(host.querySelectorAll('.history-connector')).toHaveLength(31)
+    expect(host.querySelectorAll('.history-connector')).toHaveLength(50)
     expect(allButton.getAttribute('aria-pressed')).toBe('true')
   })
 
