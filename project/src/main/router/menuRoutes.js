@@ -50,7 +50,8 @@ export const menuRoutes = [
   },
   {
     path: 'menu/query/:sub(char|zhonggu|yinwei|tone)',
-    component: QueryPage
+    component: QueryPage,
+    meta: { queryAllowlist: ['openPartitionInfo'] }
   },
   {
     path: 'menu/compare',

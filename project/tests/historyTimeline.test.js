@@ -11,6 +11,9 @@ import { exploreRoutes } from '../src/main/router/exploreRoutes.js'
 
 const testsDir = dirname(fileURLToPath(import.meta.url))
 const historyPageSource = readFileSync(resolve(testsDir, '../src/main/views/menu/support/about/AboutHistory.vue'), 'utf8')
+const customDataPanelSource = readFileSync(resolve(testsDir, '../src/main/components/map/custom/CustomDataPanel.vue'), 'utf8')
+const locationInputSource = readFileSync(resolve(testsDir, '../src/main/components/geo/LocationAndRegionInput.vue'), 'utf8')
+const appFooterSource = readFileSync(resolve(testsDir, '../src/components/footer/AppFooter.vue'), 'utf8')
 
 let app
 let host
@@ -180,7 +183,7 @@ describe('author-provided website history', () => {
 
   it('renders the four original Zhihu article URLs as safe clickable links', async () => {
     await mountHistory()
-    const links = [...host.querySelectorAll('ol a[target="_blank"]')]
+    const links = [...host.querySelectorAll('ol a[href^="https://zhuanlan.zhihu.com/"]')]
     expect(links.map(link => link.href)).toEqual([
       'https://zhuanlan.zhihu.com/p/1934345780199682731',
       'https://zhuanlan.zhihu.com/p/2001363637311381604',
@@ -202,7 +205,7 @@ describe('author-provided website history', () => {
     expect([...host.querySelectorAll('.history-version')].map(el => el.textContent)).toEqual(originalBodies.flatMap(body => body.match(/v\d+\.\d+\.\d+/g) || []))
     expect(host.querySelectorAll('.history-version').length).toBeGreaterThan(0)
     expect([...host.querySelectorAll('.history-content')].map(el => el.textContent)).toEqual(originalBodies)
-    expect(host.querySelectorAll('.history-link--external')).toHaveLength(4)
+    expect(host.querySelectorAll('.history-link--external')).toHaveLength(5)
   })
 
   it.each(['zh-CN', 'zh-Hant', 'en'])('links features to current routes in %s', async locale => {
@@ -220,5 +223,62 @@ describe('author-provided website history', () => {
     }
     links.find(link => link.textContent === '查字').click()
     await vi.waitFor(() => expect(router.currentRoute.value.path).toBe(`/${locale}/menu/query/char`))
+  })
+
+  it('routes the requested feature names to their pages and opens the correct map states', async () => {
+    await mountHistory()
+    const links = [...host.querySelectorAll('a.history-link--internal')]
+    const hrefFor = text => links.find(link => link.textContent === text)?.getAttribute('href')
+    const locale = 'zh-Hant'
+
+    expect(hrefFor('细分查询')).toBe(`/${locale}/menu/result`)
+    expect(hrefFor('右侧面板')).toBe(`/${locale}/menu/map/view?openPanel=true`)
+    expect(hrefFor('用户自定义数据添加')).toBeUndefined()
+    expect(hrefFor('按行政区划、分区等逐一查看或选择地点')).toBe(`/${locale}/menu/query/zhonggu?openPartitionInfo=true`)
+    expect(hrefFor('查字')).toBe(`/${locale}/menu/query/char`)
+    expect(hrefFor('查中古')).toBe(`/${locale}/menu/query/zhonggu`)
+    expect(hrefFor('查音位')).toBe(`/${locale}/menu/query/yinwei`)
+    expect(hrefFor('查音系')).toBe(`/${locale}/menu/pho/matrix`)
+    expect(router.resolve(hrefFor('右侧面板')).meta.queryAllowlist.variants.view).toContain('openPanel')
+    expect(router.resolve(hrefFor('按行政区划、分区等逐一查看或选择地点')).meta.queryAllowlist).toContain('openPartitionInfo')
+    expect(host.querySelector('time[datetime="2026-06-22"]')?.parentElement?.parentElement?.textContent)
+      .toContain('查字、查中古、查音位、查音系等增加文白读显示')
+
+    const oldSite = [...host.querySelectorAll('a.history-link--external')]
+      .find(link => link.textContent === '旧版网站')
+    expect(oldSite?.href).toBe('https://dialects.yzup.top/detail/')
+    expect(oldSite?.target).toBe('_blank')
+
+    links.find(link => link.textContent === '细分查询').click()
+    await vi.waitFor(() => expect(router.currentRoute.value.path).toBe(`/${locale}/menu/result`))
+    links.find(link => link.textContent === '右侧面板').click()
+    await vi.waitFor(() => expect(router.currentRoute.value.query.openPanel).toBe('true'))
+    links.find(link => link.textContent === '按行政区划、分区等逐一查看或选择地点').click()
+    await vi.waitFor(() => expect(router.currentRoute.value.query.openPartitionInfo).toBe('true'))
+  })
+
+  it('turns footer history items into the existing footer actions', async () => {
+    await mountHistory()
+    const actionButtons = [...host.querySelectorAll('button.history-link--action')]
+    const dispatchedActions = []
+    const onFooterAction = event => dispatchedActions.push(event.detail?.action)
+    window.addEventListener('app-footer-action', onFooterAction)
+
+    expect(actionButtons.map(button => button.textContent.trim())).toEqual(['反馈建议', '功能入口', '分享'])
+    actionButtons.forEach(button => button.click())
+    expect(dispatchedActions).toEqual(['feedback', 'features', 'share'])
+    expect(appFooterSource).toContain("window.addEventListener('app-footer-action'")
+    expect(appFooterSource).toContain("case 'feedback':")
+    expect(appFooterSource).toContain("case 'features':")
+    expect(appFooterSource).toContain("case 'share':")
+
+    window.removeEventListener('app-footer-action', onFooterAction)
+  })
+
+  it('opens the map panel and the read-only partition modal from their deep links', () => {
+    expect(customDataPanelSource).toContain("route.query.openPanel === 'true'")
+    expect(locationInputSource).toContain('route.query.openPartitionInfo')
+    expect(locationInputSource).toContain('openPartitionInfoModal()')
+    expect(locationInputSource).toContain('autoEnableSelection.value = false')
   })
 })

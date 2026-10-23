@@ -200,6 +200,7 @@
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, nextTick ,onMounted, onActivated, watch, computed, defineAsyncComponent, onBeforeUnmount } from 'vue'
+import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { getLocations, getCustomFeature, getLocationPartitions, batchMatch, getPartitions, resolvePartitions } from '@/api/index.js'
 import AppModal from '@/components/common/AppModal.vue'
@@ -217,6 +218,7 @@ const { getPartitionData, getDefaultTree, resolveItems } = usePartitionCache()
 
 // 接收外部传入的地點和分區
 const { t } = useI18n()
+const route = useRoute()
 
 const props = defineProps({
   modelValue: {
@@ -1130,6 +1132,12 @@ const openPartitionInfoModal = () => {
     fetchPartitionData()  // ✅ 不 await，让它在后台加载
   }
 }
+
+watch(() => route.query.openPartitionInfo, (shouldOpen) => {
+  if (shouldOpen === 'true') {
+    openPartitionInfoModal()
+  }
+}, { immediate: true })
 
 // 打开弹窗并自动启用选择模式
 const openPartitionModalWithSelection = () => {

@@ -133,7 +133,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n/localeRouting.js'
@@ -223,6 +223,22 @@ function goToSettings() {
 
 function goToHome() {
   router.push(buildLocalePath(resolveRouteLocale(route), '/'))
+}
+
+function handleHistoryFooterAction(event) {
+  switch (event.detail?.action) {
+    case 'feedback':
+      isFeedbackOpen.value = true
+      break
+    case 'features':
+      isFeaturesOpen.value = true
+      break
+    case 'share':
+      shareCurrentPage()
+      break
+    default:
+      break
+  }
 }
 
 function downloadDataUrl(dataUrl, filename) {
@@ -325,7 +341,14 @@ async function fetchFooterStats() {
   }
 }
 
-onMounted(fetchFooterStats)
+onMounted(() => {
+  window.addEventListener('app-footer-action', handleHistoryFooterAction)
+  fetchFooterStats()
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('app-footer-action', handleHistoryFooterAction)
+})
 </script>
 
 <style scoped lang="scss">

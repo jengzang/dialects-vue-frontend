@@ -5,16 +5,16 @@ const featureLinks = {
   '分析音位的中古来源': '/menu/query/yinwei',
   '查中古': '/menu/query/zhonggu',
   '查音位': '/menu/query/yinwei',
+  '查音系': '/menu/pho/matrix',
   '查字': '/menu/query/char',
   '查调': '/menu/query/tone',
-  '细分查询': '/menu/query/zhonggu',
+  '细分查询': '/menu/result',
   '结果页面': '/menu/result',
   '分区绘图': '/menu/map/divide',
   '地图': '/menu/map/view',
   '阳春自然村展示': '/explore/yc/villages',
   '阳春口语词展示页面': '/explore/yc/words',
-  '右侧面板': '/menu/map/view',
-  '用户自定义数据添加': '/menu/map/view',
+  '右侧面板': '/menu/map/view?openPanel=true',
   '资料来源': '/menu/source',
   '自然村': '/menu/villages',
   '语保': '/menu/yubao',
@@ -26,12 +26,11 @@ const featureLinks = {
   '中古汉字树状图': '/explore/char-class?tab=zhonggu',
   '语保1000词': '/menu/yubao?tab=vocabulary',
   '50句': '/menu/yubao?tab=grammar',
-  '查音系': '/menu/pho/matrix',
   '音节统计': '/menu/pho/count',
   '音素分类': '/menu/pho/custom',
   '语保地图展示': '/menu/yubao',
   'Praat': '/explore/tools/praat',
-  '按行政区划、分区等逐一查看或选择地点': '/menu/query/zhonggu',
+  '按行政区划、分区等逐一查看或选择地点': '/menu/query/zhonggu?openPartitionInfo=true',
   '自定义分区': '/auth/regions',
   '自然村机器学习子系统': '/explore/villages/ml',
   '首页': '/',
@@ -47,9 +46,17 @@ const featureLinks = {
   '同音字汇': '/menu/pho/matrix',
   '等值线图': '/menu/map/view',
   '主题色': '/menu/settings',
-  '反馈建议': '/menu/about/suggestion',
-  '功能入口': '/menu/tools',
   '字表注释': '/menu/vocabulary/view?source=character-notes'
+}
+
+const footerActions = {
+  '反馈建议': 'feedback',
+  '功能入口': 'features',
+  '分享': 'share'
+}
+
+const externalLinks = {
+  '旧版网站': 'https://dialects.yzup.top/detail/'
 }
 
 const contextualLinks = {
@@ -63,13 +70,17 @@ const contextualLinks = {
 
 function formatParts(entry) {
   const links = { ...featureLinks, ...contextualLinks[entry.date] }
-  const labels = Object.keys(links).sort((a, b) => b.length - a.length)
+  const actionsForEntry = entry.date === '2026.9.8' ? footerActions : {}
+  const labels = [...Object.keys(links), ...Object.keys(actionsForEntry), ...Object.keys(externalLinks)]
+    .sort((a, b) => b.length - a.length)
   const escapedLabels = labels.map(label => label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
   const pattern = new RegExp(`(v\\d+\\.\\d+\\.\\d+|${escapedLabels.join('|')})`, 'g')
   return entry.parts.flatMap(part => {
     if (typeof part !== 'string') return [part]
     return part.split(pattern).filter(Boolean).map(text => {
       if (/^v\d+\.\d+\.\d+$/.test(text)) return { version: text }
+      if (actionsForEntry[text]) return { label: text, action: actionsForEntry[text] }
+      if (externalLinks[text]) return { label: text, href: externalLinks[text] }
       if (links[text]) return { text, to: links[text] }
       return text
     })
@@ -158,7 +169,7 @@ export const historyEntries = [
   { date: "2026.6.7", parts: ["「音值比较」功能上线； v4.4.0"] },
   { date: "2026.6.9", parts: ["大幅改进「自定义地图」页面，支持按地点/特征录入、查看 v4.4.5"] },
   { date: "2026.6.17", parts: ["「地图绘制」（在线gis）工具上线 v4.5.0"] },
-  { date: "2026.6.22", parts: ["查字、中古、音位、音系等增加文白读显示 v4.5.2"] },
+  { date: "2026.6.22", parts: ["查字、查中古、查音位、查音系等增加文白读显示 v4.5.2"] },
   { date: "2026.6.24", parts: ["「音节统计」增加饼图、柱状图、散点图、轮盘等展示。 v4.5.5"] },
   { date: "2026.7.2", parts: ["查中古、比较中古支持手动输入 v4.5.7"] },
   { date: "2026.7.12", parts: ["「设置」支持切换主题色 v4.5.8"] },

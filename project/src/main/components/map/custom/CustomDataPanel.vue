@@ -162,6 +162,7 @@ const isPanelOpen = ref(false)
 const shouldShowPanel = computed(() => {
   const isMapTab = route.params.sub === 'view'
   if (!isMapTab) return false
+  if (route.query.openPanel === 'true') return true
 
   const sourceTab = globalPayload.value?._sourceTab || ''
   const hasQueryContext = sourceTab === 'tab1' || sourceTab === 'tab2' || sourceTab === 'tab4' || sourceTab === 'tab3'

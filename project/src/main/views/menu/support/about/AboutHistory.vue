@@ -75,6 +75,14 @@
                 v-else-if="part.version"
                 class="history-version"
               >{{ part.version }}</code>
+              <button
+                v-else-if="part.action"
+                type="button"
+                class="text-action history-link history-link--action"
+                @click="triggerFooterAction(part.action)"
+              >
+                {{ part.label }}
+              </button>
               <RouterLink
                 v-else-if="part.to"
                 class="text-action history-link history-link--internal"
@@ -125,8 +133,14 @@ import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import { historyStages } from './history.data.js'
 
+const FOOTER_ACTION_EVENT = 'app-footer-action'
+
 const route = useRoute()
 const onlyImportant = ref(false)
+function triggerFooterAction(action) {
+  window.dispatchEvent(new CustomEvent(FOOTER_ACTION_EVENT, { detail: { action } }))
+}
+
 const visibleStages = computed(() => historyStages.map(stage => ({
   ...stage,
   entries: onlyImportant.value ? stage.entries.filter(entry => entry.important) : stage.entries
