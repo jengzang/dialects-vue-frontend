@@ -66,7 +66,6 @@ describe('author-provided website history', () => {
     expect(portraitStyles).toMatch(/\.history-page\s*\{[^}]*font-size:\s*0\.875rem/s)
     expect(portraitStyles).toMatch(/\.page-title\s*\{[^}]*font-size:\s*1\.25rem/s)
     expect(portraitStyles).toMatch(/\.history-stage-title\s*\{[^}]*font-size:\s*1\.2rem/s)
-    expect(portraitStyles).toMatch(/\.history-filter\s+\.ui-tab-item\s*\{[^}]*font-size:\s*0\.875rem/s)
     expect(portraitStyles).toMatch(/\.history-filter-summary\s*\{[^}]*font-size:\s*0\.8rem/s)
     expect(portraitStyles).toMatch(/\.history-date-column\s+\.hint\s*\{[^}]*font-size:\s*0\.75rem/s)
     expect(portraitStyles).toMatch(/\.thoughts\s*\{[^}]*font-size:\s*0\.875rem/s)
@@ -125,16 +124,17 @@ describe('author-provided website history', () => {
 
   it('filters important updates and restores all history without losing stages or links', async () => {
     await mountHistory()
-    const allButton = [...host.querySelectorAll('button')].find(button => button.textContent.trim() === '全部历史')
-    const importantButton = [...host.querySelectorAll('button')].find(button => button.textContent.trim() === '仅重要更新')
-    expect(allButton?.getAttribute('aria-pressed')).toBe('true')
-    importantButton.click()
+    const historyToggle = host.querySelector('.history-filter [role="switch"]')
+    const currentMode = () => host.querySelector('.history-filter .switch-toggle__label--right')?.textContent.trim()
+    expect(historyToggle?.getAttribute('aria-checked')).toBe('false')
+    expect(currentMode()).toBe('全部历史')
+    historyToggle.click()
     await nextTick()
     const dates = () => [...host.querySelectorAll('.history-date')].map(time => time.textContent)
     expect(dates()).toEqual(historyEntries.filter(entry => entry.important).map(entry => entry.date))
     expect(dates().length).toBeLessThan(55)
-    expect(importantButton.getAttribute('aria-pressed')).toBe('true')
-    expect(allButton.getAttribute('aria-pressed')).toBe('false')
+    expect(historyToggle.getAttribute('aria-checked')).toBe('true')
+    expect(currentMode()).toBe('仅重要更新')
     expect(host.querySelectorAll('.history-stage')).toHaveLength(5)
     expect(host.querySelector('#history-stage-5').textContent).toContain('V5 完善原有功能，改进用户体验')
     for (const stage of host.querySelectorAll('.history-stage')) {
@@ -142,11 +142,12 @@ describe('author-provided website history', () => {
       expect(stage.querySelectorAll('.history-connector')).toHaveLength(Math.max(0, entries.length - 1))
     }
     expect(host.querySelector('a[href="/zh-Hant/explore/tools/praat"]')).not.toBeNull()
-    allButton.click()
+    historyToggle.click()
     await nextTick()
     expect(dates()).toEqual(historyEntries.map(entry => entry.date))
     expect(host.querySelectorAll('.history-connector')).toHaveLength(50)
-    expect(allButton.getAttribute('aria-pressed')).toBe('true')
+    expect(historyToggle.getAttribute('aria-checked')).toBe('false')
+    expect(currentMode()).toBe('全部历史')
   })
 
   it('uses the latest author versions and preserves the partial Vue migration wording', async () => {

@@ -9,29 +9,19 @@
     >
       开发历程
     </h1>
-    <div
-      class="history-filter ui-tabs-navigation--segmented"
-      role="group"
-      aria-label="历史筛选"
-    >
-      <button
-        type="button"
-        class="ui-tab-item"
-        :class="{ active: !onlyImportant }"
-        :aria-pressed="!onlyImportant"
-        @click="onlyImportant = false"
-      >
-        全部历史
-      </button>
-      <button
-        type="button"
-        class="ui-tab-item"
-        :class="{ active: onlyImportant }"
-        :aria-pressed="onlyImportant"
-        @click="onlyImportant = true"
-      >
-        仅重要更新
-      </button>
+    <div class="history-filter">
+      <SwitchToggle
+        :model-value="onlyImportant"
+        :width="50"
+        :height="28"
+        :thumb-size="24"
+        :gap="8"
+        active-text="仅重要更新"
+        inactive-text="全部历史"
+        label-position="right"
+        aria-label="历史筛选"
+        @update:model-value="onlyImportant = $event"
+      />
     </div>
     <p
       class="history-filter-summary hint"
@@ -122,6 +112,7 @@
 import { computed, ref } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
+import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import { historyStages } from './history.data.js'
 
 const route = useRoute()
@@ -196,11 +187,6 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
   width: fit-content;
   max-width: 100%;
   margin: 1.5rem auto 0;
-  padding: 0.25rem;
-
-  .ui-tab-item {
-    padding: 0.6rem 1rem;
-  }
 }
 
 .history-filter-summary {
@@ -339,11 +325,6 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
 
   .history-stage-title {
     font-size: 1.2rem;
-  }
-
-  .history-filter .ui-tab-item {
-    padding: 0.45rem 0.75rem;
-    font-size: 0.875rem;
   }
 
   .history-filter-summary {
