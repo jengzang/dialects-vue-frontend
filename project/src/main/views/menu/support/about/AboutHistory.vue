@@ -214,7 +214,7 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
   display: grid;
   grid-template-columns: 8rem minmax(0, 1fr);
   gap: 1.5rem;
-  padding: 0 0 2.5rem 2rem;
+  padding: 0 0 1rem 2rem;
 
   &::before {
     content: '';

@@ -17,7 +17,8 @@
           v-if="messageState.actionText"
           class="toast-action"
           type="button"
-          @click.stop="triggerMessageAction"
+          @pointerup.stop="handleActionPointerUp"
+          @click.stop="handleActionClick"
         >
           {{ messageState.actionText }}
         </button>
@@ -42,6 +43,30 @@ import { messageState, triggerMessageAction, hideMessage, persistMessageUntilDis
 const dynamicMessage = ref('')
 
 let tickerId = null
+let lastTouchActionAt = 0
+
+function handleActionPointerUp(event) {
+  if (event.pointerType !== 'touch' || !event.isPrimary) return
+
+  const bounds = event.currentTarget.getBoundingClientRect()
+  if (
+    event.clientX < bounds.left || event.clientX > bounds.right ||
+    event.clientY < bounds.top || event.clientY > bounds.bottom
+  ) {
+    return
+  }
+
+  lastTouchActionAt = Date.now()
+  triggerMessageAction()
+}
+
+function handleActionClick(event) {
+  const isFollowUpTouchClick = event.detail > 0 && Date.now() - lastTouchActionAt < 500
+  lastTouchActionAt = 0
+  if (isFollowUpTouchClick) return
+
+  triggerMessageAction()
+}
 
 function startTicker() {
   stopTicker()

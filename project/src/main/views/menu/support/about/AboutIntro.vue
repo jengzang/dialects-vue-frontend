@@ -277,7 +277,7 @@ function localeTo(path) {
   top: 50%;
   right: 1rem;
   z-index: 1600;
-  width: 2.5rem;
+  width: auto;
   max-height: 80dvh;
   padding: 0.35rem;
   transform: translateY(-50%);

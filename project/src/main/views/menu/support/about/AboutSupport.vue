@@ -211,6 +211,7 @@ function splitDesc(text) {
   width: 100%;
   display: flex;
   flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 1rem;

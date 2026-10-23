@@ -1,9 +1,6 @@
 <template>
   <div class="page2">
     <h1 class="tabs-title">💬 {{ $t('navigation.pageTitles.support.aboutSuggestion') }}</h1>
-    <div class="suggestion-box suggestion-intro">
-      <p v-html="$t('about.suggestion.description')"></p>
-    </div>
     <TabSwitcher
       mode="segmented"
       navigation-only
@@ -52,9 +49,9 @@
       </div>
     </div>
 
-    <h2 v-show="suggestionTab === 'internal'" class="tabs-title"
+    <!-- <h2 v-show="suggestionTab === 'internal'" class="tabs-title"
         style="margin-top: 2rem;">{{ $t('layoutFooter.feedback.title') }}
-    </h2>
+    </h2> -->
     <div
       v-show="suggestionTab === 'internal'"
       class="surface-panel suggestion-form-section"
@@ -159,6 +156,9 @@
         </div>
       </form>
     </div>
+    <div class="suggestion-box suggestion-intro">
+      <p v-html="$t('about.suggestion.description')"></p>
+    </div>
   </div>
 </template>
 
@@ -244,7 +244,7 @@ onMounted(() => {
 }
 /* 建议入口 */
 .suggestion-box {
-  max-width: 500px;
+  // max-width: 500px;
   margin: 0 auto;
   justify-content: center;
   color: var(--text-deep);
@@ -343,6 +343,16 @@ onMounted(() => {
 .suggestion-page-form .field {
   @include flex-col;
   gap: 6px;
+
+  @media (max-aspect-ratio: #{1 / 1}) {
+    flex-direction: row;
+    gap:10px;
+
+    span {
+      white-space: nowrap;
+    }
+
+  }
 }
 
 .suggestion-form-row {

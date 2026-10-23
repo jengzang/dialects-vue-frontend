@@ -578,9 +578,9 @@ const SEO_CONFIG = {
     },
     '/menu/about/history': {
       title: {
-        'zh-Hant': { main: '歷史入口', subtitle: '' },
-        'zh-CN': { main: '历史入口', subtitle: '' },
-        en: { main: 'History Entry', subtitle: '' },
+        'zh-Hant': { main: '網站歷史', subtitle: '' },
+        'zh-CN': { main: '网站历史', subtitle: '' },
+        en: { main: 'Website History', subtitle: '' },
       },
       description: {
         'zh-Hant': '查看方音圖鑑的開發歷程與開發感悟；此頁不作為搜尋結果收錄頁。',
