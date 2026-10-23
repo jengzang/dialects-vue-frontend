@@ -1133,12 +1133,6 @@ const openPartitionInfoModal = () => {
   }
 }
 
-watch(() => route.query.openPartitionInfo, (shouldOpen) => {
-  if (shouldOpen === 'true') {
-    openPartitionInfoModal()
-  }
-}, { immediate: true })
-
 // 打开弹窗并自动启用选择模式
 const openPartitionModalWithSelection = () => {
   autoEnableSelection.value = true  // 自动启用选择模式
@@ -1166,6 +1160,12 @@ const fetchPartitionData = async () => {
     isLoadingPartitions.value = false
   }
 }
+
+watch(() => route.query.openPartitionInfo, (shouldOpen) => {
+  if (shouldOpen === 'true') {
+    openPartitionInfoModal()
+  }
+}, { immediate: true })
 
 // 处理位置选择
 const handleLocationsSelected = (locations) => {
