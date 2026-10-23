@@ -36,6 +36,7 @@
       v-for="stage in visibleStages"
       :key="stage.major"
       class="history-stage"
+      :class="{ 'glass-subpanel': featured }"
       :aria-labelledby="`history-stage-${stage.major}`"
     >
       <h2
@@ -117,7 +118,6 @@
     >
       <RouterLink
         class="glass-button history-featured-link"
-        data-size="compact"
         :to="buildLocalePath(resolveRouteLocale(route), '/menu/about/history')"
       >
         <span>{{ $t('home.history.viewAll') }}</span>
@@ -191,6 +191,12 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
 .history-page--featured {
   max-width: 82rem;
   margin-inline: auto;
+
+  .page-title {
+    color: var(--color-primary);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 700;
+  }
 }
 
 .tabs-title {
@@ -238,6 +244,18 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
     margin-top: 4rem;
     padding-top: 2rem;
     border-top: 1px solid var(--color-primary-border);
+  }
+}
+
+.history-page--featured .history-stage {
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: clamp(1rem, 3vw, 2rem);
+
+  & + & {
+    margin-top: 1.5rem;
+    border-top: 0;
   }
 }
 
@@ -378,6 +396,10 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
 
   .history-page .page-title {
     font-size: 1.25rem;
+  }
+
+  .history-page--featured .page-title {
+    font-size: 1.75rem;
   }
 
   .history-stage-title {
