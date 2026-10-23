@@ -157,6 +157,13 @@ describe('AboutPage suggestion form', () => {
     document.body.innerHTML = ''
   })
 
+  it('keeps development reflections out of the support section', async () => {
+    route.params.section = 'like'
+    const wrapper = await mountAboutPage()
+    expect(wrapper.host.querySelector('.thoughts-container')).toBeNull()
+    wrapper.unmount()
+  })
+
   it('renders the in-page site feedback form below the existing external feedback cards', async () => {
     const wrapper = await mountAboutPage()
     await nextTick()

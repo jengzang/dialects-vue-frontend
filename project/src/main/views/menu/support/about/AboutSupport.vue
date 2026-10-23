@@ -72,17 +72,6 @@
       <br />
       <span class="support-note">{{ $t('about.like.supportNote') }}</span>
     </p>
-    <p></p>
-    <p></p>
-
-    <!-- 感悟部分 -->
-    <div class="thoughts-container">
-      <h2 class="tabs-title" style="margin-top: 3rem">{{ $t('about.reflection.title') }}</h2>
-      <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph1') }}</p>
-      <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph2') }}</p>
-      <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph3') }}</p>
-      <p class="thoughts" style="text-align: center;"><em v-html="$t('about.reflection.poem')"></em></p>
-    </div>
   </div>
   <SupportPopup
     :visible="showQRCodes"
@@ -150,33 +139,6 @@ function splitDesc(text) {
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
 @use './aboutShared' as *;
-
-/* 感悟 */
-.thoughts {
-  max-width: 800px;
-  margin: 20px auto;
-  padding: 20px;
-  background: transparent;
-  border-radius: var(--radius-sm2);
-  color: $text-primary;
-  font-family: var(--font-serif);
-  font-size: 18px;
-  line-height: 1.8;
-  text-align: left;
-  text-indent: 2em;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-
-  em {
-    color: var(--text-primary);
-    font-weight: bold;
-    text-decoration: underline;
-  }
-}
-
-.thoughts-container {
-  width: 100%;
-  max-width: 800px;
-}
 
 /* 项目卡片 */
 .cards-container {
@@ -335,13 +297,6 @@ function splitDesc(text) {
 }
 
 @media (max-aspect-ratio: #{1 / 1}) {
-  .thoughts {
-    margin: 24px auto;
-    padding: 14px;
-    font-size: 16px;
-    line-height: 1.65;
-  }
-
   .cards-container {
     gap: 12px;
   }

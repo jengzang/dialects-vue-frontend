@@ -41,7 +41,7 @@
     },
     "menuAboutHistory": {
       "title": "Development Journey",
-      "description": "Explore the site's development history and feature updates."
+      "description": "Explore the site's development journey, feature updates, and reflections."
     },
     "menuAboutSuggestion": {
       "title": "Feedback Entry",
@@ -49,7 +49,7 @@
     },
     "menuAboutLike": {
       "title": "Support",
-      "description": "View the project repository and the author's development reflections, or scan a QR code to support the author."
+      "description": "View the project repository, follow the author, or scan a QR code to support the author."
     },
     "menuQueryZhonggu": {
       "title": "Middle Chinese Query",

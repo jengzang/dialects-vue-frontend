@@ -41,7 +41,7 @@
     },
     "menuAboutHistory": {
       "title": "開發歷程",
-      "description": "查看網站的開發歷程與功能更新記錄。"
+      "description": "查看網站的開發歷程、功能更新記錄與開發感悟。"
     },
     "menuAboutSuggestion": {
       "title": "反饋入口",
@@ -49,7 +49,7 @@
     },
     "menuAboutLike": {
       "title": "支持項目",
-      "description": "查看專案倉庫、作者的開發感悟，以及掃碼支持作者。"
+      "description": "查看專案倉庫、關注作者，以及掃碼支持作者。"
     },
     "menuQueryZhonggu": {
       "title": "查中古",

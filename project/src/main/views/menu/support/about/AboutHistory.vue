@@ -108,6 +108,13 @@
         </li>
       </ol>
     </section>
+    <div class="thoughts-container">
+      <h2 class="tabs-title" style="margin-top: 3rem">{{ $t('about.reflection.title') }}</h2>
+      <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph1') }}</p>
+      <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph2') }}</p>
+      <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph3') }}</p>
+      <p class="thoughts" style="text-align: center;"><em v-html="$t('about.reflection.poem')"></em></p>
+    </div>
   </section>
 </template>
 
@@ -135,6 +142,41 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
   width: 100%;
   max-width: 70rem;
   padding: clamp(1rem, 3vw, 2rem);
+}
+
+.tabs-title {
+  width: 100%;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.thoughts-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.thoughts {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background: transparent;
+  border-radius: var(--radius-sm2);
+  color: var(--text-dark);
+  font-family: var(--font-serif);
+  font-size: 18px;
+  line-height: 1.8;
+  text-align: left;
+  text-indent: 2em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  em {
+    color: var(--text-primary);
+    font-weight: bold;
+    text-decoration: underline;
+  }
 }
 
 .history-stage {
@@ -292,6 +334,13 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
 }
 
 @media (max-aspect-ratio: 1 / 1) {
+  .thoughts {
+    margin: 24px auto;
+    padding: 14px;
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
   .history-entry {
     grid-template-columns: minmax(0, 1fr);
     gap: 0.5rem;

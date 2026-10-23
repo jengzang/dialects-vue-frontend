@@ -34,11 +34,21 @@ async function mountHistory(locale = 'zh-Hant') {
   document.body.append(host)
   app = createApp(HistoryPage)
   app.use(router)
+  app.config.globalProperties.$t = key => key
   app.mount(host)
   return [...host.querySelectorAll('ol > li')]
 }
 
 describe('author-provided website history', () => {
+  it('shows the existing development reflections after the timeline', async () => {
+    await mountHistory()
+    const reflection = host.querySelector('.thoughts-container')
+    expect(reflection).toBeTruthy()
+    expect(reflection.textContent).toContain('about.reflection.title')
+    expect(reflection.querySelectorAll('.thoughts')).toHaveLength(4)
+    expect(host.querySelector('.history-stage:last-of-type').compareDocumentPosition(reflection) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
   it('titles the About section 开发历程', async () => {
     await mountHistory()
     expect(host.querySelector('#history-title').textContent.trim()).toBe('开发历程')

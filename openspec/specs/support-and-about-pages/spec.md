@@ -22,17 +22,17 @@ The system SHALL provide the current source-data and privacy informational pages
 
 ### Requirement: About page exposes the current tabbed informational sections
 
-The system SHALL provide the current about-page tabs for intro, development history, suggestion, and like/support, with settings available separately.
+The system SHALL provide the current about-page tabs for intro, development journey, suggestion, and like/support, with settings available separately.
 
 #### Scenario: About intro tab is opened
 
 - WHEN a user opens `/menu/about/intro`
 - THEN the system SHALL render the about intro content
 
-#### Scenario: About development history tab is opened
+#### Scenario: About development journey tab is opened
 
 - WHEN a user opens `/menu/about/history`
-- THEN the system SHALL render the existing website history timeline
+- THEN the system SHALL render the existing website history timeline followed by the author's development reflections
 
 #### Scenario: About settings tab is opened
 

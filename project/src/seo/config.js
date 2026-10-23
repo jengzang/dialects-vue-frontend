@@ -542,14 +542,14 @@ const SEO_CONFIG = {
     },
     '/menu/about/like': {
       title: {
-        'zh-Hant': { main: '支持我們', subtitle: '專案倉庫、開發感悟與掃碼支持' },
-        'zh-CN': { main: '支持我们', subtitle: '项目仓库、开发感悟与扫码支持' },
-        en: { main: 'Support Us', subtitle: 'View the repository, development reflections, and support options' },
+        'zh-Hant': { main: '支持我們', subtitle: '專案倉庫、關注與掃碼支持' },
+        'zh-CN': { main: '支持我们', subtitle: '项目仓库、关注与扫码支持' },
+        en: { main: 'Support Us', subtitle: 'View the repository, follow the author, and find support options' },
       },
       description: {
-        'zh-Hant': '查看專案倉庫、作者的開發感悟，以及掃碼支持作者。',
-        'zh-CN': '查看项目仓库、作者的开发感悟，以及扫码支持作者。',
-        en: 'View the project repository and the author\'s development reflections, or scan a QR code to support the author.',
+        'zh-Hant': '查看專案倉庫、關注作者，以及掃碼支持作者。',
+        'zh-CN': '查看项目仓库、关注作者，以及扫码支持作者。',
+        en: 'View the project repository, follow the author, or scan a QR code to support the author.',
       },
     },
     '/explore': {
@@ -583,9 +583,9 @@ const SEO_CONFIG = {
         en: { main: 'History Entry', subtitle: '' },
       },
       description: {
-        'zh-Hant': '方音圖鑑的歷史入口頁；此入口不作為搜尋結果收錄頁。',
-        'zh-CN': '方音图鉴的历史入口页；此入口不作为搜索结果收录页。',
-        en: 'History entry for Dialects Atlas; this entry is not intended for search result indexing.',
+        'zh-Hant': '查看方音圖鑑的開發歷程與開發感悟；此頁不作為搜尋結果收錄頁。',
+        'zh-CN': '查看方音图鉴的开发历程与开发感悟；此页不作为搜索结果收录页。',
+        en: 'Explore the development journey and reflections of Dialects Atlas; this page is not intended for search result indexing.',
       },
     },
     '/explore/gis': {
