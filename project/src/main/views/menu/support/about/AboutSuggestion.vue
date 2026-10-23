@@ -1,7 +1,16 @@
 <template>
   <div class="page2">
-    <div class="suggestion-box">
-      <h1 class="tabs-title">💬 {{ $t('navigation.pageTitles.support.aboutSuggestion') }}</h1>
+    <h1 class="tabs-title">💬 {{ $t('navigation.pageTitles.support.aboutSuggestion') }}</h1>
+    <TabSwitcher
+      mode="segmented"
+      navigation-only
+      :use-router="false"
+      :tabs="suggestionTabs"
+      :model-value="suggestionTab"
+      :aria-label="$t('navigation.pageTitles.support.aboutSuggestion')"
+      @update:modelValue="suggestionTab = $event"
+    />
+    <div v-show="suggestionTab === 'external'" class="suggestion-box">
       <p v-html="$t('about.suggestion.description')"></p>
       <p class="subtext">👇 {{ $t('about.suggestion.subtext') }}</p>
       <div class="card-links">
@@ -41,10 +50,11 @@
       </div>
     </div>
 
-    <h2 class="tabs-title"
+    <h2 v-show="suggestionTab === 'internal'" class="tabs-title"
         style="margin-top: 2rem;">{{ $t('layoutFooter.feedback.title') }}
     </h2>
     <div
+      v-show="suggestionTab === 'internal'"
       class="surface-panel suggestion-form-section"
       data-about-suggestion-form
     >
@@ -151,15 +161,21 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
+import TabSwitcher from '@/components/common/TabSwitcher.vue'
 import { useSuggestionForm } from '@/composables/suggestions/useSuggestionForm.js'
 
 const { t, locale } = useI18n()
 const route = useRoute()
+const suggestionTab = ref('internal')
+const suggestionTabs = computed(() => [
+  { name: 'internal', label: t('about.suggestion.internalTab') },
+  { name: 'external', label: t('about.suggestion.externalTab') },
+])
 
 const suggestionPageContext = computed(() => ({
   path: route.path,

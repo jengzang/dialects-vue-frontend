@@ -55,7 +55,8 @@ vi.mock('../src/utils/ui/message.js', () => ({
 vi.mock('../src/components/common/TabSwitcher.vue', () => ({
   default: {
     props: ['tabs', 'modelValue', 'routeValue', 'resolveRoute'],
-    template: '<section data-tabs-container><slot :current-tab="modelValue" /></section>',
+    emits: ['update:modelValue'],
+    template: '<section data-tabs-container><button v-for="tab in tabs" :key="tab.name" type="button" :data-tab-name="tab.name" @click="$emit(\'update:modelValue\', tab.name)">{{ tab.label }}</button><slot :current-tab="modelValue" /></section>',
   },
 }))
 
@@ -164,7 +165,7 @@ describe('AboutPage suggestion form', () => {
     wrapper.unmount()
   })
 
-  it('renders the in-page site feedback form below the existing external feedback cards', async () => {
+  it('uses internal and external tabs with the site feedback form selected by default', async () => {
     const wrapper = await mountAboutPage()
     await nextTick()
 
@@ -173,9 +174,23 @@ describe('AboutPage suggestion form', () => {
 
     expect(cards).toBeTruthy()
     expect(form).toBeTruthy()
-    expect(cards.compareDocumentPosition(form) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(wrapper.host.querySelector('[data-tab-name="internal"]')).toBeTruthy()
+    expect(wrapper.host.querySelector('[data-tab-name="external"]')).toBeTruthy()
+    expect(form.style.display).not.toBe('none')
+    expect(cards.closest('.suggestion-box').style.display).toBe('none')
     expect(wrapper.host.querySelector('[data-app-modal]')).toBeNull()
     expect(wrapper.host.querySelector('[data-simple-select-dropdown]')).toBeTruthy()
+
+    const titleInput = wrapper.host.querySelector('[name="title"]')
+    titleInput.value = '待提交的建议'
+    titleInput.dispatchEvent(new Event('input'))
+    wrapper.host.querySelector('[data-tab-name="external"]').click()
+    await nextTick()
+    expect(form.style.display).toBe('none')
+    expect(cards.closest('.suggestion-box').style.display).not.toBe('none')
+    wrapper.host.querySelector('[data-tab-name="internal"]').click()
+    await nextTick()
+    expect(titleInput.value).toBe('待提交的建议')
 
     wrapper.unmount()
   })
@@ -288,10 +303,9 @@ describe('AboutPage suggestion form', () => {
     expect(portraitBlock).toContain('grid-template-columns: 1fr;')
   })
 
-  it('stacks the external cards above the in-page feedback form', () => {
+  it('controls the suggestion sections with TabSwitcher', () => {
     const source = aboutPageSource()
-    const pageBlock = source.match(/\.page2\s*\{[\s\S]*?\n\}/)?.[0]
-
-    expect(pageBlock).toContain('@include flex-col;')
+    expect(source).toContain('<TabSwitcher')
+    expect(source).toContain(':use-router="false"')
   })
 })

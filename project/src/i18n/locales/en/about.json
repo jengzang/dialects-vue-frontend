@@ -281,6 +281,8 @@
   },
   "suggestion": {
     "title": "Share Feedback",
+    "internalTab": "On-site Feedback",
+    "externalTab": "External Feedback",
     "description": "Found a bug? Have a suggestion or an idea?<br />You are welcome to open a GitHub issue or leave a comment on Zhihu!",
     "subtext": "👇 Select a card below to open the corresponding platform",
     "frontend": {

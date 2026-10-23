@@ -281,6 +281,8 @@
   },
   "suggestion": {
     "title": "我有建议",
+    "internalTab": "站内反馈",
+    "externalTab": "站外反馈",
     "description": "发现 bug？有建议？有想法？<br />欢迎通过 GitHub Issue 或知乎留言提出！",
     "subtext": "👇 点击下方卡片跳转对应平台",
     "frontend": {
