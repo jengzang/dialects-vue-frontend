@@ -72,6 +72,13 @@ describe('author-provided website history', () => {
     expect(portraitStyles).toMatch(/\.tabs-title\s*\{[^}]*font-size:\s*1\.2rem/s)
   })
 
+  it('uses plain timeline connectors without arrowheads', () => {
+    const connectorStyles = historyPageSource.slice(historyPageSource.indexOf('.history-connector {'))
+
+    expect(connectorStyles).toContain('border-left: 1px solid var(--color-primary-medium2)')
+    expect(connectorStyles).not.toContain('&::after')
+  })
+
   it('opens under About and removes the old Explore route', async () => {
     await mountHistory()
     expect(router.resolve('/zh-Hant/menu/about/history').matched).toHaveLength(2)

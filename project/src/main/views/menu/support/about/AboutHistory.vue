@@ -300,18 +300,6 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
   bottom: 0.35rem;
   left: 0.3rem;
   border-left: 1px solid var(--color-primary-medium2);
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: -0.25rem;
-    width: 0.4rem;
-    height: 0.4rem;
-    border-right: 1px solid var(--color-primary-medium2);
-    border-bottom: 1px solid var(--color-primary-medium2);
-    transform: rotate(45deg);
-  }
 }
 
 @media (max-aspect-ratio: 1 / 1) {
