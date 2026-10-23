@@ -104,8 +104,8 @@ describe('author-provided website history', () => {
     await mountHistory()
     const stages = [...host.querySelectorAll('.history-stage')]
     expect(stages.map(stage => stage.querySelector('h2').textContent.trim())).toEqual([
-      'V1 初步尝试 - 原生js页面',
-      'V2 围绕音韵的核心查询功能 - Vue',
+      'V1 兴趣缘起与初步尝试',
+      'V2 围绕音韵的核心查询功能',
       'V3 快速迭代的核心拓展功能',
       'V4 稳步推进的功能创新',
       'V5 完善原有功能，改进用户体验'
@@ -124,11 +124,11 @@ describe('author-provided website history', () => {
 
   it('identifies core capabilities and milestones rather than publicity or small refinements', () => {
     const entryAt = date => historyEntries.find(entry => entry.date === date)
-    for (const date of ['2025.7.25', '2025.9.5', '2026.1.16', '2026.1.27', '2026.2.11', '2026.3.1', '2026.3.24']) {
+    for (const date of ['2025.7.25', '2025.9.5', '2026.1.16', '2026.1.27', '2026.2.11', '2026.3.1']) {
       expect(entryAt(date).important).toBe(true)
       expect(entryAt(date).importanceReason).toBeTruthy()
     }
-    for (const date of ['2025.5', '2025.8.2', '2025.8.27', '2025.9.2', '2025.9.19', '2026.2.8', '2026.2.17']) {
+    for (const date of ['2025.5', '2025.8.2', '2025.8.27', '2025.9.2', '2025.9.19', '2026.2.8', '2026.2.17', '2026.3.24']) {
       expect(entryAt(date).important).toBe(false)
     }
   })
@@ -195,7 +195,6 @@ describe('author-provided website history', () => {
     for (const link of links) {
       expect(link.rel).toContain('noopener')
     }
-    expect(host.textContent).toContain('这也是我时隔近半年再次在知乎发文')
     expect(host.textContent).toContain('「方音圖鑑」总算有logo了。v1.3.0')
   })
 
@@ -280,5 +279,15 @@ describe('author-provided website history', () => {
     expect(locationInputSource).toContain('route.query.openPartitionInfo')
     expect(locationInputSource).toContain('openPartitionInfoModal()')
     expect(locationInputSource).toContain('autoEnableSelection.value = false')
+  })
+
+  it('links the Tyson polygon, village data, and中古 comparison to their matching tools', async () => {
+    await mountHistory()
+    const links = [...host.querySelectorAll('a.history-link--internal')]
+    const hrefFor = text => links.find(link => link.textContent === text)?.getAttribute('href')
+
+    expect(hrefFor('泰森多边形')).toBe('/zh-Hant/explore/gis')
+    expect(hrefFor('自然村')).toBe('/zh-Hant/explore/villages/gd')
+    expect(hrefFor('比较中古')).toBe('/zh-Hant/menu/compare/zhonggu')
   })
 })
