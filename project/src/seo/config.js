@@ -564,18 +564,6 @@ const SEO_CONFIG = {
         en: 'Explore Chinese dialect datasets and online tools: village records, regional vocabulary, dialect mapping, pronunciation tables, and Praat-based speech analysis.',
       },
     },
-    '/explore/features': {
-      title: {
-        'zh-Hant': { main: '功能索引', subtitle: '' },
-        'zh-CN': { main: '功能索引', subtitle: '' },
-        en: { main: 'Feature Index', subtitle: '' },
-      },
-      description: {
-        'zh-Hant': '方音圖鑑的功能索引入口；此入口不作為搜尋結果收錄頁。',
-        'zh-CN': '方音图鉴的功能索引入口；此入口不作为搜索结果收录页。',
-        en: 'Feature index entry for Dialects Atlas; this entry is not intended for search result indexing.',
-      },
-    },
     '/menu/about/history': {
       title: {
         'zh-Hant': { main: '網站歷史', subtitle: '' },
@@ -753,7 +741,6 @@ export const NOINDEX_PATHS = new Set([
   '/menu/result',
   '/explore/manage',
   '/explore/villages/all',
-  '/explore/features',
   '/menu/about/history',
 ])
 
