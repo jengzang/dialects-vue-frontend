@@ -5,12 +5,16 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createApp, nextTick } from 'vue'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import HistoryPage from '../src/main/views/menu/support/about/AboutHistory.vue'
+import i18n from '../src/i18n/index.js'
 import { historyEntries } from '../src/main/views/menu/support/about/history.data.js'
 import { menuRoutes } from '../src/main/router/menuRoutes.js'
 import { exploreRoutes } from '../src/main/router/exploreRoutes.js'
 
 const testsDir = dirname(fileURLToPath(import.meta.url))
 const historyPageSource = readFileSync(resolve(testsDir, '../src/main/views/menu/support/about/AboutHistory.vue'), 'utf8')
+const zhCnAbout = JSON.parse(readFileSync(resolve(testsDir, '../src/i18n/locales/zh-CN/about.json'), 'utf8'))
+const zhHantAbout = JSON.parse(readFileSync(resolve(testsDir, '../src/i18n/locales/zh-Hant/about.json'), 'utf8'))
+const enAbout = JSON.parse(readFileSync(resolve(testsDir, '../src/i18n/locales/en/about.json'), 'utf8'))
 const homePageSource = readFileSync(resolve(testsDir, '../src/main/views/HomePage.vue'), 'utf8')
 const customDataPanelSource = readFileSync(resolve(testsDir, '../src/main/components/map/custom/CustomDataPanel.vue'), 'utf8')
 const locationInputSource = readFileSync(resolve(testsDir, '../src/main/components/geo/LocationAndRegionInput.vue'), 'utf8')
@@ -25,7 +29,7 @@ afterEach(() => {
   host?.remove()
 })
 
-async function mountHistory(locale = 'zh-Hant', props = {}) {
+async function mountHistory(locale = 'zh-Hant', props = {}, uiLocale = 'zh-CN') {
   const stubRoutes = routes => routes.map(route => ({
     ...route,
     component: { template: '<div />' },
@@ -40,16 +44,43 @@ async function mountHistory(locale = 'zh-Hant', props = {}) {
     ] }]
   })
   await router.push(`/${locale}/menu/about/history`)
+  i18n.global.locale.value = uiLocale
   host = document.createElement('div')
   document.body.append(host)
   app = createApp(HistoryPage, props)
   app.use(router)
+  app.use(i18n)
   app.config.globalProperties.$t = key => key
   app.mount(host)
   return [...host.querySelectorAll('ol > li')]
 }
 
+function plainHistoryEntry(markedText) {
+  return markedText
+    .replace(/\[\[(?:link|external|action)::[^:]+::([^\]]+)\]\]/g, '$1')
+    .replace(/\[\[version:([^\]]+)\]\]/g, '$1')
+}
+
 describe('author-provided website history', () => {
+  it('stores every history entry and importance reason in each locale JSON without runtime conversion', () => {
+    const expectedDates = historyEntries.map(entry => entry.date.replaceAll('.', '_'))
+    for (const about of [zhCnAbout, zhHantAbout, enAbout]) {
+      expect(Object.keys(about.history.entries)).toEqual(expectedDates)
+      expect(Object.keys(about.history.importanceReasons)).toEqual(
+        historyEntries.filter(entry => entry.important).map(entry => entry.date.replaceAll('.', '_'))
+      )
+    }
+    expect(historyPageSource).not.toMatch(/opencc-js|toTraditional|Converter\(/)
+  })
+
+  it('renders saved Traditional Chinese history text directly from its locale JSON', async () => {
+    const entries = await mountHistory('zh-Hant', {}, 'zh-Hant')
+    const content = entries.find(entry => entry.querySelector('time').dateTime === '2025-06-12').textContent
+    expect(content).toContain('實現了提取「漢字音典」開源字表的聲韻調')
+    expect(content).toContain('彙總到excel表格中')
+    expect(content).not.toContain('实现了提取')
+  })
+
   it('shows the existing development reflections after the timeline', async () => {
     await mountHistory()
     const reflection = host.querySelector('.thoughts-container')
@@ -114,7 +145,7 @@ describe('author-provided website history', () => {
     expect(exploreRoutes.some(route => route.path === 'explore/history')).toBe(false)
   })
 
-  it('renders all 35 records chronologically and keeps month-only precision', async () => {
+  it('renders all 55 records chronologically and keeps month-only precision', async () => {
     const entries = await mountHistory()
     expect(entries).toHaveLength(55)
     const dates = entries.map(entry => entry.querySelector('time').dateTime)
@@ -151,7 +182,7 @@ describe('author-provided website history', () => {
     const entryAt = date => historyEntries.find(entry => entry.date === date)
     for (const date of ['2025.7.25', '2025.9.5', '2026.1.16', '2026.1.27', '2026.2.11', '2026.3.1']) {
       expect(entryAt(date).important).toBe(true)
-      expect(entryAt(date).importanceReason).toBeTruthy()
+      expect(zhCnAbout.history.importanceReasons[date.replaceAll('.', '_')]).toBeTruthy()
     }
     for (const date of ['2025.5', '2025.8.2', '2025.8.27', '2025.9.2', '2025.9.19', '2026.2.8', '2026.2.17', '2026.3.24']) {
       expect(entryAt(date).important).toBe(false)
@@ -203,7 +234,7 @@ describe('author-provided website history', () => {
     expect(contentAt('2025-08-18')).toContain('分发exe供内测用户尝鲜。v1.0.5')
     expect(contentAt('2025-09-04')).toContain('引入vue作为查询、输入页面，但地图及结果展示仍由原生js承担。v1.2.0')
     expect(contentAt('2026-01-11')).toContain('结果页面迁移到Vue，查字、查调更为显著，不再作为辅助功能。v2.0.0')
-    expect(contentAt('2026-01-16')).toContain('原生js移至「旧版网站」入口，主站全部使用Vue3开发。v2.1.0')
+    expect(contentAt('2026-01-16')).toContain('原生js移至旧版网站入口，主站全部使用Vue3开发。v2.1.0')
   })
 
   it('renders the four original Zhihu article URLs as safe clickable links', async () => {
@@ -225,7 +256,7 @@ describe('author-provided website history', () => {
 
   it('distinguishes every version while preserving all original body text', async () => {
     await mountHistory()
-    const originalBodies = historyEntries.map(entry => entry.parts.map(part => typeof part === 'string' ? part : part.label || part.href).join(''))
+    const originalBodies = historyEntries.map(entry => plainHistoryEntry(zhCnAbout.history.entries[entry.date.replaceAll('.', '_')]))
     expect([...host.querySelectorAll('.history-version')].map(el => el.textContent)).toEqual(originalBodies.flatMap(body => body.match(/v\d+\.\d+\.\d+/g) || []))
     expect(host.querySelectorAll('.history-version').length).toBeGreaterThan(0)
     expect([...host.querySelectorAll('.history-content')].map(el => el.textContent)).toEqual(originalBodies)
@@ -233,19 +264,24 @@ describe('author-provided website history', () => {
   })
 
   it.each(['zh-CN', 'zh-Hant', 'en'])('links features to current routes in %s', async locale => {
-    await mountHistory(locale)
+    await mountHistory(locale, {}, locale)
     const links = [...host.querySelectorAll('a.history-link--internal')]
-    expect(links.length).toBeGreaterThan(30)
+    expect(links.length).toBeGreaterThan(15)
     const hrefFor = text => links.find(link => link.textContent === text)?.getAttribute('href')
-    expect(hrefFor('查字')).toBe(`/${locale}/menu/query/char`)
-    expect(hrefFor('粤拼转ipa')).toBe(`/${locale}/explore/tools/jyut2ipa`)
-    expect(hrefFor('音素分类')).toBe(`/${locale}/menu/pho/custom`)
-    expect(hrefFor('中古汉字树状图')).toBe(`/${locale}/explore/char-class?tab=zhonggu`)
+    const labels = locale === 'en'
+        ? ['character lookup', 'Jyutping-to-IPA conversion', 'phoneme classification', 'character set page']
+      : locale === 'zh-Hant'
+        ? ['查字', '粵拼轉ipa', '音素分類', '中古漢字樹狀圖']
+        : ['查字', '粤拼转ipa', '音素分类', '中古汉字树状图']
+    expect(hrefFor(labels[0])).toBe(`/${locale}/menu/query/char`)
+    expect(hrefFor(labels[1])).toBe(`/${locale}/explore/tools/jyut2ipa`)
+    expect(hrefFor(labels[2])).toBe(`/${locale}/menu/pho/custom`)
+    expect(hrefFor(labels[3])).toBe(`/${locale}/explore/char-class?tab=zhonggu`)
     for (const link of links) {
       expect(router.resolve(link.getAttribute('href')).matched.length).toBeGreaterThan(1)
       expect(link.getAttribute('target')).toBeNull()
     }
-    links.find(link => link.textContent === '查字').click()
+    links.find(link => link.textContent === labels[0]).click()
     await vi.waitFor(() => expect(router.currentRoute.value.path).toBe(`/${locale}/menu/query/char`))
   })
 

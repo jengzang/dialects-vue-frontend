@@ -9,7 +9,7 @@
       id="history-title"
       class="page-title"
     >
-      {{ props.title }}
+      {{ props.title || t('about.history.title') }}
     </component>
     <div v-if="!featured" class="history-filter">
       <SwitchToggle
@@ -18,10 +18,10 @@
         :height="28"
         :thumb-size="24"
         :gap="8"
-        active-text="仅重要更新"
-        inactive-text="全部历史"
+        :active-text="t('about.history.onlyImportant')"
+        :inactive-text="t('about.history.allHistory')"
         label-position="right"
-        aria-label="历史筛选"
+        :aria-label="t('about.history.filterLabel')"
         @update:model-value="onlyImportant = $event"
       />
     </div>
@@ -32,7 +32,7 @@
       共 {{ visibleEntryCount }} 条更新
     </p> -->
     <section
-      v-for="stage in visibleStages"
+      v-for="stage in renderedStages"
       :key="stage.major"
       class="history-stage"
       :class="{ 'glass-panel': featured }"
@@ -42,7 +42,7 @@
         :id="`history-stage-${stage.major}`"
         class="history-stage-title"
       >
-        {{ stage.title }}
+        {{ t(`about.history.stage${stage.major}`) }}
       </h2>
       <ol
         v-if="stage.entries.length"
@@ -61,9 +61,9 @@
             <span
               v-if="entry.important"
               class="hint"
-              :title="entry.importanceReason"
+              :title="localizedImportanceReason(entry)"
               role="img"
-              aria-label="重要更新"
+              :aria-label="t('about.history.importantLabel')"
             >⭐</span>
           </div>
           <p class="history-content">
@@ -143,10 +143,11 @@
 
 <script setup>
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { RouterLink, useRoute } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
-import { historyStages } from './history.data.js'
+import { historyEntries, historyStages } from './history.data.js'
 
 const props = defineProps({
   featured: {
@@ -155,9 +156,11 @@ const props = defineProps({
   },
   title: {
     type: String,
-    default: '开发历程'
+    default: ''
   }
 })
+
+const { t } = useI18n()
 
 const FOOTER_ACTION_EVENT = 'app-footer-action'
 
@@ -167,13 +170,62 @@ function triggerFooterAction(action) {
   window.dispatchEvent(new CustomEvent(FOOTER_ACTION_EVENT, { detail: { action } }))
 }
 
-const visibleStages = computed(() => historyStages.map(stage => ({
-  ...stage,
-  entries: props.featured
-    ? stage.entries.filter(entry => entry.important)
-    : onlyImportant.value ? stage.entries.filter(entry => entry.important) : stage.entries
-})))
-const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stage) => count + stage.entries.length, 0))
+const renderedStages = computed(() => {
+  const stages = historyStages.map(stage => ({ ...stage, entries: [] }))
+  let currentMajor = 1
+
+  for (const entry of historyEntries) {
+    const displayParts = localizedParts(entry)
+    const release = displayParts.find(part => part.version)
+    if (release) currentMajor = Number(release.version.split('.')[0].slice(1))
+
+    const stage = stages.find(item => item.major === currentMajor)
+    if (!stage) continue
+
+    const visible = (!props.featured && !onlyImportant.value) || entry.important
+    if (visible) {
+      stage.entries.push({
+        ...entry,
+        displayParts
+      })
+    }
+  }
+
+  return stages.map(stage => ({ ...stage, title: t(`about.history.stage${stage.major}`) }))
+})
+
+function localizedImportanceReason(entry) {
+  return t(`about.history.importanceReasons.${entry.date.replaceAll('.', '_')}`)
+}
+
+function localizedParts(entry) {
+  return parseLocalizedParts(t(`about.history.entries.${entry.date.replaceAll('.', '_')}`))
+}
+
+function parseLocalizedParts(content) {
+  const markerPattern = /\[\[(link|external|action)::([^:]+)::([^\]]+)\]\]|\[\[version:([^\]]+)\]\]/g
+  const parts = []
+  let cursor = 0
+
+  for (const match of content.matchAll(markerPattern)) {
+    const type = match[1]
+    const value = match[2]
+    const label = match[3]
+    const version = match[4]
+    if (match.index > cursor) parts.push(content.slice(cursor, match.index))
+
+    if (version) parts.push({ version })
+    else if (type === 'link') parts.push({ text: label, to: value })
+    else if (type === 'action') parts.push({ label, action: value })
+    else parts.push({ label, href: decodeURIComponent(value) })
+
+    cursor = match.index + match[0].length
+  }
+
+  if (cursor < content.length) parts.push(content.slice(cursor))
+  return parts
+}
+// const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stage) => count + stage.entries.length, 0))
 </script>
 
 <style scoped lang="scss">
@@ -181,15 +233,14 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
 
 .history-page {
   box-sizing: border-box;
-  align-self: flex-start;
   width: 100%;
   max-width: 70rem;
+  margin-inline: auto;
   padding: clamp(1rem, 3vw, 2rem);
 }
 
 .history-page--featured {
   max-width: 82rem;
-  margin-inline: auto;
 
   .page-title {
     color: var(--color-primary);
