@@ -836,8 +836,8 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .logo-container {
   flex-shrink: 0;
-  width: 6dvh;
-  min-width: 5dvh;
+  width: 6svh;
+  min-width: 5svh;
   height: 6dvh;
   cursor: pointer;
   border-radius: var(--radius-full);
@@ -862,7 +862,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   align-items: center;
 
   img {
-    height: 7dvh;
+    height: 7svh;
     object-fit: contain;
   }
 }
@@ -884,8 +884,8 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  min-width: 6dvh;
-  max-width: 10dvh;
+  min-width: 6svh;
+  max-width: 10svh;
   height: 6dvh;
   padding: 0 12px;
   color: $primary-blue-dark;
@@ -928,9 +928,9 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  width: 6dvh;
-  min-width: 6dvh;
-  max-width: 6dvh;
+  width: 6svh;
+  min-width: 6svh;
+  max-width: 6svh;
   height: 6dvh;
   cursor: pointer;
   user-select: none;
@@ -1045,14 +1045,13 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
     .logo-container {
       flex-shrink: 0;
-      width: 5dvh;
-      min-width: 5dvh;
+      width: 5svh;
+      min-width: 5svh;
       height: 5dvh;
     }
 
     .login-container {
       flex-shrink: 0;
-      min-width: 6dvh;
       height: 6dvh;
     }
   }

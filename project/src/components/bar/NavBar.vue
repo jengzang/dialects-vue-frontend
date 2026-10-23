@@ -475,7 +475,8 @@ $mobile-aspect-ratio: 1;
 // 桌面端不再直接使用 10dvh，避免高分辨率屏幕上导航栏过高。
 $desktop-navbar-height: clamp(50px, 6.8dvh, 70px);
 $desktop-control-size: clamp(44px, 5dvh, 56px);
-$desktop-title-height: clamp(40px, 6.2dvh, 60px);
+$desktop-control-width: clamp(44px, 5svh, 56px);
+$desktop-title-height: clamp(40px, 6.2svh, 60px);
 
 @mixin soft-glass-background {
   background: linear-gradient(
@@ -632,14 +633,14 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
 }
 
 .desktop-brand-logo {
-  width: $desktop-control-size;
-  min-width: $desktop-control-size;
+  width: $desktop-control-width;
+  min-width: $desktop-control-width;
   height: $desktop-control-size;
 }
 
 .desktop-login-button {
   width: auto;
-  min-width: $desktop-control-size;
+  min-width: $desktop-control-width;
   height: $desktop-control-size;
   margin-right: 10px;
   padding-inline: 12px;
@@ -770,10 +771,10 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
 }
 
 .navbar-desktop .avatar-container {
-  flex: 0 0 calc(#{$desktop-control-size} + 10px);
-  width: calc(#{$desktop-control-size} + 10px);
-  min-width: calc(#{$desktop-control-size} + 10px);
-  max-width: calc(#{$desktop-control-size} + 10px);
+  flex: 0 0 calc(#{$desktop-control-width} + 10px);
+  width: calc(#{$desktop-control-width} + 10px);
+  min-width: calc(#{$desktop-control-width} + 10px);
+  max-width: calc(#{$desktop-control-width} + 10px);
   height: calc(#{$desktop-control-size} + 10px);
   margin-right: 10px;
 }
