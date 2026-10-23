@@ -334,11 +334,40 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
 }
 
 @media (max-aspect-ratio: 1 / 1) {
+  .history-page {
+    font-size: 0.875rem;
+  }
+
+  .history-page .page-title {
+    font-size: 1.25rem;
+  }
+
+  .history-stage-title {
+    font-size: 1.2rem;
+  }
+
+  .history-filter .ui-tab-item {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .history-filter-summary {
+    font-size: 0.8rem;
+  }
+
+  .history-date-column .hint {
+    font-size: 0.75rem;
+  }
+
   .thoughts {
     margin: 24px auto;
     padding: 14px;
-    font-size: 16px;
+    font-size: 0.875rem;
     line-height: 1.65;
+  }
+
+  .tabs-title {
+    font-size: 1.2rem;
   }
 
   .history-entry {

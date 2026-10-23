@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createApp, nextTick } from 'vue'
 import { createMemoryHistory, createRouter } from 'vue-router'
@@ -5,6 +8,9 @@ import HistoryPage from '../src/main/views/menu/support/about/AboutHistory.vue'
 import { historyEntries } from '../src/main/views/menu/support/about/history.data.js'
 import { menuRoutes } from '../src/main/router/menuRoutes.js'
 import { exploreRoutes } from '../src/main/router/exploreRoutes.js'
+
+const testsDir = dirname(fileURLToPath(import.meta.url))
+const historyPageSource = readFileSync(resolve(testsDir, '../src/main/views/menu/support/about/AboutHistory.vue'), 'utf8')
 
 let app
 let host
@@ -54,6 +60,19 @@ describe('author-provided website history', () => {
     expect(host.querySelector('#history-title').textContent.trim()).toBe('开发历程')
   })
 
+  it('uses a compact reading scale for the timeline in portrait mode', () => {
+    const portraitStyles = historyPageSource.split('@media (max-aspect-ratio: 1 / 1)').at(-1)
+
+    expect(portraitStyles).toMatch(/\.history-page\s*\{[^}]*font-size:\s*0\.875rem/s)
+    expect(portraitStyles).toMatch(/\.page-title\s*\{[^}]*font-size:\s*1\.25rem/s)
+    expect(portraitStyles).toMatch(/\.history-stage-title\s*\{[^}]*font-size:\s*1\.2rem/s)
+    expect(portraitStyles).toMatch(/\.history-filter\s+\.ui-tab-item\s*\{[^}]*font-size:\s*0\.875rem/s)
+    expect(portraitStyles).toMatch(/\.history-filter-summary\s*\{[^}]*font-size:\s*0\.8rem/s)
+    expect(portraitStyles).toMatch(/\.history-date-column\s+\.hint\s*\{[^}]*font-size:\s*0\.75rem/s)
+    expect(portraitStyles).toMatch(/\.thoughts\s*\{[^}]*font-size:\s*0\.875rem/s)
+    expect(portraitStyles).toMatch(/\.tabs-title\s*\{[^}]*font-size:\s*1\.2rem/s)
+  })
+
   it('opens under About and removes the old Explore route', async () => {
     await mountHistory()
     expect(router.resolve('/zh-Hant/menu/about/history').matched).toHaveLength(2)
@@ -68,7 +87,7 @@ describe('author-provided website history', () => {
     expect(entries[0].querySelector('time').textContent).toBe('2025.5')
     expect(dates.at(-1)).toBe('2026-10-22')
     expect(dates).toEqual([...dates].sort())
-    expect(host.querySelectorAll('.history-connector')).toHaveLength(31)
+    expect(host.querySelectorAll('.history-connector')).toHaveLength(50)
   })
 
   it('separates major versions at their first release and reserves the V5 title', async () => {
