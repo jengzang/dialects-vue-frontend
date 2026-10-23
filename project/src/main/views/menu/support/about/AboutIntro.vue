@@ -474,7 +474,7 @@ function localeTo(path) {
   .intro-directory-toggle {
     display: block;
     position: fixed;
-    right: 1rem;
+    left: 1rem;
     bottom: 1rem;
     z-index: 1601;
   }
@@ -482,7 +482,8 @@ function localeTo(path) {
   .intro-directory {
     display: none;
     top: auto;
-    right: 1rem;
+    right: auto;
+    left: 1rem;
     bottom: 4.5rem;
     width: min(15rem, calc(100vw - 2rem));
     max-height: 65dvh;
