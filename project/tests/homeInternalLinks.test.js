@@ -38,7 +38,6 @@ describe('home and intro internal links', () => {
     const aboutPage = readSource('src/main/views/menu/support/about/AboutIntro.vue')
 
     expect(aboutPage).toContain('const featureRouteMap = {')
-    expect(aboutPage).toContain("feature10: '/menu/cluster'")
     expect(aboutPage).toContain('const featureKeys = Object.keys(messages.about.intro.features)')
     expect(aboutPage).toContain('<RouterLink v-if="feature.route" :to="localeTo(feature.route)" class="feature-link feature-heading-link">')
     expect(aboutPage).toContain('<RouterLink v-if="feature.route" :to="localeTo(feature.route)" class="feature-link feature-subtitle-link">')

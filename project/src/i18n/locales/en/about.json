@@ -9,7 +9,7 @@
   "intro": {
     "title": "ℹ️ About This Site",
     "directory": "Contents",
-    "description": "\"Dialect Pronunciation Atlas\" (方音圖鑑) is an online platform for analyzing Middle Chinese categories, comparing dialects, and exploring geolinguistic patterns. It presents the historical layering of initials and finals, together with patterns of phonemic merger and split across dialect locations, in a clear and interactive form. The site brings together core phonological queries, dialect comparison, phonological analysis, historical character sets, interactive maps, character-list processing, public vocabulary and sentence data from the Chinese Language Resources Protection Project, village-data visualization, machine-learning analysis of natural-village names, Praat acoustic analysis, and dialect clustering. It is a comprehensive dialect-research platform that continues to grow.",
+    "description": "\"Dialect Pronunciation Atlas\" (方音圖鑑) is an online platform for analyzing Middle Chinese categories, comparing dialects, and exploring geolinguistic patterns. It presents the historical layering of initials and finals, together with patterns of phonemic merger and split across dialect locations, in a clear and interactive form. The site brings together core phonological queries, dialect comparison, phonological analysis, historical character sets, interactive maps, character-list processing, public vocabulary and sentence data from the Chinese Language Resources Protection Project, village-data visualization, machine-learning analysis of natural-village names, and Praat acoustic analysis. It is a comprehensive dialect-research platform that continues to grow.",
     "features": {
       "feature1": {
         "heading": "Core Queries",
@@ -233,12 +233,6 @@
           }
         ],
         "zhihuLink": "https://zhuanlan.zhihu.com/p/2007951324780713596"
-      },
-      "feature10": {
-        "heading": "Dialect Clustering",
-        "subtitle": "Multi-Location Clustering and Visualization",
-        "intro": "Provides a multi-panel workspace for entering dialect locations, managing clustering tasks, and viewing workflows and results. It can be used to explore relationships and grouping patterns among dialect locations and to provide quantitative evidence for dialect classification.",
-        "items": []
       }
     },
     "footer": "Welcome to \"Dialect Pronunciation Atlas\"—explore the historical layers of dialects with us!",

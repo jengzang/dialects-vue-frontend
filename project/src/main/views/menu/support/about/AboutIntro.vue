@@ -168,8 +168,7 @@ const featureRouteMap = {
   feature6: '/explore/tools/check',
   feature7: '/menu/yubao?tab=vocabulary',
   feature8: '/menu/villages',
-  feature9: '/explore/tools/praat',
-  feature10: '/menu/cluster'
+  feature9: '/explore/tools/praat'
 }
 
 const subfeatureRouteMap = {
@@ -199,8 +198,7 @@ const subfeatureRouteMap = {
     '/explore/tools/praat',
     '/explore/tools/praat',
     '/explore/tools/praat'
-  ],
-  feature10: ['/menu/cluster']
+  ]
 }
 
 const featureList = computed(() => {
