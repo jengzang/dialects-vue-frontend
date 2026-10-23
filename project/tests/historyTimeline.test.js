@@ -52,7 +52,8 @@ describe('author-provided website history', () => {
     expect(reflection).toBeTruthy()
     expect(reflection.textContent).toContain('about.reflection.title')
     expect(reflection.querySelectorAll('.thoughts')).toHaveLength(4)
-    expect(host.querySelector('.history-stage:last-of-type').compareDocumentPosition(reflection) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    const lastTimelineStage = [...host.querySelectorAll('.history-stage')].at(-1)
+    expect(lastTimelineStage.compareDocumentPosition(reflection) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
   it('titles the About section 开发历程', async () => {

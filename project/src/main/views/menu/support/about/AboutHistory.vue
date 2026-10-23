@@ -1,6 +1,6 @@
 <template>
   <section
-    class="history-page glass-panel"
+    class="history-page"
     aria-labelledby="history-title"
   >
     <h1
@@ -100,13 +100,21 @@
         </li>
       </ol>
     </section>
-    <div class="thoughts-container">
-      <h2 class="tabs-title" style="margin-top: 3rem">{{ $t('about.reflection.title') }}</h2>
+    <section
+      class="thoughts-container"
+      aria-labelledby="reflection-title"
+    >
+      <h2
+        id="reflection-title"
+        class="tabs-title"
+      >
+        {{ $t('about.reflection.title') }}
+      </h2>
       <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph1') }}</p>
       <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph2') }}</p>
       <p class="thoughts" style="text-align: left">{{ $t('about.reflection.paragraph3') }}</p>
       <p class="thoughts" style="text-align: center;"><em v-html="$t('about.reflection.poem')"></em></p>
-    </div>
+    </section>
   </section>
 </template>
 
@@ -148,22 +156,24 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
 .thoughts-container {
   width: 100%;
   max-width: 800px;
-  margin: 0 auto;
+  margin: 3rem auto 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-primary-border);
+}
+
+.thoughts-container .tabs-title {
+  margin-top: 0;
 }
 
 .thoughts {
   max-width: 800px;
   margin: 20px auto;
-  padding: 20px;
-  background: transparent;
-  border-radius: var(--radius-sm2);
   color: var(--text-dark);
   font-family: var(--font-serif);
   font-size: 18px;
   line-height: 1.8;
   text-align: left;
   text-indent: 2em;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
   em {
     color: var(--text-primary);
@@ -327,7 +337,6 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
 
   .thoughts {
     margin: 24px auto;
-    padding: 14px;
     font-size: 0.875rem;
     line-height: 1.65;
   }
