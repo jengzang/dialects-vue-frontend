@@ -171,9 +171,13 @@ describe('AboutPage suggestion form', () => {
 
     const cards = wrapper.host.querySelector('.card-links')
     const form = wrapper.host.querySelector('[data-about-suggestion-form]')
+    const intro = wrapper.host.querySelector('.suggestion-intro')
 
     expect(cards).toBeTruthy()
     expect(form).toBeTruthy()
+    expect(intro).toBeTruthy()
+    expect(intro.compareDocumentPosition(wrapper.host.querySelector('[data-tab-name="internal"]')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(intro.style.display).not.toBe('none')
     expect(wrapper.host.querySelector('[data-tab-name="internal"]')).toBeTruthy()
     expect(wrapper.host.querySelector('[data-tab-name="external"]')).toBeTruthy()
     expect(form.style.display).not.toBe('none')
@@ -188,6 +192,7 @@ describe('AboutPage suggestion form', () => {
     await nextTick()
     expect(form.style.display).toBe('none')
     expect(cards.closest('.suggestion-box').style.display).not.toBe('none')
+    expect(intro.style.display).not.toBe('none')
     wrapper.host.querySelector('[data-tab-name="internal"]').click()
     await nextTick()
     expect(titleInput.value).toBe('待提交的建议')

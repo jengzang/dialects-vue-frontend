@@ -283,7 +283,7 @@
     "title": "Share Feedback",
     "internalTab": "On-site Feedback",
     "externalTab": "External Feedback",
-    "description": "Found a bug? Have a suggestion or an idea?<br />You are welcome to open a GitHub issue or leave a comment on Zhihu!",
+    "description": "Found a problem, have a suggestion, or want to share an idea?<br />Send feedback here, open a GitHub issue, or comment on Zhihu.",
     "subtext": "👇 Select a card below to open the corresponding platform",
     "frontend": {
       "title": "🐞 Found a bug on the site?<br />💡 Have suggestions about the UI or interactions?",

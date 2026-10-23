@@ -283,7 +283,7 @@
     "title": "我有建議",
     "internalTab": "站內反饋",
     "externalTab": "站外反饋",
-    "description": "發現 bug？有建議？有想法？<br />歡迎通過 GitHub Issue 或知乎留言提出！",
+    "description": "發現問題、有建議，或想分享新想法？<br />歡迎在本站提交反饋，也可以通過 GitHub Issue 或知乎留言交流。",
     "subtext": "👇 點擊下方卡片跳轉對應平台",
     "frontend": {
       "title": "🐞 網頁運行有 bug❓<br />💡 對交互、UI 有建議❓",

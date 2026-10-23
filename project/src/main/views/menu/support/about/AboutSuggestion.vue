@@ -1,6 +1,9 @@
 <template>
   <div class="page2">
     <h1 class="tabs-title">💬 {{ $t('navigation.pageTitles.support.aboutSuggestion') }}</h1>
+    <div class="suggestion-box suggestion-intro">
+      <p v-html="$t('about.suggestion.description')"></p>
+    </div>
     <TabSwitcher
       mode="segmented"
       navigation-only
@@ -11,7 +14,6 @@
       @update:modelValue="suggestionTab = $event"
     />
     <div v-show="suggestionTab === 'external'" class="suggestion-box">
-      <p v-html="$t('about.suggestion.description')"></p>
       <p class="subtext">👇 {{ $t('about.suggestion.subtext') }}</p>
       <div class="card-links">
         <a
