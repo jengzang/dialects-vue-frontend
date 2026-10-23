@@ -39,6 +39,11 @@ async function mountHistory(locale = 'zh-Hant') {
 }
 
 describe('author-provided website history', () => {
+  it('titles the About section 开发历程', async () => {
+    await mountHistory()
+    expect(host.querySelector('#history-title').textContent.trim()).toBe('开发历程')
+  })
+
   it('opens under About and removes the old Explore route', async () => {
     await mountHistory()
     expect(router.resolve('/zh-Hant/menu/about/history').matched).toHaveLength(2)

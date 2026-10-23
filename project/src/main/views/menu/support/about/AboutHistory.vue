@@ -7,7 +7,7 @@
       id="history-title"
       class="page-title"
     >
-      网站历史
+      开发历程
     </h1>
     <div
       class="history-filter ui-tabs-navigation--segmented"
