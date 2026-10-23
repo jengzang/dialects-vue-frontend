@@ -1,31 +1,7 @@
 <template>
   <section class="feature-topology" data-feature-topology aria-labelledby="feature-topology-title">
     <h2 id="feature-topology-title" class="tabs-title">功能拓扑图</h2>
-    <p class="feature-topology-hint">选择分类和分组展开；拖动画布浏览，点击节点进入功能。地图图型需在进入地图后选择。</p>
-    <div class="topology-controls" aria-label="选择功能分类">
-      <button
-        v-for="branch in branches"
-        :key="branch.id"
-        type="button"
-        class="glass-button topology-control"
-        :data-topology-focus="branch.id"
-        :aria-pressed="activeBranchId === branch.id"
-        :data-active="activeBranchId === branch.id"
-        @click="selectBranch(branch.id)"
-      >{{ branch.label }}</button>
-    </div>
-    <div v-if="activeBranch" class="topology-controls topology-controls--groups" aria-label="选择功能分组">
-      <button
-        v-for="group in activeBranch.groups"
-        :key="group.id"
-        type="button"
-        class="glass-button topology-control"
-        :data-topology-group="group.id"
-        :aria-pressed="activeGroupId === group.id"
-        :data-active="activeGroupId === group.id"
-        @click="activeGroupId = group.id"
-      >{{ group.label }}</button>
-    </div>
+    <p class="feature-topology-hint">拖动和缩放可查看节点，点击进入功能。地图图型需在进入地图后选择。</p>
     <div class="topology-graph-frame glass-panel">
       <G6Graph
         :key="graphKey"
@@ -64,16 +40,8 @@ const props = defineProps({
 
 const route = useRoute()
 const router = useRouter()
-const activeBranchId = ref('')
-const activeGroupId = ref('')
 const portrait = ref(false)
-const activeBranch = computed(() => props.branches.find(branch => branch.id === activeBranchId.value))
-const graphKey = computed(() => `${portrait.value}-${activeBranchId.value}-${activeGroupId.value}`)
-
-function selectBranch(id) {
-  activeBranchId.value = id
-  activeGroupId.value = ''
-}
+const graphKey = computed(() => portrait.value)
 
 function updateOrientation() {
   portrait.value = window.matchMedia?.('(max-aspect-ratio: 1 / 1)').matches ?? false
@@ -91,39 +59,34 @@ const graphData = computed(() => {
   const addNode = (node, kind = 'feature') => nodes.push({ id: node.id, data: { label: node.label, kind, route: node.route } })
   const addEdge = (source, target, kind = 'tree') => edges.push({ source, target, data: { kind } })
 
-  props.branches.forEach(branch => {
-    addNode(branch, 'module')
-    addEdge('site', branch.id)
-  })
-  props.bridgeNodes.forEach(node => addNode(node, 'module'))
-
-  let bridgeSource = 'multi-analysis'
-  if (activeBranch.value) {
-    activeBranch.value.groups.forEach(group => {
-      addNode(group, 'module')
-      addEdge(activeBranch.value.id, group.id)
-      if (group.id === 'compare') bridgeSource = 'compare'
-      if (group.id !== activeGroupId.value) return
-      const addChildren = (parent, items) => {
-        items?.forEach(item => {
-          addNode(item)
-          addEdge(parent, item.id)
-          addChildren(item.id, item.items)
-        })
-      }
-      addChildren(group.id, group.items)
+  const addChildren = (parent, items) => {
+    items?.forEach(item => {
+      addNode(item)
+      addEdge(parent, item.id)
+      addChildren(item.id, item.items)
     })
   }
 
+  props.branches.forEach(branch => {
+    addNode(branch, 'module')
+    addEdge('site', branch.id)
+    branch.groups.forEach(group => {
+      addNode(group, 'module')
+      addEdge(branch.id, group.id)
+      addChildren(group.id, group.items)
+    })
+  })
+  props.bridgeNodes.forEach(node => addNode(node, 'module'))
+
   props.bridgeNodes.forEach(node => {
-    addEdge(bridgeSource, node.id, 'bridge')
+    addEdge('compare', node.id, 'bridge')
     addEdge(node.id, 'single-analysis', 'bridge')
   })
   return { nodes, edges }
 })
 
 const graphOptions = computed(() => ({
-  autoFit: activeBranchId.value ? 'center' : 'view',
+  autoFit: 'view',
   autoResize: true,
   node: { type: 'rect', style: nodeStyle() },
   edge: {
@@ -135,9 +98,9 @@ const graphOptions = computed(() => ({
   },
   layout: {
     type: 'antv-dagre',
-    rankdir: portrait.value ? 'TB' : 'LR',
-    nodesep: portrait.value ? 20 : 26,
-    ranksep: portrait.value ? 40 : 58,
+    rankdir: 'LR',
+    nodesep: portrait.value ? 12 : 26,
+    ranksep: portrait.value ? 32 : 58,
   },
   behaviors: ['drag-canvas', 'zoom-canvas'],
 }))
@@ -167,28 +130,6 @@ function openNode(id) {
   font-size: 0.875rem;
 }
 
-.topology-controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: center;
-  margin-bottom: 0.65rem;
-}
-
-.topology-controls--groups {
-  margin-bottom: 0.9rem;
-}
-
-.topology-control {
-  --glass-button-padding: 0.45rem 0.75rem;
-  --glass-button-font-size: 0.875rem;
-}
-
-.topology-control[data-active='true'] {
-  color: var(--color-primary);
-  border-color: var(--color-primary-border2);
-}
-
 .topology-graph-frame {
   height: min(68dvh, 540px);
   min-height: 360px;
@@ -214,18 +155,8 @@ function openNode(id) {
 }
 
 @media (max-aspect-ratio: #{1 / 1}) {
-  .topology-controls {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .topology-control {
-    min-width: 0;
-    white-space: normal;
-  }
-
   .topology-graph-frame {
-    height: min(62dvh, 480px);
+    height: min(70dvh, 600px);
     min-height: 340px;
   }
 }
