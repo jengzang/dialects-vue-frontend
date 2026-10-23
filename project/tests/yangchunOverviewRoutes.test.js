@@ -57,19 +57,6 @@ function setReadonlyNumber(target, property, value) {
   })
 }
 
-function setRect(target, rect) {
-  target.getBoundingClientRect = () => rect
-}
-
-function scaleFromTransform(transform) {
-  const match = transform.match(/scale\(([^)]+)\)/)
-  return match ? Number(match[1]) : 0
-}
-
-function waitForAnimationFrame() {
-  return new Promise((resolve) => requestAnimationFrame(resolve))
-}
-
 describe('Yangchun Explore pages', () => {
   afterEach(() => {
     document.body.innerHTML = ''
@@ -190,46 +177,40 @@ describe('Yangchun Explore pages', () => {
     wrapper.unmount()
   })
 
-  it('scales dialect group cards by distance from the carousel center while scrolling', async () => {
+  it('keeps every dialect group readable and synchronizes map selection with cards', async () => {
     const wrapper = await mountOverviewPage()
 
     const scroller = wrapper.host.querySelector('.yc-group-scroller')
     const cards = [...wrapper.host.querySelectorAll('.yc-group-card')]
 
     expect(scroller).toBeTruthy()
-    expect(cards.length).toBeGreaterThan(2)
+    expect(cards).toHaveLength(6)
+    expect(cards.every((card) => !card.style.transform && !card.style.opacity)).toBe(true)
+    scroller.scrollTo = vi.fn()
+    wrapper.host.querySelector('.yc-map-marker:last-of-type').click()
+    await nextTick()
+    await nextTick()
 
-    setReadonlyNumber(scroller, 'clientWidth', 600)
-    setReadonlyNumber(scroller, 'scrollWidth', 1400)
-    setRect(scroller, { left: 0, width: 600 })
-    setRect(cards[0], { left: 0, width: 280 })
-    setRect(cards[1], { left: 160, width: 280 })
-    setRect(cards[2], { left: 480, width: 280 })
-
-    scroller.dispatchEvent(new Event('scroll'))
-    await waitForAnimationFrame()
-
-    expect(cards[1].dataset.carouselActive).toBe('true')
-    expect(scaleFromTransform(cards[1].style.transform)).toBeGreaterThan(scaleFromTransform(cards[0].style.transform))
-    expect(scaleFromTransform(cards[1].style.transform)).toBeGreaterThan(scaleFromTransform(cards[2].style.transform))
+    expect(cards[5].getAttribute('aria-pressed')).toBe('true')
+    expect(wrapper.host.querySelector('.yc-group-detail h3').textContent).toContain('信宜移民涯话方言岛')
 
     wrapper.unmount()
   })
 
-  it('pads the dialect group carousel so edge cards can settle near the center', async () => {
+  it('does not scroll the group grid when all cards fit', async () => {
     const wrapper = await mountOverviewPage()
 
     const scroller = wrapper.host.querySelector('.yc-group-scroller')
-    const firstCard = wrapper.host.querySelector('.yc-group-card')
-
     setReadonlyNumber(scroller, 'clientWidth', 720)
-    setReadonlyNumber(firstCard, 'clientWidth', 280)
+    setReadonlyNumber(scroller, 'scrollWidth', 720)
+    scroller.scrollTo = vi.fn()
 
-    window.dispatchEvent(new Event('resize'))
+    wrapper.host.querySelector('[data-group-id="chunxi"]').click()
+    await nextTick()
     await nextTick()
 
-    expect(scroller.style.paddingLeft).toBe('220px')
-    expect(scroller.style.paddingRight).toBe('220px')
+    expect(scroller.scrollTo).not.toHaveBeenCalled()
+    expect(wrapper.host.querySelector('[data-group-id="chunxi"]').getAttribute('aria-pressed')).toBe('true')
 
     wrapper.unmount()
   })

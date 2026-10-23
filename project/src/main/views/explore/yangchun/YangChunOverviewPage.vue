@@ -5,7 +5,7 @@
   >
     <section
       id="yc-overview-top"
-      class="yc-hero glass-shell yc-reveal"
+      class="yc-hero yc-reveal"
     >
       <div class="yc-hero__copy">
         <span class="yc-eyebrow">Yangchun Dialect Atlas</span>
@@ -32,11 +32,70 @@
         </div>
       </div>
 
+      <div
+        class="yc-hero__visual"
+        aria-hidden="true"
+      >
+        <svg
+          viewBox="0 0 480 300"
+          class="yc-contact-art"
+        >
+          <circle
+            cx="184"
+            cy="138"
+            r="112"
+            class="yc-contact-art__cantonese"
+          />
+          <circle
+            cx="310"
+            cy="158"
+            r="94"
+            class="yc-contact-art__hakka"
+          />
+          <path d="M80 245 C170 200 220 285 405 245" />
+          <text
+            x="158"
+            y="140"
+            class="yc-contact-art__title"
+          >白话</text>
+          <text
+            x="323"
+            y="167"
+            class="yc-contact-art__title"
+          >涯话</text>
+          <text
+            x="244"
+            y="108"
+            class="yc-contact-art__caption"
+          >交汇</text>
+          <circle
+            cx="225"
+            cy="214"
+            r="5"
+          />
+          <circle
+            cx="250"
+            cy="230"
+            r="3"
+          />
+          <circle
+            cx="276"
+            cy="214"
+            r="4"
+          />
+          <text
+            x="250"
+            y="275"
+            class="yc-contact-art__caption"
+          >流域 · 迁徙 · 方言岛</text>
+        </svg>
+      </div>
+
       <div class="yc-hero__stats">
         <article
           v-for="stat in overviewStats"
           :key="stat.label"
-          class="glass-subpanel yc-stat"
+          class="yc-stat"
         >
           <span>{{ stat.label }}</span>
           <strong>{{ stat.value }}</strong>
@@ -46,7 +105,7 @@
     </section>
 
     <nav
-      class="yc-section-nav glass-subpanel yc-reveal"
+      class="yc-section-nav glass-panel"
       aria-label="阳春概览页内导航"
     >
       <button
@@ -72,7 +131,7 @@
       </div>
 
       <div class="yc-atlas-layout">
-        <article class="yc-map-panel glass-panel">
+        <article class="yc-map-panel surface-panel">
           <div class="yc-map-panel__header">
             <div>
               <span class="yc-eyebrow">Distribution Map</span>
@@ -82,9 +141,22 @@
           </div>
 
           <div
-            class="yc-map-placeholder glass-subpanel"
-            aria-label="阳春方言分布草图"
+            class="yc-map-placeholder surface-subpanel"
+            aria-label="阳春方言空间关系示意，非精确地理边界"
           >
+            <svg
+              class="yc-map-rivers"
+              viewBox="0 0 600 430"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              <path d="M290 28 C360 100 235 135 305 210 S345 300 370 400" />
+              <path d="M85 290 C145 255 180 310 305 250" />
+            </svg>
+            <span
+              class="yc-map-direction"
+              aria-hidden="true"
+            >↑ 北</span>
             <button
               v-for="group in dialectGroups"
               :key="group.id"
@@ -92,16 +164,20 @@
               :class="{ 'yc-map-marker--active': group.id === activeGroupId }"
               data-size="small"
               :data-active="group.id === activeGroupId"
+              :aria-pressed="group.id === activeGroupId"
               :style="markerStyle(group)"
               type="button"
               @click="selectGroup(group.id)"
             >
               <span>{{ group.name }}</span>
             </button>
-            <div class="yc-map-placeholder__river glass-subpanel">
+            <div class="yc-map-placeholder__river">
               漠阳江 / 潭水河流域
             </div>
           </div>
+          <p class="yc-map-caption">
+            空间关系示意 · 非精确地理边界，河流线条仅作示意
+          </p>
         </article>
 
         <aside class="yc-active-panel glass-panel">
@@ -152,13 +228,13 @@
           @scroll="onGroupCarouselScroll"
         >
           <button
-            v-for="(group, index) in dialectGroups"
+            v-for="group in dialectGroups"
             :key="group.id"
-            :ref="(el) => setGroupRef(el, index)"
             class="glass-card yc-group-card"
             data-interactive="true"
             :data-group-id="group.id"
             :aria-pressed="group.id === activeGroupId"
+            :data-active="group.id === activeGroupId"
             type="button"
             @click="selectGroup(group.id)"
           >
@@ -193,7 +269,7 @@
       id="yc-contact"
       class="yc-contact-section yc-reveal"
     >
-      <article class="yc-contact-panel glass-panel">
+      <article class="yc-contact-panel">
         <div class="yc-section-heading yc-section-heading--left">
           <span class="yc-eyebrow">Contact Zone</span>
           <h2>交汇、迁徙与方言岛</h2>
@@ -206,7 +282,7 @@
           <article
             v-for="note in migrationNotes"
             :key="note.title"
-            class="glass-subpanel yc-note-card"
+            class="surface-subpanel yc-note-card"
           >
             <strong>{{ note.title }}</strong>
             <p>{{ note.text }}</p>
@@ -270,11 +346,11 @@
         <p>页面文案整理自本仓库 `docs/zhihu/阳春` 下的调查文章。</p>
       </div>
 
-      <div class="main-card-grid yc-source-grid">
+      <div class="yc-source-grid">
         <article
           v-for="article in sourceArticles"
           :key="article.path"
-          class="glass-card yc-source-card"
+          class="yc-source-card"
         >
           <span>{{ article.date }}</span>
           <strong>{{ article.title }}</strong>
@@ -299,7 +375,6 @@ import {
 
 const pageEl = ref(null)
 const groupScroller = ref(null)
-const groupRefs = ref([])
 const { t } = useI18n()
 const FALLBACK_MARKER_POSITION = { left: 50, top: 50 }
 const FALLBACK_DIALECT_GROUP = {
@@ -339,11 +414,6 @@ const activePhonology = computed(() => (
 ))
 
 let revealObserver = null
-let groupRaf = 0
-
-function setGroupRef(el, index) {
-  if (el) groupRefs.value[index] = el
-}
 
 function markerStyle(group) {
   const left = Number(group?.marker?.left)
@@ -360,7 +430,7 @@ function selectGroup(id) {
   nextTick(() => {
     const scroller = groupScroller.value
     const target = scroller?.querySelector(`[data-group-id="${id}"]`)
-    if (!scroller || !target) return
+    if (!scroller || !target || scroller.scrollWidth <= scroller.clientWidth) return
     const scrollerRect = scroller.getBoundingClientRect()
     const targetRect = target.getBoundingClientRect()
     const left = targetRect.left - scrollerRect.left + scroller.scrollLeft - ((scroller.clientWidth - targetRect.width) / 2)
@@ -379,50 +449,7 @@ function updateGroupCarousel() {
   groupCanNext.value = scroller.scrollLeft + scroller.clientWidth < scroller.scrollWidth - 4
 }
 
-function syncGroupCarouselPadding() {
-  const scroller = groupScroller.value
-  const firstCard = groupRefs.value[0]
-  if (!scroller || !firstCard) return
-  const padding = Math.max(2, (scroller.clientWidth - firstCard.clientWidth) / 2)
-  scroller.style.paddingLeft = `${padding}px`
-  scroller.style.paddingRight = `${padding}px`
-}
-
-function updateGroupCardTransforms() {
-  const scroller = groupScroller.value
-  if (!scroller) return
-  const scrollerRect = scroller.getBoundingClientRect()
-  const center = scrollerRect.left + (scrollerRect.width / 2)
-  let activeIndex = 0
-  let activeDistance = Infinity
-
-  groupRefs.value.forEach((node, index) => {
-    if (!node) return
-    const rect = node.getBoundingClientRect()
-    const normalized = (rect.left + (rect.width / 2) - center) / rect.width
-    const clamped = Math.max(-2, Math.min(2, normalized))
-    const distance = Math.abs(clamped)
-    const scale = Math.max(0.72, 1 - (0.18 * distance))
-
-    if (distance < activeDistance) {
-      activeDistance = distance
-      activeIndex = index
-    }
-
-    node.style.transform = `perspective(1000px) rotateY(${-12 * clamped}deg) scale(${scale})`
-    node.style.opacity = String(Math.max(0.62, 1 - (0.24 * distance)))
-    node.style.zIndex = String(Math.round(100 - (32 * distance)))
-  })
-
-  groupRefs.value.forEach((node, index) => {
-    if (!node) return
-    node.dataset.carouselActive = String(index === activeIndex)
-  })
-}
-
 function onGroupCarouselScroll() {
-  cancelAnimationFrame(groupRaf)
-  groupRaf = requestAnimationFrame(updateGroupCardTransforms)
   updateGroupCarousel()
 }
 
@@ -462,20 +489,13 @@ function initReveal() {
 onMounted(async () => {
   await nextTick()
   initReveal()
-  syncGroupCarouselPadding()
   updateGroupCarousel()
-  updateGroupCardTransforms()
   window.addEventListener('resize', updateGroupCarousel)
-  window.addEventListener('resize', syncGroupCarouselPadding)
-  window.addEventListener('resize', updateGroupCardTransforms)
 })
 
 onBeforeUnmount(() => {
-  cancelAnimationFrame(groupRaf)
   revealObserver?.disconnect()
   window.removeEventListener('resize', updateGroupCarousel)
-  window.removeEventListener('resize', syncGroupCarouselPadding)
-  window.removeEventListener('resize', updateGroupCardTransforms)
 })
 </script>
 
@@ -485,10 +505,15 @@ onBeforeUnmount(() => {
 
 .yangchun-overview {
   @include flex-col;
-  gap: 28px;
+  --yc-nav-top: calc(6.5dvh + 28px);
+  gap: 64px;
   width: min(1180px, 94dvw);
   margin: 0 auto;
-  padding: 24px 0 64px;
+  padding: 40px 0 80px;
+
+  section[id] {
+    scroll-margin-top: calc(var(--yc-nav-top) + 80px);
+  }
 }
 
 .yc-reveal {
@@ -504,10 +529,10 @@ onBeforeUnmount(() => {
 
 .yc-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
-  gap: 22px;
-  padding: 32px;
-  min-height: 42dvh;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 28px 40px;
+  align-items: center;
+  padding: 20px 16px 0;
 }
 
 .yc-hero__copy {
@@ -517,14 +542,21 @@ onBeforeUnmount(() => {
 
   h1 {
     margin: 0;
-    font-size: 4rem;
-    line-height: 1.05;
+    font-size: clamp(2.2rem, 4.2dvw, 3.5rem);
+    line-height: 1.2;
+    text-wrap: balance;
+
+    :deep(svg),
+    :deep(.bar-icon-emoji) {
+      margin-right: 10px;
+      font-size: 0.7em;
+    }
   }
 
   p {
     max-width: 660px;
     margin: 0;
-    color: var(--text-secondary);
+    color: var(--text-tertiary);
     font-size: 1.05rem;
     line-height: 1.8;
   }
@@ -540,15 +572,18 @@ onBeforeUnmount(() => {
 }
 
 .yc-hero__stats {
-  @include flex-col;
-  gap: 12px;
-  justify-content: center;
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-control);
 }
 
 .yc-stat {
   @include flex-col;
   gap: 8px;
-  padding: 18px;
+  padding: 0;
 
   span,
   small {
@@ -561,30 +596,78 @@ onBeforeUnmount(() => {
   }
 }
 
+.yc-hero__visual {
+  min-width: 0;
+}
+
+// Editorial illustration of language contact; it does not depict geographic boundaries.
+.yc-contact-art {
+  width: 100%;
+  overflow: visible;
+  fill: var(--color-primary);
+  color: var(--color-primary);
+
+  &__cantonese {
+    fill: var(--color-primary-light);
+    stroke: var(--color-primary-border);
+  }
+
+  &__hakka {
+    fill: var(--color-secondary-light);
+    stroke: var(--color-secondary-border);
+  }
+
+  path {
+    fill: none;
+    stroke: var(--color-primary-border);
+    stroke-width: 2;
+  }
+
+  text {
+    text-anchor: middle;
+    dominant-baseline: middle;
+  }
+
+  &__title {
+    fill: var(--text-deep);
+    font-family: var(--font-serif);
+    font-size: 38px;
+    font-weight: 700;
+  }
+
+  &__caption {
+    fill: var(--text-tertiary);
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+}
+
 .yc-eyebrow {
   color: var(--color-primary);
   font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
 .yc-section-nav {
   position: sticky;
-  top: 14px;
+  top: var(--yc-nav-top);
   z-index: 3;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   justify-content: center;
   padding: 10px;
+  margin-top: -32px;
+  --glass-panel-background: var(--surface-glass-floating-strong);
 }
 
 .yc-section-heading {
   @include flex-col;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 18px;
+  gap: 12px;
+  margin-bottom: 28px;
   text-align: center;
 
   h2,
@@ -594,6 +677,7 @@ onBeforeUnmount(() => {
 
   h2 {
     font-size: 1.8rem;
+    text-wrap: balance;
   }
 
   p {
@@ -622,6 +706,10 @@ onBeforeUnmount(() => {
   padding: 22px;
 }
 
+.yc-contact-panel {
+  padding: 0;
+}
+
 .yc-map-panel {
   @include flex-col;
   gap: 18px;
@@ -648,26 +736,51 @@ onBeforeUnmount(() => {
 
 .yc-map-placeholder {
   position: relative;
-  min-height: 430px;
+  min-height: 400px;
   overflow: hidden;
+}
+
+.yc-map-rivers {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--color-primary-border);
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+
+.yc-map-direction {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  color: var(--text-tertiary);
+  font-size: 0.85rem;
+}
+
+.yc-map-caption {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: 0.8rem;
+  line-height: 1.6;
 }
 
 .yc-map-placeholder__river {
   position: absolute;
   left: 18%;
-  top: 48%;
+  top: 82%;
   width: 66%;
   padding: 8px 14px;
   color: var(--text-tertiary);
   font-size: 0.9rem;
   text-align: center;
-  transform: rotate(-18deg);
 }
 
 .yc-map-marker {
   position: absolute;
   z-index: 1;
-  --glass-button-padding: 8px 12px;
+  --glass-button-small-padding: 8px 12px;
   transform: translate(-50%, -50%);
   transition: transform 0.18s ease;
 
@@ -710,18 +823,15 @@ onBeforeUnmount(() => {
 }
 
 .yc-source-grid {
-  --main-card-min-width: 260px;
+  @include flex-col;
 }
 
 .yc-group-carousel {
   position: relative;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 12px;
-  align-items: center;
 }
 
 .yc-group-carousel__arrow {
+  display: none;
   min-width: 42px;
   min-height: 42px;
   padding: 0;
@@ -731,23 +841,34 @@ onBeforeUnmount(() => {
 .yc-group-scroller {
   @include scrollbars.hidden-scrollbar;
   @include scrollbars.hidden-scrollbar-webkit;
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
-  align-items: center;
+  align-items: stretch;
   overflow-x: auto;
-  padding: 18px 2px 24px;
-  perspective: 1200px;
+  padding: 6px;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
 }
 
 .yc-group-card {
+  @include flex-col;
+  gap: 12px;
+  align-items: flex-start;
   flex: 0 0 min(320px, 76dvw);
+  min-width: 0;
   min-height: 190px;
-  transform-origin: center;
+  padding: 22px;
   scroll-snap-align: center;
   text-align: left;
-  will-change: transform, opacity;
+
+  &[data-active='true'] {
+    --glass-card-background: var(--surface-selected);
+  }
+
+  small {
+    font-size: 0.8rem;
+  }
 
   strong {
     font-size: 1.18rem;
@@ -758,6 +879,10 @@ onBeforeUnmount(() => {
     margin: 0;
     color: var(--text-secondary);
     line-height: 1.7;
+  }
+
+  small {
+    margin-top: auto;
   }
 }
 
@@ -835,14 +960,20 @@ onBeforeUnmount(() => {
 }
 
 .yc-source-card {
-  cursor: default;
+  display: grid;
+  grid-template-columns: 100px minmax(0, 1fr);
+  gap: 6px 20px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--border-glass-subtle);
 
   span,
   small {
+    font-size: 0.75rem;
     color: var(--text-tertiary);
   }
 
   small {
+    grid-column: 2;
     word-break: break-all;
     white-space: normal;
   }
@@ -850,6 +981,8 @@ onBeforeUnmount(() => {
 
 @media (max-aspect-ratio: 1 / 1) {
   .yangchun-overview {
+    --yc-nav-top: calc(max(7dvh, 40px) + max(8px, env(safe-area-inset-top)) + 16px);
+    gap: 40px;
     width: min(94dvw, 760px);
     padding-top: 14px;
   }
@@ -862,21 +995,105 @@ onBeforeUnmount(() => {
   }
 
   .yc-hero {
-    padding: 22px;
+    gap: 20px;
+    padding: 12px 4px 0;
 
     h1 {
-      font-size: 2.6rem;
+      font-size: clamp(1.9rem, 7dvw, 2.6rem);
+    }
+  }
+
+  .yc-hero__visual {
+    width: min(100%, 360px);
+    margin: 0 auto;
+  }
+
+  .yc-hero__stats {
+    gap: 12px;
+
+    strong {
+      font-size: 1.05rem;
+    }
+
+    small {
+      font-size: 0.75rem;
+      line-height: 1.6;
     }
   }
 
   .yc-map-placeholder {
-    min-height: 380px;
+    min-height: 360px;
+  }
+
+  .yc-map-marker {
+    --glass-button-small-padding: 8px;
+    --glass-button-small-font-size: 12px;
+    max-width: 46%;
+
+    span {
+      white-space: normal;
+    }
+  }
+
+  .yc-map-panel,
+  .yc-active-panel,
+  .yc-phonology-panel,
+  .yc-group-detail {
+    padding: 18px;
+  }
+
+  .yc-group-carousel {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .yc-group-carousel__arrow {
+    display: inline-flex;
+    min-width: 32px;
+    min-height: 40px;
+  }
+
+  .yc-group-scroller {
+    display: flex;
+  }
+
+  .yc-group-card {
+    flex-basis: 88%;
+  }
+
+  .yc-source-card {
+    grid-template-columns: 1fr;
+
+    small {
+      grid-column: 1;
+    }
   }
 
   .yc-section-nav {
-    top: 8px;
-    justify-content: flex-start;
+    margin-top: -12px;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: 4px;
     overflow-x: auto;
+
+    .glass-button {
+      flex-shrink: 0;
+      --glass-button-small-padding: 10px;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .yc-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .yc-group-scroller {
+    scroll-behavior: auto;
   }
 }
 </style>
