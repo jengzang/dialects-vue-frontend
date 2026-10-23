@@ -1,16 +1,29 @@
 <template>
-  <main class="toponyms-page glass-container glass-shell">
-    <section class="toponyms-page__controls glass-panel">
-      <div class="toponyms-page__controls-inner glass-subpanel">
+  <main
+    class="toponyms-page"
+    :class="{ 'is-search-expanded': isSearchExpanded && !isSearchCollapsing }"
+  >
+    <QuerySearchEntrance
+      ref="querySearchEntranceRef"
+      title-tag="h1"
+      :title="t('navigation.pageTitles.villages.toponyms')"
+      @progress="updateSearchProgress"
+    >
+      <template #intro>
         <div class="toponyms-page__toolbar-copy">
-          <h1><BarIcon icon="📍" />{{ t('navigation.pageTitles.villages.toponyms') }}</h1>
+          <h1 class="page-title">
+            <BarIcon icon="📍" />{{ t('navigation.pageTitles.villages.toponyms') }}
+          </h1>
           <p>{{ t('villages.pages.toponyms.subtitle') }}</p>
         </div>
-
+      </template>
+      <template #controls="{ expanded }">
         <ToponymSearchBar
           v-model:query="query"
           v-model:match-mode="matchMode"
+          :expanded="expanded"
           :loading="pointsLoading"
+          :error="isSearchExpanded ? pointsError : ''"
           @search="handleSearch"
         >
           <template #actions>
@@ -25,66 +38,69 @@
             </button>
           </template>
         </ToponymSearchBar>
-      </div>
-    </section>
+      </template>
 
-    <section class="toponyms-page__workspace">
-      <div class="toponyms-page__chart glass-panel">
-        <div class="toponyms-page__chart-inner glass-subpanel">
-          <div class="toponyms-page__chart-header">
-            <div class="toponyms-page__stat-strip">
-              <span>{{ t('villages.pages.toponyms.chart.pointsSeries') }}</span>
-              <strong>{{ scatterData.length }}</strong>
-              <small v-if="hasSearched">
-                {{
-                  t('villages.pages.toponyms.results.count', {
-                    count: pointCount,
-                    shown: scatterData.length,
-                  })
-                }}
-              </small>
-              <small v-else>{{ t('villages.pages.toponyms.chart.searchFirst') }}</small>
+      <section
+        v-show="hasSearched && !isSearchExpanded"
+        class="toponyms-page__workspace"
+      >
+        <div class="toponyms-page__chart glass-panel">
+          <div class="toponyms-page__chart-inner">
+            <div class="toponyms-page__chart-header">
+              <div class="toponyms-page__stat-strip">
+                <span>{{ t('villages.pages.toponyms.chart.pointsSeries') }}</span>
+                <strong>{{ scatterData.length }}</strong>
+                <small v-if="hasSearched">
+                  {{
+                    t('villages.pages.toponyms.results.count', {
+                      count: pointCount,
+                      shown: scatterData.length,
+                    })
+                  }}
+                </small>
+                <small v-else>{{ t('villages.pages.toponyms.chart.searchFirst') }}</small>
+              </div>
             </div>
+
+            <ToponymDistributionChart
+              ref="chartRef"
+              :country-layer="countryLayer"
+              :loaded-layers="loadedLayers"
+              :layer-state="layerState"
+              :loading-layers="loadingLayers"
+              :layer-errors="layerErrors"
+              :scatter-data="scatterData"
+              :loading="pointsLoading"
+              :error="countryError || pointsError"
+              :has-searched="hasSearched"
+              @select-point="handleSelectPoint"
+              @toggle-layer="handleToggleLayer"
+            />
           </div>
-
-          <ToponymDistributionChart
-            ref="chartRef"
-            :country-layer="countryLayer"
-            :loaded-layers="loadedLayers"
-            :layer-state="layerState"
-            :loading-layers="loadingLayers"
-            :layer-errors="layerErrors"
-            :scatter-data="scatterData"
-            :loading="pointsLoading"
-            :error="countryError || pointsError"
-            :has-searched="hasSearched"
-            @select-point="handleSelectPoint"
-            @toggle-layer="handleToggleLayer"
-          />
         </div>
-      </div>
 
-      <ToponymResultsPanel
-        :has-searched="hasSearched"
-        :loading="pointsLoading"
-        :error="pointsError"
-        :point-count="pointCount"
-        :scatter-count="scatterData.length"
-        :truncated="pointsTruncated"
-        :name-tree="nameTree"
-        :name-tree-meta="nameTreeMeta"
-        :name-tree-loading="nameTreeLoading"
-        :name-tree-error="nameTreeError"
-        :name-tree-loaded="nameTreeLoaded"
-        @request-name-tree="handleNameTreeRequest"
-        @expand-name-tree-node="handleNameTreeNodeExpand"
-        @load-more-name-tree-names="handleNameTreeNamesMore"
-      />
-    </section>
+        <ToponymResultsPanel
+          :has-searched="hasSearched"
+          :loading="pointsLoading"
+          :error="pointsError"
+          :point-count="pointCount"
+          :scatter-count="scatterData.length"
+          :truncated="pointsTruncated"
+          :name-tree="nameTree"
+          :name-tree-meta="nameTreeMeta"
+          :name-tree-loading="nameTreeLoading"
+          :name-tree-error="nameTreeError"
+          :name-tree-loaded="nameTreeLoaded"
+          @request-name-tree="handleNameTreeRequest"
+          @expand-name-tree-node="handleNameTreeNodeExpand"
+          @load-more-name-tree-names="handleNameTreeNamesMore"
+        />
+      </section>
+    </QuerySearchEntrance>
 
     <Teleport to="body">
       <HoverDetailCard
-        :visible="isDetailCardOpen"
+        :visible="isDetailCardOpen && !isSearchExpanded"
         :is-mobile-layout="isMobileLayout"
         :is-pinned="isDetailCardPinned"
         :desktop-card-position="desktopCardPosition"
@@ -118,6 +134,7 @@
 <script setup>
 import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue';
+import QuerySearchEntrance from '@/components/common/QuerySearchEntrance.vue';
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
@@ -143,6 +160,9 @@ const TOPONYM_MATCH_MODES = new Set(['prefix', 'suffix', 'exact', 'contains']);
 const TOPONYM_VILLAGE_PLACE_TYPE_CODES = ['22200', '21610', '27610'];
 
 const chartRef = ref(null);
+const querySearchEntranceRef = ref(null);
+const isSearchExpanded = ref(true);
+const isSearchCollapsing = ref(false);
 const query = ref('');
 const matchMode = ref('prefix');
 const hasSearched = ref(false);
@@ -251,6 +271,11 @@ function hydrateSearchFromRouteQuery() {
   return true;
 }
 
+function updateSearchProgress(progress) {
+  isSearchExpanded.value = progress < 1;
+  if (progress === 0 || progress === 1) isSearchCollapsing.value = false;
+}
+
 async function handleSearch() {
   const keyword = query.value.trim();
   hasSearched.value = true;
@@ -266,6 +291,10 @@ async function handleSearch() {
     pointsError.value = t('villages.pages.toponyms.errors.emptyQuery');
     return;
   }
+
+  // Reserve result scroll space during collapse, then release it on expansion.
+  isSearchCollapsing.value = true;
+  querySearchEntranceRef.value?.collapse();
 
   const searchParams = {
     q: keyword,
@@ -669,59 +698,61 @@ async function handleToggleLayer({ key, visible }) {
 
 .toponyms-page {
   @include flex-col;
-  gap: 16px;
   width: 100%;
-  min-height: 70dvh;
-  padding: 20px;
+  min-height: calc(100dvh - 7dvh - 44px);
+  padding: 6px 20px 24px;
+  box-sizing: border-box;
 
-  &__controls {
-    width: 100%;
+  :deep(.query-search-entrance) {
+    @include flex-col;
+    flex: var(--query-expansion) 0 auto;
+    justify-content: center;
+    padding-bottom: calc((7dvh - 12px) * var(--query-expansion));
+    box-sizing: border-box;
   }
 
-  &__controls-inner {
-    display: grid;
-    grid-template-columns: minmax(220px, 0.34fr) minmax(0, 1fr);
-    gap: 16px;
-    align-items: center;
+  &.is-search-expanded :deep(.query-results) {
+    min-height: 0;
   }
 
   &__toolbar-copy {
     @include flex-col;
-    gap: 4px;
+    align-items: center;
+    gap: 8px;
     min-inline-size: 0;
+    text-align: center;
 
     h1,
     p {
       margin: 0;
     }
 
-    h1 {
-      color: var(--text-deep);
-      font-size: 18px;
-      line-height: 1.25;
-    }
-
     p {
       color: var(--text-secondary);
-      font-size: 12px;
+      font-size: 14px;
       line-height: 1.5;
     }
   }
 
   &__workspace {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 360px;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.3fr);
     gap: 16px;
+    margin-top: 16px;
+    min-block-size: 84dvh;
     align-items: stretch;
   }
 
   &__chart {
+    min-inline-size: 0;
     min-block-size: 68dvh;
+    overflow: hidden;
   }
 
   &__chart-inner {
     @include flex-col;
     gap: 12px;
+    padding: 16px;
     min-block-size: 68dvh;
   }
 
@@ -784,15 +815,15 @@ async function handleToggleLayer({ key, visible }) {
 
 @media (max-aspect-ratio: 1 / 1) {
   .toponyms-page {
-    padding: 14px;
+    min-height: calc(100dvh - 16dvh - 44px);
+    padding: 1px 8px 16px;
+
+    :deep(.query-search-entrance) {
+      padding-bottom: calc((16dvh - 8px) * var(--query-expansion));
+    }
 
     &__workspace {
       grid-template-columns: 1fr;
-    }
-
-    &__controls-inner {
-      grid-template-columns: 1fr;
-      align-items: stretch;
     }
 
     &__chart-header {
@@ -802,6 +833,10 @@ async function handleToggleLayer({ key, visible }) {
     &__chart,
     &__chart-inner {
       min-block-size: 54dvh;
+    }
+
+    &__chart-inner {
+      padding: 12px;
     }
   }
 }

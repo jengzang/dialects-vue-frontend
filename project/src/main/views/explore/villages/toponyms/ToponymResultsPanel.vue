@@ -1,6 +1,6 @@
 <template>
   <aside class="toponym-results-panel toponym-results-panel__inspector glass-panel">
-    <div class="toponym-results-panel__inner glass-subpanel">
+    <div class="toponym-results-panel__inner ui-scrollbar">
       <section class="toponym-results-panel__summary">
         <h2>{{ t('villages.pages.toponyms.results.title') }}</h2>
         <p v-if="!hasSearched">
@@ -242,7 +242,7 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
 @use '@/styles/global/mixins' as *;
 
 .toponym-results-panel {
-  min-inline-size: 320px;
+  min-inline-size: 0;
 
   &__inspector {
     align-self: stretch;
@@ -251,6 +251,7 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
   &__inner {
     @include flex-col;
     gap: 14px;
+    padding: 16px;
     max-block-size: 68dvh;
     overflow: auto;
   }
