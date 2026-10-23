@@ -32,7 +32,7 @@
     </nav>
     <h1 class="tabs-title">{{ $t('navigation.pageTitles.support.aboutIntro') }}</h1>
     <p style=" text-align: left;">{{ $t('about.intro.description') }}</p>
-    <AboutFeatureTopology :branches="[...analysisBranches, ...secondaryBranches]" :bridge-nodes="bridgeNodes" />
+    <!-- <AboutFeatureTopology :branches="[...analysisBranches, ...secondaryBranches]" :bridge-nodes="bridgeNodes" /> -->
     <ul class="customlist">
       <li
         v-for="feature in featureList"

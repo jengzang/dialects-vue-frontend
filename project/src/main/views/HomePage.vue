@@ -162,11 +162,6 @@
       </div>
     </section>
 
-    <AboutHistory
-      featured
-      :title="$t('home.history.title')"
-    />
-
     <!-- Projects Section -->
     <section class="projects-section reveal">
       <h2 class="section-title">{{ $t('home.projects.sectionTitle') }}</h2>
@@ -204,6 +199,11 @@
         </button>
       </div>
     </section>
+
+    <AboutHistory
+      featured
+      :title="$t('home.history.title')"
+    />
 
     <!-- Footer -->
     <footer class="footer">

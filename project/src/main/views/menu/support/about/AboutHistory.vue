@@ -25,18 +25,17 @@
         @update:model-value="onlyImportant = $event"
       />
     </div>
-    <p
-      v-if="!featured"
+    <!-- <p
       class="history-filter-summary hint"
       aria-live="polite"
     >
       共 {{ visibleEntryCount }} 条更新
-    </p>
+    </p> -->
     <section
       v-for="stage in visibleStages"
       :key="stage.major"
       class="history-stage"
-      :class="{ 'glass-subpanel': featured }"
+      :class="{ 'glass-panel': featured }"
       :aria-labelledby="`history-stage-${stage.major}`"
     >
       <h2
@@ -248,6 +247,13 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
 }
 
 .history-page--featured .history-stage {
+  --glass-panel-background: var(--glass-60);
+  --glass-panel-backdrop-filter: blur(20px);
+  --glass-panel-border: 1px solid rgba(var(--color-primary-rgb), 0.15);
+  --glass-panel-radius: var(--radius-md);
+  --glass-panel-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.08);
+  --glass-panel-hover-shadow: 0 12px 32px rgba(var(--color-primary-rgb), 0.18);
+
   box-sizing: border-box;
   width: 100%;
   margin-top: 1.5rem;
@@ -256,6 +262,17 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
   & + & {
     margin-top: 1.5rem;
     border-top: 0;
+  }
+}
+
+.history-page--featured {
+  .history-stage-title {
+    font-size: 1.2rem;
+  }
+
+  .history-date,
+  .history-content {
+    font-size: 0.9rem;
   }
 }
 
@@ -400,6 +417,17 @@ const visibleEntryCount = computed(() => visibleStages.value.reduce((count, stag
 
   .history-page--featured .page-title {
     font-size: 1.75rem;
+  }
+
+  .history-page--featured {
+    .history-stage-title {
+      font-size: 1.05rem;
+    }
+
+    .history-date,
+    .history-content {
+      font-size: 0.8125rem;
+    }
   }
 
   .history-stage-title {
