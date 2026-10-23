@@ -32,6 +32,86 @@
     </nav>
     <h1 class="tabs-title">{{ $t('navigation.pageTitles.support.aboutIntro') }}</h1>
     <p style=" text-align: left;">{{ $t('about.intro.description') }}</p>
+    <section class="feature-topology" data-feature-topology aria-labelledby="feature-topology-title">
+      <h2 id="feature-topology-title" class="tabs-title">功能拓扑图</h2>
+      <p class="feature-topology-hint">点击节点进入对应功能；地图图型需在进入地图后选择。</p>
+      <div ref="topologyGraph" class="topology-analysis">
+        <svg class="topology-connections" aria-hidden="true">
+          <path
+            v-for="connection in topologyConnections"
+            :key="`${connection.from}-${connection.to}`"
+            :data-topology-from="connection.from"
+            :data-topology-to="connection.to"
+            :d="connectorPaths[`${connection.from}-${connection.to}`] || ''"
+          />
+        </svg>
+        <template v-for="branch in analysisBranches" :key="branch.id">
+          <div class="topology-branch glass-panel" :class="`topology-branch--${branch.id}`">
+            <RouterLink :to="localeTo(branch.route)" class="topology-node topology-root glass-button" :data-topology-node="branch.id">
+              {{ branch.label }}
+            </RouterLink>
+            <ul class="topology-groups">
+              <li v-for="group in branch.groups" :key="group.id">
+                <RouterLink :to="localeTo(group.route)" class="topology-node topology-group-link glass-button" :data-topology-node="group.id" :title="group.hint">
+                  {{ group.label }}<small v-if="group.note" class="topology-node-note">{{ group.note }}</small>
+                </RouterLink>
+                <ul v-if="group.items?.length" class="topology-items">
+                  <li v-for="item in group.items" :key="item.id">
+                    <RouterLink :to="localeTo(item.route)" class="topology-node topology-item-link glass-button" :data-topology-node="item.id" :title="item.hint">
+                      {{ item.label }}<small v-if="item.note" class="topology-node-note">{{ item.note }}</small>
+                    </RouterLink>
+                    <ul v-if="item.items?.length" class="topology-items topology-items--nested">
+                      <li v-for="subitem in item.items" :key="subitem.id">
+                        <RouterLink :to="localeTo(subitem.route)" class="topology-node topology-item-link glass-button" :data-topology-node="subitem.id" :title="subitem.hint">
+                          {{ subitem.label }}<small v-if="subitem.note" class="topology-node-note">{{ subitem.note }}</small>
+                        </RouterLink>
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </template>
+        <div class="topology-bridge" aria-label="多方言与单方言之间的关联功能">
+          <RouterLink
+            v-for="node in bridgeNodes"
+            :key="node.id"
+            :to="localeTo(node.route)"
+            class="topology-node topology-bridge-node glass-button"
+            :data-topology-node="node.id"
+          >{{ node.label }}</RouterLink>
+        </div>
+        <div class="topology-secondary">
+        <div v-for="branch in secondaryBranches" :key="branch.id" class="topology-branch glass-panel">
+          <RouterLink :to="localeTo(branch.route)" class="topology-node topology-root glass-button" :data-topology-node="branch.id">
+            {{ branch.label }}
+          </RouterLink>
+          <ul class="topology-groups">
+            <li v-for="group in branch.groups" :key="group.id">
+              <RouterLink :to="localeTo(group.route)" class="topology-node topology-group-link glass-button" :data-topology-node="group.id" :title="group.hint">
+                {{ group.label }}<small v-if="group.note" class="topology-node-note">{{ group.note }}</small>
+              </RouterLink>
+              <ul v-if="group.items?.length" class="topology-items">
+                <li v-for="item in group.items" :key="item.id">
+                  <RouterLink :to="localeTo(item.route)" class="topology-node topology-item-link glass-button" :data-topology-node="item.id" :title="item.hint">
+                    {{ item.label }}<small v-if="item.note" class="topology-node-note">{{ item.note }}</small>
+                  </RouterLink>
+                  <ul v-if="item.items?.length" class="topology-items topology-items--nested">
+                    <li v-for="subitem in item.items" :key="subitem.id">
+                      <RouterLink :to="localeTo(subitem.route)" class="topology-node topology-item-link glass-button" :data-topology-node="subitem.id" :title="subitem.hint">
+                        {{ subitem.label }}<small v-if="subitem.note" class="topology-node-note">{{ subitem.note }}</small>
+                      </RouterLink>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+      </div>
+    </section>
     <ul class="customlist">
       <li
         v-for="feature in featureList"
@@ -147,7 +227,7 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import i18n from '@/i18n/index.js'
@@ -158,6 +238,121 @@ const route = useRoute()
 const introContainer = ref(null)
 const directoryOpen = ref(false)
 const activeSection = ref('intro-feature-1')
+const topologyGraph = ref(null)
+const connectorPaths = ref({})
+let topologyObserver
+
+const mapViewHint = '进入方言地图后选择图型；部分图型需要先完成查询。'
+const topologyConnections = [
+  { from: 'compare', to: 'phonetic-compare' },
+  { from: 'phonetic-compare', to: 'single-analysis' },
+  { from: 'compare', to: 'syllable-count' },
+  { from: 'syllable-count', to: 'single-analysis' },
+]
+const analysisBranches = [
+  {
+    id: 'multi-analysis', label: '多方言地理语言学分析', route: '/menu/query/zhonggu',
+    groups: [
+      { id: 'query', label: '查询', route: '/menu/query/zhonggu', items: [
+        { id: 'query-char', label: '查字', route: '/menu/query/char' },
+        { id: 'query-history', label: '查中古', note: '上古 · 中古 · 近古 · 粤语', route: '/menu/query/zhonggu', hint: '上古、中古、近古、粤语共用此查询入口。' },
+        { id: 'query-phoneme', label: '查音位', route: '/menu/query/yinwei' },
+        { id: 'query-tone', label: '查调', route: '/menu/query/tone' },
+      ] },
+      { id: 'compare', label: '比较', route: '/menu/compare/zhonggu', items: [
+        { id: 'compare-char', label: '比较汉字', route: '/menu/compare/char' },
+        { id: 'compare-history', label: '比较中古', route: '/menu/compare/zhonggu' },
+        { id: 'compare-tone', label: '比较调类', route: '/menu/compare/tone' },
+      ] },
+      { id: 'dialect-map', label: '方言地图', route: '/menu/map/view', items: [
+        { id: 'geo-map', label: '地理语言学地图', route: '/menu/map/view', items: [
+          { id: 'map-feature', label: '特征图', route: '/menu/map/view', hint: mapViewHint },
+          { id: 'map-district-points', label: '分区点图', route: '/menu/map/view', hint: mapViewHint },
+          { id: 'map-compare', label: '比较图', route: '/menu/map/view', hint: mapViewHint },
+          { id: 'map-place-name', label: '地名图', route: '/menu/map/view', hint: mapViewHint },
+          { id: 'map-heat', label: '热力图', route: '/menu/map/view', hint: mapViewHint },
+          { id: 'map-isoline', label: '等值线图', route: '/menu/map/view', hint: mapViewHint },
+        ] },
+        { id: 'map-divide', label: '分区图', route: '/menu/map/divide' },
+        { id: 'gis-voronoi', label: '泰森多边形绘制分布图', route: '/explore/gis', hint: '进入绘图页后选择泰森多边形。' },
+        { id: 'map-custom', label: '自定义数据', route: '/menu/map/custom' },
+      ] },
+    ],
+  },
+  {
+    id: 'single-analysis', label: '单方言深入分析', route: '/menu/pho/matrix',
+    groups: [
+      { id: 'phonology-query', label: '音系查询', route: '/menu/pho/matrix' },
+      { id: 'phoneme-query', label: '音素查询', route: '/menu/pho/custom' },
+      { id: 'evolution', label: '演化', route: '/menu/pho/evolution' },
+    ],
+  },
+]
+const bridgeNodes = [
+  { id: 'phonetic-compare', label: '音值比较', route: '/menu/compare/phonetic' },
+  { id: 'syllable-count', label: '音节统计', route: '/menu/pho/count' },
+]
+const secondaryBranches = [
+  {
+    id: 'words', label: '词句', route: '/menu/yubao?tab=vocabulary', groups: [
+      { id: 'yubao', label: '语保', route: '/menu/yubao?tab=vocabulary', items: [
+        { id: 'yubao-vocabulary', label: '1000词', route: '/menu/yubao?tab=vocabulary' },
+        { id: 'yubao-grammar', label: '50句', route: '/menu/yubao?tab=grammar' },
+      ] },
+      { id: 'vocabulary', label: '词表', route: '/menu/vocabulary/view', items: [
+        { id: 'vocabulary-query', label: '查询', route: '/menu/vocabulary/view?tab=card', items: [
+          { id: 'vocabulary-card', label: '卡片', route: '/menu/vocabulary/view?tab=card' },
+          { id: 'vocabulary-map', label: '地图', route: '/menu/vocabulary/view?tab=map' },
+          { id: 'vocabulary-table', label: '表格', route: '/menu/vocabulary/view?tab=table' },
+        ] },
+        { id: 'vocabulary-upload', label: '上传', route: '/menu/vocabulary/import' },
+        { id: 'vocabulary-manage', label: '管理', route: '/menu/vocabulary/manage' },
+      ] },
+      { id: 'yangchun-words', label: '阳春口语词', route: '/explore/yc/words' },
+    ],
+  },
+  {
+    id: 'tools', label: '工具', route: '/menu/tools', groups: [
+      { id: 'praat', label: 'Praat', route: '/explore/tools/praat' },
+      { id: 'character-table', label: '字表', route: '/explore/tools/check', items: [
+        { id: 'table-check', label: '检查工具', route: '/explore/tools/check' },
+        { id: 'jyut-to-ipa', label: '粤拼转IPA', route: '/explore/tools/jyut2ipa' },
+        { id: 'table-merge', label: '合并工具', route: '/explore/tools/merge' },
+      ] },
+      { id: 'villages', label: '自然村', route: '/menu/villages', items: [
+        { id: 'villages-ml', label: '机器学习', route: '/explore/villages/ml' },
+        { id: 'villages-toponyms', label: '地名分布', route: '/explore/villages/toponyms' },
+        { id: 'villages-tree', label: '广东自然村树状图', route: '/explore/villages/gd' },
+      ] },
+      { id: 'char-class', label: '汉字字集', route: '/explore/char-class?tab=zhonggu', items: [
+        { id: 'char-shanggu', label: '上古', route: '/explore/char-class?tab=shanggu' },
+        { id: 'char-zhonggu', label: '中古', route: '/explore/char-class?tab=zhonggu' },
+        { id: 'char-jingu', label: '近古', route: '/explore/char-class?tab=jingu' },
+        { id: 'char-yueyun', label: '粤语', route: '/explore/char-class?tab=yueyun' },
+      ] },
+    ],
+  },
+]
+
+function updateTopologyConnectors() {
+  const graph = topologyGraph.value
+  if (!graph) return
+  const graphRect = graph.getBoundingClientRect()
+  const isPortrait = window.matchMedia?.('(max-aspect-ratio: 1 / 1)').matches ?? false
+  connectorPaths.value = Object.fromEntries(topologyConnections.map(({ from, to }) => {
+    const fromRect = graph.querySelector(`[data-topology-node="${from}"]`)?.getBoundingClientRect()
+    const toRect = graph.querySelector(`[data-topology-node="${to}"]`)?.getBoundingClientRect()
+    if (!fromRect || !toRect) return [`${from}-${to}`, '']
+    const startX = fromRect.right - graphRect.left
+    const startY = fromRect.top + fromRect.height / 2 - graphRect.top
+    const endX = (isPortrait ? toRect.right : toRect.left) - graphRect.left
+    const endY = toRect.top + toRect.height / 2 - graphRect.top
+    const path = isPortrait
+      ? `M ${startX} ${startY} L ${graphRect.width - 4} ${startY} L ${graphRect.width - 4} ${endY} L ${endX} ${endY}`
+      : `M ${startX} ${startY} C ${(startX + endX) / 2} ${startY}, ${(startX + endX) / 2} ${endY}, ${endX} ${endY}`
+    return [`${from}-${to}`, path]
+  }))
+}
 
 const featureRouteMap = {
   feature1: '/menu/query/zhonggu',
@@ -247,8 +442,20 @@ function updateActiveSection() {
   }
 }
 
-onMounted(() => window.addEventListener('scroll', updateActiveSection, { passive: true, capture: true }))
-onBeforeUnmount(() => window.removeEventListener('scroll', updateActiveSection, true))
+onMounted(() => {
+  window.addEventListener('scroll', updateActiveSection, { passive: true, capture: true })
+  window.addEventListener('resize', updateTopologyConnectors)
+  nextTick(updateTopologyConnectors)
+  if (typeof ResizeObserver !== 'undefined') {
+    topologyObserver = new ResizeObserver(updateTopologyConnectors)
+    topologyObserver.observe(topologyGraph.value)
+  }
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', updateActiveSection, true)
+  window.removeEventListener('resize', updateTopologyConnectors)
+  topologyObserver?.disconnect()
+})
 
 function localeTo(path) {
   return buildLocalePath(resolveRouteLocale(route), path)
@@ -260,6 +467,147 @@ function localeTo(path) {
 @use './aboutShared' as *;
 
 /* 简介与鸣谢 */
+.feature-topology {
+  margin: 2rem 0;
+  text-align: left;
+}
+
+.feature-topology > .tabs-title {
+  text-align: center;
+}
+
+.feature-topology-hint {
+  margin: 0 0 1rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.topology-analysis {
+  position: relative;
+  display: grid;
+  grid-template-areas: 'multi bridge single' 'multi . secondary';
+  grid-template-columns: minmax(0, 1fr) minmax(7rem, 0.38fr) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.topology-connections {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+
+  path {
+    fill: none;
+    stroke: var(--color-primary-medium2);
+    stroke-width: 2;
+  }
+}
+
+.topology-branch {
+  position: relative;
+  min-width: 0;
+  padding: 0.85rem;
+}
+
+.topology-branch--multi-analysis {
+  grid-area: multi;
+}
+
+.topology-branch--single-analysis {
+  grid-area: single;
+}
+
+.topology-node {
+  position: relative;
+  z-index: 1;
+  @include flex-col;
+  align-items: flex-start;
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 2rem;
+  padding: 0.3rem 0.6rem;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  line-height: 1.35;
+  text-align: left;
+  text-decoration: none;
+  white-space: normal;
+}
+
+.topology-root {
+  width: 100%;
+  align-items: center;
+  font-weight: 700;
+  text-align: center;
+}
+
+.topology-node-note {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+.topology-group-link {
+  font-weight: 600;
+}
+
+.topology-groups,
+.topology-items {
+  margin: 0.5rem 0 0 0.65rem;
+  padding: 0 0 0 0.7rem;
+  border-left: 1px solid var(--color-primary-border2);
+  list-style: none;
+
+  > li {
+    position: relative;
+    margin: 0.45rem 0;
+
+    &::before {
+      position: absolute;
+      top: 1rem;
+      left: -0.7rem;
+      width: 0.7rem;
+      border-top: 1px solid var(--color-primary-border2);
+      content: '';
+    }
+  }
+}
+
+.topology-items {
+  margin-top: 0.25rem;
+}
+
+.topology-items--nested {
+  margin-left: 0.4rem;
+}
+
+.topology-bridge {
+  grid-area: bridge;
+  @include flex-col;
+  gap: 1.5rem;
+  align-items: center;
+  margin-top: 9rem;
+}
+
+.topology-bridge-node {
+  width: 100%;
+  align-items: center;
+  text-align: center;
+}
+
+.topology-secondary {
+  grid-area: secondary;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.25rem;
+}
+
 .thanks-container {
   max-width: 900px;
   margin: 0 auto;
@@ -469,6 +817,27 @@ function localeTo(path) {
 }
 
 @media (max-aspect-ratio: #{1 / 1}) {
+  .topology-analysis {
+    grid-template-areas: 'multi' 'bridge' 'single' 'secondary';
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.8rem;
+  }
+
+  .topology-bridge {
+    gap: 0.6rem;
+    align-items: flex-end;
+    margin: 0;
+    padding-right: 1.25rem;
+  }
+
+  .topology-bridge-node {
+    width: auto;
+  }
+
+  .topology-secondary {
+    gap: 0.8rem;
+  }
+
   .intro-directory-toggle {
     display: block;
     position: fixed;
