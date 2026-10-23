@@ -8,6 +8,7 @@
     >
       <template #default="{ currentTab }">
         <AboutIntro v-if="currentTab === 'intro'" />
+        <AboutHistory v-if="currentTab === 'history'" />
         <AboutSuggestion v-if="currentTab === 'suggestion'" />
         <AboutSupport v-if="currentTab === 'like'" />
       </template>
@@ -22,6 +23,7 @@ import { useRoute } from 'vue-router'
 import TabSwitcher from '@/components/common/TabSwitcher.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import AboutIntro from './about/AboutIntro.vue'
+import AboutHistory from './about/AboutHistory.vue'
 import AboutSuggestion from './about/AboutSuggestion.vue'
 import AboutSupport from './about/AboutSupport.vue'
 
@@ -30,12 +32,14 @@ const route = useRoute()
 
 const pathSectionToTab = {
   intro: 'intro',
+  history: 'history',
   suggestion: 'suggestion',
   like: 'like'
 }
 
 const tabToPathSection = {
   intro: 'intro',
+  history: 'history',
   suggestion: 'suggestion',
   like: 'like'
 }
@@ -51,6 +55,7 @@ const currentTab = computed(() => {
 
 const tabs = computed(() => [
   { name: 'intro', label: t('about.tabs.intro') },
+  { name: 'history', label: t('about.tabs.history') },
   { name: 'suggestion', label: t('about.tabs.suggestion') },
   { name: 'like', label: t('about.tabs.like') },
 ])

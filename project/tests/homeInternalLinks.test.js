@@ -35,7 +35,7 @@ describe('home and intro internal links', () => {
   })
 
   it('links intro feature headings, subtitles, and subfeature titles to their pages', () => {
-    const aboutPage = readSource('src/main/views/menu/support/AboutPage.vue')
+    const aboutPage = readSource('src/main/views/menu/support/about/AboutIntro.vue')
 
     expect(aboutPage).toContain('const featureRouteMap = {')
     expect(aboutPage).toContain("feature10: '/menu/cluster'")

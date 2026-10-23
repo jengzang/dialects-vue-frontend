@@ -39,6 +39,10 @@
       "title": "About Chinese Dialect Atlas",
       "description": "View the site's features, development history, acknowledgments, and more."
     },
+    "menuAboutHistory": {
+      "title": "Development History",
+      "description": "Explore the site's development history and feature updates."
+    },
     "menuAboutSuggestion": {
       "title": "Feedback Entry",
       "description": "Open an issue on GitHub, send suggestions through Zhihu AI-works, or submit feedback directly on this site."

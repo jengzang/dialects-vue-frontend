@@ -138,6 +138,7 @@ export function useSidebarConfig() {
             path: withRouteLocale(route, '/menu/about/intro'),
             children: [
                 { label: t('navigation.submenu.about.intro'), icon: 'ℹ️', path: withRouteLocale(route, '/menu/about/intro') },
+                { label: t('navigation.submenu.about.history'), icon: '📜', path: withRouteLocale(route, '/menu/about/history') },
                 { label: t('navigation.submenu.about.suggestion'), icon: '💬', path: withRouteLocale(route, '/menu/about/suggestion') },
                 { label: t('navigation.submenu.about.like'), icon: '❤️', path: withRouteLocale(route, '/menu/about/like') },
                 { label: t('navigation.submenu.about.setting'), icon: '⚙️', path: withRouteLocale(route, '/menu/settings') }
@@ -270,6 +271,7 @@ export const SideConfig = {
         path: buildLocalePath('zh-Hant', '/menu/about/intro'),
         children: [
             { label: '簡介', icon: 'ℹ️', path: buildLocalePath('zh-Hant', '/menu/about/intro') },
+            { label: '開發歷史', icon: '📜', path: buildLocalePath('zh-Hant', '/menu/about/history') },
             { label: '提出建議', icon: '💡', path: buildLocalePath('zh-Hant', '/menu/about/suggestion') },
             { label: '支持項目', icon: '❤️', path: buildLocalePath('zh-Hant', '/menu/about/like') }
         ],

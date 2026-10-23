@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 const LAYOUT_FOOTER_PATHS = [
   '/menu',
   '/menu/about/intro',
+  '/menu/about/history',
   '/menu/about/suggestion',
   '/menu/about/like',
   '/menu/query/char',

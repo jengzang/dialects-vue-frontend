@@ -10,6 +10,10 @@ const PAGE_COPY_BY_PATH = {
     pageTitleKey: 'layoutFooter.pages.menuAboutIntro.title',
     pageDescriptionKey: 'layoutFooter.pages.menuAboutIntro.description',
   },
+  '/menu/about/history': {
+    pageTitleKey: 'layoutFooter.pages.menuAboutHistory.title',
+    pageDescriptionKey: 'layoutFooter.pages.menuAboutHistory.description',
+  },
   '/menu/about/suggestion': {
     pageTitleKey: 'layoutFooter.pages.menuAboutSuggestion.title',
     pageDescriptionKey: 'layoutFooter.pages.menuAboutSuggestion.description',

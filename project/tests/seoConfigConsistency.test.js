@@ -41,7 +41,7 @@ describe('SEO config consistency', () => {
       '/explore/manage',
       '/explore/villages/all',
       '/explore/features',
-      '/explore/history',
+      '/menu/about/history',
     ]) {
       expect(SEO_CONFIG.routes[pathname]?.title, `${pathname} title`).toBeTruthy()
       expect(SEO_CONFIG.routes[pathname]?.description, `${pathname} description`).toBeTruthy()

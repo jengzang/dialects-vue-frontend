@@ -11,6 +11,7 @@ const homeSupportPopupPath = resolve(projectRoot, 'src/main/components/popup/Hom
 const homePagePath = resolve(projectRoot, 'src/main/views/HomePage.vue')
 const likeAuthorPath = resolve(projectRoot, 'src/main/views/intro/LikeAuthor.vue')
 const aboutPagePath = resolve(projectRoot, 'src/main/views/menu/support/AboutPage.vue')
+const aboutSupportPath = resolve(projectRoot, 'src/main/views/menu/support/about/AboutSupport.vue')
 const zhCnHomeLocalePath = resolve(projectRoot, 'src/i18n/locales/zh-CN/home.json')
 const zhHantHomeLocalePath = resolve(projectRoot, 'src/i18n/locales/zh-Hant/home.json')
 const enHomeLocalePath = resolve(projectRoot, 'src/i18n/locales/en/home.json')
@@ -63,14 +64,14 @@ describe('support popup unification', () => {
 
   it('keeps the like-author entry in AboutPage and opens the shared popup', () => {
     expect(existsSync(likeAuthorPath)).toBe(false)
-    const source = readSource(aboutPagePath)
-    expect(source).toContain('v-if="currentTab === \'like\'"')
-    expect(source).toContain(':visible="showQRCodes"')
-    expect(source).toContain('@close="showQRCodes = false"')
+    expect(readSource(aboutPagePath)).toContain('v-if="currentTab === \'like\'"')
+    const supportSource = readSource(aboutSupportPath)
+    expect(supportSource).toContain(':visible="showQRCodes"')
+    expect(supportSource).toContain('@close="showQRCodes = false"')
   })
 
   it('replaces the inline AboutPage modal with the shared SupportPopup component', () => {
-    const source = readSource(aboutPagePath)
+    const source = readSource(aboutSupportPath)
 
     expect(source).toContain("import SupportPopup from '@/main/components/user/popups/SupportPopup.vue'")
     expect(source).toContain('<SupportPopup')

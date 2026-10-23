@@ -81,6 +81,7 @@
     },
     "about": {
       "intro": "簡介",
+      "history": "開發歷史",
       "suggestion": "提出建議",
       "like": "支持項目",
       "setting": "設置"

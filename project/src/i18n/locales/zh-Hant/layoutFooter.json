@@ -39,6 +39,10 @@
       "title": "關於方音圖鑑",
       "description": "查看網站功能介紹、發展歷史、特別鳴謝等"
     },
+    "menuAboutHistory": {
+      "title": "開發歷史",
+      "description": "查看網站的開發歷程與功能更新記錄。"
+    },
     "menuAboutSuggestion": {
       "title": "反饋入口",
       "description": "跳轉github提出issue或透過知乎 AI-works 反映建議，或直接在本站內提交回饋。"

@@ -576,7 +576,7 @@ const SEO_CONFIG = {
         en: 'Feature index entry for Dialects Atlas; this entry is not intended for search result indexing.',
       },
     },
-    '/explore/history': {
+    '/menu/about/history': {
       title: {
         'zh-Hant': { main: '歷史入口', subtitle: '' },
         'zh-CN': { main: '历史入口', subtitle: '' },
@@ -754,7 +754,7 @@ export const NOINDEX_PATHS = new Set([
   '/explore/manage',
   '/explore/villages/all',
   '/explore/features',
-  '/explore/history',
+  '/menu/about/history',
 ])
 
 export default SEO_CONFIG

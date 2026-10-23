@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createApp, nextTick } from 'vue'
 import { createMemoryHistory, createRouter } from 'vue-router'
-import HistoryPage from '../src/main/views/explore/history/HistoryGraph.vue'
-import { historyEntries } from '../src/main/views/explore/history/history.data.js'
+import HistoryPage from '../src/main/views/menu/support/about/AboutHistory.vue'
+import { historyEntries } from '../src/main/views/menu/support/about/history.data.js'
 import { menuRoutes } from '../src/main/router/menuRoutes.js'
 import { exploreRoutes } from '../src/main/router/exploreRoutes.js'
 
@@ -29,7 +29,7 @@ async function mountHistory(locale = 'zh-Hant') {
       ...stubRoutes([...menuRoutes, ...exploreRoutes])
     ] }]
   })
-  await router.push(`/${locale}/explore/history`)
+  await router.push(`/${locale}/menu/about/history`)
   host = document.createElement('div')
   document.body.append(host)
   app = createApp(HistoryPage)
@@ -39,6 +39,12 @@ async function mountHistory(locale = 'zh-Hant') {
 }
 
 describe('author-provided website history', () => {
+  it('opens under About and removes the old Explore route', async () => {
+    await mountHistory()
+    expect(router.resolve('/zh-Hant/menu/about/history').matched).toHaveLength(2)
+    expect(exploreRoutes.some(route => route.path === 'explore/history')).toBe(false)
+  })
+
   it('renders all 35 records chronologically and keeps month-only precision', async () => {
     const entries = await mountHistory()
     expect(entries).toHaveLength(35)
