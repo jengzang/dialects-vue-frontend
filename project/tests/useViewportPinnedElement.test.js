@@ -64,6 +64,38 @@ async function mountPinnedElement(options = {}) {
 }
 
 describe('useViewportPinnedElement', () => {
+  it('waits for route scroll restoration before capturing the landscape top', async () => {
+    originalGetBoundingClientRect = HTMLElement.prototype.getBoundingClientRect
+    originalMatchMediaDescriptor = Object.getOwnPropertyDescriptor(window, 'matchMedia')
+    let scrollY = 1202
+    vi.spyOn(window, 'scrollY', 'get').mockImplementation(() => scrollY)
+    window.matchMedia = vi.fn(() => ({
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    }))
+
+    HTMLElement.prototype.getBoundingClientRect = function getPinnedRect() {
+      const top = scrollY ? -205 : 70
+      if (this.hasAttribute('data-pinned-placeholder')) {
+        return { left: 20, top, width: 800, height: 50 }
+      }
+      if (this.hasAttribute('data-pinned-navigation')) {
+        return { left: 300, top, width: 240, height: 50 }
+      }
+      return originalGetBoundingClientRect.call(this)
+    }
+
+    const { navigation } = await mountPinnedElement()
+    expect(navigation.style.position).toBe('')
+
+    scrollY = 0
+    window.dispatchEvent(new Event('scroll'))
+    await nextTick()
+    expect(navigation.style.position).toBe('fixed')
+    expect(navigation.style.top).toBe('70px')
+  })
+
   it('preserves the navigation width and center when the element becomes fixed', async () => {
     originalGetBoundingClientRect = HTMLElement.prototype.getBoundingClientRect
     originalMatchMediaDescriptor = Object.getOwnPropertyDescriptor(window, 'matchMedia')

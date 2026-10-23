@@ -78,6 +78,10 @@ export function useViewportPinnedElement(options = {}) {
 
     let top = portrait ? configuredPortraitTop : resolveValue(landscapeTop)
     if (!portrait && (top === null || top === undefined)) {
+      if (initialLandscapeTop === null && window.scrollY > 0) {
+        clearPosition()
+        return
+      }
       if (initialLandscapeTop === null) {
         initialLandscapeTop = elementRect.top
       }
