@@ -27,12 +27,12 @@ export async function getSpatialHotspotDetail(hotspotId) {
  * @param {number} [params.limit] - 返回記錄數（0表示返回所有）
  * @returns {Promise<Array>} [{ cluster_id: number, size: number, centroid_lon: number, centroid_lat: number, avg_distance_km: number }, ...]
  */
-export async function getSpatialClusters(params = {}) {
+export async function getSpatialClusters(params = {}, options = {}) {
   const query = new URLSearchParams()
   if (params.run_id) query.append('run_id', params.run_id)
   if (params.limit !== undefined) query.append('limit', params.limit)
   const qs = query.toString()
-  return villagesMLApi(`/spatial/clusters${qs ? '?' + qs : ''}`)
+  return villagesMLApi(`/spatial/clusters${qs ? '?' + qs : ''}`, options)
 }
 
 /**
@@ -48,9 +48,9 @@ export async function getSpatialClustersAvailableRuns() {
  * @param {string} [run_id] - 分析運行ID，留空使用活躍版本
  * @returns {Promise<Object>} { run_id, total_records, total_clusters, noise_points, total_villages, cluster_size: { avg, min, max }, spatial_extent: { avg_distance_km, lon_range, lat_range } }
  */
-export async function getSpatialClustersSummary(run_id) {
+export async function getSpatialClustersSummary(run_id, options = {}) {
   const qs = run_id ? `?run_id=${run_id}` : ''
-  return villagesMLApi(`/spatial/clusters/summary${qs}`)
+  return villagesMLApi(`/spatial/clusters/summary${qs}`, options)
 }
 
 /**

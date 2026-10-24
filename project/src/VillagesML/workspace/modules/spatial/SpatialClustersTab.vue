@@ -72,7 +72,8 @@
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import BarIcon from '@/components/common/BarIcon.vue'
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch, onBeforeUnmount } from 'vue'
+import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import SpatialMap from './SpatialMap.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
@@ -89,7 +90,13 @@ const selectedRunId = ref('')
 const clusters = ref([])
 const clustersMetadata = ref(null)
 const clustersSummary = ref(null)
-const loading = ref(false)
+const clustersTask = useAsyncTask({ concurrency: 'latest' })
+const loading = clustersTask.loading
+let loadController = null
+onBeforeUnmount(() => {
+  clustersTask.reset()
+  loadController?.abort()
+})
 
 // Options for SimpleSelectDropdown
 const runOptions = computed(() =>
@@ -117,12 +124,15 @@ const loadAvailableRuns = async () => {
 }
 
 const loadAll = async () => {
-  loading.value = true
-  try {
-    const [clustersRes, summaryRes] = await Promise.all([
-      getSpatialClusters({ run_id: selectedRunId.value || undefined, limit: 0 }),
-      getSpatialClustersSummary(selectedRunId.value || undefined)
-    ])
+  loadController?.abort()
+  const controller = new AbortController()
+  loadController = controller
+  const runId = selectedRunId.value || undefined
+  const options = { signal: controller.signal, showError: false }
+  await clustersTask.run(() => Promise.all([
+    getSpatialClusters({ run_id: runId, limit: 0 }, options),
+    getSpatialClustersSummary(runId, options)
+  ]), { onSuccess: ([clustersRes, summaryRes]) => {
     clusters.value = Array.isArray(clustersRes) ? clustersRes : (clustersRes.clusters || [])
     clustersMetadata.value = Array.isArray(clustersRes) ? null : {
       run_id: clustersRes.run_id,
@@ -130,20 +140,10 @@ const loadAll = async () => {
       noise_points: clustersRes.noise_points
     }
     clustersSummary.value = summaryRes
-  } catch {
-    showError('加載聚類數據失敗')
-  } finally {
-    loading.value = false
-  }
+  }, onError: () => showError('加載聚類數據失敗') })
 }
 
-onMounted(async () => {
-  await loadAvailableRuns()
-  // 自动加载聚类数据
-  if (selectedRunId.value) {
-    loadAll()
-  }
-})
+onMounted(loadAvailableRuns)
 
 // 监听 selectedRunId 变化，自动加载数据
 watch(selectedRunId, (newRunId) => {
