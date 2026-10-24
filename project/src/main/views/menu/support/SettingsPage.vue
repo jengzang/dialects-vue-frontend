@@ -187,7 +187,7 @@ import { ref, computed, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { setLocale } from '@/i18n/index.js'
-import { showSuccess } from '@/utils/ui/message.js'
+import { showSuccess, showError } from '@/utils/ui/message.js'
 import SupportPopup from '@/main/components/user/popups/SupportPopup.vue'
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
@@ -348,9 +348,15 @@ const zhongguInputModeOptions = computed(() => [
   { value: 'direct', label: t('about.settings.zhongguInputMode.options.direct') }
 ])
 
-function changeLanguage(newLocale) {
-  if (newLocale === currentLocale.value) return
-  setLocale(newLocale)
+async function changeLanguage(newLocale) {
+  const unchanged = newLocale === currentLocale.value
+  try {
+    if (!await setLocale(newLocale)) return
+  } catch {
+    showError(t('messages.error.loadFailed'))
+    return
+  }
+  if (unchanged) return
   const targetPath = buildLocalePath(newLocale, stripLocaleFromPath(route.path))
   router.push({ path: targetPath, query: route.query, hash: route.hash })
   showSuccess(t('messages.success.languageChanged'))

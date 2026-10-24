@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { nextTick } from 'vue'
-import i18n from '@/i18n/index.js'
+import i18n, { setLocale } from '@/i18n/index.js'
 import { waitForAuthReady } from '@/api/auth/auth.js'
 import { userStore } from '@/main/store/store.js'
 import { showConfirm, showWarning } from '@/utils/ui/message.js'
@@ -328,12 +328,7 @@ router.beforeEach(async (to, from, next) => {
   }
 
   const activeLocale = currentRouteLocale ? normalizeLocale(currentRouteLocale) : detectBrowserLocale()
-  if (i18n.global.locale?.value !== activeLocale) {
-    i18n.global.locale.value = activeLocale
-  }
-  if (typeof document !== 'undefined') {
-    document.documentElement.setAttribute('lang', activeLocale)
-  }
+  if (!await setLocale(activeLocale, { persist: false })) return next(false)
   await nextTick()
 
   const localizedAuthPath = withLocalePath('/auth', to)

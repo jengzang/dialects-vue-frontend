@@ -207,6 +207,8 @@ export default defineConfig(async ({ mode }) => {
             if (id.includes('/api/logs/')) {
               return 'logs';
             }
+            const localeMatch = id.match(/\/src\/i18n\/locales\/([^/]+)\//);
+            if (localeMatch) return `locale-${localeMatch[1]}`;
             if (id.includes('/src/i18n/')) {
               return 'i18n';
             }

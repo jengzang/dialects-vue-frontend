@@ -11,7 +11,7 @@ import '../styles/main-entry.scss'
 import '../utils/ui/message.js'
 
 // 🌐 导入 i18n 国际化
-import i18n from '../i18n'
+import i18n, { loadLocaleMessages } from '../i18n'
 import { initSeo } from '../seo'
 import { initializeUiPreferences } from '../composables/core/uiPreferences.js'
 import { initializeScrollbarHover } from '../utils/ui/scrollbarHover.js'
@@ -22,6 +22,7 @@ import { initializePlatformServices } from '../platform/index.js'
 import PanelManager from './components/result/PanelManager.vue'
 
 await initializePlatformServices()
+await loadLocaleMessages(i18n.global.locale.value)
 
 bootstrapAuthSession()
 

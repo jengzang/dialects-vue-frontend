@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createApp, nextTick } from 'vue'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import HistoryPage from '../src/main/views/menu/support/about/AboutHistory.vue'
-import i18n from '../src/i18n/index.js'
+import i18n, { setLocale } from '../src/i18n/index.js'
 import { historyEntries } from '../src/main/views/menu/support/about/history.data.js'
 import { menuRoutes } from '../src/main/router/menuRoutes.js'
 import { exploreRoutes } from '../src/main/router/exploreRoutes.js'
@@ -44,7 +44,7 @@ async function mountHistory(locale = 'zh-Hant', props = {}, uiLocale = 'zh-CN') 
     ] }]
   })
   await router.push(`/${locale}/menu/about/history`)
-  i18n.global.locale.value = uiLocale
+  await setLocale(uiLocale, { persist: false })
   host = document.createElement('div')
   document.body.append(host)
   app = createApp(HistoryPage, props)
