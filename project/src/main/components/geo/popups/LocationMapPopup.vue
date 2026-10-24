@@ -8,6 +8,7 @@
   >
     <div class="location-map-content">
       <MiniMapSelector
+        v-if="visible"
         :coord="coord"
         :visible="visible"
         :readonly="true"
@@ -18,10 +19,10 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
-import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue'
+const MiniMapSelector = defineAsyncComponent(() => import('@/main/components/map/MiniMapSelector.vue'))
 
 const props = defineProps({
   visible: { type: Boolean, default: false },
