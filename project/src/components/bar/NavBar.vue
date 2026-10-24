@@ -2,7 +2,7 @@
   <div
     ref="navbarRef"
     class="navbar"
-    :class="{ 'navbar--collapsing': collapseProgress > 0 }"
+    :class="{ 'navbar--collapsing': collapseProgress > 0 && collapseProgress < 1 }"
     :style="navbarStyle"
   >
     <!-- 桌面端的布局 -->
@@ -523,6 +523,11 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
     box-shadow 0.3s ease,
     border-color 0.3s ease,
     background-position 0.2s ease-out;
+}
+
+.navbar.navbar--collapsing {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 @media (prefers-contrast: more) {
