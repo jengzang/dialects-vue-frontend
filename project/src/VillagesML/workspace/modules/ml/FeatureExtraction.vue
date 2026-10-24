@@ -541,6 +541,7 @@ const handleCountyChange = () => {
 
 // 载入村庄列表
 const loadVillages = async () => {
+  if (loading.value) return
   if (!searchKeyword.value && !hasFilters.value) {
     showWarning('請輸入搜索關鍵詞或選擇區域')
     return
@@ -634,7 +635,7 @@ const nextResultsPage = () => {
 }
 
 const extractFeatures = async () => {
-  if (!canExtract.value) return
+  if (loading.value || !canExtract.value) return
 
   if (selectedVillages.value.length > 50000) {
     showWarning('選擇的村莊數量超過上限（50,000），請減少選擇後再提取')
@@ -698,7 +699,7 @@ const extractFeatures = async () => {
 }
 
 const aggregateFeatures = async () => {
-  if (!extractionResults.value) return
+  if (loading.value || !extractionResults.value) return
 
   loading.value = true
   loadingMessage.value = '正在聚合特徵...'
