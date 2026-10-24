@@ -300,9 +300,12 @@ function localeTo(path) {
 
 /* 简介与鸣谢 */
 .thanks-container {
+  width: 100%;
   max-width: 900px;
+  min-width: 0;
   margin: 0 auto;
   padding: 2rem 1rem;
+  box-sizing: border-box;
   text-align: center;
   font-family: var(--font-serif);
   font-weight: 500;

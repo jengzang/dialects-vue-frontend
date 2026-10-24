@@ -142,9 +142,12 @@ function splitDesc(text) {
 
 /* 项目卡片 */
 .cards-container {
+  width: 100%;
   max-width: 1000px;
+  min-width: 0;
   margin: 0 auto;
   padding: 2rem 1rem;
+  box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;

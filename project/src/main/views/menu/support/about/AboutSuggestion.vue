@@ -229,11 +229,14 @@ onMounted(() => {
 .page2 {
   @include flex-col;
 
+  width: 100%;
   max-width: 900px;
+  min-width: 0;
   align-items: center;
   justify-content: center;
   margin: 0 auto;
   padding: 1dvw 8dvw;
+  box-sizing: border-box;
   // background: var(--glass-05);
   // border: 1px solid var(--glass-10);
   // border-radius: var(--radius-md);
@@ -393,7 +396,6 @@ onMounted(() => {
 }
 
 .screenshot-hint {
-    white-space: nowrap;
   font-size: 12px;
   margin: 0;
 }
