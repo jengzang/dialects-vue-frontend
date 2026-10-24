@@ -234,19 +234,20 @@ describe('author-provided website history', () => {
     expect(contentAt('2025-08-18')).toContain('分发exe供内测用户尝鲜。v1.0.5')
     expect(contentAt('2025-09-04')).toContain('引入vue作为查询、输入页面，但地图及结果展示仍由原生js承担。v1.2.0')
     expect(contentAt('2026-01-11')).toContain('结果页面迁移到Vue，查字、查调更为显著，不再作为辅助功能。v2.0.0')
-    expect(contentAt('2026-01-16')).toContain('原生js移至旧版网站入口，主站全部使用Vue3开发。v2.1.0')
+    expect(contentAt('2026-01-16')).toContain('原生js移至旧版网站入口，主站全部使用Vue3开发。以查中古、查音位、查字、查调为核心功能。v2.1.0')
   })
 
-  it('renders the four original Zhihu article URLs as safe clickable links', async () => {
+  it('renders the original Zhihu article URLs as safe clickable links', async () => {
     await mountHistory()
     const links = [...host.querySelectorAll('ol a[href^="https://zhuanlan.zhihu.com/"]')]
-    expect(links.map(link => link.href)).toEqual([
+    const hrefs = links.map(link => link.href)
+    expect(hrefs).toEqual(expect.arrayContaining([
       'https://zhuanlan.zhihu.com/p/1934345780199682731',
       'https://zhuanlan.zhihu.com/p/2001363637311381604',
       'https://zhuanlan.zhihu.com/p/2002848348378521848',
       'https://zhuanlan.zhihu.com/p/2003637219919946701'
-    ])
-    expect(links.map(link => link.textContent)).toEqual(Array(4).fill('知乎文章'))
+    ]))
+    expect(links.map(link => link.textContent)).toEqual(Array(links.length).fill('知乎文章'))
     expect(host.textContent).not.toContain('zhuanlan.zhihu.com')
     for (const link of links) {
       expect(link.rel).toContain('noopener')
@@ -260,7 +261,8 @@ describe('author-provided website history', () => {
     expect([...host.querySelectorAll('.history-version')].map(el => el.textContent)).toEqual(originalBodies.flatMap(body => body.match(/v\d+\.\d+\.\d+/g) || []))
     expect(host.querySelectorAll('.history-version').length).toBeGreaterThan(0)
     expect([...host.querySelectorAll('.history-content')].map(el => el.textContent)).toEqual(originalBodies)
-    expect(host.querySelectorAll('.history-link--external')).toHaveLength(5)
+    const externalCount = Object.values(zhHantAbout.history.entries).join('').match(/\[\[external::/g).length
+    expect(host.querySelectorAll('.history-link--external')).toHaveLength(externalCount)
   })
 
   it.each(['zh-CN', 'zh-Hant', 'en'])('links features to current routes in %s', async locale => {

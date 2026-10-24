@@ -25,6 +25,11 @@
         @update:model-value="onlyImportant = $event"
       />
     </div>
+    <AboutDirectoryNav
+      v-if="!featured"
+      :sections="directorySections"
+      :label="t('about.history.directory')"
+    />
     <!-- <p
       class="history-filter-summary hint"
       aria-live="polite"
@@ -37,6 +42,7 @@
       class="history-stage"
       :class="{ 'glass-panel': featured }"
       :aria-labelledby="`history-stage-${stage.major}`"
+      data-directory-nav-target
     >
       <h2
         :id="`history-stage-${stage.major}`"
@@ -126,6 +132,7 @@
       v-if="!featured"
       class="thoughts-container"
       aria-labelledby="reflection-title"
+      data-directory-nav-target
     >
       <h2
         id="reflection-title"
@@ -147,6 +154,7 @@ import { useI18n } from 'vue-i18n'
 import { RouterLink, useRoute } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
+import AboutDirectoryNav from './AboutDirectoryNav.vue'
 import { historyEntries, historyStages } from './history.data.js'
 
 const props = defineProps({
@@ -193,6 +201,14 @@ const renderedStages = computed(() => {
 
   return stages.map(stage => ({ ...stage, title: t(`about.history.stage${stage.major}`) }))
 })
+
+const directorySections = computed(() => [
+  ...renderedStages.value.map(stage => ({
+    id: `history-stage-${stage.major}`,
+    label: t(`about.history.stage${stage.major}`)
+  })),
+  { id: 'reflection-title', label: t('about.reflection.title') }
+])
 
 function localizedImportanceReason(entry) {
   return t(`about.history.importanceReasons.${entry.date.replaceAll('.', '_')}`)
