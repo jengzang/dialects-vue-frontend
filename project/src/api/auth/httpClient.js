@@ -24,6 +24,7 @@ function createApiError(
 ) {
   const error = new Error(message);
   error.kind = kind;
+  if (kind === 'abort') error.name = 'AbortError';
   error.status = status;
   error.data = data;
   error.detail = detail;
@@ -182,28 +183,18 @@ function normalizeRequestBody(body, headers) {
   return body;
 }
 
-async function performFetch(path, { method, headers, body, timeout }) {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
-
+async function performFetch(path, { method, headers, body, signal }) {
+  if (signal.aborted) throw signal.reason;
   try {
     const response = await fetch(WEB_BASE + path, {
       method,
       headers,
       body,
-      signal: controller.signal,
+      signal,
     });
-    clearTimeout(timeoutId);
     return response;
   } catch (error) {
-    clearTimeout(timeoutId);
-
-    if (error?.name === 'AbortError') {
-      throw createApiError('請求超時，請稍後重試', {
-        kind: 'network',
-        cause: error,
-      });
-    }
+    if (signal.aborted) throw signal.reason;
 
     throw createApiError(error?.message || '網絡異常，請稍後重試', {
       kind: 'network',
@@ -292,12 +283,12 @@ async function handleErrorResponse(path, response) {
   });
 }
 
-export async function api(path, options = {}) {
+async function executeApi(path, options = {}) {
   const {
     method = 'GET',
     headers = {},
     body = null,
-    timeout = 300000,
+    signal,
     showError = true,
     responseType = 'auto',
     loginPromptEligible = false,
@@ -336,8 +327,10 @@ export async function api(path, options = {}) {
       method,
       headers: requestHeaders,
       body: requestBody,
-      timeout,
+      signal,
     });
+
+    if (signal.aborted) throw signal.reason;
 
     if (response.status === 401) {
       if (path.endsWith('/login')) {
@@ -352,7 +345,7 @@ export async function api(path, options = {}) {
           method,
           headers: requestHeaders,
           body: requestBody,
-          timeout,
+          signal,
         });
       } else if (refreshResult.reason === 'missing_refresh_token') {
         clearSession();
@@ -380,6 +373,7 @@ export async function api(path, options = {}) {
     }
 
     const responseData = await parseSuccessfulResponse(response, responseType);
+    if (signal.aborted) throw signal.reason;
 
     if (loginPromptEligible) {
       recordLoginPromptApiHit(path);
@@ -387,6 +381,7 @@ export async function api(path, options = {}) {
 
     return responseData;
   } catch (error) {
+    if (signal.aborted) throw signal.reason;
     if (
       showError &&
       error.kind !== 'network' &&
@@ -395,5 +390,37 @@ export async function api(path, options = {}) {
       showErrorToast(error.message);
     }
     throw error;
+  }
+}
+
+export async function api(path, options = {}) {
+  const { signal: callerSignal, timeout = 300000 } = options;
+  const controller = new AbortController();
+  const cancel = () => controller.abort(createApiError('Request cancelled', {
+    kind: 'abort',
+    cause: callerSignal?.reason,
+  }));
+  callerSignal?.addEventListener('abort', cancel, { once: true });
+  if (callerSignal?.aborted) cancel();
+
+  const timeoutId = setTimeout(() => controller.abort(createApiError('請求超時，請稍後重試', {
+    kind: 'network',
+  })), timeout);
+  let onAbort;
+  try {
+    if (controller.signal.aborted) throw controller.signal.reason;
+    const aborted = new Promise((_, reject) => {
+      onAbort = () => reject(controller.signal.reason);
+      controller.signal.addEventListener('abort', onAbort, { once: true });
+    });
+    // A caller can stop waiting for a shared refresh without cancelling it for other requests.
+    return await Promise.race([
+      executeApi(path, { ...options, signal: controller.signal }),
+      aborted,
+    ]);
+  } finally {
+    clearTimeout(timeoutId);
+    callerSignal?.removeEventListener('abort', cancel);
+    if (onAbort) controller.signal.removeEventListener('abort', onAbort);
   }
 }
