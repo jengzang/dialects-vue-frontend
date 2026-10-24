@@ -25,7 +25,7 @@
 
       <!-- Legacy Tab: Village Search -->
       <div v-else-if="activeModule === 'search'" class="legacy-tab">
-        <SearchPanel @search="handleSearch" />
+        <SearchPanel @search="handleSearch(true)" />
         <VillageListPanel
           :villages="searchResults"
           :total="searchTotal"
@@ -103,7 +103,7 @@
 </template>
 
 <script setup>
-import { ref, computed, defineAsyncComponent, watch } from 'vue'
+import { ref, computed, defineAsyncComponent, watch, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { resetDatasetResultState, villagesMLStore } from '@/VillagesML/store/villagesMLStore.js'
 import { userStore } from '@/main/store/store.js'
@@ -340,7 +340,12 @@ const currentComponentProps = computed(() => {
 })
 
 // Legacy handlers (for old tab components)
-const searchTask = useAsyncTask()
+const searchTask = useAsyncTask({ concurrency: 'latest' })
+let currentSearch = null
+onBeforeUnmount(() => {
+  searchTask.reset()
+  currentSearch?.controller.abort()
+})
 const regionalTask = useAsyncTask()
 const clusteringTask = useAsyncTask()
 const semanticTask = useAsyncTask()
@@ -372,15 +377,22 @@ const estimatedRegionCount = computed(() => {
   return 100 // 默認值
 })
 
-const handleSearch = async () => {
-  await searchTask.run(async () => {
-    const result = await searchVillages({
-      keyword: villagesMLStore.searchKeyword,
-      ...villagesMLStore.searchFilters,
-      page: villagesMLStore.searchPage,
-      page_size: villagesMLStore.searchPageSize
-    })
-
+const handleSearch = async (resetPage = false) => {
+  if (resetPage) villagesMLStore.searchPage = 1
+  const params = {
+    keyword: villagesMLStore.searchKeyword,
+    ...villagesMLStore.searchFilters,
+    page: villagesMLStore.searchPage,
+    page_size: villagesMLStore.searchPageSize
+  }
+  const key = JSON.stringify([activeDataset.value, params])
+  if (currentSearch?.key === key) return currentSearch.promise
+  currentSearch?.controller.abort()
+  const request = { key, controller: new AbortController(), promise: null }
+  currentSearch = request
+  request.promise = searchTask.run(
+    () => searchVillages(params, { signal: request.controller.signal, showError: false }),
+    { onSuccess: (result) => {
     const villages = (result.data || []).map(v => ({
       id: v.village_id,
       name: v.village_name,
@@ -409,11 +421,14 @@ const handleSearch = async () => {
 
     villagesMLStore.searchResults = deduplicatedVillages
     villagesMLStore.searchTotal = result.total || 0
-  }, {
+    },
     onError: () => {
       showError('搜尋失敗')
     }
+  }).finally(() => {
+    if (currentSearch === request) currentSearch = null
   })
+  return request.promise
 }
 
 const handlePageChange = (page) => {
