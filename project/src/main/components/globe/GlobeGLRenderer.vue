@@ -39,6 +39,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  centered: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const containerRef = ref(null)
@@ -65,8 +69,8 @@ let inputCapabilityMediaQueries = []
 let activeJoystickPointerId = null
 let joystickAnimationFrameId = null
 let lastJoystickFrameTime = 0
-let projShiftX = -0.3
-let projShiftY = -0.1
+let projShiftX = props.centered ? 0 : -0.3
+let projShiftY = props.centered ? 0 : -0.1
 
 const GLOBE_JOYSTICK_TRAVEL_RATIO = 0.38
 const GLOBE_JOYSTICK_DEAD_ZONE = 3
@@ -416,6 +420,12 @@ function destroy() {
 watch(() => props.points, () => {
   updatePoints()
 }, { deep: true })
+
+watch(() => props.centered, (centered) => {
+  projShiftX = centered ? 0 : -0.3
+  projShiftY = centered ? 0 : -0.1
+  globe?.camera()?.updateProjectionMatrix()
+})
 
 watch([shouldUseGlobeJoystick, hasPrimaryFinePointer, hasPrimaryHover, hasTouchInput], () => {
   cancelJoystickInteraction()

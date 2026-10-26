@@ -1,11 +1,19 @@
 <template>
-  <div class="home-page" ref="homePageRef">
+  <div
+    ref="homePageRef"
+    class="home-page"
+    :class="{ 'home-page--globe-mode': isGlobeMode }"
+  >
     <!-- Animated Background -->
     <div class="bg-gradient"></div>
 
     <!-- Hero Section -->
     <section class="hero-section">
-      <GlobeBackground :points="globePoints" />
+      <GlobeBackground
+        :points="globePoints"
+        :centered="isGlobeMode"
+        :force-interactive="isGlobeMode"
+      />
 
       <div class="hero-content">
         <img src="/brand/title.webp" :alt="$t('home.hero.logoAlt')" class="hero-logo title-logo" />
@@ -27,6 +35,34 @@
           <img :src="heroDecorationSrc" :alt="$t('home.hero.decorationAlt')" class="hero-decoration" />
         </div>
       </div>
+
+      <button
+        class="glass-button home-globe-mode-toggle"
+        :class="{ 'home-globe-mode-toggle--exit': isGlobeMode }"
+        type="button"
+        :aria-label="isGlobeMode ? $t('result.phonologyTable.exitFullscreen') : $t('result.phonologyTable.fullscreen')"
+        :aria-pressed="isGlobeMode"
+        @click="toggleGlobeMode"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path
+            v-if="isGlobeMode"
+            d="M9 3v6H3M15 3v6h6M3 15h6v6M21 15h-6v6"
+          />
+          <path
+            v-else
+            d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"
+          />
+        </svg>
+      </button>
 
       <div
         id="home-globe-joystick-anchor"
@@ -327,6 +363,7 @@ const {
   ensureVisitStats
 } = useVisitStats()
 const homePageRef = ref(null)
+const isGlobeMode = ref(false)
 const globePoints = ref([])
 const showShowcase = ref(false)
 const showcaseSectionRef = ref(null)
@@ -337,6 +374,8 @@ const sourceDbVersion = getHomeUpdateNotice(t).dbVersion
 const cachedSourceStats = getCachedSourceStats()
 const sourceLocationCount = ref(cachedSourceStats.locationCount)
 const sourceDataCount = ref(cachedSourceStats.dataCount)
+let previousDocumentOverflow = ''
+let previousBodyOverflow = ''
 
 // 当前版本号和更新时间
 const homeUpdateNotice = computed(() => getHomeUpdateNotice((key, values) => t(key, values, { locale: locale.value })))
@@ -446,6 +485,27 @@ function scrollToFeatures() {
   document.getElementById('features-section')?.scrollIntoView({ behavior: 'smooth' })
 }
 
+function toggleGlobeMode() {
+  if (isGlobeMode.value) {
+    document.documentElement.style.overflow = previousDocumentOverflow
+    document.body.style.overflow = previousBodyOverflow
+    isGlobeMode.value = false
+    return
+  }
+
+  previousDocumentOverflow = document.documentElement.style.overflow
+  previousBodyOverflow = document.body.style.overflow
+  document.documentElement.style.overflow = 'hidden'
+  document.body.style.overflow = 'hidden'
+  isGlobeMode.value = true
+}
+
+function handleGlobeModeKeydown(event) {
+  if (event.key !== 'Escape' || !isGlobeMode.value) return
+  event.preventDefault()
+  toggleGlobeMode()
+}
+
 function openZhihu() {
   window.open('https://www.zhihu.com/people/da-shu-18-11', '_blank')
 }
@@ -489,6 +549,7 @@ async function fetchGlobePoints() {
 useClickParticles()
 
 onMounted(() => {
+  window.addEventListener('keydown', handleGlobeModeKeydown)
   fetchGlobePoints()
   setTimeout(() => {
     fetchVisitStats()
@@ -499,6 +560,11 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleGlobeModeKeydown)
+  if (isGlobeMode.value) {
+    document.documentElement.style.overflow = previousDocumentOverflow
+    document.body.style.overflow = previousBodyOverflow
+  }
   revealObserver?.disconnect()
   showcaseObserver?.disconnect()
 })
@@ -538,6 +604,95 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   min-height: 100dvh;
   overflow-x: hidden;
   background: linear-gradient(135deg, var(--bg-body) 0%, var(--bg-light-gray) 100%);
+}
+
+.home-globe-mode-toggle {
+  --glass-button-padding: 0;
+  --glass-button-border-radius: var(--radius-full);
+  --glass-button-color: var(--text-primary);
+  --glass-button-shadow: var(--shadow-glass-inset);
+  --glass-button-hover-shadow: var(--shadow-glass-hover);
+  --surface-glass-button: linear-gradient(135deg, var(--glass-40), var(--glass-20));
+
+  z-index: calc(var(--z-index-vocabulary-map-fullscreen) + 1);
+  align-self: flex-end;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  margin: calc(-6rem - 20px) max(18px, env(safe-area-inset-right)) 3.75rem 0;
+
+  @include glass-blur(14px, 160%);
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &--exit {
+    position: fixed;
+    right: max(18px, env(safe-area-inset-right));
+    top: max(18px, env(safe-area-inset-top));
+    align-self: auto;
+    margin: 0;
+  }
+}
+
+.home-page--globe-mode {
+  position: fixed;
+  z-index: var(--z-index-vocabulary-map-fullscreen);
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--bg-page-gradient);
+
+  > :not(.hero-section) {
+    display: none;
+  }
+
+  .hero-section {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    gap: 0;
+    padding: 0;
+    border-radius: 0;
+
+    > :not(.globe-background):not(.globe-joystick-anchor):not(.home-globe-mode-toggle) {
+      display: none;
+    }
+
+    :deep(.globe-background) {
+      inset: 0;
+      background: var(--bg-page-gradient);
+    }
+
+    :deep(.globe-static) {
+      object-position: center;
+    }
+  }
+
+  .globe-joystick-anchor {
+    position: fixed;
+    z-index: 2;
+    left: max(16px, env(safe-area-inset-left));
+    bottom: max(16px, env(safe-area-inset-bottom));
+    align-self: auto;
+    margin: 0;
+  }
+}
+
+@media (max-aspect-ratio: 1 / 1) {
+  .home-globe-mode-toggle:not(.home-globe-mode-toggle--exit) {
+    position: absolute;
+    top: 58dvh;
+    right: max(16px, calc(env(safe-area-inset-right) + 24px));
+    align-self: auto;
+    margin: 0;
+  }
 }
 
 .bg-gradient {
@@ -690,6 +845,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
+  white-space: nowrap;
   transition: all 0.3s $ease-apple;
 }
 
@@ -1428,7 +1584,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
       text-align: center;
     }
 
-    &-content:has(+ .globe-joystick-anchor:not(:empty)) {
+    &-content:has(+ .home-globe-mode-toggle + .globe-joystick-anchor:not(:empty)) {
       margin-bottom: 1rem;
     }
 

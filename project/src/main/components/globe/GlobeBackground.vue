@@ -5,7 +5,10 @@
     </template>
     <template v-else>
       <Suspense>
-        <GlobeGLRenderer :points="points" />
+        <GlobeGLRenderer
+          :points="props.points"
+          :centered="props.centered"
+        />
         <template #fallback>
           <div class="globe-loading"><span class="ui-loading--page"></span></div>
         </template>
@@ -20,14 +23,24 @@ import { UI_MODE_COMPACT } from '@/composables/core/uiPreferences.js'
 
 const GlobeGLRenderer = defineAsyncComponent(() => import('./GlobeGLRenderer.vue'))
 
-defineProps({
+const props = defineProps({
   points: {
     type: Array,
     default: () => [],
   },
+  centered: {
+    type: Boolean,
+    default: false,
+  },
+  forceInteractive: {
+    type: Boolean,
+    default: false,
+  },
 })
 
-const simpleMode = computed(() => document.documentElement.dataset.uiMode === UI_MODE_COMPACT)
+const simpleMode = computed(() => (
+  !props.forceInteractive && document.documentElement.dataset.uiMode === UI_MODE_COMPACT
+))
 
 const webglSupported = computed(() => {
   try {
