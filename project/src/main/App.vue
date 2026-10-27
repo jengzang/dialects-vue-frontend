@@ -93,7 +93,7 @@ export default {
     const updateNoticeMode = computed(() => localStorage.getItem('update-notice-mode') || 'showinfo')
 
     // 首次访问首页后保留实例，避免切换路由使全局 toast 的回调失效。
-    watch(() => stripLocaleFromPath(route.path), (path) => {
+    watch(() => route.matched.length > 0 && stripLocaleFromPath(route.path), (path) => {
       if (path === '/') updateNoticeActivated.value = true
     }, { immediate: true })
 
