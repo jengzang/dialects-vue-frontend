@@ -33,6 +33,13 @@
 <script setup>
 import { computed, ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import Globe from 'globe.gl'
+import { currentColorTheme, COLOR_THEME_DARK, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+
+const globeImageUrl = computed(() => (
+  [COLOR_THEME_DARK, COLOR_THEME_GREEN].includes(currentColorTheme.value)
+    ? '/showcase/earth-color-relief-muted.webp'
+    : '/showcase/earth-color-relief-dark.webp'
+))
 
 const props = defineProps({
   points: {
@@ -117,7 +124,7 @@ function render() {
   const bgTint = getCssRgb('--bg-blue-tint-rgb', '240, 247, 255')
 
   globe = Globe()(globeHostRef.value)
-    .globeImageUrl('/showcase/earth-color-relief-dark.webp')
+    .globeImageUrl(globeImageUrl.value)
     .backgroundImageUrl(null)
     .showGraticules(false)
     .backgroundColor('rgba(0,0,0,0)')
@@ -416,6 +423,10 @@ function destroy() {
     globeHostRef.value.innerHTML = ''
   }
 }
+
+watch(globeImageUrl, (url) => {
+  globe?.globeImageUrl(url)
+})
 
 watch(() => props.points, () => {
   updatePoints()
