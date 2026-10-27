@@ -67,7 +67,8 @@
 
 .draw-tool-panel-body {
   min-height: 0;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   @include flex-col;
   gap: 0.9rem;
   padding-right: 0.15rem;

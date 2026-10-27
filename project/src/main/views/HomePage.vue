@@ -882,7 +882,11 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     font-size: clamp(1.25rem, 3vw, 1.75rem);
     font-weight: 600;
     letter-spacing: 0.05em;
-    color: rgba(var(--color-primary-rgb), 0.85);
+    color: var(--color-primary);
+
+    &-hover {
+      color: var(--color-primary-hover);
+    }
   }
 
   &-subtitle {
@@ -899,11 +903,13 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   }
 
   &-actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: inline-grid;
+    grid-template-columns: repeat(2, max-content);
+    justify-self: center;
     gap: 1px;
     padding: 4px;
     background: var(--glass-20);
+    backdrop-filter: blur(8px) saturate(160%);
     border: 1px solid var(--border-glass);
     border-radius: var(--radius-lg);
     box-shadow: inset 0 1px 0 var(--glass-50);
@@ -924,7 +930,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     min-height: 48px;
     padding: 0.625rem 0.875rem;
     color: var(--text-deep);
-    font-size: 0.9375rem;
+    font-size: 1rem;
     font-weight: 500;
     line-height: 1.25;
     text-decoration: none;
@@ -964,7 +970,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-features-link {
     grid-column: 1;
-    justify-self: start;
+    justify-self: center;
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
