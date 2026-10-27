@@ -22,17 +22,128 @@
         </div>
         <p class="hero-subtitle">{{ $t('home.hero.subtitle') }}</p>
         <div class="hero-bottom-row">
-          <div class="hero-actions">
-            <RouterLink class="btn-primary" :to="localeTo('/menu/query/zhonggu')">
-              <span class="btn-icon"><InlineIcon icon="🚀" /></span>
-              <span class="btn-text">{{ $t('home.hero.startExploring') }}</span>
+          <nav
+            class="hero-actions"
+            :aria-label="$t('home.features.sectionTitle')"
+          >
+            <RouterLink
+              class="hero-entry"
+              :to="localeTo('/menu/query/zhonggu')"
+            >
+              <BarIcon
+                icon="🔍"
+                class="hero-entry-icon"
+                weight="regular"
+                aria-hidden="true"
+              />
+              <span>{{ $t('navigation.tabs.query') }}</span>
+              <svg
+                class="hero-entry-arrow"
+                viewBox="0 0 16 16"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M4 12 12 4M4 4h8v8"
+                  stroke="currentColor"
+                  stroke-width="1.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
             </RouterLink>
-            <button class="btn-secondary" @click="scrollToFeatures">
-              <span class="btn-icon"><InlineIcon icon="📖" /></span>
-              <span class="btn-text">{{ $t('home.hero.featuresIntro') }}</span>
-            </button>
-          </div>
+            <RouterLink
+              class="hero-entry"
+              :to="localeTo('/menu/vocabulary/view')"
+            >
+              <BarIcon
+                icon="📋"
+                class="hero-entry-icon"
+                weight="regular"
+                aria-hidden="true"
+              />
+              <span>{{ $t('navigation.tabs.vocabulary') }}</span>
+              <svg
+                class="hero-entry-arrow"
+                viewBox="0 0 16 16"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M4 12 12 4M4 4h8v8"
+                  stroke="currentColor"
+                  stroke-width="1.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </RouterLink>
+            <RouterLink
+              class="hero-entry"
+              :to="localeTo('/menu/pho/matrix')"
+            >
+              <BarIcon
+                icon="🧬"
+                class="hero-entry-icon"
+                weight="regular"
+                aria-hidden="true"
+              />
+              <span>{{ $t('navigation.tabs.phonology') }}</span>
+              <svg
+                class="hero-entry-arrow"
+                viewBox="0 0 16 16"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M4 12 12 4M4 4h8v8"
+                  stroke="currentColor"
+                  stroke-width="1.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </RouterLink>
+            <RouterLink
+              class="hero-entry"
+              :to="localeTo('/explore/tools/praat')"
+            >
+              <BarIcon
+                icon="🎙️"
+                class="hero-entry-icon"
+                weight="regular"
+                aria-hidden="true"
+              />
+              <span>Praat</span>
+              <svg
+                class="hero-entry-arrow"
+                viewBox="0 0 16 16"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M4 12 12 4M4 4h8v8"
+                  stroke="currentColor"
+                  stroke-width="1.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </RouterLink>
+          </nav>
           <img :src="heroDecorationSrc" :alt="$t('home.hero.decorationAlt')" class="hero-decoration" />
+          <button
+            class="hero-features-link"
+            type="button"
+            @click="scrollToFeatures"
+          >
+            <span>{{ $t('home.hero.featuresIntro') }}</span>
+            <BarIcon
+              icon="⬇️"
+              weight="regular"
+              aria-hidden="true"
+            />
+          </button>
         </div>
       </div>
 
@@ -324,6 +435,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import FeaturesSection from '@/main/components/FeaturesSection.vue'
 import AboutHistory from '@/main/views/menu/support/about/AboutHistory.vue'
 import HomeFeaturedTools from '@/main/components/HomeFeaturedTools.vue'
@@ -787,19 +899,96 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   }
 
   &-actions {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    // margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    padding: 4px;
+    background: var(--glass-20);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-lg);
+    box-shadow: inset 0 1px 0 var(--glass-50);
   }
 
   &-bottom-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    justify-content: center;
-    gap: 1.5rem;
-    // margin-bottom: 5rem;
+    gap: 0.75rem 1.25rem;
+  }
+
+  &-entry {
+    box-sizing: border-box;
+    @include flex-center;
+    gap: 0.625rem;
+    min-width: 0;
+    min-height: 48px;
+    padding: 0.625rem 0.875rem;
+    color: var(--text-deep);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    line-height: 1.25;
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+
+    &:nth-child(-n + 2) {
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    &:nth-child(odd) {
+      border-right: 1px solid var(--border-light);
+    }
+
+    &:hover {
+      color: var(--color-primary-hover);
+      background: var(--glass-50);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: -2px;
+    }
+
+    &-icon {
+      flex-shrink: 0;
+      color: var(--color-primary-hover);
+      font-size: 1.25rem;
+    }
+
+    &-arrow {
+      flex-shrink: 0;
+      width: 0.875rem;
+      height: 0.875rem;
+      opacity: 0.45;
+    }
+  }
+
+  &-features-link {
+    grid-column: 1;
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 44px;
+    padding: 0.5rem 0.875rem;
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-md);
+    background: var(--glass-40);
+    box-shadow: inset 0 1px 0 var(--glass-60);
+    color: var(--text-deep);
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--color-primary-hover);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+      border-radius: var(--radius-sm);
+    }
   }
 
   &-decoration {
@@ -807,6 +996,38 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     height: 72px;
     opacity: 0.85;
     animation: float 6s ease-in-out infinite;
+  }
+}
+
+@media (max-aspect-ratio: 1 / 1) {
+  .hero-actions {
+    grid-column: 1 / -1;
+  }
+
+  .hero-entry {
+    gap: 0.25rem;
+    padding: 0.625rem 0.25rem;
+    font-size: clamp(0.6875rem, 3.5vw, 0.875rem);
+
+    &-icon {
+      font-size: 1rem;
+    }
+
+    &-arrow {
+      width: 0.625rem;
+      height: 0.625rem;
+    }
+  }
+
+  .hero-decoration {
+    grid-column: 2;
+    grid-row: 2;
+    width: 56px;
+    height: 56px;
+  }
+
+  .hero-features-link {
+    grid-row: 2;
   }
 }
 
@@ -830,59 +1051,6 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   50% {
     transform: translateY(-10px);
-  }
-}
-
-.btn-primary,
-.btn-secondary {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1.05rem 2.5rem;
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 1.1rem;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.3s $ease-apple;
-}
-
-.btn-primary {
-  @include primary-gradient;
-
-  color: var(--action-primary-text);
-  box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.3);
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(var(--color-primary-rgb), 0.4);
-  }
-
-  &.btn-explore {
-    background: linear-gradient(
-      135deg,
-      $success 0%,
-      $success-dark 100%
-    );
-    box-shadow: 0 4px 16px rgba(var(--color-success-rgb), 0.3);
-
-    &:hover {
-      box-shadow: 0 6px 24px rgba(var(--color-success-rgb), 0.4);
-    }
-  }
-}
-
-.btn-secondary {
-  background: var(--surface-panel);
-  border: 1.5px solid rgba(var(--color-primary-rgb), 0.3);
-  color: $primary;
-
-  &:hover {
-    background: var(--surface-panel-strong);
-    border-color: rgba(var(--color-primary-rgb), 0.5);
-    transform: translateY(-2px);
   }
 }
 
@@ -1593,12 +1761,6 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
       width: clamp(180px, 50vw, 340px);
       margin: 0 auto;
     }
-
-    &-actions {
-      align-items: center;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
   }
 
   .projects-grid {
@@ -1689,12 +1851,6 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 }
 
 @media (max-width: 600px) {
-  .btn-primary,
-  .btn-secondary {
-    padding: 0.7rem 1.5rem;
-    font-size: 0.9375rem;
-  }
-
   .projects-grid {
     gap: 0.625rem;
   }
