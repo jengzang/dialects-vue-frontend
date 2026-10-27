@@ -902,17 +902,21 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     }
   }
 
+  &-actions,
+  &-features-link {
+    background: linear-gradient(135deg, var(--glass-50), var(--color-primary-light2));
+    border: 1px solid var(--color-primary-border2);
+    box-shadow: inset 0 1px 0 var(--glass-70), var(--shadow-glass);
+    @include glass-blur(12px, 160%);
+  }
+
   &-actions {
     display: inline-grid;
     grid-template-columns: repeat(2, max-content);
     justify-self: center;
     gap: 1px;
     padding: 4px;
-    background: var(--glass-20);
-    backdrop-filter: blur(8px) saturate(160%);
-    border: 1px solid var(--border-glass);
     border-radius: var(--radius-lg);
-    box-shadow: inset 0 1px 0 var(--glass-50);
   }
 
   &-bottom-row {
@@ -937,11 +941,11 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     transition: background 0.2s ease, color 0.2s ease;
 
     &:nth-child(-n + 2) {
-      border-bottom: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--color-primary-border);
     }
 
     &:nth-child(odd) {
-      border-right: 1px solid var(--border-light);
+      border-right: 1px solid var(--color-primary-border);
     }
 
     &:hover {
@@ -964,7 +968,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
       flex-shrink: 0;
       width: 0.875rem;
       height: 0.875rem;
-      opacity: 0.45;
+      opacity: 0.65;
     }
   }
 
@@ -976,10 +980,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     gap: 0.375rem;
     min-height: 44px;
     padding: 0.5rem 0.875rem;
-    border: 1px solid var(--border-glass);
     border-radius: var(--radius-md);
-    background: var(--glass-40);
-    box-shadow: inset 0 1px 0 var(--glass-60);
     color: var(--text-deep);
     font: inherit;
     font-size: 0.875rem;
