@@ -97,8 +97,10 @@ describe('author-provided website history', () => {
   })
 
   it('renders a homepage preview with only important updates and links to the full history', async () => {
-    await mountHistory('zh-Hant', { featured: true, title: '开发历程' })
+    await mountHistory('zh-Hant', { featured: true })
 
+    expect(host.querySelector('#history-title')).toBeNull()
+    expect(HistoryPage.props).not.toHaveProperty('title')
     expect(host.querySelector('.history-filter')).toBeNull()
     expect(host.querySelector('.history-filter-summary')).toBeNull()
     expect(host.querySelector('.thoughts-container')).toBeNull()

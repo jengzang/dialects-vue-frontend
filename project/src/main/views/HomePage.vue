@@ -347,10 +347,13 @@
       </div>
     </section>
 
-    <AboutHistory
-      featured
-      :title="$t('home.history.title')"
-    />
+    <h2
+      id="history-title"
+      class="page-title home-history-title"
+    >
+      {{ $t('home.history.title') }}
+    </h2>
+    <AboutHistory featured />
     <div class="home-history-actions">
       <button
         type="button"
@@ -1579,6 +1582,17 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-icon {
     font-size: 1.125rem;
+  }
+}
+
+.home-history-title {
+  padding-top: clamp(1rem, 3vw, 2rem);
+  color: var(--color-primary);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+
+  @media (max-aspect-ratio: 1 / 1) {
+    font-size: 1.75rem;
   }
 }
 

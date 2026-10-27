@@ -4,13 +4,13 @@
     :class="{ 'history-page--featured': featured }"
     aria-labelledby="history-title"
   >
-    <component
-      :is="featured ? 'h2' : 'h1'"
+    <h1
+      v-if="!featured"
       id="history-title"
       class="page-title"
     >
-      {{ props.title || t('about.history.title') }}
-    </component>
+      {{ t('about.history.title') }}
+    </h1>
     <div v-if="!featured" class="history-filter">
       <SwitchToggle
         :model-value="onlyImportant"
@@ -161,10 +161,6 @@ const props = defineProps({
   featured: {
     type: Boolean,
     default: false
-  },
-  title: {
-    type: String,
-    default: ''
   }
 })
 
@@ -257,12 +253,7 @@ function parseLocalizedParts(content) {
 
 .history-page--featured {
   max-width: 82rem;
-
-  .page-title {
-    color: var(--color-primary);
-    font-size: clamp(1.75rem, 4vw, 2.5rem);
-    font-weight: 700;
-  }
+  padding-top: 0;
 }
 
 .tabs-title {
@@ -480,10 +471,6 @@ function parseLocalizedParts(content) {
 
   .history-page .page-title {
     font-size: 1.25rem;
-  }
-
-  .history-page--featured .page-title {
-    font-size: 1.75rem;
   }
 
   .history-page--featured {
