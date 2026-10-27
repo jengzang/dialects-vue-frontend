@@ -204,7 +204,7 @@
         "idle": "After searching points, query administrative name hierarchy manually.",
         "empty": "No name hierarchy results",
         "level": "Level {level}",
-        "lazyFallback": "{count} results exceed the full-tree threshold of {threshold}; expand levels manually.",
+        "lazyFallback": "More than {threshold} results match. Expand the hierarchy level by level.",
         "expand": "Expand name hierarchy",
         "loadingNode": "Loading child level...",
         "loadMore": "Load more"
