@@ -65,7 +65,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import AppModal from '@/components/common/AppModal.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { showInfo, hideMessage } from '@/utils/ui/message.js'
@@ -114,6 +114,7 @@ const emit = defineEmits(['close', 'confirm', 'update:visible', 'show-detail'])
 
 const dontShowAgain = ref(false)
 const forceModal = ref(false)
+let autoShowTimer = null
 const versionLine = computed(() => {
   if (props.lastUpdateDate) {
     return `${props.version} · ${props.lastUpdateDate}`
@@ -185,7 +186,7 @@ watch(() => props.visible, (val) => {
 onMounted(() => {
   if (!props.autoShow || !shouldAutoShow()) return
 
-  setTimeout(() => {
+  autoShowTimer = setTimeout(() => {
     if (props.mode === 'showinfo') {
       showInfo(buildSummaryText(), 20000, {
         changelogMode: true,
@@ -200,6 +201,10 @@ onMounted(() => {
       emit('update:visible', true)
     }
   }, 3000)
+})
+
+onBeforeUnmount(() => {
+  clearTimeout(autoShowTimer)
 })
 </script>
 

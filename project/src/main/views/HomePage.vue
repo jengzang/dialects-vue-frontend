@@ -394,20 +394,6 @@
       @register="navigateTo('/auth')"
     />
 
-    <!-- Update Notice Modal -->
-    <UpdateNoticeModal
-      v-model:visible="showUpdateNotice"
-      :auto-show="true"
-      :mode="updateNoticeMode"
-      :version="homeUpdateNotice.version"
-      :last-update-date="homeUpdateNotice.lastUpdateDate"
-      :title="homeUpdateNotice.title"
-      :items="homeUpdateNotice.items"
-      :view-detail-text="$t('home.viewDetails')"
-      @close="showUpdateNotice = false"
-      @show-detail="showUpdateNotice = true"
-    />
-
     <!-- Support Modal -->
     <SupportPopup
       :visible="showSupport"
@@ -450,9 +436,6 @@ import { getCachedSourceStats, getSourceStats } from '@/composables/data/useSour
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 
 // ✅ 懒加载：先弹窗 → 地球 → Hero 展示
-const UpdateNoticeModal = defineAsyncComponent(() =>
-  import('@/main/components/user/popups/UpdateNoticeModal.vue')
-)
 const GlobeBackground = defineAsyncComponent(() =>
   import('@/main/components/globe/GlobeBackground.vue')
 )
@@ -481,7 +464,6 @@ const showShowcase = ref(false)
 const showcaseSectionRef = ref(null)
 const showSupport = ref(false)
 const showBenefitsPopup = ref(false)
-const showUpdateNotice = ref(false)
 const sourceDbVersion = getHomeUpdateNotice(t).dbVersion
 const cachedSourceStats = getCachedSourceStats()
 const sourceLocationCount = ref(cachedSourceStats.locationCount)
@@ -491,7 +473,6 @@ let previousBodyOverflow = ''
 
 // 当前版本号和更新时间
 const homeUpdateNotice = computed(() => getHomeUpdateNotice((key, values) => t(key, values, { locale: locale.value })))
-const updateNoticeMode = computed(() => localStorage.getItem('update-notice-mode') || 'showinfo')
 const CURRENT_VERSION = computed(() => homeUpdateNotice.value.version)
 const LAST_UPDATE_DATE = computed(() => homeUpdateNotice.value.lastUpdateDate)
 
