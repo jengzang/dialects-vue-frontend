@@ -351,6 +351,15 @@
       featured
       :title="$t('home.history.title')"
     />
+    <div class="home-history-actions">
+      <button
+        type="button"
+        class="login-btn secondary"
+        @click="showUpdateNotice = true"
+      >
+        {{ $t('home.history.recentUpdates') }}
+      </button>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -386,6 +395,14 @@
         </div>
       </div>
     </footer>
+
+    <UpdateNoticeModal
+      v-model:visible="showUpdateNotice"
+      :version="homeUpdateNotice.version"
+      :last-update-date="homeUpdateNotice.lastUpdateDate"
+      :title="homeUpdateNotice.title"
+      :items="homeUpdateNotice.items"
+    />
 
     <!-- User Benefits Popup -->
     <UserBenefitsPopup
@@ -448,6 +465,9 @@ const UserBenefitsPopup = defineAsyncComponent(() =>
 const SupportPopup = defineAsyncComponent(() =>
   import('@/main/components/user/popups/SupportPopup.vue')
 )
+const UpdateNoticeModal = defineAsyncComponent(() =>
+  import('@/main/components/user/popups/UpdateNoticeModal.vue')
+)
 
 const { t, locale } = useI18n()
 const router = useRouter()
@@ -464,6 +484,7 @@ const showShowcase = ref(false)
 const showcaseSectionRef = ref(null)
 const showSupport = ref(false)
 const showBenefitsPopup = ref(false)
+const showUpdateNotice = ref(false)
 const sourceDbVersion = getHomeUpdateNotice(t).dbVersion
 const cachedSourceStats = getCachedSourceStats()
 const sourceLocationCount = ref(cachedSourceStats.locationCount)
@@ -1559,6 +1580,11 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &-icon {
     font-size: 1.125rem;
   }
+}
+
+.home-history-actions {
+  @include flex-center;
+  margin-top: 1.5rem;
 }
 
 /* Footer */

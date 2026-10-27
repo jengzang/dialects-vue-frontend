@@ -283,7 +283,8 @@
   },
   "history": {
     "title": "開發歷程",
-    "viewAll": "查看完整歷程"
+    "viewAll": "查看完整歷程",
+    "recentUpdates": "最近更新"
   },
   "contact": {
     "title": "聯繫作者",
