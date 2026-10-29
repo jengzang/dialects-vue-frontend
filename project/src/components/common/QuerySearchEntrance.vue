@@ -41,6 +41,7 @@ const panelStyle = computed(() => ({
 let scrollFrame = null
 let animationFrame = null
 let targetProgress = 0
+let autoCollapsing = false
 let lastAnimationTime = 0
 const transitionDuration = 400
 const boundaryWindowDuration = 5000
@@ -74,6 +75,7 @@ function animateProgress(time) {
     ? null
     : window.requestAnimationFrame(animateProgress)
   if (progress.value === 0 || progress.value === 1) {
+    if (progress.value === 1) autoCollapsing = false
     transitionUnlocked = false
     clearBoundary()
   }
@@ -85,6 +87,7 @@ function setTargetProgress(value, immediate = false) {
     if (animationFrame !== null) window.cancelAnimationFrame(animationFrame)
     animationFrame = null
     progress.value = value
+    autoCollapsing = false
     transitionUnlocked = false
     clearBoundary()
     return
@@ -106,6 +109,10 @@ function updateProgress(fromScroll = false) {
   scrollFrame = null
   if (props.enabled && !hasSubmittedQuery.value) {
     setTargetProgress(0, true)
+    return
+  }
+  if (props.enabled && autoCollapsing) {
+    setTargetProgress(1)
     return
   }
   const target = compactPosition()
@@ -136,6 +143,7 @@ function updateProgress(fromScroll = false) {
 
 function handleScroll() {
   const position = window.scrollY
+  if (position < lastScrollPosition) autoCollapsing = false
   if (boundaryScrollPosition !== null) {
     if (position !== boundaryScrollPosition) {
       window.scrollTo({ top: boundaryScrollPosition, behavior: 'instant' })
@@ -154,6 +162,7 @@ function acceptScrollInput(event, direction, canRelease = true) {
     const canScroll = direction < 0 ? element.scrollTop > 0 : element.scrollTop + element.clientHeight < element.scrollHeight - 1
     if (canScroll && /auto|scroll/.test(window.getComputedStyle(element).overflowY)) return false
   }
+  if (direction < 0) autoCollapsing = false
   inputDirection = direction
   if (boundaryScrollPosition === null) return true
   if (direction !== boundaryDirection) {
@@ -220,6 +229,8 @@ async function collapse() {
   transitionUnlocked = true
   clearBoundary()
   await nextTick()
+  autoCollapsing = progress.value < 1
+  setTargetProgress(1)
   window.scrollTo({
     top: compactPosition(),
     behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
@@ -251,6 +262,7 @@ function stopListening() {
   if (animationFrame !== null) window.cancelAnimationFrame(animationFrame)
   scrollFrame = null
   animationFrame = null
+  autoCollapsing = false
   clearBoundary()
 }
 

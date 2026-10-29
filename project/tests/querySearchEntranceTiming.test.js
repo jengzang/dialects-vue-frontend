@@ -48,6 +48,25 @@ afterEach(() => {
 })
 
 describe('query entrance transition timing', () => {
+  it.each([0, 175])('completes a submitted collapse when scrolling stops at %spx on a tall viewport', async position => {
+    vi.stubGlobal('innerHeight', 1200)
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
+      return this.classList.contains('query-intro')
+        ? { top: 180 - scrollPosition, height: 160 }
+        : { top: 419.3125 - scrollPosition, height: 140 }
+    })
+    await entrance.collapse()
+    scrollPosition = position
+    if (position) window.dispatchEvent(new Event('scroll'))
+
+    await frame(0)
+    await frame(200)
+    expect(entrance.progress).toBeCloseTo(0.5)
+    await frame(400)
+    expect(entrance.progress).toBe(1)
+    expect(frames.size).toBe(0)
+  })
+
   it('takes 400ms to collapse even when scrolling directly to the compact position', async () => {
     scrollPosition = 1000
     window.dispatchEvent(new Event('scroll'))
