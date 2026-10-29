@@ -30,4 +30,14 @@ describe('vocabulary location deletion permissions', () => {
     expect(deleteHandler).toContain('if (!location?.location_name || location.user_id === null || location.user_id === undefined) return')
     expect(deleteHandler).toContain('const params = { user_id: location.user_id }')
   })
+
+  it('shows row-level loading feedback for location exports and deletions', () => {
+    const locationsSection = readSource('src/main/views/explore/word/vocabulary/ManageLocationsSection.vue')
+
+    expect(locationsSection).toContain(':disabled="Boolean(exportingLocationKey)"')
+    expect(locationsSection).toContain('v-if="exportingLocationKey === getLocationKey(location)"')
+    expect(locationsSection).toContain(':disabled="Boolean(deletingLocationKey)"')
+    expect(locationsSection).toContain('v-if="deletingLocationKey === getLocationKey(location)"')
+    expect(locationsSection.match(/class="ui-loading--inline"/g)).toHaveLength(2)
+  })
 })

@@ -60,4 +60,16 @@ describe('vocabulary import location modal', () => {
     expect(locationsSection).toContain('locationEditFields.value')
     expect(locationsSection).toContain('updateVocabularyLocation(sourceName, payload, params)')
   })
+
+  it('shows an inline loading state while saving a managed location', () => {
+    const locationsSection = readSource('src/main/views/explore/word/vocabulary/ManageLocationsSection.vue')
+    const editorModal = readSource('src/main/views/explore/word/vocabulary/LocationEditorModal.vue')
+
+    expect(locationsSection).toContain(':loading="isSavingLocation"')
+    expect(locationsSection).toContain('if (!location || !sourceName || isSavingLocation.value)')
+    expect(locationsSection).toContain('isSavingLocation.value = true')
+    expect(locationsSection).toContain('isSavingLocation.value = false')
+    expect(editorModal).toContain(':disabled="loading"')
+    expect(editorModal).toMatch(/<span\s+v-if="loading"\s+class="ui-loading--inline"\s+aria-hidden="true"\s*>↻<\/span>/)
+  })
 })
