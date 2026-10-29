@@ -141,6 +141,10 @@
           @reset="importFlow.clearPreview"
           @confirm="handleConfirmUpload"
         />
+        <div v-if="isPreviewingImport" class="loading-state-base" role="status">
+          <div class="ui-loading--page" aria-hidden="true"></div>
+          <span>{{ t('common.label.loading') }}</span>
+        </div>
         <div
           v-if="backendPreview"
           class="backend-preview"
@@ -515,7 +519,7 @@
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { PhArrowsClockwise, PhDownloadSimple } from '@phosphor-icons/vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -670,7 +674,6 @@ const uploadTargetLocation = ref(null)
 const isLoadingExistingLocations = ref(false)
 const existingLocationsError = ref('')
 let existingLocationsRequest = 0
-let preserveBackendPreviewOnFilePromotion = false
 
 function getExistingLocationKey(location) {
   return JSON.stringify([location.user_id, location.location_name])
@@ -994,10 +997,6 @@ watch(fillStandardFromLocal, (val) => {
 })
 
 watch([uploadParserMode, selectedUploadFile, uploadLocation, uploadTargetLocation], () => {
-  if (preserveBackendPreviewOnFilePromotion) {
-    preserveBackendPreviewOnFilePromotion = false
-    return
-  }
   backendPreview.value = null
   isOverwriteConfirmed.value = false
 }, { deep: true })
@@ -1086,12 +1085,10 @@ async function handleConfirmUpload() {
   }
 
   const transformedFile = buildMappedVocabularyImportFile(file)
-  const previewResponse = await handlePreviewImport(transformedFile)
-  if (isPreviewImportable(previewResponse)) {
-    preserveBackendPreviewOnFilePromotion = true
-    uploadFile.value = transformedFile
-    importFlow.pendingFile.value = null
-  }
+  uploadFile.value = transformedFile
+  importFlow.pendingFile.value = null
+  await nextTick()
+  await handlePreviewImport(transformedFile)
 }
 
 async function handleImportAfterPreview() {

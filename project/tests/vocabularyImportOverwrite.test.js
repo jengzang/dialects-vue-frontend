@@ -51,6 +51,36 @@ beforeEach(() => {
 afterEach(() => { wrapper?.app.unmount(); wrapper?.host.remove() })
 
 describe('vocabulary import feedback', () => {
+  it.each(['success', 'empty', 'failure'])('closes the mapping dialog before preview and clears loading after %s', async (outcome) => {
+    const { state, host } = mountPage()
+    state.uploadLocation = { location_name: '甲村', coordinates: '113,23' }
+    const csv = 'standard_word,local_expression\n水,水'
+    const file = new File([csv], 'words.csv')
+    file.text = async () => csv
+    await state.importFlow.loadPreview(file)
+    await flush()
+    expect(state.importPreview.diagnostics.value.isComplete).toBe(true)
+    let finishPreview
+    mocks.previewVocabularyImport.mockImplementation(() => {
+      expect(state.importFlow.pendingFile.value).toBeNull()
+      return new Promise((resolve, reject) => { finishPreview = outcome === 'failure' ? reject : resolve })
+    })
+
+    const confirmation = state.handleConfirmUpload()
+    await flush()
+    expect(mocks.previewVocabularyImport).toHaveBeenCalledOnce()
+    expect(host.querySelector('[role="status"] .ui-loading--page')).toBeTruthy()
+    expect(state.uploadFile.name).toBe('_mapped_words.xlsx')
+
+    const response = { parsed_count: outcome === 'empty' ? 0 : 1, errors: [] }
+    finishPreview(outcome === 'failure' ? new Error('preview failed') : response)
+    await confirmation
+    await flush()
+    expect(host.querySelector('[role="status"]')).toBeNull()
+    expect(state.backendPreview).toEqual(outcome === 'failure' ? null : response)
+    expect(state.uploadFile).not.toBeNull()
+  })
+
   it.each([false, true])('resets the form only after a successful upload (%s)', async (fails) => {
     const { state } = mountPage()
     const file = new File(['content'], 'words.docx')
