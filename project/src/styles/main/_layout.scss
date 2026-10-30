@@ -8,14 +8,14 @@
 
 .main-card-title {
   color: var(--text-primary);
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .main-card-meta {
   max-width: 100%;
   color: var(--text-secondary);
   font-family: var(--font-monospace);
-  font-size: 12px;
+  font-size: var(--font-size-12);
 
   @include text-truncate;
 }

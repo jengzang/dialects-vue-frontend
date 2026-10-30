@@ -3,7 +3,7 @@
 .ui-tab-item {
   appearance: none;
   font: inherit;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 500;
   line-height: 1.4;
   color: var(--text-dark);
@@ -61,7 +61,7 @@
   box-shadow: var(--shadow-card-sm);
 
   .ui-tab-item {
-    font-size: 14px;
+    font-size: var(--font-size-14);
     color: var(--text-secondary);
     border-radius: var(--radius-sm2);
 
@@ -76,11 +76,11 @@
 
 @media (max-aspect-ratio: 1 / 1) {
   .ui-tab-item {
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 
   .ui-tabs-navigation--adaptive .ui-tab-item {
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 }
 
@@ -92,7 +92,7 @@
 
   .ui-tab-item {
     display: inline-grid;
-    font-size: 16px;
+    font-size: var(--font-size-16);
     line-height: normal;
     border-radius: var(--radius-md);
     transition: color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
@@ -134,7 +134,7 @@
 }
 
 .tabs-wrapper--segmented.tabs-wrapper--compact .ui-tab-item {
-  font-size: 15px;
+  font-size: var(--font-size-15);
 }
 
 @media (prefers-reduced-motion: reduce) {

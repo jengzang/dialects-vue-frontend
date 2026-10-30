@@ -12,21 +12,21 @@
 }
 
 .vml-glass-panel > .panel-title {
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 20px;
 }
 
 .vml-glass-panel h2 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   margin: 0;
   color: var(--text-primary);
 }
 
 .solid-button {
   padding: 10px 24px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   white-space: nowrap;
   background: linear-gradient(135deg, var(--vml-blue) 0%, var(--vml-blue-darker) 100%);
   border-radius: var(--radius-md);
@@ -65,16 +65,16 @@
 
 .solid-button.small {
   padding: 8px 16px;
-  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 
 .solid-button.large {
   padding: 14px 32px;
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .villagesml-subtab-title {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--text-deep);
   margin: 0;

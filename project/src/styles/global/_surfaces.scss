@@ -124,7 +124,7 @@
   padding: 2dvh;
   max-height: 35dvh;
   overflow-y: auto;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   background: var(--glass-05);
   border: 2px solid var(--glass-10);
   border-radius: var(--radius-md);
@@ -136,6 +136,6 @@
 @media (max-width: 600px) {
   .page {
     padding: 10px;
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 }

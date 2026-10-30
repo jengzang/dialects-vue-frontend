@@ -25,13 +25,13 @@
   text-align: center;
 
   .vml-stat-label {
-    font-size: 13px;
+    font-size: var(--font-size-13);
     color: var(--text-secondary);
     margin-bottom: 8px;
   }
 
   .vml-stat-value {
-    font-size: 24px;
+    font-size: var(--font-size-24);
     font-weight: 700;
     color: var(--color-primary);
   }

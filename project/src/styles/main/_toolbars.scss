@@ -74,7 +74,7 @@
   align-items: center;
   white-space: nowrap;
   justify-content: center;
-  font-size: 1.3rem;
+  font-size: var(--font-size-20-8);
   flex: 1 1 0;
   min-width: 0;
   text-align: center;
@@ -119,7 +119,7 @@
   background: var(--sidebar-expand-background);
   border: 2px solid var(--sidebar-expand-border);
   color: var(--sidebar-item-text);
-  font-size: 18px;
+  font-size: var(--font-size-18);
   cursor: pointer;
   transition: all 0.3s ease;
   @include flex-center;
@@ -134,7 +134,7 @@
 
 .main-sidebar-icp {
   text-align: center;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-gray);
 }
 
@@ -164,7 +164,7 @@
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: background-color 0.16s ease, transform 0.16s ease;
-  font-size: 15px;
+  font-size: var(--font-size-15);
   font-weight: 500;
   color: var(--text-dark);
 }
@@ -197,7 +197,7 @@
   }
 
   .main-sidebar-item {
-    font-size: 1.1rem;
+    font-size: var(--font-size-17-6);
     padding: 3px 8px 3px 15px;
   }
 

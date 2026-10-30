@@ -27,7 +27,7 @@
   border-radius: var(--run-btn-radius, var(--radius-pill));
   box-shadow: var(--shadow-glow-sm);
   color: var(--action-primary-text);
-  font-size: var(--run-btn-font-size, 18px);
+  font-size: var(--run-btn-font-size, var(--font-size-18));
   font-weight: var(--run-btn-font-weight, 700);
   letter-spacing: var(--run-btn-letter-spacing, 1px);
   white-space: nowrap;
@@ -72,7 +72,7 @@
     0 2px 4px var(--bg-overlay-light2);
   color: var(--action-primary-text);
   white-space: nowrap;
-  font-size: var(--action-btn-font-size, 16px);
+  font-size: var(--action-btn-font-size, var(--font-size-16));
   font-weight: var(--action-btn-font-weight, 600);
   cursor: pointer;
   transition: all 0.3s ease;
@@ -103,7 +103,7 @@
 
 .action-btn--sm {
   --action-btn-padding: 8px 16px;
-  --action-btn-font-size: 14px;
+  --action-btn-font-size: var(--font-size-14);
   --action-btn-font-weight: 500;
 }
 
@@ -128,7 +128,7 @@
   border-radius: var(--pill-btn-radius, var(--radius-pill));
   box-shadow: var(--pill-btn-shadow, none);
   color: var(--pill-btn-color, var(--color-secondary-text));
-  font-size: var(--pill-btn-font-size, 12px);
+  font-size: var(--pill-btn-font-size, var(--font-size-12));
   font-weight: var(--pill-btn-font-weight, 600);
   line-height: 1;
   white-space: nowrap;

@@ -50,7 +50,7 @@
 }
 
 .main-glass-modal-title {
-  font-size: 15px;
+  font-size: var(--font-size-15);
   font-weight: 650;
   color: var(--text-primary);
 }
@@ -90,7 +90,7 @@
 }
 
 .main-query-modal .modal-title {
-  font-size: 15px;
+  font-size: var(--font-size-15);
   font-weight: 650;
   color: var(--text-dark-light);
 }
@@ -108,14 +108,14 @@
   gap: 12px;
   padding: 40px 20px;
   color: var(--text-tertiary);
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .main-modal-error-state {
   padding: 40px 20px;
   text-align: center;
   color: var(--text-lightest);
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .main-crud-modal {
@@ -151,7 +151,7 @@
 .main-crud-modal .modal-title-base,
 .main-crud-modal .modal-header h2,
 .main-crud-modal .modal-header h3 {
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 600;
   color: var(--text-dark);
 }
@@ -164,7 +164,7 @@
 }
 
 .main-cell-detail-modal .modal-title {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 700;
   color: var(--text-primary);
 }
@@ -202,7 +202,7 @@
 
 .main-tool-modal .modal-title {
   margin: 0;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 600;
   color: var(--text-deep);
 }
@@ -238,7 +238,7 @@
 .tool-modal-shell.large-modal .modal-title,
 .modal-container .modal-title {
   margin: 0;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 600;
   color: var(--text-deep);
 }
