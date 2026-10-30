@@ -372,6 +372,7 @@
     },
     "buttons": {
       "adminBoundary": "Administrative Boundary",
+      "clearAdminBoundary": "Clear Drawn Boundaries",
       "reset": "Reset",
       "fullscreen": "Fullscreen",
       "exitFullscreen": "Exit Fullscreen",

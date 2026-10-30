@@ -372,6 +372,7 @@
     },
     "buttons": {
       "adminBoundary": "行政区划",
+      "clearAdminBoundary": "清空已绘制边界",
       "reset": "复位",
       "fullscreen": "全屏",
       "exitFullscreen": "退出全屏",

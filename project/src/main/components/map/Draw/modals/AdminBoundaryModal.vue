@@ -67,6 +67,14 @@
     <template #footer>
       <div class="clip-boundary-footer">
         <button
+          v-if="clearable"
+          class="glass-button"
+          type="button"
+          @click="handleClear"
+        >
+          {{ t('map.mapLibre.buttons.clearAdminBoundary') }}
+        </button>
+        <button
           class="glass-button"
           type="button"
           @click="handleClose"
@@ -118,10 +126,11 @@ const props = defineProps({
     validator: (value) => ['clip', 'import'].includes(value),
   },
   loading: { type: Boolean, default: false },
+  clearable: { type: Boolean, default: false },
   highPrecision: { type: Boolean, default: false },
 });
 
-const emit = defineEmits(['update:modelValue', 'confirm', 'update:highPrecision']);
+const emit = defineEmits(['update:modelValue', 'confirm', 'update:highPrecision', 'clear']);
 const { t } = useI18n();
 const router = useRouter();
 const route = useRoute();
@@ -266,6 +275,11 @@ function handleToggle(optionValue, checked) {
 
 function handleClose() {
   emit('update:modelValue', false);
+}
+
+function handleClear() {
+  emit('clear');
+  handleClose();
 }
 
 function handleConfirm() {

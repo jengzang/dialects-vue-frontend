@@ -85,7 +85,7 @@
             <span>{{ isoplethLegend.p97 }}</span>
           </div>
         </div>
-        <button v-if="mapStore.mode === 'isopleth'" class="glass-button admin-boundary-btn" @click="openAdminBoundaryModal"><InlineIcon icon="🗺️" />{{ t('map.mapLibre.buttons.adminBoundary') }}</button>
+        <button class="pill-btn admin-boundary-btn" @click="openAdminBoundaryModal"><InlineIcon icon="🗺️" />{{ t('map.mapLibre.buttons.adminBoundary') }}</button>
         <div class="button-row">
           <button class="action-btn" @click="resetView"><InlineIcon icon="🎯" />{{ t('map.mapLibre.buttons.reset') }}</button>
           <button class="action-btn fullscreen-btn" @click="toggleFullScreen"><InlineIcon icon="⛶" />{{ t('map.mapLibre.buttons.fullscreen') }}</button>
@@ -115,9 +115,12 @@
     <AdminBoundaryModal
       v-model="showAdminBoundaryModal"
       mode="import"
+      clearable
+      :boundary-config="mapStore.adminBoundary?.config"
       :boundary-options="adminBoundaryOptions"
       :loading="isAdminBoundaryOptionsLoading"
       @confirm="handleAdminBoundaryConfirm"
+      @clear="handleAdminBoundaryClear"
     />
   </div>
 </template>
@@ -125,7 +128,7 @@
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
-import { ref, onMounted, onActivated, onBeforeUnmount, shallowRef, nextTick, watch, computed, h, render } from 'vue';
+import { ref, onMounted, onActivated, onBeforeUnmount, shallowRef, nextTick, watch, computed, h, render, markRaw } from 'vue';
 import { useI18n } from 'vue-i18n';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -185,6 +188,7 @@ const ADMIN_BOUNDARY_LAYER_ID = 'admin-boundary-line-layer';
 
 const mapContainer = ref(null);
 const map = shallowRef(null);
+let isMapStyleReady = false;
 const currentStyleKey = ref('tianditu');
 const loading = ref(false);
 const isFullScreen = ref(false);
@@ -279,6 +283,7 @@ const isoplethLegend = ref(null);
 const showAdminBoundaryModal = ref(false);
 const adminBoundaryOptions = ref({ country: [], provinces: [], cities: [], counties: [] });
 const isAdminBoundaryOptionsLoading = ref(false);
+let adminBoundaryRequestId = 0;
 
 let provincesGeoJsonCache = null;
 let citiesGeoJsonCache = null;
@@ -373,6 +378,7 @@ onActivated(() => {
 });
 
 onBeforeUnmount(() => {
+  adminBoundaryRequestId += 1;
   clearIsoplethLayers();
   clearDotHeatmapLayers();
   clearMarkers();
@@ -444,6 +450,7 @@ const initMap = () => {
   map.value.addControl(new maplibregl.NavigationControl(), 'top-left');
 
   map.value.on('load', () => {
+    isMapStyleReady = true;
     // 地圖加載完畢，如果有數據，立即渲染
     renderMapContent();
     // 首次進入地圖視圖時若已帶模式數據(如等值線跳轉),依數據範圍校正視口；
@@ -464,7 +471,7 @@ const initMap = () => {
 
 // --- 核心渲染入口 ---
 const renderMapContent = async (shouldResetView = true) => {
-  if (!map.value) return;
+  if (!map.value || !isMapStyleReady) return;
 
   // 清除舊標記
   clearMarkers();
@@ -488,6 +495,10 @@ const renderMapContent = async (shouldResetView = true) => {
     drawIsopleth();
   } else if (mapStore.mode === 'heatmap') {
     drawDotHeatmap();
+  }
+
+  if (mapStore.adminBoundary) {
+    drawAdminBoundary(mapStore.adminBoundary.data);
   }
 };
 
@@ -1346,11 +1357,13 @@ async function ensureAdminBoundaryOptions() {
 }
 
 async function handleAdminBoundaryConfirm(config) {
+  const requestId = ++adminBoundaryRequestId;
   const { level, selectedNames, selectedIds, highPrecision } = config;
   let geoJson;
   try {
     if (highPrecision && level !== 'country') {
       geoJson = await fetchHighPrecisionBoundaries(selectedIds);
+      if (requestId !== adminBoundaryRequestId) return;
       if (!geoJson) { showError(t('map.drawTab.voronoi.clipBoundaryNoOptions')); return; }
     } else if (level === 'country') {
       const res = await fetch(nationalBorderGeoJsonUrl);
@@ -1364,20 +1377,30 @@ async function handleAdminBoundaryConfirm(config) {
       geoJson = await loadCountiesGeoJson();
     }
   } catch (error) {
+    if (requestId !== adminBoundaryRequestId) return;
     showError(error.message || 'Failed to load boundary');
     return;
   }
 
+  if (requestId !== adminBoundaryRequestId) return;
   const filtered = (geoJson.features ?? []).filter(
     (f) => level === 'country' || selectedNames.includes(f?.properties?.name)
   );
   if (!filtered.length) { showError(t('map.drawTab.voronoi.clipBoundaryNoOptions')); return; }
 
-  drawAdminBoundary({ type: 'FeatureCollection', features: filtered });
+  const data = markRaw({ type: 'FeatureCollection', features: filtered });
+  mapStore.adminBoundary = { config, data };
+  drawAdminBoundary(data);
+}
+
+function handleAdminBoundaryClear() {
+  adminBoundaryRequestId += 1;
+  mapStore.adminBoundary = null;
+  clearAdminBoundaryLayers();
 }
 
 function drawAdminBoundary(featureCollection) {
-  if (!map.value) return;
+  if (!map.value || !isMapStyleReady) return;
   clearAdminBoundaryLayers();
   map.value.addSource(ADMIN_BOUNDARY_SOURCE_ID, {
     type: 'geojson',
@@ -1444,8 +1467,10 @@ const toggleFullScreen = async () => {
 const handleStyleChange = () => {
   if (!map.value) return;
   const newStyle = mapStyle(currentStyleKey.value);
+  isMapStyleReady = false;
   map.value.setStyle(newStyle);
   map.value.once('style.load', () => {
+    isMapStyleReady = true;
     renderMapContent(false);
   });
 };
@@ -1679,7 +1704,9 @@ $glass-transition: all 0.3s ease;
 .admin-boundary-btn {
   width: 100%;
   margin-bottom: 10px;
-  border: 2px solid var(--color-primary-border);
+  // border: 2px solid var(--color-primary-border);
+  // padding: 10px 6px;
+  border-width: 2px;
 }
 
 .button-row {
