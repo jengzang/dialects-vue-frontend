@@ -367,7 +367,7 @@ $mobile-aspect-ratio: 1;
     }
 
     .annotation {
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
     }
   }
 }
@@ -387,7 +387,7 @@ $mobile-aspect-ratio: 1;
   margin: 4px 0 4px 20px;
   padding: 8px 12px;
   color: $error-color;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   background: rgba(var(--color-error-rgb), 0.06);
   border: 1px solid rgba(var(--color-error-rgb), 0.2);
   border-radius: var(--radius-md);

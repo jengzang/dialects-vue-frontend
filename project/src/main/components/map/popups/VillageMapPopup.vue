@@ -674,7 +674,7 @@ $success: var(--color-success);/* 地图容器 */
   border-radius: var(--radius-md);
   color: $success;
   white-space: nowrap;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
 }
 
@@ -714,7 +714,7 @@ $success: var(--color-success);/* 地图容器 */
   border-radius: var(--radius-sm2);
   color: var(--text-dark);
   white-space: nowrap;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -743,7 +743,7 @@ $success: var(--color-success);/* 地图容器 */
   border-radius: var(--radius-sm2);
   color: var(--action-primary-text);
   white-space: nowrap;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -786,7 +786,7 @@ $success: var(--color-success);/* 地图容器 */
   border-radius: var(--radius-sm2);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   color: var(--text-primary);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   line-height: 1.6;
 
   @include glass-blur(10px);
@@ -821,7 +821,7 @@ $success: var(--color-success);/* 地图容器 */
 
   .exit-fullscreen-btn {
     padding: 8px 16px;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 }
 </style>

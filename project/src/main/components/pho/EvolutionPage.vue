@@ -1648,7 +1648,7 @@ $portrait-ratio: 1;
   border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
   border-radius: var(--radius-sm2);
   color: $danger;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 /* 特征切换 */
@@ -1824,7 +1824,7 @@ $portrait-ratio: 1;
   }
 
   &__section-title {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-weight: 600;
 
     @include text-primary;

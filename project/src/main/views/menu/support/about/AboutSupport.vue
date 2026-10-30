@@ -351,7 +351,7 @@ function splitDesc(text) {
   }
 
   .support-note {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 }
 </style>

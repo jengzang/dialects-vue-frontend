@@ -171,7 +171,7 @@ const formatValue = (value) => {
 
 .vector-note {
   margin-top: 10px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   text-align: center;
 }

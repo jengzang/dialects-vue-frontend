@@ -88,7 +88,7 @@ const legendItems = computed(() => {
 }
 
 .legend-label {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-medium);
 }
 </style>

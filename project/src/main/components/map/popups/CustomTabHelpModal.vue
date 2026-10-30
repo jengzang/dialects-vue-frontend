@@ -772,7 +772,7 @@ $glass-card: var(--glass-50);
 .usage-text {
   margin-bottom: 4px;
   color: $text-secondary;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .usage-example {

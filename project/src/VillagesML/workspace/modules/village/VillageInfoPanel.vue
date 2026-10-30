@@ -122,7 +122,7 @@ defineProps({
 }
 
 .additional-info pre {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   overflow-x: auto;
 }

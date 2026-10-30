@@ -570,7 +570,7 @@ $portrait-ratio: 1;
   min-width: 0;
   @include text-truncate;
   color: var(--text-dark-medium);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .expand-btn-inline {
@@ -602,7 +602,7 @@ $portrait-ratio: 1;
   border-left: 3px solid $warning-orange;
   border-radius: var(--radius-sm);
   color: $warning-orange;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
 }
 
@@ -649,7 +649,7 @@ $portrait-ratio: 1;
 .success-message {
   padding: 6px 8px;
   color: var(--color-success);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
 }
 
@@ -742,7 +742,7 @@ $portrait-ratio: 1;
 
   .location-chip {
     padding: 4px 8px;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 }
 </style>

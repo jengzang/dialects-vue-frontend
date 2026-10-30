@@ -413,7 +413,7 @@ $text-secondary: var(--text-secondary);
 
   .hint {
     margin-top: 6px;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-weight: 400;
     line-height: 1.65;
     letter-spacing: 0.01em;

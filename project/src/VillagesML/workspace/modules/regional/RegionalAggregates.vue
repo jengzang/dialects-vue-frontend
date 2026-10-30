@@ -484,7 +484,7 @@ onBeforeUnmount(() => {
 }
 
 .stat-label {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-bottom: 8px;
 }
@@ -563,7 +563,7 @@ onBeforeUnmount(() => {
   color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-sm);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   cursor: pointer;
   transition: all 0.3s ease;
 }

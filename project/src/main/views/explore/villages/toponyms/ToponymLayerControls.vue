@@ -116,7 +116,7 @@ function handleToggle(key, visible) {
         justify-content: flex-end;
 
         h2 {
-          font-size: var(--font-size-14);
+          font-size: var(--font-size-13);
         }
 
         span {

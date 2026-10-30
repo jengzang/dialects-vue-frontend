@@ -107,7 +107,7 @@ $transition-fast: 0.2s;
   }
 
   @media (max-width: 768px) {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 }
 

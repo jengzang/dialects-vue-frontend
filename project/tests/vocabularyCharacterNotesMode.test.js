@@ -116,7 +116,7 @@ describe('Vocabulary character-notes mode', () => {
     expect(notesCardStyles).toMatch(/\.notes-card-note-text\s*\{[\s\S]*?font-size:\s*var\(--font-size-16\);/)
     expect(portraitStyles).toContain('.word-text {\n        font-size: var(--font-size-14);')
     expect(portraitStyles).toContain('.pronunciation-text {\n        font-size: var(--font-size-12);')
-    expect(portraitStyles).toMatch(/\.notes-card-note-text\s*\{\s*font-size:\s*var\(--font-size-14\);/)
+    expect(portraitStyles).toMatch(/\.notes-card-note-text\s*\{\s*font-size:\s*var\(--font-size-13\);/)
     expect(vocabularySection).toContain('class="card-location-definition-pair"')
     expect(vocabularySection).toContain('shouldShowVocabularyCardNoteToggle')
   })

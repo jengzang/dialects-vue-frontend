@@ -1322,7 +1322,7 @@ const handleApiError = (error) => {
 
 .info-note {
   color: var(--text-secondary);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 400;
   margin-left: 8px;
 }
@@ -1418,7 +1418,7 @@ const handleApiError = (error) => {
 }
 
 .metric-label {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
   color: var(--text-secondary);
   margin-bottom: 8px;
@@ -1577,7 +1577,7 @@ const handleApiError = (error) => {
 }
 
 .stat-card .stat-label {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-bottom: 8px;
   font-weight: 500;
@@ -1635,7 +1635,7 @@ const handleApiError = (error) => {
 }
 
 .sample-label {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   font-weight: 500;
 }
@@ -1652,7 +1652,7 @@ const handleApiError = (error) => {
   background: rgba(var(--vml-blue-rgb), 0.1);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.2);
   border-radius: var(--radius-sm);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-primary);
   transition: all 0.2s ease;
 }
@@ -1788,7 +1788,7 @@ const handleApiError = (error) => {
 }
 
 .display-note {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
 }
 
@@ -1813,7 +1813,7 @@ const handleApiError = (error) => {
 
 .village-region {
   color: var(--text-secondary);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .pagination {

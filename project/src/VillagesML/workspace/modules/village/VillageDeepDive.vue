@@ -323,7 +323,7 @@ watch(() => route.query.villageId, (newId) => {
 }
 
 .village-location {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
 }
 

@@ -171,7 +171,7 @@ const changePage = (page) => {
 .villages-table th {
   padding: 12px;
   text-align: left;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
   color: var(--text-primary);
   background: var(--glass-30);
@@ -180,7 +180,7 @@ const changePage = (page) => {
 
 .villages-table td {
   padding: 12px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   border-bottom: 1px solid var(--glass-20);
 }
 
@@ -228,7 +228,7 @@ const changePage = (page) => {
   border-radius: var(--radius-sm2);
   background: var(--glass-50);
   backdrop-filter: blur(10px);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -243,7 +243,7 @@ const changePage = (page) => {
 }
 
 .page-info {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-primary);
 }
 

@@ -800,7 +800,7 @@ $mobile-width: 150px;
 
         .count-location-jump-nav-text {
           max-width: 104px;
-          font-size: var(--font-size-14);
+          font-size: var(--font-size-13);
         }
       }
     }

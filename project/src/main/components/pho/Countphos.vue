@@ -2129,7 +2129,7 @@ $primary-deep: #003d9e;
 
   .char-count-label {
     color: var(--text-secondary);
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     white-space: nowrap;
   }
 
@@ -2173,7 +2173,7 @@ $primary-deep: #003d9e;
   .chart-block-desc {
     margin: 0 0 14px;
     color: var(--text-dark-light);
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     line-height: 1.6;
   }
 
@@ -2282,7 +2282,7 @@ $primary-deep: #003d9e;
   .stat-item {
     display: flex;
     gap: 4px;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   .stat-label {
@@ -2575,7 +2575,7 @@ $primary-deep: #003d9e;
 
 .modal-stat-label {
   color: rgba(37, 54, 74, 0.68);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
 }
 

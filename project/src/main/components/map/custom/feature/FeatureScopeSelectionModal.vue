@@ -501,7 +501,7 @@ function formatRegionNames(regionNames) {
   .scope-search-input {
     width: 80%;
     height: 38px;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 }
 
@@ -550,7 +550,7 @@ function formatRegionNames(regionNames) {
   }
 
   &-info {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     color: $text-secondary;
     font-weight: 700;
   }
@@ -560,7 +560,7 @@ function formatRegionNames(regionNames) {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: $text-dark;
 
   input {
@@ -571,7 +571,7 @@ function formatRegionNames(regionNames) {
 /* 清空选择: 仅尺寸/颜色覆盖, 视觉见 main/_buttons.scss 的 .pill-btn */
 .scope-clear-btn {
   --pill-btn-color: $text-muted;
-  --pill-btn-font-size: var(--font-size-14);
+  --pill-btn-font-size: var(--font-size-13);
 }
 
 .scope-grid {
@@ -699,7 +699,7 @@ function formatRegionNames(regionNames) {
 
 .scope-selection-meta,
 .scope-selection-status {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: $text-muted;
 }
 

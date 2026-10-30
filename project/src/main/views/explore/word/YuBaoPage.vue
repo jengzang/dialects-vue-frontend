@@ -1250,7 +1250,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   padding-top: 12px;
   margin-top: 12px;
   color: $text-secondary;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   text-align: center;
   border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
@@ -1382,7 +1382,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   font-weight: 500;
 
   @media (max-width: 480px) {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 }
 
@@ -1412,13 +1412,13 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   word-break: break-all;
 
   @media (max-width: 480px) {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 }
 
 .memo-text {
   color: $text-secondary;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   line-height: 1.6;
 }
 
@@ -1490,7 +1490,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 
 .filter-count {
   color: $text-secondary;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
 }
 
@@ -1513,7 +1513,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 
 .no-more {
   color: $text-tertiary;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   letter-spacing: 1px;
 }
 

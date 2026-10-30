@@ -886,7 +886,7 @@ $text-primary: var(--text-primary);
 
   &__label {
     flex-shrink: 0;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-weight: 700;
     color: var(--text-dark-lighter);
   }
@@ -904,7 +904,7 @@ $text-primary: var(--text-primary);
     background: transparent;
     border: none;
     color: var(--text-dark-lighter);
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     cursor: pointer;
     border-radius: var(--radius-sm);
 
@@ -924,7 +924,7 @@ $text-primary: var(--text-primary);
   border: 1px solid rgba(var(--color-primary-rgb), 0.15);
   border-radius: var(--radius-full);
   color: $text-primary;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   text-decoration: none;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -986,7 +986,7 @@ $text-primary: var(--text-primary);
 
   &__desc {
     margin: 0.1rem 0 0;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     color: var(--text-dark-lighter);
   }
 
@@ -1057,7 +1057,7 @@ $text-primary: var(--text-primary);
 
   &__desc {
     margin-top: 0.15rem;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     line-height: 1.4;
     color: var(--text-dark-lighter);
   }

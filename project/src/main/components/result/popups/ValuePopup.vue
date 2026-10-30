@@ -186,7 +186,7 @@ $animation-duration: 0.4s;/* 弹窗基本样式 */
 .popup-content > span {
   display: block;
   margin: 1px 0;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 400;
   line-height: 1.1;
 }

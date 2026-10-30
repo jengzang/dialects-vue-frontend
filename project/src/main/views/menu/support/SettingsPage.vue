@@ -638,7 +638,7 @@ $text-muted: var(--text-tertiary);
 
   .section-description {
     margin-bottom: 14px;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     line-height: 1.45;
   }
 
@@ -656,7 +656,7 @@ $text-muted: var(--text-tertiary);
 
   .interface-mode-radio-group {
     :deep(.liquid-radio-text) {
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
     }
   }
 

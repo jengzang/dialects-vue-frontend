@@ -210,7 +210,7 @@ function levelColor(level, clusterId) {
 }
 
 .county-row {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
 }
 

@@ -1015,7 +1015,7 @@ watch(() => props.activeTab, () => {
   padding: 8px;
   border-radius: var(--radius-sm2);
   cursor: pointer;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   transition: background 0.2s;
 }
 
@@ -1071,7 +1071,7 @@ watch(() => props.activeTab, () => {
   padding: 4px 8px;
   border-radius: var(--radius-sm);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   white-space: nowrap;
   font-family: var(--font-sans);
   font-weight: 500;
@@ -1138,7 +1138,7 @@ watch(() => props.activeTab, () => {
   background: rgba(var(--color-primary-rgb), 0.08);
   border-left: 3px solid var(--color-primary);
   border-radius: var(--radius-sm);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--color-primary);
   font-weight: 500;
 }
@@ -1174,7 +1174,7 @@ watch(() => props.activeTab, () => {
 .info-row .label {
   flex-shrink: 0;
   min-width: 60px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
   color: #6e6e73;
   letter-spacing: 0.3px;

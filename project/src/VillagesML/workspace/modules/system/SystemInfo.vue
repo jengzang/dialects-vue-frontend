@@ -640,7 +640,7 @@ onMounted(() => {
 
   &.small {
     padding: 6px 12px;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 }
 
@@ -667,7 +667,7 @@ onMounted(() => {
 
 .solid-button.small {
   padding: 6px 12px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .overview-grid {
@@ -702,7 +702,7 @@ onMounted(() => {
 }
 
 .card-meta {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-top: 12px;
   padding-top: 12px;

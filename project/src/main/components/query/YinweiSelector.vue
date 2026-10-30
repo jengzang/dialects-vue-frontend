@@ -366,7 +366,7 @@ $glass-blur: 12px;
 
 .help-trigger {
   color: $primary-blue;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   text-decoration: none;
   cursor: pointer;
   transition: opacity $transition-duration;
@@ -478,7 +478,7 @@ $glass-blur: 12px;
   margin: 2px auto 0;
   padding: 4px 12px;
   color: var(--color-warning);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   line-height: 1.4;
   text-align: center;
   background: var(--glass-50);

@@ -146,7 +146,7 @@ watch(
 
 .entry-modal-subtitle {
   grid-column: 1 / 2;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: $text-muted;
 }
 
@@ -165,7 +165,7 @@ watch(
     border-radius: var(--radius-pill);
     background: transparent;
     color: $text-secondary;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-weight: 600;
     cursor: pointer;
     transition:

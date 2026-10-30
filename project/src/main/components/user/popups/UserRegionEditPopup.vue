@@ -340,7 +340,7 @@ $transition-normal: 0.3s;
   background: $primary-background;
   border-radius: $control-radius;
   color: $primary;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
 
   &.primary {

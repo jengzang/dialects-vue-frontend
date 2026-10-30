@@ -284,7 +284,7 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
   margin: 12px auto 6px;
   padding-right: 4px;
   color: var(--color-primary);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
   text-align: center;
   cursor: pointer;
@@ -377,7 +377,7 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
   .user-info-badge {
     margin-bottom: 0;
     color: $text-muted;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-weight: 600;
     letter-spacing: -0.01em;
 
@@ -537,7 +537,7 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
 
   @media (max-width: 576px) {
     margin-top: 1px;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   @media (min-aspect-ratio: 1/1) {

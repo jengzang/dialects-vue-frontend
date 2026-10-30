@@ -341,7 +341,7 @@ watch(detailMode, (val) => {
 }
 
 .subsection-description {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-bottom: 15px;
   line-height: 1.5;
@@ -358,7 +358,7 @@ watch(detailMode, (val) => {
 }
 
 .input-label {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
   color: var(--text-primary);
 }

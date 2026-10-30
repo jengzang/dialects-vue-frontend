@@ -346,7 +346,7 @@ const offsetClass = computed(() => {
 .voronoi-learn-link {
   display: inline-block;
   margin-top: 4px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--color-primary);
   text-decoration: none;
 

@@ -133,7 +133,7 @@ function handleSubmit() {
 
     span {
       color: var(--text-secondary);
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
       line-height: 1.4;
     }
   }
@@ -150,7 +150,7 @@ function handleSubmit() {
     grid-column: 1 / -1;
     margin: 0;
     color: var(--color-error);
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   &__hint {

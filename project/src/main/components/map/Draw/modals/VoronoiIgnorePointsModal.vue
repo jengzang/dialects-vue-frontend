@@ -417,7 +417,7 @@ function formatRegionNames(regionNames) {
   .scope-search-input {
     width: 80%;
     height: 38px;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 }
 

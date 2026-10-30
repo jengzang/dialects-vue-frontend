@@ -1266,7 +1266,7 @@ $warning: var(--color-warning);
   background: rgba($primary, 0.1);
   border-radius: var(--radius-sm);
   white-space: nowrap;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
   letter-spacing: -0.01em;
   color: $primary-dark;
@@ -1314,7 +1314,7 @@ $warning: var(--color-warning);
 .first-place-value,
 .percentile {
   padding: 6px 8px !important;
-  font-size: var(--font-size-14) !important;
+  font-size: var(--font-size-13) !important;
   font-weight: 400;
   color: #aaa;
 }
@@ -1395,7 +1395,7 @@ $warning: var(--color-warning);
     }
 
     &-name {
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
     }
   }
 

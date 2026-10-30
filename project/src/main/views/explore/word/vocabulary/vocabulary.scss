@@ -489,7 +489,7 @@
   min-width: 0;
   max-width: 100%;
   color: var(--text-secondary);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
@@ -602,14 +602,14 @@
 
 .memo-text {
   color: var(--text-secondary);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   line-height: 1.6;
 }
 
 .card-dot-sep {
   color: var(--text-tertiary);
   margin: 0 4px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .upload-mode,
@@ -683,7 +683,7 @@
 .map-detail-meta-value {
   margin: 0;
   color: var(--text-primary);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   line-height: 1.6;
   word-break: break-word;
 }
@@ -882,7 +882,7 @@
 /* 折叠区复用 .map-detail-meta 的排版，但不使用「末行置灰」的页脚样式 */
 .location-details-item .map-detail-meta-item:last-child .map-detail-meta-value {
   color: var(--text-primary);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .load-more-btn {
@@ -1214,7 +1214,7 @@
 
   p {
     margin: 6px 0 0;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     color: var(--text-secondary);
   }
 }
@@ -1410,7 +1410,7 @@
 .log-timestamp {
   cursor: help;
   color: var(--text-secondary);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   white-space: nowrap;
 }
 
@@ -1560,7 +1560,7 @@
   }
 
   .word-text {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   .pronunciation-text {
@@ -1579,7 +1579,7 @@
     }
 
     .notes-card-note-text {
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
     }
   }
 
@@ -1601,7 +1601,7 @@
     }
 
     .notes-card-note-text {
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
     }
   }
 

@@ -275,7 +275,7 @@ function handleClose(value = false) {
   min-width: 0;
 
   .scope-selection-title {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-weight: 700;
     color: $text-strong;
     white-space: nowrap;

@@ -757,7 +757,7 @@ $portrait-ratio: 1;
   overflow: hidden;
   color: var(--text-secondary);
   white-space: nowrap;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .region-caret {
@@ -791,7 +791,7 @@ $portrait-ratio: 1;
 
   color: var(--text-primary);
   white-space: nowrap;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 
   &.custom-region-tag {
     background: var(--surface-selected);
@@ -872,7 +872,7 @@ $portrait-ratio: 1;
 .topbar-empty {
   flex: 1;
   color: rgba(60, 60, 60, 0.7);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .topbar-right-actions {
@@ -885,7 +885,7 @@ $portrait-ratio: 1;
 
 .topbar-title {
   color: var(--text-primary);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 700;
 }
 
@@ -904,7 +904,7 @@ $portrait-ratio: 1;
   border: none;
   border-radius: var(--radius-sm);
   white-space: nowrap;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -965,7 +965,7 @@ $portrait-ratio: 1;
   border-radius: var(--radius-md);
   box-shadow: 0 10px 26px rgba(var(--color-primary-rgb), 0.18);
   color: var(--action-primary-text);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 700;
   cursor: pointer;
 
@@ -1066,7 +1066,7 @@ $portrait-ratio: 1;
 
   border-radius: var(--radius-md);
   color: var(--color-primary);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 700;
   opacity: 0.85;
   cursor: pointer;
@@ -1153,7 +1153,7 @@ $portrait-ratio: 1;
 
 .region-info {
   color: var(--text-tertiary);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .region-desc {

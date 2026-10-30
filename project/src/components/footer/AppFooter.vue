@@ -460,7 +460,7 @@ onBeforeUnmount(() => {
 
 .footer-meta .info-text {
   color: var(--text-secondary);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .footer-theme-label {

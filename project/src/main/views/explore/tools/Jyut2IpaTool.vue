@@ -989,7 +989,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
 
   &-title {
     margin-bottom: 4px;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-weight: 600;
     color: $color-text;
   }
@@ -1192,7 +1192,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   &-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
 
     thead {
       position: sticky;
@@ -1338,7 +1338,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   &-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
 
     thead {
       position: sticky;
@@ -1378,7 +1378,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   border: 1px solid rgba(var(--color-primary-rgb), 0.15);
   border-radius: var(--radius-sm);
   font-family: var(--font-mono);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   transition: all 0.2s ease;
   color: var(--color-primary-hover);
 
@@ -1427,7 +1427,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     background: rgba(var(--color-error-light-rgb), 0.1);
     border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
     border-radius: var(--radius-sm);
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     color: $color-danger;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -1557,7 +1557,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   gap: 6px;
 
   &__hint {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     line-height: 1.5;
     color: $text-70;
     text-align: center;
@@ -1581,7 +1581,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   }
 
   .subtitle {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   .info {
@@ -1611,7 +1611,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     }
 
     &-desc {
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
     }
   }
 
@@ -1718,7 +1718,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   .category-tab {
     padding: 8px 12px;
     white-space: nowrap;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   .rules {

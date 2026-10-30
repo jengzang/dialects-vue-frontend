@@ -156,7 +156,7 @@ $table-radius: 8px;
 .help-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 
   thead {
     position: sticky;

@@ -109,7 +109,7 @@ watch(() => props.modelValue, (isOpen) => {
   .scope-search-input {
     width: 100%;
     height: 38px;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     box-sizing: border-box;
   }
 }
@@ -142,7 +142,7 @@ watch(() => props.modelValue, (isOpen) => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 700;
   color: var(--text-strong);
 }

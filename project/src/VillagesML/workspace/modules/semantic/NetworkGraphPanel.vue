@@ -280,7 +280,7 @@ onBeforeUnmount(() => {
   background: rgba(var(--vml-blue-rgb), 0.1);
   border-radius: var(--radius-md);
   margin-bottom: 16px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .metadata-item {
@@ -344,7 +344,7 @@ onBeforeUnmount(() => {
   padding: 6px 12px;
   background: var(--glass-50);
   border-radius: var(--radius-sm2);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .legend-color {

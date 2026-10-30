@@ -274,7 +274,7 @@ const runAnalysis = () => {
 }
 
 .notice-text {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--color-warning-dark);
   font-weight: 500;
 }

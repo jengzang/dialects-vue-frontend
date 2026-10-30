@@ -409,7 +409,7 @@ const resetView = () => {
   padding: 8px;
   border-radius: var(--radius-sm2);
   cursor: pointer;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   transition: background 0.2s;
   display: flex;
   justify-content: center;

@@ -175,7 +175,7 @@ $transition-duration: 0.2s;
 
   .stat-count {
     color: $text-secondary;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 }
 
@@ -196,7 +196,7 @@ $transition-duration: 0.2s;
   }
 
   .char-list {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 }
 </style>

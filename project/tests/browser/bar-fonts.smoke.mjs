@@ -42,7 +42,7 @@ try {
     [767, 0.94], [768, 0.96], [1023, 0.96], [1024, 0.98],
     [1279, 0.98], [1280, 1], [1535, 1], [1536, 1.04], [3840, 1.04],
   ]
-  const fontSizes = [12, 14, 16, 18, 20, 24, 28, 32, 48]
+  const fontSizes = [12, 13, 14, 16, 18, 20, 24, 28, 32, 48]
   for (const [width, scale] of widthCases) {
     await page.setViewportSize({ width, height: Math.max(100, Math.floor(width / 2)) })
     await page.setContent(`<style>${globalCss}</style>${fontSizes.map(size =>
@@ -56,7 +56,8 @@ try {
     }), fontSizes)
     assert.equal(measured.root, '16px', `${width}px: root font must retain the browser default`)
     measured.sizes.forEach((actual, index) => {
-      const expected = Math.max(10, fontSizes[index] * scale)
+      const baseSize = fontSizes[index] === 12 ? 11 : fontSizes[index]
+      const expected = Math.max(10, baseSize * scale)
       assert.ok(Math.abs(actual.font - expected) < 0.02, `${width}px: font ${fontSizes[index]} expected ${expected}, received ${actual.font}`)
       assert.equal(actual.padding, '16px', `${width}px: rem padding changed`)
       assert.equal(actual.margin, '16px', `${width}px: rem margin changed`)
@@ -65,7 +66,7 @@ try {
     const portraitFont = await page.locator('#size-16').evaluate(element => parseFloat(getComputedStyle(element).fontSize))
     assert.ok(Math.abs(portraitFont - 16 * scale) < 0.02, `${width}px: orientation added an unwanted font multiplier`)
   }
-  console.log('Six font breakpoints: boundaries, nine sizes, orientation independence and unchanged root/rem spacing verified')
+  console.log('Six font breakpoints: boundaries, ten tokens (legacy 12 = 11px), orientation independence and unchanged root/rem spacing verified')
   for (const bar of bars) {
     const prefix = bar.name === 'NavBar' ? 'navbar' : bar.name === 'ExploreBar' ? 'explorebar' : 'commonbar'
     const item = bar.name === 'NavBar' ? 'menu-item' : 'tab-item'

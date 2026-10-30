@@ -157,7 +157,7 @@ const {
   .stage-kicker {
     margin: 0;
     color: var(--color-primary);
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -349,7 +349,7 @@ const {
     border-radius: var(--radius-pill);
     background: rgba(var(--color-primary-rgb), 0.12);
     color: var(--color-primary);
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   .panel-actions {
@@ -403,7 +403,7 @@ const {
   .status-badge {
     padding: 6px 10px;
     border-radius: var(--radius-pill);
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-weight: 700;
   }
 

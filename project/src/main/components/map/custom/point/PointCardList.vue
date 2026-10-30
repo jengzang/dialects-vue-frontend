@@ -141,7 +141,7 @@ const filteredItems = computed(() => {
 }
 
 .point-card-region {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: $text-secondary;
 }
 

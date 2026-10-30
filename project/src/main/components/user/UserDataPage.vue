@@ -961,7 +961,7 @@ $user-accent: var(--color-primary);
   border-collapse: separate;
   border-spacing: 0 8px;
   table-layout: auto;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 
   th,
   td {
@@ -1096,7 +1096,7 @@ $user-accent: var(--color-primary);
   border: 1px solid rgba(var(--color-primary-rgb), 0.12);
   border-radius: 14px;
   color: var(--text-slate);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
   background: rgba(var(--color-primary-rgb), 0.06);
 }
@@ -1134,7 +1134,7 @@ $user-accent: var(--color-primary);
   min-width: 860px;
   border-collapse: separate;
   border-spacing: 0;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 
   thead {
     position: sticky;
@@ -1172,7 +1172,7 @@ $user-accent: var(--color-primary);
   input {
     min-width: 0;
     height: 34px;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   .col-index {
@@ -1218,7 +1218,7 @@ $user-accent: var(--color-primary);
     display: block;
     margin-bottom: 7px;
     color: var(--text-dark);
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-weight: 800;
   }
 
@@ -1277,7 +1277,7 @@ $user-accent: var(--color-primary);
 
   .username-badge {
     max-width: 160px;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   .stats {
@@ -1288,7 +1288,7 @@ $user-accent: var(--color-primary);
     span {
       flex: 1;
       justify-content: center;
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
     }
   }
 
@@ -1313,7 +1313,7 @@ $user-accent: var(--color-primary);
 
   .glass-button {
     padding-inline: 10px;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   .search-input {
@@ -1347,7 +1347,7 @@ $user-accent: var(--color-primary);
   .pagination-size {
     justify-content: center;
     text-align: center;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   .pagination-controls {

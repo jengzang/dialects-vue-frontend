@@ -1729,7 +1729,7 @@ $glass-transition: all 0.3s ease;
   padding: 8px;
 
   color: var(--action-primary-text);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 
   background: var(--color-primary);
   border: 0;

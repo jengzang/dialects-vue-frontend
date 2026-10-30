@@ -402,7 +402,7 @@ $arrow-transition: 0.2s ease;
   // width: 100%;
   padding: 6px 10px;
   color: $text-primary;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   background: var(--glass-90);
   border: 1px solid var(--border-control);
   border-radius: var(--radius-sm);
@@ -469,7 +469,7 @@ $arrow-transition: 0.2s ease;
 .empty-message {
   padding: 20px;
   color: $text-muted;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   text-align: center;
 }
 </style>

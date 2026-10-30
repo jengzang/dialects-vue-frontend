@@ -384,7 +384,7 @@ onMounted(() => {
   color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-sm);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
   cursor: pointer;
   margin-bottom: 4px;
@@ -693,7 +693,7 @@ onMounted(() => {
   }
 
   .feature-description {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     line-height: 1.5;
   }
 
@@ -723,7 +723,7 @@ onMounted(() => {
   }
 
   .section-description {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   .quick-search {

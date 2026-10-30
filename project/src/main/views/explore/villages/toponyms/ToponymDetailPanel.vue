@@ -197,7 +197,7 @@ function formatCoordinates(coordinates) {
   &__status,
   &__error {
     margin: 0;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     line-height: 1.6;
   }
 
@@ -222,7 +222,7 @@ function formatCoordinates(coordinates) {
 
     strong {
       color: var(--text-deep);
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
       font-weight: 600;
     }
   }

@@ -738,7 +738,7 @@ $preview-min-column-width: 120px;
 
   &__toolbar-label {
     color: $text-secondary;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     align-self: center;
   }
 
@@ -808,7 +808,7 @@ $preview-min-column-width: 120px;
     p {
       margin: 0;
       color: $text-secondary;
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
       line-height: 1.5;
     }
   }
@@ -903,7 +903,7 @@ $preview-min-column-width: 120px;
     width: max(100%, calc(var(--tabular-import-preview-column-count) * #{$preview-min-column-width}));
     height: 100%;
     min-height: 100%;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   &__table-header,

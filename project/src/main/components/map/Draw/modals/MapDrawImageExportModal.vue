@@ -322,7 +322,7 @@ watch(
   padding: 14px 16px;
 
   .scope-panel-title {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-weight: 700;
     color: $text-strong;
   }
@@ -362,7 +362,7 @@ watch(
   gap: 2px;
 
   .scope-selection-title {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-weight: 600;
     color: $text-strong;
   }

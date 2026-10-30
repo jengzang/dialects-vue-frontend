@@ -322,7 +322,7 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     .toast-icon {
       width: 22px;
       height: 22px;
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
     }
 
     &.position-right {

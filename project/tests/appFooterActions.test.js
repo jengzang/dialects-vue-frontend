@@ -338,7 +338,7 @@ describe('AppFooter actions', () => {
     expect(actionBlock).toContain('color: var(--color-primary-hover);')
     expect(actionBlock).toContain('font-weight: 600;')
     expect(metaInfoBlock).toContain('color: var(--text-secondary);')
-    expect(metaInfoBlock).toContain('font-size: var(--font-size-14);')
+    expect(metaInfoBlock).toContain('font-size: var(--font-size-13);')
     expect(themeLabelBlock).toBeTruthy()
     expect(themeLabelBlock).toContain('color: var(--color-primary-hover);')
     expect(source).not.toContain('grid-template-columns:')

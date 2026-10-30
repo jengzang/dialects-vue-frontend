@@ -831,7 +831,7 @@ $transition-base: 0.3s;
 .reload-btn {
   padding: 8px 16px;
   color: $primary-blue;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
   cursor: pointer;
   background: rgba(var(--color-primary-rgb), 0.05);
@@ -920,7 +920,7 @@ $transition-base: 0.3s;
 
 .retry-btn-small {
   padding: 6px 14px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   border-radius: var(--radius-sm2);
 }
 

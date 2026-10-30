@@ -174,7 +174,7 @@ h3 { font-size: var(--font-size-16); margin-top: 20px; }
 .run-selector { min-width: 0; }
 .run-selector label { font-size: var(--font-size-12); color: var(--text-secondary); }
 .run-select {
-  padding: 8px 12px; border-radius: var(--radius-sm2); font-size: var(--font-size-14);
+  padding: 8px 12px; border-radius: var(--radius-sm2); font-size: var(--font-size-13);
   border: 1px solid var(--glass-60); background: var(--glass-50);
   max-width: 360px;
 }

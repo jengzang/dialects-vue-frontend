@@ -120,7 +120,7 @@ const close = () => {
   min-width: 0;
   height: 100%;
   padding: 0 8px 0 0;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-deep);
   background: transparent;
   border: none;

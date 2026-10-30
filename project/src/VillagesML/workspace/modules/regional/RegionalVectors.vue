@@ -719,7 +719,7 @@ onUnmounted(() => {
   color: var(--action-primary-text);
   padding: 4px 12px;
   border-radius: var(--radius-md);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
 }
 
@@ -813,7 +813,7 @@ onUnmounted(() => {
   background: linear-gradient(135deg, var(--vml-blue), var(--vml-blue-darker));
   color: var(--action-primary-text);
   border-radius: var(--radius-lg);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
 }
 
@@ -851,7 +851,7 @@ onUnmounted(() => {
 }
 
 .info-label {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   background: rgba(var(--vml-blue-rgb), 0.1);
   padding: 4px 10px;
@@ -892,7 +892,7 @@ onUnmounted(() => {
 
 .stat-item .label {
   font-weight: 500;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
 }
 
@@ -969,7 +969,7 @@ onUnmounted(() => {
 }
 
 .metric-label {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-bottom: 8px;
 }

@@ -592,7 +592,7 @@ const resetForm = () => {
   }
 
   .form-group label {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     max-width: 70px;     /* 移动端减小 label 宽度 */
     min-width: 70px;
   }
@@ -658,7 +658,7 @@ const resetForm = () => {
 
   .form-group input,
   .form-group textarea {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     padding: 6px 8px;
   }
 

@@ -103,7 +103,7 @@ function handleConfirm() {
 .river-import-desc {
   margin: 0;
   color: var(--text-secondary);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   line-height: 1.5;
 }
 

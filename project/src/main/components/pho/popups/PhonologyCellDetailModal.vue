@@ -146,7 +146,7 @@ $text-secondary: var(--text-slate);
 
 .item-label {
   color: $text-main;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 700;
 }
 
@@ -161,7 +161,7 @@ $text-secondary: var(--text-slate);
 .item-chars {
   color: $text-body;
   word-break: break-all;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   line-height: 1.6;
 }
 

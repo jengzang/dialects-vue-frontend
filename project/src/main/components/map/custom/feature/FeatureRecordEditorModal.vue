@@ -595,7 +595,7 @@ watch(
   gap: 10px;
 
   span {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-weight: 700;
     color: $text-strong;
     min-width: 45px;
@@ -644,7 +644,7 @@ watch(
   align-items: center;
   cursor: pointer;
   text-align: left;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   border-bottom: 1px solid $muted-border;
   transition: background-color 0.18s ease;
 
@@ -770,7 +770,7 @@ watch(
 
   &::before {
     content: "⚠️";
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   &--inline {
@@ -792,7 +792,7 @@ watch(
 
   p {
     margin: 8px 0 0;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     color: $text-secondary;
     line-height: 1.7;
   }
@@ -820,7 +820,7 @@ watch(
   background: rgba(var(--color-warning-rgb), 0.08);
   border-left: 3px solid $warning;
   border-radius: 0 $radius-sm $radius-sm 0;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: $text-secondary;
   line-height: 1.6;
 }

@@ -587,7 +587,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   gap: 8px;
   align-items: center;
   color: $text-primary;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
   cursor: pointer;
   user-select: none;
@@ -613,7 +613,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .control-label {
   color: $text-primary;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
   letter-spacing: -0.01em;
 }
@@ -711,7 +711,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   align-items: center;
   margin-top: 4px;
   color: $text-secondary;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 550;
 
   input[type="color"] {
@@ -766,7 +766,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   gap: 8px;
   align-items: center;
   color: $text-secondary;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 550;
 
   input[type="color"] {
@@ -781,7 +781,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   width: 100%;
   margin-top: 8px;
   color: $text-secondary;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 550;
 
   .glass-range {
@@ -804,7 +804,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .text-color-btn {
   padding: 8px 16px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
   cursor: pointer;
   border: 1px solid rgba(0, 0, 0, 0.08);

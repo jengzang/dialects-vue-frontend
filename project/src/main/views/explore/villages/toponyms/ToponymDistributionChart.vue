@@ -421,7 +421,7 @@ defineExpose({ showConfigModal });
     > span:first-child {
       min-inline-size: 60px;
       color: var(--text-secondary);
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
     }
 
     .glass-range {

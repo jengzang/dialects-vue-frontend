@@ -401,7 +401,7 @@ $transition-tooltip: 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
   position: absolute;
   padding: 10px 14px;
   color: $text-color;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   line-height: 1.5;
   text-align: center;
   overflow-wrap: break-word;

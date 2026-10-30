@@ -764,7 +764,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .toggle-label {
   color: var(--text-dark-medium);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
 }
 
@@ -817,7 +817,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 .selection-warning-inline {
   color: $warning;
   white-space: nowrap;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
 }
 
@@ -1092,7 +1092,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 
     :deep(.leaf-item) {
       padding: 6px 8px;
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
     }
 
     &.selection-mode {

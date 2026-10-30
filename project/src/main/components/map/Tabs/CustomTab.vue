@@ -952,7 +952,7 @@ const openEntryModal = () => {
   border: none;
   background: transparent;
   color: var(--text-deep);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   outline: none;
 
   &::placeholder {
@@ -1045,7 +1045,7 @@ const openEntryModal = () => {
 .inline-btn {
   padding: 6px 16px !important;
   border-radius: var(--radius-lg) !important;
-  font-size: var(--font-size-14) !important;
+  font-size: var(--font-size-13) !important;
 }
 
 .tree-categories-list {
@@ -1179,7 +1179,7 @@ const openEntryModal = () => {
   border-radius: var(--radius-sm2);
   background: none;
   color: $primary;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;

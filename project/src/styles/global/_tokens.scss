@@ -12,8 +12,9 @@
   --font-sans: system-ui, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif;
   --font-serif: "Times New Roman", "Songti SC", Georgia, "Noto Serif CJK SC", "STSong", serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-  // Nine font sizes; suffix = CSS px at a 16px root in the xl tier.
-  --font-size-12: 0.75rem;
+  // Ten tokens; xl sizes use a 16px root. Legacy token 12 now represents 11px.
+  --font-size-12: 0.6875rem;
+  --font-size-13: 0.8125rem;
   --font-size-14: 0.875rem;
   --font-size-16: 1rem;
   --font-size-18: 1.125rem;
@@ -290,8 +291,8 @@ $font-size-width-scales: (
 @each $min-width, $scale in $font-size-width-scales {
   @media (min-width: $min-width) {
     :root {
-      @each $size in (12, 14, 16, 18, 20, 24, 28, 32, 48) {
-        --font-size-#{$size}: #{math.div(math.max(10, $size * $scale), 16) * 1rem};
+      @each $token, $base-size in (12: 11, 13: 13, 14: 14, 16: 16, 18: 18, 20: 20, 24: 24, 28: 28, 32: 32, 48: 48) {
+        --font-size-#{$token}: #{math.div(math.max(10, $base-size * $scale), 16) * 1rem};
       }
     }
   }

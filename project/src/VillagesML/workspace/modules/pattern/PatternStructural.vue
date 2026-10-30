@@ -199,7 +199,7 @@ const goToTendency = (pattern) => {
   background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
   border-radius: var(--radius-md);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
 }
 
@@ -234,7 +234,7 @@ const goToTendency = (pattern) => {
 }
 
 .examples-label {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
 }
 
@@ -249,7 +249,7 @@ const goToTendency = (pattern) => {
   background: rgba(var(--color-success-rgb), 0.2);
   color: var(--color-success);
   border-radius: var(--radius-md);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   cursor: pointer;
   transition: all 0.3s ease;
 }

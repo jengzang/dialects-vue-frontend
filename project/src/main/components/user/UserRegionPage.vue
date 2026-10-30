@@ -999,7 +999,7 @@ padding:20px;
     width: 100%;
     min-height: 38px;
     padding-inline: 10px;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   .back-btn {

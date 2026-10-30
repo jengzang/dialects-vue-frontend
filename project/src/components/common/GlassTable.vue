@@ -155,7 +155,7 @@ thead {
 
 th {
   padding: 10px 12px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
   color: var(--text-secondary);
   text-align: left;
@@ -241,7 +241,7 @@ tbody tr {
 
   th, td {
     padding: 8px 10px;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 }
 </style>

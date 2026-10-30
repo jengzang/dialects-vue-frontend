@@ -313,7 +313,7 @@ $overlay-transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
     .edit-overlay-text {
       color: $white;
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
       font-weight: 600;
       letter-spacing: 0.05em;
       transform: translateY(4px);

@@ -365,7 +365,7 @@ $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);/*
 .notice-meta {
   margin: 6px 0 0;
   color: $text-meta;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   line-height: 1.45;
 
   @media (max-width: 768px) {

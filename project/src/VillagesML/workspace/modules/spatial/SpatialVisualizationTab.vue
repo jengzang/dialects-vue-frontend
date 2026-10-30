@@ -851,7 +851,7 @@ h2 {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-primary);
 }
 
@@ -885,7 +885,7 @@ h2 {
 .stat-item {
   display: flex;
   justify-content: space-between;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .stat-label {

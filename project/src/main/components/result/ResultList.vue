@@ -932,7 +932,7 @@ $transition-duration: 0.2s;
   padding: 4px 10px;
   color: $primary-blue;
   font-family: var(--font-sans);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
   white-space: nowrap;
   cursor: pointer;

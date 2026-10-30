@@ -950,7 +950,7 @@ watch(
   align-items: center;
   cursor: pointer;
   text-align: left;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   border-bottom: 1px solid $muted-border;
   transition: background-color 0.18s ease;
 
@@ -1069,7 +1069,7 @@ watch(
 
 .point-rows-description {
   margin: 0;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: $text-muted;
 }
 
@@ -1205,7 +1205,7 @@ watch(
 
 .point-save-message {
   margin-top: $radius-md;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: $text-secondary;
 }
 
@@ -1223,7 +1223,7 @@ watch(
 
   &::before {
     content: "⚠️";
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 }
 
@@ -1240,7 +1240,7 @@ watch(
 
   p {
     margin: 8px 0 0;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     color: $text-secondary;
     line-height: 1.7;
   }
@@ -1268,7 +1268,7 @@ watch(
   background: rgba(var(--color-warning-rgb), 0.08);
   border-left: 3px solid $warning;
   border-radius: 0 $radius-sm $radius-sm 0;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: $text-secondary;
   line-height: 1.6;
 }
@@ -1316,7 +1316,7 @@ watch(
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 
   th,
   td {

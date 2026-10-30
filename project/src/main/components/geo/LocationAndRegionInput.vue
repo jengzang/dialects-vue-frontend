@@ -1470,7 +1470,7 @@ $portrait-ratio: 1;
   opacity: 0.9;
   color: var(--color-warning);
   text-align: center;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   line-height: 1.4;
 }
 
@@ -1489,7 +1489,7 @@ $portrait-ratio: 1;
   color: var(--text-dark-medium);
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   line-height: 1.35;
 }
 
@@ -1501,7 +1501,7 @@ $portrait-ratio: 1;
   border-radius: var(--radius-pill);
   color: var(--color-primary);
   white-space: nowrap;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   cursor: pointer;
   user-select: none;
 

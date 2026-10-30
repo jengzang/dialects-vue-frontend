@@ -520,7 +520,7 @@ $text-secondary: var(--text-slate);
   word-break: break-all;
 
   @media (max-aspect-ratio: 1/1) {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 }
 

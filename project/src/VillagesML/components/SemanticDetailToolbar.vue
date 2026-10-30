@@ -162,7 +162,7 @@ const countParentChars = (subcats) => {
 }
 
 .lexicon-meta {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-bottom: 20px;
   padding-bottom: 12px;
@@ -197,7 +197,7 @@ const countParentChars = (subcats) => {
 }
 
 .parent-count {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-left: auto;
   padding: 2px 10px;
@@ -222,7 +222,7 @@ const countParentChars = (subcats) => {
 }
 
 .subcategory-name {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
   color: var(--color-primary);
   white-space: nowrap;

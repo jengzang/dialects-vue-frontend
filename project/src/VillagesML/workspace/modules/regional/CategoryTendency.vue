@@ -354,7 +354,7 @@ const loadRegionalNgrams = async () => {
 }
 
 .tendency-freq {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   text-align: right;
 }
@@ -432,7 +432,7 @@ const loadRegionalNgrams = async () => {
 }
 
 .col-region {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .region-badge {

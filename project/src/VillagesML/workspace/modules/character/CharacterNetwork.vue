@@ -253,7 +253,7 @@ onBeforeUnmount(() => {
 }
 
 .progress-panel { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.progress-text { font-size: var(--font-size-14); color: var(--text-secondary, var(--text-tertiary)); margin: 0; }
+.progress-text { font-size: var(--font-size-13); color: var(--text-secondary, var(--text-tertiary)); margin: 0; }
 .progress-bar-track {
   width: 100%; height: 6px; background: rgba(0, 0, 0, 0.08);
   border-radius: 3px; margin-top: var(--radius-xs);
@@ -263,8 +263,8 @@ onBeforeUnmount(() => {
   border-radius: 3px; transition: width 0.3s ease;
 }
 
-.graph-stats { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 12px; font-size: var(--font-size-14); color: var(--text-secondary, var(--text-tertiary)); }
-.depth-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; font-size: var(--font-size-14); }
+.graph-stats { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 12px; font-size: var(--font-size-13); color: var(--text-secondary, var(--text-tertiary)); }
+.depth-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; font-size: var(--font-size-13); }
 .legend-item { display: flex; align-items: center; gap: 4px; }
 .legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: var(--radius-full); }
 

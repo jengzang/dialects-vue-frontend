@@ -375,7 +375,7 @@ $transition-fast: 0.2s;
   padding: 8px 0;
   border: 1px solid $primary-divider;
   color: $primary;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
   &:hover {
     background: $primary-background-medium;
@@ -405,7 +405,7 @@ $transition-fast: 0.2s;
   border-spacing: 0;
   border-collapse: separate;
   border-radius: var(--radius-sm2);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 
   th,
   td {
@@ -451,7 +451,7 @@ $transition-fast: 0.2s;
   border-radius: var(--radius-sm, 4px);
   background: transparent;
   cursor: pointer;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   line-height: 1;
   vertical-align: middle;
   transition: background 0.2s ease;
@@ -466,11 +466,11 @@ $transition-fast: 0.2s;
   .info-item {
     .info-label {
       min-width: 90px;
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
     }
 
     .info-value {
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
     }
   }
 }

@@ -909,7 +909,7 @@ $panel-radius-portrait: 24px;
 }
 
 .limit-hint {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .tree-panel {

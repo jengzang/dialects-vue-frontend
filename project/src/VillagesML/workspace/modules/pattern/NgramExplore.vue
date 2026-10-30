@@ -347,7 +347,7 @@ onMounted(async () => {
   background: rgba(var(--vml-blue-rgb), 0.08);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.25);
   border-radius: var(--radius-md);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .banner-item {
@@ -577,7 +577,7 @@ onMounted(async () => {
   background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
   border-radius: var(--radius-md);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .type-badge {

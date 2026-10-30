@@ -609,7 +609,7 @@ function formatCoordinates(longitude, latitude) {
 
   span {
     color: var(--text-secondary);
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-weight: 600;
   }
 }
@@ -665,7 +665,7 @@ function formatCoordinates(longitude, latitude) {
 
   span {
     color: var(--text-secondary);
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 }
 
@@ -673,7 +673,7 @@ function formatCoordinates(longitude, latitude) {
   margin: 0;
   padding: 10px 12px;
   color: var(--text-secondary);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .toponym-search-page__result-grid {

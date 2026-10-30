@@ -2169,7 +2169,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     padding-top: 30px;
     --glass-button-padding: 8px 16px;
     --glass-button-border-radius: var(--radius-md);
-    --glass-button-font-size: var(--font-size-14);
+    --glass-button-font-size: var(--font-size-13);
     --glass-button-small-padding: 6px 12px;
     --glass-button-small-font-size: var(--font-size-12);
     --glass-button-white-space: nowrap;
@@ -2593,7 +2593,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
     .label {
       flex: 1;
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
     }
 
     .count {
@@ -2625,7 +2625,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   }
 
   &-section-title {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-weight: 600;
     margin-bottom: 8px;
     flex-shrink: 0;
@@ -2707,7 +2707,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   }
 
   &-rime-section-title {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-weight: 600;
     margin-bottom: 4px;
     flex-shrink: 0;
@@ -2887,7 +2887,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   }
 
   &-rows {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     color: $text-muted;
   }
 }
@@ -2946,7 +2946,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   &-stats {
     display: flex;
     gap: 16px;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     align-items: center;
     flex-wrap: wrap;
 
@@ -3084,7 +3084,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     text-align: center;
     font-weight: 600;
     color: $text-main;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     border-right: 1px solid var(--glass-30);
 
     &:last-child {
@@ -3125,7 +3125,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   padding: 10px 12px;
   text-align: center;
   @include flex-center;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   border-right: 1px solid var(--glass-10);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -3265,7 +3265,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     padding: 8px 12px;
     margin-bottom: 8px;
     border-radius: var(--radius-sm2);
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-family: var(--font-mono);
 
     &.success {
@@ -3300,7 +3300,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     padding: 8px 12px;
     @include glass-surface($glass-strong, 8px, 8px);
     color: $text-main;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     transition: all 0.2s ease;
 
     &:focus {
@@ -3405,7 +3405,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     label {
       display: block;
       margin-bottom: 6px;
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
       font-weight: 600;
       color: $text-main;
     }
@@ -3431,13 +3431,13 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     ul {
       margin: 0;
       padding-left: 20px;
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
       line-height: 1.8;
     }
 
     p {
       margin: 8px 0;
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
       line-height: 1.6;
       color: rgba(var(--text-deep-rgb), 0.8);
     }
@@ -3499,7 +3499,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   }
 
   .subtitle {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   .format {
@@ -3509,7 +3509,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     }
 
     &-label {
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
       margin-bottom: 10px;
     }
 
@@ -3545,7 +3545,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   .feature {
     &-item {
       padding: 8px 10px;
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
       gap: 10px;
     }
 
@@ -3632,7 +3632,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
     &-search {
       padding: 8px 12px;
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
     }
 
     &-list {
@@ -3742,7 +3742,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
   .mode {
     &-indicator {
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
       padding: 8px 14px;
     }
   }
@@ -3750,7 +3750,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   .toolbar {
     &-btn {
       padding: 10px 16px;
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
       white-space: nowrap;
     }
   }
@@ -3816,7 +3816,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
   .form {
     &-group label {
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
     }
 
     &-input,
@@ -3844,7 +3844,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
     &-tab {
       padding: 8px 12px;
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
       white-space: nowrap;
     }
   }
@@ -3983,7 +3983,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     }
 
     &-title {
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
     }
 
     &-content {

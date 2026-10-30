@@ -1334,7 +1334,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-desc {
     margin: 0;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     color: var(--text-dark-lighter);
   }
 
@@ -1631,7 +1631,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-text {
     margin: 0;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     color: var(--text-secondary);
   }
 }
@@ -1642,7 +1642,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   color: var(--text-dark-lighter);
 
   &-muted {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     color: var(--text-secondary);
   }
 }

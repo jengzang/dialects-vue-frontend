@@ -764,7 +764,7 @@ watch(
     label {
       color: var(--text-dark);
       text-align: center;
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
       font-weight: 600;
     }
   }

@@ -353,7 +353,7 @@ const getRegionLevelName = (level) => {
 }
 
 .input-label {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
   color: var(--text-primary);
 }
@@ -418,7 +418,7 @@ const getRegionLevelName = (level) => {
   background: rgba(var(--vml-blue-rgb), 0.15);
   color: var(--color-primary);
   border-radius: var(--radius-md);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
 }
 

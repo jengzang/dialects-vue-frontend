@@ -203,7 +203,7 @@ const clearFilters = () => {
   border-radius: var(--radius-md);
   background: rgba(var(--color-warning-rgb), 0.2);
   color: var(--color-warning);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   cursor: pointer;
   transition: all 0.3s ease;
 }

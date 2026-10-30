@@ -291,7 +291,7 @@ $card-radius: 8px;
 .global-expand-btn {
   padding: 4px 12px;
   color: var(--color-primary-hover);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;

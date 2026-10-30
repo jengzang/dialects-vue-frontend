@@ -175,7 +175,7 @@ watch(detailMode, (val) => {
 }
 
 .input-label {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
   color: var(--text-primary);
 }

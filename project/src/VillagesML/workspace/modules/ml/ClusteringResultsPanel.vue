@@ -361,7 +361,7 @@ const handleQuickAdjust = (action) => {
 }
 
 .metric-label {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-bottom: 8px;
 }
@@ -403,7 +403,7 @@ const handleQuickAdjust = (action) => {
   padding: 4px 12px;
   border-radius: var(--radius-md);
   color: white;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
 }
 
@@ -495,13 +495,13 @@ const handleQuickAdjust = (action) => {
 }
 
 .assignments-table th {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .assignments-table td {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .region-name {
@@ -560,7 +560,7 @@ const handleQuickAdjust = (action) => {
 }
 
 .alert-message {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin: 0 0 12px 28px;
   line-height: 1.5;
@@ -569,7 +569,7 @@ const handleQuickAdjust = (action) => {
 .quick-adjust-button {
   margin-left: 28px;
   padding: 8px 16px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
   background: rgba(var(--vml-blue-rgb), 0.15);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
@@ -617,7 +617,7 @@ const handleQuickAdjust = (action) => {
 
 .region-grid .region-tag {
   padding: 6px 12px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 @media (max-width: 768px) {

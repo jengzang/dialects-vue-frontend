@@ -726,7 +726,7 @@ onMounted(() => {
 }
 
 .query-note {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin: 0;
   padding: 4px 12px;
@@ -788,7 +788,7 @@ onMounted(() => {
 }
 
 .map-note {
-  font-size: var(--font-size-14) !important;
+  font-size: var(--font-size-13) !important;
   color: var(--text-secondary);
 }
 
@@ -851,7 +851,7 @@ onMounted(() => {
 }
 
 .tendency-value {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
   color: var(--color-primary);
   text-align: right;
@@ -872,12 +872,12 @@ onMounted(() => {
 }
 
 .char-label {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
 }
 
 .char-value {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
   color: var(--color-primary);
 }
@@ -927,7 +927,7 @@ onMounted(() => {
   background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   color: var(--text-primary);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   white-space: nowrap;
   position: sticky;
   top: 0;
@@ -951,7 +951,7 @@ onMounted(() => {
   align-items: center;
   background: var(--glass-30);
   border-bottom: 1px solid var(--bg-hover);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   transition: background 0.3s ease;
   text-align: center;
 }
@@ -986,12 +986,12 @@ onMounted(() => {
 }
 
 .char-tendency {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
 }
 
 .char-deviation {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
 }
 
@@ -1001,7 +1001,7 @@ onMounted(() => {
 }
 
 .char-villages {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
 }
 
@@ -1032,7 +1032,7 @@ onMounted(() => {
   background: rgba(var(--color-warning-rgb), 0.1);
   border-radius: var(--radius-sm2);
   color: var(--text-secondary);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .summary-section {
@@ -1064,7 +1064,7 @@ onMounted(() => {
 }
 
 .summary-label {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-bottom: 6px;
 }
@@ -1095,7 +1095,7 @@ onMounted(() => {
   gap: 12px;
   padding: 10px 12px;
   align-items: center;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .table-header {

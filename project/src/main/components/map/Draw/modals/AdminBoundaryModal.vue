@@ -322,7 +322,7 @@ function handleConfirm() {
 }
 
 .clip-boundary-label {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
   color: var(--text-deep);
 }
@@ -334,7 +334,7 @@ function handleConfirm() {
 }
 
 .clip-boundary-search {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .clip-boundary-loading {
@@ -348,7 +348,7 @@ function handleConfirm() {
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-md);
   color: var(--text-secondary);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .clip-boundary-list {
@@ -365,7 +365,7 @@ function handleConfirm() {
 .clip-boundary-item {
   padding: 6px 8px;
   border-radius: var(--radius-sm);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 
   &:hover {
     background: var(--glass-60);
@@ -375,7 +375,7 @@ function handleConfirm() {
 .clip-boundary-empty {
   padding: 24px;
   color: var(--text-tertiary);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   text-align: center;
 }
 

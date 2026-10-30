@@ -509,7 +509,7 @@ const liftClass = (lift) => {
 
 .section-description {
   color: var(--text-secondary);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   margin-bottom: 8px;
 }
 
@@ -551,7 +551,7 @@ const liftClass = (lift) => {
   background: var(--bg-glass);
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .tag-remove {
@@ -621,13 +621,13 @@ const liftClass = (lift) => {
   }
 
   .region-index {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     color: var(--text-secondary);
     flex-shrink: 0;
   }
 
   .region-stats {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     color: var(--text-secondary);
     display: block;
     margin-top: 2px;
@@ -648,7 +648,7 @@ const liftClass = (lift) => {
 .simple-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 
   th, td {
     padding: 6px 10px;
@@ -696,7 +696,7 @@ const liftClass = (lift) => {
 
 .zscore-hint {
   text-align: center;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--color-warning, #f0a020);
   background: rgba(240, 160, 32, 0.08);
   border-radius: 6px;
@@ -718,7 +718,7 @@ const liftClass = (lift) => {
 
 .zscore-label {
   width: 120px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   text-align: right;
   flex-shrink: 0;
   color: var(--text-secondary);
@@ -741,7 +741,7 @@ const liftClass = (lift) => {
 
 .zscore-value {
   width: 56px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
   text-align: right;
 

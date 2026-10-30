@@ -480,7 +480,7 @@ function parseLocalizedParts(content) {
 
     .history-date,
     .history-content {
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
     }
   }
 

@@ -227,7 +227,7 @@ $transition-normal: 0.3s;
   border-radius: var(--radius-xl);
   box-shadow: 0 1px 2px $divider-color;
   color: $text-main;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   transition:
     transform $transition-fast,
     background $transition-fast;

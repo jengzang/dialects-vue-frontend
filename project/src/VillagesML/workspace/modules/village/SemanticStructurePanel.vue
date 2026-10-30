@@ -160,7 +160,7 @@ const parseSequence = (sequence) => {
 }
 
 .label-category {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   padding: 2px 10px;
   background: rgba(var(--vml-blue-rgb), 0.1);

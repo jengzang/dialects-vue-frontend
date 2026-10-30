@@ -1774,7 +1774,7 @@ $mobile-breakpoint: 768px;
 .glass-button {
   --glass-button-padding: 8px 16px;
   --glass-button-border-radius: var(--radius-md);
-  --glass-button-font-size: var(--font-size-14);
+  --glass-button-font-size: var(--font-size-13);
 
   display: flex;
   align-items: center;
@@ -2032,7 +2032,7 @@ td {
 }
 
 .filter-header {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
   color: var(--text-secondary);
   border-bottom: 1px solid var(--border-light);
@@ -2111,7 +2111,7 @@ td {
 
 .text-btn {
   padding: 6px 12px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   cursor: pointer;
   background: none;
   border: none;
@@ -2446,7 +2446,7 @@ td {
   border: 1px solid var(--border-medium);
   background: var(--color-primary);
   color: var(--action-primary-text);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
   cursor: pointer;
   transition: all $transition-fast;
@@ -2632,7 +2632,7 @@ td {
 }
 
 .column-checkbox-item .label-text {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: $text-dark;
   transition: all $transition-fast;
   white-space: nowrap;
@@ -2733,7 +2733,7 @@ td {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .old-value {
@@ -2807,7 +2807,7 @@ td {
   background: rgba(var(--color-warning-rgb), 0.1);
   border-radius: var(--radius-sm);
   color: $warning-dark;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
   text-align: center;
 }

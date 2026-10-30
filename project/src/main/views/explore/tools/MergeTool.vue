@@ -1095,7 +1095,7 @@ $color-danger: var(--color-error-light);
   }
 
   &-label {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-weight: 500;
     color: rgba(var(--text-deep-rgb), 0.6);
     transition: color 0.3s ease;
@@ -1199,7 +1199,7 @@ $color-danger: var(--color-error-light);
   }
 
   &-hint {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     color: rgba(var(--text-deep-rgb), 0.6);
   }
 }
@@ -1246,7 +1246,7 @@ $color-danger: var(--color-error-light);
   &-meta {
     display: flex;
     gap: 16px;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     color: rgba(var(--text-deep-rgb), 0.7);
   }
 
@@ -1513,7 +1513,7 @@ $color-danger: var(--color-error-light);
   }
 
   &-label {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     color: rgba(var(--text-deep-rgb), 0.7);
   }
 }
@@ -1636,7 +1636,7 @@ $color-danger: var(--color-error-light);
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 
   thead {
     position: sticky;
@@ -1650,7 +1650,7 @@ $color-danger: var(--color-error-light);
     border-bottom: 2px solid rgba(var(--color-primary-rgb), 0.2);
     text-align: left;
     white-space: nowrap;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-weight: 600;
     color: $color-text;
   }
@@ -1658,7 +1658,7 @@ $color-danger: var(--color-error-light);
   td {
     padding: 8px 12px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     color: rgba(var(--text-deep-rgb), 0.85);
   }
 
@@ -1694,7 +1694,7 @@ $color-danger: var(--color-error-light);
   }
 
   .subtitle {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   .steps-indicator {
@@ -1732,7 +1732,7 @@ $color-danger: var(--color-error-light);
   }
 
   .step-desc {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   .upload {
@@ -1782,7 +1782,7 @@ $color-danger: var(--color-error-light);
       padding: 10px 12px;
 
       &-name {
-        font-size: var(--font-size-14);
+        font-size: var(--font-size-13);
       }
     }
   }
@@ -1868,7 +1868,7 @@ $color-danger: var(--color-error-light);
     }
 
     &-label {
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
     }
   }
 
@@ -1883,7 +1883,7 @@ $color-danger: var(--color-error-light);
 
     &-item {
       padding: 10px 12px;
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
     }
   }
 
@@ -1915,7 +1915,7 @@ $color-danger: var(--color-error-light);
   .tab-btn {
     padding: 8px 14px;
     white-space: nowrap;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   .table-container {

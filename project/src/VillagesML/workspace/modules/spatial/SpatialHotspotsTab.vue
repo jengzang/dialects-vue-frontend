@@ -237,7 +237,7 @@ h2 {
   background: rgba(var(--color-warning-rgb), 0.2);
   color: var(--color-warning-dark);
   border-radius: var(--radius-md);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
   white-space: nowrap;
 }
@@ -250,7 +250,7 @@ h2 {
 .info-item {
   display: flex;
   justify-content: space-between;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .info-item .label {
@@ -293,7 +293,7 @@ h2 {
 }
 
 .stat-label {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-bottom: 8px;
 }

@@ -694,7 +694,7 @@ $portrait-ratio: 1;
 
   color: $text-secondary;
 
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
 }
 
@@ -766,7 +766,7 @@ $portrait-ratio: 1;
 
   color: $text-dark;
 
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
 }
 

@@ -563,7 +563,7 @@ watch(
 
 .feature-detail-row {
   padding: $radius-md 14px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: $text-strong;
 
   @media (max-width: 768px) {
@@ -579,7 +579,7 @@ watch(
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
 
       &::before {
         content: attr(data-label);
@@ -650,7 +650,7 @@ watch(
   gap: $radius-sm;
 
   span {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-weight: 700;
     color: $text-secondary;
   }
@@ -703,7 +703,7 @@ watch(
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 
   th,
   td {
@@ -740,7 +740,7 @@ watch(
 
   &::before {
     content: "⚠️";
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 }
 
@@ -757,7 +757,7 @@ watch(
 
   p {
     margin: 8px 0 0;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     color: $text-secondary;
     line-height: 1.7;
   }
@@ -785,7 +785,7 @@ watch(
   background: rgba(var(--color-warning-rgb), 0.08);
   border-left: 3px solid $warning;
   border-radius: 0 $radius-sm $radius-sm 0;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: $text-secondary;
   line-height: 1.6;
 }

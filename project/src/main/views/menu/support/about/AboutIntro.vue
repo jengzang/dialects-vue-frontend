@@ -446,7 +446,7 @@ function localeTo(path) {
   }
 
   .feature-subtitle {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   .feature-intro {
@@ -454,7 +454,7 @@ function localeTo(path) {
   }
 
   .zhihu-article-link {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   .subfeature-list {
@@ -466,7 +466,7 @@ function localeTo(path) {
   }
 
   .subfeature-body {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     line-height: 1.55;
   }
 }

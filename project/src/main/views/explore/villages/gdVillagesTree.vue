@@ -758,7 +758,7 @@ $transition-base: 0.3s;
   align-items: center;
   padding: 6px 12px;
   color: $success-green;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 600;
   background: rgba(var(--color-success-rgb), 0.15);
   border-radius: var(--radius-md);
@@ -837,7 +837,7 @@ $transition-base: 0.3s;
 
 .retry-btn-small {
   padding: 6px 14px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   border-radius: var(--radius-sm2);
 }
 

@@ -893,7 +893,7 @@ onBeforeUnmount(() => {
   gap: 10px;
 
   .sidebar-title {
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-weight: 700;
     color: $text-strong;
   }

@@ -898,7 +898,7 @@ $glass-blur: 8px;
 .positions {
   margin-bottom: 15px;
   color: gray;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   text-align: center;
 
   p {

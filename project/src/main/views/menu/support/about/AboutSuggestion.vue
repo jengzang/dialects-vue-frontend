@@ -450,7 +450,7 @@ onMounted(() => {
 
     span {
       margin-top: 6px;
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
     }
   }
 

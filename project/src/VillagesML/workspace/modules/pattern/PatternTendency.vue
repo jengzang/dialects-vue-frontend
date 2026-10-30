@@ -207,7 +207,7 @@ watch(
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-primary);
 }
 
@@ -296,7 +296,7 @@ watch(
 
 .frequency {
   color: var(--text-secondary);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 @media (max-width: 768px) {

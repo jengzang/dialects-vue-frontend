@@ -744,7 +744,7 @@ export default {
 }
 
 .char-label {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
   color: var(--text-tertiary);
   margin-bottom: 4px;
@@ -822,7 +822,7 @@ tr.significant {
 .tendency-badge {
   padding: 4px 10px;
   border-radius: var(--radius-md);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
 }
 

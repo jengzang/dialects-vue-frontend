@@ -618,7 +618,7 @@ $transition-normal: 0.3s;
   .cta-hint {
     margin-top: 12px;
     color: $text-secondary;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
     font-weight: 500;
   }
 }

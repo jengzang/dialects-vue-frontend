@@ -597,7 +597,7 @@ $transition-duration: 0.25s;
 .tone-row {
   display: flex;
   gap: 6px;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   line-height: 1.5;
 }
 
@@ -842,7 +842,7 @@ $transition-duration: 0.25s;
 .popup-no-data {
   padding: 20px;
   color: var(--text-lightest);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   text-align: center;
 }
 </style>

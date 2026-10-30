@@ -281,7 +281,7 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
 
     p {
       color: var(--text-secondary);
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
       line-height: 1.6;
     }
   }
@@ -340,7 +340,7 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
       @include text-truncate;
       min-inline-size: 0;
       color: var(--text-primary);
-      font-size: var(--font-size-14);
+      font-size: var(--font-size-13);
       line-height: 1.4;
     }
 

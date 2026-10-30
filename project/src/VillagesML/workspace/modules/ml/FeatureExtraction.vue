@@ -1157,7 +1157,7 @@ onBeforeUnmount(() => {
 }
 
 .quick-select-row label {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
   color: var(--text-secondary);
 }
@@ -1468,7 +1468,7 @@ onBeforeUnmount(() => {
   color: var(--vml-blue);
   padding: 6px 12px;
   border-radius: var(--radius-md);
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   font-weight: 500;
 }
 
@@ -1541,7 +1541,7 @@ onBeforeUnmount(() => {
 .mini-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
 }
 
 .mini-table th,
@@ -1593,7 +1593,7 @@ onBeforeUnmount(() => {
 }
 
 .cluster-count {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--vml-blue);
   font-weight: 500;
 }
@@ -1619,7 +1619,7 @@ onBeforeUnmount(() => {
 }
 
 .coverage-label {
-  font-size: var(--font-size-14);
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-bottom: 8px;
 }
@@ -1735,7 +1735,7 @@ onBeforeUnmount(() => {
 
   .glass-table {
     min-width: 600px;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-13);
   }
 
   .glass-table th,
