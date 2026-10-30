@@ -203,14 +203,14 @@ $transition-base: 0.3s ease;
   max-width: 120px;
   overflow: hidden;
   color: $apple-blue;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
 
   @media (max-aspect-ratio: 1/1) {
     max-width: 100px;
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -246,7 +246,7 @@ $transition-base: 0.3s ease;
   width: $desktop-float-size;
   height: $desktop-float-size;
   padding: 8px;
-  font-size: 24px;
+  font-size: var(--font-size-24);
   cursor: pointer;
   user-select: none;
   border-radius: var(--radius-full);
@@ -268,7 +268,7 @@ $transition-base: 0.3s ease;
   @media (max-aspect-ratio: 1/1) {
     width: $mobile-float-size;
     height: $mobile-float-size;
-    font-size: 22px;
+    font-size: var(--font-size-22);
   }
 }
 

@@ -32,7 +32,7 @@
   height: 20px;
   padding: 0;
   color: var(--text-dark);
-  font-size: 10px;
+  font-size: var(--font-size-10);
   line-height: 1;
   cursor: pointer;
   user-select: none;
@@ -62,7 +62,7 @@
   .tab-tooltip {
     padding: 6px 12px;
     color: var(--text-primary);
-    font-size: 0.875rem;
+    font-size: var(--font-size-14);
     font-weight: 500;
     white-space: nowrap;
     pointer-events: none;

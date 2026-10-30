@@ -41,7 +41,7 @@ display: {
 - 竖屏文字：竖屏基准 × `mobileFontSize`（缺省回退 `fontSize`）× 状态倍率。
 - 未选中倍率 `--font-size-nav-inactive` 为 `0.9em`，选中倍率 `--font-size-nav-active` 为 `1.1em`。
 - 竖屏堆叠小字 `--font-size-nav-caption` 为 `max(0.75rem, 0.65em)`，默认根字号下不低于 12px。
-- CommonBar 图标跟随当前布局的字号配置及状态倍率。
+- CommonBar 横屏图标跟随 `fontSize`；竖屏图标保留 `mobileFontSize × 1.2` 的原有比例。两者均使用对应布局的导航基准。
 
 整栏默认值、预设、单个 tab 的覆盖优先级不变；CommonBar 的 schema 默认值仍可能被模块配置中的显式字号覆盖。修改根字号或用户浏览器默认字号后，rem token 会跟随缩放；迁移不会主动设置全局根字号。
 

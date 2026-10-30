@@ -563,14 +563,14 @@ $portrait-ratio: 1;
 .stat-label {
   white-space: nowrap;
   color: $text-secondary;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 600;
 }
 
 
 .stat-value {
   color: $primary-dark;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 900;
 }
 
@@ -587,7 +587,7 @@ $portrait-ratio: 1;
   border-radius: var(--radius-full);
 
   color: $primary-dark;
-  font-size: 18px;
+  font-size: var(--font-size-18);
 
   cursor: pointer;
   transition: all 0.3s ease;
@@ -610,7 +610,7 @@ $portrait-ratio: 1;
 .icp-number {
   text-align: center;
   color: var(--text-gray);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   flex-shrink: 0;
 }
 
@@ -677,7 +677,7 @@ $portrait-ratio: 1;
 
 
 .stat-icon {
-  font-size: 32px;
+  font-size: var(--font-size-32);
   line-height: 1;
 }
 
@@ -694,7 +694,7 @@ $portrait-ratio: 1;
 
   color: $text-secondary;
 
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 600;
 }
 
@@ -702,7 +702,7 @@ $portrait-ratio: 1;
 .stat-value-large {
   color: $primary-dark;
 
-  font-size: 26px;
+  font-size: var(--font-size-26);
   font-weight: 900;
 
   line-height: 1;
@@ -721,7 +721,7 @@ $portrait-ratio: 1;
 
   text-transform: uppercase;
 
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 700;
 
   letter-spacing: 0.5px;
@@ -766,7 +766,7 @@ $portrait-ratio: 1;
 
   color: $text-dark;
 
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 600;
 }
 
@@ -806,7 +806,7 @@ $portrait-ratio: 1;
 
   color: $primary-dark;
 
-  font-size: 15px;
+  font-size: var(--font-size-15);
 
   font-weight: 700;
 }
@@ -857,7 +857,7 @@ $portrait-ratio: 1;
 
   color: $text-primary;
 
-  font-size: 15px;
+  font-size: var(--font-size-15);
 
   font-weight: 500;
 
@@ -889,7 +889,7 @@ $portrait-ratio: 1;
 .submenu-icon {
   flex-shrink: 0;
 
-  font-size: 18px;
+  font-size: var(--font-size-18);
 }
 
 
@@ -992,7 +992,7 @@ $portrait-ratio: 1;
 
     li {
       padding: 3px 8px 3px 15px;
-      font-size: 1.1rem;
+      font-size: var(--font-size-17-6);
     }
   }
 

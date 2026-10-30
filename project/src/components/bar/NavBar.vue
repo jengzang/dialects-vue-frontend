@@ -61,7 +61,7 @@
                 flex: getOverflowFlex(t, isMenuTabActive(t.tab), false),
                 minWidth: getOverflowMinWidth(t, false),
                 maxWidth: getOverflowMaxWidth(t, false),
-                fontSize: t.fontSize + 'rem'
+                fontSize: 'calc(var(--font-size-nav-unit) * ' + t.fontSize + ')'
               }"
               @click.prevent="onMenuBarClick(t, navigate)"
               @mouseenter="(e) => handleTabTooltipEnter(e, t.label)"
@@ -166,7 +166,7 @@
                 flex: getOverflowFlex(t, isMenuTabActive(t.tab), true),
                 minWidth: getOverflowMinWidth(t, true),
                 maxWidth: getOverflowMaxWidth(t, true),
-                fontSize: (t.mobileFontSize || t.fontSize) + 'rem'
+                fontSize: 'calc(var(--font-size-nav-mobile-unit) * ' + (t.mobileFontSize || t.fontSize) + ')'
               }"
               @click.prevent="onMenuBarClick(t, navigate)"
               @mouseenter="(e) => handleTabTooltipEnter(e, t.label)"
@@ -564,7 +564,7 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
 .navbar-item {
   padding: 4px;
   color: var(--text-white);
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   transition: transform 0.3s;
 
   @include flex-center;
@@ -691,7 +691,7 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
   white-space: nowrap;
   text-align: center;
   text-decoration: none;
-  font-size: 1.3rem;
+  font-size: var(--font-size-20-8);
   cursor: pointer;
   user-select: none;
   .tab-external {
@@ -711,7 +711,7 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
   height: calc(100% - clamp(3px, 1dvh, 6px));
   margin: 0 calc(var(--tab-pad) * -1);
   padding: 0 var(--tab-pad);
-  font-size: 0.9em;
+  font-size: var(--font-size-nav-inactive);
   border: 3px solid transparent;
   border-radius: var(--radius-md);
 
@@ -744,7 +744,7 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
     border-radius: 25px;
     color: var(--color-primary-hover);
     font-weight: 700;
-    font-size: 1.1em;
+    font-size: var(--font-size-nav-active);
     transition:
       background 0.3s ease 0.6s,
       color 0.3s ease 0.6s,
@@ -791,7 +791,7 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
   width: 28px;
   height: 28px;
   margin-right: 2px;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   cursor: pointer;
   user-select: none;
   border-radius: var(--radius-full);
@@ -953,11 +953,11 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
     }
 
     .nav-icon, .label {
-      font-size: 0.9em;
+      font-size: var(--font-size-nav-inactive);
     }
 
     .label--tiny {
-      font-size: 0.45em !important;
+      font-size: var(--font-size-nav-caption) !important;
       max-width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -976,7 +976,7 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
       transition: color 0.3s ease 0.6s;
 
       .nav-icon, .label {
-        font-size: 1.1em;
+        font-size: var(--font-size-nav-active);
       }
     }
   }

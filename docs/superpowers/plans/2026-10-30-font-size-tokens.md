@@ -12,7 +12,7 @@ The user approved fine-grained font size tokens and gradual migration, with navi
 ## Execution
 
 - [x] Step 1: Add exact primitives and aliases, migrate shared styles, document usage. Validated both Sass entrypoints, 80 exact token values, 21 files with only font substitutions, and 14 focused tests. Reviewed staged and unstaged scope; the pre-existing sitemap change is excluded.
-- [ ] Step 2: Connect NavBar, ExploreBar and CommonBar to navigation tokens. Verify computed fonts at ordinary desktop, large desktop and portrait sizes, including CommonBar icon consistency and minimum label size. Review and commit.
+- [x] Step 2: Connect NavBar, ExploreBar and CommonBar to navigation tokens. Verified computed fonts in Chrome at ordinary desktop, large desktop, three portrait sizes, and enlarged root font; retained tab settings and mobile icon multiplier. Navigation unit tests passed (15 tests). Reviewed font-only changes and CommonBar's corrected desktop icon setting.
 - [ ] Step 3: Migrate remaining static component styles without rounding. Verify that restoring token references to their former lengths reproduces the previous source outside approved bar changes; compile the production build and run the existing test suite. Update source-contract tests to resolve tokens while retaining their size assertions. Review and commit.
 
 ## Verification
