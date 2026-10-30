@@ -491,8 +491,7 @@ $text-muted: var(--text-tertiary);
     background: #388e3c;
   }
   :deep(.liquid-radio-label:nth-child(3) .liquid-radio-text::before) {
-    background: linear-gradient(135deg, #fff 50%, #e8e8e8 50%);
-    border-color: rgba(0, 0, 0, 0.18);
+    background: var(--theme-preview-red);
   }
   :deep(.liquid-radio-label:nth-child(4) .liquid-radio-text::before) {
     background: linear-gradient(135deg, #0d1117 50%, #21262d 50%);
