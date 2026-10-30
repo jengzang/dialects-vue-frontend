@@ -107,7 +107,7 @@ try {
     for (const viewport of [[390, 844], [768, 1024], [1440, 2560]]) {
       const mobile = await measure(...viewport)
       const mobileParentSize = await page.locator('#mobile-label').evaluate(element => parseFloat(getComputedStyle(element.closest('a')).fontSize))
-      assert.ok(Math.abs(mobile['mobile-label'] - mobileParentSize * 0.45) < 0.02, `${bar.name}: stacked label must retain the original 0.45em ratio at ${viewport}`)
+      assert.ok(Math.abs(mobile['mobile-label'] - mobileParentSize * 0.5) < 0.02, `${bar.name}: stacked label must use the 0.5em ratio at ${viewport}`)
       if (bar.name === 'CommonBar' && viewport[0] === 390) {
         assert.ok(Math.abs(mobile['mobile-icon'] - 15.8976) < 0.02, 'CommonBar: mobile icon multiplier changed')
       }

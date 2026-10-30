@@ -38,6 +38,6 @@
 
 倍率集中在 `_tokens.scss` 的 `$font-size-width-scales` 中。最小字号下限为 0.625rem（默认根字号下 10px；它是下限而非新增档位），不足 300px 时保留原始基准值。字号不额外叠加横竖屏倍率，现有布局的横竖屏规则保持不变。由于只改字号 token，已有 rem 间距不会随档位缩放。
 
-三个 bar 的 `fontSize` / `mobileFontSize` 数值配置仍作为倍率。导航基准为 `clamp(var(--font-size-16), 1.5dvh, var(--font-size-20))`，上下限跟随宽度档位；xl 下为默认 16–20px，2xl 下为 16.64–20.8px。选中/未选中倍率保持 1.1em / 0.9em；竖屏堆叠小字恢复原有 `0.45em`，不额外设置 10px 下限。CommonBar 横屏图标恢复优先读取 `mobileFontSize`、回退到 `fontSize` 的原有规则，竖屏图标保留原有 1.2 倍率。
+三个 bar 的 `fontSize` / `mobileFontSize` 数值配置仍作为倍率。导航基准为 `clamp(var(--font-size-16), 1.5dvh, var(--font-size-20))`，上下限跟随宽度档位；xl 下为默认 16–20px，2xl 下为 16.64–20.8px。选中/未选中倍率保持 1.1em / 0.9em；竖屏堆叠小字使用 `0.5em`，不额外设置 10px 下限。CommonBar 横屏图标恢复优先读取 `mobileFontSize`、回退到 `fontSize` 的原有规则，竖屏图标保留原有 1.2 倍率。
 
 本轮迁移组件 `<style>` 和共享 SCSS 中的静态字号。相对 em 和流体视口项保留；插值计算按端点字号归并。模板或 JS 字符串中的内联样式、图表/Canvas 数值、地图动态字号、独立截图/导出样式、参与布局运算的 Sass 变量暂不迁移。

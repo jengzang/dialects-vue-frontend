@@ -924,7 +924,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
       }
 
       .label--tiny {
-        font-size: 0.45em !important;
+        font-size: 0.5em !important;
         max-width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;
