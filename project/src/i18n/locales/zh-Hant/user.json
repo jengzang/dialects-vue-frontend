@@ -231,7 +231,7 @@
       "count": "次數",
       "gap": "距前一名",
       "firstPlace": "第一名",
-						"percentile": "超越"
+      "percentile": "超越"
     },
     "rank": {
       "first": "第 1 名",
@@ -317,7 +317,7 @@
           "locations": "地點信息",
           "villages": "村落機器學習",
           "toponyms": "地名查詢",
-          "gis": "GIS 查詢"
+          "gis": "行政區劃"
         },
         "tooltips": {
           "coordinates": "用於取得地圖繪製所需的坐標資料，查中古、查音位、查字、查調、分區圖與自定繪圖等都會使用。",

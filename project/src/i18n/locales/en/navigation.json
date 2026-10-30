@@ -217,7 +217,7 @@
       "label": "Current Theme",
       "options": {
         "blue": "Blue",
-        "light": "Light",
+        "light": "Red",
         "dark": "Dark",
         "green": "Green"
       }

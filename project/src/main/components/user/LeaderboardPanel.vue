@@ -179,10 +179,10 @@ const categoryConfigs = computed(() => [
       //   key: 'endpoint_group_toponyms',
       //   label: t('user.leaderboard.categories.villageGeography.items.toponyms')
       // },
-      // {
-      //   key: 'endpoint_group_gis',
-      //   label: t('user.leaderboard.categories.villageGeography.items.gis')
-      // }
+      {
+         key: 'endpoint_group_gis',
+        label: t('user.leaderboard.categories.villageGeography.items.gis')
+      }
     ]
   },
   {

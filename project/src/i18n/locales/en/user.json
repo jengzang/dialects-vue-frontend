@@ -231,7 +231,7 @@
       "count": "Count",
       "gap": "Rank Gap",
       "firstPlace": "First Place",
-						"percentile": "Percentile"
+      "percentile": "Percentile"
     },
     "rank": {
       "first": "1st",
@@ -317,7 +317,7 @@
           "locations": "Location Information",
           "villages": "Village Machine Learning",
           "toponyms": "Toponym Queries",
-          "gis": "GIS Queries"
+          "gis": "administrative divisions"
         },
         "tooltips": {
           "coordinates": "Used to retrieve the coordinates required for map rendering. Middle Chinese, phonetic-value, character, tone, regional-map, and custom-map queries may all use this feature.",
@@ -343,5 +343,4 @@
       }
     }
   }
-
 }
