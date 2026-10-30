@@ -88,14 +88,16 @@ describe('color theme token coverage', () => {
     expect(toolbarsSource).toContain('color: var(--sidebar-item-text);')
   })
 
-  it('uses neutral primary accents for light and white primary accents for dark themes', () => {
+  it('uses vermilion and teal accents for light and white primary accents for dark themes', () => {
     const source = readSource(tokensPath)
     const lightBlock = themeBlock(source, 'light')
     const darkBlock = themeBlock(source, 'dark')
 
-    expect(lightBlock).toContain('--color-primary: #4b5563;')
-    expect(lightBlock).toContain('--color-primary-rgb: 75, 85, 99;')
-    expect(lightBlock).toContain('--color-primary-cyan: #6e7681;')
+    expect(lightBlock).toContain('--color-primary: #b23a32;')
+    expect(lightBlock).toContain('--color-primary-rgb: 178, 58, 50;')
+    expect(lightBlock).toContain('--color-secondary: #3f6c70;')
+    expect(lightBlock).toContain('--color-secondary-hover: #31565a;')
+    expect(lightBlock).toContain('--color-primary-cyan: var(--color-secondary);')
     expect(lightBlock).not.toContain('--color-primary: #5f6368;')
     expect(lightBlock).not.toContain('--color-primary: #2f80ed;')
     expect(lightBlock).not.toContain('--color-primary-rgb: 47, 128, 237;')
@@ -111,17 +113,16 @@ describe('color theme token coverage', () => {
     expect(darkBlock).not.toContain('84, 78, 68')
   })
 
-  it('keeps the light theme off-white instead of yellow', () => {
+  it('uses warm ivory canvas and near-white surfaces in the light theme', () => {
     const source = readSource(tokensPath)
     const lightBlock = themeBlock(source, 'light')
 
-    expect(lightBlock).toContain('--bg-body: #fdfdfd;')
-    expect(lightBlock).toContain('--bg-white: #ffffff;')
-    expect(lightBlock).toContain('--bg-page-gradient: radial-gradient(1200px 800px at 8% -12%, #ffffff, #ffffff00 58%),')
-    expect(lightBlock).toContain('--bg-blue-light: #f8fbff;')
-    expect(lightBlock).toContain('--surface-panel: rgba(255, 255, 255, 0.88);')
-    expect(lightBlock).toContain('--surface-selected: #f5f8fc;')
-    expect(lightBlock).not.toContain('#f0eadf')
+    expect(lightBlock).toContain('--bg-body: #faf7f0;')
+    expect(lightBlock).toContain('--bg-white: #fffdfa;')
+    expect(lightBlock).toContain('--bg-page-gradient: radial-gradient(1200px 800px at 8% -12%, #fffdfa, #fffdfa00 58%),')
+    expect(lightBlock).toContain('--bg-blue-light: #f6f0e5;')
+    expect(lightBlock).toContain('--surface-panel: rgba(255, 253, 250, 0.88);')
+    expect(lightBlock).toContain('--surface-selected: var(--color-primary-light);')
     expect(lightBlock).not.toContain('#f4efe3')
     expect(lightBlock).not.toContain('#fff8df')
     expect(lightBlock).not.toContain('#fffdf8')
@@ -211,10 +212,10 @@ describe('color theme token coverage', () => {
     const lightBlock = themeBlock(source, 'light')
     const darkBlock = themeBlock(source, 'dark')
 
-    expect(lightBlock).toContain('--vml-blue: #4b5563;')
-    expect(lightBlock).toContain('--vml-blue-rgb: 75, 85, 99;')
-    expect(lightBlock).toContain('--vml-blue-medium: #64748b;')
-    expect(lightBlock).toContain('--vml-blue-highlight: #475569;')
+    expect(lightBlock).toContain('--vml-blue: var(--color-primary);')
+    expect(lightBlock).toContain('--vml-blue-rgb: var(--color-primary-rgb);')
+    expect(lightBlock).toContain('--vml-blue-medium: #b9534a;')
+    expect(lightBlock).toContain('--vml-blue-highlight: var(--color-primary-hover);')
     expect(darkBlock).toContain('--vml-blue: #f5f5f7;')
     expect(darkBlock).toContain('--vml-blue-rgb: 245, 245, 247;')
     expect(darkBlock).toContain('--vml-blue-highlight: #ffffff;')
