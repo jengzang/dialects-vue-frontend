@@ -102,17 +102,24 @@ try {
     assert.ok(Math.abs(activeSize - 27.456) < 0.02, `${bar.name}: active font multiplier changed`)
     for (const viewport of [[390, 844], [768, 1024], [1440, 2560]]) {
       const mobile = await measure(...viewport)
-      assert.ok(mobile['mobile-label'] >= 10, `${bar.name}: stacked label below 10px at ${viewport}`)
+      const mobileParentSize = await page.locator('#mobile-label').evaluate(element => parseFloat(getComputedStyle(element.closest('a')).fontSize))
+      assert.ok(Math.abs(mobile['mobile-label'] - mobileParentSize * 0.45) < 0.02, `${bar.name}: stacked label must retain the original 0.45em ratio at ${viewport}`)
       if (bar.name === 'CommonBar' && viewport[0] === 390) {
         assert.ok(Math.abs(mobile['mobile-icon'] - 15.8976) < 0.02, 'CommonBar: mobile icon multiplier changed')
       }
+      await page.locator('#mobile-label').evaluate(element => element.classList.remove('label--tiny'))
+      const ordinaryLabelSize = await page.locator('#mobile-label').evaluate(element => parseFloat(getComputedStyle(element).fontSize))
+      assert.ok(Math.abs(ordinaryLabelSize - mobileParentSize * 0.9) < 0.02, `${bar.name}: ordinary portrait label ratio changed`)
+      await page.locator('#mobile-label').evaluate(element => element.closest('a').classList.add('active'))
+      const activeLabelSize = await page.locator('#mobile-label').evaluate(element => parseFloat(getComputedStyle(element).fontSize))
+      assert.ok(Math.abs(activeLabelSize - mobileParentSize * 1.1) < 0.02, `${bar.name}: active portrait label ratio changed`)
     }
     if (bar.name === 'CommonBar') {
-      assert.ok(Math.abs(normal['desktop-icon'] - 19.2) < 0.02, 'CommonBar: desktop icon must use desktop config')
+      assert.ok(Math.abs(normal['desktop-icon'] - 14.4) < 0.02, 'CommonBar: desktop icon must retain the original mobileFontSize fallback')
     }
     const accessible = await measure(1440, 900, 20)
     assert.ok(accessible['desktop-label'] > normal['desktop-label'], `${bar.name}: root font preference ignored`)
-    console.log(`${bar.name}: desktop ${normal['desktop-label']}px → large ${large['desktop-label']}px; portrait minimum and root scaling verified`)
+    console.log(`${bar.name}: desktop ${normal['desktop-label']}px → large ${large['desktop-label']}px; original tiny-label ratio and root scaling verified`)
   }
 } finally {
   await browser.close()

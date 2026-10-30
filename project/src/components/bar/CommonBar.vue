@@ -58,7 +58,7 @@
           @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
         >
           <span class="tab-inner" :class="{ active: isActiveComputed(t.tab) }">
-            <BarIcon :icon="t.icon" class="nav-icon" :weight="isActiveComputed(t.tab) ? 'fill' : 'bold'" :style="{ fontSize: 'calc(clamp(var(--font-size-16), 1.5dvh, var(--font-size-20)) * ' + t.fontSize + ')' }" />
+            <BarIcon :icon="t.icon" class="nav-icon" :weight="isActiveComputed(t.tab) ? 'fill' : 'bold'" :style="{ fontSize: 'calc(clamp(var(--font-size-16), 1.5dvh, var(--font-size-20)) * ' + (t.mobileFontSize || t.fontSize) + ')' }" />
             <span
               class="label"
               v-if="!t.showLabelOnlyWhenActive || isActiveComputed(t.tab)"
@@ -999,7 +999,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
       }
 
       .label--tiny {
-        font-size: max(0.625rem, 0.65em) !important;
+        font-size: 0.45em !important;
         max-width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;
