@@ -838,7 +838,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
   border-radius: var(--radius-sm, var(--radius-sm));
   color: var(--color-error, #{$error});
   text-align: left;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .loading-state {
@@ -851,7 +851,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
 
   p {
     color: var(--text-secondary, var(--text-tertiary));
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -883,7 +883,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
   border: 1px solid var(--border-gray-light, rgba(var(--color-silver-rgb), 0.5));
   border-radius: var(--radius-md, var(--radius-md));
   color: var(--text-dark, var(--text-dark));
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.25s ease;
@@ -996,7 +996,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
   color: var(--text-dark, var(--text-dark));
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 700;
   line-height: 1.4;
 }
@@ -1004,14 +1004,14 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
 .detail-card-subtitle {
   margin-top: 4px;
   color: var(--text-secondary, var(--text-tertiary));
-  font-size: 12px;
+  font-size: var(--font-size-12);
   line-height: 1.4;
 }
 
 .detail-card-count {
   margin-top: 4px;
   color: var(--color-primary, #{$primary});
-  font-size: 11px;
+  font-size: var(--font-size-12);
   font-weight: 600;
 }
 
@@ -1019,7 +1019,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
   color: var(--text-dark, var(--text-dark));
   word-break: break-all;
   white-space: pre-wrap;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   line-height: 1.8;
   letter-spacing: 1px;
 }

@@ -479,7 +479,7 @@ defineExpose({ collapse, progress })
 
     :deep(.query-condition-label) {
       color: var(--text-secondary);
-      font-size: 14px;
+      font-size: var(--font-size-14);
       white-space: nowrap;
     }
   }

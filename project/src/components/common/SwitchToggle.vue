@@ -277,7 +277,7 @@ $transition-ease: ease;
     white-space: nowrap;
     pointer-events: none;
     padding: 0 8px;
-    font-size: 11px;
+    font-size: var(--font-size-12);
     font-weight: 500;
     max-width: 100%;
     overflow: hidden;

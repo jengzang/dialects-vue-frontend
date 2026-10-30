@@ -164,7 +164,7 @@ function applyDraft(next) {
   display: grid;
   gap: 6px;
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
 
   input,
   select {

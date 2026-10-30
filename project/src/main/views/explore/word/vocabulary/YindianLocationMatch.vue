@@ -155,7 +155,7 @@ function confirm() {
 
 .yindian-match-title {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: var(--font-size-16);
   font-weight: 600;
 }
 
@@ -172,7 +172,7 @@ function confirm() {
   input {
     // width: 100%;
     padding: 10px 12px;
-    font-size: 0.9rem;
+    font-size: var(--font-size-14);
     background: var(--surface-panel);
     border: 1px solid var(--border-glass);
     border-radius: var(--radius-md);
@@ -203,7 +203,7 @@ function confirm() {
 
 .yindian-suggest-item {
   padding: 8px 12px;
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   color: var(--text-deep);
   cursor: pointer;
 

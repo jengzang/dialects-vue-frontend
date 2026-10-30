@@ -181,7 +181,7 @@ const clearFilters = () => {
   border-radius: var(--radius-md);
   background: var(--glass-50);
   backdrop-filter: blur(10px);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   transition: all 0.3s ease;
 }
 
@@ -203,7 +203,7 @@ const clearFilters = () => {
   border-radius: var(--radius-md);
   background: rgba(var(--color-warning-rgb), 0.2);
   color: var(--color-warning);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   cursor: pointer;
   transition: all 0.3s ease;
 }

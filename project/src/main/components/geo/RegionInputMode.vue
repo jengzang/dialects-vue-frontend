@@ -255,7 +255,7 @@ $primary: var(--color-primary);
   -webkit-backdrop-filter: blur(12px);
   white-space: pre-line;
   color: var(--text-dark);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   pointer-events: auto !important;
   transition: background-color 0.2s ease;
 }
@@ -273,7 +273,7 @@ $primary: var(--color-primary);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   cursor: pointer;
   transition: all 0.3s ease;
 
@@ -309,7 +309,7 @@ $primary: var(--color-primary);
 
 .region-label {
   color: var(--text-dark);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
 }
 
@@ -340,7 +340,7 @@ $primary: var(--color-primary);
 .suggestion-text {
   flex: 1;
   color: var(--text-dark);
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .suggestion-source {
@@ -350,7 +350,7 @@ $primary: var(--color-primary);
   border-radius: var(--radius-xs);
   color: $primary;
   white-space: nowrap;
-  font-size: 11px;
+  font-size: var(--font-size-12);
   font-weight: 600;
 }
 </style>

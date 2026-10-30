@@ -119,7 +119,7 @@ $mobile-aspect-ratio: 1;
   gap: 8px;
   margin-bottom: 16px;
   color: $title-color;
-  font-size: 30px;
+  font-size: var(--font-size-32);
   font-weight: 700;
 }
 
@@ -131,19 +131,19 @@ $mobile-aspect-ratio: 1;
 }
 
 .auth-submit-button {
-  font-size: 17px;
+  font-size: var(--font-size-18);
 
   @media (max-aspect-ratio: $mobile-aspect-ratio) {
     width: 100%;
     padding: 16px;
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 }
 
 .err,
 .success {
   margin-top: 10px;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: bold;
 }
 
@@ -151,7 +151,7 @@ $mobile-aspect-ratio: 1;
   color: $error-color;
 
   @media (max-aspect-ratio: $mobile-aspect-ratio) {
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 }
 
@@ -164,7 +164,7 @@ $mobile-aspect-ratio: 1;
   height: 35px;
   min-height: 35px;
   padding: 0;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   line-height: 1;
   --glass-button-border-radius: var(--radius-full);
 }

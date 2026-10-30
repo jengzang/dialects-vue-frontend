@@ -568,7 +568,7 @@ $transition-duration: 0.3s;
 .panel-title {
   margin: 1rem;
   color: var(--color-text-primary);
-  font-size: 1.5rem;
+  font-size: var(--font-size-24);
   font-weight: 600;
   text-align: center;
 }
@@ -587,14 +587,14 @@ $transition-duration: 0.3s;
   box-shadow: 0 2px 8px rgba(255, 193, 7, 0.1);
   color: $text-primary;
   text-align: left;
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   line-height: 1.6;
 }
 
 .section-title {
   margin-bottom: 1rem;
   color: var(--color-text-primary);
-  font-size: 1.1rem;
+  font-size: var(--font-size-18);
   font-weight: 600;
   text-align: center;
 }
@@ -677,14 +677,14 @@ $transition-duration: 0.3s;
 .segment-label {
   flex: 1;
   color: var(--color-text-primary);
-  font-size: 0.95rem;
+  font-size: var(--font-size-16);
 }
 
 .segment-type-badge {
   padding: 0.25rem 0.75rem;
   border-radius: var(--radius-sm);
   text-transform: uppercase;
-  font-size: 0.8rem;
+  font-size: var(--font-size-12);
   font-weight: 500;
 
   &.type-rime_core {
@@ -749,7 +749,7 @@ $transition-duration: 0.3s;
 
   .stat-label {
     color: var(--color-text-primary);
-    font-size: 0.95rem;
+    font-size: var(--font-size-16);
     font-weight: 600;
   }
 }
@@ -766,12 +766,12 @@ $transition-duration: 0.3s;
 
   .stat-key {
     color: var(--color-text-secondary);
-    font-size: 0.85rem;
+    font-size: var(--font-size-14);
   }
 
   .stat-value {
     color: var(--color-text-primary);
-    font-size: 1rem;
+    font-size: var(--font-size-16);
     font-weight: 600;
   }
 }
@@ -787,7 +787,7 @@ $transition-duration: 0.3s;
 .description-text {
   margin: 0;
   color: var(--color-text-secondary);
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   line-height: 1.6;
 }
 
@@ -804,7 +804,7 @@ $transition-duration: 0.3s;
   .usage-hint {
     margin-bottom: 1rem;
     padding: 0.6rem 1rem;
-    font-size: 0.85rem;
+    font-size: var(--font-size-14);
   }
 
   .control-buttons {
@@ -818,7 +818,7 @@ $transition-duration: 0.3s;
   }
 
   .segment-label {
-    font-size: 0.8rem;
+    font-size: var(--font-size-12);
   }
 }
 </style>

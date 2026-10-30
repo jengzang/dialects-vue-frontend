@@ -231,7 +231,7 @@ const filteredItems = computed(() => {
 
   h1 {
     margin: 10px 0 14px;
-    font-size: clamp(1.9rem, 3.4dvw, 2.75rem);
+    font-size: clamp(var(--font-size-32), 3.4dvw, var(--font-size-48));
     line-height: 1.25;
     text-wrap: balance;
 
@@ -256,14 +256,14 @@ const filteredItems = computed(() => {
 
   span {
     color: var(--text-tertiary);
-    font-size: 0.85rem;
+    font-size: var(--font-size-14);
     line-height: 1.7;
   }
 }
 
 .yc-eyebrow {
   color: var(--color-primary);
-  font-size: 0.78rem;
+  font-size: var(--font-size-12);
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -281,7 +281,7 @@ const filteredItems = computed(() => {
 
   span {
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: var(--font-size-14);
     font-weight: 700;
   }
 
@@ -310,13 +310,13 @@ const filteredItems = computed(() => {
   flex-shrink: 0;
   margin-right: 4px;
   color: var(--text-tertiary);
-  font-size: 0.85rem;
+  font-size: var(--font-size-14);
   font-weight: 600;
 }
 
 .yc-filter-row--secondary {
   .glass-button {
-    --glass-button-small-font-size: 12px;
+    --glass-button-small-font-size: var(--font-size-12);
     --glass-button-small-padding: 6px 12px;
     --glass-button-color: var(--text-tertiary);
   }
@@ -337,7 +337,7 @@ const filteredItems = computed(() => {
   h2 {
     margin: 10px 0 0;
     color: var(--text-primary);
-    font-size: 1.55rem;
+    font-size: var(--font-size-24);
     line-height: 1.45;
     overflow-wrap: anywhere;
   }
@@ -353,7 +353,7 @@ const filteredItems = computed(() => {
   blockquote {
     margin-top: 6px;
     padding: 14px 16px;
-    font-size: 0.95rem;
+    font-size: var(--font-size-16);
     overflow-wrap: anywhere;
   }
 
@@ -365,7 +365,7 @@ const filteredItems = computed(() => {
   .yc-expression-note {
     margin-top: auto;
     padding-top: 6px;
-    font-size: 0.75rem;
+    font-size: var(--font-size-12);
     color: var(--text-secondary);
   }
 }
@@ -375,7 +375,7 @@ const filteredItems = computed(() => {
   width: 100%;
 
   small {
-    font-size: 0.75rem;
+    font-size: var(--font-size-12);
   }
 }
 
@@ -386,12 +386,12 @@ const filteredItems = computed(() => {
   min-height: 26px;
   padding: 3px 9px;
   color: var(--text-secondary);
-  font-size: 0.8rem;
+  font-size: var(--font-size-12);
 }
 
 .yc-pronunciation {
   color: var(--color-primary);
-  font-size: 0.85rem;
+  font-size: var(--font-size-14);
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
@@ -419,7 +419,7 @@ const filteredItems = computed(() => {
     gap: 16px;
 
     h1 {
-      font-size: clamp(1.7rem, 6.4dvw, 2.4rem);
+      font-size: clamp(var(--font-size-24), 6.4dvw, var(--font-size-32));
     }
   }
 

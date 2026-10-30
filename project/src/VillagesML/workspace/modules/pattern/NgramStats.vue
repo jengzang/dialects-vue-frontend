@@ -600,7 +600,7 @@ watch(
   margin-bottom: 16px;
   background: rgba(var(--vml-blue-rgb), 0.1);
   border-radius: var(--radius-md);
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .shared-controls {
@@ -620,7 +620,7 @@ watch(
   border-radius: var(--radius-sm);
   color: var(--color-primary);
   cursor: pointer;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   transition: all 0.2s ease;
 }
 
@@ -648,7 +648,7 @@ watch(
   background: rgba(var(--vml-blue-rgb), 0.2);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: var(--color-primary);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -683,7 +683,7 @@ watch(
   background: rgba(var(--vml-blue-rgb), 0.1);
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-sm2);
-  font-size: 16px;
+  font-size: var(--font-size-16);
   cursor: pointer;
   transition: all 0.3s ease;
   flex-shrink: 0;
@@ -703,7 +703,7 @@ watch(
   padding: 10px 16px;
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   background: var(--glass-50);
 }
 
@@ -720,7 +720,7 @@ watch(
   background: var(--glass-50);
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-sm2);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   color: var(--text-primary);
   cursor: pointer;
@@ -749,7 +749,7 @@ watch(
 }
 
 .results-count {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
 }
 
@@ -763,7 +763,7 @@ watch(
   background: var(--glass-80);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-sm);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -785,7 +785,7 @@ watch(
 }
 
 .results-count {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
 }
 
@@ -799,7 +799,7 @@ watch(
   background: var(--glass-80);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-sm);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -815,7 +815,7 @@ watch(
   margin-bottom: 12px;
   background: rgba(var(--vml-blue-rgb), 0.1);
   border-radius: var(--radius-sm2);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
   text-align: center;
 }
@@ -850,7 +850,7 @@ watch(
 
 .region-name {
   font-weight: 600;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   color: var(--text-primary);
 }
 
@@ -867,12 +867,12 @@ watch(
 }
 
 .stat-label {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
 }
 
 .stat-value {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -880,7 +880,7 @@ watch(
 .stat-value.tendency {
   padding: 2px 8px;
   border-radius: var(--radius-xs);
-  font-size: 13px;
+  font-size: var(--font-size-14);
 }
 
 .stat-value.strong-preference {
@@ -943,7 +943,7 @@ watch(
   gap: 12px;
   padding: 10px 12px;
   align-items: center;
-  font-size: 13px;
+  font-size: var(--font-size-14);
 }
 
 .table-header {
@@ -1024,7 +1024,7 @@ watch(
 .sig-badge {
   padding: 4px 10px;
   border-radius: var(--radius-md);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 600;
 }
 

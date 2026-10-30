@@ -194,7 +194,7 @@ onBeforeUnmount(() => {
 }
 
 .panel-title {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--text-primary);
   margin: 0;
@@ -214,7 +214,7 @@ onBeforeUnmount(() => {
   border-radius: var(--radius-sm2);
   background: transparent;
   color: var(--text-primary);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;

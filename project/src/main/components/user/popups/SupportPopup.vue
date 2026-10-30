@@ -202,7 +202,7 @@ $transition-duration: 0.3s;
     margin: 0.625rem 0 0;
     color: $text-main;
     text-align: center;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     font-weight: 600;
   }
 }
@@ -216,7 +216,7 @@ $transition-duration: 0.3s;
   margin: 0;
   color: $text-main;
   text-align: center;
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   line-height: 1.6;
 }
 
@@ -238,7 +238,7 @@ $transition-duration: 0.3s;
     border-bottom: 1px solid $surface-border;
     color: $text-main;
     text-align: left;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
   }
 
   th {
@@ -281,7 +281,7 @@ $transition-duration: 0.3s;
     th,
     td {
       padding: 10px 12px;
-      font-size: 0.875rem;
+      font-size: var(--font-size-14);
     }
   }
 }

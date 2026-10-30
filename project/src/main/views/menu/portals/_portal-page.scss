@@ -12,12 +12,12 @@
 @mixin portal-page-title {
   margin: 0 0 30px;
   color: var(--text-primary);
-  font-size: 28px;
+  font-size: var(--font-size-32);
   font-weight: 700;
   text-align: center;
 
   @media (max-aspect-ratio: 1 / 1) {
-    font-size: 24px;
+    font-size: var(--font-size-24);
   }
 }
 
@@ -52,19 +52,19 @@
   }
 
   &__icon {
-    font-size: 48px;
+    font-size: var(--font-size-48);
     line-height: 1;
   }
 
   &__name {
     color: var(--color-primary-hover);
-    font-size: 20px;
+    font-size: var(--font-size-20);
     font-weight: 700;
   }
 
   &__desc {
     color: var(--text-tertiary);
-    font-size: 13px;
+    font-size: var(--font-size-14);
     line-height: 1.4;
   }
 
@@ -72,15 +72,15 @@
     padding: var(--portal-entry-card-portrait-padding, 12px);
 
     &__icon {
-      font-size: 30px;
+      font-size: var(--font-size-32);
     }
 
     &__name {
-      font-size: 18px;
+      font-size: var(--font-size-18);
     }
 
     &__desc {
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 }

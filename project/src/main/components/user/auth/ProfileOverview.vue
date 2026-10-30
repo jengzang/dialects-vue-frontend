@@ -215,7 +215,7 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
  */
 #login-title {
   margin: 12px;
-  font-size: 30px;
+  font-size: var(--font-size-32);
   font-weight: 600;
   white-space: nowrap;
   transition: all $transition-base ease;
@@ -227,7 +227,7 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
   }
 
   @media (max-aspect-ratio: 1/1) {
-    font-size: 28px !important;
+    font-size: var(--font-size-32) !important;
   }
 }
 
@@ -247,35 +247,35 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
 .user-info-badge {
   margin-bottom: 8px;
   color: $text-primary;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   letter-spacing: -0.01em;
 
   @media (max-aspect-ratio: 1/1) {
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 }
 
 .user-number {
   padding: 0 4px;
   color: $primary-blue;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 700;
 
   @media (max-aspect-ratio: 1/1) {
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 }
 
 .user-info-details {
   color: $text-secondary;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 500;
   line-height: 1.4;
   letter-spacing: -0.01em;
 
   @media (max-aspect-ratio: 1/1) {
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -284,7 +284,7 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
   margin: 12px auto 6px;
   padding-right: 4px;
   color: var(--color-primary);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   text-align: center;
   cursor: pointer;
@@ -322,7 +322,7 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
   height: 35px;
   min-height: 35px;
   padding: 0;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   line-height: 1;
   --glass-button-border-radius: var(--radius-full);
 }
@@ -377,20 +377,20 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
   .user-info-badge {
     margin-bottom: 0;
     color: $text-muted;
-    font-size: 13px;
+    font-size: var(--font-size-14);
     font-weight: 600;
     letter-spacing: -0.01em;
 
     :deep(.user-number) {
-      font-size: 14px;
+      font-size: var(--font-size-14);
 
       @media (min-aspect-ratio: 1/1) {
-        font-size: 15.5px;
+        font-size: var(--font-size-16);
       }
     }
 
     @media (min-aspect-ratio: 1/1) {
-      font-size: 14px;
+      font-size: var(--font-size-14);
     }
   }
 }
@@ -398,26 +398,26 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
 .profile-username {
   margin-bottom: 2px;
   color: $text-primary;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 700;
   letter-spacing: -0.02em;
 
   @media (min-aspect-ratio: 1/1) {
     margin-bottom: 4px;
-    font-size: 22px;
+    font-size: var(--font-size-24);
   }
 }
 
 .profile-email {
   margin-bottom: 3px;
   color: $text-secondary;
-  font-size: 13.5px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   letter-spacing: -0.01em;
 
   @media (min-aspect-ratio: 1/1) {
     margin-bottom: 4px;
-    font-size: 14.5px;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -491,15 +491,15 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
 }
 
 .metric-icon {
-  font-size: 22px;
+  font-size: var(--font-size-24);
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
 
   @media (max-width: 576px) {
-    font-size: 20px;
+    font-size: var(--font-size-20);
   }
 
   @media (min-aspect-ratio: 1/1) {
-    font-size: 24px;
+    font-size: var(--font-size-24);
   }
 }
 
@@ -510,24 +510,24 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
 
 .metric-label {
   color: $text-muted;
-  font-size: 11px;
+  font-size: var(--font-size-12);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: -0.01em;
 
   @media (max-width: 576px) {
-    font-size: 10px;
+    font-size: var(--font-size-12);
   }
 
   @media (min-aspect-ratio: 1/1) {
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 }
 
 .metric-value {
   margin-top: 3px;
   color: $text-primary;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 700;
   letter-spacing: -0.01em;
 
@@ -537,11 +537,11 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
 
   @media (max-width: 576px) {
     margin-top: 1px;
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 
   @media (min-aspect-ratio: 1/1) {
-    font-size: 15px;
+    font-size: var(--font-size-16);
   }
 }
 </style>

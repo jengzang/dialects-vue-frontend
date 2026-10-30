@@ -1943,7 +1943,7 @@ $primary-deep: #003d9e;
     width: 100%;
     text-align: center;
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   /* 页面加载与错误状态 */
@@ -1959,14 +1959,14 @@ $primary-deep: #003d9e;
   .loading {
     p {
       color: var(--text-secondary);
-      font-size: 15px;
+      font-size: var(--font-size-16);
     }
   }
 
   .error {
     p {
       color: var(--color-error);
-      font-size: 16px;
+      font-size: var(--font-size-16);
       font-weight: 500;
     }
   }
@@ -1978,7 +1978,7 @@ $primary-deep: #003d9e;
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-md);
     color: var(--action-primary-text);
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -2017,7 +2017,7 @@ $primary-deep: #003d9e;
     p {
       margin: 0;
       color: var(--text-secondary);
-      font-size: 15px;
+      font-size: var(--font-size-16);
     }
   }
 
@@ -2027,7 +2027,7 @@ $primary-deep: #003d9e;
     justify-content: center;
     margin: 8px 0;
     color: var(--text-dark);
-    font-size: 20px;
+    font-size: var(--font-size-20);
     font-weight: 700;
 
     &--with-pill {
@@ -2048,7 +2048,7 @@ $primary-deep: #003d9e;
     border-radius: var(--radius-pill);
     color: var(--color-secondary);
     white-space: nowrap;
-    font-size: 15px;
+    font-size: var(--font-size-16);
     font-weight: 700;
     line-height: 1.4;
   }
@@ -2058,7 +2058,7 @@ $primary-deep: #003d9e;
     justify-content: center;
     margin-bottom: 20px;
     color: var(--text-dark-light);
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 
   /* 汇总与地点详情玻璃容器 */
@@ -2129,7 +2129,7 @@ $primary-deep: #003d9e;
 
   .char-count-label {
     color: var(--text-secondary);
-    font-size: 13px;
+    font-size: var(--font-size-14);
     white-space: nowrap;
   }
 
@@ -2166,14 +2166,14 @@ $primary-deep: #003d9e;
   .chart-block-title {
     margin: 0 0 6px;
     color: var(--text-dark);
-    font-size: 17px;
+    font-size: var(--font-size-18);
     font-weight: 700;
   }
 
   .chart-block-desc {
     margin: 0 0 14px;
     color: var(--text-dark-light);
-    font-size: 13px;
+    font-size: var(--font-size-14);
     line-height: 1.6;
   }
 
@@ -2206,7 +2206,7 @@ $primary-deep: #003d9e;
     gap: 8px;
     margin: 0;
     color: var(--color-primary-hover);
-    font-size: 15px;
+    font-size: var(--font-size-16);
     font-weight: 700;
   }
 
@@ -2242,7 +2242,7 @@ $primary-deep: #003d9e;
     padding-bottom: 8px;
     border-bottom: 2px solid var(--border-gray-light);
     color: var(--text-dark);
-    font-size: 18px;
+    font-size: var(--font-size-18);
     font-weight: 600;
   }
 
@@ -2269,7 +2269,7 @@ $primary-deep: #003d9e;
   .syllable-name {
     margin-bottom: 8px;
     color: var(--text-dark);
-    font-size: 20px;
+    font-size: var(--font-size-20);
     font-weight: 700;
   }
 
@@ -2282,7 +2282,7 @@ $primary-deep: #003d9e;
   .stat-item {
     display: flex;
     gap: 4px;
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 
   .stat-label {
@@ -2310,7 +2310,7 @@ $primary-deep: #003d9e;
     background: rgba(var(--color-primary-rgb), 0.1);
     border-radius: var(--radius-xs);
     color: var(--color-primary);
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   .expand-btn {
@@ -2322,7 +2322,7 @@ $primary-deep: #003d9e;
     border-radius: var(--radius-md);
     box-shadow: 0 2px 6px rgba(var(--color-primary-rgb), 0.3);
     color: var(--action-primary-text);
-    font-size: 12px;
+    font-size: var(--font-size-12);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -2362,7 +2362,7 @@ $primary-deep: #003d9e;
     border-radius: var(--radius-md);
     box-shadow: 0 2px 6px rgba(var(--color-primary-rgb), 0.3);
     color: var(--action-primary-text);
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -2402,7 +2402,7 @@ $primary-deep: #003d9e;
     padding-bottom: 8px;
     border-bottom: 1px solid rgba(var(--color-primary-rgb), 0.12);
     color: var(--color-primary);
-    font-size: 20px;
+    font-size: var(--font-size-20);
     font-weight: 700;
     cursor: pointer;
     text-decoration: none;
@@ -2433,7 +2433,7 @@ $primary-deep: #003d9e;
   .feature-type {
     margin-bottom: 10px;
     color: var(--color-primary);
-    font-size: 15px;
+    font-size: var(--font-size-16);
     font-weight: 700;
   }
 
@@ -2466,7 +2466,7 @@ $primary-deep: #003d9e;
 
   .tag-syllable {
     color: var(--color-primary-hover);
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 700;
   }
 
@@ -2475,7 +2475,7 @@ $primary-deep: #003d9e;
     background: var(--color-secondary-bg);
     border-radius: var(--radius-pill);
     color: var(--color-secondary-text);
-    font-size: 12px;
+    font-size: var(--font-size-12);
     font-weight: 700;
   }
 
@@ -2540,7 +2540,7 @@ $primary-deep: #003d9e;
   p {
     margin: 0;
     color: var(--text-secondary);
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 600;
   }
 }
@@ -2575,13 +2575,13 @@ $primary-deep: #003d9e;
 
 .modal-stat-label {
   color: rgba(37, 54, 74, 0.68);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 600;
 }
 
 .modal-stat-value {
   color: var(--color-secondary-text);
-  font-size: 17px;
+  font-size: var(--font-size-18);
   font-weight: 800;
   letter-spacing: 0.02em;
   text-shadow: 0 1px 8px rgba(var(--color-secondary-rgb), 0.16);
@@ -2608,7 +2608,7 @@ $primary-deep: #003d9e;
   color: rgba(28, 43, 61, 0.86);
   word-break: break-word;
   text-wrap: pretty;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   line-height: 1.9;
   letter-spacing: 0.015em;

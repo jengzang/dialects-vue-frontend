@@ -121,7 +121,7 @@ $content-padding-mobile: 10px 12px;
 $transition-duration: 0.2s;
 
 .stats-content {
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .feature-group {
@@ -137,7 +137,7 @@ $transition-duration: 0.2s;
   padding-bottom: 8px;
   border-bottom: 2px solid $primary-border;
   color: $text-main;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
 }
 
@@ -175,7 +175,7 @@ $transition-duration: 0.2s;
 
   .stat-count {
     color: $text-secondary;
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -185,7 +185,7 @@ $transition-duration: 0.2s;
   border-top: 1px solid $border-light;
   color: $text-main;
   word-break: break-all;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   line-height: 1.8;
 }
 
@@ -196,7 +196,7 @@ $transition-duration: 0.2s;
   }
 
   .char-list {
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 }
 </style>

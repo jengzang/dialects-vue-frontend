@@ -125,7 +125,7 @@ watch(
 
 .entry-modal-title {
   margin: 0;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 700;
   color: $text-strong;
   display: inline-flex;
@@ -134,7 +134,7 @@ watch(
 }
 
 .entry-modal-dev-badge {
-  font-size: 11px;
+  font-size: var(--font-size-12);
   font-weight: 500;
   padding: 2px 8px;
   border-radius: var(--radius-sm);
@@ -146,7 +146,7 @@ watch(
 
 .entry-modal-subtitle {
   grid-column: 1 / 2;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: $text-muted;
 }
 
@@ -165,7 +165,7 @@ watch(
     border-radius: var(--radius-pill);
     background: transparent;
     color: $text-secondary;
-    font-size: 13px;
+    font-size: var(--font-size-14);
     font-weight: 600;
     cursor: pointer;
     transition:
@@ -188,12 +188,12 @@ watch(
   background: $glass-strong;
 
   &-icon {
-    font-size: 32px;
+    font-size: var(--font-size-32);
     margin-bottom: 12px;
   }
 
   &-title {
-    font-size: 18px;
+    font-size: var(--font-size-18);
     font-weight: 700;
     color: $text-strong;
   }
@@ -201,7 +201,7 @@ watch(
   &-text {
     max-width: 520px;
     margin: 12px auto 0;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     line-height: 1.7;
     color: $text-secondary;
   }

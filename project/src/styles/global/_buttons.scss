@@ -12,7 +12,7 @@
   border-radius: var(--glass-button-border-radius, var(--radius-lg));
   box-shadow: var(--glass-button-shadow, none);
   color: var(--glass-button-color, var(--text-deep));
-  font-size: var(--glass-button-font-size, var(--font-size-15));
+  font-size: var(--glass-button-font-size, var(--font-size-16));
   font-weight: var(--glass-button-font-weight, 500);
   line-height: var(--glass-button-line-height, 1.2);
   text-align: center;
@@ -113,7 +113,7 @@
     border-radius: var(--radius-md);
     box-shadow: var(--enter-button-shadow);
     color: var(--enter-button-text);
-    font-size: var(--glass-button-enter-font-size, var(--font-size-13));
+    font-size: var(--glass-button-enter-font-size, var(--font-size-14));
     font-weight: 500;
     white-space: nowrap;
 
@@ -131,7 +131,7 @@
 
   &[data-size='small'] {
     padding: var(--glass-button-small-padding, 8px 16px);
-    font-size: var(--glass-button-small-font-size, var(--font-size-13));
+    font-size: var(--glass-button-small-font-size, var(--font-size-14));
   }
 
   &[data-size='compact'] {

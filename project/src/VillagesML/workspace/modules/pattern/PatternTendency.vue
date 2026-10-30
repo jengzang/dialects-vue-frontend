@@ -189,7 +189,7 @@ watch(
   padding: 10px 16px;
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   background: var(--glass-50);
 }
 
@@ -207,7 +207,7 @@ watch(
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
 }
 
@@ -267,7 +267,7 @@ watch(
 .tendency-region {
   font-weight: 600;
   color: var(--text-primary);
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .tendency-bar {
@@ -287,7 +287,7 @@ watch(
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .z-score {
@@ -296,7 +296,7 @@ watch(
 
 .frequency {
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: var(--font-size-14);
 }
 
 @media (max-width: 768px) {

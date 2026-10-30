@@ -404,7 +404,7 @@ $transition-normal: 0.3s;
 .section-title {
   margin: 0 0 16px;
   color: $text-main;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   letter-spacing: -0.01em;
 }
@@ -420,7 +420,7 @@ $transition-normal: 0.3s;
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 
   thead {
     @include orange-gradient(0.12, 0.08);
@@ -436,7 +436,7 @@ $transition-normal: 0.3s;
   th {
     border-bottom: 2px solid $orange-border;
     white-space: nowrap;
-    font-size: 15px;
+    font-size: var(--font-size-16);
     font-weight: 600;
 
     &:first-child {
@@ -447,7 +447,7 @@ $transition-normal: 0.3s;
 
   td {
     border-bottom: 1px solid $border-light;
-    font-size: 15px;
+    font-size: var(--font-size-16);
   }
 
   tbody {
@@ -498,7 +498,7 @@ $transition-normal: 0.3s;
     @include orange-gradient(0.12, 0.06);
 
     .member-value {
-      font-size: 16px;
+      font-size: var(--font-size-16);
     }
 
     .upgrade-badge {
@@ -509,7 +509,7 @@ $transition-normal: 0.3s;
       border-radius: var(--radius-sm2);
       box-shadow: 0 2px 6px rgba(var(--color-success-rgb), 0.3);
       color: $text-white;
-      font-size: 11px;
+      font-size: var(--font-size-12);
       font-weight: 700;
     }
   }
@@ -523,7 +523,7 @@ $transition-normal: 0.3s;
 
   .cell-unlimited {
     color: $green;
-    font-size: 16px;
+    font-size: var(--font-size-16);
     font-weight: 700;
   }
 }
@@ -556,12 +556,12 @@ $transition-normal: 0.3s;
   }
 
   .feature-icon {
-    font-size: 24px;
+    font-size: var(--font-size-24);
   }
 
   .feature-text {
     color: $text-main;
-    font-size: 15px;
+    font-size: var(--font-size-16);
     font-weight: 500;
   }
 }
@@ -578,7 +578,7 @@ $transition-normal: 0.3s;
   p {
     margin: 0;
     color: $text-main;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 500;
     line-height: 1.6;
   }
@@ -597,7 +597,7 @@ $transition-normal: 0.3s;
     border-radius: var(--radius-md);
     box-shadow: 0 6px 16px $orange-shadow;
     color: $text-white;
-    font-size: 17px;
+    font-size: var(--font-size-18);
     font-weight: 700;
     cursor: pointer;
     transition:
@@ -618,7 +618,7 @@ $transition-normal: 0.3s;
   .cta-hint {
     margin-top: 12px;
     color: $text-secondary;
-    font-size: 13px;
+    font-size: var(--font-size-14);
     font-weight: 500;
   }
 }
@@ -651,11 +651,11 @@ $transition-normal: 0.3s;
   }
 
   .section-title {
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 
   .comparison-table {
-    font-size: 12px;
+    font-size: var(--font-size-12);
 
     th,
     td {
@@ -676,11 +676,11 @@ $transition-normal: 0.3s;
     padding: 10px 14px;
 
     .feature-icon {
-      font-size: 20px;
+      font-size: var(--font-size-20);
     }
 
     .feature-text {
-      font-size: 14px;
+      font-size: var(--font-size-14);
     }
   }
 
@@ -688,7 +688,7 @@ $transition-normal: 0.3s;
     .btn-register {
       width: 100%;
       padding: 12px 20px;
-      font-size: 15px;
+      font-size: var(--font-size-16);
     }
   }
 }

@@ -582,7 +582,7 @@ $region-accent: var(--color-primary);
   .page-title {
     margin: 0;
     color: $region-text;
-    font-size: clamp(20px, 2.3vw, 28px);
+    font-size: clamp(var(--font-size-20), 2.3vw, var(--font-size-32));
   }
 
   .title-icon {
@@ -616,7 +616,7 @@ $region-accent: var(--color-primary);
 
   .header-stat-label {
     color: var(--text-deep);
-    font-size: 12px;
+    font-size: var(--font-size-12);
     font-weight: 750;
     line-height: 1;
     white-space: nowrap;
@@ -624,7 +624,7 @@ $region-accent: var(--color-primary);
 
   .header-stat-value {
     color: $region-accent;
-    font-size: 16px;
+    font-size: var(--font-size-16);
     font-weight: 850;
     line-height: 1;
     letter-spacing: -0.04em;
@@ -641,7 +641,7 @@ $region-accent: var(--color-primary);
     border: 1px solid var(--glass-50);
     border-radius: var(--radius-pill);
     color: var(--action-primary-text);
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 800;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -659,7 +659,7 @@ $region-accent: var(--color-primary);
 }
 
 .btn-icon {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   line-height: 1;
 }
 
@@ -688,7 +688,7 @@ $region-accent: var(--color-primary);
 .search-input {
   width: 100%;
   height: 42px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .status-panel {
@@ -705,7 +705,7 @@ $region-accent: var(--color-primary);
 
   p {
     margin: 0;
-    font-size: 15px;
+    font-size: var(--font-size-16);
     font-weight: 800;
     letter-spacing: 0.02em;
   }
@@ -718,14 +718,14 @@ $region-accent: var(--color-primary);
 }
 
 .empty-icon {
-  font-size: 58px;
+  font-size: var(--font-size-48);
   filter: drop-shadow(0 12px 26px rgba(var(--color-shadow-rgb), 0.12));
 }
 
 .empty-text {
   margin: 0;
   color: $region-muted;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 700;
 }
 
@@ -785,7 +785,7 @@ padding:20px;
 .region-name {
   margin: 0;
   color: $region-text;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 820;
   letter-spacing: -0.02em;
 }
@@ -800,7 +800,7 @@ padding:20px;
   width: 34px;
   height: 34px;
   padding: 0;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   --glass-button-border-radius: var(--radius-md);
 }
 
@@ -834,7 +834,7 @@ padding:20px;
   min-height: 26px;
   padding: 5px 10px;
   border-radius: var(--radius-pill);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 750;
   line-height: 1;
 }
@@ -855,7 +855,7 @@ padding:20px;
   flex-basis: 100%;
   margin: 0;
   color: var(--text-slate);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   line-height: 1.6;
 }
 
@@ -900,7 +900,7 @@ padding:20px;
     }
 
     .page-title {
-      font-size: 20px;
+      font-size: var(--font-size-20);
     }
 
     .header-stats {
@@ -913,11 +913,11 @@ padding:20px;
     }
 
     .header-stat-label {
-      font-size: 11px;
+      font-size: var(--font-size-12);
     }
 
     .header-stat-value {
-      font-size: 15px;
+      font-size: var(--font-size-16);
     }
 
     .user-badge {
@@ -950,7 +950,7 @@ padding:20px;
 
   .search-input {
     height: 42px;
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 
   .region-card {
@@ -999,7 +999,7 @@ padding:20px;
     width: 100%;
     min-height: 38px;
     padding-inline: 10px;
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 
   .back-btn {
@@ -1007,7 +1007,7 @@ padding:20px;
   }
 
   .page-title {
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 
   .page-header {
@@ -1029,7 +1029,7 @@ padding:20px;
   }
 
   .region-name {
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 
   .region-actions {
@@ -1043,7 +1043,7 @@ padding:20px;
   }
 
   .empty-icon {
-    font-size: 48px;
+    font-size: var(--font-size-48);
   }
 }
 </style>

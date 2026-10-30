@@ -347,7 +347,7 @@ onMounted(async () => {
   background: rgba(var(--vml-blue-rgb), 0.08);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.25);
   border-radius: var(--radius-md);
-  font-size: 13px;
+  font-size: var(--font-size-14);
 }
 
 .banner-item {
@@ -358,7 +358,7 @@ onMounted(async () => {
 
 .banner-label {
   color: var(--text-secondary);
-  font-size: 11px;
+  font-size: var(--font-size-12);
   margin-bottom: 2px;
 }
 
@@ -379,7 +379,7 @@ onMounted(async () => {
 
 .banner-tip {
   margin-left: auto;
-  font-size: 11px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   font-style: italic;
   padding-left: 12px;
@@ -390,7 +390,7 @@ onMounted(async () => {
   padding: 10px 16px;
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   background: var(--glass-50);
 }
 
@@ -445,7 +445,7 @@ onMounted(async () => {
 .col-ngram {
   font-weight: 600;
   color: var(--text-primary);
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .col-ngram.clickable {
@@ -461,7 +461,7 @@ onMounted(async () => {
 }
 
 .goto-icon {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   opacity: 0;
   transition: opacity 0.2s ease;
 }
@@ -473,7 +473,7 @@ onMounted(async () => {
 .position-badge {
   padding: 3px 10px;
   border-radius: var(--radius-md);
-  font-size: 11px;
+  font-size: var(--font-size-12);
   font-weight: 500;
   display: inline-block;
 }
@@ -541,7 +541,7 @@ onMounted(async () => {
 }
 
 .pattern-ngram {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -577,13 +577,13 @@ onMounted(async () => {
   background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
   border-radius: var(--radius-md);
-  font-size: 13px;
+  font-size: var(--font-size-14);
 }
 
 .type-badge {
   padding: 3px 10px;
   border-radius: var(--radius-md);
-  font-size: 11px;
+  font-size: var(--font-size-12);
   font-weight: 500;
   display: inline-block;
 }

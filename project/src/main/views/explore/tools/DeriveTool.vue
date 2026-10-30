@@ -30,7 +30,7 @@
 }
 
 .derive-tool-placeholder__text {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   color: rgba(var(--text-secondary-rgb), 0.48);
 }
 </style>

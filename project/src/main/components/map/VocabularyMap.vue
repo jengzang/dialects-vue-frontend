@@ -760,7 +760,7 @@ watch(displayMode, () => {
 
 
 .loading-text {
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 500;
   color: var(--text-primary);
   letter-spacing: 0.3px;
@@ -802,7 +802,7 @@ watch(displayMode, () => {
   border: 1px solid var(--border-light-gray);
   padding: 8px 12px;
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   cursor: pointer;
   outline: none;
   transition: border 0.3s;
@@ -818,7 +818,7 @@ watch(displayMode, () => {
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-muted)
 }
 
@@ -838,7 +838,7 @@ watch(displayMode, () => {
   border: none;
   background: transparent;
   border-radius: var(--radius-sm);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   cursor: pointer;
   transition: all 0.2s;
   color: var(--text-tertiary)
@@ -883,7 +883,7 @@ watch(displayMode, () => {
   padding: 8px;
   border-radius: var(--radius-sm2);
   cursor: pointer;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   transition: background 0.2s;
 }
 
@@ -905,7 +905,7 @@ watch(displayMode, () => {
   top: 24px;
   right: 24px;
   padding: 12px 24px;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-dark);
   background: var(--glass-70);
@@ -937,7 +937,7 @@ watch(displayMode, () => {
   padding: 4px 10px;
   border-radius: var(--radius-sm);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   white-space: nowrap;
   font-family: var(--font-sans);
   font-weight: 500;

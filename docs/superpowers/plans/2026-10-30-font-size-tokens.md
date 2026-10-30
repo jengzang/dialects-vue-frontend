@@ -1,20 +1,11 @@
 # Font size token migration
 
-The user approved fine-grained font size tokens and gradual migration, with navigation readability as the immediate visual correction.
+The user's updated requirement supersedes the initial fine-grained scale: retain exactly eight global font size tokens (12, 14, 16, 18, 20, 24, 32, 48). Round existing static font sizes to the nearest tier, choosing the larger tier on ties. Only font-size declarations and their configuration references may change; padding, margin, dimensions and other layout values must remain unchanged.
 
-## Design
+- [x] Establish shared tokens and migrate shared styles (78d0dba1). The initial precise scale is superseded by the eight-tier requirement below.
+- [x] Connect three bars to bounded viewport font scaling and fix undersized portrait labels (defd62c4). Retain tab multipliers and CommonBar's mobile icon ratio. Chrome checks cover normal desktop, 4K, three portrait viewports, active state, icon settings and enlarged root fonts.
+- [x] Consolidate to eight tokens and migrate static component styles. Removed extra aliases and rounded font sizes only. Snapshot verification covers 237 migrated files and confirms unchanged non-font source, including layout and Chinese/emoji. Independent review found no defects. Web production build and Chrome navigation checks passed.
 
-- Define exact size primitives in the existing global token surface. Names express the equivalent CSS pixel size at the default 16px root, including fractional sizes; values use rem. Add semantic aliases for captions, body, labels, headings and navigation.
-- Preserve existing sizes at the default root during migration. Keep relative em relationships and fluid viewport terms. Do not change the root font size, copy, layout, routing or business logic.
-- Three bars share a bounded fluid font unit, with existing per-tab numeric configuration retained as a multiplier. Preserve the existing active/inactive multipliers. Give stacked mobile labels a readable minimum. Correct CommonBar icons to follow the corresponding desktop/mobile configuration.
-- Migrate static font-size declarations in component style blocks and shared SCSS, including component font size custom properties. Retain inline styles, JS chart/Canvas numbers, export templates, and Sass values used in layout calculations until their consumers can be handled separately.
+Keep relative em rules and dynamic chart/export/Sass exceptions. For interpolation expressions, round endpoint text sizes rather than treating an offset as an independent font size. No dependency installation, no unrelated refactors, and no sitemap changes in commits.
 
-## Execution
-
-- [x] Step 1: Add exact primitives and aliases, migrate shared styles, document usage. Validated both Sass entrypoints, 80 exact token values, 21 files with only font substitutions, and 14 focused tests. Reviewed staged and unstaged scope; the pre-existing sitemap change is excluded.
-- [x] Step 2: Connect NavBar, ExploreBar and CommonBar to navigation tokens. Verified computed fonts in Chrome at ordinary desktop, large desktop, three portrait sizes, and enlarged root font; retained tab settings and mobile icon multiplier. Navigation unit tests passed (15 tests). Reviewed font-only changes and CommonBar's corrected desktop icon setting.
-- [ ] Step 3: Migrate remaining static component styles without rounding. Verify that restoring token references to their former lengths reproduces the previous source outside approved bar changes; compile the production build and run the existing test suite. Update source-contract tests to resolve tokens while retaining their size assertions. Review and commit.
-
-## Verification
-
-Use existing dependencies only. No installs. Save a pre-migration source baseline for exact comparison. Validate UTF-8, unchanged non-style source, complete token references, original sizes at a 16px root, and retained dynamic/relative exceptions. Run Vite directly in web mode to avoid regenerating the user's modified sitemap. Do not include that sitemap in any commit.
+Verification: 162 test files completed with 1146 passing tests and 10 failures matching the pre-migration baseline exactly. A separate theme palette run passed all 26 tests. The regionInputResolution test did not finish during baseline execution (Node heap exhaustion), so it was excluded from the final suite run. No unrelated test failures were fixed. Concurrent copy/SEO commit d479dcbb and the pre-existing sitemap modification are outside this change.

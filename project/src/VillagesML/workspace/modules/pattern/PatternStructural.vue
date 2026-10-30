@@ -183,7 +183,7 @@ const goToTendency = (pattern) => {
 }
 
 .item-pattern {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -199,7 +199,7 @@ const goToTendency = (pattern) => {
   background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
   border-radius: var(--radius-md);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 500;
 }
 
@@ -215,7 +215,7 @@ const goToTendency = (pattern) => {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .structure-label {
@@ -234,7 +234,7 @@ const goToTendency = (pattern) => {
 }
 
 .examples-label {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
 }
 
@@ -249,7 +249,7 @@ const goToTendency = (pattern) => {
   background: rgba(var(--color-success-rgb), 0.2);
   color: var(--color-success);
   border-radius: var(--radius-md);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -265,7 +265,7 @@ const goToTendency = (pattern) => {
   color: var(--color-primary);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-sm2);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;

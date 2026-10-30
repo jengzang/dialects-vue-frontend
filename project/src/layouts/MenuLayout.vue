@@ -115,7 +115,7 @@ $portrait-ratio: 1;
 
   .glass-content {
     padding: 16dvh 8px 8px;
-    font-size: 1.1rem;
+    font-size: var(--font-size-18);
     line-height: 1.6;
   }
 }
@@ -123,7 +123,7 @@ $portrait-ratio: 1;
 /* 中等宽度 */
 @media (min-width: 481px) and (max-width: 768px) {
   .glass-content {
-    font-size: 1rem;
+    font-size: var(--font-size-16);
     line-height: 1.5;
   }
 }
@@ -131,7 +131,7 @@ $portrait-ratio: 1;
 /* 桌面端 */
 @media (min-width: 769px) {
   .glass-content {
-    font-size: 0.95rem;
+    font-size: var(--font-size-16);
     line-height: 1.4;
   }
 }

@@ -133,7 +133,7 @@ function handleSubmit() {
 
     span {
       color: var(--text-secondary);
-      font-size: 13px;
+      font-size: var(--font-size-14);
       line-height: 1.4;
     }
   }
@@ -143,20 +143,20 @@ function handleSubmit() {
     min-inline-size: 0;
     min-block-size: calc(44px + var(--query-input-growth, 0px));
     box-sizing: border-box;
-    font-size: calc(15px + 5px * var(--query-expansion, 0));
+    font-size: calc(var(--font-size-16) + (var(--font-size-20) - var(--font-size-16)) * var(--query-expansion, 0));
   }
 
   &__error {
     grid-column: 1 / -1;
     margin: 0;
     color: var(--color-error);
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 
   &__hint {
     @include text-truncate;
     color: var(--text-tertiary);
-    font-size: 12px;
+    font-size: var(--font-size-12);
     line-height: 1.4;
   }
 

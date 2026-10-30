@@ -800,7 +800,7 @@ $text-primary: var(--text-primary);
 .section-title {
   margin: 0.5rem;
   text-align: center;
-  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-size: clamp(var(--font-size-32), 4vw, var(--font-size-48));
   font-weight: 700;
   color: $primary;
 }
@@ -831,7 +831,7 @@ $text-primary: var(--text-primary);
   &__icon {
     flex-shrink: 0;
     color: $primary;
-    font-size: 1.1rem;
+    font-size: var(--font-size-18);
   }
 
   &__input {
@@ -841,7 +841,7 @@ $text-primary: var(--text-primary);
     border: none;
     outline: none;
     color: $text-primary;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
 
     &::placeholder {
       color: var(--text-dark-lighter);
@@ -861,7 +861,7 @@ $text-primary: var(--text-primary);
     border: none;
     border-radius: var(--radius-full);
     color: $primary;
-    font-size: 0.75rem;
+    font-size: var(--font-size-12);
     line-height: 1;
     cursor: pointer;
 
@@ -886,7 +886,7 @@ $text-primary: var(--text-primary);
 
   &__label {
     flex-shrink: 0;
-    font-size: 0.8125rem;
+    font-size: var(--font-size-14);
     font-weight: 700;
     color: var(--text-dark-lighter);
   }
@@ -904,7 +904,7 @@ $text-primary: var(--text-primary);
     background: transparent;
     border: none;
     color: var(--text-dark-lighter);
-    font-size: 0.8125rem;
+    font-size: var(--font-size-14);
     cursor: pointer;
     border-radius: var(--radius-sm);
 
@@ -924,7 +924,7 @@ $text-primary: var(--text-primary);
   border: 1px solid rgba(var(--color-primary-rgb), 0.15);
   border-radius: var(--radius-full);
   color: $text-primary;
-  font-size: 0.8125rem;
+  font-size: var(--font-size-14);
   text-decoration: none;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -970,7 +970,7 @@ $text-primary: var(--text-primary);
     );
     border-radius: var(--radius-md);
     color: $primary;
-    font-size: 1.25rem;
+    font-size: var(--font-size-20);
   }
 
   &__text {
@@ -979,14 +979,14 @@ $text-primary: var(--text-primary);
 
   &__title {
     margin: 0;
-    font-size: 1.0625rem;
+    font-size: var(--font-size-18);
     font-weight: 700;
     color: $text-primary;
   }
 
   &__desc {
     margin: 0.1rem 0 0;
-    font-size: 0.8125rem;
+    font-size: var(--font-size-14);
     color: var(--text-dark-lighter);
   }
 
@@ -1039,7 +1039,7 @@ $text-primary: var(--text-primary);
     );
     border-radius: var(--radius-md);
     color: $primary;
-    font-size: 1.5rem;
+    font-size: var(--font-size-24);
     transition: transform 0.2s ease;
   }
 
@@ -1050,14 +1050,14 @@ $text-primary: var(--text-primary);
   }
 
   &__title {
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     font-weight: 600;
     color: $text-primary;
   }
 
   &__desc {
     margin-top: 0.15rem;
-    font-size: 0.8125rem;
+    font-size: var(--font-size-14);
     line-height: 1.4;
     color: var(--text-dark-lighter);
   }
@@ -1079,11 +1079,11 @@ $text-primary: var(--text-primary);
     &__icon {
       width: 34px;
       height: 34px;
-      font-size: 1.25rem;
+      font-size: var(--font-size-20);
     }
 
     &__desc {
-      font-size: 0.75rem;
+      font-size: var(--font-size-12);
     }
   }
 

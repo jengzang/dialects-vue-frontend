@@ -1104,7 +1104,7 @@ $transition-normal: 0.3s;
   margin: 0 0 1rem;
   color: $text-primary;
   text-align: center;
-  font-size: 1.8rem;
+  font-size: var(--font-size-32);
   font-weight: 700;
 }
 
@@ -1133,7 +1133,7 @@ $transition-normal: 0.3s;
     border-radius: var(--radius-full);
     box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
     color: var(--action-primary-text);
-    font-size: 1.2rem;
+    font-size: var(--font-size-20);
     font-weight: 700;
   }
 
@@ -1148,13 +1148,13 @@ $transition-normal: 0.3s;
   .step-title {
     margin: 0;
     color: $text-primary;
-    font-size: 1.3rem;
+    font-size: var(--font-size-20);
     font-weight: 600;
   }
 
   .step-hint {
     color: $text-secondary;
-    font-size: 0.9rem;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -1189,7 +1189,7 @@ $transition-normal: 0.3s;
 
   .no-data-icon {
     margin-bottom: 1rem;
-    font-size: 3rem;
+    font-size: var(--font-size-48);
   }
 }
 
@@ -1211,7 +1211,7 @@ $transition-normal: 0.3s;
 
 .selection-info {
   min-height: 1.5rem;
-  font-size: 0.95rem;
+  font-size: var(--font-size-16);
   font-weight: 600;
 
   .status-active {
@@ -1229,7 +1229,7 @@ $transition-normal: 0.3s;
   padding: 0.7rem 1rem;
   border: 2px solid $border-medium;
   border-radius: var(--radius-md, var(--radius-sm2));
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   transition:
     border-color $transition-fast,
     box-shadow $transition-fast;
@@ -1245,7 +1245,7 @@ $transition-normal: 0.3s;
   padding: 0.7rem;
   border: none;
   border-radius: var(--radius-md, var(--radius-sm2));
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   font-weight: 600;
   cursor: pointer;
   transition:
@@ -1275,7 +1275,7 @@ $transition-normal: 0.3s;
 .persistence-hint {
   padding: 0.25rem 0;
   color: var(--color-text-secondary, var(--text-muted));
-  font-size: 0.8rem;
+  font-size: var(--font-size-12);
   font-style: italic;
   line-height: 1.4;
 }
@@ -1290,7 +1290,7 @@ $transition-normal: 0.3s;
   align-items: center;
   justify-content: space-between;
   color: $text-primary;
-  font-size: 0.95rem;
+  font-size: var(--font-size-16);
   font-weight: 600;
 }
 
@@ -1314,7 +1314,7 @@ $transition-normal: 0.3s;
   border: 2px solid rgba(0, 0, 0, 0.5);
   border-radius: var(--radius-2xl);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  font-size: 0.95rem;
+  font-size: var(--font-size-16);
   cursor: pointer;
   transition:
     box-shadow $transition-fast,
@@ -1332,7 +1332,7 @@ $transition-normal: 0.3s;
 
   .tag-count {
     color: var(--text-tertiary);
-    font-size: 0.8rem;
+    font-size: var(--font-size-12);
     font-weight: 600;
   }
 
@@ -1344,7 +1344,7 @@ $transition-normal: 0.3s;
     background: none;
     border: none;
     color: var(--text-lightest);
-    font-size: 1.2rem;
+    font-size: var(--font-size-20);
     line-height: 1;
     cursor: pointer;
     transition:
@@ -1362,7 +1362,7 @@ $transition-normal: 0.3s;
   padding: 1rem;
   color: $text-muted;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   font-style: italic;
 }
 
@@ -1392,7 +1392,7 @@ $transition-normal: 0.3s;
   .log-scale-label {
     color: $text-primary;
     white-space: nowrap;
-    font-size: 0.95rem;
+    font-size: var(--font-size-16);
     font-weight: 600;
   }
 }
@@ -1406,7 +1406,7 @@ $transition-normal: 0.3s;
   border-radius: var(--radius-2xl);
   box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.4);
   color: var(--action-primary-text);
-  font-size: 1.2rem;
+  font-size: var(--font-size-20);
   font-weight: 700;
   cursor: pointer;
   transition:
@@ -1454,7 +1454,7 @@ $transition-normal: 0.3s;
   border-radius: var(--radius-md, var(--radius-sm2));
   color: $text-primary;
   font-family: var(--font-mono);
-  font-size: 0.95rem;
+  font-size: var(--font-size-16);
   font-weight: 600;
 }
 
@@ -1472,7 +1472,7 @@ $transition-normal: 0.3s;
   border-radius: var(--radius-lg, var(--radius-md));
   box-shadow: 0 2px 8px rgba(80, 200, 120, 0.3);
   color: $white;
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   font-weight: 600;
   cursor: pointer;
   transition:
@@ -1493,7 +1493,7 @@ $transition-normal: 0.3s;
 .text-btn {
   background: none;
   border: none;
-  font-size: 0.85rem;
+  font-size: var(--font-size-14);
   text-decoration: underline;
   cursor: pointer;
   transition: opacity $transition-fast;
@@ -1531,18 +1531,18 @@ $transition-normal: 0.3s;
 
   .preview-segment-label {
     color: $text-primary;
-    font-size: 0.9rem;
+    font-size: var(--font-size-14);
     font-weight: 600;
   }
 
   .preview-segment-meta {
     color: $text-secondary;
-    font-size: 0.8rem;
+    font-size: var(--font-size-12);
   }
 
   .preview-segment-time {
     color: $text-muted;
-    font-size: 0.75rem;
+    font-size: var(--font-size-12);
   }
 
   .text-btn.danger {
@@ -1609,20 +1609,20 @@ $transition-normal: 0.3s;
     .step-number {
       width: 2rem;
       height: 2rem;
-      font-size: 1rem;
+      font-size: var(--font-size-16);
     }
 
     .step-title {
-      font-size: 1.1rem;
+      font-size: var(--font-size-18);
     }
 
     .step-hint {
-      font-size: 0.85rem;
+      font-size: var(--font-size-14);
     }
   }
 
   .panel-title {
-    font-size: 1.4rem;
+    font-size: var(--font-size-24);
   }
 }
 </style>

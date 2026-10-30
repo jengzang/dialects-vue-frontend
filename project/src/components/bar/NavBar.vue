@@ -61,7 +61,7 @@
                 flex: getOverflowFlex(t, isMenuTabActive(t.tab), false),
                 minWidth: getOverflowMinWidth(t, false),
                 maxWidth: getOverflowMaxWidth(t, false),
-                fontSize: 'calc(var(--font-size-nav-unit) * ' + t.fontSize + ')'
+                fontSize: 'calc(clamp(var(--font-size-16), 1.5dvh, var(--font-size-20)) * ' + t.fontSize + ')'
               }"
               @click.prevent="onMenuBarClick(t, navigate)"
               @mouseenter="(e) => handleTabTooltipEnter(e, t.label)"
@@ -166,7 +166,7 @@
                 flex: getOverflowFlex(t, isMenuTabActive(t.tab), true),
                 minWidth: getOverflowMinWidth(t, true),
                 maxWidth: getOverflowMaxWidth(t, true),
-                fontSize: 'calc(var(--font-size-nav-mobile-unit) * ' + (t.mobileFontSize || t.fontSize) + ')'
+                fontSize: 'calc(clamp(var(--font-size-16), 1.5dvh, var(--font-size-20)) * ' + (t.mobileFontSize || t.fontSize) + ')'
               }"
               @click.prevent="onMenuBarClick(t, navigate)"
               @mouseenter="(e) => handleTabTooltipEnter(e, t.label)"
@@ -691,7 +691,7 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
   white-space: nowrap;
   text-align: center;
   text-decoration: none;
-  font-size: var(--font-size-20-8);
+  font-size: var(--font-size-20);
   cursor: pointer;
   user-select: none;
   .tab-external {
@@ -711,7 +711,7 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
   height: calc(100% - clamp(3px, 1dvh, 6px));
   margin: 0 calc(var(--tab-pad) * -1);
   padding: 0 var(--tab-pad);
-  font-size: var(--font-size-nav-inactive);
+  font-size: 0.9em;
   border: 3px solid transparent;
   border-radius: var(--radius-md);
 
@@ -744,7 +744,7 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
     border-radius: 25px;
     color: var(--color-primary-hover);
     font-weight: 700;
-    font-size: var(--font-size-nav-active);
+    font-size: 1.1em;
     transition:
       background 0.3s ease 0.6s,
       color 0.3s ease 0.6s,
@@ -953,11 +953,11 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
     }
 
     .nav-icon, .label {
-      font-size: var(--font-size-nav-inactive);
+      font-size: 0.9em;
     }
 
     .label--tiny {
-      font-size: var(--font-size-nav-caption) !important;
+      font-size: max(var(--font-size-12), 0.65em) !important;
       max-width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -976,7 +976,7 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
       transition: color 0.3s ease 0.6s;
 
       .nav-icon, .label {
-        font-size: var(--font-size-nav-active);
+        font-size: 1.1em;
       }
     }
   }

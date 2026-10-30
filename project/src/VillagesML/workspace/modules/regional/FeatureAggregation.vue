@@ -509,13 +509,13 @@ const liftClass = (lift) => {
 
 .section-description {
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   margin-bottom: 8px;
 }
 
 .field-label {
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   white-space: nowrap;
 }
 
@@ -551,14 +551,14 @@ const liftClass = (lift) => {
   background: var(--bg-glass);
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  font-size: 13px;
+  font-size: var(--font-size-14);
 }
 
 .tag-remove {
   border: none;
   background: none;
   cursor: pointer;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   line-height: 1;
   color: var(--text-secondary);
   padding: 0;
@@ -583,7 +583,7 @@ const liftClass = (lift) => {
   padding: 4px 8px;
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   text-align: center;
   background: var(--bg-input);
   color: var(--text-primary);
@@ -615,26 +615,26 @@ const liftClass = (lift) => {
   }
 
   .collapse-arrow {
-    font-size: 16px;
+    font-size: var(--font-size-16);
     font-weight: 700;
     color: var(--color-primary);
   }
 
   .region-index {
-    font-size: 13px;
+    font-size: var(--font-size-14);
     color: var(--text-secondary);
     flex-shrink: 0;
   }
 
   .region-stats {
-    font-size: 13px;
+    font-size: var(--font-size-14);
     color: var(--text-secondary);
     display: block;
     margin-top: 2px;
   }
 
   h4 {
-    font-size: 15px;
+    font-size: var(--font-size-16);
     margin: 0 0 8px 0;
     color: var(--text-primary);
   }
@@ -648,7 +648,7 @@ const liftClass = (lift) => {
 .simple-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: var(--font-size-14);
 
   th, td {
     padding: 6px 10px;
@@ -659,7 +659,7 @@ const liftClass = (lift) => {
   th {
     font-weight: 600;
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   .row-high {
@@ -671,7 +671,7 @@ const liftClass = (lift) => {
   }
 
   .char-cell {
-    font-size: 18px;
+    font-size: var(--font-size-18);
     font-weight: 600;
   }
 }
@@ -680,7 +680,7 @@ const liftClass = (lift) => {
   display: inline-block;
   padding: 1px 8px;
   border-radius: 10px;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 600;
 
   &.high {
@@ -696,7 +696,7 @@ const liftClass = (lift) => {
 
 .zscore-hint {
   text-align: center;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: var(--color-warning, #f0a020);
   background: rgba(240, 160, 32, 0.08);
   border-radius: 6px;
@@ -718,7 +718,7 @@ const liftClass = (lift) => {
 
 .zscore-label {
   width: 120px;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   text-align: right;
   flex-shrink: 0;
   color: var(--text-secondary);
@@ -741,7 +741,7 @@ const liftClass = (lift) => {
 
 .zscore-value {
   width: 56px;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   text-align: right;
 
@@ -768,20 +768,20 @@ const liftClass = (lift) => {
 }
 
 .metric-value {
-  font-size: 22px;
+  font-size: var(--font-size-24);
   font-weight: 700;
   color: var(--color-primary);
 }
 
 .metric-label {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   margin-top: 4px;
 }
 
 .cache-hint {
   text-align: center;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-muted, #888);
 }
 

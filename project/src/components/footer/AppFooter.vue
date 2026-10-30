@@ -401,7 +401,7 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 6px;
   white-space: pre-wrap;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   color: var(--color-primary-hover);
 
   &:hover:not(:disabled) {
@@ -439,7 +439,7 @@ onBeforeUnmount(() => {
   min-width: 0;
   color: var(--color-primary-hover);
   font-weight: 600;
-  font-size: 16px;
+  font-size: var(--font-size-16);
 
   &:hover:not(:disabled) {
     color: var(--color-primary);
@@ -460,7 +460,7 @@ onBeforeUnmount(() => {
 
 .footer-meta .info-text {
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: var(--font-size-14);
 }
 
 .footer-theme-label {

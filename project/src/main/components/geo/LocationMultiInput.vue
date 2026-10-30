@@ -472,7 +472,7 @@ $portrait-ratio: 1;
   label {
     flex-shrink: 0;
     color: var(--text-dark);
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 600;
   }
 
@@ -486,7 +486,7 @@ $portrait-ratio: 1;
     box-shadow: var(--shadow-sm);
     color: var(--text-dark);
     font-family: inherit;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     transition: all 0.3s ease;
 
     @include glass-blur(12px);
@@ -529,7 +529,7 @@ $portrait-ratio: 1;
   border-radius: var(--radius-sm2);
   color: var(--color-primary);
   white-space: nowrap;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 500;
   cursor: pointer;
   user-select: none;
@@ -562,7 +562,7 @@ $portrait-ratio: 1;
   border-radius: var(--radius-pill);
   color: var(--color-primary);
   white-space: nowrap;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 600;
 }
 
@@ -570,7 +570,7 @@ $portrait-ratio: 1;
   min-width: 0;
   @include text-truncate;
   color: var(--text-dark-medium);
-  font-size: 13px;
+  font-size: var(--font-size-14);
 }
 
 .expand-btn-inline {
@@ -581,7 +581,7 @@ $portrait-ratio: 1;
   border-radius: var(--radius-pill);
   color: var(--color-primary);
   white-space: nowrap;
-  font-size: 11px;
+  font-size: var(--font-size-12);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -602,7 +602,7 @@ $portrait-ratio: 1;
   border-left: 3px solid $warning-orange;
   border-radius: var(--radius-sm);
   color: $warning-orange;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 500;
 }
 
@@ -612,7 +612,7 @@ $portrait-ratio: 1;
   top: 50%;
   right: 12px;
   color: var(--color-success);
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: bold;
   pointer-events: none;
   transform: translateY(-50%);
@@ -649,7 +649,7 @@ $portrait-ratio: 1;
 .success-message {
   padding: 6px 8px;
   color: var(--color-success);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 600;
 }
 
@@ -657,7 +657,7 @@ $portrait-ratio: 1;
   padding: 8px 10px;
   border-radius: var(--radius-sm);
   color: var(--text-dark);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   cursor: pointer;
   transition: background-color 0.2s ease;
 
@@ -682,7 +682,7 @@ $portrait-ratio: 1;
   border-radius: var(--radius-pill);
   box-shadow: var(--shadow-sm2);
   color: var(--text-dark-lightest);
-  font-size: 14px;
+  font-size: var(--font-size-14);
 
   .location-chip-name {
     color: var(--color-primary-hover);
@@ -692,7 +692,7 @@ $portrait-ratio: 1;
   .location-chip-partition {
     margin-left: 6px;
     color: var(--text-dark-medium);
-    font-size: 11px;
+    font-size: var(--font-size-12);
 
     .part-val {
       display: inline-block;
@@ -707,7 +707,7 @@ $portrait-ratio: 1;
 @media (max-aspect-ratio: $portrait-ratio) {
   .input-section {
     textarea {
-      font-size: 14px;
+      font-size: var(--font-size-14);
     }
   }
 
@@ -723,17 +723,17 @@ $portrait-ratio: 1;
   }
 
   .preview-inline {
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   .count-inline {
     padding: 2px;
-    font-size: 11px;
+    font-size: var(--font-size-12);
   }
 
   .expand-btn-inline {
     padding: 2px 8px;
-    font-size: 10px;
+    font-size: var(--font-size-12);
   }
 
   .locations-list {
@@ -742,7 +742,7 @@ $portrait-ratio: 1;
 
   .location-chip {
     padding: 4px 8px;
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 }
 </style>

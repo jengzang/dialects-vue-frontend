@@ -583,7 +583,7 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
   flex-shrink: 0;
   margin: 0;
   color: $text-dark;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 600;
 }
 
@@ -594,7 +594,7 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
   border-radius: var(--radius-md);
   color: var(--color-success);
   white-space: nowrap;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 600;
 }
 
@@ -634,7 +634,7 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
   border-radius: var(--radius-sm2);
   color: var(--text-dark);
   white-space: nowrap;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -658,7 +658,7 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
   border-radius: var(--radius-sm2);
   color: var(--action-primary-text);
   white-space: nowrap;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -680,7 +680,7 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
   border-radius: var(--radius-md);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   color: $text-dark;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   cursor: pointer;
 
@@ -701,7 +701,7 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
   border-radius: var(--radius-sm2);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   color: var(--text-primary);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   line-height: 1.6;
 
   @include glass-blur(10px);
@@ -727,7 +727,7 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
   }
 
   .map-popup-title {
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 
   .map-controls {
@@ -736,7 +736,7 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
 
   .exit-fullscreen-btn {
     padding: 8px 16px;
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 }
 </style>

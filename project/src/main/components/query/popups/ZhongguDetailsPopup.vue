@@ -81,7 +81,7 @@ $header-gap: 10px;
 
   .combo-name {
     color: $accent-color;
-    font-size: 16px;
+    font-size: var(--font-size-16);
     font-weight: 700;
   }
 
@@ -90,14 +90,14 @@ $header-gap: 10px;
     background: $accent-background;
     border-radius: var(--radius-md);
     color: $accent-color;
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 }
 
 .full-chars {
   color: var(--text-dark);
   word-break: break-word;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   line-height: 1.6;
   letter-spacing: 0.5em;
   font-variant-ligatures: none;

@@ -496,14 +496,14 @@ onMounted(() => {
 }
 
 .page-header h2 {
-  font-size: 28px;
+  font-size: var(--font-size-32);
   color: var(--text-primary);
   margin-bottom: 10px;
 }
 
 .subtitle {
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .glass-panel {
@@ -520,7 +520,7 @@ onMounted(() => {
 }
 
 .panel-header h3 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   color: var(--text-primary);
   margin: 0;
 }
@@ -541,7 +541,7 @@ onMounted(() => {
 }
 
 .section-title {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 12px;
@@ -558,21 +558,21 @@ onMounted(() => {
 }
 
 .level-name {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--text-secondary);
   margin-bottom: 8px;
 }
 
 .level-rate {
-  font-size: 28px;
+  font-size: var(--font-size-32);
   font-weight: 700;
   color: var(--color-primary);
   margin-bottom: 12px;
 }
 
 .level-detail {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   margin-top: 8px;
 }
@@ -610,13 +610,13 @@ onMounted(() => {
 }
 
 .note-icon {
-  font-size: 24px;
+  font-size: var(--font-size-24);
   flex-shrink: 0;
 }
 
 .note-text {
   flex: 1;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   line-height: 1.6;
   color: var(--text-primary);
 }
@@ -629,7 +629,7 @@ onMounted(() => {
   background: var(--glass-50);
   border: 1px solid rgba(var(--color-primary-rgb), 0.3);
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   transition: all 0.3s ease;
 
   &:focus {
@@ -640,7 +640,7 @@ onMounted(() => {
 
   &.small {
     padding: 6px 12px;
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -650,7 +650,7 @@ onMounted(() => {
   color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-md);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -667,7 +667,7 @@ onMounted(() => {
 
 .solid-button.small {
   padding: 6px 12px;
-  font-size: 13px;
+  font-size: var(--font-size-14);
 }
 
 .overview-grid {
@@ -693,7 +693,7 @@ onMounted(() => {
 }
 
 .overview-card.large-card .card-icon {
-  font-size: 48px;
+  font-size: var(--font-size-48);
   margin-bottom: 8px;
 }
 
@@ -702,7 +702,7 @@ onMounted(() => {
 }
 
 .card-meta {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
   margin-top: 12px;
   padding-top: 12px;
@@ -713,7 +713,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   padding: 4px 0;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .meta-row span:first-child {
@@ -728,11 +728,11 @@ onMounted(() => {
 .meta-row .highlight {
   color: var(--color-primary);
   font-weight: 700;
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .card-icon {
-  font-size: 36px;
+  font-size: var(--font-size-32);
 }
 
 .card-info {
@@ -740,13 +740,13 @@ onMounted(() => {
 }
 
 .card-label {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
   margin-bottom: 4px;
 }
 
 .card-value {
-  font-size: 24px;
+  font-size: var(--font-size-24);
   font-weight: 700;
   color: var(--color-primary);
 }
@@ -767,13 +767,13 @@ onMounted(() => {
 }
 
 .dual-label {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   margin-bottom: 6px;
 }
 
 .dual-number {
-  font-size: 28px;
+  font-size: var(--font-size-32);
   font-weight: 700;
   color: var(--color-primary);
 }
@@ -830,7 +830,7 @@ onMounted(() => {
 }
 
 .page-info {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
 }
 
@@ -877,7 +877,7 @@ onMounted(() => {
 }
 
 .initial-state p {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   color: var(--text-secondary);
 }
 

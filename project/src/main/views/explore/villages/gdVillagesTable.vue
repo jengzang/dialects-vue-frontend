@@ -53,7 +53,7 @@ const localeTo = (path) => buildLocalePath(resolveRouteLocale(route), path);
 
 .cross-link {
   color: var(--color-primary);
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   font-weight: 500;
   white-space: nowrap;
   text-decoration: none;

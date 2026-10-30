@@ -76,7 +76,7 @@ $gradient-variants: (
   margin: 0 auto;
   padding: 14px 18px;
   color: var(--action-primary-text);
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   cursor: pointer;
   border: none;
@@ -91,7 +91,7 @@ $gradient-variants: (
 
   @media (max-aspect-ratio: $mobile-aspect-ratio) {
     padding: 12px 20px;
-    font-size: 15px;
+    font-size: var(--font-size-16);
   }
 }
 

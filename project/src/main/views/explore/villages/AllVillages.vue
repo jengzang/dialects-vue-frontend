@@ -764,7 +764,7 @@ $transition-base: 0.3s;
 
   p {
     color: $text-secondary;
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 
   &.error-state {
@@ -773,7 +773,7 @@ $transition-base: 0.3s;
 }
 
 .error-icon {
-  font-size: 48px;
+  font-size: var(--font-size-48);
 }
 
 .error-message {
@@ -818,7 +818,7 @@ $transition-base: 0.3s;
 .city-name {
   margin: 0;
   color: $text-primary;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 600;
 }
 
@@ -831,7 +831,7 @@ $transition-base: 0.3s;
 .reload-btn {
   padding: 8px 16px;
   color: $primary-blue;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   background: rgba(var(--color-primary-rgb), 0.05);
@@ -855,7 +855,7 @@ $transition-base: 0.3s;
 
   width: 34px;
   height: 34px;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   cursor: pointer;
   background: transparent;
   border: none;
@@ -880,7 +880,7 @@ $transition-base: 0.3s;
   align-items: center;
   padding: 16px;
   color: $primary-blue;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   background: rgba(var(--color-primary-rgb), 0.05);
   border-radius: var(--radius-md);
 }
@@ -895,7 +895,7 @@ $transition-base: 0.3s;
 .error-text {
   margin: 0 0 12px;
   color: $error-color;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .retry-btn,
@@ -914,13 +914,13 @@ $transition-base: 0.3s;
 
 .retry-btn {
   padding: 10px 24px;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   border-radius: var(--radius-md);
 }
 
 .retry-btn-small {
   padding: 6px 14px;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   border-radius: var(--radius-sm2);
 }
 
@@ -933,7 +933,7 @@ $transition-base: 0.3s;
 .empty-state {
   padding: 24px 0;
   color: $text-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   text-align: center;
 }
 </style>

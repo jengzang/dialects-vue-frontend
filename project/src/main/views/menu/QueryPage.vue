@@ -954,7 +954,7 @@ export default {
   padding: 2dvh;
   max-height: 35dvh;
   overflow-y: auto;
-  font-size: 18px;
+  font-size: var(--font-size-18);
 }
 
 @media (max-aspect-ratio: 1/1) {
@@ -964,7 +964,7 @@ export default {
 
   .query-page-panel {
     padding: 10px;
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 }
 
@@ -1050,7 +1050,7 @@ export default {
   color: var(--text-primary);
   cursor: pointer;
   transition: background 0.3s ease;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   margin: 5px;
 }
 
@@ -1085,7 +1085,7 @@ export default {
 .key-value-dropdown .dropdown-item {
   padding: 8px 16px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   transition: background-color 0.2s;
   border-radius: 8px;
   white-space: nowrap;
@@ -1131,7 +1131,7 @@ export default {
   border: none;
   outline: none;
   padding: 8px 0px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   background: transparent;
   width: 80px;
   color: var(--text-dark);
@@ -1140,7 +1140,7 @@ export default {
 
 .dropdown-input::placeholder {
   color: #6a6a6a;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   text-align: center;
 }
 
@@ -1167,7 +1167,7 @@ export default {
 }
 
 .arrow-icon {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: white;
   font-weight: bold;
 }
@@ -1194,7 +1194,7 @@ export default {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   border: 1px solid rgba(200, 200, 200, 0.5);
   display: flex;
   justify-content: space-between;

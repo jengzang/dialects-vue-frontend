@@ -548,7 +548,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
   width: 80px;
   height: 80px;
-  font-size: 28px;
+  font-size: var(--font-size-32);
   font-weight: 700;
   border: 2.5px solid $white;
   transition: all $transition-slow $smooth-easing;
@@ -557,7 +557,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 .preview-tip {
   margin: 0;
   color: $text-secondary;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 550;
 }
 
@@ -587,7 +587,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   gap: 8px;
   align-items: center;
   color: $text-primary;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   cursor: pointer;
   user-select: none;
@@ -613,7 +613,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .control-label {
   color: $text-primary;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   letter-spacing: -0.01em;
 }
@@ -622,7 +622,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   box-sizing: border-box;
   width: 100%;
   padding: 10px 14px;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 500;
   background: var(--glass-80);
   color: var(--color-primary-hover);
@@ -651,7 +651,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   gap: 4px;
   padding: 10px 12px;
   color: $text-primary;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   cursor: pointer;
   background: var(--glass-60);
@@ -711,7 +711,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   align-items: center;
   margin-top: 4px;
   color: $text-secondary;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 550;
 
   input[type="color"] {
@@ -729,7 +729,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 .gradient-bar {
   padding: 12px 6px;
   color: $white;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 600;
   text-align: center;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
@@ -766,7 +766,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   gap: 8px;
   align-items: center;
   color: $text-secondary;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 550;
 
   input[type="color"] {
@@ -781,7 +781,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   width: 100%;
   margin-top: 8px;
   color: $text-secondary;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 550;
 
   .glass-range {
@@ -804,7 +804,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .text-color-btn {
   padding: 8px 16px;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   cursor: pointer;
   border: 1px solid rgba(0, 0, 0, 0.08);
@@ -836,7 +836,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .modal-footer-btn {
   padding: 10px 18px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   cursor: pointer;
   border: none;

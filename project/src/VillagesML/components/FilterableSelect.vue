@@ -498,7 +498,7 @@ onUnmounted(() => {
   border-radius: var(--radius-sm2);
   background: var(--glass-50);
   backdrop-filter: blur(10px);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
@@ -514,7 +514,7 @@ onUnmounted(() => {
 }
 
 .level-select .arrow-icon {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-tertiary);
 }
 
@@ -545,7 +545,7 @@ onUnmounted(() => {
   padding: 10px 12px;
   border: none;
   background: transparent;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   outline: none;
 }
 
@@ -570,7 +570,7 @@ onUnmounted(() => {
 }
 
 .arrow-icon {
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 .select-dropdown {
@@ -654,7 +654,7 @@ onUnmounted(() => {
 
 .option-count {
   flex: 0 0 auto;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--color-primary);
   font-weight: 600;
   margin-left: 8px;

@@ -316,7 +316,7 @@ function localeTo(path) {
   list-style: none;
   padding: 0;
   margin: 0;
-  font-size: 1.2rem;
+  font-size: var(--font-size-20);
   line-height: 1.8;
 
   li {
@@ -327,7 +327,7 @@ function localeTo(path) {
   margin-left: 20px;
   padding-left: 20px;
   color: $text-primary;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   list-style-type: none;
 
   ol {
@@ -363,14 +363,14 @@ function localeTo(path) {
 .feature-heading {
   margin: 0 0 4px;
   color: $text-heading;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 700;
 }
 
 .feature-subtitle {
   margin: 0 0 6px;
   color: $primary;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
 }
 
@@ -386,7 +386,7 @@ function localeTo(path) {
 .feature-intro {
   margin: 0 0 12px;
   color: $text-secondary;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   line-height: 1.6;
 }
 
@@ -394,7 +394,7 @@ function localeTo(path) {
   display: inline-block;
   margin-top: 8px;
   color: $zhihu-blue;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   text-decoration: none;
 
   &:hover {
@@ -414,26 +414,26 @@ function localeTo(path) {
 .subfeature-title {
   margin: 0 0 2px;
   color: var(--text-deep);
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 600;
 }
 
 .subfeature-body {
   margin: 0;
   color: $text-secondary;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   line-height: 1.65;
 }
 @media (max-aspect-ratio: #{1 / 1}) {
   .thanks-list {
-    font-size: 15px;
+    font-size: var(--font-size-16);
     line-height: 1.6;
   }
 
   .customlist {
     margin-left: 14px;
     padding-left: 16px;
-    font-size: 15px;
+    font-size: var(--font-size-16);
 
     li {
       margin-bottom: 4px;
@@ -442,19 +442,19 @@ function localeTo(path) {
   }
 
   .feature-heading {
-    font-size: 17px;
+    font-size: var(--font-size-18);
   }
 
   .feature-subtitle {
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 
   .feature-intro {
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 
   .zhihu-article-link {
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 
   .subfeature-list {
@@ -462,11 +462,11 @@ function localeTo(path) {
   }
 
   .subfeature-title {
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 
   .subfeature-body {
-    font-size: 13px;
+    font-size: var(--font-size-14);
     line-height: 1.55;
   }
 }

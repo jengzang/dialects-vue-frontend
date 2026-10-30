@@ -853,14 +853,14 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
 
 .title {
   margin: 0 0 8px;
-  font-size: 28px;
+  font-size: var(--font-size-32);
   font-weight: 600;
   color: $color-text;
 }
 
 .subtitle {
   margin: 0;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: $text-70;
 }
 
@@ -874,7 +874,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   @include glass-blur;
   border: 1px solid var(--glass-50);
   border-radius: var(--radius-md);
-  font-size: 20px;
+  font-size: var(--font-size-20);
   cursor: pointer;
   transition: all 0.3s ease;
 
@@ -914,21 +914,21 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   }
 
   &-icon {
-    font-size: 64px;
+    font-size: var(--font-size-48);
     animation: float 3s ease-in-out infinite;
   }
 
   &-title {
     margin: 0;
     white-space: nowrap;
-    font-size: 20px;
+    font-size: var(--font-size-20);
     font-weight: 500;
     color: $color-text;
   }
 
   &-hint {
     margin: 0;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     color: $text-60;
   }
 }
@@ -971,7 +971,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
 
   &-text {
     margin: 0;
-    font-size: 16px;
+    font-size: var(--font-size-16);
     line-height: 1.6;
     color: rgba(7, 25, 44, 0.8);
     text-align: center;
@@ -980,7 +980,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
 
 .card {
   &-icon {
-    font-size: 32px;
+    font-size: var(--font-size-32);
   }
 
   &-content {
@@ -989,13 +989,13 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
 
   &-title {
     margin-bottom: 4px;
-    font-size: 13px;
+    font-size: var(--font-size-14);
     font-weight: 600;
     color: $color-text;
   }
 
   &-text {
-    font-size: 12px;
+    font-size: var(--font-size-12);
     color: $text-70;
   }
 }
@@ -1018,14 +1018,14 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
 
   &-title {
     margin: 0;
-    font-size: 24px;
+    font-size: var(--font-size-24);
     font-weight: 600;
     color: $color-text;
   }
 
   &-text {
     margin: 0;
-    font-size: 15px;
+    font-size: var(--font-size-16);
     color: $text-70;
   }
 
@@ -1040,20 +1040,20 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
 
 .complete {
   &-icon {
-    font-size: 80px;
+    font-size: var(--font-size-48);
     animation: scaleIn 0.5s ease;
   }
 
   &-title {
     margin: 0;
-    font-size: 24px;
+    font-size: var(--font-size-24);
     font-weight: 600;
     color: $color-text;
   }
 
   &-text {
     margin: 0;
-    font-size: 15px;
+    font-size: var(--font-size-16);
     color: $text-70;
   }
 }
@@ -1087,7 +1087,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
 
   &-text {
     text-align: center;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 600;
     color: $color-text;
   }
@@ -1097,7 +1097,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   &-item {
     display: flex;
     gap: 8px;
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 
   &-label {
@@ -1145,7 +1145,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   }
 
   &-number {
-    font-size: 36px;
+    font-size: var(--font-size-32);
     font-weight: 700;
     color: $color-text;
 
@@ -1159,7 +1159,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   }
 
   &-label {
-    font-size: 14px;
+    font-size: var(--font-size-14);
     color: $text-70;
   }
 }
@@ -1177,7 +1177,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
 
   &-title {
     margin: 0 0 12px;
-    font-size: 16px;
+    font-size: var(--font-size-16);
     font-weight: 600;
     color: $color-text;
   }
@@ -1192,7 +1192,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   &-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: var(--font-size-14);
 
     thead {
       position: sticky;
@@ -1274,7 +1274,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
 
 .stat-inline {
   white-space: nowrap;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: $text-70;
 
   strong {
@@ -1307,7 +1307,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     border: none;
     border-bottom: 3px solid transparent;
     white-space: nowrap;
-    font-size: 15px;
+    font-size: var(--font-size-16);
     font-weight: 500;
     color: $text-60;
     cursor: pointer;
@@ -1338,7 +1338,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   &-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: var(--font-size-14);
 
     thead {
       position: sticky;
@@ -1378,7 +1378,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   border: 1px solid rgba(var(--color-primary-rgb), 0.15);
   border-radius: var(--radius-sm);
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   transition: all 0.2s ease;
   color: var(--color-primary-hover);
 
@@ -1396,7 +1396,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   padding: 4px 10px;
   border-radius: var(--radius-sm);
   white-space: nowrap;
-  font-size: 11px;
+  font-size: var(--font-size-12);
   font-weight: 600;
 
   &.cat-wf {
@@ -1427,7 +1427,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     background: rgba(var(--color-error-light-rgb), 0.1);
     border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
     border-radius: var(--radius-sm);
-    font-size: 13px;
+    font-size: var(--font-size-14);
     color: $color-danger;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -1450,7 +1450,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     );
     border: 1px solid rgba(var(--color-success-rgb), 0.5);
     border-radius: var(--radius-md);
-    font-size: 15px;
+    font-size: var(--font-size-16);
     font-weight: 600;
     color: white;
     cursor: pointer;
@@ -1476,7 +1476,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   background: var(--glass-50);
   border: 1px solid var(--glass-50);
   border-radius: var(--radius-sm2);
-  font-size: 16px;
+  font-size: var(--font-size-16);
   cursor: pointer;
   transition: all 0.2s ease;
 
@@ -1518,7 +1518,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
 
   &-icon {
     flex-shrink: 0;
-    font-size: 48px;
+    font-size: var(--font-size-48);
     line-height: 1;
   }
 
@@ -1530,20 +1530,20 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
 
   &-title {
     margin: 0;
-    font-size: 20px;
+    font-size: var(--font-size-20);
     font-weight: 600;
     color: $color-text;
   }
 
   &-desc {
     margin: 0;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     color: $text-70;
   }
 
   &-arrow {
     flex-shrink: 0;
-    font-size: 24px;
+    font-size: var(--font-size-24);
     line-height: 1;
     color: rgba(var(--color-primary-rgb), 0.8);
     transition: transform 0.3s ease;
@@ -1557,7 +1557,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   gap: 6px;
 
   &__hint {
-    font-size: 13px;
+    font-size: var(--font-size-14);
     line-height: 1.5;
     color: $text-70;
     text-align: center;
@@ -1577,11 +1577,11 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   }
 
   .title {
-    font-size: 22px;
+    font-size: var(--font-size-24);
   }
 
   .subtitle {
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 
   .info {
@@ -1591,7 +1591,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     }
 
     &-text {
-      font-size: 14px;
+      font-size: var(--font-size-14);
     }
   }
 
@@ -1602,16 +1602,16 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     }
 
     &-icon {
-      font-size: 36px;
+      font-size: var(--font-size-32);
     }
 
     &-title {
       white-space: nowrap;
-      font-size: 17px;
+      font-size: var(--font-size-18);
     }
 
     &-desc {
-      font-size: 13px;
+      font-size: var(--font-size-14);
     }
   }
 
@@ -1621,15 +1621,15 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     }
 
     &-icon {
-      font-size: 48px;
+      font-size: var(--font-size-48);
     }
 
     &-text {
-      font-size: 15px;
+      font-size: var(--font-size-16);
     }
 
     &-hint {
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 
@@ -1675,7 +1675,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     }
 
     &-title {
-      font-size: 18px;
+      font-size: var(--font-size-18);
     }
 
     &-footer {
@@ -1706,7 +1706,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   }
 
   .stat-inline {
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   .category-tabs {
@@ -1718,7 +1718,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
   .category-tab {
     padding: 8px 12px;
     white-space: nowrap;
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 
   .rules {
@@ -1727,7 +1727,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     }
 
     &-table {
-      font-size: 12px;
+      font-size: var(--font-size-12);
 
       th,
       td {

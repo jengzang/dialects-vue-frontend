@@ -260,7 +260,7 @@ function parseLocalizedParts(content) {
   width: 100%;
   margin-top: 1rem;
   margin-bottom: 0.5rem;
-  font-size: 1.8rem;
+  font-size: var(--font-size-32);
   font-weight: bold;
 }
 
@@ -281,7 +281,7 @@ function parseLocalizedParts(content) {
   margin: 20px auto;
   color: var(--text-dark);
   font-family: var(--font-serif);
-  font-size: 18px;
+  font-size: var(--font-size-18);
   line-height: 1.8;
   text-align: left;
   text-indent: 2em;
@@ -325,12 +325,12 @@ function parseLocalizedParts(content) {
 
 .history-page--featured {
   .history-stage-title {
-    font-size: 1.2rem;
+    font-size: var(--font-size-20);
   }
 
   .history-date,
   .history-content {
-    font-size: 0.9rem;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -466,44 +466,44 @@ function parseLocalizedParts(content) {
 
 @media (max-aspect-ratio: 1 / 1) {
   .history-page {
-    font-size: 0.875rem;
+    font-size: var(--font-size-14);
   }
 
   .history-page .page-title {
-    font-size: 1.25rem;
+    font-size: var(--font-size-20);
   }
 
   .history-page--featured {
     .history-stage-title {
-      font-size: 1.05rem;
+      font-size: var(--font-size-16);
     }
 
     .history-date,
     .history-content {
-      font-size: 0.8125rem;
+      font-size: var(--font-size-14);
     }
   }
 
   .history-stage-title {
-    font-size: 1.2rem;
+    font-size: var(--font-size-20);
   }
 
   .history-filter-summary {
-    font-size: 0.8rem;
+    font-size: var(--font-size-12);
   }
 
   .history-date-column .hint {
-    font-size: 0.75rem;
+    font-size: var(--font-size-12);
   }
 
   .thoughts {
     margin: 24px auto;
-    font-size: 0.875rem;
+    font-size: var(--font-size-14);
     line-height: 1.65;
   }
 
   .tabs-title {
-    font-size: 1.2rem;
+    font-size: var(--font-size-20);
   }
 
   .history-entry {

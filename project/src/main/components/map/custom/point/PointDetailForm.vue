@@ -846,14 +846,14 @@ watch(
 
 .point-detail-title {
   margin: 0;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 700;
   color: $text-strong;
 }
 
 .point-detail-description {
   margin: 0;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: $text-muted;
 }
 
@@ -906,7 +906,7 @@ watch(
 .point-field-label,
 .point-map-title,
 .point-rows-title {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 700;
   color: $text-strong;
 }
@@ -950,7 +950,7 @@ watch(
   align-items: center;
   cursor: pointer;
   text-align: left;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   border-bottom: 1px solid $muted-border;
   transition: background-color 0.18s ease;
 
@@ -976,11 +976,11 @@ watch(
 
 .suggestion-region {
   color: $text-muted;
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 .suggestion-badge {
-  font-size: 10px;
+  font-size: var(--font-size-12);
   font-weight: 700;
   background: $primary-glass;
   color: $primary;
@@ -1002,7 +1002,7 @@ watch(
 }
 
 .quick-select-label {
-  font-size: 11px !important;
+  font-size: var(--font-size-12) !important;
   font-weight: 700;
   color: $text-muted !important;
   text-transform: uppercase;
@@ -1018,7 +1018,7 @@ watch(
 }
 
 .quick-select-pill {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 600;
   background: $glass-light;
   border: 1px solid $muted-hover;
@@ -1043,7 +1043,7 @@ watch(
 }
 
 .pill-region {
-  font-size: 10px;
+  font-size: var(--font-size-12);
   color: $text-subtle;
   font-weight: 400;
   transition: color 0.18s ease;
@@ -1069,7 +1069,7 @@ watch(
 
 .point-rows-description {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: $text-muted;
 }
 
@@ -1090,7 +1090,7 @@ watch(
 .point-rows-table-head {
   padding: 0 6px;
   color: $text-muted;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 700;
 
   @media (max-width: 768px) {
@@ -1131,7 +1131,7 @@ watch(
 
     &::before {
       content: attr(data-label);
-      font-size: 12px;
+      font-size: var(--font-size-12);
       font-weight: 700;
       color: $text-secondary;
     }
@@ -1157,7 +1157,7 @@ watch(
   border: none;
   cursor: pointer;
   padding: 4px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   line-height: 1;
   transition: transform 0.1s ease;
   user-select: none;
@@ -1205,14 +1205,14 @@ watch(
 
 .point-save-message {
   margin-top: $radius-md;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: $text-secondary;
 }
 
 /* 字段提示触发钮: 仅尺寸/颜色覆盖, 视觉见 main/_buttons.scss 的 .pill-btn */
 .field-notice-trigger {
   --pill-btn-padding: 6px 14px;
-  --pill-btn-font-size: 12px;
+  --pill-btn-font-size: var(--font-size-12);
   --pill-btn-font-weight: 600;
   --pill-btn-color: #fff;
   --pill-btn-border: 1px solid rgb(var(--color-warning-rgb));
@@ -1223,7 +1223,7 @@ watch(
 
   &::before {
     content: "⚠️";
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -1240,7 +1240,7 @@ watch(
 
   p {
     margin: 8px 0 0;
-    font-size: 13px;
+    font-size: var(--font-size-14);
     color: $text-secondary;
     line-height: 1.7;
   }
@@ -1259,7 +1259,7 @@ watch(
   border: 1px solid rgba(var(--color-primary-rgb), 0.2);
   border-radius: var(--radius-pill);
   color: $primary;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 600;
 }
 
@@ -1268,7 +1268,7 @@ watch(
   background: rgba(var(--color-warning-rgb), 0.08);
   border-left: 3px solid $warning;
   border-radius: 0 $radius-sm $radius-sm 0;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: $text-secondary;
   line-height: 1.6;
 }
@@ -1298,7 +1298,7 @@ watch(
   padding: 32px;
   text-align: center;
   color: $text-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .modal-error-state {
@@ -1316,7 +1316,7 @@ watch(
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 13px;
+  font-size: var(--font-size-14);
 
   th,
   td {

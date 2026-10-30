@@ -233,7 +233,7 @@ $shadow-hover:
   }
 
   &__dice {
-    font-size: 1.82rem;
+    font-size: var(--font-size-32);
     line-height: 1;
 
     filter:
@@ -251,7 +251,7 @@ $shadow-hover:
     border-radius: var(--radius-full);
     background: var(--color-primary);
     color: var(--action-primary-text);
-    font-size: 0.78rem;
+    font-size: var(--font-size-12);
     font-weight: 600;
     pointer-events: none;
     z-index: 10;
@@ -287,7 +287,7 @@ $shadow-hover:
   }
 
   &__eyebrow {
-    font-size: 0.66rem;
+    font-size: var(--font-size-12);
     color: var(--text-secondary);
     letter-spacing: 0.06em;
   }
@@ -295,7 +295,7 @@ $shadow-hover:
   &__label {
     max-width: 7em;
 
-    font-size: 0.86rem;
+    font-size: var(--font-size-14);
     font-weight: 800;
     color: var(--color-primary-hover);
     letter-spacing: 0.01em;
@@ -313,7 +313,7 @@ $shadow-hover:
     border-radius: var(--radius-full);
     background: var(--color-primary);
     color: var(--action-primary-text);
-    font-size: 0.78rem;
+    font-size: var(--font-size-12);
     font-weight: 600;
     pointer-events: none;
     z-index: 10;
@@ -351,7 +351,7 @@ $shadow-hover:
 
     &__label {
       max-width: 7em;
-      font-size: 0.8rem;
+      font-size: var(--font-size-12);
       line-height: 1.1;
     }
 
@@ -376,7 +376,7 @@ $shadow-hover:
     }
 
     &__dice {
-      font-size: 1.54rem;
+      font-size: var(--font-size-24);
     }
 
     &__eyebrow {
@@ -385,7 +385,7 @@ $shadow-hover:
 
     &__label {
       max-width: 6em;
-      font-size: 0.78rem;
+      font-size: var(--font-size-12);
       line-height: 1.1;
     }
   }

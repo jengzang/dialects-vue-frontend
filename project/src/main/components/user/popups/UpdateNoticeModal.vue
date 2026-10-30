@@ -235,7 +235,7 @@ $transition-button: 0.25s;
   width: 100%;
 
   .update-icon {
-    font-size: 3rem;
+    font-size: var(--font-size-48);
     line-height: 1;
     animation: bounce 1s ease infinite;
   }
@@ -250,7 +250,7 @@ $transition-button: 0.25s;
     margin: 0;
     color: $primary;
     white-space: nowrap;
-    font-size: 1.75rem;
+    font-size: var(--font-size-32);
     font-weight: 700;
   }
 
@@ -258,7 +258,7 @@ $transition-button: 0.25s;
     margin: 0;
     color: $text-secondary;
     white-space: nowrap;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     font-weight: 500;
   }
 }
@@ -291,13 +291,13 @@ $transition-button: 0.25s;
 
   .item-icon {
     flex-shrink: 0;
-    font-size: 1.25rem;
+    font-size: var(--font-size-20);
     line-height: 1.5;
   }
 
   .item-text {
     color: $text-main;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     font-weight: 500;
     line-height: 1.8 !important;
 
@@ -313,7 +313,7 @@ $transition-button: 0.25s;
   padding: 0.5rem 0.75rem;
   border-radius: var(--radius-sm2);
   color: $text-secondary-strong;
-  font-size: 0.9375rem;
+  font-size: var(--font-size-16);
   cursor: pointer;
   user-select: none;
   transition: background $transition-fast ease;
@@ -331,7 +331,7 @@ $transition-button: 0.25s;
   box-shadow: var(--action-primary-shadow);
   color: var(--action-primary-text);
   white-space: nowrap;
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   font-weight: 600;
   cursor: pointer;
   transition:
@@ -364,11 +364,11 @@ $transition-button: 0.25s;
     gap: 0.75rem;
 
     .update-icon {
-      font-size: 2.5rem;
+      font-size: var(--font-size-48);
     }
 
     .update-notice-title {
-      font-size: 1.5rem;
+      font-size: var(--font-size-24);
     }
   }
 

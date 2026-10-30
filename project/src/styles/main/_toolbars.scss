@@ -74,7 +74,7 @@
   align-items: center;
   white-space: nowrap;
   justify-content: center;
-  font-size: var(--font-size-20-8);
+  font-size: var(--font-size-20);
   flex: 1 1 0;
   min-width: 0;
   text-align: center;
@@ -164,7 +164,7 @@
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: background-color 0.16s ease, transform 0.16s ease;
-  font-size: var(--font-size-15);
+  font-size: var(--font-size-16);
   font-weight: 500;
   color: var(--text-dark);
 }
@@ -197,7 +197,7 @@
   }
 
   .main-sidebar-item {
-    font-size: var(--font-size-17-6);
+    font-size: var(--font-size-18);
     padding: 3px 8px 3px 15px;
   }
 

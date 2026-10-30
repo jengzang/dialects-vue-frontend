@@ -701,7 +701,7 @@ $duration: 450ms;
 
 .showcase-card-title {
   margin: 0;
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -714,7 +714,7 @@ $duration: 450ms;
   background: none;
   border: none;
   color: var(--color-primary);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-16);
   font-weight: 500;
   text-decoration: none;
   cursor: pointer;
@@ -841,7 +841,7 @@ $duration: 450ms;
   }
 
   .showcase-card-title {
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
   }
 }
 
@@ -886,7 +886,7 @@ $duration: 450ms;
   transform: translateX(-50%);
   margin: 0;
   color: rgba(255, 255, 255, 0.8);
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   font-weight: 500;
   pointer-events: none;
 }
@@ -924,7 +924,7 @@ $duration: 450ms;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-pill);
   color: #fff;
-  font-size: 0.9375rem;
+  font-size: var(--font-size-16);
   font-weight: 500;
   text-decoration: none;
   cursor: pointer;

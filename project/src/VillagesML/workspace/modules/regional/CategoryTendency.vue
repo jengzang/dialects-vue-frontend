@@ -288,7 +288,7 @@ const loadRegionalNgrams = async () => {
 }
 
 .tendency-section h3 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   margin: 0;
   color: var(--text-primary);
   white-space: nowrap;
@@ -296,7 +296,7 @@ const loadRegionalNgrams = async () => {
 }
 
 .section-description {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
   line-height: 1.6;
   width: 100%;
@@ -331,7 +331,7 @@ const loadRegionalNgrams = async () => {
 .tendency-category {
   font-weight: 600;
   color: var(--text-primary);
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .tendency-bar {
@@ -347,14 +347,14 @@ const loadRegionalNgrams = async () => {
 }
 
 .tendency-value {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--color-primary);
   text-align: right;
 }
 
 .tendency-freq {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
   text-align: right;
 }
@@ -428,11 +428,11 @@ const loadRegionalNgrams = async () => {
 .col-ngram {
   font-weight: 600;
   color: var(--text-primary);
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .col-region {
-  font-size: 13px;
+  font-size: var(--font-size-14);
 }
 
 .region-badge {
@@ -441,7 +441,7 @@ const loadRegionalNgrams = async () => {
   background: rgba(var(--vml-blue-rgb), 0.15);
   color: var(--color-primary);
   border-radius: var(--radius-sm);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 500;
   white-space: nowrap;
 }

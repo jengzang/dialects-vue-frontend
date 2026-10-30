@@ -184,7 +184,7 @@ const runAnalysis = () => {
 }
 
 .panel-title {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--text-primary);
   margin: 0 0 20px 0;
@@ -200,19 +200,19 @@ const runAnalysis = () => {
 }
 
 .setting-row label {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   color: var(--text-primary);
 }
 
 .required-hint {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   font-weight: 400;
 }
 
 .error-hint {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--color-error);
   font-weight: 500;
   margin-top: 4px;
@@ -220,7 +220,7 @@ const runAnalysis = () => {
 }
 
 .hint {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   margin-top: 4px;
 }
@@ -232,7 +232,7 @@ const runAnalysis = () => {
   border-radius: var(--radius-md);
   background: var(--glass-50);
   backdrop-filter: blur(10px);
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .setting-input:focus,
@@ -252,7 +252,7 @@ const runAnalysis = () => {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
   cursor: pointer;
 }
@@ -270,11 +270,11 @@ const runAnalysis = () => {
 }
 
 .notice-icon {
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .notice-text {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: var(--color-warning-dark);
   font-weight: 500;
 }
@@ -288,7 +288,7 @@ const runAnalysis = () => {
 }
 
 .toggle-label {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   color: var(--text-primary);
 }

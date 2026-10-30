@@ -128,7 +128,7 @@ $text-secondary: var(--text-slate);
   );
   border-bottom: 1px solid var(--bg-overlay-light2);
   color: var(--text-deep);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 700;
 }
 
@@ -146,7 +146,7 @@ $text-secondary: var(--text-slate);
 
 .item-label {
   color: $text-main;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 700;
 }
 
@@ -155,13 +155,13 @@ $text-secondary: var(--text-slate);
   background: var(--bg-hover-medium);
   border-radius: var(--radius-pill);
   color: $text-secondary;
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 .item-chars {
   color: $text-body;
   word-break: break-all;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   line-height: 1.6;
 }
 

@@ -234,7 +234,7 @@ watch(() => route.query.villageId, (newId) => {
 }
 
 .page-title {
-  font-size: 32px;
+  font-size: var(--font-size-32);
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 30px;
@@ -254,7 +254,7 @@ watch(() => route.query.villageId, (newId) => {
 }
 
 .selector-header h2 {
-  font-size: 18px;
+  font-size: var(--font-size-18);
 }
 
 .clear-button {
@@ -263,7 +263,7 @@ watch(() => route.query.villageId, (newId) => {
   color: var(--color-error);
   border: none;
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -281,7 +281,7 @@ watch(() => route.query.villageId, (newId) => {
   padding: 12px 20px;
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-md);
-  font-size: 16px;
+  font-size: var(--font-size-16);
   background: var(--glass-50);
   transition: all 0.3s ease;
 }
@@ -316,14 +316,14 @@ watch(() => route.query.villageId, (newId) => {
 }
 
 .village-name {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 4px;
 }
 
 .village-location {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
 }
 
@@ -338,18 +338,18 @@ watch(() => route.query.villageId, (newId) => {
 }
 
 .empty-icon {
-  font-size: 64px;
+  font-size: var(--font-size-48);
   margin-bottom: 20px;
 }
 
 .empty-state p {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   color: var(--text-secondary);
 }
 
 @media (max-width: 768px) {
   .page-title {
-    font-size: 24px;
+    font-size: var(--font-size-24);
   }
 }
 </style>

@@ -648,7 +648,7 @@ onUnmounted(() => {
   margin: 0 auto;
   padding: 8px;
   overflow-x: auto;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   background: var(--glass-05);
   border: 2px solid var(--glass-10);
   border-radius: var(--radius-md);
@@ -674,7 +674,7 @@ $glass-blur: 8px;
 .char {
   margin-top: 15px;
   margin-bottom: 1px;
-  font-size: 28px;
+  font-size: var(--font-size-32);
   font-weight: bold;
   text-align: center;
   scroll-margin-top: 12px;
@@ -702,7 +702,7 @@ $glass-blur: 8px;
   max-width: 200px;
   padding: 5px 10px;
   color: var(--text-white);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0.8);
   border-radius: var(--radius-xs);
@@ -793,12 +793,12 @@ $glass-blur: 8px;
 }
 
 .char-nav-char {
-  font-size: 17px;
+  font-size: var(--font-size-18);
   font-weight: 700;
   line-height: 1;
 
   @media (max-aspect-ratio: 1/1) {
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 }
 
@@ -816,7 +816,7 @@ $glass-blur: 8px;
   min-width: 30px;
   padding: 3px 2px;
   color: var(--text-slate);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   line-height: 1.2;
   cursor: pointer;
   background: var(--glass-60);
@@ -898,7 +898,7 @@ $glass-blur: 8px;
 .positions {
   margin-bottom: 15px;
   color: gray;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   text-align: center;
 
   p {
@@ -912,7 +912,7 @@ $glass-blur: 8px;
   margin-bottom: 5px;
   padding: 2px 8px;
   color: var(--color-primary-hover);
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
@@ -941,7 +941,7 @@ $glass-blur: 8px;
   margin: 10px 0;
   padding: 12px 20px;
   color: var(--color-error);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   text-align: center;
   background: rgba(var(--color-error-light-rgb), 0.1);
@@ -993,7 +993,7 @@ $glass-blur: 8px;
 .location-tones {
   width: 100px;
   @include text-truncate;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   cursor: pointer;
   text-decoration: none;
   transition:
@@ -1088,7 +1088,7 @@ $glass-blur: 8px;
 .loading-text {
   color: $text-gray;
   font-family: var(--font-sans);
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .multi {
@@ -1096,7 +1096,7 @@ $glass-blur: 8px;
   display: inline-block;
   margin: 0 2px;
   padding: 2px;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   text-decoration: none;
   cursor: pointer;
   transition: color $transition-fast ease;
@@ -1112,7 +1112,7 @@ $glass-blur: 8px;
     z-index: 9999;
     padding: 5px 8px;
     color: var(--text-white);
-    font-size: 12px;
+    font-size: var(--font-size-12);
     font-style: normal;
     white-space: nowrap;
     visibility: hidden;

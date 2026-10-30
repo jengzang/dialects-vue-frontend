@@ -435,13 +435,13 @@ $transition-normal: 0.3s;
 
   .radio-title {
     color: $text-radio-title;
-    font-size: 0.9rem;
+    font-size: var(--font-size-14);
     font-weight: 600;
   }
 
   .radio-desc {
     color: $text-radio-desc;
-    font-size: 0.75rem;
+    font-size: var(--font-size-12);
   }
 }
 
@@ -458,7 +458,7 @@ $transition-normal: 0.3s;
 
   label {
     color: $text-main;
-    font-size: 0.9rem;
+    font-size: var(--font-size-14);
   }
 
   input[type="number"] {
@@ -467,7 +467,7 @@ $transition-normal: 0.3s;
     border: 1px solid var(--glass-40);
     border-radius: $radius-control;
     color: $text-main;
-    font-size: 1rem;
+    font-size: var(--font-size-16);
     transition:
       background $transition-normal ease,
       border-color $transition-normal ease;
@@ -490,7 +490,7 @@ $transition-normal: 0.3s;
   display: block;
   margin-top: 0.25rem;
   color: $text-secondary;
-  font-size: 0.75rem;
+  font-size: var(--font-size-12);
   font-style: italic;
 }
 </style>

@@ -240,7 +240,7 @@ $mobile-aspect-ratio: 1;
   gap: 8px;
   align-items: center;
   color: $text-dark;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 500;
 }
 
@@ -282,7 +282,7 @@ $mobile-aspect-ratio: 1;
   width: 24px;
   height: 24px;
   color: $primary-blue;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   cursor: pointer;
   background: transparent;
   border: none;
@@ -310,7 +310,7 @@ $mobile-aspect-ratio: 1;
 .chars-row {
   padding: 12px 16px;
   color: var(--text-primary);
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 500;
   line-height: 1.8;
   letter-spacing: 2px;
@@ -320,7 +320,7 @@ $mobile-aspect-ratio: 1;
 
   @media (max-aspect-ratio: $mobile-aspect-ratio) {
     padding: 10px 12px;
-    font-size: 15px;
+    font-size: var(--font-size-16);
   }
 }
 
@@ -346,14 +346,14 @@ $mobile-aspect-ratio: 1;
   .char {
     margin-top: 1px;
     color: $primary-blue;
-    font-size: 18px;
+    font-size: var(--font-size-18);
     font-weight: 700;
     text-align: center;
   }
 
   .annotation {
     color: var(--text-primary);
-    font-size: 14px;
+    font-size: var(--font-size-14);
     line-height: 1.6;
   }
 
@@ -363,11 +363,11 @@ $mobile-aspect-ratio: 1;
     padding: 8px 10px;
 
     .char {
-      font-size: 16px;
+      font-size: var(--font-size-16);
     }
 
     .annotation {
-      font-size: 13px;
+      font-size: var(--font-size-14);
     }
   }
 }
@@ -376,7 +376,7 @@ $mobile-aspect-ratio: 1;
   display: inline-block;
   margin-left: 6px;
   color: $primary-blue;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   animation: spin 1s linear infinite;
 }
 
@@ -387,7 +387,7 @@ $mobile-aspect-ratio: 1;
   margin: 4px 0 4px 20px;
   padding: 8px 12px;
   color: $error-color;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   background: rgba(var(--color-error-rgb), 0.06);
   border: 1px solid rgba(var(--color-error-rgb), 0.2);
   border-radius: var(--radius-md);
@@ -395,7 +395,7 @@ $mobile-aspect-ratio: 1;
   .retry-btn-small {
     padding: 3px 10px;
     color: $error-color;
-    font-size: 12px;
+    font-size: var(--font-size-12);
     font-weight: 600;
     cursor: pointer;
     background: rgba(var(--color-error-rgb), 0.12);

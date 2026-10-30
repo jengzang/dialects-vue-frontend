@@ -391,7 +391,7 @@ $text-muted: var(--text-tertiary);
 .page-title {
   margin-top: 0;
   margin-bottom: 1.5rem;
-  font-size: 1.8rem;
+  font-size: var(--font-size-32);
   color: $text-primary;
 }
 
@@ -439,7 +439,7 @@ $text-muted: var(--text-tertiary);
 .section-title {
   margin: 0 0 8px;
   color: $text-primary;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 600;
   text-align: center;
 }
@@ -447,7 +447,7 @@ $text-muted: var(--text-tertiary);
 .section-description {
   margin: 0 0 20px;
   color: $text-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .settings-radio-group {
@@ -500,7 +500,7 @@ $text-muted: var(--text-tertiary);
 
 .interface-mode-radio-group {
   :deep(.liquid-radio-text) {
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -546,19 +546,19 @@ $text-muted: var(--text-tertiary);
 .language-name {
   margin-bottom: 4px;
   color: $text-primary;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
 }
 
 .language-code {
   color: var(--text-lightest);
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 .language-check {
   margin-left: 20px;
   color: $primary;
-  font-size: 24px;
+  font-size: var(--font-size-24);
   font-weight: bold;
 }
 
@@ -633,12 +633,12 @@ $text-muted: var(--text-tertiary);
 
   .section-title {
     margin-bottom: 6px;
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 
   .section-description {
     margin-bottom: 14px;
-    font-size: 13px;
+    font-size: var(--font-size-14);
     line-height: 1.45;
   }
 
@@ -656,7 +656,7 @@ $text-muted: var(--text-tertiary);
 
   .interface-mode-radio-group {
     :deep(.liquid-radio-text) {
-      font-size: 13px;
+      font-size: var(--font-size-14);
     }
   }
 
@@ -681,16 +681,16 @@ $text-muted: var(--text-tertiary);
 
   .language-name {
     margin-bottom: 0;
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 
   .language-code {
-    font-size: 11px;
+    font-size: var(--font-size-12);
   }
 
   .language-check {
     margin-left: 8px;
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 
   .tutorial-toggle-section {

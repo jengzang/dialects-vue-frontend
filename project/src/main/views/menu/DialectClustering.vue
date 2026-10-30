@@ -157,7 +157,7 @@ const {
   .stage-kicker {
     margin: 0;
     color: var(--color-primary);
-    font-size: 13px;
+    font-size: var(--font-size-14);
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -220,7 +220,7 @@ const {
     height: 24px;
     border-radius: var(--radius-pill);
     background: rgba(var(--color-primary-rgb), 0.12);
-    font-size: 12px;
+    font-size: var(--font-size-12);
     font-weight: 700;
   }
 
@@ -349,7 +349,7 @@ const {
     border-radius: var(--radius-pill);
     background: rgba(var(--color-primary-rgb), 0.12);
     color: var(--color-primary);
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 
   .panel-actions {
@@ -371,14 +371,14 @@ const {
 
   .summary-card__label {
     color: var(--text-slate);
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 
   .summary-card strong,
   .performance-row strong,
   .task-row strong {
     color: var(--text-deep);
-    font-size: 20px;
+    font-size: var(--font-size-20);
   }
 
   .hash-line,
@@ -403,7 +403,7 @@ const {
   .status-badge {
     padding: 6px 10px;
     border-radius: var(--radius-pill);
-    font-size: 13px;
+    font-size: var(--font-size-14);
     font-weight: 700;
   }
 
@@ -481,7 +481,7 @@ const {
     white-space: pre-wrap;
     word-break: break-word;
     color: var(--text-slate);
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   .performance-list {

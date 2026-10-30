@@ -213,7 +213,7 @@ export default {
 .global-route-loading-text {
   margin: 0;
   color: var(--text-slate);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
 }
 

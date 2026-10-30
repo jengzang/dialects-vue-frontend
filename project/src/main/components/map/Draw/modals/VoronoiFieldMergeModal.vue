@@ -109,7 +109,7 @@ watch(() => props.modelValue, (isOpen) => {
   .scope-search-input {
     width: 100%;
     height: 38px;
-    font-size: 13px;
+    font-size: var(--font-size-14);
     box-sizing: border-box;
   }
 }
@@ -118,7 +118,7 @@ watch(() => props.modelValue, (isOpen) => {
   text-align: center;
   padding: 24px 0;
   color: var(--text-muted);
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .field-merge-list {
@@ -142,7 +142,7 @@ watch(() => props.modelValue, (isOpen) => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 700;
   color: var(--text-strong);
 }

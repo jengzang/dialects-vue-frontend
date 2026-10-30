@@ -125,13 +125,13 @@ describe('author-provided website history', () => {
   it('uses a compact reading scale for the timeline in portrait mode', () => {
     const portraitStyles = historyPageSource.split('@media (max-aspect-ratio: 1 / 1)').at(-1)
 
-    expect(portraitStyles).toMatch(/\.history-page\s*\{[^}]*font-size:\s*0\.875rem/s)
-    expect(portraitStyles).toMatch(/\.page-title\s*\{[^}]*font-size:\s*1\.25rem/s)
-    expect(portraitStyles).toMatch(/\.history-stage-title\s*\{[^}]*font-size:\s*1\.2rem/s)
-    expect(portraitStyles).toMatch(/\.history-filter-summary\s*\{[^}]*font-size:\s*0\.8rem/s)
-    expect(portraitStyles).toMatch(/\.history-date-column\s+\.hint\s*\{[^}]*font-size:\s*0\.75rem/s)
-    expect(portraitStyles).toMatch(/\.thoughts\s*\{[^}]*font-size:\s*0\.875rem/s)
-    expect(portraitStyles).toMatch(/\.tabs-title\s*\{[^}]*font-size:\s*1\.2rem/s)
+    expect(portraitStyles).toMatch(/\.history-page\s*\{[^}]*font-size:\s*var\(--font-size-14\)/s)
+    expect(portraitStyles).toMatch(/\.page-title\s*\{[^}]*font-size:\s*var\(--font-size-20\)/s)
+    expect(portraitStyles).toMatch(/\.history-stage-title\s*\{[^}]*font-size:\s*var\(--font-size-20\)/s)
+    expect(portraitStyles).toMatch(/\.history-filter-summary\s*\{[^}]*font-size:\s*var\(--font-size-12\)/s)
+    expect(portraitStyles).toMatch(/\.history-date-column\s+\.hint\s*\{[^}]*font-size:\s*var\(--font-size-12\)/s)
+    expect(portraitStyles).toMatch(/\.thoughts\s*\{[^}]*font-size:\s*var\(--font-size-14\)/s)
+    expect(portraitStyles).toMatch(/\.tabs-title\s*\{[^}]*font-size:\s*var\(--font-size-20\)/s)
   })
 
   it('uses plain timeline connectors without arrowheads', () => {

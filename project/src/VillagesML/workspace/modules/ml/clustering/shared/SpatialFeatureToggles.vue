@@ -59,7 +59,7 @@ function update(key, value) {
 
 <style scoped lang="scss">
 .section-title {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 12px;
@@ -76,7 +76,7 @@ function update(key, value) {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   color: var(--text-primary);
   cursor: pointer;
@@ -84,7 +84,7 @@ function update(key, value) {
 }
 
 .setting-hint {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   font-style: italic;
 }

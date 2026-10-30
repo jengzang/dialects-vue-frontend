@@ -1622,7 +1622,7 @@ $glass-transition: all 0.3s ease;
     margin-bottom: 4px;
 
     color: var(--text-tertiary);
-    font-size: 12px;
+    font-size: var(--font-size-12);
     font-weight: 700;
   }
 }
@@ -1668,7 +1668,7 @@ $glass-transition: all 0.3s ease;
 
 .heatmap-slider-label {
   color: var(--text-tertiary);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 600;
 }
 
@@ -1681,7 +1681,7 @@ $glass-transition: all 0.3s ease;
   padding: 6px 4px;
 
   &-title {
-    font-size: 12px;
+    font-size: var(--font-size-12);
     font-weight: 600;
     text-align: center;
   }
@@ -1697,7 +1697,7 @@ $glass-transition: all 0.3s ease;
     display: flex;
     justify-content: space-between;
 
-    font-size: 11px;
+    font-size: var(--font-size-12);
   }
 }
 
@@ -1729,7 +1729,7 @@ $glass-transition: all 0.3s ease;
   padding: 8px;
 
   color: var(--action-primary-text);
-  font-size: 13px;
+  font-size: var(--font-size-14);
 
   background: var(--color-primary);
   border: 0;
@@ -1772,7 +1772,7 @@ $glass-transition: all 0.3s ease;
   padding: 12px 24px;
 
   color: var(--text-dark);
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 600;
 
   background: var(--glass-70);
@@ -1858,7 +1858,7 @@ $glass-transition: all 0.3s ease;
 
   color: var(--text-primary);
   font-family: "Times New Roman", serif;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   white-space: nowrap;
 
   border: 0.7px solid var(--text-primary);

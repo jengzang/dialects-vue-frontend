@@ -696,7 +696,7 @@ onMounted(() => {
 }
 
 .page-title {
-  font-size: 24px;
+  font-size: var(--font-size-24);
   font-weight: 600;
   color: var(--text-primary);
   margin: 0px;
@@ -720,13 +720,13 @@ onMounted(() => {
 }
 
 .query-form h3 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   margin: 0;
   color: var(--text-primary);
 }
 
 .query-note {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
   margin: 0;
   padding: 4px 12px;
@@ -739,7 +739,7 @@ onMounted(() => {
 }
 
 .form-group label {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   color: var(--text-secondary);
 }
@@ -769,7 +769,7 @@ onMounted(() => {
 .tendency-section h3,
 .characteristics-section h3,
 .villages-section h3 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   margin-bottom: 12px;
   color: var(--text-primary);
 }
@@ -782,13 +782,13 @@ onMounted(() => {
 }
 
 .map-placeholder p {
-  font-size: 20px;
+  font-size: var(--font-size-20);
   color: var(--text-primary);
   margin-bottom: 8px;
 }
 
 .map-note {
-  font-size: 13px !important;
+  font-size: var(--font-size-14) !important;
   color: var(--text-secondary);
 }
 
@@ -806,13 +806,13 @@ onMounted(() => {
 }
 
 .stat-label {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   margin-bottom: 6px;
 }
 
 .stat-value {
-  font-size: 24px;
+  font-size: var(--font-size-24);
   font-weight: 700;
   color: var(--color-primary);
 }
@@ -833,7 +833,7 @@ onMounted(() => {
 }
 
 .tendency-region {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -851,7 +851,7 @@ onMounted(() => {
 }
 
 .tendency-value {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--color-primary);
   text-align: right;
@@ -872,12 +872,12 @@ onMounted(() => {
 }
 
 .char-label {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
 }
 
 .char-value {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--color-primary);
 }
@@ -927,7 +927,7 @@ onMounted(() => {
   background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
   color: var(--text-primary);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   white-space: nowrap;
   position: sticky;
   top: 0;
@@ -951,7 +951,7 @@ onMounted(() => {
   align-items: center;
   background: var(--glass-30);
   border-bottom: 1px solid var(--bg-hover);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   transition: background 0.3s ease;
   text-align: center;
 }
@@ -970,7 +970,7 @@ onMounted(() => {
 }
 
 .char-name {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 700;
   color: var(--text-primary);
 }
@@ -981,32 +981,32 @@ onMounted(() => {
   background: rgba(var(--vml-blue-rgb), 0.15);
   color: var(--color-primary);
   border-radius: var(--radius-md);
-  font-size: 11px;
+  font-size: var(--font-size-12);
   font-weight: 500;
 }
 
 .char-tendency {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 600;
 }
 
 .char-deviation {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 600;
 }
 
 .char-pvalue {
-  font-size: 11px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
 }
 
 .char-villages {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
 }
 
 .char-badge {
-  font-size: 11px;
+  font-size: var(--font-size-12);
   padding: 2px 8px;
   background: rgba(var(--color-gold-rgb), 0.2);
   color: var(--color-warning-dark);
@@ -1015,13 +1015,13 @@ onMounted(() => {
 }
 
 .village-name {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .village-location {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
 }
 
@@ -1032,7 +1032,7 @@ onMounted(() => {
   background: rgba(var(--color-warning-rgb), 0.1);
   border-radius: var(--radius-sm2);
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: var(--font-size-14);
 }
 
 .summary-section {
@@ -1059,18 +1059,18 @@ onMounted(() => {
 }
 
 .summary-icon {
-  font-size: 32px;
+  font-size: var(--font-size-32);
   margin-bottom: 8px;
 }
 
 .summary-label {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
   margin-bottom: 6px;
 }
 
 .summary-value {
-  font-size: 24px;
+  font-size: var(--font-size-24);
   font-weight: 700;
   color: var(--color-primary);
 }
@@ -1095,7 +1095,7 @@ onMounted(() => {
   gap: 12px;
   padding: 10px 12px;
   align-items: center;
-  font-size: 13px;
+  font-size: var(--font-size-14);
 }
 
 .table-header {
@@ -1135,7 +1135,7 @@ onMounted(() => {
 }
 
 .char-cell {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 700;
   color: var(--text-primary);
 }
@@ -1154,7 +1154,7 @@ onMounted(() => {
   background: rgba(var(--vml-blue-rgb), 0.15);
   color: var(--color-primary);
   border-radius: var(--radius-md);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 500;
 }
 
@@ -1164,13 +1164,13 @@ onMounted(() => {
   background: rgba(var(--color-gold-rgb), 0.2);
   color: var(--color-warning-dark);
   border-radius: var(--radius-md);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 500;
 }
 
 .not-significant {
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 /* 移动端横向滚动样式 */
@@ -1183,7 +1183,7 @@ onMounted(() => {
 
 @media (max-width: 768px) {
   .page-title {
-    font-size: 20px;
+    font-size: var(--font-size-20);
   }
 
   .mode-selector {

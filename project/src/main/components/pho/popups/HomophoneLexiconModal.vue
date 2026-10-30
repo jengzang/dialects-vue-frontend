@@ -124,7 +124,7 @@ $text-secondary: var(--text-slate);
 
 .lexicon-modal-title {
   color: $text-main;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 650;
 }
 
@@ -151,7 +151,7 @@ $text-secondary: var(--text-slate);
 .lexicon-location-title {
   margin-bottom: 12px;
   color: $text-main;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 700;
   text-align: center;
 }

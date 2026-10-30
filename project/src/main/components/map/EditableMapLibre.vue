@@ -4219,7 +4219,7 @@ defineExpose({
 
 .editable-map-hit-candidate__type {
   flex: 0 0 auto;
-  font-size: 11px;
+  font-size: var(--font-size-12);
   color: var(--text-muted);
   grid-row: 2;
   overflow-wrap: anywhere;

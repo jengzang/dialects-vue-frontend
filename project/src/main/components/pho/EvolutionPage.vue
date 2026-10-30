@@ -1585,7 +1585,7 @@ $portrait-ratio: 1;
 .control {
   &-label {
     min-width: 80px;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 500;
 
     @include text-primary;
@@ -1608,7 +1608,7 @@ $portrait-ratio: 1;
 }
 
 .input-hint {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-style: italic;
 
   @include text-secondary;
@@ -1628,7 +1628,7 @@ $portrait-ratio: 1;
 
   :deep(.liquid-radio-label) {
     padding: 0;
-    font-size: 15px;
+    font-size: var(--font-size-16);
     font-weight: 500;
   }
 }
@@ -1636,7 +1636,7 @@ $portrait-ratio: 1;
 /* 查询按钮: 仅尺寸覆盖, 视觉见 main/_buttons.scss 的 .action-btn */
 .action-btn {
   --action-btn-padding: 10px 24px;
-  --action-btn-font-size: 14px;
+  --action-btn-font-size: var(--font-size-14);
   --action-btn-font-weight: 500;
 }
 
@@ -1648,7 +1648,7 @@ $portrait-ratio: 1;
   border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
   border-radius: var(--radius-sm2);
   color: $danger;
-  font-size: 13px;
+  font-size: var(--font-size-14);
 }
 
 /* 特征切换 */
@@ -1667,7 +1667,7 @@ $portrait-ratio: 1;
     border-radius: var(--radius-md);
     color: var(--color-primary);
     white-space: nowrap;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 700;
     cursor: pointer;
     text-decoration: none;
@@ -1691,7 +1691,7 @@ $portrait-ratio: 1;
   border-radius: var(--radius-md);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   color: var(--text-dark);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s $ease-fluid;
@@ -1726,13 +1726,13 @@ $portrait-ratio: 1;
 
   p {
     color: $text-secondary;
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 }
 
 .empty-state {
   color: $text-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 /* 图表区域 */
@@ -1803,7 +1803,7 @@ $portrait-ratio: 1;
   }
 
   &__title {
-    font-size: 16px;
+    font-size: var(--font-size-16);
     font-weight: 700;
     line-height: 1.3;
 
@@ -1812,7 +1812,7 @@ $portrait-ratio: 1;
 
   &__subtitle {
     margin-top: 4px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
     line-height: 1.4;
 
     @include text-secondary;
@@ -1824,7 +1824,7 @@ $portrait-ratio: 1;
   }
 
   &__section-title {
-    font-size: 13px;
+    font-size: var(--font-size-14);
     font-weight: 600;
 
     @include text-primary;
@@ -1845,7 +1845,7 @@ $portrait-ratio: 1;
   }
 
   &__item-label {
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 600;
 
     @include text-primary;
@@ -1853,14 +1853,14 @@ $portrait-ratio: 1;
 
   &__item-value {
     white-space: nowrap;
-    font-size: 12px;
+    font-size: var(--font-size-12);
 
     @include text-secondary;
   }
 
   &__chars {
     margin-top: 8px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
     line-height: 1.6;
 
     @include text-secondary;

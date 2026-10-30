@@ -127,7 +127,7 @@ function openNode(id) {
 .feature-topology-hint {
   margin: 0 0 1rem;
   color: var(--text-secondary);
-  font-size: 0.875rem;
+  font-size: var(--font-size-14);
 }
 
 .topology-graph-frame {
@@ -151,7 +151,7 @@ function openNode(id) {
 
 .topology-link {
   --glass-button-padding: 0.45rem 0.75rem;
-  --glass-button-font-size: 0.875rem;
+  --glass-button-font-size: var(--font-size-14);
 }
 
 @media (max-aspect-ratio: #{1 / 1}) {

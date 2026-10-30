@@ -491,7 +491,7 @@ $text-secondary: var(--text-slate);
 
 .lexicon-title {
   color: $text-main;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 700;
   white-space: nowrap;
 }
@@ -514,13 +514,13 @@ $text-secondary: var(--text-slate);
   background: var(--glass-60);
   border-radius: var(--radius-md);
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   line-height: 1.7;
   white-space: pre-wrap;
   word-break: break-all;
 
   @media (max-aspect-ratio: 1/1) {
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -561,7 +561,7 @@ $text-secondary: var(--text-slate);
   background: none;
   color: var(--text-primary);
   font: inherit;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   cursor: pointer;
 
   .lexicon-toggle-icon {

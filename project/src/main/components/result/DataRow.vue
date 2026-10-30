@@ -340,19 +340,19 @@ $glass-blur: 8px;
       flex: 1;
       order: 0;
       margin-right: 0;
-      font-size: 16px;
+      font-size: var(--font-size-16);
     }
 
     > p:last-child {
       order: 0;
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 
   .feature-stats-btn {
     order: 0;
     padding: 4px 10px;
-    font-size: 11px;
+    font-size: var(--font-size-12);
   }
 
   .brief-stats {
@@ -373,7 +373,7 @@ $glass-blur: 8px;
   display: inline-block;
   margin-top: 0;
   padding: 5px;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   text-align: center;
   border: 2px solid $text-dark;
 }
@@ -382,7 +382,7 @@ $glass-blur: 8px;
   display: flex;
   margin-top: 0;
   padding: 5px;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   text-align: center;
   border-bottom: 2px solid $text-dark;
 }
@@ -392,7 +392,7 @@ $glass-blur: 8px;
   margin-right: 2px;
   padding: 1px 3px;
   color: $text-dark;
-  font-size: 15px;
+  font-size: var(--font-size-16);
 
   &.multi-vue,
   &.char-vue--wendu {
@@ -453,7 +453,7 @@ $glass-blur: 8px;
   max-width: 200px;
   padding: 5px 10px;
   color: var(--text-white);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   pointer-events: none;
   background-color: rgba(0, 0, 0, 0.8);
   border-radius: var(--radius-xs);
@@ -480,7 +480,7 @@ $glass-blur: 8px;
   margin-bottom: 0;
   color: var(--text-primary);
   font-family: "SimHei", "黑体", sans-serif;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: bold;
   cursor: pointer;
   text-decoration: none;
@@ -517,7 +517,7 @@ $glass-blur: 8px;
   margin-left: 12px;
   padding: 6px 12px;
   color: $primary-blue;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 500;
   white-space: nowrap;
   appearance: none;
@@ -557,7 +557,7 @@ $glass-blur: 8px;
   padding: 4px 8px;
   overflow: hidden;
   color: $text-muted;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -582,7 +582,7 @@ $glass-blur: 8px;
     margin: 1px;
     margin-right: auto;
     color: $clickable-blue;
-    font-size: 18px;
+    font-size: var(--font-size-18);
     font-weight: bold;
     text-align: left;
   }
@@ -592,7 +592,7 @@ $glass-blur: 8px;
     margin: 1px;
     margin-left: 12px;
     color: var(--text-secondary);
-    font-size: 13px;
+    font-size: var(--font-size-14);
     font-style: italic;
     text-align: right;
     white-space: nowrap;

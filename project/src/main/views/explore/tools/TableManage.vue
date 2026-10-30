@@ -734,7 +734,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);@mixin glass-panel(
 
   h1 {
     margin-bottom: 24px;
-    font-size: 32px;
+    font-size: var(--font-size-32);
     font-weight: 800;
     letter-spacing: -0.5px;
     background: linear-gradient(
@@ -763,7 +763,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);@mixin glass-panel(
 
   p {
     color: $primary-blue;
-    font-size: 18px;
+    font-size: var(--font-size-18);
     font-weight: 600;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
@@ -820,7 +820,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);@mixin glass-panel(
 
   h3 {
     margin: 0;
-    font-size: 18px;
+    font-size: var(--font-size-18);
     font-weight: 700;
     background: linear-gradient(
       135deg,
@@ -915,7 +915,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);@mixin glass-panel(
   h3 {
     margin-top: 0;
     margin-bottom: 16px;
-    font-size: 20px;
+    font-size: var(--font-size-20);
     font-weight: 700;
     background: linear-gradient(
       135deg,
@@ -931,7 +931,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);@mixin glass-panel(
     display: block;
     margin-top: 5px;
     color: $text-primary;
-    font-size: 15px;
+    font-size: var(--font-size-16);
     font-weight: 600;
   }
 
@@ -940,7 +940,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);@mixin glass-panel(
     min-width: 250px;
     max-width: 350px;
     padding: 12px 16px;
-    font-size: 15px;
+    font-size: var(--font-size-16);
     cursor: pointer;
     background: var(--glass-90);
     border: 1px solid rgba(0, 0, 0, 0.1);
@@ -975,7 +975,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);@mixin glass-panel(
   min-width: 250px;
   max-width: 350px;
   padding: 12px 16px;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   background: var(--glass-90);
   border: 2px solid $primary-blue;
   border-radius: $radius-md;
@@ -1036,7 +1036,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);@mixin glass-panel(
 
 .column-config-table {
   width: 100%;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   background: transparent;
   border-spacing: 0;
   border-collapse: separate;
@@ -1090,7 +1090,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);@mixin glass-panel(
 .width-input {
   width: 80%;
   padding: 6px 12px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   background: var(--glass-90);
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: $radius-sm;
@@ -1115,7 +1115,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);@mixin glass-panel(
   h4 {
     margin: 0;
     color: $text-dark;
-    font-size: 17px;
+    font-size: var(--font-size-18);
     font-weight: 700;
     transition: color $transition-base;
   }
@@ -1165,14 +1165,14 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);@mixin glass-panel(
     min-width: 60px;
     margin: 0;
     color: $text-primary;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 600;
   }
 
   input {
     width: 100%;
     padding: 8px 12px;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     background: var(--glass-90);
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: $radius-sm;
@@ -1279,7 +1279,7 @@ $smooth-easing: cubic-bezier(0.4, 0, 0.2, 1);@mixin glass-panel(
 
   .admin-panel {
     h1 {
-      font-size: 24px;
+      font-size: var(--font-size-24);
     }
   }
 }

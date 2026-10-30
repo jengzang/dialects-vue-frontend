@@ -169,7 +169,7 @@ $animation-duration: 0.4s;/* 弹窗基本样式 */
   p {
     display: block;
     margin: 1px 0 2px;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 700;
     line-height: 1.2;
   }
@@ -186,7 +186,7 @@ $animation-duration: 0.4s;/* 弹窗基本样式 */
 .popup-content > span {
   display: block;
   margin: 1px 0;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 400;
   line-height: 1.1;
 }

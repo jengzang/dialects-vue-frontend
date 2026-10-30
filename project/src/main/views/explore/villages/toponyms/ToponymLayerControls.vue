@@ -82,13 +82,13 @@ function handleToggle(key, visible) {
     h2 {
       margin: 0;
       color: var(--text-deep);
-      font-size: 15px;
+      font-size: var(--font-size-16);
       line-height: 1.4;
     }
 
     span {
       color: var(--text-secondary);
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 
@@ -104,7 +104,7 @@ function handleToggle(key, visible) {
     padding: 6px 10px;
 
     small {
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 
@@ -116,7 +116,7 @@ function handleToggle(key, visible) {
         justify-content: flex-end;
 
         h2 {
-          font-size: 13px;
+          font-size: var(--font-size-14);
         }
 
         span {

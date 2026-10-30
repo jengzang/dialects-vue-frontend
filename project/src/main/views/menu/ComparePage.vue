@@ -2064,7 +2064,7 @@ $text-muted: var(--text-lightest);
   padding: 2dvh;
   max-height: 35dvh;
   overflow-y: auto;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   max-width: 900px;
 }
 
@@ -2073,7 +2073,7 @@ $text-muted: var(--text-lightest);
   align-items: center;
   gap: 1.5dvh;
   width: 100%;
-  font-size: 18px;
+  font-size: var(--font-size-18);
 }
 
 .tab5-default-location-arrow {
@@ -2135,7 +2135,7 @@ $text-muted: var(--text-lightest);
   border: 1px solid rgba(var(--color-silver-rgb), 0.5);
   border-radius: var(--radius-md);
   white-space: nowrap;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   cursor: pointer;
   transition: all 0.2s;
 
@@ -2191,7 +2191,7 @@ $text-muted: var(--text-lightest);
   border-radius: var(--radius-sm2);
   outline: none;
   text-align: center;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
 
   &:focus {
@@ -2218,7 +2218,7 @@ $text-muted: var(--text-lightest);
   border-radius: var(--radius-md);
   box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.2);
   color: $primary;
-  font-size: 0.95rem;
+  font-size: var(--font-size-16);
   font-weight: 600;
 }
 
@@ -2255,7 +2255,7 @@ $text-muted: var(--text-lightest);
   border: 2px solid;
   border-radius: var(--radius-md);
   white-space: nowrap;
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -2351,13 +2351,13 @@ $text-muted: var(--text-lightest);
   border-bottom: 2px solid rgba(var(--color-primary-rgb), 0.2);
   white-space: nowrap;
   color: $primary;
-  font-size: 1.1rem;
+  font-size: var(--font-size-18);
   font-weight: 700;
 
   .add-btn {
     padding: 0.4rem 0.8rem;
     white-space: nowrap;
-    font-size: 0.85rem;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -2387,7 +2387,7 @@ $text-muted: var(--text-lightest);
 .item-label {
   flex: 1;
   color: $text-primary;
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   word-break: break-word;
 }
 
@@ -2400,7 +2400,7 @@ $text-muted: var(--text-lightest);
   border: none;
   border-radius: var(--radius-full);
   color: $danger;
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   cursor: pointer;
   transition: all 0.2s ease;
 
@@ -2417,7 +2417,7 @@ $text-muted: var(--text-lightest);
   white-space: nowrap;
   text-align: center;
   color: $text-muted;
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   font-style: italic;
 }
 
@@ -2431,14 +2431,14 @@ $text-muted: var(--text-lightest);
 .feature-label {
   display: block;
   color: $text-primary;
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   font-weight: 600;
 }
 
 /* Tab4 调类选择 */
 .tone-tip {
   color: $primary;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
 }
 
@@ -2478,7 +2478,7 @@ $text-muted: var(--text-lightest);
 
   span {
     color: $primary;
-    font-size: 0.95rem;
+    font-size: var(--font-size-16);
     font-weight: 600;
   }
 
@@ -2563,7 +2563,7 @@ $text-muted: var(--text-lightest);
     @include flex-col;
     gap: 1px;
     color: var(--text-secondary, var(--text-tertiary));
-    font-size: 12px;
+    font-size: var(--font-size-12);
     line-height: 1.35;
   }
 
@@ -2588,7 +2588,7 @@ $text-muted: var(--text-lightest);
 
 @media (max-aspect-ratio: #{1 / 1}) {
   .tab5-page {
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 
   .card-row {
@@ -2597,7 +2597,7 @@ $text-muted: var(--text-lightest);
 
   .group-label {
     padding: 0.3rem 0.8rem;
-    font-size: 0.85rem;
+    font-size: var(--font-size-14);
   }
 
   .compare-group {
@@ -2606,7 +2606,7 @@ $text-muted: var(--text-lightest);
 
   .compare-page-panel {
     padding: 0.5rem !important;
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 
   .selected-groups-container {

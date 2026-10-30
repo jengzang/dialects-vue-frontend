@@ -155,7 +155,7 @@ thead {
 
 th {
   padding: 10px 12px;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--text-secondary);
   text-align: left;
@@ -177,7 +177,7 @@ th {
 
 .glass-table-sort-arrow {
   margin-left: 4px;
-  font-size: 10px;
+  font-size: var(--font-size-12);
   opacity: 0.4;
 
   .glass-table-th--sortable:hover & {
@@ -187,7 +187,7 @@ th {
 
 td {
   padding: 10px 12px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
   border-bottom: 1px solid var(--border-light);
   overflow: hidden;
@@ -220,7 +220,7 @@ tbody tr {
 
 .glass-table-empty-text {
   color: var(--text-muted);
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .glass-table--loading .glass-table-scroll {
@@ -241,7 +241,7 @@ tbody tr {
 
   th, td {
     padding: 8px 10px;
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 }
 </style>

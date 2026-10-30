@@ -25,7 +25,7 @@ $ease-standard: 0.3s ease;
   width: 100%;
   margin-top: 1rem;
   margin-bottom: 0.5rem;
-  font-size: 1.8rem;
+  font-size: var(--font-size-32);
   font-weight: bold;
   white-space: normal;
   overflow-wrap: anywhere;
@@ -35,7 +35,7 @@ $ease-standard: 0.3s ease;
 p {
   margin-bottom: 20px;
   color: $text-primary;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   line-height: 1.6;
 
   a {
@@ -104,7 +104,7 @@ em {
 @media (max-aspect-ratio: #{1 / 1}) {
   p {
     margin-bottom: 14px;
-    font-size: 15px;
+    font-size: var(--font-size-16);
     line-height: 1.55;
   }
 }

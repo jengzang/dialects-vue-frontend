@@ -375,7 +375,7 @@ const resetView = () => {
   border: 1px solid var(--border-light-gray);
   padding: 8px 12px;
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   cursor: pointer;
   outline: none;
   transition: border 0.3s;
@@ -391,7 +391,7 @@ const resetView = () => {
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-muted);
 }
 
@@ -409,7 +409,7 @@ const resetView = () => {
   padding: 8px;
   border-radius: var(--radius-sm2);
   cursor: pointer;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   transition: background 0.2s;
   display: flex;
   justify-content: center;
@@ -434,7 +434,7 @@ const resetView = () => {
   top: 24px;
   right: 24px;
   padding: 12px 24px;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-dark);
   background: var(--glass-80);
@@ -495,7 +495,7 @@ const resetView = () => {
 
 .popup-header h3 {
   margin: 0;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   color: var(--text-dark);
 }
 

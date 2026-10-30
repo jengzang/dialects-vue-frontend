@@ -755,7 +755,7 @@ $transition-normal: 0.3s;
 .panel-title {
   margin-bottom: 1.5rem;
   color: $text-primary;
-  font-size: 1.5rem;
+  font-size: var(--font-size-24);
   font-weight: 600;
   text-align: center;
 }
@@ -767,7 +767,7 @@ $transition-normal: 0.3s;
 .section-title {
   margin-bottom: 1rem;
   color: $text-primary;
-  font-size: 1.2rem;
+  font-size: var(--font-size-20);
   font-weight: 600;
   text-align: center;
 }
@@ -807,18 +807,18 @@ $transition-normal: 0.3s;
 .stat-label {
   margin-bottom: 0.5rem;
   color: $text-secondary;
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
 }
 
 .stat-value {
   color: $text-primary;
-  font-size: 1.5rem;
+  font-size: var(--font-size-24);
   font-weight: 600;
 
   &.contour-display {
     color: $primary-blue;
     font-family: var(--font-mono);
-    font-size: 1.1rem;
+    font-size: var(--font-size-18);
     letter-spacing: 0.05em;
   }
 }
@@ -866,12 +866,12 @@ $transition-normal: 0.3s;
 
 .quality-label {
   color: $text-secondary;
-  font-size: 0.95rem;
+  font-size: var(--font-size-16);
   font-weight: 500;
 }
 
 .quality-value {
-  font-size: 1.8rem;
+  font-size: var(--font-size-32);
   font-weight: 700;
   transition: color $transition-normal ease;
 
@@ -906,7 +906,7 @@ $transition-normal: 0.3s;
 
 .quality-status {
   color: $text-secondary;
-  font-size: 0.85rem;
+  font-size: var(--font-size-14);
   font-weight: 600;
 }
 
@@ -928,7 +928,7 @@ $transition-normal: 0.3s;
 
   .placeholder-icon {
     opacity: 0.7;
-    font-size: 3rem;
+    font-size: var(--font-size-48);
   }
 }
 
@@ -939,7 +939,7 @@ $transition-normal: 0.3s;
   border-radius: var(--radius-2xl);
   box-shadow: 0 4px 12px $blue-shadow;
   color: var(--action-primary-text);
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   font-weight: 600;
   cursor: pointer;
   transition:

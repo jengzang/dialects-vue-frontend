@@ -103,7 +103,7 @@ function handleConfirm() {
 .river-import-desc {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   line-height: 1.5;
 }
 
@@ -120,7 +120,7 @@ function handleConfirm() {
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-md);
   background: var(--glass-50);
-  font-size: 14px;
+  font-size: var(--font-size-14);
 
   &:hover {
     background: var(--glass-60);
@@ -134,7 +134,7 @@ function handleConfirm() {
 
   .river-import-item-meta {
     color: var(--text-tertiary);
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 }
 

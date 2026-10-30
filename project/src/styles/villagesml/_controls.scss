@@ -166,7 +166,7 @@
   border: 1px solid var(--bg-hover-strong);
   border-radius: var(--radius-sm2);
   background: var(--glass-90);
-  font-size: var(--font-size-15-2);
+  font-size: var(--font-size-16);
 
   &:focus {
     outline: none;
@@ -176,7 +176,7 @@
 }
 
 .vm-setting-hint-muted {
-  font-size: var(--font-size-13-6);
+  font-size: var(--font-size-14);
   color: var(--text-tertiary);
   font-style: italic;
 }

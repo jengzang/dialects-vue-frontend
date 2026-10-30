@@ -856,12 +856,12 @@ onBeforeUnmount(() => {
   }
 
   .summary-label {
-    font-size: 11px;
+    font-size: var(--font-size-12);
     color: $text-muted;
   }
 
   .summary-value {
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 700;
     color: $text-strong;
     word-break: break-word;
@@ -893,21 +893,21 @@ onBeforeUnmount(() => {
   gap: 10px;
 
   .sidebar-title {
-    font-size: 13px;
+    font-size: var(--font-size-14);
     font-weight: 700;
     color: $text-strong;
   }
 
   .sidebar-text {
     margin: 0;
-    font-size: 12px;
+    font-size: var(--font-size-12);
     line-height: 1.6;
     color: $text-secondary;
   }
 
   .image-export-preview-validation {
     margin: 0;
-    font-size: 12px;
+    font-size: var(--font-size-12);
     color: $danger;
   }
 }

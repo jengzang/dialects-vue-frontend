@@ -155,7 +155,7 @@ $error-color: red;
   gap: 8px;
   margin-bottom: 16px;
   color: $title-color;
-  font-size: 30px;
+  font-size: var(--font-size-32);
   font-weight: 700;
 }
 
@@ -167,19 +167,19 @@ $error-color: red;
 }
 
 .auth-submit-button {
-  font-size: 17px;
+  font-size: var(--font-size-18);
 
   @media (max-aspect-ratio: 1/1) {
     width: 100%;
     padding: 16px;
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 }
 
 .err,
 .success {
   margin-top: 10px;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: bold;
 }
 
@@ -187,7 +187,7 @@ $error-color: red;
   color: $error-color;
 
   @media (max-aspect-ratio: 1/1) {
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 }
 
@@ -200,7 +200,7 @@ $error-color: red;
   height: 35px;
   min-height: 35px;
   padding: 0;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   line-height: 1;
   --glass-button-border-radius: var(--radius-full);
 }

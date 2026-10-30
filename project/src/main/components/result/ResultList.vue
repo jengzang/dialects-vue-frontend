@@ -714,7 +714,7 @@ $transition-duration: 0.2s;
   margin-bottom: 4px;
   padding: 6px 10px;
   color: var(--text-slate);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   background: var(--glass-80);
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: var(--radius-md);
@@ -756,7 +756,7 @@ $transition-duration: 0.2s;
   justify-content: space-between;
   padding: 9px 18px;
   color: $text-dark;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: bold;
   background: var(--glass-30);
   visibility: hidden;
@@ -832,7 +832,7 @@ $transition-duration: 0.2s;
   width: 100%;
   padding: 6px 9px;
   color: $text-dark;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   text-align: left;
   white-space: nowrap;
@@ -861,7 +861,7 @@ $transition-duration: 0.2s;
   left: 50%;
   z-index: 1;
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   transform: translate(-50%, -50%);
 }
 
@@ -899,7 +899,7 @@ $transition-duration: 0.2s;
   align-items: center;
   margin: 6px 0;
   color: $text-dark;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   cursor: pointer;
   transition: color $transition-duration;
 
@@ -932,7 +932,7 @@ $transition-duration: 0.2s;
   padding: 4px 10px;
   color: $primary-blue;
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   white-space: nowrap;
   cursor: pointer;
@@ -978,7 +978,7 @@ $transition-duration: 0.2s;
   padding: 6px 9px;
   color: $text-dark;
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   text-align: left;
   white-space: nowrap;
@@ -997,7 +997,7 @@ $transition-duration: 0.2s;
 .custom-switch-container {
   @include flex-center;
   font-family: var(--font-sans);
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .result-display-switch {

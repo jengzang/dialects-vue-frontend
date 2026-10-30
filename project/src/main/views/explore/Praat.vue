@@ -956,7 +956,7 @@ onBeforeUnmount(() => {
   gap: 0.5rem;
   padding: 0.75rem 1.2rem;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   font-weight: 500;
   background: rgba(var(--color-error-light-rgb), 0.15);
   color: var(--color-error);
@@ -976,7 +976,7 @@ onBeforeUnmount(() => {
 }
 
 .page-title {
-  font-size: 2rem;
+  font-size: var(--font-size-32);
   margin-bottom: 0.5rem;
   margin-top: 1rem;
   background: var(--color-gradient);
@@ -986,7 +986,7 @@ onBeforeUnmount(() => {
 }
 
 .page-description {
-  font-size: 1.1rem;
+  font-size: var(--font-size-18);
   margin:0;
   color: var(--color-text-secondary);
 }
@@ -1037,7 +1037,7 @@ onBeforeUnmount(() => {
 .start-button {
   width: 100%;
   padding: 1rem 1.2rem;
-  font-size: 1.1rem;
+  font-size: var(--font-size-18);
   font-weight: 600;
   border: none;
   cursor: pointer;
@@ -1079,12 +1079,12 @@ onBeforeUnmount(() => {
   padding: 0.75rem 1rem;
   border: none;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   font-weight: 500;
 }
 
 .settings-icon {
-  font-size: 1.2rem;
+  font-size: var(--font-size-20);
 }
 
 /* Mode Selector Inline */
@@ -1095,7 +1095,7 @@ onBeforeUnmount(() => {
 }
 
 .mode-label {
-  font-size: 0.95rem;
+  font-size: var(--font-size-16);
   font-weight: 500;
   color: var(--color-text-primary);
   white-space: nowrap;
@@ -1113,7 +1113,7 @@ onBeforeUnmount(() => {
   padding: 0.5rem 0.6rem;
   border: none;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   transition: all 0.3s ease;
   position: relative;
 }
@@ -1200,7 +1200,7 @@ onBeforeUnmount(() => {
 }
 
 .sidebar-title {
-  font-size: 1.2rem;
+  font-size: var(--font-size-20);
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0;
@@ -1281,7 +1281,7 @@ onBeforeUnmount(() => {
   }
 
   .page-title {
-    font-size: 1.8rem;
+    font-size: var(--font-size-32);
     margin:0;
   }
 
@@ -1334,19 +1334,19 @@ onBeforeUnmount(() => {
 }
 
 .error-icon {
-  font-size: 3rem;
+  font-size: var(--font-size-48);
   margin-bottom: 1rem;
 }
 
 .error-title {
-  font-size: 1.3rem;
+  font-size: var(--font-size-20);
   font-weight: 600;
   color: var(--color-error-light);
   margin-bottom: 0.5rem;
 }
 
 .error-text {
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   color: var(--color-text-secondary);
 }
 
@@ -1354,14 +1354,14 @@ onBeforeUnmount(() => {
 
 
 .loading-title {
-  font-size: 1.2rem;
+  font-size: var(--font-size-20);
   font-weight: 600;
   color: var(--color-text-primary);
   margin-bottom: 0.5rem;
 }
 
 .loading-text {
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   color: var(--color-text-secondary);
   margin-bottom: 2rem;
 }
@@ -1389,7 +1389,7 @@ onBeforeUnmount(() => {
 }
 
 .progress-text {
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--color-primary);
   text-align: center;
@@ -1407,20 +1407,20 @@ onBeforeUnmount(() => {
 }
 
 .no-results-icon {
-  font-size: 4rem;
+  font-size: var(--font-size-48);
   margin-bottom: 1.2rem;
   opacity: 0.6;
 }
 
 .no-results-title {
-  font-size: 1.2rem;
+  font-size: var(--font-size-20);
   font-weight: 600;
   color: var(--color-text-primary);
   margin-bottom: 0.5rem;
 }
 
 .no-results-text {
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   color: var(--color-text-secondary);
 }
 </style>

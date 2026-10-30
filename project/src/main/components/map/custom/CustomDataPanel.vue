@@ -402,7 +402,7 @@ const resetForm = () => {
   color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-md) 0 0 var(--radius-md);
-  font-size: 24px;
+  font-size: var(--font-size-24);
   font-weight: bold;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
@@ -429,7 +429,7 @@ const resetForm = () => {
 }
 
 .panel-title {
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 600;
   color: var(--text-primary);
   text-align: center;
@@ -451,7 +451,7 @@ const resetForm = () => {
 }
 
 .form-group label {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   color: var(--text-primary);
   max-width: 60px;       /* 限定 label 最大宽度 */
@@ -469,7 +469,7 @@ const resetForm = () => {
 .form-group textarea {
   flex: 1;               /* 占据剩余空间 */
   padding: 8px 10px;     /* 略微减小 padding 以适应更紧凑的布局 */
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .form-group input[readonly] {
@@ -486,7 +486,7 @@ const resetForm = () => {
   position: absolute;
   bottom: -18px;         /* 放在 form-group 下方 */
   left: 88px;            /* 与 input 左对齐（80px label + 8px gap） */
-  font-size: 11px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   white-space: nowrap;   /* 防止换行 */
 }
@@ -512,7 +512,7 @@ const resetForm = () => {
   cursor: pointer;
   transition: background 0.2s ease;
   text-align: center;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
@@ -527,7 +527,7 @@ const resetForm = () => {
   color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-md);
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(var(--color-success-rgb), 0.3);
@@ -561,7 +561,7 @@ const resetForm = () => {
   }
 
   .panel-title {
-    font-size: 18px;
+    font-size: var(--font-size-18);
     margin-bottom: 16px;
   }
 
@@ -569,7 +569,7 @@ const resetForm = () => {
   .expand-button {
     width: 40px;
     height: 40px;
-    font-size: 20px;
+    font-size: var(--font-size-20);
     border-radius: var(--radius-md) 0 0 10px;
     top: 40%;
   }
@@ -592,25 +592,25 @@ const resetForm = () => {
   }
 
   .form-group label {
-    font-size: 13px;
+    font-size: var(--font-size-14);
     max-width: 70px;     /* 移动端减小 label 宽度 */
     min-width: 70px;
   }
 
   .form-group input,
   .form-group textarea {
-    font-size: 14px;
+    font-size: var(--font-size-14);
     padding: 8px;
   }
 
   .hint {
-    font-size: 10px;
+    font-size: var(--font-size-12);
     left: 76px;          /* 调整为新的 label 宽度 + gap */
   }
 
   .suggestions-box {
     left: 76px;          /* 调整为新的 label 宽度 + gap */
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 
   .suggestion-item {
@@ -620,7 +620,7 @@ const resetForm = () => {
   /* 提交按钮移动端优化 */
   .submit-btn {
     padding: 12px 20px;
-    font-size: 15px;
+    font-size: var(--font-size-16);
   }
 }
 
@@ -636,13 +636,13 @@ const resetForm = () => {
   }
 
   .panel-title {
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 
   .expand-button {
     width: 36px;
     height: 36px;
-    font-size: 18px;
+    font-size: var(--font-size-18);
     top: 40%;
   }
 
@@ -651,19 +651,19 @@ const resetForm = () => {
   }
 
   .form-group label {
-    font-size: 12px;
+    font-size: var(--font-size-12);
     max-width: 60px;     /* 小屏幕进一步减小 label 宽度 */
     min-width: 60px;
   }
 
   .form-group input,
   .form-group textarea {
-    font-size: 13px;
+    font-size: var(--font-size-14);
     padding: 6px 8px;
   }
 
   .hint {
-    font-size: 10px;
+    font-size: var(--font-size-12);
     left: 66px;          /* 调整为新的 label 宽度 + gap */
   }
 
@@ -673,7 +673,7 @@ const resetForm = () => {
 
   .submit-btn {
     padding: 10px 16px;
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -688,7 +688,7 @@ const resetForm = () => {
   }
 
   .panel-title {
-    font-size: 16px;
+    font-size: var(--font-size-16);
     margin-bottom: 12px;
   }
 
@@ -701,7 +701,7 @@ const resetForm = () => {
   }
 
   .form-group label {
-    font-size: 12px;
+    font-size: var(--font-size-12);
     max-width: 65px;
     min-width: 65px;
   }
@@ -712,7 +712,7 @@ const resetForm = () => {
   }
 
   .hint {
-    font-size: 10px;
+    font-size: var(--font-size-12);
     left: 71px;
   }
 

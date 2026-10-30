@@ -46,7 +46,7 @@
             flex: getOverflowFlex(t, isActiveComputed(t.tab), false),
             minWidth: getOverflowMinWidth(t, false),
             maxWidth: getOverflowMaxWidth(t, false),
-            fontSize: 'calc(var(--font-size-nav-unit) * ' + t.fontSize + ')'
+            fontSize: 'calc(clamp(var(--font-size-16), 1.5dvh, var(--font-size-20)) * ' + t.fontSize + ')'
           }"
           @click.prevent.stop="onClick(t, navigate, $event)"
           @mouseenter="(e) => { handleTabHover(t, t.tab, e); handleTabTooltipEnter(e, t.label) }"
@@ -116,7 +116,7 @@
               flex: getOverflowFlex(t, isActiveComputed(t.tab), true),
               minWidth: getOverflowMinWidth(t, true),
               maxWidth: getOverflowMaxWidth(t, true),
-              fontSize: 'calc(var(--font-size-nav-mobile-unit) * ' + (t.mobileFontSize || t.fontSize) + ')'
+              fontSize: 'calc(clamp(var(--font-size-16), 1.5dvh, var(--font-size-20)) * ' + (t.mobileFontSize || t.fontSize) + ')'
             }"
             @click.prevent.stop="onClick(t, navigate, $event)"
             @mouseenter="(e) => handleTabTooltipEnter(e, t.label)"
@@ -654,7 +654,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   min-width: 0;
   height: $desktop-tab-height;
   color: $primary-blue;
-  font-size: var(--font-size-20-8);
+  font-size: var(--font-size-20);
   text-align: center;
   text-decoration: none;
   white-space: nowrap;
@@ -674,7 +674,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   height: calc(100% - clamp(3px, 1dvh, 6px));
   margin: 0 calc(var(--tab-pad) * -1);
   padding: 0 var(--tab-pad);
-  font-size: var(--font-size-nav-inactive);
+  font-size: 0.9em;
   border: 3px solid transparent;
   border-radius: var(--radius-md);
 
@@ -712,7 +712,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     position: relative;
     color: $active-blue;
     font-weight: 1000;
-    font-size: var(--font-size-nav-active);
+    font-size: 1.1em;
     background: linear-gradient(
       145deg,
       var(--glass-20),
@@ -838,7 +838,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 .login-text {
   max-width: 80px;
   overflow: hidden;
-  font-size: var(--font-size-18-4);
+  font-size: var(--font-size-18);
   font-weight: 600;
   white-space: nowrap;
 }
@@ -913,7 +913,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
       }
 
       .nav-icon, .label {
-        font-size: var(--font-size-nav-inactive);
+        font-size: 0.9em;
       }
 
       .tab-chevron,
@@ -924,7 +924,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
       }
 
       .label--tiny {
-        font-size: var(--font-size-nav-caption) !important;
+        font-size: max(var(--font-size-12), 0.65em) !important;
         max-width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -950,7 +950,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
         transition: 0.3s ease 0.6s;
 
         .nav-icon, .label {
-          font-size: var(--font-size-nav-active);
+          font-size: 1.1em;
         }
 
         &::after {
@@ -1018,7 +1018,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   align-items: center;
   padding: 12px 16px;
   color: $text-primary;
-  font-size: var(--font-size-15);
+  font-size: var(--font-size-16);
   font-weight: 500;
   cursor: pointer;
   border-radius: var(--radius-md);

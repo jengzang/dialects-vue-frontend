@@ -694,7 +694,7 @@ $portrait-ratio: 1;
 
   color: $text-secondary;
 
-  font-size: var(--font-size-13);
+  font-size: var(--font-size-14);
   font-weight: 600;
 }
 
@@ -702,7 +702,7 @@ $portrait-ratio: 1;
 .stat-value-large {
   color: $primary-dark;
 
-  font-size: var(--font-size-26);
+  font-size: var(--font-size-24);
   font-weight: 900;
 
   line-height: 1;
@@ -766,7 +766,7 @@ $portrait-ratio: 1;
 
   color: $text-dark;
 
-  font-size: var(--font-size-13);
+  font-size: var(--font-size-14);
   font-weight: 600;
 }
 
@@ -806,7 +806,7 @@ $portrait-ratio: 1;
 
   color: $primary-dark;
 
-  font-size: var(--font-size-15);
+  font-size: var(--font-size-16);
 
   font-weight: 700;
 }
@@ -857,7 +857,7 @@ $portrait-ratio: 1;
 
   color: $text-primary;
 
-  font-size: var(--font-size-15);
+  font-size: var(--font-size-16);
 
   font-weight: 500;
 
@@ -992,7 +992,7 @@ $portrait-ratio: 1;
 
     li {
       padding: 3px 8px 3px 15px;
-      font-size: var(--font-size-17-6);
+      font-size: var(--font-size-18);
     }
   }
 

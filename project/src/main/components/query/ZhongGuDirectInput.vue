@@ -162,7 +162,7 @@ $transition-duration: 0.2s;
 
 @mixin status-item($color) {
   color: $color;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   line-height: 1.4;
 }
 
@@ -198,7 +198,7 @@ $transition-duration: 0.2s;
 
 .input-label {
   color: $text-medium-color;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
 }
 
@@ -207,7 +207,7 @@ $transition-duration: 0.2s;
   width: 24px;
   height: 24px;
   color: $primary-color;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 700;
   cursor: pointer;
   background: transparent;
@@ -225,7 +225,7 @@ textarea {
   height: auto;
   min-height: 56px;
   font-family: inherit;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   resize: vertical;
 
   &:focus {

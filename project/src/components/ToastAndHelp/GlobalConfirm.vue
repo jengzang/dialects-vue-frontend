@@ -63,38 +63,38 @@ $mobile-gap: 10px;
 }
 
 .confirm-icon {
-  font-size: 48px;
+  font-size: var(--font-size-48);
   line-height: 1;
   filter: drop-shadow(0 2px 8px rgba(var(--color-gold-rgb), 0.3));
 
   @media (max-width: 768px) {
-    font-size: 40px;
+    font-size: var(--font-size-48);
   }
 }
 
 .confirm-title {
   margin: 0;
   color: var(--text-dark-alpha);
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 600;
   text-align: center;
 
   @media (max-width: 768px) {
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 }
 
 .confirm-message {
   padding: 0 0 24px;
   color: var(--text-dark-medium);
-  font-size: 15px;
+  font-size: var(--font-size-16);
   line-height: 1.5;
   text-align: center;
   white-space: pre-line;
 
   @media (max-width: 768px) {
     padding-bottom: 20px;
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -112,7 +112,7 @@ $mobile-gap: 10px;
   flex: 1;
   padding: 12px 24px;
   border-radius: var(--radius-md);
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   cursor: pointer;
   border: none;
@@ -156,7 +156,7 @@ $mobile-gap: 10px;
 .confirm-btn {
   @media (max-width: 768px) {
     padding: 10px 20px;
-    font-size: 15px;
+    font-size: var(--font-size-16);
   }
 }
 </style>

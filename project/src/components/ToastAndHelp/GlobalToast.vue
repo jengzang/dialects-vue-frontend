@@ -151,7 +151,7 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   gap: 12px;
   padding: 14px 28px;
   border-radius: 18px;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 500;
   background: var(--surface-glass-floating);
   backdrop-filter: blur(16px) saturate(145%);
@@ -315,14 +315,14 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     bottom: 22px;
     max-width: calc(100vw - 32px);
     padding: 12px 14px;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     border-radius: 18px;
     transform: none;
 
     .toast-icon {
       width: 22px;
       height: 22px;
-      font-size: 13px;
+      font-size: var(--font-size-14);
     }
 
     &.position-right {

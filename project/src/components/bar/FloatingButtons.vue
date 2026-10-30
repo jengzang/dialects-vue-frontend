@@ -268,7 +268,7 @@ $transition-base: 0.3s ease;
   @media (max-aspect-ratio: 1/1) {
     width: $mobile-float-size;
     height: $mobile-float-size;
-    font-size: var(--font-size-22);
+    font-size: var(--font-size-24);
   }
 }
 

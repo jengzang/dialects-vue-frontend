@@ -542,7 +542,7 @@ onBeforeUnmount(() => {
 
   h1 {
     margin: 0;
-    font-size: clamp(2.2rem, 4.2dvw, 3.5rem);
+    font-size: clamp(var(--font-size-32), 4.2dvw, var(--font-size-48));
     line-height: 1.2;
     text-wrap: balance;
 
@@ -557,7 +557,7 @@ onBeforeUnmount(() => {
     max-width: 660px;
     margin: 0;
     color: var(--text-tertiary);
-    font-size: 1.05rem;
+    font-size: var(--font-size-16);
     line-height: 1.8;
   }
 }
@@ -592,7 +592,7 @@ onBeforeUnmount(() => {
 
   strong {
     color: var(--text-primary);
-    font-size: 1.45rem;
+    font-size: var(--font-size-24);
   }
 }
 
@@ -631,20 +631,20 @@ onBeforeUnmount(() => {
   &__title {
     fill: var(--text-deep);
     font-family: var(--font-serif);
-    font-size: 38px;
+    font-size: var(--font-size-32);
     font-weight: 700;
   }
 
   &__caption {
     fill: var(--text-tertiary);
-    font-size: 14px;
+    font-size: var(--font-size-14);
     letter-spacing: 2px;
   }
 }
 
 .yc-eyebrow {
   color: var(--color-primary);
-  font-size: 0.78rem;
+  font-size: var(--font-size-12);
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -676,7 +676,7 @@ onBeforeUnmount(() => {
   }
 
   h2 {
-    font-size: 1.8rem;
+    font-size: var(--font-size-32);
     text-wrap: balance;
   }
 
@@ -731,7 +731,7 @@ onBeforeUnmount(() => {
   min-height: 28px;
   padding: 4px 10px;
   color: var(--text-secondary);
-  font-size: 0.82rem;
+  font-size: var(--font-size-14);
 }
 
 .yc-map-placeholder {
@@ -756,13 +756,13 @@ onBeforeUnmount(() => {
   top: 16px;
   right: 16px;
   color: var(--text-tertiary);
-  font-size: 0.85rem;
+  font-size: var(--font-size-14);
 }
 
 .yc-map-caption {
   margin: 0;
   color: var(--text-tertiary);
-  font-size: 0.8rem;
+  font-size: var(--font-size-12);
   line-height: 1.6;
 }
 
@@ -773,7 +773,7 @@ onBeforeUnmount(() => {
   width: 66%;
   padding: 8px 14px;
   color: var(--text-tertiary);
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   text-align: center;
 }
 
@@ -819,7 +819,7 @@ onBeforeUnmount(() => {
   @include flex-col;
   gap: 4px;
   color: var(--text-tertiary);
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
 }
 
 .yc-source-grid {
@@ -835,7 +835,7 @@ onBeforeUnmount(() => {
   min-width: 42px;
   min-height: 42px;
   padding: 0;
-  font-size: 1.35rem;
+  font-size: var(--font-size-20);
 }
 
 .yc-group-scroller {
@@ -867,11 +867,11 @@ onBeforeUnmount(() => {
   }
 
   small {
-    font-size: 0.8rem;
+    font-size: var(--font-size-12);
   }
 
   strong {
-    font-size: 1.18rem;
+    font-size: var(--font-size-18);
   }
 
   p,
@@ -968,7 +968,7 @@ onBeforeUnmount(() => {
 
   span,
   small {
-    font-size: 0.75rem;
+    font-size: var(--font-size-12);
     color: var(--text-tertiary);
   }
 
@@ -999,7 +999,7 @@ onBeforeUnmount(() => {
     padding: 12px 4px 0;
 
     h1 {
-      font-size: clamp(1.9rem, 7dvw, 2.6rem);
+      font-size: clamp(var(--font-size-32), 7dvw, var(--font-size-48));
     }
   }
 
@@ -1012,11 +1012,11 @@ onBeforeUnmount(() => {
     gap: 12px;
 
     strong {
-      font-size: 1.05rem;
+      font-size: var(--font-size-16);
     }
 
     small {
-      font-size: 0.75rem;
+      font-size: var(--font-size-12);
       line-height: 1.6;
     }
   }
@@ -1027,7 +1027,7 @@ onBeforeUnmount(() => {
 
   .yc-map-marker {
     --glass-button-small-padding: 8px;
-    --glass-button-small-font-size: 12px;
+    --glass-button-small-font-size: var(--font-size-12);
     max-width: 46%;
 
     span {

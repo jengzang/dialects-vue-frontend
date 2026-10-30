@@ -630,7 +630,7 @@ export default {
 }
 
 .page-title {
-  font-size: 28px;
+  font-size: var(--font-size-32);
   font-weight: 600;
   margin-bottom: 24px;
   color: var(--text-primary);
@@ -649,7 +649,7 @@ export default {
 
 .query-form h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   color: var(--text-primary);
   white-space: nowrap;
   flex-shrink: 0;
@@ -683,7 +683,7 @@ export default {
 
 .results-header h3 {
   margin: 0;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   color: var(--text-primary);
 }
 
@@ -706,7 +706,7 @@ export default {
 
 .subcat-header h4 {
   margin: 0;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   color: var(--text-primary);
 }
 
@@ -715,7 +715,7 @@ export default {
   color: var(--vml-blue);
   padding: 4px 10px;
   border-radius: var(--radius-md);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 500;
 }
 
@@ -726,7 +726,7 @@ export default {
 .stat-item {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   margin-bottom: 4px;
 }
 
@@ -744,14 +744,14 @@ export default {
 }
 
 .char-label {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   color: var(--text-tertiary);
   margin-bottom: 4px;
 }
 
 .char-list {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
   line-height: 1.6;
 }
@@ -763,7 +763,7 @@ export default {
   color: var(--color-primary, var(--vml-blue));
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -779,7 +779,7 @@ export default {
 .subcategory-table h4,
 .ranking-table h4 {
   margin: 0 0 16px 0;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   color: var(--text-primary);
 }
 
@@ -822,7 +822,7 @@ tr.significant {
 .tendency-badge {
   padding: 4px 10px;
   border-radius: var(--radius-md);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 500;
 }
 
@@ -840,7 +840,7 @@ tr.significant {
   padding: 4px 12px;
   border-radius: var(--radius-md);
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: white;
 }
 

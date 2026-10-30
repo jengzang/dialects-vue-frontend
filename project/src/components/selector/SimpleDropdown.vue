@@ -336,7 +336,7 @@ $transition-fast: 0.2s;
   // width: 100%;
   padding: 6px 10px;
   color: $text-primary;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   background: var(--bg-white);
   border: 1px solid var(--border-control);
   border-radius: var(--radius-sm);
@@ -364,7 +364,7 @@ $transition-fast: 0.2s;
   padding: 8px 16px;
   overflow: hidden;
   color: $text-primary;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: pointer;
@@ -392,7 +392,7 @@ $transition-fast: 0.2s;
 .empty-message {
   padding: 20px;
   color: $text-muted;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   text-align: center;
 }
 </style>

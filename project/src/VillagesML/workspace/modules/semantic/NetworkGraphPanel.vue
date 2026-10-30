@@ -266,7 +266,7 @@ onBeforeUnmount(() => {
 }
 
 .panel-title {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--text-primary);
   margin: 0 0 16px 0;
@@ -280,7 +280,7 @@ onBeforeUnmount(() => {
   background: rgba(var(--vml-blue-rgb), 0.1);
   border-radius: var(--radius-md);
   margin-bottom: 16px;
-  font-size: 13px;
+  font-size: var(--font-size-14);
 }
 
 .metadata-item {
@@ -297,7 +297,7 @@ onBeforeUnmount(() => {
   background: rgba(var(--color-success-rgb), 0.2);
   color: var(--color-success);
   border-radius: var(--radius-md);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 500;
 }
 
@@ -325,7 +325,7 @@ onBeforeUnmount(() => {
 }
 
 .communities-legend h4 {
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-primary);
   margin: 0 0 12px 0;
@@ -344,7 +344,7 @@ onBeforeUnmount(() => {
   padding: 6px 12px;
   background: var(--glass-50);
   border-radius: var(--radius-sm2);
-  font-size: 13px;
+  font-size: var(--font-size-14);
 }
 
 .legend-color {

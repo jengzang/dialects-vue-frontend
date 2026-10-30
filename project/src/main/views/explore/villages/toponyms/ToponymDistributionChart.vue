@@ -403,7 +403,7 @@ defineExpose({ showConfigModal });
       padding: 0;
       margin-block-end: 10px;
       color: var(--text-deep);
-      font-size: 14px;
+      font-size: var(--font-size-14);
       font-weight: 600;
     }
   }
@@ -421,7 +421,7 @@ defineExpose({ showConfigModal });
     > span:first-child {
       min-inline-size: 60px;
       color: var(--text-secondary);
-      font-size: 13px;
+      font-size: var(--font-size-14);
     }
 
     .glass-range {
@@ -432,7 +432,7 @@ defineExpose({ showConfigModal });
     small {
       min-inline-size: 32px;
       color: var(--text-tertiary);
-      font-size: 12px;
+      font-size: var(--font-size-12);
       text-align: end;
     }
   }

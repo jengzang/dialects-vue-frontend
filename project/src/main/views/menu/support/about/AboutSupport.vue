@@ -185,7 +185,7 @@ function splitDesc(text) {
     color: var(--text-dark);
     white-space: nowrap;
     text-overflow: ellipsis;
-    font-size: 1rem;
+    font-size: var(--font-size-16);
     line-height: 1.6;
   }
 
@@ -199,7 +199,7 @@ function splitDesc(text) {
   @include flex-center;
   margin-bottom: 0.5rem;
   color: var(--color-primary);
-  font-size: 1.2rem;
+  font-size: var(--font-size-20);
   font-weight: bold;
 }
 
@@ -238,7 +238,7 @@ function splitDesc(text) {
   align-items: center;
   gap: 0.35rem;
   padding: 0.4rem 0.9rem;
-  font-size: 1.2rem;
+  font-size: var(--font-size-20);
   text-decoration: none;
   transition:
     background-color $ease-standard,
@@ -282,7 +282,7 @@ function splitDesc(text) {
   background-color: $danger;
   box-shadow: 0 2px 6px rgba(var(--color-error-light-rgb), 0.35);
   color: var(--text-white);
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   transition: all 0.2s ease;
 
   &:hover {
@@ -296,7 +296,7 @@ function splitDesc(text) {
   max-width: 500px;
   margin-top: 0.5rem;
   color: $text-secondary;
-  font-size: 0.88rem;
+  font-size: var(--font-size-14);
   line-height: 1.5;
 }
 
@@ -313,14 +313,14 @@ function splitDesc(text) {
     p {
       margin: 6px 4px 2px;
       white-space: normal;
-      font-size: 15px;
+      font-size: var(--font-size-16);
       line-height: 1.45;
     }
   }
 
   .card-header {
     margin-bottom: 6px;
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 
   .github-icon {
@@ -336,7 +336,7 @@ function splitDesc(text) {
 
   .follow-button {
     padding: 6px 12px;
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 
   .follow-logo {
@@ -347,11 +347,11 @@ function splitDesc(text) {
   .support-button {
     margin-top: 12px;
     padding: 7px 14px;
-    font-size: 15px;
+    font-size: var(--font-size-16);
   }
 
   .support-note {
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 }
 </style>

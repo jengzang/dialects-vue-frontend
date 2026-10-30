@@ -1257,7 +1257,7 @@ $portrait-ratio: 1;
   -webkit-backdrop-filter: blur(12px);
   white-space: pre-line;
   color: var(--text-dark);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   pointer-events: auto !important;
   transition: background-color 0.2s ease;
 }
@@ -1283,7 +1283,7 @@ $portrait-ratio: 1;
     border-radius: var(--radius-md);
     color: var(--text-dark);
     text-align: center;
-    font-size: 15px;
+    font-size: var(--font-size-16);
     font-weight: 500;
     cursor: pointer;
     user-select: none;
@@ -1360,7 +1360,7 @@ $portrait-ratio: 1;
 
   label {
     color: var(--text-dark);
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 600;
   }
 }
@@ -1373,7 +1373,7 @@ $portrait-ratio: 1;
   border-radius: var(--radius-sm2);
   color: var(--color-primary);
   white-space: nowrap;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 500;
   cursor: pointer;
   user-select: none;
@@ -1404,7 +1404,7 @@ $portrait-ratio: 1;
   top: 50%;
   right: 12px;
   color: $success;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: bold;
   pointer-events: none;
   transform: translateY(-50%);
@@ -1447,7 +1447,7 @@ $portrait-ratio: 1;
   backdrop-filter: blur(16px) saturate(160%);
   -webkit-backdrop-filter: blur(16px) saturate(160%);
   color: var(--text-dark-alpha);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   user-select: none;
 }
 
@@ -1470,7 +1470,7 @@ $portrait-ratio: 1;
   opacity: 0.9;
   color: var(--color-warning);
   text-align: center;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   line-height: 1.4;
 }
 
@@ -1489,7 +1489,7 @@ $portrait-ratio: 1;
   color: var(--text-dark-medium);
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   line-height: 1.35;
 }
 
@@ -1501,7 +1501,7 @@ $portrait-ratio: 1;
   border-radius: var(--radius-pill);
   color: var(--color-primary);
   white-space: nowrap;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   cursor: pointer;
   user-select: none;
 
@@ -1530,7 +1530,7 @@ $portrait-ratio: 1;
   border-radius: var(--radius-pill);
   box-shadow: var(--shadow-sm2);
   color: var(--text-dark-lightest);
-  font-size: 14px;
+  font-size: var(--font-size-14);
 
   &.custom-chip {
     background: linear-gradient(
@@ -1554,7 +1554,7 @@ $portrait-ratio: 1;
   .loc-chip-partition {
     margin-left: 6px;
     color: var(--text-dark-medium);
-    font-size: 11px;
+    font-size: var(--font-size-12);
 
     .part-val {
       display: inline-block;
@@ -1575,7 +1575,7 @@ $portrait-ratio: 1;
 .preview-label {
   margin-right: 6px;
   color: $custom-purple;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 600;
 }
 
@@ -1592,7 +1592,7 @@ $portrait-ratio: 1;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   cursor: pointer;
   transition: all 0.3s ease;
 

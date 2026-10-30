@@ -72,7 +72,7 @@ const algorithmHint = computed(() => {
   border: 1px solid var(--bg-hover-strong);
   border-radius: var(--radius-sm2);
   background: var(--glass-90);
-  font-size: 0.95rem;
+  font-size: var(--font-size-16);
   cursor: pointer;
   transition: all 0.2s ease;
 }

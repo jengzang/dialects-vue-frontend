@@ -885,7 +885,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-title {
     margin-bottom: 0;
-    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    font-size: clamp(var(--font-size-20), 3vw, var(--font-size-32));
     font-weight: 600;
     letter-spacing: 0.05em;
     color: var(--color-primary);
@@ -897,7 +897,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-subtitle {
     margin-bottom: 2rem;
-    font-size: clamp(0.95rem, 2vw, 1.25rem);
+    font-size: clamp(var(--font-size-16), 2vw, var(--font-size-20));
     line-height: 1.5;
     font-weight: 500;
     color: var(--text-dark-lighter);
@@ -929,7 +929,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
       min-width: 0;
       min-height: 48px;
       padding: 0.625rem 0.875rem;
-      font-size: 1rem;
+      font-size: var(--font-size-16);
       line-height: 1.25;
     }
 
@@ -940,7 +940,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
     &-icon {
       flex-shrink: 0;
-      font-size: 1.25rem;
+      font-size: var(--font-size-20);
     }
 
     &-arrow {
@@ -958,7 +958,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     min-height: 44px;
     padding: 0.5rem 0.875rem;
     font: inherit;
-    font-size: 0.875rem;
+    font-size: var(--font-size-14);
     font-weight: 600;
 
     &:focus-visible {
@@ -983,10 +983,10 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   .hero-entry.login-btn {
     gap: 0.25rem;
     padding: 0.625rem 0.25rem;
-    font-size: clamp(0.6875rem, 3.5vw, 0.875rem);
+    font-size: clamp(var(--font-size-12), 3.5vw, var(--font-size-14));
 
     .hero-entry-icon {
-      font-size: 1rem;
+      font-size: var(--font-size-16);
     }
 
     .hero-entry-arrow {
@@ -1074,7 +1074,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   border: 1px solid rgba(var(--color-primary-rgb), 0.2);
   border-radius: var(--radius-full);
   color: $primary;
-  font-size: 0.8rem;
+  font-size: var(--font-size-12);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1082,7 +1082,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
 .platform-title {
   margin: 1.25rem 0 0;
-  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-size: clamp(var(--font-size-32), 4vw, var(--font-size-48));
   font-weight: 700;
   line-height: 1.2;
   color: $text-primary;
@@ -1115,14 +1115,14 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   span {
     display: block;
     color: var(--text-dark-lighter);
-    font-size: 0.85rem;
+    font-size: var(--font-size-14);
     font-weight: 600;
   }
 
   strong {
     display: block;
     margin-top: 0.5rem;
-    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-size: clamp(var(--font-size-24), 3vw, var(--font-size-32));
     font-weight: 700;
     color: $primary;
   }
@@ -1132,7 +1132,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &-title {
     margin-bottom: 0.5rem;
     text-align: center;
-    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-size: clamp(var(--font-size-32), 4vw, var(--font-size-48));
     font-weight: 700;
     color: $primary;
   }
@@ -1140,7 +1140,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &-subtitle {
     margin-bottom: 2rem;
     text-align: center;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     font-weight: 500;
     color: var(--text-dark-lighter);
   }
@@ -1230,7 +1230,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
       rgba(var(--color-primary-hover-rgb), 0.12) 100%
     );
     border-radius: var(--radius-sm2);
-    font-size: 1.25rem;
+    font-size: var(--font-size-20);
 
     @include flex-center;
   }
@@ -1242,14 +1242,14 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-title {
     margin: 0;
-    font-size: 0.9rem;
+    font-size: var(--font-size-14);
     font-weight: 600;
     color: $primary;
   }
 
   &-desc {
     margin: 0;
-    font-size: 0.8rem;
+    font-size: var(--font-size-12);
     line-height: 1.5;
     color: var(--text-dark-lighter);
   }
@@ -1327,20 +1327,20 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-name {
     margin-bottom: 0.2rem;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     font-weight: 700;
     color: $text-primary;
   }
 
   &-desc {
     margin: 0;
-    font-size: 0.8125rem;
+    font-size: var(--font-size-14);
     color: var(--text-dark-lighter);
   }
 
   &-arrow {
     flex-shrink: 0;
-    font-size: 1.25rem;
+    font-size: var(--font-size-20);
     color: $primary;
     transition: transform 0.3s ease;
   }
@@ -1370,7 +1370,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-icon {
     flex-shrink: 0;
-    font-size: 2.5rem;
+    font-size: var(--font-size-48);
   }
 
   &-content {
@@ -1380,14 +1380,14 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-title {
     margin-bottom: 0.25rem;
-    font-size: 1.25rem;
+    font-size: var(--font-size-20);
     font-weight: 700;
     color: $text-primary;
   }
 
   &-desc {
     margin: 0;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     color: var(--text-dark-lighter);
   }
 
@@ -1401,7 +1401,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     border-radius: var(--radius-md);
     box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.25);
     color: var(--action-primary-text);
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s $ease-apple;
@@ -1449,7 +1449,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-icon {
     flex-shrink: 0;
-    font-size: 3rem;
+    font-size: var(--font-size-48);
   }
 
   &-content {
@@ -1459,14 +1459,14 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-title {
     margin-bottom: 0.5rem;
-    font-size: 1.375rem;
+    font-size: var(--font-size-24);
     font-weight: 700;
     color: $primary;
   }
 
   &-desc {
     margin-bottom: 1rem;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     line-height: 1.5;
     color: var(--text-dark-lighter);
   }
@@ -1491,7 +1491,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     border: none;
     border-radius: var(--radius-md);
     white-space: nowrap;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     font-weight: 600;
     text-decoration: none;
     cursor: pointer;
@@ -1539,24 +1539,24 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     padding: 0.625rem 0.875rem;
     background: var(--glass-60);
     border-radius: var(--radius-sm2);
-    font-size: 0.875rem;
+    font-size: var(--font-size-14);
     font-weight: 500;
     color: $text-primary;
   }
 
   &-icon {
-    font-size: 1.125rem;
+    font-size: var(--font-size-18);
   }
 }
 
 .home-history-title {
   padding-top: clamp(1rem, 3vw, 2rem);
   color: var(--color-primary);
-  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-size: clamp(var(--font-size-32), 4vw, var(--font-size-48));
   font-weight: 700;
 
   @media (max-aspect-ratio: 1 / 1) {
-    font-size: 1.75rem;
+    font-size: var(--font-size-32);
   }
 }
 
@@ -1593,7 +1593,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     padding: 0.25rem 0.5rem;
     border-radius: var(--radius-sm);
     color: $primary;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     font-weight: 500;
     text-decoration: none;
     cursor: pointer;
@@ -1631,18 +1631,18 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-text {
     margin: 0;
-    font-size: 0.8125rem;
+    font-size: var(--font-size-14);
     color: var(--text-secondary);
   }
 }
 
 .stat-text {
-  font-size: 0.875rem;
+  font-size: var(--font-size-14);
   font-weight: 500;
   color: var(--text-dark-lighter);
 
   &-muted {
-    font-size: 0.8125rem;
+    font-size: var(--font-size-14);
     color: var(--text-secondary);
   }
 }
@@ -1668,7 +1668,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &-title {
     margin-bottom: 0.5rem;
     text-align: center;
-    font-size: 1.75rem;
+    font-size: var(--font-size-32);
     font-weight: 700;
     color: $primary;
   }
@@ -1710,7 +1710,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &-label {
     margin-top: 0.625rem;
     text-align: center;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     font-weight: 600;
     color: $text-primary;
   }
@@ -1735,7 +1735,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
     &-subtitle {
       margin-top: 0;
-      font-size: clamp(0.7rem, 3dvw, 1.1rem);
+      font-size: clamp(var(--font-size-12), 3dvw, var(--font-size-18));
     }
 
     &-content {
@@ -1831,7 +1831,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     }
 
     &-title {
-      font-size: 1.5rem;
+      font-size: var(--font-size-24);
     }
   }
 
@@ -1858,11 +1858,11 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     }
 
     &-title {
-      font-size: 1.125rem;
+      font-size: var(--font-size-18);
     }
 
     &-desc {
-      font-size: 0.875rem;
+      font-size: var(--font-size-14);
     }
   }
 }

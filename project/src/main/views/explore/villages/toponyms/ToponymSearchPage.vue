@@ -562,7 +562,7 @@ function formatCoordinates(longitude, latitude) {
 
   p {
     color: var(--text-secondary);
-    font-size: 14px;
+    font-size: var(--font-size-14);
     line-height: 1.5;
   }
 }
@@ -609,7 +609,7 @@ function formatCoordinates(longitude, latitude) {
 
   span {
     color: var(--text-secondary);
-    font-size: 13px;
+    font-size: var(--font-size-14);
     font-weight: 600;
   }
 }
@@ -620,7 +620,7 @@ function formatCoordinates(longitude, latitude) {
 
 .toponym-search-page__query-input {
   min-block-size: calc(44px + var(--query-input-growth, 0px));
-  font-size: calc(15px + 5px * var(--query-expansion, 0));
+  font-size: calc(var(--font-size-16) + (var(--font-size-20) - var(--font-size-16)) * var(--query-expansion, 0));
 }
 
 .toponym-search-page__actions {
@@ -665,7 +665,7 @@ function formatCoordinates(longitude, latitude) {
 
   span {
     color: var(--text-secondary);
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -673,7 +673,7 @@ function formatCoordinates(longitude, latitude) {
   margin: 0;
   padding: 10px 12px;
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: var(--font-size-14);
 }
 
 .toponym-search-page__result-grid {

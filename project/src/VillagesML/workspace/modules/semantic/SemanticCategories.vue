@@ -534,7 +534,7 @@ onMounted(() => {
 }
 
 .page-title {
-  font-size: 32px;
+  font-size: var(--font-size-32);
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 16px;
@@ -586,24 +586,24 @@ onMounted(() => {
 }
 
 .category-icon {
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .category-name {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .category-description {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
   line-height: 1.4;
   margin-bottom: 8px;
 }
 
 .category-count {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--color-primary);
   font-weight: 600;
 }
@@ -626,7 +626,7 @@ onMounted(() => {
 
 .vtf-global h3,
 .vtf-regional h3 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   margin-bottom: 16px;
   color: var(--text-primary);
 }
@@ -648,7 +648,7 @@ onMounted(() => {
 }
 
 .vtf-label {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   color: var(--text-primary);
 }
@@ -671,7 +671,7 @@ onMounted(() => {
 }
 
 .vtf-value {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--color-primary);
   text-align: right;
@@ -683,7 +683,7 @@ onMounted(() => {
 }
 
 .labels-section h3 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   margin-bottom: 16px;
   color: var(--text-primary);
 }
@@ -699,7 +699,7 @@ onMounted(() => {
   background: var(--glass-50);
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -761,7 +761,7 @@ onMounted(() => {
 }
 
 .label-category {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
   padding: 2px 10px;
   background: rgba(var(--vml-blue-rgb), 0.1);
@@ -794,25 +794,25 @@ onMounted(() => {
 }
 
 .category-icon-large {
-  font-size: 32px;
+  font-size: var(--font-size-32);
   line-height: 1;
 }
 
 .category-title-large {
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
 }
 
 .category-separator {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   color: var(--text-secondary);
   font-weight: 400;
 }
 
 .category-subtitle {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   color: var(--text-dark);
   margin: 0;
   font-weight: 500;
@@ -832,7 +832,7 @@ onMounted(() => {
 }
 
 .section-header h3 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   margin: 0;
   color: var(--text-primary);
 }
@@ -844,7 +844,7 @@ onMounted(() => {
   border-radius: var(--radius-full);
   background: rgba(var(--color-error-rgb), 0.2);
   color: var(--color-error);
-  font-size: 16px;
+  font-size: var(--font-size-16);
   cursor: pointer;
   transition: all 0.3s ease;
   @include flex-center;
@@ -873,7 +873,7 @@ onMounted(() => {
 }
 
 .prompt-icon {
-  font-size: 48px;
+  font-size: var(--font-size-48);
   margin-bottom: 16px;
   animation: bounce 2s infinite;
 }
@@ -888,7 +888,7 @@ onMounted(() => {
 }
 
 .prompt-message p {
-  font-size: 15px;
+  font-size: var(--font-size-16);
   margin: 0;
   color: var(--text-secondary);
 }
@@ -912,7 +912,7 @@ onMounted(() => {
   font-weight: 600;
   color: var(--text-primary);
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .ranking-item {
@@ -933,7 +933,7 @@ onMounted(() => {
   display: inline-block;
   padding: 4px 10px;
   border-radius: var(--radius-md);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 600;
 }
 
@@ -980,7 +980,7 @@ onMounted(() => {
 
 @media (max-width: 768px) {
   .page-title {
-    font-size: 24px;
+    font-size: var(--font-size-24);
   }
 
   .category-grid {
@@ -1010,7 +1010,7 @@ onMounted(() => {
 
   .level-selector .input-hint {
     // flex-basis: 100%;
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 }
 
@@ -1019,7 +1019,7 @@ onMounted(() => {
   padding: 8px 12px;
   border: 1px solid var(--bg-hover-strong);
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   // width: 120px;
   transition: all 0.3s ease;
 }
@@ -1031,7 +1031,7 @@ onMounted(() => {
 }
 
 .input-hint {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
 }
 

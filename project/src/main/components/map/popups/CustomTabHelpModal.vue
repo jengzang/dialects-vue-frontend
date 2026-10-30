@@ -582,7 +582,7 @@ $glass-card: var(--glass-50);
 .section-title {
   margin: 0 0 12px;
   color: $primary-blue;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
 }
 
@@ -598,7 +598,7 @@ $glass-card: var(--glass-50);
   li {
     padding: 8px 0;
     color: $text-secondary;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     line-height: 1.6;
 
     strong {
@@ -611,7 +611,7 @@ $glass-card: var(--glass-50);
       background: rgba(var(--color-primary-rgb), 0.08);
       border-radius: var(--radius-xs);
       color: $primary-blue-dark;
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 }
@@ -619,7 +619,7 @@ $glass-card: var(--glass-50);
 .help-paragraph {
   margin: 0 0 12px;
   color: $text-secondary;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   line-height: 1.6;
 }
 
@@ -628,7 +628,7 @@ $glass-card: var(--glass-50);
   background: var(--bg-hover-light);
   border-radius: var(--radius-sm);
   color: var(--text-tertiary);
-  font-size: 12px;
+  font-size: var(--font-size-12);
 
   &--result {
     margin: 0;
@@ -658,7 +658,7 @@ $glass-card: var(--glass-50);
   min-width: 500px;
   border-collapse: collapse;
   text-align: left;
-  font-size: 12px;
+  font-size: var(--font-size-12);
 
   th {
     padding: 8px 6px;
@@ -698,7 +698,7 @@ $glass-card: var(--glass-50);
   background-color: var(--bg-light-gray);
   color: var(--text-muted);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--font-size-12);
 }
 
 .value-tag {
@@ -713,7 +713,7 @@ $glass-card: var(--glass-50);
 
 .note-text {
   color: $text-muted;
-  font-size: 11px;
+  font-size: var(--font-size-12);
   font-style: italic;
 }
 
@@ -755,7 +755,7 @@ $glass-card: var(--glass-50);
   width: 30px;
   margin-right: 15px;
   text-align: center;
-  font-size: 24px;
+  font-size: var(--font-size-24);
 }
 
 .level-content {
@@ -765,14 +765,14 @@ $glass-card: var(--glass-50);
 .field-tag {
   margin-bottom: 4px;
   color: $text-main;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 700;
 }
 
 .usage-text {
   margin-bottom: 4px;
   color: $text-secondary;
-  font-size: 13px;
+  font-size: var(--font-size-14);
 }
 
 .usage-example {
@@ -782,14 +782,14 @@ $glass-card: var(--glass-50);
   border-radius: var(--radius-xs);
   color: $primary-blue;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 .connector-line {
   position: relative;
   margin: 8px 0;
   color: $text-muted;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 700;
 }
 
@@ -819,32 +819,32 @@ $glass-card: var(--glass-50);
 
 .level-icon-sm {
   margin-right: 8px;
-  font-size: 18px;
+  font-size: var(--font-size-18);
 }
 
 .field-tag-sm {
   color: $usage-green;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 700;
 }
 
 .usage-text-sm {
   color: $text-secondary;
-  font-size: 11px;
+  font-size: var(--font-size-12);
 }
 
 .usage-example-sm {
   margin-top: 2px;
   color: $usage-green;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--font-size-12);
   font-weight: 700;
 }
 
 .arrow-right {
   margin: 0 4px;
   color: $text-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 /* 竖屏 */

@@ -714,15 +714,15 @@ $panel-radius-portrait: 24px;
 .page-title {
   margin: 0;
   color: $text-primary;
-  font-size: 25px;
+  font-size: var(--font-size-24);
 
   @media (max-aspect-ratio: 1 / 1) {
-    font-size: 20px;
+    font-size: var(--font-size-20);
   }
 }
 
 .tree-title {
-  font-size: 20px;
+  font-size: var(--font-size-20);
 }
 
 .page-subtitle,
@@ -731,11 +731,11 @@ $panel-radius-portrait: 24px;
 .state-hint {
   margin: 0;
   color: $text-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .tree-meta {
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .tree-meta-separator {
@@ -778,7 +778,7 @@ $panel-radius-portrait: 24px;
 
 .control-heading {
   color: $text-secondary;
-  font-size: 17px;
+  font-size: var(--font-size-18);
   font-weight: 700;
 }
 
@@ -793,7 +793,7 @@ $panel-radius-portrait: 24px;
   }
 
   :deep(.liquid-radio-text) {
-    font-size: 14px;
+    font-size: var(--font-size-14);
     white-space: nowrap;
   }
 }
@@ -809,7 +809,7 @@ $panel-radius-portrait: 24px;
   flex-shrink: 0;
   color: var(--action-primary-text);
   padding: 8px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 700;
   white-space: nowrap;
   background: var(--color-primary);
@@ -859,7 +859,7 @@ $panel-radius-portrait: 24px;
   align-items: center;
   padding: 3px 6px;
   color: $text-secondary;
-  font-size: 11px;
+  font-size: var(--font-size-12);
   font-weight: 700;
   background: var(--glass-70);
   border: 1px solid var(--glass-30);
@@ -909,7 +909,7 @@ $panel-radius-portrait: 24px;
 }
 
 .limit-hint {
-  font-size: 13px;
+  font-size: var(--font-size-14);
 }
 
 .tree-panel {
@@ -965,13 +965,13 @@ $panel-radius-portrait: 24px;
 }
 
 .state-icon {
-  font-size: 34px;
+  font-size: var(--font-size-32);
 }
 
 .state-message {
   margin: 0;
   color: $text-primary;
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .retry-button {

@@ -344,7 +344,7 @@ onBeforeUnmount(() => {
 }
 
 .page-title {
-  font-size: 32px;
+  font-size: var(--font-size-32);
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 30px;
@@ -384,7 +384,7 @@ onBeforeUnmount(() => {
   color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-md);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -415,7 +415,7 @@ onBeforeUnmount(() => {
 
 .similarity-list h3,
 .vector-viz h3 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   margin-bottom: 16px;
   color: var(--text-primary);
 }
@@ -445,14 +445,14 @@ onBeforeUnmount(() => {
 }
 
 .rank {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 700;
   color: var(--text-secondary);
   text-align: center;
 }
 
 .char {
-  font-size: 24px;
+  font-size: var(--font-size-24);
   font-weight: 600;
   color: var(--text-primary);
   text-align: center;
@@ -472,7 +472,7 @@ onBeforeUnmount(() => {
 }
 
 .similarity-value {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--color-primary);
   text-align: right;
@@ -491,13 +491,13 @@ onBeforeUnmount(() => {
 }
 
 .viz-placeholder p {
-  font-size: 20px;
+  font-size: var(--font-size-20);
   color: var(--text-primary);
   margin-bottom: 10px;
 }
 
 .viz-note {
-  font-size: 14px !important;
+  font-size: var(--font-size-14) !important;
   color: var(--text-secondary);
 }
 
@@ -510,7 +510,7 @@ onBeforeUnmount(() => {
 }
 
 .list-header h3 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   color: var(--text-primary);
   margin: 0;
 }
@@ -583,7 +583,7 @@ onBeforeUnmount(() => {
 }
 
 .col-char {
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 600;
   text-align: center;
   min-width: 60px;
@@ -607,7 +607,7 @@ onBeforeUnmount(() => {
   color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -632,7 +632,7 @@ onBeforeUnmount(() => {
   }
 
   .page-title {
-    font-size: 24px;
+    font-size: var(--font-size-24);
   }
 
 

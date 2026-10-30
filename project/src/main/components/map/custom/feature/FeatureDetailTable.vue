@@ -494,14 +494,14 @@ watch(
 
 .feature-detail-title {
   margin: 0;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 700;
   color: $text-strong;
 }
 
 .feature-detail-description {
   margin: 0;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: $text-muted;
 }
 
@@ -553,7 +553,7 @@ watch(
 .feature-detail-table-head {
   padding: 0 6px;
   color: $text-muted;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 700;
 
   @media (max-width: 768px) {
@@ -563,7 +563,7 @@ watch(
 
 .feature-detail-row {
   padding: $radius-md 14px;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: $text-strong;
 
   @media (max-width: 768px) {
@@ -579,7 +579,7 @@ watch(
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 13px;
+      font-size: var(--font-size-14);
 
       &::before {
         content: attr(data-label);
@@ -630,7 +630,7 @@ watch(
 // -- Side --
 .feature-detail-map-title {
   margin-bottom: $radius-md;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 700;
   color: $text-strong;
 }
@@ -650,7 +650,7 @@ watch(
   gap: $radius-sm;
 
   span {
-    font-size: 13px;
+    font-size: var(--font-size-14);
     font-weight: 700;
     color: $text-secondary;
   }
@@ -685,7 +685,7 @@ watch(
   padding: 32px;
   text-align: center;
   color: $text-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .modal-error-state {
@@ -703,7 +703,7 @@ watch(
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 13px;
+  font-size: var(--font-size-14);
 
   th,
   td {
@@ -729,7 +729,7 @@ watch(
 /* 字段提示触发钮: 仅尺寸/颜色覆盖, 视觉见 main/_buttons.scss 的 .pill-btn */
 .field-notice-trigger {
   --pill-btn-padding: 6px 14px;
-  --pill-btn-font-size: 12px;
+  --pill-btn-font-size: var(--font-size-12);
   --pill-btn-font-weight: 600;
   --pill-btn-color: #fff;
   --pill-btn-border: 1px solid rgb(var(--color-warning-rgb));
@@ -740,7 +740,7 @@ watch(
 
   &::before {
     content: "⚠️";
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -757,7 +757,7 @@ watch(
 
   p {
     margin: 8px 0 0;
-    font-size: 13px;
+    font-size: var(--font-size-14);
     color: $text-secondary;
     line-height: 1.7;
   }
@@ -776,7 +776,7 @@ watch(
   border: 1px solid rgba(var(--color-primary-rgb), 0.2);
   border-radius: var(--radius-pill);
   color: $primary;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 600;
 }
 
@@ -785,7 +785,7 @@ watch(
   background: rgba(var(--color-warning-rgb), 0.08);
   border-left: 3px solid $warning;
   border-radius: 0 $radius-sm $radius-sm 0;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: $text-secondary;
   line-height: 1.6;
 }

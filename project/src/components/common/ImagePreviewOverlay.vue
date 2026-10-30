@@ -363,12 +363,12 @@ onBeforeUnmount(() => {
   &__title {
     margin: 0;
     color: rgba(255, 255, 255, 0.8);
-    font-size: 1rem;
+    font-size: var(--font-size-16);
     font-weight: 500;
     pointer-events: none;
 
     @media (max-aspect-ratio: 1/1) {
-      font-size: 0.88rem;
+      font-size: var(--font-size-14);
     }
   }
 
@@ -393,7 +393,7 @@ onBeforeUnmount(() => {
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.1);
     color: rgba(255, 255, 255, 0.8);
-    font-size: 1.1rem;
+    font-size: var(--font-size-18);
     cursor: pointer;
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
@@ -425,7 +425,7 @@ onBeforeUnmount(() => {
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.08);
     color: rgba(255, 255, 255, 0.75);
-    font-size: 1.8rem;
+    font-size: var(--font-size-32);
     cursor: pointer;
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);

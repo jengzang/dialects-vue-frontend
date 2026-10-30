@@ -509,7 +509,7 @@ $float-catalog-button-left:0;
       }
 
       &__current-value {
-        font-size: 0.96rem;
+        font-size: var(--font-size-16);
       }
     }
 
@@ -570,14 +570,14 @@ $float-catalog-button-left:0;
     min-width: 0;
 
     &-label {
-      font-size: 0.76rem;
+      font-size: var(--font-size-12);
       color: var(--text-secondary);
       letter-spacing: 0.04em;
     }
 
     &-value {
       max-width: 100%;
-      font-size: 1.02rem;
+      font-size: var(--font-size-16);
       line-height: 1.25;
       color: var(--color-primary-hover);
 
@@ -689,21 +689,21 @@ $float-catalog-button-left:0;
 
   &__eyebrow {
     color: var(--text-secondary);
-    font-size: 0.72rem;
+    font-size: var(--font-size-12);
     letter-spacing: 0.05em;
     white-space: nowrap;
   }
 
   &__title {
     color: var(--color-primary-hover);
-    font-size: 0.92rem;
+    font-size: var(--font-size-14);
     font-weight: 800;
     white-space: nowrap;
   }
 
   &__description {
     color: var(--text-medium);
-    font-size: 0.84rem;
+    font-size: var(--font-size-14);
     line-height: 1.45;
 
     @include single-line;
@@ -722,7 +722,7 @@ $float-catalog-button-left:0;
     border-radius: $radius-pill;
     background: var(--action-primary-bg);
     color: var(--action-primary-text);
-    font-size: 0.86rem;
+    font-size: var(--font-size-14);
     font-weight: 800;
     white-space: nowrap;
     cursor: pointer;
@@ -745,7 +745,7 @@ $float-catalog-button-left:0;
     }
 
     &-icon {
-      font-size: 1rem;
+      font-size: var(--font-size-16);
     }
 
     &-text {
@@ -780,7 +780,7 @@ $float-catalog-button-left:0;
     &-title {
       margin: 0;
       padding: 4px 6px;
-      font-size: 0.78rem;
+      font-size: var(--font-size-12);
       font-weight: 800;
       color: var(--color-primary-hover);
       letter-spacing: 0.06em;
@@ -796,7 +796,7 @@ $float-catalog-button-left:0;
     &-title {
       margin: 0;
       padding: 0 4px;
-      font-size: 0.82rem;
+      font-size: var(--font-size-14);
       color: var(--text-secondary);
       letter-spacing: 0.04em;
     }
@@ -868,14 +868,14 @@ $float-catalog-button-left:0;
     border-radius: $radius-pill;
     background: rgba(var(--color-primary-rgb), 0.14);
     color: var(--color-primary-hover);
-    font-size: 0.7rem;
+    font-size: var(--font-size-12);
     font-weight: 800;
   }
 
   &__summary {
     margin-top: 5px;
     color: var(--text-slate);
-    font-size: 0.84rem;
+    font-size: var(--font-size-14);
     line-height: 1.42;
 
     @include two-line-clamp;
@@ -896,14 +896,14 @@ $float-catalog-button-left:0;
   &__group {
     margin: 0 0 7px;
     color: var(--text-secondary);
-    font-size: 0.8rem;
+    font-size: var(--font-size-12);
     letter-spacing: 0.04em;
   }
 
   &__title {
     margin: 0;
     color: var(--color-primary-hover);
-    font-size: clamp(1.18rem, 1.8vw, 1.54rem);
+    font-size: clamp(var(--font-size-18), 1.8vw, var(--font-size-24));
     line-height: 1.25;
   }
 
@@ -921,7 +921,7 @@ $float-catalog-button-left:0;
 
   &__content {
     font-family: var(--font-serif);
-    font-size: 0.95rem;
+    font-size: var(--font-size-16);
     color: var(--text-primary);
     line-height: 1.72;
 
@@ -933,11 +933,11 @@ $float-catalog-button-left:0;
     }
 
     :deep(h2) {
-      font-size: 1.2rem;
+      font-size: var(--font-size-20);
     }
 
     :deep(h3) {
-      font-size: 1.05rem;
+      font-size: var(--font-size-16);
     }
 
     :deep(p) {
@@ -996,7 +996,7 @@ $float-catalog-button-left:0;
     backdrop-filter: blur(20px) saturate(150%);
     -webkit-backdrop-filter: blur(20px) saturate(150%);
     color: var(--color-primary-hover);
-    font-size: 0.86rem;
+    font-size: var(--font-size-14);
     font-weight: 800;
     cursor: pointer;
     box-shadow:
@@ -1036,7 +1036,7 @@ $float-catalog-button-left:0;
   &__status {
     justify-self: center;
     color: var(--text-secondary);
-    font-size: 0.86rem;
+    font-size: var(--font-size-14);
     font-weight: 800;
     white-space: nowrap;
   }
@@ -1106,7 +1106,7 @@ $float-catalog-button-left:0;
       border-radius: 0 100px 100px 0;
       background: var(--color-primary);
       color: var(--action-primary-text);
-      font-size: 0.8rem;
+      font-size: var(--font-size-12);
       font-weight: 700;
       cursor: pointer;
       box-shadow:
@@ -1114,7 +1114,7 @@ $float-catalog-button-left:0;
         inset 0 1px 0 var(--glass-30);
 
       &__icon {
-        font-size: 0.85rem;
+        font-size: var(--font-size-14);
         line-height: 1;
       }
 
@@ -1137,7 +1137,7 @@ $float-catalog-button-left:0;
       border-radius: var(--radius-xl) var(--radius-xl) 0 0;
       background: var(--glass-50);
       color: var(--color-primary-hover);
-      font-size: 0.86rem;
+      font-size: var(--font-size-14);
       font-weight: 850;
       backdrop-filter: blur(28px) saturate(160%);
       -webkit-backdrop-filter: blur(28px) saturate(160%);

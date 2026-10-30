@@ -1774,7 +1774,7 @@ $mobile-breakpoint: 768px;
 .glass-button {
   --glass-button-padding: 8px 16px;
   --glass-button-border-radius: var(--radius-md);
-  --glass-button-font-size: 13px;
+  --glass-button-font-size: var(--font-size-14);
 
   display: flex;
   align-items: center;
@@ -1877,7 +1877,7 @@ th, td {
 }
 
 th {
-  font-size: 15px;
+  font-size: var(--font-size-16);
   color: var(--text-secondary);
   font-weight: 600;
   padding: 8px 3px !important;
@@ -1887,7 +1887,7 @@ td {
   padding: 8px 12px;
   text-align: left;
   border-bottom: 1px solid var(--border-light);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   white-space: normal;
   word-break: break-word;
   vertical-align: top;
@@ -1926,7 +1926,7 @@ td {
       top: 2px;
       right: 4px;
       color: var(--color-primary);
-      font-size: 10px;
+      font-size: var(--font-size-12);
       content: '✎';
     }
   }
@@ -1982,7 +1982,7 @@ td {
 }
 
 .filter-hint-icon {
-  font-size: 10px;
+  font-size: var(--font-size-12);
   opacity: 0.5;
 }
 
@@ -1992,12 +1992,12 @@ td {
   justify-content: center;
   opacity: 0.2;
   cursor: pointer;
-  font-size: 9px;
+  font-size: var(--font-size-12);
 }
 
 .header-content:hover .sort-controls {
   opacity: 0.8;
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 .sort-arrow.active {
@@ -2032,7 +2032,7 @@ td {
 }
 
 .filter-header {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--text-secondary);
   border-bottom: 1px solid var(--border-light);
@@ -2085,7 +2085,7 @@ td {
         &::after {
           display: block;
           color: darkgreen;
-          font-size: 14px;
+          font-size: var(--font-size-14);
           font-weight: bold;
           line-height: 1;
           content: '✓';
@@ -2111,7 +2111,7 @@ td {
 
 .text-btn {
   padding: 6px 12px;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   cursor: pointer;
   background: none;
   border: none;
@@ -2248,7 +2248,7 @@ td {
 .page-info {
   padding: 8px 12px;
   color: var(--text-primary);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   border-radius: var(--radius-md);
   transition: all $transition-fast;
@@ -2290,7 +2290,7 @@ td {
 }
 
 .page-total {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--text-secondary);
 }
@@ -2317,7 +2317,7 @@ td {
 }
 
 .label-text {
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 /* Loading States */
@@ -2345,7 +2345,7 @@ td {
   padding: 40px;
   text-align: center;
   color: var(--text-muted);
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .blur-content {
@@ -2372,7 +2372,7 @@ td {
 }
 
 .field-label {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--text-secondary);
   white-space: nowrap;
@@ -2395,7 +2395,7 @@ td {
   padding: 10px 20px;
   border-radius: var(--radius-md);
   border: none;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   cursor: pointer;
   transition: all $transition-fast;
@@ -2446,7 +2446,7 @@ td {
   border: 1px solid var(--border-medium);
   background: var(--color-primary);
   color: var(--action-primary-text);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   cursor: pointer;
   transition: all $transition-fast;
@@ -2503,7 +2503,7 @@ td {
 @media (max-width: 768px) {
   .fullscreen-toggle-btn {
     padding: 8px 12px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   .fullscreen-pagination {
@@ -2534,7 +2534,7 @@ td {
     label {
       display: block;
       margin-bottom: 8px;
-      font-size: 14px;
+      font-size: var(--font-size-14);
       font-weight: 600;
       color: var(--text-deep);
     }
@@ -2605,7 +2605,7 @@ td {
 .column-checkbox-item input:checked + .custom-checkbox::after {
   content: '✓';
   color: var(--action-primary-text);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: bold;
   line-height: 1;
   display: block;
@@ -2632,7 +2632,7 @@ td {
 }
 
 .column-checkbox-item .label-text {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: $text-dark;
   transition: all $transition-fast;
   white-space: nowrap;
@@ -2662,7 +2662,7 @@ td {
 }
 
 .radio-item span {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: $text-dark;
   user-select: none;
 }
@@ -2671,7 +2671,7 @@ td {
 .help-text {
   display: block;
   margin-top: 6px;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-help);
   font-weight: 500;
 }
@@ -2685,7 +2685,7 @@ td {
 
 .preview-section h4 {
   margin: 0 0 12px 0;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: $primary-blue;
 }
@@ -2710,7 +2710,7 @@ td {
   display: flex;
   gap: 12px;
   margin-bottom: 6px;
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 .row-label {
@@ -2733,7 +2733,7 @@ td {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: var(--font-size-14);
 }
 
 .old-value {
@@ -2756,7 +2756,7 @@ td {
   text-align: center;
   padding: 8px;
   color: $text-muted;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-style: italic;
 }
 
@@ -2770,7 +2770,7 @@ td {
 
 .all-pages-preview h4 {
   margin: 0 0 12px 0;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: $warning-orange;
 }
@@ -2784,7 +2784,7 @@ td {
 
 .stats-item {
   margin: 8px 0;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -2798,7 +2798,7 @@ td {
 .stats-item .value {
   color: $warning-orange;
   font-weight: 600;
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .warning-text {
@@ -2807,7 +2807,7 @@ td {
   background: rgba(var(--color-warning-rgb), 0.1);
   border-radius: var(--radius-sm);
   color: $warning-dark;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   text-align: center;
 }

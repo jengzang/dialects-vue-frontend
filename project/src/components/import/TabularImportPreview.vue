@@ -682,13 +682,13 @@ $preview-min-column-width: 120px;
   &__eyebrow {
     margin: 0 0 6px;
     color: $text-light;
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   &__title {
     margin: 0;
     color: $text-primary;
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 
   &__empty {
@@ -702,20 +702,20 @@ $preview-min-column-width: 120px;
     border-radius: var(--radius-xl);
 
     &-icon {
-      font-size: 36px;
+      font-size: var(--font-size-32);
     }
 
     &-title {
       margin: 0 0 4px;
       color: $text-primary;
-      font-size: 16px;
+      font-size: var(--font-size-16);
       font-weight: 600;
     }
 
     &-text {
       margin: 0;
       color: $text-secondary;
-      font-size: 14px;
+      font-size: var(--font-size-14);
       line-height: 1.5;
     }
   }
@@ -738,7 +738,7 @@ $preview-min-column-width: 120px;
 
   &__toolbar-label {
     color: $text-secondary;
-    font-size: 13px;
+    font-size: var(--font-size-14);
     align-self: center;
   }
 
@@ -747,7 +747,7 @@ $preview-min-column-width: 120px;
     gap: 12px;
     justify-content: flex-end;
     color: $text-muted;
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   &__loading {
@@ -801,14 +801,14 @@ $preview-min-column-width: 120px;
     h4 {
       margin: 0;
       color: $text-primary;
-      font-size: 16px;
+      font-size: var(--font-size-16);
       white-space: nowrap;
     }
 
     p {
       margin: 0;
       color: $text-secondary;
-      font-size: 13px;
+      font-size: var(--font-size-14);
       line-height: 1.5;
     }
   }
@@ -857,7 +857,7 @@ $preview-min-column-width: 120px;
 
   &__mapping-name {
     color: $text-primary;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 600;
     white-space: nowrap;
   }
@@ -875,7 +875,7 @@ $preview-min-column-width: 120px;
   &__mapping-example {
     margin: 0;
     color: $text-secondary;
-    font-size: 12px;
+    font-size: var(--font-size-12);
     line-height: 1.5;
   }
 
@@ -903,7 +903,7 @@ $preview-min-column-width: 120px;
     width: max(100%, calc(var(--tabular-import-preview-column-count) * #{$preview-min-column-width}));
     height: 100%;
     min-height: 100%;
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 
   &__table-header,
@@ -963,7 +963,7 @@ $preview-min-column-width: 120px;
   align-items: center;
   gap: 4px;
   border-radius: var(--radius-pill);
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 .mapping-badge {

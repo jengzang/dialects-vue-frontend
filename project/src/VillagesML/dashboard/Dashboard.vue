@@ -354,7 +354,7 @@ onMounted(() => {
 }
 
 .page-title {
-  font-size: 32px;
+  font-size: var(--font-size-32);
   font-weight: 600;
   color: var(--text-primary);
   margin: 5px;
@@ -384,7 +384,7 @@ onMounted(() => {
   color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   margin-bottom: 4px;
@@ -404,12 +404,12 @@ onMounted(() => {
   background: rgba(var(--color-warning-rgb), 0.12);
   border: 1px solid rgba(var(--color-warning-rgb), 0.4);
   border-radius: var(--radius-md);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
 }
 
 .notice-icon {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   flex-shrink: 0;
 }
 
@@ -434,7 +434,7 @@ onMounted(() => {
 }
 
 .stat-icon {
-  font-size: 48px;
+  font-size: var(--font-size-48);
   margin-right: 10px;
 }
 
@@ -443,14 +443,14 @@ onMounted(() => {
 }
 
 .stat-value {
-  font-size: 28px;
+  font-size: var(--font-size-32);
   font-weight: 700;
   color: var(--color-primary);
   margin-bottom: 5px;
 }
 
 .stat-label {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
 }
 
@@ -460,7 +460,7 @@ onMounted(() => {
 }
 
 .quick-search h2 {
-  font-size: 20px;
+  font-size: var(--font-size-20);
   margin-bottom: 15px;
   color: var(--text-primary);
 }
@@ -475,7 +475,7 @@ onMounted(() => {
   padding: 12px 20px;
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-md);
-  font-size: 16px;
+  font-size: var(--font-size-16);
   background: var(--glass-50);
   transition: all 0.3s ease;
 }
@@ -492,7 +492,7 @@ onMounted(() => {
   color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-md);
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -532,12 +532,12 @@ onMounted(() => {
 }
 
 .feature-icon {
-  font-size: 32px;
+  font-size: var(--font-size-32);
   flex-shrink: 0;
 }
 
 .feature-title {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--text-primary);
   margin: 0;
@@ -546,7 +546,7 @@ onMounted(() => {
 }
 
 .feature-description {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: 0;
@@ -557,7 +557,7 @@ onMounted(() => {
   display: inline-block;
   padding: 4px 12px;
   border-radius: var(--radius-md);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 500;
   flex-shrink: 0; /* Don't shrink badge */
   margin-left: auto; /* Push to right */
@@ -581,7 +581,7 @@ onMounted(() => {
 }
 
 .intro-text {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   line-height: 1.8;
   color: var(--text-primary);
   margin-bottom: 20px;
@@ -601,7 +601,7 @@ onMounted(() => {
 }
 
 .github-invite {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
 }
 
@@ -614,7 +614,7 @@ onMounted(() => {
   background: rgba(var(--text-deep-rgb), 0.08);
   border: 1px solid rgba(var(--text-deep-rgb), 0.2);
   color: var(--text-primary);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   text-decoration: none;
   transition: background 0.2s ease, border-color 0.2s ease;
@@ -638,14 +638,14 @@ onMounted(() => {
 }
 
 .section-header h2 {
-  font-size: 24px;
+  font-size: var(--font-size-24);
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 8px;
 }
 
 .section-description {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
   margin: 0;
 }
@@ -664,11 +664,11 @@ onMounted(() => {
   }
 
   .stat-icon {
-    font-size: 36px;
+    font-size: var(--font-size-32);
   }
 
   .stat-value {
-    font-size: 22px;
+    font-size: var(--font-size-24);
   }
 
   .features-grid {
@@ -685,15 +685,15 @@ onMounted(() => {
   }
 
   .feature-icon {
-    font-size: 28px;
+    font-size: var(--font-size-32);
   }
 
   .feature-title {
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 
   .feature-description {
-    font-size: 13px;
+    font-size: var(--font-size-14);
     line-height: 1.5;
   }
 
@@ -703,7 +703,7 @@ onMounted(() => {
   }
 
   .page-title {
-    font-size: 24px;
+    font-size: var(--font-size-24);
     margin-bottom: 0;
   }
 
@@ -713,17 +713,17 @@ onMounted(() => {
   }
 
   .intro-text {
-    font-size: 14px;
+    font-size: var(--font-size-14);
     line-height: 1.6;
   }
 
 
   .section-header h2 {
-    font-size: 20px;
+    font-size: var(--font-size-20);
   }
 
   .section-description {
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 
   .quick-search {
@@ -732,7 +732,7 @@ onMounted(() => {
   }
 
   .quick-search h2 {
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 
   .search-input-group {

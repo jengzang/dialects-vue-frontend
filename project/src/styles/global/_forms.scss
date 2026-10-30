@@ -157,7 +157,7 @@ textarea {
   height: 60px;
   box-sizing: border-box;
   font-family: var(--font-mono);
-  font-size: var(--font-size-13);
+  font-size: var(--font-size-14);
   margin-top: 0;
   padding: 6px 10px;
   resize: none;
@@ -200,7 +200,7 @@ textarea:focus {
 }
 
 .query-label {
-  font-size: var(--font-size-15);
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-tertiary);
 }

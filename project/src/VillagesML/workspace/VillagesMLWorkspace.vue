@@ -552,7 +552,7 @@ const handleAdjustParams = (action) => {
   min-height: 400px;
   text-align: center;
   color: var(--text-tertiary);
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .legacy-tab {

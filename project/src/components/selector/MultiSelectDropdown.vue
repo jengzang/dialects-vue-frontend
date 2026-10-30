@@ -356,7 +356,7 @@ $arrow-transition: 0.2s ease;
 .select-arrow {
   margin-left: 8px;
   color: var(--text-tertiary);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   transition: transform $arrow-transition;
 }
 
@@ -402,7 +402,7 @@ $arrow-transition: 0.2s ease;
   // width: 100%;
   padding: 6px 10px;
   color: $text-primary;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   background: var(--glass-90);
   border: 1px solid var(--border-control);
   border-radius: var(--radius-sm);
@@ -430,7 +430,7 @@ $arrow-transition: 0.2s ease;
   padding: 8px 16px;
   overflow: hidden;
   color: $text-primary;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: pointer;
@@ -469,7 +469,7 @@ $arrow-transition: 0.2s ease;
 .empty-message {
   padding: 20px;
   color: $text-muted;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   text-align: center;
 }
 </style>

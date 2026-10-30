@@ -380,7 +380,7 @@ $text-secondary: var(--text-secondary);
   padding: 2dvh;
   max-height: none;
   overflow: hidden;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   width: min(90%, 500px);
   min-width: 0;
 }
@@ -388,7 +388,7 @@ $text-secondary: var(--text-secondary);
 @media (max-aspect-ratio: 1 / 1) {
   .divide-tab-panel {
     padding: 10px;
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 }
 
@@ -403,7 +403,7 @@ $text-secondary: var(--text-secondary);
 /* 顶部标题与提示 */
 .page-footer {
   p {
-    font-size: clamp(20px, 2.2vw, 26px);
+    font-size: clamp(var(--font-size-20), 2.2vw, var(--font-size-24));
     font-weight: 700;
     line-height: 1.25;
     letter-spacing: -0.02em;
@@ -413,7 +413,7 @@ $text-secondary: var(--text-secondary);
 
   .hint {
     margin-top: 6px;
-    font-size: 13px;
+    font-size: var(--font-size-14);
     font-weight: 400;
     line-height: 1.65;
     letter-spacing: 0.01em;
@@ -434,7 +434,7 @@ $text-secondary: var(--text-secondary);
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--text-primary);
   cursor: pointer;
@@ -448,7 +448,7 @@ $text-secondary: var(--text-secondary);
 }
 
 .all-data-hint {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   line-height: 1.5;
   color: var(--text-secondary);
   text-align: center;
@@ -476,7 +476,7 @@ $text-secondary: var(--text-secondary);
 /* 下拉框左侧文字 */
 .query-label {
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   line-height: 1.4;
   letter-spacing: 0.01em;
@@ -497,7 +497,7 @@ $text-secondary: var(--text-secondary);
   }
 
   :deep(.dropdown) {
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 500;
     letter-spacing: 0.01em;
     color: $text-main;
@@ -507,7 +507,7 @@ $text-secondary: var(--text-secondary);
   :deep(.dropdown-option),
   :deep(.select-option),
   :deep(li) {
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 500;
     letter-spacing: 0.01em;
   }
@@ -521,7 +521,7 @@ $text-secondary: var(--text-secondary);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   letter-spacing: 0.01em;
   color: $text-main;
@@ -547,7 +547,7 @@ $text-secondary: var(--text-secondary);
   border: none;
   border-radius: 30px;
   padding: 14px 28px;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 700;
   line-height: 1;
   letter-spacing: 0.04em;

@@ -50,7 +50,7 @@
             flex: getOverflowFlex(t, isActiveComputed(t.tab), false),
             minWidth: getOverflowMinWidth(t, false),
             maxWidth: getOverflowMaxWidth(t, false),
-            fontSize: 'calc(var(--font-size-nav-unit) * ' + t.fontSize + ')'
+            fontSize: 'calc(clamp(var(--font-size-16), 1.5dvh, var(--font-size-20)) * ' + t.fontSize + ')'
           }"
           @click.prevent.stop="onClick(t, navigate, $event)"
           @mouseenter="(e) => { handleTabHover(t, t.tab, e); handleTabTooltipEnter(e, t.label) }"
@@ -58,7 +58,7 @@
           @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
         >
           <span class="tab-inner" :class="{ active: isActiveComputed(t.tab) }">
-            <BarIcon :icon="t.icon" class="nav-icon" :weight="isActiveComputed(t.tab) ? 'fill' : 'bold'" :style="{ fontSize: 'calc(var(--font-size-nav-unit) * ' + t.fontSize + ')' }" />
+            <BarIcon :icon="t.icon" class="nav-icon" :weight="isActiveComputed(t.tab) ? 'fill' : 'bold'" :style="{ fontSize: 'calc(clamp(var(--font-size-16), 1.5dvh, var(--font-size-20)) * ' + t.fontSize + ')' }" />
             <span
               class="label"
               v-if="!t.showLabelOnlyWhenActive || isActiveComputed(t.tab)"
@@ -126,7 +126,7 @@
               flex: getOverflowFlex(t, isActiveComputed(t.tab), true),
               minWidth: getOverflowMinWidth(t, true),
               maxWidth: getOverflowMaxWidth(t, true),
-              fontSize: 'calc(var(--font-size-nav-mobile-unit) * ' + (t.mobileFontSize || t.fontSize) + ')'
+              fontSize: 'calc(clamp(var(--font-size-16), 1.5dvh, var(--font-size-20)) * ' + (t.mobileFontSize || t.fontSize) + ')'
             }"
             @click.prevent.stop="onClick(t, navigate, $event)"
             @mouseenter="(e) => handleTabTooltipEnter(e, t.label)"
@@ -135,7 +135,7 @@
           >
             <span class="tab-icon-label" :class="{ 'tab-icon-label--stack': !isActiveComputed(t.tab) && (t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) !== false }">
               <span class="tab-icon-row">
-                <BarIcon :icon="t.icon" class="nav-icon" :weight="isActiveComputed(t.tab) ? 'fill' : 'bold'" :style="{ fontSize: 'calc(var(--font-size-nav-mobile-unit) * ' + ((t.mobileFontSize || t.fontSize) * 1.2) + ')' }" />
+                <BarIcon :icon="t.icon" class="nav-icon" :weight="isActiveComputed(t.tab) ? 'fill' : 'bold'" :style="{ fontSize: 'calc(clamp(var(--font-size-16), 1.5dvh, var(--font-size-20)) * ' + ((t.mobileFontSize || t.fontSize) * 1.2) + ')' }" />
                 <svg v-if="getTabChildren(t.tab)?.length" class="tab-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
                 <svg v-else-if="t.to && !t.to.startsWith('/villagesML')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
               </span>
@@ -708,7 +708,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   min-width: 0;
   height: 6.5dvh;
   color: $primary-blue;
-  font-size: var(--font-size-20-8);
+  font-size: var(--font-size-20);
   text-align: center;
   text-decoration: none;
   white-space: nowrap;
@@ -728,7 +728,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   height: calc(100% - clamp(3px, 1dvh, 6px));
   margin: 0 calc(var(--tab-pad) * -1);
   padding: 0 var(--tab-pad);
-  font-size: var(--font-size-nav-inactive);
+  font-size: 0.9em;
   border: 3px solid transparent;
   border-radius: var(--radius-md);
 
@@ -766,7 +766,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     position: relative;
     color: $active-blue;
     font-weight: 1000;
-    font-size: var(--font-size-nav-active);
+    font-size: 1.1em;
     background: linear-gradient(
       145deg,
       var(--glass-20),
@@ -872,7 +872,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   align-items: center;
   height: 7dvh;
   color: var(--text-primary);
-  font-size: var(--font-size-28-8);
+  font-size: var(--font-size-32);
   font-weight: 600;
   white-space: nowrap;
   font-family: 'STKaiti', 'KaiTi', 'Kaiti SC', '楷体', 'Songti SC', 'Noto Serif SC', 'STSong', 'SimSun', 'PingFang SC', 'Microsoft YaHei', serif;
@@ -904,7 +904,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 .login-text {
   max-width: 80px;
   overflow: hidden;
-  font-size: var(--font-size-18-4);
+  font-size: var(--font-size-18);
   font-weight: 600;
   white-space: nowrap;
 }
@@ -917,7 +917,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 .title-text-mobile {
   flex-shrink: 0;
   color: var(--text-primary);
-  font-size: var(--font-size-19-2);
+  font-size: var(--font-size-20);
   font-weight: 600;
   white-space: nowrap;
 }
@@ -988,7 +988,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
       }
 
       .nav-icon, .label {
-        font-size: var(--font-size-nav-inactive);
+        font-size: 0.9em;
       }
 
       .tab-chevron,
@@ -999,7 +999,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
       }
 
       .label--tiny {
-        font-size: var(--font-size-nav-caption) !important;
+        font-size: max(var(--font-size-12), 0.65em) !important;
         max-width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -1025,7 +1025,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
         transition: 0.3s ease 0.6s;
 
         .nav-icon, .label {
-          font-size: var(--font-size-nav-active);
+          font-size: 1.1em;
         }
 
         &::after {
@@ -1093,7 +1093,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   align-items: center;
   padding: 12px 16px;
   color: $text-primary;
-  font-size: var(--font-size-15);
+  font-size: var(--font-size-16);
   font-weight: 500;
   cursor: pointer;
   border-radius: var(--radius-md);

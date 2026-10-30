@@ -831,7 +831,7 @@ $user-accent: var(--color-primary);
     gap: 10px;
     margin: 0;
     color: $user-text;
-    font-size: clamp(20px, 2.4vw, 28px);
+    font-size: clamp(var(--font-size-20), 2.4vw, var(--font-size-32));
     font-weight: 800;
     letter-spacing: -0.04em;
   }
@@ -851,7 +851,7 @@ $user-accent: var(--color-primary);
   border-radius: var(--radius-pill);
   overflow: hidden;
   color: var(--action-primary-text);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 800;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -868,7 +868,7 @@ $user-accent: var(--color-primary);
   align-items: center;
   gap: 10px;
   color: $user-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 700;
 }
 
@@ -919,7 +919,7 @@ $user-accent: var(--color-primary);
 
 .search-input {
   height: 42px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .table-container {
@@ -950,7 +950,7 @@ $user-accent: var(--color-primary);
 
 .loading-text {
   color: $user-accent;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 800;
   letter-spacing: 0.02em;
 }
@@ -961,7 +961,7 @@ $user-accent: var(--color-primary);
   border-collapse: separate;
   border-spacing: 0 8px;
   table-layout: auto;
-  font-size: 13px;
+  font-size: var(--font-size-14);
 
   th,
   td {
@@ -976,7 +976,7 @@ $user-accent: var(--color-primary);
     top: 0;
     z-index: 10;
     color: var(--text-deep);
-    font-size: 12px;
+    font-size: var(--font-size-12);
     font-weight: 800;
     letter-spacing: 0.02em;
     background:
@@ -1062,7 +1062,7 @@ $user-accent: var(--color-primary);
 
 .pagination-info {
   color: $user-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 700;
 }
 
@@ -1081,7 +1081,7 @@ $user-accent: var(--color-primary);
 
 .pagination-size {
   color: $user-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 700;
 }
 
@@ -1096,7 +1096,7 @@ $user-accent: var(--color-primary);
   border: 1px solid rgba(var(--color-primary-rgb), 0.12);
   border-radius: 14px;
   color: var(--text-slate);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   background: rgba(var(--color-primary-rgb), 0.06);
 }
@@ -1112,7 +1112,7 @@ $user-accent: var(--color-primary);
 .row-count {
   margin-left: auto;
   color: $user-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 800;
 }
 
@@ -1134,7 +1134,7 @@ $user-accent: var(--color-primary);
   min-width: 860px;
   border-collapse: separate;
   border-spacing: 0;
-  font-size: 13px;
+  font-size: var(--font-size-14);
 
   thead {
     position: sticky;
@@ -1172,7 +1172,7 @@ $user-accent: var(--color-primary);
   input {
     min-width: 0;
     height: 34px;
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 
   .col-index {
@@ -1207,7 +1207,7 @@ $user-accent: var(--color-primary);
   width: 28px;
   height: 28px;
   min-height: 28px;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   line-height: 1;
 }
 
@@ -1218,13 +1218,13 @@ $user-accent: var(--color-primary);
     display: block;
     margin-bottom: 7px;
     color: var(--text-dark);
-    font-size: 13px;
+    font-size: var(--font-size-14);
     font-weight: 800;
   }
 
   input,
   textarea {
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 
   textarea {
@@ -1246,7 +1246,7 @@ $user-accent: var(--color-primary);
   border: 1px solid rgba(var(--color-primary-rgb), 0.14);
   border-radius: 14px;
   color: $user-accent;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 700;
   background: rgba(var(--color-primary-rgb), 0.07);
 }
@@ -1271,13 +1271,13 @@ $user-accent: var(--color-primary);
     h1 {
       flex: 1;
       min-width: 200px;
-      font-size: 18px;
+      font-size: var(--font-size-18);
     }
   }
 
   .username-badge {
     max-width: 160px;
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 
   .stats {
@@ -1288,7 +1288,7 @@ $user-accent: var(--color-primary);
     span {
       flex: 1;
       justify-content: center;
-      font-size: 13px;
+      font-size: var(--font-size-14);
     }
   }
 
@@ -1313,12 +1313,12 @@ $user-accent: var(--color-primary);
 
   .glass-button {
     padding-inline: 10px;
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 
   .search-input {
     height: 42px;
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 
   .table-container {
@@ -1328,12 +1328,12 @@ $user-accent: var(--color-primary);
 
   .data-table {
     min-width: 940px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
 
     th,
     td {
       padding: 10px 9px;
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 
@@ -1347,7 +1347,7 @@ $user-accent: var(--color-primary);
   .pagination-size {
     justify-content: center;
     text-align: center;
-    font-size: 13px;
+    font-size: var(--font-size-14);
   }
 
   .pagination-controls {
@@ -1357,7 +1357,7 @@ $user-accent: var(--color-primary);
   .btn-page {
     min-width: 36px;
     padding: 7px 9px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   .user-data-modal-footer {
@@ -1383,10 +1383,10 @@ $user-accent: var(--color-primary);
 
   .batch-table {
     min-width: 780px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
 
     input {
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 }
@@ -1408,14 +1408,14 @@ $user-accent: var(--color-primary);
     h1 {
       width: 100%;
       min-width: 0;
-      font-size: 16px;
+      font-size: var(--font-size-16);
     }
   }
 
   .btn-back {
     min-height: 34px;
     padding: 7px 11px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   .toolbar-left {
@@ -1426,7 +1426,7 @@ $user-accent: var(--color-primary);
   .glass-button {
     min-height: 34px;
     padding: 7px 8px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   .data-table {
@@ -1435,7 +1435,7 @@ $user-accent: var(--color-primary);
     th,
     td {
       padding: 8px 7px;
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 

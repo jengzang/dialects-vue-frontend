@@ -25,7 +25,7 @@
   font-weight: 600;
 
   @media (aspect-ratio > 1 / 1) {
-    font-size: var(--font-size-page-title-landscape);
+    font-size: var(--font-size-32);
   }
 }
 
@@ -47,7 +47,7 @@
   align-items: center;
   gap: 6px;
   white-space: pre-wrap;
-  font-size: var(--font-size-15);
+  font-size: var(--font-size-16);
 }
 
 .info-text strong {

@@ -422,7 +422,7 @@ $border-breath-duration: 1.5s;
 
 .loading-text {
   color: var(--text-muted);
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .result-panel-vue {

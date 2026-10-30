@@ -678,7 +678,7 @@ onMounted(async () => {
 }
 
 h2 {
-  font-size: 24px;
+  font-size: var(--font-size-24);
   margin-bottom: 16px;
   color: var(--text-primary);
   font-weight: 600;
@@ -717,7 +717,7 @@ h2 {
   border-radius: var(--radius-sm);
   padding: 4px 8px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   transition: all 0.2s;
   z-index: 10;
 }
@@ -741,7 +741,7 @@ h2 {
 }
 
 .section h3 {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   margin-bottom: 12px;
   color: var(--text-primary);
@@ -768,7 +768,7 @@ h2 {
 }
 
 .checkbox-item span {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
 }
 
@@ -792,7 +792,7 @@ h2 {
   padding: 8px 12px;
   border: 1px solid var(--border-light-gray);
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   outline: none;
   transition: border 0.3s;
   margin-bottom: 8px;
@@ -803,7 +803,7 @@ h2 {
 }
 
 .layer-note {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   margin-top: 12px;
   padding: 8px;
@@ -820,7 +820,7 @@ h2 {
   color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   cursor: pointer;
   transition: background 0.2s;
@@ -851,7 +851,7 @@ h2 {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
 }
 
@@ -885,7 +885,7 @@ h2 {
 .stat-item {
   display: flex;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: var(--font-size-14);
 }
 
 .stat-label {
@@ -914,7 +914,7 @@ h2 {
 }
 
 .map-placeholder p {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   color: var(--text-secondary);
 }
 

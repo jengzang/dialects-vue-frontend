@@ -312,7 +312,7 @@ const getRegionLevelName = (level) => {
 }
 
 .section-description {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
   margin-bottom: 16px;
   line-height: 1.6;
@@ -341,7 +341,7 @@ const getRegionLevelName = (level) => {
   color: var(--color-error);
   border: 1px solid rgba(var(--color-error-rgb), 0.3);
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   cursor: pointer;
   transition: all 0.3s ease;
   flex-shrink: 0;
@@ -353,13 +353,13 @@ const getRegionLevelName = (level) => {
 }
 
 .input-label {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   color: var(--text-primary);
 }
 
 .input-hint {
-  font-size: 11px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   margin-top: 2px;
 }
@@ -418,7 +418,7 @@ const getRegionLevelName = (level) => {
   background: rgba(var(--vml-blue-rgb), 0.15);
   color: var(--color-primary);
   border-radius: var(--radius-md);
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 500;
 }
 
@@ -428,7 +428,7 @@ const getRegionLevelName = (level) => {
   background: rgba(var(--color-success-rgb), 0.15);
   color: var(--color-success);
   border-radius: var(--radius-md);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 500;
 }
 
@@ -436,7 +436,7 @@ const getRegionLevelName = (level) => {
   display: inline-block;
   padding: 4px 10px;
   border-radius: var(--radius-md);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 600;
 }
 

@@ -294,7 +294,7 @@ $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);/*
   width: 42px;
   height: 42px;
   color: $text-icon;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 700;
   background: linear-gradient(
     180deg,
@@ -330,7 +330,7 @@ $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);/*
   align-items: center;
   min-height: 28px;
   padding: 0 12px;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 700;
   letter-spacing: 0.02em;
   border-radius: var(--radius-pill);
@@ -353,23 +353,23 @@ $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);/*
 .notice-message {
   margin: 0;
   color: $text-message;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   line-height: 1.45;
 
   @media (max-width: 768px) {
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 }
 
 .notice-meta {
   margin: 6px 0 0;
   color: $text-meta;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   line-height: 1.45;
 
   @media (max-width: 768px) {
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 }
 
@@ -390,7 +390,7 @@ $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);/*
 .notice-button {
   min-height: 40px;
   padding: 0 16px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   cursor: pointer;
   border: 1px solid transparent;

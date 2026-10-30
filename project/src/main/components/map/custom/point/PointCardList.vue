@@ -106,14 +106,14 @@ const filteredItems = computed(() => {
 
   .point-card-title {
     margin: 0;
-    font-size: 18px;
+    font-size: var(--font-size-18);
     font-weight: 700;
     color: $text-strong;
   }
 
   .point-card-description {
     margin: 0;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     color: $text-muted;
   }
 }
@@ -127,7 +127,7 @@ const filteredItems = computed(() => {
 }
 
 .point-card-name {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 700;
   color: $text-strong;
 }
@@ -141,13 +141,13 @@ const filteredItems = computed(() => {
 }
 
 .point-card-region {
-  font-size: 13px;
+  font-size: var(--font-size-14);
   color: $text-secondary;
 }
 
 .point-card-badge {
   margin-top: 4px;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: $primary;
   font-weight: 600;
 }

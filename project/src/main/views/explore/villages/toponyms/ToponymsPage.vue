@@ -729,7 +729,7 @@ async function handleToggleLayer({ key, visible }) {
 
     p {
       color: var(--text-secondary);
-      font-size: 14px;
+      font-size: var(--font-size-14);
       line-height: 1.5;
     }
   }
@@ -773,13 +773,13 @@ async function handleToggleLayer({ key, visible }) {
     span,
     small {
       color: var(--text-secondary);
-      font-size: 12px;
+      font-size: var(--font-size-12);
       line-height: 1.5;
     }
 
     strong {
       color: var(--text-deep);
-      font-size: 20px;
+      font-size: var(--font-size-20);
       line-height: 1.2;
       font-weight: 700;
     }
@@ -796,14 +796,14 @@ async function handleToggleLayer({ key, visible }) {
 
     strong {
       color: var(--text-deep);
-      font-size: 15px;
+      font-size: var(--font-size-16);
       line-height: 1.4;
       font-weight: 700;
     }
 
     span {
       color: var(--text-secondary);
-      font-size: 12px;
+      font-size: var(--font-size-12);
       line-height: 1.5;
     }
   }

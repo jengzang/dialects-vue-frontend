@@ -241,7 +241,7 @@ onMounted(() => {
   // border: 1px solid var(--glass-10);
   // border-radius: var(--radius-md);
   // box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-  font-size: 18px;
+  font-size: var(--font-size-18);
 
   // @include glass-blur(8px);
 }
@@ -257,13 +257,13 @@ onMounted(() => {
   p {
     margin: 10px 0;
     color: var(--text-secondary);
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 }
 
 .subtext {
   color: var(--text-tertiary);
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .card-links {
@@ -288,7 +288,7 @@ onMounted(() => {
   // border-radius: var(--radius-lg);
   // box-shadow: 0 6px 12px rgba(var(--color-primary-rgb), 0.1);
   color: var(--text-primary);
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
@@ -304,7 +304,7 @@ onMounted(() => {
 
   span {
     margin-top: 10px;
-    font-size: 15px;
+    font-size: var(--font-size-16);
     transition: color $ease-standard;
   }
 }
@@ -396,7 +396,7 @@ onMounted(() => {
 }
 
 .screenshot-hint {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   margin: 0;
 }
 
@@ -421,19 +421,19 @@ onMounted(() => {
   .page2 {
     max-width: none;
     padding: 10px 14px;
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
   .suggestion-box {
     max-width: 100%;
 
     p {
       margin: 8px 0;
-      font-size: 16px;
+      font-size: var(--font-size-16);
     }
   }
 
   .subtext {
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 
   .card-links {
@@ -446,11 +446,11 @@ onMounted(() => {
     min-width: 0;
     padding: 14px 16px;
     border-radius: 14px;
-    font-size: 16px;
+    font-size: var(--font-size-16);
 
     span {
       margin-top: 6px;
-      font-size: 13px;
+      font-size: var(--font-size-14);
     }
   }
 

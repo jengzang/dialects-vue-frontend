@@ -269,19 +269,19 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
 
     h2 {
       color: var(--text-deep);
-      font-size: 16px;
+      font-size: var(--font-size-16);
       line-height: 1.35;
     }
 
     h3 {
       color: var(--text-deep);
-      font-size: 15px;
+      font-size: var(--font-size-16);
       line-height: 1.4;
     }
 
     p {
       color: var(--text-secondary);
-      font-size: 13px;
+      font-size: var(--font-size-14);
       line-height: 1.6;
     }
   }
@@ -294,7 +294,7 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
 
     span {
       color: var(--text-tertiary);
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 
@@ -325,7 +325,7 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
 
     p {
       margin: 0;
-      font-size: 12px;
+      font-size: var(--font-size-12);
       line-height: 1.5;
     }
   }
@@ -340,13 +340,13 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
       @include text-truncate;
       min-inline-size: 0;
       color: var(--text-primary);
-      font-size: 13px;
+      font-size: var(--font-size-14);
       line-height: 1.4;
     }
 
     small {
       color: var(--text-tertiary);
-      font-size: 12px;
+      font-size: var(--font-size-12);
       line-height: 1.4;
     }
   }
@@ -360,7 +360,7 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
 
   &__names {
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: var(--font-size-12);
     line-height: 1.5;
     word-break: break-word;
   }

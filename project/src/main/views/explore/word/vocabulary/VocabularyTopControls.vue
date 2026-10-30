@@ -664,7 +664,7 @@ const standardWordTriggerLabel = computed(() => {
 
 .notes-refresh-action.action-button {
   padding: 6px 10px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .notes-mode-actions {
@@ -707,7 +707,7 @@ const standardWordTriggerLabel = computed(() => {
 
   border-radius: 6px;
 
-  font-size: 20px;
+  font-size: var(--font-size-20);
   line-height: 1;
   cursor: pointer;
 
@@ -739,7 +739,7 @@ const standardWordTriggerLabel = computed(() => {
 
 .location-details-btn {
   // padding: 0 4px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   white-space: nowrap;
 }
 
@@ -759,7 +759,7 @@ const standardWordTriggerLabel = computed(() => {
   grid-column: 1 / -1;
   margin: 0;
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   text-align: center;
 }
@@ -807,7 +807,7 @@ const standardWordTriggerLabel = computed(() => {
   flex: 0 0 auto;
   margin-left: 8px;
   color: var(--text-tertiary);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   transition: transform 0.18s ease;
 }
 

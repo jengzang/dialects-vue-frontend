@@ -243,7 +243,7 @@ $transition-normal: 0.3s;
   display: block;
   margin-bottom: 8px;
   color: $text-label;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
 }
 
@@ -258,7 +258,7 @@ $transition-normal: 0.3s;
   border: 1px solid $surface-border;
   border-radius: $control-radius;
   font-family: inherit;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   transition:
     background $transition-normal ease,
     border-color $transition-normal ease,
@@ -279,7 +279,7 @@ $transition-normal: 0.3s;
 .form-hint {
   margin-top: 6px;
   color: $text-hint;
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 .location-header {
@@ -298,7 +298,7 @@ $transition-normal: 0.3s;
   border-radius: $control-radius;
   color: var(--color-primary);
   white-space: nowrap;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 500;
   cursor: pointer;
   user-select: none;
@@ -340,7 +340,7 @@ $transition-normal: 0.3s;
   background: $primary-background;
   border-radius: $control-radius;
   color: $primary;
-  font-size: 13px;
+  font-size: var(--font-size-14);
   font-weight: 500;
 
   &.primary {
@@ -349,7 +349,7 @@ $transition-normal: 0.3s;
   }
 
   .stat-icon {
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 700;
   }
 }
@@ -375,7 +375,7 @@ $transition-normal: 0.3s;
   background: $primary-background;
   border-radius: var(--radius-sm);
   color: $primary;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 500;
 
   &.from-tree {
@@ -393,7 +393,7 @@ $transition-normal: 0.3s;
   padding: 10px 20px;
   border: none;
   border-radius: $control-radius;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   transition:

@@ -231,7 +231,7 @@ onBeforeUnmount(() => {
   display: flex; align-items: center; gap: 12px;
   padding: 10px 16px; margin-bottom: 12px;
   background: rgba(var(--color-error-light-rgb), 0.1); border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
-  border-radius: var(--radius-md); font-size: 14px; color: var(--color-error-light);
+  border-radius: var(--radius-md); font-size: var(--font-size-14); color: var(--color-error-light);
 }
 
 .controls-panel, .progress-panel, .graph-panel, .empty-state {
@@ -241,7 +241,7 @@ onBeforeUnmount(() => {
 .vml-char-input {
   min-width: 56px;
   width: 100%;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   border-color: rgba(var(--color-primary-rgb), 0.3);
 }
 
@@ -249,11 +249,11 @@ onBeforeUnmount(() => {
   padding: 8px 10px; border-radius: var(--radius-sm2);
   border: 1px solid var(--glass-60);
   background: var(--glass-50);
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .progress-panel { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.progress-text { font-size: 13px; color: var(--text-secondary, var(--text-tertiary)); margin: 0; }
+.progress-text { font-size: var(--font-size-14); color: var(--text-secondary, var(--text-tertiary)); margin: 0; }
 .progress-bar-track {
   width: 100%; height: 6px; background: rgba(0, 0, 0, 0.08);
   border-radius: 3px; margin-top: var(--radius-xs);
@@ -263,8 +263,8 @@ onBeforeUnmount(() => {
   border-radius: 3px; transition: width 0.3s ease;
 }
 
-.graph-stats { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 12px; font-size: 13px; color: var(--text-secondary, var(--text-tertiary)); }
-.depth-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; font-size: 13px; }
+.graph-stats { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 12px; font-size: var(--font-size-14); color: var(--text-secondary, var(--text-tertiary)); }
+.depth-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; font-size: var(--font-size-14); }
 .legend-item { display: flex; align-items: center; gap: 4px; }
 .legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: var(--radius-full); }
 

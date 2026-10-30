@@ -131,7 +131,7 @@ onBeforeUnmount(() => {
   padding: 0;
   border-radius: var(--radius-sm);
   background: var(--surface-glass-floating);
-  font-size: 0.8rem;
+  font-size: var(--font-size-12);
   opacity: 0;
   pointer-events: none;
 }

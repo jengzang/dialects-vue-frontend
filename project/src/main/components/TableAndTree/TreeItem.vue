@@ -143,7 +143,7 @@ $transition-expand: 0.3s;
   gap: 8px;
   align-items: center;
   color: $text-dark;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 500;
 }
 
@@ -160,7 +160,7 @@ $transition-expand: 0.3s;
   width: 24px;
   height: 24px;
   color: $primary-blue;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   cursor: pointer;
   background: transparent;
   border: none;

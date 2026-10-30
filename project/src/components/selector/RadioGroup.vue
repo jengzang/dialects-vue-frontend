@@ -186,7 +186,7 @@ $transition-text: 0.3s ease;
 
 .liquid-radio-text {
   color: var(--text-primary);
-  font-size: var(--radio-font-size, 14px);
+  font-size: var(--radio-font-size, var(--font-size-14));
   transition: all $transition-text;
 }
 </style>
