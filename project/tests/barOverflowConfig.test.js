@@ -73,7 +73,7 @@ describe('bar overflow navigation config', () => {
     expect(exploreBarSource.match(/scroll: 'right'/g) || []).toHaveLength(5)
 
     expect(villagesMlBarSource).toContain("id: 'home'")
-    expect(villagesMlBarSource).toContain("overrides: { mobileScroll: 'left', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 0.9 }")
+    expect(villagesMlBarSource).toContain("overrides: { mobileScroll: 'left', weightIconOnly: 0.4, fontSize: 1.0, mobileFontSize: 1.5 }")
   })
 
   it('keeps existing mobile-only overflow assignments scoped to mobile layouts', () => {

@@ -27,7 +27,7 @@ import { userStore, resultCache } from '@/main/store/store.js'
 //       weightIconOnly: 0.6,                // 当仅显示图标时，桌面端的 Flex 权重
 //       mobileWeightIconOnly: 0.55,         // 当仅显示图标时，移动端的 Flex 权重
 //       fontSize: 1.2,                      // 桌面端字体大小的缩放比例 (rem 或 em)
-//       mobileFontSize: 1.2,                // 移动端字体大小的缩放比例
+//       mobileFontSize: 1.5,                // 移动端字体大小的缩放比例
 //       hideOnMobile: false,                // 是否在移动端完全隐藏此标签
 //       hideLabelOnMobile: false,           // 移动端是否仅显示图标（隐藏文字）
 //       showLabelOnlyWhenActive: false,     // 桌面端是否仅在“激活选中”时才显示文字
@@ -65,7 +65,7 @@ const DISPLAY_DEFAULTS = {
 
     // 排版 / 字体
     fontSize: 1.2,
-    mobileFontSize: 1.2,
+    mobileFontSize: 1.5,
 
     // 可见性 / 行为
     isPseudo: false, // 标记是否为伪标签（例如仅作为占位符，不实际响应点击）
@@ -103,13 +103,13 @@ const DISPLAY_PRESETS = {
         weightIconOnly: 0.3,
         mobileWeightIconOnly: 0.3,
         fontSize: 1,
-        mobileFontSize: 1
+        mobileFontSize: 1.3
     },
 
     // 桌面端保持标准大小，但让移动端具有更大的点击区域和字号。
     balancedMobile: {
         mobileWeightIconOnly: 0.6,
-        mobileFontSize: 1.3
+        mobileFontSize: 1.6
     }
 }
 
