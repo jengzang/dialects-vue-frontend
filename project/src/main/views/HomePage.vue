@@ -908,10 +908,13 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     }
   }
 
-  &-actions,
-  &-features-link {
-    background: linear-gradient(135deg, var(--glass-50), var(--color-primary-light2));
-    border: 1px solid var(--color-primary-border2);
+  &-actions {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--bg-blue-tint) 94%, transparent),
+      color-mix(in srgb, var(--bg-blue-light) 92%, transparent)
+    );
+    border: 1px solid rgba(var(--color-primary-rgb), 0.36);
     box-shadow: inset 0 1px 0 var(--glass-70), var(--shadow-glass);
     @include glass-blur(12px, 160%);
   }
@@ -941,7 +944,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     padding: 0.625rem 0.875rem;
     color: var(--text-deep);
     font-size: 1rem;
-    font-weight: 500;
+    font-weight: 600;
     line-height: 1.25;
     text-decoration: none;
     transition: background 0.2s ease, color 0.2s ease;
@@ -956,7 +959,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
     &:hover {
       color: var(--color-primary-hover);
-      background: var(--glass-50);
+      background: var(--color-primary-light3);
     }
 
     &:focus-visible {
@@ -986,15 +989,19 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     gap: 0.375rem;
     min-height: 44px;
     padding: 0.5rem 0.875rem;
+    background: transparent;
+    border: 1px solid var(--color-primary-border2);
     border-radius: var(--radius-md);
-    color: var(--text-deep);
+    color: var(--color-primary);
     font: inherit;
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
 
     &:hover {
       color: var(--color-primary-hover);
+      background: var(--color-primary-light);
     }
 
     &:focus-visible {
