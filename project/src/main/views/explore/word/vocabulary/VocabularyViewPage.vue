@@ -388,10 +388,23 @@
     </section>
 
     <section v-else-if="viewMode === 'table'" class="content-area">
+      <div v-if="tableLocationError" class="empty-state empty-state-base">
+        <p>{{ tableLocationError }}</p>
+      </div>
+      <div v-else-if="!tableLocationFilter" class="loading-state loading-state-base">
+        <div class="ui-loading--page" aria-hidden="true"></div>
+        <span>{{ t('words.wordList.states.loadingData') }}</span>
+      </div>
+      <div v-else-if="tableLocationFilter.location_name?.length === 0" class="empty-state empty-state-base">
+        <p>{{ t('words.wordList.states.noData') }}</p>
+      </div>
       <UniversalTable
+        v-else
+        :key="JSON.stringify(tableLocationFilter)"
         db-key="vocabulary"
         table-name="vocabulary_entries"
         :columns="tableColumns"
+        :default-filter="tableLocationFilter"
         primary-key="id"
         api-adapter="vocabulary"
       />
@@ -673,6 +686,8 @@ const hasSubmittedSearch = ref(false)
 const isSearchExpanded = ref(true)
 const isVocabularyFilterOpen = ref(false)
 const appliedVocabularyQueryParams = ref(null)
+const tableLocationFilter = ref(null)
+const tableLocationError = ref('')
 let vocabularyQueryTimer = null
 
 function handleSearchProgress(progress) {
@@ -2155,6 +2170,31 @@ function applyVocabularyQuery() {
 }
 
 appliedVocabularyQueryParams.value = buildDraftVocabularyQueryParams()
+
+watch([appliedVocabularyQueryParams, viewMode, hasSubmittedSearch, isCharacterNotesMode], async (_, __, onCleanup) => {
+  tableLocationFilter.value = null
+  tableLocationError.value = ''
+  if (!hasSubmittedSearch.value || isCharacterNotesMode.value || viewMode.value !== 'table') return
+
+  const params = buildVocabularyQueryParams()
+  if (params.locations?.length) {
+    tableLocationFilter.value = { location_name: [...params.locations] }
+    return
+  }
+  if (!params.province && !params.city && !params.regions?.length) {
+    tableLocationFilter.value = {}
+    return
+  }
+
+  let cancelled = false
+  onCleanup(() => { cancelled = true })
+  try {
+    const options = await getVocabularyLocationOptions(buildVocabularyLocationOptionsParams(params))
+    if (!cancelled) tableLocationFilter.value = { location_name: options.map(option => option.value) }
+  } catch (error) {
+    if (!cancelled) tableLocationError.value = error.message || t('words.wordList.states.loadItemsFailed')
+  }
+}, { immediate: true })
 
 watch([() => buildVocabularyQueryKey(buildDraftVocabularyQueryParams()), isVocabularyFilterOpen], () => {
   clearTimeout(vocabularyQueryTimer)

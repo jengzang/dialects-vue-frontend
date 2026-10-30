@@ -33,7 +33,7 @@ vi.mock('@/api', () => ({
   searchNotes: mocks.notes,
 }))
 vi.mock('@/main/components/TableAndTree/UniversalTable.vue', () => ({
-  default: { setup() { mocks.tableMount(); return () => h('div', 'table') } },
+  default: { props: ['defaultFilter'], setup(props) { mocks.tableMount(props.defaultFilter); return () => h('div', { class: 'test-table' }, 'table') } },
 }))
 vi.mock('@/main/components/map/VocabularyMap.vue', () => ({ default: { render: () => null } }))
 vi.mock('@/main/components/geo/popups/LocationDetailPopup.vue', () => ({ default: { render: () => null } }))
@@ -92,6 +92,7 @@ async function mount(query = {}) {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mocks.locations.mockReset().mockResolvedValue([{ value: '测试地点', label: '测试地点', province: '广东', city: '广州' }])
   localStorage.clear()
   sessionStorage.clear()
   vi.stubGlobal('matchMedia', () => ({ matches: false }))
@@ -103,6 +104,85 @@ beforeEach(() => {
 afterEach(() => { app?.unmount(); host?.remove(); vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.useRealTimers() })
 
 describe('vocabulary configuration entrance', () => {
+  async function submitTable() {
+    host.querySelector('.submit').click()
+    entrance.$.exposed.progress.value = 1
+    await settle()
+    await settle()
+  }
+
+  it('passes selected location names to the table and clears them when selecting all', async () => {
+    await mount({ tab: 'table' })
+    emitControl('update:selectedLocations', ['测试地点']); await settle()
+    await submitTable()
+    expect(mocks.tableMount).toHaveBeenLastCalledWith({ location_name: ['测试地点'] })
+    emitControl('update:selectedLocations', []); await settle()
+    await submitTable()
+    expect(mocks.tableMount).toHaveBeenLastCalledWith({})
+  })
+
+  it.each(['administrative', 'yindian', 'map'])('resolves %s filters into concrete table location names', async mode => {
+    await mount({ tab: 'table' })
+    emitControl('update:filterMode', mode); await settle()
+    if (mode === 'administrative') {
+      emitControl('update:selectedProvince', '广东'); await settle()
+      emitControl('update:selectedCity', '广州'); await settle()
+    } else {
+      emitControl('update:selectedRegions', ['甲-乙']); await settle()
+    }
+    const expectedScope = mode === 'administrative'
+      ? { province: '广东', city: '广州' }
+      : { region_mode: mode, regions: ['甲-乙'] }
+    mocks.locations.mockClear()
+    await submitTable()
+    expect(mocks.locations).toHaveBeenCalledWith(expectedScope)
+    expect(mocks.tableMount).toHaveBeenLastCalledWith({ location_name: ['测试地点'] })
+  })
+
+  it('does not mount an unfiltered table while resolving, after an empty scope, or after a resolution failure', async () => {
+    await mount({ tab: 'table' })
+    emitControl('update:filterMode', 'yindian'); await settle()
+    emitControl('update:selectedRegions', ['甲-乙']); await settle()
+    let finish
+    mocks.locations.mockImplementation(() => new Promise(resolve => { finish = resolve }))
+    await submitTable()
+    expect(mocks.tableMount).not.toHaveBeenCalled()
+    finish([]); await settle(); await settle()
+    expect(mocks.tableMount).not.toHaveBeenCalled()
+    mocks.locations.mockRejectedValue(new Error('scope unavailable'))
+    emitControl('update:selectedRegions', ['丙-丁']); await settle()
+    await submitTable()
+    expect(mocks.tableMount).not.toHaveBeenCalled()
+  })
+
+  it('ignores old location resolutions when the applied table scope changes', async () => {
+    await mount({ tab: 'table' })
+    emitControl('update:filterMode', 'map'); await settle()
+    emitControl('update:selectedRegions', ['甲-乙']); await settle()
+    const pending = []
+    mocks.locations.mockImplementation(params => new Promise(resolve => { pending.push({ params, resolve }) }))
+    await submitTable()
+    emitControl('update:selectedRegions', ['丙-丁']); await settle()
+    await submitTable()
+    pending.filter(item => item.params.regions?.[0] === '丙-丁').forEach(item => item.resolve([{ value: '新地点' }]))
+    await settle(); await settle()
+    expect(mocks.tableMount).toHaveBeenLastCalledWith({ location_name: ['新地点'] })
+    pending.filter(item => item.params.regions?.[0] === '甲-乙').forEach(item => item.resolve([{ value: '旧地点' }]))
+    await settle(); await settle()
+    expect(mocks.tableMount).toHaveBeenLastCalledWith({ location_name: ['新地点'] })
+  })
+
+  it('uses the applied scope when switching from cards to table with a selector still open', async () => {
+    await mount({ tab: 'card' })
+    emitControl('update:selectedLocations', ['测试地点']); await settle()
+    host.querySelector('.submit').click(); await settle()
+    entrance.$.exposed.progress.value = 1; await settle()
+    emitControl('filterOpenChange', true)
+    emitControl('update:selectedLocations', ['未提交地点'])
+    emitControl('update:viewMode', 'table'); await settle()
+    expect(mocks.tableMount).toHaveBeenLastCalledWith({ location_name: ['测试地点'] })
+  })
+
   it('defaults vocabulary search fields to definition and headword only', async () => {
     await mount()
 
