@@ -132,7 +132,7 @@
       "description": "字表检查、合并，粤拼转换，在线praat工具，GIS绘图工具等入口。"
     },
     "menuVocabularyView": {
-      "title": "词表查询",
+      "title": "方言词表查询",
       "description": "在线查询全国各地方言词汇，比较同一词语在不同地区的方言说法、IPA和词义解释等。支持按书面语标准词、方言词、音标或释义搜索，并通过卡片、地图和表格三种模式浏览方言词表。"
     },
     "menuVocabularyImport": {

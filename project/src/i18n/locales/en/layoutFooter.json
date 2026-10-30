@@ -132,7 +132,7 @@
       "description": "Entries for character-table checking and merging, Jyutping conversion, the online Praat tool, GIS drawing tools, and more."
     },
     "menuVocabularyView": {
-      "title": "Vocabulary Browser",
+      "title": "Dialect Vocabulary Search",
       "description": "Look up dialect vocabulary across China online and compare local expressions, IPA pronunciations, and meanings for the same word across regions. Search standard written words, dialect words, transcriptions, or meanings, and browse vocabulary in card, map, and table views."
     },
     "menuVocabularyImport": {

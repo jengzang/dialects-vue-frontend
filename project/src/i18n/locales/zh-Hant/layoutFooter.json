@@ -132,7 +132,7 @@
       "description": "字表檢查、合併，粵拼轉換，在線praat工具，GIS繪圖工具等入口。"
     },
     "menuVocabularyView": {
-      "title": "詞表瀏覽",
+      "title": "方言詞表查詢",
       "description": "線上查詢全國各地方言詞彙，比較同一詞語在不同地區的方言說法、IPA和詞義解釋等。支援按書面語標準詞、方言詞、音標或釋義搜尋，並透過卡片、地圖和表格三種模式瀏覽方言詞表。"
     },
     "menuVocabularyImport": {

@@ -398,9 +398,9 @@ const SEO_CONFIG = {
     },
     '/menu/vocabulary/view': {
       title: {
-        'zh-Hant': { main: '詞表瀏覽', subtitle: '線上查詢比較各地方言詞彙與說法' },
-        'zh-CN': { main: '词表浏览', subtitle: '在线查询比较各地方言词汇与说法' },
-        en: { main: 'Vocabulary Browser', subtitle: 'Look up and compare regional dialect vocabulary' },
+        'zh-Hant': { main: '方言詞表查詢', subtitle: '查詢比較各地方言詞彙與俗語，支持地圖、卡片、表格多種呈現方式' },
+        'zh-CN': { main: '方言词表查询', subtitle: '查询比较各地方言词汇与俗语，支持地图、卡片、表格多种呈现方式' },
+        en: { main: 'Dialect Vocabulary Search', subtitle: 'Search and compare regional dialect vocabulary and sayings in map, card, and table views' },
       },
       description: {
         'zh-Hant': '線上查詢全國各地方言詞彙，比較同一詞語在不同地區的方言說法、IPA和詞義解釋等。支援按書面語標準詞、方言詞、音標或釋義搜尋，並透過卡片、地圖和表格三種模式瀏覽方言詞表。',
