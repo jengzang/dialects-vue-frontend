@@ -13,7 +13,9 @@ const importers = [{
     return url.startsWith('@/') ? pathToFileURL(resolve(projectRoot, 'src', url.slice(2))) : null
   },
 }]
+const baseFile = resolve(projectRoot, 'src/styles/global/_base.scss')
 const globalCss = compileString(readFileSync(resolve(projectRoot, 'src/styles/global/_tokens.scss'), 'utf8')).css
+  + compileString(readFileSync(baseFile, 'utf8'), { url: pathToFileURL(baseFile), importers }).css
 const tab = { fontSize: 1.2, mobileFontSize: 0.9 }
 const bars = ['NavBar', 'ExploreBar', 'CommonBar'].map(name => {
   const file = resolve(projectRoot, `src/components/bar/${name}.vue`)
@@ -36,6 +38,8 @@ const browser = await chromium.launch({
 
 try {
   const page = await browser.newPage()
+  await page.setContent(`<style>html { font-size: 20px; }</style><style>${globalCss}</style>`)
+  assert.equal(await page.locator('html').evaluate(element => getComputedStyle(element).fontSize), '16px', 'Shared base styles must explicitly set the root font to 16px')
   // Check both sides of all six breakpoints, including actual rem spacing.
   const widthCases = [
     [299, 1], [300, 0.92], [559, 0.92], [560, 0.94],
@@ -54,7 +58,7 @@ try {
         return { font: parseFloat(style.fontSize), padding: style.paddingTop, margin: style.marginTop }
       }),
     }), fontSizes)
-    assert.equal(measured.root, '16px', `${width}px: root font must retain the browser default`)
+    assert.equal(measured.root, '16px', `${width}px: root font must remain explicitly set to 16px`)
     measured.sizes.forEach((actual, index) => {
       const baseSize = fontSizes[index] === 12 ? 11 : fontSizes[index]
       const expected = Math.max(10, baseSize * scale)
