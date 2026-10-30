@@ -674,7 +674,7 @@ $glass-blur: 8px;
 .char {
   margin-top: 15px;
   margin-bottom: 1px;
-  font-size: var(--font-size-32);
+  font-size: var(--font-size-28);
   font-weight: bold;
   text-align: center;
   scroll-margin-top: 12px;

@@ -853,7 +853,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
 
 .title {
   margin: 0 0 8px;
-  font-size: var(--font-size-32);
+  font-size: var(--font-size-28);
   font-weight: 600;
   color: $color-text;
 }

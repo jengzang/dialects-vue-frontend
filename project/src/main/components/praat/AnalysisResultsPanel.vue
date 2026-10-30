@@ -871,7 +871,7 @@ $transition-normal: 0.3s;
 }
 
 .quality-value {
-  font-size: var(--font-size-32);
+  font-size: var(--font-size-28);
   font-weight: 700;
   transition: color $transition-normal ease;
 

@@ -957,7 +957,7 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
     }
 
     .label--tiny {
-      font-size: max(var(--font-size-12), 0.65em) !important;
+      font-size: max(0.625rem, 0.65em) !important;
       max-width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;

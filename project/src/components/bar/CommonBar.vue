@@ -872,7 +872,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   align-items: center;
   height: 7dvh;
   color: var(--text-primary);
-  font-size: var(--font-size-32);
+  font-size: var(--font-size-28);
   font-weight: 600;
   white-space: nowrap;
   font-family: 'STKaiti', 'KaiTi', 'Kaiti SC', '楷体', 'Songti SC', 'Noto Serif SC', 'STSong', 'SimSun', 'PingFang SC', 'Microsoft YaHei', serif;
@@ -999,7 +999,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
       }
 
       .label--tiny {
-        font-size: max(var(--font-size-12), 0.65em) !important;
+        font-size: max(0.625rem, 0.65em) !important;
         max-width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;

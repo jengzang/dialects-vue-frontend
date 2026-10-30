@@ -820,7 +820,7 @@ $warning: var(--color-warning);
 .page-title {
   margin: 12px;
   color: $primary;
-  font-size: var(--font-size-32);
+  font-size: var(--font-size-28);
 }
 
 .top-metrics-cards {
@@ -919,7 +919,7 @@ $warning: var(--color-warning);
   }
 
   &-value {
-    font-size: var(--font-size-32);
+    font-size: var(--font-size-28);
     font-weight: 600;
     color: $text-primary;
   }
@@ -1383,7 +1383,7 @@ $warning: var(--color-warning);
     }
 
     &-rank {
-      font-size: var(--font-size-32);
+      font-size: var(--font-size-28);
     }
 
     &-value {

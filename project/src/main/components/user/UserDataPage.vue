@@ -831,7 +831,7 @@ $user-accent: var(--color-primary);
     gap: 10px;
     margin: 0;
     color: $user-text;
-    font-size: clamp(var(--font-size-20), 2.4vw, var(--font-size-32));
+    font-size: clamp(var(--font-size-20), 2.4vw, var(--font-size-28));
     font-weight: 800;
     letter-spacing: -0.04em;
   }

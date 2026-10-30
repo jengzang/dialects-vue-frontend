@@ -1566,7 +1566,7 @@ watch(getCurrentWorkbenchSignature, () => {
 .draw-card {
   &-icon {
     flex-shrink: 0;
-    font-size: var(--font-size-32);
+    font-size: var(--font-size-28);
   }
 
   &-text {

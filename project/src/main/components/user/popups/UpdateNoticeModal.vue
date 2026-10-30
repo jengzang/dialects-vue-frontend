@@ -250,7 +250,7 @@ $transition-button: 0.25s;
     margin: 0;
     color: $primary;
     white-space: nowrap;
-    font-size: var(--font-size-32);
+    font-size: var(--font-size-28);
     font-weight: 700;
   }
 

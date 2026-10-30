@@ -548,7 +548,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
   width: 80px;
   height: 80px;
-  font-size: var(--font-size-32);
+  font-size: var(--font-size-28);
   font-weight: 700;
   border: 2.5px solid $white;
   transition: all $transition-slow $smooth-easing;

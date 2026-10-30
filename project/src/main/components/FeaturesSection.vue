@@ -800,7 +800,7 @@ $text-primary: var(--text-primary);
 .section-title {
   margin: 0.5rem;
   text-align: center;
-  font-size: clamp(var(--font-size-32), 4vw, var(--font-size-48));
+  font-size: clamp(var(--font-size-28), 4vw, var(--font-size-48));
   font-weight: 700;
   color: $primary;
 }

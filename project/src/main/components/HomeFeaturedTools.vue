@@ -239,7 +239,7 @@ $text-primary: var(--text-primary);
   &-title {
     margin-bottom: 0.5rem;
     text-align: center;
-    font-size: clamp(var(--font-size-32), 4vw, var(--font-size-48));
+    font-size: clamp(var(--font-size-28), 4vw, var(--font-size-48));
     font-weight: 700;
     color: $primary;
   }
@@ -470,7 +470,7 @@ $text-primary: var(--text-primary);
 
     h3 {
       margin: 8px 0 4px;
-      font-size: var(--font-size-32);
+      font-size: var(--font-size-28);
       font-weight: 700;
       line-height: 1.25;
       color: $text-primary;

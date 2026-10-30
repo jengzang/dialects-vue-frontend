@@ -1104,7 +1104,7 @@ $transition-normal: 0.3s;
   margin: 0 0 1rem;
   color: $text-primary;
   text-align: center;
-  font-size: var(--font-size-32);
+  font-size: var(--font-size-28);
   font-weight: 700;
 }
 

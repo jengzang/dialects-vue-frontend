@@ -443,7 +443,7 @@ onMounted(() => {
 }
 
 .stat-value {
-  font-size: var(--font-size-32);
+  font-size: var(--font-size-28);
   font-weight: 700;
   color: var(--color-primary);
   margin-bottom: 5px;
@@ -685,7 +685,7 @@ onMounted(() => {
   }
 
   .feature-icon {
-    font-size: var(--font-size-32);
+    font-size: var(--font-size-28);
   }
 
   .feature-title {

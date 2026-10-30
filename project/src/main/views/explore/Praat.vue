@@ -1281,7 +1281,7 @@ onBeforeUnmount(() => {
   }
 
   .page-title {
-    font-size: var(--font-size-32);
+    font-size: var(--font-size-28);
     margin:0;
   }
 

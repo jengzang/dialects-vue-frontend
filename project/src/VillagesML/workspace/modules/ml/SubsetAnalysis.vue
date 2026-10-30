@@ -1187,7 +1187,7 @@ const handleApiError = (error) => {
 }
 
 .page-header h2 {
-  font-size: var(--font-size-32);
+  font-size: var(--font-size-28);
   color: var(--text-primary);
   margin-bottom: 10px;
   font-weight: 600;
@@ -1381,7 +1381,7 @@ const handleApiError = (error) => {
 }
 
 .vs-divider {
-  font-size: var(--font-size-32);
+  font-size: var(--font-size-28);
   font-weight: 700;
   color: var(--vml-blue);
   text-shadow: 0 2px 8px rgba(var(--vml-blue-rgb), 0.3);
@@ -1427,7 +1427,7 @@ const handleApiError = (error) => {
 }
 
 .metric-value {
-  font-size: var(--font-size-32);
+  font-size: var(--font-size-28);
   font-weight: 700;
   color: var(--vml-blue);
   text-shadow: 0 2px 8px rgba(var(--vml-blue-rgb), 0.2);

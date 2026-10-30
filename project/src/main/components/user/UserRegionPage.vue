@@ -582,7 +582,7 @@ $region-accent: var(--color-primary);
   .page-title {
     margin: 0;
     color: $region-text;
-    font-size: clamp(var(--font-size-20), 2.3vw, var(--font-size-32));
+    font-size: clamp(var(--font-size-20), 2.3vw, var(--font-size-28));
   }
 
   .title-icon {

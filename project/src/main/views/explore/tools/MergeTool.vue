@@ -1032,7 +1032,7 @@ $color-danger: var(--color-error-light);
 
 .title {
   margin: 0;
-  font-size: var(--font-size-32);
+  font-size: var(--font-size-28);
   font-weight: 600;
   color: $color-text;
 }
@@ -1507,7 +1507,7 @@ $color-danger: var(--color-error-light);
   }
 
   &-number {
-    font-size: var(--font-size-32);
+    font-size: var(--font-size-28);
     font-weight: 700;
     color: $color-text;
   }

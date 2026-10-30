@@ -391,7 +391,7 @@ $text-muted: var(--text-tertiary);
 .page-title {
   margin-top: 0;
   margin-bottom: 1.5rem;
-  font-size: var(--font-size-32);
+  font-size: var(--font-size-28);
   color: $text-primary;
 }
 

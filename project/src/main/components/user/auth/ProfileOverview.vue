@@ -227,7 +227,7 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
   }
 
   @media (max-aspect-ratio: 1/1) {
-    font-size: var(--font-size-32) !important;
+    font-size: var(--font-size-28) !important;
   }
 }
 

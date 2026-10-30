@@ -260,7 +260,7 @@ function parseLocalizedParts(content) {
   width: 100%;
   margin-top: 1rem;
   margin-bottom: 0.5rem;
-  font-size: var(--font-size-32);
+  font-size: var(--font-size-28);
   font-weight: bold;
 }
 

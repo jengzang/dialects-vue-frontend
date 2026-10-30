@@ -676,7 +676,7 @@ onBeforeUnmount(() => {
   }
 
   h2 {
-    font-size: var(--font-size-32);
+    font-size: var(--font-size-28);
     text-wrap: balance;
   }
 

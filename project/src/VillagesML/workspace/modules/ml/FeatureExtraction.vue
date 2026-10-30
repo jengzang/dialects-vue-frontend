@@ -1079,7 +1079,7 @@ onBeforeUnmount(() => {
 }
 
 .page-header h2 {
-  font-size: var(--font-size-32);
+  font-size: var(--font-size-28);
   color: var(--text-primary);
   margin-bottom: 10px;
 }

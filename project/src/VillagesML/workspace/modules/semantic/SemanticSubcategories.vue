@@ -630,7 +630,7 @@ export default {
 }
 
 .page-title {
-  font-size: var(--font-size-32);
+  font-size: var(--font-size-28);
   font-weight: 600;
   margin-bottom: 24px;
   color: var(--text-primary);

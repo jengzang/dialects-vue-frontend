@@ -36,6 +36,36 @@ const browser = await chromium.launch({
 
 try {
   const page = await browser.newPage()
+  // Check both sides of all six breakpoints, including actual rem spacing.
+  const widthCases = [
+    [299, 1], [300, 0.92], [559, 0.92], [560, 0.94],
+    [767, 0.94], [768, 0.96], [1023, 0.96], [1024, 0.98],
+    [1279, 0.98], [1280, 1], [1535, 1], [1536, 1.04], [3840, 1.04],
+  ]
+  const fontSizes = [12, 14, 16, 18, 20, 24, 28, 32, 48]
+  for (const [width, scale] of widthCases) {
+    await page.setViewportSize({ width, height: Math.max(100, Math.floor(width / 2)) })
+    await page.setContent(`<style>${globalCss}</style>${fontSizes.map(size =>
+      `<span id="size-${size}" style="font-size:var(--font-size-${size});padding:1rem;margin:1rem">文字</span>`).join('')}`)
+    const measured = await page.evaluate(sizes => ({
+      root: getComputedStyle(document.documentElement).fontSize,
+      sizes: sizes.map(size => {
+        const style = getComputedStyle(document.getElementById(`size-${size}`))
+        return { font: parseFloat(style.fontSize), padding: style.paddingTop, margin: style.marginTop }
+      }),
+    }), fontSizes)
+    assert.equal(measured.root, '16px', `${width}px: root font must retain the browser default`)
+    measured.sizes.forEach((actual, index) => {
+      const expected = Math.max(10, fontSizes[index] * scale)
+      assert.ok(Math.abs(actual.font - expected) < 0.02, `${width}px: font ${fontSizes[index]} expected ${expected}, received ${actual.font}`)
+      assert.equal(actual.padding, '16px', `${width}px: rem padding changed`)
+      assert.equal(actual.margin, '16px', `${width}px: rem margin changed`)
+    })
+    await page.setViewportSize({ width, height: width * 2 })
+    const portraitFont = await page.locator('#size-16').evaluate(element => parseFloat(getComputedStyle(element).fontSize))
+    assert.ok(Math.abs(portraitFont - 16 * scale) < 0.02, `${width}px: orientation added an unwanted font multiplier`)
+  }
+  console.log('Six font breakpoints: boundaries, nine sizes, orientation independence and unchanged root/rem spacing verified')
   for (const bar of bars) {
     const prefix = bar.name === 'NavBar' ? 'navbar' : bar.name === 'ExploreBar' ? 'explorebar' : 'commonbar'
     const item = bar.name === 'NavBar' ? 'menu-item' : 'tab-item'
@@ -65,15 +95,15 @@ try {
     const large = await measure(3840, 2160)
     assert.ok(Math.abs(normal['desktop-label'] - 17.28) < 0.02, `${bar.name}: ordinary desktop size changed`)
     assert.ok(large['desktop-label'] > normal['desktop-label'], `${bar.name}: large-screen font did not grow`)
-    assert.ok(large['desktop-label'] <= 21.61, `${bar.name}: large-screen font exceeded its cap`)
+    assert.ok(Math.abs(large['desktop-label'] - 22.464) < 0.02, `${bar.name}: 2xl font scale incorrect`)
     await page.locator(`.${inner}`).evaluate(element => element.classList.add('active'))
     const activeSize = await page.locator('#desktop-label').evaluate(element => parseFloat(getComputedStyle(element).fontSize))
-    assert.ok(Math.abs(activeSize - 26.4) < 0.02, `${bar.name}: active font multiplier changed`)
+    assert.ok(Math.abs(activeSize - 27.456) < 0.02, `${bar.name}: active font multiplier changed`)
     for (const viewport of [[390, 844], [768, 1024], [1440, 2560]]) {
       const mobile = await measure(...viewport)
-      assert.ok(mobile['mobile-label'] >= 12, `${bar.name}: stacked label below 12px at ${viewport}`)
+      assert.ok(mobile['mobile-label'] >= 10, `${bar.name}: stacked label below 10px at ${viewport}`)
       if (bar.name === 'CommonBar' && viewport[0] === 390) {
-        assert.ok(Math.abs(mobile['mobile-icon'] - 17.28) < 0.02, 'CommonBar: mobile icon multiplier changed')
+        assert.ok(Math.abs(mobile['mobile-icon'] - 15.8976) < 0.02, 'CommonBar: mobile icon multiplier changed')
       }
     }
     if (bar.name === 'CommonBar') {

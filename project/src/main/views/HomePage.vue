@@ -885,7 +885,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-title {
     margin-bottom: 0;
-    font-size: clamp(var(--font-size-20), 3vw, var(--font-size-32));
+    font-size: clamp(var(--font-size-20), 3vw, var(--font-size-28));
     font-weight: 600;
     letter-spacing: 0.05em;
     color: var(--color-primary);
@@ -1082,7 +1082,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
 .platform-title {
   margin: 1.25rem 0 0;
-  font-size: clamp(var(--font-size-32), 4vw, var(--font-size-48));
+  font-size: clamp(var(--font-size-28), 4vw, var(--font-size-48));
   font-weight: 700;
   line-height: 1.2;
   color: $text-primary;
@@ -1132,7 +1132,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &-title {
     margin-bottom: 0.5rem;
     text-align: center;
-    font-size: clamp(var(--font-size-32), 4vw, var(--font-size-48));
+    font-size: clamp(var(--font-size-28), 4vw, var(--font-size-48));
     font-weight: 700;
     color: $primary;
   }
@@ -1552,11 +1552,11 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 .home-history-title {
   padding-top: clamp(1rem, 3vw, 2rem);
   color: var(--color-primary);
-  font-size: clamp(var(--font-size-32), 4vw, var(--font-size-48));
+  font-size: clamp(var(--font-size-28), 4vw, var(--font-size-48));
   font-weight: 700;
 
   @media (max-aspect-ratio: 1 / 1) {
-    font-size: var(--font-size-32);
+    font-size: var(--font-size-28);
   }
 }
 
@@ -1668,7 +1668,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &-title {
     margin-bottom: 0.5rem;
     text-align: center;
-    font-size: var(--font-size-32);
+    font-size: var(--font-size-28);
     font-weight: 700;
     color: $primary;
   }

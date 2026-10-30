@@ -490,7 +490,7 @@ onBeforeUnmount(() => {
 }
 
 .stat-value {
-  font-size: var(--font-size-32);
+  font-size: var(--font-size-28);
   font-weight: 700;
   color: var(--color-primary);
 }

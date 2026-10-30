@@ -496,7 +496,7 @@ onMounted(() => {
 }
 
 .page-header h2 {
-  font-size: var(--font-size-32);
+  font-size: var(--font-size-28);
   color: var(--text-primary);
   margin-bottom: 10px;
 }
@@ -565,7 +565,7 @@ onMounted(() => {
 }
 
 .level-rate {
-  font-size: var(--font-size-32);
+  font-size: var(--font-size-28);
   font-weight: 700;
   color: var(--color-primary);
   margin-bottom: 12px;
@@ -773,7 +773,7 @@ onMounted(() => {
 }
 
 .dual-number {
-  font-size: var(--font-size-32);
+  font-size: var(--font-size-28);
   font-weight: 700;
   color: var(--color-primary);
 }

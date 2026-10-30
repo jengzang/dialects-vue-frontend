@@ -3313,7 +3313,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 }
 
 .title {
-  font-size: var(--font-size-32);
+  font-size: var(--font-size-28);
   font-weight: 600;
   color: $text-main;
   margin: 0 0 8px 0;
