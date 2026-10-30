@@ -27,7 +27,7 @@
             :aria-label="$t('home.features.sectionTitle')"
           >
             <RouterLink
-              class="hero-entry"
+              class="hero-entry login-btn primary"
               :to="localeTo('/menu/query/zhonggu')"
             >
               <BarIcon
@@ -53,7 +53,7 @@
               </svg>
             </RouterLink>
             <RouterLink
-              class="hero-entry"
+              class="hero-entry login-btn primary"
               :to="localeTo('/menu/vocabulary/view')"
             >
               <BarIcon
@@ -79,7 +79,7 @@
               </svg>
             </RouterLink>
             <RouterLink
-              class="hero-entry"
+              class="hero-entry login-btn primary"
               :to="localeTo('/menu/pho/matrix')"
             >
               <BarIcon
@@ -105,7 +105,7 @@
               </svg>
             </RouterLink>
             <RouterLink
-              class="hero-entry"
+              class="hero-entry login-btn primary"
               :to="localeTo('/explore/tools/praat')"
             >
               <BarIcon
@@ -133,7 +133,7 @@
           </nav>
           <img :src="heroDecorationSrc" :alt="$t('home.hero.decorationAlt')" class="hero-decoration" />
           <button
-            class="hero-features-link"
+            class="hero-features-link login-btn secondary"
             type="button"
             @click="scrollToFeatures"
           >
@@ -909,23 +909,10 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   }
 
   &-actions {
-    background: linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--bg-blue-tint) 94%, transparent),
-      color-mix(in srgb, var(--bg-blue-light) 92%, transparent)
-    );
-    border: 1px solid rgba(var(--color-primary-rgb), 0.36);
-    box-shadow: inset 0 1px 0 var(--glass-70), var(--shadow-glass);
-    @include glass-blur(12px, 160%);
-  }
-
-  &-actions {
     display: inline-grid;
     grid-template-columns: repeat(2, max-content);
     justify-self: center;
-    gap: 1px;
-    padding: 4px;
-    border-radius: var(--radius-lg);
+    gap: 0.5rem;
   }
 
   &-bottom-row {
@@ -936,40 +923,23 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   }
 
   &-entry {
-    box-sizing: border-box;
-    @include flex-center;
-    gap: 0.625rem;
-    min-width: 0;
-    min-height: 48px;
-    padding: 0.625rem 0.875rem;
-    color: var(--text-deep);
-    font-size: 1rem;
-    font-weight: 600;
-    line-height: 1.25;
-    text-decoration: none;
-    transition: background 0.2s ease, color 0.2s ease;
-
-    &:nth-child(-n + 2) {
-      border-bottom: 1px solid var(--color-primary-border);
-    }
-
-    &:nth-child(odd) {
-      border-right: 1px solid var(--color-primary-border);
-    }
-
-    &:hover {
-      color: var(--color-primary-hover);
-      background: var(--color-primary-light3);
+    &.login-btn {
+      box-sizing: border-box;
+      gap: 0.625rem;
+      min-width: 0;
+      min-height: 48px;
+      padding: 0.625rem 0.875rem;
+      font-size: 1rem;
+      line-height: 1.25;
     }
 
     &:focus-visible {
       outline: 2px solid var(--color-primary);
-      outline-offset: -2px;
+      outline-offset: 2px;
     }
 
     &-icon {
       flex-shrink: 0;
-      color: var(--color-primary-hover);
       font-size: 1.25rem;
     }
 
@@ -981,33 +951,19 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     }
   }
 
-  &-features-link {
+  &-features-link.login-btn {
     grid-column: 1;
     justify-self: center;
-    display: inline-flex;
-    align-items: center;
     gap: 0.375rem;
     min-height: 44px;
     padding: 0.5rem 0.875rem;
-    background: transparent;
-    border: 1px solid var(--color-primary-border2);
-    border-radius: var(--radius-md);
-    color: var(--color-primary);
     font: inherit;
     font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s ease, color 0.2s ease;
-
-    &:hover {
-      color: var(--color-primary-hover);
-      background: var(--color-primary-light);
-    }
+    font-weight: 600;
 
     &:focus-visible {
       outline: 2px solid var(--color-primary);
       outline-offset: 2px;
-      border-radius: var(--radius-sm);
     }
   }
 
@@ -1024,16 +980,16 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     grid-column: 1 / -1;
   }
 
-  .hero-entry {
+  .hero-entry.login-btn {
     gap: 0.25rem;
     padding: 0.625rem 0.25rem;
     font-size: clamp(0.6875rem, 3.5vw, 0.875rem);
 
-    &-icon {
+    .hero-entry-icon {
       font-size: 1rem;
     }
 
-    &-arrow {
+    .hero-entry-arrow {
       width: 0.625rem;
       height: 0.625rem;
     }
