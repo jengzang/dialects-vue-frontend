@@ -1150,6 +1150,11 @@
   color: var(--color-warning, var(--color-primary));
 }
 
+.backend-preview-mapping-notices {
+  display: grid;
+  gap: 4px;
+}
+
 .backend-preview-overwrite {
   display: inline-flex;
   align-items: center;

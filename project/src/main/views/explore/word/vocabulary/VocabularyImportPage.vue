@@ -181,6 +181,23 @@
           <div class="backend-preview-meta">
             <span>{{ t('words.wordList.upload.previewParserMode') }}：{{ backendPreview.parser_mode || uploadParserMode }}</span>
           </div>
+          <div
+            v-if="unmatchedVocabularyColumnLabels.length || missingDialectOrIpaRowNumbers"
+            class="backend-preview-mapping-notices"
+          >
+            <p
+              v-if="unmatchedVocabularyColumnLabels.length"
+              class="backend-preview-warning"
+            >
+              {{ t('words.wordList.upload.previewUnmatchedColumns', { columns: unmatchedVocabularyColumnList }) }}
+            </p>
+            <p
+              v-if="missingDialectOrIpaRowNumbers"
+              class="backend-preview-warning"
+            >
+              {{ t('words.wordList.upload.previewMissingDialectOrIpaRows', { rows: missingDialectOrIpaRowNumbers }) }}
+            </p>
+          </div>
           <p v-if="(backendPreview.would_delete_existing_count ?? 0) > 0" class="backend-preview-warning">
             {{ t('words.wordList.upload.replaceWarning', { count: backendPreview.would_delete_existing_count }) }}
           </p>
@@ -655,6 +672,7 @@ const showLicense = ref(false)
 const backendPreview = ref(null)
 const isOverwriteConfirmed = ref(false)
 const importResult = ref(null)
+const vocabularyImportNotices = ref({ unmatchedFieldKeys: [], missingRowNumbers: [] })
 
 const uploadParserMode = ref('auto')
 const fillStandardFromLocal = ref(false)
@@ -825,6 +843,18 @@ const shouldConfirmOverwrite = computed(() => {
 
 const previewErrors = computed(() => parseErrorDetails(backendPreview.value?.errors))
 const previewSkippedCount = computed(() => (Number(backendPreview.value?.skipped_count) || 0) + previewErrors.value.length)
+const vocabularyOptionalFieldLabelKeys = {
+  local_expression: 'words.wordList.columns.headword',
+  ipa: 'words.wordList.columns.pronunciation',
+  notes: 'words.wordList.columns.detail',
+}
+const unmatchedVocabularyColumnLabels = computed(() => vocabularyImportNotices.value.unmatchedFieldKeys
+  .map((fieldKey) => t(vocabularyOptionalFieldLabelKeys[fieldKey]))
+)
+const unmatchedVocabularyColumnList = computed(() => unmatchedVocabularyColumnLabels.value
+  .join(locale.value.startsWith('en') ? ', ' : '、')
+)
+const missingDialectOrIpaRowNumbers = computed(() => formatRowNumberList(vocabularyImportNotices.value.missingRowNumbers))
 
 const hasImportableRows = computed(() => isPreviewImportable(backendPreview.value))
 
@@ -945,6 +975,7 @@ function clearUploadFile() {
   backendPreview.value = null
   isOverwriteConfirmed.value = false
   importResult.value = null
+  vocabularyImportNotices.value = { unmatchedFieldKeys: [], missingRowNumbers: [] }
   importFlow.clearPreview()
 }
 
@@ -1030,6 +1061,59 @@ function buildMappedVocabularyImportFile(file) {
   })
 }
 
+function buildVocabularyImportNotices() {
+  const mapping = importPreview.mapping.value || {}
+  const previewTable = importPreview.previewTable.value
+  const sourceColumns = previewTable.sourceColumns || []
+  const previewRows = previewTable.previewRows || []
+  const columnIndexForField = (fieldKey) => sourceColumns.find((column) => column.key === mapping[fieldKey])?.index
+  const localExpressionIndex = columnIndexForField('local_expression')
+  const ipaIndex = columnIndexForField('ipa')
+  const rowNumbers = previewTable.previewRowNumbers || []
+  const logicalHeaderRowIndex = previewTable.headerRowIndex ?? importPreview.headerRowIndex.value
+
+  return {
+    unmatchedFieldKeys: ['local_expression', 'ipa', 'notes'].filter((fieldKey) => !mapping[fieldKey]),
+    missingRowNumbers: previewRows.reduce((missingRows, row, rowIndex) => {
+      const localExpression = localExpressionIndex == null ? '' : String(row[localExpressionIndex] ?? '').trim()
+      const ipa = ipaIndex == null ? '' : String(row[ipaIndex] ?? '').trim()
+      if (!localExpression && !ipa) {
+        const fallbackRowNumber = logicalHeaderRowIndex >= 0
+          ? logicalHeaderRowIndex + rowIndex + 2
+          : rowIndex + 1
+        missingRows.push(rowNumbers[rowIndex] ?? fallbackRowNumber)
+      }
+      return missingRows
+    }, [])
+  }
+}
+
+function formatRowNumberList(rowNumbers) {
+  if (!rowNumbers.length) return ''
+
+  const sortedRowNumbers = [...new Set(rowNumbers)]
+    .filter((rowNumber) => Number.isInteger(rowNumber) && rowNumber > 0)
+    .sort((left, right) => left - right)
+  if (!sortedRowNumbers.length) return ''
+
+  const ranges = []
+  let rangeStart = sortedRowNumbers[0]
+  let rangeEnd = rangeStart
+
+  sortedRowNumbers.slice(1).forEach((rowNumber) => {
+    if (rowNumber === rangeEnd + 1) {
+      rangeEnd = rowNumber
+      return
+    }
+    ranges.push(rangeStart === rangeEnd ? `${rangeStart}` : `${rangeStart}–${rangeEnd}`)
+    rangeStart = rowNumber
+    rangeEnd = rowNumber
+  })
+  ranges.push(rangeStart === rangeEnd ? `${rangeStart}` : `${rangeStart}–${rangeEnd}`)
+
+  return ranges.join(locale.value.startsWith('en') ? ', ' : '、')
+}
+
 async function handlePreviewImport(fileOverride = null) {
   const file = fileOverride || uploadFile.value || importFlow.pendingFile.value
 
@@ -1084,6 +1168,7 @@ async function handleConfirmUpload() {
     return
   }
 
+  vocabularyImportNotices.value = buildVocabularyImportNotices()
   const transformedFile = buildMappedVocabularyImportFile(file)
   uploadFile.value = transformedFile
   importFlow.pendingFile.value = null

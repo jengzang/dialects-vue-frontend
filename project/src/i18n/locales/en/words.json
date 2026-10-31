@@ -169,6 +169,8 @@
       "previewDeleteCount": "Will overwrite",
       "previewErrorCount": "Errors",
       "previewErrorsHint": "These rows are missing required fields or are malformed; they will be skipped on import. Fix the source file and upload again if needed.",
+      "previewUnmatchedColumns": "Unmatched columns: {columns}. Their contents will not be imported.",
+      "previewMissingDialectOrIpaRows": "Rows {rows} have neither a dialect word nor IPA under the current mapping and will be skipped.",
       "replaceWarning": "Importing will delete {count} old entries for the target user and location before writing the new entries.",
       "confirmOverwrite": "I confirm this import should replace the existing entries for this location",
       "previewReady": "Preview ready. Confirm to submit the vocabulary.",

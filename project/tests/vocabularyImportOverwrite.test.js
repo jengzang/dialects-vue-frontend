@@ -12,11 +12,12 @@ const mocks = vi.hoisted(() => ({
   showSuccess: vi.fn(),
   showError: vi.fn(),
   showInfo: vi.fn(),
+  locale: { value: 'zh-CN' },
 }))
 vi.mock('@/api', () => mocks)
 vi.mock('@/utils/ui/message.js', () => mocks)
 vi.mock('vue-i18n', () => ({ useI18n: () => ({
-  locale: { value: 'zh-CN' },
+  locale: mocks.locale,
   t: (key, params) => `${key}${params ? JSON.stringify(params) : ''}`,
 }) }))
 vi.mock('vue-router', () => ({ useRoute: () => ({}), useRouter: () => ({ push: vi.fn() }) }))
@@ -45,12 +46,70 @@ async function flush() {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mocks.locale.value = 'zh-CN'
   mocks.getVocabularyCounts.mockResolvedValue({ total: 0, locations: 0 })
   mocks.getVocabularyLocations.mockResolvedValue({ locations: [], total: 0, page: 1, page_size: 200 })
 })
 afterEach(() => { wrapper?.app.unmount(); wrapper?.host.remove() })
 
 describe('vocabulary import feedback', () => {
+  it('shows compact unmatched columns and missing dialect-or-IPA row numbers in the backend preview', async () => {
+    const { state, host } = mountPage()
+    mocks.locale.value = 'en'
+    state.uploadLocation = { location_name: '甲村', coordinates: '113,23' }
+    const csv = [
+      'standard_word,方言词,pronunciation_text,comments_custom',
+      '水,水,,water',
+      '',
+      '饭,,,rice',
+      '',
+      '睡觉,,shuijiao,rest',
+    ].join('\n')
+    const file = new File([csv], 'words.csv')
+    file.text = async () => csv
+    mocks.previewVocabularyImport.mockResolvedValue({ parsed_count: 2, errors: [] })
+
+    await state.importFlow.loadPreview(file)
+    await flush()
+    await state.handleConfirmUpload()
+    await flush()
+
+    const notices = host.querySelector('.backend-preview-mapping-notices')
+    expect(notices).toBeTruthy()
+    expect(notices.textContent).toContain('words.wordList.columns.pronunciation')
+    expect(notices.textContent).toContain('words.wordList.columns.detail')
+    expect(notices.textContent).toContain('"rows":"4, 6"')
+    expect(notices.textContent).toContain('pronunciation, words.wordList.columns.detail')
+    expect(notices.textContent).not.toContain('words.wordList.columns.headword')
+  })
+
+  it('reports an unmapped dialect-word column and checks row validity against the current mapping', async () => {
+    const { state, host } = mountPage()
+    state.uploadLocation = { location_name: '甲村', coordinates: '113,23' }
+    const csv = [
+      'standard_word,dialect_text,ipa,notes',
+      '水,土话,,',
+      '饭,,fan,',
+      '',
+      '睡觉,困觉,,',
+    ].join('\n')
+    const file = new File([csv], 'words.csv')
+    file.text = async () => csv
+    mocks.previewVocabularyImport.mockResolvedValue({ parsed_count: 1, errors: [] })
+
+    await state.importFlow.loadPreview(file)
+    await flush()
+    await state.handleConfirmUpload()
+    await flush()
+
+    const notices = host.querySelector('.backend-preview-mapping-notices')
+    expect(notices).toBeTruthy()
+    expect(notices.textContent).toContain('words.wordList.columns.headword')
+    expect(notices.textContent).toContain('"rows":"2、5"')
+    expect(notices.textContent).not.toContain('words.wordList.columns.pronunciation')
+    expect(notices.textContent).not.toContain('words.wordList.columns.detail')
+  })
+
   it.each(['success', 'empty', 'failure'])('closes the mapping dialog before preview and clears loading after %s', async (outcome) => {
     const { state, host } = mountPage()
     state.uploadLocation = { location_name: '甲村', coordinates: '113,23' }

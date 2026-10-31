@@ -50,15 +50,34 @@ function sanitizeSheetRows(rows) {
     .filter((row) => row.some((cell) => cell !== ''))
 }
 
+function getSheetRowNumbers(sheet, range) {
+  const rowNumbers = new Set()
+
+  // Preserve physical row numbers without expanding blank rows from the worksheet range.
+  Object.keys(sheet).forEach((address) => {
+    if (address.startsWith('!')) return
+
+    const { r, c } = XLSX.utils.decode_cell(address)
+    if (r < range.s.r || r > range.e.r || c < range.s.c || c > range.e.c) return
+    if (normalizeCellValue(sheet[address]?.v) !== '') {
+      rowNumbers.add(r + 1)
+    }
+  })
+
+  return [...rowNumbers].sort((left, right) => left - right)
+}
+
 function parseWorkbook(workbook) {
   return workbook.SheetNames.map((sheetName) => {
     const sheet = workbook.Sheets[sheetName]
+    const range = sheet['!ref'] ? XLSX.utils.decode_range(sheet['!ref']) : XLSX.utils.decode_range('A1')
     const rawRows = XLSX.utils.sheet_to_json(sheet, {
       header: 1,
       blankrows: false,
       defval: ''
     })
     const rows = sanitizeSheetRows(rawRows)
+    const rowNumbers = getSheetRowNumbers(sheet, range)
     const columnCount = inferColumnCount(rows)
     const normalizedRows = rows.map((row) => padRow(row, columnCount))
 
@@ -66,6 +85,7 @@ function parseWorkbook(workbook) {
       id: sheetName,
       name: sheetName,
       rows: normalizedRows,
+      rowNumbers,
       rowCount: normalizedRows.length,
       columnCount
     }
@@ -154,6 +174,7 @@ export function derivePreviewTable(parsedFile, options = {}) {
       activeSheet: null,
       headers: [],
       previewRows: [],
+      previewRowNumbers: [],
       sourceColumns: []
     }
   }
@@ -178,6 +199,13 @@ export function derivePreviewTable(parsedFile, options = {}) {
     ? dataRows.slice(0, Math.max(0, previewRowCount))
     : dataRows
   ).map((row) => padRow(row, headers.length))
+  const rowNumbers = activeSheet.rowNumbers || rows.map((_, index) => index + 1)
+  const dataRowNumbers = hasHeader
+    ? rowNumbers.slice(safeHeaderIndex + 1)
+    : rowNumbers
+  const previewRowNumbers = Number.isFinite(previewRowCount)
+    ? dataRowNumbers.slice(0, Math.max(0, previewRowCount))
+    : dataRowNumbers
   const sourceColumns = headers.map((label, index) => ({
     key: `column_${index + 1}`,
     label,
@@ -189,6 +217,7 @@ export function derivePreviewTable(parsedFile, options = {}) {
     activeSheet,
     headers,
     previewRows,
+    previewRowNumbers,
     sourceColumns,
     headerRowIndex: safeHeaderIndex
   }
