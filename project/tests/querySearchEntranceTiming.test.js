@@ -99,49 +99,50 @@ describe('query entrance transition timing', () => {
     expect(entrance.progress).toBe(0)
   })
 
-  it('stops scrolling at the boundary and consumes inertia until a fresh gesture', async () => {
+  it('keeps native scrolling free while holding expansion until a fresh gesture', async () => {
     scrollPosition = 1000
     window.dispatchEvent(new Event('scroll'))
     await frame(0)
     await frame(400)
+    window.scrollTo.mockClear()
     scrollPosition = 0
     window.dispatchEvent(new Event('scroll'))
     await frame(410)
-    expect(window.scrollTo).toHaveBeenLastCalledWith({ top: 0, behavior: 'instant' })
+    expect(window.scrollTo).not.toHaveBeenCalled()
 
     for (const time of [450, 500, 550, 600]) {
       await frame(time)
       const event = new WheelEvent('wheel', { deltaY: -100, cancelable: true })
       window.dispatchEvent(event)
       await frame(time)
-      expect(event.defaultPrevented).toBe(true)
+      expect(event.defaultPrevented).toBe(false)
       expect(entrance.progress).toBe(1)
     }
     await frame(650)
     scrollPosition = 20
     window.dispatchEvent(new Event('scroll'))
-    expect(window.scrollTo).toHaveBeenLastCalledWith({ top: 0, behavior: 'instant' })
+    expect(window.scrollTo).not.toHaveBeenCalled()
     scrollPosition = 0
     window.dispatchEvent(new Event('scroll'))
-    await frame(750)
+    await frame(800)
     expect(entrance.progress).toBe(1)
     const fresh = new WheelEvent('wheel', { deltaY: -100, deltaMode: 1, cancelable: true })
     window.dispatchEvent(fresh)
-    await frame(750)
+    await frame(800)
     expect(fresh.defaultPrevented).toBe(false)
-    await frame(950)
+    await frame(1000)
     expect(entrance.progress).toBeCloseTo(0.5)
-    await frame(1150)
+    await frame(1200)
     expect(entrance.progress).toBe(0)
 
     window.scrollTo.mockClear()
     scrollPosition = 1000
     window.dispatchEvent(new Event('scroll'))
-    await frame(1160)
+    await frame(1210)
     expect(window.scrollTo).not.toHaveBeenCalled()
-    await frame(1360)
+    await frame(1410)
     expect(entrance.progress).toBeCloseTo(0.5)
-    await frame(1560)
+    await frame(1610)
     expect(entrance.progress).toBe(1)
   })
 
@@ -183,7 +184,7 @@ describe('query entrance transition timing', () => {
     window.dispatchEvent(new Event('scroll'))
     await frame(410)
     await frame(610)
-    expect(touch('touchmove', 150).defaultPrevented).toBe(true)
+    expect(touch('touchmove', 150).defaultPrevented).toBe(false)
     await frame(610)
     expect(entrance.progress).toBe(1)
     await frame(611)
@@ -194,7 +195,32 @@ describe('query entrance transition timing', () => {
     expect(entrance.progress).toBe(0)
   })
 
-  it('blocks held keyboard scrolling and allows a fresh key press', async () => {
+  it('does not pull back non-cancelable touch scrolling or its inertia', async () => {
+    scrollPosition = 1000
+    window.dispatchEvent(new Event('scroll'))
+    await frame(0)
+    await frame(400)
+    window.scrollTo.mockClear()
+    const touch = (type, clientY) => {
+      const event = new Event(type, { cancelable: false })
+      Object.defineProperty(event, 'touches', { value: [{ clientY }] })
+      window.dispatchEvent(event)
+    }
+    touch('touchstart', 100)
+    for (const [time, position, clientY] of [[410, 300, 200], [430, 120, 400], [450, 0, 600]]) {
+      touch('touchmove', clientY)
+      scrollPosition = position
+      window.dispatchEvent(new Event('scroll'))
+      await frame(time)
+      expect(entrance.progress).toBe(1)
+    }
+    window.dispatchEvent(new Event('touchend'))
+    await frame(850)
+    expect(window.scrollTo).not.toHaveBeenCalled()
+    expect(entrance.progress).toBe(1)
+  })
+
+  it('allows held keyboard scrolling but only expands on a fresh key press', async () => {
     scrollPosition = 1000
     window.dispatchEvent(new Event('scroll'))
     await frame(0)
@@ -205,7 +231,9 @@ describe('query entrance transition timing', () => {
     await frame(610)
     const held = new KeyboardEvent('keydown', { key: 'PageUp', repeat: true, cancelable: true })
     window.dispatchEvent(held)
-    expect(held.defaultPrevented).toBe(true)
+    expect(held.defaultPrevented).toBe(false)
+    await frame(610)
+    expect(entrance.progress).toBe(1)
     await frame(611)
     const fresh = new KeyboardEvent('keydown', { key: 'PageUp', cancelable: true })
     window.dispatchEvent(fresh)
@@ -215,7 +243,7 @@ describe('query entrance transition timing', () => {
     expect(entrance.progress).toBe(0)
   })
 
-  it('rearms after five seconds instead of opening on an expired second gesture', async () => {
+  it('accepts a fresh gesture even after a long pause', async () => {
     scrollPosition = 1000
     window.dispatchEvent(new Event('scroll'))
     await frame(0)
@@ -224,21 +252,15 @@ describe('query entrance transition timing', () => {
     window.dispatchEvent(new Event('scroll'))
     await frame(410)
     await frame(5411)
-    const expired = new KeyboardEvent('keydown', { key: 'PageUp', cancelable: true })
-    window.dispatchEvent(expired)
+    const fresh = new KeyboardEvent('keydown', { key: 'PageUp', cancelable: true })
+    window.dispatchEvent(fresh)
     await frame(5411)
-    expect(expired.defaultPrevented).toBe(true)
-    expect(entrance.progress).toBe(1)
-    await frame(5412)
-    const second = new KeyboardEvent('keydown', { key: 'PageUp', cancelable: true })
-    window.dispatchEvent(second)
-    await frame(5412)
-    expect(second.defaultPrevented).toBe(false)
-    await frame(5812)
+    expect(fresh.defaultPrevented).toBe(false)
+    await frame(5811)
     expect(entrance.progress).toBe(0)
   })
 
-  it('rejects decaying wheel inertia but accepts a new impulse without a hold delay', async () => {
+  it('does not mistake a wheel spike for a new gesture before a quiet interval', async () => {
     scrollPosition = 1000
     window.dispatchEvent(new Event('scroll'))
     await frame(0)
@@ -251,7 +273,7 @@ describe('query entrance transition timing', () => {
       const inertia = new WheelEvent('wheel', { deltaY, cancelable: true })
       window.dispatchEvent(inertia)
       await frame(time)
-      expect(inertia.defaultPrevented).toBe(true)
+      expect(inertia.defaultPrevented).toBe(false)
       expect(entrance.progress).toBe(1)
     }
     await frame(441)
@@ -260,6 +282,10 @@ describe('query entrance transition timing', () => {
     await frame(441)
     expect(impulse.defaultPrevented).toBe(false)
     await frame(841)
+    expect(entrance.progress).toBe(1)
+    window.dispatchEvent(new WheelEvent('wheel', { deltaY: -90 }))
+    await frame(841)
+    await frame(1241)
     expect(entrance.progress).toBe(0)
   })
 
@@ -295,9 +321,9 @@ describe('query entrance transition timing', () => {
     scrollPosition = 0
     window.dispatchEvent(new Event('scroll'))
     await frame(16)
-    await frame(116)
+    await frame(216)
     window.dispatchEvent(new WheelEvent('wheel', { deltaY: -100, deltaMode: 1 }))
-    await frame(116)
+    await frame(216)
     expect(frames.size).toBe(1)
     app.unmount()
     app = null

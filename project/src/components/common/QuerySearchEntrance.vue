@@ -44,15 +44,10 @@ let targetProgress = 0
 let autoCollapsing = false
 let lastAnimationTime = 0
 const transitionDuration = 400
-const boundaryWindowDuration = 5000
 const wheelGestureGap = 180
 let transitionUnlocked = false
-let boundaryDirection = 0
-let boundaryExpiresAt = 0
-let boundaryScrollPosition = null
+let waitingForGesture = false
 let lastWheelTime = -Infinity
-let lastWheelDelta = 0
-let wheelDecayCount = 0
 let lastScrollPosition = 0
 let inputDirection = 0
 let touchY = null
@@ -60,8 +55,7 @@ let touchCanReleaseBoundary = false
 const hasSubmittedQuery = ref(false)
 
 function clearBoundary() {
-  boundaryDirection = 0
-  boundaryScrollPosition = null
+  waitingForGesture = false
 }
 
 function animateProgress(time) {
@@ -115,6 +109,8 @@ function updateProgress(fromScroll = false) {
     setTargetProgress(1)
     return
   }
+  // Hold the panel state, never the browser's native scrolling or inertia.
+  if (props.enabled && waitingForGesture) return
   const target = compactPosition()
   const compactHoldDistance = Math.min(80, target / 2)
   const distance = Math.min((introEl.value?.getBoundingClientRect().height || 0) * 3, target - compactHoldDistance)
@@ -126,16 +122,11 @@ function updateProgress(fromScroll = false) {
     if (!fromScroll) return
     const direction = Math.sign(nextProgress - progress.value)
     if (inputDirection && inputDirection !== direction) {
-      boundaryDirection = 0
       return
     }
-    boundaryDirection = direction
-    boundaryExpiresAt = window.performance.now() + boundaryWindowDuration
+    waitingForGesture = true
     lastWheelTime = window.performance.now()
-    wheelDecayCount = 0
-    boundaryScrollPosition = window.scrollY
     touchCanReleaseBoundary = false
-    window.scrollTo({ top: boundaryScrollPosition, behavior: 'instant' })
     return
   }
   setTargetProgress(nextProgress, !props.enabled)
@@ -144,15 +135,8 @@ function updateProgress(fromScroll = false) {
 function handleScroll() {
   const position = window.scrollY
   if (position < lastScrollPosition) autoCollapsing = false
-  if (boundaryScrollPosition !== null) {
-    if (position !== boundaryScrollPosition) {
-      window.scrollTo({ top: boundaryScrollPosition, behavior: 'instant' })
-    }
-    return
-  }
   if (position !== lastScrollPosition) inputDirection = Math.sign(position - lastScrollPosition)
   lastScrollPosition = position
-  if (inputDirection && boundaryDirection !== inputDirection) boundaryDirection = 0
   if (scrollFrame === null) scrollFrame = window.requestAnimationFrame(() => updateProgress(true))
 }
 
@@ -164,37 +148,25 @@ function acceptScrollInput(event, direction, canRelease = true) {
   }
   if (direction < 0) autoCollapsing = false
   inputDirection = direction
-  if (boundaryScrollPosition === null) return true
-  if (direction !== boundaryDirection) {
-    clearBoundary()
-    return true
-  }
-  const now = window.performance.now()
-  if (canRelease && now <= boundaryExpiresAt) {
-    transitionUnlocked = true
+  if (!waitingForGesture) return true
+  if (direction > 0) {
     clearBoundary()
     return true
   }
   if (canRelease) {
-    boundaryExpiresAt = now + boundaryWindowDuration
-    touchCanReleaseBoundary = false
-    window.scrollTo({ top: boundaryScrollPosition, behavior: 'instant' })
+    transitionUnlocked = true
+    clearBoundary()
+    return true
   }
-  if (event.cancelable) event.preventDefault()
   return false
 }
 
 function handleWheel(event) {
   if (!event.deltaY || event.ctrlKey || event.defaultPrevented) return
   const now = window.performance.now()
-  const delta = Math.abs(event.deltaY)
-  // Wheel events have no gesture-start flag. Treat a pause or a new impulse
-  // after a decaying tail as a new gesture; do not delay touch or key input.
-  const newGesture = event.deltaMode !== 0 || now - lastWheelTime >= wheelGestureGap
-    || (wheelDecayCount >= 2 && delta >= Math.max(4, lastWheelDelta * 2))
-  wheelDecayCount = delta < lastWheelDelta ? wheelDecayCount + 1 : 0
+  // Wheel has no gesture-start event; require a quiet interval between bursts.
+  const newGesture = now - lastWheelTime >= wheelGestureGap
   lastWheelTime = now
-  lastWheelDelta = delta
   if (acceptScrollInput(event, Math.sign(event.deltaY), newGesture)) handleScroll()
 }
 
@@ -213,7 +185,7 @@ function handleTouchMove(event) {
 }
 
 function handleKeyDown(event) {
-  if (boundaryScrollPosition === null || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return
+  if (!waitingForGesture || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return
   if (event.target instanceof Element && event.target.closest('input, textarea, select, [contenteditable]')) return
   const direction = { ArrowUp: -1, PageUp: -1, Home: -1, ArrowDown: 1, PageDown: 1, End: 1, ' ': event.shiftKey ? -1 : 1 }[event.key]
   if (direction && acceptScrollInput(event, direction, !event.repeat)) handleScroll()
@@ -243,9 +215,9 @@ watch(() => props.enabled, async () => { await nextTick(); updateProgress() })
 function startListening() {
   lastScrollPosition = window.scrollY
   window.addEventListener('scroll', handleScroll, { passive: true })
-  window.addEventListener('wheel', handleWheel, { passive: false })
+  window.addEventListener('wheel', handleWheel, { passive: true })
   window.addEventListener('touchstart', handleTouchStart, { passive: true })
-  window.addEventListener('touchmove', handleTouchMove, { passive: false })
+  window.addEventListener('touchmove', handleTouchMove, { passive: true })
   window.addEventListener('keydown', handleKeyDown)
   window.addEventListener('resize', handleResize, { passive: true })
   updateProgress()
