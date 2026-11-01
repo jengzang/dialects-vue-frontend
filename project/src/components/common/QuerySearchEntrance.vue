@@ -48,6 +48,8 @@ const wheelGestureGap = 180
 let transitionUnlocked = false
 let waitingForGesture = false
 let lastWheelTime = -Infinity
+let lastWheelDelta = 0
+let wheelDecaying = false
 let lastScrollPosition = 0
 let inputDirection = 0
 let touchY = null
@@ -126,6 +128,7 @@ function updateProgress(fromScroll = false) {
     }
     waitingForGesture = true
     lastWheelTime = window.performance.now()
+    wheelDecaying = false
     touchCanReleaseBoundary = false
     return
   }
@@ -164,9 +167,14 @@ function acceptScrollInput(event, direction, canRelease = true) {
 function handleWheel(event) {
   if (!event.deltaY || event.ctrlKey || event.defaultPrevented) return
   const now = window.performance.now()
-  // Wheel has no gesture-start event; require a quiet interval between bursts.
+  const delta = Math.abs(event.deltaY)
+  // A pause or a renewed impulse after decay can signal a fresh gesture.
+  // This only unlocks the panel; native scrolling is never intercepted.
   const newGesture = now - lastWheelTime >= wheelGestureGap
+    || (wheelDecaying && delta >= Math.max(8, lastWheelDelta * 2))
+  wheelDecaying = delta < lastWheelDelta
   lastWheelTime = now
+  lastWheelDelta = delta
   if (acceptScrollInput(event, Math.sign(event.deltaY), newGesture)) handleScroll()
 }
 

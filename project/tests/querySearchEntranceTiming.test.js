@@ -260,7 +260,7 @@ describe('query entrance transition timing', () => {
     expect(entrance.progress).toBe(0)
   })
 
-  it('does not mistake a wheel spike for a new gesture before a quiet interval', async () => {
+  it('accepts a renewed wheel impulse during a decaying tail without waiting', async () => {
     scrollPosition = 1000
     window.dispatchEvent(new Event('scroll'))
     await frame(0)
@@ -281,12 +281,30 @@ describe('query entrance transition timing', () => {
     window.dispatchEvent(impulse)
     await frame(441)
     expect(impulse.defaultPrevented).toBe(false)
+    await frame(641)
+    expect(entrance.progress).toBeCloseTo(0.5)
     await frame(841)
-    expect(entrance.progress).toBe(1)
-    window.dispatchEvent(new WheelEvent('wheel', { deltaY: -90 }))
-    await frame(841)
-    await frame(1241)
     expect(entrance.progress).toBe(0)
+  })
+
+  it.each([
+    { deltas: [-90, -100, -110] }, // A strong, still accelerating first gesture.
+    { deltas: [-20, -2, -4] }, // Small fluctuations at the end of inertia.
+  ])('keeps compact during a continuous wheel sequence $deltas', async ({ deltas }) => {
+    scrollPosition = 1000
+    window.dispatchEvent(new Event('scroll'))
+    await frame(0)
+    await frame(400)
+    scrollPosition = 0
+    window.dispatchEvent(new Event('scroll'))
+    await frame(410)
+    for (const [index, deltaY] of deltas.entries()) {
+      await frame(420 + index * 10)
+      window.dispatchEvent(new WheelEvent('wheel', { deltaY }))
+      await frame(420 + index * 10)
+    }
+    await frame(840)
+    expect(entrance.progress).toBe(1)
   })
 
   it('keeps nested scrollable content usable while the page is held', async () => {
