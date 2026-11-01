@@ -6,7 +6,7 @@ import {
   createBackgroundMapTransform,
   getBackgroundLayout,
   getSurveyPoints,
-  loadBackgroundGeography,
+  loadBackgroundDots,
   loadBlueBackgroundResources,
   projectBackgroundPoint,
 } from '../src/utils/ui/blueLayoutBackground.js'
@@ -25,16 +25,16 @@ describe('blue layout background geography', () => {
     vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => country })))
     try {
       expect(await loadBlueBackgroundResources()).toBeNull()
-      expect(images).toHaveLength(6)
+      expect(images).toHaveLength(7)
       expect(await loadBlueBackgroundResources()).toBeNull()
-      expect(images).toHaveLength(12)
+      expect(images).toHaveLength(14)
     } finally {
       vi.unstubAllGlobals()
     }
   })
   it('projects north upwards and east to the right, using the same transform for points and boundaries', () => {
     const box = { x: 120, y: 80, width: 750, height: 900 }
-    const transform = createBackgroundMapTransform(country, box)
+    const transform = createBackgroundMapTransform(box)
     const south = transform.point(105, 20)
     const north = transform.point(105, 45)
     expect(north[1]).toBeLessThan(south[1])
@@ -65,7 +65,7 @@ describe('blue layout background geography', () => {
     for (const [width, height] of [[2560,1440],[1440,900],[844,390],[1080,2340],[390,844],[768,1024],[1000,1000]]) {
       const layout = getBackgroundLayout(width, height)
       expect(layout.portrait).toBe(height >= width)
-      const transform = createBackgroundMapTransform(country, layout.map)
+      const transform = createBackgroundMapTransform(layout.map)
       expect(transform.bounds.x).toBeGreaterThanOrEqual(0)
       expect(transform.bounds.x + transform.bounds.width).toBeLessThanOrEqual(width + .001)
       expect(layout.book.y + layout.book.height).toBeGreaterThan(height)
@@ -74,15 +74,11 @@ describe('blue layout background geography', () => {
     }
   })
 
-  it('loads actual project geography and current dots; a failed optional layer does not hide the country', async () => {
-    const fetcher = vi.fn(async url => ({
-      ok: !url.includes('rivers_l3'),
-      json: async () => url.endsWith('dots.json') ? { fields: ['lon', 'lat'], data: [[110, 30]] } : country,
-    }))
-    const data = await loadBackgroundGeography(fetcher)
-    expect(fetcher).toHaveBeenCalledTimes(6)
-    expect(data.country).toEqual(country)
-    expect(data.rivers[2]).toBeNull()
-    expect(getSurveyPoints(data.dots)).toEqual([[110, 30]])
+  it('loads only dots.json at runtime, without requesting geographic boundaries or rivers', async () => {
+    const table = { fields: ['lon', 'lat'], data: [[110, 30]] }
+    const fetcher = vi.fn(async () => ({ ok: true, json: async () => table }))
+    expect(await loadBackgroundDots(fetcher)).toEqual(table)
+    expect(fetcher).toHaveBeenCalledExactlyOnceWith('/data/dots.json', { cache: 'no-cache' })
+    expect(await loadBackgroundDots(async () => ({ ok: false }))).toBeNull()
   })
 })

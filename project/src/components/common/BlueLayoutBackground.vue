@@ -24,7 +24,7 @@ function queueDraw() {
     const { width, height } = canvas.value.getBoundingClientRect()
     if (!width || !height) return
     const style = getComputedStyle(canvas.value)
-    const colors = Object.fromEntries(['country', 'border', 'river', 'province', 'dot'].map(key => [
+    const colors = Object.fromEntries(['dot'].map(key => [
       key, style.getPropertyValue(`--blue-background-${key}`).trim(),
     ]))
     drawBlueLayoutBackground(canvas.value, resources, width, height, colors, window.devicePixelRatio || 1)

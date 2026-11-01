@@ -1,4 +1,6 @@
-// Decorative geography shares one Albers equal-area projection with live survey dots.
+import mapProjection from './blueBackgroundMapProjection.json'
+
+// The baked map and live survey dots share this Albers equal-area projection.
 const RAD = Math.PI / 180
 const N = (Math.sin(25 * RAD) + Math.sin(47 * RAD)) / 2
 const C = Math.cos(25 * RAD) ** 2 + 2 * N * Math.sin(25 * RAD)
@@ -10,31 +12,12 @@ export function projectBackgroundPoint(lon, lat) {
   return [rho * Math.sin(theta), rho * Math.cos(theta)]
 }
 
-function polygonRings(geojson) {
-  return (geojson?.features ?? []).flatMap(({ geometry }) => {
-    if (geometry?.type === 'MultiPolygon') return geometry.coordinates.flat()
-    if (geometry?.type === 'Polygon') return geometry.coordinates
-    return []
-  })
-}
-
-export function createBackgroundMapTransform(country, box) {
-  const rings = polygonRings(country)
-  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity
-  for (const ring of rings) {
-    for (const [lon, lat] of ring) {
-      const [x, y] = projectBackgroundPoint(lon, lat)
-      minX = Math.min(minX, x); maxX = Math.max(maxX, x)
-      minY = Math.min(minY, y); maxY = Math.max(maxY, y)
-    }
-  }
-  if (!rings.length) return null
+export function createBackgroundMapTransform(box) {
+  const { minX, maxX, minY, maxY } = mapProjection
   const scale = Math.min(box.width / (maxX - minX), box.height / (maxY - minY))
   const width = (maxX - minX) * scale, height = (maxY - minY) * scale
   const x = box.x + (box.width - width) / 2, y = box.y + (box.height - height) / 2
   return {
-    rings,
-    scale,
     bounds: { x, y, width, height },
     point(lon, lat) {
       const [px, py] = projectBackgroundPoint(lon, lat)
@@ -72,15 +55,13 @@ export function getBackgroundLayout(width, height) {
   }
 }
 
-export async function loadBackgroundGeography(fetcher = fetch) {
-  const paths = ['gis/china_country.geojson', 'gis/china_provinces.geojson', 'gis/china_rivers_l1.geojson', 'gis/china_rivers_l2.geojson', 'gis/china_rivers_l3.geojson', 'dots.json']
-  const results = await Promise.allSettled(paths.map(async path => {
-    const response = await fetcher(`/data/${path}`, { cache: 'no-cache' })
-    if (!response.ok) throw new Error(`Background geography unavailable: ${path}`)
-    return response.json()
-  }))
-  const values = results.map(result => result.status === 'fulfilled' ? result.value : null)
-  return { country: values[0], provinces: values[1], rivers: values.slice(2, 5), dots: values[5] }
+export async function loadBackgroundDots(fetcher = fetch) {
+  try {
+    const response = await fetcher('/data/dots.json', { cache: 'no-cache' })
+    return response.ok ? await response.json() : null
+  } catch {
+    return null
+  }
 }
 
 let resourcesPromise
@@ -94,9 +75,9 @@ export function loadBlueBackgroundResources() {
     })
     resourcesPromise = Promise.all([
       loadImage('base'), loadImage('fangyan'), loadImage('quote-landscape'), loadImage('quote-portrait'),
-      loadImage('mountains-upper'), loadImage('mountains-lower'), loadBackgroundGeography(),
-    ]).then(([base, book, quoteLandscape, quotePortrait, upper, lower, geography]) => {
-      if (![base, book, quoteLandscape, quotePortrait, upper, lower].every(Boolean)) {
+      loadImage('mountains-upper'), loadImage('mountains-lower'), loadImage('map'), loadBackgroundDots(),
+    ]).then(([base, book, quoteLandscape, quotePortrait, upper, lower, countryMap, dots]) => {
+      if (![base, book, quoteLandscape, quotePortrait, upper, lower, countryMap].every(Boolean)) {
         resourcesPromise = null
         return null
       }
@@ -109,51 +90,28 @@ export function loadBlueBackgroundResources() {
         for (let i = 3; i < pixels.data.length; i += 4) pixels.data[i] = pixels.data[i] ? 255 : 0
         ctx.putImageData(pixels, 0, 0)
       }
-      return { base, book, bookMask, quoteLandscape, quotePortrait, upper, lower, geography }
+      return { base, book, bookMask, quoteLandscape, quotePortrait, upper, lower, countryMap, dots }
     })
   }
   return resourcesPromise
 }
 
-function traceLine(ctx, coordinates, point, close = false) {
-  if (!coordinates.length) return
-  ctx.moveTo(...point(...coordinates[0]))
-  for (let i = 1; i < coordinates.length; i++) ctx.lineTo(...point(...coordinates[i]))
-  if (close) ctx.closePath()
-}
-
-function drawGeography(ctx, geography, map, layout, colors, width) {
-  if (!map) return
-  const alpha = .7 * (layout.portrait ? 88 / 255 : 76 / 255)
-  const unit = map.bounds.width / 1000
-  const countryPath = new Path2D()
-  for (const ring of map.rings) traceLine(countryPath, ring, map.point, true)
+function drawGeography(ctx, resources, map, layout, colors, width) {
+  const { x, y, width: mapWidth } = map.bounds
+  const unit = mapWidth / mapProjection.width
+  const padding = mapProjection.padding * unit
   ctx.save()
-  ctx.fillStyle = colors.country; ctx.globalAlpha = .7 * 12 / 255; ctx.fill(countryPath)
-  ctx.clip(countryPath)
-  ctx.lineWidth = .55 * unit; ctx.strokeStyle = colors.province; ctx.globalAlpha = alpha * .6
-  ctx.beginPath()
-  for (const ring of polygonRings(geography.provinces)) traceLine(ctx, ring, map.point)
-  ctx.stroke()
-  for (const level of [2, 1, 0]) {
-    ctx.beginPath()
-    for (const { geometry } of geography.rivers[level]?.features ?? []) {
-      const lines = geometry.type === 'MultiLineString' ? geometry.coordinates : [geometry.coordinates]
-      for (const line of lines) traceLine(ctx, line, map.point)
-    }
-    ctx.strokeStyle = colors.river; ctx.globalAlpha = alpha * [1.05, .78, .52][level]
-    ctx.lineWidth = [1.65, 1.1, .75][level] * unit; ctx.stroke()
-  }
-  ctx.restore()
-  ctx.save()
-  ctx.lineWidth = 1.3; ctx.strokeStyle = colors.border; ctx.globalAlpha = alpha; ctx.stroke(countryPath)
-  ctx.fillStyle = colors.dot; ctx.globalAlpha = alpha * .9
+  ctx.globalAlpha = .7 * (layout.portrait ? 88 / 76 : 1)
+  ctx.drawImage(resources.countryMap, x - padding, y - padding,
+    resources.countryMap.naturalWidth * unit, resources.countryMap.naturalHeight * unit)
+  ctx.fillStyle = colors.dot
+  ctx.globalAlpha = .7 * (layout.portrait ? 88 / 255 : 76 / 255) * .9
   // Single fill prevents dense survey clusters accumulating extra opacity.
   ctx.beginPath()
   const radius = Math.max(.8, (layout.portrait ? 1080 : 2560) / 2000) * 1.35 * width / (layout.portrait ? 1080 : 2560)
-  for (const [lon, lat] of getSurveyPoints(geography.dots)) {
-    const [x, y] = map.point(lon, lat)
-    ctx.moveTo(x + radius, y); ctx.arc(x, y, radius, 0, Math.PI * 2)
+  for (const [lon, lat] of getSurveyPoints(resources.dots)) {
+    const [px, py] = map.point(lon, lat)
+    ctx.moveTo(px + radius, py); ctx.arc(px, py, radius, 0, Math.PI * 2)
   }
   ctx.fill(); ctx.restore()
 }
@@ -176,7 +134,7 @@ export function drawBlueLayoutBackground(canvas, resources, width, height, color
     ctx.drawImage(image, (width - image.naturalWidth * scale) / 2, (height - image.naturalHeight * scale) / 2, image.naturalWidth * scale, image.naturalHeight * scale)
   }
   const layout = getBackgroundLayout(width, height)
-  const map = createBackgroundMapTransform(resources.geography.country, layout.map)
+  const map = createBackgroundMapTransform(layout.map)
   const mountains = document.createElement('canvas'), mask = document.createElement('canvas')
   mountains.width = mask.width = canvas.width; mountains.height = mask.height = canvas.height
   const mountainCtx = mountains.getContext('2d'), maskCtx = mask.getContext('2d')
@@ -206,7 +164,7 @@ export function drawBlueLayoutBackground(canvas, resources, width, height, color
   ctx.globalAlpha = .7
   ctx.drawImage(mountains, 0, 0, width, height)
   ctx.globalAlpha = 1
-  drawGeography(ctx, resources.geography, map, layout, colors, width)
+  drawGeography(ctx, resources, map, layout, colors, width)
   ctx.globalAlpha = .5
   if (resources.book) ctx.drawImage(resources.book, book.x, book.y, book.width, book.height)
   ctx.globalAlpha = .8
