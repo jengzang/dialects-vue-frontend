@@ -356,20 +356,22 @@
       </div>
     </section>
 
-    <h2
-      id="history-title"
-      class="page-title home-history-title reveal"
-    >
-      {{ $t('home.history.title') }}
-    </h2>
-    <div class="home-history-actions reveal">
-      <button
-        type="button"
-        class="login-btn secondary"
-        @click="showUpdateNotice = true"
+    <div class="home-history-heading reveal">
+      <h2
+        id="history-title"
+        class="page-title home-history-title"
       >
-        {{ $t('home.history.recentUpdates') }}
-      </button>
+        {{ $t('home.history.title') }}
+      </h2>
+      <div class="home-history-actions">
+        <button
+          type="button"
+          class="login-btn secondary"
+          @click="showUpdateNotice = true"
+        >
+          {{ $t('home.history.recentUpdates') }}
+        </button>
+      </div>
     </div>
     <AboutHistory class="reveal" featured />
 

@@ -307,7 +307,7 @@ function parseLocalizedParts(content) {
 
 .history-page--featured .history-stage {
   --glass-panel-background: var(--glass-60);
-  --glass-panel-backdrop-filter: blur(20px);
+  // --glass-panel-backdrop-filter: blur(20px);
   --glass-panel-border: 1px solid rgba(var(--color-primary-rgb), 0.15);
   --glass-panel-radius: var(--radius-md);
   --glass-panel-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.08);

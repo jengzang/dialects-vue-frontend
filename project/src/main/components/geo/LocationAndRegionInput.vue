@@ -72,7 +72,7 @@
               @click="openPartitionInfoModal"
               :title="$t('query.components.locationAndRegionInput.viewPartitionDetails')"
           >
-            <span class="icon"><InlineIcon icon="ℹ️" /></span>
+            <BarIcon icon="ℹ️" />
           </button>
         </div>
 
@@ -199,6 +199,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, nextTick ,onMounted, onActivated, watch, computed, defineAsyncComponent, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -1583,34 +1584,19 @@ $portrait-ratio: 1;
 /* 分区详情按钮 */
 .info-btn {
   padding: 8px;
-  background: linear-gradient(
-    145deg,
-    var(--glass-40),
-    var(--glass-20)
-  );
-  border: 1px solid var(--glass-60);
-  border-radius: var(--radius-md);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  font-size: var(--font-size-14);
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  color: var(--color-primary);
+  font-size: calc(var(--font-size-14) * 1.5);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s ease, transform 0.2s ease;
 
   @include flex-center;
 
   &:hover {
-    background: linear-gradient(
-      145deg,
-      var(--glass-50),
-      var(--glass-30)
-    );
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+    background: var(--color-primary-light);
     transform: scale(1.05);
-  }
-
-  .icon {
-    display: inline-block;
   }
 }
 
