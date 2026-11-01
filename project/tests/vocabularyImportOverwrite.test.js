@@ -76,6 +76,7 @@ describe('vocabulary import feedback', () => {
 
     const notices = host.querySelector('.backend-preview-mapping-notices')
     expect(notices).toBeTruthy()
+    expect(notices.querySelector('.backend-preview-unmatched')?.getAttribute('role')).toBe('status')
     expect(notices.textContent).toContain('words.wordList.columns.pronunciation')
     expect(notices.textContent).toContain('words.wordList.columns.detail')
     expect(notices.textContent).not.toContain('"rows":')
@@ -111,10 +112,10 @@ describe('vocabulary import feedback', () => {
   })
 
   it.each([
-    { headerRowIndex: 0, prefix: ['standard_word,local_expression,ipa,notes'], offset: 0, locale: 'zh-CN' },
-    { headerRowIndex: 1, prefix: ['说明,,,', 'standard_word,local_expression,ipa,notes'], offset: 1, locale: 'zh-Hant' },
+    { headerRowIndex: 0, prefix: ['standard_word,local_expression,ipa,notes'], offset: 0, locale: 'zh-CN', structured: true },
+    { headerRowIndex: 1, prefix: ['说明,,,', 'standard_word,local_expression,ipa,notes'], offset: 1, locale: 'zh-Hant', structured: true },
     { headerRowIndex: -1, prefix: [], offset: -1, locale: 'en' },
-  ])('groups single-field gaps and restores source rows with header $headerRowIndex', async ({ headerRowIndex, prefix, offset, locale }) => {
+  ])('groups single-field gaps and restores source rows with header $headerRowIndex', async ({ headerRowIndex, prefix, offset, locale, structured }) => {
     const { state, host } = mountPage()
     mocks.locale.value = locale
     state.uploadLocation = { location_name: '甲村', coordinates: '113,23' }
@@ -133,10 +134,11 @@ describe('vocabulary import feedback', () => {
     mocks.previewVocabularyImport.mockResolvedValue({
       parsed_count: 4,
       skipped_count: 0,
-      errors: [
+      errors: structured ? ['Missing dialect word or IPA at row 5', 'Missing dialect word or IPA at row 6'] : [
         '第 5 行缺少字段: ipa 或 local_expression（至少需要一个非空）',
         '第 6 行缺少字段: ipa 或 local_expression（至少需要一个非空）',
       ],
+      ...(structured ? { error_groups: [{ code: 'missing_fields', fields: ['local_expression_or_ipa'], row_numbers: [5, 6], error_indexes: [0, 1] }] } : {}),
     })
 
     await state.importFlow.loadPreview(file)
@@ -190,6 +192,27 @@ describe('vocabulary import feedback', () => {
     expect(state.previewErrors).toHaveLength(6)
   })
 
+  it('uses structured field codes while retaining errors not covered by recognized groups', async () => {
+    const { state, host } = mountPage()
+    state.backendPreview = {
+      parsed_count: 1, skipped_count: 0,
+      errors: ['Old wording at row 2', 'Other format error', 'Old wording at row 4'],
+      error_groups: [
+        { code: 'missing_fields', fields: ['standard_word'], row_numbers: [2, 4], error_indexes: [0, 2] },
+        { code: 'future_error', fields: ['future_field'], row_numbers: [3], error_indexes: [1] },
+      ],
+    }
+    await flush()
+    const errors = [...host.querySelectorAll('.backend-preview-errors li')].map((item) => item.textContent)
+    expect(errors).toHaveLength(2)
+    expect(errors[0]).toContain('previewMissingFieldsRows')
+    expect(errors[0]).toContain('"rows":"2、4"')
+    expect(errors[0]).toContain('words.wordList.columns.definition')
+    expect(errors[1]).toContain('Other format error')
+    expect(errors.join('')).not.toContain('Old wording')
+    expect(state.previewSkippedCount).toBe(3)
+  })
+
   it.each(['success', 'empty', 'failure'])('closes the mapping dialog before preview and clears loading after %s', async (outcome) => {
     const { state, host } = mountPage()
     state.uploadLocation = { location_name: '甲村', coordinates: '113,23' }
@@ -215,7 +238,7 @@ describe('vocabulary import feedback', () => {
     finishPreview(outcome === 'failure' ? new Error('preview failed') : response)
     await confirmation
     await flush()
-    expect(host.querySelector('[role="status"]')).toBeNull()
+    expect(host.querySelector('.loading-state-base[role="status"]')).toBeNull()
     expect(state.backendPreview).toEqual(outcome === 'failure' ? null : response)
     expect(state.uploadFile).not.toBeNull()
   })

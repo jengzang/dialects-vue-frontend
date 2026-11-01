@@ -1155,6 +1155,21 @@
   gap: 4px;
 }
 
+.backend-preview-unmatched {
+  --surface-subpanel-fill: rgba(var(--color-warning-rgb), 0.12);
+  --surface-subpanel-border: 1px solid rgba(var(--color-warning-rgb), 0.35);
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 12px;
+  color: var(--color-warning-dark);
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+}
+
 .backend-preview-overwrite {
   display: inline-flex;
   align-items: center;

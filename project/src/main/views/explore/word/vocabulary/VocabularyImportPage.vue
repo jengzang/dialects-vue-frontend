@@ -185,12 +185,17 @@
             v-if="unmatchedVocabularyColumnLabels.length || missingDialectRowNumbers || missingIpaRowNumbers"
             class="backend-preview-mapping-notices"
           >
-            <p
+            <div
               v-if="unmatchedVocabularyColumnLabels.length"
-              class="backend-preview-warning"
+              class="backend-preview-unmatched surface-subpanel"
+              role="status"
             >
-              {{ t('words.wordList.upload.previewUnmatchedColumns', { columns: unmatchedVocabularyColumnList }) }}
-            </p>
+              <PhWarningCircle
+                :size="20"
+                aria-hidden="true"
+              />
+              <strong>{{ t('words.wordList.upload.previewUnmatchedColumns', { columns: unmatchedVocabularyColumnList }) }}</strong>
+            </div>
             <p
               v-if="missingDialectRowNumbers"
               class="backend-preview-warning"
@@ -543,7 +548,7 @@
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { computed, inject, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { PhArrowsClockwise, PhDownloadSimple } from '@phosphor-icons/vue'
+import { PhArrowsClockwise, PhDownloadSimple, PhWarningCircle } from '@phosphor-icons/vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { getVocabularyCounts, getVocabularyLocations, invalidateVocabularyCountsCache, invalidateVocabularyOptionsCache, previewVocabularyImport, uploadVocabulary } from '@/api'
@@ -1099,6 +1104,45 @@ function buildVocabularyImportNotices() {
 }
 
 function groupPreviewErrors(errors) {
+  const rawErrors = Array.isArray(backendPreview.value?.errors) ? backendPreview.value.errors : []
+  const errorGroups = backendPreview.value?.error_groups
+  if (!Array.isArray(errorGroups) || !errorGroups.length) return groupLegacyPreviewErrors(errors)
+
+  const fieldLabels = {
+    standard_word: t('words.wordList.columns.definition'),
+    local_expression_or_ipa: t('words.wordList.upload.previewDialectOrIpaField'),
+  }
+  const coveredIndexes = new Set()
+  const messages = []
+  errorGroups.forEach((group) => {
+    if (group?.code !== 'missing_fields'
+      || !Array.isArray(group.fields) || !group.fields.length
+      || !group.fields.every((key) => Object.hasOwn(fieldLabels, key))
+      || !Array.isArray(group.row_numbers) || !group.row_numbers.length
+      || !group.row_numbers.every((row) => Number.isInteger(row) && row > 0)
+      || !Array.isArray(group.error_indexes) || group.error_indexes.length !== group.row_numbers.length
+      || !group.error_indexes.every((index) => Number.isInteger(index) && index >= 0 && index < rawErrors.length)) return
+
+    const rows = formatRowNumberList(group.row_numbers.map(getSourceRowNumber))
+    const message = group.fields.length === 1 && group.fields[0] === 'local_expression_or_ipa'
+      ? t('words.wordList.upload.previewMissingDialectOrIpaRows', { rows })
+      : t('words.wordList.upload.previewMissingFieldsRows', {
+        rows,
+        fields: group.fields.map((key) => fieldLabels[key]).join(locale.value.startsWith('en') ? ', ' : '、'),
+      })
+    messages.push(message)
+    group.error_indexes.forEach((index) => coveredIndexes.add(index))
+  })
+  // Leave unknown or uncovered failures visible, including during rolling upgrades.
+  return messages.concat(groupLegacyPreviewErrors(parseErrorDetails(rawErrors.filter((_, index) => !coveredIndexes.has(index)))))
+}
+
+function getSourceRowNumber(backendRowNumber) {
+  // The mapped XLSX always has one header row; blank source rows were removed.
+  return vocabularyImportNotices.value.sourceRowNumbers[backendRowNumber - 2] ?? backendRowNumber
+}
+
+function groupLegacyPreviewErrors(errors) {
   const groups = []
   const byReason = new Map()
   errors.forEach((error) => {
@@ -1108,8 +1152,7 @@ function groupPreviewErrors(errors) {
       return
     }
     const backendRowNumber = Number(match[1])
-    // The mapped XLSX always has one header row; blank source rows were removed.
-    const rowNumber = vocabularyImportNotices.value.sourceRowNumbers[backendRowNumber - 2] ?? backendRowNumber
+    const rowNumber = getSourceRowNumber(backendRowNumber)
     const reason = match[2].trim()
     if (!byReason.has(reason)) {
       const group = { reason, rowNumbers: [] }

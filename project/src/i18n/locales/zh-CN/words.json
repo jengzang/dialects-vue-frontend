@@ -174,6 +174,8 @@
       "previewMissingDialectRows": "方言词为空：第 {rows} 行（有 IPA，此项可为空）。",
       "previewMissingIpaRows": "IPA 为空：第 {rows} 行（有方言词，此项可为空）。",
       "previewGroupedRowError": "第 {rows} 行：{reason}",
+      "previewMissingFieldsRows": "第 {rows} 行缺少必填内容：{fields}（将跳过）。",
+      "previewDialectOrIpaField": "方言词或 IPA（至少一项）",
       "replaceWarning": "正式导入会先删除目标用户该地点的旧词条 {count} 条，再写入新词条。",
       "confirmOverwrite": "我确认用这次导入替换该地点已有词条",
       "previewReady": "预览完成，请确认后提交词表。",
