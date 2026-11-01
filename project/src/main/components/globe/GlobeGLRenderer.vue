@@ -72,6 +72,8 @@ const joystickThumbStyle = computed(() => ({
 }))
 let globe = null
 let resizeObserver = null
+let visibilityObserver = null
+let isInViewport = false
 let inputCapabilityMediaQueries = []
 let activeJoystickPointerId = null
 let joystickAnimationFrameId = null
@@ -175,6 +177,29 @@ function render() {
 
   window.addEventListener('keydown', onKeyDown)
   window.addEventListener('wheel', onWheel, { passive: false })
+
+  if (typeof IntersectionObserver !== 'undefined') {
+    syncRenderingVisibility()
+    visibilityObserver = new IntersectionObserver(([entry]) => {
+      isInViewport = entry.isIntersecting
+      syncRenderingVisibility()
+    })
+    visibilityObserver.observe(containerRef.value)
+  } else {
+    isInViewport = true
+    syncRenderingVisibility()
+  }
+  document.addEventListener('visibilitychange', syncRenderingVisibility)
+}
+
+function syncRenderingVisibility() {
+  if (!globe) return
+  if (isInViewport && !document.hidden) {
+    globe.resumeAnimation()
+  } else {
+    cancelJoystickInteraction()
+    globe.pauseAnimation()
+  }
 }
 
 function syncGlobePointerInteraction() {
@@ -405,6 +430,9 @@ function updatePoints() {
 
 function destroy() {
   cancelJoystickInteraction()
+  visibilityObserver?.disconnect()
+  visibilityObserver = null
+  document.removeEventListener('visibilitychange', syncRenderingVisibility)
   window.removeEventListener('keydown', onKeyDown)
   window.removeEventListener('wheel', onWheel)
   teardownInputCapabilityListeners()

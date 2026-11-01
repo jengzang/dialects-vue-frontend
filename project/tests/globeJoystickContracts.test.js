@@ -41,6 +41,8 @@ vi.mock('globe.gl', () => ({
       pointRadius: vi.fn(() => globe),
       pointResolution: vi.fn(() => globe),
       pointsData: vi.fn(() => globe),
+      pauseAnimation: vi.fn(() => globe),
+      resumeAnimation: vi.fn(() => globe),
       renderer: vi.fn(() => ({
         dispose: vi.fn(),
         setClearColor: vi.fn(),
@@ -128,6 +130,47 @@ afterEach(() => {
 })
 
 describe('globe joystick interaction contracts', () => {
+  it('pauses offscreen and background rendering, resumes the same globe, and disconnects on unmount', () => {
+    createMediaQueryHarness()
+    let onIntersection
+    const observe = vi.fn()
+    const disconnect = vi.fn()
+    vi.stubGlobal('IntersectionObserver', class {
+      constructor(callback) { onIntersection = callback }
+      observe = observe
+      disconnect = disconnect
+    })
+    let hidden = false
+    const hiddenSpy = vi.spyOn(document, 'hidden', 'get').mockImplementation(() => hidden)
+    const root = document.createElement('div')
+    document.body.appendChild(root)
+    const app = createApp(GlobeGLRenderer, { points: [] })
+    try {
+      app.mount(root)
+      const { globe } = globeInstances.at(-1)
+      expect(globe.pauseAnimation).toHaveBeenCalled()
+      expect(observe).toHaveBeenCalledWith(root.querySelector('.globegl-container'))
+      onIntersection([{ isIntersecting: true }])
+      expect(globe.resumeAnimation).toHaveBeenCalledTimes(1)
+      onIntersection([{ isIntersecting: false }])
+      expect(globe.pauseAnimation).toHaveBeenCalledTimes(2)
+      onIntersection([{ isIntersecting: true }])
+      hidden = true
+      document.dispatchEvent(new Event('visibilitychange'))
+      expect(globe.pauseAnimation).toHaveBeenCalledTimes(3)
+      hidden = false
+      document.dispatchEvent(new Event('visibilitychange'))
+      expect(globe.resumeAnimation).toHaveBeenCalledTimes(3)
+      expect(globeInstances).toHaveLength(1)
+      app.unmount()
+      expect(disconnect).toHaveBeenCalled()
+    } finally {
+      if (app._instance) app.unmount()
+      hiddenSpy.mockRestore()
+      vi.unstubAllGlobals()
+    }
+  })
+
   it('uses portrait touch input as the positive joystick condition instead of excluding hover or fine pointers', () => {
     const source = readSource('src/main/components/globe/GlobeGLRenderer.vue')
 
