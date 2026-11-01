@@ -37,7 +37,7 @@
   --color-secondary-border: rgba(var(--color-secondary-rgb), 0.28);
   --color-primary-light: rgba(0, 112, 232, 0.1);
   --color-primary-light2: rgba(0, 112, 232, 0.16);
-  --color-primary-light3: rgba(0, 112, 232, 0.12);
+  --color-primary-light-solid: #cee3fc;
   --color-primary-medium: rgba(0, 112, 232, 0.2);
   --color-primary-medium2: rgba(0, 112, 232, 0.5);
   --color-primary-border: rgba(0, 112, 232, 0.18);
@@ -122,10 +122,10 @@
 
   /* 语义别名 — 静态表面仍用玻璃 token */
   --surface-page: var(--bg-body);
-  --surface-panel: var(--glass-60);
-  --surface-panel-hover: var(--glass-80);
+  --surface-panel: var(--glass-70);
+  --surface-panel-hover: var(--glass-90);
   --surface-panel-strong: var(--glass-90);
-  --surface-panel-subtle: var(--glass-30);
+  --surface-panel-subtle: var(--glass-40);
   --surface-glass-button: var(--surface-elevation-0);
   --surface-glass-button-hover: var(--surface-elevation-1);
   --surface-selected: var(--bg-blue-light);
@@ -316,7 +316,7 @@ $font-size-width-scales: (
   --color-secondary-bg: rgba(var(--color-secondary-rgb), 0.04);
   --color-primary-light: rgba(var(--color-primary-rgb), 0.08);
   --color-primary-light2: rgba(var(--color-primary-rgb), 0.12);
-  --color-primary-light3: rgba(var(--color-primary-rgb), 0.09);
+  --color-primary-light-solid: #f4e6df;
   --color-primary-medium: rgba(var(--color-primary-rgb), 0.16);
   --color-primary-medium2: rgba(var(--color-primary-rgb), 0.38);
   --color-primary-border: rgba(var(--color-primary-rgb), 0.16);
@@ -471,7 +471,7 @@ $font-size-width-scales: (
   --color-secondary-hover: #c99360;
   --color-primary-light: rgba(134, 217, 155, 0.10);
   --color-primary-light2: rgba(134, 217, 155, 0.15);
-  --color-primary-light3: rgba(134, 217, 155, 0.11);
+  --color-primary-light-solid: #193825;
   --color-primary-medium: rgba(134, 217, 155, 0.20);
   --color-primary-medium2: rgba(134, 217, 155, 0.44);
   --color-primary-border: rgba(134, 217, 155, 0.20);
@@ -639,7 +639,7 @@ $font-size-width-scales: (
   --color-secondary-hover: #8faed5;
   --color-primary-light: rgba(240, 246, 252, 0.08);
   --color-primary-light2: rgba(240, 246, 252, 0.14);
-  --color-primary-light3: rgba(240, 246, 252, 0.10);
+  --color-primary-light-solid: #24282e;
   --color-primary-medium: rgba(240, 246, 252, 0.18);
   --color-primary-medium2: rgba(240, 246, 252, 0.42);
   --color-primary-border: rgba(240, 246, 252, 0.22);

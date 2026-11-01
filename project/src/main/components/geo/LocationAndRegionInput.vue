@@ -1368,7 +1368,8 @@ $portrait-ratio: 1;
 .select-location-btn {
   padding: 2px 8px;
   appearance: none;
-  background: var(--color-primary-light);
+  background: var(--color-primary-light-solid);
+  // backdrop-filter: blur(8px) saturate(160%);
   border: 1px solid var(--color-primary-border2);
   border-radius: var(--radius-sm2);
   color: var(--color-primary);

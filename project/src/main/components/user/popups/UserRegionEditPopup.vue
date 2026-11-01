@@ -293,7 +293,7 @@ $transition-normal: 0.3s;
 .select-location-btn {
   padding: 2px 8px;
   appearance: none;
-  background: var(--color-primary-light);
+  background: var(--color-primary-light-solid);
   border: 1px solid var(--color-primary-border2);
   border-radius: $control-radius;
   color: var(--color-primary);

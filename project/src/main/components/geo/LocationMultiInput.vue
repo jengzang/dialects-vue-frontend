@@ -480,7 +480,7 @@ $portrait-ratio: 1;
     width: 100%;
     padding: 12px 40px 12px 14px;
     resize: vertical;
-    background: var(--glass-60);
+    background: var(--bg-white);
     border: 1px solid var(--border-gray-light);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
@@ -524,7 +524,7 @@ $portrait-ratio: 1;
 .select-location-btn {
   padding: 2px 8px;
   appearance: none;
-  background: var(--color-primary-light);
+  background: var(--color-primary-light-solid);
   border: 1px solid var(--color-primary-border2);
   border-radius: var(--radius-sm2);
   color: var(--color-primary);

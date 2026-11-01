@@ -262,7 +262,7 @@ defineExpose({ collapse, progress })
   --glass-panel-radius: calc(var(--radius-xl) * var(--query-expansion));
   --glass-panel-shadow: 0 4px 14px rgba(var(--color-shadow-rgb), calc(0.08 * var(--query-expansion)));
   --glass-panel-hover-shadow: var(--glass-panel-shadow);
-  --glass-panel-backdrop-filter: none;
+  // --glass-panel-backdrop-filter: none;
   --query-input-growth: calc(48px * var(--query-expansion));
   width: min(100%, calc(760px + (100% - 760px) * var(--query-progress)));
   margin: 0 auto;

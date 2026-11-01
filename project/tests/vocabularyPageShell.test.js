@@ -267,7 +267,7 @@ describe('vocabulary explore page shell wiring', () => {
     expect(locationDefinitionPairRule).toContain('display: inline-grid')
     expect(locationDefinitionPairRule).toContain('grid-template-rows: auto auto')
     expect(locationDefinitionPairRule).toContain('max-width: calc(6em + 20px)')
-    expect(locationPillRule).toContain('--pill-btn-bg: var(--color-primary-light3)')
+    expect(locationPillRule).toContain('--pill-btn-bg: var(--color-primary-light)')
     expect(locationPillRule).toContain('color: var(--color-primary-hover)')
     expect(locationPillRule).toContain('--pill-btn-hover-bg: var(--color-primary-medium)')
     expect(locationPillTextRule).toContain('max-width: 6em')

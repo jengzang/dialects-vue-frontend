@@ -160,7 +160,7 @@ $transition-text: 0.3s ease;
   flex-shrink: 0;
   width: var(--radio-size, 18px);
   height: var(--radio-size, 18px);
-  background: var(--glass-40);
+  background: var(--glass-80);
   border: 2px solid var(--border-gray);
   border-radius: var(--radius-full);
   box-shadow:
