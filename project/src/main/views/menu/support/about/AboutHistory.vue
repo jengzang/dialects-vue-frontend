@@ -443,6 +443,7 @@ function parseLocalizedParts(content) {
   --glass-button-compact-padding: 0.2em 0.5em;
   --glass-button-border-radius: var(--radius-sm);
 
+  font-family: var(--font-sans);
   max-width: 100%;
   margin-inline: 0.25em;
   box-sizing: border-box;
