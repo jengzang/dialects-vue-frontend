@@ -11,6 +11,7 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { drawBlueLayoutBackground, loadBlueBackgroundResources } from '@/utils/ui/blueLayoutBackground.js'
 
 const canvas = ref(null)
+const emit = defineEmits(['ready'])
 let resources
 let observer
 let frame = 0
@@ -27,6 +28,7 @@ function queueDraw() {
       key, style.getPropertyValue(`--blue-background-${key}`).trim(),
     ]))
     drawBlueLayoutBackground(canvas.value, resources, width, height, colors, window.devicePixelRatio || 1)
+    emit('ready', true)
   })
 }
 
@@ -35,11 +37,15 @@ onMounted(async () => {
   observer.observe(canvas.value)
   window.addEventListener('resize', queueDraw, { passive: true })
   resources = await loadBlueBackgroundResources()
-  if (!disposed) queueDraw()
+  if (!disposed) {
+    if (resources) queueDraw()
+    else emit('ready', false)
+  }
 })
 
 onBeforeUnmount(() => {
   disposed = true
+  emit('ready', false)
   cancelAnimationFrame(frame)
   observer?.disconnect()
   window.removeEventListener('resize', queueDraw)

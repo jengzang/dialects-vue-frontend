@@ -96,6 +96,10 @@ export function loadBlueBackgroundResources() {
       loadImage('base'), loadImage('fangyan'), loadImage('quote-landscape'), loadImage('quote-portrait'),
       loadImage('mountains-upper'), loadImage('mountains-lower'), loadBackgroundGeography(),
     ]).then(([base, book, quoteLandscape, quotePortrait, upper, lower, geography]) => {
+      if (![base, book, quoteLandscape, quotePortrait, upper, lower].every(Boolean)) {
+        resourcesPromise = null
+        return null
+      }
       const bookMask = document.createElement('canvas')
       if (book) {
         bookMask.width = book.naturalWidth; bookMask.height = book.naturalHeight

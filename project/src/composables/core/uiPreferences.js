@@ -24,6 +24,7 @@ const VALID_UI_MODES = new Set([UI_MODE_DEFAULT, UI_MODE_COMPACT])
 const VALID_COLOR_THEMES = new Set([COLOR_THEME_BLUE, COLOR_THEME_LIGHT, COLOR_THEME_DARK, COLOR_THEME_GREEN])
 
 export const currentColorTheme = ref(getStoredColorTheme())
+export const currentInterfaceMode = ref(getStoredInterfaceMode())
 export const currentIconMode = ref(getStoredIconMode())
 
 function normalizeInterfaceMode(mode) {
@@ -66,6 +67,7 @@ export function applyInterfaceMode(mode) {
   }
 
   const normalizedMode = normalizeInterfaceMode(mode)
+  currentInterfaceMode.value = normalizedMode
   document.documentElement.dataset.uiMode = normalizedMode
   return normalizedMode
 }

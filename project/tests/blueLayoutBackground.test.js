@@ -7,12 +7,31 @@ import {
   getBackgroundLayout,
   getSurveyPoints,
   loadBackgroundGeography,
+  loadBlueBackgroundResources,
   projectBackgroundPoint,
 } from '../src/utils/ui/blueLayoutBackground.js'
 
 const country = JSON.parse(readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../public/data/gis/china_country.geojson'), 'utf8'))
 
 describe('blue layout background geography', () => {
+  it('rejects incomplete artwork and permits retry after an image load failure', async () => {
+    const images = []
+    vi.stubGlobal('Image', class {
+      set src(value) {
+        images.push(value)
+        queueMicrotask(() => value.endsWith('/base.webp') ? this.onerror() : this.onload())
+      }
+    })
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => country })))
+    try {
+      expect(await loadBlueBackgroundResources()).toBeNull()
+      expect(images).toHaveLength(6)
+      expect(await loadBlueBackgroundResources()).toBeNull()
+      expect(images).toHaveLength(12)
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
   it('projects north upwards and east to the right, using the same transform for points and boundaries', () => {
     const box = { x: 120, y: 80, width: 750, height: 900 }
     const transform = createBackgroundMapTransform(country, box)
