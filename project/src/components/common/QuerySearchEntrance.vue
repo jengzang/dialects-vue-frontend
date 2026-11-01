@@ -44,7 +44,7 @@ let targetProgress = 0
 let autoCollapsing = false
 let lastAnimationTime = 0
 const transitionDuration = 400
-const wheelGestureGap = 180
+const wheelGestureGap = 150
 let transitionUnlocked = false
 let waitingForGesture = false
 let lastWheelTime = -Infinity
@@ -171,7 +171,7 @@ function handleWheel(event) {
   // A pause or a renewed impulse after decay can signal a fresh gesture.
   // This only unlocks the panel; native scrolling is never intercepted.
   const newGesture = now - lastWheelTime >= wheelGestureGap
-    || (wheelDecaying && delta >= Math.max(8, lastWheelDelta * 2))
+    || (wheelDecaying && delta >= Math.max(8, lastWheelDelta * 1.2))
   wheelDecaying = delta < lastWheelDelta
   lastWheelTime = now
   lastWheelDelta = delta

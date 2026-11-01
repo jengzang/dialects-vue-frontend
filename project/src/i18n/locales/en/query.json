@@ -57,13 +57,13 @@
   "components": {
     "locationInput": {
       "label": "Location",
-      "selectButton": "Select Location",
+      "selectButton": "Select",
       "selectButtonTitle": "Select a location from a region",
       "placeholder": "Enter a location (automatic matching supported)"
     },
     "locationMultiInput": {
       "label": "Locations",
-      "selectButton": "Select Locations",
+      "selectButton": "Select",
       "selectButtonTitle": "Select locations from a region",
       "locationCount": "{count} locations",
       "expandButton": "Expand",

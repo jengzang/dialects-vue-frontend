@@ -124,15 +124,15 @@ describe('query entrance transition timing', () => {
     expect(window.scrollTo).not.toHaveBeenCalled()
     scrollPosition = 0
     window.dispatchEvent(new Event('scroll'))
-    await frame(800)
+    await frame(750)
     expect(entrance.progress).toBe(1)
     const fresh = new WheelEvent('wheel', { deltaY: -100, deltaMode: 1, cancelable: true })
     window.dispatchEvent(fresh)
-    await frame(800)
+    await frame(750)
     expect(fresh.defaultPrevented).toBe(false)
-    await frame(1000)
+    await frame(950)
     expect(entrance.progress).toBeCloseTo(0.5)
-    await frame(1200)
+    await frame(1150)
     expect(entrance.progress).toBe(0)
 
     window.scrollTo.mockClear()
@@ -277,7 +277,7 @@ describe('query entrance transition timing', () => {
       expect(entrance.progress).toBe(1)
     }
     await frame(441)
-    const impulse = new WheelEvent('wheel', { deltaY: -90, cancelable: true })
+    const impulse = new WheelEvent('wheel', { deltaY: -24, cancelable: true })
     window.dispatchEvent(impulse)
     await frame(441)
     expect(impulse.defaultPrevented).toBe(false)
