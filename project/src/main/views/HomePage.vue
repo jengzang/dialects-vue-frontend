@@ -6,6 +6,15 @@
   >
     <!-- Animated Background -->
     <div class="bg-gradient"></div>
+    <div
+      v-if="showHomeBackground"
+      class="home-content-background"
+      :class="{ 'home-content-background--ready': homeBackgroundReady }"
+      :style="{ top: `${backgroundStart}px` }"
+      aria-hidden="true"
+    >
+      <BlueLayoutBackground @ready="homeBackgroundReady = $event" />
+    </div>
 
     <!-- Hero Section -->
     <section class="hero-section">
@@ -444,13 +453,14 @@
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import BarIcon from '@/components/common/BarIcon.vue'
 import FeaturesSection from '@/main/components/FeaturesSection.vue'
+import BlueLayoutBackground from '@/components/common/BlueLayoutBackground.vue'
 import AboutHistory from '@/main/views/menu/support/about/AboutHistory.vue'
 import HomeFeaturedTools from '@/main/components/HomeFeaturedTools.vue'
 import { computed, ref, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
-import { currentColorTheme, getBrandAssets } from '@/composables/core/uiPreferences.js'
+import { currentColorTheme, currentInterfaceMode, UI_MODE_COMPACT, getBrandAssets } from '@/composables/core/uiPreferences.js'
 import { useVisitStats } from '@/composables/data/useVisitStats.js'
 import { useClickParticles } from '@/main/composables/useClickParticles.js'
 import { getCachedSourceStats, getSourceStats } from '@/composables/data/useSourceStats.js'
@@ -483,6 +493,12 @@ const {
 } = useVisitStats()
 const homePageRef = ref(null)
 const isGlobeMode = ref(false)
+const backgroundStart = ref(0)
+const homeBackgroundReady = ref(false)
+const hasReachedFeatures = ref(false)
+const showHomeBackground = computed(() => hasReachedFeatures.value && !isGlobeMode.value && currentInterfaceMode.value !== UI_MODE_COMPACT)
+let backgroundObserver
+let backgroundResizeObserver
 const globePoints = ref([])
 const showShowcase = ref(false)
 const showcaseSectionRef = ref(null)
@@ -600,6 +616,27 @@ function scrollToFeatures() {
   document.getElementById('features-section')?.scrollIntoView({ behavior: 'smooth' })
 }
 
+function initHomeBackground() {
+  const root = homePageRef.value
+  const features = root?.querySelector('#features-section')
+  const hero = root?.querySelector('.hero-section')
+  if (!features || !hero) return
+  const updateStart = () => {
+    if (features.offsetParent) backgroundStart.value = features.offsetTop
+  }
+  updateStart()
+  backgroundResizeObserver = new ResizeObserver(updateStart)
+  backgroundResizeObserver.observe(root)
+  backgroundResizeObserver.observe(hero)
+  backgroundObserver = new IntersectionObserver(entries => {
+    if (entries.some(entry => entry.isIntersecting && entry.intersectionRatio > 0)) {
+      hasReachedFeatures.value = true
+      backgroundObserver.disconnect()
+    }
+  }, { threshold: 0.01 })
+  backgroundObserver.observe(features)
+}
+
 function toggleGlobeMode() {
   if (isGlobeMode.value) {
     document.documentElement.style.overflow = previousDocumentOverflow
@@ -672,6 +709,7 @@ onMounted(() => {
   }, 1000)
   initReveal()
   initShowcaseLazy()
+  initHomeBackground()
 })
 
 onBeforeUnmount(() => {
@@ -682,6 +720,8 @@ onBeforeUnmount(() => {
   }
   revealObserver?.disconnect()
   showcaseObserver?.disconnect()
+  backgroundObserver?.disconnect()
+  backgroundResizeObserver?.disconnect()
 })
 </script>
 
@@ -719,6 +759,22 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   min-height: 100dvh;
   overflow-x: hidden;
   background: linear-gradient(135deg, var(--bg-body) 0%, var(--bg-light-gray) 100%);
+}
+
+.home-content-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  clip-path: inset(0);
+
+  &--ready::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 3rem;
+    background: linear-gradient(to bottom, var(--bg-body), transparent);
+  }
 }
 
 .home-globe-mode-toggle {
