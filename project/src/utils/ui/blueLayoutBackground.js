@@ -156,7 +156,15 @@ export function drawBlueLayoutBackground(canvas, resources, width, height, color
   }
   if (resources.book) maskCtx.drawImage(resources.bookMask, book.x, book.y, book.width, book.height)
   const fs = quote.fontSize
-  maskCtx.fillRect(quote.x - (4 * quote.gap + .85) * fs - 8, quote.y - 8, (4 * quote.gap + 1.85) * fs + 16, fs * 8 + 16)
+  const quoteMaskImage = layout.portrait ? resources.quotePortrait : resources.quoteLandscape
+  if (quoteMaskImage) {
+    const scale = fs / (layout.portrait ? 97 : 94)
+    const offsetX = layout.portrait ? -5.575257732 : -6.246808511
+    maskCtx.beginPath()
+    maskCtx.roundRect(quote.x + offsetX * fs - 8, quote.y - 8,
+      quoteMaskImage.naturalWidth * scale + 16, quoteMaskImage.naturalHeight * scale + 16, fs * .5)
+    maskCtx.fill()
+  }
   mountainCtx.globalAlpha = 1; mountainCtx.globalCompositeOperation = 'destination-out'
   mountainCtx.filter = `blur(${12 * Math.min(width / 1080, 1.5)}px)`
   mountainCtx.drawImage(mask, 0, 0, width, height)
