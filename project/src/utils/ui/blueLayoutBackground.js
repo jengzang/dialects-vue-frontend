@@ -166,7 +166,7 @@ export function drawBlueLayoutBackground(canvas, resources, width, height, color
     maskCtx.fill()
   }
   mountainCtx.globalAlpha = 1; mountainCtx.globalCompositeOperation = 'destination-out'
-  mountainCtx.filter = `blur(${12 * Math.min(width / 1080, 1.5)}px)`
+  mountainCtx.filter = `blur(${20 * Math.min(width / 1080, 1.5)}px)`
   mountainCtx.drawImage(mask, 0, 0, width, height)
   mountainCtx.filter = 'none'; mountainCtx.drawImage(mask, 0, 0, width, height)
   ctx.globalAlpha = .7
