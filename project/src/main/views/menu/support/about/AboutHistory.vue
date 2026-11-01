@@ -251,6 +251,10 @@ function parseLocalizedParts(content) {
   padding: clamp(1rem, 3vw, 2rem);
 }
 
+.history-page:not(.history-page--featured) {
+  font-family: var(--font-serif);
+}
+
 .history-page--featured {
   max-width: 82rem;
   padding-top: 0;
