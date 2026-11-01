@@ -6,7 +6,11 @@
     <div
       ref="globeHostRef"
       class="globegl-canvas-host"
+      :class="{ 'globegl-canvas-host--loading': !isGlobeReady }"
     />
+    <div v-if="!isGlobeReady" class="globegl-loading">
+      <span class="ui-loading--page" />
+    </div>
     <template v-if="shouldUseGlobeJoystick">
       <Teleport
         v-if="joystickMountTarget"
@@ -54,6 +58,7 @@ const props = defineProps({
 
 const containerRef = ref(null)
 const globeHostRef = ref(null)
+const isGlobeReady = ref(false)
 const joystickRef = ref(null)
 const joystickMountTarget = ref(null)
 const isPortraitLayout = ref(false)
@@ -126,6 +131,9 @@ function render() {
   const bgTint = getCssRgb('--bg-blue-tint-rgb', '240, 247, 255')
 
   globe = Globe()(globeHostRef.value)
+    .onGlobeReady(() => {
+      isGlobeReady.value = true
+    })
     .globeImageUrl(globeImageUrl.value)
     .backgroundImageUrl(null)
     .showGraticules(false)
@@ -179,6 +187,11 @@ function render() {
   window.addEventListener('wheel', onWheel, { passive: false })
 
   if (typeof IntersectionObserver !== 'undefined') {
+    const rect = containerRef.value.getBoundingClientRect()
+    isInViewport = rect.width > 0 && rect.height > 0 &&
+      rect.bottom > 0 && rect.right > 0 &&
+      rect.top < document.documentElement.clientHeight &&
+      rect.left < document.documentElement.clientWidth
     syncRenderingVisibility()
     visibilityObserver = new IntersectionObserver(([entry]) => {
       isInViewport = entry.isIntersecting
@@ -498,6 +511,17 @@ onBeforeUnmount(() => {
 .globegl-canvas-host {
   width: 100%;
   height: 100%;
+
+  &--loading {
+    visibility: hidden;
+  }
+}
+
+.globegl-loading {
+  @include flex-center;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
 .globe-joystick {

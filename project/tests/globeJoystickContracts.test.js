@@ -32,6 +32,7 @@ vi.mock('globe.gl', () => ({
       globeImageUrl: vi.fn(() => globe),
       height: vi.fn(() => globe),
       onPointHover: vi.fn(() => globe),
+      onGlobeReady: vi.fn(() => globe),
       pointAltitude: vi.fn(() => globe),
       pointColor: vi.fn(() => globe),
       pointLabel: vi.fn(() => globe),
@@ -149,6 +150,8 @@ describe('globe joystick interaction contracts', () => {
       app.mount(root)
       const { globe } = globeInstances.at(-1)
       expect(globe.pauseAnimation).toHaveBeenCalled()
+      expect(root.querySelector('.globegl-loading')).not.toBeNull()
+      expect(root.querySelector('.globegl-canvas-host--loading')).not.toBeNull()
       expect(observe).toHaveBeenCalledWith(root.querySelector('.globegl-container'))
       onIntersection([{ isIntersecting: true }])
       expect(globe.resumeAnimation).toHaveBeenCalledTimes(1)
@@ -168,6 +171,51 @@ describe('globe joystick interaction contracts', () => {
       if (app._instance) app.unmount()
       hiddenSpy.mockRestore()
       vi.unstubAllGlobals()
+    }
+  })
+
+  it('renders an initially visible globe without waiting for the first intersection notification', () => {
+    createMediaQueryHarness()
+    vi.spyOn(document, 'hidden', 'get').mockReturnValue(false)
+    vi.spyOn(document.documentElement, 'clientWidth', 'get').mockReturnValue(1024)
+    vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(768)
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
+      top: 0, left: 0, bottom: 500, right: 500, width: 500, height: 500
+    })
+    vi.stubGlobal('IntersectionObserver', class {
+      observe = vi.fn()
+      disconnect = vi.fn()
+    })
+    const root = document.createElement('div')
+    document.body.appendChild(root)
+    const app = createApp(GlobeGLRenderer, { points: [] })
+    try {
+      app.mount(root)
+      const { globe } = globeInstances.at(-1)
+      expect(globe.pauseAnimation).not.toHaveBeenCalled()
+      expect(globe.resumeAnimation).toHaveBeenCalled()
+    } finally {
+      app.unmount()
+      vi.unstubAllGlobals()
+    }
+  })
+
+  it('keeps loading visible until the globe reports that its texture is ready', async () => {
+    createMediaQueryHarness()
+    const root = document.createElement('div')
+    document.body.appendChild(root)
+    const app = createApp(GlobeGLRenderer, { points: [] })
+    try {
+      app.mount(root)
+      expect(root.querySelector('.globegl-loading')).not.toBeNull()
+      expect(root.querySelector('.globegl-canvas-host--loading')).not.toBeNull()
+      const { globe } = globeInstances.at(-1)
+      globe.onGlobeReady.mock.calls[0][0]()
+      await nextTick()
+      expect(root.querySelector('.globegl-loading')).toBeNull()
+      expect(root.querySelector('.globegl-canvas-host--loading')).toBeNull()
+    } finally {
+      app.unmount()
     }
   })
 
