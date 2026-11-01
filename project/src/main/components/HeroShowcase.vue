@@ -2,8 +2,9 @@
   <div
     class="showcase"
     ref="showcaseRef"
-    @mouseenter="pauseAuto"
-    @mouseleave="resumeAuto"
+    :class="{ 'showcase--paused': !isInViewport }"
+    @mouseenter="onMouseEnter"
+    @mouseleave="onMouseLeave"
     @touchstart="onTouchStart"
     @touchmove="onTouchMove"
     @touchend="onTouchEnd"
@@ -181,6 +182,9 @@ const showcaseRef = ref(null)
 const direction = ref(1)
 
 let autoTimer = null
+let visibilityObserver = null
+const isInViewport = ref(false)
+let isHovered = false
 const AUTO_INTERVAL = 5500
 const prefersReducedMotion = typeof window !== 'undefined'
   ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -365,10 +369,26 @@ function pauseAuto() {
 }
 
 function resumeAuto() {
+  if (!isInViewport.value || document.hidden || isHovered) return
   if (prefersReducedMotion) return
   if (autoTimer) return
   if (previewImage.value) return
   autoTimer = setInterval(goToNext, AUTO_INTERVAL)
+}
+
+function onMouseEnter() {
+  isHovered = true
+  pauseAuto()
+}
+
+function onMouseLeave() {
+  isHovered = false
+  resumeAuto()
+}
+
+function syncAutoplayVisibility() {
+  if (isInViewport.value && !document.hidden) resumeAuto()
+  else pauseAuto()
 }
 
 function resetAuto() {
@@ -475,13 +495,23 @@ function onImgLoad(e, i) {
 }
 
 onMounted(() => {
-  if (!prefersReducedMotion) {
-    autoTimer = setInterval(goToNext, AUTO_INTERVAL)
+  if (typeof IntersectionObserver !== 'undefined') {
+    visibilityObserver = new IntersectionObserver(([entry]) => {
+      isInViewport.value = entry.isIntersecting
+      syncAutoplayVisibility()
+    })
+    visibilityObserver.observe(showcaseRef.value)
+  } else {
+    isInViewport.value = true
+    syncAutoplayVisibility()
   }
+  document.addEventListener('visibilitychange', syncAutoplayVisibility)
   document.addEventListener('keydown', onKeydown)
 })
 
 onBeforeUnmount(() => {
+  visibilityObserver?.disconnect()
+  document.removeEventListener('visibilitychange', syncAutoplayVisibility)
   clearInterval(autoTimer)
   document.removeEventListener('keydown', onKeydown)
   document.removeEventListener('keydown', onPreviewKeydown)
@@ -494,6 +524,7 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 @use 'sass:math';
+@use '@/styles/global/mixins' as *;
 $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);
 $side-scale: 0.83;
 $side-rotate: 12deg;
@@ -510,6 +541,16 @@ $duration: 450ms;
   margin: 0 auto;
   user-select: none;
   -webkit-user-select: none;
+}
+
+.showcase--paused {
+  visibility: hidden;
+
+  *,
+  *::before,
+  *::after {
+    animation-play-state: paused !important;
+  }
 }
 
 .showcase-viewport {
