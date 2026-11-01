@@ -349,11 +349,11 @@
 
     <h2
       id="history-title"
-      class="page-title home-history-title"
+      class="page-title home-history-title reveal"
     >
       {{ $t('home.history.title') }}
     </h2>
-    <div class="home-history-actions">
+    <div class="home-history-actions reveal">
       <button
         type="button"
         class="login-btn secondary"
@@ -362,7 +362,7 @@
         {{ $t('home.history.recentUpdates') }}
       </button>
     </div>
-    <AboutHistory featured />
+    <AboutHistory class="reveal" featured />
 
 
     <!-- Footer -->
