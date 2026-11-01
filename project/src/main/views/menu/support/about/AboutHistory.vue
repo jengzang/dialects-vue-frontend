@@ -249,9 +249,6 @@ function parseLocalizedParts(content) {
   max-width: 70rem;
   margin-inline: auto;
   padding: clamp(1rem, 3vw, 2rem);
-}
-
-.history-page:not(.history-page--featured) {
   font-family: var(--font-serif);
 }
 
