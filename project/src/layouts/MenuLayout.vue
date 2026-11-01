@@ -1,6 +1,10 @@
 <!-- src/layouts/MenuLayout.vue -->
 <template>
-  <div class="menu-bg">
+  <div
+    class="menu-bg"
+    :class="{ 'blue-art-layout': currentColorTheme === COLOR_THEME_BLUE }"
+  >
+    <BlueLayoutBackground v-if="currentColorTheme === COLOR_THEME_BLUE" />
     <NavBar />
     <!--    <FloatingHeader v-if="shouldShowHeader" />-->
     <!-- 內容區：注意底部留白避免被 tab 擋住 -->
@@ -33,6 +37,8 @@ import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 import PanelManager from '@/main/components/result/PanelManager.vue'
 import ScrollToTop from '@/components/common/ScrollToTop.vue'
 import AppFooter from '@/components/footer/AppFooter.vue'
+import BlueLayoutBackground from '@/components/common/BlueLayoutBackground.vue'
+import { currentColorTheme, COLOR_THEME_BLUE } from '@/composables/core/uiPreferences.js'
 
 const keepAliveViewNames = [
   'ComparePage',

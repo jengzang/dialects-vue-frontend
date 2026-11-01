@@ -1,5 +1,9 @@
 <template>
-  <div class="explore-layout">
+  <div
+    class="explore-layout"
+    :class="{ 'blue-art-layout': currentColorTheme === COLOR_THEME_BLUE }"
+  >
+    <BlueLayoutBackground v-if="currentColorTheme === COLOR_THEME_BLUE" />
     <!-- ExploreBar 导航栏 -->
     <ExploreBar />
 
@@ -27,6 +31,8 @@ import ExploreBar from '@/components/bar/ExploreBar.vue'
 import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 import ScrollToTop from '@/components/common/ScrollToTop.vue'
 import AppFooter from '@/components/footer/AppFooter.vue'
+import BlueLayoutBackground from '@/components/common/BlueLayoutBackground.vue'
+import { currentColorTheme, COLOR_THEME_BLUE } from '@/composables/core/uiPreferences.js'
 
 const keepAliveViewNames = [
   'AllVillages',
