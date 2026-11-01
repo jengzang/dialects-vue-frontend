@@ -51,8 +51,8 @@ vi.mock('@/components/common/AppModal.vue', () => ({ default: {
 } }))
 vi.mock('../src/main/views/explore/word/vocabulary/VocabularyTopControls.vue', () => ({
   default: {
-    props: ['source', 'filterMode', 'selectedRegions', 'selectedLocations', 'selectedSearchFields', 'partitionNodes', 'partitionLoading', 'partitionError', 'notesRefreshDisabled'],
-    emits: ['search', 'refreshNotes', 'openLocationDetails', 'filterOpenChange', 'update:query', 'update:selectedLocations', 'update:viewMode', 'update:filterMode', 'update:selectedRegions', 'update:selectedProvince', 'update:selectedCity', 'update:selectedStandardWord'],
+    props: ['source', 'filterMode', 'selectedRegions', 'selectedLocations', 'selectedProvince', 'selectedCity', 'rememberLocationSelection', 'selectedSearchFields', 'partitionNodes', 'partitionLoading', 'partitionError', 'notesRefreshDisabled'],
+    emits: ['search', 'refreshNotes', 'openLocationDetails', 'filterOpenChange', 'update:rememberLocationSelection', 'update:query', 'update:selectedLocations', 'update:viewMode', 'update:filterMode', 'update:selectedRegions', 'update:selectedProvince', 'update:selectedCity', 'update:selectedStandardWord'],
     setup(props, { emit }) {
       controlProps = props
       emitControl = emit
@@ -104,6 +104,86 @@ beforeEach(() => {
 afterEach(() => { app?.unmount(); host?.remove(); vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.useRealTimers() })
 
 describe('vocabulary configuration entrance', () => {
+  const memoryKey = 'vocabulary_location_selection'
+
+  it.each(['location', 'administrative', 'yindian', 'map'])('restores remembered %s selection before the first query', async filterMode => {
+    const saved = { filterMode, locations: ['测试地点'], province: '广东', city: '广州', regions: ['甲-乙'] }
+    localStorage.setItem(memoryKey, JSON.stringify(saved))
+    await mount()
+    expect(controlProps.rememberLocationSelection).toBe(true)
+    expect(controlProps.filterMode).toBe(filterMode)
+    if (filterMode === 'location') expect(controlProps.selectedLocations).toEqual(saved.locations)
+    else if (filterMode === 'administrative') {
+      expect(controlProps.selectedProvince).toBe('广东')
+      expect(controlProps.selectedCity).toBe('广州')
+    } else expect(controlProps.selectedRegions).toEqual(saved.regions)
+    expect(mocks.items).not.toHaveBeenCalled()
+    host.querySelector('.submit').click(); await settle()
+    const expected = filterMode === 'location' ? { locations: saved.locations }
+      : filterMode === 'administrative' ? { province: saved.province, city: saved.city }
+        : { region_mode: filterMode, regions: saved.regions }
+    expect(mocks.items).toHaveBeenCalledWith(expect.objectContaining(expected))
+  })
+
+  it.each(['card', 'map', 'table'])('persists the applied scope in %s view while another mode is still a draft', async tab => {
+    vi.useFakeTimers()
+    await mount({ tab })
+    emitControl('update:rememberLocationSelection', true); await settle()
+    emitControl('update:filterMode', 'administrative'); await settle()
+    emitControl('update:selectedProvince', '广东'); await settle()
+    emitControl('update:selectedCity', '广州'); await settle()
+    host.querySelector('.submit').click(); await settle()
+    const saved = JSON.parse(localStorage.getItem(memoryKey))
+    expect(saved).toEqual({ filterMode: 'administrative', locations: [], province: '广东', city: '广州', regions: [] })
+    emitControl('filterOpenChange', true)
+    emitControl('update:filterMode', 'map'); await settle()
+    emitControl('update:selectedRegions', ['未提交分区']); await settle()
+    emitControl('update:viewMode', tab === 'card' ? 'map' : 'card'); await settle()
+    expect(JSON.parse(localStorage.getItem(memoryKey))).toEqual(saved)
+  })
+
+  it('continues querying if local storage writes fail', async () => {
+    await mount()
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('quota') })
+    emitControl('update:rememberLocationSelection', true); await settle()
+    host.querySelector('.submit').click(); await settle()
+    expect(mocks.items).toHaveBeenCalled()
+    emitControl('update:rememberLocationSelection', false); await settle()
+    expect(controlProps.rememberLocationSelection).toBe(false)
+  })
+
+  it('remembers on opt-in, saves only queried selections, deduplicates and clears on opt-out', async () => {
+    vi.useFakeTimers()
+    await mount()
+    emitControl('update:selectedLocations', ['测试地点']); await settle()
+    expect(localStorage.getItem(memoryKey)).toBeNull()
+    emitControl('update:rememberLocationSelection', true); await settle()
+    expect(JSON.parse(localStorage.getItem(memoryKey)).locations).toEqual(['测试地点'])
+    host.querySelector('.submit').click(); await settle()
+    const write = vi.spyOn(Storage.prototype, 'setItem')
+    emitControl('filterOpenChange', true)
+    emitControl('update:selectedLocations', []); await settle()
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(JSON.parse(localStorage.getItem(memoryKey)).locations).toEqual(['测试地点'])
+    emitControl('filterOpenChange', false); await settle()
+    await vi.advanceTimersByTimeAsync(250); await settle()
+    expect(JSON.parse(localStorage.getItem(memoryKey)).locations).toEqual([])
+    expect(write.mock.calls.filter(([key]) => key === memoryKey)).toHaveLength(1)
+    emitControl('update:query', '新查询'); await settle()
+    await vi.advanceTimersByTimeAsync(250); await settle()
+    expect(write.mock.calls.filter(([key]) => key === memoryKey)).toHaveLength(1)
+    emitControl('update:rememberLocationSelection', false); await settle()
+    expect(localStorage.getItem(memoryKey)).toBeNull()
+    expect(controlProps.selectedLocations).toEqual([])
+  })
+
+  it.each(['{bad json', 'null', '{"filterMode":"invalid"}'])('ignores invalid remembered selection %s', async saved => {
+    localStorage.setItem(memoryKey, saved)
+    await mount()
+    expect(controlProps.rememberLocationSelection).toBe(false)
+    expect(controlProps.selectedLocations).toEqual([])
+  })
+
   async function submitTable() {
     host.querySelector('.submit').click()
     entrance.$.exposed.progress.value = 1

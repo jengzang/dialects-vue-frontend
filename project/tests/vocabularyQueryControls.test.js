@@ -28,21 +28,36 @@ async function mountControls(expanded, overrides = {}) {
   const search = vi.fn()
   const refresh = vi.fn()
   const filterOpenChange = vi.fn()
+  const rememberSelection = vi.fn()
   host = document.createElement('div')
   document.body.append(host)
   app = createApp({ render: () => h(VocabularyTopControls, {
     ...props, 'onUpdate:query': updateQuery, onSearch: search, onRefreshNotes: refresh, onFilterOpenChange: filterOpenChange,
     'onUpdate:filterMode': value => { props.filterMode = value },
+    'onUpdate:rememberLocationSelection': rememberSelection,
   }) })
   app.use(createI18n({ legacy: false, locale: 'zh-CN', missingWarn: false, fallbackWarn: false, messages: { 'zh-CN': { common: { button: { search: '搜索' } } } } }))
   app.mount(host)
   await nextTick()
   const input = host.querySelector('.search-input')
   const type = text => { input.value = text; input.dispatchEvent(new Event('input', { bubbles: true })) }
-  return { props, updateQuery, search, refresh, type, filterOpenChange }
+  return { props, updateQuery, search, refresh, type, filterOpenChange, rememberSelection }
 }
 
 describe('vocabulary query submission in the same input', () => {
+  it('offers the remember selection checkbox in vocabulary settings and forwards changes', async () => {
+    const { rememberSelection, props } = await mountControls(false)
+    host.querySelector('.gear-btn').click(); await nextTick()
+    const label = [...host.querySelectorAll('.checkbox-wrapper')].find(element => element.textContent.includes('rememberLocationSelection'))
+    expect(label).toBeDefined()
+    const input = label.querySelector('input')
+    expect(input.checked).toBe(false)
+    input.checked = true
+    input.dispatchEvent(new Event('change', { bubbles: true })); await nextTick()
+    expect(rememberSelection).toHaveBeenCalledWith(true)
+    props.source = 'character-notes'; await nextTick()
+    expect(host.textContent).not.toContain('rememberLocationSelection')
+  })
   it('reports location opening and both trigger and outside closing', async () => {
     const { filterOpenChange } = await mountControls(false, { locationOptions: [{ value: '甲', label: '甲' }] })
     const trigger = host.querySelector('.location-select-trigger')

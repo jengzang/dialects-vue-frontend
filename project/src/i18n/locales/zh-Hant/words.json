@@ -88,6 +88,7 @@
       "singleSelect": "單選",
       "multiSelect": "多選",
       "filterModeTitle": "篩選方式",
+      "rememberLocationSelection": "記住目前選擇",
       "filterByRegion": "按行政區",
       "filterByLocation": "按地點",
       "filterByAdministrative": "按行政區劃",

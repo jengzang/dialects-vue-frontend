@@ -88,6 +88,7 @@
       "singleSelect": "Single",
       "multiSelect": "Multi",
       "filterModeTitle": "Filter Mode",
+      "rememberLocationSelection": "Remember current selection",
       "filterByRegion": "By Region",
       "filterByLocation": "By Location",
       "filterByAdministrative": "By Administrative Area",

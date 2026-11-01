@@ -128,6 +128,16 @@
             @update:model-value="emit('update:filterMode', $event)"
           />
         </div>
+        <div
+          v-if="source === 'vocabulary'"
+          class="search-field-mode-section"
+        >
+          <CheckBox
+            :model-value="rememberLocationSelection"
+            :label="t('words.wordList.search.rememberLocationSelection')"
+            @update:model-value="emit('update:rememberLocationSelection', $event)"
+          />
+        </div>
         <div v-if="source === 'vocabulary'" class="search-field-mode-section">
           <h4 class="search-field-modal-title">
             {{ t('words.wordList.search.standardWordFilterMode') }}
@@ -364,6 +374,7 @@ const props = defineProps({
   locationOptions: { type: Array, default: () => [] },
   standardWordOptions: { type: Array, default: () => [] },
   filterMode: { type: String, default: 'location' },
+  rememberLocationSelection: { type: Boolean, default: false },
   selectedRegions: { type: Array, default: () => [] },
   partitionNodes: { type: Array, default: () => [] },
   partitionLoading: { type: Boolean, default: false },
@@ -385,6 +396,7 @@ const emit = defineEmits([
   'update:singleSelect',
   'update:viewMode',
   'update:filterMode',
+  'update:rememberLocationSelection',
   'update:selectedRegions',
   'retryPartitions',
   'update:selectedProvince',

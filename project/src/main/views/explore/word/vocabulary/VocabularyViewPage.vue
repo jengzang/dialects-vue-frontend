@@ -20,6 +20,7 @@
     </template>
     <template #controls="{ expanded, collapse }">
     <VocabularyTopControls
+          v-model:remember-location-selection="rememberLocationSelection"
       :source="source"
       v-model:query="activeQuery"
       v-model:selected-search-fields="activeSearchFields"
@@ -815,20 +816,34 @@ const savedSearchFields = localStorage.getItem('vocabulary_search_fields')
 const selectedSearchFields = ref(savedSearchFields === null
   ? ['definition', 'headword']
   : JSON.parse(savedSearchFields))
-const selectedLocations = ref([])
 const FILTER_MODES = ['location', 'administrative', 'yindian', 'map']
+const LOCATION_SELECTION_STORAGE_KEY = 'vocabulary_location_selection'
+let savedLocationSelection = null
+try {
+  const saved = JSON.parse(localStorage.getItem(LOCATION_SELECTION_STORAGE_KEY) || 'null')
+  if (saved && FILTER_MODES.includes(saved.filterMode)
+    && ['locations', 'regions'].every(key => Array.isArray(saved[key]) && saved[key].every(value => typeof value === 'string'))
+    && typeof saved.province === 'string' && typeof saved.city === 'string') {
+    savedLocationSelection = saved
+  }
+} catch {
+  // 损坏或不可用的本地存储不应阻止查询。
+}
+const rememberLocationSelection = ref(Boolean(savedLocationSelection))
+const selectedLocations = ref(savedLocationSelection?.filterMode === 'location' ? savedLocationSelection.locations : [])
 const savedFilterMode = localStorage.getItem('vocabulary_filter_mode')
-const filterMode = ref(FILTER_MODES.includes(savedFilterMode)
+const filterMode = ref(savedLocationSelection?.filterMode || (FILTER_MODES.includes(savedFilterMode)
   ? savedFilterMode
-  : localStorage.getItem('vocabulary_filter_by_region') === 'true' ? 'administrative' : 'location')
-const selectedRegions = ref([])
+  : localStorage.getItem('vocabulary_filter_by_region') === 'true' ? 'administrative' : 'location'))
+const appliedVocabularyFilterMode = ref(filterMode.value)
+const selectedRegions = ref(['yindian', 'map'].includes(savedLocationSelection?.filterMode) ? savedLocationSelection.regions : [])
 const partitionNodes = ref([])
 const partitionLoading = ref(false)
 const partitionError = ref('')
 const partitionTrees = new Map()
 let partitionRequestId = 0
-const selectedProvince = ref('')
-const selectedCity = ref('')
+const selectedProvince = ref(savedLocationSelection?.filterMode === 'administrative' ? savedLocationSelection.province : '')
+const selectedCity = ref(savedLocationSelection?.filterMode === 'administrative' ? savedLocationSelection.city : '')
 const selectedStandardWord = ref('')
 const singleSelect = ref(localStorage.getItem('vocabulary_single_select') !== 'false')
 const selectedStandardWordsModel = ref([])
@@ -1389,6 +1404,24 @@ function buildVocabularyFilterParams() {
   return params
 }
 
+function saveVocabularyLocationSelection(params, mode = appliedVocabularyFilterMode.value) {
+  if (!rememberLocationSelection.value) return
+  const selection = JSON.stringify({
+    filterMode: mode,
+    locations: mode === 'location' ? params.locations || [] : [],
+    province: mode === 'administrative' ? params.province || '' : '',
+    city: mode === 'administrative' ? params.city || '' : '',
+    regions: ['yindian', 'map'].includes(mode) ? params.regions || [] : [],
+  })
+  try {
+    if (localStorage.getItem(LOCATION_SELECTION_STORAGE_KEY) !== selection) {
+      localStorage.setItem(LOCATION_SELECTION_STORAGE_KEY, selection)
+    }
+  } catch {
+    // 存储失败时仍继续正常查询。
+  }
+}
+
 function buildDraftVocabularyQueryParams() {
   return {
     q: query.value.trim(),
@@ -1466,6 +1499,7 @@ async function requestVocabularyItems(params) {
     return pendingVocabularyItemRequests.get(requestKey)
   }
 
+  saveVocabularyLocationSelection(params)
   const requestPromise = getVocabularyItems(params)
     .finally(() => {
       pendingVocabularyItemRequests.delete(requestKey)
@@ -1480,6 +1514,7 @@ async function requestVocabularyMapPoints(params = buildVocabularyMapPointsParam
     return pendingVocabularyMapPointRequests.get(requestKey)
   }
 
+  saveVocabularyLocationSelection(params)
   const requestPromise = getVocabularyMapPoints(params)
     .finally(() => {
       pendingVocabularyMapPointRequests.delete(requestKey)
@@ -1494,6 +1529,7 @@ async function requestVocabularyMapItems(params = buildVocabularyMapItemsParams(
     return pendingVocabularyMapPointRequests.get(requestKey)
   }
 
+  saveVocabularyLocationSelection(params)
   const requestPromise = getVocabularyMapItems(params)
     .finally(() => {
       pendingVocabularyMapPointRequests.delete(requestKey)
@@ -1508,6 +1544,7 @@ async function requestVocabularyStandardWords(params = buildVocabularyStandardWo
     return pendingVocabularyStandardWordRequests.get(requestKey)
   }
 
+  saveVocabularyLocationSelection(params)
   const requestPromise = getVocabularyStandardWords(params)
     .finally(() => {
       pendingVocabularyStandardWordRequests.delete(requestKey)
@@ -2102,13 +2139,27 @@ watch(selectedProvince, () => {
 
 watch(filterMode, (mode, previousMode) => {
   localStorage.setItem('vocabulary_filter_mode', mode)
-  selectedLocations.value = []
-  selectedProvince.value = ''
-  selectedCity.value = ''
-  selectedRegions.value = []
+  if (previousMode) {
+    selectedLocations.value = []
+    selectedProvince.value = ''
+    selectedCity.value = ''
+    selectedRegions.value = []
+  }
   loadVocabularyPartitionTree()
   if (previousMode && previousMode !== mode) loadVocabularyLocationOptionsForMode()
 }, { immediate: true })
+
+watch(rememberLocationSelection, (remember) => {
+  if (remember) {
+    saveVocabularyLocationSelection(buildVocabularyFilterParams(), filterMode.value)
+  } else {
+    try {
+      localStorage.removeItem(LOCATION_SELECTION_STORAGE_KEY)
+    } catch {
+      // 本地存储不可用时不影响当前选择。
+    }
+  }
+})
 
 watch(selectedSearchFields, (val) => {
   localStorage.setItem('vocabulary_search_fields', JSON.stringify(val))
@@ -2150,6 +2201,7 @@ function applyVocabularyQuery() {
   if (appliedVocabularyQueryParams.value
     && buildVocabularyQueryKey(params) === buildVocabularyQueryKey(appliedVocabularyQueryParams.value)) return false
   appliedVocabularyQueryParams.value = params
+  appliedVocabularyFilterMode.value = filterMode.value
   page.value = 1
   mapDetailPage.value = 1
   activeVocabularyItemsRequestKey.value = ''
@@ -2179,16 +2231,19 @@ watch([appliedVocabularyQueryParams, viewMode, hasSubmittedSearch, isCharacterNo
   const params = buildVocabularyQueryParams()
   if (params.locations?.length) {
     tableLocationFilter.value = { location_name: [...params.locations] }
+    saveVocabularyLocationSelection(params)
     return
   }
   if (!params.province && !params.city && !params.regions?.length) {
     tableLocationFilter.value = {}
+    saveVocabularyLocationSelection(params)
     return
   }
 
   let cancelled = false
   onCleanup(() => { cancelled = true })
   try {
+    saveVocabularyLocationSelection(params)
     const options = await getVocabularyLocationOptions(buildVocabularyLocationOptionsParams(params))
     if (!cancelled) tableLocationFilter.value = { location_name: options.map(option => option.value) }
   } catch (error) {
