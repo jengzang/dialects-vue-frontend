@@ -108,7 +108,7 @@ function drawGeography(ctx, resources, map, layout, colors, width) {
   ctx.globalAlpha = .7 * (layout.portrait ? 88 / 255 : 76 / 255) * .9
   // Single fill prevents dense survey clusters accumulating extra opacity.
   ctx.beginPath()
-  const radius = Math.max(.8, (layout.portrait ? 1080 : 2560) / 2000) * 1.35 * width / (layout.portrait ? 1080 : 2560)
+  const radius = Math.max(.8, (layout.portrait ? 1080 : 2560) / 2000) * 1.8225 * width / (layout.portrait ? 1080 : 2560)
   for (const [lon, lat] of getSurveyPoints(resources.dots)) {
     const [px, py] = map.point(lon, lat)
     ctx.moveTo(px + radius, py); ctx.arc(px, py, radius, 0, Math.PI * 2)
@@ -165,7 +165,7 @@ export function drawBlueLayoutBackground(canvas, resources, width, height, color
   ctx.drawImage(mountains, 0, 0, width, height)
   ctx.globalAlpha = 1
   drawGeography(ctx, resources, map, layout, colors, width)
-  ctx.globalAlpha = .5
+  ctx.globalAlpha = .25
   if (resources.book) ctx.drawImage(resources.book, book.x, book.y, book.width, book.height)
   ctx.globalAlpha = .8
   const quoteImage = layout.portrait ? resources.quotePortrait : resources.quoteLandscape
