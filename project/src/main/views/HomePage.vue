@@ -576,20 +576,45 @@ function localeTo(path) {
 
 // reveal 淡入
 let revealObserver = null
+let revealScrollFrame = null
+let pendingRevealNodes = new Set()
+
+function revealNode(node) {
+  node.classList.add('visible')
+  pendingRevealNodes.delete(node)
+  revealObserver?.unobserve(node)
+  if (pendingRevealNodes.size === 0) {
+    window.removeEventListener('scroll', scheduleRevealFallback)
+  }
+}
+
+function scheduleRevealFallback() {
+  if (revealScrollFrame !== null) return
+  revealScrollFrame = window.requestAnimationFrame(() => {
+    revealScrollFrame = null
+    pendingRevealNodes.forEach(node => {
+      if (node.getBoundingClientRect().top < window.innerHeight) {
+        revealNode(node)
+      }
+    })
+  })
+}
+
 const initReveal = () => {
   const root = homePageRef.value
   if (!root) return
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
-  const nodes = root.querySelectorAll('.reveal')
+  const nodes = [...root.querySelectorAll('.reveal')]
   if (reduced) {
     nodes.forEach(n => n.classList.add('visible'))
     return
   }
+  pendingRevealNodes = new Set(nodes)
+  window.addEventListener('scroll', scheduleRevealFallback, { passive: true })
   revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        entry.target.classList.add('visible')
-        revealObserver.unobserve(entry.target)
+        revealNode(entry.target)
       }
     })
   }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' })
@@ -714,11 +739,18 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleGlobeModeKeydown)
+  revealObserver?.disconnect()
+  revealObserver = null
+  pendingRevealNodes.clear()
+  window.removeEventListener('scroll', scheduleRevealFallback)
+  if (revealScrollFrame !== null) {
+    window.cancelAnimationFrame(revealScrollFrame)
+    revealScrollFrame = null
+  }
   if (isGlobeMode.value) {
     document.documentElement.style.overflow = previousDocumentOverflow
     document.body.style.overflow = previousBodyOverflow
   }
-  revealObserver?.disconnect()
   showcaseObserver?.disconnect()
   backgroundObserver?.disconnect()
   backgroundResizeObserver?.disconnect()
