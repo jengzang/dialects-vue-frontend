@@ -167,7 +167,7 @@ export function drawBlueLayoutBackground(canvas, resources, width, height, color
   drawGeography(ctx, resources, map, layout, colors, width)
   ctx.globalAlpha = .25
   if (resources.book) ctx.drawImage(resources.book, book.x, book.y, book.width, book.height)
-  ctx.globalAlpha = .8
+  ctx.globalAlpha = .84
   const quoteImage = layout.portrait ? resources.quotePortrait : resources.quoteLandscape
   if (quoteImage) {
     const originalFs = layout.portrait ? 97 : 94

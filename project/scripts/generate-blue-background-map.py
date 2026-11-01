@@ -11,7 +11,7 @@ from PIL import Image, ImageChops, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
 GIS = ROOT / 'public/data/gis'
-WIDTH, PADDING, AA = 2000, 8, 2
+WIDTH, PADDING, AA = 1000, 4, 3
 
 
 def project(lon, lat):
@@ -83,11 +83,11 @@ for level in (2, 1, 0):
     add_lines(lines, (100, 154, 198), 76 * (1.05, .78, .52)[level],
               (1.65, 1.1, .75)[level] * WIDTH / 1000)
 # Bake a smooth outline at the reference desktop map size; dots use live projection.
-add_lines((ring for polygon in country for ring in polygon), (119, 157, 192), 76, 4, False)
+add_lines((ring for polygon in country for ring in polygon), (119, 157, 192), 76, 4 * WIDTH / 2000, False)
 target = ROOT / 'public/backgrounds/blue/map.webp'
 # A restrained palette keeps this faint, mostly transparent line drawing small.
 image.resize(size, Image.Resampling.LANCZOS).quantize(
-    colors=128, method=Image.Quantize.FASTOCTREE
+    colors=32, method=Image.Quantize.FASTOCTREE
 ).convert('RGBA').save(target, lossless=True, method=6)
 metadata = dict(minX=min_x, maxX=max_x, minY=min_y, maxY=max_y,
                 width=WIDTH, padding=PADDING)
