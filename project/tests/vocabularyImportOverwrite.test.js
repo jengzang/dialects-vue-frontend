@@ -53,7 +53,7 @@ beforeEach(() => {
 afterEach(() => { wrapper?.app.unmount(); wrapper?.host.remove() })
 
 describe('vocabulary import feedback', () => {
-  it('shows compact unmatched columns and missing dialect-or-IPA row numbers in the backend preview', async () => {
+  it('shows unmatched columns without repeating every row as a missing-field notice', async () => {
     const { state, host } = mountPage()
     mocks.locale.value = 'en'
     state.uploadLocation = { location_name: '甲村', coordinates: '113,23' }
@@ -78,7 +78,7 @@ describe('vocabulary import feedback', () => {
     expect(notices).toBeTruthy()
     expect(notices.textContent).toContain('words.wordList.columns.pronunciation')
     expect(notices.textContent).toContain('words.wordList.columns.detail')
-    expect(notices.textContent).toContain('"rows":"4, 6"')
+    expect(notices.textContent).not.toContain('"rows":')
     expect(notices.textContent).toContain('pronunciation, words.wordList.columns.detail')
     expect(notices.textContent).not.toContain('words.wordList.columns.headword')
   })
@@ -105,9 +105,89 @@ describe('vocabulary import feedback', () => {
     const notices = host.querySelector('.backend-preview-mapping-notices')
     expect(notices).toBeTruthy()
     expect(notices.textContent).toContain('words.wordList.columns.headword')
-    expect(notices.textContent).toContain('"rows":"2、5"')
+    expect(notices.textContent).not.toContain('"rows":')
     expect(notices.textContent).not.toContain('words.wordList.columns.pronunciation')
     expect(notices.textContent).not.toContain('words.wordList.columns.detail')
+  })
+
+  it.each([
+    { headerRowIndex: 0, prefix: ['standard_word,local_expression,ipa,notes'], offset: 0, locale: 'zh-CN' },
+    { headerRowIndex: 1, prefix: ['说明,,,', 'standard_word,local_expression,ipa,notes'], offset: 1, locale: 'zh-Hant' },
+    { headerRowIndex: -1, prefix: [], offset: -1, locale: 'en' },
+  ])('groups single-field gaps and restores source rows with header $headerRowIndex', async ({ headerRowIndex, prefix, offset, locale }) => {
+    const { state, host } = mountPage()
+    mocks.locale.value = locale
+    state.uploadLocation = { location_name: '甲村', coordinates: '113,23' }
+    const csv = [
+      ...prefix,
+      '甲,,a,',
+      '乙,,b,',
+      '丙,丙,,',
+      '',
+      '丁,,,',
+      '戊,,,',
+      '己,己,k,',
+    ].join('\n')
+    const file = new File([csv], 'words.csv')
+    file.text = async () => csv
+    mocks.previewVocabularyImport.mockResolvedValue({
+      parsed_count: 4,
+      skipped_count: 0,
+      errors: [
+        '第 5 行缺少字段: ipa 或 local_expression（至少需要一个非空）',
+        '第 6 行缺少字段: ipa 或 local_expression（至少需要一个非空）',
+      ],
+    })
+
+    await state.importFlow.loadPreview(file)
+    await flush()
+    state.importPreview.headerRowIndex.value = headerRowIndex
+    await flush()
+    state.importPreview.mapping.value = {
+      standard_word: 'column_1', local_expression: 'column_2', ipa: 'column_3', notes: 'column_4',
+    }
+    await flush()
+    await state.handleConfirmUpload()
+    await flush()
+
+    const notices = host.querySelector('.backend-preview-mapping-notices')
+    expect(notices.textContent).toContain(`previewMissingDialectRows{"rows":"${2 + offset}–${3 + offset}"}`)
+    expect(notices.textContent).toContain(`previewMissingIpaRows{"rows":"${4 + offset}"}`)
+    expect(notices.textContent).not.toContain('previewMissingDialectOrIpaRows')
+    const errors = host.querySelectorAll('.backend-preview-errors li')
+    expect(errors).toHaveLength(1)
+    expect(errors[0].textContent).toContain(`previewMissingDialectOrIpaRows{"rows":"${6 + offset}–${7 + offset}"}`)
+    expect(state.previewSkippedCount).toBe(2)
+    expect(state.previewErrors).toHaveLength(2)
+    expect(mocks.showError).not.toHaveBeenCalled()
+
+    state.clearUploadFile()
+    await flush()
+    state.backendPreview = { parsed_count: 1, errors: ['第 2 行缺少字段: standard_word'] }
+    await flush()
+    expect(host.querySelector('.backend-preview-mapping-notices')).toBeNull()
+    expect(host.querySelector('.backend-preview-errors').textContent).toContain('"rows":"2"')
+  })
+
+  it('groups backend row errors by reason and retains unknown errors without mapping metadata', async () => {
+    const { state, host } = mountPage()
+    state.backendPreview = {
+      parsed_count: 1, skipped_count: 3,
+      errors: ['第 9 行缺少字段: standard_word', '无法识别的格式',
+        '第 2 行缺少字段: standard_word', '第 3 行缺少字段: standard_word',
+        '第 5 行格式有误', '第 6 行格式有误'],
+    }
+    await flush()
+
+    const errors = [...host.querySelectorAll('.backend-preview-errors li')].map((item) => item.textContent)
+    expect(errors).toHaveLength(3)
+    expect(errors[0]).toContain('"rows":"2–3、9"')
+    expect(errors[0]).toContain('缺少字段: standard_word')
+    expect(errors[1]).toContain('无法识别的格式')
+    expect(errors[2]).toContain('"rows":"5–6"')
+    expect(errors[2]).toContain('格式有误')
+    expect(state.previewSkippedCount).toBe(9)
+    expect(state.previewErrors).toHaveLength(6)
   })
 
   it.each(['success', 'empty', 'failure'])('closes the mapping dialog before preview and clears loading after %s', async (outcome) => {

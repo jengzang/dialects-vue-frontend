@@ -182,7 +182,7 @@
             <span>{{ t('words.wordList.upload.previewParserMode') }}：{{ backendPreview.parser_mode || uploadParserMode }}</span>
           </div>
           <div
-            v-if="unmatchedVocabularyColumnLabels.length || missingDialectOrIpaRowNumbers"
+            v-if="unmatchedVocabularyColumnLabels.length || missingDialectRowNumbers || missingIpaRowNumbers"
             class="backend-preview-mapping-notices"
           >
             <p
@@ -192,10 +192,16 @@
               {{ t('words.wordList.upload.previewUnmatchedColumns', { columns: unmatchedVocabularyColumnList }) }}
             </p>
             <p
-              v-if="missingDialectOrIpaRowNumbers"
+              v-if="missingDialectRowNumbers"
               class="backend-preview-warning"
             >
-              {{ t('words.wordList.upload.previewMissingDialectOrIpaRows', { rows: missingDialectOrIpaRowNumbers }) }}
+              {{ t('words.wordList.upload.previewMissingDialectRows', { rows: missingDialectRowNumbers }) }}
+            </p>
+            <p
+              v-if="missingIpaRowNumbers"
+              class="backend-preview-warning"
+            >
+              {{ t('words.wordList.upload.previewMissingIpaRows', { rows: missingIpaRowNumbers }) }}
             </p>
           </div>
           <p v-if="(backendPreview.would_delete_existing_count ?? 0) > 0" class="backend-preview-warning">
@@ -212,7 +218,7 @@
           >
             <ul class="backend-preview-errors">
               <li
-                v-for="error in previewErrors"
+                v-for="error in previewErrorMessages"
                 :key="error"
               >
                 {{ error }}
@@ -672,7 +678,7 @@ const showLicense = ref(false)
 const backendPreview = ref(null)
 const isOverwriteConfirmed = ref(false)
 const importResult = ref(null)
-const vocabularyImportNotices = ref({ unmatchedFieldKeys: [], missingRowNumbers: [] })
+const vocabularyImportNotices = ref({ unmatchedFieldKeys: [], missingDialectRows: [], missingIpaRows: [], sourceRowNumbers: [] })
 
 const uploadParserMode = ref('auto')
 const fillStandardFromLocal = ref(false)
@@ -842,6 +848,7 @@ const shouldConfirmOverwrite = computed(() => {
 })
 
 const previewErrors = computed(() => parseErrorDetails(backendPreview.value?.errors))
+const previewErrorMessages = computed(() => groupPreviewErrors(previewErrors.value))
 const previewSkippedCount = computed(() => (Number(backendPreview.value?.skipped_count) || 0) + previewErrors.value.length)
 const vocabularyOptionalFieldLabelKeys = {
   local_expression: 'words.wordList.columns.headword',
@@ -854,7 +861,8 @@ const unmatchedVocabularyColumnLabels = computed(() => vocabularyImportNotices.v
 const unmatchedVocabularyColumnList = computed(() => unmatchedVocabularyColumnLabels.value
   .join(locale.value.startsWith('en') ? ', ' : '、')
 )
-const missingDialectOrIpaRowNumbers = computed(() => formatRowNumberList(vocabularyImportNotices.value.missingRowNumbers))
+const missingDialectRowNumbers = computed(() => formatRowNumberList(vocabularyImportNotices.value.missingDialectRows))
+const missingIpaRowNumbers = computed(() => formatRowNumberList(vocabularyImportNotices.value.missingIpaRows))
 
 const hasImportableRows = computed(() => isPreviewImportable(backendPreview.value))
 
@@ -975,7 +983,7 @@ function clearUploadFile() {
   backendPreview.value = null
   isOverwriteConfirmed.value = false
   importResult.value = null
-  vocabularyImportNotices.value = { unmatchedFieldKeys: [], missingRowNumbers: [] }
+  vocabularyImportNotices.value = { unmatchedFieldKeys: [], missingDialectRows: [], missingIpaRows: [], sourceRowNumbers: [] }
   importFlow.clearPreview()
 }
 
@@ -1072,20 +1080,52 @@ function buildVocabularyImportNotices() {
   const rowNumbers = previewTable.previewRowNumbers || []
   const logicalHeaderRowIndex = previewTable.headerRowIndex ?? importPreview.headerRowIndex.value
 
-  return {
+  const notices = {
     unmatchedFieldKeys: ['local_expression', 'ipa', 'notes'].filter((fieldKey) => !mapping[fieldKey]),
-    missingRowNumbers: previewRows.reduce((missingRows, row, rowIndex) => {
-      const localExpression = localExpressionIndex == null ? '' : String(row[localExpressionIndex] ?? '').trim()
-      const ipa = ipaIndex == null ? '' : String(row[ipaIndex] ?? '').trim()
-      if (!localExpression && !ipa) {
-        const fallbackRowNumber = logicalHeaderRowIndex >= 0
-          ? logicalHeaderRowIndex + rowIndex + 2
-          : rowIndex + 1
-        missingRows.push(rowNumbers[rowIndex] ?? fallbackRowNumber)
-      }
-      return missingRows
-    }, [])
+    missingDialectRows: [],
+    missingIpaRows: [],
+    sourceRowNumbers: previewRows.map((_, rowIndex) => rowNumbers[rowIndex] ?? (logicalHeaderRowIndex >= 0
+      ? logicalHeaderRowIndex + rowIndex + 2
+      : rowIndex + 1)),
   }
+  previewRows.forEach((row, rowIndex) => {
+    const localExpression = localExpressionIndex == null ? '' : String(row[localExpressionIndex] ?? '').trim()
+    const ipa = ipaIndex == null ? '' : String(row[ipaIndex] ?? '').trim()
+    const rowNumber = notices.sourceRowNumbers[rowIndex]
+    if (localExpressionIndex != null && !localExpression && ipa) notices.missingDialectRows.push(rowNumber)
+    if (ipaIndex != null && !ipa && localExpression) notices.missingIpaRows.push(rowNumber)
+  })
+  return notices
+}
+
+function groupPreviewErrors(errors) {
+  const groups = []
+  const byReason = new Map()
+  errors.forEach((error) => {
+    const match = String(error).match(/^第\s*(\d+)\s*行\s*(.+)$/)
+    if (!match || Number(match[1]) < 1) {
+      groups.push({ message: error })
+      return
+    }
+    const backendRowNumber = Number(match[1])
+    // The mapped XLSX always has one header row; blank source rows were removed.
+    const rowNumber = vocabularyImportNotices.value.sourceRowNumbers[backendRowNumber - 2] ?? backendRowNumber
+    const reason = match[2].trim()
+    if (!byReason.has(reason)) {
+      const group = { reason, rowNumbers: [] }
+      byReason.set(reason, group)
+      groups.push(group)
+    }
+    byReason.get(reason).rowNumbers.push(rowNumber)
+  })
+  return groups.map((group) => {
+    if (!group.rowNumbers) return group.message
+    const rows = formatRowNumberList(group.rowNumbers)
+    if (group.reason === '缺少字段: ipa 或 local_expression（至少需要一个非空）') {
+      return t('words.wordList.upload.previewMissingDialectOrIpaRows', { rows })
+    }
+    return t('words.wordList.upload.previewGroupedRowError', { rows, reason: group.reason })
+  })
 }
 
 function formatRowNumberList(rowNumbers) {
@@ -1146,7 +1186,7 @@ async function handlePreviewImport(fileOverride = null) {
     })
     backendPreview.value = previewResponse
     if (!isPreviewImportable(previewResponse)) {
-      const details = parseErrorDetails(previewResponse.errors)
+      const details = previewErrorMessages.value
       const message = details.length
         ? details.join('；')
         : t('words.wordList.upload.noImportableData')
