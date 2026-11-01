@@ -7,8 +7,9 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { drawBlueLayoutBackground, loadBlueBackgroundResources } from '@/utils/ui/blueLayoutBackground.js'
+import { currentColorTheme } from '@/composables/core/uiPreferences.js'
 
 const canvas = ref(null)
 const emit = defineEmits(['ready'])
@@ -27,10 +28,13 @@ function queueDraw() {
     const colors = Object.fromEntries(['dot'].map(key => [
       key, style.getPropertyValue(`--blue-background-${key}`).trim(),
     ]))
+    colors.filter = style.getPropertyValue('--layout-art-filter').trim() || 'none'
     drawBlueLayoutBackground(canvas.value, resources, width, height, colors, window.devicePixelRatio || 1)
     emit('ready', true)
   })
 }
+
+watch(currentColorTheme, queueDraw, { flush: 'post' })
 
 onMounted(async () => {
   observer = new ResizeObserver(queueDraw)

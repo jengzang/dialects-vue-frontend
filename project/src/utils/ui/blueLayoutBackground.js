@@ -128,7 +128,7 @@ export function drawBlueLayoutBackground(canvas, resources, width, height, color
   canvas.width = Math.round(width * ratio); canvas.height = Math.round(height * ratio)
   const ctx = canvas.getContext('2d')
   ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
-  if (resources.base) {
+  if (resources.base && (!colors.filter || colors.filter === 'none')) {
     const image = resources.base
     const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight)
     ctx.drawImage(image, (width - image.naturalWidth * scale) / 2, (height - image.naturalHeight * scale) / 2, image.naturalWidth * scale, image.naturalHeight * scale)
@@ -175,4 +175,12 @@ export function drawBlueLayoutBackground(canvas, resources, width, height, color
     ctx.drawImage(quoteImage, quote.x + offsetX * fs, quote.y, quoteImage.naturalWidth * fs / originalFs, quoteImage.naturalHeight * fs / originalFs)
   }
   ctx.globalAlpha = 1
+  if (colors.filter && colors.filter !== 'none') {
+    // Recolor once per redraw, preserving transparency over the theme's own background.
+    ctx.save()
+    ctx.globalCompositeOperation = 'copy'
+    ctx.filter = colors.filter
+    ctx.drawImage(canvas, 0, 0, width, height)
+    ctx.restore()
+  }
 }

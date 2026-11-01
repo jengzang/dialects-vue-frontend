@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApp, nextTick } from 'vue'
 import Background from '../src/components/common/BlueLayoutBackground.vue'
 import { drawBlueLayoutBackground, loadBlueBackgroundResources } from '../src/utils/ui/blueLayoutBackground.js'
+import { currentColorTheme } from '../src/composables/core/uiPreferences.js'
 
 vi.mock('../src/utils/ui/blueLayoutBackground.js', () => ({
   drawBlueLayoutBackground: vi.fn(),
@@ -31,9 +32,23 @@ describe('blue background lifecycle', () => {
   afterEach(() => {
     app?.unmount()
     app = null
+    currentColorTheme.value = 'blue'
     host.remove()
     vi.restoreAllMocks()
     vi.unstubAllGlobals()
+  })
+
+  it('recolors after a theme switch without loading another set of resources', async () => {
+    loadBlueBackgroundResources.mockResolvedValue({ dots: null })
+    app = createApp(Background)
+    app.mount(host)
+    await nextTick()
+    await Promise.resolve()
+    const count = requestAnimationFrame.mock.calls.length
+    currentColorTheme.value = 'green'
+    await nextTick()
+    expect(requestAnimationFrame.mock.calls.length).toBeGreaterThan(count)
+    expect(loadBlueBackgroundResources).toHaveBeenCalledOnce()
   })
 
   it('redraws on resize and releases pending frames, observers and resize handlers on unmount', async () => {

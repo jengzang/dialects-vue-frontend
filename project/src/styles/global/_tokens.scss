@@ -54,6 +54,7 @@
   --blue-background-river: #649ac6;
   --blue-background-province: #7b9ebe;
   --blue-background-dot: #5d91be;
+  --layout-art-filter: none;
   --color-map-draw: #2563eb;
 
   /* 页面背景渐变 - 三層藍色漸變 */
@@ -351,6 +352,7 @@ $font-size-width-scales: (
   --color-text-secondary: #667085;
 
   --bg-body: #faf7f0;
+  --layout-art-filter: sepia(0.65) saturate(0.5);
   --bg-white: #fffdfa;
   --bg-light-gray: #f7f3eb;
   --bg-light: #f6f0e5;
@@ -491,6 +493,7 @@ $font-size-width-scales: (
   --surface-glass-floating-subtle: rgba(23, 60, 38, 0.62);
 
   --bg-body: #0c2416;
+  --layout-art-filter: hue-rotate(-75deg) saturate(0.8);
   --bg-white: #173c26;
   --bg-light-gray: #1d452d;
   --bg-light: #102f1c;
@@ -660,6 +663,7 @@ $font-size-width-scales: (
   --surface-glass-floating-subtle: rgba(255, 255, 255, 0.08);
 
   --bg-body: #0d1117;
+  --layout-art-filter: grayscale(1) brightness(1.35);
   --bg-white: #161b22;
   --bg-light-gray: #0d1117;
   --bg-light: #21262d;
