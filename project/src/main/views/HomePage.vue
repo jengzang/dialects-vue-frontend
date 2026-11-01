@@ -16,7 +16,7 @@
       />
 
       <div class="hero-content">
-        <img src="/brand/title.webp" :alt="$t('home.hero.logoAlt')" class="hero-logo title-logo" />
+        <img :src="brandTitleSrc" :alt="$t('home.hero.logoAlt')" class="hero-logo title-logo" />
         <div class="hero-title-row">
           <h1 class="hero-title">{{ $t('home.hero.title') }}</h1>
         </div>
@@ -450,7 +450,7 @@ import { computed, ref, onMounted, onBeforeUnmount, defineAsyncComponent } from 
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
-import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { currentColorTheme, getBrandAssets } from '@/composables/core/uiPreferences.js'
 import { useVisitStats } from '@/composables/data/useVisitStats.js'
 import { useClickParticles } from '@/main/composables/useClickParticles.js'
 import { getCachedSourceStats, getSourceStats } from '@/composables/data/useSourceStats.js'
@@ -501,11 +501,8 @@ const homeUpdateNotice = computed(() => getHomeUpdateNotice((key, values) => t(k
 const CURRENT_VERSION = computed(() => homeUpdateNotice.value.version)
 const LAST_UPDATE_DATE = computed(() => homeUpdateNotice.value.lastUpdateDate)
 
-const heroDecorationSrc = computed(() =>
-  currentColorTheme.value === COLOR_THEME_GREEN
-    ? '/brand/GreenCircle.webp'
-    : '/brand/BlueCircle.webp'
-)
+const heroDecorationSrc = computed(() => getBrandAssets(currentColorTheme.value).decoration)
+const brandTitleSrc = computed(() => getBrandAssets(currentColorTheme.value).title)
 
 const projects = [
   {

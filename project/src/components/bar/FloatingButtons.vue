@@ -52,13 +52,9 @@ import InlineIcon from '@/components/common/InlineIcon.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { userStore } from '@/main/store/store.js';
 import NavAvatar from '@/components/bar/NavAvatar.vue';
-import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { currentColorTheme, getBrandAssets } from '@/composables/core/uiPreferences.js'
 
-const faviconSrc = computed(() =>
-  currentColorTheme.value === COLOR_THEME_GREEN
-    ? '/brand/favicon_green.ico'
-    : '/brand/favicon.ico'
-)
+const faviconSrc = computed(() => getBrandAssets(currentColorTheme.value).logo)
 
 const props = defineProps({
   // 认证按钮位置: 'top-right' | 'bottom-left'

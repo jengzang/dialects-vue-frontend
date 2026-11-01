@@ -34,6 +34,15 @@ function normalizeColorTheme(theme) {
   return VALID_COLOR_THEMES.has(theme) ? theme : COLOR_THEME_DEFAULT
 }
 
+export function getBrandAssets(theme) {
+  const normalizedTheme = normalizeColorTheme(theme)
+  return {
+    logo: `/brand/theme-previews/favicon-${normalizedTheme}.png`,
+    title: normalizedTheme === COLOR_THEME_BLUE ? '/brand/title.webp' : `/brand/theme-previews/title-${normalizedTheme}.png`,
+    decoration: normalizedTheme === COLOR_THEME_BLUE ? '/brand/BlueCircle.webp' : `/brand/theme-previews/logo-${normalizedTheme}.png`,
+  }
+}
+
 function normalizeIconMode(mode) {
   return VALID_ICON_MODES.has(mode) ? mode : ICON_MODE_DEFAULT
 }
@@ -81,6 +90,10 @@ export function applyColorTheme(theme) {
 
   const normalizedTheme = normalizeColorTheme(theme)
   document.documentElement.dataset.colorTheme = normalizedTheme
+  document.querySelectorAll('link[rel="icon"]').forEach((icon) => {
+    icon.href = getBrandAssets(normalizedTheme).logo
+    icon.type = 'image/png'
+  })
   return normalizedTheme
 }
 

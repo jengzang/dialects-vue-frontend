@@ -11,7 +11,7 @@
       <div v-if="isOpen" class="sidebar main-sidebar-shell" @touchmove.stop>
       <!-- 标题图片 (可选) -->
       <div v-if="showTitle" class="sidebar-header">
-        <img src="/brand/title.webp" alt="Title" class="title-img title-logo" />
+        <img :src="brandTitleSrc" alt="Title" class="title-img title-logo" />
       </div>
       <div v-else class="sidebar-empty main-sidebar-empty"></div>
 
@@ -148,6 +148,9 @@ import {userStore} from "@/main/store/store.js";
 import { useSidebarConfig } from '@/main/config/index.js';
 import { navigatePlatformLink } from '@/platform/index.js'
 import { WEB_BASE } from '@/env-config.js'
+import { currentColorTheme, getBrandAssets } from '@/composables/core/uiPreferences.js'
+
+const brandTitleSrc = computed(() => getBrandAssets(currentColorTheme.value).title)
 
 const { t } = useI18n();
 const router = useRouter();

@@ -212,7 +212,7 @@ describe('share card helper', () => {
     expect(qrBlocks.length).toBeGreaterThan(80)
   })
 
-  it('draws brand title and themed logo images when they load', async () => {
+  it.each(['blue', 'light', 'green', 'dark'])('draws matching %s brand images when they load', async colorTheme => {
     const calls = []
     const context = {
       fillStyle: '',
@@ -248,16 +248,19 @@ describe('share card helper', () => {
       url: 'https://dialects.yzup.top/menu/query/zhonggu',
       languageLabel: '简体',
       themeLabel: '绿色',
-      colorTheme: 'green',
+      colorTheme,
       brandName: '方音图鉴',
       qrHint: '扫码打开当前页面',
       loadImage,
     })
 
-    expect(loadImage).toHaveBeenCalledWith('/brand/title.webp')
-    expect(loadImage).toHaveBeenCalledWith('/brand/GreenCircle.webp')
-    expect(calls.some(call => call[0] === 'drawImage' && call[1].src === '/brand/title.webp')).toBe(true)
-    expect(calls.some(call => call[0] === 'drawImage' && call[1].src === '/brand/GreenCircle.webp')).toBe(true)
+    const titleSrc = colorTheme === 'blue' ? '/brand/title.webp' : `/brand/theme-previews/title-${colorTheme}.png`
+    const circleSrc = colorTheme === 'blue' ? '/brand/BlueCircle.webp' : `/brand/theme-previews/logo-${colorTheme}.png`
+    const logoSrc = `/brand/theme-previews/favicon-${colorTheme}.png`
+    for (const src of [titleSrc, circleSrc, logoSrc]) {
+      expect(loadImage).toHaveBeenCalledWith(src)
+      expect(calls.some(call => call[0] === 'drawImage' && call[1].src === src)).toBe(true)
+    }
   })
 
   it('truncates oversized share-card title and URL before drawing', async () => {

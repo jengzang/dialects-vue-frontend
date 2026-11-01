@@ -6,7 +6,7 @@
           <img class="logo" :src="faviconSrc" alt="Logo" />
         </div>
         <div class="title">
-          <img src="/brand/title.webp" alt="Title" class="title-logo" />
+          <img :src="brandTitleSrc" alt="Title" class="title-logo" />
         </div>
       </div>
 
@@ -213,7 +213,7 @@ import { useTabPill } from '@/composables/bar/useTabPill.js'
 import { useScrollSnap } from '@/composables/bar/useScrollSnap.js'
 import { useScrollArrows } from '@/composables/bar/useScrollArrows.js'
 import { useBarOverflow, getDefaultTabScroll, sortTabsByScroll } from '@/composables/bar/useBarOverflow.js'
-import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { currentColorTheme, getBrandAssets } from '@/composables/core/uiPreferences.js'
 import { navigatePlatformLink } from '@/platform/index.js'
 
 const props = defineProps({
@@ -227,11 +227,8 @@ const props = defineProps({
   },
 })
 
-const faviconSrc = computed(() =>
-  currentColorTheme.value === COLOR_THEME_GREEN
-    ? '/brand/favicon_green.ico'
-    : '/brand/favicon.ico'
-)
+const faviconSrc = computed(() => getBrandAssets(currentColorTheme.value).logo)
+const brandTitleSrc = computed(() => getBrandAssets(currentColorTheme.value).title)
 
 const { t } = useI18n()
 const route = useRoute()

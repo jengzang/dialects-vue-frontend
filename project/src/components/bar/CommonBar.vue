@@ -231,14 +231,10 @@ import { useTabPill } from '@/composables/bar/useTabPill.js'
 import { useScrollSnap } from '@/composables/bar/useScrollSnap.js'
 import { useScrollArrows } from '@/composables/bar/useScrollArrows.js'
 import { useBarOverflow, getDefaultTabScroll, sortTabsByScroll } from '@/composables/bar/useBarOverflow.js'
-import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { currentColorTheme, getBrandAssets } from '@/composables/core/uiPreferences.js'
 import { isInternalAppNavigationTarget, navigatePlatformLink } from '@/platform/index.js'
 
-const faviconSrc = computed(() =>
-  currentColorTheme.value === COLOR_THEME_GREEN
-    ? '/brand/favicon_green.ico'
-    : '/brand/favicon.ico'
-)
+const faviconSrc = computed(() => getBrandAssets(currentColorTheme.value).logo)
 
 // Props definition
 const props = defineProps({
