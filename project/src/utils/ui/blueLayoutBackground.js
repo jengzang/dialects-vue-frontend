@@ -58,14 +58,14 @@ export function getBackgroundLayout(width, height) {
   const portrait = height >= width
   const box = (x, y, w, h) => ({ x: x * width, y: y * height, width: w * width, height: h * height })
   // Each subject is fitted separately. Unusual aspect ratios crop only decorative edges.
-  const bookWidth = Math.min(width * (portrait ? 982 / 1080 : 1197 / 2560), height * (portrait ? .38 : .65) * 1448 / 876)
+  const bookWidth = .9 * Math.min(width * (portrait ? 982 / 1080 : 1197 / 2560), height * (portrait ? .38 : .65) * 1448 / 876)
   const bookHeight = bookWidth * 876 / 1448
   const fontSize = Math.min(width * (portrait ? .09 : .037), height * (portrait ? .048 : .075))
   return {
     portrait,
     book: { x: -bookWidth * (243 / 1448 + .06), y: height - bookHeight * (866 / 876 - .18), width: bookWidth, height: bookHeight },
     quote: { x: width * (portrait ? .71 : .47), y: height * (portrait ? .13 : .19), fontSize, gap: portrait ? 1.23 : 1.4 },
-    map: portrait ? box(0, .37, 1, .57) : box(.5, -.02, .5, 1.1),
+    map: portrait ? box(0, .37, 1, .57) : box(.525, .035, .45, .99),
     mountains: portrait
       ? [ { kind: 'upper', box: box(-.12, .36, .8, .26), opacity: .95 }, { kind: 'lower', box: box(-.12, .84, 1.24, .22), opacity: 1.15 }, { kind: 'upper', box: box(.48, .8, .65, .22), opacity: .85 } ]
       : [ { kind: 'upper', box: box(-.05, .31, .56, .38), opacity: .9 }, { kind: 'lower', box: box(-.08, .77, 1.18, .28), opacity: 1.15 } ],
@@ -120,12 +120,12 @@ function traceLine(ctx, coordinates, point, close = false) {
 
 function drawGeography(ctx, geography, map, layout, colors, width) {
   if (!map) return
-  const alpha = layout.portrait ? 88 / 255 : 76 / 255
+  const alpha = .7 * (layout.portrait ? 88 / 255 : 76 / 255)
   const unit = map.bounds.width / 1000
   const countryPath = new Path2D()
   for (const ring of map.rings) traceLine(countryPath, ring, map.point, true)
   ctx.save()
-  ctx.fillStyle = colors.country; ctx.globalAlpha = 12 / 255; ctx.fill(countryPath)
+  ctx.fillStyle = colors.country; ctx.globalAlpha = .7 * 12 / 255; ctx.fill(countryPath)
   ctx.clip(countryPath)
   ctx.lineWidth = .55 * unit; ctx.strokeStyle = colors.province; ctx.globalAlpha = alpha * .6
   ctx.beginPath()
@@ -199,13 +199,18 @@ export function drawBlueLayoutBackground(canvas, resources, width, height, color
   mountainCtx.filter = `blur(${12 * Math.min(width / 1080, 1.5)}px)`
   mountainCtx.drawImage(mask, 0, 0, width, height)
   mountainCtx.filter = 'none'; mountainCtx.drawImage(mask, 0, 0, width, height)
+  ctx.globalAlpha = .7
   ctx.drawImage(mountains, 0, 0, width, height)
+  ctx.globalAlpha = 1
   drawGeography(ctx, resources.geography, map, layout, colors, width)
+  ctx.globalAlpha = .5
   if (resources.book) ctx.drawImage(resources.book, book.x, book.y, book.width, book.height)
+  ctx.globalAlpha = .8
   const quoteImage = layout.portrait ? resources.quotePortrait : resources.quoteLandscape
   if (quoteImage) {
     const originalFs = layout.portrait ? 97 : 94
     const offsetX = layout.portrait ? -5.575257732 : -6.246808511
     ctx.drawImage(quoteImage, quote.x + offsetX * fs, quote.y, quoteImage.naturalWidth * fs / originalFs, quoteImage.naturalHeight * fs / originalFs)
   }
+  ctx.globalAlpha = 1
 }

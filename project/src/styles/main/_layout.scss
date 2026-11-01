@@ -2,6 +2,11 @@
 
 .blue-art-layout {
   isolation: isolate;
+
+  footer.app-footer {
+    background: var(--glass-80);
+    @include glass-blur(6px);
+  }
 }
 
 .main-card-grid {
