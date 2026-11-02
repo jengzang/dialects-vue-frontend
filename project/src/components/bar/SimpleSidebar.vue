@@ -22,6 +22,7 @@
             v-for="(item, key) in filteredMenuConfig"
             :key="key"
             class="main-sidebar-item"
+            :class="{ 'is-active': isMenuItemActive(item) }"
             @pointerup="handleMainPointerUp(item, key, $event)"
             @click.stop
             @mouseenter="handleItemMouseEnter(item, key, $event)"
@@ -125,6 +126,7 @@
           v-for="(child, index) in getFilteredChildren(activeSubmenu)"
           :key="index"
           class="submenu-item main-sidebar-submenu-item"
+          :class="{ 'is-active': isPathActive(child.path) }"
           @click="handleSubmenuClick(child)"
         >
           <BarIcon :icon="child.icon" class="submenu-icon" />
@@ -251,6 +253,21 @@ const getFilteredChildren = (menuKey) => {
     }
     return true
   })
+}
+
+const isPathActive = (path) => {
+  if (!path) return false
+  const target = router.resolve(path)
+  if (route.path !== target.path) return false
+
+  return Object.entries(target.query).every(([key, value]) => {
+    return JSON.stringify(route.query[key]) === JSON.stringify(value)
+  })
+}
+
+const isMenuItemActive = (item) => {
+  const paths = item.children?.map((child) => child.path) ?? [item.path]
+  return paths.some(isPathActive)
 }
 
 // 监听路由变化，记录当前路径到对应菜单项的 sessionStorage
@@ -572,7 +589,7 @@ $portrait-ratio: 1;
 
 
 .stat-value {
-  color: $primary-dark;
+  color: var(--color-secondary-hover);
   font-size: var(--font-size-18);
   font-weight: 900;
 }
@@ -589,7 +606,7 @@ $portrait-ratio: 1;
   border: 2px solid var(--glass-50);
   border-radius: var(--radius-full);
 
-  color: $primary-dark;
+  color: var(--color-secondary-hover);
   font-size: var(--font-size-18);
 
   cursor: pointer;
@@ -703,7 +720,7 @@ $portrait-ratio: 1;
 
 
 .stat-value-large {
-  color: $primary-dark;
+  color: var(--color-secondary-hover);
 
   font-size: var(--font-size-24);
   font-weight: 900;
@@ -849,6 +866,7 @@ $portrait-ratio: 1;
 
 .submenu-item {
   display: flex;
+  position: relative;
 
   align-items: center;
 
@@ -871,13 +889,26 @@ $portrait-ratio: 1;
 
 
   &:hover {
-    background: linear-gradient(
-      145deg,
-      rgba(var(--color-primary-rgb),0.15),
-      rgba(var(--color-primary-rgb),0.08)
-    );
+    background: var(--submenu-hover-background);
 
     transform: translateX(4px);
+  }
+
+  &.is-active {
+    background: var(--submenu-hover-background);
+    color: var(--color-secondary-hover);
+    font-weight: 700;
+
+    &::before {
+      position: absolute;
+      left: 16px;
+      bottom: 5px;
+      width: 22px;
+      height: 3px;
+      border-radius: var(--radius-full);
+      background: var(--color-secondary);
+      content: '';
+    }
   }
 }
 

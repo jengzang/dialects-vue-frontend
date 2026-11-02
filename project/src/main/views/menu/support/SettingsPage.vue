@@ -155,7 +155,7 @@
             <button
               class="action-btn"
               @click="showUpdateNotice = true"
-              style="white-space: nowrap; padding: 8px;"
+              style="white-space: nowrap; padding: 8px;background: var(--color-primary)"
             ><InlineIcon icon="📋" />{{ $t('about.settings.viewUpdateLog') }}
             </button>
           </div>
