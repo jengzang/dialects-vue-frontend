@@ -88,15 +88,15 @@ describe('color theme token coverage', () => {
     expect(toolbarsSource).toContain('color: var(--sidebar-item-text);')
   })
 
-  it('uses vermilion and teal accents for light and white primary accents for dark themes', () => {
+  it('uses vermilion and walnut accents for light and white primary accents for dark themes', () => {
     const source = readSource(tokensPath)
     const lightBlock = themeBlock(source, 'light')
     const darkBlock = themeBlock(source, 'dark')
 
     expect(lightBlock).toContain('--color-primary: #b23a32;')
     expect(lightBlock).toContain('--color-primary-rgb: 178, 58, 50;')
-    expect(lightBlock).toContain('--color-secondary: #3f6c70;')
-    expect(lightBlock).toContain('--color-secondary-hover: #31565a;')
+    expect(lightBlock).toContain('--color-secondary: #85634d;')
+    expect(lightBlock).toContain('--color-secondary-hover: #70513e;')
     expect(lightBlock).toContain('--color-primary-cyan: var(--color-secondary);')
     expect(lightBlock).not.toContain('--color-primary: #5f6368;')
     expect(lightBlock).not.toContain('--color-primary: #2f80ed;')
