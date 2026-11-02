@@ -22,8 +22,8 @@
       "searchPlaceholder": "Search pronunciation or notes",
       "enterSearch": "Enter a search term",
       "noMatches": "No matches found",
-      "ipaSearchConfirmTitle": "Enable pronunciation search",
-      "ipaSearchConfirm": "Pronunciation searches may take longer. Leave pronunciation unchecked if you only need to search notes. Enable pronunciation search?"
+      "ipaSearchConfirmTitle": "Enable pronunciation or detailed meaning search",
+      "ipaSearchConfirm": "Searching pronunciation or detailed meanings may feel slow. Do you want to enable it?"
     },
     "tabs": {
       "label": "Vocabulary workflows",

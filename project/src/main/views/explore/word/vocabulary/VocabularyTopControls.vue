@@ -522,10 +522,10 @@ function isFieldChecked(value) {
   return props.selectedSearchFields.length === 0 || props.selectedSearchFields.includes(value)
 }
 
-let isConfirmingNotesPronunciation = false
+let isConfirmingSlowSearch = false
 
 async function toggleField(value, checked) {
-  if (isConfirmingNotesPronunciation) return
+  if (isConfirmingSlowSearch) return
 
   const allValues = props.searchFieldOptions.map((o) => o.value)
   const current = props.selectedSearchFields.length === 0
@@ -537,17 +537,17 @@ async function toggleField(value, checked) {
     : current.filter((v) => v !== value)
 
   const allChecked = allValues.every((v) => updated.includes(v))
-  if (props.source === 'character-notes'
-    && !current.includes('pronunciation')
-    && (!updated.length || updated.includes('pronunciation'))) {
-    isConfirmingNotesPronunciation = true
+  const isSlowSearchField = value === 'pronunciation'
+    || (props.source === 'vocabulary' && value === 'detail')
+  if (checked && isSlowSearchField && !current.includes(value)) {
+    isConfirmingSlowSearch = true
     try {
       const confirmed = await showConfirm(t('words.wordList.notes.ipaSearchConfirm'), {
         title: t('words.wordList.notes.ipaSearchConfirmTitle'),
       })
       if (!confirmed) return
     } finally {
-      isConfirmingNotesPronunciation = false
+      isConfirmingSlowSearch = false
     }
   }
   emit('update:selectedSearchFields', allChecked ? [] : updated)

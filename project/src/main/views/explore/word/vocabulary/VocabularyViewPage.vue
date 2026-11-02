@@ -812,6 +812,11 @@ function resolveViewModeFromRoute() {
 }
 
 const viewMode = ref(resolveViewModeFromRoute())
+const VOCABULARY_SEARCH_FIELDS_MIGRATION = 'standard-word-and-dialect-word-v1'
+if (localStorage.getItem('vocabulary_search_fields_migration') !== VOCABULARY_SEARCH_FIELDS_MIGRATION) {
+  localStorage.setItem('vocabulary_search_fields', JSON.stringify(['definition', 'headword']))
+  localStorage.setItem('vocabulary_search_fields_migration', VOCABULARY_SEARCH_FIELDS_MIGRATION)
+}
 const savedSearchFields = localStorage.getItem('vocabulary_search_fields')
 const selectedSearchFields = ref(savedSearchFields === null
   ? ['definition', 'headword']
