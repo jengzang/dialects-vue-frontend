@@ -57,7 +57,7 @@ const LAYOUT_FOOTER_PATHS = [
 ]
 
 describe('layout footer context', () => {
-  it.each(['red-dark', 'green-light'])('labels the new %s combination without falling back to blue', async theme => {
+  it.each(['blue-light', 'red-light', 'green-light', 'blue-dark', 'red-dark', 'green-dark'])('labels the new %s combination without falling back to blue', async theme => {
     const { resolveLayoutFooterContext } = await import('../src/main/config/layoutFooter.js')
     expect(resolveLayoutFooterContext({ route: { path: '/menu/settings' }, locale: 'en', colorTheme: theme }).themeLabelKey)
       .toBe(`layoutFooter.theme.${theme}`)
@@ -69,14 +69,14 @@ describe('layout footer context', () => {
       route: { path: '/menu/query/zhonggu', fullPath: '/menu/query/zhonggu', query: {} },
       t: (key) => key,
       locale: 'zh-CN',
-      colorTheme: 'green',
+      colorTheme: 'green-dark',
     })
 
     expect(context.pageTitleKey).toBe('layoutFooter.pages.menuQueryZhonggu.title')
     expect(context.pageDescriptionKey).toBe('layoutFooter.pages.menuQueryZhonggu.description')
     expect(context.hasTutorial).toBe(true)
     expect(context.languageLabelKey).toBe('layoutFooter.language.zhCN')
-    expect(context.themeLabelKey).toBe('layoutFooter.theme.green')
+    expect(context.themeLabelKey).toBe('layoutFooter.theme.green-dark')
   })
 
   it('resolves current-page copy for routes without a tutorial entry', async () => {
@@ -86,14 +86,14 @@ describe('layout footer context', () => {
       route: { path: '/menu/settings', fullPath: '/menu/settings', query: {} },
       t: (key) => key,
       locale: 'zh-Hant',
-      colorTheme: 'blue',
+      colorTheme: 'blue-light',
     })
 
     expect(context.pageTitleKey).toBe('layoutFooter.pages.menuSettings.title')
     expect(context.pageDescriptionKey).toBe('layoutFooter.pages.menuSettings.description')
     expect(context.hasTutorial).toBe(false)
     expect(context.languageLabelKey).toBe('layoutFooter.language.zhHant')
-    expect(context.themeLabelKey).toBe('layoutFooter.theme.blue')
+    expect(context.themeLabelKey).toBe('layoutFooter.theme.blue-light')
   })
 
   it('keeps a current-function copy entry for every shared layout route', async () => {
@@ -103,7 +103,7 @@ describe('layout footer context', () => {
       const context = resolveLayoutFooterContext({
         route: { path, fullPath: path, query: {} },
         locale: 'zh-CN',
-        colorTheme: 'blue',
+        colorTheme: 'blue-light',
       })
 
       expect(context.pageTitleKey, path).not.toBe('layoutFooter.pages.generic.title')

@@ -21,10 +21,10 @@
     "en": "English"
   },
   "theme": {
-    "blue": "Blue · Light",
-    "light": "Red · Light",
-    "dark": "Blue · Dark",
-    "green": "Green · Dark",
+    "blue-light": "Blue · Light",
+    "red-light": "Red · Light",
+    "blue-dark": "Blue · Dark",
+    "green-dark": "Green · Dark",
     "red-dark": "Red · Dark",
     "green-light": "Green · Light"
   },

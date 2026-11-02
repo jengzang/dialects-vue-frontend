@@ -128,10 +128,12 @@ const CARD_CONFIGS = {
 
 
 const THEME_COLOR_TOKENS = {
-  blue: '--color-primary-hover',
-  green: '--color-primary-hover',
-  light: '--color-primary-hover',
-  dark: '--color-primary-hover',
+  'blue-light': '--color-primary-hover',
+  'red-light': '--color-primary-hover',
+  'green-light': '--color-primary-hover',
+  'blue-dark': '--color-primary-hover',
+  'red-dark': '--color-primary-hover',
+  'green-dark': '--color-primary-hover',
 }
 
 
@@ -441,7 +443,7 @@ export async function createShareCardDataUrl({
   const accent =
     readCssToken(
       THEME_COLOR_TOKENS[colorTheme] ||
-      THEME_COLOR_TOKENS.blue,
+      THEME_COLOR_TOKENS['blue-light'],
       '#2f74c0',
     )
 

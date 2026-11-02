@@ -265,7 +265,7 @@ const iconMode = ref(getStoredIconMode())
 
 const colorThemeOptions = computed(() => [
   { value: 'blue', label: t('navigation.settings.colorTheme.options.blue') },
-  { value: 'red', label: t('navigation.settings.colorTheme.options.light') },
+  { value: 'red', label: t('navigation.settings.colorTheme.options.red') },
   { value: 'green', label: t('navigation.settings.colorTheme.options.green') },
 ])
 
@@ -426,7 +426,7 @@ $text-muted: var(--text-tertiary);
 
 }
 
-:global(:root[data-color-theme='green'] .setting-section) {
+:global(:root[data-color-theme='green-dark'] .setting-section) {
   --glass-panel-background: linear-gradient(145deg, var(--glass-50), var(--glass-20));
   --glass-panel-border: 1px solid var(--border-glass-subtle);
   --glass-panel-shadow: var(--shadow-glass);

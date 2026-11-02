@@ -27,14 +27,14 @@ describe('settings color and brightness selection', () => {
   let app, host
   beforeEach(() => {
     localStorage.clear()
-    setColorTheme('blue')
+    setColorTheme('blue-light')
     host = document.createElement('div')
     document.body.append(host)
   })
   afterEach(() => {
     app?.unmount()
     host.remove()
-    setColorTheme('blue')
+    setColorTheme('blue-light')
   })
   function mount() {
     app = createApp(SettingsPage)
@@ -51,15 +51,15 @@ describe('settings color and brightness selection', () => {
   it('changes family without losing brightness and changes brightness without losing family', async () => {
     mount()
     await select('settings-color-mode', 'dark')
-    expect(document.documentElement.dataset.colorTheme).toBe('dark')
+    expect(document.documentElement.dataset.colorTheme).toBe('blue-dark')
     await select('settings-color-theme', 'red')
     expect(document.documentElement.dataset.colorTheme).toBe('red-dark')
     await select('settings-color-mode', 'light')
-    expect(document.documentElement.dataset.colorTheme).toBe('light')
+    expect(document.documentElement.dataset.colorTheme).toBe('red-light')
     await select('settings-color-theme', 'green')
     expect(document.documentElement.dataset.colorTheme).toBe('green-light')
     await select('settings-color-mode', 'dark')
-    expect(document.documentElement.dataset.colorTheme).toBe('green')
+    expect(document.documentElement.dataset.colorTheme).toBe('green-dark')
   })
   it('restores both controls from the existing green dark preference', () => {
     setColorTheme('green')

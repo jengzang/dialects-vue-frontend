@@ -14,24 +14,30 @@ const VALID_ICON_MODES = new Set([ICON_MODE_ALL_EMOJI, ICON_MODE_ALL_SVG, ICON_M
 export const UI_MODE_DEFAULT = 'default'
 export const UI_MODE_COMPACT = 'compact'
 
-export const COLOR_THEME_BLUE = 'blue'
-export const COLOR_THEME_LIGHT = 'light'
-export const COLOR_THEME_DARK = 'dark'
-export const COLOR_THEME_GREEN = 'green'
-export const COLOR_THEME_RED_DARK = 'red-dark'
+export const COLOR_THEME_BLUE_LIGHT = 'blue-light'
+export const COLOR_THEME_RED_LIGHT = 'red-light'
 export const COLOR_THEME_GREEN_LIGHT = 'green-light'
-export const COLOR_THEME_DEFAULT = COLOR_THEME_BLUE
+export const COLOR_THEME_BLUE_DARK = 'blue-dark'
+export const COLOR_THEME_RED_DARK = 'red-dark'
+export const COLOR_THEME_GREEN_DARK = 'green-dark'
+export const COLOR_THEME_DEFAULT = COLOR_THEME_BLUE_LIGHT
 
 const VALID_UI_MODES = new Set([UI_MODE_DEFAULT, UI_MODE_COMPACT])
 const COLOR_THEME_PARTS = {
-  [COLOR_THEME_BLUE]: { family: 'blue', mode: 'light' },
-  [COLOR_THEME_LIGHT]: { family: 'red', mode: 'light' },
-  [COLOR_THEME_DARK]: { family: 'blue', mode: 'dark' },
-  [COLOR_THEME_GREEN]: { family: 'green', mode: 'dark' },
-  [COLOR_THEME_RED_DARK]: { family: 'red', mode: 'dark' },
+  [COLOR_THEME_BLUE_LIGHT]: { family: 'blue', mode: 'light' },
+  [COLOR_THEME_RED_LIGHT]: { family: 'red', mode: 'light' },
   [COLOR_THEME_GREEN_LIGHT]: { family: 'green', mode: 'light' },
+  [COLOR_THEME_BLUE_DARK]: { family: 'blue', mode: 'dark' },
+  [COLOR_THEME_RED_DARK]: { family: 'red', mode: 'dark' },
+  [COLOR_THEME_GREEN_DARK]: { family: 'green', mode: 'dark' },
 }
 const VALID_COLOR_THEMES = new Set(Object.keys(COLOR_THEME_PARTS))
+const LEGACY_COLOR_THEMES = {
+  blue: COLOR_THEME_BLUE_LIGHT,
+  light: COLOR_THEME_RED_LIGHT,
+  dark: COLOR_THEME_BLUE_DARK,
+  green: COLOR_THEME_GREEN_DARK,
+}
 
 export const currentColorTheme = ref(getStoredColorTheme())
 export const currentInterfaceMode = ref(getStoredInterfaceMode())
@@ -42,7 +48,8 @@ function normalizeInterfaceMode(mode) {
 }
 
 function normalizeColorTheme(theme) {
-  return VALID_COLOR_THEMES.has(theme) ? theme : COLOR_THEME_DEFAULT
+  const normalized = Object.hasOwn(LEGACY_COLOR_THEMES, theme) ? LEGACY_COLOR_THEMES[theme] : theme
+  return VALID_COLOR_THEMES.has(normalized) ? normalized : COLOR_THEME_DEFAULT
 }
 
 export function getColorThemeParts(theme) {
@@ -62,7 +69,7 @@ export function isDarkColorTheme(theme) {
 }
 
 export function getBrandAssets(theme) {
-  const normalizedTheme = theme === COLOR_THEME_RED_DARK ? COLOR_THEME_LIGHT : normalizeColorTheme(theme)
+  const normalizedTheme = normalizeColorTheme(theme)
   if (normalizedTheme === COLOR_THEME_GREEN_LIGHT) {
     return {
       logo: '/brand/favicon_green.ico',
@@ -70,10 +77,18 @@ export function getBrandAssets(theme) {
       decoration: '/brand/GreenCircle.webp',
     }
   }
+  // Existing asset filenames are independent of the canonical theme identifiers.
+  const assetName = {
+    [COLOR_THEME_BLUE_LIGHT]: 'blue',
+    [COLOR_THEME_RED_LIGHT]: 'light',
+    [COLOR_THEME_BLUE_DARK]: 'dark',
+    [COLOR_THEME_RED_DARK]: 'light',
+    [COLOR_THEME_GREEN_DARK]: 'green',
+  }[normalizedTheme]
   return {
-    logo: `/brand/theme-previews/favicon-${normalizedTheme}.png`,
-    title: theme === COLOR_THEME_RED_DARK ? '/brand/theme-previews/title-red-dark.png' : normalizedTheme === COLOR_THEME_BLUE ? '/brand/title.webp' : `/brand/theme-previews/title-${normalizedTheme}.png`,
-    decoration: normalizedTheme === COLOR_THEME_BLUE ? '/brand/BlueCircle.webp' : `/brand/theme-previews/logo-${normalizedTheme}.png`,
+    logo: `/brand/theme-previews/favicon-${assetName}.png`,
+    title: normalizedTheme === COLOR_THEME_RED_DARK ? '/brand/theme-previews/title-red-dark.png' : normalizedTheme === COLOR_THEME_BLUE_LIGHT ? '/brand/title.webp' : `/brand/theme-previews/title-${assetName}.png`,
+    decoration: normalizedTheme === COLOR_THEME_BLUE_LIGHT ? '/brand/BlueCircle.webp' : `/brand/theme-previews/logo-${assetName}.png`,
   }
 }
 
@@ -173,7 +188,7 @@ export function initializeInterfaceMode() {
 }
 
 export function initializeColorTheme() {
-  const theme = getStoredColorTheme()
+  const theme = setStoredColorTheme(getStoredColorTheme())
   currentColorTheme.value = theme
   return applyColorTheme(theme)
 }

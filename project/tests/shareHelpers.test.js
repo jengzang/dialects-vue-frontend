@@ -155,7 +155,7 @@ describe('share card helper', () => {
       url: 'https://dialects.yzup.top/menu/query/zhonggu',
       languageLabel: '简体',
       themeLabel: '绿色',
-      colorTheme: 'green',
+      colorTheme: 'green-dark',
       loadImage: () => Promise.resolve(null),
     })
 
@@ -196,7 +196,7 @@ describe('share card helper', () => {
       url: 'https://dialects.yzup.top/en/menu/query/zhonggu',
       languageLabel: 'English',
       themeLabel: 'Green',
-      colorTheme: 'green',
+      colorTheme: 'green-dark',
       brandName: 'Chinese Dialect Atlas',
       qrHint: 'Scan to open this page',
       loadImage: () => Promise.resolve(null),
@@ -212,7 +212,7 @@ describe('share card helper', () => {
     expect(qrBlocks.length).toBeGreaterThan(80)
   })
 
-  it.each(['blue', 'light', 'green', 'dark', 'red-dark', 'green-light'])('draws matching %s brand images when they load', async colorTheme => {
+  it.each(['blue-light', 'red-light', 'green-dark', 'blue-dark', 'red-dark', 'green-light'])('draws matching %s brand images when they load', async colorTheme => {
     const calls = []
     const context = {
       fillStyle: '',
@@ -254,10 +254,10 @@ describe('share card helper', () => {
       loadImage,
     })
 
-    const brandTheme = colorTheme === 'red-dark' ? 'light' : colorTheme
+    const brandTheme = { 'blue-light': 'blue', 'red-light': 'light', 'green-dark': 'green', 'blue-dark': 'dark', 'red-dark': 'light' }[colorTheme]
     const originalGreen = colorTheme === 'green-light'
-    const titleSrc = colorTheme === 'red-dark' ? '/brand/theme-previews/title-red-dark.png' : originalGreen || colorTheme === 'blue' ? '/brand/title.webp' : `/brand/theme-previews/title-${brandTheme}.png`
-    const circleSrc = originalGreen ? '/brand/GreenCircle.webp' : colorTheme === 'blue' ? '/brand/BlueCircle.webp' : `/brand/theme-previews/logo-${brandTheme}.png`
+    const titleSrc = colorTheme === 'red-dark' ? '/brand/theme-previews/title-red-dark.png' : originalGreen || colorTheme === 'blue-light' ? '/brand/title.webp' : `/brand/theme-previews/title-${brandTheme}.png`
+    const circleSrc = originalGreen ? '/brand/GreenCircle.webp' : colorTheme === 'blue-light' ? '/brand/BlueCircle.webp' : `/brand/theme-previews/logo-${brandTheme}.png`
     const logoSrc = originalGreen ? '/brand/favicon_green.ico' : `/brand/theme-previews/favicon-${brandTheme}.png`
     for (const src of [titleSrc, circleSrc, logoSrc]) {
       expect(loadImage).toHaveBeenCalledWith(src)
@@ -296,7 +296,7 @@ describe('share card helper', () => {
       url: longUrl,
       languageLabel: '简体',
       themeLabel: '绿色',
-      colorTheme: 'green',
+      colorTheme: 'green-dark',
       loadImage: () => Promise.resolve(null),
     })
 

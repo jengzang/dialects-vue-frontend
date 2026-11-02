@@ -32,7 +32,7 @@ describe('blue background lifecycle', () => {
   afterEach(() => {
     app?.unmount()
     app = null
-    currentColorTheme.value = 'blue'
+    currentColorTheme.value = 'blue-light'
     host.remove()
     vi.restoreAllMocks()
     vi.unstubAllGlobals()
@@ -45,7 +45,7 @@ describe('blue background lifecycle', () => {
     await nextTick()
     await Promise.resolve()
     const count = requestAnimationFrame.mock.calls.length
-    currentColorTheme.value = 'green'
+    currentColorTheme.value = 'green-dark'
     await nextTick()
     expect(requestAnimationFrame.mock.calls.length).toBeGreaterThan(count)
     expect(loadBlueBackgroundResources).toHaveBeenCalledOnce()

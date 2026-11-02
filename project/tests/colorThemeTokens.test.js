@@ -36,7 +36,7 @@ function themeBlock(source, theme) {
 }
 
 function rootBlock(source) {
-  const match = source.match(/:root \{([\s\S]*?)\n\}\n\n:root\[data-color-theme='light'\]/)
+  const match = source.match(/:root \{([\s\S]*?)\n\}\n\n:root\[data-color-theme='red-light'\]/)
   return match?.[1] || ''
 }
 
@@ -90,8 +90,8 @@ describe('color theme token coverage', () => {
 
   it('uses vermilion and walnut for red light and blue accents for blue dark', () => {
     const source = readSource(tokensPath)
-    const lightBlock = themeBlock(source, 'light')
-    const darkBlock = themeBlock(source, 'dark')
+    const lightBlock = themeBlock(source, 'red-light')
+    const darkBlock = themeBlock(source, 'blue-dark')
 
     expect(lightBlock).toContain('--color-primary: #b23a32;')
     expect(lightBlock).toContain('--color-primary-rgb: 178, 58, 50;')
@@ -115,7 +115,7 @@ describe('color theme token coverage', () => {
 
   it('uses warm ivory canvas and near-white surfaces in the light theme', () => {
     const source = readSource(tokensPath)
-    const lightBlock = themeBlock(source, 'light')
+    const lightBlock = themeBlock(source, 'red-light')
 
     expect(lightBlock).toContain('--bg-body: #faf7f0;')
     expect(lightBlock).toContain('--bg-white: #fffdfa;')
@@ -203,8 +203,8 @@ describe('color theme token coverage', () => {
 
   it('maps VillagesML blue tokens to non-blue theme accents', () => {
     const source = readSource(villagesMlTokensPath)
-    const lightBlock = themeBlock(source, 'light')
-    const darkBlock = themeBlock(source, 'dark')
+    const lightBlock = themeBlock(source, 'red-light')
+    const darkBlock = themeBlock(source, 'blue-dark')
 
     expect(lightBlock).toContain('--vml-blue: var(--color-primary);')
     expect(lightBlock).toContain('--vml-blue-rgb: var(--color-primary-rgb);')

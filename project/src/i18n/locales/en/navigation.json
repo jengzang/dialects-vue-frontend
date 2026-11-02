@@ -222,7 +222,7 @@
       },
       "options": {
         "blue": "Blue",
-        "light": "Red",
+        "red": "Red",
         "dark": "Dark",
         "green": "Green"
       }

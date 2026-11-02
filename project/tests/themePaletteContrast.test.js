@@ -9,7 +9,7 @@ import { parse as parseCss } from 'postcss'
 
 const source = readFileSync(resolve(import.meta.dirname, '../src/styles/global/_tokens.scss'), 'utf8')
 const vmlSource = readFileSync(resolve(import.meta.dirname, '../src/styles/villagesml/_tokens.scss'), 'utf8')
-const themes = ['blue', 'light', 'green', 'dark', 'red-dark', 'green-light']
+const themes = ['blue-light', 'red-light', 'green-dark', 'blue-dark', 'red-dark', 'green-light']
 
 function declarations(css, theme) {
   const selectors = [':root', `:root[data-color-theme=${theme}]`]
@@ -23,7 +23,7 @@ function declarations(css, theme) {
 }
 
 function palette(theme) {
-  return { ...declarations(source, 'blue'), ...(theme === 'blue' ? {} : declarations(source, theme)) }
+  return { ...declarations(source, 'blue-light'), ...(theme === 'blue-light' ? {} : declarations(source, theme)) }
 }
 
 function value(tokens, name) {
@@ -100,12 +100,12 @@ describe('approved theme palette readability', () => {
     expect(contrast(rgba(value(tokens, '--action-solid-text')), rgba(value(tokens, '--action-primary-bg')))).toBeGreaterThanOrEqual(4.5)
     expect(contrast(rgba(value(tokens, '--color-primary')), rgba(value(tokens, '--surface-panel')))).toBeGreaterThanOrEqual(4.5)
   })
-  it.each(['green', 'dark', 'red-dark'])('%s keeps footer copy readable on glass, including above light artwork', theme => {
+  it.each(['green-dark', 'blue-dark', 'red-dark'])('%s keeps footer copy readable on glass, including above light artwork', theme => {
     const tokens = palette(theme)
     const rule = compiledRule('styles/main/_layout.scss', '.blue-art-layout footer.app-footer')
     const fill = rgba(resolved(rule.background, tokens))
     const backings = [rgba(value(tokens, '--bg-body'))]
-    if (theme !== 'green') backings.push([255, 255, 255, 1])
+    if (theme !== 'green-dark') backings.push([255, 255, 255, 1])
     for (const backing of backings) {
       const surface = over(fill, backing)
       for (const name of ['--text-secondary', '--text-muted', '--color-primary', '--color-primary-hover']) {
@@ -132,11 +132,11 @@ describe('approved theme palette readability', () => {
     parseCss(result.code).walkRules(rule => {
       if (rule.nodes.some(n => n.prop === '--glass-panel-background' && n.value.includes('linear-gradient'))) selectors.push(rule.selector)
     })
-    expect(selectors).toEqual([":root[data-color-theme='green'] .setting-section"])
+    expect(selectors).toEqual([":root[data-color-theme='green-dark'] .setting-section"])
   })
 
   it('keeps green floating fills readable above a light map', () => {
-    const tokens = palette('green')
+    const tokens = palette('green-dark')
     for (const name of ['--glass-80', '--glass-90']) {
       const fill = rgba(value(tokens, name))
       expect(fill[3], name).toBeGreaterThanOrEqual(0.85)
@@ -145,7 +145,7 @@ describe('approved theme palette readability', () => {
   })
 
   it('separates green glass fills and specular highlights from the night canvas', () => {
-    const tokens = palette('green')
+    const tokens = palette('green-dark')
     const page = rgba(value(tokens, '--bg-body'))
     const glass = over(rgba(value(tokens, '--glass-50')), page)
     expect(luminance(glass) - luminance(page)).toBeGreaterThan(0.018)
@@ -155,7 +155,7 @@ describe('approved theme palette readability', () => {
   })
 
   it('gives both secondary navigation bars a green glass fill', () => {
-    const tokens = palette('green')
+    const tokens = palette('green-dark')
     for (const [component, selector] of [['CommonBar', '.commonbar'], ['ExploreBar', '.explorebar']]) {
       const rule = compiledRule(`components/bar/${component}.vue`, selector, true)
       const background = resolved(rule.background || 'none', tokens)
@@ -164,7 +164,7 @@ describe('approved theme palette readability', () => {
   })
 
   it('uses an actual dark forest canvas with readable green-theme surface text', () => {
-    const tokens = palette('green')
+    const tokens = palette('green-dark')
     const page = rgba(value(tokens, '--bg-body'))
     expect(luminance(page)).toBeLessThan(0.04)
     for (const name of ['--surface-panel', '--surface-panel-strong', '--surface-elevation-0', '--glass-50', '--glass-90']) {
@@ -208,7 +208,7 @@ describe('approved theme palette readability', () => {
   }
 
   it('keeps VillagesML green interface foregrounds readable on the night canvas', () => {
-    const tokens = { ...palette('green'), ...declarations(vmlSource, 'green') }
+    const tokens = { ...palette('green-dark'), ...declarations(vmlSource, 'green-dark') }
     const panel = rgba(value(tokens, '--surface-elevation-0'))
     for (const name of ['--vml-blue', '--vml-blue-dark', '--vml-blue-darker', '--vml-blue-darkest', '--vml-blue-highlight']) {
       expect(contrast(rgba(value(tokens, name)), panel), name).toBeGreaterThanOrEqual(4.5)

@@ -33,7 +33,7 @@ vi.mock('vue-i18n', () => ({
       if (key === 'layoutFooter.pages.menuQueryZhonggu.title') return '查中古'
       if (key === 'layoutFooter.pages.menuQueryZhonggu.description') return '按中古地位整理各方言点读音。'
       if (key === 'layoutFooter.language.zhCN') return '简体'
-      if (key === 'layoutFooter.theme.green') return '绿色'
+      if (key === 'layoutFooter.theme.green-dark') return '绿色'
       if (key === 'layoutFooter.share.imageReady') return 'layoutFooter.share.imageReady'
       if (key === 'layoutFooter.share.copied') return 'layoutFooter.share.copied'
       if (key === 'layoutFooter.share.qrHint') return '扫码打开当前页面'
@@ -48,7 +48,7 @@ vi.mock('../src/main/config/layoutFooter.js', () => ({
     pageDescriptionKey: 'layoutFooter.pages.menuQueryZhonggu.description',
     hasTutorial: true,
     languageLabelKey: 'layoutFooter.language.zhCN',
-    themeLabelKey: 'layoutFooter.theme.green',
+    themeLabelKey: 'layoutFooter.theme.green-dark',
   }),
 }))
 
@@ -60,7 +60,7 @@ vi.mock('../src/utils/user/updateNoticeConfig.js', () => ({
 }))
 
 vi.mock('../src/composables/core/uiPreferences.js', () => ({
-  currentColorTheme: { value: 'green' },
+  currentColorTheme: { value: 'green-dark' },
 }))
 
 vi.mock('../src/composables/data/useVisitStats.js', () => ({

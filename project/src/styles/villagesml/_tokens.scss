@@ -20,7 +20,7 @@
   --vml-brown-dark: #6b3e1a;
 }
 
-:root[data-color-theme='light'] {
+:root[data-color-theme='red-light'] {
   color-scheme: light;
   --vml-blue: var(--color-primary);
   --vml-blue-rgb: var(--color-primary-rgb);
@@ -35,7 +35,7 @@
   --vml-blue-highlight: var(--color-primary-hover);
 }
 
-:root[data-color-theme='green'] {
+:root[data-color-theme='green-dark'] {
   color-scheme: dark;
   --vml-blue: #86d99b;
   --vml-blue-rgb: 134, 217, 155;
@@ -50,7 +50,7 @@
   --vml-blue-highlight: #a2e5b3;
 }
 
-:root[data-color-theme='dark'],
+:root[data-color-theme='blue-dark'],
 :root[data-color-theme='red-dark'] {
   color-scheme: dark;
   --vml-blue: var(--color-primary);

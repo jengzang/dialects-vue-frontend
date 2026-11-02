@@ -292,7 +292,7 @@ $font-size-width-scales: (
   }
 }
 
-:root[data-color-theme='light'] {
+:root[data-color-theme='red-light'] {
   color-scheme: light;
   --color-primary: #b23a32;
   --color-primary-hover: #922f29;
@@ -434,7 +434,7 @@ $font-size-width-scales: (
   --shadow-glass-inset: inset 0 0 0.5px rgba(255, 253, 250, 0.62), 0 8px 22px rgba(15, 23, 42, 0.09), 0 0 0 0.5px rgba(255, 253, 250, 0.22);
 }
 
-:root[data-color-theme='green'] {
+:root[data-color-theme='green-dark'] {
   color-scheme: dark;
   /* ── 主色調 - 綠色系 ── */
   --color-primary: #86d99b;
@@ -588,7 +588,7 @@ $font-size-width-scales: (
   --glass-panel-hover-shadow: var(--shadow-glass-hover);
 }
 
-:root[data-color-theme='dark'],
+:root[data-color-theme='blue-dark'],
 :root[data-color-theme='red-dark'] {
   color-scheme: dark;
   /* ── 主色（反轉為淺色）── */

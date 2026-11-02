@@ -21,10 +21,10 @@
     "en": "English"
   },
   "theme": {
-    "blue": "藍色 · 淺色",
-    "light": "紅色 · 淺色",
-    "dark": "藍色 · 深色",
-    "green": "綠色 · 深色",
+    "blue-light": "藍色 · 淺色",
+    "red-light": "紅色 · 淺色",
+    "blue-dark": "藍色 · 深色",
+    "green-dark": "綠色 · 深色",
     "red-dark": "紅色 · 深色",
     "green-light": "綠色 · 淺色"
   },
