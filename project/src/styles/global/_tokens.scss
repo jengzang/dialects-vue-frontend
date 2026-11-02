@@ -751,14 +751,15 @@ $font-size-width-scales: (
 }
 
 :root[data-color-theme='red-dark'] {
-  --color-primary: #e58a87;
-  --color-primary-hover: #eea29e;
-  --color-primary-rgb: 229, 138, 135;
-  --color-primary-hover-rgb: 238, 162, 158;
+  --color-primary: #ff3b3b;
+  --color-primary-hover: #ff514b;
+  --color-primary-rgb: 255, 59, 59;
+  --color-primary-hover-rgb: 255, 81, 75;
   --color-secondary: #c4ae93;
   --color-secondary-rgb: 196, 174, 147;
   --color-secondary-hover: #d0bea8;
   --glass-tint-rgb: 25, 25, 25;
+  --glass-80: rgba(var(--glass-tint-rgb), 0.97);
   --bg-body: #111111;
   --surface-page: var(--bg-body);
   --surface-elevation-0: #191919;
@@ -786,8 +787,8 @@ $font-size-width-scales: (
   --text-secondary-rgb: 180, 180, 180;
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
-  --action-primary-bg: #b84a50;
-  --action-primary-bg-hover: #be5056;
+  --action-primary-bg: #c73530;
+  --action-primary-bg-hover: #d13d36;
   --action-primary-text: #111111;
   --action-solid-text: #ffffff;
   --enter-button-bg: var(--action-primary-bg);
