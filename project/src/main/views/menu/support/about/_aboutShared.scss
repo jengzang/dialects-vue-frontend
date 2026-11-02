@@ -1,7 +1,7 @@
 @use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
-$zhihu-blue: var(--color-primary);
+$zhihu-blue: #0070e8;
 $github-dark: #24292f;
 $danger: var(--color-error);
 
@@ -29,6 +29,11 @@ $ease-standard: 0.3s ease;
   font-weight: bold;
   white-space: normal;
   overflow-wrap: anywhere;
+}
+
+.about-page-title {
+  @include flex-center;
+  gap: 0.4em;
 }
 
 /* 通用正文 */

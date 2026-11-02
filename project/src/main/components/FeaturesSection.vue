@@ -5,7 +5,7 @@
     <!-- Search -->
     <div class="features-toolbar">
       <label class="features-search">
-        <InlineIcon icon="🔍" class="features-search__icon" />
+        <BarIcon icon="🔍" class="features-search__icon" />
         <input
           v-model="query"
           type="search"
@@ -34,7 +34,7 @@
           class="recent-pill"
           @click="recordRecent(item.route)"
         >
-          <InlineIcon :icon="item.icon" class="recent-pill__icon" />
+          <BarIcon :icon="item.icon" class="recent-pill__icon" />
           <span class="recent-pill__title">{{ item.title }}</span>
         </RouterLink>
       </div>
@@ -48,7 +48,7 @@
     <!-- Grouped feature grid -->
     <div v-for="group in visibleGroups" :key="group.id" class="feature-group">
       <div class="feature-group__header">
-        <span class="feature-group__icon"><InlineIcon :icon="group.icon" /></span>
+        <span class="feature-group__icon"><BarIcon :icon="group.icon" /></span>
         <div class="feature-group__text">
           <h3 class="feature-group__title">{{ group.title }}</h3>
           <p v-if="group.desc" class="feature-group__desc">{{ group.desc }}</p>
@@ -63,7 +63,7 @@
           class="feature-tile"
           @click="recordRecent(item.route)"
         >
-          <span class="feature-tile__icon"><InlineIcon :icon="item.icon" /></span>
+          <span class="feature-tile__icon"><BarIcon :icon="item.icon" /></span>
           <span class="feature-tile__text">
             <span class="feature-tile__title">{{ item.title }}</span>
             <span class="feature-tile__desc">{{ item.desc }}</span>
@@ -82,7 +82,7 @@
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t } = useI18n()
@@ -97,7 +97,7 @@ const groups = [
     descKey: 'home.features.query.desc',
     items: [
       {
-        icon: '📝',
+        icon: '🔣',
         labelKey: 'home.features.query.searchChar',
         route: '/menu/query/char',
         search: {
@@ -133,7 +133,7 @@ const groups = [
         },
       },
       {
-        icon: '🎶',
+        icon: '🎼',
         labelKey: 'home.features.query.searchTone',
         route: '/menu/query/tone',
         search: {
@@ -148,12 +148,12 @@ const groups = [
   },
   {
     id: 'compare',
-    icon: '🔀',
+    icon: '↔️',
     titleKey: 'home.features.compare.title',
     descKey: 'home.features.compare.desc',
     items: [
       {
-        icon: '📊',
+        icon: '↔️',
         labelKey: 'home.features.compare.compareChar',
         route: '/menu/compare/char',
         search: {
@@ -165,7 +165,7 @@ const groups = [
         },
       },
       {
-        icon: '🎯',
+        icon: '📜',
         labelKey: 'home.features.compare.compareMiddle',
         route: '/menu/compare/zhonggu',
         search: {
@@ -177,7 +177,7 @@ const groups = [
         },
       },
       {
-        icon: '🎹',
+        icon: '📈',
         labelKey: 'home.features.compare.compareTone',
         route: '/menu/compare/tone',
         search: {
@@ -189,7 +189,7 @@ const groups = [
         },
       },
       {
-        icon: '⚖️',
+        icon: '🎵',
         labelKey: 'home.features.compare.comparePhonetic',
         route: '/menu/compare/phonetic',
         search: {
@@ -209,7 +209,7 @@ const groups = [
     descKey: 'home.features.map.desc',
     items: [
       {
-        icon: '📍',
+        icon: '🗺️',
         labelKey: 'home.features.map.dialectMap',
         route: '/menu/map/view',
         search: {
@@ -221,7 +221,7 @@ const groups = [
         },
       },
       {
-        icon: '🧭',
+        icon: '🎨',
         labelKey: 'home.features.map.regionMap',
         route: '/menu/map/divide',
         search: {
@@ -233,7 +233,7 @@ const groups = [
         },
       },
       {
-        icon: '📁',
+        icon: '🗂️',
         labelKey: 'home.features.map.customMap',
         route: '/menu/map/custom',
         search: {
@@ -265,7 +265,7 @@ const groups = [
     descKey: 'home.features.phonology.desc',
     items: [
       {
-        icon: '⚗️',
+        icon: '⚛️',
         labelKey: 'home.features.phonology.phonologyQuery',
         route: '/menu/pho/matrix',
         search: {
@@ -277,7 +277,7 @@ const groups = [
         },
       },
       {
-        icon: '🔬',
+        icon: '📐',
         labelKey: 'home.features.phonology.phonemeClassify',
         route: '/menu/pho/custom',
         search: {
@@ -301,7 +301,7 @@ const groups = [
         },
       },
       {
-        icon: '📊',
+        icon: '🧮',
         labelKey: 'home.features.phonology.syllableCount',
         route: '/menu/pho/count',
         search: {
@@ -316,12 +316,12 @@ const groups = [
   },
   {
     id: 'charClass',
-    icon: '📜',
+    icon: '📚',
     titleKey: 'home.features.charClass.title',
     descKey: 'home.features.charClass.desc',
     items: [
       {
-        icon: '🏛️',
+        icon: '📜',
         labelKey: 'home.features.charClass.zhonggu',
         route: '/explore/char-class?tab=zhonggu',
         search: {
@@ -333,7 +333,7 @@ const groups = [
         },
       },
       {
-        icon: '📿',
+        icon: '🏛️',
         labelKey: 'home.features.charClass.shanggu',
         route: '/explore/char-class?tab=shanggu',
         search: {
@@ -469,7 +469,7 @@ const groups = [
         },
       },
       {
-        icon: '🌾',
+        icon: '🏕️',
         labelKey: 'home.features.villages.ycVillages',
         route: '/explore/yc/villages',
         search: {
@@ -489,7 +489,7 @@ const groups = [
     descKey: 'home.features.tools.desc',
     items: [
       {
-        icon: '📋',
+        icon: '📝',
         labelKey: 'home.features.tools.tableProcess',
         route: '/explore/tools/check',
         search: {
@@ -566,7 +566,7 @@ const groups = [
         },
       },
       {
-        icon: '🕰️',
+        icon: '🗓️',
         labelKey: 'home.features.about.history',
         route: '/menu/about/history',
         search: {
@@ -610,7 +610,7 @@ const groups = [
         },
       },
       {
-        icon: '🔗',
+        icon: '📎',
         labelKey: 'home.features.about.source',
         route: '/menu/source',
         search: {

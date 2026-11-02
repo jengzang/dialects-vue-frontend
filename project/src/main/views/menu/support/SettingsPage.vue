@@ -153,10 +153,9 @@
               class="settings-radio-group"
             />
             <button
-              class="glass-button"
-              data-variant="secondary"
+              class="action-btn"
               @click="showUpdateNotice = true"
-              style="white-space: nowrap;"
+              style="white-space: nowrap; padding: 8px;"
             ><InlineIcon icon="📋" />{{ $t('about.settings.viewUpdateLog') }}
             </button>
           </div>

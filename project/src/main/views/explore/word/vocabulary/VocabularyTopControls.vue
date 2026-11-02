@@ -706,6 +706,7 @@ const standardWordTriggerLabel = computed(() => {
   outline: none;
   background: transparent;
   box-shadow: none;
+  color: var(--color-secondary);
 
   margin: 0;
   padding: 5px;
@@ -737,7 +738,7 @@ const standardWordTriggerLabel = computed(() => {
   &:hover {
     background: var(--glass-10);
     border-color: var(--color-primary-border);
-    color: var(--color-primary);
+    color: var(--color-secondary);
   }
 
   &:hover span {

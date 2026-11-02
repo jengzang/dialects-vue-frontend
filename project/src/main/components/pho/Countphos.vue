@@ -2068,6 +2068,7 @@ $primary-deep: #003d9e;
     background: none;
     border: none;
     box-shadow: none;
+    backdrop-filter: none;
     // border: 1px solid var(--border-gray-light);
     // border-radius: var(--radius-lg);
     // backdrop-filter: blur(12px);

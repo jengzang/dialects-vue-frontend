@@ -1,7 +1,10 @@
 <template>
   <div class="cards-container">
     <h1 class="tabs-title like-author-title">
-      {{ $t('navigation.pageTitles.support.aboutLike') }}
+      <span class="like-author-heading">
+        <BarIcon icon="❤️" />
+        {{ $t('navigation.pageTitles.support.aboutLike') }}
+      </span>
       <span class="follow-buttons">
         <button class="follow-button zhihu-follow" @click="followClicked">
           <img
@@ -82,6 +85,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import BarIcon from '@/components/common/BarIcon.vue'
 import SupportPopup from '@/main/components/user/popups/SupportPopup.vue'
 
 const { t } = useI18n()
@@ -218,6 +222,11 @@ function splitDesc(text) {
   align-items: center;
   justify-content: center;
   gap: 1rem;
+}
+
+.like-author-heading {
+  @include flex-center;
+  gap: 0.4em;
 }
 
 .follow-buttons {

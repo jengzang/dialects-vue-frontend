@@ -60,11 +60,7 @@
   gap: var(--action-btn-gap, 8px);
   max-width: var(--action-btn-max-width, none);
   padding: var(--action-btn-padding, 12px 24px);
-  background: linear-gradient(
-    135deg,
-    var(--color-primary) 0%,
-    var(--color-primary-hover) 100%
-  );
+  background: var(--color-secondary-hover);
   border: none;
   border-radius: var(--action-btn-radius, var(--radius-md));
   box-shadow:
@@ -78,11 +74,7 @@
   transition: all 0.3s ease;
 
   &:hover:not(:disabled) {
-    background: linear-gradient(
-      135deg,
-      var(--color-primary-hover) 0%,
-      var(--color-primary-hover) 100%
-    );
+    background: var(--color-secondary);
     box-shadow:
       0 6px 16px var(--color-primary-shadow-light),
       var(--shadow-sm-dark);

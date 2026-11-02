@@ -1,6 +1,6 @@
 <template>
   <div class="page2">
-    <h1 class="tabs-title">💬 {{ $t('navigation.pageTitles.support.aboutSuggestion') }}</h1>
+    <h1 class="tabs-title about-page-title"><BarIcon icon="💬" /><span>{{ $t('navigation.pageTitles.support.aboutSuggestion') }}</span></h1>
     <TabSwitcher
       mode="segmented"
       navigation-only
@@ -166,6 +166,7 @@
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
+import BarIcon from '@/components/common/BarIcon.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import TabSwitcher from '@/components/common/TabSwitcher.vue'

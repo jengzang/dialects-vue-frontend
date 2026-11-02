@@ -812,7 +812,7 @@ $panel-radius-portrait: 24px;
   font-size: var(--font-size-14);
   font-weight: 700;
   white-space: nowrap;
-  background: var(--color-primary);
+  // background: var(--color-primary);
   border-color: rgba(var(--color-primary-rgb), 0.34);
   box-shadow: 0 12px 28px rgba(var(--color-primary-rgb), 0.12);
 
@@ -886,7 +886,7 @@ $panel-radius-portrait: 24px;
 .level-action {
   --glass-button-padding: 0;
   --glass-button-border-radius: var(--radius-md);
-  --glass-button-color: var(--color-primary-hover);
+  --glass-button-color: var(--color-secondary-hover);
   --glass-button-hover-shadow: none;
 
   width: 30px;

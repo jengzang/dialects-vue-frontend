@@ -6,6 +6,16 @@ SERVER_HOST="47.115.57.138"           # 服务器IP
 SERVER_PATH="/srv/myapp/statics"      # 服务器上的目标路径
 LOCAL_DIST="./dist/"                  # 本地dist目录
 
+# 默认只部署应用构建产物；传入 --public 时一并更新 public/ 中的静态内容
+UPLOAD_PUBLIC=false
+if [ "$#" -gt 1 ] || { [ "$#" -eq 1 ] && [ "$1" != "--public" ]; }; then
+    echo "用法: $0 [--public]"
+    exit 1
+fi
+if [ "$1" = "--public" ]; then
+    UPLOAD_PUBLIC=true
+fi
+
 # SSH 密码配置（可选，不推荐）
 # 如果设置了 SERVER_PASSWORD，将使用 sshpass 自动填充密码
 # 留空则使用 SSH 密钥认证（推荐）
@@ -44,19 +54,30 @@ fi
 # 白名单：需要上传的文件和目录
 FILES_TO_UPLOAD=(
     "index.html"
-    "config.js"
-    "robots.txt"
-    "sitemap.xml"  
     "auth/"
-    "detail/"
     "explore/"
     "menu/"
     "villagesML/"
+)
+
+PUBLIC_FILES_TO_UPLOAD=(
+    "config.js"
+    "robots.txt"
+    "sitemap.xml"
+    "detail/"
     "tutorial/"
     "data/"
     "showcase/"
     "brand/"
+    "backgrounds/"
 )
+
+if [ "$UPLOAD_PUBLIC" = true ]; then
+    FILES_TO_UPLOAD+=("${PUBLIC_FILES_TO_UPLOAD[@]}")
+    echo -e "${YELLOW}已启用 public/ 静态内容更新（--public）${NC}"
+else
+    echo -e "${YELLOW}跳过 public/ 静态内容；需要时使用 --public${NC}"
+fi
 
 echo -e "${BLUE}步骤 1/2: 清空服务器上的 assets 目录${NC}"
 $SSH_CMD "${SERVER_USER}@${SERVER_HOST}" "rm -rf ${SERVER_PATH}/assets/*"

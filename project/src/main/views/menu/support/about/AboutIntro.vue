@@ -5,7 +5,7 @@
       :sections="directorySections"
       :label="t('about.intro.directory')"
     />
-    <h1 class="tabs-title">{{ $t('navigation.pageTitles.support.aboutIntro') }}</h1>
+    <h1 class="tabs-title about-page-title"><BarIcon icon="ℹ️" /><span>{{ $t('navigation.pageTitles.support.aboutIntro') }}</span></h1>
     <p style=" text-align: left;">{{ $t('about.intro.description') }}</p>
     <!-- <AboutFeatureTopology :branches="[...analysisBranches, ...secondaryBranches]" :bridge-nodes="bridgeNodes" /> -->
     <ul class="customlist">
@@ -126,6 +126,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
+import BarIcon from '@/components/common/BarIcon.vue'
 import i18n from '@/i18n/index.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import AboutDirectoryNav from './AboutDirectoryNav.vue'

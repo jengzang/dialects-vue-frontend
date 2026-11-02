@@ -9,7 +9,8 @@
       id="history-title"
       class="page-title"
     >
-      {{ t('about.history.title') }}
+      <BarIcon icon="🗓️" />
+      <span>{{ t('about.history.title') }}</span>
     </h1>
     <div v-if="!featured" class="history-filter">
       <SwitchToggle
@@ -66,11 +67,11 @@
             >{{ entry.date }}</time>
             <span
               v-if="entry.important"
-              class="hint"
+              class="hint history-important-star"
               :title="localizedImportanceReason(entry)"
               role="img"
               :aria-label="t('about.history.importantLabel')"
-            >⭐</span>
+            ><InlineIcon icon="⭐" /></span>
           </div>
           <p class="history-content">
             <template
@@ -154,6 +155,8 @@ import { useI18n } from 'vue-i18n'
 import { RouterLink, useRoute } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
+import InlineIcon from '@/components/common/InlineIcon.vue'
 import AboutDirectoryNav from './AboutDirectoryNav.vue'
 import { historyEntries, historyStages } from './history.data.js'
 
@@ -397,6 +400,10 @@ function parseLocalizedParts(content) {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+.history-important-star {
+  color: var(--color-secondary);
 }
 
 .history-date {
