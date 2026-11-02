@@ -12,9 +12,42 @@ import {
   getBrandAssets,
   initializeUiPreferences,
   setColorTheme,
+  getColorThemeParts,
+  getColorThemeFor,
+  isDarkColorTheme,
 } from '../src/composables/core/uiPreferences.js'
 
 describe('uiPreferences color theme', () => {
+  it.each([
+    ['blue', 'blue', 'light'], ['light', 'red', 'light'],
+    ['green', 'green', 'dark'], ['dark', 'blue', 'dark'],
+    ['red-dark', 'red', 'dark'], ['green-light', 'green', 'light'],
+  ])('persists %s and exposes its family and brightness', (theme, family, mode) => {
+    expect(getColorThemeParts(theme)).toEqual({ family, mode })
+    expect(getColorThemeFor(family, mode)).toBe(theme)
+    expect(isDarkColorTheme(theme)).toBe(mode === 'dark')
+    setColorTheme(theme)
+    expect(document.documentElement.dataset.colorFamily).toBe(family)
+    expect(document.documentElement.dataset.colorMode).toBe(mode)
+    expect(getStoredColorTheme()).toBe(theme)
+    initializeUiPreferences()
+    expect(document.documentElement.dataset.colorTheme).toBe(theme)
+  })
+
+  it('reuses the original green artwork for green light and dark artwork for red dark', () => {
+    expect(getBrandAssets('green-light')).toEqual({
+      logo: '/brand/favicon_green.ico', title: '/brand/title.webp', decoration: '/brand/GreenCircle.webp',
+    })
+    expect(getBrandAssets('red-dark')).toEqual(getBrandAssets('dark'))
+    setColorTheme('green-light')
+    expect(document.querySelector('link[rel="icon"]').type).toBe('image/x-icon')
+  })
+
+  it('falls back consistently for invalid family and mode combinations', () => {
+    expect(getColorThemeParts('invalid')).toEqual({ family: 'blue', mode: 'light' })
+    expect(getColorThemeFor('invalid', 'dark')).toBe('dark')
+    expect(getColorThemeFor('green', 'invalid')).toBe('green-light')
+  })
   beforeEach(() => {
     document.head.innerHTML = '<link rel="icon" type="image/x-icon" href="/favicon.ico">'
     window.localStorage.clear()

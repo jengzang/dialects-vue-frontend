@@ -18,10 +18,20 @@ export const COLOR_THEME_BLUE = 'blue'
 export const COLOR_THEME_LIGHT = 'light'
 export const COLOR_THEME_DARK = 'dark'
 export const COLOR_THEME_GREEN = 'green'
+export const COLOR_THEME_RED_DARK = 'red-dark'
+export const COLOR_THEME_GREEN_LIGHT = 'green-light'
 export const COLOR_THEME_DEFAULT = COLOR_THEME_BLUE
 
 const VALID_UI_MODES = new Set([UI_MODE_DEFAULT, UI_MODE_COMPACT])
-const VALID_COLOR_THEMES = new Set([COLOR_THEME_BLUE, COLOR_THEME_LIGHT, COLOR_THEME_DARK, COLOR_THEME_GREEN])
+const COLOR_THEME_PARTS = {
+  [COLOR_THEME_BLUE]: { family: 'blue', mode: 'light' },
+  [COLOR_THEME_LIGHT]: { family: 'red', mode: 'light' },
+  [COLOR_THEME_DARK]: { family: 'blue', mode: 'dark' },
+  [COLOR_THEME_GREEN]: { family: 'green', mode: 'dark' },
+  [COLOR_THEME_RED_DARK]: { family: 'red', mode: 'dark' },
+  [COLOR_THEME_GREEN_LIGHT]: { family: 'green', mode: 'light' },
+}
+const VALID_COLOR_THEMES = new Set(Object.keys(COLOR_THEME_PARTS))
 
 export const currentColorTheme = ref(getStoredColorTheme())
 export const currentInterfaceMode = ref(getStoredInterfaceMode())
@@ -35,8 +45,31 @@ function normalizeColorTheme(theme) {
   return VALID_COLOR_THEMES.has(theme) ? theme : COLOR_THEME_DEFAULT
 }
 
+export function getColorThemeParts(theme) {
+  return { ...COLOR_THEME_PARTS[normalizeColorTheme(theme)] }
+}
+
+export function getColorThemeFor(family, mode) {
+  const selectedFamily = ['blue', 'red', 'green'].includes(family) ? family : 'blue'
+  const selectedMode = mode === 'dark' ? 'dark' : 'light'
+  return Object.keys(COLOR_THEME_PARTS).find(theme => (
+    COLOR_THEME_PARTS[theme].family === selectedFamily && COLOR_THEME_PARTS[theme].mode === selectedMode
+  ))
+}
+
+export function isDarkColorTheme(theme) {
+  return getColorThemeParts(theme).mode === 'dark'
+}
+
 export function getBrandAssets(theme) {
-  const normalizedTheme = normalizeColorTheme(theme)
+  const normalizedTheme = theme === COLOR_THEME_RED_DARK ? COLOR_THEME_DARK : normalizeColorTheme(theme)
+  if (normalizedTheme === COLOR_THEME_GREEN_LIGHT) {
+    return {
+      logo: '/brand/favicon_green.ico',
+      title: '/brand/title.webp',
+      decoration: '/brand/GreenCircle.webp',
+    }
+  }
   return {
     logo: `/brand/theme-previews/favicon-${normalizedTheme}.png`,
     title: normalizedTheme === COLOR_THEME_BLUE ? '/brand/title.webp' : `/brand/theme-previews/title-${normalizedTheme}.png`,
@@ -92,9 +125,12 @@ export function applyColorTheme(theme) {
 
   const normalizedTheme = normalizeColorTheme(theme)
   document.documentElement.dataset.colorTheme = normalizedTheme
+  const { family, mode } = getColorThemeParts(normalizedTheme)
+  document.documentElement.dataset.colorFamily = family
+  document.documentElement.dataset.colorMode = mode
   document.querySelectorAll('link[rel="icon"]').forEach((icon) => {
     icon.href = getBrandAssets(normalizedTheme).logo
-    icon.type = 'image/png'
+    icon.type = getBrandAssets(normalizedTheme).logo.endsWith('.ico') ? 'image/x-icon' : 'image/png'
   })
   return normalizedTheme
 }
