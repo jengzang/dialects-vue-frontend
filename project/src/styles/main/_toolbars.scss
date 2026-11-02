@@ -10,6 +10,20 @@
 }
 
 .main-sidebar-shell {
+  --sidebar-shell-background: var(--glass-20);
+  --sidebar-shell-border: var(--glass-30);
+  --sidebar-shell-shadow: inset 0 0 0.5px var(--glass-20), 0 10px 24px rgba(0, 0, 0, 0.16), 0 0 0 0.5px var(--glass-10);
+  --sidebar-item-background: var(--glass-80);
+  --sidebar-item-background-hover: var(--color-primary-light);
+  --sidebar-item-active-background: var(--color-primary-light2);
+  --sidebar-item-text: var(--color-primary-hover);
+  --sidebar-item-border: var(--glass-30);
+  --sidebar-stats-background: linear-gradient(145deg, var(--glass-30), var(--glass-20));
+  --sidebar-stats-border: var(--glass-40);
+  --sidebar-expand-background: linear-gradient(145deg, var(--glass-40), var(--glass-20));
+  --sidebar-expand-background-hover: linear-gradient(145deg, var(--glass-60), var(--glass-40));
+  --sidebar-expand-border: var(--glass-50);
+
   position: fixed;
   top: 12px;
   left: 12px;
@@ -94,8 +108,8 @@
 
 .main-sidebar-item.is-active {
   background: var(--sidebar-item-active-background);
-  border-color: rgba(var(--color-primary-rgb), 0.52);
-  color: var(--color-primary-hover);
+  border-color: rgba(var(--color-primary-rgb), 0.72);
+  color: var(--color-primary);
 }
 
 .main-sidebar-item.is-active::before {
@@ -155,6 +169,12 @@
 }
 
 .main-submenu-panel {
+  --submenu-hover-background: linear-gradient(
+    145deg,
+    rgba(var(--color-secondary-rgb), 0.12),
+    rgba(var(--color-secondary-rgb), 0.06)
+  );
+
   position: fixed;
   width: auto;
   max-width: min(300px, calc(100vw - 20px));
