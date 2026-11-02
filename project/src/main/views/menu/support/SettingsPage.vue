@@ -84,6 +84,7 @@
             >
               <PhCircle class="theme-choice-swatch" :class="`theme-choice-swatch--${option.value}`" weight="fill" :size="18" aria-hidden="true" />
               <span class="theme-choice-label">{{ option.label }}</span>
+              <span class="theme-choice-short-label" aria-hidden="true">{{ $t(`navigation.settings.colorTheme.shortOptions.${option.value}`) }}</span>
             </button>
           </div>
           <h3 class="section-title">
@@ -109,6 +110,7 @@
             >
               <component :is="option.icon" :size="20" aria-hidden="true" />
               <span class="theme-choice-label">{{ option.label }}</span>
+              <span class="theme-choice-short-label" aria-hidden="true">{{ $t(`navigation.settings.colorTheme.shortModes.${option.value}`) }}</span>
             </button>
           </div>
         </div>
@@ -533,9 +535,17 @@ $text-muted: var(--text-tertiary);
   }
 }
 
+.theme-choice-short-label {
+  display: none;
+}
+
 @media (max-aspect-ratio: 1 / 1) {
   .theme-choice-label {
     display: none;
+  }
+
+  .theme-choice-short-label {
+    display: inline;
   }
 }
 

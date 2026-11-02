@@ -90,8 +90,6 @@
       <div class="footer-meta">
         <div class="page-footer footer-stats">
           <span class="info-text">
-            <span>{{ t(context.languageLabelKey) }}</span>
-            <span aria-hidden="true">·</span>
             <span class="footer-theme-controls">
               <button
                 v-for="control in themeControls"
@@ -108,6 +106,7 @@
               >
                 <component :is="control.icon" :size="18" aria-hidden="true" />
                 <span class="footer-theme-label">{{ control.selectedLabel }}</span>
+                <span class="footer-theme-short-label" aria-hidden="true">{{ control.shortLabel }}</span>
                 <PhCaretDown :size="12" aria-hidden="true" />
               </button>
             </span>
@@ -180,8 +179,9 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { PhCircle, PhPalette, PhSun, PhMoon, PhDesktop, PhCaretDown } from '@phosphor-icons/vue'
+import { PhCircle, PhPalette, PhSun, PhMoon, PhDesktop, PhCaretDown, PhTranslate } from '@phosphor-icons/vue'
 import { useI18n } from 'vue-i18n'
+import { setLocale } from '@/i18n/index.js'
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n/localeRouting.js'
 import { requestCurrentTutorialGuideOpen } from '@/main/store/store.js'
@@ -222,27 +222,51 @@ const isMenuOpen = ref(false)
 const isSupportOpen = ref(false)
 const themeMenu = ref(null)
 const themeTriggers = {}
+const languageOptions = [
+  { value: 'zh-Hant', label: '繁體中文', shortLabel: '繁', icon: PhTranslate },
+  { value: 'zh-CN', label: '简体中文', shortLabel: '简', icon: PhTranslate },
+  { value: 'en', label: 'English', shortLabel: 'EN', icon: PhTranslate },
+]
 const colorOptions = computed(() => ['blue', 'red', 'green'].map(value => ({
-  value, label: t(`navigation.settings.colorTheme.options.${value}`), icon: PhCircle,
+  value, label: t(`navigation.settings.colorTheme.options.${value}`), shortLabel: t(`navigation.settings.colorTheme.shortOptions.${value}`), icon: PhCircle,
 })))
 const appearanceOptions = computed(() => [
-  { value: 'light', label: t('navigation.settings.colorTheme.modes.light'), icon: PhSun },
-  { value: 'dark', label: t('navigation.settings.colorTheme.modes.dark'), icon: PhMoon },
-  { value: 'system', label: t('navigation.settings.colorTheme.modes.system'), icon: PhDesktop },
+  { value: 'light', label: t('navigation.settings.colorTheme.modes.light'), shortLabel: t('navigation.settings.colorTheme.shortModes.light'), icon: PhSun },
+  { value: 'dark', label: t('navigation.settings.colorTheme.modes.dark'), shortLabel: t('navigation.settings.colorTheme.shortModes.dark'), icon: PhMoon },
+  { value: 'system', label: t('navigation.settings.colorTheme.modes.system'), shortLabel: t('navigation.settings.colorTheme.shortModes.system'), icon: PhDesktop },
 ])
 const themeControls = computed(() => {
   const family = getColorThemeParts(currentColorTheme.value).family
+  const color = colorOptions.value.find(option => option.value === family)
   const appearance = appearanceOptions.value.find(option => option.value === currentColorMode.value)
+  const language = languageOptions.find(option => option.value === locale.value)
   return [
-    { id: 'family', value: family, label: t('navigation.settings.colorTheme.title'), selectedLabel: colorOptions.value.find(option => option.value === family).label, icon: PhPalette, options: colorOptions.value },
-    { id: 'mode', value: currentColorMode.value, label: t('navigation.settings.colorTheme.modeTitle'), selectedLabel: appearance.label, icon: appearance.icon, options: appearanceOptions.value },
+    { id: 'language', value: locale.value, label: t('navigation.settings.language.title'), selectedLabel: language.label, shortLabel: language.shortLabel, icon: PhTranslate, options: languageOptions },
+    { id: 'family', value: family, label: t('navigation.settings.colorTheme.title'), selectedLabel: color.label, shortLabel: color.shortLabel, icon: PhPalette, options: colorOptions.value },
+    { id: 'mode', value: currentColorMode.value, label: t('navigation.settings.colorTheme.modeTitle'), selectedLabel: appearance.label, shortLabel: appearance.shortLabel, icon: appearance.icon, options: appearanceOptions.value },
   ]
 })
 const activeThemeControl = computed(() => themeControls.value.find(control => control.id === themeMenu.value))
 
 function changeFooterTheme(value) {
-  if (themeMenu.value === 'family') setColorFamily(value)
+  if (themeMenu.value === 'language') changeFooterLanguage(value)
+  else if (themeMenu.value === 'family') setColorFamily(value)
   else setColorMode(value)
+}
+
+async function changeFooterLanguage(newLocale) {
+  const unchanged = newLocale === locale.value
+  try {
+    if (!await setLocale(newLocale)) return
+  } catch {
+    showError(t('messages.error.loadFailed'))
+    return
+  }
+  if (unchanged) return
+  const path = buildLocalePath(newLocale, stripLocaleFromPath(route.path))
+  await router.push({ path, query: route.query, hash: route.hash })
+  showSuccess(t('messages.success.languageChanged'))
+  setTimeout(() => window.location.reload(), 500)
 }
 
 function closeThemeMenu() {
@@ -564,6 +588,10 @@ onBeforeUnmount(() => {
   min-height: 38px;
 }
 
+.footer-theme-short-label {
+  display: none;
+}
+
 .footer-features-modal {
   :deep(.features-section) {
     max-width: none;
@@ -587,6 +615,10 @@ onBeforeUnmount(() => {
 @media (max-aspect-ratio: 1 / 1) {
   .footer-theme-label {
     display: none;
+  }
+
+  .footer-theme-short-label {
+    display: inline;
   }
 
   .footer-theme-trigger {

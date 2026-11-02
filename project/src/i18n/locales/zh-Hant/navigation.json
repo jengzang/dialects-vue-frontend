@@ -216,6 +216,8 @@
       "description": "選擇頁面背景、玻璃面板與文字的整體配色。",
       "label": "目前配色",
       "modeTitle": "明暗模式",
+      "shortOptions": { "blue": "藍", "red": "紅", "green": "綠" },
+      "shortModes": { "light": "日", "dark": "夜", "system": "隨" },
       "modes": {
         "light": "日間",
         "dark": "夜間",

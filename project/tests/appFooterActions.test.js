@@ -17,6 +17,9 @@ const createShareCardDataUrlMock = vi.fn()
 const showSuccessMock = vi.fn()
 const showErrorMock = vi.fn()
 const clipboardWriteTextMock = vi.fn()
+const setLocaleMock = vi.fn()
+
+vi.mock('../src/i18n/index.js', () => ({ setLocale: setLocaleMock }))
 
 vi.mock('vue-router', () => ({
   useRoute: () => route,
@@ -154,6 +157,7 @@ describe('AppFooter actions', () => {
       hash: '',
     })
     routerPushMock.mockReset()
+    setLocaleMock.mockReset().mockResolvedValue(true)
     ensureVisitStatsMock.mockResolvedValue({ todayVisits: 7, totalVisits: 99 })
     getSourceStatsMock.mockResolvedValue({ locationCount: 12, dataCount: 34 })
     createShareCardDataUrlMock.mockReturnValue('data:image/png;base64,card')
@@ -178,6 +182,8 @@ describe('AppFooter actions', () => {
 
   afterEach(() => {
     document.body.innerHTML = ''
+    vi.clearAllTimers()
+    vi.useRealTimers()
     vi.restoreAllMocks()
   })
 
@@ -198,7 +204,7 @@ describe('AppFooter actions', () => {
     expect(footer.querySelector('.footer-primary .footer-actions')).toBeTruthy()
     expect(footer.querySelector('.footer-meta .footer-stats')).toBeTruthy()
     expect(footer.querySelector('.footer-meta .footer-legal')).toBeTruthy()
-    expect(footer.querySelector('.footer-meta .footer-theme-label')?.textContent).toBe('绿色')
+    expect(footer.querySelector('[data-theme-menu="family"] .footer-theme-label')?.textContent).toBe('绿色')
     expect(footer.querySelector('.page-copy')).toBeNull()
     expect([...footer.querySelectorAll('.footer-action')]
       .some(button => button.classList.contains('glass-button'))).toBe(false)
@@ -232,6 +238,42 @@ describe('AppFooter actions', () => {
     await nextTick()
     expect(currentColorTheme.value).toBe('red-dark')
     expect(currentColorMode.value).toBe('dark')
+    wrapper.unmount()
+  })
+
+  it('changes footer language through the existing locale loader and preserves path, query and hash', async () => {
+    vi.useFakeTimers()
+    route.path = '/zh-CN/menu/query/zhonggu'
+    route.query = { input: '東', tab: 'results' }
+    route.hash = '#result'
+    const { default: AppFooter } = await import('../src/components/footer/AppFooter.vue')
+    const wrapper = mountFooter(AppFooter)
+    const trigger = wrapper.host.querySelector('[data-theme-menu="language"]')
+    expect(trigger).not.toBeNull()
+    trigger.click()
+    await nextTick()
+    const english = [...document.querySelectorAll('.dropdown-item')].find(item => item.textContent.includes('English'))
+    english.click()
+    await nextTick()
+    await nextTick()
+    expect(setLocaleMock).toHaveBeenCalledWith('en')
+    expect(routerPushMock).toHaveBeenCalledWith({ path: '/en/menu/query/zhonggu', query: route.query, hash: '#result' })
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    expect(showSuccessMock).toHaveBeenCalledWith('messages.success.languageChanged')
+    wrapper.unmount()
+  })
+
+  it('keeps the current route and reports failure when a footer language cannot load', async () => {
+    setLocaleMock.mockRejectedValue(new Error('offline'))
+    const { default: AppFooter } = await import('../src/components/footer/AppFooter.vue')
+    const wrapper = mountFooter(AppFooter)
+    wrapper.host.querySelector('[data-theme-menu="language"]').click()
+    await nextTick()
+    const traditional = [...document.querySelectorAll('.dropdown-item')].find(item => item.textContent.includes('繁體中文'))
+    traditional.click()
+    await nextTick()
+    expect(routerPushMock).not.toHaveBeenCalled()
+    expect(showErrorMock).toHaveBeenCalledWith('messages.error.loadFailed')
     wrapper.unmount()
   })
 

@@ -216,6 +216,8 @@
       "description": "Choose the overall color scheme for page backgrounds, glass panels, and text.",
       "label": "Current Theme",
       "modeTitle": "Appearance",
+      "shortOptions": { "blue": "B", "red": "R", "green": "G" },
+      "shortModes": { "light": "L", "dark": "D", "system": "S" },
       "modes": {
         "light": "Light",
         "dark": "Dark",
