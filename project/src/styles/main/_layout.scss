@@ -9,8 +9,7 @@
   }
 }
 
-:root[data-color-theme='blue'],
-:root[data-color-theme='light'] {
+:root[data-color-mode='light'] {
   .history-page:not(.history-page--featured) {
     .history-content,
     .thoughts {

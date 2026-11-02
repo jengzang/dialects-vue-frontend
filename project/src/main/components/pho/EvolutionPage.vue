@@ -1678,7 +1678,7 @@ $portrait-ratio: 1;
       text-decoration: underline;
     }
 
-    :root[data-color-theme='dark'] & {
+    :root[data-color-mode='dark'] & {
       color: var(--text-primary);
     }
   }

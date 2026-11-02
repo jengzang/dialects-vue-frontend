@@ -586,7 +586,7 @@ $portrait-ratio: 1;
   cursor: pointer;
   transition: all 0.2s ease;
 
-  :root[data-color-theme='dark'] & {
+  :root[data-color-mode='dark'] & {
     color: var(--text-primary);
   }
 

@@ -1608,8 +1608,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
         box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.2);
         transform: translateY(-2px);
 
-        :root[data-color-theme='green'] &,
-        :root[data-color-theme='dark'] & {
+        :root[data-color-mode='dark'] & {
           color: var(--text-primary);
           background: var(--surface-panel-strong);
         }

@@ -31,7 +31,7 @@ function readSource(path) {
 }
 
 function themeBlock(source, theme) {
-  const match = source.match(new RegExp(`:root\\[data-color-theme='${theme}'\\] \\{([\\s\\S]*?)\\n\\}`))
+  const match = source.match(new RegExp(`:root\\[data-color-theme='${theme}'\\](?:,\\s*:root\\[[^\\]]+\\])* \\{([\\s\\S]*?)\\n\\}`))
   return match?.[1] || ''
 }
 
@@ -88,7 +88,7 @@ describe('color theme token coverage', () => {
     expect(toolbarsSource).toContain('color: var(--sidebar-item-text);')
   })
 
-  it('uses vermilion and walnut accents for light and white primary accents for dark themes', () => {
+  it('uses vermilion and walnut for red light and blue accents for blue dark', () => {
     const source = readSource(tokensPath)
     const lightBlock = themeBlock(source, 'light')
     const darkBlock = themeBlock(source, 'dark')
@@ -102,8 +102,8 @@ describe('color theme token coverage', () => {
     expect(lightBlock).not.toContain('--color-primary: #2f80ed;')
     expect(lightBlock).not.toContain('--color-primary-rgb: 47, 128, 237;')
 
-    expect(darkBlock).toContain('--color-primary: #f0f6fc;')
-    expect(darkBlock).toContain('--color-primary-rgb: 240, 246, 252;')
+    expect(darkBlock).toContain('--color-primary: #8ab4f8;')
+    expect(darkBlock).toContain('--color-primary-rgb: 138, 180, 248;')
     expect(darkBlock).toContain('--color-primary-cyan: #79c0ff;')
     expect(darkBlock).not.toContain('--color-primary: #62a8ff;')
     expect(darkBlock).not.toContain('--color-primary-rgb: 98, 168, 255;')
@@ -183,18 +183,12 @@ describe('color theme token coverage', () => {
     expect(source).toContain('props.triggerEl?.value || props.triggerEl || internalTriggerEl.value')
   })
 
-  it('gives the sidebar shell dedicated theme-aware glass surface tokens', () => {
-    const source = readSource(tokensPath)
-    const lightBlock = themeBlock(source, 'light')
-    const darkBlock = themeBlock(source, 'dark')
+  it('keeps sidebar surface roles scoped to the shell and derived from theme tokens', () => {
     const toolbarsSource = readSource(toolbarsPath)
 
-    expect(lightBlock).toContain('--sidebar-shell-background:')
-    expect(lightBlock).toContain('--sidebar-shell-border:')
-    expect(lightBlock).toContain('--sidebar-shell-shadow:')
-    expect(darkBlock).toContain('--sidebar-shell-background:')
-    expect(darkBlock).toContain('--sidebar-shell-border:')
-    expect(darkBlock).toContain('--sidebar-shell-shadow:')
+    expect(toolbarsSource).toContain('--sidebar-shell-background: var(--glass-20);')
+    expect(toolbarsSource).toContain('--sidebar-shell-border: var(--glass-30);')
+    expect(toolbarsSource).toContain('--sidebar-item-background: var(--glass-80);')
     expect(toolbarsSource).toContain('background: var(--sidebar-shell-background);')
     expect(toolbarsSource).toContain('border: 3px solid var(--sidebar-shell-border);')
     expect(toolbarsSource).toContain('box-shadow: var(--sidebar-shell-shadow);')
@@ -216,9 +210,9 @@ describe('color theme token coverage', () => {
     expect(lightBlock).toContain('--vml-blue-rgb: var(--color-primary-rgb);')
     expect(lightBlock).toContain('--vml-blue-medium: #b9534a;')
     expect(lightBlock).toContain('--vml-blue-highlight: var(--color-primary-hover);')
-    expect(darkBlock).toContain('--vml-blue: #f5f5f7;')
-    expect(darkBlock).toContain('--vml-blue-rgb: 245, 245, 247;')
-    expect(darkBlock).toContain('--vml-blue-highlight: #ffffff;')
+    expect(darkBlock).toContain('--vml-blue: var(--color-primary);')
+    expect(darkBlock).toContain('--vml-blue-rgb: var(--color-primary-rgb);')
+    expect(darkBlock).toContain('--vml-blue-highlight: var(--color-primary-hover);')
     expect(darkBlock).not.toContain('#d8c08a')
     expect(darkBlock).not.toContain('216, 192, 138')
     expect(readSource(villagesMlSurfacesPath)).toContain('var(--vml-blue-highlight)')

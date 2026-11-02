@@ -585,42 +585,44 @@ $font-size-width-scales: (
   --glass-panel-hover-shadow: var(--shadow-glass-hover);
 }
 
-:root[data-color-theme='dark'] {
+:root[data-color-theme='dark'],
+:root[data-color-theme='red-dark'] {
   color-scheme: dark;
   /* ── 主色（反轉為淺色）── */
-  --color-primary: #f0f6fc;
-  --color-primary-hover: #ffffff;
-  --color-secondary: #9fbce0;
-  --color-secondary-rgb: 159, 188, 224;
+  --color-primary: #8ab4f8;
+  --color-primary-hover: #aacbff;
+  --color-secondary: #b7a5e8;
+  --color-secondary-rgb: 183, 165, 232;
   --color-secondary-text: var(--color-secondary);
-  --color-secondary-hover: #8faed5;
-  --color-primary-light: rgba(240, 246, 252, 0.08);
-  --color-primary-light2: rgba(240, 246, 252, 0.14);
+  --color-secondary-hover: #c6b6f0;
+  --color-primary-light: rgba(var(--color-primary-rgb), 0.08);
+  --color-primary-light2: rgba(var(--color-primary-rgb), 0.14);
   --color-primary-light-solid: #24282e;
-  --color-primary-medium: rgba(240, 246, 252, 0.18);
-  --color-primary-medium2: rgba(240, 246, 252, 0.42);
-  --color-primary-border: rgba(240, 246, 252, 0.22);
-  --color-primary-border2: rgba(240, 246, 252, 0.30);
-  --color-primary-shadow: rgba(240, 246, 252, 0.10);
-  --color-primary-shadow-light: rgba(240, 246, 252, 0.18);
+  --color-primary-medium: rgba(var(--color-primary-rgb), 0.18);
+  --color-primary-medium2: rgba(var(--color-primary-rgb), 0.42);
+  --color-primary-border: rgba(var(--color-primary-rgb), 0.22);
+  --color-primary-border2: rgba(var(--color-primary-rgb), 0.30);
+  --color-primary-shadow: rgba(var(--color-primary-rgb), 0.10);
+  --color-primary-shadow-light: rgba(var(--color-primary-rgb), 0.18);
   --color-gradient: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
 
   /* ── RGB 分量 ── */
-  --color-primary-rgb: 240, 246, 252;
-  --color-primary-hover-rgb: 255, 255, 255;
+  --color-primary-rgb: 138, 180, 248;
+  --color-primary-hover-rgb: 170, 203, 255;
 
   /* ── 頁面背景（GitHub canvas.default → canvas.subtle → canvas.overlay）── */
   /* ── 静态表面层级 ── */
   --surface-elevation-0: #161b22;
   --surface-elevation-1: #21262d;
   --surface-elevation-2: #0d1117;
-  /* ── 浮动玻璃表面（纯白高不透明度，不染色）── */
-  --surface-glass-floating: rgba(255, 255, 255, 0.14);
-  --surface-glass-floating-strong: rgba(255, 255, 255, 0.22);
-  --surface-glass-floating-subtle: rgba(255, 255, 255, 0.08);
+  /* ── 浮动玻璃表面（深色填充，保留主题色调）── */
+  --glass-tint-rgb: 28, 39, 52;
+  --surface-glass-floating: rgba(var(--glass-tint-rgb), 0.90);
+  --surface-glass-floating-strong: rgba(var(--glass-tint-rgb), 0.96);
+  --surface-glass-floating-subtle: rgba(var(--glass-tint-rgb), 0.80);
 
   --bg-body: #0d1117;
-  --layout-art-filter: grayscale(1) brightness(1.35);
+  --layout-art-filter: saturate(0.65) brightness(1.15);
   --bg-white: #161b22;
   --bg-light-gray: #0d1117;
   --bg-light: #21262d;
@@ -632,16 +634,16 @@ $font-size-width-scales: (
 
   --bg-blue-tint: #0d1117;
   --bg-blue-light: #161b22;
-  --bg-blue-hover: rgba(240, 246, 252, 0.08);
+  --bg-blue-hover: rgba(var(--color-primary-rgb), 0.08);
   --bg-blue-tint-rgb: 13, 17, 23;
-  --color-map-draw: #e6edf3;
+  --color-map-draw: var(--color-primary);
 
   /* ── 文字（GitHub fg.default → fg.muted → fg.subtle）── */
   --text-deep: #e6edf3;
   --text-primary: #e6edf3;
-  --text-secondary: #8b949e;
+  --text-secondary: #acb7c6;
   --text-tertiary: #7d8590;
-  --text-muted: #8b949e;
+  --text-muted: #acb7c6;
   --text-lightest: #6e7681;
   --text-dark: #e6edf3;
   --text-dark-alpha: rgba(230, 237, 243, 0.90);
@@ -650,27 +652,27 @@ $font-size-width-scales: (
   --text-dark-lighter: rgba(195, 205, 218, 0.70);
   --text-dark-lightest: rgba(195, 205, 218, 0.80);
   --text-medium: #a5adba;
-  --text-gray: #8b949e;
+  --text-gray: #acb7c6;
   --color-text-primary: #e6edf3;
-  --color-text-secondary: #8b949e;
+  --color-text-secondary: #acb7c6;
   --text-deep-rgb: 230, 237, 243;
-  --text-secondary-rgb: 139, 148, 158;
+  --text-secondary-rgb: 172, 183, 198;
   --text-slate: #c3cdda;
   --text-slate-rgb: 195, 205, 218;
   --text-slate-light: #7d8590;
   --text-slate-light-rgb: 125, 133, 144;
 
   /* ── 毛玻璃（提高不透明度，暗色背景下玻璃可见）── */
-  --glass-05: rgba(255, 255, 255, 0.04);
-  --glass-10: rgba(255, 255, 255, 0.08);
-  --glass-20: rgba(255, 255, 255, 0.12);
-  --glass-30: rgba(255, 255, 255, 0.16);
-  --glass-40: rgba(255, 255, 255, 0.20);
-  --glass-50: rgba(255, 255, 255, 0.24);
-  --glass-60: rgba(255, 255, 255, 0.30);
-  --glass-70: rgba(255, 255, 255, 0.36);
-  --glass-80: rgba(255, 255, 255, 0.42);
-  --glass-90: rgba(255, 255, 255, 0.50);
+  --glass-05: rgba(var(--glass-tint-rgb), 0.05);
+  --glass-10: rgba(var(--glass-tint-rgb), 0.14);
+  --glass-20: rgba(var(--glass-tint-rgb), 0.26);
+  --glass-30: rgba(var(--glass-tint-rgb), 0.38);
+  --glass-40: rgba(var(--glass-tint-rgb), 0.50);
+  --glass-50: rgba(var(--glass-tint-rgb), 0.62);
+  --glass-60: rgba(var(--glass-tint-rgb), 0.72);
+  --glass-70: rgba(var(--glass-tint-rgb), 0.80);
+  --glass-80: rgba(var(--glass-tint-rgb), 0.90);
+  --glass-90: rgba(var(--glass-tint-rgb), 0.96);
 
   /* ── 語義表面（GitHub 層級：canvas.subtle / overlay / inset）── */
   --surface-panel: #161b22;
@@ -679,8 +681,8 @@ $font-size-width-scales: (
   --surface-panel-subtle: rgba(240, 246, 252, 0.06);
   --surface-glass-button: #21262d;
   --surface-glass-button-hover: #30363d;
-  --surface-selected: rgba(240, 246, 252, 0.10);
-  --text-selected: #ffffff;
+  --surface-selected: rgba(var(--color-primary-rgb), 0.10);
+  --text-selected: var(--color-primary-hover);
 
   /* ── 邊框（GitHub border.default / muted）── */
   --border-glass: rgba(240, 246, 252, 0.14);
@@ -710,14 +712,14 @@ $font-size-width-scales: (
   --bg-overlay-very-light: rgba(0, 0, 0, 0.48);
 
   /* ── 交互 ── */
-  --focus-ring: 0 0 0 3px rgba(88, 166, 255, 0.25);
-  --action-primary-bg: #f0f6fc;
-  --action-primary-bg-hover: #ffffff;
+  --focus-ring: 0 0 0 3px rgba(var(--color-primary-rgb), 0.25);
+  --action-primary-bg: var(--color-primary);
+  --action-primary-bg-hover: var(--color-primary-hover);
   --action-primary-text: #0d1117;
-  --action-primary-border: rgba(240, 246, 252, 0.18);
+  --action-primary-border: rgba(var(--color-primary-rgb), 0.18);
   --action-primary-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --action-active-bg: rgba(240, 246, 252, 0.14);
-  --action-active-border: rgba(240, 246, 252, 0.26);
+  --action-active-bg: rgba(var(--color-primary-rgb), 0.14);
+  --action-active-border: rgba(var(--color-primary-rgb), 0.26);
   --enter-button-bg: var(--color-primary);
   --enter-button-bg-hover: var(--color-primary-hover);
   --enter-button-text: var(--action-primary-text);
@@ -745,11 +747,98 @@ $font-size-width-scales: (
   --shadow-glass-inset: inset 0 0 0.5px rgba(240, 246, 252, 0.16), 0 10px 28px rgba(0, 0, 0, 0.48), 0 0 0 0.5px rgba(240, 246, 252, 0.06);
 }
 
+:root[data-color-theme='red-dark'] {
+  --color-primary: #efaaa0;
+  --color-primary-hover: #ffc0b6;
+  --color-primary-rgb: 239, 170, 160;
+  --color-primary-hover-rgb: 255, 192, 182;
+  --color-secondary: #d0b494;
+  --color-secondary-rgb: 208, 180, 148;
+  --color-secondary-hover: #dfc3a3;
+  --glass-tint-rgb: 49, 32, 33;
+  --bg-body: #1b1213;
+  --surface-page: var(--bg-body);
+  --surface-elevation-0: #261b1d;
+  --surface-elevation-1: #302326;
+  --surface-elevation-2: #1b1213;
+  --bg-white: var(--surface-elevation-0);
+  --bg-light-gray: var(--surface-elevation-2);
+  --bg-light: var(--surface-elevation-1);
+  --surface-panel: var(--surface-elevation-0);
+  --surface-panel-hover: #322326;
+  --surface-panel-strong: var(--surface-elevation-1);
+  --surface-glass-button: var(--surface-elevation-1);
+  --surface-glass-button-hover: #3c2c2e;
+  --bg-blue-tint: var(--bg-body);
+  --bg-blue-tint-rgb: 27, 18, 19;
+  --bg-blue-light: var(--surface-elevation-0);
+  --bg-page-gradient: radial-gradient(1200px 800px at 8% -12%, #3a2528, #3a252800 58%),
+    linear-gradient(180deg, #1b1213, #261b1d);
+  --layout-art-filter: hue-rotate(150deg) saturate(0.55) brightness(1.15);
+  --color-primary-cyan: var(--color-secondary);
+  --color-primary-cyan-rgb: var(--color-secondary-rgb);
+  --color-cyan: var(--color-secondary);
+  --color-cyan-rgb: var(--color-secondary-rgb);
+}
+
+:root[data-color-theme='green-light'] {
+  color-scheme: light;
+  --color-primary: #267443;
+  --color-primary-hover: #1c5b34;
+  --color-primary-rgb: 38, 116, 67;
+  --color-primary-hover-rgb: 28, 91, 52;
+  --color-secondary: #7d6c42;
+  --color-secondary-rgb: 125, 108, 66;
+  --color-secondary-text: #75653f;
+  --color-secondary-hover: #625332;
+  --color-primary-light: rgba(var(--color-primary-rgb), 0.08);
+  --color-primary-light2: rgba(var(--color-primary-rgb), 0.14);
+  --color-primary-light-solid: #deede2;
+  --color-primary-medium: rgba(var(--color-primary-rgb), 0.20);
+  --color-primary-medium2: rgba(var(--color-primary-rgb), 0.44);
+  --color-primary-border: rgba(var(--color-primary-rgb), 0.18);
+  --color-primary-border2: rgba(var(--color-primary-rgb), 0.25);
+  --color-primary-shadow: rgba(var(--color-primary-rgb), 0.12);
+  --color-primary-shadow-light: rgba(var(--color-primary-rgb), 0.18);
+  --color-gradient: linear-gradient(135deg, var(--color-primary), var(--color-secondary-text));
+  --bg-body: #eff5ec;
+  --surface-page: var(--bg-body);
+  --bg-white: #fcfdf9;
+  --bg-light-gray: #f3f7ef;
+  --bg-light: #e6eee1;
+  --surface-elevation-0: #fcfdf9;
+  --surface-elevation-1: #f3f7ef;
+  --surface-elevation-2: #e6eee1;
+  --bg-blue-tint: var(--bg-body);
+  --bg-blue-tint-rgb: 239, 245, 236;
+  --bg-blue-light: #e1eddf;
+  --bg-blue-hover: rgba(var(--color-primary-rgb), 0.10);
+  --bg-page-gradient: radial-gradient(1200px 800px at 8% -12%, #f8fbf1, #f8fbf100 58%),
+    linear-gradient(180deg, #eff5ec, #e1eddf);
+  --text-deep: #233b2a;
+  --text-deep-rgb: 35, 59, 42;
+  --text-primary: #24382b;
+  --text-secondary: #526650;
+  --text-muted: #5d6d56;
+  --text-tertiary: #5d6d56;
+  --text-secondary-rgb: 82, 102, 80;
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --text-slate: #526650;
+  --text-slate-rgb: 82, 102, 80;
+  --text-slate-light: #72836e;
+  --text-slate-light-rgb: 114, 131, 110;
+  --color-primary-cyan: var(--color-primary);
+  --color-primary-cyan-rgb: var(--color-primary-rgb);
+  --color-cyan: var(--color-primary);
+  --color-cyan-rgb: var(--color-primary-rgb);
+  --color-map-draw: var(--color-primary);
+  --layout-art-filter: hue-rotate(-75deg) saturate(0.7);
+}
+
 /* 深色模式地圖控制面板 — 地圖永遠是淺色的，毛玻璃會太透 */
-:root[data-color-theme='green'] .map-controls,
-:root[data-color-theme='green'] .vml-map-controls,
-:root[data-color-theme='dark'] .map-controls,
-:root[data-color-theme='dark'] .vml-map-controls {
+:root[data-color-mode='dark'] .map-controls,
+:root[data-color-mode='dark'] .vml-map-controls {
   background: var(--surface-panel-strong) !important;
   border: 1px solid var(--border-glass) !important;
   box-shadow: var(--shadow-md) !important;

@@ -115,7 +115,7 @@
   }
 
   &.ui-tabs-navigation--surface {
-    :root[data-color-theme='dark'] & .ui-tab-item.active {
+    :root[data-color-mode='dark'] & .ui-tab-item.active {
       background: var(--color-primary-light2);
     }
   }

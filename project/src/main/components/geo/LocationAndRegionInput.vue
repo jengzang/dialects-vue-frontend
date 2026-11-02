@@ -1381,7 +1381,7 @@ $portrait-ratio: 1;
   user-select: none;
   transition: all 0.2s ease;
 
-  :root[data-color-theme='dark'] & {
+  :root[data-color-mode='dark'] & {
     color: var(--text-primary);
   }
 
@@ -1507,7 +1507,7 @@ $portrait-ratio: 1;
   cursor: pointer;
   user-select: none;
 
-  :root[data-color-theme='dark'] & {
+  :root[data-color-mode='dark'] & {
     color: var(--text-primary);
   }
 

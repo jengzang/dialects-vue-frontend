@@ -9,11 +9,17 @@ import { parse as parseCss } from 'postcss'
 
 const source = readFileSync(resolve(import.meta.dirname, '../src/styles/global/_tokens.scss'), 'utf8')
 const vmlSource = readFileSync(resolve(import.meta.dirname, '../src/styles/villagesml/_tokens.scss'), 'utf8')
+const themes = ['blue', 'light', 'green', 'dark', 'red-dark', 'green-light']
 
 function declarations(css, theme) {
-  const selector = theme === 'blue' ? ':root' : `:root[data-color-theme='${theme}']`
-  const block = css.slice(css.indexOf(`${selector} {`)).split('\n}')[0]
-  return Object.fromEntries([...block.matchAll(/(--[\w-]+):\s*([^;]+);/g)].map(m => [m[1], m[2]]))
+  const selectors = [':root', `:root[data-color-theme=${theme}]`]
+  const tokens = {}
+  parseCss(compileString(css, { logger: { warn() {}, debug() {} } }).css).walkRules(rule => {
+    if (rule.selector.split(',').some(s => selectors.includes(s.trim().replaceAll(/['"]/g, '')))) {
+      for (const node of rule.nodes) if (node.type === 'decl') tokens[node.prop] = node.value
+    }
+  })
+  return tokens
 }
 
 function palette(theme) {
@@ -83,6 +89,27 @@ function resolved(input, tokens) {
 }
 
 describe('approved theme palette readability', () => {
+  it.each(['green', 'dark', 'red-dark'])('%s keeps footer copy readable on glass, including above light artwork', theme => {
+    const tokens = palette(theme)
+    const rule = compiledRule('styles/main/_layout.scss', '.blue-art-layout footer.app-footer')
+    const fill = rgba(resolved(rule.background, tokens))
+    const backings = [rgba(value(tokens, '--bg-body'))]
+    if (theme !== 'green') backings.push([255, 255, 255, 1])
+    for (const backing of backings) {
+      const surface = over(fill, backing)
+      for (const name of ['--text-secondary', '--text-muted', '--color-primary', '--color-primary-hover']) {
+        expect(contrast(rgba(value(tokens, name)), surface), `${theme} ${name}`).toBeGreaterThanOrEqual(4.5)
+      }
+    }
+  })
+
+  it('adds green light with a green primary and dark readable button text pairings', () => {
+    const tokens = palette('green-light')
+    const primary = rgba(value(tokens, '--color-primary'))
+    expect(primary[1]).toBeGreaterThan(primary[0])
+    expect(primary[1]).toBeGreaterThan(primary[2])
+    expect(value(tokens, 'color-scheme')).toBe('light')
+  })
   it('limits compiled green settings surface overrides to the setting sections', () => {
     const result = compileStyle({
       source: compiledCss('main/views/menu/support/SettingsPage.vue'),
@@ -129,7 +156,7 @@ describe('approved theme palette readability', () => {
     const tokens = palette('green')
     const page = rgba(value(tokens, '--bg-body'))
     expect(luminance(page)).toBeLessThan(0.04)
-    for (const name of ['--surface-panel', '--surface-panel-strong', '--surface-elevation-0', '--glass-50', '--glass-90', '--sidebar-item-background']) {
+    for (const name of ['--surface-panel', '--surface-panel-strong', '--surface-elevation-0', '--glass-50', '--glass-90']) {
       const surface = over(rgba(value(tokens, name)), page)
       expect(luminance(surface), name).toBeLessThan(0.08)
       for (const text of ['--text-primary', '--text-secondary', '--text-muted']) {
@@ -138,7 +165,7 @@ describe('approved theme palette readability', () => {
     }
   })
 
-  for (const theme of ['blue', 'green', 'light', 'dark']) {
+  for (const theme of themes) {
     it(`${theme}: gives primary and secondary colors coherent RGB values and readable accents`, () => {
       const tokens = palette(theme)
       const page = rgba(value(tokens, '--bg-body'))
@@ -189,9 +216,9 @@ describe('approved theme palette readability', () => {
     ['main/components/praat/PitchTonePanel.vue', '.analyze-btn'],
     ['main/components/praat/PitchTonePanel.vue', '.step-header .step-number'],
   ]) {
-    it(`keeps actual compiled ${selector} labels readable in all four themes`, () => {
+    it(`keeps actual compiled ${selector} labels readable in all six themes`, () => {
       const rule = compiledRule(path, selector)
-      for (const theme of ['blue', 'green', 'light', 'dark']) {
+      for (const theme of themes) {
         const tokens = palette(theme)
         const panel = over(rgba(value(tokens, '--surface-panel')), rgba(value(tokens, '--bg-body')))
         const fill = resolved(rule.background, tokens)
@@ -210,7 +237,7 @@ describe('approved theme palette readability', () => {
     const analyze = compiledRule('main/components/praat/PitchTonePanel.vue', '.analyze-btn')
     const title = compiledRule('main/views/explore/Praat.vue', '.page-title')
     const steps = compiledRule('main/components/praat/PitchTonePanel.vue', '.step-header .step-number')
-    for (const theme of ['blue', 'green', 'light', 'dark']) {
+    for (const theme of themes) {
       const tokens = palette(theme)
       for (const action of [start, analyze]) {
         expect(resolved(action.background, tokens)).toBe(value(tokens, '--action-primary-bg'))

@@ -37,10 +37,10 @@
 <script setup>
 import { computed, ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import Globe from 'globe.gl'
-import { currentColorTheme, COLOR_THEME_DARK, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { currentColorTheme, isDarkColorTheme } from '@/composables/core/uiPreferences.js'
 
 const globeImageUrl = computed(() => (
-  [COLOR_THEME_DARK, COLOR_THEME_GREEN].includes(currentColorTheme.value)
+  isDarkColorTheme(currentColorTheme.value)
     ? '/showcase/earth-color-relief-muted.webp'
     : '/showcase/earth-color-relief-dark.webp'
 ))

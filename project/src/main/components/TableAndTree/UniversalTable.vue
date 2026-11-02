@@ -1966,13 +1966,13 @@ td {
       color: var(--color-primary);
       font-weight: bold;
 
-      :root[data-color-theme='dark'] & {
+      :root[data-color-mode='dark'] & {
         color: var(--color-primary-hover);
       }
     }
   }
 
-  :root[data-color-theme='dark'] & {
+  :root[data-color-mode='dark'] & {
     color: var(--text-primary);
   }
 }

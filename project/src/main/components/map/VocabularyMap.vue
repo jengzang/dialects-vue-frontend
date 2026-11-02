@@ -854,8 +854,7 @@ watch(displayMode, () => {
   font-weight: 600;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
-  :root[data-color-theme='green'] &,
-  :root[data-color-theme='dark'] & {
+  :root[data-color-mode='dark'] & {
     color: var(--text-primary);
     background: var(--surface-panel-strong);
   }

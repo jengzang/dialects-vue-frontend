@@ -17,7 +17,7 @@ $use-native-scrollbars: true;
   }
 }
 
-:root:not([data-color-theme='dark']) {
+:root:not([data-color-mode='dark']) {
   --app-scrollbar-thumb: rgba(var(--color-primary-hover-rgb), 0.42);
   --app-scrollbar-thumb-hover: rgba(var(--color-primary-hover-rgb), 0.6);
 

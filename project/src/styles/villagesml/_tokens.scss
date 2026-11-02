@@ -50,17 +50,32 @@
   --vml-blue-highlight: #a2e5b3;
 }
 
-:root[data-color-theme='dark'] {
+:root[data-color-theme='dark'],
+:root[data-color-theme='red-dark'] {
   color-scheme: dark;
-  --vml-blue: #f5f5f7;
-  --vml-blue-rgb: 245, 245, 247;
-  --vml-blue-dark: #ffffff;
-  --vml-blue-dark-rgb: 255, 255, 255;
-  --vml-blue-darker: #d1d1d6;
-  --vml-blue-darker-rgb: 209, 209, 214;
-  --vml-blue-darkest: #a1a1a6;
-  --vml-blue-darkest-rgb: 161, 161, 166;
-  --vml-blue-medium: #e5e5ea;
-  --vml-blue-medium-rgb: 229, 229, 234;
-  --vml-blue-highlight: #ffffff;
+  --vml-blue: var(--color-primary);
+  --vml-blue-rgb: var(--color-primary-rgb);
+  --vml-blue-dark: var(--color-primary-hover);
+  --vml-blue-dark-rgb: var(--color-primary-hover-rgb);
+  --vml-blue-darker: var(--color-secondary);
+  --vml-blue-darker-rgb: var(--color-secondary-rgb);
+  --vml-blue-darkest: var(--text-primary);
+  --vml-blue-darkest-rgb: var(--text-deep-rgb);
+  --vml-blue-medium: var(--color-primary);
+  --vml-blue-medium-rgb: var(--color-primary-rgb);
+  --vml-blue-highlight: var(--color-primary-hover);
+}
+
+:root[data-color-theme='green-light'] {
+  --vml-blue: var(--color-primary);
+  --vml-blue-rgb: var(--color-primary-rgb);
+  --vml-blue-dark: var(--color-primary-hover);
+  --vml-blue-dark-rgb: var(--color-primary-hover-rgb);
+  --vml-blue-darker: #205332;
+  --vml-blue-darker-rgb: 32, 83, 50;
+  --vml-blue-darkest: #193d26;
+  --vml-blue-darkest-rgb: 25, 61, 38;
+  --vml-blue-medium: var(--color-primary);
+  --vml-blue-medium-rgb: var(--color-primary-rgb);
+  --vml-blue-highlight: var(--color-primary-hover);
 }

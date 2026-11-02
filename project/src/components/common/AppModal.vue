@@ -606,7 +606,7 @@ $panel-transition-ease: cubic-bezier(0.25, 1, 0.25, 1);
   }
 }
 
-:root[data-color-theme='dark'] .app-modal {
-  --modal-background: rgba(22, 27, 34, 0.92);
+:root[data-color-mode='dark'] .app-modal {
+  --modal-background: var(--surface-glass-floating-strong);
 }
 </style>
