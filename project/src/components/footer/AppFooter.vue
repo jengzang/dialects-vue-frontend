@@ -33,6 +33,7 @@
             class="text-action footer-action"
             @click="isFeaturesOpen = true"
           >
+            <BarIcon icon="🧭" class="footer-action-icon" aria-hidden="true" />
             {{ t('layoutFooter.actions.features') }}
           </button>
           <!-- <button
@@ -48,6 +49,7 @@
             :disabled="!context.hasTutorial"
             @click="openTutorial"
           >
+            <BarIcon icon="📖" class="footer-action-icon" aria-hidden="true" />
             {{ t('layoutFooter.actions.tutorial') }}
           </button>
           <button
@@ -55,6 +57,7 @@
             class="text-action footer-action"
             @click="shareCurrentPage"
           >
+            <BarIcon icon="📤" class="footer-action-icon" aria-hidden="true" />
             {{ t('layoutFooter.actions.share') }}
           </button>
           <button
@@ -62,6 +65,7 @@
             class="text-action footer-action"
             @click="isFeedbackOpen = true"
           >
+            <BarIcon icon="💬" class="footer-action-icon" aria-hidden="true" />
             {{ t('layoutFooter.actions.feedback') }}
           </button>
           <button
@@ -69,15 +73,17 @@
             class="text-action footer-action"
             @click="isSupportOpen = true"
           >
+            <BarIcon icon="🎁" class="footer-action-icon" aria-hidden="true" />
             {{ t('layoutFooter.actions.support') }}
           </button>
-          <button
+          <!-- <button
             type="button"
             class="text-action footer-action"
             @click="goToSettings"
           >
+            <BarIcon icon="⚙️" class="footer-action-icon" aria-hidden="true" />
             {{ t('layoutFooter.actions.settings') }}
-          </button>
+          </button> -->
         </div>
       </div>
 
@@ -145,6 +151,7 @@ import { useVisitStats } from '@/composables/data/useVisitStats.js'
 import { currentColorTheme } from '@/composables/core/uiPreferences.js'
 import { createShareCardDataUrl } from '@/utils/share/shareCard.js'
 import { showError, showSuccess } from '@/utils/ui/message.js'
+import BarIcon from '@/components/common/BarIcon.vue'
 import AppModal from '@/components/common/AppModal.vue'
 import LayoutFeedbackModal from '@/main/components/footer/LayoutFeedbackModal.vue'
 import FeaturesSection from '@/main/components/FeaturesSection.vue'
@@ -436,10 +443,13 @@ onBeforeUnmount(() => {
 }
 
 .footer-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
   min-width: 0;
   color: var(--color-primary-hover);
   font-weight: 600;
-  font-size: var(--font-size-16);
+  font-size: var(--font-size-14);
 
   &:hover:not(:disabled) {
     color: var(--color-primary);
@@ -448,6 +458,11 @@ onBeforeUnmount(() => {
   &:disabled {
     color: var(--text-secondary);
   }
+}
+
+.footer-action-icon {
+  flex-shrink: 0;
+  line-height: 1;
 }
 
 .footer-meta {
