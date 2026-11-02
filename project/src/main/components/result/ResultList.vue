@@ -121,7 +121,6 @@
               :height="30"
               :thumb-size="26"
               color="blue"
-              variant="glow"
               show-label
               :active-text="t('result.resultList.displayMode.full')"
               :inactive-text="t('result.resultList.displayMode.main')"
@@ -768,7 +767,7 @@ $transition-duration: 0.2s;
     box-shadow 0.3s ease;
 
   &:hover {
-    background: rgba(240, 240, 240, 0.9);
+    // background: rgba(240, 240, 240, 0.9);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 
@@ -1000,15 +999,15 @@ $transition-duration: 0.2s;
   font-size: var(--font-size-16);
 }
 
-.result-display-switch {
-  :deep(.switch-toggle__button) {
-    cursor: pointer;
+// .result-display-switch {
+//   :deep(.switch-toggle__button) {
+//     cursor: pointer;
 
-    &:hover:not(.is-disabled) {
-      transform: scale(1.3);
-    }
-  }
-}
+//     &:hover:not(.is-disabled) {
+//       transform: scale(1.3);
+//     }
+//   }
+// }
 
 @media (max-aspect-ratio: 1 / 1) {
   .sticky-bar-inner {
