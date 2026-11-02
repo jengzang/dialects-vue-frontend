@@ -217,8 +217,9 @@
       "label": "目前配色",
       "modeTitle": "明暗模式",
       "modes": {
-        "light": "淺色",
-        "dark": "深色"
+        "light": "日間",
+        "dark": "夜間",
+        "system": "系統"
       },
       "options": {
         "blue": "藍色",

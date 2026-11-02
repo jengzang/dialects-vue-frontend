@@ -64,21 +64,53 @@
               icon-color="var(--color-primary)"
             />
           </h3>
-          <RadioGroup
-            v-model="colorThemeModel"
-            :options="colorThemeRadioOptions"
-            name="settings-color-theme"
-            class="settings-radio-group color-theme-radio-group"
-          />
+          <div
+            class="theme-options ui-tabs-navigation--segmented ui-tabs-navigation--filled"
+            role="group"
+            :aria-label="$t('navigation.settings.colorTheme.title')"
+            data-theme-control="settings-color-theme"
+          >
+            <button
+              v-for="option in colorThemeOptions"
+              :key="option.value"
+              type="button"
+              class="ui-tab-item"
+              :class="{ active: colorThemeModel === option.value }"
+              :value="option.value"
+              :aria-label="option.label"
+              :aria-pressed="colorThemeModel === option.value"
+              :title="option.label"
+              @click="colorThemeModel = option.value"
+            >
+              <PhCircle class="theme-choice-swatch" :class="`theme-choice-swatch--${option.value}`" weight="fill" :size="18" aria-hidden="true" />
+              <span class="theme-choice-label">{{ option.label }}</span>
+            </button>
+          </div>
           <h3 class="section-title">
             {{ $t('navigation.settings.colorTheme.modeTitle') }}
           </h3>
-          <RadioGroup
-            v-model="colorModeModel"
-            :options="colorModeOptions"
-            name="settings-color-mode"
-            class="settings-radio-group"
-          />
+          <div
+            class="theme-options ui-tabs-navigation--segmented ui-tabs-navigation--filled"
+            role="group"
+            :aria-label="$t('navigation.settings.colorTheme.modeTitle')"
+            data-theme-control="settings-color-mode"
+          >
+            <button
+              v-for="option in colorModeOptions"
+              :key="option.value"
+              type="button"
+              class="ui-tab-item"
+              :class="{ active: colorModeModel === option.value }"
+              :value="option.value"
+              :aria-label="option.label"
+              :aria-pressed="colorModeModel === option.value"
+              :title="option.label"
+              @click="colorModeModel = option.value"
+            >
+              <component :is="option.icon" :size="20" aria-hidden="true" />
+              <span class="theme-choice-label">{{ option.label }}</span>
+            </button>
+          </div>
         </div>
         <hr class="setting-split-divider">
         <div class="setting-split-item">
@@ -192,6 +224,7 @@
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed, defineAsyncComponent } from 'vue'
+import { PhCircle, PhSun, PhMoon, PhDesktop } from '@phosphor-icons/vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { setLocale } from '@/i18n/index.js'
@@ -205,16 +238,17 @@ import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { TABLE_COLUMN_SCHEMAS } from '@/main/config/index.js'
 import {
   getColorThemeParts,
-  getColorThemeFor,
+  currentColorTheme,
+  currentColorMode,
   UI_MODE_DEFAULT,
   UI_MODE_COMPACT,
   ICON_MODE_ALL_EMOJI,
   ICON_MODE_ALL_SVG,
   ICON_MODE_BAR_SVG,
-  getStoredColorTheme,
   getStoredInterfaceMode,
   getStoredIconMode,
-  setColorTheme,
+  setColorFamily,
+  setColorMode,
   setInterfaceMode,
   setIconMode,
 } from '@/composables/core/uiPreferences.js'
@@ -260,7 +294,6 @@ const languages = ref([
 ])
 
 const interfaceMode = ref(getStoredInterfaceMode())
-const colorTheme = ref(getStoredColorTheme())
 const iconMode = ref(getStoredIconMode())
 
 const colorThemeOptions = computed(() => [
@@ -269,26 +302,28 @@ const colorThemeOptions = computed(() => [
   { value: 'green', label: t('navigation.settings.colorTheme.options.green') },
 ])
 
-const colorThemeRadioOptions = computed(() =>
-  colorThemeOptions.value.map(option => ({
-    value: option.value,
-    label: option.label
-  }))
-)
-
 const colorThemeModel = computed({
-  get: () => getColorThemeParts(colorTheme.value).family,
-  set: (family) => changeColorTheme(getColorThemeFor(family, getColorThemeParts(colorTheme.value).mode))
+  get: () => getColorThemeParts(currentColorTheme.value).family,
+  set: (family) => {
+    if (family === colorThemeModel.value) return
+    setColorFamily(family)
+    showSuccess(t('messages.success.colorThemeChanged'))
+  }
 })
 
 const colorModeOptions = computed(() => [
-  { value: 'light', label: t('navigation.settings.colorTheme.modes.light') },
-  { value: 'dark', label: t('navigation.settings.colorTheme.modes.dark') },
+  { value: 'light', label: t('navigation.settings.colorTheme.modes.light'), icon: PhSun },
+  { value: 'dark', label: t('navigation.settings.colorTheme.modes.dark'), icon: PhMoon },
+  { value: 'system', label: t('navigation.settings.colorTheme.modes.system'), icon: PhDesktop },
 ])
 
 const colorModeModel = computed({
-  get: () => getColorThemeParts(colorTheme.value).mode,
-  set: (mode) => changeColorTheme(getColorThemeFor(getColorThemeParts(colorTheme.value).family, mode))
+  get: () => currentColorMode.value,
+  set: (mode) => {
+    if (mode === currentColorMode.value) return
+    setColorMode(mode)
+    showSuccess(t('messages.success.colorThemeChanged'))
+  }
 })
 
 const interfaceModeOptions = computed(() => [
@@ -384,11 +419,6 @@ function changeInterfaceMode(mode) {
   showSuccess(t('messages.success.interfaceModeChanged'))
 }
 
-function changeColorTheme(theme) {
-  if (theme === colorTheme.value) return
-  colorTheme.value = setColorTheme(theme)
-  showSuccess(t('messages.success.colorThemeChanged'))
-}
 </script>
 
 <style scoped lang="scss">
@@ -478,35 +508,28 @@ $text-muted: var(--text-tertiary);
   }
 }
 
-.color-theme-radio-group {
+.theme-options {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  justify-items: center;
-  gap: 4px 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  max-width: 480px;
+  margin: 0 auto 20px;
+  padding: 4px;
 
-  :deep(.liquid-radio-text) {
-    display: flex;
-    align-items: center;
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .ui-tab-item {
+    min-height: 44px;
+    padding: 10px 12px;
     gap: 8px;
+  }
+}
 
-    &::before {
-      width: 18px;
-      height: 18px;
-      content: '';
-      border: 1px solid rgba(0, 0, 0, 0.12);
-      border-radius: 5px;
-      flex-shrink: 0;
-    }
-  }
-
-  :deep(.liquid-radio-label:nth-child(1) .liquid-radio-text::before) {
-    background: var(--theme-preview-blue);
-  }
-  :deep(.liquid-radio-label:nth-child(2) .liquid-radio-text::before) {
-    background: var(--theme-preview-red);
-  }
-  :deep(.liquid-radio-label:nth-child(3) .liquid-radio-text::before) {
-    background: var(--theme-preview-green);
+@media (max-aspect-ratio: 1 / 1) {
+  .theme-choice-label {
+    display: none;
   }
 }
 

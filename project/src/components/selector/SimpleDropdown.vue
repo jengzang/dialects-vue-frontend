@@ -39,7 +39,7 @@
             @mouseenter="focusedIndex = index"
           >
             <span class="check-icon">{{ isSelected(option.value) ? '✓' : '' }}</span>
-            {{ option.label }}
+            <slot name="option" :option="option">{{ option.label }}</slot>
           </div>
 
           <div v-if="filteredOptions.length === 0" class="empty-message">
@@ -196,6 +196,7 @@ const updatePosition = () => {
   if (!triggerElement || !dropdownPanel.value) return
 
   requestAnimationFrame(() => {
+    if (!dropdownPanel.value) return
     const triggerRect = triggerElement.getBoundingClientRect()
     const panelWidth = props.matchTriggerWidth ? triggerRect.width : (dropdownPanel.value.offsetWidth || 200)
     const panelHeight = dropdownPanel.value.offsetHeight || 60

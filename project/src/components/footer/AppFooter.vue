@@ -92,7 +92,25 @@
           <span class="info-text">
             <span>{{ t(context.languageLabelKey) }}</span>
             <span aria-hidden="true">·</span>
-            <span class="footer-theme-label">{{ t(context.themeLabelKey) }}</span>
+            <span class="footer-theme-controls">
+              <button
+                v-for="control in themeControls"
+                :key="control.id"
+                :ref="el => { themeTriggers[control.id] = el }"
+                type="button"
+                class="glass-button footer-theme-trigger"
+                data-size="compact"
+                :data-theme-menu="control.id"
+                :aria-label="`${control.label}: ${control.selectedLabel}`"
+                :aria-expanded="themeMenu === control.id"
+                :title="`${control.label}: ${control.selectedLabel}`"
+                @click="themeMenu = themeMenu === control.id ? null : control.id"
+              >
+                <component :is="control.icon" :size="18" aria-hidden="true" />
+                <span class="footer-theme-label">{{ control.selectedLabel }}</span>
+                <PhCaretDown :size="12" aria-hidden="true" />
+              </button>
+            </span>
           </span>
           <span class="info-text">{{ t('layoutFooter.stats.visits', { today: todayVisits, total: totalVisits }) }}</span>
           <span class="info-text">{{ t('layoutFooter.stats.source', { locationCount: sourceLocationCount, dataCount: sourceDataCount }) }}</span>
@@ -105,6 +123,28 @@
         </div>
       </div>
     </div>
+
+    <SimpleDropdown
+      v-if="activeThemeControl"
+      :model-value="activeThemeControl.value"
+      :options="activeThemeControl.options"
+      :trigger-el="themeTriggers[themeMenu]"
+      direction="up"
+      align="right"
+      @update:modelValue="changeFooterTheme"
+      @close="closeThemeMenu"
+    >
+      <template #option="{ option }">
+        <component
+          :is="option.icon"
+          :size="18"
+          :weight="themeMenu === 'family' ? 'fill' : 'regular'"
+          :class="themeMenu === 'family' ? ['theme-choice-swatch', `theme-choice-swatch--${option.value}`] : null"
+          aria-hidden="true"
+        />
+        {{ option.label }}
+      </template>
+    </SimpleDropdown>
 
     <LayoutFeedbackModal
       v-model="isFeedbackOpen"
@@ -139,7 +179,8 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { PhCircle, PhPalette, PhSun, PhMoon, PhDesktop, PhCaretDown } from '@phosphor-icons/vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale, stripLocaleFromPath } from '@/i18n/localeRouting.js'
@@ -148,7 +189,7 @@ import { resolveLayoutFooterContext } from '@/main/config/layoutFooter.js'
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 import { getCachedSourceStats, getSourceStats } from '@/composables/data/useSourceStats.js'
 import { useVisitStats } from '@/composables/data/useVisitStats.js'
-import { currentColorTheme } from '@/composables/core/uiPreferences.js'
+import { currentColorTheme, currentColorMode, getColorThemeParts, setColorFamily, setColorMode } from '@/composables/core/uiPreferences.js'
 import { createShareCardDataUrl } from '@/utils/share/shareCard.js'
 import { showError, showSuccess } from '@/utils/ui/message.js'
 import BarIcon from '@/components/common/BarIcon.vue'
@@ -157,6 +198,7 @@ import LayoutFeedbackModal from '@/main/components/footer/LayoutFeedbackModal.vu
 import FeaturesSection from '@/main/components/FeaturesSection.vue'
 import SimpleSidebar from '@/components/bar/SimpleSidebar.vue'
 import SupportPopup from '@/main/components/user/popups/SupportPopup.vue'
+import SimpleDropdown from '@/components/selector/SimpleDropdown.vue'
 
 const props = defineProps({
   layoutKind: {
@@ -178,11 +220,42 @@ const isFeaturesOpen = ref(false)
 const isFeedbackOpen = ref(false)
 const isMenuOpen = ref(false)
 const isSupportOpen = ref(false)
+const themeMenu = ref(null)
+const themeTriggers = {}
+const colorOptions = computed(() => ['blue', 'red', 'green'].map(value => ({
+  value, label: t(`navigation.settings.colorTheme.options.${value}`), icon: PhCircle,
+})))
+const appearanceOptions = computed(() => [
+  { value: 'light', label: t('navigation.settings.colorTheme.modes.light'), icon: PhSun },
+  { value: 'dark', label: t('navigation.settings.colorTheme.modes.dark'), icon: PhMoon },
+  { value: 'system', label: t('navigation.settings.colorTheme.modes.system'), icon: PhDesktop },
+])
+const themeControls = computed(() => {
+  const family = getColorThemeParts(currentColorTheme.value).family
+  const appearance = appearanceOptions.value.find(option => option.value === currentColorMode.value)
+  return [
+    { id: 'family', value: family, label: t('navigation.settings.colorTheme.title'), selectedLabel: colorOptions.value.find(option => option.value === family).label, icon: PhPalette, options: colorOptions.value },
+    { id: 'mode', value: currentColorMode.value, label: t('navigation.settings.colorTheme.modeTitle'), selectedLabel: appearance.label, icon: appearance.icon, options: appearanceOptions.value },
+  ]
+})
+const activeThemeControl = computed(() => themeControls.value.find(control => control.id === themeMenu.value))
+
+function changeFooterTheme(value) {
+  if (themeMenu.value === 'family') setColorFamily(value)
+  else setColorMode(value)
+}
+
+function closeThemeMenu() {
+  const trigger = themeTriggers[themeMenu.value]
+  themeMenu.value = null
+  nextTick(() => trigger?.focus())
+}
 
 watch(
   () => route.fullPath,
   () => {
     isFeaturesOpen.value = false
+    themeMenu.value = null
   },
 )
 
@@ -478,8 +551,16 @@ onBeforeUnmount(() => {
   font-size: var(--font-size-13);
 }
 
-.footer-theme-label {
-  color: var(--color-primary-hover);
+.footer-theme-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.footer-theme-trigger {
+  --glass-button-compact-padding: 6px 10px;
+  --glass-button-color: var(--text-primary);
+  min-height: 38px;
 }
 
 .footer-features-modal {
@@ -503,6 +584,15 @@ onBeforeUnmount(() => {
 }
 
 @media (max-aspect-ratio: 1 / 1) {
+  .footer-theme-label {
+    display: none;
+  }
+
+  .footer-theme-trigger {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
   .app-footer {
     margin-top: 18px;
     width:auto;

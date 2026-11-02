@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApp, nextTick } from 'vue'
 import { createI18n } from 'vue-i18n'
 import SettingsPage from '../src/main/views/menu/support/SettingsPage.vue'
-import { setColorTheme } from '../src/composables/core/uiPreferences.js'
+import { setColorTheme, setColorMode } from '../src/composables/core/uiPreferences.js'
 import navigation from '../src/i18n/locales/en/navigation.json'
 
 vi.mock('vue-router', () => ({ useRoute: () => ({ path: '/en/menu/settings' }), useRouter: () => ({ push: vi.fn() }) }))
@@ -42,10 +42,9 @@ describe('settings color and brightness selection', () => {
     app.mount(host)
   }
   async function select(name, value) {
-    const input = host.querySelector(`input[name="${name}"][value="${value}"]`)
-    expect(input, `${name}: ${value}`).not.toBeNull()
-    input.checked = true
-    input.dispatchEvent(new Event('change', { bubbles: true }))
+    const button = host.querySelector(`[data-theme-control="${name}"] button[value="${value}"]`)
+    expect(button, `${name}: ${value}`).not.toBeNull()
+    button.click()
     await nextTick()
   }
   it('changes family without losing brightness and changes brightness without losing family', async () => {
@@ -64,7 +63,19 @@ describe('settings color and brightness selection', () => {
   it('restores both controls from the existing green dark preference', () => {
     setColorTheme('green')
     mount()
-    expect(host.querySelector('input[name="settings-color-theme"]:checked')?.value).toBe('green')
-    expect(host.querySelector('input[name="settings-color-mode"]:checked')?.value).toBe('dark')
+    expect(host.querySelector('[data-theme-control="settings-color-theme"] [aria-pressed="true"]')?.value).toBe('green')
+    expect(host.querySelector('[data-theme-control="settings-color-mode"] [aria-pressed="true"]')?.value).toBe('dark')
+  })
+  it('shows system as a separate preference and stays synchronized with changes from outside the settings page', async () => {
+    mount()
+    await select('settings-color-mode', 'system')
+    expect(localStorage.getItem('dialects-color-mode')).toBe('system')
+    await select('settings-color-theme', 'red')
+    expect(localStorage.getItem('dialects-color-mode')).toBe('system')
+    setColorMode('dark')
+    await nextTick()
+    expect(host.querySelector('[data-theme-control="settings-color-mode"] [aria-pressed="true"]')?.value).toBe('dark')
+    expect(host.querySelector('input[name="settings-interface-mode"]')).not.toBeNull()
+    expect(host.querySelector('input[name="settings-icon-mode"]')).not.toBeNull()
   })
 })

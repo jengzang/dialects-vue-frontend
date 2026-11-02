@@ -34,6 +34,7 @@ vi.mock('vue-i18n', () => ({
       if (key === 'layoutFooter.pages.menuQueryZhonggu.description') return '按中古地位整理各方言点读音。'
       if (key === 'layoutFooter.language.zhCN') return '简体'
       if (key === 'layoutFooter.theme.green-dark') return '绿色'
+      if (key === 'navigation.settings.colorTheme.options.green') return '绿色'
       if (key === 'layoutFooter.share.imageReady') return 'layoutFooter.share.imageReady'
       if (key === 'layoutFooter.share.copied') return 'layoutFooter.share.copied'
       if (key === 'layoutFooter.share.qrHint') return '扫码打开当前页面'
@@ -57,10 +58,6 @@ vi.mock('../src/utils/user/updateNoticeConfig.js', () => ({
     version: '5.0.0',
     dbVersion: '2026.08',
   }),
-}))
-
-vi.mock('../src/composables/core/uiPreferences.js', () => ({
-  currentColorTheme: { value: 'green-dark' },
 }))
 
 vi.mock('../src/composables/data/useVisitStats.js', () => ({
@@ -185,6 +182,8 @@ describe('AppFooter actions', () => {
   })
 
   it('renders footer actions, stats, and legal information as separate flat rows', async () => {
+    const { setColorTheme } = await import('../src/composables/core/uiPreferences.js')
+    setColorTheme('green-dark')
     const { default: AppFooter } = await import('../src/components/footer/AppFooter.vue')
     const wrapper = mountFooter(AppFooter)
     await nextTick()
@@ -204,6 +203,35 @@ describe('AppFooter actions', () => {
     expect([...footer.querySelectorAll('.footer-action')]
       .some(button => button.classList.contains('glass-button'))).toBe(false)
 
+    wrapper.unmount()
+  })
+
+  it('switches color and appearance from the footer while retaining system preference', async () => {
+    const { setColorTheme, setColorMode, currentColorTheme, currentColorMode } = await import('../src/composables/core/uiPreferences.js')
+    setColorTheme('green-dark')
+    setColorMode('system')
+    const { default: AppFooter } = await import('../src/components/footer/AppFooter.vue')
+    const wrapper = mountFooter(AppFooter)
+    const colorTrigger = wrapper.host.querySelector('[data-theme-menu="family"]')
+    expect(colorTrigger).not.toBeNull()
+    colorTrigger.click()
+    await nextTick()
+    await nextTick()
+    const red = [...document.querySelectorAll('.dropdown-item')].find(item => item.textContent.includes('options.red'))
+    expect(red).toBeTruthy()
+    red.click()
+    await nextTick()
+    expect(currentColorTheme.value).toMatch(/^red-/)
+    expect(currentColorMode.value).toBe('system')
+    expect(colorTrigger.getAttribute('aria-expanded')).toBe('false')
+    wrapper.host.querySelector('[data-theme-menu="mode"]').click()
+    await nextTick()
+    await nextTick()
+    const dark = [...document.querySelectorAll('.dropdown-item')].find(item => item.textContent.includes('modes.dark'))
+    dark.click()
+    await nextTick()
+    expect(currentColorTheme.value).toBe('red-dark')
+    expect(currentColorMode.value).toBe('dark')
     wrapper.unmount()
   })
 
@@ -333,14 +361,13 @@ describe('AppFooter actions', () => {
     const source = appFooterSource()
     const actionBlock = source.match(/\.footer-action\s*\{[\s\S]*?\n\}/)?.[0]
     const metaInfoBlock = source.match(/\.footer-meta \.info-text\s*\{[\s\S]*?\n\}/)?.[0]
-    const themeLabelBlock = source.match(/\.footer-theme-label\s*\{[\s\S]*?\n\}/)?.[0]
+    const themeTriggerBlock = source.match(/\.footer-theme-trigger\s*\{[\s\S]*?\n\}/)?.[0]
 
     expect(actionBlock).toContain('color: var(--color-primary-hover);')
     expect(actionBlock).toContain('font-weight: 600;')
     expect(metaInfoBlock).toContain('color: var(--text-secondary);')
     expect(metaInfoBlock).toContain('font-size: var(--font-size-13);')
-    expect(themeLabelBlock).toBeTruthy()
-    expect(themeLabelBlock).toContain('color: var(--color-primary-hover);')
+    expect(themeTriggerBlock).toContain('--glass-button-color: var(--text-primary);')
     expect(source).not.toContain('grid-template-columns:')
     expect(source).toContain('v-if="isMenuOpen"')
     expect(source).toContain('v-if="isSupportOpen"')

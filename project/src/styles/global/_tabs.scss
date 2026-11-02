@@ -137,6 +137,44 @@
   font-size: var(--font-size-16);
 }
 
+// Filled single-choice controls share the tab foundation without changing tabs.
+.ui-tabs-navigation--segmented.ui-tabs-navigation--filled {
+  background: var(--surface-elevation-0);
+  border-color: var(--border-control);
+  border-radius: var(--radius-lg);
+  box-shadow: none;
+
+  .ui-tab-item {
+    @include flex-center;
+    color: var(--text-secondary);
+    border-radius: var(--radius-md);
+
+    &::after {
+      content: none;
+    }
+
+    &.active {
+      color: var(--action-solid-text);
+      background: var(--action-primary-bg);
+      box-shadow: var(--shadow-sm);
+
+      &:hover {
+        background: var(--action-primary-bg-hover);
+      }
+    }
+  }
+}
+
+.theme-choice-swatch {
+  flex-shrink: 0;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 0 0 2px var(--surface-panel);
+
+  &--blue { color: var(--theme-preview-blue); }
+  &--red { color: var(--theme-preview-red); }
+  &--green { color: var(--theme-preview-green); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ui-tabs-navigation .ui-tab-item {
     transition: none;

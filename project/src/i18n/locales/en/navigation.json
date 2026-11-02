@@ -218,7 +218,8 @@
       "modeTitle": "Appearance",
       "modes": {
         "light": "Light",
-        "dark": "Dark"
+        "dark": "Dark",
+        "system": "System"
       },
       "options": {
         "blue": "Blue",
