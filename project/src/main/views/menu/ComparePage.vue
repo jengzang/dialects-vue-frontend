@@ -473,6 +473,20 @@
             </svg>
           </button>
         </RecentQueryPills>
+                <!-- Tab5 独立运行按钮 -->
+        <div>
+          <button
+            v-if="currentTab === 'tab5'"
+            class="run-btn"
+            :disabled="buttonState.isRunning || isTab5RunDisabled"
+            :class="{ disabled: isTab5RunDisabled }"
+            @click="runTab5Action"
+          >
+            <span v-if="buttonState.isRunning"><InlineIcon icon="🔄" />{{ $t('compare.button.running') }}</span>
+            <span v-else-if="isTab5RunDisabled"><InlineIcon icon="🚫" />{{ $t('compare.button.invalid') }}</span>
+            <span v-else><InlineIcon icon="🚀" />{{ $t('compare.button.startCompare') }}</span>
+          </button>
+        </div>
         <div class="compare-page-panel glass-panel tab5-page">
           <PhoneticCompare
             :query-locations="tabStates.tab5.queryLocations"
@@ -515,19 +529,6 @@
         >
           <span v-if="buttonState.isRunning"><InlineIcon icon="🔄" />{{ $t('compare.button.running') }}</span>
           <span v-else-if="isRunDisabled"><InlineIcon icon="🚫" />{{ $t('compare.button.invalid') }}</span>
-          <span v-else><InlineIcon icon="🚀" />{{ $t('compare.button.startCompare') }}</span>
-        </button>
-
-        <!-- Tab5 独立运行按钮 -->
-        <button
-          v-else
-          class="run-btn"
-          :disabled="buttonState.isRunning || isTab5RunDisabled"
-          :class="{ disabled: isTab5RunDisabled }"
-          @click="runTab5Action"
-        >
-          <span v-if="buttonState.isRunning"><InlineIcon icon="🔄" />{{ $t('compare.button.running') }}</span>
-          <span v-else-if="isTab5RunDisabled"><InlineIcon icon="🚫" />{{ $t('compare.button.invalid') }}</span>
           <span v-else><InlineIcon icon="🚀" />{{ $t('compare.button.startCompare') }}</span>
         </button>
       </div>

@@ -1,16 +1,13 @@
 @use '@/styles/global/mixins' as *;
 
 .run-container {
-  position: fixed;
-  bottom: 25px;
-  left: 50%;
-  z-index: 100;
+  position: static;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin-top: 0;
-  transform: translateX(-50%);
+  width: 100%;
+  margin: 1rem auto 25px;
   pointer-events: none;
 }
 
@@ -45,6 +42,7 @@
   }
 
   &:disabled {
+    color: var(--text-dark);
     background: var(--border-gray);
     opacity: 0.7;
     cursor: not-allowed;
