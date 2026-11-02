@@ -34,11 +34,13 @@ describe('uiPreferences color theme', () => {
     expect(document.documentElement.dataset.colorTheme).toBe(theme)
   })
 
-  it('reuses the original green artwork for green light and dark artwork for red dark', () => {
+  it('reuses the original green artwork for green light and red light artwork for red dark', () => {
     expect(getBrandAssets('green-light')).toEqual({
       logo: '/brand/favicon_green.ico', title: '/brand/title.webp', decoration: '/brand/GreenCircle.webp',
     })
-    expect(getBrandAssets('red-dark')).toEqual(getBrandAssets('dark'))
+    expect(getBrandAssets('red-dark')).toEqual({
+      ...getBrandAssets('light'), title: '/brand/theme-previews/title-red-dark.png',
+    })
     setColorTheme('green-light')
     expect(document.querySelector('link[rel="icon"]').type).toBe('image/x-icon')
   })

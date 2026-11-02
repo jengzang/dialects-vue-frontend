@@ -656,7 +656,7 @@ $mobile-breakpoint: 768px;/* 地图弹窗主体 */
   background: var(--action-primary-bg);
   border: none;
   border-radius: var(--radius-sm2);
-  color: var(--action-primary-text);
+  color: var(--action-solid-text);
   white-space: nowrap;
   font-size: var(--font-size-13);
   font-weight: 500;

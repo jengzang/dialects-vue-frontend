@@ -70,7 +70,7 @@ describe('color theme token coverage', () => {
 
     expect(buttonsSource).toContain('background: var(--surface-glass-button);')
     expect(buttonsSource).toContain('background: var(--action-primary-bg);')
-    expect(buttonsSource).toContain('color: var(--action-primary-text);')
+    expect(buttonsSource).toContain('color: var(--action-solid-text);')
     expect(buttonsSource).toContain('background: var(--action-primary-bg-hover);')
     expect(buttonsSource).toContain('box-shadow: var(--action-primary-shadow);')
     expect(formsSource).toContain('background-color: var(--surface-selected);')

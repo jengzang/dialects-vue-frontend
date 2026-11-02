@@ -329,7 +329,7 @@ $transition-button: 0.25s;
   border: none;
   border-radius: $card-radius;
   box-shadow: var(--action-primary-shadow);
-  color: var(--action-primary-text);
+  color: var(--action-solid-text);
   white-space: nowrap;
   font-size: var(--font-size-16);
   font-weight: 600;

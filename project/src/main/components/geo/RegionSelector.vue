@@ -964,7 +964,7 @@ $portrait-ratio: 1;
   border: 1px solid rgba(var(--color-primary-rgb), 0.35);
   border-radius: var(--radius-md);
   box-shadow: 0 10px 26px rgba(var(--color-primary-rgb), 0.18);
-  color: var(--action-primary-text);
+  color: var(--action-solid-text);
   font-size: var(--font-size-13);
   font-weight: 700;
   cursor: pointer;

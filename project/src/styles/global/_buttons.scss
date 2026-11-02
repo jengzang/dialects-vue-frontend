@@ -66,7 +66,7 @@
   &[data-variant='primary'] {
     background: var(--action-primary-bg);
     border-color: var(--action-primary-border);
-    color: var(--action-primary-text);
+    color: var(--action-solid-text);
 
     &:hover:not(:disabled) {
       background: var(--action-primary-bg-hover);

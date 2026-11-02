@@ -89,6 +89,17 @@ function resolved(input, tokens) {
 }
 
 describe('approved theme palette readability', () => {
+  it('uses neutral graphite surfaces and distinct red text and filled action colors for red dark', () => {
+    const tokens = palette('red-dark')
+    for (const name of ['--bg-body', '--surface-panel', '--surface-panel-strong', '--surface-glass-button']) {
+      const channels = rgba(value(tokens, name)).slice(0, 3)
+      expect(Math.max(...channels) - Math.min(...channels), name).toBe(0)
+    }
+    expect(value(tokens, '--layout-art-filter')).toBe('grayscale(1) brightness(1.15)')
+    expect(value(tokens, '--action-primary-bg')).not.toBe(value(tokens, '--color-primary'))
+    expect(contrast(rgba(value(tokens, '--action-solid-text')), rgba(value(tokens, '--action-primary-bg')))).toBeGreaterThanOrEqual(4.5)
+    expect(contrast(rgba(value(tokens, '--color-primary')), rgba(value(tokens, '--surface-panel')))).toBeGreaterThanOrEqual(4.5)
+  })
   it.each(['green', 'dark', 'red-dark'])('%s keeps footer copy readable on glass, including above light artwork', theme => {
     const tokens = palette(theme)
     const rule = compiledRule('styles/main/_layout.scss', '.blue-art-layout footer.app-footer')
@@ -188,7 +199,8 @@ describe('approved theme palette readability', () => {
           const stops = fill.startsWith('linear-gradient') ? fill.match(/rgba?\([^)]+\)|#[\da-f]+/gi) : [fill]
           for (const stop of stops) {
             const bg = over(rgba(stop), panel)
-            expect(contrast(rgba(value(tokens, `--${role}-text`)), bg), `${role}-${state}`).toBeGreaterThanOrEqual(4.5)
+            const text = role === 'action-primary' ? '--action-solid-text' : `--${role}-text`
+            expect(contrast(rgba(value(tokens, text)), bg), `${role}-${state}`).toBeGreaterThanOrEqual(4.5)
           }
         }
       }
@@ -241,7 +253,7 @@ describe('approved theme palette readability', () => {
       const tokens = palette(theme)
       for (const action of [start, analyze]) {
         expect(resolved(action.background, tokens)).toBe(value(tokens, '--action-primary-bg'))
-        expect(resolved(action.color, tokens)).toBe(value(tokens, '--action-primary-text'))
+        expect(resolved(action.color, tokens)).toBe(value(tokens, '--action-solid-text'))
       }
       for (const decoration of [title, steps]) {
         const gradient = resolved(decoration.background, tokens)

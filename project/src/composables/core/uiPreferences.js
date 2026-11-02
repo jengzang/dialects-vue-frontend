@@ -62,7 +62,7 @@ export function isDarkColorTheme(theme) {
 }
 
 export function getBrandAssets(theme) {
-  const normalizedTheme = theme === COLOR_THEME_RED_DARK ? COLOR_THEME_DARK : normalizeColorTheme(theme)
+  const normalizedTheme = theme === COLOR_THEME_RED_DARK ? COLOR_THEME_LIGHT : normalizeColorTheme(theme)
   if (normalizedTheme === COLOR_THEME_GREEN_LIGHT) {
     return {
       logo: '/brand/favicon_green.ico',
@@ -72,7 +72,7 @@ export function getBrandAssets(theme) {
   }
   return {
     logo: `/brand/theme-previews/favicon-${normalizedTheme}.png`,
-    title: normalizedTheme === COLOR_THEME_BLUE ? '/brand/title.webp' : `/brand/theme-previews/title-${normalizedTheme}.png`,
+    title: theme === COLOR_THEME_RED_DARK ? '/brand/theme-previews/title-red-dark.png' : normalizedTheme === COLOR_THEME_BLUE ? '/brand/title.webp' : `/brand/theme-previews/title-${normalizedTheme}.png`,
     decoration: normalizedTheme === COLOR_THEME_BLUE ? '/brand/BlueCircle.webp' : `/brand/theme-previews/logo-${normalizedTheme}.png`,
   }
 }

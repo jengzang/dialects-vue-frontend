@@ -136,6 +136,7 @@
   --action-primary-bg: var(--color-primary);
   --action-primary-bg-hover: var(--color-primary-hover);
   --action-primary-text: white;
+  --action-solid-text: var(--action-primary-text);
   --action-primary-border: rgba(var(--color-primary-rgb), 0.52);
   --action-primary-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.2);
   --action-active-bg: rgba(var(--color-primary-rgb), 0.5);
@@ -750,33 +751,48 @@ $font-size-width-scales: (
 }
 
 :root[data-color-theme='red-dark'] {
-  --color-primary: #efaaa0;
-  --color-primary-hover: #ffc0b6;
-  --color-primary-rgb: 239, 170, 160;
-  --color-primary-hover-rgb: 255, 192, 182;
-  --color-secondary: #d0b494;
-  --color-secondary-rgb: 208, 180, 148;
-  --color-secondary-hover: #dfc3a3;
-  --glass-tint-rgb: 49, 32, 33;
-  --bg-body: #1b1213;
+  --color-primary: #e58a87;
+  --color-primary-hover: #eea29e;
+  --color-primary-rgb: 229, 138, 135;
+  --color-primary-hover-rgb: 238, 162, 158;
+  --color-secondary: #c4ae93;
+  --color-secondary-rgb: 196, 174, 147;
+  --color-secondary-hover: #d0bea8;
+  --glass-tint-rgb: 25, 25, 25;
+  --bg-body: #111111;
   --surface-page: var(--bg-body);
-  --surface-elevation-0: #261b1d;
-  --surface-elevation-1: #302326;
-  --surface-elevation-2: #1b1213;
+  --surface-elevation-0: #191919;
+  --surface-elevation-1: #222222;
+  --surface-elevation-2: #111111;
   --bg-white: var(--surface-elevation-0);
   --bg-light-gray: var(--surface-elevation-2);
   --bg-light: var(--surface-elevation-1);
   --surface-panel: var(--surface-elevation-0);
-  --surface-panel-hover: #322326;
+  --surface-panel-hover: #222222;
   --surface-panel-strong: var(--surface-elevation-1);
   --surface-glass-button: var(--surface-elevation-1);
-  --surface-glass-button-hover: #3c2c2e;
+  --surface-glass-button-hover: #2a2a2a;
   --bg-blue-tint: var(--bg-body);
-  --bg-blue-tint-rgb: 27, 18, 19;
+  --bg-blue-tint-rgb: 17, 17, 17;
   --bg-blue-light: var(--surface-elevation-0);
-  --bg-page-gradient: radial-gradient(1200px 800px at 8% -12%, #3a2528, #3a252800 58%),
-    linear-gradient(180deg, #1b1213, #261b1d);
-  --layout-art-filter: hue-rotate(150deg) saturate(0.55) brightness(1.15);
+  --bg-page-gradient: radial-gradient(1200px 800px at 8% -12%, #222222, #22222200 58%),
+    linear-gradient(180deg, #111111, #191919);
+  --layout-art-filter: grayscale(1) brightness(1.15);
+  --text-primary: #eeeeee;
+  --text-secondary: #b4b4b4;
+  --text-muted: var(--text-secondary);
+  --text-deep: var(--text-primary);
+  --text-deep-rgb: 238, 238, 238;
+  --text-secondary-rgb: 180, 180, 180;
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --action-primary-bg: #b84a50;
+  --action-primary-bg-hover: #be5056;
+  --action-primary-text: #111111;
+  --action-solid-text: #ffffff;
+  --enter-button-bg: var(--action-primary-bg);
+  --enter-button-bg-hover: var(--action-primary-bg-hover);
+  --enter-button-text: var(--action-solid-text);
   --color-primary-cyan: var(--color-secondary);
   --color-primary-cyan-rgb: var(--color-secondary-rgb);
   --color-cyan: var(--color-secondary);

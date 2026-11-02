@@ -1072,7 +1072,7 @@ $color-danger: var(--color-error-light);
     .step-number {
       background: var(--action-primary-bg);
       border-color: rgba(var(--color-primary-rgb), 0.6);
-      color: var(--action-primary-text);
+      color: var(--action-solid-text);
       box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.3);
     }
 

@@ -721,7 +721,7 @@ $float-catalog-button-left:0;
     border: 1px solid var(--glass-40);
     border-radius: $radius-pill;
     background: var(--action-primary-bg);
-    color: var(--action-primary-text);
+    color: var(--action-solid-text);
     font-size: var(--font-size-14);
     font-weight: 800;
     white-space: nowrap;

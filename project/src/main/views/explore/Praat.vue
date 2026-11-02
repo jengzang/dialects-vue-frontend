@@ -1042,7 +1042,7 @@ onBeforeUnmount(() => {
   border: none;
   cursor: pointer;
   background: var(--action-primary-bg);
-  color: var(--action-primary-text);
+  color: var(--action-solid-text);
   transition: all 0.3s ease;
 }
 
@@ -1126,7 +1126,7 @@ onBeforeUnmount(() => {
 
 .mode-options .radio-option.active {
   background: var(--action-primary-bg);
-  color: var(--action-primary-text);
+  color: var(--action-solid-text);
   box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
 }
 

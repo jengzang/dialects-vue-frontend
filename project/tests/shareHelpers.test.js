@@ -254,9 +254,9 @@ describe('share card helper', () => {
       loadImage,
     })
 
-    const brandTheme = colorTheme === 'red-dark' ? 'dark' : colorTheme
+    const brandTheme = colorTheme === 'red-dark' ? 'light' : colorTheme
     const originalGreen = colorTheme === 'green-light'
-    const titleSrc = originalGreen || colorTheme === 'blue' ? '/brand/title.webp' : `/brand/theme-previews/title-${brandTheme}.png`
+    const titleSrc = colorTheme === 'red-dark' ? '/brand/theme-previews/title-red-dark.png' : originalGreen || colorTheme === 'blue' ? '/brand/title.webp' : `/brand/theme-previews/title-${brandTheme}.png`
     const circleSrc = originalGreen ? '/brand/GreenCircle.webp' : colorTheme === 'blue' ? '/brand/BlueCircle.webp' : `/brand/theme-previews/logo-${brandTheme}.png`
     const logoSrc = originalGreen ? '/brand/favicon_green.ico' : `/brand/theme-previews/favicon-${brandTheme}.png`
     for (const src of [titleSrc, circleSrc, logoSrc]) {

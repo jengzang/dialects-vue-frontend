@@ -1405,7 +1405,7 @@ $transition-normal: 0.3s;
   border: none;
   border-radius: var(--radius-2xl);
   box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.4);
-  color: var(--action-primary-text);
+  color: var(--action-solid-text);
   font-size: var(--font-size-20);
   font-weight: 700;
   cursor: pointer;

@@ -741,7 +741,7 @@ $success: var(--color-success);/* 地图容器 */
   background: var(--action-primary-bg);
   border: none;
   border-radius: var(--radius-sm2);
-  color: var(--action-primary-text);
+  color: var(--action-solid-text);
   white-space: nowrap;
   font-size: var(--font-size-13);
   font-weight: 500;

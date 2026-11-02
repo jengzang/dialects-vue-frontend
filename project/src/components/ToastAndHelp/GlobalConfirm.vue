@@ -138,7 +138,7 @@ $mobile-gap: 10px;
 
 .action-btn-primary {
   background: var(--action-primary-bg);
-  color: var(--action-primary-text);
+  color: var(--action-solid-text);
   box-shadow: var(--action-primary-shadow);
 }
 
