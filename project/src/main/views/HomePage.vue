@@ -356,7 +356,7 @@
       </div>
     </section>
 
-    <div class="home-history-heading reveal">
+    <section class="projects-section reveal">
       <h2
         id="history-title"
         class="page-title home-history-title"
@@ -372,8 +372,8 @@
           {{ $t('home.history.recentUpdates') }}
         </button>
       </div>
-    </div>
-    <AboutHistory class="reveal" featured />
+      <AboutHistory featured />
+    </section>
 
 
     <!-- Footer -->

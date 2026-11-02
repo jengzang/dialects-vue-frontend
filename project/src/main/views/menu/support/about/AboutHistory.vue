@@ -21,7 +21,8 @@
         :gap="8"
         :active-text="t('about.history.onlyImportant')"
         :inactive-text="t('about.history.allHistory')"
-        label-position="right"
+        label-position="inside"
+        auto-width
         :aria-label="t('about.history.filterLabel')"
         @update:model-value="onlyImportant = $event"
       />
@@ -479,7 +480,7 @@ function parseLocalizedParts(content) {
   }
 
   .history-page .page-title {
-    font-size: var(--font-size-20);
+    font-size: var(--font-size-28);
   }
 
   .history-page--featured {
