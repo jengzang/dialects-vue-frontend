@@ -14,7 +14,7 @@
           <h1 class="page-title">
             <BarIcon icon="📍" />{{ t('navigation.pageTitles.villages.toponyms') }}
           </h1>
-          <p>{{ t('villages.pages.toponyms.subtitle') }}</p>
+          <!-- <p>{{ t('villages.pages.toponyms.subtitle') }}</p> -->
         </div>
       </template>
       <template #controls="{ expanded }">

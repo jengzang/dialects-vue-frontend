@@ -14,13 +14,41 @@
         autocomplete="off"
         @input="emit('update:query', $event.target.value)"
       >
-      <small
+      <!-- <small
         v-if="expanded"
         class="toponym-search-bar__hint"
       >
         {{ t('villages.pages.toponyms.search.placeholder') }}
-      </small>
+      </small> -->
     </label>
+
+    <div v-if="expanded" class="toponym-search-bar__quick-starts">
+      <span>{{ t('words.wordList.quickStartPrompt') }}</span>
+      <button
+        v-for="example in TOPONYM_SEARCH_EXAMPLES"
+        :key="example"
+        class="pill-btn"
+        type="button"
+        @click="runQuickStart(example)"
+      >
+        <span>{{ example }}</span>
+        <svg
+          class="toponym-search-bar__quick-start-icon"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M7 17L17 7M7 7h10v10" />
+        </svg>
+      </button>
+    </div>
 
     <label class="toponym-search-bar__field">
       <span>{{ t('villages.pages.toponyms.search.matchMode') }}</span>
@@ -85,6 +113,7 @@ const emit = defineEmits([
 ]);
 
 const { t } = useI18n();
+const TOPONYM_SEARCH_EXAMPLES = ['垌', '塬', '厝', '浜', '礤', '峪', '畈'];
 
 const matchModeOptions = computed(() => [
   { value: 'prefix', label: t('villages.pages.toponyms.matchModes.prefix') },
@@ -92,6 +121,11 @@ const matchModeOptions = computed(() => [
   { value: 'exact', label: t('villages.pages.toponyms.matchModes.exact') },
   { value: 'contains', label: t('villages.pages.toponyms.matchModes.contains') },
 ]);
+
+function runQuickStart(example) {
+  emit('update:query', example);
+  emit('search');
+}
 
 function handleSubmit() {
   emit('search');
@@ -136,6 +170,24 @@ function handleSubmit() {
       font-size: var(--font-size-13);
       line-height: 1.4;
     }
+  }
+
+  &__quick-starts {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 1.5dvh;
+
+    > span {
+      color: var(--text-secondary);
+      font-size: var(--font-size-13);
+    }
+  }
+
+  &__quick-start-icon {
+    flex: 0 0 auto;
   }
 
   &__input {

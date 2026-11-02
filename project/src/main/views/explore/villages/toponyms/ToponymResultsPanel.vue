@@ -290,6 +290,8 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
 
 .toponym-results-panel {
   min-inline-size: 0;
+  background: none;
+  backdrop-filter: none;
 
   &__inspector {
     position: relative;
