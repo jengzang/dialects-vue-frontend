@@ -985,6 +985,7 @@ const openEntryModal = () => {
   padding: 12px;
   overflow-y: auto;
   background: none;
+  backdrop-filter: none;
   // border: 1px solid var(--glass-40);
   // border-radius: var(--radius-lg);
   // background: $glass-white;
@@ -1060,11 +1061,8 @@ const openEntryModal = () => {
   // border: 1px solid var(--glass-40);
   // border-radius: var(--radius-md);
   background: var(--glass-50);
+  backdrop-filter: none;
   // transition: $motion-fast;
-
-  &:hover {
-    // background: var(--glass-60);
-  }
 
   &.collapsed {
     .arrow-indicator {

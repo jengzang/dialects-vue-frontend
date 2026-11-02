@@ -896,8 +896,12 @@ $portrait-ratio: 1;
 
   &.is-active {
     background: var(--submenu-hover-background);
-    color: var(--color-secondary-hover);
+    color: var(--color-secondary-text);
     font-weight: 700;
+
+    &:hover {
+      color: var(--color-secondary-hover);
+    }
 
     &::before {
       position: absolute;

@@ -800,6 +800,41 @@ $font-size-width-scales: (
   --color-cyan-rgb: var(--color-secondary-rgb);
 }
 
+:root[data-color-theme='blue-dark'] {
+  /* Give blue dark mode a restrained blue glass edge and highlight. */
+  --glass-tint-rgb: 32, 45, 62;
+  --glass-highlight: rgba(var(--color-primary-rgb), 0.14);
+  --bar-background: linear-gradient(
+    145deg,
+    rgba(var(--color-primary-rgb), 0.08),
+    rgba(var(--color-primary-rgb), 0.03)
+  );
+
+  --border-glass: rgba(var(--color-primary-rgb), 0.22);
+  --border-glass-subtle: rgba(var(--color-primary-rgb), 0.14);
+
+  --shadow-glass: 0 8px 22px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(var(--color-primary-rgb), 0.14);
+  --shadow-glass-hover: 0 12px 28px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(var(--color-primary-rgb), 0.14);
+  --shadow-glass-inset: inset 0 1px 0 rgba(var(--color-primary-rgb), 0.16), 0 8px 22px rgba(0, 0, 0, 0.42), 0 0 0 0.5px rgba(var(--color-primary-rgb), 0.08);
+}
+
+:root[data-color-theme='red-dark'] {
+  --glass-tint-rgb: 35, 27, 29;
+  --glass-highlight: rgba(var(--color-primary-rgb), 0.14);
+  --bar-background: linear-gradient(
+    145deg,
+    rgba(var(--color-primary-rgb), 0.08),
+    rgba(var(--color-primary-rgb), 0.03)
+  );
+
+  --border-glass: rgba(var(--color-primary-rgb), 0.22);
+  --border-glass-subtle: rgba(var(--color-primary-rgb), 0.14);
+
+  --shadow-glass: 0 8px 22px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(var(--color-primary-rgb), 0.14);
+  --shadow-glass-hover: 0 12px 28px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(var(--color-primary-rgb), 0.14);
+  --shadow-glass-inset: inset 0 1px 0 rgba(var(--color-primary-rgb), 0.16), 0 8px 22px rgba(0, 0, 0, 0.42), 0 0 0 0.5px rgba(var(--color-primary-rgb), 0.08);
+}
+
 :root[data-color-theme='green-light'] {
   color-scheme: light;
   --color-primary: #267443;

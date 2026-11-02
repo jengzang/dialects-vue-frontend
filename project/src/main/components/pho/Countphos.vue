@@ -2158,6 +2158,8 @@ $primary-deep: #003d9e;
 
   .chart-block {
     padding: 16px;
+    background: none;
+    backdrop-filter: none;
     // background: var(--glass-60);
     // border: 1px solid rgba(var(--color-primary-rgb), 0.1);
     // border-radius: 14px;
@@ -2192,7 +2194,7 @@ $primary-deep: #003d9e;
   .chart-card {
     min-width: 0;
     padding: 12px;
-    background: var(--glass-80);
+    // background: var(--glass-80);
     border: 1px solid rgba(var(--color-primary-rgb), 0.1);
     border-radius: var(--radius-md);
 

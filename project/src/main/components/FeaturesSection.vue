@@ -1071,8 +1071,20 @@ $text-primary: var(--text-primary);
 
 /* Portrait: tighter tiles */
 @media (max-aspect-ratio: 1/1) {
+  .feature-group {
+    width: fit-content;
+    max-width: 100%;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .feature-group__grid {
+    width: fit-content;
+    max-width: 100%;
+  }
+
   .feature-tile {
-    flex-basis: 160px;
+    flex: 0 1 160px;
     gap: 0.5rem;
     padding: 0.75rem 0.75rem;
 
