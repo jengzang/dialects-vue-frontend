@@ -102,6 +102,7 @@ vi.mock('@/components/selector/CheckBox.vue', () => ({
 }))
 
 import ClipBoundaryModal from '../src/main/components/map/Draw/modals/AdminBoundaryModal.vue'
+import { userStore } from '../src/main/store/store.js'
 
 async function flushTicks(count = 4) {
   for (let index = 0; index < count; index += 1) {
@@ -129,6 +130,56 @@ describe('ClipBoundaryModal state restore', () => {
   afterEach(() => {
     document.body.innerHTML = ''
     mocks.api.mockReset()
+    vi.unstubAllGlobals()
+    userStore.isAuthenticated = false
+  })
+
+  it('shows Start Fetch immediately on the default country selection', async () => {
+    const loadOptions = vi.fn()
+    const wrapper = mountClipBoundaryModal({ modelValue: true, manualLoad: true, onLoadOptions: loadOptions })
+    await flushTicks()
+    const start = [...wrapper.host.querySelectorAll('button')].find(b => b.textContent.includes('clipBoundaryStartFetch'))
+    expect(start).toBeTruthy()
+    expect(wrapper.host.querySelector('[data-variant="primary"]').disabled).toBe(true)
+    expect(loadOptions).not.toHaveBeenCalled()
+    start.click()
+    expect(loadOptions).toHaveBeenCalledExactlyOnceWith('country')
+    wrapper.unmount()
+  })
+
+  it('requests static options only after clicking Start Fetch and allows switching to API while loading', async () => {
+    userStore.isAuthenticated = true
+    mocks.api.mockResolvedValue({ items: [{ id: 'city-1', name: '广州' }] })
+    const loadOptions = vi.fn()
+    const wrapper = mountClipBoundaryModal({
+      modelValue: true,
+      manualLoad: true,
+      loading: true,
+      boundaryConfig: { level: 'cities' },
+      onLoadOptions: loadOptions,
+    })
+    await flushTicks()
+    expect(loadOptions).not.toHaveBeenCalled()
+    const toggle = wrapper.host.querySelector('[data-testid="high-precision-toggle"]')
+    expect(toggle.disabled).toBe(false)
+    toggle.click()
+    await flushTicks()
+    expect(mocks.api).toHaveBeenCalledWith('/api/gis/children?deep=1')
+    expect(wrapper.host.textContent).toContain('广州')
+    wrapper.unmount()
+    userStore.isAuthenticated = false
+
+    const manual = mountClipBoundaryModal({
+      modelValue: true, manualLoad: true, boundaryConfig: { level: 'cities' }, onLoadOptions: loadOptions,
+    })
+    await flushTicks()
+    expect(loadOptions).not.toHaveBeenCalled()
+    const start = [...manual.host.querySelectorAll('button')].find(b => b.textContent.includes('clipBoundaryStartFetch'))
+    expect(start).toBeTruthy()
+    start.click()
+    expect(loadOptions).toHaveBeenCalledExactlyOnceWith('cities')
+    expect(mocks.api).toHaveBeenCalledTimes(1)
+    manual.unmount()
   })
 
   it('restores selected high precision ids and loads their option labels on reopen', async () => {

@@ -70,6 +70,27 @@ beforeEach(() => {
 afterEach(() => { mounted.forEach(w => w.unmount()); mounted = []; vi.unstubAllGlobals() })
 
 describe('administrative boundary overlay', () => {
+  it('does not download static files on open and loads only the requested level', async () => {
+    const w = mountMap()
+    w.state.openAdminBoundaryModal()
+    await nextTick()
+    expect(fetch).not.toHaveBeenCalled()
+    await w.state.ensureAdminBoundaryOptions('cities')
+    expect(fetch).toHaveBeenCalledExactlyOnceWith('/cities.geojson')
+    await w.state.ensureAdminBoundaryOptions('cities')
+    expect(fetch).toHaveBeenCalledTimes(1)
+  })
+
+  it('loads the country on explicit request and reuses that geometry on confirm', async () => {
+    const w = mountMap()
+    w.state.openAdminBoundaryModal()
+    expect(fetch).not.toHaveBeenCalled()
+    await w.state.ensureAdminBoundaryOptions('country')
+    expect(fetch).toHaveBeenCalledExactlyOnceWith('/country.geojson')
+    await w.state.handleAdminBoundaryConfirm({ level: 'country', selectedNames: ['中国'] })
+    expect(fetch).toHaveBeenCalledTimes(1)
+    expect(w.map.getSource(sourceId)?.data).toEqual(boundary)
+  })
   it('offers the boundary control in every rendering mode', async () => {
     const w = mountMap()
     for (const mode of ['base', 'dot', 'heatmap', 'feature', 'compare', 'isopleth']) {

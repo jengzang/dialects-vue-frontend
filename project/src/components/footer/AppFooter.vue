@@ -498,7 +498,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 18px 32px;
+  gap: 12px;
 }
 
 .footer-brand-name {
@@ -518,6 +518,7 @@ onBeforeUnmount(() => {
 
 .footer-brand-copy {
   @include flex-col;
+  flex: 1 1 0;
   align-items: flex-start;
   min-width: 0;
   gap: 4px;
@@ -534,10 +535,11 @@ onBeforeUnmount(() => {
 
 .footer-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px 18px;
+  gap: 8px clamp(6px, 1vw, 14px);
 }
 
 .footer-action {
@@ -545,6 +547,7 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 2px;
   min-width: 0;
+  white-space: nowrap;
   color: var(--color-primary-hover);
   font-weight: 600;
   font-size: var(--font-size-14);
@@ -642,11 +645,13 @@ onBeforeUnmount(() => {
   }
 
   .footer-brand-copy {
+    flex: initial;
     align-items: center;
     text-align: center;
   }
 
   .footer-actions {
+    flex-wrap: wrap;
     justify-content: center;
     gap: 8px 16px;
   }

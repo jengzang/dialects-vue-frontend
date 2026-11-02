@@ -116,10 +116,12 @@
       v-model="showAdminBoundaryModal"
       mode="import"
       clearable
+      manual-load
       :boundary-config="mapStore.adminBoundary?.config"
       :boundary-options="adminBoundaryOptions"
       :loading="isAdminBoundaryOptionsLoading"
       @confirm="handleAdminBoundaryConfirm"
+      @load-options="ensureAdminBoundaryOptions"
       @clear="handleAdminBoundaryClear"
     />
   </div>
@@ -285,9 +287,18 @@ const adminBoundaryOptions = ref({ country: [], provinces: [], cities: [], count
 const isAdminBoundaryOptionsLoading = ref(false);
 let adminBoundaryRequestId = 0;
 
+let nationalBorderGeoJsonCache = null;
 let provincesGeoJsonCache = null;
 let citiesGeoJsonCache = null;
 let countiesGeoJsonCache = null;
+
+async function loadNationalBorderGeoJson() {
+  if (nationalBorderGeoJsonCache) return nationalBorderGeoJsonCache;
+  const res = await fetch(nationalBorderGeoJsonUrl);
+  if (!res.ok) throw new Error(`Failed to load country GeoJSON: ${res.status}`);
+  nationalBorderGeoJsonCache = await res.json();
+  return nationalBorderGeoJsonCache;
+}
 
 async function loadProvincesGeoJson() {
   if (provincesGeoJsonCache) return provincesGeoJsonCache;
@@ -1333,24 +1344,19 @@ const drawIsopleth = () => {
 
 function openAdminBoundaryModal() {
   showAdminBoundaryModal.value = true;
-  ensureAdminBoundaryOptions();
 }
 
-async function ensureAdminBoundaryOptions() {
+async function ensureAdminBoundaryOptions(level) {
+  const loaders = { country: loadNationalBorderGeoJson, provinces: loadProvincesGeoJson, cities: loadCitiesGeoJson, counties: loadCountiesGeoJson };
+  if (!loaders[level] || isAdminBoundaryOptionsLoading.value) return;
   isAdminBoundaryOptionsLoading.value = true;
   try {
-    const countryOpts = [{ label: '中国', value: '中国' }];
-    const [prov, city, county] = await Promise.all([
-      loadProvincesGeoJson().catch(() => null),
-      loadCitiesGeoJson().catch(() => null),
-      loadCountiesGeoJson().catch(() => null),
-    ]);
-    adminBoundaryOptions.value = {
-      country: countryOpts,
-      provinces: (prov?.features ?? []).map((f) => f?.properties?.name).filter(Boolean).map((n) => ({ label: n, value: n })),
-      cities: (city?.features ?? []).map((f) => f?.properties?.name).filter(Boolean).map((n) => ({ label: n, value: n })),
-      counties: (county?.features ?? []).map((f) => f?.properties?.name).filter(Boolean).map((n) => ({ label: n, value: n })),
-    };
+    const geoJson = await loaders[level]();
+    adminBoundaryOptions.value[level] = level === 'country'
+      ? [{ label: '中国', value: '中国' }]
+      : (geoJson?.features ?? []).map((f) => f?.properties?.name).filter(Boolean).map((n) => ({ label: n, value: n }));
+  } catch (error) {
+    showError(error.message || 'Failed to load boundary');
   } finally {
     isAdminBoundaryOptionsLoading.value = false;
   }
@@ -1366,9 +1372,7 @@ async function handleAdminBoundaryConfirm(config) {
       if (requestId !== adminBoundaryRequestId) return;
       if (!geoJson) { showError(t('map.drawTab.voronoi.clipBoundaryNoOptions')); return; }
     } else if (level === 'country') {
-      const res = await fetch(nationalBorderGeoJsonUrl);
-      if (!res.ok) throw new Error(`Failed to load country GeoJSON: ${res.status}`);
-      geoJson = await res.json();
+      geoJson = await loadNationalBorderGeoJson();
     } else if (level === 'provinces') {
       geoJson = await loadProvincesGeoJson();
     } else if (level === 'cities') {
