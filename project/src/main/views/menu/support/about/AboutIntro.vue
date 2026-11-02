@@ -5,7 +5,7 @@
       :sections="directorySections"
       :label="t('about.intro.directory')"
     />
-    <h1 class="tabs-title about-page-title"><BarIcon icon="ℹ️" /><span>{{ $t('navigation.pageTitles.support.aboutIntro') }}</span></h1>
+    <h1 class="page-title about-page-title"><BarIcon icon="ℹ️" /><span>{{ $t('navigation.pageTitles.support.aboutIntro') }}</span></h1>
     <p style=" text-align: left;">{{ $t('about.intro.description') }}</p>
     <!-- <AboutFeatureTopology :branches="[...analysisBranches, ...secondaryBranches]" :bridge-nodes="bridgeNodes" /> -->
     <ul class="customlist">
@@ -305,7 +305,7 @@ function localeTo(path) {
   max-width: 900px;
   min-width: 0;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 0.5rem 1rem 2rem;
   box-sizing: border-box;
   text-align: center;
   font-family: var(--font-serif);

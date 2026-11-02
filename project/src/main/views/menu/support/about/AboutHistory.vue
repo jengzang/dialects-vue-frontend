@@ -7,7 +7,7 @@
     <h1
       v-if="!featured"
       id="history-title"
-      class="page-title"
+      class="page-title about-page-title"
     >
       <BarIcon icon="🗓️" />
       <span>{{ t('about.history.title') }}</span>
@@ -253,7 +253,17 @@ function parseLocalizedParts(content) {
   max-width: 70rem;
   margin-inline: auto;
   padding: clamp(1rem, 3vw, 2rem);
+  padding-top: 0.5rem;
   font-family: var(--font-serif);
+}
+
+.history-page .about-page-title {
+  min-height: 2.1em;
+  margin: 0.5rem auto 0.5rem;
+  font-size: var(--font-size-28);
+  font-weight: bold;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .history-page--featured {
@@ -300,7 +310,7 @@ function parseLocalizedParts(content) {
 
 .history-stage {
   max-width: 60rem;
-  margin: 2.5rem auto 0;
+  margin: 2rem auto 0;
 
   & + & {
     margin-top: 4rem;
@@ -344,7 +354,7 @@ function parseLocalizedParts(content) {
   justify-content: center;
   width: fit-content;
   max-width: 100%;
-  margin: 1.5rem auto 0;
+  margin: 0.5rem auto 0;
 }
 
 .history-filter-summary {

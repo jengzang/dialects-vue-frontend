@@ -1,6 +1,6 @@
 <template>
   <div class="page2">
-    <h1 class="tabs-title about-page-title"><BarIcon icon="💬" /><span>{{ $t('navigation.pageTitles.support.aboutSuggestion') }}</span></h1>
+    <h1 class="page-title about-page-title"><BarIcon icon="💬" /><span>{{ $t('navigation.pageTitles.support.aboutSuggestion') }}</span></h1>
     <TabSwitcher
       mode="segmented"
       navigation-only
@@ -236,7 +236,7 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   margin: 0 auto;
-  padding: 1dvw 8dvw;
+  padding: 0.5rem 8dvw 1dvw;
   box-sizing: border-box;
   // background: var(--glass-05);
   // border: 1px solid var(--glass-10);
@@ -421,7 +421,7 @@ onMounted(() => {
 @media (max-aspect-ratio: #{1 / 1}) {
   .page2 {
     max-width: none;
-    padding: 10px 14px;
+    padding: 0.5rem 14px 10px;
     font-size: var(--font-size-16);
   }
   .suggestion-box {

@@ -1,31 +1,31 @@
 <template>
   <div class="cards-container">
-    <h1 class="tabs-title like-author-title">
+    <h1 class="page-title about-page-title">
       <span class="like-author-heading">
         <BarIcon icon="❤️" />
         {{ $t('navigation.pageTitles.support.aboutLike') }}
       </span>
-      <span class="follow-buttons">
-        <button class="follow-button zhihu-follow" @click="followClicked">
-          <img
-            class="follow-logo"
-            src="https://static.zhihu.com/heifetz/favicon.ico"
-            alt="Zhihu"
-            @error="e => e.target.src = zhihuFallback"
-              />
-          {{ $t('about.like.followButton') }}
-        </button>
-        <a class="follow-button github-follow" href="https://github.com/jengzang" target="_blank" rel="noopener noreferrer">
-          <img
-            class="follow-logo"
-            src="https://github.githubassets.com/favicons/favicon-dark.svg"
-            alt="GitHub"
-            @error="e => e.target.src = githubFallback"
-              />
-          GitHub
-        </a>
-      </span>
     </h1>
+    <div class="follow-buttons">
+      <button class="follow-button zhihu-follow" @click="followClicked">
+        <img
+          class="follow-logo"
+          src="https://static.zhihu.com/heifetz/favicon.ico"
+          alt="Zhihu"
+          @error="e => e.target.src = zhihuFallback"
+        />
+        {{ $t('about.like.followButton') }}
+      </button>
+      <a class="follow-button github-follow" href="https://github.com/jengzang" target="_blank" rel="noopener noreferrer">
+        <img
+          class="follow-logo"
+          src="https://github.githubassets.com/favicons/favicon-dark.svg"
+          alt="GitHub"
+          @error="e => e.target.src = githubFallback"
+        />
+        GitHub
+      </a>
+    </div>
     <p style="display: block; width: 100%; clear: both; margin: 0 0 0.8rem;">
       {{ $t('about.like.starMessage') }}
     </p>
@@ -150,7 +150,7 @@ function splitDesc(text) {
   max-width: 1000px;
   min-width: 0;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 0.5rem 1rem 2rem;
   box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
@@ -214,25 +214,18 @@ function splitDesc(text) {
 }
 
 /* 关注与支持按钮 */
-.like-author-title {
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-}
-
 .like-author-heading {
   @include flex-center;
   gap: 0.4em;
 }
 
 .follow-buttons {
-  display: inline-flex;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
+  margin: 0 auto 0.8rem;
 }
 
 .follow-button,
@@ -312,6 +305,7 @@ function splitDesc(text) {
 @media (max-aspect-ratio: #{1 / 1}) {
   .cards-container {
     gap: 12px;
+    padding-top: 0.5rem;
   }
 
   .project-card {
@@ -336,11 +330,6 @@ function splitDesc(text) {
     width: 22px;
     height: 22px;
     margin-right: 6px;
-  }
-
-  .like-author-title {
-    gap: 8px;
-    flex-direction: column;
   }
 
   .follow-button {
