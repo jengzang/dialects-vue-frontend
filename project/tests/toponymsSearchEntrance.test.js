@@ -5,6 +5,10 @@ import ToponymsPage from '../src/main/views/explore/villages/toponyms/ToponymsPa
 const mocks = vi.hoisted(() => ({ route: { query: {} }, points: vi.fn() }));
 vi.mock('vue-router', () => ({ useRoute: () => mocks.route }));
 vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: key => key }) }));
+vi.mock('@/composables/router/useAuthGuard.js', () => ({
+  useAuthGuard: () => ({ isAuthenticated: { value: true }, requireAuth: vi.fn() }),
+}));
+vi.mock('@/utils/ui/message.js', () => ({ showConfirm: vi.fn() }));
 vi.mock('@/api', () => ({
   getToponymPoints: mocks.points,
   getToponymNames: vi.fn(),
@@ -94,7 +98,7 @@ describe('toponym search entrance', () => {
   it('collapses through the shared entrance and shows the map even for zero matches', async () => {
     await mount();
     await submit('黄村');
-    expect(mocks.points).toHaveBeenCalledWith(expect.objectContaining({ q: '黄村', match_mode: 'prefix' }));
+    expect(mocks.points).toHaveBeenCalledWith(expect.objectContaining({ q: '黄村', match_mode: 'contains' }));
     expect(host.querySelector('.query-search-panel.is-compact')).not.toBeNull();
     expect(host.querySelector('.test-map')).not.toBeNull();
     expect(host.querySelector('.toponyms-page__workspace').style.display).not.toBe('none');

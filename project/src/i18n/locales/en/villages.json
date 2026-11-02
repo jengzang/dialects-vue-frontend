@@ -234,6 +234,7 @@
       },
       "errors": {
         "emptyQuery": "Enter a keyword before searching.",
+        "loginRequired": "Toponym queries require login. Go to the login page?",
         "countryLayer": "Failed to load the country boundary.",
         "optionalLayer": "Failed to load the optional layer.",
         "nameTree": "Failed to load name hierarchy.",

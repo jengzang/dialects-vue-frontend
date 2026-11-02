@@ -234,6 +234,7 @@
       },
       "errors": {
         "emptyQuery": "请输入关键词后再搜索。",
+        "loginRequired": "地名查询需要登录，是否前往登录？",
         "countryLayer": "无法加载国界底图。",
         "optionalLayer": "无法加载可选图层。",
         "nameTree": "无法加载地名层级。",

@@ -153,9 +153,19 @@ import ToponymResultsPanel from './ToponymResultsPanel.vue';
 import ToponymSearchBar from './ToponymSearchBar.vue';
 import { buildToponymScatterData } from './toponymsChartData.js';
 import { getDefaultToponymsLayerState, loadToponymsGisAsset } from './toponymsGisAssets.js';
+import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
+import { showConfirm } from '@/utils/ui/message.js';
 
 const { t } = useI18n();
 const route = useRoute();
+const { requireAuth, isAuthenticated } = useAuthGuard();
+
+async function guardToponymRequest() {
+  if (isAuthenticated.value) return true;
+  const confirmed = await showConfirm(t('villages.pages.toponyms.errors.loginRequired'));
+  if (confirmed) await requireAuth();
+  return false;
+}
 const TOPONYM_NAME_TREE_PAGE_SIZE = 100;
 const TOPONYM_MATCH_MODES = new Set(['prefix', 'suffix', 'exact', 'contains']);
 const TOPONYM_VILLAGE_PLACE_TYPE_CODES = ['22200', '21610', '27610'];
@@ -278,6 +288,8 @@ function updateSearchProgress(progress) {
 }
 
 async function handleSearch() {
+  if (!(await guardToponymRequest())) return;
+
   const keyword = query.value.trim();
   hasSearched.value = true;
   pointsError.value = '';
@@ -332,6 +344,8 @@ async function handleSearch() {
 }
 
 async function handleNameTreeRequest() {
+  if (!(await guardToponymRequest())) return;
+
   const searchParams = lastPointSearchParams.value;
   nameTreeError.value = '';
   nameTreeLoaded.value = true;
@@ -367,6 +381,8 @@ async function handleNameTreeRequest() {
 }
 
 async function handleNameTreeNodeExpand(node) {
+  if (!(await guardToponymRequest())) return;
+
   if (!node?.path?.length || node.loading) return;
 
   if (node.loaded || !node.lazy) {
@@ -401,6 +417,8 @@ async function handleNameTreeNodeExpand(node) {
 }
 
 async function handleNameTreeNamesMore(node) {
+  if (!(await guardToponymRequest())) return;
+
   if (!node?.path?.length || node.namesLoading || !node.namesHasMore) return;
 
   const requestId = nameTreeRequestId.value;
@@ -461,6 +479,8 @@ async function handleSelectPoint(point) {
 }
 
 async function handleLocalDetailRequest() {
+  if (!(await guardToponymRequest())) return;
+
   const id = selectedPoint.value?.id;
   if (!id) return;
 
@@ -631,6 +651,8 @@ function abortOfficialDetailRequest() {
 }
 
 async function handleOfficialDetailRequest() {
+  if (!(await guardToponymRequest())) return;
+
   const id = selectedPoint.value?.id || selectedLocalDetail.value?.id;
   if (!id) return;
 

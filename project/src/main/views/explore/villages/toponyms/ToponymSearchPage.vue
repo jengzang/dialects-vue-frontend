@@ -301,9 +301,19 @@ import { getToponymDetails, getToponymSearch } from '@/api';
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue';
 import QuerySearchEntrance from '@/components/common/QuerySearchEntrance.vue';
+import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
+import { showConfirm } from '@/utils/ui/message.js';
 
 const { t } = useI18n();
 const router = useRouter();
+const { requireAuth, isAuthenticated } = useAuthGuard();
+
+async function guardToponymRequest() {
+  if (isAuthenticated.value) return true;
+  const confirmed = await showConfirm(t('villages.pages.toponyms.errors.loginRequired'));
+  if (confirmed) await requireAuth();
+  return false;
+}
 const querySearchEntranceRef = ref(null);
 const entranceKey = ref(0);
 const isSearchExpanded = ref(true);
@@ -403,6 +413,8 @@ function updateSearchProgress(progress) {
 }
 
 async function handleSearch() {
+  if (!(await guardToponymRequest())) return;
+
   const keyword = query.value.trim();
   hasSearched.value = true;
   searchError.value = '';
@@ -466,6 +478,8 @@ async function handleReset() {
 }
 
 async function handleSelectResult(item) {
+  if (!(await guardToponymRequest())) return;
+
   const id = item?.id;
   if (!id) return;
 

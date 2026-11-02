@@ -234,6 +234,7 @@
       },
       "errors": {
         "emptyQuery": "請輸入關鍵詞後再搜索。",
+        "loginRequired": "地名查詢需要登入，是否前往登入？",
         "countryLayer": "無法加載國界底圖。",
         "optionalLayer": "無法加載可選圖層。",
         "nameTree": "無法加載地名層級。",

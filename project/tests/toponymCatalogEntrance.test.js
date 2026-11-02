@@ -5,6 +5,10 @@ import ToponymSearchPage from '../src/main/views/explore/villages/toponyms/Topon
 const mocks = vi.hoisted(() => ({ search: vi.fn(), details: vi.fn(), push: vi.fn() }));
 vi.mock('vue-router', () => ({ useRouter: () => ({ push: mocks.push }) }));
 vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: key => key }) }));
+vi.mock('@/composables/router/useAuthGuard.js', () => ({
+  useAuthGuard: () => ({ isAuthenticated: { value: true }, requireAuth: vi.fn() }),
+}));
+vi.mock('@/utils/ui/message.js', () => ({ showConfirm: vi.fn() }));
 vi.mock('@/api', () => ({ getToponymSearch: mocks.search, getToponymDetails: mocks.details }));
 vi.mock('@/components/selector/SimpleSelectDropdown.vue', () => ({ default: {
   props: ['modelValue', 'options', 'disabled'],

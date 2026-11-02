@@ -22,6 +22,7 @@ function loadTree() {
     .filter((node) => node.type === 'FunctionDeclaration' && handlers.includes(node.id.name))
     .map((node) => descriptor.scriptSetup.content.slice(node.start, node.end)).join('\n');
   const bindings = {
+    guardToponymRequest: async () => true,
     getToponymNames, nameTree: ref([]), nameTreeMeta: reactive({ levels: 4 }),
     nameTreeError: ref(''), nameTreeLoaded: ref(false), nameTreeLoading: ref(false),
     nameTreeRequestId: ref(0), lastPointSearchParams: ref({ q: '村', match_mode: 'contains' }),
