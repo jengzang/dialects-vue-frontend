@@ -552,7 +552,7 @@ function updateNameTreeMeta(payload) {
 }
 
 function mergeLazyTreePayload(node, payload) {
-  if (Array.isArray(payload.names)) {
+  if (payload.page != null && Array.isArray(payload.names)) {
     node.names = payload.page && payload.page > 1
       ? [...node.names, ...payload.names]
       : payload.names;
@@ -561,9 +561,7 @@ function mergeLazyTreePayload(node, payload) {
     node.loaded = true;
     node.expanded = true;
     node.lazy = false;
-  }
-
-  if (Array.isArray(payload.children)) {
+  } else if (Array.isArray(payload.children)) {
     node.children = buildToponymTreeNodes(payload.children, {
       parentPath: node.path,
       lazy: true,
@@ -602,7 +600,7 @@ function createToponymTreeNode(node, index, options = {}) {
     path,
     names: Array.isArray(node?.names) ? node.names.filter((item) => typeof item === 'string' && item) : [],
     children,
-    expanded: options.expanded || Boolean(children.length && !lazy),
+    expanded: Boolean(children.length && (options.expanded || !lazy)),
     lazy,
     loaded: Boolean(!lazy || children.length),
     loading: false,
