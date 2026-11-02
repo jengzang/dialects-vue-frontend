@@ -11,7 +11,10 @@
             :aria-expanded="summaryExpanded"
             @click="summaryExpanded = !summaryExpanded"
           >
-            ▶
+            <PhCaretRight
+              :size="16"
+              aria-hidden="true"
+            />
           </button>
         </div>
         <p
@@ -67,7 +70,10 @@
             :aria-expanded="treeNotesExpanded"
             @click="treeNotesExpanded = !treeNotesExpanded"
           >
-            ▶
+            <PhCaretRight
+              :size="16"
+              aria-hidden="true"
+            />
           </button>
         </div>
         <p
@@ -180,6 +186,7 @@
 
 <script setup>
 import { computed, ref } from 'vue';
+import { PhCaretRight } from '@phosphor-icons/vue';
 import { useI18n } from 'vue-i18n';
 
 const props = defineProps({
@@ -235,8 +242,8 @@ const emit = defineEmits([
   'load-more-name-tree-names',
 ]);
 const { t } = useI18n();
-const summaryExpanded = ref(true);
-const treeNotesExpanded = ref(true);
+const summaryExpanded = ref(false);
+const treeNotesExpanded = ref(false);
 
 const nameTreeRows = computed(() => flattenNameTreeNodes(props.nameTree));
 
