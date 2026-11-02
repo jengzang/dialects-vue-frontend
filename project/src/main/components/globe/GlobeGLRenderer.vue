@@ -92,12 +92,6 @@ const GLOBE_JOYSTICK_ROTATION_SPEED = 30
 const GLOBE_MAX_LATITUDE = 75
 const HOME_GLOBE_JOYSTICK_ANCHOR_ID = 'home-globe-joystick-anchor'
 
-function getCssRgb(varName, fallback) {
-  return getComputedStyle(document.documentElement)
-    .getPropertyValue(varName)
-    .trim() || fallback
-}
-
 function setupInputCapabilityListeners() {
   inputCapabilityMediaQueries = [
     { ref: isPortraitLayout, mql: window.matchMedia('(max-aspect-ratio: 1 / 1)') },
@@ -127,9 +121,6 @@ function teardownInputCapabilityListeners() {
 function render() {
   if (!containerRef.value || !globeHostRef.value) return
 
-  const primary = getCssRgb('--color-primary-rgb', '0, 122, 255')
-  const bgTint = getCssRgb('--bg-blue-tint-rgb', '240, 247, 255')
-
   globe = Globe()(globeHostRef.value)
     .onGlobeReady(() => {
       isGlobeReady.value = true
@@ -138,12 +129,12 @@ function render() {
     .backgroundImageUrl(null)
     .showGraticules(false)
     .backgroundColor('rgba(0,0,0,0)')
-    .atmosphereColor(`rgb(${bgTint})`)
+    .atmosphereColor('#f0f7ff')
     .atmosphereAltitude(0.2)
     .pointsData(props.points)
     .pointLat('lat')
     .pointLng('lng')
-    .pointColor(() => `rgb(${primary})`)
+    .pointColor(() => '#0070e8')
     .pointRadius(0.15)
     .pointAltitude(0.001)
     .pointResolution(6)

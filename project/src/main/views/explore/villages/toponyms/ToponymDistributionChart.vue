@@ -77,7 +77,8 @@ import {
 const COUNTRY_MAP_NAME = 'toponyms-country';
 const BOUNDARY_LAYER_KEYS = ['provinces', 'cities'];
 const TOPONYM_LARGE_RENDER_THRESHOLD = 2000;
-const POINT_COLOR_TOKEN = '--color-primary';
+// 绘图颜色固定，避免底图、边界和数据点随页面主题改变。
+const POINT_COLOR = '#0070e8';
 const POINT_CLICK_FILTER = {
   seriesType: 'scatter',
 };
@@ -232,8 +233,8 @@ function renderChart() {
         max: 28,
       },
       itemStyle: {
-        areaColor: cssToken('--surface-panel-subtle'),
-        borderColor: cssToken('--border-control'),
+        areaColor: 'rgba(255, 255, 255, 0.4)',
+        borderColor: 'rgba(148, 163, 184, 0.32)',
         borderWidth: 1,
       },
       emphasis: {
@@ -267,7 +268,7 @@ function buildBoundarySeries() {
       z: key === 'provinces' ? 2 : 3,
       data: buildBoundaryLineSeriesData(props.loadedLayers[key]),
       lineStyle: {
-        color: cssToken(key === 'provinces' ? '--border-medium' : '--border-control'),
+        color: key === 'provinces' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(148, 163, 184, 0.32)',
         opacity: key === 'provinces' ? 0.65 : 0.55,
         width: key === 'provinces' ? 1.2 : 0.7,
       },
@@ -287,7 +288,7 @@ function buildRiverSeries() {
       z: 8 + index,
       data: buildRiverLineSeriesData(props.loadedLayers[key]),
       lineStyle: {
-        color: cssToken('--color-primary'),
+        color: '#0070e8',
         opacity: key === 'riverL1' ? 0.5 : 0.32,
         width: key === 'riverL1' ? 1.1 : 0.8,
       },
@@ -309,7 +310,7 @@ function buildPointSeries() {
     progressive: 0,
     progressiveThreshold: Number.MAX_SAFE_INTEGER,
     itemStyle: {
-      color: cssToken(POINT_COLOR_TOKEN),
+      color: POINT_COLOR,
       opacity: 0.72,
     },
     emphasis: {
@@ -324,7 +325,7 @@ function buildTooltipOption() {
     triggerOn: 'click',
     confine: true,
     textStyle: {
-      color: cssToken('--text-deep'),
+      color: '#0b2540',
     },
     formatter(params) {
       if (params.seriesType !== 'scatter') return params.seriesName || '';
@@ -355,11 +356,6 @@ function handleChartClick(params) {
       }
     : null;
   emit('select-point', { ...point, eventPosition });
-}
-
-function cssToken(name) {
-  if (typeof document === 'undefined') return '';
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
 defineExpose({ showConfigModal });

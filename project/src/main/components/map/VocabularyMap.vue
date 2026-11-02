@@ -970,13 +970,13 @@ watch(displayMode, () => {
 }
 
 :deep(.vocabulary-marker__overview-name) {
-  color: var(--text-primary);
+  color: #1d1d1f;
   font-size: 1em;
   font-weight: 700;
 }
 
 :deep(.vocabulary-marker__overview-count) {
-  color: var(--text-primary);
+  color: #1d1d1f;
   background: rgba(255, 255, 255, 0.68);
   font-size: 0.9em;
   font-weight: 600;

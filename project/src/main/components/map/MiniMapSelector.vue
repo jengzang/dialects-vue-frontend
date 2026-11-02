@@ -375,7 +375,7 @@ onBeforeUnmount(() => {
 
   &.is-active {
     background-color: #006eff;
-    color: var(--action-primary-text);
+    color: #fff;
     box-shadow: 0 2px 8px rgba(0, 110, 255, 0.5);
   }
 }

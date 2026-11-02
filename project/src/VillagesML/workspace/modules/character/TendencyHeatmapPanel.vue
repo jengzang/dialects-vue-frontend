@@ -86,10 +86,6 @@ const renderChart = () => {
   if (chartInstance) chartInstance.dispose()
   chartInstance = echarts.init(chartRef.value)
 
-  const styles = getComputedStyle(document.documentElement)
-  const successColor = styles.getPropertyValue('--color-success').trim()
-  const errorColor = styles.getPropertyValue('--color-error').trim()
-
   const option = {
     tooltip: {
       trigger: 'axis',
@@ -127,7 +123,7 @@ const renderChart = () => {
           return {
             value,
             itemStyle: {
-              color: value > 0 ? successColor : errorColor
+              color: value > 0 ? '#50c878' : '#e74c3c'
             }
           }
         })
@@ -176,6 +172,8 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 .vml-glass-panel {
   padding: 20px;
   min-height: 400px;

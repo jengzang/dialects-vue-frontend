@@ -133,7 +133,7 @@ const buildTag = (text, bgColor) =>
 
 const buildHoverHtml = (name, pathStr, tagText, tagColor) => {
   let html = `<div style="text-align:center"><strong>${name}</strong></div>`
-  if (pathStr) html += `<div style="text-align:center;font-size:11px;color:var(--text-secondary);margin-top:2px">${pathStr}</div>`
+  if (pathStr) html += `<div style="text-align:center;font-size:11px;color:#86868b;margin-top:2px">${pathStr}</div>`
   if (tagText) html += `<div style="text-align:center">${buildTag(tagText, tagColor)}</div>`
   return html
 }
@@ -782,17 +782,17 @@ $success: var(--color-success);/* 地图容器 */
 /* MapLibre 动态弹窗 */
 :deep(.maplibregl-popup-content) {
   padding: 10px 12px;
-  background: var(--surface-panel-strong);
+  background: rgba(255, 255, 255, 0.9);
   border-radius: var(--radius-sm2);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  color: var(--text-primary);
+  color: #1d1d1f;
   font-size: var(--font-size-13);
   line-height: 1.6;
 
   @include glass-blur(10px);
 
   strong {
-    color: var(--text-primary);
+    color: #1d1d1f;
     font-weight: 700;
   }
 }

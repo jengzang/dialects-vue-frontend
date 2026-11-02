@@ -1826,20 +1826,21 @@ $glass-transition: all 0.3s ease;
  *
  * 这些元素由 JavaScript 创建，没有 Vue 的
  * scoped 属性，因此必须使用 :deep()
+ * 绘图颜色固定，不随页面主题变化。
  * ========================= */
 
 :deep(.marker-text-base) {
   width: auto;
   padding: 2px 4px;
 
-  color: var(--color-cyan);
+  color: #a6ffdc;
   font-family: "SimHei", "黑体", sans-serif;
   text-align: center;
   white-space: nowrap;
 
-  background-color: var(--color-dark-teal);
+  background-color: #1b2e2b;
   border-radius: var(--radius-xs);
-  box-shadow: var(--shadow-focus-ring);
+  box-shadow: 0 2px 6px rgba(114, 124, 245, 0.5);
 
   cursor: pointer;
 }
@@ -1850,9 +1851,9 @@ $glass-transition: all 0.3s ease;
 
   opacity: 0.8;
   background-clip: padding-box;
-  border: 2px solid var(--text-primary);
+  border: 2px solid #000;
   border-radius: var(--radius-full);
-  box-shadow: 0 0 2px var(--bg-overlay-dark);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
 
   cursor: pointer;
 }
@@ -1860,17 +1861,21 @@ $glass-transition: all 0.3s ease;
 :deep(.marker-text-feature) {
   padding: 2px 4px;
 
-  color: var(--text-primary);
+  color: #000;
   font-family: "Times New Roman", serif;
   font-size: var(--font-size-16);
   white-space: nowrap;
 
-  border: 0.7px solid var(--text-primary);
+  border: 0.7px solid #000;
   border-radius: var(--radius-xs);
-  box-shadow: var(--shadow-focus-ring);
+  box-shadow: 0 2px 6px rgba(114, 124, 245, 0.5);
 
   cursor: pointer;
 
   // 背景色由 JavaScript 根据 item.color 动态设置。
+}
+
+:deep(.maplibregl-popup-content) {
+  color: #333;
 }
 </style>
