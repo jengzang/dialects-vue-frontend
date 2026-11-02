@@ -400,7 +400,8 @@ async function shareCurrentPage() {
     } catch {
       showSuccess(t('layoutFooter.share.imageReady'))
     }
-  } catch {
+  } catch (error) {
+    if (error?.name === 'AbortError') return
     showError(t('layoutFooter.share.failed'))
   }
 }

@@ -112,7 +112,9 @@
             </button>
           </div>
         </div>
-        <hr class="setting-split-divider">
+      </div>
+
+      <div class="setting-section setting-split glass-panel">
         <div class="setting-split-item">
           <h3 class="section-title">
             {{ $t('navigation.settings.interfaceMode.title') }}
@@ -130,22 +132,25 @@
             name="settings-interface-mode"
             class="settings-radio-group interface-mode-radio-group"
           />
-          <h3 class="section-title" style="margin-top: 18px">
-            {{ $t('about.settings.iconMode.title') }}
-            <HelpIcon
-              :content="$t('about.settings.iconMode.description')"
-              size="sm"
-              placement="right"
-              icon="?"
-              icon-color="var(--color-primary)"
+        </div>
+        <hr class="setting-split-divider">
+        <div class="setting-split-item">
+            <h3 class="section-title">
+              {{ $t('about.settings.iconMode.title') }}
+              <HelpIcon
+                :content="$t('about.settings.iconMode.description')"
+                size="sm"
+                placement="right"
+                icon="?"
+                icon-color="var(--color-primary)"
+              />
+            </h3>
+            <RadioGroup
+              v-model="iconModeModel"
+              :options="iconModeRadioOptions"
+              name="settings-icon-mode"
+              class="settings-radio-group"
             />
-          </h3>
-          <RadioGroup
-            v-model="iconModeModel"
-            :options="iconModeRadioOptions"
-            name="settings-icon-mode"
-            class="settings-radio-group"
-          />
         </div>
       </div>
 
@@ -448,7 +453,8 @@ $text-muted: var(--text-tertiary);
 
 .setting-section {
   --glass-panel-radius: var(--radius-lg);
-  --glass-panel-backdrop-filter: blur(10px);
+  --glass-panel-backdrop-filter: none;
+  --glass-panel-background: none;
   --glass-panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   --glass-panel-hover-shadow: var(--glass-panel-shadow);
   margin-bottom: 24px;
