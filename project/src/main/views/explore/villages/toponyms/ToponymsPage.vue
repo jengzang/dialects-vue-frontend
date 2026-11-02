@@ -28,13 +28,14 @@
         >
           <template #actions>
             <button
-              class="glass-button"
+              class="toponyms-page__config-button"
               type="button"
-              data-variant="secondary"
               :aria-label="t('villages.pages.toponyms.chart.configAriaLabel')"
               @click="openChartConfig"
             >
-              <InlineIcon icon="⚙" />
+              <span class="toponyms-page__config-icon">
+                <InlineIcon icon="⚙" />
+              </span>
             </button>
           </template>
         </ToponymSearchBar>
@@ -47,8 +48,8 @@
         <div class="toponyms-page__chart glass-panel">
           <div class="toponyms-page__chart-inner">
             <div class="toponyms-page__chart-header">
-              <div class="toponyms-page__stat-strip">
-                <span>{{ t('villages.pages.toponyms.chart.pointsSeries') }}</span>
+              <!-- <div class="toponyms-page__stat-strip"> -->
+                <!-- <span>{{ t('villages.pages.toponyms.chart.pointsSeries') }}</span>
                 <strong>{{ scatterData.length }}</strong>
                 <small v-if="hasSearched">
                   {{
@@ -58,8 +59,8 @@
                     })
                   }}
                 </small>
-                <small v-else>{{ t('villages.pages.toponyms.chart.searchFirst') }}</small>
-              </div>
+                <small v-else>{{ t('villages.pages.toponyms.chart.searchFirst') }}</small> -->
+              <!-- </div> -->
             </div>
 
             <ToponymDistributionChart
@@ -164,7 +165,7 @@ const querySearchEntranceRef = ref(null);
 const isSearchExpanded = ref(true);
 const isSearchCollapsing = ref(false);
 const query = ref('');
-const matchMode = ref('prefix');
+const matchMode = ref('contains');
 const hasSearched = ref(false);
 const lastPointSearchParams = ref(null);
 
@@ -732,18 +733,41 @@ async function handleToggleLayer({ key, visible }) {
     }
   }
 
+  &__config-button {
+    @include flex-center;
+    inline-size: 40px;
+    block-size: 40px;
+    padding: 0;
+    border: 1px solid var(--border-control);
+    border-radius: var(--radius-md);
+    background: transparent;
+    box-shadow: none;
+    color: var(--text-deep);
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover .toponyms-page__config-icon {
+      transform: scale(1.2);
+    }
+  }
+
+  &__config-icon {
+    transition: transform 0.18s ease;
+  }
+
   &__workspace {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(220px, 0.3fr);
     gap: 16px;
     margin-top: 16px;
-    min-block-size: 84dvh;
+    min-block-size: 80dvh;
     align-items: stretch;
   }
 
   &__chart {
     min-inline-size: 0;
-    min-block-size: 68dvh;
+    min-block-size: 72dvh;
     overflow: hidden;
   }
 
@@ -751,7 +775,7 @@ async function handleToggleLayer({ key, visible }) {
     @include flex-col;
     gap: 12px;
     padding: 16px;
-    min-block-size: 68dvh;
+    min-block-size: 72dvh;
   }
 
   &__chart-header {

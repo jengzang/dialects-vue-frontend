@@ -33,7 +33,7 @@
     </label>
 
     <button
-      class="glass-button toponym-search-bar__submit"
+      class="action-btn toponym-search-bar__submit"
       type="submit"
       :disabled="loading"
     >

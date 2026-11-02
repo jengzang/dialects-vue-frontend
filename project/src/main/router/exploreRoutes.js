@@ -109,8 +109,7 @@ export const exploreRoutes = [
   },
   {
     path: 'explore/villages/toponyms',
-    component: ToponymsPage,
-    meta: { development: { type: 'blockApi', feature: 'toponyms' } }
+    component: ToponymsPage
   },
   {
     path: 'explore/villages/search',

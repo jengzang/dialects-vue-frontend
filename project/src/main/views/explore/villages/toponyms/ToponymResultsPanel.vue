@@ -48,7 +48,7 @@
           }}
         </p>
         <button
-          class="glass-button toponym-results-panel__tree-action"
+          class="action-btn toponym-results-panel__tree-action"
           type="button"
           :disabled="loading || nameTreeLoading || !hasSearched"
           @click="emit('request-name-tree')"
@@ -245,15 +245,31 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
   min-inline-size: 0;
 
   &__inspector {
+    position: relative;
     align-self: stretch;
+    min-block-size: 0;
   }
 
   &__inner {
     @include flex-col;
+    position: absolute;
+    inset: 0;
     gap: 14px;
     padding: 16px;
-    max-block-size: 68dvh;
     overflow: auto;
+  }
+
+  &__summary {
+    flex-shrink: 0;
+  }
+
+  &__name-tree {
+    flex: 1;
+    min-block-size: 0;
+
+    > :not(ol) {
+      flex-shrink: 0;
+    }
   }
 
   &__summary,
@@ -308,8 +324,9 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
 
   &__tree-list {
     @include flex-col;
+    flex: 1;
+    min-block-size: 0;
     gap: 8px;
-    max-block-size: 240px;
     margin: 0;
     overflow: auto;
     padding-inline-start: 0;
@@ -319,6 +336,7 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
 
   &__tree-node {
     @include flex-col;
+    flex-shrink: 0;
     gap: 3px;
     padding: 8px;
     padding-inline-start: calc(8px + var(--toponym-tree-indent, 0px));
@@ -387,6 +405,12 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
 
   &__error {
     color: var(--color-error);
+  }
+}
+
+@media (max-aspect-ratio: 1 / 1) {
+  .toponym-results-panel__inspector {
+    min-block-size: 72dvh;
   }
 }
 </style>

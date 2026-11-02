@@ -371,11 +371,11 @@ defineExpose({ showConfigModal });
 .toponym-distribution-chart {
   position: relative;
   width: 100%;
-  min-block-size: 68dvh;
+  min-block-size: 72dvh;
 
   &__canvas {
     width: 100%;
-    min-block-size: 68dvh;
+    min-block-size: 72dvh;
   }
 
   &__status {
