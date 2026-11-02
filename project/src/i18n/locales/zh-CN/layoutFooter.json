@@ -211,7 +211,7 @@
     },
     "exploreVillagesToponyms": {
       "title": "地名检索",
-      "description": "自然村地名检索与分布地图开发中，规划按村名及行政信息查询村落；目前地名数据功能暂不可用。"
+      "description": "自然村地名检索与分布地图开发中，规划按村名及行政信息查询村落；"
     },
     "exploreVillagesGd": {
       "title": "广东自然村树",

@@ -65,7 +65,23 @@
         >
           <span class="feature-tile__icon"><BarIcon :icon="item.icon" /></span>
           <span class="feature-tile__text">
-            <span class="feature-tile__title">{{ item.title }}</span>
+            <span class="feature-tile__title">
+              {{ item.title }}
+              <svg
+                class="feature-tile__arrow"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--color-secondary)"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M7 17 17 7M9 7h8v8" />
+              </svg>
+            </span>
             <span class="feature-tile__desc">{{ item.desc }}</span>
           </span>
         </RouterLink>
@@ -83,11 +99,17 @@ import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import BarIcon from '@/components/common/BarIcon.vue'
+import { loadLocaleMessages } from '@/i18n/index.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t } = useI18n()
 const route = useRoute()
 const SEARCH_LOCALES = ['zh-CN', 'zh-Hant', 'en']
+const searchLocaleMessagesReady = ref(false)
+
+void Promise.allSettled(SEARCH_LOCALES.map((locale) => loadLocaleMessages(locale))).then((results) => {
+  searchLocaleMessagesReady.value = results.every((result) => result.status === 'fulfilled')
+})
 
 const groups = [
   {
@@ -534,7 +556,7 @@ const groups = [
     items: [
       {
         icon: '🎙️',
-        titleKey: 'home.features.praat.title',
+        titleKey: 'home.features.praat.itemTitle',
         descKey: 'home.features.praat.desc',
         route: '/explore/tools/praat',
         search: {
@@ -647,11 +669,11 @@ function resolveItem(item, targetLocale) {
   return { title: translate(item.titleKey), desc: item.descKey ? translate(item.descKey) : '' }
 }
 
-function resolveItemSearchText(item) {
+function resolveItemSearchText(item, searchLocales) {
 
   // 1. 原本的多语言标题和描述
   const translatedTexts =
-    SEARCH_LOCALES.flatMap((targetLocale) => {
+    searchLocales.flatMap((targetLocale) => {
       const resolved = resolveItem(
         item,
         targetLocale
@@ -671,7 +693,7 @@ function resolveItemSearchText(item) {
 
   // 3. i18n关键词
   const translatedKeywords =
-    SEARCH_LOCALES.flatMap((targetLocale) => {
+    searchLocales.flatMap((targetLocale) => {
       return (
         item.search?.i18nKeys || []
       ).map((key) =>
@@ -692,8 +714,8 @@ function resolveItemSearchText(item) {
     .toLowerCase()
 }
 
-function resolveGroupSearchText(group) {
-  return SEARCH_LOCALES
+function resolveGroupSearchText(group, searchLocales) {
+  return searchLocales
     .flatMap((targetLocale) => [
       translateForLocale(group.titleKey, targetLocale),
       group.descKey ? translateForLocale(group.descKey, targetLocale) : '',
@@ -702,20 +724,23 @@ function resolveGroupSearchText(group) {
     .toLowerCase()
 }
 
-const resolvedGroups = computed(() =>
-  groups.map((g) => ({
+const resolvedGroups = computed(() => {
+  const searchLocales = searchLocaleMessagesReady.value
+    ? SEARCH_LOCALES
+    : [resolveRouteLocale(route)]
+  return groups.map((g) => ({
     id: g.id,
     icon: g.icon,
     title: t(g.titleKey),
     desc: g.descKey ? t(g.descKey) : '',
-    searchText: resolveGroupSearchText(g),
+    searchText: resolveGroupSearchText(g, searchLocales),
     items: g.items.map((item) => ({
       ...item,
       ...resolveItem(item),
-      searchText: resolveItemSearchText(item),
+      searchText: resolveItemSearchText(item, searchLocales),
     })),
   }))
-)
+})
 
 const query = ref('')
 
@@ -1002,7 +1027,7 @@ $text-primary: var(--text-primary);
   display: flex;
   align-items: center;
   flex: 1 1 200px;
-  max-width: 360px;
+  max-width: 500px;
   gap: 0.75rem;
   padding: 0.875rem 1rem;
   text-align: left;
@@ -1047,12 +1072,29 @@ $text-primary: var(--text-primary);
     display: flex;
     flex-direction: column;
     min-width: 0;
+
+    @media(max-aspect-ratio: 1/1) {
+      flex-direction: row;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
   }
 
   &__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
     font-size: var(--font-size-16);
     font-weight: 600;
     color: $text-primary;
+    white-space: nowrap;
+  }
+
+  &__arrow {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
   }
 
   &__desc {
@@ -1084,7 +1126,9 @@ $text-primary: var(--text-primary);
   }
 
   .feature-tile {
-    flex: 0 1 160px;
+    flex: 0 1 auto;
+    max-width: 100%;
+    // flex: 0 1 160px;
     gap: 0.5rem;
     padding: 0.75rem 0.75rem;
 
@@ -1101,6 +1145,23 @@ $text-primary: var(--text-primary);
 
   .features-recent {
     padding: 0.5rem 0.75rem;
+  }
+
+  .features-recent__label {
+    order: 1;
+  }
+
+  .features-recent__clear {
+    order: 2;
+  }
+
+  .features-recent__list {
+    order: 3;
+    width: 100%;
+  }
+
+  .features-recent__list > .recent-pill:nth-child(n + 7) {
+    display: none;
   }
 }
 </style>

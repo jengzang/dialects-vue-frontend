@@ -211,7 +211,7 @@
     },
     "exploreVillagesToponyms": {
       "title": "地名檢索",
-      "description": "自然村地名檢索與分佈地圖開發中，規劃按村名及行政資訊查詢村落；目前地名資料功能暫不可用。"
+      "description": "自然村地名檢索與分佈地圖開發中，規劃按村名及行政資訊查詢村落。"
     },
     "exploreVillagesGd": {
       "title": "廣東自然村樹",

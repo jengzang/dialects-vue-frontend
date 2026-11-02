@@ -600,10 +600,6 @@ onBeforeUnmount(() => {
     max-width: none;
     padding: 0;
   }
-
-  :deep(.feature-tile) {
-    flex: 1 1 100px;
-  }
 }
 
 .footer-stats,

@@ -56,85 +56,86 @@
     "noResults": "沒有符合的功能",
     "query": {
       "title": "查詢分析",
-      "desc": "多維度查詢方言音韻資料",
-      "searchChar": "查字 - 查詢字音、地位",
-      "searchMiddle": "查中古 - 按韻書地位整理讀音",
-      "searchPhoneme": "查音位 - 分析音位的韻書來源",
-      "searchTone": "查調 - 查詢調值、調類"
+      "desc": "詳細整理各方言音韻特徵",
+      "searchChar": "查字 - 查詢各方言點漢字讀音",
+      "searchMiddle": "查中古 - 選擇韻書地位 整理各點的聲韻調讀音",
+      "searchPhoneme": "查音位 - 輸入具體的音位 分析各點音位的韻書來源",
+      "searchTone": "查調 - 查詢各方言點的調值、調類"
     },
     "compare": {
       "title": "方言比較",
       "desc": "對比不同方言的音韻特徵",
-      "compareChar": "比較漢字 - 比較各點聲韻調的字音差異",
-      "compareMiddle": "比較中古 - 按音韻地位比較各點",
-      "compareTone": "比較調類 - 對比各點聲調系統",
-      "comparePhonetic": "比較音值 - 桑基圖呈現各點音值差異"
+      "compareChar": "比較漢字 - 任選兩個字 比較各點聲韻調差異",
+      "compareMiddle": "比較中古 - 任選兩個韻書地位 對比各點的合流與分立情況",
+      "compareTone": "比較調類 - 任選兩個調類 比較各點聲調系統合併情況",
+      "comparePhonetic": "比較音值 - 選擇多個方言 呈現各點音值對應關係"
     },
     "map": {
       "title": "地圖可視化",
-      "desc": "地理語言學視角呈現",
-      "dialectMap": "地圖顯示 - 地圖上呈現查詢結果",
-      "regionMap": "方言分區圖 - 按地圖集或音典分區繪製",
-      "customMap": "自定義數據 - 添加個人數據繪圖",
-      "drawMap": "繪圖工具 - GIS在線繪圖 泰森多邊形"
+      "desc": "地理語言學 繪製直觀對比圖",
+      "dialectMap": "地圖 - 特徵圖、對比圖、等值線圖、熱力圖等",
+      "regionMap": "方言分區圖 - 按照分區繪製方言分佈點圖",
+      "customMap": "自定義數據 - 添加、管理個人數據",
+      "drawMap": "繪圖工具 - 在線GIS工具 泰森多邊形繪製方言分佈圖"
     },
     "phonology": {
       "title": "音系分析",
-      "desc": "方言語音係統研究",
-      "phonologyQuery": "音系查詢 - 查看方言音系表",
-      "phonemeClassify": "音素分類 - 按自定義類別分析音素",
-      "syllableCount": "音節統計 - 統計音節數量",
+      "desc": "深入分析方言點的語音系統",
+      "phonologyQuery": "音系查詢 - 查看方言點的音系表、同音字彙",
+      "phonemeClassify": "音素分類 - 選擇韻書地位 多維度音類統計",
+      "syllableCount": "音節統計 - 統計方言點的音節數量 繪製圖表與等值線圖",
       "middlePosition": "中古地位 - 查詢漢字中古地位",
-      "evolution": "演化 - 餅圖桑基圖展示方言演化"
+      "evolution": "演化 - 方言點與韻書的對應關係 餅圖桑基圖呈現音類分化"
     },
     "words": {
       "title": "詞句資料",
       "desc": "方言詞彙與語法資料",
-      "yubaoVocab": "語保詞彙 - 語保工程詞彙資料",
-      "yubaoGrammar": "語保語法 - 語保工程句子資料",
-      "wordList": "詞表 - 方言詞表頁面",
-      "ycSpoken": "陽春口語詞 - 陽春方言口語詞彙"
+      "yubaoVocab": "語保詞彙 - 查詢語保1000詞（1200+方言點）",
+      "yubaoGrammar": "語保語法 - 查詢語保50句（1200+方言點）",
+      "wordList": "詞表 - 查詢各方言點的詞彙資料 貢獻詞表",
+      "ycSpoken": "陽春口語詞 - 廣東陽春口語單字詞"
     },
     "villages": {
       "title": "自然村資料",
-      "desc": "村落地名分析與方言繪圖",
+      "desc": "自然村地名分佈、分析與繪圖",
       "toponyms": "地名分佈 - 查詢漢字在各地自然村地名中的分佈，探索地名規律",
-      "gdVillages": "廣東自然村 - 廣東自然村樹狀圖",
-      "villagesML": "機器學習 - 自然村名機器學習",
+      "gdVillages": "廣東自然村 - 廣東省自然村樹狀圖 方言分佈圖",
+      "villagesML": "機器學習 - 運用機器學習方法分析自然村名",
       "gdVillagesTable": "全粵村情表格 - 廣東村落詳細表格",
-      "ycVillages": "陽春自然村 - 陽春自然村資料",
+      "ycVillages": "陽春自然村 - 1996《陽春縣志》自然村資料",
       "allVillages": "全部自然村 - 全部自然村數據（僅管理員）"
     },
     "tools": {
       "title": "字表工具",
-      "desc": "字表轉換、合併、檢查等工具",
-      "tableProcess": "字表處理 - 字表檢查與格式轉換",
-      "jyut2ipa": "粵拼轉IPA - 粵拼轉國際音標",
-      "tableMerge": "字表合併 - 合併多個字表",
+      "desc": "字表轉換、檢查、合併工具",
+      "tableProcess": "字表處理 - 檢查字表的錯誤調值、錯字、錯誤聲韻等 支援格式轉換",
+      "jyut2ipa": "粵拼轉ipa - 將帶有粵拼的表格轉為國際音標 支援自定義規則",
+      "tableMerge": "字表合併 - 按照參考表的漢字順序 合併多份字表",
       "tableDerive": "字表推導 - 基於規則生成完整字表"
     },
     "charClass": {
       "title": "漢字地位",
-      "desc": "歷代漢字音韻地位資料",
+      "desc": "歷代韻書的漢字音韻地位",
       "zhonggu": "中古漢語 - 廣韻等中古音系地位",
       "shanggu": "上古漢語 - 詩經諧聲等上古地位",
       "jingu": "近古漢語 - 洪武正韻、中原音韻等近古地位",
       "yueyun": "粵語韻書 - 分韻撮要等韻書"
     },
     "praat": {
-      "title": "Praat 聲學分析",
-      "desc": "實驗語音學工具與數據分析"
+      "title": "聲學分析",
+      "itemTitle": "在線Praat",
+      "desc": "上傳音頻文件或直接錄音 分析基頻、共振峰、頻譜圖等"
     },
     "about": {
       "title": "關於網站",
       "desc": "網站介紹與資料來源",
-      "intro": "簡介 - 網站功能介紹",
-      "history": "開發歷程 - 查看網站版本與功能演進記錄",
+      "intro": "簡介 - 「方音圖鑑」功能簡介",
+      "history": "開發歷程 - 網站各功能的上線時間",
       "reflection": "感悟 - 開發感悟與鳴謝",
       "suggestion": "提出建議 - 反饋與建議",
-      "likeAuthor": "喜歡作者 - 支持與關注",
+      "likeAuthor": "支持項目 - 支持項目與關注作者",
       "source": "資料來源 - 查閱字表來源與相關信息",
-      "setting": "設定 - 語言與音韻資料選擇"
+      "setting": "設定 - 選擇語音、主題、韻書資料等"
     },
     "dialectClustering": {
       "title": "方言聚類",

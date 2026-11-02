@@ -56,74 +56,75 @@
     "noResults": "No matching features",
     "query": {
       "title": "Query & Analysis",
-      "desc": "Explore dialect phonology from multiple perspectives",
-      "searchChar": "Characters - View character readings and Middle Chinese categories",
-      "searchMiddle": "Middle Chinese - Organize readings by rime-book categories",
-      "searchPhoneme": "Readings - Trace dialect readings back to their rime-book categories",
-      "searchTone": "Tones - View tone values and tone classes"
+      "desc": "Explore phonological features across dialects in detail",
+      "searchChar": "Characters - Look up Chinese-character readings across dialect locations",
+      "searchMiddle": "Middle Chinese - Select rime-book categories to organize initials, finals, and tones at each location",
+      "searchPhoneme": "Phonemes - Enter a specific phoneme to trace its rime-book sources across locations",
+      "searchTone": "Tones - Look up tone values and tone classes across dialect locations"
     },
     "compare": {
       "title": "Dialect Comparison",
       "desc": "Compare phonological features across dialects",
-      "compareChar": "Characters - Compare initials, finals, and tones across locations",
-      "compareMiddle": "Middle Chinese - Compare locations by phonological category",
-      "compareTone": "Tone Classes - Compare tone systems across locations",
-      "comparePhonetic": "Readings - Visualize phonetic-value differences across locations with Sankey diagrams"
+      "compareChar": "Characters - Choose any two characters to compare initials, finals, and tones across locations",
+      "compareMiddle": "Middle Chinese - Choose two rime-book categories to compare mergers and splits across locations",
+      "compareTone": "Tone Classes - Choose two tone classes to compare mergers in dialect tone systems",
+      "comparePhonetic": "Phonetic Values - Select multiple dialects to show correspondences among phonetic values"
     },
     "map": {
       "title": "Map Visualization",
-      "desc": "Visualize dialect data from a geolinguistic perspective",
-      "dialectMap": "Map View - Display query results on a map",
-      "regionMap": "Dialect Regions - Draw maps using atlas- or pronunciation-dictionary-based divisions",
-      "customMap": "Custom Data - Add your own data to create maps",
-      "drawMap": "Map Drawing - Online GIS drawing and Voronoi polygons"
+      "desc": "Draw clear comparison maps for geolinguistic analysis",
+      "dialectMap": "Map - Feature maps, comparison maps, isogloss maps, heat maps, and more",
+      "regionMap": "Dialect Regions - Plot dialect locations according to regional classifications",
+      "customMap": "Custom Data - Add and manage personal data",
+      "drawMap": "Drawing Tools - Online GIS tools for creating dialect maps with Voronoi polygons"
     },
     "phonology": {
       "title": "Phonological Analysis",
-      "desc": "Analyze dialect sound systems",
-      "phonologyQuery": "Phonological Systems - View dialect phonology charts",
-      "phonemeClassify": "Phoneme Classification - Analyze phonemes using custom categories",
-      "syllableCount": "Syllable Statistics - Count syllables",
+      "desc": "Analyze the sound systems of dialect locations in depth",
+      "phonologyQuery": "Phonology Lookup - View phonological charts and homophone lists for dialect locations",
+      "phonemeClassify": "Phoneme Classification - Select rime-book categories for multidimensional phoneme-class statistics",
+      "syllableCount": "Syllable Statistics - Count syllables at dialect locations and plot charts and isogloss maps",
       "middlePosition": "Middle Chinese Categories - View the Middle Chinese categories of Chinese characters",
-      "evolution": "Evolution - Visualize dialect change with pie charts and Sankey diagrams"
+      "evolution": "Evolution - Explore how dialect locations correspond to rime books, with pie charts and Sankey diagrams showing phoneme-class splits"
     },
     "words": {
       "title": "Lexical & Grammatical Data",
       "desc": "Dialect vocabulary and grammar resources",
-      "yubaoVocab": "Language Preservation Vocabulary - Vocabulary data from the Chinese Language Resources Protection Project",
-      "yubaoGrammar": "Language Preservation Grammar - Sentence data from the Chinese Language Resources Protection Project",
-      "wordList": "Vocabulary List - Dialect vocabulary list page",
-      "ycSpoken": "Yangchun Colloquial Vocabulary - Colloquial words from the Yangchun dialect"
+      "yubaoVocab": "Language Preservation Vocabulary - Browse the 1,000-word list from 1,200+ dialect locations",
+      "yubaoGrammar": "Language Preservation Grammar - Browse the 50-sentence list from 1,200+ dialect locations",
+      "wordList": "Vocabulary List - Browse vocabulary data by dialect location and contribute word lists",
+      "ycSpoken": "Yangchun Colloquial Words - Single-character colloquial words from Yangchun, Guangdong"
     },
     "villages": {
       "title": "Natural Village Data",
-      "desc": "Village-name analysis and dialect mapping",
+      "desc": "Distribution, analysis, and mapping of natural-village names",
       "toponyms": "Village Toponym Distribution - Map the distribution of Chinese characters in village names across regions and explore place-name patterns",
-      "gdVillages": "Guangdong Natural Villages - Browse the Guangdong natural-village hierarchy",
-      "villagesML": "Machine Learning - Analyze natural-village names with machine learning",
+      "gdVillages": "Guangdong Natural Villages - Natural-village tree and dialect distribution map of Guangdong Province",
+      "villagesML": "Machine Learning - Apply machine-learning methods to analyze natural-village names",
       "gdVillagesTable": "Guangdong Village Table - Detailed village data for Guangdong",
-      "ycVillages": "Yangchun Natural Villages - Natural-village data for Yangchun",
+      "ycVillages": "Yangchun Natural Villages - Natural-village data from the 1996 Yangchun County Gazetteer",
       "allVillages": "All Natural Villages - Complete natural-village data (administrators only)"
     },
     "tools": {
       "title": "Character List Tools",
-      "desc": "Convert, merge, validate, and process character lists",
-      "tableProcess": "Character List Processing - Validate character lists and convert formats",
-      "jyut2ipa": "Jyutping to IPA - Convert Jyutping to the International Phonetic Alphabet",
-      "tableMerge": "Merge Character Lists - Combine multiple character lists",
+      "desc": "Convert, validate, and merge character lists",
+      "tableProcess": "Character List Processing - Check for incorrect tone values, typos, and errors in initials and finals; convert formats",
+      "jyut2ipa": "Jyutping to IPA - Convert tables containing Jyutping to IPA, with support for custom rules",
+      "tableMerge": "Merge Character Lists - Merge multiple lists in the character order of a reference list",
       "tableDerive": "Character List Derivation - Generate a complete character list from phonological rules"
     },
     "charClass": {
       "title": "Historical Phonological Categories",
-      "desc": "Phonological categories of Chinese characters across historical periods",
+      "desc": "Phonological categories of Chinese characters in historical rime books",
       "zhonggu": "Middle Chinese - Categories from Guangyun and other Middle Chinese systems",
       "shanggu": "Old Chinese - Categories based on Shijing rhymes, phonetic series, and related evidence",
       "jingu": "Early Modern Chinese - Categories from Hongwu Zhengyun, Zhongyuan Yinyun, and other early modern sources",
       "yueyun": "Cantonese Rime Books - Data from Fenyun Cuoyao and other Cantonese rime books"
     },
     "praat": {
-      "title": "Praat Acoustic Analysis",
-      "desc": "Experimental phonetics tools and data analysis"
+      "title": "Acoustic Analysis",
+      "itemTitle": "Online Praat",
+      "desc": "Upload an audio file or record directly to analyze fundamental frequency, formants, spectrograms, and more"
     },
     "dialectClustering": {
       "title": "Dialect Clustering",
@@ -132,13 +133,13 @@
     "about": {
       "title": "About This Site",
       "desc": "Site introduction and data sources",
-      "intro": "Introduction - Overview of the site's features",
-      "history": "Development History - Browse site releases and feature milestones",
+      "intro": "Introduction - Overview of the features of \"方音图鑑\"",
+      "history": "Development History - Launch dates of the site's features",
       "reflection": "Reflections - Development reflections and acknowledgments",
       "suggestion": "Feedback - Share comments and suggestions",
-      "likeAuthor": "Support the Author - Follow and support the project",
+      "likeAuthor": "Support the Project - Support the project and follow the author",
       "source": "Data Sources - View character-list sources and related information",
-      "setting": "Settings - Choose the language and phonological resources"
+      "setting": "Settings - Choose the language, theme, rime-book resources, and more"
     }
   },
   "roadmap": {
