@@ -2,20 +2,41 @@
   <aside class="toponym-results-panel toponym-results-panel__inspector glass-panel">
     <div class="toponym-results-panel__inner ui-scrollbar">
       <section class="toponym-results-panel__summary">
-        <h2>{{ t('villages.pages.toponyms.results.title') }}</h2>
-        <p v-if="!hasSearched">
+        <div class="toponym-results-panel__section-header">
+          <h2>{{ t('villages.pages.toponyms.results.title') }}</h2>
+          <button
+            class="glass-button toponym-results-panel__tree-toggle toponym-results-panel__disclosure"
+            type="button"
+            :aria-label="t('villages.pages.toponyms.results.title')"
+            :aria-expanded="summaryExpanded"
+            @click="summaryExpanded = !summaryExpanded"
+          >
+            ▶
+          </button>
+        </div>
+        <p
+          v-if="!hasSearched"
+          v-show="summaryExpanded"
+        >
           {{ t('villages.pages.toponyms.results.empty') }}
         </p>
-        <p v-else-if="loading">
+        <p
+          v-else-if="loading"
+          v-show="summaryExpanded"
+        >
           {{ t('villages.pages.toponyms.results.loading') }}
         </p>
         <p
           v-else-if="error"
+          v-show="summaryExpanded"
           class="toponym-results-panel__error"
         >
           {{ error }}
         </p>
-        <p v-else>
+        <p
+          v-else
+          v-show="summaryExpanded"
+        >
           {{
             t('villages.pages.toponyms.results.count', {
               count: pointCount,
@@ -25,6 +46,7 @@
         </p>
         <p
           v-if="truncated"
+          v-show="summaryExpanded"
           class="toponym-results-panel__warning"
         >
           {{ t('villages.pages.toponyms.results.truncated') }}
@@ -34,10 +56,23 @@
       <section class="toponym-results-panel__name-tree">
         <div class="toponym-results-panel__section-header">
           <h3>{{ t('villages.pages.toponyms.nameTree.title') }}</h3>
-          <span v-if="nameTreeLoading">{{ t('villages.pages.toponyms.nameTree.loading') }}</span>
+          <span
+            v-if="nameTreeLoading"
+            v-show="treeNotesExpanded"
+          >{{ t('villages.pages.toponyms.nameTree.loading') }}</span>
+          <button
+            class="glass-button toponym-results-panel__tree-toggle toponym-results-panel__disclosure"
+            type="button"
+            :aria-label="t('villages.pages.toponyms.nameTree.title')"
+            :aria-expanded="treeNotesExpanded"
+            @click="treeNotesExpanded = !treeNotesExpanded"
+          >
+            ▶
+          </button>
         </div>
         <p
           v-if="nameTreeMeta.mode === 'lazy_fallback'"
+          v-show="treeNotesExpanded"
           class="toponym-results-panel__muted toponym-results-panel__name-tree-note"
         >
           {{
@@ -61,18 +96,21 @@
         </button>
         <p
           v-if="nameTreeError"
+          v-show="treeNotesExpanded"
           class="toponym-results-panel__error"
         >
           {{ nameTreeError }}
         </p>
         <p
           v-else-if="!nameTreeLoaded"
+          v-show="treeNotesExpanded"
           class="toponym-results-panel__muted toponym-results-panel__name-tree-note"
         >
           {{ t('villages.pages.toponyms.nameTree.idle') }}
         </p>
         <p
           v-else-if="!nameTreeLoading && !nameTreeRows.length"
+          v-show="treeNotesExpanded"
           class="toponym-results-panel__muted toponym-results-panel__name-tree-note"
         >
           {{ t('villages.pages.toponyms.nameTree.empty') }}
@@ -141,7 +179,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const props = defineProps({
@@ -197,6 +235,8 @@ const emit = defineEmits([
   'load-more-name-tree-names',
 ]);
 const { t } = useI18n();
+const summaryExpanded = ref(true);
+const treeNotesExpanded = ref(true);
 
 const nameTreeRows = computed(() => flattenNameTreeNodes(props.nameTree));
 
@@ -320,6 +360,10 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
     &:disabled {
       @include disabled-state;
     }
+  }
+
+  &__disclosure[aria-expanded='true'] {
+    transform: rotate(90deg);
   }
 
   &__tree-list {
