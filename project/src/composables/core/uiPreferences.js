@@ -81,11 +81,17 @@ export function getBrandAssets(theme) {
       decoration: '/brand/GreenCircle.webp',
     }
   }
+  if (normalizedTheme === COLOR_THEME_BLUE_DARK) {
+    return {
+      logo: '/brand/theme-previews/favicon-blue-dark.png',
+      title: '/brand/theme-previews/title-dark.png',
+      decoration: '/brand/theme-previews/circle-blue-dark.webp',
+    }
+  }
   // Existing asset filenames are independent of the canonical theme identifiers.
   const assetName = {
     [COLOR_THEME_BLUE_LIGHT]: 'blue',
     [COLOR_THEME_RED_LIGHT]: 'light',
-    [COLOR_THEME_BLUE_DARK]: 'dark',
     [COLOR_THEME_RED_DARK]: 'light',
     [COLOR_THEME_GREEN_DARK]: 'green',
   }[normalizedTheme]
