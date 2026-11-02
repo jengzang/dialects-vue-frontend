@@ -98,7 +98,7 @@
     "villages": {
       "title": "Natural Village Data",
       "desc": "Distribution, analysis, and mapping of natural-village names",
-      "toponyms": "Village Toponym Distribution - Map the distribution of Chinese characters in village names across regions and explore place-name patterns",
+      "toponyms": "Village Toponym Distribution - Enter a Chinese character to explore its distribution across natural-village names",
       "gdVillages": "Guangdong Natural Villages - Natural-village tree and dialect distribution map of Guangdong Province",
       "villagesML": "Machine Learning - Apply machine-learning methods to analyze natural-village names",
       "gdVillagesTable": "Guangdong Village Table - Detailed village data for Guangdong",

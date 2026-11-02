@@ -211,7 +211,7 @@
     },
     "exploreVillagesToponyms": {
       "title": "地名检索",
-      "description": "自然村地名检索与分布地图开发中，规划按村名及行政信息查询村落；"
+      "description": "查询汉字在各地自然村地名中的分布，探索各地的地名规律、特点"
     },
     "exploreVillagesGd": {
       "title": "广东自然村树",
