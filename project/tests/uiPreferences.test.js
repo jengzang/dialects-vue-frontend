@@ -108,6 +108,7 @@ describe('uiPreferences color theme', () => {
     expect(document.documentElement.dataset.colorTheme).toBe(COLOR_THEME_BLUE_DARK)
 
     window.localStorage.setItem('dialects-color-theme', COLOR_THEME_RED_LIGHT)
+    window.localStorage.removeItem('dialects-color-mode')
 
     initializeUiPreferences()
 

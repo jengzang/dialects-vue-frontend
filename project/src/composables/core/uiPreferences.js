@@ -2,6 +2,7 @@ import { ref } from 'vue'
 
 const UI_MODE_STORAGE_KEY = 'dialects-ui-mode'
 const COLOR_THEME_STORAGE_KEY = 'dialects-color-theme'
+const COLOR_MODE_STORAGE_KEY = 'dialects-color-mode'
 const ICON_MODE_STORAGE_KEY = 'dialects-icon-mode'
 
 export const ICON_MODE_ALL_EMOJI = 'all-emoji'
@@ -38,7 +39,10 @@ const LEGACY_COLOR_THEMES = {
   dark: COLOR_THEME_BLUE_DARK,
   green: COLOR_THEME_GREEN_DARK,
 }
+const VALID_COLOR_MODES = new Set(['light', 'dark', 'system'])
+let systemColorMedia
 
+export const currentColorMode = ref(getStoredColorMode())
 export const currentColorTheme = ref(getStoredColorTheme())
 export const currentInterfaceMode = ref(getStoredInterfaceMode())
 export const currentIconMode = ref(getStoredIconMode())
@@ -121,16 +125,43 @@ export function applyInterfaceMode(mode) {
 }
 
 export function getStoredColorTheme() {
-  if (typeof window === 'undefined') {
-    return COLOR_THEME_DEFAULT
-  }
+  const stored = readColorPreference(COLOR_THEME_STORAGE_KEY)
+  return getColorThemeFor(getColorThemeParts(stored).family, resolveColorMode(getStoredColorMode()))
+}
 
+function readColorPreference(key) {
+  if (typeof window === 'undefined') return null
   try {
-    return normalizeColorTheme(window.localStorage.getItem(COLOR_THEME_STORAGE_KEY))
+    return window.localStorage.getItem(key)
   } catch (error) {
-    console.warn('Failed to read color theme from localStorage:', error)
-    return COLOR_THEME_DEFAULT
+    console.warn('Failed to read color preference from localStorage:', error)
+    return null
   }
+}
+
+function hasStoredColorTheme(theme) {
+  return VALID_COLOR_THEMES.has(theme) || Object.hasOwn(LEGACY_COLOR_THEMES, theme)
+}
+
+export function getStoredColorMode() {
+  const mode = readColorPreference(COLOR_MODE_STORAGE_KEY)
+  if (VALID_COLOR_MODES.has(mode)) return mode
+  const theme = readColorPreference(COLOR_THEME_STORAGE_KEY)
+  // Old palettes encode a deliberate brightness choice. Keep it even if it
+  // was saved automatically by the old initialization; its origin is unknown.
+  return hasStoredColorTheme(theme) ? getColorThemeParts(theme).mode : 'system'
+}
+
+function resolveColorMode(mode) {
+  if (mode !== 'system') return mode
+  return typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
+
+function handleSystemColorChange() {
+  if (currentColorMode.value !== 'system') return
+  const theme = getColorThemeFor(getColorThemeParts(currentColorTheme.value).family, resolveColorMode('system'))
+  currentColorTheme.value = theme
+  applyColorTheme(theme)
 }
 
 export function applyColorTheme(theme) {
@@ -188,8 +219,17 @@ export function initializeInterfaceMode() {
 }
 
 export function initializeColorTheme() {
-  const theme = setStoredColorTheme(getStoredColorTheme())
+  // Normalize existing identifiers without turning a first visit into a saved choice.
+  const stored = readColorPreference(COLOR_THEME_STORAGE_KEY)
+  currentColorMode.value = getStoredColorMode()
+  if (hasStoredColorTheme(stored)) setStoredColorTheme(stored)
+  const theme = getStoredColorTheme()
   currentColorTheme.value = theme
+  if (systemColorMedia?.removeEventListener) systemColorMedia.removeEventListener('change', handleSystemColorChange)
+  else systemColorMedia?.removeListener?.(handleSystemColorChange)
+  systemColorMedia = typeof window !== 'undefined' ? window.matchMedia?.('(prefers-color-scheme: dark)') : null
+  if (systemColorMedia?.addEventListener) systemColorMedia.addEventListener('change', handleSystemColorChange)
+  else systemColorMedia?.addListener?.(handleSystemColorChange)
   return applyColorTheme(theme)
 }
 
@@ -206,9 +246,30 @@ export function setInterfaceMode(mode) {
 }
 
 export function setColorTheme(theme) {
-  const normalizedTheme = setStoredColorTheme(theme)
+  const { family, mode } = getColorThemeParts(theme)
+  return saveColorSelection(family, mode)
+}
+
+function saveColorSelection(family, mode) {
+  currentColorMode.value = mode
+  if (typeof window !== 'undefined') {
+    try {
+      window.localStorage.setItem(COLOR_MODE_STORAGE_KEY, mode)
+    } catch (error) {
+      console.warn('Failed to save color mode to localStorage:', error)
+    }
+  }
+  const normalizedTheme = setStoredColorTheme(getColorThemeFor(family, resolveColorMode(mode)))
   currentColorTheme.value = normalizedTheme
   return applyColorTheme(normalizedTheme)
+}
+
+export function setColorFamily(family) {
+  return saveColorSelection(family, currentColorMode.value)
+}
+
+export function setColorMode(mode) {
+  return saveColorSelection(getColorThemeParts(currentColorTheme.value).family, VALID_COLOR_MODES.has(mode) ? mode : 'system')
 }
 
 export function getStoredIconMode() {
