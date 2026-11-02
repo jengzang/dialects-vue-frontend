@@ -57,6 +57,11 @@ const LAYOUT_FOOTER_PATHS = [
 ]
 
 describe('layout footer context', () => {
+  it.each(['red-dark', 'green-light'])('labels the new %s combination without falling back to blue', async theme => {
+    const { resolveLayoutFooterContext } = await import('../src/main/config/layoutFooter.js')
+    expect(resolveLayoutFooterContext({ route: { path: '/menu/settings' }, locale: 'en', colorTheme: theme }).themeLabelKey)
+      .toBe(`layoutFooter.theme.${theme}`)
+  })
   it('resolves route-specific copy for known menu routes', async () => {
     const { resolveLayoutFooterContext } = await import('../src/main/config/layoutFooter.js')
 

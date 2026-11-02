@@ -215,6 +215,11 @@
       "title": "Color Theme",
       "description": "Choose the overall color scheme for page backgrounds, glass panels, and text.",
       "label": "Current Theme",
+      "modeTitle": "Appearance",
+      "modes": {
+        "light": "Light",
+        "dark": "Dark"
+      },
       "options": {
         "blue": "Blue",
         "light": "Red",

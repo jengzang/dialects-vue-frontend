@@ -21,10 +21,12 @@
     "en": "English"
   },
   "theme": {
-    "blue": "Blue",
-    "light": "Red",
-    "dark": "Dark",
-    "green": "Green"
+    "blue": "Blue · Light",
+    "light": "Red · Light",
+    "dark": "Blue · Dark",
+    "green": "Green · Dark",
+    "red-dark": "Red · Dark",
+    "green-light": "Green · Light"
   },
   "pages": {
     "generic": {

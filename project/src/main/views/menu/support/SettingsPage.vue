@@ -70,6 +70,15 @@
             name="settings-color-theme"
             class="settings-radio-group color-theme-radio-group"
           />
+          <h3 class="section-title">
+            {{ $t('navigation.settings.colorTheme.modeTitle') }}
+          </h3>
+          <RadioGroup
+            v-model="colorModeModel"
+            :options="colorModeOptions"
+            name="settings-color-mode"
+            class="settings-radio-group"
+          />
         </div>
         <hr class="setting-split-divider">
         <div class="setting-split-item">
@@ -195,10 +204,8 @@ import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { TABLE_COLUMN_SCHEMAS } from '@/main/config/index.js'
 import {
-  COLOR_THEME_BLUE,
-  COLOR_THEME_DARK,
-  COLOR_THEME_LIGHT,
-  COLOR_THEME_GREEN,
+  getColorThemeParts,
+  getColorThemeFor,
   UI_MODE_DEFAULT,
   UI_MODE_COMPACT,
   ICON_MODE_ALL_EMOJI,
@@ -257,10 +264,9 @@ const colorTheme = ref(getStoredColorTheme())
 const iconMode = ref(getStoredIconMode())
 
 const colorThemeOptions = computed(() => [
-  { value: COLOR_THEME_BLUE, label: t('navigation.settings.colorTheme.options.blue') },
-  { value: COLOR_THEME_GREEN, label: t('navigation.settings.colorTheme.options.green') },
-  { value: COLOR_THEME_LIGHT, label: t('navigation.settings.colorTheme.options.light') },
-  { value: COLOR_THEME_DARK, label: t('navigation.settings.colorTheme.options.dark') },
+  { value: 'blue', label: t('navigation.settings.colorTheme.options.blue') },
+  { value: 'red', label: t('navigation.settings.colorTheme.options.light') },
+  { value: 'green', label: t('navigation.settings.colorTheme.options.green') },
 ])
 
 const colorThemeRadioOptions = computed(() =>
@@ -271,8 +277,18 @@ const colorThemeRadioOptions = computed(() =>
 )
 
 const colorThemeModel = computed({
-  get: () => colorTheme.value,
-  set: (theme) => changeColorTheme(theme)
+  get: () => getColorThemeParts(colorTheme.value).family,
+  set: (family) => changeColorTheme(getColorThemeFor(family, getColorThemeParts(colorTheme.value).mode))
+})
+
+const colorModeOptions = computed(() => [
+  { value: 'light', label: t('navigation.settings.colorTheme.modes.light') },
+  { value: 'dark', label: t('navigation.settings.colorTheme.modes.dark') },
+])
+
+const colorModeModel = computed({
+  get: () => getColorThemeParts(colorTheme.value).mode,
+  set: (mode) => changeColorTheme(getColorThemeFor(getColorThemeParts(colorTheme.value).family, mode))
 })
 
 const interfaceModeOptions = computed(() => [
@@ -484,16 +500,13 @@ $text-muted: var(--text-tertiary);
   }
 
   :deep(.liquid-radio-label:nth-child(1) .liquid-radio-text::before) {
-    background: #007aff;
+    background: var(--theme-preview-blue);
   }
   :deep(.liquid-radio-label:nth-child(2) .liquid-radio-text::before) {
-    background: #388e3c;
-  }
-  :deep(.liquid-radio-label:nth-child(3) .liquid-radio-text::before) {
     background: var(--theme-preview-red);
   }
-  :deep(.liquid-radio-label:nth-child(4) .liquid-radio-text::before) {
-    background: linear-gradient(135deg, #0d1117 50%, #21262d 50%);
+  :deep(.liquid-radio-label:nth-child(3) .liquid-radio-text::before) {
+    background: var(--theme-preview-green);
   }
 }
 

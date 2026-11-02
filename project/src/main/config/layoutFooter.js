@@ -245,6 +245,8 @@ const THEME_LABEL_KEYS = {
   light: 'layoutFooter.theme.light',
   dark: 'layoutFooter.theme.dark',
   green: 'layoutFooter.theme.green',
+  'red-dark': 'layoutFooter.theme.red-dark',
+  'green-light': 'layoutFooter.theme.green-light',
 }
 
 function hasTutorialEntry(route) {

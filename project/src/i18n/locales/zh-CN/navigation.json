@@ -215,6 +215,11 @@
       "title": "主题配色",
       "description": "选择页面背景、玻璃面板与文字的整体配色。",
       "label": "当前配色",
+      "modeTitle": "明暗模式",
+      "modes": {
+        "light": "浅色",
+        "dark": "深色"
+      },
       "options": {
         "blue": "蓝色",
         "light": "红色",

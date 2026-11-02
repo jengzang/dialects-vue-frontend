@@ -212,7 +212,7 @@ describe('share card helper', () => {
     expect(qrBlocks.length).toBeGreaterThan(80)
   })
 
-  it.each(['blue', 'light', 'green', 'dark'])('draws matching %s brand images when they load', async colorTheme => {
+  it.each(['blue', 'light', 'green', 'dark', 'red-dark', 'green-light'])('draws matching %s brand images when they load', async colorTheme => {
     const calls = []
     const context = {
       fillStyle: '',
@@ -254,9 +254,11 @@ describe('share card helper', () => {
       loadImage,
     })
 
-    const titleSrc = colorTheme === 'blue' ? '/brand/title.webp' : `/brand/theme-previews/title-${colorTheme}.png`
-    const circleSrc = colorTheme === 'blue' ? '/brand/BlueCircle.webp' : `/brand/theme-previews/logo-${colorTheme}.png`
-    const logoSrc = `/brand/theme-previews/favicon-${colorTheme}.png`
+    const brandTheme = colorTheme === 'red-dark' ? 'dark' : colorTheme
+    const originalGreen = colorTheme === 'green-light'
+    const titleSrc = originalGreen || colorTheme === 'blue' ? '/brand/title.webp' : `/brand/theme-previews/title-${brandTheme}.png`
+    const circleSrc = originalGreen ? '/brand/GreenCircle.webp' : colorTheme === 'blue' ? '/brand/BlueCircle.webp' : `/brand/theme-previews/logo-${brandTheme}.png`
+    const logoSrc = originalGreen ? '/brand/favicon_green.ico' : `/brand/theme-previews/favicon-${brandTheme}.png`
     for (const src of [titleSrc, circleSrc, logoSrc]) {
       expect(loadImage).toHaveBeenCalledWith(src)
       expect(calls.some(call => call[0] === 'drawImage' && call[1].src === src)).toBe(true)
