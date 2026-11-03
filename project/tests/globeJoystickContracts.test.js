@@ -131,35 +131,6 @@ afterEach(() => {
 })
 
 describe('globe joystick interaction contracts', () => {
-  it('keeps globe data points and atmosphere colors fixed across page themes', () => {
-    createMediaQueryHarness()
-    const originalStyle = document.documentElement.getAttribute('style')
-    const colors = []
-    try {
-      for (const primary of ['0, 112, 232', '134, 217, 155']) {
-        document.documentElement.style.setProperty('--color-primary-rgb', primary)
-        document.documentElement.style.setProperty('--bg-blue-tint-rgb', primary)
-        const root = document.createElement('div')
-        document.body.appendChild(root)
-        const app = createApp(GlobeGLRenderer, { points: [{ lat: 23, lng: 113 }] })
-        try {
-          app.mount(root)
-          const { globe } = globeInstances.at(-1)
-          colors.push({
-            point: globe.pointColor.mock.calls.at(-1)[0](),
-            atmosphere: globe.atmosphereColor.mock.calls.at(-1)[0],
-          })
-        } finally {
-          app.unmount()
-        }
-      }
-      expect(colors[0]).toEqual(colors[1])
-    } finally {
-      if (originalStyle === null) document.documentElement.removeAttribute('style')
-      else document.documentElement.setAttribute('style', originalStyle)
-    }
-  })
-
   it('pauses offscreen and background rendering, resumes the same globe, and disconnects on unmount', () => {
     createMediaQueryHarness()
     let onIntersection

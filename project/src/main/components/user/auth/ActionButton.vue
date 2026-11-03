@@ -75,7 +75,7 @@ $gradient-variants: (
   max-width: 180px;
   margin: 0 auto;
   padding: 14px 18px;
-  color: var(--action-primary-text);
+  color: white;
   font-size: var(--font-size-16);
   font-weight: 600;
   cursor: pointer;
@@ -116,9 +116,9 @@ $gradient-variants: (
     }
   }
 
-  &.yellow {
-    color: var(--text-white);
-  }
+  // &.yellow {
+  //   color: var(--text-white);
+  // }
 
   &.teal {
     box-shadow: 0 4px 12px rgba(90, 200, 250, 0.3);
