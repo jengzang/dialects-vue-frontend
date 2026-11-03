@@ -10,7 +10,7 @@
         // 判断是否是要加载的图标URL
         if (originalSrc && originalSrc.includes('c-webapi.amap.com/style_icon')) {
             // 替换成根目录下的自定义favicon.ico
-            img.src = '/favicon.ico'; // 根目录下的图标路径
+            img.src = '/brand/favicon.ico'; // 品牌图标路径
         }
 
         return img;

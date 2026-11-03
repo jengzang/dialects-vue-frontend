@@ -83,9 +83,9 @@ export function getBrandAssets(theme) {
   }
   if (normalizedTheme === COLOR_THEME_BLUE_DARK) {
     return {
-      logo: '/brand/theme-previews/favicon-blue-dark.png',
-      title: '/brand/theme-previews/title-dark.png',
-      decoration: '/brand/theme-previews/circle-blue-dark.webp',
+      logo: '/brand/themes/favicon-blue-dark.webp',
+      title: '/brand/themes/title-dark.webp',
+      decoration: '/brand/themes/circle-blue-dark.webp',
     }
   }
   // Existing asset filenames are independent of the canonical theme identifiers.
@@ -96,9 +96,9 @@ export function getBrandAssets(theme) {
     [COLOR_THEME_GREEN_DARK]: 'green',
   }[normalizedTheme]
   return {
-    logo: `/brand/theme-previews/favicon-${assetName}.png`,
-    title: normalizedTheme === COLOR_THEME_RED_DARK ? '/brand/theme-previews/title-red-dark.png' : normalizedTheme === COLOR_THEME_BLUE_LIGHT ? '/brand/title.webp' : `/brand/theme-previews/title-${assetName}.png`,
-    decoration: normalizedTheme === COLOR_THEME_BLUE_LIGHT ? '/brand/BlueCircle.webp' : `/brand/theme-previews/logo-${assetName}.png`,
+    logo: `/brand/themes/favicon-${assetName}.webp`,
+    title: normalizedTheme === COLOR_THEME_RED_DARK ? '/brand/themes/title-red-dark.webp' : normalizedTheme === COLOR_THEME_BLUE_LIGHT ? '/brand/title.webp' : `/brand/themes/title-${assetName}.webp`,
+    decoration: normalizedTheme === COLOR_THEME_BLUE_LIGHT ? '/brand/BlueCircle.webp' : `/brand/themes/logo-${assetName}.webp`,
   }
 }
 

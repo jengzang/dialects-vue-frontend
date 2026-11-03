@@ -56,7 +56,7 @@ describe('uiPreferences color theme', () => {
       logo: '/brand/favicon_green.ico', title: '/brand/title.webp', decoration: '/brand/GreenCircle.webp',
     })
     expect(getBrandAssets('red-dark')).toEqual({
-      ...getBrandAssets('red-light'), title: '/brand/theme-previews/title-red-dark.png',
+      ...getBrandAssets('red-light'), title: '/brand/themes/title-red-dark.webp',
     })
     setColorTheme('green-light')
     expect(document.querySelector('link[rel="icon"]').type).toBe('image/x-icon')
@@ -68,7 +68,7 @@ describe('uiPreferences color theme', () => {
     expect(getColorThemeFor('green', 'invalid')).toBe('green-light')
   })
   beforeEach(() => {
-    document.head.innerHTML = '<link rel="icon" type="image/x-icon" href="/favicon.ico">'
+    document.head.innerHTML = '<link rel="icon" type="image/x-icon" href="/brand/favicon.ico">'
     window.localStorage.clear()
     document.documentElement.removeAttribute('data-color-theme')
     document.documentElement.removeAttribute('data-ui-mode')
@@ -78,13 +78,13 @@ describe('uiPreferences color theme', () => {
     ['blue-light', 'blue'], ['red-light', 'light'], ['green-dark', 'green'], ['blue-dark', 'blue-dark'],
   ])('selects existing %s brand assets and keeps the browser icon stable', (theme, assetName) => {
     const assets = getBrandAssets(theme)
-    expect(assets.logo).toBe(`/brand/theme-previews/favicon-${assetName}.png`)
-    expect(assets.title).toBe(theme === 'blue-light' ? '/brand/title.webp' : theme === 'blue-dark' ? '/brand/theme-previews/title-dark.png' : `/brand/theme-previews/title-${assetName}.png`)
-    expect(assets.decoration).toBe(theme === 'blue-light' ? '/brand/BlueCircle.webp' : theme === 'blue-dark' ? '/brand/theme-previews/circle-blue-dark.webp' : `/brand/theme-previews/logo-${assetName}.png`)
+    expect(assets.logo).toBe(`/brand/themes/favicon-${assetName}.webp`)
+    expect(assets.title).toBe(theme === 'blue-light' ? '/brand/title.webp' : theme === 'blue-dark' ? '/brand/themes/title-dark.webp' : `/brand/themes/title-${assetName}.webp`)
+    expect(assets.decoration).toBe(theme === 'blue-light' ? '/brand/BlueCircle.webp' : theme === 'blue-dark' ? '/brand/themes/circle-blue-dark.webp' : `/brand/themes/logo-${assetName}.webp`)
     const publicDir = resolve(dirname(fileURLToPath(import.meta.url)), '../public')
     for (const path of Object.values(assets)) expect(existsSync(resolve(publicDir, path.slice(1)))).toBe(true)
     setColorTheme(theme)
-    expect(document.querySelector('link[rel="icon"]').getAttribute('href')).toBe('/favicon.ico')
+    expect(document.querySelector('link[rel="icon"]').getAttribute('href')).toBe('/brand/favicon.ico')
     expect(document.querySelector('link[rel="icon"]').type).toBe('image/x-icon')
   })
 

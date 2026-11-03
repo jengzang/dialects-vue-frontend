@@ -254,11 +254,11 @@ describe('share card helper', () => {
       loadImage,
     })
 
-    const brandTheme = { 'blue-light': 'blue', 'red-light': 'light', 'green-dark': 'green', 'blue-dark': 'dark', 'red-dark': 'light' }[colorTheme]
+    const brandTheme = { 'blue-light': 'blue', 'red-light': 'light', 'green-dark': 'green', 'blue-dark': 'blue-dark', 'red-dark': 'light' }[colorTheme]
     const originalGreen = colorTheme === 'green-light'
-    const titleSrc = colorTheme === 'red-dark' ? '/brand/theme-previews/title-red-dark.png' : originalGreen || colorTheme === 'blue-light' ? '/brand/title.webp' : `/brand/theme-previews/title-${brandTheme}.png`
-    const circleSrc = originalGreen ? '/brand/GreenCircle.webp' : colorTheme === 'blue-light' ? '/brand/BlueCircle.webp' : `/brand/theme-previews/logo-${brandTheme}.png`
-    const logoSrc = originalGreen ? '/brand/favicon_green.ico' : `/brand/theme-previews/favicon-${brandTheme}.png`
+    const titleSrc = colorTheme === 'red-dark' ? '/brand/themes/title-red-dark.webp' : originalGreen || colorTheme === 'blue-light' ? '/brand/title.webp' : colorTheme === 'blue-dark' ? '/brand/themes/title-dark.webp' : `/brand/themes/title-${brandTheme}.webp`
+    const circleSrc = originalGreen ? '/brand/GreenCircle.webp' : colorTheme === 'blue-light' ? '/brand/BlueCircle.webp' : colorTheme === 'blue-dark' ? '/brand/themes/circle-blue-dark.webp' : `/brand/themes/logo-${brandTheme}.webp`
+    const logoSrc = originalGreen ? '/brand/favicon_green.ico' : `/brand/themes/favicon-${brandTheme}.webp`
     for (const src of [titleSrc, circleSrc, logoSrc]) {
       expect(loadImage).toHaveBeenCalledWith(src)
       expect(calls.some(call => call[0] === 'drawImage' && call[1].src === src)).toBe(true)

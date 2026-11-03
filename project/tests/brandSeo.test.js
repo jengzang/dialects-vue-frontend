@@ -11,6 +11,8 @@ describe('public brand metadata', () => {
       const html = readFileSync(resolve(root, entry), 'utf8')
       const doc = new DOMParser().parseFromString(html, 'text/html')
       const icon = doc.querySelector('link[rel="icon"]')
+      expect(icon.getAttribute('href')).toBe('/brand/favicon.ico')
+      expect(icon.getAttribute('type')).toBe('image/x-icon')
       expect(existsSync(resolve(root, 'public', icon.getAttribute('href').slice(1)))).toBe(true)
       if (entry !== 'index.html') continue
       const organizations = [...doc.querySelectorAll('script[type="application/ld+json"]')]
