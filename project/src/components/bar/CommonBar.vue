@@ -4,7 +4,7 @@
     <div ref="desktopRef" class="commonbar-desktop">
       <div class="logo-and-title" @click="toggleSidebar" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
         <div class="logo-container">
-          <img class="logo" :src="faviconSrc" alt="Logo" />
+          <img class="logo" :src="faviconSrc" alt="方音圖鑑" />
         </div>
         <div v-if="titleImage" class="title">
           <img :src="titleImage" alt="Title" />
@@ -94,7 +94,7 @@
     <!-- 移动端：单行布局（无 title.png） -->
     <div class="commonbar-mobile">
       <div class="logo-container" @click="toggleSidebar" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
-        <img class="logo" :src="faviconSrc" alt="Logo" />
+        <img class="logo" :src="faviconSrc" alt="方音圖鑑" />
       </div>
       <div v-if="title && showTitleOnMobile" class="title-text-mobile">
         {{ title }}

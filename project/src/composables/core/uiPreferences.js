@@ -180,10 +180,6 @@ export function applyColorTheme(theme) {
   const { family, mode } = getColorThemeParts(normalizedTheme)
   document.documentElement.dataset.colorFamily = family
   document.documentElement.dataset.colorMode = mode
-  document.querySelectorAll('link[rel="icon"]').forEach((icon) => {
-    icon.href = getBrandAssets(normalizedTheme).logo
-    icon.type = getBrandAssets(normalizedTheme).logo.endsWith('.ico') ? 'image/x-icon' : 'image/png'
-  })
   return normalizedTheme
 }
 

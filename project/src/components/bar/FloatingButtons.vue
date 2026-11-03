@@ -29,7 +29,7 @@
       :title="t('navigation.actions.openMenu')"
 
     >
-      <img class="logo" :src="faviconSrc" alt="Logo" />
+      <img class="logo" :src="faviconSrc" alt="方音圖鑑" />
     </button>
 
     <!-- 打开侧边栏按钮 - 只在非首页时显示 -->

@@ -13,10 +13,10 @@
     >
       <div  class="navbar-item logo-and-title" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
         <div @click="toggleSidebar" class="logo-container desktop-brand-logo">
-          <img class="logo" :src="faviconSrc" alt="Logo" />
+          <img class="logo" :src="faviconSrc" alt="方音圖鑑" />
         </div>
         <div class="title">
-          <img :src="brandTitleSrc" alt="Title" class="title-logo" />
+          <img :src="brandTitleSrc" alt="方音圖鑑" class="title-logo" />
         </div>
       </div>
       <button
@@ -119,10 +119,10 @@
       <div class="navbar-top">
         <div class="navbar-item logo-and-title" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
           <div @click="toggleSidebar" class="logo-container mobile-brand-logo">
-            <img class="logo" :src="faviconSrc" alt="Logo" />
+            <img class="logo" :src="faviconSrc" alt="方音圖鑑" />
           </div>
           <div class="title">
-            <img :src="brandTitleSrc" alt="Title" class="title-logo" />
+            <img :src="brandTitleSrc" alt="方音圖鑑" class="title-logo" />
           </div>
         </div>
         <div class="navbar-top-actions">

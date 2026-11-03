@@ -75,17 +75,17 @@ describe('uiPreferences color theme', () => {
   })
 
   it.each([
-    ['blue-light', 'blue'], ['red-light', 'light'], ['green-dark', 'green'], ['blue-dark', 'dark'],
-  ])('selects existing %s brand assets and updates the browser icon', (theme, assetName) => {
+    ['blue-light', 'blue'], ['red-light', 'light'], ['green-dark', 'green'], ['blue-dark', 'blue-dark'],
+  ])('selects existing %s brand assets and keeps the browser icon stable', (theme, assetName) => {
     const assets = getBrandAssets(theme)
     expect(assets.logo).toBe(`/brand/theme-previews/favicon-${assetName}.png`)
-    expect(assets.title).toBe(theme === 'blue-light' ? '/brand/title.webp' : `/brand/theme-previews/title-${assetName}.png`)
-    expect(assets.decoration).toBe(theme === 'blue-light' ? '/brand/BlueCircle.webp' : `/brand/theme-previews/logo-${assetName}.png`)
+    expect(assets.title).toBe(theme === 'blue-light' ? '/brand/title.webp' : theme === 'blue-dark' ? '/brand/theme-previews/title-dark.png' : `/brand/theme-previews/title-${assetName}.png`)
+    expect(assets.decoration).toBe(theme === 'blue-light' ? '/brand/BlueCircle.webp' : theme === 'blue-dark' ? '/brand/theme-previews/circle-blue-dark.webp' : `/brand/theme-previews/logo-${assetName}.png`)
     const publicDir = resolve(dirname(fileURLToPath(import.meta.url)), '../public')
     for (const path of Object.values(assets)) expect(existsSync(resolve(publicDir, path.slice(1)))).toBe(true)
     setColorTheme(theme)
-    expect(document.querySelector('link[rel="icon"]').getAttribute('href')).toBe(assets.logo)
-    expect(document.querySelector('link[rel="icon"]').type).toBe('image/png')
+    expect(document.querySelector('link[rel="icon"]').getAttribute('href')).toBe('/favicon.ico')
+    expect(document.querySelector('link[rel="icon"]').type).toBe('image/x-icon')
   })
 
   it('falls back to blue brand assets for an unsupported theme', () => {

@@ -3,10 +3,10 @@
     <div ref="desktopRef" class="explorebar-desktop">
       <div class="logo-and-title" @click="toggleSidebar" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
         <div class="logo-container">
-          <img class="logo" :src="faviconSrc" alt="Logo" />
+          <img class="logo" :src="faviconSrc" alt="方音圖鑑" />
         </div>
         <div class="title">
-          <img :src="brandTitleSrc" alt="Title" class="title-logo" />
+          <img :src="brandTitleSrc" alt="方音圖鑑" class="title-logo" />
         </div>
       </div>
 
@@ -87,7 +87,7 @@
 
     <div class="explorebar-mobile">
       <div class="logo-container" @click="toggleSidebar" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
-        <img class="logo" :src="faviconSrc" alt="Logo" />
+        <img class="logo" :src="faviconSrc" alt="方音圖鑑" />
       </div>
 
       <nav
