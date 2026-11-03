@@ -254,11 +254,15 @@ describe('share card helper', () => {
       loadImage,
     })
 
-    const brandTheme = { 'blue-light': 'blue', 'red-light': 'light', 'green-dark': 'green', 'blue-dark': 'blue-dark', 'red-dark': 'light' }[colorTheme]
-    const originalGreen = colorTheme === 'green-light'
-    const titleSrc = colorTheme === 'red-dark' ? '/brand/themes/title-red-dark.webp' : originalGreen || colorTheme === 'blue-light' ? '/brand/title.webp' : colorTheme === 'blue-dark' ? '/brand/themes/title-dark.webp' : `/brand/themes/title-${brandTheme}.webp`
-    const circleSrc = originalGreen ? '/brand/GreenCircle.webp' : colorTheme === 'blue-light' ? '/brand/BlueCircle.webp' : colorTheme === 'blue-dark' ? '/brand/themes/circle-blue-dark.webp' : `/brand/themes/logo-${brandTheme}.webp`
-    const logoSrc = originalGreen ? '/brand/favicon_green.ico' : `/brand/themes/favicon-${brandTheme}.webp`
+    const assetsByTheme = {
+      'blue-light': ['/brand/title.webp', '/brand/BlueCircle.webp', '/brand/favicon.ico'],
+      'blue-dark': ['/brand/blue/title-dark.webp', '/brand/blue/decoration-dark.webp', '/brand/blue/icon-dark.webp'],
+      'red-light': ['/brand/red/title-light.webp', '/brand/red/decoration.webp', '/brand/red/icon.webp'],
+      'red-dark': ['/brand/red/title-dark.webp', '/brand/red/decoration.webp', '/brand/red/icon.webp'],
+      'green-light': ['/brand/title.webp', '/brand/green/decoration-light.webp', '/brand/green/icon-light.ico'],
+      'green-dark': ['/brand/green/title-dark.webp', '/brand/green/decoration-dark.webp', '/brand/green/icon-dark.webp'],
+    }
+    const [titleSrc, circleSrc, logoSrc] = assetsByTheme[colorTheme]
     for (const src of [titleSrc, circleSrc, logoSrc]) {
       expect(loadImage).toHaveBeenCalledWith(src)
       expect(calls.some(call => call[0] === 'drawImage' && call[1].src === src)).toBe(true)

@@ -53,10 +53,10 @@ describe('uiPreferences color theme', () => {
 
   it('reuses the original green artwork for green light and red light artwork for red dark', () => {
     expect(getBrandAssets('green-light')).toEqual({
-      logo: '/brand/favicon_green.ico', title: '/brand/title.webp', decoration: '/brand/GreenCircle.webp',
+      logo: '/brand/green/icon-light.ico', title: '/brand/title.webp', decoration: '/brand/green/decoration-light.webp',
     })
     expect(getBrandAssets('red-dark')).toEqual({
-      ...getBrandAssets('red-light'), title: '/brand/themes/title-red-dark.webp',
+      ...getBrandAssets('red-light'), title: '/brand/red/title-dark.webp',
     })
     setColorTheme('green-light')
     expect(document.querySelector('link[rel="icon"]').type).toBe('image/x-icon')
@@ -75,12 +75,15 @@ describe('uiPreferences color theme', () => {
   })
 
   it.each([
-    ['blue-light', 'blue'], ['red-light', 'light'], ['green-dark', 'green'], ['blue-dark', 'blue-dark'],
-  ])('selects existing %s brand assets and keeps the browser icon stable', (theme, assetName) => {
+    ['blue-light', '/brand/favicon.ico', '/brand/title.webp', '/brand/BlueCircle.webp'],
+    ['blue-dark', '/brand/blue/icon-dark.webp', '/brand/blue/title-dark.webp', '/brand/blue/decoration-dark.webp'],
+    ['red-light', '/brand/red/icon.webp', '/brand/red/title-light.webp', '/brand/red/decoration.webp'],
+    ['red-dark', '/brand/red/icon.webp', '/brand/red/title-dark.webp', '/brand/red/decoration.webp'],
+    ['green-light', '/brand/green/icon-light.ico', '/brand/title.webp', '/brand/green/decoration-light.webp'],
+    ['green-dark', '/brand/green/icon-dark.webp', '/brand/green/title-dark.webp', '/brand/green/decoration-dark.webp'],
+  ])('selects existing %s brand assets and keeps the browser icon stable', (theme, logo, title, decoration) => {
     const assets = getBrandAssets(theme)
-    expect(assets.logo).toBe(`/brand/themes/favicon-${assetName}.webp`)
-    expect(assets.title).toBe(theme === 'blue-light' ? '/brand/title.webp' : theme === 'blue-dark' ? '/brand/themes/title-dark.webp' : `/brand/themes/title-${assetName}.webp`)
-    expect(assets.decoration).toBe(theme === 'blue-light' ? '/brand/BlueCircle.webp' : theme === 'blue-dark' ? '/brand/themes/circle-blue-dark.webp' : `/brand/themes/logo-${assetName}.webp`)
+    expect(assets).toEqual({ logo, title, decoration })
     const publicDir = resolve(dirname(fileURLToPath(import.meta.url)), '../public')
     for (const path of Object.values(assets)) expect(existsSync(resolve(publicDir, path.slice(1)))).toBe(true)
     setColorTheme(theme)

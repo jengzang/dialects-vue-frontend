@@ -73,33 +73,39 @@ export function isDarkColorTheme(theme) {
 }
 
 export function getBrandAssets(theme) {
-  const normalizedTheme = normalizeColorTheme(theme)
-  if (normalizedTheme === COLOR_THEME_GREEN_LIGHT) {
-    return {
-      logo: '/brand/favicon_green.ico',
+  const assets = {
+    [COLOR_THEME_BLUE_LIGHT]: {
+      logo: '/brand/favicon.ico',
       title: '/brand/title.webp',
-      decoration: '/brand/GreenCircle.webp',
-    }
+      decoration: '/brand/BlueCircle.webp',
+    },
+    [COLOR_THEME_BLUE_DARK]: {
+      logo: '/brand/blue/icon-dark.webp',
+      title: '/brand/blue/title-dark.webp',
+      decoration: '/brand/blue/decoration-dark.webp',
+    },
+    [COLOR_THEME_RED_LIGHT]: {
+      logo: '/brand/red/icon.webp',
+      title: '/brand/red/title-light.webp',
+      decoration: '/brand/red/decoration.webp',
+    },
+    [COLOR_THEME_RED_DARK]: {
+      logo: '/brand/red/icon.webp',
+      title: '/brand/red/title-dark.webp',
+      decoration: '/brand/red/decoration.webp',
+    },
+    [COLOR_THEME_GREEN_LIGHT]: {
+      logo: '/brand/green/icon-light.ico',
+      title: '/brand/title.webp',
+      decoration: '/brand/green/decoration-light.webp',
+    },
+    [COLOR_THEME_GREEN_DARK]: {
+      logo: '/brand/green/icon-dark.webp',
+      title: '/brand/green/title-dark.webp',
+      decoration: '/brand/green/decoration-dark.webp',
+    },
   }
-  if (normalizedTheme === COLOR_THEME_BLUE_DARK) {
-    return {
-      logo: '/brand/themes/favicon-blue-dark.webp',
-      title: '/brand/themes/title-dark.webp',
-      decoration: '/brand/themes/circle-blue-dark.webp',
-    }
-  }
-  // Existing asset filenames are independent of the canonical theme identifiers.
-  const assetName = {
-    [COLOR_THEME_BLUE_LIGHT]: 'blue',
-    [COLOR_THEME_RED_LIGHT]: 'light',
-    [COLOR_THEME_RED_DARK]: 'light',
-    [COLOR_THEME_GREEN_DARK]: 'green',
-  }[normalizedTheme]
-  return {
-    logo: `/brand/themes/favicon-${assetName}.webp`,
-    title: normalizedTheme === COLOR_THEME_RED_DARK ? '/brand/themes/title-red-dark.webp' : normalizedTheme === COLOR_THEME_BLUE_LIGHT ? '/brand/title.webp' : `/brand/themes/title-${assetName}.webp`,
-    decoration: normalizedTheme === COLOR_THEME_BLUE_LIGHT ? '/brand/BlueCircle.webp' : `/brand/themes/logo-${assetName}.webp`,
-  }
+  return assets[normalizeColorTheme(theme)]
 }
 
 function normalizeIconMode(mode) {
