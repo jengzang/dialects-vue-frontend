@@ -678,9 +678,9 @@ $font-size-width-scales: (
   --glass-90: rgba(var(--glass-tint-rgb), 0.96);
 
   /* ── 語義表面（GitHub 層級：canvas.subtle / overlay / inset）── */
-  --surface-panel: #161b22;
-  --surface-panel-hover: #1c2128;
-  --surface-panel-strong: #21262d;
+  --surface-panel: #202f40;
+  --surface-panel-hover: #293a4c;
+  --surface-panel-strong: #304355;
   --surface-panel-subtle: rgba(240, 246, 252, 0.06);
   --surface-glass-button: #21262d;
   --surface-glass-button-hover: #30363d;
@@ -690,7 +690,7 @@ $font-size-width-scales: (
   /* ── 邊框（GitHub border.default / muted）── */
   --border-glass: rgba(240, 246, 252, 0.14);
   --border-glass-subtle: rgba(240, 246, 252, 0.08);
-  --border-control: rgba(240, 246, 252, 0.14);
+  --border-control: rgba(240, 246, 252, 0.24);
   --border-control-focus: rgba(240, 246, 252, 0.32);
   --border-light: rgba(240, 246, 252, 0.06);
   --border-medium: rgba(240, 246, 252, 0.10);
@@ -768,9 +768,9 @@ $font-size-width-scales: (
   --bg-white: var(--surface-elevation-0);
   --bg-light-gray: var(--surface-elevation-2);
   --bg-light: var(--surface-elevation-1);
-  --surface-panel: var(--surface-elevation-0);
-  --surface-panel-hover: #222222;
-  --surface-panel-strong: var(--surface-elevation-1);
+  --surface-panel: #202020;
+  --surface-panel-hover: #2a2a2a;
+  --surface-panel-strong: #303030;
   --surface-glass-button: var(--surface-elevation-1);
   --surface-glass-button-hover: #2a2a2a;
   --bg-blue-tint: var(--bg-body);
@@ -802,7 +802,8 @@ $font-size-width-scales: (
 
 :root[data-color-theme='blue-dark'] {
   /* Give blue dark mode a restrained blue glass edge and highlight. */
-  --glass-tint-rgb: 32, 45, 62;
+  --glass-tint-rgb: 55, 75, 100;
+  --glass-80: rgba(32, 45, 62, 0.96);
   --glass-highlight: rgba(var(--color-primary-rgb), 0.14);
   --bar-background: linear-gradient(
     145deg,
@@ -810,8 +811,8 @@ $font-size-width-scales: (
     rgba(var(--color-primary-rgb), 0.03)
   );
 
-  --border-glass: rgba(var(--color-primary-rgb), 0.22);
-  --border-glass-subtle: rgba(var(--color-primary-rgb), 0.14);
+  --border-glass: rgba(var(--color-primary-rgb), 0.36);
+  --border-glass-subtle: rgba(var(--color-primary-rgb), 0.26);
 
   --shadow-glass: 0 8px 22px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(var(--color-primary-rgb), 0.14);
   --shadow-glass-hover: 0 12px 28px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(var(--color-primary-rgb), 0.14);
@@ -819,7 +820,8 @@ $font-size-width-scales: (
 }
 
 :root[data-color-theme='red-dark'] {
-  --glass-tint-rgb: 35, 27, 29;
+  --glass-tint-rgb: 70, 60, 60;
+  --glass-80: rgba(25, 25, 25, 0.98);
   --glass-highlight: rgba(var(--color-primary-rgb), 0.14);
   --bar-background: linear-gradient(
     145deg,
@@ -827,8 +829,8 @@ $font-size-width-scales: (
     rgba(var(--color-primary-rgb), 0.03)
   );
 
-  --border-glass: rgba(var(--color-primary-rgb), 0.22);
-  --border-glass-subtle: rgba(var(--color-primary-rgb), 0.14);
+  --border-glass: rgba(255, 150, 145, 0.36);
+  --border-glass-subtle: rgba(255, 150, 145, 0.26);
 
   --shadow-glass: 0 8px 22px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(var(--color-primary-rgb), 0.14);
   --shadow-glass-hover: 0 12px 28px rgba(0, 0, 0, 0.48), inset 0 1px 0 rgba(var(--color-primary-rgb), 0.14);
