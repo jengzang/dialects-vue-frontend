@@ -2,7 +2,7 @@
 
 檢視單個方言點的今音與韻書地位之間的對應關係，用餅圖和桑基圖展示聲母、韻母、聲調的歷史演化分佈。
 
-![演化功能總覽](/tutorial/menu-pho-evolution/01-演化功能总览.png)
+![演化功能總覽](/tutorial/menu-pho-evolution/01-演化功能总览.webp)
 
 ## 查詢配置
 
@@ -11,23 +11,23 @@
 - **按今音**：以方言點的現代音值為中心，觀察這些音值分別來自哪些韻書地位
 - **按地位**：以韻書地位為中心，觀察同一類歷史地位在該方言點裏分化成哪些今音
 
-![統計模式](/tutorial/menu-pho-evolution/02-统计模式.png)
+![統計模式](/tutorial/menu-pho-evolution/02-统计模式.webp)
 
 接著選擇要參照的韻書或歷史分類體系。頁面會根據所選韻書提供對應的分類維度，例如上古相關分類、中古音相關分類等。
 
-![支持韻書上古](/tutorial/menu-pho-evolution/03-支持韵书上古.png)
+![支持韻書上古](/tutorial/menu-pho-evolution/03-支持韵书上古.webp)
 
-![支持韻書中古](/tutorial/menu-pho-evolution/04-支持韵书中古.png)
+![支持韻書中古](/tutorial/menu-pho-evolution/04-支持韵书中古.webp)
 
 然後選擇第一層分類和第二層分類。兩層分類不能相同，因為圖表需要用兩個不同維度來拆解對應關係。例如可以用「攝/韻」或「聲類/等呼」這樣的組合來觀察。
 
 地點一次只能選擇一個。可以在輸入框輸入地名進行匹配，也可以從候選列表中直接點選地點。
 
-![地點選擇](/tutorial/menu-pho-evolution/05-地点选择.png)
+![地點選擇](/tutorial/menu-pho-evolution/05-地点选择.webp)
 
 選擇完成後點選「查詢」。查詢完成後，結果區會出現「聲母、韻母、聲調」三個切換入口，可以分別檢視不同音系層面的演化圖。
 
-![聲韻調切換](/tutorial/menu-pho-evolution/06-声韵调切换.png)
+![聲韻調切換](/tutorial/menu-pho-evolution/06-声韵调切换.webp)
 
 ## 按今音檢視
 
@@ -35,11 +35,11 @@
 
 餅圖中央顯示的是今音音值。每個扇區對應第一層分類，扇區大小由該分類下的字數決定；點選或懸停後，還可以繼續看到第二層分類和具體漢字。
 
-![按今音餅圖](/tutorial/menu-pho-evolution/07-按今音饼图.png)
+![按今音餅圖](/tutorial/menu-pho-evolution/07-按今音饼图.webp)
 
 桑基圖按照「音值 → 第一層分類 → 第二層分類」的方向展示。左側是今音，向右流向韻書分類，可以直觀看出某個現代音值是否來源集中，或是否由多個歷史類別合流而成。
 
-![按今音桑基圖](/tutorial/menu-pho-evolution/08-按今音桑基图.png)
+![按今音桑基圖](/tutorial/menu-pho-evolution/08-按今音桑基图.webp)
 
 如果桑基圖連線太密，可以勾選「最佳化連線」。最佳化後會忽略部分字數很少的連線，並重新排布節點，讓主要對應關係更清楚。
 
@@ -49,17 +49,17 @@
 
 圖表不是只看形狀，也可以繼續追到具體字例。滑鼠懸停或單擊餅圖扇區，會在小窗裏按第二層分類展開，並列出對應漢字。
 
-![餅圖小窗](/tutorial/menu-pho-evolution/10-饼图小窗.png)
+![餅圖小窗](/tutorial/menu-pho-evolution/10-饼图小窗.webp)
 
 桑基圖也支援同樣的小窗。放在節點上，可以查看某個音值或某個分類下的字；放在連線上，可以查看這條對應關係裏的具體漢字。
 
-![桑基圖節點小窗](/tutorial/menu-pho-evolution/11-桑基图节点小窗.png)
+![桑基圖節點小窗](/tutorial/menu-pho-evolution/11-桑基图节点小窗.webp)
 
-![桑基圖連線小窗](/tutorial/menu-pho-evolution/12-桑基图连线小窗.png)
+![桑基圖連線小窗](/tutorial/menu-pho-evolution/12-桑基图连线小窗.webp)
 
 桌面端懸停小窗會隨滑鼠離開而消失；如果想固定小窗，單擊圖表元素即可。固定後可以滾輪查看較長的漢字列表，並通過右上角關閉。
 
-![桌面固定小窗](/tutorial/menu-pho-evolution/13-桌面固定小窗.png)
+![桌面固定小窗](/tutorial/menu-pho-evolution/13-桌面固定小窗.webp)
 
 移動端點選後，小窗會固定在底部，適合在小螢幕上慢慢查看字例。
 
@@ -71,27 +71,27 @@
 
 餅圖中央顯示韻書地位的第一層分類，扇區展示該分類下不同今音所佔比例。它特別適合觀察同一歷史類別在某個方言點裏的分裂情況。
 
-![按地位餅圖](/tutorial/menu-pho-evolution/15-按地位饼图.png)
+![按地位餅圖](/tutorial/menu-pho-evolution/15-按地位饼图.webp)
 
 桑基圖按照「第一層分類 → 音值 → 第二層分類」的方向展示。中間的音值節點能幫助你看到歷史類別進入現代讀音後的分合關係。
 
-![按地位桑基圖](/tutorial/menu-pho-evolution/16-按地位桑基图.png)
+![按地位桑基圖](/tutorial/menu-pho-evolution/16-按地位桑基图.webp)
 
 按地位模式下，餅圖和桑基圖同樣支援懸停、點選和固定小窗。可以用它核對某個歷史分類下到底有哪些字，以及這些字分別讀成哪些音值。
 
-![按地位餅圖小窗](/tutorial/menu-pho-evolution/17-按地位饼图小窗.png)
+![按地位餅圖小窗](/tutorial/menu-pho-evolution/17-按地位饼图小窗.webp)
 
-![按地位桑基圖小窗](/tutorial/menu-pho-evolution/18-按地位桑基图小窗.png)
+![按地位桑基圖小窗](/tutorial/menu-pho-evolution/18-按地位桑基图小窗.webp)
 
 ## 繼續查看地點資料
 
 結果頁中的地點名稱可以繼續點選，打開該方言點的詳情。
 
-![地點詳情入口](/tutorial/menu-pho-evolution/19-地点详情入口.png)
+![地點詳情入口](/tutorial/menu-pho-evolution/19-地点详情入口.webp)
 
 地點詳情裏可以快速跳轉到音系、同音字彙、中古演化、音節統計等頁面。研究單點材料時，可以先用演化圖發現音類分合，再跳到這些頁面核對具體音系和字例。
 
-![地點詳情導航](/tutorial/menu-pho-evolution/20-地点详情导航.png)
+![地點詳情導航](/tutorial/menu-pho-evolution/20-地点详情导航.webp)
 
 ## 提示
 

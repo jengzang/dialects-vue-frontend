@@ -2,13 +2,13 @@
 
 选择 2 到 5 个方言点，以同一批汉字为锚点，比较各地点之间的声母、韵母或声调音值对应关系。
 
-![音值比较功能总览](/tutorial/menu-compare-phonetic/01-音值比较功能总览.png)
+![音值比较功能总览](/tutorial/menu-compare-phonetic/01-音值比较功能总览.webp)
 
 ## 基本操作
 
 在配置区输入要比较的地点。最少 2 个，最多 5 个；地点越多，桑基图越能看出链式对应关系，但连线也会更密。
 
-![地点配置](/tutorial/menu-compare-phonetic/02-地点配置.png)
+![地点配置](/tutorial/menu-compare-phonetic/02-地点配置.webp)
 
 常用流程如下：
 
@@ -24,17 +24,17 @@
 
 不勾选「优化连线」时，节点会按默认顺序排列，适合保留原始音值顺序来观察。
 
-![默认连线](/tutorial/menu-compare-phonetic/03-默认连线.png)
+![默认连线](/tutorial/menu-compare-phonetic/03-默认连线.webp)
 
 勾选「优化连线」后，系统会以减少交叉和连线混乱为目标调整节点顺序。它不会改变数据本身，只改变图上的排列方式，让主干对应关系更容易看清。
 
-![优化连线](/tutorial/menu-compare-phonetic/04-优化连线.png)
+![优化连线](/tutorial/menu-compare-phonetic/04-优化连线.webp)
 
 ## 减少干扰连线
 
 多音字会让同一个汉字产生多条可能路径，图上可能出现更多交叉。勾选「忽略多音字」后，系统会排除多音字带来的复杂路径，图面通常会更整洁。
 
-![忽略多音字](/tutorial/menu-compare-phonetic/05-忽略多音字.png)
+![忽略多音字](/tutorial/menu-compare-phonetic/05-忽略多音字.webp)
 
 如果图仍然太密，可以继续调两个阈值滑块：
 
@@ -43,21 +43,21 @@
 
 阈值越高，图越简洁，但细碎对应关系会被隐藏。做展示图或寻找主干对应时可以调高；做细读和核对材料时建议调低。
 
-![阈值滑块](/tutorial/menu-compare-phonetic/06-阈值滑块.png)
+![阈值滑块](/tutorial/menu-compare-phonetic/06-阈值滑块.webp)
 
 ## 查看具体字例
 
 鼠标悬停到连线上，会显示这条音值对应里的具体汉字。这个小窗适合核对“为什么两个音值之间有这条线”，也能快速看出对应关系是由哪些常用字支撑的。
 
-![连线小窗](/tutorial/menu-compare-phonetic/07-连线小窗.png)
+![连线小窗](/tutorial/menu-compare-phonetic/07-连线小窗.webp)
 
 鼠标悬停到音值节点上，可以查看该地点该音值下的全部汉字。节点小窗适合观察一个音值内部是否包含多个来源，或是否混入了你不想纳入分析的字。
 
-![节点小窗](/tutorial/menu-compare-phonetic/08-节点小窗.png)
+![节点小窗](/tutorial/menu-compare-phonetic/08-节点小窗.webp)
 
 单击节点或连线后，小窗会固定。固定后可以滚轮查看更长的字表，再点击右上角关闭。
 
-![固定小窗](/tutorial/menu-compare-phonetic/09-固定小窗.png)
+![固定小窗](/tutorial/menu-compare-phonetic/09-固定小窗.webp)
 
 移动端也可以使用音值比较。图表支持横向滚动，点击节点或连线后，小窗会显示在底部，方便在手机上查看字例。
 
