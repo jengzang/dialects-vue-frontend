@@ -424,7 +424,7 @@
     },
     "supportMessage": "\"If this site has been helpful, you can buy the author a coffee ☕️. Your support helps keep the project maintained and moving forward 🙏\"",
     "supportButton": "Support",
-    "supportNote": "\"Note: This site is developed and operated by an undergraduate student (starting graduate studies in September 2026). Character-list processing, the backend API, and the frontend interface were all completed by one person, while server and domain expenses are paid out of the developer's living allowance 💸\"",
+    "supportNote": "\"Note: This site is developed and operated by an undergraduate student (starting graduate studies in Fall 2026). Character-list processing, the backend API, and the frontend interface were all completed by one person, while server and domain expenses are paid out of the developer's living allowance 💸\"",
     "qrModal": {
       "title": "☕️ Buy the Author a Coffee",
       "subtitle": "Thank you for your support! 💖"
