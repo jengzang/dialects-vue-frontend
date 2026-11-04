@@ -1788,6 +1788,7 @@ $mobile-breakpoint: 768px;
   transition: all $transition-fast;
 
   &:hover:not(:disabled) {
+    color: var(--action-primary-text);
     background: var(--color-primary-hover);
     transform: translateY(-1px);
   }
@@ -1795,7 +1796,8 @@ $mobile-breakpoint: 768px;
   &[data-size='compact'] {
     --glass-button-padding: 8px 6px;
     &:hover:not(:disabled) {
-        background: var(--glass-30)
+      color: var(--text-primary);
+      background: var(--glass-30);
     }
   }
 
@@ -1805,16 +1807,19 @@ $mobile-breakpoint: 768px;
   }
 
   &[data-role='edit-toggle'] {
-    background: darkgoldenrod;
+    color: var(--text-white);
+    background: var(--color-warning);
 
     &[data-state='edit-mode'] {
-      color: white;
+      color: var(--text-white);
       background: var(--color-warning);
       animation: pulse 2s ease-in-out infinite;
     }
 
     &:hover:not(:disabled) {
-       background : rgba(201, 149, 17, 0.937) 
+      color: var(--text-white);
+      background: var(--color-warning);
+      filter: brightness(1.1);
     }
   }
 }
@@ -1830,7 +1835,7 @@ $mobile-breakpoint: 768px;
 
 /* 提交按鈕樣式 */
 .glass-button[data-role='submit'] {
-  color: white;
+  color: var(--text-white);
   font-weight: 600;
   background: linear-gradient(135deg, $success-green, var(--color-success));
 
@@ -1898,17 +1903,17 @@ td {
 td {
   &.editable-cell {
     cursor: text;
-    background: var(--bg-warning-light);
-    border: 1px solid var(--color-gold);
+    background: rgba(var(--color-gold-rgb), 0.14);
+    border: 1px solid rgba(var(--color-gold-rgb), 0.6);
     transition: all $transition-fast;
 
     &:hover {
-      background: var(--bg-warning-light);
+      background: rgba(var(--color-gold-rgb), 0.2);
       box-shadow: 0 0 0 2px rgba(var(--color-gold-rgb), 0.2);
     }
 
     &:focus {
-      background: white;
+      background: var(--surface-elevation-0);
       border-color: var(--color-primary);
       outline: none;
       box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.2);
@@ -1918,7 +1923,7 @@ td {
   &.cell-changed {
     position: relative;
     font-weight: 600;
-    background: var(--bg-blue-tint);
+    background: rgba(var(--color-primary-rgb), 0.12);
     border-color: var(--color-primary);
 
     &::after {
@@ -2084,7 +2089,7 @@ td {
 
         &::after {
           display: block;
-          color: darkgreen;
+          color: var(--action-primary-text);
           font-size: var(--font-size-14);
           font-weight: bold;
           line-height: 1;
@@ -2103,7 +2108,7 @@ td {
   justify-content: center;
   width: 20px;
   height: 20px;
-  background: white;
+  background: var(--surface-elevation-0);
   border: 2px solid var(--border-gray);
   border-radius: 5px;
   transition: all $transition-fast;
@@ -2221,11 +2226,11 @@ td {
 
   /* 删除按钮专用样式（暗红色） */
   &.delete {
-    color: white;
+    color: var(--text-white);
     background: var(--color-error-dark);
 
     &:hover {
-      color: white;
+      color: var(--text-white);
       background: var(--color-error);
       transform: scale(1.1);
     }
@@ -2551,7 +2556,7 @@ td {
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 10px;
   padding: 12px;
-  background: rgba(0, 0, 0, 0.02);
+  background: var(--bg-hover-light);
   border-radius: var(--radius-md);
   overflow-y: auto;
 }
@@ -2564,8 +2569,8 @@ td {
   cursor: pointer;
   padding: 8px 12px;
   border-radius: var(--radius-sm2);
-  background: white;
-  border: 2px solid rgba(0, 0, 0, 0.08);
+  background: var(--surface-elevation-0);
+  border: 2px solid var(--border-medium);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   user-select: none;
@@ -2590,7 +2595,7 @@ td {
   border: 2px solid var(--border-gray);
   @include flex-center;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: white;
+  background: var(--surface-elevation-0);
   flex-shrink: 0;
   position: relative;
 }
@@ -2672,7 +2677,7 @@ td {
   display: block;
   margin-top: 6px;
   font-size: var(--font-size-12);
-  color: var(--text-help);
+  color: var(--color-primary);
   font-weight: 500;
 }
 
@@ -2701,9 +2706,9 @@ td {
 .preview-item {
   padding: 10px;
   margin-bottom: 8px;
-  background: white;
+  background: var(--surface-elevation-0);
   border-radius: var(--radius-sm2);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-light);
 }
 
 .preview-row {
@@ -2776,7 +2781,7 @@ td {
 }
 
 .stats-box {
-  background: white;
+  background: var(--surface-elevation-0);
   border-radius: var(--radius-sm2);
   padding: 12px;
   margin-bottom: 12px;
