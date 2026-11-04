@@ -244,7 +244,7 @@ const subfeatureRouteMap = {
     '/explore/char-class?tab=yueyun'
   ],
   feature6: ['/explore/tools/check', '/explore/tools/jyut2ipa', '/explore/tools/merge', '/explore/tools/derive'],
-  feature7: ['/menu/yubao?tab=vocabulary', '/menu/yubao?tab=grammar', '/explore/yc/words'],
+  feature7: ['/menu/yubao?tab=vocabulary', '/menu/yubao?tab=grammar', '/explore/yc/words', '/menu/vocabulary/view', '/menu/vocabulary/import', '/menu/vocabulary/manage'],
   feature8: [
     '/explore/villages/gd',
     '/explore/villages/toponyms',
