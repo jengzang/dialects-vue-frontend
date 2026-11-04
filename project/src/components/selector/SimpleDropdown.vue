@@ -273,9 +273,9 @@ onMounted(() => {
   setTimeout(() => updatePosition(), 0)
   initializeFocusedIndex()
 
-  // Focus search input if searchable, otherwise focus the panel for keyboard navigation
+  // Avoid opening the on-screen keyboard on touch devices.
   nextTick(() => {
-    if (props.searchable && searchInput.value) {
+    if (props.searchable && searchInput.value && !window.matchMedia?.('(pointer: coarse)').matches) {
       searchInput.value.focus()
     } else if (dropdownPanel.value) {
       dropdownPanel.value.focus()
