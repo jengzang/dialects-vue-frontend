@@ -225,9 +225,9 @@ const featureRouteMap = {
   feature2: '/menu/map/view',
   feature3: '/menu/compare/zhonggu',
   feature4: '/menu/pho/matrix',
-  feature5: '/explore/char-class?tab=zhonggu',
+  feature7: '/explore/char-class?tab=zhonggu',
   feature6: '/explore/tools/check',
-  feature7: '/menu/yubao?tab=vocabulary',
+  feature5: '/menu/vocabulary',
   feature8: '/menu/villages',
   feature9: '/explore/tools/praat'
 }
@@ -237,14 +237,14 @@ const subfeatureRouteMap = {
   feature2: ['/menu/map/view', '/menu/map/divide', '/menu/map/custom', '/explore/gis'],
   feature3: ['/menu/compare/char', '/menu/compare/zhonggu', '/menu/compare/tone', '/menu/compare/phonetic'],
   feature4: ['/menu/pho/matrix', '/menu/pho/custom', '/menu/pho/count', '/menu/pho/evolution'],
-  feature5: [
+  feature7: [
     '/explore/char-class?tab=zhonggu',
     '/explore/char-class?tab=shanggu',
     '/explore/char-class?tab=jingu',
     '/explore/char-class?tab=yueyun'
   ],
   feature6: ['/explore/tools/check', '/explore/tools/jyut2ipa', '/explore/tools/merge', '/explore/tools/derive'],
-  feature7: ['/menu/yubao?tab=vocabulary', '/menu/yubao?tab=grammar', '/explore/yc/words', '/menu/vocabulary/view', '/menu/vocabulary/import', '/menu/vocabulary/manage'],
+  feature5: ['/menu/vocabulary/view','/menu/vocabulary/view?source=character-notes', '/menu/yubao?tab=vocabulary', '/menu/yubao?tab=grammar', '/explore/yc/words', ],
   feature8: [
     '/explore/villages/gd',
     '/explore/villages/toponyms',
