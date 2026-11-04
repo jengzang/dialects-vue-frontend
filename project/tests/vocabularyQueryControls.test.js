@@ -167,3 +167,17 @@ describe('vocabulary query submission in the same input', () => {
     expect(host.querySelector('.search-input').value).toBe('吃饭')
   })
 })
+
+
+describe('standard-word loading stays inside its selector', () => {
+  it.each([true, false])('replaces the %s selector with a disabled loading trigger then restores it', async singleSelect => {
+    const { props } = await mountControls(false, { viewMode: 'map', singleSelect, standardWordsLoading: true,
+      standardWordOptions: [{ value: '太阳', label: '太阳' }] })
+    const filter = host.querySelector('.standard-word-filter')
+    expect(filter.textContent).toContain('loading')
+    expect(filter.querySelector('[aria-busy="true"]').disabled).toBe(true)
+    props.standardWordsLoading = false; await nextTick()
+    expect(filter.querySelector('[aria-busy="true"]')).toBeNull()
+    expect(filter.querySelector('.select-trigger')).not.toBeNull()
+  })
+})

@@ -132,7 +132,7 @@ describe('vocabulary location details modal', () => {
     expect(source).toContain('if (!append && itemsCacheKey.value === requestKey) {')
     expect(source).toContain('if (standardWordsCacheKey.value === requestKey) {')
     expect(source).toContain('if (activeVocabularyItemsRequestKey.value !== requestKey || !shouldUseVocabularyItemsApi()) {')
-    expect(source).toContain('if (activeStandardWordsRequestKey.value !== requestKey || viewMode.value !== \'map\') {')
+    expect(source).toContain('if (activeStandardWordsRequestKey.value !== requestKey || viewMode.value !== \'map\' || isCharacterNotesMode.value) {')
     expect(source).toContain('if (activeMapPointsRequestKey.value !== requestKey || (!shouldUseVocabularyMapPointsApi() && !shouldUseVocabularyMapItemsApi())) {')
     expect(source).toContain('if (activeMapDetailRequestKey.value !== requestKey) {')
     expect(source).toContain('async function refreshVocabularyMapData()')

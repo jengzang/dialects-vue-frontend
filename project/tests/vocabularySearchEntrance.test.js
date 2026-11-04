@@ -51,7 +51,7 @@ vi.mock('@/components/common/AppModal.vue', () => ({ default: {
 } }))
 vi.mock('../src/main/views/explore/word/vocabulary/VocabularyTopControls.vue', () => ({
   default: {
-    props: ['source', 'filterMode', 'selectedRegions', 'selectedLocations', 'selectedProvince', 'selectedCity', 'rememberLocationSelection', 'selectedSearchFields', 'partitionNodes', 'partitionLoading', 'partitionError', 'notesRefreshDisabled'],
+    props: ['source', 'filterMode', 'selectedRegions', 'selectedLocations', 'selectedProvince', 'selectedCity', 'rememberLocationSelection', 'selectedSearchFields', 'partitionNodes', 'partitionLoading', 'partitionError', 'notesRefreshDisabled', 'standardWordsLoading', 'standardWordsError'],
     emits: ['search', 'refreshNotes', 'openLocationDetails', 'filterOpenChange', 'update:rememberLocationSelection', 'update:query', 'update:selectedLocations', 'update:viewMode', 'update:filterMode', 'update:selectedRegions', 'update:selectedProvince', 'update:selectedCity', 'update:selectedStandardWord'],
     setup(props, { emit }) {
       controlProps = props
@@ -730,5 +730,47 @@ describe('vocabulary configuration entrance', () => {
     await settle()
     expect(mocks.points).toHaveBeenCalled()
     expect(mocks.words).toHaveBeenCalled()
+  })
+})
+
+
+describe('map first and independent standard-word loading', () => {
+  const deferred = () => { let resolve, reject; const promise = new Promise((yes, no) => { resolve = yes; reject = no }); return { promise, resolve, reject } }
+  it('requests the map first and shows even an empty map while words are pending', async () => {
+    const map = deferred(), words = deferred()
+    mocks.points.mockImplementationOnce(() => map.promise)
+    mocks.words.mockImplementationOnce(() => words.promise)
+    await mount({ tab: 'map' })
+    host.querySelector('.submit').click(); await settle()
+    expect(mocks.points).toHaveBeenCalledTimes(1)
+    expect(mocks.words).not.toHaveBeenCalled()
+    map.resolve({ points: [], total_entries: 0 }); await settle(); await settle()
+    expect(mocks.words).toHaveBeenCalledTimes(1)
+    expect(pageState.isMapInitialLoading).toBe(false)
+    expect(controlProps.standardWordsLoading).toBe(true)
+    words.resolve({ standard_words: [] }); await settle()
+    expect(controlProps.standardWordsLoading).toBe(false)
+  })
+  it('does not launch old words when the applied search changes during the map request', async () => {
+    const map = deferred()
+    mocks.points.mockImplementationOnce(() => map.promise)
+    await mount({ tab: 'map' })
+    host.querySelector('.submit').click(); await settle()
+    emitControl('update:query', '新词'); pageState.applyVocabularyQuery()
+    map.resolve({ points: [] }); await settle(); await settle()
+    expect(mocks.words).not.toHaveBeenCalled()
+  })
+  it('keeps the map and selected words on a standard-word failure and allows a retry', async () => {
+    await mount({ tab: 'map' })
+    emitControl('update:selectedStandardWord', '太阳'); await settle()
+    mocks.words.mockRejectedValueOnce(new Error('offline'))
+    host.querySelector('.submit').click(); await settle(); await settle()
+    expect(pageState.selectedStandardWord).toBe('太阳')
+    expect(controlProps.standardWordsError).toBe(true)
+    expect(pageState.loadError).toBe('')
+    mocks.words.mockResolvedValueOnce({ standard_words: [{ standard_word: '太阳' }] })
+    await pageState.loadVocabularyStandardWords(); await settle()
+    expect(controlProps.standardWordsError).toBe(false)
+    expect(pageState.selectedStandardWord).toBe('太阳')
   })
 })

@@ -179,8 +179,27 @@
           v-if="viewMode === 'map'"
           class="standard-word-filter"
         >
+          <button
+            v-if="standardWordsLoading"
+            class="select-trigger standard-word-select-trigger"
+            type="button"
+            disabled
+            aria-busy="true"
+          >
+            <span class="select-label" role="status">{{ t('common.label.loading') }}</span>
+            <span class="ui-loading--inline" aria-hidden="true"></span>
+          </button>
+          <button
+            v-else-if="standardWordsError"
+            class="select-trigger standard-word-select-trigger"
+            type="button"
+            :title="t('common.label.error')"
+            @click="emit('retryStandardWords')"
+          >
+            <span class="select-label">{{ t('common.errorBoundary.retry') }}</span>
+          </button>
           <SimpleSelectDropdown
-            v-if="singleSelect"
+            v-else-if="singleSelect"
             :model-value="selectedStandardWord"
             :options="standardWordOptions"
             :placeholder="t('words.wordList.search.standardWordPlaceholder')"
@@ -373,6 +392,8 @@ const props = defineProps({
   searchFieldOptions: { type: Array, default: () => [] },
   locationOptions: { type: Array, default: () => [] },
   standardWordOptions: { type: Array, default: () => [] },
+  standardWordsLoading: { type: Boolean, default: false },
+  standardWordsError: { type: Boolean, default: false },
   filterMode: { type: String, default: 'location' },
   rememberLocationSelection: { type: Boolean, default: false },
   selectedRegions: { type: Array, default: () => [] },
@@ -387,6 +408,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits([
+  'retryStandardWords',
   'search',
   'update:query',
   'update:selectedSearchFields',
@@ -412,6 +434,9 @@ const standardWordTriggerEl = ref(null)
 const searchFieldModalOpen = ref(false)
 const locationDropdownOpen = ref(false)
 const standardWordDropdownOpen = ref(false)
+watch(() => props.standardWordsLoading, loading => {
+  if (loading) standardWordDropdownOpen.value = false
+})
 const filterDropdownOpen = ref({})
 const isFilterOpen = computed(() => locationDropdownOpen.value || Object.values(filterDropdownOpen.value).some(Boolean))
 

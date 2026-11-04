@@ -41,6 +41,9 @@
       :search-field-options="activeSearchFieldOptions"
       :location-options="locationOptions"
       :standard-word-options="standardWordOptions"
+      :standard-words-loading="isLoadingStandardWords"
+      :standard-words-error="standardWordsError"
+      @retry-standard-words="loadVocabularyStandardWords"
       :province-options="provinceOptions"
       :city-options="cityOptions"
       :notes-refresh-disabled="isNotesScopeResolving || isNotesScopeDisabled"
@@ -896,6 +899,8 @@ const page = ref(1)
 const pageSize = ref(50)
 const isLoadingItems = ref(false)
 const isLoadingStandardWords = ref(false)
+const standardWordsError = ref(false)
+let vocabularyMapRefreshId = 0
 const loadError = ref('')
 const isMapDetailModalOpen = ref(false)
 const isLoadingMapDetail = ref(false)
@@ -1081,7 +1086,7 @@ const standardWordOptions = computed(() => {
 })
 
 const isInitialLoading = computed(() => isLoadingItems.value && !entries.value.length && !loadError.value)
-const isMapInitialLoading = computed(() => (isLoadingItems.value || isLoadingStandardWords.value) && !mapDataForVocabularyMap.value.length && !loadError.value)
+const isMapInitialLoading = computed(() => isLoadingItems.value && !mapDataForVocabularyMap.value.length && !loadError.value)
 const isLoadingMore = computed(() => isLoadingItems.value && entries.value.length > 0)
 
 const canLoadMore = computed(() => {
@@ -1852,10 +1857,11 @@ async function loadVocabularyStandardWords() {
 
   activeStandardWordsRequestKey.value = requestKey
   isLoadingStandardWords.value = true
+  standardWordsError.value = false
 
   try {
     const response = await requestVocabularyStandardWords(requestParams)
-    if (activeStandardWordsRequestKey.value !== requestKey || viewMode.value !== 'map') {
+    if (activeStandardWordsRequestKey.value !== requestKey || viewMode.value !== 'map' || isCharacterNotesMode.value) {
       return
     }
 
@@ -1885,12 +1891,13 @@ async function loadVocabularyStandardWords() {
     }
     standardWordsCacheKey.value = requestKey
   } catch {
-    if (activeStandardWordsRequestKey.value !== requestKey || viewMode.value !== 'map') {
+    if (activeStandardWordsRequestKey.value !== requestKey || viewMode.value !== 'map' || isCharacterNotesMode.value) {
       return
     }
 
     vocabularyStandardWordOptions.value = []
-    selectedStandardWord.value = ''
+    // A failed lookup cannot establish whether the current selection is valid.
+    standardWordsError.value = true
     standardWordsCacheKey.value = ''
   } finally {
     if (activeStandardWordsRequestKey.value === requestKey) {
@@ -2067,8 +2074,13 @@ async function openLocationDetails(focusedLocationName = '') {
 }
 
 async function refreshVocabularyMapData() {
+  const refreshId = ++vocabularyMapRefreshId
+  const queryKey = buildVocabularyQueryKey(buildVocabularyQueryParams())
+  await loadVocabularyMapPoints()
+  if (refreshId !== vocabularyMapRefreshId || !hasSubmittedSearch.value
+    || viewMode.value !== 'map' || isCharacterNotesMode.value
+    || queryKey !== buildVocabularyQueryKey(buildVocabularyQueryParams())) return
   await loadVocabularyStandardWords()
-  loadVocabularyMapPoints()
 }
 
 function loadActiveViewMode() {
@@ -2227,6 +2239,8 @@ function applyVocabularyQuery() {
   itemsCacheKey.value = ''
   mapPointsCacheKey.value = ''
   standardWordsCacheKey.value = ''
+  vocabularyStandardWordOptions.value = []
+  standardWordsError.value = false
   entries.value = []
   mapPoints.value = []
   total.value = 0
@@ -2306,6 +2320,8 @@ watch(selectedStandardWords, (words) => {
 })
 
 onBeforeUnmount(() => {
+  vocabularyMapRefreshId++
+  activeStandardWordsRequestKey.value = ''
   clearTimeout(vocabularyQueryTimer)
   notesCardResizeObserver?.disconnect()
   notesCardResizeObserver = null
