@@ -47,7 +47,7 @@
         <a v-if="feature.zhihuLink" :href="feature.zhihuLink" target="_blank" rel="noopener" class="zhihu-article-link">{{ $t('about.intro.readZhihuArticle') }}</a>
       </li>
       <p style="text-align: left;">
-        <a href="https://zhuanlan.zhihu.com/p/1934345780199682731" target="_blank" rel="noopener" class="zhihu-article-link">{{ $t('about.intro.oldSiteZhihuArticle') }}</a>
+        <a href="https://zhuanlan.zhihu.com/p/1934345780199682731" target="_blank" rel="noopener">{{ $t('about.intro.oldSiteZhihuArticle') }}</a>
       </p>
       <!-- <li v-html="$t('about.intro.features.blueText')"></li>
       <li v-html="$t('about.intro.features.mapClick')"></li> -->
@@ -243,7 +243,7 @@ const subfeatureRouteMap = {
     '/explore/char-class?tab=jingu',
     '/explore/char-class?tab=yueyun'
   ],
-  feature6: ['/explore/tools/check', '/explore/tools/jyut2ipa', '/explore/tools/merge', '/explore/tools/derive'],
+  feature6: ['/explore/tools/check', '/explore/tools/jyut2ipa', '/explore/tools/merge'],
   feature5: ['/menu/vocabulary/view','/menu/vocabulary/view?source=character-notes', '/menu/yubao?tab=vocabulary', '/menu/yubao?tab=grammar', '/explore/yc/words', ],
   feature8: [
     '/explore/villages/gd',
@@ -265,6 +265,7 @@ const subfeatureRouteMap = {
 const featureList = computed(() => {
   const messages = i18n.global.messages.value[locale.value]
   const featureKeys = Object.keys(messages.about.intro.features)
+    .sort((a, b) => Number(a.replace('feature', '')) - Number(b.replace('feature', '')))
   return featureKeys.map((key) => {
     const f = messages.about.intro.features[key]
     return {
@@ -358,7 +359,7 @@ function localeTo(path) {
 .feature-item {
   margin-bottom: 24px !important;
   padding-bottom: 18px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--border-divider);
 }
 
 .feature-heading {

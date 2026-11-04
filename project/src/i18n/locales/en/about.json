@@ -108,28 +108,28 @@
   "intro": {
     "title": "ℹ️ About This Site",
     "directory": "Contents",
-    "description": "\"Dialect Pronunciation Atlas\" (方音圖鑑) is an online platform for analyzing Middle Chinese categories, comparing dialects, and exploring geolinguistic patterns. It presents the historical layering of initials and finals, together with patterns of phonemic merger and split across dialect locations, in a clear and interactive form. The site brings together core phonological queries, dialect comparison, phonological analysis, historical character sets, interactive maps, character-list processing, public vocabulary and sentence data from the Chinese Language Resources Protection Project, village-data visualization, machine-learning analysis of natural-village names, and Praat acoustic analysis. It is a comprehensive dialect-research platform that continues to grow.",
+    "description": "\"Dialect Pronunciation Atlas\" (方音圖鑑) is an online platform focused on dialect queries and comparison and on geolinguistics. It presents the phonological layering of initials and finals at dialect locations, together with phonemic mergers and splits, in a clear and interactive way. The site integrates phonological queries, dialect comparison, phonological analysis, interactive maps, character-list processing, vocabulary and sentence data from the Chinese Language Resources Protection Project, character sets from historical rime books, village-data visualization, machine learning on natural-village names, and Praat acoustic analysis. It is a comprehensive dialect-research platform that continues to grow.",
     "features": {
       "feature1": {
         "heading": "Core Queries",
-        "subtitle": "Middle Chinese, Readings, Tones, Characters",
-        "intro": "The site's earliest and central module, comprising four subpages.",
+        "subtitle": "Middle Chinese, Phonetic Values, Tones, Characters",
+        "intro": "The site's earliest and most central module, focusing on detailed analysis of dialect locations and on drawing geolinguistic comparison maps. It contains four subpages.",
         "items": [
           {
             "title": "Middle Chinese",
-            "body": "Organize modern dialect readings by rime-book categories. Users can freely combine rime group, rime, division, openness, tone, initial series, initial group, initial, voicing, place of articulation, and manner of articulation; the site automatically calculates the Cartesian product and removes invalid combinations. Location input supports fuzzy matching across simplified and traditional Chinese, as well as batch selection by region (Atlas Regions or MCPDict Regions). Results are displayed in tables, with multiple readings shown for polyphonic characters and distinct colors for literary and colloquial readings (red for literary, blue for colloquial, purple when the two share the same form, and green for ordinary polyphony). Statistics buttons open drill-down queries—for example, showing initial and tone distributions when examining finals. Clicking a phonetic value traces the source syllables, while clicking a place name opens detailed information about that dialect location. Multiple query windows can be compared in parallel, with phonetic-value filtering and Full or Primary display modes. The map view layers phonetic values by proportion, and map points also open drill-down queries. The phonological dataset can be switched; current options include Guangyun, the Dialect Survey Character List, Jiyun, Hongwu Zhengyun, and Old Chinese datasets."
+            "body": "Organize readings by rime-book categories, supporting direct selection or keyboard input. Categories such as rime group, rime, division, openness, tone, initial series, initial group, and initial, together with voicing, place of articulation, and manner of articulation, can be freely combined for Middle Chinese in the Guangyun system. The rime book can also be switched; currently supported are Guangyun, the Dialect Survey Character List, Jiyun, Hongwu Zhengyun, and Old Chinese materials. Location input supports fuzzy matching across simplified and traditional Chinese as well as batch selection by region (Atlas Regions / MCPDict Regions). Results are shown in tables, with multiple readings displayed for polyphonic characters and different colors for literary and colloquial readings (red for literary, blue for colloquial, purple when the two share the same form, green for ordinary polyphony). Clicking the statistics button performs further drill-down queries (for example, when querying finals, clicking statistics shows the distribution of initials and tones). Pop-ups also allow further subdivision: clicking a phonetic value traces the source syllables, and clicking a place name shows detailed information about the dialect location. Multiple windows can be compared in parallel, with phonetic-value filtering and two display modes, Full and Primary. The map view layers phonetic values by proportion, and clicking points on the map likewise opens drill-down queries."
           },
           {
-            "title": "Readings",
-            "body": "Analyze the rime-book sources of specific dialect readings. After entering syllables and locations, the results are presented in the same table and map formats. This query is computationally intensive, so using fewer locations is recommended."
+            "title": "Phonetic Values",
+            "body": "Analyze the rime-book sources of a specific phoneme (phonetic value), for example tracing a modern phoneme back to its Middle Chinese sources and the specific rime groups, rimes, initials, and openness classes in Guangyun. After entering a syllable and dialect locations, results are presented in tables and maps, supporting the number of characters, proportions, and example characters for each rime-book source. Computation is relatively intensive, so reducing the number of locations is recommended."
           },
           {
             "title": "Characters",
-            "body": "Enter Chinese characters to view their readings and Middle Chinese categories across dialect locations. Results include annotations, while the map shows the geographical distribution of readings and supports literary/colloquial coloring."
+            "body": "Enter Chinese characters to query readings across dialect locations and their Middle Chinese categories. Results include annotations; the map displays the geographical distribution of readings and supports coloring for literary/colloquial readings and polyphonic characters."
           },
           {
             "title": "Tones",
-            "body": "View tone values and tone classes. The API is lightweight, and logged-in users can query multiple locations simultaneously without a fixed limit. Results are shown in tables, with tone classes distinguished by color. The map can display different tone classes, and clicking an item opens details about tone-class mergers."
+            "body": "Query the tone values and tone classes of dialect locations. Results are presented in tables (different tone classes in different colors); the map can switch between tone classes for drawing, and clicking shows tone-class merger information. The API is lightweight, so thousands of dialect locations can be queried at the same time."
           }
         ],
         "zhihuLink": "https://zhuanlan.zhihu.com/p/2047826401479364959"
@@ -137,23 +137,23 @@
       "feature2": {
         "heading": "Interactive Maps & Custom Data",
         "subtitle": "Dialect Map, Regional Mapping, Custom Data, Map Drawing",
-        "intro": "Corresponds to the 'Map' tab in the top navigation bar, containing four sub-pages.",
+        "intro": "Focused on the drawing and display of geolinguistic maps. It contains four subpages.",
         "items": [
           {
             "title": "Dialect Map",
-            "body": "Switch query results to a map view with one click. Phonetic values are layered by proportion, and clicking a map point opens a drill-down query. Place-name labels, fullscreen mode, and basemap switching are supported."
+            "body": "Query results switch to a map view with one click, displaying phonetic values in proportion-based layers. Clicking a point on the map opens a drill-down query, with support for place-name labels, fullscreen, and basemap switching. It also presents dialect-comparison results together with dialect-region point maps and heatmaps. The Syllable Statistics feature can also draw isopleth maps of syllable counts."
           },
           {
             "title": "Regional Mapping",
-            "body": "Create dialect maps using Atlas Regions or MCPDict Regions, each with three selectable levels. Regions are shown in different colors; hovering or clicking reveals location names and regional information. The complete dataset can also be used to draw a nationwide regional map."
+            "body": "Draw dialect maps by Atlas Regions / MCPDict Regions and explore dialect regions and their distribution from a geolinguistic perspective. Point maps are drawn by region level, with three selectable levels each; different regions use different colors, and hovering or clicking shows place names and regional information. The complete dataset can be used to draw a nationwide regional map. Heatmaps can also be drawn to explore the distribution density of dialect survey points."
           },
           {
             "title": "Custom Data",
-            "body": "Users can import their own fieldwork data. The data are visible only to the owner, linked to the account, and synchronized across devices. Two organizational modes are supported: by survey location, for continually supplementing a single location; or by dialect feature, for continually adding locations to one feature and conducting geolinguistic comparisons."
+            "body": "Users can import personal fieldwork data; the data are visible only to the owner, bound to the account, and synchronized across devices. Two modes are supported: organizing by survey location (continually supplementing a single location) and organizing by dialect feature (continually adding dialect locations for one feature to conduct geolinguistic comparisons). Users can keep adding and managing personal data such as phonological features, character pronunciations, and tone values, and draw custom dialect maps."
           },
           {
             "title": "Map Drawing",
-            "body": "Provides online drawing tools with support for Voronoi diagrams and layer export."
+            "body": "An online GIS drawing tool that can import geographical data such as administrative boundaries and rivers, and edit points, lines, polygons, and text labels by layer. Finished drawings can be exported as GeoJSON or images. It can also draw Thiessen polygons (Voronoi diagrams) from dialect data, using either site data or custom-uploaded dialect locations."
           }
         ],
         "zhihuLink": "https://zhuanlan.zhihu.com/p/2047826401479364959"
@@ -161,138 +161,142 @@
       "feature3": {
         "heading": "Dialect Comparison",
         "subtitle": "Compare Characters, Middle Chinese, Tone Classes, Phonetic Values",
-        "intro": "Designed for quickly identifying similarities and differences among dialect locations, with four subpages.",
+        "intro": "Designed for quickly and intuitively judging similarities and differences among dialect-point features. It contains four subpages.",
         "items": [
           {
             "title": "Compare Characters",
-            "body": "Select Chinese characters and dialect regions or locations. Green indicates identical readings, yellow partial agreement, and red complete difference, making cross-location similarities immediately visible. Fullscreen enlargement and pop-up views of detailed readings are supported. This can be used to examine the geographical distribution of particular phonological phenomena, such as lateral fricatives or palatalization."
+            "body": "Enter two Chinese characters and select the dialect regions / locations to compare. Three colors—green (completely identical), yellow (partially identical), and red (completely different)—intuitively show the degree of similarity of readings across dialect locations. Fullscreen zoom and click-to-open pop-ups with detailed readings are supported. This can be used to observe the regional distribution of particular phonological phenomena, such as lateral fricatives and palatalization."
           },
           {
             "title": "Compare Middle Chinese",
-            "body": "Define two sets of Middle Chinese criteria—for example, open Division I of the 宕 rime group versus open Division II of the 江 rime group—and compare complex phonological-category combinations across dialect locations. The similarity measure is defined as total overlap = Σ min(proportion in group 1, proportion in group 2). High overlap is shown in green, medium overlap in yellow, and low overlap in red. The method is simple and intuitive, works well for comparisons within the same location, and avoids problems caused by directly matching phoneme labels."
+            "body": "Select two sets of rime-book category (phonological class) conditions, such as open Division I of the Dang rime group versus open Division II of the Jiang rime group in Middle Chinese Guangyun. Complex rime-book category combinations can be compared across dialect locations. A similarity algorithm is used: total overlap = Σ min(proportion of readings in group 1, proportion of readings in group 2). High overlap is shown in green, medium in yellow, and low in red. The algorithm is simple and intuitive, and is suitable for comparing phonological-class mergers within the same location."
           },
           {
             "title": "Compare Tone Classes",
-            "body": "Analyze tone-class mergers across dialect locations, such as Yangshang merging with Yinqu or Yinru merging with Yangru. Multiple locations can be analyzed at once."
+            "body": "Select two tone classes to analyze tone-class mergers across dialect locations (such as Yangshang–Yinqu and Yinru–Yangru mergers); multiple locations can be analyzed at once. Results show the locations where the classes merge, possibly merge, or are distinct, along with distribution maps."
           },
           {
             "title": "Compare Phonetic Values",
-            "body": "Display the actual readings of multiple dialect locations side by side for direct, location-by-location comparison."
+            "body": "Select 2–5 dialect locations and display their actual readings side by side, presenting the correspondence of phonetic values for initials, finals, or tones for easy point-by-point comparison. Sankey diagrams present phonological-class mergers and splits."
           }
         ],
         "zhihuLink": "https://zhuanlan.zhihu.com/p/2023530288848930082"
       },
       "feature4": {
         "heading": "In-Depth Analysis of Individual Dialects",
-        "subtitle": "Phonological Systems, Phoneme Classification, Syllable Statistics, Sound Change",
-        "intro": "Tools for detailed analysis of one or a small number of dialect locations, organized into four subpages.",
+        "subtitle": "Phonological Systems, Phoneme Classification, Syllable Statistics, Rime-Book Evolution",
+        "intro": "Focused on a small number of dialect locations, with in-depth analysis of their phonetic features. It contains four subpages.",
         "items": [
           {
             "title": "Phonological Systems",
-            "body": "Enter a dialect location to view its complete phonological matrix (initial × final × tone), with up to ten locations analyzed at once. Literary and colloquial readings are color-coded (red for literary, blue for colloquial, purple when the two share the same form, and green for ordinary polyphony). Cells are clickable for details, and fullscreen viewing is supported."
+            "body": "Enter a dialect location name to view its complete phonological table, the co-occurrence relations of initials, finals, and tones, and the dialect's homophone list, presenting initial–final–tone combinations (initial × final × tone) in table form. Literary/colloquial coloring is supported (red for literary, blue for colloquial, purple when the two share the same form, green for ordinary polyphony). Clicking a cell shows details, and fullscreen viewing is supported."
           },
           {
             "title": "Phoneme Classification",
-            "body": "Freely combine three dimensions—horizontal axis, vertical axis, and cell contents. For example, classify horizontally by voicing, vertically by place of articulation, and within cells by initial to count occurrences of each initial value. Alternatively, classify horizontally by openness, vertically by rime group, and within cells by division to organize final values. Clicking a cell opens its details."
+            "body": "Based on rime-book category features such as voicing, place of articulation, open/closed mouth, and rime group, users freely choose three classification dimensions to organize dialect initials, finals, and tones, performing initial, final, and tone classification as well as dialect phonological statistics, with counts and example characters for each category; clicking a cell opens details in a pop-up. For example, rows, columns, and cells can be freely combined in three dimensions: classify rows by voicing, columns by place of articulation, and cells by initial to count the occurrences of each initial value; or classify rows by open/closed mouth, columns by rime group, and cells by division to organize the number of final values."
           },
           {
             "title": "Syllable Statistics",
-            "body": "By default, data for all locations are shown through a pie chart of syllable proportions, a bar chart of the number of locations containing each syllable, and a scatter plot comparing syllable totals with the corresponding number of locations; larger circles represent more syllables. Every chart is clickable for detailed pop-ups. A custom-location mode supports up to 100 locations per analysis, counting initials, finals, and tones for each location, with a navigation wheel on the right for quick jumps."
+            "body": "Count the number of syllables of a dialect location and draw charts and isopleth maps. Includes three modes: separate initial/final/tone statistics, toneless syllables, and toned syllables. Toned/toneless syllable statistics can jump to map drawing to create isopleth maps of syllable counts, intuitively showing how many syllables each place has. The separate initial/final/tone mode provides a pie chart (syllable proportions), a bar chart (number of locations where each syllable occurs), and a scatter plot (total syllables vs. corresponding number of locations; larger circles indicate more syllables), all clickable for detail pop-ups. A custom location-selection mode is supported, analyzing up to 100 locations at a time and counting the numbers of initials, finals, and tones at each location separately, with wheel navigation on the right for quick jumps. By default, data for all locations (3,000+ dialect points) are displayed."
           },
           {
-            "title": "Sound-Change Diagrams",
-            "body": "Use Sankey diagrams, pie charts, and other visualizations to show how the initials, finals, and tones of a single dialect location developed from Middle Chinese to their modern forms, making merger and split pathways easy to see."
+            "title": "Rime-Book Evolution Analysis",
+            "body": "Query the rime-book evolution of a specified dialect location. Sankey diagrams, pie charts, and other forms show the modern sources and phonological-class splits of initials / finals / tones, and even the dialect's sound change, intuitively presenting merger and split trajectories. For example, view the correspondences between initials, finals, and tones and the rime groups and initials of Middle Chinese Guangyun."
           }
         ],
         "zhihuLink": "https://zhuanlan.zhihu.com/p/2002848348378521848"
       },
       "feature5": {
-        "heading": "Historical Character Sets",
-        "subtitle": "Middle Chinese, Old Chinese, Early Modern Chinese, Cantonese Rime Books",
-        "intro": "Browse the characters and Guangyun annotations under each phonological category by progressively expanding the hierarchy—the reverse direction of the Characters query, which starts from an entered character. The section covers four phonological systems across seven data tables.",
+        "heading": "Vocabulary and Sentence Data",
+        "subtitle": "Dialect Word Lists, Character-List Annotations, Language Preservation Vocabulary, Language Preservation Grammar, Yangchun Colloquial Vocabulary",
+        "intro": "Query and manage vocabulary data. The word lists are collaboratively built by the site's users, who digitize word lists from existing studies. Public data from the Chinese Language Resources Protection Project is also included, covering 1,247 dialect locations, each with 1,000 vocabulary items and 50 sentences.",
         "items": [
           {
-            "title": "Middle Chinese",
-            "body": "The Guangyun system, organized hierarchically by rime group, openness, division, rime, tone, voicing, initial series, initial group, and initial. Guangyun annotations can be displayed, and the data can also be reorganized by initial labels, voicing, and other dimensions."
+            "title": "Dialect Word Lists",
+            "body": "Query dialect vocabulary across the country online, comparing how the same word is expressed in different regions, including IPA and glosses. Supports searching by standard written word, dialect word, phonetic transcription, or gloss, and browsing word lists in card, map, and table modes. After applying for word-list editing permission, users can fill in dialect-location information, batch-upload dialect vocabulary, IPA readings, and glosses in the standard format, and validate the imported data. Users with editing permission can manage the word lists they submitted, edit entries and location information online, batch-replace content, and add or delete entries."
           },
           {
-            "title": "Old Chinese",
-            "body": "Organized hierarchically by tone, initial, final, rime group, initial group, /r/ medial, and phonetic-series domain."
+            "title": "Character-List Annotations",
+            "body": "Query the specific glosses in dialect character-list datasets. Supports searching characters and IPA by annotation, and also direct IPA search (which runs more slowly). Dialect locations can be filtered by place or region."
           },
           {
-            "title": "Early Modern Chinese",
-            "body": "Includes three data tables: Zhongyuan Yinyun, Hongwu Zhengyun, and Menggu Ziyun."
+            "title": "Language Preservation Vocabulary (1,000 Words)",
+            "body": "Presents vocabulary data for each location from the Chinese Language Resources Protection Project. Supports map, card, and table views. In map view, dialect locations are clustered when the scale is small, and specific vocabulary appears when zoomed in; the display can switch among glosses (text), speech (IPA), and place names, and each point opens a detail pop-up. Card view presents place name, vocabulary, annotation, pronunciation, and region, with search matching. Table view supports search, sorting (all columns), and pop-up filtering (multi-select / inverse selection)."
           },
           {
-            "title": "Cantonese Rime Books",
-            "body": "A hierarchical query based on the Fenyun Cuoyao system."
+            "title": "Language Preservation Grammar (50 Sentences)",
+            "body": "Presents sentence data for each location from the Chinese Language Resources Protection Project. Also supports card, table, and map modes, with search by place name, text, or syllable and filtering by dialect region."
+          },
+          {
+            "title": "Yangchun Colloquial Vocabulary",
+            "body": "Query colloquial words of the Yangchun dialect, including etymological characters, IPA readings, Jyutping, glosses, and example words and sentences; supports field-based filtering of the word list."
           }
-        ]
+        ],
+        "zhihuLink": "https://zhuanlan.zhihu.com/p/2003637219919946701"
       },
       "feature6": {
         "heading": "Dialect Character-List Tools",
-        "subtitle": "Character-List Validation, Jyutping to IPA, List Merging, List Derivation",
-        "intro": "A practical toolkit for dialect fieldworkers, comprising four subpages.",
+        "subtitle": "Character-List Validation, Jyutping to IPA, List Merging",
+        "intro": "A practical toolkit for dialect fieldworkers, supporting various character-list processing scenarios. It contains three subpages.",
         "items": [
           {
-            "title": "Character-List Validation",
-            "body": "Upload a dialect character list to automatically detect non-single-character entries, unusual phonetic symbols, missing tones, and other issues. The tool automatically separates initials, finals, and tones, and provides initial/final statistics together with tone-class and tone-value statistics. Online editing includes cell editing, batch editing of initials and finals, batch replacement of tone values, and row deletion; the revised file can then be downloaded. A command-line mode is retained for backward compatibility."
+            "title": "Character-List Validation and Format Conversion",
+            "body": "Upload a dialect character list to automatically detect non-single-character entries, unusual phonetic symbols, missing tones, and other issues; the tool automatically splits initials, finals, and tones and provides initial/final statistics and tone-class/tone-value statistics. Online editing is supported (editing cells, batch-editing initials and finals, batch-replacing tone values, deleting rows); download the modified file to save it. Character lists in Word and other formats can also be converted into a one-character-one-reading table format."
           },
           {
             "title": "Jyutping to IPA",
-            "body": "Upload a character list containing a \"Jyutping\" column and convert it to IPA according to configurable rules. Custom conversion rules are supported, and personal settings can be stored locally."
+            "body": "Upload a character list containing a Jyutping column and convert it to IPA according to rules. Custom conversion rules are supported and personal configurations can be stored. Conversion results can be previewed and downloaded."
           },
           {
             "title": "Merge Character Lists",
-            "body": "Upload a reference list, which determines the final order, together with the lists to merge. Column names are detected automatically (character columns: 單字/phrase/汉字/漢字; transcription columns: IPA/ipa/音標/音标/syllable). Annotations are stored as Excel comments, multiple readings are separated with semicolons, and missing characters are appended at the end."
-          },
-          {
-            "title": "Character-List Derivation",
-            "body": "Automatically infer and generate missing readings according to phonological rules."
+            "body": "Upload a reference list (which determines the final order) plus the lists to merge. Column names are detected automatically (character columns: 单字/phrase/汉字/漢字; transcription columns: IPA/ipa/音标/音標/syllable); annotations are stored as Excel comments; multiple readings are separated by semicolons; missing characters are appended at the end. Multiple lists can be uploaded and the result downloaded."
           }
         ],
         "zhihuLink": "https://zhuanlan.zhihu.com/p/2001363637311381604"
       },
       "feature7": {
-        "heading": "Vocabulary and Sentence Data",
-        "subtitle": "Language Preservation Vocabulary, Grammar (50 Sentences), Yangchun Colloquial Vocabulary",
-        "intro": "Based on public data from the Chinese Language Resources Protection Project. The site currently includes 1,000 vocabulary items from 1,247 dialect locations, together with the project's 50-sentence grammar dataset. All data come from the project's official public platform.",
+        "heading": "Rime-Book Character Sets",
+        "subtitle": "Middle Chinese, Old Chinese, Early Modern Chinese, Cantonese Rime Books",
+        "intro": "Browse the characters and annotations under each phonological category by expanding the hierarchy level by level. Seven rime books are included.",
         "items": [
           {
-            "title": "Language Preservation Vocabulary",
-            "body": "Available in map, card, and table views. When the map is zoomed out, dialect locations are clustered; zooming in reveals individual vocabulary entries. The display can switch among glosses, IPA transcriptions, and place names, and every point opens a detailed pop-up. Card view presents place name, vocabulary, annotation, pronunciation, and region information, with search matching. Table view supports search, sorting on every column, and pop-up filters with multi-select and inverse selection."
+            "title": "Middle Chinese",
+            "body": "The Guangyun system, organized hierarchically by rime group / openness / division / rime / tone / voicing / initial series / initial group / initial. Guangyun annotations can be displayed, and the data can be reorganized by dimensions such as initial labels and voicing. Custom classification levels and order are supported."
           },
           {
-            "title": "Language Preservation Grammar (50 Sentences)",
-            "body": "Also available in card, table, and map views. Entries can be searched by place name, written form, or syllable and filtered by dialect region."
+            "title": "Old Chinese",
+            "body": "Organized hierarchically by tone / initial / final / rime group / initial group / /r/ medial / phonetic-series domain. Custom classification levels and order are supported."
           },
           {
-            "title": "Yangchun Colloquial Vocabulary",
-            "body": "A collection of commonly used colloquial vocabulary from the Yangchun area."
+            "title": "Early Modern Chinese",
+            "body": "Covers three rime books: Zhongyuan Yinyun, Hongwu Zhengyun, and Menggu Ziyun. Custom classification levels and order are supported."
+          },
+          {
+            "title": "Cantonese Rime Books",
+            "body": "Hierarchical queries based on the Fenyun Cuoyao system. Custom classification levels and order are supported."
           }
-        ],
-        "zhihuLink": "https://zhuanlan.zhihu.com/p/2003637219919946701"
+        ]
       },
       "feature8": {
         "heading": "Natural Village Data",
-        "subtitle": "Guangdong Hierarchy, Interactive Map, Raw Data, Yangchun Natural Villages, Machine Learning",
-        "intro": "Provides geographical, administrative, and dialect information for natural villages. The site includes a Guangdong natural-village hierarchy, an interactive map, raw data tables, a dedicated Yangchun dataset, and machine-learning analyses.",
+        "subtitle": "Guangdong Natural-Village Hierarchy, Toponym Distribution, Guangdong Village Table, Yangchun Natural Villages, Machine Learning",
+        "intro": "Look up the geographical location, administrative divisions, and dialect information of natural villages, and explore the geographical distribution and naming patterns of village names.",
         "items": [
           {
             "title": "Guangdong Natural-Village Hierarchy",
-            "body": "Based on dialect data for Guangdong natural villages entered from the Quan Yue Cunqing series. The author recorded the villages manually, one by one, with most current data concentrated in western Guangdong, including Yangjiang, Maoming, and Yunfu. The hierarchy can be expanded from city → county or district → town → administrative village → natural village, clearly showing administrative relationships and supporting search."
+            "body": "Browse the Guangdong natural-village directory hierarchically by city, county, town, and other administrative levels (supporting expansion city → county → town → administrative village → natural village). Query village names, dialect distribution, and coordinates, and view villages on the map. Search is supported, with filtering by city, county, or town. Natural-village points are clustered at small scales and reveal specific village names and dialect data when zoomed in. The display can switch between village names and dialect data. Links to the map-drawing page let users draw dialect-distribution maps with Thiessen-polygon algorithms. The dialect data are based on the Quan Yue Cunqing series (manually recorded village by village by the author, mostly concentrated in western Guangdong: Yangjiang, Maoming, Yunfu, etc.)."
           },
           {
-            "title": "Interactive Map",
-            "body": "Natural-village points are clustered when the map is zoomed out; zooming in reveals individual village names and dialect data. The data can be filtered by city, county, and town, and the map remains responsive during free zooming. Users can switch between village-name and dialect-data displays."
+            "title": "Toponym Distribution",
+            "body": "(In development) Query the distribution of Chinese characters in natural-village toponyms and explore regional toponym patterns and characteristics."
           },
           {
             "title": "Raw Data Table",
-            "body": "Displays the original Guangdong natural-village data with filtering and search matching."
+            "body": "Display raw natural-village data for Guangdong Province in table form, with filtering and search matching. Filter by village name, administrative division, or dialect, view coordinates, and sort and paginate the table."
           },
           {
             "title": "Yangchun Natural Villages",
-            "body": "A specially compiled and proofread dataset based on the Yangchun County Gazetteer. It uses etymologically appropriate characters rather than homophonous substitutes, making it more accurate and faster to load than the general Quan Yue Cunqing dataset."
+            "body": "The author specially compiled and proofread the natural-village data in the Yangchun County Gazetteer (1996), using etymological characters rather than homophonous substitutes; it is more accurate than the Quan Yue Cunqing data and loads faster. Expand by administrative levels such as town and community to view the affiliation between villages and village committees."
           },
           {
             "title": "Machine Learning Analysis (VillagesML)",
@@ -342,7 +346,7 @@
     "title": "🧑‍💻 Reflections",
     "paragraph1": "It began simply as a convenience for my own research: I wrote a few Python scripts to process dialect data. Later, I organized them into a FastAPI backend and built a modest single-page interface with vanilla JavaScript. My ambition at the time was uncomplicated—a tool that felt comfortable to use would have been enough. I never expected the project to keep growing until, almost without notice, a year had passed. That year brought disappointment in the postgraduate entrance examination, anxiety about employment, and the farewells of graduation. My state of mind shifted again and again, yet in the quiet of writing code I always found a small corner in which to settle myself.",
     "paragraph2": "Over that year, I gradually became acquainted with front-end development. At the beginning of 2026, I spent three months interning as a front-end developer at an internet company, and during that period I carefully rewrote the entire project in Vue. Over the following months, I added dialect comparison, character-list processing, vocabulary and sentence data from the Chinese Language Resources Protection Project, village-data visualization, Praat acoustic analysis, and more. Writing code was also a way of studying phonology: building a sound query workflow often required first clarifying the phonological information behind it, while a deeper understanding of phonology continually inspired new features. Technology and scholarship nourished one another, allowing the project to become steadily more complete.",
-    "paragraph3": "Today, the site receives roughly 300 visits and 5,000 API calls each day. The journey from command-line scripts to an online platform has not been straightforward, but seeing people genuinely use it—and knowing that it has helped many language enthusiasts and even university researchers—makes every effort feel worthwhile. My sincere thanks go to everyone who has offered support, encouragement, or a response. If the site can save you even a little time spent searching through reference materials, it has fulfilled its purpose.",
+    "paragraph3": "Today, the site receives roughly 300 visits and 8,000 API calls each day. The journey from command-line scripts to an online platform has not been straightforward, but seeing people genuinely use it—and knowing that it has helped many language enthusiasts and even university researchers—makes every effort feel worthwhile. My sincere thanks go to everyone who has offered support, encouragement, or a response. If the site can save you even a little time spent searching through reference materials, it has fulfilled its purpose.",
     "poem": "May the voices of every region live on;<br>May the beauty of Chinese characters always be cherished;<br>May the flame of civilization endure through every interaction and every moment of resonance."
   },
   "thanks": {
