@@ -14,7 +14,7 @@ const VocabularyImportPage = () => import('@/main/views/explore/word/vocabulary/
 const VocabularyManagePage = () => import('@/main/views/explore/word/vocabulary/VocabularyManagePage.vue')
 const YuBaoMenuPage = () => import('@/main/views/menu/YuBaoMenuPage.vue')
 const VillagesPage = () => import('@/main/views/menu/portals/VillagesPage.vue')
-const DialectClusteringPage = () => import('@/main/views/menu/DialectClustering.vue')
+// const DialectClusteringPage = () => import('@/main/views/menu/DialectClustering.vue')
 
 export const menuRoutes = [
   {
@@ -161,8 +161,8 @@ export const menuRoutes = [
     path: 'menu/villages',
     component: VillagesPage
   },
-  {
-    path: 'menu/cluster',
-    component: DialectClusteringPage
-  }
+  // {
+  //   path: 'menu/cluster',
+  //   component: DialectClusteringPage
+  // }
 ]
