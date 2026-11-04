@@ -14,7 +14,7 @@
           class="manage-filter-grid locations-filter-grid"
           @submit.prevent="applyLocationFilters"
         >
-          <label class="upload-field">
+          <label v-if="canSearchUsername" class="upload-field">
             <span>{{ t('words.wordList.locations.filters.userName') }}</span>
             <input v-model="locationFilters.username" type="text" :placeholder="t('words.wordList.locations.filters.userName')" />
           </label>
@@ -249,7 +249,8 @@ function getLocationKey(location) {
 
 const canGoPreviousLocationPage = computed(() => locationPagination.page > 1)
 const canGoNextLocationPage = computed(() => locationPagination.page * locationPagination.pageSize < locationPagination.total)
-const canShowLocationFilters = computed(() => props.managePermissionLevel === 'manage')
+const canShowLocationFilters = computed(() => ['manage', 'edit'].includes(props.managePermissionLevel))
+const canSearchUsername = computed(() => props.managePermissionLevel === 'manage')
 const transferModalTitle = computed(() => {
   const locationName = transferLocationSource.value?.location_name
   return locationName
@@ -278,11 +279,12 @@ function appendFilledFilters(target, filters) {
 }
 
 function buildLocationQueryParams(overrides = {}) {
+  const filters = canSearchUsername.value ? locationFilters : { location_name: locationFilters.location_name }
   return appendFilledFilters({
     page: locationPagination.page,
     page_size: locationPagination.pageSize,
     ...overrides,
-  }, locationFilters)
+  }, filters)
 }
 
 async function loadVocabularyLocations() {

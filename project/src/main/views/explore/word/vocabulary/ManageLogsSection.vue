@@ -12,7 +12,8 @@
         <form class="manage-filter-grid logs-filter-grid" @submit.prevent="applyLogFilters">
           <label v-for="field in logFilterFields" :key="field.key" class="upload-field">
             <span>{{ field.label }}</span>
-            <input v-model="logFilters[field.key]" type="text" :placeholder="field.label" />
+            <MultiSelectDropdown v-if="field.options" v-model="logFilters[field.key]" :options="field.options" :placeholder="t('common.label.all')" match-trigger-width />
+            <input v-else v-model="logFilters[field.key]" type="number" min="1" :placeholder="field.label" />
           </label>
         </form>
 
@@ -48,9 +49,6 @@
         </template>
         <template #cell-created_at="{ value }">
           <span class="log-timestamp" :title="value">{{ formatRelativeTime(value) }}</span>
-        </template>
-        <template #cell-status="{ value }">
-          <span class="log-status-badge" :data-status="value">{{ value || '-' }}</span>
         </template>
         <template #cell-_payload="{ row }">
           <button
@@ -102,6 +100,7 @@ import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getVocabularyLogs } from '@/api'
 import GlassTable from '@/components/common/GlassTable.vue'
+import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue'
 import { showError } from '@/utils/ui/message.js'
 
 const { t } = useI18n()
@@ -117,11 +116,10 @@ const logsLoadError = ref('')
 const logRows = ref([])
 const logFilters = reactive({
   user_id: '',
-  permission_level: '',
-  source: '',
-  action: '',
-  table_name: '',
-  status: '',
+  permission_levels: [],
+  sources: [],
+  actions: [],
+  table_names: [],
 })
 const logPagination = reactive({
   page: 1,
@@ -139,23 +137,26 @@ const logTableColumns = computed(() => [
   { key: 'user_id', label: t('words.wordList.logs.columns.userId'), width: '90px' },
   { key: 'source', label: t('words.wordList.logs.columns.source'), width: '100px' },
   { key: 'table_name', label: t('words.wordList.logs.columns.table'), width: '120px' },
-  { key: 'status', label: t('words.wordList.logs.columns.status'), width: '90px' },
   { key: 'affected_rows', label: t('words.wordList.logs.columns.affectedRows'), width: '90px', align: 'right' },
-  { key: '_payload', label: t('words.wordList.logs.columns.payload') },
-  { key: '_rollback', label: t('words.wordList.logs.columns.rollback'), width: '140px' },
+  { key: '_payload', label: t('words.wordList.logs.columns.payload'), sortable: false },
+  { key: '_rollback', label: t('words.wordList.logs.columns.rollback'), width: '140px', sortable: false },
 ])
 
+const options = (values) => values.map((value) => ({ value, label: value }))
 const logFilterFields = computed(() => [
   { key: 'user_id', label: t('words.wordList.logs.filters.userId') },
-  { key: 'permission_level', label: t('words.wordList.logs.filters.permission') },
-  { key: 'source', label: t('words.wordList.logs.filters.source') },
-  { key: 'action', label: t('words.wordList.logs.filters.action') },
-  { key: 'table_name', label: t('words.wordList.logs.filters.table') },
-  { key: 'status', label: t('words.wordList.logs.filters.status') },
+  { key: 'permission_levels', label: t('words.wordList.logs.filters.permission'), options: options(['edit', 'manage', 'one', 'two', 'three']) },
+  { key: 'sources', label: t('words.wordList.logs.filters.source'), options: options(['upload', 'location_editor', 'admin', 'sql_editor', 'batch_mutate', 'batch_replace']) },
+  { key: 'actions', label: t('words.wordList.logs.filters.action'), options: options(['import', 'update_location', 'transfer_location', 'delete_location', 'set_permission', 'create', 'update', 'delete', 'batch_create', 'batch_update', 'batch_delete', 'replace']) },
+  { key: 'table_names', label: t('words.wordList.logs.filters.table'), options: options(['vocabulary_entries', 'vocabulary_locations', 'vocabulary_permissions']) },
 ])
 
 function appendFilledFilters(target, filters) {
   Object.entries(filters).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      if (value.length) target[key] = value
+      return
+    }
     const normalized = String(value || '').trim()
     if (normalized) {
       target[key] = normalized
@@ -328,7 +329,7 @@ function applyLogFilters() {
 
 function resetLogFilters() {
   Object.keys(logFilters).forEach((key) => {
-    logFilters[key] = ''
+    logFilters[key] = Array.isArray(logFilters[key]) ? [] : ''
   })
   return applyLogFilters()
 }

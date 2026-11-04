@@ -11,13 +11,15 @@ function readSource(path) {
 }
 
 describe('vocabulary manage location filters', () => {
-  it('shows the location search filters only for manage permission users', () => {
+  it('allows edit users to search locations and restricts username search to manage users', () => {
     const managePage = readSource('src/main/views/explore/word/vocabulary/VocabularyManagePage.vue')
     const locationsSection = readSource('src/main/views/explore/word/vocabulary/ManageLocationsSection.vue')
 
     expect(managePage).toContain(':manage-permission-level="effectiveVocabularyMe?.permission_level"')
     expect(locationsSection).toContain('managePermissionLevel: { type: String, default: null }')
-    expect(locationsSection).toContain("const canShowLocationFilters = computed(() => props.managePermissionLevel === 'manage')")
+    expect(locationsSection).toContain("const canShowLocationFilters = computed(() => ['manage', 'edit'].includes(props.managePermissionLevel))")
     expect(locationsSection).toContain('v-if="canShowLocationFilters"')
+    expect(locationsSection).toContain('v-if="canSearchUsername"')
+    expect(locationsSection).toContain("const canSearchUsername = computed(() => props.managePermissionLevel === 'manage')")
   })
 })

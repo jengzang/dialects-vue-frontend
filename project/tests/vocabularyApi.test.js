@@ -436,6 +436,8 @@ describe('vocabulary table API adapter', () => {
     apiMock.mockResolvedValueOnce({ logs: [], total: 0, page: 1, page_size: 50 })
     await getVocabularyLogs({ source: 'upload', action: 'import' })
     expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/logs?source=upload&action=import')
+    await getVocabularyLogs({ actions: ['create', 'batch_create'], statuses: [], sort_by: 'action', sort_order: 'asc' })
+    expect(apiMock).toHaveBeenLastCalledWith('/api/vocabulary/logs?actions=create%2Cbatch_create&sort_by=action&sort_order=asc')
 
     apiMock.mockResolvedValueOnce({ logs: [], total: 0, page: 1, page_size: 50 })
     await getVocabularyLogs({

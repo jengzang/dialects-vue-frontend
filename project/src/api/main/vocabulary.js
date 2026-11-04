@@ -740,7 +740,7 @@ export async function exportVocabularyLocation(locationName, params = {}) {
 /**
  * 获取词表操作日志。
  *
- * @param {{user_id?: number|string, permission_level?: string, source?: string, action?: string, table_name?: string, status?: string, page?: number, page_size?: number}} [params={}]
+ * @param {{user_id?: number|string, permission_level?: string, source?: string, action?: string, table_name?: string, status?: string, permission_levels?: string[], sources?: string[], actions?: string[], table_names?: string[], statuses?: string[], sort_by?: string, sort_order?: string, page?: number, page_size?: number}} [params={}]
  * @returns {Promise<{logs: Array<object>, total: number, page: number, page_size: number}>}
  */
 export async function getVocabularyLogs(params = {}) {

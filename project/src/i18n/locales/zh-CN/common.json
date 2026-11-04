@@ -22,6 +22,7 @@
     "collapse": "收起"
   },
   "label": {
+    "all": "全部",
     "loading": "加载中...",
     "noData": "暂无数据",
     "error": "错误",

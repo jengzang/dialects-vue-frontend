@@ -22,6 +22,7 @@
     "collapse": "Collapse"
   },
   "label": {
+    "all": "All",
     "loading": "Loading...",
     "noData": "No Data",
     "error": "Error",
