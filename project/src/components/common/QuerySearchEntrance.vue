@@ -38,6 +38,9 @@ const panelStyle = computed(() => ({
   '--query-progress': props.enabled ? progress.value : 1,
   '--query-expansion': props.enabled ? 1 - progress.value : 0,
 }))
+let reboundTimer = null
+let rebounding = false
+let touching = false
 let scrollFrame = null
 let animationFrame = null
 let targetProgress = 0
@@ -58,6 +61,32 @@ const hasSubmittedQuery = ref(false)
 
 function clearBoundary() {
   waitingForGesture = false
+  window.clearTimeout(reboundTimer)
+  reboundTimer = null
+}
+
+function scheduleRebound() {
+  window.clearTimeout(reboundTimer)
+  if (!waitingForGesture || touching || rebounding) return
+  reboundTimer = window.setTimeout(() => {
+    reboundTimer = null
+    if (!waitingForGesture || touching) return
+    const target = compactPosition()
+    if (window.scrollY >= target - 1) return
+    rebounding = true
+    window.scrollTo({
+      top: target,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+    })
+  }, 200)
+}
+
+function cancelRebound() {
+  window.clearTimeout(reboundTimer)
+  reboundTimer = null
+  if (!rebounding) return
+  rebounding = false
+  window.scrollTo({ top: window.scrollY, behavior: 'instant' })
 }
 
 function animateProgress(time) {
@@ -130,12 +159,18 @@ function updateProgress(fromScroll = false) {
     lastWheelTime = window.performance.now()
     wheelDecaying = false
     touchCanReleaseBoundary = false
+    scheduleRebound()
     return
   }
   setTargetProgress(nextProgress, !props.enabled)
 }
 
 function handleScroll() {
+  if (rebounding) {
+    if (window.scrollY >= compactPosition() - 1) rebounding = false
+    return
+  }
+  if (waitingForGesture) scheduleRebound()
   const position = window.scrollY
   if (position < lastScrollPosition) autoCollapsing = false
   if (position !== lastScrollPosition) inputDirection = Math.sign(position - lastScrollPosition)
@@ -153,10 +188,12 @@ function acceptScrollInput(event, direction, canRelease = true) {
   inputDirection = direction
   if (!waitingForGesture) return true
   if (direction > 0) {
+    cancelRebound()
     clearBoundary()
     return true
   }
   if (canRelease) {
+    cancelRebound()
     transitionUnlocked = true
     clearBoundary()
     return true
@@ -179,6 +216,8 @@ function handleWheel(event) {
 }
 
 function handleTouchStart(event) {
+  touching = true
+  cancelRebound()
   touchY = event.touches[0]?.clientY ?? null
   touchCanReleaseBoundary = true
 }
@@ -190,6 +229,11 @@ function handleTouchMove(event) {
     if (acceptScrollInput(event, Math.sign(touchY - nextY), touchCanReleaseBoundary)) handleScroll()
   }
   touchY = nextY ?? null
+}
+
+function handleTouchEnd() {
+  touching = false
+  scheduleRebound()
 }
 
 function handleKeyDown(event) {
@@ -226,6 +270,8 @@ function startListening() {
   window.addEventListener('wheel', handleWheel, { passive: true })
   window.addEventListener('touchstart', handleTouchStart, { passive: true })
   window.addEventListener('touchmove', handleTouchMove, { passive: true })
+  window.addEventListener('touchend', handleTouchEnd, { passive: true })
+  window.addEventListener('touchcancel', handleTouchEnd, { passive: true })
   window.addEventListener('keydown', handleKeyDown)
   window.addEventListener('resize', handleResize, { passive: true })
   updateProgress()
@@ -236,6 +282,8 @@ function stopListening() {
   window.removeEventListener('wheel', handleWheel)
   window.removeEventListener('touchstart', handleTouchStart)
   window.removeEventListener('touchmove', handleTouchMove)
+  window.removeEventListener('touchend', handleTouchEnd)
+  window.removeEventListener('touchcancel', handleTouchEnd)
   window.removeEventListener('keydown', handleKeyDown)
   window.removeEventListener('resize', handleResize)
   if (scrollFrame !== null) window.cancelAnimationFrame(scrollFrame)
@@ -243,6 +291,8 @@ function stopListening() {
   scrollFrame = null
   animationFrame = null
   autoCollapsing = false
+  rebounding = false
+  touching = false
   clearBoundary()
 }
 

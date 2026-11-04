@@ -445,7 +445,6 @@ const tableData = computed(() => {
         </div>
       </div>
 
-      <div class="table-wrapper">
         <div class="table-container">
           <table class="rankings-table desktop-table">
             <thead>
@@ -708,7 +707,6 @@ const tableData = computed(() => {
             </tbody>
           </table>
         </div>
-      </div>
 
       <div class="total-users">
         {{ t('user.leaderboard.totalUsers', { value: formatNumber(rankingsData.total_users) }) }}
@@ -945,24 +943,13 @@ $warning: var(--color-warning);
   }
 }
 
-.table-wrapper {
-  padding: 20px;
-  background: $glass-70;
-  @include glass;
-  border: 0.5px solid $glass-80;
-  border-radius: var(--radius-xl);
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.04),
-    0 8px 32px rgba(0, 0, 0, 0.08),
-    inset 0 0 0 1px $glass-90;
-}
-
 .table-container {
   overflow-x: auto;
   background: $glass-50;
   backdrop-filter: blur(20px);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   box-shadow: inset 0 0 0 1px $glass-60;
+  border: 1px solid $glass-70;
 }
 
 .rankings-table {
@@ -1397,15 +1384,6 @@ $warning: var(--color-warning);
     &-name {
       font-size: var(--font-size-13);
     }
-  }
-
-  .table-wrapper {
-    width: 100%;
-    min-width: 0;
-    align-self: stretch;
-    padding: 12px 0;
-    box-sizing: border-box;
-    overflow-x: auto;
   }
 
   .table-container {

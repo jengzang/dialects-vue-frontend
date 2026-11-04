@@ -43,6 +43,7 @@ beforeEach(async () => {
 afterEach(() => {
   app?.unmount()
   host?.remove()
+  vi.useRealTimers()
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
 })
@@ -144,6 +145,47 @@ describe('query entrance transition timing', () => {
     expect(entrance.progress).toBeCloseTo(0.5)
     await frame(1610)
     expect(entrance.progress).toBe(1)
+  })
+
+  it('returns to the compact position after scrolling settles and cancels on a fresh gesture', async () => {
+    vi.useFakeTimers()
+    scrollPosition = 1000
+    window.dispatchEvent(new Event('scroll'))
+    await frame(0)
+    await frame(400)
+    window.scrollTo.mockClear()
+    scrollPosition = 0
+    window.dispatchEvent(new Event('scroll'))
+    await frame(410)
+    vi.advanceTimersByTime(200)
+    expect(window.scrollTo).toHaveBeenCalledWith({ top: 627.84, behavior: 'smooth' })
+    await frame(610)
+    window.dispatchEvent(new WheelEvent('wheel', { deltaY: -100 }))
+    expect(window.scrollTo).toHaveBeenLastCalledWith({ top: 0, behavior: 'instant' })
+  })
+
+  it('waits for touch release and scrolling inertia before returning', async () => {
+    vi.useFakeTimers()
+    scrollPosition = 1000
+    window.dispatchEvent(new Event('scroll'))
+    await frame(0)
+    await frame(400)
+    window.scrollTo.mockClear()
+    const start = new Event('touchstart')
+    Object.defineProperty(start, 'touches', { value: [{ clientY: 100 }] })
+    window.dispatchEvent(start)
+    scrollPosition = 0
+    window.dispatchEvent(new Event('scroll'))
+    await frame(410)
+    vi.advanceTimersByTime(500)
+    expect(window.scrollTo).not.toHaveBeenCalled()
+    window.dispatchEvent(new Event('touchend'))
+    vi.advanceTimersByTime(100)
+    window.dispatchEvent(new Event('scroll'))
+    vi.advanceTimersByTime(199)
+    expect(window.scrollTo).not.toHaveBeenCalled()
+    vi.advanceTimersByTime(1)
+    expect(window.scrollTo).toHaveBeenCalledOnce()
   })
 
   it('supports a second touch gesture at page top without a scroll event', async () => {
