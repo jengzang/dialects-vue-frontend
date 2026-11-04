@@ -295,7 +295,7 @@ function splitDesc(text) {
 
 .support-note {
   display: inline-block;
-  max-width: 500px;
+  // max-width: 500px;
   margin-top: 0.5rem;
   color: $text-secondary;
   font-size: var(--font-size-14);
