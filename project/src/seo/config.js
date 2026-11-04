@@ -571,9 +571,9 @@ const SEO_CONFIG = {
         en: { main: 'Website History', subtitle: '' },
       },
       description: {
-        'zh-Hant': '查看方音圖鑑的開發歷程與開發感悟；此頁不作為搜尋結果收錄頁。',
-        'zh-CN': '查看方音图鉴的开发历程与开发感悟；此页不作为搜索结果收录页。',
-        en: 'Explore the development journey and reflections of Dialects Atlas; this page is not intended for search result indexing.',
+        'zh-Hant': '查看方音圖鑑從最初腳本到線上平台的完整開發歷程、各版本功能上線時間與開發感悟。',
+        'zh-CN': '查看方音图鉴从最初脚本到线上平台的完整开发历程、各版本功能上线时间与开发感悟。',
+        en: 'Explore the complete development history of Dialects Atlas, from its first scripts to an online platform, including feature release dates and reflections.',
       },
     },
     '/explore/gis': {
@@ -693,6 +693,7 @@ export const SITEMAP_PATHS = [
   '/menu/privacy',
   '/menu/settings',
   '/menu/about/intro',
+  '/menu/about/history',
   '/menu/about/suggestion',
   '/menu/about/like',
   '/menu/query/char',
@@ -741,7 +742,6 @@ export const NOINDEX_PATHS = new Set([
   '/menu/result',
   '/explore/manage',
   '/explore/villages/all',
-  '/menu/about/history',
 ])
 
 export default SEO_CONFIG
