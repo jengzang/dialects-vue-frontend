@@ -531,6 +531,56 @@ describe('vocabulary configuration entrance', () => {
     expect(mocks.locations).toHaveBeenCalledTimes(locationsCount)
   })
 
+  it('loads consecutive pending-total card pages until has_more is false', async () => {
+    mocks.items
+      .mockResolvedValueOnce({ items: [{ id: 1 }], total: null, has_more: true, page: 1 })
+      .mockResolvedValueOnce({ items: [{ id: 2 }], total: null, has_more: true, page: 2 })
+      .mockResolvedValueOnce({ items: [{ id: 3 }], total: 3, has_more: false, page: 3 })
+    await mount()
+    host.querySelector('.submit').click(); await settle()
+    expect(mocks.items.mock.calls.at(-1)[0]).toMatchObject({ defer_total: true, page: 1 })
+    expect(pageState.total).toBeNull()
+    expect(pageState.canLoadMore).toBe(true)
+    await pageState.loadVocabularyItems({ append: true }); await settle()
+    expect(pageState.canLoadMore).toBe(true)
+    await pageState.loadVocabularyItems({ append: true }); await settle()
+    expect(pageState.entries.map(item => item.id)).toEqual([1, 2, 3])
+    expect(pageState.total).toBe(3)
+    expect(pageState.canLoadMore).toBe(false)
+  })
+
+  it('retries the same card page after a failed load without skipping data', async () => {
+    mocks.items
+      .mockResolvedValueOnce({ items: [{ id: 1 }], total: null, has_more: true, page: 1 })
+      .mockRejectedValueOnce(new Error('temporary'))
+      .mockResolvedValueOnce({ items: [{ id: 2 }], total: 2, has_more: false, page: 2 })
+    await mount()
+    host.querySelector('.submit').click(); await settle()
+    await pageState.loadVocabularyItems({ append: true }); await settle()
+    expect(pageState.canLoadMore).toBe(true)
+    await pageState.loadVocabularyItems({ append: true }); await settle()
+    expect(mocks.items.mock.calls.slice(-2).map(([params]) => params.page)).toEqual([2, 2])
+    expect(pageState.entries.map(item => item.id)).toEqual([1, 2])
+  })
+
+  it('keeps cached pending map details loadable and stops on has_more false', async () => {
+    mocks.items
+      .mockResolvedValueOnce({ items: [{ id: 1 }], total: null, has_more: true, page: 1 })
+      .mockResolvedValueOnce({ items: [{ id: 2 }], total: 2, has_more: false, page: 2 })
+    await mount({ tab: 'map' })
+    host.querySelector('.submit').click(); await settle()
+    await pageState.handleMapPointClick({ locationName: '测试地点' }); await settle()
+    expect(mocks.items.mock.calls.at(-1)[0]).toMatchObject({ defer_total: true, page: 1 })
+    expect(pageState.mapDetailTotal).toBeNull()
+    expect(pageState.canLoadMoreMapDetail).toBe(true)
+    await pageState.handleMapPointClick({ locationName: '测试地点' }); await settle()
+    expect(mocks.items).toHaveBeenCalledTimes(1)
+    expect(pageState.canLoadMoreMapDetail).toBe(true)
+    await pageState.loadMoreMapDetail(); await settle()
+    expect(pageState.mapDetailEntries.map(item => item.id)).toEqual([1, 2])
+    expect(pageState.canLoadMoreMapDetail).toBe(false)
+  })
+
   it('keeps pagination on the applied scope while a new location is being selected', async () => {
     vi.useFakeTimers()
     mocks.items.mockResolvedValueOnce({ items: [{ id: 1 }], total: 100 })

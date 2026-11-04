@@ -890,6 +890,7 @@ const pendingVocabularyMapPointRequests = new Map()
 const pendingVocabularyStandardWordRequests = new Map()
 const mapDetailItemsCache = new Map()
 const total = ref(0)
+const itemsHasMore = ref(null)
 const vocabularyCounts = ref({ total: null, locations: null })
 const page = ref(1)
 const pageSize = ref(50)
@@ -901,6 +902,7 @@ const isLoadingMapDetail = ref(false)
 const mapDetailError = ref('')
 const mapDetailEntries = ref([])
 const mapDetailTotal = ref(0)
+const mapDetailHasMore = ref(null)
 const mapDetailPage = ref(1)
 const selectedMapPointLabel = ref('')
 const activeMapPointLocations = ref([])
@@ -1083,11 +1085,13 @@ const isMapInitialLoading = computed(() => (isLoadingItems.value || isLoadingSta
 const isLoadingMore = computed(() => isLoadingItems.value && entries.value.length > 0)
 
 const canLoadMore = computed(() => {
-  return shouldUseVocabularyItemsApi() && !isLoadingItems.value && entries.value.length < total.value
+  return shouldUseVocabularyItemsApi() && !isLoadingItems.value
+    && (itemsHasMore.value ?? (entries.value.length < total.value))
 })
 
 const canLoadMoreMapDetail = computed(() => {
-  return !isLoadingMapDetail.value && mapDetailEntries.value.length < mapDetailTotal.value
+  return !isLoadingMapDetail.value
+    && (mapDetailHasMore.value ?? (mapDetailEntries.value.length < mapDetailTotal.value))
 })
 
 const tableColumns = computed(() => [
@@ -1451,6 +1455,7 @@ function buildVocabularyItemsParams(overrides = {}) {
     ...buildVocabularyQueryParams(),
     page: page.value,
     page_size: pageSize.value,
+    defer_total: true,
     ...overrides,
   }
 }
@@ -1479,6 +1484,7 @@ function buildMapDetailItemsParams(locations, pageNumber) {
     locations,
     page: pageNumber,
     page_size: pageSize.value,
+    defer_total: true,
   }
 }
 
@@ -1660,7 +1666,6 @@ async function loadVocabularyItems({ append = false } = {}) {
 
   activeVocabularyItemsRequestKey.value = requestKey
   activeMapPointsRequestKey.value = ''
-  page.value = nextPage
   isLoadingItems.value = true
   loadError.value = ''
 
@@ -1672,7 +1677,8 @@ async function loadVocabularyItems({ append = false } = {}) {
 
     const nextEntries = Array.isArray(response.items) ? response.items.map((item, index) => normalizeVocabularyEntry(item, index)) : []
     entries.value = append ? entries.value.concat(nextEntries) : nextEntries
-    total.value = Number(response.total) || entries.value.length
+    total.value = response.total == null ? null : Number(response.total)
+    itemsHasMore.value = typeof response.has_more === 'boolean' ? response.has_more : null
     page.value = Number(response.page) || nextPage
     pageSize.value = Number(response.page_size) || pageSize.value
     if (!append) {
@@ -1688,6 +1694,7 @@ async function loadVocabularyItems({ append = false } = {}) {
     if (!append) {
       entries.value = []
       total.value = 0
+      itemsHasMore.value = null
     }
   } finally {
     if (activeVocabularyItemsRequestKey.value === requestKey) {
@@ -1907,6 +1914,7 @@ async function handleMapPointClick(point) {
   mapDetailError.value = ''
   mapDetailEntries.value = []
   mapDetailTotal.value = 0
+  mapDetailHasMore.value = null
   mapDetailPage.value = 1
   activeMapPointLocations.value = locations
 
@@ -1918,6 +1926,7 @@ async function handleMapPointClick(point) {
     const allItems = matchingPoints.flatMap((p) => (Array.isArray(p.items) ? p.items : []))
     mapDetailEntries.value = allItems
     mapDetailTotal.value = allItems.length
+    mapDetailHasMore.value = false
     selectedMapPointLabel.value = baseLabel
     isLoadingMapDetail.value = false
     return
@@ -1935,7 +1944,8 @@ async function handleMapPointClick(point) {
     }
 
     mapDetailEntries.value = Array.isArray(response.items) ? response.items.map((item, index) => normalizeVocabularyEntry(item, index)) : []
-    mapDetailTotal.value = Number(response.total) || mapDetailEntries.value.length
+    mapDetailTotal.value = response.total == null ? null : Number(response.total)
+    mapDetailHasMore.value = typeof response.has_more === 'boolean' ? response.has_more : null
     mapDetailPage.value = Number(response.page) || 1
     selectedMapPointLabel.value = baseLabel
   } catch (error) {
@@ -1953,7 +1963,7 @@ async function handleMapPointClick(point) {
 }
 
 async function loadMoreMapDetail() {
-  if (isLoadingMapDetail.value || mapDetailEntries.value.length >= mapDetailTotal.value) {
+  if (!canLoadMoreMapDetail.value) {
     return
   }
 
@@ -1973,7 +1983,8 @@ async function loadMoreMapDetail() {
       ? response.items.map((item, index) => normalizeVocabularyEntry(item, mapDetailEntries.value.length + index))
       : []
     mapDetailEntries.value = mapDetailEntries.value.concat(nextEntries)
-    mapDetailTotal.value = Number(response.total) || mapDetailEntries.value.length
+    mapDetailTotal.value = response.total == null ? null : Number(response.total)
+    mapDetailHasMore.value = typeof response.has_more === 'boolean' ? response.has_more : null
     mapDetailPage.value = Number(response.page) || nextPage
     selectedMapPointLabel.value = activeMapPointBaseLabel.value
   } catch (error) {
@@ -2219,6 +2230,8 @@ function applyVocabularyQuery() {
   entries.value = []
   mapPoints.value = []
   total.value = 0
+  itemsHasMore.value = null
+  mapDetailHasMore.value = null
   isLoadingItems.value = hasSubmittedSearch.value && viewMode.value !== 'table'
   isLoadingStandardWords.value = false
   isMapDetailModalOpen.value = false
