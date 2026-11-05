@@ -300,13 +300,15 @@ import ResultViewSwitcher from '@/components/common/ResultViewSwitcher.vue'
 import QuerySearchEntrance from '@/components/common/QuerySearchEntrance.vue'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 import { useStorageState } from '@/composables/core/useStorageState.js'
+import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const converter = OpenCC.Converter({ from: 'tw', to: 'cn' })
-const vocabularyCache = useStorageState('yubao_vocabulary_all', { defaultValue: null })
-const grammarCache = useStorageState('yubao_grammar_all', { defaultValue: null })
+const yubaoCacheVersion = getHomeUpdateNotice(() => '').dbVersion || 'default'
+const vocabularyCache = useStorageState(`yubao_vocabulary_all:${yubaoCacheVersion}`, { defaultValue: null })
+const grammarCache = useStorageState(`yubao_grammar_all:${yubaoCacheVersion}`, { defaultValue: null })
 
 // --- 基础状态 ---
 const { state: activeTab, set: setActiveTab } = useRouteQueryState('tab', {
