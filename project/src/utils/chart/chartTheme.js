@@ -35,8 +35,7 @@ function buildAxisTheme(tokens) {
   };
 }
 
-function chartThemeDefaults() {
-  const tokens = readChartTokens();
+function chartThemeDefaults(tokens) {
   return {
     textStyle: { color: tokens.text },
     title: {
@@ -85,10 +84,32 @@ function mergeAxis(defaults, axis) {
   return mergeDefaults(defaults, axis);
 }
 
+// 饼图、桑基图、柱图、散点的标签默认是黑字 + 白描边，且不会继承全局 textStyle。
+const SERIES_LABEL_TYPES = new Set(['pie', 'sankey', 'bar', 'scatter']);
+
+function themeSeriesLabel(series, tokens) {
+  if (!isPlainObject(series) || !SERIES_LABEL_TYPES.has(series.type)) return series;
+
+  const labelDefaults = {
+    color: tokens.text,
+    textBorderColor: tokens.surface,
+    textBorderWidth: 2,
+  };
+  const themed = { ...series, label: mergeDefaults(labelDefaults, series.label) };
+  if (series.emphasis?.label !== undefined) {
+    themed.emphasis = {
+      ...series.emphasis,
+      label: mergeDefaults(labelDefaults, series.emphasis.label),
+    };
+  }
+  return themed;
+}
+
 export function withChartTheme(option) {
   if (!option || !isPlainObject(option)) return option;
 
-  const defaults = chartThemeDefaults();
+  const tokens = readChartTokens();
+  const defaults = chartThemeDefaults(tokens);
   const themed = { ...option, textStyle: mergeDefaults(defaults.textStyle, option.textStyle) };
 
   for (const key of ['title', 'legend', 'tooltip', 'radar', 'toolbox']) {
@@ -102,6 +123,11 @@ export function withChartTheme(option) {
   }
   for (const key of ['xAxis', 'yAxis']) {
     if (option[key] !== undefined) themed[key] = mergeAxis(defaults[key], option[key]);
+  }
+  if (option.series !== undefined) {
+    themed.series = Array.isArray(option.series)
+      ? option.series.map((item) => themeSeriesLabel(item, tokens))
+      : themeSeriesLabel(option.series, tokens);
   }
 
   return themed;
