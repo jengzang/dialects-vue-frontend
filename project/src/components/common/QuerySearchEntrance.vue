@@ -517,9 +517,9 @@ defineExpose({ collapse, progress })
   &.is-compact { width: 100%; }
 }
 
-.query-results--enabled {
-  min-height: 84dvh;
-}
+// .query-results--enabled {
+//   min-height: 84dvh;
+// }
 
 .query-panel-footer {
   @include flex-col;

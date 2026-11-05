@@ -776,7 +776,7 @@ Create `project/src/i18n/locales/zh-CN/layoutFooter.json`:
     }
   },
   "legal": {
-    "copyright": "© 2026 方音图鉴",
+    "copyright": "© 2025–2026 方音图鉴",
     "icp": "粤ICP备2025466875号"
   },
   "share": {
@@ -845,7 +845,7 @@ Create `project/src/i18n/locales/zh-Hant/layoutFooter.json` with literal Traditi
     }
   },
   "legal": {
-    "copyright": "© 2026 方音圖鑑",
+    "copyright": "© 2025–2026 方音圖鑑",
     "icp": "粵ICP備2025466875號"
   },
   "share": {
@@ -914,7 +914,7 @@ Create `project/src/i18n/locales/en/layoutFooter.json`:
     }
   },
   "legal": {
-    "copyright": "© 2026 Chinese Dialect Atlas",
+    "copyright": "© 2025–2026 Chinese Dialect Atlas",
     "icp": "粤ICP备2025466875号"
   },
   "share": {

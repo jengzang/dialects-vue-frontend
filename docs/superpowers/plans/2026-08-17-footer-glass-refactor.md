@@ -423,7 +423,7 @@ Ensure every locale has `legal.copyright` and exact `legal.icp`:
 
 ```json
 "legal": {
-  "copyright": "© 2026 方音图鉴",
+  "copyright": "© 2025–2026 方音图鉴",
   "icp": "粤ICP备2025466875号"
 }
 ```
