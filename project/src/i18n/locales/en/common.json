@@ -82,7 +82,8 @@
       "exportSource": "Export Original File",
       "exporting": "Exporting...",
       "reselect": "Choose Another File",
-      "confirmAndUse": "Confirm Mapping and Continue"
+      "fullscreenPreview": "Fullscreen Preview",
+      "confirmAndUse": "Confirm and Continue"
     },
     "empty": {
       "title": "Select a spreadsheet file first",

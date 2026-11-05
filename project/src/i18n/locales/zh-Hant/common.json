@@ -84,7 +84,8 @@
       "exportSource": "導出源文件",
       "exporting": "導出中...",
       "reselect": "重新選擇檔案",
-      "confirmAndUse": "確認列匹配並使用"
+      "fullscreenPreview": "全螢幕預覽",
+      "confirmAndUse": "確認使用"
     },
     "empty": {
       "title": "請先選擇一個表格檔案",

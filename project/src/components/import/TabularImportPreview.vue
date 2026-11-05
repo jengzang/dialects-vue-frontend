@@ -1,6 +1,6 @@
 <template>
+  <template v-if="!embedded">
   <AppModal
-    v-if="!embedded"
     v-model="isModalOpen"
     size="lg"
     :title="title"
@@ -91,7 +91,11 @@
           <span>{{ t('common.label.loading') }}</span>
         </div>
 
-        <div v-else class="tabular-import-preview__body">
+        <div
+          v-else
+          class="tabular-import-preview__body"
+          :class="{ 'tabular-import-preview__body--mapping-only': portraitMappingOnly }"
+        >
           <div v-if="mappingEnabled" class="tabular-import-preview__mapping glass-subpanel">
             <div class="tabular-import-preview__section-head">
               <div class="tabular-import-preview__section-head-row">
@@ -102,7 +106,7 @@
                   </span>
                 </div>
               </div>
-              <p>{{ t('common.importPreview.mapping.description') }}</p>
+              <!-- <p>{{ t('common.importPreview.mapping.description') }}</p> -->
             </div>
 
             <div class="tabular-import-preview__mapping-list ui-scrollbar">
@@ -194,6 +198,14 @@
         {{ t('common.button.cancel') }}
       </button>
       <button
+        v-if="portraitFullscreenEntry"
+        class="glass-button tabular-import-preview__fullscreen-entry"
+        type="button"
+        @click="isFullscreenPreview = true"
+      >
+        {{ t('common.importPreview.actions.fullscreenPreview') }}
+      </button>
+      <button
         class="glass-button"
         data-variant="primary"
         type="button"
@@ -204,6 +216,123 @@
       </button>
     </template>
   </AppModal>
+
+  <Teleport to="body">
+    <div
+      v-if="isFullscreenPreview"
+      class="tabular-import-preview-fullscreen"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div class="tabular-import-preview-fullscreen__header">
+        <h3 class="tabular-import-preview-fullscreen__title">{{ title }}</h3>
+        <button
+          type="button"
+          class="close-btn close-btn-lg close-btn-inline"
+          :aria-label="t('common.button.close')"
+          @click="isFullscreenPreview = false"
+        >
+          ×
+        </button>
+      </div>
+
+      <div class="tabular-import-preview-fullscreen__content">
+        <div class="tabular-import-preview__toolbar">
+          <div class="tabular-import-preview__toolbar-item">
+            <span class="tabular-import-preview__toolbar-label">{{ t('common.importPreview.controls.sheet') }}</span>
+            <SimpleSelectDropdown
+              :model-value="selectedSheetId"
+              :options="sheetOptions"
+              searchable
+              match-trigger-width
+              width="220px"
+              @update:modelValue="emitSheetChange"
+            />
+          </div>
+          <div class="tabular-import-preview__toolbar-item tabular-import-preview__toolbar-item--compact">
+            <span class="tabular-import-preview__toolbar-label">{{ t('common.importPreview.controls.headerRow') }}</span>
+            <SimpleSelectDropdown
+              :model-value="headerRowIndex"
+              :options="headerRowOptions"
+              width="160px"
+              @update:modelValue="emitHeaderRowChange"
+            />
+          </div>
+          <div class="tabular-import-preview__toolbar-meta">
+            <span>{{ t('common.importPreview.controls.fileName') }}: {{ file?.name }}</span>
+            <span>{{ t('common.importPreview.controls.columns') }}: {{ previewTable?.sourceColumns?.length ?? 0 }}</span>
+            <span>{{ t('common.importPreview.controls.rows') }}: {{ previewTable.activeSheet?.rowCount || 0 }}</span>
+          </div>
+        </div>
+
+        <div v-if="loading" class="tabular-import-preview__loading">
+          <div class="ui-loading--inline" aria-hidden="true"></div>
+          <span>{{ t('common.label.loading') }}</span>
+        </div>
+
+        <div v-else class="tabular-import-preview__preview glass-subpanel">
+          <div class="tabular-import-preview__table-wrap ui-scrollbar" :style="tableStyle">
+            <div class="tabular-import-preview__table">
+              <div class="tabular-import-preview__table-header">
+                <div
+                  v-for="column in previewTable.sourceColumns"
+                  :key="column.key"
+                  class="tabular-import-preview__table-cell tabular-import-preview__table-cell--head"
+                >
+                  {{ column.label }}
+                </div>
+              </div>
+
+              <RecycleScroller
+                v-if="virtualPreviewRows.length"
+                v-slot="{ item: row }"
+                :items="virtualPreviewRows"
+                :item-size="40"
+                :buffer="200"
+                key-field="__rowKey"
+                class="tabular-import-preview__table-scroller ui-scrollbar"
+              >
+                <div class="tabular-import-preview__table-row">
+                  <div
+                    v-for="(cell, cellIndex) in row.cells"
+                    :key="`${row.__rowKey}-${cellIndex}`"
+                    class="tabular-import-preview__table-cell"
+                  >
+                    {{ cell || '—' }}
+                  </div>
+                </div>
+              </RecycleScroller>
+
+              <div v-else class="tabular-import-preview__table-empty">
+                {{ t('common.importPreview.preview.empty') }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabular-import-preview-fullscreen__footer">
+        <button
+          class="glass-button"
+          data-variant="secondary"
+          type="button"
+          @click="isFullscreenPreview = false"
+        >
+          {{ t('common.button.back') }}
+        </button>
+        <button
+          class="glass-button"
+          data-variant="primary"
+          type="button"
+          :disabled="!diagnostics.isComplete"
+          @click="handleFullscreenConfirm"
+        >
+          {{ t('common.importPreview.actions.confirmAndUse') }}
+        </button>
+      </div>
+    </div>
+  </Teleport>
+  </template>
 
   <div v-else class="tabular-import-preview glass-panel">
     <div class="tabular-import-preview__embedded-header">
@@ -379,7 +508,7 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RecycleScroller } from 'vue-virtual-scroller'
 import AppModal from '@/components/common/AppModal.vue'
@@ -489,6 +618,27 @@ const isExporting = ref(false)
 
 const isModalOpen = ref(false)
 
+const portraitQuery = typeof window !== 'undefined'
+  ? window.matchMedia('(max-aspect-ratio: 1/1)')
+  : null
+const isPortrait = ref(portraitQuery?.matches ?? false)
+const isFullscreenPreview = ref(false)
+
+const portraitMappingOnly = computed(() => !props.embedded && isPortrait.value && props.mappingEnabled)
+const portraitFullscreenEntry = computed(() => portraitMappingOnly.value && Boolean(props.file))
+
+function handlePortraitChange(event) {
+  isPortrait.value = event.matches
+}
+
+onMounted(() => {
+  portraitQuery?.addEventListener('change', handlePortraitChange)
+})
+
+onBeforeUnmount(() => {
+  portraitQuery?.removeEventListener('change', handlePortraitChange)
+})
+
 watch(() => props.modelValue, (val) => {
   isModalOpen.value = val
 }, { immediate: true })
@@ -497,6 +647,19 @@ watch(isModalOpen, (val) => {
   if (val !== props.modelValue) {
     emit('update:modelValue', val)
   }
+  if (!val) {
+    isFullscreenPreview.value = false
+  }
+})
+
+watch(isPortrait, (val) => {
+  if (!val) {
+    isFullscreenPreview.value = false
+  }
+})
+
+watch(() => props.file, () => {
+  isFullscreenPreview.value = false
 })
 
 const sheetOptions = computed(() => props.sheets.map((sheet) => ({
@@ -564,6 +727,14 @@ function closeModal() {
 function handleCancel() {
   isModalOpen.value = false
   emit('reset')
+}
+
+function handleFullscreenConfirm() {
+  if (!props.diagnostics.isComplete) {
+    return
+  }
+  isFullscreenPreview.value = false
+  emit('confirm')
 }
 
 function emitSheetChange(value) {
@@ -677,6 +848,16 @@ $preview-min-column-width: 120px;
     align-items: center;
     gap: 8px;
     justify-content: flex-end;
+  }
+
+  &__fullscreen-entry {
+    color: var(--color-primary);
+    background: rgba(var(--color-primary-rgb), 0.12);
+    border-color: rgba(var(--color-primary-rgb), 0.24);
+
+    &:hover:not(:disabled) {
+      background: rgba(var(--color-primary-rgb), 0.2);
+    }
   }
 
   &__eyebrow {
@@ -818,6 +999,8 @@ $preview-min-column-width: 120px;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    padding-bottom: 8px;
+    border-bottom: 0.5px solid var(--text-lightest);
   }
 
   &__mapping-summary {
@@ -1014,20 +1197,93 @@ $preview-min-column-width: 120px;
   }
 }
 
+.tabular-import-preview-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 21000;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: $panel-gap;
+  padding:
+    max(12px, env(safe-area-inset-top))
+    max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom))
+    max(12px, env(safe-area-inset-left));
+  // background: var(--glass-90);
+  backdrop-filter: blur(20px) saturate(160%);
+
+  &__header {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  &__title {
+    margin: 0;
+    color: $text-primary;
+    font-size: var(--font-size-16);
+  }
+
+  &__content {
+    @include flex-col;
+
+    flex: 1 1 auto;
+    gap: $panel-gap;
+    min-height: 0;
+  }
+
+  &__footer {
+    display: flex;
+    flex: 0 0 auto;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+}
+
 @media (orientation: portrait) {
   .tabular-import-preview {
+    padding: 4px;
+
     &__body,
     &__section-head,
     &__header,
     &__toolbar {
       flex-direction: column;
     }
+    &__toolbar {
+      gap: 4px;
+    }
 
     &__mapping {
       flex: 0 1 auto;
       min-height: 0;
+      max-height: 45%;
       overflow: auto;
       transform: translateZ(0);
+    }
+
+    &__preview {
+      flex: 1 1 0;
+      min-height: 200px;
+    }
+
+    &__body--mapping-only {
+      .tabular-import-preview__mapping {
+        flex: 1 1 auto;
+        max-height: none;
+      }
+
+      .tabular-import-preview__mapping-list {
+        flex: 1 1 auto;
+        max-height: none;
+      }
+
+      .tabular-import-preview__preview {
+        display: none;
+      }
     }
 
     &__mapping-row-top {
