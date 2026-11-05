@@ -78,6 +78,8 @@ const COUNTRY_MAP_NAME = 'toponyms-country';
 const BOUNDARY_LAYER_KEYS = ['provinces', 'cities'];
 const TOPONYM_LARGE_RENDER_THRESHOLD = 2000;
 // 绘图颜色固定，避免底图、边界和数据点随页面主题改变。
+// 地图始终使用浅色画布，保证深色主题下深色边界线仍然可见。
+const MAP_BACKGROUND = '#eaf3ff';
 const POINT_COLOR = '#0070e8';
 const POINT_CLICK_FILTER = {
   seriesType: 'scatter',
@@ -220,7 +222,7 @@ function renderChart() {
   }
 
   const option = {
-    backgroundColor: 'transparent',
+    backgroundColor: MAP_BACKGROUND,
     animation: false,
     tooltip: buildTooltipOption(),
     geo: {

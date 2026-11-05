@@ -144,8 +144,8 @@
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import {ref, watch, onMounted, onBeforeUnmount, computed, nextTick} from 'vue'
-import * as echarts from 'echarts'
 import { useI18n } from 'vue-i18n'
+import { initChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 
 const props = defineProps({
   results: {
@@ -248,7 +248,7 @@ const formatContour5pt = (contour) => {
 const initPitchChart = () => {
   if (!pitchChartContainer.value || !hasPitchData.value) return
 
-  pitchChart = echarts.init(pitchChartContainer.value)
+  pitchChart = initChart(pitchChartContainer.value)
   const ts = props.results.timeseries
 
   const pitchData = ts.pitch_hz
@@ -314,7 +314,7 @@ const initPitchChart = () => {
 const initIntensityChart = () => {
   if (!intensityChartContainer.value || !hasIntensityData.value) return
 
-  intensityChart = echarts.init(intensityChartContainer.value)
+  intensityChart = initChart(intensityChartContainer.value)
   const ts = props.results.timeseries
 
   const intensityData = ts.intensity_db
@@ -365,7 +365,7 @@ const initIntensityChart = () => {
 const initFormantChart = () => {
   if (!formantChartContainer.value || !hasFormantData.value) return
 
-  formantChart = echarts.init(formantChartContainer.value)
+  formantChart = initChart(formantChartContainer.value)
   const ts = props.results.timeseries
 
   const formantColors = ['#34c759', '#ff9500', '#5856d6', '#ff2d55', '#5ac8fa']
@@ -437,7 +437,7 @@ const initFormantChart = () => {
 const initSpectrogramChart = () => {
   if (!spectrogramChartContainer.value || !hasSpectrogramData.value) return
 
-  spectrogramChart = echarts.init(spectrogramChartContainer.value)
+  spectrogramChart = initChart(spectrogramChartContainer.value)
 
   const { time, frequency, energy_db } = props.results.spectrogram
 
@@ -647,10 +647,7 @@ const addSpectrogramOverlays = (option) => {
     option.series.push(...overlays)
     option.legend = {
       data: overlays.map(s => s.name),
-      top: 'bottom',
-      textStyle: {
-        color: '#333'
-      }
+      top: 'bottom'
     }
   }
 }
@@ -714,6 +711,11 @@ onMounted(() => {
   }
 })
 
+onChartThemeChange(() => {
+  renderTimeSeriesCharts()
+  if (props.results && hasSpectrogramData.value) initSpectrogramChart()
+})
+
 onBeforeUnmount(() => {
   clearChartResizeObservers()
   disposeTimeSeriesCharts()
@@ -740,7 +742,7 @@ $chart-height: 400px;
 $card-padding: 1.5rem;
 $section-spacing: 2rem;
 
-$border-light: rgba(0, 0, 0, 0.1);
+$border-light: var(--border-light);
 $blue-shadow: rgba(var(--color-primary-rgb), 0.2);
 $blue-shadow-hover: rgba(var(--color-primary-rgb), 0.3);
 

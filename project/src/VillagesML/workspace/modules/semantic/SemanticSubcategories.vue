@@ -219,10 +219,10 @@ import {
   getSemanticSubcategoryComparison
 } from '@/api/index.js'
 import { showError, showSuccess } from '@/utils/ui/message.js'
-import * as echarts from 'echarts'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import { initChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 import BarIcon from '@/components/common/BarIcon.vue'
 import { SEMANTIC_SUBCATEGORY_NAMES, getCategoryDisplayName } from '@/VillagesML/config/villagesML.js'
 import RadioGroup from "@/components/selector/RadioGroup.vue";
@@ -385,7 +385,7 @@ export default {
         radarChartInstance.dispose()
       }
 
-      radarChartInstance = echarts.init(radarChart.value)
+      radarChartInstance = initChart(radarChart.value)
 
       const subcategories = regionalData.value.subcategories || []
       console.log('子类别数据:', subcategories)
@@ -414,7 +414,6 @@ export default {
           splitNumber: 5,
           name: {
             textStyle: {
-              color: '#333',
               fontSize: 12
             }
           },
@@ -487,7 +486,7 @@ export default {
         barChartInstance.dispose()
       }
 
-      barChartInstance = echarts.init(barChart.value)
+      barChartInstance = initChart(barChart.value)
 
       const labels = rankingData.value.map(item => `${item.region_name}\n${getSubcategoryName(item.subcategory)}`)
       const values = rankingData.value.map(item => item.tendency)
@@ -555,6 +554,11 @@ export default {
     onMounted(() => {
       // 添加窗口 resize 事件监听
       window.addEventListener('resize', handleResize)
+    })
+
+    onChartThemeChange(() => {
+      renderRadarChart()
+      renderBarChart()
     })
 
     onUnmounted(() => {

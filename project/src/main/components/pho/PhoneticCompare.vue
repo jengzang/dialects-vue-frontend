@@ -114,11 +114,11 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import * as echarts from 'echarts'
 import HoverDetailCard from '@/components/ToastAndHelp/HoverDetailCard.vue'
 import { resolveHoverDetailCardPosition } from '@/utils/EchartHover/hoverDetailCardPosition.js'
 import { getFeatureStats } from '@/api/index.js'
 import { setRunning } from '@/main/store/store.js'
+import { initChart, onChartThemeChange, readChartTokens } from '@/utils/chart/chartTheme'
 
 const { t } = useI18n()
 
@@ -529,7 +529,8 @@ const renderSankey = async (queryLocs) => {
 
   await nextTick()
 
-  chartInstance.value = echarts.init(el)
+  chartInstance.value = initChart(el)
+  const tokens = readChartTokens()
 
   const option = {
     animation: false,
@@ -559,14 +560,13 @@ const renderSankey = async (queryLocs) => {
         opacity: 0.25
       },
       label: {
-        color: '#333',
         fontSize: 12,
         fontWeight: 'bold',
         formatter: ({ data }) => data.rawLabel
       },
       itemStyle: {
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.8)'
+        borderColor: tokens.surface
       },
       levels: [
         { depth: 0, itemStyle: { color: '#4f7cff' } },
@@ -810,6 +810,10 @@ onMounted(() => {
   window.addEventListener('resize', handleResize)
 })
 
+onChartThemeChange(() => {
+  if (rawData.value) renderSankey(activeLocations.value)
+})
+
 onUnmounted(() => {
   clearChart()
   window.removeEventListener('resize', handleResize)
@@ -969,7 +973,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
 /* 详情卡片内部结构 */
 :deep(.sankey-detail-card .hover-detail-card__header) {
   padding: 14px 16px 10px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--border-divider);
 }
 
 :deep(.sankey-detail-card .hover-detail-card__body) {

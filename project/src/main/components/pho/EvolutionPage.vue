@@ -265,7 +265,6 @@ import { ref, computed, watch, onMounted, onActivated, onUnmounted, nextTick } f
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
-import * as echarts from 'echarts'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
@@ -278,6 +277,7 @@ import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { TABLE_COLUMN_SCHEMAS } from '../../config/chars_positions/characters.js'
 import { userStore } from '@/main/store/store.js'
 import { showWarning } from '@/utils/ui/message.js'
+import { initChart, onChartThemeChange, readChartTokens } from '@/utils/chart/chartTheme'
 import { buildEvolutionMobileDetail, isSameEvolutionMobileDetail } from '@/utils/EchartHover/evolutionDetail.js'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 import {
@@ -692,6 +692,7 @@ const generatePieChartOption = (pieData) => {
   const title = isByValue ? pieData.value : pieData.level1_value
   const total = pieData.total
   const items = isByValue ? pieData.level1 : pieData.phonetic_values
+  const tokens = readChartTokens()
 
   if (!items) return null
 
@@ -706,12 +707,10 @@ const generatePieChartOption = (pieData) => {
       textStyle: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: '#333',
         lineHeight: 14
       },
       subtextStyle: {
-        fontSize: 11,
-        color: '#666'
+        fontSize: 11
       }
     },
     tooltip: {
@@ -771,7 +770,7 @@ const generatePieChartOption = (pieData) => {
       avoidLabelOverlap: true,
       itemStyle: {
         borderRadius: 4,
-        borderColor: '#fff',
+        borderColor: tokens.surface,
         borderWidth: 2
       },
       label: {
@@ -816,7 +815,7 @@ const initPieChart = (container, pieData, index) => {
     return null
   }
 
-  const chart = echarts.init(container, null, {
+  const chart = initChart(container, null, {
     renderer: 'canvas',
     useDirtyRect: true // 启用脏矩形优化
   })
@@ -1130,6 +1129,7 @@ const updateSankeyHeight = (nodes) => {
 }
 
 const generateSankeyOption = () => {
+  const tokens = readChartTokens()
   const sankeyData = buildSankeyData()
   updateSankeyHeight(sankeyData.nodes)
 
@@ -1145,8 +1145,7 @@ const generateSankeyOption = () => {
       top: 12,
       textStyle: {
         fontSize: 15,
-        fontWeight: 'bold',
-        color: '#333'
+        fontWeight: 'bold'
       }
     },
     tooltip: {
@@ -1186,13 +1185,12 @@ const generateSankeyOption = () => {
         opacity: 0.35
       },
       label: {
-        color: '#333',
         fontSize: 12,
         formatter: ({ data }) => data.rawLabel
       },
       itemStyle: {
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.8)'
+        borderColor: tokens.surface
       },
       levels: [
         { depth: 0, itemStyle: { color: '#4f7cff' }, lineStyle: { opacity: 0.35 } },
@@ -1217,7 +1215,7 @@ const renderSankey = async () => {
 
   await nextTick()
 
-  sankeyChartInstance.value = echarts.init(sankeyContainerRef.value, null, {
+  sankeyChartInstance.value = initChart(sankeyContainerRef.value, null, {
     renderer: 'canvas',
     useDirtyRect: true
   })
@@ -1490,6 +1488,11 @@ onUnmounted(() => {
   clearPieCharts()
   clearSankeyChart()
   window.removeEventListener('resize', handleWindowResize)
+})
+
+onChartThemeChange(async () => {
+  if (!rawData.value) return
+  await renderCurrentVisualization()
 })
 </script>
 

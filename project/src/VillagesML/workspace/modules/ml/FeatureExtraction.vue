@@ -400,6 +400,7 @@ import { userStore } from '@/main/store/store.js'
 import { cityHasCounties } from '@/VillagesML/utils/regionPreload.js'
 import { SEMANTIC_CATEGORY_NAMES, isSemanticFeature } from '@/VillagesML/config/villagesML.js'
 import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
+import { initChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 
 // Router
 const router = useRouter()
@@ -890,7 +891,7 @@ const renderAggregationChart = () => {
   if (!aggregationChart.value || !aggregationResults.value) return
 
   if (aggregationChartInstance) aggregationChartInstance.dispose()
-  aggregationChartInstance = echarts.init(aggregationChart.value)
+  aggregationChartInstance = initChart(aggregationChart.value)
   const types = Object.keys(aggregationResults.value.aggregates)
   const values = types.map(t => aggregationResults.value.aggregates[t].value)
 
@@ -1056,6 +1057,10 @@ const handleApiError = (error) => {
 // Lifecycle
 onMounted(() => {
   // FilterableSelect 会自动加载区域列表，无需手动加载
+})
+
+onChartThemeChange(() => {
+  renderAggregationChart()
 })
 
 onBeforeUnmount(() => {

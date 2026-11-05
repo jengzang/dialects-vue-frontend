@@ -197,7 +197,6 @@ import AppModal from '@/components/common/AppModal.vue'
 import RegionDisplay from '@/VillagesML/components/RegionDisplay.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import * as echarts from 'echarts'
 import {
     getRegionalAggregatesCity,
     getRegionalAggregatesCounty,
@@ -207,6 +206,7 @@ import {
 import { showError } from '@/utils/ui/message.js'
 import { SEMANTIC_FEATURE_KEYS, SEMANTIC_CATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'
 import { useAsyncData } from '@/composables/core/useAsyncData.js'
+import { initChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 
 // State
 const currentLevel = ref('city')
@@ -324,7 +324,7 @@ const loadSpatialAggregates = async () => {
 function renderSpatialChart() {
   if (!spatialChart.value || !spatialAggregates.value.length) return
   if (spatialChartInstance) spatialChartInstance.dispose()
-  spatialChartInstance = echarts.init(spatialChart.value)
+  spatialChartInstance = initChart(spatialChart.value)
 
   const seen = new Set()
   const items = spatialAggregates.value.filter(d => {
@@ -391,8 +391,7 @@ function renderSpatialChart() {
         show: true,
         formatter: p => p.data.name,
         position: 'top',
-        fontSize: 11,
-        color: '#555'
+        fontSize: 11
       },
       emphasis: { scale: 1.2 }
     }]
@@ -408,6 +407,10 @@ watch(spatialAggregates, async (val) => {
   requestAnimationFrame(() => {
     renderSpatialChart()
   })
+})
+
+onChartThemeChange(() => {
+  renderSpatialChart()
 })
 
 onBeforeUnmount(() => {

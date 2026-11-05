@@ -225,13 +225,13 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import * as echarts from 'echarts'
 import { compareRegionalVectors, batchCompareRegionalVectors, reduceRegionalVectors } from '@/api/index.js'
 import { showError, showSuccess, showWarning } from '@/utils/ui/message.js'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import BarIcon from '@/components/common/BarIcon.vue'
 import { SEMANTIC_CATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'
+import { initChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 
 // State - Two Region Comparison
 const level1 = ref('city')
@@ -425,7 +425,7 @@ const renderComparisonChart = () => {
   }
 
   if (!comparisonChartInstance) {
-    comparisonChartInstance = echarts.init(comparisonChart.value)
+    comparisonChartInstance = initChart(comparisonChart.value)
   }
 
   const categoryKeys = ['agriculture', 'clan', 'direction', 'infrastructure', 'mountain', 'settlement', 'symbolic', 'vegetation', 'water']
@@ -489,7 +489,7 @@ const renderHeatmap = () => {
   if (!heatmapChart.value || !batchComparisonData.value) return
 
   if (!heatmapChartInstance) {
-    heatmapChartInstance = echarts.init(heatmapChart.value)
+    heatmapChartInstance = initChart(heatmapChart.value)
   }
 
   const regions = batchComparisonData.value.regions.map(r => r.region_name || r.display)
@@ -566,7 +566,7 @@ const renderScatterPlot = () => {
   if (!scatterChart.value || !reductionData.value) return
 
   if (!scatterChartInstance) {
-    scatterChartInstance = echarts.init(scatterChart.value)
+    scatterChartInstance = initChart(scatterChart.value)
   }
 
   const regions = reductionData.value.regions.map(r => r.region_name || r.display)
@@ -668,6 +668,12 @@ const handleResize = () => {
 onMounted(() => {
   window.addEventListener('resize', handleResize)
   window.addEventListener('orientationchange', handleResize)
+})
+
+onChartThemeChange(() => {
+  if (comparisonChartInstance) renderComparisonChart()
+  if (heatmapChartInstance) renderHeatmap()
+  if (scatterChartInstance && reductionData.value) renderScatterPlot()
 })
 
 onUnmounted(() => {

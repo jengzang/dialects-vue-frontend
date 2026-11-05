@@ -51,7 +51,7 @@ describe('Chart lifecycle review fixes', () => {
     expect(source).toContain('onBeforeUnmount')
     expect(source).toContain('let aggregationChartInstance = null')
     expect(source).toContain('if (aggregationChartInstance) aggregationChartInstance.dispose()')
-    expect(source).toContain('aggregationChartInstance = echarts.init(aggregationChart.value)')
+    expect(source).toContain('aggregationChartInstance = initChart(aggregationChart.value)')
     expect(source).toContain('aggregationChartInstance.setOption({')
     expect(source).toContain('onBeforeUnmount(() => {')
   })

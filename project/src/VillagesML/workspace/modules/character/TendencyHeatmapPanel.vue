@@ -56,8 +56,8 @@
 
 <script setup>
 import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import * as echarts from 'echarts'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import { initChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 
 const props = defineProps({
   data: { type: Array, default: () => [] },
@@ -84,7 +84,7 @@ const renderChart = () => {
   if (!chartRef.value || props.data.length === 0) return
 
   if (chartInstance) chartInstance.dispose()
-  chartInstance = echarts.init(chartRef.value)
+  chartInstance = initChart(chartRef.value)
 
   const option = {
     tooltip: {
@@ -160,6 +160,10 @@ watch(
 onMounted(() => {
   window.addEventListener('resize', handleResize)
   nextTick(renderChart)
+})
+
+onChartThemeChange(() => {
+  if (props.data.length) renderChart()
 })
 
 onBeforeUnmount(() => {

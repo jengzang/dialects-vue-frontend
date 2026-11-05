@@ -137,8 +137,8 @@
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import * as echarts from 'echarts'
 import { useI18n } from 'vue-i18n'
+import { initChart as createChart, onChartThemeChange, readChartTokens } from '@/utils/chart/chartTheme'
 import referenceVowelsData from '@/assets/data/vowels.json'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
@@ -312,7 +312,8 @@ const initChart = () => {
     resizeObserver.disconnect()
   }
 
-  chart = echarts.init(chartContainer.value)
+  chart = createChart(chartContainer.value)
+  const tokens = readChartTokens()
 
   let series = []
 
@@ -370,7 +371,7 @@ const initChart = () => {
       itemStyle: {
         color: '#8e8e93',
         opacity: 0.7,
-        borderColor: '#fff',
+        borderColor: tokens.surface,
         borderWidth: 1
       },
       label: {
@@ -520,6 +521,12 @@ onMounted(() => {
       initChart()
     }
   })
+})
+
+onChartThemeChange(() => {
+  if (segmentVowelData.value.length > 0 || allVowelSpaceData.value.length > 0) {
+    initChart()
+  }
 })
 
 onBeforeUnmount(() => {

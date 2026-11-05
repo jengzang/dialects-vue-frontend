@@ -57,8 +57,8 @@
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import * as echarts from 'echarts'
 import { getCategoryDisplayName, getCategoryIcon } from '@/VillagesML/config/villagesML.js'
+import { initChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 
 const props = defineProps({
   network: { type: Object, default: null },
@@ -179,7 +179,7 @@ const renderChart = () => {
   if (!chartRef.value || !props.network) return
 
   if (chartInstance) chartInstance.dispose()
-  chartInstance = echarts.init(chartRef.value)
+  chartInstance = initChart(chartRef.value)
 
   const nodes = transformNodes(props.network.nodes, props.network.communities)
   const edges = transformEdges(props.network.edges)
@@ -248,6 +248,10 @@ const handleResize = () => {
 
 onMounted(() => {
   window.addEventListener('resize', handleResize)
+})
+
+onChartThemeChange(() => {
+  if (props.network && !props.loading) renderChart()
 })
 
 onBeforeUnmount(() => {

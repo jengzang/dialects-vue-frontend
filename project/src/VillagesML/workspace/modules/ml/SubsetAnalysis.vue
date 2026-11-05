@@ -544,7 +544,6 @@ import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed, nextTick, onBeforeUnmount } from 'vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { useRoute, useRouter } from 'vue-router'
-import * as echarts from 'echarts'
 import { clusterSubset, compareSubsets as compareSubsetsAPI, fetchSubsetFilter } from '@/api/index.js'
 import { showError, showSuccess, showWarning } from '@/utils/ui/message.js'
 import { userStore } from '@/main/store/store.js'
@@ -554,6 +553,7 @@ import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { FILTER_FIELDS, getOperatorOptions, getDefaultOperator, getFieldInputType, getFieldOptions } from '@/VillagesML/config/subsetFilters.js'
 import { getCategoryName, getCategoryIcon } from '@/VillagesML/config/villagesML.js'
 import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
+import { initChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 
 // Router
 const router = useRouter()
@@ -972,7 +972,7 @@ const renderComparisonChart = () => {
     comparisonChartInstance = null
   }
 
-  comparisonChartInstance = echarts.init(comparisonChart.value)
+  comparisonChartInstance = initChart(comparisonChart.value)
 
   // 使用 semantic_comparison 數據構建雷達圖
   const semanticData = comparisonResults.value.semantic_comparison || []
@@ -998,7 +998,7 @@ const renderComparisonChart = () => {
   }))
 
   comparisonChartInstance.setOption({
-    title: { text: '子集語義特徵比較', left: 'center', textStyle: { color: '#0b2540', fontWeight: 600 } },
+    title: { text: '子集語義特徵比較', left: 'center', textStyle: { fontWeight: 600 } },
     tooltip: {
       trigger: 'item',
       formatter: (params) => {
@@ -1043,6 +1043,10 @@ const renderClusteringChart = () => {
   // 如果后续 API 添加了 PCA 坐标，可以在这里实现可视化
   return
 }
+
+onChartThemeChange(() => {
+  renderComparisonChart()
+})
 
 // Cleanup on unmount
 onBeforeUnmount(() => {

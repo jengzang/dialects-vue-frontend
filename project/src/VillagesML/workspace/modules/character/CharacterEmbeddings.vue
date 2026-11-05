@@ -156,12 +156,12 @@ import InlineIcon from '@/components/common/InlineIcon.vue'
 import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed, onBeforeUnmount, onMounted, nextTick } from 'vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import * as echarts from 'echarts'
 import {
   getCharEmbeddingsList,
   getCharSimilarities
 } from '@/api/index.js'
 import { showError } from '@/utils/ui/message.js'
+import { initChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 
 // State
 const searchChar = ref('')
@@ -218,7 +218,7 @@ const renderVizChart = () => {
   if (!vizChartRef.value || similarities.value.length === 0) return
 
   if (vizChartInstance) vizChartInstance.dispose()
-  vizChartInstance = echarts.init(vizChartRef.value)
+  vizChartInstance = initChart(vizChartRef.value)
 
   // 過濾掉搜索字符本身，並去除重複字符
   const seenCharacters = new Set([searchChar.value])
@@ -326,6 +326,10 @@ const changePage = (page) => {
 
 onMounted(() => {
   loadEmbeddingsList()
+})
+
+onChartThemeChange(() => {
+  renderVizChart()
 })
 
 onBeforeUnmount(() => {

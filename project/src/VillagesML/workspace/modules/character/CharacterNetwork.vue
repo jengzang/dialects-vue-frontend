@@ -91,13 +91,13 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import * as echarts from 'echarts'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import BarIcon from '@/components/common/BarIcon.vue'
 import { fetchCharacterNetwork } from '@/api/index.js'
 import { showWarning } from '@/utils/ui/message.js'
 import { userStore } from '@/main/store/store.js'
+import { initChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
 
 const router = useRouter()
@@ -194,7 +194,7 @@ const buildNetwork = async () => {
 const renderChart = () => {
   if (!chartRef.value) return
   if (chartInstance) chartInstance.dispose()
-  chartInstance = echarts.init(chartRef.value)
+  chartInstance = initChart(chartRef.value)
   chartInstance.setOption({
     tooltip: {
       formatter: (params) => {
@@ -218,6 +218,10 @@ const renderChart = () => {
 const onResize = () => chartInstance?.resize()
 
 onMounted(() => window.addEventListener('resize', onResize))
+
+onChartThemeChange(() => {
+  if (graphNodes.value.length) renderChart()
+})
 onBeforeUnmount(() => {
   window.removeEventListener('resize', onResize)
   if (chartInstance) chartInstance.dispose()
@@ -255,7 +259,7 @@ onBeforeUnmount(() => {
 .progress-panel { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .progress-text { font-size: var(--font-size-13); color: var(--text-secondary, var(--text-tertiary)); margin: 0; }
 .progress-bar-track {
-  width: 100%; height: 6px; background: rgba(0, 0, 0, 0.08);
+  width: 100%; height: 6px; background: var(--border-light);
   border-radius: 3px; margin-top: var(--radius-xs);
 }
 .progress-bar-fill {

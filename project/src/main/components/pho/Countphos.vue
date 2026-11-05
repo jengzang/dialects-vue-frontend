@@ -3,7 +3,6 @@ import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, nextTick, onMounted, onBeforeUnmount, onActivated, onDeactivated, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { I18nT, useI18n } from 'vue-i18n'
-import * as echarts from 'echarts'
 import { getFeatureCounts, getLocationDetail, getLocations, getSyllableCounts } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue'
@@ -13,6 +12,7 @@ import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { mapStore, pendingCountphosLocations, pendingCountphosQueryMode } from '@/main/store/store.js'
+import { getOrInitChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { useNavAnchorJump } from '@/composables/bar/useNavAnchorJump.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
@@ -384,7 +384,7 @@ const getChartInstance = (chartType, featureType) => {
     return existed
   }
 
-  chartInstances[chartType][featureType] = echarts.getInstanceByDom(el) || echarts.init(el)
+  chartInstances[chartType][featureType] = getOrInitChart(el)
 
   return chartInstances[chartType][featureType]
 }
@@ -397,7 +397,7 @@ const getScatterChartInstance = () => {
     return scatterChartInstance
   }
 
-  scatterChartInstance = echarts.getInstanceByDom(el) || echarts.init(el)
+  scatterChartInstance = getOrInitChart(el)
 
   return scatterChartInstance
 }
@@ -1430,6 +1430,10 @@ watch(pendingCountphosLocations, () => {
 onBeforeUnmount(() => {
   window.removeEventListener('resize', resizeCharts)
   disposeAllCharts()
+})
+
+onChartThemeChange(() => {
+  if (hasChartData.value) renderAllCharts()
 })
 </script>
 
@@ -2556,7 +2560,7 @@ $primary-deep: #003d9e;
   background: linear-gradient(
     135deg,
     var(--glass-70),
-    rgba(245, 250, 255, 0.46)
+    var(--glass-40)
   );
   border: 1px solid var(--glass-70);
   border-radius: 18px;
@@ -2577,7 +2581,7 @@ $primary-deep: #003d9e;
 }
 
 .modal-stat-label {
-  color: rgba(37, 54, 74, 0.68);
+  color: var(--text-tertiary);
   font-size: var(--font-size-13);
   font-weight: 600;
 }
@@ -2596,7 +2600,7 @@ $primary-deep: #003d9e;
   background: linear-gradient(
     145deg,
     var(--glass-70),
-    rgba(248, 251, 255, 0.42)
+    var(--glass-40)
   );
   border: 1px solid var(--glass-60);
   border-radius: 18px;
@@ -2608,7 +2612,7 @@ $primary-deep: #003d9e;
 
 .modal-location-text {
   display: block;
-  color: rgba(28, 43, 61, 0.86);
+  color: var(--text-primary);
   word-break: break-word;
   text-wrap: pretty;
   font-size: var(--font-size-14);

@@ -307,11 +307,11 @@ import {
   getRegionSimilarityMatrix
 } from '@/api/index.js'
 import { showError, showSuccess } from '@/utils/ui/message.js'
-import * as echarts from 'echarts'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import RadioGroup from "@/components/selector/RadioGroup.vue";
+import { initChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 
 export default {
   name: 'RegionSimilarity',
@@ -514,7 +514,7 @@ export default {
         chartInstance.dispose()
       }
 
-      chartInstance = echarts.init(heatmapChart.value)
+      chartInstance = initChart(heatmapChart.value)
 
       const regions = matrixData.value.regions || []
       const matrix = matrixData.value.matrix || []
@@ -601,6 +601,10 @@ export default {
       searchResults.value = null
       pairData.value = null
       matrixData.value = null
+    })
+
+    onChartThemeChange(() => {
+      if (matrixData.value) renderHeatmap()
     })
 
     onBeforeUnmount(() => {
