@@ -791,7 +791,7 @@ $user-accent: var(--color-primary);
     pointer-events: none;
     background:
       radial-gradient(circle at 12% 8%, rgba(var(--color-primary-rgb), 0.16), transparent 30%),
-      radial-gradient(circle at 82% 12%, rgba(88, 86, 214, 0.15), transparent 32%),
+      radial-gradient(circle at 82% 12%, rgba(var(--color-secondary-rgb), 0.15), transparent 32%),
       radial-gradient(circle at 70% 86%, rgba(var(--color-success-rgb), 0.12), transparent 34%),
       linear-gradient(180deg, var(--bg-blue-tint) 0%, var(--bg-blue-light) 48%, var(--bg-light-gray) 100%);
   }
@@ -856,7 +856,7 @@ $user-accent: var(--color-primary);
   text-overflow: ellipsis;
   white-space: nowrap;
   background:
-    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.9), rgba(88, 86, 214, 0.86)),
+    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.9), rgba(var(--color-secondary-rgb), 0.86)),
     rgba(var(--color-primary-rgb), 0.72);
   box-shadow:
     inset 0 1px 0 var(--glass-40),

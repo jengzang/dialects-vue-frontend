@@ -1914,7 +1914,7 @@ onChartThemeChange(() => {
 
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
-$primary-deep: #003d9e;
+$primary-deep: var(--color-secondary-text);
 .phonology-page {
   min-width: 80dvw;
   max-width: min(1000px, 98%);

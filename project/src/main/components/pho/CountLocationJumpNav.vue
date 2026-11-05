@@ -401,7 +401,7 @@ onBeforeUnmount(() => {
 
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
-$primary-deep: #004fc4;
+$primary-deep: var(--color-secondary-text);
 
 $desktop-width: 214px;
 $tablet-width: 176px;
@@ -744,7 +744,7 @@ $mobile-width: 150px;
     background: linear-gradient(
       135deg,
       rgba(var(--color-primary-rgb), 0.88),
-      rgba(0, 81, 213, 0.88)
+      rgba(var(--color-primary-hover-rgb), 0.88)
     );
     border-radius: var(--radius-full);
     box-shadow:

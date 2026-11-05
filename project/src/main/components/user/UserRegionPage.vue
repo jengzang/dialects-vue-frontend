@@ -545,7 +545,7 @@ $region-accent: var(--color-primary);
     pointer-events: none;
     background:
       radial-gradient(circle at 12% 10%, rgba(var(--color-primary-rgb), 0.16), transparent 30%),
-      radial-gradient(circle at 84% 14%, rgba(88, 86, 214, 0.14), transparent 32%),
+      radial-gradient(circle at 84% 14%, rgba(var(--color-secondary-rgb), 0.14), transparent 32%),
       radial-gradient(circle at 70% 86%, rgba(var(--color-success-rgb), 0.11), transparent 34%),
       linear-gradient(180deg, var(--bg-blue-tint) 0%, var(--bg-blue-light) 48%, var(--bg-light-gray) 100%);
   }
@@ -646,7 +646,7 @@ $region-accent: var(--color-primary);
     text-overflow: ellipsis;
     white-space: nowrap;
     background:
-      linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.96), rgba(88, 86, 214, 0.88)),
+      linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.96), rgba(var(--color-secondary-rgb), 0.88)),
       $region-accent;
     box-shadow:
       inset 0 1px 0 var(--glass-40),

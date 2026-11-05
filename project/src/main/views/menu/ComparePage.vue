@@ -2264,6 +2264,10 @@ $text-muted: var(--text-lightest);
   &:disabled {
     opacity: 0.3;
     cursor: not-allowed;
+
+    :root[data-color-mode='dark'] & {
+      opacity: 0.55;
+    }
   }
 }
 
@@ -2275,6 +2279,11 @@ $text-muted: var(--text-lightest);
   );
   border-color: $group1-primary;
   color: $group1-text;
+
+  :root[data-color-mode='dark'] & {
+    color: #81c784;
+    border-color: rgba(var(--color-success-rgb), 0.75);
+  }
 
   &:hover:not(:disabled) {
     background: linear-gradient(
@@ -2295,6 +2304,11 @@ $text-muted: var(--text-lightest);
   );
   border-color: $group2-primary;
   color: $group2-text;
+
+  :root[data-color-mode='dark'] & {
+    color: #64b5f6;
+    border-color: rgba(var(--color-material-blue-rgb), 0.75);
+  }
 
   &:hover:not(:disabled) {
     background: linear-gradient(

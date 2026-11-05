@@ -234,7 +234,7 @@ $transition-base: 0.3s;
   background: linear-gradient(
     135deg,
     rgba(var(--color-primary-rgb), 0.05),
-    rgba(88, 86, 214, 0.05)
+    rgba(var(--color-secondary-rgb), 0.05)
   );
   border-left: 4px solid $primary-blue;
   border-radius: $radius-md;
