@@ -289,8 +289,15 @@ const navbarStyle = computed(() => {
 const getMaxScrollableDistance = () =>
   Math.max(document.documentElement.scrollHeight - window.innerHeight, 0)
 
+const getContentScrollableDistance = () => {
+  const footer = document.querySelector('[data-app-footer]')
+  if (!footer) return getMaxScrollableDistance()
+  return Math.max(footer.getBoundingClientRect().top + window.scrollY - window.innerHeight, 0)
+}
+
 const updateNavbarCollapse = () => {
-  const scrollTop = window.scrollY || document.documentElement.scrollTop
+  const contentScrollableDistance = getContentScrollableDistance()
+  const scrollTop = Math.min(window.scrollY || document.documentElement.scrollTop, contentScrollableDistance)
   const previousScrollTop = lastCollapseScrollTop
   lastCollapseScrollTop = scrollTop
   viewportWidth.value = document.documentElement.clientWidth
@@ -301,7 +308,7 @@ const updateNavbarCollapse = () => {
     return
   }
 
-  if (getMaxScrollableDistance() <= MIN_SCROLLABLE_DISTANCE) {
+  if (contentScrollableDistance <= MIN_SCROLLABLE_DISTANCE) {
     manualExpandScrollStart = null
     collapseProgress.value = 0
     return
@@ -328,7 +335,7 @@ const updateNavbarCollapse = () => {
 }
 
 const expandNavbar = () => {
-  const scrollTop = window.scrollY || document.documentElement.scrollTop
+  const scrollTop = Math.min(window.scrollY || document.documentElement.scrollTop, getContentScrollableDistance())
   lastCollapseScrollTop = scrollTop
   manualExpandScrollStart = scrollTop > MANUAL_EXPAND_MIN_SCROLL ? scrollTop : null
   collapseProgress.value = 0
