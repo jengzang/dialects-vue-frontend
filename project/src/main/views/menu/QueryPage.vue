@@ -26,6 +26,26 @@
             autocomplete="off"
         ></textarea>
       </div>
+      <RouterLink
+          v-show="currentTab === 'tab1'"
+          class="query-cross-link"
+          :to="notesQueryLink"
+      >
+        {{ $t('query.tab1.notesCrossLink') }}
+        <svg
+            class="query-cross-link-arrow"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+        >
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
+      </RouterLink>
 
 
       <div v-show="currentTab === 'tab2'" class="query-page-panel glass-panel">
@@ -347,6 +367,11 @@ const pageTitleIcons = {
 
 const activePageTitle = computed(() => t(pageTitleKeys[currentTab.value] || pageTitleKeys.tab2))
 const activePageIcon = computed(() => pageTitleIcons[currentTab.value] || pageTitleIcons.tab2)
+
+const notesQueryLink = computed(() => ({
+  path: buildLocalePath(resolveRouteLocale(route), '/menu/vocabulary/view'),
+  query: { source: 'character-notes' },
+}))
 
 // Compute limit context based on current tab
 const locationLimitContext = computed(() => {
@@ -955,6 +980,34 @@ export default {
   width: min(90dvw, 600px);
   margin-top: 1dvh;
   border-bottom: 1px solid var(--border-control-focus);
+}
+
+.query-cross-link {
+  margin-top: 1.2dvh;
+  margin-bottom: 1.2dvh;
+  color: var(--color-secondary);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-16);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  transition: color 0.2s ease;
+}
+
+.query-cross-link:hover {
+  color: var(--color-secondary-hover);
+  text-decoration-thickness: 2px;
+}
+
+.query-cross-link-arrow {
+  width: 1em;
+  height: 1em;
+  margin-left: 0.35em;
+  vertical-align: -0.1em;
+  transition: transform 0.2s ease;
+}
+
+.query-cross-link:hover .query-cross-link-arrow {
+  transform: translateX(3px);
 }
 
 .query-hero-input {

@@ -13,6 +13,7 @@
     "desc": "Dialect vocabulary list page",
     "placeholder": "Vocabulary page shell",
     "quickStartPrompt": "Try:",
+    "queryPageCrossLink": "Enter a character to see its readings and distribution on the map? Go to Characters",
     "source": {
       "vocabulary": "Vocabulary",
       "characterNotes": "Character Notes"

@@ -4,6 +4,7 @@
     "title": "查字",
     "label": "請輸入待查漢字",
     "placeholder": "請輸入漢字搜索，單次最多5個漢字，繁簡均可",
+    "notesCrossLink": "根據注釋查詢漢字/□(有音無字)？前往字表註釋",
     "maxCharsWarning": "最多輸入{max}個字，已自動截斷",
     "button": "查詢",
     "description": "查詢漢字的讀音、地位及注釋"

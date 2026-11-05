@@ -4,6 +4,7 @@
     "title": "Characters",
     "label": "Enter Chinese characters",
     "placeholder": "Search Chinese characters (max 5); simplified or traditional both work",
+    "notesCrossLink": "Search characters by annotation or □ (spoken but unwritten)? Go to Character Notes",
     "maxCharsWarning": "You can enter up to {max} characters. Extra characters have been removed automatically.",
     "button": "Query",
     "description": "View character readings, Middle Chinese categories, and annotations"

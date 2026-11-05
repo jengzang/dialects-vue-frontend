@@ -13,6 +13,7 @@
     "desc": "方言詞表頁面",
     "placeholder": "詞表頁面殼子",
     "quickStartPrompt": "試試：",
+    "queryPageCrossLink": "輸入漢字查詢讀音，地圖展示分佈？前往查字",
     "source": {
       "vocabulary": "詞表",
       "characterNotes": "字表註釋"

@@ -13,6 +13,7 @@
     "desc": "方言词表页面",
     "placeholder": "词表页面壳子",
     "quickStartPrompt": "试试：",
+    "queryPageCrossLink": "输入汉字查询读音，地图展示分布？前往查字",
     "source": {
       "vocabulary": "词表",
       "characterNotes": "字表注释"

@@ -96,7 +96,7 @@ describe('color theme token coverage', () => {
     expect(lightBlock).toContain('--color-primary: #b23a32;')
     expect(lightBlock).toContain('--color-primary-rgb: 178, 58, 50;')
     expect(lightBlock).toContain('--color-secondary: #85634d;')
-    expect(lightBlock).toContain('--color-secondary-hover: #70513e;')
+    expect(lightBlock).toContain('--color-secondary-hover: #6a4f3e;')
     expect(lightBlock).toContain('--color-primary-cyan: var(--color-secondary);')
     expect(lightBlock).not.toContain('--color-primary: #5f6368;')
     expect(lightBlock).not.toContain('--color-primary: #2f80ed;')

@@ -51,6 +51,36 @@
   margin-top: 1.5dvh;
 }
 
+.vocabulary-cross-link {
+  display: block;
+  margin-top: 1.5dvh;
+  margin-bottom: 1.5dvh;
+  color: var(--color-secondary);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-16);
+  text-align: center;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  transition: color 0.2s ease;
+}
+
+.vocabulary-cross-link:hover {
+  color: var(--color-secondary-hover);
+  text-decoration-thickness: 2px;
+}
+
+.vocabulary-cross-link-arrow {
+  width: 1em;
+  height: 1em;
+  margin-left: 0.35em;
+  vertical-align: -0.1em;
+  transition: transform 0.2s ease;
+}
+
+.vocabulary-cross-link:hover .vocabulary-cross-link-arrow {
+  transform: translateX(3px);
+}
+
 .vocabulary-quick-start {
   gap: 6px;
 }

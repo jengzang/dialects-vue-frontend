@@ -54,6 +54,26 @@
     />
     </template>
     <template #outside-panel>
+      <RouterLink
+        v-if="isCharacterNotesMode"
+        class="vocabulary-cross-link"
+        :to="queryPageLink"
+      >
+        {{ t('words.wordList.queryPageCrossLink') }}
+        <svg
+          class="vocabulary-cross-link-arrow"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
+      </RouterLink>
       <Teleport
         v-if="isCharacterNotesMode"
         to="#vocabulary-notes-scope-filter"
@@ -610,6 +630,7 @@ import QuerySearchEntrance from '@/components/common/QuerySearchEntrance.vue'
 import LocationAndRegionInput from '@/main/components/geo/LocationAndRegionInput.vue'
 import BarIcon from '@/components/common/BarIcon.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -735,6 +756,7 @@ const source = computed({
   },
 })
 const isCharacterNotesMode = computed(() => source.value === 'character-notes')
+const queryPageLink = computed(() => buildLocalePath(resolveRouteLocale(route), '/menu/query/char'))
 const sourceOptions = computed(() => [
   { value: 'vocabulary', label: t('words.wordList.source.vocabulary') },
   { value: 'character-notes', label: t('words.wordList.source.characterNotes') },
