@@ -1021,7 +1021,7 @@ $preview-min-column-width: 120px;
     flex-direction: column;
     gap: 4px;
     padding: 12px;
-    background: var(--glass-35);
+    background: var(--glass-40);
     border: 1px solid var(--glass-30);
     border-radius: var(--radius-lg);
   }
@@ -1102,7 +1102,7 @@ $preview-min-column-width: 120px;
     z-index: 2;
     flex: 0 0 auto;
     height: $preview-row-height;
-    background: var(--glass-45);
+    background: var(--glass-50);
   }
 
   &__table-scroller {
