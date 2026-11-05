@@ -14,21 +14,17 @@
         {{ activePageTitle }}
       </h1>
 
-      <div v-show="currentTab === 'tab1'" class="query-page-panel glass-panel">
-        <div class="page-content-stack">
-          <!-- 🔹 輸入框區塊 -->
-          <div class="query-box">
-            <label class="query-label" for="hanzi-input">{{ $t('query.tab1.label') }}</label>
-            <textarea
-                id="hanzi-input"
-                style="height: 5dvh;white-space:nowrap;width:min(80dvw,500px)"
-                :placeholder="$t('query.tab1.placeholder')"
-                v-model="hanziInput"
-                @input="handleHanziInput"
-                autocomplete="off"
-            ></textarea>
-          </div>
-        </div>
+      <div v-show="currentTab === 'tab1'" class="query-hero">
+        <textarea
+            id="hanzi-input"
+            class="query-hero-input"
+            rows="1"
+            :aria-label="$t('query.tab1.label')"
+            :placeholder="$t('query.tab1.placeholder')"
+            v-model="hanziInput"
+            @input="handleHanziInput"
+            autocomplete="off"
+        ></textarea>
       </div>
 
 
@@ -947,6 +943,52 @@ export default {
   margin-bottom: 1.5dvh;
 }
 
+.query-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.query-hero::after {
+  content: '';
+  width: min(90dvw, 600px);
+  margin-top: 1dvh;
+  border-bottom: 1px solid var(--border-control-focus);
+}
+
+.query-hero-input {
+  --query-hero-input-height: clamp(64px, 9dvh, 92px);
+  width: min(90dvw, 600px);
+  max-width: none;
+  height: var(--query-hero-input-height);
+  box-sizing: border-box;
+  padding: 0 1.5rem;
+  font-family: var(--font-sans);
+  font-size: clamp(var(--font-size-24), 3.2dvh, var(--font-size-32));
+  line-height: calc(var(--query-hero-input-height) - 4px);
+  text-align: center;
+  color: var(--text-primary);
+  background: var(--surface-panel);
+  border: 2px solid var(--border-control-focus);
+  border-radius: var(--radius-lg);
+  resize: none;
+  white-space: nowrap;
+  overflow-x: auto;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.query-hero-input::placeholder {
+  font-size: var(--font-size-18);
+  color: var(--text-tertiary);
+}
+
+.query-hero-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--focus-ring);
+}
+
 .query-page-panel {
   display: flex;
   justify-content: center;
@@ -964,6 +1006,16 @@ export default {
 
   .query-page-panel {
     padding: 10px;
+    font-size: var(--font-size-16);
+  }
+
+  .query-hero-input {
+    --query-hero-input-height: 60px;
+    padding: 0 4px;
+    font-size: var(--font-size-20);
+  }
+
+  .query-hero-input::placeholder {
     font-size: var(--font-size-16);
   }
 }
@@ -1030,153 +1082,6 @@ export default {
   white-space: nowrap;
   flex-direction: column;
   align-items: center;
-}
-
-.button-group{
-  flex-wrap: wrap; /* 按钮换行 */
-  display: flex;
-  justify-content: center;
-  border-bottom: 1px solid var(--color-blue-dark);  /* 添加苹果蓝色调的下划线 */
-}
-.key-item {
-  flex: 0 1 auto; /* 保证它们的大小适应内容 */
-}
-/* 键名按钮样式 */
-.key-button {
-  padding: 8px 16px;
-  border: 1px solid var(--color-primary-medium);
-  border-radius: 12px;
-  background: var(--glass-30);
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: background 0.3s ease;
-  font-size: var(--font-size-14);
-  margin: 5px;
-}
-
-@media(max-width: 600px) {
-  .key-button{
-    padding: 8px 10px;
-    margin: 3px;
-  }
-}
-
-.key-button.active {
-  background: var(--color-primary-medium2);
-  color: var(--action-primary-text);
-  font-weight: 600;
-}
-.key-dropdown-group{
-  display: flex;
-  flex-wrap: wrap;
-  column-gap:30px;
-}
-/* 键值展示样式 */
-.key-value-dropdown {
-  margin-top: 10px;
-  display: flex;
-  flex-direction: row;
-  width: 135px;
-}
-.key-name{
-  align-self: center;
-}
-
-.key-value-dropdown .dropdown-item {
-  padding: 8px 16px;
-  cursor: pointer;
-  font-size: var(--font-size-14);
-  transition: background-color 0.2s;
-  border-radius: 8px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.key-value-dropdown .dropdown-item:hover {
-  background-color: var(--color-blue-very-light);
-}
-
-/* 选中的键名显示的效果 */
-.key-value-dropdown .dropdown-item.active {
-  background-color: var(--color-primary-medium);
-  color: var(--color-primary);
-}
-
-/* 下拉菜单分割线 */
-.dropdown-divider {
-  height: 1px;
-  background: var(--border-divider);
-  margin: 2px 0;
-}
-
-/* 键名文字颜色 */
-.key-name-text {
-  color: var(--color-blue-custom);
-}
-
-/* 下拉框包装器 */
-.dropdown-wrapper {
-  display: flex;
-  align-items: stretch;
-  border: 1px solid var(--color-primary-medium);
-  border-radius: 8px;
-  overflow: hidden;
-  background: var(--glass-light);
-}
-
-/* 输入框样式 */
-.dropdown-input {
-  flex: 1;
-  border: none;
-  outline: none;
-  padding: 8px 0px;
-  font-size: var(--font-size-14);
-  background: transparent;
-  width: 80px;
-  color: var(--text-dark);
-  text-align: center;
-}
-
-.dropdown-input::placeholder {
-  color: #6a6a6a;
-  font-size: var(--font-size-12);
-  text-align: center;
-}
-
-/* 箭头触发区域 */
-.arrow-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  background: var(--color-primary-medium);
-  border-left: 1px solid rgba(255, 255, 255, 0.3);
-  transition: all 0.2s ease;
-  user-select: none;
-  min-width: 36px;
-  max-width: 36px;
-}
-
-.arrow-trigger:hover {
-  background: var(--color-primary-medium2);
-}
-
-.arrow-trigger:active {
-  transform: scale(0.95);
-}
-
-.arrow-icon {
-  font-size: var(--font-size-14);
-  color: white;
-  font-weight: bold;
-}
-
-/* 全选按钮特殊样式 */
-.select-all-item {
-  color: var(--text-tertiary);
-  font-size: 0.9em;
-  border-bottom: 1px solid #f0f0f0;
 }
 
 .check-icon {

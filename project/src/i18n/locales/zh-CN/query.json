@@ -3,7 +3,7 @@
   "tab1": {
     "title": "查字",
     "label": "请输入待查汉字",
-    "placeholder": "可输入一个或多个汉字",
+    "placeholder": "请输入汉字搜索，单次最多5个汉字，繁简均可",
     "maxCharsWarning": "最多输入{max}个字，已自动截断",
     "button": "查询",
     "description": "查询汉字的读音、地位及注释"

@@ -39,7 +39,7 @@
           <component
             :is="deferQuery ? 'button' : ActionButton"
             class="notes-refresh-action"
-            :class="{ 'query-search-action glass-button': deferQuery }"
+            :class="{ 'query-search-action action-btn': deferQuery }"
             :data-variant="deferQuery ? 'primary' : undefined"
             :variant="deferQuery ? undefined : 'blue'"
             type="button"
