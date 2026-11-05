@@ -4168,7 +4168,7 @@ defineExpose({
     width: 100dvw;
     height: 100dvh;
     min-height: 100dvh;
-    background: var(--color-bg);
+    background: var(--bg-body);
   }
 
   @media (max-aspect-ratio:1/1) {

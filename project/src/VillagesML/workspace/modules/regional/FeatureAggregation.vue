@@ -548,8 +548,8 @@ const liftClass = (lift) => {
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
-  background: var(--bg-glass);
-  border: 1px solid var(--border-color);
+  background: var(--glass-40);
+  border: 1px solid var(--border-glass);
   border-radius: 6px;
   font-size: var(--font-size-13);
 }
@@ -581,11 +581,11 @@ const liftClass = (lift) => {
 .number-input {
   width: 64px;
   padding: 4px 8px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-glass);
   border-radius: 4px;
   font-size: var(--font-size-14);
   text-align: center;
-  background: var(--bg-input);
+  background: var(--surface-panel);
   color: var(--text-primary);
 }
 
@@ -728,7 +728,7 @@ const liftClass = (lift) => {
   flex: 1;
   height: 18px;
   border-radius: 4px;
-  background: var(--bg-glass);
+  background: var(--glass-40);
   overflow: hidden;
 }
 
@@ -761,8 +761,8 @@ const liftClass = (lift) => {
   flex-direction: column;
   align-items: center;
   padding: 12px 20px;
-  background: var(--bg-glass);
-  border: 1px solid var(--border-color);
+  background: var(--glass-40);
+  border: 1px solid var(--border-glass);
   border-radius: 8px;
   min-width: 100px;
 }

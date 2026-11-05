@@ -37,7 +37,7 @@
 .main-card-meta {
   max-width: 100%;
   color: var(--text-secondary);
-  font-family: var(--font-monospace);
+  font-family: var(--font-mono);
   font-size: var(--font-size-12);
 
   @include text-truncate;

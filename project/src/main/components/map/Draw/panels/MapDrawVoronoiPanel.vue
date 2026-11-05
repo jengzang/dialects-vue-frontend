@@ -429,7 +429,7 @@ const offsetClass = computed(() => {
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  background: rgba(var(--glass-50-rgb), 0.85);
+  background: var(--surface-glass-floating);
   backdrop-filter: blur(4px);
   border-radius: inherit;
   z-index: 10;

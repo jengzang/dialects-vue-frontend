@@ -332,7 +332,7 @@ $text-radio-desc: var(--text-tertiary);
 
 $surface-light: var(--glass-30);
 $surface-medium: var(--glass-60);
-$surface-white: var(--glass-100);
+$surface-white: var(--glass-90);
 
 $border-default: rgba(0, 0, 0, 0.1);
 $active-background: rgba(var(--color-primary-rgb), 0.206);

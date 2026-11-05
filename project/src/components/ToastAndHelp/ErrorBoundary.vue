@@ -157,7 +157,7 @@ function goToFeedback() {
   &--secondary {
     background: var(--surface-glass-button);
     color: var(--text-primary);
-    border: 1px solid var(--glass-15);
+    border: 1px solid var(--glass-20);
 
     &:hover {
       background: var(--surface-glass-button-hover);

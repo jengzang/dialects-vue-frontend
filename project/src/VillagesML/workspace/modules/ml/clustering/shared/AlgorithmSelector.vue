@@ -78,12 +78,12 @@ const algorithmHint = computed(() => {
 }
 
 .setting-select:hover {
-  border-color: var(--primary-color);
+  border-color: var(--vml-blue);
 }
 
 .setting-select:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: var(--vml-blue);
   box-shadow: 0 0 0 3px rgba(var(--vml-blue-rgb), 0.1);
 }
 

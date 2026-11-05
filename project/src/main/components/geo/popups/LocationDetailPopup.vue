@@ -447,7 +447,7 @@ $transition-fast: 0.2s;
   width: 24px;
   height: 24px;
   padding: 0;
-  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+  border: 1px solid var(--border-glass);
   border-radius: var(--radius-sm, 4px);
   background: transparent;
   cursor: pointer;

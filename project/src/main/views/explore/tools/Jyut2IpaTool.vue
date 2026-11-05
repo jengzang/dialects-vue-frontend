@@ -973,7 +973,7 @@ $text-60: rgba(var(--text-deep-rgb), 0.6);.jyut2ipa-container {
     margin: 0;
     font-size: var(--font-size-16);
     line-height: 1.6;
-    color: rgba(7, 25, 44, 0.8);
+    color: $text-70;
     text-align: center;
   }
 }

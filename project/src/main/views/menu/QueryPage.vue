@@ -1148,7 +1148,7 @@ export default {
 .dropdown {
   padding: 6px 12px;
   border-radius: var(--radius-md);
-  background: var(--glass-light);
+  background: var(--glass-40);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   cursor: pointer;
@@ -1164,7 +1164,7 @@ export default {
 }
 
 .dropdown:hover {
-  background: var(--glass-medium);
+  background: var(--glass-60);
   border-color: var(--color-primary);
 }
 

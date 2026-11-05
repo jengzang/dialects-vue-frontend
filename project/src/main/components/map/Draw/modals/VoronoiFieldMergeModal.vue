@@ -144,7 +144,7 @@ watch(() => props.modelValue, (isOpen) => {
   white-space: nowrap;
   font-size: var(--font-size-13);
   font-weight: 700;
-  color: var(--text-strong);
+  color: var(--text-deep);
 }
 
 .field-merge-input {
