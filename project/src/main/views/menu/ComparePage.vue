@@ -2073,7 +2073,7 @@ $text-muted: var(--text-lightest);
   @include flex-col;
   align-items: center;
   gap: 1.5dvh;
-  width: 100%;
+  // width: 100%;
   font-size: var(--font-size-18);
 }
 
@@ -2534,6 +2534,7 @@ $text-muted: var(--text-lightest);
     flex-direction: column;
     align-items: center;
     overflow-x: auto;
+    width:auto;
   }
 
   &-location-group {

@@ -272,6 +272,12 @@
     "compare": {
       "options": {
         "optimizeLinks": "优化连线"
+      },
+      "scrollHint": {
+        "drag": "可左右拖动",
+        "scroll": "可左右滚动",
+        "left": "向左滚动",
+        "right": "向右滚动"
       }
     }
   },

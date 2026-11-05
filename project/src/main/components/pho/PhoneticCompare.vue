@@ -41,26 +41,72 @@
       </div>
 
       <!-- 桑基图容器 -->
-      <div
-        class="sankey-chart-wrapper"
-        :class="{ 'is-rendering': isChartRendering }"
-      >
-        <!-- 局部加载：切换 Tab / 重绘桑基图时使用 -->
+      <div class="sankey-chart-shell">
+        <!-- 横向可滚动提示 -->
         <div
-          v-if="isChartRendering"
-          class="sankey-rendering-mask"
+          v-if="showScrollHint && !isChartRendering"
+          class="sankey-scroll-hint"
+          :class="{ 'is-at-start': isAtScrollStart, 'is-at-end': isAtScrollEnd }"
         >
-          <div
-            class="ui-loading--page"
+          <button
+            type="button"
+            class="hint-chevron hint-chevron--left"
+            :aria-label="t('phonology.phonology.compare.scrollHint.left', '向左滚动')"
+            :disabled="isAtScrollStart"
+            @click="scrollSankeyBy(-1)"
+          >
+            <svg
+              viewBox="0 0 10 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M7.5 3 2.5 8l5 5" />
+            </svg>
+          </button>
+          <span
+            class="hint-text"
             aria-hidden="true"
-          />
+          >{{ scrollHintText }}</span>
+          <button
+            type="button"
+            class="hint-chevron hint-chevron--right"
+            :aria-label="t('phonology.phonology.compare.scrollHint.right', '向右滚动')"
+            :disabled="isAtScrollEnd"
+            @click="scrollSankeyBy(1)"
+          >
+            <svg
+              viewBox="0 0 10 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M2.5 3l5 5-5 5" />
+            </svg>
+          </button>
         </div>
 
         <div
-          ref="sankeyContainerRef"
-          class="sankey-chart"
-          :style="{ width: sankeyWidth, height: sankeyHeight }"
-        />
+          ref="sankeyScrollRef"
+          class="sankey-chart-wrapper"
+          :class="{ 'is-rendering': isChartRendering }"
+          @scroll.passive="updateScrollHint"
+        >
+          <!-- 局部加载：切换 Tab / 重绘桑基图时使用 -->
+          <div
+            v-if="isChartRendering"
+            class="sankey-rendering-mask"
+          >
+            <div
+              class="ui-loading--page"
+              aria-hidden="true"
+            />
+          </div>
+
+          <div
+            ref="sankeyContainerRef"
+            class="sankey-chart"
+            :style="{ width: sankeyWidth, height: sankeyHeight }"
+          />
+        </div>
       </div>
     </div>
 
@@ -182,6 +228,41 @@ const sankeyContainerRef = ref(null)
 const chartInstance = ref(null)
 const isMobileLayout = ref(false)
 const MOBILE_LAYOUT_MEDIA_QUERY = '(max-aspect-ratio: 1/1)'
+
+// 横向滚动提示：内容超出可视宽度时显示
+const sankeyScrollRef = ref(null)
+const showScrollHint = ref(false)
+const isAtScrollStart = ref(true)
+const isAtScrollEnd = ref(true)
+
+const scrollHintText = computed(() =>
+  isMobileLayout.value
+    ? t('phonology.phonology.compare.scrollHint.drag', '可左右拖动')
+    : t('phonology.phonology.compare.scrollHint.scroll', '可左右滚动')
+)
+
+const scrollSankeyBy = (direction) => {
+  const el = sankeyScrollRef.value
+
+  if (!el) return
+
+  const step = Math.max(80, Math.round(el.clientWidth * 0.2))
+  el.scrollBy({ left: direction * step, behavior: 'smooth' })
+}
+
+const updateScrollHint = () => {
+  const el = sankeyScrollRef.value
+
+  if (!el) {
+    showScrollHint.value = false
+    return
+  }
+
+  const maxScrollLeft = el.scrollWidth - el.clientWidth
+  showScrollHint.value = maxScrollLeft > 2
+  isAtScrollStart.value = el.scrollLeft <= 2
+  isAtScrollEnd.value = el.scrollLeft >= maxScrollLeft - 2
+}
 
 // 父组件控制项在图表渲染期间变化时，记录一次待重绘
 let hasPendingRerender = false
@@ -361,14 +442,20 @@ const renderSankey = async (queryLocs) => {
 
   const el = sankeyContainerRef.value
 
-  if (!el || !rawData.value) return
+  if (!el || !rawData.value) {
+    updateScrollHint()
+    return
+  }
   if (el.clientWidth === 0 || el.clientHeight === 0) return
 
   const raw = rawData.value
   const charsMap = raw.chars_map || []
   const validLocs = queryLocs.filter(loc => raw.data[loc])
 
-  if (validLocs.length < 2) return
+  if (validLocs.length < 2) {
+    updateScrollHint()
+    return
+  }
 
   const nodeMap = new Map()
   const links = []
@@ -589,6 +676,7 @@ const renderSankey = async (queryLocs) => {
 
   requestAnimationFrame(() => {
     chartInstance.value?.resize()
+    updateScrollHint()
   })
 
   const updateDetailCardPosition = (params) => {
@@ -699,6 +787,7 @@ const renderSankey = async (queryLocs) => {
 const handleResize = () => {
   isMobileLayout.value = window.matchMedia(MOBILE_LAYOUT_MEDIA_QUERY).matches
   chartInstance.value?.resize()
+  nextTick(updateScrollHint)
 }
 
 // ========== 监听父组件传入的图表控制项：只重绘，不重新请求 API ==========
@@ -904,6 +993,131 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
     border-color: var(--color-primary, #{$primary});
     box-shadow: 0 4px 10px rgba(var(--color-primary-rgb), 0.2);
     color: var(--action-primary-text);
+  }
+}
+
+/* 桑基图横向滚动提示 */
+.sankey-chart-shell {
+  position: relative;
+  width: 100%;
+}
+
+.sankey-scroll-hint {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  z-index: 21;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 2px 9px;
+  background: var(--glass-80);
+  border: 1px solid var(--border-glass-subtle);
+  border-radius: var(--radius-pill);
+  color: var(--color-primary);
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition: opacity 0.2s ease;
+
+  @include glass-blur(8px);
+
+  .hint-text {
+    color: var(--text-secondary);
+    font-size: var(--font-size-12);
+    line-height: 1;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .hint-chevron {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    opacity: 0.9;
+    pointer-events: auto;
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+
+    svg {
+      display: block;
+      width: 10px;
+      height: 16px;
+    }
+
+    &:not(:disabled) svg {
+      animation: hint-chevron-nudge 2.4s ease-in-out infinite;
+    }
+
+    &--left:not(:disabled) svg {
+      animation-name: hint-chevron-nudge-left;
+    }
+
+    path {
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    &:not(:disabled):hover {
+      opacity: 1;
+    }
+
+    &:not(:disabled):active {
+      transform: scale(0.88);
+    }
+
+    &:focus-visible {
+      border-radius: var(--radius-pill);
+      outline: 2px solid var(--color-primary);
+      outline-offset: 1px;
+    }
+
+    &:disabled {
+      cursor: default;
+    }
+  }
+
+  &.is-at-start .hint-chevron--left,
+  &.is-at-end .hint-chevron--right {
+    opacity: 0.2;
+  }
+}
+
+@keyframes hint-chevron-nudge {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes hint-chevron-nudge-left {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hint-chevron svg {
+    animation: none;
   }
 }
 
