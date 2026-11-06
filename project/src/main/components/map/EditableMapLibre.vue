@@ -401,6 +401,17 @@ let previewHoverBound = false
 let suppressedProgrammaticFeatureSelectionIds = null
 let isDeletingSelected = false
 let featureBoxDragPanWasEnabled = true
+let pendingStyleSync = false
+
+const isMapStyleReady = () => Boolean(map.value?.isStyleLoaded?.())
+
+// addSource/addLayer throw "Style is not done loading" until the style (and its
+// sources) finish loading; defer the overlay sync to the map idle event instead.
+const canSyncOverlayLayers = () => {
+  if (isMapStyleReady()) return true
+  if (map.value) pendingStyleSync = true
+  return false
+}
 let lastEditTargetHoverKey = ''
 let consumedHitGesture = null
 let sketchSession = null
@@ -1010,7 +1021,7 @@ const ensureTextBackgroundLayers = () => {
 }
 
 const syncTextBackgroundBoxes = () => {
-  if (!map.value) return
+  if (!canSyncOverlayLayers()) return
   ensureTextBackgroundLayers()
   map.value.getSource(textBackgroundSourceId)?.setData?.(featureCollection(buildTextBackgroundFeatures()))
 }
@@ -1088,7 +1099,7 @@ const ensureTextLeaderLayer = () => {
 }
 
 const syncTextLeaderLines = () => {
-  if (!map.value) return
+  if (!canSyncOverlayLayers()) return
   ensureTextLeaderLayer()
   map.value.getSource(textLeaderSourceId)?.setData?.(featureCollection(buildTextLeaderFeatures()))
 }
@@ -1100,7 +1111,7 @@ const syncTextScaleVisibility = () => {
 }
 
 const syncReadonlyLayers = () => {
-  if (!map.value) return
+  if (!canSyncOverlayLayers()) return
   const layerDescriptors = [
     ...buildReadonlyLayerDescriptors(),
     ...buildPreviewLayerDescriptors(),
@@ -1294,7 +1305,7 @@ const getSquaredScreenDistance = (left, right) => {
 const emptySnapPreviewFeatureCollection = () => featureCollection([])
 
 const ensureSnapPreviewLayers = () => {
-  if (!map.value) return
+  if (!canSyncOverlayLayers()) return
 
   if (!map.value.getSource(snapPreviewSourceId)) {
     map.value.addSource(snapPreviewSourceId, {
@@ -1337,6 +1348,13 @@ const ensureSnapPreviewLayers = () => {
       },
     })
   }
+}
+
+const flushPendingStyleSync = () => {
+  if (!pendingStyleSync || !isMapStyleReady()) return
+  pendingStyleSync = false
+  syncReadonlyLayers()
+  ensureSnapPreviewLayers()
 }
 
 const setSnapPreview = (snapResult) => {
@@ -2498,7 +2516,7 @@ const buildHitCandidatesFromClick = (event) => {
 }
 
 const previewHitCandidate = (candidate) => {
-  if (!map.value || !candidate?.feature?.geometry) return
+  if (!isMapStyleReady() || !candidate?.feature?.geometry) return
   if (!map.value.getSource(hitPreviewSourceId)) map.value.addSource(hitPreviewSourceId, { type: 'geojson', data: featureCollection([]) })
   const layers = [
     { id: hitPreviewLayerIds[0], type: 'fill', filter: ['==', '$type', 'Polygon'], paint: { 'fill-color': drawFallbackStroke, 'fill-opacity': 0.15 } },
@@ -2891,7 +2909,7 @@ const focusGeometryIssue = (issue) => {
 const clearGeometryIssue = () => map.value?.getSource?.(geometryIssueSourceId)?.setData?.(featureCollection([]))
 
 const showGeometryIssue = (issue, feature) => {
-  if (!map.value) return
+  if (!isMapStyleReady()) return
   if (!map.value.getSource(geometryIssueSourceId)) {
     map.value.addSource(geometryIssueSourceId, { type: 'geojson', data: featureCollection([]) })
   }
@@ -3807,6 +3825,7 @@ const initializeMap = async () => {
     syncActiveTextLayoutConstants()
     syncTextBackgroundBoxes()
   })
+  map.value.on('idle', flushPendingStyleSync)
   map.value.on('mousemove', handleEditTargetMouseMove)
   map.value.on('mouseleave', clearEditTargetHover)
   map.value.on('moveend', () => {

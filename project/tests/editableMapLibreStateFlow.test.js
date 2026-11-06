@@ -63,6 +63,9 @@ vi.mock('maplibre-gl', () => {
       handler()
     }
     triggerRepaint() {}
+    isStyleLoaded() {
+      return true
+    }
     getStyle() {
       return { layers: [] }
     }
