@@ -469,6 +469,9 @@ const convertToGeoJSON = (data) => {
       naturalVillage: aggregateField(item => item.naturalVillage),
       yindianRegion: aggregateField(item => item.yindianRegion),
       atlasRegion: aggregateField(item => item.atlasRegion),
+      vocabularySource: aggregateField(item => item.vocabularySource),
+      description: aggregateField(item => item.description),
+      other: aggregateField(item => item.other),
       ...Object.fromEntries(TONE_FIELD_KEYS.map(key => [key, aggregateField(item => item[key])])),
     }
 
@@ -588,6 +591,9 @@ const handleMarkerClick = (properties) => {
     naturalVillage: properties.naturalVillage,
     yindianRegion: properties.yindianRegion,
     atlasRegion: properties.atlasRegion,
+    vocabularySource: properties.vocabularySource,
+    description: properties.description,
+    other: properties.other,
     ...Object.fromEntries(TONE_FIELD_KEYS.map(key => [key, properties[key]])),
     itemCount: Number(properties.itemCount) || 0,
   })

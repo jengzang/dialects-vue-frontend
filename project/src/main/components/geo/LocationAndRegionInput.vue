@@ -606,6 +606,29 @@ function applySuggestion(item) {
   })
 }
 
+/* ========== 地點輸入框高度自適應（最多 5 行） ========== */
+const MIN_TEXTAREA_ROWS = 2
+const MAX_TEXTAREA_ROWS = 5
+
+function resizeLocationTextarea() {
+  const el = inputEl.value
+  if (!el) return
+
+  const styles = getComputedStyle(el)
+  const lineHeight = parseFloat(styles.lineHeight) || parseFloat(styles.fontSize) * 1.4
+  const borderHeight = parseFloat(styles.borderTopWidth) + parseFloat(styles.borderBottomWidth)
+  const verticalExtra = parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom) + borderHeight
+  const minHeight = lineHeight * MIN_TEXTAREA_ROWS + verticalExtra
+  const maxHeight = lineHeight * MAX_TEXTAREA_ROWS + verticalExtra
+
+  el.style.height = 'auto'
+  const contentHeight = el.scrollHeight + borderHeight
+  el.style.height = `${Math.min(Math.max(contentHeight, minHeight), maxHeight)}px`
+  el.style.overflowY = contentHeight > maxHeight ? 'auto' : 'hidden'
+}
+
+watch(inputValue, () => nextTick(resizeLocationTextarea))
+
 /* ========== 分區選擇邏輯 ========== */
 // const selectedValue = ref([])  // ✅ 不要 ['']
 
@@ -628,6 +651,8 @@ function onSelect(values) {
 
 onMounted(() => {
   commitLastValidRegionSelection()
+  resizeLocationTextarea()
+  window.addEventListener('resize', resizeLocationTextarea)
 })
 
 async function fetchLocationsResult() {
@@ -1223,6 +1248,7 @@ onBeforeUnmount(() => {
   locationResolutionToken++
   clearTimeout(debounceTimer)
   clearTimeout(debounceTimer2)
+  window.removeEventListener('resize', resizeLocationTextarea)
 })
 </script>
 

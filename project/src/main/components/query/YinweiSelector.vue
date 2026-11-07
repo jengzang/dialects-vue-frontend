@@ -365,7 +365,7 @@ $glass-blur: 12px;
 }
 
 .help-trigger {
-  color: $primary-blue;
+  color: var(--color-secondary-hover);
   font-size: var(--font-size-13);
   text-decoration: none;
   cursor: pointer;
@@ -373,7 +373,7 @@ $glass-blur: 12px;
 
   &:hover {
     text-decoration: underline;
-    opacity: 0.7;
+    transform: scale(1.05);
   }
 }
 

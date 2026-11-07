@@ -139,7 +139,6 @@ $white: var(--text-white);
 
 $text-default: rgba(24, 32, 46, 0.86);
 $text-dark: rgba(0, 0, 0, 0.85);
-$text-action-info: rgba(20, 34, 56, 0.88);
 
 $toast-enter-easing: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -274,11 +273,11 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
     &.has-action {
-      color: $text-action-info;
+      color: var(--text-primary);
       background: linear-gradient(
         135deg,
         var(--glass-60),
-        rgba(234, 243, 255, 0.4)
+        rgba(var(--color-primary-rgb), 0.10)
       );
       border-color: var(--glass-50);
 

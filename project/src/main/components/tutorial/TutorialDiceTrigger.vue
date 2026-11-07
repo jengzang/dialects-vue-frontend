@@ -112,7 +112,7 @@ $shadow-hover:
 
 @mixin glass-bg {
   background:
-    linear-gradient(135deg, var(--glass-80), rgba(226, 241, 255, 0.46)),
+    linear-gradient(135deg, var(--glass-80), rgba(var(--color-primary-rgb), 0.10)),
     radial-gradient(circle at 18% 0%, var(--glass-90), transparent 40%);
   backdrop-filter: blur(20px) saturate(165%);
   -webkit-backdrop-filter: blur(20px) saturate(165%);

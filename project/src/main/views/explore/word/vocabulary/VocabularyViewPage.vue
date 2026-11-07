@@ -958,12 +958,6 @@ const mapDetailMetaRows = computed(() => {
     rows.push(toneRow)
   }
 
-  rows.push({
-    key: 'count',
-    label: '',
-    value: t('words.wordList.map.pointCount', { count: mapDetailEntries.value.length }),
-  })
-
   appendTrailingMapPointMetaRow(rows, meta)
 
   return rows

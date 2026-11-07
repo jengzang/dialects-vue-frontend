@@ -1012,7 +1012,6 @@ $preview-min-column-width: 120px;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    max-height: 280px;
     padding-right: 4px;
     overflow: auto;
   }
