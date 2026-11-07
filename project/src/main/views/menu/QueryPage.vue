@@ -63,44 +63,43 @@
       </div>
 
       <div v-show="currentTab === 'tab2'" class="query-page-panel glass-panel">
-        <div class="page-content-stack">
-          <!-- 直接輸入模式 -->
-          <div v-if="zhongguInputMode === 'direct'" class="direct-input-box">
-            <ZhongGuDirectInput
+        <p v-if="zhongguInputMode !== 'direct'" class="panel-hint">{{ $t('query.tab2.selectHint') }}</p>
+        <!-- 直接輸入模式 -->
+        <div v-if="zhongguInputMode === 'direct'" class="direct-input-box">
+          <ZhongGuDirectInput
+            :exclude-columns="tabStates.tab2.excludeColumns"
+            :table-name="selectedCharacterTable"
+            @update:runDisabled="setTabContentDisabled('query', 'tab2', $event)"
+            ref="ZhongguDirectInputRef"
+          />
+        </div>
+
+        <!-- 選擇器模式 -->
+        <div v-else class="triple-select-box">
+          <!-- ✅ 鍵名 + 鍵值：同一行，用容器包 -->
+          <div class="dropdown-row">
+            <KeyButtonGroup
+              :available-keys="availableKeys"
+              v-model="tabStates.tab2.keys"
+              :exclusive-rules="exclusiveRules"
+              :single-select-keys="singleSelectKeys"
+            />
+            <DropdownValueSelector
+              :selected-keys="tabStates.tab2.keys"
+              v-model="tabStates.tab2.valueMap"
+              :key-value-map="keyValueMap"
+            />
+          </div>
+          <ZhongguSelector
+              :active-keys="tabStates.tab2.keys"
+              :value-map="tabStates.tab2.valueMap"
+              :is-dropdown-open="excludeDropdownOpen === 'tab2'"
+              :selected-card="tabStates.tab2.card"
               :exclude-columns="tabStates.tab2.excludeColumns"
               :table-name="selectedCharacterTable"
               @update:runDisabled="setTabContentDisabled('query', 'tab2', $event)"
-              ref="ZhongguDirectInputRef"
-            />
-          </div>
-
-          <!-- 選擇器模式 -->
-          <div v-else class="triple-select-box">
-            <!-- ✅ 鍵名 + 鍵值：同一行，用容器包 -->
-            <div class="dropdown-row">
-              <KeyButtonGroup
-                :available-keys="availableKeys"
-                v-model="tabStates.tab2.keys"
-                :exclusive-rules="exclusiveRules"
-                :single-select-keys="singleSelectKeys"
-              />
-              <DropdownValueSelector
-                :selected-keys="tabStates.tab2.keys"
-                v-model="tabStates.tab2.valueMap"
-                :key-value-map="keyValueMap"
-              />
-            </div>
-            <ZhongguSelector
-                :active-keys="tabStates.tab2.keys"
-                :value-map="tabStates.tab2.valueMap"
-                :is-dropdown-open="excludeDropdownOpen === 'tab2'"
-                :selected-card="tabStates.tab2.card"
-                :exclude-columns="tabStates.tab2.excludeColumns"
-                :table-name="selectedCharacterTable"
-                @update:runDisabled="setTabContentDisabled('query', 'tab2', $event)"
-                ref="ZhongguRef"
-            />
-          </div>
+              ref="ZhongguRef"
+          />
         </div>
       </div>
 
@@ -120,29 +119,28 @@
       </div>
 
       <div v-show="currentTab === 'tab3'" class="query-page-panel glass-panel">
-        <div class="page-content-stack">
-          <!-- 三欄選擇 -->
-          <div class="triple-select-box">
-            <div class="dropdown-row">
-              <KeyButtonGroup
-                :available-keys="availableKeys"
-                v-model="tabStates.tab3.keys"
-                :exclusive-rules="exclusiveRules"
-                :single-select-keys="singleSelectKeys"
-              />
+        <p class="panel-hint">{{ $t('query.tab3.selectHint') }}</p>
+        <!-- 三欄選擇 -->
+        <div class="triple-select-box">
+          <div class="dropdown-row">
+            <KeyButtonGroup
+              :available-keys="availableKeys"
+              v-model="tabStates.tab3.keys"
+              :exclusive-rules="exclusiveRules"
+              :single-select-keys="singleSelectKeys"
+            />
 
-              <!-- 🔄 輸入框 -->
-              <YinweiSelector
-                  ref="YinweiSelectorRef"
-                  :locationRef="locationRef"
-                  :selected-card="tabStates.tab3.card"
-                  @update:runDisabled="setTabContentDisabled('query', 'tab3', $event)"
-              />
+            <!-- 🔄 輸入框 -->
+            <YinweiSelector
+                ref="YinweiSelectorRef"
+                :locationRef="locationRef"
+                :selected-card="tabStates.tab3.card"
+                @update:runDisabled="setTabContentDisabled('query', 'tab3', $event)"
+            />
 
-              <div class="info-text" style="margin: 10px 0 15px">
-                <span class="info-icon">ℹ️</span>
-                <span v-html="$t('query.tab3.analysisText', { card: tabStates.tab3.card, keys: selectedKeysString })"></span>
-              </div>
+            <div class="info-text" style="margin: 10px 0 15px">
+              <span class="info-icon">ℹ️</span>
+              <span v-html="$t('query.tab3.analysisText', { card: tabStates.tab3.card, keys: selectedKeysString })"></span>
             </div>
           </div>
         </div>
@@ -894,7 +892,9 @@ export default {
 
 .query-page-panel {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5dvh;
   margin: 0 auto;
   padding: 2dvh;
   max-height: 35dvh;
@@ -957,11 +957,17 @@ export default {
   flex-direction: column;
 }
 
-.page-content-stack {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5dvh;
+.panel-hint {
+  display: none;
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--font-size-13);
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .panel-hint {
+    display: block;
+  }
 }
 
 .card-row-outer {

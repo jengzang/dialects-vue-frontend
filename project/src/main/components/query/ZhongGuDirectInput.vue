@@ -1,5 +1,5 @@
 <template>
-  <div class="zhonggu-direct-input glass-card">
+  <div class="zhonggu-direct-input">
     <div class="input-section">
       <div class="input-label-row">
         <label class="input-label">{{ $t('query.components.zhongguDirectInput.positionLabel') }}</label>
@@ -173,7 +173,7 @@ $transition-duration: 0.2s;
   gap: 6px;
   width: 80dvw;
   max-width: 600px;
-  margin: 10px 0;
+  margin-bottom: 10px;
   padding: 12px;
   background: none;
   transform: translateX(-50%);

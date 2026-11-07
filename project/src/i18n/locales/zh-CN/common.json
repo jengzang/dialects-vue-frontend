@@ -40,6 +40,9 @@
     "search": "请输入搜索内容"
   },
   "components": {
+    "cardExcludeRow": {
+      "hint": "请选择声/韵/调"
+    },
     "multiSelect": {
       "selectAll": "全选",
       "deselectAll": "取消全选",

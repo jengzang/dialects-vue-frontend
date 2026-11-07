@@ -96,6 +96,7 @@
         style="max-height: 50dvh;overflow-x: auto;"
       >
         <div class="page-content-stack">
+          <p v-if="zhongguInputMode !== 'direct'" class="panel-hint">{{ $t('compare.messages.tab2SelectHint') }}</p>
           <!-- 單一中古選擇器 -->
           <div
             class="compare-group"
@@ -1925,6 +1926,8 @@ $text-muted: var(--text-lightest);
 .compare-page-panel {
   display: flex;
   justify-content: center;
+  width: fit-content;
+  min-width: 60dvw;
   margin: 0 auto;
   padding: 2dvh;
   max-height: 35dvh;
@@ -1949,6 +1952,19 @@ $text-muted: var(--text-lightest);
   @include flex-col;
   align-items: center;
   gap: 1.5dvh;
+}
+
+.panel-hint {
+  display: none;
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--font-size-13);
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .panel-hint {
+    display: block;
+  }
 }
 
 @keyframes fade {
@@ -1987,6 +2003,8 @@ $text-muted: var(--text-lightest);
 
 /* Tab1 汉字比较 */
 .tab1-layout {
+  width: fit-content;
+  max-width: 100%;
   flex-direction: row;
   flex-wrap: wrap;
   align-items: stretch;
@@ -2000,7 +2018,7 @@ $text-muted: var(--text-lightest);
   }
 
   .feature-selection {
-    width: 100%;
+    width: auto;
     order: 3;
   }
 
@@ -2296,7 +2314,7 @@ $text-muted: var(--text-lightest);
   justify-content: center;
   flex-wrap: wrap;
   gap: 1rem;
-  padding: 1rem;
+  // padding: 1rem;
 }
 
 .tone-checkbox {
@@ -2461,7 +2479,7 @@ $text-muted: var(--text-lightest);
 
   .tone-selection {
     gap: 0.8rem;
-    padding: 0.5rem;
+    // padding: 0.5rem;
   }
 
   .tone-checkbox {

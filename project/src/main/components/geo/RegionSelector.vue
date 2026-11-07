@@ -1181,5 +1181,11 @@ $portrait-ratio: 1;
   .partition-item {
     font-size: var(--font-size-18);
   }
+  .region-select-box{
+    padding: 8px 15px 8px 10px;
+  }
+  .region-tag{
+    padding: 2px 3px;
+  }
 }
 </style>

@@ -38,6 +38,9 @@
     "search": "Enter search terms"
   },
   "components": {
+    "cardExcludeRow": {
+      "hint": "Select initial / rime / tone"
+    },
     "multiSelect": {
       "selectAll": "All",
       "deselectAll": "Clear",

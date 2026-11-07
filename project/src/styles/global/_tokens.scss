@@ -801,13 +801,16 @@ $font-size-width-scales: (
 }
 
 :root[data-color-theme='blue-dark'] {
-  /* Give blue dark mode a restrained blue glass edge and highlight. */
-  --glass-tint-rgb: 55, 75, 100;
-  --glass-80: rgba(32, 45, 62, 0.96);
-  /* 浮动面板需比 glass 系列更深，否则同色相卡片会融进背景 */
-  --surface-glass-floating: rgba(32, 45, 62, 0.90);
-  --surface-glass-floating-strong: rgba(32, 45, 62, 0.96);
-  --surface-glass-floating-subtle: rgba(32, 45, 62, 0.80);
+  /* 参考 red-dark：面板表面保持中性偏冷，蓝色主色淡底才不会被同色相吞掉 */
+  --glass-tint-rgb: 38, 46, 57;
+  --glass-80: rgba(29, 35, 44, 0.97);
+  /* 浮动面板需与 static 面板同色系，避免蓝色浮层叠在中性面板上 */
+  --surface-glass-floating: rgba(29, 35, 44, 0.90);
+  --surface-glass-floating-strong: rgba(29, 35, 44, 0.96);
+  --surface-glass-floating-subtle: rgba(29, 35, 44, 0.80);
+  --surface-panel: #1f252d;
+  --surface-panel-hover: #28303a;
+  --surface-panel-strong: #323b46;
   --glass-highlight: rgba(var(--color-primary-rgb), 0.14);
   --bar-background: linear-gradient(
     145deg,

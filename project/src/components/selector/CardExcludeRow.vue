@@ -1,5 +1,6 @@
 <template>
   <div class="card-row">
+    <span class="card-row-hint">{{ $t('common.components.cardExcludeRow.hint') }}</span>
     <ChoiceSelector
       v-model="cardModel"
       :options="options"
@@ -152,6 +153,19 @@ defineExpose({ triggerEl })
   @include flex-center;
   flex-wrap: wrap;
   gap: 20px;
+}
+
+.card-row-hint {
+  display: none;
+  color: var(--text-tertiary);
+  font-size: var(--font-size-13);
+  white-space: nowrap;
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .card-row-hint {
+    display: inline-block;
+  }
 }
 
 @media (max-aspect-ratio: 1/1) {
