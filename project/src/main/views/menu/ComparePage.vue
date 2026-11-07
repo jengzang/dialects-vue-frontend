@@ -76,6 +76,20 @@
       </div>
 
       <!-- Tab2: 比較中古 --  -->
+      <div v-show="currentTab === 'tab2'" class="card-row-outer">
+        <CardExcludeRow
+          v-model="tabStates.tab2.current.card"
+          v-model:exclude-values="tabStates.tab2.current.excludeColumns"
+          :options="cardOptions"
+          :aria-label="$t('compare.group.label1')"
+          :exclude-options="excludeOptions"
+          :open="excludeDropdownOpen === 'tab2_current'"
+          :disabled="buttonState.isRunning"
+          :no-exclude-text="$t('compare.excludeOptions.noExclude')"
+          @toggle="toggleExcludeDropdown('tab2', 'current')"
+        />
+      </div>
+
       <div
         v-show="currentTab === 'tab2'"
         class="compare-page-panel glass-panel"
@@ -89,42 +103,6 @@
           >
             <!-- 直接輸入模式 -->
             <div v-if="zhongguInputMode === 'direct'" class="direct-compare-box">
-              <div class="card-row">
-                <ChoiceSelector
-                  v-model="tabStates.tab2.current.card"
-                  :options="cardOptions"
-                  :aria-label="$t('compare.group.label1')"
-                />
-                <div
-                  :ref="(el) => excludeFilterTriggerRef.tab2_current = el"
-                  class="dropdown"
-                  style="margin: 0;padding: 8px 10px;min-width: 60px;max-height:30px"
-                  :class="{ disabled: buttonState.isRunning }"
-                  @click="toggleExcludeDropdown('tab2', 'current')"
-                >
-                  {{ getExcludeDisplayText('tab2', 'current') || $t('compare.excludeOptions.noExclude') }}
-                  <span class="arrow">▾</span>
-                </div>
-                <Teleport to="body">
-                  <div
-                    v-if="excludeDropdownOpen === 'tab2_current'"
-                    class="dropdown-panel glass-dropdown-panel"
-                    :style="excludeDropdownStyle"
-                  >
-                    <div
-                      v-for="option in excludeOptions"
-                      :key="option.value"
-                      class="dropdown-item glass-dropdown-item"
-                      :class="{ active: isExcludeSelected(option.value, 'tab2', 'current') }"
-                      @click="toggleExcludeOption(option.value, 'tab2', 'current')"
-                    >
-                      <span class="check-icon">{{ isExcludeSelected(option.value, 'tab2', 'current') ? '✓' : '' }}</span>
-                      {{ option.label }}
-                    </div>
-                  </div>
-                </Teleport>
-              </div>
-
               <ZhongGuDirectInput
                 ref="CompareDirectInputRef"
                 :exclude-columns="tabStates.tab2.current.excludeColumns"
@@ -200,45 +178,6 @@
 
             <!-- 選擇器模式 -->
             <div v-else class="triple-select-box">
-              <!-- 卡片選擇區 -->
-              <div class="card-row">
-                <ChoiceSelector
-                  v-model="tabStates.tab2.current.card"
-                  :options="cardOptions"
-                  :aria-label="$t('compare.group.label1')"
-                />
-
-                <div
-                  :ref="(el) => excludeFilterTriggerRef.tab2_current = el"
-                  class="dropdown"
-                  style="margin: 0;padding: 8px 10px;min-width: 60px;max-height:30px"
-                  :class="{ disabled: buttonState.isRunning }"
-                  @click="toggleExcludeDropdown('tab2', 'current')"
-                >
-                  {{ getExcludeDisplayText('tab2', 'current') || $t('compare.excludeOptions.noExclude') }}
-                  <span class="arrow">▾</span>
-                </div>
-
-                <Teleport to="body">
-                  <div
-                    v-if="excludeDropdownOpen === 'tab2_current'"
-                    class="dropdown-panel glass-dropdown-panel"
-                    :style="excludeDropdownStyle"
-                  >
-                    <div
-                      v-for="option in excludeOptions"
-                      :key="option.value"
-                      class="dropdown-item glass-dropdown-item"
-                      :class="{ active: isExcludeSelected(option.value, 'tab2', 'current') }"
-                      @click="toggleExcludeOption(option.value, 'tab2', 'current')"
-                    >
-                      <span class="check-icon">{{ isExcludeSelected(option.value, 'tab2', 'current') ? '✓' : '' }}</span>
-                      {{ option.label }}
-                    </div>
-                  </div>
-                </Teleport>
-              </div>
-
               <!-- 鍵名 + 鍵值 -->
               <div class="dropdown-row">
                 <KeyButtonGroup
@@ -586,7 +525,7 @@ import ZhongGuDirectInput from "@/main/components/query/ZhongGuDirectInput.vue";
 import KeyButtonGroup from "@/main/components/query/KeyButtonGroup.vue";
 import RadioGroup from '@/components/selector/RadioGroup.vue';
 import DropdownValueSelector from "@/main/components/query/DropdownValueSelector.vue";
-import ChoiceSelector from "@/components/selector/ChoiceSelector.vue";
+import CardExcludeRow from "@/components/selector/CardExcludeRow.vue";
 import CheckBox from "@/components/selector/CheckBox.vue";
 import {
   queryStore,
@@ -695,22 +634,11 @@ const excludeOptions = computed(() => [
       ]
     : [])
 ])
-const excludeFilterTriggerRef = reactive({
-  tab2_current: null,  // ✅ 添加 current 的 ref
-  tab2_group1: null,
-  tab2_group2: null
-})
 const dropdownOpen = ref(null)
 const currentActiveKey = ref(null)
 const triggerRefs = ref({})
 const keyTriggerEl = ref(null)
 const excludeDropdownOpen = ref(null) // 'tab2' 或 'tab3' 或 null
-const excludeDropdownStyle = ref({
-  position: 'absolute',
-  top: '0px',
-  left: '0px',
-  zIndex: 99999
-})
 
 const tabStates = reactive({
   tab1: {
@@ -1296,10 +1224,8 @@ function onClickOutside(event) {
     keyTriggerEl.value,
     // 检查动态的 triggers
     ...Object.values(triggerRefs.value),
-    // ✨ 检查过滤器 triggers
-    excludeFilterTriggerRef.tab2_current,
-    excludeFilterTriggerRef.tab2_group1,
-    excludeFilterTriggerRef.tab2_group2
+    // ✨ 检查过滤器 trigger
+    event.target.closest('.card-exclude-trigger')
   ].some(el => el?.contains(event.target))
 
   const isInsidePanel = event.target.closest('.dropdown-panel')
@@ -1440,74 +1366,12 @@ function getDisplayText(key, group = 'group1') {
 }
 
 // ✨ 過濾器相關函數
-// 獲取過濾器顯示文本
-function getExcludeDisplayText(tab, group = 'group1') {
-  const targetState = tab === 'tab2' ? (group === 'current' ? tabStates.tab2.current : tabStates.tab2[group]) : null
-  if (!targetState) return ''
-
-  const list = targetState.excludeColumns || []
-  if (list.length === 0) return ''
-
-  // ✨ 新增：将 value 转换为 label
-  const labels = list.map(value => {
-    const option = excludeOptions.value.find(opt => opt.value === value)
-    return option ? option.label : value  // 找不到就用原值
-  })
-
-  if (labels.length > 2) {
-    return `${labels.slice(0, 1).join(', ')}...`
-  }
-  return labels.join(', ')
-}
-
-
-
-// 判斷單項是否選中
-function isExcludeSelected(value, tab, group = 'group1') {
-  const targetState = tab === 'tab2' ? (group === 'current' ? tabStates.tab2.current : tabStates.tab2[group]) : null
-  if (!targetState) return false
-
-  const list = targetState.excludeColumns || []
-  return list.includes(value)
-}
-
 // 切換過濾器下拉框
 function toggleExcludeDropdown(tab, group = 'group1') {
   if (buttonState.isRunning) return
 
   const dropdownKey = `${tab}_${group}`
-  if (excludeDropdownOpen.value === dropdownKey) {
-    excludeDropdownOpen.value = null
-  } else {
-    excludeDropdownOpen.value = dropdownKey
-    nextTick(() => {
-      const triggerEl = excludeFilterTriggerRef[dropdownKey]
-      if (triggerEl) {
-        const rect = triggerEl.getBoundingClientRect()
-        excludeDropdownStyle.value = {
-          position: 'absolute',
-          top: `${rect.top + rect.height + window.scrollY}px`,
-          left: `${rect.left + window.scrollX}px`,
-          zIndex: 99999
-        }
-      }
-    })
-  }
-}
-
-// 切換單個選項
-function toggleExcludeOption(value, tab, group = 'group1') {
-  const targetState = tab === 'tab2' ? (group === 'current' ? tabStates.tab2.current : tabStates.tab2[group]) : null
-  if (!targetState) return
-
-  const list = targetState.excludeColumns
-  const index = list.indexOf(value)
-
-  if (index > -1) {
-    list.splice(index, 1)
-  } else {
-    list.push(value)
-  }
+  excludeDropdownOpen.value = excludeDropdownOpen.value === dropdownKey ? null : dropdownKey
 }
 
 const ZhongguRef = ref(null);
@@ -2108,11 +1972,9 @@ $text-muted: var(--text-lightest);
   gap: 1.5dvw;
 }
 
-.card-row {
-  width: 100%;
-  @include flex-center;
-  flex-wrap: wrap;
-  gap: 20px;
+.card-row-outer {
+  width: min(90dvw, 900px);
+  margin: 0 auto 1.2dvh;
 }
 
 .dropdown-row {
@@ -2121,34 +1983,6 @@ $text-muted: var(--text-lightest);
   align-items: center;
   justify-content: center;
   white-space: nowrap;
-}
-
-/* 排除条件下拉框 */
-.dropdown {
-  min-width: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: auto;
-  padding: 6px 12px;
-  background: var(--glass-30);
-  @include glass-blur;
-  border: 1px solid rgba(var(--color-silver-rgb), 0.5);
-  border-radius: var(--radius-md);
-  white-space: nowrap;
-  font-size: var(--font-size-14);
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    background: var(--glass-60);
-    border-color: var(--color-primary);
-  }
-}
-
-.check-icon {
-  display: inline-block;
-  width: 16px;
 }
 
 /* Tab1 汉字比较 */
@@ -2605,10 +2439,6 @@ $text-muted: var(--text-lightest);
 @media (max-aspect-ratio: #{1 / 1}) {
   .tab5-page {
     font-size: var(--font-size-16);
-  }
-
-  .card-row {
-    gap: 0;
   }
 
   .group-label {
