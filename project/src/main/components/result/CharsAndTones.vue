@@ -21,7 +21,7 @@
 
 
           <div class="info-container" v-if="item.音节 && item.音节.length > 0">
-            <div class="location" @click.stop="handleLocationClick(item.location)">{{ item.location }}</div>
+            <div class="location pill-btn" @click.stop="handleLocationClick(item.location)">{{ item.location }}</div>
 
             <div class="syllables-grid">
               <div
@@ -65,8 +65,10 @@
         </thead>
         <tbody>
         <tr v-for="(row, rIdx) in processedData" :key="rIdx">
-          <td class="location-tones" @click.stop="handleLocationClick(row['簡稱'])">
-            {{ row['簡稱'] }}
+          <td class="location-tones">
+            <button type="button" class="location-tones-btn pill-btn" @click.stop="handleLocationClick(row['簡稱'])">
+              {{ row['簡稱'] }}
+            </button>
           </td>
           <td v-for="(toneVal, tIdx) in getToneValues(row.tones)" :key="tIdx"
               class="tones-cell-tones"
@@ -102,14 +104,14 @@
 
         <button
           type="button"
-          class="char-nav-action"
+          class="char-nav-action pill-btn"
           @click="handleCopy"
         >
           {{ t('result.charsAndTones.export.copy') }}
         </button>
         <button
           type="button"
-          class="char-nav-action"
+          class="char-nav-action pill-btn"
           @click="handleExport"
         >
           {{ t('result.charsAndTones.export.export') }}
@@ -810,30 +812,10 @@ $glass-blur: 8px;
 }
 
 .char-nav-action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 30px;
-  padding: 3px 2px;
-  color: var(--text-slate);
+  min-width: 32px;
+  padding: 4px 8px;
   font-size: var(--font-size-12);
-  line-height: 1.2;
-  cursor: pointer;
-  background: var(--glass-60);
-  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
-  border-radius: var(--radius-pill);
-  transition:
-    transform 0.18s ease,
-    color 0.18s ease,
-    background 0.18s ease,
-    border-color 0.18s ease;
-
-  &:hover {
-    color: $deep-blue;
-    background: var(--glass-90);
-    border-color: rgba(var(--color-primary-rgb), 0.45);
-    transform: translateX(-2px);
-  }
+  white-space: nowrap;
 }
 
 .info-container {
@@ -907,34 +889,17 @@ $glass-blur: 8px;
 }
 
 .location {
-  display: inline-block;
+  display: inline-flex;
   margin-right: 15px;
   margin-bottom: 5px;
-  padding: 2px 8px;
-  color: var(--color-primary-hover);
+  padding: 4px 12px;
   font-size: var(--font-size-16);
   font-weight: 600;
   white-space: nowrap;
-  cursor: pointer;
-  background: rgba(var(--color-primary-rgb), 0.04);
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
   text-decoration: none;
-  transition: all $transition-fast ease;
-
-  &::after {
-    content: '\00A0🔍';
-    font-size: 0.8em;
-  }
-
-  &:hover {
-    color: $primary-blue;
-    text-decoration: underline;
-    background: rgba(var(--color-primary-rgb), 0.1);
-    border-color: rgba(var(--color-primary-rgb), 0.25);
-    box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.12);
-    transform: translateY(-1px);
-  }
+  --pill-btn-color: var(--color-primary);
+  --pill-btn-hover-color: var(--color-primary-hover);
+  --pill-btn-hover-border: var(--color-primary-hover);
 }
 
 .no-data-warning {
@@ -993,29 +958,14 @@ $glass-blur: 8px;
 .location-tones {
   width: 100px;
   @include text-truncate;
-  font-size: var(--font-size-12);
-  cursor: pointer;
-  text-decoration: none;
-  transition:
-    color $transition-fast ease,
-    transform $transition-fast ease,
-    background-color $transition-fast ease;
 
-  &::after {
-    content: '\00A0🔍';
-    font-size: 0.85em;
-    transition: color $transition-fast ease;
-  }
-
-  &:hover {
-    color: $primary-blue;
-    text-decoration: underline;
-    background-color: var(--bg-light-gray);
-    transform: scale(1.15);
-
-    &::after {
-      color: $primary-blue;
-    }
+  .location-tones-btn {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 4px 8px;
+    --pill-btn-color: var(--color-primary);
+    --pill-btn-hover-color: var(--color-primary-hover);
+    --pill-btn-hover-border: var(--color-primary-hover);
   }
 }
 

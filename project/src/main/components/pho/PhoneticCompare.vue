@@ -27,17 +27,38 @@
     >
       <!-- 声韵调切换 Tab -->
       <div class="feature-control-row">
-        <div class="feature-tabs">
+        <TabSwitcher
+          mode="segmented"
+          navigation-only
+          :use-router="false"
+          :tabs="FEATURE_TABS"
+          :model-value="activeFeature"
+          @update:model-value="changeFeature"
+        />
+      </div>
+
+      <!-- 比较地点（按查询顺序） -->
+      <div
+        v-if="compareLocations.length"
+        class="compare-locations"
+      >
+        <template
+          v-for="(loc, index) in compareLocations"
+          :key="loc"
+        >
+          <span
+            v-if="index > 0"
+            class="compare-locations-arrow"
+            aria-hidden="true"
+          >→</span>
           <button
-            v-for="feat in ['聲母', '韻母', '聲調']"
-            :key="feat"
-            :class="['feature-tab', { active: activeFeature === feat }]"
             type="button"
-            @click="changeFeature(feat)"
+            class="pill-btn"
+            @click="openLocationDetail(loc)"
           >
-            {{ feat }}
+            {{ loc }}
           </button>
-        </div>
+        </template>
       </div>
 
       <!-- 桑基图容器 -->
@@ -154,6 +175,14 @@
         </div>
       </HoverDetailCard>
     </Teleport>
+
+    <LocationDetailPopup
+      :visible="locationPopup.visible"
+      :location-name="locationPopup.locationName"
+      :data="locationPopup.data"
+      :loading="locationPopup.loading"
+      @close="locationPopup.visible = false"
+    />
   </div>
 </template>
 
@@ -161,8 +190,10 @@
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import HoverDetailCard from '@/components/ToastAndHelp/HoverDetailCard.vue'
+import TabSwitcher from '@/components/common/TabSwitcher.vue'
+import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue'
 import { resolveHoverDetailCardPosition } from '@/utils/EchartHover/hoverDetailCardPosition.js'
-import { getFeatureStats } from '@/api/index.js'
+import { getFeatureStats, getLocationDetail } from '@/api/index.js'
 import { setRunning } from '@/main/store/store.js'
 import { initChart, onChartThemeChange, readChartTokens } from '@/utils/chart/chartTheme'
 
@@ -209,6 +240,12 @@ const props = defineProps({
 })
 
 // ========== 响应式数据 ==========
+const FEATURE_TABS = [
+  { name: '聲母', label: '聲母' },
+  { name: '韻母', label: '韻母' },
+  { name: '聲調', label: '聲調' }
+]
+
 const rawData = ref(null)
 const activeLocations = ref([])
 const activeFeature = ref('韻母')
@@ -217,6 +254,36 @@ const errorMessage = ref('')
 
 // 图表局部渲染状态：切换 Tab / 重绘图表时显示
 const isChartRendering = ref(false)
+
+// 比较地点（按查询顺序，只保留有数据的地点）
+const compareLocations = computed(() =>
+  activeLocations.value.filter(loc => rawData.value?.data?.[loc])
+)
+
+// 地点详情弹窗
+const locationPopup = ref({
+  visible: false,
+  locationName: '',
+  data: null,
+  loading: false
+})
+
+const openLocationDetail = async (locationName) => {
+  if (!locationName) return
+
+  locationPopup.value.visible = true
+  locationPopup.value.locationName = locationName
+  locationPopup.value.loading = true
+  locationPopup.value.data = null
+
+  try {
+    locationPopup.value.data = await getLocationDetail(locationName)
+  } catch (error) {
+    console.error('查詢地名數據失敗:', error)
+  } finally {
+    locationPopup.value.loading = false
+  }
+}
 
 // 详情卡片状态
 const selectedDetail = ref(null)
@@ -964,37 +1031,28 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
   margin-bottom: 5px;
 }
 
-.feature-tabs {
+/* 比较地点 */
+.compare-locations {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 6px 8px;
+  width: 100%;
+  margin-top: 16px;
+  margin-bottom: 2px;
+
+  .pill-btn {
+    --pill-btn-font-size: var(--font-size-14);
+  }
 }
 
-.feature-tab {
-  padding: 8px 18px;
-  background: var(--glass-30, var(--glass-30));
-  border: 1px solid var(--border-gray-light, rgba(var(--color-silver-rgb), 0.5));
-  border-radius: var(--radius-md, var(--radius-md));
-  color: var(--text-dark, var(--text-dark));
+.compare-locations-arrow {
+  color: var(--text-tertiary);
   font-size: var(--font-size-14);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.25s ease;
-
-  @include glass-blur(10px);
-
-  &:hover {
-    background: var(--glass-60, var(--glass-50));
-    transform: translateY(-1px);
-  }
-
-  &.active {
-    background: var(--color-primary, #{$primary});
-    border-color: var(--color-primary, #{$primary});
-    box-shadow: 0 4px 10px rgba(var(--color-primary-rgb), 0.2);
-    color: var(--action-primary-text);
-  }
+  line-height: 1;
 }
+
 
 /* 桑基图横向滚动提示 */
 .sankey-chart-shell {

@@ -36,11 +36,15 @@
 }
 
 .ui-tabs-navigation--underline {
-  border-bottom: 1px solid var(--border-control);
+  border-top: 0.5px solid var(--border-control);
+  border-left: 0.5px solid var(--border-control);
+  border-right: 0.5px solid var(--border-control);
+  border-bottom: 2px solid var(--border-control);
     background: var(--glass-10);
     backdrop-filter: blur(8px) saturate(180%);
     -webkit-backdrop-filter: blur(8px) saturate(180%);
     border-radius: var(--radius-sm);
+  font-size: var(--font-size-18);
 
   .ui-tab-item {
     border-bottom: 3px solid transparent;
@@ -49,6 +53,8 @@
 
     &.active {
       border-bottom-color: var(--color-primary);
+      font-size: var(--font-size-20);
+      font-weight: 600;
     }
   }
 }

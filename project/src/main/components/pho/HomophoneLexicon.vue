@@ -29,7 +29,7 @@
             <button
               v-else-if="showToneButton"
               type="button"
-              class="glass-button"
+              class="pill-btn"
               data-size="compact"
               :disabled="toneLoading"
               @click="loadToneMap"
@@ -38,7 +38,7 @@
             </button>
           </template>
 
-          <button v-if="showCopy" type="button" class="glass-button" data-size="compact" @click="handleCopy">
+          <button v-if="showCopy" type="button" class="pill-btn" data-size="compact" @click="handleCopy">
             {{ copyState === 'copied'
               ? t('phonology.phonology.homophoneLexicon.copied')
               : t('phonology.phonology.homophoneLexicon.copy') }}

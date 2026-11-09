@@ -427,7 +427,7 @@
             <span v-else><InlineIcon icon="🚀" />{{ $t('compare.button.startCompare') }}</span>
           </button>
         </div>
-        <div class="compare-page-panel glass-panel tab5-page">
+        <div class="compare-page-panel tab5-page">
           <PhoneticCompare
             :query-locations="tabStates.tab5.queryLocations"
             :active="currentTab === 'tab5'"

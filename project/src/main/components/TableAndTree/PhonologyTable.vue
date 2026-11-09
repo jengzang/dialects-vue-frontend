@@ -3,7 +3,7 @@
     <div v-if="location" class="location-header">
       <div class="location-title"><InlineIcon icon="📍" />{{ location }}</div>
       <div class="header-actions">
-        <button class="tone-search-btn glass-button" @click="handleShowDetails" :disabled="isLoading">
+        <button class="tone-search-btn pill-btn" @click="handleShowDetails" :disabled="isLoading">
           {{ isLoading ? t('result.phonologyTable.loadingButton') : t('result.phonologyTable.detailButton') }}
         </button>
         <button class="fullscreen-btn glass-button" @click="toggleFullScreen">
@@ -693,11 +693,11 @@ $transition-duration: 0.25s;
 }
 
 .tone-search-btn {
-  @include glass-button;
-
-  color: $primary-blue;
+  // @include glass-button;
+  font-size: var(--font-size-16);
+  // color: $primary-blue;
   background: var(--glass-60);
-  border: 1px solid var(--glass-30);
+  // border: 1px solid var(--glass-30);
   box-shadow:
     0 2px 8px rgba(0, 0, 0, 0.08),
     inset 0 1px 0 var(--glass-50);
@@ -705,7 +705,7 @@ $transition-duration: 0.25s;
 
   &:hover:not(:disabled) {
     background: var(--glass-80);
-    border-color: rgba(var(--color-primary-rgb), 0.3);
+    // border-color: rgba(var(--color-primary-rgb), 0.3);
     box-shadow:
       0 4px 12px rgba(var(--color-primary-rgb), 0.15),
       inset 0 1px 0 var(--glass-60);

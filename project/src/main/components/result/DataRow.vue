@@ -1,6 +1,6 @@
 <template>
   <div class="data-row-vue" :class="{ 'has-stats-data': featureStatsPopup.fetched }">
-    <p v-if="showLocation" class="locations-vue" @click="handleLocationClick" style="cursor: pointer;">
+    <p v-if="showLocation" class="locations-vue action-btn" @click="handleLocationClick">
       {{ item.地點 }}
     </p>
 
@@ -476,34 +476,18 @@ $glass-blur: 8px;
 
 /* 地名樣式 */
 .locations-vue {
+  display: inline-flex;
+  padding: 6px 16px;
   margin-top: 20px;
   margin-bottom: 0;
-  color: var(--text-primary);
   font-family: "SimHei", "黑体", sans-serif;
   font-size: var(--font-size-20);
   font-weight: bold;
-  cursor: pointer;
   text-decoration: none;
-  transition: all $transition-duration cubic-bezier(0.4, 0, 0.2, 1);
 
   &::after {
     content: '\00A0🔍';
     font-size: 0.7em;
-    transition: all $transition-duration cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  &:hover {
-    color: $primary-blue;
-    text-decoration: underline;
-    transform: translateX(2px);
-
-    &::after {
-      color: $primary-blue;
-    }
-  }
-
-  &:active {
-    transform: scale(0.98);
   }
 }
 

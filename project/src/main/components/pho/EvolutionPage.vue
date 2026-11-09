@@ -92,16 +92,15 @@
 
     <!-- Tab切换 -->
     <div v-if="rawData" class="feature-tabs">
-      <button
-        v-for="feature in features"
-        :key="feature"
-        @click="currentFeature = feature"
-        :class="['feature-tab', { active: currentFeature === feature }]"
-      >
-        {{ feature }} ({{ pieCountByFeature[feature] || 0 }})
-      </button>
+      <TabSwitcher
+        mode="segmented"
+        navigation-only
+        :use-router="false"
+        :tabs="featureTabs"
+        v-model="currentFeature"
+      />
 
-      <div v-if="currentDataLocationName" class="feature-tabs-location glass-button" @click.stop="handleLocationClick(currentDataLocationName)"><InlineIcon icon="📍" />{{ currentDataLocationName }}
+      <div v-if="currentDataLocationName" class="feature-tabs-location pill-btn" @click.stop="handleLocationClick(currentDataLocationName)"><InlineIcon icon="📍" />{{ currentDataLocationName }}
       </div>
     </div>
 
@@ -269,6 +268,7 @@ import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import HoverDetailCard from '@/components/ToastAndHelp/HoverDetailCard.vue'
+import TabSwitcher from '@/components/common/TabSwitcher.vue'
 import { resolveHoverDetailCardPosition } from '@/utils/EchartHover/hoverDetailCardPosition.js'
 import LocationMultiInput from '../geo/LocationMultiInput.vue'
 import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue'
@@ -431,6 +431,13 @@ const pieCountByFeature = computed(() => {
     聲調: rawData.value.data.聲調?.length || 0
   }
 })
+
+const featureTabs = computed(() =>
+  features.map(feature => ({
+    name: feature,
+    label: `${feature} (${pieCountByFeature.value[feature] || 0})`
+  }))
+)
 
 const currentDataLocationName = computed(() => {
   const locations = Array.isArray(rawData.value?.locations)
@@ -1664,54 +1671,29 @@ $portrait-ratio: 1;
   &-location {
     display: inline-flex;
     align-items: center;
-    padding: 8px 14px;
-    background: rgba(var(--color-primary-rgb), 0.1);
-    border: 1px solid rgba(var(--color-primary-rgb), 0.18);
-    border-radius: var(--radius-md);
-    color: var(--color-primary);
+    padding: 10px 12px;
+    // background: rgba(var(--color-primary-rgb), 0.1);
+    background: var(--glass-50);
+    // border: 1px solid rgba(var(--color-primary-rgb), 0.18);
+    // border-radius: var(--radius-md);
+    // color: var(--color-primary);
     white-space: nowrap;
-    font-size: var(--font-size-14);
+    font-size: var(--font-size-16);
     font-weight: 700;
     cursor: pointer;
     text-decoration: none;
     transition: all 0.2s ease;
 
     &:hover {
-      color: var(--color-primary-hover);
-      text-decoration: underline;
+      transform: scale(1.05);
+      background: var(--glass-80);
+      // color: var(--color-primary-hover);
+      // text-decoration: underline;
     }
 
     :root[data-color-mode='dark'] & {
       color: var(--text-primary);
     }
-  }
-}
-
-.feature-tab {
-  padding: 10px 20px;
-  background: var(--glass-30);
-  border: 1px solid var(--glass-30);
-  border-radius: var(--radius-md);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  color: var(--text-dark);
-  font-size: var(--font-size-14);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s $ease-fluid;
-
-  @include glass-blur;
-
-  &:hover {
-    background: var(--glass-60);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transform: translateY(-1px);
-  }
-
-  &.active {
-    background: var(--color-primary);
-    border-color: var(--color-primary);
-    box-shadow: 0 4px 12px var(--color-primary-shadow);
-    color: var(--action-primary-text);
   }
 }
 
@@ -1907,10 +1889,6 @@ $portrait-ratio: 1;
     gap: 14px;
   }
 
-  .feature-tab {
-    padding: 10px 8px;
-  }
-
   .feature-tabs-location {
     padding: 10px 6px;
     cursor: pointer;
@@ -1918,7 +1896,7 @@ $portrait-ratio: 1;
     transition: all 0.2s ease;
 
     &:hover {
-      color: var(--color-primary-hover);
+      // color: var(--color-primary-hover);
       text-decoration: underline;
     }
   }
