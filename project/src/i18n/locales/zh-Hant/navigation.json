@@ -259,7 +259,10 @@
     "pageVisits": "網頁訪問人次",
     "pageVisitsLeftAxis": "網頁訪問人次（左軸）",
     "featureUsageRightAxis": "功能使用次數（右軸）",
-    "usageLoadError": "功能使用統計載入失敗"
+    "staticRequests": "靜態資源",
+    "staticRequestsRightAxis": "靜態資源（右軸）",
+    "usageLoadError": "功能使用統計載入失敗",
+    "staticLoadError": "靜態資源統計載入失敗"
   },
   "login": "登錄",
   "actions": {

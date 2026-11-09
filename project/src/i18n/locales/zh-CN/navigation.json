@@ -259,7 +259,10 @@
     "pageVisits": "网页访问人次",
     "pageVisitsLeftAxis": "网页访问人次（左轴）",
     "featureUsageRightAxis": "功能使用次数（右轴）",
-    "usageLoadError": "功能使用统计加载失败"
+    "staticRequests": "静态资源",
+    "staticRequestsRightAxis": "静态资源（右轴）",
+    "usageLoadError": "功能使用统计加载失败",
+    "staticLoadError": "静态资源统计加载失败"
   },
   "login": "登录",
   "actions": {

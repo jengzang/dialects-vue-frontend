@@ -94,9 +94,10 @@
           ref="visitHistoryChartEl"
           class="visit-history-chart"
           role="img"
-          :aria-label="`${t('navigation.stats.pageVisits')} / ${t('navigation.stats.featureUsage')}`"
+          :aria-label="`${t('navigation.stats.pageVisits')} / ${t('navigation.stats.featureUsage')} / ${t('navigation.stats.staticRequests')}`"
         ></div>
         <p v-if="usageHistoryError" class="usage-history-error">{{ t('navigation.stats.usageLoadError') }}</p>
+        <p v-if="totalHistoryError" class="usage-history-error">{{ t('navigation.stats.staticLoadError') }}</p>
 
         <div class="history-section">
           <button
@@ -135,6 +136,12 @@
                 :label="t('navigation.stats.pageVisits')"
                 @update:model-value="setHistoryFilter('visits', $event)"
               />
+              <CheckBox
+                :model-value="showStaticHistory"
+                :label="t('navigation.stats.staticRequests')"
+                class="static-checkbox"
+                @update:model-value="setHistoryFilter('static', $event)"
+              />
             </div>
             <div class="history-list">
               <div v-for="item in combinedHistory" :key="item.date" class="history-item-modal">
@@ -150,8 +157,13 @@
                     class="history-bar history-bar--usage"
                     :style="{ width: (item.usage / maxHistoryCount * 100) + '%' }"
                   ></div>
+                  <div
+                    v-if="showStaticHistory && item.static > 0"
+                    class="history-bar history-bar--static"
+                    :style="{ width: (item.static / maxHistoryCount * 100) + '%' }"
+                  ></div>
                 </div>
-                <span class="history-count">{{ item.total }}</span>
+                <span class="history-count" :style="historyCountStyle">{{ item.total }}</span>
               </div>
             </div>
           </template>
@@ -359,12 +371,25 @@ const isStatsExpanded = ref(false);
 const isVisitHistoryExpanded = ref(true)
 const showVisitHistory = ref(true)
 const showUsageHistory = ref(true)
+const showStaticHistory = ref(false)
 const usageHistory = ref([])
 const usageHistoryError = ref(false)
+const totalHistory = ref([])
+const totalHistoryError = ref(false)
 let usageHistoryLoaded = false
 let usageHistoryRequest = null
+let totalHistoryLoaded = false
+let totalHistoryRequest = null
 const visitHistoryChartEl = ref(null)
 let visitHistoryChart = null
+
+const staticHistory = computed(() => {
+  const visits = new Map(visitHistory.value.map((item) => [item.date, item.count]))
+  const usage = new Map(usageHistory.value.map((item) => [item.date, item.count]))
+  return totalHistory.value
+    .filter((item) => visits.has(item.date) && usage.has(item.date))
+    .map((item) => ({ date: item.date, count: item.count - usage.get(item.date) - visits.get(item.date) }))
+})
 
 const combinedHistory = computed(() => {
   const days = new Map()
@@ -377,16 +402,57 @@ const combinedHistory = computed(() => {
     day.hasUsage = true
     days.set(item.date, day)
   }
+  for (const item of staticHistory.value) {
+    const day = days.get(item.date) || { date: item.date, visits: 0, usage: 0, hasVisits: false, hasUsage: false }
+    day.static = item.count
+    day.hasStatic = true
+    days.set(item.date, day)
+  }
   return [...days.values()]
-    .filter((day) => (showVisitHistory.value && day.hasVisits) || (showUsageHistory.value && day.hasUsage))
-    .map((day) => ({ ...day, total: (showVisitHistory.value ? day.visits : 0) + (showUsageHistory.value ? day.usage : 0) }))
+    .filter((day) => (showVisitHistory.value && day.hasVisits) || (showUsageHistory.value && day.hasUsage) || (showStaticHistory.value && day.hasStatic))
+    .map((day) => ({ ...day, total: (showVisitHistory.value ? day.visits : 0) + (showUsageHistory.value ? day.usage : 0) + (showStaticHistory.value ? (day.static ?? 0) : 0) }))
     .sort((a, b) => b.date.localeCompare(a.date))
 })
 const maxHistoryCount = computed(() => Math.max(1, ...combinedHistory.value.map((day) => day.total)))
+const historyCountStyle = computed(() => {
+  const colors = []
+  if (showVisitHistory.value) colors.push('var(--color-primary-hover)')
+  if (showUsageHistory.value) colors.push('var(--color-secondary)')
+  if (showStaticHistory.value) colors.push('var(--color-cyan)')
+  if (colors.length === 1) return { color: colors[0] }
+  return {
+    backgroundImage: `linear-gradient(90deg, ${colors.join(', ')})`,
+    backgroundClip: 'text',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent'
+  }
+})
 
 function setHistoryFilter(kind, checked) {
-  if (kind === 'usage' && (checked || showVisitHistory.value)) showUsageHistory.value = checked
-  if (kind === 'visits' && (checked || showUsageHistory.value)) showVisitHistory.value = checked
+  if (kind === 'usage' && (checked || showVisitHistory.value || showStaticHistory.value)) showUsageHistory.value = checked
+  if (kind === 'visits' && (checked || showUsageHistory.value || showStaticHistory.value)) showVisitHistory.value = checked
+  if (kind === 'static' && (checked || showVisitHistory.value || showUsageHistory.value)) showStaticHistory.value = checked
+}
+
+async function fetchTotalHistory() {
+  if (totalHistoryLoaded || totalHistoryRequest) return totalHistoryRequest
+  totalHistoryError.value = false
+  totalHistoryRequest = (async () => {
+    try {
+      const response = await fetch(`${WEB_BASE}/logs/stats/daily?days=60`)
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+      const result = await response.json()
+      if (!Array.isArray(result.data)) throw new Error('Invalid daily statistics response')
+      totalHistory.value = result.data.map((item) => ({ date: item.date, count: Number(item.total_calls) || 0 }))
+      totalHistoryLoaded = true
+    } catch (error) {
+      totalHistoryError.value = true
+      console.error('获取静态资源统计失败:', error)
+    } finally {
+      totalHistoryRequest = null
+    }
+  })()
+  return totalHistoryRequest
 }
 
 async function fetchUsageHistory() {
@@ -415,15 +481,19 @@ function updateVisitHistoryChart() {
 
   const visits = new Map(visitHistory.value.map((item) => [item.date, item.count]))
   const usage = new Map(usageHistory.value.map((item) => [item.date, item.count]))
-  const dates = [...new Set([...visits.keys(), ...usage.keys()])].sort()
+  const staticRequests = new Map(staticHistory.value.map((item) => [item.date, item.count]))
+  const dates = [...new Set([...visits.keys(), ...usage.keys(), ...staticRequests.keys()])].sort()
   const style = getComputedStyle(document.documentElement)
   const primary = style.getPropertyValue('--color-primary').trim()
   const secondary = style.getPropertyValue('--color-secondary').trim()
+  const staticColor = style.getPropertyValue('--color-cyan').trim()
   visitHistoryChart = getOrInitChart(visitHistoryChartEl.value)
+  const staticLabel = t('navigation.stats.staticRequestsRightAxis')
+  const staticSelected = visitHistoryChart.getOption()?.legend?.[0]?.selected?.[staticLabel] ?? false
   visitHistoryChart.setOption({
-    color: [primary, secondary],
+    color: [primary, secondary, staticColor],
     tooltip: { trigger: 'axis' },
-    legend: { type: 'scroll', top: 0 },
+    legend: { type: 'scroll', top: 0, inactiveColor: style.getPropertyValue('--text-tertiary').trim(), selected: { [staticLabel]: staticSelected } },
     grid: { top: 40, right: 55, bottom: 28, left: 48 },
     xAxis: {
       type: 'category',
@@ -437,12 +507,13 @@ function updateVisitHistoryChart() {
     ],
     series: [
       { name: t('navigation.stats.pageVisitsLeftAxis'), type: 'line', smooth: true, showSymbol: false, data: dates.map((date) => visits.get(date) ?? null) },
-      { name: t('navigation.stats.featureUsageRightAxis'), type: 'line', yAxisIndex: 1, smooth: true, showSymbol: false, data: dates.map((date) => usage.get(date) ?? null) }
+      { name: t('navigation.stats.featureUsageRightAxis'), type: 'line', yAxisIndex: 1, smooth: true, showSymbol: false, data: dates.map((date) => usage.get(date) ?? null) },
+      { name: staticLabel, type: 'line', yAxisIndex: 1, smooth: true, showSymbol: false, data: dates.map((date) => staticRequests.get(date) ?? null) }
     ]
   }, true)
 }
 
-watch([isStatsExpanded, loadingStats, visitHistory, usageHistory], async ([expanded, loading]) => {
+watch([isStatsExpanded, loadingStats, visitHistory, usageHistory, totalHistory], async ([expanded, loading]) => {
   if (!expanded) {
     visitHistoryChart?.dispose()
     visitHistoryChart = null
@@ -599,7 +670,7 @@ async function toggleStatsPanel() {
   isStatsExpanded.value = !isStatsExpanded.value;
 
   if (isStatsExpanded.value) {
-    const requests = [fetchUsageHistory()]
+    const requests = [fetchUsageHistory(), fetchTotalHistory()]
     if (visitHistory.value.length === 0) requests.push(fetchVisitHistory())
     await Promise.all(requests)
   }
@@ -919,6 +990,12 @@ $portrait-ratio: 1;
   --checkbox-shadow: rgba(var(--color-secondary-rgb), 0.3);
 }
 
+.static-checkbox.checkbox-wrapper {
+  --checkbox-color: var(--color-cyan);
+  --checkbox-border: var(--color-cyan);
+  --checkbox-shadow: rgba(var(--color-cyan-rgb), 0.3);
+}
+
 
 .section-title {
   display: flex;
@@ -1026,8 +1103,13 @@ $portrait-ratio: 1;
   background: var(--color-secondary);
 }
 
+.history-bar--static {
+  background: var(--color-cyan);
+}
+
 
 .history-count {
+  justify-self: end;
   text-align: right;
 
   color: $primary-dark;

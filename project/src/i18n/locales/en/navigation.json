@@ -259,7 +259,10 @@
     "pageVisits": "Page Visits",
     "pageVisitsLeftAxis": "Page Visits (left axis)",
     "featureUsageRightAxis": "Feature Usage Count (right axis)",
-    "usageLoadError": "Failed to load feature usage statistics"
+    "staticRequests": "Static Resources",
+    "staticRequestsRightAxis": "Static Resources (right axis)",
+    "usageLoadError": "Failed to load feature usage statistics",
+    "staticLoadError": "Failed to load static resource statistics"
   },
   "login": "Log In",
   "actions": {
