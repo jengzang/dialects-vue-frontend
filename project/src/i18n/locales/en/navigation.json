@@ -254,7 +254,10 @@
     "historyTitle": "Visit History",
     "loading": "Loading...",
     "todayVisits": "Visits Today",
-    "historyRecords": "Historical Records"
+    "historyRecords": "Historical Records",
+    "featureUsage": "Feature Usage Count",
+    "pageVisits": "Page Visits",
+    "usageLoadError": "Failed to load feature usage statistics"
   },
   "login": "Log In",
   "actions": {

@@ -254,7 +254,10 @@
     "historyTitle": "访问统计历史",
     "loading": "加载中...",
     "todayVisits": "今日访问",
-    "historyRecords": "历史记录"
+    "historyRecords": "历史记录",
+    "featureUsage": "功能使用次数",
+    "pageVisits": "网页访问人次",
+    "usageLoadError": "功能使用统计加载失败"
   },
   "login": "登录",
   "actions": {

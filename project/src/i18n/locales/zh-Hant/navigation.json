@@ -254,7 +254,10 @@
     "historyTitle": "訪問統計歷史",
     "loading": "加載中...",
     "todayVisits": "今日訪問",
-    "historyRecords": "歷史記錄"
+    "historyRecords": "歷史記錄",
+    "featureUsage": "功能使用次數",
+    "pageVisits": "網頁訪問人次",
+    "usageLoadError": "功能使用統計載入失敗"
   },
   "login": "登錄",
   "actions": {

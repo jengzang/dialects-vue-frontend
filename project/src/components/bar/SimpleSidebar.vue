@@ -90,20 +90,80 @@
           </div>
         </div>
 
+        <h4 class="section-title chart-title">{{ t('navigation.stats.pageVisits') }}</h4>
+        <div
+          ref="visitHistoryChartEl"
+          class="visit-history-chart"
+          role="img"
+          :aria-label="t('navigation.stats.pageVisits')"
+        ></div>
+
+        <h4 class="section-title chart-title">{{ t('navigation.stats.featureUsage') }}</h4>
+        <div
+          ref="usageHistoryChartEl"
+          class="visit-history-chart"
+          role="img"
+          :aria-label="t('navigation.stats.featureUsage')"
+        ></div>
+        <p v-if="usageHistoryError" class="usage-history-error">{{ t('navigation.stats.usageLoadError') }}</p>
+
         <div class="history-section">
-          <h4 class="section-title">{{ t('navigation.stats.historyRecords') }}</h4>
-          <div class="history-list">
-            <div v-for="item in visitHistory" :key="item.date" class="history-item-modal">
-              <span class="history-date">{{ item.date }}</span>
-              <div class="history-bar-container">
-                <div
-                  class="history-bar"
-                  :style="{ width: (item.count / Math.max(...visitHistory.map(v => v.count)) * 100) + '%' }"
-                ></div>
-              </div>
-              <span class="history-count">{{ item.count }}</span>
+          <button
+            class="section-title"
+            type="button"
+            :aria-expanded="isVisitHistoryExpanded"
+            @click="isVisitHistoryExpanded = !isVisitHistoryExpanded"
+          >
+            <span>{{ t('navigation.stats.historyRecords') }}</span>
+            <svg
+              class="history-toggle-arrow"
+              :class="{ 'is-expanded': isVisitHistoryExpanded }"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </button>
+          <template v-if="isVisitHistoryExpanded">
+            <div class="history-filters">
+              <CheckBox
+                :model-value="showUsageHistory"
+                :label="t('navigation.stats.featureUsage')"
+                class="usage-checkbox"
+                @update:model-value="setHistoryFilter('usage', $event)"
+              />
+              <CheckBox
+                :model-value="showVisitHistory"
+                :label="t('navigation.stats.pageVisits')"
+                @update:model-value="setHistoryFilter('visits', $event)"
+              />
             </div>
-          </div>
+            <div class="history-list">
+              <div v-for="item in combinedHistory" :key="item.date" class="history-item-modal">
+                <span class="history-date">{{ item.date }}</span>
+                <div class="history-bar-container">
+                  <div
+                    v-if="showVisitHistory && item.visits > 0"
+                    class="history-bar"
+                    :style="{ width: (item.visits / maxHistoryCount * 100) + '%' }"
+                  ></div>
+                  <div
+                    v-if="showUsageHistory && item.usage > 0"
+                    class="history-bar history-bar--usage"
+                    :style="{ width: (item.usage / maxHistoryCount * 100) + '%' }"
+                  ></div>
+                </div>
+                <span class="history-count">{{ item.total }}</span>
+              </div>
+            </div>
+          </template>
         </div>
       </div>
   </AppModal>
@@ -138,19 +198,21 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed, watch, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue'
 import { clearToken, getToken } from '@/api/auth/auth.js'
 import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import { useVisitStats, ensureVisitHistory } from '@/composables/data/useVisitStats.js'
 import {userStore} from "@/main/store/store.js";
 import { useSidebarConfig } from '@/main/config/index.js';
 import { navigatePlatformLink } from '@/platform/index.js'
 import { WEB_BASE } from '@/env-config.js'
 import { currentColorTheme, getBrandAssets } from '@/composables/core/uiPreferences.js'
+import { getOrInitChart, onChartThemeChange } from '@/utils/chart/chartTheme.js'
 
 const brandTitleSrc = computed(() => getBrandAssets(currentColorTheme.value).title)
 
@@ -303,6 +365,137 @@ watch(
 
 // 访问统计相关
 const isStatsExpanded = ref(false);
+const isVisitHistoryExpanded = ref(true)
+const showVisitHistory = ref(true)
+const showUsageHistory = ref(true)
+const usageHistory = ref([])
+const usageHistoryError = ref(false)
+let usageHistoryLoaded = false
+let usageHistoryRequest = null
+const visitHistoryChartEl = ref(null)
+const usageHistoryChartEl = ref(null)
+let visitHistoryChart = null
+let usageHistoryChart = null
+
+const combinedHistory = computed(() => {
+  const days = new Map()
+  for (const item of visitHistory.value) {
+    days.set(item.date, { date: item.date, visits: item.count, usage: 0, hasVisits: true, hasUsage: false })
+  }
+  for (const item of usageHistory.value) {
+    const day = days.get(item.date) || { date: item.date, visits: 0, usage: 0, hasVisits: false, hasUsage: false }
+    day.usage = item.count
+    day.hasUsage = true
+    days.set(item.date, day)
+  }
+  return [...days.values()]
+    .filter((day) => (showVisitHistory.value && day.hasVisits) || (showUsageHistory.value && day.hasUsage))
+    .map((day) => ({ ...day, total: (showVisitHistory.value ? day.visits : 0) + (showUsageHistory.value ? day.usage : 0) }))
+    .sort((a, b) => b.date.localeCompare(a.date))
+})
+const maxHistoryCount = computed(() => Math.max(1, ...combinedHistory.value.map((day) => day.total)))
+
+function setHistoryFilter(kind, checked) {
+  if (kind === 'usage' && (checked || showVisitHistory.value)) showUsageHistory.value = checked
+  if (kind === 'visits' && (checked || showUsageHistory.value)) showVisitHistory.value = checked
+}
+
+async function fetchUsageHistory() {
+  if (usageHistoryLoaded || usageHistoryRequest) return usageHistoryRequest
+  usageHistoryError.value = false
+  usageHistoryRequest = (async () => {
+    try {
+      const response = await fetch(`${WEB_BASE}/logs/stats/daily?days=60&exclude_static=true`)
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+      const result = await response.json()
+      if (!Array.isArray(result.data)) throw new Error('Invalid daily statistics response')
+      usageHistory.value = result.data.map((item) => ({ date: item.date, count: Number(item.total_calls) || 0 }))
+      usageHistoryLoaded = true
+    } catch (error) {
+      usageHistoryError.value = true
+      console.error('获取功能使用统计失败:', error)
+    } finally {
+      usageHistoryRequest = null
+    }
+  })()
+  return usageHistoryRequest
+}
+
+function updateVisitHistoryChart() {
+  if (!visitHistoryChartEl.value) return
+
+  const history = [...visitHistory.value].sort((a, b) => new Date(a.date) - new Date(b.date))
+  visitHistoryChart = getOrInitChart(visitHistoryChartEl.value)
+  visitHistoryChart.setOption({
+    tooltip: {
+      trigger: 'axis',
+      formatter: (params) => {
+        const point = params?.[0]
+        if (!point) return ''
+        return `${point.axisValue}<br />${t('navigation.stats.pageVisits')}: ${point.value}`
+      }
+    },
+    grid: { top: 18, right: 16, bottom: 28, left: 42 },
+    xAxis: {
+      type: 'category',
+      boundaryGap: false,
+      data: history.map((item) => item.date),
+      axisLabel: { hideOverlap: true }
+    },
+    yAxis: {
+      type: 'value',
+      minInterval: 1,
+      splitLine: { lineStyle: { type: 'dashed' } }
+    },
+    series: [{
+      type: 'line',
+      smooth: true,
+      showSymbol: false,
+      data: history.map((item) => item.count),
+      areaStyle: { opacity: 0.16 }
+    }]
+  }, true)
+}
+
+function updateUsageHistoryChart() {
+  if (!usageHistoryChartEl.value) return
+  const history = [...usageHistory.value].sort((a, b) => a.date.localeCompare(b.date))
+  const color = getComputedStyle(document.documentElement).getPropertyValue('--color-secondary').trim()
+  usageHistoryChart = getOrInitChart(usageHistoryChartEl.value)
+  usageHistoryChart.setOption({
+    color: [color],
+    tooltip: { trigger: 'axis' },
+    grid: { top: 18, right: 16, bottom: 28, left: 42 },
+    xAxis: { type: 'category', boundaryGap: false, data: history.map((item) => item.date), axisLabel: { hideOverlap: true } },
+    yAxis: { type: 'value', minInterval: 1, splitLine: { lineStyle: { type: 'dashed' } } },
+    series: [{ name: t('navigation.stats.featureUsage'), type: 'line', smooth: true, showSymbol: false, data: history.map((item) => item.count), areaStyle: { opacity: 0.16 } }]
+  }, true)
+}
+
+watch([isStatsExpanded, loadingStats, visitHistory, usageHistory], async ([expanded, loading]) => {
+  if (!expanded) {
+    visitHistoryChart?.dispose()
+    usageHistoryChart?.dispose()
+    visitHistoryChart = null
+    usageHistoryChart = null
+    return
+  }
+  if (loading) return
+  await nextTick()
+  if (!isStatsExpanded.value || loadingStats.value) return
+  updateVisitHistoryChart()
+  updateUsageHistoryChart()
+})
+
+onChartThemeChange(() => {
+  updateVisitHistoryChart()
+  updateUsageHistoryChart()
+})
+
+function resizeVisitHistoryChart() {
+  visitHistoryChart?.resize()
+  usageHistoryChart?.resize()
+}
 
 // 导航方法
 const closeSidebar = () => {
@@ -442,8 +635,10 @@ async function fetchVisitStats() {
 async function toggleStatsPanel() {
   isStatsExpanded.value = !isStatsExpanded.value;
 
-  if (isStatsExpanded.value && visitHistory.value.length === 0) {
-    await fetchVisitHistory();
+  if (isStatsExpanded.value) {
+    const requests = [fetchUsageHistory()]
+    if (visitHistory.value.length === 0) requests.push(fetchVisitHistory())
+    await Promise.all(requests)
   }
 }
 
@@ -465,9 +660,15 @@ onMounted(async () => {
   checkInputCapabilities();
   await fetchVisitStats();
   document.addEventListener('click', closeSubmenu);
+  window.addEventListener('resize', resizeVisitHistoryChart)
 });
 
 onBeforeUnmount(() => {
+  window.removeEventListener('resize', resizeVisitHistoryChart)
+  visitHistoryChart?.dispose()
+  usageHistoryChart?.dispose()
+  visitHistoryChart = null
+  usageHistoryChart = null
   if (props.isOpen) document.body.style.overflow = savedBodyOverflow;
   document.removeEventListener('click', closeSubmenu);
   if (hoverMediaQuery) {
@@ -488,6 +689,7 @@ onBeforeUnmount(() => {
 
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
@@ -668,6 +870,13 @@ $portrait-ratio: 1;
 }
 
 
+.visit-history-chart {
+  width: 100%;
+  height: 220px;
+  margin-bottom: 25px;
+}
+
+
 .stat-card {
   display: flex;
 
@@ -733,9 +942,38 @@ $portrait-ratio: 1;
   margin-top: 10px;
 }
 
+.section-title.chart-title {
+  display: block;
+  width: auto;
+  cursor: default;
+}
+
+.usage-history-error {
+  color: var(--color-error-dark);
+}
+
+.history-filters {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.usage-checkbox.checkbox-wrapper {
+  --checkbox-color: var(--color-secondary);
+  --checkbox-border: var(--color-secondary);
+  --checkbox-shadow: rgba(var(--color-secondary-rgb), 0.3);
+}
+
 
 .section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
   margin: 0 0 12px 4px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
 
   color: $text-muted;
 
@@ -745,6 +983,18 @@ $portrait-ratio: 1;
   font-weight: 700;
 
   letter-spacing: 0.5px;
+  text-align: left;
+  cursor: pointer;
+}
+
+
+.history-toggle-arrow {
+  flex: 0 0 auto;
+  transition: transform 0.2s ease;
+
+  &.is-expanded {
+    transform: rotate(180deg);
+  }
 }
 
 
@@ -793,6 +1043,7 @@ $portrait-ratio: 1;
 
 .history-bar-container {
   position: relative;
+  display: flex;
 
   height: 20px;
 
@@ -805,8 +1056,6 @@ $portrait-ratio: 1;
 
 
 .history-bar {
-  min-width: 2%;
-
   height: 100%;
 
   background: linear-gradient(
@@ -815,9 +1064,11 @@ $portrait-ratio: 1;
     $primary-light
   );
 
-  border-radius: var(--radius-md);
-
   transition: width 0.5s ease;
+}
+
+.history-bar--usage {
+  background: var(--color-secondary);
 }
 
 
