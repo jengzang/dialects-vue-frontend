@@ -418,7 +418,7 @@ const historyCountStyle = computed(() => {
   const colors = []
   if (showVisitHistory.value) colors.push('var(--color-primary-hover)')
   if (showUsageHistory.value) colors.push('var(--color-secondary)')
-  if (showStaticHistory.value) colors.push('var(--color-cyan)')
+  if (showStaticHistory.value) colors.push('var(--color-tertiary)')
   if (colors.length === 1) return { color: colors[0] }
   return {
     backgroundImage: `linear-gradient(90deg, ${colors.join(', ')})`,
@@ -486,7 +486,7 @@ function updateVisitHistoryChart() {
   const style = getComputedStyle(document.documentElement)
   const primary = style.getPropertyValue('--color-primary').trim()
   const secondary = style.getPropertyValue('--color-secondary').trim()
-  const staticColor = style.getPropertyValue('--color-cyan').trim()
+  const staticColor = style.getPropertyValue('--color-tertiary').trim()
   visitHistoryChart = getOrInitChart(visitHistoryChartEl.value)
   const staticLabel = t('navigation.stats.staticRequestsRightAxis')
   const staticSelected = visitHistoryChart.getOption()?.legend?.[0]?.selected?.[staticLabel] ?? false
@@ -991,9 +991,9 @@ $portrait-ratio: 1;
 }
 
 .static-checkbox.checkbox-wrapper {
-  --checkbox-color: var(--color-cyan);
-  --checkbox-border: var(--color-cyan);
-  --checkbox-shadow: rgba(var(--color-cyan-rgb), 0.3);
+  --checkbox-color: var(--color-tertiary);
+  --checkbox-border: var(--color-tertiary);
+  --checkbox-shadow: rgba(var(--color-tertiary-rgb), 0.3);
 }
 
 
@@ -1104,7 +1104,7 @@ $portrait-ratio: 1;
 }
 
 .history-bar--static {
-  background: var(--color-cyan);
+  background: var(--color-tertiary);
 }
 
 

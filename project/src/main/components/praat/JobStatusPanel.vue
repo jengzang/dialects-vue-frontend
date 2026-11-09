@@ -83,7 +83,7 @@ onUnmounted(() => {
 @use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
-$primary-light: var(--color-cyan);
+$primary-light: var(--color-tertiary);
 
 $error: var(--color-error-light);
 $success: var(--color-success);

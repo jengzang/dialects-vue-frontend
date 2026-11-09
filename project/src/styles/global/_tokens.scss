@@ -191,8 +191,8 @@
   --color-silver-rgb: 192, 192, 192;
   --color-bronze: #cd7f32;
   --color-bronze-rgb: 205, 127, 50;
-  --color-cyan: #5ac8fa;
-  --color-cyan-rgb: 90, 200, 250;
+  --color-tertiary: #087c83;
+  --color-tertiary-rgb: 8, 124, 131;
   --color-dark-teal: #1b2e2b;
 
   /* RGB 分量 — 用于 rgba(var(--xxx-rgb), alpha) 透明度组合 */
@@ -413,8 +413,8 @@ $font-size-width-scales: (
   --color-primary-cyan: var(--color-secondary);
   --color-accent-purple: var(--color-secondary);
   --color-accent-purple-light: var(--color-secondary-bg);
-  --color-cyan: var(--color-secondary);
-  --color-cyan-rgb: var(--color-secondary-rgb);
+  --color-tertiary: #287b83;
+  --color-tertiary-rgb: 40, 123, 131;
   --color-primary-rgb: 178, 58, 50;
   --color-primary-hover-rgb: 146, 47, 41;
   --text-deep-rgb: 36, 48, 64;
@@ -572,8 +572,8 @@ $font-size-width-scales: (
   --color-accent-purple: var(--color-secondary);
   --color-accent-purple-rgb: var(--color-secondary-rgb);
   --color-accent-purple-light: var(--color-secondary-bg);
-  --color-cyan: #a2e5b3;
-  --color-cyan-rgb: 162, 229, 179;
+  --color-tertiary: #90c3ed;
+  --color-tertiary-rgb: 144, 195, 237;
 
   --color-shadow-rgb: 2, 12, 6;
 
@@ -734,8 +734,8 @@ $font-size-width-scales: (
   --color-accent-purple: var(--color-secondary);
   --color-accent-purple-rgb: var(--color-secondary-rgb);
   --color-accent-purple-light: var(--color-secondary-bg);
-  --color-cyan: #a5d6ff;
-  --color-cyan-rgb: 165, 214, 255;
+  --color-tertiary: #58cabb;
+  --color-tertiary-rgb: 88, 202, 187;
 
   --color-shadow-rgb: 0, 0, 0;
 
@@ -796,8 +796,8 @@ $font-size-width-scales: (
   --enter-button-text: var(--action-solid-text);
   --color-primary-cyan: var(--color-secondary);
   --color-primary-cyan-rgb: var(--color-secondary-rgb);
-  --color-cyan: var(--color-secondary);
-  --color-cyan-rgb: var(--color-secondary-rgb);
+  --color-tertiary: #65c5c4;
+  --color-tertiary-rgb: 101, 197, 196;
 }
 
 :root[data-color-theme='blue-dark'] {
@@ -897,8 +897,8 @@ $font-size-width-scales: (
   --text-slate-light-rgb: 114, 131, 110;
   --color-primary-cyan: var(--color-primary);
   --color-primary-cyan-rgb: var(--color-primary-rgb);
-  --color-cyan: var(--color-primary);
-  --color-cyan-rgb: var(--color-primary-rgb);
+  --color-tertiary: #3974a0;
+  --color-tertiary-rgb: 57, 116, 160;
   --color-map-draw: var(--color-primary);
   --layout-art-filter: hue-rotate(-75deg) saturate(0.7);
 }
