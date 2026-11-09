@@ -823,7 +823,7 @@ $portrait-ratio: 1;
 
 
 .stat-value {
-  color: var(--color-secondary-hover);
+  color: var(--color-primary-hover);
   font-size: var(--font-size-18);
   font-weight: 900;
 }
@@ -840,7 +840,7 @@ $portrait-ratio: 1;
   border: 2px solid var(--glass-50);
   border-radius: var(--radius-full);
 
-  color: var(--color-secondary-hover);
+  color: var(--color-primary-hover);
   font-size: var(--font-size-18);
 
   cursor: pointer;
@@ -961,7 +961,7 @@ $portrait-ratio: 1;
 
 
 .stat-value-large {
-  color: var(--color-secondary-hover);
+  color: var(--color-primary-hover);
 
   font-size: var(--font-size-24);
   font-weight: 900;
