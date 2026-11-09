@@ -2017,6 +2017,16 @@ $text-muted: var(--text-lightest);
     gap: 0.6rem;
   }
 
+  .group1-style {
+    --compare-input-color: var(--color-tertiary);
+    --compare-input-rgb: var(--color-tertiary-rgb);
+  }
+
+  .group2-style {
+    --compare-input-color: var(--color-secondary);
+    --compare-input-rgb: var(--color-secondary-rgb);
+  }
+
   .feature-selection {
     width: auto;
     order: 3;
@@ -2038,9 +2048,9 @@ $text-muted: var(--text-lightest);
   width: 100%;
   max-width: 180px;
   height: 38px;
-  color: var(--text-primary);
+  color: var(--compare-input-color);
   background: var(--bg-white);
-  border: 1px solid rgba(var(--color-primary-rgb), 0.35);
+  border: 1px solid rgba(var(--compare-input-rgb), 0.35);
   border-radius: var(--radius-sm2);
   outline: none;
   text-align: center;
@@ -2048,8 +2058,8 @@ $text-muted: var(--text-lightest);
   font-weight: 600;
 
   &:focus {
-    border-color: $primary;
-    box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
+    border-color: var(--compare-input-color);
+    box-shadow: 0 0 0 2px rgba(var(--compare-input-rgb), 0.2);
   }
 }
 
