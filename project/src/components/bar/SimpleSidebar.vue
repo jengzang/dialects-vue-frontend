@@ -90,20 +90,11 @@
           </div>
         </div>
 
-        <h4 class="section-title chart-title">{{ t('navigation.stats.pageVisits') }}</h4>
         <div
           ref="visitHistoryChartEl"
           class="visit-history-chart"
           role="img"
-          :aria-label="t('navigation.stats.pageVisits')"
-        ></div>
-
-        <h4 class="section-title chart-title">{{ t('navigation.stats.featureUsage') }}</h4>
-        <div
-          ref="usageHistoryChartEl"
-          class="visit-history-chart"
-          role="img"
-          :aria-label="t('navigation.stats.featureUsage')"
+          :aria-label="`${t('navigation.stats.pageVisits')} / ${t('navigation.stats.featureUsage')}`"
         ></div>
         <p v-if="usageHistoryError" class="usage-history-error">{{ t('navigation.stats.usageLoadError') }}</p>
 
@@ -373,9 +364,7 @@ const usageHistoryError = ref(false)
 let usageHistoryLoaded = false
 let usageHistoryRequest = null
 const visitHistoryChartEl = ref(null)
-const usageHistoryChartEl = ref(null)
 let visitHistoryChart = null
-let usageHistoryChart = null
 
 const combinedHistory = computed(() => {
   const days = new Map()
@@ -424,77 +413,51 @@ async function fetchUsageHistory() {
 function updateVisitHistoryChart() {
   if (!visitHistoryChartEl.value) return
 
-  const history = [...visitHistory.value].sort((a, b) => new Date(a.date) - new Date(b.date))
+  const visits = new Map(visitHistory.value.map((item) => [item.date, item.count]))
+  const usage = new Map(usageHistory.value.map((item) => [item.date, item.count]))
+  const dates = [...new Set([...visits.keys(), ...usage.keys()])].sort()
+  const style = getComputedStyle(document.documentElement)
+  const primary = style.getPropertyValue('--color-primary').trim()
+  const secondary = style.getPropertyValue('--color-secondary').trim()
   visitHistoryChart = getOrInitChart(visitHistoryChartEl.value)
   visitHistoryChart.setOption({
-    tooltip: {
-      trigger: 'axis',
-      formatter: (params) => {
-        const point = params?.[0]
-        if (!point) return ''
-        return `${point.axisValue}<br />${t('navigation.stats.pageVisits')}: ${point.value}`
-      }
-    },
-    grid: { top: 18, right: 16, bottom: 28, left: 42 },
+    color: [primary, secondary],
+    tooltip: { trigger: 'axis' },
+    legend: { type: 'scroll', top: 0 },
+    grid: { top: 40, right: 55, bottom: 28, left: 48 },
     xAxis: {
       type: 'category',
       boundaryGap: false,
-      data: history.map((item) => item.date),
+      data: dates,
       axisLabel: { hideOverlap: true }
     },
-    yAxis: {
-      type: 'value',
-      minInterval: 1,
-      splitLine: { lineStyle: { type: 'dashed' } }
-    },
-    series: [{
-      type: 'line',
-      smooth: true,
-      showSymbol: false,
-      data: history.map((item) => item.count),
-      areaStyle: { opacity: 0.16 }
-    }]
-  }, true)
-}
-
-function updateUsageHistoryChart() {
-  if (!usageHistoryChartEl.value) return
-  const history = [...usageHistory.value].sort((a, b) => a.date.localeCompare(b.date))
-  const color = getComputedStyle(document.documentElement).getPropertyValue('--color-secondary').trim()
-  usageHistoryChart = getOrInitChart(usageHistoryChartEl.value)
-  usageHistoryChart.setOption({
-    color: [color],
-    tooltip: { trigger: 'axis' },
-    grid: { top: 18, right: 16, bottom: 28, left: 42 },
-    xAxis: { type: 'category', boundaryGap: false, data: history.map((item) => item.date), axisLabel: { hideOverlap: true } },
-    yAxis: { type: 'value', minInterval: 1, splitLine: { lineStyle: { type: 'dashed' } } },
-    series: [{ name: t('navigation.stats.featureUsage'), type: 'line', smooth: true, showSymbol: false, data: history.map((item) => item.count), areaStyle: { opacity: 0.16 } }]
+    yAxis: [
+      { type: 'value', minInterval: 1, axisLabel: { color: primary }, splitLine: { lineStyle: { type: 'dashed' } } },
+      { type: 'value', minInterval: 1, axisLabel: { color: secondary }, splitLine: { show: false } }
+    ],
+    series: [
+      { name: t('navigation.stats.pageVisitsLeftAxis'), type: 'line', smooth: true, showSymbol: false, data: dates.map((date) => visits.get(date) ?? null) },
+      { name: t('navigation.stats.featureUsageRightAxis'), type: 'line', yAxisIndex: 1, smooth: true, showSymbol: false, data: dates.map((date) => usage.get(date) ?? null) }
+    ]
   }, true)
 }
 
 watch([isStatsExpanded, loadingStats, visitHistory, usageHistory], async ([expanded, loading]) => {
   if (!expanded) {
     visitHistoryChart?.dispose()
-    usageHistoryChart?.dispose()
     visitHistoryChart = null
-    usageHistoryChart = null
     return
   }
   if (loading) return
   await nextTick()
   if (!isStatsExpanded.value || loadingStats.value) return
   updateVisitHistoryChart()
-  updateUsageHistoryChart()
 })
 
-onChartThemeChange(() => {
-  updateVisitHistoryChart()
-  updateUsageHistoryChart()
-})
+onChartThemeChange(updateVisitHistoryChart)
 
 function resizeVisitHistoryChart() {
   visitHistoryChart?.resize()
-  usageHistoryChart?.resize()
 }
 
 // 导航方法
@@ -666,9 +629,7 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   window.removeEventListener('resize', resizeVisitHistoryChart)
   visitHistoryChart?.dispose()
-  usageHistoryChart?.dispose()
   visitHistoryChart = null
-  usageHistoryChart = null
   if (props.isOpen) document.body.style.overflow = savedBodyOverflow;
   document.removeEventListener('click', closeSubmenu);
   if (hoverMediaQuery) {
@@ -872,7 +833,7 @@ $portrait-ratio: 1;
 
 .visit-history-chart {
   width: 100%;
-  height: 220px;
+  height: 260px;
   margin-bottom: 25px;
 }
 
@@ -940,12 +901,6 @@ $portrait-ratio: 1;
 
 .history-section {
   margin-top: 10px;
-}
-
-.section-title.chart-title {
-  display: block;
-  width: auto;
-  cursor: default;
 }
 
 .usage-history-error {

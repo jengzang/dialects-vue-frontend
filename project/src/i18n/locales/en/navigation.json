@@ -257,6 +257,8 @@
     "historyRecords": "Historical Records",
     "featureUsage": "Feature Usage Count",
     "pageVisits": "Page Visits",
+    "pageVisitsLeftAxis": "Page Visits (left axis)",
+    "featureUsageRightAxis": "Feature Usage Count (right axis)",
     "usageLoadError": "Failed to load feature usage statistics"
   },
   "login": "Log In",
