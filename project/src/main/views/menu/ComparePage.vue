@@ -23,7 +23,7 @@
           <!-- 組1 輸入 -->
           <div class="compare-group group1-style">
             <div class="group-label">
-              {{ $t('compare.group.label1') }}
+              {{ $t('compare.group.char1') }}
             </div>
             <div class="query-box">
               <input
@@ -48,7 +48,7 @@
           <!-- 組2 輸入 -->
           <div class="compare-group group2-style">
             <div class="group-label">
-              {{ $t('compare.group.label2') }}
+              {{ $t('compare.group.char2') }}
             </div>
             <div class="query-box">
               <input
@@ -1882,10 +1882,10 @@ export default {
 @use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
-$group1-primary: #4caf50;
-$group1-text: #2e7d32;
-$group2-primary: #2196f3;
-$group2-text: #1565c0;
+$group1-primary: var(--color-tertiary);
+$group1-text: var(--color-tertiary);
+$group2-primary: var(--color-secondary);
+$group2-text: var(--color-secondary);
 $danger: #f44336;
 $text-primary: var(--text-dark);
 $text-muted: var(--text-lightest);
@@ -2079,10 +2079,10 @@ $text-muted: var(--text-lightest);
   .group-label {
     background: linear-gradient(
       135deg,
-      rgba(var(--color-success-rgb), 0.15),
-      rgba(var(--color-success-rgb), 0.25)
+      rgba(var(--color-tertiary-rgb), 0.15),
+      rgba(var(--color-tertiary-rgb), 0.25)
     );
-    box-shadow: 0 2px 8px rgba(var(--color-success-rgb), 0.2);
+    box-shadow: 0 2px 8px rgba(var(--color-tertiary-rgb), 0.2);
     color: $group1-text;
   }
 }
@@ -2091,10 +2091,10 @@ $text-muted: var(--text-lightest);
   .group-label {
     background: linear-gradient(
       135deg,
-      rgba(33, 150, 243, 0.15),
-      rgba(33, 150, 243, 0.25)
+      rgba(var(--color-secondary-rgb), 0.15),
+      rgba(var(--color-secondary-rgb), 0.25)
     );
-    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
+    box-shadow: 0 2px 8px rgba(var(--color-secondary-rgb), 0.2);
     color: $group2-text;
   }
 }
@@ -2126,24 +2126,24 @@ $text-muted: var(--text-lightest);
 .add-to-group1 {
   background: linear-gradient(
     145deg,
-    rgba(var(--color-success-rgb), 0.25),
-    rgba(var(--color-success-rgb), 0.2)
+    rgba(var(--color-tertiary-rgb), 0.25),
+    rgba(var(--color-tertiary-rgb), 0.2)
   );
   border-color: $group1-primary;
   color: $group1-text;
 
   :root[data-color-mode='dark'] & {
-    color: #81c784;
-    border-color: rgba(var(--color-success-rgb), 0.75);
+    color: $group1-text;
+    border-color: rgba(var(--color-tertiary-rgb), 0.75);
   }
 
   &:hover:not(:disabled) {
     background: linear-gradient(
       145deg,
-      rgba(var(--color-success-rgb), 0.4),
-      rgba(var(--color-success-rgb), 0.3)
+      rgba(var(--color-tertiary-rgb), 0.4),
+      rgba(var(--color-tertiary-rgb), 0.3)
     );
-    box-shadow: 0 4px 12px rgba(var(--color-success-rgb), 0.3);
+    box-shadow: 0 4px 12px rgba(var(--color-tertiary-rgb), 0.3);
     transform: translateY(-2px);
   }
 }
@@ -2151,24 +2151,24 @@ $text-muted: var(--text-lightest);
 .add-to-group2 {
   background: linear-gradient(
     145deg,
-    rgba(33, 150, 243, 0.25),
-    rgba(33, 150, 243, 0.2)
+    rgba(var(--color-secondary-rgb), 0.25),
+    rgba(var(--color-secondary-rgb), 0.2)
   );
   border-color: $group2-primary;
   color: $group2-text;
 
   :root[data-color-mode='dark'] & {
-    color: #64b5f6;
-    border-color: rgba(var(--color-material-blue-rgb), 0.75);
+    color: $group2-text;
+    border-color: rgba(var(--color-secondary-rgb), 0.75);
   }
 
   &:hover:not(:disabled) {
     background: linear-gradient(
       145deg,
-      rgba(33, 150, 243, 0.4),
-      rgba(33, 150, 243, 0.3)
+      rgba(var(--color-secondary-rgb), 0.4),
+      rgba(var(--color-secondary-rgb), 0.3)
     );
-    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+    box-shadow: 0 4px 12px rgba(var(--color-secondary-rgb), 0.3);
     transform: translateY(-2px);
   }
 }
@@ -2190,19 +2190,19 @@ $text-muted: var(--text-lightest);
   border-radius: var(--radius-md);
 
   &.group1-style {
-    border-color: rgba(var(--color-success-rgb), 0.7);
+    border-color: rgba(var(--color-tertiary-rgb), 0.7);
 
     .selected-group-header {
-      border-bottom-color: rgba(var(--color-success-rgb), 0.3);
+      border-bottom-color: rgba(var(--color-tertiary-rgb), 0.3);
       color: $group1-text;
     }
   }
 
   &.group2-style {
-    border-color: rgba(33, 150, 243, 0.7);
+    border-color: rgba(var(--color-secondary-rgb), 0.7);
 
     .selected-group-header {
-      border-bottom-color: rgba(33, 150, 243, 0.3);
+      border-bottom-color: rgba(var(--color-secondary-rgb), 0.3);
       color: $group2-text;
     }
   }
@@ -2350,30 +2350,38 @@ $text-muted: var(--text-lightest);
   }
 
   &-green {
-    background: rgba(var(--color-success-rgb), 0.1);
+    background: rgba(var(--color-tertiary-rgb), 0.1);
     border-color: $group1-primary;
 
     &:hover {
-      background: rgba(var(--color-success-rgb), 0.2);
+      background: rgba(var(--color-tertiary-rgb), 0.2);
       border-color: $group1-primary;
     }
 
     span {
       color: $group1-text;
     }
+
+    input {
+      accent-color: $group1-primary;
+    }
   }
 
   &-blue {
-    background: rgba(33, 150, 243, 0.1);
+    background: rgba(var(--color-secondary-rgb), 0.1);
     border-color: $group2-primary;
 
     &:hover {
-      background: rgba(33, 150, 243, 0.2);
+      background: rgba(var(--color-secondary-rgb), 0.2);
       border-color: $group2-primary;
     }
 
     span {
       color: $group2-text;
+    }
+
+    input {
+      accent-color: $group2-primary;
     }
   }
 }

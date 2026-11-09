@@ -7,7 +7,9 @@
   },
   "group": {
     "label1": "组1",
-    "label2": "组2"
+    "label2": "组2",
+    "char1": "字1",
+    "char2": "字2"
   },
   "placeholder": {
     "enterChar": "请输入汉字",

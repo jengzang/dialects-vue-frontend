@@ -7,7 +7,9 @@
   },
   "group": {
     "label1": "Group 1",
-    "label2": "Group 2"
+    "label2": "Group 2",
+    "char1": "Character 1",
+    "char2": "Character 2"
   },
   "placeholder": {
     "enterChar": "Please enter a character",

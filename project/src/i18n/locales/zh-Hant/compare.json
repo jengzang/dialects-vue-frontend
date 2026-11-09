@@ -7,7 +7,9 @@
   },
   "group": {
     "label1": "組1",
-    "label2": "組2"
+    "label2": "組2",
+    "char1": "字1",
+    "char2": "字2"
   },
   "placeholder": {
     "enterChar": "請輸入漢字",
