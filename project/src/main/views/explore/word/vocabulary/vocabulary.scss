@@ -919,7 +919,8 @@
   width: 100%;
 
   .vocabulary-entry-row:not(.is-note-expanded) {
-    grid-template-columns: minmax(5em, 1fr) minmax(0, 2.5fr) minmax(0, 3.5fr) minmax(0, 3fr) max-content;
+    // 为三个预览字符、省略号和展开按钮保留空间，空注释也占位。
+    grid-template-columns: minmax(5em, 1fr) minmax(0, 2.5fr) minmax(0, 3.5fr) minmax(0, 3fr) minmax(calc(var(--font-size-13) * 4 + 16px), max-content);
   }
 
   .card-location-definition-pair,
