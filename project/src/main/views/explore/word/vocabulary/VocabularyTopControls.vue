@@ -157,6 +157,7 @@
     </div>
 
     <div
+      ref="notesScopeTargetEl"
       :id="source === 'character-notes' ? 'vocabulary-notes-scope-filter' : undefined"
       class="filter-strip"
       :class="{ 'notes-scope-filter': source === 'character-notes' }"
@@ -418,7 +419,11 @@ const emit = defineEmits([
   'refreshNotes',
   'openLocationDetails',
   'filterOpenChange',
+  'notesScopeTargetChange',
 ])
+
+const notesScopeTargetEl = ref(null)
+watch(notesScopeTargetEl, element => emit('notesScopeTargetChange', element), { flush: 'post' })
 
 const searchInputEl = ref(null)
 const locationTriggerEl = ref(null)

@@ -38,8 +38,8 @@ describe('VocabularyTopControls character-notes mode', () => {
     const intro = view.slice(view.indexOf('<template #intro>'), view.indexOf('</template>'))
     expect(intro).toContain('name="vocabulary-query-source"')
     expect(readComponentSource()).toContain(":id=\"source === 'character-notes' ? 'vocabulary-notes-scope-filter' : undefined\"")
-    expect(view).toContain('to="#vocabulary-notes-scope-filter"')
-    expect(view).toContain(':disabled="isSearchExpanded"')
+    expect(view).toContain(':to="notesScopeTarget"')
+    expect(view).toContain(':disabled="isSearchExpanded || !notesScopeTarget"')
   })
 
   it('uses a page-owned unlimited notes scope and refreshes manually after resolution', () => {

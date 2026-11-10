@@ -57,7 +57,7 @@ vi.mock('../src/main/views/explore/word/vocabulary/VocabularyTopControls.vue', (
       controlProps = props
       emitControl = emit
       return () => h('div', [
-        props.source === 'character-notes' ? h('div', { id: 'vocabulary-notes-scope-filter', class: 'filter-strip notes-scope-filter' }) : null,
+        props.source === 'character-notes' ? h('div', { id: 'vocabulary-notes-scope-filter', class: 'filter-strip notes-scope-filter', ref: element => emit('notesScopeTargetChange', element) }) : null,
         h('button', { class: 'submit', onClick: () => {
           emit('update:query', '')
           if (props.source === 'character-notes') emit('refreshNotes')

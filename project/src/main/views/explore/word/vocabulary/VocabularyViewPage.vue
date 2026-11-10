@@ -35,6 +35,7 @@
       :partition-error="partitionError"
       @retry-partitions="loadVocabularyPartitionTree"
       @filter-open-change="isVocabularyFilterOpen = $event"
+      @notes-scope-target-change="notesScopeTarget = $event"
       v-model:selected-province="selectedProvince"
       v-model:selected-city="selectedCity"
       v-model:view-mode="viewMode"
@@ -76,9 +77,8 @@
       </RouterLink>
       <Teleport
         v-if="isCharacterNotesMode"
-        to="#vocabulary-notes-scope-filter"
-        defer
-        :disabled="isSearchExpanded"
+        :to="notesScopeTarget"
+        :disabled="isSearchExpanded || !notesScopeTarget"
       >
       <LocationAndRegionInput
         :model-value="draftScope"
@@ -682,6 +682,7 @@ const props = defineProps({
 
 const query = ref('')
 const querySearchEntranceRef = ref(null)
+const notesScopeTarget = ref(null)
 const notesQuery = ref('')
 const hasSubmittedSearch = ref(false)
 const isSearchExpanded = ref(true)

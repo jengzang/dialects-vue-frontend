@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { createApp, h, nextTick, reactive } from 'vue'
+import { createApp, h, nextTick, reactive, shallowRef, Teleport } from 'vue'
 import { createI18n } from 'vue-i18n'
 import VocabularyTopControls from '../src/main/views/explore/word/vocabulary/VocabularyTopControls.vue'
 
@@ -46,6 +46,30 @@ async function mountControls(expanded, overrides = {}) {
 }
 
 describe('vocabulary query submission in the same input', () => {
+  it('keeps the page-owned notes scope attached when the controls are recreated', async () => {
+    const target = shallowRef(null)
+    const state = reactive({ generation: 0, expanded: false })
+    host = document.createElement('div')
+    document.body.append(host)
+    app = createApp({ render: () => h('div', [
+      h(VocabularyTopControls, {
+        key: state.generation, source: 'character-notes', deferQuery: state.expanded,
+        onNotesScopeTargetChange: element => { target.value = element },
+      }),
+      h(Teleport, { to: target.value, disabled: state.expanded || !target.value }, [h('input', { class: 'page-owned-scope', value: '保留地点' })]),
+    ]) })
+    app.use(createI18n({ legacy: false, locale: 'zh-CN', missingWarn: false, fallbackWarn: false, messages: {} }))
+    app.mount(host)
+    await nextTick(); await nextTick()
+    const input = host.querySelector('.page-owned-scope')
+    expect(host.querySelector('.notes-scope-filter').contains(input)).toBe(true)
+    state.generation++; await nextTick(); await nextTick()
+    expect(host.querySelector('.notes-scope-filter').contains(input)).toBe(true)
+    expect(input.value).toBe('保留地点')
+    state.expanded = true; await nextTick()
+    expect(host.querySelector('.page-owned-scope')).toBe(input)
+    expect(host.querySelector('.notes-scope-filter').contains(input)).toBe(false)
+  })
   it.each([true, false])('changes notes height and switcher placement only when compact in portrait=%s', async portrait => {
     vi.stubGlobal('matchMedia', () => ({ matches: portrait, addEventListener() {}, removeEventListener() {} }))
     const { props } = await mountControls(true, { source: 'character-notes' })
