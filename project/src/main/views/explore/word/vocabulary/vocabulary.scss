@@ -927,6 +927,11 @@
     display: contents;
   }
 
+  .card-pronunciation-pair > span {
+    text-align: center;
+    text-align-last: auto;
+  }
+
   .card-location-pill {
     justify-self: start;
   }
