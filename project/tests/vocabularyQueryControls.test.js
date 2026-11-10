@@ -35,6 +35,7 @@ async function mountControls(expanded, overrides = {}) {
     ...props, 'onUpdate:query': updateQuery, onSearch: search, onRefreshNotes: refresh, onFilterOpenChange: filterOpenChange,
     'onUpdate:filterMode': value => { props.filterMode = value },
     'onUpdate:rememberLocationSelection': rememberSelection,
+    'onUpdate:viewMode': value => { props.viewMode = value },
   }) })
   app.use(createI18n({ legacy: false, locale: 'zh-CN', missingWarn: false, fallbackWarn: false, messages: { 'zh-CN': { common: { button: { search: '搜索' } } } } }))
   app.mount(host)
@@ -45,6 +46,18 @@ async function mountControls(expanded, overrides = {}) {
 }
 
 describe('vocabulary query submission in the same input', () => {
+  it.each([true, false])('switches notes between table and cards outside settings with expanded=%s', async expanded => {
+    await mountControls(expanded, { source: 'character-notes', viewMode: 'card' })
+    const buttons = [...host.querySelectorAll('.result-view-switcher .mode-btn')]
+    expect(buttons).toHaveLength(2)
+    expect(buttons.map(button => button.title)).toEqual(['words.wordList.viewModes.table', 'words.wordList.viewModes.card'])
+    buttons[0].click(); await nextTick()
+    expect(buttons[0].getAttribute('aria-pressed')).toBe('true')
+    host.querySelector('.gear-btn').click(); await nextTick()
+    expect(host.querySelector('.search-field-mode-section [role="switch"]')).toBeNull()
+    buttons[1].click(); await nextTick()
+    expect(buttons[1].getAttribute('aria-pressed')).toBe('true')
+  })
   it('offers the remember selection checkbox in vocabulary settings and forwards changes', async () => {
     const { rememberSelection, props } = await mountControls(false)
     host.querySelector('.gear-btn').click(); await nextTick()

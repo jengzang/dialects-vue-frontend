@@ -89,12 +89,12 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyPage).toContain("'/menu/vocabulary/manage'")
   })
 
-  it('keeps vocabulary card and map queries separate from the table API', () => {
+  it('shares item queries between cards and table while keeping map queries separate', () => {
     const vocabularyPage = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
     const vocabularyScss = readSource('src/main/views/explore/word/vocabulary/vocabulary.scss')
     const topControls = readSource('src/main/views/explore/word/vocabulary/VocabularyTopControls.vue')
 
-    expect(vocabularyPage).toContain("return !isCharacterNotesMode.value && viewMode.value === 'card'")
+    expect(vocabularyPage).toContain("return !isCharacterNotesMode.value && ['card', 'table'].includes(viewMode.value)")
     expect(vocabularyPage).toContain("return !isCharacterNotesMode.value && viewMode.value === 'map'")
     expect(vocabularyPage).toContain('tab: nextMode,')
     expect(vocabularyPage).toContain('const canLoadMore = computed')
@@ -113,7 +113,7 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyPage).toContain('search_fields: normalizeSelectedSearchFields()')
     expect(vocabularyPage).toContain("const selectedSearchFields = ref(savedSearchFields === null")
     expect(vocabularyPage).toContain("['definition', 'headword']")
-    expect(vocabularyPage).toContain('const selectedLocations = ref([])')
+    expect(vocabularyPage).toContain("const selectedLocations = ref(savedLocationSelection?.filterMode === 'location' ? savedLocationSelection.locations : [])")
     expect(vocabularyPage).toContain('const selectedStandardWord = ref(\'\')')
     expect(vocabularyPage).toContain('const selectedStandardWords = computed')
     expect(vocabularyPage).toContain("const singleSelect = ref(localStorage.getItem('vocabulary_single_select') !== 'false')")
@@ -147,10 +147,8 @@ describe('vocabulary explore page shell wiring', () => {
     expect(vocabularyPage).not.toContain("value: 'ipa'")
     expect(vocabularyPage).not.toContain("value: 'notes'")
     expect(vocabularyPage).not.toContain('const mappableEntries = computed')
-    expect(vocabularyPage).toContain('db-key="vocabulary"')
-    expect(vocabularyPage).toContain('table-name="vocabulary_entries"')
-    expect(vocabularyPage).toContain('api-adapter="vocabulary"')
-    expect(vocabularyPage).toContain('primary-key="id"')
+    expect(vocabularyPage).toContain("'notes-list vocabulary-list'")
+    expect(vocabularyPage).not.toContain('<UniversalTable')
     expect(vocabularyPage).not.toContain(':can-edit="canUseVocabularyTable"')
     expect(vocabularyPage).not.toContain('const canUseVocabularyTable = computed')
     expect(vocabularyPage).not.toContain("mode.key !== 'table'")
@@ -235,7 +233,7 @@ describe('vocabulary explore page shell wiring', () => {
     const noteToggleRule = vocabularyScss.match(/\.card-note-toggle\s*\{[^}]*\}/)?.[0] || ''
     const expandedNoteRule = vocabularyScss.match(/\.vocabulary-entry-card\.is-note-expanded\s+\.card-note\s*\{[^}]*\}/)?.[0] || ''
 
-    expect(vocabularyPage).toContain('class="glass-card vocabulary-entry-card"')
+    expect(vocabularyPage).toContain("'glass-card vocabulary-entry-card'")
     expect(vocabularyPage).toContain('class="card-location-definition-pair"')
     expect(vocabularyPage).toContain('class="card-location pill-btn card-location-pill"')
     expect(vocabularyPage).toContain('@click="openLocationDetails(entry.locationName)"')

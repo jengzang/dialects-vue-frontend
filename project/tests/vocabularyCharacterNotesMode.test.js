@@ -81,7 +81,7 @@ describe('Vocabulary character-notes mode', () => {
     const page = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
     const styles = readSource('src/main/views/explore/word/vocabulary/vocabulary.scss')
     const notesSectionStart = page.indexOf('<section v-if="isCharacterNotesMode"')
-    const notesSectionEnd = page.indexOf('\n    <section v-else-if="viewMode !== \'table\'"', notesSectionStart)
+    const notesSectionEnd = page.indexOf('\n    <section v-else class="content-area">', notesSectionStart)
     const notesSection = page.slice(notesSectionStart, notesSectionEnd)
     const vocabularySection = page.slice(notesSectionEnd)
     const notesCardStyles = styles.slice(

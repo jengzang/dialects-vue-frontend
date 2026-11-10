@@ -293,8 +293,8 @@
       </button>
     </section>
 
-    <section v-else-if="viewMode !== 'table'" class="content-area">
-      <div v-if="viewMode === 'card' && isInitialLoading" class="loading-state loading-state-base">
+    <section v-else class="content-area">
+      <div v-if="viewMode !== 'map' && isInitialLoading" class="loading-state loading-state-base">
         <div class="ui-loading--page" aria-hidden="true"></div>
         <span>{{ t('words.wordList.states.loadingCards') }}</span>
       </div>
@@ -303,17 +303,16 @@
         <p>{{ loadError }}</p>
       </div>
 
-      <div v-else-if="viewMode === 'card'" class="card-mode">
+      <div v-else-if="viewMode !== 'map'" class="card-mode">
         <div v-if="isLoadingItems && entries.length" class="loading-state loading-state-base">
           <div class="ui-loading--page" aria-hidden="true"></div>
           <span>{{ t('words.wordList.states.loadingCards') }}</span>
         </div>
-        <div v-if="entries.length" class="cards-grid">
+        <div v-if="entries.length" :class="viewMode === 'table' ? 'notes-list vocabulary-list' : 'cards-grid'">
           <article
             v-for="entry in entries"
             :key="entry.id"
-            class="glass-card vocabulary-entry-card"
-            :class="{ 'is-note-expanded': isVocabularyCardNoteExpanded(entry.id) }"
+            :class="[viewMode === 'table' ? 'notes-row vocabulary-entry-row' : 'glass-card vocabulary-entry-card', { 'is-note-expanded': isVocabularyCardNoteExpanded(entry.id) }]"
           >
             <div class="card-location-definition-pair">
               <button
@@ -411,28 +410,6 @@
       </button>
     </section>
 
-    <section v-else-if="viewMode === 'table'" class="content-area">
-      <div v-if="tableLocationError" class="empty-state empty-state-base">
-        <p>{{ tableLocationError }}</p>
-      </div>
-      <div v-else-if="!tableLocationFilter" class="loading-state loading-state-base">
-        <div class="ui-loading--page" aria-hidden="true"></div>
-        <span>{{ t('words.wordList.states.loadingData') }}</span>
-      </div>
-      <div v-else-if="tableLocationFilter.location_name?.length === 0" class="empty-state empty-state-base">
-        <p>{{ t('words.wordList.states.noData') }}</p>
-      </div>
-      <UniversalTable
-        v-else
-        :key="JSON.stringify(tableLocationFilter)"
-        db-key="vocabulary"
-        table-name="vocabulary_entries"
-        :columns="tableColumns"
-        :default-filter="tableLocationFilter"
-        primary-key="id"
-        api-adapter="vocabulary"
-      />
-    </section>
     </QuerySearchEntrance>
 
     <AppModal
@@ -623,7 +600,6 @@ import {
 } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue'
-import UniversalTable from '@/main/components/TableAndTree/UniversalTable.vue'
 import VocabularyMap from '@/main/components/map/VocabularyMap.vue'
 import VocabularyTopControls from './VocabularyTopControls.vue'
 import QuerySearchEntrance from '@/components/common/QuerySearchEntrance.vue'
@@ -711,8 +687,6 @@ const hasSubmittedSearch = ref(false)
 const isSearchExpanded = ref(true)
 const isVocabularyFilterOpen = ref(false)
 const appliedVocabularyQueryParams = ref(null)
-const tableLocationFilter = ref(null)
-const tableLocationError = ref('')
 let vocabularyQueryTimer = null
 
 function handleSearchProgress(progress) {
@@ -823,9 +797,9 @@ const notesLocationPopup = ref({
 })
 let notesCardResizeObserver = null
 let notesLocationPopupRequestId = 0
-const NOTES_VIEW_MODES = ['card', 'list']
+const NOTES_VIEW_MODES = ['card', 'table', 'list']
 function resolveNotesViewMode(tab) {
-  return tab === 'list' ? 'list' : 'card'
+  return tab === 'list' || tab === 'table' ? 'table' : 'card'
 }
 function resolveViewModeFromRoute() {
   if (route.query.source === 'character-notes') return resolveNotesViewMode(route.query.tab)
@@ -1115,14 +1089,6 @@ const canLoadMoreMapDetail = computed(() => {
     && (mapDetailHasMore.value ?? (mapDetailEntries.value.length < mapDetailTotal.value))
 })
 
-const tableColumns = computed(() => [
-  { key: 'standard_word', label: t('words.wordList.columns.definition'), filterable: true, width: 1.2 },
-  { key: 'local_expression', label: t('words.wordList.columns.headword'), filterable: true, width: 1 },
-  { key: 'ipa', label: t('words.wordList.columns.pronunciation'), filterable: false, width: 1.2 },
-  { key: 'notes', label: t('words.wordList.columns.detail'), filterable: false, width: 1.6 },
-  { key: 'location_name', label: t('words.wordList.columns.location'), filterable: true, width: 1 },
-])
-
 function normalizeViewMode(value) {
   return ['card', 'map', 'table'].includes(value) ? value : 'card'
 }
@@ -1170,7 +1136,7 @@ const mapDataForVocabularyMap = computed(() => {
 })
 
 function shouldUseVocabularyItemsApi() {
-  return !isCharacterNotesMode.value && viewMode.value === 'card'
+  return !isCharacterNotesMode.value && ['card', 'table'].includes(viewMode.value)
 }
 
 function shouldUseVocabularyMapPointsApi() {
@@ -2172,8 +2138,9 @@ watch(() => route.query.tab, (tab) => {
   }
 })
 
-watch(viewMode, () => {
+watch(viewMode, (nextMode, previousMode) => {
   if (isCharacterNotesMode.value) return
+  if (['card', 'table'].includes(nextMode) && ['card', 'table'].includes(previousMode)) return
   loadActiveViewMode()
 })
 
@@ -2230,7 +2197,6 @@ watch(isCharacterNotesMode, async (isNotes) => {
     }
     loadNotes()
   } else {
-    if (viewMode.value === 'list') viewMode.value = 'card'
     closeNotesLocationPopup()
     void loadVocabularyCounts()
     loadVocabularyPartitionTree()
@@ -2262,7 +2228,7 @@ function applyVocabularyQuery() {
   total.value = 0
   itemsHasMore.value = null
   mapDetailHasMore.value = null
-  isLoadingItems.value = hasSubmittedSearch.value && viewMode.value !== 'table'
+  isLoadingItems.value = hasSubmittedSearch.value
   isLoadingStandardWords.value = false
   isMapDetailModalOpen.value = false
   isLocationDetailsModalOpen.value = false
@@ -2270,34 +2236,6 @@ function applyVocabularyQuery() {
 }
 
 appliedVocabularyQueryParams.value = buildDraftVocabularyQueryParams()
-
-watch([appliedVocabularyQueryParams, viewMode, hasSubmittedSearch, isCharacterNotesMode], async (_, __, onCleanup) => {
-  tableLocationFilter.value = null
-  tableLocationError.value = ''
-  if (!hasSubmittedSearch.value || isCharacterNotesMode.value || viewMode.value !== 'table') return
-
-  const params = buildVocabularyQueryParams()
-  if (params.locations?.length) {
-    tableLocationFilter.value = { location_name: [...params.locations] }
-    saveVocabularyLocationSelection(params)
-    return
-  }
-  if (!params.province && !params.city && !params.regions?.length) {
-    tableLocationFilter.value = {}
-    saveVocabularyLocationSelection(params)
-    return
-  }
-
-  let cancelled = false
-  onCleanup(() => { cancelled = true })
-  try {
-    saveVocabularyLocationSelection(params)
-    const options = await getVocabularyLocationOptions(buildVocabularyLocationOptionsParams(params))
-    if (!cancelled) tableLocationFilter.value = { location_name: options.map(option => option.value) }
-  } catch (error) {
-    if (!cancelled) tableLocationError.value = error.message || t('words.wordList.states.loadItemsFailed')
-  }
-}, { immediate: true })
 
 watch([() => buildVocabularyQueryKey(buildDraftVocabularyQueryParams()), isVocabularyFilterOpen], () => {
   clearTimeout(vocabularyQueryTimer)

@@ -392,7 +392,7 @@ defineExpose({ collapse, progress })
     }
 
     :deep(.query-controls--notes) {
-      grid-template-areas: 'input action';
+      grid-template-areas: 'input action' 'modes modes';
     }
 
     :deep(.query-controls--yubao) {
@@ -553,7 +553,7 @@ defineExpose({ collapse, progress })
       grid-template-areas: 'input input' 'modes action' 'range tools';
     }
     :deep(.query-controls--notes) {
-      grid-template-areas: 'input input' 'action action';
+      grid-template-areas: 'input input' 'modes action';
     }
     :deep(.query-controls--yubao) {
       grid-template-areas: 'category category' 'input input' 'action action';

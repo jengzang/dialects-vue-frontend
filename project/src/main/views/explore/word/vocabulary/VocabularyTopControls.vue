@@ -151,20 +151,6 @@
             auto-width
           />
         </div>
-        <div v-if="source === 'character-notes'" class="search-field-mode-section">
-          <h4 class="search-field-modal-title">
-            {{ t('words.wordList.viewModes.label') }}
-          </h4>
-          <SwitchToggle
-            :model-value="viewMode === 'list'"
-            :show-label="true"
-            :active-text="t('words.wordList.viewModes.list')"
-            :inactive-text="t('words.wordList.viewModes.card')"
-            label-position="inside"
-            auto-width
-            @update:model-value="emit('update:viewMode', $event ? 'list' : 'card')"
-          />
-        </div>
       </AppModal>
 
     </div>
@@ -314,11 +300,11 @@
           </button>
         </div>
       </div>
-      <div v-if="source === 'vocabulary'" class="query-mode-controls">
+      <div class="query-mode-controls">
         <span v-if="deferQuery" class="query-condition-label">{{ t('words.wordList.viewModes.label') }}</span>
         <div class="result-view-switcher view-mode-selector" role="group" :aria-label="t('words.wordList.viewModes.label')">
           <button
-            v-for="mode in ['table', 'card', 'map']"
+            v-for="mode in source === 'character-notes' ? ['table', 'card'] : ['table', 'card', 'map']"
             :key="mode"
             class="mode-btn"
             :class="{ active: viewMode === mode }"

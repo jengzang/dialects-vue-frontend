@@ -915,6 +915,42 @@
   font-size: var(--font-size-13);
 }
 
+.vocabulary-list {
+  .vocabulary-entry-row {
+    grid-template-columns: minmax(0, 6em) minmax(0, 6em) minmax(0, 5em) minmax(0, 5em) minmax(0, 18em);
+  }
+
+  .card-location-definition-pair,
+  .card-pronunciation-pair {
+    display: contents;
+  }
+
+  .card-location-pill {
+    justify-self: start;
+  }
+
+  .card-definition,
+  .pronunciation-text,
+  .word-text {
+    min-width: 0;
+    overflow-x: auto;
+  }
+
+  .card-note {
+    grid-column: 5;
+    justify-self: stretch;
+    justify-content: start;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+  }
+
+  .card-note-text {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+}
+
 .load-more-btn {
   display: flex;
   width: fit-content;
@@ -1653,6 +1689,10 @@
     .notes-card-note-text {
       font-size: var(--font-size-13);
     }
+  }
+
+  .vocabulary-list .vocabulary-entry-row {
+    grid-template-columns: minmax(0, 4.5em) minmax(0, 4em) minmax(0, 4.5em) minmax(0, 3em) minmax(0, 1fr);
   }
 
   .map-canvas-shell {

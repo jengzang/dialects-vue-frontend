@@ -96,6 +96,7 @@ beforeEach(() => {
   localStorage.clear()
   sessionStorage.clear()
   vi.stubGlobal('matchMedia', () => ({ matches: false }))
+  vi.stubGlobal('ResizeObserver', class { observe() {} disconnect() {} })
   vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
     return this.classList.contains('query-intro') ? { top: 180, height: 240 } : { top: 420, height: 140 }
@@ -104,6 +105,54 @@ beforeEach(() => {
 afterEach(() => { app?.unmount(); host?.remove(); vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.useRealTimers() })
 
 describe('vocabulary configuration entrance', () => {
+  it.each(['table', 'list'])('opens notes rows from tab=%s and switches to cards without another request', async tab => {
+    mocks.notes.mockResolvedValueOnce({ items: [{ id: 1, location_name: '测试地点', character: '字', ipa: 'tsi', notes: '测试注释' }], total: 1 })
+    await mount({ source: 'character-notes', tab })
+    host.querySelector('.submit').click()
+    entrance.$.exposed.progress.value = 1
+    await settle(); await settle()
+    expect(host.querySelector('.notes-list .notes-row')?.textContent).toContain('测试注释')
+    const calls = mocks.notes.mock.calls.length
+    emitControl('update:viewMode', 'card'); await settle()
+    expect(host.querySelector('.notes-entry-card')?.textContent).toContain('测试注释')
+    expect(mocks.notes).toHaveBeenCalledTimes(calls)
+    emitControl('update:viewMode', 'table'); await settle()
+    expect(host.querySelector('.notes-list .notes-row')).not.toBeNull()
+    expect(mocks.route.query.tab).toBe('table')
+    expect(mocks.notes).toHaveBeenCalledTimes(calls)
+  })
+
+  it('uses the same filtered items and pagination in table and card views', async () => {
+    const entry = { id: 1, location_name: '测试地点', standard_word: '蜘蛛', local_expression: '蛛仔', ipa: 'tsu', notes: '注释' }
+    mocks.items.mockResolvedValueOnce({ items: [entry], total: 2, has_more: true })
+    await mount({ tab: 'table' })
+    emitControl('update:query', '蜘蛛'); await settle()
+    emitControl('update:selectedLocations', ['测试地点']); await settle()
+    emitControl('search')
+    entrance.$.exposed.progress.value = 1
+    await settle(); await settle()
+    expect(mocks.items).toHaveBeenLastCalledWith(expect.objectContaining({ q: '蜘蛛', locations: ['测试地点'], page: 1 }))
+    const row = host.querySelector('.vocabulary-list .notes-row')
+    expect(row?.textContent).toContain('蛛仔')
+    expect(row?.textContent).toContain('蜘蛛')
+    expect(row?.textContent).toContain('tsu')
+    expect(row?.textContent).toContain('注释')
+    expect(mocks.tableMount).not.toHaveBeenCalled()
+    const calls = mocks.items.mock.calls.length
+    emitControl('update:viewMode', 'card'); await settle()
+    expect(host.querySelector('.vocabulary-entry-card')?.textContent).toContain('蛛仔')
+    expect(mocks.items).toHaveBeenCalledTimes(calls)
+    emitControl('update:viewMode', 'table'); await settle()
+    mocks.items.mockResolvedValueOnce({ items: [{ ...entry, id: 2 }], total: 2, has_more: false })
+    host.querySelector('.load-more-btn').click(); await settle()
+    expect(mocks.items).toHaveBeenLastCalledWith(expect.objectContaining({ q: '蜘蛛', page: 2 }))
+    expect(host.querySelectorAll('.vocabulary-list .notes-row')).toHaveLength(2)
+    const callsAfterAppend = mocks.items.mock.calls.length
+    emitControl('update:viewMode', 'card'); await settle()
+    expect(host.querySelectorAll('.vocabulary-entry-card')).toHaveLength(2)
+    expect(mocks.items).toHaveBeenCalledTimes(callsAfterAppend)
+  })
+
   const memoryKey = 'vocabulary_location_selection'
 
   it.each(['location', 'administrative', 'yindian', 'map'])('restores remembered %s selection before the first query', async filterMode => {
@@ -191,17 +240,17 @@ describe('vocabulary configuration entrance', () => {
     await settle()
   }
 
-  it('passes selected location names to the table and clears them when selecting all', async () => {
+  it('queries selected location names in table mode and clears them when selecting all', async () => {
     await mount({ tab: 'table' })
     emitControl('update:selectedLocations', ['测试地点']); await settle()
     await submitTable()
-    expect(mocks.tableMount).toHaveBeenLastCalledWith({ location_name: ['测试地点'] })
+    expect(mocks.items).toHaveBeenLastCalledWith(expect.objectContaining({ locations: ['测试地点'] }))
     emitControl('update:selectedLocations', []); await settle()
     await submitTable()
-    expect(mocks.tableMount).toHaveBeenLastCalledWith({})
+    expect(mocks.items.mock.lastCall[0].locations).toEqual([])
   })
 
-  it.each(['administrative', 'yindian', 'map'])('resolves %s filters into concrete table location names', async mode => {
+  it.each(['administrative', 'yindian', 'map'])('passes %s scope to the table items query', async mode => {
     await mount({ tab: 'table' })
     emitControl('update:filterMode', mode); await settle()
     if (mode === 'administrative') {
@@ -215,41 +264,42 @@ describe('vocabulary configuration entrance', () => {
       : { region_mode: mode, regions: ['甲-乙'] }
     mocks.locations.mockClear()
     await submitTable()
-    expect(mocks.locations).toHaveBeenCalledWith(expectedScope)
-    expect(mocks.tableMount).toHaveBeenLastCalledWith({ location_name: ['测试地点'] })
+    expect(mocks.items).toHaveBeenLastCalledWith(expect.objectContaining(expectedScope))
+    expect(mocks.tableMount).not.toHaveBeenCalled()
   })
 
-  it('does not mount an unfiltered table while resolving, after an empty scope, or after a resolution failure', async () => {
+  it('shows an empty table result and item query failures without a database table fallback', async () => {
     await mount({ tab: 'table' })
     emitControl('update:filterMode', 'yindian'); await settle()
     emitControl('update:selectedRegions', ['甲-乙']); await settle()
-    let finish
-    mocks.locations.mockImplementation(() => new Promise(resolve => { finish = resolve }))
+    mocks.items.mockResolvedValueOnce({ items: [], total: 0 })
     await submitTable()
     expect(mocks.tableMount).not.toHaveBeenCalled()
-    finish([]); await settle(); await settle()
-    expect(mocks.tableMount).not.toHaveBeenCalled()
-    mocks.locations.mockRejectedValue(new Error('scope unavailable'))
+    expect(host.querySelector('.empty-state')?.textContent).toContain('noData')
+    mocks.items.mockRejectedValueOnce(new Error('scope unavailable'))
     emitControl('update:selectedRegions', ['丙-丁']); await settle()
     await submitTable()
+    expect(host.querySelector('.empty-state')?.textContent).toContain('scope unavailable')
     expect(mocks.tableMount).not.toHaveBeenCalled()
   })
 
-  it('ignores old location resolutions when the applied table scope changes', async () => {
+  it('ignores old item responses when the applied table scope changes', async () => {
     await mount({ tab: 'table' })
     emitControl('update:filterMode', 'map'); await settle()
     emitControl('update:selectedRegions', ['甲-乙']); await settle()
     const pending = []
-    mocks.locations.mockImplementation(params => new Promise(resolve => { pending.push({ params, resolve }) }))
+    mocks.items.mockImplementationOnce(params => new Promise(resolve => { pending.push({ params, resolve }) }))
     await submitTable()
     emitControl('update:selectedRegions', ['丙-丁']); await settle()
+    mocks.items.mockImplementationOnce(params => new Promise(resolve => { pending.push({ params, resolve }) }))
     await submitTable()
-    pending.filter(item => item.params.regions?.[0] === '丙-丁').forEach(item => item.resolve([{ value: '新地点' }]))
+    pending.filter(item => item.params.regions?.[0] === '丙-丁').forEach(item => item.resolve({ items: [{ id: 2, location_name: '新地点' }], total: 1 }))
     await settle(); await settle()
-    expect(mocks.tableMount).toHaveBeenLastCalledWith({ location_name: ['新地点'] })
-    pending.filter(item => item.params.regions?.[0] === '甲-乙').forEach(item => item.resolve([{ value: '旧地点' }]))
+    expect(host.querySelector('.vocabulary-list')?.textContent).toContain('新地点')
+    pending.filter(item => item.params.regions?.[0] === '甲-乙').forEach(item => item.resolve({ items: [{ id: 1, location_name: '旧地点' }], total: 1 }))
     await settle(); await settle()
-    expect(mocks.tableMount).toHaveBeenLastCalledWith({ location_name: ['新地点'] })
+    expect(host.querySelector('.vocabulary-list')?.textContent).toContain('新地点')
+    expect(host.querySelector('.vocabulary-list')?.textContent).not.toContain('旧地点')
   })
 
   it('uses the applied scope when switching from cards to table with a selector still open', async () => {
@@ -260,7 +310,7 @@ describe('vocabulary configuration entrance', () => {
     emitControl('filterOpenChange', true)
     emitControl('update:selectedLocations', ['未提交地点'])
     emitControl('update:viewMode', 'table'); await settle()
-    expect(mocks.tableMount).toHaveBeenLastCalledWith({ location_name: ['测试地点'] })
+    expect(mocks.items).toHaveBeenLastCalledWith(expect.objectContaining({ locations: ['测试地点'] }))
   })
 
   it('defaults vocabulary search fields to definition and headword only', async () => {
@@ -706,14 +756,15 @@ describe('vocabulary configuration entrance', () => {
     expect(request).not.toHaveBeenCalled()
   })
 
-  it('mounts the table only after Search finishes collapsing and resets when switching source', async () => {
+  it('shows table results only after Search finishes collapsing and resets when switching source', async () => {
     await mount({ tab: 'table' })
     host.querySelector('.submit').click()
     await settle()
-    expect(mocks.tableMount).not.toHaveBeenCalled()
+    expect(host.querySelector('.content-area')).toBeNull()
     entrance.$.exposed.progress.value = 1
     await settle()
-    expect(mocks.tableMount).toHaveBeenCalledTimes(1)
+    expect(host.querySelector('.content-area')).not.toBeNull()
+    expect(mocks.items).toHaveBeenCalledTimes(1)
     mocks.route.query = { source: 'character-notes', tab: 'card' }
     await settle()
     expect(mocks.notes).not.toHaveBeenCalled()

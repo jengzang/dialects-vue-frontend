@@ -21,11 +21,12 @@ describe('vocabulary table read-only view', () => {
     expect(vocabularyPage).not.toContain("navigateTo('/menu/vocabulary/view')")
   })
 
-  it('lets everyone open table mode while keeping the view page UniversalTable read-only', () => {
+  it('lets everyone open table mode using read-only query results', () => {
     const vocabularyViewPage = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
 
-    expect(readSource('src/main/views/explore/word/vocabulary/VocabularyTopControls.vue')).toContain("v-for=\"mode in ['table', 'card', 'map']\"")
-    expect(vocabularyViewPage).toContain('v-else-if="viewMode === \'table\'"')
+    expect(readSource('src/main/views/explore/word/vocabulary/VocabularyTopControls.vue')).toContain("['table', 'card', 'map']")
+    expect(vocabularyViewPage).toContain("viewMode === 'table' ? 'notes-list vocabulary-list' : 'cards-grid'")
+    expect(vocabularyViewPage).not.toContain('<UniversalTable')
     expect(vocabularyViewPage).not.toContain("mode.key !== 'table'")
     expect(vocabularyViewPage).not.toContain("value === 'table'")
     expect(vocabularyViewPage).not.toContain(':can-edit=')
