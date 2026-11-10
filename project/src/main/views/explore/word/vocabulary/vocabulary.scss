@@ -918,6 +918,7 @@
 .vocabulary-list {
   .vocabulary-entry-row {
     grid-template-columns: minmax(0, 6em) minmax(0, 6em) minmax(0, 5em) minmax(0, 5em) minmax(0, 18em);
+    justify-content: center;
   }
 
   .card-location-definition-pair,
