@@ -919,7 +919,7 @@
   width: 100%;
 
   .vocabulary-entry-row:not(.is-note-expanded) {
-    grid-template-columns: repeat(4, minmax(0, 1fr)) max-content;
+    grid-template-columns: minmax(5em, 1fr) minmax(0, 2.5fr) minmax(0, 3.5fr) minmax(0, 3fr) max-content;
   }
 
   .card-location-definition-pair,
@@ -938,6 +938,10 @@
     overflow-x: auto;
   }
 
+  .card-definition {
+    max-width: none;
+  }
+
   .card-note {
     grid-column: 5;
     justify-self: stretch;
@@ -948,7 +952,7 @@
   }
 
   .vocabulary-entry-row.is-note-expanded {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: minmax(5em, 1fr) minmax(0, 2.5fr) minmax(0, 3.5fr) minmax(0, 3fr);
 
     .card-note {
       grid-column: 1 / -1;
@@ -1703,10 +1707,6 @@
     .notes-card-note-text {
       font-size: var(--font-size-13);
     }
-  }
-
-  .vocabulary-list .vocabulary-entry-row:not(.is-note-expanded) {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
   .map-canvas-shell {
