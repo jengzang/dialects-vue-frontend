@@ -400,7 +400,7 @@
         data-variant="secondary"
         type="button"
         :disabled="isLoadingMore"
-        @click="loadVocabularyItems({ append: true })"
+        @click="loadActiveViewMode({ append: true })"
       >
         <template v-if="isLoadingMore">
           <span class="btn-loading-dot" aria-hidden="true"></span>
@@ -691,6 +691,14 @@ const isSearchExpanded = ref(true)
 const isVocabularyFilterOpen = ref(false)
 const appliedVocabularyQueryParams = ref(null)
 let vocabularyQueryTimer = null
+let queryPageDisposed = false
+let runningVocabularyQueryKey = ''
+let runningVocabularyMapResult = null
+let queuedVocabularyQuery = null
+let runningNotesQueryKey = ''
+let queuedNotesQuery = null
+let vocabularyQueryDebouncing = false
+let notesQueryDebouncing = false
 
 function handleSearchProgress(progress) {
   isSearchExpanded.value = progress < 1
@@ -1380,11 +1388,11 @@ function closeNotesLocationPopup() {
   notesLocationPopup.value.loading = false
 }
 
-async function loadNotes({ append = false } = {}) {
-  if (!hasSubmittedSearch.value || !isCharacterNotesMode.value) return
+async function loadNotes({ append = false, params: queuedParams = null } = {}) {
+  if (queryPageDisposed || !hasSubmittedSearch.value || !isCharacterNotesMode.value) return
 
   const nextPage = append ? notesPage.value + 1 : 1
-  const params = {
+  const params = queuedParams || {
     q: notesQuery.value.trim(),
     search_fields: normalizeNotesSearchFields(notesSearchFields.value),
     locations: appliedScope.value.locations,
@@ -1394,19 +1402,25 @@ async function loadNotes({ append = false } = {}) {
     page_size: notesPageSize.value,
   }
   const requestKey = JSON.stringify(params)
+  if (runningNotesQueryKey) {
+    queuedNotesQuery = requestKey === runningNotesQueryKey ? null : { append, params }
+    return
+  }
+  runningNotesQueryKey = requestKey
+  queuedNotesQuery = null
   activeNotesRequestKey.value = requestKey
   isLoadingNotes.value = true
   notesLoadError.value = ''
   try {
     const response = await searchNotes(params)
-    if (activeNotesRequestKey.value !== requestKey || !isCharacterNotesMode.value) return
+    if (queryPageDisposed || queuedNotesQuery || activeNotesRequestKey.value !== requestKey || !isCharacterNotesMode.value) return
     const nextEntries = Array.isArray(response.items) ? response.items.map(normalizeNotesEntry) : []
     notesEntries.value = append ? notesEntries.value.concat(nextEntries) : nextEntries
     notesTotal.value = Number(response.total) || notesEntries.value.length
     notesPage.value = Number(response.page) || nextPage
     notesPageSize.value = Number(response.page_size) || notesPageSize.value
   } catch (error) {
-    if (activeNotesRequestKey.value !== requestKey || !isCharacterNotesMode.value) return
+    if (queryPageDisposed || queuedNotesQuery || activeNotesRequestKey.value !== requestKey || !isCharacterNotesMode.value) return
     notesLoadError.value = error.message || t('words.wordList.states.loadItemsFailed')
     if (!append) {
       notesEntries.value = []
@@ -1414,6 +1428,8 @@ async function loadNotes({ append = false } = {}) {
     }
   } finally {
     if (activeNotesRequestKey.value === requestKey) isLoadingNotes.value = false
+    runningNotesQueryKey = ''
+    if (queuedNotesQuery && !notesQueryDebouncing) void loadNotes(queuedNotesQuery)
   }
 }
 
@@ -1697,6 +1713,7 @@ async function loadVocabularyItems({ append = false } = {}) {
   const nextPage = append ? page.value + 1 : 1
   const requestParams = buildVocabularyItemsParams({ page: nextPage })
   const requestKey = buildVocabularyMapRequestKey('items', requestParams)
+  const queryKey = buildVocabularyQueryKey(buildVocabularyQueryParams())
 
   if (!append && itemsCacheKey.value === requestKey) {
     return
@@ -1713,7 +1730,7 @@ async function loadVocabularyItems({ append = false } = {}) {
 
   try {
     const response = await requestVocabularyItems(requestParams)
-    if (activeVocabularyItemsRequestKey.value !== requestKey || !shouldUseVocabularyItemsApi()) {
+    if (queryPageDisposed || queryKey !== buildVocabularyQueryKey(buildVocabularyQueryParams()) || activeVocabularyItemsRequestKey.value !== requestKey || !shouldUseVocabularyItemsApi()) {
       return
     }
 
@@ -1727,7 +1744,7 @@ async function loadVocabularyItems({ append = false } = {}) {
       itemsCacheKey.value = requestKey
     }
   } catch (error) {
-    if (activeVocabularyItemsRequestKey.value !== requestKey || !shouldUseVocabularyItemsApi()) {
+    if (queryPageDisposed || queryKey !== buildVocabularyQueryKey(buildVocabularyQueryParams()) || activeVocabularyItemsRequestKey.value !== requestKey || !shouldUseVocabularyItemsApi()) {
       return
     }
 
@@ -1756,6 +1773,10 @@ async function loadVocabularyMapPoints() {
     ? buildVocabularyMapItemsParams()
     : buildVocabularyMapPointsParams()
   const requestKey = buildVocabularyMapRequestKey(shouldLoadMapItems ? 'map-items' : 'map-points', requestParams)
+  const isCurrentRequest = () => !queryPageDisposed && requestKey === buildVocabularyMapRequestKey(
+    shouldUseVocabularyMapItemsApi() ? 'map-items' : 'map-points',
+    shouldUseVocabularyMapItemsApi() ? buildVocabularyMapItemsParams() : buildVocabularyMapPointsParams(),
+  )
 
   if (mapPointsCacheKey.value === requestKey) {
     return
@@ -1773,7 +1794,7 @@ async function loadVocabularyMapPoints() {
     const response = shouldLoadMapItems
       ? await requestVocabularyMapItems(requestParams)
       : await requestVocabularyMapPoints(requestParams)
-    if (activeMapPointsRequestKey.value !== requestKey || (!shouldUseVocabularyMapPointsApi() && !shouldUseVocabularyMapItemsApi())) {
+    if (!isCurrentRequest() || activeMapPointsRequestKey.value !== requestKey || (!shouldUseVocabularyMapPointsApi() && !shouldUseVocabularyMapItemsApi())) {
       return
     }
 
@@ -1787,7 +1808,7 @@ async function loadVocabularyMapPoints() {
       omittedWithoutCoordinates: Number(response.omitted_without_coordinates) || 0,
     }
   } catch (error) {
-    if (activeMapPointsRequestKey.value !== requestKey || (!shouldUseVocabularyMapPointsApi() && !shouldUseVocabularyMapItemsApi())) {
+    if (!isCurrentRequest() || activeMapPointsRequestKey.value !== requestKey || (!shouldUseVocabularyMapPointsApi() && !shouldUseVocabularyMapItemsApi())) {
       return
     }
 
@@ -1887,6 +1908,7 @@ async function loadVocabularyStandardWords() {
 
   const requestParams = buildVocabularyStandardWordsParams()
   const requestKey = buildVocabularyMapRequestKey('standard-words', requestParams)
+  const isCurrentRequest = () => !queryPageDisposed && requestKey === buildVocabularyMapRequestKey('standard-words', buildVocabularyStandardWordsParams())
 
   if (standardWordsCacheKey.value === requestKey) {
     return
@@ -1898,7 +1920,7 @@ async function loadVocabularyStandardWords() {
 
   try {
     const response = await requestVocabularyStandardWords(requestParams)
-    if (activeStandardWordsRequestKey.value !== requestKey || viewMode.value !== 'map' || isCharacterNotesMode.value) {
+    if (!isCurrentRequest() || activeStandardWordsRequestKey.value !== requestKey || viewMode.value !== 'map' || isCharacterNotesMode.value) {
       return
     }
 
@@ -1928,7 +1950,7 @@ async function loadVocabularyStandardWords() {
     }
     standardWordsCacheKey.value = requestKey
   } catch {
-    if (activeStandardWordsRequestKey.value !== requestKey || viewMode.value !== 'map' || isCharacterNotesMode.value) {
+    if (!isCurrentRequest() || activeStandardWordsRequestKey.value !== requestKey || viewMode.value !== 'map' || isCharacterNotesMode.value) {
       return
     }
 
@@ -2114,19 +2136,48 @@ async function refreshVocabularyMapData() {
   const refreshId = ++vocabularyMapRefreshId
   const queryKey = buildVocabularyQueryKey(buildVocabularyQueryParams())
   await loadVocabularyMapPoints()
-  if (refreshId !== vocabularyMapRefreshId || !hasSubmittedSearch.value
+  if (queryPageDisposed || refreshId !== vocabularyMapRefreshId || !hasSubmittedSearch.value
     || viewMode.value !== 'map' || isCharacterNotesMode.value
     || queryKey !== buildVocabularyQueryKey(buildVocabularyQueryParams())) return
+  if (mapPointsCacheKey.value) {
+    runningVocabularyMapResult = { points: mapPoints.value, stats: mapStats.value, key: mapPointsCacheKey.value }
+  }
   await loadVocabularyStandardWords()
 }
 
-function loadActiveViewMode() {
-  if (shouldUseVocabularyItemsApi()) {
-    loadVocabularyItems()
-  } else if (shouldUseVocabularyMapPointsApi()) {
-    refreshVocabularyMapData()
-  } else if (shouldUseVocabularyMapItemsApi()) {
-    refreshVocabularyMapData()
+async function loadActiveViewMode({ append = false } = {}) {
+  if (queryPageDisposed || !hasSubmittedSearch.value || isCharacterNotesMode.value) return
+  const requestKey = buildVocabularyQueryKey({
+    ...buildVocabularyQueryParams(),
+    view: shouldUseVocabularyItemsApi() ? 'items' : 'map',
+    standard_words: shouldUseVocabularyItemsApi() ? [] : selectedStandardWords.value,
+    page: append ? page.value + 1 : 1,
+  })
+  if (runningVocabularyQueryKey) {
+    queuedVocabularyQuery = requestKey === runningVocabularyQueryKey ? null : { append }
+    // The points stage may have finished while standard words are still pending.
+    if (!queuedVocabularyQuery && runningVocabularyMapResult) {
+      mapPoints.value = runningVocabularyMapResult.points
+      mapStats.value = runningVocabularyMapResult.stats
+      mapPointsCacheKey.value = runningVocabularyMapResult.key
+      isLoadingItems.value = false
+    }
+    return
+  }
+  runningVocabularyQueryKey = requestKey
+  queuedVocabularyQuery = null
+  try {
+    if (shouldUseVocabularyItemsApi()) {
+      await loadVocabularyItems({ append })
+    } else {
+      await refreshVocabularyMapData()
+    }
+  } finally {
+    runningVocabularyQueryKey = ''
+    runningVocabularyMapResult = null
+    if (queuedVocabularyQuery && !vocabularyQueryDebouncing && !isVocabularyFilterOpen.value) {
+      void loadActiveViewMode(queuedVocabularyQuery)
+    }
   }
 }
 
@@ -2241,6 +2292,9 @@ watch(notesSearchFields, (val) => {
 
 watch(isCharacterNotesMode, async (isNotes) => {
   clearTimeout(vocabularyQueryTimer)
+  vocabularyQueryDebouncing = false
+  queuedVocabularyQuery = null
+  queuedNotesQuery = null
   hasSubmittedSearch.value = false
   isNotesScopeResolving.value = false
   isNotesScopeDisabled.value = false
@@ -2262,6 +2316,7 @@ watch(isCharacterNotesMode, async (isNotes) => {
 
 function applyVocabularyQuery() {
   clearTimeout(vocabularyQueryTimer)
+  vocabularyQueryDebouncing = false
   const params = buildDraftVocabularyQueryParams()
   if (appliedVocabularyQueryParams.value
     && buildVocabularyQueryKey(params) === buildVocabularyQueryKey(appliedVocabularyQueryParams.value)) return false
@@ -2269,9 +2324,6 @@ function applyVocabularyQuery() {
   appliedVocabularyFilterMode.value = filterMode.value
   page.value = 1
   mapDetailPage.value = 1
-  activeVocabularyItemsRequestKey.value = ''
-  activeMapPointsRequestKey.value = ''
-  activeStandardWordsRequestKey.value = ''
   activeMapDetailRequestKey.value = ''
   itemsCacheKey.value = ''
   mapPointsCacheKey.value = ''
@@ -2294,18 +2346,27 @@ appliedVocabularyQueryParams.value = buildDraftVocabularyQueryParams()
 
 watch([() => buildVocabularyQueryKey(buildDraftVocabularyQueryParams()), isVocabularyFilterOpen], () => {
   clearTimeout(vocabularyQueryTimer)
+  vocabularyQueryDebouncing = false
   if (isCharacterNotesMode.value || isVocabularyFilterOpen.value) return
-  if (buildVocabularyQueryKey(buildDraftVocabularyQueryParams()) === buildVocabularyQueryKey(appliedVocabularyQueryParams.value)) return
+  if (!queuedVocabularyQuery && buildVocabularyQueryKey(buildDraftVocabularyQueryParams()) === buildVocabularyQueryKey(appliedVocabularyQueryParams.value)) return
   // Only a closed selector starts the delay; reopening cancels it without clearing results.
+  vocabularyQueryDebouncing = true
   vocabularyQueryTimer = setTimeout(() => {
-    if (isCharacterNotesMode.value || isVocabularyFilterOpen.value || !applyVocabularyQuery()) return
+    vocabularyQueryDebouncing = false
+    if (isCharacterNotesMode.value || isVocabularyFilterOpen.value) return
+    if (!applyVocabularyQuery() && !queuedVocabularyQuery) return
     // 行政区模式的省市候选来自全量列表，不需要随查询范围重新拉取。
     if (filterMode.value !== 'administrative') loadVocabularyLocationOptions()
     loadActiveViewMode()
   }, 250)
 })
 
+watch([notesQuery, notesSearchFields], () => {
+  notesQueryDebouncing = true
+})
+
 watchDebounced([notesQuery, notesSearchFields], () => {
+  notesQueryDebouncing = false
   loadNotes()
 }, { debounce: 250, maxWait: 800 })
 
@@ -2324,11 +2385,14 @@ watch(selectedStandardWords, (words) => {
     mapDisplayMode.value = 'overview'
   }
   if (shouldUseVocabularyMapPointsApi() || shouldUseVocabularyMapItemsApi()) {
-    loadVocabularyMapPoints()
+    loadActiveViewMode()
   }
 })
 
 onBeforeUnmount(() => {
+  queryPageDisposed = true
+  queuedVocabularyQuery = null
+  queuedNotesQuery = null
   vocabularyMapRefreshId++
   activeStandardWordsRequestKey.value = ''
   clearTimeout(vocabularyQueryTimer)

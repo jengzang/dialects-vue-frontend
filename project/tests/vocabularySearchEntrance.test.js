@@ -322,10 +322,12 @@ describe('vocabulary configuration entrance', () => {
     emitControl('update:selectedRegions', ['丙-丁']); await settle()
     mocks.items.mockImplementationOnce(params => new Promise(resolve => { pending.push({ params, resolve }) }))
     await submitTable()
-    pending.filter(item => item.params.regions?.[0] === '丙-丁').forEach(item => item.resolve({ items: [{ id: 2, location_name: '新地点' }], total: 1 }))
+    expect(pending).toHaveLength(1)
+    pending[0].resolve({ items: [{ id: 1, location_name: '旧地点' }], total: 1 })
     await settle(); await settle()
-    expect(host.querySelector('.vocabulary-list')?.textContent).toContain('新地点')
-    pending.filter(item => item.params.regions?.[0] === '甲-乙').forEach(item => item.resolve({ items: [{ id: 1, location_name: '旧地点' }], total: 1 }))
+    expect(pending).toHaveLength(2)
+    expect(host.querySelector('.vocabulary-list')?.textContent || '').not.toContain('旧地点')
+    pending[1].resolve({ items: [{ id: 2, location_name: '新地点' }], total: 1 })
     await settle(); await settle()
     expect(host.querySelector('.vocabulary-list')?.textContent).toContain('新地点')
     expect(host.querySelector('.vocabulary-list')?.textContent).not.toContain('旧地点')
@@ -519,9 +521,11 @@ describe('vocabulary configuration entrance', () => {
     host.querySelector('.submit').click(); await settle()
     emitControl('update:selectedRegions', ['丙-乙']); await settle()
     host.querySelector('.submit').click(); await settle()
+    expect(mocks.items).toHaveBeenCalledTimes(1)
+    finishOld({ items: [{ id: 99, local_expression: '舊結果' }], total: 1 }); await settle()
+    await settle()
     expect(mocks.items).toHaveBeenCalledTimes(2)
     expect(mocks.items.mock.calls.at(-1)[0]).toMatchObject({ regions: ['丙-乙'], page: 1 })
-    finishOld({ items: [{ id: 99, local_expression: '舊結果' }], total: 1 }); await settle()
     expect(pageState.entries).toEqual([])
   })
 
@@ -813,6 +817,159 @@ describe('vocabulary configuration entrance', () => {
   })
 })
 
+
+describe('serial vocabulary queries', () => {
+  const deferred = () => { let resolve, reject; const promise = new Promise((yes, no) => { resolve = yes; reject = no }); return { promise, resolve, reject } }
+
+  it.each(['card', 'table', 'map'])('keeps only the latest automatic query in %s mode', async tab => {
+    vi.useFakeTimers()
+    const first = deferred()
+    const api = tab === 'map' ? mocks.points : mocks.items
+    api.mockImplementationOnce(() => first.promise)
+    await mount({ tab })
+    host.querySelector('.submit').click(); await settle()
+    const initialCalls = api.mock.calls.length
+    for (const query of ['中间词', '最新词']) {
+      emitControl('update:query', query); await settle()
+      await vi.advanceTimersByTimeAsync(250); await settle()
+    }
+    expect(api).toHaveBeenCalledTimes(initialCalls)
+    first.resolve({ items: [], points: [] }); await settle(); await settle()
+    expect(api).toHaveBeenCalledTimes(initialCalls + 1)
+    expect(api.mock.calls.at(-1)[0].q).toBe('最新词')
+  })
+
+  it('does not repeat an active query when edits return to its original conditions', async () => {
+    vi.useFakeTimers()
+    const first = deferred()
+    mocks.items.mockImplementationOnce(() => first.promise)
+    await mount({ tab: 'card' })
+    host.querySelector('.submit').click(); await settle()
+    for (const query of ['中间词', '']) {
+      emitControl('update:query', query); await settle()
+      await vi.advanceTimersByTimeAsync(250); await settle()
+    }
+    first.resolve({ items: [{ id: 1, standard_word: '原词' }] }); await settle(); await settle()
+    expect(mocks.items).toHaveBeenCalledTimes(1)
+    expect(pageState.entries).toHaveLength(1)
+  })
+
+  it.each(['vocabulary', 'character-notes'])('respects a newer debounce while %s has a waiting query', async source => {
+    vi.useFakeTimers()
+    const first = deferred()
+    const api = source === 'vocabulary' ? mocks.items : mocks.notes
+    api.mockImplementationOnce(() => first.promise)
+    await mount({ source, tab: 'card' })
+    host.querySelector('.submit').click(); await settle()
+    const type = async query => {
+      if (source === 'vocabulary') emitControl('update:query', query)
+      else pageState.notesQuery = query
+      await settle()
+    }
+    await type('中间词'); await vi.advanceTimersByTimeAsync(250); await settle()
+    await type('最新词'); await vi.advanceTimersByTimeAsync(100)
+    first.resolve({ items: [] }); await settle(); await settle()
+    expect(api).toHaveBeenCalledTimes(1)
+    await vi.advanceTimersByTimeAsync(150); await settle()
+    expect(api).toHaveBeenCalledTimes(2)
+    expect(api.mock.calls.at(-1)[0].q).toBe('最新词')
+  })
+
+  it.each(['resolve', 'reject'])('continues the latest notes query after the active request %s', async outcome => {
+    vi.useFakeTimers()
+    const first = deferred()
+    mocks.notes.mockImplementationOnce(() => first.promise)
+    await mount({ source: 'character-notes', tab: 'card' })
+    host.querySelector('.submit').click(); await settle()
+    for (const query of ['中间词', '最新词']) {
+      pageState.notesQuery = query; await settle()
+      await vi.advanceTimersByTimeAsync(250); await settle()
+    }
+    expect(mocks.notes).toHaveBeenCalledTimes(1)
+    if (outcome === 'resolve') first.resolve({ items: [] })
+    else first.reject(new Error('timeout'))
+    await settle(); await settle()
+    expect(mocks.notes).toHaveBeenCalledTimes(2)
+    expect(mocks.notes.mock.calls.at(-1)[0].q).toBe('最新词')
+  })
+
+  it.each(['card', 'map'])('continues the latest %s query after a failure', async tab => {
+    vi.useFakeTimers()
+    const first = deferred()
+    const api = tab === 'map' ? mocks.points : mocks.items
+    api.mockImplementationOnce(() => first.promise)
+    await mount({ tab })
+    host.querySelector('.submit').click(); await settle()
+    emitControl('update:query', '最新词'); await settle()
+    await vi.advanceTimersByTimeAsync(250); await settle()
+    first.reject(new Error('timeout')); await settle(); await settle()
+    expect(api).toHaveBeenCalledTimes(2)
+    expect(api.mock.calls.at(-1)[0].q).toBe('最新词')
+  })
+
+  it('waits for standard words before starting a query in another view', async () => {
+    const words = deferred()
+    mocks.words.mockImplementationOnce(() => words.promise)
+    await mount({ tab: 'map' })
+    host.querySelector('.submit').click(); await settle(); await settle()
+    expect(mocks.words).toHaveBeenCalledTimes(1)
+    emitControl('update:viewMode', 'card'); await settle()
+    expect(mocks.items).not.toHaveBeenCalled()
+    words.resolve({ standard_words: [] }); await settle(); await settle()
+    expect(mocks.items).toHaveBeenCalledTimes(1)
+  })
+
+  it('restores completed map points when returning to an active query waiting for standard words', async () => {
+    vi.useFakeTimers()
+    const words = deferred()
+    mocks.points.mockResolvedValueOnce({ points: [{ location_name: '原地点', entry_count: 3 }] })
+    mocks.words.mockImplementationOnce(() => words.promise)
+    await mount({ tab: 'map' })
+    host.querySelector('.submit').click(); await settle(); await settle()
+    expect(pageState.mapPoints).toHaveLength(1)
+    for (const query of ['中间词', '']) {
+      emitControl('update:query', query); await settle()
+      await vi.advanceTimersByTimeAsync(250); await settle()
+    }
+    words.resolve({ standard_words: [] }); await settle(); await settle()
+    expect(mocks.points).toHaveBeenCalledTimes(1)
+    expect(pageState.mapPoints).toHaveLength(1)
+    expect(pageState.mapPoints[0].locationName).toBe('原地点')
+    expect(pageState.isLoadingItems).toBe(false)
+  })
+
+  it('keeps a waiting query paused until an unchanged selector closes', async () => {
+    vi.useFakeTimers()
+    const first = deferred()
+    mocks.items.mockImplementationOnce(() => first.promise)
+    await mount({ tab: 'card' })
+    host.querySelector('.submit').click(); await settle()
+    emitControl('update:query', '最新词'); await settle()
+    await vi.advanceTimersByTimeAsync(250); await settle()
+    emitControl('filterOpenChange', true); await settle()
+    first.resolve({ items: [] }); await settle(); await settle()
+    expect(mocks.items).toHaveBeenCalledTimes(1)
+    emitControl('filterOpenChange', false); await settle()
+    await vi.advanceTimersByTimeAsync(249); await settle()
+    expect(mocks.items).toHaveBeenCalledTimes(1)
+    await vi.advanceTimersByTimeAsync(1); await settle()
+    expect(mocks.items).toHaveBeenCalledTimes(2)
+    expect(mocks.items.mock.calls.at(-1)[0].q).toBe('最新词')
+  })
+
+  it('does not start a queued query after leaving the page', async () => {
+    vi.useFakeTimers()
+    const first = deferred()
+    mocks.items.mockImplementationOnce(() => first.promise)
+    await mount({ tab: 'card' })
+    host.querySelector('.submit').click(); await settle()
+    emitControl('update:query', '最新词'); await settle()
+    await vi.advanceTimersByTimeAsync(250); await settle()
+    app.unmount(); app = null
+    first.resolve({ items: [] }); await settle(); await settle()
+    expect(mocks.items).toHaveBeenCalledTimes(1)
+  })
+})
 
 describe('map first and independent standard-word loading', () => {
   const deferred = () => { let resolve, reject; const promise = new Promise((yes, no) => { resolve = yes; reject = no }); return { promise, resolve, reject } }

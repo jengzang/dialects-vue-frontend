@@ -589,6 +589,9 @@ let tableFetchTimeout = null;
 let scheduledFetchSource = null;
 let searchNeedsPageReset = false;
 let fetchRequestVersion = 0;
+let runningVocabularyTableQuery = null;
+let queuedVocabularyTableQuery = false;
+let tableDisposed = false;
 const searchText = ref('');
 const sortCol = ref(null);
 const sortDesc = ref(false);
@@ -724,6 +727,7 @@ watch(() => props.defaultFilter, (next) => {
 
 // 獲取數據
 const fetchData = async () => {
+  if (tableDisposed) return;
   if (searchNeedsPageReset) {
     currentPage.value = 1;
     searchNeedsPageReset = false;
@@ -751,11 +755,21 @@ const fetchData = async () => {
     search_text: searchText.value,
     search_columns: searchCols
   };
+  const requestState = { key: JSON.stringify(payload), version: requestVersion };
+  if (props.apiAdapter === 'vocabulary') {
+    if (runningVocabularyTableQuery) {
+      queuedVocabularyTableQuery = runningVocabularyTableQuery.key !== requestState.key;
+      if (!queuedVocabularyTableQuery) runningVocabularyTableQuery.version = requestVersion;
+      return;
+    }
+    runningVocabularyTableQuery = requestState;
+  }
+  const isCurrentRequest = () => !tableDisposed && requestState.version === fetchRequestVersion;
 
   try {
     const response = await tableApi.value.query(payload);
 
-    if (requestVersion !== fetchRequestVersion) return;
+    if (!isCurrentRequest()) return;
 
     tableData.value = response.data;
     total.value = response.total;
@@ -812,12 +826,19 @@ const fetchData = async () => {
       }
     }
   } catch (e) {
-    if (requestVersion === fetchRequestVersion) {
+    if (isCurrentRequest()) {
       console.error("Data Load Error:", e);
     }
   }finally {
-    if (requestVersion === fetchRequestVersion) {
+    if (isCurrentRequest()) {
       isLoading.value = false; // 請求結束（無論成功失敗）都關閉
+    }
+    if (runningVocabularyTableQuery === requestState) {
+      runningVocabularyTableQuery = null;
+      const queued = queuedVocabularyTableQuery;
+      queuedVocabularyTableQuery = false;
+      // A newer edit still inside its debounce owns the next submission.
+      if (queued && tableFetchTimeout === null && !isSearchComposing.value) void fetchData();
     }
   }
 };
@@ -1685,6 +1706,8 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  tableDisposed = true;
+  queuedVocabularyTableQuery = false;
   clearPendingTableFetch();
   fetchRequestVersion += 1;
   // 組件銷毀時移除監聽，防止內存洩漏
