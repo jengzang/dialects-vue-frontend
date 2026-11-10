@@ -308,11 +308,13 @@
           <div class="ui-loading--page" aria-hidden="true"></div>
           <span>{{ t('words.wordList.states.loadingCards') }}</span>
         </div>
-        <div v-if="entries.length" :class="viewMode === 'table' ? 'notes-list vocabulary-list' : 'cards-grid'">
+        <div v-if="entries.length" ref="vocabularyResultsEl" :class="viewMode === 'table' ? 'notes-list vocabulary-list' : 'cards-grid'">
           <article
             v-for="entry in entries"
             :key="entry.id"
-            :class="[viewMode === 'table' ? 'notes-row vocabulary-entry-row' : 'glass-card vocabulary-entry-card', { 'is-note-expanded': isVocabularyCardNoteExpanded(entry.id) }]"
+            :data-entry-id="entry.id"
+            :style="{ '--vocabulary-inline-column-unit': `${inlineVocabularyNoteUnits.get(String(entry.id)) || 0}px` }"
+            :class="[viewMode === 'table' ? 'notes-row vocabulary-entry-row' : 'glass-card vocabulary-entry-card', { 'is-note-expanded': isVocabularyCardNoteExpanded(entry.id), 'is-note-inline': viewMode === 'table' && inlineVocabularyNoteUnits.has(String(entry.id)) }]"
           >
             <div class="card-location-definition-pair">
               <button
@@ -994,6 +996,58 @@ function toggleVocabularyCardNote(entryId) {
   }
   expandedVocabularyCardNoteIds.value = nextExpandedIds
 }
+
+const vocabularyResultsEl = ref(null)
+const inlineVocabularyNoteUnits = ref(new Map())
+let vocabularyResultsResizeObserver = null
+
+function measureInlineVocabularyNotes() {
+  const nextUnits = new Map()
+  if (viewMode.value === 'table') {
+    vocabularyResultsEl.value?.querySelectorAll('.vocabulary-entry-row.is-note-expanded').forEach(row => {
+      const rowStyle = getComputedStyle(row)
+      const widths = ['.card-location-pill', '.card-definition', '.pronunciation-text', '.word-text'].map(selector => {
+        const source = row.querySelector(selector)
+        const measure = source.cloneNode(true)
+        measure.classList.add('vocabulary-inline-measure')
+        measure.setAttribute('aria-hidden', 'true')
+        Object.assign(measure.style, {
+          position: 'fixed', visibility: 'hidden', display: 'block',
+          width: 'max-content', minWidth: '0', maxWidth: 'none', whiteSpace: 'pre',
+          font: getComputedStyle(source).font,
+        })
+        measure.querySelectorAll('.card-location-pill-text').forEach(text => { text.style.maxWidth = 'none' })
+        row.append(measure)
+        const width = measure.getBoundingClientRect().width
+        measure.remove()
+        return width
+      })
+      // Keep the requested column proportions while giving each field enough room for one line.
+      const unit = Math.ceil(Math.max(widths[0], widths[1] / 2.5, widths[2] / 3.5, widths[3] / 3))
+      const locationWidth = Math.max((parseFloat(rowStyle.fontSize) || 16) * 5, unit)
+      const noteFontSize = parseFloat(getComputedStyle(row.querySelector('.card-note-text')).fontSize) || 13
+      const available = row.getBoundingClientRect().width
+        - (parseFloat(rowStyle.paddingLeft) || 0) - (parseFloat(rowStyle.paddingRight) || 0)
+        - (parseFloat(rowStyle.columnGap) || 0) * 4
+      if (available >= locationWidth + unit * 9 + noteFontSize * 4 + 16) nextUnits.set(row.dataset.entryId, unit)
+    })
+  }
+  if (nextUnits.size !== inlineVocabularyNoteUnits.value.size
+    || [...nextUnits].some(([id, unit]) => inlineVocabularyNoteUnits.value.get(id) !== unit)) {
+    inlineVocabularyNoteUnits.value = nextUnits
+  }
+}
+
+watch(vocabularyResultsEl, element => {
+  vocabularyResultsResizeObserver?.disconnect()
+  vocabularyResultsResizeObserver = null
+  if (!element) return
+  vocabularyResultsResizeObserver = new ResizeObserver(measureInlineVocabularyNotes)
+  vocabularyResultsResizeObserver.observe(element)
+  measureInlineVocabularyNotes()
+}, { flush: 'post' })
+
+watch([viewMode, entries, expandedVocabularyCardNoteIds], measureInlineVocabularyNotes, { flush: 'post' })
 
 const locationDetailsSourcePoints = computed(() => {
   return viewMode.value === 'map' ? mapPoints.value : locationDetailsPoints.value
@@ -2280,6 +2334,8 @@ onBeforeUnmount(() => {
   clearTimeout(vocabularyQueryTimer)
   notesCardResizeObserver?.disconnect()
   notesCardResizeObserver = null
+  vocabularyResultsResizeObserver?.disconnect()
+  vocabularyResultsResizeObserver = null
 })
 </script>
 

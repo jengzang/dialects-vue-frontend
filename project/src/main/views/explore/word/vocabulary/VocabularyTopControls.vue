@@ -866,7 +866,7 @@ const standardWordTriggerLabel = computed(() => {
     width: auto;
   }
   .partition-filter {
-    min-width: 200px;
+    min-width: 130px;
   }
 
   .location-select-trigger,

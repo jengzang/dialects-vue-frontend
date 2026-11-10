@@ -105,6 +105,35 @@ beforeEach(() => {
 afterEach(() => { app?.unmount(); host?.remove(); vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.useRealTimers() })
 
 describe('vocabulary configuration entrance', () => {
+  it('keeps expanded table notes inline only when the first four columns fit without wrapping', async () => {
+    let rowWidth = 1000
+    let resize
+    vi.stubGlobal('ResizeObserver', class { constructor(callback) { resize = callback } observe() {} disconnect() {} })
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
+      if (this.classList.contains('vocabulary-inline-measure')) {
+        const width = this.classList.contains('card-location-pill') ? 80
+          : this.classList.contains('card-definition') ? 200
+            : this.classList.contains('pronunciation-text') ? 280 : 240
+        return { width }
+      }
+      if (this.classList.contains('vocabulary-entry-row')) return { width: rowWidth }
+      return { top: 180, height: 240, width: 1000 }
+    })
+    mocks.items.mockResolvedValueOnce({ items: [{ id: 1, location_name: '测试地点', standard_word: '标准词', local_expression: '方言词', ipa: 'ipa', notes: '展开后的完整注释' }], total: 1 })
+    await mount({ tab: 'table' })
+    host.querySelector('.submit').click()
+    entrance.$.exposed.progress.value = 1
+    await settle(); await settle()
+    host.querySelector('.card-note-toggle').click(); await settle()
+    expect(host.querySelector('.vocabulary-entry-row').classList.contains('is-note-inline')).toBe(true)
+    rowWidth = 400; resize(); await settle()
+    expect(host.querySelector('.vocabulary-entry-row').classList.contains('is-note-inline')).toBe(false)
+    rowWidth = 1000; resize(); await settle()
+    expect(host.querySelector('.vocabulary-entry-row').classList.contains('is-note-inline')).toBe(true)
+    host.querySelector('.card-note-toggle').click(); await settle()
+    expect(host.querySelector('.vocabulary-entry-row').classList.contains('is-note-inline')).toBe(false)
+  })
+
   it.each(['table', 'list'])('opens notes rows from tab=%s and switches to cards without another request', async tab => {
     mocks.notes.mockResolvedValueOnce({ items: [{ id: 1, location_name: '测试地点', character: '字', ipa: 'tsi', notes: '测试注释' }], total: 1 })
     await mount({ source: 'character-notes', tab })

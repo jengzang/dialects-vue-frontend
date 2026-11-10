@@ -920,7 +920,7 @@
 
   .vocabulary-entry-row:not(.is-note-expanded) {
     // 为三个预览字符、省略号和展开按钮保留空间，空注释也占位。
-    grid-template-columns: minmax(5em, 1fr) minmax(0, 2.5fr) minmax(0, 3.5fr) minmax(0, 3fr) minmax(calc(var(--font-size-13) * 4 + 16px), max-content);
+    grid-template-columns: minmax(4em, 1fr) minmax(0, 2fr) minmax(0, 3.5fr) minmax(0, 3fr) minmax(calc(var(--font-size-13) * 4 + 6px), max-content);
   }
 
   .card-location-definition-pair,
@@ -966,6 +966,20 @@
       justify-self: center;
       justify-content: center;
       text-align: center;
+    }
+
+    &.is-note-inline {
+      grid-template-columns: max(5em, var(--vocabulary-inline-column-unit)) calc(var(--vocabulary-inline-column-unit) * 2.5) calc(var(--vocabulary-inline-column-unit) * 3.5) calc(var(--vocabulary-inline-column-unit) * 3) minmax(0, 1fr);
+
+      .card-pronunciation-pair > span,
+      .card-definition {
+        white-space: nowrap;
+      }
+
+      .card-note {
+        grid-column: 5;
+        grid-row: 1;
+      }
     }
   }
 
