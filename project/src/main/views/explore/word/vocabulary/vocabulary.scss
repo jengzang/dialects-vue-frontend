@@ -919,7 +919,7 @@
   width: 100%;
 
   .vocabulary-entry-row:not(.is-note-expanded) {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr)) max-content;
   }
 
   .card-location-definition-pair,
@@ -1700,6 +1700,10 @@
     .notes-card-note-text {
       font-size: var(--font-size-13);
     }
+  }
+
+  .vocabulary-list .vocabulary-entry-row:not(.is-note-expanded) {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
   .map-canvas-shell {
