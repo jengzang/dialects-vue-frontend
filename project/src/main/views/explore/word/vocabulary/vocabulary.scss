@@ -916,9 +916,10 @@
 }
 
 .vocabulary-list {
-  .vocabulary-entry-row {
-    grid-template-columns: minmax(0, 6em) minmax(0, 6em) minmax(0, 5em) minmax(0, 5em) minmax(0, 18em);
-    justify-content: center;
+  width: 100%;
+
+  .vocabulary-entry-row:not(.is-note-expanded) {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
   .card-location-definition-pair,
@@ -1699,10 +1700,6 @@
     .notes-card-note-text {
       font-size: var(--font-size-13);
     }
-  }
-
-  .vocabulary-list .vocabulary-entry-row {
-    grid-template-columns: minmax(0, 4.5em) minmax(0, 4em) minmax(0, 4.5em) minmax(0, 3em) minmax(0, 1fr);
   }
 
   .map-canvas-shell {
