@@ -945,6 +945,11 @@
     padding: 0;
   }
 
+  .vocabulary-entry-row.is-note-expanded .card-note {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
   .card-note-text {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
