@@ -38,7 +38,7 @@ vi.mock('@/main/store/store.js', async () => {
 vi.mock('@/utils/map/MapSource.js', () => ({ mapStyle: () => ({}), mapStyleConfig: {}, calculateMapCenterAndZoom: () => ({}) }))
 vi.mock('@/main/utils/query/ResultTable.js', () => ({ get_detail: vi.fn() }))
 vi.mock('@/utils/map/MapData.js', () => ({ refreshCurrentCustomLayer: vi.fn() }))
-vi.mock('@/api', () => ({ getLocationDetail: vi.fn(), deleteCustomForm: vi.fn() }))
+vi.mock('@/api', () => ({ getLocationDetail: vi.fn(), batchDeleteCustomDataById: vi.fn() }))
 vi.mock('@/api/auth/httpClient.js', () => ({ api: vi.fn() }))
 vi.mock('@/utils/ui/message.js', () => ({ showSuccess: vi.fn(), showError: vi.fn(), showWarning: vi.fn(), showConfirm: vi.fn() }))
 vi.mock('@/main/components/map/Draw/modals/AdminBoundaryModal.vue', () => ({ default: { render: () => null } }))

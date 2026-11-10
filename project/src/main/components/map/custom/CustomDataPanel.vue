@@ -1,32 +1,52 @@
 <template>
   <Teleport to="body">
-    <button v-if="shouldShowPanel" class="expand-button" :class="{ open: isPanelOpen }" @click="togglePanel">
+    <button
+      v-if="shouldShowPanel"
+      class="expand-button"
+      :class="{ open: isPanelOpen }"
+      @click="togglePanel"
+    >
       {{ isPanelOpen ? t('map.customDataPanel.buttons.collapse') : t('map.customDataPanel.buttons.expand') }}
     </button>
 
-    <div v-if="shouldShowPanel" :class="['custom-data-panel', 'glass-panel', { open: isPanelOpen }]">
-      <div v-if="isPanelOpen" class="panelContent">
-        <h3 class="panel-title">{{ t('map.customDataPanel.title') }}</h3>
+    <div
+      v-if="shouldShowPanel"
+      :class="['custom-data-panel', 'glass-panel', { open: isPanelOpen }]"
+    >
+      <div
+        v-if="isPanelOpen"
+        class="panelContent"
+      >
+        <h3 class="panel-title">
+          {{ t('map.customDataPanel.title') }}
+        </h3>
 
-        <form @submit.prevent="handleSubmit" class="data-form">
+        <form
+          class="data-form"
+          @submit.prevent="handleSubmit"
+        >
           <div class="form-group">
             <label for="location-input">{{ t('map.customDataPanel.labels.location') }}<span class="required">*</span></label>
             <input
-                id="location-input"
-                v-model="formData.location"
-                class="glass-field"
-                type="text"
-                :placeholder="t('map.customDataPanel.placeholders.location')"
-                autocomplete="off"
-                @input="handleLocationInput"
-                @blur="hideSuggestions"
-            />
-            <div v-if="showSuggestions && suggestions.length > 0" class="suggestions-box">
+              id="location-input"
+              v-model="formData.location"
+              :disabled="locked"
+              class="glass-field"
+              type="text"
+              :placeholder="t('map.customDataPanel.placeholders.location')"
+              autocomplete="off"
+              @input="handleLocationInput"
+              @blur="hideSuggestions"
+            >
+            <div
+              v-if="showSuggestions && suggestions.length > 0"
+              class="suggestions-box"
+            >
               <div
-                  v-for="item in suggestions"
-                  :key="item"
-                  class="suggestion-item"
-                  @mousedown.prevent="selectSuggestion(item)"
+                v-for="item in suggestions"
+                :key="item"
+                class="suggestion-item"
+                @mousedown.prevent="selectSuggestion(item)"
               >
                 {{ item }}
               </div>
@@ -36,115 +56,135 @@
           <div class="form-group">
             <label for="region-input">
               <HelpIcon
-                  :content="t('map.customDataPanel.helpText.region')"
-                  size="sm"
-                  placement="right"
-                  icon="?"
-                  icon-color="var(--color-primary)"
-                  style="margin-right: 2px; vertical-align: bottom;"
+                :content="t('map.customDataPanel.helpText.region')"
+                size="sm"
+                placement="right"
+                icon="?"
+                icon-color="var(--color-primary)"
+                style="margin-right: 2px; vertical-align: bottom;"
               />
               {{ t('map.customDataPanel.labels.region') }}<span class="required">*</span>
             </label>
             <input
-                id="region-input"
-                v-model="formData.region"
-                class="glass-field"
-                type="text"
-                :placeholder="t('map.customDataPanel.placeholders.region')"
-            />
+              id="region-input"
+              v-model="formData.region"
+              :disabled="locked"
+              class="glass-field"
+              type="text"
+              :placeholder="t('map.customDataPanel.placeholders.region')"
+            >
           </div>
 
           <div class="form-group">
             <label for="coordinates-input">{{ t('map.customDataPanel.labels.coordinates') }}<span class="required">*</span></label>
             <input
-                id="coordinates-input"
-                v-model="formData.coordinates"
-                class="glass-field"
-                type="text"
-                :placeholder="t('map.customDataPanel.placeholders.coordinates')"
-            />
+              id="coordinates-input"
+              v-model="formData.coordinates"
+              :disabled="locked"
+              class="glass-field"
+              type="text"
+              :placeholder="t('map.customDataPanel.placeholders.coordinates')"
+            >
           </div>
 
           <div class="form-group">
             <label for="feature-type-input">{{ t('map.customDataPanel.labels.featureType') }}<span class="required">*</span></label>
             <input
-                id="feature-type-input"
-                v-model="formData.featureType"
-                class="glass-field"
-                type="text"
-                :placeholder="t('map.customDataPanel.placeholders.featureType')"
-                autocomplete="off"
-                :readonly="formData.featureType.trim() !== ''"
-            />
+              id="feature-type-input"
+              v-model="formData.featureType"
+              :disabled="locked"
+              class="glass-field"
+              type="text"
+              :placeholder="t('map.customDataPanel.placeholders.featureType')"
+              autocomplete="off"
+              :readonly="formData.featureType.trim() !== ''"
+            >
           </div>
 
           <div class="form-group">
             <label for="feature-field-input">{{ t('map.customDataPanel.labels.featureField') }}<span class="required">*</span></label>
             <input
-                id="feature-field-input"
-                v-model="formData.featureField"
-                class="glass-field"
-                type="text"
-                :placeholder="t('map.customDataPanel.placeholders.featureField')"
-                :readonly="formData.featureField.trim() !== ''"
-            />
+              id="feature-field-input"
+              v-model="formData.featureField"
+              :disabled="locked"
+              class="glass-field"
+              type="text"
+              :placeholder="t('map.customDataPanel.placeholders.featureField')"
+              :readonly="formData.featureField.trim() !== ''"
+            >
           </div>
 
           <div class="form-group">
             <label for="value-input">
               <HelpIcon
-                  :content="t('map.customDataPanel.helpText.value')"
-                  size="sm"
-                  placement="right"
-                  icon="?"
-                  icon-color="var(--color-primary)"
-                  style="margin-right: 2px; vertical-align: bottom;"
+                :content="t('map.customDataPanel.helpText.value')"
+                size="sm"
+                placement="right"
+                icon="?"
+                icon-color="var(--color-primary)"
+                style="margin-right: 2px; vertical-align: bottom;"
               />
               {{ t('map.customDataPanel.labels.value') }}<span class="required">*</span></label>
             <input
-                id="value-input"
-                v-model="formData.value"
-                class="glass-field"
-                type="text"
-                :placeholder="t('map.customDataPanel.placeholders.value')"
-            />
+              id="value-input"
+              v-model="formData.value"
+              :disabled="locked"
+              class="glass-field"
+              type="text"
+              :placeholder="t('map.customDataPanel.placeholders.value')"
+            >
           </div>
 
           <div class="form-group">
             <label for="description-input">{{ t('map.customDataPanel.labels.description') }}</label>
             <textarea
-                id="description-input"
-                v-model="formData.description"
-                class="glass-field"
-                :placeholder="t('map.customDataPanel.placeholders.description')"
-                rows="3"
+              id="description-input"
+              v-model="formData.description"
+              :disabled="locked"
+              class="glass-field"
+              :placeholder="t('map.customDataPanel.placeholders.description')"
+              rows="3"
             />
           </div>
 
-          <button type="submit" class="submit-btn">
+          <button
+            type="submit"
+            class="submit-btn"
+            :disabled="locked"
+          >
             {{ t('map.customDataPanel.buttons.submit') }}
           </button>
         </form>
+        <CustomDataSaveNotice
+          :state="saveState"
+          @retry="retrySave"
+        />
       </div>
     </div>
   </Teleport>
 </template>
 
 <script setup>
-import { ref, reactive, watch, computed } from 'vue'
+import { ref, reactive, watch, computed, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { batchMatch, getRegions, submitCustomForm } from '@/api'
-import { invalidateCustomDataPresence, markCustomDataExists } from '@/composables/data/useCustomDataPresence.js'
-import { showSuccess, showError, showWarning, showInfo } from '@/utils/ui/message.js'
+import { batchMatch, getRegions, saveCustomData } from '@/api'
+import { markCustomDataExists } from '@/composables/data/useCustomDataPresence.js'
+import { showSuccess, showWarning } from '@/utils/ui/message.js'
 import { userStore, globalPayload, resultCache } from '@/main/store/store.js'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import CustomDataSaveNotice from '@/main/components/user/CustomDataSaveNotice.vue'
+import { useCustomDataSave } from '@/main/composables/useCustomDataSave.js'
+import { validateRows } from '@/utils/user/customDataMutations.js'
 import { formatCoord } from '@/main/utils/drawMap/formatCoord.js'
 
 const route = useRoute()
 const { t } = useI18n()
+const saveState = useCustomDataSave(saveCustomData, { leaveMessage: () => t('user.customSafety.leave') })
+const locked = saveState.locked
 
 const props = defineProps({
+  active: { type: Boolean, default: true },
   mapClickCoordinates: {
     type: Object,
     default: null
@@ -160,6 +200,7 @@ const emit = defineEmits(['submit-success', 'panel-toggle'])
 const isPanelOpen = ref(false)
 
 const shouldShowPanel = computed(() => {
+  if (!props.active) return false
   const isMapTab = route.params.sub === 'view'
   if (!isMapTab) return false
   if (route.query.openPanel === 'true') return true
@@ -184,6 +225,8 @@ const suggestions = ref([])
 const showSuggestions = ref(false)
 
 let debounceTimer = null
+let suggestionSequence = 0
+onBeforeUnmount(() => clearTimeout(debounceTimer))
 
 const togglePanel = () => {
   isPanelOpen.value = !isPanelOpen.value
@@ -191,13 +234,13 @@ const togglePanel = () => {
 }
 
 watch(() => props.mapClickCoordinates, (newVal) => {
-  if (newVal && isPanelOpen.value) {
+  if (newVal && isPanelOpen.value && !locked.value) {
     formData.coordinates = formatCoord(newVal.lng, newVal.lat)
   }
 })
 
 watch(() => props.selectedFeature, (newFeature) => {
-  if (!newFeature) return
+  if (!newFeature || locked.value) return
 
   formData.featureField = newFeature
 
@@ -216,6 +259,8 @@ watch(() => route.query.openPanel, (newVal) => {
 }, { immediate: true })
 
 const handleLocationInput = () => {
+  if (locked.value) return
+  const sequence = ++suggestionSequence
   showSuggestions.value = false
 
   clearTimeout(debounceTimer)
@@ -229,6 +274,7 @@ const handleLocationInput = () => {
 
     try {
       const response = await batchMatch(query, false)
+      if (sequence !== suggestionSequence || locked.value || formData.location.trim() !== query) return
 
       if (response && response.length > 0) {
         const r = response[0]
@@ -260,11 +306,14 @@ const handleLocationInput = () => {
 }
 
 const selectSuggestion = async (item) => {
+  if (locked.value) return
+  const sequence = ++suggestionSequence
   formData.location = item
   showSuggestions.value = false
 
   try {
     const response = await getRegions(item)
+    if (sequence !== suggestionSequence || locked.value || formData.location !== item) return
     if (response) {
       if (response['音典分區']) {
         formData.region = response['音典分區']
@@ -279,6 +328,7 @@ const selectSuggestion = async (item) => {
     }
   } catch (error) {
     console.error('获取分区失败:', error)
+    if (sequence !== suggestionSequence || locked.value) return
     formData.region = t('map.customDataPanel.messages.regionRequestFailed')
   }
 }
@@ -317,41 +367,38 @@ const validateForm = () => {
   return true
 }
 
+const finishSave = response => {
+  if (!response) return
+  markCustomDataExists(true)
+  showSuccess(t('map.customDataPanel.messages.submitSuccess'))
+  resetForm()
+  saveState.reset()
+  emit('submit-success', response)
+}
+
 const handleSubmit = async () => {
+  if (locked.value) return
   if (!userStore.isAuthenticated) {
     showWarning(t('map.customDataPanel.validation.loginRequired'))
     return
   }
-
-  if (!validateForm()) {
+  if (!validateForm()) return
+  const { items, errors } = validateRows([{
+    簡稱: formData.location, 音典分區: formData.region, 經緯度: formData.coordinates,
+    聲韻調: formData.featureType, 特徵: formData.featureField,
+    值: formData.value, 說明: formData.description,
+  }], { creates: true })
+  if (errors.length) {
+    const error = errors[0]
+    showWarning(t('user.customSafety.rowError', { row: 1, field: error.field, reason: t(`user.customSafety.${error.messageKey}`) }))
     return
   }
+  finishSave(await saveState.save({ creates: items, updates: [], deletes: [] }))
+}
 
-  try {
-    const payload = {
-      location: formData.location.trim(),
-      region: formData.region.trim(),
-      coordinates: formData.coordinates.trim(),
-      phonology: formData.featureType.trim(),
-      feature: formData.featureField.trim(),
-      value: formData.value.trim(),
-      description: formData.description.trim() || null
-    }
-
-    const response = await submitCustomForm(payload)
-
-    if (response.success) {
-      markCustomDataExists(true)
-      showSuccess(t('map.customDataPanel.messages.submitSuccess'))
-      resetForm()
-      emit('submit-success', response)
-    } else {
-      showError(t('map.customDataPanel.messages.submitFailed', { message: response.message }))
-    }
-  } catch (error) {
-    console.error('提交失败:', error)
-    showError(t('map.customDataPanel.messages.submitError', { error: error.message }))
-  }
+const retrySave = async () => {
+  if (saveState.status.value !== 'unknown') return
+  finishSave(await saveState.save({}))
 }
 
 const resetForm = () => {

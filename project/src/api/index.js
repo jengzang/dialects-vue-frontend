@@ -154,6 +154,9 @@ export { compareChars, compareZhongGu, compareTones } from './main/core/compare.
 
 // ==================== 用户数据 ====================
 export {
+  batchUpdateCustomData,
+  batchDeleteCustomDataById,
+  saveCustomData,
   getAllCustomData,
   editCustomData,
   batchCreateCustomData,

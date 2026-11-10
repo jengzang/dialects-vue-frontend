@@ -342,5 +342,27 @@
         }
       }
     }
+  },
+  "customSafety": {
+    "required": "Required field",
+    "length": "Field is too long",
+    "coordinates": "Invalid longitude,latitude",
+    "limit": "At most 50 changes per save.",
+    "duplicate": "Duplicate record ID",
+    "unavailable": "Record is no longer available. Read the current data before editing.",
+    "rowError": "Row {row}, {field}: {reason}",
+    "unknown": "Save result is unknown. Keep this draft and retry to confirm the same save. Do not submit these additions again as new records.",
+    "failed": "Save failed. Your draft is preserved. Check the fields and try again.",
+    "conflict": "The records changed on the server. Compare your draft with the latest records before merging.",
+    "expired": "The 24-hour confirmation window expired. Read and check server records; this request cannot be automatically resent.",
+    "retry": "Retry to confirm this save",
+    "reread": "Read current records for comparison",
+    "refreshFailed": "Saved data could not be refreshed. Retry reading; do not repeat a confirmed save.",
+    "localDraft": "Local request snapshot",
+    "serverRecords": "Current server records",
+    "merge": "Keep my draft and use these latest versions",
+    "saving": "Saving…",
+    "leave": "This save is unresolved. Leaving loses the confirmation key. Stay to confirm or compare server records.",
+    "empty": "No changes to save."
   }
 }

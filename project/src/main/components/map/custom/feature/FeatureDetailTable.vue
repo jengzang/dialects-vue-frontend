@@ -31,7 +31,11 @@
               :placeholder="t('customEntry.pointDetail.placeholders.phonology')"
             >
           </label>
-          <button class="pill-btn field-notice-trigger" type="button" @click="isFieldNoticeOpen = true">
+          <button
+            class="pill-btn field-notice-trigger"
+            type="button"
+            @click="isFieldNoticeOpen = true"
+          >
             {{ t('customEntry.pointDetail.rows.noticeTrigger') }}
           </button>
         </div>
@@ -55,7 +59,15 @@
       </button>
     </div>
 
-    <div class="feature-detail-layout">
+    <CustomDataSaveNotice
+      :state="mutation"
+      :retryable="false"
+      @merge="mergeVersions"
+    />
+    <div
+      class="feature-detail-layout"
+      :inert="mutation.isSaving.value"
+    >
       <div class="feature-detail-main glass-subpanel">
         <div
           v-if="loading"
@@ -96,7 +108,7 @@
           </div>
           <div
             v-for="row in rows"
-            :key="row.created_at || `${row['簡稱']}-${row['音典分區']}-${row['值']}`"
+            :key="row.id"
             class="feature-detail-row"
           >
             <span
@@ -231,7 +243,7 @@
             <tbody>
               <tr
                 v-for="record in pointRecords"
-                :key="record.created_at || record.id"
+                :key="record.id"
               >
                 <td v-if="selectedDetailType === 'region'">
                   {{ record['簡稱'] }}
@@ -248,11 +260,23 @@
     </AppModal>
 
     <!-- 字段填写注意事项弹窗 -->
-    <AppModal v-model="isFieldNoticeOpen" size="sm" width="480px">
+    <AppModal
+      v-model="isFieldNoticeOpen"
+      size="sm"
+      width="480px"
+    >
       <template #header>
         <div class="point-detail-modal-header">
-          <h4 class="point-detail-modal-title">{{ t('customEntry.pointDetail.rows.noticeTitle') }}</h4>
-          <button class="close-btn close-btn-sm close-btn-inline" type="button" @click="isFieldNoticeOpen = false">×</button>
+          <h4 class="point-detail-modal-title">
+            {{ t('customEntry.pointDetail.rows.noticeTitle') }}
+          </h4>
+          <button
+            class="close-btn close-btn-sm close-btn-inline"
+            type="button"
+            @click="isFieldNoticeOpen = false"
+          >
+            ×
+          </button>
         </div>
       </template>
       <div class="field-notice-body">
@@ -284,9 +308,11 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue';
+import { useCustomDataSave } from '@/main/composables/useCustomDataSave.js';
+import CustomDataSaveNotice from '@/main/components/user/CustomDataSaveNotice.vue';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue';
-import { batchDeleteCustomData, getDataByFeature, getDataByPoint } from '@/api';
+import { batchDeleteCustomDataById, getDataByFeature, getDataByPoint } from '@/api';
 import { ensureCustomDataPresence } from '@/composables/data/useCustomDataPresence.js';
 import { showConfirm, showWarning } from '@/utils/ui/message.js';
 import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue';
@@ -302,6 +328,7 @@ const props = defineProps({
 const emit = defineEmits(['back', 'saved']);
 const { t } = useI18n();
 
+const mutation=useCustomDataSave(body=>batchDeleteCustomDataById(body.deletes), {leaveMessage:()=>t('user.customSafety.leave')});
 const loading = ref(false);
 const errorMessage = ref('');
 const rows = ref([]);
@@ -329,7 +356,7 @@ const mapPoints = computed(() =>
       return {
         coord: [lng, lat],
         label: row['簡稱'] || '',
-        active: editingRecord.value?.created_at === row.created_at,
+        active: editingRecord.value?.id === row.id,
       };
     })
     .filter(Boolean)
@@ -397,13 +424,21 @@ const openEditModal = (row) => {
 };
 
 const handleDelete = async (row) => {
-  if (!row?.created_at) return;
-  const confirmed = await showConfirm(t('customEntry.featureDetail.confirmDelete'));
-  if (confirmed === false) return;
-  await batchDeleteCustomData([row.created_at]);
-  rows.value = rows.value.filter((item) => item.created_at !== row.created_at);
+  if(mutation.locked.value || !row?.id) return;
+  mutation.reset();
+  const response=await mutation.save({creates:[],updates:[],deletes:[{id:row.id,version:row.version}]},{confirm:()=>showConfirm(t('customEntry.featureDetail.confirmDelete'))});
+  if(!response) return;
+  rows.value=rows.value.filter(item=>!response.deleted_ids.includes(item.id));
   emit('saved');
 };
+function mergeVersions(current) {
+  mutation.prepareMerge();
+  for(const row of rows.value) {
+    const latest=current.find(record=>record.id===row.id);
+    if(latest) row.version=latest.version;
+  }
+  mutation.reset();
+}
 
 const handleSaved = async (newFeature) => {
   const targetFeature = newFeature || { '特徵': localFeatureName.value, '聲韻調': localPhonology.value };

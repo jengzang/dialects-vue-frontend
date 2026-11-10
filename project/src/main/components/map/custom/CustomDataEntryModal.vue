@@ -1,11 +1,11 @@
 <template>
   <AppModal
-    :model-value="modelValue"
+    :model-value="modelValue || closeBlocked"
     size="lg"
     width="90vw"
     max-height="90dvh"
     :close-on-backdrop="false"
-    @update:modelValue="handleVisibleChange"
+    @update:model-value="handleVisibleChange"
   >
     <template #header>
       <div class="entry-modal-header">
@@ -22,6 +22,7 @@
         >
           <button
             class="entry-mode-button"
+            :disabled="closeBlocked"
             :class="{ active: activeMode === 'point' }"
             type="button"
             @click="activeMode = 'point'"
@@ -30,6 +31,7 @@
           </button>
           <button
             class="entry-mode-button"
+            :disabled="closeBlocked"
             :class="{ active: activeMode === 'feature' }"
             type="button"
             @click="activeMode = 'feature'"
@@ -39,6 +41,7 @@
         </div>
         <button
           class="close-btn close-btn-lg close-btn-inline"
+          :disabled="closeBlocked"
           type="button"
           :aria-label="t('customEntry.modal.close')"
           @click="closeModal"
@@ -49,14 +52,21 @@
     </template>
 
     <KeepAlive>
-      <PointCentricMode v-if="activeMode === 'point'" :key="`point-${modalSessionKey}`" />
-      <FeatureCentricMode v-else :key="`feature-${modalSessionKey}`" />
+      <PointCentricMode
+        v-if="activeMode === 'point'"
+        :key="`point-${modalSessionKey}`"
+      />
+      <FeatureCentricMode
+        v-else
+        :key="`feature-${modalSessionKey}`"
+      />
     </KeepAlive>
   </AppModal>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, computed, provide, reactive } from 'vue';
+import { CUSTOM_DATA_SAVE_SCOPE } from '@/main/composables/useCustomDataSave.js';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue';
 import PointCentricMode from './point/PointCentricMode.vue';
@@ -71,21 +81,26 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue']);
 const { t } = useI18n();
+const saveLocks = reactive(new Set());
+provide(CUSTOM_DATA_SAVE_SCOPE, saveLocks);
+const closeBlocked=computed(()=>saveLocks.size>0);
 const activeMode = ref('point');
 const modalSessionKey = ref(0);
 
 const closeModal = () => {
+  if(closeBlocked.value) return;
   emit('update:modelValue', false);
 };
 
 const handleVisibleChange = (value) => {
+  if(!value && closeBlocked.value) return;
   emit('update:modelValue', value);
 };
 
 watch(
   () => props.modelValue,
   (visible, prev) => {
-    if (prev && !visible) {
+    if (prev && !visible && !closeBlocked.value) {
       activeMode.value = 'point';
       modalSessionKey.value += 1;
     }

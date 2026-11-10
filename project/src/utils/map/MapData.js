@@ -340,6 +340,9 @@ export function buildMergedDataFromFeatureRows(rows, feature, phonology = '') {
             notes: row["說明"] || '',
             iscustoms: 1,
             detailContent: [],
+            id: row.id,
+            version: row.version,
+            customRecords: [{ id: row.id, version: row.version }],
             created_at: row["created_at"] || null,
             phonology: row["聲韻調"] || phonology || '',
             yindianRegion: row["音典分區"] || ''
@@ -404,7 +407,7 @@ export async function addCustomFeatureData(feature, phonology = '') {
 }
 
 // 對用戶自定義數據進行處理
-function mergeBackendData(result, mergedData, isCustomFeatureSearch = false) {
+export function mergeBackendData(result, mergedData, isCustomFeatureSearch = false) {
     result.forEach(row => {
         const featureType = row["聲韻調"];  // "声母"/"韵母"/"声调" 或空字符串（自定义特征）
 
@@ -434,6 +437,9 @@ function mergeBackendData(result, mergedData, isCustomFeatureSearch = false) {
                 notes: row["說明"],
                 iscustoms: 1,
                 detailContent: [],
+                id: row.id,
+                version: row.version,
+                customRecords: [{ id: row.id, version: row.version }],
                 created_at:created_at,
             });
         } else {
@@ -443,6 +449,10 @@ function mergeBackendData(result, mergedData, isCustomFeatureSearch = false) {
                 existingItem.maxValue += "║" + row["maxValue"];
                 existingItem.notes += "║" + row["說明"];
                 existingItem.iscustoms = 1;
+                existingItem.id ??= row.id;
+                existingItem.version ??= row.version;
+                existingItem.customRecords ??= [];
+                existingItem.customRecords.push({ id: row.id, version: row.version });
             } else {
                 mergedData.push({
                     location: newLocation,
@@ -453,7 +463,10 @@ function mergeBackendData(result, mergedData, isCustomFeatureSearch = false) {
                     notes: row["說明"],
                     iscustoms: 1,
                     detailContent: [],
-                    created_at:created_at,
+                    id: row.id,
+                version: row.version,
+                customRecords: [{ id: row.id, version: row.version }],
+                created_at:created_at,
                 });
             }
         }

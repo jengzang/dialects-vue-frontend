@@ -139,7 +139,8 @@ import {get_detail} from "@/main/utils/query/ResultTable.js";
 import {mapStore, userStore, resultCache} from "@/main/store/store.js";
 import { showSuccess, showError, showWarning, showConfirm } from '@/utils/ui/message.js';
 import { getLocationDetail } from '@/api'
-import { deleteCustomForm } from '@/api'
+import { batchDeleteCustomDataById } from '@/api'
+import { createCustomPopupDelete } from '@/utils/user/customPopupDelete.js'
 import { refreshCurrentCustomLayer } from '@/utils/map/MapData.js';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
@@ -808,52 +809,40 @@ const createPopupDOM = (item) => {
 };
 
 // --- 按鈕點擊處理函數 ---
+const customPopupDelete = createCustomPopupDelete({
+  remove: batchDeleteCustomDataById,
+  confirm: (item, count) => showConfirm(
+    t('map.mapLibre.confirm.deleteMessage', { location: item.location, feature: item.feature, value: item.value }) +
+      '\n' + t('user.dataPage.messages.batchDeleteConfirm', { count }),
+    {
+      title: t('map.mapLibre.confirm.title'),
+      confirmText: t('map.mapLibre.confirm.confirmText'),
+      cancelText: t('map.mapLibre.confirm.cancelText')
+    }
+  )
+})
+
 const handleCustomBtnClick = async (item) => {
-  const feature = item.feature;
-  const value = item.value;
-  const location = item.location;
-  const created_at = item.created_at;
-  const isConfirmed = await showConfirm(
-      t('map.mapLibre.confirm.deleteMessage', { location, feature, value }),
-      {
-        title: t('map.mapLibre.confirm.title'),
-        confirmText: t('map.mapLibre.confirm.confirmText'),
-        cancelText: t('map.mapLibre.confirm.cancelText')
-      }
-  );
-  if (isConfirmed) {
-    if (!location || !feature || !value) {
-      showError(t('map.mapLibre.messages.deleteInvalid'));
-      return;
+  try {
+    const result = await customPopupDelete.deleteItem(item)
+    if (!result) return
+    if (!result.success) {
+      showError(t('map.mapLibre.messages.deleteFailed', { message: result.message || '' }))
+      return
     }
-    const formData = {
-      location: location,
-      feature: feature,
-      value: value,
-      created_at: created_at,
-    };
-
+    showSuccess(t('user.dataPage.messages.deleteSuccess'))
+    mapStore.showCustomData = true
     try {
-      const data = await deleteCustomForm(formData);
-
-      if (data.success) {
-        showSuccess(t('map.mapLibre.messages.deleteSuccess', { message: data.message }));
-
-        mapStore.showCustomData = true;
-
-        try {
-          await refreshCurrentCustomLayer()
-          // console.log('Custom data refreshed after delete')
-        } catch (error) {
-          console.error('Failed to refresh data after delete:', error)
-        }
-      } else {
-        showError(t('map.mapLibre.messages.deleteFailed', { message: data.message }));
-      }
-    } catch (error) {
-      console.error('Delete failed:', error);
-      showError(t('map.mapLibre.messages.deleteError'));
+      await refreshCurrentCustomLayer()
+    } catch {
+      showWarning(t('user.customSafety.refreshFailed'))
     }
+  } catch (error) {
+    const code = error.detail?.code
+    const key = code === 'version_conflict' ? 'conflict'
+      : code === 'record_unavailable' ? 'unavailable'
+        : code === 'validation_error' ? 'limit' : 'failed'
+    showError(t(`user.customSafety.${key}`))
   }
 };
 
