@@ -8,6 +8,7 @@ import ModifyProfileForm from '../src/main/components/user/auth/ModifyProfileFor
 import ProfileOverview from '../src/main/components/user/auth/ProfileOverview.vue'
 
 vi.mock('@/api', () => ({ getCustomCounts: vi.fn(async () => ({ success: true, custom_region_total: 0, custom_data_total: 0 })) }))
+vi.mock('@/api/auth/actions.js', () => ({ createPasswordResetRequest: vi.fn() }))
 vi.mock('@/main/components/user/auth/UserAvatarEditor.vue', () => ({ default: { template: '<div />' } }))
 vi.mock('@/main/components/user/LeaderboardPanel.vue', () => ({ default: { template: '<div data-leaderboard />' } }))
 

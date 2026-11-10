@@ -26,6 +26,7 @@ export {
 
 // Export authentication actions
 export {
+  createPasswordResetRequest,
   loginUser,
   registerUser,
   updateUsername,

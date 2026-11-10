@@ -1,7 +1,7 @@
 <template>
   <div class="login-form">
     <h3 class="form-title">
-      {{ $t('auth.login.title') }}
+      {{ $t(recoveryOpen ? 'auth.reset.title' : 'auth.login.title') }}
       <button
         class="glass-button auth-benefit-button"
         data-size="compact"
@@ -10,6 +10,7 @@
       ><InlineIcon icon="🎁" /></button>
     </h3>
 
+    <template v-if="!recoveryOpen">
     <!-- Tab Switcher -->
     <TabSwitcher
       mode="segmented"
@@ -73,6 +74,38 @@
     <p>
       <a href="#" @click.prevent="$emit('switchToRegister')">{{ $t('auth.login.noAccount') }}</a>
     </p>
+    <p>
+      <a href="#" data-forgot-password @click.prevent="openRecovery">{{ $t('auth.reset.entry') }}</a>
+    </p>
+    </template>
+
+    <template v-else>
+      <template v-if="!recoveryRequest">
+        <FormInput v-model="recoveryEmail" data-reset-email type="email" :placeholder="$t('auth.login.email')" />
+        <FormInput v-model="recoveryPassword" data-reset-password type="password" :placeholder="$t('auth.reset.newPassword')" :show-password-toggle="true" />
+        <FormInput v-model="recoveryConfirm" data-reset-confirm type="password" :placeholder="$t('auth.register.confirmPassword')" :show-password-toggle="true" />
+        <div class="form-row">
+          <button type="button" class="glass-button auth-submit-button" data-variant="primary" data-reset-submit :disabled="recoveryLoading" @click="submitRecovery">
+            {{ $t(recoveryLoading ? 'auth.reset.submitting' : 'auth.reset.submit') }}
+          </button>
+        </div>
+      </template>
+      <template v-else>
+        <p>{{ $t('auth.reset.instructions', { minutes: Math.floor(recoveryRequest.expires_in / 60) }) }}</p>
+        <p>{{ $t('auth.reset.recipient') }} <span>{{ recoveryRequest.recipient }}</span></p>
+        <button type="button" class="glass-button" @click="copyRecovery(recoveryRequest.recipient)">{{ $t('auth.reset.copyRecipient') }}</button>
+        <p>{{ $t('auth.reset.subject') }} RESET-REQUEST</p>
+        <textarea class="glass-field reset-mail-body" :value="recoveryMailBody" readonly rows="3" :aria-label="$t('auth.reset.mailBody')" @focus="$event.target.select()"></textarea>
+        <div class="form-row reset-actions">
+          <button type="button" class="glass-button" data-reset-copy @click="copyRecovery(recoveryMailBody)">{{ $t('auth.reset.copyBody') }}</button>
+          <a class="glass-button" data-reset-mailto :href="recoveryMailto">{{ $t('auth.reset.openMail') }}</a>
+        </div>
+        <p v-if="recoveryCopyKey" role="status">{{ $t(recoveryCopyKey) }}</p>
+      </template>
+      <p v-if="recoveryErrorKey" class="err" role="alert">{{ $t(recoveryErrorKey) }}</p>
+      <p>{{ $t('auth.reset.appeal') }} <span>2639548777</span></p>
+      <button type="button" class="glass-button" :disabled="recoveryLoading" @click="closeRecovery">{{ $t('auth.reset.back') }}</button>
+    </template>
   </div>
 </template>
 
@@ -82,6 +115,8 @@ import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import FormInput from './FormInput.vue'
 import TabSwitcher from '@/components/common/TabSwitcher.vue'
+import { showConfirm } from '@/utils/ui/message.js'
+import { createPasswordResetRequest } from '@/api/auth/actions.js'
 
 const { t } = useI18n()
 
@@ -114,6 +149,77 @@ const tabs = computed(() => [
 const localEmail = ref('')
 const localUsername = ref('')
 const localPassword = ref('')
+const recoveryOpen = ref(false)
+const recoveryEmail = ref('')
+const recoveryPassword = ref('')
+const recoveryConfirm = ref('')
+const recoveryLoading = ref(false)
+const recoveryRequest = ref(null)
+const recoveryErrorKey = ref('')
+const recoveryCopyKey = ref('')
+const recoveryMailBody = computed(() => recoveryRequest.value ? `RESET-REQUEST: ${recoveryRequest.value.request_id}` : '')
+const recoveryMailto = computed(() => recoveryRequest.value
+  ? `mailto:${encodeURIComponent(recoveryRequest.value.recipient)}?subject=RESET-REQUEST&body=${encodeURIComponent(recoveryMailBody.value)}`
+  : '')
+
+async function openRecovery() {
+  if (await showConfirm(t('auth.reset.explanation'), { title: t('auth.reset.title') })) {
+    recoveryEmail.value = localEmail.value
+    localPassword.value = ''
+    recoveryOpen.value = true
+  }
+}
+
+function closeRecovery() {
+  recoveryOpen.value = false
+  recoveryPassword.value = ''
+  recoveryConfirm.value = ''
+  recoveryRequest.value = null
+  recoveryErrorKey.value = ''
+  recoveryCopyKey.value = ''
+}
+
+async function submitRecovery() {
+  if (recoveryLoading.value) return
+  recoveryErrorKey.value = ''
+  const email = recoveryEmail.value.trim()
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    recoveryErrorKey.value = 'auth.reset.errors.email'
+    return
+  }
+  if (recoveryPassword.value.length < 6 || new TextEncoder().encode(recoveryPassword.value).length > 72) {
+    recoveryErrorKey.value = 'auth.reset.errors.password'
+    return
+  }
+  if (recoveryPassword.value !== recoveryConfirm.value) {
+    recoveryErrorKey.value = 'auth.reset.errors.mismatch'
+    return
+  }
+  recoveryLoading.value = true
+  try {
+    recoveryRequest.value = await createPasswordResetRequest({ email, newPassword: recoveryPassword.value })
+    recoveryPassword.value = ''
+    recoveryConfirm.value = ''
+  } catch (error) {
+    const codes = {
+      password_reset_unavailable: 'unavailable',
+      password_reset_rate_limited: 'rateLimited',
+      password_reset_invalid_password: 'password'
+    }
+    recoveryErrorKey.value = `auth.reset.errors.${codes[error.detail?.code] || 'failed'}`
+  } finally {
+    recoveryLoading.value = false
+  }
+}
+
+async function copyRecovery(value) {
+  try {
+    await navigator.clipboard.writeText(value)
+    recoveryCopyKey.value = 'auth.reset.copied'
+  } catch {
+    recoveryCopyKey.value = 'auth.reset.copyFailed'
+  }
+}
 
 const handleSubmit = () => {
   const credentials = {
@@ -164,6 +270,16 @@ $error-color: red;
   justify-content: center;
   width: 100%;
   margin: 12px 0;
+}
+
+.reset-mail-body {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.reset-actions {
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .auth-submit-button {

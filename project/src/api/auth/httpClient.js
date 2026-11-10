@@ -240,7 +240,7 @@ async function handleErrorResponse(path, response) {
     normalizedResponse.status
   );
 
-  if (response.status === 429) {
+  if (response.status === 429 && path !== '/api/auth/password-reset/requests') {
     const detail = normalizedResponse.data?.detail;
     const detailObj = detail && typeof detail === 'object' ? detail : null;
 
