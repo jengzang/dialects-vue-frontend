@@ -945,9 +945,13 @@
     padding: 0;
   }
 
-  .vocabulary-entry-row.is-note-expanded .card-note {
-    grid-column: 1 / -1;
-    grid-row: 2;
+  .vocabulary-entry-row.is-note-expanded {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+
+    .card-note {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
   }
 
   .card-note-text {
