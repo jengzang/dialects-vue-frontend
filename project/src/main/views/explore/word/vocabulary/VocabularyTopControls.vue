@@ -3,7 +3,7 @@
     class="top-controls query-controls-layout"
     :class="source === 'vocabulary' ? 'query-controls--vocabulary' : 'query-controls--notes'"
   >
-    <div class="search-container">
+    <div ref="searchContainerEl" class="search-container">
       <div class="search-section">
         <div class="input-wrapper">
           <textarea
@@ -300,6 +300,7 @@
           </button>
         </div>
       </div>
+      <Teleport :to="searchContainerEl" :disabled="!searchContainerEl || source !== 'character-notes' || !isPortrait">
       <div class="query-mode-controls">
         <span v-if="deferQuery" class="query-condition-label">{{ t('words.wordList.viewModes.label') }}</span>
         <div class="result-view-switcher view-mode-selector" role="group" :aria-label="t('words.wordList.viewModes.label')">
@@ -337,6 +338,7 @@
           </button>
         </div>
       </div>
+      </Teleport>
     </div>
   </div>
 </template>
@@ -344,6 +346,7 @@
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { useMediaQuery } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
 import * as OpenCCT2CN from 'opencc-js/t2cn'
 import AppModal from '@/components/common/AppModal.vue'
@@ -357,6 +360,8 @@ import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue
 import { showConfirm } from '@/utils/ui/message.js'
 
 const { t } = useI18n()
+const searchContainerEl = ref(null)
+const isPortrait = useMediaQuery('(max-aspect-ratio: 1 / 1)')
 
 const locationSearchT2S = OpenCCT2CN.Converter({ from: 'tw', to: 'cn' })
 
@@ -687,6 +692,10 @@ const standardWordTriggerLabel = computed(() => {
 .notes-refresh-action.action-button {
   padding: 6px 10px;
   font-size: var(--font-size-14);
+}
+
+.query-controls--notes .search-input {
+  min-height: calc(64px + var(--query-input-growth, 0px));
 }
 
 .notes-mode-actions {

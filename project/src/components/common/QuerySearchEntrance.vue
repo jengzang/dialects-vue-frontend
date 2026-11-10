@@ -553,7 +553,14 @@ defineExpose({ collapse, progress })
       grid-template-areas: 'input input' 'modes action' 'range tools';
     }
     :deep(.query-controls--notes) {
-      grid-template-areas: 'input input' 'modes action';
+      grid-template-areas: 'input input';
+    }
+    :deep(.query-controls--notes > .search-container) {
+      grid-area: input;
+      display: flex;
+    }
+    :deep(.query-controls--notes .search-section) {
+      display: flex;
     }
     :deep(.query-controls--yubao) {
       grid-template-areas: 'category category' 'input input' 'action action';
