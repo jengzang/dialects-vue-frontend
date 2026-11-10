@@ -899,7 +899,7 @@ const standardWordTriggerLabel = computed(() => {
     flex: 0 0 auto;
   }
 
-  .notes-search-settings { flex-direction: row; }
+  .query-search-panel:not(.is-compact) .notes-search-settings { flex-direction: row; }
 
   .filter-strip {
     flex: 1 1 100%;
