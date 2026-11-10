@@ -10,6 +10,7 @@
             ref="searchInputEl"
             :value="inputText"
             class="search-input"
+            :class="{ 'notes-search-input--compact': source === 'character-notes' && !deferQuery }"
             rows="1"
             :placeholder="source === 'character-notes' ? t('words.wordList.notes.searchPlaceholder') : t('words.wordList.search.placeholder')"
             @compositionstart="handleCompositionStart"
@@ -300,7 +301,7 @@
           </button>
         </div>
       </div>
-      <Teleport :to="searchContainerEl" :disabled="!searchContainerEl || source !== 'character-notes' || !isPortrait">
+      <Teleport :to="searchContainerEl" :disabled="!searchContainerEl || source !== 'character-notes' || !isPortrait || deferQuery">
       <div class="query-mode-controls">
         <span v-if="deferQuery" class="query-condition-label">{{ t('words.wordList.viewModes.label') }}</span>
         <div class="result-view-switcher view-mode-selector" role="group" :aria-label="t('words.wordList.viewModes.label')">
@@ -694,8 +695,8 @@ const standardWordTriggerLabel = computed(() => {
   font-size: var(--font-size-14);
 }
 
-.query-controls--notes .search-input {
-  min-height: calc(64px + var(--query-input-growth, 0px));
+.search-input.notes-search-input--compact {
+  min-height: 64px;
 }
 
 .notes-mode-actions {

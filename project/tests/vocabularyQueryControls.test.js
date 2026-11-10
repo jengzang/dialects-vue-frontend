@@ -46,16 +46,23 @@ async function mountControls(expanded, overrides = {}) {
 }
 
 describe('vocabulary query submission in the same input', () => {
-  it.each([true, false])('places the notes switcher inside the search container only in portrait=%s', async portrait => {
+  it.each([true, false])('changes notes height and switcher placement only when compact in portrait=%s', async portrait => {
     vi.stubGlobal('matchMedia', () => ({ matches: portrait, addEventListener() {}, removeEventListener() {} }))
     const { props } = await mountControls(true, { source: 'character-notes' })
     await nextTick()
     const switcher = host.querySelector('.result-view-switcher')
-    expect(host.querySelector('.search-container').contains(switcher)).toBe(portrait)
+    expect(host.querySelector('.search-container').contains(switcher)).toBe(false)
+    expect(host.querySelector('.search-input').classList.contains('notes-search-input--compact')).toBe(false)
     props.deferQuery = false; await nextTick()
     expect(host.querySelector('.search-container').contains(switcher)).toBe(portrait)
+    expect(host.querySelector('.search-input').classList.contains('notes-search-input--compact')).toBe(true)
+    props.deferQuery = true; await nextTick()
+    expect(host.querySelector('.search-container').contains(switcher)).toBe(false)
+    expect(host.querySelector('.search-input').classList.contains('notes-search-input--compact')).toBe(false)
+    props.deferQuery = false; await nextTick()
     props.source = 'vocabulary'; await nextTick()
     expect(host.querySelector('.search-container').contains(switcher)).toBe(false)
+    expect(host.querySelector('.search-input').classList.contains('notes-search-input--compact')).toBe(false)
   })
   it.each([true, false])('switches notes between table and cards outside settings with expanded=%s', async expanded => {
     await mountControls(expanded, { source: 'character-notes', viewMode: 'card' })
