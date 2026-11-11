@@ -29,7 +29,7 @@
       :title="t('navigation.actions.openMenu')"
 
     >
-      <img class="logo" :src="faviconSrc" alt="Logo" />
+      <img class="logo" :src="faviconSrc" alt="方音圖鑑" />
     </button>
 
     <!-- 打开侧边栏按钮 - 只在非首页时显示 -->
@@ -52,13 +52,9 @@ import InlineIcon from '@/components/common/InlineIcon.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { userStore } from '@/main/store/store.js';
 import NavAvatar from '@/components/bar/NavAvatar.vue';
-import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { currentColorTheme, getBrandAssets } from '@/composables/core/uiPreferences.js'
 
-const faviconSrc = computed(() =>
-  currentColorTheme.value === COLOR_THEME_GREEN
-    ? '/brand/favicon_green.ico'
-    : '/brand/favicon.ico'
-)
+const faviconSrc = computed(() => getBrandAssets(currentColorTheme.value).logo)
 
 const props = defineProps({
   // 认证按钮位置: 'top-right' | 'bottom-left'
@@ -203,14 +199,14 @@ $transition-base: 0.3s ease;
   max-width: 120px;
   overflow: hidden;
   color: $apple-blue;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
 
   @media (max-aspect-ratio: 1/1) {
     max-width: 100px;
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -246,7 +242,7 @@ $transition-base: 0.3s ease;
   width: $desktop-float-size;
   height: $desktop-float-size;
   padding: 8px;
-  font-size: 24px;
+  font-size: var(--font-size-24);
   cursor: pointer;
   user-select: none;
   border-radius: var(--radius-full);
@@ -268,7 +264,7 @@ $transition-base: 0.3s ease;
   @media (max-aspect-ratio: 1/1) {
     width: $mobile-float-size;
     height: $mobile-float-size;
-    font-size: 22px;
+    font-size: var(--font-size-24);
   }
 }
 

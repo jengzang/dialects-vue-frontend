@@ -42,7 +42,7 @@
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-sm2);
   background: var(--glass-90);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
   cursor: pointer;
 
@@ -58,7 +58,7 @@
   color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -89,7 +89,7 @@
   backdrop-filter: blur(8px);
   border: 1px solid var(--glass-50);
   border-radius: var(--radius-sm2);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   cursor: pointer;
   box-shadow: 0 2px 6px var(--bg-hover-strong);
   transition: all 0.3s ease;
@@ -109,7 +109,7 @@
   color: white;
   border: none;
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   cursor: pointer;
   box-shadow: var(--shadow-sm-strong);

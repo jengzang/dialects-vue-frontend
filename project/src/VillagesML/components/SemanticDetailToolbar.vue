@@ -130,7 +130,7 @@ const countParentChars = (subcats) => {
 
 .toggle-hint {
   white-space: nowrap;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
 }
 
@@ -140,7 +140,7 @@ const countParentChars = (subcats) => {
   color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -162,7 +162,7 @@ const countParentChars = (subcats) => {
 }
 
 .lexicon-meta {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-bottom: 20px;
   padding-bottom: 12px;
@@ -187,17 +187,17 @@ const countParentChars = (subcats) => {
 }
 
 .parent-icon {
-  font-size: 18px;
+  font-size: var(--font-size-18);
 }
 
 .parent-name {
-  font-size: 17px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .parent-count {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-left: auto;
   padding: 2px 10px;
@@ -222,7 +222,7 @@ const countParentChars = (subcats) => {
 }
 
 .subcategory-name {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 600;
   color: var(--color-primary);
   white-space: nowrap;
@@ -231,7 +231,7 @@ const countParentChars = (subcats) => {
 }
 
 .subcategory-chars {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
   line-height: 1.6;
   word-break: keep-all;

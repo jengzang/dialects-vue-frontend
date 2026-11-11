@@ -313,7 +313,7 @@ const getSignificanceBadge = (pValue) => {
 }
 
 .page-title {
-  font-size: 32px;
+  font-size: var(--font-size-32);
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 30px;
@@ -341,7 +341,7 @@ const getSignificanceBadge = (pValue) => {
 }
 
 .form-content h3 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   margin: 0 16px 0 0;
   color: var(--text-primary);
   white-space: nowrap;
@@ -354,7 +354,7 @@ const getSignificanceBadge = (pValue) => {
 
 .form-group label {
   font-weight: 500;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
 }
 
@@ -368,7 +368,7 @@ const getSignificanceBadge = (pValue) => {
 }
 
 .results-table h3 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   margin-bottom: 16px;
   color: var(--text-primary);
 }
@@ -397,7 +397,7 @@ const getSignificanceBadge = (pValue) => {
 .table-header {
   background: rgba(var(--vml-blue-rgb), 0.2);
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
   white-space: nowrap;
 }
@@ -406,7 +406,7 @@ const getSignificanceBadge = (pValue) => {
   background: var(--glass-30);
   border-bottom: 1px solid var(--bg-hover);
   transition: background 0.3s ease;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .table-row:hover {
@@ -445,7 +445,7 @@ const getSignificanceBadge = (pValue) => {
 .significance-badge {
   padding: 4px 10px;
   border-radius: var(--radius-md);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 600;
 }
 
@@ -474,7 +474,7 @@ const getSignificanceBadge = (pValue) => {
 }
 
 .summary-panel h3 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   margin-bottom: 16px;
   color: var(--text-primary);
 }
@@ -493,13 +493,13 @@ const getSignificanceBadge = (pValue) => {
 }
 
 .summary-label {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-bottom: 8px;
 }
 
 .summary-value {
-  font-size: 24px;
+  font-size: var(--font-size-24);
   font-weight: 700;
   color: var(--color-primary);
 }
@@ -526,7 +526,7 @@ const getSignificanceBadge = (pValue) => {
   }
 
   .page-title {
-    font-size: 24px;
+    font-size: var(--font-size-24);
   }
 
   .form-group {

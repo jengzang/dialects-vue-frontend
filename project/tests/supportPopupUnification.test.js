@@ -6,11 +6,12 @@ import { describe, expect, it } from 'vitest'
 const testsDir = dirname(fileURLToPath(import.meta.url))
 const projectRoot = resolve(testsDir, '..')
 
-const supportPopupPath = resolve(projectRoot, 'src/main/components/popup/SupportPopup.vue')
+const supportPopupPath = resolve(projectRoot, 'src/main/components/user/popups/SupportPopup.vue')
 const homeSupportPopupPath = resolve(projectRoot, 'src/main/components/popup/HomeSupportPopup.vue')
 const homePagePath = resolve(projectRoot, 'src/main/views/HomePage.vue')
 const likeAuthorPath = resolve(projectRoot, 'src/main/views/intro/LikeAuthor.vue')
 const aboutPagePath = resolve(projectRoot, 'src/main/views/menu/support/AboutPage.vue')
+const aboutSupportPath = resolve(projectRoot, 'src/main/views/menu/support/about/AboutSupport.vue')
 const zhCnHomeLocalePath = resolve(projectRoot, 'src/i18n/locales/zh-CN/home.json')
 const zhHantHomeLocalePath = resolve(projectRoot, 'src/i18n/locales/zh-Hant/home.json')
 const enHomeLocalePath = resolve(projectRoot, 'src/i18n/locales/en/home.json')
@@ -56,23 +57,23 @@ describe('support popup unification', () => {
   it('updates the homepage to import the renamed SupportPopup component', () => {
     const source = readSource(homePagePath)
 
-    expect(source).toContain("import('@/main/components/popup/SupportPopup.vue')")
+    expect(source).toContain("import('@/main/components/user/popups/SupportPopup.vue')")
     expect(source).not.toContain("import('@/main/components/popup/HomeSupportPopup.vue')")
     expect(source).toContain('<SupportPopup')
   })
 
-  it('replaces the inline LikeAuthor modal with the shared SupportPopup component', () => {
-    const source = readSource(likeAuthorPath)
-
-    expect(source).toContain("import SupportPopup from '@/main/components/popup/SupportPopup.vue'")
-    expect(source).toContain('<SupportPopup')
-    expect(source).not.toContain('<AppModal')
+  it('keeps the like-author entry in AboutPage and opens the shared popup', () => {
+    expect(existsSync(likeAuthorPath)).toBe(false)
+    expect(readSource(aboutPagePath)).toContain('v-if="currentTab === \'like\'"')
+    const supportSource = readSource(aboutSupportPath)
+    expect(supportSource).toContain(':visible="showQRCodes"')
+    expect(supportSource).toContain('@close="showQRCodes = false"')
   })
 
   it('replaces the inline AboutPage modal with the shared SupportPopup component', () => {
-    const source = readSource(aboutPagePath)
+    const source = readSource(aboutSupportPath)
 
-    expect(source).toContain("import SupportPopup from '@/main/components/popup/SupportPopup.vue'")
+    expect(source).toContain("import SupportPopup from '@/main/components/user/popups/SupportPopup.vue'")
     expect(source).toContain('<SupportPopup')
     expect(source).not.toContain('<AppModal')
   })
@@ -105,8 +106,8 @@ describe('support popup unification', () => {
       method: expect.any(String),
     })
 
-    expect(zhCn.supportModal.donorColumns.amount).toBe('金额（元）')
-    expect(zhHant.supportModal.donorColumns.amount).toBe('金額（元）')
+    expect(zhCn.supportModal.donorColumns.amount).toBe('金额(元)')
+    expect(zhHant.supportModal.donorColumns.amount).toBe('金額(元)')
     expect(en.supportModal.donorColumns.amount).toBe('Amount (CNY)')
   })
 })

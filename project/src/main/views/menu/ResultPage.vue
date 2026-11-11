@@ -450,14 +450,14 @@ $transition-fast: 0.2s;
   align-items: center;
   padding: 40px;
   color: $text-muted;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   text-align: center;
 }
 
 /* 空态跳转按钮: 仅尺寸覆盖, 视觉见 main/_buttons.scss 的 .action-btn */
 .action-btn {
   --action-btn-padding: 10px 24px;
-  --action-btn-font-size: 15px;
+  --action-btn-font-size: var(--font-size-16);
   --action-btn-radius: var(--radius-xl);
 }
 
@@ -481,7 +481,7 @@ $transition-fast: 0.2s;
   min-width: 80px;
   padding: 6px 12px;
   margin: auto;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   white-space: nowrap;
   cursor: pointer;
   background: var(--glass-30);

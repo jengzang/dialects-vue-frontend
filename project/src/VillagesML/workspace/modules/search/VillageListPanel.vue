@@ -136,7 +136,7 @@ const changePage = (page) => {
 }
 
 .empty-icon {
-  font-size: 48px;
+  font-size: var(--font-size-48);
   margin-bottom: 16px;
 }
 
@@ -154,7 +154,7 @@ const changePage = (page) => {
 }
 
 .results-count {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
   font-weight: 500;
 }
@@ -171,7 +171,7 @@ const changePage = (page) => {
 .villages-table th {
   padding: 12px;
   text-align: left;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 600;
   color: var(--text-primary);
   background: var(--glass-30);
@@ -180,7 +180,7 @@ const changePage = (page) => {
 
 .villages-table td {
   padding: 12px;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   border-bottom: 1px solid var(--glass-20);
 }
 
@@ -203,7 +203,7 @@ const changePage = (page) => {
   border-radius: var(--radius-sm);
   background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   cursor: pointer;
   transition: all 0.3s ease;
   white-space: nowrap;
@@ -228,7 +228,7 @@ const changePage = (page) => {
   border-radius: var(--radius-sm2);
   background: var(--glass-50);
   backdrop-filter: blur(10px);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -243,7 +243,7 @@ const changePage = (page) => {
 }
 
 .page-info {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-primary);
 }
 
@@ -255,7 +255,7 @@ const changePage = (page) => {
   .villages-table th,
   .villages-table td {
     padding: 8px 6px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   .pagination {
@@ -264,7 +264,7 @@ const changePage = (page) => {
 
   .page-button {
     padding: 6px 10px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 }
 </style>

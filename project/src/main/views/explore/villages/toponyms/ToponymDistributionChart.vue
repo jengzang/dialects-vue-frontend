@@ -77,7 +77,10 @@ import {
 const COUNTRY_MAP_NAME = 'toponyms-country';
 const BOUNDARY_LAYER_KEYS = ['provinces', 'cities'];
 const TOPONYM_LARGE_RENDER_THRESHOLD = 2000;
-const POINT_COLOR_TOKEN = '--color-primary';
+// 绘图颜色固定，避免底图、边界和数据点随页面主题改变。
+// 地图始终使用浅色画布，保证深色主题下深色边界线仍然可见。
+const MAP_BACKGROUND = '#eaf3ff';
+const POINT_COLOR = '#0070e8';
 const POINT_CLICK_FILTER = {
   seriesType: 'scatter',
 };
@@ -219,7 +222,7 @@ function renderChart() {
   }
 
   const option = {
-    backgroundColor: 'transparent',
+    backgroundColor: MAP_BACKGROUND,
     animation: false,
     tooltip: buildTooltipOption(),
     geo: {
@@ -232,8 +235,8 @@ function renderChart() {
         max: 28,
       },
       itemStyle: {
-        areaColor: cssToken('--surface-panel-subtle'),
-        borderColor: cssToken('--border-control'),
+        areaColor: 'rgba(255, 255, 255, 0.4)',
+        borderColor: 'rgba(148, 163, 184, 0.32)',
         borderWidth: 1,
       },
       emphasis: {
@@ -267,7 +270,7 @@ function buildBoundarySeries() {
       z: key === 'provinces' ? 2 : 3,
       data: buildBoundaryLineSeriesData(props.loadedLayers[key]),
       lineStyle: {
-        color: cssToken(key === 'provinces' ? '--border-medium' : '--border-control'),
+        color: key === 'provinces' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(148, 163, 184, 0.32)',
         opacity: key === 'provinces' ? 0.65 : 0.55,
         width: key === 'provinces' ? 1.2 : 0.7,
       },
@@ -287,7 +290,7 @@ function buildRiverSeries() {
       z: 8 + index,
       data: buildRiverLineSeriesData(props.loadedLayers[key]),
       lineStyle: {
-        color: cssToken('--color-primary'),
+        color: '#0070e8',
         opacity: key === 'riverL1' ? 0.5 : 0.32,
         width: key === 'riverL1' ? 1.1 : 0.8,
       },
@@ -309,7 +312,7 @@ function buildPointSeries() {
     progressive: 0,
     progressiveThreshold: Number.MAX_SAFE_INTEGER,
     itemStyle: {
-      color: cssToken(POINT_COLOR_TOKEN),
+      color: POINT_COLOR,
       opacity: 0.72,
     },
     emphasis: {
@@ -324,7 +327,7 @@ function buildTooltipOption() {
     triggerOn: 'click',
     confine: true,
     textStyle: {
-      color: cssToken('--text-deep'),
+      color: '#0b2540',
     },
     formatter(params) {
       if (params.seriesType !== 'scatter') return params.seriesName || '';
@@ -357,11 +360,6 @@ function handleChartClick(params) {
   emit('select-point', { ...point, eventPosition });
 }
 
-function cssToken(name) {
-  if (typeof document === 'undefined') return '';
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-
 defineExpose({ showConfigModal });
 </script>
 
@@ -371,11 +369,11 @@ defineExpose({ showConfigModal });
 .toponym-distribution-chart {
   position: relative;
   width: 100%;
-  min-block-size: 68dvh;
+  min-block-size: 72dvh;
 
   &__canvas {
     width: 100%;
-    min-block-size: 68dvh;
+    min-block-size: 72dvh;
   }
 
   &__status {
@@ -403,7 +401,7 @@ defineExpose({ showConfigModal });
       padding: 0;
       margin-block-end: 10px;
       color: var(--text-deep);
-      font-size: 14px;
+      font-size: var(--font-size-14);
       font-weight: 600;
     }
   }
@@ -421,7 +419,7 @@ defineExpose({ showConfigModal });
     > span:first-child {
       min-inline-size: 60px;
       color: var(--text-secondary);
-      font-size: 13px;
+      font-size: var(--font-size-13);
     }
 
     .glass-range {
@@ -432,7 +430,7 @@ defineExpose({ showConfigModal });
     small {
       min-inline-size: 32px;
       color: var(--text-tertiary);
-      font-size: 12px;
+      font-size: var(--font-size-12);
       text-align: end;
     }
   }

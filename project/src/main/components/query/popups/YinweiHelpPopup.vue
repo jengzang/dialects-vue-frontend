@@ -123,7 +123,7 @@ $transition-normal: 0.3s;
 
   .icon-warn {
     margin-bottom: 10px;
-    font-size: 40px;
+    font-size: var(--font-size-48);
   }
 
   .empty-text {
@@ -163,7 +163,7 @@ $transition-normal: 0.3s;
   gap: 12px;
 
   .loc-name {
-    font-size: 16px;
+    font-size: var(--font-size-16);
     font-weight: 500;
   }
 }
@@ -207,7 +207,7 @@ $transition-normal: 0.3s;
   margin: 0 0 6px 4px;
   color: $text-muted;
   text-transform: uppercase;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 700;
   letter-spacing: 0.5px;
 }
@@ -227,7 +227,7 @@ $transition-normal: 0.3s;
   border-radius: var(--radius-xl);
   box-shadow: 0 1px 2px $divider-color;
   color: $text-main;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   transition:
     transform $transition-fast,
     background $transition-fast;
@@ -250,7 +250,7 @@ $transition-normal: 0.3s;
     border-radius: var(--radius-sm2);
     color: $primary;
     text-align: center;
-    font-size: 11px;
+    font-size: var(--font-size-12);
     font-weight: 700;
   }
 }

@@ -129,7 +129,7 @@ defineProps({
 }
 
 .item-icon {
-  font-size: 32px;
+  font-size: var(--font-size-32);
   margin-right: 15px;
 }
 
@@ -138,13 +138,13 @@ defineProps({
 }
 
 .item-label {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-bottom: 4px;
 }
 
 .item-value {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--color-primary);
 }
@@ -154,7 +154,7 @@ defineProps({
   padding: 12px 16px;
   background: var(--glass-20);
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
   text-align: center;
 }
@@ -167,13 +167,13 @@ defineProps({
 }
 
 .map-placeholder p {
-  font-size: 24px;
+  font-size: var(--font-size-24);
   color: var(--text-primary);
   margin-bottom: 10px;
 }
 
 .map-note {
-  font-size: 14px !important;
+  font-size: var(--font-size-14) !important;
   color: var(--text-secondary);
 }
 

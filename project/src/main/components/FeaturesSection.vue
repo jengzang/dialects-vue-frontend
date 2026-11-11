@@ -5,7 +5,7 @@
     <!-- Search -->
     <div class="features-toolbar">
       <label class="features-search">
-        <InlineIcon icon="🔍" class="features-search__icon" />
+        <BarIcon icon="🔍" class="features-search__icon" />
         <input
           v-model="query"
           type="search"
@@ -34,7 +34,7 @@
           class="recent-pill"
           @click="recordRecent(item.route)"
         >
-          <InlineIcon :icon="item.icon" class="recent-pill__icon" />
+          <BarIcon :icon="item.icon" class="recent-pill__icon" />
           <span class="recent-pill__title">{{ item.title }}</span>
         </RouterLink>
       </div>
@@ -48,7 +48,7 @@
     <!-- Grouped feature grid -->
     <div v-for="group in visibleGroups" :key="group.id" class="feature-group">
       <div class="feature-group__header">
-        <span class="feature-group__icon"><InlineIcon :icon="group.icon" /></span>
+        <span class="feature-group__icon"><BarIcon :icon="group.icon" /></span>
         <div class="feature-group__text">
           <h3 class="feature-group__title">{{ group.title }}</h3>
           <p v-if="group.desc" class="feature-group__desc">{{ group.desc }}</p>
@@ -63,9 +63,25 @@
           class="feature-tile"
           @click="recordRecent(item.route)"
         >
-          <span class="feature-tile__icon"><InlineIcon :icon="item.icon" /></span>
+          <span class="feature-tile__icon"><BarIcon :icon="item.icon" /></span>
           <span class="feature-tile__text">
-            <span class="feature-tile__title">{{ item.title }}</span>
+            <span class="feature-tile__title">
+              {{ item.title }}
+              <svg
+                class="feature-tile__arrow"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="var(--color-secondary)"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M7 17 17 7M9 7h8v8" />
+              </svg>
+            </span>
             <span class="feature-tile__desc">{{ item.desc }}</span>
           </span>
         </RouterLink>
@@ -82,12 +98,18 @@
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
+import { loadLocaleMessages } from '@/i18n/index.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const { t } = useI18n()
 const route = useRoute()
 const SEARCH_LOCALES = ['zh-CN', 'zh-Hant', 'en']
+const searchLocaleMessagesReady = ref(false)
+
+void Promise.allSettled(SEARCH_LOCALES.map((locale) => loadLocaleMessages(locale))).then((results) => {
+  searchLocaleMessagesReady.value = results.every((result) => result.status === 'fulfilled')
+})
 
 const groups = [
   {
@@ -97,7 +119,7 @@ const groups = [
     descKey: 'home.features.query.desc',
     items: [
       {
-        icon: '📝',
+        icon: '🔣',
         labelKey: 'home.features.query.searchChar',
         route: '/menu/query/char',
         search: {
@@ -133,7 +155,7 @@ const groups = [
         },
       },
       {
-        icon: '🎶',
+        icon: '🎼',
         labelKey: 'home.features.query.searchTone',
         route: '/menu/query/tone',
         search: {
@@ -148,12 +170,12 @@ const groups = [
   },
   {
     id: 'compare',
-    icon: '🔀',
+    icon: '↔️',
     titleKey: 'home.features.compare.title',
     descKey: 'home.features.compare.desc',
     items: [
       {
-        icon: '📊',
+        icon: '↔️',
         labelKey: 'home.features.compare.compareChar',
         route: '/menu/compare/char',
         search: {
@@ -165,7 +187,7 @@ const groups = [
         },
       },
       {
-        icon: '🎯',
+        icon: '📜',
         labelKey: 'home.features.compare.compareMiddle',
         route: '/menu/compare/zhonggu',
         search: {
@@ -177,7 +199,7 @@ const groups = [
         },
       },
       {
-        icon: '🎹',
+        icon: '📈',
         labelKey: 'home.features.compare.compareTone',
         route: '/menu/compare/tone',
         search: {
@@ -189,7 +211,7 @@ const groups = [
         },
       },
       {
-        icon: '⚖️',
+        icon: '🎵',
         labelKey: 'home.features.compare.comparePhonetic',
         route: '/menu/compare/phonetic',
         search: {
@@ -209,7 +231,7 @@ const groups = [
     descKey: 'home.features.map.desc',
     items: [
       {
-        icon: '📍',
+        icon: '🗺️',
         labelKey: 'home.features.map.dialectMap',
         route: '/menu/map/view',
         search: {
@@ -221,7 +243,7 @@ const groups = [
         },
       },
       {
-        icon: '🧭',
+        icon: '🎨',
         labelKey: 'home.features.map.regionMap',
         route: '/menu/map/divide',
         search: {
@@ -233,7 +255,7 @@ const groups = [
         },
       },
       {
-        icon: '📁',
+        icon: '🗂️',
         labelKey: 'home.features.map.customMap',
         route: '/menu/map/custom',
         search: {
@@ -265,7 +287,7 @@ const groups = [
     descKey: 'home.features.phonology.desc',
     items: [
       {
-        icon: '⚗️',
+        icon: '⚛️',
         labelKey: 'home.features.phonology.phonologyQuery',
         route: '/menu/pho/matrix',
         search: {
@@ -277,7 +299,7 @@ const groups = [
         },
       },
       {
-        icon: '🔬',
+        icon: '📐',
         labelKey: 'home.features.phonology.phonemeClassify',
         route: '/menu/pho/custom',
         search: {
@@ -301,7 +323,7 @@ const groups = [
         },
       },
       {
-        icon: '📊',
+        icon: '🧮',
         labelKey: 'home.features.phonology.syllableCount',
         route: '/menu/pho/count',
         search: {
@@ -316,12 +338,12 @@ const groups = [
   },
   {
     id: 'charClass',
-    icon: '📜',
+    icon: '📚',
     titleKey: 'home.features.charClass.title',
     descKey: 'home.features.charClass.desc',
     items: [
       {
-        icon: '🏛️',
+        icon: '📜',
         labelKey: 'home.features.charClass.zhonggu',
         route: '/explore/char-class?tab=zhonggu',
         search: {
@@ -333,7 +355,7 @@ const groups = [
         },
       },
       {
-        icon: '📿',
+        icon: '🏛️',
         labelKey: 'home.features.charClass.shanggu',
         route: '/explore/char-class?tab=shanggu',
         search: {
@@ -432,18 +454,18 @@ const groups = [
     titleKey: 'home.features.villages.title',
     descKey: 'home.features.villages.desc',
     items: [
-      // {
-      //   icon: '📍',
-      //   labelKey: 'home.features.villages.toponyms',
-      //   route: '/explore/villages/toponyms',
-      //   search: {
-      //     keywords: ['地名', '自然村', '分布', '地名检索', 'toponym'],
-      //     i18nKeys: [
-      //       'layoutFooter.pages.exploreVillagesToponyms.description',
-      //       'navigation.pageTitles.villages.toponyms',
-      //     ],
-      //   },
-      // },
+      {
+        icon: '📍',
+        labelKey: 'home.features.villages.toponyms',
+        route: '/explore/villages/toponyms',
+        search: {
+          keywords: ['地名', '自然村', '分布', '地名检索', 'toponym'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreVillagesToponyms.description',
+            'navigation.pageTitles.villages.toponyms',
+          ],
+        },
+      },
       {
         icon: '🤖',
         labelKey: 'home.features.villages.villagesML',
@@ -469,7 +491,7 @@ const groups = [
         },
       },
       {
-        icon: '🌾',
+        icon: '🏕️',
         labelKey: 'home.features.villages.ycVillages',
         route: '/explore/yc/villages',
         search: {
@@ -489,7 +511,7 @@ const groups = [
     descKey: 'home.features.tools.desc',
     items: [
       {
-        icon: '📋',
+        icon: '📝',
         labelKey: 'home.features.tools.tableProcess',
         route: '/explore/tools/check',
         search: {
@@ -534,7 +556,7 @@ const groups = [
     items: [
       {
         icon: '🎙️',
-        titleKey: 'home.features.praat.title',
+        titleKey: 'home.features.praat.itemTitle',
         descKey: 'home.features.praat.desc',
         route: '/explore/tools/praat',
         search: {
@@ -563,6 +585,14 @@ const groups = [
             'layoutFooter.pages.menuAboutIntro.description',
             'navigation.pageTitles.support.aboutIntro',
           ],
+        },
+      },
+      {
+        icon: '🗓️',
+        labelKey: 'home.features.about.history',
+        route: '/menu/about/history',
+        search: {
+          keywords: ['开发历程', '版本历史', '更新记录', 'development history', 'release history'],
         },
       },
       {
@@ -602,7 +632,7 @@ const groups = [
         },
       },
       {
-        icon: '🔗',
+        icon: '📎',
         labelKey: 'home.features.about.source',
         route: '/menu/source',
         search: {
@@ -639,11 +669,11 @@ function resolveItem(item, targetLocale) {
   return { title: translate(item.titleKey), desc: item.descKey ? translate(item.descKey) : '' }
 }
 
-function resolveItemSearchText(item) {
+function resolveItemSearchText(item, searchLocales) {
 
   // 1. 原本的多语言标题和描述
   const translatedTexts =
-    SEARCH_LOCALES.flatMap((targetLocale) => {
+    searchLocales.flatMap((targetLocale) => {
       const resolved = resolveItem(
         item,
         targetLocale
@@ -663,7 +693,7 @@ function resolveItemSearchText(item) {
 
   // 3. i18n关键词
   const translatedKeywords =
-    SEARCH_LOCALES.flatMap((targetLocale) => {
+    searchLocales.flatMap((targetLocale) => {
       return (
         item.search?.i18nKeys || []
       ).map((key) =>
@@ -684,8 +714,8 @@ function resolveItemSearchText(item) {
     .toLowerCase()
 }
 
-function resolveGroupSearchText(group) {
-  return SEARCH_LOCALES
+function resolveGroupSearchText(group, searchLocales) {
+  return searchLocales
     .flatMap((targetLocale) => [
       translateForLocale(group.titleKey, targetLocale),
       group.descKey ? translateForLocale(group.descKey, targetLocale) : '',
@@ -694,20 +724,23 @@ function resolveGroupSearchText(group) {
     .toLowerCase()
 }
 
-const resolvedGroups = computed(() =>
-  groups.map((g) => ({
+const resolvedGroups = computed(() => {
+  const searchLocales = searchLocaleMessagesReady.value
+    ? SEARCH_LOCALES
+    : [resolveRouteLocale(route)]
+  return groups.map((g) => ({
     id: g.id,
     icon: g.icon,
     title: t(g.titleKey),
     desc: g.descKey ? t(g.descKey) : '',
-    searchText: resolveGroupSearchText(g),
+    searchText: resolveGroupSearchText(g, searchLocales),
     items: g.items.map((item) => ({
       ...item,
       ...resolveItem(item),
-      searchText: resolveItemSearchText(item),
+      searchText: resolveItemSearchText(item, searchLocales),
     })),
   }))
-)
+})
 
 const query = ref('')
 
@@ -792,7 +825,7 @@ $text-primary: var(--text-primary);
 .section-title {
   margin: 0.5rem;
   text-align: center;
-  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-size: clamp(var(--font-size-28), 4vw, var(--font-size-48));
   font-weight: 700;
   color: $primary;
 }
@@ -823,7 +856,7 @@ $text-primary: var(--text-primary);
   &__icon {
     flex-shrink: 0;
     color: $primary;
-    font-size: 1.1rem;
+    font-size: var(--font-size-18);
   }
 
   &__input {
@@ -833,7 +866,7 @@ $text-primary: var(--text-primary);
     border: none;
     outline: none;
     color: $text-primary;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
 
     &::placeholder {
       color: var(--text-dark-lighter);
@@ -853,7 +886,7 @@ $text-primary: var(--text-primary);
     border: none;
     border-radius: var(--radius-full);
     color: $primary;
-    font-size: 0.75rem;
+    font-size: var(--font-size-12);
     line-height: 1;
     cursor: pointer;
 
@@ -878,7 +911,7 @@ $text-primary: var(--text-primary);
 
   &__label {
     flex-shrink: 0;
-    font-size: 0.8125rem;
+    font-size: var(--font-size-13);
     font-weight: 700;
     color: var(--text-dark-lighter);
   }
@@ -896,7 +929,7 @@ $text-primary: var(--text-primary);
     background: transparent;
     border: none;
     color: var(--text-dark-lighter);
-    font-size: 0.8125rem;
+    font-size: var(--font-size-13);
     cursor: pointer;
     border-radius: var(--radius-sm);
 
@@ -916,7 +949,7 @@ $text-primary: var(--text-primary);
   border: 1px solid rgba(var(--color-primary-rgb), 0.15);
   border-radius: var(--radius-full);
   color: $text-primary;
-  font-size: 0.8125rem;
+  font-size: var(--font-size-13);
   text-decoration: none;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -962,7 +995,7 @@ $text-primary: var(--text-primary);
     );
     border-radius: var(--radius-md);
     color: $primary;
-    font-size: 1.25rem;
+    font-size: var(--font-size-20);
   }
 
   &__text {
@@ -971,14 +1004,14 @@ $text-primary: var(--text-primary);
 
   &__title {
     margin: 0;
-    font-size: 1.0625rem;
+    font-size: var(--font-size-18);
     font-weight: 700;
     color: $text-primary;
   }
 
   &__desc {
     margin: 0.1rem 0 0;
-    font-size: 0.8125rem;
+    font-size: var(--font-size-13);
     color: var(--text-dark-lighter);
   }
 
@@ -994,7 +1027,7 @@ $text-primary: var(--text-primary);
   display: flex;
   align-items: center;
   flex: 1 1 200px;
-  max-width: 360px;
+  max-width: 500px;
   gap: 0.75rem;
   padding: 0.875rem 1rem;
   text-align: left;
@@ -1031,7 +1064,7 @@ $text-primary: var(--text-primary);
     );
     border-radius: var(--radius-md);
     color: $primary;
-    font-size: 1.5rem;
+    font-size: var(--font-size-24);
     transition: transform 0.2s ease;
   }
 
@@ -1039,17 +1072,34 @@ $text-primary: var(--text-primary);
     display: flex;
     flex-direction: column;
     min-width: 0;
+
+    @media(max-aspect-ratio: 1/1) {
+      flex-direction: row;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
   }
 
   &__title {
-    font-size: 0.9375rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: var(--font-size-16);
     font-weight: 600;
     color: $text-primary;
+    white-space: nowrap;
+  }
+
+  &__arrow {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
   }
 
   &__desc {
     margin-top: 0.15rem;
-    font-size: 0.8125rem;
+    font-size: var(--font-size-13);
     line-height: 1.4;
     color: var(--text-dark-lighter);
   }
@@ -1063,24 +1113,55 @@ $text-primary: var(--text-primary);
 
 /* Portrait: tighter tiles */
 @media (max-aspect-ratio: 1/1) {
+  .feature-group {
+    width: fit-content;
+    max-width: 100%;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .feature-group__grid {
+    width: fit-content;
+    max-width: 100%;
+  }
+
   .feature-tile {
-    flex-basis: 160px;
+    flex: 0 1 auto;
+    max-width: 100%;
+    // flex: 0 1 160px;
     gap: 0.5rem;
     padding: 0.75rem 0.75rem;
 
     &__icon {
       width: 34px;
       height: 34px;
-      font-size: 1.25rem;
+      font-size: var(--font-size-20);
     }
 
     &__desc {
-      font-size: 0.75rem;
+      font-size: var(--font-size-12);
     }
   }
 
   .features-recent {
     padding: 0.5rem 0.75rem;
+  }
+
+  .features-recent__label {
+    order: 1;
+  }
+
+  .features-recent__clear {
+    order: 2;
+  }
+
+  .features-recent__list {
+    order: 3;
+    width: 100%;
+  }
+
+  .features-recent__list > .recent-pill:nth-child(n + 7) {
+    display: none;
   }
 }
 </style>

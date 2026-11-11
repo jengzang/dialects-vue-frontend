@@ -17,6 +17,9 @@ const createShareCardDataUrlMock = vi.fn()
 const showSuccessMock = vi.fn()
 const showErrorMock = vi.fn()
 const clipboardWriteTextMock = vi.fn()
+const setLocaleMock = vi.fn()
+
+vi.mock('../src/i18n/index.js', () => ({ setLocale: setLocaleMock }))
 
 vi.mock('vue-router', () => ({
   useRoute: () => route,
@@ -33,7 +36,8 @@ vi.mock('vue-i18n', () => ({
       if (key === 'layoutFooter.pages.menuQueryZhonggu.title') return '查中古'
       if (key === 'layoutFooter.pages.menuQueryZhonggu.description') return '按中古地位整理各方言点读音。'
       if (key === 'layoutFooter.language.zhCN') return '简体'
-      if (key === 'layoutFooter.theme.green') return '绿色'
+      if (key === 'layoutFooter.theme.green-dark') return '绿色'
+      if (key === 'navigation.settings.colorTheme.options.green') return '绿色'
       if (key === 'layoutFooter.share.imageReady') return 'layoutFooter.share.imageReady'
       if (key === 'layoutFooter.share.copied') return 'layoutFooter.share.copied'
       if (key === 'layoutFooter.share.qrHint') return '扫码打开当前页面'
@@ -48,7 +52,7 @@ vi.mock('../src/main/config/layoutFooter.js', () => ({
     pageDescriptionKey: 'layoutFooter.pages.menuQueryZhonggu.description',
     hasTutorial: true,
     languageLabelKey: 'layoutFooter.language.zhCN',
-    themeLabelKey: 'layoutFooter.theme.green',
+    themeLabelKey: 'layoutFooter.theme.green-dark',
   }),
 }))
 
@@ -57,10 +61,6 @@ vi.mock('../src/utils/user/updateNoticeConfig.js', () => ({
     version: '5.0.0',
     dbVersion: '2026.08',
   }),
-}))
-
-vi.mock('../src/composables/core/uiPreferences.js', () => ({
-  currentColorTheme: { value: 'green' },
 }))
 
 vi.mock('../src/composables/data/useVisitStats.js', () => ({
@@ -157,6 +157,7 @@ describe('AppFooter actions', () => {
       hash: '',
     })
     routerPushMock.mockReset()
+    setLocaleMock.mockReset().mockResolvedValue(true)
     ensureVisitStatsMock.mockResolvedValue({ todayVisits: 7, totalVisits: 99 })
     getSourceStatsMock.mockResolvedValue({ locationCount: 12, dataCount: 34 })
     createShareCardDataUrlMock.mockReturnValue('data:image/png;base64,card')
@@ -181,10 +182,14 @@ describe('AppFooter actions', () => {
 
   afterEach(() => {
     document.body.innerHTML = ''
+    vi.clearAllTimers()
+    vi.useRealTimers()
     vi.restoreAllMocks()
   })
 
   it('renders footer actions, stats, and legal information as separate flat rows', async () => {
+    const { setColorTheme } = await import('../src/composables/core/uiPreferences.js')
+    setColorTheme('green-dark')
     const { default: AppFooter } = await import('../src/components/footer/AppFooter.vue')
     const wrapper = mountFooter(AppFooter)
     await nextTick()
@@ -194,18 +199,81 @@ describe('AppFooter actions', () => {
     expect(footer.querySelector('.footer-brand-line')?.getAttribute('aria-hidden')).toBe('true')
     expect(footer.querySelector('.footer-content')).toBeTruthy()
     expect(footer.querySelector('.footer-primary')).toBeTruthy()
-    expect(footer.querySelector('.footer-brand-title')?.getAttribute('src')).toBe('/brand/title.webp')
-    expect(footer.querySelector('.footer-brand-title')?.getAttribute('alt')).toBe('方音图鉴')
-    expect(footer.querySelector('.footer-brand-title')?.classList.contains('title-logo')).toBe(true)
+    expect(footer.querySelector('.footer-brand-button strong')?.textContent).toBe('方音图鉴')
     expect(footer.querySelector('.footer-page-description')?.textContent).toBe('按中古地位整理各方言点读音。')
     expect(footer.querySelector('.footer-primary .footer-actions')).toBeTruthy()
     expect(footer.querySelector('.footer-meta .footer-stats')).toBeTruthy()
     expect(footer.querySelector('.footer-meta .footer-legal')).toBeTruthy()
-    expect(footer.querySelector('.footer-meta .footer-theme-label')?.textContent).toBe('绿色')
+    expect(footer.querySelector('[data-theme-menu="family"] .footer-theme-label')?.textContent).toBe('绿色')
     expect(footer.querySelector('.page-copy')).toBeNull()
     expect([...footer.querySelectorAll('.footer-action')]
       .some(button => button.classList.contains('glass-button'))).toBe(false)
 
+    wrapper.unmount()
+  })
+
+  it('switches color and appearance from the footer while retaining system preference', async () => {
+    const { setColorTheme, setColorMode, currentColorTheme, currentColorMode } = await import('../src/composables/core/uiPreferences.js')
+    setColorTheme('green-dark')
+    setColorMode('system')
+    const { default: AppFooter } = await import('../src/components/footer/AppFooter.vue')
+    const wrapper = mountFooter(AppFooter)
+    const colorTrigger = wrapper.host.querySelector('[data-theme-menu="family"]')
+    expect(colorTrigger).not.toBeNull()
+    colorTrigger.click()
+    await nextTick()
+    await nextTick()
+    const red = [...document.querySelectorAll('.dropdown-item')].find(item => item.textContent.includes('options.red'))
+    expect(red).toBeTruthy()
+    red.click()
+    await nextTick()
+    expect(currentColorTheme.value).toMatch(/^red-/)
+    expect(currentColorMode.value).toBe('system')
+    expect(colorTrigger.getAttribute('aria-expanded')).toBe('false')
+    wrapper.host.querySelector('[data-theme-menu="mode"]').click()
+    await nextTick()
+    await nextTick()
+    const dark = [...document.querySelectorAll('.dropdown-item')].find(item => item.textContent.includes('modes.dark'))
+    dark.click()
+    await nextTick()
+    expect(currentColorTheme.value).toBe('red-dark')
+    expect(currentColorMode.value).toBe('dark')
+    wrapper.unmount()
+  })
+
+  it('changes footer language through the existing locale loader and preserves path, query and hash', async () => {
+    vi.useFakeTimers()
+    route.path = '/zh-CN/menu/query/zhonggu'
+    route.query = { input: '東', tab: 'results' }
+    route.hash = '#result'
+    const { default: AppFooter } = await import('../src/components/footer/AppFooter.vue')
+    const wrapper = mountFooter(AppFooter)
+    const trigger = wrapper.host.querySelector('[data-theme-menu="language"]')
+    expect(trigger).not.toBeNull()
+    trigger.click()
+    await nextTick()
+    const english = [...document.querySelectorAll('.dropdown-item')].find(item => item.textContent.includes('English'))
+    english.click()
+    await nextTick()
+    await nextTick()
+    expect(setLocaleMock).toHaveBeenCalledWith('en')
+    expect(routerPushMock).toHaveBeenCalledWith({ path: '/en/menu/query/zhonggu', query: route.query, hash: '#result' })
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+    expect(showSuccessMock).toHaveBeenCalledWith('messages.success.languageChanged')
+    wrapper.unmount()
+  })
+
+  it('keeps the current route and reports failure when a footer language cannot load', async () => {
+    setLocaleMock.mockRejectedValue(new Error('offline'))
+    const { default: AppFooter } = await import('../src/components/footer/AppFooter.vue')
+    const wrapper = mountFooter(AppFooter)
+    wrapper.host.querySelector('[data-theme-menu="language"]').click()
+    await nextTick()
+    const traditional = [...document.querySelectorAll('.dropdown-item')].find(item => item.textContent.includes('繁體中文'))
+    traditional.click()
+    await nextTick()
+    expect(routerPushMock).not.toHaveBeenCalled()
+    expect(showErrorMock).toHaveBeenCalledWith('messages.error.loadFailed')
     wrapper.unmount()
   })
 
@@ -261,12 +329,10 @@ describe('AppFooter actions', () => {
       files: expect.any(Array),
     }))
     expect(nativeShareMock).toHaveBeenCalledWith(expect.objectContaining({
-      title: '查中古',
       files: expect.any(Array),
     }))
     const [shareData] = nativeShareMock.mock.calls[0]
-    expect(shareData.text).toBe('按中古地位整理各方言点读音。')
-    expect(shareData.text).not.toContain(window.location.href)
+    expect(Object.keys(shareData)).toEqual(['files'])
     expect(shareData.files[0].name).toBe('dialects-share.png')
     expect(shareData.files[0].type).toBe('image/png')
     expect(HTMLAnchorElement.prototype.click).not.toHaveBeenCalled()
@@ -275,7 +341,7 @@ describe('AppFooter actions', () => {
     wrapper.unmount()
   })
 
-  it('opens SimpleSidebar from the i18n menu action', async () => {
+  it('keeps the retired menu action hidden', async () => {
     const { default: AppFooter } = await import('../src/components/footer/AppFooter.vue')
     const wrapper = mountFooter(AppFooter)
     await nextTick()
@@ -283,17 +349,7 @@ describe('AppFooter actions', () => {
     const menuButton = [...wrapper.host.querySelectorAll('.footer-action')]
       .find(button => button.textContent.trim() === 'layoutFooter.actions.menu')
 
-    expect(menuButton).toBeTruthy()
-    expect(wrapper.host.querySelector('[data-simple-sidebar-stub]')).toBeNull()
-
-    menuButton.click()
-    await nextTick()
-
-    expect(wrapper.host.querySelector('[data-simple-sidebar-stub]')).toBeTruthy()
-
-    wrapper.host.querySelector('[data-close-sidebar]').click()
-    await nextTick()
-
+    expect(menuButton).toBeUndefined()
     expect(wrapper.host.querySelector('[data-simple-sidebar-stub]')).toBeNull()
 
     wrapper.unmount()
@@ -347,14 +403,13 @@ describe('AppFooter actions', () => {
     const source = appFooterSource()
     const actionBlock = source.match(/\.footer-action\s*\{[\s\S]*?\n\}/)?.[0]
     const metaInfoBlock = source.match(/\.footer-meta \.info-text\s*\{[\s\S]*?\n\}/)?.[0]
-    const themeLabelBlock = source.match(/\.footer-theme-label\s*\{[\s\S]*?\n\}/)?.[0]
+    const themeTriggerBlock = source.match(/\.footer-theme-trigger\s*\{[\s\S]*?\n\}/)?.[0]
 
     expect(actionBlock).toContain('color: var(--color-primary-hover);')
     expect(actionBlock).toContain('font-weight: 600;')
     expect(metaInfoBlock).toContain('color: var(--text-secondary);')
-    expect(metaInfoBlock).toContain('font-size: 13px;')
-    expect(themeLabelBlock).toBeTruthy()
-    expect(themeLabelBlock).toContain('color: var(--color-primary-hover);')
+    expect(metaInfoBlock).toContain('font-size: var(--font-size-13);')
+    expect(themeTriggerBlock).toContain('--glass-button-color: var(--text-primary);')
     expect(source).not.toContain('grid-template-columns:')
     expect(source).toContain('v-if="isMenuOpen"')
     expect(source).toContain('v-if="isSupportOpen"')

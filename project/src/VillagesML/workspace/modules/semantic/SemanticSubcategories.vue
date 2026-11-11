@@ -219,10 +219,10 @@ import {
   getSemanticSubcategoryComparison
 } from '@/api/index.js'
 import { showError, showSuccess } from '@/utils/ui/message.js'
-import * as echarts from 'echarts'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import { initChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 import BarIcon from '@/components/common/BarIcon.vue'
 import { SEMANTIC_SUBCATEGORY_NAMES, getCategoryDisplayName } from '@/VillagesML/config/villagesML.js'
 import RadioGroup from "@/components/selector/RadioGroup.vue";
@@ -385,7 +385,7 @@ export default {
         radarChartInstance.dispose()
       }
 
-      radarChartInstance = echarts.init(radarChart.value)
+      radarChartInstance = initChart(radarChart.value)
 
       const subcategories = regionalData.value.subcategories || []
       console.log('子类别数据:', subcategories)
@@ -414,7 +414,6 @@ export default {
           splitNumber: 5,
           name: {
             textStyle: {
-              color: '#333',
               fontSize: 12
             }
           },
@@ -487,7 +486,7 @@ export default {
         barChartInstance.dispose()
       }
 
-      barChartInstance = echarts.init(barChart.value)
+      barChartInstance = initChart(barChart.value)
 
       const labels = rankingData.value.map(item => `${item.region_name}\n${getSubcategoryName(item.subcategory)}`)
       const values = rankingData.value.map(item => item.tendency)
@@ -555,6 +554,11 @@ export default {
     onMounted(() => {
       // 添加窗口 resize 事件监听
       window.addEventListener('resize', handleResize)
+    })
+
+    onChartThemeChange(() => {
+      renderRadarChart()
+      renderBarChart()
     })
 
     onUnmounted(() => {
@@ -630,7 +634,7 @@ export default {
 }
 
 .page-title {
-  font-size: 28px;
+  font-size: var(--font-size-28);
   font-weight: 600;
   margin-bottom: 24px;
   color: var(--text-primary);
@@ -649,7 +653,7 @@ export default {
 
 .query-form h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   color: var(--text-primary);
   white-space: nowrap;
   flex-shrink: 0;
@@ -683,7 +687,7 @@ export default {
 
 .results-header h3 {
   margin: 0;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   color: var(--text-primary);
 }
 
@@ -706,7 +710,7 @@ export default {
 
 .subcat-header h4 {
   margin: 0;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   color: var(--text-primary);
 }
 
@@ -715,7 +719,7 @@ export default {
   color: var(--vml-blue);
   padding: 4px 10px;
   border-radius: var(--radius-md);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 500;
 }
 
@@ -726,7 +730,7 @@ export default {
 .stat-item {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   margin-bottom: 4px;
 }
 
@@ -744,14 +748,14 @@ export default {
 }
 
 .char-label {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 500;
   color: var(--text-tertiary);
   margin-bottom: 4px;
 }
 
 .char-list {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
   line-height: 1.6;
 }
@@ -763,7 +767,7 @@ export default {
   color: var(--color-primary, var(--vml-blue));
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -779,7 +783,7 @@ export default {
 .subcategory-table h4,
 .ranking-table h4 {
   margin: 0 0 16px 0;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   color: var(--text-primary);
 }
 
@@ -822,7 +826,7 @@ tr.significant {
 .tendency-badge {
   padding: 4px 10px;
   border-radius: var(--radius-md);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 500;
 }
 
@@ -840,7 +844,7 @@ tr.significant {
   padding: 4px 12px;
   border-radius: var(--radius-md);
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: white;
 }
 

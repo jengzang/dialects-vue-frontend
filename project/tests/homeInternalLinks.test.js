@@ -35,10 +35,9 @@ describe('home and intro internal links', () => {
   })
 
   it('links intro feature headings, subtitles, and subfeature titles to their pages', () => {
-    const aboutPage = readSource('src/main/views/menu/support/AboutPage.vue')
+    const aboutPage = readSource('src/main/views/menu/support/about/AboutIntro.vue')
 
     expect(aboutPage).toContain('const featureRouteMap = {')
-    expect(aboutPage).toContain("feature10: '/menu/cluster'")
     expect(aboutPage).toContain('const featureKeys = Object.keys(messages.about.intro.features)')
     expect(aboutPage).toContain('<RouterLink v-if="feature.route" :to="localeTo(feature.route)" class="feature-link feature-heading-link">')
     expect(aboutPage).toContain('<RouterLink v-if="feature.route" :to="localeTo(feature.route)" class="feature-link feature-subtitle-link">')
@@ -65,7 +64,7 @@ describe('home and intro internal links', () => {
     expect(villagesPage).toContain('<RouterLink class="portal-entry-card glass-card" data-interactive="true" :to="localeTo(\'/explore/villages/toponyms\')">')
     expect(villagesPage).toContain(':to="localeTo(\'/explore/villages/table\')"')
     expect(villagesPage).toContain(':to="localeTo(\'/explore/villages/gd\')"')
-    expect(villagesPage).toContain(':to="localeTo(\'/explore/villages/yc\')"')
+    expect(villagesPage).toContain(':to="localeTo(\'/explore/yc/villages\')"')
     expect(villagesPage).toContain(':to="localeTo(\'/explore/villages/ml\')"')
     expect(villagesPage).toContain('@click="handleAllVillages"')
 
@@ -75,7 +74,7 @@ describe('home and intro internal links', () => {
 
     expect(gdVillagesTable).toContain('<RouterLink class="cross-link" :to="localeTo(\'/explore/villages/gd\')">')
     expect(gdVillagesTree).toContain('<RouterLink class="cross-link" :to="localeTo(\'/explore/villages/table\')">')
-    expect(yangChunSpoken).toContain('<RouterLink class="cross-link" :to="localeTo(\'/explore/villages/yc\')">')
+    expect(yangChunSpoken).toContain('<RouterLink class="cross-link" :to="localeTo(\'/explore/yc/villages\')">')
     expect(yangChunVillages).toContain('<RouterLink class="cross-link" :to="localeTo(\'/explore/yc/words\')">')
   })
 })

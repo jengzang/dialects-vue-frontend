@@ -966,12 +966,12 @@ $transition-normal: 0.3s;
   margin-bottom: 1rem;
   color: $text-primary;
   text-align: center;
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   font-weight: 600;
 
   .segment-count {
     color: $text-secondary;
-    font-size: 0.85rem;
+    font-size: var(--font-size-14);
     font-weight: 500;
   }
 }
@@ -990,7 +990,7 @@ $transition-normal: 0.3s;
   background: $surface-medium;
   border: 2px solid var(--glass-40);
   border-radius: var(--radius-md);
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   transition:
@@ -1022,11 +1022,11 @@ $transition-normal: 0.3s;
   border: 1px solid $primary-border;
   border-radius: var(--radius-md);
   color: $primary;
-  font-size: 0.85rem;
+  font-size: var(--font-size-14);
 
   .info-icon {
     flex-shrink: 0;
-    font-size: 1.1rem;
+    font-size: var(--font-size-18);
   }
 }
 
@@ -1081,19 +1081,19 @@ $transition-normal: 0.3s;
 
   .segment-number {
     color: $text-primary;
-    font-size: 0.9rem;
+    font-size: var(--font-size-14);
     font-weight: 600;
   }
 
   .segment-duration {
     color: $primary;
-    font-size: 0.85rem;
+    font-size: var(--font-size-14);
     font-weight: 500;
   }
 
   .segment-time-range {
     color: $text-secondary;
-    font-size: 0.75rem;
+    font-size: var(--font-size-12);
   }
 }
 
@@ -1101,7 +1101,7 @@ $transition-normal: 0.3s;
   padding: 0.15rem 0.4rem;
   border-radius: var(--radius-sm);
   color: var(--action-primary-text);
-  font-size: 0.7rem;
+  font-size: var(--font-size-12);
   font-weight: 600;
 
   &.badge-original {
@@ -1132,14 +1132,14 @@ $transition-normal: 0.3s;
     border-radius: var(--radius-sm);
     color: var(--action-primary-text);
     white-space: nowrap;
-    font-size: 0.75rem;
+    font-size: var(--font-size-12);
     font-weight: 600;
   }
 
   .drag-hint {
     opacity: 0.5;
     color: $text-secondary;
-    font-size: 1.2rem;
+    font-size: var(--font-size-20);
     cursor: grab;
     transition: opacity $transition-normal ease;
   }
@@ -1179,7 +1179,7 @@ $transition-normal: 0.3s;
   }
 
   .control-icon {
-    font-size: 1rem;
+    font-size: var(--font-size-16);
   }
 }
 
@@ -1188,7 +1188,7 @@ $transition-normal: 0.3s;
   gap: 0.25rem;
   min-width: 70px;
   color: $text-primary;
-  font-size: 0.8rem;
+  font-size: var(--font-size-12);
   font-variant-numeric: tabular-nums;
 
   .separator {
@@ -1217,7 +1217,7 @@ $transition-normal: 0.3s;
   h4 {
     margin: 0;
     color: $text-primary;
-    font-size: 0.9rem;
+    font-size: var(--font-size-14);
     font-weight: 600;
   }
 }
@@ -1233,7 +1233,7 @@ $transition-normal: 0.3s;
   margin: 0.5rem 0 0;
   color: $text-secondary;
   text-align: center;
-  font-size: 0.8rem;
+  font-size: var(--font-size-12);
 }
 
 .control-buttons {
@@ -1245,7 +1245,7 @@ $transition-normal: 0.3s;
     flex: 1;
     padding: 0.6rem 1rem;
     border: none;
-    font-size: 0.85rem;
+    font-size: var(--font-size-14);
     cursor: pointer;
     transition:
       background $transition-normal ease,
@@ -1289,7 +1289,7 @@ $transition-normal: 0.3s;
   border-radius: var(--radius-md);
   color: $error;
   text-align: center;
-  font-size: 0.85rem;
+  font-size: var(--font-size-14);
 }
 
 .regions-list {
@@ -1302,7 +1302,7 @@ $transition-normal: 0.3s;
     margin: 0.5rem 0 0;
     color: $text-primary;
     text-align: center;
-    font-size: 0.9rem;
+    font-size: var(--font-size-14);
     font-weight: 600;
   }
 }
@@ -1340,13 +1340,13 @@ $transition-normal: 0.3s;
     padding: 0.25rem 0.75rem;
     border-radius: var(--radius-sm);
     color: var(--action-primary-text);
-    font-size: 0.8rem;
+    font-size: var(--font-size-12);
     font-weight: 600;
   }
 
   .region-duration {
     color: $text-secondary;
-    font-size: 0.85rem;
+    font-size: var(--font-size-14);
     font-weight: 500;
   }
 }
@@ -1361,7 +1361,7 @@ $transition-normal: 0.3s;
     background: $primary;
     border-radius: var(--radius-sm);
     color: var(--action-primary-text);
-    font-size: 0.75rem;
+    font-size: var(--font-size-12);
     font-weight: 600;
   }
 
@@ -1370,7 +1370,7 @@ $transition-normal: 0.3s;
     background: $error-background;
     border: none;
     border-radius: var(--radius-sm);
-    font-size: 1rem;
+    font-size: var(--font-size-16);
     cursor: pointer;
     transition:
       background $transition-normal ease,
@@ -1402,7 +1402,7 @@ $transition-normal: 0.3s;
     align-items: center;
     gap: 0.25rem;
     color: $text-primary;
-    font-size: 0.8rem;
+    font-size: var(--font-size-12);
   }
 
   input {
@@ -1411,13 +1411,13 @@ $transition-normal: 0.3s;
     background: $surface-strong;
     border: 1px solid var(--glass-40);
     border-radius: var(--radius-sm);
-    font-size: 0.8rem;
+    font-size: var(--font-size-12);
   }
 
   .duration-display {
     margin-left: auto;
     color: $text-secondary;
-    font-size: 0.8rem;
+    font-size: var(--font-size-12);
   }
 }
 
@@ -1429,12 +1429,12 @@ $transition-normal: 0.3s;
     height: 2rem;
     border: 1px solid rgba(128, 128, 128, 0.51);
     border-radius: var(--radius-full);
-    font-size: 0.9rem;
+    font-size: var(--font-size-14);
   }
 
   .time-display {
     min-width: 80px;
-    font-size: 0.75rem;
+    font-size: var(--font-size-12);
   }
 }
 

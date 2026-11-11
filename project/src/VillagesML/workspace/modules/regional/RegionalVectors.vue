@@ -225,13 +225,13 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import * as echarts from 'echarts'
 import { compareRegionalVectors, batchCompareRegionalVectors, reduceRegionalVectors } from '@/api/index.js'
 import { showError, showSuccess, showWarning } from '@/utils/ui/message.js'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import BarIcon from '@/components/common/BarIcon.vue'
 import { SEMANTIC_CATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'
+import { initChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 
 // State - Two Region Comparison
 const level1 = ref('city')
@@ -425,7 +425,7 @@ const renderComparisonChart = () => {
   }
 
   if (!comparisonChartInstance) {
-    comparisonChartInstance = echarts.init(comparisonChart.value)
+    comparisonChartInstance = initChart(comparisonChart.value)
   }
 
   const categoryKeys = ['agriculture', 'clan', 'direction', 'infrastructure', 'mountain', 'settlement', 'symbolic', 'vegetation', 'water']
@@ -489,7 +489,7 @@ const renderHeatmap = () => {
   if (!heatmapChart.value || !batchComparisonData.value) return
 
   if (!heatmapChartInstance) {
-    heatmapChartInstance = echarts.init(heatmapChart.value)
+    heatmapChartInstance = initChart(heatmapChart.value)
   }
 
   const regions = batchComparisonData.value.regions.map(r => r.region_name || r.display)
@@ -566,7 +566,7 @@ const renderScatterPlot = () => {
   if (!scatterChart.value || !reductionData.value) return
 
   if (!scatterChartInstance) {
-    scatterChartInstance = echarts.init(scatterChart.value)
+    scatterChartInstance = initChart(scatterChart.value)
   }
 
   const regions = reductionData.value.regions.map(r => r.region_name || r.display)
@@ -670,6 +670,12 @@ onMounted(() => {
   window.addEventListener('orientationchange', handleResize)
 })
 
+onChartThemeChange(() => {
+  if (comparisonChartInstance) renderComparisonChart()
+  if (heatmapChartInstance) renderHeatmap()
+  if (scatterChartInstance && reductionData.value) renderScatterPlot()
+})
+
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
   window.removeEventListener('orientationchange', handleResize)
@@ -709,7 +715,7 @@ onUnmounted(() => {
 }
 
 .panel-header h3 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   color: var(--text-primary);
   margin: 0;
 }
@@ -719,7 +725,7 @@ onUnmounted(() => {
   color: var(--action-primary-text);
   padding: 4px 12px;
   border-radius: var(--radius-md);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 500;
 }
 
@@ -737,7 +743,7 @@ onUnmounted(() => {
 }
 
 .group-title {
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-primary);
   margin: 0 0 16px 0;
@@ -750,7 +756,7 @@ onUnmounted(() => {
   padding: 12px 24px;
   border: none;
   border-radius: var(--radius-sm2);
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -813,7 +819,7 @@ onUnmounted(() => {
   background: linear-gradient(135deg, var(--vml-blue), var(--vml-blue-darker));
   color: var(--action-primary-text);
   border-radius: var(--radius-lg);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 500;
 }
 
@@ -826,7 +832,7 @@ onUnmounted(() => {
   background: none;
   border: none;
   color: inherit;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   line-height: 1;
   cursor: pointer;
   padding: 0;
@@ -851,7 +857,7 @@ onUnmounted(() => {
 }
 
 .info-label {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   background: rgba(var(--vml-blue-rgb), 0.1);
   padding: 4px 10px;
@@ -892,13 +898,13 @@ onUnmounted(() => {
 
 .stat-item .label {
   font-weight: 500;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
 }
 
 .stat-item .value {
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
 }
 
@@ -932,7 +938,7 @@ onUnmounted(() => {
   padding: 8px 20px;
   border-radius: var(--radius-xl);
   font-weight: 600;
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .region-badge.primary {
@@ -946,7 +952,7 @@ onUnmounted(() => {
 }
 
 .vs-label {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 700;
   color: var(--text-secondary);
 }
@@ -969,13 +975,13 @@ onUnmounted(() => {
 }
 
 .metric-label {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-bottom: 8px;
 }
 
 .metric-value {
-  font-size: 26px;
+  font-size: var(--font-size-24);
   font-weight: 700;
   color: var(--vml-blue);
 }
@@ -997,7 +1003,7 @@ onUnmounted(() => {
 .loading-overlay p {
   color: white;
   margin-top: 16px;
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 /* Responsive - Portrait orientation */
@@ -1033,7 +1039,7 @@ onUnmounted(() => {
 
   .region-badge {
     padding: 6px 16px;
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 
   .similarity-metrics {
@@ -1046,7 +1052,7 @@ onUnmounted(() => {
   }
 
   .metric-value {
-    font-size: 22px;
+    font-size: var(--font-size-24);
   }
 
   .chart-container {

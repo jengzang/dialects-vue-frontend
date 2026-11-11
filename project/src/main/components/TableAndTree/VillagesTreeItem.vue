@@ -272,7 +272,7 @@ $transition-expand: 0.3s;
   gap: 8px;
   align-items: center;
   color: $text-dark;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 500;
 }
 
@@ -287,7 +287,7 @@ $transition-expand: 0.3s;
 
   width: 28px;
   height: 28px;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   cursor: pointer;
   background: transparent;
   border: none;
@@ -317,7 +317,7 @@ $transition-expand: 0.3s;
   margin-left: 6px;
   padding: 1px 6px;
   color: $text-muted;
-  font-size: 10px;
+  font-size: var(--font-size-12);
   font-weight: 500;
   white-space: nowrap;
   border-radius: var(--radius-sm2);
@@ -327,7 +327,7 @@ $transition-expand: 0.3s;
   display: inline-block;
   margin-left: 6px;
   color: $primary-blue;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   animation: spin 1s linear infinite;
 }
 
@@ -338,7 +338,7 @@ $transition-expand: 0.3s;
   margin: 4px 0 4px 20px;
   padding: 8px 12px;
   color: $error-color;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   background: rgba(var(--color-error-rgb), 0.06);
   border: 1px solid rgba(var(--color-error-rgb), 0.2);
   border-radius: var(--radius-md);
@@ -346,7 +346,7 @@ $transition-expand: 0.3s;
   .retry-btn-small {
     padding: 3px 10px;
     color: $error-color;
-    font-size: 12px;
+    font-size: var(--font-size-12);
     font-weight: 600;
     cursor: pointer;
     background: rgba(var(--color-error-rgb), 0.12);
@@ -383,7 +383,7 @@ $transition-expand: 0.3s;
   width: 24px;
   height: 24px;
   color: $primary-blue;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   cursor: pointer;
   background: transparent;
   border: none;

@@ -180,7 +180,7 @@ const loadCompleteData = async () => {
 @use '@/styles/global/mixins' as *;
 
 .village-modal-title {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 650;
   color: var(--text-dark);
 }
@@ -237,7 +237,7 @@ const loadCompleteData = async () => {
   }
 
   .village-modal-title {
-    font-size: 15px;
+    font-size: var(--font-size-16);
   }
 }
 </style>

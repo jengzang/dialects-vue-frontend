@@ -400,6 +400,7 @@ import { userStore } from '@/main/store/store.js'
 import { cityHasCounties } from '@/VillagesML/utils/regionPreload.js'
 import { SEMANTIC_CATEGORY_NAMES, isSemanticFeature } from '@/VillagesML/config/villagesML.js'
 import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
+import { initChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 
 // Router
 const router = useRouter()
@@ -541,6 +542,7 @@ const handleCountyChange = () => {
 
 // 载入村庄列表
 const loadVillages = async () => {
+  if (loading.value) return
   if (!searchKeyword.value && !hasFilters.value) {
     showWarning('請輸入搜索關鍵詞或選擇區域')
     return
@@ -634,7 +636,7 @@ const nextResultsPage = () => {
 }
 
 const extractFeatures = async () => {
-  if (!canExtract.value) return
+  if (loading.value || !canExtract.value) return
 
   if (selectedVillages.value.length > 50000) {
     showWarning('選擇的村莊數量超過上限（50,000），請減少選擇後再提取')
@@ -698,7 +700,7 @@ const extractFeatures = async () => {
 }
 
 const aggregateFeatures = async () => {
-  if (!extractionResults.value) return
+  if (loading.value || !extractionResults.value) return
 
   loading.value = true
   loadingMessage.value = '正在聚合特徵...'
@@ -889,7 +891,7 @@ const renderAggregationChart = () => {
   if (!aggregationChart.value || !aggregationResults.value) return
 
   if (aggregationChartInstance) aggregationChartInstance.dispose()
-  aggregationChartInstance = echarts.init(aggregationChart.value)
+  aggregationChartInstance = initChart(aggregationChart.value)
   const types = Object.keys(aggregationResults.value.aggregates)
   const values = types.map(t => aggregationResults.value.aggregates[t].value)
 
@@ -1057,6 +1059,10 @@ onMounted(() => {
   // FilterableSelect 会自动加载区域列表，无需手动加载
 })
 
+onChartThemeChange(() => {
+  renderAggregationChart()
+})
+
 onBeforeUnmount(() => {
   if (aggregationChartInstance) {
     aggregationChartInstance.dispose()
@@ -1078,14 +1084,14 @@ onBeforeUnmount(() => {
 }
 
 .page-header h2 {
-  font-size: 28px;
+  font-size: var(--font-size-28);
   color: var(--text-primary);
   margin-bottom: 10px;
 }
 
 .subtitle {
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   margin-bottom: 16px;
 }
 
@@ -1102,7 +1108,7 @@ onBeforeUnmount(() => {
 }
 
 .lock-icon {
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .glass-panel {
@@ -1119,7 +1125,7 @@ onBeforeUnmount(() => {
 }
 
 .panel-header h3 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   color: var(--text-primary);
   margin: 0;
 }
@@ -1129,7 +1135,7 @@ onBeforeUnmount(() => {
   color: var(--action-primary-text);
   padding: 4px 12px;
   border-radius: var(--radius-md);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
 }
 
@@ -1156,7 +1162,7 @@ onBeforeUnmount(() => {
 }
 
 .quick-select-row label {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 500;
   color: var(--text-secondary);
 }
@@ -1171,7 +1177,7 @@ onBeforeUnmount(() => {
 }
 
 .empty-hint p {
-  font-size: 15px;
+  font-size: var(--font-size-16);
   color: var(--color-warning);
   margin: 0;
   font-weight: 500;
@@ -1200,7 +1206,7 @@ onBeforeUnmount(() => {
   background: var(--glass-50);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   transition: all 0.3s ease;
 }
 
@@ -1253,11 +1259,11 @@ onBeforeUnmount(() => {
 .village-name {
   font-weight: 600;
   color: var(--text-primary);
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .village-id {
-  font-size: 11px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   background: rgba(var(--vml-blue-rgb), 0.1);
   padding: 2px 8px;
@@ -1269,7 +1275,7 @@ onBeforeUnmount(() => {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 .location-item {
@@ -1288,7 +1294,7 @@ onBeforeUnmount(() => {
 }
 
 .page-info {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
 }
 
@@ -1319,11 +1325,11 @@ onBeforeUnmount(() => {
   font-weight: 600;
   color: var(--text-primary);
   min-width: 80px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .type-desc {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   flex: 1;
 }
@@ -1346,7 +1352,7 @@ onBeforeUnmount(() => {
 }
 
 .control-item span {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
 }
 
@@ -1371,13 +1377,13 @@ onBeforeUnmount(() => {
 }
 
 .stat-label {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
   margin-bottom: 8px;
 }
 
 .stat-value {
-  font-size: 24px;
+  font-size: var(--font-size-24);
   font-weight: 700;
   color: var(--vml-blue);
 }
@@ -1387,7 +1393,7 @@ onBeforeUnmount(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  font-size: 11px;
+  font-size: var(--font-size-12);
 }
 
 .breakdown-item {
@@ -1458,7 +1464,7 @@ onBeforeUnmount(() => {
 .loading-overlay p {
   color: white;
   margin-top: 16px;
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 /* Aggregation Results Styles */
@@ -1467,7 +1473,7 @@ onBeforeUnmount(() => {
   color: var(--vml-blue);
   padding: 6px 12px;
   border-radius: var(--radius-md);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 500;
 }
 
@@ -1479,7 +1485,7 @@ onBeforeUnmount(() => {
 }
 
 .agg-section h4 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   color: var(--text-primary);
   margin: 0 0 16px 0;
   padding-bottom: 8px;
@@ -1487,7 +1493,7 @@ onBeforeUnmount(() => {
 }
 
 .agg-section h5 {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
   margin: 0 0 12px 0;
 }
@@ -1507,20 +1513,20 @@ onBeforeUnmount(() => {
 }
 
 .category-name {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 6px;
 }
 
 .category-count {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   margin-bottom: 4px;
 }
 
 .category-percentage {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 700;
   color: var(--vml-blue);
 }
@@ -1540,7 +1546,7 @@ onBeforeUnmount(() => {
 .mini-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 
 .mini-table th,
@@ -1585,14 +1591,14 @@ onBeforeUnmount(() => {
 }
 
 .cluster-id {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 4px;
 }
 
 .cluster-count {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--vml-blue);
   font-weight: 500;
 }
@@ -1618,13 +1624,13 @@ onBeforeUnmount(() => {
 }
 
 .coverage-label {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-bottom: 8px;
 }
 
 .coverage-value {
-  font-size: 24px;
+  font-size: var(--font-size-24);
   font-weight: 700;
   color: var(--vml-blue);
 }
@@ -1644,14 +1650,14 @@ onBeforeUnmount(() => {
 }
 
 .char-text {
-  font-size: 24px;
+  font-size: var(--font-size-24);
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 6px;
 }
 
 .char-percentage {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--vml-blue);
   font-weight: 500;
 }
@@ -1666,12 +1672,12 @@ onBeforeUnmount(() => {
 
 .empty-cluster-hint p {
   margin: 8px 0;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--color-warning);
 }
 
 .empty-cluster-hint .hint-text {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
 }
 
@@ -1734,7 +1740,7 @@ onBeforeUnmount(() => {
 
   .glass-table {
     min-width: 600px;
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 
   .glass-table th,

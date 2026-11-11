@@ -74,7 +74,7 @@ const handleAnalyze = () => {
 }
 
 .panel-title {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--text-primary);
   margin: 0;

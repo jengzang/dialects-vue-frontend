@@ -92,16 +92,15 @@
 
     <!-- Tab切换 -->
     <div v-if="rawData" class="feature-tabs">
-      <button
-        v-for="feature in features"
-        :key="feature"
-        @click="currentFeature = feature"
-        :class="['feature-tab', { active: currentFeature === feature }]"
-      >
-        {{ feature }} ({{ pieCountByFeature[feature] || 0 }})
-      </button>
+      <TabSwitcher
+        mode="segmented"
+        navigation-only
+        :use-router="false"
+        :tabs="featureTabs"
+        v-model="currentFeature"
+      />
 
-      <div v-if="currentDataLocationName" class="feature-tabs-location glass-button" @click.stop="handleLocationClick(currentDataLocationName)"><InlineIcon icon="📍" />{{ currentDataLocationName }}
+      <div v-if="currentDataLocationName" class="feature-tabs-location pill-btn" @click.stop="handleLocationClick(currentDataLocationName)"><InlineIcon icon="📍" />{{ currentDataLocationName }}
       </div>
     </div>
 
@@ -265,11 +264,11 @@ import { ref, computed, watch, onMounted, onActivated, onUnmounted, nextTick } f
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
-import * as echarts from 'echarts'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import HoverDetailCard from '@/components/ToastAndHelp/HoverDetailCard.vue'
+import TabSwitcher from '@/components/common/TabSwitcher.vue'
 import { resolveHoverDetailCardPosition } from '@/utils/EchartHover/hoverDetailCardPosition.js'
 import LocationMultiInput from '../geo/LocationMultiInput.vue'
 import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue'
@@ -278,6 +277,7 @@ import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { TABLE_COLUMN_SCHEMAS } from '../../config/chars_positions/characters.js'
 import { userStore } from '@/main/store/store.js'
 import { showWarning } from '@/utils/ui/message.js'
+import { initChart, onChartThemeChange, readChartTokens } from '@/utils/chart/chartTheme'
 import { buildEvolutionMobileDetail, isSameEvolutionMobileDetail } from '@/utils/EchartHover/evolutionDetail.js'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 import {
@@ -431,6 +431,13 @@ const pieCountByFeature = computed(() => {
     聲調: rawData.value.data.聲調?.length || 0
   }
 })
+
+const featureTabs = computed(() =>
+  features.map(feature => ({
+    name: feature,
+    label: `${feature} (${pieCountByFeature.value[feature] || 0})`
+  }))
+)
 
 const currentDataLocationName = computed(() => {
   const locations = Array.isArray(rawData.value?.locations)
@@ -692,6 +699,7 @@ const generatePieChartOption = (pieData) => {
   const title = isByValue ? pieData.value : pieData.level1_value
   const total = pieData.total
   const items = isByValue ? pieData.level1 : pieData.phonetic_values
+  const tokens = readChartTokens()
 
   if (!items) return null
 
@@ -706,12 +714,10 @@ const generatePieChartOption = (pieData) => {
       textStyle: {
         fontSize: 14,
         fontWeight: 'bold',
-        color: '#333',
         lineHeight: 14
       },
       subtextStyle: {
-        fontSize: 11,
-        color: '#666'
+        fontSize: 11
       }
     },
     tooltip: {
@@ -771,7 +777,7 @@ const generatePieChartOption = (pieData) => {
       avoidLabelOverlap: true,
       itemStyle: {
         borderRadius: 4,
-        borderColor: '#fff',
+        borderColor: tokens.surface,
         borderWidth: 2
       },
       label: {
@@ -816,7 +822,7 @@ const initPieChart = (container, pieData, index) => {
     return null
   }
 
-  const chart = echarts.init(container, null, {
+  const chart = initChart(container, null, {
     renderer: 'canvas',
     useDirtyRect: true // 启用脏矩形优化
   })
@@ -1130,6 +1136,7 @@ const updateSankeyHeight = (nodes) => {
 }
 
 const generateSankeyOption = () => {
+  const tokens = readChartTokens()
   const sankeyData = buildSankeyData()
   updateSankeyHeight(sankeyData.nodes)
 
@@ -1145,8 +1152,7 @@ const generateSankeyOption = () => {
       top: 12,
       textStyle: {
         fontSize: 15,
-        fontWeight: 'bold',
-        color: '#333'
+        fontWeight: 'bold'
       }
     },
     tooltip: {
@@ -1186,13 +1192,12 @@ const generateSankeyOption = () => {
         opacity: 0.35
       },
       label: {
-        color: '#333',
         fontSize: 12,
         formatter: ({ data }) => data.rawLabel
       },
       itemStyle: {
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.8)'
+        borderColor: tokens.surface
       },
       levels: [
         { depth: 0, itemStyle: { color: '#4f7cff' }, lineStyle: { opacity: 0.35 } },
@@ -1217,7 +1222,7 @@ const renderSankey = async () => {
 
   await nextTick()
 
-  sankeyChartInstance.value = echarts.init(sankeyContainerRef.value, null, {
+  sankeyChartInstance.value = initChart(sankeyContainerRef.value, null, {
     renderer: 'canvas',
     useDirtyRect: true
   })
@@ -1491,6 +1496,11 @@ onUnmounted(() => {
   clearSankeyChart()
   window.removeEventListener('resize', handleWindowResize)
 })
+
+onChartThemeChange(async () => {
+  if (!rawData.value) return
+  await renderCurrentVisualization()
+})
 </script>
 
 
@@ -1585,7 +1595,7 @@ $portrait-ratio: 1;
 .control {
   &-label {
     min-width: 80px;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 500;
 
     @include text-primary;
@@ -1608,7 +1618,7 @@ $portrait-ratio: 1;
 }
 
 .input-hint {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-style: italic;
 
   @include text-secondary;
@@ -1628,7 +1638,7 @@ $portrait-ratio: 1;
 
   :deep(.liquid-radio-label) {
     padding: 0;
-    font-size: 15px;
+    font-size: var(--font-size-16);
     font-weight: 500;
   }
 }
@@ -1636,7 +1646,7 @@ $portrait-ratio: 1;
 /* 查询按钮: 仅尺寸覆盖, 视觉见 main/_buttons.scss 的 .action-btn */
 .action-btn {
   --action-btn-padding: 10px 24px;
-  --action-btn-font-size: 14px;
+  --action-btn-font-size: var(--font-size-14);
   --action-btn-font-weight: 500;
 }
 
@@ -1648,7 +1658,7 @@ $portrait-ratio: 1;
   border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
   border-radius: var(--radius-sm2);
   color: $danger;
-  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 
 /* 特征切换 */
@@ -1661,54 +1671,29 @@ $portrait-ratio: 1;
   &-location {
     display: inline-flex;
     align-items: center;
-    padding: 8px 14px;
-    background: rgba(var(--color-primary-rgb), 0.1);
-    border: 1px solid rgba(var(--color-primary-rgb), 0.18);
-    border-radius: var(--radius-md);
-    color: var(--color-primary);
+    padding: 10px 12px;
+    // background: rgba(var(--color-primary-rgb), 0.1);
+    background: var(--glass-50);
+    // border: 1px solid rgba(var(--color-primary-rgb), 0.18);
+    // border-radius: var(--radius-md);
+    // color: var(--color-primary);
     white-space: nowrap;
-    font-size: 14px;
+    font-size: var(--font-size-16);
     font-weight: 700;
     cursor: pointer;
     text-decoration: none;
     transition: all 0.2s ease;
 
     &:hover {
-      color: var(--color-primary-hover);
-      text-decoration: underline;
+      transform: scale(1.05);
+      background: var(--glass-80);
+      // color: var(--color-primary-hover);
+      // text-decoration: underline;
     }
 
-    :root[data-color-theme='dark'] & {
+    :root[data-color-mode='dark'] & {
       color: var(--text-primary);
     }
-  }
-}
-
-.feature-tab {
-  padding: 10px 20px;
-  background: var(--glass-30);
-  border: 1px solid var(--glass-30);
-  border-radius: var(--radius-md);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  color: var(--text-dark);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s $ease-fluid;
-
-  @include glass-blur;
-
-  &:hover {
-    background: var(--glass-60);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transform: translateY(-1px);
-  }
-
-  &.active {
-    background: var(--color-primary);
-    border-color: var(--color-primary);
-    box-shadow: 0 4px 12px var(--color-primary-shadow);
-    color: var(--action-primary-text);
   }
 }
 
@@ -1726,13 +1711,13 @@ $portrait-ratio: 1;
 
   p {
     color: $text-secondary;
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 }
 
 .empty-state {
   color: $text-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 /* 图表区域 */
@@ -1803,7 +1788,7 @@ $portrait-ratio: 1;
   }
 
   &__title {
-    font-size: 16px;
+    font-size: var(--font-size-16);
     font-weight: 700;
     line-height: 1.3;
 
@@ -1812,7 +1797,7 @@ $portrait-ratio: 1;
 
   &__subtitle {
     margin-top: 4px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
     line-height: 1.4;
 
     @include text-secondary;
@@ -1824,7 +1809,7 @@ $portrait-ratio: 1;
   }
 
   &__section-title {
-    font-size: 13px;
+    font-size: var(--font-size-13);
     font-weight: 600;
 
     @include text-primary;
@@ -1845,7 +1830,7 @@ $portrait-ratio: 1;
   }
 
   &__item-label {
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 600;
 
     @include text-primary;
@@ -1853,14 +1838,14 @@ $portrait-ratio: 1;
 
   &__item-value {
     white-space: nowrap;
-    font-size: 12px;
+    font-size: var(--font-size-12);
 
     @include text-secondary;
   }
 
   &__chars {
     margin-top: 8px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
     line-height: 1.6;
 
     @include text-secondary;
@@ -1904,10 +1889,6 @@ $portrait-ratio: 1;
     gap: 14px;
   }
 
-  .feature-tab {
-    padding: 10px 8px;
-  }
-
   .feature-tabs-location {
     padding: 10px 6px;
     cursor: pointer;
@@ -1915,7 +1896,7 @@ $portrait-ratio: 1;
     transition: all 0.2s ease;
 
     &:hover {
-      color: var(--color-primary-hover);
+      // color: var(--color-primary-hover);
       text-decoration: underline;
     }
   }

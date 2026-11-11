@@ -691,7 +691,7 @@ const openEntryModal = () => {
   padding: 10px 20px;
   border: none;
   border-radius: var(--radius-sm2);
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -732,7 +732,7 @@ const openEntryModal = () => {
     rgba(var(--color-primary-hover-rgb), 0.9)
   );
   color: var(--action-primary-text);
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(var(--color-primary-rgb), 0.2);
@@ -769,7 +769,7 @@ const openEntryModal = () => {
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   color: $primary;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
@@ -821,7 +821,7 @@ const openEntryModal = () => {
 
 .auth-warning-icon {
   margin-bottom: 16px;
-  font-size: 44px;
+  font-size: var(--font-size-48);
   filter: drop-shadow(0 4px 6px var(--bg-hover-strong));
   animation: floatIcon 3s ease-in-out infinite;
 }
@@ -829,7 +829,7 @@ const openEntryModal = () => {
 .auth-warning-text {
   margin-bottom: 20px;
   color: $text-secondary;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   line-height: 1.6;
 }
 
@@ -869,7 +869,7 @@ const openEntryModal = () => {
   padding: 5px 12px;
   border: 1px solid transparent;
   border-radius: var(--radius-pill);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 700;
   line-height: 1.35;
   white-space: nowrap;
@@ -939,7 +939,7 @@ const openEntryModal = () => {
   border: none;
   background: transparent;
   color: $primary;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   line-height: 1;
   cursor: pointer;
 }
@@ -952,7 +952,7 @@ const openEntryModal = () => {
   border: none;
   background: transparent;
   color: var(--text-deep);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   outline: none;
 
   &::placeholder {
@@ -968,7 +968,7 @@ const openEntryModal = () => {
   border: none;
   background: transparent;
   color: $text-light;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   line-height: 1;
   cursor: pointer;
   transition: color 0.15s;
@@ -985,6 +985,7 @@ const openEntryModal = () => {
   padding: 12px;
   overflow-y: auto;
   background: none;
+  backdrop-filter: none;
   // border: 1px solid var(--glass-40);
   // border-radius: var(--radius-lg);
   // background: $glass-white;
@@ -1002,7 +1003,7 @@ const openEntryModal = () => {
   min-height: 160px;
   padding: 30px 10px;
   color: $text-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   text-align: center;
   box-sizing: border-box;
 }
@@ -1013,7 +1014,7 @@ const openEntryModal = () => {
 
 .spinner-icon {
   display: inline-block;
-  font-size: 24px;
+  font-size: var(--font-size-24);
   animation: spin 1.5s linear infinite;
 }
 
@@ -1025,7 +1026,7 @@ const openEntryModal = () => {
 
 .empty-state-icon {
   margin-bottom: 12px;
-  font-size: 36px;
+  font-size: var(--font-size-32);
 }
 
 .empty-state-title {
@@ -1038,14 +1039,14 @@ const openEntryModal = () => {
   max-width: 260px;
   margin: 0 0 16px;
   color: $text-muted;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   line-height: 1.5;
 }
 
 .inline-btn {
   padding: 6px 16px !important;
   border-radius: var(--radius-lg) !important;
-  font-size: 13px !important;
+  font-size: var(--font-size-13) !important;
 }
 
 .tree-categories-list {
@@ -1060,11 +1061,8 @@ const openEntryModal = () => {
   // border: 1px solid var(--glass-40);
   // border-radius: var(--radius-md);
   background: var(--glass-50);
+  backdrop-filter: none;
   // transition: $motion-fast;
-
-  &:hover {
-    // background: var(--glass-60);
-  }
 
   &.collapsed {
     .arrow-indicator {
@@ -1090,7 +1088,7 @@ const openEntryModal = () => {
 .arrow-indicator {
   margin-right: 10px;
   color: $text-light;
-  font-size: 8px;
+  font-size: var(--font-size-12);
   transform: rotate(90deg);
   transition: transform 0.2s ease;
 }
@@ -1098,7 +1096,7 @@ const openEntryModal = () => {
 .category-name {
   flex: 1;
   color: var(--text-dark);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 700;
 }
 
@@ -1107,7 +1105,7 @@ const openEntryModal = () => {
   border-radius: var(--radius-md);
   background: rgba(var(--color-primary-rgb), 0.08);
   color: $primary;
-  font-size: 10px;
+  font-size: var(--font-size-12);
   font-weight: 700;
 }
 
@@ -1151,7 +1149,7 @@ const openEntryModal = () => {
   .feature-name {
     margin-bottom: 4px;
     color: $text-main;
-    font-size: 12.5px;
+    font-size: var(--font-size-12);
     font-weight: 600;
     line-height: 1.35;
     word-break: break-all;
@@ -1159,7 +1157,7 @@ const openEntryModal = () => {
 
   .feature-count-badge {
     color: $text-secondary;
-    font-size: 9.5px;
+    font-size: var(--font-size-12);
     font-weight: 500;
   }
 }
@@ -1179,7 +1177,7 @@ const openEntryModal = () => {
   border-radius: var(--radius-sm2);
   background: none;
   color: $primary;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;

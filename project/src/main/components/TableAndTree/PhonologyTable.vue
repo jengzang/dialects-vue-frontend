@@ -3,7 +3,7 @@
     <div v-if="location" class="location-header">
       <div class="location-title"><InlineIcon icon="📍" />{{ location }}</div>
       <div class="header-actions">
-        <button class="tone-search-btn glass-button" @click="handleShowDetails" :disabled="isLoading">
+        <button class="tone-search-btn pill-btn" @click="handleShowDetails" :disabled="isLoading">
           {{ isLoading ? t('result.phonologyTable.loadingButton') : t('result.phonologyTable.detailButton') }}
         </button>
         <button class="fullscreen-btn glass-button" @click="toggleFullScreen">
@@ -434,7 +434,7 @@ $transition-duration: 0.25s;
 
 @mixin glass-button {
   padding: 8px 16px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   border-radius: var(--radius-md);
@@ -486,7 +486,7 @@ $transition-duration: 0.25s;
 .location-title {
   margin-bottom: 6px;
   color: var(--text-dark-light);
-  font-size: 24px;
+  font-size: var(--font-size-24);
   font-weight: 700;
   text-align: center;
 }
@@ -513,7 +513,7 @@ $transition-duration: 0.25s;
 
 .matrix-table {
   width: 100%;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   border-collapse: collapse;
 }
 
@@ -536,7 +536,7 @@ $transition-duration: 0.25s;
   z-index: 2;
   min-width: 120px;
   padding: 10px;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   text-align: center;
   background: linear-gradient(
@@ -553,7 +553,7 @@ $transition-duration: 0.25s;
   z-index: 1;
   min-width: 80px;
   padding: 10px;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   text-align: center;
   background: linear-gradient(
@@ -597,7 +597,7 @@ $transition-duration: 0.25s;
 .tone-row {
   display: flex;
   gap: 6px;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   line-height: 1.5;
 }
 
@@ -638,11 +638,11 @@ $transition-duration: 0.25s;
 @media (max-aspect-ratio: 1/1) {
   .location-title {
     margin-bottom: 5px;
-    font-size: 20px;
+    font-size: var(--font-size-20);
   }
 
   .matrix-table {
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   .corner-cell,
@@ -658,7 +658,7 @@ $transition-duration: 0.25s;
   }
 
   .tone-row {
-    font-size: 11px;
+    font-size: var(--font-size-12);
   }
 
   .tone-label {
@@ -688,16 +688,16 @@ $transition-duration: 0.25s;
 .location-title {
   margin: 0;
   color: var(--text-dark-light);
-  font-size: 24px;
+  font-size: var(--font-size-24);
   font-weight: 700;
 }
 
 .tone-search-btn {
-  @include glass-button;
-
-  color: $primary-blue;
+  // @include glass-button;
+  font-size: var(--font-size-16);
+  // color: $primary-blue;
   background: var(--glass-60);
-  border: 1px solid var(--glass-30);
+  // border: 1px solid var(--glass-30);
   box-shadow:
     0 2px 8px rgba(0, 0, 0, 0.08),
     inset 0 1px 0 var(--glass-50);
@@ -705,7 +705,7 @@ $transition-duration: 0.25s;
 
   &:hover:not(:disabled) {
     background: var(--glass-80);
-    border-color: rgba(var(--color-primary-rgb), 0.3);
+    // border-color: rgba(var(--color-primary-rgb), 0.3);
     box-shadow:
       0 4px 12px rgba(var(--color-primary-rgb), 0.15),
       inset 0 1px 0 var(--glass-60);
@@ -747,7 +747,7 @@ $transition-duration: 0.25s;
   z-index: 100000;
   padding: 10px 18px;
   color: var(--text-primary);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   cursor: pointer;
   background: var(--surface-glass-floating);
@@ -776,7 +776,7 @@ $transition-duration: 0.25s;
 .info-title {
   margin-bottom: 10px;
   color: $text-dark;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 600;
 }
 
@@ -784,7 +784,7 @@ $transition-duration: 0.25s;
   display: flex;
   align-items: baseline;
   padding: 6px 0;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   line-height: 1.6;
 }
 
@@ -810,13 +810,13 @@ $transition-duration: 0.25s;
 .section-title {
   margin-bottom: 8px;
   color: $text-dark;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
 }
 
 .tone-mini-table {
   width: 100%;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   border-collapse: collapse;
 
   th,
@@ -842,7 +842,7 @@ $transition-duration: 0.25s;
 .popup-no-data {
   padding: 20px;
   color: var(--text-lightest);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   text-align: center;
 }
 </style>

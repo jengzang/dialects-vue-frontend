@@ -1,32 +1,188 @@
 <template>
-  <div class="home-page" ref="homePageRef">
+  <div
+    ref="homePageRef"
+    class="home-page"
+    :class="{ 'home-page--globe-mode': isGlobeMode }"
+  >
     <!-- Animated Background -->
     <div class="bg-gradient"></div>
+    <div
+      v-if="showHomeBackground"
+      class="home-content-background"
+      :class="{ 'home-content-background--ready': homeBackgroundReady }"
+      :style="{ top: `${backgroundStart}px` }"
+      aria-hidden="true"
+    >
+      <BlueLayoutBackground @ready="homeBackgroundReady = $event" />
+    </div>
 
     <!-- Hero Section -->
     <section class="hero-section">
-      <GlobeBackground :points="globePoints" />
+      <GlobeBackground
+        :points="globePoints"
+        :centered="isGlobeMode"
+        :force-interactive="isGlobeMode"
+      />
 
       <div class="hero-content">
-        <img src="/brand/title.webp" :alt="$t('home.hero.logoAlt')" class="hero-logo title-logo" />
+        <img :src="brandTitleSrc" :alt="$t('home.hero.logoAlt')" class="hero-logo title-logo" />
         <div class="hero-title-row">
           <h1 class="hero-title">{{ $t('home.hero.title') }}</h1>
         </div>
         <p class="hero-subtitle">{{ $t('home.hero.subtitle') }}</p>
         <div class="hero-bottom-row">
-          <div class="hero-actions">
-            <RouterLink class="btn-primary" :to="localeTo('/menu/query/zhonggu')">
-              <span class="btn-icon"><InlineIcon icon="🚀" /></span>
-              <span class="btn-text">{{ $t('home.hero.startExploring') }}</span>
+          <nav
+            class="hero-actions"
+            :aria-label="$t('home.features.sectionTitle')"
+          >
+            <RouterLink
+              class="hero-entry login-btn primary"
+              :to="localeTo('/menu/query/zhonggu')"
+            >
+              <BarIcon
+                icon="🔍"
+                class="hero-entry-icon"
+                weight="regular"
+                aria-hidden="true"
+              />
+              <span>{{ $t('navigation.tabs.query') }}</span>
+              <svg
+                class="hero-entry-arrow"
+                viewBox="0 0 16 16"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M4 12 12 4M4 4h8v8"
+                  stroke="currentColor"
+                  stroke-width="1.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
             </RouterLink>
-            <button class="btn-secondary" @click="scrollToFeatures">
-              <span class="btn-icon"><InlineIcon icon="📖" /></span>
-              <span class="btn-text">{{ $t('home.hero.featuresIntro') }}</span>
-            </button>
-          </div>
+            <RouterLink
+              class="hero-entry login-btn primary"
+              :to="localeTo('/menu/vocabulary/view')"
+            >
+              <BarIcon
+                icon="📋"
+                class="hero-entry-icon"
+                weight="regular"
+                aria-hidden="true"
+              />
+              <span>{{ $t('navigation.tabs.vocabulary') }}</span>
+              <svg
+                class="hero-entry-arrow"
+                viewBox="0 0 16 16"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M4 12 12 4M4 4h8v8"
+                  stroke="currentColor"
+                  stroke-width="1.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </RouterLink>
+            <RouterLink
+              class="hero-entry login-btn primary"
+              :to="localeTo('/menu/pho/matrix')"
+            >
+              <BarIcon
+                icon="🧬"
+                class="hero-entry-icon"
+                weight="regular"
+                aria-hidden="true"
+              />
+              <span>{{ $t('navigation.tabs.phonology') }}</span>
+              <svg
+                class="hero-entry-arrow"
+                viewBox="0 0 16 16"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M4 12 12 4M4 4h8v8"
+                  stroke="currentColor"
+                  stroke-width="1.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </RouterLink>
+            <RouterLink
+              class="hero-entry login-btn primary"
+              :to="localeTo('/explore/tools/praat')"
+            >
+              <BarIcon
+                icon="🎙️"
+                class="hero-entry-icon"
+                weight="regular"
+                aria-hidden="true"
+              />
+              <span>Praat</span>
+              <svg
+                class="hero-entry-arrow"
+                viewBox="0 0 16 16"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M4 12 12 4M4 4h8v8"
+                  stroke="currentColor"
+                  stroke-width="1.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </RouterLink>
+          </nav>
           <img :src="heroDecorationSrc" :alt="$t('home.hero.decorationAlt')" class="hero-decoration" />
+          <button
+            class="hero-features-link login-btn secondary"
+            type="button"
+            @click="scrollToFeatures"
+          >
+            <span>{{ $t('home.hero.featuresIntro') }}</span>
+            <BarIcon
+              icon="⬇️"
+              weight="regular"
+              aria-hidden="true"
+            />
+          </button>
         </div>
       </div>
+
+      <button
+        class="glass-button home-globe-mode-toggle"
+        :class="{ 'home-globe-mode-toggle--exit': isGlobeMode }"
+        type="button"
+        :aria-label="isGlobeMode ? $t('result.phonologyTable.exitFullscreen') : $t('result.phonologyTable.fullscreen')"
+        :aria-pressed="isGlobeMode"
+        @click="toggleGlobeMode"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path
+            v-if="isGlobeMode"
+            d="M9 3v6H3M15 3v6h6M3 15h6v6M21 15h-6v6"
+          />
+          <path
+            v-else
+            d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"
+          />
+        </svg>
+      </button>
 
       <div
         id="home-globe-joystick-anchor"
@@ -200,6 +356,26 @@
       </div>
     </section>
 
+    <section class="projects-section reveal">
+      <h2
+        id="history-title"
+        class="page-title home-history-title"
+      >
+        {{ $t('home.history.title') }}
+      </h2>
+      <div class="home-history-actions">
+        <button
+          type="button"
+          class="login-btn secondary"
+          @click="showUpdateNotice = true"
+        >
+          {{ $t('home.history.recentUpdates') }}
+        </button>
+      </div>
+      <AboutHistory featured />
+    </section>
+
+
     <!-- Footer -->
     <footer class="footer">
       <div class="footer-content">
@@ -235,25 +411,19 @@
       </div>
     </footer>
 
+    <UpdateNoticeModal
+      v-model:visible="showUpdateNotice"
+      :version="homeUpdateNotice.version"
+      :last-update-date="homeUpdateNotice.lastUpdateDate"
+      :title="homeUpdateNotice.title"
+      :items="homeUpdateNotice.items"
+    />
+
     <!-- User Benefits Popup -->
     <UserBenefitsPopup
       :visible="showBenefitsPopup"
       @close="showBenefitsPopup = false"
       @register="navigateTo('/auth')"
-    />
-
-    <!-- Update Notice Modal -->
-    <UpdateNoticeModal
-      v-model:visible="showUpdateNotice"
-      :auto-show="true"
-      :mode="updateNoticeMode"
-      :version="homeUpdateNotice.version"
-      :last-update-date="homeUpdateNotice.lastUpdateDate"
-      :title="homeUpdateNotice.title"
-      :items="homeUpdateNotice.items"
-      :view-detail-text="$t('home.viewDetails')"
-      @close="showUpdateNotice = false"
-      @show-detail="showUpdateNotice = true"
     />
 
     <!-- Support Modal -->
@@ -283,22 +453,22 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import FeaturesSection from '@/main/components/FeaturesSection.vue'
+import BlueLayoutBackground from '@/components/common/BlueLayoutBackground.vue'
+import AboutHistory from '@/main/views/menu/support/about/AboutHistory.vue'
 import HomeFeaturedTools from '@/main/components/HomeFeaturedTools.vue'
 import { computed, ref, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
-import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { currentColorTheme, currentInterfaceMode, UI_MODE_COMPACT, getBrandAssets } from '@/composables/core/uiPreferences.js'
 import { useVisitStats } from '@/composables/data/useVisitStats.js'
 import { useClickParticles } from '@/main/composables/useClickParticles.js'
 import { getCachedSourceStats, getSourceStats } from '@/composables/data/useSourceStats.js'
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 
 // ✅ 懒加载：先弹窗 → 地球 → Hero 展示
-const UpdateNoticeModal = defineAsyncComponent(() =>
-  import('@/main/components/user/popups/UpdateNoticeModal.vue')
-)
 const GlobeBackground = defineAsyncComponent(() =>
   import('@/main/components/globe/GlobeBackground.vue')
 )
@@ -311,6 +481,9 @@ const UserBenefitsPopup = defineAsyncComponent(() =>
 const SupportPopup = defineAsyncComponent(() =>
   import('@/main/components/user/popups/SupportPopup.vue')
 )
+const UpdateNoticeModal = defineAsyncComponent(() =>
+  import('@/main/components/user/popups/UpdateNoticeModal.vue')
+)
 
 const { t, locale } = useI18n()
 const router = useRouter()
@@ -321,6 +494,13 @@ const {
   ensureVisitStats
 } = useVisitStats()
 const homePageRef = ref(null)
+const isGlobeMode = ref(false)
+const backgroundStart = ref(0)
+const homeBackgroundReady = ref(false)
+const hasReachedFeatures = ref(false)
+const showHomeBackground = computed(() => hasReachedFeatures.value && !isGlobeMode.value && currentInterfaceMode.value !== UI_MODE_COMPACT)
+let backgroundObserver
+let backgroundResizeObserver
 const globePoints = ref([])
 const showShowcase = ref(false)
 const showcaseSectionRef = ref(null)
@@ -331,18 +511,16 @@ const sourceDbVersion = getHomeUpdateNotice(t).dbVersion
 const cachedSourceStats = getCachedSourceStats()
 const sourceLocationCount = ref(cachedSourceStats.locationCount)
 const sourceDataCount = ref(cachedSourceStats.dataCount)
+let previousDocumentOverflow = ''
+let previousBodyOverflow = ''
 
 // 当前版本号和更新时间
 const homeUpdateNotice = computed(() => getHomeUpdateNotice((key, values) => t(key, values, { locale: locale.value })))
-const updateNoticeMode = computed(() => localStorage.getItem('update-notice-mode') || 'showinfo')
 const CURRENT_VERSION = computed(() => homeUpdateNotice.value.version)
 const LAST_UPDATE_DATE = computed(() => homeUpdateNotice.value.lastUpdateDate)
 
-const heroDecorationSrc = computed(() =>
-  currentColorTheme.value === COLOR_THEME_GREEN
-    ? '/brand/GreenCircle.webp'
-    : '/brand/BlueCircle.webp'
-)
+const heroDecorationSrc = computed(() => getBrandAssets(currentColorTheme.value).decoration)
+const brandTitleSrc = computed(() => getBrandAssets(currentColorTheme.value).title)
 
 const projects = [
   {
@@ -400,20 +578,45 @@ function localeTo(path) {
 
 // reveal 淡入
 let revealObserver = null
+let revealScrollFrame = null
+let pendingRevealNodes = new Set()
+
+function revealNode(node) {
+  node.classList.add('visible')
+  pendingRevealNodes.delete(node)
+  revealObserver?.unobserve(node)
+  if (pendingRevealNodes.size === 0) {
+    window.removeEventListener('scroll', scheduleRevealFallback)
+  }
+}
+
+function scheduleRevealFallback() {
+  if (revealScrollFrame !== null) return
+  revealScrollFrame = window.requestAnimationFrame(() => {
+    revealScrollFrame = null
+    pendingRevealNodes.forEach(node => {
+      if (node.getBoundingClientRect().top < window.innerHeight) {
+        revealNode(node)
+      }
+    })
+  })
+}
+
 const initReveal = () => {
   const root = homePageRef.value
   if (!root) return
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
-  const nodes = root.querySelectorAll('.reveal')
+  const nodes = [...root.querySelectorAll('.reveal')]
   if (reduced) {
     nodes.forEach(n => n.classList.add('visible'))
     return
   }
+  pendingRevealNodes = new Set(nodes)
+  window.addEventListener('scroll', scheduleRevealFallback, { passive: true })
   revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        entry.target.classList.add('visible')
-        revealObserver.unobserve(entry.target)
+        revealNode(entry.target)
       }
     })
   }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' })
@@ -438,6 +641,48 @@ const initShowcaseLazy = () => {
 
 function scrollToFeatures() {
   document.getElementById('features-section')?.scrollIntoView({ behavior: 'smooth' })
+}
+
+function initHomeBackground() {
+  const root = homePageRef.value
+  const features = root?.querySelector('#features-section')
+  const hero = root?.querySelector('.hero-section')
+  if (!features || !hero) return
+  const updateStart = () => {
+    if (features.offsetParent) backgroundStart.value = features.offsetTop
+  }
+  updateStart()
+  backgroundResizeObserver = new ResizeObserver(updateStart)
+  backgroundResizeObserver.observe(root)
+  backgroundResizeObserver.observe(hero)
+  backgroundObserver = new IntersectionObserver(entries => {
+    if (entries.some(entry => entry.isIntersecting && entry.intersectionRatio > 0)) {
+      hasReachedFeatures.value = true
+      backgroundObserver.disconnect()
+    }
+  }, { threshold: 0.01 })
+  backgroundObserver.observe(features)
+}
+
+function toggleGlobeMode() {
+  if (isGlobeMode.value) {
+    document.documentElement.style.overflow = previousDocumentOverflow
+    document.body.style.overflow = previousBodyOverflow
+    isGlobeMode.value = false
+    return
+  }
+
+  previousDocumentOverflow = document.documentElement.style.overflow
+  previousBodyOverflow = document.body.style.overflow
+  document.documentElement.style.overflow = 'hidden'
+  document.body.style.overflow = 'hidden'
+  isGlobeMode.value = true
+}
+
+function handleGlobeModeKeydown(event) {
+  if (event.key !== 'Escape' || !isGlobeMode.value) return
+  event.preventDefault()
+  toggleGlobeMode()
 }
 
 function openZhihu() {
@@ -483,6 +728,7 @@ async function fetchGlobePoints() {
 useClickParticles()
 
 onMounted(() => {
+  window.addEventListener('keydown', handleGlobeModeKeydown)
   fetchGlobePoints()
   setTimeout(() => {
     fetchVisitStats()
@@ -490,11 +736,26 @@ onMounted(() => {
   }, 1000)
   initReveal()
   initShowcaseLazy()
+  initHomeBackground()
 })
 
 onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleGlobeModeKeydown)
   revealObserver?.disconnect()
+  revealObserver = null
+  pendingRevealNodes.clear()
+  window.removeEventListener('scroll', scheduleRevealFallback)
+  if (revealScrollFrame !== null) {
+    window.cancelAnimationFrame(revealScrollFrame)
+    revealScrollFrame = null
+  }
+  if (isGlobeMode.value) {
+    document.documentElement.style.overflow = previousDocumentOverflow
+    document.body.style.overflow = previousBodyOverflow
+  }
   showcaseObserver?.disconnect()
+  backgroundObserver?.disconnect()
+  backgroundResizeObserver?.disconnect()
 })
 </script>
 
@@ -532,6 +793,111 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   min-height: 100dvh;
   overflow-x: hidden;
   background: linear-gradient(135deg, var(--bg-body) 0%, var(--bg-light-gray) 100%);
+}
+
+.home-content-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  clip-path: inset(0);
+
+  &--ready::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 3rem;
+    background: linear-gradient(to bottom, var(--bg-body), transparent);
+  }
+}
+
+.home-globe-mode-toggle {
+  --glass-button-padding: 0;
+  --glass-button-border-radius: var(--radius-full);
+  --glass-button-color: var(--text-primary);
+  --glass-button-shadow: var(--shadow-glass-inset);
+  --glass-button-hover-shadow: var(--shadow-glass-hover);
+  --surface-glass-button: linear-gradient(135deg, var(--glass-40), var(--glass-20));
+
+  z-index: calc(var(--z-index-vocabulary-map-fullscreen) + 1);
+  align-self: flex-end;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  margin: calc(-6rem - 20px) max(18px, env(safe-area-inset-right)) 3.75rem 0;
+
+  @include glass-blur(14px, 160%);
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &--exit {
+    position: fixed;
+    right: max(18px, env(safe-area-inset-right));
+    top: max(18px, env(safe-area-inset-top));
+    align-self: auto;
+    margin: 0;
+  }
+}
+
+.home-page--globe-mode {
+  position: fixed;
+  z-index: var(--z-index-vocabulary-map-fullscreen);
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--bg-page-gradient);
+
+  > :not(.hero-section) {
+    display: none;
+  }
+
+  .hero-section {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    gap: 0;
+    padding: 0;
+    border-radius: 0;
+
+    > :not(.globe-background):not(.globe-joystick-anchor):not(.home-globe-mode-toggle) {
+      display: none;
+    }
+
+    :deep(.globe-background) {
+      inset: 0;
+      background: var(--bg-page-gradient);
+    }
+
+    :deep(.globe-static) {
+      object-position: center;
+    }
+  }
+
+  .globe-joystick-anchor {
+    position: fixed;
+    z-index: 2;
+    left: max(16px, env(safe-area-inset-left));
+    bottom: max(16px, env(safe-area-inset-bottom));
+    align-self: auto;
+    margin: 0;
+  }
+}
+
+@media (max-aspect-ratio: 1 / 1) {
+  .home-globe-mode-toggle:not(.home-globe-mode-toggle--exit) {
+    position: absolute;
+    top: 58dvh;
+    right: max(16px, calc(env(safe-area-inset-right) + 24px));
+    align-self: auto;
+    margin: 0;
+  }
 }
 
 .bg-gradient {
@@ -606,15 +972,19 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-title {
     margin-bottom: 0;
-    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    font-size: clamp(var(--font-size-20), 3vw, var(--font-size-28));
     font-weight: 600;
     letter-spacing: 0.05em;
-    color: rgba(var(--color-primary-rgb), 0.85);
+    color: var(--color-primary);
+
+    &-hover {
+      color: var(--color-primary-hover);
+    }
   }
 
   &-subtitle {
     margin-bottom: 2rem;
-    font-size: clamp(0.95rem, 2vw, 1.25rem);
+    font-size: clamp(var(--font-size-16), 2vw, var(--font-size-20));
     line-height: 1.5;
     font-weight: 500;
     color: var(--text-dark-lighter);
@@ -626,19 +996,62 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   }
 
   &-actions {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    // margin-bottom: 2rem;
+    display: inline-grid;
+    grid-template-columns: repeat(2, max-content);
+    justify-self: center;
+    gap: 0.5rem;
   }
 
   &-bottom-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    justify-content: center;
-    gap: 1.5rem;
-    // margin-bottom: 5rem;
+    gap: 0.75rem 1.25rem;
+  }
+
+  &-entry {
+    &.login-btn {
+      box-sizing: border-box;
+      gap: 0.625rem;
+      min-width: 0;
+      min-height: 48px;
+      padding: 0.625rem 0.875rem;
+      font-size: var(--font-size-16);
+      line-height: 1.25;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+
+    &-icon {
+      flex-shrink: 0;
+      font-size: var(--font-size-20);
+    }
+
+    &-arrow {
+      flex-shrink: 0;
+      width: 0.875rem;
+      height: 0.875rem;
+      opacity: 0.65;
+    }
+  }
+
+  &-features-link.login-btn {
+    grid-column: 1;
+    justify-self: center;
+    gap: 0.375rem;
+    min-height: 44px;
+    padding: 0.5rem 0.875rem;
+    font: inherit;
+    font-size: var(--font-size-14);
+    font-weight: 600;
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
   }
 
   &-decoration {
@@ -646,6 +1059,38 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     height: 72px;
     opacity: 0.85;
     animation: float 6s ease-in-out infinite;
+  }
+}
+
+@media (max-aspect-ratio: 1 / 1) {
+  .hero-actions {
+    grid-column: 1 / -1;
+  }
+
+  .hero-entry.login-btn {
+    gap: 0.25rem;
+    padding: 0.625rem 0.25rem;
+    font-size: clamp(var(--font-size-12), 3.5vw, var(--font-size-14));
+
+    .hero-entry-icon {
+      font-size: var(--font-size-16);
+    }
+
+    .hero-entry-arrow {
+      width: 0.625rem;
+      height: 0.625rem;
+    }
+  }
+
+  .hero-decoration {
+    grid-column: 2;
+    grid-row: 2;
+    width: 56px;
+    height: 56px;
+  }
+
+  .hero-features-link {
+    grid-row: 2;
   }
 }
 
@@ -669,58 +1114,6 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   50% {
     transform: translateY(-10px);
-  }
-}
-
-.btn-primary,
-.btn-secondary {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1.05rem 2.5rem;
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 1.1rem;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.3s $ease-apple;
-}
-
-.btn-primary {
-  @include primary-gradient;
-
-  color: var(--action-primary-text);
-  box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.3);
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(var(--color-primary-rgb), 0.4);
-  }
-
-  &.btn-explore {
-    background: linear-gradient(
-      135deg,
-      $success 0%,
-      $success-dark 100%
-    );
-    box-shadow: 0 4px 16px rgba(var(--color-success-rgb), 0.3);
-
-    &:hover {
-      box-shadow: 0 6px 24px rgba(var(--color-success-rgb), 0.4);
-    }
-  }
-}
-
-.btn-secondary {
-  background: var(--surface-panel);
-  border: 1.5px solid rgba(var(--color-primary-rgb), 0.3);
-  color: $primary;
-
-  &:hover {
-    background: var(--surface-panel-strong);
-    border-color: rgba(var(--color-primary-rgb), 0.5);
-    transform: translateY(-2px);
   }
 }
 
@@ -768,7 +1161,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   border: 1px solid rgba(var(--color-primary-rgb), 0.2);
   border-radius: var(--radius-full);
   color: $primary;
-  font-size: 0.8rem;
+  font-size: var(--font-size-12);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -776,7 +1169,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
 .platform-title {
   margin: 1.25rem 0 0;
-  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-size: clamp(var(--font-size-28), 4vw, var(--font-size-48));
   font-weight: 700;
   line-height: 1.2;
   color: $text-primary;
@@ -809,14 +1202,14 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   span {
     display: block;
     color: var(--text-dark-lighter);
-    font-size: 0.85rem;
+    font-size: var(--font-size-14);
     font-weight: 600;
   }
 
   strong {
     display: block;
     margin-top: 0.5rem;
-    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-size: clamp(var(--font-size-24), 3vw, var(--font-size-32));
     font-weight: 700;
     color: $primary;
   }
@@ -826,7 +1219,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &-title {
     margin-bottom: 0.5rem;
     text-align: center;
-    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-size: clamp(var(--font-size-28), 4vw, var(--font-size-48));
     font-weight: 700;
     color: $primary;
   }
@@ -834,7 +1227,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &-subtitle {
     margin-bottom: 2rem;
     text-align: center;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     font-weight: 500;
     color: var(--text-dark-lighter);
   }
@@ -924,7 +1317,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
       rgba(var(--color-primary-hover-rgb), 0.12) 100%
     );
     border-radius: var(--radius-sm2);
-    font-size: 1.25rem;
+    font-size: var(--font-size-20);
 
     @include flex-center;
   }
@@ -936,14 +1329,14 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-title {
     margin: 0;
-    font-size: 0.9rem;
+    font-size: var(--font-size-14);
     font-weight: 600;
     color: $primary;
   }
 
   &-desc {
     margin: 0;
-    font-size: 0.8rem;
+    font-size: var(--font-size-12);
     line-height: 1.5;
     color: var(--text-dark-lighter);
   }
@@ -1021,20 +1414,20 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-name {
     margin-bottom: 0.2rem;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     font-weight: 700;
     color: $text-primary;
   }
 
   &-desc {
     margin: 0;
-    font-size: 0.8125rem;
+    font-size: var(--font-size-13);
     color: var(--text-dark-lighter);
   }
 
   &-arrow {
     flex-shrink: 0;
-    font-size: 1.25rem;
+    font-size: var(--font-size-20);
     color: $primary;
     transition: transform 0.3s ease;
   }
@@ -1064,7 +1457,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-icon {
     flex-shrink: 0;
-    font-size: 2.5rem;
+    font-size: var(--font-size-48);
   }
 
   &-content {
@@ -1074,14 +1467,14 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-title {
     margin-bottom: 0.25rem;
-    font-size: 1.25rem;
+    font-size: var(--font-size-20);
     font-weight: 700;
     color: $text-primary;
   }
 
   &-desc {
     margin: 0;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     color: var(--text-dark-lighter);
   }
 
@@ -1095,7 +1488,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     border-radius: var(--radius-md);
     box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.25);
     color: var(--action-primary-text);
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s $ease-apple;
@@ -1143,7 +1536,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-icon {
     flex-shrink: 0;
-    font-size: 3rem;
+    font-size: var(--font-size-48);
   }
 
   &-content {
@@ -1153,14 +1546,14 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-title {
     margin-bottom: 0.5rem;
-    font-size: 1.375rem;
+    font-size: var(--font-size-24);
     font-weight: 700;
     color: $primary;
   }
 
   &-desc {
     margin-bottom: 1rem;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     line-height: 1.5;
     color: var(--text-dark-lighter);
   }
@@ -1185,7 +1578,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     border: none;
     border-radius: var(--radius-md);
     white-space: nowrap;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     font-weight: 600;
     text-decoration: none;
     cursor: pointer;
@@ -1215,8 +1608,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
         box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.2);
         transform: translateY(-2px);
 
-        :root[data-color-theme='green'] &,
-        :root[data-color-theme='dark'] & {
+        :root[data-color-mode='dark'] & {
           color: var(--text-primary);
           background: var(--surface-panel-strong);
         }
@@ -1233,14 +1625,30 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     padding: 0.625rem 0.875rem;
     background: var(--glass-60);
     border-radius: var(--radius-sm2);
-    font-size: 0.875rem;
+    font-size: var(--font-size-14);
     font-weight: 500;
     color: $text-primary;
   }
 
   &-icon {
-    font-size: 1.125rem;
+    font-size: var(--font-size-18);
   }
+}
+
+.home-history-title {
+  padding-top: clamp(1rem, 3vw, 2rem);
+  color: var(--color-primary);
+  font-size: clamp(var(--font-size-28), 4vw, var(--font-size-48));
+  font-weight: 700;
+
+  @media (max-aspect-ratio: 1 / 1) {
+    font-size: var(--font-size-28);
+  }
+}
+
+.home-history-actions {
+  @include flex-center;
+  margin-top: 1.5rem;
 }
 
 /* Footer */
@@ -1271,7 +1679,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     padding: 0.25rem 0.5rem;
     border-radius: var(--radius-sm);
     color: $primary;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     font-weight: 500;
     text-decoration: none;
     cursor: pointer;
@@ -1309,18 +1717,18 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &-text {
     margin: 0;
-    font-size: 0.8125rem;
+    font-size: var(--font-size-13);
     color: var(--text-secondary);
   }
 }
 
 .stat-text {
-  font-size: 0.875rem;
+  font-size: var(--font-size-14);
   font-weight: 500;
   color: var(--text-dark-lighter);
 
   &-muted {
-    font-size: 0.8125rem;
+    font-size: var(--font-size-13);
     color: var(--text-secondary);
   }
 }
@@ -1346,7 +1754,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &-title {
     margin-bottom: 0.5rem;
     text-align: center;
-    font-size: 1.75rem;
+    font-size: var(--font-size-28);
     font-weight: 700;
     color: $primary;
   }
@@ -1388,7 +1796,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &-label {
     margin-top: 0.625rem;
     text-align: center;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     font-weight: 600;
     color: $text-primary;
   }
@@ -1413,7 +1821,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
     &-subtitle {
       margin-top: 0;
-      font-size: clamp(0.7rem, 3dvw, 1.1rem);
+      font-size: clamp(var(--font-size-12), 3dvw, var(--font-size-18));
     }
 
     &-content {
@@ -1422,7 +1830,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
       text-align: center;
     }
 
-    &-content:has(+ .globe-joystick-anchor:not(:empty)) {
+    &-content:has(+ .home-globe-mode-toggle + .globe-joystick-anchor:not(:empty)) {
       margin-bottom: 1rem;
     }
 
@@ -1430,12 +1838,6 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
       display: block;
       width: clamp(180px, 50vw, 340px);
       margin: 0 auto;
-    }
-
-    &-actions {
-      align-items: center;
-      flex-direction: column;
-      gap: 0.75rem;
     }
   }
 
@@ -1515,7 +1917,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     }
 
     &-title {
-      font-size: 1.5rem;
+      font-size: var(--font-size-24);
     }
   }
 
@@ -1527,12 +1929,6 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 }
 
 @media (max-width: 600px) {
-  .btn-primary,
-  .btn-secondary {
-    padding: 0.7rem 1.5rem;
-    font-size: 0.9375rem;
-  }
-
   .projects-grid {
     gap: 0.625rem;
   }
@@ -1548,11 +1944,11 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     }
 
     &-title {
-      font-size: 1.125rem;
+      font-size: var(--font-size-18);
     }
 
     &-desc {
-      font-size: 0.875rem;
+      font-size: var(--font-size-14);
     }
   }
 }

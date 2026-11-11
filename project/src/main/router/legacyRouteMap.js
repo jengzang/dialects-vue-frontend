@@ -63,9 +63,9 @@ export const MENU_LEGACY_ROUTES = {
   villages: {
     defaultPath: '/menu/villages'
   },
-  cluster: {
-    defaultPath: '/menu/cluster'
-  }
+  // cluster: {
+  //   defaultPath: '/menu/cluster'
+  // }
 }
 
 export const EXPLORE_LEGACY_ROUTES = {

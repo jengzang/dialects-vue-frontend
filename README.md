@@ -5,6 +5,7 @@
 [![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?logo=vue.js)](https://vuejs.org/)
 [![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite)](https://vite.dev/)
 [![MapLibre GL](https://img.shields.io/badge/MapLibre%20GL-5-396CB2)](https://maplibre.org/)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/jengzang/dialects-vue-frontend)
 
 **線上使用：** [dialects.yzup.top](https://dialects.yzup.top)
 

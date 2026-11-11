@@ -1,6 +1,13 @@
 <!-- src/layouts/MenuLayout.vue -->
 <template>
-  <div class="menu-bg">
+  <div
+    class="menu-bg"
+    :class="{ 'blue-art-layout': useLayoutBackground && backgroundReady }"
+  >
+    <BlueLayoutBackground
+      v-if="useLayoutBackground"
+      @ready="backgroundReady = $event"
+    />
     <NavBar />
     <!--    <FloatingHeader v-if="shouldShowHeader" />-->
     <!-- 內容區：注意底部留白避免被 tab 擋住 -->
@@ -33,6 +40,12 @@ import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 import PanelManager from '@/main/components/result/PanelManager.vue'
 import ScrollToTop from '@/components/common/ScrollToTop.vue'
 import AppFooter from '@/components/footer/AppFooter.vue'
+import BlueLayoutBackground from '@/components/common/BlueLayoutBackground.vue'
+import { computed, ref } from 'vue'
+import { currentInterfaceMode, UI_MODE_COMPACT } from '@/composables/core/uiPreferences.js'
+
+const backgroundReady = ref(false)
+const useLayoutBackground = computed(() => currentInterfaceMode.value !== UI_MODE_COMPACT)
 
 const keepAliveViewNames = [
   'ComparePage',
@@ -115,7 +128,7 @@ $portrait-ratio: 1;
 
   .glass-content {
     padding: 16dvh 8px 8px;
-    font-size: 1.1rem;
+    font-size: var(--font-size-18);
     line-height: 1.6;
   }
 }
@@ -123,7 +136,7 @@ $portrait-ratio: 1;
 /* 中等宽度 */
 @media (min-width: 481px) and (max-width: 768px) {
   .glass-content {
-    font-size: 1rem;
+    font-size: var(--font-size-16);
     line-height: 1.5;
   }
 }
@@ -131,7 +144,7 @@ $portrait-ratio: 1;
 /* 桌面端 */
 @media (min-width: 769px) {
   .glass-content {
-    font-size: 0.95rem;
+    font-size: var(--font-size-16);
     line-height: 1.4;
   }
 }

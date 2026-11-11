@@ -14,207 +14,133 @@
         {{ activePageTitle }}
       </h1>
 
-      <div v-show="currentTab === 'tab1'" class="query-page-panel glass-panel">
-        <div class="page-content-stack">
-          <!-- 🔹 輸入框區塊 -->
-          <div class="query-box">
-            <label class="query-label" for="hanzi-input">{{ $t('query.tab1.label') }}</label>
-            <textarea
-                id="hanzi-input"
-                style="height: 5dvh;white-space:nowrap;width:min(80dvw,500px)"
-                :placeholder="$t('query.tab1.placeholder')"
-                v-model="hanziInput"
-                @input="handleHanziInput"
-                autocomplete="off"
-            ></textarea>
-          </div>
-        </div>
+      <div v-show="currentTab === 'tab1'" class="query-hero">
+        <textarea
+            id="hanzi-input"
+            class="query-hero-input"
+            rows="1"
+            :aria-label="$t('query.tab1.label')"
+            :placeholder="$t('query.tab1.placeholder')"
+            v-model="hanziInput"
+            @input="handleHanziInput"
+            autocomplete="off"
+        ></textarea>
+      </div>
+      <RouterLink
+          v-show="currentTab === 'tab1'"
+          class="query-cross-link"
+          :to="notesQueryLink"
+      >
+        {{ $t('query.tab1.notesCrossLink') }}
+        <svg
+            class="query-cross-link-arrow"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+        >
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </svg>
+      </RouterLink>
+
+
+      <div v-show="currentTab === 'tab2'" class="card-row-outer">
+        <CardExcludeRow
+          v-model="tabStates.tab2.card"
+          v-model:exclude-values="tabStates.tab2.excludeColumns"
+          :options="cardOptions"
+          :aria-label="$t('query.tab2.title')"
+          :exclude-options="excludeOptions"
+          :open="excludeDropdownOpen === 'tab2'"
+          :disabled="buttonState.isRunning"
+          :no-exclude-text="$t('query.tab2.noExclude')"
+          @toggle="toggleExcludeDropdown('tab2')"
+        />
       </div>
 
-
       <div v-show="currentTab === 'tab2'" class="query-page-panel glass-panel">
-        <div class="page-content-stack">
-          <!-- 直接輸入模式 -->
-          <div v-if="zhongguInputMode === 'direct'" class="direct-input-box">
-            <div class="card-row">
-              <ChoiceSelector
-                v-model="tabStates.tab2.card"
-                :options="cardOptions"
-                :aria-label="$t('query.tab2.title')"
-              />
-              <div class="dropdown"
-                   :ref="(el) => excludeFilterTriggerRef.tab2 = el"
-                   @click="toggleExcludeDropdown('tab2')"
-                   style="margin: 0;padding: 8px 10px;min-width: 60px;max-height:30px"
-                   :class="{ disabled: buttonState.isRunning }"
-              >
-                {{ getExcludeDisplayText('tab2') || $t('query.tab2.noExclude') }}
-                <span class="arrow">▾</span>
-              </div>
-              <Teleport to="body">
-                <div
-                    v-if="excludeDropdownOpen === 'tab2'"
-                    class="dropdown-panel glass-dropdown-panel"
-                    :style="excludeDropdownStyle"
-                >
-                  <div
-                      class="dropdown-item glass-dropdown-item"
-                      v-for="option in excludeOptions"
-                      :key="option.value"
-                      :class="{ active: isExcludeSelected(option.value, 'tab2') }"
-                      @click="toggleExcludeOption(option.value, 'tab2')"
-                  >
-                    <span class="check-icon">{{ isExcludeSelected(option.value, 'tab2') ? '✓' : '' }}</span>
-                    {{ option.label }}
-                  </div>
-                </div>
-              </Teleport>
-            </div>
-            <ZhongGuDirectInput
+        <p v-if="zhongguInputMode !== 'direct'" class="panel-hint">{{ $t('query.tab2.selectHint') }}</p>
+        <!-- 直接輸入模式 -->
+        <div v-if="zhongguInputMode === 'direct'" class="direct-input-box">
+          <ZhongGuDirectInput
+            :exclude-columns="tabStates.tab2.excludeColumns"
+            :table-name="selectedCharacterTable"
+            @update:runDisabled="setTabContentDisabled('query', 'tab2', $event)"
+            ref="ZhongguDirectInputRef"
+          />
+        </div>
+
+        <!-- 選擇器模式 -->
+        <div v-else class="triple-select-box">
+          <!-- ✅ 鍵名 + 鍵值：同一行，用容器包 -->
+          <div class="dropdown-row">
+            <KeyButtonGroup
+              :available-keys="availableKeys"
+              v-model="tabStates.tab2.keys"
+              :exclusive-rules="exclusiveRules"
+              :single-select-keys="singleSelectKeys"
+            />
+            <DropdownValueSelector
+              :selected-keys="tabStates.tab2.keys"
+              v-model="tabStates.tab2.valueMap"
+              :key-value-map="keyValueMap"
+            />
+          </div>
+          <ZhongguSelector
+              :active-keys="tabStates.tab2.keys"
+              :value-map="tabStates.tab2.valueMap"
+              :is-dropdown-open="excludeDropdownOpen === 'tab2'"
+              :selected-card="tabStates.tab2.card"
               :exclude-columns="tabStates.tab2.excludeColumns"
               :table-name="selectedCharacterTable"
               @update:runDisabled="setTabContentDisabled('query', 'tab2', $event)"
-              ref="ZhongguDirectInputRef"
-            />
-          </div>
-
-          <!-- 選擇器模式 -->
-          <div v-else class="triple-select-box">
-            <!-- ✅ 卡片選擇區：獨立一行 -->
-            <div class="card-row">
-              <ChoiceSelector
-                v-model="tabStates.tab2.card"
-                :options="cardOptions"
-                :aria-label="$t('query.tab2.title')"
-              />
-
-                <div class="dropdown"
-                     :ref="(el) => excludeFilterTriggerRef.tab2 = el"
-                     @click="toggleExcludeDropdown('tab2')"
-                     style="margin: 0;padding: 8px 10px;min-width: 60px;max-height:30px "
-                     :class="{ disabled: buttonState.isRunning }"
-                >
-                  {{ getExcludeDisplayText('tab2') || $t('query.tab2.noExclude') }}
-                  <span class="arrow">▾</span>
-                </div>
-
-                <Teleport to="body">
-                  <div
-                      v-if="excludeDropdownOpen === 'tab2'"
-                      class="dropdown-panel glass-dropdown-panel"
-                      :style="excludeDropdownStyle"
-                  >
-                    <div
-                        class="dropdown-item glass-dropdown-item"
-                        v-for="option in excludeOptions"
-                        :key="option.value"
-                        :class="{ active: isExcludeSelected(option.value, 'tab2') }"
-                        @click="toggleExcludeOption(option.value, 'tab2')"
-                    >
-                      <span class="check-icon">{{ isExcludeSelected(option.value, 'tab2') ? '✓' : '' }}</span>
-                      {{ option.label }}
-                    </div>
-                  </div>
-                </Teleport>
-
-            </div>
-
-            <!-- ✅ 鍵名 + 鍵值：同一行，用容器包 -->
-            <div class="dropdown-row">
-              <KeyButtonGroup
-                :available-keys="availableKeys"
-                v-model="tabStates.tab2.keys"
-                :exclusive-rules="exclusiveRules"
-                :single-select-keys="singleSelectKeys"
-              />
-              <DropdownValueSelector
-                :selected-keys="tabStates.tab2.keys"
-                v-model="tabStates.tab2.valueMap"
-                :key-value-map="keyValueMap"
-              />
-            </div>
-            <ZhongguSelector
-                :active-keys="tabStates.tab2.keys"
-                :value-map="tabStates.tab2.valueMap"
-                :is-dropdown-open="excludeDropdownOpen === 'tab2'"
-                :selected-card="tabStates.tab2.card"
-                :exclude-columns="tabStates.tab2.excludeColumns"
-                :table-name="selectedCharacterTable"
-                @update:runDisabled="setTabContentDisabled('query', 'tab2', $event)"
-                ref="ZhongguRef"
-            />
-          </div>
+              ref="ZhongguRef"
+          />
         </div>
       </div>
 
       <!-- 📤 tab3：查音位頁面 -->
+      <div v-show="currentTab === 'tab3'" class="card-row-outer">
+        <CardExcludeRow
+          v-model="tabStates.tab3.card"
+          v-model:exclude-values="tabStates.tab3.excludeColumns"
+          :options="cardOptions"
+          :aria-label="$t('query.tab3.title')"
+          :exclude-options="excludeOptions"
+          :open="excludeDropdownOpen === 'tab3'"
+          :disabled="buttonState.isRunning"
+          :no-exclude-text="$t('query.tab3.noExclude')"
+          @toggle="toggleExcludeDropdown('tab3')"
+        />
+      </div>
+
       <div v-show="currentTab === 'tab3'" class="query-page-panel glass-panel">
-        <div class="page-content-stack">
-          <!-- 三欄選擇 -->
-          <div class="triple-select-box">
-            <!-- ✅ 卡片選擇區：獨立一行 -->
-            <div class="card-row">
-              <ChoiceSelector
-                v-model="tabStates.tab3.card"
-                :options="cardOptions"
-                :aria-label="$t('query.tab3.title')"
-              />
+        <p class="panel-hint">{{ $t('query.tab3.selectHint') }}</p>
+        <!-- 三欄選擇 -->
+        <div class="triple-select-box">
+          <div class="dropdown-row">
+            <KeyButtonGroup
+              :available-keys="availableKeys"
+              v-model="tabStates.tab3.keys"
+              :exclusive-rules="exclusiveRules"
+              :single-select-keys="singleSelectKeys"
+            />
 
-              <!-- ✨ 過濾器下拉框 -->
+            <!-- 🔄 輸入框 -->
+            <YinweiSelector
+                ref="YinweiSelectorRef"
+                :locationRef="locationRef"
+                :selected-card="tabStates.tab3.card"
+                @update:runDisabled="setTabContentDisabled('query', 'tab3', $event)"
+            />
 
-                <div
-                    class="dropdown"
-                    :ref="(el) => excludeFilterTriggerRef.tab3 = el"
-                    @click="toggleExcludeDropdown('tab3')"
-                    style="margin: 0;padding: 8px 10px;min-width: 60px;max-height:30px "
-                    :class="{ disabled: buttonState.isRunning }"
-                >
-                  {{ getExcludeDisplayText('tab3') || $t('query.tab3.noExclude') }}
-                  <span class="arrow">▾</span>
-                </div>
-
-                <Teleport to="body">
-                  <div
-                      v-if="excludeDropdownOpen === 'tab3'"
-                      class="dropdown-panel glass-dropdown-panel"
-                      :style="excludeDropdownStyle"
-                  >
-
-                    <div
-                        class="dropdown-item glass-dropdown-item"
-                        v-for="option in excludeOptions"
-                        :key="option.value"
-                        :class="{ active: isExcludeSelected(option.value, 'tab3') }"
-                        @click="toggleExcludeOption(option.value, 'tab3')"
-                    >
-                      <span class="check-icon">{{ isExcludeSelected(option.value, 'tab3') ? '✓' : '' }}</span>
-                      {{ option.label }}
-                    </div>
-                  </div>
-                </Teleport>
-
-            </div>
-
-            <div class="dropdown-row">
-              <KeyButtonGroup
-                :available-keys="availableKeys"
-                v-model="tabStates.tab3.keys"
-                :exclusive-rules="exclusiveRules"
-                :single-select-keys="singleSelectKeys"
-              />
-
-              <!-- 🔄 輸入框 -->
-              <YinweiSelector
-                  ref="YinweiSelectorRef"
-                  :locationRef="locationRef"
-                  :selected-card="tabStates.tab3.card"
-                  @update:runDisabled="setTabContentDisabled('query', 'tab3', $event)"
-              />
-
-              <div class="info-text" style="margin: 10px 0 15px">
-                <span class="info-icon">ℹ️</span>
-                <span v-html="$t('query.tab3.analysisText', { card: tabStates.tab3.card, keys: selectedKeysString })"></span>
-              </div>
+            <div class="info-text" style="margin: 10px 0 15px">
+              <span class="info-icon">ℹ️</span>
+              <span v-html="$t('query.tab3.analysisText', { card: tabStates.tab3.card, keys: selectedKeysString })"></span>
             </div>
           </div>
         </div>
@@ -283,7 +209,7 @@ import ZhongGuDirectInput from "@/main/components/query/ZhongGuDirectInput.vue";
 import YinweiSelector from "@/main/components/query/YinweiSelector.vue";
 import KeyButtonGroup from "@/main/components/query/KeyButtonGroup.vue";
 import DropdownValueSelector from "@/main/components/query/DropdownValueSelector.vue";
-import ChoiceSelector from "@/components/selector/ChoiceSelector.vue";
+import CardExcludeRow from "@/components/selector/CardExcludeRow.vue";
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import {
   globalPayload,
@@ -352,6 +278,11 @@ const pageTitleIcons = {
 const activePageTitle = computed(() => t(pageTitleKeys[currentTab.value] || pageTitleKeys.tab2))
 const activePageIcon = computed(() => pageTitleIcons[currentTab.value] || pageTitleIcons.tab2)
 
+const notesQueryLink = computed(() => ({
+  path: buildLocalePath(resolveRouteLocale(route), '/menu/vocabulary/view'),
+  query: { source: 'character-notes' },
+}))
+
 // Compute limit context based on current tab
 const locationLimitContext = computed(() => {
   return currentTab.value  // 'tab1', 'tab2', 'tab3', or 'tab4'
@@ -377,14 +308,7 @@ const excludeOptions = computed(() => {
 
   return options
 })
-const excludeFilterTriggerRef = reactive({ tab2: null, tab3: null })
 const excludeDropdownOpen = ref(null) // 'tab2' 或 'tab3' 或 null
-const excludeDropdownStyle = ref({
-  position: 'absolute',
-  top: '0px',
-  left: '0px',
-  zIndex: 99999
-})
 
 const tabStates = reactive({
   tab2: {
@@ -603,9 +527,8 @@ function onClickOutside(event) {
   const isInsideTrigger = [
     keyTriggerEl.value,
     tab3KeyTriggerEl.value,
-    // ✨ 检查过滤器 triggers
-    excludeFilterTriggerRef.tab2,
-    excludeFilterTriggerRef.tab3
+    // ✨ 检查过滤器 trigger
+    event.target.closest('.card-exclude-trigger')
   ].some(el => el?.contains(event.target))
 
   const isInsidePanel = event.target.closest('.dropdown-panel')
@@ -616,64 +539,10 @@ function onClickOutside(event) {
 }
 
 // ✨ 過濾器相關函數
-// 獲取過濾器顯示文本
-function getExcludeDisplayText(tab) {
-  const list = tabStates[tab]?.excludeColumns || []
-  if (list.length === 0) return ''
-
-  // ✨ 新增：将 value 转换为 label
-  const labels = list.map(value => {
-    const option = excludeOptions.value.find(opt => opt.value === value)
-    return option ? option.label : value  // 找不到就用原值
-  })
-
-  if (labels.length > 2) {
-    return `${labels.slice(0, 1).join(', ')}...`
-  }
-  return labels.join(', ')
-}
-
-
-
-// 判斷單項是否選中
-function isExcludeSelected(value, tab) {
-  const list = tabStates[tab]?.excludeColumns || []
-  return list.includes(value)
-}
-
 // 切換過濾器下拉框
 function toggleExcludeDropdown(tab) {
   if (buttonState.isRunning) return
-
-  if (excludeDropdownOpen.value === tab) {
-    excludeDropdownOpen.value = null
-  } else {
-    excludeDropdownOpen.value = tab
-    nextTick(() => {
-      const triggerEl = excludeFilterTriggerRef[tab]
-      if (triggerEl) {
-        const rect = triggerEl.getBoundingClientRect()
-        excludeDropdownStyle.value = {
-          position: 'absolute',
-          top: `${rect.top + rect.height + window.scrollY}px`,
-          left: `${rect.left + window.scrollX}px`,
-          zIndex: 99999
-        }
-      }
-    })
-  }
-}
-
-// 切換單個選項
-function toggleExcludeOption(value, tab) {
-  const list = tabStates[tab].excludeColumns
-  const index = list.indexOf(value)
-
-  if (index > -1) {
-    list.splice(index, 1)
-  } else {
-    list.push(value)
-  }
+  excludeDropdownOpen.value = excludeDropdownOpen.value === tab ? null : tab
 }
 
 // isRunning 状态已移至 uiStore，不再需要本地定义
@@ -947,14 +816,90 @@ export default {
   margin-bottom: 1.5dvh;
 }
 
+.query-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.query-hero::after {
+  content: '';
+  width: min(90dvw, 600px);
+  margin-top: 1dvh;
+  border-bottom: 1px solid var(--border-control-focus);
+}
+
+.query-cross-link {
+  margin-top: 1.2dvh;
+  margin-bottom: 1.2dvh;
+  color: var(--color-secondary);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-16);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  transition: color 0.2s ease;
+}
+
+.query-cross-link:hover {
+  color: var(--color-secondary-hover);
+  text-decoration-thickness: 2px;
+}
+
+.query-cross-link-arrow {
+  width: 1em;
+  height: 1em;
+  margin-left: 0.35em;
+  vertical-align: -0.1em;
+  transition: transform 0.2s ease;
+}
+
+.query-cross-link:hover .query-cross-link-arrow {
+  transform: translateX(3px);
+}
+
+.query-hero-input {
+  --query-hero-input-height: clamp(64px, 9dvh, 92px);
+  width: min(90dvw, 600px);
+  max-width: none;
+  height: var(--query-hero-input-height);
+  box-sizing: border-box;
+  padding: 0 1.5rem;
+  font-family: var(--font-sans);
+  font-size: clamp(var(--font-size-24), 3.2dvh, var(--font-size-32));
+  line-height: calc(var(--query-hero-input-height) - 4px);
+  text-align: center;
+  color: var(--text-primary);
+  background: var(--surface-panel);
+  border: 2px solid var(--border-control-focus);
+  border-radius: var(--radius-lg);
+  resize: none;
+  white-space: nowrap;
+  overflow-x: auto;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.query-hero-input::placeholder {
+  font-size: var(--font-size-18);
+  color: var(--text-tertiary);
+}
+
+.query-hero-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--focus-ring);
+}
+
 .query-page-panel {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5dvh;
   margin: 0 auto;
   padding: 2dvh;
   max-height: 35dvh;
   overflow-y: auto;
-  font-size: 18px;
+  font-size: var(--font-size-18);
 }
 
 @media (max-aspect-ratio: 1/1) {
@@ -964,7 +909,17 @@ export default {
 
   .query-page-panel {
     padding: 10px;
-    font-size: 16px;
+    font-size: var(--font-size-16);
+  }
+
+  .query-hero-input {
+    --query-hero-input-height: 60px;
+    padding: 0 4px;
+    font-size: var(--font-size-20);
+  }
+
+  .query-hero-input::placeholder {
+    font-size: var(--font-size-16);
   }
 }
 
@@ -1002,25 +957,22 @@ export default {
   flex-direction: column;
 }
 
-.page-content-stack {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5dvh;
+.panel-hint {
+  display: none;
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--font-size-13);
 }
 
-.card-row {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap; /* ✨ 支持自动换行 */
-}
-@media (max-aspect-ratio: 1/1) {
-  .card-row{
-    gap:0;
+@media (min-aspect-ratio: 1/1) {
+  .panel-hint {
+    display: block;
   }
+}
+
+.card-row-outer {
+  width: min(90dvw, 600px);
+  margin: 0 auto 1.2dvh;
 }
 
 .dropdown-row {
@@ -1030,184 +982,6 @@ export default {
   white-space: nowrap;
   flex-direction: column;
   align-items: center;
-}
-
-.button-group{
-  flex-wrap: wrap; /* 按钮换行 */
-  display: flex;
-  justify-content: center;
-  border-bottom: 1px solid var(--color-blue-dark);  /* 添加苹果蓝色调的下划线 */
-}
-.key-item {
-  flex: 0 1 auto; /* 保证它们的大小适应内容 */
-}
-/* 键名按钮样式 */
-.key-button {
-  padding: 8px 16px;
-  border: 1px solid var(--color-primary-medium);
-  border-radius: 12px;
-  background: var(--glass-30);
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: background 0.3s ease;
-  font-size: 14px;
-  margin: 5px;
-}
-
-@media(max-width: 600px) {
-  .key-button{
-    padding: 8px 10px;
-    margin: 3px;
-  }
-}
-
-.key-button.active {
-  background: var(--color-primary-medium2);
-  color: var(--action-primary-text);
-  font-weight: 600;
-}
-.key-dropdown-group{
-  display: flex;
-  flex-wrap: wrap;
-  column-gap:30px;
-}
-/* 键值展示样式 */
-.key-value-dropdown {
-  margin-top: 10px;
-  display: flex;
-  flex-direction: row;
-  width: 135px;
-}
-.key-name{
-  align-self: center;
-}
-
-.key-value-dropdown .dropdown-item {
-  padding: 8px 16px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s;
-  border-radius: 8px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.key-value-dropdown .dropdown-item:hover {
-  background-color: var(--color-blue-very-light);
-}
-
-/* 选中的键名显示的效果 */
-.key-value-dropdown .dropdown-item.active {
-  background-color: var(--color-primary-medium);
-  color: var(--color-primary);
-}
-
-/* 下拉菜单分割线 */
-.dropdown-divider {
-  height: 1px;
-  background: var(--border-divider);
-  margin: 2px 0;
-}
-
-/* 键名文字颜色 */
-.key-name-text {
-  color: var(--color-blue-custom);
-}
-
-/* 下拉框包装器 */
-.dropdown-wrapper {
-  display: flex;
-  align-items: stretch;
-  border: 1px solid var(--color-primary-medium);
-  border-radius: 8px;
-  overflow: hidden;
-  background: var(--glass-light);
-}
-
-/* 输入框样式 */
-.dropdown-input {
-  flex: 1;
-  border: none;
-  outline: none;
-  padding: 8px 0px;
-  font-size: 14px;
-  background: transparent;
-  width: 80px;
-  color: var(--text-dark);
-  text-align: center;
-}
-
-.dropdown-input::placeholder {
-  color: #6a6a6a;
-  font-size: 12px;
-  text-align: center;
-}
-
-/* 箭头触发区域 */
-.arrow-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  background: var(--color-primary-medium);
-  border-left: 1px solid rgba(255, 255, 255, 0.3);
-  transition: all 0.2s ease;
-  user-select: none;
-  min-width: 36px;
-  max-width: 36px;
-}
-
-.arrow-trigger:hover {
-  background: var(--color-primary-medium2);
-}
-
-.arrow-trigger:active {
-  transform: scale(0.95);
-}
-
-.arrow-icon {
-  font-size: 14px;
-  color: white;
-  font-weight: bold;
-}
-
-/* 全选按钮特殊样式 */
-.select-all-item {
-  color: var(--text-tertiary);
-  font-size: 0.9em;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.check-icon {
-  width: 16px;
-  display: inline-block;
-}
-
-/* Dropdown 样式 */
-
-/* Dropdown 触发器样式（用于 tab2/tab3 的"不排除"下拉框） */
-.dropdown {
-  padding: 6px 12px;
-  border-radius: var(--radius-md);
-  background: var(--glass-light);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  cursor: pointer;
-  font-size: 14px;
-  border: 1px solid rgba(200, 200, 200, 0.5);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  min-width: 80px;
-  margin: auto;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.dropdown:hover {
-  background: var(--glass-medium);
-  border-color: var(--color-primary);
 }
 
 

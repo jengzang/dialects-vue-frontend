@@ -197,7 +197,6 @@ import AppModal from '@/components/common/AppModal.vue'
 import RegionDisplay from '@/VillagesML/components/RegionDisplay.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
-import * as echarts from 'echarts'
 import {
     getRegionalAggregatesCity,
     getRegionalAggregatesCounty,
@@ -207,6 +206,7 @@ import {
 import { showError } from '@/utils/ui/message.js'
 import { SEMANTIC_FEATURE_KEYS, SEMANTIC_CATEGORY_NAMES } from '@/VillagesML/config/villagesML.js'
 import { useAsyncData } from '@/composables/core/useAsyncData.js'
+import { initChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 
 // State
 const currentLevel = ref('city')
@@ -324,7 +324,7 @@ const loadSpatialAggregates = async () => {
 function renderSpatialChart() {
   if (!spatialChart.value || !spatialAggregates.value.length) return
   if (spatialChartInstance) spatialChartInstance.dispose()
-  spatialChartInstance = echarts.init(spatialChart.value)
+  spatialChartInstance = initChart(spatialChart.value)
 
   const seen = new Set()
   const items = spatialAggregates.value.filter(d => {
@@ -391,8 +391,7 @@ function renderSpatialChart() {
         show: true,
         formatter: p => p.data.name,
         position: 'top',
-        fontSize: 11,
-        color: '#555'
+        fontSize: 11
       },
       emphasis: { scale: 1.2 }
     }]
@@ -408,6 +407,10 @@ watch(spatialAggregates, async (val) => {
   requestAnimationFrame(() => {
     renderSpatialChart()
   })
+})
+
+onChartThemeChange(() => {
+  renderSpatialChart()
 })
 
 onBeforeUnmount(() => {
@@ -426,7 +429,7 @@ onBeforeUnmount(() => {
 }
 
 .page-title {
-  font-size: 32px;
+  font-size: var(--font-size-32);
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 16px;
@@ -459,7 +462,7 @@ onBeforeUnmount(() => {
   padding: 10px 16px;
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   background: var(--glass-50);
 }
 
@@ -484,13 +487,13 @@ onBeforeUnmount(() => {
 }
 
 .stat-label {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-bottom: 8px;
 }
 
 .stat-value {
-  font-size: 28px;
+  font-size: var(--font-size-28);
   font-weight: 700;
   color: var(--color-primary);
 }
@@ -551,7 +554,7 @@ onBeforeUnmount(() => {
   background: rgba(var(--vml-blue-rgb), 0.2);
   color: var(--color-primary);
   border-radius: var(--radius-xs);
-  font-size: 11px;
+  font-size: var(--font-size-12);
   font-weight: 600;
   cursor: help;
   white-space: nowrap;
@@ -563,7 +566,7 @@ onBeforeUnmount(() => {
   color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -600,7 +603,7 @@ onBeforeUnmount(() => {
 
 .regional-detail-title {
   margin: 0;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   color: var(--text-primary);
 }
 
@@ -633,7 +636,7 @@ onBeforeUnmount(() => {
 }
 
 .categories-chart h4 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   margin-bottom: 16px;
   color: var(--text-primary);
 }
@@ -651,7 +654,7 @@ onBeforeUnmount(() => {
 }
 
 .bar-label {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   color: var(--text-primary);
 }
@@ -670,14 +673,14 @@ onBeforeUnmount(() => {
 }
 
 .bar-value {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--color-primary);
   text-align: right;
 }
 
 .statistics-section h4 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   margin-bottom: 16px;
   color: var(--text-primary);
 }
@@ -696,13 +699,13 @@ onBeforeUnmount(() => {
 }
 
 .stat-item .stat-label {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   margin-bottom: 6px;
 }
 
 .stat-item .stat-value {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--color-primary);
 }
@@ -723,7 +726,7 @@ onBeforeUnmount(() => {
 }
 
 .spatial-desc {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   margin: 0 0 8px 0;
 }
@@ -745,7 +748,7 @@ onBeforeUnmount(() => {
 
 @media (max-width: 768px) {
   .page-title {
-    font-size: 24px;
+    font-size: var(--font-size-24);
   }
 
   .level-selector {

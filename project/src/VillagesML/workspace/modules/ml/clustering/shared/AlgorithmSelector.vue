@@ -72,18 +72,18 @@ const algorithmHint = computed(() => {
   border: 1px solid var(--bg-hover-strong);
   border-radius: var(--radius-sm2);
   background: var(--glass-90);
-  font-size: 0.95rem;
+  font-size: var(--font-size-16);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .setting-select:hover {
-  border-color: var(--primary-color);
+  border-color: var(--vml-blue);
 }
 
 .setting-select:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: var(--vml-blue);
   box-shadow: 0 0 0 3px rgba(var(--vml-blue-rgb), 0.1);
 }
 

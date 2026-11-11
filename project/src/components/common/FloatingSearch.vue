@@ -107,7 +107,7 @@ const close = () => {
   width: 40px;
   height: 40px;
   padding: 0;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   line-height: 1;
   color: var(--color-primary);
   cursor: pointer;
@@ -120,7 +120,7 @@ const close = () => {
   min-width: 0;
   height: 100%;
   padding: 0 8px 0 0;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-deep);
   background: transparent;
   border: none;
@@ -136,7 +136,7 @@ const close = () => {
   width: 36px;
   height: 40px;
   padding: 0;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   line-height: 1;
   color: var(--text-secondary);
   cursor: pointer;

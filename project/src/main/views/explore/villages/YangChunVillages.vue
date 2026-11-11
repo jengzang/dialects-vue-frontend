@@ -191,7 +191,7 @@ $transition-base: 0.3s;
   p {
     margin: 0 0 12px;
     color: $text-secondary;
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -204,7 +204,7 @@ $transition-base: 0.3s;
 
 .cross-link {
   color: var(--color-primary);
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   font-weight: 500;
   white-space: nowrap;
   text-decoration: none;
@@ -219,7 +219,7 @@ $transition-base: 0.3s;
 
 .title {
   margin: 0;
-  font-size: 22px;
+  font-size: var(--font-size-24);
   font-weight: 700;
 }
 
@@ -240,7 +240,7 @@ $transition-base: 0.3s;
 .village-link-btn {
   padding: 8px 6px;
   color: $button-blue;
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   font-weight: 1000;
   white-space: nowrap;
   cursor: pointer;

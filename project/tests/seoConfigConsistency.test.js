@@ -40,14 +40,19 @@ describe('SEO config consistency', () => {
       '/menu/result',
       '/explore/manage',
       '/explore/villages/all',
-      '/explore/features',
-      '/explore/history',
+      '/menu/about/history',
     ]) {
       expect(SEO_CONFIG.routes[pathname]?.title, `${pathname} title`).toBeTruthy()
       expect(SEO_CONFIG.routes[pathname]?.description, `${pathname} description`).toBeTruthy()
       expect(NOINDEX_PATHS.has(pathname), `${pathname} noindex`).toBe(true)
       expect(SITEMAP_PATHS, `${pathname} sitemap`).not.toContain(pathname)
     }
+  })
+
+  it('does not expose the retired explore features page', () => {
+    expect(readSource('src/main/router/exploreRoutes.js')).not.toContain("path: 'explore/features'")
+    expect(SEO_CONFIG.routes['/explore/features']).toBeUndefined()
+    expect(NOINDEX_PATHS.has('/explore/features')).toBe(false)
   })
 
   it('lists only configured indexable canonical routes in the sitemap', () => {

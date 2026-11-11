@@ -144,8 +144,8 @@
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import {ref, watch, onMounted, onBeforeUnmount, computed, nextTick} from 'vue'
-import * as echarts from 'echarts'
 import { useI18n } from 'vue-i18n'
+import { initChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 
 const props = defineProps({
   results: {
@@ -248,7 +248,7 @@ const formatContour5pt = (contour) => {
 const initPitchChart = () => {
   if (!pitchChartContainer.value || !hasPitchData.value) return
 
-  pitchChart = echarts.init(pitchChartContainer.value)
+  pitchChart = initChart(pitchChartContainer.value)
   const ts = props.results.timeseries
 
   const pitchData = ts.pitch_hz
@@ -314,7 +314,7 @@ const initPitchChart = () => {
 const initIntensityChart = () => {
   if (!intensityChartContainer.value || !hasIntensityData.value) return
 
-  intensityChart = echarts.init(intensityChartContainer.value)
+  intensityChart = initChart(intensityChartContainer.value)
   const ts = props.results.timeseries
 
   const intensityData = ts.intensity_db
@@ -365,7 +365,7 @@ const initIntensityChart = () => {
 const initFormantChart = () => {
   if (!formantChartContainer.value || !hasFormantData.value) return
 
-  formantChart = echarts.init(formantChartContainer.value)
+  formantChart = initChart(formantChartContainer.value)
   const ts = props.results.timeseries
 
   const formantColors = ['#34c759', '#ff9500', '#5856d6', '#ff2d55', '#5ac8fa']
@@ -437,7 +437,7 @@ const initFormantChart = () => {
 const initSpectrogramChart = () => {
   if (!spectrogramChartContainer.value || !hasSpectrogramData.value) return
 
-  spectrogramChart = echarts.init(spectrogramChartContainer.value)
+  spectrogramChart = initChart(spectrogramChartContainer.value)
 
   const { time, frequency, energy_db } = props.results.spectrogram
 
@@ -647,10 +647,7 @@ const addSpectrogramOverlays = (option) => {
     option.series.push(...overlays)
     option.legend = {
       data: overlays.map(s => s.name),
-      top: 'bottom',
-      textStyle: {
-        color: '#333'
-      }
+      top: 'bottom'
     }
   }
 }
@@ -714,6 +711,11 @@ onMounted(() => {
   }
 })
 
+onChartThemeChange(() => {
+  renderTimeSeriesCharts()
+  if (props.results && hasSpectrogramData.value) initSpectrogramChart()
+})
+
 onBeforeUnmount(() => {
   clearChartResizeObservers()
   disposeTimeSeriesCharts()
@@ -740,7 +742,7 @@ $chart-height: 400px;
 $card-padding: 1.5rem;
 $section-spacing: 2rem;
 
-$border-light: rgba(0, 0, 0, 0.1);
+$border-light: var(--border-light);
 $blue-shadow: rgba(var(--color-primary-rgb), 0.2);
 $blue-shadow-hover: rgba(var(--color-primary-rgb), 0.3);
 
@@ -755,7 +757,7 @@ $transition-normal: 0.3s;
 .panel-title {
   margin-bottom: 1.5rem;
   color: $text-primary;
-  font-size: 1.5rem;
+  font-size: var(--font-size-24);
   font-weight: 600;
   text-align: center;
 }
@@ -767,7 +769,7 @@ $transition-normal: 0.3s;
 .section-title {
   margin-bottom: 1rem;
   color: $text-primary;
-  font-size: 1.2rem;
+  font-size: var(--font-size-20);
   font-weight: 600;
   text-align: center;
 }
@@ -807,18 +809,18 @@ $transition-normal: 0.3s;
 .stat-label {
   margin-bottom: 0.5rem;
   color: $text-secondary;
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
 }
 
 .stat-value {
   color: $text-primary;
-  font-size: 1.5rem;
+  font-size: var(--font-size-24);
   font-weight: 600;
 
   &.contour-display {
     color: $primary-blue;
     font-family: var(--font-mono);
-    font-size: 1.1rem;
+    font-size: var(--font-size-18);
     letter-spacing: 0.05em;
   }
 }
@@ -866,12 +868,12 @@ $transition-normal: 0.3s;
 
 .quality-label {
   color: $text-secondary;
-  font-size: 0.95rem;
+  font-size: var(--font-size-16);
   font-weight: 500;
 }
 
 .quality-value {
-  font-size: 1.8rem;
+  font-size: var(--font-size-28);
   font-weight: 700;
   transition: color $transition-normal ease;
 
@@ -906,7 +908,7 @@ $transition-normal: 0.3s;
 
 .quality-status {
   color: $text-secondary;
-  font-size: 0.85rem;
+  font-size: var(--font-size-14);
   font-weight: 600;
 }
 
@@ -928,7 +930,7 @@ $transition-normal: 0.3s;
 
   .placeholder-icon {
     opacity: 0.7;
-    font-size: 3rem;
+    font-size: var(--font-size-48);
   }
 }
 
@@ -939,7 +941,7 @@ $transition-normal: 0.3s;
   border-radius: var(--radius-2xl);
   box-shadow: 0 4px 12px $blue-shadow;
   color: var(--action-primary-text);
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   font-weight: 600;
   cursor: pointer;
   transition:

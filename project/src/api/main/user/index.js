@@ -1,5 +1,8 @@
 // api/user/index.js - 用户模块统一导出
 export {
+  batchUpdateCustomData,
+  batchDeleteCustomDataById,
+  saveCustomData,
   getAllCustomData,
   editCustomData,
   batchCreateCustomData,

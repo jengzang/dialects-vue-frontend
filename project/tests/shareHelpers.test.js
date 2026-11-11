@@ -155,7 +155,7 @@ describe('share card helper', () => {
       url: 'https://dialects.yzup.top/menu/query/zhonggu',
       languageLabel: '简体',
       themeLabel: '绿色',
-      colorTheme: 'green',
+      colorTheme: 'green-dark',
       loadImage: () => Promise.resolve(null),
     })
 
@@ -163,7 +163,8 @@ describe('share card helper', () => {
     expect(canvas.width).toBe(1200)
     expect(canvas.height).toBe(630)
     expect(calls.some(call => call.includes('方音图鉴'))).toBe(true)
-    expect(calls.some(call => call.includes('简体 · 绿色'))).toBe(true)
+    expect(calls.some(call => call.includes('查中古'))).toBe(true)
+    expect(calls.some(call => call.includes('https://dialects.yzup.top/menu/query/zhonggu'))).toBe(true)
   })
 
   it('draws localized brand copy and QR blocks on the share card', async () => {
@@ -195,7 +196,7 @@ describe('share card helper', () => {
       url: 'https://dialects.yzup.top/en/menu/query/zhonggu',
       languageLabel: 'English',
       themeLabel: 'Green',
-      colorTheme: 'green',
+      colorTheme: 'green-dark',
       brandName: 'Chinese Dialect Atlas',
       qrHint: 'Scan to open this page',
       loadImage: () => Promise.resolve(null),
@@ -211,13 +212,14 @@ describe('share card helper', () => {
     expect(qrBlocks.length).toBeGreaterThan(80)
   })
 
-  it('draws brand title and themed logo images when they load', async () => {
+  it.each(['blue-light', 'red-light', 'green-dark', 'blue-dark', 'red-dark', 'green-light'])('draws matching %s brand images when they load', async colorTheme => {
     const calls = []
     const context = {
       fillStyle: '',
       font: '',
       textAlign: '',
       drawImage: (...args) => calls.push(['drawImage', ...args]),
+      beginPath: vi.fn(), arc: vi.fn(), fill: vi.fn(), clip: vi.fn(), save: vi.fn(), restore: vi.fn(),
       fillRect: (...args) => calls.push(['fillRect', ...args]),
       fillText: (...args) => calls.push(['fillText', ...args]),
       measureText: (text) => ({ width: text.length * 12 }),
@@ -246,16 +248,25 @@ describe('share card helper', () => {
       url: 'https://dialects.yzup.top/menu/query/zhonggu',
       languageLabel: '简体',
       themeLabel: '绿色',
-      colorTheme: 'green',
+      colorTheme,
       brandName: '方音图鉴',
       qrHint: '扫码打开当前页面',
       loadImage,
     })
 
-    expect(loadImage).toHaveBeenCalledWith('/brand/title.webp')
-    expect(loadImage).toHaveBeenCalledWith('/brand/GreenCircle.webp')
-    expect(calls.some(call => call[0] === 'drawImage' && call[1].src === '/brand/title.webp')).toBe(true)
-    expect(calls.some(call => call[0] === 'drawImage' && call[1].src === '/brand/GreenCircle.webp')).toBe(true)
+    const assetsByTheme = {
+      'blue-light': ['/brand/title.webp', '/brand/BlueCircle.webp', '/brand/favicon.ico'],
+      'blue-dark': ['/brand/blue/title-dark.webp', '/brand/blue/decoration-dark.webp', '/brand/blue/icon-dark.webp'],
+      'red-light': ['/brand/red/title-light.webp', '/brand/red/decoration.webp', '/brand/red/icon.webp'],
+      'red-dark': ['/brand/red/title-dark.webp', '/brand/red/decoration.webp', '/brand/red/icon.webp'],
+      'green-light': ['/brand/title.webp', '/brand/green/decoration-light.webp', '/brand/green/icon-light.ico'],
+      'green-dark': ['/brand/green/title-dark.webp', '/brand/green/decoration-dark.webp', '/brand/green/icon-dark.webp'],
+    }
+    const [titleSrc, circleSrc, logoSrc] = assetsByTheme[colorTheme]
+    for (const src of [titleSrc, circleSrc, logoSrc]) {
+      expect(loadImage).toHaveBeenCalledWith(src)
+      expect(calls.some(call => call[0] === 'drawImage' && call[1].src === src)).toBe(true)
+    }
   })
 
   it('truncates oversized share-card title and URL before drawing', async () => {
@@ -289,7 +300,7 @@ describe('share card helper', () => {
       url: longUrl,
       languageLabel: '简体',
       themeLabel: '绿色',
-      colorTheme: 'green',
+      colorTheme: 'green-dark',
       loadImage: () => Promise.resolve(null),
     })
 

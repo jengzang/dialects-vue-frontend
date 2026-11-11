@@ -84,7 +84,7 @@
         />
         <!-- 自定義數據提交面板（只在 map tab 顯示） -->
         <CustomDataPanel
-          v-if="activeTab === 'map' && mapStore.mode !== 'isopleth'"
+          :active="activeTab === 'map' && mapStore.mode !== 'isopleth'"
           :map-click-coordinates="mapClickCoordinates"
           :selected-feature="selectedFeature"
           @submit-success="handleSubmitSuccess"
@@ -375,7 +375,7 @@ $transition-base: 0.3s;
 .feature-btn {
   padding: 10px 24px;
   color: $text-primary;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   white-space: nowrap;
   cursor: pointer;
   background: var(--glass-30);
@@ -421,7 +421,7 @@ $transition-base: 0.3s;
   min-width: 80px;
   padding: 6px 12px;
   margin: auto;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   white-space: nowrap;
   cursor: pointer;
   background: var(--glass-30);

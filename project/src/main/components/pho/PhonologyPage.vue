@@ -305,14 +305,14 @@ watch(locationQuery, (urlLocations) => {
   .loading {
     p {
       color: var(--text-secondary);
-      font-size: 15px;
+      font-size: var(--font-size-16);
     }
   }
 
   .error {
     p {
       color: var(--color-error);
-      font-size: 16px;
+      font-size: var(--font-size-16);
       font-weight: 500;
     }
   }
@@ -324,7 +324,7 @@ watch(locationQuery, (urlLocations) => {
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-md);
     color: var(--action-primary-text);
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -360,7 +360,7 @@ watch(locationQuery, (urlLocations) => {
 
     .action-btn {
       --action-btn-padding: 10px 20px;
-      --action-btn-font-size: 14px;
+      --action-btn-font-size: var(--font-size-14);
     }
   }
 }

@@ -1,5 +1,28 @@
 @use '@/styles/global/mixins' as *;
 
+.blue-art-layout {
+  isolation: isolate;
+
+  footer.app-footer {
+    background: var(--glass-80);
+    @include glass-blur(6px);
+  }
+}
+
+:root[data-color-mode='light'] {
+  .history-page:not(.history-page--featured) {
+    .history-content,
+    .thoughts {
+      font-weight: 600;
+    }
+  }
+
+  .thanks-container,
+  .thanks-container .feature-subtitle {
+    font-weight: 600;
+  }
+}
+
 .main-card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(var(--main-card-min-width, 220px), 1fr));
@@ -8,14 +31,14 @@
 
 .main-card-title {
   color: var(--text-primary);
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .main-card-meta {
   max-width: 100%;
   color: var(--text-secondary);
-  font-family: var(--font-monospace);
-  font-size: 12px;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-12);
 
   @include text-truncate;
 }

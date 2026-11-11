@@ -1,5 +1,12 @@
 <template>
-  <div class="explore-layout">
+  <div
+    class="explore-layout"
+    :class="{ 'blue-art-layout': useLayoutBackground && backgroundReady }"
+  >
+    <BlueLayoutBackground
+      v-if="useLayoutBackground"
+      @ready="backgroundReady = $event"
+    />
     <!-- ExploreBar 导航栏 -->
     <ExploreBar />
 
@@ -27,6 +34,12 @@ import ExploreBar from '@/components/bar/ExploreBar.vue'
 import PageTutorialGuide from '@/main/components/tutorial/PageTutorialGuide.vue'
 import ScrollToTop from '@/components/common/ScrollToTop.vue'
 import AppFooter from '@/components/footer/AppFooter.vue'
+import BlueLayoutBackground from '@/components/common/BlueLayoutBackground.vue'
+import { computed, ref } from 'vue'
+import { currentInterfaceMode, UI_MODE_COMPACT } from '@/composables/core/uiPreferences.js'
+
+const backgroundReady = ref(false)
+const useLayoutBackground = computed(() => currentInterfaceMode.value !== UI_MODE_COMPACT)
 
 const keepAliveViewNames = [
   'AllVillages',

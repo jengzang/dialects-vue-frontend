@@ -85,7 +85,7 @@
             <span>{{ isoplethLegend.p97 }}</span>
           </div>
         </div>
-        <button v-if="mapStore.mode === 'isopleth'" class="glass-button admin-boundary-btn" @click="openAdminBoundaryModal"><InlineIcon icon="🗺️" />{{ t('map.mapLibre.buttons.adminBoundary') }}</button>
+        <button class="pill-btn admin-boundary-btn" @click="openAdminBoundaryModal"><InlineIcon icon="🗺️" />{{ t('map.mapLibre.buttons.adminBoundary') }}</button>
         <div class="button-row">
           <button class="action-btn" @click="resetView"><InlineIcon icon="🎯" />{{ t('map.mapLibre.buttons.reset') }}</button>
           <button class="action-btn fullscreen-btn" @click="toggleFullScreen"><InlineIcon icon="⛶" />{{ t('map.mapLibre.buttons.fullscreen') }}</button>
@@ -115,9 +115,14 @@
     <AdminBoundaryModal
       v-model="showAdminBoundaryModal"
       mode="import"
+      clearable
+      manual-load
+      :boundary-config="mapStore.adminBoundary?.config"
       :boundary-options="adminBoundaryOptions"
       :loading="isAdminBoundaryOptionsLoading"
       @confirm="handleAdminBoundaryConfirm"
+      @load-options="ensureAdminBoundaryOptions"
+      @clear="handleAdminBoundaryClear"
     />
   </div>
 </template>
@@ -125,7 +130,7 @@
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
-import { ref, onMounted, onActivated, onBeforeUnmount, shallowRef, nextTick, watch, computed, h, render } from 'vue';
+import { ref, onMounted, onActivated, onBeforeUnmount, shallowRef, nextTick, watch, computed, h, render, markRaw } from 'vue';
 import { useI18n } from 'vue-i18n';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -134,7 +139,8 @@ import {get_detail} from "@/main/utils/query/ResultTable.js";
 import {mapStore, userStore, resultCache} from "@/main/store/store.js";
 import { showSuccess, showError, showWarning, showConfirm } from '@/utils/ui/message.js';
 import { getLocationDetail } from '@/api'
-import { deleteCustomForm } from '@/api'
+import { batchDeleteCustomDataById } from '@/api'
+import { createCustomPopupDelete } from '@/utils/user/customPopupDelete.js'
 import { refreshCurrentCustomLayer } from '@/utils/map/MapData.js';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
@@ -185,6 +191,7 @@ const ADMIN_BOUNDARY_LAYER_ID = 'admin-boundary-line-layer';
 
 const mapContainer = ref(null);
 const map = shallowRef(null);
+let isMapStyleReady = false;
 const currentStyleKey = ref('tianditu');
 const loading = ref(false);
 const isFullScreen = ref(false);
@@ -279,10 +286,20 @@ const isoplethLegend = ref(null);
 const showAdminBoundaryModal = ref(false);
 const adminBoundaryOptions = ref({ country: [], provinces: [], cities: [], counties: [] });
 const isAdminBoundaryOptionsLoading = ref(false);
+let adminBoundaryRequestId = 0;
 
+let nationalBorderGeoJsonCache = null;
 let provincesGeoJsonCache = null;
 let citiesGeoJsonCache = null;
 let countiesGeoJsonCache = null;
+
+async function loadNationalBorderGeoJson() {
+  if (nationalBorderGeoJsonCache) return nationalBorderGeoJsonCache;
+  const res = await fetch(nationalBorderGeoJsonUrl);
+  if (!res.ok) throw new Error(`Failed to load country GeoJSON: ${res.status}`);
+  nationalBorderGeoJsonCache = await res.json();
+  return nationalBorderGeoJsonCache;
+}
 
 async function loadProvincesGeoJson() {
   if (provincesGeoJsonCache) return provincesGeoJsonCache;
@@ -373,6 +390,7 @@ onActivated(() => {
 });
 
 onBeforeUnmount(() => {
+  adminBoundaryRequestId += 1;
   clearIsoplethLayers();
   clearDotHeatmapLayers();
   clearMarkers();
@@ -444,6 +462,7 @@ const initMap = () => {
   map.value.addControl(new maplibregl.NavigationControl(), 'top-left');
 
   map.value.on('load', () => {
+    isMapStyleReady = true;
     // 地圖加載完畢，如果有數據，立即渲染
     renderMapContent();
     // 首次進入地圖視圖時若已帶模式數據(如等值線跳轉),依數據範圍校正視口；
@@ -464,7 +483,7 @@ const initMap = () => {
 
 // --- 核心渲染入口 ---
 const renderMapContent = async (shouldResetView = true) => {
-  if (!map.value) return;
+  if (!map.value || !isMapStyleReady) return;
 
   // 清除舊標記
   clearMarkers();
@@ -488,6 +507,10 @@ const renderMapContent = async (shouldResetView = true) => {
     drawIsopleth();
   } else if (mapStore.mode === 'heatmap') {
     drawDotHeatmap();
+  }
+
+  if (mapStore.adminBoundary) {
+    drawAdminBoundary(mapStore.adminBoundary.data);
   }
 };
 
@@ -786,52 +809,40 @@ const createPopupDOM = (item) => {
 };
 
 // --- 按鈕點擊處理函數 ---
+const customPopupDelete = createCustomPopupDelete({
+  remove: batchDeleteCustomDataById,
+  confirm: (item, count) => showConfirm(
+    t('map.mapLibre.confirm.deleteMessage', { location: item.location, feature: item.feature, value: item.value }) +
+      '\n' + t('user.dataPage.messages.batchDeleteConfirm', { count }),
+    {
+      title: t('map.mapLibre.confirm.title'),
+      confirmText: t('map.mapLibre.confirm.confirmText'),
+      cancelText: t('map.mapLibre.confirm.cancelText')
+    }
+  )
+})
+
 const handleCustomBtnClick = async (item) => {
-  const feature = item.feature;
-  const value = item.value;
-  const location = item.location;
-  const created_at = item.created_at;
-  const isConfirmed = await showConfirm(
-      t('map.mapLibre.confirm.deleteMessage', { location, feature, value }),
-      {
-        title: t('map.mapLibre.confirm.title'),
-        confirmText: t('map.mapLibre.confirm.confirmText'),
-        cancelText: t('map.mapLibre.confirm.cancelText')
-      }
-  );
-  if (isConfirmed) {
-    if (!location || !feature || !value) {
-      showError(t('map.mapLibre.messages.deleteInvalid'));
-      return;
+  try {
+    const result = await customPopupDelete.deleteItem(item)
+    if (!result) return
+    if (!result.success) {
+      showError(t('map.mapLibre.messages.deleteFailed', { message: result.message || '' }))
+      return
     }
-    const formData = {
-      location: location,
-      feature: feature,
-      value: value,
-      created_at: created_at,
-    };
-
+    showSuccess(t('user.dataPage.messages.deleteSuccess'))
+    mapStore.showCustomData = true
     try {
-      const data = await deleteCustomForm(formData);
-
-      if (data.success) {
-        showSuccess(t('map.mapLibre.messages.deleteSuccess', { message: data.message }));
-
-        mapStore.showCustomData = true;
-
-        try {
-          await refreshCurrentCustomLayer()
-          // console.log('Custom data refreshed after delete')
-        } catch (error) {
-          console.error('Failed to refresh data after delete:', error)
-        }
-      } else {
-        showError(t('map.mapLibre.messages.deleteFailed', { message: data.message }));
-      }
-    } catch (error) {
-      console.error('Delete failed:', error);
-      showError(t('map.mapLibre.messages.deleteError'));
+      await refreshCurrentCustomLayer()
+    } catch {
+      showWarning(t('user.customSafety.refreshFailed'))
     }
+  } catch (error) {
+    const code = error.detail?.code
+    const key = code === 'version_conflict' ? 'conflict'
+      : code === 'record_unavailable' ? 'unavailable'
+        : code === 'validation_error' ? 'limit' : 'failed'
+    showError(t(`user.customSafety.${key}`))
   }
 };
 
@@ -1322,40 +1333,35 @@ const drawIsopleth = () => {
 
 function openAdminBoundaryModal() {
   showAdminBoundaryModal.value = true;
-  ensureAdminBoundaryOptions();
 }
 
-async function ensureAdminBoundaryOptions() {
+async function ensureAdminBoundaryOptions(level) {
+  const loaders = { country: loadNationalBorderGeoJson, provinces: loadProvincesGeoJson, cities: loadCitiesGeoJson, counties: loadCountiesGeoJson };
+  if (!loaders[level] || isAdminBoundaryOptionsLoading.value) return;
   isAdminBoundaryOptionsLoading.value = true;
   try {
-    const countryOpts = [{ label: '中国', value: '中国' }];
-    const [prov, city, county] = await Promise.all([
-      loadProvincesGeoJson().catch(() => null),
-      loadCitiesGeoJson().catch(() => null),
-      loadCountiesGeoJson().catch(() => null),
-    ]);
-    adminBoundaryOptions.value = {
-      country: countryOpts,
-      provinces: (prov?.features ?? []).map((f) => f?.properties?.name).filter(Boolean).map((n) => ({ label: n, value: n })),
-      cities: (city?.features ?? []).map((f) => f?.properties?.name).filter(Boolean).map((n) => ({ label: n, value: n })),
-      counties: (county?.features ?? []).map((f) => f?.properties?.name).filter(Boolean).map((n) => ({ label: n, value: n })),
-    };
+    const geoJson = await loaders[level]();
+    adminBoundaryOptions.value[level] = level === 'country'
+      ? [{ label: '中国', value: '中国' }]
+      : (geoJson?.features ?? []).map((f) => f?.properties?.name).filter(Boolean).map((n) => ({ label: n, value: n }));
+  } catch (error) {
+    showError(error.message || 'Failed to load boundary');
   } finally {
     isAdminBoundaryOptionsLoading.value = false;
   }
 }
 
 async function handleAdminBoundaryConfirm(config) {
+  const requestId = ++adminBoundaryRequestId;
   const { level, selectedNames, selectedIds, highPrecision } = config;
   let geoJson;
   try {
     if (highPrecision && level !== 'country') {
       geoJson = await fetchHighPrecisionBoundaries(selectedIds);
+      if (requestId !== adminBoundaryRequestId) return;
       if (!geoJson) { showError(t('map.drawTab.voronoi.clipBoundaryNoOptions')); return; }
     } else if (level === 'country') {
-      const res = await fetch(nationalBorderGeoJsonUrl);
-      if (!res.ok) throw new Error(`Failed to load country GeoJSON: ${res.status}`);
-      geoJson = await res.json();
+      geoJson = await loadNationalBorderGeoJson();
     } else if (level === 'provinces') {
       geoJson = await loadProvincesGeoJson();
     } else if (level === 'cities') {
@@ -1364,20 +1370,30 @@ async function handleAdminBoundaryConfirm(config) {
       geoJson = await loadCountiesGeoJson();
     }
   } catch (error) {
+    if (requestId !== adminBoundaryRequestId) return;
     showError(error.message || 'Failed to load boundary');
     return;
   }
 
+  if (requestId !== adminBoundaryRequestId) return;
   const filtered = (geoJson.features ?? []).filter(
     (f) => level === 'country' || selectedNames.includes(f?.properties?.name)
   );
   if (!filtered.length) { showError(t('map.drawTab.voronoi.clipBoundaryNoOptions')); return; }
 
-  drawAdminBoundary({ type: 'FeatureCollection', features: filtered });
+  const data = markRaw({ type: 'FeatureCollection', features: filtered });
+  mapStore.adminBoundary = { config, data };
+  drawAdminBoundary(data);
+}
+
+function handleAdminBoundaryClear() {
+  adminBoundaryRequestId += 1;
+  mapStore.adminBoundary = null;
+  clearAdminBoundaryLayers();
 }
 
 function drawAdminBoundary(featureCollection) {
-  if (!map.value) return;
+  if (!map.value || !isMapStyleReady) return;
   clearAdminBoundaryLayers();
   map.value.addSource(ADMIN_BOUNDARY_SOURCE_ID, {
     type: 'geojson',
@@ -1444,8 +1460,10 @@ const toggleFullScreen = async () => {
 const handleStyleChange = () => {
   if (!map.value) return;
   const newStyle = mapStyle(currentStyleKey.value);
+  isMapStyleReady = false;
   map.value.setStyle(newStyle);
   map.value.once('style.load', () => {
+    isMapStyleReady = true;
     renderMapContent(false);
   });
 };
@@ -1597,7 +1615,7 @@ $glass-transition: all 0.3s ease;
     margin-bottom: 4px;
 
     color: var(--text-tertiary);
-    font-size: 12px;
+    font-size: var(--font-size-12);
     font-weight: 700;
   }
 }
@@ -1643,7 +1661,7 @@ $glass-transition: all 0.3s ease;
 
 .heatmap-slider-label {
   color: var(--text-tertiary);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 600;
 }
 
@@ -1656,7 +1674,7 @@ $glass-transition: all 0.3s ease;
   padding: 6px 4px;
 
   &-title {
-    font-size: 12px;
+    font-size: var(--font-size-12);
     font-weight: 600;
     text-align: center;
   }
@@ -1672,14 +1690,16 @@ $glass-transition: all 0.3s ease;
     display: flex;
     justify-content: space-between;
 
-    font-size: 11px;
+    font-size: var(--font-size-12);
   }
 }
 
 .admin-boundary-btn {
   width: 100%;
   margin-bottom: 10px;
-  border: 2px solid var(--color-primary-border);
+  // border: 2px solid var(--color-primary-border);
+  // padding: 10px 6px;
+  border-width: 2px;
 }
 
 .button-row {
@@ -1702,7 +1722,7 @@ $glass-transition: all 0.3s ease;
   padding: 8px;
 
   color: var(--action-primary-text);
-  font-size: 13px;
+  font-size: var(--font-size-13);
 
   background: var(--color-primary);
   border: 0;
@@ -1745,7 +1765,7 @@ $glass-transition: all 0.3s ease;
   padding: 12px 24px;
 
   color: var(--text-dark);
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 600;
 
   background: var(--glass-70);
@@ -1795,20 +1815,21 @@ $glass-transition: all 0.3s ease;
  *
  * 这些元素由 JavaScript 创建，没有 Vue 的
  * scoped 属性，因此必须使用 :deep()
+ * 绘图颜色固定，不随页面主题变化。
  * ========================= */
 
 :deep(.marker-text-base) {
   width: auto;
   padding: 2px 4px;
 
-  color: var(--color-cyan);
+  color: #a6ffdc;
   font-family: "SimHei", "黑体", sans-serif;
   text-align: center;
   white-space: nowrap;
 
-  background-color: var(--color-dark-teal);
+  background-color: #1b2e2b;
   border-radius: var(--radius-xs);
-  box-shadow: var(--shadow-focus-ring);
+  box-shadow: 0 2px 6px rgba(114, 124, 245, 0.5);
 
   cursor: pointer;
 }
@@ -1819,9 +1840,9 @@ $glass-transition: all 0.3s ease;
 
   opacity: 0.8;
   background-clip: padding-box;
-  border: 2px solid var(--text-primary);
+  border: 2px solid #000;
   border-radius: var(--radius-full);
-  box-shadow: 0 0 2px var(--bg-overlay-dark);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
 
   cursor: pointer;
 }
@@ -1829,17 +1850,21 @@ $glass-transition: all 0.3s ease;
 :deep(.marker-text-feature) {
   padding: 2px 4px;
 
-  color: var(--text-primary);
+  color: #000;
   font-family: "Times New Roman", serif;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   white-space: nowrap;
 
-  border: 0.7px solid var(--text-primary);
+  border: 0.7px solid #000;
   border-radius: var(--radius-xs);
-  box-shadow: var(--shadow-focus-ring);
+  box-shadow: 0 2px 6px rgba(114, 124, 245, 0.5);
 
   cursor: pointer;
 
   // 背景色由 JavaScript 根据 item.color 动态设置。
+}
+
+:deep(.maplibregl-popup-content) {
+  color: #333;
 }
 </style>

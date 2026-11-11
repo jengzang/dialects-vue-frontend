@@ -167,12 +167,12 @@ function handleClose(value = false) {
   }
 
   .summary-label {
-    font-size: 11px;
+    font-size: var(--font-size-12);
     color: $text-muted;
   }
 
   .summary-value {
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 700;
     color: $text-strong;
   }
@@ -197,7 +197,7 @@ function handleClose(value = false) {
   }
 
   &-info {
-    font-size: 12px;
+    font-size: var(--font-size-12);
     color: $text-secondary;
     font-weight: 700;
   }
@@ -206,7 +206,7 @@ function handleClose(value = false) {
 /* 清空选择: 仅尺寸/颜色覆盖, 视觉见 main/_buttons.scss 的 .pill-btn */
 .scope-clear-btn {
   --pill-btn-padding: 9px 14px;
-  --pill-btn-font-size: 12px;
+  --pill-btn-font-size: var(--font-size-12);
   --pill-btn-font-weight: 700;
   --pill-btn-border: 1px solid rgba(var(--color-error-light-rgb), 0.28);
   --pill-btn-bg: var(--bg-error-light);
@@ -219,7 +219,7 @@ function handleClose(value = false) {
 
 .voronoi-export-hint {
   padding: 10px 14px;
-  font-size: 11px;
+  font-size: var(--font-size-12);
   line-height: 1.55;
   color: $text-muted;
 }
@@ -275,14 +275,14 @@ function handleClose(value = false) {
   min-width: 0;
 
   .scope-selection-title {
-    font-size: 13px;
+    font-size: var(--font-size-13);
     font-weight: 700;
     color: $text-strong;
     white-space: nowrap;
   }
 
   .scope-selection-meta {
-    font-size: 11px;
+    font-size: var(--font-size-12);
     color: $text-muted;
     white-space: nowrap;
   }

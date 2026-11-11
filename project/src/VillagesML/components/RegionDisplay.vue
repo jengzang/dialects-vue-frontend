@@ -75,7 +75,7 @@ const displayClass = computed(() => ({
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
 }
 

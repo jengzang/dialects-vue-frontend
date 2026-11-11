@@ -107,7 +107,7 @@ const formatValue = (value) => {
 }
 
 .feature-type h4 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 12px;
@@ -124,7 +124,7 @@ const formatValue = (value) => {
   padding: 8px 12px;
   background: var(--glass-50);
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .feature-name {
@@ -143,7 +143,7 @@ const formatValue = (value) => {
 }
 
 .vector-visualization h4 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   margin-bottom: 15px;
   color: var(--text-primary);
 }
@@ -171,7 +171,7 @@ const formatValue = (value) => {
 
 .vector-note {
   margin-top: 10px;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   text-align: center;
 }

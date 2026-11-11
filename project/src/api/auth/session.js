@@ -18,6 +18,7 @@ import {
 export const AUTH_API_BASE = '/api/auth';
 
 const REQUEST_TIMEOUT = 300000;
+const REFRESH_TIMEOUT = 15000;
 
 const refreshSingleFlight = createSingleFlight();
 let authReadyPromise = Promise.resolve({ user: null, role: 'anonymous' });
@@ -169,8 +170,6 @@ async function requestAuthJson(path, { method = 'GET', token = null, body = null
       signal: controller.signal,
     });
 
-    clearTimeout(timeoutId);
-
     if (!response.ok) {
       const rawText = await response.text();
       const message = rawText.trim() || `Request failed with status ${response.status}`;
@@ -181,10 +180,8 @@ async function requestAuthJson(path, { method = 'GET', token = null, body = null
       });
     }
 
-    return parseJsonResponse(response);
+    return await parseJsonResponse(response);
   } catch (error) {
-    clearTimeout(timeoutId);
-
     if (error?.status) {
       throw error;
     }
@@ -200,6 +197,8 @@ async function requestAuthJson(path, { method = 'GET', token = null, body = null
       kind: 'network',
       cause: error,
     });
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 
@@ -237,6 +236,8 @@ export async function refreshAccessToken() {
       return { ok: false, reason: 'missing_refresh_token' };
     }
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REFRESH_TIMEOUT);
     try {
       const response = await fetch(WEB_BASE + `${AUTH_API_BASE}/refresh`, {
         method: 'POST',
@@ -244,6 +245,7 @@ export async function refreshAccessToken() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ refresh_token: refreshToken }),
+        signal: controller.signal,
       });
 
       if (response.status === 401 || response.status === 403) {
@@ -274,6 +276,8 @@ export async function refreshAccessToken() {
     } catch (error) {
       markSessionDegraded();
       return { ok: false, reason: 'network_error', error };
+    } finally {
+      clearTimeout(timeoutId);
     }
   });
 }

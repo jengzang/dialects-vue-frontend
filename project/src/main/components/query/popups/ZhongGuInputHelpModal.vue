@@ -127,14 +127,14 @@ $table-radius: 8px;
 .help-subtitle {
   margin: 0 0 10px;
   color: $text-heading;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
 }
 
 .help-examples-note {
   margin: 0 0 8px;
   color: $text-note;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-style: italic;
 }
 
@@ -156,7 +156,7 @@ $table-radius: 8px;
 .help-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: var(--font-size-13);
 
   thead {
     position: sticky;

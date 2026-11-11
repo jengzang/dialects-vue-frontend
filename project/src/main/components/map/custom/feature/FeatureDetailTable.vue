@@ -31,7 +31,11 @@
               :placeholder="t('customEntry.pointDetail.placeholders.phonology')"
             >
           </label>
-          <button class="pill-btn field-notice-trigger" type="button" @click="isFieldNoticeOpen = true">
+          <button
+            class="pill-btn field-notice-trigger"
+            type="button"
+            @click="isFieldNoticeOpen = true"
+          >
             {{ t('customEntry.pointDetail.rows.noticeTrigger') }}
           </button>
         </div>
@@ -55,7 +59,15 @@
       </button>
     </div>
 
-    <div class="feature-detail-layout">
+    <CustomDataSaveNotice
+      :state="mutation"
+      :retryable="false"
+      @merge="mergeVersions"
+    />
+    <div
+      class="feature-detail-layout"
+      :inert="mutation.isSaving.value"
+    >
       <div class="feature-detail-main glass-subpanel">
         <div
           v-if="loading"
@@ -96,7 +108,7 @@
           </div>
           <div
             v-for="row in rows"
-            :key="row.created_at || `${row['簡稱']}-${row['音典分區']}-${row['值']}`"
+            :key="row.id"
             class="feature-detail-row"
           >
             <span
@@ -231,7 +243,7 @@
             <tbody>
               <tr
                 v-for="record in pointRecords"
-                :key="record.created_at || record.id"
+                :key="record.id"
               >
                 <td v-if="selectedDetailType === 'region'">
                   {{ record['簡稱'] }}
@@ -248,11 +260,23 @@
     </AppModal>
 
     <!-- 字段填写注意事项弹窗 -->
-    <AppModal v-model="isFieldNoticeOpen" size="sm" width="480px">
+    <AppModal
+      v-model="isFieldNoticeOpen"
+      size="sm"
+      width="480px"
+    >
       <template #header>
         <div class="point-detail-modal-header">
-          <h4 class="point-detail-modal-title">{{ t('customEntry.pointDetail.rows.noticeTitle') }}</h4>
-          <button class="close-btn close-btn-sm close-btn-inline" type="button" @click="isFieldNoticeOpen = false">×</button>
+          <h4 class="point-detail-modal-title">
+            {{ t('customEntry.pointDetail.rows.noticeTitle') }}
+          </h4>
+          <button
+            class="close-btn close-btn-sm close-btn-inline"
+            type="button"
+            @click="isFieldNoticeOpen = false"
+          >
+            ×
+          </button>
         </div>
       </template>
       <div class="field-notice-body">
@@ -284,9 +308,11 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue';
+import { useCustomDataSave } from '@/main/composables/useCustomDataSave.js';
+import CustomDataSaveNotice from '@/main/components/user/CustomDataSaveNotice.vue';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue';
-import { batchDeleteCustomData, getDataByFeature, getDataByPoint } from '@/api';
+import { batchDeleteCustomDataById, getDataByFeature, getDataByPoint } from '@/api';
 import { ensureCustomDataPresence } from '@/composables/data/useCustomDataPresence.js';
 import { showConfirm, showWarning } from '@/utils/ui/message.js';
 import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue';
@@ -302,6 +328,7 @@ const props = defineProps({
 const emit = defineEmits(['back', 'saved']);
 const { t } = useI18n();
 
+const mutation=useCustomDataSave(body=>batchDeleteCustomDataById(body.deletes), {leaveMessage:()=>t('user.customSafety.leave')});
 const loading = ref(false);
 const errorMessage = ref('');
 const rows = ref([]);
@@ -329,7 +356,7 @@ const mapPoints = computed(() =>
       return {
         coord: [lng, lat],
         label: row['簡稱'] || '',
-        active: editingRecord.value?.created_at === row.created_at,
+        active: editingRecord.value?.id === row.id,
       };
     })
     .filter(Boolean)
@@ -397,13 +424,21 @@ const openEditModal = (row) => {
 };
 
 const handleDelete = async (row) => {
-  if (!row?.created_at) return;
-  const confirmed = await showConfirm(t('customEntry.featureDetail.confirmDelete'));
-  if (confirmed === false) return;
-  await batchDeleteCustomData([row.created_at]);
-  rows.value = rows.value.filter((item) => item.created_at !== row.created_at);
+  if(mutation.locked.value || !row?.id) return;
+  mutation.reset();
+  const response=await mutation.save({creates:[],updates:[],deletes:[{id:row.id,version:row.version}]},{confirm:()=>showConfirm(t('customEntry.featureDetail.confirmDelete'))});
+  if(!response) return;
+  rows.value=rows.value.filter(item=>!response.deleted_ids.includes(item.id));
   emit('saved');
 };
+function mergeVersions(current) {
+  mutation.prepareMerge();
+  for(const row of rows.value) {
+    const latest=current.find(record=>record.id===row.id);
+    if(latest) row.version=latest.version;
+  }
+  mutation.reset();
+}
 
 const handleSaved = async (newFeature) => {
   const targetFeature = newFeature || { '特徵': localFeatureName.value, '聲韻調': localPhonology.value };
@@ -494,14 +529,14 @@ watch(
 
 .feature-detail-title {
   margin: 0;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 700;
   color: $text-strong;
 }
 
 .feature-detail-description {
   margin: 0;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: $text-muted;
 }
 
@@ -553,7 +588,7 @@ watch(
 .feature-detail-table-head {
   padding: 0 6px;
   color: $text-muted;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 700;
 
   @media (max-width: 768px) {
@@ -563,7 +598,7 @@ watch(
 
 .feature-detail-row {
   padding: $radius-md 14px;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: $text-strong;
 
   @media (max-width: 768px) {
@@ -579,7 +614,7 @@ watch(
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 13px;
+      font-size: var(--font-size-13);
 
       &::before {
         content: attr(data-label);
@@ -630,7 +665,7 @@ watch(
 // -- Side --
 .feature-detail-map-title {
   margin-bottom: $radius-md;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 700;
   color: $text-strong;
 }
@@ -650,7 +685,7 @@ watch(
   gap: $radius-sm;
 
   span {
-    font-size: 13px;
+    font-size: var(--font-size-13);
     font-weight: 700;
     color: $text-secondary;
   }
@@ -685,7 +720,7 @@ watch(
   padding: 32px;
   text-align: center;
   color: $text-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .modal-error-state {
@@ -703,7 +738,7 @@ watch(
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 13px;
+  font-size: var(--font-size-13);
 
   th,
   td {
@@ -729,7 +764,7 @@ watch(
 /* 字段提示触发钮: 仅尺寸/颜色覆盖, 视觉见 main/_buttons.scss 的 .pill-btn */
 .field-notice-trigger {
   --pill-btn-padding: 6px 14px;
-  --pill-btn-font-size: 12px;
+  --pill-btn-font-size: var(--font-size-12);
   --pill-btn-font-weight: 600;
   --pill-btn-color: #fff;
   --pill-btn-border: 1px solid rgb(var(--color-warning-rgb));
@@ -740,7 +775,7 @@ watch(
 
   &::before {
     content: "⚠️";
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 }
 
@@ -757,7 +792,7 @@ watch(
 
   p {
     margin: 8px 0 0;
-    font-size: 13px;
+    font-size: var(--font-size-13);
     color: $text-secondary;
     line-height: 1.7;
   }
@@ -776,7 +811,7 @@ watch(
   border: 1px solid rgba(var(--color-primary-rgb), 0.2);
   border-radius: var(--radius-pill);
   color: $primary;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 600;
 }
 
@@ -785,7 +820,7 @@ watch(
   background: rgba(var(--color-warning-rgb), 0.08);
   border-left: 3px solid $warning;
   border-radius: 0 $radius-sm $radius-sm 0;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: $text-secondary;
   line-height: 1.6;
 }

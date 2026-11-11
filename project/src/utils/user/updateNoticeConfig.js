@@ -1,25 +1,25 @@
 export function getHomeUpdateNotice(t) {
     const items = [
+        {
+            icon: '👀',
+            strong: '增加背景圖和主題切換；完善開發歷程等',
+            text: '支持藍、綠、紅三種主題色，和日間、夜間、系統三種模式切換。詳細介紹網站的功能、發展曆史等，方便新用戶快速了解『方音圖鑑』。'
+        },
         {   
             icon: '📖',
             strong: '詞表展示搜索樣式優化',
-            text: '大幅重構頁面，並支持按照音典分區、地圖集分區篩選；增加詞表方言點詳情展示（包含調值、行政區劃等信息）。'
+            text: '支持記住上次查詢選擇的地點；大幅重構頁面，並支持按照音典分區、地圖集分區篩選。'
         },
         {
             icon: '🗂️',
             strong: '增加查注釋功能',
             text: '支持通過注釋或音標檢索字表'
         },
-        {
-            icon: '👀',
-            strong: '優化用戶體驗',
-            text: '增加頁腳導航欄、建議反饋入口、網站功能檢索、快速分享等。'
-        },
     ]
   return {
-    version: 'v5.2.2',
+    version: 'v5.2.4',
     dbVersion: '2026-09-30',
-    lastUpdateDate: '2026-10-21',
+    lastUpdateDate: '2026-11-02',
     title: t('home.updateNotice.title'),
     items
   }

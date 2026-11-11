@@ -48,12 +48,14 @@ const legendItems = computed(() => {
 })
 </script>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 .map-legend {
   position: absolute;
   bottom: 30px;
   right: 20px;
-  background: var(--glass-90);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   padding: 12px 16px;
   border-radius: var(--radius-sm2);
@@ -63,9 +65,9 @@ const legendItems = computed(() => {
 
 .legend-title {
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   margin-bottom: 8px;
-  color: var(--text-dark);
+  color: #333;
 }
 
 .legend-items {
@@ -88,7 +90,7 @@ const legendItems = computed(() => {
 }
 
 .legend-label {
-  font-size: 13px;
-  color: var(--text-medium);
+  font-size: var(--font-size-13);
+  color: #555;
 }
 </style>

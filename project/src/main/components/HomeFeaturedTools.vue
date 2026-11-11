@@ -239,7 +239,7 @@ $text-primary: var(--text-primary);
   &-title {
     margin-bottom: 0.5rem;
     text-align: center;
-    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-size: clamp(var(--font-size-28), 4vw, var(--font-size-48));
     font-weight: 700;
     color: $primary;
   }
@@ -247,7 +247,7 @@ $text-primary: var(--text-primary);
   &-subtitle {
     margin-bottom: 2rem;
     text-align: center;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     font-weight: 500;
     color: var(--text-dark-lighter);
   }
@@ -264,7 +264,7 @@ $text-primary: var(--text-primary);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   color: $primary;
-  font-size: 0.875rem;
+  font-size: var(--font-size-14);
   font-weight: 600;
   cursor: pointer;
   transition: background 0.25s ease, transform 0.25s ease;
@@ -454,7 +454,7 @@ $text-primary: var(--text-primary);
   }
 
   &__logo {
-    font-size: 3rem;
+    font-size: var(--font-size-48);
     line-height: 1;
   }
 
@@ -470,7 +470,7 @@ $text-primary: var(--text-primary);
 
     h3 {
       margin: 8px 0 4px;
-      font-size: 1.75rem;
+      font-size: var(--font-size-28);
       font-weight: 700;
       line-height: 1.25;
       color: $text-primary;
@@ -508,7 +508,7 @@ $text-primary: var(--text-primary);
       background: rgba(var(--color-primary-rgb), 0.08);
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
       color: $primary;
-      font-size: 0.78rem;
+      font-size: var(--font-size-12);
       font-weight: 700;
       white-space: nowrap;
     }

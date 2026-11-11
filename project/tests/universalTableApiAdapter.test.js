@@ -24,7 +24,7 @@ describe('UniversalTable API adapter wiring', () => {
     expect(source).toContain('const tableApi = computed(() => tableApiAdapters[props.apiAdapter] || tableApiAdapters.normal)')
 
     expect(source).toContain('await tableApi.value.query(payload)')
-    expect(source).toContain('await tableApi.value.distinct(payload)')
+    expect(source).toContain('tableApi.value.distinct(payload).then(res => {')
     expect(source).toContain('await tableApi.value.batchMutate(payload)')
     expect(source).toContain('await tableApi.value.mutateSingle(payload)')
     expect(source).toContain('await tableApi.value.batchReplacePreview(payload)')

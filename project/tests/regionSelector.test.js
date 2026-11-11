@@ -3,7 +3,7 @@ import { createApp, defineComponent, nextTick, reactive } from 'vue'
 
 const mocks = vi.hoisted(() => ({ getPartitions: vi.fn(), showError: vi.fn(), user: { isAuthenticated: false, role: 'anonymous', id: null } }))
 vi.mock('@/api/index.js', () => ({ getPartitions: mocks.getPartitions }))
-vi.mock('vue-router', () => ({ useRouter: () => ({ push: vi.fn(), currentRoute: { value: {} } }) }))
+vi.mock('vue-router', () => ({ useRoute: () => ({ path: '/zh-CN/menu/query/zhonggu' }), useRouter: () => ({ push: vi.fn(), currentRoute: { value: {} } }) }))
 vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: value => value }) }))
 vi.mock('@/composables/router/useAuthGuard.js', () => ({ useAuthGuard: () => ({ requireAuth: vi.fn() }) }))
 vi.mock('@/main/store/store.js', () => ({ userStore: mocks.user }))

@@ -307,11 +307,11 @@ import {
   getRegionSimilarityMatrix
 } from '@/api/index.js'
 import { showError, showSuccess } from '@/utils/ui/message.js'
-import * as echarts from 'echarts'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import RadioGroup from "@/components/selector/RadioGroup.vue";
+import { initChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 
 export default {
   name: 'RegionSimilarity',
@@ -514,7 +514,7 @@ export default {
         chartInstance.dispose()
       }
 
-      chartInstance = echarts.init(heatmapChart.value)
+      chartInstance = initChart(heatmapChart.value)
 
       const regions = matrixData.value.regions || []
       const matrix = matrixData.value.matrix || []
@@ -603,6 +603,10 @@ export default {
       matrixData.value = null
     })
 
+    onChartThemeChange(() => {
+      if (matrixData.value) renderHeatmap()
+    })
+
     onBeforeUnmount(() => {
       if (chartInstance) {
         chartInstance.dispose()
@@ -655,7 +659,7 @@ export default {
 }
 
 .page-title {
-  font-size: 28px;
+  font-size: var(--font-size-28);
   font-weight: 600;
   margin-bottom: 24px;
   color: var(--text-primary);
@@ -677,7 +681,7 @@ export default {
 
 .query-form h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   color: var(--text-primary);
   white-space: nowrap;
   flex-shrink: 0;
@@ -702,7 +706,7 @@ export default {
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-sm2);
   background: var(--glass-80);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   transition: border-color 0.3s ease;
 }
 
@@ -713,7 +717,7 @@ export default {
 
 .results-header h3 {
   margin: 0;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   color: var(--text-primary);
 }
 
@@ -740,12 +744,12 @@ export default {
   padding: 4px 12px;
   border-radius: var(--radius-md);
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .card-header h4 {
   margin: 0;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   color: var(--text-primary);
 }
 
@@ -754,7 +758,7 @@ export default {
 }
 
 .similarity-label {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   margin-bottom: 8px;
   color: var(--text-primary);
@@ -782,14 +786,14 @@ export default {
 }
 
 .char-label {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 500;
   color: var(--text-tertiary);
   margin-bottom: 4px;
 }
 
 .char-list {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
   line-height: 1.6;
 }
@@ -801,7 +805,7 @@ export default {
   color: var(--color-primary, var(--vml-blue));
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -815,7 +819,7 @@ export default {
 .similarity-metrics h3,
 .comparison-details h3 {
   margin-bottom: 16px;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   color: var(--text-primary);
 }
 
@@ -833,13 +837,13 @@ export default {
 }
 
 .metric-label {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-tertiary);
   margin-bottom: 8px;
 }
 
 .metric-value {
-  font-size: 32px;
+  font-size: var(--font-size-32);
   font-weight: 600;
   color: var(--color-primary, var(--vml-blue));
 }
@@ -851,7 +855,7 @@ export default {
 
 .comparison-section h4 {
   margin-bottom: 12px;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   color: var(--text-primary);
 }
 
@@ -864,7 +868,7 @@ export default {
 .char-tag {
   padding: 6px 12px;
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
 }
 
@@ -893,7 +897,7 @@ export default {
   color: white;
   border: none;
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -924,7 +928,7 @@ export default {
   background: rgba(var(--vml-blue-rgb), 0.1);
   border: 2px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-xl);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
 }
 
@@ -932,7 +936,7 @@ export default {
   background: none;
   border: none;
   color: var(--color-error);
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: bold;
   cursor: pointer;
   padding: 0;

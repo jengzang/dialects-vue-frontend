@@ -27,40 +27,107 @@
     >
       <!-- 声韵调切换 Tab -->
       <div class="feature-control-row">
-        <div class="feature-tabs">
+        <TabSwitcher
+          mode="segmented"
+          navigation-only
+          :use-router="false"
+          :tabs="FEATURE_TABS"
+          :model-value="activeFeature"
+          @update:model-value="changeFeature"
+        />
+      </div>
+
+      <!-- 比较地点（按查询顺序） -->
+      <div
+        v-if="compareLocations.length"
+        class="compare-locations"
+      >
+        <template
+          v-for="(loc, index) in compareLocations"
+          :key="loc"
+        >
+          <span
+            v-if="index > 0"
+            class="compare-locations-arrow"
+            aria-hidden="true"
+          >→</span>
           <button
-            v-for="feat in ['聲母', '韻母', '聲調']"
-            :key="feat"
-            :class="['feature-tab', { active: activeFeature === feat }]"
             type="button"
-            @click="changeFeature(feat)"
+            class="pill-btn"
+            @click="openLocationDetail(loc)"
           >
-            {{ feat }}
+            {{ loc }}
           </button>
-        </div>
+        </template>
       </div>
 
       <!-- 桑基图容器 -->
-      <div
-        class="sankey-chart-wrapper"
-        :class="{ 'is-rendering': isChartRendering }"
-      >
-        <!-- 局部加载：切换 Tab / 重绘桑基图时使用 -->
+      <div class="sankey-chart-shell">
+        <!-- 横向可滚动提示 -->
         <div
-          v-if="isChartRendering"
-          class="sankey-rendering-mask"
+          v-if="showScrollHint && !isChartRendering"
+          class="sankey-scroll-hint"
+          :class="{ 'is-at-start': isAtScrollStart, 'is-at-end': isAtScrollEnd }"
         >
-          <div
-            class="ui-loading--page"
+          <button
+            type="button"
+            class="hint-chevron hint-chevron--left"
+            :aria-label="t('phonology.phonology.compare.scrollHint.left', '向左滚动')"
+            :disabled="isAtScrollStart"
+            @click="scrollSankeyBy(-1)"
+          >
+            <svg
+              viewBox="0 0 10 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M7.5 3 2.5 8l5 5" />
+            </svg>
+          </button>
+          <span
+            class="hint-text"
             aria-hidden="true"
-          />
+          >{{ scrollHintText }}</span>
+          <button
+            type="button"
+            class="hint-chevron hint-chevron--right"
+            :aria-label="t('phonology.phonology.compare.scrollHint.right', '向右滚动')"
+            :disabled="isAtScrollEnd"
+            @click="scrollSankeyBy(1)"
+          >
+            <svg
+              viewBox="0 0 10 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M2.5 3l5 5-5 5" />
+            </svg>
+          </button>
         </div>
 
         <div
-          ref="sankeyContainerRef"
-          class="sankey-chart"
-          :style="{ width: sankeyWidth, height: sankeyHeight }"
-        />
+          ref="sankeyScrollRef"
+          class="sankey-chart-wrapper"
+          :class="{ 'is-rendering': isChartRendering }"
+          @scroll.passive="updateScrollHint"
+        >
+          <!-- 局部加载：切换 Tab / 重绘桑基图时使用 -->
+          <div
+            v-if="isChartRendering"
+            class="sankey-rendering-mask"
+          >
+            <div
+              class="ui-loading--page"
+              aria-hidden="true"
+            />
+          </div>
+
+          <div
+            ref="sankeyContainerRef"
+            class="sankey-chart"
+            :style="{ width: sankeyWidth, height: sankeyHeight }"
+          />
+        </div>
       </div>
     </div>
 
@@ -108,17 +175,27 @@
         </div>
       </HoverDetailCard>
     </Teleport>
+
+    <LocationDetailPopup
+      :visible="locationPopup.visible"
+      :location-name="locationPopup.locationName"
+      :data="locationPopup.data"
+      :loading="locationPopup.loading"
+      @close="locationPopup.visible = false"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import * as echarts from 'echarts'
 import HoverDetailCard from '@/components/ToastAndHelp/HoverDetailCard.vue'
+import TabSwitcher from '@/components/common/TabSwitcher.vue'
+import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue'
 import { resolveHoverDetailCardPosition } from '@/utils/EchartHover/hoverDetailCardPosition.js'
-import { getFeatureStats } from '@/api/index.js'
+import { getFeatureStats, getLocationDetail } from '@/api/index.js'
 import { setRunning } from '@/main/store/store.js'
+import { initChart, onChartThemeChange, readChartTokens } from '@/utils/chart/chartTheme'
 
 const { t } = useI18n()
 
@@ -163,6 +240,12 @@ const props = defineProps({
 })
 
 // ========== 响应式数据 ==========
+const FEATURE_TABS = [
+  { name: '聲母', label: '聲母' },
+  { name: '韻母', label: '韻母' },
+  { name: '聲調', label: '聲調' }
+]
+
 const rawData = ref(null)
 const activeLocations = ref([])
 const activeFeature = ref('韻母')
@@ -171,6 +254,36 @@ const errorMessage = ref('')
 
 // 图表局部渲染状态：切换 Tab / 重绘图表时显示
 const isChartRendering = ref(false)
+
+// 比较地点（按查询顺序，只保留有数据的地点）
+const compareLocations = computed(() =>
+  activeLocations.value.filter(loc => rawData.value?.data?.[loc])
+)
+
+// 地点详情弹窗
+const locationPopup = ref({
+  visible: false,
+  locationName: '',
+  data: null,
+  loading: false
+})
+
+const openLocationDetail = async (locationName) => {
+  if (!locationName) return
+
+  locationPopup.value.visible = true
+  locationPopup.value.locationName = locationName
+  locationPopup.value.loading = true
+  locationPopup.value.data = null
+
+  try {
+    locationPopup.value.data = await getLocationDetail(locationName)
+  } catch (error) {
+    console.error('查詢地名數據失敗:', error)
+  } finally {
+    locationPopup.value.loading = false
+  }
+}
 
 // 详情卡片状态
 const selectedDetail = ref(null)
@@ -182,6 +295,41 @@ const sankeyContainerRef = ref(null)
 const chartInstance = ref(null)
 const isMobileLayout = ref(false)
 const MOBILE_LAYOUT_MEDIA_QUERY = '(max-aspect-ratio: 1/1)'
+
+// 横向滚动提示：内容超出可视宽度时显示
+const sankeyScrollRef = ref(null)
+const showScrollHint = ref(false)
+const isAtScrollStart = ref(true)
+const isAtScrollEnd = ref(true)
+
+const scrollHintText = computed(() =>
+  isMobileLayout.value
+    ? t('phonology.phonology.compare.scrollHint.drag', '可左右拖动')
+    : t('phonology.phonology.compare.scrollHint.scroll', '可左右滚动')
+)
+
+const scrollSankeyBy = (direction) => {
+  const el = sankeyScrollRef.value
+
+  if (!el) return
+
+  const step = Math.max(80, Math.round(el.clientWidth * 0.2))
+  el.scrollBy({ left: direction * step, behavior: 'smooth' })
+}
+
+const updateScrollHint = () => {
+  const el = sankeyScrollRef.value
+
+  if (!el) {
+    showScrollHint.value = false
+    return
+  }
+
+  const maxScrollLeft = el.scrollWidth - el.clientWidth
+  showScrollHint.value = maxScrollLeft > 2
+  isAtScrollStart.value = el.scrollLeft <= 2
+  isAtScrollEnd.value = el.scrollLeft >= maxScrollLeft - 2
+}
 
 // 父组件控制项在图表渲染期间变化时，记录一次待重绘
 let hasPendingRerender = false
@@ -361,14 +509,20 @@ const renderSankey = async (queryLocs) => {
 
   const el = sankeyContainerRef.value
 
-  if (!el || !rawData.value) return
+  if (!el || !rawData.value) {
+    updateScrollHint()
+    return
+  }
   if (el.clientWidth === 0 || el.clientHeight === 0) return
 
   const raw = rawData.value
   const charsMap = raw.chars_map || []
   const validLocs = queryLocs.filter(loc => raw.data[loc])
 
-  if (validLocs.length < 2) return
+  if (validLocs.length < 2) {
+    updateScrollHint()
+    return
+  }
 
   const nodeMap = new Map()
   const links = []
@@ -529,7 +683,8 @@ const renderSankey = async (queryLocs) => {
 
   await nextTick()
 
-  chartInstance.value = echarts.init(el)
+  chartInstance.value = initChart(el)
+  const tokens = readChartTokens()
 
   const option = {
     animation: false,
@@ -559,14 +714,13 @@ const renderSankey = async (queryLocs) => {
         opacity: 0.25
       },
       label: {
-        color: '#333',
         fontSize: 12,
         fontWeight: 'bold',
         formatter: ({ data }) => data.rawLabel
       },
       itemStyle: {
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.8)'
+        borderColor: tokens.surface
       },
       levels: [
         { depth: 0, itemStyle: { color: '#4f7cff' } },
@@ -589,6 +743,7 @@ const renderSankey = async (queryLocs) => {
 
   requestAnimationFrame(() => {
     chartInstance.value?.resize()
+    updateScrollHint()
   })
 
   const updateDetailCardPosition = (params) => {
@@ -699,6 +854,7 @@ const renderSankey = async (queryLocs) => {
 const handleResize = () => {
   isMobileLayout.value = window.matchMedia(MOBILE_LAYOUT_MEDIA_QUERY).matches
   chartInstance.value?.resize()
+  nextTick(updateScrollHint)
 }
 
 // ========== 监听父组件传入的图表控制项：只重绘，不重新请求 API ==========
@@ -810,6 +966,10 @@ onMounted(() => {
   window.addEventListener('resize', handleResize)
 })
 
+onChartThemeChange(() => {
+  if (rawData.value) renderSankey(activeLocations.value)
+})
+
 onUnmounted(() => {
   clearChart()
   window.removeEventListener('resize', handleResize)
@@ -838,7 +998,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
   border-radius: var(--radius-sm, var(--radius-sm));
   color: var(--color-error, #{$error});
   text-align: left;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .loading-state {
@@ -851,7 +1011,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
 
   p {
     color: var(--text-secondary, var(--text-tertiary));
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -871,35 +1031,151 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
   margin-bottom: 5px;
 }
 
-.feature-tabs {
+/* 比较地点 */
+.compare-locations {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 6px 8px;
+  width: 100%;
+  margin-top: 16px;
+  margin-bottom: 2px;
+
+  .pill-btn {
+    --pill-btn-font-size: var(--font-size-14);
+  }
 }
 
-.feature-tab {
-  padding: 8px 18px;
-  background: var(--glass-30, var(--glass-30));
-  border: 1px solid var(--border-gray-light, rgba(var(--color-silver-rgb), 0.5));
-  border-radius: var(--radius-md, var(--radius-md));
-  color: var(--text-dark, var(--text-dark));
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.25s ease;
+.compare-locations-arrow {
+  color: var(--text-tertiary);
+  font-size: var(--font-size-14);
+  line-height: 1;
+}
 
-  @include glass-blur(10px);
 
-  &:hover {
-    background: var(--glass-60, var(--glass-50));
-    transform: translateY(-1px);
+/* 桑基图横向滚动提示 */
+.sankey-chart-shell {
+  position: relative;
+  width: 100%;
+}
+
+.sankey-scroll-hint {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  z-index: 21;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 2px 9px;
+  background: var(--glass-80);
+  border: 1px solid var(--border-glass-subtle);
+  border-radius: var(--radius-pill);
+  color: var(--color-primary);
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition: opacity 0.2s ease;
+
+  @include glass-blur(8px);
+
+  .hint-text {
+    color: var(--text-secondary);
+    font-size: var(--font-size-12);
+    line-height: 1;
+    white-space: nowrap;
+    pointer-events: none;
   }
 
-  &.active {
-    background: var(--color-primary, #{$primary});
-    border-color: var(--color-primary, #{$primary});
-    box-shadow: 0 4px 10px rgba(var(--color-primary-rgb), 0.2);
-    color: var(--action-primary-text);
+  .hint-chevron {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    opacity: 0.9;
+    pointer-events: auto;
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+
+    svg {
+      display: block;
+      width: 10px;
+      height: 16px;
+    }
+
+    &:not(:disabled) svg {
+      animation: hint-chevron-nudge 2.4s ease-in-out infinite;
+    }
+
+    &--left:not(:disabled) svg {
+      animation-name: hint-chevron-nudge-left;
+    }
+
+    path {
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    &:not(:disabled):hover {
+      opacity: 1;
+    }
+
+    &:not(:disabled):active {
+      transform: scale(0.88);
+    }
+
+    &:focus-visible {
+      border-radius: var(--radius-pill);
+      outline: 2px solid var(--color-primary);
+      outline-offset: 1px;
+    }
+
+    &:disabled {
+      cursor: default;
+    }
+  }
+
+  &.is-at-start .hint-chevron--left,
+  &.is-at-end .hint-chevron--right {
+    opacity: 0.2;
+  }
+}
+
+@keyframes hint-chevron-nudge {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes hint-chevron-nudge-left {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hint-chevron svg {
+    animation: none;
   }
 }
 
@@ -969,7 +1245,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
 /* 详情卡片内部结构 */
 :deep(.sankey-detail-card .hover-detail-card__header) {
   padding: 14px 16px 10px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--border-divider);
 }
 
 :deep(.sankey-detail-card .hover-detail-card__body) {
@@ -996,7 +1272,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
   color: var(--text-dark, var(--text-dark));
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 700;
   line-height: 1.4;
 }
@@ -1004,14 +1280,14 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
 .detail-card-subtitle {
   margin-top: 4px;
   color: var(--text-secondary, var(--text-tertiary));
-  font-size: 12px;
+  font-size: var(--font-size-12);
   line-height: 1.4;
 }
 
 .detail-card-count {
   margin-top: 4px;
   color: var(--color-primary, #{$primary});
-  font-size: 11px;
+  font-size: var(--font-size-12);
   font-weight: 600;
 }
 
@@ -1019,7 +1295,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);.phonetic-compare-results-containe
   color: var(--text-dark, var(--text-dark));
   word-break: break-all;
   white-space: pre-wrap;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   line-height: 1.8;
   letter-spacing: 1px;
 }

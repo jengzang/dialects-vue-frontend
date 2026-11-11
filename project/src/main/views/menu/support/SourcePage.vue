@@ -93,7 +93,7 @@ $transition-fast: 0.2s;
 .privacy-link {
   padding: 4px 8px;
   color: $primary-blue;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   white-space: nowrap;
   text-decoration: none;
   cursor: pointer;
@@ -107,7 +107,7 @@ $transition-fast: 0.2s;
   }
 
   @media (max-width: 768px) {
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 }
 
@@ -126,7 +126,7 @@ $transition-fast: 0.2s;
   margin-top: 12px;
   margin-bottom: 0;
   color: $summary-color;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 </style>

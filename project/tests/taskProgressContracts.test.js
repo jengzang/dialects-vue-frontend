@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
 const testsDir = dirname(fileURLToPath(import.meta.url))
 const projectRoot = resolve(testsDir, '..')
 
-const praatViewPath = resolve(projectRoot, 'src/main/views/Praat.vue')
+const praatViewPath = resolve(projectRoot, 'src/main/views/explore/Praat.vue')
 const mergeViewPath = resolve(projectRoot, 'src/main/views/explore/tools/MergeTool.vue')
 const jyutViewPath = resolve(projectRoot, 'src/main/views/explore/tools/Jyut2IpaTool.vue')
 const pollingTaskPath = resolve(projectRoot, 'src/composables/core/usePollingTask.js')
@@ -40,7 +40,7 @@ describe('task progress contracts', () => {
     expect(source).toContain('immediate: false')
     expect(source).toContain("const isFetchingResults = ref(false)")
     expect(source).toContain('isFetchingResults.value = true')
-    expect(source).toContain("jobStatus.value = 'processing'")
+    expect(source).toContain('await fetchResults(currentJobId)')
     expect(source).toContain("jobStage.value = t('praat.main.status.fetchingResults')")
     expect(source).toContain('isFetchingResults.value = false')
   })

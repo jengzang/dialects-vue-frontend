@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
   getVocabularyCounts: vi.fn(),
+  invalidateVocabularyCountsCache: vi.fn(),
+  invalidateVocabularyOptionsCache: vi.fn(),
   getVocabularyLocations: vi.fn(),
   previewVocabularyImport: vi.fn(),
   uploadVocabulary: vi.fn(),
@@ -10,10 +12,12 @@ const mocks = vi.hoisted(() => ({
   showSuccess: vi.fn(),
   showError: vi.fn(),
   showInfo: vi.fn(),
+  locale: { value: 'zh-CN' },
 }))
 vi.mock('@/api', () => mocks)
 vi.mock('@/utils/ui/message.js', () => mocks)
 vi.mock('vue-i18n', () => ({ useI18n: () => ({
+  locale: mocks.locale,
   t: (key, params) => `${key}${params ? JSON.stringify(params) : ''}`,
 }) }))
 vi.mock('vue-router', () => ({ useRoute: () => ({}), useRouter: () => ({ push: vi.fn() }) }))
@@ -42,12 +46,203 @@ async function flush() {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mocks.locale.value = 'zh-CN'
   mocks.getVocabularyCounts.mockResolvedValue({ total: 0, locations: 0 })
   mocks.getVocabularyLocations.mockResolvedValue({ locations: [], total: 0, page: 1, page_size: 200 })
 })
 afterEach(() => { wrapper?.app.unmount(); wrapper?.host.remove() })
 
 describe('vocabulary import feedback', () => {
+  it('shows unmatched columns without repeating every row as a missing-field notice', async () => {
+    const { state, host } = mountPage()
+    mocks.locale.value = 'en'
+    state.uploadLocation = { location_name: '甲村', coordinates: '113,23' }
+    const csv = [
+      'standard_word,方言词,pronunciation_text,comments_custom',
+      '水,水,,water',
+      '',
+      '饭,,,rice',
+      '',
+      '睡觉,,shuijiao,rest',
+    ].join('\n')
+    const file = new File([csv], 'words.csv')
+    file.text = async () => csv
+    mocks.previewVocabularyImport.mockResolvedValue({ parsed_count: 2, errors: [] })
+
+    await state.importFlow.loadPreview(file)
+    await flush()
+    await state.handleConfirmUpload()
+    await flush()
+
+    const notices = host.querySelector('.backend-preview-mapping-notices')
+    expect(notices).toBeTruthy()
+    expect(notices.querySelector('.backend-preview-unmatched')?.getAttribute('role')).toBe('status')
+    expect(notices.textContent).toContain('words.wordList.columns.pronunciation')
+    expect(notices.textContent).toContain('words.wordList.columns.detail')
+    expect(notices.textContent).not.toContain('"rows":')
+    expect(notices.textContent).toContain('pronunciation, words.wordList.columns.detail')
+    expect(notices.textContent).not.toContain('words.wordList.columns.headword')
+  })
+
+  it('reports an unmapped dialect-word column and checks row validity against the current mapping', async () => {
+    const { state, host } = mountPage()
+    state.uploadLocation = { location_name: '甲村', coordinates: '113,23' }
+    const csv = [
+      'standard_word,dialect_text,ipa,notes',
+      '水,土话,,',
+      '饭,,fan,',
+      '',
+      '睡觉,困觉,,',
+    ].join('\n')
+    const file = new File([csv], 'words.csv')
+    file.text = async () => csv
+    mocks.previewVocabularyImport.mockResolvedValue({ parsed_count: 1, errors: [] })
+
+    await state.importFlow.loadPreview(file)
+    await flush()
+    await state.handleConfirmUpload()
+    await flush()
+
+    const notices = host.querySelector('.backend-preview-mapping-notices')
+    expect(notices).toBeTruthy()
+    expect(notices.textContent).toContain('words.wordList.columns.headword')
+    expect(notices.textContent).not.toContain('"rows":')
+    expect(notices.textContent).not.toContain('words.wordList.columns.pronunciation')
+    expect(notices.textContent).not.toContain('words.wordList.columns.detail')
+  })
+
+  it.each([
+    { headerRowIndex: 0, prefix: ['standard_word,local_expression,ipa,notes'], offset: 0, locale: 'zh-CN', structured: true },
+    { headerRowIndex: 1, prefix: ['说明,,,', 'standard_word,local_expression,ipa,notes'], offset: 1, locale: 'zh-Hant', structured: true },
+    { headerRowIndex: -1, prefix: [], offset: -1, locale: 'en' },
+  ])('groups single-field gaps and restores source rows with header $headerRowIndex', async ({ headerRowIndex, prefix, offset, locale, structured }) => {
+    const { state, host } = mountPage()
+    mocks.locale.value = locale
+    state.uploadLocation = { location_name: '甲村', coordinates: '113,23' }
+    const csv = [
+      ...prefix,
+      '甲,,a,',
+      '乙,,b,',
+      '丙,丙,,',
+      '',
+      '丁,,,',
+      '戊,,,',
+      '己,己,k,',
+    ].join('\n')
+    const file = new File([csv], 'words.csv')
+    file.text = async () => csv
+    mocks.previewVocabularyImport.mockResolvedValue({
+      parsed_count: 4,
+      skipped_count: 0,
+      errors: structured ? ['Missing dialect word or IPA at row 5', 'Missing dialect word or IPA at row 6'] : [
+        '第 5 行缺少字段: ipa 或 local_expression（至少需要一个非空）',
+        '第 6 行缺少字段: ipa 或 local_expression（至少需要一个非空）',
+      ],
+      ...(structured ? { error_groups: [{ code: 'missing_fields', fields: ['local_expression_or_ipa'], row_numbers: [5, 6], error_indexes: [0, 1] }] } : {}),
+    })
+
+    await state.importFlow.loadPreview(file)
+    await flush()
+    state.importPreview.headerRowIndex.value = headerRowIndex
+    await flush()
+    state.importPreview.mapping.value = {
+      standard_word: 'column_1', local_expression: 'column_2', ipa: 'column_3', notes: 'column_4',
+    }
+    await flush()
+    await state.handleConfirmUpload()
+    await flush()
+
+    const notices = host.querySelector('.backend-preview-mapping-notices')
+    expect(notices.textContent).toContain(`previewMissingDialectRows{"rows":"${2 + offset}–${3 + offset}"}`)
+    expect(notices.textContent).toContain(`previewMissingIpaRows{"rows":"${4 + offset}"}`)
+    expect(notices.textContent).not.toContain('previewMissingDialectOrIpaRows')
+    const errors = host.querySelectorAll('.backend-preview-errors li')
+    expect(errors).toHaveLength(1)
+    expect(errors[0].textContent).toContain(`previewMissingDialectOrIpaRows{"rows":"${6 + offset}–${7 + offset}"}`)
+    expect(state.previewSkippedCount).toBe(2)
+    expect(state.previewErrors).toHaveLength(2)
+    expect(mocks.showError).not.toHaveBeenCalled()
+
+    state.clearUploadFile()
+    await flush()
+    state.backendPreview = { parsed_count: 1, errors: ['第 2 行缺少字段: standard_word'] }
+    await flush()
+    expect(host.querySelector('.backend-preview-mapping-notices')).toBeNull()
+    expect(host.querySelector('.backend-preview-errors').textContent).toContain('"rows":"2"')
+  })
+
+  it('groups backend row errors by reason and retains unknown errors without mapping metadata', async () => {
+    const { state, host } = mountPage()
+    state.backendPreview = {
+      parsed_count: 1, skipped_count: 3,
+      errors: ['第 9 行缺少字段: standard_word', '无法识别的格式',
+        '第 2 行缺少字段: standard_word', '第 3 行缺少字段: standard_word',
+        '第 5 行格式有误', '第 6 行格式有误'],
+    }
+    await flush()
+
+    const errors = [...host.querySelectorAll('.backend-preview-errors li')].map((item) => item.textContent)
+    expect(errors).toHaveLength(3)
+    expect(errors[0]).toContain('"rows":"2–3、9"')
+    expect(errors[0]).toContain('缺少字段: standard_word')
+    expect(errors[1]).toContain('无法识别的格式')
+    expect(errors[2]).toContain('"rows":"5–6"')
+    expect(errors[2]).toContain('格式有误')
+    expect(state.previewSkippedCount).toBe(9)
+    expect(state.previewErrors).toHaveLength(6)
+  })
+
+  it('uses structured field codes while retaining errors not covered by recognized groups', async () => {
+    const { state, host } = mountPage()
+    state.backendPreview = {
+      parsed_count: 1, skipped_count: 0,
+      errors: ['Old wording at row 2', 'Other format error', 'Old wording at row 4'],
+      error_groups: [
+        { code: 'missing_fields', fields: ['standard_word'], row_numbers: [2, 4], error_indexes: [0, 2] },
+        { code: 'future_error', fields: ['future_field'], row_numbers: [3], error_indexes: [1] },
+      ],
+    }
+    await flush()
+    const errors = [...host.querySelectorAll('.backend-preview-errors li')].map((item) => item.textContent)
+    expect(errors).toHaveLength(2)
+    expect(errors[0]).toContain('previewMissingFieldsRows')
+    expect(errors[0]).toContain('"rows":"2、4"')
+    expect(errors[0]).toContain('words.wordList.columns.definition')
+    expect(errors[1]).toContain('Other format error')
+    expect(errors.join('')).not.toContain('Old wording')
+    expect(state.previewSkippedCount).toBe(3)
+  })
+
+  it.each(['success', 'empty', 'failure'])('closes the mapping dialog before preview and clears loading after %s', async (outcome) => {
+    const { state, host } = mountPage()
+    state.uploadLocation = { location_name: '甲村', coordinates: '113,23' }
+    const csv = 'standard_word,local_expression\n水,水'
+    const file = new File([csv], 'words.csv')
+    file.text = async () => csv
+    await state.importFlow.loadPreview(file)
+    await flush()
+    expect(state.importPreview.diagnostics.value.isComplete).toBe(true)
+    let finishPreview
+    mocks.previewVocabularyImport.mockImplementation(() => {
+      expect(state.importFlow.pendingFile.value).toBeNull()
+      return new Promise((resolve, reject) => { finishPreview = outcome === 'failure' ? reject : resolve })
+    })
+
+    const confirmation = state.handleConfirmUpload()
+    await flush()
+    expect(mocks.previewVocabularyImport).toHaveBeenCalledOnce()
+    expect(host.querySelector('[role="status"] .ui-loading--page')).toBeTruthy()
+    expect(state.uploadFile.name).toBe('_mapped_words.xlsx')
+
+    const response = { parsed_count: outcome === 'empty' ? 0 : 1, errors: [] }
+    finishPreview(outcome === 'failure' ? new Error('preview failed') : response)
+    await confirmation
+    await flush()
+    expect(host.querySelector('.loading-state-base[role="status"]')).toBeNull()
+    expect(state.backendPreview).toEqual(outcome === 'failure' ? null : response)
+    expect(state.uploadFile).not.toBeNull()
+  })
+
   it.each([false, true])('resets the form only after a successful upload (%s)', async (fails) => {
     const { state } = mountPage()
     const file = new File(['content'], 'words.docx')

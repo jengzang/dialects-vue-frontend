@@ -144,7 +144,7 @@ const parseTrigrams = (trigrams) => {
 }
 
 .ngram-section h4 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-primary);
   margin: 6px;
@@ -159,7 +159,7 @@ const parseTrigrams = (trigrams) => {
 .ngram-item {
   padding: 8px 16px;
   border-radius: var(--radius-sm2);
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 500;
   transition: transform 0.3s ease;
 }
@@ -201,13 +201,13 @@ const parseTrigrams = (trigrams) => {
 }
 
 .stat-label {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-bottom: 6px;
 }
 
 .stat-value {
-  font-size: 24px;
+  font-size: var(--font-size-24);
   font-weight: 700;
   color: var(--color-primary);
 }

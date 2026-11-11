@@ -893,7 +893,7 @@ watch(() => props.activeTab, () => {
 
 
 .loading-text {
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 500;
   color: var(--text-primary);
   letter-spacing: 0.3px;
@@ -935,7 +935,7 @@ watch(() => props.activeTab, () => {
   border: 1px solid var(--border-light-gray);
   padding: 8px 12px;
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   cursor: pointer;
   outline: none;
   transition: border 0.3s;
@@ -951,7 +951,7 @@ watch(() => props.activeTab, () => {
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-muted)
 }
 
@@ -970,7 +970,7 @@ watch(() => props.activeTab, () => {
   border: none;
   background: transparent;
   border-radius: var(--radius-sm);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   cursor: pointer;
   transition: all 0.2s;
   color: var(--text-tertiary)
@@ -986,8 +986,7 @@ watch(() => props.activeTab, () => {
   font-weight: 600;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
-  :root[data-color-theme='green'] &,
-  :root[data-color-theme='dark'] & {
+  :root[data-color-mode='dark'] & {
     color: var(--text-primary);
     background: var(--surface-panel-strong);
   }
@@ -1015,7 +1014,7 @@ watch(() => props.activeTab, () => {
   padding: 8px;
   border-radius: var(--radius-sm2);
   cursor: pointer;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   transition: background 0.2s;
 }
 
@@ -1037,7 +1036,7 @@ watch(() => props.activeTab, () => {
   top: 24px;
   right: 24px;
   padding: 12px 24px;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-dark);
   background: var(--glass-70);
@@ -1071,7 +1070,7 @@ watch(() => props.activeTab, () => {
   padding: 4px 8px;
   border-radius: var(--radius-sm);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   white-space: nowrap;
   font-family: var(--font-sans);
   font-weight: 500;
@@ -1117,7 +1116,7 @@ watch(() => props.activeTab, () => {
 
 .popup-header h3 {
   margin: 0;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   color: var(--text-dark);
   font-weight: 600;
 }
@@ -1138,7 +1137,7 @@ watch(() => props.activeTab, () => {
   background: rgba(var(--color-primary-rgb), 0.08);
   border-left: 3px solid var(--color-primary);
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--color-primary);
   font-weight: 500;
 }
@@ -1174,7 +1173,7 @@ watch(() => props.activeTab, () => {
 .info-row .label {
   flex-shrink: 0;
   min-width: 60px;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 600;
   color: #6e6e73;
   letter-spacing: 0.3px;
@@ -1184,7 +1183,7 @@ watch(() => props.activeTab, () => {
 /* 值样式 */
 .info-row .value {
   flex: 1;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 500;
   color: var(--text-primary);
   line-height: 1.6;
@@ -1196,13 +1195,13 @@ watch(() => props.activeTab, () => {
   font-family: var(--font-mono);
   color: var(--color-primary);
   letter-spacing: 0.5px;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: bold;
 }
 
 /* 字/词汇特殊样式 */
 .word-value {
-  font-size: 17px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -1211,13 +1210,13 @@ watch(() => props.activeTab, () => {
 .category-row .value {
   color: var(--color-secondary-text);
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .info-line {
   padding: 10px 0;
   border-bottom: 1px solid var(--bg-light);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   line-height: 1.6;
 }
 

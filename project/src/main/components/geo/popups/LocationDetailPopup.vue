@@ -301,7 +301,7 @@ $transition-fast: 0.2s;
 
 /* 内容区域 */
 .location-content {
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 /* 基本信息 */
@@ -314,7 +314,7 @@ $transition-fast: 0.2s;
   padding-bottom: 8px;
   border-bottom: 2px solid $primary-divider;
   color: $text-main;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
 }
 
@@ -375,7 +375,7 @@ $transition-fast: 0.2s;
   padding: 8px 0;
   border: 1px solid $primary-divider;
   color: $primary;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 600;
   &:hover {
     background: $primary-background-medium;
@@ -393,7 +393,7 @@ $transition-fast: 0.2s;
 .section-title {
   margin-bottom: 12px;
   color: $text-main;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 600;
 }
 
@@ -405,7 +405,7 @@ $transition-fast: 0.2s;
   border-spacing: 0;
   border-collapse: separate;
   border-radius: var(--radius-sm2);
-  font-size: 13px;
+  font-size: var(--font-size-13);
 
   th,
   td {
@@ -447,11 +447,11 @@ $transition-fast: 0.2s;
   width: 24px;
   height: 24px;
   padding: 0;
-  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+  border: 1px solid var(--border-glass);
   border-radius: var(--radius-sm, 4px);
   background: transparent;
   cursor: pointer;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   line-height: 1;
   vertical-align: middle;
   transition: background 0.2s ease;
@@ -466,11 +466,11 @@ $transition-fast: 0.2s;
   .info-item {
     .info-label {
       min-width: 90px;
-      font-size: 13px;
+      font-size: var(--font-size-13);
     }
 
     .info-value {
-      font-size: 13px;
+      font-size: var(--font-size-13);
     }
   }
 }

@@ -129,6 +129,7 @@ function withVocabularyEntryCreateLocation(params = {}) {
  * @property {string[]} [regions] 完整分区路径，使用重复参数，保留原文。
  * @property {number} [page=1] 卡片模式结果页码；后端默认 1。
  * @property {number} [page_size=50] 卡片模式每页数量；后端默认 50，最大 200。
+ * @property {boolean} [defer_total=false] 先返回当前页，精确总数允许稍后缓存。
  */
 
 /**
@@ -185,7 +186,8 @@ function withVocabularyEntryCreateLocation(params = {}) {
 /**
  * @typedef {object} VocabularyItemsResponse
  * @property {VocabularyItem[]} items 卡片模式词条结果。
- * @property {number} total 后端匹配总数。
+ * @property {number|null} total 后端匹配总数；延后计数尚未完成时为空。
+ * @property {boolean} [has_more] 是否还有下一页。
  * @property {number} page 当前页码。
  * @property {number} page_size 当前页大小。
  */
@@ -218,6 +220,7 @@ export function buildVocabularyItemsPath(params = {}) {
     regions: params.regions,
     page: params.page,
     page_size: params.page_size,
+    defer_total: params.defer_total,
   })}`
 }
 
@@ -737,7 +740,7 @@ export async function exportVocabularyLocation(locationName, params = {}) {
 /**
  * 获取词表操作日志。
  *
- * @param {{user_id?: number|string, permission_level?: string, source?: string, action?: string, table_name?: string, status?: string, page?: number, page_size?: number}} [params={}]
+ * @param {{user_id?: number|string, permission_level?: string, source?: string, action?: string, table_name?: string, status?: string, permission_levels?: string[], sources?: string[], actions?: string[], table_names?: string[], statuses?: string[], sort_by?: string, sort_order?: string, page?: number, page_size?: number}} [params={}]
  * @returns {Promise<{logs: Array<object>, total: number, page: number, page_size: number}>}
  */
 export async function getVocabularyLogs(params = {}) {

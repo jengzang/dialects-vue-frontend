@@ -20,22 +20,22 @@
   --vml-brown-dark: #6b3e1a;
 }
 
-:root[data-color-theme='light'] {
+:root[data-color-theme='red-light'] {
   color-scheme: light;
-  --vml-blue: #4b5563;
-  --vml-blue-rgb: 75, 85, 99;
-  --vml-blue-dark: #374151;
-  --vml-blue-dark-rgb: 55, 65, 81;
-  --vml-blue-darker: #111418;
-  --vml-blue-darker-rgb: 17, 20, 24;
-  --vml-blue-darkest: #050608;
-  --vml-blue-darkest-rgb: 5, 6, 8;
-  --vml-blue-medium: #64748b;
-  --vml-blue-medium-rgb: 100, 116, 139;
-  --vml-blue-highlight: #475569;
+  --vml-blue: var(--color-primary);
+  --vml-blue-rgb: var(--color-primary-rgb);
+  --vml-blue-dark: var(--color-primary-hover);
+  --vml-blue-dark-rgb: var(--color-primary-hover-rgb);
+  --vml-blue-darker: #76251f;
+  --vml-blue-darker-rgb: 118, 37, 31;
+  --vml-blue-darkest: #5c1b17;
+  --vml-blue-darkest-rgb: 92, 27, 23;
+  --vml-blue-medium: #b9534a;
+  --vml-blue-medium-rgb: 185, 83, 74;
+  --vml-blue-highlight: var(--color-primary-hover);
 }
 
-:root[data-color-theme='green'] {
+:root[data-color-theme='green-dark'] {
   color-scheme: dark;
   --vml-blue: #86d99b;
   --vml-blue-rgb: 134, 217, 155;
@@ -50,17 +50,32 @@
   --vml-blue-highlight: #a2e5b3;
 }
 
-:root[data-color-theme='dark'] {
+:root[data-color-theme='blue-dark'],
+:root[data-color-theme='red-dark'] {
   color-scheme: dark;
-  --vml-blue: #f5f5f7;
-  --vml-blue-rgb: 245, 245, 247;
-  --vml-blue-dark: #ffffff;
-  --vml-blue-dark-rgb: 255, 255, 255;
-  --vml-blue-darker: #d1d1d6;
-  --vml-blue-darker-rgb: 209, 209, 214;
-  --vml-blue-darkest: #a1a1a6;
-  --vml-blue-darkest-rgb: 161, 161, 166;
-  --vml-blue-medium: #e5e5ea;
-  --vml-blue-medium-rgb: 229, 229, 234;
-  --vml-blue-highlight: #ffffff;
+  --vml-blue: var(--color-primary);
+  --vml-blue-rgb: var(--color-primary-rgb);
+  --vml-blue-dark: var(--color-primary-hover);
+  --vml-blue-dark-rgb: var(--color-primary-hover-rgb);
+  --vml-blue-darker: var(--color-secondary);
+  --vml-blue-darker-rgb: var(--color-secondary-rgb);
+  --vml-blue-darkest: var(--text-primary);
+  --vml-blue-darkest-rgb: var(--text-deep-rgb);
+  --vml-blue-medium: var(--color-primary);
+  --vml-blue-medium-rgb: var(--color-primary-rgb);
+  --vml-blue-highlight: var(--color-primary-hover);
+}
+
+:root[data-color-theme='green-light'] {
+  --vml-blue: var(--color-primary);
+  --vml-blue-rgb: var(--color-primary-rgb);
+  --vml-blue-dark: var(--color-primary-hover);
+  --vml-blue-dark-rgb: var(--color-primary-hover-rgb);
+  --vml-blue-darker: #205332;
+  --vml-blue-darker-rgb: 32, 83, 50;
+  --vml-blue-darkest: #193d26;
+  --vml-blue-darkest-rgb: 25, 61, 38;
+  --vml-blue-medium: var(--color-primary);
+  --vml-blue-medium-rgb: var(--color-primary-rgb);
+  --vml-blue-highlight: var(--color-primary-hover);
 }

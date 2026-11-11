@@ -405,7 +405,7 @@ function formatRegionNames(regionNames) {
 
 .scope-modal-title {
   margin: 0;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 700;
   color: $text-strong;
   min-width: 100px;
@@ -417,7 +417,7 @@ function formatRegionNames(regionNames) {
   .scope-search-input {
     width: 80%;
     height: 38px;
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 }
 
@@ -436,12 +436,12 @@ function formatRegionNames(regionNames) {
   }
 
   .summary-label {
-    font-size: 12px;
+    font-size: var(--font-size-12);
     color: $text-muted;
   }
 
   .summary-value {
-    font-size: 15px;
+    font-size: var(--font-size-16);
     font-weight: 700;
     color: $text-strong;
   }
@@ -495,7 +495,7 @@ function formatRegionNames(regionNames) {
   padding: 16px;
 
   &-title {
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 800;
     color: $text-strong;
   }
@@ -591,7 +591,7 @@ function formatRegionNames(regionNames) {
   }
 
   .scope-selection-meta {
-    font-size: 12px;
+    font-size: var(--font-size-12);
     color: $text-muted;
     color: var(--color-primary-hover);
 
@@ -599,7 +599,7 @@ function formatRegionNames(regionNames) {
 }
 
 .scope-selection-status {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: $text-muted;
 }
 

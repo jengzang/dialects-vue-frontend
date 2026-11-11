@@ -64,6 +64,38 @@ async function mountPinnedElement(options = {}) {
 }
 
 describe('useViewportPinnedElement', () => {
+  it('waits for route scroll restoration before capturing the landscape top', async () => {
+    originalGetBoundingClientRect = HTMLElement.prototype.getBoundingClientRect
+    originalMatchMediaDescriptor = Object.getOwnPropertyDescriptor(window, 'matchMedia')
+    let scrollY = 1202
+    vi.spyOn(window, 'scrollY', 'get').mockImplementation(() => scrollY)
+    window.matchMedia = vi.fn(() => ({
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    }))
+
+    HTMLElement.prototype.getBoundingClientRect = function getPinnedRect() {
+      const top = scrollY ? -205 : 70
+      if (this.hasAttribute('data-pinned-placeholder')) {
+        return { left: 20, top, width: 800, height: 50 }
+      }
+      if (this.hasAttribute('data-pinned-navigation')) {
+        return { left: 300, top, width: 240, height: 50 }
+      }
+      return originalGetBoundingClientRect.call(this)
+    }
+
+    const { navigation } = await mountPinnedElement()
+    expect(navigation.style.position).toBe('')
+
+    scrollY = 0
+    window.dispatchEvent(new Event('scroll'))
+    await nextTick()
+    expect(navigation.style.position).toBe('fixed')
+    expect(navigation.style.top).toBe('70px')
+  })
+
   it('preserves the navigation width and center when the element becomes fixed', async () => {
     originalGetBoundingClientRect = HTMLElement.prototype.getBoundingClientRect
     originalMatchMediaDescriptor = Object.getOwnPropertyDescriptor(window, 'matchMedia')
@@ -104,7 +136,7 @@ describe('useViewportPinnedElement', () => {
 
     expect(placeholder.style.width).toBe('800px')
     expect(navigation.style.width).toBe('240px')
-    expect(navigation.style.left).toBe('20px')
+    expect(navigation.style.left).toBe('300px')
   })
 
   it('waits for the portrait navigation to reach the viewport top before pinning', async () => {
@@ -141,16 +173,17 @@ describe('useViewportPinnedElement', () => {
     expect(navigation.style.position).toBe('fixed')
     expect(navigation.style.top).toBe('0px')
     expect(navigation.style.width).toBe('240px')
-    expect(navigation.style.left).toBe('300px')
+    expect(navigation.style.left).toBe('20px')
   })
 
-  it('recalculates the fixed navigation center after an orientation change', async () => {
+  it('recenters the rendered navigation width on orientation changes and clamps it to its parent', async () => {
     originalGetBoundingClientRect = HTMLElement.prototype.getBoundingClientRect
     originalMatchMediaDescriptor = Object.getOwnPropertyDescriptor(window, 'matchMedia')
 
     let placeholderLeft = 20
     let placeholderTop = 100
     let placeholderWidth = 800
+    const intrinsicNavigationWidth = 240
     const orientationQuery = {
       matches: false,
       addEventListener: vi.fn(),
@@ -172,7 +205,7 @@ describe('useViewportPinnedElement', () => {
         }
       }
       if (this.hasAttribute('data-pinned-navigation')) {
-        const width = Number.parseFloat(this.style.width) || 240
+        const width = Number.parseFloat(this.style.width) || intrinsicNavigationWidth
         const left = Number.parseFloat(this.style.left) || 300
         return { x: left, y: 100, left, top: 100, right: left + width, bottom: 150, width, height: 50 }
       }
@@ -190,6 +223,13 @@ describe('useViewportPinnedElement', () => {
     await nextTick()
 
     expect(navigation.style.left).toBe('70px')
+    expect(navigation.style.width).toBe('240px')
+
+    placeholderWidth = 120
+    window.dispatchEvent(new Event('resize'))
+    await nextTick()
+    expect(navigation.style.width).toBe('120px')
+    expect(navigation.style.left).toBe('10px')
   })
 
   it('uses a dynamic portrait top offset when pinning below a fixed header', async () => {

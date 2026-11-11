@@ -1,6 +1,6 @@
 <template>
   <button
-    v-if="diceEntry && tutorialEnabled"
+    v-if="diceEntry"
     type="button"
     class="pill-btn tutorial-quick-start"
     @click="apply"
@@ -30,7 +30,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { tutorialEnabled, requestTutorialAssistApply } from '@/main/store/store.js'
+import { requestTutorialAssistApply } from '@/main/store/store.js'
 import {
   getTutorialDiceEntryByTarget,
   getTutorialDicePresetState,

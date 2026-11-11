@@ -186,7 +186,7 @@ const runClustering = () => {
 }
 
 .panel-title {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--text-primary);
   margin: 0 0 20px 0;
@@ -202,7 +202,7 @@ const runClustering = () => {
 
 .setting-row label {
   min-width: 100px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
 }
 
@@ -213,7 +213,7 @@ const runClustering = () => {
   border-radius: var(--radius-md);
   background: var(--glass-50);
   backdrop-filter: blur(10px);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   white-space: nowrap;
 }
 
@@ -229,7 +229,7 @@ const runClustering = () => {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   cursor: pointer;
 }
 
@@ -246,11 +246,11 @@ const runClustering = () => {
 }
 
 .notice-icon {
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .notice-text {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--color-warning-dark);
   font-weight: 500;
 }
@@ -272,7 +272,7 @@ const runClustering = () => {
 }
 
 .config-title {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--text-primary);
 }

@@ -3,7 +3,7 @@
 // Info text utilities — migrated from _legacy.scss
 
 .tabs-title {
-  font-size: 1.5rem;
+  font-size: var(--font-size-24);
   font-weight: 600;
   margin-bottom: 1.2rem;
   margin-top: 0.5rem;
@@ -21,11 +21,11 @@
   // margin: 0 0 12px;
   margin: 0 auto;
   color: var(--text-primary);
-  font-size: 1.5rem;
+  font-size: var(--font-size-24);
   font-weight: 600;
 
   @media (aspect-ratio > 1 / 1) {
-    font-size: var(--font-size-page-title-landscape);
+    font-size: var(--font-size-28);
   }
 }
 
@@ -37,7 +37,7 @@
 }
 
 .hint {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-muted);
   // white-space: nowrap;
 }
@@ -47,7 +47,7 @@
   align-items: center;
   gap: 6px;
   white-space: pre-wrap;
-  font-size: 15px;
+  font-size: var(--font-size-16);
 }
 
 .info-text strong {

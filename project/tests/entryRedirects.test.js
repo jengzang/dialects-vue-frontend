@@ -46,7 +46,7 @@ describe('legacy entry redirects', () => {
     await nextTick()
 
     expect(replaceMock).toHaveBeenCalledWith({
-      path: '/menu/query/zhonggu',
+      path: '/zh-Hant/menu/query/zhonggu',
       hash: '',
     })
 
@@ -65,7 +65,7 @@ describe('legacy entry redirects', () => {
     await nextTick()
 
     expect(replaceMock).toHaveBeenCalledWith({
-      path: '/explore/yubao',
+      path: '/zh-Hant/menu/yubao',
       query: {
         tab: 'grammar',
       },

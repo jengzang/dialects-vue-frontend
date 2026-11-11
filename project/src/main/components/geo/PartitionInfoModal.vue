@@ -751,7 +751,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 /* 弹窗标题 */
 .partition-modal-title {
   color: var(--text-dark-light);
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 650;
 }
 
@@ -764,7 +764,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .toggle-label {
   color: var(--text-dark-medium);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 500;
 }
 
@@ -790,7 +790,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
   border-radius: var(--radius-md);
   color: var(--text-primary);
   white-space: nowrap;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -817,7 +817,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 .selection-warning-inline {
   color: $warning;
   white-space: nowrap;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 600;
 }
 
@@ -830,7 +830,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
   border-radius: var(--radius-md);
   box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
   color: var(--action-primary-text);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -866,7 +866,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 /* 分区树 */
 .partition-tree-container {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   line-height: 1.6;
 
   :deep(.tree-node) {
@@ -893,11 +893,11 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     align-items: center;
     gap: 8px;
     color: var(--text-dark);
-    font-size: 15px;
+    font-size: var(--font-size-16);
     font-weight: 500;
 
     .icon {
-      font-size: 16px;
+      font-size: var(--font-size-16);
     }
 
     .text {
@@ -907,7 +907,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     .count {
       margin-left: 4px;
       color: var(--text-secondary);
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
 
     .selected-count {
@@ -931,7 +931,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     padding: 4px 10px;
     border: none;
     border-radius: var(--radius-pill);
-    font-size: 12px;
+    font-size: var(--font-size-12);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -970,7 +970,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     border: none;
     border-radius: var(--radius-full);
     color: $primary;
-    font-size: 16px;
+    font-size: var(--font-size-16);
     cursor: pointer;
     transition: all 0.3s ease;
 
@@ -1009,7 +1009,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
     color: var(--text-dark);
     white-space: nowrap;
     text-overflow: ellipsis;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 500;
     cursor: default;
     transition: all 0.2s;
@@ -1092,7 +1092,7 @@ $ease-fluid: cubic-bezier(0.25, 0.8, 0.25, 1);
 
     :deep(.leaf-item) {
       padding: 6px 8px;
-      font-size: 13px;
+      font-size: var(--font-size-13);
     }
 
     &.selection-mode {

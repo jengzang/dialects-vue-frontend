@@ -38,20 +38,21 @@ const panelStyle = computed(() => ({
   '--query-progress': props.enabled ? progress.value : 1,
   '--query-expansion': props.enabled ? 1 - progress.value : 0,
 }))
+let reboundTimer = null
+let rebounding = false
+let touching = false
 let scrollFrame = null
 let animationFrame = null
 let targetProgress = 0
+let autoCollapsing = false
 let lastAnimationTime = 0
 const transitionDuration = 400
-const boundaryWindowDuration = 5000
-const wheelGestureGap = 180
+const wheelGestureGap = 150
 let transitionUnlocked = false
-let boundaryDirection = 0
-let boundaryExpiresAt = 0
-let boundaryScrollPosition = null
+let waitingForGesture = false
 let lastWheelTime = -Infinity
 let lastWheelDelta = 0
-let wheelDecayCount = 0
+let wheelDecaying = false
 let lastScrollPosition = 0
 let inputDirection = 0
 let touchY = null
@@ -59,8 +60,33 @@ let touchCanReleaseBoundary = false
 const hasSubmittedQuery = ref(false)
 
 function clearBoundary() {
-  boundaryDirection = 0
-  boundaryScrollPosition = null
+  waitingForGesture = false
+  window.clearTimeout(reboundTimer)
+  reboundTimer = null
+}
+
+function scheduleRebound() {
+  window.clearTimeout(reboundTimer)
+  if (!waitingForGesture || touching || rebounding) return
+  reboundTimer = window.setTimeout(() => {
+    reboundTimer = null
+    if (!waitingForGesture || touching) return
+    const target = compactPosition()
+    if (window.scrollY >= target - 1) return
+    rebounding = true
+    window.scrollTo({
+      top: target,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+    })
+  }, 200)
+}
+
+function cancelRebound() {
+  window.clearTimeout(reboundTimer)
+  reboundTimer = null
+  if (!rebounding) return
+  rebounding = false
+  window.scrollTo({ top: window.scrollY, behavior: 'instant' })
 }
 
 function animateProgress(time) {
@@ -74,6 +100,7 @@ function animateProgress(time) {
     ? null
     : window.requestAnimationFrame(animateProgress)
   if (progress.value === 0 || progress.value === 1) {
+    if (progress.value === 1) autoCollapsing = false
     transitionUnlocked = false
     clearBoundary()
   }
@@ -85,6 +112,7 @@ function setTargetProgress(value, immediate = false) {
     if (animationFrame !== null) window.cancelAnimationFrame(animationFrame)
     animationFrame = null
     progress.value = value
+    autoCollapsing = false
     transitionUnlocked = false
     clearBoundary()
     return
@@ -108,6 +136,12 @@ function updateProgress(fromScroll = false) {
     setTargetProgress(0, true)
     return
   }
+  if (props.enabled && autoCollapsing) {
+    setTargetProgress(1)
+    return
+  }
+  // Hold the panel state, never the browser's native scrolling or inertia.
+  if (props.enabled && waitingForGesture) return
   const target = compactPosition()
   const compactHoldDistance = Math.min(80, target / 2)
   const distance = Math.min((introEl.value?.getBoundingClientRect().height || 0) * 3, target - compactHoldDistance)
@@ -119,32 +153,28 @@ function updateProgress(fromScroll = false) {
     if (!fromScroll) return
     const direction = Math.sign(nextProgress - progress.value)
     if (inputDirection && inputDirection !== direction) {
-      boundaryDirection = 0
       return
     }
-    boundaryDirection = direction
-    boundaryExpiresAt = window.performance.now() + boundaryWindowDuration
+    waitingForGesture = true
     lastWheelTime = window.performance.now()
-    wheelDecayCount = 0
-    boundaryScrollPosition = window.scrollY
+    wheelDecaying = false
     touchCanReleaseBoundary = false
-    window.scrollTo({ top: boundaryScrollPosition, behavior: 'instant' })
+    scheduleRebound()
     return
   }
   setTargetProgress(nextProgress, !props.enabled)
 }
 
 function handleScroll() {
-  const position = window.scrollY
-  if (boundaryScrollPosition !== null) {
-    if (position !== boundaryScrollPosition) {
-      window.scrollTo({ top: boundaryScrollPosition, behavior: 'instant' })
-    }
+  if (rebounding) {
+    if (window.scrollY >= compactPosition() - 1) rebounding = false
     return
   }
+  if (waitingForGesture) scheduleRebound()
+  const position = window.scrollY
+  if (position < lastScrollPosition) autoCollapsing = false
   if (position !== lastScrollPosition) inputDirection = Math.sign(position - lastScrollPosition)
   lastScrollPosition = position
-  if (inputDirection && boundaryDirection !== inputDirection) boundaryDirection = 0
   if (scrollFrame === null) scrollFrame = window.requestAnimationFrame(() => updateProgress(true))
 }
 
@@ -154,24 +184,20 @@ function acceptScrollInput(event, direction, canRelease = true) {
     const canScroll = direction < 0 ? element.scrollTop > 0 : element.scrollTop + element.clientHeight < element.scrollHeight - 1
     if (canScroll && /auto|scroll/.test(window.getComputedStyle(element).overflowY)) return false
   }
+  if (direction < 0) autoCollapsing = false
   inputDirection = direction
-  if (boundaryScrollPosition === null) return true
-  if (direction !== boundaryDirection) {
-    clearBoundary()
-    return true
-  }
-  const now = window.performance.now()
-  if (canRelease && now <= boundaryExpiresAt) {
-    transitionUnlocked = true
+  if (!waitingForGesture) return true
+  if (direction > 0) {
+    cancelRebound()
     clearBoundary()
     return true
   }
   if (canRelease) {
-    boundaryExpiresAt = now + boundaryWindowDuration
-    touchCanReleaseBoundary = false
-    window.scrollTo({ top: boundaryScrollPosition, behavior: 'instant' })
+    cancelRebound()
+    transitionUnlocked = true
+    clearBoundary()
+    return true
   }
-  if (event.cancelable) event.preventDefault()
   return false
 }
 
@@ -179,17 +205,19 @@ function handleWheel(event) {
   if (!event.deltaY || event.ctrlKey || event.defaultPrevented) return
   const now = window.performance.now()
   const delta = Math.abs(event.deltaY)
-  // Wheel events have no gesture-start flag. Treat a pause or a new impulse
-  // after a decaying tail as a new gesture; do not delay touch or key input.
-  const newGesture = event.deltaMode !== 0 || now - lastWheelTime >= wheelGestureGap
-    || (wheelDecayCount >= 2 && delta >= Math.max(4, lastWheelDelta * 2))
-  wheelDecayCount = delta < lastWheelDelta ? wheelDecayCount + 1 : 0
+  // A pause or a renewed impulse after decay can signal a fresh gesture.
+  // This only unlocks the panel; native scrolling is never intercepted.
+  const newGesture = now - lastWheelTime >= wheelGestureGap
+    || (wheelDecaying && delta >= Math.max(8, lastWheelDelta * 1.2))
+  wheelDecaying = delta < lastWheelDelta
   lastWheelTime = now
   lastWheelDelta = delta
   if (acceptScrollInput(event, Math.sign(event.deltaY), newGesture)) handleScroll()
 }
 
 function handleTouchStart(event) {
+  touching = true
+  cancelRebound()
   touchY = event.touches[0]?.clientY ?? null
   touchCanReleaseBoundary = true
 }
@@ -203,8 +231,13 @@ function handleTouchMove(event) {
   touchY = nextY ?? null
 }
 
+function handleTouchEnd() {
+  touching = false
+  scheduleRebound()
+}
+
 function handleKeyDown(event) {
-  if (boundaryScrollPosition === null || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return
+  if (!waitingForGesture || event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return
   if (event.target instanceof Element && event.target.closest('input, textarea, select, [contenteditable]')) return
   const direction = { ArrowUp: -1, PageUp: -1, Home: -1, ArrowDown: 1, PageDown: 1, End: 1, ' ': event.shiftKey ? -1 : 1 }[event.key]
   if (direction && acceptScrollInput(event, direction, !event.repeat)) handleScroll()
@@ -220,6 +253,8 @@ async function collapse() {
   transitionUnlocked = true
   clearBoundary()
   await nextTick()
+  autoCollapsing = progress.value < 1
+  setTargetProgress(1)
   window.scrollTo({
     top: compactPosition(),
     behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
@@ -232,9 +267,11 @@ watch(() => props.enabled, async () => { await nextTick(); updateProgress() })
 function startListening() {
   lastScrollPosition = window.scrollY
   window.addEventListener('scroll', handleScroll, { passive: true })
-  window.addEventListener('wheel', handleWheel, { passive: false })
+  window.addEventListener('wheel', handleWheel, { passive: true })
   window.addEventListener('touchstart', handleTouchStart, { passive: true })
-  window.addEventListener('touchmove', handleTouchMove, { passive: false })
+  window.addEventListener('touchmove', handleTouchMove, { passive: true })
+  window.addEventListener('touchend', handleTouchEnd, { passive: true })
+  window.addEventListener('touchcancel', handleTouchEnd, { passive: true })
   window.addEventListener('keydown', handleKeyDown)
   window.addEventListener('resize', handleResize, { passive: true })
   updateProgress()
@@ -245,12 +282,17 @@ function stopListening() {
   window.removeEventListener('wheel', handleWheel)
   window.removeEventListener('touchstart', handleTouchStart)
   window.removeEventListener('touchmove', handleTouchMove)
+  window.removeEventListener('touchend', handleTouchEnd)
+  window.removeEventListener('touchcancel', handleTouchEnd)
   window.removeEventListener('keydown', handleKeyDown)
   window.removeEventListener('resize', handleResize)
   if (scrollFrame !== null) window.cancelAnimationFrame(scrollFrame)
   if (animationFrame !== null) window.cancelAnimationFrame(animationFrame)
   scrollFrame = null
   animationFrame = null
+  autoCollapsing = false
+  rebounding = false
+  touching = false
   clearBoundary()
 }
 
@@ -270,7 +312,7 @@ defineExpose({ collapse, progress })
   --glass-panel-radius: calc(var(--radius-xl) * var(--query-expansion));
   --glass-panel-shadow: 0 4px 14px rgba(var(--color-shadow-rgb), calc(0.08 * var(--query-expansion)));
   --glass-panel-hover-shadow: var(--glass-panel-shadow);
-  --glass-panel-backdrop-filter: none;
+  // --glass-panel-backdrop-filter: none;
   --query-input-growth: calc(48px * var(--query-expansion));
   width: min(100%, calc(760px + (100% - 760px) * var(--query-progress)));
   margin: 0 auto;
@@ -350,7 +392,7 @@ defineExpose({ collapse, progress })
     }
 
     :deep(.query-controls--notes) {
-      grid-template-areas: 'input action';
+      grid-template-areas: 'input action' 'modes modes';
     }
 
     :deep(.query-controls--yubao) {
@@ -467,7 +509,7 @@ defineExpose({ collapse, progress })
 
     :deep(.query-condition-label) {
       color: var(--text-secondary);
-      font-size: 14px;
+      font-size: var(--font-size-14);
       white-space: nowrap;
     }
   }
@@ -475,9 +517,9 @@ defineExpose({ collapse, progress })
   &.is-compact { width: 100%; }
 }
 
-.query-results--enabled {
-  min-height: 84dvh;
-}
+// .query-results--enabled {
+//   min-height: 84dvh;
+// }
 
 .query-panel-footer {
   @include flex-col;
@@ -511,7 +553,7 @@ defineExpose({ collapse, progress })
       grid-template-areas: 'input input' 'modes action' 'range tools';
     }
     :deep(.query-controls--notes) {
-      grid-template-areas: 'input input' 'action action';
+      grid-template-areas: 'input input' 'modes action';
     }
     :deep(.query-controls--yubao) {
       grid-template-areas: 'category category' 'input input' 'action action';

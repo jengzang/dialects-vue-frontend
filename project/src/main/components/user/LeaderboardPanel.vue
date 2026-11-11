@@ -179,10 +179,10 @@ const categoryConfigs = computed(() => [
       //   key: 'endpoint_group_toponyms',
       //   label: t('user.leaderboard.categories.villageGeography.items.toponyms')
       // },
-      // {
-      //   key: 'endpoint_group_gis',
-      //   label: t('user.leaderboard.categories.villageGeography.items.gis')
-      // }
+      {
+         key: 'endpoint_group_gis',
+        label: t('user.leaderboard.categories.villageGeography.items.gis')
+      }
     ]
   },
   {
@@ -445,7 +445,6 @@ const tableData = computed(() => {
         </div>
       </div>
 
-      <div class="table-wrapper">
         <div class="table-container">
           <table class="rankings-table desktop-table">
             <thead>
@@ -708,7 +707,6 @@ const tableData = computed(() => {
             </tbody>
           </table>
         </div>
-      </div>
 
       <div class="total-users">
         {{ t('user.leaderboard.totalUsers', { value: formatNumber(rankingsData.total_users) }) }}
@@ -792,7 +790,7 @@ $warning: var(--color-warning);
   border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   transition: all 0.3s ease;
 
   &:hover {
@@ -820,7 +818,7 @@ $warning: var(--color-warning);
 .page-title {
   margin: 12px;
   color: $primary;
-  font-size: 28px;
+  font-size: var(--font-size-28);
 }
 
 .top-metrics-cards {
@@ -887,18 +885,18 @@ $warning: var(--color-warning);
   }
 
   &-icon {
-    font-size: 24px;
+    font-size: var(--font-size-24);
   }
 
   &-label {
-    font-size: 16px;
+    font-size: var(--font-size-16);
     font-weight: 600;
     color: $text-primary;
     letter-spacing: -0.01em;
   }
 
   &-rank {
-    font-size: 36px;
+    font-size: var(--font-size-32);
     font-weight: 700;
 
     @include gradient-text($primary, $primary-dark);
@@ -919,13 +917,13 @@ $warning: var(--color-warning);
   }
 
   &-value {
-    font-size: 28px;
+    font-size: var(--font-size-28);
     font-weight: 600;
     color: $text-primary;
   }
 
   &-details {
-    font-size: 14px;
+    font-size: var(--font-size-14);
     line-height: 1.6;
     color: $text-secondary;
   }
@@ -945,24 +943,13 @@ $warning: var(--color-warning);
   }
 }
 
-.table-wrapper {
-  padding: 20px;
-  background: $glass-70;
-  @include glass;
-  border: 0.5px solid $glass-80;
-  border-radius: var(--radius-xl);
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.04),
-    0 8px 32px rgba(0, 0, 0, 0.08),
-    inset 0 0 0 1px $glass-90;
-}
-
 .table-container {
   overflow-x: auto;
   background: $glass-50;
   backdrop-filter: blur(20px);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   box-shadow: inset 0 0 0 1px $glass-60;
+  border: 1px solid $glass-70;
 }
 
 .rankings-table {
@@ -984,7 +971,7 @@ $warning: var(--color-warning);
     white-space: nowrap;
     text-align: center;
     text-transform: uppercase;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 600;
     letter-spacing: 0.5px;
     color: $text-secondary;
@@ -995,7 +982,7 @@ $warning: var(--color-warning);
 .col-first-place,
 .col-percentile {
   padding: 6px 8px !important;
-  font-size: 11px !important;
+  font-size: var(--font-size-12) !important;
 }
 
 .category {
@@ -1015,7 +1002,7 @@ $warning: var(--color-warning);
     border-bottom: 1px solid var(--border-gray);
     vertical-align: middle;
     text-align: center;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 600;
     letter-spacing: -0.01em;
     color: $primary;
@@ -1109,7 +1096,7 @@ $warning: var(--color-warning);
 
   td {
     padding: 12px;
-    font-size: 15px;
+    font-size: var(--font-size-16);
     color: $text-primary;
 
     &.first-place {
@@ -1266,7 +1253,7 @@ $warning: var(--color-warning);
   background: rgba($primary, 0.1);
   border-radius: var(--radius-sm);
   white-space: nowrap;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 600;
   letter-spacing: -0.01em;
   color: $primary-dark;
@@ -1314,7 +1301,7 @@ $warning: var(--color-warning);
 .first-place-value,
 .percentile {
   padding: 6px 8px !important;
-  font-size: 13px !important;
+  font-size: var(--font-size-13) !important;
   font-weight: 400;
   color: #aaa;
 }
@@ -1324,7 +1311,7 @@ $warning: var(--color-warning);
   padding-top: 16px;
   border-top: 1px solid rgba(0, 0, 0, 0.06);
   text-align: center;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: $text-secondary;
 }
 
@@ -1350,7 +1337,7 @@ $warning: var(--color-warning);
   }
 
   .page-title {
-    font-size: 20px;
+    font-size: var(--font-size-20);
   }
 
   .top-metrics-cards {
@@ -1375,37 +1362,28 @@ $warning: var(--color-warning);
     }
 
     &-icon {
-      font-size: 20px;
+      font-size: var(--font-size-20);
     }
 
     &-label {
-      font-size: 15px;
+      font-size: var(--font-size-16);
     }
 
     &-rank {
-      font-size: 28px;
+      font-size: var(--font-size-28);
     }
 
     &-value {
-      font-size: 20px;
+      font-size: var(--font-size-20);
     }
 
     &-details {
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
 
     &-name {
-      font-size: 13px;
+      font-size: var(--font-size-13);
     }
-  }
-
-  .table-wrapper {
-    width: 100%;
-    min-width: 0;
-    align-self: stretch;
-    padding: 12px 0;
-    box-sizing: border-box;
-    overflow-x: auto;
   }
 
   .table-container {
@@ -1422,7 +1400,7 @@ $warning: var(--color-warning);
 
     th {
       padding: 10px 6px;
-      font-size: 11px;
+      font-size: var(--font-size-12);
     }
   }
 
@@ -1430,33 +1408,33 @@ $warning: var(--color-warning);
   .col-first-place,
   .col-percentile {
     padding: 4px !important;
-    font-size: 9px !important;
+    font-size: var(--font-size-12) !important;
   }
 
   .data-row {
     td {
       padding: 10px 6px;
       white-space: nowrap;
-      font-size: 14px;
+      font-size: var(--font-size-14);
 
       &.gap,
       &.first-place-value,
       &.percentile {
         padding: 4px !important;
-        font-size: 12px !important;
+        font-size: var(--font-size-12) !important;
       }
     }
   }
 
   .rank-badge {
     padding: 3px 8px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   .total-users {
     margin-top: 16px;
     padding-top: 12px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 }
 </style>

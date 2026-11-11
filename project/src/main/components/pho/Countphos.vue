@@ -3,7 +3,6 @@ import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, nextTick, onMounted, onBeforeUnmount, onActivated, onDeactivated, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { I18nT, useI18n } from 'vue-i18n'
-import * as echarts from 'echarts'
 import { getFeatureCounts, getLocationDetail, getLocations, getSyllableCounts } from '@/api'
 import AppModal from '@/components/common/AppModal.vue'
 import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopup.vue'
@@ -13,6 +12,7 @@ import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { PHONOLOGY_LOCATION_LIMITS } from '@/main/config/constants.js'
 import { mapStore, pendingCountphosLocations, pendingCountphosQueryMode } from '@/main/store/store.js'
+import { getOrInitChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 import { useAsyncTask } from '@/composables/core/useAsyncTask.js'
 import { useNavAnchorJump } from '@/composables/bar/useNavAnchorJump.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
@@ -384,7 +384,7 @@ const getChartInstance = (chartType, featureType) => {
     return existed
   }
 
-  chartInstances[chartType][featureType] = echarts.getInstanceByDom(el) || echarts.init(el)
+  chartInstances[chartType][featureType] = getOrInitChart(el)
 
   return chartInstances[chartType][featureType]
 }
@@ -397,7 +397,7 @@ const getScatterChartInstance = () => {
     return scatterChartInstance
   }
 
-  scatterChartInstance = echarts.getInstanceByDom(el) || echarts.init(el)
+  scatterChartInstance = getOrInitChart(el)
 
   return scatterChartInstance
 }
@@ -1431,6 +1431,10 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', resizeCharts)
   disposeAllCharts()
 })
+
+onChartThemeChange(() => {
+  if (hasChartData.value) renderAllCharts()
+})
 </script>
 
 <template>
@@ -1910,7 +1914,7 @@ onBeforeUnmount(() => {
 
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
-$primary-deep: #003d9e;
+$primary-deep: var(--color-secondary-text);
 .phonology-page {
   min-width: 80dvw;
   max-width: min(1000px, 98%);
@@ -1943,7 +1947,7 @@ $primary-deep: #003d9e;
     width: 100%;
     text-align: center;
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   /* 页面加载与错误状态 */
@@ -1959,14 +1963,14 @@ $primary-deep: #003d9e;
   .loading {
     p {
       color: var(--text-secondary);
-      font-size: 15px;
+      font-size: var(--font-size-16);
     }
   }
 
   .error {
     p {
       color: var(--color-error);
-      font-size: 16px;
+      font-size: var(--font-size-16);
       font-weight: 500;
     }
   }
@@ -1978,7 +1982,7 @@ $primary-deep: #003d9e;
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-md);
     color: var(--action-primary-text);
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -2017,7 +2021,7 @@ $primary-deep: #003d9e;
     p {
       margin: 0;
       color: var(--text-secondary);
-      font-size: 15px;
+      font-size: var(--font-size-16);
     }
   }
 
@@ -2027,7 +2031,7 @@ $primary-deep: #003d9e;
     justify-content: center;
     margin: 8px 0;
     color: var(--text-dark);
-    font-size: 20px;
+    font-size: var(--font-size-20);
     font-weight: 700;
 
     &--with-pill {
@@ -2048,7 +2052,7 @@ $primary-deep: #003d9e;
     border-radius: var(--radius-pill);
     color: var(--color-secondary);
     white-space: nowrap;
-    font-size: 15px;
+    font-size: var(--font-size-16);
     font-weight: 700;
     line-height: 1.4;
   }
@@ -2058,7 +2062,7 @@ $primary-deep: #003d9e;
     justify-content: center;
     margin-bottom: 20px;
     color: var(--text-dark-light);
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 
   /* 汇总与地点详情玻璃容器 */
@@ -2068,6 +2072,7 @@ $primary-deep: #003d9e;
     background: none;
     border: none;
     box-shadow: none;
+    backdrop-filter: none;
     // border: 1px solid var(--border-gray-light);
     // border-radius: var(--radius-lg);
     // backdrop-filter: blur(12px);
@@ -2129,7 +2134,7 @@ $primary-deep: #003d9e;
 
   .char-count-label {
     color: var(--text-secondary);
-    font-size: 13px;
+    font-size: var(--font-size-13);
     white-space: nowrap;
   }
 
@@ -2157,6 +2162,8 @@ $primary-deep: #003d9e;
 
   .chart-block {
     padding: 16px;
+    background: none;
+    backdrop-filter: none;
     // background: var(--glass-60);
     // border: 1px solid rgba(var(--color-primary-rgb), 0.1);
     // border-radius: 14px;
@@ -2166,14 +2173,14 @@ $primary-deep: #003d9e;
   .chart-block-title {
     margin: 0 0 6px;
     color: var(--text-dark);
-    font-size: 17px;
+    font-size: var(--font-size-18);
     font-weight: 700;
   }
 
   .chart-block-desc {
     margin: 0 0 14px;
     color: var(--text-dark-light);
-    font-size: 13px;
+    font-size: var(--font-size-13);
     line-height: 1.6;
   }
 
@@ -2191,7 +2198,7 @@ $primary-deep: #003d9e;
   .chart-card {
     min-width: 0;
     padding: 12px;
-    background: var(--glass-80);
+    // background: var(--glass-80);
     border: 1px solid rgba(var(--color-primary-rgb), 0.1);
     border-radius: var(--radius-md);
 
@@ -2206,7 +2213,7 @@ $primary-deep: #003d9e;
     gap: 8px;
     margin: 0;
     color: var(--color-primary-hover);
-    font-size: 15px;
+    font-size: var(--font-size-16);
     font-weight: 700;
   }
 
@@ -2242,7 +2249,7 @@ $primary-deep: #003d9e;
     padding-bottom: 8px;
     border-bottom: 2px solid var(--border-gray-light);
     color: var(--text-dark);
-    font-size: 18px;
+    font-size: var(--font-size-18);
     font-weight: 600;
   }
 
@@ -2269,7 +2276,7 @@ $primary-deep: #003d9e;
   .syllable-name {
     margin-bottom: 8px;
     color: var(--text-dark);
-    font-size: 20px;
+    font-size: var(--font-size-20);
     font-weight: 700;
   }
 
@@ -2282,7 +2289,7 @@ $primary-deep: #003d9e;
   .stat-item {
     display: flex;
     gap: 4px;
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 
   .stat-label {
@@ -2310,7 +2317,7 @@ $primary-deep: #003d9e;
     background: rgba(var(--color-primary-rgb), 0.1);
     border-radius: var(--radius-xs);
     color: var(--color-primary);
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   .expand-btn {
@@ -2322,7 +2329,7 @@ $primary-deep: #003d9e;
     border-radius: var(--radius-md);
     box-shadow: 0 2px 6px rgba(var(--color-primary-rgb), 0.3);
     color: var(--action-primary-text);
-    font-size: 12px;
+    font-size: var(--font-size-12);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -2362,7 +2369,7 @@ $primary-deep: #003d9e;
     border-radius: var(--radius-md);
     box-shadow: 0 2px 6px rgba(var(--color-primary-rgb), 0.3);
     color: var(--action-primary-text);
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -2402,7 +2409,7 @@ $primary-deep: #003d9e;
     padding-bottom: 8px;
     border-bottom: 1px solid rgba(var(--color-primary-rgb), 0.12);
     color: var(--color-primary);
-    font-size: 20px;
+    font-size: var(--font-size-20);
     font-weight: 700;
     cursor: pointer;
     text-decoration: none;
@@ -2433,7 +2440,7 @@ $primary-deep: #003d9e;
   .feature-type {
     margin-bottom: 10px;
     color: var(--color-primary);
-    font-size: 15px;
+    font-size: var(--font-size-16);
     font-weight: 700;
   }
 
@@ -2466,7 +2473,7 @@ $primary-deep: #003d9e;
 
   .tag-syllable {
     color: var(--color-primary-hover);
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 700;
   }
 
@@ -2475,7 +2482,7 @@ $primary-deep: #003d9e;
     background: var(--color-secondary-bg);
     border-radius: var(--radius-pill);
     color: var(--color-secondary-text);
-    font-size: 12px;
+    font-size: var(--font-size-12);
     font-weight: 700;
   }
 
@@ -2540,7 +2547,7 @@ $primary-deep: #003d9e;
   p {
     margin: 0;
     color: var(--text-secondary);
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 600;
   }
 }
@@ -2553,7 +2560,7 @@ $primary-deep: #003d9e;
   background: linear-gradient(
     135deg,
     var(--glass-70),
-    rgba(245, 250, 255, 0.46)
+    var(--glass-40)
   );
   border: 1px solid var(--glass-70);
   border-radius: 18px;
@@ -2574,14 +2581,14 @@ $primary-deep: #003d9e;
 }
 
 .modal-stat-label {
-  color: rgba(37, 54, 74, 0.68);
-  font-size: 13px;
+  color: var(--text-tertiary);
+  font-size: var(--font-size-13);
   font-weight: 600;
 }
 
 .modal-stat-value {
   color: var(--color-secondary-text);
-  font-size: 17px;
+  font-size: var(--font-size-18);
   font-weight: 800;
   letter-spacing: 0.02em;
   text-shadow: 0 1px 8px rgba(var(--color-secondary-rgb), 0.16);
@@ -2593,7 +2600,7 @@ $primary-deep: #003d9e;
   background: linear-gradient(
     145deg,
     var(--glass-70),
-    rgba(248, 251, 255, 0.42)
+    var(--glass-40)
   );
   border: 1px solid var(--glass-60);
   border-radius: 18px;
@@ -2605,10 +2612,10 @@ $primary-deep: #003d9e;
 
 .modal-location-text {
   display: block;
-  color: rgba(28, 43, 61, 0.86);
+  color: var(--text-primary);
   word-break: break-word;
   text-wrap: pretty;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   line-height: 1.9;
   letter-spacing: 0.015em;

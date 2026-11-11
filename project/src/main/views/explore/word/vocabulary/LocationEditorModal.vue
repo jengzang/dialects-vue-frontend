@@ -49,7 +49,18 @@
         <button class="glass-button" data-variant="secondary" type="button" @click="emit('cancel')">
           {{ cancelText }}
         </button>
-        <button class="glass-button" data-variant="primary" type="button" @click="emit('confirm')">
+        <button
+          class="glass-button"
+          data-variant="primary"
+          type="button"
+          :disabled="loading"
+          @click="emit('confirm')"
+        >
+          <span
+            v-if="loading"
+            class="ui-loading--inline"
+            aria-hidden="true"
+          >↻</span>
           {{ confirmText }}
         </button>
       </div>
@@ -74,6 +85,7 @@ defineProps({
   closeLabel: { type: String, default: '' },
   cancelText: { type: String, default: '' },
   confirmText: { type: String, default: '' },
+  loading: { type: Boolean, default: false },
   mapLabel: { type: String, default: '' },
 })
 
@@ -152,7 +164,7 @@ function applyDraft(next) {
   display: grid;
   gap: 6px;
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
 
   input,
   select {

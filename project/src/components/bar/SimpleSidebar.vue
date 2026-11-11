@@ -11,7 +11,7 @@
       <div v-if="isOpen" class="sidebar main-sidebar-shell" @touchmove.stop>
       <!-- 标题图片 (可选) -->
       <div v-if="showTitle" class="sidebar-header">
-        <img src="/brand/title.webp" alt="Title" class="title-img title-logo" />
+        <img :src="brandTitleSrc" alt="方音圖鑑" class="title-img title-logo" />
       </div>
       <div v-else class="sidebar-empty main-sidebar-empty"></div>
 
@@ -22,6 +22,7 @@
             v-for="(item, key) in filteredMenuConfig"
             :key="key"
             class="main-sidebar-item"
+            :class="{ 'is-active': isMenuItemActive(item) }"
             @pointerup="handleMainPointerUp(item, key, $event)"
             @click.stop
             @mouseenter="handleItemMouseEnter(item, key, $event)"
@@ -89,20 +90,83 @@
           </div>
         </div>
 
+        <div
+          ref="visitHistoryChartEl"
+          class="visit-history-chart"
+          role="img"
+          :aria-label="`${t('navigation.stats.pageVisits')} / ${t('navigation.stats.featureUsage')} / ${t('navigation.stats.staticRequests')}`"
+        ></div>
+        <p v-if="usageHistoryError" class="usage-history-error">{{ t('navigation.stats.usageLoadError') }}</p>
+        <p v-if="totalHistoryError" class="usage-history-error">{{ t('navigation.stats.staticLoadError') }}</p>
+
         <div class="history-section">
-          <h4 class="section-title">{{ t('navigation.stats.historyRecords') }}</h4>
-          <div class="history-list">
-            <div v-for="item in visitHistory" :key="item.date" class="history-item-modal">
-              <span class="history-date">{{ item.date }}</span>
-              <div class="history-bar-container">
-                <div
-                  class="history-bar"
-                  :style="{ width: (item.count / Math.max(...visitHistory.map(v => v.count)) * 100) + '%' }"
-                ></div>
-              </div>
-              <span class="history-count">{{ item.count }}</span>
+          <button
+            class="section-title"
+            type="button"
+            :aria-expanded="isVisitHistoryExpanded"
+            @click="isVisitHistoryExpanded = !isVisitHistoryExpanded"
+          >
+            <span>{{ t('navigation.stats.historyRecords') }}</span>
+            <svg
+              class="history-toggle-arrow"
+              :class="{ 'is-expanded': isVisitHistoryExpanded }"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </button>
+          <template v-if="isVisitHistoryExpanded">
+            <div class="history-filters">
+              <CheckBox
+                :model-value="showUsageHistory"
+                :label="t('navigation.stats.featureUsage')"
+                class="usage-checkbox"
+                @update:model-value="setHistoryFilter('usage', $event)"
+              />
+              <CheckBox
+                :model-value="showVisitHistory"
+                :label="t('navigation.stats.pageVisits')"
+                @update:model-value="setHistoryFilter('visits', $event)"
+              />
+              <CheckBox
+                :model-value="showStaticHistory"
+                :label="t('navigation.stats.staticRequests')"
+                class="static-checkbox"
+                @update:model-value="setHistoryFilter('static', $event)"
+              />
             </div>
-          </div>
+            <div class="history-list">
+              <div v-for="item in combinedHistory" :key="item.date" class="history-item-modal">
+                <span class="history-date">{{ item.date }}</span>
+                <div class="history-bar-container">
+                  <div
+                    v-if="showVisitHistory && item.visits > 0"
+                    class="history-bar"
+                    :style="{ width: (item.visits / maxHistoryCount * 100) + '%' }"
+                  ></div>
+                  <div
+                    v-if="showUsageHistory && item.usage > 0"
+                    class="history-bar history-bar--usage"
+                    :style="{ width: (item.usage / maxHistoryCount * 100) + '%' }"
+                  ></div>
+                  <div
+                    v-if="showStaticHistory && item.static > 0"
+                    class="history-bar history-bar--static"
+                    :style="{ width: (item.static / maxHistoryCount * 100) + '%' }"
+                  ></div>
+                </div>
+                <span class="history-count" :style="historyCountStyle">{{ item.total }}</span>
+              </div>
+            </div>
+          </template>
         </div>
       </div>
   </AppModal>
@@ -125,6 +189,7 @@
           v-for="(child, index) in getFilteredChildren(activeSubmenu)"
           :key="index"
           class="submenu-item main-sidebar-submenu-item"
+          :class="{ 'is-active': isPathActive(child.path) }"
           @click="handleSubmenuClick(child)"
         >
           <BarIcon :icon="child.icon" class="submenu-icon" />
@@ -136,18 +201,23 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed, watch, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue'
 import { clearToken, getToken } from '@/api/auth/auth.js'
 import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import { useVisitStats, ensureVisitHistory } from '@/composables/data/useVisitStats.js'
 import {userStore} from "@/main/store/store.js";
 import { useSidebarConfig } from '@/main/config/index.js';
 import { navigatePlatformLink } from '@/platform/index.js'
 import { WEB_BASE } from '@/env-config.js'
+import { currentColorTheme, getBrandAssets } from '@/composables/core/uiPreferences.js'
+import { getOrInitChart, onChartThemeChange } from '@/utils/chart/chartTheme.js'
+
+const brandTitleSrc = computed(() => getBrandAssets(currentColorTheme.value).title)
 
 const { t } = useI18n();
 const router = useRouter();
@@ -250,6 +320,21 @@ const getFilteredChildren = (menuKey) => {
   })
 }
 
+const isPathActive = (path) => {
+  if (!path) return false
+  const target = router.resolve(path)
+  if (route.path !== target.path) return false
+
+  return Object.entries(target.query).every(([key, value]) => {
+    return JSON.stringify(route.query[key]) === JSON.stringify(value)
+  })
+}
+
+const isMenuItemActive = (item) => {
+  const paths = item.children?.map((child) => child.path) ?? [item.path]
+  return paths.some(isPathActive)
+}
+
 // 监听路由变化，记录当前路径到对应菜单项的 sessionStorage
 watch(() => route.fullPath, () => {
   for (const [key, item] of Object.entries(menuConfigData.value)) {
@@ -283,6 +368,168 @@ watch(
 
 // 访问统计相关
 const isStatsExpanded = ref(false);
+const isVisitHistoryExpanded = ref(true)
+const showVisitHistory = ref(true)
+const showUsageHistory = ref(true)
+const showStaticHistory = ref(false)
+const usageHistory = ref([])
+const usageHistoryError = ref(false)
+const totalHistory = ref([])
+const totalHistoryError = ref(false)
+let usageHistoryLoaded = false
+let usageHistoryRequest = null
+let totalHistoryLoaded = false
+let totalHistoryRequest = null
+const visitHistoryChartEl = ref(null)
+let visitHistoryChart = null
+
+const staticHistory = computed(() => {
+  const visits = new Map(visitHistory.value.map((item) => [item.date, item.count]))
+  const usage = new Map(usageHistory.value.map((item) => [item.date, item.count]))
+  return totalHistory.value
+    .filter((item) => visits.has(item.date) && usage.has(item.date))
+    .map((item) => ({ date: item.date, count: item.count - usage.get(item.date) - visits.get(item.date) }))
+})
+
+const combinedHistory = computed(() => {
+  const days = new Map()
+  for (const item of visitHistory.value) {
+    days.set(item.date, { date: item.date, visits: item.count, usage: 0, hasVisits: true, hasUsage: false })
+  }
+  for (const item of usageHistory.value) {
+    const day = days.get(item.date) || { date: item.date, visits: 0, usage: 0, hasVisits: false, hasUsage: false }
+    day.usage = item.count
+    day.hasUsage = true
+    days.set(item.date, day)
+  }
+  for (const item of staticHistory.value) {
+    const day = days.get(item.date) || { date: item.date, visits: 0, usage: 0, hasVisits: false, hasUsage: false }
+    day.static = item.count
+    day.hasStatic = true
+    days.set(item.date, day)
+  }
+  return [...days.values()]
+    .filter((day) => (showVisitHistory.value && day.hasVisits) || (showUsageHistory.value && day.hasUsage) || (showStaticHistory.value && day.hasStatic))
+    .map((day) => ({ ...day, total: (showVisitHistory.value ? day.visits : 0) + (showUsageHistory.value ? day.usage : 0) + (showStaticHistory.value ? (day.static ?? 0) : 0) }))
+    .sort((a, b) => b.date.localeCompare(a.date))
+})
+const maxHistoryCount = computed(() => Math.max(1, ...combinedHistory.value.map((day) => day.total)))
+const historyCountStyle = computed(() => {
+  const colors = []
+  if (showVisitHistory.value) colors.push('var(--color-primary-hover)')
+  if (showUsageHistory.value) colors.push('var(--color-secondary)')
+  if (showStaticHistory.value) colors.push('var(--color-tertiary)')
+  if (colors.length === 1) return { color: colors[0] }
+  return {
+    backgroundImage: `linear-gradient(90deg, ${colors.join(', ')})`,
+    backgroundClip: 'text',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent'
+  }
+})
+
+function setHistoryFilter(kind, checked) {
+  if (kind === 'usage' && (checked || showVisitHistory.value || showStaticHistory.value)) showUsageHistory.value = checked
+  if (kind === 'visits' && (checked || showUsageHistory.value || showStaticHistory.value)) showVisitHistory.value = checked
+  if (kind === 'static' && (checked || showVisitHistory.value || showUsageHistory.value)) showStaticHistory.value = checked
+}
+
+async function fetchTotalHistory() {
+  if (totalHistoryLoaded || totalHistoryRequest) return totalHistoryRequest
+  totalHistoryError.value = false
+  totalHistoryRequest = (async () => {
+    try {
+      const response = await fetch(`${WEB_BASE}/logs/stats/daily?days=60`)
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+      const result = await response.json()
+      if (!Array.isArray(result.data)) throw new Error('Invalid daily statistics response')
+      totalHistory.value = result.data.map((item) => ({ date: item.date, count: Number(item.total_calls) || 0 }))
+      totalHistoryLoaded = true
+    } catch (error) {
+      totalHistoryError.value = true
+      console.error('获取静态资源统计失败:', error)
+    } finally {
+      totalHistoryRequest = null
+    }
+  })()
+  return totalHistoryRequest
+}
+
+async function fetchUsageHistory() {
+  if (usageHistoryLoaded || usageHistoryRequest) return usageHistoryRequest
+  usageHistoryError.value = false
+  usageHistoryRequest = (async () => {
+    try {
+      const response = await fetch(`${WEB_BASE}/logs/stats/daily?days=60&exclude_static=true`)
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+      const result = await response.json()
+      if (!Array.isArray(result.data)) throw new Error('Invalid daily statistics response')
+      usageHistory.value = result.data.map((item) => ({ date: item.date, count: Number(item.total_calls) || 0 }))
+      usageHistoryLoaded = true
+    } catch (error) {
+      usageHistoryError.value = true
+      console.error('获取功能使用统计失败:', error)
+    } finally {
+      usageHistoryRequest = null
+    }
+  })()
+  return usageHistoryRequest
+}
+
+function updateVisitHistoryChart() {
+  if (!visitHistoryChartEl.value) return
+
+  const visits = new Map(visitHistory.value.map((item) => [item.date, item.count]))
+  const usage = new Map(usageHistory.value.map((item) => [item.date, item.count]))
+  const staticRequests = new Map(staticHistory.value.map((item) => [item.date, item.count]))
+  const dates = [...new Set([...visits.keys(), ...usage.keys(), ...staticRequests.keys()])].sort()
+  const style = getComputedStyle(document.documentElement)
+  const primary = style.getPropertyValue('--color-primary').trim()
+  const secondary = style.getPropertyValue('--color-secondary').trim()
+  const staticColor = style.getPropertyValue('--color-tertiary').trim()
+  visitHistoryChart = getOrInitChart(visitHistoryChartEl.value)
+  const staticLabel = t('navigation.stats.staticRequestsRightAxis')
+  const staticSelected = visitHistoryChart.getOption()?.legend?.[0]?.selected?.[staticLabel] ?? false
+  visitHistoryChart.setOption({
+    color: [primary, secondary, staticColor],
+    tooltip: { trigger: 'axis' },
+    legend: { type: 'scroll', top: 0, inactiveColor: style.getPropertyValue('--text-tertiary').trim(), selected: { [staticLabel]: staticSelected } },
+    grid: { top: 40, right: 55, bottom: 28, left: 48 },
+    xAxis: {
+      type: 'category',
+      boundaryGap: false,
+      data: dates,
+      axisLabel: { hideOverlap: true }
+    },
+    yAxis: [
+      { type: 'value', minInterval: 1, axisLabel: { color: primary }, splitLine: { lineStyle: { type: 'dashed' } } },
+      { type: 'value', minInterval: 1, axisLabel: { color: secondary }, splitLine: { show: false } }
+    ],
+    series: [
+      { name: t('navigation.stats.pageVisitsLeftAxis'), type: 'line', smooth: true, showSymbol: false, data: dates.map((date) => visits.get(date) ?? null) },
+      { name: t('navigation.stats.featureUsageRightAxis'), type: 'line', yAxisIndex: 1, smooth: true, showSymbol: false, data: dates.map((date) => usage.get(date) ?? null) },
+      { name: staticLabel, type: 'line', yAxisIndex: 1, smooth: true, showSymbol: false, data: dates.map((date) => staticRequests.get(date) ?? null) }
+    ]
+  }, true)
+}
+
+watch([isStatsExpanded, loadingStats, visitHistory, usageHistory, totalHistory], async ([expanded, loading]) => {
+  if (!expanded) {
+    visitHistoryChart?.dispose()
+    visitHistoryChart = null
+    return
+  }
+  if (loading) return
+  await nextTick()
+  if (!isStatsExpanded.value || loadingStats.value) return
+  updateVisitHistoryChart()
+})
+
+onChartThemeChange(updateVisitHistoryChart)
+
+function resizeVisitHistoryChart() {
+  visitHistoryChart?.resize()
+}
 
 // 导航方法
 const closeSidebar = () => {
@@ -422,8 +669,10 @@ async function fetchVisitStats() {
 async function toggleStatsPanel() {
   isStatsExpanded.value = !isStatsExpanded.value;
 
-  if (isStatsExpanded.value && visitHistory.value.length === 0) {
-    await fetchVisitHistory();
+  if (isStatsExpanded.value) {
+    const requests = [fetchUsageHistory(), fetchTotalHistory()]
+    if (visitHistory.value.length === 0) requests.push(fetchVisitHistory())
+    await Promise.all(requests)
   }
 }
 
@@ -445,9 +694,13 @@ onMounted(async () => {
   checkInputCapabilities();
   await fetchVisitStats();
   document.addEventListener('click', closeSubmenu);
+  window.addEventListener('resize', resizeVisitHistoryChart)
 });
 
 onBeforeUnmount(() => {
+  window.removeEventListener('resize', resizeVisitHistoryChart)
+  visitHistoryChart?.dispose()
+  visitHistoryChart = null
   if (props.isOpen) document.body.style.overflow = savedBodyOverflow;
   document.removeEventListener('click', closeSubmenu);
   if (hoverMediaQuery) {
@@ -468,6 +721,7 @@ onBeforeUnmount(() => {
 
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
@@ -563,14 +817,14 @@ $portrait-ratio: 1;
 .stat-label {
   white-space: nowrap;
   color: $text-secondary;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 600;
 }
 
 
 .stat-value {
-  color: $primary-dark;
-  font-size: 18px;
+  color: var(--color-primary-hover);
+  font-size: var(--font-size-18);
   font-weight: 900;
 }
 
@@ -586,8 +840,8 @@ $portrait-ratio: 1;
   border: 2px solid var(--glass-50);
   border-radius: var(--radius-full);
 
-  color: $primary-dark;
-  font-size: 18px;
+  color: var(--color-primary-hover);
+  font-size: var(--font-size-18);
 
   cursor: pointer;
   transition: all 0.3s ease;
@@ -610,7 +864,7 @@ $portrait-ratio: 1;
 .icp-number {
   text-align: center;
   color: var(--text-gray);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   flex-shrink: 0;
 }
 
@@ -648,6 +902,13 @@ $portrait-ratio: 1;
 }
 
 
+.visit-history-chart {
+  width: 100%;
+  height: 260px;
+  margin-bottom: 25px;
+}
+
+
 .stat-card {
   display: flex;
 
@@ -677,7 +938,7 @@ $portrait-ratio: 1;
 
 
 .stat-icon {
-  font-size: 32px;
+  font-size: var(--font-size-32);
   line-height: 1;
 }
 
@@ -694,15 +955,15 @@ $portrait-ratio: 1;
 
   color: $text-secondary;
 
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 600;
 }
 
 
 .stat-value-large {
-  color: $primary-dark;
+  color: var(--color-primary-hover);
 
-  font-size: 26px;
+  font-size: var(--font-size-24);
   font-weight: 900;
 
   line-height: 1;
@@ -713,18 +974,59 @@ $portrait-ratio: 1;
   margin-top: 10px;
 }
 
+.usage-history-error {
+  color: var(--color-error-dark);
+}
+
+.history-filters {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.usage-checkbox.checkbox-wrapper {
+  --checkbox-color: var(--color-secondary);
+  --checkbox-border: var(--color-secondary);
+  --checkbox-shadow: rgba(var(--color-secondary-rgb), 0.3);
+}
+
+.static-checkbox.checkbox-wrapper {
+  --checkbox-color: var(--color-tertiary);
+  --checkbox-border: var(--color-tertiary);
+  --checkbox-shadow: rgba(var(--color-tertiary-rgb), 0.3);
+}
+
 
 .section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
   margin: 0 0 12px 4px;
+  padding: 0 4px;
+  border: 0;
+  background: transparent;
 
   color: $text-muted;
 
   text-transform: uppercase;
 
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 700;
 
   letter-spacing: 0.5px;
+  text-align: left;
+  cursor: pointer;
+}
+
+
+.history-toggle-arrow {
+  flex: 0 0 auto;
+  transition: transform 0.2s ease;
+
+  &.is-expanded {
+    transform: rotate(180deg);
+  }
 }
 
 
@@ -766,13 +1068,14 @@ $portrait-ratio: 1;
 
   color: $text-dark;
 
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 600;
 }
 
 
 .history-bar-container {
   position: relative;
+  display: flex;
 
   height: 20px;
 
@@ -785,8 +1088,6 @@ $portrait-ratio: 1;
 
 
 .history-bar {
-  min-width: 2%;
-
   height: 100%;
 
   background: linear-gradient(
@@ -795,18 +1096,25 @@ $portrait-ratio: 1;
     $primary-light
   );
 
-  border-radius: var(--radius-md);
-
   transition: width 0.5s ease;
+}
+
+.history-bar--usage {
+  background: var(--color-secondary);
+}
+
+.history-bar--static {
+  background: var(--color-tertiary);
 }
 
 
 .history-count {
+  justify-self: end;
   text-align: right;
 
   color: $primary-dark;
 
-  font-size: 15px;
+  font-size: var(--font-size-16);
 
   font-weight: 700;
 }
@@ -846,6 +1154,7 @@ $portrait-ratio: 1;
 
 .submenu-item {
   display: flex;
+  position: relative;
 
   align-items: center;
 
@@ -857,7 +1166,7 @@ $portrait-ratio: 1;
 
   color: $text-primary;
 
-  font-size: 15px;
+  font-size: var(--font-size-16);
 
   font-weight: 500;
 
@@ -868,13 +1177,30 @@ $portrait-ratio: 1;
 
 
   &:hover {
-    background: linear-gradient(
-      145deg,
-      rgba(var(--color-primary-rgb),0.15),
-      rgba(var(--color-primary-rgb),0.08)
-    );
+    background: var(--submenu-hover-background);
 
     transform: translateX(4px);
+  }
+
+  &.is-active {
+    background: var(--submenu-hover-background);
+    color: var(--color-secondary-text);
+    font-weight: 700;
+
+    &:hover {
+      color: var(--color-secondary-hover);
+    }
+
+    &::before {
+      position: absolute;
+      left: 16px;
+      bottom: 5px;
+      width: 22px;
+      height: 3px;
+      border-radius: var(--radius-full);
+      background: var(--color-secondary);
+      content: '';
+    }
   }
 }
 
@@ -889,7 +1215,7 @@ $portrait-ratio: 1;
 .submenu-icon {
   flex-shrink: 0;
 
-  font-size: 18px;
+  font-size: var(--font-size-18);
 }
 
 
@@ -992,7 +1318,7 @@ $portrait-ratio: 1;
 
     li {
       padding: 3px 8px 3px 15px;
-      font-size: 1.1rem;
+      font-size: var(--font-size-18);
     }
   }
 

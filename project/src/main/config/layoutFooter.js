@@ -10,6 +10,10 @@ const PAGE_COPY_BY_PATH = {
     pageTitleKey: 'layoutFooter.pages.menuAboutIntro.title',
     pageDescriptionKey: 'layoutFooter.pages.menuAboutIntro.description',
   },
+  '/menu/about/history': {
+    pageTitleKey: 'layoutFooter.pages.menuAboutHistory.title',
+    pageDescriptionKey: 'layoutFooter.pages.menuAboutHistory.description',
+  },
   '/menu/about/suggestion': {
     pageTitleKey: 'layoutFooter.pages.menuAboutSuggestion.title',
     pageDescriptionKey: 'layoutFooter.pages.menuAboutSuggestion.description',
@@ -237,10 +241,12 @@ const LANGUAGE_LABEL_KEYS = {
 }
 
 const THEME_LABEL_KEYS = {
-  blue: 'layoutFooter.theme.blue',
-  light: 'layoutFooter.theme.light',
-  dark: 'layoutFooter.theme.dark',
-  green: 'layoutFooter.theme.green',
+  'blue-light': 'layoutFooter.theme.blue-light',
+  'red-light': 'layoutFooter.theme.red-light',
+  'blue-dark': 'layoutFooter.theme.blue-dark',
+  'green-dark': 'layoutFooter.theme.green-dark',
+  'red-dark': 'layoutFooter.theme.red-dark',
+  'green-light': 'layoutFooter.theme.green-light',
 }
 
 function hasTutorialEntry(route) {
@@ -268,6 +274,6 @@ export function resolveLayoutFooterContext({
     ...pageCopy,
     hasTutorial: hasTutorialEntry(route),
     languageLabelKey: LANGUAGE_LABEL_KEYS[locale] || LANGUAGE_LABEL_KEYS['zh-Hant'],
-    themeLabelKey: THEME_LABEL_KEYS[colorTheme] || THEME_LABEL_KEYS.blue,
+    themeLabelKey: THEME_LABEL_KEYS[colorTheme] || THEME_LABEL_KEYS['blue-light'],
   }
 }

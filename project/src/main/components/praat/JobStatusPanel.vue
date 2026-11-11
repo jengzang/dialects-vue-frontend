@@ -83,7 +83,7 @@ onUnmounted(() => {
 @use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
-$primary-light: var(--color-cyan);
+$primary-light: var(--color-tertiary);
 
 $error: var(--color-error-light);
 $success: var(--color-success);
@@ -111,12 +111,12 @@ $transition-duration: 0.3s;
 
 @mixin status-icon {
   margin-bottom: 1rem;
-  font-size: 3rem;
+  font-size: var(--font-size-48);
 }
 
 @mixin status-title($color) {
   color: $color;
-  font-size: 1.3rem;
+  font-size: var(--font-size-20);
   font-weight: 600;
 }
 
@@ -143,13 +143,13 @@ $transition-duration: 0.3s;
 
   .job-label {
     color: $text-secondary;
-    font-size: 0.9rem;
+    font-size: var(--font-size-14);
   }
 
   .job-id {
     color: $text-primary;
     font-family: var(--font-mono);
-    font-size: 0.9rem;
+    font-size: var(--font-size-14);
     font-weight: 600;
   }
 
@@ -159,7 +159,7 @@ $transition-duration: 0.3s;
     border: 1px solid $error-border;
     border-radius: var(--radius-md);
     color: $error;
-    font-size: 0.9rem;
+    font-size: var(--font-size-14);
     font-weight: 500;
     cursor: pointer;
     transition:
@@ -181,14 +181,14 @@ $transition-duration: 0.3s;
 .loading-title {
   margin-bottom: 0.5rem;
   color: $text-primary;
-  font-size: 1.5rem;
+  font-size: var(--font-size-24);
   font-weight: 600;
 }
 
 .loading-text {
   margin-bottom: 2rem;
   color: $text-secondary;
-  font-size: 1rem;
+  font-size: var(--font-size-16);
 }
 
 .loading-progress {
@@ -216,7 +216,7 @@ $transition-duration: 0.3s;
 .progress-text {
   color: $primary;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   font-weight: 600;
 }
 
@@ -237,7 +237,7 @@ $transition-duration: 0.3s;
 
 .error-text {
   color: $text-secondary;
-  font-size: 1rem;
+  font-size: var(--font-size-16);
 }
 
 /* 完成状态 */

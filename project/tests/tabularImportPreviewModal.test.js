@@ -11,7 +11,7 @@ const tabularPreviewUtilPath = resolve(projectRoot, 'src/utils/import/tabularPre
 const checkToolPath = resolve(projectRoot, 'src/main/views/explore/tools/CheckTool.vue')
 const mergeToolPath = resolve(projectRoot, 'src/main/views/explore/tools/MergeTool.vue')
 const jyut2IpaToolPath = resolve(projectRoot, 'src/main/views/explore/tools/Jyut2IpaTool.vue')
-const voronoiCustomImportPath = resolve(projectRoot, 'src/main/components/map/Draw/modals/VoronoiCustomImportModal.vue')
+const voronoiCustomImportPath = resolve(projectRoot, 'src/main/views/explore/GisPage.vue')
 const vocabularyImportPath = resolve(projectRoot, 'src/main/views/explore/word/vocabulary/VocabularyImportPage.vue')
 const enCommonLocalePath = resolve(projectRoot, 'src/i18n/locales/en/common.json')
 const zhCnToolsLocalePath = resolve(projectRoot, 'src/i18n/locales/zh-CN/tools.json')
@@ -54,10 +54,11 @@ describe('tabular import preview modal shell', () => {
   it('keeps the import preview chrome compact', () => {
     const source = readSource(previewPath)
 
-    expect(source).toContain('$preview-padding: 12px;')
+    expect(source).toContain('$preview-padding: 10px;')
     expect(source).toContain('$preview-panel-padding: 12px;')
     expect(source).toMatch(/\.tabular-import-preview\s*\{[^}]*padding:\s*\$preview-padding/s)
-    expect(source).toMatch(/&__mapping,\s*\n\s*&__preview\s*\{[^}]*padding:\s*\$preview-panel-padding/s)
+    expect(source).toMatch(/&__mapping\s*\{[^}]*padding:\s*\$preview-panel-padding/s)
+    expect(source).toMatch(/&__preview\s*\{[^}]*padding:\s*\$preview-panel-padding/s)
     expect(source).not.toContain('padding: 18px')
   })
 
@@ -148,12 +149,12 @@ describe('tabular import preview modal shell', () => {
     }
   })
 
-  it('keeps the Voronoi custom import preview embedded in its existing modal', () => {
+  it('uses the shared modal preview directly for Voronoi custom imports', () => {
     const source = readSource(voronoiCustomImportPath)
 
     expect(source).toContain('<TabularImportPreview')
-    expect(source).toContain('embedded')
-    expect(source).toContain('<AppModal')
+    expect(source).toContain('v-model="showVoronoiPreviewModal"')
+    expect(source).toContain('@confirm="handleVoronoiPreviewConfirm"')
   })
 
   it('adds the CheckTool import-preview copy to the English locale', () => {

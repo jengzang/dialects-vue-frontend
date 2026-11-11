@@ -159,7 +159,7 @@ $transition-base: 0.3s;
 .title {
   margin: 0;
   color: $text-primary;
-  font-size: 32px;
+  font-size: var(--font-size-32);
   font-weight: 700;
   background: linear-gradient(135deg, $primary-blue, $purple);
   background-clip: text;
@@ -167,7 +167,7 @@ $transition-base: 0.3s;
   -webkit-text-fill-color: transparent;
 
   @media (max-width: 768px) {
-    font-size: 24px;
+    font-size: var(--font-size-24);
   }
 }
 
@@ -183,12 +183,12 @@ $transition-base: 0.3s;
     padding-bottom: 10px;
     margin-bottom: 20px;
     color: $text-primary;
-    font-size: 24px;
+    font-size: var(--font-size-24);
     font-weight: 700;
     border-bottom: 2px solid rgba(var(--color-primary-rgb), 0.15);
 
     @media (max-width: 768px) {
-      font-size: 20px;
+      font-size: var(--font-size-20);
     }
   }
 
@@ -196,17 +196,17 @@ $transition-base: 0.3s;
     margin-top: 24px;
     margin-bottom: 12px;
     color: $text-secondary;
-    font-size: 18px;
+    font-size: var(--font-size-18);
     font-weight: 600;
 
     @media (max-width: 768px) {
-      font-size: 16px;
+      font-size: var(--font-size-16);
     }
   }
 
   p {
     color: $text-secondary;
-    font-size: 15px;
+    font-size: var(--font-size-16);
     line-height: 1.8;
   }
 
@@ -218,7 +218,7 @@ $transition-base: 0.3s;
   li {
     margin-bottom: 8px;
     color: $text-secondary;
-    font-size: 15px;
+    font-size: var(--font-size-16);
     line-height: 1.8;
   }
 }
@@ -234,7 +234,7 @@ $transition-base: 0.3s;
   background: linear-gradient(
     135deg,
     rgba(var(--color-primary-rgb), 0.05),
-    rgba(88, 86, 214, 0.05)
+    rgba(var(--color-secondary-rgb), 0.05)
   );
   border-left: 4px solid $primary-blue;
   border-radius: $radius-md;
@@ -249,7 +249,7 @@ $transition-base: 0.3s;
   flex: 1;
   margin: 0;
   color: $text-primary;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-style: italic;
   font-weight: 500;
 
@@ -266,7 +266,7 @@ $transition-base: 0.3s;
 .copy-btn {
   padding: 10px 20px;
   color: var(--action-primary-text);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
@@ -293,7 +293,7 @@ $transition-base: 0.3s;
   padding: 12px;
   margin-top: 12px;
   color: $text-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-style: italic;
   background: rgba(var(--color-primary-rgb), 0.03);
   border-radius: $radius-sm;
@@ -302,7 +302,7 @@ $transition-base: 0.3s;
 .update-note {
   padding: 16px;
   margin-top: 24px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   background: rgba(var(--color-gold-rgb), 0.1);
   border-left: 4px solid $warning-yellow;
   border-radius: $radius-sm;

@@ -25,7 +25,7 @@ describe('villagesML cache keys', () => {
   })
 
   it('keeps villages cache reads scoped to the current route dataset', () => {
-    const source = readSource('src/composables/useVillagesCache.js')
+    const source = readSource('src/composables/data/useVillagesCache.js')
 
     expect(source).toContain('getCurrentVillagesMLDataset')
     expect(source).not.toContain('const OVERVIEW_CACHE_KEY')

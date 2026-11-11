@@ -77,12 +77,13 @@
       "source": "字表来源",
       "privacy": "隐私政策",
       "suggestion": "提出建议",
-      "like": "支持作者"
+      "like": "支持项目"
     },
     "about": {
       "intro": "简介",
+      "history": "开发历程",
       "suggestion": "提出建议",
-      "like": "支持作者",
+      "like": "支持项目",
       "setting": "设置"
     }
   },
@@ -95,9 +96,9 @@
       "privacy": "隐私政策与引用说明",
       "settings": "设置",
       "source": "资料来源",
-      "aboutIntro": "ℹ️ 关于网站",
+      "aboutIntro": "关于网站",
       "aboutSuggestion": "我有建议",
-      "aboutLike": "❤️ 喜欢作者"
+      "aboutLike": "喜欢作者"
     },
     "portals": {
       "tools": "工具箱",
@@ -137,7 +138,7 @@
       "evolution": "韵书演化分析"
     },
     "vocabulary": {
-      "view": "词表查询",
+      "view": "方言词表查询",
       "import": "词表上传",
       "manage": "词表管理"
     },
@@ -214,9 +215,17 @@
       "title": "主题配色",
       "description": "选择页面背景、玻璃面板与文字的整体配色。",
       "label": "当前配色",
+      "modeTitle": "明暗模式",
+      "shortOptions": { "blue": "蓝", "red": "红", "green": "绿" },
+      "shortModes": { "light": "日", "dark": "夜", "system": "随" },
+      "modes": {
+        "light": "日间",
+        "dark": "夜间",
+        "system": "系统"
+      },
       "options": {
         "blue": "蓝色",
-        "light": "浅色",
+        "red": "红色",
         "dark": "深色",
         "green": "绿色"
       }
@@ -245,7 +254,15 @@
     "historyTitle": "访问统计历史",
     "loading": "加载中...",
     "todayVisits": "今日访问",
-    "historyRecords": "历史记录"
+    "historyRecords": "历史记录",
+    "featureUsage": "功能使用次数",
+    "pageVisits": "网页访问人次",
+    "pageVisitsLeftAxis": "网页访问人次（左轴）",
+    "featureUsageRightAxis": "功能使用次数（右轴）",
+    "staticRequests": "静态资源",
+    "staticRequestsRightAxis": "静态资源（右轴）",
+    "usageLoadError": "功能使用统计加载失败",
+    "staticLoadError": "静态资源统计加载失败"
   },
   "login": "登录",
   "actions": {
@@ -253,7 +270,7 @@
     "backHome": "返回首页"
   },
   "introTabs": {
-    "like": "支持作者",
+    "like": "支持项目",
     "suggestions": "提出建议",
     "thanks": "鸣谢"
   }

@@ -3,7 +3,8 @@
   "tab1": {
     "title": "Characters",
     "label": "Enter Chinese characters",
-    "placeholder": "Enter one or more characters",
+    "placeholder": "Search Chinese characters (max 5); simplified or traditional both work",
+    "notesCrossLink": "Search characters by annotation or □ (spoken but unwritten)? Go to Character Notes",
     "maxCharsWarning": "You can enter up to {max} characters. Extra characters have been removed automatically.",
     "button": "Query",
     "description": "View character readings, Middle Chinese categories, and annotations"
@@ -13,6 +14,7 @@
     "placeholder": "Enter Middle Chinese categories",
     "button": "Query",
     "description": "Rime Book → Readings · Organize readings by rime-book category, separated into initials, finals, and tones",
+    "selectHint": "Select the rime-book category to analyze",
     "noExclude": "No Exclusions",
     "selectAll": "Select All",
     "cards": {
@@ -32,6 +34,7 @@
     "placeholder": "Enter readings",
     "button": "Query",
     "description": "Readings → Rime Book · Analyze which rime-book category each initial, final, and tone reading comes from",
+    "selectHint": "Select the rime-book category to analyze",
     "noExclude": "No Exclusions",
     "selectAll": "Select All",
     "analysisText": "Analyze the rime-book sources of the <strong>{card}</strong> syllable, i.e. which rime books the modern characters sharing the same <strong>{card}</strong> come from [<strong>{keys}</strong>].",
@@ -57,13 +60,13 @@
   "components": {
     "locationInput": {
       "label": "Location",
-      "selectButton": "Select Location",
+      "selectButton": "Select",
       "selectButtonTitle": "Select a location from a region",
       "placeholder": "Enter a location (automatic matching supported)"
     },
     "locationMultiInput": {
       "label": "Locations",
-      "selectButton": "Select Locations",
+      "selectButton": "Select",
       "selectButtonTitle": "Select locations from a region",
       "locationCount": "{count} locations",
       "expandButton": "Expand",

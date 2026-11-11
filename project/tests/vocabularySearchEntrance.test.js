@@ -17,7 +17,10 @@ vi.mock('vue-router', () => ({
   useRoute: () => mocks.route,
   useRouter: () => ({ replace: async ({ query }) => { mocks.route.query = query } }),
 }))
-vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: key => key }) }))
+vi.mock('vue-i18n', () => ({
+  useI18n: () => ({ t: key => key }),
+  I18nT: { setup: (_, { slots }) => () => h('span', Object.values(slots).flatMap(slot => slot())) },
+}))
 vi.mock('@/api', () => ({
   getVocabularyItems: mocks.items,
   getVocabularyCounts: mocks.counts,
@@ -30,7 +33,7 @@ vi.mock('@/api', () => ({
   searchNotes: mocks.notes,
 }))
 vi.mock('@/main/components/TableAndTree/UniversalTable.vue', () => ({
-  default: { setup() { mocks.tableMount(); return () => h('div', 'table') } },
+  default: { props: ['defaultFilter'], setup(props) { mocks.tableMount(props.defaultFilter); return () => h('div', { class: 'test-table' }, 'table') } },
 }))
 vi.mock('@/main/components/map/VocabularyMap.vue', () => ({ default: { render: () => null } }))
 vi.mock('@/main/components/geo/popups/LocationDetailPopup.vue', () => ({ default: { render: () => null } }))
@@ -48,13 +51,13 @@ vi.mock('@/components/common/AppModal.vue', () => ({ default: {
 } }))
 vi.mock('../src/main/views/explore/word/vocabulary/VocabularyTopControls.vue', () => ({
   default: {
-    props: ['source', 'filterMode', 'selectedRegions', 'selectedLocations', 'selectedSearchFields', 'partitionNodes', 'partitionLoading', 'partitionError', 'notesRefreshDisabled'],
-    emits: ['search', 'refreshNotes', 'openLocationDetails', 'filterOpenChange', 'update:query', 'update:selectedLocations', 'update:viewMode', 'update:filterMode', 'update:selectedRegions', 'update:selectedProvince', 'update:selectedCity', 'update:selectedStandardWord'],
+    props: ['source', 'filterMode', 'selectedRegions', 'selectedLocations', 'selectedProvince', 'selectedCity', 'rememberLocationSelection', 'selectedSearchFields', 'partitionNodes', 'partitionLoading', 'partitionError', 'notesRefreshDisabled', 'standardWordsLoading', 'standardWordsError'],
+    emits: ['search', 'refreshNotes', 'openLocationDetails', 'filterOpenChange', 'update:rememberLocationSelection', 'update:query', 'update:selectedLocations', 'update:viewMode', 'update:filterMode', 'update:selectedRegions', 'update:selectedProvince', 'update:selectedCity', 'update:selectedStandardWord'],
     setup(props, { emit }) {
       controlProps = props
       emitControl = emit
       return () => h('div', [
-        props.source === 'character-notes' ? h('div', { id: 'vocabulary-notes-scope-filter', class: 'filter-strip notes-scope-filter' }) : null,
+        props.source === 'character-notes' ? h('div', { id: 'vocabulary-notes-scope-filter', class: 'filter-strip notes-scope-filter', ref: element => emit('notesScopeTargetChange', element) }) : null,
         h('button', { class: 'submit', onClick: () => {
           emit('update:query', '')
           if (props.source === 'character-notes') emit('refreshNotes')
@@ -89,9 +92,11 @@ async function mount(query = {}) {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mocks.locations.mockReset().mockResolvedValue([{ value: '测试地点', label: '测试地点', province: '广东', city: '广州' }])
   localStorage.clear()
   sessionStorage.clear()
   vi.stubGlobal('matchMedia', () => ({ matches: false }))
+  vi.stubGlobal('ResizeObserver', class { observe() {} disconnect() {} })
   vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
     return this.classList.contains('query-intro') ? { top: 180, height: 240 } : { top: 420, height: 140 }
@@ -100,6 +105,245 @@ beforeEach(() => {
 afterEach(() => { app?.unmount(); host?.remove(); vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.useRealTimers() })
 
 describe('vocabulary configuration entrance', () => {
+  it('keeps expanded table notes inline only when the first four columns fit without wrapping', async () => {
+    let rowWidth = 1000
+    let resize
+    vi.stubGlobal('ResizeObserver', class { constructor(callback) { resize = callback } observe() {} disconnect() {} })
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function () {
+      if (this.classList.contains('vocabulary-inline-measure')) {
+        const width = this.classList.contains('card-location-pill') ? 80
+          : this.classList.contains('card-definition') ? 200
+            : this.classList.contains('pronunciation-text') ? 280 : 240
+        return { width }
+      }
+      if (this.classList.contains('vocabulary-entry-row')) return { width: rowWidth }
+      return { top: 180, height: 240, width: 1000 }
+    })
+    mocks.items.mockResolvedValueOnce({ items: [{ id: 1, location_name: '测试地点', standard_word: '标准词', local_expression: '方言词', ipa: 'ipa', notes: '展开后的完整注释' }], total: 1 })
+    await mount({ tab: 'table' })
+    host.querySelector('.submit').click()
+    entrance.$.exposed.progress.value = 1
+    await settle(); await settle()
+    host.querySelector('.card-note-toggle').click(); await settle()
+    expect(host.querySelector('.vocabulary-entry-row').classList.contains('is-note-inline')).toBe(true)
+    rowWidth = 400; resize(); await settle()
+    expect(host.querySelector('.vocabulary-entry-row').classList.contains('is-note-inline')).toBe(false)
+    rowWidth = 1000; resize(); await settle()
+    expect(host.querySelector('.vocabulary-entry-row').classList.contains('is-note-inline')).toBe(true)
+    host.querySelector('.card-note-toggle').click(); await settle()
+    expect(host.querySelector('.vocabulary-entry-row').classList.contains('is-note-inline')).toBe(false)
+  })
+
+  it.each(['table', 'list'])('opens notes rows from tab=%s and switches to cards without another request', async tab => {
+    mocks.notes.mockResolvedValueOnce({ items: [{ id: 1, location_name: '测试地点', character: '字', ipa: 'tsi', notes: '测试注释' }], total: 1 })
+    await mount({ source: 'character-notes', tab })
+    host.querySelector('.submit').click()
+    entrance.$.exposed.progress.value = 1
+    await settle(); await settle()
+    expect(host.querySelector('.notes-list .notes-row')?.textContent).toContain('测试注释')
+    const calls = mocks.notes.mock.calls.length
+    emitControl('update:viewMode', 'card'); await settle()
+    expect(host.querySelector('.notes-entry-card')?.textContent).toContain('测试注释')
+    expect(mocks.notes).toHaveBeenCalledTimes(calls)
+    emitControl('update:viewMode', 'table'); await settle()
+    expect(host.querySelector('.notes-list .notes-row')).not.toBeNull()
+    expect(mocks.route.query.tab).toBe('table')
+    expect(mocks.notes).toHaveBeenCalledTimes(calls)
+  })
+
+  it('uses the same filtered items and pagination in table and card views', async () => {
+    const entry = { id: 1, location_name: '测试地点', standard_word: '蜘蛛', local_expression: '蛛仔', ipa: 'tsu', notes: '注释' }
+    mocks.items.mockResolvedValueOnce({ items: [entry], total: 2, has_more: true })
+    await mount({ tab: 'table' })
+    emitControl('update:query', '蜘蛛'); await settle()
+    emitControl('update:selectedLocations', ['测试地点']); await settle()
+    emitControl('search')
+    entrance.$.exposed.progress.value = 1
+    await settle(); await settle()
+    expect(mocks.items).toHaveBeenLastCalledWith(expect.objectContaining({ q: '蜘蛛', locations: ['测试地点'], page: 1 }))
+    const row = host.querySelector('.vocabulary-list .notes-row')
+    expect(row?.textContent).toContain('蛛仔')
+    expect(row?.textContent).toContain('蜘蛛')
+    expect(row?.textContent).toContain('tsu')
+    expect(row?.textContent).toContain('注释')
+    expect(mocks.tableMount).not.toHaveBeenCalled()
+    const calls = mocks.items.mock.calls.length
+    emitControl('update:viewMode', 'card'); await settle()
+    expect(host.querySelector('.vocabulary-entry-card')?.textContent).toContain('蛛仔')
+    expect(mocks.items).toHaveBeenCalledTimes(calls)
+    emitControl('update:viewMode', 'table'); await settle()
+    mocks.items.mockResolvedValueOnce({ items: [{ ...entry, id: 2 }], total: 2, has_more: false })
+    host.querySelector('.load-more-btn').click(); await settle()
+    expect(mocks.items).toHaveBeenLastCalledWith(expect.objectContaining({ q: '蜘蛛', page: 2 }))
+    expect(host.querySelectorAll('.vocabulary-list .notes-row')).toHaveLength(2)
+    const callsAfterAppend = mocks.items.mock.calls.length
+    emitControl('update:viewMode', 'card'); await settle()
+    expect(host.querySelectorAll('.vocabulary-entry-card')).toHaveLength(2)
+    expect(mocks.items).toHaveBeenCalledTimes(callsAfterAppend)
+  })
+
+  const memoryKey = 'vocabulary_location_selection'
+
+  it.each(['location', 'administrative', 'yindian', 'map'])('restores remembered %s selection before the first query', async filterMode => {
+    const saved = { filterMode, locations: ['测试地点'], province: '广东', city: '广州', regions: ['甲-乙'] }
+    localStorage.setItem(memoryKey, JSON.stringify(saved))
+    await mount()
+    expect(controlProps.rememberLocationSelection).toBe(true)
+    expect(controlProps.filterMode).toBe(filterMode)
+    if (filterMode === 'location') expect(controlProps.selectedLocations).toEqual(saved.locations)
+    else if (filterMode === 'administrative') {
+      expect(controlProps.selectedProvince).toBe('广东')
+      expect(controlProps.selectedCity).toBe('广州')
+    } else expect(controlProps.selectedRegions).toEqual(saved.regions)
+    expect(mocks.items).not.toHaveBeenCalled()
+    host.querySelector('.submit').click(); await settle()
+    const expected = filterMode === 'location' ? { locations: saved.locations }
+      : filterMode === 'administrative' ? { province: saved.province, city: saved.city }
+        : { region_mode: filterMode, regions: saved.regions }
+    expect(mocks.items).toHaveBeenCalledWith(expect.objectContaining(expected))
+  })
+
+  it.each(['card', 'map', 'table'])('persists the applied scope in %s view while another mode is still a draft', async tab => {
+    vi.useFakeTimers()
+    await mount({ tab })
+    emitControl('update:rememberLocationSelection', true); await settle()
+    emitControl('update:filterMode', 'administrative'); await settle()
+    emitControl('update:selectedProvince', '广东'); await settle()
+    emitControl('update:selectedCity', '广州'); await settle()
+    host.querySelector('.submit').click(); await settle()
+    const saved = JSON.parse(localStorage.getItem(memoryKey))
+    expect(saved).toEqual({ filterMode: 'administrative', locations: [], province: '广东', city: '广州', regions: [] })
+    emitControl('filterOpenChange', true)
+    emitControl('update:filterMode', 'map'); await settle()
+    emitControl('update:selectedRegions', ['未提交分区']); await settle()
+    emitControl('update:viewMode', tab === 'card' ? 'map' : 'card'); await settle()
+    expect(JSON.parse(localStorage.getItem(memoryKey))).toEqual(saved)
+  })
+
+  it('continues querying if local storage writes fail', async () => {
+    await mount()
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('quota') })
+    emitControl('update:rememberLocationSelection', true); await settle()
+    host.querySelector('.submit').click(); await settle()
+    expect(mocks.items).toHaveBeenCalled()
+    emitControl('update:rememberLocationSelection', false); await settle()
+    expect(controlProps.rememberLocationSelection).toBe(false)
+  })
+
+  it('remembers on opt-in, saves only queried selections, deduplicates and clears on opt-out', async () => {
+    vi.useFakeTimers()
+    await mount()
+    emitControl('update:selectedLocations', ['测试地点']); await settle()
+    expect(localStorage.getItem(memoryKey)).toBeNull()
+    emitControl('update:rememberLocationSelection', true); await settle()
+    expect(JSON.parse(localStorage.getItem(memoryKey)).locations).toEqual(['测试地点'])
+    host.querySelector('.submit').click(); await settle()
+    const write = vi.spyOn(Storage.prototype, 'setItem')
+    emitControl('filterOpenChange', true)
+    emitControl('update:selectedLocations', []); await settle()
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(JSON.parse(localStorage.getItem(memoryKey)).locations).toEqual(['测试地点'])
+    emitControl('filterOpenChange', false); await settle()
+    await vi.advanceTimersByTimeAsync(250); await settle()
+    expect(JSON.parse(localStorage.getItem(memoryKey)).locations).toEqual([])
+    expect(write.mock.calls.filter(([key]) => key === memoryKey)).toHaveLength(1)
+    emitControl('update:query', '新查询'); await settle()
+    await vi.advanceTimersByTimeAsync(250); await settle()
+    expect(write.mock.calls.filter(([key]) => key === memoryKey)).toHaveLength(1)
+    emitControl('update:rememberLocationSelection', false); await settle()
+    expect(localStorage.getItem(memoryKey)).toBeNull()
+    expect(controlProps.selectedLocations).toEqual([])
+  })
+
+  it.each(['{bad json', 'null', '{"filterMode":"invalid"}'])('ignores invalid remembered selection %s', async saved => {
+    localStorage.setItem(memoryKey, saved)
+    await mount()
+    expect(controlProps.rememberLocationSelection).toBe(false)
+    expect(controlProps.selectedLocations).toEqual([])
+  })
+
+  async function submitTable() {
+    host.querySelector('.submit').click()
+    entrance.$.exposed.progress.value = 1
+    await settle()
+    await settle()
+  }
+
+  it('queries selected location names in table mode and clears them when selecting all', async () => {
+    await mount({ tab: 'table' })
+    emitControl('update:selectedLocations', ['测试地点']); await settle()
+    await submitTable()
+    expect(mocks.items).toHaveBeenLastCalledWith(expect.objectContaining({ locations: ['测试地点'] }))
+    emitControl('update:selectedLocations', []); await settle()
+    await submitTable()
+    expect(mocks.items.mock.lastCall[0].locations).toEqual([])
+  })
+
+  it.each(['administrative', 'yindian', 'map'])('passes %s scope to the table items query', async mode => {
+    await mount({ tab: 'table' })
+    emitControl('update:filterMode', mode); await settle()
+    if (mode === 'administrative') {
+      emitControl('update:selectedProvince', '广东'); await settle()
+      emitControl('update:selectedCity', '广州'); await settle()
+    } else {
+      emitControl('update:selectedRegions', ['甲-乙']); await settle()
+    }
+    const expectedScope = mode === 'administrative'
+      ? { province: '广东', city: '广州' }
+      : { region_mode: mode, regions: ['甲-乙'] }
+    mocks.locations.mockClear()
+    await submitTable()
+    expect(mocks.items).toHaveBeenLastCalledWith(expect.objectContaining(expectedScope))
+    expect(mocks.tableMount).not.toHaveBeenCalled()
+  })
+
+  it('shows an empty table result and item query failures without a database table fallback', async () => {
+    await mount({ tab: 'table' })
+    emitControl('update:filterMode', 'yindian'); await settle()
+    emitControl('update:selectedRegions', ['甲-乙']); await settle()
+    mocks.items.mockResolvedValueOnce({ items: [], total: 0 })
+    await submitTable()
+    expect(mocks.tableMount).not.toHaveBeenCalled()
+    expect(host.querySelector('.empty-state')?.textContent).toContain('noData')
+    mocks.items.mockRejectedValueOnce(new Error('scope unavailable'))
+    emitControl('update:selectedRegions', ['丙-丁']); await settle()
+    await submitTable()
+    expect(host.querySelector('.empty-state')?.textContent).toContain('scope unavailable')
+    expect(mocks.tableMount).not.toHaveBeenCalled()
+  })
+
+  it('ignores old item responses when the applied table scope changes', async () => {
+    await mount({ tab: 'table' })
+    emitControl('update:filterMode', 'map'); await settle()
+    emitControl('update:selectedRegions', ['甲-乙']); await settle()
+    const pending = []
+    mocks.items.mockImplementationOnce(params => new Promise(resolve => { pending.push({ params, resolve }) }))
+    await submitTable()
+    emitControl('update:selectedRegions', ['丙-丁']); await settle()
+    mocks.items.mockImplementationOnce(params => new Promise(resolve => { pending.push({ params, resolve }) }))
+    await submitTable()
+    expect(pending).toHaveLength(1)
+    pending[0].resolve({ items: [{ id: 1, location_name: '旧地点' }], total: 1 })
+    await settle(); await settle()
+    expect(pending).toHaveLength(2)
+    expect(host.querySelector('.vocabulary-list')?.textContent || '').not.toContain('旧地点')
+    pending[1].resolve({ items: [{ id: 2, location_name: '新地点' }], total: 1 })
+    await settle(); await settle()
+    expect(host.querySelector('.vocabulary-list')?.textContent).toContain('新地点')
+    expect(host.querySelector('.vocabulary-list')?.textContent).not.toContain('旧地点')
+  })
+
+  it('uses the applied scope when switching from cards to table with a selector still open', async () => {
+    await mount({ tab: 'card' })
+    emitControl('update:selectedLocations', ['测试地点']); await settle()
+    host.querySelector('.submit').click(); await settle()
+    entrance.$.exposed.progress.value = 1; await settle()
+    emitControl('filterOpenChange', true)
+    emitControl('update:selectedLocations', ['未提交地点'])
+    emitControl('update:viewMode', 'table'); await settle()
+    expect(mocks.items).toHaveBeenLastCalledWith(expect.objectContaining({ locations: ['测试地点'] }))
+  })
+
   it('defaults vocabulary search fields to definition and headword only', async () => {
     await mount()
 
@@ -191,8 +435,8 @@ describe('vocabulary configuration entrance', () => {
   it('deduplicates same-scope location requests, rejects stale scopes, and clears invalid selected locations', async () => {
     await mount()
     let finishOld
-    mocks.locations.mockImplementationOnce(() => new Promise(resolve => { finishOld = resolve }))
     emitControl('update:filterMode', 'yindian'); await settle()
+    mocks.locations.mockImplementationOnce(() => new Promise(resolve => { finishOld = resolve }))
     emitControl('update:selectedRegions', ['舊分區']); await settle()
     pageState.applyVocabularyQuery()
     const count = mocks.locations.mock.calls.length
@@ -277,9 +521,11 @@ describe('vocabulary configuration entrance', () => {
     host.querySelector('.submit').click(); await settle()
     emitControl('update:selectedRegions', ['丙-乙']); await settle()
     host.querySelector('.submit').click(); await settle()
+    expect(mocks.items).toHaveBeenCalledTimes(1)
+    finishOld({ items: [{ id: 99, local_expression: '舊結果' }], total: 1 }); await settle()
+    await settle()
     expect(mocks.items).toHaveBeenCalledTimes(2)
     expect(mocks.items.mock.calls.at(-1)[0]).toMatchObject({ regions: ['丙-乙'], page: 1 })
-    finishOld({ items: [{ id: 99, local_expression: '舊結果' }], total: 1 }); await settle()
     expect(pageState.entries).toEqual([])
   })
 
@@ -319,7 +565,7 @@ describe('vocabulary configuration entrance', () => {
     expect(mocks.items).toHaveBeenCalledTimes(1)
     await vi.advanceTimersByTimeAsync(1); await settle()
     expect(mocks.items).toHaveBeenCalledTimes(2)
-    expect(mocks.locations).toHaveBeenCalledTimes(locationsCount + 1)
+    expect(mocks.locations).toHaveBeenCalledTimes(locationsCount + (mode === 'administrative' ? 0 : 1))
   })
 
   it.each(['card', 'map'])('does not refresh unchanged partition sets in %s mode', async tab => {
@@ -366,6 +612,56 @@ describe('vocabulary configuration entrance', () => {
     await vi.advanceTimersByTimeAsync(1000)
     expect(mocks.items).toHaveBeenCalledTimes(1)
     expect(mocks.locations).toHaveBeenCalledTimes(locationsCount)
+  })
+
+  it('loads consecutive pending-total card pages until has_more is false', async () => {
+    mocks.items
+      .mockResolvedValueOnce({ items: [{ id: 1 }], total: null, has_more: true, page: 1 })
+      .mockResolvedValueOnce({ items: [{ id: 2 }], total: null, has_more: true, page: 2 })
+      .mockResolvedValueOnce({ items: [{ id: 3 }], total: 3, has_more: false, page: 3 })
+    await mount()
+    host.querySelector('.submit').click(); await settle()
+    expect(mocks.items.mock.calls.at(-1)[0]).toMatchObject({ defer_total: true, page: 1 })
+    expect(pageState.total).toBeNull()
+    expect(pageState.canLoadMore).toBe(true)
+    await pageState.loadVocabularyItems({ append: true }); await settle()
+    expect(pageState.canLoadMore).toBe(true)
+    await pageState.loadVocabularyItems({ append: true }); await settle()
+    expect(pageState.entries.map(item => item.id)).toEqual([1, 2, 3])
+    expect(pageState.total).toBe(3)
+    expect(pageState.canLoadMore).toBe(false)
+  })
+
+  it('retries the same card page after a failed load without skipping data', async () => {
+    mocks.items
+      .mockResolvedValueOnce({ items: [{ id: 1 }], total: null, has_more: true, page: 1 })
+      .mockRejectedValueOnce(new Error('temporary'))
+      .mockResolvedValueOnce({ items: [{ id: 2 }], total: 2, has_more: false, page: 2 })
+    await mount()
+    host.querySelector('.submit').click(); await settle()
+    await pageState.loadVocabularyItems({ append: true }); await settle()
+    expect(pageState.canLoadMore).toBe(true)
+    await pageState.loadVocabularyItems({ append: true }); await settle()
+    expect(mocks.items.mock.calls.slice(-2).map(([params]) => params.page)).toEqual([2, 2])
+    expect(pageState.entries.map(item => item.id)).toEqual([1, 2])
+  })
+
+  it('keeps cached pending map details loadable and stops on has_more false', async () => {
+    mocks.items
+      .mockResolvedValueOnce({ items: [{ id: 1 }], total: null, has_more: true, page: 1 })
+      .mockResolvedValueOnce({ items: [{ id: 2 }], total: 2, has_more: false, page: 2 })
+    await mount({ tab: 'map' })
+    host.querySelector('.submit').click(); await settle()
+    await pageState.handleMapPointClick({ locationName: '测试地点' }); await settle()
+    expect(mocks.items.mock.calls.at(-1)[0]).toMatchObject({ defer_total: true, page: 1 })
+    expect(pageState.mapDetailTotal).toBeNull()
+    expect(pageState.canLoadMoreMapDetail).toBe(true)
+    await pageState.handleMapPointClick({ locationName: '测试地点' }); await settle()
+    expect(mocks.items).toHaveBeenCalledTimes(1)
+    expect(pageState.canLoadMoreMapDetail).toBe(true)
+    await pageState.loadMoreMapDetail(); await settle()
+    expect(pageState.mapDetailEntries.map(item => item.id)).toEqual([1, 2])
+    expect(pageState.canLoadMoreMapDetail).toBe(false)
   })
 
   it('keeps pagination on the applied scope while a new location is being selected', async () => {
@@ -493,14 +789,15 @@ describe('vocabulary configuration entrance', () => {
     expect(request).not.toHaveBeenCalled()
   })
 
-  it('mounts the table only after Search finishes collapsing and resets when switching source', async () => {
+  it('shows table results only after Search finishes collapsing and resets when switching source', async () => {
     await mount({ tab: 'table' })
     host.querySelector('.submit').click()
     await settle()
-    expect(mocks.tableMount).not.toHaveBeenCalled()
+    expect(host.querySelector('.content-area')).toBeNull()
     entrance.$.exposed.progress.value = 1
     await settle()
-    expect(mocks.tableMount).toHaveBeenCalledTimes(1)
+    expect(host.querySelector('.content-area')).not.toBeNull()
+    expect(mocks.items).toHaveBeenCalledTimes(1)
     mocks.route.query = { source: 'character-notes', tab: 'card' }
     await settle()
     expect(mocks.notes).not.toHaveBeenCalled()
@@ -517,5 +814,200 @@ describe('vocabulary configuration entrance', () => {
     await settle()
     expect(mocks.points).toHaveBeenCalled()
     expect(mocks.words).toHaveBeenCalled()
+  })
+})
+
+
+describe('serial vocabulary queries', () => {
+  const deferred = () => { let resolve, reject; const promise = new Promise((yes, no) => { resolve = yes; reject = no }); return { promise, resolve, reject } }
+
+  it.each(['card', 'table', 'map'])('keeps only the latest automatic query in %s mode', async tab => {
+    vi.useFakeTimers()
+    const first = deferred()
+    const api = tab === 'map' ? mocks.points : mocks.items
+    api.mockImplementationOnce(() => first.promise)
+    await mount({ tab })
+    host.querySelector('.submit').click(); await settle()
+    const initialCalls = api.mock.calls.length
+    for (const query of ['中间词', '最新词']) {
+      emitControl('update:query', query); await settle()
+      await vi.advanceTimersByTimeAsync(250); await settle()
+    }
+    expect(api).toHaveBeenCalledTimes(initialCalls)
+    first.resolve({ items: [], points: [] }); await settle(); await settle()
+    expect(api).toHaveBeenCalledTimes(initialCalls + 1)
+    expect(api.mock.calls.at(-1)[0].q).toBe('最新词')
+  })
+
+  it('does not repeat an active query when edits return to its original conditions', async () => {
+    vi.useFakeTimers()
+    const first = deferred()
+    mocks.items.mockImplementationOnce(() => first.promise)
+    await mount({ tab: 'card' })
+    host.querySelector('.submit').click(); await settle()
+    for (const query of ['中间词', '']) {
+      emitControl('update:query', query); await settle()
+      await vi.advanceTimersByTimeAsync(250); await settle()
+    }
+    first.resolve({ items: [{ id: 1, standard_word: '原词' }] }); await settle(); await settle()
+    expect(mocks.items).toHaveBeenCalledTimes(1)
+    expect(pageState.entries).toHaveLength(1)
+  })
+
+  it.each(['vocabulary', 'character-notes'])('respects a newer debounce while %s has a waiting query', async source => {
+    vi.useFakeTimers()
+    const first = deferred()
+    const api = source === 'vocabulary' ? mocks.items : mocks.notes
+    api.mockImplementationOnce(() => first.promise)
+    await mount({ source, tab: 'card' })
+    host.querySelector('.submit').click(); await settle()
+    const type = async query => {
+      if (source === 'vocabulary') emitControl('update:query', query)
+      else pageState.notesQuery = query
+      await settle()
+    }
+    await type('中间词'); await vi.advanceTimersByTimeAsync(250); await settle()
+    await type('最新词'); await vi.advanceTimersByTimeAsync(100)
+    first.resolve({ items: [] }); await settle(); await settle()
+    expect(api).toHaveBeenCalledTimes(1)
+    await vi.advanceTimersByTimeAsync(150); await settle()
+    expect(api).toHaveBeenCalledTimes(2)
+    expect(api.mock.calls.at(-1)[0].q).toBe('最新词')
+  })
+
+  it.each(['resolve', 'reject'])('continues the latest notes query after the active request %s', async outcome => {
+    vi.useFakeTimers()
+    const first = deferred()
+    mocks.notes.mockImplementationOnce(() => first.promise)
+    await mount({ source: 'character-notes', tab: 'card' })
+    host.querySelector('.submit').click(); await settle()
+    for (const query of ['中间词', '最新词']) {
+      pageState.notesQuery = query; await settle()
+      await vi.advanceTimersByTimeAsync(250); await settle()
+    }
+    expect(mocks.notes).toHaveBeenCalledTimes(1)
+    if (outcome === 'resolve') first.resolve({ items: [] })
+    else first.reject(new Error('timeout'))
+    await settle(); await settle()
+    expect(mocks.notes).toHaveBeenCalledTimes(2)
+    expect(mocks.notes.mock.calls.at(-1)[0].q).toBe('最新词')
+  })
+
+  it.each(['card', 'map'])('continues the latest %s query after a failure', async tab => {
+    vi.useFakeTimers()
+    const first = deferred()
+    const api = tab === 'map' ? mocks.points : mocks.items
+    api.mockImplementationOnce(() => first.promise)
+    await mount({ tab })
+    host.querySelector('.submit').click(); await settle()
+    emitControl('update:query', '最新词'); await settle()
+    await vi.advanceTimersByTimeAsync(250); await settle()
+    first.reject(new Error('timeout')); await settle(); await settle()
+    expect(api).toHaveBeenCalledTimes(2)
+    expect(api.mock.calls.at(-1)[0].q).toBe('最新词')
+  })
+
+  it('waits for standard words before starting a query in another view', async () => {
+    const words = deferred()
+    mocks.words.mockImplementationOnce(() => words.promise)
+    await mount({ tab: 'map' })
+    host.querySelector('.submit').click(); await settle(); await settle()
+    expect(mocks.words).toHaveBeenCalledTimes(1)
+    emitControl('update:viewMode', 'card'); await settle()
+    expect(mocks.items).not.toHaveBeenCalled()
+    words.resolve({ standard_words: [] }); await settle(); await settle()
+    expect(mocks.items).toHaveBeenCalledTimes(1)
+  })
+
+  it('restores completed map points when returning to an active query waiting for standard words', async () => {
+    vi.useFakeTimers()
+    const words = deferred()
+    mocks.points.mockResolvedValueOnce({ points: [{ location_name: '原地点', entry_count: 3 }] })
+    mocks.words.mockImplementationOnce(() => words.promise)
+    await mount({ tab: 'map' })
+    host.querySelector('.submit').click(); await settle(); await settle()
+    expect(pageState.mapPoints).toHaveLength(1)
+    for (const query of ['中间词', '']) {
+      emitControl('update:query', query); await settle()
+      await vi.advanceTimersByTimeAsync(250); await settle()
+    }
+    words.resolve({ standard_words: [] }); await settle(); await settle()
+    expect(mocks.points).toHaveBeenCalledTimes(1)
+    expect(pageState.mapPoints).toHaveLength(1)
+    expect(pageState.mapPoints[0].locationName).toBe('原地点')
+    expect(pageState.isLoadingItems).toBe(false)
+  })
+
+  it('keeps a waiting query paused until an unchanged selector closes', async () => {
+    vi.useFakeTimers()
+    const first = deferred()
+    mocks.items.mockImplementationOnce(() => first.promise)
+    await mount({ tab: 'card' })
+    host.querySelector('.submit').click(); await settle()
+    emitControl('update:query', '最新词'); await settle()
+    await vi.advanceTimersByTimeAsync(250); await settle()
+    emitControl('filterOpenChange', true); await settle()
+    first.resolve({ items: [] }); await settle(); await settle()
+    expect(mocks.items).toHaveBeenCalledTimes(1)
+    emitControl('filterOpenChange', false); await settle()
+    await vi.advanceTimersByTimeAsync(249); await settle()
+    expect(mocks.items).toHaveBeenCalledTimes(1)
+    await vi.advanceTimersByTimeAsync(1); await settle()
+    expect(mocks.items).toHaveBeenCalledTimes(2)
+    expect(mocks.items.mock.calls.at(-1)[0].q).toBe('最新词')
+  })
+
+  it('does not start a queued query after leaving the page', async () => {
+    vi.useFakeTimers()
+    const first = deferred()
+    mocks.items.mockImplementationOnce(() => first.promise)
+    await mount({ tab: 'card' })
+    host.querySelector('.submit').click(); await settle()
+    emitControl('update:query', '最新词'); await settle()
+    await vi.advanceTimersByTimeAsync(250); await settle()
+    app.unmount(); app = null
+    first.resolve({ items: [] }); await settle(); await settle()
+    expect(mocks.items).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('map first and independent standard-word loading', () => {
+  const deferred = () => { let resolve, reject; const promise = new Promise((yes, no) => { resolve = yes; reject = no }); return { promise, resolve, reject } }
+  it('requests the map first and shows even an empty map while words are pending', async () => {
+    const map = deferred(), words = deferred()
+    mocks.points.mockImplementationOnce(() => map.promise)
+    mocks.words.mockImplementationOnce(() => words.promise)
+    await mount({ tab: 'map' })
+    host.querySelector('.submit').click(); await settle()
+    expect(mocks.points).toHaveBeenCalledTimes(1)
+    expect(mocks.words).not.toHaveBeenCalled()
+    map.resolve({ points: [], total_entries: 0 }); await settle(); await settle()
+    expect(mocks.words).toHaveBeenCalledTimes(1)
+    expect(pageState.isMapInitialLoading).toBe(false)
+    expect(controlProps.standardWordsLoading).toBe(true)
+    words.resolve({ standard_words: [] }); await settle()
+    expect(controlProps.standardWordsLoading).toBe(false)
+  })
+  it('does not launch old words when the applied search changes during the map request', async () => {
+    const map = deferred()
+    mocks.points.mockImplementationOnce(() => map.promise)
+    await mount({ tab: 'map' })
+    host.querySelector('.submit').click(); await settle()
+    emitControl('update:query', '新词'); pageState.applyVocabularyQuery()
+    map.resolve({ points: [] }); await settle(); await settle()
+    expect(mocks.words).not.toHaveBeenCalled()
+  })
+  it('keeps the map and selected words on a standard-word failure and allows a retry', async () => {
+    await mount({ tab: 'map' })
+    emitControl('update:selectedStandardWord', '太阳'); await settle()
+    mocks.words.mockRejectedValueOnce(new Error('offline'))
+    host.querySelector('.submit').click(); await settle(); await settle()
+    expect(pageState.selectedStandardWord).toBe('太阳')
+    expect(controlProps.standardWordsError).toBe(true)
+    expect(pageState.loadError).toBe('')
+    mocks.words.mockResolvedValueOnce({ standard_words: [{ standard_word: '太阳' }] })
+    await pageState.loadVocabularyStandardWords(); await settle()
+    expect(controlProps.standardWordsError).toBe(false)
+    expect(pageState.selectedStandardWord).toBe('太阳')
   })
 })

@@ -16,8 +16,8 @@ describe('cluster route exposure', () => {
     const menuBarSource = readSource('src/main/config/BarAndTabs/MenuBarConfig.js')
     const sidebarSource = readSource('src/main/config/BarAndTabs/SideBarConfig.js')
 
-    expect(menuRoutesSource).toContain("path: '/menu/cluster'")
-    expect(menuBarSource).toContain("if (route.path === '/menu/cluster') return 'cluster'")
+    expect(menuRoutesSource).toContain("path: 'menu/cluster'")
+    expect(menuBarSource).toContain("if (normalizedPath === '/menu/cluster') return 'cluster'")
     expect(menuBarSource).not.toContain("tab: 'cluster'")
     expect(sidebarSource).toContain('cluster intentionally remains disabled in the i18n sidebar config.')
   })

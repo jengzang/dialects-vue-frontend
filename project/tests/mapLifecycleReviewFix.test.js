@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
 const testsDir = dirname(fileURLToPath(import.meta.url))
 const projectRoot = resolve(testsDir, '..')
 
-const villageMapPopupPath = resolve(projectRoot, 'src/main/components/popup/map/VillageMapPopup.vue')
+const villageMapPopupPath = resolve(projectRoot, 'src/main/components/map/popups/VillageMapPopup.vue')
 const spatialMapPath = resolve(projectRoot, 'src/VillagesML/workspace/modules/spatial/SpatialMap.vue')
 const yuBaoMapPath = resolve(projectRoot, 'src/main/components/map/YuBaoMap.vue')
 

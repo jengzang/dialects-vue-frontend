@@ -64,14 +64,59 @@
               icon-color="var(--color-primary)"
             />
           </h3>
-          <RadioGroup
-            v-model="colorThemeModel"
-            :options="colorThemeRadioOptions"
-            name="settings-color-theme"
-            class="settings-radio-group color-theme-radio-group"
-          />
+          <div
+            class="theme-options ui-tabs-navigation--segmented ui-tabs-navigation--filled"
+            role="group"
+            :aria-label="$t('navigation.settings.colorTheme.title')"
+            data-theme-control="settings-color-theme"
+          >
+            <button
+              v-for="option in colorThemeOptions"
+              :key="option.value"
+              type="button"
+              class="ui-tab-item"
+              :class="{ active: colorThemeModel === option.value }"
+              :value="option.value"
+              :aria-label="option.label"
+              :aria-pressed="colorThemeModel === option.value"
+              :title="option.label"
+              @click="colorThemeModel = option.value"
+            >
+              <PhCircle class="theme-choice-swatch" :class="`theme-choice-swatch--${option.value}`" weight="fill" :size="18" aria-hidden="true" />
+              <span class="theme-choice-label">{{ option.label }}</span>
+              <span class="theme-choice-short-label" aria-hidden="true">{{ $t(`navigation.settings.colorTheme.shortOptions.${option.value}`) }}</span>
+            </button>
+          </div>
+          <h3 class="section-title">
+            {{ $t('navigation.settings.colorTheme.modeTitle') }}
+          </h3>
+          <div
+            class="theme-options ui-tabs-navigation--segmented ui-tabs-navigation--filled"
+            role="group"
+            :aria-label="$t('navigation.settings.colorTheme.modeTitle')"
+            data-theme-control="settings-color-mode"
+          >
+            <button
+              v-for="option in colorModeOptions"
+              :key="option.value"
+              type="button"
+              class="ui-tab-item"
+              :class="{ active: colorModeModel === option.value }"
+              :value="option.value"
+              :aria-label="option.label"
+              :aria-pressed="colorModeModel === option.value"
+              :title="option.label"
+              @click="colorModeModel = option.value"
+            >
+              <component :is="option.icon" :size="20" aria-hidden="true" />
+              <span class="theme-choice-label">{{ option.label }}</span>
+              <span class="theme-choice-short-label" aria-hidden="true">{{ $t(`navigation.settings.colorTheme.shortModes.${option.value}`) }}</span>
+            </button>
+          </div>
         </div>
-        <hr class="setting-split-divider">
+      </div>
+
+      <div class="setting-section setting-split glass-panel">
         <div class="setting-split-item">
           <h3 class="section-title">
             {{ $t('navigation.settings.interfaceMode.title') }}
@@ -89,22 +134,25 @@
             name="settings-interface-mode"
             class="settings-radio-group interface-mode-radio-group"
           />
-          <h3 class="section-title" style="margin-top: 18px">
-            {{ $t('about.settings.iconMode.title') }}
-            <HelpIcon
-              :content="$t('about.settings.iconMode.description')"
-              size="sm"
-              placement="right"
-              icon="?"
-              icon-color="var(--color-primary)"
+        </div>
+        <hr class="setting-split-divider">
+        <div class="setting-split-item">
+            <h3 class="section-title">
+              {{ $t('about.settings.iconMode.title') }}
+              <HelpIcon
+                :content="$t('about.settings.iconMode.description')"
+                size="sm"
+                placement="right"
+                icon="?"
+                icon-color="var(--color-primary)"
+              />
+            </h3>
+            <RadioGroup
+              v-model="iconModeModel"
+              :options="iconModeRadioOptions"
+              name="settings-icon-mode"
+              class="settings-radio-group"
             />
-          </h3>
-          <RadioGroup
-            v-model="iconModeModel"
-            :options="iconModeRadioOptions"
-            name="settings-icon-mode"
-            class="settings-radio-group"
-          />
         </div>
       </div>
 
@@ -153,10 +201,9 @@
               class="settings-radio-group"
             />
             <button
-              class="glass-button"
-              data-variant="secondary"
+              class="action-btn"
               @click="showUpdateNotice = true"
-              style="white-space: nowrap;"
+              style="white-space: nowrap; padding: 8px;background: var(--color-primary)"
             ><InlineIcon icon="📋" />{{ $t('about.settings.viewUpdateLog') }}
             </button>
           </div>
@@ -184,10 +231,11 @@
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed, defineAsyncComponent } from 'vue'
+import { PhCircle, PhSun, PhMoon, PhDesktop } from '@phosphor-icons/vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { setLocale } from '@/i18n/index.js'
-import { showSuccess } from '@/utils/ui/message.js'
+import { showSuccess, showError } from '@/utils/ui/message.js'
 import SupportPopup from '@/main/components/user/popups/SupportPopup.vue'
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
@@ -196,19 +244,18 @@ import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { TABLE_COLUMN_SCHEMAS } from '@/main/config/index.js'
 import {
-  COLOR_THEME_BLUE,
-  COLOR_THEME_DARK,
-  COLOR_THEME_LIGHT,
-  COLOR_THEME_GREEN,
+  getColorThemeParts,
+  currentColorTheme,
+  currentColorMode,
   UI_MODE_DEFAULT,
   UI_MODE_COMPACT,
   ICON_MODE_ALL_EMOJI,
   ICON_MODE_ALL_SVG,
   ICON_MODE_BAR_SVG,
-  getStoredColorTheme,
   getStoredInterfaceMode,
   getStoredIconMode,
-  setColorTheme,
+  setColorFamily,
+  setColorMode,
   setInterfaceMode,
   setIconMode,
 } from '@/composables/core/uiPreferences.js'
@@ -254,26 +301,36 @@ const languages = ref([
 ])
 
 const interfaceMode = ref(getStoredInterfaceMode())
-const colorTheme = ref(getStoredColorTheme())
 const iconMode = ref(getStoredIconMode())
 
 const colorThemeOptions = computed(() => [
-  { value: COLOR_THEME_BLUE, label: t('navigation.settings.colorTheme.options.blue') },
-  { value: COLOR_THEME_GREEN, label: t('navigation.settings.colorTheme.options.green') },
-  { value: COLOR_THEME_LIGHT, label: t('navigation.settings.colorTheme.options.light') },
-  { value: COLOR_THEME_DARK, label: t('navigation.settings.colorTheme.options.dark') },
+  { value: 'blue', label: t('navigation.settings.colorTheme.options.blue') },
+  { value: 'red', label: t('navigation.settings.colorTheme.options.red') },
+  { value: 'green', label: t('navigation.settings.colorTheme.options.green') },
 ])
 
-const colorThemeRadioOptions = computed(() =>
-  colorThemeOptions.value.map(option => ({
-    value: option.value,
-    label: option.label
-  }))
-)
-
 const colorThemeModel = computed({
-  get: () => colorTheme.value,
-  set: (theme) => changeColorTheme(theme)
+  get: () => getColorThemeParts(currentColorTheme.value).family,
+  set: (family) => {
+    if (family === colorThemeModel.value) return
+    setColorFamily(family)
+    showSuccess(t('messages.success.colorThemeChanged'))
+  }
+})
+
+const colorModeOptions = computed(() => [
+  { value: 'light', label: t('navigation.settings.colorTheme.modes.light'), icon: PhSun },
+  { value: 'dark', label: t('navigation.settings.colorTheme.modes.dark'), icon: PhMoon },
+  { value: 'system', label: t('navigation.settings.colorTheme.modes.system'), icon: PhDesktop },
+])
+
+const colorModeModel = computed({
+  get: () => currentColorMode.value,
+  set: (mode) => {
+    if (mode === currentColorMode.value) return
+    setColorMode(mode)
+    showSuccess(t('messages.success.colorThemeChanged'))
+  }
 })
 
 const interfaceModeOptions = computed(() => [
@@ -348,9 +405,15 @@ const zhongguInputModeOptions = computed(() => [
   { value: 'direct', label: t('about.settings.zhongguInputMode.options.direct') }
 ])
 
-function changeLanguage(newLocale) {
-  if (newLocale === currentLocale.value) return
-  setLocale(newLocale)
+async function changeLanguage(newLocale) {
+  const unchanged = newLocale === currentLocale.value
+  try {
+    if (!await setLocale(newLocale)) return
+  } catch {
+    showError(t('messages.error.loadFailed'))
+    return
+  }
+  if (unchanged) return
   const targetPath = buildLocalePath(newLocale, stripLocaleFromPath(route.path))
   router.push({ path: targetPath, query: route.query, hash: route.hash })
   showSuccess(t('messages.success.languageChanged'))
@@ -363,11 +426,6 @@ function changeInterfaceMode(mode) {
   showSuccess(t('messages.success.interfaceModeChanged'))
 }
 
-function changeColorTheme(theme) {
-  if (theme === colorTheme.value) return
-  colorTheme.value = setColorTheme(theme)
-  showSuccess(t('messages.success.colorThemeChanged'))
-}
 </script>
 
 <style scoped lang="scss">
@@ -385,7 +443,7 @@ $text-muted: var(--text-tertiary);
 .page-title {
   margin-top: 0;
   margin-bottom: 1.5rem;
-  font-size: 1.8rem;
+  font-size: var(--font-size-28);
   color: $text-primary;
 }
 
@@ -397,7 +455,8 @@ $text-muted: var(--text-tertiary);
 
 .setting-section {
   --glass-panel-radius: var(--radius-lg);
-  --glass-panel-backdrop-filter: blur(10px);
+  --glass-panel-backdrop-filter: none;
+  --glass-panel-background: none;
   --glass-panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   --glass-panel-hover-shadow: var(--glass-panel-shadow);
   margin-bottom: 24px;
@@ -405,7 +464,7 @@ $text-muted: var(--text-tertiary);
 
 }
 
-:global(:root[data-color-theme='green'] .setting-section) {
+:global(:root[data-color-theme='green-dark'] .setting-section) {
   --glass-panel-background: linear-gradient(145deg, var(--glass-50), var(--glass-20));
   --glass-panel-border: 1px solid var(--border-glass-subtle);
   --glass-panel-shadow: var(--shadow-glass);
@@ -433,7 +492,7 @@ $text-muted: var(--text-tertiary);
 .section-title {
   margin: 0 0 8px;
   color: $text-primary;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 600;
   text-align: center;
 }
@@ -441,7 +500,7 @@ $text-muted: var(--text-tertiary);
 .section-description {
   margin: 0 0 20px;
   color: $text-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .settings-radio-group {
@@ -457,45 +516,42 @@ $text-muted: var(--text-tertiary);
   }
 }
 
-.color-theme-radio-group {
+.theme-options {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  justify-items: center;
-  gap: 4px 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  max-width: 480px;
+  margin: 0 auto 20px;
+  padding: 4px;
 
-  :deep(.liquid-radio-text) {
-    display: flex;
-    align-items: center;
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .ui-tab-item {
+    min-height: 44px;
+    padding: 10px 12px;
     gap: 8px;
+  }
+}
 
-    &::before {
-      width: 18px;
-      height: 18px;
-      content: '';
-      border: 1px solid rgba(0, 0, 0, 0.12);
-      border-radius: 5px;
-      flex-shrink: 0;
-    }
+.theme-choice-short-label {
+  display: none;
+}
+
+@media (max-aspect-ratio: 1 / 1) {
+  .theme-choice-label {
+    display: none;
   }
 
-  :deep(.liquid-radio-label:nth-child(1) .liquid-radio-text::before) {
-    background: #007aff;
-  }
-  :deep(.liquid-radio-label:nth-child(2) .liquid-radio-text::before) {
-    background: #388e3c;
-  }
-  :deep(.liquid-radio-label:nth-child(3) .liquid-radio-text::before) {
-    background: linear-gradient(135deg, #fff 50%, #e8e8e8 50%);
-    border-color: rgba(0, 0, 0, 0.18);
-  }
-  :deep(.liquid-radio-label:nth-child(4) .liquid-radio-text::before) {
-    background: linear-gradient(135deg, #0d1117 50%, #21262d 50%);
+  .theme-choice-short-label {
+    display: inline;
   }
 }
 
 .interface-mode-radio-group {
   :deep(.liquid-radio-text) {
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -541,19 +597,19 @@ $text-muted: var(--text-tertiary);
 .language-name {
   margin-bottom: 4px;
   color: $text-primary;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
 }
 
 .language-code {
   color: var(--text-lightest);
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 .language-check {
   margin-left: 20px;
   color: $primary;
-  font-size: 24px;
+  font-size: var(--font-size-24);
   font-weight: bold;
 }
 
@@ -628,12 +684,12 @@ $text-muted: var(--text-tertiary);
 
   .section-title {
     margin-bottom: 6px;
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 
   .section-description {
     margin-bottom: 14px;
-    font-size: 13px;
+    font-size: var(--font-size-13);
     line-height: 1.45;
   }
 
@@ -651,7 +707,7 @@ $text-muted: var(--text-tertiary);
 
   .interface-mode-radio-group {
     :deep(.liquid-radio-text) {
-      font-size: 13px;
+      font-size: var(--font-size-13);
     }
   }
 
@@ -676,16 +732,16 @@ $text-muted: var(--text-tertiary);
 
   .language-name {
     margin-bottom: 0;
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 
   .language-code {
-    font-size: 11px;
+    font-size: var(--font-size-12);
   }
 
   .language-check {
     margin-left: 8px;
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 
   .tutorial-toggle-section {

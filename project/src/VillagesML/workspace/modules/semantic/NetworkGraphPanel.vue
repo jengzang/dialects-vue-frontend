@@ -57,8 +57,8 @@
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import * as echarts from 'echarts'
 import { getCategoryDisplayName, getCategoryIcon } from '@/VillagesML/config/villagesML.js'
+import { initChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 
 const props = defineProps({
   network: { type: Object, default: null },
@@ -179,7 +179,7 @@ const renderChart = () => {
   if (!chartRef.value || !props.network) return
 
   if (chartInstance) chartInstance.dispose()
-  chartInstance = echarts.init(chartRef.value)
+  chartInstance = initChart(chartRef.value)
 
   const nodes = transformNodes(props.network.nodes, props.network.communities)
   const edges = transformEdges(props.network.edges)
@@ -250,6 +250,10 @@ onMounted(() => {
   window.addEventListener('resize', handleResize)
 })
 
+onChartThemeChange(() => {
+  if (props.network && !props.loading) renderChart()
+})
+
 onBeforeUnmount(() => {
   window.removeEventListener('resize', handleResize)
   if (chartInstance) {
@@ -266,7 +270,7 @@ onBeforeUnmount(() => {
 }
 
 .panel-title {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--text-primary);
   margin: 0 0 16px 0;
@@ -280,7 +284,7 @@ onBeforeUnmount(() => {
   background: rgba(var(--vml-blue-rgb), 0.1);
   border-radius: var(--radius-md);
   margin-bottom: 16px;
-  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 
 .metadata-item {
@@ -297,7 +301,7 @@ onBeforeUnmount(() => {
   background: rgba(var(--color-success-rgb), 0.2);
   color: var(--color-success);
   border-radius: var(--radius-md);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 500;
 }
 
@@ -325,7 +329,7 @@ onBeforeUnmount(() => {
 }
 
 .communities-legend h4 {
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-primary);
   margin: 0 0 12px 0;
@@ -344,7 +348,7 @@ onBeforeUnmount(() => {
   padding: 6px 12px;
   background: var(--glass-50);
   border-radius: var(--radius-sm2);
-  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 
 .legend-color {

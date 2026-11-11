@@ -9,6 +9,20 @@
 
   <GlobalToast />
 
+  <UpdateNoticeModal
+    v-if="updateNoticeActivated"
+    v-model:visible="showUpdateNotice"
+    :auto-show="true"
+    :mode="updateNoticeMode"
+    :version="homeUpdateNotice.version"
+    :last-update-date="homeUpdateNotice.lastUpdateDate"
+    :title="homeUpdateNotice.title"
+    :items="homeUpdateNotice.items"
+    :view-detail-text="$t('home.viewDetails')"
+    @close="showUpdateNotice = false"
+    @show-detail="showUpdateNotice = true"
+  />
+
   <!-- 🍎 全局确认对话框 -->
   <GlobalConfirm />
 
@@ -23,8 +37,9 @@
 </template>
 
 <script>
-import { computed, onMounted, onBeforeUnmount } from 'vue'
+import { computed, defineAsyncComponent, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 // import IntroLayout from '../layouts/IntroLayout.vue'
 import MenuLayout from '../layouts/MenuLayout.vue'
@@ -40,6 +55,11 @@ import { getToken } from '../api/auth/auth.js'
 import { stripLocaleFromPath } from '../i18n/localeRouting.js'
 import { isRouteLoading } from '../utils/ui/routeLoading.js'
 import { showRateLimitNotice } from '../utils/user/rateLimitNotice.js'
+import { getHomeUpdateNotice } from '../utils/user/updateNoticeConfig.js'
+
+const UpdateNoticeModal = defineAsyncComponent(() =>
+  import('@/main/components/user/popups/UpdateNoticeModal.vue')
+)
 
 window.__showRateLimitNotice = showRateLimitNotice
 
@@ -60,11 +80,22 @@ export default {
     ErrorBoundary,
     GlobalToast,
     GlobalConfirm,
+    UpdateNoticeModal,
 
   },
   setup() {
     const route = useRoute()
     const router = useRouter()
+    const { t, locale } = useI18n()
+    const showUpdateNotice = ref(false)
+    const updateNoticeActivated = ref(false)
+    const homeUpdateNotice = computed(() => getHomeUpdateNotice((key, values) => t(key, values, { locale: locale.value })))
+    const updateNoticeMode = computed(() => localStorage.getItem('update-notice-mode') || 'showinfo')
+
+    // 首次访问首页后保留实例，避免切换路由使全局 toast 的回调失效。
+    watch(() => route.matched.length > 0 && stripLocaleFromPath(route.path), (path) => {
+      if (path === '/') updateNoticeActivated.value = true
+    }, { immediate: true })
 
     const layoutComponent = computed(() => {
       const normalizedPath = stripLocaleFromPath(route.path)
@@ -152,6 +183,10 @@ export default {
     // }
 
     return {
+      showUpdateNotice,
+      updateNoticeActivated,
+      homeUpdateNotice,
+      updateNoticeMode,
       layoutComponent,
       isRouteLoading
     }
@@ -178,7 +213,7 @@ export default {
 .global-route-loading-text {
   margin: 0;
   color: var(--text-slate);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
 }
 

@@ -272,6 +272,12 @@
     "compare": {
       "options": {
         "optimizeLinks": "Optimize links"
+      },
+      "scrollHint": {
+        "drag": "Swipe left or right",
+        "scroll": "Scroll left or right",
+        "left": "Scroll left",
+        "right": "Scroll right"
       }
     }
   },

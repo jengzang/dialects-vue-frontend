@@ -19,7 +19,8 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, inject } from 'vue'
+import { CUSTOM_DATA_SAVE_SCOPE } from '@/main/composables/useCustomDataSave.js'
 import { useI18n } from 'vue-i18n'
 import { getUserPoints } from '@/api'
 import PointCardList from './PointCardList.vue'
@@ -27,6 +28,7 @@ import PointDetailForm from './PointDetailForm.vue'
 
 const { t } = useI18n()
 
+const saveLocks=inject(CUSTOM_DATA_SAVE_SCOPE,null)
 const loading = ref(false)
 const errorMessage = ref('')
 const pointItems = ref([])
@@ -59,6 +61,7 @@ const handleCreatePoint = () => {
 }
 
 const handleBack = () => {
+  if(saveLocks?.size) return
   view.value = 'list'
   selectedPoint.value = null
 }

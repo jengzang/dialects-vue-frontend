@@ -14,7 +14,7 @@
           class="manage-filter-grid locations-filter-grid"
           @submit.prevent="applyLocationFilters"
         >
-          <label class="upload-field">
+          <label v-if="canSearchUsername" class="upload-field">
             <span>{{ t('words.wordList.locations.filters.userName') }}</span>
             <input v-model="locationFilters.username" type="text" :placeholder="t('words.wordList.locations.filters.userName')" />
           </label>
@@ -58,12 +58,29 @@
               class="glass-button"
               data-variant="success"
               type="button"
-              :disabled="isExportingLocation"
+              :disabled="Boolean(exportingLocationKey)"
               @click="handleExportLocation(location)"
             >
+              <span
+                v-if="exportingLocationKey === getLocationKey(location)"
+                class="ui-loading--inline"
+                aria-hidden="true"
+              >↻</span>
               {{ t('words.wordList.locations.export') }}
             </button>
-            <button v-if="canDeleteLocation" class="glass-button" data-variant="danger" type="button" @click="handleDeleteLocation(location)">
+            <button
+              v-if="canDeleteLocation"
+              class="glass-button"
+              data-variant="danger"
+              type="button"
+              :disabled="Boolean(deletingLocationKey)"
+              @click="handleDeleteLocation(location)"
+            >
+              <span
+                v-if="deletingLocationKey === getLocationKey(location)"
+                class="ui-loading--inline"
+                aria-hidden="true"
+              >↻</span>
               {{ t('common.button.delete') }}
             </button>
             <button
@@ -114,6 +131,7 @@
     :fields="locationEditFields"
     :cancel-text="t('common.button.cancel')"
     :confirm-text="t('words.wordList.locations.save')"
+    :loading="isSavingLocation"
     @close="closeLocationEditor"
     @cancel="closeLocationEditor"
     @confirm="handleSaveEditingLocation"
@@ -205,6 +223,7 @@ const isLoadingLocations = ref(false)
 const locationsLoadError = ref('')
 const locationRows = ref([])
 const isLocationEditorOpen = ref(false)
+const isSavingLocation = ref(false)
 const editingLocationSource = ref(null)
 const editingLocationDraft = ref(null)
 const isTransferModalOpen = ref(false)
@@ -212,7 +231,8 @@ const transferLocationSource = ref(null)
 const transferTargetUserId = ref('')
 const transferTargetUsername = ref('')
 const isTransferringLocation = ref(false)
-const isExportingLocation = ref(false)
+const exportingLocationKey = ref('')
+const deletingLocationKey = ref('')
 const locationFilters = reactive({
   username: '',
   location_name: '',
@@ -223,9 +243,14 @@ const locationPagination = reactive({
   total: 0,
 })
 
+function getLocationKey(location) {
+  return `${location.user_id ?? location.username ?? ''}-${location.location_name}`
+}
+
 const canGoPreviousLocationPage = computed(() => locationPagination.page > 1)
 const canGoNextLocationPage = computed(() => locationPagination.page * locationPagination.pageSize < locationPagination.total)
-const canShowLocationFilters = computed(() => props.managePermissionLevel === 'manage')
+const canShowLocationFilters = computed(() => ['manage', 'edit'].includes(props.managePermissionLevel))
+const canSearchUsername = computed(() => props.managePermissionLevel === 'manage')
 const transferModalTitle = computed(() => {
   const locationName = transferLocationSource.value?.location_name
   return locationName
@@ -254,11 +279,12 @@ function appendFilledFilters(target, filters) {
 }
 
 function buildLocationQueryParams(overrides = {}) {
+  const filters = canSearchUsername.value ? locationFilters : { location_name: locationFilters.location_name }
   return appendFilledFilters({
     page: locationPagination.page,
     page_size: locationPagination.pageSize,
     ...overrides,
-  }, locationFilters)
+  }, filters)
 }
 
 async function loadVocabularyLocations() {
@@ -336,7 +362,7 @@ function closeTransferModal() {
 
 async function handleSaveLocation(location, originalLocationName) {
   const sourceName = String(originalLocationName || '').trim()
-  if (!location || !sourceName) {
+  if (!location || !sourceName || isSavingLocation.value) {
     return
   }
 
@@ -355,6 +381,7 @@ async function handleSaveLocation(location, originalLocationName) {
     payload.new_location_name = nextName
   }
   const params = location.user_id ? { user_id: location.user_id } : {}
+  isSavingLocation.value = true
   try {
     await updateVocabularyLocation(sourceName, payload, params)
     invalidateVocabularyOptionsCache()
@@ -363,6 +390,8 @@ async function handleSaveLocation(location, originalLocationName) {
     closeLocationEditor()
   } catch (error) {
     showError(error.message || t('words.wordList.locations.saveFailed'))
+  } finally {
+    isSavingLocation.value = false
   }
 }
 
@@ -429,9 +458,9 @@ function triggerBlobDownload(blob, fileName) {
 }
 
 async function handleExportLocation(location) {
-  if (!location?.location_name || isExportingLocation.value) return
+  if (!location?.location_name || exportingLocationKey.value) return
 
-  isExportingLocation.value = true
+  exportingLocationKey.value = getLocationKey(location)
   try {
     const params = location.user_id ? { user_id: location.user_id } : {}
     const blob = await exportVocabularyLocation(location.location_name, params)
@@ -440,19 +469,21 @@ async function handleExportLocation(location) {
   } catch (error) {
     showError(error.message || t('words.wordList.locations.exportFailed'))
   } finally {
-    isExportingLocation.value = false
+    exportingLocationKey.value = ''
   }
 }
 
 async function handleDeleteLocation(location) {
   if (!location?.location_name || location.user_id === null || location.user_id === undefined) return
+  if (deletingLocationKey.value) return
 
   const confirmed = await showConfirm(
     t('words.wordList.locations.deleteConfirm', { name: location.location_name }),
     { confirmText: t('common.button.delete'), cancelText: t('common.button.cancel') },
   )
-  if (!confirmed) return
+  if (!confirmed || deletingLocationKey.value) return
 
+  deletingLocationKey.value = getLocationKey(location)
   try {
     const params = { user_id: location.user_id }
     const result = await deleteVocabularyLocation(location.location_name, params)
@@ -461,6 +492,8 @@ async function handleDeleteLocation(location) {
     await loadVocabularyLocations()
   } catch (error) {
     showError(error.message || t('words.wordList.locations.deleteFailed'))
+  } finally {
+    deletingLocationKey.value = ''
   }
 }
 

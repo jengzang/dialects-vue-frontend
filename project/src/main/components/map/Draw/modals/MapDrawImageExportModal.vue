@@ -296,12 +296,12 @@ watch(
   }
 
   .summary-label {
-    font-size: 11px;
+    font-size: var(--font-size-12);
     color: $text-muted;
   }
 
   .summary-value {
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 700;
     color: $text-strong;
     word-break: break-word;
@@ -322,7 +322,7 @@ watch(
   padding: 14px 16px;
 
   .scope-panel-title {
-    font-size: 13px;
+    font-size: var(--font-size-13);
     font-weight: 700;
     color: $text-strong;
   }
@@ -362,13 +362,13 @@ watch(
   gap: 2px;
 
   .scope-selection-title {
-    font-size: 13px;
+    font-size: var(--font-size-13);
     font-weight: 600;
     color: $text-strong;
   }
 
   .scope-selection-meta {
-    font-size: 11px;
+    font-size: var(--font-size-12);
     color: $text-muted;
   }
 }
@@ -378,7 +378,7 @@ watch(
   gap: 6px;
 
   .draw-field-label {
-    font-size: 12px;
+    font-size: var(--font-size-12);
     font-weight: 600;
     color: $text-dark;
   }

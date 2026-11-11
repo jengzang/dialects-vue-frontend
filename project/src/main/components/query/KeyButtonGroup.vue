@@ -65,7 +65,7 @@ function toggleKey(key) {
   flex-wrap: wrap;
   display: flex;
   justify-content: center;
-  border-bottom: 1px solid var(--color-primary-hover);
+  border-bottom: 1px solid var(--border-control-focus);
 }
 
 .key-item {
@@ -80,7 +80,7 @@ function toggleKey(key) {
   color: var(--text-primary);
   cursor: pointer;
   transition: background 0.3s ease;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   margin: 5px;
 }
 

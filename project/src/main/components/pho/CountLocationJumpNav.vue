@@ -401,7 +401,7 @@ onBeforeUnmount(() => {
 
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);
-$primary-deep: #004fc4;
+$primary-deep: var(--color-secondary-text);
 
 $desktop-width: 214px;
 $tablet-width: 176px;
@@ -438,7 +438,7 @@ $mobile-width: 150px;
       0 8px 18px rgba(24, 38, 64, 0.1),
       inset 0 1px 0 var(--glass-80);
     color: var(--color-primary);
-    font-size: 18px;
+    font-size: var(--font-size-18);
     font-weight: 800;
     line-height: 1;
     cursor: pointer;
@@ -599,7 +599,7 @@ $mobile-width: 150px;
       .count-location-jump-nav-text {
         max-width: 134px;
         color: var(--color-primary);
-        font-size: 14px;
+        font-size: var(--font-size-14);
         font-weight: 800;
       }
 
@@ -723,7 +723,7 @@ $mobile-width: 150px;
     color: var(--text-dark);
     white-space: nowrap;
     text-overflow: ellipsis;
-    font-size: 12px;
+    font-size: var(--font-size-12);
     font-weight: 650;
     line-height: 1.25;
 
@@ -744,7 +744,7 @@ $mobile-width: 150px;
     background: linear-gradient(
       135deg,
       rgba(var(--color-primary-rgb), 0.88),
-      rgba(0, 81, 213, 0.88)
+      rgba(var(--color-primary-hover-rgb), 0.88)
     );
     border-radius: var(--radius-full);
     box-shadow:
@@ -773,7 +773,7 @@ $mobile-width: 150px;
       width: 28px;
       height: 28px;
       margin-right: 6px;
-      font-size: 17px;
+      font-size: var(--font-size-18);
     }
 
     .count-location-jump-nav-items {
@@ -800,7 +800,7 @@ $mobile-width: 150px;
 
         .count-location-jump-nav-text {
           max-width: 104px;
-          font-size: 13px;
+          font-size: var(--font-size-13);
         }
       }
     }
@@ -813,7 +813,7 @@ $mobile-width: 150px;
 
     .count-location-jump-nav-text {
       max-width: 104px;
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 }
@@ -860,7 +860,7 @@ $mobile-width: 150px;
 
         .count-location-jump-nav-text {
           max-width: 84px;
-          font-size: 12px;
+          font-size: var(--font-size-12);
         }
 
         .count-location-jump-nav-dot {
@@ -880,7 +880,7 @@ $mobile-width: 150px;
 
     .count-location-jump-nav-text {
       max-width: 82px;
-      font-size: 11px;
+      font-size: var(--font-size-12);
     }
 
     .count-location-jump-nav-dot {

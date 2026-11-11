@@ -350,7 +350,7 @@ $transition-tooltip: 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
   &.size-sm {
     width: 20px;
     height: 20px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
 
     @include touch-area(44px);
   }
@@ -358,7 +358,7 @@ $transition-tooltip: 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
   &.size-md {
     width: 24px;
     height: 24px;
-    font-size: 14px;
+    font-size: var(--font-size-14);
 
     @include touch-area(44px);
   }
@@ -366,7 +366,7 @@ $transition-tooltip: 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
   &.size-lg {
     width: 28px;
     height: 28px;
-    font-size: 16px;
+    font-size: var(--font-size-16);
 
     @include touch-area(48px);
   }
@@ -401,7 +401,7 @@ $transition-tooltip: 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
   position: absolute;
   padding: 10px 14px;
   color: $text-color;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   line-height: 1.5;
   text-align: center;
   overflow-wrap: break-word;

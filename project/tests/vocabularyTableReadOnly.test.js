@@ -12,19 +12,21 @@ function readSource(path) {
 
 describe('vocabulary table read-only view', () => {
   it('keeps vocabulary page tabs navigable without redirecting unavailable tab content', () => {
-    const vocabularyPage = readSource('src/main/views/explore/word/VocabularyPage.vue')
+    const vocabularyPage = readSource('src/main/views/menu/VocabularyPage.vue')
 
-    expect(vocabularyPage).toContain("path: '/explore/vocabulary/view'")
-    expect(vocabularyPage).toContain("path: '/explore/vocabulary/import'")
-    expect(vocabularyPage).toContain("path: '/explore/vocabulary/manage'")
+    expect(vocabularyPage).toContain("path: '/menu/vocabulary/view'")
+    expect(vocabularyPage).toContain("path: '/menu/vocabulary/import'")
+    expect(vocabularyPage).toContain("'/menu/vocabulary/manage'")
     expect(vocabularyPage).not.toContain('redirectUnavailablePage')
-    expect(vocabularyPage).not.toContain("navigateTo('/explore/vocabulary/view')")
+    expect(vocabularyPage).not.toContain("navigateTo('/menu/vocabulary/view')")
   })
 
-  it('lets everyone open table mode while keeping the view page UniversalTable read-only', () => {
+  it('lets everyone open table mode using read-only query results', () => {
     const vocabularyViewPage = readSource('src/main/views/explore/word/vocabulary/VocabularyViewPage.vue')
 
-    expect(vocabularyViewPage).toContain("key: 'table'")
+    expect(readSource('src/main/views/explore/word/vocabulary/VocabularyTopControls.vue')).toContain("['table', 'card', 'map']")
+    expect(vocabularyViewPage).toContain("viewMode === 'table' ? 'notes-list vocabulary-list' : 'cards-grid'")
+    expect(vocabularyViewPage).not.toContain('<UniversalTable')
     expect(vocabularyViewPage).not.toContain("mode.key !== 'table'")
     expect(vocabularyViewPage).not.toContain("value === 'table'")
     expect(vocabularyViewPage).not.toContain(':can-edit=')
@@ -32,9 +34,13 @@ describe('vocabulary table read-only view', () => {
   })
 
   it('places editable vocabulary table access inside the permission-gated manage page', () => {
-    const vocabularyManagePage = readSource('src/main/views/explore/word/vocabulary/VocabularyManagePage.vue')
+    const managePage = readSource('src/main/views/explore/word/vocabulary/VocabularyManagePage.vue')
+    const vocabularyManagePage = readSource('src/main/views/explore/word/vocabulary/ManageEntriesSection.vue')
 
-    expect(vocabularyManagePage).toContain('<section v-if="hasVocabularyPermission" class="content-area">')
+    expect(managePage).toContain('<KeepAlive v-if="!shouldShowAccessGate">')
+    expect(managePage).toContain('<ManageEntriesSection')
+    expect(managePage).toContain(':has-vocabulary-permission="hasVocabularyPermission"')
+    expect(vocabularyManagePage).toContain('v-if="canRenderEntriesTable"')
     expect(vocabularyManagePage).toContain('<UniversalTable')
     expect(vocabularyManagePage).toContain('db-key="vocabulary"')
     expect(vocabularyManagePage).toContain('table-name="vocabulary_entries"')

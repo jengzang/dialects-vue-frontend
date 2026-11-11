@@ -6,7 +6,11 @@
     <div
       ref="globeHostRef"
       class="globegl-canvas-host"
+      :class="{ 'globegl-canvas-host--loading': !isGlobeReady }"
     />
+    <div v-if="!isGlobeReady" class="globegl-loading">
+      <span class="ui-loading--page" />
+    </div>
     <template v-if="shouldUseGlobeJoystick">
       <Teleport
         v-if="joystickMountTarget"
@@ -33,16 +37,28 @@
 <script setup>
 import { computed, ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import Globe from 'globe.gl'
+import { currentColorTheme, isDarkColorTheme } from '@/composables/core/uiPreferences.js'
+
+const globeImageUrl = computed(() => (
+  isDarkColorTheme(currentColorTheme.value)
+    ? '/showcase/earth-color-relief-muted.webp'
+    : '/showcase/earth-color-relief-dark.webp'
+))
 
 const props = defineProps({
   points: {
     type: Array,
     default: () => [],
   },
+  centered: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const containerRef = ref(null)
 const globeHostRef = ref(null)
+const isGlobeReady = ref(false)
 const joystickRef = ref(null)
 const joystickMountTarget = ref(null)
 const isPortraitLayout = ref(false)
@@ -61,12 +77,14 @@ const joystickThumbStyle = computed(() => ({
 }))
 let globe = null
 let resizeObserver = null
+let visibilityObserver = null
+let isInViewport = false
 let inputCapabilityMediaQueries = []
 let activeJoystickPointerId = null
 let joystickAnimationFrameId = null
 let lastJoystickFrameTime = 0
-let projShiftX = -0.3
-let projShiftY = -0.1
+let projShiftX = props.centered ? 0 : -0.3
+let projShiftY = props.centered ? 0 : -0.1
 
 const GLOBE_JOYSTICK_TRAVEL_RATIO = 0.38
 const GLOBE_JOYSTICK_DEAD_ZONE = 3
@@ -113,7 +131,10 @@ function render() {
   const bgTint = getCssRgb('--bg-blue-tint-rgb', '240, 247, 255')
 
   globe = Globe()(globeHostRef.value)
-    .globeImageUrl('/showcase/earth-color-relief-dark.webp')
+    .onGlobeReady(() => {
+      isGlobeReady.value = true
+    })
+    .globeImageUrl(globeImageUrl.value)
     .backgroundImageUrl(null)
     .showGraticules(false)
     .backgroundColor('rgba(0,0,0,0)')
@@ -164,6 +185,34 @@ function render() {
 
   window.addEventListener('keydown', onKeyDown)
   window.addEventListener('wheel', onWheel, { passive: false })
+
+  if (typeof IntersectionObserver !== 'undefined') {
+    const rect = containerRef.value.getBoundingClientRect()
+    isInViewport = rect.width > 0 && rect.height > 0 &&
+      rect.bottom > 0 && rect.right > 0 &&
+      rect.top < document.documentElement.clientHeight &&
+      rect.left < document.documentElement.clientWidth
+    syncRenderingVisibility()
+    visibilityObserver = new IntersectionObserver(([entry]) => {
+      isInViewport = entry.isIntersecting
+      syncRenderingVisibility()
+    })
+    visibilityObserver.observe(containerRef.value)
+  } else {
+    isInViewport = true
+    syncRenderingVisibility()
+  }
+  document.addEventListener('visibilitychange', syncRenderingVisibility)
+}
+
+function syncRenderingVisibility() {
+  if (!globe) return
+  if (isInViewport && !document.hidden) {
+    globe.resumeAnimation()
+  } else {
+    cancelJoystickInteraction()
+    globe.pauseAnimation()
+  }
 }
 
 function syncGlobePointerInteraction() {
@@ -394,6 +443,9 @@ function updatePoints() {
 
 function destroy() {
   cancelJoystickInteraction()
+  visibilityObserver?.disconnect()
+  visibilityObserver = null
+  document.removeEventListener('visibilitychange', syncRenderingVisibility)
   window.removeEventListener('keydown', onKeyDown)
   window.removeEventListener('wheel', onWheel)
   teardownInputCapabilityListeners()
@@ -413,9 +465,19 @@ function destroy() {
   }
 }
 
+watch(globeImageUrl, (url) => {
+  globe?.globeImageUrl(url)
+})
+
 watch(() => props.points, () => {
   updatePoints()
 }, { deep: true })
+
+watch(() => props.centered, (centered) => {
+  projShiftX = centered ? 0 : -0.3
+  projShiftY = centered ? 0 : -0.1
+  globe?.camera()?.updateProjectionMatrix()
+})
 
 watch([shouldUseGlobeJoystick, hasPrimaryFinePointer, hasPrimaryHover, hasTouchInput], () => {
   cancelJoystickInteraction()
@@ -449,6 +511,17 @@ onBeforeUnmount(() => {
 .globegl-canvas-host {
   width: 100%;
   height: 100%;
+
+  &--loading {
+    visibility: hidden;
+  }
+}
+
+.globegl-loading {
+  @include flex-center;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
 .globe-joystick {

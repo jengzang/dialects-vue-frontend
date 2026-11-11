@@ -93,9 +93,9 @@ export function useSidebarConfig() {
             icon: '🏘️',
             path: withRouteLocale(route, '/menu/villages'),
             children: [
-                { label: t('navigation.submenu.villages.VillagesML'), icon: '🤖', path: withRouteLocale(route, '/explore/villages/ml') },
                 { label: t('navigation.submenu.villages.toponyms'), icon: '📍', path: withRouteLocale(route, '/explore/villages/toponyms') },
                 { label: t('navigation.submenu.villages.toponymSearch'), icon: '🔎', path: withRouteLocale(route, '/explore/villages/search') },
+                { label: t('navigation.submenu.villages.VillagesML'), icon: '🤖', path: withRouteLocale(route, '/explore/villages/ml') },
                 { label: t('navigation.submenu.villages.gdVillages'), icon: '🏘️', path: withRouteLocale(route, '/explore/villages/gd') },
                 // { label: t('navigation.submenu.villages.gdVillagesTable'), icon: '📊', path: withRouteLocale(route, '/explore/villages/table') },
                 { label: t('navigation.submenu.villages.ycVillages'), icon: '🏕️', path: withRouteLocale(route, '/explore/yc/villages') },
@@ -138,6 +138,7 @@ export function useSidebarConfig() {
             path: withRouteLocale(route, '/menu/about/intro'),
             children: [
                 { label: t('navigation.submenu.about.intro'), icon: 'ℹ️', path: withRouteLocale(route, '/menu/about/intro') },
+                { label: t('navigation.submenu.about.history'), icon: '🗓️', path: withRouteLocale(route, '/menu/about/history') },
                 { label: t('navigation.submenu.about.suggestion'), icon: '💬', path: withRouteLocale(route, '/menu/about/suggestion') },
                 { label: t('navigation.submenu.about.like'), icon: '❤️', path: withRouteLocale(route, '/menu/about/like') },
                 { label: t('navigation.submenu.about.setting'), icon: '⚙️', path: withRouteLocale(route, '/menu/settings') }
@@ -234,8 +235,8 @@ export const SideConfig = {
         children: [
             { label: '自然村地名分佈', icon: '📍', path: buildLocalePath('zh-Hant', '/explore/villages/toponyms') },
             { label: '地名查詢', icon: '🔎', path: buildLocalePath('zh-Hant', '/explore/villages/search') },
-            { label: '廣東自然村', icon: '🏕️', path: buildLocalePath('zh-Hant', '/explore/villages/gd') },
             { label: '機器學習', icon: '🤖', path: buildLocalePath('zh-Hant', '/explore/villages/ml') },
+            { label: '廣東自然村', icon: '🏕️', path: buildLocalePath('zh-Hant', '/explore/villages/gd') },
             { label: '全粵村情表格', icon: '📊', path: buildLocalePath('zh-Hant', '/explore/villages/table') },
             { label: '陽春自然村', icon: '🏠', path: buildLocalePath('zh-Hant', '/explore/yc/villages') },
             { label: '全部自然村', icon: '📋', path: buildLocalePath('zh-Hant', '/explore/villages/all'), visibleWhen: () => userStore.role === 'admin' }
@@ -261,7 +262,7 @@ export const SideConfig = {
             { label: '字表來源', icon: '📎', path: buildLocalePath('zh-Hant', '/menu/source') },
             { label: '隱私政策', icon: '🛡️', path: buildLocalePath('zh-Hant', '/menu/privacy') },
             { label: '提出建議', icon: '💡', path: buildLocalePath('zh-Hant', '/menu/about/suggestion') },
-            { label: '支持作者', icon: '❤️', path: buildLocalePath('zh-Hant', '/menu/about/like') }
+            { label: '支持項目', icon: '❤️', path: buildLocalePath('zh-Hant', '/menu/about/like') }
         ]
     },
     about_ontop: {
@@ -270,8 +271,9 @@ export const SideConfig = {
         path: buildLocalePath('zh-Hant', '/menu/about/intro'),
         children: [
             { label: '簡介', icon: 'ℹ️', path: buildLocalePath('zh-Hant', '/menu/about/intro') },
+            { label: '開發歷程', icon: '🗓️', path: buildLocalePath('zh-Hant', '/menu/about/history') },
             { label: '提出建議', icon: '💡', path: buildLocalePath('zh-Hant', '/menu/about/suggestion') },
-            { label: '支持作者', icon: '❤️', path: buildLocalePath('zh-Hant', '/menu/about/like') }
+            { label: '支持項目', icon: '❤️', path: buildLocalePath('zh-Hant', '/menu/about/like') }
         ],
         showIn: ['none']
     }

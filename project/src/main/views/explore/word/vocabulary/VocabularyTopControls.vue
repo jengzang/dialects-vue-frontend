@@ -3,13 +3,14 @@
     class="top-controls query-controls-layout"
     :class="source === 'vocabulary' ? 'query-controls--vocabulary' : 'query-controls--notes'"
   >
-    <div class="search-container">
+    <div ref="searchContainerEl" class="search-container">
       <div class="search-section">
         <div class="input-wrapper">
           <textarea
             ref="searchInputEl"
             :value="inputText"
             class="search-input"
+            :class="{ 'notes-search-input--compact': source === 'character-notes' && !deferQuery }"
             rows="1"
             :placeholder="source === 'character-notes' ? t('words.wordList.notes.searchPlaceholder') : t('words.wordList.search.placeholder')"
             @compositionstart="handleCompositionStart"
@@ -39,7 +40,7 @@
           <component
             :is="deferQuery ? 'button' : ActionButton"
             class="notes-refresh-action"
-            :class="{ 'query-search-action glass-button': deferQuery }"
+            :class="{ 'query-search-action action-btn': deferQuery }"
             :data-variant="deferQuery ? 'primary' : undefined"
             :variant="deferQuery ? undefined : 'blue'"
             type="button"
@@ -128,6 +129,16 @@
             @update:model-value="emit('update:filterMode', $event)"
           />
         </div>
+        <div
+          v-if="source === 'vocabulary'"
+          class="search-field-mode-section"
+        >
+          <CheckBox
+            :model-value="rememberLocationSelection"
+            :label="t('words.wordList.search.rememberLocationSelection')"
+            @update:model-value="emit('update:rememberLocationSelection', $event)"
+          />
+        </div>
         <div v-if="source === 'vocabulary'" class="search-field-mode-section">
           <h4 class="search-field-modal-title">
             {{ t('words.wordList.search.standardWordFilterMode') }}
@@ -141,25 +152,12 @@
             auto-width
           />
         </div>
-        <div v-if="source === 'character-notes'" class="search-field-mode-section">
-          <h4 class="search-field-modal-title">
-            {{ t('words.wordList.viewModes.label') }}
-          </h4>
-          <SwitchToggle
-            :model-value="viewMode === 'list'"
-            :show-label="true"
-            :active-text="t('words.wordList.viewModes.list')"
-            :inactive-text="t('words.wordList.viewModes.card')"
-            label-position="inside"
-            auto-width
-            @update:model-value="emit('update:viewMode', $event ? 'list' : 'card')"
-          />
-        </div>
       </AppModal>
 
     </div>
 
     <div
+      ref="notesScopeTargetEl"
       :id="source === 'character-notes' ? 'vocabulary-notes-scope-filter' : undefined"
       class="filter-strip"
       :class="{ 'notes-scope-filter': source === 'character-notes' }"
@@ -169,8 +167,27 @@
           v-if="viewMode === 'map'"
           class="standard-word-filter"
         >
+          <button
+            v-if="standardWordsLoading"
+            class="select-trigger standard-word-select-trigger"
+            type="button"
+            disabled
+            aria-busy="true"
+          >
+            <span class="select-label" role="status">{{ t('common.label.loading') }}</span>
+            <span class="ui-loading--inline" aria-hidden="true"></span>
+          </button>
+          <button
+            v-else-if="standardWordsError"
+            class="select-trigger standard-word-select-trigger"
+            type="button"
+            :title="t('common.label.error')"
+            @click="emit('retryStandardWords')"
+          >
+            <span class="select-label">{{ t('common.errorBoundary.retry') }}</span>
+          </button>
           <SimpleSelectDropdown
-            v-if="singleSelect"
+            v-else-if="singleSelect"
             :model-value="selectedStandardWord"
             :options="standardWordOptions"
             :placeholder="t('words.wordList.search.standardWordPlaceholder')"
@@ -285,11 +302,12 @@
           </button>
         </div>
       </div>
-      <div v-if="source === 'vocabulary'" class="query-mode-controls">
+      <Teleport :to="searchContainerEl" :disabled="!searchContainerEl || source !== 'character-notes' || !isPortrait || deferQuery">
+      <div class="query-mode-controls">
         <span v-if="deferQuery" class="query-condition-label">{{ t('words.wordList.viewModes.label') }}</span>
         <div class="result-view-switcher view-mode-selector" role="group" :aria-label="t('words.wordList.viewModes.label')">
           <button
-            v-for="mode in ['table', 'card', 'map']"
+            v-for="mode in source === 'character-notes' ? ['table', 'card'] : ['table', 'card', 'map']"
             :key="mode"
             class="mode-btn"
             :class="{ active: viewMode === mode }"
@@ -322,6 +340,7 @@
           </button>
         </div>
       </div>
+      </Teleport>
     </div>
   </div>
 </template>
@@ -329,6 +348,7 @@
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { useMediaQuery } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
 import * as OpenCCT2CN from 'opencc-js/t2cn'
 import AppModal from '@/components/common/AppModal.vue'
@@ -342,6 +362,8 @@ import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue
 import { showConfirm } from '@/utils/ui/message.js'
 
 const { t } = useI18n()
+const searchContainerEl = ref(null)
+const isPortrait = useMediaQuery('(max-aspect-ratio: 1 / 1)')
 
 const locationSearchT2S = OpenCCT2CN.Converter({ from: 'tw', to: 'cn' })
 
@@ -363,7 +385,10 @@ const props = defineProps({
   searchFieldOptions: { type: Array, default: () => [] },
   locationOptions: { type: Array, default: () => [] },
   standardWordOptions: { type: Array, default: () => [] },
+  standardWordsLoading: { type: Boolean, default: false },
+  standardWordsError: { type: Boolean, default: false },
   filterMode: { type: String, default: 'location' },
+  rememberLocationSelection: { type: Boolean, default: false },
   selectedRegions: { type: Array, default: () => [] },
   partitionNodes: { type: Array, default: () => [] },
   partitionLoading: { type: Boolean, default: false },
@@ -376,6 +401,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits([
+  'retryStandardWords',
   'search',
   'update:query',
   'update:selectedSearchFields',
@@ -385,6 +411,7 @@ const emit = defineEmits([
   'update:singleSelect',
   'update:viewMode',
   'update:filterMode',
+  'update:rememberLocationSelection',
   'update:selectedRegions',
   'retryPartitions',
   'update:selectedProvince',
@@ -392,7 +419,11 @@ const emit = defineEmits([
   'refreshNotes',
   'openLocationDetails',
   'filterOpenChange',
+  'notesScopeTargetChange',
 ])
+
+const notesScopeTargetEl = ref(null)
+watch(notesScopeTargetEl, element => emit('notesScopeTargetChange', element), { flush: 'post' })
 
 const searchInputEl = ref(null)
 const locationTriggerEl = ref(null)
@@ -400,6 +431,9 @@ const standardWordTriggerEl = ref(null)
 const searchFieldModalOpen = ref(false)
 const locationDropdownOpen = ref(false)
 const standardWordDropdownOpen = ref(false)
+watch(() => props.standardWordsLoading, loading => {
+  if (loading) standardWordDropdownOpen.value = false
+})
 const filterDropdownOpen = ref({})
 const isFilterOpen = computed(() => locationDropdownOpen.value || Object.values(filterDropdownOpen.value).some(Boolean))
 
@@ -510,10 +544,10 @@ function isFieldChecked(value) {
   return props.selectedSearchFields.length === 0 || props.selectedSearchFields.includes(value)
 }
 
-let isConfirmingNotesPronunciation = false
+let isConfirmingSlowSearch = false
 
 async function toggleField(value, checked) {
-  if (isConfirmingNotesPronunciation) return
+  if (isConfirmingSlowSearch) return
 
   const allValues = props.searchFieldOptions.map((o) => o.value)
   const current = props.selectedSearchFields.length === 0
@@ -525,17 +559,17 @@ async function toggleField(value, checked) {
     : current.filter((v) => v !== value)
 
   const allChecked = allValues.every((v) => updated.includes(v))
-  if (props.source === 'character-notes'
-    && !current.includes('pronunciation')
-    && (!updated.length || updated.includes('pronunciation'))) {
-    isConfirmingNotesPronunciation = true
+  const isSlowSearchField = value === 'pronunciation'
+    || (props.source === 'vocabulary' && value === 'detail')
+  if (checked && isSlowSearchField && !current.includes(value)) {
+    isConfirmingSlowSearch = true
     try {
       const confirmed = await showConfirm(t('words.wordList.notes.ipaSearchConfirm'), {
         title: t('words.wordList.notes.ipaSearchConfirmTitle'),
       })
       if (!confirmed) return
     } finally {
-      isConfirmingNotesPronunciation = false
+      isConfirmingSlowSearch = false
     }
   }
   emit('update:selectedSearchFields', allChecked ? [] : updated)
@@ -628,8 +662,7 @@ const standardWordTriggerLabel = computed(() => {
       0 1px 3px rgba(var(--color-shadow-rgb), 0.08),
       0 1px 2px rgba(var(--color-shadow-rgb), 0.06);
 
-    :root[data-color-theme='green'] &,
-    :root[data-color-theme='dark'] & {
+    :root[data-color-mode='dark'] & {
       color: var(--text-primary);
       background: var(--surface-panel-strong);
     }
@@ -664,7 +697,11 @@ const standardWordTriggerLabel = computed(() => {
 
 .notes-refresh-action.action-button {
   padding: 6px 10px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
+}
+
+.search-input.notes-search-input--compact {
+  min-height: 64px;
 }
 
 .notes-mode-actions {
@@ -694,6 +731,7 @@ const standardWordTriggerLabel = computed(() => {
   outline: none;
   background: transparent;
   box-shadow: none;
+  color: var(--color-secondary);
 
   margin: 0;
   padding: 5px;
@@ -707,7 +745,7 @@ const standardWordTriggerLabel = computed(() => {
 
   border-radius: 6px;
 
-  font-size: 20px;
+  font-size: var(--font-size-20);
   line-height: 1;
   cursor: pointer;
 
@@ -725,7 +763,7 @@ const standardWordTriggerLabel = computed(() => {
   &:hover {
     background: var(--glass-10);
     border-color: var(--color-primary-border);
-    color: var(--color-primary);
+    color: var(--color-secondary);
   }
 
   &:hover span {
@@ -739,7 +777,7 @@ const standardWordTriggerLabel = computed(() => {
 
 .location-details-btn {
   // padding: 0 4px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   white-space: nowrap;
 }
 
@@ -759,7 +797,7 @@ const standardWordTriggerLabel = computed(() => {
   grid-column: 1 / -1;
   margin: 0;
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   text-align: center;
 }
@@ -807,7 +845,7 @@ const standardWordTriggerLabel = computed(() => {
   flex: 0 0 auto;
   margin-left: 8px;
   color: var(--text-tertiary);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   transition: transform 0.18s ease;
 }
 
@@ -828,7 +866,7 @@ const standardWordTriggerLabel = computed(() => {
     width: auto;
   }
   .partition-filter {
-    min-width: 200px;
+    min-width: 130px;
   }
 
   .location-select-trigger,
@@ -861,7 +899,7 @@ const standardWordTriggerLabel = computed(() => {
     flex: 0 0 auto;
   }
 
-  .notes-search-settings { flex-direction: row; }
+  .query-search-panel:not(.is-compact) .notes-search-settings { flex-direction: row; }
 
   .filter-strip {
     flex: 1 1 100%;

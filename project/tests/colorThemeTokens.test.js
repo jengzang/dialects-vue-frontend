@@ -31,12 +31,12 @@ function readSource(path) {
 }
 
 function themeBlock(source, theme) {
-  const match = source.match(new RegExp(`:root\\[data-color-theme='${theme}'\\] \\{([\\s\\S]*?)\\n\\}`))
+  const match = source.match(new RegExp(`:root\\[data-color-theme='${theme}'\\](?:,\\s*:root\\[[^\\]]+\\])* \\{([\\s\\S]*?)\\n\\}`))
   return match?.[1] || ''
 }
 
 function rootBlock(source) {
-  const match = source.match(/:root \{([\s\S]*?)\n\}\n\n:root\[data-color-theme='light'\]/)
+  const match = source.match(/:root \{([\s\S]*?)\n\}\n\n:root\[data-color-theme='red-light'\]/)
   return match?.[1] || ''
 }
 
@@ -57,8 +57,8 @@ describe('color theme token coverage', () => {
     expect(defaultBlock).toContain('--action-primary-bg-hover: var(--color-primary-hover);')
     expect(defaultBlock).toContain('--action-primary-text: white;')
     expect(defaultBlock).toContain('--focus-ring: 0 0 0 4px rgba(var(--color-primary-rgb), 0.1);')
-    expect(defaultBlock).toContain('--switch-thumb-background: white;')
-    expect(defaultBlock).toContain('--switch-label-text: black;')
+    expect(defaultBlock).toContain('--bg-white: #ffffff;')
+    expect(defaultBlock).toContain('--text-primary:')
   })
 
   it('uses semantic aliases in high-impact interactive surfaces', () => {
@@ -70,37 +70,40 @@ describe('color theme token coverage', () => {
 
     expect(buttonsSource).toContain('background: var(--surface-glass-button);')
     expect(buttonsSource).toContain('background: var(--action-primary-bg);')
-    expect(buttonsSource).toContain('color: var(--action-primary-text);')
+    expect(buttonsSource).toContain('color: var(--action-solid-text);')
     expect(buttonsSource).toContain('background: var(--action-primary-bg-hover);')
     expect(buttonsSource).toContain('box-shadow: var(--action-primary-shadow);')
     expect(formsSource).toContain('background-color: var(--surface-selected);')
     expect(formsSource).toContain('color: var(--text-selected);')
     expect(formsSource).toContain('border-color: var(--glass-field-focus-border-color, var(--border-control-focus));')
     expect(formsSource).toContain('box-shadow: var(--glass-field-focus-shadow, var(--focus-ring));')
-    expect(formsSource).toContain('background-color: var(--switch-hover-background);')
-    expect(formsSource).toContain('color: var(--switch-label-text);')
-    expect(readSource(basePath)).toContain('background: var(--switch-thumb-background);')
-    expect(readSource(basePath)).toContain('background-color: var(--switch-thumb-background);')
+    const switchSource = readSource(resolve(projectRoot, 'src/components/common/SwitchToggle.vue'))
+    expect(switchSource).toContain('$thumb-background: var(--bg-white);')
+    expect(switchSource).toContain('$inside-label-color: var(--text-primary);')
+    expect(switchSource).toContain('background: $thumb-background;')
+    expect(switchSource).toContain('color: $inside-label-color;')
     expect(mainSurfacesSource).toContain('background: var(--glass-panel-background, var(--surface-panel));')
     expect(selectorSource).toContain('background: var(--surface-panel);')
     expect(toolbarsSource).toContain('background: var(--sidebar-item-background);')
     expect(toolbarsSource).toContain('color: var(--sidebar-item-text);')
   })
 
-  it('uses neutral primary accents for light and white primary accents for dark themes', () => {
+  it('uses vermilion and walnut for red light and blue accents for blue dark', () => {
     const source = readSource(tokensPath)
-    const lightBlock = themeBlock(source, 'light')
-    const darkBlock = themeBlock(source, 'dark')
+    const lightBlock = themeBlock(source, 'red-light')
+    const darkBlock = themeBlock(source, 'blue-dark')
 
-    expect(lightBlock).toContain('--color-primary: #4b5563;')
-    expect(lightBlock).toContain('--color-primary-rgb: 75, 85, 99;')
-    expect(lightBlock).toContain('--color-primary-cyan: #6e7681;')
+    expect(lightBlock).toContain('--color-primary: #b23a32;')
+    expect(lightBlock).toContain('--color-primary-rgb: 178, 58, 50;')
+    expect(lightBlock).toContain('--color-secondary: #85634d;')
+    expect(lightBlock).toContain('--color-secondary-hover: #6a4f3e;')
+    expect(lightBlock).toContain('--color-primary-cyan: var(--color-secondary);')
     expect(lightBlock).not.toContain('--color-primary: #5f6368;')
     expect(lightBlock).not.toContain('--color-primary: #2f80ed;')
     expect(lightBlock).not.toContain('--color-primary-rgb: 47, 128, 237;')
 
-    expect(darkBlock).toContain('--color-primary: #f0f6fc;')
-    expect(darkBlock).toContain('--color-primary-rgb: 240, 246, 252;')
+    expect(darkBlock).toContain('--color-primary: #8ab4f8;')
+    expect(darkBlock).toContain('--color-primary-rgb: 138, 180, 248;')
     expect(darkBlock).toContain('--color-primary-cyan: #79c0ff;')
     expect(darkBlock).not.toContain('--color-primary: #62a8ff;')
     expect(darkBlock).not.toContain('--color-primary-rgb: 98, 168, 255;')
@@ -110,17 +113,16 @@ describe('color theme token coverage', () => {
     expect(darkBlock).not.toContain('84, 78, 68')
   })
 
-  it('keeps the light theme off-white instead of yellow', () => {
+  it('uses warm ivory canvas and near-white surfaces in the light theme', () => {
     const source = readSource(tokensPath)
-    const lightBlock = themeBlock(source, 'light')
+    const lightBlock = themeBlock(source, 'red-light')
 
-    expect(lightBlock).toContain('--bg-body: #fdfdfd;')
-    expect(lightBlock).toContain('--bg-white: #ffffff;')
-    expect(lightBlock).toContain('--bg-page-gradient: radial-gradient(1200px 800px at 8% -12%, #ffffff, #ffffff00 58%),')
-    expect(lightBlock).toContain('--bg-blue-light: #f8fbff;')
-    expect(lightBlock).toContain('--surface-panel: rgba(255, 255, 255, 0.88);')
-    expect(lightBlock).toContain('--surface-selected: #f5f8fc;')
-    expect(lightBlock).not.toContain('#f0eadf')
+    expect(lightBlock).toContain('--bg-body: #faf7f0;')
+    expect(lightBlock).toContain('--bg-white: #fffdfa;')
+    expect(lightBlock).toContain('--bg-page-gradient: radial-gradient(1200px 800px at 8% -12%, #fffdfa, #fffdfa00 58%),')
+    expect(lightBlock).toContain('--bg-blue-light: #f6f0e5;')
+    expect(lightBlock).toContain('--surface-panel: rgba(255, 253, 250, 0.88);')
+    expect(lightBlock).toContain('--surface-selected: var(--color-primary-light);')
     expect(lightBlock).not.toContain('#f4efe3')
     expect(lightBlock).not.toContain('#fff8df')
     expect(lightBlock).not.toContain('#fffdf8')
@@ -181,20 +183,14 @@ describe('color theme token coverage', () => {
     expect(source).toContain('props.triggerEl?.value || props.triggerEl || internalTriggerEl.value')
   })
 
-  it('gives the sidebar shell dedicated theme-aware glass surface tokens', () => {
-    const source = readSource(tokensPath)
-    const lightBlock = themeBlock(source, 'light')
-    const darkBlock = themeBlock(source, 'dark')
+  it('keeps sidebar surface roles scoped to the shell and derived from theme tokens', () => {
     const toolbarsSource = readSource(toolbarsPath)
 
-    expect(lightBlock).toContain('--sidebar-shell-background:')
-    expect(lightBlock).toContain('--sidebar-shell-border:')
-    expect(lightBlock).toContain('--sidebar-shell-shadow:')
-    expect(darkBlock).toContain('--sidebar-shell-background:')
-    expect(darkBlock).toContain('--sidebar-shell-border:')
-    expect(darkBlock).toContain('--sidebar-shell-shadow:')
+    expect(toolbarsSource).toContain('--sidebar-shell-background: var(--glass-20);')
+    expect(toolbarsSource).toContain('--sidebar-shell-border: var(--glass-30);')
+    expect(toolbarsSource).toContain('--sidebar-item-background: var(--glass-80);')
     expect(toolbarsSource).toContain('background: var(--sidebar-shell-background);')
-    expect(toolbarsSource).toContain('border: 1px solid var(--sidebar-shell-border);')
+    expect(toolbarsSource).toContain('border: 3px solid var(--sidebar-shell-border);')
     expect(toolbarsSource).toContain('box-shadow: var(--sidebar-shell-shadow);')
     expect(toolbarsSource).not.toContain('background: var(--bg-page-gradient);')
   })
@@ -207,16 +203,16 @@ describe('color theme token coverage', () => {
 
   it('maps VillagesML blue tokens to non-blue theme accents', () => {
     const source = readSource(villagesMlTokensPath)
-    const lightBlock = themeBlock(source, 'light')
-    const darkBlock = themeBlock(source, 'dark')
+    const lightBlock = themeBlock(source, 'red-light')
+    const darkBlock = themeBlock(source, 'blue-dark')
 
-    expect(lightBlock).toContain('--vml-blue: #4b5563;')
-    expect(lightBlock).toContain('--vml-blue-rgb: 75, 85, 99;')
-    expect(lightBlock).toContain('--vml-blue-medium: #64748b;')
-    expect(lightBlock).toContain('--vml-blue-highlight: #475569;')
-    expect(darkBlock).toContain('--vml-blue: #f5f5f7;')
-    expect(darkBlock).toContain('--vml-blue-rgb: 245, 245, 247;')
-    expect(darkBlock).toContain('--vml-blue-highlight: #ffffff;')
+    expect(lightBlock).toContain('--vml-blue: var(--color-primary);')
+    expect(lightBlock).toContain('--vml-blue-rgb: var(--color-primary-rgb);')
+    expect(lightBlock).toContain('--vml-blue-medium: #b9534a;')
+    expect(lightBlock).toContain('--vml-blue-highlight: var(--color-primary-hover);')
+    expect(darkBlock).toContain('--vml-blue: var(--color-primary);')
+    expect(darkBlock).toContain('--vml-blue-rgb: var(--color-primary-rgb);')
+    expect(darkBlock).toContain('--vml-blue-highlight: var(--color-primary-hover);')
     expect(darkBlock).not.toContain('#d8c08a')
     expect(darkBlock).not.toContain('216, 192, 138')
     expect(readSource(villagesMlSurfacesPath)).toContain('var(--vml-blue-highlight)')

@@ -23,7 +23,7 @@
           <!-- 組1 輸入 -->
           <div class="compare-group group1-style">
             <div class="group-label">
-              {{ $t('compare.group.label1') }}
+              {{ $t('compare.group.char1') }}
             </div>
             <div class="query-box">
               <input
@@ -48,7 +48,7 @@
           <!-- 組2 輸入 -->
           <div class="compare-group group2-style">
             <div class="group-label">
-              {{ $t('compare.group.label2') }}
+              {{ $t('compare.group.char2') }}
             </div>
             <div class="query-box">
               <input
@@ -76,12 +76,27 @@
       </div>
 
       <!-- Tab2: 比較中古 --  -->
+      <div v-show="currentTab === 'tab2'" class="card-row-outer">
+        <CardExcludeRow
+          v-model="tabStates.tab2.current.card"
+          v-model:exclude-values="tabStates.tab2.current.excludeColumns"
+          :options="cardOptions"
+          :aria-label="$t('compare.group.label1')"
+          :exclude-options="excludeOptions"
+          :open="excludeDropdownOpen === 'tab2_current'"
+          :disabled="buttonState.isRunning"
+          :no-exclude-text="$t('compare.excludeOptions.noExclude')"
+          @toggle="toggleExcludeDropdown('tab2', 'current')"
+        />
+      </div>
+
       <div
         v-show="currentTab === 'tab2'"
         class="compare-page-panel glass-panel"
         style="max-height: 50dvh;overflow-x: auto;"
       >
         <div class="page-content-stack">
+          <p v-if="zhongguInputMode !== 'direct'" class="panel-hint">{{ $t('compare.messages.tab2SelectHint') }}</p>
           <!-- 單一中古選擇器 -->
           <div
             class="compare-group"
@@ -89,42 +104,6 @@
           >
             <!-- 直接輸入模式 -->
             <div v-if="zhongguInputMode === 'direct'" class="direct-compare-box">
-              <div class="card-row">
-                <ChoiceSelector
-                  v-model="tabStates.tab2.current.card"
-                  :options="cardOptions"
-                  :aria-label="$t('compare.group.label1')"
-                />
-                <div
-                  :ref="(el) => excludeFilterTriggerRef.tab2_current = el"
-                  class="dropdown"
-                  style="margin: 0;padding: 8px 10px;min-width: 60px;max-height:30px"
-                  :class="{ disabled: buttonState.isRunning }"
-                  @click="toggleExcludeDropdown('tab2', 'current')"
-                >
-                  {{ getExcludeDisplayText('tab2', 'current') || $t('compare.excludeOptions.noExclude') }}
-                  <span class="arrow">▾</span>
-                </div>
-                <Teleport to="body">
-                  <div
-                    v-if="excludeDropdownOpen === 'tab2_current'"
-                    class="dropdown-panel glass-dropdown-panel"
-                    :style="excludeDropdownStyle"
-                  >
-                    <div
-                      v-for="option in excludeOptions"
-                      :key="option.value"
-                      class="dropdown-item glass-dropdown-item"
-                      :class="{ active: isExcludeSelected(option.value, 'tab2', 'current') }"
-                      @click="toggleExcludeOption(option.value, 'tab2', 'current')"
-                    >
-                      <span class="check-icon">{{ isExcludeSelected(option.value, 'tab2', 'current') ? '✓' : '' }}</span>
-                      {{ option.label }}
-                    </div>
-                  </div>
-                </Teleport>
-              </div>
-
               <ZhongGuDirectInput
                 ref="CompareDirectInputRef"
                 :exclude-columns="tabStates.tab2.current.excludeColumns"
@@ -200,45 +179,6 @@
 
             <!-- 選擇器模式 -->
             <div v-else class="triple-select-box">
-              <!-- 卡片選擇區 -->
-              <div class="card-row">
-                <ChoiceSelector
-                  v-model="tabStates.tab2.current.card"
-                  :options="cardOptions"
-                  :aria-label="$t('compare.group.label1')"
-                />
-
-                <div
-                  :ref="(el) => excludeFilterTriggerRef.tab2_current = el"
-                  class="dropdown"
-                  style="margin: 0;padding: 8px 10px;min-width: 60px;max-height:30px"
-                  :class="{ disabled: buttonState.isRunning }"
-                  @click="toggleExcludeDropdown('tab2', 'current')"
-                >
-                  {{ getExcludeDisplayText('tab2', 'current') || $t('compare.excludeOptions.noExclude') }}
-                  <span class="arrow">▾</span>
-                </div>
-
-                <Teleport to="body">
-                  <div
-                    v-if="excludeDropdownOpen === 'tab2_current'"
-                    class="dropdown-panel glass-dropdown-panel"
-                    :style="excludeDropdownStyle"
-                  >
-                    <div
-                      v-for="option in excludeOptions"
-                      :key="option.value"
-                      class="dropdown-item glass-dropdown-item"
-                      :class="{ active: isExcludeSelected(option.value, 'tab2', 'current') }"
-                      @click="toggleExcludeOption(option.value, 'tab2', 'current')"
-                    >
-                      <span class="check-icon">{{ isExcludeSelected(option.value, 'tab2', 'current') ? '✓' : '' }}</span>
-                      {{ option.label }}
-                    </div>
-                  </div>
-                </Teleport>
-              </div>
-
               <!-- 鍵名 + 鍵值 -->
               <div class="dropdown-row">
                 <KeyButtonGroup
@@ -473,7 +413,21 @@
             </svg>
           </button>
         </RecentQueryPills>
-        <div class="compare-page-panel glass-panel tab5-page">
+                <!-- Tab5 独立运行按钮 -->
+        <div>
+          <button
+            v-if="currentTab === 'tab5'"
+            class="run-btn"
+            :disabled="buttonState.isRunning || isTab5RunDisabled"
+            :class="{ disabled: isTab5RunDisabled }"
+            @click="runTab5Action"
+          >
+            <span v-if="buttonState.isRunning"><InlineIcon icon="🔄" />{{ $t('compare.button.running') }}</span>
+            <span v-else-if="isTab5RunDisabled"><InlineIcon icon="🚫" />{{ $t('compare.button.invalid') }}</span>
+            <span v-else><InlineIcon icon="🚀" />{{ $t('compare.button.startCompare') }}</span>
+          </button>
+        </div>
+        <div class="compare-page-panel tab5-page">
           <PhoneticCompare
             :query-locations="tabStates.tab5.queryLocations"
             :active="currentTab === 'tab5'"
@@ -515,19 +469,6 @@
         >
           <span v-if="buttonState.isRunning"><InlineIcon icon="🔄" />{{ $t('compare.button.running') }}</span>
           <span v-else-if="isRunDisabled"><InlineIcon icon="🚫" />{{ $t('compare.button.invalid') }}</span>
-          <span v-else><InlineIcon icon="🚀" />{{ $t('compare.button.startCompare') }}</span>
-        </button>
-
-        <!-- Tab5 独立运行按钮 -->
-        <button
-          v-else
-          class="run-btn"
-          :disabled="buttonState.isRunning || isTab5RunDisabled"
-          :class="{ disabled: isTab5RunDisabled }"
-          @click="runTab5Action"
-        >
-          <span v-if="buttonState.isRunning"><InlineIcon icon="🔄" />{{ $t('compare.button.running') }}</span>
-          <span v-else-if="isTab5RunDisabled"><InlineIcon icon="🚫" />{{ $t('compare.button.invalid') }}</span>
           <span v-else><InlineIcon icon="🚀" />{{ $t('compare.button.startCompare') }}</span>
         </button>
       </div>
@@ -585,7 +526,7 @@ import ZhongGuDirectInput from "@/main/components/query/ZhongGuDirectInput.vue";
 import KeyButtonGroup from "@/main/components/query/KeyButtonGroup.vue";
 import RadioGroup from '@/components/selector/RadioGroup.vue';
 import DropdownValueSelector from "@/main/components/query/DropdownValueSelector.vue";
-import ChoiceSelector from "@/components/selector/ChoiceSelector.vue";
+import CardExcludeRow from "@/components/selector/CardExcludeRow.vue";
 import CheckBox from "@/components/selector/CheckBox.vue";
 import {
   queryStore,
@@ -694,22 +635,11 @@ const excludeOptions = computed(() => [
       ]
     : [])
 ])
-const excludeFilterTriggerRef = reactive({
-  tab2_current: null,  // ✅ 添加 current 的 ref
-  tab2_group1: null,
-  tab2_group2: null
-})
 const dropdownOpen = ref(null)
 const currentActiveKey = ref(null)
 const triggerRefs = ref({})
 const keyTriggerEl = ref(null)
 const excludeDropdownOpen = ref(null) // 'tab2' 或 'tab3' 或 null
-const excludeDropdownStyle = ref({
-  position: 'absolute',
-  top: '0px',
-  left: '0px',
-  zIndex: 99999
-})
 
 const tabStates = reactive({
   tab1: {
@@ -1295,10 +1225,8 @@ function onClickOutside(event) {
     keyTriggerEl.value,
     // 检查动态的 triggers
     ...Object.values(triggerRefs.value),
-    // ✨ 检查过滤器 triggers
-    excludeFilterTriggerRef.tab2_current,
-    excludeFilterTriggerRef.tab2_group1,
-    excludeFilterTriggerRef.tab2_group2
+    // ✨ 检查过滤器 trigger
+    event.target.closest('.card-exclude-trigger')
   ].some(el => el?.contains(event.target))
 
   const isInsidePanel = event.target.closest('.dropdown-panel')
@@ -1439,74 +1367,12 @@ function getDisplayText(key, group = 'group1') {
 }
 
 // ✨ 過濾器相關函數
-// 獲取過濾器顯示文本
-function getExcludeDisplayText(tab, group = 'group1') {
-  const targetState = tab === 'tab2' ? (group === 'current' ? tabStates.tab2.current : tabStates.tab2[group]) : null
-  if (!targetState) return ''
-
-  const list = targetState.excludeColumns || []
-  if (list.length === 0) return ''
-
-  // ✨ 新增：将 value 转换为 label
-  const labels = list.map(value => {
-    const option = excludeOptions.value.find(opt => opt.value === value)
-    return option ? option.label : value  // 找不到就用原值
-  })
-
-  if (labels.length > 2) {
-    return `${labels.slice(0, 1).join(', ')}...`
-  }
-  return labels.join(', ')
-}
-
-
-
-// 判斷單項是否選中
-function isExcludeSelected(value, tab, group = 'group1') {
-  const targetState = tab === 'tab2' ? (group === 'current' ? tabStates.tab2.current : tabStates.tab2[group]) : null
-  if (!targetState) return false
-
-  const list = targetState.excludeColumns || []
-  return list.includes(value)
-}
-
 // 切換過濾器下拉框
 function toggleExcludeDropdown(tab, group = 'group1') {
   if (buttonState.isRunning) return
 
   const dropdownKey = `${tab}_${group}`
-  if (excludeDropdownOpen.value === dropdownKey) {
-    excludeDropdownOpen.value = null
-  } else {
-    excludeDropdownOpen.value = dropdownKey
-    nextTick(() => {
-      const triggerEl = excludeFilterTriggerRef[dropdownKey]
-      if (triggerEl) {
-        const rect = triggerEl.getBoundingClientRect()
-        excludeDropdownStyle.value = {
-          position: 'absolute',
-          top: `${rect.top + rect.height + window.scrollY}px`,
-          left: `${rect.left + window.scrollX}px`,
-          zIndex: 99999
-        }
-      }
-    })
-  }
-}
-
-// 切換單個選項
-function toggleExcludeOption(value, tab, group = 'group1') {
-  const targetState = tab === 'tab2' ? (group === 'current' ? tabStates.tab2.current : tabStates.tab2[group]) : null
-  if (!targetState) return
-
-  const list = targetState.excludeColumns
-  const index = list.indexOf(value)
-
-  if (index > -1) {
-    list.splice(index, 1)
-  } else {
-    list.push(value)
-  }
+  excludeDropdownOpen.value = excludeDropdownOpen.value === dropdownKey ? null : dropdownKey
 }
 
 const ZhongguRef = ref(null);
@@ -2016,10 +1882,10 @@ export default {
 @use '@/styles/global/mixins' as *;
 
 $primary: var(--color-primary);
-$group1-primary: #4caf50;
-$group1-text: #2e7d32;
-$group2-primary: #2196f3;
-$group2-text: #1565c0;
+$group1-primary: var(--color-tertiary);
+$group1-text: var(--color-tertiary);
+$group2-primary: var(--color-secondary);
+$group2-text: var(--color-secondary);
 $danger: #f44336;
 $text-primary: var(--text-dark);
 $text-muted: var(--text-lightest);
@@ -2060,11 +1926,13 @@ $text-muted: var(--text-lightest);
 .compare-page-panel {
   display: flex;
   justify-content: center;
+  width: fit-content;
+  min-width: 60dvw;
   margin: 0 auto;
   padding: 2dvh;
   max-height: 35dvh;
   overflow-y: auto;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   max-width: 900px;
 }
 
@@ -2072,8 +1940,8 @@ $text-muted: var(--text-lightest);
   @include flex-col;
   align-items: center;
   gap: 1.5dvh;
-  width: 100%;
-  font-size: 18px;
+  // width: 100%;
+  font-size: var(--font-size-18);
 }
 
 .tab5-default-location-arrow {
@@ -2084,6 +1952,19 @@ $text-muted: var(--text-lightest);
   @include flex-col;
   align-items: center;
   gap: 1.5dvh;
+}
+
+.panel-hint {
+  display: none;
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: var(--font-size-13);
+}
+
+@media (min-aspect-ratio: 1/1) {
+  .panel-hint {
+    display: block;
+  }
 }
 
 @keyframes fade {
@@ -2107,11 +1988,9 @@ $text-muted: var(--text-lightest);
   gap: 1.5dvw;
 }
 
-.card-row {
-  width: 100%;
-  @include flex-center;
-  flex-wrap: wrap;
-  gap: 20px;
+.card-row-outer {
+  width: min(90dvw, 900px);
+  margin: 0 auto 1.2dvh;
 }
 
 .dropdown-row {
@@ -2122,36 +2001,10 @@ $text-muted: var(--text-lightest);
   white-space: nowrap;
 }
 
-/* 排除条件下拉框 */
-.dropdown {
-  min-width: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: auto;
-  padding: 6px 12px;
-  background: var(--glass-30);
-  @include glass-blur;
-  border: 1px solid rgba(var(--color-silver-rgb), 0.5);
-  border-radius: var(--radius-md);
-  white-space: nowrap;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    background: var(--glass-60);
-    border-color: var(--color-primary);
-  }
-}
-
-.check-icon {
-  display: inline-block;
-  width: 16px;
-}
-
 /* Tab1 汉字比较 */
 .tab1-layout {
+  width: fit-content;
+  max-width: 100%;
   flex-direction: row;
   flex-wrap: wrap;
   align-items: stretch;
@@ -2164,8 +2017,18 @@ $text-muted: var(--text-lightest);
     gap: 0.6rem;
   }
 
+  .group1-style {
+    --compare-input-color: var(--color-tertiary);
+    --compare-input-rgb: var(--color-tertiary-rgb);
+  }
+
+  .group2-style {
+    --compare-input-color: var(--color-secondary);
+    --compare-input-rgb: var(--color-secondary-rgb);
+  }
+
   .feature-selection {
-    width: 100%;
+    width: auto;
     order: 3;
   }
 
@@ -2185,18 +2048,18 @@ $text-muted: var(--text-lightest);
   width: 100%;
   max-width: 180px;
   height: 38px;
-  color: var(--text-primary);
+  color: var(--compare-input-color);
   background: var(--bg-white);
-  border: 1px solid rgba(var(--color-primary-rgb), 0.35);
+  border: 1px solid rgba(var(--compare-input-rgb), 0.35);
   border-radius: var(--radius-sm2);
   outline: none;
   text-align: center;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
 
   &:focus {
-    border-color: $primary;
-    box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
+    border-color: var(--compare-input-color);
+    box-shadow: 0 0 0 2px rgba(var(--compare-input-rgb), 0.2);
   }
 }
 
@@ -2218,7 +2081,7 @@ $text-muted: var(--text-lightest);
   border-radius: var(--radius-md);
   box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.2);
   color: $primary;
-  font-size: 0.95rem;
+  font-size: var(--font-size-16);
   font-weight: 600;
 }
 
@@ -2226,10 +2089,10 @@ $text-muted: var(--text-lightest);
   .group-label {
     background: linear-gradient(
       135deg,
-      rgba(var(--color-success-rgb), 0.15),
-      rgba(var(--color-success-rgb), 0.25)
+      rgba(var(--color-tertiary-rgb), 0.15),
+      rgba(var(--color-tertiary-rgb), 0.25)
     );
-    box-shadow: 0 2px 8px rgba(var(--color-success-rgb), 0.2);
+    box-shadow: 0 2px 8px rgba(var(--color-tertiary-rgb), 0.2);
     color: $group1-text;
   }
 }
@@ -2238,10 +2101,10 @@ $text-muted: var(--text-lightest);
   .group-label {
     background: linear-gradient(
       135deg,
-      rgba(33, 150, 243, 0.15),
-      rgba(33, 150, 243, 0.25)
+      rgba(var(--color-secondary-rgb), 0.15),
+      rgba(var(--color-secondary-rgb), 0.25)
     );
-    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
+    box-shadow: 0 2px 8px rgba(var(--color-secondary-rgb), 0.2);
     color: $group2-text;
   }
 }
@@ -2255,7 +2118,7 @@ $text-muted: var(--text-lightest);
   border: 2px solid;
   border-radius: var(--radius-md);
   white-space: nowrap;
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -2263,25 +2126,34 @@ $text-muted: var(--text-lightest);
   &:disabled {
     opacity: 0.3;
     cursor: not-allowed;
+
+    :root[data-color-mode='dark'] & {
+      opacity: 0.55;
+    }
   }
 }
 
 .add-to-group1 {
   background: linear-gradient(
     145deg,
-    rgba(var(--color-success-rgb), 0.25),
-    rgba(var(--color-success-rgb), 0.2)
+    rgba(var(--color-tertiary-rgb), 0.25),
+    rgba(var(--color-tertiary-rgb), 0.2)
   );
   border-color: $group1-primary;
   color: $group1-text;
 
+  :root[data-color-mode='dark'] & {
+    color: $group1-text;
+    border-color: rgba(var(--color-tertiary-rgb), 0.75);
+  }
+
   &:hover:not(:disabled) {
     background: linear-gradient(
       145deg,
-      rgba(var(--color-success-rgb), 0.4),
-      rgba(var(--color-success-rgb), 0.3)
+      rgba(var(--color-tertiary-rgb), 0.4),
+      rgba(var(--color-tertiary-rgb), 0.3)
     );
-    box-shadow: 0 4px 12px rgba(var(--color-success-rgb), 0.3);
+    box-shadow: 0 4px 12px rgba(var(--color-tertiary-rgb), 0.3);
     transform: translateY(-2px);
   }
 }
@@ -2289,19 +2161,24 @@ $text-muted: var(--text-lightest);
 .add-to-group2 {
   background: linear-gradient(
     145deg,
-    rgba(33, 150, 243, 0.25),
-    rgba(33, 150, 243, 0.2)
+    rgba(var(--color-secondary-rgb), 0.25),
+    rgba(var(--color-secondary-rgb), 0.2)
   );
   border-color: $group2-primary;
   color: $group2-text;
 
+  :root[data-color-mode='dark'] & {
+    color: $group2-text;
+    border-color: rgba(var(--color-secondary-rgb), 0.75);
+  }
+
   &:hover:not(:disabled) {
     background: linear-gradient(
       145deg,
-      rgba(33, 150, 243, 0.4),
-      rgba(33, 150, 243, 0.3)
+      rgba(var(--color-secondary-rgb), 0.4),
+      rgba(var(--color-secondary-rgb), 0.3)
     );
-    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+    box-shadow: 0 4px 12px rgba(var(--color-secondary-rgb), 0.3);
     transform: translateY(-2px);
   }
 }
@@ -2323,19 +2200,19 @@ $text-muted: var(--text-lightest);
   border-radius: var(--radius-md);
 
   &.group1-style {
-    border-color: rgba(var(--color-success-rgb), 0.7);
+    border-color: rgba(var(--color-tertiary-rgb), 0.7);
 
     .selected-group-header {
-      border-bottom-color: rgba(var(--color-success-rgb), 0.3);
+      border-bottom-color: rgba(var(--color-tertiary-rgb), 0.3);
       color: $group1-text;
     }
   }
 
   &.group2-style {
-    border-color: rgba(33, 150, 243, 0.7);
+    border-color: rgba(var(--color-secondary-rgb), 0.7);
 
     .selected-group-header {
-      border-bottom-color: rgba(33, 150, 243, 0.3);
+      border-bottom-color: rgba(var(--color-secondary-rgb), 0.3);
       color: $group2-text;
     }
   }
@@ -2351,13 +2228,13 @@ $text-muted: var(--text-lightest);
   border-bottom: 2px solid rgba(var(--color-primary-rgb), 0.2);
   white-space: nowrap;
   color: $primary;
-  font-size: 1.1rem;
+  font-size: var(--font-size-18);
   font-weight: 700;
 
   .add-btn {
     padding: 0.4rem 0.8rem;
     white-space: nowrap;
-    font-size: 0.85rem;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -2387,7 +2264,7 @@ $text-muted: var(--text-lightest);
 .item-label {
   flex: 1;
   color: $text-primary;
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   word-break: break-word;
 }
 
@@ -2400,7 +2277,7 @@ $text-muted: var(--text-lightest);
   border: none;
   border-radius: var(--radius-full);
   color: $danger;
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   cursor: pointer;
   transition: all 0.2s ease;
 
@@ -2417,7 +2294,7 @@ $text-muted: var(--text-lightest);
   white-space: nowrap;
   text-align: center;
   color: $text-muted;
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   font-style: italic;
 }
 
@@ -2431,14 +2308,14 @@ $text-muted: var(--text-lightest);
 .feature-label {
   display: block;
   color: $text-primary;
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   font-weight: 600;
 }
 
 /* Tab4 调类选择 */
 .tone-tip {
   color: $primary;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
 }
 
@@ -2447,7 +2324,7 @@ $text-muted: var(--text-lightest);
   justify-content: center;
   flex-wrap: wrap;
   gap: 1rem;
-  padding: 1rem;
+  // padding: 1rem;
 }
 
 .tone-checkbox {
@@ -2478,35 +2355,43 @@ $text-muted: var(--text-lightest);
 
   span {
     color: $primary;
-    font-size: 0.95rem;
+    font-size: var(--font-size-16);
     font-weight: 600;
   }
 
   &-green {
-    background: rgba(var(--color-success-rgb), 0.1);
+    background: rgba(var(--color-tertiary-rgb), 0.1);
     border-color: $group1-primary;
 
     &:hover {
-      background: rgba(var(--color-success-rgb), 0.2);
+      background: rgba(var(--color-tertiary-rgb), 0.2);
       border-color: $group1-primary;
     }
 
     span {
       color: $group1-text;
     }
+
+    input {
+      accent-color: $group1-primary;
+    }
   }
 
   &-blue {
-    background: rgba(33, 150, 243, 0.1);
+    background: rgba(var(--color-secondary-rgb), 0.1);
     border-color: $group2-primary;
 
     &:hover {
-      background: rgba(33, 150, 243, 0.2);
+      background: rgba(var(--color-secondary-rgb), 0.2);
       border-color: $group2-primary;
     }
 
     span {
       color: $group2-text;
+    }
+
+    input {
+      accent-color: $group2-primary;
     }
   }
 }
@@ -2519,6 +2404,7 @@ $text-muted: var(--text-lightest);
     flex-direction: column;
     align-items: center;
     overflow-x: auto;
+    width:auto;
   }
 
   &-location-group {
@@ -2563,7 +2449,7 @@ $text-muted: var(--text-lightest);
     @include flex-col;
     gap: 1px;
     color: var(--text-secondary, var(--text-tertiary));
-    font-size: 12px;
+    font-size: var(--font-size-12);
     line-height: 1.35;
   }
 
@@ -2588,16 +2474,12 @@ $text-muted: var(--text-lightest);
 
 @media (max-aspect-ratio: #{1 / 1}) {
   .tab5-page {
-    font-size: 16px;
-  }
-
-  .card-row {
-    gap: 0;
+    font-size: var(--font-size-16);
   }
 
   .group-label {
     padding: 0.3rem 0.8rem;
-    font-size: 0.85rem;
+    font-size: var(--font-size-14);
   }
 
   .compare-group {
@@ -2606,7 +2488,7 @@ $text-muted: var(--text-lightest);
 
   .compare-page-panel {
     padding: 0.5rem !important;
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 
   .selected-groups-container {
@@ -2615,7 +2497,7 @@ $text-muted: var(--text-lightest);
 
   .tone-selection {
     gap: 0.8rem;
-    padding: 0.5rem;
+    // padding: 0.5rem;
   }
 
   .tone-checkbox {

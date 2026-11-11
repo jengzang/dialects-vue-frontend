@@ -95,7 +95,7 @@ export function useNavAnchorJump(options = {}) {
       .forEach((location) => orderedLocations.push(location))
     const totalItems = []
 
-    if (Boolean(unref(hasChartData))) {
+    if (unref(hasChartData)) {
       totalItems.push({
         id: chartsNavId,
         fullLabel: chartsLabel,

@@ -30,7 +30,7 @@ async function mountEntrance(overrides = {}) {
 }
 
 async function resumeScroll(direction) {
-  now += 1
+  now += 200
   window.dispatchEvent(new WheelEvent('wheel', { deltaY: direction, deltaMode: 1 }))
   await settle()
 }
@@ -109,9 +109,13 @@ describe('one query panel morphing with scroll', () => {
     input.dispatchEvent(new Event('input', { bubbles: true }))
     const end = 420 - window.innerHeight * 0.12
     const distance = Math.min(240 * 3, end - 80)
+    scrollPosition = Math.floor(end)
+    window.dispatchEvent(new Event('scroll'))
+    await settle()
     scrollPosition = end - 80 - distance / 2
     window.dispatchEvent(new Event('scroll'))
     await settle()
+    await resumeScroll(-100)
     expect(entrance.progress).toBeCloseTo(0.5)
     scrollPosition = Math.floor(end)
     window.dispatchEvent(new Event('scroll'))

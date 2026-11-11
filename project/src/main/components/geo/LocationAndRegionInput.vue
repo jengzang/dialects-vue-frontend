@@ -72,7 +72,7 @@
               @click="openPartitionInfoModal"
               :title="$t('query.components.locationAndRegionInput.viewPartitionDetails')"
           >
-            <span class="icon"><InlineIcon icon="ℹ️" /></span>
+            <BarIcon icon="ℹ️" />
           </button>
         </div>
 
@@ -199,7 +199,9 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
+import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, nextTick ,onMounted, onActivated, watch, computed, defineAsyncComponent, onBeforeUnmount } from 'vue'
+import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { getLocations, getCustomFeature, getLocationPartitions, batchMatch, getPartitions, resolvePartitions } from '@/api/index.js'
 import AppModal from '@/components/common/AppModal.vue'
@@ -217,6 +219,7 @@ const { getPartitionData, getDefaultTree, resolveItems } = usePartitionCache()
 
 // 接收外部传入的地點和分區
 const { t } = useI18n()
+const route = useRoute()
 
 const props = defineProps({
   modelValue: {
@@ -603,6 +606,29 @@ function applySuggestion(item) {
   })
 }
 
+/* ========== 地點輸入框高度自適應（最多 5 行） ========== */
+const MIN_TEXTAREA_ROWS = 2
+const MAX_TEXTAREA_ROWS = 5
+
+function resizeLocationTextarea() {
+  const el = inputEl.value
+  if (!el) return
+
+  const styles = getComputedStyle(el)
+  const lineHeight = parseFloat(styles.lineHeight) || parseFloat(styles.fontSize) * 1.4
+  const borderHeight = parseFloat(styles.borderTopWidth) + parseFloat(styles.borderBottomWidth)
+  const verticalExtra = parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom) + borderHeight
+  const minHeight = lineHeight * MIN_TEXTAREA_ROWS + verticalExtra
+  const maxHeight = lineHeight * MAX_TEXTAREA_ROWS + verticalExtra
+
+  el.style.height = 'auto'
+  const contentHeight = el.scrollHeight + borderHeight
+  el.style.height = `${Math.min(Math.max(contentHeight, minHeight), maxHeight)}px`
+  el.style.overflowY = contentHeight > maxHeight ? 'auto' : 'hidden'
+}
+
+watch(inputValue, () => nextTick(resizeLocationTextarea))
+
 /* ========== 分區選擇邏輯 ========== */
 // const selectedValue = ref([])  // ✅ 不要 ['']
 
@@ -625,6 +651,8 @@ function onSelect(values) {
 
 onMounted(() => {
   commitLastValidRegionSelection()
+  resizeLocationTextarea()
+  window.addEventListener('resize', resizeLocationTextarea)
 })
 
 async function fetchLocationsResult() {
@@ -1159,6 +1187,12 @@ const fetchPartitionData = async () => {
   }
 }
 
+watch(() => route.query.openPartitionInfo, (shouldOpen) => {
+  if (shouldOpen === 'true') {
+    openPartitionInfoModal()
+  }
+}, { immediate: true })
+
 // 处理位置选择
 const handleLocationsSelected = (locations) => {
   // ✅ REPLACE instead of append
@@ -1214,6 +1248,7 @@ onBeforeUnmount(() => {
   locationResolutionToken++
   clearTimeout(debounceTimer)
   clearTimeout(debounceTimer2)
+  window.removeEventListener('resize', resizeLocationTextarea)
 })
 </script>
 
@@ -1249,7 +1284,7 @@ $portrait-ratio: 1;
   -webkit-backdrop-filter: blur(12px);
   white-space: pre-line;
   color: var(--text-dark);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   pointer-events: auto !important;
   transition: background-color 0.2s ease;
 }
@@ -1275,7 +1310,7 @@ $portrait-ratio: 1;
     border-radius: var(--radius-md);
     color: var(--text-dark);
     text-align: center;
-    font-size: 15px;
+    font-size: var(--font-size-16);
     font-weight: 500;
     cursor: pointer;
     user-select: none;
@@ -1352,7 +1387,7 @@ $portrait-ratio: 1;
 
   label {
     color: var(--text-dark);
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 600;
   }
 }
@@ -1360,18 +1395,19 @@ $portrait-ratio: 1;
 .select-location-btn {
   padding: 2px 8px;
   appearance: none;
-  background: var(--color-primary-light);
+  background: var(--color-primary-light-solid);
+  // backdrop-filter: blur(8px) saturate(160%);
   border: 1px solid var(--color-primary-border2);
   border-radius: var(--radius-sm2);
   color: var(--color-primary);
   white-space: nowrap;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 500;
   cursor: pointer;
   user-select: none;
   transition: all 0.2s ease;
 
-  :root[data-color-theme='dark'] & {
+  :root[data-color-mode='dark'] & {
     color: var(--text-primary);
   }
 
@@ -1396,7 +1432,7 @@ $portrait-ratio: 1;
   top: 50%;
   right: 12px;
   color: $success;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: bold;
   pointer-events: none;
   transform: translateY(-50%);
@@ -1439,7 +1475,7 @@ $portrait-ratio: 1;
   backdrop-filter: blur(16px) saturate(160%);
   -webkit-backdrop-filter: blur(16px) saturate(160%);
   color: var(--text-dark-alpha);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   user-select: none;
 }
 
@@ -1462,7 +1498,7 @@ $portrait-ratio: 1;
   opacity: 0.9;
   color: var(--color-warning);
   text-align: center;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   line-height: 1.4;
 }
 
@@ -1481,7 +1517,7 @@ $portrait-ratio: 1;
   color: var(--text-dark-medium);
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   line-height: 1.35;
 }
 
@@ -1493,11 +1529,11 @@ $portrait-ratio: 1;
   border-radius: var(--radius-pill);
   color: var(--color-primary);
   white-space: nowrap;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   cursor: pointer;
   user-select: none;
 
-  :root[data-color-theme='dark'] & {
+  :root[data-color-mode='dark'] & {
     color: var(--text-primary);
   }
 
@@ -1522,7 +1558,7 @@ $portrait-ratio: 1;
   border-radius: var(--radius-pill);
   box-shadow: var(--shadow-sm2);
   color: var(--text-dark-lightest);
-  font-size: 14px;
+  font-size: var(--font-size-14);
 
   &.custom-chip {
     background: linear-gradient(
@@ -1546,7 +1582,7 @@ $portrait-ratio: 1;
   .loc-chip-partition {
     margin-left: 6px;
     color: var(--text-dark-medium);
-    font-size: 11px;
+    font-size: var(--font-size-12);
 
     .part-val {
       display: inline-block;
@@ -1567,41 +1603,26 @@ $portrait-ratio: 1;
 .preview-label {
   margin-right: 6px;
   color: $custom-purple;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 600;
 }
 
 /* 分区详情按钮 */
 .info-btn {
   padding: 8px;
-  background: linear-gradient(
-    145deg,
-    var(--glass-40),
-    var(--glass-20)
-  );
-  border: 1px solid var(--glass-60);
-  border-radius: var(--radius-md);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  font-size: 14px;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  color: var(--color-primary);
+  font-size: calc(var(--font-size-14) * 1.5);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s ease, transform 0.2s ease;
 
   @include flex-center;
 
   &:hover {
-    background: linear-gradient(
-      145deg,
-      var(--glass-50),
-      var(--glass-30)
-    );
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+    background: var(--color-primary-light);
     transform: scale(1.05);
-  }
-
-  .icon {
-    display: inline-block;
   }
 }
 

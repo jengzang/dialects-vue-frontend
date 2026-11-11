@@ -308,14 +308,14 @@ onBeforeUnmount(() => {
   border-radius: var(--radius-pill);
   background: var(--glass-90);
   color: $text-secondary;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   line-height: 1;
   box-shadow: 0 6px 18px rgba(var(--color-shadow-rgb), 0.12);
 
   @media (max-width: 768px) {
     right: 8px;
     bottom: 8px;
-    font-size: 11px;
+    font-size: var(--font-size-12);
   }
 }
 
@@ -365,7 +365,7 @@ onBeforeUnmount(() => {
   border-radius: var(--radius-xs);
   background-color: #1b2e2b;
   color: #5ac8fa;
-  font-size: 11px;
+  font-size: var(--font-size-12);
   line-height: 1.2;
   white-space: nowrap;
   box-shadow: 0 2px 6px rgba(114, 124, 245, 0.5);
@@ -375,7 +375,7 @@ onBeforeUnmount(() => {
 
   &.is-active {
     background-color: #006eff;
-    color: var(--action-primary-text);
+    color: #fff;
     box-shadow: 0 2px 8px rgba(0, 110, 255, 0.5);
   }
 }

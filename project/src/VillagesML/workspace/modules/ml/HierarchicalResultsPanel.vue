@@ -140,7 +140,7 @@ function levelColor(level, clusterId) {
 }
 
 .panel-title {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--text-primary);
   margin: 0 0 20px 0;
@@ -161,26 +161,26 @@ function levelColor(level, clusterId) {
 }
 
 .metric-label {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   margin-bottom: 6px;
 }
 
 .metric-value {
-  font-size: 22px;
+  font-size: var(--font-size-24);
   font-weight: 600;
   color: var(--color-primary);
 }
 
 .tree-section h4 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-primary);
   margin: 0 0 4px 0;
 }
 
 .tree-hint {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   margin-bottom: 16px;
 }
@@ -203,19 +203,19 @@ function levelColor(level, clusterId) {
 }
 
 .city-row {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   background: var(--glass-20);
   margin-bottom: 2px;
 }
 
 .county-row {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 500;
 }
 
 .township-row {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
 }
 
@@ -234,7 +234,7 @@ function levelColor(level, clusterId) {
 
 .expand-icon {
   width: 14px;
-  font-size: 11px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   flex-shrink: 0;
 }
@@ -243,7 +243,7 @@ function levelColor(level, clusterId) {
   padding: 2px 8px;
   border-radius: var(--radius-md);
   color: white;
-  font-size: 11px;
+  font-size: var(--font-size-12);
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -254,7 +254,7 @@ function levelColor(level, clusterId) {
 }
 
 .child-count {
-  font-size: 11px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   flex-shrink: 0;
 }

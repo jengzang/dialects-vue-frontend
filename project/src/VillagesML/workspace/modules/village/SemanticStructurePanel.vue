@@ -120,7 +120,7 @@ const parseSequence = (sequence) => {
 }
 
 .section h4 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-primary);
   margin: 6px;
@@ -137,7 +137,7 @@ const parseSequence = (sequence) => {
   background: var(--color-primary);
   color: var(--action-primary-text);
   border-radius: var(--radius-xl);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
 }
 
@@ -160,7 +160,7 @@ const parseSequence = (sequence) => {
 }
 
 .label-category {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   padding: 2px 10px;
   background: rgba(var(--vml-blue-rgb), 0.1);
@@ -180,14 +180,14 @@ const parseSequence = (sequence) => {
 }
 
 .comp-pattern {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--color-primary);
   margin-bottom: 4px;
 }
 
 .comp-description {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
 }
 

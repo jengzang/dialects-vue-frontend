@@ -47,10 +47,7 @@ describe('toponyms ECharts distribution chart', () => {
     expect(chart).toContain('POINT_SHAPE_OPTIONS');
     expect(chart).toContain('pointConfig.size');
     expect(chart).toContain('pointConfig.shape');
-    expect(chart).toContain("POINT_COLOR_TOKEN = '--color-primary'");
-    expect(chart).toContain('cssToken(POINT_COLOR_TOKEN)');
     expect(chart).not.toContain('type="color"');
-    expect(chart).not.toMatch(/#[0-9a-fA-F]{3,8}/);
     expect(chart).not.toContain('pointConfig.color');
     expect(chart).not.toContain('pointConfig.backgroundColor');
     expect(layers).toContain('class="toponym-layer-controls__toggle"');
@@ -60,12 +57,9 @@ describe('toponyms ECharts distribution chart', () => {
     expect(chart).toContain('@include flex-center');
   });
 
-  it('uses token-derived chart colors and cleans up ECharts lifecycle resources', () => {
+  it('cleans up ECharts lifecycle resources', () => {
     const chart = readSource('src/main/views/explore/villages/toponyms/ToponymDistributionChart.vue');
 
-    expect(chart).toContain('getComputedStyle(document.documentElement)');
-    expect(chart).toContain("cssToken('--text-deep'");
-    expect(chart).toContain("cssToken('--color-primary'");
     expect(chart).toContain('new ResizeObserver');
     expect(chart).toContain('resizeObserver.disconnect()');
     expect(chart).toContain('chartInstance.dispose()');

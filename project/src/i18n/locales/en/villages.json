@@ -143,7 +143,7 @@
       "subtitle": "Enter a Chinese character or place-name fragment to inspect matching point distribution, then click a point to query local and Ministry details manually.",
       "search": {
         "keyword": "Keyword",
-        "placeholder": "Try: 黄, 塘, 村",
+        "placeholder": "Try: 垌, 塬, 厝, 浜, 礤, 峪, 畈",
         "matchMode": "Match",
         "placeType": "Type",
         "submit": "Search",
@@ -204,7 +204,7 @@
         "idle": "After searching points, query administrative name hierarchy manually.",
         "empty": "No name hierarchy results",
         "level": "Level {level}",
-        "lazyFallback": "{count} results exceed the full-tree threshold of {threshold}; expand levels manually.",
+        "lazyFallback": "More than {threshold} results match. Expand the hierarchy level by level.",
         "expand": "Expand name hierarchy",
         "loadingNode": "Loading child level...",
         "loadMore": "Load more"
@@ -234,6 +234,7 @@
       },
       "errors": {
         "emptyQuery": "Enter a keyword before searching.",
+        "loginRequired": "Toponym queries require login. Go to the login page?",
         "countryLayer": "Failed to load the country boundary.",
         "optionalLayer": "Failed to load the optional layer.",
         "nameTree": "Failed to load name hierarchy.",

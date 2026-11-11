@@ -56,8 +56,8 @@
 
 <script setup>
 import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import * as echarts from 'echarts'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import { initChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 
 const props = defineProps({
   data: { type: Array, default: () => [] },
@@ -84,11 +84,7 @@ const renderChart = () => {
   if (!chartRef.value || props.data.length === 0) return
 
   if (chartInstance) chartInstance.dispose()
-  chartInstance = echarts.init(chartRef.value)
-
-  const styles = getComputedStyle(document.documentElement)
-  const successColor = styles.getPropertyValue('--color-success').trim()
-  const errorColor = styles.getPropertyValue('--color-error').trim()
+  chartInstance = initChart(chartRef.value)
 
   const option = {
     tooltip: {
@@ -127,7 +123,7 @@ const renderChart = () => {
           return {
             value,
             itemStyle: {
-              color: value > 0 ? successColor : errorColor
+              color: value > 0 ? '#50c878' : '#e74c3c'
             }
           }
         })
@@ -166,6 +162,10 @@ onMounted(() => {
   nextTick(renderChart)
 })
 
+onChartThemeChange(() => {
+  if (props.data.length) renderChart()
+})
+
 onBeforeUnmount(() => {
   window.removeEventListener('resize', handleResize)
   if (chartInstance) {
@@ -176,6 +176,8 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 .vml-glass-panel {
   padding: 20px;
   min-height: 400px;
@@ -194,7 +196,7 @@ onBeforeUnmount(() => {
 }
 
 .panel-title {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--text-primary);
   margin: 0;
@@ -214,7 +216,7 @@ onBeforeUnmount(() => {
   border-radius: var(--radius-sm2);
   background: transparent;
   color: var(--text-primary);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;

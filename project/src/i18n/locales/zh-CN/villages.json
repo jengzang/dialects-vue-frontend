@@ -143,7 +143,7 @@
       "subtitle": "输入汉字或地名片段，查看匹配地名的全国点位分布；点击点位后可手动查询本地与民政部详情。",
       "search": {
         "keyword": "关键词",
-        "placeholder": "例如：黄、塘、村",
+        "placeholder": "例如：垌、塬、厝、浜、礤、峪、畈",
         "matchMode": "匹配方式",
         "placeType": "地名类型",
         "submit": "搜索分布",
@@ -204,7 +204,7 @@
         "idle": "搜索点位后，可手动查询行政区层级地名。",
         "empty": "暂无地名层级结果",
         "level": "{level} 级",
-        "lazyFallback": "结果较多：{count} 条，超过完整树阈值 {threshold}，可逐级展开。",
+        "lazyFallback": "匹配结果超过 {threshold} 项，已切换为逐级展开。",
         "expand": "展开地名层级",
         "loadingNode": "正在加载下级...",
         "loadMore": "加载更多"
@@ -234,6 +234,7 @@
       },
       "errors": {
         "emptyQuery": "请输入关键词后再搜索。",
+        "loginRequired": "地名查询需要登录，是否前往登录？",
         "countryLayer": "无法加载国界底图。",
         "optionalLayer": "无法加载可选图层。",
         "nameTree": "无法加载地名层级。",

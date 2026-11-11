@@ -346,7 +346,7 @@ const offsetClass = computed(() => {
 .voronoi-learn-link {
   display: inline-block;
   margin-top: 4px;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--color-primary);
   text-decoration: none;
 
@@ -398,12 +398,12 @@ const offsetClass = computed(() => {
   // border: 1px solid var(--glass-60);
 
   .voronoi-summary-label {
-    font-size: 0.78rem;
+    font-size: var(--font-size-12);
     color: rgba(var(--text-deep-rgb), 0.68);
   }
 
   .voronoi-summary-value {
-    font-size: 1.08rem;
+    font-size: var(--font-size-18);
     color: $deep-blue;
   }
 }
@@ -429,13 +429,13 @@ const offsetClass = computed(() => {
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  background: rgba(var(--glass-50-rgb), 0.85);
+  background: var(--surface-glass-floating);
   backdrop-filter: blur(4px);
   border-radius: inherit;
   z-index: 10;
 
   .voronoi-calc-overlay-text {
-    font-size: 0.95rem;
+    font-size: var(--font-size-16);
     color: var(--color-primary);
     font-weight: 600;
   }

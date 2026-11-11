@@ -17,7 +17,8 @@
           v-if="messageState.actionText"
           class="toast-action"
           type="button"
-          @click.stop="triggerMessageAction"
+          @pointerup.stop="handleActionPointerUp"
+          @click.stop="handleActionClick"
         >
           {{ messageState.actionText }}
         </button>
@@ -42,6 +43,30 @@ import { messageState, triggerMessageAction, hideMessage, persistMessageUntilDis
 const dynamicMessage = ref('')
 
 let tickerId = null
+let lastTouchActionAt = 0
+
+function handleActionPointerUp(event) {
+  if (event.pointerType !== 'touch' || !event.isPrimary) return
+
+  const bounds = event.currentTarget.getBoundingClientRect()
+  if (
+    event.clientX < bounds.left || event.clientX > bounds.right ||
+    event.clientY < bounds.top || event.clientY > bounds.bottom
+  ) {
+    return
+  }
+
+  lastTouchActionAt = Date.now()
+  triggerMessageAction()
+}
+
+function handleActionClick(event) {
+  const isFollowUpTouchClick = event.detail > 0 && Date.now() - lastTouchActionAt < 500
+  lastTouchActionAt = 0
+  if (isFollowUpTouchClick) return
+
+  triggerMessageAction()
+}
 
 function startTicker() {
   stopTicker()
@@ -114,7 +139,6 @@ $white: var(--text-white);
 
 $text-default: rgba(24, 32, 46, 0.86);
 $text-dark: rgba(0, 0, 0, 0.85);
-$text-action-info: rgba(20, 34, 56, 0.88);
 
 $toast-enter-easing: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -126,7 +150,7 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   gap: 12px;
   padding: 14px 28px;
   border-radius: 18px;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 500;
   background: var(--surface-glass-floating);
   backdrop-filter: blur(16px) saturate(145%);
@@ -249,11 +273,11 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
     &.has-action {
-      color: $text-action-info;
+      color: var(--text-primary);
       background: linear-gradient(
         135deg,
         var(--glass-60),
-        rgba(234, 243, 255, 0.4)
+        rgba(var(--color-primary-rgb), 0.10)
       );
       border-color: var(--glass-50);
 
@@ -290,14 +314,14 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     bottom: 22px;
     max-width: calc(100vw - 32px);
     padding: 12px 14px;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     border-radius: 18px;
     transform: none;
 
     .toast-icon {
       width: 22px;
       height: 22px;
-      font-size: 13px;
+      font-size: var(--font-size-13);
     }
 
     &.position-right {

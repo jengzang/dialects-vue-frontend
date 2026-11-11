@@ -61,7 +61,7 @@
             :show-level-selector="false"
             :disabled="!canSelectTownship"
             placeholder="全部鄉鎮"
-            @update:modelValue="handleSearch"
+            @update:modelValue="scheduleSearch"
           />
         </div>
 
@@ -77,7 +77,7 @@
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import BarIcon from '@/components/common/BarIcon.vue'
-import { ref, computed } from 'vue'
+import { ref, computed, onBeforeUnmount } from 'vue'
 import { villagesMLStore } from '@/VillagesML/store/villagesMLStore.js'
 import FilterableSelect from '@/VillagesML/components/FilterableSelect.vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
@@ -118,7 +118,20 @@ const townshipParent = computed(() => {
 })
 
 // Methods
+let searchTimer = null
+let citySequence = 0
+onBeforeUnmount(() => {
+  clearTimeout(searchTimer)
+  citySequence += 1
+})
+
+const scheduleSearch = () => {
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(handleSearch, 250)
+}
+
 const handleSearch = () => {
+  clearTimeout(searchTimer)
   // console.log('[SearchPanel] handleSearch called with filters:', localFilters.value)
   villagesMLStore.searchKeyword = localKeyword.value
   villagesMLStore.searchFilters = { ...localFilters.value }
@@ -126,25 +139,29 @@ const handleSearch = () => {
 }
 
 const handleCityChange = async () => {
+  const sequence = ++citySequence
   localFilters.value.county = ''
   localFilters.value.township = ''
 
   // 检查该城市是否有区县（从预加载的数据中检查，无 API 请求）
   if (localFilters.value.city) {
-    hasCounties.value = await cityHasCounties(localFilters.value.city)
+    const result = await cityHasCounties(localFilters.value.city)
+    if (sequence !== citySequence) return
+    hasCounties.value = result
   } else {
     hasCounties.value = true
   }
 
-  handleSearch()
+  scheduleSearch()
 }
 
 const handleCountyChange = () => {
   localFilters.value.township = ''
-  handleSearch()
+  scheduleSearch()
 }
 
 const clearFilters = () => {
+  citySequence += 1
   localFilters.value = { city: '', county: '', township: '' }
   handleSearch()
 }
@@ -164,7 +181,7 @@ const clearFilters = () => {
   border-radius: var(--radius-md);
   background: var(--glass-50);
   backdrop-filter: blur(10px);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   transition: all 0.3s ease;
 }
 
@@ -186,7 +203,7 @@ const clearFilters = () => {
   border-radius: var(--radius-md);
   background: rgba(var(--color-warning-rgb), 0.2);
   color: var(--color-warning);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   cursor: pointer;
   transition: all 0.3s ease;
 }

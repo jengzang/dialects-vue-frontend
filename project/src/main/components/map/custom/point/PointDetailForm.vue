@@ -1,7 +1,11 @@
 <template>
   <section class="point-detail-form">
     <div class="point-detail-header">
-      <button class="glass-button" type="button" @click="$emit('back')">
+      <button
+        class="glass-button"
+        type="button"
+        @click="handleBack"
+      >
         {{ t('customEntry.pointDetail.back') }}
       </button>
       <div class="point-detail-heading">
@@ -18,7 +22,15 @@
       </div>
     </div>
 
-    <div class="point-detail-layout">
+    <CustomDataSaveNotice
+      :state="mutation"
+      @retry="retrySave"
+      @merge="mergeVersions"
+    />
+    <div
+      class="point-detail-layout"
+      :inert="locked"
+    >
       <div class="point-detail-main glass-subpanel">
         <div class="point-base-fields">
           <div class="point-field">
@@ -34,7 +46,7 @@
                 @input="handleLocationInput"
                 @focus="handleLocationFocus"
                 @blur="hideSuggestions"
-              />
+              >
               <div
                 v-if="showPointSuggestions && pointSuggestions.length > 0"
                 class="point-suggestions-box"
@@ -64,11 +76,14 @@
               class="point-field-input glass-field"
               type="text"
               :placeholder="t('customEntry.pointDetail.placeholders.region')"
-            />
+            >
           </label>
 
           <!-- Quick Select Pills -->
-          <div v-if="isRealCreateMode && userPoints.length > 0" class="user-points-quick-select point-field-full">
+          <div
+            v-if="isRealCreateMode && userPoints.length > 0"
+            class="user-points-quick-select point-field-full"
+          >
             <span class="quick-select-label">{{ t('customEntry.featureRecord.labels.quickSelect') }}:</span>
             <div class="quick-select-list">
               <button
@@ -86,11 +101,17 @@
         </div>
 
         <div class="point-rows-header">
-          <h5 class="point-rows-title">{{ t('customEntry.pointDetail.rows.title') }}</h5>
+          <h5 class="point-rows-title">
+            {{ t('customEntry.pointDetail.rows.title') }}
+          </h5>
           <p class="point-rows-description">
             {{ t('customEntry.pointDetail.rows.description') }}
           </p>
-          <button class="pill-btn field-notice-trigger" type="button" @click="isFieldNoticeOpen = true">
+          <button
+            class="pill-btn field-notice-trigger"
+            type="button"
+            @click="isFieldNoticeOpen = true"
+          >
             {{ t('customEntry.pointDetail.rows.noticeTrigger') }}
           </button>
         </div>
@@ -103,7 +124,11 @@
             <span>{{ t('customEntry.pointDetail.rows.headers.note') }}</span>
             <span>{{ t('customEntry.pointDetail.rows.headers.action') }}</span>
           </div>
-          <div v-for="row in rows" :key="row.id" class="point-row">
+          <div
+            v-for="row in rows"
+            :key="row.clientRowId"
+            class="point-row"
+          >
             <div
               class="point-cell"
               :data-label="t('customEntry.pointDetail.rows.headers.phonology')"
@@ -113,65 +138,88 @@
                 class="point-row-input glass-field"
                 type="text"
                 :placeholder="t('customEntry.pointDetail.placeholders.phonology')"
-              />
+              >
             </div>
-            <div class="point-cell" :data-label="t('customEntry.pointDetail.rows.headers.feature')">
+            <div
+              class="point-cell"
+              :data-label="t('customEntry.pointDetail.rows.headers.feature')"
+            >
               <div class="feature-input-wrapper">
                 <input
                   v-model="row.特徵"
                   class="point-row-input glass-field"
                   type="text"
                   :placeholder="t('customEntry.pointDetail.placeholders.feature')"
-                />
+                >
                 <button
                   v-if="row.特徵"
                   class="feature-search-emoji-btn"
                   type="button"
-                  @click="showFeatureDetail(row.特徵, row.聲韻調)"
                   title="查看该特征在其他地点的分布"
-                ><InlineIcon icon="🔍" /></button>
+                  @click="showFeatureDetail(row.特徵, row.聲韻調)"
+                >
+                  <InlineIcon icon="🔍" />
+                </button>
               </div>
             </div>
-            <div class="point-cell" :data-label="t('customEntry.pointDetail.rows.headers.value')">
+            <div
+              class="point-cell"
+              :data-label="t('customEntry.pointDetail.rows.headers.value')"
+            >
               <input
                 v-model="row.值"
                 class="point-row-input glass-field"
                 type="text"
                 :placeholder="t('customEntry.pointDetail.placeholders.value')"
-              />
+              >
             </div>
-            <div class="point-cell" :data-label="t('customEntry.pointDetail.rows.headers.note')">
+            <div
+              class="point-cell"
+              :data-label="t('customEntry.pointDetail.rows.headers.note')"
+            >
               <input
                 v-model="row.說明"
                 class="point-row-input glass-field"
                 type="text"
                 :placeholder="t('customEntry.pointDetail.placeholders.note')"
-              />
+              >
             </div>
-            <button class="point-row-remove" type="button" @click="removeRow(row.id)">
+            <button
+              class="point-row-remove"
+              type="button"
+              @click="removeRow(row.clientRowId)"
+            >
               {{ t('customEntry.pointDetail.rows.remove') }}
             </button>
           </div>
         </div>
-          <div class="action-group">
-            <button class="glass-button add-row-btn" type="button" @click="addRow">
-              {{ t('customEntry.pointDetail.rows.add') }}
-            </button>
-            <button class="glass-button" type="button" @click="$emit('back')">
-              {{ t('customEntry.pointDetail.actions.cancel') }}
-            </button>
-            <button
-              class="glass-button"
-              data-variant="primary"
-              type="button"
-              :disabled="isSaving"
-              @click="handleSave"
-            >
-              {{
-                isSaving ? t('customEntry.common.saving') : t('customEntry.pointDetail.actions.save')
-              }}
-            </button>
-          </div>
+        <div class="action-group">
+          <button
+            class="glass-button add-row-btn"
+            type="button"
+            @click="addRow"
+          >
+            {{ t('customEntry.pointDetail.rows.add') }}
+          </button>
+          <button
+            class="glass-button"
+            type="button"
+            @click="handleBack"
+          >
+            {{ t('customEntry.pointDetail.actions.cancel') }}
+          </button>
+          <button
+            class="glass-button"
+            data-variant="primary"
+            type="button"
+            :disabled="isSaving"
+            @click="handleSave"
+          >
+            {{
+              isSaving ? t('customEntry.common.saving') : t('customEntry.pointDetail.actions.save')
+            }}
+          </button>
+        </div>
       </div>
 
       <div class="point-detail-side glass-subpanel">
@@ -190,7 +238,7 @@
             type="text"
             readonly
             :placeholder="t('customEntry.pointDetail.placeholders.coord')"
-          />
+          >
         </label>
         <MiniMapSelector
           v-model:coord="coord"
@@ -206,14 +254,31 @@
       </div>
     </div>
 
-    <div v-if="saveMessage" class="point-save-message">{{ saveMessage }}</div>
+    <div
+      v-if="saveMessage"
+      class="point-save-message"
+    >
+      {{ saveMessage }}
+    </div>
 
     <!-- 字段填写注意事项弹窗 -->
-    <AppModal v-model="isFieldNoticeOpen" size="sm" width="480px">
+    <AppModal
+      v-model="isFieldNoticeOpen"
+      size="sm"
+      width="480px"
+    >
       <template #header>
         <div class="feature-detail-modal-header">
-          <h4 class="feature-detail-modal-title">{{ t('customEntry.pointDetail.rows.noticeTitle') }}</h4>
-          <button class="close-btn close-btn-sm close-btn-inline" type="button" @click="isFieldNoticeOpen = false">×</button>
+          <h4 class="feature-detail-modal-title">
+            {{ t('customEntry.pointDetail.rows.noticeTitle') }}
+          </h4>
+          <button
+            class="close-btn close-btn-sm close-btn-inline"
+            type="button"
+            @click="isFieldNoticeOpen = false"
+          >
+            ×
+          </button>
         </div>
       </template>
       <div class="field-notice-body">
@@ -242,7 +307,12 @@
     </AppModal>
 
     <!-- 特征详情联动弹窗 -->
-    <AppModal v-model="isFeatureModalOpen" size="md" width="640px" max-height="80dvh">
+    <AppModal
+      v-model="isFeatureModalOpen"
+      size="md"
+      width="640px"
+      max-height="80dvh"
+    >
       <template #header>
         <div class="feature-detail-modal-header">
           <h4 class="feature-detail-modal-title">
@@ -264,16 +334,28 @@
       </template>
 
       <div class="feature-detail-modal-body">
-        <div v-if="featureLoading" class="modal-loading-state">
+        <div
+          v-if="featureLoading"
+          class="modal-loading-state"
+        >
           {{ t('customEntry.featureDetail.loading') }}
         </div>
-        <div v-else-if="featureError" class="modal-error-state">
+        <div
+          v-else-if="featureError"
+          class="modal-error-state"
+        >
           {{ featureError }}
         </div>
-        <div v-else-if="featureRecords.length === 0" class="modal-empty-state">
+        <div
+          v-else-if="featureRecords.length === 0"
+          class="modal-empty-state"
+        >
           {{ t('customEntry.featureDetail.empty') }}
         </div>
-        <div v-else class="modal-table-container">
+        <div
+          v-else
+          class="modal-table-container"
+        >
           <table class="modal-records-table">
             <thead>
               <tr>
@@ -285,7 +367,10 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="record in featureRecords" :key="record.created_at || record.id">
+              <tr
+                v-for="record in featureRecords"
+                :key="record.id"
+              >
                 <td>{{ record['簡稱'] }}</td>
                 <td>{{ record['音典分區'] }}</td>
                 <td>{{ record['經緯度'] }}</td>
@@ -304,18 +389,18 @@
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, ref, watch, nextTick } from 'vue';
 import { batchMatch, getRegions, getUserPoints } from '@/api';
-import { showConfirm, showWarning } from '@/utils/ui/message.js';
+import { showWarning } from '@/utils/ui/message.js';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue';
 import {
-  batchCreateCustomData,
-  batchDeleteCustomData,
-  editCustomData,
+  saveCustomData,
   getDataByPoint,
   getDataByFeature,
 } from '@/api';
 import { ensureCustomDataPresence, invalidateCustomDataPresence, markCustomDataExists } from '@/composables/data/useCustomDataPresence.js';
-import { userStore } from '@/main/store/store.js';
+import { buildPointMutations } from '@/utils/user/customDataMutations.js';
+import { useCustomDataSave } from '@/main/composables/useCustomDataSave.js';
+import CustomDataSaveNotice from '@/main/components/user/CustomDataSaveNotice.vue';
 import { formatCoord } from '@/main/utils/drawMap/formatCoord.js';
 import MiniMapSelector from '@/main/components/map/MiniMapSelector.vue';
 
@@ -335,7 +420,14 @@ const coord = ref(null);
 const rows = ref([]);
 const removedIds = ref([]);
 const saveMessage = ref('');
-const isSaving = ref(false);
+const detailReading=ref(false);
+const detailReadFailed=ref(false);
+const mutation = useCustomDataSave(saveCustomData, {leaveMessage:()=>t('user.customSafety.leave')});
+const isSaving = mutation.isSaving;
+const locked = mutation.locked;
+let detailSequence = 0;
+let matchSequence = 0;
+let existingSequence = 0;
 const pointSuggestions = ref([]);
 const showPointSuggestions = ref(false);
 const userPoints = ref([]);
@@ -374,8 +466,8 @@ const mapPreviewPoints = computed(() => {
 function createEmptyRow() {
   rowSeed += 1;
   return {
-    id: `row-${rowSeed}`,
-    created_at: '',
+    clientRowId: `row-${rowSeed}`,
+    recordId: null,
     聲韻調: '',
     特徵: '',
     值: '',
@@ -403,6 +495,8 @@ async function loadUserPoints() {
 }
 
 function handleLocationInput() {
+  if (locked.value) return;
+  const sequence=++matchSequence;
   if (!isRealCreateMode.value) return;
   showPointSuggestions.value = false;
   clearTimeout(locationDebounceTimer);
@@ -438,6 +532,7 @@ function handleLocationInput() {
     try {
       const currentQuery = location.value.trim();
       const response = await batchMatch(currentQuery, false);
+      if(sequence !== matchSequence || locked.value || location.value.trim() !== currentQuery) return;
 
       let publicItems = [];
 
@@ -470,7 +565,8 @@ function handleLocationInput() {
 
       pointSuggestions.value = [...matchedCustom, ...filteredPublic];
       showPointSuggestions.value = pointSuggestions.value.length > 0;
-    } catch (error) {
+    } catch {
+      if(sequence !== matchSequence || locked.value) return;
       pointSuggestions.value = matchedCustom;
       showPointSuggestions.value = pointSuggestions.value.length > 0;
     }
@@ -482,6 +578,7 @@ function handleLocationFocus() {
 }
 
 async function selectSuggestion(item) {
+  if (locked.value) return;
   isSelectingSuggestion.value = true;
   try {
     location.value = item.location;
@@ -498,7 +595,7 @@ async function selectSuggestion(item) {
     if (!region.value) {
       try {
         const response = await getRegions(item.location);
-        if (response) {
+        if (response && !locked.value && location.value === item.location) {
           if (response['音典分區']) {
             region.value = response['音典分區'];
           }
@@ -509,7 +606,7 @@ async function selectSuggestion(item) {
             }
           }
         }
-      } catch (error) {
+      } catch {
         // ignore
       }
     }
@@ -522,6 +619,7 @@ async function selectSuggestion(item) {
 }
 
 async function selectQuickPoint(p) {
+  if (locked.value) return;
   isSelectingSuggestion.value = true;
   try {
     location.value = p['簡稱'] || p.location || '';
@@ -546,178 +644,114 @@ function hideSuggestions() {
   }, 150);
 }
 
-function rowChanged(row) {
-  if (!row.created_at || !row.original) return true;
-
-  const originalCoord = props.point?.['經緯度'] || props.point?.coordinate || '';
-  const currentCoord = isCoordValid.value ? formatCoord(coord.value[0], coord.value[1]) : '';
-  const isCoordChanged = currentCoord !== originalCoord;
-
-  return (
-    isCoordChanged ||
-    row.聲韻調 !== (row.original.聲韻調 || '') ||
-    row.特徵 !== (row.original.特徵 || '') ||
-    row.值 !== (row.original.值 || '') ||
-    row.說明 !== (row.original.說明 || '')
-  );
-}
-
 function removeRow(id) {
-  const target = rows.value.find((row) => row.id === id);
-  if (target?.created_at) {
-    removedIds.value.push(target.created_at);
-  }
-  rows.value = rows.value.filter((row) => row.id !== id);
-  if (rows.value.length === 0) {
-    rows.value = [createEmptyRow()];
-  }
+  if (locked.value) return;
+  const target = rows.value.find(row => row.clientRowId === id);
+  if (target?.recordId) removedIds.value.push({id:target.recordId,version:target.version});
+  rows.value = rows.value.filter(row => row.clientRowId !== id);
+  if (!rows.value.length) rows.value = [createEmptyRow()];
+}
+function fromServer(record) {
+  const row=createEmptyRow();
+  return {...row, ...record, recordId:record.id, original:{...record}};
 }
 
 function addRow() {
+  if (locked.value) return;
   rows.value.push(createEmptyRow());
 }
 
 async function loadPointDetail(point) {
+  if (locked.value) return;
+  const sequence=++detailSequence;
+  const expectedLocation = point?.['簡稱'] || point?.location || '';
+  const expectedRegion = point?.['音典分區'] || point?.region || '';
+  const previous={location:location.value,region:region.value,coord:coord.value};
   location.value = point?.['簡稱'] || point?.location || '';
   region.value = point?.['音典分區'] || point?.region || '';
   coord.value = parseCoordText(point?.['經緯度'] || point?.coordinate || '');
-  rows.value = [];
-  removedIds.value = [];
   saveMessage.value = '';
+  detailReadFailed.value=false;
 
   loadUserPoints();
 
   if (!point) {
+    detailReading.value=false;
+    removedIds.value=[];
     rows.value = [createEmptyRow()];
     return;
   }
 
+  detailReading.value=true;
   try {
     const response = await getDataByPoint(location.value, region.value);
     const records = Array.isArray(response?.data) ? response.data : [];
-    rows.value = records.map((record) => {
-      rowSeed += 1;
-      return {
-        id: `row-${rowSeed}`,
-        created_at: record.created_at || '',
-        聲韻調: record['聲韻調'] || '',
-        特徵: record['特徵'] || '',
-        值: record['值'] || '',
-        說明: record['說明'] || '',
-        original: {
-          聲韻調: record['聲韻調'] || '',
-          特徵: record['特徵'] || '',
-          值: record['值'] || '',
-          說明: record['說明'] || '',
-        },
-      };
-    });
+    if (sequence !== detailSequence || locked.value || location.value !== expectedLocation || region.value !== expectedRegion) return;
+    rows.value = records.map(fromServer);
+    removedIds.value=[];
 
     if (rows.value.length === 0) {
       rows.value = [createEmptyRow()];
     }
   } catch (error) {
+    if (sequence !== detailSequence || locked.value) return;
+    detailReadFailed.value=true;
+    location.value=previous.location;region.value=previous.region;coord.value=previous.coord;
     saveMessage.value = error.message || t('customEntry.pointDetail.messages.loadFailed');
-    rows.value = [createEmptyRow()];
+  } finally {
+    if(sequence===detailSequence) detailReading.value=false;
   }
 }
 
 async function handleSave() {
-  if (isSaving.value) return;
+  if (locked.value || detailReading.value || detailReadFailed.value) return;
+  mutation.reset();
   saveMessage.value = '';
-
-  if (!location.value.trim() || !region.value.trim()) {
-    showWarning(t('customEntry.pointDetail.messages.locationRegionRequired'));
+  let body;
+  try {
+    body = buildPointMutations(rows.value, {簡稱:location.value,音典分區:region.value,經緯度:coordText.value}, removedIds.value);
+  } catch (error) {
+    const first=error.errors?.[0];
+    saveMessage.value=first ? t('user.customSafety.rowError',{row:first.row_index+1,field:first.field,reason:t(`user.customSafety.${first.messageKey}`)}) : t('user.customSafety.failed');
+    document.querySelectorAll('.point-row')[first?.row_index]?.querySelector('input')?.focus();
     return;
   }
-
-  if (!isCoordValid.value) {
-    showWarning(t('customEntry.pointDetail.messages.coordRequired'));
-    return;
+  if (!body.creates.length && !body.updates.length && !body.deletes.length) {showWarning(t('user.customSafety.empty'));return;}
+  const response = await mutation.save(body);
+  if (response) finishSave(response);
+}
+function finishSave(response) {
+  for (const created of response.created || []) {
+    const row=rows.value.find(item=>item.clientRowId===created.client_row_id);
+    if(row) {row.recordId=created.id;row.version=created.version || 1;}
   }
-
-  const validRows = rows.value.filter((row) => (row.特徵 || '').trim() && (row.值 || '').trim());
-  const duplicateKeys = new Set();
-  let hasDuplicate = false;
-  validRows.forEach((row) => {
-    const key = `${(row.聲韻調 || '').trim()}||${(row.特徵 || '').trim()}`;
-    if (duplicateKeys.has(key)) hasDuplicate = true;
-    duplicateKeys.add(key);
-  });
-  if (hasDuplicate) {
-    showWarning(t('customEntry.pointDetail.rows.duplicateWarning'));
-    const confirmed = await showConfirm(t('customEntry.pointDetail.messages.confirmContinue'));
-    if (confirmed === false) return;
+  for(const row of rows.value) {
+    if(response.updated_ids?.includes(row.recordId)) row.version += 1;
+    if(row.recordId) row.original={簡稱:location.value.trim(),音典分區:region.value.trim(),經緯度:coordText.value,聲韻調:row.聲韻調,特徵:row.特徵,值:row.值,說明:row.說明};
   }
-  if (validRows.length === 0 && removedIds.value.length === 0) {
-    showWarning(t('customEntry.pointDetail.messages.rowRequired'));
-    return;
-  }
-
-  const baseRecord = {
-    簡稱: location.value.trim(),
-    音典分區: region.value.trim(),
-    經緯度: formatCoord(coord.value[0], coord.value[1]),
-    username: userStore.username,
-  };
-
-  const toCreate = [];
-  const toEdit = [];
-
-  validRows.forEach((row) => {
-    const nextRecord = {
-      ...baseRecord,
-      聲韻調: (row.聲韻調 || '').trim(),
-      特徵: (row.特徵 || '').trim(),
-      值: (row.值 || '').trim(),
-      說明: (row.說明 || '').trim(),
-    };
-
-    if (!row.created_at) {
-      toCreate.push(nextRecord);
-      return;
-    }
-
-    if (rowChanged(row)) {
-      toEdit.push({
-        ...nextRecord,
-        created_at: row.created_at,
-      });
-    }
-  });
-
-  const tasks = [];
-  const hasCreate = toCreate.length > 0;
-  const hasDelete = removedIds.value.length > 0;
-  const hasEdit = toEdit.length > 0;
-  if (hasCreate) tasks.push(batchCreateCustomData(toCreate));
-  if (hasDelete) tasks.push(batchDeleteCustomData(removedIds.value));
-  toEdit.forEach((record) => tasks.push(editCustomData(record)));
-
-  if (tasks.length === 0) {
-    showWarning(t('customEntry.pointDetail.messages.noChanges'));
-    return;
-  }
-
-  isSaving.value = true;
-  const results = await Promise.allSettled(tasks);
-  const failedCount = results.filter((item) => item.status === 'rejected').length;
-
-  if (failedCount > 0) {
-    showWarning(t('customEntry.pointDetail.messages.partialFailed', { count: failedCount }));
-    isSaving.value = false;
-    return;
-  }
-
-  saveMessage.value = t('customEntry.pointDetail.messages.saveSuccess');
-  if (hasDelete || hasEdit) {
-    invalidateCustomDataPresence();
-  } else if (hasCreate) {
-    markCustomDataExists(true);
-  }
-  isSaving.value = false;
+  removedIds.value=[];
+  invalidateCustomDataPresence();
+  if(response.created_count) markCustomDataExists(true);
+  saveMessage.value=t('customEntry.pointDetail.messages.saveSuccess');
   emit('saved');
 }
+async function retrySave() {
+  const response=await mutation.save({});
+  if(response) finishSave(response);
+}
+function mergeVersions(current) {
+  mutation.prepareMerge();
+  for(const row of rows.value) {
+    const latest=current.find(record=>record.id===row.recordId);
+    if(latest) {row.version=latest.version;row.original={...latest};}
+  }
+  for(const item of removedIds.value) {
+    const latest=current.find(record=>record.id===item.id);
+    if(latest) item.version=latest.version;
+  }
+  mutation.reset();
+}
+function handleBack() { if(!locked.value) emit('back'); else showWarning(t('user.customSafety.leave')); }
 
 const isFeatureModalOpen = ref(false);
 const isFieldNoticeOpen = ref(false);
@@ -755,6 +789,8 @@ const showFeatureDetail = async (feature, phonology) => {
 const isCheckingExisting = ref(false);
 
 async function checkExistingPointOnCreate() {
+  if (locked.value) return;
+  const sequence=++existingSequence;
   if (!isCreateMode.value || autoSwitched.value) return;
 
   const loc = location.value.trim();
@@ -765,6 +801,7 @@ async function checkExistingPointOnCreate() {
   try {
     const response = await getDataByPoint(loc, reg);
     const records = Array.isArray(response?.data) ? response.data : [];
+    if (sequence !== existingSequence || locked.value || location.value.trim() !== loc || region.value.trim() !== reg) return;
     if (records.length > 0) {
       autoSwitched.value = true;
       saveMessage.value = '检测到该地点已存在，已自动切换为追加/编辑模式并加载历史数据';
@@ -772,23 +809,9 @@ async function checkExistingPointOnCreate() {
       const firstRecord = records[0];
       coord.value = parseCoordText(firstRecord['經緯度']);
       
-      rows.value = records.map((record) => {
-        rowSeed += 1;
-        return {
-          id: `row-${rowSeed}`,
-          created_at: record.created_at || '',
-          聲韻調: record['聲韻調'] || '',
-          特徵: record['特徵'] || '',
-          值: record['值'] || '',
-          說明: record['說明'] || '',
-          original: {
-            聲韻調: record['聲韻調'] || '',
-            特徵: record['特徵'] || '',
-            值: record['值'] || '',
-            說明: record['說明'] || '',
-          },
-        };
-      });
+      // Append only records not already in the draft; preserve unsaved rows.
+      const existingIds=new Set(rows.value.map(row=>row.recordId));
+      rows.value=[...records.filter(record=>!existingIds.has(record.id)).map(fromServer), ...rows.value];
     }
   } catch (error) {
     console.error('Check existing point failed:', error);
@@ -801,14 +824,9 @@ watch([location, region], async () => {
   if (!isCreateMode.value) return;
   if (isSelectingSuggestion.value) return;
 
-  // 如果用户修改了输入，且之前已经自动切换过，我们先重置状态
-  if (autoSwitched.value) {
-    autoSwitched.value = false;
-    coord.value = null;
-    rows.value = [createEmptyRow()];
-    saveMessage.value = '';
-  }
-
+  if (locked.value) return;
+  // Existing rows remain the same records when their base fields change.
+  if (autoSwitched.value) return;
   await checkExistingPointOnCreate();
 });
 
@@ -846,14 +864,14 @@ watch(
 
 .point-detail-title {
   margin: 0;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 700;
   color: $text-strong;
 }
 
 .point-detail-description {
   margin: 0;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: $text-muted;
 }
 
@@ -906,7 +924,7 @@ watch(
 .point-field-label,
 .point-map-title,
 .point-rows-title {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 700;
   color: $text-strong;
 }
@@ -950,7 +968,7 @@ watch(
   align-items: center;
   cursor: pointer;
   text-align: left;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   border-bottom: 1px solid $muted-border;
   transition: background-color 0.18s ease;
 
@@ -976,11 +994,11 @@ watch(
 
 .suggestion-region {
   color: $text-muted;
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 .suggestion-badge {
-  font-size: 10px;
+  font-size: var(--font-size-12);
   font-weight: 700;
   background: $primary-glass;
   color: $primary;
@@ -1002,7 +1020,7 @@ watch(
 }
 
 .quick-select-label {
-  font-size: 11px !important;
+  font-size: var(--font-size-12) !important;
   font-weight: 700;
   color: $text-muted !important;
   text-transform: uppercase;
@@ -1018,7 +1036,7 @@ watch(
 }
 
 .quick-select-pill {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 600;
   background: $glass-light;
   border: 1px solid $muted-hover;
@@ -1043,7 +1061,7 @@ watch(
 }
 
 .pill-region {
-  font-size: 10px;
+  font-size: var(--font-size-12);
   color: $text-subtle;
   font-weight: 400;
   transition: color 0.18s ease;
@@ -1069,7 +1087,7 @@ watch(
 
 .point-rows-description {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: $text-muted;
 }
 
@@ -1090,7 +1108,7 @@ watch(
 .point-rows-table-head {
   padding: 0 6px;
   color: $text-muted;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 700;
 
   @media (max-width: 768px) {
@@ -1131,7 +1149,7 @@ watch(
 
     &::before {
       content: attr(data-label);
-      font-size: 12px;
+      font-size: var(--font-size-12);
       font-weight: 700;
       color: $text-secondary;
     }
@@ -1157,7 +1175,7 @@ watch(
   border: none;
   cursor: pointer;
   padding: 4px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   line-height: 1;
   transition: transform 0.1s ease;
   user-select: none;
@@ -1205,14 +1223,14 @@ watch(
 
 .point-save-message {
   margin-top: $radius-md;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: $text-secondary;
 }
 
 /* 字段提示触发钮: 仅尺寸/颜色覆盖, 视觉见 main/_buttons.scss 的 .pill-btn */
 .field-notice-trigger {
   --pill-btn-padding: 6px 14px;
-  --pill-btn-font-size: 12px;
+  --pill-btn-font-size: var(--font-size-12);
   --pill-btn-font-weight: 600;
   --pill-btn-color: #fff;
   --pill-btn-border: 1px solid rgb(var(--color-warning-rgb));
@@ -1223,7 +1241,7 @@ watch(
 
   &::before {
     content: "⚠️";
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 }
 
@@ -1240,7 +1258,7 @@ watch(
 
   p {
     margin: 8px 0 0;
-    font-size: 13px;
+    font-size: var(--font-size-13);
     color: $text-secondary;
     line-height: 1.7;
   }
@@ -1259,7 +1277,7 @@ watch(
   border: 1px solid rgba(var(--color-primary-rgb), 0.2);
   border-radius: var(--radius-pill);
   color: $primary;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 600;
 }
 
@@ -1268,7 +1286,7 @@ watch(
   background: rgba(var(--color-warning-rgb), 0.08);
   border-left: 3px solid $warning;
   border-radius: 0 $radius-sm $radius-sm 0;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: $text-secondary;
   line-height: 1.6;
 }
@@ -1298,7 +1316,7 @@ watch(
   padding: 32px;
   text-align: center;
   color: $text-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .modal-error-state {
@@ -1316,7 +1334,7 @@ watch(
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 13px;
+  font-size: var(--font-size-13);
 
   th,
   td {

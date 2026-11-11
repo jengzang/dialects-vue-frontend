@@ -260,7 +260,7 @@ $overlay-transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   width: $avatar-size;
   height: $avatar-size;
   color: var(--action-primary-text);
-  font-size: 22px;
+  font-size: var(--font-size-24);
   font-weight: 700;
   background: linear-gradient(135deg, $primary-blue, $secondary-blue);
   border: 1.5px solid $white;
@@ -273,7 +273,7 @@ $overlay-transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   @media (min-aspect-ratio: 1/1) {
     width: $avatar-size-landscape;
     height: $avatar-size-landscape;
-    font-size: 24px;
+    font-size: var(--font-size-24);
   }
 }
 
@@ -313,7 +313,7 @@ $overlay-transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
     .edit-overlay-text {
       color: $white;
-      font-size: 13px;
+      font-size: var(--font-size-13);
       font-weight: 600;
       letter-spacing: 0.05em;
       transform: translateY(4px);

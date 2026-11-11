@@ -4,11 +4,12 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import '../../styles/villagesml-entry.scss'
-import i18n from '../../i18n'
+import i18n, { loadLocaleMessages } from '../../i18n'
 import { initSeo } from '../../seo'
 import { initializeUiPreferences } from '../../composables/core/uiPreferences.js'
 import { initializeScrollbarHover } from '../../utils/ui/scrollbarHover.js'
 
+await loadLocaleMessages(i18n.global.locale.value)
 const app = createApp(App)
 
 initializeUiPreferences()

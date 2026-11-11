@@ -81,7 +81,7 @@ function updateFeature(key, value) {
 
 <style scoped lang="scss">
 .section-title {
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 1rem;
@@ -105,7 +105,7 @@ function updateFeature(key, value) {
 }
 
 .setting-hint {
-  font-size: 0.85rem;
+  font-size: var(--font-size-14);
   color: var(--text-tertiary);
   font-style: italic;
 }

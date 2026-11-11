@@ -31,7 +31,7 @@ describe('vocabulary location transfer', () => {
 
     await transferVocabularyLocation(
       { location_name: '息烽', user_id: 7, username: 'alice' },
-      '8',
+      { target_user_id: '8' },
     )
 
     expect(apiMock).toHaveBeenCalledWith('/api/vocabulary/locations/transfer', {
@@ -44,19 +44,19 @@ describe('vocabulary location transfer', () => {
     })
   })
 
-  it('posts source username and target username when the target is not numeric', async () => {
+  it('posts source user id and explicit target username', async () => {
     apiMock.mockResolvedValueOnce({ success: true, transferred_entries_count: 1 })
 
     await transferVocabularyLocation(
-      { location_name: '息烽', username: 'alice' },
-      'bob',
+      { location_name: '息烽', user_id: 7, username: 'alice' },
+      { target_username: 'bob' },
     )
 
     expect(apiMock).toHaveBeenCalledWith('/api/vocabulary/locations/transfer', {
       method: 'POST',
       body: {
         location_name: '息烽',
-        username: 'alice',
+        user_id: 7,
         target_username: 'bob',
       },
     })
@@ -73,7 +73,8 @@ describe('vocabulary location transfer', () => {
       itemHead.indexOf("t('words.wordList.locations.transfer.action')")
     )
     expect(source).toContain('v-model="isTransferModalOpen"')
-    expect(source).toContain('transferTargetInput')
+    expect(source).toContain('v-model="transferTargetUserId"')
+    expect(source).toContain('v-model="transferTargetUsername"')
     expect(source).toContain('handleConfirmTransferLocation')
   })
 })

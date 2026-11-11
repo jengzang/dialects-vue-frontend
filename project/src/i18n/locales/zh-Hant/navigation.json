@@ -77,12 +77,13 @@
       "source": "字表來源",
       "privacy": "隱私政策",
       "suggestion": "提出建議",
-      "like": "支持作者"
+      "like": "支持項目"
     },
     "about": {
       "intro": "簡介",
+      "history": "開發歷程",
       "suggestion": "提出建議",
-      "like": "支持作者",
+      "like": "支持項目",
       "setting": "設置"
     }
   },
@@ -95,9 +96,9 @@
       "privacy": "隱私政策與引用說明",
       "settings": "設置",
       "source": "資料來源",
-      "aboutIntro": "ℹ️ 關於網站",
+      "aboutIntro": "關於網站",
       "aboutSuggestion": "我有建議",
-      "aboutLike": "❤️ 喜歡作者"
+      "aboutLike": "喜歡作者"
     },
     "portals": {
       "tools": "工具箱",
@@ -137,7 +138,7 @@
       "evolution": "韻書演化分析"
     },
     "vocabulary": {
-      "view": "詞表查詢",
+      "view": "方言詞表查詢",
       "import": "詞表上傳",
       "manage": "詞表管理"
     },
@@ -214,9 +215,17 @@
       "title": "主題配色",
       "description": "選擇頁面背景、玻璃面板與文字的整體配色。",
       "label": "目前配色",
+      "modeTitle": "明暗模式",
+      "shortOptions": { "blue": "藍", "red": "紅", "green": "綠" },
+      "shortModes": { "light": "日", "dark": "夜", "system": "隨" },
+      "modes": {
+        "light": "日間",
+        "dark": "夜間",
+        "system": "系統"
+      },
       "options": {
         "blue": "藍色",
-        "light": "淺色",
+        "red": "紅色",
         "dark": "深色",
         "green": "綠色"
       }
@@ -245,7 +254,15 @@
     "historyTitle": "訪問統計歷史",
     "loading": "加載中...",
     "todayVisits": "今日訪問",
-    "historyRecords": "歷史記錄"
+    "historyRecords": "歷史記錄",
+    "featureUsage": "功能使用次數",
+    "pageVisits": "網頁訪問人次",
+    "pageVisitsLeftAxis": "網頁訪問人次（左軸）",
+    "featureUsageRightAxis": "功能使用次數（右軸）",
+    "staticRequests": "靜態資源",
+    "staticRequestsRightAxis": "靜態資源（右軸）",
+    "usageLoadError": "功能使用統計載入失敗",
+    "staticLoadError": "靜態資源統計載入失敗"
   },
   "login": "登錄",
   "actions": {
@@ -253,7 +270,7 @@
     "backHome": "返回首頁"
   },
   "introTabs": {
-    "like": "支持作者",
+    "like": "支持項目",
     "suggestions": "提出建議",
     "thanks": "鳴謝"
   }

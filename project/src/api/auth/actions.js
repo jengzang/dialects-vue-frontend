@@ -4,6 +4,15 @@ import { clearSession, ensureAuthenticated, update_userdatas_bytoken } from './s
 
 const AUTH_API_BASE = '/api/auth'
 
+export async function createPasswordResetRequest({ email, newPassword }) {
+  return api(`${AUTH_API_BASE}/password-reset/requests`, {
+    method: 'POST',
+    showError: false,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, new_password: newPassword })
+  })
+}
+
 /**
  * Login with email or username
  * @param {Object} credentials - { email?, username?, password }

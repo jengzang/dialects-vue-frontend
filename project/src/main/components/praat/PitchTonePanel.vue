@@ -165,7 +165,6 @@
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import * as echarts from 'echarts'
 import * as XLSX from 'xlsx'
 import { useI18n } from 'vue-i18n'
 import { showSuccess, showWarning, showConfirm } from '@/utils/ui/message.js'
@@ -173,6 +172,7 @@ import { useStorageState } from '@/composables/core/useStorageState.js'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import AppModal from '@/components/common/AppModal.vue'
+import { initChart, onChartThemeChange, readChartTokens } from '@/utils/chart/chartTheme'
 
 const STANDARD_POINT_COUNT = 11
 
@@ -371,7 +371,7 @@ const initPitchChart = () => {
   }
 
   console.log('[PitchTone] Initializing ECharts...')
-  pitchChart = echarts.init(pitchChartContainer.value)
+  pitchChart = initChart(pitchChartContainer.value)
   console.log('[PitchTone] ECharts initialized:', pitchChart)
 
   const ts = props.results.timeseries
@@ -403,7 +403,7 @@ const initPitchChart = () => {
     title: {
       text: t('praat.pitchTone.step1.chart.title'),
       left: 'center',
-      textStyle: { fontSize: 14, color: '#666' }
+      textStyle: { fontSize: 14 }
     },
     tooltip: {
       trigger: 'axis',
@@ -833,7 +833,7 @@ const initTValueChart = () => {
     resizeObserver.observe(tValueChartContainer.value)
   }
 
-  tValueChart = echarts.init(tValueChartContainer.value)
+  tValueChart = initChart(tValueChartContainer.value)
 
   const isZScore = globalStats.value.mode === 'logZScore'
   const isElevenPoint = analysisMode.value
@@ -865,7 +865,6 @@ const ACADEMIC_SYMBOLS = [
 ]
 
 const ACADEMIC_COLORS = [
-  '#000000',
   '#e41a1c',
   '#377eb8',
   '#4daf4a',
@@ -877,6 +876,8 @@ const ACADEMIC_COLORS = [
 
 const initElevenPointChart = () => {
   const isZScore = globalStats.value.mode === 'logZScore'
+  const tokens = readChartTokens()
+  const academicColors = [tokens.text, ...ACADEMIC_COLORS]
 
   const series = tValueResults.value.map((res, idx) => ({
     name: res.name,
@@ -888,27 +889,27 @@ const initElevenPointChart = () => {
     symbolSize: 7,
     lineStyle: {
       width: 1.8,
-      color: ACADEMIC_COLORS[idx % ACADEMIC_COLORS.length],
+      color: academicColors[idx % academicColors.length],
     },
     itemStyle: {
-      color: ACADEMIC_COLORS[idx % ACADEMIC_COLORS.length],
+      color: academicColors[idx % academicColors.length],
     },
   }))
 
   const option = {
-    backgroundColor: '#ffffff',
+    backgroundColor: tokens.surface,
     title: {
       text: t('praat.pitchTone.step3.chart.title'),
       left: 'center',
       top: 8,
-      textStyle: { fontSize: 14, fontWeight: 'bold', color: '#000' },
+      textStyle: { fontSize: 14, fontWeight: 'bold' },
     },
     tooltip: {
       trigger: 'axis',
-      backgroundColor: '#fff',
-      borderColor: '#000',
+      backgroundColor: tokens.surface,
+      borderColor: tokens.border,
       borderWidth: 1,
-      textStyle: { color: '#000', fontSize: 12 },
+      textStyle: { color: tokens.text, fontSize: 12 },
       formatter: (params) => {
         let result = t('praat.pitchTone.step3.chart.tooltipTimeElevenPoint', {
           percent: (params[0]?.value[0] ?? 0).toFixed(0)
@@ -923,13 +924,13 @@ const initElevenPointChart = () => {
       orient: 'vertical',
       right: 8,
       top: 50,
-      backgroundColor: '#ffffff',
-      borderColor: '#000000',
+      backgroundColor: tokens.surface,
+      borderColor: tokens.border,
       borderWidth: 1,
       padding: [8, 12],
       itemGap: 10,
       itemWidth: 24,
-      textStyle: { fontSize: 12, color: '#000' },
+      textStyle: { fontSize: 12 },
     },
     toolbox: {
       right: 10,
@@ -939,7 +940,7 @@ const initElevenPointChart = () => {
           title: t('praat.pitchTone.step3.chart.toolbox.saveAsImage'),
           name: t('praat.pitchTone.step3.chart.imageName'),
           pixelRatio: 2,
-          backgroundColor: '#fff',
+          backgroundColor: tokens.surface,
         },
       },
     },
@@ -954,12 +955,12 @@ const initElevenPointChart = () => {
       name: t('praat.pitchTone.step3.chart.xAxisElevenPoint'),
       nameLocation: 'center',
       nameGap: 28,
-      nameTextStyle: { fontSize: 12, color: '#000' },
+      nameTextStyle: { fontSize: 12, color: tokens.axis },
       min: 0,
       max: 100,
-      axisLabel: { formatter: '{value}%', color: '#000', fontSize: 11 },
-      axisLine: { lineStyle: { color: '#000', width: 1 } },
-      axisTick: { lineStyle: { color: '#000' } },
+      axisLabel: { formatter: '{value}%', color: tokens.axis, fontSize: 11 },
+      axisLine: { lineStyle: { color: tokens.axis, width: 1 } },
+      axisTick: { lineStyle: { color: tokens.axis } },
       splitLine: { show: false },
     },
     yAxis: {
@@ -967,17 +968,17 @@ const initElevenPointChart = () => {
       name: isZScore
         ? t('praat.pitchTone.step3.chart.yAxisZScore')
         : t('praat.pitchTone.step3.chart.yAxis'),
-      nameTextStyle: { fontSize: 12, color: '#000' },
+      nameTextStyle: { fontSize: 12, color: tokens.axis },
       ...(isZScore
         ? { scale: true }
         : { min: 0, max: 5, interval: 1 }
       ),
-      axisLabel: { color: '#000', fontSize: 11 },
-      axisLine: { lineStyle: { color: '#000', width: 1 } },
-      axisTick: { lineStyle: { color: '#000' } },
+      axisLabel: { color: tokens.axis, fontSize: 11 },
+      axisLine: { lineStyle: { color: tokens.axis, width: 1 } },
+      axisTick: { lineStyle: { color: tokens.axis } },
       splitLine: {
         show: true,
-        lineStyle: { color: '#555555', width: 0.8, type: 'solid' },
+        lineStyle: { color: tokens.split, width: 0.8, type: 'solid' },
       },
     },
     series: series,
@@ -987,6 +988,7 @@ const initElevenPointChart = () => {
 }
 
 const initContinuousChart = (isZScore) => {
+  const tokens = readChartTokens()
   const series = tValueResults.value.map(res => ({
     name: res.name,
     type: 'line',
@@ -1016,8 +1018,7 @@ const initContinuousChart = (isZScore) => {
       orient: 'horizontal',
       itemGap: 20,
       textStyle: {
-        fontSize: 14,
-        color: '#2c3e50'
+        fontSize: 14
       }
     },
     toolbox: {
@@ -1034,7 +1035,7 @@ const initContinuousChart = (isZScore) => {
           title: t('praat.pitchTone.step3.chart.toolbox.saveAsImage'),
           name: t('praat.pitchTone.step3.chart.imageName'),
           pixelRatio: 2,
-          backgroundColor: '#fff'
+          backgroundColor: tokens.surface
         }
       }
     },
@@ -1061,6 +1062,11 @@ const initContinuousChart = (isZScore) => {
 
   tValueChart.setOption(option)
 }
+
+onChartThemeChange(() => {
+  if (hasPitchData.value) initPitchChart()
+  if (tValueChart) initTValueChart()
+})
 </script>
 
 <style scoped lang="scss">
@@ -1082,8 +1088,8 @@ $text-muted: var(--color-text-secondary, var(--text-lightest));
 $white: var(--text-white);
 $surface: var(--glass-50);
 $surface-strong: var(--glass-80);
-$border-light: rgba(0, 0, 0, 0.05);
-$border-medium: rgba(0, 0, 0, 0.1);
+$border-light: var(--border-light);
+$border-medium: var(--border-medium);
 
 $primary-gradient: var(--color-gradient);
 
@@ -1104,7 +1110,7 @@ $transition-normal: 0.3s;
   margin: 0 0 1rem;
   color: $text-primary;
   text-align: center;
-  font-size: 1.8rem;
+  font-size: var(--font-size-28);
   font-weight: 700;
 }
 
@@ -1133,7 +1139,7 @@ $transition-normal: 0.3s;
     border-radius: var(--radius-full);
     box-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.3);
     color: var(--action-primary-text);
-    font-size: 1.2rem;
+    font-size: var(--font-size-20);
     font-weight: 700;
   }
 
@@ -1148,13 +1154,13 @@ $transition-normal: 0.3s;
   .step-title {
     margin: 0;
     color: $text-primary;
-    font-size: 1.3rem;
+    font-size: var(--font-size-20);
     font-weight: 600;
   }
 
   .step-hint {
     color: $text-secondary;
-    font-size: 0.9rem;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -1189,7 +1195,7 @@ $transition-normal: 0.3s;
 
   .no-data-icon {
     margin-bottom: 1rem;
-    font-size: 3rem;
+    font-size: var(--font-size-48);
   }
 }
 
@@ -1211,7 +1217,7 @@ $transition-normal: 0.3s;
 
 .selection-info {
   min-height: 1.5rem;
-  font-size: 0.95rem;
+  font-size: var(--font-size-16);
   font-weight: 600;
 
   .status-active {
@@ -1229,7 +1235,7 @@ $transition-normal: 0.3s;
   padding: 0.7rem 1rem;
   border: 2px solid $border-medium;
   border-radius: var(--radius-md, var(--radius-sm2));
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   transition:
     border-color $transition-fast,
     box-shadow $transition-fast;
@@ -1245,7 +1251,7 @@ $transition-normal: 0.3s;
   padding: 0.7rem;
   border: none;
   border-radius: var(--radius-md, var(--radius-sm2));
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   font-weight: 600;
   cursor: pointer;
   transition:
@@ -1275,7 +1281,7 @@ $transition-normal: 0.3s;
 .persistence-hint {
   padding: 0.25rem 0;
   color: var(--color-text-secondary, var(--text-muted));
-  font-size: 0.8rem;
+  font-size: var(--font-size-12);
   font-style: italic;
   line-height: 1.4;
 }
@@ -1290,7 +1296,7 @@ $transition-normal: 0.3s;
   align-items: center;
   justify-content: space-between;
   color: $text-primary;
-  font-size: 0.95rem;
+  font-size: var(--font-size-16);
   font-weight: 600;
 }
 
@@ -1311,10 +1317,10 @@ $transition-normal: 0.3s;
   gap: 0.5rem;
   padding: 0.4rem 0.8rem;
   // background: $white;
-  border: 2px solid rgba(0, 0, 0, 0.5);
+  border: 2px solid var(--border-control);
   border-radius: var(--radius-2xl);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  font-size: 0.95rem;
+  font-size: var(--font-size-16);
   cursor: pointer;
   transition:
     box-shadow $transition-fast,
@@ -1332,7 +1338,7 @@ $transition-normal: 0.3s;
 
   .tag-count {
     color: var(--text-tertiary);
-    font-size: 0.8rem;
+    font-size: var(--font-size-12);
     font-weight: 600;
   }
 
@@ -1344,7 +1350,7 @@ $transition-normal: 0.3s;
     background: none;
     border: none;
     color: var(--text-lightest);
-    font-size: 1.2rem;
+    font-size: var(--font-size-20);
     line-height: 1;
     cursor: pointer;
     transition:
@@ -1362,7 +1368,7 @@ $transition-normal: 0.3s;
   padding: 1rem;
   color: $text-muted;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   font-style: italic;
 }
 
@@ -1392,7 +1398,7 @@ $transition-normal: 0.3s;
   .log-scale-label {
     color: $text-primary;
     white-space: nowrap;
-    font-size: 0.95rem;
+    font-size: var(--font-size-16);
     font-weight: 600;
   }
 }
@@ -1405,8 +1411,8 @@ $transition-normal: 0.3s;
   border: none;
   border-radius: var(--radius-2xl);
   box-shadow: 0 4px 16px rgba(var(--color-primary-rgb), 0.4);
-  color: var(--action-primary-text);
-  font-size: 1.2rem;
+  color: var(--action-solid-text);
+  font-size: var(--font-size-20);
   font-weight: 700;
   cursor: pointer;
   transition:
@@ -1454,7 +1460,7 @@ $transition-normal: 0.3s;
   border-radius: var(--radius-md, var(--radius-sm2));
   color: $text-primary;
   font-family: var(--font-mono);
-  font-size: 0.95rem;
+  font-size: var(--font-size-16);
   font-weight: 600;
 }
 
@@ -1472,7 +1478,7 @@ $transition-normal: 0.3s;
   border-radius: var(--radius-lg, var(--radius-md));
   box-shadow: 0 2px 8px rgba(80, 200, 120, 0.3);
   color: $white;
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   font-weight: 600;
   cursor: pointer;
   transition:
@@ -1493,7 +1499,7 @@ $transition-normal: 0.3s;
 .text-btn {
   background: none;
   border: none;
-  font-size: 0.85rem;
+  font-size: var(--font-size-14);
   text-decoration: underline;
   cursor: pointer;
   transition: opacity $transition-fast;
@@ -1521,7 +1527,7 @@ $transition-normal: 0.3s;
   justify-content: space-between;
   gap: 1rem;
   padding: 0.6rem 0.75rem;
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--bg-hover-light);
   border-radius: var(--radius-md, var(--radius-sm2));
 
   .preview-segment-info {
@@ -1531,18 +1537,18 @@ $transition-normal: 0.3s;
 
   .preview-segment-label {
     color: $text-primary;
-    font-size: 0.9rem;
+    font-size: var(--font-size-14);
     font-weight: 600;
   }
 
   .preview-segment-meta {
     color: $text-secondary;
-    font-size: 0.8rem;
+    font-size: var(--font-size-12);
   }
 
   .preview-segment-time {
     color: $text-muted;
-    font-size: 0.75rem;
+    font-size: var(--font-size-12);
   }
 
   .text-btn.danger {
@@ -1609,20 +1615,20 @@ $transition-normal: 0.3s;
     .step-number {
       width: 2rem;
       height: 2rem;
-      font-size: 1rem;
+      font-size: var(--font-size-16);
     }
 
     .step-title {
-      font-size: 1.1rem;
+      font-size: var(--font-size-18);
     }
 
     .step-hint {
-      font-size: 0.85rem;
+      font-size: var(--font-size-14);
     }
   }
 
   .panel-title {
-    font-size: 1.4rem;
+    font-size: var(--font-size-24);
   }
 }
 </style>

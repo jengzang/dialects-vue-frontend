@@ -198,7 +198,7 @@ $transition-base: 0.2s;
 h3 {
   margin: 0 0 16px;
   color: $text-title;
-  font-size: 30px;
+  font-size: var(--font-size-32);
   font-weight: 700;
 }
 
@@ -232,7 +232,7 @@ h3 {
   min-height: 36px;
   padding: 8px 14px;
   color: $white;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 800;
   cursor: pointer;
   background: linear-gradient(135deg, $primary-blue, $primary-blue-dark);
@@ -276,7 +276,7 @@ h3 {
 .btn-search {
   padding: 12px 24px;
   color: $white;
-  font-size: 17px;
+  font-size: var(--font-size-18);
   font-weight: 700;
   cursor: pointer;
   background: linear-gradient(135deg, $primary-blue, $primary-blue-dark);
@@ -304,7 +304,7 @@ h3 {
   @media (max-aspect-ratio: 1/1) {
     width: 100%;
     padding: 16px;
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 }
 
@@ -319,11 +319,11 @@ h3 {
 .err,
 .success {
   margin-top: 10px;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 700;
 
   @media (max-aspect-ratio: 1/1) {
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 }
 

@@ -158,7 +158,7 @@ onMounted(() => {
 }
 
 h2 {
-  font-size: 24px;
+  font-size: var(--font-size-24);
   margin-bottom: 16px;
   color: var(--text-primary);
   font-weight: 600;
@@ -170,7 +170,7 @@ h2 {
   color: var(--action-primary-text);
   border: none;
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -227,7 +227,7 @@ h2 {
 }
 
 .hotspot-id {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -237,7 +237,7 @@ h2 {
   background: rgba(var(--color-warning-rgb), 0.2);
   color: var(--color-warning-dark);
   border-radius: var(--radius-md);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 500;
   white-space: nowrap;
 }
@@ -250,7 +250,7 @@ h2 {
 .info-item {
   display: flex;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 
 .info-item .label {
@@ -269,7 +269,7 @@ h2 {
 }
 
 .hotspot-detail h3 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   margin-bottom: 15px;
   color: var(--text-primary);
 }
@@ -293,13 +293,13 @@ h2 {
 }
 
 .stat-label {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-bottom: 8px;
 }
 
 .stat-value {
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 700;
   color: var(--color-primary);
 }

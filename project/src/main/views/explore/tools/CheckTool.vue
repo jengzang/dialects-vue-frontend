@@ -2169,9 +2169,9 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     padding-top: 30px;
     --glass-button-padding: 8px 16px;
     --glass-button-border-radius: var(--radius-md);
-    --glass-button-font-size: 13px;
+    --glass-button-font-size: var(--font-size-13);
     --glass-button-small-padding: 6px 12px;
-    --glass-button-small-font-size: 12px;
+    --glass-button-small-font-size: var(--font-size-12);
     --glass-button-white-space: nowrap;
   }
 
@@ -2212,7 +2212,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   }
 
   &-icon {
-    font-size: 64px;
+    font-size: var(--font-size-48);
   }
 
   &-features {
@@ -2228,7 +2228,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     white-space: nowrap;
     justify-content: center;
     display: flex;
-    font-size: 15px;
+    font-size: var(--font-size-16);
     align-items: center;
     gap: 12px;
     padding: 6px;
@@ -2264,7 +2264,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   }
 
   &-label {
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 600;
     color: $text-main;
     margin: 0;
@@ -2304,7 +2304,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
     h5 {
       margin: 0 0 8px 0;
-      font-size: 14px;
+      font-size: var(--font-size-14);
       font-weight: 600;
       color: $primary;
     }
@@ -2363,7 +2363,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     justify-content: space-between;
 
     h3 {
-      font-size: 16px;
+      font-size: var(--font-size-16);
       margin: 0;
       white-space: nowrap;
     }
@@ -2442,7 +2442,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     border-radius: var(--radius-sm2);
     cursor: pointer;
     font-weight: 600;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     transition: all 0.2s ease;
     flex-shrink: 0;
 
@@ -2470,7 +2470,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
 .toggle {
   &-icon {
-    font-size: 12px;
+    font-size: var(--font-size-12);
     transition: transform 0.2s ease;
   }
 }
@@ -2498,7 +2498,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     border-radius: var(--radius-sm2);
     cursor: pointer;
     transition: all 0.2s ease;
-    font-size: 12px;
+    font-size: var(--font-size-12);
     display: flex;
     gap: 10px;
     justify-content: center;
@@ -2514,14 +2514,14 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   }
 
   &-row-num {
-    font-size: 10px;
+    font-size: var(--font-size-12);
     color: $text-muted;
     margin-bottom: 2px;
   }
 
   &-char {
     font-weight: 600;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     margin-bottom: 2px;
   }
 
@@ -2529,7 +2529,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     display: inline-block;
     padding: 2px 6px;
     border-radius: var(--radius-xs);
-    font-size: 10px;
+    font-size: var(--font-size-12);
     font-weight: 500;
 
     &.nonSingleChar {
@@ -2557,7 +2557,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   &-more {
     padding: 8px;
     text-align: center;
-    font-size: 12px;
+    font-size: var(--font-size-12);
     color: $text-muted;
   }
 
@@ -2567,7 +2567,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
   &-indicator {
     margin-left: 4px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 }
 
@@ -2588,17 +2588,17 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     }
 
     .badge {
-      font-size: 18px;
+      font-size: var(--font-size-18);
     }
 
     .label {
       flex: 1;
-      font-size: 13px;
+      font-size: var(--font-size-13);
     }
 
     .count {
       font-weight: 700;
-      font-size: 16px;
+      font-size: var(--font-size-16);
     }
 
     &.error .count {
@@ -2625,7 +2625,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   }
 
   &-section-title {
-    font-size: 13px;
+    font-size: var(--font-size-13);
     font-weight: 600;
     margin-bottom: 8px;
     flex-shrink: 0;
@@ -2643,7 +2643,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     padding: 8px;
     border-radius: var(--radius-sm2);
     cursor: pointer;
-    font-size: 12px;
+    font-size: var(--font-size-12);
     transition: all 0.2s ease;
 
     &.ru {
@@ -2676,17 +2676,17 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
   &-count {
     color: $text-muted;
-    font-size: 11px;
+    font-size: var(--font-size-12);
   }
 
   &-chars {
     color: $text-muted;
-    font-size: 11px;
+    font-size: var(--font-size-12);
     line-height: 1.4;
   }
 
   &-chars-display {
-    font-size: 16px;
+    font-size: var(--font-size-16);
     line-height: 2;
     word-break: break-all;
   }
@@ -2707,7 +2707,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   }
 
   &-rime-section-title {
-    font-size: 13px;
+    font-size: var(--font-size-13);
     font-weight: 600;
     margin-bottom: 4px;
     flex-shrink: 0;
@@ -2728,7 +2728,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all 0.2s ease;
-    font-size: 12px;
+    font-size: var(--font-size-12);
 
     &:hover {
       background: $glass-panel;
@@ -2747,7 +2747,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
   &-rime-count {
     color: $text-muted;
-    font-size: 11px;
+    font-size: var(--font-size-12);
     background: rgba(0, 0, 0, 0.05);
     padding: 2px 6px;
     border-radius: var(--radius-md);
@@ -2769,7 +2769,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
   &-indicator {
     margin-left: 4px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   &-modal-body {
@@ -2823,7 +2823,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
       background: $glass-panel;
       border: 2px solid rgba(var(--color-primary-rgb), 0.3);
       border-radius: var(--radius-xs);
-      font-size: 12px;
+      font-size: var(--font-size-12);
       font-weight: 600;
       color: $primary;
       flex-shrink: 0;
@@ -2831,12 +2831,12 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
     .value-text {
       flex: 1;
-      font-size: 14px;
+      font-size: var(--font-size-14);
       font-weight: 500;
     }
 
     .value-count {
-      font-size: 12px;
+      font-size: var(--font-size-12);
       color: $text-muted;
       background: rgba(0, 0, 0, 0.05);
       padding: 2px 8px;
@@ -2882,12 +2882,12 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
   &-name {
     font-weight: 600;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     white-space: nowrap;
   }
 
   &-rows {
-    font-size: 13px;
+    font-size: var(--font-size-13);
     color: $text-muted;
   }
 }
@@ -2910,7 +2910,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     border: 1px solid transparent;
     border-radius: var(--radius-md);
     color: rgba(var(--text-deep-rgb), 0.7);
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -2920,7 +2920,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
       background: var(--action-primary-bg);
       backdrop-filter: blur(14px);
       border-color: rgba(var(--color-primary-rgb), 0.6);
-      color: var(--action-primary-text);
+      color: var(--action-solid-text);
       box-shadow: 0 4px 20px rgba(var(--color-primary-rgb), 0.3);
     }
   }
@@ -2946,7 +2946,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   &-stats {
     display: flex;
     gap: 16px;
-    font-size: 13px;
+    font-size: var(--font-size-13);
     align-items: center;
     flex-wrap: wrap;
 
@@ -2990,7 +2990,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   }
 
   &-loading-text {
-    font-size: 14px;
+    font-size: var(--font-size-14);
     color: $primary;
     font-weight: 500;
   }
@@ -3004,7 +3004,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     padding: 4px 10px;
     background: $primary-soft;
     border-radius: var(--radius-sm2);
-    font-size: 12px;
+    font-size: var(--font-size-12);
     color: $primary;
     font-weight: 500;
     animation: pulse 2s ease-in-out infinite;
@@ -3084,7 +3084,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     text-align: center;
     font-weight: 600;
     color: $text-main;
-    font-size: 13px;
+    font-size: var(--font-size-13);
     border-right: 1px solid var(--glass-30);
 
     &:last-child {
@@ -3125,7 +3125,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   padding: 10px 12px;
   text-align: center;
   @include flex-center;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   border-right: 1px solid var(--glass-10);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -3167,7 +3167,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     background: $danger-soft;
     border: 1px solid rgba(var(--color-error-light-rgb), 0.3);
     border-radius: var(--radius-sm);
-    font-size: 16px;
+    font-size: var(--font-size-16);
     cursor: pointer;
     transition: all 0.2s ease;
 
@@ -3208,7 +3208,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
     h3 {
       margin: 0;
-      font-size: 18px;
+      font-size: var(--font-size-18);
     }
   }
 
@@ -3217,7 +3217,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     padding: 16px;
     @include glass-surface($glass-panel, 10px, 16px);
     color: $text-main;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     font-family: var(--font-mono);
     resize: vertical;
     transition: all 0.2s ease;
@@ -3250,7 +3250,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
     h4 {
       margin: 0;
-      font-size: 14px;
+      font-size: var(--font-size-14);
     }
   }
 
@@ -3265,7 +3265,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     padding: 8px 12px;
     margin-bottom: 8px;
     border-radius: var(--radius-sm2);
-    font-size: 13px;
+    font-size: var(--font-size-13);
     font-family: var(--font-mono);
 
     &.success {
@@ -3300,7 +3300,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     padding: 8px 12px;
     @include glass-surface($glass-strong, 8px, 8px);
     color: $text-main;
-    font-size: 13px;
+    font-size: var(--font-size-13);
     transition: all 0.2s ease;
 
     &:focus {
@@ -3313,14 +3313,14 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 }
 
 .title {
-  font-size: 28px;
+  font-size: var(--font-size-28);
   font-weight: 600;
   color: $text-main;
   margin: 0 0 8px 0;
 }
 
 .subtitle {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: rgba(var(--text-deep-rgb), 0.7);
   margin: 0 0 24px 0;
 }
@@ -3354,12 +3354,12 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   }
 
   &-icon-large {
-    font-size: 48px;
+    font-size: var(--font-size-48);
     animation: float 3s ease-in-out infinite;
   }
 
   &-text {
-    font-size: 16px;
+    font-size: var(--font-size-16);
     font-weight: 500;
     color: $text-main;
     margin: 0;
@@ -3378,11 +3378,11 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
 .hint {
   margin-top: 4px;
-  font-size: 11px;
+  font-size: var(--font-size-12);
   color: $text-muted;
 
   &-text {
-    font-size: 12px;
+    font-size: var(--font-size-12);
     color: $text-muted;
     margin: 0;
   }
@@ -3391,7 +3391,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     padding: 12px;
     background: $primary-soft;
     border-radius: var(--radius-sm2);
-    font-size: 12px;
+    font-size: var(--font-size-12);
     color: $text-muted;
   }
 }
@@ -3405,7 +3405,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     label {
       display: block;
       margin-bottom: 6px;
-      font-size: 13px;
+      font-size: var(--font-size-13);
       font-weight: 600;
       color: $text-main;
     }
@@ -3424,20 +3424,20 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
     h4 {
       margin: 0 0 12px 0;
-      font-size: 15px;
+      font-size: var(--font-size-16);
       color: $text-main;
     }
 
     ul {
       margin: 0;
       padding-left: 20px;
-      font-size: 13px;
+      font-size: var(--font-size-13);
       line-height: 1.8;
     }
 
     p {
       margin: 8px 0;
-      font-size: 13px;
+      font-size: var(--font-size-13);
       line-height: 1.6;
       color: rgba(var(--text-deep-rgb), 0.8);
     }
@@ -3446,7 +3446,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   &-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 12px;
+    font-size: var(--font-size-12);
     margin: 12px 0;
 
     th,
@@ -3466,7 +3466,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
       padding: 2px 6px;
       border-radius: var(--radius-xs);
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: var(--font-size-12);
     }
   }
 }
@@ -3495,11 +3495,11 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   }
 
   .title {
-    font-size: 22px;
+    font-size: var(--font-size-24);
   }
 
   .subtitle {
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 
   .format {
@@ -3509,7 +3509,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     }
 
     &-label {
-      font-size: 13px;
+      font-size: var(--font-size-13);
       margin-bottom: 10px;
     }
 
@@ -3533,7 +3533,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     }
 
     &-icon {
-      font-size: 48px;
+      font-size: var(--font-size-48);
     }
 
     &-features {
@@ -3545,14 +3545,14 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   .feature {
     &-item {
       padding: 8px 10px;
-      font-size: 13px;
+      font-size: var(--font-size-13);
       gap: 10px;
     }
 
     &-icon {
       width: 20px;
       height: 20px;
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 
@@ -3563,11 +3563,11 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     }
 
     &-icon-large {
-      font-size: 48px;
+      font-size: var(--font-size-48);
     }
 
     &-text {
-      font-size: 16px;
+      font-size: var(--font-size-16);
     }
 
     &-section {
@@ -3579,24 +3579,24 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     }
 
     &-icon {
-      font-size: 48px;
+      font-size: var(--font-size-48);
     }
 
     &-hint {
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 
   .hint {
     &-text {
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 
   .analyze {
     &-btn {
       padding: 14px 28px;
-      font-size: 15px;
+      font-size: var(--font-size-16);
     }
   }
 
@@ -3616,7 +3616,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     }
 
     &-title {
-      font-size: 14px;
+      font-size: var(--font-size-14);
     }
 
     &-content {
@@ -3632,7 +3632,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
     &-search {
       padding: 8px 12px;
-      font-size: 13px;
+      font-size: var(--font-size-13);
     }
 
     &-list {
@@ -3641,11 +3641,11 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
     &-item {
       padding: 10px;
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
 
     &-badge {
-      font-size: 10px;
+      font-size: var(--font-size-12);
       padding: 2px 6px;
     }
   }
@@ -3670,12 +3670,12 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
   .glass-button[data-size="small"] {
     padding: 8px 12px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   .stat {
     &-item {
-      font-size: 12px;
+      font-size: var(--font-size-12);
       padding: 8px 12px;
     }
   }
@@ -3690,11 +3690,11 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     }
 
     &-label {
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
 
     &-count {
-      font-size: 16px;
+      font-size: var(--font-size-16);
     }
   }
 
@@ -3708,7 +3708,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
     &-stats {
       gap: 10px;
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
 
     &-actions {
@@ -3723,7 +3723,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
   .edit {
     &-hint {
-      font-size: 11px;
+      font-size: var(--font-size-12);
       padding: 3px 8px;
     }
 
@@ -3742,7 +3742,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
   .mode {
     &-indicator {
-      font-size: 13px;
+      font-size: var(--font-size-13);
       padding: 8px 14px;
     }
   }
@@ -3750,14 +3750,14 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   .toolbar {
     &-btn {
       padding: 10px 16px;
-      font-size: 13px;
+      font-size: var(--font-size-13);
       white-space: nowrap;
     }
   }
 
   .data {
     &-table {
-      font-size: 11px;
+      font-size: var(--font-size-12);
 
       th,
       td {
@@ -3777,7 +3777,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
         right: 2px;
         top: 50%;
         transform: translateY(-50%);
-        font-size: 8px;
+        font-size: var(--font-size-12);
         opacity: 0.5;
       }
     }
@@ -3785,7 +3785,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
   .delete {
     &-btn-icon {
-      font-size: 16px;
+      font-size: var(--font-size-16);
     }
   }
 
@@ -3795,7 +3795,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     }
 
     &-title {
-      font-size: 18px;
+      font-size: var(--font-size-18);
     }
 
     &-body {
@@ -3816,13 +3816,13 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
   .form {
     &-group label {
-      font-size: 13px;
+      font-size: var(--font-size-13);
     }
 
     &-input,
     &-textarea {
       padding: 10px 12px;
-      font-size: 14px;
+      font-size: var(--font-size-14);
     }
   }
 
@@ -3844,7 +3844,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
     &-tab {
       padding: 8px 12px;
-      font-size: 13px;
+      font-size: var(--font-size-13);
       white-space: nowrap;
     }
   }
@@ -3858,7 +3858,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
     &-input {
       padding: 10px 12px;
-      font-size: 14px;
+      font-size: var(--font-size-14);
     }
 
     &-buttons {
@@ -3867,14 +3867,14 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
     &-output {
       padding: 12px;
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 
   .cmd {
     &-btn {
       padding: 8px 12px;
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 }
@@ -3898,7 +3898,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     }
 
     &-icon {
-      font-size: 40px;
+      font-size: var(--font-size-48);
     }
 
     &-features {
@@ -3908,24 +3908,24 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   }
 
   .title {
-    font-size: 20px;
+    font-size: var(--font-size-20);
   }
 
   .subtitle {
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   .feature {
     &-item {
       padding: 6px 8px;
-      font-size: 12px;
+      font-size: var(--font-size-12);
       gap: 8px;
     }
 
     &-icon {
       width: 18px;
       height: 18px;
-      font-size: 11px;
+      font-size: var(--font-size-12);
     }
   }
 
@@ -3936,7 +3936,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     }
 
     &-label {
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
 
     &-options {
@@ -3954,17 +3954,17 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     }
 
     &-icon-large {
-      font-size: 40px;
+      font-size: var(--font-size-48);
     }
 
     &-text {
-      font-size: 15px;
+      font-size: var(--font-size-16);
     }
   }
 
   .hint {
     &-text {
-      font-size: 11px;
+      font-size: var(--font-size-12);
     }
   }
 
@@ -3983,7 +3983,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     }
 
     &-title {
-      font-size: 13px;
+      font-size: var(--font-size-13);
     }
 
     &-content {
@@ -3998,7 +3998,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
     &-item {
       padding: 8px;
-      font-size: 11px;
+      font-size: var(--font-size-12);
       gap: 6px;
     }
   }
@@ -4006,7 +4006,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   .stat {
     &-item {
       padding: 6px 10px;
-      font-size: 11px;
+      font-size: var(--font-size-12);
     }
   }
 
@@ -4016,7 +4016,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
       .glass-button {
         padding: 6px 12px;
-        font-size: 12px;
+        font-size: var(--font-size-12);
       }
     }
   }
@@ -4024,13 +4024,13 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   .search {
     &-input {
       padding: 6px 10px;
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 
   .tone {
     &-section-title {
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
 
     &-item {
@@ -4038,35 +4038,35 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
     }
 
     &-value {
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
 
     &-count {
-      font-size: 11px;
+      font-size: var(--font-size-12);
     }
 
     &-chars {
-      font-size: 10px;
+      font-size: var(--font-size-12);
     }
   }
 
   .table {
     &-stats {
       gap: 8px;
-      font-size: 11px;
+      font-size: var(--font-size-12);
     }
   }
 
   .edit {
     &-hint {
-      font-size: 10px;
+      font-size: var(--font-size-12);
       padding: 2px 6px;
     }
   }
 
   .data {
     &-table {
-      font-size: 10px;
+      font-size: var(--font-size-12);
 
       th,
       td {
@@ -4077,7 +4077,7 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
 
   .editable {
     &-cell::after {
-      font-size: 7px;
+      font-size: var(--font-size-12);
       right: 1px;
     }
   }
@@ -4085,13 +4085,13 @@ $success-soft: rgba(var(--color-success-rgb), 0.1);
   .toolbar {
     &-btn {
       padding: 8px 12px;
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 
   .mode {
     &-indicator {
-      font-size: 12px;
+      font-size: var(--font-size-12);
       padding: 6px 12px;
     }
   }

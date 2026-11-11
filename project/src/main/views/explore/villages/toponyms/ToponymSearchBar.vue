@@ -1,22 +1,54 @@
 <template>
   <form
     class="toponym-search-bar__form"
+    :class="{ 'is-expanded': expanded, 'glass-panel': !expanded }"
     @submit.prevent="handleSubmit"
   >
     <label class="toponym-search-bar__field toponym-search-bar__field--query">
       <span>{{ t('villages.pages.toponyms.search.keyword') }}</span>
       <input
-        class="glass-field"
+        class="glass-field toponym-search-bar__input"
         data-shape="search"
         :value="query"
         :placeholder="t('villages.pages.toponyms.search.placeholder')"
         autocomplete="off"
         @input="emit('update:query', $event.target.value)"
       >
-      <small class="toponym-search-bar__hint">
+      <!-- <small
+        v-if="expanded"
+        class="toponym-search-bar__hint"
+      >
         {{ t('villages.pages.toponyms.search.placeholder') }}
-      </small>
+      </small> -->
     </label>
+
+    <div v-if="expanded" class="toponym-search-bar__quick-starts">
+      <span>{{ t('words.wordList.quickStartPrompt') }}</span>
+      <button
+        v-for="example in TOPONYM_SEARCH_EXAMPLES"
+        :key="example"
+        class="pill-btn"
+        type="button"
+        @click="runQuickStart(example)"
+      >
+        <span>{{ example }}</span>
+        <svg
+          class="toponym-search-bar__quick-start-icon"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M7 17L17 7M7 7h10v10" />
+        </svg>
+      </button>
+    </div>
 
     <label class="toponym-search-bar__field">
       <span>{{ t('villages.pages.toponyms.search.matchMode') }}</span>
@@ -29,13 +61,20 @@
     </label>
 
     <button
-      class="glass-button toponym-search-bar__submit"
+      class="action-btn toponym-search-bar__submit"
       type="submit"
       :disabled="loading"
     >
       {{ loading ? t('villages.pages.toponyms.search.searching') : t('villages.pages.toponyms.search.submit') }}
     </button>
     <slot name="actions" />
+    <p
+      v-if="error"
+      class="toponym-search-bar__error"
+      role="alert"
+    >
+      {{ error }}
+    </p>
   </form>
 </template>
 
@@ -45,6 +84,14 @@ import { useI18n } from 'vue-i18n';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue';
 
 defineProps({
+  expanded: {
+    type: Boolean,
+    default: false,
+  },
+  error: {
+    type: String,
+    default: '',
+  },
   query: {
     type: String,
     default: '',
@@ -66,6 +113,7 @@ const emit = defineEmits([
 ]);
 
 const { t } = useI18n();
+const TOPONYM_SEARCH_EXAMPLES = ['垌', '塬', '厝', '浜', '礤', '峪', '畈'];
 
 const matchModeOptions = computed(() => [
   { value: 'prefix', label: t('villages.pages.toponyms.matchModes.prefix') },
@@ -73,6 +121,11 @@ const matchModeOptions = computed(() => [
   { value: 'exact', label: t('villages.pages.toponyms.matchModes.exact') },
   { value: 'contains', label: t('villages.pages.toponyms.matchModes.contains') },
 ]);
+
+function runQuickStart(example) {
+  emit('update:query', example);
+  emit('search');
+}
 
 function handleSubmit() {
   emit('search');
@@ -83,33 +136,79 @@ function handleSubmit() {
 @use '@/styles/global/mixins' as *;
 
 .toponym-search-bar__form {
-  display: flex;
-  align-items: flex-end;
-  gap: 12px;
-  flex-wrap: wrap;
+  --glass-panel-background: var(--surface-glass-floating);
+  --glass-panel-radius: var(--radius-xl);
+  --glass-panel-border: 1px solid var(--border-glass);
+  --glass-panel-shadow: var(--shadow-glass-inset);
+  --glass-panel-hover-shadow: var(--shadow-glass-inset);
+  --glass-panel-backdrop-filter: blur(24px) saturate(180%);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(110px, 160px) auto auto;
+  align-items: center;
+  gap: 10px;
+  min-inline-size: 0;
+  padding: 12px;
+
+  &.is-expanded {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    padding: 0;
+
+    .toponym-search-bar__field--query {
+      grid-column: 1 / -1;
+    }
+  }
 }
 
 .toponym-search-bar {
   &__field {
     @include flex-col;
     gap: 6px;
-    min-inline-size: 152px;
+    min-inline-size: 0;
 
     span {
       color: var(--text-secondary);
-      font-size: 13px;
+      font-size: var(--font-size-13);
       line-height: 1.4;
     }
+  }
 
-    &--query {
-      flex: 1 1 260px;
+  &__quick-starts {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 1.5dvh;
+
+    > span {
+      color: var(--text-secondary);
+      font-size: var(--font-size-13);
     }
+  }
+
+  &__quick-start-icon {
+    flex: 0 0 auto;
+  }
+
+  &__input {
+    inline-size: 100%;
+    min-inline-size: 0;
+    min-block-size: calc(44px + var(--query-input-growth, 0px));
+    box-sizing: border-box;
+    font-size: calc(var(--font-size-16) + (var(--font-size-20) - var(--font-size-16)) * var(--query-expansion, 0));
+  }
+
+  &__error {
+    grid-column: 1 / -1;
+    margin: 0;
+    color: var(--color-error);
+    font-size: var(--font-size-13);
   }
 
   &__hint {
     @include text-truncate;
     color: var(--text-tertiary);
-    font-size: 12px;
+    font-size: var(--font-size-12);
     line-height: 1.4;
   }
 
@@ -118,6 +217,21 @@ function handleSubmit() {
 
     &:disabled {
       @include disabled-state;
+    }
+  }
+}
+
+@media (max-aspect-ratio: 1 / 1) {
+  .toponym-search-bar__form {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    padding: 10px;
+
+    .toponym-search-bar__field--query {
+      grid-column: 1 / -1;
+    }
+
+    &.is-expanded {
+      padding: 0;
     }
   }
 }

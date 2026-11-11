@@ -2,10 +2,14 @@
 
 // == Base element styles (migrated from _legacy.scss) ==
 
+html {
+  font-size: 16px;
+}
+
 body {
   margin: 0;
   background: var(--bg-body);
-  font-size: 16px;
+  font-size: var(--font-size-16);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
@@ -16,7 +20,7 @@ body {
 
 @media (min-width: 768px) {
   body {
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 }
 

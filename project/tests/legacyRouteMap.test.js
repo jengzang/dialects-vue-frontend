@@ -39,7 +39,7 @@ describe('legacy route map', () => {
       sub: 'grammar',
       foo: 'bar',
     })).toEqual({
-      path: '/explore/yubao',
+      path: '/menu/yubao',
       query: {
         foo: 'bar',
         tab: 'grammar',
@@ -65,7 +65,7 @@ describe('legacy route map', () => {
       sub: 'card',
       foo: 'bar',
     })).toEqual({
-      path: '/explore/vocabulary/view',
+      path: '/menu/vocabulary',
       query: {
         foo: 'bar',
         tab: 'card',

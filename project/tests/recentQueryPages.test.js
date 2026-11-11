@@ -221,10 +221,10 @@ describe('compare recent conditions', () => {
     expect(vm.CompareDirectInputRef.charInput).toBe('火')
   })
 
-  it('does not add history to phonetic comparison', async () => {
+  it('restores history for phonetic comparison', async () => {
     localStorage.setItem('recent-query:v1:compare:tab5', JSON.stringify({ version: 1, entries: [{ snapshot: {}, summary: 'excluded' }] }))
     await mount(ComparePage, 'phonetic')
-    expect(document.querySelector('.pill-btn--history')).toBeNull()
+    expect(document.querySelector('.pill-btn--history')?.textContent).toContain('excluded')
     expect(document.querySelector('.existing-quick-start')).not.toBeNull()
   })
 })

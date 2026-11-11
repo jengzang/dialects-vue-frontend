@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { createApp, h, nextTick, reactive } from 'vue'
+import { createApp, h, nextTick, reactive, shallowRef, Teleport } from 'vue'
 import { createI18n } from 'vue-i18n'
 import VocabularyTopControls from '../src/main/views/explore/word/vocabulary/VocabularyTopControls.vue'
 
@@ -19,7 +19,7 @@ vi.mock('../src/components/common/AppModal.vue', () => ({ default: {
 let app
 let host
 let emitRegion
-afterEach(() => { app?.unmount(); host?.remove(); document.body.innerHTML = ''; vi.useRealTimers() })
+afterEach(() => { app?.unmount(); host?.remove(); document.body.innerHTML = ''; vi.useRealTimers(); vi.unstubAllGlobals() })
 
 async function mountControls(expanded, overrides = {}) {
   vi.useFakeTimers()
@@ -28,21 +28,91 @@ async function mountControls(expanded, overrides = {}) {
   const search = vi.fn()
   const refresh = vi.fn()
   const filterOpenChange = vi.fn()
+  const rememberSelection = vi.fn()
   host = document.createElement('div')
   document.body.append(host)
   app = createApp({ render: () => h(VocabularyTopControls, {
     ...props, 'onUpdate:query': updateQuery, onSearch: search, onRefreshNotes: refresh, onFilterOpenChange: filterOpenChange,
     'onUpdate:filterMode': value => { props.filterMode = value },
+    'onUpdate:rememberLocationSelection': rememberSelection,
+    'onUpdate:viewMode': value => { props.viewMode = value },
   }) })
   app.use(createI18n({ legacy: false, locale: 'zh-CN', missingWarn: false, fallbackWarn: false, messages: { 'zh-CN': { common: { button: { search: '搜索' } } } } }))
   app.mount(host)
   await nextTick()
   const input = host.querySelector('.search-input')
   const type = text => { input.value = text; input.dispatchEvent(new Event('input', { bubbles: true })) }
-  return { props, updateQuery, search, refresh, type, filterOpenChange }
+  return { props, updateQuery, search, refresh, type, filterOpenChange, rememberSelection }
 }
 
 describe('vocabulary query submission in the same input', () => {
+  it('keeps the page-owned notes scope attached when the controls are recreated', async () => {
+    const target = shallowRef(null)
+    const state = reactive({ generation: 0, expanded: false })
+    host = document.createElement('div')
+    document.body.append(host)
+    app = createApp({ render: () => h('div', [
+      h(VocabularyTopControls, {
+        key: state.generation, source: 'character-notes', deferQuery: state.expanded,
+        onNotesScopeTargetChange: element => { target.value = element },
+      }),
+      h(Teleport, { to: target.value, disabled: state.expanded || !target.value }, [h('input', { class: 'page-owned-scope', value: '保留地点' })]),
+    ]) })
+    app.use(createI18n({ legacy: false, locale: 'zh-CN', missingWarn: false, fallbackWarn: false, messages: {} }))
+    app.mount(host)
+    await nextTick(); await nextTick()
+    const input = host.querySelector('.page-owned-scope')
+    expect(host.querySelector('.notes-scope-filter').contains(input)).toBe(true)
+    state.generation++; await nextTick(); await nextTick()
+    expect(host.querySelector('.notes-scope-filter').contains(input)).toBe(true)
+    expect(input.value).toBe('保留地点')
+    state.expanded = true; await nextTick()
+    expect(host.querySelector('.page-owned-scope')).toBe(input)
+    expect(host.querySelector('.notes-scope-filter').contains(input)).toBe(false)
+  })
+  it.each([true, false])('changes notes height and switcher placement only when compact in portrait=%s', async portrait => {
+    vi.stubGlobal('matchMedia', () => ({ matches: portrait, addEventListener() {}, removeEventListener() {} }))
+    const { props } = await mountControls(true, { source: 'character-notes' })
+    await nextTick()
+    const switcher = host.querySelector('.result-view-switcher')
+    expect(host.querySelector('.search-container').contains(switcher)).toBe(false)
+    expect(host.querySelector('.search-input').classList.contains('notes-search-input--compact')).toBe(false)
+    props.deferQuery = false; await nextTick()
+    expect(host.querySelector('.search-container').contains(switcher)).toBe(portrait)
+    expect(host.querySelector('.search-input').classList.contains('notes-search-input--compact')).toBe(true)
+    props.deferQuery = true; await nextTick()
+    expect(host.querySelector('.search-container').contains(switcher)).toBe(false)
+    expect(host.querySelector('.search-input').classList.contains('notes-search-input--compact')).toBe(false)
+    props.deferQuery = false; await nextTick()
+    props.source = 'vocabulary'; await nextTick()
+    expect(host.querySelector('.search-container').contains(switcher)).toBe(false)
+    expect(host.querySelector('.search-input').classList.contains('notes-search-input--compact')).toBe(false)
+  })
+  it.each([true, false])('switches notes between table and cards outside settings with expanded=%s', async expanded => {
+    await mountControls(expanded, { source: 'character-notes', viewMode: 'card' })
+    const buttons = [...host.querySelectorAll('.result-view-switcher .mode-btn')]
+    expect(buttons).toHaveLength(2)
+    expect(buttons.map(button => button.title)).toEqual(['words.wordList.viewModes.table', 'words.wordList.viewModes.card'])
+    buttons[0].click(); await nextTick()
+    expect(buttons[0].getAttribute('aria-pressed')).toBe('true')
+    host.querySelector('.gear-btn').click(); await nextTick()
+    expect(host.querySelector('.search-field-mode-section [role="switch"]')).toBeNull()
+    buttons[1].click(); await nextTick()
+    expect(buttons[1].getAttribute('aria-pressed')).toBe('true')
+  })
+  it('offers the remember selection checkbox in vocabulary settings and forwards changes', async () => {
+    const { rememberSelection, props } = await mountControls(false)
+    host.querySelector('.gear-btn').click(); await nextTick()
+    const label = [...host.querySelectorAll('.checkbox-wrapper')].find(element => element.textContent.includes('rememberLocationSelection'))
+    expect(label).toBeDefined()
+    const input = label.querySelector('input')
+    expect(input.checked).toBe(false)
+    input.checked = true
+    input.dispatchEvent(new Event('change', { bubbles: true })); await nextTick()
+    expect(rememberSelection).toHaveBeenCalledWith(true)
+    props.source = 'character-notes'; await nextTick()
+    expect(host.textContent).not.toContain('rememberLocationSelection')
+  })
   it('reports location opening and both trigger and outside closing', async () => {
     const { filterOpenChange } = await mountControls(false, { locationOptions: [{ value: '甲', label: '甲' }] })
     const trigger = host.querySelector('.location-select-trigger')
@@ -150,5 +220,19 @@ describe('vocabulary query submission in the same input', () => {
     await vi.advanceTimersByTimeAsync(600)
     expect(updateQuery).not.toHaveBeenCalled()
     expect(host.querySelector('.search-input').value).toBe('吃饭')
+  })
+})
+
+
+describe('standard-word loading stays inside its selector', () => {
+  it.each([true, false])('replaces the %s selector with a disabled loading trigger then restores it', async singleSelect => {
+    const { props } = await mountControls(false, { viewMode: 'map', singleSelect, standardWordsLoading: true,
+      standardWordOptions: [{ value: '太阳', label: '太阳' }] })
+    const filter = host.querySelector('.standard-word-filter')
+    expect(filter.textContent).toContain('loading')
+    expect(filter.querySelector('[aria-busy="true"]').disabled).toBe(true)
+    props.standardWordsLoading = false; await nextTick()
+    expect(filter.querySelector('[aria-busy="true"]')).toBeNull()
+    expect(filter.querySelector('.select-trigger')).not.toBeNull()
   })
 })

@@ -22,6 +22,7 @@
     "collapse": "收起"
   },
   "label": {
+    "all": "全部",
     "loading": "加載中...",
     "noData": "暫無數據",
     "error": "錯誤",
@@ -39,6 +40,9 @@
     "search": "請輸入搜索內容"
   },
   "components": {
+    "cardExcludeRow": {
+      "hint": "請選擇聲/韻/調"
+    },
     "multiSelect": {
       "selectAll": "全選",
       "deselectAll": "取消全選",
@@ -83,7 +87,8 @@
       "exportSource": "導出源文件",
       "exporting": "導出中...",
       "reselect": "重新選擇檔案",
-      "confirmAndUse": "確認列匹配並使用"
+      "fullscreenPreview": "全螢幕預覽",
+      "confirmAndUse": "確認使用"
     },
     "empty": {
       "title": "請先選擇一個表格檔案",

@@ -1,4 +1,5 @@
 import qrcode from 'qrcode-generator'
+import { getBrandAssets } from '@/composables/core/uiPreferences.js'
 
 const CARD_CONFIGS = {
   landscape: {
@@ -127,29 +128,12 @@ const CARD_CONFIGS = {
 
 
 const THEME_COLOR_TOKENS = {
-  blue: '--color-primary-hover',
-  green: '--color-primary-hover',
-  light: '--color-primary-hover',
-  dark: '--color-primary-hover',
-}
-
-
-const BRAND_TITLE_SRC = '/brand/title.webp'
-
-
-const BRAND_LOGO_SRCS = {
-  green: '/brand/favicon_green.ico',
-  blue: '/brand/favicon.ico',
-  light: '/brand/favicon.ico',
-  dark: '/brand/favicon.ico',
-}
-
-
-const QR_CENTER_SRCS = {
-  green: '/brand/GreenCircle.webp',
-  blue: '/brand/BlueCircle.webp',
-  light: '/brand/BlueCircle.webp',
-  dark: '/brand/BlueCircle.webp',
+  'blue-light': '--color-primary-hover',
+  'red-light': '--color-primary-hover',
+  'green-light': '--color-primary-hover',
+  'blue-dark': '--color-primary-hover',
+  'red-dark': '--color-primary-hover',
+  'green-dark': '--color-primary-hover',
 }
 
 
@@ -416,15 +400,11 @@ export async function createShareCardDataUrl({
   brandName = '方音图鉴',
   qrHint = '',
 
-  brandTitleSrc = BRAND_TITLE_SRC,
+  brandTitleSrc = getBrandAssets(colorTheme).title,
 
-  brandLogoSrc =
-    BRAND_LOGO_SRCS[colorTheme] ||
-    BRAND_LOGO_SRCS.blue,
+  brandLogoSrc = getBrandAssets(colorTheme).logo,
 
-  qrCenterSrc =
-    QR_CENTER_SRCS[colorTheme] ||
-    QR_CENTER_SRCS.blue,
+  qrCenterSrc = getBrandAssets(colorTheme).decoration,
 
   loadImage = loadCanvasImage,
 }) {
@@ -463,7 +443,7 @@ export async function createShareCardDataUrl({
   const accent =
     readCssToken(
       THEME_COLOR_TOKENS[colorTheme] ||
-      THEME_COLOR_TOKENS.blue,
+      THEME_COLOR_TOKENS['blue-light'],
       '#2f74c0',
     )
 

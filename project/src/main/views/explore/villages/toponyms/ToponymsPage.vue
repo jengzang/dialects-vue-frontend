@@ -1,90 +1,107 @@
 <template>
-  <main class="toponyms-page glass-container glass-shell">
-    <section class="toponyms-page__controls glass-panel">
-      <div class="toponyms-page__controls-inner glass-subpanel">
+  <main
+    class="toponyms-page"
+    :class="{ 'is-search-expanded': isSearchExpanded && !isSearchCollapsing }"
+  >
+    <QuerySearchEntrance
+      ref="querySearchEntranceRef"
+      title-tag="h1"
+      :title="t('navigation.pageTitles.villages.toponyms')"
+      @progress="updateSearchProgress"
+    >
+      <template #intro>
         <div class="toponyms-page__toolbar-copy">
-          <h1><BarIcon icon="📍" />{{ t('navigation.pageTitles.villages.toponyms') }}</h1>
-          <p>{{ t('villages.pages.toponyms.subtitle') }}</p>
+          <h1 class="page-title">
+            <BarIcon icon="📍" />{{ t('navigation.pageTitles.villages.toponyms') }}
+          </h1>
+          <!-- <p>{{ t('villages.pages.toponyms.subtitle') }}</p> -->
         </div>
-
+      </template>
+      <template #controls="{ expanded }">
         <ToponymSearchBar
           v-model:query="query"
           v-model:match-mode="matchMode"
+          :expanded="expanded"
           :loading="pointsLoading"
+          :error="isSearchExpanded ? pointsError : ''"
           @search="handleSearch"
         >
           <template #actions>
             <button
-              class="glass-button"
+              class="toponyms-page__config-button"
               type="button"
-              data-variant="secondary"
               :aria-label="t('villages.pages.toponyms.chart.configAriaLabel')"
               @click="openChartConfig"
             >
-              <InlineIcon icon="⚙" />
+              <span class="toponyms-page__config-icon">
+                <InlineIcon icon="⚙" />
+              </span>
             </button>
           </template>
         </ToponymSearchBar>
-      </div>
-    </section>
+      </template>
 
-    <section class="toponyms-page__workspace">
-      <div class="toponyms-page__chart glass-panel">
-        <div class="toponyms-page__chart-inner glass-subpanel">
-          <div class="toponyms-page__chart-header">
-            <div class="toponyms-page__stat-strip">
-              <span>{{ t('villages.pages.toponyms.chart.pointsSeries') }}</span>
-              <strong>{{ scatterData.length }}</strong>
-              <small v-if="hasSearched">
-                {{
-                  t('villages.pages.toponyms.results.count', {
-                    count: pointCount,
-                    shown: scatterData.length,
-                  })
-                }}
-              </small>
-              <small v-else>{{ t('villages.pages.toponyms.chart.searchFirst') }}</small>
+      <section
+        v-show="hasSearched && !isSearchExpanded"
+        class="toponyms-page__workspace"
+      >
+        <div class="toponyms-page__chart glass-panel">
+          <div class="toponyms-page__chart-inner">
+            <div class="toponyms-page__chart-header">
+              <!-- <div class="toponyms-page__stat-strip"> -->
+                <!-- <span>{{ t('villages.pages.toponyms.chart.pointsSeries') }}</span>
+                <strong>{{ scatterData.length }}</strong>
+                <small v-if="hasSearched">
+                  {{
+                    t('villages.pages.toponyms.results.count', {
+                      count: pointCount,
+                      shown: scatterData.length,
+                    })
+                  }}
+                </small>
+                <small v-else>{{ t('villages.pages.toponyms.chart.searchFirst') }}</small> -->
+              <!-- </div> -->
             </div>
+
+            <ToponymDistributionChart
+              ref="chartRef"
+              :country-layer="countryLayer"
+              :loaded-layers="loadedLayers"
+              :layer-state="layerState"
+              :loading-layers="loadingLayers"
+              :layer-errors="layerErrors"
+              :scatter-data="scatterData"
+              :loading="pointsLoading"
+              :error="countryError || pointsError"
+              :has-searched="hasSearched"
+              @select-point="handleSelectPoint"
+              @toggle-layer="handleToggleLayer"
+            />
           </div>
-
-          <ToponymDistributionChart
-            ref="chartRef"
-            :country-layer="countryLayer"
-            :loaded-layers="loadedLayers"
-            :layer-state="layerState"
-            :loading-layers="loadingLayers"
-            :layer-errors="layerErrors"
-            :scatter-data="scatterData"
-            :loading="pointsLoading"
-            :error="countryError || pointsError"
-            :has-searched="hasSearched"
-            @select-point="handleSelectPoint"
-            @toggle-layer="handleToggleLayer"
-          />
         </div>
-      </div>
 
-      <ToponymResultsPanel
-        :has-searched="hasSearched"
-        :loading="pointsLoading"
-        :error="pointsError"
-        :point-count="pointCount"
-        :scatter-count="scatterData.length"
-        :truncated="pointsTruncated"
-        :name-tree="nameTree"
-        :name-tree-meta="nameTreeMeta"
-        :name-tree-loading="nameTreeLoading"
-        :name-tree-error="nameTreeError"
-        :name-tree-loaded="nameTreeLoaded"
-        @request-name-tree="handleNameTreeRequest"
-        @expand-name-tree-node="handleNameTreeNodeExpand"
-        @load-more-name-tree-names="handleNameTreeNamesMore"
-      />
-    </section>
+        <ToponymResultsPanel
+          :has-searched="hasSearched"
+          :loading="pointsLoading"
+          :error="pointsError"
+          :point-count="pointCount"
+          :scatter-count="scatterData.length"
+          :truncated="pointsTruncated"
+          :name-tree="nameTree"
+          :name-tree-meta="nameTreeMeta"
+          :name-tree-loading="nameTreeLoading"
+          :name-tree-error="nameTreeError"
+          :name-tree-loaded="nameTreeLoaded"
+          @request-name-tree="handleNameTreeRequest"
+          @expand-name-tree-node="handleNameTreeNodeExpand"
+          @load-more-name-tree-names="handleNameTreeNamesMore"
+        />
+      </section>
+    </QuerySearchEntrance>
 
     <Teleport to="body">
       <HoverDetailCard
-        :visible="isDetailCardOpen"
+        :visible="isDetailCardOpen && !isSearchExpanded"
         :is-mobile-layout="isMobileLayout"
         :is-pinned="isDetailCardPinned"
         :desktop-card-position="desktopCardPosition"
@@ -118,6 +135,7 @@
 <script setup>
 import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue';
+import QuerySearchEntrance from '@/components/common/QuerySearchEntrance.vue';
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
@@ -135,16 +153,29 @@ import ToponymResultsPanel from './ToponymResultsPanel.vue';
 import ToponymSearchBar from './ToponymSearchBar.vue';
 import { buildToponymScatterData } from './toponymsChartData.js';
 import { getDefaultToponymsLayerState, loadToponymsGisAsset } from './toponymsGisAssets.js';
+import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
+import { showConfirm } from '@/utils/ui/message.js';
 
 const { t } = useI18n();
 const route = useRoute();
+const { requireAuth, isAuthenticated } = useAuthGuard();
+
+async function guardToponymRequest() {
+  if (isAuthenticated.value) return true;
+  const confirmed = await showConfirm(t('villages.pages.toponyms.errors.loginRequired'));
+  if (confirmed) await requireAuth();
+  return false;
+}
 const TOPONYM_NAME_TREE_PAGE_SIZE = 100;
 const TOPONYM_MATCH_MODES = new Set(['prefix', 'suffix', 'exact', 'contains']);
 const TOPONYM_VILLAGE_PLACE_TYPE_CODES = ['22200', '21610', '27610'];
 
 const chartRef = ref(null);
+const querySearchEntranceRef = ref(null);
+const isSearchExpanded = ref(true);
+const isSearchCollapsing = ref(false);
 const query = ref('');
-const matchMode = ref('prefix');
+const matchMode = ref('contains');
 const hasSearched = ref(false);
 const lastPointSearchParams = ref(null);
 
@@ -251,7 +282,14 @@ function hydrateSearchFromRouteQuery() {
   return true;
 }
 
+function updateSearchProgress(progress) {
+  isSearchExpanded.value = progress < 1;
+  if (progress === 0 || progress === 1) isSearchCollapsing.value = false;
+}
+
 async function handleSearch() {
+  if (!(await guardToponymRequest())) return;
+
   const keyword = query.value.trim();
   hasSearched.value = true;
   pointsError.value = '';
@@ -266,6 +304,10 @@ async function handleSearch() {
     pointsError.value = t('villages.pages.toponyms.errors.emptyQuery');
     return;
   }
+
+  // Reserve result scroll space during collapse, then release it on expansion.
+  isSearchCollapsing.value = true;
+  querySearchEntranceRef.value?.collapse();
 
   const searchParams = {
     q: keyword,
@@ -302,6 +344,8 @@ async function handleSearch() {
 }
 
 async function handleNameTreeRequest() {
+  if (!(await guardToponymRequest())) return;
+
   const searchParams = lastPointSearchParams.value;
   nameTreeError.value = '';
   nameTreeLoaded.value = true;
@@ -337,6 +381,8 @@ async function handleNameTreeRequest() {
 }
 
 async function handleNameTreeNodeExpand(node) {
+  if (!(await guardToponymRequest())) return;
+
   if (!node?.path?.length || node.loading) return;
 
   if (node.loaded || !node.lazy) {
@@ -371,6 +417,8 @@ async function handleNameTreeNodeExpand(node) {
 }
 
 async function handleNameTreeNamesMore(node) {
+  if (!(await guardToponymRequest())) return;
+
   if (!node?.path?.length || node.namesLoading || !node.namesHasMore) return;
 
   const requestId = nameTreeRequestId.value;
@@ -431,6 +479,8 @@ async function handleSelectPoint(point) {
 }
 
 async function handleLocalDetailRequest() {
+  if (!(await guardToponymRequest())) return;
+
   const id = selectedPoint.value?.id;
   if (!id) return;
 
@@ -523,7 +573,7 @@ function updateNameTreeMeta(payload) {
 }
 
 function mergeLazyTreePayload(node, payload) {
-  if (Array.isArray(payload.names)) {
+  if (payload.page != null && Array.isArray(payload.names)) {
     node.names = payload.page && payload.page > 1
       ? [...node.names, ...payload.names]
       : payload.names;
@@ -532,9 +582,7 @@ function mergeLazyTreePayload(node, payload) {
     node.loaded = true;
     node.expanded = true;
     node.lazy = false;
-  }
-
-  if (Array.isArray(payload.children)) {
+  } else if (Array.isArray(payload.children)) {
     node.children = buildToponymTreeNodes(payload.children, {
       parentPath: node.path,
       lazy: true,
@@ -573,7 +621,7 @@ function createToponymTreeNode(node, index, options = {}) {
     path,
     names: Array.isArray(node?.names) ? node.names.filter((item) => typeof item === 'string' && item) : [],
     children,
-    expanded: options.expanded || Boolean(children.length && !lazy),
+    expanded: Boolean(children.length && (options.expanded || !lazy)),
     lazy,
     loaded: Boolean(!lazy || children.length),
     loading: false,
@@ -603,6 +651,8 @@ function abortOfficialDetailRequest() {
 }
 
 async function handleOfficialDetailRequest() {
+  if (!(await guardToponymRequest())) return;
+
   const id = selectedPoint.value?.id || selectedLocalDetail.value?.id;
   if (!id) return;
 
@@ -669,60 +719,85 @@ async function handleToggleLayer({ key, visible }) {
 
 .toponyms-page {
   @include flex-col;
-  gap: 16px;
   width: 100%;
-  min-height: 70dvh;
-  padding: 20px;
+  min-height: calc(100dvh - 7dvh - 44px);
+  padding: 6px 20px 24px;
+  box-sizing: border-box;
 
-  &__controls {
-    width: 100%;
+  :deep(.query-search-entrance) {
+    @include flex-col;
+    flex: var(--query-expansion) 0 auto;
+    justify-content: center;
+    padding-bottom: calc((7dvh - 12px) * var(--query-expansion));
+    box-sizing: border-box;
   }
 
-  &__controls-inner {
-    display: grid;
-    grid-template-columns: minmax(220px, 0.34fr) minmax(0, 1fr);
-    gap: 16px;
-    align-items: center;
+  &.is-search-expanded :deep(.query-results) {
+    min-height: 0;
   }
 
   &__toolbar-copy {
     @include flex-col;
-    gap: 4px;
+    align-items: center;
+    gap: 8px;
     min-inline-size: 0;
+    text-align: center;
 
     h1,
     p {
       margin: 0;
     }
 
-    h1 {
-      color: var(--text-deep);
-      font-size: 18px;
-      line-height: 1.25;
-    }
-
     p {
       color: var(--text-secondary);
-      font-size: 12px;
+      font-size: var(--font-size-14);
       line-height: 1.5;
     }
   }
 
+  &__config-button {
+    @include flex-center;
+    inline-size: 40px;
+    block-size: 40px;
+    padding: 0;
+    border: 1px solid var(--border-control);
+    border-radius: var(--radius-md);
+    background: transparent;
+    box-shadow: none;
+    color: var(--text-deep);
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover .toponyms-page__config-icon {
+      transform: scale(1.2);
+    }
+  }
+
+  &__config-icon {
+    transition: transform 0.18s ease;
+  }
+
   &__workspace {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 360px;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.3fr);
     gap: 16px;
+    margin-top: 16px;
+    min-block-size: 80dvh;
     align-items: stretch;
   }
 
   &__chart {
-    min-block-size: 68dvh;
+    min-inline-size: 0;
+    min-block-size: 72dvh;
+    overflow: hidden;
   }
 
   &__chart-inner {
     @include flex-col;
     gap: 12px;
-    min-block-size: 68dvh;
+    padding: 16px;
+    min-block-size: 72dvh;
   }
 
   &__chart-header {
@@ -742,13 +817,13 @@ async function handleToggleLayer({ key, visible }) {
     span,
     small {
       color: var(--text-secondary);
-      font-size: 12px;
+      font-size: var(--font-size-12);
       line-height: 1.5;
     }
 
     strong {
       color: var(--text-deep);
-      font-size: 20px;
+      font-size: var(--font-size-20);
       line-height: 1.2;
       font-weight: 700;
     }
@@ -765,14 +840,14 @@ async function handleToggleLayer({ key, visible }) {
 
     strong {
       color: var(--text-deep);
-      font-size: 15px;
+      font-size: var(--font-size-16);
       line-height: 1.4;
       font-weight: 700;
     }
 
     span {
       color: var(--text-secondary);
-      font-size: 12px;
+      font-size: var(--font-size-12);
       line-height: 1.5;
     }
   }
@@ -784,15 +859,15 @@ async function handleToggleLayer({ key, visible }) {
 
 @media (max-aspect-ratio: 1 / 1) {
   .toponyms-page {
-    padding: 14px;
+    min-height: calc(100dvh - 16dvh - 44px);
+    padding: 1px 8px 16px;
+
+    :deep(.query-search-entrance) {
+      padding-bottom: calc((16dvh - 8px) * var(--query-expansion));
+    }
 
     &__workspace {
       grid-template-columns: 1fr;
-    }
-
-    &__controls-inner {
-      grid-template-columns: 1fr;
-      align-items: stretch;
     }
 
     &__chart-header {
@@ -802,6 +877,10 @@ async function handleToggleLayer({ key, visible }) {
     &__chart,
     &__chart-inner {
       min-block-size: 54dvh;
+    }
+
+    &__chart-inner {
+      padding: 12px;
     }
   }
 }

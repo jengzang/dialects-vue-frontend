@@ -4,7 +4,7 @@
     <div ref="desktopRef" class="commonbar-desktop">
       <div class="logo-and-title" @click="toggleSidebar" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
         <div class="logo-container">
-          <img class="logo" :src="faviconSrc" alt="Logo" />
+          <img class="logo" :src="faviconSrc" alt="方音圖鑑" />
         </div>
         <div v-if="titleImage" class="title">
           <img :src="titleImage" alt="Title" />
@@ -50,7 +50,7 @@
             flex: getOverflowFlex(t, isActiveComputed(t.tab), false),
             minWidth: getOverflowMinWidth(t, false),
             maxWidth: getOverflowMaxWidth(t, false),
-            fontSize: t.fontSize + 'rem'
+            fontSize: 'calc(clamp(var(--font-size-16), 1.5dvh, var(--font-size-20)) * ' + t.fontSize + ')'
           }"
           @click.prevent.stop="onClick(t, navigate, $event)"
           @mouseenter="(e) => { handleTabHover(t, t.tab, e); handleTabTooltipEnter(e, t.label) }"
@@ -58,7 +58,7 @@
           @touchstart="(e) => handleTabTooltipTouch(e, t.label)"
         >
           <span class="tab-inner" :class="{ active: isActiveComputed(t.tab) }">
-            <BarIcon :icon="t.icon" class="nav-icon" :weight="isActiveComputed(t.tab) ? 'fill' : 'bold'" :style="{ fontSize: ((t.mobileFontSize || t.fontSize) * 1) + 'rem' }" />
+            <BarIcon :icon="t.icon" class="nav-icon" :weight="isActiveComputed(t.tab) ? 'fill' : 'bold'" :style="{ fontSize: 'calc(clamp(var(--font-size-16), 1.5dvh, var(--font-size-20)) * ' + (t.mobileFontSize || t.fontSize) + ')' }" />
             <span
               class="label"
               v-if="!t.showLabelOnlyWhenActive || isActiveComputed(t.tab)"
@@ -94,7 +94,7 @@
     <!-- 移动端：单行布局（无 title.png） -->
     <div class="commonbar-mobile">
       <div class="logo-container" @click="toggleSidebar" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
-        <img class="logo" :src="faviconSrc" alt="Logo" />
+        <img class="logo" :src="faviconSrc" alt="方音圖鑑" />
       </div>
       <div v-if="title && showTitleOnMobile" class="title-text-mobile">
         {{ title }}
@@ -126,7 +126,7 @@
               flex: getOverflowFlex(t, isActiveComputed(t.tab), true),
               minWidth: getOverflowMinWidth(t, true),
               maxWidth: getOverflowMaxWidth(t, true),
-              fontSize: (t.mobileFontSize || t.fontSize) + 'rem'
+              fontSize: 'calc(clamp(var(--font-size-16), 1.5dvh, var(--font-size-20)) * ' + (t.mobileFontSize || t.fontSize) + ')'
             }"
             @click.prevent.stop="onClick(t, navigate, $event)"
             @mouseenter="(e) => handleTabTooltipEnter(e, t.label)"
@@ -135,7 +135,7 @@
           >
             <span class="tab-icon-label" :class="{ 'tab-icon-label--stack': !isActiveComputed(t.tab) && (t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) !== false }">
               <span class="tab-icon-row">
-                <BarIcon :icon="t.icon" class="nav-icon" :weight="isActiveComputed(t.tab) ? 'fill' : 'bold'" :style="{ fontSize: ((t.mobileFontSize || t.fontSize) * 1.2) + 'rem' }" />
+                <BarIcon :icon="t.icon" class="nav-icon" :weight="isActiveComputed(t.tab) ? 'fill' : 'bold'" :style="{ fontSize: 'calc(clamp(var(--font-size-16), 1.5dvh, var(--font-size-20)) * ' + ((t.mobileFontSize || t.fontSize) * 1.2) + ')' }" />
                 <svg v-if="getTabChildren(t.tab)?.length" class="tab-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 9l-7 7-7-7"/></svg>
                 <svg v-else-if="t.to && !t.to.startsWith('/villagesML')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
               </span>
@@ -231,14 +231,10 @@ import { useTabPill } from '@/composables/bar/useTabPill.js'
 import { useScrollSnap } from '@/composables/bar/useScrollSnap.js'
 import { useScrollArrows } from '@/composables/bar/useScrollArrows.js'
 import { useBarOverflow, getDefaultTabScroll, sortTabsByScroll } from '@/composables/bar/useBarOverflow.js'
-import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { currentColorTheme, getBrandAssets } from '@/composables/core/uiPreferences.js'
 import { isInternalAppNavigationTarget, navigatePlatformLink } from '@/platform/index.js'
 
-const faviconSrc = computed(() =>
-  currentColorTheme.value === COLOR_THEME_GREEN
-    ? '/brand/favicon_green.ico'
-    : '/brand/favicon.ico'
-)
+const faviconSrc = computed(() => getBrandAssets(currentColorTheme.value).logo)
 
 // Props definition
 const props = defineProps({
@@ -708,7 +704,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   min-width: 0;
   height: 6.5dvh;
   color: $primary-blue;
-  font-size: 1.3rem;
+  font-size: var(--font-size-20);
   text-align: center;
   text-decoration: none;
   white-space: nowrap;
@@ -836,8 +832,8 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .logo-container {
   flex-shrink: 0;
-  width: 6dvh;
-  min-width: 5dvh;
+  width: 6svh;
+  min-width: 5svh;
   height: 6dvh;
   cursor: pointer;
   border-radius: var(--radius-full);
@@ -862,7 +858,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   align-items: center;
 
   img {
-    height: 7dvh;
+    height: 7svh;
     object-fit: contain;
   }
 }
@@ -872,7 +868,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   align-items: center;
   height: 7dvh;
   color: var(--text-primary);
-  font-size: 1.8rem;
+  font-size: var(--font-size-28);
   font-weight: 600;
   white-space: nowrap;
   font-family: 'STKaiti', 'KaiTi', 'Kaiti SC', '楷体', 'Songti SC', 'Noto Serif SC', 'STSong', 'SimSun', 'PingFang SC', 'Microsoft YaHei', serif;
@@ -884,8 +880,8 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  min-width: 6dvh;
-  max-width: 10dvh;
+  min-width: 6svh;
+  max-width: 10svh;
   height: 6dvh;
   padding: 0 12px;
   color: $primary-blue-dark;
@@ -904,7 +900,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 .login-text {
   max-width: 80px;
   overflow: hidden;
-  font-size: 1.15rem;
+  font-size: var(--font-size-18);
   font-weight: 600;
   white-space: nowrap;
 }
@@ -917,7 +913,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 .title-text-mobile {
   flex-shrink: 0;
   color: var(--text-primary);
-  font-size: 1.2rem;
+  font-size: var(--font-size-20);
   font-weight: 600;
   white-space: nowrap;
 }
@@ -928,9 +924,9 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  width: 6dvh;
-  min-width: 6dvh;
-  max-width: 6dvh;
+  width: 6svh;
+  min-width: 6svh;
+  max-width: 6svh;
   height: 6dvh;
   cursor: pointer;
   user-select: none;
@@ -999,7 +995,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
       }
 
       .label--tiny {
-        font-size: 0.45em !important;
+        font-size: 0.5em !important;
         max-width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -1045,14 +1041,13 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
     .logo-container {
       flex-shrink: 0;
-      width: 5dvh;
-      min-width: 5dvh;
+      width: 5svh;
+      min-width: 5svh;
       height: 5dvh;
     }
 
     .login-container {
       flex-shrink: 0;
-      min-width: 6dvh;
       height: 6dvh;
     }
   }
@@ -1094,7 +1089,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   align-items: center;
   padding: 12px 16px;
   color: $text-primary;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 500;
   cursor: pointer;
   border-radius: var(--radius-md);
@@ -1111,13 +1106,13 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
   @media (max-aspect-ratio: 1/1) {
     padding: 10px 14px;
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 }
 
 .submenu-icon {
   flex-shrink: 0;
-  font-size: 18px;
+  font-size: var(--font-size-18);
 }
 
 .submenu-label {

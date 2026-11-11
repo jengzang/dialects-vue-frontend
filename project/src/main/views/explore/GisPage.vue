@@ -1370,7 +1370,7 @@ watch(getCurrentWorkbenchSignature, () => {
     &-title {
       margin: 0;
       display: flex;
-      font-size: 25px;
+      font-size: var(--font-size-24);
       justify-content: center;
       align-items: center;
     }
@@ -1424,13 +1424,13 @@ watch(getCurrentWorkbenchSignature, () => {
     }
 
     &-title {
-      font-size: 1rem;
+      font-size: var(--font-size-16);
       font-weight: 700;
       color: var(--text-deep);
     }
 
     &-text {
-      font-size: 0.92rem;
+      font-size: var(--font-size-14);
       color: var(--text-dark);
     }
   }
@@ -1448,7 +1448,7 @@ watch(getCurrentWorkbenchSignature, () => {
       rgba(var(--color-primary-rgb), 0.06)
     );
     color: var(--text-deep);
-    font-size: 0.92rem;
+    font-size: var(--font-size-14);
     box-shadow:
       inset 0 0 0.5px var(--glass-50),
       0 8px 18px rgba(var(--color-primary-rgb), 0.08);
@@ -1477,17 +1477,17 @@ watch(getCurrentWorkbenchSignature, () => {
     backdrop-filter: blur(8px);
     border-radius: 8px;
     color: #fff;
-    font-size: 0.88rem;
+    font-size: var(--font-size-14);
     pointer-events: none;
 
     strong {
       font-weight: 600;
-      font-size: 0.92rem;
+      font-size: var(--font-size-14);
     }
 
     .point-count,
     .partition-info {
-      font-size: 0.78rem;
+      font-size: var(--font-size-12);
       color: rgba(255, 255, 255, 0.7);
     }
   }
@@ -1515,7 +1515,7 @@ watch(getCurrentWorkbenchSignature, () => {
           min-height: 2.15rem;
           padding: 0 0.65rem;
           color: var(--text-deep);
-          font-size: 0.84rem;
+          font-size: var(--font-size-14);
         }
       }
     }
@@ -1566,7 +1566,7 @@ watch(getCurrentWorkbenchSignature, () => {
 .draw-card {
   &-icon {
     flex-shrink: 0;
-    font-size: 1.8rem;
+    font-size: var(--font-size-28);
   }
 
   &-text {
@@ -1575,13 +1575,13 @@ watch(getCurrentWorkbenchSignature, () => {
   }
 
   &-title {
-    font-size: 1.05rem;
+    font-size: var(--font-size-16);
     font-weight: 600;
     color: var(--text-deep);
   }
 
   &-desc {
-    font-size: 0.85rem;
+    font-size: var(--font-size-14);
     color: rgba(var(--text-deep-rgb), 0.65);
   }
 }
@@ -1633,7 +1633,7 @@ watch(getCurrentWorkbenchSignature, () => {
 
   &-icon {
     margin-bottom: 16px;
-    font-size: 44px;
+    font-size: var(--font-size-48);
     filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
     animation: floatIcon 3s ease-in-out infinite;
   }
@@ -1641,7 +1641,7 @@ watch(getCurrentWorkbenchSignature, () => {
   &-text {
     margin-bottom: 20px;
     color: var(--text-secondary);
-    font-size: 14px;
+    font-size: var(--font-size-14);
     line-height: 1.6;
   }
 }
@@ -1676,7 +1676,7 @@ watch(getCurrentWorkbenchSignature, () => {
 
 .add-point-partition-key {
   flex: 1;
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--text-deep);
   min-width: 0;
@@ -1686,7 +1686,7 @@ watch(getCurrentWorkbenchSignature, () => {
 }
 
 .add-point-partition-count {
-  font-size: 0.82rem;
+  font-size: var(--font-size-14);
   color: rgba(var(--text-deep-rgb), 0.6);
   background: var(--glass-70);
   padding: 0.15rem 0.5rem;
@@ -1698,7 +1698,7 @@ watch(getCurrentWorkbenchSignature, () => {
 .add-point-delete-btn {
   min-width: auto;
   padding: 0.3rem 0.65rem !important;
-  font-size: 0.82rem;
+  font-size: var(--font-size-14);
   border-color: rgba(var(--color-error-rgb, 220 38 38), 0.35);
   color: var(--color-error, #dc2626);
 

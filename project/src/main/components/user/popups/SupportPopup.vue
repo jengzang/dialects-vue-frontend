@@ -133,6 +133,13 @@ const donors = [
     name: '知乎人文',
     amount: '1000.00',
     method: '知乎钱包'
+  },
+  {
+    sortTime: '2026-11-04T15:57:52+08:00',
+    time: '2026.11.4 15:57:52',
+    name: '*严',
+    amount: '100.00',
+    method: '微信'
   }
 ]
 const sortedDonors = [...donors].sort((left, right) =>
@@ -148,7 +155,6 @@ function handleClose() {
 @use '@/styles/global/mixins' as *;
 
 $text-main: var(--text-primary);
-$text-secondary: rgba(0, 0, 0, 0.6);
 
 $surface-border: rgba(0, 0, 0, 0.06);
 $surface-background: var(--glass-60);
@@ -167,7 +173,7 @@ $transition-duration: 0.3s;
 
 .home-support-subtitle {
   margin: 0;
-  color: $text-secondary;
+  color: $text-main;
   text-align: center;
 }
 
@@ -202,7 +208,7 @@ $transition-duration: 0.3s;
     margin: 0.625rem 0 0;
     color: $text-main;
     text-align: center;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
     font-weight: 600;
   }
 }
@@ -216,7 +222,7 @@ $transition-duration: 0.3s;
   margin: 0;
   color: $text-main;
   text-align: center;
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   line-height: 1.6;
 }
 
@@ -238,7 +244,7 @@ $transition-duration: 0.3s;
     border-bottom: 1px solid $surface-border;
     color: $text-main;
     text-align: left;
-    font-size: 0.9375rem;
+    font-size: var(--font-size-16);
   }
 
   th {
@@ -281,7 +287,7 @@ $transition-duration: 0.3s;
     th,
     td {
       padding: 10px 12px;
-      font-size: 0.875rem;
+      font-size: var(--font-size-14);
     }
   }
 }

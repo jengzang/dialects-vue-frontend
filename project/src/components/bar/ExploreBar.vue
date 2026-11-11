@@ -3,10 +3,10 @@
     <div ref="desktopRef" class="explorebar-desktop">
       <div class="logo-and-title" @click="toggleSidebar" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
         <div class="logo-container">
-          <img class="logo" :src="faviconSrc" alt="Logo" />
+          <img class="logo" :src="faviconSrc" alt="方音圖鑑" />
         </div>
         <div class="title">
-          <img src="/brand/title.webp" alt="Title" class="title-logo" />
+          <img :src="brandTitleSrc" alt="方音圖鑑" class="title-logo" />
         </div>
       </div>
 
@@ -46,7 +46,7 @@
             flex: getOverflowFlex(t, isActiveComputed(t.tab), false),
             minWidth: getOverflowMinWidth(t, false),
             maxWidth: getOverflowMaxWidth(t, false),
-            fontSize: t.fontSize + 'rem'
+            fontSize: 'calc(clamp(var(--font-size-16), 1.5dvh, var(--font-size-20)) * ' + t.fontSize + ')'
           }"
           @click.prevent.stop="onClick(t, navigate, $event)"
           @mouseenter="(e) => { handleTabHover(t, t.tab, e); handleTabTooltipEnter(e, t.label) }"
@@ -87,7 +87,7 @@
 
     <div class="explorebar-mobile">
       <div class="logo-container" @click="toggleSidebar" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
-        <img class="logo" :src="faviconSrc" alt="Logo" />
+        <img class="logo" :src="faviconSrc" alt="方音圖鑑" />
       </div>
 
       <nav
@@ -116,7 +116,7 @@
               flex: getOverflowFlex(t, isActiveComputed(t.tab), true),
               minWidth: getOverflowMinWidth(t, true),
               maxWidth: getOverflowMaxWidth(t, true),
-              fontSize: (t.mobileFontSize || t.fontSize) + 'rem'
+              fontSize: 'calc(clamp(var(--font-size-16), 1.5dvh, var(--font-size-20)) * ' + (t.mobileFontSize || t.fontSize) + ')'
             }"
             @click.prevent.stop="onClick(t, navigate, $event)"
             @mouseenter="(e) => handleTabTooltipEnter(e, t.label)"
@@ -213,7 +213,7 @@ import { useTabPill } from '@/composables/bar/useTabPill.js'
 import { useScrollSnap } from '@/composables/bar/useScrollSnap.js'
 import { useScrollArrows } from '@/composables/bar/useScrollArrows.js'
 import { useBarOverflow, getDefaultTabScroll, sortTabsByScroll } from '@/composables/bar/useBarOverflow.js'
-import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { currentColorTheme, getBrandAssets } from '@/composables/core/uiPreferences.js'
 import { navigatePlatformLink } from '@/platform/index.js'
 
 const props = defineProps({
@@ -227,11 +227,8 @@ const props = defineProps({
   },
 })
 
-const faviconSrc = computed(() =>
-  currentColorTheme.value === COLOR_THEME_GREEN
-    ? '/brand/favicon_green.ico'
-    : '/brand/favicon.ico'
-)
+const faviconSrc = computed(() => getBrandAssets(currentColorTheme.value).logo)
+const brandTitleSrc = computed(() => getBrandAssets(currentColorTheme.value).title)
 
 const { t } = useI18n()
 const route = useRoute()
@@ -654,7 +651,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   min-width: 0;
   height: $desktop-tab-height;
   color: $primary-blue;
-  font-size: 1.3rem;
+  font-size: var(--font-size-20);
   text-align: center;
   text-decoration: none;
   white-space: nowrap;
@@ -782,8 +779,8 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .logo-container {
   flex-shrink: 0;
-  width: 5.5dvh;
-  min-width: 5dvh;
+  width: 5.5svh;
+  min-width: 5svh;
   height: 5.5dvh;
   cursor: pointer;
   border-radius: var(--radius-full);
@@ -808,7 +805,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   align-items: center;
 
   img {
-    height: 7dvh;
+    height: 7svh;
     object-fit: contain;
   }
 }
@@ -818,8 +815,8 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  min-width: 6dvh;
-  max-width: 10dvh;
+  min-width: 6svh;
+  max-width: 10svh;
   height: 6dvh;
   padding: 0 12px;
   color: $primary-blue-dark;
@@ -838,7 +835,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 .login-text {
   max-width: 80px;
   overflow: hidden;
-  font-size: 1.15rem;
+  font-size: var(--font-size-18);
   font-weight: 600;
   white-space: nowrap;
 }
@@ -849,9 +846,9 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  width: 6dvh;
-  min-width: 6dvh;
-  max-width: 6dvh;
+  width: 6svh;
+  min-width: 6svh;
+  max-width: 6svh;
   height: 6dvh;
   cursor: pointer;
   user-select: none;
@@ -924,7 +921,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
       }
 
       .label--tiny {
-        font-size: 0.45em !important;
+        font-size: 0.5em !important;
         max-width: 100%;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -970,14 +967,13 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
     .logo-container {
       flex-shrink: 0;
-      width: 5dvh;
-      min-width: 5dvh;
+      width: 5svh;
+      min-width: 5svh;
       height: 5dvh;
     }
 
     .login-container {
       flex-shrink: 0;
-      min-width: 6dvh;
       height: 6dvh;
     }
   }
@@ -1019,7 +1015,7 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   align-items: center;
   padding: 12px 16px;
   color: $text-primary;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 500;
   cursor: pointer;
   border-radius: var(--radius-md);
@@ -1036,13 +1032,13 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
   @media (max-aspect-ratio: 1/1) {
     padding: 10px 14px;
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 }
 
 .submenu-icon {
   flex-shrink: 0;
-  font-size: 18px;
+  font-size: var(--font-size-18);
 }
 
 .submenu-label {

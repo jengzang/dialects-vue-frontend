@@ -117,14 +117,14 @@ function resolveToneType(item) {
 
   .feature-card-title {
     margin: 0;
-    font-size: 18px;
+    font-size: var(--font-size-18);
     font-weight: 700;
     color: $text-strong;
   }
 
   .feature-card-description {
     margin: 0;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     color: $text-muted;
   }
 }
@@ -146,7 +146,7 @@ function resolveToneType(item) {
 }
 
 .feature-card-name {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 700;
   color: $text-strong;
 }
@@ -157,7 +157,7 @@ function resolveToneType(item) {
   min-height: 26px;
   padding: 0 10px;
   border-radius: var(--radius-pill);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 700;
 
   &[data-tone='initial'] {
@@ -197,7 +197,7 @@ function resolveToneType(item) {
 }
 
 .feature-card-badge {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: $text-secondary;
   font-weight: 600;
 }

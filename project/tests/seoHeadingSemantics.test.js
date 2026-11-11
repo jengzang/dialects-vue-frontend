@@ -131,7 +131,7 @@ describe('SEO heading semantics', () => {
     }
   })
 
-  it('provides a header slot for tabbed pages to render their h1 above tabs', () => {
+  it('supports header slots and renders tab page titles with semantic h1 elements', () => {
     const tabSwitcher = readSource('src/components/common/TabSwitcher.vue')
     const tabbedMenuPages = [
       'src/main/views/menu/PhoPage.vue',
@@ -145,8 +145,8 @@ describe('SEO heading semantics', () => {
     for (const file of tabbedMenuPages) {
       const source = readSource(file)
 
-      expect(source, `${file} renders a TabSwitcher header`).toContain('<template #header>')
-      expect(source, `${file} renders a page h1 with BarIcon`).toMatch(/<h1 class="page-title">[\s\S]*?<BarIcon[\s\S]*?<\/h1>/)
+      expect(source, `${file} renders a tab page`).toContain('<TabSwitcher')
+      expect(source, `${file} renders a page h1 with BarIcon`).toMatch(/<h1\b[^>]*class="page-title"[^>]*>[\s\S]*?<BarIcon[\s\S]*?<\/h1>/)
     }
   })
 
@@ -283,7 +283,9 @@ describe('SEO heading semantics', () => {
       'src/main/views/menu/support/PrivacyPage.vue',
       'src/main/views/menu/support/SettingsPage.vue',
       'src/main/views/menu/support/SourcePage.vue',
-      'src/main/views/menu/support/AboutPage.vue',
+      'src/main/views/menu/support/about/AboutIntro.vue',
+      'src/main/views/menu/support/about/AboutSuggestion.vue',
+      'src/main/views/menu/support/about/AboutSupport.vue',
       'src/main/views/menu/portals/ToolsPage.vue',
       'src/main/views/menu/portals/VillagesPage.vue',
       'src/main/views/menu/ResultPage.vue',

@@ -3,7 +3,8 @@
   "tab1": {
     "title": "查字",
     "label": "请输入待查汉字",
-    "placeholder": "可输入一个或多个汉字",
+    "placeholder": "请输入汉字搜索，单次最多5个汉字，繁简均可",
+    "notesCrossLink": "根据注释查询汉字/□(有音无字)？前往字表注释",
     "maxCharsWarning": "最多输入{max}个字，已自动截断",
     "button": "查询",
     "description": "查询汉字的读音、地位及注释"
@@ -13,6 +14,7 @@
     "placeholder": "请输入中古音",
     "button": "查询",
     "description": "韵书 → 读音 • 按韵书地位分别整理声韵调的读音",
+    "selectHint": "请选择要分析的韵书地位",
     "noExclude": "不排除",
     "selectAll": "全选",
     "cards": {
@@ -32,6 +34,7 @@
     "placeholder": "请输入音位",
     "button": "查询",
     "description": "读音 → 韵书 • 分析各声韵调的音位来源于什么韵书地位",
+    "selectHint": "请选择要分析的韵书地位",
     "noExclude": "不排除",
     "selectAll": "全选",
     "analysisText": "分析<strong>{card}</strong>音节的韵书来源，即当今的同<strong>{card}</strong>字分别来自哪些韵书[<strong>{keys}</strong>]",

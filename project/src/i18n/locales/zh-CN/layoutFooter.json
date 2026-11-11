@@ -21,10 +21,12 @@
     "en": "English"
   },
   "theme": {
-    "blue": "蓝色",
-    "light": "浅色",
-    "dark": "深色",
-    "green": "绿色"
+    "blue-light": "蓝色 · 浅色",
+    "red-light": "红色 · 浅色",
+    "blue-dark": "蓝色 · 深色",
+    "green-dark": "绿色 · 深色",
+    "red-dark": "红色 · 深色",
+    "green-light": "绿色 · 浅色"
   },
   "pages": {
     "generic": {
@@ -39,13 +41,17 @@
       "title": "关于方音图鉴",
       "description": "查看网站功能介绍、发展历史、特别鸣谢等"
     },
+    "menuAboutHistory": {
+      "title": "开发历程",
+      "description": "查看网站的开发历程、功能更新记录与开发感悟。"
+    },
     "menuAboutSuggestion": {
       "title": "反馈入口",
       "description": "跳转github提出issue或通过知乎 AI-works 反映建议，或直接在本站内提交反馈。"
     },
     "menuAboutLike": {
       "title": "支持项目",
-      "description": "查看项目仓库、作者的开发感悟，以及扫码支持作者。"
+      "description": "查看项目仓库、关注作者，以及扫码支持作者。"
     },
     "menuQueryZhonggu": {
       "title": "查中古",
@@ -128,7 +134,7 @@
       "description": "字表检查、合并，粤拼转换，在线praat工具，GIS绘图工具等入口。"
     },
     "menuVocabularyView": {
-      "title": "词表查询",
+      "title": "方言词表查询",
       "description": "在线查询全国各地方言词汇，比较同一词语在不同地区的方言说法、IPA和词义解释等。支持按书面语标准词、方言词、音标或释义搜索，并通过卡片、地图和表格三种模式浏览方言词表。"
     },
     "menuVocabularyImport": {
@@ -205,7 +211,7 @@
     },
     "exploreVillagesToponyms": {
       "title": "地名检索",
-      "description": "自然村地名检索与分布地图开发中，规划按村名及行政信息查询村落；目前地名数据功能暂不可用。"
+      "description": "查询汉字在各地自然村地名中的分布，探索各地的地名规律、特点"
     },
     "exploreVillagesGd": {
       "title": "广东自然村树",
@@ -241,7 +247,7 @@
     }
   },
   "legal": {
-    "copyright": "© 2026 方音图鉴",
+    "copyright": "© 2025–2026 方音图鉴",
     "icp": "粤ICP备2025466875号"
   },
   "share": {

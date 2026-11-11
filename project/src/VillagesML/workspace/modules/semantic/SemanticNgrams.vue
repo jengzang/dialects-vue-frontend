@@ -335,13 +335,13 @@ watch(detailMode, (val) => {
 
 .bigrams h3,
 .trigrams h3 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   margin-bottom: 15px;
   color: var(--text-primary);
 }
 
 .subsection-description {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-bottom: 15px;
   line-height: 1.5;
@@ -358,13 +358,13 @@ watch(detailMode, (val) => {
 }
 
 .input-label {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 500;
   color: var(--text-primary);
 }
 
 .input-hint {
-  font-size: 11px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   margin-top: 2px;
 }
@@ -394,14 +394,14 @@ watch(detailMode, (val) => {
 
 .bigram-text,
 .trigram-text {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .bigram-count,
 .trigram-count {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
   text-align: center;
 }
@@ -419,7 +419,7 @@ watch(detailMode, (val) => {
   background: rgba(var(--vml-blue-rgb), 0.15);
   color: var(--color-primary);
   border-radius: var(--radius-md);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 500;
 }
 
@@ -433,7 +433,7 @@ watch(detailMode, (val) => {
 }
 
 .section-description {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
   margin-bottom: 16px;
   line-height: 1.6;

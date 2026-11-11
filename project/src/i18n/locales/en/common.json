@@ -22,6 +22,7 @@
     "collapse": "Collapse"
   },
   "label": {
+    "all": "All",
     "loading": "Loading...",
     "noData": "No Data",
     "error": "Error",
@@ -37,6 +38,9 @@
     "search": "Enter search terms"
   },
   "components": {
+    "cardExcludeRow": {
+      "hint": "Select initial / rime / tone"
+    },
     "multiSelect": {
       "selectAll": "All",
       "deselectAll": "Clear",
@@ -81,7 +85,8 @@
       "exportSource": "Export Original File",
       "exporting": "Exporting...",
       "reselect": "Choose Another File",
-      "confirmAndUse": "Confirm Mapping and Continue"
+      "fullscreenPreview": "Fullscreen Preview",
+      "confirmAndUse": "Confirm and Continue"
     },
     "empty": {
       "title": "Select a spreadsheet file first",

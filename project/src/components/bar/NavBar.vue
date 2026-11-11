@@ -2,7 +2,7 @@
   <div
     ref="navbarRef"
     class="navbar"
-    :class="{ 'navbar--collapsing': collapseProgress > 0 }"
+    :class="{ 'navbar--collapsing': collapseProgress > 0 && collapseProgress < 1 }"
     :style="navbarStyle"
   >
     <!-- 桌面端的布局 -->
@@ -13,10 +13,10 @@
     >
       <div  class="navbar-item logo-and-title" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
         <div @click="toggleSidebar" class="logo-container desktop-brand-logo">
-          <img class="logo" :src="faviconSrc" alt="Logo" />
+          <img class="logo" :src="faviconSrc" alt="方音圖鑑" />
         </div>
         <div class="title">
-          <img src="/brand/title.webp" alt="Title" class="title-logo" />
+          <img :src="brandTitleSrc" alt="方音圖鑑" class="title-logo" />
         </div>
       </div>
       <button
@@ -61,7 +61,7 @@
                 flex: getOverflowFlex(t, isMenuTabActive(t.tab), false),
                 minWidth: getOverflowMinWidth(t, false),
                 maxWidth: getOverflowMaxWidth(t, false),
-                fontSize: t.fontSize + 'rem'
+                fontSize: 'calc(clamp(var(--font-size-16), 1.5dvh, var(--font-size-20)) * ' + t.fontSize + ')'
               }"
               @click.prevent="onMenuBarClick(t, navigate)"
               @mouseenter="(e) => handleTabTooltipEnter(e, t.label)"
@@ -119,10 +119,10 @@
       <div class="navbar-top">
         <div class="navbar-item logo-and-title" :style="{ zIndex: isSidebarVisible ? '1100' : '999' }">
           <div @click="toggleSidebar" class="logo-container mobile-brand-logo">
-            <img class="logo" :src="faviconSrc" alt="Logo" />
+            <img class="logo" :src="faviconSrc" alt="方音圖鑑" />
           </div>
           <div class="title">
-            <img src="/brand/title.webp" alt="Title" class="title-logo" />
+            <img :src="brandTitleSrc" alt="方音圖鑑" class="title-logo" />
           </div>
         </div>
         <div class="navbar-top-actions">
@@ -166,7 +166,7 @@
                 flex: getOverflowFlex(t, isMenuTabActive(t.tab), true),
                 minWidth: getOverflowMinWidth(t, true),
                 maxWidth: getOverflowMaxWidth(t, true),
-                fontSize: (t.mobileFontSize || t.fontSize) + 'rem'
+                fontSize: 'calc(clamp(var(--font-size-16), 1.5dvh, var(--font-size-20)) * ' + (t.mobileFontSize || t.fontSize) + ')'
               }"
               @click.prevent="onMenuBarClick(t, navigate)"
               @mouseenter="(e) => handleTabTooltipEnter(e, t.label)"
@@ -252,14 +252,11 @@ import { useTabPill } from '@/composables/bar/useTabPill.js'
 import { useScrollSnap } from '@/composables/bar/useScrollSnap.js'
 import { useScrollArrows } from '@/composables/bar/useScrollArrows.js'
 import { useBarOverflow, getDefaultTabScroll, sortTabsByScroll } from '@/composables/bar/useBarOverflow.js'
-import { currentColorTheme, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { currentColorTheme, getBrandAssets } from '@/composables/core/uiPreferences.js'
 import { showSuccess } from '@/utils/ui/message.js'
 
-const faviconSrc = computed(() =>
-  currentColorTheme.value === COLOR_THEME_GREEN
-    ? '/brand/favicon_green.ico'
-    : '/brand/favicon.ico'
-)
+const faviconSrc = computed(() => getBrandAssets(currentColorTheme.value).logo)
+const brandTitleSrc = computed(() => getBrandAssets(currentColorTheme.value).title)
 
 const { t } = useI18n()
 const route = useRoute()
@@ -292,8 +289,15 @@ const navbarStyle = computed(() => {
 const getMaxScrollableDistance = () =>
   Math.max(document.documentElement.scrollHeight - window.innerHeight, 0)
 
+const getContentScrollableDistance = () => {
+  const footer = document.querySelector('[data-app-footer]')
+  if (!footer) return getMaxScrollableDistance()
+  return Math.max(footer.getBoundingClientRect().top + window.scrollY - window.innerHeight, 0)
+}
+
 const updateNavbarCollapse = () => {
-  const scrollTop = window.scrollY || document.documentElement.scrollTop
+  const contentScrollableDistance = getContentScrollableDistance()
+  const scrollTop = Math.min(window.scrollY || document.documentElement.scrollTop, contentScrollableDistance)
   const previousScrollTop = lastCollapseScrollTop
   lastCollapseScrollTop = scrollTop
   viewportWidth.value = document.documentElement.clientWidth
@@ -304,7 +308,7 @@ const updateNavbarCollapse = () => {
     return
   }
 
-  if (getMaxScrollableDistance() <= MIN_SCROLLABLE_DISTANCE) {
+  if (contentScrollableDistance <= MIN_SCROLLABLE_DISTANCE) {
     manualExpandScrollStart = null
     collapseProgress.value = 0
     return
@@ -331,7 +335,7 @@ const updateNavbarCollapse = () => {
 }
 
 const expandNavbar = () => {
-  const scrollTop = window.scrollY || document.documentElement.scrollTop
+  const scrollTop = Math.min(window.scrollY || document.documentElement.scrollTop, getContentScrollableDistance())
   lastCollapseScrollTop = scrollTop
   manualExpandScrollStart = scrollTop > MANUAL_EXPAND_MIN_SCROLL ? scrollTop : null
   collapseProgress.value = 0
@@ -475,7 +479,8 @@ $mobile-aspect-ratio: 1;
 // 桌面端不再直接使用 10dvh，避免高分辨率屏幕上导航栏过高。
 $desktop-navbar-height: clamp(50px, 6.8dvh, 70px);
 $desktop-control-size: clamp(44px, 5dvh, 56px);
-$desktop-title-height: clamp(40px, 6.2dvh, 60px);
+$desktop-control-width: clamp(44px, 5svh, 56px);
+$desktop-title-height: clamp(40px, 6.2svh, 60px);
 
 @mixin soft-glass-background {
   background: linear-gradient(
@@ -524,6 +529,11 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
     background-position 0.2s ease-out;
 }
 
+.navbar.navbar--collapsing {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
 @media (prefers-contrast: more) {
   .navbar {
     background: var(--surface-panel-strong);
@@ -558,7 +568,7 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
 .navbar-item {
   padding: 4px;
   color: var(--text-white);
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   transition: transform 0.3s;
 
   @include flex-center;
@@ -632,14 +642,14 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
 }
 
 .desktop-brand-logo {
-  width: $desktop-control-size;
-  min-width: $desktop-control-size;
+  width: $desktop-control-width;
+  min-width: $desktop-control-width;
   height: $desktop-control-size;
 }
 
 .desktop-login-button {
   width: auto;
-  min-width: $desktop-control-size;
+  min-width: $desktop-control-width;
   height: $desktop-control-size;
   margin-right: 10px;
   padding-inline: 12px;
@@ -685,7 +695,7 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   white-space: nowrap;
   text-align: center;
   text-decoration: none;
-  font-size: 1.3rem;
+  font-size: var(--font-size-20);
   cursor: pointer;
   user-select: none;
   .tab-external {
@@ -770,10 +780,10 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
 }
 
 .navbar-desktop .avatar-container {
-  flex: 0 0 calc(#{$desktop-control-size} + 10px);
-  width: calc(#{$desktop-control-size} + 10px);
-  min-width: calc(#{$desktop-control-size} + 10px);
-  max-width: calc(#{$desktop-control-size} + 10px);
+  flex: 0 0 calc(#{$desktop-control-width} + 10px);
+  width: calc(#{$desktop-control-width} + 10px);
+  min-width: calc(#{$desktop-control-width} + 10px);
+  max-width: calc(#{$desktop-control-width} + 10px);
   height: calc(#{$desktop-control-size} + 10px);
   margin-right: 10px;
 }
@@ -785,7 +795,7 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
   width: 28px;
   height: 28px;
   margin-right: 2px;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   cursor: pointer;
   user-select: none;
   border-radius: var(--radius-full);
@@ -951,7 +961,7 @@ $desktop-title-height: clamp(40px, 6.2dvh, 60px);
     }
 
     .label--tiny {
-      font-size: 0.45em !important;
+      font-size: 0.5em !important;
       max-width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;

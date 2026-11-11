@@ -21,10 +21,12 @@
     "en": "English"
   },
   "theme": {
-    "blue": "Blue",
-    "light": "Light",
-    "dark": "Dark",
-    "green": "Green"
+    "blue-light": "Blue · Light",
+    "red-light": "Red · Light",
+    "blue-dark": "Blue · Dark",
+    "green-dark": "Green · Dark",
+    "red-dark": "Red · Dark",
+    "green-light": "Green · Light"
   },
   "pages": {
     "generic": {
@@ -39,13 +41,17 @@
       "title": "About Chinese Dialect Atlas",
       "description": "View the site's features, development history, acknowledgments, and more."
     },
+    "menuAboutHistory": {
+      "title": "Development Journey",
+      "description": "Explore the site's development journey, feature updates, and reflections."
+    },
     "menuAboutSuggestion": {
       "title": "Feedback Entry",
       "description": "Open an issue on GitHub, send suggestions through Zhihu AI-works, or submit feedback directly on this site."
     },
     "menuAboutLike": {
       "title": "Support",
-      "description": "View the project repository and the author's development reflections, or scan a QR code to support the author."
+      "description": "View the project repository, follow the author, or scan a QR code to support the author."
     },
     "menuQueryZhonggu": {
       "title": "Middle Chinese Query",
@@ -128,7 +134,7 @@
       "description": "Entries for character-table checking and merging, Jyutping conversion, the online Praat tool, GIS drawing tools, and more."
     },
     "menuVocabularyView": {
-      "title": "Vocabulary Browser",
+      "title": "Dialect Vocabulary Search",
       "description": "Look up dialect vocabulary across China online and compare local expressions, IPA pronunciations, and meanings for the same word across regions. Search standard written words, dialect words, transcriptions, or meanings, and browse vocabulary in card, map, and table views."
     },
     "menuVocabularyImport": {
@@ -205,7 +211,7 @@
     },
     "exploreVillagesToponyms": {
       "title": "Toponym Search",
-      "description": "Natural village place-name search and distribution maps are under development. Village and administrative searches are planned; place-name data is currently unavailable."
+      "description": "Search for a Chinese character to see how it appears in natural-village names across regions and explore regional place-name patterns and characteristics."
     },
     "exploreVillagesGd": {
       "title": "Guangdong Village Tree",
@@ -241,7 +247,7 @@
     }
   },
   "legal": {
-    "copyright": "© 2026 Chinese Dialect Atlas",
+    "copyright": "© 2025–2026 Chinese Dialect Atlas",
     "icp": "粤ICP备2025466875号"
   },
   "share": {

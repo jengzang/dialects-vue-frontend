@@ -111,6 +111,7 @@ export const mapStore = reactive({
     mapData: null,            // 存放基础地图数据 (center, zoom, locations)
     mergedData: [],           // 存放特征数据 (results)
     isoplethPayload: null, // 等值線專用數據，避免污染 mergedData
+    adminBoundary: null,      // 独立保存边界配置及 GeoJSON，供地图重绘和重新挂载时恢复
     loading: false,           // 共享加载状态
     selectedFeature: '',      // 当前选中的特征
     selectedFeaturePhonology: '', // 当前选中的特征的声韵调类型

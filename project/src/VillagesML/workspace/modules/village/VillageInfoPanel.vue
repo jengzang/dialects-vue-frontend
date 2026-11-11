@@ -116,13 +116,13 @@ defineProps({
 }
 
 .additional-info h4 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   margin-bottom: 10px;
   color: var(--text-primary);
 }
 
 .additional-info pre {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   overflow-x: auto;
 }

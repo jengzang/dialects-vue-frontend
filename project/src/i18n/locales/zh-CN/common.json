@@ -22,6 +22,7 @@
     "collapse": "收起"
   },
   "label": {
+    "all": "全部",
     "loading": "加载中...",
     "noData": "暂无数据",
     "error": "错误",
@@ -39,6 +40,9 @@
     "search": "请输入搜索内容"
   },
   "components": {
+    "cardExcludeRow": {
+      "hint": "请选择声/韵/调"
+    },
     "multiSelect": {
       "selectAll": "全选",
       "deselectAll": "取消全选",
@@ -83,7 +87,8 @@
       "exportSource": "导出源文件",
       "exporting": "导出中...",
       "reselect": "重新选择文件",
-      "confirmAndUse": "确认列匹配并使用"
+      "fullscreenPreview": "全屏预览",
+      "confirmAndUse": "确认使用"
     },
     "empty": {
       "title": "请先选择一个表格文件",

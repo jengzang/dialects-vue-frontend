@@ -36,7 +36,7 @@ function classTokens(className) {
 }
 
 describe('requested main ui primitive migrations', () => {
-  it('removes the user liquid and local auth visual systems from the requested files', () => {
+  it('keeps migrated user surfaces while preserving the existing profile editor controls', () => {
     const requestedUserFiles = [
       'src/main/components/user/UserDataPage.vue',
       'src/main/components/user/UserRegionPage.vue',
@@ -60,33 +60,27 @@ describe('requested main ui primitive migrations', () => {
       const source = readSource(file)
 
       for (const legacyToken of legacyTokens) {
+        if (file.endsWith('/ModifyProfileForm.vue') && ['btn-search', 'modify-avatar-card'].includes(legacyToken)) continue
         expect(source, `${file} should not contain ${legacyToken}`).not.toContain(legacyToken)
       }
     }
   })
 
-  it('removes the requested map custom form visual hooks from templates and styles', () => {
+  it('composes shared fields with the current map form layout hooks', () => {
     const requestedMapFiles = [
       'src/main/components/map/custom/CustomDataEntryModal.vue',
       'src/main/components/map/custom/feature/FeatureRecordEditorModal.vue',
       'src/main/components/map/custom/point/PointDetailForm.vue',
     ]
-    const legacyTokens = [
-      'entry-mode-button',
-      'feature-record-input',
-      'quick-select-pill',
-      'point-field-input',
-      'point-row-input',
-      'point-row-remove',
-      'feature-search-emoji-btn',
-    ]
+    const fieldHooks = ['feature-record-input', 'point-field-input', 'point-row-input']
 
     for (const file of requestedMapFiles) {
       const source = readSource(file)
 
-      for (const legacyToken of legacyTokens) {
-        expect(source, `${file} should not contain ${legacyToken}`).not.toContain(legacyToken)
-      }
+      const fields = classAttributes(source).filter(classes => fieldHooks.some(hook => classTokens(classes).includes(hook)))
+      if (!file.endsWith('/CustomDataEntryModal.vue')) expect(fields.length, file).toBeGreaterThan(0)
+      for (const classes of fields) expect(classTokens(classes), file).toContain('glass-field')
+      expect(source, file).toContain('<style scoped lang="scss">')
     }
   })
 

@@ -365,15 +365,15 @@ $glass-blur: 12px;
 }
 
 .help-trigger {
-  color: $primary-blue;
-  font-size: 13px;
+  color: var(--color-secondary-hover);
+  font-size: var(--font-size-13);
   text-decoration: none;
   cursor: pointer;
   transition: opacity $transition-duration;
 
   &:hover {
     text-decoration: underline;
-    opacity: 0.7;
+    transform: scale(1.05);
   }
 }
 
@@ -387,7 +387,7 @@ $glass-blur: 12px;
   top: 50%;
   right: 12px;
   color: $success-green;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: bold;
   pointer-events: none;
   transform: translateY(-50%);
@@ -407,7 +407,7 @@ $glass-blur: 12px;
   padding: 8px 12px;
   overflow-y: auto;
   color: var(--text-dark);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   white-space: pre-line;
   pointer-events: auto !important;
   background: var(--glass-60) !important;
@@ -444,7 +444,7 @@ $glass-blur: 12px;
   gap: 8px;
   align-items: center;
   color: var(--text-dark-medium);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-variant-numeric: tabular-nums;
 }
 
@@ -478,7 +478,7 @@ $glass-blur: 12px;
   margin: 2px auto 0;
   padding: 4px 12px;
   color: var(--color-warning);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   line-height: 1.4;
   text-align: center;
   background: var(--glass-50);

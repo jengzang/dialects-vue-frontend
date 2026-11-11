@@ -469,6 +469,9 @@ const convertToGeoJSON = (data) => {
       naturalVillage: aggregateField(item => item.naturalVillage),
       yindianRegion: aggregateField(item => item.yindianRegion),
       atlasRegion: aggregateField(item => item.atlasRegion),
+      vocabularySource: aggregateField(item => item.vocabularySource),
+      description: aggregateField(item => item.description),
+      other: aggregateField(item => item.other),
       ...Object.fromEntries(TONE_FIELD_KEYS.map(key => [key, aggregateField(item => item[key])])),
     }
 
@@ -588,6 +591,9 @@ const handleMarkerClick = (properties) => {
     naturalVillage: properties.naturalVillage,
     yindianRegion: properties.yindianRegion,
     atlasRegion: properties.atlasRegion,
+    vocabularySource: properties.vocabularySource,
+    description: properties.description,
+    other: properties.other,
     ...Object.fromEntries(TONE_FIELD_KEYS.map(key => [key, properties[key]])),
     itemCount: Number(properties.itemCount) || 0,
   })
@@ -760,7 +766,7 @@ watch(displayMode, () => {
 
 
 .loading-text {
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 500;
   color: var(--text-primary);
   letter-spacing: 0.3px;
@@ -802,7 +808,7 @@ watch(displayMode, () => {
   border: 1px solid var(--border-light-gray);
   padding: 8px 12px;
   border-radius: var(--radius-sm2);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   cursor: pointer;
   outline: none;
   transition: border 0.3s;
@@ -818,7 +824,7 @@ watch(displayMode, () => {
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-muted)
 }
 
@@ -838,7 +844,7 @@ watch(displayMode, () => {
   border: none;
   background: transparent;
   border-radius: var(--radius-sm);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   cursor: pointer;
   transition: all 0.2s;
   color: var(--text-tertiary)
@@ -854,8 +860,7 @@ watch(displayMode, () => {
   font-weight: 600;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
-  :root[data-color-theme='green'] &,
-  :root[data-color-theme='dark'] & {
+  :root[data-color-mode='dark'] & {
     color: var(--text-primary);
     background: var(--surface-panel-strong);
   }
@@ -883,7 +888,7 @@ watch(displayMode, () => {
   padding: 8px;
   border-radius: var(--radius-sm2);
   cursor: pointer;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   transition: background 0.2s;
 }
 
@@ -905,7 +910,7 @@ watch(displayMode, () => {
   top: 24px;
   right: 24px;
   padding: 12px 24px;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-dark);
   background: var(--glass-70);
@@ -937,7 +942,7 @@ watch(displayMode, () => {
   padding: 4px 10px;
   border-radius: var(--radius-sm);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   white-space: nowrap;
   font-family: var(--font-sans);
   font-weight: 500;
@@ -971,13 +976,13 @@ watch(displayMode, () => {
 }
 
 :deep(.vocabulary-marker__overview-name) {
-  color: var(--text-primary);
+  color: #1d1d1f;
   font-size: 1em;
   font-weight: 700;
 }
 
 :deep(.vocabulary-marker__overview-count) {
-  color: var(--text-primary);
+  color: #1d1d1f;
   background: rgba(255, 255, 255, 0.68);
   font-size: 0.9em;
   font-weight: 600;

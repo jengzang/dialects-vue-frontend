@@ -50,7 +50,7 @@ describe('downloadTabularSource helpers', () => {
 
   it('downloads resolved payload through object url flow', async () => {
     const appendChild = vi.spyOn(document.body, 'appendChild')
-    const removeChild = vi.spyOn(document.body, 'removeChild')
+    const remove = vi.spyOn(Element.prototype, 'remove')
     const click = vi.fn()
     const anchor = document.createElement('a')
     vi.spyOn(anchor, 'click').mockImplementation(click)
@@ -73,7 +73,8 @@ describe('downloadTabularSource helpers', () => {
     expect(click).toHaveBeenCalledTimes(1)
     expect(global.URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock-url')
     expect(appendChild).toHaveBeenCalledTimes(1)
-    expect(removeChild).toHaveBeenCalledTimes(1)
+    expect(remove).toHaveBeenCalledTimes(1)
+    expect(anchor.isConnected).toBe(false)
     createElement.mockRestore()
   })
 })

@@ -300,13 +300,15 @@ import ResultViewSwitcher from '@/components/common/ResultViewSwitcher.vue'
 import QuerySearchEntrance from '@/components/common/QuerySearchEntrance.vue'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 import { useStorageState } from '@/composables/core/useStorageState.js'
+import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const converter = OpenCC.Converter({ from: 'tw', to: 'cn' })
-const vocabularyCache = useStorageState('yubao_vocabulary_all', { defaultValue: null })
-const grammarCache = useStorageState('yubao_grammar_all', { defaultValue: null })
+const yubaoCacheVersion = getHomeUpdateNotice(() => '').dbVersion || 'default'
+const vocabularyCache = useStorageState(`yubao_vocabulary_all:${yubaoCacheVersion}`, { defaultValue: null })
+const grammarCache = useStorageState(`yubao_grammar_all:${yubaoCacheVersion}`, { defaultValue: null })
 
 // --- 基础状态 ---
 const { state: activeTab, set: setActiveTab } = useRouteQueryState('tab', {
@@ -934,8 +936,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
     0 1px 3px rgba(0, 0, 0, 0.08),
     0 1px 2px rgba(0, 0, 0, 0.06);
 
-  :root[data-color-theme='green'] &,
-  :root[data-color-theme='dark'] & {
+  :root[data-color-mode='dark'] & {
     color: var(--text-primary);
     background: var(--surface-panel-strong);
   }
@@ -1015,7 +1016,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 .tab-btn {
   padding: 8px 16px;
   color: $text-secondary;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   letter-spacing: -0.01em;
   white-space: nowrap;
@@ -1038,7 +1039,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 
   @media (max-width: 768px) {
     padding: 8px 12px;
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -1096,7 +1097,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   overflow: hidden;
   color: var(--text-dark);
   font-family: var(--font-sans);
-  font-size: 15px;
+  font-size: var(--font-size-16);
   line-height: 1.6;
   resize: vertical;
   background: var(--bg-white);
@@ -1173,7 +1174,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   padding: 8px 12px;
   overflow-y: auto;
   color: var(--text-dark);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   white-space: pre-line;
   pointer-events: auto !important;
   background: var(--glass-60) !important;
@@ -1209,7 +1210,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 .modal-search-input {
   width: 95%;
   padding: 10px 16px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   background: var(--glass-80);
   color: var(--text-dark);
   border: 1px solid rgba(0, 0, 0, 0.1);
@@ -1235,7 +1236,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   padding: 10px 12px;
   margin-bottom: 4px;
   color: $text-primary;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   cursor: pointer;
   border-radius: var(--radius-sm2);
   transition: all 0.15s;
@@ -1250,7 +1251,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   padding-top: 12px;
   margin-top: 12px;
   color: $text-secondary;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   text-align: center;
   border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
@@ -1331,10 +1332,10 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 .row-1 {
   flex-wrap: wrap;
   color: $text-secondary;
-  font-size: 12px;
+  font-size: var(--font-size-12);
 
   @media (max-width: 480px) {
-    font-size: 11px;
+    font-size: var(--font-size-12);
   }
 }
 
@@ -1348,7 +1349,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 
 .category-chain {
   color: $purple;
-  font-size: 11px;
+  font-size: var(--font-size-12);
   font-weight: 600;
   white-space: nowrap;
 }
@@ -1356,33 +1357,33 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 .vocabulary-card {
   .row-2 {
     flex-wrap: wrap;
-    font-size: 16px;
+    font-size: var(--font-size-16);
     font-weight: 600;
   }
 }
 
 .word-text {
   color: $text-primary;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   letter-spacing: -0.01em;
 
   @media (max-width: 768px) {
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 
   @media (max-width: 480px) {
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 }
 
 .pronunciation-text {
   color: $primary;
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
 
   @media (max-width: 480px) {
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 }
 
@@ -1406,19 +1407,19 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 .phonetic-text {
   color: $primary;
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   line-height: 1.6;
   word-break: break-all;
 
   @media (max-width: 480px) {
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 }
 
 .memo-text {
   color: $text-secondary;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   line-height: 1.6;
 }
 
@@ -1453,7 +1454,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 
 .local-filter-input {
   padding: 8px 32px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   background: var(--glass-80);
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: var(--radius-sm2);
@@ -1473,7 +1474,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   height: 18px;
   padding: 0;
   color: $white;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   line-height: 1;
   cursor: pointer;
   background: rgba(0, 0, 0, 0.1);
@@ -1490,7 +1491,7 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
 
 .filter-count {
   color: $text-secondary;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 500;
 }
 
@@ -1508,12 +1509,12 @@ $ease-standard: cubic-bezier(0.4, 0, 0.2, 1);@mixin saturated-glass($blur: 30px,
   gap: 8px;
   align-items: center;
   color: $text-secondary;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .no-more {
   color: $text-tertiary;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   letter-spacing: 1px;
 }
 

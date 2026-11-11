@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 function jsonResponse(body, init = {}) {
   return new Response(JSON.stringify(body), {
@@ -46,7 +46,30 @@ beforeEach(() => {
   globalThis.__WEB_BASE__ = '';
 });
 
+afterEach(() => { vi.clearAllTimers(); vi.useRealTimers(); });
+
 describe('auth session lifecycle', () => {
+  it.each(['headers', 'body'])('bounds a stalled refresh %s and releases single flight', async phase => {
+    const { refreshAccessToken, saveToken, getToken } = await loadAuthModules();
+    saveToken('access-token', 'refresh-token', 1800);
+    vi.useFakeTimers();
+    let signal;
+    global.fetch = vi.fn(async (_url, options) => {
+      signal = options.signal;
+      const stalled = () => new Promise((_, reject) => {
+        signal?.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')), { once: true });
+      });
+      return phase === 'headers' ? stalled() : { ok: true, status: 200, json: stalled };
+    });
+    const pending = refreshAccessToken();
+    await vi.advanceTimersByTimeAsync(15001);
+    expect(signal?.aborted).toBe(true);
+    await expect(pending).resolves.toMatchObject({ ok: false, reason: 'network_error' });
+    expect(getToken()).toBe('access-token');
+    global.fetch = vi.fn().mockResolvedValue(jsonResponse({ access_token: 'new', refresh_token: 'new-refresh', expires_in: 1800 }));
+    await expect(refreshAccessToken()).resolves.toMatchObject({ ok: true });
+  });
+
   it('restores a cached authenticated session synchronously during bootstrap', { timeout: 10000 }, async () => {
 
     const {

@@ -70,7 +70,7 @@ const { t } = useI18n()
 
   &__item {
     min-width: 0;
-    max-width: 200px;
+    max-width: 160px;
 
     svg { flex-shrink: 0; }
   }

@@ -2,13 +2,24 @@
   <div class="user-data-page">
     <div class="page-header glass-panel">
       <div class="header-left">
-        <button class="glass-button btn-back" data-variant="secondary" type="button" @click="goBack">
+        <button
+          class="glass-button btn-back"
+          data-variant="secondary"
+          type="button"
+          @click="goBack"
+        >
           {{ t('common.button.back') }}
         </button>
         <h1>
-          <BarIcon class="title-icon" icon="📊" />
+          <BarIcon
+            class="title-icon"
+            icon="📊"
+          />
           <span>{{ t('navigation.pageTitles.user.data') }}</span>
-          <span v-if="username" class="username-badge">{{ username }}</span>
+          <span
+            v-if="username"
+            class="username-badge"
+          >{{ username }}</span>
         </h1>
       </div>
       <div class="stats">
@@ -17,9 +28,27 @@
       </div>
     </div>
 
+    <CustomDataSaveNotice
+      :state="mutation"
+      :retryable="mutationMode === 'create'"
+      @retry="retryMutation"
+      @merge="mergeVersions"
+    />
+    <p
+      v-if="validationErrors.length"
+      role="alert"
+    >
+      {{ t('user.customSafety.rowError', {row:validationErrors[0].row_index+1,field:validationErrors[0].field,reason:t(`user.customSafety.${validationErrors[0].messageKey}`)}) }}
+    </p>
     <div class="toolbar glass-panel">
       <div class="toolbar-left">
-        <button class="glass-button" data-variant="primary" type="button" @click="openBatchCreateModal"><InlineIcon icon="➕" />{{ t('user.dataPage.toolbar.batchAdd') }}
+        <button
+          class="glass-button"
+          data-variant="primary"
+          type="button"
+          @click="openBatchCreateModal"
+        >
+          <InlineIcon icon="➕" />{{ t('user.dataPage.toolbar.batchAdd') }}
         </button>
         <button
           class="glass-button"
@@ -27,7 +56,8 @@
           type="button"
           :disabled="selectedRecords.length === 0"
           @click="handleBatchEdit"
-        ><InlineIcon icon="✏️" />{{ t('user.dataPage.toolbar.batchEdit') }}
+        >
+          <InlineIcon icon="✏️" />{{ t('user.dataPage.toolbar.batchEdit') }}
         </button>
         <button
           class="glass-button"
@@ -35,27 +65,43 @@
           type="button"
           :disabled="selectedRecords.length === 0"
           @click="handleBatchDelete"
-        ><InlineIcon icon="🗑️" />{{ t('user.dataPage.toolbar.batchDelete') }}
+        >
+          <InlineIcon icon="🗑️" />{{ t('user.dataPage.toolbar.batchDelete') }}
         </button>
-        <button class="glass-button" data-variant="secondary" type="button" @click="fetchData"><InlineIcon icon="🔄" />{{ t('user.dataPage.toolbar.refresh') }}
+        <button
+          class="glass-button"
+          data-variant="secondary"
+          type="button"
+          @click="fetchData"
+        >
+          <InlineIcon icon="🔄" />{{ t('user.dataPage.toolbar.refresh') }}
         </button>
       </div>
       <div class="toolbar-right">
         <input
           v-model="searchQuery"
+          :disabled="locked"
           class="search-input glass-field"
           data-shape="search"
           :placeholder="t('user.dataPage.searchPlaceholder')"
           @input="handleSearch"
-        />
+        >
       </div>
     </div>
 
     <div class="table-container glass-panel">
-      <div v-if="loading" class="loading-overlay">
+      <div
+        v-if="loading"
+        class="loading-overlay"
+      >
         <div class="loading-content glass-panel">
-          <div class="ui-loading--page" aria-hidden="true"></div>
-          <div class="loading-text">{{ t('common.label.loading') }}</div>
+          <div
+            class="ui-loading--page"
+            aria-hidden="true"
+          />
+          <div class="loading-text">
+            {{ t('common.label.loading') }}
+          </div>
         </div>
       </div>
 
@@ -65,7 +111,7 @@
             <th class="col-check">
               <CheckBox
                 :model-value="isAllSelected"
-                @update:modelValue="toggleSelectAll"
+                @update:model-value="toggleSelectAll"
               />
             </th>
             <th>{{ t('user.dataPage.table.shortName') }}</th>
@@ -81,7 +127,10 @@
         </thead>
         <tbody>
           <tr v-if="paginatedData.length === 0">
-            <td colspan="10" class="table-empty-cell">
+            <td
+              colspan="10"
+              class="table-empty-cell"
+            >
               {{
                 searchQuery
                   ? t('user.dataPage.empty.noMatch')
@@ -89,11 +138,14 @@
               }}
             </td>
           </tr>
-          <tr v-for="record in paginatedData" :key="record.created_at">
+          <tr
+            v-for="record in paginatedData"
+            :key="record.id"
+          >
             <td class="col-check">
               <CheckBox
-                :model-value="selectedRecords.includes(record.created_at)"
-                @update:modelValue="toggleRecordSelection(record.created_at, $event)"
+                :model-value="selectedRecords.includes(record.id)"
+                @update:model-value="toggleRecordSelection(record.id, $event)"
               />
             </td>
             <td>{{ record.簡稱 }}</td>
@@ -102,10 +154,18 @@
             <td>{{ record.聲韻調 || '-' }}</td>
             <td>{{ record.特徵 }}</td>
             <td>{{ record.值 }}</td>
-            <td class="cell-note">{{ record.說明 || '-' }}</td>
-            <td>{{ formatDate(record.created_at) }}</td>
+            <td class="cell-note">
+              {{ record.說明 || '-' }}
+            </td>
+            <td>{{ formatDate(record.created_at_utc || record.created_at) }}</td>
             <td>
-              <button class="glass-button btn-edit" data-size="compact" data-variant="primary" type="button" @click="openEditModal(record)">
+              <button
+                class="glass-button btn-edit"
+                data-size="compact"
+                data-variant="primary"
+                type="button"
+                @click="openEditModal(record)"
+              >
                 {{ t('common.button.edit') }}
               </button>
             </td>
@@ -114,7 +174,10 @@
       </table>
     </div>
 
-    <div v-if="filteredData.length > 0" class="pagination glass-panel">
+    <div
+      v-if="filteredData.length > 0"
+      class="pagination glass-panel"
+    >
       <div class="pagination-info">
         {{
           t('user.dataPage.pagination.showing', {
@@ -125,10 +188,22 @@
         }}
       </div>
       <div class="pagination-controls">
-        <button class="glass-button btn-page" data-size="compact" type="button" :disabled="currentPage === 1" @click="goToPage(1)">
+        <button
+          class="glass-button btn-page"
+          data-size="compact"
+          type="button"
+          :disabled="currentPage === 1"
+          @click="goToPage(1)"
+        >
           {{ t('user.dataPage.pagination.first') }}
         </button>
-        <button class="glass-button btn-page" data-size="compact" type="button" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">
+        <button
+          class="glass-button btn-page"
+          data-size="compact"
+          type="button"
+          :disabled="currentPage === 1"
+          @click="goToPage(currentPage - 1)"
+        >
           {{ t('user.dataPage.pagination.previous') }}
         </button>
         <div class="page-numbers">
@@ -144,10 +219,22 @@
             {{ page }}
           </button>
         </div>
-        <button class="glass-button btn-page" data-size="compact" type="button" :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)">
+        <button
+          class="glass-button btn-page"
+          data-size="compact"
+          type="button"
+          :disabled="currentPage === totalPages"
+          @click="goToPage(currentPage + 1)"
+        >
           {{ t('user.dataPage.pagination.next') }}
         </button>
-        <button class="glass-button btn-page" data-size="compact" type="button" :disabled="currentPage === totalPages" @click="goToPage(totalPages)">
+        <button
+          class="glass-button btn-page"
+          data-size="compact"
+          type="button"
+          :disabled="currentPage === totalPages"
+          @click="goToPage(totalPages)"
+        >
           {{ t('user.dataPage.pagination.last') }}
         </button>
       </div>
@@ -156,7 +243,7 @@
         <SimpleSelectDropdown
           v-model.number="pageSize"
           :options="pageSizeOptions"
-          @update:modelValue="handlePageSizeChange"
+          @update:model-value="handlePageSizeChange"
         />
       </div>
     </div>
@@ -166,43 +253,146 @@
       size="lg"
       :title="t('user.dataPage.batchEdit.title', { count: batchEditRows.length })"
       close-label="關閉"
-      @update:modelValue="closeBatchEditModal"
+      @update:model-value="closeBatchEditModal"
     >
-      <p class="hint"><InlineIcon icon="💡" />{{ t('user.dataPage.batchEdit.hint') }}</p>
-      <div class="batch-table-wrapper" data-variant="edit">
-        <table class="batch-table">
-          <thead>
-            <tr>
-              <th class="col-index">#</th>
-              <th class="col-short-name">{{ t('user.dataPage.table.shortNameRequired') }}</th>
-              <th class="col-region">{{ t('user.dataPage.table.regionRequired') }}</th>
-              <th class="col-coordinates">{{ t('user.dataPage.table.coordinatesRequired') }}</th>
-              <th class="col-phonology">{{ t('user.dataPage.table.phonology') }}</th>
-              <th class="col-feature">{{ t('user.dataPage.table.featureRequired') }}</th>
-              <th class="col-value">{{ t('user.dataPage.table.valueRequired') }}</th>
-              <th class="col-note">{{ t('user.dataPage.table.note') }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(row, index) in batchEditRows" :key="index">
-              <td>{{ index + 1 }}</td>
-              <td><input v-model="row.簡稱" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.shortName')" /></td>
-              <td><input v-model="row.音典分區" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.regionPlaceholder')" /></td>
-              <td><input v-model="row.經緯度" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.coordinatesPlaceholder')" /></td>
-              <td><input v-model="row.聲韻調" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.phonologyPlaceholder')" /></td>
-              <td><input v-model="row.特徵" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.featurePlaceholder')" /></td>
-              <td><input v-model="row.值" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.valuePlaceholder')" /></td>
-              <td><input v-model="row.說明" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.notePlaceholder')" /></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <CustomDataSaveNotice
+        :state="mutation"
+        :retryable="mutationMode === 'create'"
+        @retry="retryMutation"
+        @merge="mergeVersions"
+      />
+      <fieldset
+        :disabled="locked"
+        class="save-fieldset"
+      >
+        <p class="hint">
+          <InlineIcon icon="💡" />{{ t('user.dataPage.batchEdit.hint') }}
+        </p>
+        <div
+          class="batch-table-wrapper"
+          data-variant="edit"
+        >
+          <table class="batch-table">
+            <thead>
+              <tr>
+                <th class="col-index">
+                  #
+                </th>
+                <th class="col-short-name">
+                  {{ t('user.dataPage.table.shortNameRequired') }}
+                </th>
+                <th class="col-region">
+                  {{ t('user.dataPage.table.regionRequired') }}
+                </th>
+                <th class="col-coordinates">
+                  {{ t('user.dataPage.table.coordinatesRequired') }}
+                </th>
+                <th class="col-phonology">
+                  {{ t('user.dataPage.table.phonology') }}
+                </th>
+                <th class="col-feature">
+                  {{ t('user.dataPage.table.featureRequired') }}
+                </th>
+                <th class="col-value">
+                  {{ t('user.dataPage.table.valueRequired') }}
+                </th>
+                <th class="col-note">
+                  {{ t('user.dataPage.table.note') }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(row, index) in batchEditRows"
+                :key="row.id || index"
+                :data-edit-row="index"
+              >
+                <td>{{ index + 1 }}</td>
+                <td>
+                  <input
+                    v-model="row.簡稱"
+                    :disabled="locked"
+                    class="glass-field"
+                    data-size="compact"
+                    :placeholder="t('user.dataPage.form.shortName')"
+                  >
+                </td>
+                <td>
+                  <input
+                    v-model="row.音典分區"
+                    :disabled="locked"
+                    class="glass-field"
+                    data-size="compact"
+                    :placeholder="t('user.dataPage.form.regionPlaceholder')"
+                  >
+                </td>
+                <td>
+                  <input
+                    v-model="row.經緯度"
+                    :disabled="locked"
+                    class="glass-field"
+                    data-size="compact"
+                    :placeholder="t('user.dataPage.form.coordinatesPlaceholder')"
+                  >
+                </td>
+                <td>
+                  <input
+                    v-model="row.聲韻調"
+                    :disabled="locked"
+                    class="glass-field"
+                    data-size="compact"
+                    :placeholder="t('user.dataPage.form.phonologyPlaceholder')"
+                  >
+                </td>
+                <td>
+                  <input
+                    v-model="row.特徵"
+                    :disabled="locked"
+                    class="glass-field"
+                    data-size="compact"
+                    :placeholder="t('user.dataPage.form.featurePlaceholder')"
+                  >
+                </td>
+                <td>
+                  <input
+                    v-model="row.值"
+                    :disabled="locked"
+                    class="glass-field"
+                    data-size="compact"
+                    :placeholder="t('user.dataPage.form.valuePlaceholder')"
+                  >
+                </td>
+                <td>
+                  <input
+                    v-model="row.說明"
+                    :disabled="locked"
+                    class="glass-field"
+                    data-size="compact"
+                    :placeholder="t('user.dataPage.form.notePlaceholder')"
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </fieldset>
       <template #footer>
         <div class="user-data-modal-footer">
-          <button class="glass-button" data-variant="primary" type="button" :disabled="validBatchEditRows.length === 0" @click="submitBatchEdit">
+          <button
+            class="glass-button"
+            data-variant="primary"
+            type="button"
+            :disabled="locked || batchEditRows.length === 0"
+            @click="submitBatchEdit"
+          >
             {{ t('user.dataPage.batchEdit.save', { count: validBatchEditRows.length }) }}
           </button>
-          <button class="glass-button" data-variant="secondary" type="button" @click="closeBatchEditModal">
+          <button
+            class="glass-button"
+            data-variant="secondary"
+            type="button"
+            @click="closeBatchEditModal"
+          >
             {{ t('common.button.cancel') }}
           </button>
         </div>
@@ -214,56 +404,182 @@
       size="lg"
       :title="t('user.dataPage.batchCreate.title')"
       close-label="關閉"
-      @update:modelValue="closeBatchCreateModal"
+      @update:model-value="closeBatchCreateModal"
     >
-      <p class="hint"><InlineIcon icon="💡" />{{ t('user.dataPage.batchCreate.hint') }}</p>
-      <div class="batch-table-controls">
-        <button class="glass-button" data-variant="primary" type="button" @click="addBatchRow"><InlineIcon icon="➕" />{{ t('user.dataPage.batchCreate.addRow') }}
-        </button>
-        <button class="glass-button" data-variant="secondary" type="button" @click="clearBatchRows"><InlineIcon icon="🗑️" />{{ t('user.dataPage.batchCreate.clear') }}
-        </button>
-        <span class="row-count">
-          {{ t('user.dataPage.batchCreate.currentRows', { count: batchRows.length }) }}
-        </span>
-      </div>
-      <div class="batch-table-wrapper" data-variant="create" @paste="handlePaste">
-        <table class="batch-table">
-          <thead>
-            <tr>
-              <th class="col-index">#</th>
-              <th class="col-short-name">{{ t('user.dataPage.table.shortNameRequired') }}</th>
-              <th class="col-region">{{ t('user.dataPage.table.regionRequired') }}</th>
-              <th class="col-coordinates">{{ t('user.dataPage.table.coordinatesRequired') }}</th>
-              <th class="col-phonology">{{ t('user.dataPage.table.phonology') }}</th>
-              <th class="col-feature">{{ t('user.dataPage.table.featureRequired') }}</th>
-              <th class="col-value">{{ t('user.dataPage.table.valueRequired') }}</th>
-              <th class="col-note">{{ t('user.dataPage.table.note') }}</th>
-              <th class="col-action">{{ t('user.dataPage.table.actions') }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(row, index) in batchRows" :key="index">
-              <td>{{ index + 1 }}</td>
-              <td><input v-model="row.簡稱" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.shortName')" /></td>
-              <td><input v-model="row.音典分區" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.regionPlaceholder')" /></td>
-              <td><input v-model="row.經緯度" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.coordinatesPlaceholder')" /></td>
-              <td><input v-model="row.聲韻調" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.phonologyPlaceholder')" /></td>
-              <td><input v-model="row.特徵" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.featurePlaceholder')" /></td>
-              <td><input v-model="row.值" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.valuePlaceholder')" /></td>
-              <td><input v-model="row.說明" class="glass-field" data-size="compact" :placeholder="t('user.dataPage.form.notePlaceholder')" /></td>
-              <td>
-                <button class="glass-button btn-remove" data-size="compact" data-variant="danger" type="button" @click="removeBatchRow(index)">×</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <CustomDataSaveNotice
+        :state="mutation"
+        :retryable="mutationMode === 'create'"
+        @retry="retryMutation"
+        @merge="mergeVersions"
+      />
+      <fieldset
+        :disabled="locked"
+        class="save-fieldset"
+      >
+        <p class="hint">
+          <InlineIcon icon="💡" />{{ t('user.dataPage.batchCreate.hint') }}
+        </p>
+        <div class="batch-table-controls">
+          <button
+            class="glass-button"
+            data-variant="primary"
+            type="button"
+            @click="addBatchRow"
+          >
+            <InlineIcon icon="➕" />{{ t('user.dataPage.batchCreate.addRow') }}
+          </button>
+          <button
+            class="glass-button"
+            data-variant="secondary"
+            type="button"
+            @click="clearBatchRows"
+          >
+            <InlineIcon icon="🗑️" />{{ t('user.dataPage.batchCreate.clear') }}
+          </button>
+          <span class="row-count">
+            {{ t('user.dataPage.batchCreate.currentRows', { count: batchRows.length }) }}
+          </span>
+        </div>
+        <div
+          class="batch-table-wrapper"
+          data-variant="create"
+          @paste="handlePaste"
+        >
+          <table class="batch-table">
+            <thead>
+              <tr>
+                <th class="col-index">
+                  #
+                </th>
+                <th class="col-short-name">
+                  {{ t('user.dataPage.table.shortNameRequired') }}
+                </th>
+                <th class="col-region">
+                  {{ t('user.dataPage.table.regionRequired') }}
+                </th>
+                <th class="col-coordinates">
+                  {{ t('user.dataPage.table.coordinatesRequired') }}
+                </th>
+                <th class="col-phonology">
+                  {{ t('user.dataPage.table.phonology') }}
+                </th>
+                <th class="col-feature">
+                  {{ t('user.dataPage.table.featureRequired') }}
+                </th>
+                <th class="col-value">
+                  {{ t('user.dataPage.table.valueRequired') }}
+                </th>
+                <th class="col-note">
+                  {{ t('user.dataPage.table.note') }}
+                </th>
+                <th class="col-action">
+                  {{ t('user.dataPage.table.actions') }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(row, index) in batchRows"
+                :key="row.id || index"
+                :data-edit-row="index"
+              >
+                <td>{{ index + 1 }}</td>
+                <td>
+                  <input
+                    v-model="row.簡稱"
+                    :disabled="locked"
+                    class="glass-field"
+                    data-size="compact"
+                    :placeholder="t('user.dataPage.form.shortName')"
+                  >
+                </td>
+                <td>
+                  <input
+                    v-model="row.音典分區"
+                    :disabled="locked"
+                    class="glass-field"
+                    data-size="compact"
+                    :placeholder="t('user.dataPage.form.regionPlaceholder')"
+                  >
+                </td>
+                <td>
+                  <input
+                    v-model="row.經緯度"
+                    :disabled="locked"
+                    class="glass-field"
+                    data-size="compact"
+                    :placeholder="t('user.dataPage.form.coordinatesPlaceholder')"
+                  >
+                </td>
+                <td>
+                  <input
+                    v-model="row.聲韻調"
+                    :disabled="locked"
+                    class="glass-field"
+                    data-size="compact"
+                    :placeholder="t('user.dataPage.form.phonologyPlaceholder')"
+                  >
+                </td>
+                <td>
+                  <input
+                    v-model="row.特徵"
+                    :disabled="locked"
+                    class="glass-field"
+                    data-size="compact"
+                    :placeholder="t('user.dataPage.form.featurePlaceholder')"
+                  >
+                </td>
+                <td>
+                  <input
+                    v-model="row.值"
+                    :disabled="locked"
+                    class="glass-field"
+                    data-size="compact"
+                    :placeholder="t('user.dataPage.form.valuePlaceholder')"
+                  >
+                </td>
+                <td>
+                  <input
+                    v-model="row.說明"
+                    :disabled="locked"
+                    class="glass-field"
+                    data-size="compact"
+                    :placeholder="t('user.dataPage.form.notePlaceholder')"
+                  >
+                </td>
+                <td>
+                  <button
+                    class="glass-button btn-remove"
+                    data-size="compact"
+                    data-variant="danger"
+                    type="button"
+                    @click="removeBatchRow(index)"
+                  >
+                    ×
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </fieldset>
       <template #footer>
         <div class="user-data-modal-footer">
-          <button class="glass-button" data-variant="primary" type="button" :disabled="validBatchRows.length === 0" @click="submitBatchCreate">
+          <button
+            class="glass-button"
+            data-variant="primary"
+            type="button"
+            :disabled="locked || batchRows.length === 0"
+            @click="submitBatchCreate"
+          >
             {{ t('user.dataPage.batchCreate.submit', { count: validBatchRows.length }) }}
           </button>
-          <button class="glass-button" data-variant="secondary" type="button" @click="closeBatchCreateModal">
+          <button
+            class="glass-button"
+            data-variant="secondary"
+            type="button"
+            @click="closeBatchCreateModal"
+          >
             {{ t('common.button.cancel') }}
           </button>
         </div>
@@ -275,42 +591,88 @@
       size="sm"
       :title="t('user.dataPage.singleEdit.title')"
       close-label="關閉"
-      @update:modelValue="closeEditModal"
+      @update:model-value="closeEditModal"
     >
+      <CustomDataSaveNotice
+        :state="mutation"
+        :retryable="false"
+        @merge="mergeVersions"
+      />
       <div class="form-group">
         <label>{{ t('user.dataPage.table.shortNameRequired') }}</label>
-        <input v-model="editingRecord.簡稱" class="glass-field" />
+        <input
+          v-model="editingRecord.簡稱"
+          :disabled="locked"
+          class="glass-field"
+        >
       </div>
       <div class="form-group">
         <label>{{ t('user.dataPage.table.regionRequired') }}</label>
-        <input v-model="editingRecord.音典分區" class="glass-field" />
+        <input
+          v-model="editingRecord.音典分區"
+          :disabled="locked"
+          class="glass-field"
+        >
       </div>
       <div class="form-group">
         <label>{{ t('user.dataPage.table.coordinatesRequired') }}</label>
-        <input v-model="editingRecord.經緯度" class="glass-field" :placeholder="t('user.dataPage.form.coordinatesPlaceholder')" />
+        <input
+          v-model="editingRecord.經緯度"
+          :disabled="locked"
+          class="glass-field"
+          :placeholder="t('user.dataPage.form.coordinatesPlaceholder')"
+        >
       </div>
       <div class="form-group">
         <label>{{ t('user.dataPage.table.phonology') }}</label>
-        <input v-model="editingRecord.聲韻調" class="glass-field" />
+        <input
+          v-model="editingRecord.聲韻調"
+          :disabled="locked"
+          class="glass-field"
+        >
       </div>
       <div class="form-group">
         <label>{{ t('user.dataPage.table.featureRequired') }}</label>
-        <input v-model="editingRecord.特徵" class="glass-field" />
+        <input
+          v-model="editingRecord.特徵"
+          :disabled="locked"
+          class="glass-field"
+        >
       </div>
       <div class="form-group">
         <label>{{ t('user.dataPage.table.valueRequired') }}</label>
-        <input v-model="editingRecord.值" class="glass-field" />
+        <input
+          v-model="editingRecord.值"
+          :disabled="locked"
+          class="glass-field"
+        >
       </div>
       <div class="form-group">
         <label>{{ t('user.dataPage.table.note') }}</label>
-        <textarea v-model="editingRecord.說明" class="glass-field" rows="3"></textarea>
+        <textarea
+          v-model="editingRecord.說明"
+          :disabled="locked"
+          class="glass-field"
+          rows="3"
+        />
       </div>
       <template #footer>
         <div class="user-data-modal-footer">
-          <button class="glass-button" data-variant="primary" type="button" @click="submitEdit">
+          <button
+            class="glass-button"
+            data-variant="primary"
+            type="button"
+            :disabled="locked"
+            @click="submitEdit"
+          >
             {{ t('common.button.save') }}
           </button>
-          <button class="glass-button" data-variant="secondary" type="button" @click="closeEditModal">
+          <button
+            class="glass-button"
+            data-variant="secondary"
+            type="button"
+            @click="closeEditModal"
+          >
             {{ t('common.button.cancel') }}
           </button>
         </div>
@@ -328,7 +690,11 @@ import { useRoute, useRouter } from 'vue-router'
 import AppModal from '@/components/common/AppModal.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
-import { batchCreateCustomData, batchDeleteCustomData, editCustomData, getAllCustomData } from '@/api'
+import { batchUpdateCustomData, batchDeleteCustomDataById, saveCustomData, getAllCustomData } from '@/api'
+import { validateRows, formatCustomDataTime } from '@/utils/user/customDataMutations.js'
+import { useCustomDataSave } from '@/main/composables/useCustomDataSave.js'
+import CustomDataSaveNotice from './CustomDataSaveNotice.vue'
+
 import { invalidateCustomDataPresence, markCustomDataExists } from '@/composables/data/useCustomDataPresence.js'
 import { useAsyncData } from '@/composables/core/useAsyncData.js'
 import { userStore } from '@/main/store/store.js'
@@ -341,6 +707,11 @@ const route = useRoute()
 
 const username = computed(() => route.query.username || userStore.username || t('user.dataPage.usernameFallback'))
 
+const mutation = useCustomDataSave(body => body.mode === 'update' ? batchUpdateCustomData(body.updates) : body.mode === 'delete' ? batchDeleteCustomDataById(body.deletes) : saveCustomData(body), {leaveMessage:()=>t('user.customSafety.leave')})
+const locked = mutation.locked
+const mutationMode = ref('')
+const mutationRows = ref([])
+const validationErrors = ref([])
 const dataList = ref([])
 const totalCount = ref(0)
 const selectedRecords = ref([])
@@ -367,7 +738,7 @@ const pageSizeOptions = computed(() => [10, 20, 50, 100].map((value) => ({
 
 const isAllSelected = computed(() => (
   paginatedData.value.length > 0 &&
-  selectedRecords.value.length === paginatedData.value.length
+  paginatedData.value.every(row => selectedRecords.value.includes(row.id))
 ))
 
 const filteredData = computed(() => {
@@ -412,38 +783,15 @@ const visiblePages = computed(() => {
   return pages
 })
 
-const parsedBatchData = computed(() => {
-  if (!batchCreateText.value.trim()) return []
+const validBatchRows = computed(() => batchRows.value.filter(row => Object.values(row).some(value => String(value).trim())))
+const validBatchEditRows = computed(() => batchEditRows.value)
 
-  const lines = batchCreateText.value.trim().split('\n')
-  return lines.map((line) => {
-    const parts = line.split('\t')
-    return {
-      簡稱: parts[0]?.trim() || '',
-      音典分區: parts[1]?.trim() || '',
-      經緯度: parts[2]?.trim() || '',
-      聲韻調: parts[3]?.trim() || '',
-      特徵: parts[4]?.trim() || '',
-      值: parts[5]?.trim() || '',
-      說明: parts[6]?.trim() || '',
-      username: userStore.username
-    }
-  }).filter((item) => item.簡稱 && item.音典分區 && item.經緯度 && item.特徵 && item.值)
-})
-
-const validBatchRows = computed(() => batchRows.value.filter((row) => (
-  row.簡稱 && row.音典分區 && row.經緯度 && row.特徵 && row.值
-)))
-
-const validBatchEditRows = computed(() => batchEditRows.value.filter((row) => (
-  row.簡稱 && row.音典分區 && row.經緯度 && row.特徵 && row.值
-)))
-
-const fetchData = async () => {
+const fetchData = async ({ afterSave = false } = {}) => {
   await dataQuery.load(() => getAllCustomData(), {
     onSuccess: (response) => {
       dataList.value = response.data || []
       totalCount.value = response.total || 0
+      selectedRecords.value = selectedRecords.value.filter(id => dataList.value.some(row => row.id === id))
 
       if (dataList.value.length > 0) {
         showSuccess(t('user.dataPage.messages.fetchSuccess'))
@@ -452,9 +800,7 @@ const fetchData = async () => {
       }
     },
     onError: (error) => {
-      dataList.value = []
-      totalCount.value = 0
-      showError(t('user.dataPage.messages.fetchFailed', { message: error.message }))
+      showError(afterSave ? t('user.customSafety.refreshFailed') : t('user.dataPage.messages.fetchFailed', { message: error.message }))
 
       if (error.message.includes('401') || error.message.includes('登錄') || error.message.includes('登录')) {
         setTimeout(() => router.replace({
@@ -468,7 +814,7 @@ const fetchData = async () => {
 
 const toggleSelectAll = (checked) => {
   if (checked) {
-    selectedRecords.value = paginatedData.value.map((record) => record.created_at)
+    selectedRecords.value = paginatedData.value.map((record) => record.id)
   } else {
     selectedRecords.value = []
   }
@@ -500,28 +846,21 @@ const handlePageSizeChange = () => {
 }
 
 const openEditModal = (record) => {
+  if (locked.value) return
   editingRecord.value = { ...record }
   showEditModal.value = true
 }
 
 const closeEditModal = () => {
+  if (locked.value) return
   showEditModal.value = false
   editingRecord.value = {}
 }
 
-const submitEdit = async () => {
-  try {
-    await editCustomData(editingRecord.value)
-    invalidateCustomDataPresence()
-    showSuccess(t('user.dataPage.messages.updateSuccess'))
-    closeEditModal()
-    await fetchData()
-  } catch (error) {
-    showError(t('user.dataPage.messages.updateFailed', { message: error.message }))
-  }
-}
+const submitEdit = () => runMutation('update', [editingRecord.value], 'single')
 
 const openBatchCreateModal = () => {
+  if (locked.value) return
   showBatchCreateModal.value = true
   if (batchRows.value.length === 0) {
     addBatchRow()
@@ -529,12 +868,14 @@ const openBatchCreateModal = () => {
 }
 
 const closeBatchCreateModal = () => {
+  if (locked.value) return
   showBatchCreateModal.value = false
   batchCreateText.value = ''
   batchRows.value = []
 }
 
 const addBatchRow = () => {
+  if (locked.value) return
   batchRows.value.push({
     簡稱: '',
     音典分區: '',
@@ -547,11 +888,12 @@ const addBatchRow = () => {
 }
 
 const removeBatchRow = (index) => {
+  if (locked.value) return
   batchRows.value.splice(index, 1)
 }
 
 const clearBatchRows = async () => {
-  if (batchRows.value.length === 0) return
+  if (locked.value || batchRows.value.length === 0) return
 
   const confirmed = await showConfirm(t('user.dataPage.messages.clearRowsConfirm'), {
     title: t('user.dataPage.messages.clearRowsTitle'),
@@ -559,12 +901,13 @@ const clearBatchRows = async () => {
     cancelText: t('common.button.cancel')
   })
 
-  if (confirmed) {
+  if (confirmed && !locked.value) {
     batchRows.value = []
   }
 }
 
 const handlePaste = (event) => {
+  if (locked.value) return
   const clipboardData = event.clipboardData || window.clipboardData
   const pastedText = clipboardData.getData('text')
 
@@ -594,40 +937,16 @@ const handlePaste = (event) => {
   showSuccess(t('user.dataPage.messages.pastedRows', { count: newRows.length }))
 }
 
-const submitBatchCreate = async () => {
-  const data = validBatchRows.value.map((row) => ({
-    ...row,
-    username: userStore.username
-  }))
-
-  if (data.length === 0) {
-    showWarning(t('user.dataPage.messages.invalidBatchData'))
-    return
-  }
-
-  if (data.length > 50) {
-    showWarning(t('user.dataPage.messages.maxBatchLimit'))
-    return
-  }
-
-  try {
-    const response = await batchCreateCustomData(data)
-    markCustomDataExists(true)
-    showSuccess(response.message || t('user.dataPage.messages.batchCreateSuccess', { count: data.length }))
-    closeBatchCreateModal()
-    await fetchData()
-  } catch (error) {
-    showError(t('user.dataPage.messages.batchCreateFailed', { message: error.message }))
-  }
-}
+const submitBatchCreate = () => runMutation('create', batchRows.value, 'create')
 
 const handleBatchEdit = () => {
+  if (locked.value) return
   if (selectedRecords.value.length === 0) {
     showWarning(t('user.dataPage.messages.selectForEdit'))
     return
   }
 
-  const selectedData = dataList.value.filter((record) => selectedRecords.value.includes(record.created_at))
+  const selectedData = dataList.value.filter((record) => selectedRecords.value.includes(record.id))
 
   batchEditRows.value = selectedData.map((record) => ({
     簡稱: record.簡稱,
@@ -637,107 +956,69 @@ const handleBatchEdit = () => {
     特徵: record.特徵,
     值: record.值,
     說明: record.說明 || '',
-    created_at: record.created_at
+    id: record.id,
+    version: record.version
   }))
 
   showBatchEditModal.value = true
 }
 
 const closeBatchEditModal = () => {
+  if (locked.value) return
   showBatchEditModal.value = false
   batchEditRows.value = []
 }
 
-const submitBatchEdit = async () => {
-  const validRows = validBatchEditRows.value
+const submitBatchEdit = () => runMutation('update', batchEditRows.value, 'batch')
 
-  if (validRows.length === 0) {
-    showWarning(t('user.dataPage.messages.invalidBatchData'))
+const handleBatchDelete = () => runMutation('delete', dataList.value.filter(row => selectedRecords.value.includes(row.id)), 'delete')
+
+async function runMutation(mode, rows, source) {
+  if (locked.value) return
+  mutation.reset()
+  validationErrors.value = []
+  const checked = mode === 'delete'
+    ? {items: rows.map(({id,version}) => ({id,version})), errors: rows.length > 50 ? [{row_index:0,field:'',messageKey:'limit'}] : rows.some(row=>!Number.isSafeInteger(row.id)||row.id<=0||!Number.isSafeInteger(row.version)||row.version<=0) ? [{row_index:0,field:'id',messageKey:'unavailable'}] : []}
+    : validateRows(rows, {creates: mode === 'create'})
+  if (checked.errors.length) {
+    validationErrors.value = checked.errors
+    const error = checked.errors[0]
+    showWarning(t('user.customSafety.rowError', {row:error.row_index+1,field:error.field,reason:t(`user.customSafety.${error.messageKey}`)}))
+    document.querySelector(`[data-edit-row="${error.row_index}"] input`)?.focus()
     return
   }
-
-  const confirmed = await showConfirm(
-    t('user.dataPage.messages.batchEditConfirm', { count: validRows.length }),
-    {
-      title: t('user.dataPage.messages.batchEditTitle'),
-      confirmText: t('common.button.confirm'),
-      cancelText: t('common.button.cancel')
-    }
-  )
-
-  if (!confirmed) return
-
-  try {
-    const deleteIds = batchEditRows.value.map((row) => row.created_at)
-    await batchDeleteCustomData(deleteIds)
-
-    const newData = validRows.map((row) => ({
-      簡稱: row.簡稱,
-      音典分區: row.音典分區,
-      經緯度: row.經緯度,
-      聲韻調: row.聲韻調,
-      特徵: row.特徵,
-      值: row.值,
-      說明: row.說明,
-      username: userStore.username
-    }))
-
-    await batchCreateCustomData(newData)
-    markCustomDataExists(true)
-
-    showSuccess(t('user.dataPage.messages.batchEditSuccess', { count: validRows.length }))
-    closeBatchEditModal()
-    selectedRecords.value = []
-    await fetchData()
-  } catch (error) {
-    showError(t('user.dataPage.messages.batchEditFailed', { message: error.message }))
-  }
+  if (!checked.items.length) { showWarning(t('user.customSafety.empty')); return }
+  mutationMode.value = source
+  mutationRows.value = rows
+  const body = {creates:[],updates:[],deletes:[], ...(mode === 'create' ? {} : {mode})}
+  body[mode === 'create' ? 'creates' : mode === 'update' ? 'updates' : 'deletes'] = checked.items
+  const response = await mutation.save(body, { confirm: mode === 'create' ? undefined : () => showConfirm(t(mode === 'delete' ? 'user.dataPage.messages.batchDeleteConfirm' : 'user.dataPage.messages.batchEditConfirm', {count:checked.items.length})) })
+  if (response) await finishMutation(response)
 }
-
-const handleBatchDelete = async () => {
-  if (selectedRecords.value.length === 0) {
-    showWarning(t('user.dataPage.messages.selectForDelete'))
-    return
-  }
-
-  const confirmed = await showConfirm(
-    t('user.dataPage.messages.batchDeleteConfirm', { count: selectedRecords.value.length }),
-    {
-      title: t('user.dataPage.messages.batchDeleteTitle'),
-      confirmText: t('common.button.delete'),
-      cancelText: t('common.button.cancel')
-    }
-  )
-
-  if (!confirmed) return
-
-  try {
-    const response = await batchDeleteCustomData(selectedRecords.value)
-    invalidateCustomDataPresence()
-    showSuccess(response.message || t('user.dataPage.messages.deleteSuccess'))
-    selectedRecords.value = []
-    await fetchData()
-  } catch (error) {
-    showError(t('user.dataPage.messages.deleteFailed', { message: error.message }))
-  }
+async function finishMutation(response) {
+  invalidateCustomDataPresence()
+  if (response.created_count) markCustomDataExists(true)
+  showSuccess(t('user.dataPage.messages.updateSuccess'))
+  // Clear only after the write has a confirmed success response.
+  if (mutationMode.value === 'single') {showEditModal.value=false;editingRecord.value={}}
+  if (mutationMode.value === 'batch') {showBatchEditModal.value=false;batchEditRows.value=[]}
+  if (mutationMode.value === 'create') {showBatchCreateModal.value=false;batchRows.value=[]}
+  if (response.deleted_ids) selectedRecords.value=selectedRecords.value.filter(id => !response.deleted_ids.includes(id))
+  await fetchData({afterSave:true})
 }
-
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-'
-
-  const formattedStr = (typeof dateStr === 'string' && !dateStr.endsWith('Z') && !dateStr.includes('+') && !/-\d{2}:?\d{2}$/.test(dateStr))
-    ? (dateStr.includes('T') ? dateStr + 'Z' : dateStr.replace(' ', 'T') + 'Z')
-    : dateStr
-
-  const currentLocale = locale.value === 'en' ? 'en-US' : locale.value
-  return new Intl.DateTimeFormat(currentLocale, {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
-  }).format(new Date(formattedStr))
+async function retryMutation() {
+  const response=await mutation.save({})
+  if(response) await finishMutation(response)
 }
+function mergeVersions(current) {
+  mutation.prepareMerge();
+  for (const row of mutationRows.value) {
+    const latest=current.find(item=>item.id===row.id)
+    if(latest) row.version=latest.version
+  }
+  mutation.reset()
+}
+const formatDate = date => formatCustomDataTime(date, locale.value)
 
 const goBack = () => {
   router.push({
@@ -756,13 +1037,13 @@ onMounted(() => {
     return
   }
 
-  void parsedBatchData.value
   void fetchData()
 })
 </script>
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
+.save-fieldset { border:0; padding:0; margin:0; min-width:0; }
 
 $user-text: var(--text-deep);
 $user-muted: var(--text-slate);
@@ -791,7 +1072,7 @@ $user-accent: var(--color-primary);
     pointer-events: none;
     background:
       radial-gradient(circle at 12% 8%, rgba(var(--color-primary-rgb), 0.16), transparent 30%),
-      radial-gradient(circle at 82% 12%, rgba(88, 86, 214, 0.15), transparent 32%),
+      radial-gradient(circle at 82% 12%, rgba(var(--color-secondary-rgb), 0.15), transparent 32%),
       radial-gradient(circle at 70% 86%, rgba(var(--color-success-rgb), 0.12), transparent 34%),
       linear-gradient(180deg, var(--bg-blue-tint) 0%, var(--bg-blue-light) 48%, var(--bg-light-gray) 100%);
   }
@@ -831,7 +1112,7 @@ $user-accent: var(--color-primary);
     gap: 10px;
     margin: 0;
     color: $user-text;
-    font-size: clamp(20px, 2.4vw, 28px);
+    font-size: clamp(var(--font-size-20), 2.4vw, var(--font-size-28));
     font-weight: 800;
     letter-spacing: -0.04em;
   }
@@ -851,12 +1132,12 @@ $user-accent: var(--color-primary);
   border-radius: var(--radius-pill);
   overflow: hidden;
   color: var(--action-primary-text);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 800;
   text-overflow: ellipsis;
   white-space: nowrap;
   background:
-    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.9), rgba(88, 86, 214, 0.86)),
+    linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.9), rgba(var(--color-secondary-rgb), 0.86)),
     rgba(var(--color-primary-rgb), 0.72);
   box-shadow:
     inset 0 1px 0 var(--glass-40),
@@ -868,7 +1149,7 @@ $user-accent: var(--color-primary);
   align-items: center;
   gap: 10px;
   color: $user-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 700;
 }
 
@@ -919,7 +1200,7 @@ $user-accent: var(--color-primary);
 
 .search-input {
   height: 42px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .table-container {
@@ -950,7 +1231,7 @@ $user-accent: var(--color-primary);
 
 .loading-text {
   color: $user-accent;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 800;
   letter-spacing: 0.02em;
 }
@@ -961,7 +1242,7 @@ $user-accent: var(--color-primary);
   border-collapse: separate;
   border-spacing: 0 8px;
   table-layout: auto;
-  font-size: 13px;
+  font-size: var(--font-size-13);
 
   th,
   td {
@@ -976,7 +1257,7 @@ $user-accent: var(--color-primary);
     top: 0;
     z-index: 10;
     color: var(--text-deep);
-    font-size: 12px;
+    font-size: var(--font-size-12);
     font-weight: 800;
     letter-spacing: 0.02em;
     background:
@@ -1062,7 +1343,7 @@ $user-accent: var(--color-primary);
 
 .pagination-info {
   color: $user-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 700;
 }
 
@@ -1081,7 +1362,7 @@ $user-accent: var(--color-primary);
 
 .pagination-size {
   color: $user-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 700;
 }
 
@@ -1096,7 +1377,7 @@ $user-accent: var(--color-primary);
   border: 1px solid rgba(var(--color-primary-rgb), 0.12);
   border-radius: 14px;
   color: var(--text-slate);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 600;
   background: rgba(var(--color-primary-rgb), 0.06);
 }
@@ -1112,7 +1393,7 @@ $user-accent: var(--color-primary);
 .row-count {
   margin-left: auto;
   color: $user-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 800;
 }
 
@@ -1134,7 +1415,7 @@ $user-accent: var(--color-primary);
   min-width: 860px;
   border-collapse: separate;
   border-spacing: 0;
-  font-size: 13px;
+  font-size: var(--font-size-13);
 
   thead {
     position: sticky;
@@ -1172,7 +1453,7 @@ $user-accent: var(--color-primary);
   input {
     min-width: 0;
     height: 34px;
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 
   .col-index {
@@ -1207,7 +1488,7 @@ $user-accent: var(--color-primary);
   width: 28px;
   height: 28px;
   min-height: 28px;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   line-height: 1;
 }
 
@@ -1218,13 +1499,13 @@ $user-accent: var(--color-primary);
     display: block;
     margin-bottom: 7px;
     color: var(--text-dark);
-    font-size: 13px;
+    font-size: var(--font-size-13);
     font-weight: 800;
   }
 
   input,
   textarea {
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 
   textarea {
@@ -1246,7 +1527,7 @@ $user-accent: var(--color-primary);
   border: 1px solid rgba(var(--color-primary-rgb), 0.14);
   border-radius: 14px;
   color: $user-accent;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 700;
   background: rgba(var(--color-primary-rgb), 0.07);
 }
@@ -1271,13 +1552,13 @@ $user-accent: var(--color-primary);
     h1 {
       flex: 1;
       min-width: 200px;
-      font-size: 18px;
+      font-size: var(--font-size-18);
     }
   }
 
   .username-badge {
     max-width: 160px;
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 
   .stats {
@@ -1288,7 +1569,7 @@ $user-accent: var(--color-primary);
     span {
       flex: 1;
       justify-content: center;
-      font-size: 13px;
+      font-size: var(--font-size-13);
     }
   }
 
@@ -1313,12 +1594,12 @@ $user-accent: var(--color-primary);
 
   .glass-button {
     padding-inline: 10px;
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 
   .search-input {
     height: 42px;
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 
   .table-container {
@@ -1328,12 +1609,12 @@ $user-accent: var(--color-primary);
 
   .data-table {
     min-width: 940px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
 
     th,
     td {
       padding: 10px 9px;
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 
@@ -1347,7 +1628,7 @@ $user-accent: var(--color-primary);
   .pagination-size {
     justify-content: center;
     text-align: center;
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 
   .pagination-controls {
@@ -1357,7 +1638,7 @@ $user-accent: var(--color-primary);
   .btn-page {
     min-width: 36px;
     padding: 7px 9px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   .user-data-modal-footer {
@@ -1383,10 +1664,10 @@ $user-accent: var(--color-primary);
 
   .batch-table {
     min-width: 780px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
 
     input {
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 }
@@ -1408,14 +1689,14 @@ $user-accent: var(--color-primary);
     h1 {
       width: 100%;
       min-width: 0;
-      font-size: 16px;
+      font-size: var(--font-size-16);
     }
   }
 
   .btn-back {
     min-height: 34px;
     padding: 7px 11px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   .toolbar-left {
@@ -1426,7 +1707,7 @@ $user-accent: var(--color-primary);
   .glass-button {
     min-height: 34px;
     padding: 7px 8px;
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 
   .data-table {
@@ -1435,7 +1716,7 @@ $user-accent: var(--color-primary);
     th,
     td {
       padding: 8px 7px;
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 

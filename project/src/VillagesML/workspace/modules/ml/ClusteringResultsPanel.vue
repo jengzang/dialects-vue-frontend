@@ -333,14 +333,14 @@ const handleQuickAdjust = (action) => {
 }
 
 .panel-title {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--text-primary);
   margin: 0 0 20px 0;
 }
 
 .results-content h4 {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-primary);
   margin: 24px 0 12px 0;
@@ -361,19 +361,19 @@ const handleQuickAdjust = (action) => {
 }
 
 .metric-label {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-bottom: 8px;
 }
 
 .metric-value {
-  font-size: 24px;
+  font-size: var(--font-size-24);
   font-weight: 600;
   color: var(--color-primary);
 }
 
 .metric-hint {
-  font-size: 11px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   margin-top: 4px;
 }
@@ -403,17 +403,17 @@ const handleQuickAdjust = (action) => {
   padding: 4px 12px;
   border-radius: var(--radius-md);
   color: white;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 600;
 }
 
 .cluster-badge.small {
   padding: 2px 8px;
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 .region-count {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
 }
 
@@ -428,7 +428,7 @@ const handleQuickAdjust = (action) => {
   padding: 4px 10px;
   background: rgba(var(--vml-blue-rgb), 0.1);
   border-radius: var(--radius-sm2);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-primary);
 }
 
@@ -437,7 +437,7 @@ const handleQuickAdjust = (action) => {
   background: rgba(var(--vml-blue-rgb), 0.15);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-sm2);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--vml-blue);
   font-weight: 500;
   cursor: pointer;
@@ -458,7 +458,7 @@ const handleQuickAdjust = (action) => {
 .stat-item {
   display: flex;
   justify-content: space-between;
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 .stat-label {
@@ -495,13 +495,13 @@ const handleQuickAdjust = (action) => {
 }
 
 .assignments-table th {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .assignments-table td {
-  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 
 .region-name {
@@ -550,17 +550,17 @@ const handleQuickAdjust = (action) => {
 }
 
 .alert-icon {
-  font-size: 18px;
+  font-size: var(--font-size-18);
 }
 
 .alert-title {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .alert-message {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin: 0 0 12px 28px;
   line-height: 1.5;
@@ -569,7 +569,7 @@ const handleQuickAdjust = (action) => {
 .quick-adjust-button {
   margin-left: 28px;
   padding: 8px 16px;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 500;
   background: rgba(var(--vml-blue-rgb), 0.15);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
@@ -598,13 +598,13 @@ const handleQuickAdjust = (action) => {
   align-items: center;
   gap: 12px;
   margin: 0;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .cluster-region-modal-title {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 500;
   color: var(--text-secondary);
 }
@@ -617,12 +617,12 @@ const handleQuickAdjust = (action) => {
 
 .region-grid .region-tag {
   padding: 6px 12px;
-  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 
 @media (max-width: 768px) {
   .metric-value {
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 
   .metric-card {

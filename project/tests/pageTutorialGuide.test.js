@@ -1,9 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApp, nextTick, reactive } from 'vue'
 import { createI18n } from 'vue-i18n'
+import { marked } from 'marked'
+import { resolveTutorialDocument } from '../src/main/components/tutorial/tutorialMarkdown.js'
 
 let route
 let i18n
+const wrappers = []
 
 vi.mock('vue-router', () => ({
   useRoute: () => route,
@@ -149,20 +152,22 @@ function mountComponent(component) {
   app.use(i18n)
   app.mount(host)
 
-  return {
-    host,
-    unmount() {
-      app.unmount()
-      host.remove()
-    },
-  }
+  let isMounted = true
+  const wrapper = { host, unmount() {
+    if (!isMounted) return
+    isMounted = false
+    app.unmount()
+    host.remove()
+  } }
+  wrappers.push(wrapper)
+  return wrapper
 }
 
 async function openGuideFor(component) {
   const wrapper = mountComponent(component)
   await nextTick()
 
-  const trigger = document.querySelector('[data-tutorial-trigger]')
+  const trigger = document.querySelector('[data-tutorial-trigger] .tutorial-trigger__main')
   expect(trigger).toBeTruthy()
   trigger.click()
 
@@ -174,6 +179,7 @@ async function openGuideFor(component) {
 
 describe('PageTutorialGuide', () => {
   beforeEach(() => {
+    vi.stubGlobal('matchMedia', () => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() }))
     route = reactive({
       path: '/menu/query/zhonggu',
       query: {},
@@ -192,8 +198,11 @@ describe('PageTutorialGuide', () => {
   })
 
   afterEach(() => {
+    vi.unstubAllGlobals()
+    wrappers.splice(0).forEach(wrapper => wrapper.unmount())
     document.body.innerHTML = ''
     vi.clearAllMocks()
+    vi.restoreAllMocks()
   })
 
   it.each([
@@ -209,28 +218,28 @@ describe('PageTutorialGuide', () => {
       params: { sub: 'custom' },
       query: {},
       expectedKey: 'menu-map-custom',
-      expectedTitle: '自定義繪圖'
+      expectedTitle: '自定地圖'
     },
     {
       path: '/explore/tools/praat',
       params: {},
       query: { tab: 'results' },
       expectedKey: 'explore-praat-results',
-      expectedTitle: 'Praat 結果'
+      expectedTitle: '分析結果'
     },
     {
-      path: '/explore/yubao',
+      path: '/menu/yubao',
       params: {},
       query: { tab: 'grammar' },
-      expectedKey: 'explore-yubao-grammar',
-      expectedTitle: '語保語法'
+      expectedKey: 'explore-yubao',
+      expectedTitle: '語保'
     },
     {
       path: '/auth',
       params: {},
-      query: { view: 'register' },
-      expectedKey: 'auth-register',
-      expectedTitle: '註冊'
+      query: { view: 'overview' },
+      expectedKey: 'auth-overview',
+      expectedTitle: '賬戶總覽'
     },
   ])('auto-selects the current route tutorial for $path', async ({ path, params, query, expectedKey, expectedTitle }) => {
     route.path = path
@@ -274,52 +283,53 @@ describe('PageTutorialGuide', () => {
     wrapper.unmount()
   })
 
-  it('renders markdown article content with images and secure external links', async () => {
+  it('renders current markdown screenshots and section headings', async () => {
     const { default: PageTutorialGuide } = await tutorialModule()
     const wrapper = await openGuideFor(PageTutorialGuide)
 
     const articleImage = document.querySelector('.tutorial-article img')
-    const articleLink = document.querySelector('.tutorial-article a[href="https://example.com/tutorial/query/zhonggu"]')
-    const externalLink = articleLink || document.querySelector('.tutorial-article a[target="_blank"]')
-    const codeNodes = [...document.querySelectorAll('.tutorial-article code')]
-    const routeCodeNode = codeNodes.find((node) => node.textContent === '/menu/query/zhonggu')
+    const articleHeading = document.querySelector('.tutorial-article__content h2')
 
-    expect(articleImage?.getAttribute('src')).toBe('/tutorial/menu-query-zhonggu/overview.svg')
-    expect(externalLink?.getAttribute('target')).toBe('_blank')
-    expect(externalLink?.getAttribute('rel')).toContain('noopener')
-    expect(routeCodeNode?.textContent).toBe('/menu/query/zhonggu')
+    expect(decodeURI(articleImage?.getAttribute('src'))).toBe('/tutorial/menu-query-zhonggu/01-输入页面总览.webp')
+    expect(articleHeading?.textContent).toContain('輸入頁面')
 
     wrapper.unmount()
+  })
+
+  it('renders external markdown links with secure new-tab attributes', () => {
+    const tokens = marked.lexer('# Fixture\n\nSummary\n\n[External](https://example.com)')
+    vi.spyOn(marked, 'lexer').mockReturnValue(tokens)
+    const doc = resolveTutorialDocument('menu-query-zhonggu', 'zh-Hant', { isNativeBuild: true })
+    const container = document.createElement('div')
+    container.innerHTML = doc.html
+    const link = container.querySelector('a[href="https://example.com"]')
+    expect(link).not.toBeNull()
+    expect(link.target).toBe('_blank')
+    expect(link.rel.split(' ')).toEqual(expect.arrayContaining(['noopener', 'noreferrer']))
   })
 
   it('uses locale-specific markdown when it exists', async () => {
-    route.path = '/auth'
-    route.params = {}
-    route.query = { view: 'register' }
-    route.fullPath = '/auth?view=register'
-    i18n.global.locale.value = 'en'
-
-    const { default: PageTutorialGuide } = await tutorialModule()
-    const wrapper = await openGuideFor(PageTutorialGuide)
-
-    expect(document.querySelector('[data-tutorial-title]')?.textContent).toContain('Register')
-    expect(document.querySelector('.tutorial-shell__current-label')?.textContent).toContain('Current Page')
-    expect(document.querySelector('.tutorial-article__group')?.textContent).toContain('Account and Customization')
-    expect(document.querySelector('[data-tutorial-next]')?.textContent).toContain('Next')
-
-    wrapper.unmount()
-  })
-
-  it('falls back to zh-Hant markdown when the current locale document is missing', async () => {
     i18n.global.locale.value = 'zh-CN'
 
     const { default: PageTutorialGuide } = await tutorialModule()
     const wrapper = await openGuideFor(PageTutorialGuide)
 
-    expect(document.querySelector('.tutorial-shell__current-label')?.textContent).toContain('当前页')
-    expect(document.querySelector('.tutorial-article__group')?.textContent).toContain('主站查询')
+    expect(document.querySelector('[data-tutorial-title]')?.textContent).toBe('查中古')
+    expect(document.querySelector('.tutorial-article__summary')?.textContent).toContain('中古音韵地位')
+    expect(document.querySelector('[data-tutorial-next]')?.textContent).toContain('下一篇')
+
+    wrapper.unmount()
+  })
+
+  it('falls back to zh-Hant markdown when the current locale document is missing', async () => {
+    i18n.global.locale.value = 'en'
+
+    const { default: PageTutorialGuide } = await tutorialModule()
+    const wrapper = await openGuideFor(PageTutorialGuide)
+
+    expect(document.querySelector('[data-tutorial-next]')?.textContent).toContain('Next')
     expect(document.querySelector('[data-tutorial-title]')?.textContent).toContain('查中古')
-    expect(document.querySelector('.tutorial-article__summary')?.textContent).toContain('中古音條件')
+    expect(document.querySelector('.tutorial-article__summary')?.textContent).toContain('中古音韻地位')
 
     wrapper.unmount()
   })
@@ -336,7 +346,7 @@ describe('PageTutorialGuide', () => {
 
     const previewImg = document.querySelector('.image-preview-overlay__img')
     expect(previewImg).toBeTruthy()
-    expect(previewImg.getAttribute('src')).toBe(articleImage.getAttribute('src'))
+    expect(previewImg.getAttribute('src')).toBe(articleImage.src)
 
     const closeBtn = document.querySelector('.image-preview-overlay .close-btn')
     expect(closeBtn).toBeTruthy()
@@ -376,7 +386,7 @@ describe('PageTutorialGuide', () => {
     const wrapper = mountComponent(PageTutorialGuide)
     await nextTick()
 
-    expect(document.querySelector('[data-tutorial-trigger]')).toBeNull()
+    expect(document.querySelector('[data-tutorial-trigger] .tutorial-trigger__main')).toBeNull()
 
     wrapper.unmount()
   })

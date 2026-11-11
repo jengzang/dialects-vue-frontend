@@ -110,7 +110,11 @@
           </div>
           <div class="custom-color-picker">
             <span>{{ $t('auth.profile.avatar.textColorCustom') }}</span>
-            <input v-model="avatarConfig.bgColor" type="color" />
+            <input
+              :value="resolveColorToHex(avatarConfig.bgColor)"
+              type="color"
+              @input="avatarConfig.bgColor = $event.target.value"
+            />
           </div>
         </div>
 
@@ -142,11 +146,19 @@
           <div class="custom-gradient-pickers">
             <div class="picker-item">
               <span>{{ $t('auth.profile.avatar.gradientStartColor') }}</span>
-              <input v-model="avatarConfig.gradientFrom" type="color" />
+              <input
+                :value="resolveColorToHex(avatarConfig.gradientFrom)"
+                type="color"
+                @input="avatarConfig.gradientFrom = $event.target.value"
+              />
             </div>
             <div class="picker-item">
               <span>{{ $t('auth.profile.avatar.gradientEndColor') }}</span>
-              <input v-model="avatarConfig.gradientTo" type="color" />
+              <input
+                :value="resolveColorToHex(avatarConfig.gradientTo)"
+                type="color"
+                @input="avatarConfig.gradientTo = $event.target.value"
+              />
             </div>
           </div>
         </div>
@@ -184,7 +196,11 @@
 
             <div class="custom-text-color">
               <span>{{ $t('auth.profile.avatar.textColorCustom') }}</span>
-              <input v-model="avatarConfig.textColor" type="color" />
+              <input
+                :value="resolveColorToHex(avatarConfig.textColor)"
+                type="color"
+                @input="avatarConfig.textColor = $event.target.value"
+              />
             </div>
           </div>
         </div>
@@ -246,17 +262,28 @@ const presetSolids = [
   '#34c759', // Apple Green
   '#ff9500', // Apple Orange
   '#ff2d55', // Apple Pink
+  '#8ab4f8', // Theme primary: blue dark
   '#af52de', // Apple Purple
-  '#5856d6', // Apple Indigo
+  // '#5856d6', // Apple Indigo
   '#ffcc00', // Apple Yellow
   '#8e8e93', // Apple Gray
+  // '#0070e8', // Theme primary: default
+  // '#b23a32', // Theme primary: red light
+  // '#86d99b', // Theme primary: green dark
+  // '#ff3b3b', // Theme primary: red dark
+  // '#267443', // Theme primary: green light
 ];
 
 const presetTextColors = [
   '#ffffff',
   '#000000',
   '#0051d5',
-  '#1b5e20',
+  '#1c5b34', // Theme hover: green light
+  '#a2e5b3', // Theme hover: green dark
+  '#922f29', // Theme hover: red light
+  '#ff514b', // Theme hover: red dark
+  '#aacbff', // Theme hover: blue dark
+  // '#1b5e20',
   '#6e00ff',
 ];
 
@@ -277,7 +304,7 @@ const getDefaultConfig = () => {
     shape: 'circle',
     bgType: 'solid',
     glass: true,
-    bgColor: '#ffffff',
+    bgColor: 'var(--color-primary)',
     gradientFrom: 'var(--color-primary)',
     gradientTo: 'var(--color-primary-cyan)',
     gradientAngle: 145,
@@ -293,7 +320,7 @@ const avatarConfig = ref({
   shape: 'circle',
   bgType: 'solid',
   glass: true,
-  bgColor: '#ffffff',
+  bgColor: 'var(--color-primary)',
   gradientFrom: 'var(--color-primary)',
   gradientTo: 'var(--color-primary-cyan)',
   gradientAngle: 145,
@@ -338,8 +365,8 @@ const resetAvatarConfig = () => {
 
 const applyPresetGradient = (grad) => {
   avatarConfig.value.bgType = 'gradient';
-  avatarConfig.value.gradientFrom = grad.from;
-  avatarConfig.value.gradientTo = grad.to;
+  avatarConfig.value.gradientFrom = resolveColorToHex(grad.from);
+  avatarConfig.value.gradientTo = resolveColorToHex(grad.to);
 };
 
 const hexToRgb = (hex) => {
@@ -351,6 +378,28 @@ const hexToRgb = (hex) => {
         b: parseInt(result[3], 16),
       }
     : null;
+};
+
+const toRgba = (color, fallbackRgbToken, alpha) => {
+  const rgb = hexToRgb(color);
+  return rgb
+    ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`
+    : `rgba(var(${fallbackRgbToken}), ${alpha})`;
+};
+
+const resolveColorToHex = (color) => {
+  if (!color?.startsWith('var(')) return color;
+
+  const probe = document.createElement('span');
+  probe.style.color = color;
+  document.body.appendChild(probe);
+  const computedColor = getComputedStyle(probe).color;
+  probe.remove();
+
+  const match = computedColor.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  return match
+    ? `#${match.slice(1, 4).map((channel) => Number(channel).toString(16).padStart(2, '0')).join('')}`
+    : color;
 };
 
 const avatarStyle = computed(() => {
@@ -369,8 +418,7 @@ const avatarStyle = computed(() => {
 
   if (avatarConfig.value.bgType === 'solid') {
     if (isGlass) {
-      const rgb = hexToRgb(avatarConfig.value.bgColor) || { r: 255, g: 255, b: 255 };
-      styles.background = `linear-gradient(145deg, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2), rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1))`;
+      styles.background = `linear-gradient(145deg, ${toRgba(avatarConfig.value.bgColor, '--color-primary-rgb', 0.2)}, ${toRgba(avatarConfig.value.bgColor, '--color-primary-rgb', 0.1)})`;
       if (avatarConfig.value.bgColor === '#ffffff') {
         styles.backdropFilter = 'blur(15px) saturate(150%)';
         styles.webkitBackdropFilter = 'blur(15px) saturate(150%)';
@@ -385,9 +433,7 @@ const avatarStyle = computed(() => {
     }
   } else if (avatarConfig.value.bgType === 'gradient') {
     if (isGlass) {
-      const rgbFrom = hexToRgb(avatarConfig.value.gradientFrom) || { r: 0, g: 122, b: 255 };
-      const rgbTo = hexToRgb(avatarConfig.value.gradientTo) || { r: 0, g: 198, b: 255 };
-      styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.55), rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25))`;
+      styles.background = `linear-gradient(${avatarConfig.value.gradientAngle}deg, ${toRgba(avatarConfig.value.gradientFrom, '--color-primary-rgb', 0.55)}, ${toRgba(avatarConfig.value.gradientTo, '--color-primary-cyan-rgb', 0.25)})`;
       styles.backdropFilter = 'blur(20px) saturate(190%)';
       styles.webkitBackdropFilter = 'blur(20px) saturate(190%)';
       styles.border = '2.5px solid var(--glass-50)';
@@ -402,8 +448,7 @@ const avatarStyle = computed(() => {
         if (avatarConfig.value.bgColor === '#ffffff') {
           styles.boxShadow = '0 6px 10px rgba(0, 0, 0, 0.1), 0 1px 4px rgba(0, 0, 0, 0.08)';
         } else {
-          const rgb = hexToRgb(avatarConfig.value.bgColor) || { r: 0, g: 122, b: 255 };
-          styles.boxShadow = `0 8px 24px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2), inset 0 0 12px var(--glass-30)`;
+          styles.boxShadow = `0 8px 24px ${toRgba(avatarConfig.value.bgColor, '--color-primary-rgb', 0.2)}, inset 0 0 12px var(--glass-30)`;
         }
       } else {
         const rgb = hexToRgb(avatarConfig.value.bgColor);
@@ -416,18 +461,9 @@ const avatarStyle = computed(() => {
       }
     } else if (avatarConfig.value.bgType === 'gradient') {
       if (isGlass) {
-        const rgbFrom = hexToRgb(avatarConfig.value.gradientFrom) || { r: 0, g: 122, b: 255 };
-        const rgbTo = hexToRgb(avatarConfig.value.gradientTo) || { r: 0, g: 198, b: 255 };
-        styles.boxShadow = `0 10px 25px rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.25), 0 5px 15px rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25), inset 0 2px 4px var(--glass-60), inset 0 -2px 4px rgba(0, 0, 0, 0.08)`;
+        styles.boxShadow = `0 10px 25px ${toRgba(avatarConfig.value.gradientFrom, '--color-primary-rgb', 0.25)}, 0 5px 15px ${toRgba(avatarConfig.value.gradientTo, '--color-primary-cyan-rgb', 0.25)}, inset 0 2px 4px var(--glass-60), inset 0 -2px 4px rgba(0, 0, 0, 0.08)`;
       } else {
-        const rgbFrom = hexToRgb(avatarConfig.value.gradientFrom);
-        const rgbTo = hexToRgb(avatarConfig.value.gradientTo);
-        if (rgbFrom && rgbTo) {
-          styles.boxShadow = `0 8px 20px rgba(${rgbFrom.r}, ${rgbFrom.g}, ${rgbFrom.b}, 0.25), 0 4px 12px rgba(${rgbTo.r}, ${rgbTo.g}, ${rgbTo.b}, 0.25), inset 0 0 8px var(--glass-20)`;
-        } else {
-          styles.boxShadow =
-            '0 8px 20px rgba(var(--color-primary-rgb), 0.3), inset 0 0 8px var(--glass-20)';
-        }
+        styles.boxShadow = `0 8px 20px ${toRgba(avatarConfig.value.gradientFrom, '--color-primary-rgb', 0.25)}, 0 4px 12px ${toRgba(avatarConfig.value.gradientTo, '--color-primary-cyan-rgb', 0.25)}, inset 0 0 8px var(--glass-20)`;
       }
     }
   } else {
@@ -548,7 +584,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
   width: 80px;
   height: 80px;
-  font-size: 28px;
+  font-size: var(--font-size-28);
   font-weight: 700;
   border: 2.5px solid $white;
   transition: all $transition-slow $smooth-easing;
@@ -557,7 +593,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 .preview-tip {
   margin: 0;
   color: $text-secondary;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 550;
 }
 
@@ -587,7 +623,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   gap: 8px;
   align-items: center;
   color: $text-primary;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 600;
   cursor: pointer;
   user-select: none;
@@ -613,7 +649,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .control-label {
   color: $text-primary;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 600;
   letter-spacing: -0.01em;
 }
@@ -622,7 +658,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   box-sizing: border-box;
   width: 100%;
   padding: 10px 14px;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   font-weight: 500;
   background: var(--glass-80);
   color: var(--color-primary-hover);
@@ -651,7 +687,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   gap: 4px;
   padding: 10px 12px;
   color: $text-primary;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   cursor: pointer;
   background: var(--glass-60);
@@ -711,7 +747,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   align-items: center;
   margin-top: 4px;
   color: $text-secondary;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 550;
 
   input[type="color"] {
@@ -729,7 +765,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 .gradient-bar {
   padding: 12px 6px;
   color: $white;
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 600;
   text-align: center;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
@@ -766,7 +802,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   gap: 8px;
   align-items: center;
   color: $text-secondary;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 550;
 
   input[type="color"] {
@@ -781,7 +817,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   width: 100%;
   margin-top: 8px;
   color: $text-secondary;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 550;
 
   .glass-range {
@@ -804,7 +840,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .text-color-btn {
   padding: 8px 16px;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 600;
   cursor: pointer;
   border: 1px solid rgba(0, 0, 0, 0.08);
@@ -836,7 +872,7 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .modal-footer-btn {
   padding: 10px 18px;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   cursor: pointer;
   border: none;

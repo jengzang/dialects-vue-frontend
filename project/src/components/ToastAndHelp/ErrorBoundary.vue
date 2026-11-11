@@ -117,14 +117,14 @@ function goToFeedback() {
 }
 
 .error-boundary-title {
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 600;
   color: var(--text-deep);
   margin: 0 0 8px;
 }
 
 .error-boundary-message {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
   line-height: 1.6;
   margin: 0 0 28px;
@@ -139,7 +139,7 @@ function goToFeedback() {
 .error-boundary-btn {
   padding: 10px 24px;
   border-radius: var(--radius-md);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -157,7 +157,7 @@ function goToFeedback() {
   &--secondary {
     background: var(--surface-glass-button);
     color: var(--text-primary);
-    border: 1px solid var(--glass-15);
+    border: 1px solid var(--glass-20);
 
     &:hover {
       background: var(--surface-glass-button-hover);

@@ -544,7 +544,6 @@ import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed, nextTick, onBeforeUnmount } from 'vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import { useRoute, useRouter } from 'vue-router'
-import * as echarts from 'echarts'
 import { clusterSubset, compareSubsets as compareSubsetsAPI, fetchSubsetFilter } from '@/api/index.js'
 import { showError, showSuccess, showWarning } from '@/utils/ui/message.js'
 import { userStore } from '@/main/store/store.js'
@@ -554,6 +553,7 @@ import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { FILTER_FIELDS, getOperatorOptions, getDefaultOperator, getFieldInputType, getFieldOptions } from '@/VillagesML/config/subsetFilters.js'
 import { getCategoryName, getCategoryIcon } from '@/VillagesML/config/villagesML.js'
 import { buildCurrentVillagesMLPath } from '@/VillagesML/utils/currentDataset.js'
+import { initChart, onChartThemeChange } from '@/utils/chart/chartTheme'
 
 // Router
 const router = useRouter()
@@ -972,7 +972,7 @@ const renderComparisonChart = () => {
     comparisonChartInstance = null
   }
 
-  comparisonChartInstance = echarts.init(comparisonChart.value)
+  comparisonChartInstance = initChart(comparisonChart.value)
 
   // 使用 semantic_comparison 數據構建雷達圖
   const semanticData = comparisonResults.value.semantic_comparison || []
@@ -998,7 +998,7 @@ const renderComparisonChart = () => {
   }))
 
   comparisonChartInstance.setOption({
-    title: { text: '子集語義特徵比較', left: 'center', textStyle: { color: '#0b2540', fontWeight: 600 } },
+    title: { text: '子集語義特徵比較', left: 'center', textStyle: { fontWeight: 600 } },
     tooltip: {
       trigger: 'item',
       formatter: (params) => {
@@ -1043,6 +1043,10 @@ const renderClusteringChart = () => {
   // 如果后续 API 添加了 PCA 坐标，可以在这里实现可视化
   return
 }
+
+onChartThemeChange(() => {
+  renderComparisonChart()
+})
 
 // Cleanup on unmount
 onBeforeUnmount(() => {
@@ -1187,7 +1191,7 @@ const handleApiError = (error) => {
 }
 
 .page-header h2 {
-  font-size: 28px;
+  font-size: var(--font-size-28);
   color: var(--text-primary);
   margin-bottom: 10px;
   font-weight: 600;
@@ -1195,7 +1199,7 @@ const handleApiError = (error) => {
 
 .subtitle {
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   margin-bottom: 16px;
 }
 
@@ -1212,7 +1216,7 @@ const handleApiError = (error) => {
 }
 
 .lock-icon {
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 /* Glass Panel */
@@ -1240,7 +1244,7 @@ const handleApiError = (error) => {
 }
 
 .panel-header h3 {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--text-primary);
   margin: 0;
@@ -1317,12 +1321,12 @@ const handleApiError = (error) => {
 .info-value {
   color: var(--vml-blue);
   font-weight: 600;
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 .info-note {
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 400;
   margin-left: 8px;
 }
@@ -1352,7 +1356,7 @@ const handleApiError = (error) => {
 
 .subset-card h4 {
   margin: 0 0 16px 0;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -1370,18 +1374,18 @@ const handleApiError = (error) => {
 }
 
 .stat-item .label {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
 }
 
 .stat-item .value {
   font-weight: 600;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   color: var(--vml-blue);
 }
 
 .vs-divider {
-  font-size: 28px;
+  font-size: var(--font-size-28);
   font-weight: 700;
   color: var(--vml-blue);
   text-shadow: 0 2px 8px rgba(var(--vml-blue-rgb), 0.3);
@@ -1418,7 +1422,7 @@ const handleApiError = (error) => {
 }
 
 .metric-label {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 500;
   color: var(--text-secondary);
   margin-bottom: 8px;
@@ -1427,7 +1431,7 @@ const handleApiError = (error) => {
 }
 
 .metric-value {
-  font-size: 28px;
+  font-size: var(--font-size-28);
   font-weight: 700;
   color: var(--vml-blue);
   text-shadow: 0 2px 8px rgba(var(--vml-blue-rgb), 0.2);
@@ -1465,7 +1469,7 @@ const handleApiError = (error) => {
 
 .glass-table th {
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -1505,7 +1509,7 @@ const handleApiError = (error) => {
 
 .control-row label {
   font-weight: 500;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
   white-space: nowrap;
 }
@@ -1543,13 +1547,13 @@ const handleApiError = (error) => {
 }
 
 .checkbox-label {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .checkbox-desc {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
 }
 
@@ -1577,14 +1581,14 @@ const handleApiError = (error) => {
 }
 
 .stat-card .stat-label {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   margin-bottom: 8px;
   font-weight: 500;
 }
 
 .stat-card .stat-value {
-  font-size: 24px;
+  font-size: var(--font-size-24);
   font-weight: 700;
   color: var(--vml-blue);
 }
@@ -1618,13 +1622,13 @@ const handleApiError = (error) => {
 }
 
 .cluster-id {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--vml-blue);
 }
 
 .cluster-size {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
   font-weight: 500;
 }
@@ -1635,7 +1639,7 @@ const handleApiError = (error) => {
 }
 
 .sample-label {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   font-weight: 500;
 }
@@ -1652,7 +1656,7 @@ const handleApiError = (error) => {
   background: rgba(var(--vml-blue-rgb), 0.1);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.2);
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-primary);
   transition: all 0.2s ease;
 }
@@ -1675,7 +1679,7 @@ const handleApiError = (error) => {
 .loading-overlay p {
   color: var(--text-on-overlay, white);
   margin-top: 16px;
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 /* Responsive Design */
@@ -1782,13 +1786,13 @@ const handleApiError = (error) => {
 }
 
 .total-count {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--vml-blue);
 }
 
 .display-note {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
 }
 
@@ -1813,7 +1817,7 @@ const handleApiError = (error) => {
 
 .village-region {
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 
 .pagination {
@@ -1826,7 +1830,7 @@ const handleApiError = (error) => {
 }
 
 .page-info {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
   font-weight: 500;
 }
@@ -1844,11 +1848,11 @@ const handleApiError = (error) => {
 }
 
 .hint-icon {
-  font-size: 18px;
+  font-size: var(--font-size-18);
 }
 
 .hint-text {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
   line-height: 1.5;
 }
@@ -1883,7 +1887,7 @@ const handleApiError = (error) => {
 
 .timings-section h4 {
   margin: 0 0 16px 0;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -1913,7 +1917,7 @@ const handleApiError = (error) => {
 }
 
 .timing-icon {
-  font-size: 24px;
+  font-size: var(--font-size-24);
   line-height: 1;
 }
 
@@ -1924,20 +1928,20 @@ const handleApiError = (error) => {
 }
 
 .timing-label {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   font-weight: 500;
 }
 
 .timing-value {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 700;
   color: var(--vml-blue);
   font-family: var(--font-mono);
 }
 
 .char-cell {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--text-primary);
   text-align: center;
@@ -1961,7 +1965,7 @@ const handleApiError = (error) => {
 
 .lift-value.infinite {
   color: var(--color-warning);
-  font-size: 16px;
+  font-size: var(--font-size-16);
 }
 
 /* Spatial Comparison */
@@ -1975,7 +1979,7 @@ const handleApiError = (error) => {
 
 .spatial-comparison-section h4 {
   margin: 0 0 20px 0;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -1989,7 +1993,7 @@ const handleApiError = (error) => {
 
 .spatial-group h5 {
   margin: 0 0 12px 0;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--vml-blue);
 }
@@ -2009,13 +2013,13 @@ const handleApiError = (error) => {
 }
 
 .stat-label {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
   font-weight: 500;
 }
 
 .stat-value {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
   font-weight: 600;
   font-family: var(--font-mono);
@@ -2033,13 +2037,13 @@ const handleApiError = (error) => {
 }
 
 .distance-label {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .distance-value {
-  font-size: 24px;
+  font-size: var(--font-size-24);
   font-weight: 700;
   color: var(--vml-blue);
   text-shadow: 0 2px 8px rgba(var(--vml-blue-rgb), 0.2);

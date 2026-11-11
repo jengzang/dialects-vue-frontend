@@ -398,9 +398,9 @@ const SEO_CONFIG = {
     },
     '/menu/vocabulary/view': {
       title: {
-        'zh-Hant': { main: '詞表瀏覽', subtitle: '線上查詢比較各地方言詞彙與說法' },
-        'zh-CN': { main: '词表浏览', subtitle: '在线查询比较各地方言词汇与说法' },
-        en: { main: 'Vocabulary Browser', subtitle: 'Look up and compare regional dialect vocabulary' },
+        'zh-Hant': { main: '方言詞表查詢', subtitle: '查詢比較各地方言詞彙與俗語，支持地圖、卡片、表格多種呈現方式' },
+        'zh-CN': { main: '方言词表查询', subtitle: '查询比较各地方言词汇与俗语，支持地图、卡片、表格多种呈现方式' },
+        en: { main: 'Dialect Vocabulary Search', subtitle: 'Search and compare regional dialect vocabulary and sayings in map, card, and table views' },
       },
       description: {
         'zh-Hant': '線上查詢全國各地方言詞彙，比較同一詞語在不同地區的方言說法、IPA和詞義解釋等。支援按書面語標準詞、方言詞、音標或釋義搜尋，並透過卡片、地圖和表格三種模式瀏覽方言詞表。',
@@ -542,14 +542,14 @@ const SEO_CONFIG = {
     },
     '/menu/about/like': {
       title: {
-        'zh-Hant': { main: '支持我們', subtitle: '專案倉庫、開發感悟與掃碼支持' },
-        'zh-CN': { main: '支持我们', subtitle: '项目仓库、开发感悟与扫码支持' },
-        en: { main: 'Support Us', subtitle: 'View the repository, development reflections, and support options' },
+        'zh-Hant': { main: '支持我們', subtitle: '專案倉庫、關注與掃碼支持' },
+        'zh-CN': { main: '支持我们', subtitle: '项目仓库、关注与扫码支持' },
+        en: { main: 'Support Us', subtitle: 'View the repository, follow the author, and find support options' },
       },
       description: {
-        'zh-Hant': '查看專案倉庫、作者的開發感悟，以及掃碼支持作者。',
-        'zh-CN': '查看项目仓库、作者的开发感悟，以及扫码支持作者。',
-        en: 'View the project repository and the author\'s development reflections, or scan a QR code to support the author.',
+        'zh-Hant': '查看專案倉庫、關注作者，以及掃碼支持作者。',
+        'zh-CN': '查看项目仓库、关注作者，以及扫码支持作者。',
+        en: 'View the project repository, follow the author, or scan a QR code to support the author.',
       },
     },
     '/explore': {
@@ -564,28 +564,16 @@ const SEO_CONFIG = {
         en: 'Explore Chinese dialect datasets and online tools: village records, regional vocabulary, dialect mapping, pronunciation tables, and Praat-based speech analysis.',
       },
     },
-    '/explore/features': {
+    '/menu/about/history': {
       title: {
-        'zh-Hant': { main: '功能索引', subtitle: '' },
-        'zh-CN': { main: '功能索引', subtitle: '' },
-        en: { main: 'Feature Index', subtitle: '' },
+        'zh-Hant': { main: '網站歷史', subtitle: '' },
+        'zh-CN': { main: '网站历史', subtitle: '' },
+        en: { main: 'Website History', subtitle: '' },
       },
       description: {
-        'zh-Hant': '方音圖鑑的功能索引入口；此入口不作為搜尋結果收錄頁。',
-        'zh-CN': '方音图鉴的功能索引入口；此入口不作为搜索结果收录页。',
-        en: 'Feature index entry for Dialects Atlas; this entry is not intended for search result indexing.',
-      },
-    },
-    '/explore/history': {
-      title: {
-        'zh-Hant': { main: '歷史入口', subtitle: '' },
-        'zh-CN': { main: '历史入口', subtitle: '' },
-        en: { main: 'History Entry', subtitle: '' },
-      },
-      description: {
-        'zh-Hant': '方音圖鑑的歷史入口頁；此入口不作為搜尋結果收錄頁。',
-        'zh-CN': '方音图鉴的历史入口页；此入口不作为搜索结果收录页。',
-        en: 'History entry for Dialects Atlas; this entry is not intended for search result indexing.',
+        'zh-Hant': '查看方音圖鑑從最初腳本到線上平台的完整開發歷程、各版本功能上線時間與開發感悟。',
+        'zh-CN': '查看方音图鉴从最初脚本到线上平台的完整开发历程、各版本功能上线时间与开发感悟。',
+        en: 'Explore the complete development history of Dialects Atlas, from its first scripts to an online platform, including feature release dates and reflections.',
       },
     },
     '/explore/gis': {
@@ -705,6 +693,7 @@ export const SITEMAP_PATHS = [
   '/menu/privacy',
   '/menu/settings',
   '/menu/about/intro',
+  '/menu/about/history',
   '/menu/about/suggestion',
   '/menu/about/like',
   '/menu/query/char',
@@ -753,8 +742,6 @@ export const NOINDEX_PATHS = new Set([
   '/menu/result',
   '/explore/manage',
   '/explore/villages/all',
-  '/explore/features',
-  '/explore/history',
 ])
 
 export default SEO_CONFIG

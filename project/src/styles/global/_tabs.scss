@@ -3,7 +3,7 @@
 .ui-tab-item {
   appearance: none;
   font: inherit;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 500;
   line-height: 1.4;
   color: var(--text-dark);
@@ -36,11 +36,15 @@
 }
 
 .ui-tabs-navigation--underline {
-  border-bottom: 1px solid var(--border-control);
+  border-top: 0.5px solid var(--border-control);
+  border-left: 0.5px solid var(--border-control);
+  border-right: 0.5px solid var(--border-control);
+  border-bottom: 2px solid var(--border-control);
     background: var(--glass-10);
     backdrop-filter: blur(8px) saturate(180%);
     -webkit-backdrop-filter: blur(8px) saturate(180%);
     border-radius: var(--radius-sm);
+  font-size: var(--font-size-18);
 
   .ui-tab-item {
     border-bottom: 3px solid transparent;
@@ -49,6 +53,8 @@
 
     &.active {
       border-bottom-color: var(--color-primary);
+      font-size: var(--font-size-20);
+      font-weight: 600;
     }
   }
 }
@@ -61,7 +67,7 @@
   box-shadow: var(--shadow-card-sm);
 
   .ui-tab-item {
-    font-size: 14px;
+    font-size: var(--font-size-14);
     color: var(--text-secondary);
     border-radius: var(--radius-sm2);
 
@@ -76,11 +82,11 @@
 
 @media (max-aspect-ratio: 1 / 1) {
   .ui-tab-item {
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 
   .ui-tabs-navigation--adaptive .ui-tab-item {
-    font-size: 13px;
+    font-size: var(--font-size-13);
   }
 }
 
@@ -92,7 +98,7 @@
 
   .ui-tab-item {
     display: inline-grid;
-    font-size: 16px;
+    font-size: var(--font-size-16);
     line-height: normal;
     border-radius: var(--radius-md);
     transition: color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
@@ -115,7 +121,7 @@
   }
 
   &.ui-tabs-navigation--surface {
-    :root[data-color-theme='dark'] & .ui-tab-item.active {
+    :root[data-color-mode='dark'] & .ui-tab-item.active {
       background: var(--color-primary-light2);
     }
   }
@@ -134,7 +140,45 @@
 }
 
 .tabs-wrapper--segmented.tabs-wrapper--compact .ui-tab-item {
-  font-size: 15px;
+  font-size: var(--font-size-16);
+}
+
+// Filled single-choice controls share the tab foundation without changing tabs.
+.ui-tabs-navigation--segmented.ui-tabs-navigation--filled {
+  background: var(--surface-elevation-0);
+  border-color: var(--border-control);
+  border-radius: var(--radius-lg);
+  box-shadow: none;
+
+  .ui-tab-item {
+    @include flex-center;
+    color: var(--text-secondary);
+    border-radius: var(--radius-md);
+
+    &::after {
+      content: none;
+    }
+
+    &.active {
+      color: var(--action-solid-text);
+      background: var(--action-primary-bg);
+      box-shadow: var(--shadow-sm);
+
+      &:hover {
+        background: var(--action-primary-bg-hover);
+      }
+    }
+  }
+}
+
+.theme-choice-swatch {
+  flex-shrink: 0;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 0 0 2px var(--surface-panel);
+
+  &--blue { color: var(--theme-preview-blue); }
+  &--red { color: var(--theme-preview-red); }
+  &--green { color: var(--theme-preview-green); }
 }
 
 @media (prefers-reduced-motion: reduce) {

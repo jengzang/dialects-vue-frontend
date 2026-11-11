@@ -25,7 +25,9 @@ describe('result panel layout', () => {
   it('keeps the result panel in page flow so the layout footer remains reachable', () => {
     const panelStyle = extractPanelStyle(resultListSource())
 
-    expect(panelStyle).toContain('height: 85dvh')
+    expect(panelStyle).toContain('position: relative')
+    expect(panelStyle).toContain('overflow: visible')
+    expect(panelStyle).not.toMatch(/(?:^|\n)\s*height:/)
     expect(panelStyle).toContain('border: 1px solid var(--border-light-gray)')
     expect(panelStyle).not.toContain('position: fixed')
     expect(panelStyle).not.toContain('bottom: 1dvh')

@@ -246,6 +246,7 @@ watch(currentTab, () => {
     width: fit-content;
     max-width: 100%;
     margin-bottom: 0;
+    box-sizing: border-box;
     z-index: 101;
   }
 }
@@ -257,12 +258,16 @@ watch(currentTab, () => {
   min-width: 0;
   max-width: 100%;
   overflow-x: auto;
+  overflow-y: hidden;
   position: relative;
 }
 
 .tab {
   flex-shrink: 0;
-  padding: 12px 8px;
+  padding: 12px 8px 6px;
+  &.active {
+    padding: 8px 8px 4px;
+  }
 }
 
 .tabs-header {
@@ -314,7 +319,7 @@ watch(currentTab, () => {
   }
 
   .tab {
-    padding: 10px 8px;
+    padding: 10px 8px 5px;
   }
 
   .tabs-wrapper--adaptive {
@@ -349,7 +354,7 @@ watch(currentTab, () => {
 
   @media (max-aspect-ratio: 1 / 1) {
     .tabs { gap: 8px; }
-    .tab { padding: 12px 6px; }
+    .tab { padding: 12px 16px; }
   }
 
   &.tabs-wrapper--compact {

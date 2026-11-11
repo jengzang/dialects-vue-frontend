@@ -6,9 +6,14 @@
         <title>方音圖鑑 - 方言比較 地理語言學平台</title>
         <!-- SEO: description -->
         <meta name="description" content="方音圖鑑 - 語言學分析與地理可視化平台。提供音韻查詢、方言比較、音系分析、Praat聲學分析、自然村機器學習等專業工具，探索漢語方言的歷史層次與地理分布。">
-        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/x-icon" href="/brand/favicon.ico" />
+        <meta property="og:title" content="方音圖鑑 - 方言比較 地理語言學平台" />
+        <meta property="og:description" content="方音圖鑑 - 語言學分析與地理可視化平台。提供音韻查詢、方言比較、音系分析、Praat聲學分析、自然村機器學習等專業工具，探索漢語方言的歷史層次與地理分布。" />
+        <meta property="og:url" content="https://dialects.yzup.top/zh-Hant" />
+        <meta property="og:image" content="https://dialects.yzup.top/brand/title.webp" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:image" content="https://dialects.yzup.top/brand/title.webp" />
         <!-- 資源提示優化 -->
-        <link rel="preload" as="image" href="/brand/title.webp">
         <link rel="dns-prefetch" href="https://dialects.yzup.top">
         <link rel="preconnect" href="https://dialects.yzup.top" crossorigin>
         <script>
@@ -53,13 +58,22 @@
                 }
             })();
         </script>
-        <script type="application/ld+json">
+        <script type="application/ld+json" data-hermes-seo="jsonld">
             {
                 "@context": "https://schema.org",
                 "@type": "WebSite",
                 "name": "方音圖鑑",
                 "alternateName": "Chinese Dialect Atlas",
                 "url": "https://dialects.yzup.top/"
+            }
+        </script>
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                "name": "方音圖鑑",
+                "url": "https://dialects.yzup.top/",
+                "logo": "https://dialects.yzup.top/brand/logo.png"
             }
         </script>
         <style>
@@ -176,16 +190,17 @@
       <main class="app-boot-loading app-boot-seo">
         <div class="app-boot-spinner" aria-hidden="true"></div>
         <h1 class="app-boot-title">方音圖鑑</h1>
-        <p class="app-boot-desc">方音圖鑑是一個漢語方言音韻查詢、方言比較、音系分析與地理可視化平台。提供查字、查中古、查音位、查調、方言比較、音系、音節統計、方言地圖、Praat 聲學分析、字表工具與自然村資料分析等功能。</p>
+        <p class="app-boot-desc">方音圖鑑是一個涵蓋漢語方言查詢与比較、音系与聲韻分析、地理可視化的平台。提供查字、查中古、查音位、查調、方言比較、音系、音節統計、方言地圖、Praat 聲學分析、字表工具與自然村資料分析等功能。</p>
         <nav class="app-boot-links" aria-label="主要功能">
-          <a href="/zh-Hant/menu/query/char/">查字</a>
-          <a href="/zh-Hant/menu/query/zhonggu/">查中古</a>
-          <a href="/zh-Hant/menu/compare/">方言比較</a>
-          <a href="/zh-Hant/menu/pho">音系</a>
-          <a href="/zh-Hant/menu/map/view/">方言地圖</a>
-          <a href="/zh-Hant/explore/tools/praat/">Praat 聲學分析</a>
-          <a href="/zh-Hant/explore/tools/check/">字表工具</a>
+          <a href="/zh-Hant/menu/query/char">查字</a>
+          <a href="/zh-Hant/menu/query/zhonggu">查中古</a>
+          <a href="/zh-Hant/menu/compare/zhonggu">方言比較</a>
+          <a href="/zh-Hant/menu/pho/matrix">音系</a>
+          <a href="/zh-Hant/menu/map/view">方言地圖</a>
+          <a href="/zh-Hant/explore/tools/praat">Praat 聲學分析</a>
+          <a href="/zh-Hant/explore/tools/check">字表工具</a>
           <a href="/zh-Hant/explore/villages/gd">自然村分析</a>
+          <a href="/zh-Hant/menu/vocabulary/view">詞表</a>
         </nav>
         <p class="app-boot-text">頁面載入中...</p>
         <noscript>
@@ -217,9 +232,9 @@
                 if (navLabels[loc]) nav.setAttribute('aria-label', navLabels[loc]);
                 var links = nav.querySelectorAll('a');
                 var linkTexts = {
-                    'zh-Hant': ['查字', '查中古', '方言比較', '音系', '方言地圖', 'Praat 聲學分析', '字表工具', '自然村分析'],
-                    'zh-CN': ['查字', '查中古', '方言比较', '音系', '方言地图', 'Praat 声学分析', '字表工具', '自然村分析'],
-                    'en': ['Char Lookup', 'MC Query', 'Comparison', 'Phonology', 'Dialect Map', 'Praat', 'Table Tools', 'Village Data']
+                    'zh-Hant': ['查字', '查中古', '方言比較', '音系', '方言地圖', 'Praat 聲學分析', '字表工具', '自然村分析', '詞表', '地名分布'],
+                    'zh-CN': ['查字', '查中古', '方言比较', '音系', '方言地图', 'Praat 声学分析', '字表工具', '自然村分析', '词表', '地名分布'],
+                    'en': ['Char Lookup', 'MC Query', 'Comparison', 'Phonology', 'Dialect Map', 'Praat', 'Table Tools', 'Village Data', 'Vocabulary', 'Toponym Distribution']
                 };
                 for (var i = 0; i < links.length; i++) {
                     links[i].href = links[i].getAttribute('href').replace(/^\/zh-(?:CN|Hant)\//, '/' + loc + '/');

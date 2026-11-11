@@ -14,7 +14,7 @@ import { villagesMLApi } from './request.js'
  * @param {number} params.page_size - 每頁數量（默認20）
  * @returns {Promise<Object>} { villages: [], total: number, page: number, page_size: number }
  */
-export async function searchVillages(params) {
+export async function searchVillages(params, options = {}) {
   const queryParams = new URLSearchParams()
 
   // query 參數是必需的，如果沒有關鍵詞則使用空格作為通配符
@@ -34,7 +34,7 @@ export async function searchVillages(params) {
   queryParams.append('limit', limit)
   queryParams.append('offset', offset)
 
-  return villagesMLApi(`/village/search?${queryParams.toString()}`)
+  return villagesMLApi(`/village/search?${queryParams.toString()}`, options)
 }
 
 /**

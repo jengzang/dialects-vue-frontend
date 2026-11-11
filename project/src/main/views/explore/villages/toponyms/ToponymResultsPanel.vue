@@ -1,21 +1,45 @@
 <template>
   <aside class="toponym-results-panel toponym-results-panel__inspector glass-panel">
-    <div class="toponym-results-panel__inner glass-subpanel">
+    <div class="toponym-results-panel__inner ui-scrollbar">
       <section class="toponym-results-panel__summary">
-        <h2>{{ t('villages.pages.toponyms.results.title') }}</h2>
-        <p v-if="!hasSearched">
+        <div class="toponym-results-panel__section-header">
+          <h2>{{ t('villages.pages.toponyms.results.title') }}</h2>
+          <button
+            class="glass-button toponym-results-panel__tree-toggle toponym-results-panel__disclosure"
+            type="button"
+            :aria-label="t('villages.pages.toponyms.results.title')"
+            :aria-expanded="summaryExpanded"
+            @click="summaryExpanded = !summaryExpanded"
+          >
+            <PhCaretRight
+              :size="16"
+              aria-hidden="true"
+            />
+          </button>
+        </div>
+        <p
+          v-if="!hasSearched"
+          v-show="summaryExpanded"
+        >
           {{ t('villages.pages.toponyms.results.empty') }}
         </p>
-        <p v-else-if="loading">
+        <p
+          v-else-if="loading"
+          v-show="summaryExpanded"
+        >
           {{ t('villages.pages.toponyms.results.loading') }}
         </p>
         <p
           v-else-if="error"
+          v-show="summaryExpanded"
           class="toponym-results-panel__error"
         >
           {{ error }}
         </p>
-        <p v-else>
+        <p
+          v-else
+          v-show="summaryExpanded"
+        >
           {{
             t('villages.pages.toponyms.results.count', {
               count: pointCount,
@@ -25,6 +49,7 @@
         </p>
         <p
           v-if="truncated"
+          v-show="summaryExpanded"
           class="toponym-results-panel__warning"
         >
           {{ t('villages.pages.toponyms.results.truncated') }}
@@ -34,10 +59,26 @@
       <section class="toponym-results-panel__name-tree">
         <div class="toponym-results-panel__section-header">
           <h3>{{ t('villages.pages.toponyms.nameTree.title') }}</h3>
-          <span v-if="nameTreeLoading">{{ t('villages.pages.toponyms.nameTree.loading') }}</span>
+          <span
+            v-if="nameTreeLoading"
+            v-show="treeNotesExpanded"
+          >{{ t('villages.pages.toponyms.nameTree.loading') }}</span>
+          <button
+            class="glass-button toponym-results-panel__tree-toggle toponym-results-panel__disclosure"
+            type="button"
+            :aria-label="t('villages.pages.toponyms.nameTree.title')"
+            :aria-expanded="treeNotesExpanded"
+            @click="treeNotesExpanded = !treeNotesExpanded"
+          >
+            <PhCaretRight
+              :size="16"
+              aria-hidden="true"
+            />
+          </button>
         </div>
         <p
           v-if="nameTreeMeta.mode === 'lazy_fallback'"
+          v-show="treeNotesExpanded"
           class="toponym-results-panel__muted toponym-results-panel__name-tree-note"
         >
           {{
@@ -48,7 +89,7 @@
           }}
         </p>
         <button
-          class="glass-button toponym-results-panel__tree-action"
+          class="action-btn toponym-results-panel__tree-action"
           type="button"
           :disabled="loading || nameTreeLoading || !hasSearched"
           @click="emit('request-name-tree')"
@@ -61,18 +102,21 @@
         </button>
         <p
           v-if="nameTreeError"
+          v-show="treeNotesExpanded"
           class="toponym-results-panel__error"
         >
           {{ nameTreeError }}
         </p>
         <p
           v-else-if="!nameTreeLoaded"
+          v-show="treeNotesExpanded"
           class="toponym-results-panel__muted toponym-results-panel__name-tree-note"
         >
           {{ t('villages.pages.toponyms.nameTree.idle') }}
         </p>
         <p
           v-else-if="!nameTreeLoading && !nameTreeRows.length"
+          v-show="treeNotesExpanded"
           class="toponym-results-panel__muted toponym-results-panel__name-tree-note"
         >
           {{ t('villages.pages.toponyms.nameTree.empty') }}
@@ -141,7 +185,8 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+import { PhCaretRight } from '@phosphor-icons/vue';
 import { useI18n } from 'vue-i18n';
 
 const props = defineProps({
@@ -197,6 +242,8 @@ const emit = defineEmits([
   'load-more-name-tree-names',
 ]);
 const { t } = useI18n();
+const summaryExpanded = ref(false);
+const treeNotesExpanded = ref(false);
 
 const nameTreeRows = computed(() => flattenNameTreeNodes(props.nameTree));
 
@@ -242,17 +289,36 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
 @use '@/styles/global/mixins' as *;
 
 .toponym-results-panel {
-  min-inline-size: 320px;
+  min-inline-size: 0;
+  background: none;
+  backdrop-filter: none;
 
   &__inspector {
+    position: relative;
     align-self: stretch;
+    min-block-size: 0;
   }
 
   &__inner {
     @include flex-col;
+    position: absolute;
+    inset: 0;
     gap: 14px;
-    max-block-size: 68dvh;
+    padding: 16px;
     overflow: auto;
+  }
+
+  &__summary {
+    flex-shrink: 0;
+  }
+
+  &__name-tree {
+    flex: 1;
+    min-block-size: 0;
+
+    > :not(ol) {
+      flex-shrink: 0;
+    }
   }
 
   &__summary,
@@ -268,19 +334,19 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
 
     h2 {
       color: var(--text-deep);
-      font-size: 16px;
+      font-size: var(--font-size-16);
       line-height: 1.35;
     }
 
     h3 {
       color: var(--text-deep);
-      font-size: 15px;
+      font-size: var(--font-size-16);
       line-height: 1.4;
     }
 
     p {
       color: var(--text-secondary);
-      font-size: 13px;
+      font-size: var(--font-size-13);
       line-height: 1.6;
     }
   }
@@ -293,7 +359,7 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
 
     span {
       color: var(--text-tertiary);
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
   }
 
@@ -305,10 +371,15 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
     }
   }
 
+  &__disclosure[aria-expanded='true'] {
+    transform: rotate(90deg);
+  }
+
   &__tree-list {
     @include flex-col;
+    flex: 1;
+    min-block-size: 0;
     gap: 8px;
-    max-block-size: 240px;
     margin: 0;
     overflow: auto;
     padding-inline-start: 0;
@@ -318,13 +389,14 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
 
   &__tree-node {
     @include flex-col;
+    flex-shrink: 0;
     gap: 3px;
     padding: 8px;
     padding-inline-start: calc(8px + var(--toponym-tree-indent, 0px));
 
     p {
       margin: 0;
-      font-size: 12px;
+      font-size: var(--font-size-12);
       line-height: 1.5;
     }
   }
@@ -339,13 +411,13 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
       @include text-truncate;
       min-inline-size: 0;
       color: var(--text-primary);
-      font-size: 13px;
+      font-size: var(--font-size-13);
       line-height: 1.4;
     }
 
     small {
       color: var(--text-tertiary);
-      font-size: 12px;
+      font-size: var(--font-size-12);
       line-height: 1.4;
     }
   }
@@ -359,7 +431,7 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
 
   &__names {
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: var(--font-size-12);
     line-height: 1.5;
     word-break: break-word;
   }
@@ -386,6 +458,12 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
 
   &__error {
     color: var(--color-error);
+  }
+}
+
+@media (max-aspect-ratio: 1 / 1) {
+  .toponym-results-panel__inspector {
+    min-block-size: 72dvh;
   }
 }
 </style>

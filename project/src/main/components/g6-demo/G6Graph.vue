@@ -11,6 +11,7 @@ const props = defineProps({
   graphOptions: { type: Object, default: () => ({}) },
   height: { type: String, default: '640px' },
 })
+const emit = defineEmits(['node-click'])
 
 const containerRef = ref(null)
 let graph = null
@@ -23,6 +24,7 @@ onMounted(() => {
     padding: 24,
     ...props.graphOptions,
   })
+  graph.on('node:click', event => emit('node-click', event.target.id))
   graph.render()
 })
 

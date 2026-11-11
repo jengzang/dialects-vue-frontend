@@ -205,8 +205,10 @@ const toggle = () => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/global/mixins' as *;
+
 $active-blue: var(--color-primary);
-$thumb-background: var(--bg-white);
+$thumb-background: var(--surface-elevation-0);
 $inside-label-color: var(--text-primary);
 
 $transition-duration: 0.3s;
@@ -259,6 +261,27 @@ $transition-ease: ease;
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.25);
 }
 
+.variant-solid,
+.variant-glow {
+  .switch-toggle__track {
+    background-color: color-mix(
+      in srgb,
+      var(--surface-elevation-1) 84%,
+      var(--text-primary) 16%
+    );
+  }
+
+  .switch-toggle__button.is-on .switch-toggle__track {
+    background-color: var(--switch-toggle-active-color, $active-blue);
+  }
+}
+
+.switch-toggle__button:active:not(.is-disabled) .switch-toggle__track {
+  box-shadow:
+    inset 0 0 0 30px rgba(0, 0, 0, 0.1),
+    inset 0 0 10px rgba(0, 0, 0, 0.25);
+}
+
 .switch-toggle__thumb {
   position: absolute;
   background: $thumb-background;
@@ -277,7 +300,7 @@ $transition-ease: ease;
     white-space: nowrap;
     pointer-events: none;
     padding: 0 8px;
-    font-size: 11px;
+    font-size: var(--font-size-12);
     font-weight: 500;
     max-width: 100%;
     overflow: hidden;
@@ -318,6 +341,10 @@ $transition-ease: ease;
       background-color: dimgray;
       box-shadow: 0 0 10px 4px rgba(var(--color-primary-rgb), 0.7);
 
+      .switch-toggle__track {
+        background-color: dimgray;
+      }
+
       .switch-toggle__thumb {
         box-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.5);
       }
@@ -330,6 +357,10 @@ $transition-ease: ease;
       &:hover:not(.is-disabled) {
         background: linear-gradient(135deg, var(--color-primary-cyan), #66ccff);
         box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+
+        .switch-toggle__track {
+          background: linear-gradient(135deg, var(--color-primary-cyan), #66ccff);
+        }
 
         .switch-toggle__thumb {
           box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);

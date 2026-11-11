@@ -144,14 +144,14 @@ async function runClustering() {
 }
 
 .panel-title {
-  font-size: 18px;
+  font-size: var(--font-size-18);
   font-weight: 600;
   color: var(--text-primary);
   margin: 0 0 8px 0;
 }
 
 .panel-description {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
   margin-bottom: 20px;
   line-height: 1.5;
@@ -165,7 +165,7 @@ async function runClustering() {
 }
 
 .section-title {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 12px;

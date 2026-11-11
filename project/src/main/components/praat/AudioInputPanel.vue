@@ -561,20 +561,20 @@ $transition-duration: 0.3s;
 
   .upload-icon {
     margin-bottom: 0.5rem;
-    font-size: 3rem;
+    font-size: var(--font-size-48);
   }
 
   .upload-text {
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
     color: $text-primary;
-    font-size: 1.1rem;
+    font-size: var(--font-size-18);
   }
 
   .upload-hint {
     margin: 0;
     color: $text-secondary;
-    font-size: 0.9rem;
+    font-size: var(--font-size-14);
   }
 }
 
@@ -593,7 +593,7 @@ $transition-duration: 0.3s;
     background: var(--glass-30);
     border-radius: var(--radius-md);
     color: $text-secondary;
-    font-size: 0.9rem;
+    font-size: var(--font-size-14);
   }
 
   .record-button {
@@ -602,7 +602,7 @@ $transition-duration: 0.3s;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    font-size: 1rem;
+    font-size: var(--font-size-16);
     cursor: pointer;
 
     &.recording {
@@ -619,7 +619,7 @@ $transition-duration: 0.3s;
     }
 
     .record-icon {
-      font-size: 1.5rem;
+      font-size: var(--font-size-24);
     }
   }
 }
@@ -628,7 +628,7 @@ $transition-duration: 0.3s;
   margin-top: 1rem;
   color: $error-color;
   text-align: center;
-  font-size: 1.1rem;
+  font-size: var(--font-size-18);
   font-weight: 600;
 }
 
@@ -646,13 +646,13 @@ $transition-duration: 0.3s;
 
   .file-name {
     color: $text-primary;
-    font-size: 15px;
+    font-size: var(--font-size-16);
     font-weight: 500;
   }
 
   .file-size {
     color: $text-secondary;
-    font-size: 0.9rem;
+    font-size: var(--font-size-14);
   }
 
 }

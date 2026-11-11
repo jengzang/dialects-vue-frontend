@@ -223,7 +223,7 @@
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { getPartitions } from '@/api/index.js'
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js'
@@ -261,6 +261,7 @@ const emit = defineEmits([
 ])
 
 const router = useRouter()
+const route = useRoute()
 const { requireAuth } = useAuthGuard()
 
 /* =========================
@@ -756,7 +757,7 @@ $portrait-ratio: 1;
   overflow: hidden;
   color: var(--text-secondary);
   white-space: nowrap;
-  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 
 .region-caret {
@@ -790,7 +791,7 @@ $portrait-ratio: 1;
 
   color: var(--text-primary);
   white-space: nowrap;
-  font-size: 13px;
+  font-size: var(--font-size-13);
 
   &.custom-region-tag {
     background: var(--surface-selected);
@@ -871,7 +872,7 @@ $portrait-ratio: 1;
 .topbar-empty {
   flex: 1;
   color: rgba(60, 60, 60, 0.7);
-  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 
 .topbar-right-actions {
@@ -884,7 +885,7 @@ $portrait-ratio: 1;
 
 .topbar-title {
   color: var(--text-primary);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 700;
 }
 
@@ -903,7 +904,7 @@ $portrait-ratio: 1;
   border: none;
   border-radius: var(--radius-sm);
   white-space: nowrap;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -941,11 +942,11 @@ $portrait-ratio: 1;
   }
 
   .btn-icon {
-    font-size: 14px;
+    font-size: var(--font-size-14);
   }
 
   .btn-text {
-    font-size: 12px;
+    font-size: var(--font-size-12);
   }
 }
 
@@ -963,8 +964,8 @@ $portrait-ratio: 1;
   border: 1px solid rgba(var(--color-primary-rgb), 0.35);
   border-radius: var(--radius-md);
   box-shadow: 0 10px 26px rgba(var(--color-primary-rgb), 0.18);
-  color: var(--action-primary-text);
-  font-size: 13px;
+  color: var(--action-solid-text);
+  font-size: var(--font-size-13);
   font-weight: 700;
   cursor: pointer;
 
@@ -1049,7 +1050,7 @@ $portrait-ratio: 1;
 .partition-item {
   flex: 1 1 auto;
   @include text-truncate;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   cursor: pointer;
 
   &.chosen {
@@ -1065,7 +1066,7 @@ $portrait-ratio: 1;
 
   border-radius: var(--radius-md);
   color: var(--color-primary);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 700;
   opacity: 0.85;
   cursor: pointer;
@@ -1111,7 +1112,7 @@ $portrait-ratio: 1;
   border: none;
   border-radius: var(--radius-sm2);
   color: var(--action-primary-text);
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -1146,13 +1147,13 @@ $portrait-ratio: 1;
 .region-name {
   margin-bottom: 6px;
   color: var(--text-deep);
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
 }
 
 .region-info {
   color: var(--text-tertiary);
-  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 
 .region-desc {
@@ -1165,7 +1166,7 @@ $portrait-ratio: 1;
   border: 1px solid rgba(var(--color-primary-rgb), 0.3);
   border-radius: var(--radius-sm2);
   color: $primary;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -1178,7 +1179,13 @@ $portrait-ratio: 1;
 /* 竖屏 */
 @media (max-aspect-ratio: $portrait-ratio) {
   .partition-item {
-    font-size: 18px;
+    font-size: var(--font-size-18);
+  }
+  .region-select-box{
+    padding: 8px 15px 8px 10px;
+  }
+  .region-tag{
+    padding: 2px 3px;
   }
 }
 </style>

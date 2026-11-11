@@ -4,7 +4,7 @@ const DISPLAY_DEFAULTS = {
   weightIconOnly: 0.6,
   mobileWeightIconOnly: 0.55,
   fontSize: 1.2,
-  mobileFontSize: 1.2,
+  mobileFontSize: 1.3,
   isPseudo: false,
   hideOnMobile: false,
   hideLabelOnMobile: false,

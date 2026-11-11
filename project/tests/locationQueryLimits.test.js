@@ -7,7 +7,7 @@ import {
 import {
   buildExplicitLocationsForGetLocs,
   isExplicitLocationsLimitExceeded,
-} from '../src/main/utils/queryLimits.js';
+} from '../src/main/utils/query/queryLimits.js';
 
 describe('location query limits', () => {
   it('exports separate limits for query payloads and custom regions', () => {

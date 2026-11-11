@@ -1,20 +1,98 @@
 import { beforeEach, describe, expect, it } from 'vitest'
+import { existsSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 import {
-  COLOR_THEME_BLUE,
-  COLOR_THEME_DARK,
+  COLOR_THEME_BLUE_LIGHT,
+  COLOR_THEME_BLUE_DARK,
   COLOR_THEME_DEFAULT,
-  COLOR_THEME_LIGHT,
+  COLOR_THEME_RED_LIGHT,
   getStoredColorTheme,
+  getBrandAssets,
   initializeUiPreferences,
   setColorTheme,
+  getColorThemeParts,
+  getColorThemeFor,
+  isDarkColorTheme,
 } from '../src/composables/core/uiPreferences.js'
 
 describe('uiPreferences color theme', () => {
+  it.each([
+    ['blue', 'blue-light'], ['light', 'red-light'],
+    ['dark', 'blue-dark'], ['green', 'green-dark'],
+  ])('migrates legacy %s preferences to %s without changing the selected palette', (legacy, canonical) => {
+    window.localStorage.setItem('dialects-color-theme', legacy)
+    expect(getStoredColorTheme()).toBe(canonical)
+    initializeUiPreferences()
+    expect(document.documentElement.dataset.colorTheme).toBe(canonical)
+    expect(window.localStorage.getItem('dialects-color-theme')).toBe(canonical)
+    expect(getBrandAssets(legacy)).toEqual(getBrandAssets(canonical))
+    expect(setColorTheme(legacy)).toBe(canonical)
+  })
+  it.each(['blue-light', 'red-light', 'green-light', 'blue-dark', 'red-dark', 'green-dark'])('stores only the canonical %s identifier', theme => {
+    expect(setColorTheme(theme)).toBe(theme)
+    expect(window.localStorage.getItem('dialects-color-theme')).toBe(theme)
+    expect(document.documentElement.dataset.colorTheme).toBe(theme)
+  })
+  it.each([
+    ['blue-light', 'blue', 'light'], ['red-light', 'red', 'light'],
+    ['green-dark', 'green', 'dark'], ['blue-dark', 'blue', 'dark'],
+    ['red-dark', 'red', 'dark'], ['green-light', 'green', 'light'],
+  ])('persists %s and exposes its family and brightness', (theme, family, mode) => {
+    expect(getColorThemeParts(theme)).toEqual({ family, mode })
+    expect(getColorThemeFor(family, mode)).toBe(theme)
+    expect(isDarkColorTheme(theme)).toBe(mode === 'dark')
+    setColorTheme(theme)
+    expect(document.documentElement.dataset.colorFamily).toBe(family)
+    expect(document.documentElement.dataset.colorMode).toBe(mode)
+    expect(getStoredColorTheme()).toBe(theme)
+    initializeUiPreferences()
+    expect(document.documentElement.dataset.colorTheme).toBe(theme)
+  })
+
+  it('reuses the original green artwork for green light and red light artwork for red dark', () => {
+    expect(getBrandAssets('green-light')).toEqual({
+      logo: '/brand/green/icon-light.ico', title: '/brand/title.webp', decoration: '/brand/green/decoration-light.webp',
+    })
+    expect(getBrandAssets('red-dark')).toEqual({
+      ...getBrandAssets('red-light'), title: '/brand/red/title-dark.webp',
+    })
+    setColorTheme('green-light')
+    expect(document.querySelector('link[rel="icon"]').type).toBe('image/x-icon')
+  })
+
+  it('falls back consistently for invalid family and mode combinations', () => {
+    expect(getColorThemeParts('invalid')).toEqual({ family: 'blue', mode: 'light' })
+    expect(getColorThemeFor('invalid', 'dark')).toBe('blue-dark')
+    expect(getColorThemeFor('green', 'invalid')).toBe('green-light')
+  })
   beforeEach(() => {
+    document.head.innerHTML = '<link rel="icon" type="image/x-icon" href="/brand/favicon.ico">'
     window.localStorage.clear()
     document.documentElement.removeAttribute('data-color-theme')
     document.documentElement.removeAttribute('data-ui-mode')
+  })
+
+  it.each([
+    ['blue-light', '/brand/favicon.ico', '/brand/title.webp', '/brand/BlueCircle.webp'],
+    ['blue-dark', '/brand/blue/icon-dark.webp', '/brand/blue/title-dark.webp', '/brand/blue/decoration-dark.webp'],
+    ['red-light', '/brand/red/icon.webp', '/brand/red/title-light.webp', '/brand/red/decoration.webp'],
+    ['red-dark', '/brand/red/icon.webp', '/brand/red/title-dark.webp', '/brand/red/decoration.webp'],
+    ['green-light', '/brand/green/icon-light.ico', '/brand/title.webp', '/brand/green/decoration-light.webp'],
+    ['green-dark', '/brand/green/icon-dark.webp', '/brand/green/title-dark.webp', '/brand/green/decoration-dark.webp'],
+  ])('selects existing %s brand assets and keeps the browser icon stable', (theme, logo, title, decoration) => {
+    const assets = getBrandAssets(theme)
+    expect(assets).toEqual({ logo, title, decoration })
+    const publicDir = resolve(dirname(fileURLToPath(import.meta.url)), '../public')
+    for (const path of Object.values(assets)) expect(existsSync(resolve(publicDir, path.slice(1)))).toBe(true)
+    setColorTheme(theme)
+    expect(document.querySelector('link[rel="icon"]').getAttribute('href')).toBe('/brand/favicon.ico')
+    expect(document.querySelector('link[rel="icon"]').type).toBe('image/x-icon')
+  })
+
+  it('falls back to blue brand assets for an unsupported theme', () => {
+    expect(getBrandAssets('invalid')).toEqual(getBrandAssets('blue-light'))
   })
 
   it('defaults to the blue theme when no stored theme exists', () => {
@@ -22,30 +100,31 @@ describe('uiPreferences color theme', () => {
 
     initializeUiPreferences()
 
-    expect(document.documentElement.dataset.colorTheme).toBe(COLOR_THEME_BLUE)
+    expect(document.documentElement.dataset.colorTheme).toBe(COLOR_THEME_BLUE_LIGHT)
   })
 
   it('persists and applies supported color themes', () => {
-    const theme = setColorTheme(COLOR_THEME_DARK)
+    const theme = setColorTheme(COLOR_THEME_BLUE_DARK)
 
-    expect(theme).toBe(COLOR_THEME_DARK)
-    expect(window.localStorage.getItem('dialects-color-theme')).toBe(COLOR_THEME_DARK)
-    expect(document.documentElement.dataset.colorTheme).toBe(COLOR_THEME_DARK)
+    expect(theme).toBe(COLOR_THEME_BLUE_DARK)
+    expect(window.localStorage.getItem('dialects-color-theme')).toBe(COLOR_THEME_BLUE_DARK)
+    expect(document.documentElement.dataset.colorTheme).toBe(COLOR_THEME_BLUE_DARK)
 
-    window.localStorage.setItem('dialects-color-theme', COLOR_THEME_LIGHT)
+    window.localStorage.setItem('dialects-color-theme', COLOR_THEME_RED_LIGHT)
+    window.localStorage.removeItem('dialects-color-mode')
 
     initializeUiPreferences()
 
-    expect(document.documentElement.dataset.colorTheme).toBe(COLOR_THEME_LIGHT)
+    expect(document.documentElement.dataset.colorTheme).toBe(COLOR_THEME_RED_LIGHT)
   })
 
   it('falls back to blue for unsupported stored themes', () => {
     window.localStorage.setItem('dialects-color-theme', 'pink')
 
-    expect(getStoredColorTheme()).toBe(COLOR_THEME_BLUE)
+    expect(getStoredColorTheme()).toBe(COLOR_THEME_BLUE_LIGHT)
 
     initializeUiPreferences()
 
-    expect(document.documentElement.dataset.colorTheme).toBe(COLOR_THEME_BLUE)
+    expect(document.documentElement.dataset.colorTheme).toBe(COLOR_THEME_BLUE_LIGHT)
   })
 })

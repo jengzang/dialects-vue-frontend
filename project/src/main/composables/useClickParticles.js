@@ -1,5 +1,5 @@
 import { onMounted, onBeforeUnmount, watch } from 'vue'
-import { currentColorTheme, UI_MODE_COMPACT, COLOR_THEME_DARK, COLOR_THEME_GREEN } from '@/composables/core/uiPreferences.js'
+import { currentColorTheme, UI_MODE_COMPACT, isDarkColorTheme } from '@/composables/core/uiPreferences.js'
 
 const LIGHT_COLORS = [
   '#ff8f00', '#ff6d00', '#ffab00', '#ffc107', '#ffd54f',
@@ -12,7 +12,7 @@ const DARK_COLORS = [
 ]
 
 let colors = [...LIGHT_COLORS]
-const isDark = () => [COLOR_THEME_DARK, COLOR_THEME_GREEN].includes(currentColorTheme.value)
+const isDark = () => isDarkColorTheme(currentColorTheme.value)
 
 const sparks = []
 
@@ -108,7 +108,7 @@ export function useClickParticles() {
   colors = isDark() ? [...DARK_COLORS] : [...LIGHT_COLORS]
 
   watch(currentColorTheme, (val) => {
-    colors = [COLOR_THEME_DARK, COLOR_THEME_GREEN].includes(val)
+    colors = isDarkColorTheme(val)
       ? [...DARK_COLORS]
       : [...LIGHT_COLORS]
   })

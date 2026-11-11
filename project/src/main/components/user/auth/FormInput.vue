@@ -95,7 +95,7 @@ $glass-blur: 12px;
   max-width: 320px;
   padding: 14px 2em 14px 16px;
   color: $text-color;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   background: var(--glass-30);
   border: none;
   border-radius: var(--radius-md);
@@ -125,7 +125,7 @@ $glass-blur: 12px;
 
   @media (max-aspect-ratio: 1/1) {
     padding: 16px 2.5em 16px 16px;
-    font-size: 18px;
+    font-size: var(--font-size-18);
   }
 }
 
@@ -134,7 +134,7 @@ $glass-blur: 12px;
   position: absolute;
   top: 50%;
   right: $control-right;
-  font-size: 16px;
+  font-size: var(--font-size-16);
   user-select: none;
   transform: translateY(-50%);
 }

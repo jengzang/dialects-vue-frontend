@@ -220,7 +220,7 @@ const goToTendency = (pattern) => {
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
 }
 
@@ -239,7 +239,7 @@ const goToTendency = (pattern) => {
 }
 
 .control-label {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   color: var(--text-secondary);
   font-weight: 500;
 }
@@ -283,11 +283,11 @@ const goToTendency = (pattern) => {
   border-radius: var(--radius-full);
   @include flex-center;
   font-weight: 700;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 .pattern-text {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 12px;
@@ -305,18 +305,18 @@ const goToTendency = (pattern) => {
 }
 
 .stat-label {
-  font-size: 12px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
 }
 
 .stat-value {
-  font-size: 16px;
+  font-size: var(--font-size-16);
   font-weight: 600;
   color: var(--color-primary);
 }
 
 .region-name {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-primary);
   font-weight: 500;
 }
@@ -342,7 +342,7 @@ const goToTendency = (pattern) => {
   color: var(--color-primary);
   border: 1px solid rgba(var(--vml-blue-rgb), 0.3);
   border-radius: var(--radius-sm2);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;

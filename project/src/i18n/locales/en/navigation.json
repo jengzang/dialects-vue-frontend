@@ -77,12 +77,13 @@
       "source": "Character List Sources",
       "privacy": "Privacy Policy",
       "suggestion": "Send Feedback",
-      "like": "Support the Author"
+      "like": "Support the Project"
     },
     "about": {
       "intro": "Introduction",
+      "history": "Development Journey",
       "suggestion": "Send Feedback",
-      "like": "Support the Author",
+      "like": "Support the Project",
       "setting": "Settings"
     }
   },
@@ -95,9 +96,9 @@
       "privacy": "Privacy Policy & Citation",
       "settings": "Settings",
       "source": "Data Sources",
-      "aboutIntro": "ℹ️ About This Site",
+      "aboutIntro": "About This Site",
       "aboutSuggestion": "Share Feedback",
-      "aboutLike": "❤️ Support the Author"
+      "aboutLike": "Support the Author"
     },
     "portals": {
       "tools": "Toolbox",
@@ -137,7 +138,7 @@
       "evolution": "Rime-Book Evolution Analysis"
     },
     "vocabulary": {
-      "view": "Vocabulary Query",
+      "view": "Dialect Vocabulary Search",
       "import": "Vocabulary Upload",
       "manage": "Vocabulary Management"
     },
@@ -214,9 +215,17 @@
       "title": "Color Theme",
       "description": "Choose the overall color scheme for page backgrounds, glass panels, and text.",
       "label": "Current Theme",
+      "modeTitle": "Appearance",
+      "shortOptions": { "blue": "B", "red": "R", "green": "G" },
+      "shortModes": { "light": "L", "dark": "D", "system": "S" },
+      "modes": {
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      },
       "options": {
         "blue": "Blue",
-        "light": "Light",
+        "red": "Red",
         "dark": "Dark",
         "green": "Green"
       }
@@ -245,7 +254,15 @@
     "historyTitle": "Visit History",
     "loading": "Loading...",
     "todayVisits": "Visits Today",
-    "historyRecords": "Historical Records"
+    "historyRecords": "Historical Records",
+    "featureUsage": "Feature Usage Count",
+    "pageVisits": "Page Visits",
+    "pageVisitsLeftAxis": "Page Visits (left axis)",
+    "featureUsageRightAxis": "Feature Usage Count (right axis)",
+    "staticRequests": "Static Resources",
+    "staticRequestsRightAxis": "Static Resources (right axis)",
+    "usageLoadError": "Failed to load feature usage statistics",
+    "staticLoadError": "Failed to load static resource statistics"
   },
   "login": "Log In",
   "actions": {
@@ -253,7 +270,7 @@
     "backHome": "Back to Home"
   },
   "introTabs": {
-    "like": "Support the Author",
+    "like": "Support the Project",
     "suggestions": "Send Feedback",
     "thanks": "Acknowledgements"
   }

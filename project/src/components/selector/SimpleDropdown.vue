@@ -39,7 +39,7 @@
             @mouseenter="focusedIndex = index"
           >
             <span class="check-icon">{{ isSelected(option.value) ? '✓' : '' }}</span>
-            {{ option.label }}
+            <slot name="option" :option="option">{{ option.label }}</slot>
           </div>
 
           <div v-if="filteredOptions.length === 0" class="empty-message">
@@ -196,6 +196,7 @@ const updatePosition = () => {
   if (!triggerElement || !dropdownPanel.value) return
 
   requestAnimationFrame(() => {
+    if (!dropdownPanel.value) return
     const triggerRect = triggerElement.getBoundingClientRect()
     const panelWidth = props.matchTriggerWidth ? triggerRect.width : (dropdownPanel.value.offsetWidth || 200)
     const panelHeight = dropdownPanel.value.offsetHeight || 60
@@ -272,9 +273,9 @@ onMounted(() => {
   setTimeout(() => updatePosition(), 0)
   initializeFocusedIndex()
 
-  // Focus search input if searchable, otherwise focus the panel for keyboard navigation
+  // Avoid opening the on-screen keyboard on touch devices.
   nextTick(() => {
-    if (props.searchable && searchInput.value) {
+    if (props.searchable && searchInput.value && !window.matchMedia?.('(pointer: coarse)').matches) {
       searchInput.value.focus()
     } else if (dropdownPanel.value) {
       dropdownPanel.value.focus()
@@ -336,7 +337,7 @@ $transition-fast: 0.2s;
   // width: 100%;
   padding: 6px 10px;
   color: $text-primary;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   background: var(--bg-white);
   border: 1px solid var(--border-control);
   border-radius: var(--radius-sm);
@@ -364,7 +365,7 @@ $transition-fast: 0.2s;
   padding: 8px 16px;
   overflow: hidden;
   color: $text-primary;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: pointer;
@@ -392,7 +393,7 @@ $transition-fast: 0.2s;
 .empty-message {
   padding: 20px;
   color: $text-muted;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   text-align: center;
 }
 </style>

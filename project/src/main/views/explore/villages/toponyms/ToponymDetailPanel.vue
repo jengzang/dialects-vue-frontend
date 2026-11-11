@@ -15,7 +15,7 @@
 
       <div class="toponym-detail-panel__actions">
         <button
-          class="glass-button"
+          class="action-btn"
           type="button"
           :disabled="localLoading"
           @click="emit('request-local-detail')"
@@ -26,7 +26,7 @@
               : t('villages.pages.toponyms.detail.localButton')
           }}
         </button>
-        <button
+        <!-- <button
           class="glass-button"
           type="button"
           :disabled="officialLoading"
@@ -37,7 +37,7 @@
               ? t('villages.pages.toponyms.detail.officialLoading')
               : t('villages.pages.toponyms.detail.officialButton')
           }}
-        </button>
+        </button> -->
       </div>
 
       <p
@@ -58,12 +58,12 @@
       >
         {{ t('villages.pages.toponyms.detail.noLocalDetail') }}
       </p>
-      <p
+      <!-- <p
         v-else-if="selectedPoint && !localDetail"
         class="toponym-detail-panel__status"
       >
         {{ t('villages.pages.toponyms.detail.localHint') }}
-      </p>
+      </p> -->
 
       <dl
         v-if="localDetail"
@@ -197,7 +197,7 @@ function formatCoordinates(coordinates) {
   &__status,
   &__error {
     margin: 0;
-    font-size: 13px;
+    font-size: var(--font-size-13);
     line-height: 1.6;
   }
 
@@ -217,12 +217,12 @@ function formatCoordinates(coordinates) {
 
     span {
       color: var(--text-secondary);
-      font-size: 12px;
+      font-size: var(--font-size-12);
     }
 
     strong {
       color: var(--text-deep);
-      font-size: 13px;
+      font-size: var(--font-size-13);
       font-weight: 600;
     }
   }

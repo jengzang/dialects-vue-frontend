@@ -633,14 +633,14 @@ $transition-base: 0.3s;
 
   @media (max-aspect-ratio: 1/1) {
     gap: 5px !important;
-    font-size: 14px;
+    font-size: var(--font-size-14);
     white-space: nowrap;
   }
 }
 
 .cross-link {
   color: var(--color-primary);
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   font-weight: 500;
   white-space: nowrap;
   text-decoration: none;
@@ -656,14 +656,14 @@ $transition-base: 0.3s;
 .title {
   margin: 0 0 8px;
   color: $text-primary;
-  font-size: 26px;
+  font-size: var(--font-size-24);
   font-weight: 700;
 }
 
 .subtitle {
   margin: 3px;
   color: $text-secondary;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 /* Content Area */
@@ -685,7 +685,7 @@ $transition-base: 0.3s;
 
   p {
     color: $text-secondary;
-    font-size: 16px;
+    font-size: var(--font-size-16);
   }
 
   &.error-state {
@@ -694,7 +694,7 @@ $transition-base: 0.3s;
 }
 
 .error-icon {
-  font-size: 48px;
+  font-size: var(--font-size-48);
 }
 
 .error-message {
@@ -741,7 +741,7 @@ $transition-base: 0.3s;
 .city-name {
   margin: 0;
   color: $text-primary;
-  font-size: 20px;
+  font-size: var(--font-size-20);
   font-weight: 600;
 }
 
@@ -758,7 +758,7 @@ $transition-base: 0.3s;
   align-items: center;
   padding: 6px 12px;
   color: $success-green;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 600;
   background: rgba(var(--color-success-rgb), 0.15);
   border-radius: var(--radius-md);
@@ -769,7 +769,7 @@ $transition-base: 0.3s;
 
   width: 34px;
   height: 34px;
-  font-size: 18px;
+  font-size: var(--font-size-18);
   cursor: pointer;
   background: transparent;
   border: none;
@@ -795,7 +795,7 @@ $transition-base: 0.3s;
   align-items: center;
   padding: 16px;
   color: $primary-blue;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   background: rgba(var(--color-primary-rgb), 0.05);
   border-radius: var(--radius-md);
 }
@@ -811,7 +811,7 @@ $transition-base: 0.3s;
 .error-text {
   margin: 0 0 12px;
   color: $error-red;
-  font-size: 14px;
+  font-size: var(--font-size-14);
 }
 
 /* Retry Buttons */
@@ -831,13 +831,13 @@ $transition-base: 0.3s;
 
 .retry-btn {
   padding: 10px 24px;
-  font-size: 15px;
+  font-size: var(--font-size-16);
   border-radius: var(--radius-md);
 }
 
 .retry-btn-small {
   padding: 6px 14px;
-  font-size: 13px;
+  font-size: var(--font-size-13);
   border-radius: var(--radius-sm2);
 }
 
@@ -852,7 +852,7 @@ $transition-base: 0.3s;
 .empty-state {
   padding: 24px 0;
   color: $text-muted;
-  font-size: 14px;
+  font-size: var(--font-size-14);
   text-align: center;
 }
 
@@ -863,7 +863,7 @@ $transition-base: 0.3s;
 .village-link-btn {
   padding: 8px 16px;
   color: $button-blue;
-  font-size: 1rem;
+  font-size: var(--font-size-16);
   font-weight: 1000;
   white-space: nowrap;
   cursor: pointer;

@@ -19,7 +19,8 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, inject } from 'vue'
+import { CUSTOM_DATA_SAVE_SCOPE } from '@/main/composables/useCustomDataSave.js'
 import { useI18n } from 'vue-i18n'
 import { getUserFeatures } from '@/api'
 import { ensureCustomDataPresence } from '@/composables/data/useCustomDataPresence.js'
@@ -29,6 +30,7 @@ import FeatureDetailTable from './FeatureDetailTable.vue'
 
 const { t } = useI18n()
 
+const saveLocks=inject(CUSTOM_DATA_SAVE_SCOPE,null)
 const loading = ref(false)
 const errorMessage = ref('')
 const featureItems = ref([])
@@ -79,6 +81,7 @@ const handleCreateFeature = () => {
 }
 
 const handleBack = () => {
+  if(saveLocks?.size) return
   selectedFeature.value = null
   view.value = 'list'
 }

@@ -12,6 +12,13 @@ This repository has strict collaboration and change-control rules. Read this bef
 - Before each new step, re-check current workspace state because the user may have edited or reorganized files.
 - Never run `npm install`, `npm ci`, or any automatic dependency installation command. Use only the repository's existing dependencies and scripts unless the user explicitly revokes this rule.
 
+## 1.1 Small, Clear Tasks
+
+- For small, narrowly scoped, reversible tasks with a clear outcome, make the change directly and run focused verification; do not create a design document or implementation plan.
+- Treat the user's approval of a concrete proposal or direct instruction to execute as sufficient authorization. Do not ask for the same approval again.
+- Ask a follow-up question only when an unresolved ambiguity blocks the work or would materially change its scope or result.
+- Reserve design documents and implementation plans for broad, multi-step work, or when the user requests them.
+
 ## 2. Review Requirements
 
 - CR means real code review, not a superficial glance.

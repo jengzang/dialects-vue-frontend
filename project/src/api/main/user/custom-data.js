@@ -22,13 +22,7 @@ import { showError } from '@/utils/ui/message.js'
  * const data = await getAllCustomData()
  */
 export async function getAllCustomData() {
-  try {
-    return await api('/user/custom/all')
-  } catch (error) {
-    console.error('Get all custom data error:', error)
-    showError(error.message || '獲取自定義數據失敗')
-    throw new Error(error.message || '獲取自定義數據失敗')
-  }
+  return api('/user/custom/all', { showError: false })
 }
 
 /**
@@ -103,4 +97,16 @@ export async function batchDeleteCustomData(createdAtList) {
     showError(error.message || '批量刪除自定義數據失敗')
     throw new Error(error.message || '批量刪除自定義數據失敗')
   }
+}
+
+
+// Strict atomic mutations preserve ApiError.status/detail for the editor.
+export function batchUpdateCustomData(items) {
+  return api('/user/custom/batch-update', { method: 'PUT', body: { items }, showError: false })
+}
+export function batchDeleteCustomDataById(items) {
+  return api('/user/custom/batch-delete-by-id', { method: 'DELETE', body: { items }, showError: false })
+}
+export function saveCustomData(snapshot) {
+  return api('/user/custom/save', { method: 'POST', body: snapshot, showError: false })
 }

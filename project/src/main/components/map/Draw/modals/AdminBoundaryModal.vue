@@ -17,10 +17,15 @@
           />
         </div>
         <div class="clip-boundary-field">
-          <label class="clip-boundary-label">{{ t('map.drawTab.voronoi.clipBoundaryHighPrecision') }}</label>
           <SwitchToggle
             :model-value="localHighPrecision"
-            :disabled="loading"
+            :disabled="loading && !manualLoad"
+            :active-text="t('map.drawTab.voronoi.clipBoundaryHighPrecision')"
+            :inactive-text="t('map.drawTab.voronoi.clipBoundaryLowPrecision')"
+            :aria-label="t('map.drawTab.voronoi.clipBoundaryHighPrecision')"
+            label-position="inside"
+            show-label
+            auto-width
             @update:model-value="handleHighPrecisionToggle"
           />
           <p v-if="!userStore.isAuthenticated" class="clip-boundary-hint">
@@ -42,11 +47,20 @@
         <p v-if="highPrecisionLimit" class="clip-boundary-hint">
           {{ t('map.drawTab.voronoi.clipBoundaryHighPrecisionLimitHint') }}
         </p>
+        <button
+          v-if="needsStaticOptions && !isOptionsLoading"
+          class="action-btn"
+          style="width:auto; align-self:flex-start;"
+          type="button"
+          @click="emit('load-options', localLevel)"
+        >
+          {{ t('map.drawTab.voronoi.clipBoundaryStartFetch') }}
+        </button>
         <div v-if="isOptionsLoading" class="clip-boundary-loading">
           <div class="ui-loading--page" aria-hidden="true" />
           <span>{{ t('map.drawTab.voronoi.clipBoundaryLoading') }}</span>
         </div>
-        <div v-else class="clip-boundary-list ui-scrollbar">
+        <div v-else-if="!needsStaticOptions" class="clip-boundary-list ui-scrollbar">
           <CheckBox
             v-for="option in filteredOptions"
             :key="option.value"
@@ -67,6 +81,14 @@
     <template #footer>
       <div class="clip-boundary-footer">
         <button
+          v-if="clearable"
+          class="glass-button"
+          type="button"
+          @click="handleClear"
+        >
+          {{ t('map.mapLibre.buttons.clearAdminBoundary') }}
+        </button>
+        <button
           class="glass-button"
           type="button"
           @click="handleClose"
@@ -77,7 +99,7 @@
           class="glass-button"
           data-variant="primary"
           type="button"
-          :disabled="localSelected.length === 0 || isOptionsLoading"
+          :disabled="localSelected.length === 0 || isOptionsLoading || needsStaticOptions"
           @click="handleConfirm"
         >
           {{ mode === 'import' ? t('map.drawTab.voronoi.clipBoundaryConfirmImport') : t('map.drawTab.voronoi.confirmExport') }}
@@ -118,10 +140,12 @@ const props = defineProps({
     validator: (value) => ['clip', 'import'].includes(value),
   },
   loading: { type: Boolean, default: false },
+  manualLoad: { type: Boolean, default: false },
+  clearable: { type: Boolean, default: false },
   highPrecision: { type: Boolean, default: false },
 });
 
-const emit = defineEmits(['update:modelValue', 'confirm', 'update:highPrecision']);
+const emit = defineEmits(['update:modelValue', 'confirm', 'update:highPrecision', 'clear', 'load-options']);
 const { t } = useI18n();
 const router = useRouter();
 const route = useRoute();
@@ -136,12 +160,13 @@ const isHighPrecisionLoading = ref(false);
 const highPrecisionLimit = computed(() => localHighPrecision.value && localLevel.value !== 'country');
 
 const isOptionsLoading = computed(() => {
+  if (props.manualLoad && localLevel.value === 'country') return props.loading;
   if (localHighPrecision.value) return isHighPrecisionLoading.value;
   return props.loading;
 });
 
 const levelOptions = computed(() => [
-  { label: t('map.drawTab.voronoi.clipBoundaryLevelCountry'), value: 'country' },
+  ...(!localHighPrecision.value ? [{ label: t('map.drawTab.voronoi.clipBoundaryLevelCountry'), value: 'country' }] : []),
   { label: t('map.drawTab.voronoi.clipBoundaryLevelProvinces'), value: 'provinces' },
   { label: t('map.drawTab.voronoi.clipBoundaryLevelCities'), value: 'cities' },
   { label: t('map.drawTab.voronoi.clipBoundaryLevelCounties'), value: 'counties' },
@@ -153,6 +178,8 @@ const currentOptions = computed(() => {
   }
   return props.boundaryOptions[localLevel.value] ?? [];
 });
+
+const needsStaticOptions = computed(() => props.manualLoad && !localHighPrecision.value && currentOptions.value.length === 0);
 
 const filteredOptions = computed(() => {
   if (localLevel.value === 'country') return currentOptions.value;
@@ -200,6 +227,9 @@ watch(
       initialized = true;
       localLevel.value = props.boundaryConfig.level || 'country';
       localHighPrecision.value = getInitialHighPrecision();
+      if (localHighPrecision.value && localLevel.value === 'country') {
+        localLevel.value = 'provinces';
+      }
       localSelected.value = getInitialSelectedValues();
       if (localSelected.value.length === 0 && localLevel.value === 'country') {
         localSelected.value = ['中国'];
@@ -226,6 +256,7 @@ async function handleHighPrecisionToggle(val) {
       { confirmText: t('map.drawTab.voronoi.clipBoundaryGoLogin') }
     );
     if (confirmed) {
+      handleClose();
       router.push({
         path: '/auth',
         query: { view: 'login', redirect: route.fullPath }
@@ -236,7 +267,12 @@ async function handleHighPrecisionToggle(val) {
 
   localHighPrecision.value = val;
   emit('update:highPrecision', val);
-  if (val && localLevel.value !== 'country') {
+  if (val && localLevel.value === 'country') {
+    localLevel.value = 'provinces';
+    searchQuery.value = '';
+    localSelected.value = [];
+    fetchHighPrecisionOptions('provinces');
+  } else if (val) {
     localSelected.value = [];
     fetchHighPrecisionOptions(localLevel.value);
   } else if (!val) {
@@ -266,6 +302,11 @@ function handleToggle(optionValue, checked) {
 
 function handleClose() {
   emit('update:modelValue', false);
+}
+
+function handleClear() {
+  emit('clear');
+  handleClose();
 }
 
 function handleConfirm() {
@@ -308,7 +349,7 @@ function handleConfirm() {
 }
 
 .clip-boundary-label {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 600;
   color: var(--text-deep);
 }
@@ -316,11 +357,11 @@ function handleConfirm() {
 .clip-boundary-hint {
   margin: 0;
   color: var(--color-warning, #e6a23c);
-  font-size: 12px;
+  font-size: var(--font-size-12);
 }
 
 .clip-boundary-search {
-  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 
 .clip-boundary-loading {
@@ -334,7 +375,7 @@ function handleConfirm() {
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-md);
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: var(--font-size-13);
 }
 
 .clip-boundary-list {
@@ -351,7 +392,7 @@ function handleConfirm() {
 .clip-boundary-item {
   padding: 6px 8px;
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: var(--font-size-13);
 
   &:hover {
     background: var(--glass-60);
@@ -361,7 +402,7 @@ function handleConfirm() {
 .clip-boundary-empty {
   padding: 24px;
   color: var(--text-tertiary);
-  font-size: 13px;
+  font-size: var(--font-size-13);
   text-align: center;
 }
 

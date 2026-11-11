@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 
 const testsDir = dirname(fileURLToPath(import.meta.url))
 const projectRoot = resolve(testsDir, '..')
-const translucentBackground = 'linear-gradient(135deg, var(--surface-glass-floating), var(--surface-glass-floating-subtle));'
+const translucentBackground = 'var(--bar-background,'
 
 function readSource(relativePath) {
   return readFileSync(resolve(projectRoot, relativePath), 'utf8')
@@ -31,7 +31,7 @@ describe('navigation glass transparency', () => {
     const sidebarSource = readSource('src/components/bar/SimpleSidebar.vue')
 
     expect(tokenSource).toContain('--sidebar-shell-background: var(--glass-20);')
-    expect(tokenSource.match(/--sidebar-shell-background: var\(--glass-10\);/g)).toHaveLength(3)
+    expect(tokenSource.match(/--sidebar-shell-background: var\(--glass-10\);/g)).toHaveLength(2)
     expect(toolbarSource).toContain('backdrop-filter: blur(24px) saturate(145%);')
     expect(toolbarSource).toContain('-webkit-backdrop-filter: blur(24px) saturate(145%);')
     expect(sidebarSource).toMatch(/<Teleport to="body">[\s\S]*?<Transition name="fade">/)

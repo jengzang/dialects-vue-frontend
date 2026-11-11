@@ -159,7 +159,7 @@ watch(detailMode, (val) => {
 }
 
 .section-description {
-  font-size: 14px;
+  font-size: var(--font-size-14);
   color: var(--text-secondary);
   margin-bottom: 16px;
   line-height: 1.6;
@@ -175,13 +175,13 @@ watch(detailMode, (val) => {
 }
 
 .input-label {
-  font-size: 13px;
+  font-size: var(--font-size-13);
   font-weight: 500;
   color: var(--text-primary);
 }
 
 .input-hint {
-  font-size: 11px;
+  font-size: var(--font-size-12);
   color: var(--text-secondary);
   margin-top: 2px;
 }
@@ -238,7 +238,7 @@ watch(detailMode, (val) => {
 .component-tag {
   padding: 3px 10px;
   border-radius: var(--radius-md);
-  font-size: 12px;
+  font-size: var(--font-size-12);
   font-weight: 500;
   white-space: nowrap;
 }

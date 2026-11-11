@@ -137,8 +137,8 @@
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import * as echarts from 'echarts'
 import { useI18n } from 'vue-i18n'
+import { initChart as createChart, onChartThemeChange, readChartTokens } from '@/utils/chart/chartTheme'
 import referenceVowelsData from '@/assets/data/vowels.json'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
@@ -312,7 +312,8 @@ const initChart = () => {
     resizeObserver.disconnect()
   }
 
-  chart = echarts.init(chartContainer.value)
+  chart = createChart(chartContainer.value)
+  const tokens = readChartTokens()
 
   let series = []
 
@@ -370,7 +371,7 @@ const initChart = () => {
       itemStyle: {
         color: '#8e8e93',
         opacity: 0.7,
-        borderColor: '#fff',
+        borderColor: tokens.surface,
         borderWidth: 1
       },
       label: {
@@ -522,6 +523,12 @@ onMounted(() => {
   })
 })
 
+onChartThemeChange(() => {
+  if (segmentVowelData.value.length > 0 || allVowelSpaceData.value.length > 0) {
+    initChart()
+  }
+})
+
 onBeforeUnmount(() => {
   if (chart) {
     chart.dispose()
@@ -568,7 +575,7 @@ $transition-duration: 0.3s;
 .panel-title {
   margin: 1rem;
   color: var(--color-text-primary);
-  font-size: 1.5rem;
+  font-size: var(--font-size-24);
   font-weight: 600;
   text-align: center;
 }
@@ -587,14 +594,14 @@ $transition-duration: 0.3s;
   box-shadow: 0 2px 8px rgba(255, 193, 7, 0.1);
   color: $text-primary;
   text-align: left;
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   line-height: 1.6;
 }
 
 .section-title {
   margin-bottom: 1rem;
   color: var(--color-text-primary);
-  font-size: 1.1rem;
+  font-size: var(--font-size-18);
   font-weight: 600;
   text-align: center;
 }
@@ -677,14 +684,14 @@ $transition-duration: 0.3s;
 .segment-label {
   flex: 1;
   color: var(--color-text-primary);
-  font-size: 0.95rem;
+  font-size: var(--font-size-16);
 }
 
 .segment-type-badge {
   padding: 0.25rem 0.75rem;
   border-radius: var(--radius-sm);
   text-transform: uppercase;
-  font-size: 0.8rem;
+  font-size: var(--font-size-12);
   font-weight: 500;
 
   &.type-rime_core {
@@ -749,7 +756,7 @@ $transition-duration: 0.3s;
 
   .stat-label {
     color: var(--color-text-primary);
-    font-size: 0.95rem;
+    font-size: var(--font-size-16);
     font-weight: 600;
   }
 }
@@ -766,12 +773,12 @@ $transition-duration: 0.3s;
 
   .stat-key {
     color: var(--color-text-secondary);
-    font-size: 0.85rem;
+    font-size: var(--font-size-14);
   }
 
   .stat-value {
     color: var(--color-text-primary);
-    font-size: 1rem;
+    font-size: var(--font-size-16);
     font-weight: 600;
   }
 }
@@ -787,7 +794,7 @@ $transition-duration: 0.3s;
 .description-text {
   margin: 0;
   color: var(--color-text-secondary);
-  font-size: 0.9rem;
+  font-size: var(--font-size-14);
   line-height: 1.6;
 }
 
@@ -804,7 +811,7 @@ $transition-duration: 0.3s;
   .usage-hint {
     margin-bottom: 1rem;
     padding: 0.6rem 1rem;
-    font-size: 0.85rem;
+    font-size: var(--font-size-14);
   }
 
   .control-buttons {
@@ -818,7 +825,7 @@ $transition-duration: 0.3s;
   }
 
   .segment-label {
-    font-size: 0.8rem;
+    font-size: var(--font-size-12);
   }
 }
 </style>

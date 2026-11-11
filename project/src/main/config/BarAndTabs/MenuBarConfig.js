@@ -96,7 +96,7 @@ const MENU_CHILD_PATHS = {
   map: ['/menu/map/view', '/menu/map/divide', '/menu/map/custom'],
   pho: ['/menu/pho/matrix', '/menu/pho/custom', '/menu/pho/count', '/menu/pho/evolution'],
   vocabulary: ['/menu/vocabulary/view', '/menu/vocabulary/import', '/menu/vocabulary/manage'],
-  about: ['/menu/about/intro', '/menu/about/suggestion', '/menu/about/like']
+  about: ['/menu/about/intro', '/menu/about/history', '/menu/about/suggestion', '/menu/about/like']
 }
 
 function filterPlatformChildPaths(tabKey, paths) {
