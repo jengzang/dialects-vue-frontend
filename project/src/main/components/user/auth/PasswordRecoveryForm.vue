@@ -240,8 +240,9 @@ $error-color: red;
 }
 
 .reset-step-number {
-      color: var(--color-success);
-    }
+  color: var(--color-primary);
+  font-size: var(--font-size-32);
+}
 
 .reset-mail-body {
   width: 100%;
