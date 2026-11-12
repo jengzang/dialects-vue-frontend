@@ -71,16 +71,14 @@
     <p v-if="success" class="success" v-html="success"></p>
 
     <!-- Switch to Register -->
-    <p>
+    <div class="auth-navigation">
       <button type="button" class="pill-btn" @click="$emit('switchToRegister')">{{ $t('auth.login.noAccount') }}
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg>
       </button>
-    </p>
-    <p>
       <button type="button" class="pill-btn" data-forgot-password @click="openRecovery">{{ $t('auth.reset.entry') }}
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg>
       </button>
-    </p>
+    </div>
     </template>
 
     <template v-else>
@@ -298,6 +296,17 @@ $error-color: red;
 
 .reset-important {
   color: var(--color-primary);
+}
+
+.auth-navigation {
+  @include flex-center;
+  flex-wrap: nowrap;
+  gap: 8px;
+  margin: 16px 0;
+
+  .pill-btn {
+    flex-shrink: 0;
+  }
 }
 
 .reset-back-button {
