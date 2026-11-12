@@ -17,7 +17,7 @@ export function resolvePraatAnalysisStrategy(target = 'web', options = {}) {
     }
   }
 
-  if (options.localAvailable) {
+  if (options.preferLocal && options.localAvailable) {
     return {
       target: normalizedTarget,
       engine: 'local-python',

@@ -297,6 +297,7 @@
 import { computed, nextTick, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js';
 import { getToponymDetails, getToponymSearch } from '@/api';
 import MultiSelectDropdown from '@/components/selector/MultiSelectDropdown.vue';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue';
@@ -306,6 +307,7 @@ import { showConfirm } from '@/utils/ui/message.js';
 
 const { t } = useI18n();
 const router = useRouter();
+const route = computed(() => router.currentRoute?.value || { path: typeof window !== 'undefined' ? window.location.pathname : '/en/explore/villages/toponyms' });
 const { requireAuth, isAuthenticated } = useAuthGuard();
 
 async function guardToponymRequest() {
@@ -507,7 +509,7 @@ async function handleSelectResult(item) {
 
 function handleViewDistribution() {
   router.push({
-    path: '/explore/villages/toponyms',
+    path: buildLocalePath(resolveRouteLocale(route), '/explore/villages/toponyms'),
     query: {
       q: query.value.trim(),
       match_mode: matchMode.value,

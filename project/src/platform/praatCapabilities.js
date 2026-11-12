@@ -32,8 +32,8 @@ export const PRAAT_PLATFORM_CAPABILITIES = {
   },
   ios: {
     target: 'ios',
-    preferredEngine: 'local-python',
-    fallbackEngine: 'remote-api',
+    preferredEngine: 'remote-api',
+    fallbackEngine: 'local-python',
     inputFormats: NATIVE_PRAAT_FORMATS,
     acceptsAllBackendFormats: false,
     accept: '.wav,audio/wav,audio/x-wav',
@@ -41,8 +41,8 @@ export const PRAAT_PLATFORM_CAPABILITIES = {
   },
   android: {
     target: 'android',
-    preferredEngine: 'local-python',
-    fallbackEngine: 'remote-api',
+    preferredEngine: 'remote-api',
+    fallbackEngine: 'local-python',
     inputFormats: NATIVE_PRAAT_FORMATS,
     acceptsAllBackendFormats: false,
     accept: '.wav,audio/wav,audio/x-wav',

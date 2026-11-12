@@ -112,6 +112,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js';
 import { useI18n } from 'vue-i18n';
 import AppModal from '@/components/common/AppModal.vue';
 import CheckBox from '@/components/selector/CheckBox.vue';
@@ -258,7 +259,7 @@ async function handleHighPrecisionToggle(val) {
     if (confirmed) {
       handleClose();
       router.push({
-        path: '/auth',
+        path: buildLocalePath(resolveRouteLocale(route), '/auth'),
         query: { view: 'login', redirect: route.fullPath }
       });
     }

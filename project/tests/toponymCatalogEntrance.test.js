@@ -103,7 +103,7 @@ describe('toponym catalog entrance', () => {
     await settle();
     expect(mocks.details).toHaveBeenCalledWith('village-1');
     host.querySelector('.toponym-search-page__detail header button').click();
-    expect(mocks.push).toHaveBeenCalledWith({ path: '/explore/villages/toponyms', query: { q: '黄村', match_mode: 'suffix' } });
+    expect(mocks.push).toHaveBeenCalledWith({ path: '/zh-Hant/explore/villages/toponyms', query: { q: '黄村', match_mode: 'suffix' } });
   });
 
   it('shows empty input validation in the expanded form without querying', async () => {
