@@ -67,6 +67,11 @@ describe('Mail password recovery', () => {
     expect(host.querySelector('input[type=password]')).toBeNull()
     expect(host.textContent).toContain('2639548777')
     expect(host.textContent).not.toContain('auth.reset.')
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } })
+    host.querySelector('[data-reset-copy-subject]').click()
+    await settle()
+    expect(writeText).toHaveBeenCalledExactlyOnceWith('RESET-REQUEST')
   })
 
   it('rejects mismatched passwords without creating a request', async () => {

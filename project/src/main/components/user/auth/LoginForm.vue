@@ -3,7 +3,7 @@
     <h3 class="form-title">
       {{ $t(recoveryOpen ? 'auth.reset.title' : 'auth.login.title') }}
       <button
-        class="glass-button auth-benefit-button"
+        :class="[recoveryOpen ? 'action-btn' : 'glass-button', 'auth-benefit-button']"
         data-size="compact"
         @click="$emit('showBenefits')"
         :title="$t('auth.login.viewBenefits')"
@@ -85,26 +85,28 @@
         <FormInput v-model="recoveryPassword" data-reset-password type="password" :placeholder="$t('auth.reset.newPassword')" :show-password-toggle="true" />
         <FormInput v-model="recoveryConfirm" data-reset-confirm type="password" :placeholder="$t('auth.register.confirmPassword')" :show-password-toggle="true" />
         <div class="form-row">
-          <button type="button" class="glass-button auth-submit-button" data-variant="primary" data-reset-submit :disabled="recoveryLoading" @click="submitRecovery">
+          <button type="button" class="action-btn auth-submit-button" data-variant="primary" data-reset-submit :disabled="recoveryLoading" @click="submitRecovery">
             {{ $t(recoveryLoading ? 'auth.reset.submitting' : 'auth.reset.submit') }}
           </button>
         </div>
       </template>
       <template v-else>
         <p>{{ $t('auth.reset.instructions', { minutes: Math.floor(recoveryRequest.expires_in / 60) }) }}</p>
-        <p>{{ $t('auth.reset.recipient') }} <span>{{ recoveryRequest.recipient }}</span></p>
-        <button type="button" class="glass-button" @click="copyRecovery(recoveryRequest.recipient)">{{ $t('auth.reset.copyRecipient') }}</button>
-        <p>{{ $t('auth.reset.subject') }} RESET-REQUEST</p>
-        <textarea class="glass-field reset-mail-body" :value="recoveryMailBody" readonly rows="3" :aria-label="$t('auth.reset.mailBody')" @focus="$event.target.select()"></textarea>
+        <p>{{ $t('auth.reset.recipient') }} <span class="reset-important">{{ recoveryRequest.recipient }}</span></p>
+        <button type="button" class="action-btn" @click="copyRecovery(recoveryRequest.recipient)">{{ $t('auth.reset.copyRecipient') }}</button>
+        <p>{{ $t('auth.reset.subject') }} <span class="reset-important">RESET-REQUEST</span></p>
+        <button type="button" class="action-btn" data-reset-copy-subject @click="copyRecovery('RESET-REQUEST')">{{ $t('auth.reset.copySubject') }}</button>
+        <p class="reset-important">{{ $t('auth.reset.subjectRequired') }}</p>
+        <textarea class="glass-field reset-mail-body reset-important" :value="recoveryMailBody" readonly rows="3" :aria-label="$t('auth.reset.mailBody')" @focus="$event.target.select()"></textarea>
         <div class="form-row reset-actions">
-          <button type="button" class="glass-button" data-reset-copy @click="copyRecovery(recoveryMailBody)">{{ $t('auth.reset.copyBody') }}</button>
-          <a class="glass-button" data-reset-mailto :href="recoveryMailto">{{ $t('auth.reset.openMail') }}</a>
+          <button type="button" class="action-btn" data-reset-copy @click="copyRecovery(recoveryMailBody)">{{ $t('auth.reset.copyBody') }}</button>
+          <a class="action-btn" data-reset-mailto :href="recoveryMailto">{{ $t('auth.reset.openMail') }}</a>
         </div>
         <p v-if="recoveryCopyKey" role="status">{{ $t(recoveryCopyKey) }}</p>
       </template>
       <p v-if="recoveryErrorKey" class="err" role="alert">{{ $t(recoveryErrorKey) }}</p>
-      <p>{{ $t('auth.reset.appeal') }} <span>2639548777</span></p>
-      <button type="button" class="glass-button" :disabled="recoveryLoading" @click="closeRecovery">{{ $t('auth.reset.back') }}</button>
+      <p>{{ $t('auth.reset.appeal') }} <span class="reset-important">2639548777</span></p>
+      <button type="button" class="action-btn" :disabled="recoveryLoading" @click="closeRecovery">{{ $t('auth.reset.back') }}</button>
     </template>
   </div>
 </template>
@@ -270,6 +272,10 @@ $error-color: red;
   justify-content: center;
   width: 100%;
   margin: 12px 0;
+}
+
+.reset-important {
+  color: var(--color-primary);
 }
 
 .reset-mail-body {
