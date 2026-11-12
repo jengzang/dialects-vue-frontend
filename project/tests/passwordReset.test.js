@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { createApp, nextTick } from 'vue'
+import { createApp, h, nextTick, ref } from 'vue'
 import { createI18n } from 'vue-i18n'
 import LoginForm from '../src/main/components/user/auth/LoginForm.vue'
+import PasswordRecoveryForm from '../src/main/components/user/auth/PasswordRecoveryForm.vue'
 import en from '../src/i18n/locales/en/auth.json'
 import zhCN from '../src/i18n/locales/zh-CN/auth.json'
 import zhHant from '../src/i18n/locales/zh-Hant/auth.json'
@@ -16,7 +17,10 @@ const settle = async () => { await Promise.resolve(); await nextTick(); await ne
 function mount(locale = 'zh-CN') {
   host = document.createElement('div')
   document.body.append(host)
-  app = createApp(LoginForm)
+  const recovering = ref(false)
+  app = createApp({ render: () => recovering.value
+    ? h(PasswordRecoveryForm, { onBack: () => { recovering.value = false } })
+    : h(LoginForm, { onRecoverPassword: () => { recovering.value = true } }) })
   const i18n = createI18n({ legacy: false, locale, messages: {
     en: { auth: en }, 'zh-CN': { auth: zhCN }, 'zh-Hant': { auth: zhHant },
   }, missingWarn: false, fallbackWarn: false })

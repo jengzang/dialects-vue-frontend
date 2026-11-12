@@ -18,6 +18,14 @@
         @update:loginMode="loginMode = $event"
         @submit="handleLogin"
         @switchToRegister="setMode('register')"
+        @recoverPassword="openPasswordRecovery"
+        @showBenefits="showBenefitsPopup"
+      />
+
+      <PasswordRecoveryForm
+        v-else-if="mode === 'recover'"
+        :initial-email="recoveryEmail"
+        @back="setMode('login')"
         @showBenefits="showBenefitsPopup"
       />
 
@@ -105,6 +113,7 @@ import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 
 // Component imports
 import LoginForm from '@/main/components/user/auth/LoginForm.vue'
+import PasswordRecoveryForm from '@/main/components/user/auth/PasswordRecoveryForm.vue'
 import RegisterForm from '@/main/components/user/auth/RegisterForm.vue'
 import ProfileOverview from '@/main/components/user/auth/ProfileOverview.vue'
 import ModifyProfileForm from '@/main/components/user/auth/ModifyProfileForm.vue'
@@ -126,6 +135,7 @@ const loading = authTask.loading
 
 // Login/Register state
 const loginMode = ref('email') // 'email' | 'username'
+const recoveryEmail = ref('')
 const modeType = ref('username') // 'username' | 'password'
 const statsExpanded = ref(false)
 const showBenefits = ref(false)
@@ -170,6 +180,11 @@ const setMode = (newMode) => {
 
 const switchTab = (tab) => {
   setView(tab)
+}
+
+const openPasswordRecovery = (email) => {
+  recoveryEmail.value = email
+  setMode('recover')
 }
 
 function extractErrorMessage(error, fallback = t('auth.validation.unknownError')) {
@@ -479,7 +494,7 @@ const handleRegisterFromBenefits = () => {
 
 // Lifecycle
 onMounted(async () => {
-  if (getToken()) {
+  if (getToken() && mode.value !== 'recover') {
     await fetchUser()
     if (userStore.isAuthenticated) {
       setMode('profile')
