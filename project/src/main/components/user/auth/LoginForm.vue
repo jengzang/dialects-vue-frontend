@@ -83,6 +83,7 @@
 
     <template v-else>
       <template v-if="!recoveryRequest">
+        <p>{{ $t('auth.reset.formInstructions') }}</p>
         <FormInput v-model="recoveryEmail" data-reset-email type="email" :placeholder="$t('auth.login.email')" />
         <FormInput v-model="recoveryPassword" data-reset-password type="password" :placeholder="$t('auth.reset.newPassword')" :show-password-toggle="true" />
         <FormInput v-model="recoveryConfirm" data-reset-confirm type="password" :placeholder="$t('auth.register.confirmPassword')" :show-password-toggle="true" />
