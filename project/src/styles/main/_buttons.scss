@@ -109,6 +109,28 @@
   border-color: var(--color-secondary-border);
 }
 
+.pill-btn--success {
+  --pill-btn-bg: rgba(var(--color-success-rgb), 0.1);
+  --pill-btn-color: var(--color-success);
+  --pill-btn-border: 1px solid rgba(var(--color-success-rgb), 0.3);
+  --pill-btn-hover-bg: rgba(var(--color-success-rgb), 0.18);
+  --pill-btn-hover-color: var(--color-success);
+  --pill-btn-hover-border: var(--color-success);
+}
+
+.pill-btn--blur {
+  @include glass-blur;
+}
+
+.pill-btn--error {
+  --pill-btn-bg: var(--color-error-bg);
+  --pill-btn-color: var(--color-error);
+  --pill-btn-border: 1px solid var(--color-error-border);
+  --pill-btn-hover-bg: rgba(var(--color-error-rgb), 0.16);
+  --pill-btn-hover-color: var(--color-error);
+  --pill-btn-hover-border: var(--color-error);
+}
+
 .pill-btn {
   @include flex-center;
   gap: var(--pill-btn-gap, 6px);

@@ -72,10 +72,10 @@
 
     <!-- Switch to Register -->
     <div class="auth-navigation">
-      <button type="button" class="pill-btn" @click="$emit('switchToRegister')">{{ $t('auth.login.noAccount') }}
+      <button type="button" class="pill-btn pill-btn--success pill-btn--blur" @click="$emit('switchToRegister')">{{ $t('auth.login.noAccount') }}
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg>
       </button>
-      <button type="button" class="pill-btn" data-forgot-password @click="openRecovery">{{ $t('auth.reset.entry') }}
+      <button type="button" class="pill-btn pill-btn--error pill-btn--blur" data-forgot-password @click="openRecovery">{{ $t('auth.reset.entry') }}
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg>
       </button>
     </div>
@@ -121,7 +121,7 @@
       </template>
       <p v-if="recoveryErrorKey" class="err" role="alert">{{ $t(recoveryErrorKey) }}</p>
       <p>{{ $t('auth.reset.appeal') }} <span class="reset-important">2639548777</span></p>
-      <button type="button" class="glass-button reset-back-button" data-reset-back :disabled="recoveryLoading" @click="closeRecovery">{{ $t('auth.reset.back') }}</button>
+      <button type="button" class="pill-btn pill-btn--history pill-btn--blur reset-back-button" data-reset-back :disabled="recoveryLoading" @click="closeRecovery">{{ $t('auth.reset.back') }}</button>
     </template>
   </div>
 </template>
@@ -310,14 +310,8 @@ $error-color: red;
 }
 
 .reset-back-button {
-  --glass-button-color: var(--color-secondary-text);
-  background: var(--color-secondary-bg);
-  border-color: var(--color-secondary-border);
-
-  &:hover:not(:disabled) {
-    --glass-button-color: var(--color-secondary-hover);
-    background: var(--color-secondary-light);
-  }
+  width: fit-content;
+  margin-inline: auto;
 }
 
 .reset-step {
