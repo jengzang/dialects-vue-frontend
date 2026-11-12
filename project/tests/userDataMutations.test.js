@@ -11,7 +11,7 @@ vi.mock('vue-router',()=>({useRoute:()=>({query:{},fullPath:'/user'}),useRouter:
 vi.mock('@/components/common/AppModal.vue',()=>({default:defineComponent({props:['modelValue'],setup:(props,{slots})=>()=>props.modelValue?h('section',{class:'test-modal'},[slots.default?.(),slots.footer?.()]):null})}))
 vi.mock('@/components/selector/CheckBox.vue',()=>({default:defineComponent({props:['modelValue'],emits:['update:modelValue'],setup:(props,{emit})=>()=>h('input',{type:'checkbox',checked:props.modelValue,onChange:e=>emit('update:modelValue',e.target.checked)})})}))
 import UserDataPage from '@/main/components/user/UserDataPage.vue'
-const record={version:1,簡稱:'甲',音典分區:'區',經緯度:'113,23',聲韻調:'',特徵:'調',值:'55',說明:'',created_at:'2026-01-01T00:00:00Z'}
+const record={簡稱:'甲',音典分區:'區',經緯度:'113,23',聲韻調:'',特徵:'調',值:'55',說明:'',created_at:'2026-01-01T00:00:00Z'}
 let app,host,vm
 const flush=async()=>{for(let i=0;i<8;i++) await Promise.resolve();await nextTick()}
 beforeEach(async()=>{
@@ -36,26 +36,26 @@ it('identifies same-timestamp records independently and locks before confirmatio
  const first=vm.submitBatchEdit();await vm.submitBatchEdit();expect(mocks.showConfirm).toHaveBeenCalledTimes(1)
  vm.batchEditRows[0].值='late change';confirm(true);mocks.batchUpdateCustomData.mockResolvedValue({updated_ids:[2]});await first
  expect(mocks.batchUpdateCustomData).toHaveBeenCalledTimes(1)
- expect(mocks.batchUpdateCustomData.mock.calls[0][0][0]).toMatchObject({id:2,version:1,值:'55'})
+ expect(mocks.batchUpdateCustomData.mock.calls[0][0][0]).toMatchObject({id:2,值:'55'})
  expect(mocks.saveCustomData).not.toHaveBeenCalled()
 })
-it('does not clear delete selection on conflict and submits expected versions',async()=>{
- vm.selectedRecords=[2];mocks.batchDeleteCustomDataById.mockRejectedValue({status:409,detail:{code:'version_conflict'}})
+it('does not clear delete selection on failure and submits IDs',async()=>{
+ vm.selectedRecords=[2];mocks.batchDeleteCustomDataById.mockRejectedValue({status:404,detail:{code:'record_unavailable'}})
  await vm.handleBatchDelete();expect(vm.selectedRecords).toEqual([2])
- expect(mocks.batchDeleteCustomDataById).toHaveBeenCalledWith([{id:2,version:1}])
+ expect(mocks.batchDeleteCustomDataById).toHaveBeenCalledWith([{id:2}])
 })
-it('requires an explicit merge and submits the latest version while retaining local values',async()=>{
+it('sends edited values by ID without requiring a version or a merge',async()=>{
  vm.selectedRecords=[2];vm.handleBatchEdit();vm.batchEditRows[0].值='my draft'
- mocks.batchUpdateCustomData.mockRejectedValueOnce({status:409,detail:{code:'version_conflict'}})
- await vm.submitBatchEdit();vm.mergeVersions([{...record,id:2,version:4,值:'server value'}])
- expect(vm.batchEditRows[0].值).toBe('my draft')
  mocks.batchUpdateCustomData.mockResolvedValueOnce({updated_ids:[2]});await vm.submitBatchEdit()
- expect(mocks.batchUpdateCustomData.mock.calls[1][0][0]).toMatchObject({id:2,version:4,值:'my draft'})
+ const item=mocks.batchUpdateCustomData.mock.calls[0][0][0]
+ expect(item).toMatchObject({id:2,值:'my draft'})
+ expect(item).not.toHaveProperty('version')
+ expect(vm.showBatchEditModal).toBe(false)
 })
 it('blocks 51 changes and safely confirms an unknown create with the identical body',async()=>{
- vm.batchRows=Array.from({length:51},()=>({...record,id:undefined,version:undefined}));await vm.submitBatchCreate()
+ vm.batchRows=Array.from({length:51},()=>({...record,id:undefined}));await vm.submitBatchCreate()
  expect(mocks.saveCustomData).not.toHaveBeenCalled()
- vm.batchRows=[{...record,id:undefined,version:undefined}];mocks.saveCustomData.mockRejectedValueOnce(new TypeError('lost')).mockResolvedValueOnce({created_count:1,created:[{client_row_id:'a',id:8}]})
+ vm.batchRows=[{...record,id:undefined}];mocks.saveCustomData.mockRejectedValueOnce(new TypeError('lost')).mockResolvedValueOnce({created_count:1,created:[{client_row_id:'a',id:8}]})
  await vm.submitBatchCreate();expect(vm.batchRows).toHaveLength(1);await vm.submitBatchCreate();expect(mocks.saveCustomData).toHaveBeenCalledTimes(1)
  await vm.retryMutation();expect(mocks.saveCustomData.mock.calls[0][0]).toEqual(mocks.saveCustomData.mock.calls[1][0]);expect(vm.batchRows).toEqual([])
 })

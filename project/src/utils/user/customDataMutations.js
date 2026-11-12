@@ -16,10 +16,10 @@ export function validateRows(rows, { creates = false } = {}) {
     const [lng, lat] = parts.map(Number)
     if (parts.length !== 2 || parts.some(v => !v) || !Number.isFinite(lng) || !Number.isFinite(lat) || Math.abs(lng) > 180 || Math.abs(lat) > 90) errors.push({ row_index, field: '經緯度', messageKey: 'coordinates' })
     if (!creates) {
-      if (!Number.isSafeInteger(row.id) || row.id <= 0 || !Number.isSafeInteger(row.version) || row.version <= 0) errors.push({ row_index, field: 'id', messageKey: 'unavailable' })
+      if (!Number.isSafeInteger(row.id) || row.id <= 0) errors.push({ row_index, field: 'id', messageKey: 'unavailable' })
       if (ids.has(row.id)) errors.push({ row_index, field: 'id', messageKey: 'duplicate' })
       ids.add(row.id)
-      items.push({ id: row.id, version: row.version, ...item })
+      items.push({ id: row.id, ...item })
     } else items.push({ client_row_id: row.client_row_id || crypto.randomUUID(), ...item })
   })
   if (items.length > 50) errors.unshift({ row_index: 0, field: '', messageKey: 'limit' })
@@ -48,11 +48,11 @@ export function buildPointMutations(rows, base, deletes) {
   for (const item of [...updates, ...deletes]) {
     if (ids.has(item.id)) errors.push({row_index:0,field:'id',messageKey:'duplicate'})
     ids.add(item.id)
-    if (!Number.isSafeInteger(item.id) || item.id <= 0 || !Number.isSafeInteger(item.version) || item.version <= 0) errors.push({row_index:0,field:'id',messageKey:'unavailable'})
+    if (!Number.isSafeInteger(item.id) || item.id <= 0) errors.push({row_index:0,field:'id',messageKey:'unavailable'})
   }
   if (creates.length + updates.length + deletes.length > 50) errors.unshift({row_index:0,field:'',messageKey:'limit'})
   if (errors.length) throw Object.assign(new Error('validation'), { errors })
-  return { creates, updates, deletes: deletes.map(({id,version})=>({id,version})) }
+  return { creates, updates, deletes: deletes.map(({id})=>({id})) }
 }
 export function formatCustomDataTime(value, locale = 'zh-CN', timeZone) {
   if (!value || typeof value !== 'string') return '-'

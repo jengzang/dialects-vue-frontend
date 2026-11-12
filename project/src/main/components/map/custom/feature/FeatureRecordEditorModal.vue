@@ -31,7 +31,7 @@
       :state="mutation"
       :retryable="isCreateMode"
       @retry="retrySave"
-      @merge="mergeVersions"
+      @merge="reconcileUnknownSave"
     />
     <div
       class="feature-record-body"
@@ -275,7 +275,6 @@ const isSaving = mutation.isSaving;
 const locked = mutation.locked;
 const phonologyField=ref('');
 const featureField=ref('');
-const expectedVersion=ref(null);
 let coordinateSequence=0;
 let matchSequence=0;
 const isFieldNoticeOpen = ref(false);
@@ -509,7 +508,6 @@ function hideSuggestions() {
 function syncFromProps() {
   if(locked.value) return;
   mutation.reset();
-  expectedVersion.value=props.record?.version;
   featureField.value=props.record?.['特徵'] || props.feature?.['特徵'] || props.feature?.feature || '';
   phonologyField.value=props.record?.['聲韻調'] || props.feature?.['聲韻調'] || props.feature?.phonology || '';
   const record = props.record || {};
@@ -560,7 +558,7 @@ async function handleSave() {
   if(locked.value) return;
   mutation.reset();
   message.value='';
-  const record={id:props.record?.id,version:expectedVersion.value,簡稱:location.value,音典分區:region.value,經緯度:coordText.value,聲韻調:phonologyField.value,特徵:featureField.value,值:valueField.value,說明:noteField.value};
+  const record={id:props.record?.id,簡稱:location.value,音典分區:region.value,經緯度:coordText.value,聲韻調:phonologyField.value,特徵:featureField.value,值:valueField.value,說明:noteField.value};
   const checked=validateRows([record],{creates:isCreateMode.value});
   if(checked.errors.length) {
     const first=checked.errors[0];
@@ -581,11 +579,8 @@ function finishSave() {
   emit('update:modelValue',false);
 }
 async function retrySave() {if(await mutation.save({})) finishSave();}
-function mergeVersions(current) {
-  mutation.prepareMerge();
-  const latest=current.find(row=>row.id===props.record?.id);
-  if(latest) expectedVersion.value=latest.version;
-  mutation.reset();
+function reconcileUnknownSave() {
+  if (mutation.prepareMerge()) mutation.reset();
 }
 
 watch(

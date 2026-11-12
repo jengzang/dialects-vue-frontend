@@ -341,8 +341,7 @@ export function buildMergedDataFromFeatureRows(rows, feature, phonology = '') {
             iscustoms: 1,
             detailContent: [],
             id: row.id,
-            version: row.version,
-            customRecords: [{ id: row.id, version: row.version }],
+            customRecords: [{ id: row.id }],
             created_at: row["created_at"] || null,
             phonology: row["聲韻調"] || phonology || '',
             yindianRegion: row["音典分區"] || ''
@@ -438,8 +437,7 @@ export function mergeBackendData(result, mergedData, isCustomFeatureSearch = fal
                 iscustoms: 1,
                 detailContent: [],
                 id: row.id,
-                version: row.version,
-                customRecords: [{ id: row.id, version: row.version }],
+                customRecords: [{ id: row.id }],
                 created_at:created_at,
             });
         } else {
@@ -450,9 +448,8 @@ export function mergeBackendData(result, mergedData, isCustomFeatureSearch = fal
                 existingItem.notes += "║" + row["說明"];
                 existingItem.iscustoms = 1;
                 existingItem.id ??= row.id;
-                existingItem.version ??= row.version;
                 existingItem.customRecords ??= [];
-                existingItem.customRecords.push({ id: row.id, version: row.version });
+                existingItem.customRecords.push({ id: row.id });
             } else {
                 mergedData.push({
                     location: newLocation,
@@ -464,8 +461,7 @@ export function mergeBackendData(result, mergedData, isCustomFeatureSearch = fal
                     iscustoms: 1,
                     detailContent: [],
                     id: row.id,
-                version: row.version,
-                customRecords: [{ id: row.id, version: row.version }],
+                    customRecords: [{ id: row.id }],
                 created_at:created_at,
                 });
             }

@@ -839,8 +839,7 @@ const handleCustomBtnClick = async (item) => {
     }
   } catch (error) {
     const code = error.detail?.code
-    const key = code === 'version_conflict' ? 'conflict'
-      : code === 'record_unavailable' ? 'unavailable'
+    const key = code === 'record_unavailable' ? 'unavailable'
         : code === 'validation_error' ? 'limit' : 'failed'
     showError(t(`user.customSafety.${key}`))
   }

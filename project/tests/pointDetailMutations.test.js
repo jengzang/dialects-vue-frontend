@@ -12,7 +12,7 @@ vi.mock('@/main/components/map/MiniMapSelector.vue',()=>({default:{render:()=>nu
 vi.mock('@/components/common/AppModal.vue',()=>({default:defineComponent({props:['modelValue'],setup:(props,{slots})=>()=>props.modelValue?h('section',[slots.default?.(),slots.footer?.()]):null})}))
 import PointDetailForm from '@/main/components/map/custom/point/PointDetailForm.vue'
 import FeatureRecordEditorModal from '@/main/components/map/custom/feature/FeatureRecordEditorModal.vue'
-const record={id:7,version:3,簡稱:'甲',音典分區:'區',經緯度:'113.000000,23.000000',聲韻調:'',特徵:'調',值:'55',說明:''}
+const record={id:7,簡稱:'甲',音典分區:'區',經緯度:'113.000000,23.000000',聲韻調:'',特徵:'調',值:'55',說明:''}
 let app,host,vm,onSaved
 const flush=async()=>{for(let i=0;i<10;i++) await Promise.resolve();await nextTick()}
 beforeEach(async()=>{
@@ -20,18 +20,18 @@ beforeEach(async()=>{
  onSaved=vi.fn();host=document.createElement('div');document.body.append(host);app=createApp(PointDetailForm,{point:record,onSaved});app.component('InlineIcon',{render:()=>null});app.mount(host);vm=app._instance.setupState;await flush()
 })
 afterEach(()=>{app.unmount();host.remove()})
-it('saves location-only changes once and keeps id/version',async()=>{
+it('saves location-only changes once and keeps id',async()=>{
  vm.location='乙';mocks.saveCustomData.mockResolvedValue({created:[],updated_ids:[7],deleted_ids:[]})
  await vm.handleSave()
  expect(mocks.saveCustomData).toHaveBeenCalledTimes(1)
- expect(mocks.saveCustomData.mock.calls[0][0]).toMatchObject({updates:[{id:7,version:3,簡稱:'乙'}],creates:[],deletes:[]})
+ expect(mocks.saveCustomData.mock.calls[0][0]).toMatchObject({updates:[{id:7,簡稱:'乙'}],creates:[],deletes:[]})
  expect(onSaved).toHaveBeenCalledTimes(1)
 })
 it('blocks cleared existing rows and preserves all draft/deletes after failed save',async()=>{
  vm.rows[0].值='';await vm.handleSave();expect(mocks.saveCustomData).not.toHaveBeenCalled()
  vm.rows[0].值='new';vm.addRow();vm.rows[1].特徵='new feature';vm.rows[1].值='new value';vm.removeRow(vm.rows[0].clientRowId)
  mocks.saveCustomData.mockRejectedValue({status:422,detail:{code:'invalid'}});await vm.handleSave()
- expect(vm.rows[0].值).toBe('new value');expect(vm.removedIds).toEqual([{id:7,version:3}]);expect(onSaved).not.toHaveBeenCalled()
+ expect(vm.rows[0].值).toBe('new value');expect(vm.removedIds).toEqual([{id:7}]);expect(onSaved).not.toHaveBeenCalled()
 })
 it('replays lost response with same key/body while locked and emits saved once',async()=>{
  vm.rows[0].值='new';mocks.saveCustomData.mockRejectedValueOnce(new TypeError('lost')).mockResolvedValueOnce({created:[],updated_ids:[7],deleted_ids:[]})
@@ -49,7 +49,7 @@ it('feature editor updates by ID and keeps the modal and draft after failure',as
  app=createApp(FeatureRecordEditorModal,{modelValue:true,record,feature:{特徵:'調',聲韻調:''},onSaved});app.mount(host);vm=app._instance.setupState;await flush()
  vm.valueField='my value';mocks.batchUpdateCustomData.mockRejectedValueOnce({status:422,detail:{code:'invalid'}})
  await vm.handleSave();expect(vm.valueField).toBe('my value');expect(vm.isSaving).toBe(false);expect(onSaved).not.toHaveBeenCalled()
- expect(mocks.batchUpdateCustomData.mock.calls[0][0][0]).toMatchObject({id:7,version:3,值:'my value'})
+ expect(mocks.batchUpdateCustomData.mock.calls[0][0][0]).toMatchObject({id:7,值:'my value'})
 })
 it('feature editor creates through idempotent save and confirms the same lost response',async()=>{
  app.unmount();host.innerHTML='';onSaved=vi.fn()
