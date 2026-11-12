@@ -92,21 +92,34 @@
       </template>
       <template v-else>
         <p>{{ $t('auth.reset.instructions', { minutes: Math.floor(recoveryRequest.expires_in / 60) }) }}</p>
-        <p>{{ $t('auth.reset.recipient') }} <span class="reset-important">{{ recoveryRequest.recipient }}</span></p>
-        <button type="button" class="action-btn" @click="copyRecovery(recoveryRequest.recipient)">{{ $t('auth.reset.copyRecipient') }}</button>
-        <p>{{ $t('auth.reset.subject') }} <span class="reset-important">RESET-REQUEST</span></p>
-        <button type="button" class="action-btn" data-reset-copy-subject @click="copyRecovery('RESET-REQUEST')">{{ $t('auth.reset.copySubject') }}</button>
-        <p class="reset-important">{{ $t('auth.reset.subjectRequired') }}</p>
-        <textarea class="glass-field reset-mail-body reset-important" :value="recoveryMailBody" readonly rows="3" :aria-label="$t('auth.reset.mailBody')" @focus="$event.target.select()"></textarea>
+        <div class="reset-step" data-reset-step="recipient" :class="{ completed: recoveryCopied.recipient }">
+          <div class="reset-step-row">
+            <p><span class="reset-step-number">①</span> {{ $t('auth.reset.recipient') }} <span class="reset-important">{{ recoveryRequest.recipient }}</span></p>
+            <button type="button" class="action-btn" data-reset-copy-recipient @click="copyRecovery(recoveryRequest.recipient, 'recipient')">{{ $t('auth.reset.copyRecipient') }}</button>
+          </div>
+        </div>
+        <div class="reset-step" data-reset-step="subject" :class="{ completed: recoveryCopied.subject }">
+          <div class="reset-step-row">
+            <p><span class="reset-step-number">②</span> {{ $t('auth.reset.subject') }} <span class="reset-important">RESET-REQUEST</span></p>
+            <button type="button" class="action-btn" data-reset-copy-subject @click="copyRecovery('RESET-REQUEST', 'subject')">{{ $t('auth.reset.copySubject') }}</button>
+          </div>
+          <p class="reset-important">{{ $t('auth.reset.subjectRequired') }}</p>
+        </div>
+        <div class="reset-step" data-reset-step="body" :class="{ completed: recoveryCopied.body }">
+          <div class="reset-step-row">
+            <p><span class="reset-step-number">③</span> {{ $t('auth.reset.mailBody') }}</p>
+            <button type="button" class="action-btn" data-reset-copy @click="copyRecovery(recoveryMailBody, 'body')">{{ $t('auth.reset.copyBody') }}</button>
+          </div>
+          <textarea class="glass-field reset-mail-body reset-important" :value="recoveryMailBody" readonly rows="3" :aria-label="$t('auth.reset.mailBody')" @focus="$event.target.select()"></textarea>
+        </div>
         <div class="form-row reset-actions">
-          <button type="button" class="action-btn" data-reset-copy @click="copyRecovery(recoveryMailBody)">{{ $t('auth.reset.copyBody') }}</button>
           <a class="action-btn" data-reset-mailto :href="recoveryMailto">{{ $t('auth.reset.openMail') }}</a>
         </div>
         <p v-if="recoveryCopyKey" role="status">{{ $t(recoveryCopyKey) }}</p>
       </template>
       <p v-if="recoveryErrorKey" class="err" role="alert">{{ $t(recoveryErrorKey) }}</p>
       <p>{{ $t('auth.reset.appeal') }} <span class="reset-important">2639548777</span></p>
-      <button type="button" class="action-btn" :disabled="recoveryLoading" @click="closeRecovery">{{ $t('auth.reset.back') }}</button>
+      <button type="button" class="glass-button reset-back-button" data-reset-back :disabled="recoveryLoading" @click="closeRecovery">{{ $t('auth.reset.back') }}</button>
     </template>
   </div>
 </template>
@@ -117,7 +130,7 @@ import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import FormInput from './FormInput.vue'
 import TabSwitcher from '@/components/common/TabSwitcher.vue'
-import { showConfirm } from '@/utils/ui/message.js'
+import { showConfirm, showSuccess } from '@/utils/ui/message.js'
 import { createPasswordResetRequest } from '@/api/auth/actions.js'
 
 const { t } = useI18n()
@@ -159,6 +172,7 @@ const recoveryLoading = ref(false)
 const recoveryRequest = ref(null)
 const recoveryErrorKey = ref('')
 const recoveryCopyKey = ref('')
+const recoveryCopied = ref({})
 const recoveryMailBody = computed(() => recoveryRequest.value ? `RESET-REQUEST: ${recoveryRequest.value.request_id}` : '')
 const recoveryMailto = computed(() => recoveryRequest.value
   ? `mailto:${encodeURIComponent(recoveryRequest.value.recipient)}?subject=RESET-REQUEST&body=${encodeURIComponent(recoveryMailBody.value)}`
@@ -179,6 +193,7 @@ function closeRecovery() {
   recoveryRequest.value = null
   recoveryErrorKey.value = ''
   recoveryCopyKey.value = ''
+  recoveryCopied.value = {}
 }
 
 async function submitRecovery() {
@@ -214,10 +229,12 @@ async function submitRecovery() {
   }
 }
 
-async function copyRecovery(value) {
+async function copyRecovery(value, step) {
   try {
     await navigator.clipboard.writeText(value)
-    recoveryCopyKey.value = 'auth.reset.copied'
+    recoveryCopyKey.value = ''
+    recoveryCopied.value[step] = true
+    showSuccess(t('auth.reset.copied'))
   } catch {
     recoveryCopyKey.value = 'auth.reset.copyFailed'
   }
@@ -276,6 +293,47 @@ $error-color: red;
 
 .reset-important {
   color: var(--color-primary);
+}
+
+.reset-back-button {
+  --glass-button-color: var(--color-secondary-text);
+  background: var(--color-secondary-bg);
+  border-color: var(--color-secondary-border);
+
+  &:hover:not(:disabled) {
+    --glass-button-color: var(--color-secondary-hover);
+    background: var(--color-secondary-light);
+  }
+}
+
+.reset-step {
+  margin-top: 16px;
+
+  &.completed {
+    .reset-step-number {
+      color: var(--color-success);
+    }
+
+    .action-btn {
+      background: var(--color-success);
+    }
+  }
+}
+
+.reset-step-row {
+  @include flex-center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+
+  p {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+.reset-step-number {
+  color: var(--color-primary);
+  font-size: var(--font-size-24);
 }
 
 .reset-mail-body {

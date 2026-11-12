@@ -5,10 +5,10 @@ import LoginForm from '../src/main/components/user/auth/LoginForm.vue'
 import en from '../src/i18n/locales/en/auth.json'
 import zhCN from '../src/i18n/locales/zh-CN/auth.json'
 import zhHant from '../src/i18n/locales/zh-Hant/auth.json'
-import { showConfirm } from '@/utils/ui/message.js'
+import { showConfirm, showSuccess } from '@/utils/ui/message.js'
 import { createPasswordResetRequest } from '@/api/auth/actions.js'
 
-vi.mock('@/utils/ui/message.js', () => ({ showConfirm: vi.fn() }))
+vi.mock('@/utils/ui/message.js', () => ({ showConfirm: vi.fn(), showSuccess: vi.fn() }))
 vi.mock('@/api/auth/actions.js', () => ({ createPasswordResetRequest: vi.fn() }))
 
 let app, host
@@ -72,6 +72,21 @@ describe('Mail password recovery', () => {
     host.querySelector('[data-reset-copy-subject]').click()
     await settle()
     expect(writeText).toHaveBeenCalledExactlyOnceWith('RESET-REQUEST')
+    expect(showSuccess).toHaveBeenCalledWith(({ en, 'zh-CN': zhCN, 'zh-Hant': zhHant })[locale].reset.copied)
+    expect(host.querySelector('[role=status]')).toBeNull()
+    expect(host.querySelector('[data-reset-step="subject"]').classList.contains('completed')).toBe(true)
+    expect(host.querySelector('[data-reset-step="recipient"]').classList.contains('completed')).toBe(false)
+    host.querySelector('[data-reset-copy-recipient]').click()
+    host.querySelector('[data-reset-copy]').click()
+    await settle()
+    expect(host.querySelectorAll('[data-reset-step].completed')).toHaveLength(3)
+    host.querySelector('[data-reset-back]').click()
+    await settle()
+    await open()
+    fillRequest()
+    host.querySelector('[data-reset-submit]').click()
+    await settle()
+    expect(host.querySelectorAll('[data-reset-step].completed')).toHaveLength(0)
   })
 
   it('rejects mismatched passwords without creating a request', async () => {
@@ -100,5 +115,7 @@ describe('Mail password recovery', () => {
     host.querySelector('[data-reset-copy]').click(); await settle()
     expect(host.querySelector('textarea').readOnly).toBe(true)
     expect(host.textContent).toContain(zhCN.reset.copyFailed)
+    expect(showSuccess).not.toHaveBeenCalled()
+    expect(host.querySelectorAll('[data-reset-step].completed')).toHaveLength(0)
   })
 })
