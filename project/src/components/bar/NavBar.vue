@@ -986,10 +986,27 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
   }
 
 
+  .navbar-top .logo-and-title {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .navbar-top-actions {
+    flex: 0 0 auto;
+  }
+
+  .navbar-top .title {
+    flex: 1 1 0;
+
+    img {
+      max-width: 100%;
+      object-position: left center;
+    }
+  }
+
   .title {
     img {
       height: 9dvh;
-      max-width: none;
     }
   }
 }
