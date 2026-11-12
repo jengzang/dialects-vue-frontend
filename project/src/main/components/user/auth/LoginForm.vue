@@ -3,7 +3,7 @@
     <h3 class="form-title">
       {{ $t(recoveryOpen ? 'auth.reset.title' : 'auth.login.title') }}
       <button
-        :class="[recoveryOpen ? 'action-btn' : 'glass-button', 'auth-benefit-button']"
+        class="glass-button auth-benefit-button"
         data-size="compact"
         @click="$emit('showBenefits')"
         :title="$t('auth.login.viewBenefits')"
