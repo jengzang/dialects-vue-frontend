@@ -83,7 +83,9 @@
 
     <template v-else>
       <template v-if="!recoveryRequest">
-        <p>{{ $t('auth.reset.formInstructions') }}</p>
+        <ul class="reset-instructions">
+          <li v-for="item in ['account', 'mail', 'verification']" :key="item">{{ $t(`auth.reset.formInstructions.${item}`) }}</li>
+        </ul>
         <FormInput v-model="recoveryEmail" data-reset-email type="email" :placeholder="$t('auth.login.email')" />
         <FormInput v-model="recoveryPassword" data-reset-password type="password" :placeholder="$t('auth.reset.newPassword')" :show-password-toggle="true" />
         <FormInput v-model="recoveryConfirm" data-reset-confirm type="password" :placeholder="$t('auth.register.confirmPassword')" :show-password-toggle="true" />
@@ -301,6 +303,11 @@ $error-color: red;
 
 .reset-important {
   color: var(--color-primary);
+}
+
+.reset-instructions {
+  list-style-type: '· ';
+  text-align: left;
 }
 
 .auth-navigation {
