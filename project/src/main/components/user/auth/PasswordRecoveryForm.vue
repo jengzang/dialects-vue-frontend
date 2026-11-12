@@ -48,9 +48,9 @@
         <textarea class="glass-field reset-mail-body reset-important" :value="recoveryMailBody" readonly rows="3" :aria-label="$t('auth.reset.mailBody')" @focus="$event.target.select()"></textarea>
       </div>
       <div class="form-row reset-actions">
-        <a class="glass-button" data-reset-mailto :href="recoveryMailto">{{ $t('auth.reset.openMail') }}</a>
+        <a class="glass-button" data-variant="success" data-reset-mailto :href="recoveryMailto">{{ $t('auth.reset.openMail') }}</a>
       </div>
-      <p>{{ $t('auth.reset.openMailHint') }}</p>
+      <p class="reset-mail-hint">{{ $t('auth.reset.openMailHint') }}</p>
       <p v-if="recoveryCopyKey" role="status">{{ $t(recoveryCopyKey) }}</p>
     </template>
     <p v-if="recoveryErrorKey" class="err" role="alert">{{ $t(recoveryErrorKey) }}</p>
@@ -255,5 +255,12 @@ $error-color: red;
 .reset-actions {
   flex-wrap: wrap;
   gap: 8px;
+  margin-bottom: 4px;
+}
+
+.reset-mail-hint {
+  margin-top: 0;
+  color: var(--text-tertiary);
+  font-size: var(--font-size-14);
 }
 </style>
