@@ -183,7 +183,7 @@ function normalizeRequestBody(body, headers) {
   return body;
 }
 
-async function performFetch(path, { method, headers, body, signal }) {
+async function performFetch(path, { method, headers, body, signal, keepalive = false }) {
   if (signal.aborted) throw signal.reason;
   try {
     const response = await fetch(WEB_BASE + path, {
@@ -191,6 +191,7 @@ async function performFetch(path, { method, headers, body, signal }) {
       headers,
       body,
       signal,
+      keepalive,
     });
     return response;
   } catch (error) {
@@ -292,12 +293,14 @@ async function executeApi(path, options = {}) {
     showError = true,
     responseType = 'auto',
     loginPromptEligible = false,
+    keepalive = false,
   } = options;
 
   const requestHeaders = { ...headers };
   let token = getToken();
 
-  if (token && needsProactiveRefresh(getTokenExpiresAt())) {
+  // Page-hide requests must reach fetch before the WebView is suspended.
+  if (!keepalive && token && needsProactiveRefresh(getTokenExpiresAt())) {
     const refreshResult = await refreshAccessToken();
     if (refreshResult.ok) {
       token = refreshResult.accessToken;
@@ -328,6 +331,7 @@ async function executeApi(path, options = {}) {
       headers: requestHeaders,
       body: requestBody,
       signal,
+      keepalive,
     });
 
     if (signal.aborted) throw signal.reason;
@@ -346,6 +350,7 @@ async function executeApi(path, options = {}) {
           headers: requestHeaders,
           body: requestBody,
           signal,
+          keepalive,
         });
       } else if (refreshResult.reason === 'missing_refresh_token') {
         clearSession();

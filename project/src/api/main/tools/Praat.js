@@ -1,6 +1,5 @@
 // composables/Praat.js - 完整的 Praat 声学分析 API
 import { api } from '../../auth/httpClient.js'
-import { WEB_BASE } from '../../../env-config.js'
 
 /**
  * Praat 声学分析 API
@@ -116,17 +115,10 @@ export function praat() {
    */
   const downloadNormalizedAudio = async (taskId) => {
     try {
-      const response = await
-          fetch(`${WEB_BASE}/api/tools/praat/uploads/progress/${taskId}/audio`, {
-            method: 'GET',
-            credentials: 'include' // 如果需要认证
-          })
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-
-      return await response.blob()
+      return await api(`/api/tools/praat/uploads/progress/${taskId}/audio`, {
+        method: 'GET',
+        responseType: 'blob',
+      })
     } catch (error) {
       console.error('Download audio error:', error)
       throw new Error(error.message || '下載音頻失敗')
