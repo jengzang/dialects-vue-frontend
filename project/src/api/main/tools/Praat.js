@@ -1,5 +1,6 @@
 // composables/Praat.js - 完整的 Praat 声学分析 API
 import { api } from '../../auth/httpClient.js'
+import { WEB_BASE } from '../../../env-config.js'
 
 /**
  * Praat 声学分析 API
@@ -116,7 +117,7 @@ export function praat() {
   const downloadNormalizedAudio = async (taskId) => {
     try {
       const response = await
-          fetch(`/api/tools/praat/uploads/progress/${taskId}/audio`, {
+          fetch(`${WEB_BASE}/api/tools/praat/uploads/progress/${taskId}/audio`, {
             method: 'GET',
             credentials: 'include' // 如果需要认证
           })
