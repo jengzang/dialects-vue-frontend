@@ -47,6 +47,7 @@ export {
   navigatePlatformLink,
   resolveInternalNavigationTarget,
 } from './navigation.js'
+export { initializeNativeBackButton } from './nativeNavigation.js'
 export {
   initializePlatformServices,
   resetPlatformServicesForTests,
