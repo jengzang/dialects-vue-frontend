@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-    android:src="@drawable/ic_launcher_foreground_image"
-    android:gravity="fill" />
+<!-- Keep the complete square artwork inside the adaptive icon safe circle. -->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:insetLeft="30%"
+    android:insetTop="30%"
+    android:insetRight="30%"
+    android:insetBottom="30%">
+    <bitmap
+        android:src="@drawable/ic_launcher_foreground_image"
+        android:gravity="fill" />
+</inset>
