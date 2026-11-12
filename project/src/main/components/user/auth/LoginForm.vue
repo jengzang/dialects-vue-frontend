@@ -72,10 +72,14 @@
 
     <!-- Switch to Register -->
     <p>
-      <a href="#" @click.prevent="$emit('switchToRegister')">{{ $t('auth.login.noAccount') }}</a>
+      <button type="button" class="pill-btn" @click="$emit('switchToRegister')">{{ $t('auth.login.noAccount') }}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg>
+      </button>
     </p>
     <p>
-      <a href="#" data-forgot-password @click.prevent="openRecovery">{{ $t('auth.reset.entry') }}</a>
+      <button type="button" class="pill-btn" data-forgot-password @click="openRecovery">{{ $t('auth.reset.entry') }}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg>
+      </button>
     </p>
     </template>
 
@@ -271,6 +275,7 @@ $error-color: red;
 
 .login-form {
   padding: 12px;
+  min-width: 300px;
   text-align: center;
 }
 
