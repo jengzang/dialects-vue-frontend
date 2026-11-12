@@ -24,7 +24,9 @@
       </div>
     </template>
     <template v-else>
-      <p>{{ $t('auth.reset.instructions', { minutes: Math.floor(recoveryRequest.expires_in / 60) }) }}</p>
+      <ul class="reset-instructions">
+        <li v-for="item in ['send', 'verification', 'login']" :key="item">{{ $t(`auth.reset.instructions.${item}`, { minutes: Math.floor(recoveryRequest.expires_in / 60) }) }}</li>
+      </ul>
       <div class="reset-step" data-reset-step="recipient" :class="{ completed: recoveryCopied.recipient }">
         <div class="reset-step-row">
           <p><span class="reset-step-number">①</span> {{ $t('auth.reset.recipient') }} <span class="reset-important">{{ recoveryRequest.recipient }}</span></p>
