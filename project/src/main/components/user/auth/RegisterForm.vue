@@ -112,6 +112,7 @@ $error-color: red;
 $mobile-aspect-ratio: 1;
 .register-form {
   padding: 12px;
+  min-width: 300px;
   text-align: center;
 }
 

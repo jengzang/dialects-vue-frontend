@@ -121,7 +121,11 @@
       </template>
       <p v-if="recoveryErrorKey" class="err" role="alert">{{ $t(recoveryErrorKey) }}</p>
       <p>{{ $t('auth.reset.appeal') }} <span class="reset-important">2639548777</span></p>
-      <button type="button" class="pill-btn pill-btn--history pill-btn--blur reset-back-button" data-reset-back :disabled="recoveryLoading" @click="closeRecovery">{{ $t('auth.reset.back') }}</button>
+      <p class="form-row">
+        <button type="button" class="pill-btn pill-btn--blur" data-reset-back :disabled="recoveryLoading" @click="closeRecovery">{{ $t('auth.reset.back') }}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10" /></svg>
+        </button>
+      </p>
     </template>
   </div>
 </template>
@@ -307,11 +311,6 @@ $error-color: red;
   .pill-btn {
     flex-shrink: 0;
   }
-}
-
-.reset-back-button {
-  width: fit-content;
-  margin-inline: auto;
 }
 
 .reset-step {
