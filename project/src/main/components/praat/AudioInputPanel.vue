@@ -60,7 +60,8 @@
 
 <script setup>
 import InlineIcon from '@/components/common/InlineIcon.vue'
-import { ref, computed, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { takeSharedAudio, onSharedAudio } from '@/platform/audioIntake.js'
 import { useI18n } from 'vue-i18n'
 import { PRAAT_AUDIO_LIMITS } from '@/main/config/constants.js'
 import {
@@ -512,7 +513,18 @@ const formatFileSize = (bytes) => {
   return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
 }
 
+let removeSharedAudioListener = () => {}
+const receiveSharedAudio = () => {
+  const file = takeSharedAudio()
+  if (file && validateFile(file)) processFile(file)
+}
+onMounted(() => {
+  removeSharedAudioListener = onSharedAudio(receiveSharedAudio)
+  receiveSharedAudio()
+})
+
 onBeforeUnmount(() => {
+  removeSharedAudioListener()
   if (isRecording.value) {
     stopRecording()
   }

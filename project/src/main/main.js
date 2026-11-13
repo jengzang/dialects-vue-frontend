@@ -3,6 +3,8 @@
 import '../env-config.js'
 
 import { createApp } from 'vue'
+import { initializeNativeAudioIntake } from '../platform/audioIntake.js'
+import { buildLocalePath } from '../i18n/localeRouting.js'
 import App from './App.vue'
 import router from './router'
 import '../styles/main-entry.scss'
@@ -45,3 +47,8 @@ app.component('PanelManager', PanelManager)
 
 // 5. 掛載
 app.mount('#app')
+
+initializeNativeAudioIntake(
+  router,
+  () => buildLocalePath(i18n.global.locale.value, '/explore/tools/praat'),
+).catch(console.error)

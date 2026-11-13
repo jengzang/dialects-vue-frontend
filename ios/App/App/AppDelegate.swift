@@ -36,6 +36,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
         // Called when the app was launched with a url. Feel free to add additional processing here,
         // but if you want the App API to support tracking app url opens, make sure to keep this call
+        if url.isFileURL {
+            do {
+                try SharedAudioInbox.save(url)
+                NotificationCenter.default.post(name: Notification.Name("DialectsAudioReceived"), object: nil)
+                return true
+            } catch {
+                let alert = UIAlertController(title: "Audio import", message: error.localizedDescription, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default))
+                window?.rootViewController?.present(alert, animated: true)
+                return false
+            }
+        }
         return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
     }
 
@@ -51,6 +63,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 // Enable WebKit history gestures, including Vue Router pushState entries.
 class DialectsBridgeViewController: CAPBridgeViewController {
     override func capacitorDidLoad() {
+        bridge?.registerPluginInstance(DialectsNativePlugin())
         webView?.allowsBackForwardNavigationGestures = true
     }
 }
