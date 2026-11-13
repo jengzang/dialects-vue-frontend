@@ -582,7 +582,7 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-left: 5px;
+  margin-left: 2px;
   cursor: pointer;
 }
 

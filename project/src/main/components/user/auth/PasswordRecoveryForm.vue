@@ -214,7 +214,8 @@ $error-color: red;
 .reset-instructions {
   list-style-type: '· ';
   text-align: left;
-  color: var(--text-deep);
+  color: var(--text-tertiary);
+  font-size: var(--font-size-14);
 }
 
 .reset-step {
