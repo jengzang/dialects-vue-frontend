@@ -346,6 +346,15 @@
       "searchPlaceholder": "Search locations or regions"
     }
   },
+  "partitionColors": {
+    "title": "Partition colors",
+    "search": "Search partitions",
+    "sessionHint": "Changes are saved automatically for this tab session.",
+    "retry": "Retry",
+    "empty": "No matching partitions",
+    "reset": "Restore default colors for this partition source",
+    "loadFailed": "Failed to load partition colors. Please retry."
+  },
   "mapLibre": {
     "common": {
       "none": "None"

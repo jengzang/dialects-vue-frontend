@@ -346,6 +346,15 @@
       "searchPlaceholder": "搜索地点或分区"
     }
   },
+  "partitionColors": {
+    "title": "分区颜色",
+    "search": "搜索分区",
+    "sessionHint": "修改后自动保存，仅在当前标签页会话中生效。",
+    "retry": "重试",
+    "empty": "没有匹配的分区",
+    "reset": "恢复当前分区来源的默认颜色",
+    "loadFailed": "分区颜色加载失败，请重试。"
+  },
   "mapLibre": {
     "common": {
       "none": "无"

@@ -224,18 +224,17 @@ let mapRenderFrame = null;
 let clearMapRenderWait = () => {};
 const isFullScreen = ref(false);
 const { t } = useI18n();
-const { loadPartitionColors, getContrastTextColor } = usePartitionColors()
+const { loadPartitionColors, getPartitionColor, getContrastTextColor, colorVersion } = usePartitionColors()
 const useCustomPartitionColors = ref(true)
-const partitionColors = ref(new Map())
+const partitionColorMode = computed(() => mapStore.mapData?.region_mode || 'map')
 
 const partitionIdentity = computed(() => JSON.stringify([userStore.role, userStore.id]))
 
 const ensurePartitionColors = async () => {
-  if (!useCustomPartitionColors.value || !['base', 'feature'].includes(mapStore.mode)) return
+  if (mapStore.mode !== 'dot' && (!useCustomPartitionColors.value || !['base', 'feature'].includes(mapStore.mode))) return
   try {
-    partitionColors.value = await loadPartitionColors('map', partitionIdentity.value)
+    await loadPartitionColors(partitionColorMode.value, partitionIdentity.value)
   } catch (error) {
-    partitionColors.value = new Map()
     console.warn('Failed to load partition colors:', error)
   }
 }
@@ -249,7 +248,7 @@ const toggleCustomPartitionColors = async (enabled) => {
 const getLocationPartitionPath = (location) => mapStore.mapData?.region_mappings?.[location] || ''
 const getCustomPartitionStyle = (path, fallbackBackground, fallbackText) => {
   if (!useCustomPartitionColors.value || !path) return { background: fallbackBackground, color: fallbackText }
-  const background = partitionColors.value.get(path)
+  const background = getPartitionColor(partitionColorMode.value, partitionIdentity.value, path)
   return background ? { background, color: getContrastTextColor(background) } : { background: fallbackBackground, color: fallbackText }
 }
 
@@ -514,9 +513,8 @@ watch(
 // 2. 監聽 store 的模式變化，自動記錄歷史
 watch(
     () => mapStore.mode,
-    async (newMode) => {
+    (newMode) => {
       useCustomPartitionColors.value = newMode === 'base'
-      if (useCustomPartitionColors.value) await ensurePartitionColors()
       if (newMode === 'feature' || newMode === 'compare') {
         mapStore.divideMapView = false;
       }
@@ -528,6 +526,16 @@ watch(
     },
     { immediate: true }
 );
+
+watch(
+  [() => mapStore.mode, useCustomPartitionColors, partitionIdentity, partitionColorMode, colorVersion],
+  async () => {
+    await ensurePartitionColors()
+    await nextTick()
+    requestMapContentRender()
+  },
+  { immediate: true }
+)
 
 // --- 初始化地圖 ---
 const initMap = () => {
@@ -965,6 +973,7 @@ const drawPointLayer = (entries, mode) => {
     geometry: { type: 'Point', coordinates: entry.coordinate.slice(0, 2) },
     properties: {
       index: entry.index,
+      textColor: entry.textColor || labelStyle?.color,
       image: labelStyle && useRasterText(entry.label)
         ? getTextImage(entry.label, mode === 'base' ? (entry.backgroundColor || labelStyle.background) : (entry.backgroundColor || entry.color), { ...labelStyle, color: entry.textColor || labelStyle.color, fontSize: entry.fontSize || labelStyle.fontSize })
         : getPointImage(labelStyle && mode === 'base' ? (entry.backgroundColor || labelStyle.background) : (entry.backgroundColor || entry.color), mode, false, labelStyle),
@@ -1204,7 +1213,7 @@ const drawDotMap = () => {
   });
 
   drawPointLayer(pointsToDraw.map(point => ({
-    ...point, coordinate: point.coords, color: levelColorMap[point.targetRegion],
+    ...point, coordinate: point.coords, color: getPartitionColor(partitionColorMode.value, partitionIdentity.value, point.fullRegion) || levelColorMap[point.targetRegion],
   })), 'dot');
 };
 

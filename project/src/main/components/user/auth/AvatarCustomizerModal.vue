@@ -110,10 +110,10 @@
           </div>
           <div class="custom-color-picker">
             <span>{{ $t('auth.profile.avatar.textColorCustom') }}</span>
-            <input
-              :value="resolveColorToHex(avatarConfig.bgColor)"
-              type="color"
-              @input="avatarConfig.bgColor = $event.target.value"
+            <ColorPicker
+              :model-value="resolveColorToHex(avatarConfig.bgColor)"
+              :label="$t('auth.profile.avatar.textColorCustom')"
+              @update:model-value="avatarConfig.bgColor = $event"
             />
           </div>
         </div>
@@ -146,18 +146,18 @@
           <div class="custom-gradient-pickers">
             <div class="picker-item">
               <span>{{ $t('auth.profile.avatar.gradientStartColor') }}</span>
-              <input
-                :value="resolveColorToHex(avatarConfig.gradientFrom)"
-                type="color"
-                @input="avatarConfig.gradientFrom = $event.target.value"
+              <ColorPicker
+                :model-value="resolveColorToHex(avatarConfig.gradientFrom)"
+                :label="$t('auth.profile.avatar.gradientStartColor')"
+                @update:model-value="avatarConfig.gradientFrom = $event"
               />
             </div>
             <div class="picker-item">
               <span>{{ $t('auth.profile.avatar.gradientEndColor') }}</span>
-              <input
-                :value="resolveColorToHex(avatarConfig.gradientTo)"
-                type="color"
-                @input="avatarConfig.gradientTo = $event.target.value"
+              <ColorPicker
+                :model-value="resolveColorToHex(avatarConfig.gradientTo)"
+                :label="$t('auth.profile.avatar.gradientEndColor')"
+                @update:model-value="avatarConfig.gradientTo = $event"
               />
             </div>
           </div>
@@ -196,10 +196,10 @@
 
             <div class="custom-text-color">
               <span>{{ $t('auth.profile.avatar.textColorCustom') }}</span>
-              <input
-                :value="resolveColorToHex(avatarConfig.textColor)"
-                type="color"
-                @input="avatarConfig.textColor = $event.target.value"
+              <ColorPicker
+                :model-value="resolveColorToHex(avatarConfig.textColor)"
+                :label="$t('auth.profile.avatar.textColorCustom')"
+                @update:model-value="avatarConfig.textColor = $event"
               />
             </div>
           </div>
@@ -234,6 +234,7 @@
 import { ref, computed, watch } from 'vue';
 import AppModal from '@/components/common/AppModal.vue';
 import CheckBox from '@/components/selector/CheckBox.vue'
+import ColorPicker from '@/components/selector/ColorPicker.vue'
 
 const props = defineProps({
   modelValue: {
@@ -531,33 +532,6 @@ $transition-fast: 0.2s;
 $transition-medium: 0.25s;
 $transition-slow: 0.3s;
 $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
-@mixin color-picker-input {
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  cursor: pointer;
-  background: none;
-  border: none;
-  border-radius: var(--radius-full);
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.1),
-    0 2px 6px rgba(0, 0, 0, 0.08);
-  transition: transform $transition-fast ease;
-  -webkit-appearance: none;
-
-  &::-webkit-color-swatch-wrapper {
-    padding: 0;
-  }
-
-  &::-webkit-color-swatch {
-    border: 2px solid $white;
-    border-radius: var(--radius-full);
-  }
-
-  &:hover {
-    transform: scale(1.1);
-  }
-}
 
 .avatar-config-modal {
   @include flex-col;
@@ -749,10 +723,6 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   color: $text-secondary;
   font-size: var(--font-size-13);
   font-weight: 550;
-
-  input[type="color"] {
-    @include color-picker-input;
-  }
 }
 
 .gradient-preset-grid {
@@ -804,10 +774,6 @@ $smooth-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   color: $text-secondary;
   font-size: var(--font-size-13);
   font-weight: 550;
-
-  input[type="color"] {
-    @include color-picker-input;
-  }
 }
 
 .angle-slider {
