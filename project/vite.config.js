@@ -137,6 +137,12 @@ export default defineConfig(async ({ mode }) => {
     plugins: [
       vue(),
       devMpaRewritePlugin(),
+      ...(buildTarget.isNative ? [{
+        name: 'native-launch-config',
+        generateBundle() {
+          this.emitFile({ type: 'asset', fileName: 'native-launch-config.json', source: JSON.stringify({ webBase }) })
+        },
+      }] : []),
 
       visualizer({
         filename: 'dist/bundle-network.html',
