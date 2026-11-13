@@ -3,6 +3,8 @@
 import '../env-config.js'
 
 import { createApp } from 'vue'
+import { initializeNativeDownloadLinks } from '../platform/fileExport.js'
+import { getCurrentRuntimePlatform } from '../platform/runtime.js'
 import { initializeNativeAudioIntake } from '../platform/audioIntake.js'
 import { buildLocalePath } from '../i18n/localeRouting.js'
 import App from './App.vue'
@@ -10,7 +12,7 @@ import router from './router'
 import '../styles/main-entry.scss'
 
 // 🍎 导入全局消息系统（会自动挂载到 window）
-import '../utils/ui/message.js'
+import { showError } from '../utils/ui/message.js'
 
 // 🌐 导入 i18n 国际化
 import i18n, { loadLocaleMessages } from '../i18n'
@@ -46,6 +48,10 @@ initSeo({ router, i18n })
 app.component('PanelManager', PanelManager)
 
 // 5. 掛載
+const disposeNativeDownloads = getCurrentRuntimePlatform().container === 'native-webview'
+  ? initializeNativeDownloadLinks({ onError: error => showError(error.message) })
+  : () => {}
+if (import.meta.hot) import.meta.hot.dispose(disposeNativeDownloads)
 app.mount('#app')
 
 initializeNativeAudioIntake(
