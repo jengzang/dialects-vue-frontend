@@ -1,0 +1,74 @@
+# Clickable external link inventory
+
+Scope: static hrefs, window.open calls, project link data, rich-text external tokens and tutorial Markdown links under project/src. Image/font/tile/API URLs are excluded. Same-domain legacy pages are included because they leave the SPA. Dynamic user-supplied links cannot be enumerated as fixed URLs. No navigation behavior was changed.
+
+- http://1.14.238.88:8099/dialect/main/about.html
+  - project/src/main/views/menu/support/about/AboutIntro.vue
+- https://dialects.yzup.top
+  - project/src/main/views/menu/support/PrivacyPage.vue
+- https://dialects.yzup.top/detail/
+  - project/src/i18n/locales/en/about.json, project/src/i18n/locales/zh-CN/about.json, project/src/i18n/locales/zh-Hant/about.json, project/src/main/views/HomePage.vue
+- https://dmfw.mca.gov.cn/
+  - project/src/main/views/menu/support/about/AboutIntro.vue
+- https://github.com/jengzang
+  - project/src/main/views/menu/support/PrivacyPage.vue, project/src/main/views/menu/support/about/AboutSupport.vue
+- https://github.com/jengzang/dialects-backend
+  - project/src/main/views/HomePage.vue, project/src/main/views/menu/support/about/AboutSupport.vue
+- https://github.com/jengzang/dialects-build
+  - project/src/main/views/HomePage.vue, project/src/main/views/menu/support/about/AboutSupport.vue
+- https://github.com/jengzang/dialects-build/issues
+  - project/src/main/views/menu/support/about/AboutSuggestion.vue
+- https://github.com/jengzang/dialects-js-frontend/issues
+  - project/src/main/views/menu/support/about/AboutSuggestion.vue
+- https://github.com/jengzang/dialects-vue-frontend
+  - project/src/main/views/HomePage.vue, project/src/main/views/menu/support/about/AboutSupport.vue
+- https://github.com/jengzang/villages-ML
+  - project/src/VillagesML/dashboard/Dashboard.vue, project/src/main/views/HomePage.vue
+- https://github.com/osfans/MCPDict/tree/master/tools/tables/output
+  - project/src/main/views/menu/support/about/AboutIntro.vue
+- https://jyutdict.org/
+  - project/src/main/views/menu/support/about/AboutIntro.vue
+- https://jyutjam.org/
+  - project/src/main/views/menu/support/about/AboutIntro.vue
+- https://mcpdict.vear.vip/
+  - project/src/main/views/menu/support/about/AboutIntro.vue
+- https://www.zhihu.com/column/c_1899090664681080236
+  - project/src/main/views/menu/support/about/AboutSupport.vue
+- https://www.zhihu.com/people/da-shu-18-11
+  - project/src/main/views/HomePage.vue, project/src/main/views/menu/support/PrivacyPage.vue, project/src/main/views/menu/support/about/AboutSupport.vue
+- https://www.zhihu.com/project/detail/60225
+  - project/src/main/views/menu/support/about/AboutSuggestion.vue, project/src/main/views/menu/support/about/AboutSupport.vue
+- https://www.zhihu.com/question/52496605/answer/2073538906222601431
+  - project/src/i18n/locales/en/about.json, project/src/i18n/locales/zh-CN/about.json, project/src/i18n/locales/zh-Hant/about.json
+- https://xiaoxue.iis.sinica.edu.tw/ccrdata/
+  - project/src/main/views/menu/support/about/AboutIntro.vue
+- https://zhongguoyuyan.cn/
+  - project/src/main/views/menu/support/about/AboutIntro.vue
+- https://zhuanlan.zhihu.com/p/1890022649830290824
+  - project/src/main/views/menu/support/about/AboutIntro.vue
+- https://zhuanlan.zhihu.com/p/1906824130126414290
+  - project/src/i18n/locales/en/about.json, project/src/i18n/locales/zh-CN/about.json, project/src/i18n/locales/zh-Hant/about.json
+- https://zhuanlan.zhihu.com/p/1934345780199682731
+  - project/src/i18n/locales/en/about.json, project/src/i18n/locales/zh-CN/about.json, project/src/i18n/locales/zh-Hant/about.json, project/src/main/views/menu/support/about/AboutIntro.vue
+- https://zhuanlan.zhihu.com/p/2001363637311381604
+  - project/src/i18n/locales/en/about.json, project/src/i18n/locales/zh-CN/about.json, project/src/i18n/locales/zh-Hant/about.json
+- https://zhuanlan.zhihu.com/p/2002848348378521848
+  - project/src/i18n/locales/en/about.json, project/src/i18n/locales/zh-CN/about.json, project/src/i18n/locales/zh-Hant/about.json
+- https://zhuanlan.zhihu.com/p/2003637219919946701
+  - project/src/i18n/locales/en/about.json, project/src/i18n/locales/zh-CN/about.json, project/src/i18n/locales/zh-Hant/about.json
+- https://zhuanlan.zhihu.com/p/2005418333642707057
+  - project/src/i18n/locales/en/about.json, project/src/i18n/locales/zh-CN/about.json, project/src/i18n/locales/zh-Hant/about.json
+- https://zhuanlan.zhihu.com/p/2007951324780713596
+  - project/src/i18n/locales/en/about.json, project/src/i18n/locales/zh-CN/about.json, project/src/i18n/locales/zh-Hant/about.json
+- https://zhuanlan.zhihu.com/p/2023530288848930082
+  - project/src/i18n/locales/en/about.json, project/src/i18n/locales/zh-CN/about.json, project/src/i18n/locales/zh-Hant/about.json
+- https://zhuanlan.zhihu.com/p/2047826401479364959
+  - project/src/i18n/locales/en/about.json, project/src/i18n/locales/zh-CN/about.json, project/src/i18n/locales/zh-Hant/about.json
+- https://zhuanlan.zhihu.com/p/2068861503634200119
+  - project/src/i18n/locales/en/about.json, project/src/i18n/locales/zh-CN/about.json, project/src/i18n/locales/zh-Hant/about.json
+- https://zhuanlan.zhihu.com/p/2074128724597929735
+  - project/src/i18n/locales/en/about.json, project/src/i18n/locales/zh-CN/about.json, project/src/i18n/locales/zh-Hant/about.json
+- https://zhuanlan.zhihu.com/p/717458312
+  - project/src/i18n/locales/en/about.json, project/src/i18n/locales/zh-CN/about.json, project/src/i18n/locales/zh-Hant/about.json
+- https://zhuanlan.zhihu.com/p/985825588
+  - project/src/main/components/map/Draw/panels/MapDrawVoronoiPanel.vue
