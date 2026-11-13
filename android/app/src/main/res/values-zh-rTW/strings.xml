@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">方音圖鑑</string>
     <string name="title_activity_main">方音圖鑑</string>
+    <string name="press_back_again_to_exit">再按一次返回鍵退出應用</string>
 </resources>

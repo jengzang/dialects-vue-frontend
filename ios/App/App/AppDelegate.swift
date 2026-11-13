@@ -47,3 +47,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
 }
+
+// Enable WebKit history gestures, including Vue Router pushState entries.
+class DialectsBridgeViewController: CAPBridgeViewController {
+    override func capacitorDidLoad() {
+        webView?.allowsBackForwardNavigationGestures = true
+    }
+}
