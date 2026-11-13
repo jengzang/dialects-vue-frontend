@@ -7,7 +7,8 @@ public class DialectsNativePlugin: CAPPlugin, CAPBridgedPlugin {
     public let jsName = "DialectsNative"
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "getPendingAudio", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "consumeAudio", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "consumeAudio", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "setBackBlocked", returnType: CAPPluginReturnPromise)
     ]
 
     public override func load() {
@@ -25,6 +26,13 @@ public class DialectsNativePlugin: CAPPlugin, CAPBridgedPlugin {
         DispatchQueue.global(qos: .userInitiated).async {
             do { call.resolve(try SharedAudioInbox.pending()) }
             catch { call.reject(error.localizedDescription) }
+        }
+    }
+
+    @objc func setBackBlocked(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            (self.bridge?.viewController as? DialectsBridgeViewController)?.setOverlayBlocked(call.getBool("blocked") ?? false)
+            call.resolve()
         }
     }
 

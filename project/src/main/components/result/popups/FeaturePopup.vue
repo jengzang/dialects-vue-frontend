@@ -2,6 +2,7 @@
   <Teleport to="body">
     <div
       v-if="visible"
+      v-native-back="() => emit('close')"
       class="popup-vue popup-animated"
       :style="{ position: 'fixed', top: `${position.top}px`, left: `${position.left}px`, zIndex: 999999 }"
       @click.stop
@@ -26,6 +27,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';

@@ -128,6 +128,7 @@
 </template>
 
 <script setup>
+import { trackNativeMapPopup } from '@/platform/backRegistry.js'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
 import { ref, onMounted, onActivated, onBeforeUnmount, shallowRef, nextTick, watch, computed, h, render, markRaw } from 'vue';
@@ -723,7 +724,7 @@ const drawDotMap = () => {
         .setLngLat(p.coords)
         .addTo(map.value);
 
-    const popup = new maplibregl.Popup({ offset: 10, closeButton: false })
+    const popup = trackNativeMapPopup(new maplibregl.Popup({ offset: 10, closeButton: false }))
         .setHTML(`<b>${p.locName}</b><br>${p.fullRegion}`);
 
     el.addEventListener('mouseenter', () => marker.setPopup(popup).togglePopup());
@@ -777,12 +778,12 @@ const drawFeatureMap = () => {
     const popupNode = createPopupDOM(item);
 
     // 3. 使用 setDOMContent
-    const popup = new maplibregl.Popup({
+    const popup = trackNativeMapPopup(new maplibregl.Popup({
       offset: 80,
       maxWidth: '300px',
       closeButton: false, // 建議隱藏默認關閉按鈕，用點擊地圖關閉，或者自己加
       className: 'map-popup-wrapper'
-    }).setDOMContent(popupNode);
+    })).setDOMContent(popupNode);
 
     marker.setPopup(popup);
     currentMarkers.push(marker);
@@ -904,11 +905,11 @@ const drawCompareMap = () => {
     const popupContent = createComparePopupNode(item);
 
     // 創建彈窗
-    const popup = new maplibregl.Popup({
+    const popup = trackNativeMapPopup(new maplibregl.Popup({
       offset: 15,
       maxWidth: '350px',
       className: 'map-popup-wrapper'
-    }).setDOMContent(popupContent);
+    })).setDOMContent(popupContent);
 
     const marker = new maplibregl.Marker({ element: el })
       .setLngLat(item.coordinate)
@@ -1315,7 +1316,7 @@ const drawIsopleth = () => {
     const feature = event.features?.[0];
     if (!feature) return;
 
-    new maplibregl.Popup({ offset: 12 })
+    trackNativeMapPopup(new maplibregl.Popup({ offset: 12 }))
       .setLngLat(feature.geometry.coordinates)
       .setDOMContent(createIsoplethPopupNode(feature.properties || {}))
       .addTo(map.value);

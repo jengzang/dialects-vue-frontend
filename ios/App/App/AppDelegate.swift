@@ -62,8 +62,44 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 // Enable WebKit history gestures, including Vue Router pushState entries.
 class DialectsBridgeViewController: CAPBridgeViewController {
+    private var overlayBlocked = false
+    private var keyboardVisible = false
+    private var overlayBackGesture: UIScreenEdgePanGestureRecognizer?
+
     override func capacitorDidLoad() {
         bridge?.registerPluginInstance(DialectsNativePlugin())
         webView?.allowsBackForwardNavigationGestures = true
+        let gesture = UIScreenEdgePanGestureRecognizer(target: self, action: #selector(handleOverlayBack(_:)))
+        gesture.edges = .left
+        gesture.isEnabled = false
+        webView?.addGestureRecognizer(gesture)
+        overlayBackGesture = gesture
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardShown),
+            name: UIResponder.keyboardDidShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardHidden),
+            name: UIResponder.keyboardDidHideNotification, object: nil)
     }
+
+    func setOverlayBlocked(_ blocked: Bool) {
+        overlayBlocked = blocked
+        updateBackGestures()
+    }
+
+    @objc private func keyboardShown() { keyboardVisible = true; updateBackGestures() }
+    @objc private func keyboardHidden() { keyboardVisible = false; updateBackGestures() }
+
+    private func updateBackGestures() {
+        let blocked = overlayBlocked || keyboardVisible
+        webView?.allowsBackForwardNavigationGestures = !blocked
+        overlayBackGesture?.isEnabled = blocked
+    }
+
+    @objc private func handleOverlayBack(_ gesture: UIScreenEdgePanGestureRecognizer) {
+        guard gesture.state == .ended, gesture.translation(in: webView).x > 40 else { return }
+        webView?.evaluateJavaScript("Boolean(window.__dialectsHandleBack && window.__dialectsHandleBack())") { [weak self] handled, _ in
+            if (handled as? Bool) != true { self?.view.endEditing(true) }
+        }
+    }
+
+    deinit { NotificationCenter.default.removeObserver(self) }
 }

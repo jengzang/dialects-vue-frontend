@@ -2,6 +2,7 @@
   <Teleport to="body">
     <div
       v-if="src"
+      v-native-back="close"
       class="image-preview-overlay"
       @click="close"
     >
@@ -75,6 +76,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import { computed, ref, onBeforeUnmount, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 

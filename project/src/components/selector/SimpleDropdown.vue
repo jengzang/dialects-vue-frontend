@@ -2,6 +2,7 @@
   <Teleport to="body">
     <div
       v-if="isOpen"
+      v-native-back="handleClose"
       class="dropdown-overlay"
       @click="handleClose"
     >
@@ -52,6 +53,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 

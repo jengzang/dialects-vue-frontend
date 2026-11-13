@@ -42,7 +42,8 @@
 
     <!-- ✅ 彈出分區樹（全局玻璃） -->
     <Teleport to="body">
-      <div v-if="popupOpen" class="partition-overlay">
+      <div v-if="popupOpen" v-native-back="closePopup"
+        class="partition-overlay">
         <!-- ✅ 頂部確認欄：顯示已選 + 可刪除 + 確認 -->
         <div ref="topbarEl" class="partition-topbar" @mousedown.stop>
           <!-- 第一行：标题 + 按钮 -->
@@ -221,6 +222,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

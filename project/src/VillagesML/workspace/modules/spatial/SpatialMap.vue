@@ -33,6 +33,7 @@
 </template>
 
 <script setup>
+import { trackNativeMapPopup } from '@/platform/backRegistry.js'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, onMounted, onBeforeUnmount, shallowRef, nextTick, watch, computed } from 'vue'
 import maplibregl from 'maplibre-gl'
@@ -331,7 +332,7 @@ const showPopup = (feature, lngLat) => {
 
   html += '</div>'
 
-  new maplibregl.Popup()
+  trackNativeMapPopup(new maplibregl.Popup())
     .setLngLat(lngLat)
     .setHTML(html)
     .addTo(map.value)
@@ -471,7 +472,7 @@ const renderHotspot = () => {
       click: (e) => {
         if (e.features && e.features.length > 0) {
           const props = e.features[0].properties
-          new maplibregl.Popup()
+          trackNativeMapPopup(new maplibregl.Popup())
             .setLngLat(e.features[0].geometry.coordinates)
             .setHTML(`
               <div style="padding: 8px;">
@@ -575,7 +576,7 @@ const renderClusters = () => {
     click: (e) => {
       if (e.features && e.features.length > 0) {
         const props = e.features[0].properties
-        new maplibregl.Popup()
+        trackNativeMapPopup(new maplibregl.Popup())
           .setLngLat(e.features[0].geometry.coordinates)
           .setHTML(`
             <div style="padding: 8px;">

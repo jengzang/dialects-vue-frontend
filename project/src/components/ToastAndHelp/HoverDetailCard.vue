@@ -2,6 +2,7 @@
   <Transition name="hover-detail-card-fade">
     <div
       v-if="visible"
+      v-native-back="() => $emit('close')"
       class="hover-detail-card"
       :class="[
         rootClass,
@@ -33,6 +34,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 defineOptions({
   name: 'HoverDetailCard',
 })

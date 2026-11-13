@@ -111,7 +111,8 @@
 
     <!-- Settings Sidebar -->
     <Transition name="overlay">
-      <div v-if="showSettings" class="sidebar-overlay" @click="showSettings = false"></div>
+      <div v-if="showSettings" v-native-back="() => showSettings = false"
+        class="sidebar-overlay" @click="showSettings = false"></div>
     </Transition>
 
     <Transition name="sidebar">
@@ -145,6 +146,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import TabSwitcher from '@/components/common/TabSwitcher.vue'

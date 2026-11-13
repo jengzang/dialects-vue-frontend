@@ -67,6 +67,7 @@
 </template>
 
 <script setup>
+import { trackNativeMapPopup } from '@/platform/backRegistry.js'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch, shallowRef, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -200,11 +201,11 @@ const bindClusteredInteractions = () => {
 
   unbindClusteredInteractions()
 
-  clusteredPopup = new maplibregl.Popup({
+  clusteredPopup = trackNativeMapPopup(new maplibregl.Popup({
     closeButton: false,
     closeOnClick: false,
     offset: 10
-  })
+  }))
 
   clusteredInteractionHandlers = {
     clickClusters: (e) => {
@@ -459,11 +460,11 @@ const renderWithoutClustering = (geojsonData) => {
     }
   })
 
-  const dialectPopup = new maplibregl.Popup({
+  const dialectPopup = trackNativeMapPopup(new maplibregl.Popup({
     closeButton: false,
     closeOnClick: false,
     offset: 10
-  })
+  }))
 
   map.value.on('mouseenter', 'unclustered-point-bg', (e) => {
     map.value.getCanvas().style.cursor = 'pointer'

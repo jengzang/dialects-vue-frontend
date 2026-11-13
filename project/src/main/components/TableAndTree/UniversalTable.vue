@@ -145,7 +145,8 @@
     <!-- 全屏模式 -->
     <Teleport to="body">
       <transition name="fade-scale">
-        <div v-if="isFullscreen" class="table-fullscreen-overlay">
+        <div v-if="isFullscreen" v-native-back="toggleFullscreen"
+          class="table-fullscreen-overlay">
           <div class="fullscreen-container">
             <div class="table-scroll-area fullscreen-table ui-scrollbar">
               <div v-if="isLoading" class="loading-overlay">
@@ -242,7 +243,8 @@
 
     <Teleport to="body">
       <transition name="fade-scale">
-        <div v-if="activeFilterCol" class="teleport-overlay" @click="closeFilter">
+        <div v-if="activeFilterCol" v-native-back="closeFilter"
+          class="teleport-overlay" @click="closeFilter">
           <div
               class="glass-panel"
               data-surface="filter-popup"
@@ -511,6 +513,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import { getCurrentRuntimePlatform, getPlatformFileService } from '@/platform/index.js'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, reactive, onMounted, computed, onUnmounted, nextTick, watch } from 'vue';

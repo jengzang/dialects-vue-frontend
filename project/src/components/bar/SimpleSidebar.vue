@@ -3,7 +3,8 @@
   <Teleport to="body">
     <!-- 遮罩层 -->
     <Transition name="fade">
-      <div v-if="isOpen" class="overlay main-sidebar-overlay" @click="$emit('close')" @wheel.prevent @touchmove.prevent></div>
+      <div v-if="isOpen" v-native-back="() => $emit('close')"
+        class="overlay main-sidebar-overlay" @click="$emit('close')" @wheel.prevent @touchmove.prevent></div>
     </Transition>
 
     <!-- 侧边栏 -->
@@ -176,6 +177,7 @@
     <Transition name="submenu-fade">
       <div
         v-if="activeSubmenu"
+        v-native-back="() => activeSubmenu = null"
         class="submenu-panel main-submenu-panel"
         :style="{
           top: submenuPosition.top + 'px',
@@ -201,6 +203,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import { ref, onMounted, onBeforeUnmount, computed, watch, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';

@@ -55,6 +55,7 @@
 </template>
 
 <script setup>
+import { trackNativeMapPopup } from '@/platform/backRegistry.js'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch, shallowRef, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -210,11 +211,11 @@ const bindClusteredInteractions = () => {
   if (!map.value) return
   unbindClusteredInteractions()
 
-  clusteredPopup = new maplibregl.Popup({
+  clusteredPopup = trackNativeMapPopup(new maplibregl.Popup({
     closeButton: false,
     closeOnClick: false,
     offset: 10
-  })
+  }))
 
   clusteredInteractionHandlers = {
     clickClusters: (e) => {
@@ -348,7 +349,7 @@ const renderCircles = (pointFeatures) => {
     }
   })
 
-  const pointPopup = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 10 })
+  const pointPopup = trackNativeMapPopup(new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 10 }))
   map.value.on('mouseenter', 'allvillages-points-layer', (e) => {
     map.value.getCanvas().style.cursor = 'pointer'
     const props = e.features[0].properties
@@ -413,7 +414,7 @@ const renderMarkers = () => {
     })
 
     // Line hover popup
-    const linePopup = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 10 })
+    const linePopup = trackNativeMapPopup(new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 10 }))
     map.value.on('mouseenter', 'allvillages-lines', (e) => {
       map.value.getCanvas().style.cursor = 'pointer'
       const props = e.features[0].properties

@@ -54,7 +54,8 @@
     </button>
 
     <Teleport to="body">
-      <div v-if="showPopup && popupData" class="yubao-popup-overlay" @click="closePopup">
+      <div v-if="showPopup && popupData" v-native-back="closePopup"
+        class="yubao-popup-overlay" @click="closePopup">
         <div class="yubao-popup-content" @click.stop>
           <div class="popup-header">
             <h3>{{ t('map.yuBaoMap.popup.title') }}</h3>
@@ -130,6 +131,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, onMounted, onBeforeUnmount, shallowRef, nextTick, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'

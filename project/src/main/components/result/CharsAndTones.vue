@@ -122,6 +122,7 @@
     <Teleport to="body">
       <div
         v-if="readingTooltip.visible"
+        v-native-back="() => readingTooltip.visible = false"
         class="global-tooltip-popup"
         :style="{ top: readingTooltip.top + 'px', left: readingTooltip.left + 'px' }"
       >
@@ -141,6 +142,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import { computed, nextTick, onActivated, onDeactivated, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getReadingClass, getSearchCharReadingType } from '@/main/utils/query/ResultTable.js';

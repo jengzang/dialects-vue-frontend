@@ -62,6 +62,7 @@
     <Teleport to="body">
       <div
         v-if="previewImage"
+        v-native-back="closePreview"
         class="showcase-preview-overlay"
         @click="closePreview"
       >
@@ -92,6 +93,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import { ref, reactive, computed, onMounted, onBeforeUnmount, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'

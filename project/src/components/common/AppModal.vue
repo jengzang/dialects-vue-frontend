@@ -7,6 +7,7 @@
     >
       <div
         v-if="modelValue"
+        v-native-back="close"
         class="app-modal"
         :class="{
           'is-frameless': frameless,
@@ -106,6 +107,7 @@ function stopPointerTracking() {
 </script>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import { computed, useSlots, watch, onMounted, onBeforeUnmount } from 'vue'
 
 const props = defineProps({

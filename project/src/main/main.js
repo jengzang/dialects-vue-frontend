@@ -5,6 +5,7 @@ import '../env-config.js'
 import { createApp } from 'vue'
 import { initializeNativeDownloadLinks } from '../platform/fileExport.js'
 import { getCurrentRuntimePlatform } from '../platform/runtime.js'
+import { initializeNativeBackPriority } from '../platform/backRegistry.js'
 import { initializeNativeAudioIntake } from '../platform/audioIntake.js'
 import { buildLocalePath } from '../i18n/localeRouting.js'
 import App from './App.vue'
@@ -52,6 +53,8 @@ const disposeNativeDownloads = getCurrentRuntimePlatform().container === 'native
   ? initializeNativeDownloadLinks({ onError: error => showError(error.message) })
   : () => {}
 if (import.meta.hot) import.meta.hot.dispose(disposeNativeDownloads)
+const disposeNativeBack = initializeNativeBackPriority()
+if (import.meta.hot) import.meta.hot.dispose(disposeNativeBack)
 app.mount('#app')
 
 initializeNativeAudioIntake(

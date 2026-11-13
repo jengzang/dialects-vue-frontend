@@ -156,6 +156,7 @@
       <Transition name="submenu-fade">
         <div
           v-if="activeSubmenu"
+          v-native-back="() => activeSubmenu = null"
           class="main-submenu-panel"
           :style="{
             top: submenuPosition.top + 'px',
@@ -192,6 +193,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'

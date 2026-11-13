@@ -110,6 +110,13 @@ public class DialectsNativePlugin extends Plugin {
         });
     }
 
+    @PluginMethod public void setBackBlocked(PluginCall call) {
+        getActivity().runOnUiThread(() -> {
+            ((MainActivity) getActivity()).setOverlayBackBlocked(call.getBoolean("blocked", false));
+            call.resolve();
+        });
+    }
+
     @PluginMethod public void consumeAudio(PluginCall call) {
         String id = call.getString("id", "");
         if (!id.matches("[0-9]+-[a-f0-9-]+")) { call.reject("Invalid audio ID"); return; }
