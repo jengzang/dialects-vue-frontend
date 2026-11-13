@@ -64,8 +64,8 @@ const error = ref('')
 const identity = computed(() => JSON.stringify([userStore.role, userStore.id]))
 let sequence = 0
 const modeOptions = computed(() => [
-  { value: 'map', label: t('map.divideTab.options.mapPartition') },
-  { value: 'yindian', label: t('map.divideTab.options.yindianPartition') },
+  { value: 'map', label: t('map.partitionColors.mapSource') },
+  { value: 'yindian', label: t('map.partitionColors.yindianSource') },
 ])
 const filteredNodes = computed(() => {
   const query = search.value.trim().toLocaleLowerCase()
@@ -145,18 +145,22 @@ summary {
 .partition-color-editor[open] .editor-chevron { transform: rotate(90deg); }
 .editor-content { @include flex-col; gap: 12px; padding-top: 14px; }
 .editor-toolbar {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: 'source search reset';
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
 
-  :deep(.liquid-radio-group) { flex-shrink: 0; gap: 4px 8px; }
+  :deep(.liquid-radio-group) { grid-area: source; gap: 4px 8px; flex-wrap: nowrap; }
 }
-.editor-search { flex: 1; min-width: 0; }
-.reset-colors { flex-shrink: 0; }
+.editor-search { grid-area: search; min-width: 0; }
+.reset-colors { grid-area: reset; justify-self: end; }
 @media (max-aspect-ratio: 1 / 1) {
-  .editor-toolbar { flex-wrap: wrap; }
-  .editor-search { order: 1; flex-basis: 100%; }
+  .editor-toolbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'source reset' 'search search';
+  }
+  .editor-toolbar :deep(.liquid-radio-group) { justify-content: flex-start; }
 }
 .editor-hint { color: var(--text-secondary); font-size: var(--font-size-12); line-height: 1.6; }
 .color-tree { padding: 6px 8px; }

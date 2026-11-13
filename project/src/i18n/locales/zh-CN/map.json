@@ -347,6 +347,8 @@
     }
   },
   "partitionColors": {
+    "mapSource": "地图集",
+    "yindianSource": "音典",
     "expand": "展开",
     "collapse": "收起",
     "title": "分区颜色",
