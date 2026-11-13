@@ -292,12 +292,28 @@ describe('main map point layers', () => {
     expect(markers).toHaveLength(0)
     expect(pointFeatures(map).map(feature => feature.properties.label)).toEqual(['广州', '四字地名', '五个字地名', '六个字的地名'])
     expect(pointFeatures(map).map(feature => feature.properties.fontSize)).toEqual([12.5, 11.5, 10.5, 10])
-    expect(map.images.size).toBe(1)
+    expect(map.images.size).toBe(4)
     hit(map, 0)
     expect(getLocationDetail).toHaveBeenCalledWith('广州')
     expect(popups).toHaveLength(0)
     mapStore.showCustomData = true; await nextTick()
     expect(pointFeatures(map).map(feature => feature.properties.label)).toEqual(['广州', '四字地名', '五个字地名', '六个字的地名', '个人'])
+  })
+
+  it('draws each base label and its background together, reusing repeated place names', async () => {
+    mapStore.mode = 'base'
+    mapStore.mapData = { coordinates_locations: [
+      ['广州', [113, 23]], ['广州', [114, 24]], ['英德英城', [115, 25]],
+    ] }
+    const map = await mountMap()
+    expect(pointFeatures(map).map(feature => feature.properties.renderText)).toEqual(['', '', ''])
+    const images = pointFeatures(map).map(feature => feature.properties.image)
+    expect(images[0]).toBe(images[1])
+    expect(images[2]).not.toBe(images[0])
+    expect(map.images.size).toBe(2)
+    const context = HTMLCanvasElement.prototype.getContext.mock.results[0].value
+    expect(context.fillText.mock.calls.map(call => call[0])).toEqual(['广州', '英德英城'])
+    expect(map.getLayer('map-points-layer').layout['symbol-sort-key']).toEqual(['get', 'index'])
   })
 
   it('keeps feature filters, text, color reuse, percentage details and the original detail action', async () => {

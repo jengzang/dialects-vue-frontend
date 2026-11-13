@@ -830,6 +830,8 @@ const drawPointLayer = (entries, mode) => {
   if (!pointEntries.length) return;
   const labelStyle = mode === 'base' || mode === 'feature' ? getPointLabelStyle(mode) : null;
   pointStyleSignature = getPointStyleSignature(mode, labelStyle);
+  // Base labels must stack as whole cards: MapLibre draws all icons before all text.
+  const useRasterText = label => mode === 'base' || needsCanvasText(label);
   const measurementContext = labelStyle ? document.createElement('canvas').getContext('2d') : null;
   const textWidths = new Map();
   const rasterLabels = new Set();
@@ -845,7 +847,7 @@ const drawPointLayer = (entries, mode) => {
     entry.hitWidth = textWidths.get(key) / 2 + labelStyle.paddingX + labelStyle.borderWidth;
     entry.hitHeight = labelStyle.lineHeight / 2 + labelStyle.paddingY + labelStyle.borderWidth;
     const rasterKey = JSON.stringify([font, entry.label, entry.color]);
-    if (needsCanvasText(entry.label) && !rasterLabels.has(rasterKey)) {
+    if (useRasterText(entry.label) && !rasterLabels.has(rasterKey)) {
       rasterLabels.add(rasterKey);
       rasterArea += (entry.hitWidth * 2 + 24) * (entry.hitHeight * 2 + 24);
     }
@@ -856,10 +858,10 @@ const drawPointLayer = (entries, mode) => {
     geometry: { type: 'Point', coordinates: entry.coordinate.slice(0, 2) },
     properties: {
       index: entry.index,
-      image: labelStyle && needsCanvasText(entry.label)
+      image: labelStyle && useRasterText(entry.label)
         ? getTextImage(entry.label, mode === 'base' ? labelStyle.background : entry.color, { ...labelStyle, fontSize: entry.fontSize || labelStyle.fontSize })
         : getPointImage(labelStyle && mode === 'base' ? labelStyle.background : entry.color, mode, false, labelStyle),
-      ...(labelStyle ? { label: entry.label, renderText: needsCanvasText(entry.label) ? '' : entry.label, fontSize: entry.fontSize || labelStyle.fontSize } : {}),
+      ...(labelStyle ? { label: entry.label, renderText: useRasterText(entry.label) ? '' : entry.label, fontSize: entry.fontSize || labelStyle.fontSize } : {}),
     },
   }));
   map.value.addSource(POINT_SOURCE_ID, { type: 'geojson', data: { type: 'FeatureCollection', features } });

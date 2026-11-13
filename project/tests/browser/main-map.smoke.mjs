@@ -94,7 +94,22 @@ try {
       }, mode)
       await page.waitForFunction(mode => window.mainMap.getSource('map-points-source') && window.mainMap.queryRenderedFeatures({ layers: ['map-points-layer'] }).some(feature => feature.properties.label === (mode === 'base' ? '廣州地名' : 'tɕʰ ŋ̍ 中文')), mode)
       assert.equal(await page.locator('.maplibregl-marker').count(), 0)
+      await page.evaluate(() => new Promise(resolve => { window.mainMap.once('idle', resolve); window.mainMap.triggerRepaint() }))
       await page.screenshot({ path: `/tmp/main-map-${touch ? 'portrait' : 'desktop'}-${mode}.png` })
+      if (mode === 'base') {
+        const clip = { x: Math.floor(point.x - 12), y: Math.floor(point.y - 5), width: 24, height: 10 }
+        const topLabel = await page.screenshot({ clip })
+        await page.evaluate(async () => {
+          const { mapStore, nextTick } = window.mainMapSmoke
+          mapStore.mapData = { coordinates_locations: [['疊疊疊疊', [113.001, 23.001]], ['廣州地名', [113, 23]]] }
+          await nextTick()
+        })
+        await page.waitForFunction(() => window.mainMap.isSourceLoaded('map-points-source') && window.mainMap.queryRenderedFeatures({ layers: ['map-points-layer'] }).length >= 2)
+        await page.evaluate(() => new Promise(resolve => { window.mainMap.once('idle', resolve); window.mainMap.triggerRepaint() }))
+        const stackedLabels = await page.screenshot({ clip })
+        assert.equal(topLabel.equals(stackedLabels), true, 'the top base label must cover text from labels underneath')
+        await page.screenshot({ path: `/tmp/main-map-${touch ? 'portrait' : 'desktop'}-base-overlap.png` })
+      }
       if (mode === 'feature') {
         if (touch) await page.waitForTimeout(350)
         if (touch) await page.touchscreen.tap(point.x, point.y)
