@@ -15,10 +15,12 @@
     "title": "Privacy Policy",
     "dataCollection": {
       "title": "Data Collection and Use",
-      "intro": "Dialects Atlas (dialects.yzup.top) is committed to protecting user privacy. We solemnly promise:",
-      "minimal": "<strong>Minimal Data Collection</strong>: This website only collects necessary technical information (such as access logs, browser type) to maintain normal website operation and improve user experience.",
-      "noPersonal": "<strong>No Personal Identification Information</strong>: We do not actively collect personally identifiable information (such as name, phone number, birthday, etc.).",
-      "security": "<strong>Data Security</strong>: All collected data is protected using industry-standard security measures to prevent unauthorized access, disclosure, modification, or destruction."
+      "intro": "Dialects Atlas (dialects.yzup.top) values and is committed to protecting user privacy. We follow the principle of data minimization, collecting and processing information only to the extent necessary to provide our services and maintain the normal operation of the platform.",
+      "account": "<strong>Account information</strong>: Registration requires an email address, and users may set their own username. This information is used only for account registration, identity verification, account management, and necessary service notifications. We do not require users to provide additional identity information such as real name, phone number, or date of birth.",
+      "technical": "<strong>Technical and usage information</strong>: To safeguard platform security, maintain normal operation, and improve user experience, we may collect necessary access logs, IP addresses, browser types, device information, and feature usage records.",
+      "submitted": "<strong>Data actively submitted by users</strong>: When using features such as dialect data management, character table processing, and online Praat, users may voluntarily upload text, tables, or audio files. Such data is used only to provide the corresponding features and is handled according to the actual data retention and deletion mechanisms.",
+      "security": "<strong>Data security</strong>: We adopt reasonable technical and administrative measures to protect user data and strive to prevent unauthorized access, disclosure, modification, or destruction.",
+      "principles": "<strong>Privacy principles</strong>: We will not forcibly collect additional personal information for purposes unrelated to platform features, and we will protect users' personal information rights in accordance with applicable laws and regulations."
     },
     "cookies": {
       "title": "Use of Cookies",
