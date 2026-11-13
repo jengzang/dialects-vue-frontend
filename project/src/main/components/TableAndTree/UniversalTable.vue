@@ -511,6 +511,7 @@
 </template>
 
 <script setup>
+import { getCurrentRuntimePlatform, getPlatformFileService } from '@/platform/index.js'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, reactive, onMounted, computed, onUnmounted, nextTick, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -1123,11 +1124,19 @@ const handleToggleSelect = () => {
   }
 };
 // 導出 Excel
-const exportToExcel = () => {
+const exportToExcel = async () => {
   const ws = XLSX.utils.json_to_sheet(tableData.value);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-  XLSX.writeFile(wb, `${props.tableName}_export.xlsx`);
+  if (getCurrentRuntimePlatform().container === 'native-webview') {
+    const data = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+    await getPlatformFileService().saveBlob(
+      new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+      `${props.tableName}_export.xlsx`,
+    )
+  } else {
+    XLSX.writeFile(wb, `${props.tableName}_export.xlsx`)
+  }
 };
 
 // 翻頁

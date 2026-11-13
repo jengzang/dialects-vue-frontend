@@ -595,12 +595,12 @@ const handleCopy = async () => {
   }
 };
 
-const handleExport = () => {
+const handleExport = async () => {
   const { headers, rows } = buildExportData();
   const fileName = props.mode === 'tab4'
     ? `查調結果_${Date.now()}.csv`
     : `查字結果_${Date.now()}.csv`;
-  downloadText(toCsv([headers, ...rows]), fileName);
+  await downloadText(toCsv([headers, ...rows]), fileName);
   showSuccess(t('result.charsAndTones.export.exported'));
 };
 

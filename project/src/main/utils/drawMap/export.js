@@ -1,3 +1,4 @@
+import { getCurrentRuntimePlatform, getPlatformFileService } from '@/platform/index.js'
 import { kml as kmlToGeoJson } from '@tmcw/togeojson'
 import { DOMParser } from '@xmldom/xmldom'
 import { unzipSync, strFromU8 } from 'fflate'
@@ -167,6 +168,9 @@ function ensureFeatureId(feature, usedFeatureIds = new Set()) {
 }
 
 function triggerDownload(blob, filename) {
+  if (getCurrentRuntimePlatform().container === 'native-webview') {
+    return getPlatformFileService().saveBlob(blob, filename)
+  }
   console.log('[exportCurrentMapAsPng] trigger download', {
     filename,
     blobSize: blob?.size ?? 0,
@@ -640,8 +644,8 @@ export function exportFeatureCollectionAsGeoJson(featureCollection, filename = '
     type: 'application/geo+json;charset=utf-8'
   })
 
-  triggerDownload(blob, filename)
-  return normalized
+  const download = triggerDownload(blob, filename)
+  return download ? download.then(() => normalized) : normalized
 }
 
 export function exportCurrentMapAsPng(mapInstance, filename = 'map-draw.png') {
@@ -700,8 +704,7 @@ export function exportCurrentMapAsPng(mapInstance, filename = 'map-draw.png') {
           return
         }
 
-        triggerDownload(blob, filename)
-        resolve(blob)
+        Promise.resolve(triggerDownload(blob, filename)).then(() => resolve(blob), reject)
       }, 'image/png')
     }
 

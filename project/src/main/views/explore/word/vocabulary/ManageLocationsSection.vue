@@ -200,6 +200,7 @@
 </template>
 
 <script setup>
+import { getCurrentRuntimePlatform, getPlatformFileService } from '@/platform/index.js'
 import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { deleteVocabularyLocation, exportVocabularyLocation, getVocabularyLocations, invalidateVocabularyOptionsCache, transferVocabularyLocation, updateVocabularyLocation } from '@/api'
@@ -444,6 +445,9 @@ function handleSaveEditingLocation() {
 }
 
 function triggerBlobDownload(blob, fileName) {
+  if (getCurrentRuntimePlatform().container === 'native-webview') {
+    return getPlatformFileService().saveBlob(blob, fileName)
+  }
   const url = URL.createObjectURL(blob)
   try {
     const anchor = document.createElement('a')
@@ -464,7 +468,7 @@ async function handleExportLocation(location) {
   try {
     const params = location.user_id ? { user_id: location.user_id } : {}
     const blob = await exportVocabularyLocation(location.location_name, params)
-    triggerBlobDownload(blob, `${location.location_name}词表.xlsx`)
+    await triggerBlobDownload(blob, `${location.location_name}词表.xlsx`)
     showSuccess(t('words.wordList.locations.exportSuccess', { name: location.location_name }))
   } catch (error) {
     showError(error.message || t('words.wordList.locations.exportFailed'))

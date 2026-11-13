@@ -1,3 +1,4 @@
+import { getCurrentRuntimePlatform, getPlatformFileService } from '@/platform/index.js'
 // 通用结果导出/复制原语：CSV/TSV 序列化 + 剪贴板 + 下载
 
 function escapeCsvCell(value) {
@@ -53,6 +54,9 @@ export async function copyText(text) {
 
 export function downloadText(content, filename, mime = 'text/csv;charset=utf-8') {
   const blob = new Blob([content], { type: mime })
+  if (getCurrentRuntimePlatform().container === 'native-webview') {
+    return getPlatformFileService().saveBlob(blob, filename)
+  }
   const url = URL.createObjectURL(blob)
   const anchor = document.createElement('a')
   anchor.href = url
