@@ -113,6 +113,7 @@ async function mountMap(props = {}) {
   const host = document.createElement('div'); document.body.append(host)
   const app = createApp({ render: () => h(MapLibre, props) })
   app.mount(host); mounted.push({ app, host })
+  await new Promise(resolve => setTimeout(resolve, 0))
   const map = maps.at(-1); map.emit('load'); await nextTick()
   map.component = app._instance.subTree.component.setupState
   return map
@@ -125,6 +126,7 @@ function hit(map, index, type = 'click', longitude = 113) {
 }
 
 beforeEach(() => {
+  api.mockImplementation(async url => ({ schema_version: 2, region_mode: new URL(url, 'https://test.local').searchParams.get('region_mode'), nodes: [] }))
   vi.stubGlobal('requestAnimationFrame', callback => { callback(); return 0 })
   vi.stubGlobal('cancelAnimationFrame', vi.fn())
   Object.assign(mapStore, { mode: 'dot', mapData: null, mergedData: [], isoplethPayload: null, showCustomData: false, adminBoundary: null, fitViewKey: 0, divideMapView: false })
@@ -167,18 +169,22 @@ describe('main map point layers', () => {
 
   it('paints loading before preparing a switched mode and keeps it until its source renders', async () => {
     const map = await mountMap()
-    const frames = []
-    vi.stubGlobal('requestAnimationFrame', callback => { frames.push(callback); return frames.length })
+    const frames = new Map()
+    let frameId = 0
+    vi.stubGlobal('requestAnimationFrame', callback => { frames.set(++frameId, callback); return frameId })
+    vi.stubGlobal('cancelAnimationFrame', id => frames.delete(id))
+    const runFrame = () => { const [id, callback] = frames.entries().next().value; frames.delete(id); callback() }
     vi.spyOn(map, 'triggerRepaint').mockImplementation(() => {})
     const loaded = vi.spyOn(map, 'isSourceLoaded').mockReturnValue(false)
     mapStore.mapData = { coordinates_locations: [['广州', [113, 23]]] }
     mapStore.mode = 'base'; await nextTick()
+    await new Promise(resolve => setTimeout(resolve, 0))
     const host = mounted.at(-1).host
     expect(host.querySelector('.loading-overlay')).not.toBeNull()
     expect(pointFeatures(map)).toHaveLength(0)
-    frames.shift()(); await nextTick()
+    runFrame(); await nextTick()
     expect(pointFeatures(map)).toHaveLength(0)
-    frames.shift()(); await nextTick()
+    runFrame(); await nextTick()
     expect(pointFeatures(map)).toHaveLength(1)
     map.emit('render'); await nextTick()
     expect(host.querySelector('.loading-overlay')).not.toBeNull()
@@ -405,6 +411,63 @@ describe('main map point layers', () => {
     const context = HTMLCanvasElement.prototype.getContext.mock.results[0].value
     expect(context.fillText.mock.calls.map(call => call[0])).toEqual(['广州', '英德英城'])
     expect(map.getLayer('map-points-layer').layout['symbol-sort-key']).toEqual(['get', 'index'])
+  })
+
+  it('stacks complete feature labels and reuses repeated readings at full device resolution', async () => {
+    vi.stubGlobal('devicePixelRatio', 3)
+    mapStore.mode = 'feature'
+    const variants = [
+      { value: 'faʔ7', color: '#ffb366' },
+      { value: 'faʔ7-vaː3', color: '#f7b6d2' },
+      { value: 'ŋ̍a', color: '#a1d5e8' },
+      { value: 'faʔ7', color: '#f7b6d2' },
+    ]
+    mapStore.mergedData = Array.from({ length: 3000 }, (_, index) => ({
+      location: `地点${index}`, feature: '声母', coordinate: [113, 23], ...variants[index % variants.length],
+    }))
+    const map = await mountMap({ activeFeature: '声母' })
+    expect(pointFeatures(map)).toHaveLength(3000)
+    expect(pointFeatures(map).every(feature => feature.properties.renderText === '')).toBe(true)
+    expect(map.images.size).toBe(4)
+    expect([...map.images.values()].every(image => image.options.pixelRatio === 3)).toBe(true)
+    const context = HTMLCanvasElement.prototype.getContext.mock.results[0].value
+    expect(context.fillText).toHaveBeenCalledTimes(4)
+    expect(pointFeatures(map)[0].properties.image).toBe(pointFeatures(map)[4].properties.image)
+    expect(pointFeatures(map)[0].properties.image).not.toBe(pointFeatures(map)[3].properties.image)
+    map.emit('click', { features: pointFeatures(map), point: { x: 113, y: 23 }, lngLat: { lng: 113, lat: 23 } }, 'map-points-layer')
+    expect(popups.at(-1).node.textContent).toContain('地点2999')
+  })
+
+  it('preserves narrow feature card widths and matches the clickable area', async () => {
+    mapStore.mode = 'feature'
+    const context = document.createElement('canvas').getContext('2d')
+    context.measureText.mockReturnValue({ width: 2 })
+    mapStore.mergedData = [{ location: '甲', feature: '声母', value: 'i', color: '#ff0', coordinate: [113, 23] }]
+    const map = await mountMap({ activeFeature: '声母' })
+    const style = map.component.getPointLabelStyle('feature')
+    const expectedWidth = 2 + 2 * (style.paddingX + style.borderWidth)
+    const { image, options } = [...map.images.values()][0]
+    expect(image.width / options.pixelRatio).toBe(Math.ceil(expectedWidth) + 24)
+    map.emit('click', { features: pointFeatures(map), point: { x: 113 + expectedWidth / 2, y: 23 }, lngLat: { lng: 113, lat: 23 } }, 'map-points-layer')
+    expect(popups.at(-1).node.textContent).toContain('甲')
+  })
+
+  it('includes partition background and text colors in the feature texture budget', async () => {
+    vi.stubGlobal('devicePixelRatio', 3)
+    mapStore.mode = 'feature'
+    const map = await mountMap({ activeFeature: '声母' })
+    const context = document.createElement('canvas').getContext('2d')
+    context.measureText.mockReturnValue({ width: 1000 })
+    const entries = Array.from({ length: 64 }, (_, index) => ({
+      label: 'faʔ7', item: { location: `地点${index}` }, coordinate: [113, 23], color: '#ff0',
+      backgroundColor: `#${index.toString(16).padStart(6, '0')}`, textColor: index % 2 ? '#fff' : '#000',
+    }))
+    map.component.drawPointLayer(entries, 'feature')
+    expect(map.images.size).toBe(64)
+    const pixels = [...map.images.values()].reduce((total, { image }) => total + image.width * image.height, 0)
+    expect(pixels).toBeLessThan(16 * 1024 * 1024 * 1.05)
+    expect(pointFeatures(map)[0].properties.textColor).toBe('#000')
+    expect(pointFeatures(map)[1].properties.textColor).toBe('#fff')
   })
 
   it('keeps feature filters, text, color reuse, percentage details and the original detail action', async () => {

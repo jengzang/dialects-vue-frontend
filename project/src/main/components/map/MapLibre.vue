@@ -784,8 +784,6 @@ const getPointImage = (color, mode, hover = false, labelStyle = null) => {
 
 const getPointStyleSignature = (mode, labelStyle) => JSON.stringify([mode, Math.min(window.devicePixelRatio || 1, 3), labelStyle]);
 
-const needsCanvasText = (value) => /[\p{M}\p{Extended_Pictographic}\p{Regional_Indicator}\u200d]/u.test(value || '');
-
 const getTextImage = (label, color, labelStyle) => {
   const key = JSON.stringify(['text', label, color, labelStyle.fontSize, labelStyle.color]);
   if (pointImages.has(key)) return pointImages.get(key);
@@ -793,7 +791,7 @@ const getTextImage = (label, color, labelStyle) => {
   const context = canvas.getContext('2d');
   context.font = `${labelStyle.fontSize}px ${labelStyle.font.join(',')}`;
   const textWidth = Math.ceil(context.measureText(label).width);
-  const width = Math.max(16, textWidth + 2 * (labelStyle.paddingX + labelStyle.borderWidth));
+  const width = Math.max(1, textWidth + 2 * (labelStyle.paddingX + labelStyle.borderWidth));
   const height = Math.max(16, Math.ceil(labelStyle.lineHeight + 2 * (labelStyle.paddingY + labelStyle.borderWidth)));
   const margin = 12;
   // Bound the raster fallback budget and individual texture dimensions for unusually large datasets/labels.
@@ -945,8 +943,7 @@ const drawPointLayer = (entries, mode) => {
   if (!pointEntries.length) return;
   const labelStyle = mode === 'base' || mode === 'feature' ? getPointLabelStyle(mode) : null;
   pointStyleSignature = getPointStyleSignature(mode, labelStyle);
-  // Base labels must stack as whole cards: MapLibre draws all icons before all text.
-  const useRasterText = label => mode === 'base' || needsCanvasText(label);
+  // Text and background must stack together: MapLibre draws all icons before all native text.
   const measurementContext = labelStyle ? document.createElement('canvas').getContext('2d') : null;
   const textWidths = new Map();
   const rasterLabels = new Set();
@@ -961,8 +958,8 @@ const drawPointLayer = (entries, mode) => {
     }
     entry.hitWidth = textWidths.get(key) / 2 + labelStyle.paddingX + labelStyle.borderWidth;
     entry.hitHeight = labelStyle.lineHeight / 2 + labelStyle.paddingY + labelStyle.borderWidth;
-    const rasterKey = JSON.stringify([font, entry.label, entry.color]);
-    if (useRasterText(entry.label) && !rasterLabels.has(rasterKey)) {
+    const rasterKey = JSON.stringify([font, entry.label, entry.backgroundColor || (mode === 'base' ? labelStyle.background : entry.color), entry.textColor || labelStyle.color]);
+    if (!rasterLabels.has(rasterKey)) {
       rasterLabels.add(rasterKey);
       rasterArea += (entry.hitWidth * 2 + 24) * (entry.hitHeight * 2 + 24);
     }
@@ -974,10 +971,10 @@ const drawPointLayer = (entries, mode) => {
     properties: {
       index: entry.index,
       textColor: entry.textColor || labelStyle?.color,
-      image: labelStyle && useRasterText(entry.label)
+      image: labelStyle
         ? getTextImage(entry.label, mode === 'base' ? (entry.backgroundColor || labelStyle.background) : (entry.backgroundColor || entry.color), { ...labelStyle, color: entry.textColor || labelStyle.color, fontSize: entry.fontSize || labelStyle.fontSize })
         : getPointImage(labelStyle && mode === 'base' ? (entry.backgroundColor || labelStyle.background) : (entry.backgroundColor || entry.color), mode, false, labelStyle),
-      ...(labelStyle ? { label: entry.label, renderText: useRasterText(entry.label) ? '' : entry.label, fontSize: entry.fontSize || labelStyle.fontSize } : {}),
+      ...(labelStyle ? { label: entry.label, renderText: '', fontSize: entry.fontSize || labelStyle.fontSize } : {}),
     },
   }));
   map.value.addSource(POINT_SOURCE_ID, { type: 'geojson', data: { type: 'FeatureCollection', features } });
