@@ -1,5 +1,5 @@
 import { WEB_BASE } from '../../env-config.js';
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, CapacitorHttp } from '@capacitor/core';
 import { showRateLimitNotice } from '../../utils/user/rateLimitNotice.js';
 import { recordLoginPromptApiHit } from '../../utils/user/loginPromptTracker.js';
 import { userStore } from '../../main/store/store.js';
@@ -196,9 +196,58 @@ function normalizeRequestBody(body, headers) {
   return body;
 }
 
-async function performFetch(path, { method, headers, body, signal, keepalive = false }) {
+function isNativeHttpAvailable() {
+  const platform = Capacitor.getPlatform?.();
+  return (platform === 'ios' || platform === 'android') && typeof CapacitorHttp?.request === 'function';
+}
+
+function canSendWithNativeHttp(body) {
+  const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
+  const isBlob = typeof Blob !== 'undefined' && body instanceof Blob;
+  const isArrayBuffer = typeof ArrayBuffer !== 'undefined' && body instanceof ArrayBuffer;
+  return body == null || typeof body === 'string' || (typeof body === 'object' && !isFormData && !isBlob && !isArrayBuffer);
+}
+
+function nativeResponseBody(data, headers, responseType) {
+  if (data == null) return null;
+  if (responseType === 'arraybuffer' || responseType === 'blob') {
+    if (data instanceof ArrayBuffer || data instanceof Blob) return data;
+    if (typeof data === 'string') {
+      const binary = atob(data);
+      const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+      return responseType === 'blob' ? new Blob([bytes], { type: headers['content-type'] || headers['Content-Type'] || '' }) : bytes;
+    }
+  }
+  if (typeof data === 'object') return JSON.stringify(data);
+  return data;
+}
+
+async function performNativeHttp(path, { method, headers, body, responseType = 'auto', timeout }) {
+  const platform = Capacitor.getPlatform();
+  const nativeResponse = await CapacitorHttp.request({
+    url: WEB_BASE + path,
+    method,
+    headers: { ...headers, 'User-Agent': `DialectsApp/${platform}` },
+    ...(body == null ? {} : { data: body }),
+    ...(responseType !== 'auto' ? { responseType } : {}),
+    connectTimeout: timeout,
+    readTimeout: timeout,
+  });
+  const responseHeaders = nativeResponse.headers || {};
+  const response = new Response(nativeResponseBody(nativeResponse.data, responseHeaders, responseType), {
+    status: nativeResponse.status,
+    headers: responseHeaders,
+  });
+  Object.defineProperty(response, 'url', { value: nativeResponse.url || WEB_BASE + path });
+  return response;
+}
+
+async function performFetch(path, { method, headers, body, signal, keepalive = false, responseType = 'auto', timeout }) {
   if (signal.aborted) throw signal.reason;
   try {
+    if (isNativeHttpAvailable() && canSendWithNativeHttp(body)) {
+      return await performNativeHttp(path, { method, headers, body, responseType, timeout });
+    }
     const response = await fetch(WEB_BASE + path, {
       method,
       headers,
@@ -307,6 +356,7 @@ async function executeApi(path, options = {}) {
     responseType = 'auto',
     loginPromptEligible = false,
     keepalive = false,
+    timeout = 300000,
   } = options;
 
   const requestHeaders = { ...headers };
@@ -345,6 +395,8 @@ async function executeApi(path, options = {}) {
       body: requestBody,
       signal,
       keepalive,
+      responseType,
+      timeout,
     });
 
     if (signal.aborted) throw signal.reason;
@@ -364,6 +416,8 @@ async function executeApi(path, options = {}) {
           body: requestBody,
           signal,
           keepalive,
+          responseType,
+          timeout,
         });
       } else if (refreshResult.reason === 'missing_refresh_token') {
         clearSession();

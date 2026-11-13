@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const mocks = vi.hoisted(() => ({ platform: 'web', token: null, refresh: vi.fn(), toast: vi.fn() }))
-vi.mock('@capacitor/core', () => ({ Capacitor: { getPlatform: () => mocks.platform } }))
+const mocks = vi.hoisted(() => ({ platform: 'web', token: null, refresh: vi.fn(), toast: vi.fn(), nativeHttp: vi.fn(), nativeHttpPlugin: {} }))
+vi.mock('@capacitor/core', () => ({ Capacitor: { getPlatform: () => mocks.platform }, CapacitorHttp: mocks.nativeHttpPlugin }))
 vi.mock('@/env-config.js', () => ({ WEB_BASE: '' }))
 vi.mock('@/api/auth/tokenStorage.js', () => ({ getToken: () => mocks.token, getTokenExpiresAt: () => 0 }))
 vi.mock('@/api/auth/session.js', () => ({ clearSession: vi.fn(), refreshAccessToken: mocks.refresh }))
@@ -16,10 +16,23 @@ function pendingBody(signal) {
     signal.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError')), { once: true })
   })
 }
-beforeEach(() => { vi.useFakeTimers(); mocks.platform = 'web'; mocks.token = null; vi.clearAllMocks() })
+beforeEach(() => { vi.useFakeTimers(); mocks.platform = 'web'; mocks.token = null; delete mocks.nativeHttpPlugin.request; mocks.nativeHttp.mockResolvedValue({ status: 200, headers: { 'Content-Type': 'application/json' }, data: {} }); vi.clearAllMocks() })
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals() })
 
 describe('HTTP request lifecycle', () => {
+  it.each(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])('uses native CapacitorHttp for %s on native platforms', async method => {
+    vi.useRealTimers()
+    mocks.platform = 'ios'
+    mocks.nativeHttpPlugin.request = mocks.nativeHttp
+    const fetch = vi.fn()
+    vi.stubGlobal('fetch', fetch)
+    await api('/api/test', { method, body: method === 'GET' ? null : { value: 1 } })
+    expect(mocks.nativeHttp).toHaveBeenCalledWith(expect.objectContaining({
+      url: '/api/test', method, headers: expect.objectContaining({ 'User-Agent': 'DialectsApp/ios' }),
+    }))
+    expect(fetch).not.toHaveBeenCalled()
+  })
+
   it.each(['android', 'ios', 'web'])('preserves UTF-8 multipart names and content on %s', async platform => {
     vi.useRealTimers();
     mocks.platform = platform;
