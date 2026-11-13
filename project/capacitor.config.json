@@ -2,6 +2,11 @@
   "appId": "top.yzup.dialects",
   "appName": "Dialects",
   "webDir": "dist",
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  },
   "android": {
     "path": "../android"
   },

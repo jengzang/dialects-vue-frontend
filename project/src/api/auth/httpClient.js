@@ -1,4 +1,5 @@
 import { WEB_BASE } from '../../env-config.js';
+import { Capacitor } from '@capacitor/core';
 import { showRateLimitNotice } from '../../utils/user/rateLimitNotice.js';
 import { recordLoginPromptApiHit } from '../../utils/user/loginPromptTracker.js';
 import { userStore } from '../../main/store/store.js';
@@ -168,6 +169,18 @@ function normalizeRequestBody(body, headers) {
   }
 
   if (body instanceof FormData) {
+    if (Capacitor.getPlatform() === 'android') {
+      // Capacitor Android 8.5.3 writes multipart header names with writeBytes(),
+      // keeping only each character's low byte. Supply UTF-8 bytes as characters.
+      // Remove this workaround when its native multipart writer uses UTF-8.
+      const headerBytes = value => Array.from(new TextEncoder().encode(value), byte => String.fromCharCode(byte)).join('');
+      const nativeBody = new FormData();
+      for (const [key, value] of body.entries()) {
+        if (value instanceof File) nativeBody.append(headerBytes(key), value, headerBytes(value.name));
+        else nativeBody.append(headerBytes(key), value);
+      }
+      return nativeBody;
+    }
     return body;
   }
 
