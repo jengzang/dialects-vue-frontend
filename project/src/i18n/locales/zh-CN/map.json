@@ -355,6 +355,8 @@
       "show": "显示",
       "hide": "隐藏",
       "viewPlaceNames": "查看地名",
+      "useCustomPartitionColors": "使用自定颜色",
+      "useCustomPartitionColorsHelp": "可在「地图-分区图」页面自定义各分区颜色。",
       "enabled": "开启",
       "disabled": "关闭"
     },

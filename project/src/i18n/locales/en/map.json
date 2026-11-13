@@ -355,6 +355,8 @@
       "show": "Show",
       "hide": "Hide",
       "viewPlaceNames": "Show Place Names",
+      "useCustomPartitionColors": "Use custom colors",
+      "useCustomPartitionColorsHelp": "You can customize partition colors on the Map > Partition Map page.",
       "enabled": "On",
       "disabled": "Off"
     },

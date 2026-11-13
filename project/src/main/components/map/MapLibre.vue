@@ -36,6 +36,22 @@
           />
         </div>
         <div
+          v-if="mapStore.mode === 'base' || mapStore.mode === 'feature'"
+          class="custom-switch-container1 partition-color-switch"
+        >
+          <CheckBox
+            :model-value="useCustomPartitionColors"
+            :label="t('map.mapLibre.controls.useCustomPartitionColors')"
+            :font-size="14"
+            @change="toggleCustomPartitionColors"
+          />
+          <HelpIcon
+            size="sm"
+            :content="t('map.mapLibre.controls.useCustomPartitionColorsHelp')"
+            tooltip-max-width="280px"
+          />
+        </div>
+        <div
           v-if="mapStore.divideMapView && isDivideDisplayMode"
           class="display-mode-radios"
         >
@@ -145,6 +161,7 @@ import { createCustomPopupDelete } from '@/utils/user/customPopupDelete.js'
 import { refreshCurrentCustomLayer } from '@/utils/map/MapData.js';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
+import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import MapLegend from './MapLegend.vue'
 import CompareMapPopup from './popups/CompareMapPopup.vue'
 import FeatureMapPopup from './popups/FeatureMapPopup.vue'
@@ -152,6 +169,7 @@ import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopu
 import { contours } from 'd3-contour';
 import { booleanPointInPolygon } from '@turf/turf';
 import { buildVoronoiClipBoundary, computeVoronoiRadius } from '@/main/utils/drawMap/partitionVoronoi.js';
+import { usePartitionColors } from '@/composables/data/usePartitionColors.js'
 import AdminBoundaryModal from '@/main/components/map/Draw/modals/AdminBoundaryModal.vue';
 import { api } from '@/api/auth/httpClient.js';
 import nationalBorderGeoJsonUrl from '/data/gis/china_country.geojson?url';
@@ -206,6 +224,34 @@ let mapRenderFrame = null;
 let clearMapRenderWait = () => {};
 const isFullScreen = ref(false);
 const { t } = useI18n();
+const { loadPartitionColors, getContrastTextColor } = usePartitionColors()
+const useCustomPartitionColors = ref(true)
+const partitionColors = ref(new Map())
+
+const partitionIdentity = computed(() => JSON.stringify([userStore.role, userStore.id]))
+
+const ensurePartitionColors = async () => {
+  if (!useCustomPartitionColors.value || !['base', 'feature'].includes(mapStore.mode)) return
+  try {
+    partitionColors.value = await loadPartitionColors('map', partitionIdentity.value)
+  } catch (error) {
+    partitionColors.value = new Map()
+    console.warn('Failed to load partition colors:', error)
+  }
+}
+
+const toggleCustomPartitionColors = async (enabled) => {
+  useCustomPartitionColors.value = enabled
+  if (enabled) await ensurePartitionColors()
+  requestMapContentRender()
+}
+
+const getLocationPartitionPath = (location) => mapStore.mapData?.region_mappings?.[location] || ''
+const getCustomPartitionStyle = (path, fallbackBackground, fallbackText) => {
+  if (!useCustomPartitionColors.value || !path) return { background: fallbackBackground, color: fallbackText }
+  const background = partitionColors.value.get(path)
+  return background ? { background, color: getContrastTextColor(background) } : { background: fallbackBackground, color: fallbackText }
+}
 
 // Map style options
 const mapStyleOptions = computed(() => {
@@ -468,7 +514,9 @@ watch(
 // 2. 監聽 store 的模式變化，自動記錄歷史
 watch(
     () => mapStore.mode,
-    (newMode) => {
+    async (newMode) => {
+      useCustomPartitionColors.value = newMode === 'base'
+      if (useCustomPartitionColors.value) await ensurePartitionColors()
       if (newMode === 'feature' || newMode === 'compare') {
         mapStore.divideMapView = false;
       }
@@ -476,6 +524,7 @@ watch(
       if (newMode !== 'base') {
         lastNonBaseMode.value = newMode;
       }
+      void nextTick(() => requestMapContentRender())
     },
     { immediate: true }
 );
@@ -917,8 +966,8 @@ const drawPointLayer = (entries, mode) => {
     properties: {
       index: entry.index,
       image: labelStyle && useRasterText(entry.label)
-        ? getTextImage(entry.label, mode === 'base' ? labelStyle.background : entry.color, { ...labelStyle, fontSize: entry.fontSize || labelStyle.fontSize })
-        : getPointImage(labelStyle && mode === 'base' ? labelStyle.background : entry.color, mode, false, labelStyle),
+        ? getTextImage(entry.label, mode === 'base' ? (entry.backgroundColor || labelStyle.background) : (entry.backgroundColor || entry.color), { ...labelStyle, color: entry.textColor || labelStyle.color, fontSize: entry.fontSize || labelStyle.fontSize })
+        : getPointImage(labelStyle && mode === 'base' ? (entry.backgroundColor || labelStyle.background) : (entry.backgroundColor || entry.color), mode, false, labelStyle),
       ...(labelStyle ? { label: entry.label, renderText: useRasterText(entry.label) ? '' : entry.label, fontSize: entry.fontSize || labelStyle.fontSize } : {}),
     },
   }));
@@ -939,7 +988,7 @@ const drawPointLayer = (entries, mode) => {
     id: POINT_LAYER_ID, type: 'symbol', source: POINT_SOURCE_ID, layout,
     paint: {
       'icon-opacity': mode === 'compare' ? ['case', ['boolean', ['feature-state', 'hover'], false], 0, 1] : 1,
-      ...(labelStyle ? { 'text-color': labelStyle.color } : {}),
+      ...(labelStyle ? { 'text-color': ['coalesce', ['get', 'textColor'], labelStyle.color] } : {}),
     },
   });
   if (mode === 'compare') {
@@ -1056,7 +1105,12 @@ const drawBaseMap = () => {
     // 标记该坐标已显示
     if (key) displayedCoordinates.add(key);
 
-    return { label: locationName, coordinate: coordinates, fontSize };
+    const partitionStyle = getCustomPartitionStyle(
+      getLocationPartitionPath(locationName),
+      null,
+      null
+    )
+    return { label: locationName, coordinate: coordinates, fontSize, backgroundColor: partitionStyle.background, textColor: partitionStyle.color };
   };
 
   // 1. 显示基础地图数据的地名
@@ -1184,7 +1238,8 @@ const drawFeatureMap = () => {
       return;
     }
 
-    entries.push({ item, label: item.value, coordinate: item.coordinate, color: item.color || '#fff' });
+    const partitionStyle = getCustomPartitionStyle(getLocationPartitionPath(item.location), item.color || '#fff', '#000')
+    entries.push({ item, label: item.value, coordinate: item.coordinate, color: item.color || '#fff', backgroundColor: partitionStyle.background, textColor: partitionStyle.color });
   });
   drawPointLayer(entries, 'feature');
 };
@@ -1971,6 +2026,11 @@ $glass-transition: all 0.3s ease;
   gap: 12px;
 
   width: 100%;
+}
+
+.partition-color-switch {
+  justify-content: flex-start;
+  gap: 4px;
 }
 
 .display-mode-radios {
