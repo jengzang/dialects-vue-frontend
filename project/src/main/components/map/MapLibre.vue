@@ -99,7 +99,7 @@
       ✕ {{ t('map.mapLibre.buttons.exitFullscreen') }}
     </button>
 
-    <div v-if="loading" class="loading-overlay">
+    <div v-if="loading || isRenderingMap" class="loading-overlay" role="status" aria-live="polite">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <span>{{ t('map.mapLibre.loading.rendering') }}</span>
     </div>
@@ -131,7 +131,7 @@
 import { trackNativeMapPopup } from '@/platform/backRegistry.js'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
-import { ref, onMounted, onActivated, onBeforeUnmount, shallowRef, nextTick, watch, computed, h, render, markRaw } from 'vue';
+import { ref, onMounted, onActivated, onDeactivated, onBeforeUnmount, shallowRef, nextTick, watch, computed, h, render, markRaw } from 'vue';
 import { useI18n } from 'vue-i18n';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -200,6 +200,10 @@ let isMapStyleReady = false;
 let needsContentRender = false;
 const currentStyleKey = ref('tianditu');
 const loading = ref(false);
+const isRenderingMap = ref(false);
+let mapRenderVersion = 0;
+let mapRenderFrame = null;
+let clearMapRenderWait = () => {};
 const isFullScreen = ref(false);
 const { t } = useI18n();
 
@@ -399,7 +403,7 @@ onActivated(async () => {
   await nextTick();
   if (!map.value) return;
   if (needsContentRender) {
-    renderMapContent(false);
+    requestMapContentRender();
     map.value.resize();
   }
   if (map.value && mapStore.mergedData?.length > 0) {
@@ -407,7 +411,16 @@ onActivated(async () => {
   }
 });
 
+onDeactivated(() => {
+  if (isRenderingMap.value) {
+    needsContentRender = true;
+    renderMapContent(false);
+  }
+  cancelMapContentRender();
+});
+
 onBeforeUnmount(() => {
+  cancelMapContentRender();
   adminBoundaryRequestId += 1;
   clearIsoplethLayers();
   clearDotHeatmapLayers();
@@ -426,13 +439,13 @@ watch(
     () => {
       // 視圖內容變更時只重繪，不在這裡自行判斷是否 reset；
       // reset 邊界統一由 requestMapFitView -> fitViewKey watcher 控制。
-      renderMapContent(false);
+      requestMapContentRender();
     },
     { deep: true }
 );
 
 watch(() => mapStore.showCustomData, () => {
-  renderMapContent(false); // 切換自定義數據顯示時不重置視角
+  requestMapContentRender(); // 切換自定義數據顯示時不重置視角
 });
 
 // 監聽 resultCache.mode 變化，更新 isMiddleChineseMode
@@ -485,7 +498,7 @@ const initMap = () => {
   map.value.on('resize', () => {
     if (!isMapStyleReady || !pointStyleSignature || !map.value.getLayer(POINT_LAYER_ID)) return;
     const labelStyle = ['base', 'feature'].includes(mapStore.mode) ? getPointLabelStyle(mapStore.mode) : null;
-    if (getPointStyleSignature(mapStore.mode, labelStyle) !== pointStyleSignature) renderMapContent(false);
+    if (getPointStyleSignature(mapStore.mode, labelStyle) !== pointStyleSignature) requestMapContentRender();
   });
 
   map.value.on('load', () => {
@@ -508,8 +521,53 @@ const initMap = () => {
   });
 };
 
+const cancelMapContentRender = () => {
+  mapRenderVersion += 1;
+  if (mapRenderFrame !== null) cancelAnimationFrame(mapRenderFrame);
+  mapRenderFrame = null;
+  clearMapRenderWait();
+  clearMapRenderWait = () => {};
+  isRenderingMap.value = false;
+};
+
+const requestMapContentRender = () => {
+  if (!map.value || !isMapStyleReady) return;
+  cancelMapContentRender();
+  if (!mapContainer.value?.isConnected) {
+    renderMapContent(false);
+    return;
+  }
+  const version = mapRenderVersion;
+  isRenderingMap.value = true;
+  // Let Vue paint the overlay before synchronous canvas/GeoJSON preparation.
+  mapRenderFrame = requestAnimationFrame(() => {
+    if (version !== mapRenderVersion) return;
+    mapRenderFrame = requestAnimationFrame(() => {
+      mapRenderFrame = null;
+      if (version !== mapRenderVersion || !map.value) return;
+      try {
+        renderMapContent(false);
+        const targetMap = map.value;
+        const finish = () => { if (version === mapRenderVersion) cancelMapContentRender(); };
+        const sources = [POINT_SOURCE_ID, POINT_HOVER_SOURCE_ID, DOT_HEATMAP_SOURCE_ID, ISOPLETH_SOURCE_ID, ISOPLETH_POINT_SOURCE_ID];
+        const onRender = () => {
+          if (sources.every(id => !targetMap.getSource(id) || targetMap.isSourceLoaded(id))) finish();
+        };
+        const onError = event => { if (sources.includes(event.sourceId)) finish(); };
+        clearMapRenderWait = () => { targetMap.off('render', onRender); targetMap.off('error', onError); };
+        targetMap.on('render', onRender);
+        targetMap.on('error', onError);
+        targetMap.triggerRepaint();
+      } catch (error) {
+        cancelMapContentRender();
+        throw error;
+      }
+    });
+  });
+};
+
 // --- 核心渲染入口 ---
-const renderMapContent = async (shouldResetView = true) => {
+const renderMapContent = (shouldResetView = true) => {
   if (!map.value || !isMapStyleReady) return;
   needsContentRender = !mapContainer.value?.isConnected;
 
@@ -1736,13 +1794,19 @@ const toggleFullScreen = async () => {
 
 const handleStyleChange = () => {
   if (!map.value) return;
+  cancelMapContentRender();
+  isRenderingMap.value = true;
+  const targetMap = map.value;
+  const onError = event => { if (!event.sourceId) cancelMapContentRender(); };
+  targetMap.on('error', onError);
+  clearMapRenderWait = () => targetMap.off('error', onError);
   const newStyle = mapStyle(currentStyleKey.value);
   isMapStyleReady = false;
   clearPointLayer();
   map.value.setStyle(newStyle);
   map.value.once('style.load', () => {
     isMapStyleReady = true;
-    renderMapContent(false);
+    requestMapContentRender();
   });
 };
 

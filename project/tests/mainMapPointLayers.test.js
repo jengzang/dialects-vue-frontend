@@ -75,6 +75,8 @@ vi.mock('maplibre-gl', () => {
     setStyle() { this.sources.clear(); this.layers.clear(); this.images.clear() }
     flyTo() {}
     resize() {}
+    isSourceLoaded() { return true }
+    triggerRepaint() { this.emit('render') }
     remove() { this.removed = true; this.canvasContainer.remove() }
   }
   class Popup {
@@ -121,6 +123,8 @@ function hit(map, index, type = 'click', longitude = 113) {
 }
 
 beforeEach(() => {
+  vi.stubGlobal('requestAnimationFrame', callback => { callback(); return 0 })
+  vi.stubGlobal('cancelAnimationFrame', vi.fn())
   Object.assign(mapStore, { mode: 'dot', mapData: null, mergedData: [], isoplethPayload: null, showCustomData: false, adminBoundary: null, fitViewKey: 0, divideMapView: false })
   maps.length = 0; popups.length = 0; markers.length = 0
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
@@ -133,9 +137,65 @@ afterEach(() => {
   mounted.splice(0).forEach(({ app, host }) => { app.unmount(); host.remove() })
   vi.restoreAllMocks()
   vi.clearAllMocks()
+  vi.unstubAllGlobals()
 })
 
 describe('main map point layers', () => {
+  it('paints loading before preparing a switched mode and keeps it until its source renders', async () => {
+    const map = await mountMap()
+    const frames = []
+    vi.stubGlobal('requestAnimationFrame', callback => { frames.push(callback); return frames.length })
+    vi.spyOn(map, 'triggerRepaint').mockImplementation(() => {})
+    const loaded = vi.spyOn(map, 'isSourceLoaded').mockReturnValue(false)
+    mapStore.mapData = { coordinates_locations: [['广州', [113, 23]]] }
+    mapStore.mode = 'base'; await nextTick()
+    const host = mounted.at(-1).host
+    expect(host.querySelector('.loading-overlay')).not.toBeNull()
+    expect(pointFeatures(map)).toHaveLength(0)
+    frames.shift()(); await nextTick()
+    expect(pointFeatures(map)).toHaveLength(0)
+    frames.shift()(); await nextTick()
+    expect(pointFeatures(map)).toHaveLength(1)
+    map.emit('render'); await nextTick()
+    expect(host.querySelector('.loading-overlay')).not.toBeNull()
+    map.emit('error', { sourceId: 'basemap' }); await nextTick()
+    expect(host.querySelector('.loading-overlay')).not.toBeNull()
+    loaded.mockReturnValue(true); map.emit('render'); await nextTick()
+    expect(host.querySelector('.loading-overlay')).toBeNull()
+    expect(map.handlers.filter(handler => ['render', 'error'].includes(handler.type))).toHaveLength(0)
+  })
+
+  it('keeps style-switch loading while query data changes and draws the latest data after style.load', async () => {
+    const map = await mountMap()
+    const host = mounted.at(-1).host
+    map.component.handleStyleChange(); await nextTick()
+    expect(host.querySelector('.loading-overlay')).not.toBeNull()
+    mapStore.mode = 'base'
+    mapStore.mapData = { coordinates_locations: [['广州', [113, 23]]] }
+    await nextTick()
+    expect(host.querySelector('.loading-overlay')).not.toBeNull()
+    map.emit('style.load'); await nextTick()
+    expect(pointFeatures(map)).toHaveLength(1)
+    expect(host.querySelector('.loading-overlay')).toBeNull()
+  })
+
+  it('cancels an obsolete switch and removes pending loading on unmount', async () => {
+    const map = await mountMap()
+    const frames = []
+    vi.stubGlobal('requestAnimationFrame', callback => { frames.push(callback); return frames.length })
+    mapStore.mapData = { coordinates_locations: [['广州', [113, 23]]] }
+    mapStore.mode = 'base'; await nextTick()
+    mapStore.mode = 'heatmap'; await nextTick()
+    while (frames.length) frames.shift()()
+    await nextTick()
+    expect(map.getLayer('map-points-layer')).toBeUndefined()
+    mapStore.mode = 'base'; await nextTick()
+    const { app, host } = mounted.pop(); app.unmount(); host.remove()
+    while (frames.length) frames.shift()()
+    expect(map.images.size).toBe(0)
+    expect(map.handlers.filter(handler => ['render', 'error'].includes(handler.type))).toHaveLength(0)
+  })
+
   it('defers query redraws while cached and draws the latest feature on reactivation', async () => {
     const visible = ref(true)
     const props = reactive({ activeFeature: '旧中古' })
@@ -148,7 +208,14 @@ describe('main map point layers', () => {
     const map = maps.at(-1); map.emit('load'); await nextTick()
     hit(map, 0)
     const oldPopup = popups.at(-1)
+    const frames = []
+    vi.stubGlobal('requestAnimationFrame', callback => { frames.push(callback); return frames.length })
+    mapStore.showCustomData = true; await nextTick()
     visible.value = false; await nextTick()
+    expect(oldPopup.open).toBe(false)
+    expect(oldPopup.node.childNodes).toHaveLength(0)
+    vi.stubGlobal('requestAnimationFrame', callback => { callback(); return 0 })
+    while (frames.length) frames.shift()()
     const addSource = vi.spyOn(map, 'addSource')
     mapStore.mode = 'feature'
     props.activeFeature = '中古'

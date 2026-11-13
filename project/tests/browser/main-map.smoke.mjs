@@ -71,6 +71,7 @@ try {
     })
     await page.waitForFunction(() => window.mainMap.getSource('map-points-source') && window.mainMap.isSourceLoaded('map-points-source') && !window.mainMap.isMoving() && window.mainMap.queryRenderedFeatures({ layers: ['map-points-layer'] }).length >= 2)
     await page.evaluate(() => new Promise(resolve => { window.mainMap.once('idle', resolve); window.mainMap.triggerRepaint() }))
+    await page.locator('.loading-overlay').waitFor({ state: 'hidden' })
     await page.mouse.move(0, 0)
     // Separate taps across mode changes from MapLibre's existing double-tap zoom gesture.
     if (touch) await page.waitForTimeout(350)
