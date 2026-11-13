@@ -189,6 +189,10 @@ const DOT_HEATMAP_SOURCE_ID = 'dot-heatmap-source';
 const DOT_HEATMAP_LAYER_ID = 'dot-heatmap-layer';
 const ADMIN_BOUNDARY_SOURCE_ID = 'admin-boundary-source';
 const ADMIN_BOUNDARY_LAYER_ID = 'admin-boundary-line-layer';
+const POINT_SOURCE_ID = 'map-points-source';
+const POINT_LAYER_ID = 'map-points-layer';
+const POINT_HOVER_SOURCE_ID = 'map-points-hover-source';
+const POINT_HOVER_LAYER_ID = 'map-points-hover-layer';
 
 const mapContainer = ref(null);
 const map = shallowRef(null);
@@ -281,6 +285,12 @@ const toggleBaseMode = (e) => {
 // 管理所有的 Marker 實例，用於清除
 let currentMarkers = [];
 let currentPopupMountTargets = [];
+let pointEntries = [];
+let pointPopup = null;
+let pointPopupIndex = null;
+let hoveredPointIndex = null;
+const pointImages = new Map();
+const pointHandlers = new Map();
 let isoplethClickHandler = null;
 const isoplethLegend = ref(null);
 
@@ -516,10 +526,171 @@ const renderMapContent = async (shouldResetView = true) => {
 };
 
 const clearMarkers = () => {
+  clearPointLayer();
   currentPopupMountTargets.forEach(target => render(null, target));
   currentPopupMountTargets = [];
   currentMarkers.forEach(marker => marker.remove());
   currentMarkers = [];
+};
+
+const closePointPopup = () => {
+  pointPopup?.remove();
+  pointPopup = null;
+  pointPopupIndex = null;
+};
+
+const clearPointLayer = () => {
+  closePointPopup();
+  if (map.value) {
+    pointHandlers.forEach((handler, event) => map.value.off(event, POINT_LAYER_ID, handler));
+    map.value.getCanvas().style.cursor = '';
+    [POINT_HOVER_LAYER_ID, POINT_LAYER_ID].forEach(id => {
+      if (map.value.getLayer(id)) map.value.removeLayer(id);
+    });
+    [POINT_HOVER_SOURCE_ID, POINT_SOURCE_ID].forEach(id => {
+      if (map.value.getSource(id)) map.value.removeSource(id);
+    });
+    pointImages.forEach(id => {
+      if (map.value.hasImage(id)) map.value.removeImage(id);
+    });
+  }
+  pointHandlers.clear();
+  pointImages.clear();
+  pointEntries = [];
+  hoveredPointIndex = null;
+};
+
+// Share a small circle texture per color, including the original border and shadow.
+const getPointImage = (color, mode, hover = false) => {
+  const key = JSON.stringify([color, mode, hover]);
+  if (pointImages.has(key)) return pointImages.get(key);
+  const id = `map-point-image-${pointImages.size}`;
+  const ratio = 2;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 64 * ratio;
+  const context = canvas.getContext('2d');
+  context.scale(ratio, ratio);
+  const radius = mode === 'dot' ? 7 : hover ? 11 : 9;
+  context.beginPath();
+  context.arc(32, 32, radius - 1, 0, Math.PI * 2);
+  context.fillStyle = 'transparent';
+  if (color) context.fillStyle = color;
+  context.strokeStyle = mode === 'dot' ? '#000' : '#fff';
+  context.lineWidth = 2;
+  context.shadowColor = mode === 'dot' ? 'rgba(0,0,0,0.5)' : hover ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.3)';
+  context.shadowBlur = (mode === 'dot' ? 2 : hover ? 12 : 6) * ratio;
+  context.shadowOffsetY = (mode === 'dot' ? 0 : hover ? 4 : 2) * ratio;
+  context.fill();
+  context.shadowColor = 'transparent';
+  context.stroke();
+  if (hover) {
+    context.beginPath();
+    context.arc(32, 32, radius + 1.5, 0, Math.PI * 2);
+    context.strokeStyle = 'rgba(255,255,255,0.8)';
+    context.lineWidth = 3;
+    context.stroke();
+  }
+  map.value.addImage(id, context.getImageData(0, 0, canvas.width, canvas.height), { pixelRatio: ratio });
+  pointImages.set(key, id);
+  return id;
+};
+
+const getPointHit = (event) => {
+  // Later DOM markers used to cover earlier ones at the same coordinate.
+  return (event.features || [])
+    .map(feature => pointEntries[feature.properties?.index])
+    .filter(Boolean)
+    .filter(entry => {
+      if (!event.point) return true;
+      const coordinate = [...entry.coordinate];
+      coordinate[0] += 360 * Math.round((event.lngLat.lng - coordinate[0]) / 360);
+      const screen = map.value.project(coordinate);
+      const halfSize = mapStore.mode === 'dot' ? 7 : hoveredPointIndex === entry.index ? 11 : 9;
+      return Math.abs(event.point.x - screen.x) <= halfSize && Math.abs(event.point.y - screen.y) <= halfSize;
+    })
+    .sort((a, b) => (mapStore.mode === 'compare'
+      ? Number(b.index === hoveredPointIndex) - Number(a.index === hoveredPointIndex)
+      : 0) || b.index - a.index)[0];
+};
+
+const showPointPopup = (entry, event, toggle = false) => {
+  const wasOpen = pointPopupIndex === entry.index && pointPopup?.isOpen();
+  closePointPopup();
+  if (toggle && wasOpen) return;
+  const mode = mapStore.mode;
+  const popup = trackNativeMapPopup(new maplibregl.Popup(mode === 'dot'
+    ? { offset: 10, closeButton: false }
+    : { offset: 15, maxWidth: '350px', className: 'map-popup-wrapper' }));
+  let node;
+  if (mode === 'dot') {
+    node = document.createElement('div');
+    const title = document.createElement('b');
+    title.textContent = entry.locName;
+    node.append(title, document.createElement('br'), document.createTextNode(entry.fullRegion));
+  } else {
+    node = createComparePopupNode(entry.item);
+  }
+  const coordinate = [...entry.coordinate];
+  coordinate[0] += 360 * Math.round((event.lngLat.lng - coordinate[0]) / 360);
+  pointPopup = popup;
+  pointPopupIndex = entry.index;
+  popup.on('close', () => {
+    render(null, node);
+    currentPopupMountTargets = currentPopupMountTargets.filter(target => target !== node);
+    if (pointPopup === popup) {
+      pointPopup = null;
+      pointPopupIndex = null;
+    }
+  });
+  popup.setLngLat(coordinate).setDOMContent(node).addTo(map.value);
+};
+
+const drawPointLayer = (entries, mode) => {
+  pointEntries = entries.map((entry, index) => ({ ...entry, index }));
+  if (!pointEntries.length) return;
+  const features = pointEntries.map(entry => ({
+    type: 'Feature', id: entry.index,
+    geometry: { type: 'Point', coordinates: entry.coordinate.slice(0, 2) },
+    properties: { index: entry.index, image: getPointImage(entry.color, mode) },
+  }));
+  map.value.addSource(POINT_SOURCE_ID, { type: 'geojson', data: { type: 'FeatureCollection', features } });
+  const layout = {
+    'icon-image': ['get', 'image'], 'icon-allow-overlap': true, 'icon-ignore-placement': true,
+    'icon-rotation-alignment': 'viewport', 'icon-pitch-alignment': 'viewport',
+    'symbol-sort-key': ['get', 'index'], 'symbol-z-order': 'source',
+  };
+  map.value.addLayer({
+    id: POINT_LAYER_ID, type: 'symbol', source: POINT_SOURCE_ID, layout,
+    paint: { 'icon-opacity': mode === 'dot' ? 0.8 : ['case', ['boolean', ['feature-state', 'hover'], false], 0, 1] },
+  });
+  if (mode === 'compare') {
+    map.value.addSource(POINT_HOVER_SOURCE_ID, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+    map.value.addLayer({ id: POINT_HOVER_LAYER_ID, type: 'symbol', source: POINT_HOVER_SOURCE_ID, layout: { ...layout } });
+  }
+  const updateHover = event => {
+    const entry = getPointHit(event);
+    map.value.getCanvas().style.cursor = entry ? 'pointer' : '';
+    if (hoveredPointIndex === (entry?.index ?? null)) return;
+    if (mode === 'compare') {
+      if (hoveredPointIndex !== null) map.value.setFeatureState({ source: POINT_SOURCE_ID, id: hoveredPointIndex }, { hover: false });
+      if (entry) map.value.setFeatureState({ source: POINT_SOURCE_ID, id: entry.index }, { hover: true });
+      map.value.getSource(POINT_HOVER_SOURCE_ID).setData({ type: 'FeatureCollection', features: entry ? [{
+        ...features[entry.index], properties: { index: entry.index, image: getPointImage(entry.color, mode, true) },
+      }] : [] });
+    } else if (mode === 'dot') {
+      if (entry) showPointPopup(entry, event);
+      else closePointPopup();
+    }
+    hoveredPointIndex = entry?.index ?? null;
+  };
+  pointHandlers.set('mouseenter', updateHover);
+  pointHandlers.set('mousemove', updateHover);
+  pointHandlers.set('mouseleave', () => updateHover({ features: [] }));
+  pointHandlers.set('click', event => {
+    const entry = getPointHit(event);
+    if (entry) showPointPopup(entry, event, mode !== 'dot');
+  });
+  pointHandlers.forEach((handler, event) => map.value.on(event, POINT_LAYER_ID, handler));
 };
 
 const clearIsoplethLayers = () => {
@@ -712,26 +883,9 @@ const drawDotMap = () => {
     levelColorMap[lvl] = CATEGORY_PALETTE[idx % CATEGORY_PALETTE.length];
   });
 
-  // 4. 繪製 (保持不變)
-  pointsToDraw.forEach(p => {
-    const color = levelColorMap[p.targetRegion];
-
-    const el = document.createElement('div');
-    el.className = 'marker-dot';
-    el.style.backgroundColor = color;
-
-    const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
-        .setLngLat(p.coords)
-        .addTo(map.value);
-
-    const popup = trackNativeMapPopup(new maplibregl.Popup({ offset: 10, closeButton: false }))
-        .setHTML(`<b>${p.locName}</b><br>${p.fullRegion}`);
-
-    el.addEventListener('mouseenter', () => marker.setPopup(popup).togglePopup());
-    el.addEventListener('mouseleave', () => popup.remove());
-
-    currentMarkers.push(marker);
-  });
+  drawPointLayer(pointsToDraw.map(point => ({
+    ...point, coordinate: point.coords, color: levelColorMap[point.targetRegion],
+  })), 'dot');
 };
 
 // =======================================================
@@ -855,72 +1009,8 @@ const handleDetailBtnClick = (item) => {
 // 邏輯 4: 比較模式 - 用圓點和顏色顯示比較結果
 // =======================================================
 const drawCompareMap = () => {
-  // console.log('🗺️ drawCompareMap 被调用')
-  // console.log('📦 mapStore.mergedData:', mapStore.mergedData)
-  // console.log('📦 mergedData 长度:', mapStore.mergedData?.length)
-
-  if (!mapStore.mergedData || mapStore.mergedData.length === 0) {
-    console.warn('⚠️ mergedData 为空，无法绘制')
-    return;
-  }
-
-  const items = mapStore.mergedData;
-  // console.log(`🎨 开始绘制 ${items.length} 个标记`)
-
-  items.forEach((item, index) => {
-    // console.log(`  🔸 标记 ${index + 1}:`, item)
-
-    // 坐標驗證
-    if (!isValidCoordinatePair(item.coordinate)) {
-      console.warn(`  ⚠️ 标记 ${index + 1} 坐标无效:`, item.coordinate)
-      return;
-    }
-
-    // 創建圓點標記
-    const el = document.createElement('div');
-    el.className = 'marker-dot-compare';
-    el.style.backgroundColor = item.color;
-    el.style.width = '14px';
-    el.style.height = '14px';
-    el.style.borderRadius = '50%';
-    el.style.border = '2px solid white';
-    el.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
-    el.style.cursor = 'pointer';
-
-    // 鼠标悬停效果 - 使用 box-shadow 而不是 transform 避免位置偏移
-    el.addEventListener('mouseenter', () => {
-      el.style.boxShadow = '0 0 0 3px rgba(255,255,255,0.80), 0 4px 12px rgba(0,0,0,0.4)';
-      el.style.width = '18px';
-      el.style.height = '18px';
-      el.style.zIndex = '1000';
-    });
-    el.addEventListener('mouseleave', () => {
-      el.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
-      el.style.width = '14px';
-      el.style.height = '14px';
-      el.style.zIndex = 'auto';
-    });
-
-    // 創建彈窗內容
-    const popupContent = createComparePopupNode(item);
-
-    // 創建彈窗
-    const popup = trackNativeMapPopup(new maplibregl.Popup({
-      offset: 15,
-      maxWidth: '350px',
-      className: 'map-popup-wrapper'
-    })).setDOMContent(popupContent);
-
-    const marker = new maplibregl.Marker({ element: el })
-      .setLngLat(item.coordinate)
-      .setPopup(popup)
-      .addTo(map.value);
-
-    currentMarkers.push(marker);
-    // console.log(`  ✅ 标记 ${index + 1} 已添加到地图`)
-  });
-
-  // console.log(`✅ 绘制完成，共添加 ${currentMarkers.length} 个标记`)
+  const items = (mapStore.mergedData || []).filter(item => isValidCoordinatePair(item.coordinate));
+  drawPointLayer(items.map(item => ({ item, coordinate: item.coordinate, color: item.color })), 'compare');
 };
 
 // =======================================================
@@ -1408,7 +1498,7 @@ function drawAdminBoundary(featureCollection) {
       'line-width': 1.5,
       'line-opacity': 0.9
     }
-  });
+  }, map.value.getLayer(POINT_LAYER_ID) ? POINT_LAYER_ID : undefined);
 }
 
 // 創建比較模式的彈窗內容
@@ -1461,6 +1551,7 @@ const handleStyleChange = () => {
   if (!map.value) return;
   const newStyle = mapStyle(currentStyleKey.value);
   isMapStyleReady = false;
+  clearPointLayer();
   map.value.setStyle(newStyle);
   map.value.once('style.load', () => {
     isMapStyleReady = true;
