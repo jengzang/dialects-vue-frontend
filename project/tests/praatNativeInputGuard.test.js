@@ -19,16 +19,16 @@ function readSource(relativePath) {
 }
 
 describe('Praat native input guard', () => {
-  it('exposes WAV-only accept values for native Praat file picking', () => {
-    expect(getPraatInputAccept('ios')).toBe('.wav,audio/wav,audio/x-wav')
-    expect(getPraatInputAccept('android')).toBe('.wav,audio/wav,audio/x-wav')
+  it('exposes Web accept values for native Praat file picking', () => {
+    expect(getPraatInputAccept('ios')).toBe(getPraatInputAccept('web'))
+    expect(getPraatInputAccept('android')).toBe(getPraatInputAccept('web'))
     expect(getPraatInputAccept('web')).toContain('.mp3')
   })
 
-  it('rejects non-WAV files on native platforms before analysis', () => {
+  it('accepts Web-supported files on native platforms before analysis', () => {
     expect(isPraatFileAcceptedOnPlatform({ name: 'tone.wav', type: 'audio/wav' }, 'ios')).toBe(true)
-    expect(isPraatFileAcceptedOnPlatform({ name: 'tone.mp3', type: 'audio/mpeg' }, 'ios')).toBe(false)
-    expect(isPraatFileAcceptedOnPlatform({ name: 'tone.m4a', type: 'audio/mp4' }, 'android')).toBe(false)
+    expect(isPraatFileAcceptedOnPlatform({ name: 'tone.mp3', type: 'audio/mpeg' }, 'ios')).toBe(true)
+    expect(isPraatFileAcceptedOnPlatform({ name: 'tone.m4a', type: 'audio/mp4' }, 'android')).toBe(true)
     expect(isPraatFileAcceptedOnPlatform({ name: 'tone.m4a', type: 'audio/mp4' }, 'web')).toBe(true)
   })
 
@@ -38,7 +38,7 @@ describe('Praat native input guard', () => {
     expect(source).toContain(':accept="fileInputAccept"')
     expect(source).toContain('accept: fileInputAccept.value')
     expect(source).toContain('isPraatFileAcceptedOnPlatform(file, praatPlatformTarget)')
-    expect(source).toContain("t('praat.audioInput.errors.nativeUnsupportedFormat')")
+    expect(source).not.toContain("t('praat.audioInput.errors.nativeUnsupportedFormat')")
   })
 
   it('keeps a second guard in the page-level start analysis action', () => {
@@ -46,12 +46,12 @@ describe('Praat native input guard', () => {
 
     expect(source).toContain("import { getCurrentRuntimePlatform, isPraatFileAcceptedOnPlatform } from '@/platform/index.js'")
     expect(source).toContain('isPraatFileAcceptedOnPlatform(audioFile.value, praatPlatformTarget)')
-    expect(source).toContain("t('praat.audioInput.errors.nativeUnsupportedFormat')")
+    expect(source).not.toContain("t('praat.audioInput.errors.nativeUnsupportedFormat')")
   })
 
-  it('documents the native-only WAV message in every Praat locale', () => {
+  it('provides the shared unsupported format message in every Praat locale', () => {
     for (const locale of [enPraat, zhCNPraat, zhHantPraat]) {
-      expect(locale.audioInput.errors.nativeUnsupportedFormat).toBeTruthy()
+      expect(locale.audioInput.errors.unsupportedFormat).toBeTruthy()
     }
   })
 })

@@ -608,11 +608,7 @@ const startAnalysis = async () => {
     return
   }
   if (!isPraatFileAcceptedOnPlatform(audioFile.value, praatPlatformTarget)) {
-    showError(
-      praatPlatformTarget === 'ios' || praatPlatformTarget === 'android'
-        ? t('praat.audioInput.errors.nativeUnsupportedFormat')
-        : t('praat.audioInput.errors.unsupportedFormat')
-    )
+    showError(t('praat.audioInput.errors.unsupportedFormat'))
     return
   }
 

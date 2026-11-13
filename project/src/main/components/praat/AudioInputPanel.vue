@@ -115,11 +115,7 @@ const validateFile = (file) => {
   }
 
   if (!isPraatFileAcceptedOnPlatform(file, praatPlatformTarget)) {
-    showError(
-      praatPlatformTarget === 'ios' || praatPlatformTarget === 'android'
-        ? t('praat.audioInput.errors.nativeUnsupportedFormat')
-        : t('praat.audioInput.errors.unsupportedFormat')
-    )
+    showError(t('praat.audioInput.errors.unsupportedFormat'))
     return false
   }
 

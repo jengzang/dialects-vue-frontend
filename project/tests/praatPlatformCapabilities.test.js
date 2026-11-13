@@ -19,13 +19,13 @@ describe('Praat platform capabilities', () => {
     expect(getPraatInputAccept('web')).toBe('.wav,.mp3,.m4a,.webm,.ogg,.flac,.aac,audio/*')
   })
 
-  it.each(['ios', 'android'])('uses the remote API by default with WAV-only input on %s', (target) => {
+  it.each(['ios', 'android'])('uses the remote API by default with Web input formats on %s', (target) => {
     expect(getPraatPlatformCapabilities(target)).toMatchObject({
       target,
       preferredEngine: 'remote-api',
       fallbackEngine: 'local-python',
-      acceptsAllBackendFormats: false,
-      inputFormats: ['wav'],
+      acceptsAllBackendFormats: true,
+      inputFormats: ['wav', 'mp3', 'm4a', 'webm', 'ogg', 'flac', 'aac'],
       temporaryAudioPolicy: {
         originalInput: 'delete-after-analysis',
         normalizedAudio: 'delete-after-analysis',
@@ -33,13 +33,13 @@ describe('Praat platform capabilities', () => {
         runMetadata: 'retain',
       },
     })
-    expect(getPraatInputAccept(target)).toBe('.wav,audio/wav,audio/x-wav')
+    expect(getPraatInputAccept(target)).toBe(getPraatInputAccept('web'))
   })
 
   it('validates selected file names against target-specific Praat input formats', () => {
     expect(isPraatFileAcceptedOnPlatform({ name: 'sample.wav', type: 'audio/wav' }, 'ios')).toBe(true)
-    expect(isPraatFileAcceptedOnPlatform({ name: 'sample.m4a', type: 'audio/mp4' }, 'ios')).toBe(false)
-    expect(isPraatFileAcceptedOnPlatform({ name: 'sample.flac', type: 'audio/flac' }, 'android')).toBe(false)
+    expect(isPraatFileAcceptedOnPlatform({ name: 'sample.m4a', type: 'audio/mp4' }, 'ios')).toBe(true)
+    expect(isPraatFileAcceptedOnPlatform({ name: 'sample.flac', type: 'audio/flac' }, 'android')).toBe(true)
     expect(isPraatFileAcceptedOnPlatform({ name: 'sample.flac', type: 'audio/flac' }, 'web')).toBe(true)
   })
 
@@ -57,19 +57,22 @@ describe('Praat platform capabilities', () => {
     { name: 'flac', type: '' },
   ])('preserves legacy Web acceptance for $name ($type)', (file) => {
     expect(isPraatFileAcceptedOnPlatform(file, 'web')).toBe(true)
-    expect(isPraatFileAcceptedOnPlatform(file, 'ios')).toBe(false)
-    expect(isPraatFileAcceptedOnPlatform(file, 'android')).toBe(false)
+    expect(isPraatFileAcceptedOnPlatform(file, 'ios')).toBe(true)
+    expect(isPraatFileAcceptedOnPlatform(file, 'android')).toBe(true)
   })
 
-  it('continues rejecting unsupported Web audio', () => {
-    expect(isPraatFileAcceptedOnPlatform({ name: 'recording.aiff', type: 'audio/aiff' }, 'web')).toBe(false)
+  it.each(['web', 'ios', 'android'])('accepts every Web format and rejects unsupported audio on %s', (target) => {
+    for (const extension of getPraatPlatformCapabilities('web').inputFormats) {
+      expect(isPraatFileAcceptedOnPlatform({ name: `recording.${extension}`, type: '' }, target)).toBe(true)
+    }
+    expect(isPraatFileAcceptedOnPlatform({ name: 'recording.aiff', type: 'audio/aiff' }, target)).toBe(false)
   })
 
   it('keeps native local Python available as an explicit fallback in the acceptance matrix', () => {
     expect(PLATFORM_FEATURE_MATRIX.praatTools.capabilities).toMatchObject({
       web: { preferredEngine: 'remote-api' },
-      ios: { preferredEngine: 'remote-api', fallbackEngine: 'local-python', inputFormats: ['wav'] },
-      android: { preferredEngine: 'remote-api', fallbackEngine: 'local-python', inputFormats: ['wav'] },
+      ios: { preferredEngine: 'remote-api', fallbackEngine: 'local-python', inputFormats: ['wav', 'mp3', 'm4a', 'webm', 'ogg', 'flac', 'aac'] },
+      android: { preferredEngine: 'remote-api', fallbackEngine: 'local-python', inputFormats: ['wav', 'mp3', 'm4a', 'webm', 'ogg', 'flac', 'aac'] },
     })
 
     expect(PLATFORM_FEATURE_MATRIX.praatTools.acceptance.ios).toEqual(expect.arrayContaining([
