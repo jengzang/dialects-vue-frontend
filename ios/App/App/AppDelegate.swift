@@ -66,6 +66,25 @@ class DialectsBridgeViewController: CAPBridgeViewController {
     private var keyboardVisible = false
     private var overlayBackGesture: UIScreenEdgePanGestureRecognizer?
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        guard let webView = webView else { return }
+
+        // Keep every page clear of the status bar, camera cutout and home indicator.
+        let container = UIView()
+        container.backgroundColor = .systemBackground
+        view = container
+        webView.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(webView)
+        let safeArea = container.safeAreaLayoutGuide
+        NSLayoutConstraint.activate([
+            webView.topAnchor.constraint(equalTo: safeArea.topAnchor),
+            webView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor),
+            webView.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor),
+            webView.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor)
+        ])
+    }
+
     override func capacitorDidLoad() {
         bridge?.registerPluginInstance(DialectsNativePlugin())
         webView?.allowsBackForwardNavigationGestures = true
