@@ -2,8 +2,8 @@ import { readSessionCache, writeSessionCache } from '@/composables/core/sessionC
 
 export const PARTITION_DATA_CACHE_KEY = 'partition_data_cache'
 export const PARTITION_POINTS_CACHE_KEY = 'partition_points_cache'
+export const DEFAULT_TREE_CACHE_KEY = 'partition_default_tree_cache'
 
-// A fresh page starts a fresh cache; sessionStorage must not keep old default trees alive.
 const defaultTrees = new Map()
 const pendingTrees = new Map()
 const resolvedItems = new Map()
@@ -40,11 +40,20 @@ export function usePartitionCache() {
     const key = JSON.stringify([2, identity, mode])
     if (defaultTrees.has(key)) return defaultTrees.get(key)
     if (pendingTrees.has(key)) return pendingTrees.get(key)
+
+    const sessionTrees = readSessionCache(DEFAULT_TREE_CACHE_KEY) || {}
+    const cached = sessionTrees[key]
+    if (cached) {
+      defaultTrees.set(key, cached)
+      return cached
+    }
+
     const pending = Promise.resolve().then(loadTree).then(tree => {
       if (tree?.schema_version !== 2 || tree.region_mode !== mode || !Array.isArray(tree.nodes)) {
         throw new Error('Invalid default partition tree')
       }
       defaultTrees.set(key, tree)
+      writeSessionCache(DEFAULT_TREE_CACHE_KEY, { ...sessionTrees, [key]: tree })
       return tree
     }).finally(() => pendingTrees.delete(key))
     pendingTrees.set(key, pending)
