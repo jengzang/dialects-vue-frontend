@@ -19,6 +19,14 @@ beforeEach(() => { vi.useFakeTimers(); mocks.token = null; vi.clearAllMocks() })
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals() })
 
 describe('HTTP request lifecycle', () => {
+  it('sends a successful business request once without issuing OPTIONS itself', async () => {
+    const fetch = vi.fn().mockResolvedValue(new Response('{}', { headers: { 'Content-Type': 'application/json' } }))
+    vi.stubGlobal('fetch', fetch)
+    await api('/api/test', { method: 'POST', body: { value: 1 } })
+    expect(fetch).toHaveBeenCalledTimes(1)
+    expect(fetch).toHaveBeenCalledWith('/api/test', expect.objectContaining({ method: 'POST' }))
+  })
+
   it('sends keepalive reports immediately with the current token', async () => {
     mocks.token = 'current-token'
     const fetch = vi.fn().mockResolvedValue(new Response('{}', { headers: { 'Content-Type': 'application/json' } }))
