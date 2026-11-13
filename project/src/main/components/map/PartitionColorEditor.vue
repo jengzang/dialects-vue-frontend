@@ -7,9 +7,9 @@
     <div class="editor-content">
       <div class="editor-toolbar">
         <RadioGroup v-model="mode" name="partition-color-source" :options="modeOptions" />
+        <input v-model="search" class="glass-field editor-search" data-shape="search" :placeholder="t('map.partitionColors.search')" :aria-label="t('map.partitionColors.search')">
         <button type="button" class="pill-btn reset-colors" :disabled="loading || !!error" @click="resetColors">{{ t('map.partitionColors.reset') }}</button>
       </div>
-      <input v-model="search" class="glass-field" data-shape="search" :placeholder="t('map.partitionColors.search')" :aria-label="t('map.partitionColors.search')">
       <small class="editor-hint">{{ t('map.partitionColors.sessionHint') }}</small>
       <div v-if="loading" class="main-list-state">{{ t('common.label.loading') }}</div>
       <div v-else-if="error" class="main-list-state" data-state="error">
@@ -27,6 +27,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import * as OpenCCCN2T from 'opencc-js/cn2t'
 import { userStore } from '@/main/store/store.js'
 import { getPartitions } from '@/api/main/geo/LocationAndRegion.js'
 import { usePartitionCache } from '@/composables/data/usePartitionCache.js'
@@ -35,6 +36,7 @@ import RadioGroup from '@/components/selector/RadioGroup.vue'
 import PartitionColorTreeItem from '@/main/components/TableAndTree/PartitionColorTreeItem.vue'
 
 const { t } = useI18n()
+const toTraditional = OpenCCCN2T.Converter({ from: 'cn', to: 'tw' })
 const { getDefaultTree } = usePartitionCache()
 const { loadPartitionColors, getPartitionColor, setPartitionColor, resetPartitionColor, colorVersion } = usePartitionColors()
 const mode = ref('map')
@@ -64,9 +66,11 @@ const modeOptions = computed(() => [
 ])
 const filteredNodes = computed(() => {
   const query = search.value.trim().toLocaleLowerCase()
+  const traditionalQuery = toTraditional(query)
   function filter(items) {
     return items.flatMap(node => {
-      if (!query || node.path.toLocaleLowerCase().includes(query)) return [node]
+      const path = node.path.toLocaleLowerCase()
+      if (!query || path.includes(query) || path.includes(traditionalQuery)) return [node]
       const children = filter(node.children || [])
       return children.length ? [{ ...node, children }] : []
     })
@@ -135,9 +139,14 @@ summary {
   justify-content: space-between;
   gap: 8px;
 
-  :deep(.liquid-radio-group) { gap: 4px 8px; }
+  :deep(.liquid-radio-group) { flex-shrink: 0; gap: 4px 8px; }
 }
+.editor-search { flex: 1; min-width: 0; }
 .reset-colors { flex-shrink: 0; }
+@media (max-aspect-ratio: 1 / 1) {
+  .editor-toolbar { flex-wrap: wrap; }
+  .editor-search { order: 1; flex-basis: 100%; }
+}
 .editor-hint { color: var(--text-secondary); font-size: var(--font-size-12); line-height: 1.6; }
 .color-tree { max-height: 320px; overflow-y: auto; padding: 6px 8px; }
 </style>
