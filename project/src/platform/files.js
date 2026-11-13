@@ -256,8 +256,18 @@ async function saveBlobWithCapacitor(blob, fileName, base64, options = {}) {
     ? await CapacitorShare.canShare()
     : { value: true }
 
-  if (canShareResult?.value) {
+  if (!canShareResult?.value) {
+    throw createPlatformFileError('NATIVE_SHARE_UNAVAILABLE', 'System sharing is unavailable')
+  }
+  try {
     await CapacitorShare.share(sharePayload)
+  } catch (error) {
+    if (isFilePickerCanceled(error)) {
+      const canceled = createPlatformFileError('NATIVE_SHARE_CANCELED', 'Share canceled', error)
+      canceled.name = 'AbortError'
+      throw canceled
+    }
+    throw error
   }
 
   return {
@@ -394,6 +404,9 @@ export function getPlatformFileService(options = {}) {
         }
       }
 
+      if (isNativeCapacitorApp(getGlobals(options))) {
+        throw createPlatformFileError('NATIVE_SHARE_UNAVAILABLE', 'System sharing is unavailable')
+      }
       return saveBlobWithBrowserDownload(blob, fileName, options)
     },
   }

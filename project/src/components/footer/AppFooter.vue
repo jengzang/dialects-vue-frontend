@@ -178,6 +178,8 @@
 </template>
 
 <script setup>
+import { getCurrentRuntimePlatform } from '@/platform/runtime.js'
+import { getPlatformShareUrl, shareNativeImage } from '@/platform/sharing.js'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { PhCircle, PhPalette, PhSun, PhMoon, PhDesktop, PhCaretDown, PhTranslate } from '@phosphor-icons/vue'
 import { useI18n } from 'vue-i18n'
@@ -366,6 +368,10 @@ function dataUrlToFile(dataUrl, filename) {
 }
 
 async function shareImageFile({ dataUrl, filename }) {
+  if (getCurrentRuntimePlatform().container === 'native-webview') {
+    await shareNativeImage(dataUrl, filename)
+    return true
+  }
   if (!navigator.share || !navigator.canShare) {
     return false
   }
@@ -390,7 +396,10 @@ async function copyShareUrl(url) {
 }
 
 async function shareCurrentPage() {
-  const target = new URL(window.location.href)
+  const target = new URL(getPlatformShareUrl(
+    window.location.href,
+    getCurrentRuntimePlatform().container === 'native-webview',
+  ))
   target.pathname = stripLocaleFromPath(target.pathname)
   const url = target.toString()
   const title = t(context.value.pageTitleKey)
