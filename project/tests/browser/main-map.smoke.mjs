@@ -12,6 +12,33 @@ try {
     page.on('pageerror', error => errors.push(error.message))
     await page.goto(`${process.env.MAP_SMOKE_BASE_URL || 'http://localhost:5173'}/tests/browser/main-map.html`)
     await page.waitForFunction(() => window.mainMap?.isStyleLoaded())
+    // Query results can arrive while the real MapPage is detached in KeepAlive.
+    await page.evaluate(async () => {
+      const { mapStore, feature, showMap, nextTick } = window.mainMapSmoke
+      mapStore.divideMapView = true
+      showMap.value = false
+      await nextTick()
+      mapStore.mode = 'feature'
+      feature.value = '中古'
+      mapStore.mapData = { coordinates_locations: [['广州', [113, 23]]] }
+      mapStore.mergedData = [{ location: '广州', feature: '中古', value: 'a', color: '#ff0', coordinate: [113, 23] }]
+      await nextTick()
+    })
+    assert.deepEqual(await page.evaluate(() => window.mainMapErrors), [])
+    await page.evaluate(async () => { window.mainMapSmoke.showMap.value = true; await window.mainMapSmoke.nextTick() })
+    await page.waitForFunction(() => window.mainMap.getLayer('map-points-layer') && window.mainMap.queryRenderedFeatures({ layers: ['map-points-layer'] }).some(feature => feature.properties.label === 'a'))
+    await page.locator('#base-switch-container').waitFor({ state: 'visible' })
+    await page.locator('#base-switch-container label').click()
+    await page.waitForFunction(() => window.mainMap.queryRenderedFeatures({ layers: ['map-points-layer'] }).some(feature => feature.properties.label === '广州'))
+    await page.locator('#base-switch-container label').click()
+    await page.waitForFunction(() => window.mainMap.queryRenderedFeatures({ layers: ['map-points-layer'] }).some(feature => feature.properties.label === 'a'))
+    await page.evaluate(async () => {
+      const { mapStore, feature, nextTick } = window.mainMapSmoke
+      feature.value = '测试'
+      mapStore.mode = 'dot'
+      mapStore.mergedData = []
+      await nextTick()
+    })
     await page.evaluate(async () => {
       const { mapStore, nextTick } = window.mainMapSmoke
       mapStore.mapData = {
@@ -21,7 +48,8 @@ try {
       await nextTick()
       window.mainMap.jumpTo({ center: [113, 23], zoom: 10 })
     })
-    await page.waitForFunction(() => window.mainMap.getSource('map-points-source') && window.mainMap.queryRenderedFeatures({ layers: ['map-points-layer'] }).length >= 2)
+    await page.waitForFunction(() => window.mainMap.getSource('map-points-source') && window.mainMap.isSourceLoaded('map-points-source') && !window.mainMap.isMoving() && window.mainMap.queryRenderedFeatures({ layers: ['map-points-layer'] }).length >= 2)
+    await page.evaluate(() => new Promise(resolve => { window.mainMap.once('idle', resolve); window.mainMap.triggerRepaint() }))
     const point = await page.evaluate(() => {
       const map = window.mainMap
       const screen = map.project([113, 23]); const bounds = map.getCanvas().getBoundingClientRect()
@@ -41,7 +69,8 @@ try {
       ]
       await nextTick()
     })
-    await page.waitForFunction(() => window.mainMap.getSource('map-points-source') && window.mainMap.queryRenderedFeatures({ layers: ['map-points-layer'] }).length >= 2)
+    await page.waitForFunction(() => window.mainMap.getSource('map-points-source') && window.mainMap.isSourceLoaded('map-points-source') && !window.mainMap.isMoving() && window.mainMap.queryRenderedFeatures({ layers: ['map-points-layer'] }).length >= 2)
+    await page.evaluate(() => new Promise(resolve => { window.mainMap.once('idle', resolve); window.mainMap.triggerRepaint() }))
     await page.mouse.move(0, 0)
     // Separate taps across mode changes from MapLibre's existing double-tap zoom gesture.
     if (touch) await page.waitForTimeout(350)

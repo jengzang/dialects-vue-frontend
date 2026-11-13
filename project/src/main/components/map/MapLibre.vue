@@ -197,6 +197,7 @@ const POINT_HOVER_LAYER_ID = 'map-points-hover-layer';
 const mapContainer = ref(null);
 const map = shallowRef(null);
 let isMapStyleReady = false;
+let needsContentRender = false;
 const currentStyleKey = ref('tianditu');
 const loading = ref(false);
 const isFullScreen = ref(false);
@@ -394,7 +395,13 @@ onMounted(() => {
   initMap();
 });
 
-onActivated(() => {
+onActivated(async () => {
+  await nextTick();
+  if (!map.value) return;
+  if (needsContentRender) {
+    renderMapContent(false);
+    map.value.resize();
+  }
   if (map.value && mapStore.mergedData?.length > 0) {
     applyResetView(AUTO_RESET_DENSITY_PERCENTILE);
   }
@@ -449,6 +456,9 @@ watch(
 watch(
     () => mapStore.mode,
     (newMode) => {
+      if (newMode === 'feature' || newMode === 'compare') {
+        mapStore.divideMapView = false;
+      }
       // 只要當前模式不是 base，就把它記下來
       if (newMode !== 'base') {
         lastNonBaseMode.value = newMode;
@@ -501,12 +511,16 @@ const initMap = () => {
 // --- 核心渲染入口 ---
 const renderMapContent = async (shouldResetView = true) => {
   if (!map.value || !isMapStyleReady) return;
+  needsContentRender = !mapContainer.value?.isConnected;
 
   // 清除舊標記
   clearMarkers();
   clearIsoplethLayers();
   clearDotHeatmapLayers();
   clearAdminBoundaryLayers();
+
+  // KeepAlive detaches the page: clear stale content now, read label CSS on return.
+  if (needsContentRender) return;
 
   // 視角統一由 requestMapFitView -> resetView 控制，這裡不再消費入口側預計算的 center/zoom。
   void shouldResetView;

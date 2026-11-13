@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createApp, h, nextTick, reactive } from 'vue'
+import { createApp, h, KeepAlive, nextTick, reactive, ref } from 'vue'
 
 vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: key => key }) }))
 vi.mock('vue-router', () => ({ useRouter: () => ({}), useRoute: () => ({}) }))
@@ -121,7 +121,7 @@ function hit(map, index, type = 'click', longitude = 113) {
 }
 
 beforeEach(() => {
-  Object.assign(mapStore, { mode: 'dot', mapData: null, mergedData: [], isoplethPayload: null, showCustomData: false, adminBoundary: null, fitViewKey: 0 })
+  Object.assign(mapStore, { mode: 'dot', mapData: null, mergedData: [], isoplethPayload: null, showCustomData: false, adminBoundary: null, fitViewKey: 0, divideMapView: false })
   maps.length = 0; popups.length = 0; markers.length = 0
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
     scale() {}, beginPath() {}, arc() {}, fill() {}, stroke() {}, roundRect() {},
@@ -136,6 +136,49 @@ afterEach(() => {
 })
 
 describe('main map point layers', () => {
+  it('defers query redraws while cached and draws the latest feature on reactivation', async () => {
+    const visible = ref(true)
+    const props = reactive({ activeFeature: '旧中古' })
+    mapStore.mode = 'feature'
+    mapStore.mergedData = [{ location: '广州', feature: '旧中古', value: 'b', coordinate: [113, 23] }]
+    const cachedPage = { render: () => h(MapLibre, props) }
+    const host = document.createElement('div'); document.body.append(host)
+    const app = createApp({ render: () => h(KeepAlive, null, { default: () => visible.value ? h(cachedPage) : null }) })
+    app.mount(host); mounted.push({ app, host })
+    const map = maps.at(-1); map.emit('load'); await nextTick()
+    hit(map, 0)
+    const oldPopup = popups.at(-1)
+    visible.value = false; await nextTick()
+    const addSource = vi.spyOn(map, 'addSource')
+    mapStore.mode = 'feature'
+    props.activeFeature = '中古'
+    mapStore.mergedData = [{ location: '广州', feature: '中古', value: 'a', coordinate: [113, 23], color: '#ff0' }]
+    await nextTick()
+    expect(addSource).not.toHaveBeenCalled()
+    expect(oldPopup.open).toBe(false)
+    expect(oldPopup.node.childNodes).toHaveLength(0)
+    visible.value = true; await nextTick(); await nextTick()
+    expect(pointFeatures(map).map(feature => feature.properties.label)).toEqual(['a'])
+    expect(host.querySelector('#base-switch-container')).not.toBeNull()
+  })
+
+  it('restores the place-name switch after leaving a division map for a feature query', async () => {
+    mapStore.divideMapView = true
+    const map = await mountMap({ activeFeature: '中古' })
+    mapStore.mode = 'feature'
+    mapStore.mergedData = [{ location: '广州', feature: '中古', value: 'a', coordinate: [113, 23] }]
+    await nextTick()
+    const host = mounted.at(-1).host
+    const toggle = host.querySelector('#base-switch-container input')
+    expect(toggle).not.toBeNull()
+    toggle.checked = true; toggle.dispatchEvent(new Event('change', { bubbles: true })); await nextTick()
+    expect(mapStore.mode).toBe('base')
+    expect(host.querySelector('#base-switch-container')).not.toBeNull()
+    toggle.checked = false; toggle.dispatchEvent(new Event('change', { bubbles: true })); await nextTick()
+    expect(mapStore.mode).toBe('feature')
+    expect(pointFeatures(map)).toHaveLength(1)
+  })
+
   it('renders thousands of dot points without DOM markers or eager popups, preserving level colors and duplicates', async () => {
     mapStore.mapData = {
       coordinates_locations: Array.from({ length: 2000 }, (_, index) => [`地点${index}`, [113, 23]]),
