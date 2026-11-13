@@ -89,8 +89,6 @@
       @update:run-disabled="uiStore.buttonStates.divide.isLocationDisabled = $event"
     />
 
-    <PartitionColorEditor />
-
     <div class="run-container">
       <button
         id="allmap-first"
@@ -103,6 +101,8 @@
         <span v-else>{{ t('map.divideTab.buttons.run') }}</span>
       </button>
     </div>
+
+    <PartitionColorEditor />
   </div>
 </template>
 

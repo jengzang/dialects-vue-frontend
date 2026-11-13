@@ -35,7 +35,7 @@ describe('partition color editor', () => {
     await flush()
     expect(host.querySelector('input[type="color"]')).toBe(picker)
     expect(sessionStorage.getItem('partition_color_overrides')).toContain('#abcdef')
-    host.querySelector('.editor-content > button').click()
+    host.querySelector('.editor-toolbar .reset-colors').click()
     await flush()
     expect(picker.value).toBe('#123456')
     expect(getPartitions).toHaveBeenCalledTimes(1)

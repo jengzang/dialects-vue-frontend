@@ -352,7 +352,7 @@
     "sessionHint": "Changes are saved automatically for this tab session.",
     "retry": "Retry",
     "empty": "No matching partitions",
-    "reset": "Restore default colors for this partition source",
+    "reset": "Reset",
     "loadFailed": "Failed to load partition colors. Please retry."
   },
   "mapLibre": {

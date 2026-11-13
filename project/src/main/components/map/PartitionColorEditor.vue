@@ -1,20 +1,25 @@
 <template>
   <details class="partition-color-editor glass-panel" @toggle="onToggle">
-    <summary>{{ t('map.partitionColors.title') }}</summary>
+    <summary>
+      <span>{{ t('map.partitionColors.title') }}</span>
+      <svg class="editor-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
+    </summary>
     <div class="editor-content">
-      <RadioGroup v-model="mode" name="partition-color-source" :options="modeOptions" />
-      <input v-model="search" class="input" :placeholder="t('map.partitionColors.search')" :aria-label="t('map.partitionColors.search')">
-      <small>{{ t('map.partitionColors.sessionHint') }}</small>
+      <div class="editor-toolbar">
+        <RadioGroup v-model="mode" name="partition-color-source" :options="modeOptions" />
+        <button type="button" class="pill-btn reset-colors" :disabled="loading || !!error" @click="resetColors">{{ t('map.partitionColors.reset') }}</button>
+      </div>
+      <input v-model="search" class="glass-field" data-shape="search" :placeholder="t('map.partitionColors.search')" :aria-label="t('map.partitionColors.search')">
+      <small class="editor-hint">{{ t('map.partitionColors.sessionHint') }}</small>
       <div v-if="loading" class="main-list-state">{{ t('common.label.loading') }}</div>
       <div v-else-if="error" class="main-list-state" data-state="error">
         {{ error }}
         <button type="button" class="pill-btn" @click="loadTree">{{ t('map.partitionColors.retry') }}</button>
       </div>
-      <div v-else class="color-tree ui-scrollbar">
+      <div v-else class="color-tree glass-subpanel ui-scrollbar">
         <PartitionColorTreeItem v-for="node in filteredNodes" :key="node.path" :node="node" :colors="colors" :search-query="search" @color-change="changeColor" />
         <small v-if="!filteredNodes.length">{{ t('map.partitionColors.empty') }}</small>
       </div>
-      <button type="button" class="pill-btn" :disabled="loading || !!error" @click="resetColors">{{ t('map.partitionColors.reset') }}</button>
     </div>
   </details>
 </template>
@@ -101,8 +106,38 @@ watch([mode, identity], loadTree)
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
-.partition-color-editor { width: min(90%, 500px); margin: 12px auto; padding: 12px; box-sizing: border-box; }
-summary { cursor: pointer; }
-.editor-content { @include flex-col; gap: 8px; padding-top: 12px; }
-.color-tree { max-height: 320px; overflow-y: auto; }
+.partition-color-editor {
+  width: min(90%, 500px);
+  margin: 12px auto;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  color: var(--text-primary);
+}
+summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--color-primary-hover);
+  font-size: var(--font-size-15);
+  font-weight: 700;
+  list-style: none;
+  cursor: pointer;
+
+  &::-webkit-details-marker { display: none; }
+}
+.editor-chevron { flex-shrink: 0; transition: transform 0.2s ease; }
+.partition-color-editor[open] .editor-chevron { transform: rotate(90deg); }
+.editor-content { @include flex-col; gap: 12px; padding-top: 14px; }
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  :deep(.liquid-radio-group) { gap: 4px 8px; }
+}
+.reset-colors { flex-shrink: 0; }
+.editor-hint { color: var(--text-secondary); font-size: var(--font-size-12); line-height: 1.6; }
+.color-tree { max-height: 320px; overflow-y: auto; padding: 6px 8px; }
 </style>

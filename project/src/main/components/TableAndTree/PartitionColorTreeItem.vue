@@ -1,8 +1,8 @@
 <template>
   <div class="tree-node">
     <div class="node-content" :title="node.path">
-      <button v-if="hasChildren" type="button" class="node-toggle" :aria-expanded="isOpen" @click="expanded = !isOpen">
-        <span aria-hidden="true">{{ isOpen ? '▾' : '▸' }}</span>
+      <button v-if="hasChildren" type="button" class="node-toggle glass-dropdown-item" :aria-expanded="isOpen" @click="expanded = !isOpen">
+        <svg class="node-chevron" :class="{ 'is-open': isOpen }" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
         {{ node.label }}
       </button>
       <template v-else>
@@ -45,20 +45,25 @@ const color = computed(() => props.colors.get(props.node.path) || '#ffffff')
   display: flex;
   align-items: center;
   gap: 8px;
-  min-height: 32px;
+  min-height: 34px;
+  color: var(--text-primary);
 }
 .node-toggle {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 0;
+  padding: 6px 8px;
+  width: 100%;
+  border-radius: var(--radius-sm);
   border: 0;
   background: transparent;
-  color: inherit;
+  color: var(--color-primary-hover);
   font: inherit;
   text-align: start;
   cursor: pointer;
 }
-.leaf-name { margin-inline-start: 18px; }
+.node-chevron { flex-shrink: 0; transition: transform 0.2s ease; }
+.node-chevron.is-open { transform: rotate(90deg); }
+.leaf-name { margin-inline-start: 28px; color: var(--text-secondary); }
 .children-container { padding-inline-start: 16px; }
 </style>
