@@ -57,7 +57,9 @@ export async function getCoordinates(params) {
     if (params.feature) query.append('feature', params.feature)
     if (params.value) query.append('value', params.value)
 
-    return await api(`/api/get_coordinates?${query.toString()}`)
+    const data = await api(`/api/get_coordinates?${query.toString()}`)
+    // Coordinate paths belong to the requested tree; the backend omits its mode.
+    return data ? { ...data, region_mode: params.region_mode || 'yindian' } : data
   } catch (error) {
     console.error('Get coordinates error:', error)
     showError(error.message || '獲取坐標數據失敗')

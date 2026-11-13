@@ -103,6 +103,8 @@ vi.mock('maplibre-gl', () => {
 import MapLibre from '@/main/components/map/MapLibre.vue'
 import { mapStore } from '@/main/store/store.js'
 import { getLocationDetail } from '@/api'
+import { api } from '@/api/auth/httpClient.js'
+import { getCoordinates } from '@/api/main/geo/geo.js'
 import { get_detail } from '@/main/utils/query/ResultTable.js'
 
 const mounted = []
@@ -137,10 +139,32 @@ afterEach(() => {
   mounted.splice(0).forEach(({ app, host }) => { app.unmount(); host.remove() })
   vi.restoreAllMocks()
   vi.clearAllMocks()
+  api.mockReset()
   vi.unstubAllGlobals()
 })
 
 describe('main map point layers', () => {
+  it('uses yindian partition backgrounds and white text for a queried feature', async () => {
+    api.mockImplementation(async url => url.startsWith('/api/get_coordinates')
+      ? { coordinates_locations: [['台山', [112, 22]]], region_mappings: { 台山: '嶺南-四邑-台山' } }
+      : { schema_version: 2, region_mode: 'yindian', nodes: [{ path: '嶺南-四邑-台山', color: '#123456', children: [] }] })
+    mapStore.mode = 'feature'
+    mapStore.mapData = await getCoordinates({ locations: ['台山'], region_mode: 'yindian' })
+    mapStore.mergedData = [{ location: '台山', feature: '中古', value: 'a', color: '#ff0', coordinate: [112, 22] }]
+    const map = await mountMap({ activeFeature: '中古' })
+    const fills = []
+    const context = document.createElement('canvas').getContext('2d')
+    context.fill = function () { fills.push(this.fillStyle) }
+    await map.component.toggleCustomPartitionColors(true)
+    await nextTick()
+    expect(api).toHaveBeenCalledWith('/api/partitions?region_mode=yindian')
+    expect(pointFeatures(map)[0].properties.textColor).toBe('#fff')
+    expect(fills).toContain('#123456')
+    await map.component.toggleCustomPartitionColors(false)
+    await nextTick()
+    expect(fills).toContain('#ff0')
+  })
+
   it('paints loading before preparing a switched mode and keeps it until its source renders', async () => {
     const map = await mountMap()
     const frames = []
