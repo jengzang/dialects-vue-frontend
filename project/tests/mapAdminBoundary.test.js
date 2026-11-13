@@ -16,6 +16,7 @@ vi.mock('maplibre-gl', () => ({ default: {
   Map: class {
     constructor() { this.sources = new Map(); this.layers = new Map(); this.events = {}; maps.push(this) }
     addControl() {}
+    getCanvas() { return { style: {} } }
     on(name, handler) { this.events[name] = handler }
     once(name, handler) { this.events[name] = handler }
     off() {}

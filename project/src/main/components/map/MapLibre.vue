@@ -282,8 +282,6 @@ const toggleBaseMode = (e) => {
     mapStore.mode = 'base';
   }
 };
-// 管理所有的 Marker 實例，用於清除
-let currentMarkers = [];
 let currentPopupMountTargets = [];
 let pointEntries = [];
 let pointPopup = null;
@@ -291,6 +289,8 @@ let pointPopupIndex = null;
 let hoveredPointIndex = null;
 const pointImages = new Map();
 const pointHandlers = new Map();
+let clearPointKeyboard = () => {};
+let pointStyleSignature = '';
 let isoplethClickHandler = null;
 const isoplethLegend = ref(null);
 
@@ -472,6 +472,12 @@ const initMap = () => {
 
   map.value.addControl(new maplibregl.NavigationControl(), 'top-left');
 
+  map.value.on('resize', () => {
+    if (!isMapStyleReady || !pointStyleSignature || !map.value.getLayer(POINT_LAYER_ID)) return;
+    const labelStyle = ['base', 'feature'].includes(mapStore.mode) ? getPointLabelStyle(mapStore.mode) : null;
+    if (getPointStyleSignature(mapStore.mode, labelStyle) !== pointStyleSignature) renderMapContent(false);
+  });
+
   map.value.on('load', () => {
     isMapStyleReady = true;
     // 地圖加載完畢，如果有數據，立即渲染
@@ -529,8 +535,6 @@ const clearMarkers = () => {
   clearPointLayer();
   currentPopupMountTargets.forEach(target => render(null, target));
   currentPopupMountTargets = [];
-  currentMarkers.forEach(marker => marker.remove());
-  currentMarkers = [];
 };
 
 const closePointPopup = () => {
@@ -540,6 +544,8 @@ const closePointPopup = () => {
 };
 
 const clearPointLayer = () => {
+  clearPointKeyboard();
+  clearPointKeyboard = () => {};
   closePointPopup();
   if (map.value) {
     pointHandlers.forEach((handler, event) => map.value.off(event, POINT_LAYER_ID, handler));
@@ -558,21 +564,73 @@ const clearPointLayer = () => {
   pointImages.clear();
   pointEntries = [];
   hoveredPointIndex = null;
+  pointStyleSignature = '';
 };
 
-// Share a small circle texture per color, including the original border and shadow.
-const getPointImage = (color, mode, hover = false) => {
+// Read the existing CSS once per draw, including responsive font tokens.
+const getPointLabelStyle = (mode) => {
+  const probe = document.createElement('div');
+  probe.className = `maplibregl-marker ${mode === 'base' ? 'marker-text-base' : 'marker-text-feature'}`;
+  Object.assign(probe.style, { position: 'absolute', visibility: 'hidden', pointerEvents: 'none' });
+  if (mode === 'base') probe.style.fontSize = '12.5px';
+  mapContainer.value.append(probe);
+  const style = getComputedStyle(probe);
+  const result = {
+    fontSize: parseFloat(style.fontSize) || 16,
+    font: style.fontFamily.split(',').map(font => font.trim().replace(/^['"]|['"]$/g, '')),
+    color: style.color, background: style.backgroundColor,
+    radius: parseFloat(style.borderRadius) || 0,
+    borderWidth: parseFloat(style.borderTopWidth) || 0,
+    borderColor: style.borderTopColor,
+    paddingX: parseFloat(style.paddingLeft) || 0,
+    paddingY: parseFloat(style.paddingTop) || 0,
+    lineHeight: parseFloat(style.lineHeight) || 20,
+  };
+  probe.remove();
+  return result;
+};
+
+// Share a small texture per color; text glyphs are shared by MapLibre, not rasterized per label.
+const getPointImage = (color, mode, hover = false, labelStyle = null) => {
   const key = JSON.stringify([color, mode, hover]);
   if (pointImages.has(key)) return pointImages.get(key);
   const id = `map-point-image-${pointImages.size}`;
-  const ratio = 2;
+  const ratio = Math.min(window.devicePixelRatio || 1, 3);
   const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = 64 * ratio;
+  const circleSize = mode === 'dot' ? 20 : hover ? 68 : 40;
+  canvas.width = (labelStyle ? 64 : circleSize) * ratio;
+  const labelHeight = labelStyle ? labelStyle.lineHeight + 2 * (labelStyle.paddingY + labelStyle.borderWidth) : 40;
+  canvas.height = labelStyle ? Math.ceil((labelHeight + 24) * ratio) : circleSize * ratio;
   const context = canvas.getContext('2d');
   context.scale(ratio, ratio);
+  if (labelStyle) {
+    const { borderWidth, borderColor, radius, paddingX } = labelStyle;
+    context.beginPath();
+    context.roundRect(12, 12, 40, labelHeight, radius);
+    context.fillStyle = 'transparent';
+    if (color) context.fillStyle = color;
+    context.shadowColor = 'rgba(114,124,245,0.5)';
+    context.shadowBlur = 6 * ratio;
+    context.shadowOffsetY = 2 * ratio;
+    context.fill();
+    context.shadowColor = 'transparent';
+    if (borderWidth) {
+      context.strokeStyle = borderColor;
+      context.lineWidth = borderWidth;
+      context.stroke();
+    }
+    const insetX = 12 + paddingX + borderWidth;
+    map.value.addImage(id, context.getImageData(0, 0, canvas.width, canvas.height), {
+      pixelRatio: ratio, content: [insetX * ratio, 0, (64 - insetX) * ratio, canvas.height],
+      stretchX: [[16 * ratio, 48 * ratio]],
+    });
+    pointImages.set(key, id);
+    return id;
+  }
   const radius = mode === 'dot' ? 7 : hover ? 11 : 9;
   context.beginPath();
-  context.arc(32, 32, radius - 1, 0, Math.PI * 2);
+  const center = circleSize / 2;
+  context.arc(center, center, radius - 1, 0, Math.PI * 2);
   context.fillStyle = 'transparent';
   if (color) context.fillStyle = color;
   context.strokeStyle = mode === 'dot' ? '#000' : '#fff';
@@ -585,11 +643,54 @@ const getPointImage = (color, mode, hover = false) => {
   context.stroke();
   if (hover) {
     context.beginPath();
-    context.arc(32, 32, radius + 1.5, 0, Math.PI * 2);
+    context.arc(center, center, radius + 1.5, 0, Math.PI * 2);
     context.strokeStyle = 'rgba(255,255,255,0.8)';
     context.lineWidth = 3;
     context.stroke();
   }
+  map.value.addImage(id, context.getImageData(0, 0, canvas.width, canvas.height), { pixelRatio: ratio });
+  pointImages.set(key, id);
+  return id;
+};
+
+const getPointStyleSignature = (mode, labelStyle) => JSON.stringify([mode, Math.min(window.devicePixelRatio || 1, 3), labelStyle]);
+
+const needsCanvasText = (value) => /[\p{M}\p{Extended_Pictographic}\p{Regional_Indicator}\u200d]/u.test(value || '');
+
+const getTextImage = (label, color, labelStyle) => {
+  const key = JSON.stringify(['text', label, color, labelStyle.fontSize, labelStyle.color]);
+  if (pointImages.has(key)) return pointImages.get(key);
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  context.font = `${labelStyle.fontSize}px ${labelStyle.font.join(',')}`;
+  const textWidth = Math.ceil(context.measureText(label).width);
+  const width = Math.max(16, textWidth + 2 * (labelStyle.paddingX + labelStyle.borderWidth));
+  const height = Math.max(16, Math.ceil(labelStyle.lineHeight + 2 * (labelStyle.paddingY + labelStyle.borderWidth)));
+  const margin = 12;
+  // Bound the raster fallback budget and individual texture dimensions for unusually large datasets/labels.
+  const ratio = Math.min(labelStyle.rasterRatio, 4096 / (width + margin * 2), 4096 / (height + margin * 2));
+  canvas.width = Math.min(4096, Math.max(1, Math.ceil((width + margin * 2) * ratio)));
+  canvas.height = Math.min(4096, Math.max(1, Math.ceil((height + margin * 2) * ratio)));
+  context.scale(ratio, ratio);
+  context.font = `${labelStyle.fontSize}px ${labelStyle.font.join(',')}`;
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.beginPath();
+  context.roundRect(margin + labelStyle.borderWidth / 2, margin + labelStyle.borderWidth / 2, width - labelStyle.borderWidth, height - labelStyle.borderWidth, labelStyle.radius);
+  context.fillStyle = color || 'transparent';
+  context.shadowColor = 'rgba(114,124,245,0.5)';
+  context.shadowBlur = 6 * ratio;
+  context.shadowOffsetY = 2 * ratio;
+  context.fill();
+  context.shadowColor = 'transparent';
+  if (labelStyle.borderWidth) {
+    context.strokeStyle = labelStyle.borderColor;
+    context.lineWidth = labelStyle.borderWidth;
+    context.stroke();
+  }
+  context.fillStyle = labelStyle.color;
+  context.fillText(label, margin + width / 2, margin + height / 2);
+  const id = `map-point-image-${pointImages.size}`;
   map.value.addImage(id, context.getImageData(0, 0, canvas.width, canvas.height), { pixelRatio: ratio });
   pointImages.set(key, id);
   return id;
@@ -605,8 +706,11 @@ const getPointHit = (event) => {
       const coordinate = [...entry.coordinate];
       coordinate[0] += 360 * Math.round((event.lngLat.lng - coordinate[0]) / 360);
       const screen = map.value.project(coordinate);
-      const halfSize = mapStore.mode === 'dot' ? 7 : hoveredPointIndex === entry.index ? 11 : 9;
-      return Math.abs(event.point.x - screen.x) <= halfSize && Math.abs(event.point.y - screen.y) <= halfSize;
+      const halfWidth = entry.hitWidth || (mapStore.mode === 'dot' ? 7 : hoveredPointIndex === entry.index ? 11 : 9);
+      const halfHeight = entry.hitHeight || halfWidth;
+      const dx = Math.abs(event.point.x - screen.x);
+      const dy = Math.abs(event.point.y - screen.y);
+      return entry.hitWidth ? dx <= halfWidth && dy <= halfHeight : dx * dx + dy * dy <= halfWidth * halfWidth;
     })
     .sort((a, b) => (mapStore.mode === 'compare'
       ? Number(b.index === hoveredPointIndex) - Number(a.index === hoveredPointIndex)
@@ -620,13 +724,17 @@ const showPointPopup = (entry, event, toggle = false) => {
   const mode = mapStore.mode;
   const popup = trackNativeMapPopup(new maplibregl.Popup(mode === 'dot'
     ? { offset: 10, closeButton: false }
-    : { offset: 15, maxWidth: '350px', className: 'map-popup-wrapper' }));
+    : mode === 'feature'
+      ? { offset: 80, maxWidth: '300px', closeButton: false, className: 'map-popup-wrapper' }
+      : { offset: 15, maxWidth: '350px', className: 'map-popup-wrapper' }));
   let node;
   if (mode === 'dot') {
     node = document.createElement('div');
     const title = document.createElement('b');
     title.textContent = entry.locName;
     node.append(title, document.createElement('br'), document.createTextNode(entry.fullRegion));
+  } else if (mode === 'feature') {
+    node = createPopupDOM(entry.item);
   } else {
     node = createComparePopupNode(entry.item);
   }
@@ -645,13 +753,100 @@ const showPointPopup = (entry, event, toggle = false) => {
   popup.setLngLat(coordinate).setDOMContent(node).addTo(map.value);
 };
 
+// Preserve sequential Tab/Shift+Tab and Enter/Space access without one focusable DOM node per point.
+const installPointKeyboard = (mode, labelStyle) => {
+  if (mode !== 'compare' && mode !== 'feature') return;
+  const target = document.createElement('button');
+  target.type = 'button';
+  target.className = 'map-point-keyboard-target';
+  Object.assign(target.style, {
+    position: 'absolute', pointerEvents: 'none', opacity: '0', padding: '0', margin: '0',
+    background: 'transparent', border: '0', outline: 'auto', transform: 'translate(-50%, -50%)',
+  });
+  let index = 0;
+  const coordinate = () => {
+    const value = pointEntries[index].coordinate.slice(0, 2);
+    value[0] += 360 * Math.round((map.value.getCenter().lng - value[0]) / 360);
+    return value;
+  };
+  const sync = () => {
+    const entry = pointEntries[index];
+    target.setAttribute('aria-label', [entry.item.location, entry.label || entry.item.featureLabel || entry.item.feature].filter(Boolean).join(' '));
+    const screen = map.value.project(coordinate());
+    let width = 18;
+    let height = 18;
+    if (labelStyle) {
+      const context = document.createElement('canvas').getContext('2d');
+      context.font = `${labelStyle.fontSize}px ${labelStyle.font.join(',')}`;
+      width = context.measureText(entry.label).width + 2 * (labelStyle.paddingX + labelStyle.borderWidth);
+      height = labelStyle.lineHeight + 2 * (labelStyle.paddingY + labelStyle.borderWidth);
+    }
+    Object.assign(target.style, { left: `${screen.x}px`, top: `${screen.y}px`, width: `${width}px`, height: `${height}px` });
+  };
+  target.addEventListener('focus', event => {
+    index = event.relatedTarget?.compareDocumentPosition(target) & Node.DOCUMENT_POSITION_PRECEDING ? pointEntries.length - 1 : 0;
+    target.style.opacity = '1';
+    sync();
+    map.value.on('move', sync);
+  });
+  target.addEventListener('blur', () => {
+    target.style.opacity = '0';
+    map.value?.off('move', sync);
+  });
+  target.addEventListener('keydown', event => {
+    if (event.key === 'Tab') {
+      const nextIndex = index + (event.shiftKey ? -1 : 1);
+      if (nextIndex < 0 || nextIndex >= pointEntries.length) return;
+      event.preventDefault();
+      index = nextIndex;
+      sync();
+    } else if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      event.stopPropagation();
+      showPointPopup(pointEntries[index], { lngLat: { lng: coordinate()[0] } }, true);
+    }
+  });
+  target.setAttribute('aria-label', pointEntries[0].item.location || pointEntries[0].label || '');
+  map.value.getCanvasContainer().append(target);
+  clearPointKeyboard = () => { map.value?.off('move', sync); target.remove(); };
+};
+
 const drawPointLayer = (entries, mode) => {
   pointEntries = entries.map((entry, index) => ({ ...entry, index }));
   if (!pointEntries.length) return;
+  const labelStyle = mode === 'base' || mode === 'feature' ? getPointLabelStyle(mode) : null;
+  pointStyleSignature = getPointStyleSignature(mode, labelStyle);
+  const measurementContext = labelStyle ? document.createElement('canvas').getContext('2d') : null;
+  const textWidths = new Map();
+  const rasterLabels = new Set();
+  let rasterArea = 0;
+  pointEntries.forEach(entry => {
+    if (!labelStyle) return;
+    const font = `${entry.fontSize || labelStyle.fontSize}px ${labelStyle.font.join(',')}`;
+    const key = JSON.stringify([font, entry.label]);
+    if (!textWidths.has(key)) {
+      measurementContext.font = font;
+      textWidths.set(key, measurementContext.measureText(entry.label).width);
+    }
+    entry.hitWidth = textWidths.get(key) / 2 + labelStyle.paddingX + labelStyle.borderWidth;
+    entry.hitHeight = labelStyle.lineHeight / 2 + labelStyle.paddingY + labelStyle.borderWidth;
+    const rasterKey = JSON.stringify([font, entry.label, entry.color]);
+    if (needsCanvasText(entry.label) && !rasterLabels.has(rasterKey)) {
+      rasterLabels.add(rasterKey);
+      rasterArea += (entry.hitWidth * 2 + 24) * (entry.hitHeight * 2 + 24);
+    }
+  });
+  if (labelStyle) labelStyle.rasterRatio = Math.min(window.devicePixelRatio || 1, 3, Math.sqrt(16 * 1024 * 1024 / Math.max(1, rasterArea)));
   const features = pointEntries.map(entry => ({
     type: 'Feature', id: entry.index,
     geometry: { type: 'Point', coordinates: entry.coordinate.slice(0, 2) },
-    properties: { index: entry.index, image: getPointImage(entry.color, mode) },
+    properties: {
+      index: entry.index,
+      image: labelStyle && needsCanvasText(entry.label)
+        ? getTextImage(entry.label, mode === 'base' ? labelStyle.background : entry.color, { ...labelStyle, fontSize: entry.fontSize || labelStyle.fontSize })
+        : getPointImage(labelStyle && mode === 'base' ? labelStyle.background : entry.color, mode, false, labelStyle),
+      ...(labelStyle ? { label: entry.label, renderText: needsCanvasText(entry.label) ? '' : entry.label, fontSize: entry.fontSize || labelStyle.fontSize } : {}),
+    },
   }));
   map.value.addSource(POINT_SOURCE_ID, { type: 'geojson', data: { type: 'FeatureCollection', features } });
   const layout = {
@@ -659,9 +854,19 @@ const drawPointLayer = (entries, mode) => {
     'icon-rotation-alignment': 'viewport', 'icon-pitch-alignment': 'viewport',
     'symbol-sort-key': ['get', 'index'], 'symbol-z-order': 'source',
   };
+  if (labelStyle) Object.assign(layout, {
+    'text-field': ['get', 'renderText'], 'text-size': ['get', 'fontSize'], 'text-font': labelStyle.font,
+    'text-max-width': 1000, 'text-line-height': labelStyle.lineHeight / labelStyle.fontSize,
+    'text-allow-overlap': true, 'text-ignore-placement': true, 'text-padding': 0,
+    'text-rotation-alignment': 'viewport', 'text-pitch-alignment': 'viewport',
+    'icon-text-fit': 'width',
+  });
   map.value.addLayer({
     id: POINT_LAYER_ID, type: 'symbol', source: POINT_SOURCE_ID, layout,
-    paint: { 'icon-opacity': mode === 'dot' ? 0.8 : ['case', ['boolean', ['feature-state', 'hover'], false], 0, 1] },
+    paint: {
+      'icon-opacity': mode === 'compare' ? ['case', ['boolean', ['feature-state', 'hover'], false], 0, 1] : 1,
+      ...(labelStyle ? { 'text-color': labelStyle.color } : {}),
+    },
   });
   if (mode === 'compare') {
     map.value.addSource(POINT_HOVER_SOURCE_ID, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
@@ -688,9 +893,12 @@ const drawPointLayer = (entries, mode) => {
   pointHandlers.set('mouseleave', () => updateHover({ features: [] }));
   pointHandlers.set('click', event => {
     const entry = getPointHit(event);
-    if (entry) showPointPopup(entry, event, mode !== 'dot');
+    if (!entry) return;
+    if (mode === 'base') handleLocationClick(entry.label);
+    else showPointPopup(entry, event, mode !== 'dot');
   });
   pointHandlers.forEach((handler, event) => map.value.on(event, POINT_LAYER_ID, handler));
+  installPointKeyboard(mode, labelStyle);
 };
 
 const clearIsoplethLayers = () => {
@@ -744,6 +952,7 @@ const clearDotHeatmapLayers = () => {
 // 邏輯 1: 基礎圖繪製 (復刻 create_map1 的後半部分)
 // =======================================================
 const drawBaseMap = () => {
+  const entries = [];
   // 用于跟踪已显示的坐标，避免重复
   const displayedCoordinates = new Set();
 
@@ -754,11 +963,10 @@ const drawBaseMap = () => {
   };
 
   // 辅助函数：创建地名标记
-  const createLocationMarker = (locationName, coordinates) => {
+  const createLocationEntry = (locationName, coordinates) => {
     if (!isValidCoordinatePair(coordinates)) return null;
     if (!locationName || !locationName.trim()) return null;
 
-    const [lng, lat] = coordinates;
     const key = coordToKey(coordinates);
 
     // 如果这个坐标已经显示过，跳过
@@ -766,39 +974,22 @@ const drawBaseMap = () => {
 
     // 字體大小邏輯 (完全復刻)
     const len = locationName.length;
-    let fontSize = '10px';
-    if (len <= 3) fontSize = '12.5px';
-    else if (len === 4) fontSize = '11.5px';
-    else if (len === 5) fontSize = '10.5px';
-
-    // 創建 DOM
-    const el = document.createElement('div');
-    el.className = 'marker-text-base'; // 樣式見下方 style
-    el.innerText = locationName;
-    el.style.fontSize = fontSize;
-    el.style.cursor = 'pointer'; // 添加指針樣式
-
-    // 添加點擊事件
-    el.addEventListener('click', () => {
-      handleLocationClick(locationName);
-    });
-
-    // 添加 Marker
-    const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
-        .setLngLat([lng, lat])
-        .addTo(map.value);
+    let fontSize = 10;
+    if (len <= 3) fontSize = 12.5;
+    else if (len === 4) fontSize = 11.5;
+    else if (len === 5) fontSize = 10.5;
 
     // 标记该坐标已显示
     if (key) displayedCoordinates.add(key);
 
-    return marker;
+    return { label: locationName, coordinate: coordinates, fontSize };
   };
 
   // 1. 显示基础地图数据的地名
   if (mapStore.mapData && mapStore.mapData.coordinates_locations) {
     mapStore.mapData.coordinates_locations.forEach(([locationName, coordinates]) => {
-      const marker = createLocationMarker(locationName, coordinates);
-      if (marker) currentMarkers.push(marker);
+      const entry = createLocationEntry(locationName, coordinates);
+      if (entry) entries.push(entry);
     });
   }
 
@@ -824,10 +1015,11 @@ const drawBaseMap = () => {
 
     // 显示自定义地名
     customLocations.forEach(({ name, coord }) => {
-      const marker = createLocationMarker(name, coord);
-      if (marker) currentMarkers.push(marker);
+      const entry = createLocationEntry(name, coord);
+      if (entry) entries.push(entry);
     });
   }
+  drawPointLayer(entries, 'base');
 };
 
 // =======================================================
@@ -889,7 +1081,7 @@ const drawDotMap = () => {
 };
 
 // =======================================================
-// 邏輯 3: 特徵圖 + 複雜彈窗 (DOM版，支持按鈕點擊)
+// 邏輯 3: 特徵圖 + 複雜彈窗 (按需建立，支持按鈕點擊)
 // =======================================================
 const drawFeatureMap = () => {
   if (!mapStore.mergedData || mapStore.mergedData.length === 0) return;
@@ -907,7 +1099,7 @@ const drawFeatureMap = () => {
 
     return isFeatureMatch && isCustomMatch;
   });
-  // console.log(items)
+  const entries = [];
   items.forEach(item => {
     // 1. 基礎校驗：無值跳過
     if (!item.value || !item.value.trim()) return;
@@ -918,30 +1110,9 @@ const drawFeatureMap = () => {
       return;
     }
 
-    // 1. 創建地圖上的文字 Marker (保持不變)
-    const el = document.createElement('div');
-    el.className = 'marker-text-feature';
-    el.innerText = item.value;
-    el.style.backgroundColor = item.color || '#fff';
-
-    const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
-        .setLngLat(item.coordinate)
-        .addTo(map.value);
-
-    // 2. ✨ 改動點：創建 DOM 節點而不是字符串
-    const popupNode = createPopupDOM(item);
-
-    // 3. 使用 setDOMContent
-    const popup = trackNativeMapPopup(new maplibregl.Popup({
-      offset: 80,
-      maxWidth: '300px',
-      closeButton: false, // 建議隱藏默認關閉按鈕，用點擊地圖關閉，或者自己加
-      className: 'map-popup-wrapper'
-    })).setDOMContent(popupNode);
-
-    marker.setPopup(popup);
-    currentMarkers.push(marker);
+    entries.push({ item, label: item.value, coordinate: item.coordinate, color: item.color || '#fff' });
   });
+  drawPointLayer(entries, 'feature');
 };
 
 // ✨ 核心函數：生成 DOM 並綁定事件

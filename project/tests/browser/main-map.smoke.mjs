@@ -21,7 +21,7 @@ try {
       await nextTick()
       window.mainMap.jumpTo({ center: [113, 23], zoom: 10 })
     })
-    await page.waitForFunction(() => window.mainMap.isSourceLoaded('map-points-source') && window.mainMap.queryRenderedFeatures({ layers: ['map-points-layer'] }).length >= 2)
+    await page.waitForFunction(() => window.mainMap.getSource('map-points-source') && window.mainMap.queryRenderedFeatures({ layers: ['map-points-layer'] }).length >= 2)
     const point = await page.evaluate(() => {
       const map = window.mainMap
       const screen = map.project([113, 23]); const bounds = map.getCanvas().getBoundingClientRect()
@@ -41,7 +41,7 @@ try {
       ]
       await nextTick()
     })
-    await page.waitForFunction(() => window.mainMap.isSourceLoaded('map-points-source') && window.mainMap.queryRenderedFeatures({ layers: ['map-points-layer'] }).length >= 2)
+    await page.waitForFunction(() => window.mainMap.getSource('map-points-source') && window.mainMap.queryRenderedFeatures({ layers: ['map-points-layer'] }).length >= 2)
     await page.mouse.move(0, 0)
     // Separate taps across mode changes from MapLibre's existing double-tap zoom gesture.
     if (touch) await page.waitForTimeout(350)
@@ -55,8 +55,60 @@ try {
     else await page.mouse.click(point.x + 120, point.y + 80)
     await page.waitForFunction(() => !document.querySelector('.maplibregl-popup'))
     await page.screenshot({ path: `/tmp/main-map-${touch ? 'portrait' : 'desktop'}-circles.png` })
+    for (const mode of ['base', 'feature']) {
+      await page.evaluate(async mode => {
+        const { mapStore, nextTick } = window.mainMapSmoke
+        mapStore.mode = mode
+        mapStore.mapData = { coordinates_locations: [['廣州地名', [113, 23]]] }
+        mapStore.mergedData = [{ location: '廣州', feature: '测试', value: 'tɕʰ ŋ̍ 中文', color: '#ffff99', coordinate: [113, 23], detailContent: [{ value: 'tɕʰ', percentage: 0.7 }] }]
+        await nextTick()
+      }, mode)
+      await page.waitForFunction(mode => window.mainMap.getSource('map-points-source') && window.mainMap.queryRenderedFeatures({ layers: ['map-points-layer'] }).some(feature => feature.properties.label === (mode === 'base' ? '廣州地名' : 'tɕʰ ŋ̍ 中文')), mode)
+      assert.equal(await page.locator('.maplibregl-marker').count(), 0)
+      await page.screenshot({ path: `/tmp/main-map-${touch ? 'portrait' : 'desktop'}-${mode}.png` })
+      if (mode === 'feature') {
+        if (touch) await page.waitForTimeout(350)
+        if (touch) await page.touchscreen.tap(point.x, point.y)
+        else await page.mouse.click(point.x, point.y)
+        await page.locator('.maplibregl-popup-content .map-popup.active').waitFor()
+        assert.match(await page.locator('.maplibregl-popup-content').textContent(), /70\.0%/)
+      }
+    }
+    await page.evaluate(() => window.mainMapSmoke.component.value.$.setupState.handleStyleChange())
+    await page.waitForFunction(() => window.mainMap.getSource('map-points-source') && window.mainMap.queryRenderedFeatures({ layers: ['map-points-layer'] }).some(feature => feature.properties.label === 'tɕʰ ŋ̍ 中文'))
+    assert.equal(await page.locator('.maplibregl-popup').count(), 0)
+    await page.locator('.map-point-keyboard-target').focus()
+    await page.keyboard.press('Enter')
+    await page.locator('.maplibregl-popup-content .map-popup.active').waitFor()
+    await page.locator('.map-point-keyboard-target').focus()
+    await page.keyboard.press('Enter')
+    assert.equal(await page.locator('.maplibregl-popup').count(), 0)
+    const oldFontSize = await page.evaluate(() => window.mainMap.getSource('map-points-source').serialize().data.features[0].properties.fontSize)
+    await page.setViewportSize(touch ? { width: 844, height: 390 } : { width: 980, height: 800 })
+    await page.waitForFunction(oldSize => {
+      const source = window.mainMap.getSource('map-points-source')
+      if (!source) return false
+      const fontSize = source.serialize().data.features[0].properties.fontSize
+      return fontSize !== oldSize && fontSize === window.mainMapSmoke.component.value.$.setupState.getPointLabelStyle('feature').fontSize
+    }, oldFontSize)
+    for (const mode of ['heatmap', 'isopleth', 'dot']) {
+      await page.evaluate(async mode => {
+        const { mapStore, nextTick } = window.mainMapSmoke
+        mapStore.mode = mode
+        mapStore.mapData = { coordinates_locations: [['甲', [113, 23]], ['乙', [113.1, 23.1]]], region_mappings: { 甲: '甲-乙', 乙: '甲-丙' } }
+        mapStore.isoplethPayload = { points: [
+          { location: '甲', coordinate: [113, 23], unique_syllables: { toneless: 80 } },
+          { location: '乙', coordinate: [113.1, 23.1], unique_syllables: { toneless: 120 } },
+        ] }
+        await nextTick()
+      }, mode)
+      const layer = mode === 'heatmap' ? 'dot-heatmap-layer' : mode === 'isopleth' ? 'isopleth-fill-layer' : 'map-points-layer'
+      await page.waitForFunction(id => !!window.mainMap.getLayer(id), layer)
+      assert.equal(await page.locator('.maplibregl-marker').count(), 0)
+    }
+    assert.deepEqual(await page.evaluate(() => window.mainMapErrors), [])
     assert.deepEqual(errors, [])
-    console.log(`${touch ? 'portrait touch' : 'desktop'}: circle rendering, overlap, popups and toggle passed`)
+    console.log(`${touch ? 'portrait touch' : 'desktop'}: circle/text rendering, overlap, popups, keyboard target and style restoration passed`)
     await page.close()
   }
 } finally { await browser.close() }

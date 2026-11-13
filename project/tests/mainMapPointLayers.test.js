@@ -1,7 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createApp, defineComponent, h, nextTick, reactive } from 'vue'
+import { createApp, h, nextTick, reactive } from 'vue'
 
 vi.mock('vue-i18n', () => ({ useI18n: () => ({ t: key => key }) }))
+vi.mock('vue-router', () => ({ useRouter: () => ({}), useRoute: () => ({}) }))
 vi.mock('@/main/store/store.js', () => ({
   mapStore: reactive({}), userStore: reactive({ role: 'user' }), resultCache: reactive({}),
 }))
@@ -10,12 +11,14 @@ vi.mock('@/api/auth/httpClient.js', () => ({ api: vi.fn() }))
 vi.mock('@/utils/map/MapData.js', () => ({ refreshCurrentCustomLayer: vi.fn() }))
 vi.mock('@/main/utils/query/ResultTable.js', () => ({ get_detail: vi.fn() }))
 vi.mock('@/utils/ui/message.js', () => ({ showSuccess: vi.fn(), showError: vi.fn(), showWarning: vi.fn(), showConfirm: vi.fn() }))
-vi.mock('@/utils/user/customPopupDelete.js', () => ({ createCustomPopupDelete: () => ({ deleteOne: vi.fn() }) }))
+const deleteItem = vi.hoisted(() => vi.fn(async () => null))
+vi.mock('@/utils/user/customPopupDelete.js', () => ({ createCustomPopupDelete: () => ({ deleteItem }) }))
 vi.mock('@/utils/map/MapSource.js', () => ({
   mapStyleConfig: { test: 'Test' }, mapStyle: () => ({ version: 8, sources: {}, layers: [] }),
   calculateMapCenterAndZoom: () => ({ center: [113, 23], zoom: 8 }),
 }))
-vi.mock('@/platform/backRegistry.js', () => ({ trackNativeMapPopup: popup => popup }))
+vi.mock('@/platform/backRegistry.js', () => ({ trackNativeMapPopup: popup => popup, vNativeBack: {} }))
+vi.mock('@/main/components/geo/popups/LocationDetailPopup.vue', () => ({ default: { template: '<div />' } }))
 vi.mock('/data/gis/china_country.geojson?url', () => ({ default: '/country.geojson' }))
 vi.mock('/data/gis/china_provinces.geojson?url', () => ({ default: '/provinces.geojson' }))
 vi.mock('/data/gis/china_cities_simplified_balanced.geojson?url', () => ({ default: '/cities.geojson' }))
@@ -29,6 +32,8 @@ vi.mock('maplibre-gl', () => {
     constructor() {
       this.sources = new Map(); this.layers = new Map(); this.images = new Map(); this.handlers = []
       this.canvas = { style: {} }
+      this.canvasContainer = document.createElement('div')
+      document.body.append(this.canvasContainer)
       maps.push(this)
     }
     on(type, layer, handler) {
@@ -44,6 +49,8 @@ vi.mock('maplibre-gl', () => {
     }
     addControl() {}
     getCanvas() { return this.canvas }
+    getCanvasContainer() { return this.canvasContainer }
+    getCenter() { return { lng: 113, lat: 23 } }
     project(coordinate) { return { x: coordinate[0], y: coordinate[1] } }
     addSource(id, source) { this.sources.set(id, { ...source, setData: data => { this.sources.get(id).data = data } }) }
     getSource(id) { return this.sources.get(id) }
@@ -68,7 +75,7 @@ vi.mock('maplibre-gl', () => {
     setStyle() { this.sources.clear(); this.layers.clear(); this.images.clear() }
     flyTo() {}
     resize() {}
-    remove() { this.removed = true }
+    remove() { this.removed = true; this.canvasContainer.remove() }
   }
   class Popup {
     constructor(options) { this.options = options; this.handlers = []; this.open = false; popups.push(this) }
@@ -93,22 +100,14 @@ vi.mock('maplibre-gl', () => {
 
 import MapLibre from '@/main/components/map/MapLibre.vue'
 import { mapStore } from '@/main/store/store.js'
+import { getLocationDetail } from '@/api'
+import { get_detail } from '@/main/utils/query/ResultTable.js'
 
 const mounted = []
-const passive = defineComponent({ template: '<div />' })
-const comparePopup = defineComponent({ props: ['item'], template: '<div class="test-compare-popup">{{ item.location }}</div>' })
-const stubs = {
-  InlineIcon: passive, RadioGroup: passive, SimpleSelectDropdown: passive, CheckBox: passive,
-  MapLegend: passive, LocationDetailPopup: passive, AdminBoundaryModal: passive,
-  CompareMapPopup: comparePopup,
-}
 
 async function mountMap(props = {}) {
   const host = document.createElement('div'); document.body.append(host)
-  // Popup render(h(...)) uses the real imported popup components; app stubs cover the main template only.
-  const component = { ...MapLibre, components: { ...MapLibre.components, ...stubs } }
-  const app = createApp({ render: () => h(component, props) })
-  app.config.warnHandler = () => {}
+  const app = createApp({ render: () => h(MapLibre, props) })
   app.mount(host); mounted.push({ app, host })
   const map = maps.at(-1); map.emit('load'); await nextTick()
   map.component = app._instance.subTree.component.setupState
@@ -126,12 +125,14 @@ beforeEach(() => {
   maps.length = 0; popups.length = 0; markers.length = 0
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
     scale() {}, beginPath() {}, arc() {}, fill() {}, stroke() {}, roundRect() {},
-    clearRect() {}, fillRect() {}, getImageData: () => ({ width: 64, height: 64, data: new Uint8ClampedArray(64 * 64 * 4) }),
+    measureText: vi.fn(() => ({ width: 20 })), fillText: vi.fn(),
+    clearRect() {}, fillRect() {}, getImageData: (_x, _y, width, height) => ({ width, height, data: new Uint8ClampedArray(4) }),
   })
 })
 afterEach(() => {
   mounted.splice(0).forEach(({ app, host }) => { app.unmount(); host.remove() })
   vi.restoreAllMocks()
+  vi.clearAllMocks()
 })
 
 describe('main map point layers', () => {
@@ -231,5 +232,159 @@ describe('main map point layers', () => {
     const map = await mountMap()
     const layers = [...map.layers.keys()]
     expect(layers.indexOf('admin-boundary-line-layer')).toBeLessThan(layers.indexOf('map-points-layer'))
+  })
+
+  it('preserves base coordinate deduplication, location font sizes and custom visibility without DOM markers', async () => {
+    mapStore.mode = 'base'
+    mapStore.mapData = { coordinates_locations: [
+      ['广州', [113, 23]], ['重复', [113.0000001, 23]], ['四字地名', [114, 24]], ['五个字地名', [115, 25]],
+      ['六个字的地名', [116, 26]], ['空', null], ['   ', [117, 27]],
+    ] }
+    mapStore.mergedData = [
+      { location: '个人', coordinate: [118, 28], iscustoms: 1 },
+      { location: '重复个人', coordinate: [118, 28], iscustoms: 1 },
+      { location: '已有基础', coordinate: [113, 23], iscustoms: 1 },
+    ]
+    const map = await mountMap()
+    expect(markers).toHaveLength(0)
+    expect(pointFeatures(map).map(feature => feature.properties.label)).toEqual(['广州', '四字地名', '五个字地名', '六个字的地名'])
+    expect(pointFeatures(map).map(feature => feature.properties.fontSize)).toEqual([12.5, 11.5, 10.5, 10])
+    expect(map.images.size).toBe(1)
+    hit(map, 0)
+    expect(getLocationDetail).toHaveBeenCalledWith('广州')
+    expect(popups).toHaveLength(0)
+    mapStore.showCustomData = true; await nextTick()
+    expect(pointFeatures(map).map(feature => feature.properties.label)).toEqual(['广州', '四字地名', '五个字地名', '六个字的地名', '个人'])
+  })
+
+  it('keeps feature filters, text, color reuse, percentage details and the original detail action', async () => {
+    mapStore.mode = 'feature'
+    mapStore.mergedData = [
+      { location: '甲', feature: '声母', value: 'tɕʰ ŋ̍ 中文', color: '#ff0', coordinate: [113, 23], detailContent: [{ value: 'a', percentage: 0.7 }] },
+      { location: '乙', feature: '声母', value: 'ɐ', color: '#ff0', coordinate: [113, 23] },
+      { location: '个人', feature: '声母', value: 'a', color: '#0ff', coordinate: [115, 24], iscustoms: 1 },
+      { location: '其他', feature: '韵母', value: 'b', coordinate: [116, 25] },
+      { location: '空', feature: '声母', value: ' ', coordinate: [116, 25] },
+      { location: '坏点', feature: '声母', value: 'b', coordinate: [NaN, 25] },
+    ]
+    const props = reactive({ activeFeature: '声母' })
+    const map = await mountMap(props)
+    expect(markers).toHaveLength(0)
+    expect(popups).toHaveLength(0)
+    expect(pointFeatures(map).map(feature => feature.properties.label)).toEqual(['tɕʰ ŋ̍ 中文', 'ɐ'])
+    expect(map.images.size).toBe(2)
+    hit(map, 0)
+    const popup = popups.at(-1)
+    expect(popup.options.offset).toBe(80)
+    expect(popup.node.textContent).toContain('70.0%')
+    popup.node.querySelector('button').click()
+    expect(get_detail).toHaveBeenCalledWith('甲', '声母', false, true)
+    props.activeFeature = '韵母'; await nextTick()
+    expect(popup.open).toBe(false)
+    expect(pointFeatures(map).map(feature => feature.properties.label)).toEqual(['b'])
+    props.activeFeature = ''; await nextTick()
+    expect(pointFeatures(map)).toHaveLength(0)
+  })
+
+  it('preserves the custom feature delete action and closes/unmounts the active popup on component removal', async () => {
+    mapStore.mode = 'feature'; mapStore.showCustomData = true
+    const item = { location: '个人', feature: '声母', value: 'a', coordinate: [113, 23], iscustoms: 1, notes: '原始备注 📝' }
+    mapStore.mergedData = [item]
+    const map = await mountMap({ activeFeature: '声母', isCustom: true })
+    expect(popups).toHaveLength(0)
+    hit(map, 0)
+    const popup = popups.at(-1)
+    popup.node.querySelector('button').click()
+    expect(deleteItem).toHaveBeenCalledWith(item)
+    const { app, host } = mounted.pop(); app.unmount(); host.remove()
+    expect(popup.open).toBe(false)
+    expect(popup.node.childNodes).toHaveLength(0)
+    expect(map.removed).toBe(true)
+    expect(map.images.size).toBe(0)
+    expect(map.handlers.filter(entry => entry.layer === 'map-points-layer')).toHaveLength(0)
+  })
+
+  it('keeps keyboard point traversal and Enter/Space popup activation with one reusable focus target', async () => {
+    mapStore.mode = 'compare'
+    mapStore.mergedData = ['甲', '乙', '丙'].map(location => ({ location, coordinate: [113, 23], color: '#f00' }))
+    const map = await mountMap()
+    const target = map.getCanvasContainer().querySelector('.map-point-keyboard-target')
+    expect(target).not.toBeNull()
+    expect(map.getCanvasContainer().querySelectorAll('button')).toHaveLength(1)
+    target.focus()
+    target.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
+    expect(popups.at(-1).node.textContent).toContain('甲')
+    target.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true }))
+    expect(target.getAttribute('aria-label')).toContain('乙')
+    target.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }))
+    expect(popups.at(-1).node.textContent).toContain('乙')
+    target.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true }))
+    expect(target.getAttribute('aria-label')).toContain('甲')
+    mapStore.mode = 'heatmap'; await nextTick()
+    expect(map.getCanvasContainer().querySelectorAll('button')).toHaveLength(0)
+    expect(map.handlers.filter(entry => entry.type === 'move')).toHaveLength(0)
+  })
+
+  it('renders complete combining-mark labels once per distinct text and rejects clicks in text shadow padding', async () => {
+    mapStore.mode = 'feature'
+    mapStore.mergedData = Array.from({ length: 1000 }, (_, index) => ({
+      location: `地点${index}`, feature: '声母', value: 'ŋ̍a', coordinate: [113, 23], color: '#ffff99',
+    }))
+    const map = await mountMap({ activeFeature: '声母' })
+    expect(pointFeatures(map)).toHaveLength(1000)
+    expect(pointFeatures(map).every(feature => feature.properties.renderText === '')).toBe(true)
+    expect(map.images.size).toBe(1)
+    const context = HTMLCanvasElement.prototype.getContext.mock.results[0].value
+    expect(context.fillText).toHaveBeenCalledTimes(1)
+    expect(context.fillText.mock.calls[0][0]).toBe('ŋ̍a')
+    map.emit('click', { features: pointFeatures(map), point: { x: 140, y: 23 }, lngLat: { lng: 140, lat: 23 } }, 'map-points-layer')
+    expect(popups).toHaveLength(0)
+    map.emit('click', { features: pointFeatures(map), point: { x: 113, y: 23 }, lngLat: { lng: 113, lat: 23 } }, 'map-points-layer')
+    expect(popups.at(-1).node.textContent).toContain('地点999')
+  })
+
+  it('redraws feature labels on resize only when their computed font or pixel density changes', async () => {
+    let fontSize = 16
+    vi.spyOn(window, 'getComputedStyle').mockImplementation(() => ({
+      fontSize: `${fontSize}px`, fontFamily: 'Times New Roman', lineHeight: '20px', color: '#000',
+      backgroundColor: 'transparent', borderRadius: '0', borderTopWidth: '0.7px', borderTopColor: '#000', paddingLeft: '4px', paddingTop: '2px',
+    }))
+    mapStore.mode = 'feature'
+    mapStore.mergedData = [{ location: '甲', feature: '声母', value: 'a', coordinate: [113, 23] }]
+    const map = await mountMap({ activeFeature: '声母' })
+    const addSource = vi.spyOn(map, 'addSource')
+    map.emit('resize'); await nextTick()
+    expect(addSource).not.toHaveBeenCalled()
+    fontSize = 20
+    map.emit('resize'); await nextTick()
+    expect(pointFeatures(map)[0].properties.fontSize).toBe(20)
+  })
+
+  it('preserves flag emoji as a single canvas label instead of two regional indicator glyphs', async () => {
+    mapStore.mode = 'feature'
+    mapStore.mergedData = [{ location: '甲', feature: '声母', value: '🇨🇳', coordinate: [113, 23] }]
+    const map = await mountMap({ activeFeature: '声母' })
+    expect(pointFeatures(map)[0].properties.renderText).toBe('')
+  })
+
+  it('bounds a very long combining label texture without truncating the displayed string', async () => {
+    const context = HTMLCanvasElement.prototype.getContext.mock.results[0]?.value || document.createElement('canvas').getContext('2d')
+    context.measureText.mockReturnValue({ width: 1e9 })
+    mapStore.mode = 'feature'
+    const label = 'ŋ̍'.repeat(2000)
+    mapStore.mergedData = [{ location: '甲', feature: '声母', value: label, coordinate: [113, 23] }]
+    const map = await mountMap({ activeFeature: '声母' })
+    expect(pointFeatures(map)[0].properties.label).toBe(label)
+    expect(context.fillText.mock.calls[0][0]).toBe(label)
+    expect([...map.images.values()][0].options.pixelRatio).toBeLessThan(1)
+    expect([...map.images.values()][0].image.width).toBeLessThanOrEqual(4096)
+    expect([...map.images.values()][0].image.height).toBeGreaterThanOrEqual(1)
+  })
+
+  it('does not hit the transparent corners around a circular dot', async () => {
+    mapStore.mapData = { coordinates_locations: [['甲', [113, 23]]], region_mappings: { 甲: '甲-乙-丙' } }
+    const map = await mountMap()
+    map.emit('click', { features: pointFeatures(map), point: { x: 119, y: 29 }, lngLat: { lng: 119, lat: 29 } }, 'map-points-layer')
+    expect(popups).toHaveLength(0)
   })
 })

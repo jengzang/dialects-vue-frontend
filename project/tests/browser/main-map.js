@@ -7,8 +7,13 @@ import MapLibre from '../../src/main/components/map/MapLibre.vue'
 import { mapStore } from '../../src/main/store/store.js'
 
 const originalSetStyle = maplibregl.Map.prototype.setStyle
+window.mainMapErrors = []
 maplibregl.Map.prototype.setStyle = function () {
   window.mainMap = this
+  if (!this.mainMapErrorBound) {
+    this.mainMapErrorBound = true
+    this.on('error', event => window.mainMapErrors.push(event.error.message))
+  }
   return originalSetStyle.call(this, { version: 8, sources: {}, layers: [{ id: 'background', type: 'background', paint: { 'background-color': '#ededed' } }] }, { diff: false })
 }
 const component = ref(null)
