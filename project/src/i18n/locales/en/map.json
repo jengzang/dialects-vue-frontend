@@ -347,6 +347,8 @@
     }
   },
   "partitionColors": {
+    "expand": "Expand",
+    "collapse": "Collapse",
     "title": "Partition colors",
     "search": "Search partitions",
     "sessionHint": "Changes are saved automatically for this tab session.",

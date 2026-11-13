@@ -347,6 +347,8 @@
     }
   },
   "partitionColors": {
+    "expand": "展開",
+    "collapse": "收起",
     "title": "分區顏色",
     "search": "搜尋分區",
     "sessionHint": "修改後自動儲存，僅在目前分頁工作階段中生效。",

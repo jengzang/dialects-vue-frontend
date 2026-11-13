@@ -2,7 +2,10 @@
   <details class="partition-color-editor" :class="{ 'glass-panel': !opened }" @toggle="onToggle">
     <summary>
       <span>{{ t('map.partitionColors.title') }}</span>
-      <svg class="editor-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
+      <span class="editor-toggle-hint">
+        <span>{{ t(opened ? 'map.partitionColors.collapse' : 'map.partitionColors.expand') }}</span>
+        <svg class="editor-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
+      </span>
     </summary>
     <div class="editor-content">
       <div class="editor-toolbar">
@@ -16,7 +19,7 @@
         {{ error }}
         <button type="button" class="pill-btn" @click="loadTree">{{ t('map.partitionColors.retry') }}</button>
       </div>
-      <div v-else class="color-tree glass-subpanel ui-scrollbar">
+      <div v-else class="color-tree glass-panel ui-scrollbar">
         <PartitionColorTreeItem v-for="node in filteredNodes" :key="node.path" :node="node" :colors="colors" :search-query="search" @color-change="changeColor" />
         <small v-if="!filteredNodes.length">{{ t('map.partitionColors.empty') }}</small>
       </div>
@@ -130,6 +133,14 @@ summary {
 
   &::-webkit-details-marker { display: none; }
 }
+.editor-toggle-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-secondary);
+  font-size: var(--font-size-12);
+  font-weight: 400;
+}
 .editor-chevron { flex-shrink: 0; transition: transform 0.2s ease; }
 .partition-color-editor[open] .editor-chevron { transform: rotate(90deg); }
 .editor-content { @include flex-col; gap: 12px; padding-top: 14px; }
@@ -148,5 +159,5 @@ summary {
   .editor-search { order: 1; flex-basis: 100%; }
 }
 .editor-hint { color: var(--text-secondary); font-size: var(--font-size-12); line-height: 1.6; }
-.color-tree { max-height: 320px; overflow-y: auto; padding: 6px 8px; }
+.color-tree { padding: 6px 8px; }
 </style>

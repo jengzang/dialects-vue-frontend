@@ -347,6 +347,8 @@
     }
   },
   "partitionColors": {
+    "expand": "展开",
+    "collapse": "收起",
     "title": "分区颜色",
     "search": "搜索分区",
     "sessionHint": "修改后自动保存，仅在当前标签页会话中生效。",
