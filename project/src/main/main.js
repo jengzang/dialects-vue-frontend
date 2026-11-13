@@ -1,10 +1,12 @@
 // src/main.js
 // ⚠️ 必须在最开头导入环境配置
 import '../env-config.js'
+import { WEB_BASE } from '../env-config.js'
 
 import { createApp } from 'vue'
 import { initializeNativeDownloadLinks } from '../platform/fileExport.js'
 import { getCurrentRuntimePlatform } from '../platform/runtime.js'
+import { reportAppStart } from '../platform/appStartVisit.js'
 import { initializeNativeBackPriority } from '../platform/backRegistry.js'
 import { initializeNativeAudioIntake } from '../platform/audioIntake.js'
 import { buildLocalePath } from '../i18n/localeRouting.js'
@@ -27,6 +29,7 @@ import { initializePlatformServices } from '../platform/index.js'
 import PanelManager from './components/result/PanelManager.vue'
 
 await initializePlatformServices()
+void reportAppStart(getCurrentRuntimePlatform(), WEB_BASE)
 await loadLocaleMessages(i18n.global.locale.value)
 
 bootstrapAuthSession()
