@@ -43,3 +43,19 @@ describe('text export dispatch', () => {
     click.mockRestore()
   })
 })
+
+it('exports native GeoJSON without importing plugins into geometry workers', async () => {
+  const { registerNativeFileService } = await import('../src/platform/fileExport.js')
+  const { exportFeatureCollectionAsGeoJson } = await import('../src/main/utils/drawMap/export.js')
+  window.Capacitor = { getPlatform: () => 'ios' }
+  const saveBlob = vi.fn().mockResolvedValue({})
+  registerNativeFileService({ saveBlob })
+  try {
+    const collection = { type: 'FeatureCollection', features: [] }
+    await expect(exportFeatureCollectionAsGeoJson(collection, '地圖.geojson')).resolves.toEqual(collection)
+    expect(saveBlob).toHaveBeenCalledWith(expect.any(Blob), '地圖.geojson')
+  } finally {
+    delete window.Capacitor
+    registerNativeFileService(null)
+  }
+})

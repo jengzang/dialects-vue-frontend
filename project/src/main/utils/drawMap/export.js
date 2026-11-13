@@ -1,4 +1,5 @@
-import { getCurrentRuntimePlatform, getPlatformFileService } from '@/platform/index.js'
+import { getCurrentRuntimePlatform } from '@/platform/runtime.js'
+import { getPlatformFileService } from '@/platform/fileExport.js'
 import { kml as kmlToGeoJson } from '@tmcw/togeojson'
 import { DOMParser } from '@xmldom/xmldom'
 import { unzipSync, strFromU8 } from 'fflate'
