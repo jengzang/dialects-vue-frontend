@@ -365,7 +365,7 @@
       "hide": "Hide",
       "viewPlaceNames": "Show Place Names",
       "useCustomPartitionColors": "Use custom colors",
-      "useCustomPartitionColorsHelp": "You can customize partition colors on the Map > Partition Map page.",
+      "useCustomPartitionColorsHelp": "You can customize partition colors on the Map > Partition Map page. Colors default to those from Hanzi Yindian.",
       "enabled": "On",
       "disabled": "Off"
     },
