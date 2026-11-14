@@ -42,7 +42,8 @@
       v-for="stage in renderedStages"
       :key="stage.major"
       class="history-stage"
-      :class="{ 'glass-panel': featured }"
+      :class="{ 'surface-panel': featured }"
+      :data-variant="featured ? 'transparent' : null"
       :aria-labelledby="`history-stage-${stage.major}`"
       data-directory-nav-target
     >
@@ -320,12 +321,10 @@ function parseLocalizedParts(content) {
 }
 
 .history-page--featured .history-stage {
-  --glass-panel-background: none;
-  --glass-panel-backdrop-filter: none;
-  --glass-panel-border: 1px solid rgba(var(--color-primary-rgb), 0.15);
-  --glass-panel-radius: var(--radius-md);
-  --glass-panel-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.08);
-  --glass-panel-hover-shadow: 0 12px 32px rgba(var(--color-primary-rgb), 0.18);
+  border: 1px solid rgba(var(--color-primary-rgb), 0.15);
+  --surface-panel-radius: var(--radius-md);
+  --surface-panel-shadow: 0 2px 8px rgba(var(--color-primary-rgb), 0.08);
+  --surface-panel-hover-shadow: 0 12px 32px rgba(var(--color-primary-rgb), 0.18);
 
   box-sizing: border-box;
   width: 100%;

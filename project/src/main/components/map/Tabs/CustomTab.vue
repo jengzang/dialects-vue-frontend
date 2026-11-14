@@ -105,7 +105,7 @@
           :class="{ 'search-open': showFloatingSearchInput }"
         >
           <!-- Collapsible Tree Selector -->
-          <div class="tree-selector-container glass-panel">
+          <div class="tree-selector-container surface-panel" data-variant="transparent">
             <div
               v-if="loadingFeatures"
               class="loading-state-base"
@@ -978,14 +978,13 @@ const openEntryModal = () => {
   }
 }
 
-.tree-selector-container {
+.tree-selector-container.surface-panel {
   width: 100%;
   min-width: 0;
   min-height: 220px;
   padding: 12px;
   overflow-y: auto;
-  background: none;
-  backdrop-filter: none;
+  border: 1px solid var(--border-glass);
   // border: 1px solid var(--glass-40);
   // border-radius: var(--radius-lg);
   // background: $glass-white;

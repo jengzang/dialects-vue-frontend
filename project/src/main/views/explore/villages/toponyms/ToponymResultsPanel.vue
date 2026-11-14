@@ -1,5 +1,5 @@
 <template>
-  <aside class="toponym-results-panel toponym-results-panel__inspector glass-panel">
+  <aside class="toponym-results-panel toponym-results-panel__inspector surface-panel" data-variant="transparent">
     <div class="toponym-results-panel__inner ui-scrollbar">
       <section class="toponym-results-panel__summary">
         <div class="toponym-results-panel__section-header">
@@ -290,8 +290,9 @@ function flattenNameTreeNodes(nodes, lineage = '', depth = 0) {
 
 .toponym-results-panel {
   min-inline-size: 0;
-  background: none;
-  backdrop-filter: none;
+  &.surface-panel {
+    border: 1px solid var(--border-glass);
+  }
 
   &__inspector {
     position: relative;
