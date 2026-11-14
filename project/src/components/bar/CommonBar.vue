@@ -874,11 +874,11 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   cursor: pointer;
   border-radius: 30px;
   transition: all $transition-base ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
   @include glass-control;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transform: scale(1.05);
   }
 }
