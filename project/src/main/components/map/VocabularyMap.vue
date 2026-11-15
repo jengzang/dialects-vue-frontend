@@ -8,7 +8,7 @@
         </div>
       </div>
 
-      <div class="map-controls" v-if="!isFullScreen">
+      <div class="map-controls" v-if="showControls && !isFullScreen">
         <div class="control-group">
           <SimpleSelectDropdown
             v-model="currentStyleKey"
@@ -85,6 +85,18 @@ const props = defineProps({
   activeTab: {
     type: String,
     default: 'vocabulary'
+  },
+  showControls: {
+    type: Boolean,
+    default: true
+  },
+  enableCustomPartitionColors: {
+    type: Boolean,
+    default: true
+  },
+  overviewPartitionColors: {
+    type: Boolean,
+    default: false
   }
 })
 const emit = defineEmits(['marker-click'])
@@ -124,7 +136,7 @@ const mapLoaded = ref(false)  // 跟踪地图是否已加载
 const isLoadingMarkers = ref(false)  // 跟踪标记是否正在加载
 const { t } = useI18n()
 const { loadPartitionColors, getPartitionColor, getContrastTextColor, colorVersion } = usePartitionColors()
-const useCustomPartitionColors = ref(true)
+const useCustomPartitionColors = ref(props.enableCustomPartitionColors)
 const partitionIdentity = computed(() => JSON.stringify([userStore.role, userStore.id]))
 
 const ensurePartitionColors = async () => {
@@ -401,7 +413,13 @@ function normalizeOverviewCount(count, scale) {
   return clampNumber((scaledCount - scale.p5) / (scale.p95 - scale.p5), 0, 1)
 }
 
-function getOverviewMarkerStyle(count, scale) {
+function getOverviewMarkerStyle(count, scale, yindianRegion) {
+  if (props.overviewPartitionColors && yindianRegion) {
+    const color = getPartitionColor('yindian', partitionIdentity.value, yindianRegion)
+    if (color) {
+      return { color, textColor: getContrastTextColor(color), fontSize: `${OVERVIEW_MARKER_FONT_SIZE}px` }
+    }
+  }
   const normalized = normalizeOverviewCount(count, scale)
   const colorIndex = Math.min(
     OVERVIEW_MARKER_COLORS.length - 1,
@@ -551,7 +569,7 @@ const convertToGeoJSON = (data) => {
         markerMode: displayMode.value,
         bgColor: bgColor,
         textColor: textColor,
-        overviewStyle: isOverviewMode ? getOverviewMarkerStyle(overviewCount, overviewScale) : null,
+        overviewStyle: isOverviewMode ? getOverviewMarkerStyle(overviewCount, overviewScale, aggregatedData.yindianRegion) : null,
         // 使用聚合后的数据用于弹窗
         ...aggregatedData,
         // 添加额外信息：此位置的数据点数量

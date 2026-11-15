@@ -9,7 +9,10 @@
   "download": {
     "title": "下载应用",
     "description": "随时随地触摸方言的历史层次。",
-    "availability": "下载苹果和安卓应用，了解最新信息。"
+    "availability": "下载苹果和安卓应用，了解最新信息。",
+    "mapStats": "地图：{points} 个方言点 · 共 {entries} 条数据",
+    "mapLoading": "正在加载方言点地图…",
+    "mapError": "方言点地图加载失败"
   },
   "showcase": {
     "nav": "产品展示",

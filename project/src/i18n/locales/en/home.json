@@ -9,7 +9,10 @@
   "download": {
     "title": "Download the app",
     "description": "Discover the historical layers of dialects, wherever you are.",
-    "availability": "Download the iOS and Android apps and get the latest updates."
+    "availability": "Download the iOS and Android apps and get the latest updates.",
+    "mapStats": "Map: {points} dialect points · {entries} entries total",
+    "mapLoading": "Loading dialect point map…",
+    "mapError": "Failed to load dialect point map"
   },
   "showcase": {
     "nav": "Product showcase",

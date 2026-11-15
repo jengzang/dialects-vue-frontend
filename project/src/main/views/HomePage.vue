@@ -237,6 +237,19 @@
           <span aria-hidden="true">↗</span>
         </RouterLink>
       </div>
+      <div class="home-dialect-map-block">
+        <div class="home-dialect-map-stats">
+          <span>{{ $t('home.download.mapStats', { points: dialectMapStats.totalPoints, entries: dialectMapStats.totalEntries }) }}</span>
+        </div>
+        <div v-if="dialectMapError" class="home-dialect-map-error">{{ dialectMapError }}</div>
+        <VocabularyMap
+          v-else-if="dialectMapData.length"
+          :map-data="dialectMapData"
+          :show-controls="false"
+          :overview-partition-colors="true"
+        />
+        <div v-else-if="dialectMapLoading" class="home-dialect-map-loading">{{ $t('home.download.mapLoading') }}</div>
+      </div>
     </section>
     <FeaturesSection />
 
@@ -487,6 +500,8 @@ import { useClickParticles } from '@/main/composables/useClickParticles.js'
 import { getCachedSourceStats, getSourceStats } from '@/composables/data/useSourceStats.js'
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 import { getCurrentRuntimePlatform } from '@/platform/runtime.js'
+import { api } from '@/api/auth/httpClient.js'
+import VocabularyMap from '@/main/components/map/VocabularyMap.vue'
 
 // ✅ 懒加载：先弹窗 → 地球 → Hero 展示
 const GlobeBackground = defineAsyncComponent(() =>
@@ -507,6 +522,10 @@ const UpdateNoticeModal = defineAsyncComponent(() =>
 
 const { t, locale } = useI18n()
 const showAppDownload = (typeof __IS_NATIVE_BUILD__ === 'undefined' || !__IS_NATIVE_BUILD__) && getCurrentRuntimePlatform().container !== 'native-webview'
+const dialectMapData = ref([])
+const dialectMapLoading = ref(false)
+const dialectMapError = ref('')
+const dialectMapStats = ref({ totalPoints: 0, totalEntries: 0 })
 const router = useRouter()
 const route = useRoute()
 const {
@@ -746,11 +765,47 @@ async function fetchGlobePoints() {
   }
 }
 
+function normalizeDialectMapPoint(point) {
+  const values = String(point.coordinates || '')
+    .split(/[，,\s]+/)
+    .map(Number)
+    .filter(Number.isFinite)
+  if (values.length < 2) return null
+  return {
+    longitude: values[0],
+    latitude: values[1],
+    entryCount: Number(point.entry_count) || 0,
+    locationName: point.location || '',
+    yindianRegion: point.yindian_region || '',
+    atlasRegion: point.atlas_region || '',
+    items: []
+  }
+}
+
+async function fetchDialectMap() {
+  if (!showAppDownload) return
+  dialectMapLoading.value = true
+  try {
+    const result = await api('/dialect_counts')
+    dialectMapStats.value = {
+      totalPoints: Number(result.total_points) || 0,
+      totalEntries: Number(result.total_entries) || 0
+    }
+    dialectMapData.value = (result.points || []).map(normalizeDialectMapPoint).filter(Boolean)
+  } catch (error) {
+    dialectMapError.value = error.message || t('home.download.mapError')
+    console.error('獲取方言點統計地圖失敗:', error)
+  } finally {
+    dialectMapLoading.value = false
+  }
+}
+
 useClickParticles()
 
 onMounted(() => {
   window.addEventListener('keydown', handleGlobeModeKeydown)
   fetchGlobePoints()
+  fetchDialectMap()
   setTimeout(() => {
     fetchVisitStats()
     fetchSourceStats()
@@ -815,6 +870,34 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &__description { font-size: var(--font-size-20); margin: 0.4rem 0; text-align: center; }
   &__availability { color: var(--text-dark-lighter); font-size: var(--font-size-13); }
   &__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 1rem; }
+}
+
+.home-dialect-map-block {
+  margin-top: 2rem;
+}
+
+.home-dialect-map-stats,
+.home-dialect-map-loading,
+.home-dialect-map-error {
+  color: var(--text-dark-lighter);
+  font-size: var(--font-size-14);
+  text-align: center;
+}
+
+.home-dialect-map-error {
+  color: var(--color-error-light);
+}
+
+.home-dialect-map-block :deep(.vocabulary-map-container) {
+  min-height: 520px;
+  margin-top: 0.75rem;
+}
+
+.home-dialect-map-block :deep(.map-container) {
+  min-height: 520px;
+}
+
+.home-download {
   &__entry {
     --glass-card-background: rgba(var(--color-shadow-rgb), 0.9);
 
