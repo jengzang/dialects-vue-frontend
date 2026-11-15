@@ -24,9 +24,11 @@
       </h2>
       <div class="platform-row">
         <div class="platform-details">
-          <p class="platform-label">
-            iOS / iPadOS
-          </p>
+          <PhAppleLogo
+            class="platform-icon"
+            weight="fill"
+            aria-hidden="true"
+          />
           <h3>{{ t('application.platforms.ios.title') }}</h3>
         </div>
         <button
@@ -40,9 +42,11 @@
       </div>
       <div class="platform-row">
         <div class="platform-details">
-          <p class="platform-label">
-            ANDROID
-          </p>
+          <PhAndroidLogo
+            class="platform-icon"
+            weight="fill"
+            aria-hidden="true"
+          />
           <h3>{{ t('application.platforms.android.title') }}</h3>
         </div>
         <div class="platform-channels">
@@ -74,6 +78,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { PhAndroidLogo, PhAppleLogo } from '@phosphor-icons/vue'
 import { currentColorTheme, getBrandAssets } from '@/composables/core/uiPreferences.js'
 
 const { t } = useI18n()
@@ -144,12 +149,17 @@ const appIcon = computed(() => getBrandAssets(currentColorTheme.value).logo)
   border-top: 1px solid var(--border-glass-subtle);
 }
 
-.platform-label {
-  margin: 0 0 6px;
+.platform-details {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.platform-icon {
   color: var(--color-primary);
-  font-size: var(--font-size-12);
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  flex: none;
+  width: 32px;
+  height: 32px;
 }
 
 .platform-details h3 {
