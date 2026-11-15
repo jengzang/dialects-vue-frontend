@@ -56,7 +56,7 @@
             aria-hidden="true"
           />
           <h3>{{ t('application.platforms.android.title') }}</h3>
-          <span class="platform-version">v5.2.7</span>
+          <span class="platform-version">v5.3.0</span>
         </div>
         <div class="platform-channels">
           <div class="channel-group">

@@ -91,7 +91,6 @@ function readLabelStyle() {
     borderColor: nameCss.borderTopColor || 'rgba(255,255,255,0.7)',
     radius: parseFloat(nameCss.borderRadius) || 4,
     gap: parseFloat(getComputedStyle(probe).gap) || 2,
-    countColor: countCss.color || '#333',
   }
   probe.remove()
   return style
@@ -128,7 +127,7 @@ function getLabelImage(label, style, pixelRatio, pending, tier) {
     context.ellipse(x, margin + style.nameHeight / 2, label.width / 2, style.nameHeight / 2, 0, 0, Math.PI * 2)
     context.fill()
     context.font = style.countFont
-    context.fillStyle = getContrastTextColor(label.color)
+    context.fillStyle = '#000'
     context.fillText(label.count, x, margin + style.nameHeight / 2)
   } else {
     context.fillRect(x - label.nameWidth / 2, margin, label.nameWidth, style.nameHeight)
@@ -136,7 +135,7 @@ function getLabelImage(label, style, pixelRatio, pending, tier) {
     context.fillStyle = getContrastTextColor(label.color)
     context.fillText(label.name, x, margin + style.nameHeight / 2)
     context.font = style.countFont
-    context.fillStyle = style.countColor
+    context.fillStyle = '#000'
     context.fillText(label.count, x, margin + style.nameHeight + style.gap + style.countLine / 2)
   }
   const id = `home-dialect-label-${images.size}`
@@ -392,7 +391,7 @@ onBeforeUnmount(() => {
 }
 
 :global(.dialect-point-marker__count) {
-  color: var(--text-primary);
+  color: #000;
   font-size: 8px;
   font-weight: 700;
   line-height: 1;
