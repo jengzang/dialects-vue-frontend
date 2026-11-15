@@ -10,6 +10,8 @@
     "title": "下載應用程式",
     "description": "隨時隨地觸摸方言的歷史層次。",
     "availability": "下載蘋果和安卓應用程式，了解最新資訊。",
+    "mapTitle": "方言地圖",
+    "mapEmpty": "暫無方言點資料",
     "mapStats": "地圖：{points} 個方言點 · 共 {entries} 條資料",
     "mapLoading": "正在載入方言點地圖…",
     "mapError": "方言點地圖載入失敗"

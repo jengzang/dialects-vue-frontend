@@ -237,19 +237,36 @@
           <span aria-hidden="true">↗</span>
         </RouterLink>
       </div>
-      <div class="home-dialect-map-block">
-        <div class="home-dialect-map-stats">
-          <span>{{ $t('home.download.mapStats', { points: dialectMapStats.totalPoints, entries: dialectMapStats.totalEntries }) }}</span>
-        </div>
-        <div v-if="dialectMapError" class="home-dialect-map-error">{{ dialectMapError }}</div>
-        <VocabularyMap
-          v-else-if="dialectMapData.length"
-          :map-data="dialectMapData"
-          :show-controls="false"
-          :overview-partition-colors="true"
-        />
-        <div v-else-if="dialectMapLoading" class="home-dialect-map-loading">{{ $t('home.download.mapLoading') }}</div>
+    </section>
+    <section class="home-dialect-map-section">
+      <div class="home-section-heading">
+        <h2 class="section-title">{{ $t('home.download.mapTitle') }}</h2>
+        <button
+          class="glass-button home-dialect-map-fullscreen"
+          :class="{ 'is-map-fullscreen': dialectMapFullscreen }"
+          type="button"
+          :aria-label="dialectMapFullscreen ? $t('result.phonologyTable.exitFullscreen') : $t('result.phonologyTable.fullscreen')"
+          :aria-pressed="dialectMapFullscreen"
+          @click="dialectMapFullscreen = !dialectMapFullscreen"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path v-if="dialectMapFullscreen" d="M9 3v6H3M15 3v6h6M3 15h6v6M21 15h-6v6" />
+            <path v-else d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5" />
+          </svg>
+        </button>
       </div>
+      <div class="home-dialect-map-stats">
+        <span>{{ $t('home.download.mapStats', { points: dialectMapStats.totalPoints, entries: dialectMapStats.totalEntries }) }}</span>
+      </div>
+      <div v-if="dialectMapError" class="home-dialect-map-error">{{ dialectMapError }}</div>
+      <DialectPointMap
+        v-else
+        :points="dialectMapData"
+        :fullscreen="dialectMapFullscreen"
+        :loading="dialectMapLoading"
+        :loading-text="$t('home.download.mapLoading')"
+        :empty-text="$t('home.download.mapEmpty')"
+      />
     </section>
     <FeaturesSection />
 
@@ -501,7 +518,7 @@ import { getCachedSourceStats, getSourceStats } from '@/composables/data/useSour
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 import { getCurrentRuntimePlatform } from '@/platform/runtime.js'
 import { api } from '@/api/auth/httpClient.js'
-import VocabularyMap from '@/main/components/map/VocabularyMap.vue'
+import DialectPointMap from '@/main/components/map/DialectPointMap.vue'
 
 // ✅ 懒加载：先弹窗 → 地球 → Hero 展示
 const GlobeBackground = defineAsyncComponent(() =>
@@ -526,6 +543,7 @@ const dialectMapData = ref([])
 const dialectMapLoading = ref(false)
 const dialectMapError = ref('')
 const dialectMapStats = ref({ totalPoints: 0, totalEntries: 0 })
+const dialectMapFullscreen = ref(false)
 const router = useRouter()
 const route = useRoute()
 const {
@@ -872,9 +890,14 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   &__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 1rem; }
 }
 
-.home-dialect-map-block {
-  margin-top: 2rem;
-}
+.home-dialect-map-section { @include section-container(1300px); padding: clamp(2rem, 4dvw, 4rem) clamp(1.5rem, 3dvw, 2.5rem); }
+
+.home-section-heading { display: flex; align-items: center; justify-content: center; gap: 1rem; }
+
+.home-dialect-map-fullscreen { width: 40px; height: 40px; padding: 0; }
+.home-dialect-map-fullscreen.is-map-fullscreen { position: fixed; top: 18px; right: 18px; z-index: calc(var(--z-index-vocabulary-map-fullscreen) + 1); }
+
+.home-dialect-map-fullscreen svg { width: 20px; height: 20px; }
 
 .home-dialect-map-stats,
 .home-dialect-map-loading,
@@ -888,35 +911,8 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
   color: var(--color-error-light);
 }
 
-.home-dialect-map-block :deep(.vocabulary-map-container) {
-  min-height: 520px;
-  margin-top: 0.75rem;
-}
-
-.home-dialect-map-block :deep(.map-container) {
-  min-height: 520px;
-}
-
-.home-download {
-  &__entry {
-    --glass-card-background: rgba(var(--color-shadow-rgb), 0.9);
-
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    // flex: 1 1 120px;
-    max-width: 360px;
-    padding: 0.4rem 0.5rem;
-    color: var(--text-white);
-    text-decoration: none;
-
-    &:hover { background: rgba(var(--color-shadow-rgb), 1); }
-  }
-
-  @media (max-aspect-ratio: 1 / 1) {
-    &__entry { flex: 0 1 auto; }
-  }
-}
+.home-download__entry { --glass-card-background: rgba(var(--color-shadow-rgb), 0.9); display: flex; align-items: center; gap: 0.6rem; max-width: 360px; padding: 0.4rem 0.5rem; color: var(--text-white); text-decoration: none; }
+.home-download__entry:hover { background: rgba(var(--color-shadow-rgb), 1); }
 
 .home-page {
   position: relative;
