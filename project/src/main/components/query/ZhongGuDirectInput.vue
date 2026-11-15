@@ -49,7 +49,10 @@
     />
 
      <div class="input-section" style="margin-top: 12px;">
-      <label class="input-label">{{ $t('query.components.zhongguDirectInput.charLabel') }}</label>
+      <div class="input-label-row">
+        <label class="input-label">{{ $t('query.components.zhongguDirectInput.charLabel') }}</label>
+        <CheckBox v-model="convertToTraditional" :label="$t('query.components.zhongguDirectInput.convertToTraditional')" size="14" font-size="12" />
+      </div>
       <input
         v-model="charInput"
         class="glass-field"
@@ -71,9 +74,11 @@
 import { ref, computed, watch } from 'vue'
 import ZhongGuSelector from '@/main/components/query/ZhongGuSelector.vue'
 import ZhongGuInputHelpModal from '@/main/components/query/popups/ZhongGuInputHelpModal.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
 import { validateAll, parseTokens, tokensToPathStrings } from '@/main/utils/query/zhongguDirectInputValidator.js'
 import { ROLE_LIMITS } from '@/main/config/constants.js'
 import { userStore } from '@/main/store/store.js'
+import * as OpenCCCN2T from 'opencc-js/cn2t'
 
 const emit = defineEmits(['update:runDisabled'])
 
@@ -84,6 +89,8 @@ const props = defineProps({
 
 const positionInput = ref('')
 const charInput = ref('')
+const convertToTraditional = ref(false)
+const toTraditional = OpenCCCN2T.Converter({ from: 'cn', to: 'tw' })
 const positionErrors = ref([])
 const positionWarnings = ref([])
 const isHelpModalOpen = ref(false)
@@ -106,7 +113,9 @@ const pathStrings = computed(() => {
 
 const chars = computed(() => {
   if (!charInput.value.trim()) return ''
-  return [...charInput.value.trim()].filter(ch => /\p{Script=Han}/u.test(ch))
+  const input = [...charInput.value.trim()].filter(ch => /\p{Script=Han}/u.test(ch)).join('')
+  const converted = convertToTraditional.value ? toTraditional(input) : input
+  return [...converted]
 })
 
 function onPositionInput() {
@@ -143,7 +152,7 @@ watch(chars, (newVal) => {
   }
 })
 
-defineExpose({ pathStrings, chars, positionInput, charInput })
+defineExpose({ pathStrings, chars, positionInput, charInput, convertToTraditional })
 </script>
 
 <style scoped lang="scss">
