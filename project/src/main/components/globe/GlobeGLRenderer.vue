@@ -241,6 +241,7 @@ function syncCanvasTouchAction(controlsInteractionEnabled) {
 
 function onWheel(e) {
   if (!e.ctrlKey && !e.metaKey) return
+  if (e.target instanceof Element && e.target.closest('.dialect-point-map')) return
   e.preventDefault()
   const delta = e.deltaY > 0 ? 0.15 : -0.15
   const pov = globe.pointOfView()
