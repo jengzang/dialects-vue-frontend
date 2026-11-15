@@ -17,9 +17,11 @@ describe('application page', () => {
     expect(getDefaultTabScroll({ mobileScroll: 'right' }, true)).toBe('right')
   })
 
-  it('provides web, iOS and Android choices without fabricated download links', () => {
+  it('groups the mobile download channels without a separate web card or fabricated links', () => {
     const page = readFileSync('src/main/views/explore/ApplicationPage.vue', 'utf8')
-    expect(page).toContain('application.platforms.web')
+    expect(page).not.toContain('application.platforms.web')
+    expect(page).toContain('application-identity')
+    expect(page).toContain('platform-list')
     expect(page).toContain('application.platforms.ios')
     expect(page).toContain('application.platforms.android')
     expect(page).toContain('disabled')
