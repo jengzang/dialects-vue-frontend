@@ -96,48 +96,64 @@ function clearPoints() {
 
 // One complete image per distinct label, in source order, just like the main map.
 // Never split text/background into separate layers or hide points via collision.
-function getLabelImage(label, style, pixelRatio) {
+function getLabelImage(label, style, pixelRatio, pending) {
   if (images.has(label.key)) return images.get(label.key)
   const margin = 8
   const ratio = Math.min(pixelRatio, 4096 / (label.width + margin * 2), 4096 / (style.height + margin * 2))
   const canvas = document.createElement('canvas')
   canvas.width = Math.max(1, Math.ceil((label.width + margin * 2) * ratio))
   canvas.height = Math.max(1, Math.ceil((style.height + margin * 2) * ratio))
-  const context = canvas.getContext('2d')
+  const context = canvas.getContext('2d', { willReadFrequently: true })
   context.scale(ratio, ratio)
   context.textAlign = 'center'
   context.textBaseline = 'middle'
   const x = margin + label.width / 2
-  context.beginPath()
-  context.roundRect(x - label.nameWidth / 2 + style.borderWidth / 2, margin + style.borderWidth / 2,
-    label.nameWidth - style.borderWidth, style.nameHeight - style.borderWidth, style.radius)
   context.fillStyle = label.color
-  context.fill()
-  context.strokeStyle = style.borderColor
-  context.lineWidth = style.borderWidth
-  context.stroke()
+  context.fillRect(x - label.nameWidth / 2, margin, label.nameWidth, style.nameHeight)
   context.font = style.nameFont
   context.fillStyle = getContrastTextColor(label.color)
   context.fillText(label.name, x, margin + style.nameHeight / 2)
   context.font = style.countFont
   context.fillStyle = style.countColor
-  context.shadowColor = 'rgba(255,255,255,0.9)'
-  context.shadowBlur = 2 * ratio
-  context.shadowOffsetY = ratio
   context.fillText(label.count, x, margin + style.nameHeight + style.gap + style.countLine / 2)
-  // The original CSS applies drop-shadow to the entire name/count group.
-  const texture = document.createElement('canvas')
-  texture.width = canvas.width
-  texture.height = canvas.height
-  const textureContext = texture.getContext('2d')
-  textureContext.shadowColor = 'rgba(0,0,0,0.28)'
-  textureContext.shadowBlur = 3 * ratio
-  textureContext.shadowOffsetY = 2 * ratio
-  textureContext.drawImage(canvas, 0, 0)
   const id = `home-dialect-label-${images.size}`
-  map.value.addImage(id, textureContext.getImageData(0, 0, texture.width, texture.height), { pixelRatio: ratio })
+  pending.push({ id, texture: canvas, pixelRatio: ratio })
   images.set(label.key, id)
   return id
+}
+
+// Read back one canvas per batch instead of forcing a GPU readback for every label.
+function registerLabelImages(pending) {
+  const limit = Math.max(2048, ...pending.map(({ texture }) => Math.max(texture.width, texture.height)))
+  let batch = []
+  let x = 0, y = 0, rowHeight = 0
+  const flush = () => {
+    if (!batch.length) return
+    const atlas = document.createElement('canvas')
+    atlas.width = limit
+    atlas.height = y + rowHeight
+    const ctx = atlas.getContext('2d', { willReadFrequently: true })
+    for (const item of batch) ctx.drawImage(item.texture, item.x, item.y)
+    const pixels = ctx.getImageData(0, 0, atlas.width, atlas.height).data
+    for (const item of batch) {
+      const { width, height } = item.texture
+      const data = new Uint8Array(width * height * 4)
+      for (let row = 0; row < height; row++) {
+        const start = ((item.y + row) * atlas.width + item.x) * 4
+        data.set(pixels.subarray(start, start + width * 4), row * width * 4)
+      }
+      map.value.addImage(item.id, { width, height, data }, { pixelRatio: item.pixelRatio })
+    }
+    batch = []; x = 0; y = 0; rowHeight = 0
+  }
+  for (const item of pending) {
+    if (x + item.texture.width > limit) { x = 0; y += rowHeight; rowHeight = 0 }
+    if (y + item.texture.height > limit) flush()
+    batch.push({ ...item, x, y })
+    x += item.texture.width
+    rowHeight = Math.max(rowHeight, item.texture.height)
+  }
+  flush()
 }
 
 function renderPoints(fitView = true) {
@@ -172,11 +188,13 @@ function renderPoints(fitView = true) {
   })
   // Same bounded raster budget as the main map; no point sampling or collision culling.
   const ratio = Math.min(window.devicePixelRatio || 1, 3, Math.sqrt(16 * 1024 * 1024 / Math.max(1, area)))
+  const pendingImages = []
   const features = labels.map((label, index) => ({
     type: 'Feature',
     geometry: { type: 'Point', coordinates: label.coordinate },
-    properties: { index, name: label.name, count: label.count, image: getLabelImage(label, style, ratio) },
+    properties: { index, name: label.name, count: label.count, image: getLabelImage(label, style, ratio, pendingImages) },
   }))
+  registerLabelImages(pendingImages)
   map.value.addSource(SOURCE_ID, { type: 'geojson', data: { type: 'FeatureCollection', features } })
   map.value.addLayer({
     id: LAYER_ID, type: 'symbol', source: SOURCE_ID,
