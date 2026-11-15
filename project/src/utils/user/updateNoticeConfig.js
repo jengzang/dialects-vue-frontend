@@ -2,8 +2,8 @@ export function getHomeUpdateNotice(t) {
     const items = [
         {
             icon: '🗺️',
-            strong: '地圖渲染速度加快',
-            text: '優化渲染大量點的performance，減少卡頓的情況'
+            strong: '地圖繪圖支持音典配色，加快渲染速度',
+            text: '可以選擇使用音典分區和地圖集分區的配色，更直觀地對比繪製地圖。優化渲染大量點的performance，減少卡頓的情況'
         },
         {
             icon: '👀',
@@ -17,9 +17,9 @@ export function getHomeUpdateNotice(t) {
         },
     ]
   return {
-    version: 'v5.2.7',
-    dbVersion: '2026-09-30',
-    lastUpdateDate: '2026-11-02',
+    version: 'v5.3.0',
+    dbVersion: '2026-11-16',
+    lastUpdateDate: '2026-11-16',
     title: t('home.updateNotice.title'),
     items
   }
