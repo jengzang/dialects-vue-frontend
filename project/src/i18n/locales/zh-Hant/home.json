@@ -9,7 +9,7 @@
   "download": {
     "title": "下載應用程式",
     "description": "隨時隨地觸摸方言的歷史層次。",
-    "availability": "下載 iOS 和 Android 應用程式，了解最新資訊。"
+    "availability": "下載蘋果和安卓應用程式，了解最新資訊。"
   },
   "showcase": {
     "nav": "產品展示",
@@ -152,12 +152,36 @@
     "viewAll": "查看全部 →",
     "discover": "進入工具 →",
     "items": {
-      "zhonggu": { "name": "查中古", "desc": "按中古地位整理各方言點讀音", "tag": "查詢" },
-      "compare": { "name": "方言比較", "desc": "對比各方言點聲韻調的字音差異", "tag": "比較" },
-      "gis": { "name": "GIS 繪圖", "desc": "GIS 在線繪圖 · 泰森多邊形", "tag": "地圖" },
-      "phonology": { "name": "音系查詢", "desc": "查看各方言點音系表", "tag": "音系" },
-      "tableProcess": { "name": "字表處理", "desc": "字表檢查與格式轉換", "tag": "工具" },
-      "praat": { "name": "Praat 聲學分析", "desc": "實驗語音學工具與數據分析", "tag": "聲學" }
+      "zhonggu": {
+        "name": "查中古",
+        "desc": "按中古地位整理各方言點讀音",
+        "tag": "查詢"
+      },
+      "compare": {
+        "name": "方言比較",
+        "desc": "對比各方言點聲韻調的字音差異",
+        "tag": "比較"
+      },
+      "gis": {
+        "name": "GIS 繪圖",
+        "desc": "GIS 在線繪圖 · 泰森多邊形",
+        "tag": "地圖"
+      },
+      "phonology": {
+        "name": "音系查詢",
+        "desc": "查看各方言點音系表",
+        "tag": "音系"
+      },
+      "tableProcess": {
+        "name": "字表處理",
+        "desc": "字表檢查與格式轉換",
+        "tag": "工具"
+      },
+      "praat": {
+        "name": "Praat 聲學分析",
+        "desc": "實驗語音學工具與數據分析",
+        "tag": "聲學"
+      }
     }
   },
   "roadmap": {

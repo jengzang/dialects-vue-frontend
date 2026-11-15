@@ -104,9 +104,11 @@ const appIcon = computed(() => getBrandAssets(currentColorTheme.value).logo)
 @use '@/styles/global/mixins' as *;
 
 .application-page {
+  @include flex-col;
+  justify-content: safe center;
   width: min(100%, 760px);
   margin: 0 auto;
-  padding: 48px 16px 64px;
+  padding: 0 16px;
   box-sizing: border-box;
 }
 
@@ -132,10 +134,10 @@ const appIcon = computed(() => getBrandAssets(currentColorTheme.value).logo)
 
 .application-identity h1 {
   margin: 0;
-  font-size: clamp(var(--font-size-32), 4dvw, 48px);
+  font-size: clamp(var(--font-size-32), 3dvw, 48px);
   line-height: 1.2;
   @media (max-aspect-ratio: 1 / 1) {
-    font-size: clamp(var(--font-size-28), 6dvw, 36px);
+    font-size: clamp(var(--font-size-28), 5dvw, 36px);
   }
 }
 
@@ -218,7 +220,7 @@ const appIcon = computed(() => getBrandAssets(currentColorTheme.value).logo)
 }
 
 @media (max-aspect-ratio: 1 / 1) {
-  .application-page { padding: 32px 8px 48px; }
+  .application-page { padding: 0 8px; }
   .application-icon { width: 76px; height: 76px; }
   .platform-list { margin-top: 32px; padding: 20px; }
   .platform-row { align-items: stretch; flex-direction: column; gap: 14px; }
