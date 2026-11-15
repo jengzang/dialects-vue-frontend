@@ -336,7 +336,7 @@ onBeforeUnmount(() => {
 
 .dialect-point-map {
   position: relative;
-  width: min(80dvw,800px);
+  width: min(80dvw,1000px);
   height: 600px;
   margin: 0 auto;
   overflow: hidden;

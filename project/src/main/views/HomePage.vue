@@ -815,7 +815,6 @@ function normalizeDialectMapPoint(point) {
 }
 
 async function fetchDialectMap() {
-  if (!showAppDownload) return
   dialectMapLoading.value = true
   try {
     const result = await api('/api/dialect_counts')
