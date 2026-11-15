@@ -122,7 +122,8 @@ export default {
         normalizedPath === '/explore/char-class' ||
         normalizedPath.startsWith('/explore/villages/') ||
         normalizedPath.startsWith('/explore/yc/') ||
-        normalizedPath === '/explore/gis'
+        normalizedPath === '/explore/gis' ||
+        normalizedPath === '/explore/application'
       ) {
         return ExploreLayout
       }

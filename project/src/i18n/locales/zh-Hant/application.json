@@ -1,0 +1,12 @@
+{
+  "eyebrow": "方音圖鑑 · 隨處探索",
+  "title": "在喜歡的裝置上使用方音圖鑑",
+  "intro": "從瀏覽器到手機和平板，選擇適合你的方式，繼續探索方言與地方文化。",
+  "comingSoon": "敬請期待",
+  "note": "行動應用程式正在準備中，發布後將在此頁面提供下載。",
+  "platforms": {
+    "web": { "title": "網頁版", "description": "無需安裝，透過瀏覽器訪問方音圖鑑。", "action": "開啟網頁版" },
+    "ios": { "title": "iPhone 與 iPad", "description": "在 iPhone 和 iPad 上使用方音圖鑑。" },
+    "android": { "title": "Android", "description": "Android 版本發布後，可透過 GitHub 或 Gitee 取得。" }
+  }
+}

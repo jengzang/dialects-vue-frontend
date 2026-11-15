@@ -1,0 +1,12 @@
+{
+  "eyebrow": "DIALECTS ATLAS · EXPLORE ANYWHERE",
+  "title": "Dialects Atlas on your favorite device",
+  "intro": "From your browser to your phone or tablet, choose how you explore dialects and local culture.",
+  "comingSoon": "Coming soon",
+  "note": "Our mobile apps are in preparation. Download links will appear here when they are released.",
+  "platforms": {
+    "web": { "title": "Web", "description": "Explore Dialects Atlas in your browser, with no installation required.", "action": "Open the website" },
+    "ios": { "title": "iPhone and iPad", "description": "Use Dialects Atlas on your iPhone and iPad." },
+    "android": { "title": "Android", "description": "Get the Android app from GitHub or Gitee when it is released." }
+  }
+}

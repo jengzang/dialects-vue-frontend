@@ -576,6 +576,18 @@ const SEO_CONFIG = {
         en: 'Explore the complete development history of Dialects Atlas, from its first scripts to an online platform, including feature release dates and reflections.',
       },
     },
+    '/explore/application': {
+      title: {
+        'zh-Hant': { main: '下載', subtitle: '在網頁、iPhone、iPad 和 Android 使用方音圖鑑' },
+        'zh-CN': { main: '下载', subtitle: '在网页、iPhone、iPad 和 Android 使用方音图鉴' },
+        en: { main: 'Download', subtitle: 'Dialects Atlas for web, iPhone, iPad and Android' },
+      },
+      description: {
+        'zh-Hant': '在網頁使用方音圖鑑，了解 iPhone、iPad 與 Android 應用的發布資訊。',
+        'zh-CN': '在网页使用方音图鉴，了解 iPhone、iPad 与 Android 应用的发布信息。',
+        en: 'Use Dialects Atlas on the web and learn about the upcoming iPhone, iPad and Android apps.',
+      },
+    },
     '/explore/gis': {
       title: {
         'zh-Hant': { main: '地圖繪製', subtitle: '線上GIS圖層編輯與方言分佈圖繪製' },
@@ -711,6 +723,7 @@ export const SITEMAP_PATHS = [
   '/menu/map/view',
   '/menu/map/divide',
   '/menu/map/custom',
+  '/explore/application',
   '/explore/gis',
   '/menu/tools',
   '/menu/vocabulary/view',
