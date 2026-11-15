@@ -1,4 +1,4 @@
-import { queryCount } from '@/api'
+import { api } from '@/api/auth/httpClient.js'
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 import { readLocalCache, writeLocalCache } from '@/composables/core/localCache.js'
 import { createSingleFlight } from '@/composables/core/singleFlight.js'
@@ -42,14 +42,11 @@ function writeCachedStats(stats) {
 }
 
 async function requestSourceStats() {
-  const [locationCount, dataCount] = await Promise.all([
-    queryCount({ db_key: 'query', table_name: 'dialects', filter_column: '存儲標記', filter_value: 1 }),
-    queryCount({ db_key: 'dialects', table_name: 'dialects' })
-  ])
+  const result = await api('/api/dialect_counts')
 
   const nextStats = {
-    locationCount,
-    dataCount
+    locationCount: result.total_points ?? 0,
+    dataCount: result.total_entries ?? 0
   }
 
   writeCachedStats(nextStats)
