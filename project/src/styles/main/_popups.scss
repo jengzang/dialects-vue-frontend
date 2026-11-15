@@ -28,23 +28,6 @@
   transform: scale(1.2);
 }
 
-.popup-vue .mini-button-delete {
-  margin-top: 2px;
-  padding: 1px 2px;
-  font-size: var(--font-size-12);
-  background-color: var(--color-error-dark);
-  color: white;
-  border: none;
-  border-radius: var(--radius-xs);
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
-}
-
-.popup-vue .mini-button-delete:hover {
-  background-color: var(--color-error);
-  transform: scale(1.2);
-}
-
 .maplibregl-popup.map-popup-wrapper .maplibregl-popup-content {
   padding: 0;
   border-radius: var(--radius-sm2);
