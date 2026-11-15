@@ -6,6 +6,11 @@
     "logoAlt": "方音圖鑑",
     "decorationAlt": "藍色圓環"
   },
+  "download": {
+    "title": "下載應用程式",
+    "description": "隨時隨地觸摸方言的歷史層次。",
+    "availability": "下載 iOS 和 Android 應用程式，了解最新資訊。"
+  },
   "showcase": {
     "nav": "產品展示",
     "switchTo": "切換到",

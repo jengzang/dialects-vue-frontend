@@ -30,6 +30,7 @@
             aria-hidden="true"
           />
           <h3>{{ t('application.platforms.ios.title') }}</h3>
+          <span class="platform-version">v1.0.2</span>
         </div>
         <button
           class="glass-button channel-button"
@@ -48,6 +49,7 @@
             aria-hidden="true"
           />
           <h3>{{ t('application.platforms.android.title') }}</h3>
+          <span class="platform-version">v5.2.7</span>
         </div>
         <div class="platform-channels">
           <div class="channel-group">
@@ -181,6 +183,14 @@ const appIcon = computed(() => getBrandAssets(currentColorTheme.value).logo)
 .platform-details h3 {
   margin: 0;
   font-size: var(--font-size-20);
+}
+
+.platform-version {
+  padding: 3px 8px;
+  font-size: var(--font-size-14);
+  font-weight: 500;
+  color: var(--color-primary);
+  white-space: nowrap;
 }
 
 .platform-channels {

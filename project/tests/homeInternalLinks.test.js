@@ -11,6 +11,15 @@ function readSource(path) {
 }
 
 describe('home and intro internal links', () => {
+  it('places mobile app links before core features and hides them in native builds', () => {
+    const homePage = readSource('src/main/views/HomePage.vue')
+    const section = homePage.match(/<section\s+v-if="showAppDownload"[\s\S]*?<\/section>/)?.[0]
+    expect(section).toBeTruthy()
+    expect(homePage.indexOf(section)).toBeLessThan(homePage.indexOf('<FeaturesSection />'))
+    expect(section.match(/:to="localeTo\('\/explore\/application'\)"/g)).toHaveLength(2)
+    expect(homePage).toContain('__IS_NATIVE_BUILD__')
+    expect(homePage).toContain("getCurrentRuntimePlatform().container !== 'native-webview'")
+  })
   it('uses RouterLink for homepage internal navigation entries', () => {
     const homePage = readSource('src/main/views/HomePage.vue')
     const homeFeaturedToolsPath = resolve(projectRoot, 'src/main/components/HomeFeaturedTools.vue')

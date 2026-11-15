@@ -2,8 +2,8 @@
 
 .glass-panel {
   background: var(--glass-panel-background, var(--surface-panel));
-  backdrop-filter: var(--glass-panel-backdrop-filter, blur(18px) saturate(145%));
-  -webkit-backdrop-filter: var(--glass-panel-backdrop-filter, blur(18px) saturate(145%));
+  backdrop-filter: var(--glass-panel-backdrop-filter, blur(15px) saturate(145%));
+  -webkit-backdrop-filter: var(--glass-panel-backdrop-filter, blur(15px) saturate(145%));
   border: var(--glass-panel-border, 1px solid var(--border-glass));
   border-radius: var(--glass-panel-radius, var(--radius-xl));
   box-shadow: var(--glass-panel-shadow, 0 4px 14px rgba(var(--color-shadow-rgb), 0.08), 0 1px 4px rgba(var(--color-shadow-rgb), 0.06));

@@ -6,6 +6,11 @@
     "logoAlt": "Dialect Pronunciation Atlas",
     "decorationAlt": "Blue ring"
   },
+  "download": {
+    "title": "Download the app",
+    "description": "Discover the historical layers of dialects, wherever you are.",
+    "availability": "Download the iOS and Android apps and get the latest updates."
+  },
   "showcase": {
     "nav": "Product showcase",
     "switchTo": "Switch to",

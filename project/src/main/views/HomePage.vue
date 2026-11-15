@@ -221,6 +221,23 @@
 
     <!-- <HomeFeaturedTools @view-all="scrollToFeatures" /> -->
 
+    <section v-if="showAppDownload" class="home-download">
+      <h2 class="section-title">{{ $t('home.download.title') }}</h2>
+      <p class="home-download__description">{{ $t('home.download.description') }}</p>
+      <p class="home-download__description home-download__availability">{{ $t('home.download.availability') }}</p>
+      <div class="home-download__actions">
+        <RouterLink class="home-download__entry glass-card" data-interactive="true" :to="localeTo('/explore/application')">
+          <PhAppleLogo :size="26" weight="fill" aria-hidden="true" />
+          <span>iPhone / iPad</span>
+          <span aria-hidden="true">↗</span>
+        </RouterLink>
+        <RouterLink class="home-download__entry glass-card" data-interactive="true" :to="localeTo('/explore/application')">
+          <PhAndroidLogo :size="26" weight="fill" aria-hidden="true" />
+          <span>Android</span>
+          <span aria-hidden="true">↗</span>
+        </RouterLink>
+      </div>
+    </section>
     <FeaturesSection />
 
     <!-- Roadmap Section -->
@@ -452,6 +469,8 @@
 </template>
 
 <script setup>
+/* global __IS_NATIVE_BUILD__ */
+import { PhAndroidLogo, PhAppleLogo } from '@phosphor-icons/vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import BarIcon from '@/components/common/BarIcon.vue'
 import FeaturesSection from '@/main/components/FeaturesSection.vue'
@@ -467,6 +486,7 @@ import { useVisitStats } from '@/composables/data/useVisitStats.js'
 import { useClickParticles } from '@/main/composables/useClickParticles.js'
 import { getCachedSourceStats, getSourceStats } from '@/composables/data/useSourceStats.js'
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
+import { getCurrentRuntimePlatform } from '@/platform/runtime.js'
 
 // ✅ 懒加载：先弹窗 → 地球 → Hero 展示
 const GlobeBackground = defineAsyncComponent(() =>
@@ -486,6 +506,7 @@ const UpdateNoticeModal = defineAsyncComponent(() =>
 )
 
 const { t, locale } = useI18n()
+const showAppDownload = (typeof __IS_NATIVE_BUILD__ === 'undefined' || !__IS_NATIVE_BUILD__) && getCurrentRuntimePlatform().container !== 'native-webview'
 const router = useRouter()
 const route = useRoute()
 const {
@@ -645,7 +666,7 @@ function scrollToFeatures() {
 
 function initHomeBackground() {
   const root = homePageRef.value
-  const features = root?.querySelector('#features-section')
+  const features = root?.querySelector('.home-download')
   const hero = root?.querySelector('.hero-section')
   if (!features || !hero) return
   const updateStart = () => {
@@ -787,6 +808,33 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 }
 
 /* Base */
+.home-download {
+  @include section-container(1300px);
+  padding: clamp(2rem, 4dvw, 4rem) clamp(1.5rem, 3dvw, 2.5rem);
+
+  &__description { font-size: var(--font-size-20); margin: 0.4rem 0; text-align: center; }
+  &__availability { color: var(--text-dark-lighter); font-size: var(--font-size-13); }
+  &__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 1rem; }
+  &__entry {
+    --glass-card-background: rgba(var(--color-shadow-rgb), 0.9);
+
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    // flex: 1 1 120px;
+    max-width: 360px;
+    padding: 0.4rem 0.5rem;
+    color: var(--text-white);
+    text-decoration: none;
+
+    &:hover { background: rgba(var(--color-shadow-rgb), 1); }
+  }
+
+  @media (max-aspect-ratio: 1 / 1) {
+    &__entry { flex: 0 1 auto; }
+  }
+}
+
 .home-page {
   position: relative;
   width: 100%;

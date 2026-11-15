@@ -819,7 +819,7 @@ $text-primary: var(--text-primary);
   z-index: 1;
   max-width: 1300px;
   margin: 0 auto;
-  padding: clamp(3rem, 6dvw, 6rem) clamp(1.5rem, 4dvw, 2.5rem);
+  padding: clamp(2rem, 4dvw, 4rem) clamp(1.5rem, 3dvw, 2.5rem);
 }
 
 .section-title {
