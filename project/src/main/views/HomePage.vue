@@ -1384,6 +1384,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 .section {
   &-title {
     margin-bottom: 0.5rem;
+    margin-top: 0.5rem;
     text-align: center;
     font-size: clamp(var(--font-size-28), 4vw, var(--font-size-48));
     font-weight: 700;

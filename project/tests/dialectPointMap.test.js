@@ -10,10 +10,14 @@ vi.mock('@/main/store/store.js', () => ({ userStore: reactive({ role: 'anonymous
 vi.mock('@/utils/map/MapSource.js', () => ({ mapStyle: () => ({ version: 8, sources: {}, layers: [] }) }))
 vi.mock('maplibre-gl', () => {
   class Map {
-    constructor() { this.sources = {}; this.layers = {}; this.images = {}; this.handlers = {}; maps.push(this) }
+    constructor() { this.sources = {}; this.layers = {}; this.images = {}; this.handlers = {}; this.zoom = 9; maps.push(this) }
     once(type, callback) { this.handlers[type] = callback }
+    on(type, callback) { this.handlers[type] = callback }
+    getZoom() { return this.zoom }
+    getBounds() { return { contains: () => true } }
+    setZoom(zoom) { this.zoom = zoom; this.handlers.moveend?.() }
     load() { this.handlers.load() }
-    addSource(id, source) { this.sources[id] = source }
+    addSource(id, source) { this.sources[id] = { ...source, setData(data) { this.data = data } } }
     getSource(id) { return this.sources[id] }
     removeSource(id) { delete this.sources[id] }
     addLayer(layer) { this.layers[layer.id] = layer }
@@ -60,7 +64,7 @@ beforeEach(() => {
   partition.load.mockReset().mockResolvedValue(undefined)
   partition.get.mockReset()
   context = {
-    scale() {}, beginPath() {}, roundRect() {}, fillRect: vi.fn(function () { this.fillColors.push(this.fillStyle) }), stroke() {}, fillColors: [],
+    scale() {}, beginPath() {}, roundRect() {}, ellipse() {}, fill() {}, fillRect: vi.fn(function () { this.fillColors.push(this.fillStyle) }), stroke() {}, fillColors: [],
     measureText: vi.fn(text => ({ width: text.length * 8 })),
     fillText: vi.fn(), drawImage: vi.fn(),
     getImageData: vi.fn((x, y, width, height) => ({ width, height, data: new Uint8ClampedArray(width * height * 4) })),
@@ -70,6 +74,31 @@ beforeEach(() => {
 afterEach(() => { app?.unmount(); host?.remove(); vi.restoreAllMocks(); vi.unstubAllGlobals() })
 
 describe('homepage dialect map', () => {
+  it('switches representations by zoom without creating labels in dot mode', () => {
+    const map = mount(); map.zoom = 3; map.load()
+    expect(Object.keys(map.images)).toHaveLength(0)
+    expect(map.layers['home-dialect-dots'].type).toBe('circle')
+    map.setZoom(5)
+    expect(Object.keys(map.images).length).toBeGreaterThan(0)
+    expect(context.fillText.mock.calls.map(call => call[0])).toEqual(['12345', '12'])
+    context.fillText.mockClear()
+    map.setZoom(8)
+    expect(context.fillText.mock.calls.map(call => call[0])).toEqual(['广州', '12345', 'ŋ̍ 中文', '12'])
+    map.setZoom(4)
+    expect(map.layers['home-dialect-dots'].type).toBe('circle')
+  })
+  it('keeps the current layer and source while zooming within one tier', async () => {
+    vi.useFakeTimers()
+    const map = mount(); map.zoom = 9; map.load()
+    await Promise.resolve(); await nextTick()
+    const layer = map.getLayer('home-dialect-labels')
+    const source = map.getSource('home-dialect-points')
+    map.setZoom(10)
+    await vi.advanceTimersByTimeAsync(200)
+    expect(map.getLayer('home-dialect-labels')).toBe(layer)
+    expect(map.getSource('home-dialect-points')).toBe(source)
+    vi.useRealTimers()
+  })
   it('loads yindian colors and redraws using the configured partition color', async () => {
     let finish
     partition.load.mockReturnValue(new Promise(resolve => { finish = resolve }))

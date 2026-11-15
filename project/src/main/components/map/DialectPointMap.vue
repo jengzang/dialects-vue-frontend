@@ -31,11 +31,19 @@ const mapContainer = ref(null)
 const map = shallowRef(null)
 const SOURCE_ID = 'home-dialect-points'
 const LAYER_ID = 'home-dialect-labels'
+const DOT_LAYER_ID = 'home-dialect-dots'
 const images = new Map()
 const regionColors = new Map()
 const { loadPartitionColors, getPartitionColor, colorVersion } = usePartitionColors()
 const partitionIdentity = computed(() => JSON.stringify([userStore.role, userStore.id]))
 let styleReady = false
+let currentTier = null
+let viewportTimer = null
+
+function zoomTier() {
+  const zoom = map.value.getZoom()
+  return zoom < 5 ? 'dots' : zoom < 8 ? 'count' : 'full'
+}
 
 function getRegionColor(region) {
   const key = String(region || '未分類').trim() || '未分類'
@@ -86,17 +94,20 @@ function readLabelStyle() {
   return style
 }
 
-function clearPoints() {
+function clearPoints(resetImages = false) {
   if (!map.value) return
   if (map.value.getLayer(LAYER_ID)) map.value.removeLayer(LAYER_ID)
+  if (map.value.getLayer(DOT_LAYER_ID)) map.value.removeLayer(DOT_LAYER_ID)
   if (map.value.getSource(SOURCE_ID)) map.value.removeSource(SOURCE_ID)
-  images.forEach(id => { if (map.value.hasImage(id)) map.value.removeImage(id) })
-  images.clear()
+  if (resetImages) {
+    images.forEach(id => { if (map.value.hasImage(id)) map.value.removeImage(id) })
+    images.clear()
+  }
 }
 
 // One complete image per distinct label, in source order, just like the main map.
 // Never split text/background into separate layers or hide points via collision.
-function getLabelImage(label, style, pixelRatio, pending) {
+function getLabelImage(label, style, pixelRatio, pending, tier) {
   if (images.has(label.key)) return images.get(label.key)
   const margin = 8
   const ratio = Math.min(pixelRatio, 4096 / (label.width + margin * 2), 4096 / (style.height + margin * 2))
@@ -109,13 +120,22 @@ function getLabelImage(label, style, pixelRatio, pending) {
   context.textBaseline = 'middle'
   const x = margin + label.width / 2
   context.fillStyle = label.color
-  context.fillRect(x - label.nameWidth / 2, margin, label.nameWidth, style.nameHeight)
-  context.font = style.nameFont
-  context.fillStyle = getContrastTextColor(label.color)
-  context.fillText(label.name, x, margin + style.nameHeight / 2)
-  context.font = style.countFont
-  context.fillStyle = style.countColor
-  context.fillText(label.count, x, margin + style.nameHeight + style.gap + style.countLine / 2)
+  if (tier === 'count') {
+    context.beginPath()
+    context.ellipse(x, margin + style.nameHeight / 2, label.width / 2, style.nameHeight / 2, 0, 0, Math.PI * 2)
+    context.fill()
+    context.font = style.countFont
+    context.fillStyle = getContrastTextColor(label.color)
+    context.fillText(label.count, x, margin + style.nameHeight / 2)
+  } else {
+    context.fillRect(x - label.nameWidth / 2, margin, label.nameWidth, style.nameHeight)
+    context.font = style.nameFont
+    context.fillStyle = getContrastTextColor(label.color)
+    context.fillText(label.name, x, margin + style.nameHeight / 2)
+    context.font = style.countFont
+    context.fillStyle = style.countColor
+    context.fillText(label.count, x, margin + style.nameHeight + style.gap + style.countLine / 2)
+  }
   const id = `home-dialect-label-${images.size}`
   pending.push({ id, texture: canvas, pixelRatio: ratio })
   images.set(label.key, id)
@@ -156,35 +176,60 @@ function registerLabelImages(pending) {
   flush()
 }
 
-function renderPoints(fitView = true) {
+function renderPoints(fitView = true, resetImages = false) {
   if (!map.value || !styleReady) return
-  clearPoints()
+  clearTimeout(viewportTimer)
+  const tier = zoomTier()
+  const canUpdateSource = !resetImages && currentTier === tier && map.value.getSource(SOURCE_ID)
+  if (!canUpdateSource) clearPoints(resetImages)
+  currentTier = tier
+  if (tier === 'dots') {
+    const bounds = new maplibregl.LngLatBounds()
+    const features = []
+    props.points.forEach(point => {
+      const longitude = Number(point.longitude), latitude = Number(point.latitude)
+      if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return
+      bounds.extend([longitude, latitude])
+      features.push({ type: 'Feature', geometry: { type: 'Point', coordinates: [longitude, latitude] }, properties: { color: getRegionColor(point.yindianRegion) } })
+    })
+    const data = { type: 'FeatureCollection', features }
+    if (canUpdateSource) canUpdateSource.setData(data)
+    else {
+      map.value.addSource(SOURCE_ID, { type: 'geojson', data })
+      map.value.addLayer({ id: DOT_LAYER_ID, type: 'circle', source: SOURCE_ID, paint: { 'circle-radius': 3, 'circle-color': ['get', 'color'] } })
+    }
+    if (fitView && !bounds.isEmpty()) map.value.fitBounds(bounds, { padding: 48, maxZoom: 7, duration: 0 })
+    return
+  }
   const style = readLabelStyle()
   style.nameHeight = style.nameLine + 2 * (style.paddingY + style.borderWidth)
-  style.height = style.nameHeight + style.gap + style.countLine
+  style.height = tier === 'count' ? style.nameHeight : style.nameHeight + style.gap + style.countLine
   const context = document.createElement('canvas').getContext('2d')
   const bounds = new maplibregl.LngLatBounds()
   const distinct = new Map()
   let area = 0
   const labels = []
+  const visibleBounds = map.value.getBounds()
   props.points.forEach(point => {
     const longitude = Number(point.longitude)
     const latitude = Number(point.latitude)
     if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return
+    bounds.extend([longitude, latitude])
+    if (!visibleBounds.contains([longitude, latitude])) return
     const name = String(point.locationName || '-').replace(/\s+/g, ' ').trim()
     const count = String(point.entryCount || 0).replace(/\s+/g, ' ').trim()
     const color = getRegionColor(point.yindianRegion)
-    const key = JSON.stringify([name, count, color])
+    const key = JSON.stringify(tier === 'count' ? [tier, count, color] : [tier, name, count, color])
     if (!distinct.has(key)) {
       context.font = style.nameFont
       const nameWidth = Math.ceil(context.measureText(name).width) + 2 * (style.paddingX + style.borderWidth)
       context.font = style.countFont
-      const width = Math.max(nameWidth, Math.ceil(context.measureText(count).width))
+      const countWidth = Math.ceil(context.measureText(count).width) + 2 * style.paddingX
+      const width = tier === 'count' ? countWidth : Math.max(nameWidth, countWidth)
       distinct.set(key, { name, count, color, nameWidth, width, key })
       area += (width + 16) * (style.height + 16)
     }
     labels.push({ ...distinct.get(key), coordinate: [longitude, latitude] })
-    bounds.extend([longitude, latitude])
   })
   // Same bounded raster budget as the main map; no point sampling or collision culling.
   const ratio = Math.min(window.devicePixelRatio || 1, 3, Math.sqrt(16 * 1024 * 1024 / Math.max(1, area)))
@@ -192,18 +237,22 @@ function renderPoints(fitView = true) {
   const features = labels.map((label, index) => ({
     type: 'Feature',
     geometry: { type: 'Point', coordinates: label.coordinate },
-    properties: { index, name: label.name, count: label.count, image: getLabelImage(label, style, ratio, pendingImages) },
+    properties: { index, name: label.name, count: label.count, image: getLabelImage(label, style, ratio, pendingImages, tier) },
   }))
   registerLabelImages(pendingImages)
-  map.value.addSource(SOURCE_ID, { type: 'geojson', data: { type: 'FeatureCollection', features } })
-  map.value.addLayer({
+  const data = { type: 'FeatureCollection', features }
+  if (canUpdateSource) canUpdateSource.setData(data)
+  else {
+    map.value.addSource(SOURCE_ID, { type: 'geojson', data })
+    map.value.addLayer({
     id: LAYER_ID, type: 'symbol', source: SOURCE_ID,
     layout: {
       'icon-image': ['get', 'image'], 'icon-allow-overlap': true, 'icon-ignore-placement': true,
       'symbol-sort-key': ['get', 'index'], 'symbol-z-order': 'source',
       'icon-rotation-alignment': 'viewport', 'icon-pitch-alignment': 'viewport',
     },
-  })
+    })
+  }
   if (fitView && !bounds.isEmpty()) map.value.fitBounds(bounds, { padding: 48, maxZoom: 7, duration: 0 })
 }
 
@@ -211,16 +260,16 @@ function resizeMap() {
   nextTick(() => map.value?.resize())
 }
 
-watch(() => props.points, () => renderPoints(), { deep: true })
+watch(() => props.points, () => renderPoints(true, true), { deep: true })
 watch(() => props.fullscreen, resizeMap)
-watch(currentColorTheme, () => renderPoints(false))
-watch(colorVersion, () => renderPoints(false))
+watch(currentColorTheme, () => renderPoints(false, true))
+watch(colorVersion, () => renderPoints(false, true))
 watch(partitionIdentity, loadColors)
 
 async function loadColors() {
   try {
     await loadPartitionColors('yindian', partitionIdentity.value)
-    renderPoints(false)
+    renderPoints(false, true)
   } catch (error) {
     console.warn('Failed to load yindian partition colors:', error)
   }
@@ -240,9 +289,16 @@ onMounted(() => {
     styleReady = true
     renderPoints()
   })
+  map.value.on('moveend', () => {
+    if (!styleReady) return
+    clearTimeout(viewportTimer)
+    if (zoomTier() !== currentTier) renderPoints(false)
+    else if (currentTier !== 'dots') viewportTimer = setTimeout(() => renderPoints(false), 200)
+  })
 })
 
 onBeforeUnmount(() => {
+  clearTimeout(viewportTimer)
   map.value?.remove()
   map.value = null
   images.clear()
@@ -254,7 +310,7 @@ onBeforeUnmount(() => {
 
 .dialect-point-map {
   position: relative;
-  width: min(90dvw,800px);
+  width: min(80dvw,800px);
   height: 600px;
   margin: 0 auto;
   overflow: hidden;
@@ -304,7 +360,7 @@ onBeforeUnmount(() => {
 
 :global(.dialect-point-marker__count) {
   color: var(--text-primary);
-  font-size: 10px;
+  font-size: 8px;
   font-weight: 700;
   line-height: 1;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);

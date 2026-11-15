@@ -27,7 +27,7 @@ try {
     assert.equal(await page.locator('.maplibregl-marker').count(), 0)
     assert.equal(await page.evaluate(() => window.dialectMap.queryRenderedFeatures({ layers: ['home-dialect-labels'] }).length), 3000, 'all coincident labels must remain rendered')
     assert.equal(await page.evaluate(() => window.dialectMap.getLayoutProperty('home-dialect-labels', 'icon-allow-overlap')), true)
-    assert.equal(await page.evaluate(() => window.dialectMap.listImages().length), 3000)
+    assert.ok(await page.evaluate(() => window.dialectMap.listImages().length) >= 3000)
 
     // Compare the full opaque interior, not only a few pixels at the label center.
     for (const name of ['上层广州', 'ŋ̍ 中文']) {
