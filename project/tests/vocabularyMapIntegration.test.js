@@ -11,6 +11,19 @@ function readSource(path) {
 }
 
 describe('vocabulary map integration', () => {
+  it('uses partition colors in overview by default and restores count colors when unchecked', () => {
+    const source = readSource('src/main/components/map/VocabularyMap.vue')
+    expect(source).toMatch(/overviewPartitionColors: \{\s*type: Boolean,\s*default: true/)
+    const body = source.match(/function getOverviewMarkerStyle\(count, scale, yindianRegion\) \{([\s\S]*?)\n\}/)[1]
+    const enabled = { value: true }
+    const style = new Function('useCustomPartitionColors', 'props', 'partitionIdentity', 'getPartitionColor', 'getContrastTextColor', 'OVERVIEW_MARKER_FONT_SIZE', 'normalizeOverviewCount', 'OVERVIEW_MARKER_COLORS', 'OVERVIEW_MARKER_TEXT_COLORS', 'count', 'scale', 'yindianRegion', body)
+    const render = (path) => style(enabled, { overviewPartitionColors: true }, { value: 'user' }, (_mode, _identity, key) => key === '甲-乙' ? '#123456' : undefined, () => '#fff', 12, () => 0, ['#fef08a'], ['#000'], 10, {}, path)
+    expect(render('未知 / 甲-乙')).toEqual({ color: '#123456', textColor: '#fff', fontSize: '12px' })
+    expect(render('未知').color).toBe('#fef08a')
+    enabled.value = false
+    expect(render('甲-乙').color).toBe('#fef08a')
+  })
+
   it('uses YuBaoMap marker clicks to fetch vocabulary point details', () => {
     const yuBaoMap = readSource('src/main/components/map/YuBaoMap.vue')
 
@@ -42,7 +55,7 @@ describe('vocabulary map integration', () => {
     expect(vocabularyMap).toContain('const overviewCount = items.reduce(')
     expect(vocabularyMap).toContain('overviewLocationName: isOverviewMode ? getOverviewLocationName(items) : null')
     expect(vocabularyMap).toContain('markerMode: displayMode.value')
-    expect(vocabularyMap).toContain('overviewStyle: isOverviewMode ? getOverviewMarkerStyle(overviewCount, overviewScale) : null')
+    expect(vocabularyMap).toContain('overviewStyle: isOverviewMode ? getOverviewMarkerStyle(overviewCount, overviewScale, aggregatedData.yindianRegion) : null')
     expect(vocabularyMap).toContain("const nameEl = document.createElement('div')")
     expect(vocabularyMap).toContain("nameEl.className = 'vocabulary-marker__overview-name'")
     expect(vocabularyMap).toContain("countEl.className = 'vocabulary-marker__overview-count'")

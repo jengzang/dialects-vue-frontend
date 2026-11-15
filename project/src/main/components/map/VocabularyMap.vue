@@ -96,7 +96,7 @@ const props = defineProps({
   },
   overviewPartitionColors: {
     type: Boolean,
-    default: false
+    default: true
   }
 })
 const emit = defineEmits(['marker-click'])
@@ -414,8 +414,10 @@ function normalizeOverviewCount(count, scale) {
 }
 
 function getOverviewMarkerStyle(count, scale, yindianRegion) {
-  if (props.overviewPartitionColors && yindianRegion) {
-    const color = getPartitionColor('yindian', partitionIdentity.value, yindianRegion)
+  if (useCustomPartitionColors.value && props.overviewPartitionColors && yindianRegion) {
+    const color = String(yindianRegion).split(' / ')
+      .map(path => getPartitionColor('yindian', partitionIdentity.value, path.trim()))
+      .find(Boolean)
     if (color) {
       return { color, textColor: getContrastTextColor(color), fontSize: `${OVERVIEW_MARKER_FONT_SIZE}px` }
     }
