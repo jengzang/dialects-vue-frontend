@@ -10,7 +10,7 @@ vi.mock('@/main/store/store.js', () => ({ userStore: reactive({ role: 'anonymous
 vi.mock('@/utils/map/MapSource.js', () => ({ mapStyle: () => ({ version: 8, sources: {}, layers: [] }) }))
 vi.mock('maplibre-gl', () => {
   class Map {
-    constructor() { this.sources = {}; this.layers = {}; this.images = {}; this.handlers = {}; this.zoom = 9; maps.push(this) }
+    constructor(options) { this.options = options; this.sources = {}; this.layers = {}; this.images = {}; this.handlers = {}; this.zoom = 9; maps.push(this) }
     once(type, callback) { this.handlers[type] = callback }
     on(type, callback) { this.handlers[type] = callback }
     getZoom() { return this.zoom }
@@ -74,6 +74,12 @@ beforeEach(() => {
 afterEach(() => { app?.unmount(); host?.remove(); vi.restoreAllMocks(); vi.unstubAllGlobals() })
 
 describe('homepage dialect map', () => {
+  it('starts at zoom 4 and does not fit to point bounds after loading or updates', async () => {
+    const map = mount(); map.zoom = 4; map.load()
+    expect(map.options.zoom).toBe(4)
+    state.points = [points[1]]; await nextTick()
+    expect(map.fitBounds).not.toHaveBeenCalled()
+  })
   it('switches representations by zoom without creating labels in dot mode', () => {
     const map = mount(); map.zoom = 3; map.load()
     expect(Object.keys(map.images)).toHaveLength(0)

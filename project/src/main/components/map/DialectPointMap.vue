@@ -176,7 +176,7 @@ function registerLabelImages(pending) {
   flush()
 }
 
-function renderPoints(fitView = true, resetImages = false) {
+function renderPoints(resetImages = false) {
   if (!map.value || !styleReady) return
   clearTimeout(viewportTimer)
   const tier = zoomTier()
@@ -184,12 +184,10 @@ function renderPoints(fitView = true, resetImages = false) {
   if (!canUpdateSource) clearPoints(resetImages)
   currentTier = tier
   if (tier === 'dots') {
-    const bounds = new maplibregl.LngLatBounds()
     const features = []
     props.points.forEach(point => {
       const longitude = Number(point.longitude), latitude = Number(point.latitude)
       if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return
-      bounds.extend([longitude, latitude])
       features.push({ type: 'Feature', geometry: { type: 'Point', coordinates: [longitude, latitude] }, properties: { color: getRegionColor(point.yindianRegion) } })
     })
     const data = { type: 'FeatureCollection', features }
@@ -198,14 +196,12 @@ function renderPoints(fitView = true, resetImages = false) {
       map.value.addSource(SOURCE_ID, { type: 'geojson', data })
       map.value.addLayer({ id: DOT_LAYER_ID, type: 'circle', source: SOURCE_ID, paint: { 'circle-radius': 3, 'circle-color': ['get', 'color'] } })
     }
-    if (fitView && !bounds.isEmpty()) map.value.fitBounds(bounds, { padding: 48, maxZoom: 7, duration: 0 })
     return
   }
   const style = readLabelStyle()
   style.nameHeight = style.nameLine + 2 * (style.paddingY + style.borderWidth)
   style.height = tier === 'count' ? style.nameHeight : style.nameHeight + style.gap + style.countLine
   const context = document.createElement('canvas').getContext('2d')
-  const bounds = new maplibregl.LngLatBounds()
   const distinct = new Map()
   let area = 0
   const labels = []
@@ -214,7 +210,6 @@ function renderPoints(fitView = true, resetImages = false) {
     const longitude = Number(point.longitude)
     const latitude = Number(point.latitude)
     if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return
-    bounds.extend([longitude, latitude])
     if (!visibleBounds.contains([longitude, latitude])) return
     const name = String(point.locationName || '-').replace(/\s+/g, ' ').trim()
     const count = String(point.entryCount || 0).replace(/\s+/g, ' ').trim()
@@ -253,23 +248,22 @@ function renderPoints(fitView = true, resetImages = false) {
     },
     })
   }
-  if (fitView && !bounds.isEmpty()) map.value.fitBounds(bounds, { padding: 48, maxZoom: 7, duration: 0 })
 }
 
 function resizeMap() {
   nextTick(() => map.value?.resize())
 }
 
-watch(() => props.points, () => renderPoints(true, true), { deep: true })
+watch(() => props.points, () => renderPoints(true), { deep: true })
 watch(() => props.fullscreen, resizeMap)
-watch(currentColorTheme, () => renderPoints(false, true))
-watch(colorVersion, () => renderPoints(false, true))
+watch(currentColorTheme, () => renderPoints(true))
+watch(colorVersion, () => renderPoints(true))
 watch(partitionIdentity, loadColors)
 
 async function loadColors() {
   try {
     await loadPartitionColors('yindian', partitionIdentity.value)
-    renderPoints(false, true)
+    renderPoints(true)
   } catch (error) {
     console.warn('Failed to load yindian partition colors:', error)
   }
@@ -281,7 +275,7 @@ onMounted(() => {
     container: mapContainer.value,
     style: mapStyle(props.styleKey),
     center: [105, 35],
-    zoom: 3.2,
+    zoom: 4,
     attributionControl: false
   })
   map.value.once('load', () => {
@@ -292,8 +286,8 @@ onMounted(() => {
   map.value.on('moveend', () => {
     if (!styleReady) return
     clearTimeout(viewportTimer)
-    if (zoomTier() !== currentTier) renderPoints(false)
-    else if (currentTier !== 'dots') viewportTimer = setTimeout(() => renderPoints(false), 200)
+    if (zoomTier() !== currentTier) renderPoints()
+    else if (currentTier !== 'dots') viewportTimer = setTimeout(() => renderPoints(), 200)
   })
 })
 
