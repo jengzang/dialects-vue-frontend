@@ -11,7 +11,6 @@ const exploreBarPath = resolve(projectRoot, 'src/components/bar/ExploreBar.vue')
 const navBarPath = resolve(projectRoot, 'src/components/bar/NavBar.vue')
 const villagesMlTokensPath = resolve(projectRoot, 'src/styles/villagesml/_tokens.scss')
 const villagesMlSurfacesPath = resolve(projectRoot, 'src/styles/villagesml/_surfaces.scss')
-const toolbarsPath = resolve(projectRoot, 'src/styles/main/_toolbars.scss')
 const buttonsPath = resolve(projectRoot, 'src/styles/global/_buttons.scss')
 const formsPath = resolve(projectRoot, 'src/styles/global/_forms.scss')
 const mainSurfacesPath = resolve(projectRoot, 'src/styles/global/_surfaces.scss')
@@ -66,7 +65,7 @@ describe('color theme token coverage', () => {
     const formsSource = readSource(formsPath)
     const mainSurfacesSource = readSource(mainSurfacesPath)
     const selectorSource = readSource(selectorPath)
-    const toolbarsSource = readSource(toolbarsPath)
+    const toolbarsSource = readSource(resolve(projectRoot, 'src/components/bar/SimpleSidebar.vue'))
 
     expect(buttonsSource).toContain('background: var(--surface-glass-button);')
     expect(buttonsSource).toContain('background: var(--action-primary-bg);')
@@ -184,7 +183,7 @@ describe('color theme token coverage', () => {
   })
 
   it('keeps sidebar surface roles scoped to the shell and derived from theme tokens', () => {
-    const toolbarsSource = readSource(toolbarsPath)
+    const toolbarsSource = readSource(resolve(projectRoot, 'src/components/bar/SimpleSidebar.vue'))
 
     expect(toolbarsSource).toContain('--sidebar-shell-background: var(--glass-20);')
     expect(toolbarsSource).toContain('--sidebar-shell-border: var(--glass-30);')
