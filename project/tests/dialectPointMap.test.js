@@ -1,7 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createApp, h, nextTick, reactive } from 'vue'
+import { createApp, h, nextTick, reactive, ref } from 'vue'
 
 const { maps, markers } = vi.hoisted(() => ({ maps: [], markers: [] }))
+const partition = vi.hoisted(() => ({ load: vi.fn(), get: vi.fn(), version: { value: 0 } }))
+vi.mock('@/composables/data/usePartitionColors.js', () => ({
+  usePartitionColors: () => ({ loadPartitionColors: partition.load, getPartitionColor: partition.get, colorVersion: ref(0) }),
+}))
+vi.mock('@/main/store/store.js', () => ({ userStore: reactive({ role: 'anonymous', id: null }) }))
 vi.mock('@/utils/map/MapSource.js', () => ({ mapStyle: () => ({ version: 8, sources: {}, layers: [] }) }))
 vi.mock('maplibre-gl', () => {
   class Map {
@@ -52,22 +57,39 @@ function features(map) { return Object.values(map.sources)[0]?.data.features || 
 
 beforeEach(() => {
   maps.length = 0; markers.length = 0
+  partition.load.mockReset().mockResolvedValue(undefined)
+  partition.get.mockReset()
   context = {
-    scale() {}, beginPath() {}, roundRect() {}, fill() {}, stroke() {},
+    scale() {}, beginPath() {}, roundRect() {}, fillRect: vi.fn(function () { this.fillColors.push(this.fillStyle) }), stroke() {}, fillColors: [],
     measureText: vi.fn(text => ({ width: text.length * 8 })),
     fillText: vi.fn(), drawImage: vi.fn(),
-    getImageData: (x, y, width, height) => ({ width, height, data: new Uint8ClampedArray(width * height * 4) }),
+    getImageData: vi.fn((x, y, width, height) => ({ width, height, data: new Uint8ClampedArray(width * height * 4) })),
   }
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(() => context)
 })
 afterEach(() => { app?.unmount(); host?.remove(); vi.restoreAllMocks(); vi.unstubAllGlobals() })
 
 describe('homepage dialect map', () => {
+  it('loads yindian colors and redraws using the configured partition color', async () => {
+    let finish
+    partition.load.mockReturnValue(new Promise(resolve => { finish = resolve }))
+    partition.get.mockImplementation((_mode, _identity, path) => path === '粤语' ? '#123456' : undefined)
+    const map = mount(); map.load()
+    const fits = map.fitBounds.mock.calls.length
+    expect(partition.load).toHaveBeenCalledWith('yindian', JSON.stringify(['anonymous', null]))
+    context.fillText.mockClear()
+    finish(); await Promise.resolve(); await nextTick()
+    expect(partition.get).toHaveBeenCalledWith('yindian', JSON.stringify(['anonymous', null]), '粤语')
+    expect(context.fillColors).toContain('#123456')
+    expect(context.fillText).toHaveBeenCalled()
+    expect(map.fitBounds).toHaveBeenCalledTimes(fits)
+  })
   it('keeps every coincident point with no collision hiding, filtering or DOM markers', () => {
     const map = mount({ points: Array.from({ length: 3000 }, (_, i) => ({ ...points[i % 2], locationName: '地点' + i })) })
     map.load()
     expect(markers).toHaveLength(0)
     expect(features(map)).toHaveLength(3000)
+    expect(context.getImageData.mock.calls.length).toBeLessThan(30)
     const layout = Object.values(map.layers)[0].layout
     expect(layout).toMatchObject({
       'icon-allow-overlap': true, 'icon-ignore-placement': true,

@@ -254,8 +254,9 @@ onBeforeUnmount(() => {
 
 .dialect-point-map {
   position: relative;
-  width: 100%;
-  height: 420px;
+  width: min(90dvw,800px);
+  height: 600px;
+  margin: 0 auto;
   overflow: hidden;
   border-radius: var(--radius-lg);
 
@@ -263,7 +264,9 @@ onBeforeUnmount(() => {
     position: fixed;
     inset: 0;
     z-index: var(--z-index-vocabulary-map-fullscreen);
+    width: 100%;
     height: 100dvh;
+    margin: 0;
     border-radius: 0;
   }
 }
@@ -292,7 +295,7 @@ onBeforeUnmount(() => {
 :global(.dialect-point-marker__name) {
   padding: 3px 6px;
   color: #fff;
-  font-size: 11px;
+  font-size: 9px;
   line-height: 1.2;
   white-space: nowrap;
   border: 1px solid rgba(255, 255, 255, 0.7);
@@ -301,7 +304,7 @@ onBeforeUnmount(() => {
 
 :global(.dialect-point-marker__count) {
   color: var(--text-primary);
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 700;
   line-height: 1;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);

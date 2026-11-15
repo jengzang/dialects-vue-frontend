@@ -238,7 +238,7 @@
         </RouterLink>
       </div>
     </section>
-    <section class="home-dialect-map-section">
+    <section class="home-dialect-map-section" :class="{ 'is-map-fullscreen': dialectMapFullscreen }">
       <div class="home-section-heading">
         <h2 class="section-title">{{ $t('home.download.mapTitle') }}</h2>
         <button
@@ -256,7 +256,19 @@
         </button>
       </div>
       <div class="home-dialect-map-stats">
-        <span>{{ $t('home.download.mapStats', { points: dialectMapStats.totalPoints, entries: dialectMapStats.totalEntries }) }}</span>
+        <i18n-t
+          keypath="home.download.mapStats"
+          tag="span"
+          scope="global"
+          class="home-dialect-map-stats__pill"
+        >
+          <template #points>
+            <strong class="home-dialect-map-stats__value">{{ dialectMapStats.totalPoints }}</strong>
+          </template>
+          <template #entries>
+            <strong class="home-dialect-map-stats__value">{{ dialectMapStats.totalEntries }}</strong>
+          </template>
+        </i18n-t>
       </div>
       <div v-if="dialectMapError" class="home-dialect-map-error">{{ dialectMapError }}</div>
       <DialectPointMap
@@ -893,6 +905,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 }
 
 .home-dialect-map-section { @include section-container(1300px); padding: clamp(2rem, 4dvw, 4rem) clamp(1.5rem, 3dvw, 2.5rem); }
+.home-dialect-map-section.is-map-fullscreen { z-index: var(--z-index-vocabulary-map-fullscreen); }
 
 .home-section-heading { display: flex; align-items: center; justify-content: center; gap: 1rem; }
 
@@ -901,12 +914,36 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
 .home-dialect-map-fullscreen svg { width: 20px; height: 20px; }
 
-.home-dialect-map-stats,
 .home-dialect-map-loading,
 .home-dialect-map-error {
   color: var(--text-dark-lighter);
   font-size: var(--font-size-14);
   text-align: center;
+}
+
+.home-dialect-map-stats {
+  display: flex;
+  justify-content: center;
+  margin: 0.75rem 0 1.25rem;
+}
+
+.home-dialect-map-stats__pill {
+  display: inline-block;
+  padding: 0.4rem 1.1rem;
+  color: var(--text-dark-lighter);
+  font-size: var(--font-size-13);
+  letter-spacing: 0.01em;
+  background: var(--color-secondary-light);
+  border: 1px solid var(--color-secondary-border);
+  border-radius: var(--radius-full);
+}
+
+.home-dialect-map-stats__value {
+  margin: 0 0.15rem;
+  color: var(--color-secondary-text);
+  font-size: var(--font-size-16);
+  font-weight: 700;
+  font-feature-settings: 'tnum' 1;
 }
 
 .home-dialect-map-error {
