@@ -127,7 +127,7 @@ function getLabelImage(label, style, pixelRatio, pending, tier) {
     context.ellipse(x, margin + style.nameHeight / 2, label.width / 2, style.nameHeight / 2, 0, 0, Math.PI * 2)
     context.fill()
     context.font = style.countFont
-    context.fillStyle = '#000'
+    context.fillStyle = getContrastTextColor(label.color)
     context.fillText(label.count, x, margin + style.nameHeight / 2)
   } else {
     context.fillRect(x - label.nameWidth / 2, margin, label.nameWidth, style.nameHeight)
