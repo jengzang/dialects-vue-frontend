@@ -12,6 +12,7 @@ import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { mapStyle } from '@/utils/map/MapSource.js'
 import { CATEGORY_PALETTE } from '@/main/config/colors/mapColors.js'
+import { currentColorTheme } from '@/composables/core/uiPreferences.js'
 
 defineOptions({ name: 'DialectPointMap' })
 
@@ -26,9 +27,12 @@ const props = defineProps({
 
 const mapContainer = ref(null)
 const map = shallowRef(null)
-let markers = []
-
+const SOURCE_ID = 'home-dialect-points'
+const LAYER_ID = 'home-dialect-labels'
+const images = new Map()
 const regionColors = new Map()
+let styleReady = false
+
 function getRegionColor(region) {
   const key = String(region || '未分類').trim() || '未分類'
   if (!regionColors.has(key)) {
@@ -37,51 +41,145 @@ function getRegionColor(region) {
   return regionColors.get(key)
 }
 
-function clearMarkers() {
-  markers.forEach((marker) => marker.remove())
-  markers = []
+function readLabelStyle() {
+  const probe = document.createElement('div')
+  probe.className = 'dialect-point-marker'
+  Object.assign(probe.style, { position: 'absolute', visibility: 'hidden' })
+  const name = document.createElement('span')
+  name.className = 'dialect-point-marker__name'
+  const count = document.createElement('span')
+  count.className = 'dialect-point-marker__count'
+  probe.append(name, count)
+  mapContainer.value.append(probe)
+  const nameCss = getComputedStyle(name)
+  const countCss = getComputedStyle(count)
+  const style = {
+    nameFont: `${nameCss.fontWeight || 400} ${nameCss.fontSize || '11px'} ${nameCss.fontFamily || 'sans-serif'}`,
+    countFont: `${countCss.fontWeight || 700} ${countCss.fontSize || '12px'} ${countCss.fontFamily || 'sans-serif'}`,
+    nameLine: parseFloat(nameCss.lineHeight) || 13.2,
+    countLine: parseFloat(countCss.lineHeight) || 12,
+    paddingX: parseFloat(nameCss.paddingLeft) || 6,
+    paddingY: parseFloat(nameCss.paddingTop) || 3,
+    borderWidth: parseFloat(nameCss.borderTopWidth) || 1,
+    borderColor: nameCss.borderTopColor || 'rgba(255,255,255,0.7)',
+    radius: parseFloat(nameCss.borderRadius) || 4,
+    gap: parseFloat(getComputedStyle(probe).gap) || 2,
+    countColor: countCss.color || '#333',
+  }
+  probe.remove()
+  return style
 }
 
-function renderMarkers() {
+function clearPoints() {
   if (!map.value) return
-  clearMarkers()
-  const bounds = new maplibregl.LngLatBounds()
+  if (map.value.getLayer(LAYER_ID)) map.value.removeLayer(LAYER_ID)
+  if (map.value.getSource(SOURCE_ID)) map.value.removeSource(SOURCE_ID)
+  images.forEach(id => { if (map.value.hasImage(id)) map.value.removeImage(id) })
+  images.clear()
+}
 
-  props.points.forEach((point) => {
+// One complete image per distinct label, in source order, just like the main map.
+// Never split text/background into separate layers or hide points via collision.
+function getLabelImage(label, style, pixelRatio) {
+  if (images.has(label.key)) return images.get(label.key)
+  const margin = 8
+  const ratio = Math.min(pixelRatio, 4096 / (label.width + margin * 2), 4096 / (style.height + margin * 2))
+  const canvas = document.createElement('canvas')
+  canvas.width = Math.max(1, Math.ceil((label.width + margin * 2) * ratio))
+  canvas.height = Math.max(1, Math.ceil((style.height + margin * 2) * ratio))
+  const context = canvas.getContext('2d')
+  context.scale(ratio, ratio)
+  context.textAlign = 'center'
+  context.textBaseline = 'middle'
+  const x = margin + label.width / 2
+  context.beginPath()
+  context.roundRect(x - label.nameWidth / 2 + style.borderWidth / 2, margin + style.borderWidth / 2,
+    label.nameWidth - style.borderWidth, style.nameHeight - style.borderWidth, style.radius)
+  context.fillStyle = label.color
+  context.fill()
+  context.strokeStyle = style.borderColor
+  context.lineWidth = style.borderWidth
+  context.stroke()
+  context.font = style.nameFont
+  context.fillStyle = '#fff'
+  context.fillText(label.name, x, margin + style.nameHeight / 2)
+  context.font = style.countFont
+  context.fillStyle = style.countColor
+  context.shadowColor = 'rgba(255,255,255,0.9)'
+  context.shadowBlur = 2 * ratio
+  context.shadowOffsetY = ratio
+  context.fillText(label.count, x, margin + style.nameHeight + style.gap + style.countLine / 2)
+  // The original CSS applies drop-shadow to the entire name/count group.
+  const texture = document.createElement('canvas')
+  texture.width = canvas.width
+  texture.height = canvas.height
+  const textureContext = texture.getContext('2d')
+  textureContext.shadowColor = 'rgba(0,0,0,0.28)'
+  textureContext.shadowBlur = 3 * ratio
+  textureContext.shadowOffsetY = 2 * ratio
+  textureContext.drawImage(canvas, 0, 0)
+  const id = `home-dialect-label-${images.size}`
+  map.value.addImage(id, textureContext.getImageData(0, 0, texture.width, texture.height), { pixelRatio: ratio })
+  images.set(label.key, id)
+  return id
+}
+
+function renderPoints(fitView = true) {
+  if (!map.value || !styleReady) return
+  clearPoints()
+  const style = readLabelStyle()
+  style.nameHeight = style.nameLine + 2 * (style.paddingY + style.borderWidth)
+  style.height = style.nameHeight + style.gap + style.countLine
+  const context = document.createElement('canvas').getContext('2d')
+  const bounds = new maplibregl.LngLatBounds()
+  const distinct = new Map()
+  let area = 0
+  const labels = []
+  props.points.forEach(point => {
     const longitude = Number(point.longitude)
     const latitude = Number(point.latitude)
     if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return
-
-    const element = document.createElement('div')
-    element.className = 'dialect-point-marker'
-    const name = document.createElement('span')
-    name.className = 'dialect-point-marker__name'
-    name.textContent = point.locationName || '-'
-    const count = document.createElement('span')
-    count.className = 'dialect-point-marker__count'
-    count.textContent = String(point.entryCount || 0)
+    const name = String(point.locationName || '-').replace(/\s+/g, ' ').trim()
+    const count = String(point.entryCount || 0).replace(/\s+/g, ' ').trim()
     const color = getRegionColor(point.yindianRegion)
-    name.style.backgroundColor = color
-    name.style.color = '#fff'
-    element.append(name, count)
-
-    markers.push(new maplibregl.Marker({ element, anchor: 'center' })
-      .setLngLat([longitude, latitude])
-      .addTo(map.value))
+    const key = JSON.stringify([name, count, color])
+    if (!distinct.has(key)) {
+      context.font = style.nameFont
+      const nameWidth = Math.ceil(context.measureText(name).width) + 2 * (style.paddingX + style.borderWidth)
+      context.font = style.countFont
+      const width = Math.max(nameWidth, Math.ceil(context.measureText(count).width))
+      distinct.set(key, { name, count, color, nameWidth, width, key })
+      area += (width + 16) * (style.height + 16)
+    }
+    labels.push({ ...distinct.get(key), coordinate: [longitude, latitude] })
     bounds.extend([longitude, latitude])
   })
-
-  if (!bounds.isEmpty()) {
-    map.value.fitBounds(bounds, { padding: 48, maxZoom: 7, duration: 0 })
-  }
+  // Same bounded raster budget as the main map; no point sampling or collision culling.
+  const ratio = Math.min(window.devicePixelRatio || 1, 3, Math.sqrt(16 * 1024 * 1024 / Math.max(1, area)))
+  const features = labels.map((label, index) => ({
+    type: 'Feature',
+    geometry: { type: 'Point', coordinates: label.coordinate },
+    properties: { index, name: label.name, count: label.count, image: getLabelImage(label, style, ratio) },
+  }))
+  map.value.addSource(SOURCE_ID, { type: 'geojson', data: { type: 'FeatureCollection', features } })
+  map.value.addLayer({
+    id: LAYER_ID, type: 'symbol', source: SOURCE_ID,
+    layout: {
+      'icon-image': ['get', 'image'], 'icon-allow-overlap': true, 'icon-ignore-placement': true,
+      'symbol-sort-key': ['get', 'index'], 'symbol-z-order': 'source',
+      'icon-rotation-alignment': 'viewport', 'icon-pitch-alignment': 'viewport',
+    },
+  })
+  if (fitView && !bounds.isEmpty()) map.value.fitBounds(bounds, { padding: 48, maxZoom: 7, duration: 0 })
 }
 
 function resizeMap() {
   nextTick(() => map.value?.resize())
 }
 
-watch(() => props.points, renderMarkers, { deep: true })
+watch(() => props.points, () => renderPoints(), { deep: true })
 watch(() => props.fullscreen, resizeMap)
+watch(currentColorTheme, () => renderPoints(false))
 
 onMounted(() => {
   map.value = new maplibregl.Map({
@@ -91,13 +189,17 @@ onMounted(() => {
     zoom: 3.2,
     attributionControl: false
   })
-  map.value.once('load', renderMarkers)
+  map.value.once('load', () => {
+    if (!map.value) return
+    styleReady = true
+    renderPoints()
+  })
 })
 
 onBeforeUnmount(() => {
-  clearMarkers()
   map.value?.remove()
   map.value = null
+  images.clear()
 })
 </script>
 
