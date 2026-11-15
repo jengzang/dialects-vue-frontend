@@ -780,24 +780,6 @@ $success: var(--color-success);/* 地图容器 */
   }
 }
 
-/* MapLibre 动态弹窗 */
-:deep(.maplibregl-popup-content) {
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: var(--radius-sm2);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  color: #1d1d1f;
-  font-size: var(--font-size-13);
-  line-height: 1.6;
-
-  @include glass-blur(10px);
-
-  strong {
-    color: #1d1d1f;
-    font-weight: 700;
-  }
-}
-
 /* 移动端 */
 @media (max-width: 768px) {
   .map-modal-container {
