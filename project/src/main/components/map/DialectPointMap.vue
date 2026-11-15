@@ -7,12 +7,14 @@
 </template>
 
 <script setup>
-import { nextTick, onBeforeUnmount, onMounted, watch, shallowRef, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, watch, shallowRef, ref } from 'vue'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { mapStyle } from '@/utils/map/MapSource.js'
 import { CATEGORY_PALETTE } from '@/main/config/colors/mapColors.js'
 import { currentColorTheme } from '@/composables/core/uiPreferences.js'
+import { usePartitionColors } from '@/composables/data/usePartitionColors.js'
+import { userStore } from '@/main/store/store.js'
 
 defineOptions({ name: 'DialectPointMap' })
 
@@ -31,14 +33,28 @@ const SOURCE_ID = 'home-dialect-points'
 const LAYER_ID = 'home-dialect-labels'
 const images = new Map()
 const regionColors = new Map()
+const { loadPartitionColors, getPartitionColor, colorVersion } = usePartitionColors()
+const partitionIdentity = computed(() => JSON.stringify([userStore.role, userStore.id]))
 let styleReady = false
 
 function getRegionColor(region) {
   const key = String(region || '未分類').trim() || '未分類'
+  const configured = getPartitionColor('yindian', partitionIdentity.value, key)
+  if (configured) return configured
   if (!regionColors.has(key)) {
     regionColors.set(key, CATEGORY_PALETTE[regionColors.size % CATEGORY_PALETTE.length])
   }
   return regionColors.get(key)
+}
+
+function getContrastTextColor(color) {
+  if (/^#[\da-f]{3}$/i.test(color)) color = '#' + [...color.slice(1)].map(char => char + char).join('')
+  const channels = [1, 3, 5].map(index => {
+    const channel = parseInt(color.slice(index, index + 2), 16) / 255
+    return channel <= 0.03928 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4
+  })
+  const luminance = channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722
+  return luminance > 0.179 ? '#000' : '#fff'
 }
 
 function readLabelStyle() {
@@ -101,7 +117,7 @@ function getLabelImage(label, style, pixelRatio) {
   context.lineWidth = style.borderWidth
   context.stroke()
   context.font = style.nameFont
-  context.fillStyle = '#fff'
+  context.fillStyle = getContrastTextColor(label.color)
   context.fillText(label.name, x, margin + style.nameHeight / 2)
   context.font = style.countFont
   context.fillStyle = style.countColor
@@ -180,8 +196,20 @@ function resizeMap() {
 watch(() => props.points, () => renderPoints(), { deep: true })
 watch(() => props.fullscreen, resizeMap)
 watch(currentColorTheme, () => renderPoints(false))
+watch(colorVersion, () => renderPoints(false))
+watch(partitionIdentity, loadColors)
+
+async function loadColors() {
+  try {
+    await loadPartitionColors('yindian', partitionIdentity.value)
+    renderPoints(false)
+  } catch (error) {
+    console.warn('Failed to load yindian partition colors:', error)
+  }
+}
 
 onMounted(() => {
+  loadColors()
   map.value = new maplibregl.Map({
     container: mapContainer.value,
     style: mapStyle(props.styleKey),
