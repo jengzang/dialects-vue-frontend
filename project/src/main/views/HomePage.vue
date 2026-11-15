@@ -518,11 +518,13 @@ import { getCachedSourceStats, getSourceStats } from '@/composables/data/useSour
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 import { getCurrentRuntimePlatform } from '@/platform/runtime.js'
 import { api } from '@/api/auth/httpClient.js'
-import DialectPointMap from '@/main/components/map/DialectPointMap.vue'
 
 // ✅ 懒加载：先弹窗 → 地球 → Hero 展示
 const GlobeBackground = defineAsyncComponent(() =>
   import('@/main/components/globe/GlobeBackground.vue')
+)
+const DialectPointMap = defineAsyncComponent(() =>
+  import('@/main/components/map/DialectPointMap.vue')
 )
 const HeroShowcase = defineAsyncComponent(() =>
   import('@/main/components/HeroShowcase.vue')
