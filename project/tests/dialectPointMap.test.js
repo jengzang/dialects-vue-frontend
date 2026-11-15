@@ -14,6 +14,9 @@ vi.mock('maplibre-gl', () => {
     once(type, callback) { this.handlers[type] = callback }
     on(type, callback) { this.handlers[type] = callback }
     getZoom() { return this.zoom }
+    getCenter() { return { lng: 110, lat: 24 } }
+    getBearing() { return 12 }
+    getPitch() { return 5 }
     getBounds() { return { contains: () => true } }
     setZoom(zoom) { this.zoom = zoom; this.handlers.moveend?.() }
     load() { this.handlers.load() }
@@ -74,9 +77,26 @@ beforeEach(() => {
 afterEach(() => { app?.unmount(); host?.remove(); vi.restoreAllMocks(); vi.unstubAllGlobals() })
 
 describe('homepage dialect map', () => {
-  it('starts at zoom 4 and does not fit to point bounds after loading or updates', async () => {
+  it('creates the map only while visible and restores the view after returning', async () => {
+    let observe, disconnect, notify
+    vi.stubGlobal('IntersectionObserver', class {
+      constructor(callback) { notify = callback; observe = vi.fn(); disconnect = vi.fn(); this.observe = observe; this.disconnect = disconnect }
+    })
+    mount()
+    expect(maps).toHaveLength(0)
+    expect(observe).toHaveBeenCalledTimes(1)
+    notify([{ isIntersecting: true }]); expect(maps).toHaveLength(1)
+    maps[0].zoom = 8; maps[0].load()
+    notify([{ isIntersecting: false }]); expect(maps[0].remove).toHaveBeenCalledTimes(1)
+    state.points = [points[1]]; await nextTick()
+    notify([{ isIntersecting: true }]); expect(maps).toHaveLength(2)
+    expect(maps[1].options).toMatchObject({ center: [110, 24], zoom: 8, bearing: 12, pitch: 5 })
+    maps[1].load(); expect(features(maps[1])[0].properties.name).toBe('ŋ̍ 中文')
+    app.unmount(); app = null
+    expect(disconnect).toHaveBeenCalledTimes(1)
+  })
+  it('does not fit to point bounds after loading or updates', async () => {
     const map = mount(); map.zoom = 4; map.load()
-    expect(map.options.zoom).toBe(4)
     state.points = [points[1]]; await nextTick()
     expect(map.fitBounds).not.toHaveBeenCalled()
   })

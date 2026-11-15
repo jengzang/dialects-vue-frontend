@@ -39,6 +39,9 @@ const partitionIdentity = computed(() => JSON.stringify([userStore.role, userSto
 let styleReady = false
 let currentTier = null
 let viewportTimer = null
+let visibilityObserver = null
+let savedView = null
+let disposed = false
 
 function zoomTier() {
   const zoom = map.value.getZoom()
@@ -269,29 +272,59 @@ async function loadColors() {
   }
 }
 
-onMounted(() => {
-  loadColors()
+function mountMap() {
+  if (map.value || disposed) return
   map.value = new maplibregl.Map({
     container: mapContainer.value,
     style: mapStyle(props.styleKey),
-    center: [105, 35],
-    zoom: 4,
+    center: savedView?.center || [105, 35],
+    zoom: savedView?.zoom ?? 3.5,
+    bearing: savedView?.bearing ?? 0,
+    pitch: savedView?.pitch ?? 0,
     attributionControl: false
   })
-  map.value.once('load', () => {
-    if (!map.value) return
+  const instance = map.value
+  instance.once('load', () => {
+    if (map.value !== instance) return
     styleReady = true
     renderPoints()
   })
-  map.value.on('moveend', () => {
-    if (!styleReady) return
+  instance.on('moveend', () => {
+    if (map.value !== instance || !styleReady) return
     clearTimeout(viewportTimer)
     if (zoomTier() !== currentTier) renderPoints()
     else if (currentTier !== 'dots') viewportTimer = setTimeout(() => renderPoints(), 200)
   })
+}
+
+function unmountMap() {
+  if (!map.value) return
+  const center = map.value.getCenter()
+  savedView = { center: [center.lng, center.lat], zoom: map.value.getZoom(), bearing: map.value.getBearing(), pitch: map.value.getPitch() }
+  clearTimeout(viewportTimer)
+  styleReady = false
+  currentTier = null
+  map.value.remove()
+  map.value = null
+  images.clear()
+}
+
+onMounted(() => {
+  loadColors()
+  if (typeof IntersectionObserver === 'undefined') {
+    mountMap()
+    return
+  }
+  visibilityObserver = new IntersectionObserver(([entry]) => {
+    if (entry.isIntersecting) mountMap()
+    else unmountMap()
+  })
+  visibilityObserver.observe(mapContainer.value)
 })
 
 onBeforeUnmount(() => {
+  disposed = true
+  visibilityObserver?.disconnect()
   clearTimeout(viewportTimer)
   map.value?.remove()
   map.value = null
@@ -308,7 +341,11 @@ onBeforeUnmount(() => {
   height: 600px;
   margin: 0 auto;
   overflow: hidden;
+  border: 3px solid var(--color-primary-border);
   border-radius: var(--radius-lg);
+  box-shadow:
+    0 2px 8px rgba(var(--color-shadow-rgb), 0.06),
+    0 18px 48px rgba(var(--color-shadow-rgb), 0.16);
 
   &.is-fullscreen {
     position: fixed;
@@ -317,7 +354,9 @@ onBeforeUnmount(() => {
     width: 100%;
     height: 100dvh;
     margin: 0;
+    border: 0;
     border-radius: 0;
+    box-shadow: none;
   }
 }
 
@@ -345,7 +384,7 @@ onBeforeUnmount(() => {
 :global(.dialect-point-marker__name) {
   padding: 3px 6px;
   color: #fff;
-  font-size: 9px;
+  font-size: 10px;
   line-height: 1.2;
   white-space: nowrap;
   border: 1px solid rgba(255, 255, 255, 0.7);
