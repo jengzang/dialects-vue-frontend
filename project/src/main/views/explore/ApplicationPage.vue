@@ -19,9 +19,9 @@
       class="platform-list glass-panel"
       :aria-label="t('application.downloadTitle')"
     >
-      <h2 class="list-heading">
+      <!-- <h2 class="list-heading">
         {{ t('application.downloadTitle') }}
-      </h2>
+      </h2> -->
       <div class="platform-row">
         <div class="platform-details">
           <PhAppleLogo
@@ -50,22 +50,34 @@
           <h3>{{ t('application.platforms.android.title') }}</h3>
         </div>
         <div class="platform-channels">
-          <button
-            class="glass-button channel-button"
-            type="button"
-            disabled
-          >
-            <span>GitHub</span>
-            <span>{{ t('application.comingSoon') }}</span>
-          </button>
-          <button
-            class="glass-button channel-button"
-            type="button"
-            disabled
-          >
-            <span>Gitee</span>
-            <span>{{ t('application.comingSoon') }}</span>
-          </button>
+          <div class="channel-group">
+            <button
+              class="glass-button channel-button"
+              type="button"
+              disabled
+            >
+              <span>GitHub</span>
+              <span>{{ t('application.comingSoon') }}</span>
+            </button>
+            <HelpIcon
+              :content="t('application.platforms.android.githubHelp')"
+              size="sm"
+            />
+          </div>
+          <div class="channel-group">
+            <button
+              class="glass-button channel-button"
+              type="button"
+              disabled
+            >
+              <span>Gitee</span>
+              <span>{{ t('application.comingSoon') }}</span>
+            </button>
+            <HelpIcon
+              :content="t('application.platforms.android.giteeHelp')"
+              size="sm"
+            />
+          </div>
         </div>
       </div>
     </section>
@@ -79,6 +91,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { PhAndroidLogo, PhAppleLogo } from '@phosphor-icons/vue'
+import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { currentColorTheme, getBrandAssets } from '@/composables/core/uiPreferences.js'
 
 const { t } = useI18n()
@@ -117,8 +130,11 @@ const appIcon = computed(() => getBrandAssets(currentColorTheme.value).logo)
 
 .application-identity h1 {
   margin: 0;
-  font-size: clamp(var(--font-size-32), 4vw, 48px);
+  font-size: clamp(var(--font-size-32), 4dvw, 48px);
   line-height: 1.2;
+  @media (max-aspect-ratio: 1 / 1) {
+    font-size: clamp(var(--font-size-28), 6dvw, 36px);
+  }
 }
 
 .application-intro {
@@ -172,6 +188,12 @@ const appIcon = computed(() => getBrandAssets(currentColorTheme.value).logo)
   gap: 10px;
 }
 
+.channel-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .channel-button {
   min-width: 150px;
   justify-content: space-between;
@@ -191,6 +213,7 @@ const appIcon = computed(() => getBrandAssets(currentColorTheme.value).logo)
   .platform-list { margin-top: 32px; padding: 20px; }
   .platform-row { align-items: stretch; flex-direction: column; gap: 14px; }
   .platform-channels { flex-wrap: wrap; }
+  .channel-group { flex: 1; }
   .channel-button { flex: 1; }
 }
 </style>

@@ -8,6 +8,6 @@
   "platforms": {
     "web": { "title": "网页版", "description": "无需安装，通过浏览器访问方音图鉴。", "action": "打开网页版" },
     "ios": { "title": "iPhone 与 iPad", "description": "在 iPhone 和 iPad 上使用方音图鉴。" },
-    "android": { "title": "Android", "description": "Android 版本发布后，可通过 GitHub 或 Gitee 获取。" }
+    "android": { "title": "Android", "description": "Android 版本发布后，可通过 GitHub 或 Gitee 获取。", "githubHelp": "前端仓库，最新版安卓应用均会发布于此", "giteeHelp": "国内网络直连，下载速度较快" }
   }
 }

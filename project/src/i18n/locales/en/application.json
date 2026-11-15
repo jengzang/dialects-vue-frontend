@@ -8,6 +8,6 @@
   "platforms": {
     "web": { "title": "Web", "description": "Explore Dialects Atlas in your browser, with no installation required.", "action": "Open the website" },
     "ios": { "title": "iPhone and iPad", "description": "Use Dialects Atlas on your iPhone and iPad." },
-    "android": { "title": "Android", "description": "Get the Android app from GitHub or Gitee when it is released." }
+    "android": { "title": "Android", "description": "Get the Android app from GitHub or Gitee when it is released.", "githubHelp": "Frontend repository where the latest Android app releases are published.", "giteeHelp": "Direct access from mainland China for faster downloads." }
   }
 }
