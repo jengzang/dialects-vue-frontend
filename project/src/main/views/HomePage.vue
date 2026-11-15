@@ -806,7 +806,7 @@ async function fetchDialectMap() {
   if (!showAppDownload) return
   dialectMapLoading.value = true
   try {
-    const result = await api('/dialect_counts')
+    const result = await api('/api/dialect_counts')
     dialectMapStats.value = {
       totalPoints: Number(result.total_points) || 0,
       totalEntries: Number(result.total_entries) || 0
