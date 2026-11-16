@@ -13,8 +13,6 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { mapStyle } from '@/utils/map/MapSource.js'
 import { CATEGORY_PALETTE } from '@/main/config/colors/mapColors.js'
 import { currentColorTheme } from '@/composables/core/uiPreferences.js'
-import { usePartitionColors } from '@/composables/data/usePartitionColors.js'
-import { userStore } from '@/main/store/store.js'
 
 defineOptions({ name: 'DialectPointMap' })
 
@@ -34,8 +32,6 @@ const LAYER_ID = 'home-dialect-labels'
 const DOT_LAYER_ID = 'home-dialect-dots'
 const images = new Map()
 const regionColors = new Map()
-const { loadPartitionColors, getPartitionColor, colorVersion } = usePartitionColors()
-const partitionIdentity = computed(() => JSON.stringify([userStore.role, userStore.id]))
 let styleReady = false
 let currentTier = null
 let viewportTimer = null
@@ -51,8 +47,6 @@ function zoomTier() {
 function getRegionColor(region, fallbackColor) {
   const key = String(region || '未分類').trim() || '未分類'
   if (fallbackColor) return fallbackColor
-  const configured = getPartitionColor('yindian', partitionIdentity.value, key)
-  if (configured) return configured
   if (!regionColors.has(key)) {
     regionColors.set(key, CATEGORY_PALETTE[regionColors.size % CATEGORY_PALETTE.length])
   }
@@ -272,17 +266,6 @@ function resizeMap() {
 watch(() => props.points, () => renderPoints(true), { deep: true })
 watch(() => props.fullscreen, resizeMap)
 watch(currentColorTheme, () => renderPoints(true))
-watch(colorVersion, () => renderPoints(true))
-watch(partitionIdentity, loadColors)
-
-async function loadColors() {
-  try {
-    await loadPartitionColors('yindian', partitionIdentity.value)
-    renderPoints(true)
-  } catch (error) {
-    console.warn('Failed to load yindian partition colors:', error)
-  }
-}
 
 function mountMap() {
   if (map.value || disposed) return
@@ -322,7 +305,6 @@ function unmountMap() {
 }
 
 onMounted(() => {
-  loadColors()
   if (typeof IntersectionObserver === 'undefined') {
     mountMap()
     return
