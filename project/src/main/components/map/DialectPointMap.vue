@@ -48,8 +48,9 @@ function zoomTier() {
   return zoom < 5 ? 'dots' : zoom < 8 ? 'count' : 'full'
 }
 
-function getRegionColor(region) {
+function getRegionColor(region, fallbackColor) {
   const key = String(region || '未分類').trim() || '未分類'
+  if (fallbackColor) return fallbackColor
   const configured = getPartitionColor('yindian', partitionIdentity.value, key)
   if (configured) return configured
   if (!regionColors.has(key)) {
@@ -118,10 +119,21 @@ function getLabelImage(label, style, pixelRatio, pending, tier) {
   canvas.height = Math.max(1, Math.ceil((style.height + margin * 2) * ratio))
   const context = canvas.getContext('2d', { willReadFrequently: true })
   context.scale(ratio, ratio)
+  const primaryColor = label.color
+  const transitionColor = label.transitionColor
+  const fillStyle = transitionColor
+    ? (() => {
+        const gradient = context.createLinearGradient(0, 0, label.width, 0)
+        gradient.addColorStop(0, primaryColor)
+        gradient.addColorStop(0.6, primaryColor)
+        gradient.addColorStop(1, transitionColor)
+        return gradient
+      })()
+    : primaryColor
   context.textAlign = 'center'
   context.textBaseline = 'middle'
   const x = margin + label.width / 2
-  context.fillStyle = label.color
+  context.fillStyle = fillStyle
   if (tier === 'count') {
     context.beginPath()
     context.ellipse(x, margin + style.nameHeight / 2, label.width / 2, style.nameHeight / 2, 0, 0, Math.PI * 2)
@@ -190,7 +202,7 @@ function renderPoints(resetImages = false) {
     props.points.forEach(point => {
       const longitude = Number(point.longitude), latitude = Number(point.latitude)
       if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return
-      features.push({ type: 'Feature', geometry: { type: 'Point', coordinates: [longitude, latitude] }, properties: { color: getRegionColor(point.yindianRegion) } })
+      features.push({ type: 'Feature', geometry: { type: 'Point', coordinates: [longitude, latitude] }, properties: { color: getRegionColor(point.yindianRegion, point.color) } })
     })
     const data = { type: 'FeatureCollection', features }
     if (canUpdateSource) canUpdateSource.setData(data)
@@ -215,15 +227,16 @@ function renderPoints(resetImages = false) {
     if (!visibleBounds.contains([longitude, latitude])) return
     const name = String(point.locationName || '-').replace(/\s+/g, ' ').trim()
     const count = String(point.entryCount || 0).replace(/\s+/g, ' ').trim()
-    const color = getRegionColor(point.yindianRegion)
-    const key = JSON.stringify(tier === 'count' ? [tier, count, color] : [tier, name, count, color])
+    const color = getRegionColor(point.yindianRegion, point.color)
+    const transitionColor = point.transitionColor
+    const key = JSON.stringify(tier === 'count' ? [tier, count, color, transitionColor] : [tier, name, count, color, transitionColor])
     if (!distinct.has(key)) {
       context.font = style.nameFont
       const nameWidth = Math.ceil(context.measureText(name).width) + 2 * (style.paddingX + style.borderWidth)
       context.font = style.countFont
       const countWidth = Math.ceil(context.measureText(count).width) + 2 * style.paddingX
       const width = tier === 'count' ? countWidth : Math.max(nameWidth, countWidth)
-      distinct.set(key, { name, count, color, nameWidth, width, key })
+      distinct.set(key, { name, count, color, transitionColor, nameWidth, width, key })
       area += (width + 16) * (style.height + 16)
     }
     labels.push({ ...distinct.get(key), coordinate: [longitude, latitude] })
@@ -276,7 +289,7 @@ function mountMap() {
   map.value = new maplibregl.Map({
     container: mapContainer.value,
     style: mapStyle(props.styleKey),
-    center: savedView?.center || [105, 35],
+    center: savedView?.center || [114.3, 30.6],
     zoom: savedView?.zoom ?? 3.5,
     bearing: savedView?.bearing ?? 0,
     pitch: savedView?.pitch ?? 0,

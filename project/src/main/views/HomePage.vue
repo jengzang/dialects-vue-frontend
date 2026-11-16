@@ -279,6 +279,37 @@
         :loading-text="$t('home.download.mapLoading')"
         :empty-text="$t('home.download.mapEmpty')"
       />
+      <p class="home-dialect-map-copy">
+        <i18n-t keypath="home.download.mapDescription" tag="span" scope="global">
+          <template
+            v-for="link in dialectMapLinks"
+            :key="link.key"
+            #[link.key]
+          >
+            <component
+              :is="link.external ? 'a' : 'RouterLink'"
+              v-bind="link.external ? { href: link.href, target: '_blank', rel: 'noopener noreferrer' } : { to: localeTo(link.to) }"
+              class="home-dialect-map-link"
+            >
+              <span>{{ $t(`home.download.mapLinks.${link.key}`) }}</span>
+              <svg
+                class="home-dialect-map-link__arrow"
+                viewBox="0 0 16 16"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M4 12 12 4M4 4h8v8"
+                  stroke="currentColor"
+                  stroke-width="1.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </component>
+          </template>
+        </i18n-t>
+      </p>
     </section>
     <FeaturesSection />
 
@@ -553,6 +584,16 @@ const UpdateNoticeModal = defineAsyncComponent(() =>
 
 const { t, locale } = useI18n()
 const showAppDownload = (typeof __IS_NATIVE_BUILD__ === 'undefined' || !__IS_NATIVE_BUILD__) && getCurrentRuntimePlatform().container !== 'native-webview'
+const dialectMapLinks = [
+  { key: 'feature', to: '/menu/query/zhonggu' },
+  { key: 'compare', to: '/menu/compare/char' },
+  { key: 'distribution', to: '/menu/map/divide' },
+  { key: 'heatmap', to: '/menu/map/divide' },
+  { key: 'isopleth', to: '/menu/pho/count' },
+  { key: 'adminBoundary', to: '/menu/map/view' },
+  { key: 'onlineGis', to: '/explore/gis' },
+  { key: 'thiessenPolygon', href: 'https://zhuanlan.zhihu.com/p/985825588', external: true }
+]
 const dialectMapData = ref([])
 const dialectMapLoading = ref(false)
 const dialectMapError = ref('')
@@ -810,6 +851,8 @@ function normalizeDialectMapPoint(point) {
     locationName: point.location || '',
     yindianRegion: point.yindian_region || '',
     atlasRegion: point.atlas_region || '',
+    color: point.color || '',
+    transitionColor: point.transition_color || '',
     items: []
   }
 }
@@ -947,6 +990,43 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
 .home-dialect-map-error {
   color: var(--color-error-light);
+}
+
+.home-dialect-map-copy {
+  max-width: 920px;
+  margin: 1.25rem auto 0;
+  color: var(--text-dark-lighter);
+  font-size: var(--font-size-16);
+  line-height: 1.9;
+  text-align: center;
+  @media (max-aspect-ratio: 1 / 1) {
+    font-size: var(--font-size-14);
+  }
+}
+
+.home-dialect-map-link {
+  color: var(--color-primary);
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+
+  &:hover {
+    color: var(--color-primary-hover);
+    border-bottom-color: currentColor;
+  }
+
+  &__arrow {
+    display: inline-block;
+    width: 0.7em;
+    height: 0.7em;
+    margin-left: 0.1em;
+    vertical-align: baseline;
+    opacity: 0.75;
+  }
 }
 
 .home-download__entry { --glass-card-background: rgba(var(--color-shadow-rgb), 0.9); display: flex; align-items: center; gap: 0.6rem; max-width: 360px; padding: 0.4rem 0.5rem; color: var(--text-white); text-decoration: none; }

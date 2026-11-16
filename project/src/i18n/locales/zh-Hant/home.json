@@ -14,7 +14,18 @@
     "mapEmpty": "暫無方言點資料",
     "mapStats": "地圖：{points} 個方言點 · 共 {entries} 條資料",
     "mapLoading": "正在載入方言點地圖…",
-    "mapError": "方言點地圖載入失敗"
+    "mapError": "方言點地圖載入失敗",
+    "mapDescription": "在方音圖鑑，你可以繪製{feature}、{compare}、{distribution}、{isopleth}、{heatmap}以及{adminBoundary}等；你也可以使用{onlineGis}自由繪製各種地圖，不僅如此，方音圖鑑還能根據{thiessenPolygon}自動繪製方言分布圖。",
+    "mapLinks": {
+      "feature": "方言特徵圖",
+      "compare": "方言比較點圖",
+      "distribution": "方言分布點圖",
+      "isopleth": "音節數量等值線圖",
+      "heatmap": "方言點密度熱力圖",
+      "adminBoundary": "行政區劃邊界",
+      "onlineGis": "線上 GIS 工具",
+      "thiessenPolygon": "泰森多邊形演算法"
+    }
   },
   "showcase": {
     "nav": "產品展示",
