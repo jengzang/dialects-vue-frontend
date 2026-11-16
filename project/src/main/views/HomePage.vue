@@ -557,10 +557,9 @@ import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { currentColorTheme, currentInterfaceMode, UI_MODE_COMPACT, getBrandAssets } from '@/composables/core/uiPreferences.js'
 import { useVisitStats } from '@/composables/data/useVisitStats.js'
 import { useClickParticles } from '@/main/composables/useClickParticles.js'
-import { getCachedSourceStats, getSourceStats } from '@/composables/data/useSourceStats.js'
+import { getCachedSourceStats, getDialectCounts, getSourceStats } from '@/composables/data/useSourceStats.js'
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 import { getCurrentRuntimePlatform } from '@/platform/runtime.js'
-import { api } from '@/api/auth/httpClient.js'
 
 // ✅ 懒加载：先弹窗 → 地球 → Hero 展示
 const GlobeBackground = defineAsyncComponent(() =>
@@ -860,11 +859,12 @@ function normalizeDialectMapPoint(point) {
 async function fetchDialectMap() {
   dialectMapLoading.value = true
   try {
-    const result = await api('/api/dialect_counts')
-    dialectMapStats.value = {
-      totalPoints: Number(result.total_points) || 0,
-      totalEntries: Number(result.total_entries) || 0
-    }
+    const result = await getDialectCounts()
+    const totalPoints = Number(result.total_points) || 0
+    const totalEntries = Number(result.total_entries) || 0
+    dialectMapStats.value = { totalPoints, totalEntries }
+    sourceLocationCount.value = totalPoints
+    sourceDataCount.value = totalEntries
     dialectMapData.value = (result.points || []).map(normalizeDialectMapPoint).filter(Boolean)
   } catch (error) {
     dialectMapError.value = error.message || t('home.download.mapError')

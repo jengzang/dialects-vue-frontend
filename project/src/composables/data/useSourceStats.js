@@ -4,7 +4,9 @@ import { readLocalCache, writeLocalCache } from '@/composables/core/localCache.j
 import { createSingleFlight } from '@/composables/core/singleFlight.js'
 
 const SOURCE_STATS_STORAGE_KEY = 'source-stats-cache'
+const SOURCE_STATS_RESPONSE_STORAGE_KEY = 'source-stats-response-cache'
 const singleFlight = createSingleFlight()
+const countsSingleFlight = createSingleFlight()
 
 function getCurrentDbVersion() {
   return getHomeUpdateNotice(() => '').dbVersion || 'default'
@@ -34,23 +36,61 @@ function readCachedStats() {
 }
 
 function writeCachedStats(stats) {
+  writeLocalCache(SOURCE_STATS_STORAGE_KEY, stats, getCurrentDbVersion())
+}
+
+function readCachedResponse() {
+  const parsed = readLocalCache(SOURCE_STATS_RESPONSE_STORAGE_KEY, getCurrentDbVersion())
+  return parsed?.response || null
+}
+
+function stripUnusedPointFields(response) {
+  return {
+    ...response,
+    points: (response.points || []).map(point => {
+      const next = { ...point }
+      delete next.atlas_region
+      return next
+    })
+  }
+}
+
+function writeCachedResponse(result) {
+  writeCachedStats({
+    locationCount: result.total_points ?? 0,
+    dataCount: result.total_entries ?? 0
+  })
   writeLocalCache(
-    SOURCE_STATS_STORAGE_KEY,
-    { locationCount: stats.locationCount, dataCount: stats.dataCount },
+    SOURCE_STATS_RESPONSE_STORAGE_KEY,
+    { response: stripUnusedPointFields(result) },
     getCurrentDbVersion()
   )
 }
 
-async function requestSourceStats() {
-  const result = await api('/api/dialect_counts')
+export async function getDialectCounts(options = {}) {
+  const { forceRefresh = false } = options
 
-  const nextStats = {
+  if (!forceRefresh) {
+    const cached = readCachedResponse()
+    if (cached) {
+      return cached
+    }
+  }
+
+  return countsSingleFlight(async () => {
+    const result = await api('/api/dialect_counts')
+    writeCachedResponse(result)
+    return result
+  })
+}
+
+async function requestSourceStats(forceRefresh) {
+  const result = await getDialectCounts({ forceRefresh })
+
+  return {
     locationCount: result.total_points ?? 0,
     dataCount: result.total_entries ?? 0
   }
-
-  writeCachedStats(nextStats)
-  return nextStats
 }
 
 export function getCachedSourceStats() {
@@ -67,5 +107,5 @@ export async function getSourceStats(options = {}) {
     }
   }
 
-  return singleFlight(requestSourceStats)
+  return singleFlight(() => requestSourceStats(forceRefresh))
 }
