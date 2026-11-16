@@ -8,7 +8,9 @@ import i18n, { loadLocaleMessages } from '../../i18n'
 import { initSeo } from '../../seo'
 import { initializeUiPreferences } from '../../composables/core/uiPreferences.js'
 import { initializeScrollbarHover } from '../../utils/ui/scrollbarHover.js'
+import { initializePlatformServices } from '../../platform/index.js'
 
+await initializePlatformServices()
 await loadLocaleMessages(i18n.global.locale.value)
 const app = createApp(App)
 
