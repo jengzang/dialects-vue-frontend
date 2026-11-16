@@ -10,6 +10,7 @@ describe('custom variant matching', () => {
 
   it('returns unique candidates without changing unrelated characters', () => {
     expect(getVariantCandidates('淸')).toEqual(expect.arrayContaining(['淸', '清']))
+    expect(getVariantCandidates('浙南-溫州-樂淸')).toEqual(expect.arrayContaining(['浙南-溫州-樂淸', '浙南-溫州-樂清']))
     expect(getVariantCandidates('A')).toEqual(['A'])
   })
 })

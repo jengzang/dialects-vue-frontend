@@ -2,6 +2,7 @@ import { getPartitions } from '@/api/main/geo/LocationAndRegion.js'
 import { usePartitionCache } from '@/composables/data/usePartitionCache.js'
 import { ref } from 'vue'
 import { readSessionCache, writeSessionCache } from '@/composables/core/sessionCache.js'
+import { getVariantCandidates } from '@/main/utils/query/customVariant.js'
 
 const treePromises = new Map()
 const defaultColors = new Map()
@@ -57,8 +58,14 @@ export function usePartitionColors() {
   }
 
   function getPartitionColor(mode, identity, path) {
-    return getOverrides()[cacheKey(mode, identity)]?.[path]
-      || defaultColors.get(cacheKey(mode, identity))?.get(path)
+    const key = cacheKey(mode, identity)
+    const overrides = getOverrides()[key] || {}
+    const colors = defaultColors.get(key)
+    for (const candidate of getVariantCandidates(path)) {
+      const color = overrides[candidate] || colors?.get(candidate)
+      if (color) return color
+    }
+    return undefined
   }
 
   function setPartitionColor(mode, identity, path, color) {
