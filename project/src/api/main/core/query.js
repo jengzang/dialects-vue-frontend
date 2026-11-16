@@ -1,6 +1,7 @@
 // api/query/core.js - 核心查询 API
 import { api } from '../../auth/httpClient.js'
 import { showError } from '@/utils/ui/message.js'
+import { getVariantCandidates } from '@/main/utils/query/customVariant.js'
 
 /**
  * @typedef {Object} ZhongGuQueryParams
@@ -138,7 +139,8 @@ export async function searchChars(params) {
 
     // 处理 chars 参数
     if (params.chars && Array.isArray(params.chars)) {
-      params.chars.forEach(char => {
+      const chars = new Set(params.chars.flatMap(char => getVariantCandidates(char)))
+      chars.forEach(char => {
         query.append('chars', char)
       })
     }
