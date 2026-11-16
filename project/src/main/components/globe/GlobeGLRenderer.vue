@@ -38,6 +38,7 @@
 import { computed, ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import Globe from 'globe.gl'
 import { currentColorTheme, isDarkColorTheme } from '@/composables/core/uiPreferences.js'
+import { getCurrentRuntimePlatform } from '@/platform/runtime.js'
 
 const globeImageUrl = computed(() => (
   isDarkColorTheme(currentColorTheme.value)
@@ -67,9 +68,9 @@ const hasPrimaryFinePointer = ref(false)
 const hasPrimaryHover = ref(false)
 const joystickThumb = ref({ x: 0, y: 0 })
 const joystickVector = ref({ x: 0, y: 0 })
+const isNativeWebview = getCurrentRuntimePlatform().container === 'native-webview'
 const shouldUseGlobeJoystick = computed(() => (
-  isPortraitLayout.value &&
-  hasTouchInput.value
+  isNativeWebview || (isPortraitLayout.value && hasTouchInput.value)
 ))
 const joystickThumbStyle = computed(() => ({
   '--globe-joystick-thumb-x': `${joystickThumb.value.x}px`,
