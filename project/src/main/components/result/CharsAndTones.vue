@@ -842,7 +842,7 @@ $glass-blur: 8px;
 
 .pronunciation {
   color: $text-black;
-  font-size: 1.1em;
+  font-size: var(--font-size-18);
   font-weight: normal;
 
   &--wendu {
@@ -931,7 +931,7 @@ $glass-blur: 8px;
   td {
     padding: 3px;
     overflow: hidden;
-    font-size: 1em;
+    font-size: var(--font-size-18);
     text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -965,6 +965,7 @@ $glass-blur: 8px;
     box-sizing: border-box;
     width: 100%;
     padding: 4px 8px;
+    font-size: var(--font-size-16);
     --pill-btn-color: var(--color-primary);
     --pill-btn-hover-color: var(--color-primary-hover);
     --pill-btn-hover-border: var(--color-primary-hover);
@@ -975,7 +976,7 @@ $glass-blur: 8px;
   box-sizing: border-box;
   width: 60px;
   @include text-truncate;
-  font-size: 1em;
+  font-size: var(--font-size-18);
 }
 
 #loading-overlay {
