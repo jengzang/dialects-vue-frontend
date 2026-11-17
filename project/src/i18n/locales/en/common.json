@@ -308,5 +308,14 @@
     "defaultItem": "New Feature",
     "dontShowAgain": "Don't Show This Update Again",
     "confirm": "Got It"
+  },
+  "contact": {
+    "qqQuestion": "Questions? Join our QQ group:",
+    "qqCopy": "Click to copy the group number",
+    "qqCopied": "QQ group number copied",
+    "qqCopyFailed": "Copy failed. Please note down the group number.",
+    "qqScan": "Scan to join",
+    "qqModalTitle": "Scan to join the QQ group",
+    "qqQRAlt": "QQ group QR code"
   }
 }

@@ -237,6 +237,7 @@
           <span aria-hidden="true">↗</span>
         </RouterLink>
       </div>
+      <QQGroupContact class="home-download__contact" />
     </section>
     <section class="home-dialect-map-section" :class="{ 'is-map-fullscreen': dialectMapFullscreen }">
       <div class="home-section-heading">
@@ -546,6 +547,7 @@
 import { PhAndroidLogo, PhAppleLogo } from '@phosphor-icons/vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import BarIcon from '@/components/common/BarIcon.vue'
+import QQGroupContact from '@/components/common/QQGroupContact.vue'
 import FeaturesSection from '@/main/components/FeaturesSection.vue'
 import BlueLayoutBackground from '@/components/common/BlueLayoutBackground.vue'
 import AboutHistory from '@/main/views/menu/support/about/AboutHistory.vue'
@@ -943,7 +945,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 
   &__description { font-size: var(--font-size-20); margin: 0.4rem 0; text-align: center; }
   &__availability { color: var(--text-dark-lighter); font-size: var(--font-size-13); }
-  &__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 1rem; }
+  &__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 1rem;margin-bottom: 1.5rem; }
 }
 
 .home-dialect-map-section { @include section-container(1300px); padding: clamp(2rem, 4dvw, 4rem) clamp(1.5rem, 3dvw, 2.5rem); }

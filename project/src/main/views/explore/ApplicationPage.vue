@@ -13,6 +13,7 @@
       <p class="application-intro">
         {{ t('application.intro') }}
       </p>
+      <QQGroupContact class="application-qq-group" />
     </header>
 
     <section
@@ -32,10 +33,11 @@
           <h3>{{ t('application.platforms.ios.title') }}</h3>
           <span class="platform-version">v1.0.2</span>
         </div>
-        <button
+        <a
           class="action-btn channel-button"
-          type="button"
-          disabled
+          href="https://apps.apple.com/app/id6834269482"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           <span class="channel-label">
             <PhAppStoreLogo
@@ -45,8 +47,8 @@
             />
             <span>App Store</span>
           </span>
-          <span>{{ t('application.comingSoon') }}</span>
-        </button>
+          <span aria-hidden="true">↗</span>
+        </a>
       </div>
       <div class="platform-row">
         <div class="platform-details">
@@ -56,7 +58,7 @@
             aria-hidden="true"
           />
           <h3>{{ t('application.platforms.android.title') }}</h3>
-          <span class="platform-version">v5.3.0</span>
+          <span class="platform-version">{{ frontendVersion }}</span>
         </div>
         <div class="platform-channels">
           <div class="channel-group">
@@ -119,10 +121,13 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { PhAndroidLogo, PhAppleLogo, PhAppStoreLogo, PhGithubLogo } from '@phosphor-icons/vue'
 import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
+import QQGroupContact from '@/components/common/QQGroupContact.vue'
 import { currentColorTheme, getBrandAssets } from '@/composables/core/uiPreferences.js'
+import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 
 const { t } = useI18n()
 const appIcon = computed(() => getBrandAssets(currentColorTheme.value).logo)
+const frontendVersion = getHomeUpdateNotice(t).version
 </script>
 
 <style scoped lang="scss">
@@ -168,12 +173,12 @@ const appIcon = computed(() => getBrandAssets(currentColorTheme.value).logo)
 
 .application-intro {
   max-width: 38em;
-  margin: 16px 0 0;
+  margin: 16px 0 ;
   line-height: 1.7;
 }
 
 .platform-list {
-  margin-top: 48px;
+  margin-top: 16px;
   padding: 28px 32px;
 }
 
@@ -275,10 +280,8 @@ const appIcon = computed(() => getBrandAssets(currentColorTheme.value).logo)
 @media (max-aspect-ratio: 1 / 1) {
   .application-page { padding: 0 8px; }
   .application-icon { width: 76px; height: 76px; }
-  .platform-list { margin-top: 32px; padding: 20px; }
-  .platform-row { align-items: stretch; flex-direction: column; gap: 14px; }
-  .platform-channels { flex-wrap: wrap; }
-  .channel-group { flex: 1; }
-  .channel-button { flex: 1; }
+  .platform-list { margin-top: 12px; padding: 8px 16px; }
+  .platform-row {  flex-direction: column; gap: 14px; }
+  .platform-channels { flex-wrap: wrap;justify-content: center; }
 }
 </style>

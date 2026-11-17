@@ -6,6 +6,9 @@
         {{ $t('navigation.pageTitles.support.aboutLike') }}
       </span>
     </h1>
+    <div class="support-qq-row">
+      <QQGroupContact />
+    </div>
     <div class="follow-buttons">
       <button class="follow-button zhihu-follow" @click="followClicked">
         <img
@@ -86,6 +89,7 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BarIcon from '@/components/common/BarIcon.vue'
+import QQGroupContact from '@/components/common/QQGroupContact.vue'
 import SupportPopup from '@/main/components/user/popups/SupportPopup.vue'
 
 const { t } = useI18n()
@@ -155,7 +159,7 @@ function splitDesc(text) {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.8rem;
   text-align: center;
 }
 
@@ -211,6 +215,10 @@ function splitDesc(text) {
   width: 22px;
   height: 22px;
   margin-right: 0.5rem;
+}
+
+.support-qq-row {
+  flex: 0 0 100%;
 }
 
 /* 关注与支持按钮 */
