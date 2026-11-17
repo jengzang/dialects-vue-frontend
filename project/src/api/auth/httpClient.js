@@ -168,6 +168,10 @@ function normalizeRequestBody(body, headers) {
     return body;
   }
 
+  if (typeof URLSearchParams !== 'undefined' && body instanceof URLSearchParams) {
+    return body.toString();
+  }
+
   if (body instanceof FormData) {
     if (Capacitor.getPlatform() === 'android') {
       // Capacitor Android 8.5.3 writes multipart header names with writeBytes(),

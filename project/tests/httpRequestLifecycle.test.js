@@ -33,6 +33,23 @@ describe('HTTP request lifecycle', () => {
     expect(fetch).not.toHaveBeenCalled()
   })
 
+  it.each(['ios', 'android'])('serializes URL-encoded form bodies before sending them through native HTTP on %s', async platform => {
+    vi.useRealTimers()
+    mocks.platform = platform
+    mocks.nativeHttpPlugin.request = mocks.nativeHttp
+    const form = new URLSearchParams({ username: '檀妈', password: 'secret' })
+
+    await api('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: form,
+    })
+
+    expect(mocks.nativeHttp).toHaveBeenCalledWith(expect.objectContaining({
+      data: 'username=%E6%AA%80%E5%A6%88&password=secret',
+    }))
+  })
+
   it.each(['android', 'ios', 'web'])('preserves UTF-8 multipart names and content on %s', async platform => {
     vi.useRealTimers();
     mocks.platform = platform;
