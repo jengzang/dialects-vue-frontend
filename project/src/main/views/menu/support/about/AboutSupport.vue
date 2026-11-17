@@ -69,19 +69,32 @@
       <div class="glow-border"></div>
     </a>
 
-    <p style="margin-top: 2rem">
-      {{ $t('about.like.supportMessage') }}
-      <br />
-      <button class="support-button" @click="showQRCodes = true">
-        🙌 {{ $t('about.like.supportButton') }}
-      </button>
-      <br />
-      <span class="support-note">{{ $t('about.like.supportNote') }}</span>
-    </p>
+    <section class="support-section">
+      <p class="support-message">{{ $t('about.like.supportMessage') }}</p>
+      <div class="donate-qr-grid">
+        <div class="donate-qr-box">
+          <button type="button" class="donate-qr-button" @click="previewSrc = weixinQR">
+            <img :src="weixinQR" :alt="$t('about.like.weixinAlt')">
+          </button>
+          <p class="donate-qr-label">{{ $t('about.like.weixinLabel') }}</p>
+        </div>
+        <div class="donate-qr-box">
+          <button type="button" class="donate-qr-button" @click="previewSrc = alipayQR">
+            <img :src="alipayQR" :alt="$t('about.like.alipayAlt')">
+          </button>
+          <p class="donate-qr-label">{{ $t('about.like.alipayLabel') }}</p>
+        </div>
+      </div>
+    </section>
+    <DonorSection class="support-donor-section" />
+    <p class="support-note">{{ $t('about.like.supportNote') }}</p>
   </div>
-  <SupportPopup
-    :visible="showQRCodes"
-    @close="showQRCodes = false"
+  <ImagePreviewOverlay
+    :src="previewSrc"
+    :alt="previewAlt"
+    :sibling-images="qrSiblingImages"
+    @close="previewSrc = ''"
+    @navigate="previewSrc = $event.src"
   />
 </template>
 
@@ -89,11 +102,24 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BarIcon from '@/components/common/BarIcon.vue'
+import ImagePreviewOverlay from '@/components/common/ImagePreviewOverlay.vue'
 import QQGroupContact from '@/components/common/QQGroupContact.vue'
-import SupportPopup from '@/main/components/user/popups/SupportPopup.vue'
+import DonorSection from '@/main/components/user/DonorSection.vue'
+
+const weixinQR = '/brand/weixin.webp'
+const alipayQR = '/brand/zfb.webp'
 
 const { t } = useI18n()
-const showQRCodes = ref(false)
+const previewSrc = ref('')
+const previewAlt = computed(() => {
+  if (previewSrc.value === weixinQR) return t('about.like.weixinAlt')
+  if (previewSrc.value === alipayQR) return t('about.like.alipayAlt')
+  return ''
+})
+const qrSiblingImages = computed(() => [
+  { src: weixinQR, alt: t('about.like.weixinAlt') },
+  { src: alipayQR, alt: t('about.like.alipayAlt') },
+])
 
 const zhihuFallback = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="4" fill="#0066FF"/><text x="12" y="17" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="sans-serif">知</text></svg>')
 const githubFallback = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#24292f"/><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.78.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12c0-5.52-4.48-10-10-10z" fill="white"/></svg>')
@@ -236,8 +262,7 @@ function splitDesc(text) {
   margin: 0 auto 0.8rem;
 }
 
-.follow-button,
-.support-button {
+.follow-button {
   border: none;
   border-radius: var(--radius-sm2);
   cursor: pointer;
@@ -286,19 +311,58 @@ function splitDesc(text) {
   }
 }
 
-.support-button {
-  margin-top: 1rem;
-  padding: 0.5rem 1.1rem;
-  background-color: $danger;
-  box-shadow: 0 2px 6px rgba(var(--color-error-light-rgb), 0.35);
-  color: var(--text-white);
-  font-size: var(--font-size-16);
-  transition: all 0.2s ease;
+.support-section {
+  flex: 0 0 100%;
+  margin-top: 2rem;
+}
 
-  &:hover {
-    background-color: var(--color-error-light);
-    transform: scale(1.05);
+.support-donor-section {
+  flex: 0 0 100%;
+  margin-top: 1.5rem;
+}
+
+.support-message {
+  margin: 0 0 1rem;
+}
+
+.donate-qr-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.donate-qr-box {
+  @include flex-col;
+  align-items: center;
+
+  img {
+    width: 150px;
+    max-width: 40dvw;
+    height: auto;
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
+}
+
+.donate-qr-button {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: zoom-in;
+
+  &:hover img {
+    transform: scale(1.04);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+  }
+}
+
+.donate-qr-label {
+  margin: 0.625rem 0 0;
+  color: var(--text-primary);
+  font-size: var(--font-size-16);
+  font-weight: 600;
 }
 
 .support-note {
@@ -348,12 +412,6 @@ function splitDesc(text) {
   .follow-logo {
     width: 16px;
     height: 16px;
-  }
-
-  .support-button {
-    margin-top: 12px;
-    padding: 7px 14px;
-    font-size: var(--font-size-16);
   }
 
   .support-note {

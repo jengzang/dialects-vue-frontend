@@ -430,7 +430,9 @@
       "subtitle": "Thank you for your support! 💖"
     },
     "weixinAlt": "WeChat payment QR code",
-    "alipayAlt": "Alipay payment QR code"
+    "weixinLabel": "WeChat",
+    "alipayAlt": "Alipay payment QR code",
+    "alipayLabel": "Alipay"
   },
   "settings": {
     "tutorialToggle": {

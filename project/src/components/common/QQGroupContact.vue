@@ -131,7 +131,7 @@ async function copyGroupNumber() {
 .qq-group-number {
   border: none;
   background: var(--color-primary);
-  color: #fff;
+  color: var(--action-primary-text);
   font-weight: 700;
   letter-spacing: 0.04em;
 }
