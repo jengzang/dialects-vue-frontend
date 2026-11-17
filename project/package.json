@@ -21,6 +21,8 @@
     "verify:platform:web": "node ./scripts/verify-platform-builds.mjs web",
     "verify:platform:ios": "node ./scripts/verify-platform-builds.mjs ios",
     "verify:platform:android": "node ./scripts/verify-platform-builds.mjs android",
+    "build:app:ios": "npm run verify:platform:ios",
+    "build:app:android": "npm run verify:platform:android",
     "verify:platform:acceptance": "node ./scripts/verify-platform-builds.mjs acceptance",
     "verify:platform:all": "node ./scripts/verify-platform-builds.mjs all",
     "i18n:extract": "vue-i18n-extract report --vueFiles \"./src/**/*.{js,vue}\" --languageFiles \"./src/i18n/locales/**/*.json\"",

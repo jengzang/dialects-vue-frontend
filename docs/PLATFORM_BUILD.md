@@ -39,6 +39,16 @@ Native dist audit 會同時檢查體積預算，默認上限為 45 MiB。Web 端
 
 ## 完整驗證命令
 
+完整打包並輸出 Android APK / iOS App 大小：
+
+```bash
+cd project
+npm run build:app:android
+npm run build:app:ios
+```
+
+每條命令都會依序執行前端平台構建、`npx cap sync` 和原生編譯；成功後輸出產物的 MiB / MB 大小。
+
 需要確認平台 App 可構建時使用：
 
 ```bash

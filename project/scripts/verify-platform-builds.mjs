@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process'
+import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -88,7 +89,11 @@ function runCapture(command, args, options = {}) {
 
 function withAndroidEnv() {
   const androidHome = process.env.ANDROID_HOME || path.join(os.homedir(), 'Library/Android/sdk')
-  const javaHome = process.env.JAVA_HOME
+  const javaHome = process.env.JAVA_HOME || (
+    process.platform === 'darwin'
+      ? execFileSync('/usr/libexec/java_home', ['-v', '21'], { encoding: 'utf8' }).trim()
+      : undefined
+  )
   const pathEntries = [
     javaHome ? path.join(javaHome, 'bin') : null,
     path.join(androidHome, 'platform-tools'),
@@ -169,6 +174,28 @@ function parseBootedIosSimulators(output) {
     .filter((line) => line.includes('(Booted)'))
 }
 
+function formatArtifactSize(bytes) {
+  return `${(bytes / 1024 / 1024).toFixed(2)} MiB (${(bytes / 1000000).toFixed(2)} MB)`
+}
+
+function getDirectorySize(directory) {
+  if (!fs.existsSync(directory)) return 0
+  let total = 0
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    const entryPath = path.join(directory, entry.name)
+    total += entry.isDirectory() ? getDirectorySize(entryPath) : fs.statSync(entryPath).size
+  }
+  return total
+}
+
+function printArtifactSize(label, artifactPath, size) {
+  if (size === 0) {
+    console.log(`- ${label}: missing (${artifactPath})`)
+    return
+  }
+  console.log(`- ${label}: ${formatArtifactSize(size)} (${artifactPath})`)
+}
+
 async function printNativeSmokeStatus() {
   console.log(`\nNative dist size budget: ${formatNativeDistBytes(DEFAULT_NATIVE_DIST_MAX_BYTES)}`)
 
@@ -221,6 +248,7 @@ async function verifyAndroid() {
     cwd: path.join(repoRoot, 'android'),
     env: withAndroidEnv(),
   })
+  printArtifactSize('APK size', androidDebugApk, fs.existsSync(androidDebugApk) ? fs.statSync(androidDebugApk).size : 0)
 }
 
 async function verifyIos() {
@@ -243,6 +271,7 @@ async function verifyIos() {
     cwd: repoRoot,
     env: withIosEnv(),
   })
+  printArtifactSize('iOS App size', iosSimulatorApp, getDirectorySize(iosSimulatorApp))
 }
 
 if (target === 'web' || target === 'all') {
