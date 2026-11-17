@@ -7,7 +7,6 @@
     />
     <h1 class="page-title about-page-title"><BarIcon icon="ℹ️" /><span>{{ $t('navigation.pageTitles.support.aboutIntro') }}</span></h1>
     <p style=" text-align: left;">{{ $t('about.intro.description') }}</p>
-    <!-- <AboutFeatureTopology :branches="[...analysisBranches, ...secondaryBranches]" :bridge-nodes="bridgeNodes" /> -->
     <ul class="customlist">
       <li
         v-for="feature in featureList"
@@ -130,96 +129,9 @@ import BarIcon from '@/components/common/BarIcon.vue'
 import i18n from '@/i18n/index.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import AboutDirectoryNav from './AboutDirectoryNav.vue'
-import AboutFeatureTopology from './AboutFeatureTopology.vue'
 
 const { locale, t } = useI18n()
 const route = useRoute()
-const mapViewHint = '进入方言地图后选择图型；部分图型需要先完成查询。'
-const analysisBranches = [
-  {
-    id: 'multi-analysis', label: '多方言地理语言学分析', route: '/menu/query/zhonggu',
-    groups: [
-      { id: 'query', label: '查询', route: '/menu/query/zhonggu', items: [
-        { id: 'query-char', label: '查字', route: '/menu/query/char' },
-        { id: 'query-history', label: '查中古', note: '上古 · 中古 · 近古 · 粤语', route: '/menu/query/zhonggu', hint: '上古、中古、近古、粤语共用此查询入口。' },
-        { id: 'query-phoneme', label: '查音位', route: '/menu/query/yinwei' },
-        { id: 'query-tone', label: '查调', route: '/menu/query/tone' },
-      ] },
-      { id: 'compare', label: '比较', route: '/menu/compare/zhonggu', items: [
-        { id: 'compare-char', label: '比较汉字', route: '/menu/compare/char' },
-        { id: 'compare-history', label: '比较中古', route: '/menu/compare/zhonggu' },
-        { id: 'compare-tone', label: '比较调类', route: '/menu/compare/tone' },
-      ] },
-      { id: 'dialect-map', label: '方言地图', route: '/menu/map/view', items: [
-        { id: 'geo-map', label: '地理语言学地图', route: '/menu/map/view', items: [
-          { id: 'map-feature', label: '特征图', route: '/menu/map/view', hint: mapViewHint },
-          { id: 'map-district-points', label: '分区点图', route: '/menu/map/view', hint: mapViewHint },
-          { id: 'map-compare', label: '比较图', route: '/menu/map/view', hint: mapViewHint },
-          { id: 'map-place-name', label: '地名图', route: '/menu/map/view', hint: mapViewHint },
-          { id: 'map-heat', label: '热力图', route: '/menu/map/view', hint: mapViewHint },
-          { id: 'map-isoline', label: '等值线图', route: '/menu/map/view', hint: mapViewHint },
-        ] },
-        { id: 'map-divide', label: '分区图', route: '/menu/map/divide' },
-        { id: 'gis-voronoi', label: '泰森多边形绘制分布图', route: '/explore/gis', hint: '进入绘图页后选择泰森多边形。' },
-        { id: 'map-custom', label: '自定义数据', route: '/menu/map/custom' },
-      ] },
-    ],
-  },
-  {
-    id: 'single-analysis', label: '单方言深入分析', route: '/menu/pho/matrix',
-    groups: [
-      { id: 'phonology-query', label: '音系查询', route: '/menu/pho/matrix' },
-      { id: 'phoneme-query', label: '音素查询', route: '/menu/pho/custom' },
-      { id: 'evolution', label: '演化', route: '/menu/pho/evolution' },
-    ],
-  },
-]
-const bridgeNodes = [
-  { id: 'phonetic-compare', label: '音值比较', route: '/menu/compare/phonetic' },
-  { id: 'syllable-count', label: '音节统计', route: '/menu/pho/count' },
-]
-const secondaryBranches = [
-  {
-    id: 'words', label: '词句', route: '/menu/yubao?tab=vocabulary', groups: [
-      { id: 'yubao', label: '语保', route: '/menu/yubao?tab=vocabulary', items: [
-        { id: 'yubao-vocabulary', label: '1000词', route: '/menu/yubao?tab=vocabulary' },
-        { id: 'yubao-grammar', label: '50句', route: '/menu/yubao?tab=grammar' },
-      ] },
-      { id: 'vocabulary', label: '词表', route: '/menu/vocabulary/view', items: [
-        { id: 'vocabulary-query', label: '查询', route: '/menu/vocabulary/view?tab=card', items: [
-          { id: 'vocabulary-card', label: '卡片', route: '/menu/vocabulary/view?tab=card' },
-          { id: 'vocabulary-map', label: '地图', route: '/menu/vocabulary/view?tab=map' },
-          { id: 'vocabulary-table', label: '表格', route: '/menu/vocabulary/view?tab=table' },
-        ] },
-        { id: 'vocabulary-upload', label: '上传', route: '/menu/vocabulary/import' },
-        { id: 'vocabulary-manage', label: '管理', route: '/menu/vocabulary/manage' },
-      ] },
-      { id: 'yangchun-words', label: '阳春口语词', route: '/explore/yc/words' },
-    ],
-  },
-  {
-    id: 'tools', label: '工具', route: '/menu/tools', groups: [
-      { id: 'praat', label: 'Praat', route: '/explore/tools/praat' },
-      { id: 'character-table', label: '字表', route: '/explore/tools/check', items: [
-        { id: 'table-check', label: '检查工具', route: '/explore/tools/check' },
-        { id: 'jyut-to-ipa', label: '粤拼转IPA', route: '/explore/tools/jyut2ipa' },
-        { id: 'table-merge', label: '合并工具', route: '/explore/tools/merge' },
-      ] },
-      { id: 'villages', label: '自然村', route: '/menu/villages', items: [
-        { id: 'villages-ml', label: '机器学习', route: '/explore/villages/ml' },
-        { id: 'villages-toponyms', label: '地名分布', route: '/explore/villages/toponyms' },
-        { id: 'villages-tree', label: '广东自然村树状图', route: '/explore/villages/gd' },
-      ] },
-      { id: 'char-class', label: '汉字字集', route: '/explore/char-class?tab=zhonggu', items: [
-        { id: 'char-shanggu', label: '上古', route: '/explore/char-class?tab=shanggu' },
-        { id: 'char-zhonggu', label: '中古', route: '/explore/char-class?tab=zhonggu' },
-        { id: 'char-jingu', label: '近古', route: '/explore/char-class?tab=jingu' },
-        { id: 'char-yueyun', label: '粤语', route: '/explore/char-class?tab=yueyun' },
-      ] },
-    ],
-  },
-]
-
 const featureRouteMap = {
   feature1: '/menu/query/zhonggu',
   feature2: '/menu/map/view',
