@@ -56,6 +56,7 @@ import { stripLocaleFromPath } from '../i18n/localeRouting.js'
 import { isRouteLoading } from '../utils/ui/routeLoading.js'
 import { showRateLimitNotice } from '../utils/user/rateLimitNotice.js'
 import { getHomeUpdateNotice } from '../utils/user/updateNoticeConfig.js'
+import { getCurrentRuntimePlatform } from '../platform/runtime.js'
 
 const UpdateNoticeModal = defineAsyncComponent(() =>
   import('@/main/components/user/popups/UpdateNoticeModal.vue')
@@ -89,12 +90,13 @@ export default {
     const { t, locale } = useI18n()
     const showUpdateNotice = ref(false)
     const updateNoticeActivated = ref(false)
+    const isNativeWebView = getCurrentRuntimePlatform().container === 'native-webview'
     const homeUpdateNotice = computed(() => getHomeUpdateNotice((key, values) => t(key, values, { locale: locale.value })))
     const updateNoticeMode = computed(() => localStorage.getItem('update-notice-mode') || 'showinfo')
 
     // 首次访问首页后保留实例，避免切换路由使全局 toast 的回调失效。
     watch(() => route.matched.length > 0 && stripLocaleFromPath(route.path), (path) => {
-      if (path === '/') updateNoticeActivated.value = true
+      if (path === '/' && !isNativeWebView) updateNoticeActivated.value = true
     }, { immediate: true })
 
     const layoutComponent = computed(() => {
