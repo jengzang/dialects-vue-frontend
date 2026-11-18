@@ -274,8 +274,16 @@
 
 // Scale only font tokens for the active English locale, without changing rem-based layout.
 :root:lang(en) {
+  --english-font-scale: 0.95;
+
   @each $token, $base-size in (12: 11, 13: 13, 14: 14, 16: 16, 18: 18, 20: 20, 24: 24, 28: 28, 32: 32, 48: 48) {
-    --font-size-#{$token}: #{math.div($base-size * 0.95, 16) * 1rem};
+    --font-size-#{$token}: calc(#{math.div($base-size, 16) * 1rem} * var(--english-font-scale));
+  }
+}
+
+@media (max-aspect-ratio: 1 / 1) {
+  :root:lang(en) {
+    --english-font-scale: 0.9;
   }
 }
 
@@ -298,7 +306,7 @@ $font-size-width-scales: (
     }
     :root:lang(en) {
       @each $token, $base-size in (12: 11, 13: 13, 14: 14, 16: 16, 18: 18, 20: 20, 24: 24, 28: 28, 32: 32, 48: 48) {
-        --font-size-#{$token}: #{math.div(math.max(10, $base-size * $scale) * 0.95, 16) * 1rem};
+        --font-size-#{$token}: calc(#{math.div(math.max(10, $base-size * $scale), 16) * 1rem} * var(--english-font-scale));
       }
     }
   }
