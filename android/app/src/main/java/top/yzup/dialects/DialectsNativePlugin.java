@@ -96,6 +96,13 @@ public class DialectsNativePlugin extends Plugin {
         }
     }
 
+    @PluginMethod public void hideLaunch(PluginCall call) {
+        getActivity().runOnUiThread(() -> {
+            ((MainActivity) getActivity()).hideLaunch();
+            call.resolve();
+        });
+    }
+
     @PluginMethod public void getPendingAudio(PluginCall call) {
         worker.execute(() -> {
             try {

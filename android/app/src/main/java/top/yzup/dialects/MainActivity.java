@@ -6,6 +6,9 @@ import android.window.OnBackInvokedCallback;
 import android.window.OnBackInvokedDispatcher;
 import android.os.SystemClock;
 import android.webkit.WebView;
+import android.view.View;
+import android.view.ViewGroup;
+import androidx.core.splashscreen.SplashScreen;
 import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.core.view.ViewCompat;
@@ -14,6 +17,7 @@ import androidx.core.view.WindowInsetsControllerCompat;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
+    private View launchOverlay;
     private long lastExitBackPress = -1;
     private Toast exitToast;
     private boolean backDispatchInFlight;
@@ -22,14 +26,28 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SplashScreen.installSplashScreen(this);
         registerPlugin(DialectsNativePlugin.class);
         super.onCreate(savedInstanceState);
+        launchOverlay = getLayoutInflater().inflate(R.layout.native_launch, null);
+        addContentView(launchOverlay, new ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        launchOverlay.postDelayed(this::hideLaunch, 15000);
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 handleNativeBack();
             }
         });
+    }
+
+    public void hideLaunch() {
+        if (launchOverlay == null) return;
+        View overlay = launchOverlay;
+        launchOverlay = null;
+        overlay.animate().alpha(0f).setDuration(180).withEndAction(() -> {
+            if (overlay.getParent() instanceof ViewGroup) ((ViewGroup) overlay.getParent()).removeView(overlay);
+        }).start();
     }
 
     public boolean isOverlayBackBlocked() { return overlayBackBlocked; }

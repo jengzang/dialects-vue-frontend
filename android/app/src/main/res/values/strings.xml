@@ -5,4 +5,5 @@
     <string name="package_name">top.yzup.dialects</string>
     <string name="custom_url_scheme">top.yzup.dialects</string>
     <string name="press_back_again_to_exit">Press back again to exit</string>
+    <string name="launch_description">Explore Chinese dialects</string>
 </resources>
