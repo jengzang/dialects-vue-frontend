@@ -728,6 +728,7 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
   }
 
   .label-minimum {
+    padding-right: 1px;
     visibility: hidden;
     white-space: nowrap;
   }
