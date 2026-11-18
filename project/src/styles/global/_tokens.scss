@@ -272,6 +272,13 @@
   --shadow-focus-ring: 0 2px 6px rgba(var(--color-indigo-rgb), 0.5);
 }
 
+// Scale only font tokens for the active English locale, without changing rem-based layout.
+:root:lang(en) {
+  @each $token, $base-size in (12: 11, 13: 13, 14: 14, 16: 16, 18: 18, 20: 20, 24: 24, 28: 28, 32: 32, 48: 48) {
+    --font-size-#{$token}: #{math.div($base-size * 0.95, 16) * 1rem};
+  }
+}
+
 // User-defined width tiers affect font tokens only, leaving the root and rem layout untouched.
 $font-size-width-scales: (
   300px: 0.9,  // ssm
@@ -287,6 +294,11 @@ $font-size-width-scales: (
     :root {
       @each $token, $base-size in (12: 11, 13: 13, 14: 14, 16: 16, 18: 18, 20: 20, 24: 24, 28: 28, 32: 32, 48: 48) {
         --font-size-#{$token}: #{math.div(math.max(10, $base-size * $scale), 16) * 1rem};
+      }
+    }
+    :root:lang(en) {
+      @each $token, $base-size in (12: 11, 13: 13, 14: 14, 16: 16, 18: 18, 20: 20, 24: 24, 28: 28, 32: 32, 48: 48) {
+        --font-size-#{$token}: #{math.div(math.max(10, $base-size * $scale) * 0.95, 16) * 1rem};
       }
     }
   }
