@@ -6,6 +6,7 @@ public class DialectsNativePlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "DialectsNativePlugin"
     public let jsName = "DialectsNative"
     public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "hideLaunch", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getPendingAudio", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "consumeAudio", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setBackBlocked", returnType: CAPPluginReturnPromise)
@@ -20,6 +21,13 @@ public class DialectsNativePlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc private func audioAvailable() {
         notifyListeners("audioReceived", data: [:], retainUntilConsumed: true)
+    }
+
+    @objc func hideLaunch(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            (self.bridge?.viewController as? DialectsBridgeViewController)?.hideLaunch()
+            call.resolve()
+        }
     }
 
     @objc func getPendingAudio(_ call: CAPPluginCall) {

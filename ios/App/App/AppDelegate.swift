@@ -63,6 +63,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 // Enable WebKit history gestures, including Vue Router pushState entries.
 class DialectsBridgeViewController: CAPBridgeViewController {
+    private var launchController: UIViewController?
     private var overlayBlocked = false
     private var keyboardVisible = false
     private var overlayBackGesture: UIScreenEdgePanGestureRecognizer?
@@ -84,6 +85,16 @@ class DialectsBridgeViewController: CAPBridgeViewController {
             webView.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor),
             webView.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor)
         ])
+
+        if let launch = UIStoryboard(name: "LaunchScreen", bundle: nil).instantiateInitialViewController() {
+            launchController = launch
+            addChild(launch)
+            launch.view.frame = container.bounds
+            launch.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            container.addSubview(launch.view)
+            launch.didMove(toParent: self)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 15) { [weak self] in self?.hideLaunch() }
+        }
     }
 
     override func capacitorDidLoad() {
@@ -98,6 +109,16 @@ class DialectsBridgeViewController: CAPBridgeViewController {
             name: UIResponder.keyboardDidShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardHidden),
             name: UIResponder.keyboardDidHideNotification, object: nil)
+    }
+
+    func hideLaunch() {
+        guard let launch = launchController else { return }
+        launchController = nil
+        launch.willMove(toParent: nil)
+        UIView.animate(withDuration: 0.18, animations: { launch.view.alpha = 0 }) { _ in
+            launch.view.removeFromSuperview()
+            launch.removeFromParent()
+        }
     }
 
     func setOverlayBlocked(_ blocked: Bool) {
