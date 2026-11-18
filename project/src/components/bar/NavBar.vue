@@ -167,7 +167,6 @@
               ]"
               :style="{
                 flex: getOverflowFlex(t, isMenuTabActive(t.tab), true),
-                minWidth: getOverflowMinWidth(t, true),
                 maxWidth: getOverflowMaxWidth(t, true),
                 fontSize: 'calc(clamp(var(--font-size-16), 1.5dvh, var(--font-size-20)) * ' + (t.mobileFontSize || t.fontSize) + ')'
               }"
@@ -972,6 +971,7 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
 
     .tab-icon-label--stack {
       flex-direction: column;
+      width: 100%;
     }
 
     .tab-icon-row {
