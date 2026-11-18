@@ -73,7 +73,10 @@
             <span
               class="label"
               v-if="!t.showLabelOnlyWhenActive || isMenuTabActive(t.tab)"
-            >{{ t.label }}</span>
+            >
+              <span class="label-text">{{ t.label }}</span>
+              <span class="label-minimum" aria-hidden="true">{{ minimumLabel(t.label) }}</span>
+            </span>
             <svg v-if="t.to?.path && !t.to.path.includes('/menu/')" class="tab-external" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-hover)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M7 7h10v10"/></svg>
           </span>
           </a>
@@ -182,7 +185,10 @@
                 class="label"
                 :class="{ 'label--tiny': !isMenuTabActive(t.tab) && (t.mobileShowLabelOnlyWhenActive ?? t.showLabelOnlyWhenActive) !== false }"
                 v-if="!t.hideLabelOnMobile"
-              >{{ t.label }}</span>
+              >
+                <span class="label-text">{{ t.label }}</span>
+                <span class="label-minimum" aria-hidden="true">{{ minimumLabel(t.label) }}</span>
+              </span>
             </span>
           </a>
         </RouterLink>
@@ -258,7 +264,12 @@ import { showSuccess } from '@/utils/ui/message.js'
 const faviconSrc = computed(() => getBrandAssets(currentColorTheme.value).logo)
 const brandTitleSrc = computed(() => getBrandAssets(currentColorTheme.value).title)
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+const minimumLabel = (label) => {
+  const chars = Array.from(label)
+  const count = locale.value === 'en' ? 4 : 2
+  return chars.slice(0, count).join('') + (chars.length > count ? '…' : '')
+}
 const route = useRoute()
 const router = useRouter()
 const isSidebarVisible = ref(false)
@@ -684,7 +695,7 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
 
 .menu-item {
   flex: 1 1 0;
-  min-width: 0;
+  min-width: min-content;
   height: 100%;
   box-sizing: border-box;
 
@@ -704,12 +715,31 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
   }
 }
 
+.label {
+  display: grid;
+  min-width: min-content;
+
+  .label-text, .label-minimum {
+    grid-area: 1 / 1;
+  }
+
+  .label-text {
+    min-width: 0;
+    @include text-truncate;
+  }
+
+  .label-minimum {
+    visibility: hidden;
+    white-space: nowrap;
+  }
+}
+
 .menu-inner {
   position: relative;
   z-index: 1;
   display: flex;
   align-items: center;
-  min-width: 0;
+  min-width: min-content;
   gap: 1px;
   --tab-pad: clamp(3px, 1.2vw, 14px);
   height: calc(100% - clamp(3px, 1dvh, 6px));
@@ -729,13 +759,6 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
     border-radius 0.25s ease,
     box-shadow 0.25s ease,
     font-size 0.25s ease;
-
-  .label {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
 
   .menu-item:hover & {
     background: var(--glass-10);
@@ -944,7 +967,7 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
       display: flex;
       align-items: center;
       gap: 1px;
-      min-width: 0;
+      min-width: min-content;
     }
 
     .tab-icon-label--stack {
