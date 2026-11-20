@@ -664,6 +664,18 @@ describe('vocabulary configuration entrance', () => {
     expect(pageState.canLoadMoreMapDetail).toBe(false)
   })
 
+  it('does not remember a map point location as the search scope', async () => {
+    await mount({ tab: 'map' })
+    emitControl('update:selectedLocations', ['搜索地点']); await settle()
+    emitControl('update:rememberLocationSelection', true); await settle()
+    host.querySelector('.submit').click(); await settle()
+    const savedBeforeMapClick = JSON.parse(localStorage.getItem(memoryKey))
+
+    await pageState.handleMapPointClick({ locationName: '地图点击地点' }); await settle()
+
+    expect(JSON.parse(localStorage.getItem(memoryKey))).toEqual(savedBeforeMapClick)
+  })
+
   it('keeps pagination on the applied scope while a new location is being selected', async () => {
     vi.useFakeTimers()
     mocks.items.mockResolvedValueOnce({ items: [{ id: 1 }], total: 100 })
