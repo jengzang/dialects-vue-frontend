@@ -52,6 +52,7 @@
         @goToModifyProfile="setMode('modifyProfile')"
         @goToSettings="goToSettings"
         @logout="logout"
+        @deactivateAccount="handleDeactivateAccount"
         @goToAdminPanel="goToAdminPanel"
         @goToTableManager="goToTableManager"
         @toggleStats="statsExpanded = !statsExpanded"
@@ -97,6 +98,7 @@ import {
   updateUsername,
   updatePassword,
   logoutUser,
+  deactivateAccount,
   getUserRole,
   validateEmail,
   validateUsername,
@@ -421,6 +423,30 @@ const logout = async () => {
     rethrow: true
   }).catch((error) => {
     console.error(t('auth.messages.logoutFailed'), error)
+  })
+}
+
+const handleDeactivateAccount = async () => {
+  const confirmed = await showConfirm(t('auth.confirm.deactivateAccount.message'), {
+    title: t('auth.confirm.deactivateAccount.title'),
+    confirmText: t('auth.confirm.deactivateAccount.confirm'),
+    cancelText: t('auth.confirm.deactivateAccount.cancel')
+  })
+
+  if (!confirmed) return
+
+  await authTask.run(async () => {
+    await manualReport()
+    stopOnlineTimeTracker({ clearPending: true })
+    await deactivateAccount()
+    clearToken()
+    user.value = null
+    setView('login')
+    showSuccess(t('auth.messages.accountDeactivated'))
+  }, {
+    rethrow: true
+  }).catch((e) => {
+    error.value = t('auth.messages.errorDetail', { detail: extractErrorMessage(e) })
   })
 }
 

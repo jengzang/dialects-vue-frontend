@@ -480,8 +480,10 @@
           <RouterLink :to="localeTo('/menu/settings')" class="footer-link">{{ $t('home.footer.links.setting') }}</RouterLink>
           <span class="footer-divider">·</span>
           <a href="https://dialects.yzup.top/detail/" target="_blank" class="footer-link">{{ $t('home.footer.links.oldSite') }}</a>
-          <span class="footer-divider">·</span>
-          <a @click="showSupport = true" class="footer-link">{{ $t('home.footer.links.support') }}</a>
+          <template v-if="!hideSponsorContent">
+            <span class="footer-divider">·</span>
+            <a @click="showSupport = true" class="footer-link">{{ $t('home.footer.links.support') }}</a>
+          </template>
         </div>
 
         <!-- Visit Stats -->
@@ -519,6 +521,7 @@
 
     <!-- Support Modal -->
     <SupportPopup
+      v-if="!hideSponsorContent"
       :visible="showSupport"
       @close="showSupport = false"
     />
@@ -562,6 +565,7 @@ import { useClickParticles } from '@/main/composables/useClickParticles.js'
 import { getCachedSourceStats, getDialectCounts, getSourceStats } from '@/composables/data/useSourceStats.js'
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 import { getCurrentRuntimePlatform } from '@/platform/runtime.js'
+import { shouldHideSponsorContent } from '@/platform/sponsorship.js'
 
 // ✅ 懒加载：先弹窗 → 地球 → Hero 展示
 const GlobeBackground = defineAsyncComponent(() =>
@@ -619,6 +623,7 @@ const globePoints = ref([])
 const showShowcase = ref(false)
 const showcaseSectionRef = ref(null)
 const showSupport = ref(false)
+const hideSponsorContent = shouldHideSponsorContent()
 const showBenefitsPopup = ref(false)
 const showUpdateNotice = ref(false)
 const sourceDbVersion = getHomeUpdateNotice(t).dbVersion

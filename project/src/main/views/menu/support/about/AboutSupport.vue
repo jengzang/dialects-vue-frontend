@@ -69,7 +69,7 @@
       <div class="glow-border"></div>
     </a>
 
-    <section class="support-section">
+    <section v-if="!hideSponsorContent" class="support-section">
       <p class="support-message">{{ $t('about.like.supportMessage') }}</p>
       <div class="donate-qr-grid">
         <div class="donate-qr-box">
@@ -86,8 +86,8 @@
         </div>
       </div>
     </section>
-    <DonorSection class="support-donor-section" />
-    <p class="support-note">{{ $t('about.like.supportNote') }}</p>
+    <DonorSection v-if="!hideSponsorContent" class="support-donor-section" />
+    <p v-if="!hideSponsorContent" class="support-note">{{ $t('about.like.supportNote') }}</p>
   </div>
   <ImagePreviewOverlay
     :src="previewSrc"
@@ -105,9 +105,11 @@ import BarIcon from '@/components/common/BarIcon.vue'
 import ImagePreviewOverlay from '@/components/common/ImagePreviewOverlay.vue'
 import QQGroupContact from '@/components/common/QQGroupContact.vue'
 import DonorSection from '@/main/components/user/DonorSection.vue'
+import { shouldHideSponsorContent } from '@/platform/sponsorship.js'
 
 const weixinQR = '/brand/weixin.webp'
 const alipayQR = '/brand/zfb.webp'
+const hideSponsorContent = shouldHideSponsorContent()
 
 const { t } = useI18n()
 const previewSrc = ref('')

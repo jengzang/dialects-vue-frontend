@@ -101,6 +101,13 @@ export async function logoutUser(refreshToken) {
   }
 }
 
+export async function deactivateAccount() {
+  await ensureAuthenticated()
+  return api(`${AUTH_API_BASE}/account`, {
+    method: 'DELETE'
+  })
+}
+
 /**
  * Get leaderboard rankings
  * @returns {Promise<Object>} Leaderboard data with rankings and total users

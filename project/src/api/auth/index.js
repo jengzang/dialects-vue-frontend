@@ -32,5 +32,6 @@ export {
   updateUsername,
   updatePassword,
   logoutUser,
+  deactivateAccount,
   getLeaderboard
 } from './actions.js'

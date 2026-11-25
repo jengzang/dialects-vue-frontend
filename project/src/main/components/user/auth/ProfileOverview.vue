@@ -97,6 +97,8 @@
         </ActionButton>
         <ActionButton variant="danger" @click="$emit('logout')"><InlineIcon icon="🚪" />{{ $t('auth.profile.buttons.logout') }}
         </ActionButton>
+        <ActionButton variant="danger" @click="$emit('deactivateAccount')"><InlineIcon icon="🗑️" />{{ $t('auth.profile.buttons.deactivateAccount') }}
+        </ActionButton>
         <ActionButton
           v-if="user?.role === 'admin'"
           variant="green"
@@ -160,6 +162,7 @@ defineEmits([
   'goToModifyProfile',
   'goToSettings',
   'logout',
+  'deactivateAccount',
   'goToAdminPanel',
   'goToTableManager',
   'toggleStats',

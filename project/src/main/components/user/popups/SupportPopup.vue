@@ -1,5 +1,6 @@
 <template>
   <AppModal
+    v-if="!hideSponsorContent"
     :model-value="visible"
     size="sm"
     :title="t('home.supportModal.title')"
@@ -27,8 +28,10 @@
 import { useI18n } from 'vue-i18n'
 import AppModal from '@/components/common/AppModal.vue'
 import DonorSection from '@/main/components/user/DonorSection.vue'
+import { shouldHideSponsorContent } from '@/platform/sponsorship.js'
 const weixinQR = '/brand/weixin.webp'
 const alipayQR = '/brand/zfb.webp'
+const hideSponsorContent = shouldHideSponsorContent()
 
 defineProps({
   visible: {
