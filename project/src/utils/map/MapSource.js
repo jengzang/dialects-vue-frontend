@@ -1,3 +1,6 @@
+import maplibregl from 'maplibre-gl';
+import { registerMapTileCacheProtocol, wrapTileUrlWithCacheProtocol } from './tileCache.js';
+
 const maptilerKey = "HSnYXzpfPRlVp7fkOywW"
 
 // 统一的地图样式配置
@@ -7,7 +10,7 @@ const mapStyleConfigData = {
         name: '天地图',
         custom: true,
         tiles: [
-            'https://t0.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=9a516b0f2a8179bb68f73172cff4bd22',
+            'https://t0.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=938f67853b2e094b47c97b5e6c8f5af7',
         ],
         labelTiles: [
             'https://t0.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=9a516b0f2a8179bb68f73172cff4bd22',
@@ -136,10 +139,13 @@ export const mapStyle = (name) => {
         return config.url;
     }
 
+    const useTileCache = registerMapTileCacheProtocol(maplibregl);
+    const resolveTileUrls = (tiles) => (useTileCache ? tiles.map((url) => wrapTileUrlWithCacheProtocol(url)) : tiles);
+
     const sources = {
         [name]: {
             type: 'raster',
-            tiles: config.tiles,
+            tiles: resolveTileUrls(config.tiles),
             tileSize: 256,
             maxzoom: 18,
             minzoom: 0,
@@ -163,7 +169,7 @@ export const mapStyle = (name) => {
 
         sources[labelSourceName] = {
             type: 'raster',
-            tiles: config.labelTiles,
+            tiles: resolveTileUrls(config.labelTiles),
             tileSize: 256,
             maxzoom: 18,
             minzoom: 0,
