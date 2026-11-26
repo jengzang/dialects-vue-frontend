@@ -299,7 +299,6 @@ const toggleFullScreen = async () => {
 const handleStyleChange = () => {
   if (!map.value) return
   const newStyle = mapStyle(currentStyleKey.value)
-  map.value.setStyle(newStyle)
 
   // 樣式加載完成後重新渲染
   map.value.once('style.load', () => {
@@ -307,6 +306,7 @@ const handleStyleChange = () => {
       renderHotspot()
     }
   })
+  map.value.setStyle(newStyle, { diff: false })
 }
 
 const resetView = () => {

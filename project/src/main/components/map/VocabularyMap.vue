@@ -702,11 +702,10 @@ const handleStyleChange = () => {
   if (!map.value) return
   const newStyle = mapStyle(currentStyleKey.value)
 
-  map.value.setStyle(newStyle)
-
   map.value.once('style.load', () => {
     renderMarkers()
   })
+  map.value.setStyle(newStyle, { diff: false })
 }
 
 // 初始化地图

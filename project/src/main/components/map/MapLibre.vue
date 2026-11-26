@@ -1858,17 +1858,24 @@ const handleStyleChange = () => {
   cancelMapContentRender();
   isRenderingMap.value = true;
   const targetMap = map.value;
+  let active = true;
+  const onStyleLoad = () => {
+    if (!active) return;
+    isMapStyleReady = true;
+    requestMapContentRender();
+  };
   const onError = event => { if (!event.sourceId) cancelMapContentRender(); };
   targetMap.on('error', onError);
-  clearMapRenderWait = () => targetMap.off('error', onError);
+  clearMapRenderWait = () => {
+    active = false;
+    targetMap.off('error', onError);
+    targetMap.off('style.load', onStyleLoad);
+  };
   const newStyle = mapStyle(currentStyleKey.value);
   isMapStyleReady = false;
   clearPointLayer();
-  map.value.setStyle(newStyle);
-  map.value.once('style.load', () => {
-    isMapStyleReady = true;
-    requestMapContentRender();
-  });
+  targetMap.once('style.load', onStyleLoad);
+  targetMap.setStyle(newStyle, { diff: false });
 };
 
 const AUTO_RESET_DENSITY_PERCENTILE = 0.98;

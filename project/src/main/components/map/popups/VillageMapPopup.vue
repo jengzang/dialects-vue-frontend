@@ -510,10 +510,10 @@ const resetView = () => {
 const changeMapStyle = () => {
   if (!map.value) return
   const newStyle = mapStyle(currentStyle.value)
-  map.value.setStyle(newStyle)
   map.value.once('style.load', () => {
     renderMarkers()
   })
+  map.value.setStyle(newStyle, { diff: false })
 }
 
 // 清理地图

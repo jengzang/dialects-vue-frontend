@@ -541,8 +541,6 @@ const handleStyleChange = () => {
   // 保存当前数据
   const currentData = map.value.getSource('yubao-markers')?._data
 
-  map.value.setStyle(newStyle)
-
   // 样式加载完成后重新添加 layers
   map.value.once('style.load', () => {
     if (!currentData) return
@@ -636,6 +634,8 @@ const handleStyleChange = () => {
     mapLoaded.value = true
     console.log('✅ 地图样式切换完成，layers 已重新添加')
   })
+
+  map.value.setStyle(newStyle, { diff: false })
 }
 
 // 初始化地图

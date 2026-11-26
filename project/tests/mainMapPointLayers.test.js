@@ -209,6 +209,33 @@ describe('main map point layers', () => {
     expect(host.querySelector('.loading-overlay')).toBeNull()
   })
 
+  it('restores existing markers and clears loading even when setStyle emits style.load synchronously', async () => {
+    mapStore.mode = 'base'
+    mapStore.mapData = {
+      coordinates_locations: [
+        ['广州', [113, 23]],
+        ['香港', [114.17, 22.32]],
+      ],
+    }
+    const map = await mountMap()
+    const host = mounted.at(-1).host
+    expect(pointFeatures(map)).toHaveLength(2)
+
+    const setStyleSpy = vi.spyOn(map, 'setStyle').mockImplementation(function () {
+      this.sources.clear()
+      this.layers.clear()
+      this.images.clear()
+      this.emit('style.load')
+    })
+
+    map.component.handleStyleChange()
+    await nextTick()
+
+    expect(setStyleSpy).toHaveBeenCalledWith(expect.any(Object), { diff: false })
+    expect(pointFeatures(map)).toHaveLength(2)
+    expect(host.querySelector('.loading-overlay')).toBeNull()
+  })
+
   it('cancels an obsolete switch and removes pending loading on unmount', async () => {
     const map = await mountMap()
     const frames = []

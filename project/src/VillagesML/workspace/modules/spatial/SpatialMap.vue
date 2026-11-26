@@ -688,11 +688,11 @@ const toggleFullScreen = async () => {
 const handleStyleChange = () => {
   if (!map.value) return
   const newStyle = mapStyle(currentStyleKey.value)
-  map.value.setStyle(newStyle)
 
   map.value.once('style.load', () => {
     renderData()
   })
+  map.value.setStyle(newStyle, { diff: false })
 }
 
 const resetView = () => {

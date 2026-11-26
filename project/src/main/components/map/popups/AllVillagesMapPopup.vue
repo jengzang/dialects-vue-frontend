@@ -480,10 +480,10 @@ const resetView = () => {
 
 const changeMapStyle = () => {
   if (!map.value) return
-  map.value.setStyle(mapStyle(currentStyle.value))
   map.value.once('style.load', () => {
     renderMarkers()
   })
+  map.value.setStyle(mapStyle(currentStyle.value), { diff: false })
 }
 
 const cleanupMap = () => {
