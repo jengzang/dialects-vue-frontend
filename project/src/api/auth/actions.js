@@ -101,10 +101,13 @@ export async function logoutUser(refreshToken) {
   }
 }
 
-export async function deactivateAccount() {
+export async function deactivateAccount(password) {
   await ensureAuthenticated()
   return api(`${AUTH_API_BASE}/account`, {
-    method: 'DELETE'
+    method: 'DELETE',
+    showError: false,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password })
   })
 }
 

@@ -81,6 +81,14 @@
       @close="closeBenefitsPopup"
       @register="handleRegisterFromBenefits"
     />
+
+    <DeleteAccountPopup
+      :visible="showDeleteAccountPopup"
+      :loading="deleteAccountLoading"
+      :error="deleteAccountError"
+      @close="closeDeleteAccountPopup"
+      @confirm="handleDeleteAccountConfirm"
+    />
   </div>
 </template>
 
@@ -120,6 +128,7 @@ import RegisterForm from '@/main/components/user/auth/RegisterForm.vue'
 import ProfileOverview from '@/main/components/user/auth/ProfileOverview.vue'
 import ModifyProfileForm from '@/main/components/user/auth/ModifyProfileForm.vue'
 import UserBenefitsPopup from '@/main/components/user/popups/UserBenefitsPopup.vue'
+import DeleteAccountPopup from '@/main/components/user/popups/DeleteAccountPopup.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const router = useRouter()
@@ -141,6 +150,9 @@ const recoveryEmail = ref('')
 const modeType = ref('username') // 'username' | 'password'
 const statsExpanded = ref(false)
 const showBenefits = ref(false)
+const showDeleteAccountPopup = ref(false)
+const deleteAccountLoading = ref(false)
+const deleteAccountError = ref('')
 
 // Auth 页内部视图统一由 query.view 驱动，这样刷新、回退和外部直达都能保持一致。
 const { state: view, set: setAuthView } = useRouteQueryState('view', {
@@ -426,28 +438,34 @@ const logout = async () => {
   })
 }
 
-const handleDeactivateAccount = async () => {
-  const confirmed = await showConfirm(t('auth.confirm.deactivateAccount.message'), {
-    title: t('auth.confirm.deactivateAccount.title'),
-    confirmText: t('auth.confirm.deactivateAccount.confirm'),
-    cancelText: t('auth.confirm.deactivateAccount.cancel')
-  })
+const handleDeactivateAccount = () => {
+  deleteAccountError.value = ''
+  showDeleteAccountPopup.value = true
+}
 
-  if (!confirmed) return
+const closeDeleteAccountPopup = () => {
+  if (deleteAccountLoading.value) return
+  showDeleteAccountPopup.value = false
+}
 
-  await authTask.run(async () => {
+const handleDeleteAccountConfirm = async ({ password }) => {
+  deleteAccountError.value = ''
+  deleteAccountLoading.value = true
+
+  try {
     await manualReport()
     stopOnlineTimeTracker({ clearPending: true })
-    await deactivateAccount()
+    await deactivateAccount(password)
     clearToken()
     user.value = null
+    showDeleteAccountPopup.value = false
     setView('login')
     showSuccess(t('auth.messages.accountDeactivated'))
-  }, {
-    rethrow: true
-  }).catch((e) => {
-    error.value = t('auth.messages.errorDetail', { detail: extractErrorMessage(e) })
-  })
+  } catch (e) {
+    deleteAccountError.value = extractErrorMessage(e)
+  } finally {
+    deleteAccountLoading.value = false
+  }
 }
 
 const fetchUser = async () => {

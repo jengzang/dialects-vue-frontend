@@ -12,12 +12,17 @@ describe('account deactivation', () => {
     expect(shouldHideSponsorContent({ family: 'web', os: 'ios', container: 'browser' })).toBe(false)
   })
 
-  it('deactivates the current account through the auth API', async () => {
-    const apiMock = vi.fn().mockResolvedValue({ status: 'disabled' })
+  it('deletes the current account through the auth API with the password', async () => {
+    const apiMock = vi.fn().mockResolvedValue({ status: 'deleted' })
     vi.doMock('../src/api/auth/httpClient.js', () => ({ api: apiMock }))
 
     const { deactivateAccount } = await import('../src/api/auth/actions.js')
-    await expect(deactivateAccount()).resolves.toEqual({ status: 'disabled' })
-    expect(apiMock).toHaveBeenCalledWith('/api/auth/account', { method: 'DELETE' })
+    await expect(deactivateAccount('secret')).resolves.toEqual({ status: 'deleted' })
+    expect(apiMock).toHaveBeenCalledWith('/api/auth/account', {
+      method: 'DELETE',
+      showError: false,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: 'secret' })
+    })
   })
 })
