@@ -212,18 +212,20 @@ class DialectsBridgeViewController: CAPBridgeViewController {
 }
 
 private final class NativeLaunchOverlayView: UIView {
-    private let titleWidth: CGFloat = 208
-    private let titleHeight: CGFloat = 76
+    private let titleWidth: CGFloat = 228
+    private let titleHeight: CGFloat = 83
+    private let minDisplayDuration: CFTimeInterval = 0.90
 
-    private let logoImageView = UIImageView(image: UIImage(named: "LaunchLogo"))
-    private let footerStack = UIStackView()
     private let titleContainer = UIView()
     private let brushImageView = UIImageView(image: UIImage(named: "LaunchTitleBrush"))
     private let sealImageView = UIImageView(image: UIImage(named: "LaunchTitleSeal"))
+    private let logoImageView = UIImageView(image: UIImage(named: "LaunchLogo"))
+    private let footerStack = UIStackView()
     private let descriptionLabel = UILabel()
     private let phoneticsLabel = UILabel()
     private let versionLabel = UILabel()
 
+    private var shownAt: CFTimeInterval = 0
     private var isDismissing = false
 
     override init(frame: CGRect) {
@@ -240,16 +242,6 @@ private final class NativeLaunchOverlayView: UIView {
         backgroundColor = UIColor(named: "LaunchBackground") ?? .systemBackground
         accessibilityElementsHidden = true
 
-        logoImageView.contentMode = .scaleAspectFit
-        logoImageView.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(logoImageView)
-
-        footerStack.axis = .vertical
-        footerStack.alignment = .center
-        footerStack.spacing = 8
-        footerStack.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(footerStack)
-
         titleContainer.translatesAutoresizingMaskIntoConstraints = false
         titleContainer.clipsToBounds = false
         brushImageView.contentMode = .scaleAspectFit
@@ -258,21 +250,34 @@ private final class NativeLaunchOverlayView: UIView {
         sealImageView.translatesAutoresizingMaskIntoConstraints = false
         titleContainer.addSubview(brushImageView)
         titleContainer.addSubview(sealImageView)
-        footerStack.addArrangedSubview(titleContainer)
-        footerStack.setCustomSpacing(8, after: titleContainer)
+        addSubview(titleContainer)
+
+        logoImageView.contentMode = .scaleAspectFit
+        logoImageView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(logoImageView)
 
         let descriptionColor = UIColor(named: "LaunchDescription") ?? .secondaryLabel
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.alignment = .center
+        paragraph.lineSpacing = 4
         descriptionLabel.attributedText = NSAttributedString(
             string: Self.localizedDescription(),
             attributes: [
                 .font: UIFont.systemFont(ofSize: 13.5),
                 .foregroundColor: descriptionColor,
-                .kern: 1.8
+                .kern: 1.0,
+                .paragraphStyle: paragraph
             ]
         )
-        descriptionLabel.textAlignment = .center
-        footerStack.addArrangedSubview(descriptionLabel)
-        footerStack.setCustomSpacing(8, after: descriptionLabel)
+        descriptionLabel.numberOfLines = 0
+        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(descriptionLabel)
+
+        footerStack.axis = .vertical
+        footerStack.alignment = .center
+        footerStack.spacing = 10
+        footerStack.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(footerStack)
 
         let serifDescriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .footnote)
             .withDesign(.serif) ?? UIFontDescriptor.preferredFontDescriptor(withTextStyle: .footnote)
@@ -287,7 +292,6 @@ private final class NativeLaunchOverlayView: UIView {
         phoneticsLabel.alpha = 0.58
         phoneticsLabel.textAlignment = .center
         footerStack.addArrangedSubview(phoneticsLabel)
-        footerStack.setCustomSpacing(12, after: phoneticsLabel)
 
         versionLabel.font = UIFont.monospacedDigitSystemFont(ofSize: 11, weight: .regular)
         versionLabel.textColor = descriptionColor
@@ -296,28 +300,9 @@ private final class NativeLaunchOverlayView: UIView {
         versionLabel.text = Self.appVersionLabel()
         footerStack.addArrangedSubview(versionLabel)
 
-        let logoCenterY = NSLayoutConstraint(
-            item: logoImageView,
-            attribute: .centerY,
-            relatedBy: .equal,
-            toItem: self,
-            attribute: .centerY,
-            multiplier: 0.84,
-            constant: 0
-        )
-
         NSLayoutConstraint.activate([
-            logoImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            logoCenterY,
-            logoImageView.widthAnchor.constraint(equalToConstant: 168),
-            logoImageView.heightAnchor.constraint(equalToConstant: 168),
-
-            footerStack.centerXAnchor.constraint(equalTo: centerXAnchor),
-            footerStack.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -28),
-            footerStack.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: 24),
-            footerStack.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -24),
-            footerStack.topAnchor.constraint(greaterThanOrEqualTo: logoImageView.bottomAnchor, constant: 20),
-
+            titleContainer.centerXAnchor.constraint(equalTo: centerXAnchor),
+            titleContainer.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 48),
             titleContainer.widthAnchor.constraint(equalToConstant: titleWidth),
             titleContainer.heightAnchor.constraint(equalToConstant: titleHeight),
 
@@ -329,11 +314,27 @@ private final class NativeLaunchOverlayView: UIView {
             sealImageView.topAnchor.constraint(equalTo: titleContainer.topAnchor),
             sealImageView.bottomAnchor.constraint(equalTo: titleContainer.bottomAnchor),
             sealImageView.leadingAnchor.constraint(equalTo: titleContainer.leadingAnchor),
-            sealImageView.trailingAnchor.constraint(equalTo: titleContainer.trailingAnchor)
+            sealImageView.trailingAnchor.constraint(equalTo: titleContainer.trailingAnchor),
+
+            logoImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            logoImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            logoImageView.widthAnchor.constraint(equalToConstant: 160),
+            logoImageView.heightAnchor.constraint(equalToConstant: 160),
+
+            descriptionLabel.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 18),
+            descriptionLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+            descriptionLabel.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: 32),
+            descriptionLabel.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -32),
+
+            footerStack.centerXAnchor.constraint(equalTo: centerXAnchor),
+            footerStack.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -24),
+            footerStack.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: 24),
+            footerStack.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -24)
         ])
     }
 
     func startAnimation() {
+        shownAt = CACurrentMediaTime()
         guard !UIAccessibility.isReduceMotionEnabled else { return }
 
         // Keep logo pinned at the exact LaunchScreen.storyboard coordinates with a gentle settle.
@@ -423,10 +424,11 @@ private final class NativeLaunchOverlayView: UIView {
     }
 
     func dismiss(completion: @escaping () -> Void) {
+        guard !isDismissing else { return }
         isDismissing = true
-        phoneticsLabel.layer.removeAllAnimations()
 
         if UIAccessibility.isReduceMotionEnabled {
+            phoneticsLabel.layer.removeAllAnimations()
             UIView.animate(withDuration: 0.2, animations: {
                 self.alpha = 0
             }, completion: { _ in
@@ -435,30 +437,46 @@ private final class NativeLaunchOverlayView: UIView {
             return
         }
 
-        let easeOut = UICubicTimingParameters(controlPoint1: CGPoint(x: 0.22, y: 1.0), controlPoint2: CGPoint(x: 0.36, y: 1.0))
-        let exitAnimator = UIViewPropertyAnimator(duration: 0.36, timingParameters: easeOut)
-        exitAnimator.addAnimations {
-            self.logoImageView.transform = CGAffineTransform(translationX: 0, y: -28).scaledBy(x: 0.94, y: 0.94)
-            self.logoImageView.alpha = 0
-            self.footerStack.transform = CGAffineTransform(translationX: 0, y: 16)
-            self.footerStack.alpha = 0
-            self.alpha = 0
+        let elapsed = CACurrentMediaTime() - shownAt
+        let remaining = max(0, minDisplayDuration - elapsed)
+        let runExit = { [weak self] in
+            guard let self else { return }
+            self.phoneticsLabel.layer.removeAllAnimations()
+            let easeOut = UICubicTimingParameters(controlPoint1: CGPoint(x: 0.22, y: 1.0), controlPoint2: CGPoint(x: 0.36, y: 1.0))
+            let exitAnimator = UIViewPropertyAnimator(duration: 0.36, timingParameters: easeOut)
+            exitAnimator.addAnimations {
+                self.titleContainer.transform = CGAffineTransform(translationX: 0, y: -20)
+                self.titleContainer.alpha = 0
+                self.logoImageView.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
+                self.logoImageView.alpha = 0
+                self.descriptionLabel.transform = CGAffineTransform(translationX: 0, y: 8)
+                self.descriptionLabel.alpha = 0
+                self.footerStack.transform = CGAffineTransform(translationX: 0, y: 12)
+                self.footerStack.alpha = 0
+                self.alpha = 0
+            }
+            exitAnimator.addCompletion { _ in
+                completion()
+            }
+            exitAnimator.startAnimation()
         }
-        exitAnimator.addCompletion { _ in
-            completion()
+
+        if remaining > 0 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + remaining, execute: runExit)
+        } else {
+            runExit()
         }
-        exitAnimator.startAnimation()
     }
 
     private static func localizedDescription() -> String {
         let preferred = Locale.preferredLanguages.first?.lowercased() ?? "en"
         if preferred.hasPrefix("zh-hant") || preferred.hasPrefix("zh-tw") || preferred.hasPrefix("zh-hk") || preferred.hasPrefix("zh-mo") {
-            return "探索漢語方言"
+            return "探索方言的歷史層次 · 觸摸漢字的音韻之美"
         }
         if preferred.hasPrefix("zh") {
-            return "探索汉语方言"
+            return "探索方言的历史层次 · 触摸汉字的音韵之美"
         }
-        return "Explore Chinese dialects"
+        return "Explore the Historical Layers of Dialects · Discover the Phonological Beauty of Chinese Characters"
     }
 
     private static func appVersionLabel() -> String {

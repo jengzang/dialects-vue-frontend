@@ -16,15 +16,15 @@
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" image="LaunchLogo" translatesAutoresizingMaskIntoConstraints="NO" id="launch-logo">
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="168" id="logo-width"/>
-                                    <constraint firstAttribute="height" constant="168" id="logo-height"/>
+                                    <constraint firstAttribute="width" constant="160" id="logo-width"/>
+                                    <constraint firstAttribute="height" constant="160" id="logo-height"/>
                                 </constraints>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" name="LaunchBackground"/>
                         <constraints>
                             <constraint firstItem="launch-logo" firstAttribute="centerX" secondItem="launch-view" secondAttribute="centerX" id="logo-center-x"/>
-                            <constraint firstItem="launch-logo" firstAttribute="centerY" secondItem="launch-view" secondAttribute="centerY" multiplier="0.84" id="logo-center-y"/>
+                            <constraint firstItem="launch-logo" firstAttribute="centerY" secondItem="launch-view" secondAttribute="centerY" id="logo-center-y"/>
                         </constraints>
                     </view>
                 </viewController>

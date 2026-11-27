@@ -28,7 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends BridgeActivity {
+    private static final long MIN_LAUNCH_DISPLAY_MS = 900L;
     private View launchOverlay;
+    private long launchShownAtMs = 0L;
+    private boolean launchHideScheduled = false;
     private final List<Animator> launchAnimators = new ArrayList<>();
     private long lastExitBackPress = -1;
     private Toast exitToast;
@@ -82,6 +85,35 @@ public class MainActivity extends BridgeActivity {
     }
 
     private void startLaunchAnimation(View overlay) {
+        launchShownAtMs = SystemClock.elapsedRealtime();
+        launchHideScheduled = false;
+
+        View header = overlay.findViewById(R.id.launch_header);
+        View footer = overlay.findViewById(R.id.launch_footer);
+        final int baseHeaderTop = header != null ? header.getPaddingTop() : 0;
+        final int baseFooterBottom = footer != null ? footer.getPaddingBottom() : 0;
+        ViewCompat.setOnApplyWindowInsetsListener(overlay, (v, insets) -> {
+            androidx.core.graphics.Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            if (header != null) {
+                header.setPadding(
+                    header.getPaddingLeft(),
+                    baseHeaderTop + bars.top,
+                    header.getPaddingRight(),
+                    header.getPaddingBottom()
+                );
+            }
+            if (footer != null) {
+                footer.setPadding(
+                    footer.getPaddingLeft(),
+                    footer.getPaddingTop(),
+                    footer.getPaddingRight(),
+                    baseFooterBottom + bars.bottom
+                );
+            }
+            return insets;
+        });
+        ViewCompat.requestApplyInsets(overlay);
+
         TextView versionView = overlay.findViewById(R.id.launch_version);
         if (versionView != null) {
             versionView.setText(resolveAppVersionLabel());
@@ -205,6 +237,23 @@ public class MainActivity extends BridgeActivity {
     }
 
     public void hideLaunch() {
+        if (launchOverlay == null || launchHideScheduled) return;
+        launchHideScheduled = true;
+
+        long delayMs = 0L;
+        if (!isReduceMotionEnabled()) {
+            long elapsedMs = SystemClock.elapsedRealtime() - launchShownAtMs;
+            delayMs = Math.max(0L, MIN_LAUNCH_DISPLAY_MS - elapsedMs);
+        }
+
+        if (delayMs > 0L) {
+            launchOverlay.postDelayed(this::performHideLaunch, delayMs);
+        } else {
+            performHideLaunch();
+        }
+    }
+
+    private void performHideLaunch() {
         if (launchOverlay == null) return;
         View overlay = launchOverlay;
         launchOverlay = null;
@@ -223,13 +272,21 @@ public class MainActivity extends BridgeActivity {
 
         PathInterpolator easeOut = new PathInterpolator(0.22f, 1f, 0.36f, 1f);
         float density = getResources().getDisplayMetrics().density;
-        View logo = overlay.findViewById(R.id.launch_logo);
+        View header = overlay.findViewById(R.id.launch_header);
+        View center = overlay.findViewById(R.id.launch_center);
         View footer = overlay.findViewById(R.id.launch_footer);
-        if (logo != null) {
-            logo.animate()
-                .translationY(-28f * density)
-                .scaleX(0.94f)
-                .scaleY(0.94f)
+        if (header != null) {
+            header.animate()
+                .translationY(-20f * density)
+                .alpha(0f)
+                .setDuration(320)
+                .setInterpolator(easeOut)
+                .start();
+        }
+        if (center != null) {
+            center.animate()
+                .scaleX(0.95f)
+                .scaleY(0.95f)
                 .alpha(0f)
                 .setDuration(340)
                 .setInterpolator(easeOut)
@@ -237,7 +294,7 @@ public class MainActivity extends BridgeActivity {
         }
         if (footer != null) {
             footer.animate()
-                .translationY(16f * density)
+                .translationY(12f * density)
                 .alpha(0f)
                 .setDuration(320)
                 .setInterpolator(easeOut)
