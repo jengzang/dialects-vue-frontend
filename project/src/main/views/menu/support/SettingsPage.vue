@@ -116,6 +116,47 @@
         </div>
       </div>
 
+      <div class="setting-section surface-panel" data-variant="transparent">
+        <div class="font-scale-header">
+          <h3 class="section-title">
+            {{ $t('navigation.settings.fontSize.title') }}
+            <HelpIcon
+              :content="$t('navigation.settings.fontSize.description')"
+              size="sm"
+              placement="right"
+              icon="?"
+              icon-color="var(--color-primary)"
+            />
+          </h3>
+          <div class="font-scale-meta">
+            <span class="font-scale-value">{{ fontScalePercent }}%</span>
+            <button
+              v-if="fontScaleModel !== FONT_SCALE_DEFAULT"
+              type="button"
+              class="glass-button font-scale-reset"
+              @click="resetFontScale"
+            >
+              {{ $t('navigation.settings.fontSize.reset') }}
+            </button>
+          </div>
+        </div>
+        <div class="font-scale-control">
+          <span class="font-scale-bound font-scale-bound--small" aria-hidden="true">A-</span>
+          <input
+            v-model.number="fontScaleModel"
+            type="range"
+            class="glass-range font-scale-slider"
+            :min="FONT_SCALE_MIN"
+            :max="FONT_SCALE_MAX"
+            :step="FONT_SCALE_STEP"
+            :style="{ '--glass-range-progress': fontScaleProgress }"
+            :aria-label="$t('navigation.settings.fontSize.title')"
+          />
+          <span class="font-scale-bound font-scale-bound--large" aria-hidden="true">A+</span>
+        </div>
+        <p class="font-scale-preview">{{ $t('navigation.settings.fontSize.preview') }}</p>
+      </div>
+
       <div class="setting-section setting-split surface-panel" data-variant="transparent">
         <div class="setting-split-item">
           <h3 class="section-title">
@@ -247,17 +288,23 @@ import {
   getColorThemeParts,
   currentColorTheme,
   currentColorMode,
+  currentFontScale,
   UI_MODE_DEFAULT,
   UI_MODE_COMPACT,
   ICON_MODE_ALL_EMOJI,
   ICON_MODE_ALL_SVG,
   ICON_MODE_BAR_SVG,
+  FONT_SCALE_MIN,
+  FONT_SCALE_MAX,
+  FONT_SCALE_STEP,
+  FONT_SCALE_DEFAULT,
   getStoredInterfaceMode,
   getStoredIconMode,
   setColorFamily,
   setColorMode,
   setInterfaceMode,
   setIconMode,
+  setFontScale,
 } from '@/composables/core/uiPreferences.js'
 import { buildLocalePath, stripLocaleFromPath } from '@/i18n/localeRouting.js'
 import {
@@ -302,6 +349,24 @@ const languages = ref([
 
 const interfaceMode = ref(getStoredInterfaceMode())
 const iconMode = ref(getStoredIconMode())
+
+const fontScaleModel = computed({
+  get: () => currentFontScale.value,
+  set: (scale) => {
+    setFontScale(scale)
+  }
+})
+
+const fontScalePercent = computed(() => Math.round(fontScaleModel.value * 100))
+
+const fontScaleProgress = computed(() => {
+  const ratio = (fontScaleModel.value - FONT_SCALE_MIN) / (FONT_SCALE_MAX - FONT_SCALE_MIN)
+  return `${Math.round(Math.min(1, Math.max(0, ratio)) * 100)}%`
+})
+
+const resetFontScale = () => {
+  setFontScale(FONT_SCALE_DEFAULT)
+}
 
 const colorThemeOptions = computed(() => [
   { value: 'blue', label: t('navigation.settings.colorTheme.options.blue') },
@@ -656,6 +721,71 @@ $text-muted: var(--text-tertiary);
   justify-content: center;
   gap: 16px;
   margin-top: 8px;
+}
+
+.font-scale-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+
+  .section-title {
+    margin-bottom: 0;
+  }
+}
+
+.font-scale-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.font-scale-value {
+  font-size: var(--font-size-14);
+  font-weight: 700;
+  color: var(--color-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.font-scale-reset {
+  --glass-button-padding: 3px 10px;
+  --glass-button-font-size: var(--font-size-12);
+}
+
+.font-scale-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.font-scale-slider {
+  flex: 1;
+}
+
+.font-scale-bound {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-weight: 600;
+  user-select: none;
+
+  &--small {
+    font-size: var(--font-size-12);
+  }
+
+  &--large {
+    font-size: var(--font-size-18);
+  }
+}
+
+.font-scale-preview {
+  margin: 12px 0 0;
+  text-align: center;
+  font-size: var(--font-size-16);
+  color: var(--text-primary);
 }
 
 @media (max-aspect-ratio: #{1 / 1}) {

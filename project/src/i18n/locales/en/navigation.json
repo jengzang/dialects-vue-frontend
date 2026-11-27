@@ -231,6 +231,12 @@
         "green": "Green"
       }
     },
+    "fontSize": {
+      "title": "Font Size",
+      "description": "Scale text size across the site (85% – 125%). Adjusts typography only without altering layout spacing.",
+      "reset": "Reset",
+      "preview": "Dialect Atlas · Dialect Comparison & Geolinguistics"
+    },
     "interfaceMode": {
       "title": "Interface Style",
       "description": "Choose between the standard and simplified interface styles. Simplified mode disables animations, shadows, blur, and other visual effects to improve performance on less powerful devices.",

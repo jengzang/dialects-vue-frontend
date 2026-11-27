@@ -4,6 +4,12 @@ const UI_MODE_STORAGE_KEY = 'dialects-ui-mode'
 const COLOR_THEME_STORAGE_KEY = 'dialects-color-theme'
 const COLOR_MODE_STORAGE_KEY = 'dialects-color-mode'
 const ICON_MODE_STORAGE_KEY = 'dialects-icon-mode'
+const FONT_SCALE_STORAGE_KEY = 'dialects-font-scale'
+
+export const FONT_SCALE_MIN = 0.85
+export const FONT_SCALE_MAX = 1.25
+export const FONT_SCALE_STEP = 0.05
+export const FONT_SCALE_DEFAULT = 1
 
 export const ICON_MODE_ALL_EMOJI = 'all-emoji'
 export const ICON_MODE_ALL_SVG = 'all-svg'
@@ -46,6 +52,7 @@ export const currentColorMode = ref(getStoredColorMode())
 export const currentColorTheme = ref(getStoredColorTheme())
 export const currentInterfaceMode = ref(getStoredInterfaceMode())
 export const currentIconMode = ref(getStoredIconMode())
+export const currentFontScale = ref(getStoredFontScale())
 
 function normalizeInterfaceMode(mode) {
   return VALID_UI_MODES.has(mode) ? mode : UI_MODE_DEFAULT
@@ -245,6 +252,7 @@ export function initializeUiPreferences() {
   return {
     interfaceMode: initializeInterfaceMode(),
     colorTheme: initializeColorTheme(),
+    fontScale: initializeFontScale(),
   }
 }
 
@@ -313,4 +321,58 @@ export function setIconMode(mode) {
   const normalizedMode = setStoredIconMode(mode)
   currentIconMode.value = normalizedMode
   return normalizedMode
+}
+
+function normalizeFontScale(value) {
+  const parsed = Number.parseFloat(value)
+  if (!Number.isFinite(parsed)) return FONT_SCALE_DEFAULT
+  const clamped = Math.min(FONT_SCALE_MAX, Math.max(FONT_SCALE_MIN, parsed))
+  const stepped = Math.round(clamped / FONT_SCALE_STEP) * FONT_SCALE_STEP
+  return Number(stepped.toFixed(2))
+}
+
+export function getStoredFontScale() {
+  if (typeof window === 'undefined') {
+    return FONT_SCALE_DEFAULT
+  }
+
+  try {
+    return normalizeFontScale(window.localStorage.getItem(FONT_SCALE_STORAGE_KEY))
+  } catch (error) {
+    console.warn('Failed to read font scale from localStorage:', error)
+    return FONT_SCALE_DEFAULT
+  }
+}
+
+export function applyFontScale(scale) {
+  const normalizedScale = normalizeFontScale(scale)
+  currentFontScale.value = normalizedScale
+  if (typeof document !== 'undefined') {
+    document.documentElement.style.setProperty('--user-font-scale', String(normalizedScale))
+  }
+  return normalizedScale
+}
+
+export function setStoredFontScale(scale) {
+  const normalizedScale = normalizeFontScale(scale)
+  if (typeof window === 'undefined') {
+    return normalizedScale
+  }
+
+  try {
+    window.localStorage.setItem(FONT_SCALE_STORAGE_KEY, String(normalizedScale))
+  } catch (error) {
+    console.warn('Failed to save font scale to localStorage:', error)
+  }
+
+  return normalizedScale
+}
+
+export function initializeFontScale() {
+  return applyFontScale(getStoredFontScale())
+}
+
+export function setFontScale(scale) {
+  const normalizedScale = setStoredFontScale(scale)
+  return applyFontScale(normalizedScale)
 }
