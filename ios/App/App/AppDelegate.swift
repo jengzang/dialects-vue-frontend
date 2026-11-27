@@ -63,7 +63,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 // Enable WebKit history gestures, including Vue Router pushState entries.
 class DialectsBridgeViewController: CAPBridgeViewController {
-    private var launchController: UIViewController?
+    private var launchOverlay: NativeLaunchOverlayView?
     private var dialectMapHost: DialectAppleMapHost?
     private var overlayBlocked = false
     private var keyboardVisible = false
@@ -104,15 +104,12 @@ class DialectsBridgeViewController: CAPBridgeViewController {
         ]
         NSLayoutConstraint.activate(safeAreaConstraints)
 
-        if let launch = UIStoryboard(name: "LaunchScreen", bundle: nil).instantiateInitialViewController() {
-            launchController = launch
-            addChild(launch)
-            launch.view.frame = container.bounds
-            launch.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            container.addSubview(launch.view)
-            launch.didMove(toParent: self)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 15) { [weak self] in self?.hideLaunch() }
-        }
+        let overlay = NativeLaunchOverlayView(frame: container.bounds)
+        overlay.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        container.addSubview(overlay)
+        launchOverlay = overlay
+        overlay.startAnimation()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 15) { [weak self] in self?.hideLaunch() }
     }
 
     override func capacitorDidLoad() {
@@ -130,12 +127,10 @@ class DialectsBridgeViewController: CAPBridgeViewController {
     }
 
     func hideLaunch() {
-        guard let launch = launchController else { return }
-        launchController = nil
-        launch.willMove(toParent: nil)
-        UIView.animate(withDuration: 0.18, animations: { launch.view.alpha = 0 }) { _ in
-            launch.view.removeFromSuperview()
-            launch.removeFromParent()
+        guard let overlay = launchOverlay else { return }
+        launchOverlay = nil
+        overlay.dismiss {
+            overlay.removeFromSuperview()
         }
     }
 
@@ -237,4 +232,251 @@ class DialectsBridgeViewController: CAPBridgeViewController {
     }
 
     deinit { NotificationCenter.default.removeObserver(self) }
+}
+
+private final class NativeLaunchOverlayView: UIView {
+    private let titleWidth: CGFloat = 248
+    private let titleHeight: CGFloat = 91
+
+    private let contentStack = UIStackView()
+    private let logoImageView = UIImageView(image: UIImage(named: "LaunchLogo"))
+    private let titleContainer = UIView()
+    private let brushImageView = UIImageView(image: UIImage(named: "LaunchTitleBrush"))
+    private let sealImageView = UIImageView(image: UIImage(named: "LaunchTitleSeal"))
+    private let descriptionLabel = UILabel()
+    private let phoneticsLabel = UILabel()
+    private let versionLabel = UILabel()
+
+    private var isDismissing = false
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupView()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupView()
+    }
+
+    private func setupView() {
+        backgroundColor = UIColor(named: "LaunchBackground") ?? .systemBackground
+        accessibilityElementsHidden = true
+
+        contentStack.axis = .vertical
+        contentStack.alignment = .center
+        contentStack.spacing = 12
+        contentStack.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(contentStack)
+
+        logoImageView.contentMode = .scaleAspectFit
+        logoImageView.translatesAutoresizingMaskIntoConstraints = false
+        contentStack.addArrangedSubview(logoImageView)
+        contentStack.setCustomSpacing(14, after: logoImageView)
+
+        titleContainer.translatesAutoresizingMaskIntoConstraints = false
+        titleContainer.clipsToBounds = false
+        brushImageView.contentMode = .scaleAspectFit
+        brushImageView.translatesAutoresizingMaskIntoConstraints = false
+        sealImageView.contentMode = .scaleAspectFit
+        sealImageView.translatesAutoresizingMaskIntoConstraints = false
+        titleContainer.addSubview(brushImageView)
+        titleContainer.addSubview(sealImageView)
+        contentStack.addArrangedSubview(titleContainer)
+        contentStack.setCustomSpacing(12, after: titleContainer)
+
+        let descriptionColor = UIColor(named: "LaunchDescription") ?? .secondaryLabel
+        descriptionLabel.attributedText = NSAttributedString(
+            string: Self.localizedDescription(),
+            attributes: [
+                .font: UIFont.systemFont(ofSize: 14),
+                .foregroundColor: descriptionColor,
+                .kern: 1.8
+            ]
+        )
+        descriptionLabel.textAlignment = .center
+        contentStack.addArrangedSubview(descriptionLabel)
+        contentStack.setCustomSpacing(10, after: descriptionLabel)
+
+        let serifDescriptor = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .footnote)
+            .withDesign(.serif) ?? UIFontDescriptor.preferredFontDescriptor(withTextStyle: .footnote)
+        phoneticsLabel.attributedText = NSAttributedString(
+            string: "攝 · 韻 · æ · ɔ · tʂʰ",
+            attributes: [
+                .font: UIFont(descriptor: serifDescriptor, size: 12),
+                .foregroundColor: descriptionColor,
+                .kern: 1.4
+            ]
+        )
+        phoneticsLabel.alpha = 0.58
+        phoneticsLabel.textAlignment = .center
+        contentStack.addArrangedSubview(phoneticsLabel)
+
+        versionLabel.font = UIFont.monospacedDigitSystemFont(ofSize: 11, weight: .regular)
+        versionLabel.textColor = descriptionColor
+        versionLabel.alpha = 0.55
+        versionLabel.textAlignment = .center
+        versionLabel.text = Self.appVersionLabel()
+        versionLabel.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(versionLabel)
+
+        NSLayoutConstraint.activate([
+            contentStack.centerXAnchor.constraint(equalTo: centerXAnchor),
+            contentStack.centerYAnchor.constraint(equalTo: centerYAnchor),
+            contentStack.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: 24),
+            contentStack.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -24),
+
+            logoImageView.widthAnchor.constraint(equalToConstant: 116),
+            logoImageView.heightAnchor.constraint(equalToConstant: 116),
+
+            titleContainer.widthAnchor.constraint(equalToConstant: titleWidth),
+            titleContainer.heightAnchor.constraint(equalToConstant: titleHeight),
+
+            brushImageView.topAnchor.constraint(equalTo: titleContainer.topAnchor),
+            brushImageView.bottomAnchor.constraint(equalTo: titleContainer.bottomAnchor),
+            brushImageView.leadingAnchor.constraint(equalTo: titleContainer.leadingAnchor),
+            brushImageView.trailingAnchor.constraint(equalTo: titleContainer.trailingAnchor),
+
+            sealImageView.topAnchor.constraint(equalTo: titleContainer.topAnchor),
+            sealImageView.bottomAnchor.constraint(equalTo: titleContainer.bottomAnchor),
+            sealImageView.leadingAnchor.constraint(equalTo: titleContainer.leadingAnchor),
+            sealImageView.trailingAnchor.constraint(equalTo: titleContainer.trailingAnchor),
+
+            versionLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+            versionLabel.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -24)
+        ])
+    }
+
+    func startAnimation() {
+        guard !UIAccessibility.isReduceMotionEnabled else { return }
+
+        // Start logo aligned with the centered LaunchScreen.storyboard, then ease into the full stack.
+        contentStack.transform = CGAffineTransform(translationX: 0, y: 52)
+        descriptionLabel.alpha = 0
+        descriptionLabel.transform = CGAffineTransform(translationX: 0, y: 10)
+        phoneticsLabel.alpha = 0
+        phoneticsLabel.transform = CGAffineTransform(translationX: 0, y: 10)
+        versionLabel.alpha = 0
+
+        // Pivot seal stamp around its exact position (0.85, 0.19) inside the shared title canvas.
+        let dx = titleWidth * 0.35
+        let dy = -titleHeight * 0.31
+        sealImageView.alpha = 0
+        sealImageView.transform = CGAffineTransform(translationX: dx, y: dy)
+            .scaledBy(x: 1.65, y: 1.65)
+            .rotated(by: -10 * .pi / 180)
+            .translatedBy(x: -dx, y: -dy)
+
+        // Left-to-right ink brush reveal via CALayer mask.
+        let maskLayer = CALayer()
+        maskLayer.backgroundColor = UIColor.black.cgColor
+        maskLayer.anchorPoint = CGPoint(x: 0, y: 0.5)
+        maskLayer.position = CGPoint(x: 0, y: titleHeight / 2)
+        maskLayer.bounds = CGRect(x: 0, y: 0, width: titleWidth, height: titleHeight)
+        brushImageView.layer.mask = maskLayer
+
+        let inkSweep = CABasicAnimation(keyPath: "bounds.size.width")
+        inkSweep.fromValue = 0
+        inkSweep.toValue = titleWidth
+        inkSweep.beginTime = CACurrentMediaTime() + 0.10
+        inkSweep.duration = 0.56
+        inkSweep.fillMode = .backwards
+        inkSweep.timingFunction = CAMediaTimingFunction(controlPoints: 0.22, 1.0, 0.36, 1.0)
+        maskLayer.add(inkSweep, forKey: "inkSweep")
+
+        let easeOut = UICubicTimingParameters(controlPoint1: CGPoint(x: 0.22, y: 1.0), controlPoint2: CGPoint(x: 0.36, y: 1.0))
+
+        let stackAnimator = UIViewPropertyAnimator(duration: 0.34, timingParameters: easeOut)
+        stackAnimator.addAnimations {
+            self.contentStack.transform = .identity
+        }
+        stackAnimator.startAnimation()
+
+        UIView.animate(
+            withDuration: 0.42,
+            delay: 0.46,
+            usingSpringWithDamping: 0.58,
+            initialSpringVelocity: 0.9,
+            options: [.allowUserInteraction],
+            animations: {
+                self.sealImageView.alpha = 1
+                self.sealImageView.transform = .identity
+            }
+        )
+
+        let descAnimator = UIViewPropertyAnimator(duration: 0.34, timingParameters: easeOut)
+        descAnimator.addAnimations {
+            self.descriptionLabel.alpha = 1
+            self.descriptionLabel.transform = .identity
+        }
+        descAnimator.startAnimation(afterDelay: 0.52)
+
+        let versionAnimator = UIViewPropertyAnimator(duration: 0.32, timingParameters: easeOut)
+        versionAnimator.addAnimations {
+            self.versionLabel.alpha = 0.55
+        }
+        versionAnimator.startAnimation(afterDelay: 0.48)
+
+        let phoneticsAnimator = UIViewPropertyAnimator(duration: 0.34, timingParameters: easeOut)
+        phoneticsAnimator.addAnimations {
+            self.phoneticsLabel.alpha = 0.62
+            self.phoneticsLabel.transform = .identity
+        }
+        phoneticsAnimator.addCompletion { [weak self] _ in
+            guard let self, !self.isDismissing else { return }
+            UIView.animate(
+                withDuration: 1.25,
+                delay: 0,
+                options: [.repeat, .autoreverse, .allowUserInteraction],
+                animations: {
+                    self.phoneticsLabel.alpha = 0.26
+                }
+            )
+        }
+        phoneticsAnimator.startAnimation(afterDelay: 0.64)
+    }
+
+    func dismiss(completion: @escaping () -> Void) {
+        isDismissing = true
+        phoneticsLabel.layer.removeAllAnimations()
+
+        if UIAccessibility.isReduceMotionEnabled {
+            UIView.animate(withDuration: 0.2, animations: {
+                self.alpha = 0
+            }, completion: { _ in
+                completion()
+            })
+            return
+        }
+
+        let easeOut = UICubicTimingParameters(controlPoint1: CGPoint(x: 0.22, y: 1.0), controlPoint2: CGPoint(x: 0.36, y: 1.0))
+        let exitAnimator = UIViewPropertyAnimator(duration: 0.36, timingParameters: easeOut)
+        exitAnimator.addAnimations {
+            self.contentStack.transform = CGAffineTransform(translationX: 0, y: -36).scaledBy(x: 0.94, y: 0.94)
+            self.contentStack.alpha = 0
+            self.alpha = 0
+        }
+        exitAnimator.addCompletion { _ in
+            completion()
+        }
+        exitAnimator.startAnimation()
+    }
+
+    private static func localizedDescription() -> String {
+        let preferred = Locale.preferredLanguages.first?.lowercased() ?? "en"
+        if preferred.hasPrefix("zh-hant") || preferred.hasPrefix("zh-tw") || preferred.hasPrefix("zh-hk") || preferred.hasPrefix("zh-mo") {
+            return "探索漢語方言"
+        }
+        if preferred.hasPrefix("zh") {
+            return "探索汉语方言"
+        }
+        return "Explore Chinese dialects"
+    }
+
+    private static func appVersionLabel() -> String {
+        guard let raw = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String, !raw.isEmpty else {
+            return ""
+        }
+        return raw.hasPrefix("v") ? raw : "v\(raw)"
+    }
 }
