@@ -283,13 +283,13 @@
 
 @media (max-aspect-ratio: 1 / 1) {
   :root:lang(en) {
-    --english-font-scale: 0.9;
+    --english-font-scale: 0.92;
   }
 }
 
 // User-defined width tiers affect font tokens only, leaving the root and rem layout untouched.
 $font-size-width-scales: (
-  300px: 0.9,  // ssm
+  0px: 0.9,  // ssm (<560px)
   560px: 0.93,  // sm
   768px: 0.96,  // md
   1024px: 1, // lg
