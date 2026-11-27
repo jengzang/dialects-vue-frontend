@@ -18,6 +18,7 @@
     />
 
     <TutorialGuideModal
+      v-if="hasLoadedGuide || isOpen"
       ref="guideModalRef"
       :model-value="isOpen"
       :current-entry="currentMatchedEntry"
@@ -43,7 +44,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, defineAsyncComponent, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useMediaQuery } from '@vueuse/core'
@@ -53,11 +54,12 @@ import {
   tutorialGuideRequestState,
 } from '@/main/store/store.js'
 import { tutorialManifest } from './tutorialManifest'
-import { resolveTutorialDocument } from './tutorialMarkdown'
 import { tutorialDiceConfig } from '@/main/config/tutorial/tutorialDiceConfig.js'
 import TutorialDiceTrigger from './TutorialDiceTrigger.vue'
-import TutorialGuideModal from './TutorialGuideModal.vue'
-import { showConfirm } from '@/utils/ui/message.js'
+
+const TutorialGuideModal = defineAsyncComponent(() =>
+  import('./TutorialGuideModal.vue').then((mod) => mod.default)
+)
 
 const props = defineProps({
   bottomOffset: {
@@ -86,6 +88,9 @@ let disclaimerShown = false
 const DICE_TOOLTIP_PREFIX = 'tutorial-dice-tooltip-shown:'
 
 const isOpen = ref(false)
+const hasLoadedGuide = ref(false)
+const markdownResolver = shallowRef(null)
+let markdownLoadPromise = null
 const showDiceTooltip = ref(false)
 const showFingerHint = ref(false)
 let diceTooltipTimer = null
@@ -111,10 +116,24 @@ const guideStyle = computed(() => ({
   '--tutorial-guide-right': isPortrait.value ? props.mobileRightOffset : props.rightOffset,
 }))
 
+function ensureTutorialMarkdownLoaded() {
+  if (markdownResolver.value) {
+    return Promise.resolve(markdownResolver.value)
+  }
+  if (!markdownLoadPromise) {
+    markdownLoadPromise = import('./tutorialMarkdown').then((mod) => {
+      markdownResolver.value = mod.resolveTutorialDocument
+      return mod.resolveTutorialDocument
+    })
+  }
+  return markdownLoadPromise
+}
+
 const tutorialEntries = computed(() => {
+  const resolveDoc = markdownResolver.value
   return tutorialManifest
     .map((entry) => {
-      const document = resolveTutorialDocument(entry.docKey, locale.value)
+      const document = resolveDoc ? resolveDoc(entry.docKey, locale.value) : null
 
       return {
         ...entry,
@@ -249,9 +268,13 @@ function openGuide() {
   //   })
   // }
 
+  hasLoadedGuide.value = true
   selectedKey.value = currentMatchedEntry.value.key
   isCatalogOpen.value = true
   isOpen.value = true
+  ensureTutorialMarkdownLoaded().then(() => {
+    scrollSelectionIntoView()
+  })
   scrollSelectionIntoView()
 }
 

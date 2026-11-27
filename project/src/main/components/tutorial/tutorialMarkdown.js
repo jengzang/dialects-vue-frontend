@@ -128,7 +128,7 @@ function parseMarkdownDocument(rawMarkdown, options = {}) {
   }
 }
 
-const tutorialDocumentMap = new Map(
+const rawMarkdownMap = new Map(
   Object.entries(markdownFiles).map(([filePath, rawMarkdown]) => {
     const match = filePath.match(/^\.\/content\/([^/]+)\/(.+)\.md$/)
 
@@ -137,15 +137,33 @@ const tutorialDocumentMap = new Map(
     }
 
     const [, locale, key] = match
-    return [`${locale}/${key}`, parseMarkdownDocument(rawMarkdown)]
+    return [`${locale}/${key}`, rawMarkdown]
   })
 )
 
+const parsedDocumentCache = new Map()
+
+function getParsedDefaultDocument(cacheKey) {
+  if (parsedDocumentCache.has(cacheKey)) {
+    return parsedDocumentCache.get(cacheKey)
+  }
+
+  const rawMarkdown = rawMarkdownMap.get(cacheKey)
+  if (!rawMarkdown) {
+    return null
+  }
+
+  const parsed = parseMarkdownDocument(rawMarkdown)
+  parsedDocumentCache.set(cacheKey, parsed)
+  return parsed
+}
+
 export function resolveTutorialDocument(key, locale, options = {}) {
   const normalizedLocale = normalizeLocale(locale)
-  const document = tutorialDocumentMap.get(`${normalizedLocale}/${key}`)
-    || tutorialDocumentMap.get(`${BASE_LOCALE}/${key}`)
-    || null
+  const cacheKey = rawMarkdownMap.has(`${normalizedLocale}/${key}`)
+    ? `${normalizedLocale}/${key}`
+    : `${BASE_LOCALE}/${key}`
+  const document = getParsedDefaultDocument(cacheKey)
 
   if (!document || !(options.isNativeBuild ?? BUILD_IS_NATIVE)) {
     return document

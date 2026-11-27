@@ -1,5 +1,3 @@
-import html2canvas from 'html2canvas'
-
 const DEFAULT_MAX_WIDTH = 1200
 const DEFAULT_MAX_HEIGHT = 900
 const DEFAULT_TARGET_BYTES = 600 * 1024
@@ -70,6 +68,7 @@ export async function capturePageSnapshot({
   targetBytes = DEFAULT_TARGET_BYTES,
   maxBytes = DEFAULT_MAX_BYTES,
 } = {}) {
+  const { default: html2canvas } = await import('html2canvas')
   const captureWidth = window.innerWidth
   const captureHeight = Math.min(window.innerHeight, maxHeight)
   const canvas = await html2canvas(target, {

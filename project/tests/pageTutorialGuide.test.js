@@ -171,7 +171,9 @@ async function openGuideFor(component) {
   expect(trigger).toBeTruthy()
   trigger.click()
 
-  await nextTick()
+  await vi.waitFor(() => {
+    expect(document.querySelector('[data-tutorial-content]')).toBeTruthy()
+  })
   await nextTick()
 
   return wrapper
