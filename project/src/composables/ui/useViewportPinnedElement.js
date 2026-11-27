@@ -16,6 +16,19 @@ function toCssLength(value) {
   return typeof value === 'number' ? `${value}px` : value
 }
 
+let safeAreaTopProbe = null
+
+function getSafeAreaInsetTop() {
+  if (typeof document === 'undefined' || !document.body) return 0
+  if (!safeAreaTopProbe) {
+    safeAreaTopProbe = document.createElement('div')
+    safeAreaTopProbe.style.cssText =
+      'position:fixed;top:0;left:0;width:0;height:0;padding-top:env(safe-area-inset-top,0px);visibility:hidden;pointer-events:none;'
+    document.body.appendChild(safeAreaTopProbe)
+  }
+  return Number.parseFloat(window.getComputedStyle(safeAreaTopProbe).paddingTop) || 0
+}
+
 function setStyle(styleRef, nextStyle) {
   const currentStyle = styleRef.value
   const keys = new Set([...Object.keys(currentStyle), ...Object.keys(nextStyle)])
@@ -67,16 +80,18 @@ export function useViewportPinnedElement(options = {}) {
     const elementRect = element.getBoundingClientRect()
     const portrait = orientationQuery?.matches ?? false
     const configuredPortraitTop = resolveValue(portraitTop)
-    const portraitThreshold = typeof configuredPortraitTop === 'number'
+    const basePortraitThreshold = typeof configuredPortraitTop === 'number'
       ? configuredPortraitTop
       : Number.parseFloat(configuredPortraitTop) || 0
+    const safeTop = portrait ? getSafeAreaInsetTop() : 0
+    const portraitThreshold = basePortraitThreshold + safeTop
 
     if (portrait && placeholderRect.top > portraitThreshold) {
       clearPosition()
       return
     }
 
-    let top = portrait ? configuredPortraitTop : resolveValue(landscapeTop)
+    let top = portrait ? portraitThreshold : resolveValue(landscapeTop)
     if (!portrait && (top === null || top === undefined)) {
       if (initialLandscapeTop === null && window.scrollY > 0) {
         clearPosition()

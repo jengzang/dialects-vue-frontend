@@ -50,12 +50,10 @@ public class DialectsNativePlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     @objc func setSystemChrome(_ call: CAPPluginCall) {
-        let edgeToEdge = call.getBool("edgeToEdge")
         let backgroundColor = call.getString("backgroundColor")
         let isDark = call.getBool("isDark")
         DispatchQueue.main.async {
             (self.bridge?.viewController as? DialectsBridgeViewController)?.setSystemChrome(
-                edgeToEdge: edgeToEdge,
                 backgroundColorHex: backgroundColor,
                 isDark: isDark
             )

@@ -85,7 +85,7 @@ $portrait-ratio: 1;
   padding:
     max(16px, env(safe-area-inset-top))
     max(16px, env(safe-area-inset-right))
-    max(16px, env(safe-area-inset-bottom))
+    16px
     max(16px, env(safe-area-inset-left));
 
   background: var(--bg-page-gradient);
@@ -94,7 +94,7 @@ $portrait-ratio: 1;
     padding:
       max(16px, env(safe-area-inset-top))
       max(8px, env(safe-area-inset-right))
-      max(16px, env(safe-area-inset-bottom))
+      16px
       max(8px, env(safe-area-inset-left));
   }
 }

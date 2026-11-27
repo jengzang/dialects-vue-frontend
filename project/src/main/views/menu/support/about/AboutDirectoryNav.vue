@@ -93,7 +93,7 @@ onBeforeUnmount(() => {
 .directory-nav {
   position: fixed;
   top: 50%;
-  right: 1rem;
+  right: calc(1rem + env(safe-area-inset-right, 0px));
   z-index: 1600;
   width: auto;
   max-height: 80dvh;
@@ -168,8 +168,8 @@ onBeforeUnmount(() => {
   .directory-nav-toggle {
     display: block;
     position: fixed;
-    left: 1rem;
-    bottom: 1rem;
+    left: calc(1rem + env(safe-area-inset-left, 0px));
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
     z-index: 1601;
   }
 
@@ -177,8 +177,8 @@ onBeforeUnmount(() => {
     display: none;
     top: auto;
     right: auto;
-    left: 1rem;
-    bottom: 4.5rem;
+    left: calc(1rem + env(safe-area-inset-left, 0px));
+    bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px));
     width: min(15rem, calc(100vw - 2rem));
     max-height: 65dvh;
     overflow-y: auto;

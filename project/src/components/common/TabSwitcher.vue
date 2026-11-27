@@ -290,8 +290,8 @@ watch(currentTab, () => {
     @include flex-col;
     align-items: stretch;
     position: fixed;
-    top: 140px;
-    left: 2rem;
+    top: calc(140px + env(safe-area-inset-top, 0px));
+    left: calc(2rem + env(safe-area-inset-left, 0px));
     width: 136px;
     max-height: calc(100dvh - 160px);
     overflow-y: auto;

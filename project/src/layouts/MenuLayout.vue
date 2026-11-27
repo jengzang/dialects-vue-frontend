@@ -80,9 +80,9 @@ $portrait-ratio: 1;
   box-sizing: border-box;
 
   padding:
-    max(16px, env(safe-area-inset-top))
+    calc(16px + env(safe-area-inset-top, 0px))
     max(16px, env(safe-area-inset-right))
-    max(16px, env(safe-area-inset-bottom))
+    16px
     max(16px, env(safe-area-inset-left));
 
   background: var(--bg-page-gradient);
@@ -93,7 +93,7 @@ $portrait-ratio: 1;
   position: relative;
   width: 100%;
   box-sizing: border-box;
-  min-height: calc(100dvh - max(16px, env(safe-area-inset-top)));
+  min-height: calc(100dvh - 16px - env(safe-area-inset-top, 0px));
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -120,9 +120,9 @@ $portrait-ratio: 1;
 @media (max-aspect-ratio: $portrait-ratio) {
   .menu-bg {
     padding:
-      max(16px, env(safe-area-inset-top))
+      calc(16px + env(safe-area-inset-top, 0px))
       max(8px, env(safe-area-inset-right))
-      max(16px, env(safe-area-inset-bottom))
+      16px
       max(8px, env(safe-area-inset-left));
   }
 

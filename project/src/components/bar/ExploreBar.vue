@@ -573,9 +573,9 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .explorebar {
   position: fixed;
-  top: 12px;
-  right: 16px;
-  left: 16px;
+  top: max(12px, env(safe-area-inset-top, 0px));
+  right: calc(16px + env(safe-area-inset-right, 0px));
+  left: calc(16px + env(safe-area-inset-left, 0px));
   z-index: 999;
   width: auto;
   box-sizing: border-box;
@@ -846,9 +846,9 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 @media (max-aspect-ratio: 1/1) {
   .explorebar {
-    top: max(8px, env(safe-area-inset-top));
-    right: 8px;
-    left: 8px;
+    top: max(8px, env(safe-area-inset-top, 0px));
+    right: calc(8px + env(safe-area-inset-right, 0px));
+    left: calc(8px + env(safe-area-inset-left, 0px));
     border-radius: var(--radius-lg);
   }
 

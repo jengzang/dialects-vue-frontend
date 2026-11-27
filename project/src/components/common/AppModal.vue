@@ -355,7 +355,11 @@ $panel-transition-ease: cubic-bezier(0.25, 1, 0.25, 1);
   inset: 0;
   z-index: var(--app-modal-z-index, 20000);
   @include flex-center;
-  padding: 18px;
+  padding:
+    max(18px, env(safe-area-inset-top, 0px))
+    max(18px, env(safe-area-inset-right, 0px))
+    max(18px, env(safe-area-inset-bottom, 0px))
+    max(18px, env(safe-area-inset-left, 0px));
   perspective: 1200px;
   overscroll-behavior: contain;
   background: rgba(0, 0, 0, 0.4);

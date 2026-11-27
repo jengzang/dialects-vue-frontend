@@ -185,7 +185,7 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
  */
 .global-toast {
   position: fixed;
-  top: 80px;
+  top: calc(80px + env(safe-area-inset-top, 0px));
   left: 0;
   right: 0;
   z-index: 99999;
@@ -212,7 +212,7 @@ $toast-leave-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
   &.position-right {
     top: 20dvh;
-    right: 28px;
+    right: calc(28px + env(safe-area-inset-right, 0px));
     left: auto;
     transform: none;
   }

@@ -68,9 +68,6 @@ class DialectsBridgeViewController: CAPBridgeViewController {
     private var overlayBlocked = false
     private var keyboardVisible = false
     private var overlayBackGesture: UIScreenEdgePanGestureRecognizer?
-    private var safeAreaConstraints: [NSLayoutConstraint] = []
-    private var edgeToEdgeConstraints: [NSLayoutConstraint] = []
-    private var edgeToEdge = false
     private var prefersLightStatusBar: Bool?
 
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -82,27 +79,19 @@ class DialectsBridgeViewController: CAPBridgeViewController {
         super.viewDidLoad()
         guard let webView = webView else { return }
 
-        // Keep non-home pages clear of system safe areas, while allowing the homepage to opt into full edge-to-edge.
+        // Render edge-to-edge across all pages and let CSS env(safe-area-inset-*) handle UI clearances.
         let container = UIView()
         container.backgroundColor = .systemBackground
         view = container
         webView.translatesAutoresizingMaskIntoConstraints = false
         webView.scrollView.contentInsetAdjustmentBehavior = .never
         container.addSubview(webView)
-        let safeArea = container.safeAreaLayoutGuide
-        safeAreaConstraints = [
-            webView.topAnchor.constraint(equalTo: safeArea.topAnchor),
-            webView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor),
-            webView.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor),
-            webView.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor)
-        ]
-        edgeToEdgeConstraints = [
+        NSLayoutConstraint.activate([
             webView.topAnchor.constraint(equalTo: container.topAnchor),
             webView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
             webView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             webView.trailingAnchor.constraint(equalTo: container.trailingAnchor)
-        ]
-        NSLayoutConstraint.activate(safeAreaConstraints)
+        ])
 
         let overlay = NativeLaunchOverlayView(frame: container.bounds)
         overlay.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -140,19 +129,7 @@ class DialectsBridgeViewController: CAPBridgeViewController {
         updateBackGestures()
     }
 
-    func setSystemChrome(edgeToEdge: Bool?, backgroundColorHex: String?, isDark: Bool?) {
-        if let edgeToEdge, edgeToEdge != self.edgeToEdge, !safeAreaConstraints.isEmpty {
-            self.edgeToEdge = edgeToEdge
-            if edgeToEdge {
-                NSLayoutConstraint.deactivate(safeAreaConstraints)
-                NSLayoutConstraint.activate(edgeToEdgeConstraints)
-            } else {
-                NSLayoutConstraint.deactivate(edgeToEdgeConstraints)
-                NSLayoutConstraint.activate(safeAreaConstraints)
-            }
-            view.layoutIfNeeded()
-        }
-
+    func setSystemChrome(backgroundColorHex: String?, isDark: Bool?) {
         if let hex = backgroundColorHex, let color = Self.parseHexColor(hex) {
             view.backgroundColor = color
             webView?.backgroundColor = color

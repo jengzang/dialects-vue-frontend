@@ -509,9 +509,9 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
 /* 导航栏根容器 */
 .navbar {
   position: fixed;
-  top: 12px;
-  right: 16px;
-  left: 16px;
+  top: max(12px, env(safe-area-inset-top, 0px));
+  right: calc(16px + env(safe-area-inset-right, 0px));
+  left: calc(16px + env(safe-area-inset-left, 0px));
   z-index: 999;
   width: auto;
   box-sizing: border-box;
@@ -920,9 +920,9 @@ $desktop-title-height: clamp(40px, 6.2svh, 60px);
 /* 横竖屏切换 */
 @media (max-aspect-ratio: $mobile-aspect-ratio) {
   .navbar {
-    top: max(8px, env(safe-area-inset-top));
-    right: 8px;
-    left: 8px;
+    top: max(8px, env(safe-area-inset-top, 0px));
+    right: calc(8px + env(safe-area-inset-right, 0px));
+    left: calc(8px + env(safe-area-inset-left, 0px));
     border-radius: var(--radius-lg);
   }
 

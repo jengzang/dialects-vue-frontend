@@ -72,8 +72,8 @@ const close = () => {
 <style scoped lang="scss">
 .floating-search {
   position: fixed;
-  top: 16dvh;
-  left: 12px;
+  top: calc(16dvh + env(safe-area-inset-top, 0px));
+  left: calc(12px + env(safe-area-inset-left, 0px));
   z-index: 5;
   display: inline-flex;
   align-items: center;

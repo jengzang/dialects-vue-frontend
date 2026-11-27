@@ -103,17 +103,16 @@ export default {
       if (path === '/' && !isNativeWebView) updateNoticeActivated.value = true
     }, { immediate: true })
 
-    // iOS 首页启用四边沉浸式安全区，其他页面保持系统安全区；同时同步外层背景色与状态栏明暗。
+    // iOS 全局启用四边沉浸式布局；同步外层背景色与状态栏明暗。
     if (isNativeIos) {
       watch(
-        [() => route.path, currentColorTheme],
-        async ([path, theme]) => {
+        currentColorTheme,
+        async (theme) => {
           await nextTick()
           const backgroundColor = getComputedStyle(document.documentElement)
             .getPropertyValue('--bg-body')
             .trim()
           void DialectsNative.setSystemChrome?.({
-            edgeToEdge: stripLocaleFromPath(path) === '/',
             backgroundColor,
             isDark: isDarkColorTheme(theme),
           })?.catch(() => {})
