@@ -69,6 +69,7 @@
             {{ t('layoutFooter.actions.feedback') }}
           </button>
           <button
+            v-if="!hideSponsorContent"
             type="button"
             class="text-action footer-action"
             @click="isSupportOpen = true"
@@ -179,6 +180,7 @@
 
 <script setup>
 import { getCurrentRuntimePlatform } from '@/platform/runtime.js'
+import { shouldHideSponsorContent } from '@/platform/sponsorship.js'
 import { getPlatformShareUrl, shareNativeImage } from '@/platform/sharing.js'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { PhCircle, PhPalette, PhSun, PhMoon, PhDesktop, PhCaretDown, PhTranslate } from '@phosphor-icons/vue'
@@ -222,6 +224,7 @@ const isFeaturesOpen = ref(false)
 const isFeedbackOpen = ref(false)
 const isMenuOpen = ref(false)
 const isSupportOpen = ref(false)
+const hideSponsorContent = shouldHideSponsorContent()
 const themeMenu = ref(null)
 const themeTriggers = {}
 const languageOptions = [
