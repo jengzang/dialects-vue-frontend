@@ -960,7 +960,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 .home-section-heading { display: flex; align-items: center; justify-content: center; gap: 1rem; }
 
 .home-dialect-map-fullscreen { width: 40px; height: 40px; padding: 0; }
-.home-dialect-map-fullscreen.is-map-fullscreen { position: fixed; top: 18px; right: 18px; z-index: calc(var(--z-index-vocabulary-map-fullscreen) + 1); }
+.home-dialect-map-fullscreen.is-map-fullscreen { position: fixed; top: max(18px, env(safe-area-inset-top, 0px)); right: max(18px, env(safe-area-inset-right, 0px)); z-index: calc(var(--z-index-vocabulary-map-fullscreen) + 1); }
 
 .home-dialect-map-fullscreen svg { width: 20px; height: 20px; }
 
@@ -1187,7 +1187,11 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     align-items: flex-start;
     justify-content: center;
     gap: 1rem;
-    padding: 2rem 1.5rem;
+    padding:
+      calc(2rem + env(safe-area-inset-top, 0px))
+      calc(1.5rem + env(safe-area-inset-right, 0px))
+      2rem
+      calc(1.5rem + env(safe-area-inset-left, 0px));
   }
 
   &-content {
@@ -1909,7 +1913,11 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 .footer {
   position: relative;
   z-index: 1;
-  padding: 2.5rem clamp(1.5rem, 4vw, 2.5rem);
+  padding:
+    2.5rem
+    calc(clamp(1.5rem, 4vw, 2.5rem) + env(safe-area-inset-right, 0px))
+    calc(2.5rem + env(safe-area-inset-bottom, 0px))
+    calc(clamp(1.5rem, 4vw, 2.5rem) + env(safe-area-inset-left, 0px));
   background: var(--glass-40);
   backdrop-filter: blur(20px);
   border-top: 1px solid rgba(var(--color-primary-rgb), 0.1);

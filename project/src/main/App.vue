@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { computed, defineAsyncComponent, onMounted, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, defineAsyncComponent, nextTick, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 
@@ -57,6 +57,8 @@ import { isRouteLoading } from '../utils/ui/routeLoading.js'
 import { showRateLimitNotice } from '../utils/user/rateLimitNotice.js'
 import { getHomeUpdateNotice } from '../utils/user/updateNoticeConfig.js'
 import { getCurrentRuntimePlatform } from '../platform/runtime.js'
+import { DialectsNative } from '../platform/nativeBridge.js'
+import { currentColorTheme, isDarkColorTheme } from '../composables/core/uiPreferences.js'
 
 const UpdateNoticeModal = defineAsyncComponent(() =>
   import('@/main/components/user/popups/UpdateNoticeModal.vue')
@@ -90,7 +92,9 @@ export default {
     const { t, locale } = useI18n()
     const showUpdateNotice = ref(false)
     const updateNoticeActivated = ref(false)
-    const isNativeWebView = getCurrentRuntimePlatform().container === 'native-webview'
+    const runtimePlatform = getCurrentRuntimePlatform()
+    const isNativeWebView = runtimePlatform.container === 'native-webview'
+    const isNativeIos = runtimePlatform.family === 'ios' && isNativeWebView
     const homeUpdateNotice = computed(() => getHomeUpdateNotice((key, values) => t(key, values, { locale: locale.value })))
     const updateNoticeMode = computed(() => localStorage.getItem('update-notice-mode') || 'showinfo')
 
@@ -98,6 +102,25 @@ export default {
     watch(() => route.matched.length > 0 && stripLocaleFromPath(route.path), (path) => {
       if (path === '/' && !isNativeWebView) updateNoticeActivated.value = true
     }, { immediate: true })
+
+    // iOS 首页启用四边沉浸式安全区，其他页面保持系统安全区；同时同步外层背景色与状态栏明暗。
+    if (isNativeIos) {
+      watch(
+        [() => route.path, currentColorTheme],
+        async ([path, theme]) => {
+          await nextTick()
+          const backgroundColor = getComputedStyle(document.documentElement)
+            .getPropertyValue('--bg-body')
+            .trim()
+          void DialectsNative.setSystemChrome?.({
+            edgeToEdge: stripLocaleFromPath(path) === '/',
+            backgroundColor,
+            isDark: isDarkColorTheme(theme),
+          })?.catch(() => {})
+        },
+        { immediate: true }
+      )
+    }
 
     const layoutComponent = computed(() => {
       const normalizedPath = stripLocaleFromPath(route.path)

@@ -68,24 +68,41 @@ class DialectsBridgeViewController: CAPBridgeViewController {
     private var overlayBlocked = false
     private var keyboardVisible = false
     private var overlayBackGesture: UIScreenEdgePanGestureRecognizer?
+    private var safeAreaConstraints: [NSLayoutConstraint] = []
+    private var edgeToEdgeConstraints: [NSLayoutConstraint] = []
+    private var edgeToEdge = false
+    private var prefersLightStatusBar: Bool?
+
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        guard let prefersLightStatusBar else { return super.preferredStatusBarStyle }
+        return prefersLightStatusBar ? .lightContent : .darkContent
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         guard let webView = webView else { return }
 
-        // Keep every page clear of the status bar, camera cutout and home indicator.
+        // Keep non-home pages clear of system safe areas, while allowing the homepage to opt into full edge-to-edge.
         let container = UIView()
         container.backgroundColor = .systemBackground
         view = container
         webView.translatesAutoresizingMaskIntoConstraints = false
+        webView.scrollView.contentInsetAdjustmentBehavior = .never
         container.addSubview(webView)
         let safeArea = container.safeAreaLayoutGuide
-        NSLayoutConstraint.activate([
+        safeAreaConstraints = [
             webView.topAnchor.constraint(equalTo: safeArea.topAnchor),
             webView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor),
             webView.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor),
             webView.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor)
-        ])
+        ]
+        edgeToEdgeConstraints = [
+            webView.topAnchor.constraint(equalTo: container.topAnchor),
+            webView.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+            webView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            webView.trailingAnchor.constraint(equalTo: container.trailingAnchor)
+        ]
+        NSLayoutConstraint.activate(safeAreaConstraints)
 
         if let launch = UIStoryboard(name: "LaunchScreen", bundle: nil).instantiateInitialViewController() {
             launchController = launch
@@ -126,6 +143,47 @@ class DialectsBridgeViewController: CAPBridgeViewController {
         overlayBlocked = blocked
         dialectMapHost?.setOverlayBlocked(blocked)
         updateBackGestures()
+    }
+
+    func setSystemChrome(edgeToEdge: Bool?, backgroundColorHex: String?, isDark: Bool?) {
+        if let edgeToEdge, edgeToEdge != self.edgeToEdge, !safeAreaConstraints.isEmpty {
+            self.edgeToEdge = edgeToEdge
+            if edgeToEdge {
+                NSLayoutConstraint.deactivate(safeAreaConstraints)
+                NSLayoutConstraint.activate(edgeToEdgeConstraints)
+            } else {
+                NSLayoutConstraint.deactivate(edgeToEdgeConstraints)
+                NSLayoutConstraint.activate(safeAreaConstraints)
+            }
+            view.layoutIfNeeded()
+        }
+
+        if let hex = backgroundColorHex, let color = Self.parseHexColor(hex) {
+            view.backgroundColor = color
+            webView?.backgroundColor = color
+            webView?.scrollView.backgroundColor = color
+        }
+
+        if let isDark {
+            prefersLightStatusBar = isDark
+            overrideUserInterfaceStyle = isDark ? .dark : .light
+            setNeedsStatusBarAppearanceUpdate()
+        }
+    }
+
+    private static func parseHexColor(_ hex: String) -> UIColor? {
+        var cleaned = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+        if cleaned.hasPrefix("#") { cleaned.removeFirst() }
+        if cleaned.count == 3 {
+            cleaned = cleaned.map { "\($0)\($0)" }.joined()
+        }
+        guard cleaned.count == 6, let value = UInt64(cleaned, radix: 16) else { return nil }
+        return UIColor(
+            red: CGFloat((value >> 16) & 0xFF) / 255.0,
+            green: CGFloat((value >> 8) & 0xFF) / 255.0,
+            blue: CGFloat(value & 0xFF) / 255.0,
+            alpha: 1.0
+        )
     }
 
     func mountDialectMap(

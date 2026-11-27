@@ -10,6 +10,7 @@ public class DialectsNativePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "getPendingAudio", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "consumeAudio", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setBackBlocked", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "setSystemChrome", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "mountDialectMap", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "updateDialectMap", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setDialectMapFrame", returnType: CAPPluginReturnPromise),
@@ -44,6 +45,20 @@ public class DialectsNativePlugin: CAPPlugin, CAPBridgedPlugin {
     @objc func setBackBlocked(_ call: CAPPluginCall) {
         DispatchQueue.main.async {
             (self.bridge?.viewController as? DialectsBridgeViewController)?.setOverlayBlocked(call.getBool("blocked") ?? false)
+            call.resolve()
+        }
+    }
+
+    @objc func setSystemChrome(_ call: CAPPluginCall) {
+        let edgeToEdge = call.getBool("edgeToEdge")
+        let backgroundColor = call.getString("backgroundColor")
+        let isDark = call.getBool("isDark")
+        DispatchQueue.main.async {
+            (self.bridge?.viewController as? DialectsBridgeViewController)?.setSystemChrome(
+                edgeToEdge: edgeToEdge,
+                backgroundColorHex: backgroundColor,
+                isDark: isDark
+            )
             call.resolve()
         }
     }

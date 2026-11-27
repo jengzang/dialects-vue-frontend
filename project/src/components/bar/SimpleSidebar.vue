@@ -752,11 +752,11 @@ onBeforeUnmount(() => {
   --sidebar-expand-border: var(--glass-50);
 
   position: fixed;
-  top: 12px;
-  left: 12px;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  left: calc(12px + env(safe-area-inset-left, 0px));
   width: min(40dvw + 40px, 340px);
   max-width: none;
-  height: calc(100dvh - 24px);
+  height: calc(100dvh - 24px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
   box-sizing: border-box;
   box-shadow: var(--sidebar-shell-shadow);
   background: var(--sidebar-shell-background);
