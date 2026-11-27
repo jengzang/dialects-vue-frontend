@@ -23,6 +23,7 @@
         A10000000000000000000003 = {isa = PBXBuildFile; fileRef = A10000000000000000000012; };
         A10000000000000000000004 = {isa = PBXBuildFile; fileRef = A10000000000000000000013; };
         A10000000000000000000005 = {isa = PBXBuildFile; fileRef = A10000000000000000000014; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+        A10000000000000000000006 = {isa = PBXBuildFile; fileRef = A10000000000000000000015; };
 
 /* End PBXBuildFile section */
 
@@ -65,6 +66,7 @@
         A10000000000000000000012 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared/SharedAudioInbox.swift; sourceTree = SOURCE_ROOT; };
         A10000000000000000000013 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioShare/ShareViewController.swift; sourceTree = SOURCE_ROOT; };
         A10000000000000000000014 = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AudioShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+        A10000000000000000000015 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/DialectAppleMapView.swift; sourceTree = SOURCE_ROOT; };
 
 /* End PBXFileReference section */
 
@@ -92,6 +94,7 @@
 				958DCC722DB07C7200EA8C5F /* debug.xcconfig */,
 				504EC3061FED79650016851F /* App */,
                 A10000000000000000000011,
+                A10000000000000000000015,
                 A10000000000000000000012,
                 A10000000000000000000013,
 				504EC3051FED79650016851F /* Products */,
@@ -221,6 +224,7 @@
 				7A1F3B532E50000100D1A1EC /* AppLaunchReporter.swift in Sources */,
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
                 A10000000000000000000001,
+                A10000000000000000000006,
                 A10000000000000000000002,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

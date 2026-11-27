@@ -1,7 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApp, h, nextTick, reactive, ref } from 'vue'
 
-const { maps, markers } = vi.hoisted(() => ({ maps: [], markers: [] }))
+const { maps, markers, nativeBridge } = vi.hoisted(() => ({
+  maps: [],
+  markers: [],
+  nativeBridge: {
+    mountDialectMap: vi.fn(),
+    updateDialectMap: vi.fn(),
+    setDialectMapFrame: vi.fn(),
+    unmountDialectMap: vi.fn(),
+    addListener: vi.fn(() => Promise.resolve({ remove: vi.fn() })),
+  },
+}))
+vi.mock('@/platform/nativeBridge.js', () => ({ DialectsNative: nativeBridge }))
 const partition = vi.hoisted(() => ({ load: vi.fn(), get: vi.fn(), version: { value: 0 } }))
 vi.mock('@/composables/data/usePartitionColors.js', () => ({
   usePartitionColors: () => ({ loadPartitionColors: partition.load, getPartitionColor: partition.get, colorVersion: ref(0) }),
@@ -64,6 +75,12 @@ function features(map) { return Object.values(map.sources)[0]?.data.features || 
 
 beforeEach(() => {
   maps.length = 0; markers.length = 0
+  delete window.Capacitor
+  nativeBridge.mountDialectMap.mockClear()
+  nativeBridge.updateDialectMap.mockClear()
+  nativeBridge.setDialectMapFrame.mockClear()
+  nativeBridge.unmountDialectMap.mockClear()
+  nativeBridge.addListener.mockReset().mockImplementation(() => Promise.resolve({ remove: vi.fn() }))
   partition.load.mockReset().mockResolvedValue(undefined)
   partition.get.mockReset()
   context = {
@@ -222,5 +239,42 @@ describe('homepage dialect map', () => {
     expect(map.fitBounds).toHaveBeenCalledTimes(fits)
     app.unmount(); app = null
     expect(map.remove).toHaveBeenCalledTimes(1)
+  })
+
+  it('uses native Apple Map bridge on iOS native-webview without instantiating MapLibre', async () => {
+    window.Capacitor = { getPlatform: () => 'ios' }
+    let notify, exitHandler
+    vi.stubGlobal('IntersectionObserver', class {
+      constructor(callback) { notify = callback; this.observe = vi.fn(); this.disconnect = vi.fn() }
+    })
+    nativeBridge.addListener.mockImplementation((event, handler) => {
+      if (event === 'dialectMapExitFullscreen') exitHandler = handler
+      return Promise.resolve({ remove: vi.fn() })
+    })
+    const onExit = vi.fn()
+    host = document.createElement('div'); document.body.append(host)
+    state = reactive({ points: [...points], fullscreen: false, loading: false, onExitFullscreen: onExit })
+    app = createApp({ render: () => h(DialectPointMap, state) }); app.mount(host)
+    await nextTick()
+
+    expect(maps).toHaveLength(0)
+    expect(nativeBridge.mountDialectMap).not.toHaveBeenCalled()
+
+    notify([{ isIntersecting: true }])
+    expect(maps).toHaveLength(0)
+    expect(nativeBridge.mountDialectMap).toHaveBeenCalledTimes(1)
+    expect(nativeBridge.mountDialectMap.mock.calls[0][0].points).toHaveLength(2)
+
+    state.fullscreen = true; await nextTick(); await nextTick()
+    expect(nativeBridge.setDialectMapFrame).toHaveBeenCalledWith(expect.objectContaining({ fullscreen: true }))
+
+    exitHandler?.()
+    expect(onExit).toHaveBeenCalledTimes(1)
+
+    state.fullscreen = false; await nextTick(); await nextTick()
+    notify([{ isIntersecting: false }])
+    expect(nativeBridge.unmountDialectMap).toHaveBeenCalledTimes(1)
+
+    delete window.Capacitor
   })
 })

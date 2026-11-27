@@ -279,6 +279,7 @@
         :loading="dialectMapLoading"
         :loading-text="$t('home.download.mapLoading')"
         :empty-text="$t('home.download.mapEmpty')"
+        @exit-fullscreen="dialectMapFullscreen = false"
       />
       <p class="home-dialect-map-copy">
         <i18n-t keypath="home.download.mapDescription" tag="span" scope="global">

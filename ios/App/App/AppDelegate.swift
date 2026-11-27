@@ -64,6 +64,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 // Enable WebKit history gestures, including Vue Router pushState entries.
 class DialectsBridgeViewController: CAPBridgeViewController {
     private var launchController: UIViewController?
+    private var dialectMapHost: DialectAppleMapHost?
     private var overlayBlocked = false
     private var keyboardVisible = false
     private var overlayBackGesture: UIScreenEdgePanGestureRecognizer?
@@ -123,7 +124,42 @@ class DialectsBridgeViewController: CAPBridgeViewController {
 
     func setOverlayBlocked(_ blocked: Bool) {
         overlayBlocked = blocked
+        dialectMapHost?.setOverlayBlocked(blocked)
         updateBackGestures()
+    }
+
+    func mountDialectMap(
+        points: [DialectMapPoint],
+        style: DialectMapStyleConfig,
+        frame: CGRect,
+        fullscreen: Bool,
+        onExitFullscreen: @escaping () -> Void
+    ) {
+        guard let webView else { return }
+        if dialectMapHost == nil {
+            dialectMapHost = DialectAppleMapHost(parentController: self, webView: webView)
+        }
+        dialectMapHost?.setOverlayBlocked(overlayBlocked)
+        dialectMapHost?.mount(
+            points: points,
+            style: style,
+            frame: frame,
+            fullscreen: fullscreen,
+            onExitFullscreen: onExitFullscreen
+        )
+    }
+
+    func updateDialectMap(
+        points: [DialectMapPoint]?,
+        style: DialectMapStyleConfig?,
+        frame: CGRect?,
+        fullscreen: Bool?
+    ) {
+        dialectMapHost?.update(points: points, style: style, frame: frame, fullscreen: fullscreen)
+    }
+
+    func unmountDialectMap() {
+        dialectMapHost?.unmount()
     }
 
     @objc private func keyboardShown() { keyboardVisible = true; updateBackGestures() }

@@ -12,9 +12,13 @@ import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { mapStyle } from '@/utils/map/MapSource.js'
 import { CATEGORY_PALETTE } from '@/main/config/colors/mapColors.js'
-import { currentColorTheme } from '@/composables/core/uiPreferences.js'
+import { currentColorTheme, isDarkColorTheme } from '@/composables/core/uiPreferences.js'
+import { getCurrentRuntimePlatform } from '@/platform/runtime.js'
+import { DialectsNative } from '@/platform/nativeBridge.js'
 
 defineOptions({ name: 'DialectPointMap' })
+
+const emit = defineEmits(['exit-fullscreen'])
 
 const props = defineProps({
   points: { type: Array, default: () => [] },
@@ -36,8 +40,18 @@ let styleReady = false
 let currentTier = null
 let viewportTimer = null
 let visibilityObserver = null
+let resizeObserver = null
 let savedView = null
 let disposed = false
+let isVisible = false
+let nativeMounted = false
+let lastNativeFrame = null
+let nativeExitListener = null
+
+function shouldUseNativeAppleMap() {
+  const runtime = getCurrentRuntimePlatform()
+  return runtime.family === 'ios' && runtime.container === 'native-webview'
+}
 
 function zoomTier() {
   const zoom = map.value.getZoom()
@@ -259,15 +273,150 @@ function renderPoints(resetImages = false) {
   }
 }
 
+function buildNativePointsPayload() {
+  const result = []
+  props.points.forEach(point => {
+    const longitude = Number(point.longitude)
+    const latitude = Number(point.latitude)
+    if (!Number.isFinite(longitude) || !Number.isFinite(latitude)) return
+    result.push({
+      longitude,
+      latitude,
+      locationName: String(point.locationName || '-').replace(/\s+/g, ' ').trim(),
+      entryCount: String(point.entryCount || 0).replace(/\s+/g, ' ').trim(),
+      color: getRegionColor(point.yindianRegion, point.color),
+      transitionColor: point.transitionColor || null,
+    })
+  })
+  return result
+}
+
+function readNativeStylePayload() {
+  if (!mapContainer.value) return {}
+  const style = readLabelStyle()
+  const containerStyle = getComputedStyle(mapContainer.value.parentElement || mapContainer.value)
+  const nameFontMatch = String(style.nameFont || '').match(/(\d+(?:\.\d+)?)px/)
+  const countFontMatch = String(style.countFont || '').match(/(\d+(?:\.\d+)?)px/)
+  return {
+    nameFontSize: nameFontMatch ? parseFloat(nameFontMatch[1]) : 10,
+    countFontSize: countFontMatch ? parseFloat(countFontMatch[1]) : 8,
+    paddingX: style.paddingX,
+    paddingY: style.paddingY,
+    borderWidth: style.borderWidth,
+    gap: style.gap,
+    cornerRadius: parseFloat(containerStyle.borderRadius) || 12,
+    isDark: isDarkColorTheme(currentColorTheme.value),
+  }
+}
+
+function readNativeFrame() {
+  if (!mapContainer.value) return { x: 0, y: 0, width: 0, height: 0 }
+  const rect = mapContainer.value.getBoundingClientRect()
+  const scrollX = typeof window !== 'undefined' ? window.scrollX || window.pageXOffset || 0 : 0
+  const scrollY = typeof window !== 'undefined' ? window.scrollY || window.pageYOffset || 0 : 0
+  return {
+    x: Math.round((rect.left + scrollX) * 100) / 100,
+    y: Math.round((rect.top + scrollY) * 100) / 100,
+    width: Math.max(0, Math.round(rect.width * 100) / 100),
+    height: Math.max(0, Math.round(rect.height * 100) / 100),
+  }
+}
+
+function isSameNativeFrame(a, b) {
+  if (!a || !b) return false
+  return Math.abs(a.x - b.x) < 1
+    && Math.abs(a.y - b.y) < 1
+    && Math.abs(a.width - b.width) < 1
+    && Math.abs(a.height - b.height) < 1
+}
+
+function syncNativeFrame(force = false) {
+  if (!nativeMounted || disposed) return
+  const frame = readNativeFrame()
+  if (!force && isSameNativeFrame(frame, lastNativeFrame)) return
+  lastNativeFrame = frame
+  void DialectsNative.setDialectMapFrame?.({ frame, fullscreen: props.fullscreen })
+}
+
+function mountNativeMap() {
+  if (disposed || !mapContainer.value || props.loading || !props.points.length) return
+  const frame = readNativeFrame()
+  lastNativeFrame = frame
+  const payload = {
+    points: buildNativePointsPayload(),
+    style: readNativeStylePayload(),
+    frame,
+    fullscreen: props.fullscreen,
+  }
+  if (nativeMounted) {
+    void DialectsNative.updateDialectMap?.(payload)
+    return
+  }
+  nativeMounted = true
+  void DialectsNative.mountDialectMap?.(payload)
+}
+
+function unmountNativeMap() {
+  if (!nativeMounted) return
+  nativeMounted = false
+  lastNativeFrame = null
+  void DialectsNative.unmountDialectMap?.()
+}
+
 function resizeMap() {
+  if (shouldUseNativeAppleMap()) {
+    nextTick(() => syncNativeFrame(true))
+    return
+  }
   nextTick(() => map.value?.resize())
 }
 
-watch(() => props.points, () => renderPoints(true), { deep: true })
-watch(() => props.fullscreen, resizeMap)
-watch(currentColorTheme, () => renderPoints(true))
+watch(() => props.points, () => {
+  if (shouldUseNativeAppleMap()) {
+    if (!props.loading && props.points.length && (isVisible || props.fullscreen)) mountNativeMap()
+    else unmountNativeMap()
+    return
+  }
+  renderPoints(true)
+}, { deep: true })
+
+watch(() => props.loading, (loading) => {
+  if (!shouldUseNativeAppleMap()) return
+  if (loading) unmountNativeMap()
+  else if (props.points.length && (isVisible || props.fullscreen)) mountNativeMap()
+})
+
+watch(() => props.fullscreen, () => {
+  if (shouldUseNativeAppleMap()) {
+    nextTick(() => {
+      if (props.fullscreen && !nativeMounted && !props.loading && props.points.length) mountNativeMap()
+      else syncNativeFrame(true)
+    })
+    return
+  }
+  resizeMap()
+})
+
+watch(currentColorTheme, () => {
+  if (shouldUseNativeAppleMap()) {
+    if (nativeMounted) {
+      void DialectsNative.updateDialectMap?.({
+        points: buildNativePointsPayload(),
+        style: readNativeStylePayload(),
+        frame: readNativeFrame(),
+        fullscreen: props.fullscreen,
+      })
+    }
+    return
+  }
+  renderPoints(true)
+})
 
 function mountMap() {
+  if (shouldUseNativeAppleMap()) {
+    mountNativeMap()
+    return
+  }
   if (map.value || disposed) return
   map.value = new maplibregl.Map({
     container: mapContainer.value,
@@ -293,6 +442,10 @@ function mountMap() {
 }
 
 function unmountMap() {
+  if (shouldUseNativeAppleMap()) {
+    if (!props.fullscreen) unmountNativeMap()
+    return
+  }
   if (!map.value) return
   const center = map.value.getCenter()
   savedView = { center: [center.lng, center.lat], zoom: map.value.getZoom(), bearing: map.value.getBearing(), pitch: map.value.getPitch() }
@@ -304,12 +457,35 @@ function unmountMap() {
   images.clear()
 }
 
+function handleNativeWindowResize() {
+  syncNativeFrame()
+}
+
 onMounted(() => {
+  if (shouldUseNativeAppleMap()) {
+    if (typeof DialectsNative.addListener === 'function') {
+      Promise.resolve(DialectsNative.addListener('dialectMapExitFullscreen', () => {
+        emit('exit-fullscreen')
+      })).then(handle => {
+        if (disposed) handle?.remove?.()
+        else nativeExitListener = handle
+      }).catch(() => {})
+    }
+    if (typeof ResizeObserver !== 'undefined' && mapContainer.value) {
+      resizeObserver = new ResizeObserver(() => syncNativeFrame())
+      resizeObserver.observe(mapContainer.value)
+      if (document.body) resizeObserver.observe(document.body)
+    }
+    window.addEventListener('resize', handleNativeWindowResize)
+  }
+
   if (typeof IntersectionObserver === 'undefined') {
+    isVisible = true
     mountMap()
     return
   }
   visibilityObserver = new IntersectionObserver(([entry]) => {
+    isVisible = Boolean(entry.isIntersecting)
     if (entry.isIntersecting) mountMap()
     else unmountMap()
   })
@@ -319,6 +495,11 @@ onMounted(() => {
 onBeforeUnmount(() => {
   disposed = true
   visibilityObserver?.disconnect()
+  resizeObserver?.disconnect()
+  window.removeEventListener('resize', handleNativeWindowResize)
+  nativeExitListener?.remove?.()
+  nativeExitListener = null
+  unmountNativeMap()
   clearTimeout(viewportTimer)
   map.value?.remove()
   map.value = null
