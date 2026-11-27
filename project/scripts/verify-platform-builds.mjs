@@ -12,13 +12,15 @@ import {
   DEFAULT_NATIVE_DIST_MAX_BYTES,
   formatNativeDistBytes,
 } from './audit-native-dist.mjs'
+import { readUpdateNoticeVersion } from './sync-native-version.mjs'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const projectRoot = path.resolve(__dirname, '..')
 const repoRoot = path.resolve(projectRoot, '..')
 const appId = 'top.yzup.dialects'
-const androidDebugApk = path.join(repoRoot, 'android/app/build/outputs/apk/debug/app-debug.apk')
+const { version: nativeVersion } = readUpdateNoticeVersion(repoRoot)
+const androidDebugApk = path.join(repoRoot, `android/app/build/outputs/apk/debug/方音圖鑑-v${nativeVersion}.apk`)
 const iosSimulatorApp = path.join(projectRoot, 'build/ios-derived/Build/Products/Debug-iphonesimulator/App.app')
 
 const VALID_TARGETS = new Set(['web', 'ios', 'android', 'acceptance', 'all'])

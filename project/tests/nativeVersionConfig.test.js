@@ -21,13 +21,17 @@ describe('native app version metadata', () => {
     expect(androidBuild).toContain(`versionName "${version}"`)
     expect(iosProject).toContain(`CURRENT_PROJECT_VERSION = ${versionCode};`)
     expect(iosProject).toContain(`MARKETING_VERSION = ${version};`)
-    expect(capacitorConfig).toContain(`"appName": "方音圖鑑-v${version}"`)
+    expect(capacitorConfig).toContain(`"appName": "方音圖鑑"`)
   })
 
-  it('uses the versioned Traditional Chinese Android app name', () => {
-    const appName = `方音圖鑑-v${readUpdateNoticeVersion(repoRoot).version}`
+  it('uses localized Android app names without version suffix', () => {
+    const expectedNames = {
+      values: 'Dialects Atlas',
+      'values-zh-rCN': '方音图鉴',
+      'values-zh-rTW': '方音圖鑑',
+    }
 
-    for (const locale of ['values', 'values-zh-rCN', 'values-zh-rTW']) {
+    for (const [locale, appName] of Object.entries(expectedNames)) {
       const strings = readRepoFile(`android/app/src/main/res/${locale}/strings.xml`)
       expect(strings).toContain(`<string name="app_name">${appName}</string>`)
       expect(strings).toContain(`<string name="title_activity_main">${appName}</string>`)

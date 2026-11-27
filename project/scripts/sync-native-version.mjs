@@ -7,7 +7,12 @@ const __dirname = path.dirname(__filename)
 const projectRoot = path.resolve(__dirname, '..')
 const repoRoot = path.resolve(projectRoot, '..')
 
-const ANDROID_STRING_LOCALES = ['values', 'values-zh-rCN', 'values-zh-rTW']
+const ANDROID_STRING_APP_NAMES = {
+  values: 'Dialects Atlas',
+  'values-zh-rCN': '方音图鉴',
+  'values-zh-rTW': '方音圖鑑',
+}
+const DEFAULT_APP_NAME = '方音圖鑑'
 
 export function readUpdateNoticeVersion(root = repoRoot) {
   const configPath = path.resolve(root, 'project/src/utils/user/updateNoticeConfig.js')
@@ -41,7 +46,7 @@ function updateFileIfChanged(filePath, transform) {
 
 export function syncNativeVersion(root = repoRoot) {
   const { version, versionCode } = readUpdateNoticeVersion(root)
-  const appName = `方音圖鑑-v${version}`
+  const appName = DEFAULT_APP_NAME
   const updatedFiles = []
 
   // 1. project/capacitor.config.json
@@ -63,13 +68,13 @@ export function syncNativeVersion(root = repoRoot) {
   }
 
   // 3. android/app/src/main/res/{values,values-zh-rCN,values-zh-rTW}/strings.xml
-  for (const locale of ANDROID_STRING_LOCALES) {
+  for (const [locale, localizedAppName] of Object.entries(ANDROID_STRING_APP_NAMES)) {
     const relPath = `android/app/src/main/res/${locale}/strings.xml`
     const stringsPath = path.resolve(root, relPath)
     if (updateFileIfChanged(stringsPath, (content) =>
       content
-        .replace(/(<string name="app_name">)[^<]*(<\/string>)/, `$1${appName}$2`)
-        .replace(/(<string name="title_activity_main">)[^<]*(<\/string>)/, `$1${appName}$2`)
+        .replace(/(<string name="app_name">)[^<]*(<\/string>)/, `$1${localizedAppName}$2`)
+        .replace(/(<string name="title_activity_main">)[^<]*(<\/string>)/, `$1${localizedAppName}$2`)
     )) {
       updatedFiles.push(relPath)
     }
