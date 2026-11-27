@@ -4,6 +4,9 @@
 @mixin bar-has-overflow-tabs {
   justify-content: flex-start;
   overflow-x: scroll;
+  overflow-y: hidden;
+  touch-action: pan-x;
+  overscroll-behavior-y: none;
   @include scrollbars.hidden-scrollbar;
   @include scrollbars.hidden-scrollbar-webkit;
 }

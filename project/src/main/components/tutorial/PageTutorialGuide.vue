@@ -46,6 +46,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { useMediaQuery } from '@vueuse/core'
 import {
   tutorialEnabled,
   requestTutorialAssistApply,
@@ -65,7 +66,7 @@ const props = defineProps({
   },
   mobileBottomOffset: {
     type: String,
-    default: '65dvh',
+    default: '62dvh',
   },
   rightOffset: {
     type: String,
@@ -99,14 +100,15 @@ const viewport = ref({
   height: typeof window === 'undefined' ? 800 : window.innerHeight,
 })
 
+const isPortrait = useMediaQuery('(max-aspect-ratio: 1 / 1)')
 const isCompact = computed(() => viewport.value.width <= 900)
 const isMobileLandscape = computed(() => {
   return isCompact.value && viewport.value.width > viewport.value.height
 })
 
 const guideStyle = computed(() => ({
-  '--tutorial-guide-bottom': isCompact.value ? props.mobileBottomOffset : props.bottomOffset,
-  '--tutorial-guide-right': isCompact.value ? props.mobileRightOffset : props.rightOffset,
+  '--tutorial-guide-bottom': isPortrait.value ? props.mobileBottomOffset : props.bottomOffset,
+  '--tutorial-guide-right': isPortrait.value ? props.mobileRightOffset : props.rightOffset,
 }))
 
 const tutorialEntries = computed(() => {
