@@ -3933,7 +3933,7 @@ const exportLayer = async (layerName) => {
   const featureCollection = normalizeFeatureCollection(draw.value?.getAll?.() ?? props.modelValue)
   const safeLayerName = sanitizeLayerFilename(layerName || props.activeLayer?.name || 'map-draw-layer')
   const filename = `${safeLayerName}.geojson`
-  const exported = exportFeatureCollectionAsGeoJson(featureCollection, filename)
+  const exported = await exportFeatureCollectionAsGeoJson(featureCollection, filename)
   emit('export-layer', exported)
   return exported
 }
@@ -3955,7 +3955,7 @@ const exportAllLayers = async (layers = []) => {
     features: allFeatures,
   })
   const filename = 'map-draw-layers.geojson'
-  const exported = exportFeatureCollectionAsGeoJson(featureCollection, filename)
+  const exported = await exportFeatureCollectionAsGeoJson(featureCollection, filename)
   emit('export-layer', exported)
   return exported
 }

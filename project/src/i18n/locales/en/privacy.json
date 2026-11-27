@@ -15,18 +15,27 @@
     "title": "Privacy Policy",
     "dataCollection": {
       "title": "Data Collection and Use",
-      "intro": "Dialects Atlas (dialects.yzup.top) is committed to protecting user privacy. We solemnly promise:",
-      "minimal": "<strong>Minimal Data Collection</strong>: This website only collects necessary technical information (such as access logs, browser type) to maintain normal website operation and improve user experience.",
-      "noPersonal": "<strong>No Personal Identification Information</strong>: We do not actively collect personally identifiable information (such as name, phone number, birthday, etc.).",
-      "security": "<strong>Data Security</strong>: All collected data is protected using industry-standard security measures to prevent unauthorized access, disclosure, modification, or destruction."
+      "intro": "Dialects Atlas (dialects.yzup.top) values and is committed to protecting user privacy. This policy applies to the website and mobile apps. We follow the principle of data minimization, collecting and processing information only to the extent necessary to provide our services and maintain the normal operation of the platform.",
+      "account": "<strong>Account information</strong>: Registration requires an email address, and users may set their own username. This information is used only for account registration, identity verification, account management, and necessary service notifications. We do not require users to provide additional identity information such as real name, phone number, or date of birth.",
+      "technical": "<strong>Technical and usage information</strong>: Access logs record technical information such as IP address, API endpoint, usage duration, and user agent (UA) for website optimization, performance diagnostics, and protection against automated scraping.",
+      "submitted": "<strong>Data submitted by users</strong>: When using dialect data management, character table processing, online Praat, and other features, you may submit text, tables, or audio files. These data are used to provide the corresponding features.",
+      "personal": "<strong>Personal data and custom content</strong>: These are stored on the server so that you can use and synchronize them across devices.",
+      "tools": "<strong>Online tools and audio</strong>: Tools such as character table processing and online Praat process uploaded files on the server. Recorded or uploaded audio is also processed on the server and is not stored permanently. Temporary tool files and results enter an approximately 30-minute cleanup period after a successful download and are then automatically removed by periodic cleanup.",
+      "feedback": "<strong>Feedback, permission requests, and activity records</strong>: Feedback, permission requests, and related activity records are stored on the server. Only site administrators can view them; ordinary users cannot.",
+      "publicData": "<strong>Public vocabulary lists</strong>: Before uploading a public list, ensure you have the right to share its contents. Publication and licensing follow the instructions on the vocabulary upload page.",
+      "maps": "<strong>Third-party maps</strong>: Map features use third-party map sources. When maps load, your device requests map resources from the relevant provider.",
+      "security": "<strong>Data security</strong>: We adopt reasonable technical and administrative measures to protect user data and strive to prevent unauthorized access, disclosure, modification, or destruction.",
+      "principles": "<strong>Privacy principles</strong>: We will not forcibly collect additional personal information for purposes unrelated to platform features, and we will protect users' personal information rights in accordance with applicable laws and regulations."
     },
     "cookies": {
-      "title": "Use of Cookies",
-      "intro": "This website may use Cookies and similar technologies to:",
-      "login": "Remember your login status",
-      "analytics": "Analyze website traffic and user behavior patterns to improve service quality",
-      "personalization": "Provide personalized user experience",
-      "note": "You can manage or disable Cookies through browser settings, but this may affect the normal use of some website functions."
+      "title": "Cookies and Local Storage",
+      "intro": "The website and apps use cookies, browser local storage, session storage, IndexedDB, and caches to store some information on your device:",
+      "login": "Login tokens and cached account information to maintain your session",
+      "analytics": "Language, theme, avatar, interface, and notification preferences",
+      "personalization": "Recent queries, filters, and page selections, as well as some analysis settings, custom rules, and tone-category results",
+      "work": "Map drawing drafts stored locally for recovery; export anything you want to keep before clearing them",
+      "cache": "Cached regions, map resources, and other data, plus session state such as page navigation, to speed up loading and restore activity",
+      "note": "You can clear this site's data in your browser settings or clear app data through your device settings. This may sign you out and delete local preferences, history, and unexported drafts. Clearing device data does not automatically delete personal data stored on the server."
     },
     "commitment": {
       "title": "Data Protection Commitment",
@@ -50,7 +59,7 @@
       "github": "GitHub: ",
       "zhihu": "Zhihu: "
     },
-    "lastUpdated": "<strong>Last Updated</strong>: January 2026"
+    "lastUpdated": "<strong>Last Updated</strong>: November 2026"
   },
   "disclaimer": {
     "title": "Disclaimer",

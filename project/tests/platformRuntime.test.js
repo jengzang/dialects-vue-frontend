@@ -550,6 +550,84 @@ describe('platform runtime detection and capabilities', () => {
     }])
   })
 
+  it('reads Capacitor FilePicker paths that report status 0 / ok=false for readable media files', async () => {
+    const fileService = getPlatformFileService({
+      globals: {
+        Capacitor: {
+          getPlatform: () => 'ios',
+          convertFileSrc: (path) => `capacitor://localhost/_capacitor_file_${path.replace('file://', '')}`,
+          isPluginAvailable: (name) => name === 'FilePicker',
+        },
+      },
+      filePicker: {
+        FilePicker: {
+          async pickFiles() {
+            return {
+              files: [{
+                name: 'picked.wav',
+                mimeType: 'audio/wav',
+                path: 'file:///tmp/picked.wav',
+              }],
+            }
+          },
+        },
+      },
+      fetch: async () => ({
+        ok: false,
+        status: 0,
+        async blob() {
+          return new Blob(['picked audio'], { type: 'audio/wav' })
+        },
+      }),
+    })
+
+    const files = await fileService.pickFiles({
+      accept: 'audio/*',
+      multiple: false,
+      readData: false,
+    })
+
+    expect(files).toHaveLength(1)
+    expect(files[0].name).toBe('picked.wav')
+    expect(await readFileAsText(files[0])).toBe('picked audio')
+  })
+
+  it('classifies native file path read failures before tools handle the message', async () => {
+    const fileService = getPlatformFileService({
+      globals: {
+        Capacitor: {
+          getPlatform: () => 'ios',
+          convertFileSrc: (path) => path,
+          isPluginAvailable: (name) => name === 'FilePicker',
+        },
+      },
+      filePicker: {
+        FilePicker: {
+          async pickFiles() {
+            return {
+              files: [{
+                name: 'missing.wav',
+                mimeType: 'audio/wav',
+                path: 'file:///tmp/missing.wav',
+              }],
+            }
+          },
+        },
+      },
+      fetch: async () => {
+        throw new Error('File not found')
+      },
+    })
+
+    await expect(fileService.pickFiles({
+      accept: 'audio/*',
+      multiple: false,
+      readData: false,
+    })).rejects.toMatchObject({
+      code: 'NATIVE_FILE_READ_FAILED',
+    })
+  })
+
   it('normalizes native file picker cancellation into a non-fatal empty selection', async () => {
     const fileService = getPlatformFileService({
       globals: {
@@ -745,6 +823,38 @@ describe('platform runtime detection and capabilities', () => {
     await expect(recorder.start()).rejects.toMatchObject({
       code: 'NATIVE_MICROPHONE_PERMISSION_DENIED',
     })
+  })
+
+  it('reads iOS recordings that report status 0 / ok=false for readable media files', async () => {
+    const recorder = getPlatformAudioRecorder({
+      globals: {
+        Capacitor: {
+          getPlatform: () => 'ios',
+          convertFileSrc: (uri) => `capacitor://localhost/_capacitor_file_${uri.replace('file://', '')}`,
+          isPluginAvailable: (name) => name === 'CapacitorAudioRecorder',
+        },
+      },
+      audioRecorder: {
+        CapacitorAudioRecorder: {
+          async stopRecording() {
+            return { uri: 'file:///tmp/native.m4a', duration: 500 }
+          },
+        },
+      },
+      fetch: async () => ({
+        ok: false,
+        status: 0,
+        async blob() {
+          return new Blob(['ios audio'], { type: 'audio/mp4' })
+        },
+      }),
+      now: () => 2000,
+    })
+
+    const result = await recorder.stop()
+
+    expect(result.file.name).toBe('recording-2000.m4a')
+    expect(await readFileAsText(result.file)).toBe('ios audio')
   })
 
   it('classifies native recording URI read failures before Praat handles the message', async () => {

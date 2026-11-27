@@ -332,6 +332,19 @@ export function useExploreBarConfig() {
                 ]
             }
         }),
+        application: createExploreTab({
+            tab: 'application',
+            label: t('navigation.tabs.application'),
+            icon: '📥',
+            display: {
+                preset: 'balancedMobile',
+                overrides: { mobileScroll: 'right', mobileWeightIconOnly: 0.6 }
+            },
+            navigation: {
+                defaultTo: { path: withRouteLocale(route, '/explore/application') },
+                activeMatchPaths: [withRouteLocale(route, '/explore/application')]
+            }
+        }),
         yangchun: createExploreTab({
             tab: 'yangchun',
             label: t('navigation.tabs.yangchun'),

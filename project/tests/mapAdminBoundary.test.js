@@ -16,11 +16,14 @@ vi.mock('maplibre-gl', () => ({ default: {
   Map: class {
     constructor() { this.sources = new Map(); this.layers = new Map(); this.events = {}; maps.push(this) }
     addControl() {}
+    getCanvas() { return { style: {} } }
     on(name, handler) { this.events[name] = handler }
     once(name, handler) { this.events[name] = handler }
     off() {}
     remove() {}
     flyTo() {}
+    isSourceLoaded() { return true }
+    triggerRepaint() { this.events.render?.() }
     getSource(id) { return this.sources.get(id) }
     getLayer(id) { return this.layers.get(id) }
     addSource(id, source) { this.sources.set(id, source) }
@@ -64,6 +67,8 @@ function mountMap() {
 }
 
 beforeEach(() => {
+  vi.stubGlobal('requestAnimationFrame', callback => { callback(); return 0 })
+  vi.stubGlobal('cancelAnimationFrame', vi.fn())
   Object.assign(mapStore, { mode: 'base', mapData: null, mergedData: [], isoplethPayload: null, adminBoundary: null, featureLabels: {} })
   vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, json: async () => boundary })))
 })

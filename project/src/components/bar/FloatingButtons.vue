@@ -158,13 +158,13 @@ $transition-base: 0.3s ease;
   @include floating-glass;
 
   &.position-top-right {
-    top: $desktop-offset;
-    right: $desktop-offset;
+    top: calc(#{$desktop-offset} + env(safe-area-inset-top, 0px));
+    right: calc(#{$desktop-offset} + env(safe-area-inset-right, 0px));
   }
 
   &.position-bottom-left {
-    bottom: $desktop-offset;
-    left: $desktop-offset;
+    bottom: calc(#{$desktop-offset} + env(safe-area-inset-bottom, 0px));
+    left: calc(#{$desktop-offset} + env(safe-area-inset-left, 0px));
   }
 
   &:hover {
@@ -184,13 +184,13 @@ $transition-base: 0.3s ease;
     border-radius: 22px;
 
     &.position-top-right {
-      top: $mobile-offset;
-      right: $mobile-offset;
+      top: calc(#{$mobile-offset} + env(safe-area-inset-top, 0px));
+      right: calc(#{$mobile-offset} + env(safe-area-inset-right, 0px));
     }
 
     &.position-bottom-left {
-      bottom: $mobile-offset;
-      left: $mobile-offset;
+      bottom: calc(#{$mobile-offset} + env(safe-area-inset-bottom, 0px));
+      left: calc(#{$mobile-offset} + env(safe-area-inset-left, 0px));
     }
   }
 }
@@ -213,27 +213,27 @@ $transition-base: 0.3s ease;
 /* 右下角功能按钮组 */
 .floating-buttons {
   position: fixed;
-  right: $desktop-offset;
-  bottom: $desktop-offset;
+  right: calc(#{$desktop-offset} + env(safe-area-inset-right, 0px));
+  bottom: calc(#{$desktop-offset} + env(safe-area-inset-bottom, 0px));
   z-index: 998;
   @include flex-col;
   gap: 12px;
 
   &.position-top-left {
     right: auto;
-    left: $desktop-offset;
+    left: calc(#{$desktop-offset} + env(safe-area-inset-left, 0px));
     bottom: auto;
-    top: $desktop-offset;
+    top: calc(#{$desktop-offset} + env(safe-area-inset-top, 0px));
 
     @media (max-aspect-ratio: 1/1) {
-      left: $mobile-offset;
-      top: $mobile-offset;
+      left: calc(#{$mobile-offset} + env(safe-area-inset-left, 0px));
+      top: calc(#{$mobile-offset} + env(safe-area-inset-top, 0px));
     }
   }
 
   @media (max-aspect-ratio: 1/1) {
-    right: $mobile-offset;
-    bottom: $mobile-offset;
+    right: calc(#{$mobile-offset} + env(safe-area-inset-right, 0px));
+    bottom: calc(#{$mobile-offset} + env(safe-area-inset-bottom, 0px));
     gap: 10px;
   }
 }
@@ -286,13 +286,13 @@ $transition-base: 0.3s ease;
   @include flex-center;
 
   &.position-top-right {
-    top: $desktop-offset;
-    right: $desktop-offset;
+    top: calc(#{$desktop-offset} + env(safe-area-inset-top, 0px));
+    right: calc(#{$desktop-offset} + env(safe-area-inset-right, 0px));
   }
 
   &.position-bottom-left {
-    bottom: $desktop-offset;
-    left: $desktop-offset;
+    bottom: calc(#{$desktop-offset} + env(safe-area-inset-bottom, 0px));
+    left: calc(#{$desktop-offset} + env(safe-area-inset-left, 0px));
   }
 
   @media (max-aspect-ratio: 1/1) {
@@ -300,13 +300,13 @@ $transition-base: 0.3s ease;
     height: $mobile-auth-size;
 
     &.position-top-right {
-      top: $mobile-offset;
-      right: $mobile-offset;
+      top: calc(#{$mobile-offset} + env(safe-area-inset-top, 0px));
+      right: calc(#{$mobile-offset} + env(safe-area-inset-right, 0px));
     }
 
     &.position-bottom-left {
-      bottom: $mobile-offset;
-      left: $mobile-offset;
+      bottom: calc(#{$mobile-offset} + env(safe-area-inset-bottom, 0px));
+      left: calc(#{$mobile-offset} + env(safe-area-inset-left, 0px));
     }
   }
 }

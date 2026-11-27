@@ -1,14 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { createApp, nextTick } from 'vue'
+import { createApp, h, nextTick, ref } from 'vue'
 import { createI18n } from 'vue-i18n'
 import LoginForm from '../src/main/components/user/auth/LoginForm.vue'
+import PasswordRecoveryForm from '../src/main/components/user/auth/PasswordRecoveryForm.vue'
 import en from '../src/i18n/locales/en/auth.json'
 import zhCN from '../src/i18n/locales/zh-CN/auth.json'
 import zhHant from '../src/i18n/locales/zh-Hant/auth.json'
-import { showConfirm } from '@/utils/ui/message.js'
+import { showConfirm, showSuccess } from '@/utils/ui/message.js'
 import { createPasswordResetRequest } from '@/api/auth/actions.js'
 
-vi.mock('@/utils/ui/message.js', () => ({ showConfirm: vi.fn() }))
+vi.mock('@/utils/ui/message.js', () => ({ showConfirm: vi.fn(), showSuccess: vi.fn() }))
 vi.mock('@/api/auth/actions.js', () => ({ createPasswordResetRequest: vi.fn() }))
 
 let app, host
@@ -16,7 +17,10 @@ const settle = async () => { await Promise.resolve(); await nextTick(); await ne
 function mount(locale = 'zh-CN') {
   host = document.createElement('div')
   document.body.append(host)
-  app = createApp(LoginForm)
+  const recovering = ref(false)
+  app = createApp({ render: () => recovering.value
+    ? h(PasswordRecoveryForm, { onBack: () => { recovering.value = false } })
+    : h(LoginForm, { onRecoverPassword: () => { recovering.value = true } }) })
   const i18n = createI18n({ legacy: false, locale, messages: {
     en: { auth: en }, 'zh-CN': { auth: zhCN }, 'zh-Hant': { auth: zhHant },
   }, missingWarn: false, fallbackWarn: false })
@@ -67,6 +71,26 @@ describe('Mail password recovery', () => {
     expect(host.querySelector('input[type=password]')).toBeNull()
     expect(host.textContent).toContain('2639548777')
     expect(host.textContent).not.toContain('auth.reset.')
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } })
+    host.querySelector('[data-reset-copy-subject]').click()
+    await settle()
+    expect(writeText).toHaveBeenCalledExactlyOnceWith('RESET-REQUEST')
+    expect(showSuccess).toHaveBeenCalledWith(({ en, 'zh-CN': zhCN, 'zh-Hant': zhHant })[locale].reset.copied)
+    expect(host.querySelector('[role=status]')).toBeNull()
+    expect(host.querySelector('[data-reset-step="subject"]').classList.contains('completed')).toBe(true)
+    expect(host.querySelector('[data-reset-step="recipient"]').classList.contains('completed')).toBe(false)
+    host.querySelector('[data-reset-copy-recipient]').click()
+    host.querySelector('[data-reset-copy]').click()
+    await settle()
+    expect(host.querySelectorAll('[data-reset-step].completed')).toHaveLength(3)
+    host.querySelector('[data-reset-back]').click()
+    await settle()
+    await open()
+    fillRequest()
+    host.querySelector('[data-reset-submit]').click()
+    await settle()
+    expect(host.querySelectorAll('[data-reset-step].completed')).toHaveLength(0)
   })
 
   it('rejects mismatched passwords without creating a request', async () => {
@@ -95,5 +119,7 @@ describe('Mail password recovery', () => {
     host.querySelector('[data-reset-copy]').click(); await settle()
     expect(host.querySelector('textarea').readOnly).toBe(true)
     expect(host.textContent).toContain(zhCN.reset.copyFailed)
+    expect(showSuccess).not.toHaveBeenCalled()
+    expect(host.querySelectorAll('[data-reset-step].completed')).toHaveLength(0)
   })
 })

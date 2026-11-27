@@ -6,6 +6,7 @@ const Jyut2IpaTool = () => import('@/main/views/explore/tools/Jyut2IpaTool.vue')
 const MergeTool = () => import('@/main/views/explore/tools/MergeTool.vue')
 const DeriveTool = () => import('@/main/views/explore/tools/DeriveTool.vue')
 const PraatPage = () => import('@/main/views/explore/Praat.vue')
+const ApplicationPage = () => import('@/main/views/explore/ApplicationPage.vue')
 const GisPage = () => import('@/main/views/explore/GisPage.vue')
 const TableManagePage = () => import('@/main/views/explore/tools/TableManage.vue')
 const CharacterClassificationPage = () => import('@/main/views/explore/charClass/CharacterClassification.vue')
@@ -19,9 +20,12 @@ const AllVillagesPage = () => import('@/main/views/explore/villages/AllVillages.
 const VillagesMLPage = () => import('@/main/views/explore/villages/VillagesML.vue')
 const ToponymsPage = () => import('@/main/views/explore/villages/toponyms/ToponymsPage.vue')
 const ToponymSearchPage = () => import('@/main/views/explore/villages/toponyms/ToponymSearchPage.vue')
-const G6DemoPage = () => import('@/main/components/g6-demo/index.vue')
 
 export const exploreRoutes = [
+  {
+    path: 'explore/application',
+    component: ApplicationPage
+  },
   {
     path: 'explore/tools/check',
     component: CheckTool
@@ -135,10 +139,6 @@ export const exploreRoutes = [
   {
     path: 'explore/villages/ml',
     component: VillagesMLPage
-  },
-  {
-    path: 'explore/g6-demo',
-    component: G6DemoPage
   },
   {
     path: 'explore/villages/all',

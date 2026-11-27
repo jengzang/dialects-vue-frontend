@@ -1,5 +1,5 @@
 <template>
-  <div class="form-row">
+  <div class="form-row form-input-row">
     <input
       :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
@@ -82,12 +82,13 @@ $control-right: 15px;
 $transition-duration: 0.3s;
 $glass-blur: 12px;
 
-.form-row {
+.form-row.form-input-row {
   position: relative;
   display: flex;
   justify-content: center;
   width: 100%;
-  margin: 12px 0;
+  max-width: 320px;
+  margin: 12px auto;
 }
 
 .form-input {

@@ -1,7 +1,8 @@
 <template>
   <Teleport to="body">
     <Transition name="rate-limit-slide">
-      <aside v-if="rateLimitNoticeState.visible" class="rate-limit-shell" aria-live="polite">
+      <aside v-if="rateLimitNoticeState.visible" v-native-back="handleDismiss"
+        class="rate-limit-shell" aria-live="polite">
         <section class="rate-limit-notice">
           <div class="notice-glow"></div>
 
@@ -44,6 +45,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import { computed, onBeforeUnmount, watch, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
@@ -223,7 +225,7 @@ $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);/*
  */
 .rate-limit-shell {
   position: fixed;
-  top: 92px;
+  top: calc(92px + env(safe-area-inset-top, 0px));
   left: 50%;
   z-index: 99990;
   width: min(720px, calc(100vw - 32px));
@@ -231,7 +233,7 @@ $enter-easing: cubic-bezier(0.22, 1, 0.36, 1);/*
   transform: translateX(-50%);
 
   @media (max-width: 768px) {
-    top: 72px;
+    top: calc(72px + env(safe-area-inset-top, 0px));
     width: calc(100vw - 20px);
   }
 }

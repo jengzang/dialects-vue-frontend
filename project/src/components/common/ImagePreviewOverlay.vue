@@ -2,6 +2,7 @@
   <Teleport to="body">
     <div
       v-if="src"
+      v-native-back="close"
       class="image-preview-overlay"
       @click="close"
     >
@@ -75,6 +76,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import { computed, ref, onBeforeUnmount, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -355,7 +357,11 @@ onBeforeUnmount(() => {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 16px 20px;
+    padding:
+      calc(16px + env(safe-area-inset-top, 0px))
+      calc(20px + env(safe-area-inset-right, 0px))
+      16px
+      calc(20px + env(safe-area-inset-left, 0px));
     pointer-events: none;
     z-index: 1;
   }

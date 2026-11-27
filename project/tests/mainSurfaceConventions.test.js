@@ -58,6 +58,17 @@ function trackedStyleAndVueFilesUnder(relativePath) {
 }
 
 describe('main surface conventions', () => {
+  it('provides transparent panel and card variants with glass geometry and no glass effects', () => {
+    const source = readSource('src/styles/global/_surfaces.scss')
+    for (const kind of ['panel', 'card']) {
+      const block = blockFor(source, `.surface-${kind}[data-variant='transparent']`)
+      expect(block).toContain('background: transparent')
+      expect(block).toContain('border: none')
+      expect(block).toContain('var(--radius-xl)')
+      expect(block).not.toContain('backdrop-filter')
+      expect(block).not.toContain('blend-mode')
+    }
+  })
   it('defines the canonical main glass surface primitives without the legacy main prefix', () => {
     const source = readSource('src/styles/global/_surfaces.scss')
 

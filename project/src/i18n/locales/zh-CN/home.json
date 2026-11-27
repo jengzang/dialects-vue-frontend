@@ -6,6 +6,27 @@
     "logoAlt": "方音图鉴",
     "decorationAlt": "蓝色圆环"
   },
+  "download": {
+    "title": "下载应用",
+    "description": "随时随地触摸方言的历史层次。",
+    "availability": "下载苹果和安卓应用，了解最新信息。",
+    "mapTitle": "方言地图",
+    "mapEmpty": "暂无方言点数据",
+    "mapStats": "地图：{points} 个方言点 · 共 {entries} 条数据",
+    "mapLoading": "正在加载方言点地图…",
+    "mapError": "方言点地图加载失败",
+    "mapDescription": "在方音图鉴，你可以绘制{feature}、{compare}、{distribution}、{isopleth}、{heatmap}以及{adminBoundary}等；你也可以使用{onlineGis}自由绘制各种地图，不仅如此，方音图鉴还能根据{thiessenPolygon}自动绘制方言分布图。",
+    "mapLinks": {
+      "feature": "方言特征图",
+      "compare": "方言比较点图",
+      "distribution": "方言分布点图",
+      "isopleth": "音节数量等值线图",
+      "heatmap": "方言点密度热力图",
+      "adminBoundary": "行政区划边界",
+      "onlineGis": "在线 GIS 工具",
+      "thiessenPolygon": "泰森多边形算法"
+    }
+  },
   "showcase": {
     "nav": "产品展示",
     "switchTo": "切换到",
@@ -147,12 +168,36 @@
     "viewAll": "查看全部 →",
     "discover": "进入工具 →",
     "items": {
-      "zhonggu": { "name": "查中古", "desc": "按中古地位整理各方言点读音", "tag": "查询" },
-      "compare": { "name": "方言比较", "desc": "对比各方言点声韵调的字音差异", "tag": "比较" },
-      "gis": { "name": "GIS 绘图", "desc": "GIS 在线绘图 · 泰森多边形", "tag": "地图" },
-      "phonology": { "name": "音系查询", "desc": "查看各方言点音系表", "tag": "音系" },
-      "tableProcess": { "name": "字表处理", "desc": "字表检查与格式转换", "tag": "工具" },
-      "praat": { "name": "Praat 声学分析", "desc": "实验语音学工具与数据分析", "tag": "声学" }
+      "zhonggu": {
+        "name": "查中古",
+        "desc": "按中古地位整理各方言点读音",
+        "tag": "查询"
+      },
+      "compare": {
+        "name": "方言比较",
+        "desc": "对比各方言点声韵调的字音差异",
+        "tag": "比较"
+      },
+      "gis": {
+        "name": "GIS 绘图",
+        "desc": "GIS 在线绘图 · 泰森多边形",
+        "tag": "地图"
+      },
+      "phonology": {
+        "name": "音系查询",
+        "desc": "查看各方言点音系表",
+        "tag": "音系"
+      },
+      "tableProcess": {
+        "name": "字表处理",
+        "desc": "字表检查与格式转换",
+        "tag": "工具"
+      },
+      "praat": {
+        "name": "Praat 声学分析",
+        "desc": "实验语音学工具与数据分析",
+        "tag": "声学"
+      }
     }
   },
   "roadmap": {

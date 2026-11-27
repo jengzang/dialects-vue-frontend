@@ -22,9 +22,9 @@ it('locks before confirmation, deep copies and safely repeats the same unknown r
   expect(state.status.value).toBe('succeeded')
 })
 it('preserves structured errors and blocks unknown replay after receipt expiry', async () => {
-  const error={status:409,detail:{code:'version_conflict',current_records:[{id:1,version:3}]}}
+  const error={status:404,detail:{code:'record_unavailable',current_records:[{id:1}]}}
   const state=useCustomDataSave(async()=>{throw error})
-  await state.save({updates:[{id:1,version:2}],creates:[],deletes:[]})
+  await state.save({updates:[{id:1}],creates:[],deletes:[]})
   expect(state.status.value).toBe('failed')
   expect(state.error.value).toEqual(error)
 })

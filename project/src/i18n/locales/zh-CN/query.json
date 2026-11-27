@@ -285,6 +285,7 @@
       "positionPlaceholder": "空格分隔独立地位，连写代表组合查询，横杠代表全匹配。例：泥母 流开一 蟹-等",
       "charLabel": "汉字直接输入",
       "charPlaceholder": "输入汉字，例：你好",
+      "convertToTraditional": "转繁体",
       "helpButton": "?",
       "possibleCombinations": "可能产生{count}种组合",
       "actualMatches": ",实际匹配{count}组",

@@ -87,8 +87,6 @@ describe('plot colors stay independent of page theme', () => {
     ['main/components/map/MapLibre.vue', /(?:marker-text|marker-dot|maplibregl-popup-content)/],
     ['main/components/map/MiniMapSelector.vue', /mini-map-point-label/],
     ['main/components/map/VocabularyMap.vue', /vocabulary-marker/],
-    ['main/components/map/popups/VillageMapPopup.vue', /maplibregl-popup-content/],
-    ['main/components/map/popups/AllVillagesMapPopup.vue', /maplibregl-popup-content/],
     ['main/components/map/MapLegend.vue', /map-legend|legend-title|legend-label/],
   ])('keeps rendered map labels and popup surfaces free of theme colors: %s', async (path, selectors) => {
     const filename = resolve(srcRoot, path);
@@ -107,6 +105,13 @@ describe('plot colors stay independent of page theme', () => {
         expect(colors.join(';'), selector).not.toMatch(/var\(--/);
       }
     }
+  });
+
+  it('keeps village map popup surfaces fixed and shared', async () => {
+    const filename = resolve(srcRoot, 'styles/main/_popups.scss');
+    const result = await compileStyleAsync({ filename, source: readFileSync(filename, 'utf8'), id: 'map-popups', preprocessLang: 'scss', preprocessOptions: scssOptions });
+    expect(result.errors).toEqual([]);
+    expect(result.code).toMatch(/\.map-modal-container \.maplibregl-popup-content\s*\{[^}]*padding:\s*10px 12px;[^}]*background:\s*rgba\(255, 255, 255, 0\.9\);[^}]*color:\s*#1d1d1f;/s);
   });
 
   it('keeps shared map popup content independent of theme while preserving themed action buttons', async () => {

@@ -1,0 +1,13 @@
+{
+  "eyebrow": "方音图鉴 · 移动应用",
+  "title": "随时随地触摸方言的历史层次",
+  "intro": "查询方言读音，比较音韵差异，进行地理语言学研究，在线声学分析",
+  "downloadTitle": "选择下载平台",
+  "comingSoon": "敬请期待",
+  "note": "安卓安装包也可以加入 QQ 群，在群文件中下载。",
+  "platforms": {
+    "web": { "title": "网页版", "description": "无需安装，通过浏览器访问方音图鉴。", "action": "打开网页版" },
+    "ios": { "title": "iPhone 与 iPad", "description": "在 iPhone 和 iPad 上使用方音图鉴。" },
+    "android": { "title": "Android", "description": "Android 版本发布后，可通过 GitHub 或 Gitee 获取。", "githubHelp": "前端仓库，最新版安卓应用均会发布于此", "giteeHelp": "国内网络直连，下载速度较快" }
+  }
+}

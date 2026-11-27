@@ -229,6 +229,16 @@ npm run dev:web
 
 ### 構建、預覽與檢查
 
+完整構建原生 App（會完成前端構建、Capacitor 同步、原生編譯，並在成功後輸出產物大小）：
+
+```bash
+cd project
+npm run build:app:android
+npm run build:app:ios
+```
+
+Android 產物位於 `android/app/build/outputs/apk/debug/app-debug.apk`；iOS Simulator 產物位於 `project/build/ios-derived/Build/Products/Debug-iphonesimulator/App.app`。
+
 ```bash
 npm run build
 npm run preview

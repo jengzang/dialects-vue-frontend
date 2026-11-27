@@ -95,7 +95,9 @@
         </ActionButton>
         <ActionButton variant="blue" @click="$emit('goToModifyProfile')"><InlineIcon icon="🛠" />{{ $t('auth.profile.buttons.modifyProfile') }}
         </ActionButton>
-        <ActionButton variant="danger" @click="$emit('logout')"><InlineIcon icon="🚪" />{{ $t('auth.profile.buttons.logout') }}
+        <ActionButton variant="danger" class="logout-button" @click="$emit('logout')"><InlineIcon icon="🚪" />{{ $t('auth.profile.buttons.logout') }}
+        </ActionButton>
+        <ActionButton variant="danger" @click="$emit('deactivateAccount')"><InlineIcon icon="🗑️" />{{ $t('auth.profile.buttons.deactivateAccount') }}
         </ActionButton>
         <ActionButton
           v-if="user?.role === 'admin'"
@@ -160,6 +162,7 @@ defineEmits([
   'goToModifyProfile',
   'goToSettings',
   'logout',
+  'deactivateAccount',
   'goToAdminPanel',
   'goToTableManager',
   'toggleStats',
@@ -307,6 +310,14 @@ $card-easing: cubic-bezier(0.16, 1, 0.3, 1);.profile-overview {
   width: 100%;
   max-width: 500px;
   margin: 16px auto 0;
+
+  button.logout-button {
+    background-color: #6b7280;
+
+    &:hover:not(:disabled) {
+      background-color: #4b5563;
+    }
+  }
 
   /*
    * 原样式在移动端设置 flex-direction，

@@ -137,6 +137,12 @@ export default defineConfig(async ({ mode }) => {
     plugins: [
       vue(),
       devMpaRewritePlugin(),
+      ...(buildTarget.isNative ? [{
+        name: 'native-launch-config',
+        generateBundle() {
+          this.emitFile({ type: 'asset', fileName: 'native-launch-config.json', source: JSON.stringify({ webBase }) })
+        },
+      }] : []),
 
       visualizer({
         filename: 'dist/bundle-network.html',
@@ -196,7 +202,9 @@ export default defineConfig(async ({ mode }) => {
         output: {
           entryFileNames: 'assets/[name].[hash].js',
           chunkFileNames(chunkInfo) {
-            const stableChunks = ['globe-gl', 'echarts', 'maplibre', 'xlsx', 'wavesurfer', 'opencc'];
+            if (chunkInfo.name === 'xlsx') return 'assets/[name]-v3.js';
+            if (chunkInfo.name === 'opencc') return 'assets/[name]-v3.js';
+            const stableChunks = ['globe-gl', 'echarts', 'maplibre', 'wavesurfer'];
             if (stableChunks.includes(chunkInfo.name)) {
               return 'assets/[name]-v2.js';
             }

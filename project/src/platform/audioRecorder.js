@@ -77,15 +77,29 @@ async function blobFromRecordingResult(result, options = {}) {
   const recordingUri = typeof globals?.Capacitor?.convertFileSrc === 'function'
     ? globals.Capacitor.convertFileSrc(result.uri)
     : result.uri
-  const response = await fetchApi(recordingUri)
-  if (response?.ok === false) {
+
+  let blob
+  try {
+    const response = await fetchApi(recordingUri)
+    blob = await response.blob()
+  } catch (error) {
     throw createPlatformAudioError(
       'NATIVE_RECORDING_READ_FAILED',
-      'Failed to read native recording'
+      'Failed to read native recording',
+      error
     )
   }
 
-  return response.blob()
+  // Custom schemes (iOS capacitor://) report status 0 / ok=false for readable
+  // media files, so success must be judged by content, not response.ok.
+  if (!blob?.size) {
+    throw createPlatformAudioError(
+      'NATIVE_RECORDING_READ_FAILED',
+      'Native recording is empty'
+    )
+  }
+
+  return blob
 }
 
 export function hasNativeAudioRecorder(options = {}) {

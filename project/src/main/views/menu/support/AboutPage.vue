@@ -2,6 +2,7 @@
   <div class="about-page-wrapper">
     <TabSwitcher
       pin-navigation
+      swipeable
       :tabs="tabs"
       :model-value="currentTab"
       :route-value="currentTab"

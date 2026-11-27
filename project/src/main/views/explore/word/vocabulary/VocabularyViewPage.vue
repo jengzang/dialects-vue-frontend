@@ -1568,7 +1568,6 @@ async function requestVocabularyItems(params) {
     return pendingVocabularyItemRequests.get(requestKey)
   }
 
-  saveVocabularyLocationSelection(params)
   const requestPromise = getVocabularyItems(params)
     .finally(() => {
       pendingVocabularyItemRequests.delete(requestKey)
@@ -1583,7 +1582,6 @@ async function requestVocabularyMapPoints(params = buildVocabularyMapPointsParam
     return pendingVocabularyMapPointRequests.get(requestKey)
   }
 
-  saveVocabularyLocationSelection(params)
   const requestPromise = getVocabularyMapPoints(params)
     .finally(() => {
       pendingVocabularyMapPointRequests.delete(requestKey)
@@ -1598,7 +1596,6 @@ async function requestVocabularyMapItems(params = buildVocabularyMapItemsParams(
     return pendingVocabularyMapPointRequests.get(requestKey)
   }
 
-  saveVocabularyLocationSelection(params)
   const requestPromise = getVocabularyMapItems(params)
     .finally(() => {
       pendingVocabularyMapPointRequests.delete(requestKey)
@@ -1613,7 +1610,6 @@ async function requestVocabularyStandardWords(params = buildVocabularyStandardWo
     return pendingVocabularyStandardWordRequests.get(requestKey)
   }
 
-  saveVocabularyLocationSelection(params)
   const requestPromise = getVocabularyStandardWords(params)
     .finally(() => {
       pendingVocabularyStandardWordRequests.delete(requestKey)
@@ -2322,6 +2318,7 @@ function applyVocabularyQuery() {
     && buildVocabularyQueryKey(params) === buildVocabularyQueryKey(appliedVocabularyQueryParams.value)) return false
   appliedVocabularyQueryParams.value = params
   appliedVocabularyFilterMode.value = filterMode.value
+  if (hasSubmittedSearch.value) saveVocabularyLocationSelection(params, filterMode.value)
   page.value = 1
   mapDetailPage.value = 1
   activeMapDetailRequestKey.value = ''

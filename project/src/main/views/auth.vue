@@ -18,6 +18,14 @@
         @update:loginMode="loginMode = $event"
         @submit="handleLogin"
         @switchToRegister="setMode('register')"
+        @recoverPassword="openPasswordRecovery"
+        @showBenefits="showBenefitsPopup"
+      />
+
+      <PasswordRecoveryForm
+        v-else-if="mode === 'recover'"
+        :initial-email="recoveryEmail"
+        @back="setMode('login')"
         @showBenefits="showBenefitsPopup"
       />
 
@@ -44,6 +52,7 @@
         @goToModifyProfile="setMode('modifyProfile')"
         @goToSettings="goToSettings"
         @logout="logout"
+        @deactivateAccount="handleDeactivateAccount"
         @goToAdminPanel="goToAdminPanel"
         @goToTableManager="goToTableManager"
         @toggleStats="statsExpanded = !statsExpanded"
@@ -72,6 +81,14 @@
       @close="closeBenefitsPopup"
       @register="handleRegisterFromBenefits"
     />
+
+    <DeleteAccountPopup
+      :visible="showDeleteAccountPopup"
+      :loading="deleteAccountLoading"
+      :error="deleteAccountError"
+      @close="closeDeleteAccountPopup"
+      @confirm="handleDeleteAccountConfirm"
+    />
   </div>
 </template>
 
@@ -89,6 +106,7 @@ import {
   updateUsername,
   updatePassword,
   logoutUser,
+  deactivateAccount,
   getUserRole,
   validateEmail,
   validateUsername,
@@ -105,10 +123,12 @@ import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
 
 // Component imports
 import LoginForm from '@/main/components/user/auth/LoginForm.vue'
+import PasswordRecoveryForm from '@/main/components/user/auth/PasswordRecoveryForm.vue'
 import RegisterForm from '@/main/components/user/auth/RegisterForm.vue'
 import ProfileOverview from '@/main/components/user/auth/ProfileOverview.vue'
 import ModifyProfileForm from '@/main/components/user/auth/ModifyProfileForm.vue'
 import UserBenefitsPopup from '@/main/components/user/popups/UserBenefitsPopup.vue'
+import DeleteAccountPopup from '@/main/components/user/popups/DeleteAccountPopup.vue'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 
 const router = useRouter()
@@ -126,9 +146,13 @@ const loading = authTask.loading
 
 // Login/Register state
 const loginMode = ref('email') // 'email' | 'username'
+const recoveryEmail = ref('')
 const modeType = ref('username') // 'username' | 'password'
 const statsExpanded = ref(false)
 const showBenefits = ref(false)
+const showDeleteAccountPopup = ref(false)
+const deleteAccountLoading = ref(false)
+const deleteAccountError = ref('')
 
 // Auth 页内部视图统一由 query.view 驱动，这样刷新、回退和外部直达都能保持一致。
 const { state: view, set: setAuthView } = useRouteQueryState('view', {
@@ -170,6 +194,11 @@ const setMode = (newMode) => {
 
 const switchTab = (tab) => {
   setView(tab)
+}
+
+const openPasswordRecovery = (email) => {
+  recoveryEmail.value = email
+  setMode('recover')
 }
 
 function extractErrorMessage(error, fallback = t('auth.validation.unknownError')) {
@@ -409,6 +438,36 @@ const logout = async () => {
   })
 }
 
+const handleDeactivateAccount = () => {
+  deleteAccountError.value = ''
+  showDeleteAccountPopup.value = true
+}
+
+const closeDeleteAccountPopup = () => {
+  if (deleteAccountLoading.value) return
+  showDeleteAccountPopup.value = false
+}
+
+const handleDeleteAccountConfirm = async ({ password }) => {
+  deleteAccountError.value = ''
+  deleteAccountLoading.value = true
+
+  try {
+    await manualReport()
+    stopOnlineTimeTracker({ clearPending: true })
+    await deactivateAccount(password)
+    clearToken()
+    user.value = null
+    showDeleteAccountPopup.value = false
+    setView('login')
+    showSuccess(t('auth.messages.accountDeactivated'))
+  } catch (e) {
+    deleteAccountError.value = extractErrorMessage(e)
+  } finally {
+    deleteAccountLoading.value = false
+  }
+}
+
 const fetchUser = async () => {
   isInitLoading.value = true
   try {
@@ -479,7 +538,7 @@ const handleRegisterFromBenefits = () => {
 
 // Lifecycle
 onMounted(async () => {
-  if (getToken()) {
+  if (getToken() && mode.value !== 'recover') {
     await fetchUser()
     if (userStore.isAuthenticated) {
       setMode('profile')

@@ -54,7 +54,8 @@
     </button>
 
     <Teleport to="body">
-      <div v-if="showPopup && popupData" class="yubao-popup-overlay" @click="closePopup">
+      <div v-if="showPopup && popupData" v-native-back="closePopup"
+        class="yubao-popup-overlay" @click="closePopup">
         <div class="yubao-popup-content" @click.stop>
           <div class="popup-header">
             <h3>{{ t('map.yuBaoMap.popup.title') }}</h3>
@@ -130,6 +131,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, onMounted, onBeforeUnmount, shallowRef, nextTick, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -539,8 +541,6 @@ const handleStyleChange = () => {
   // 保存当前数据
   const currentData = map.value.getSource('yubao-markers')?._data
 
-  map.value.setStyle(newStyle)
-
   // 样式加载完成后重新添加 layers
   map.value.once('style.load', () => {
     if (!currentData) return
@@ -634,6 +634,8 @@ const handleStyleChange = () => {
     mapLoaded.value = true
     console.log('✅ 地图样式切换完成，layers 已重新添加')
   })
+
+  map.value.setStyle(newStyle, { diff: false })
 }
 
 // 初始化地图

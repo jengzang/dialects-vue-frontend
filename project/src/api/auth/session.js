@@ -145,6 +145,21 @@ async function parseJsonResponse(response) {
   }
 }
 
+// Native HTTP POST may ignore AbortSignal. Stop awaiting it and discard late results.
+async function awaitAuthResponse(promise, signal) {
+  let onAbort;
+  try {
+    const aborted = new Promise((_, reject) => {
+      onAbort = () => reject(signal.reason);
+      signal.addEventListener('abort', onAbort, { once: true });
+      if (signal.aborted) onAbort();
+    });
+    return await Promise.race([promise, aborted]);
+  } finally {
+    signal.removeEventListener('abort', onAbort);
+  }
+}
+
 async function requestAuthJson(path, { method = 'GET', token = null, body = null } = {}) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
@@ -163,15 +178,15 @@ async function requestAuthJson(path, { method = 'GET', token = null, body = null
   }
 
   try {
-    const response = await fetch(WEB_BASE + path, {
+    const response = await awaitAuthResponse(fetch(WEB_BASE + path, {
       method,
       headers,
       body: requestBody,
       signal: controller.signal,
-    });
+    }), controller.signal);
 
     if (!response.ok) {
-      const rawText = await response.text();
+      const rawText = await awaitAuthResponse(response.text(), controller.signal);
       const message = rawText.trim() || `Request failed with status ${response.status}`;
       throw createRequestError(message, {
         status: response.status,
@@ -180,7 +195,7 @@ async function requestAuthJson(path, { method = 'GET', token = null, body = null
       });
     }
 
-    return await parseJsonResponse(response);
+    return await awaitAuthResponse(parseJsonResponse(response), controller.signal);
   } catch (error) {
     if (error?.status) {
       throw error;
@@ -239,14 +254,14 @@ export async function refreshAccessToken() {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REFRESH_TIMEOUT);
     try {
-      const response = await fetch(WEB_BASE + `${AUTH_API_BASE}/refresh`, {
+      const response = await awaitAuthResponse(fetch(WEB_BASE + `${AUTH_API_BASE}/refresh`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ refresh_token: refreshToken }),
         signal: controller.signal,
-      });
+      }), controller.signal);
 
       if (response.status === 401 || response.status === 403) {
         clearSession();
@@ -258,7 +273,7 @@ export async function refreshAccessToken() {
         return { ok: false, reason: 'server_error', status: response.status };
       }
 
-      const data = await response.json();
+      const data = await awaitAuthResponse(response.json(), controller.signal);
       saveToken(data.access_token, data.refresh_token, data.expires_in);
 
       if (userStore.sessionStatus === 'degraded') {

@@ -310,5 +310,14 @@
     "defaultItem": "新功能提示",
     "dontShowAgain": "不再显示此版本更新",
     "confirm": "知道了"
+  },
+  "contact": {
+    "qqQuestion": "有疑问？加入 QQ 群：",
+    "qqCopy": "点击复制群号",
+    "qqCopied": "已复制 QQ 群号",
+    "qqCopyFailed": "复制失败，请手动记下群号",
+    "qqScan": "扫码加群",
+    "qqModalTitle": "扫码加入 QQ 群",
+    "qqQRAlt": "QQ 群二维码"
   }
 }

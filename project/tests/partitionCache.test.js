@@ -21,7 +21,7 @@ describe('default partition page cache', () => {
     expect(loader).toHaveBeenCalledTimes(1)
   })
 
-  it('separates modes and identities and refreshes only after a new page module', async () => {
+  it('separates modes and identities and reuses session trees after a new page module', async () => {
     let { usePartitionCache } = await import('../src/composables/data/usePartitionCache.js')
     const loader = vi.fn(async mode => tree(mode))
     await usePartitionCache().getDefaultTree('map', () => loader('map'), { identity: 'guest' })
@@ -31,7 +31,7 @@ describe('default partition page cache', () => {
     vi.resetModules()
     ;({ usePartitionCache } = await import('../src/composables/data/usePartitionCache.js'))
     await usePartitionCache().getDefaultTree('map', () => loader('map'), { identity: 'guest' })
-    expect(loader).toHaveBeenCalledTimes(4)
+    expect(loader).toHaveBeenCalledTimes(3)
   })
 
   it('allows retry after failure without caching malformed success', async () => {
@@ -39,6 +39,21 @@ describe('default partition page cache', () => {
     const cache = usePartitionCache()
     await expect(cache.getDefaultTree('map', async () => ({ old: {} }))).rejects.toThrow()
     expect(await cache.getDefaultTree('map', async () => tree('map'))).toEqual(tree('map'))
+  })
+
+  it('persists partition colors with the tree in session storage', async () => {
+    const { usePartitionCache } = await import('../src/composables/data/usePartitionCache.js')
+    const coloredTree = {
+      ...tree('map'),
+      nodes: [{ label: '华南', path: '华南', depth: 1, color: '#123456', children: [] }],
+    }
+    await usePartitionCache().getDefaultTree('map', async () => coloredTree, { identity: 'guest' })
+
+    vi.resetModules()
+    const reloaded = await import('../src/composables/data/usePartitionCache.js')
+    const result = await reloaded.usePartitionCache().getDefaultTree('map', vi.fn(), { identity: 'guest' })
+
+    expect(result.nodes[0].color).toBe('#123456')
   })
 
   it('deduplicates resolution tokens and reuses unchanged results but isolates user and scope', async () => {

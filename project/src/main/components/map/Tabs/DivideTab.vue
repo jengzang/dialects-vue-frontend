@@ -101,6 +101,8 @@
         <span v-else>{{ t('map.divideTab.buttons.run') }}</span>
       </button>
     </div>
+
+    <PartitionColorEditor />
   </div>
 </template>
 
@@ -111,6 +113,7 @@ import { useI18n } from 'vue-i18n'
 import LocationAndRegionInput from "@/main/components/geo/LocationAndRegionInput.vue";
 import SimpleSelectDropdown from "@/components/selector/SimpleSelectDropdown.vue";
 import RadioGroup from '@/components/selector/RadioGroup.vue'
+import PartitionColorEditor from '@/main/components/map/PartitionColorEditor.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import SwitchToggle from '@/components/common/SwitchToggle.vue'
 import { mapStore, uiStore, userStore, isDivideButtonDisabled, setRunning } from "@/main/store/store.js";
@@ -294,7 +297,7 @@ const runAllDataAction = async () => {
     throw new Error(t('map.divideTab.messages.allDataNotLoaded'))
   }
 
-  mapStore.mapData = buildAllDataMapData()
+  mapStore.mapData = { ...buildAllDataMapData(), region_mode: allDataPartitionMode.value }
   mapStore.mergedData = []
   mapStore.mode = 'dot'
   mapStore.divideMapView = true
@@ -340,7 +343,7 @@ const runAction = async () => {
     const data = await getCoordinates(queryParams)
 
     // 更新 Store
-    mapStore.mapData = data;
+    mapStore.mapData = { ...data, region_mode: queryParams.region_mode };
     mapStore.mergedData = [];
     mapStore.mode = 'dot';
     mapStore.divideMapView = true;

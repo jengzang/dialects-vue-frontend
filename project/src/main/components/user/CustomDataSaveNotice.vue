@@ -35,7 +35,7 @@
       <div><strong>{{ t('user.customSafety.serverRecords') }}</strong><pre>{{ current }}</pre></div>
     </div>
     <button
-      v-if="current !== null && (code === 'version_conflict' || (state.status.value === 'unknown' && !state.getSnapshot()?.creates?.length))"
+      v-if="current !== null && state.status.value === 'unknown' && !state.getSnapshot()?.creates?.length"
       type="button"
       class="glass-button"
       @click="$emit('merge', current)"
@@ -55,7 +55,7 @@ const {t}=useI18n()
 const current=ref(null),reading=ref(false),readError=ref(false)
 const code=computed(()=>props.state.error.value?.detail?.code)
 const validationError=computed(()=>customDataRowErrors(props.state.error.value)[0])
-const notice=computed(()=>t(`user.customSafety.${code.value === 'receipt_expired' ? 'expired' : props.state.status.value === 'unknown' ? 'unknown' : code.value === 'version_conflict' ? 'conflict' : props.state.error.value?.status === 404 ? 'unavailable' : 'failed'}`))
+const notice=computed(()=>t(`user.customSafety.${code.value === 'receipt_expired' ? 'expired' : props.state.status.value === 'unknown' ? 'unknown' : props.state.error.value?.status === 404 ? 'unavailable' : 'failed'}`))
 async function readCurrent(){
  reading.value=true;readError.value=false
  try {

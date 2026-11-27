@@ -13,16 +13,17 @@
   --font-serif: "Times New Roman", "Songti SC", Georgia, "Noto Serif CJK SC", "STSong", serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   // Ten tokens; xl sizes use a 16px root. Legacy token 12 now represents 11px.
-  --font-size-12: 0.6875rem;
-  --font-size-13: 0.8125rem;
-  --font-size-14: 0.875rem;
-  --font-size-16: 1rem;
-  --font-size-18: 1.125rem;
-  --font-size-20: 1.25rem;
-  --font-size-24: 1.5rem;
-  --font-size-28: 1.75rem;
-  --font-size-32: 2rem;
-  --font-size-48: 3rem;
+  --user-font-scale: 1;
+  --font-size-12: calc(0.6875rem * var(--user-font-scale, 1));
+  --font-size-13: calc(0.8125rem * var(--user-font-scale, 1));
+  --font-size-14: calc(0.875rem * var(--user-font-scale, 1));
+  --font-size-16: calc(1rem * var(--user-font-scale, 1));
+  --font-size-18: calc(1.125rem * var(--user-font-scale, 1));
+  --font-size-20: calc(1.25rem * var(--user-font-scale, 1));
+  --font-size-24: calc(1.5rem * var(--user-font-scale, 1));
+  --font-size-28: calc(1.75rem * var(--user-font-scale, 1));
+  --font-size-32: calc(2rem * var(--user-font-scale, 1));
+  --font-size-48: calc(3rem * var(--user-font-scale, 1));
 
   /* 主题色 */
   --theme-preview-blue: #0070e8;
@@ -272,9 +273,24 @@
   --shadow-focus-ring: 0 2px 6px rgba(var(--color-indigo-rgb), 0.5);
 }
 
+// Scale only font tokens for the active English locale, without changing rem-based layout.
+:root:lang(en) {
+  --english-font-scale: 0.95;
+
+  @each $token, $base-size in (12: 11, 13: 13, 14: 14, 16: 16, 18: 18, 20: 20, 24: 24, 28: 28, 32: 32, 48: 48) {
+    --font-size-#{$token}: calc(#{math.div($base-size, 16) * 1rem} * var(--english-font-scale) * var(--user-font-scale, 1));
+  }
+}
+
+@media (max-aspect-ratio: 1 / 1) {
+  :root:lang(en) {
+    --english-font-scale: 0.92;
+  }
+}
+
 // User-defined width tiers affect font tokens only, leaving the root and rem layout untouched.
 $font-size-width-scales: (
-  300px: 0.9,  // ssm
+  0px: 0.9,  // ssm (<560px)
   560px: 0.93,  // sm
   768px: 0.96,  // md
   1024px: 1, // lg
@@ -286,7 +302,12 @@ $font-size-width-scales: (
   @media (min-width: $min-width) {
     :root {
       @each $token, $base-size in (12: 11, 13: 13, 14: 14, 16: 16, 18: 18, 20: 20, 24: 24, 28: 28, 32: 32, 48: 48) {
-        --font-size-#{$token}: #{math.div(math.max(10, $base-size * $scale), 16) * 1rem};
+        --font-size-#{$token}: calc(#{math.div(math.max(10, $base-size * $scale), 16) * 1rem} * var(--user-font-scale, 1));
+      }
+    }
+    :root:lang(en) {
+      @each $token, $base-size in (12: 11, 13: 13, 14: 14, 16: 16, 18: 18, 20: 20, 24: 24, 28: 28, 32: 32, 48: 48) {
+        --font-size-#{$token}: calc(#{math.div(math.max(10, $base-size * $scale), 16) * 1rem} * var(--english-font-scale) * var(--user-font-scale, 1));
       }
     }
   }

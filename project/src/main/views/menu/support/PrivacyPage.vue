@@ -44,9 +44,16 @@ const copyCitation = () => {
             {{ t('privacy.privacy.dataCollection.intro') }}
           </p>
           <ul>
-            <li v-html="t('privacy.privacy.dataCollection.minimal')"></li>
-            <li v-html="t('privacy.privacy.dataCollection.noPersonal')"></li>
+            <li v-html="t('privacy.privacy.dataCollection.account')"></li>
+            <li v-html="t('privacy.privacy.dataCollection.technical')"></li>
+            <li v-html="t('privacy.privacy.dataCollection.submitted')"></li>
+            <li v-html="t('privacy.privacy.dataCollection.personal')"></li>
+            <li v-html="t('privacy.privacy.dataCollection.tools')"></li>
+            <li v-html="t('privacy.privacy.dataCollection.feedback')"></li>
+            <li v-html="t('privacy.privacy.dataCollection.publicData')"></li>
+            <li v-html="t('privacy.privacy.dataCollection.maps')"></li>
             <li v-html="t('privacy.privacy.dataCollection.security')"></li>
+            <li v-html="t('privacy.privacy.dataCollection.principles')"></li>
           </ul>
 
           <h3>{{ t('privacy.privacy.cookies.title') }}</h3>
@@ -57,6 +64,8 @@ const copyCitation = () => {
             <li>{{ t('privacy.privacy.cookies.login') }}</li>
             <li>{{ t('privacy.privacy.cookies.analytics') }}</li>
             <li>{{ t('privacy.privacy.cookies.personalization') }}</li>
+            <li>{{ t('privacy.privacy.cookies.work') }}</li>
+            <li>{{ t('privacy.privacy.cookies.cache') }}</li>
           </ul>
           <p class="note">
             {{ t('privacy.privacy.cookies.note') }}

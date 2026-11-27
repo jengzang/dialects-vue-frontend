@@ -52,21 +52,47 @@
     <div
       v-if="!navigationOnly"
       :id="panelId"
-      class="tab-content"
+      ref="panelElement"
+      :class="[
+        'tab-content',
+        {
+          'tab-content--swiping': swipeState.dragging,
+          'tab-content--settling': swipeState.settling,
+          'tab-content--enter-next': swipeEnterDirection === 1,
+          'tab-content--enter-prev': swipeEnterDirection === -1,
+        }
+      ]"
+      :style="panelSwipeStyle"
       :role="useRouter ? undefined : 'tabpanel'"
       :aria-labelledby="useRouter ? undefined : tabId(currentTab)"
+      @animationend="handlePanelAnimationEnd"
     >
       <!-- 使用具名插槽渲染每个 tab 的内容 -->
       <slot :current-tab="currentTab"></slot>
     </div>
+
+    <div
+      v-if="showSwipeEdgeGlow"
+      :class="[
+        'tab-swipe-edge-glow',
+        swipeState.direction === 1 ? 'tab-swipe-edge-glow--right' : 'tab-swipe-edge-glow--left',
+        {
+          'tab-swipe-edge-glow--ready': swipeState.ready,
+          'tab-swipe-edge-glow--boundary': swipeState.atBoundary,
+        }
+      ]"
+      :style="swipeEdgeGlowStyle"
+      aria-hidden="true"
+    />
   </div>
 </template>
 
 <script setup>
-import { computed, inject, ref, useId, watch } from 'vue'
-import { RouterLink, routeLocationKey } from 'vue-router'
+import { computed, inject, onBeforeUnmount, ref, useId, watch } from 'vue'
+import { RouterLink, routeLocationKey, routerKey } from 'vue-router'
 import { useMediaQuery } from '@vueuse/core'
 import { useViewportPinnedElement } from '@/composables/ui/useViewportPinnedElement.js'
+import { useTabSwipe } from '@/composables/ui/useTabSwipe.js'
 
 const props = defineProps({
   mode: {
@@ -133,15 +159,22 @@ const props = defineProps({
   pinNavigation: {
     type: Boolean,
     default: false
+  },
+  // 原生 App (Android / iOS) 下是否允许左右滑动切换相邻 tab（需按页显式开启）
+  swipeable: {
+    type: Boolean,
+    default: false
   }
 })
 
 const emit = defineEmits(['update:modelValue', 'tab-change'])
 
 const route = inject(routeLocationKey, undefined)
+const router = inject(routerKey, undefined)
 const tabList = ref(null)
 const navigationElement = ref(null)
 const navigationPlaceholder = ref(null)
+const panelElement = ref(null)
 const isPortrait = useMediaQuery('(max-aspect-ratio: 1 / 1)')
 const id = useId()
 const panelId = `${id}-panel`
@@ -185,6 +218,91 @@ const handleTabClick = (tab, event) => {
   emit('update:modelValue', tab.name)
   emit('tab-change', tab.name)
 }
+
+const findAdjacentEnabledTab = (direction) => {
+  const currentIndex = props.tabs.findIndex(tab => tab.name === currentTab.value)
+  if (currentIndex < 0) return null
+  for (let i = currentIndex + direction; i >= 0 && i < props.tabs.length; i += direction) {
+    if (!props.tabs[i].disabled) return props.tabs[i]
+  }
+  return null
+}
+
+const swipeEnterDirection = ref(0)
+let swipeEnterTimer = null
+
+const clearSwipeEnterAnimation = () => {
+  if (swipeEnterTimer !== null) {
+    clearTimeout(swipeEnterTimer)
+    swipeEnterTimer = null
+  }
+  swipeEnterDirection.value = 0
+}
+
+const triggerSwipeEnterAnimation = (direction) => {
+  clearSwipeEnterAnimation()
+  swipeEnterDirection.value = direction
+  swipeEnterTimer = setTimeout(() => {
+    swipeEnterTimer = null
+    swipeEnterDirection.value = 0
+  }, 260)
+}
+
+const handlePanelAnimationEnd = (event) => {
+  if (event.target === panelElement.value && swipeEnterDirection.value !== 0) {
+    clearSwipeEnterAnimation()
+  }
+}
+
+const handleSwipeSwitch = (direction) => {
+  const targetTab = findAdjacentEnabledTab(direction)
+  if (!targetTab) return
+
+  triggerSwipeEnterAnimation(direction)
+  if (props.useRouter && router) {
+    router.replace(resolveTabLocation(targetTab.name))
+  }
+  emit('update:modelValue', targetTab.name)
+  emit('tab-change', targetTab.name)
+}
+
+const { swipeState } = useTabSwipe({
+  elementRef: panelElement,
+  enabled: () => props.swipeable && !props.navigationOnly,
+  canSwipe: (direction) => Boolean(findAdjacentEnabledTab(direction)),
+  onSwipe: handleSwipeSwitch,
+})
+
+const panelSwipeStyle = computed(() => {
+  if (!swipeState.value.dragging && !swipeState.value.settling) {
+    return undefined
+  }
+  return {
+    transform: `translate3d(${swipeState.value.offsetX}px, 0, 0)`,
+  }
+})
+
+const showSwipeEdgeGlow = computed(() => {
+  return !props.navigationOnly && swipeState.value.dragging && swipeState.value.progress > 0.05
+})
+
+const swipeEdgeGlowStyle = computed(() => {
+  const { progress, ready, atBoundary } = swipeState.value
+  const opacity = atBoundary
+    ? Number((0.18 + progress * 0.2).toFixed(2))
+    : Number((0.28 + progress * 0.52 + (ready ? 0.16 : 0)).toFixed(2))
+  const scaleX = Number((0.72 + progress * 0.36 + (ready ? 0.14 : 0)).toFixed(3))
+  const scaleY = Number((0.86 + progress * 0.14 + (ready ? 0.06 : 0)).toFixed(3))
+  return {
+    '--swipe-glow-opacity': opacity,
+    '--swipe-glow-scale-x': scaleX,
+    '--swipe-glow-scale-y': scaleY,
+  }
+})
+
+onBeforeUnmount(() => {
+  clearSwipeEnterAnimation()
+})
 
 const handleTabKeydown = (event) => {
   if (props.useRouter) return
@@ -280,6 +398,132 @@ watch(currentTab, () => {
   flex: 1;
   width: 100%;
   min-width: 0;
+
+  &--swiping {
+    will-change: transform;
+  }
+
+  &--settling {
+    transition: transform 0.26s cubic-bezier(0.22, 1.2, 0.36, 1);
+    will-change: transform;
+  }
+
+  &--enter-next {
+    animation: tab-swipe-enter-next 0.24s cubic-bezier(0.22, 1.12, 0.36, 1);
+  }
+
+  &--enter-prev {
+    animation: tab-swipe-enter-prev 0.24s cubic-bezier(0.22, 1.12, 0.36, 1);
+  }
+}
+
+.tab-swipe-edge-glow {
+  position: fixed;
+  top: 50%;
+  z-index: 950;
+  width: 44px;
+  height: min(36dvh, 240px);
+  pointer-events: none;
+  opacity: var(--swipe-glow-opacity, 0);
+  transition: opacity 0.12s ease, transform 0.14s cubic-bezier(0.22, 1.12, 0.36, 1);
+  will-change: transform, opacity;
+
+  &--right {
+    right: 0;
+    transform-origin: right center;
+    transform: translateY(-50%) scaleX(var(--swipe-glow-scale-x, 1)) scaleY(var(--swipe-glow-scale-y, 1));
+    border-radius: 999px 0 0 999px;
+    background:
+      radial-gradient(
+        ellipse 100% 52% at 100% 50%,
+        rgba(var(--color-primary-rgb), 0.26) 0%,
+        var(--glass-highlight, var(--glass-50)) 36%,
+        transparent 76%
+      );
+    box-shadow: inset 1.5px 0 0 var(--glass-highlight, var(--glass-60));
+  }
+
+  &--left {
+    left: 0;
+    transform-origin: left center;
+    transform: translateY(-50%) scaleX(var(--swipe-glow-scale-x, 1)) scaleY(var(--swipe-glow-scale-y, 1));
+    border-radius: 0 999px 999px 0;
+    background:
+      radial-gradient(
+        ellipse 100% 52% at 0% 50%,
+        rgba(var(--color-primary-rgb), 0.26) 0%,
+        var(--glass-highlight, var(--glass-50)) 36%,
+        transparent 76%
+      );
+    box-shadow: inset -1.5px 0 0 var(--glass-highlight, var(--glass-60));
+  }
+
+  &--ready {
+    &.tab-swipe-edge-glow--right {
+      background:
+        radial-gradient(
+          ellipse 100% 54% at 100% 50%,
+          rgba(var(--color-primary-rgb), 0.42) 0%,
+          var(--glass-highlight, var(--glass-80)) 42%,
+          transparent 80%
+        );
+    }
+
+    &.tab-swipe-edge-glow--left {
+      background:
+        radial-gradient(
+          ellipse 100% 54% at 0% 50%,
+          rgba(var(--color-primary-rgb), 0.42) 0%,
+          var(--glass-highlight, var(--glass-80)) 42%,
+          transparent 80%
+        );
+    }
+  }
+
+  &--boundary {
+    filter: saturate(0.45);
+  }
+}
+
+@keyframes tab-swipe-enter-next {
+  from {
+    opacity: 0.72;
+    transform: translate3d(22px, 0, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes tab-swipe-enter-prev {
+  from {
+    opacity: 0.72;
+    transform: translate3d(-22px, 0, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab-content {
+    &--settling {
+      transition: none;
+    }
+
+    &--enter-next,
+    &--enter-prev {
+      animation: none;
+    }
+  }
+
+  .tab-swipe-edge-glow {
+    transition: none;
+  }
 }
 
 .tabs-wrapper--adaptive {
@@ -290,8 +534,8 @@ watch(currentTab, () => {
     @include flex-col;
     align-items: stretch;
     position: fixed;
-    top: 140px;
-    left: 2rem;
+    top: calc(140px + env(safe-area-inset-top, 0px));
+    left: calc(2rem + env(safe-area-inset-left, 0px));
     width: 136px;
     max-height: calc(100dvh - 160px);
     overflow-y: auto;

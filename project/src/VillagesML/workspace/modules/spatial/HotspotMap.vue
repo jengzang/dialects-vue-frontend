@@ -32,7 +32,8 @@
 
       <!-- 村莊詳情彈窗 -->
       <Teleport to="body">
-        <div v-if="showPopup && selectedVillage" class="village-popup-overlay" @click="closePopup">
+        <div v-if="showPopup && selectedVillage" v-native-back="closePopup"
+          class="village-popup-overlay" @click="closePopup">
           <div class="village-popup-content" @click.stop>
             <div class="popup-header">
               <h3>{{ selectedVillage.village_name }}</h3>
@@ -64,6 +65,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, onMounted, onBeforeUnmount, shallowRef, nextTick, watch, computed } from 'vue'
 import maplibregl from 'maplibre-gl'
@@ -297,7 +299,6 @@ const toggleFullScreen = async () => {
 const handleStyleChange = () => {
   if (!map.value) return
   const newStyle = mapStyle(currentStyleKey.value)
-  map.value.setStyle(newStyle)
 
   // 樣式加載完成後重新渲染
   map.value.once('style.load', () => {
@@ -305,6 +306,7 @@ const handleStyleChange = () => {
       renderHotspot()
     }
   })
+  map.value.setStyle(newStyle, { diff: false })
 }
 
 const resetView = () => {

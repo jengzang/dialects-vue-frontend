@@ -8,12 +8,26 @@
         </div>
       </div>
 
-      <div class="map-controls" v-if="!isFullScreen">
+      <div class="map-controls" v-if="showControls && !isFullScreen">
         <div class="control-group">
           <SimpleSelectDropdown
             v-model="currentStyleKey"
             :options="mapStyleOptions"
             @update:modelValue="handleStyleChange"
+          />
+        </div>
+
+        <div class="control-group partition-color-switch">
+          <CheckBox
+            v-model="useCustomPartitionColors"
+            :label="t('map.mapLibre.controls.useCustomPartitionColors')"
+            :font-size="13"
+            @change="toggleCustomPartitionColors"
+          />
+          <HelpIcon
+            size="sm"
+            :content="t('map.mapLibre.controls.useCustomPartitionColorsHelp')"
+            tooltip-max-width="280px"
           />
         </div>
 
@@ -54,7 +68,11 @@ import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import {mapStyle, calculateDenseMapCenterAndZoom, mapStyleConfig} from '@/utils/map/MapSource.js'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
+import CheckBox from '@/components/selector/CheckBox.vue'
+import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import { FEATURE_PALETTE } from '@/main/config/colors/mapColors.js'
+import { userStore } from '@/main/store/store.js'
+import { usePartitionColors } from '@/composables/data/usePartitionColors.js'
 
 defineOptions({ name: "VocabularyMap" })
 
@@ -67,6 +85,18 @@ const props = defineProps({
   activeTab: {
     type: String,
     default: 'vocabulary'
+  },
+  showControls: {
+    type: Boolean,
+    default: true
+  },
+  enableCustomPartitionColors: {
+    type: Boolean,
+    default: true
+  },
+  overviewPartitionColors: {
+    type: Boolean,
+    default: true
   }
 })
 const emit = defineEmits(['marker-click'])
@@ -105,6 +135,25 @@ const isFullScreen = ref(false)
 const mapLoaded = ref(false)  // 跟踪地图是否已加载
 const isLoadingMarkers = ref(false)  // 跟踪标记是否正在加载
 const { t } = useI18n()
+const { loadPartitionColors, getPartitionColor, getContrastTextColor, colorVersion } = usePartitionColors()
+const useCustomPartitionColors = ref(props.enableCustomPartitionColors)
+const partitionIdentity = computed(() => JSON.stringify([userStore.role, userStore.id]))
+
+const ensurePartitionColors = async () => {
+  if (!useCustomPartitionColors.value) return
+  try {
+    await loadPartitionColors('yindian', partitionIdentity.value)
+    if (map.value) renderMarkers()
+  } catch (error) {
+    console.warn('Failed to load vocabulary partition colors:', error)
+  }
+}
+
+const toggleCustomPartitionColors = async (enabled) => {
+  useCustomPartitionColors.value = enabled
+  if (enabled) await ensurePartitionColors()
+  else renderMarkers()
+}
 
 let currentMarkers = []
 
@@ -364,7 +413,15 @@ function normalizeOverviewCount(count, scale) {
   return clampNumber((scaledCount - scale.p5) / (scale.p95 - scale.p5), 0, 1)
 }
 
-function getOverviewMarkerStyle(count, scale) {
+function getOverviewMarkerStyle(count, scale, yindianRegion) {
+  if (useCustomPartitionColors.value && props.overviewPartitionColors && yindianRegion) {
+    const color = String(yindianRegion).split(' / ')
+      .map(path => getPartitionColor('yindian', partitionIdentity.value, path.trim()))
+      .find(Boolean)
+    if (color) {
+      return { color, textColor: getContrastTextColor(color), fontSize: `${OVERVIEW_MARKER_FONT_SIZE}px` }
+    }
+  }
   const normalized = normalizeOverviewCount(count, scale)
   const colorIndex = Math.min(
     OVERVIEW_MARKER_COLORS.length - 1,
@@ -475,7 +532,7 @@ const convertToGeoJSON = (data) => {
       ...Object.fromEntries(TONE_FIELD_KEYS.map(key => [key, aggregateField(item => item[key])])),
     }
 
-    // 计算颜色（基于合并后的文字）
+    // 计算颜色（优先使用音典分区颜色）
     let bgColor, textColor
     if (isOverviewMode) {
       bgColor = 'transparent'
@@ -486,6 +543,20 @@ const convertToGeoJSON = (data) => {
     } else {
       bgColor = assignColor(mergedText)
       textColor = '#1d1d1f'
+    }
+
+    if (!isOverviewMode && useCustomPartitionColors.value) {
+      const partitionPaths = String(aggregatedData.yindianRegion || '')
+        .split(' / ')
+        .map(path => path.trim())
+        .filter(Boolean)
+      const customBackground = partitionPaths
+        .map(path => getPartitionColor('yindian', partitionIdentity.value, path))
+        .find(Boolean)
+      if (customBackground) {
+        bgColor = customBackground
+        textColor = getContrastTextColor(customBackground)
+      }
     }
 
     deduplicatedFeatures.push({
@@ -500,7 +571,7 @@ const convertToGeoJSON = (data) => {
         markerMode: displayMode.value,
         bgColor: bgColor,
         textColor: textColor,
-        overviewStyle: isOverviewMode ? getOverviewMarkerStyle(overviewCount, overviewScale) : null,
+        overviewStyle: isOverviewMode ? getOverviewMarkerStyle(overviewCount, overviewScale, aggregatedData.yindianRegion) : null,
         // 使用聚合后的数据用于弹窗
         ...aggregatedData,
         // 添加额外信息：此位置的数据点数量
@@ -631,11 +702,10 @@ const handleStyleChange = () => {
   if (!map.value) return
   const newStyle = mapStyle(currentStyleKey.value)
 
-  map.value.setStyle(newStyle)
-
   map.value.once('style.load', () => {
     renderMarkers()
   })
+  map.value.setStyle(newStyle, { diff: false })
 }
 
 // 初始化地图
@@ -666,6 +736,7 @@ const initMap = () => {
 // --- Lifecycle ---
 onMounted(() => {
   initMap()
+  ensurePartitionColors()
 })
 
 onBeforeUnmount(() => {
@@ -699,6 +770,10 @@ watch(displayModeOptions, () => {
 })
 
 watch(displayMode, () => {
+  renderMarkers()
+})
+
+watch(colorVersion, () => {
   renderMarkers()
 })
 </script>
@@ -793,6 +868,16 @@ watch(displayMode, () => {
   width: 100%;
   position: relative;
   display: flex;
+}
+
+.partition-color-switch {
+  align-items: center;
+  gap: 4px;
+}
+
+.partition-color-switch :deep(.checkbox-wrapper) {
+  flex: 1;
+  min-width: 0;
 }
 
 /* 自定义 Select */

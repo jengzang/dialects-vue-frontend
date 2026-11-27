@@ -111,7 +111,8 @@
 
     <!-- Settings Sidebar -->
     <Transition name="overlay">
-      <div v-if="showSettings" class="sidebar-overlay" @click="showSettings = false"></div>
+      <div v-if="showSettings" v-native-back="() => showSettings = false"
+        class="sidebar-overlay" @click="showSettings = false"></div>
     </Transition>
 
     <Transition name="sidebar">
@@ -145,6 +146,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import BarIcon from '@/components/common/BarIcon.vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import TabSwitcher from '@/components/common/TabSwitcher.vue'
@@ -608,11 +610,7 @@ const startAnalysis = async () => {
     return
   }
   if (!isPraatFileAcceptedOnPlatform(audioFile.value, praatPlatformTarget)) {
-    showError(
-      praatPlatformTarget === 'ios' || praatPlatformTarget === 'android'
-        ? t('praat.audioInput.errors.nativeUnsupportedFormat')
-        : t('praat.audioInput.errors.unsupportedFormat')
-    )
+    showError(t('praat.audioInput.errors.unsupportedFormat'))
     return
   }
 
@@ -945,8 +943,8 @@ onBeforeUnmount(() => {
 /* Login Prompt */
 .login-prompt {
   position: fixed;
-  top: 2rem;
-  right: 2rem;
+  top: calc(2rem + env(safe-area-inset-top, 0px));
+  right: calc(2rem + env(safe-area-inset-right, 0px));
   z-index: 200;
 }
 
@@ -1151,9 +1149,9 @@ onBeforeUnmount(() => {
 .settings-sidebar {
   position: fixed;
   /* 调整位置，让它悬浮起来更有“液态”感 */
-  top: 15px;
-  left: 15px;
-  bottom: 15px;
+  top: calc(15px + env(safe-area-inset-top, 0px));
+  left: calc(15px + env(safe-area-inset-left, 0px));
+  bottom: calc(15px + env(safe-area-inset-bottom, 0px));
   width: 380px;
   max-width: calc(100vw - 30px);
 
@@ -1240,7 +1238,7 @@ onBeforeUnmount(() => {
 /* Audio Preview Floating Window */
 .audio-preview-float {
   position: fixed;
-  right: 2rem;
+  right: calc(2rem + env(safe-area-inset-right, 0px));
   width: 320px;
   max-width: calc(100vw - 4rem);
   background: var(--glass-80);
@@ -1293,7 +1291,7 @@ onBeforeUnmount(() => {
   .audio-preview-float {
     position: fixed;
     bottom: auto;
-    top: 8dvh;
+    top: calc(8dvh + env(safe-area-inset-top, 0px));
     max-height: 90dvh;
     // overflow-y: auto;
     left: 0;

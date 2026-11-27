@@ -194,6 +194,7 @@
     "about": "关于",
     "tools": "工具",
     "praat": "praat",
+    "application": "下载",
     "gis": "GIS",
     "phrases": "词句",
     "vocabulary": "词表",
@@ -229,6 +230,12 @@
         "dark": "深色",
         "green": "绿色"
       }
+    },
+    "fontSize": {
+      "title": "字号缩放",
+      "description": "调整全站文字大小（85% – 125%），仅缩放字体，不影响整体布局。",
+      "reset": "恢复默认",
+      "preview": "方音图鉴 · 方言比较与地理语言学平台"
     },
     "interfaceMode": {
       "title": "页面风格",

@@ -1,3 +1,5 @@
+import { getPlatformFileService } from './files.js'
+import { registerNativeFileService } from './fileExport.js'
 import { Preferences as CapacitorPreferences } from '@capacitor/preferences'
 
 import { detectRuntimePlatform } from './runtime.js'
@@ -15,6 +17,9 @@ export async function initializePlatformServices(options = {}) {
   const globals = getGlobals(options)
   const runtime = options.runtime ?? detectRuntimePlatform({ globals })
   const preferences = options.preferences ?? CapacitorPreferences
+  if (runtime?.container === 'native-webview') {
+    registerNativeFileService(getPlatformFileService({ globals }))
+  }
 
   if (runtime?.container === 'native-webview' && isCapacitorPluginAvailable(globals, 'Preferences')) {
     await registerCapacitorPreferencesStorage(preferences)
@@ -23,4 +28,5 @@ export async function initializePlatformServices(options = {}) {
 
 export function resetPlatformServicesForTests() {
   resetCapacitorPreferencesStorageForTests()
+  registerNativeFileService(null)
 }

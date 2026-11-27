@@ -619,10 +619,10 @@ const handleCopy = async () => {
   }
 };
 
-const handleExport = () => {
+const handleExport = async () => {
   isExportDropdownOpen.value = false;
   const rows = [EXPORT_HEADERS, ...buildExportRows()];
-  downloadText(toCsv(rows), `查詢結果_${Date.now()}.csv`);
+  await downloadText(toCsv(rows), `查詢結果_${Date.now()}.csv`);
   showSuccess(t('result.resultList.export.exported'));
 };
 

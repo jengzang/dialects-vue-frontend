@@ -67,6 +67,7 @@
 </template>
 
 <script setup>
+import { trackNativeMapPopup } from '@/platform/backRegistry.js'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { ref, computed, watch, shallowRef, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -200,11 +201,11 @@ const bindClusteredInteractions = () => {
 
   unbindClusteredInteractions()
 
-  clusteredPopup = new maplibregl.Popup({
+  clusteredPopup = trackNativeMapPopup(new maplibregl.Popup({
     closeButton: false,
     closeOnClick: false,
     offset: 10
-  })
+  }))
 
   clusteredInteractionHandlers = {
     clickClusters: (e) => {
@@ -459,11 +460,11 @@ const renderWithoutClustering = (geojsonData) => {
     }
   })
 
-  const dialectPopup = new maplibregl.Popup({
+  const dialectPopup = trackNativeMapPopup(new maplibregl.Popup({
     closeButton: false,
     closeOnClick: false,
     offset: 10
-  })
+  }))
 
   map.value.on('mouseenter', 'unclustered-point-bg', (e) => {
     map.value.getCanvas().style.cursor = 'pointer'
@@ -509,10 +510,10 @@ const resetView = () => {
 const changeMapStyle = () => {
   if (!map.value) return
   const newStyle = mapStyle(currentStyle.value)
-  map.value.setStyle(newStyle)
   map.value.once('style.load', () => {
     renderMarkers()
   })
+  map.value.setStyle(newStyle, { diff: false })
 }
 
 // 清理地图
@@ -776,24 +777,6 @@ $success: var(--color-success);/* 地图容器 */
   &:hover {
     background: var(--bg-white);
     transform: scale(1.05);
-  }
-}
-
-/* MapLibre 动态弹窗 */
-:deep(.maplibregl-popup-content) {
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: var(--radius-sm2);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  color: #1d1d1f;
-  font-size: var(--font-size-13);
-  line-height: 1.6;
-
-  @include glass-blur(10px);
-
-  strong {
-    color: #1d1d1f;
-    font-weight: 700;
   }
 }
 

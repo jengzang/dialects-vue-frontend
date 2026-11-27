@@ -187,15 +187,26 @@ async function capacitorPayloadToFile(payload, options = {}) {
     const fileUri = typeof globals?.Capacitor?.convertFileSrc === 'function'
       ? globals.Capacitor.convertFileSrc(payload.path)
       : payload.path
-    const response = await fetchApi(fileUri)
-    if (response?.ok === false || typeof response?.blob !== 'function') {
+
+    try {
+      const response = await fetchApi(fileUri)
+      blob = await response.blob()
+    } catch (error) {
       throw createPlatformFileError(
         'NATIVE_FILE_READ_FAILED',
-        'Failed to read native file'
+        'Failed to read native file',
+        error
       )
     }
 
-    blob = await response.blob()
+    // Custom schemes (iOS capacitor://) report status 0 / ok=false for readable
+    // media files, so success must be judged by content, not response.ok.
+    if (!blob?.size) {
+      throw createPlatformFileError(
+        'NATIVE_FILE_READ_FAILED',
+        'Native file is empty'
+      )
+    }
   }
 
   if (!blob) {
@@ -256,8 +267,18 @@ async function saveBlobWithCapacitor(blob, fileName, base64, options = {}) {
     ? await CapacitorShare.canShare()
     : { value: true }
 
-  if (canShareResult?.value) {
+  if (!canShareResult?.value) {
+    throw createPlatformFileError('NATIVE_SHARE_UNAVAILABLE', 'System sharing is unavailable')
+  }
+  try {
     await CapacitorShare.share(sharePayload)
+  } catch (error) {
+    if (isFilePickerCanceled(error)) {
+      const canceled = createPlatformFileError('NATIVE_SHARE_CANCELED', 'Share canceled', error)
+      canceled.name = 'AbortError'
+      throw canceled
+    }
+    throw error
   }
 
   return {
@@ -394,6 +415,9 @@ export function getPlatformFileService(options = {}) {
         }
       }
 
+      if (isNativeCapacitorApp(getGlobals(options))) {
+        throw createPlatformFileError('NATIVE_SHARE_UNAVAILABLE', 'System sharing is unavailable')
+      }
       return saveBlobWithBrowserDownload(blob, fileName, options)
     },
   }

@@ -385,6 +385,7 @@
 </template>
 
 <script setup>
+import { getCurrentRuntimePlatform, getPlatformFileService } from '@/platform/index.js'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import BarIcon from '@/components/common/BarIcon.vue'
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
@@ -1002,7 +1003,7 @@ const formatNumber = (num) => {
   return typeof num === 'number' ? num.toFixed(4) : 'N/A'
 }
 
-const exportResults = () => {
+const exportResults = async () => {
   if (!extractionResults.value) {
     showWarning('請先執行特徵提取')
     return
@@ -1025,11 +1026,15 @@ const exportResults = () => {
 
   // Download file
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-  const link = document.createElement('a')
-  link.href = URL.createObjectURL(blob)
-  link.download = `feature_extraction_${Date.now()}.csv`
-  link.click()
-  URL.revokeObjectURL(link.href)
+  if (getCurrentRuntimePlatform().container === 'native-webview') {
+    await getPlatformFileService().saveBlob(blob, `feature_extraction_${Date.now()}.csv`)
+  } else {
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = `feature_extraction_${Date.now()}.csv`
+    link.click()
+    URL.revokeObjectURL(link.href)
+  }
 
   showSuccess('CSV 導出成功')
 }

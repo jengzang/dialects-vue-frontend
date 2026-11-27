@@ -3,6 +3,7 @@
 
 import common from './common.json'
 import navigation from './navigation.json'
+import application from './application.json'
 import messages from './messages.json'
 import query from './query.json'
 import auth from './auth.json'
@@ -29,6 +30,7 @@ import layoutFooter from './layoutFooter.json'
 export default {
   common,
   navigation,
+  application,
   messages,
   query,
   auth,

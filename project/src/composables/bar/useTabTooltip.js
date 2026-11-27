@@ -16,7 +16,7 @@ export function useTabTooltip() {
 
     const rect = target.getBoundingClientRect()
     const viewportWidth = window.innerWidth
-    const estimatedWidth = Math.min(target.querySelector('.label')?.scrollWidth + 24 || 100, 260)
+    const estimatedWidth = Math.min((target.querySelector('.label-text') || target.querySelector('.label'))?.scrollWidth + 24 || 100, 260)
 
     let x
     if (rect.right + 6 + estimatedWidth <= viewportWidth - 10) {
@@ -35,7 +35,7 @@ export function useTabTooltip() {
 
   const handleMouseEnter = (event, label) => {
     const target = event.currentTarget
-    const labelEl = target.querySelector('.label')
+    const labelEl = target.querySelector('.label-text') || target.querySelector('.label')
     if (!labelEl) return
 
     if (labelEl.scrollWidth <= labelEl.clientWidth) return
@@ -51,7 +51,7 @@ export function useTabTooltip() {
 
   const handleTouchStart = (event, label) => {
     const target = event.currentTarget
-    const labelEl = target.querySelector('.label')
+    const labelEl = target.querySelector('.label-text') || target.querySelector('.label')
     if (!labelEl) return
 
     if (labelEl.scrollWidth <= labelEl.clientWidth) return

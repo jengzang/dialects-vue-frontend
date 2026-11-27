@@ -429,7 +429,9 @@
       "subtitle": "感谢您的支持！ 💖"
     },
     "weixinAlt": "微信收款二维码",
-    "alipayAlt": "支付宝收款二维码"
+    "weixinLabel": "微信",
+    "alipayAlt": "支付宝收款二维码",
+    "alipayLabel": "支付宝"
   },
   "settings": {
     "tutorialToggle": {

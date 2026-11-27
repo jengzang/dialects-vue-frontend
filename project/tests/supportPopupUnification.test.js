@@ -7,6 +7,7 @@ const testsDir = dirname(fileURLToPath(import.meta.url))
 const projectRoot = resolve(testsDir, '..')
 
 const supportPopupPath = resolve(projectRoot, 'src/main/components/user/popups/SupportPopup.vue')
+const donorSectionPath = resolve(projectRoot, 'src/main/components/user/DonorSection.vue')
 const homeSupportPopupPath = resolve(projectRoot, 'src/main/components/popup/HomeSupportPopup.vue')
 const homePagePath = resolve(projectRoot, 'src/main/views/HomePage.vue')
 const likeAuthorPath = resolve(projectRoot, 'src/main/views/intro/LikeAuthor.vue')
@@ -30,28 +31,34 @@ describe('support popup unification', () => {
     expect(existsSync(homeSupportPopupPath)).toBe(false)
   })
 
-  it('keeps the shared popup content and donor list scaffolding in SupportPopup', () => {
+  it('shares the donor list between SupportPopup and the About page', () => {
     const source = readSource(supportPopupPath)
 
     expect(source).toContain("t('home.supportModal.title')")
     expect(source).toContain("t('home.supportModal.subtitle')")
     expect(source).toContain("t('home.supportModal.weixinLabel')")
     expect(source).toContain("t('home.supportModal.alipayLabel')")
-    expect(source).toContain("t('home.supportModal.donorThanks')")
-    expect(source).toContain("t('home.supportModal.donorColumns.time')")
-    expect(source).toContain("t('home.supportModal.donorColumns.donor')")
-    expect(source).toContain("t('home.supportModal.donorColumns.amount')")
-    expect(source).toContain("t('home.supportModal.donorColumns.method')")
-    expect(source).toContain('<table class="donor-table">')
-    expect(source).toContain('const donors = [')
-    expect(source).toContain("amount: '100.00'")
-    expect(source).toContain("amount: '9.90'")
-    expect(source).toContain("amount: '1.00'")
-    expect(source).toContain("amount: '7.00'")
-    expect(source).not.toContain("amount: '100元'")
-    expect(source).not.toContain("amount: '1元'")
-    expect(source).toContain('const sortedDonors = [...donors].sort((left, right) =>')
-    expect(source).toContain('new Date(left.sortTime) - new Date(right.sortTime)')
+    expect(source).toContain('<DonorSection')
+    expect(source).not.toContain('const donors = [')
+
+    const donorSource = readSource(donorSectionPath)
+    expect(donorSource).toContain("t('home.supportModal.donorThanks')")
+    expect(donorSource).toContain("t('home.supportModal.donorColumns.time')")
+    expect(donorSource).toContain("t('home.supportModal.donorColumns.donor')")
+    expect(donorSource).toContain("t('home.supportModal.donorColumns.amount')")
+    expect(donorSource).toContain("t('home.supportModal.donorColumns.method')")
+    expect(donorSource).toContain('<table class="donor-table">')
+    expect(donorSource).toContain('const donors = [')
+    expect(donorSource).toContain("amount: '100.00'")
+    expect(donorSource).toContain("amount: '9.90'")
+    expect(donorSource).toContain("amount: '1.00'")
+    expect(donorSource).toContain("amount: '7.00'")
+    expect(donorSource).not.toContain("amount: '100元'")
+    expect(donorSource).not.toContain("amount: '1元'")
+    expect(donorSource).toContain('const sortedDonors = [...donors].sort((left, right) =>')
+    expect(donorSource).toContain('new Date(left.sortTime) - new Date(right.sortTime)')
+
+    expect(readSource(aboutSupportPath)).toContain('<DonorSection')
   })
 
   it('updates the homepage to import the renamed SupportPopup component', () => {
@@ -62,20 +69,15 @@ describe('support popup unification', () => {
     expect(source).toContain('<SupportPopup')
   })
 
-  it('keeps the like-author entry in AboutPage and opens the shared popup', () => {
+  it('keeps the like-author entry in AboutPage and shows payment QR codes inline', () => {
     expect(existsSync(likeAuthorPath)).toBe(false)
     expect(readSource(aboutPagePath)).toContain('v-if="currentTab === \'like\'"')
     const supportSource = readSource(aboutSupportPath)
-    expect(supportSource).toContain(':visible="showQRCodes"')
-    expect(supportSource).toContain('@close="showQRCodes = false"')
-  })
-
-  it('replaces the inline AboutPage modal with the shared SupportPopup component', () => {
-    const source = readSource(aboutSupportPath)
-
-    expect(source).toContain("import SupportPopup from '@/main/components/user/popups/SupportPopup.vue'")
-    expect(source).toContain('<SupportPopup')
-    expect(source).not.toContain('<AppModal')
+    expect(supportSource).toContain("const weixinQR = '/brand/weixin.webp'")
+    expect(supportSource).toContain("const alipayQR = '/brand/zfb.webp'")
+    expect(supportSource).toContain('class="donate-qr-grid"')
+    expect(supportSource).not.toContain('<SupportPopup')
+    expect(supportSource).not.toContain('<AppModal')
   })
 
   it('adds donor thanks and table column labels to all three home locale files', () => {

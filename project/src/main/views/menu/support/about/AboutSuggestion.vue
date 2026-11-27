@@ -1,6 +1,7 @@
 <template>
-  <div class="page2">
+  <div class="suggestion-page">
     <h1 class="page-title about-page-title"><BarIcon icon="💬" /><span>{{ $t('navigation.pageTitles.support.aboutSuggestion') }}</span></h1>
+    <QQGroupContact class="suggestion-qq-group" />
     <TabSwitcher
       mode="segmented"
       navigation-only
@@ -167,6 +168,7 @@ import { computed, nextTick, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import BarIcon from '@/components/common/BarIcon.vue'
+import QQGroupContact from '@/components/common/QQGroupContact.vue'
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
 import TabSwitcher from '@/components/common/TabSwitcher.vue'
@@ -227,7 +229,7 @@ onMounted(() => {
 @use './aboutShared' as *;
 
 /* 建议页面 */
-.page2 {
+.suggestion-page {
   @include flex-col;
 
   width: 100%;
@@ -236,6 +238,7 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   margin: 0 auto;
+  gap: 0.5rem;
   padding: 0.5rem 8dvw 1dvw;
   box-sizing: border-box;
   // background: var(--glass-05);
@@ -419,7 +422,7 @@ onMounted(() => {
 }
 
 @media (max-aspect-ratio: #{1 / 1}) {
-  .page2 {
+  .suggestion-page {
     max-width: none;
     padding: 0.5rem 14px 10px;
     font-size: var(--font-size-16);
@@ -462,7 +465,7 @@ onMounted(() => {
   }
 
   .suggestion-form-section {
-    margin-top: 22px;
+    // margin-top: 22px;
     padding: 16px;
   }
 

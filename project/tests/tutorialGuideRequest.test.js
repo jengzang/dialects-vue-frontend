@@ -119,10 +119,9 @@ describe('tutorial guide open request bridge', () => {
     expect(wrapper.host.querySelector('[data-tutorial-modal]')).toBeNull()
 
     requestCurrentTutorialGuideOpen()
-    await nextTick()
-    await nextTick()
-
-    expect(wrapper.host.querySelector('[data-tutorial-modal]')).toBeTruthy()
+    await vi.waitFor(() => {
+      expect(wrapper.host.querySelector('[data-tutorial-modal]')).toBeTruthy()
+    })
 
     wrapper.unmount()
   })
@@ -139,10 +138,9 @@ describe('tutorial guide open request bridge', () => {
     expect(wrapper.host.querySelector('[data-tutorial-modal]')).toBeNull()
 
     requestCurrentTutorialGuideOpen()
-    await nextTick()
-    await nextTick()
-
-    expect(wrapper.host.querySelector('[data-tutorial-modal]')).toBeTruthy()
+    await vi.waitFor(() => {
+      expect(wrapper.host.querySelector('[data-tutorial-modal]')).toBeTruthy()
+    })
 
     wrapper.unmount()
   })

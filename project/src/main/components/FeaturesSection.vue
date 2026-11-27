@@ -225,62 +225,6 @@ const groups = [
     ],
   },
   {
-    id: 'map',
-    icon: '🗺️',
-    titleKey: 'home.features.map.title',
-    descKey: 'home.features.map.desc',
-    items: [
-      {
-        icon: '🗺️',
-        labelKey: 'home.features.map.dialectMap',
-        route: '/menu/map/view',
-        search: {
-          keywords: ['地图', '方言地图', 'map'],
-          i18nKeys: [
-            'layoutFooter.pages.menuMapView.description',
-            'navigation.pageTitles.map.view',
-          ],
-        },
-      },
-      {
-        icon: '🎨',
-        labelKey: 'home.features.map.regionMap',
-        route: '/menu/map/divide',
-        search: {
-          keywords: ['分区', '方言区', '分区着色', 'region', '等值线'],
-          i18nKeys: [
-            'layoutFooter.pages.menuMapDivide.description',
-            'navigation.pageTitles.map.divide',
-          ],
-        },
-      },
-      {
-        icon: '🗂️',
-        labelKey: 'home.features.map.customMap',
-        route: '/menu/map/custom',
-        search: {
-          keywords: ['自定义', '个人数据', '上传', 'custom'],
-          i18nKeys: [
-            'layoutFooter.pages.menuMapCustom.description',
-            'navigation.pageTitles.map.custom',
-          ],
-        },
-      },
-      {
-        icon: '✏️',
-        labelKey: 'home.features.map.drawMap',
-        route: '/explore/gis',
-        search: {
-          keywords: ['GIS', '泰森多边形', '绘制', '地理要素', 'draw', 'voronoi'],
-          i18nKeys: [
-            'layoutFooter.pages.exploreGis.description',
-            'navigation.pageTitles.gis.main',
-          ],
-        },
-      },
-    ],
-  },
-  {
     id: 'phonology',
     icon: '🧬',
     titleKey: 'home.features.phonology.title',
@@ -331,62 +275,6 @@ const groups = [
           i18nKeys: [
             'layoutFooter.pages.menuPhoCount.description',
             'navigation.pageTitles.pho.count',
-          ],
-        },
-      },
-    ],
-  },
-  {
-    id: 'charClass',
-    icon: '📚',
-    titleKey: 'home.features.charClass.title',
-    descKey: 'home.features.charClass.desc',
-    items: [
-      {
-        icon: '📜',
-        labelKey: 'home.features.charClass.zhonggu',
-        route: '/explore/char-class?tab=zhonggu',
-        search: {
-          keywords: ['中古', '广韵', '切韵', 'Middle Chinese'],
-          i18nKeys: [
-            'layoutFooter.pages.exploreCharClass.description',
-            'navigation.pageTitles.charClass.zhonggu',
-          ],
-        },
-      },
-      {
-        icon: '🏛️',
-        labelKey: 'home.features.charClass.shanggu',
-        route: '/explore/char-class?tab=shanggu',
-        search: {
-          keywords: ['上古', '诗经', '谐声', '上古音', 'Old Chinese'],
-          i18nKeys: [
-            'layoutFooter.pages.exploreCharClass.description',
-            'navigation.pageTitles.charClass.shanggu',
-          ],
-        },
-      },
-      {
-        icon: '📖',
-        labelKey: 'home.features.charClass.jingu',
-        route: '/explore/char-class?tab=jingu',
-        search: {
-          keywords: ['近古', '中原音韵', '洪武正韵', '近代音', 'Early Mandarin'],
-          i18nKeys: [
-            'layoutFooter.pages.exploreCharClass.description',
-            'navigation.pageTitles.charClass.jingu',
-          ],
-        },
-      },
-      {
-        icon: '🎵',
-        labelKey: 'home.features.charClass.yueyun',
-        route: '/explore/char-class?tab=yueyun',
-        search: {
-          keywords: ['粤语', '分韵撮要', '韵书', '粤音', 'Cantonese'],
-          i18nKeys: [
-            'layoutFooter.pages.exploreCharClass.description',
-            'navigation.pageTitles.charClass.yueyun',
           ],
         },
       },
@@ -449,56 +337,56 @@ const groups = [
     ],
   },
   {
-    id: 'villages',
-    icon: '🏘️',
-    titleKey: 'home.features.villages.title',
-    descKey: 'home.features.villages.desc',
+    id: 'map',
+    icon: '🗺️',
+    titleKey: 'home.features.map.title',
+    descKey: 'home.features.map.desc',
     items: [
       {
-        icon: '📍',
-        labelKey: 'home.features.villages.toponyms',
-        route: '/explore/villages/toponyms',
+        icon: '🗺️',
+        labelKey: 'home.features.map.dialectMap',
+        route: '/menu/map/view',
         search: {
-          keywords: ['地名', '自然村', '分布', '地名检索', 'toponym'],
+          keywords: ['地图', '方言地图', 'map'],
           i18nKeys: [
-            'layoutFooter.pages.exploreVillagesToponyms.description',
-            'navigation.pageTitles.villages.toponyms',
+            'layoutFooter.pages.menuMapView.description',
+            'navigation.pageTitles.map.view',
           ],
         },
       },
       {
-        icon: '🤖',
-        labelKey: 'home.features.villages.villagesML',
-        route: '/explore/villages/ml',
+        icon: '🎨',
+        labelKey: 'home.features.map.regionMap',
+        route: '/menu/map/divide',
         search: {
-          keywords: ['机器学习', '村名', '聚类', '分析', 'machine learning'],
+          keywords: ['分区', '方言区', '分区着色', 'region', '等值线'],
           i18nKeys: [
-            'layoutFooter.pages.exploreVillagesMl.description',
-            'layoutFooter.pages.exploreVillagesMl.title',
+            'layoutFooter.pages.menuMapDivide.description',
+            'navigation.pageTitles.map.divide',
           ],
         },
       },
       {
-        icon: '🏘️',
-        labelKey: 'home.features.villages.gdVillages',
-        route: '/explore/villages/gd',
+        icon: '🗂️',
+        labelKey: 'home.features.map.customMap',
+        route: '/menu/map/custom',
         search: {
-          keywords: ['广东', '自然村', '树状图', '行政区划', 'Guangdong'],
+          keywords: ['自定义', '个人数据', '上传', 'custom'],
           i18nKeys: [
-            'layoutFooter.pages.exploreVillagesGd.description',
-            'navigation.pageTitles.villages.gdTree',
+            'layoutFooter.pages.menuMapCustom.description',
+            'navigation.pageTitles.map.custom',
           ],
         },
       },
       {
-        icon: '🏕️',
-        labelKey: 'home.features.villages.ycVillages',
-        route: '/explore/yc/villages',
+        icon: '✏️',
+        labelKey: 'home.features.map.drawMap',
+        route: '/explore/gis',
         search: {
-          keywords: ['阳春', '自然村', '村落', '分布', 'Yangchun'],
+          keywords: ['GIS', '泰森多边形', '绘制', '地理要素', 'draw', 'voronoi'],
           i18nKeys: [
-            'layoutFooter.pages.exploreYcVillages.description',
-            'navigation.pageTitles.villages.yangChun',
+            'layoutFooter.pages.exploreGis.description',
+            'navigation.pageTitles.gis.main',
           ],
         },
       },
@@ -564,6 +452,118 @@ const groups = [
           i18nKeys: [
             'layoutFooter.pages.explorePraat.description',
             'navigation.pageTitles.praat.main',
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: 'villages',
+    icon: '🏘️',
+    titleKey: 'home.features.villages.title',
+    descKey: 'home.features.villages.desc',
+    items: [
+      {
+        icon: '📍',
+        labelKey: 'home.features.villages.toponyms',
+        route: '/explore/villages/toponyms',
+        search: {
+          keywords: ['地名', '自然村', '分布', '地名检索', 'toponym'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreVillagesToponyms.description',
+            'navigation.pageTitles.villages.toponyms',
+          ],
+        },
+      },
+      {
+        icon: '🤖',
+        labelKey: 'home.features.villages.villagesML',
+        route: '/explore/villages/ml',
+        search: {
+          keywords: ['机器学习', '村名', '聚类', '分析', 'machine learning'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreVillagesMl.description',
+            'layoutFooter.pages.exploreVillagesMl.title',
+          ],
+        },
+      },
+      {
+        icon: '🏘️',
+        labelKey: 'home.features.villages.gdVillages',
+        route: '/explore/villages/gd',
+        search: {
+          keywords: ['广东', '自然村', '树状图', '行政区划', 'Guangdong'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreVillagesGd.description',
+            'navigation.pageTitles.villages.gdTree',
+          ],
+        },
+      },
+      {
+        icon: '🏕️',
+        labelKey: 'home.features.villages.ycVillages',
+        route: '/explore/yc/villages',
+        search: {
+          keywords: ['阳春', '自然村', '村落', '分布', 'Yangchun'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreYcVillages.description',
+            'navigation.pageTitles.villages.yangChun',
+          ],
+        },
+      },
+    ],
+  },
+  {
+    id: 'charClass',
+    icon: '📚',
+    titleKey: 'home.features.charClass.title',
+    descKey: 'home.features.charClass.desc',
+    items: [
+      {
+        icon: '📜',
+        labelKey: 'home.features.charClass.zhonggu',
+        route: '/explore/char-class?tab=zhonggu',
+        search: {
+          keywords: ['中古', '广韵', '切韵', 'Middle Chinese'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreCharClass.description',
+            'navigation.pageTitles.charClass.zhonggu',
+          ],
+        },
+      },
+      {
+        icon: '🏛️',
+        labelKey: 'home.features.charClass.shanggu',
+        route: '/explore/char-class?tab=shanggu',
+        search: {
+          keywords: ['上古', '诗经', '谐声', '上古音', 'Old Chinese'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreCharClass.description',
+            'navigation.pageTitles.charClass.shanggu',
+          ],
+        },
+      },
+      {
+        icon: '📖',
+        labelKey: 'home.features.charClass.jingu',
+        route: '/explore/char-class?tab=jingu',
+        search: {
+          keywords: ['近古', '中原音韵', '洪武正韵', '近代音', 'Early Mandarin'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreCharClass.description',
+            'navigation.pageTitles.charClass.jingu',
+          ],
+        },
+      },
+      {
+        icon: '🎵',
+        labelKey: 'home.features.charClass.yueyun',
+        route: '/explore/char-class?tab=yueyun',
+        search: {
+          keywords: ['粤语', '分韵撮要', '韵书', '粤音', 'Cantonese'],
+          i18nKeys: [
+            'layoutFooter.pages.exploreCharClass.description',
+            'navigation.pageTitles.charClass.yueyun',
           ],
         },
       },
@@ -819,7 +819,7 @@ $text-primary: var(--text-primary);
   z-index: 1;
   max-width: 1300px;
   margin: 0 auto;
-  padding: clamp(3rem, 6dvw, 6rem) clamp(1.5rem, 4dvw, 2.5rem);
+  padding: clamp(2rem, 4dvw, 4rem) clamp(1.5rem, 3dvw, 2.5rem);
 }
 
 .section-title {

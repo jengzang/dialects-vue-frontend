@@ -18,6 +18,7 @@
     <Teleport to="body">
       <div
         v-if="open"
+        v-native-back="() => emit('toggle')"
         class="dropdown-panel glass-dropdown-panel"
         :style="panelStyle"
       >
@@ -37,6 +38,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import { computed, nextTick, ref, watch } from 'vue'
 import ChoiceSelector from './ChoiceSelector.vue'
 

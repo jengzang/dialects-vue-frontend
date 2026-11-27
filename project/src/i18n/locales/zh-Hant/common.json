@@ -311,5 +311,14 @@
     "defaultItem": "新功能提示",
     "dontShowAgain": "不再顯示此版本更新",
     "confirm": "知道了"
+  },
+  "contact": {
+    "qqQuestion": "有疑問？加入 QQ 群：",
+    "qqCopy": "點擊複製群號",
+    "qqCopied": "已複製 QQ 群號",
+    "qqCopyFailed": "複製失敗，請手動記下群號",
+    "qqScan": "掃碼加群",
+    "qqModalTitle": "掃碼加入 QQ 群",
+    "qqQRAlt": "QQ 群二維碼"
   }
 }

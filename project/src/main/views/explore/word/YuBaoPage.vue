@@ -299,6 +299,7 @@ import BarIcon from '@/components/common/BarIcon.vue'
 import ResultViewSwitcher from '@/components/common/ResultViewSwitcher.vue'
 import QuerySearchEntrance from '@/components/common/QuerySearchEntrance.vue'
 import { useRouteQueryState } from '@/composables/router/useRouteQueryState.js'
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { useStorageState } from '@/composables/core/useStorageState.js'
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 
@@ -805,7 +806,7 @@ onMounted(async () => {
   // 如果 URL 中没有 sub 参数，默认跳转到 vocabulary
   if (!route.query.tab) {
     await router.replace({
-      path: '/menu/yubao',
+      path: buildLocalePath(resolveRouteLocale(route), '/menu/yubao'),
       query: { ...route.query, tab: 'vocabulary' }
     })
   }

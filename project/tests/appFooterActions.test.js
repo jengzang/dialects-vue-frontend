@@ -182,9 +182,30 @@ describe('AppFooter actions', () => {
 
   afterEach(() => {
     document.body.innerHTML = ''
+    vi.unstubAllGlobals()
     vi.clearAllTimers()
     vi.useRealTimers()
     vi.restoreAllMocks()
+  })
+
+  it('hides the support action only in native iOS', async () => {
+    const { default: AppFooter } = await import('../src/components/footer/AppFooter.vue')
+
+    vi.stubGlobal('webkit', { messageHandlers: { dialectsNative: {} } })
+    const ios = mountFooter(AppFooter)
+    expect(ios.host.textContent).not.toContain('layoutFooter.actions.support')
+    ios.unmount()
+
+    vi.unstubAllGlobals()
+    vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue('Mozilla/5.0 (iPhone)')
+    const web = mountFooter(AppFooter)
+    expect(web.host.textContent).toContain('layoutFooter.actions.support')
+    web.unmount()
+
+    vi.stubGlobal('DialectsAndroidBridge', {})
+    const android = mountFooter(AppFooter)
+    expect(android.host.textContent).toContain('layoutFooter.actions.support')
+    android.unmount()
   })
 
   it('renders footer actions, stats, and legal information as separate flat rows', async () => {

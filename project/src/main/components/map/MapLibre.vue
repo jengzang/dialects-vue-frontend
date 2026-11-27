@@ -36,6 +36,22 @@
           />
         </div>
         <div
+          v-if="mapStore.mode === 'base' || mapStore.mode === 'feature'"
+          class="custom-switch-container1 partition-color-switch"
+        >
+          <CheckBox
+            :model-value="useCustomPartitionColors"
+            :label="t('map.mapLibre.controls.useCustomPartitionColors')"
+            :font-size="14"
+            @change="toggleCustomPartitionColors"
+          />
+          <HelpIcon
+            size="sm"
+            :content="t('map.mapLibre.controls.useCustomPartitionColorsHelp')"
+            tooltip-max-width="280px"
+          />
+        </div>
+        <div
           v-if="mapStore.divideMapView && isDivideDisplayMode"
           class="display-mode-radios"
         >
@@ -99,7 +115,7 @@
       ✕ {{ t('map.mapLibre.buttons.exitFullscreen') }}
     </button>
 
-    <div v-if="loading" class="loading-overlay">
+    <div v-if="loading || isRenderingMap" class="loading-overlay" role="status" aria-live="polite">
       <div class="ui-loading--page" aria-hidden="true"></div>
       <span>{{ t('map.mapLibre.loading.rendering') }}</span>
     </div>
@@ -128,9 +144,10 @@
 </template>
 
 <script setup>
+import { trackNativeMapPopup } from '@/platform/backRegistry.js'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import RadioGroup from '@/components/selector/RadioGroup.vue'
-import { ref, onMounted, onActivated, onBeforeUnmount, shallowRef, nextTick, watch, computed, h, render, markRaw } from 'vue';
+import { ref, onMounted, onActivated, onDeactivated, onBeforeUnmount, shallowRef, nextTick, watch, computed, h, render, markRaw } from 'vue';
 import { useI18n } from 'vue-i18n';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -144,6 +161,7 @@ import { createCustomPopupDelete } from '@/utils/user/customPopupDelete.js'
 import { refreshCurrentCustomLayer } from '@/utils/map/MapData.js';
 import SimpleSelectDropdown from '@/components/selector/SimpleSelectDropdown.vue'
 import CheckBox from '@/components/selector/CheckBox.vue'
+import HelpIcon from '@/components/ToastAndHelp/HelpIcon.vue'
 import MapLegend from './MapLegend.vue'
 import CompareMapPopup from './popups/CompareMapPopup.vue'
 import FeatureMapPopup from './popups/FeatureMapPopup.vue'
@@ -151,6 +169,7 @@ import LocationDetailPopup from '@/main/components/geo/popups/LocationDetailPopu
 import { contours } from 'd3-contour';
 import { booleanPointInPolygon } from '@turf/turf';
 import { buildVoronoiClipBoundary, computeVoronoiRadius } from '@/main/utils/drawMap/partitionVoronoi.js';
+import { usePartitionColors } from '@/composables/data/usePartitionColors.js'
 import AdminBoundaryModal from '@/main/components/map/Draw/modals/AdminBoundaryModal.vue';
 import { api } from '@/api/auth/httpClient.js';
 import nationalBorderGeoJsonUrl from '/data/gis/china_country.geojson?url';
@@ -188,14 +207,50 @@ const DOT_HEATMAP_SOURCE_ID = 'dot-heatmap-source';
 const DOT_HEATMAP_LAYER_ID = 'dot-heatmap-layer';
 const ADMIN_BOUNDARY_SOURCE_ID = 'admin-boundary-source';
 const ADMIN_BOUNDARY_LAYER_ID = 'admin-boundary-line-layer';
+const POINT_SOURCE_ID = 'map-points-source';
+const POINT_LAYER_ID = 'map-points-layer';
+const POINT_HOVER_SOURCE_ID = 'map-points-hover-source';
+const POINT_HOVER_LAYER_ID = 'map-points-hover-layer';
 
 const mapContainer = ref(null);
 const map = shallowRef(null);
 let isMapStyleReady = false;
+let needsContentRender = false;
 const currentStyleKey = ref('tianditu');
 const loading = ref(false);
+const isRenderingMap = ref(false);
+let mapRenderVersion = 0;
+let mapRenderFrame = null;
+let clearMapRenderWait = () => {};
 const isFullScreen = ref(false);
 const { t } = useI18n();
+const { loadPartitionColors, getPartitionColor, getContrastTextColor, colorVersion } = usePartitionColors()
+const useCustomPartitionColors = ref(true)
+const partitionColorMode = computed(() => mapStore.mapData?.region_mode || 'map')
+
+const partitionIdentity = computed(() => JSON.stringify([userStore.role, userStore.id]))
+
+const ensurePartitionColors = async () => {
+  if (mapStore.mode !== 'dot' && (!useCustomPartitionColors.value || !['base', 'feature'].includes(mapStore.mode))) return
+  try {
+    await loadPartitionColors(partitionColorMode.value, partitionIdentity.value)
+  } catch (error) {
+    console.warn('Failed to load partition colors:', error)
+  }
+}
+
+const toggleCustomPartitionColors = async (enabled) => {
+  useCustomPartitionColors.value = enabled
+  if (enabled) await ensurePartitionColors()
+  requestMapContentRender()
+}
+
+const getLocationPartitionPath = (location) => mapStore.mapData?.region_mappings?.[location] || ''
+const getCustomPartitionStyle = (path, fallbackBackground, fallbackText) => {
+  if (!useCustomPartitionColors.value || !path) return { background: fallbackBackground, color: fallbackText }
+  const background = getPartitionColor(partitionColorMode.value, partitionIdentity.value, path)
+  return background ? { background, color: getContrastTextColor(background) } : { background: fallbackBackground, color: fallbackText }
+}
 
 // Map style options
 const mapStyleOptions = computed(() => {
@@ -277,9 +332,15 @@ const toggleBaseMode = (e) => {
     mapStore.mode = 'base';
   }
 };
-// 管理所有的 Marker 實例，用於清除
-let currentMarkers = [];
 let currentPopupMountTargets = [];
+let pointEntries = [];
+let pointPopup = null;
+let pointPopupIndex = null;
+let hoveredPointIndex = null;
+const pointImages = new Map();
+const pointHandlers = new Map();
+let clearPointKeyboard = () => {};
+let pointStyleSignature = '';
 let isoplethClickHandler = null;
 const isoplethLegend = ref(null);
 
@@ -383,13 +444,28 @@ onMounted(() => {
   initMap();
 });
 
-onActivated(() => {
+onActivated(async () => {
+  await nextTick();
+  if (!map.value) return;
+  if (needsContentRender) {
+    requestMapContentRender();
+    map.value.resize();
+  }
   if (map.value && mapStore.mergedData?.length > 0) {
     applyResetView(AUTO_RESET_DENSITY_PERCENTILE);
   }
 });
 
+onDeactivated(() => {
+  if (isRenderingMap.value) {
+    needsContentRender = true;
+    renderMapContent(false);
+  }
+  cancelMapContentRender();
+});
+
 onBeforeUnmount(() => {
+  cancelMapContentRender();
   adminBoundaryRequestId += 1;
   clearIsoplethLayers();
   clearDotHeatmapLayers();
@@ -408,13 +484,13 @@ watch(
     () => {
       // 視圖內容變更時只重繪，不在這裡自行判斷是否 reset；
       // reset 邊界統一由 requestMapFitView -> fitViewKey watcher 控制。
-      renderMapContent(false);
+      requestMapContentRender();
     },
     { deep: true }
 );
 
 watch(() => mapStore.showCustomData, () => {
-  renderMapContent(false); // 切換自定義數據顯示時不重置視角
+  requestMapContentRender(); // 切換自定義數據顯示時不重置視角
 });
 
 // 監聽 resultCache.mode 變化，更新 isMiddleChineseMode
@@ -438,13 +514,28 @@ watch(
 watch(
     () => mapStore.mode,
     (newMode) => {
+      useCustomPartitionColors.value = newMode === 'base'
+      if (newMode === 'feature' || newMode === 'compare') {
+        mapStore.divideMapView = false;
+      }
       // 只要當前模式不是 base，就把它記下來
       if (newMode !== 'base') {
         lastNonBaseMode.value = newMode;
       }
+      void nextTick(() => requestMapContentRender())
     },
     { immediate: true }
 );
+
+watch(
+  [() => mapStore.mode, useCustomPartitionColors, partitionIdentity, partitionColorMode, colorVersion],
+  async () => {
+    await ensurePartitionColors()
+    await nextTick()
+    requestMapContentRender()
+  },
+  { immediate: true }
+)
 
 // --- 初始化地圖 ---
 const initMap = () => {
@@ -460,6 +551,12 @@ const initMap = () => {
   });
 
   map.value.addControl(new maplibregl.NavigationControl(), 'top-left');
+
+  map.value.on('resize', () => {
+    if (!isMapStyleReady || !pointStyleSignature || !map.value.getLayer(POINT_LAYER_ID)) return;
+    const labelStyle = ['base', 'feature'].includes(mapStore.mode) ? getPointLabelStyle(mapStore.mode) : null;
+    if (getPointStyleSignature(mapStore.mode, labelStyle) !== pointStyleSignature) requestMapContentRender();
+  });
 
   map.value.on('load', () => {
     isMapStyleReady = true;
@@ -481,15 +578,64 @@ const initMap = () => {
   });
 };
 
-// --- 核心渲染入口 ---
-const renderMapContent = async (shouldResetView = true) => {
+const cancelMapContentRender = () => {
+  mapRenderVersion += 1;
+  if (mapRenderFrame !== null) cancelAnimationFrame(mapRenderFrame);
+  mapRenderFrame = null;
+  clearMapRenderWait();
+  clearMapRenderWait = () => {};
+  isRenderingMap.value = false;
+};
+
+const requestMapContentRender = () => {
   if (!map.value || !isMapStyleReady) return;
+  cancelMapContentRender();
+  if (!mapContainer.value?.isConnected) {
+    renderMapContent(false);
+    return;
+  }
+  const version = mapRenderVersion;
+  isRenderingMap.value = true;
+  // Let Vue paint the overlay before synchronous canvas/GeoJSON preparation.
+  mapRenderFrame = requestAnimationFrame(() => {
+    if (version !== mapRenderVersion) return;
+    mapRenderFrame = requestAnimationFrame(() => {
+      mapRenderFrame = null;
+      if (version !== mapRenderVersion || !map.value) return;
+      try {
+        renderMapContent(false);
+        const targetMap = map.value;
+        const finish = () => { if (version === mapRenderVersion) cancelMapContentRender(); };
+        const sources = [POINT_SOURCE_ID, POINT_HOVER_SOURCE_ID, DOT_HEATMAP_SOURCE_ID, ISOPLETH_SOURCE_ID, ISOPLETH_POINT_SOURCE_ID];
+        const onRender = () => {
+          if (sources.every(id => !targetMap.getSource(id) || targetMap.isSourceLoaded(id))) finish();
+        };
+        const onError = event => { if (sources.includes(event.sourceId)) finish(); };
+        clearMapRenderWait = () => { targetMap.off('render', onRender); targetMap.off('error', onError); };
+        targetMap.on('render', onRender);
+        targetMap.on('error', onError);
+        targetMap.triggerRepaint();
+      } catch (error) {
+        cancelMapContentRender();
+        throw error;
+      }
+    });
+  });
+};
+
+// --- 核心渲染入口 ---
+const renderMapContent = (shouldResetView = true) => {
+  if (!map.value || !isMapStyleReady) return;
+  needsContentRender = !mapContainer.value?.isConnected;
 
   // 清除舊標記
   clearMarkers();
   clearIsoplethLayers();
   clearDotHeatmapLayers();
   clearAdminBoundaryLayers();
+
+  // KeepAlive detaches the page: clear stale content now, read label CSS on return.
+  if (needsContentRender) return;
 
   // 視角統一由 requestMapFitView -> resetView 控制，這裡不再消費入口側預計算的 center/zoom。
   void shouldResetView;
@@ -515,10 +661,373 @@ const renderMapContent = async (shouldResetView = true) => {
 };
 
 const clearMarkers = () => {
+  clearPointLayer();
   currentPopupMountTargets.forEach(target => render(null, target));
   currentPopupMountTargets = [];
-  currentMarkers.forEach(marker => marker.remove());
-  currentMarkers = [];
+};
+
+const closePointPopup = () => {
+  pointPopup?.remove();
+  pointPopup = null;
+  pointPopupIndex = null;
+};
+
+const clearPointLayer = () => {
+  clearPointKeyboard();
+  clearPointKeyboard = () => {};
+  closePointPopup();
+  if (map.value) {
+    pointHandlers.forEach((handler, event) => map.value.off(event, POINT_LAYER_ID, handler));
+    map.value.getCanvas().style.cursor = '';
+    [POINT_HOVER_LAYER_ID, POINT_LAYER_ID].forEach(id => {
+      if (map.value.getLayer(id)) map.value.removeLayer(id);
+    });
+    [POINT_HOVER_SOURCE_ID, POINT_SOURCE_ID].forEach(id => {
+      if (map.value.getSource(id)) map.value.removeSource(id);
+    });
+    pointImages.forEach(id => {
+      if (map.value.hasImage(id)) map.value.removeImage(id);
+    });
+  }
+  pointHandlers.clear();
+  pointImages.clear();
+  pointEntries = [];
+  hoveredPointIndex = null;
+  pointStyleSignature = '';
+};
+
+// Read the existing CSS once per draw, including responsive font tokens.
+const getPointLabelStyle = (mode) => {
+  const probe = document.createElement('div');
+  probe.className = `maplibregl-marker ${mode === 'base' ? 'marker-text-base' : 'marker-text-feature'}`;
+  Object.assign(probe.style, { position: 'absolute', visibility: 'hidden', pointerEvents: 'none' });
+  if (mode === 'base') probe.style.fontSize = '12.5px';
+  mapContainer.value.append(probe);
+  const style = getComputedStyle(probe);
+  const result = {
+    fontSize: parseFloat(style.fontSize) || 16,
+    font: style.fontFamily.split(',').map(font => font.trim().replace(/^['"]|['"]$/g, '')),
+    color: style.color, background: style.backgroundColor,
+    radius: parseFloat(style.borderRadius) || 0,
+    borderWidth: parseFloat(style.borderTopWidth) || 0,
+    borderColor: style.borderTopColor,
+    paddingX: parseFloat(style.paddingLeft) || 0,
+    paddingY: parseFloat(style.paddingTop) || 0,
+    lineHeight: parseFloat(style.lineHeight) || 20,
+  };
+  probe.remove();
+  return result;
+};
+
+// Share a small texture per color; text glyphs are shared by MapLibre, not rasterized per label.
+const getPointImage = (color, mode, hover = false, labelStyle = null) => {
+  const key = JSON.stringify([color, mode, hover]);
+  if (pointImages.has(key)) return pointImages.get(key);
+  const id = `map-point-image-${pointImages.size}`;
+  const ratio = Math.min(window.devicePixelRatio || 1, 3);
+  const canvas = document.createElement('canvas');
+  const circleSize = mode === 'dot' ? 20 : hover ? 68 : 40;
+  canvas.width = (labelStyle ? 64 : circleSize) * ratio;
+  const labelHeight = labelStyle ? labelStyle.lineHeight + 2 * (labelStyle.paddingY + labelStyle.borderWidth) : 40;
+  canvas.height = labelStyle ? Math.ceil((labelHeight + 24) * ratio) : circleSize * ratio;
+  const context = canvas.getContext('2d');
+  context.scale(ratio, ratio);
+  if (labelStyle) {
+    const { borderWidth, borderColor, radius, paddingX } = labelStyle;
+    context.beginPath();
+    context.roundRect(12, 12, 40, labelHeight, radius);
+    context.fillStyle = 'transparent';
+    if (color) context.fillStyle = color;
+    context.shadowColor = 'rgba(114,124,245,0.5)';
+    context.shadowBlur = 6 * ratio;
+    context.shadowOffsetY = 2 * ratio;
+    context.fill();
+    context.shadowColor = 'transparent';
+    if (borderWidth) {
+      context.strokeStyle = borderColor;
+      context.lineWidth = borderWidth;
+      context.stroke();
+    }
+    const insetX = 12 + paddingX + borderWidth;
+    map.value.addImage(id, context.getImageData(0, 0, canvas.width, canvas.height), {
+      pixelRatio: ratio, content: [insetX * ratio, 0, (64 - insetX) * ratio, canvas.height],
+      stretchX: [[16 * ratio, 48 * ratio]],
+    });
+    pointImages.set(key, id);
+    return id;
+  }
+  const radius = mode === 'dot' ? 7 : hover ? 11 : 9;
+  context.beginPath();
+  const center = circleSize / 2;
+  context.arc(center, center, radius - 1, 0, Math.PI * 2);
+  context.fillStyle = 'transparent';
+  if (color) context.fillStyle = color;
+  context.strokeStyle = mode === 'dot' ? '#000' : '#fff';
+  context.lineWidth = 2;
+  context.shadowColor = mode === 'dot' ? 'rgba(0,0,0,0.5)' : hover ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.3)';
+  context.shadowBlur = (mode === 'dot' ? 2 : hover ? 12 : 6) * ratio;
+  context.shadowOffsetY = (mode === 'dot' ? 0 : hover ? 4 : 2) * ratio;
+  context.fill();
+  context.shadowColor = 'transparent';
+  context.stroke();
+  if (hover) {
+    context.beginPath();
+    context.arc(center, center, radius + 1.5, 0, Math.PI * 2);
+    context.strokeStyle = 'rgba(255,255,255,0.8)';
+    context.lineWidth = 3;
+    context.stroke();
+  }
+  map.value.addImage(id, context.getImageData(0, 0, canvas.width, canvas.height), { pixelRatio: ratio });
+  pointImages.set(key, id);
+  return id;
+};
+
+const getPointStyleSignature = (mode, labelStyle) => JSON.stringify([mode, Math.min(window.devicePixelRatio || 1, 3), labelStyle]);
+
+const getTextImage = (label, color, labelStyle) => {
+  const key = JSON.stringify(['text', label, color, labelStyle.fontSize, labelStyle.color]);
+  if (pointImages.has(key)) return pointImages.get(key);
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  context.font = `${labelStyle.fontSize}px ${labelStyle.font.join(',')}`;
+  const textWidth = Math.ceil(context.measureText(label).width);
+  const width = Math.max(1, textWidth + 2 * (labelStyle.paddingX + labelStyle.borderWidth));
+  const height = Math.max(16, Math.ceil(labelStyle.lineHeight + 2 * (labelStyle.paddingY + labelStyle.borderWidth)));
+  const margin = 12;
+  // Bound the raster fallback budget and individual texture dimensions for unusually large datasets/labels.
+  const ratio = Math.min(labelStyle.rasterRatio, 4096 / (width + margin * 2), 4096 / (height + margin * 2));
+  canvas.width = Math.min(4096, Math.max(1, Math.ceil((width + margin * 2) * ratio)));
+  canvas.height = Math.min(4096, Math.max(1, Math.ceil((height + margin * 2) * ratio)));
+  context.scale(ratio, ratio);
+  context.font = `${labelStyle.fontSize}px ${labelStyle.font.join(',')}`;
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.beginPath();
+  context.roundRect(margin + labelStyle.borderWidth / 2, margin + labelStyle.borderWidth / 2, width - labelStyle.borderWidth, height - labelStyle.borderWidth, labelStyle.radius);
+  context.fillStyle = color || 'transparent';
+  context.shadowColor = 'rgba(114,124,245,0.5)';
+  context.shadowBlur = 6 * ratio;
+  context.shadowOffsetY = 2 * ratio;
+  context.fill();
+  context.shadowColor = 'transparent';
+  if (labelStyle.borderWidth) {
+    context.strokeStyle = labelStyle.borderColor;
+    context.lineWidth = labelStyle.borderWidth;
+    context.stroke();
+  }
+  context.fillStyle = labelStyle.color;
+  context.fillText(label, margin + width / 2, margin + height / 2);
+  const id = `map-point-image-${pointImages.size}`;
+  map.value.addImage(id, context.getImageData(0, 0, canvas.width, canvas.height), { pixelRatio: ratio });
+  pointImages.set(key, id);
+  return id;
+};
+
+const getPointHit = (event) => {
+  // Later DOM markers used to cover earlier ones at the same coordinate.
+  return (event.features || [])
+    .map(feature => pointEntries[feature.properties?.index])
+    .filter(Boolean)
+    .filter(entry => {
+      if (!event.point) return true;
+      const coordinate = [...entry.coordinate];
+      coordinate[0] += 360 * Math.round((event.lngLat.lng - coordinate[0]) / 360);
+      const screen = map.value.project(coordinate);
+      const halfWidth = entry.hitWidth || (mapStore.mode === 'dot' ? 7 : hoveredPointIndex === entry.index ? 11 : 9);
+      const halfHeight = entry.hitHeight || halfWidth;
+      const dx = Math.abs(event.point.x - screen.x);
+      const dy = Math.abs(event.point.y - screen.y);
+      return entry.hitWidth ? dx <= halfWidth && dy <= halfHeight : dx * dx + dy * dy <= halfWidth * halfWidth;
+    })
+    .sort((a, b) => (mapStore.mode === 'compare'
+      ? Number(b.index === hoveredPointIndex) - Number(a.index === hoveredPointIndex)
+      : 0) || b.index - a.index)[0];
+};
+
+const showPointPopup = (entry, event, toggle = false) => {
+  const wasOpen = pointPopupIndex === entry.index && pointPopup?.isOpen();
+  closePointPopup();
+  if (toggle && wasOpen) return;
+  const mode = mapStore.mode;
+  const popup = trackNativeMapPopup(new maplibregl.Popup(mode === 'dot'
+    ? { offset: 10, closeButton: false }
+    : mode === 'feature'
+      ? { offset: 80, maxWidth: '300px', closeButton: false, className: 'map-popup-wrapper' }
+      : { offset: 15, maxWidth: '350px', className: 'map-popup-wrapper' }));
+  let node;
+  if (mode === 'dot') {
+    node = document.createElement('div');
+    const title = document.createElement('b');
+    title.textContent = entry.locName;
+    node.append(title, document.createElement('br'), document.createTextNode(entry.fullRegion));
+  } else if (mode === 'feature') {
+    node = createPopupDOM(entry.item);
+  } else {
+    node = createComparePopupNode(entry.item);
+  }
+  const coordinate = [...entry.coordinate];
+  coordinate[0] += 360 * Math.round((event.lngLat.lng - coordinate[0]) / 360);
+  pointPopup = popup;
+  pointPopupIndex = entry.index;
+  popup.on('close', () => {
+    render(null, node);
+    currentPopupMountTargets = currentPopupMountTargets.filter(target => target !== node);
+    if (pointPopup === popup) {
+      pointPopup = null;
+      pointPopupIndex = null;
+    }
+  });
+  popup.setLngLat(coordinate).setDOMContent(node).addTo(map.value);
+};
+
+// Preserve sequential Tab/Shift+Tab and Enter/Space access without one focusable DOM node per point.
+const installPointKeyboard = (mode, labelStyle) => {
+  if (mode !== 'compare' && mode !== 'feature') return;
+  const target = document.createElement('button');
+  target.type = 'button';
+  target.className = 'map-point-keyboard-target';
+  Object.assign(target.style, {
+    position: 'absolute', pointerEvents: 'none', opacity: '0', padding: '0', margin: '0',
+    background: 'transparent', border: '0', outline: 'auto', transform: 'translate(-50%, -50%)',
+  });
+  let index = 0;
+  const coordinate = () => {
+    const value = pointEntries[index].coordinate.slice(0, 2);
+    value[0] += 360 * Math.round((map.value.getCenter().lng - value[0]) / 360);
+    return value;
+  };
+  const sync = () => {
+    const entry = pointEntries[index];
+    target.setAttribute('aria-label', [entry.item.location, entry.label || entry.item.featureLabel || entry.item.feature].filter(Boolean).join(' '));
+    const screen = map.value.project(coordinate());
+    let width = 18;
+    let height = 18;
+    if (labelStyle) {
+      const context = document.createElement('canvas').getContext('2d');
+      context.font = `${labelStyle.fontSize}px ${labelStyle.font.join(',')}`;
+      width = context.measureText(entry.label).width + 2 * (labelStyle.paddingX + labelStyle.borderWidth);
+      height = labelStyle.lineHeight + 2 * (labelStyle.paddingY + labelStyle.borderWidth);
+    }
+    Object.assign(target.style, { left: `${screen.x}px`, top: `${screen.y}px`, width: `${width}px`, height: `${height}px` });
+  };
+  target.addEventListener('focus', event => {
+    index = event.relatedTarget?.compareDocumentPosition(target) & Node.DOCUMENT_POSITION_PRECEDING ? pointEntries.length - 1 : 0;
+    target.style.opacity = '1';
+    sync();
+    map.value.on('move', sync);
+  });
+  target.addEventListener('blur', () => {
+    target.style.opacity = '0';
+    map.value?.off('move', sync);
+  });
+  target.addEventListener('keydown', event => {
+    if (event.key === 'Tab') {
+      const nextIndex = index + (event.shiftKey ? -1 : 1);
+      if (nextIndex < 0 || nextIndex >= pointEntries.length) return;
+      event.preventDefault();
+      index = nextIndex;
+      sync();
+    } else if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      event.stopPropagation();
+      showPointPopup(pointEntries[index], { lngLat: { lng: coordinate()[0] } }, true);
+    }
+  });
+  target.setAttribute('aria-label', pointEntries[0].item.location || pointEntries[0].label || '');
+  map.value.getCanvasContainer().append(target);
+  clearPointKeyboard = () => { map.value?.off('move', sync); target.remove(); };
+};
+
+const drawPointLayer = (entries, mode) => {
+  pointEntries = entries.map((entry, index) => ({ ...entry, index }));
+  if (!pointEntries.length) return;
+  const labelStyle = mode === 'base' || mode === 'feature' ? getPointLabelStyle(mode) : null;
+  pointStyleSignature = getPointStyleSignature(mode, labelStyle);
+  // Text and background must stack together: MapLibre draws all icons before all native text.
+  const measurementContext = labelStyle ? document.createElement('canvas').getContext('2d') : null;
+  const textWidths = new Map();
+  const rasterLabels = new Set();
+  let rasterArea = 0;
+  pointEntries.forEach(entry => {
+    if (!labelStyle) return;
+    const font = `${entry.fontSize || labelStyle.fontSize}px ${labelStyle.font.join(',')}`;
+    const key = JSON.stringify([font, entry.label]);
+    if (!textWidths.has(key)) {
+      measurementContext.font = font;
+      textWidths.set(key, measurementContext.measureText(entry.label).width);
+    }
+    entry.hitWidth = textWidths.get(key) / 2 + labelStyle.paddingX + labelStyle.borderWidth;
+    entry.hitHeight = labelStyle.lineHeight / 2 + labelStyle.paddingY + labelStyle.borderWidth;
+    const rasterKey = JSON.stringify([font, entry.label, entry.backgroundColor || (mode === 'base' ? labelStyle.background : entry.color), entry.textColor || labelStyle.color]);
+    if (!rasterLabels.has(rasterKey)) {
+      rasterLabels.add(rasterKey);
+      rasterArea += (entry.hitWidth * 2 + 24) * (entry.hitHeight * 2 + 24);
+    }
+  });
+  if (labelStyle) labelStyle.rasterRatio = Math.min(window.devicePixelRatio || 1, 3, Math.sqrt(16 * 1024 * 1024 / Math.max(1, rasterArea)));
+  const features = pointEntries.map(entry => ({
+    type: 'Feature', id: entry.index,
+    geometry: { type: 'Point', coordinates: entry.coordinate.slice(0, 2) },
+    properties: {
+      index: entry.index,
+      textColor: entry.textColor || labelStyle?.color,
+      image: labelStyle
+        ? getTextImage(entry.label, mode === 'base' ? (entry.backgroundColor || labelStyle.background) : (entry.backgroundColor || entry.color), { ...labelStyle, color: entry.textColor || labelStyle.color, fontSize: entry.fontSize || labelStyle.fontSize })
+        : getPointImage(labelStyle && mode === 'base' ? (entry.backgroundColor || labelStyle.background) : (entry.backgroundColor || entry.color), mode, false, labelStyle),
+      ...(labelStyle ? { label: entry.label, renderText: '', fontSize: entry.fontSize || labelStyle.fontSize } : {}),
+    },
+  }));
+  map.value.addSource(POINT_SOURCE_ID, { type: 'geojson', data: { type: 'FeatureCollection', features } });
+  const layout = {
+    'icon-image': ['get', 'image'], 'icon-allow-overlap': true, 'icon-ignore-placement': true,
+    'icon-rotation-alignment': 'viewport', 'icon-pitch-alignment': 'viewport',
+    'symbol-sort-key': ['get', 'index'], 'symbol-z-order': 'source',
+  };
+  if (labelStyle) Object.assign(layout, {
+    'text-field': ['get', 'renderText'], 'text-size': ['get', 'fontSize'], 'text-font': labelStyle.font,
+    'text-max-width': 1000, 'text-line-height': labelStyle.lineHeight / labelStyle.fontSize,
+    'text-allow-overlap': true, 'text-ignore-placement': true, 'text-padding': 0,
+    'text-rotation-alignment': 'viewport', 'text-pitch-alignment': 'viewport',
+    'icon-text-fit': 'width',
+  });
+  map.value.addLayer({
+    id: POINT_LAYER_ID, type: 'symbol', source: POINT_SOURCE_ID, layout,
+    paint: {
+      'icon-opacity': mode === 'compare' ? ['case', ['boolean', ['feature-state', 'hover'], false], 0, 1] : 1,
+      ...(labelStyle ? { 'text-color': ['coalesce', ['get', 'textColor'], labelStyle.color] } : {}),
+    },
+  });
+  if (mode === 'compare') {
+    map.value.addSource(POINT_HOVER_SOURCE_ID, { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+    map.value.addLayer({ id: POINT_HOVER_LAYER_ID, type: 'symbol', source: POINT_HOVER_SOURCE_ID, layout: { ...layout } });
+  }
+  const updateHover = event => {
+    const entry = getPointHit(event);
+    map.value.getCanvas().style.cursor = entry ? 'pointer' : '';
+    if (hoveredPointIndex === (entry?.index ?? null)) return;
+    if (mode === 'compare') {
+      if (hoveredPointIndex !== null) map.value.setFeatureState({ source: POINT_SOURCE_ID, id: hoveredPointIndex }, { hover: false });
+      if (entry) map.value.setFeatureState({ source: POINT_SOURCE_ID, id: entry.index }, { hover: true });
+      map.value.getSource(POINT_HOVER_SOURCE_ID).setData({ type: 'FeatureCollection', features: entry ? [{
+        ...features[entry.index], properties: { index: entry.index, image: getPointImage(entry.color, mode, true) },
+      }] : [] });
+    } else if (mode === 'dot') {
+      if (entry) showPointPopup(entry, event);
+      else closePointPopup();
+    }
+    hoveredPointIndex = entry?.index ?? null;
+  };
+  pointHandlers.set('mouseenter', updateHover);
+  pointHandlers.set('mousemove', updateHover);
+  pointHandlers.set('mouseleave', () => updateHover({ features: [] }));
+  pointHandlers.set('click', event => {
+    const entry = getPointHit(event);
+    if (!entry) return;
+    if (mode === 'base') handleLocationClick(entry.label);
+    else showPointPopup(entry, event, mode !== 'dot');
+  });
+  pointHandlers.forEach((handler, event) => map.value.on(event, POINT_LAYER_ID, handler));
+  installPointKeyboard(mode, labelStyle);
 };
 
 const clearIsoplethLayers = () => {
@@ -572,6 +1081,7 @@ const clearDotHeatmapLayers = () => {
 // 邏輯 1: 基礎圖繪製 (復刻 create_map1 的後半部分)
 // =======================================================
 const drawBaseMap = () => {
+  const entries = [];
   // 用于跟踪已显示的坐标，避免重复
   const displayedCoordinates = new Set();
 
@@ -582,11 +1092,10 @@ const drawBaseMap = () => {
   };
 
   // 辅助函数：创建地名标记
-  const createLocationMarker = (locationName, coordinates) => {
+  const createLocationEntry = (locationName, coordinates) => {
     if (!isValidCoordinatePair(coordinates)) return null;
     if (!locationName || !locationName.trim()) return null;
 
-    const [lng, lat] = coordinates;
     const key = coordToKey(coordinates);
 
     // 如果这个坐标已经显示过，跳过
@@ -594,39 +1103,27 @@ const drawBaseMap = () => {
 
     // 字體大小邏輯 (完全復刻)
     const len = locationName.length;
-    let fontSize = '10px';
-    if (len <= 3) fontSize = '12.5px';
-    else if (len === 4) fontSize = '11.5px';
-    else if (len === 5) fontSize = '10.5px';
-
-    // 創建 DOM
-    const el = document.createElement('div');
-    el.className = 'marker-text-base'; // 樣式見下方 style
-    el.innerText = locationName;
-    el.style.fontSize = fontSize;
-    el.style.cursor = 'pointer'; // 添加指針樣式
-
-    // 添加點擊事件
-    el.addEventListener('click', () => {
-      handleLocationClick(locationName);
-    });
-
-    // 添加 Marker
-    const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
-        .setLngLat([lng, lat])
-        .addTo(map.value);
+    let fontSize = 10;
+    if (len <= 3) fontSize = 12.5;
+    else if (len === 4) fontSize = 11.5;
+    else if (len === 5) fontSize = 10.5;
 
     // 标记该坐标已显示
     if (key) displayedCoordinates.add(key);
 
-    return marker;
+    const partitionStyle = getCustomPartitionStyle(
+      getLocationPartitionPath(locationName),
+      null,
+      null
+    )
+    return { label: locationName, coordinate: coordinates, fontSize, backgroundColor: partitionStyle.background, textColor: partitionStyle.color };
   };
 
   // 1. 显示基础地图数据的地名
   if (mapStore.mapData && mapStore.mapData.coordinates_locations) {
     mapStore.mapData.coordinates_locations.forEach(([locationName, coordinates]) => {
-      const marker = createLocationMarker(locationName, coordinates);
-      if (marker) currentMarkers.push(marker);
+      const entry = createLocationEntry(locationName, coordinates);
+      if (entry) entries.push(entry);
     });
   }
 
@@ -652,10 +1149,11 @@ const drawBaseMap = () => {
 
     // 显示自定义地名
     customLocations.forEach(({ name, coord }) => {
-      const marker = createLocationMarker(name, coord);
-      if (marker) currentMarkers.push(marker);
+      const entry = createLocationEntry(name, coord);
+      if (entry) entries.push(entry);
     });
   }
+  drawPointLayer(entries, 'base');
 };
 
 // =======================================================
@@ -711,30 +1209,13 @@ const drawDotMap = () => {
     levelColorMap[lvl] = CATEGORY_PALETTE[idx % CATEGORY_PALETTE.length];
   });
 
-  // 4. 繪製 (保持不變)
-  pointsToDraw.forEach(p => {
-    const color = levelColorMap[p.targetRegion];
-
-    const el = document.createElement('div');
-    el.className = 'marker-dot';
-    el.style.backgroundColor = color;
-
-    const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
-        .setLngLat(p.coords)
-        .addTo(map.value);
-
-    const popup = new maplibregl.Popup({ offset: 10, closeButton: false })
-        .setHTML(`<b>${p.locName}</b><br>${p.fullRegion}`);
-
-    el.addEventListener('mouseenter', () => marker.setPopup(popup).togglePopup());
-    el.addEventListener('mouseleave', () => popup.remove());
-
-    currentMarkers.push(marker);
-  });
+  drawPointLayer(pointsToDraw.map(point => ({
+    ...point, coordinate: point.coords, color: getPartitionColor(partitionColorMode.value, partitionIdentity.value, point.fullRegion) || levelColorMap[point.targetRegion],
+  })), 'dot');
 };
 
 // =======================================================
-// 邏輯 3: 特徵圖 + 複雜彈窗 (DOM版，支持按鈕點擊)
+// 邏輯 3: 特徵圖 + 複雜彈窗 (按需建立，支持按鈕點擊)
 // =======================================================
 const drawFeatureMap = () => {
   if (!mapStore.mergedData || mapStore.mergedData.length === 0) return;
@@ -752,7 +1233,7 @@ const drawFeatureMap = () => {
 
     return isFeatureMatch && isCustomMatch;
   });
-  // console.log(items)
+  const entries = [];
   items.forEach(item => {
     // 1. 基礎校驗：無值跳過
     if (!item.value || !item.value.trim()) return;
@@ -763,30 +1244,10 @@ const drawFeatureMap = () => {
       return;
     }
 
-    // 1. 創建地圖上的文字 Marker (保持不變)
-    const el = document.createElement('div');
-    el.className = 'marker-text-feature';
-    el.innerText = item.value;
-    el.style.backgroundColor = item.color || '#fff';
-
-    const marker = new maplibregl.Marker({ element: el, anchor: 'center' })
-        .setLngLat(item.coordinate)
-        .addTo(map.value);
-
-    // 2. ✨ 改動點：創建 DOM 節點而不是字符串
-    const popupNode = createPopupDOM(item);
-
-    // 3. 使用 setDOMContent
-    const popup = new maplibregl.Popup({
-      offset: 80,
-      maxWidth: '300px',
-      closeButton: false, // 建議隱藏默認關閉按鈕，用點擊地圖關閉，或者自己加
-      className: 'map-popup-wrapper'
-    }).setDOMContent(popupNode);
-
-    marker.setPopup(popup);
-    currentMarkers.push(marker);
+    const partitionStyle = getCustomPartitionStyle(getLocationPartitionPath(item.location), item.color || '#fff', '#000')
+    entries.push({ item, label: item.value, coordinate: item.coordinate, color: item.color || '#fff', backgroundColor: partitionStyle.background, textColor: partitionStyle.color });
   });
+  drawPointLayer(entries, 'feature');
 };
 
 // ✨ 核心函數：生成 DOM 並綁定事件
@@ -839,8 +1300,7 @@ const handleCustomBtnClick = async (item) => {
     }
   } catch (error) {
     const code = error.detail?.code
-    const key = code === 'version_conflict' ? 'conflict'
-      : code === 'record_unavailable' ? 'unavailable'
+    const key = code === 'record_unavailable' ? 'unavailable'
         : code === 'validation_error' ? 'limit' : 'failed'
     showError(t(`user.customSafety.${key}`))
   }
@@ -855,72 +1315,8 @@ const handleDetailBtnClick = (item) => {
 // 邏輯 4: 比較模式 - 用圓點和顏色顯示比較結果
 // =======================================================
 const drawCompareMap = () => {
-  // console.log('🗺️ drawCompareMap 被调用')
-  // console.log('📦 mapStore.mergedData:', mapStore.mergedData)
-  // console.log('📦 mergedData 长度:', mapStore.mergedData?.length)
-
-  if (!mapStore.mergedData || mapStore.mergedData.length === 0) {
-    console.warn('⚠️ mergedData 为空，无法绘制')
-    return;
-  }
-
-  const items = mapStore.mergedData;
-  // console.log(`🎨 开始绘制 ${items.length} 个标记`)
-
-  items.forEach((item, index) => {
-    // console.log(`  🔸 标记 ${index + 1}:`, item)
-
-    // 坐標驗證
-    if (!isValidCoordinatePair(item.coordinate)) {
-      console.warn(`  ⚠️ 标记 ${index + 1} 坐标无效:`, item.coordinate)
-      return;
-    }
-
-    // 創建圓點標記
-    const el = document.createElement('div');
-    el.className = 'marker-dot-compare';
-    el.style.backgroundColor = item.color;
-    el.style.width = '14px';
-    el.style.height = '14px';
-    el.style.borderRadius = '50%';
-    el.style.border = '2px solid white';
-    el.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
-    el.style.cursor = 'pointer';
-
-    // 鼠标悬停效果 - 使用 box-shadow 而不是 transform 避免位置偏移
-    el.addEventListener('mouseenter', () => {
-      el.style.boxShadow = '0 0 0 3px rgba(255,255,255,0.80), 0 4px 12px rgba(0,0,0,0.4)';
-      el.style.width = '18px';
-      el.style.height = '18px';
-      el.style.zIndex = '1000';
-    });
-    el.addEventListener('mouseleave', () => {
-      el.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)';
-      el.style.width = '14px';
-      el.style.height = '14px';
-      el.style.zIndex = 'auto';
-    });
-
-    // 創建彈窗內容
-    const popupContent = createComparePopupNode(item);
-
-    // 創建彈窗
-    const popup = new maplibregl.Popup({
-      offset: 15,
-      maxWidth: '350px',
-      className: 'map-popup-wrapper'
-    }).setDOMContent(popupContent);
-
-    const marker = new maplibregl.Marker({ element: el })
-      .setLngLat(item.coordinate)
-      .setPopup(popup)
-      .addTo(map.value);
-
-    currentMarkers.push(marker);
-    // console.log(`  ✅ 标记 ${index + 1} 已添加到地图`)
-  });
-
-  // console.log(`✅ 绘制完成，共添加 ${currentMarkers.length} 个标记`)
+  const items = (mapStore.mergedData || []).filter(item => isValidCoordinatePair(item.coordinate));
+  drawPointLayer(items.map(item => ({ item, coordinate: item.coordinate, color: item.color })), 'compare');
 };
 
 // =======================================================
@@ -1316,7 +1712,7 @@ const drawIsopleth = () => {
     const feature = event.features?.[0];
     if (!feature) return;
 
-    new maplibregl.Popup({ offset: 12 })
+    trackNativeMapPopup(new maplibregl.Popup({ offset: 12 }))
       .setLngLat(feature.geometry.coordinates)
       .setDOMContent(createIsoplethPopupNode(feature.properties || {}))
       .addTo(map.value);
@@ -1408,7 +1804,7 @@ function drawAdminBoundary(featureCollection) {
       'line-width': 1.5,
       'line-opacity': 0.9
     }
-  });
+  }, map.value.getLayer(POINT_LAYER_ID) ? POINT_LAYER_ID : undefined);
 }
 
 // 創建比較模式的彈窗內容
@@ -1459,13 +1855,27 @@ const toggleFullScreen = async () => {
 
 const handleStyleChange = () => {
   if (!map.value) return;
+  cancelMapContentRender();
+  isRenderingMap.value = true;
+  const targetMap = map.value;
+  let active = true;
+  const onStyleLoad = () => {
+    if (!active) return;
+    isMapStyleReady = true;
+    requestMapContentRender();
+  };
+  const onError = event => { if (!event.sourceId) cancelMapContentRender(); };
+  targetMap.on('error', onError);
+  clearMapRenderWait = () => {
+    active = false;
+    targetMap.off('error', onError);
+    targetMap.off('style.load', onStyleLoad);
+  };
   const newStyle = mapStyle(currentStyleKey.value);
   isMapStyleReady = false;
-  map.value.setStyle(newStyle);
-  map.value.once('style.load', () => {
-    isMapStyleReady = true;
-    renderMapContent(false);
-  });
+  clearPointLayer();
+  targetMap.once('style.load', onStyleLoad);
+  targetMap.setStyle(newStyle, { diff: false });
 };
 
 const AUTO_RESET_DENSITY_PERCENTILE = 0.98;
@@ -1629,6 +2039,11 @@ $glass-transition: all 0.3s ease;
   gap: 12px;
 
   width: 100%;
+}
+
+.partition-color-switch {
+  justify-content: flex-start;
+  gap: 4px;
 }
 
 .display-mode-radios {

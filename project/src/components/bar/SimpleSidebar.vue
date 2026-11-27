@@ -3,7 +3,8 @@
   <Teleport to="body">
     <!-- 遮罩层 -->
     <Transition name="fade">
-      <div v-if="isOpen" class="overlay main-sidebar-overlay" @click="$emit('close')" @wheel.prevent @touchmove.prevent></div>
+      <div v-if="isOpen" v-native-back="() => $emit('close')"
+        class="overlay main-sidebar-overlay" @click="$emit('close')" @wheel.prevent @touchmove.prevent></div>
     </Transition>
 
     <!-- 侧边栏 -->
@@ -176,6 +177,7 @@
     <Transition name="submenu-fade">
       <div
         v-if="activeSubmenu"
+        v-native-back="() => activeSubmenu = null"
         class="submenu-panel main-submenu-panel"
         :style="{
           top: submenuPosition.top + 'px',
@@ -201,6 +203,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import { ref, onMounted, onBeforeUnmount, computed, watch, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
@@ -722,6 +725,221 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 @use '@/styles/global/mixins' as *;
+
+:global(.main-sidebar-overlay) {
+  position: fixed;
+  top: 0;
+  left: min(40dvw + 40px, 340px);
+  width: calc(100dvw - min(40dvw + 40px, 340px));
+  height: 100dvh;
+  background: var(--bg-overlay-dark);
+  z-index: 1000;
+}
+
+:global(.main-sidebar-shell) {
+  --sidebar-shell-background: var(--glass-20);
+  --sidebar-shell-border: var(--glass-30);
+  --sidebar-shell-shadow: inset 0 0 0.5px var(--glass-20), 0 10px 24px rgba(0, 0, 0, 0.16), 0 0 0 0.5px var(--glass-10);
+  --sidebar-item-background: var(--glass-80);
+  --sidebar-item-background-hover: var(--color-primary-light);
+  --sidebar-item-active-background: var(--color-primary-light2);
+  --sidebar-item-text: var(--color-primary-hover);
+  --sidebar-item-border: var(--glass-30);
+  --sidebar-stats-background: linear-gradient(145deg, var(--glass-30), var(--glass-20));
+  --sidebar-stats-border: var(--glass-40);
+  --sidebar-expand-background: linear-gradient(145deg, var(--glass-40), var(--glass-20));
+  --sidebar-expand-background-hover: linear-gradient(145deg, var(--glass-60), var(--glass-40));
+  --sidebar-expand-border: var(--glass-50);
+
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  left: calc(12px + env(safe-area-inset-left, 0px));
+  width: min(40dvw + 40px, 340px);
+  max-width: none;
+  height: calc(100dvh - 24px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+  box-shadow: var(--sidebar-shell-shadow);
+  background: var(--sidebar-shell-background);
+  border: 3px solid var(--sidebar-shell-border);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(24px) saturate(145%);
+  -webkit-backdrop-filter: blur(24px) saturate(145%);
+  z-index: 1001;
+  @include flex-col;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 0 20px 0;
+}
+
+:global(.main-sidebar-empty) {
+  height: 8dvh;
+}
+
+:global(.main-sidebar-content) {
+  @include flex-col;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  flex-grow: 1;
+  max-height: 100%;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+:global(.main-sidebar-list) {
+  list-style-type: none;
+  padding: 0 0 10px;
+  margin: 0;
+  @include flex-col;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+}
+
+:global(.main-sidebar-item) {
+  background: var(--sidebar-item-background);
+  color: var(--sidebar-item-text);
+  font-weight: 1000;
+  border-radius: 25px;
+  padding: 5px 8px 5px 15px;
+  box-shadow: 0 4px 8px var(--bg-overlay-light2), 0 1px 3px var(--bg-hover);
+  border: 2px solid var(--sidebar-item-border);
+  transition: background-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+  height: 10dvh;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  justify-content: center;
+  font-size: var(--font-size-20);
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
+  text-decoration: none;
+  gap: 7px;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+
+:global(.main-sidebar-item:hover) {
+  background: var(--sidebar-item-background-hover);
+  box-shadow: var(--shadow-glass-hover);
+  margin: 0;
+  transform: scale(1.04);
+}
+
+:global(.main-sidebar-item.is-active) {
+  background: var(--sidebar-item-active-background);
+  border-color: rgba(var(--color-primary-rgb), 0.72);
+  color: var(--color-primary);
+}
+
+:global(.main-sidebar-item.is-active::before) {
+  position: absolute;
+  left: 7px;
+  width: 4px;
+  height: 40%;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  content: '';
+}
+
+:global(.main-sidebar-stats) {
+  width: 100%;
+  margin-top: 10px;
+  margin-bottom: 15px;
+  flex-shrink: 0;
+}
+
+:global(.main-sidebar-stats-summary) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 10px;
+  background: var(--sidebar-stats-background);
+  border-radius: 15px;
+  box-shadow: 0 4px 8px var(--bg-hover-strong);
+  border: 2px solid var(--sidebar-stats-border);
+  gap: 9px;
+  flex-wrap: nowrap;
+}
+
+:global(.main-sidebar-expand-btn) {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--sidebar-expand-background);
+  border: 2px solid var(--sidebar-expand-border);
+  color: var(--sidebar-item-text);
+  font-size: var(--font-size-18);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  @include flex-center;
+  flex-shrink: 0;
+}
+
+:global(.main-sidebar-expand-btn:hover) {
+  background: var(--sidebar-expand-background-hover);
+  transform: scale(1.15);
+  box-shadow: var(--shadow-lg2);
+}
+
+:global(.main-sidebar-submenu-item) {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+  font-size: var(--font-size-16);
+  font-weight: 500;
+  color: var(--text-dark);
+}
+
+:global(.main-sidebar-submenu-item:hover) {
+  background: var(--submenu-hover-background);
+  color: var(--color-secondary-hover);
+  transform: translateX(2px);
+}
+
+@media (max-aspect-ratio: 1/1) {
+  :global(.main-sidebar-shell) {
+    top: 0;
+    left: 0;
+    width: min(40dvw + 40px, 340px);
+    max-width: none;
+    height: 100dvh;
+    border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
+  }
+
+  :global(.main-sidebar-empty) {
+    height: 8dvh;
+  }
+
+  :global(.main-sidebar-content) {
+    gap: 15px;
+  }
+
+  :global(.main-sidebar-list) {
+    gap: 8px;
+  }
+
+  :global(.main-sidebar-item) {
+    font-size: var(--font-size-18);
+    padding: 3px 8px 3px 15px;
+  }
+
+  :global(.main-sidebar-submenu-item) {
+    padding: 8px 12px;
+  }
+}
+
 
 $primary: var(--color-primary);
 $primary-dark: var(--color-primary-hover);

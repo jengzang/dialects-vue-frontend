@@ -2,7 +2,7 @@
 
 @use './main/buttons' as main-buttons;
 @use './main/layout' as main-layout;
-@use './main/toolbars' as main-toolbars;
+@use '../components/bar/submenu' as bar-submenu;
 @use './main/overlays' as main-overlays;
 @use './main/popups' as main-popups;
 @use './main/states' as main-states;

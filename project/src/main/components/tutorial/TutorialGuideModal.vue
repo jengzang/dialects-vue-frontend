@@ -87,7 +87,6 @@
     </template>
 
     <div
-      ref="modalBodyRef"
       class="tutorial-shell"
       :class="{
         'is-compact': isCompact,
@@ -96,71 +95,77 @@
       data-tutorial-modal
     >
       <div class="tutorial-shell__body">
-        <aside
-          v-show="shouldShowCatalog"
-          class="tutorial-catalog ui-scrollbar"
+        <Teleport
+          to="body"
+          :disabled="!isCatalogFloating"
         >
-          <div
-            v-if="isCompact && !isMobileLandscape"
-            class="tutorial-catalog__float-header"
+          <aside
+            v-show="shouldShowCatalog"
+            ref="catalogRef"
+            class="tutorial-catalog ui-scrollbar"
           >
-            <span>{{ t('tutorial.ui.catalogLabel') }}</span>
-            <button
-              type="button"
-              class="close-btn close-btn-sm close-btn-inline"
-              :aria-label="t('tutorial.ui.collapseCatalog')"
-              @click="$emit('update:isCatalogOpen', false)"
+            <div
+              v-if="isCatalogFloating"
+              class="tutorial-catalog__float-header"
             >
-              ×
-            </button>
-          </div>
-
-          <section
-            v-for="category in groupedEntries"
-            :key="category.key"
-            class="tutorial-catalog__category"
-          >
-            <h2 class="tutorial-catalog__category-title">
-              {{ category.label }}
-            </h2>
+              <span>{{ t('tutorial.ui.catalogLabel') }}</span>
+              <button
+                type="button"
+                class="close-btn close-btn-sm close-btn-inline"
+                :aria-label="t('tutorial.ui.collapseCatalog')"
+                @click="$emit('update:isCatalogOpen', false)"
+              >
+                ×
+              </button>
+            </div>
 
             <section
-              v-for="group in category.groups"
-              :key="group.key"
-              class="tutorial-catalog__group"
+              v-for="category in groupedEntries"
+              :key="category.key"
+              class="tutorial-catalog__category"
             >
-              <h3 class="tutorial-catalog__group-title">
-                {{ group.label }}
-              </h3>
+              <h2 class="tutorial-catalog__category-title">
+                {{ category.label }}
+              </h2>
 
-              <button
-                v-for="entry in group.entries"
-                :key="entry.key"
-                type="button"
-                class="tutorial-entry"
-                :class="{
-                  'is-active': entry.key === selectedEntry.key,
-                  'is-current-route': entry.key === currentEntry.key
-                }"
-                :data-tutorial-key="entry.key"
-                data-tutorial-entry
-                @click="$emit('selectEntry', entry.key)"
+              <section
+                v-for="group in category.groups"
+                :key="group.key"
+                class="tutorial-catalog__group"
               >
-                <span class="tutorial-entry__title-row">
-                  <span class="tutorial-entry__title">{{ entry.title }}</span>
-                  <span
-                    v-if="entry.key === currentEntry.key"
-                    class="tutorial-entry__badge"
-                  >
-                    {{ t('tutorial.ui.currentBadge') }}
-                  </span>
-                </span>
+                <h3 class="tutorial-catalog__group-title">
+                  {{ group.label }}
+                </h3>
 
-                <span class="tutorial-entry__summary">{{ entry.summary }}</span>
-              </button>
+                <button
+                  v-for="entry in group.entries"
+                  :key="entry.key"
+                  type="button"
+                  class="tutorial-entry"
+                  :class="{
+                    'is-active': entry.key === selectedEntry.key,
+                    'is-current-route': entry.key === currentEntry.key
+                  }"
+                  :data-tutorial-key="entry.key"
+                  data-tutorial-entry
+                  @click="$emit('selectEntry', entry.key)"
+                >
+                  <span class="tutorial-entry__title-row">
+                    <span class="tutorial-entry__title">{{ entry.title }}</span>
+                    <span
+                      v-if="entry.key === currentEntry.key"
+                      class="tutorial-entry__badge"
+                    >
+                      {{ t('tutorial.ui.currentBadge') }}
+                    </span>
+                  </span>
+
+                  <span class="tutorial-entry__summary">{{ entry.summary }}</span>
+                </button>
+              </section>
             </section>
-          </section>
-        </aside>
+          </aside>
+        </Teleport>
 
         <article
           ref="articleScrollRef"
@@ -328,7 +333,7 @@ const emit = defineEmits([
 
 const { t } = useI18n()
 
-const modalBodyRef = ref(null)
+const catalogRef = ref(null)
 const articleTopRef = ref(null)
 const articleScrollRef = ref(null)
 const scrollContainer = computed(() => articleScrollRef.value)
@@ -374,6 +379,8 @@ function onImageNavigate({ src, alt }) {
 const shouldShowCatalog = computed(() => {
   return !props.isCompact || props.isMobileLandscape || props.isCatalogOpen
 })
+
+const isCatalogFloating = computed(() => props.isCompact && !props.isMobileLandscape)
 
 const hideTutorialLocal = ref(!tutorialEnabled.value)
 
@@ -425,7 +432,7 @@ function scrollSelectionIntoView() {
       return
     }
 
-    const activeEntryElement = modalBodyRef.value?.querySelector?.(
+    const activeEntryElement = catalogRef.value?.querySelector?.(
       `[data-tutorial-key="${key}"]`
     )
 
@@ -767,6 +774,8 @@ $float-catalog-button-left:0;
   padding: 12px 10px;
   border-radius: var(--radius-xl);
   overflow: auto;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 
   &-float-button,
   &__float-header {
@@ -1080,9 +1089,9 @@ $float-catalog-button-left:0;
     padding: 10px;
     border-radius: var(--radius-xl);
     background: var(--glass-60);
-    backdrop-filter: blur(18px) saturate(145%);
-    -webkit-backdrop-filter: blur(18px) saturate(145%);
-    border: 2px solid var(--glass-40);
+    backdrop-filter: blur(12px) saturate(145%);
+    -webkit-backdrop-filter: blur(12px) saturate(145%);
+    border: 2px solid var(--color-primary-border);
     // box-shadow: var(--shadow-glass);
     overflow: auto;
     box-shadow:

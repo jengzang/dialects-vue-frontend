@@ -319,7 +319,7 @@ const computedDefaultFilter = computed(() => {
 
 // 方法
 const goHome = () => {
-  router.push('/')
+  router.push(buildLocalePath(resolveRouteLocale(route), '/'))
 }
 
 const onDbKeyChange = () => {
@@ -592,7 +592,7 @@ onMounted(async () => {
     if (!isAdmin.value) {
       showWarning(t('tools.tableManage.messages.adminOnly'))
       setTimeout(() => {
-        router.push('/')
+        router.push(buildLocalePath(resolveRouteLocale(route), '/'))
       }, 3000)
     } else {
       console.log('[TableManage] 管理员身份验证成功')

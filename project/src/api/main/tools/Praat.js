@@ -115,17 +115,10 @@ export function praat() {
    */
   const downloadNormalizedAudio = async (taskId) => {
     try {
-      const response = await
-          fetch(`/api/tools/praat/uploads/progress/${taskId}/audio`, {
-            method: 'GET',
-            credentials: 'include' // 如果需要认证
-          })
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-
-      return await response.blob()
+      return await api(`/api/tools/praat/uploads/progress/${taskId}/audio`, {
+        method: 'GET',
+        responseType: 'blob',
+      })
     } catch (error) {
       console.error('Download audio error:', error)
       throw new Error(error.message || '下載音頻失敗')

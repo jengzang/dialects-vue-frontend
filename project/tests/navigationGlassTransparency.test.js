@@ -26,14 +26,11 @@ describe('navigation glass transparency', () => {
   })
 
   it('keeps the sidebar shell lightly brightened while preserving the stronger background blur', () => {
-    const tokenSource = readSource('src/styles/global/_tokens.scss')
-    const toolbarSource = readSource('src/styles/main/_toolbars.scss')
     const sidebarSource = readSource('src/components/bar/SimpleSidebar.vue')
 
-    expect(tokenSource).toContain('--sidebar-shell-background: var(--glass-20);')
-    expect(tokenSource.match(/--sidebar-shell-background: var\(--glass-10\);/g)).toHaveLength(2)
-    expect(toolbarSource).toContain('backdrop-filter: blur(24px) saturate(145%);')
-    expect(toolbarSource).toContain('-webkit-backdrop-filter: blur(24px) saturate(145%);')
+    expect(sidebarSource).toContain('--sidebar-shell-background: var(--glass-20);')
+    expect(sidebarSource).toContain('backdrop-filter: blur(24px) saturate(145%);')
+    expect(sidebarSource).toContain('-webkit-backdrop-filter: blur(24px) saturate(145%);')
     expect(sidebarSource).toMatch(/<Teleport to="body">[\s\S]*?<Transition name="fade">/)
     expect(sidebarSource).toMatch(/<Transition name="slide-fade">\s*<div v-if="isOpen" class="sidebar main-sidebar-shell"/)
   })

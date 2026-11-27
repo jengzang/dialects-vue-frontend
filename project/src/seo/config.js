@@ -22,10 +22,10 @@ const SEO_CONFIG = {
   },
   defaultDescription: {
     'zh-Hant':
-      '方音圖鑑是一個專注於方言比較與地理語言學的線上平台，提供查字、查中古、查音位、查調、音系分析、方言比較、地圖可視化與自然村資料等功能。',
+      '方音圖鑑是一個專注於方言查詢、比較與地理語言學研究的線上平臺，提供漢字讀音查詢、依韻書音韻地位整理讀音、音系分析、線上 Praat 工具、地圖視覺化、方言詞表，以及利用泰森多邊形繪製方言分布圖等功能。',
     'zh-CN':
-      '方音图鉴是一个专注于方言比较与地理语言学的在线平台，提供查字、查中古、查音位、查调、音系分析、方言比较、地图可视化与自然村资料等功能。',
-    en: 'Dialects Atlas is an online platform focused on dialect comparison and geolinguistics, offering character lookup, Middle Chinese query, phoneme analysis, tone query, phonology analysis, dialect comparison, map visualization, and village datasets.',
+      '方音图鉴是一个专注于方言查询比较与地理语言学的在线平台，提供查字、按韵书地位整理读音、音系分析、在线praat、地图可视化、方言词表以及泰森多边形绘制方言分布图等功能。',
+    en: 'Dialect Atlas(方音圖鑑) is an online platform dedicated to dialect lookup, comparison, and geolinguistic research. It offers Chinese character pronunciation lookup, organization of dialect readings by traditional rime-book phonological categories, phonological system analysis, web-based Praat tools, geographic visualization, dialect wordlists, and dialect distribution mapping using Thiessen (Voronoi) polygons.',
   },
   routes: {
     '/': {
@@ -36,10 +36,10 @@ const SEO_CONFIG = {
       },
       description: {
         'zh-Hant':
-          '方音圖鑑是一個專注於方言比較與地理語言學的線上平台，提供查字、查中古、查音位、查調、音系分析、方言比較、地圖可視化與自然村資料等功能。',
+          '方音圖鑑是一個專注於方言查詢、比較與地理語言學研究的線上平臺，提供漢字讀音查詢、依韻書音韻地位整理讀音、音系分析、線上 Praat 工具、地圖視覺化、方言詞表，以及利用泰森多邊形繪製方言分布圖等功能。',
         'zh-CN':
-          '方音图鉴是一个专注于方言比较与地理语言学的在线平台，提供查字、查中古、查音位、查调、音系分析、方言比较、地图可视化与自然村资料等功能。',
-        en: 'Dialects Atlas is an online platform focused on dialect comparison and geolinguistics, offering character lookup, Middle Chinese query, phoneme analysis, tone query, phonology analysis, dialect comparison, map visualization, and village datasets.',
+          '方音图鉴是一个专注于方言查询比较与地理语言学的在线平台，提供查字、按韵书地位整理读音、音系分析、在线praat、地图可视化、方言词表以及泰森多边形绘制方言分布图等功能。',
+        en: 'Dialect Atlas(方音圖鑑) is an online platform dedicated to dialect lookup, comparison, and geolinguistic research. It offers Chinese character pronunciation lookup, organization of dialect readings by traditional rime-book phonological categories, phonological system analysis, web-based Praat tools, geographic visualization, dialect wordlists, and dialect distribution mapping using Thiessen (Voronoi) polygons.',
       },
     },
     '/auth': {
@@ -576,6 +576,18 @@ const SEO_CONFIG = {
         en: 'Explore the complete development history of Dialects Atlas, from its first scripts to an online platform, including feature release dates and reflections.',
       },
     },
+    '/explore/application': {
+      title: {
+        'zh-Hant': { main: '下載', subtitle: '在網頁、iPhone、iPad 和 Android 使用方音圖鑑' },
+        'zh-CN': { main: '下载', subtitle: '在网页、iPhone、iPad 和 Android 使用方音图鉴' },
+        en: { main: 'Download', subtitle: 'Dialects Atlas for web, iPhone, iPad and Android' },
+      },
+      description: {
+        'zh-Hant': '在網頁使用方音圖鑑，了解 iPhone、iPad 與 Android 應用的發布資訊。',
+        'zh-CN': '在网页使用方音图鉴，了解 iPhone、iPad 与 Android 应用的发布信息。',
+        en: 'Use Dialects Atlas on the web and learn about the upcoming iPhone, iPad and Android apps.',
+      },
+    },
     '/explore/gis': {
       title: {
         'zh-Hant': { main: '地圖繪製', subtitle: '線上GIS圖層編輯與方言分佈圖繪製' },
@@ -711,6 +723,7 @@ export const SITEMAP_PATHS = [
   '/menu/map/view',
   '/menu/map/divide',
   '/menu/map/custom',
+  '/explore/application',
   '/explore/gis',
   '/menu/tools',
   '/menu/vocabulary/view',

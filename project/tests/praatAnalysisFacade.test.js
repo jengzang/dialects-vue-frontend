@@ -16,8 +16,17 @@ describe('Praat analysis facade', () => {
     })
   })
 
-  it.each(['ios', 'android'])('prefers local Python on %s when the native bridge is available', (target) => {
+  it.each(['ios', 'android'])('keeps the remote API as default on %s even when local Python is available', (target) => {
     expect(resolvePraatAnalysisStrategy(target, { localAvailable: true })).toEqual({
+      target,
+      engine: 'remote-api',
+      fallbackEngine: 'remote-api',
+      fallbackReason: 'local-python-unavailable',
+    })
+  })
+
+  it.each(['ios', 'android'])('allows explicit local Python opt-in on %s', (target) => {
+    expect(resolvePraatAnalysisStrategy(target, { localAvailable: true, preferLocal: true })).toEqual({
       target,
       engine: 'local-python',
       fallbackEngine: 'remote-api',

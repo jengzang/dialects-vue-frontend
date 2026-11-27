@@ -18,9 +18,9 @@ import { useNavAnchorJump } from '@/composables/bar/useNavAnchorJump.js'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { requestMapFitView } from '@/utils/map/MapData.js'
 import { showConfirm } from '@/utils/ui/message.js'
-import all_feature_counts from '/data/feature_counts_20260930.json?url'
-import all_syllable_counts from '/data/syllable_counts_20260930.json?url'
-import all_points from '/data/points_20260930.json?url'
+import all_feature_counts from '/data/feature_counts_20261127.json?url'
+import all_syllable_counts from '/data/syllable_counts_20261127.json?url'
+import all_points from '/data/points_20261127.json?url'
 import { resolveStatsLocations } from '@/main/utils/countData.js'
 import { resolvePhonologyActionLocations } from '@/main/utils/phonology/actionLocationResolver.js'
 
@@ -1521,7 +1521,7 @@ onChartThemeChange(() => {
         <p>{{ $t('phonology.phonology.countphos.actions.loading') }}</p>
       </div>
       <!-- 匯總統計部分 -->
-      <section v-if="queryMode.featureCounts && !isSingleLocation && hasChartData" class="aggregated-section glass-panel">
+      <section v-if="queryMode.featureCounts && !isSingleLocation && hasChartData" class="aggregated-section surface-panel" data-variant="transparent">
         <!-- <h3 class="section-title">匯總統計</h3> -->
         <h3 class="section-title section-title--with-pill">
           <span>{{ $t('phonology.phonology.countphos.titlePrefix') }}</span>
@@ -1534,7 +1534,7 @@ onChartThemeChange(() => {
 
         <!-- 圖表統計部分 -->
         <div v-if="hasChartData" :id="getChartsAnchorId()" class="charts-section">
-          <div class="chart-block glass-card">
+          <div class="chart-block surface-card" data-variant="transparent">
             <h4 class="chart-block-title">{{ $t('phonology.phonology.countphos.charts.pie.title') }}</h4>
             <p class="chart-block-desc">
               {{ $t('phonology.phonology.countphos.charts.pie.description') }}
@@ -1555,7 +1555,7 @@ onChartThemeChange(() => {
             </div>
           </div>
 
-          <div v-if="!isSingleLocation" class="chart-block glass-card">
+          <div v-if="!isSingleLocation" class="chart-block surface-card" data-variant="transparent">
             <h4 class="chart-block-title">{{ $t('phonology.phonology.countphos.charts.bar.title') }}</h4>
             <p class="chart-block-desc">
               {{ $t('phonology.phonology.countphos.charts.bar.description') }}
@@ -1578,7 +1578,7 @@ onChartThemeChange(() => {
             </div>
           </div>
 
-          <div v-if="!isSingleLocation" class="chart-block glass-card">
+          <div v-if="!isSingleLocation" class="chart-block surface-card" data-variant="transparent">
             <h4 class="chart-block-title">{{ $t('phonology.phonology.countphos.charts.scatter.title') }}</h4>
             <p class="chart-block-desc">
               {{ $t('phonology.phonology.countphos.charts.scatter.description') }}
@@ -1648,7 +1648,7 @@ onChartThemeChange(() => {
       <section
         v-if="queryMode.syllableCounts && !isSingleLocation && hasSyllableResultData"
         :id="getSyllableAnchorId()"
-        class="syllable-section glass-panel"
+        class="syllable-section surface-panel" data-variant="transparent"
       >
         <div class="syllable-section-header">
           <div>
@@ -1779,7 +1779,7 @@ onChartThemeChange(() => {
       </section>
 
       <!-- 地點詳情部分 -->
-      <section v-if="queryMode.featureCounts && hasLocationDetailData" class="locations-section glass-panel">
+      <section v-if="queryMode.featureCounts && hasLocationDetailData" class="locations-section surface-panel" data-variant="transparent">
         <h3 class="section-title">{{ $t('phonology.phonology.countphos.sections.locations') }}</h3>
         <p class="section-subtitle">
           {{ $t('phonology.phonology.countphos.sections.locationsSubtitle') }}
@@ -1814,7 +1814,7 @@ onChartThemeChange(() => {
       </section>
 
       <!-- 音節地點詳情 -->
-      <section v-if="queryMode.syllableCounts && showSyllableLocations" class="locations-section glass-panel">
+      <section v-if="queryMode.syllableCounts && showSyllableLocations" class="locations-section surface-panel" data-variant="transparent">
         <h3 class="section-title">{{ $t('phonology.phonology.countphos.sections.locations') }}</h3>
         <p class="section-subtitle">
           {{ $t('phonology.phonology.countphos.sections.locationsSubtitle') }}
@@ -2069,10 +2069,8 @@ $primary-deep: var(--color-secondary-text);
   .aggregated-section,
   .syllable-section,
   .locations-section {
-    background: none;
-    border: none;
-    box-shadow: none;
-    backdrop-filter: none;
+    --surface-panel-shadow: none;
+    --surface-panel-hover-shadow: none;
     // border: 1px solid var(--border-gray-light);
     // border-radius: var(--radius-lg);
     // backdrop-filter: blur(12px);
@@ -2162,8 +2160,7 @@ $primary-deep: var(--color-secondary-text);
 
   .chart-block {
     padding: 16px;
-    background: none;
-    backdrop-filter: none;
+    border: 1px solid var(--border-glass);
     // background: var(--glass-60);
     // border: 1px solid rgba(var(--color-primary-rgb), 0.1);
     // border-radius: 14px;

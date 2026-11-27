@@ -1,6 +1,6 @@
 import { reportOnlineTime, getToken } from '../../api/auth/auth.js'
+import { api } from '../../api/auth/httpClient.js'
 import { userStore } from '@/main/store/store.js'
-import { WEB_BASE } from '@/env-config.js'
 
 const AUTH_API_BASE = '/api/auth'
 const REPORT_INTERVAL = 5 * 60 * 1000
@@ -162,19 +162,14 @@ function handlePageHide() {
       const seconds = Math.max(1, Math.min(3600, Math.floor(accumulatedTime)))
       const data = JSON.stringify({ seconds })
 
-      try {
-        fetch(WEB_BASE + `${AUTH_API_BASE}/report-online-time`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-          },
-          body: data,
-          keepalive: true
-        })
-      } catch {
-        persistPendingTime(accumulatedTime)
-      }
+      void api(`${AUTH_API_BASE}/report-online-time`, {
+        method: 'POST',
+        body: data,
+        headers: { 'Content-Type': 'application/json' },
+        keepalive: true,
+        showError: false,
+        timeout: 10000,
+      }).catch(() => persistPendingTime(accumulatedTime))
     }
   }
 }

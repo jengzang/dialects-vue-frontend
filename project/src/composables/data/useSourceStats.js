@@ -1,10 +1,12 @@
-import { queryCount } from '@/api'
+import { api } from '@/api/auth/httpClient.js'
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
 import { readLocalCache, writeLocalCache } from '@/composables/core/localCache.js'
 import { createSingleFlight } from '@/composables/core/singleFlight.js'
 
 const SOURCE_STATS_STORAGE_KEY = 'source-stats-cache'
+const SOURCE_STATS_RESPONSE_STORAGE_KEY = 'source-stats-response-cache'
 const singleFlight = createSingleFlight()
+const countsSingleFlight = createSingleFlight()
 
 function getCurrentDbVersion() {
   return getHomeUpdateNotice(() => '').dbVersion || 'default'
@@ -34,26 +36,61 @@ function readCachedStats() {
 }
 
 function writeCachedStats(stats) {
+  writeLocalCache(SOURCE_STATS_STORAGE_KEY, stats, getCurrentDbVersion())
+}
+
+function readCachedResponse() {
+  const parsed = readLocalCache(SOURCE_STATS_RESPONSE_STORAGE_KEY, getCurrentDbVersion())
+  return parsed?.response || null
+}
+
+function stripUnusedPointFields(response) {
+  return {
+    ...response,
+    points: (response.points || []).map(point => {
+      const next = { ...point }
+      delete next.atlas_region
+      return next
+    })
+  }
+}
+
+function writeCachedResponse(result) {
+  writeCachedStats({
+    locationCount: result.total_points ?? 0,
+    dataCount: result.total_entries ?? 0
+  })
   writeLocalCache(
-    SOURCE_STATS_STORAGE_KEY,
-    { locationCount: stats.locationCount, dataCount: stats.dataCount },
+    SOURCE_STATS_RESPONSE_STORAGE_KEY,
+    { response: stripUnusedPointFields(result) },
     getCurrentDbVersion()
   )
 }
 
-async function requestSourceStats() {
-  const [locationCount, dataCount] = await Promise.all([
-    queryCount({ db_key: 'query', table_name: 'dialects', filter_column: '存儲標記', filter_value: 1 }),
-    queryCount({ db_key: 'dialects', table_name: 'dialects' })
-  ])
+export async function getDialectCounts(options = {}) {
+  const { forceRefresh = false } = options
 
-  const nextStats = {
-    locationCount,
-    dataCount
+  if (!forceRefresh) {
+    const cached = readCachedResponse()
+    if (cached) {
+      return cached
+    }
   }
 
-  writeCachedStats(nextStats)
-  return nextStats
+  return countsSingleFlight(async () => {
+    const result = await api('/api/dialect_counts')
+    writeCachedResponse(result)
+    return result
+  })
+}
+
+async function requestSourceStats(forceRefresh) {
+  const result = await getDialectCounts({ forceRefresh })
+
+  return {
+    locationCount: result.total_points ?? 0,
+    dataCount: result.total_entries ?? 0
+  }
 }
 
 export function getCachedSourceStats() {
@@ -70,5 +107,5 @@ export async function getSourceStats(options = {}) {
     }
   }
 
-  return singleFlight(requestSourceStats)
+  return singleFlight(() => requestSourceStats(forceRefresh))
 }

@@ -19,19 +19,10 @@ export async function createPasswordResetRequest({ email, newPassword }) {
  * @returns {Promise<Object>} User data with tokens
  */
 export async function loginUser({ email, username, password }) {
-  const form = new URLSearchParams()
-
-  if (email) {
-    form.append('username', email)
-  } else {
-    form.append('username', username)
-  }
-  form.append('password', password)
-
   const data = await api(`${AUTH_API_BASE}/login`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: form
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: email || username, password })
   })
 
   // Save tokens and update store
@@ -65,14 +56,10 @@ export async function registerUser({ username, email, password }) {
 export async function updateUsername(newUsername, email) {
   await ensureAuthenticated()
 
-  const form = new URLSearchParams()
-  form.append('username', newUsername)
-  form.append('email', email)
-
   const data = await api(`${AUTH_API_BASE}/updateProfile`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: form
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: newUsername, email })
   })
 
   return data
@@ -86,15 +73,10 @@ export async function updateUsername(newUsername, email) {
 export async function updatePassword({ currentPassword, newPassword, email }) {
   await ensureAuthenticated()
 
-  const form = new URLSearchParams()
-  form.append('password', currentPassword)
-  form.append('new_password', newPassword)
-  form.append('email', email)
-
   const data = await api(`${AUTH_API_BASE}/updateProfile`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: form
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: currentPassword, new_password: newPassword, email })
   })
 
   return data
@@ -117,6 +99,16 @@ export async function logoutUser(refreshToken) {
   } finally {
     clearSession()
   }
+}
+
+export async function deactivateAccount(password) {
+  await ensureAuthenticated()
+  return api(`${AUTH_API_BASE}/account`, {
+    method: 'DELETE',
+    showError: false,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password })
+  })
 }
 
 /**

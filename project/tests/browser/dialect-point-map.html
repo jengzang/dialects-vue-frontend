@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Homepage map regression fixture</title></head>
+  <body style="margin:0">
+    <div id="app"></div>
+    <script type="module">
+      import { createApp, h, reactive, nextTick } from 'vue'
+      import maplibregl from 'maplibre-gl'
+      import '../../src/styles/main-entry.scss'
+      import DialectPointMap from '../../src/main/components/map/DialectPointMap.vue'
+      const original = maplibregl.Map.prototype.setStyle
+      window.mapErrors = []
+      maplibregl.Map.prototype.setStyle = function () {
+        window.dialectMap = this
+        this.on('error', event => window.mapErrors.push(event.error.message))
+        return original.call(this, { version: 8, sources: {}, layers: [{ id: 'background', type: 'background', paint: { 'background-color': '#ededed' } }] }, { diff: false })
+      }
+      const state = reactive({ points: [], fullscreen: false })
+      window.dialectSmoke = { state, nextTick }
+      createApp({ render: () => h(DialectPointMap, state) }).mount('#app')
+    </script>
+  </body>
+</html>

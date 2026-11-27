@@ -19,6 +19,7 @@
       <Transition name="tooltip-fade">
         <div
           v-if="isVisible"
+          v-native-back="hideTooltip"
           class="help-tooltip tooltip-surface"
           :style="[tooltipPosition, { maxWidth: tooltipMaxWidth }]"
         >
@@ -30,6 +31,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import { ref, reactive, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
 
 const HELP_ICON_OPEN_EVENT = 'help-icon-open'

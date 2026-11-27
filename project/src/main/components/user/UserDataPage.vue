@@ -32,7 +32,7 @@
       :state="mutation"
       :retryable="mutationMode === 'create'"
       @retry="retryMutation"
-      @merge="mergeVersions"
+      @merge="reconcileUnknownSave"
     />
     <p
       v-if="validationErrors.length"
@@ -259,7 +259,7 @@
         :state="mutation"
         :retryable="mutationMode === 'create'"
         @retry="retryMutation"
-        @merge="mergeVersions"
+        @merge="reconcileUnknownSave"
       />
       <fieldset
         :disabled="locked"
@@ -410,7 +410,7 @@
         :state="mutation"
         :retryable="mutationMode === 'create'"
         @retry="retryMutation"
-        @merge="mergeVersions"
+        @merge="reconcileUnknownSave"
       />
       <fieldset
         :disabled="locked"
@@ -596,7 +596,7 @@
       <CustomDataSaveNotice
         :state="mutation"
         :retryable="false"
-        @merge="mergeVersions"
+        @merge="reconcileUnknownSave"
       />
       <div class="form-group">
         <label>{{ t('user.dataPage.table.shortNameRequired') }}</label>
@@ -710,7 +710,6 @@ const username = computed(() => route.query.username || userStore.username || t(
 const mutation = useCustomDataSave(body => body.mode === 'update' ? batchUpdateCustomData(body.updates) : body.mode === 'delete' ? batchDeleteCustomDataById(body.deletes) : saveCustomData(body), {leaveMessage:()=>t('user.customSafety.leave')})
 const locked = mutation.locked
 const mutationMode = ref('')
-const mutationRows = ref([])
 const validationErrors = ref([])
 const dataList = ref([])
 const totalCount = ref(0)
@@ -956,8 +955,7 @@ const handleBatchEdit = () => {
     特徵: record.特徵,
     值: record.值,
     說明: record.說明 || '',
-    id: record.id,
-    version: record.version
+    id: record.id
   }))
 
   showBatchEditModal.value = true
@@ -978,7 +976,7 @@ async function runMutation(mode, rows, source) {
   mutation.reset()
   validationErrors.value = []
   const checked = mode === 'delete'
-    ? {items: rows.map(({id,version}) => ({id,version})), errors: rows.length > 50 ? [{row_index:0,field:'',messageKey:'limit'}] : rows.some(row=>!Number.isSafeInteger(row.id)||row.id<=0||!Number.isSafeInteger(row.version)||row.version<=0) ? [{row_index:0,field:'id',messageKey:'unavailable'}] : []}
+    ? {items: rows.map(({id}) => ({id})), errors: rows.length > 50 ? [{row_index:0,field:'',messageKey:'limit'}] : rows.some(row=>!Number.isSafeInteger(row.id)||row.id<=0) ? [{row_index:0,field:'id',messageKey:'unavailable'}] : []}
     : validateRows(rows, {creates: mode === 'create'})
   if (checked.errors.length) {
     validationErrors.value = checked.errors
@@ -989,7 +987,6 @@ async function runMutation(mode, rows, source) {
   }
   if (!checked.items.length) { showWarning(t('user.customSafety.empty')); return }
   mutationMode.value = source
-  mutationRows.value = rows
   const body = {creates:[],updates:[],deletes:[], ...(mode === 'create' ? {} : {mode})}
   body[mode === 'create' ? 'creates' : mode === 'update' ? 'updates' : 'deletes'] = checked.items
   const response = await mutation.save(body, { confirm: mode === 'create' ? undefined : () => showConfirm(t(mode === 'delete' ? 'user.dataPage.messages.batchDeleteConfirm' : 'user.dataPage.messages.batchEditConfirm', {count:checked.items.length})) })
@@ -1010,13 +1007,8 @@ async function retryMutation() {
   const response=await mutation.save({})
   if(response) await finishMutation(response)
 }
-function mergeVersions(current) {
-  mutation.prepareMerge();
-  for (const row of mutationRows.value) {
-    const latest=current.find(item=>item.id===row.id)
-    if(latest) row.version=latest.version
-  }
-  mutation.reset()
+function reconcileUnknownSave() {
+  if (mutation.prepareMerge()) mutation.reset()
 }
 const formatDate = date => formatCustomDataTime(date, locale.value)
 

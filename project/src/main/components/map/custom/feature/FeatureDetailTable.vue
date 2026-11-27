@@ -62,7 +62,7 @@
     <CustomDataSaveNotice
       :state="mutation"
       :retryable="false"
-      @merge="mergeVersions"
+      @merge="reconcileUnknownSave"
     />
     <div
       class="feature-detail-layout"
@@ -426,18 +426,13 @@ const openEditModal = (row) => {
 const handleDelete = async (row) => {
   if(mutation.locked.value || !row?.id) return;
   mutation.reset();
-  const response=await mutation.save({creates:[],updates:[],deletes:[{id:row.id,version:row.version}]},{confirm:()=>showConfirm(t('customEntry.featureDetail.confirmDelete'))});
+  const response=await mutation.save({creates:[],updates:[],deletes:[{id:row.id}]},{confirm:()=>showConfirm(t('customEntry.featureDetail.confirmDelete'))});
   if(!response) return;
   rows.value=rows.value.filter(item=>!response.deleted_ids.includes(item.id));
   emit('saved');
 };
-function mergeVersions(current) {
-  mutation.prepareMerge();
-  for(const row of rows.value) {
-    const latest=current.find(record=>record.id===row.id);
-    if(latest) row.version=latest.version;
-  }
-  mutation.reset();
+function reconcileUnknownSave() {
+  if (mutation.prepareMerge()) mutation.reset();
 }
 
 const handleSaved = async (newFeature) => {

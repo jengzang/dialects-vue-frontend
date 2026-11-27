@@ -49,6 +49,28 @@ beforeEach(() => {
 afterEach(() => { vi.clearAllTimers(); vi.useRealTimers(); });
 
 describe('auth session lifecycle', () => {
+  it.each(['headers', 'body'])('times out native refresh ignoring AbortSignal during %s without accepting a late token', async phase => {
+    const { refreshAccessToken, saveToken, getToken } = await loadAuthModules();
+    saveToken('access-token', 'refresh-token', 1800);
+    vi.useFakeTimers();
+    let finish;
+    const stalled = new Promise(resolve => { finish = resolve; });
+    global.fetch = vi.fn(() => phase === 'headers' ? stalled : Promise.resolve({
+      ok: true, status: 200, json: () => stalled,
+    }));
+    let result;
+    const pending = refreshAccessToken().then(value => { result = value; });
+    await vi.advanceTimersByTimeAsync(15001);
+    expect(result).toMatchObject({ ok: false, reason: 'network_error' });
+    const lateToken = { access_token: 'late', refresh_token: 'late-refresh', expires_in: 1800 };
+    finish(phase === 'headers' ? jsonResponse(lateToken) : lateToken);
+    await pending;
+    await vi.advanceTimersByTimeAsync(0);
+    expect(getToken()).toBe('access-token');
+    global.fetch = vi.fn().mockResolvedValue(jsonResponse(lateToken));
+    await expect(refreshAccessToken()).resolves.toMatchObject({ ok: true });
+  });
+
   it.each(['headers', 'body'])('bounds a stalled refresh %s and releases single flight', async phase => {
     const { refreshAccessToken, saveToken, getToken } = await loadAuthModules();
     saveToken('access-token', 'refresh-token', 1800);

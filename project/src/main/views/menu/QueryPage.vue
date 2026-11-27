@@ -2,6 +2,7 @@
   <TabSwitcher
     class="page-tabs--vertically-centered"
     pin-navigation
+    swipeable
     :tabs="tabs"
     :model-value="currentTab"
     :route-value="currentTab"

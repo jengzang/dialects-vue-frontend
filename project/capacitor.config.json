@@ -1,7 +1,12 @@
 {
   "appId": "top.yzup.dialects",
-  "appName": "Dialects",
+  "appName": "方音圖鑑",
   "webDir": "dist",
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  },
   "android": {
     "path": "../android"
   },

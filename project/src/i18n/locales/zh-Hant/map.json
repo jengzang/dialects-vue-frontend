@@ -346,6 +346,19 @@
       "searchPlaceholder": "搜索地點或分區"
     }
   },
+  "partitionColors": {
+    "mapSource": "地圖集",
+    "yindianSource": "音典",
+    "expand": "展開",
+    "collapse": "收起",
+    "title": "分區顏色",
+    "search": "搜尋分區",
+    "sessionHint": "修改後自動儲存，僅在目前分頁工作階段中生效。",
+    "retry": "重試",
+    "empty": "沒有符合的分區",
+    "reset": "重置",
+    "loadFailed": "分區顏色載入失敗，請重試。"
+  },
   "mapLibre": {
     "common": {
       "none": "無"
@@ -355,6 +368,8 @@
       "show": "顯示",
       "hide": "隱藏",
       "viewPlaceNames": "查看地名",
+      "useCustomPartitionColors": "使用自訂顏色",
+      "useCustomPartitionColorsHelp": "可在「地圖-分區圖」頁面自訂各分區顏色。預設為「漢字音典」的顏色。",
       "enabled": "開啟",
       "disabled": "關閉"
     },

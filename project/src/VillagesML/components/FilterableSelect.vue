@@ -46,6 +46,7 @@
       <div
         v-if="dropdownOpen"
         ref="dropdownRef"
+        v-native-back="() => dropdownOpen = false"
         class="select-dropdown"
         :style="dropdownStyle"
         @click.stop
@@ -104,6 +105,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { showError } from '@/utils/ui/message.js'

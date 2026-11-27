@@ -163,6 +163,7 @@
 </template>
 
 <script setup>
+import { getCurrentRuntimePlatform, getPlatformFileService } from '@/platform/index.js'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import * as XLSX from 'xlsx'
@@ -783,7 +784,7 @@ const performTValueAnalysis = () => {
 }
 
 // === 4. Excel 导出功能 ===
-const exportToExcel = () => {
+const exportToExcel = async () => {
   if (tValueResults.value.length === 0) {
     showWarning(t('praat.pitchTone.step3.export.noData'))
     return
@@ -820,7 +821,15 @@ const exportToExcel = () => {
 
   // 4. 下载文件
   const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-')
-  XLSX.writeFile(wb, `${PITCH_TONE_EXPORT_FILE_PREFIX}${timestamp}.xlsx`)
+  if (getCurrentRuntimePlatform().container === 'native-webview') {
+    const data = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+    await getPlatformFileService().saveBlob(
+      new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+      `${PITCH_TONE_EXPORT_FILE_PREFIX}${timestamp}.xlsx`,
+    )
+  } else {
+    XLSX.writeFile(wb, `${PITCH_TONE_EXPORT_FILE_PREFIX}${timestamp}.xlsx`)
+  }
 
   showSuccess(t('praat.pitchTone.step3.export.success'))
 }

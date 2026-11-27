@@ -122,6 +122,7 @@
     <Teleport to="body">
       <div
         v-if="readingTooltip.visible"
+        v-native-back="() => readingTooltip.visible = false"
         class="global-tooltip-popup"
         :style="{ top: readingTooltip.top + 'px', left: readingTooltip.left + 'px' }"
       >
@@ -141,6 +142,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import { computed, nextTick, onActivated, onDeactivated, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getReadingClass, getSearchCharReadingType } from '@/main/utils/query/ResultTable.js';
@@ -595,12 +597,12 @@ const handleCopy = async () => {
   }
 };
 
-const handleExport = () => {
+const handleExport = async () => {
   const { headers, rows } = buildExportData();
   const fileName = props.mode === 'tab4'
     ? `查調結果_${Date.now()}.csv`
     : `查字結果_${Date.now()}.csv`;
-  downloadText(toCsv([headers, ...rows]), fileName);
+  await downloadText(toCsv([headers, ...rows]), fileName);
   showSuccess(t('result.charsAndTones.export.exported'));
 };
 
@@ -840,7 +842,7 @@ $glass-blur: 8px;
 
 .pronunciation {
   color: $text-black;
-  font-size: 1.1em;
+  font-size: var(--font-size-18);
   font-weight: normal;
 
   &--wendu {
@@ -929,7 +931,7 @@ $glass-blur: 8px;
   td {
     padding: 3px;
     overflow: hidden;
-    font-size: 1em;
+    font-size: var(--font-size-18);
     text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -963,6 +965,7 @@ $glass-blur: 8px;
     box-sizing: border-box;
     width: 100%;
     padding: 4px 8px;
+    font-size: var(--font-size-16);
     --pill-btn-color: var(--color-primary);
     --pill-btn-hover-color: var(--color-primary-hover);
     --pill-btn-hover-border: var(--color-primary-hover);
@@ -973,7 +976,7 @@ $glass-blur: 8px;
   box-sizing: border-box;
   width: 60px;
   @include text-truncate;
-  font-size: 1em;
+  font-size: var(--font-size-18);
 }
 
 #loading-overlay {

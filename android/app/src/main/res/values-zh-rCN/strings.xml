@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">方音图鉴</string>
+    <string name="title_activity_main">方音图鉴</string>
+    <string name="press_back_again_to_exit">再按一次返回键退出应用</string>
+    <string name="launch_description">探索方言的历史层次 · 触摸汉字的音韵之美</string>
+</resources>

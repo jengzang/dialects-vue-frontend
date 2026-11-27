@@ -26,6 +26,11 @@ describe('native dist audit manifest', () => {
     ])).toEqual(['tutorial/menu-query-char/01-输入页面.webp'])
   })
 
+  it('rejects legacy site assets in native builds', () => {
+    expect(auditNativeDistFiles(['detail/index.html', 'detail/js/main.js', 'assets/index.js']))
+      .toEqual(['detail/index.html', 'detail/js/main.js'])
+  })
+
   it('fails native dist audit when Vite visualizer reports remain', () => {
     expect(auditNativeDistFiles([
       'bundle-network.html',

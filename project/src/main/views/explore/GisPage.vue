@@ -792,6 +792,7 @@ import InlineIcon from '@/components/common/InlineIcon.vue'
 import { onBeforeUnmount, onMounted, ref, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
+import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js';
 import { showConfirm } from '@/utils/ui/message.js';
 
 import { useAuthGuard } from '@/composables/router/useAuthGuard.js';
@@ -826,7 +827,7 @@ async function guardWrite() {
   if (isAuthenticated.value) return true;
   const confirmed = await showConfirm(t('map.drawTab.auth.loginRequired'));
   if (confirmed) {
-    router.push({ path: '/auth', query: { redirect: route.fullPath } });
+    router.push({ path: buildLocalePath(resolveRouteLocale(route), '/auth'), query: { redirect: route.fullPath } });
   }
   return false;
 }

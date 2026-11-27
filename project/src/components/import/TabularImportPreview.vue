@@ -220,6 +220,7 @@
   <Teleport to="body">
     <div
       v-if="isFullscreenPreview"
+      v-native-back="() => isFullscreenPreview = false"
       class="tabular-import-preview-fullscreen"
       role="dialog"
       aria-modal="true"
@@ -507,6 +508,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'

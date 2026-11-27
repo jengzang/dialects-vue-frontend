@@ -156,6 +156,7 @@
       <Transition name="submenu-fade">
         <div
           v-if="activeSubmenu"
+          v-native-back="() => activeSubmenu = null"
           class="main-submenu-panel"
           :style="{
             top: submenuPosition.top + 'px',
@@ -192,6 +193,7 @@
 </template>
 
 <script setup>
+import { vNativeBack } from '@/platform/backRegistry.js'
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
@@ -571,9 +573,9 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 .explorebar {
   position: fixed;
-  top: 12px;
-  right: 16px;
-  left: 16px;
+  top: max(12px, env(safe-area-inset-top, 0px));
+  right: calc(16px + env(safe-area-inset-right, 0px));
+  left: calc(16px + env(safe-area-inset-left, 0px));
   z-index: 999;
   width: auto;
   box-sizing: border-box;
@@ -710,16 +712,9 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
     color: $active-blue;
     font-weight: 1000;
     font-size: 1.1em;
-    background: linear-gradient(
-      145deg,
-      var(--glass-20),
-      var(--glass-10)
-    );
-    border: 3px solid var(--glass-40);
+    background: transparent;
+    border: 3px solid transparent;
     border-radius: 25px;
-    box-shadow:
-      0 6px 10px rgba(0, 0, 0, 0.1),
-      0 1px 4px rgba(0, 0, 0, 0.08);
     transition:
       background $transition-base ease 0.6s,
       color $transition-base ease 0.6s,
@@ -741,14 +736,6 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
       opacity: 0.5;
     }
 
-    &:hover {
-      background: linear-gradient(
-        145deg,
-        var(--glass-50),
-        var(--glass-30)
-      );
-      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-    }
   }
 }
 
@@ -758,19 +745,18 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   left: 0;
   top: 50%;
   pointer-events: none;
-  background: linear-gradient(
-    145deg,
-    var(--glass-20),
-    var(--glass-10)
-  );
+  background: linear-gradient(155deg, var(--glass-30), var(--glass-05));
   border-radius: 25px;
   box-shadow:
-    0 6px 10px rgba(0, 0, 0, 0.1),
-    0 1px 4px rgba(0, 0, 0, 0.08);
+    inset 0 1px 0 var(--glass-highlight, var(--glass-90)),
+    inset 0 0 0 1px var(--glass-highlight, var(--glass-60)),
+    inset 0 -3px 8px rgba(var(--color-shadow-rgb), 0.08),
+    0 5px 12px rgba(var(--color-shadow-rgb), 0.15);
+  @include glass-blur(8px, 150%);
+  opacity: 1 !important;
   transition:
     transform 0.6s cubic-bezier(0.25, 0.1, 0.0, 1.0),
-    width 0.6s cubic-bezier(0.25, 0.1, 0.0, 1.0),
-    opacity 0.15s ease;
+    width 0.6s cubic-bezier(0.25, 0.1, 0.0, 1.0);
 
   &--mobile {
     border-radius: 30px;
@@ -785,12 +771,12 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   cursor: pointer;
   border-radius: var(--radius-full);
   transition: all $transition-base ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
   @include flex-center;
   @include glass-control;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transform: scale(1.1);
   }
 }
@@ -823,11 +809,11 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
   cursor: pointer;
   border-radius: 30px;
   transition: all $transition-base ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
   @include glass-control;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transform: scale(1.05);
   }
 }
@@ -860,9 +846,9 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
 
 @media (max-aspect-ratio: 1/1) {
   .explorebar {
-    top: max(8px, env(safe-area-inset-top));
-    right: 8px;
-    left: 8px;
+    top: max(8px, env(safe-area-inset-top, 0px));
+    right: calc(8px + env(safe-area-inset-right, 0px));
+    left: calc(8px + env(safe-area-inset-left, 0px));
     border-radius: var(--radius-lg);
   }
 
@@ -934,16 +920,9 @@ $submenu-easing: cubic-bezier(0.25, 0.8, 0.25, 1);
         z-index: 1;
         color: $active-blue;
         font-weight: 1000;
-        background: linear-gradient(
-          145deg,
-          var(--glass-20),
-          var(--glass-10)
-        );
-        border: 3px solid var(--glass-40);
+        background: transparent;
+        border: 3px solid transparent;
         border-radius: 30px;
-        box-shadow:
-          0 6px 10px rgba(0, 0, 0, 0.1),
-          0 1px 4px rgba(0, 0, 0, 0.08);
         transition: 0.3s ease 0.6s;
 
         .nav-icon, .label {

@@ -410,7 +410,7 @@ $mobile-width: 150px;
 .count-location-jump-nav {
   position: fixed;
   top: 50%;
-  right: 10px;
+  right: calc(10px + env(safe-area-inset-right, 0px));
   z-index: 1600;
   width: $desktop-width;
   max-height: min(82vh, 620px);

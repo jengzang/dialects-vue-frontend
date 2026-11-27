@@ -25,7 +25,7 @@
     <CustomDataSaveNotice
       :state="mutation"
       @retry="retrySave"
-      @merge="mergeVersions"
+      @merge="reconcileUnknownSave"
     />
     <div
       class="point-detail-layout"
@@ -647,7 +647,7 @@ function hideSuggestions() {
 function removeRow(id) {
   if (locked.value) return;
   const target = rows.value.find(row => row.clientRowId === id);
-  if (target?.recordId) removedIds.value.push({id:target.recordId,version:target.version});
+  if (target?.recordId) removedIds.value.push({id:target.recordId});
   rows.value = rows.value.filter(row => row.clientRowId !== id);
   if (!rows.value.length) rows.value = [createEmptyRow()];
 }
@@ -723,10 +723,9 @@ async function handleSave() {
 function finishSave(response) {
   for (const created of response.created || []) {
     const row=rows.value.find(item=>item.clientRowId===created.client_row_id);
-    if(row) {row.recordId=created.id;row.version=created.version || 1;}
+    if(row) {row.recordId=created.id;}
   }
   for(const row of rows.value) {
-    if(response.updated_ids?.includes(row.recordId)) row.version += 1;
     if(row.recordId) row.original={簡稱:location.value.trim(),音典分區:region.value.trim(),經緯度:coordText.value,聲韻調:row.聲韻調,特徵:row.特徵,值:row.值,說明:row.說明};
   }
   removedIds.value=[];
@@ -739,15 +738,11 @@ async function retrySave() {
   const response=await mutation.save({});
   if(response) finishSave(response);
 }
-function mergeVersions(current) {
-  mutation.prepareMerge();
+function reconcileUnknownSave(current) {
+  if (!mutation.prepareMerge()) return;
   for(const row of rows.value) {
     const latest=current.find(record=>record.id===row.recordId);
-    if(latest) {row.version=latest.version;row.original={...latest};}
-  }
-  for(const item of removedIds.value) {
-    const latest=current.find(record=>record.id===item.id);
-    if(latest) item.version=latest.version;
+    if(latest) row.original={...latest};
   }
   mutation.reset();
 }

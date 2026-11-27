@@ -221,6 +221,98 @@
 
     <!-- <HomeFeaturedTools @view-all="scrollToFeatures" /> -->
 
+    <section v-if="showAppDownload" class="home-download">
+      <h2 class="section-title">{{ $t('home.download.title') }}</h2>
+      <p class="home-download__description">{{ $t('home.download.description') }}</p>
+      <p class="home-download__description home-download__availability">{{ $t('home.download.availability') }}</p>
+      <div class="home-download__actions">
+        <RouterLink class="home-download__entry glass-card" data-interactive="true" :to="localeTo('/explore/application')">
+          <PhAppleLogo :size="26" weight="fill" aria-hidden="true" />
+          <span>iPhone / iPad</span>
+          <span aria-hidden="true">↗</span>
+        </RouterLink>
+        <RouterLink class="home-download__entry glass-card" data-interactive="true" :to="localeTo('/explore/application')">
+          <PhAndroidLogo :size="26" weight="fill" aria-hidden="true" />
+          <span>Android</span>
+          <span aria-hidden="true">↗</span>
+        </RouterLink>
+      </div>
+      <QQGroupContact class="home-download__contact" />
+    </section>
+    <section class="home-dialect-map-section" :class="{ 'is-map-fullscreen': dialectMapFullscreen }">
+      <div class="home-section-heading">
+        <h2 class="section-title">{{ $t('home.download.mapTitle') }}</h2>
+        <button
+          class="glass-button home-dialect-map-fullscreen"
+          :class="{ 'is-map-fullscreen': dialectMapFullscreen }"
+          type="button"
+          :aria-label="dialectMapFullscreen ? $t('result.phonologyTable.exitFullscreen') : $t('result.phonologyTable.fullscreen')"
+          :aria-pressed="dialectMapFullscreen"
+          @click="dialectMapFullscreen = !dialectMapFullscreen"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path v-if="dialectMapFullscreen" d="M9 3v6H3M15 3v6h6M3 15h6v6M21 15h-6v6" />
+            <path v-else d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5" />
+          </svg>
+        </button>
+      </div>
+      <div class="home-dialect-map-stats">
+        <i18n-t
+          keypath="home.download.mapStats"
+          tag="span"
+          scope="global"
+          class="home-dialect-map-stats__pill"
+        >
+          <template #points>
+            <strong class="home-dialect-map-stats__value">{{ dialectMapStats.totalPoints }}</strong>
+          </template>
+          <template #entries>
+            <strong class="home-dialect-map-stats__value">{{ dialectMapStats.totalEntries }}</strong>
+          </template>
+        </i18n-t>
+      </div>
+      <div v-if="dialectMapError" class="home-dialect-map-error">{{ dialectMapError }}</div>
+      <DialectPointMap
+        v-else
+        :points="dialectMapData"
+        :fullscreen="dialectMapFullscreen"
+        :loading="dialectMapLoading"
+        :loading-text="$t('home.download.mapLoading')"
+        :empty-text="$t('home.download.mapEmpty')"
+        @exit-fullscreen="dialectMapFullscreen = false"
+      />
+      <p class="home-dialect-map-copy">
+        <i18n-t keypath="home.download.mapDescription" tag="span" scope="global">
+          <template
+            v-for="link in dialectMapLinks"
+            :key="link.key"
+            #[link.key]
+          >
+            <component
+              :is="link.external ? 'a' : 'RouterLink'"
+              v-bind="link.external ? { href: link.href, target: '_blank', rel: 'noopener noreferrer' } : { to: localeTo(link.to) }"
+              class="home-dialect-map-link"
+            >
+              <span>{{ $t(`home.download.mapLinks.${link.key}`) }}</span>
+              <svg
+                class="home-dialect-map-link__arrow"
+                viewBox="0 0 16 16"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M4 12 12 4M4 4h8v8"
+                  stroke="currentColor"
+                  stroke-width="1.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </component>
+          </template>
+        </i18n-t>
+      </p>
+    </section>
     <FeaturesSection />
 
     <!-- Roadmap Section -->
@@ -389,8 +481,10 @@
           <RouterLink :to="localeTo('/menu/settings')" class="footer-link">{{ $t('home.footer.links.setting') }}</RouterLink>
           <span class="footer-divider">·</span>
           <a href="https://dialects.yzup.top/detail/" target="_blank" class="footer-link">{{ $t('home.footer.links.oldSite') }}</a>
-          <span class="footer-divider">·</span>
-          <a @click="showSupport = true" class="footer-link">{{ $t('home.footer.links.support') }}</a>
+          <template v-if="!hideSponsorContent">
+            <span class="footer-divider">·</span>
+            <a @click="showSupport = true" class="footer-link">{{ $t('home.footer.links.support') }}</a>
+          </template>
         </div>
 
         <!-- Visit Stats -->
@@ -428,6 +522,7 @@
 
     <!-- Support Modal -->
     <SupportPopup
+      v-if="!hideSponsorContent"
       :visible="showSupport"
       @close="showSupport = false"
     />
@@ -452,8 +547,11 @@
 </template>
 
 <script setup>
+/* global __IS_NATIVE_BUILD__ */
+import { PhAndroidLogo, PhAppleLogo } from '@phosphor-icons/vue'
 import InlineIcon from '@/components/common/InlineIcon.vue'
 import BarIcon from '@/components/common/BarIcon.vue'
+import QQGroupContact from '@/components/common/QQGroupContact.vue'
 import FeaturesSection from '@/main/components/FeaturesSection.vue'
 import BlueLayoutBackground from '@/components/common/BlueLayoutBackground.vue'
 import AboutHistory from '@/main/views/menu/support/about/AboutHistory.vue'
@@ -465,12 +563,17 @@ import { buildLocalePath, resolveRouteLocale } from '@/i18n/localeRouting.js'
 import { currentColorTheme, currentInterfaceMode, UI_MODE_COMPACT, getBrandAssets } from '@/composables/core/uiPreferences.js'
 import { useVisitStats } from '@/composables/data/useVisitStats.js'
 import { useClickParticles } from '@/main/composables/useClickParticles.js'
-import { getCachedSourceStats, getSourceStats } from '@/composables/data/useSourceStats.js'
+import { getCachedSourceStats, getDialectCounts, getSourceStats } from '@/composables/data/useSourceStats.js'
 import { getHomeUpdateNotice } from '@/utils/user/updateNoticeConfig.js'
+import { getCurrentRuntimePlatform } from '@/platform/runtime.js'
+import { shouldHideSponsorContent } from '@/platform/sponsorship.js'
 
 // ✅ 懒加载：先弹窗 → 地球 → Hero 展示
 const GlobeBackground = defineAsyncComponent(() =>
   import('@/main/components/globe/GlobeBackground.vue')
+)
+const DialectPointMap = defineAsyncComponent(() =>
+  import('@/main/components/map/DialectPointMap.vue')
 )
 const HeroShowcase = defineAsyncComponent(() =>
   import('@/main/components/HeroShowcase.vue')
@@ -486,6 +589,22 @@ const UpdateNoticeModal = defineAsyncComponent(() =>
 )
 
 const { t, locale } = useI18n()
+const showAppDownload = (typeof __IS_NATIVE_BUILD__ === 'undefined' || !__IS_NATIVE_BUILD__) && getCurrentRuntimePlatform().container !== 'native-webview'
+const dialectMapLinks = [
+  { key: 'feature', to: '/menu/query/zhonggu' },
+  { key: 'compare', to: '/menu/compare/char' },
+  { key: 'distribution', to: '/menu/map/divide' },
+  { key: 'heatmap', to: '/menu/map/divide' },
+  { key: 'isopleth', to: '/menu/pho/count' },
+  { key: 'adminBoundary', to: '/menu/map/view' },
+  { key: 'onlineGis', to: '/explore/gis' },
+  { key: 'thiessenPolygon', href: 'https://zhuanlan.zhihu.com/p/985825588', external: true }
+]
+const dialectMapData = ref([])
+const dialectMapLoading = ref(false)
+const dialectMapError = ref('')
+const dialectMapStats = ref({ totalPoints: 0, totalEntries: 0 })
+const dialectMapFullscreen = ref(false)
 const router = useRouter()
 const route = useRoute()
 const {
@@ -505,6 +624,7 @@ const globePoints = ref([])
 const showShowcase = ref(false)
 const showcaseSectionRef = ref(null)
 const showSupport = ref(false)
+const hideSponsorContent = shouldHideSponsorContent()
 const showBenefitsPopup = ref(false)
 const showUpdateNotice = ref(false)
 const sourceDbVersion = getHomeUpdateNotice(t).dbVersion
@@ -645,7 +765,7 @@ function scrollToFeatures() {
 
 function initHomeBackground() {
   const root = homePageRef.value
-  const features = root?.querySelector('#features-section')
+  const features = root?.querySelector('.home-download')
   const hero = root?.querySelector('.hero-section')
   if (!features || !hero) return
   const updateStart = () => {
@@ -725,11 +845,49 @@ async function fetchGlobePoints() {
   }
 }
 
+function normalizeDialectMapPoint(point) {
+  const values = String(point.coordinates || '')
+    .split(/[，,\s]+/)
+    .map(Number)
+    .filter(Number.isFinite)
+  if (values.length < 2) return null
+  return {
+    longitude: values[0],
+    latitude: values[1],
+    entryCount: Number(point.entry_count) || 0,
+    locationName: point.location || '',
+    yindianRegion: point.yindian_region || '',
+    atlasRegion: point.atlas_region || '',
+    color: point.color || '',
+    transitionColor: point.transition_color || '',
+    items: []
+  }
+}
+
+async function fetchDialectMap() {
+  dialectMapLoading.value = true
+  try {
+    const result = await getDialectCounts()
+    const totalPoints = Number(result.total_points) || 0
+    const totalEntries = Number(result.total_entries) || 0
+    dialectMapStats.value = { totalPoints, totalEntries }
+    sourceLocationCount.value = totalPoints
+    sourceDataCount.value = totalEntries
+    dialectMapData.value = (result.points || []).map(normalizeDialectMapPoint).filter(Boolean)
+  } catch (error) {
+    dialectMapError.value = error.message || t('home.download.mapError')
+    console.error('獲取方言點統計地圖失敗:', error)
+  } finally {
+    dialectMapLoading.value = false
+  }
+}
+
 useClickParticles()
 
 onMounted(() => {
   window.addEventListener('keydown', handleGlobeModeKeydown)
   fetchGlobePoints()
+  fetchDialectMap()
   setTimeout(() => {
     fetchVisitStats()
     fetchSourceStats()
@@ -787,6 +945,101 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 }
 
 /* Base */
+.home-download {
+  @include section-container(1300px);
+  padding: clamp(2rem, 4dvw, 4rem) clamp(1.5rem, 3dvw, 2.5rem);
+
+  &__description { font-size: var(--font-size-20); margin: 0.4rem 0; text-align: center; }
+  &__availability { color: var(--text-dark-lighter); font-size: var(--font-size-13); }
+  &__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 1rem;margin-bottom: 1.5rem; }
+}
+
+.home-dialect-map-section { @include section-container(1300px); padding: clamp(2rem, 4dvw, 4rem) clamp(1.5rem, 3dvw, 2.5rem); }
+.home-dialect-map-section.is-map-fullscreen { z-index: var(--z-index-vocabulary-map-fullscreen); }
+
+.home-section-heading { display: flex; align-items: center; justify-content: center; gap: 1rem; }
+
+.home-dialect-map-fullscreen { width: 40px; height: 40px; padding: 0; }
+.home-dialect-map-fullscreen.is-map-fullscreen { position: fixed; top: max(18px, env(safe-area-inset-top, 0px)); right: max(18px, env(safe-area-inset-right, 0px)); z-index: calc(var(--z-index-vocabulary-map-fullscreen) + 1); }
+
+.home-dialect-map-fullscreen svg { width: 20px; height: 20px; }
+
+.home-dialect-map-loading,
+.home-dialect-map-error {
+  color: var(--text-dark-lighter);
+  font-size: var(--font-size-14);
+  text-align: center;
+}
+
+.home-dialect-map-stats {
+  display: flex;
+  justify-content: center;
+  margin: 0.75rem 0 1.25rem;
+}
+
+.home-dialect-map-stats__pill {
+  display: inline-block;
+  padding: 0.4rem 1.1rem;
+  color: var(--text-dark-lighter);
+  font-size: var(--font-size-13);
+  letter-spacing: 0.01em;
+  background: var(--color-secondary-light);
+  border: 1px solid var(--color-secondary-border);
+  border-radius: var(--radius-full);
+}
+
+.home-dialect-map-stats__value {
+  margin: 0 0.15rem;
+  color: var(--color-secondary-text);
+  font-size: var(--font-size-16);
+  font-weight: 700;
+  font-feature-settings: 'tnum' 1;
+}
+
+.home-dialect-map-error {
+  color: var(--color-error-light);
+}
+
+.home-dialect-map-copy {
+  max-width: 920px;
+  margin: 1.25rem auto 0;
+  color: var(--text-dark-lighter);
+  font-size: var(--font-size-16);
+  line-height: 1.9;
+  text-align: center;
+  @media (max-aspect-ratio: 1 / 1) {
+    font-size: var(--font-size-14);
+  }
+}
+
+.home-dialect-map-link {
+  color: var(--color-primary);
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+
+  &:hover {
+    color: var(--color-primary-hover);
+    border-bottom-color: currentColor;
+  }
+
+  &__arrow {
+    display: inline-block;
+    width: 0.7em;
+    height: 0.7em;
+    margin-left: 0.1em;
+    vertical-align: baseline;
+    opacity: 0.75;
+  }
+}
+
+.home-download__entry { --glass-card-background: rgba(var(--color-shadow-rgb), 0.9); display: flex; align-items: center; gap: 0.6rem; max-width: 360px; padding: 0.4rem 0.5rem; color: var(--text-white); text-decoration: none; }
+.home-download__entry:hover { background: rgba(var(--color-shadow-rgb), 1); }
+
 .home-page {
   position: relative;
   width: 100%;
@@ -934,7 +1187,11 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
     align-items: flex-start;
     justify-content: center;
     gap: 1rem;
-    padding: 2rem 1.5rem;
+    padding:
+      calc(2rem + env(safe-area-inset-top, 0px))
+      calc(1.5rem + env(safe-area-inset-right, 0px))
+      2rem
+      calc(1.5rem + env(safe-area-inset-left, 0px));
   }
 
   &-content {
@@ -1218,6 +1475,7 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 .section {
   &-title {
     margin-bottom: 0.5rem;
+    margin-top: 0.5rem;
     text-align: center;
     font-size: clamp(var(--font-size-28), 4vw, var(--font-size-48));
     font-weight: 700;
@@ -1655,7 +1913,11 @@ $ease-apple: cubic-bezier(0.32, 0.72, 0, 1);@mixin primary-gradient {
 .footer {
   position: relative;
   z-index: 1;
-  padding: 2.5rem clamp(1.5rem, 4vw, 2.5rem);
+  padding:
+    2.5rem
+    calc(clamp(1.5rem, 4vw, 2.5rem) + env(safe-area-inset-right, 0px))
+    calc(2.5rem + env(safe-area-inset-bottom, 0px))
+    calc(clamp(1.5rem, 4vw, 2.5rem) + env(safe-area-inset-left, 0px));
   background: var(--glass-40);
   backdrop-filter: blur(20px);
   border-top: 1px solid rgba(var(--color-primary-rgb), 0.1);
