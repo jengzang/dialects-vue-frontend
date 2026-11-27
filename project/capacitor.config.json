@@ -1,6 +1,6 @@
 {
   "appId": "top.yzup.dialects",
-  "appName": "方音圖鑑-v5.3.0",
+  "appName": "方音圖鑑-v5.3.1",
   "webDir": "dist",
   "plugins": {
     "CapacitorHttp": {

@@ -375,7 +375,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 50300;
+				CURRENT_PROJECT_VERSION = 50301;
 				INFOPLIST_FILE = App/Info.plist;
                 CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -383,7 +383,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 5.3.0;
+				MARKETING_VERSION = 5.3.1;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" \"-DDEBUG\"";
 				PRODUCT_BUNDLE_IDENTIFIER = top.yzup.dialects;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -398,7 +398,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 50300;
+				CURRENT_PROJECT_VERSION = 50301;
 				INFOPLIST_FILE = App/Info.plist;
                 CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -406,7 +406,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 5.3.0;
+				MARKETING_VERSION = 5.3.1;
 				PRODUCT_BUNDLE_IDENTIFIER = top.yzup.dialects;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
@@ -417,17 +417,17 @@
 		};
 
         A10000000000000000000041 = {isa = XCBuildConfiguration; buildSettings = {APPLICATION_EXTENSION_API_ONLY = YES; CODE_SIGN_ENTITLEMENTS = AudioShare/AudioShare.entitlements;
-                CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 50300; GENERATE_INFOPLIST_FILE = NO;
+                CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 50301; GENERATE_INFOPLIST_FILE = NO;
                 INFOPLIST_FILE = AudioShare/Info.plist; IPHONEOS_DEPLOYMENT_TARGET = 15.0;
                 LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@executable_path/../../Frameworks");
-                MARKETING_VERSION = 5.3.0; PRODUCT_BUNDLE_IDENTIFIER = top.yzup.dialects.AudioShare;
+                MARKETING_VERSION = 5.3.1; PRODUCT_BUNDLE_IDENTIFIER = top.yzup.dialects.AudioShare;
                 PRODUCT_NAME = "$(TARGET_NAME)"; SKIP_INSTALL = YES; SWIFT_VERSION = 5.0;
                 TARGETED_DEVICE_FAMILY = "1,2"; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; }; name = Debug; };
         A10000000000000000000042 = {isa = XCBuildConfiguration; buildSettings = {APPLICATION_EXTENSION_API_ONLY = YES; CODE_SIGN_ENTITLEMENTS = AudioShare/AudioShare.entitlements;
-                CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 50300; GENERATE_INFOPLIST_FILE = NO;
+                CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 50301; GENERATE_INFOPLIST_FILE = NO;
                 INFOPLIST_FILE = AudioShare/Info.plist; IPHONEOS_DEPLOYMENT_TARGET = 15.0;
                 LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@executable_path/../../Frameworks");
-                MARKETING_VERSION = 5.3.0; PRODUCT_BUNDLE_IDENTIFIER = top.yzup.dialects.AudioShare;
+                MARKETING_VERSION = 5.3.1; PRODUCT_BUNDLE_IDENTIFIER = top.yzup.dialects.AudioShare;
                 PRODUCT_NAME = "$(TARGET_NAME)"; SKIP_INSTALL = YES; SWIFT_VERSION = 5.0;
                 TARGETED_DEVICE_FAMILY = "1,2";}; name = Release; };
 
