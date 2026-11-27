@@ -98,9 +98,9 @@ public class MainActivity extends BridgeActivity {
         PathInterpolator easeOut = new PathInterpolator(0.22f, 1f, 0.36f, 1f);
 
         if (logo != null) {
-            logo.setScaleX(1.04f);
-            logo.setScaleY(1.04f);
-            logo.animate().scaleX(1f).scaleY(1f).setDuration(320).setInterpolator(easeOut).start();
+            logo.setScaleX(1.03f);
+            logo.setScaleY(1.03f);
+            logo.animate().scaleX(1f).scaleY(1f).setDuration(360).setInterpolator(easeOut).start();
         }
         if (brush != null) {
             brush.setAlpha(0f);
@@ -222,15 +222,24 @@ public class MainActivity extends BridgeActivity {
         }
 
         PathInterpolator easeOut = new PathInterpolator(0.22f, 1f, 0.36f, 1f);
-        float liftPx = -36f * getResources().getDisplayMetrics().density;
-        View content = overlay.findViewById(R.id.launch_content);
-        if (content != null) {
-            content.animate()
-                .translationY(liftPx)
+        float density = getResources().getDisplayMetrics().density;
+        View logo = overlay.findViewById(R.id.launch_logo);
+        View footer = overlay.findViewById(R.id.launch_footer);
+        if (logo != null) {
+            logo.animate()
+                .translationY(-28f * density)
                 .scaleX(0.94f)
                 .scaleY(0.94f)
                 .alpha(0f)
                 .setDuration(340)
+                .setInterpolator(easeOut)
+                .start();
+        }
+        if (footer != null) {
+            footer.animate()
+                .translationY(16f * density)
+                .alpha(0f)
+                .setDuration(320)
                 .setInterpolator(easeOut)
                 .start();
         }
