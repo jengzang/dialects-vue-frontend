@@ -10,7 +10,7 @@ export const DEFAULT_TILE_CACHE_OPTIONS = Object.freeze({
   touchThrottleMs: 60 * 1000, // 1 minute
 })
 
-const registeredMaplibreInstances = new WeakSet()
+const registeredHandlers = new WeakMap()
 
 function createAbortError(reason) {
   if (reason instanceof Error) return reason
@@ -332,35 +332,34 @@ export function createIndexedDbTileStore(options = {}) {
 const defaultTileStore = createIndexedDbTileStore()
 const defaultCorsFallbackOrigins = new Set()
 
+function isNonImageContentType(contentType) {
+  return /^(text\/|application\/(json|xml|xhtml))/i.test(String(contentType || '').trim())
+}
+
 export function createTileCacheProtocolHandler(options = {}) {
   const store = options.store || defaultTileStore
   const fetchImpl = options.fetch || (typeof fetch !== 'undefined' ? fetch.bind(globalThis) : null)
   const loadImageImpl = options.loadImage || loadImageElement
   const corsFallbackOrigins = options.corsFallbackOrigins || defaultCorsFallbackOrigins
   const protocol = options.protocol || TILE_CACHE_PROTOCOL
+  const getFallbackUrl = typeof options.getFallbackUrl === 'function' ? options.getFallbackUrl : null
 
-  return async (params, abortController) => {
-    const rawUrl = unwrapTileCacheUrl(params?.url, protocol)
-    const origin = getSafeOrigin(rawUrl)
+  async function requestSingleUrl(url, abortController) {
+    const origin = getSafeOrigin(url)
 
     if (origin && corsFallbackOrigins.has(origin)) {
-      const image = await loadImageImpl(rawUrl, abortController)
-      return { data: image }
-    }
-
-    const cached = await store.get(rawUrl).catch(() => null)
-    if (cached?.data) {
-      return { data: cached.data }
+      const image = await loadImageImpl(url, abortController)
+      return { data: image, cacheable: false }
     }
 
     if (!fetchImpl) {
-      const image = await loadImageImpl(rawUrl, abortController)
-      return { data: image }
+      const image = await loadImageImpl(url, abortController)
+      return { data: image, cacheable: false }
     }
 
     let response
     try {
-      response = await fetchImpl(rawUrl, {
+      response = await fetchImpl(url, {
         signal: abortController?.signal,
         mode: 'cors',
       })
@@ -369,22 +368,57 @@ export function createTileCacheProtocolHandler(options = {}) {
         throw fetchError
       }
       // CORS-blocked or fetch-incompatible tile origins fall back to direct Image loading.
-      const image = await loadImageImpl(rawUrl, abortController)
+      const image = await loadImageImpl(url, abortController)
       if (origin) {
         corsFallbackOrigins.add(origin)
       }
-      return { data: image }
+      return { data: image, cacheable: false }
     }
 
     if (!response.ok) {
-      throw new Error(`Tile fetch error (${response.status}): ${rawUrl}`)
+      throw new Error(`Tile fetch error (${response.status}): ${url}`)
+    }
+
+    const contentType = response.headers?.get?.('content-type') || ''
+    if (isNonImageContentType(contentType)) {
+      throw new Error(`Tile fetch returned non-image content (${contentType}): ${url}`)
     }
 
     const buffer = await response.arrayBuffer()
-    const contentType = response.headers?.get?.('content-type') || ''
-    void store.put(rawUrl, buffer, contentType)
+    if (!buffer || buffer.byteLength === 0) {
+      throw new Error(`Tile fetch returned empty payload: ${url}`)
+    }
 
-    return { data: buffer }
+    return { data: buffer, contentType, cacheable: true }
+  }
+
+  return async (params, abortController) => {
+    const rawUrl = unwrapTileCacheUrl(params?.url, protocol)
+
+    const cached = await store.get(rawUrl).catch(() => null)
+    if (cached?.data) {
+      return { data: cached.data }
+    }
+
+    let result
+    try {
+      result = await requestSingleUrl(rawUrl, abortController)
+    } catch (primaryError) {
+      if (abortController?.signal?.aborted || primaryError?.name === 'AbortError') {
+        throw primaryError
+      }
+      const fallbackUrl = getFallbackUrl?.(rawUrl)
+      if (!fallbackUrl || fallbackUrl === rawUrl) {
+        throw primaryError
+      }
+      result = await requestSingleUrl(fallbackUrl, abortController)
+    }
+
+    if (result.cacheable && result.data instanceof ArrayBuffer) {
+      void store.put(rawUrl, result.data, result.contentType)
+    }
+
+    return { data: result.data }
   }
 }
 
@@ -392,11 +426,25 @@ export function registerMapTileCacheProtocol(maplibreglInstance, options = {}) {
   if (typeof maplibreglInstance?.addProtocol !== 'function') {
     return false
   }
-  if (!registeredMaplibreInstances.has(maplibreglInstance)) {
-    const protocol = options.protocol || TILE_CACHE_PROTOCOL
-    maplibreglInstance.addProtocol(protocol, createTileCacheProtocolHandler(options))
-    registeredMaplibreInstances.add(maplibreglInstance)
+  const existing = registeredHandlers.get(maplibreglInstance)
+  if (existing) {
+    if (typeof options.getFallbackUrl === 'function') {
+      existing.getFallbackUrl = options.getFallbackUrl
+    }
+    return true
   }
+  const protocol = options.protocol || TILE_CACHE_PROTOCOL
+  const state = {
+    getFallbackUrl: typeof options.getFallbackUrl === 'function' ? options.getFallbackUrl : null,
+  }
+  maplibreglInstance.addProtocol(
+    protocol,
+    createTileCacheProtocolHandler({
+      ...options,
+      getFallbackUrl: (url) => state.getFallbackUrl?.(url) ?? null,
+    })
+  )
+  registeredHandlers.set(maplibreglInstance, state)
   return true
 }
 

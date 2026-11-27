@@ -1,4 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
+
+vi.mock('maplibre-gl', () => ({
+  default: {
+    addProtocol: vi.fn(),
+  },
+}))
+
 import {
   TILE_CACHE_PROTOCOL,
   createIndexedDbTileStore,
@@ -290,5 +297,75 @@ describe('map tile cache (addProtocol + IndexedDB LRU)', () => {
     expect(mockMaplibre.addProtocol).toHaveBeenCalledTimes(1)
     expect(mockMaplibre.addProtocol).toHaveBeenCalledWith(TILE_CACHE_PROTOCOL, expect.any(Function))
     expect(registerMapTileCacheProtocol({})).toBe(false)
+  })
+
+  it('retries with fallback URL when primary tile request fails or returns empty/non-image, and caches result under primary URL', async () => {
+    const store = createIndexedDbTileStore({
+      indexedDB: createMockIndexedDB(),
+      dbName: 'test-fallback-db',
+    })
+
+    const fetchMock = vi.fn(async (url) => {
+      if (url.includes('tk=primary')) {
+        return {
+          ok: true,
+          status: 200,
+          headers: { get: () => 'application/json' },
+          arrayBuffer: async () => makeBytes(12, 0),
+        }
+      }
+      return {
+        ok: true,
+        status: 200,
+        headers: { get: () => 'image/png' },
+        arrayBuffer: async () => makeBytes(16, 77),
+      }
+    })
+
+    const handler = createTileCacheProtocolHandler({
+      store,
+      fetch: fetchMock,
+      corsFallbackOrigins: new Set(),
+      getFallbackUrl: (url) => url.replace('tk=primary', 'tk=fallback'),
+    })
+
+    const primaryWrapped = wrapTileUrlWithCacheProtocol(
+      'https://t0.tianditu.gov.cn/vec_w/wmts?TILECOL=1&tk=primary'
+    )
+
+    const first = await handler({ url: primaryWrapped }, new AbortController())
+    await flushMicrotasks()
+
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(fetchMock.mock.calls[0][0]).toContain('tk=primary')
+    expect(fetchMock.mock.calls[1][0]).toContain('tk=fallback')
+    expect(new Uint8Array(first.data)[0]).toBe(77)
+
+    // Subsequent call hits IndexedDB directly without hitting primary or fallback again.
+    const second = await handler({ url: primaryWrapped }, new AbortController())
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(new Uint8Array(second.data)[0]).toBe(77)
+  })
+
+  it('resolves TianDiTu fallback key by platform (web vs iOS/Android)', async () => {
+    const { resolveTiandituFallbackUrl } = await import('@/utils/map/MapSource.js')
+    const baseUrl =
+      'https://t0.tianditu.gov.cn/vec_w/wmts?TILECOL=1&tk=9a516b0f2a8179bb68f73172cff4bd22'
+
+    // Web (default jsdom)
+    expect(resolveTiandituFallbackUrl(baseUrl)).toBe(
+      'https://t0.tianditu.gov.cn/vec_w/wmts?TILECOL=1&tk=938f67853b2e094b47c97b5e6c8f5af7'
+    )
+
+    // Native iOS / Android
+    window.Capacitor = { getPlatform: () => 'ios' }
+    expect(resolveTiandituFallbackUrl(baseUrl)).toBe(
+      'https://t0.tianditu.gov.cn/vec_w/wmts?TILECOL=1&tk=d487273f17220e08e5a97805e5b710ea'
+    )
+    window.Capacitor = { getPlatform: () => 'android' }
+    expect(resolveTiandituFallbackUrl(baseUrl)).toBe(
+      'https://t0.tianditu.gov.cn/vec_w/wmts?TILECOL=1&tk=d487273f17220e08e5a97805e5b710ea'
+    )
+    delete window.Capacitor
   })
 })

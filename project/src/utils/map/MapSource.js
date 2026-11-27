@@ -1,7 +1,52 @@
 import maplibregl from 'maplibre-gl';
+import { getCurrentRuntimePlatform } from '@/platform/runtime.js';
 import { registerMapTileCacheProtocol, wrapTileUrlWithCacheProtocol } from './tileCache.js';
 
-const maptilerKey = "HSnYXzpfPRlVp7fkOywW"
+// 统一的地图服务 API Key 配置
+// 天地图：三端默认优先使用 primary；单瓦片请求失败或无有效返回时，按平台自动回退到 fallback（web / native）
+const MAP_API_KEYS = {
+    tianditu: {
+        primary: '9a516b0f2a8179bb68f73172cff4bd22',
+        fallback: {
+            web: '938f67853b2e094b47c97b5e6c8f5af7',
+            native: 'd487273f17220e08e5a97805e5b710ea',
+        },
+    },
+    maptiler: {
+        web: 'HSnYXzpfPRlVp7fkOywW',
+        native: 'HSnYXzpfPRlVp7fkOywW',
+    },
+    thunderforest: {
+        web: 'a5dd6a2f1c934394bce6b0fb077203eb',
+        native: 'a5dd6a2f1c934394bce6b0fb077203eb',
+    },
+};
+
+const isNativeRuntime = () => getCurrentRuntimePlatform().container === 'native-webview';
+
+const resolveMapApiKey = (provider) => {
+    const keys = MAP_API_KEYS[provider];
+    if (!keys) return '';
+    return isNativeRuntime() ? (keys.native || keys.web) : (keys.web || keys.native);
+};
+
+const resolveTiandituFallbackKey = () => {
+    const fallback = MAP_API_KEYS.tianditu.fallback;
+    return isNativeRuntime() ? (fallback.native || fallback.web) : (fallback.web || fallback.native);
+};
+
+export const resolveTiandituFallbackUrl = (rawUrl) => {
+    if (typeof rawUrl !== 'string' || !rawUrl.includes('tianditu.gov.cn')) return null;
+    const primary = MAP_API_KEYS.tianditu.primary;
+    const fallbackKey = resolveTiandituFallbackKey();
+    if (!fallbackKey || fallbackKey === primary) return null;
+    const primaryToken = `tk=${primary}`;
+    if (!rawUrl.includes(primaryToken)) return null;
+    return rawUrl.replace(primaryToken, `tk=${fallbackKey}`);
+};
+
+const buildTiandituWmtsUrl = (layer) =>
+    `https://t0.tianditu.gov.cn/${layer}_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=${layer}&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=${MAP_API_KEYS.tianditu.primary}`;
 
 // 统一的地图样式配置
 const mapStyleConfigData = {
@@ -9,23 +54,15 @@ const mapStyleConfigData = {
     tianditu: {
         name: '天地图',
         custom: true,
-        tiles: [
-            'https://t0.tianditu.gov.cn/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=938f67853b2e094b47c97b5e6c8f5af7',
-        ],
-        labelTiles: [
-            'https://t0.tianditu.gov.cn/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=9a516b0f2a8179bb68f73172cff4bd22',
-        ],
+        tiles: () => [buildTiandituWmtsUrl('vec')],
+        labelTiles: () => [buildTiandituWmtsUrl('cva')],
     },
 
     tianditu_img: {
         name: '天地图卫星图',
         custom: true,
-        tiles: [
-            'https://t0.tianditu.gov.cn/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=9a516b0f2a8179bb68f73172cff4bd22',
-        ],
-        labelTiles: [
-            'https://t0.tianditu.gov.cn/cia_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cia&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&tk=9a516b0f2a8179bb68f73172cff4bd22',
-        ],
+        tiles: () => [buildTiandituWmtsUrl('img')],
+        labelTiles: () => [buildTiandituWmtsUrl('cia')],
     },
 
     // 高德地图服务
@@ -48,22 +85,22 @@ const mapStyleConfigData = {
     maptiler: {
         name: 'MapTiler街道图',
         custom: false,
-        url: `https://api.maptiler.com/maps/streets-v2/style.json?key=${maptilerKey}`,
+        url: () => `https://api.maptiler.com/maps/streets-v2/style.json?key=${resolveMapApiKey('maptiler')}`,
     },
     maptiler_basic: {
         name: 'MapTiler基础图',
         custom: false,
-        url: `https://api.maptiler.com/maps/basic-v2/style.json?key=${maptilerKey}`,
+        url: () => `https://api.maptiler.com/maps/basic-v2/style.json?key=${resolveMapApiKey('maptiler')}`,
     },
     maptiler_landscape: {
         name: 'MapTiler地形图',
         custom: false,
-        url: `https://api.maptiler.com/maps/landscape/style.json?key=${maptilerKey}`,
+        url: () => `https://api.maptiler.com/maps/landscape/style.json?key=${resolveMapApiKey('maptiler')}`,
     },
     maptiler_streets: {
         name: 'MapTiler经典街道',
         custom: false,
-        url: `https://api.maptiler.com/maps/streets/style.json?key=${maptilerKey}`,
+        url: () => `https://api.maptiler.com/maps/streets/style.json?key=${resolveMapApiKey('maptiler')}`,
     },
 
     // Stadia Maps 地图服务
@@ -121,8 +158,8 @@ const mapStyleConfigData = {
     thunderforest_cycle: {
         name: 'OpenCycle地形图',
         custom: true,
-        tiles: [
-            'http://a.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=a5dd6a2f1c934394bce6b0fb077203eb', // OpenCycle地形图
+        tiles: () => [
+            `http://a.tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=${resolveMapApiKey('thunderforest')}`, // OpenCycle地形图
         ],
     },
 };
@@ -132,15 +169,22 @@ export const mapStyleConfig = Object.fromEntries(
     Object.entries(mapStyleConfigData).map(([key, config]) => [key, config.name])
 );
 
+const resolveConfigValue = (value) => (typeof value === 'function' ? value() : value);
+
 export const mapStyle = (name) => {
     const config = mapStyleConfigData[name];
 
     if (!config.custom) {
-        return config.url;
+        return resolveConfigValue(config.url);
     }
 
-    const useTileCache = registerMapTileCacheProtocol(maplibregl);
-    const resolveTileUrls = (tiles) => (useTileCache ? tiles.map((url) => wrapTileUrlWithCacheProtocol(url)) : tiles);
+    const useTileCache = registerMapTileCacheProtocol(maplibregl, {
+        getFallbackUrl: resolveTiandituFallbackUrl,
+    });
+    const resolveTileUrls = (tiles) => {
+        const list = resolveConfigValue(tiles);
+        return useTileCache ? list.map((url) => wrapTileUrlWithCacheProtocol(url)) : list;
+    };
 
     const sources = {
         [name]: {
